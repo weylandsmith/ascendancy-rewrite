@@ -3,7 +3,7 @@
 
 phase: P1
 milestone: 1  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
-updated: 2026-10-03T09:15
+updated: 2026-10-03T09:55
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 468 files, Ghidra+MCP wired, plan written"
   - "crash: 2026-10-03T01:49 session 20261003_003843 died on 'Session DB append_message
@@ -14,17 +14,23 @@ turn_log_recent:
      'Are you sure to quit anyway now? / y/n:' echo loop — a dosbox-x autoquit prompt
      being spammed, zero research value). Deleted; head salvaged to
      .logs/dosbox_probe_salvaged.log. Frees 12 GB."
+  - "P1b: scripts/table_probe.py written; docs/re/tables.md generated (deterministic,
+     sha256 stable across reruns). .bin layout SOLVED (16B hdr + N x 24B / 6 x u32,
+     exact 7/7). Seed's '.tsv = text form of .bin' claim FALSIFIED. OQ-001 CLOSED:
+     offset table is N not N+1; fixed cob.py which had silently dropped each
+     archive's last file (468 -> 471 extracted, existing 468 byte-identical)."
 
 ## CURRENT FOCUS
-P1 data formats, starting with the ascend02 .tsv/.bin table pair. P1b NEVER STARTED
-(no scripts/tsv_probe.py, no docs/re/ anywhere). The previous turn burned itself on
-the Ghidra import below and then hit ENOSPC mid-P2.
+P1 data formats. .bin tables are done (docs/re/tables.md). The .tsv container
+grammar and "which file does the exe load" are NOT resolvable from data alone —
+they need Ghidra xrefs, so they are carried into P2 as OQ-004 rather than guessed.
 
 ## NEXT ACTION (exactly one)
-Write scripts/tsv_probe.py: parse all .tsv tables in extracted/ascend02
-(delimiter, header rows, column count per line, types); dump column
-inventory to docs/re/tables.md. Cross-check one row of galactic.tsv
-against galactic.bin bytes.
+P1c: write scripts/shp_probe.py for extracted/ascend01/data/*.shp (plus
+ascend02/data/dkship*.shp, lgrace*.shp): header fields, record/frame encoding,
+palette handling; render sample shapes to PNG under docs/assets/ and document in
+docs/re/shp.md. Closes OQ-005. OQ-004 and P2's Ghidra import are deliberately
+deferred behind this because P1c needs no binary RE; see PLAN ordering rule.
 
 ## KNOWN-ISSUES / PARKING LOT
 - P2 BLOCKER (do not retry the old way): the Watcom LE payload at
@@ -69,7 +75,9 @@ See docs/PLAN.md P6 + goal contract. All P0-P6 items checked below.
 ## CHECKLIST
 [P0] env verified
 [x] P1a .cob format spec (docs/FINDINGS.md)
-[ ] P1b .tsv/.bin tables
+[~] P1b .tsv/.bin tables — .bin SPEC COMPLETE (docs/re/tables.md, 7/7 exact);
+        .tsv characterised as binary string blobs, container grammar OPEN (OQ-004,
+        needs Ghidra). Seed claim that .tsv = text .bin is falsified in FINDINGS 1b.
 [ ] P1c .shp sprites
 [ ] P1d .gam saves
 [ ] P1e FLIC/audio inventory

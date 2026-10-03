@@ -1,13 +1,13 @@
 # OPEN QUESTIONS — unknowns to resolve, never guess-fill
 Format: ID | area | question | status | resolution (when closed)
 
-OQ-001 | cob   | is the offset table N or N+1 u32 entries? last offset vs EOF | open | 
-OQ-002 | flc   | confirm Autodesk FLC frame table by parsing; is it one container? | open |
-OQ-003 | gam   | resume.gam layout; does it embed a version stamp matching exe build? | open |
-OQ-004 | tables| .tsv vs .bin: which does the exe actually load? column types/types | open |
-OQ-005 | shp   | .shp record encoding (RLE? palette indices?) + display size | open |
-OQ-006 | audio | music.txt -> which actual audio codec in data files (.bam?) | open |
-OQ-007 | text  | .txt encodings CP437 vs CP1252; line-ending mix; control codes | open |
-OQ-008 | exe   | overlay/memory model of Watcom flat binary in Ghidra (verify func count) | open |
-OQ-009 | ai    | per-race AI personalities: data-driven (race*.dip) or code | open |
+OQ-001 | cob   | is the offset table N or N+1 u32 entries? last offset vs EOF | CLOSED 2026-10-03 | It is N, not N+1. Proof on all 3 archives: dir_end==4+50*N (fixed-50 name records), off[0]==dir_end+4*N exactly, blob sizes sum exactly to filesize-(4+50N+4N), last entry runs to EOF. Seed extractor's N+1 fallback silently dropped each archive's last file; fixed in scripts/cob.py (471 files extracted, 468 pre-existing unchanged).
+OQ-002 | flc   | confirm Autodesk FLC frame table by parsing; is it one container? | open | NOTE 2026-10-03: ascend02 also holds data\intro65a.flc (19,054,614 B) — recovered by the cob.py fix; parse both.
+OQ-003 | gam   | resume.gam layout; does it embed a version stamp matching exe build? | open | 
+OQ-004 | tables| which of name.bin/name.tsv does the exe load, and what is the .tsv container grammar? | open (narrowed 2026-10-03) | SEED CLAIM FALSIFIED: .tsv are NOT text renderings of .bin. .bin = 16B hdr (u32 60,0,0,0) + N x 24B (6 x u32 LE), exact 7/7 — see docs/re/tables.md. .tsv = sparse binary string blobs (56-59% NUL, entropy 2.55-3.0), tech-name run at species.tsv+182 shared by all 7 .tsv, absent from every .bin. Needs Ghidra xrefs on the loader to resolve which is read.
+OQ-005 | shp   | .shp record encoding (RLE? palette indices?) + display size | open | 
+OQ-006 | audio | music.txt -> which actual audio codec in data files (.bam?) | open | NOTE: ascend01 holds .voc files; ascend02 holds .raw theme/race/victory files (uncompressed PCM candidate).
+OQ-007 | text  | .txt encodings CP437 vs CP1252; line-ending mix; control codes | open | 
+OQ-008 | exe   | overlay/memory model of Watcom flat binary in Ghidra (verify func count) | open | PARTIAL 2026-10-03: LE payload @ MZ+0x3c (=0x2a50), 576,643 B; auto-import stops at 0x2a4e -> 0 functions; 'watcom' compiler spec does not exist in Ghidra 12.1.4 (valid: windows/clangwindows/gcc/borlandcpp/borlanddelphi/golang). Load raw at imagebase w/ gcc spec. See STATE.md.
+OQ-009 | ai    | per-race AI personalities: data-driven (race*.dip) or code | open | 
 OQ-010 | rules | combat formula constants (to be lifted from Ghidra P2) | open |

@@ -1,29 +1,57 @@
 # FINDINGS — verified reverse-engineering facts
 Every entry cites its evidence. [verified] = observed directly in bytes/tools.
 
-## 1. .cob resource archives [verified 2026-10-03, scripts/cob.py]
+## 1. .cob resource archives [verified 2026-10-03, scripts/cob.py; OQ-001 CLOSED]
 Layout (all LE):
   offset 0: u32 filecount N
-  then N name records: ASCII filename, NUL-terminated, zero-padded so the
-    next record starts on a 4-byte boundary (ascend00: 'batfx.txt' + 37 NULs
-    -> next name at 0x36; padding pattern observed on all entries)
-  then (N+1) u32 offsets: monotonic byte offsets into this file; entry i
-    spans [off[i], off[i+1]). ascend00 N=54: dir ends 0xA90, first offsets
-    2920, 6797, 6848 ... last == file size semantics TBD (extractor accepts
-    best-fit N or N+1 tables; verified: extracted text is well-formed).
+  then N FIXED-50-BYTE name records: ASCII filename NUL-padded to exactly 50 B.
+    Proof: dir_end == 4 + 50*N for all three archives (ascend00 4+50*54=0xA90,
+    ascend01 4+50*328=0x4014, ascend02 4+50*89=0x1166) and an offset-table u32
+    starts at each of those. Name lengths cover all residues mod 4, so the
+    padding is fixed-50, NOT align-to-4.
+  then N u32 offsets (NOT N+1 — see below); entry i spans [off[i], off[i+1]),
+    last entry spans [off[N-1], EOF].
+  Verified per archive: table strictly increasing; off[0] == 4+50*N+4*N exactly
+    (data area starts immediately after the table); blob sizes sum exactly to
+    filesize - (4 + 50N + 4N). OQ-001 CLOSED.
+  BUG FIXED 2026-10-03: the seed extractor tried N-then-N+1 and used o[i+1] per
+    entry, so it silently dropped each archive's LAST file (ascend00/static.txt
+    5,685 B; ascend01/data/intro01.raw 479,670 B; ascend02/data/intro65a.flc
+    19,054,614 B). Extraction now yields 471 files (was 468); the other 468 are
+    byte-identical to before (0 mismatches in a full re-extract diff).
 NO compression anywhere (extracted .txt files are plain CP437/ASCII;
 entropy < 5.2 on text entries).
 Contents:
   ascend00.cob (54 files): plaintext .txt/.dip — help.txt (44 KB),
     gizhelp.txt, gizmos.txt, history.txt, cosmos.txt ("STARS 50 /
     RACES 5 / SEED -1"), race00..race19.dip, music.txt, planitem.txt,
-    subtitle.txt, tutindex.txt, ship.txt, static.txt, static? , beginnew.txt,
-    galactic.txt, end-*.txt (ending texts).
+    subtitle.txt, tutindex.txt, ship.txt, static.txt, beginnew.txt,
+    galactic.txt, restree.txt, starstat.txt, end-*.txt (ending texts).
+    The same-stem .txt (battle/beginnew/galactic/planet/ship/species) are
+    HELP/SCREEN TEXT with `text`/`endtext`/`pos`/`help`/`button` keywords —
+    they are NOT data tables despite matching the ascend02 stems.
   ascend01.cob (328 entries): data\NNname.shp shape sets (opening, status,
-    negot, intel, ...), .tmp config blobs, misc.
+    negot, intel, ...), .tmp config blobs, .voc audio, misc.
   ascend02.cob (89 entries): PAIRED tables name.bin + name.tsv
     (battle, beginnew, galactic, planet, ship, species, tutintro) +
-    data\ subdir (contents TBD).
+    data\ subdir (.shp dkship00..20/lgrace00..20/9endgame, .raw theme00..04/
+    race00..08/victory, intro65a.flc, intro.fnt, logo.gif, .tmp).
+
+## 1b. ascend02 table pair [verified 2026-10-03, scripts/table_probe.py]
+`name.bin` = 16-byte header (u32 constant 60; u32[3] zero — identical in all
+7) + N x 24-byte records of 6 x u32 LE. Stride 24 is exact (body%24==0 on
+7/7; autocorrelation ranks 24 above 48/72/96). Record counts: battle 2084,
+beginnew 767, galactic 1028, planet 3463, ship 2169, species 1198,
+tutintro 384. Full column inventory in docs/re/tables.md. cols 0/1/3/4 fit
+u16 (high half always zero); col 2 contains recurring 0xFFFF and col 5
+sometimes 0xFFFFFFFF -> keep as u32 pending Ghidra.
+`name.tsv` = NOT TEXT despite the extension and NOT a text form of the .bin
+(SEED CLAIM FALSIFIED). Evidence: 56-59% NUL bytes; entropy 2.55-3.00 (rules
+out compression); lcp(x.tsv, x.bin)==0 for all 7; no .bin is a substring of
+its .tsv; a 40-byte tech-name run at species.tsv+182 ("Orbital Structures...")
+appears in ALL SEVEN .tsv and in NO .bin. They are sparse binary blobs of
+NUL-delimited strings (tech names / UI labels). Container grammar + which file
+the exe loads remain OQ-004.
 
 ## 2. Executables [verified]
 ascend.exe 587,475 B: MZ DOS header; strings show "WATCOM C Run-Time

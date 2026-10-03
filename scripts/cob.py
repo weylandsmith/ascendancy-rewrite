@@ -28,20 +28,27 @@ def read_dir(p):
     return b, n, names, off
 
 def offsets(b, n, dir_end, filesize):
-    """Heuristic: table is u32 LE; try N then N+1 entries; accept a table whose
-    values are strictly increasing, all < filesize, and whose span best matches
-    the data area (dir_end .. filesize)."""
-    best = None
-    for cnt in (n, n + 1):
-        vals = list(struct.unpack_from(f'<{cnt}I', b, dir_end))
-        if not all(vals[i] < vals[i + 1] for i in range(len(vals) - 1)):
-            continue
-        lo = vals[0] if cnt == n else vals[0]
-        # score: how well [dir_end+4*cnt, filesize] aligns with first data offset
-        gap = abs(vals[0] - (dir_end + 4 * cnt))
-        if best is None or gap < best[0]:
-            best = (gap, vals)
-    return best[1] if best else None
+    """Offset table is exactly N u32 LE entries (OQ-001 CLOSED, verified on all
+    three shipped archives): vals[0] == dir_end + 4*N (i.e. the table is immediately
+    followed by the data area) and the LAST entry's blob runs to EOF.
+
+    Proof for each of ascend00/01/02.cob: table strictly increasing,
+    vals[0] == dir_end+4*N exactly, and sum of blob sizes with last->EOF equals
+    filesize - (dir_end + 4*N) exactly.
+
+    The previous N-then-N+1 heuristic was wrong on both counts: it could pick N+1
+    (reading a data byte as an offset) and, even when it picked N, callers used
+    o[i+1] for every entry, so the final blob was never emitted -- each archive
+    silently lost its last file (ascend02: data\\intro65a.flc, 19,054,614 B).
+
+    Returns a list of N+1 values where the synthetic trailing element is `filesize`,
+    so callers can keep using o[i], o[i+1]."""
+    vals = list(struct.unpack_from(f'<{n}I', b, dir_end))
+    if not all(vals[i] < vals[i + 1] for i in range(n - 1)):
+        return None
+    if vals[0] != dir_end + 4 * n or vals[-1] >= filesize:
+        return None
+    return vals + [filesize]
 
 def entropy(d):
     if not d: return 0.0

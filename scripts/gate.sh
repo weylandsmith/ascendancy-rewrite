@@ -29,6 +29,17 @@ for f in docs/PLAN.md docs/STATE.md docs/FINDINGS.md; do
   [ -s "$ROOT/$f" ] || err "$f missing or empty"
 done
 
+# 3b. P1b invariant: .bin tables parse at stride 24, and the .cob extractor must
+# emit ALL directory entries (it silently dropped the last file of every archive
+# until 2026-10-03, so count is asserted, not trusted).
+if /usr/bin/python3 "$ROOT/scripts/table_probe.py" --out /tmp/gate_tables.md >/tmp/gate_probe.log 2>&1; then
+  [ "$(ls "$ROOT/extracted/ascend00" | wc -l)" -ge 54 ] || err "ascend00 extracted <54 files"
+  [ "$(find "$ROOT/extracted/ascend02" -type f | wc -l)" -ge 89 ] || err "ascend02 extracted <89 files"
+  [ -f "$ROOT/extracted/ascend02/data/intro65a.flc" ] || err "ascend02/data/intro65a.flc missing (last-entry regression)"
+else
+  tail -20 /tmp/gate_probe.log; err "table_probe.py failed (.bin stride invariant broken?)"
+fi
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}
