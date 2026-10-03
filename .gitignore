@@ -1,0 +1,11 @@
+# Ascendancy RE Project
+build/
+build-*/
+rewrite/build/
+.logs/
+__pycache__/
+*.pyc
+.venv/
+.cache/
+.cache_check
+*.log
