@@ -6,7 +6,7 @@
 
 phase: P4
 milestone: 3  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
-updated: 2026-10-04T07:40
+updated: 2026-10-04T09:10
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -60,27 +60,39 @@ turn_log_recent:
      II58 III46 IV31 V13 = 223, 75/75 bases in names.txt) and corrected.
      Also found galactic.tsv carries research-tree strings too -> .tsv are
      per-context string pools (OQ-004 unchanged, corroborated)."
+  - "P4 gizmos/economy (this turn): gizmos.txt + planitem.txt both carry the
+     VENDORS OWN format docs above '#'. 76 gizmos (10W/6Sh/5Dr/6Sc/5G/44Spec;
+     damage 1..13, shields 1..5, all gated by restree rows - third independent
+     cross-validation of restree numbering: FergnatzLens->44, Plasmatron->29).
+     39 items = 33 gated + 5x255 + 1x254 (254 UNDOCUMENTED sentinel, record
+     verbatim). docs/re/gizmos.md + docs/re/economy.md + src/game/economy.* +
+     6 tests (25/25), gate 3j, OQ-014; OQ-010 narrowed (device constants in
+     data, application formula not). THREE self-caught errors this turn, all
+     caught by controls or raw-data re-checks: (1) vacuous range check -
+     testing v[7] for tech-range passes because flag bits 0..7 live in
+     [0,106); (2) field-index drift - v[6] vs v[7] only differs on the 19
+     len>8 rows, semantics decide (Shield->Superconductivity vs nonsense
+     Shield->Spacetime Surfing); (3) test constant typed from memory (Ship
+     cost 30 vs real 20 - the ADJACENT row's value)."
 
 ## CURRENT FOCUS
-P4 systems, R2-first per docs/BLOCKED.md. Mapgen DONE, research DONE
-(docs/re/mapgen.md, docs/re/research.md + 19/19 tests). Systems whose
-constants are verifiable from extracted files go first: economy/production
-(planitem.txt + name.bin), ships (ship.txt + species.tsv), AI weights
-(race*.dip DIPVALUES; OQ-009 closed data-side). Systems needing exact
-original formulas (combat OQ-010, save format OQ-003) are blocked pending
-R1: implement behaviour-plausible from the manual (docs/assets/manual-jpg/,
-23 pp rasterised) and mark every choice in OPEN-QUESTIONS.
+P4 systems, R2-first per docs/BLOCKED.md. DONE: mapgen, research, gizmos,
+economy/items (docs/re/{mapgen,research,gizmos,economy}.md + 25/25 tests).
+Next data-verifiable systems: species/players (race*.dip weights + specnum
+blocks in history.txt: 21 species each with a 'power' blurb), production
+turn mechanics (item IND/RES/PROS columns + gizmo industry adds to ship
+build), UI map (windows.txt: 2,067 rows of TYPE/NAME/X0/Y0 - a full window
+layout grammar), subtitles (subtitle.txt SUBTITLE/TEXT/FRAME_START/FRAME_END
+for the intro FLIC). Formula-blocked pending R1: combat application (OQ-010),
+save format (OQ-003).
 
 ## NEXT ACTION (exactly one)
-P4 ships/economy: probe extracted/ascend00/ship.txt and planitem.txt
-(same CP437/CRLF/0x1A text family — expect a similar row grammar), write
-docs/re/ships.md + docs/re/economy.md with verified/inferred separation,
-then implement rewrite/src/game/{ship,item}.{h,cpp} + tests. Probe first:
-this turn proved two of my own earlier numbers were unreproducible
-(177 planets; "restree has no grammar" from text_probe) — re-measure before
-writing any sentence. If time allows after that, the bounded R1 attempt:
-dosbox-x with a pty per the DOSBOX RULE, targeting a memory dump of the
-data segment (settles OQ-004/005/011 in one shot).
+P4 UI-data + species pass: probe windows.txt (grammar from its own header;
+2,067 rows - is it a complete widget layout spec?) and subtitle.txt, plus
+extract the specnum blocks (specnum/power/name per species 0..20) from
+history.txt. Write docs/re/ui.md + docs/re/species.md, then the loaders +
+tests. Rule from last two turns: every test constant comes from a raw-row
+print, never memory.
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr
@@ -123,8 +135,9 @@ See docs/PLAN.md P6 + goal contract. All P0-P6 items checked below.
 [~] P3 engine skeleton — BUILDS + BOOTS (gate 4/4b). C++17 + SDL2 2.32.4 /
         SDL2_mixer 2.8.1; readers ported 1:1; boots headless AND Xvfb/x11.
         Remaining: render surface + input pump (arrives with P5 UI).
-[~] P4 systems — mapgen DONE (docs/re/mapgen.md, corrected) + research DONE
-        (docs/re/research.md, gate 3i, OQ-013) + 19/19 tests. Remaining:
-        economy, production, ships, combat, AI, diplomacy, UI, audio.
+[~] P4 systems — mapgen + research + gizmos + items DONE (docs/re/{mapgen,
+        research,gizmos,economy}.md; gates 3i/3j; OQ-012..014). 25/25 tests.
+        Remaining: species, UI, turn loop integration, combat application,
+        diplomacy, audio.
 [ ] P5 UI+media parity pass
 [ ] P6 full campaign playable to victory; README

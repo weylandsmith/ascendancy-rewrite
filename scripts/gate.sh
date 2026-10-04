@@ -123,6 +123,17 @@ else
   err "restree_probe.py crashed"
 fi
 
+# 3j. P4 gizmos/economy invariant: the probes' asserted invariants (76 gizmos,
+# 39 items, REQUIRES cross-range, sentinel counts) run on every gate; docs
+# must exist and keep the sentinel fact visible.
+[ -s "$ROOT/docs/re/gizmos.md" ] || err "docs/re/gizmos.md missing"
+[ -s "$ROOT/docs/re/economy.md" ] || err "docs/re/economy.md missing"
+if ! /usr/bin/python3 "$ROOT/scripts/gizmo_probe.py" --quiet; then
+  err "gizmo_probe.py failed its own invariants"
+fi
+grep -q 'Interstellar Trucking' "$ROOT/docs/re/economy.md" \
+  || err "economy.md lost the 254-sentinel record"
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}
