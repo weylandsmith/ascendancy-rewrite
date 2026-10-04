@@ -73,6 +73,7 @@ public:
     Victory victory() const { return victory_; }
     int starsOwned(int owner) const;
     int starOwner(int starId) const { return owner_[starId]; }
+    int driveHopsFor(int owner) const;  // docs/re/ships.md §3 (launch range)
     int techsOwned(int owner) const;
     double resources(int owner) const;
     const std::vector<CampaignEvent>& events() const { return events_; }

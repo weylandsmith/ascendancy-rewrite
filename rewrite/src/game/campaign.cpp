@@ -16,7 +16,10 @@ struct BuildStep {
     const char* name;
     int want;
 };
-const BuildStep kBuildOrder[] = {{"Factory", 2}, {"Laboratory", 1}, {"Agriplot", 2}};
+const BuildStep kBuildOrder[] = {{"Factory", 2}, {"Laboratory", 1},
+                                 {"Agriplot", 2}, {"Shipyard", 1}};
+
+// (member impl below) — see Campaign::driveHopsFor
 
 }  // namespace
 
@@ -81,16 +84,23 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     for (int s = 0; s < n; ++s) {
         if (owner_[s] >= 0) planets_[s].pop = cfg_.initialPop;
     }
-    // First build round on homes happens through normal buildPhase(), but
-    // seed one factory + lab on every home so economies start functional
-    // [documented default]: free because it is the game's opening position
-    // (analogous to the original's starting items; exact start list OQ-016).
+    // Opening position on every home (documented default; tutorial.txt in
+    // ascend00 describes exactly this state: "we ended after beginning
+    // construction of our first Shipyard... Further research has been
+    // completed which will allow building a useful ship"; exact start list
+    // stays OQ-016). Factory+Lab = economy; Shipyard + restree rows
+    // {0 Orbital Structures, 1 Interplanetary Exploration, 2 Tonklin Diary}
+    // = the ability to launch a basic ship (docs/re/ships.md §1,§3).
     for (int s = 0; s < n; ++s) {
         if (owner_[s] < 0) continue;
-        int f = itemId("Factory"), l = itemId("Laboratory");
+        int f = itemId("Factory"), l = itemId("Laboratory"), y = itemId("Shipyard");
         if (f >= 0) planets_[s].items.push_back(f);
         if (l >= 0) planets_[s].items.push_back(l);
+        if (y >= 0) planets_[s].items.push_back(y);
     }
+    if (tree_ && tree_->all().size() > 2)
+        for (auto& techSet : ownedTech)
+            if (techSet.size() > 2) { techSet[0] = true; techSet[1] = true; techSet[2] = true; }
 }
 
 int Campaign::itemId(const std::string& name) const {
@@ -232,31 +242,72 @@ void Campaign::expansionPhase() {
         }
     }
     fleet_.clear();
-    // Launch: each owner with spare industry (>= Ship cost 20 [verified])
-    // claims one adjacent unowned star per owned star, nearest-first by hop
-    // frontier (policy [inferred]).
+    // Launch (docs/re/ships.md §5): precondition = the source star HAS a
+    // Shipyard (vendor tutorial: it "makes building ships possible") and
+    // the target is within the owner's researched drive range (§3). Hull
+    // industry cost 20 [verified planitem row] charged per launch.
     const int shipCost = [&] {
         int id = itemId("Ship");
         return id < 0 ? 20 : (*items_)[id].cost;
     }();
+    const int shipyardId = itemId("Shipyard");
     const int owners = cfg_.aiCount + 1;
     for (int o = 0; o < owners; ++o) {
+        const int hops = driveHopsFor(o);
+        if (hops <= 0) continue;  // no researched drive -> nothing flies (§3)
         for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
             if (owner_[s] != o) continue;
             if (ind_[o] < shipCost) break;  // economy can't spare it
-            const auto nbs = galaxy_.neighbours(static_cast<int>(s));
-            for (int nb : nbs) {
-                bool already = owner_[nb] >= 0;
-                if (!already)
-                    already = std::any_of(fleet_.begin(), fleet_.end(),
-                                          [&](const ShipInTransit& x) { return x.target == nb; });
-                if (already) continue;
-                ind_[o] -= shipCost;
-                fleet_.push_back({o, static_cast<int>(s), nb});
-                break;
+            bool hasYard = shipyardId < 0;
+            if (shipyardId >= 0)
+                for (int it : planets_[s].items)
+                    if (it == shipyardId) { hasYard = true; break; }
+            if (!hasYard) continue;  // docs/re/ships.md §1
+            // BFS frontier up to `hops`, nearest-first.
+            std::vector<int> frontier = galaxy_.neighbours(static_cast<int>(s));
+            std::vector<char> seen(galaxy_.stars.size(), 0);
+            seen[s] = 1;
+            for (int d = 1; d <= hops; ++d) {
+                bool launched = false;
+                std::vector<int> next;
+                for (int nb : frontier) {
+                    if (nb < 0 || nb >= (int)seen.size() || seen[nb]) continue;
+                    seen[nb] = 1;
+                    bool taken = owner_[nb] >= 0;
+                    if (!taken)
+                        taken = std::any_of(fleet_.begin(), fleet_.end(),
+                                            [&](const ShipInTransit& x) { return x.target == nb; });
+                    if (taken) { next.push_back(nb); continue; }
+                    ind_[o] -= shipCost;
+                    fleet_.push_back({o, static_cast<int>(s), nb});
+                    launched = true;
+                    break;
+                }
+                if (launched || d == hops) break;
+                std::vector<int> expand;
+                for (int e : next)
+                    for (int nb2 : galaxy_.neighbours(e)) expand.push_back(nb2);
+                frontier.swap(expand);
             }
         }
     }
+}
+
+int Campaign::driveHopsFor(int owner) const {
+    // docs/re/ships.md §3: launch range = best RESEARCHED drive Level / 2
+    // lane hops, clamped [1,3] (sugar-cube scale = documented default;
+    // drive (level, gate) pairs verified in ships.md §3).
+    int lvl = 0;
+    if (gizmos_ && owner >= 0 && owner < int(ownedTech.size())) {
+        for (const Gizmo& g : *gizmos_) {
+            if (g.cat != GizmoCat::Drive) continue;
+            if (requiresValidTech(g.resReq, tree_->all().size()) &&
+                !ownedTech[owner][g.resReq])
+                continue;
+            if (g.level > lvl) lvl = g.level;
+        }
+    }
+    return lvl > 0 ? std::max(1, std::min(3, lvl / 2)) : 0;
 }
 
 void Campaign::diplomacyPhase() {

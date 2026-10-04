@@ -66,6 +66,7 @@ add_executable(run_tests
   tests/test_campaign.cpp
   tests/test_ui_layout.cpp
   tests/test_audio.cpp
+  tests/test_ships.cpp
   src/ui/layout.cpp
 )
 target_link_libraries(run_tests PRIVATE ascend_core)
