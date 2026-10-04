@@ -29,6 +29,8 @@ include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS} src)
 add_library(ascend_core STATIC
   src/formats/cob.cpp
   src/formats/bin_table.cpp
+  src/game/starstat.cpp
+  src/game/mapgen.cpp
 )
 
 # ---- importer + game ------------------------------------------------------
@@ -43,6 +45,7 @@ add_executable(run_tests
   tests/main.cpp
   tests/test_cob.cpp
   tests/test_bin_table.cpp
+  tests/test_mapgen.cpp
 )
 target_link_libraries(run_tests PRIVATE ascend_core)
 add_test(NAME unit_tests COMMAND run_tests)
