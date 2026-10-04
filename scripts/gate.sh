@@ -105,6 +105,25 @@ if [ "$MS" -ge 3 ] && [ -d "$ROOT/rewrite" ]; then
       "$ROOT/rewrite/build/run_tests" >/tmp/gate_tests.log 2>&1 \
         || { tail -40 /tmp/gate_tests.log; err "unit tests failed"; }
     fi
+    # 4b. Boot smoke test. Runs the REAL binary twice: once with the dummy
+    # video driver and once under Xvfb with x11, because the completion
+    # contract requires an Xvfb boot. Bounds are mandatory — see the DOSBOX
+    # RULE in STATE.md about unbounded log growth.
+    if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
+      timeout 60 "$ROOT/rewrite/build/ascendancy" --headless --turns 3 >/tmp/gate_boot.log 2>&1 \
+        || { tail -20 /tmp/gate_boot.log; err "headless boot failed"; }
+      grep -q '(.bin tables parsed: 7)' /tmp/gate_boot.log \
+        || { tail -20 /tmp/gate_boot.log; err "boot did not parse all 7 .bin tables"; }
+      grep -q '^ok$' /tmp/gate_boot.log || err "headless boot did not complete the turn loop"
+      if command -v xvfb-run >/dev/null 2>&1; then
+        timeout 60 xvfb-run -a "$ROOT/rewrite/build/ascendancy" --turns 2 >/tmp/gate_xvfb.log 2>&1 \
+          || { tail -20 /tmp/gate_xvfb.log; err "xvfb boot failed"; }
+        grep -q 'video driver: x11' /tmp/gate_xvfb.log \
+          || { tail -20 /tmp/gate_xvfb.log; err "xvfb boot did not use the x11 driver"; }
+      else
+        note "xvfb-run unavailable: skipped x11 boot"
+      fi
+    fi
   fi
 fi
 

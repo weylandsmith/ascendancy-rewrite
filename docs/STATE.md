@@ -1,9 +1,9 @@
 # STATE — machine-readable working memory for the loop
 # Update EVERY turn. A fresh session must be able to resume from THIS file alone.
 
-phase: P1
-milestone: 1  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
-updated: 2026-10-03T12:30
+phase: P3
+milestone: 3  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
+updated: 2026-10-04T03:20
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 468 files, Ghidra+MCP wired, plan written"
   - "crash: 2026-10-03T01:49 session 20261003_003843 died on 'Session DB append_message
@@ -36,7 +36,19 @@ turn_log_recent:
      write it back into source (that corrupted and deleted shp_probe.py earlier;
      it was untracked, git had no copy).
 
-## CURRENT FOCUS
+  - "P3 + exe model (this turn): (a) PROVED the LE payload is stored in file =
+     memory order (scripts/le_contiguity_test.py: rel32 call targets resolve
+     76:1 in-page and 135:1 inter-page vs a page-shuffled control), so a raw
+     load at imagebase 0 is valid for control flow; absolute base C is STILL
+     open (OQ-011) because the string-anchor vote is a density artefact.
+     (b) Ghidra facts, all measured here: no LE loader (LinearExecutable.java
+     = NotYetImplementedException stub); NO 'watcom' cspec; headless flag is
+     -cspec, NOT -compiler (the earlier run died with 'Bad argument:
+     -compiler'); MCP run_script_inline is NOT a GhidraScript context, so
+     batch analysis must go through analyzeHeadless + a -postScript.
+     (c) rewrite/ built and booted; gate stage 4b added (headless + Xvfb).
+     (d) OQ-002/006/007/009 closed or narrowed from measurements; the earlier
+     savegame note mis-cited OQ-010 (that is combat) — corrected to OQ-003.
 P1 data formats. .bin tables (docs/re/tables.md) and the .shp container
 (docs/re/shp.md) are done and gate-asserted (stages 3b, 3c). Three open items
 all terminate at the same place — the exe's loaders: OQ-004 (.tsv grammar /
@@ -45,12 +57,16 @@ is one Ghidra session, so P2 is the critical path; P1d/P1f are independent and
 can be done any time but do not unblock P2.
 
 ## NEXT ACTION (exactly one)
-Start P2: run scripts/ghidra_headless_up.sh, confirm /health on 127.0.0.1:8089,
-then import the Watcom LE payload per the PARKING LOT recipe (raw at imagebase,
-x86:LE:32:default + compiler 'gcc', never 'watcom'). First target: xrefs to the
-'DATA\DKSHIP%02d.SHP' string at ascend.exe+0x86190 -> shape loader -> settle
-OQ-005 (codec), then render PNGs to docs/assets/. Then the table loader for
-OQ-004.
+Check the background analyzeHeadless run (work/ghidra_headless.out and
+work/ghidra_bootstrap.log; it was launched with
+  analyzeHeadless work/ghproj ascend_proj -import work/ascend_payload.bin
+    -processor x86:LE:32:default -cspec gcc -postScript Bootstrap.java
+and started 2026-10-04 ~03:15). Read the 'BOOTSTRAP: ...' lines. If
+'bootstrapped functions' > 0, open work/ghproj with the MCP server
+(scripts/ghidra_headless_up.sh) and chase the shape loader from the strings
+SMRACE/LGRACE/DKSHIP (raw 0x86154/0x86168/... in the .rsrc cluster) to settle
+OQ-005. If the log shows 0 functions or an exception, fix Bootstrap.java — the
+prologue byte patterns and the DisassembleCommand address set are in there.
 
 ## KNOWN-ISSUES / PARKING LOT
 - P2 BLOCKER (do not retry the old way): the Watcom LE payload at
@@ -101,11 +117,25 @@ See docs/PLAN.md P6 + goal contract. All P0-P6 items checked below.
 [~] P1c .shp sprites — CONTAINER SPEC COMPLETE + gate-asserted (docs/re/shp.md,
         scripts/shp_probe.py, gate 3c; 208 libs / 1557 records). Pixel codec OPEN
         (OQ-005, needs the P2 shape loader); no PNGs until the codec is known.
-[ ] P1d .gam saves
-[ ] P1e FLIC/audio inventory
-[ ] P1f text encodings
+[~] P1d .gam saves — CORRELATION ONLY (docs/re/savegame.md, scripts/gam_probe.py,
+        gate 3f). resume.gam = sparse u32-LE; stride-75 tech-name chain resolves
+        against restree.txt. Full record map OPEN (OQ-003): needs the exe's save
+        writer. PLAN P4 requires save/load, which is NOT satisfiable until
+        OQ-003 closes — tracked as a real dependency, not worked around.
+[~] P1e FLIC/audio inventory — INVENTORY COMPLETE (docs/re/media.md, gate 3e).
+        2 FLICs exact-tiled; 15 real Creative VOC + 77 headerless raw PCM
+        (extension lies); sample rate unknown (OQ-006).
+[~] P1f text encodings — COMPLETE (docs/re/text.md, gate 3g). ascend00 is
+        CP437-clean; the shipped exe exposes 34 source module names, which is
+        the P2 subsystem spine.
 [ ] P2 Ghidra subsystem specs (9 subsystems, docs/re/*.md)
-[ ] P3 engine skeleton builds, importer verified, headless smoke test
+[~] P3 engine skeleton — BUILDS + BOOTS (gate 4/4b). rewrite/ C++17 + SDL2
+        2.32.4 / SDL2_mixer 2.8.1 via pkg-config; libascend_core holds the
+        verified readers (formats/cob.cpp, formats/bin_table.cpp) ported 1:1
+        from the gate-asserted Python probes. 8 unit tests pass, including
+        byte-for-byte equality between the C++ .cob reader and the extracted/
+        tree. Binary boots headless (dummy driver) AND under Xvfb (x11).
+        Remaining for P3: an actual render surface + input event pump.
 [ ] P4 all systems ported with tests
 [ ] P5 UI+media parity pass
 [ ] P6 full campaign playable to victory; README
