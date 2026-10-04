@@ -168,6 +168,46 @@ if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
     || { tail -20 /tmp/gate_campaign.log; err "campaign log has no VICTORY line"; }
 fi
 
+# 4c. UI smoke: the P5a window must boot under Xvfb, play N turns driven by
+# the autoplay path, and exit 0 printing 'ui ok:' (docs/re/ui-runtime.md §5).
+if [ -x "$ROOT/rewrite/build/ascendancy" ] && command -v xvfb-run >/dev/null 2>&1; then
+  if ! timeout 120 xvfb-run -a "$ROOT/rewrite/build/ascendancy" --ui \
+       --campaign 3 --autoplay --seed 9 >/tmp/gate_ui.log 2>&1; then
+    tail -20 /tmp/gate_ui.log; err "ui boot failed under xvfb"
+  fi
+  grep -q 'ui ok: turn 3' /tmp/gate_ui.log \
+    || { tail -20 /tmp/gate_ui.log; err "ui did not complete 3 turns"; }
+
+  # 4c-b. Real input: an X client (tools/xsend, libX11 XSendEvent + XWarpPointer
+  # -- SDL re-reads the pointer for synthetic Button events) must drive the
+  # NEXT TURN button. The app is run WITHOUT --autoplay so a turn can ONLY
+  # come from injected input; 'ui ok: turn 1' proves it advanced.
+  if [ ! -x "$ROOT/tools/xsend" ] && command -v gcc >/dev/null 2>&1; then
+    gcc -O1 -o "$ROOT/tools/xsend" "$ROOT/tools/xsend.c" -lX11 \
+      || err "could not build tools/xsend"
+  fi
+  if [ -x "$ROOT/tools/xsend" ]; then
+    Xvfb :77 -screen 0 640x480x24 >/dev/null 2>&1 &
+    GATE_XV=$!
+    sleep 1
+    DISPLAY=:77 "$ROOT/rewrite/build/ascendancy" --ui --campaign 1 \
+      --seed 5 >/tmp/gate_ui_in.log 2>&1 &
+    GATE_APP=$!
+    sleep 2
+    DISPLAY=:77 "$ROOT/tools/xsend" "Ascendancy" 510 66 || err "xsend failed"
+    wait $GATE_APP || err "ui app exited non-zero with input"
+    kill $GATE_XV 2>/dev/null
+    grep -q 'ui click next-turn' /tmp/gate_ui_in.log \
+      || { cat /tmp/gate_ui_in.log; err "injected click never reached the app"; }
+    grep -q 'ui ok: turn 1' /tmp/gate_ui_in.log \
+      || { cat /tmp/gate_ui_in.log; err "click did not advance the campaign"; }
+  else
+    note "tools/xsend not built: skipped real-input UI check"
+  fi
+else
+  note "xvfb-run unavailable: skipped UI smoke"
+fi
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}

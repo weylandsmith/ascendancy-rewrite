@@ -116,22 +116,27 @@ turn_log_recent:
      documented-default constants (R1 replaces §3-5 wholesale)."
 
 ## CURRENT FOCUS
-P5 now. CONTRACT-CORE MET: seeded campaign plays to victory (headless AND
-Xvfb — docs/PLAYTHROUGH.md, gate 3l smoke). DONE P4: mapgen, research,
-gizmos, items, ui-manifest, species, diplomacy, turn loop (docs/re/ 10
-specs, 42/42 tests, gates 3i/3j/3k/3l). Remaining to full contract:
-rendered UI over the campaign (windows.txt grammar in ui.md + .shp codec
-OQ-005 gate on bitmaps — text-mode UI first is acceptable and honest),
-audio mixing (OQ-006 sample rate), and the P6 README. R1-blocked and
-stated-as-open in specs: exact combat arithmetic (OQ-010), end-capt/
-end-unit evaluation, save/load (OQ-003), AI orderings (OQ-015/016).
+P5b next. CONTRACT-CORE MET (see Run A/B/C + gate 3l). DONE P4: mapgen,
+research, gizmos, items, ui-manifest, species, diplomacy, turn loop.
+DONE P5a (docs/re/ui-runtime.md): SDL2+SDL2_ttf window over the LIVE
+campaign — cosmos view (circles; .shp sprites stay OQ-005), NEXT TURN
+button + status + event pane; gates 4c (Xvfb autoplay run) and 4c-b
+(synthetic XSendEvent click advances a real turn — tools/xsend, no
+xdotool on host; SDL re-reads pointer for synthetic events -> warp first).
+Owner palette SEARCHED and pixel-verified: 0/42 pair-checks fail under
+deuteranopia AND protanopia simulation of the rendered framebuffer;
+neutrals also coded by dot SIZE. Font = Liberation substitute (vendor
+.fnt header/stride partly known, codec OPEN as OQ-017). 47/47 tests.
+Remaining to full contract: audio mixing (OQ-006 sample rate), P6 README,
+STATE checklist pass. R1-blocked and stated-as-open in specs: exact
+combat arithmetic (OQ-010), end-capt/end-unit evaluation, save/load
+(OQ-003), AI orderings (OQ-015/016).
 
 ## NEXT ACTION (exactly one)
-P5a: minimal in-window UI over the live campaign — SDL render surface,
-cosmos star/lane view (positions from campaign galaxy; shapes can be
-plain circles until the .shp codec lands — NO fabricated sprites), turn
-button + status line (playerScorePct, traceLine), event log pane. Gate
-4c: Xvfb run of UI mode takes >=1 input event and repaints.
+P5b: audio. Probe the .wav/.voc candidates in extracted/ for format facts,
+fix or bound OQ-006 (sample-rate ambiguity), wire SDL2_mixer music+SFX
+behind a mute flag, gate 4d: Xvfb run boots mixer, loads >=1 real sample,
+prints mixer facts, exits 0.
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr

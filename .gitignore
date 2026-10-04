@@ -10,3 +10,5 @@ __pycache__/
 .cache_check
 *.log
 work/
+xsend/build/rewrite
+tools/xsend

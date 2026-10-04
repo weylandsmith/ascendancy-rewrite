@@ -72,6 +72,7 @@ public:
     bool over() const { return victory_ != Victory::None; }
     Victory victory() const { return victory_; }
     int starsOwned(int owner) const;
+    int starOwner(int starId) const { return owner_[starId]; }
     int techsOwned(int owner) const;
     double resources(int owner) const;
     const std::vector<CampaignEvent>& events() const { return events_; }

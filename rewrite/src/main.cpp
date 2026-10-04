@@ -9,6 +9,7 @@
 
 #include <cstdio>
 #include <filesystem>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -19,7 +20,8 @@
 #include "game/economy.h"
 #include "game/mapgen.h"
 #include "game/research.h"
-#include "game/starstat.h""
+#include "game/starstat.h"
+#include "ui/ui.h""
 
 #ifndef ASCENDANCY_SOURCE_DIR
 #define ASCENDANCY_SOURCE_DIR "."
@@ -37,6 +39,8 @@ struct Options {
     bool headless = false;                      // SDL dummy driver, no audio
     int campaign = 0;                           // N turns of seeded campaign
     unsigned seed = 1;
+    bool ui = false;                            // P5a window (docs/re/ui-runtime.md)
+    bool autoplay = false;
 };
 
 bool parseArgs(int argc, char** argv, Options* o) {
@@ -52,6 +56,10 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->campaign = std::atoi(argv[++i]);
         else if (a == "--seed" && i + 1 < argc)
             o->seed = static_cast<unsigned>(std::atol(argv[++i]));
+        else if (a == "--ui")
+            o->ui = true;
+        else if (a == "--autoplay")
+            o->autoplay = true;
         else if (a == "--help")
             return false;
         else {
@@ -69,7 +77,9 @@ void usage() {
         "  --turns N     run N turns of the turn loop then exit\n"
         "  --headless    SDL dummy video driver, no audio device\n"
         "  --campaign N  play N turns of a seeded campaign (docs/re/turnloop.md)\n"
-        "  --seed S      seed for --campaign (default 1)\n");
+        "  --seed S      seed for --campaign (default 1)\n"
+        "  --ui          open the P5a campaign window (docs/re/ui-runtime.md)\n"
+        "  --autoplay    with --ui: advance a turn every 250 ms\n");
 }
 
 // Loads the three archives from the ORIGINAL game/ directory, because the
@@ -113,28 +123,34 @@ bool loadGameData(const Options& o, GameData* g, std::string* err) {
 }  // namespace
 
 
-// Seeded campaign to victory: docs/re/turnloop.md. Returns process exit code
-// (0 when a victory was reached within --campaign turns).
-int runCampaign(const Options& o) {
+// Shared campaign builder for --campaign and --ui (docs/re/turnloop.md).
+// The tables are function-local statics because Campaign stores pointers into
+// them (research tree, item/gizmo tables).
+std::unique_ptr<ascend::game::Campaign> buildCampaign(const Options& o,
+                                                      std::string* err) {
     namespace ag = ascend::game;
+    static const ag::ResearchTree tree =
+        ag::ResearchTree::loadFromFile(
+            (o.dataRoot / "extracted/ascend00/restree.txt").string(), *err);
+    static const std::vector<ag::PlanetItem> items =
+        ag::loadPlanItems((o.dataRoot / "extracted/ascend00/planitem.txt").string(), *err);
+    static const std::vector<ag::Gizmo> gizmos =
+        ag::loadGizmos((o.dataRoot / "extracted/ascend00/gizmos.txt").string(), *err);
     const fs::path d0 = o.dataRoot / "extracted" / "ascend00";
-    std::string err;
-    auto stats = ag::StarStats::load(d0 / "starstat.txt", &err);
-    if (!stats) { std::printf("starstat: %s\n", err.c_str()); return 1; }
-    auto names = ag::loadStarNames(d0 / "names.txt", &err);
-    if (names.empty()) { std::printf("names: %s\n", err.c_str()); return 1; }
-    auto tree = ag::ResearchTree::loadFromFile((d0 / "restree.txt").string(), err);
-    auto items = ag::loadPlanItems((d0 / "planitem.txt").string(), err);
-    auto gizmos = ag::loadGizmos((d0 / "gizmos.txt").string(), err);
+    auto stats = ag::StarStats::load(d0 / "starstat.txt", err);
+    if (!stats) return nullptr;
+    auto names = ag::loadStarNames(d0 / "names.txt", err);
+    if (names.empty()) return nullptr;
     if (items.size() != 39 || gizmos.size() != 76) {
-        std::printf("table counts wrong: items %zu gizmos %zu\n", items.size(), gizmos.size());
-        return 1;
+        *err = "table counts wrong: items " + std::to_string(items.size()) +
+               " gizmos " + std::to_string(gizmos.size());
+        return nullptr;
     }
     std::vector<ag::DipFile> ai;
     for (int i = 0; i < 6; ++i) {
         ag::DipFile df;
         const fs::path p = d0 / ("race" + std::to_string(i / 10) + std::to_string(i % 10) + ".dip");
-        if (!df.loadFromFile(p.string(), &err)) { std::printf("dip: %s\n", err.c_str()); return 1; }
+        if (!df.loadFromFile(p.string(), err)) return nullptr;
         ai.push_back(std::move(df));
     }
     ag::CampaignConfig cfg;
@@ -142,20 +158,28 @@ int runCampaign(const Options& o) {
     ag::MapConfig mc;
     mc.seed = o.seed;
     ag::Galaxy g = ag::MapGenerator(mc, *stats, names).generate();
-    ag::Campaign c(cfg, g, &tree, items, gizmos, ai, &err);
-    if (!err.empty()) { std::printf("campaign: %s\n", err.c_str()); return 1; }
+    return std::make_unique<ag::Campaign>(cfg, g, &tree, items, gizmos, ai, err);
+}
+
+// Seeded campaign to victory: docs/re/turnloop.md. Returns process exit code
+// (0 when a victory was reached within --campaign turns).
+int runCampaign(const Options& o) {
+    namespace ag = ascend::game;
+    std::string err;
+    auto c = buildCampaign(o, &err);
+    if (!c) { std::printf("campaign: %s\n", err.c_str()); return 1; }
     std::printf("campaign seed=%u stars=%zu lanes=%zu ai=6\n", o.seed,
-                g.stars.size(), g.lanes.size());
-    for (int t = 0; t < o.campaign && !c.over(); ++t) {
-        c.advance();
-        std::printf("%s\n", c.traceLine().c_str());
+                c->galaxy().stars.size(), c->galaxy().lanes.size());
+    for (int t = 0; t < o.campaign && !c->over(); ++t) {
+        c->advance();
+        std::printf("%s\n", c->traceLine().c_str());
     }
-    for (const auto& ev : c.events())
+    for (const auto& ev : c->events())
         std::printf("  [t%d] %s\n", ev.turn, ev.text.c_str());
-    if (c.over()) {
+    if (c->over()) {
         std::printf("VICTORY %s via %s.txt on turn %d (score %d%%)\n",
-                    ag::victoryName(c.victory()), ag::victoryConditionFile(c.victory()),
-                    c.turn(), c.playerScorePct());
+                    ag::victoryName(c->victory()), ag::victoryConditionFile(c->victory()),
+                    c->turn(), c->playerScorePct());
         return 0;
     }
     std::printf("no victory after %d turns\n", o.campaign);
@@ -187,8 +211,23 @@ int main(int argc, char** argv) {
     std::printf("SDL %d.%d.%d initialised (video driver: %s)\n", SDL_MAJOR_VERSION,
                 SDL_MINOR_VERSION, SDL_PATCHLEVEL, SDL_GetCurrentVideoDriver());
 
-    if (o.campaign > 0) {
+    if (o.campaign > 0 && !o.ui) {
         const int rc = runCampaign(o);
+        SDL_Quit();
+        return rc;
+    }
+    if (o.ui) {
+        std::string cerr;
+        auto camp = buildCampaign(o, &cerr);
+        if (!camp) {
+            std::printf("campaign: %s\n", cerr.c_str());
+            SDL_Quit();
+            return 1;
+        }
+        // Substitute face (docs/re/ui-runtime.md §3; vendor .fnt = OQ-017).
+        const std::string font =
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf";
+        const int rc = ascend::ui::runCampaignUi(*camp, o.campaign, o.autoplay, font);
         SDL_Quit();
         return rc;
     }

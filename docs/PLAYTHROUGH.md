@@ -335,3 +335,20 @@ VICTORY Control via end-ctrl.txt on turn 50 (score 68%)
   documented-inferred), alliance-victory end-unit / home-world-capture
   end-capt (need R1 accept/capture bookkeeping), original AI build order,
   graphics/audio. Those remain open items in docs/OPEN-QUESTIONS.md.
+
+## Run E — P5a UI under Xvfb driven by injected X input (gate 4c/4c-b)
+
+```
+$ Xvfb :77 -screen 0 640x480x24 &
+$ DISPLAY=:77 ./rewrite/build/ascendancy --ui --campaign 1 --seed 5 &
+$ DISPLAY=:77 ./tools/xsend "Ascendancy" 510 66      # NEXT TURN button rect
+archives: 3 54 328 89  (.bin tables parsed: 7)
+SDL 2.32.4 initialised (video driver: x11)
+ui click next-turn
+ui ok: turn 1                                          # exit code 0
+```
+Map clicks resolve too: `ui click map (140,160) -> Burphee` (no --autoplay
+in Run E, so the ONLY way turn count advances is injected input). Screenshot
+mid-run (scripts/ui_screenshot.sh): /tmp/ui_shot2.png shows cosmos, lanes,
+NEXT TURN, event pane; rendered pixel clusters measure separable under
+deuteranopia AND protanopia simulation (0/42 pair-checks fail).

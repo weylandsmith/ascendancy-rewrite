@@ -8,11 +8,6 @@
 namespace ascend::game {
 namespace {
 
-bool hasItemNamed(const std::vector<PlanetItem>& items, const std::string& n) {
-    return std::any_of(items.begin(), items.end(),
-                       [&](const PlanetItem& it) { return it.name == n; });
-}
-
 // Build order policy [documented default, turnloop.md §4]: factories (IND),
 // labs (RES), then agriplots (PROS). Tech gates honoured when REQUIRES is a
 // valid tech index (economy.h requiresValidTech); sentinels are UNGATED per
