@@ -33,6 +33,7 @@ add_library(ascend_core STATIC
   src/game/mapgen.cpp
   src/game/research.cpp
   src/game/economy.cpp
+  src/game/diplomacy.cpp
 )
 
 # ---- importer + game ------------------------------------------------------
@@ -50,6 +51,7 @@ add_executable(run_tests
   tests/test_mapgen.cpp
   tests/test_research.cpp
   tests/test_economy.cpp
+  tests/test_diplomacy.cpp
 )
 target_link_libraries(run_tests PRIVATE ascend_core)
 add_test(NAME unit_tests COMMAND run_tests)

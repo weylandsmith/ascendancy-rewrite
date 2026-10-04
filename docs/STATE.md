@@ -6,7 +6,7 @@
 
 phase: P4
 milestone: 3  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
-updated: 2026-10-04T09:10
+updated: 2026-10-04T10:40
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -74,25 +74,46 @@ turn_log_recent:
      len>8 rows, semantics decide (Shield->Superconductivity vs nonsense
      Shield->Spacetime Surfing); (3) test constant typed from memory (Ship
      cost 30 vs real 20 - the ADJACENT row's value)."
+  - "P4 ui/species/diplomacy (this turn): windows.txt is a window+resource
+     manifest, not per-screen widget layout (docs/re/ui.md): 2,067 keyed lines
+     over 60 distinct keys; 132 window TYPE defs (124 named; the 8 unnamed are
+     ALL TYPE 100 shape-file overlays - measured rule); NUMTABLES 23 asserted
+     == 23 TABLE (.haz palette) lines; all 42 backslash DATA\ paths resolve in
+     extracted/ (existence check itself initially tripped the KNOWN backslash
+     basename footgun - split on BOTH separators before trusting 'missing').
+     NUM_STARS/NUM_LANES are SINGLETON values 100 under the COSMOS window
+     (snapshot display table), NOT small/large map options - the actual
+     new-game size options remain glyph-baked in 3cfgnew.tmp (OQ-012 OPEN,
+     re-checked and still open). history.txt: 21 species specnum 0..20 contiguous; raceNN.dip
+     headers give names + unique SA_<Ability> tokens (docs/re/species.md);
+     specnum<->raceNN mapping inferred from blurb cross-refs. DIP: races share
+     one 15-key set, player carries strict 8-key subset; NEGATIVE values are
+     legal (BIO_MAXNEGATIVE negative in all 21; first revision of ui_probe
+     silently dropped them with isdigit - its own subset assertion caught it;
+     dip_probe.py always parsed 15 correctly) -> docs/re/diplomacy.md +
+     src/game/diplomacy.{h,cpp} (parse, sinusoidal mood model [inferred],
+     %m%y%s%t renderer, threshold policy [inferred]) + 10 tests (35/35), gate
+     3k, OQ-015 (token table + DA_ selection order).
 
 ## CURRENT FOCUS
 P4 systems, R2-first per docs/BLOCKED.md. DONE: mapgen, research, gizmos,
-economy/items (docs/re/{mapgen,research,gizmos,economy}.md + 25/25 tests).
-Next data-verifiable systems: species/players (race*.dip weights + specnum
-blocks in history.txt: 21 species each with a 'power' blurb), production
-turn mechanics (item IND/RES/PROS columns + gizmo industry adds to ship
-build), UI map (windows.txt: 2,067 rows of TYPE/NAME/X0/Y0 - a full window
-layout grammar), subtitles (subtitle.txt SUBTITLE/TEXT/FRAME_START/FRAME_END
-for the intro FLIC). Formula-blocked pending R1: combat application (OQ-010),
-save format (OQ-003).
+economy/items, ui-manifest, species roster, diplomacy engine (docs/re/
+{mapgen,research,gizmos,economy,ui,species,diplomacy}.md + 35/35 tests,
+gates 3i/3j/3k). Next: the TURN LOOP itself - integrate mapgen+research+
+economy+diplomacy into a seeded campaign state in src/game/campaign.* with
+production/research per-turn deltas (constants from planitem/gizmo columns +
+documented defaults, OQ-tracked), then victory conditions -> docs/
+PLAYTHROUGH.md (contract needs turns-advance-to-victory). Still R1-blocked:
+combat application (OQ-010), save format (OQ-003), exact AI/turn orderings
+(OQ-015). Audio spec exists (media.md) but mixing is P5.
 
 ## NEXT ACTION (exactly one)
-P4 UI-data + species pass: probe windows.txt (grammar from its own header;
-2,067 rows - is it a complete widget layout spec?) and subtitle.txt, plus
-extract the specnum blocks (specnum/power/name per species 0..20) from
-history.txt. Write docs/re/ui.md + docs/re/species.md, then the loaders +
-tests. Rule from last two turns: every test constant comes from a raw-row
-print, never memory.
+Write rewrite/src/game/campaign.{h,cpp}: seeded campaign state (galaxy from
+mapgen, one home species + N AI from raceNN.dip, research/economy owned
+tables), advanceTurn() applying documented per-turn deltas, victory check
+(extinction/last-alive + surrender threshold - all cited or OQ'd), then a
+--campaign N headless mode in main.cpp and docs/PLAYTHROUGH.md from a real
+seeded run. Constants from raw rows only; behaviour defaults OQ-tracked.
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr
@@ -135,9 +156,9 @@ See docs/PLAN.md P6 + goal contract. All P0-P6 items checked below.
 [~] P3 engine skeleton — BUILDS + BOOTS (gate 4/4b). C++17 + SDL2 2.32.4 /
         SDL2_mixer 2.8.1; readers ported 1:1; boots headless AND Xvfb/x11.
         Remaining: render surface + input pump (arrives with P5 UI).
-[~] P4 systems — mapgen + research + gizmos + items DONE (docs/re/{mapgen,
-        research,gizmos,economy}.md; gates 3i/3j; OQ-012..014). 25/25 tests.
-        Remaining: species, UI, turn loop integration, combat application,
-        diplomacy, audio.
+[~] P4 systems — mapgen, research, gizmos, items, ui-manifest, species,
+        diplomacy DONE (docs/re/*.md; gates 3i/3j/3k; OQ-012..015). 35/35
+        tests. Remaining: turn-loop integration (next), combat application
+        (R1), audio mixing (P5), victory/playthrough (next).
 [ ] P5 UI+media parity pass
 [ ] P6 full campaign playable to victory; README

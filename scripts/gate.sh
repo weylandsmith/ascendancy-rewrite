@@ -134,6 +134,20 @@ fi
 grep -q 'Interstellar Trucking' "$ROOT/docs/re/economy.md" \
   || err "economy.md lost the 254-sentinel record"
 
+# 3k. P4 UI/species/diplomacy invariant: ui_probe asserts 132 windows, 15-key
+# DIPVALUES identity across 21 races, 15 DA_ templates, 21 species, unique
+# SA_ tokens; docs must exist and keep the parse-trap + roster facts visible.
+[ -s "$ROOT/docs/re/ui.md" ] || err "docs/re/ui.md missing"
+[ -s "$ROOT/docs/re/species.md" ] || err "docs/re/species.md missing"
+[ -s "$ROOT/docs/re/diplomacy.md" ] || err "docs/re/diplomacy.md missing"
+if ! /usr/bin/python3 "$ROOT/scripts/ui_probe.py" --quiet; then
+  err "ui_probe.py failed its own invariants"
+fi
+grep -q 'PARSE TRAP' "$ROOT/docs/re/diplomacy.md" \
+  || err "diplomacy.md lost the negative-value parse-trap record"
+grep -q 'SA_SuperMarines' "$ROOT/docs/re/species.md" \
+  || err "species.md lost the ability roster"
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}
