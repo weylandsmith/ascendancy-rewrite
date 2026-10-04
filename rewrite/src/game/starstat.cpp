@@ -13,7 +13,7 @@ namespace {
 // CP437 -> UTF-8 for the bytes that can actually appear. docs/re/text.md:
 // ascend00 text is CP437-clean (names.txt is ASCII-only in practice, but the
 // decoder keeps the invariant honest for high bytes).
-std::string cp437ToUtf8(const std::string& in) {
+std::string cp437ToUtf8Impl(const std::string& in) {
     static const char* table = nullptr;  // ASCII fast path below covers names.txt
     std::string out;
     out.reserve(in.size());
@@ -142,18 +142,20 @@ std::vector<std::string> loadStarNames(const std::filesystem::path& namesTxt, st
         const size_t eofmark = line.find('\x1A');
         if (eofmark != std::string::npos) line = line.substr(0, eofmark);
         line = trim(line);
-        if (!line.empty()) out.push_back(cp437ToUtf8(line));
+        if (!line.empty()) out.push_back(cp437ToUtf8Impl(line));
     }
     // [verified docs/re/mapgen.md §2]: 100 non-empty bases, first "Vega".
     // (A Python-side count of 101 earlier was an artefact: str.strip() does
     // not remove the 0x1A EOF marker, so the marker counted as a name.)
     if (out.size() != 100) {
-        if (err) *err = "names.txt: expected 101 bases, got " + std::to_string(out.size());
+        if (err) *err = "names.txt: expected 100 bases, got " + std::to_string(out.size());
         return {};
     }
     if (err) err->clear();
     return out;
 }
+
+std::string cp437ToUtf8(const std::string& in) { return cp437ToUtf8Impl(in); }
 
 std::string roman(int n) {
     // docs/re/mapgen.md §3 measured I..V; table extends the standard way.

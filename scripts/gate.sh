@@ -110,6 +110,19 @@ else
   note "venv/payload/functions.tsv not present: skipped loader-model probes"
 fi
 
+# 3i. P4 research invariant: docs/re/research.md exists and the probe
+# reproduces its headline measurements on the shipped restree.txt (66 main
+# rows + 40 ALL-CAPS variants, acyclic prereq graph). Pure stdlib.
+[ -s "$ROOT/docs/re/research.md" ] || err "docs/re/research.md missing"
+if /usr/bin/python3 "$ROOT/scripts/restree_probe.py" --out /tmp/gate_research.md --quiet; then
+  grep -q 'data rows = \*\*106\*\* = \*\*66\*\*' /tmp/gate_research.md \
+    || err "restree_probe: row counts drifted from 106=66+40"
+  grep -q 'acyclic True' /tmp/gate_research.md \
+    || err "restree_probe: prereq graph no longer acyclic"
+else
+  err "restree_probe.py crashed"
+fi
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}

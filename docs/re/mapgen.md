@@ -34,7 +34,7 @@ lanes column = 2.225; min 1.62 (isolated type 10), max 2.62 (hub type 0).
 `extracted/ascend00/names.txt`, 100 single-line bases (Vega, Algol, ..., Bindacia; the file ends with two blank lines and a 0x1A EOF marker — a naive strip counts 101, the C-side C-isspace trim counts 100; unique, verified),
 no numbering). The generator appends Roman numerals ONLY to planets:
 every `"<Base> <roman>"` string found in the galaxy snapshot has its base
-in names.txt (177/177) [verified].
+in names.txt (223/223 strings, 75/75 distinct bases) [verified 2026-10-04].
 
 ## 3. Galaxy shape, measured from the golden snapshot [verified for this save]
 
@@ -42,9 +42,13 @@ in names.txt (177/177) [verified].
 galaxy (116,022 B; also holds a u32 data area whose layout is OQ-004).
 String evidence [verified]:
 
-- 75 distinct star bases ("Parsimony", "Yorbins", ...); 177 planet strings.
+- 75 distinct star bases ("Parsimony", "Yorbins", ...); **223** planet strings
+  (erratum 2026-10-04: an earlier revision of this file said 177, from a
+  scan that is not reproducible; re-measured NUL-delimited: 223 total,
+  histogram below sums to 223).
 - Orbit numerals observed: I 75, II 58, III 46, IV 31, V 13; **never VI+**.
   Orbit I count == star count exactly (75) -> orbits are contiguous from I.
+  75+58+46+31+13 = 223 = the planet-string count [verified].
 - Planets-per-star histogram: {1:17, 2:12, 3:15, 4:18, 5:13} — consistent
   with a uniform 1..5 draw; no zero-planet star observed in this snapshot.
 - `galactic.bin` (1028 records x 6 u32): cols 3/4 are bounded (0..639,

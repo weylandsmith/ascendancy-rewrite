@@ -47,6 +47,10 @@ class StarStats {
 std::vector<std::string> loadStarNames(const std::filesystem::path& namesTxt,
                                        std::string* err = nullptr);
 
+// ASCII pass-through with '?' for high bytes so mojibake is loud, not silent
+// (docs/re/text.md: the shipped text tables are CP437/ASCII-clean).
+std::string cp437ToUtf8(const std::string& in);
+
 // 1..13 (orbit numerals observed I..V; the table extends the obvious way and
 // nothing emits 0) — docs/re/mapgen.md §3.
 std::string roman(int n);

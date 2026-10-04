@@ -31,6 +31,7 @@ add_library(ascend_core STATIC
   src/formats/bin_table.cpp
   src/game/starstat.cpp
   src/game/mapgen.cpp
+  src/game/research.cpp
 )
 
 # ---- importer + game ------------------------------------------------------
@@ -46,6 +47,7 @@ add_executable(run_tests
   tests/test_cob.cpp
   tests/test_bin_table.cpp
   tests/test_mapgen.cpp
+  tests/test_research.cpp
 )
 target_link_libraries(run_tests PRIVATE ascend_core)
 add_test(NAME unit_tests COMMAND run_tests)

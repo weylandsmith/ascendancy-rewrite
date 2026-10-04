@@ -6,7 +6,7 @@
 
 phase: P4
 milestone: 3  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
-updated: 2026-10-04T05:10
+updated: 2026-10-04T07:40
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -50,27 +50,37 @@ turn_log_recent:
      NN-tree spine + distance-ascending capped top-up (sum(deg)+2<=target AND
      deg+1<=type-mean per endpoint; the first cap formula FAILED the +-0.35
      mean-degree test and was fixed). OQ-012 = the 4 documented choices."
+  - "P4 research (this turn): restree.txt SOLVED as 'NAME flag cost prereq*
+     255', 66 main rows + 40 ALL-CAPS variant rows (cost 20 flat, flag 0..4);
+     acyclic, 3 roots, 3 FORWARD prereq refs so file order is NOT topological
+     (naive recursion RecursionError was the control that refuted 'field1 is
+     an index'). docs/re/research.md + src/game/research.{h,cpp} + 5 tests
+     (19/19). OQ-013 = variant-field semantics, default union. ERRATUM:
+     mapgen.md's '177 planets' was unreproducible; re-measured 223 (I75
+     II58 III46 IV31 V13 = 223, 75/75 bases in names.txt) and corrected.
+     Also found galactic.tsv carries research-tree strings too -> .tsv are
+     per-context string pools (OQ-004 unchanged, corroborated)."
 
 ## CURRENT FOCUS
-P4 systems, R2-first per docs/BLOCKED.md. Mapgen DONE (docs/re/mapgen.md +
-tests). Systems whose constants are verifiable from extracted files go first:
-research (restree.txt + tech-name pool shared by all 7 ascend02 .tsv),
-economy/production (name.bin/.tsv + planitem.txt), ships (ship.txt +
-species .tsv), AI weights (race*.dip DIPVALUES; OQ-009 closed data-side).
-Systems needing exact original formulas (combat OQ-010, save format OQ-003)
-are blocked pending R1: implement behaviour-plausible from the manual
-(docs/assets/manual-jpg/, 23 pp rasterised) and mark every choice in
-OPEN-QUESTIONS.
+P4 systems, R2-first per docs/BLOCKED.md. Mapgen DONE, research DONE
+(docs/re/mapgen.md, docs/re/research.md + 19/19 tests). Systems whose
+constants are verifiable from extracted files go first: economy/production
+(planitem.txt + name.bin), ships (ship.txt + species.tsv), AI weights
+(race*.dip DIPVALUES; OQ-009 closed data-side). Systems needing exact
+original formulas (combat OQ-010, save format OQ-003) are blocked pending
+R1: implement behaviour-plausible from the manual (docs/assets/manual-jpg/,
+23 pp rasterised) and mark every choice in OPEN-QUESTIONS.
 
 ## NEXT ACTION (exactly one)
-P4 research system: write docs/re/research.md from
-extracted/ascend00/restree.txt (rows: name, cost, prereqs; the stride-75
-chain in docs/re/savegame.md corroborates name order) and determine what the
-ascend02 *.tsv pools carry beyond names (79 strings in ALL 7 pools — tech
-names + ?). Then implement rewrite/src/game/research.{h,cpp} + unit tests
-(tree integrity: every prereq resolves, costs positive, deterministic
-topological order). Anything not derivable goes to OPEN-QUESTIONS — never
-invent. Do NOT chase the static base (docs/re/loader.md section 4).
+P4 ships/economy: probe extracted/ascend00/ship.txt and planitem.txt
+(same CP437/CRLF/0x1A text family — expect a similar row grammar), write
+docs/re/ships.md + docs/re/economy.md with verified/inferred separation,
+then implement rewrite/src/game/{ship,item}.{h,cpp} + tests. Probe first:
+this turn proved two of my own earlier numbers were unreproducible
+(177 planets; "restree has no grammar" from text_probe) — re-measure before
+writing any sentence. If time allows after that, the bounded R1 attempt:
+dosbox-x with a pty per the DOSBOX RULE, targeting a memory dump of the
+data segment (settles OQ-004/005/011 in one shot).
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr
@@ -113,8 +123,8 @@ See docs/PLAN.md P6 + goal contract. All P0-P6 items checked below.
 [~] P3 engine skeleton — BUILDS + BOOTS (gate 4/4b). C++17 + SDL2 2.32.4 /
         SDL2_mixer 2.8.1; readers ported 1:1; boots headless AND Xvfb/x11.
         Remaining: render surface + input pump (arrives with P5 UI).
-[~] P4 systems — mapgen DONE: docs/re/mapgen.md + src/game/{starstat,mapgen}
-        + 14/14 tests. OQ-012 records the 4 choices. Remaining: research,
+[~] P4 systems — mapgen DONE (docs/re/mapgen.md, corrected) + research DONE
+        (docs/re/research.md, gate 3i, OQ-013) + 19/19 tests. Remaining:
         economy, production, ships, combat, AI, diplomacy, UI, audio.
 [ ] P5 UI+media parity pass
 [ ] P6 full campaign playable to victory; README
