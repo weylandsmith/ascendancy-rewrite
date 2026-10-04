@@ -192,13 +192,15 @@ commits c1b6d3f..d85b281; d85b281 = committed one-char include-quote fix
 in main.cpp). Finding scheduled in NEXT ACTION — must not be lost.
 
 ## NEXT ACTION (exactly one)
-SA_ ability wiring is DONE (turn above; audit finding closed, gate 3m).
-No open hardening item remains from the audit. Any FUTURE work starts from
-docs/OPEN-QUESTIONS.md (R1 = exe runtime base is the master key: unblocks
+SA_ ability wiring is DONE (2026-10-04e; audit finding closed, gate 3m).
+All five end-*.txt victory conditions evaluated 2026-10-04f (peace
+acceptance fixed; 73/73 tests). No open non-R1 item remains; CONTRACT
+CHECKLIST fully [x]. Any FUTURE work starts from docs/OPEN-QUESTIONS.md
+(R1 = exe runtime base is the master key: unblocks
 OQ-003 saves, OQ-005 sprites, OQ-010 combat arithmetic, OQ-017 vendor font,
 OQ-006 headerless sample rate, OQ-020 exact ability charge days, and
 CauseWar's third-party redirect). Verification criterion holds: gate 0 +
-CONTRACT CHECKLIST + PLAYTHROUGH victory record, all green 2026-10-04e.
+CONTRACT CHECKLIST + PLAYTHROUGH victory record, all green 2026-10-04f.
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr
