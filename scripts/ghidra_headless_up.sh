@@ -18,6 +18,10 @@ fi
 CP="$JAR"
 for jar in "$GHIDRA_HOME"/Ghidra/Framework/*/lib/*.jar "$GHIDRA_HOME"/Ghidra/Features/*/lib/*.jar "$GHIDRA_HOME"/Ghidra/Processors/*/lib/*.jar; do CP="$CP:$jar"; done
 mkdir -p "$HOME/projects/ascendancy/.logs"
+# run_script_inline is gated by this env var in GhidraMCP >= 5.4.1; P2 needs
+# scripted analysis (create functions / bulk xrefs) because a raw binary gets
+# 0 function symbols from auto-analysis alone.
+export GHIDRA_MCP_ALLOW_SCRIPTS=1
 nohup java -Xmx3g -XX:+UseG1GC -Dghidra.home="$GHIDRA_HOME" -Dapplication.name=GhidraMCP \
   -classpath "$CP" com.xebyte.headless.GhidraMCPHeadlessServer \
   --port 8089 --bind 127.0.0.1 > "$HOME/projects/ascendancy/.logs/ghidra_headless.log" 2>&1 &

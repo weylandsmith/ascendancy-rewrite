@@ -53,6 +53,43 @@ else
   tail -20 /tmp/gate_shp.log; err "shp_probe.py failed (.shp container invariant broken?)"
 fi
 
+# 3d. P2-input invariant: all 21 race*.dip parse with the SAME DIPVALUES key
+# set (that identity is what makes per-race AI data-driven rather than 21
+# bespoke scripts). Also pins the corpus size.
+if /usr/bin/python3 "$ROOT/scripts/dip_probe.py" --out /tmp/gate_dip.md >/tmp/gate_dip.log 2>&1; then
+  grep -q 'OK: 21/21 dips parsed' /tmp/gate_dip.log \
+    || { tail -20 /tmp/gate_dip.log; err "dip_probe did not parse all 21 dips"; }
+else
+  tail -20 /tmp/gate_dip.log; err "dip_probe.py failed (.dip grammar broken?)"
+fi
+
+# 3e. P1e invariant: FLIC chunk chains tile their files exactly; audio/font/
+# hazard/tmp inventory regenerates.
+if /usr/bin/python3 "$ROOT/scripts/media_probe.py" --out /tmp/gate_media.md >/tmp/gate_media.log 2>&1; then
+  grep -q 'OK: 2 flic exact-tiled' /tmp/gate_media.log \
+    || { tail -20 /tmp/gate_media.log; err "media_probe did not verify both FLICs"; }
+else
+  tail -20 /tmp/gate_media.log; err "media_probe.py failed (FLIC/audio inventory)"
+fi
+
+# 3f. P1d invariant: the golden save is byte-pinned by size and the measured
+# stride-75 tech chain still resolves.
+if /usr/bin/python3 "$ROOT/scripts/gam_probe.py" --out /tmp/gate_gam.md >/tmp/gate_gam.log 2>&1; then
+  grep -q 'stride=75' /tmp/gate_gam.log \
+    || { tail -20 /tmp/gate_gam.log; err "gam_probe stride changed (was 75)"; }
+else
+  tail -20 /tmp/gate_gam.log; err "gam_probe.py failed (resume.gam correlation)"
+fi
+
+# 3g. P1f invariant: ascend00 stays CP437-safe (few high bytes) and the exe
+# still exposes its 34 module names (the P2 subsystem spine).
+if /usr/bin/python3 "$ROOT/scripts/text_probe.py" --quiet >/dev/null 2>/tmp/gate_text.log; then
+  grep -q 'modules=34' /tmp/gate_text.log \
+    || { cat /tmp/gate_text.log; err "text_probe module count changed (was 34)"; }
+else
+  cat /tmp/gate_text.log; err "text_probe.py failed"
+fi
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}
