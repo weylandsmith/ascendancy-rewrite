@@ -48,6 +48,17 @@ the contract explicitly admits extracted-file-offset citations, so B is
 compliant, and interleaved A attempts can only improve fidelity for free.
 Ambiguities go to OPEN-QUESTIONS as required; nothing is invented.
 
-If the user instead requires formula-exact parity (A-only), say so before
-P4-combat starts — retrofitting exact formulas into a working system is cheap
-(they are constants and small arithmetic), so this choice is not irreversible.
+If the user instead requires formula-exact parity (A-only), say so — the
+project COMPLETED under default C (gate green, victory playthroughs,
+checklist closed at 5ac604d), and retrofitting exact formulas into the
+working systems stays cheap: they are constants and small arithmetic in
+Campaign::attackScore/defenseScore/economy phases, each cited to its
+OQ entry. Residual R1-blocked items after completion: OQ-003 (.gam save
+map), OQ-005 (.shp pixel codec), OQ-006 (headerless sample rate),
+OQ-010 (combat arithmetic), OQ-017 (vendor .fnt font), OQ-019 (ship
+design screen). Pursuing any of them needs a runtime-capture capability
+this box lacks: dosbox-x here has no gdb stub, and the safe capture
+routes (INT-hook memory dump inside dosbox, or an external tracer under a
+custom emulator) each change how the original binary is EXECUTED — that
+environmental commitment is the user's call, not a step to take
+unilaterally.
