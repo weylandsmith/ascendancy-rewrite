@@ -27,6 +27,8 @@ const char* victoryName(Victory v) {
     switch (v) {
         case Victory::None: return "None";
         case Victory::Control: return "Control";
+        case Victory::Captured: return "Captured";
+        case Victory::Unification: return "Unification";
         case Victory::Extinct: return "Extinct";
         case Victory::LastAlive: return "LastAlive";
     }
@@ -36,6 +38,8 @@ const char* victoryName(Victory v) {
 const char* victoryConditionFile(Victory v) {
     switch (v) {
         case Victory::Control: return "end-ctrl";   // "over half the galaxy"
+        case Victory::Captured: return "end-capt";  // "captured all home worlds"
+        case Victory::Unification: return "end-unit"; // "one alliance, player alive"
         case Victory::Extinct: return "end-xtnc";   // "Player extinct"
         case Victory::LastAlive: return "end-dest"; // "destroyed other races"
         case Victory::None: return "";
@@ -175,6 +179,7 @@ void Campaign::pickHomeStars() {
         owner_[best] = o;
         assigned.push_back(best);
     }
+    homeStar_ = assigned;  // fixed at setup; Captured tests these ids (§1)
 }
 
 double Campaign::popCapFor(int star) const {
@@ -365,11 +370,15 @@ int Campaign::driveHopsFor(int owner) const {
         }
     }
     if (lvl <= 0) return 0;
+    int hops = lvl / 2;
     // SA_FastLaneTravel (help.txt L2409-2410 "move quickly through star
     // lanes"): +1 lane hop [documented mapping, abilities.md §2 — the vendor
-    // gives no numeric speed; hop scale itself is OQ-019].
-    if (ability_[owner] == SpeciesAbility::FastLaneTravel) ++lvl;
-    return std::max(1, std::min(3, lvl / 2));
+    // gives no numeric speed; hop scale itself is OQ-019]. Applied to the
+    // HOP count before the clamp — an earlier cut did ++lvl before lvl/2,
+    // which silently did nothing at odd quotients (lvl 2 -> 1 hop, lvl 3 ->
+    // 1 hop; self-caught while planning the end-capt reachability test).
+    if (ability_[owner] == SpeciesAbility::FastLaneTravel) ++hops;
+    return std::max(1, std::min(3, hops));
 }
 
 void Campaign::diplomacyPhase() {
@@ -382,6 +391,18 @@ void Campaign::diplomacyPhase() {
         if (act == DipAction::DeclareWar && !war_[owner * Nowner_ + kPlayer]) {
             setWar(owner, kPlayer, true);
             events_.push_back({turn_, aiDip_[i].displayName + " declared war on the player"});
+        } else if (act == DipAction::ProposePeace && war_[owner * Nowner_ + kPlayer]) {
+            // Player accepts, always [inferred from verified numbers,
+            // docs/re/diplomacy.md §1]: a proposal only fires at
+            // attitude >= PROPOSE_PEACE (race range 200..530), and the
+            // player's ACCEPT_PEACE is 100 — strictly below the minimum
+            // proposal threshold, so any state that can propose can also
+            // accept. An earlier cut proposed into the void (dead branch,
+            // self-caught while wiring end-unit reachability).
+            setWar(owner, kPlayer, false);
+            st.atWar = false;
+            events_.push_back({turn_, aiDip_[i].displayName +
+                                  " proposed peace; accepted"});
         } else if (act == DipAction::BreakAlliance && war_[owner * Nowner_ + kPlayer]) {
             // already at war; nothing to break (alliance bookkeeping R1-blocked)
         } else if (act == DipAction::ProposeAlliance && !st.allied) {
@@ -679,11 +700,42 @@ Victory Campaign::checkVictory() const {
     const bool fleetPending = std::any_of(fleet_.begin(), fleet_.end(),
                                           [&](const ShipInTransit& x) { return x.owner == kPlayer; });
     if (mine == 0 && turn_ > 0 && !fleetPending) return Victory::Extinct;  // end-xtnc
-    int alive = 0, last = -1;
-    for (int o = 0; o < Nowner_; ++o)
-        if (starsOwned(o) > 0) { ++alive; last = o; }
-    if (alive == 1 && last == kPlayer) return Victory::LastAlive;          // end-dest
-    if (mine * 2 > total) return Victory::Control;                          // end-ctrl "> half"
+    // ORDER [documented choice, turnloop.md §1 — vendor priority unknown]:
+    // Extinct (with its fleetPending wait, above) > LastAlive > Captured >
+    // Unification > Control; each earlier condition is strictly more
+    // specific. Do NOT re-add a mine==0 Extinct check below: while a player
+    // colony ship is still in transit it can colonise next turn (that is
+    // what the fleetPending wait above exists for; self-caught).
+    int alive = 0, last = -1, aliveAi = 0, aiAllied = 0;
+    for (int o = 0; o < Nowner_; ++o) {
+        if (starsOwned(o) <= 0) continue;
+        ++alive; last = o;
+        if (o != kPlayer) {
+            ++aliveAi;
+            if (dipState_[o - 1].allied) ++aiAllied;
+        }
+    }
+    if (alive == 1 && last == kPlayer) return Victory::LastAlive;           // end-dest
+    // end-capt: "Player captured all home worlds" [verified comment]. The
+    // home world is the star fixed at setup (homeStar_), not "any star the
+    // race ever owned".
+    bool allHomesMine = cfg_.aiCount > 0 && mine > 0;
+    for (size_t o = 1; allHomesMine && o < homeStar_.size(); ++o)
+        if (homeStar_[o] >= 0 && owner_[homeStar_[o]] != kPlayer) allHomesMine = false;
+    if (allHomesMine) return Victory::Captured;
+    // end-unit: "Galaxy under one alliance, player alive" [verified
+    // comment]. Player-relative reading [documented, turnloop.md §1]: every
+    // live AI allied to the player and no player-AI war bit. AI-vs-AI wars
+    // are deliberately NOT part of the test — the diplomacy model has no
+    // AI-AI relations at all (OQ-020/abilities.md), so only player-relative
+    // "one alliance" is internally expressible; the FFA arcade default's
+    // AI-AI bits are a documented setup artifact, not vendor semantics.
+    bool playerAtWar = false;
+    for (int o = 1; o < Nowner_ && !playerAtWar; ++o)
+        if (starsOwned(o) > 0 && war_[kPlayer * Nowner_ + o]) playerAtWar = true;
+    if (aliveAi > 0 && aiAllied == aliveAi && !playerAtWar)
+        return Victory::Unification;
+    if (mine * 2 > total) return Victory::Control;  // end-ctrl (OQ-021: "> half" vs prose "two-thirds")
     return Victory::None;
 }
 

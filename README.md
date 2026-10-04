@@ -66,8 +66,9 @@ palette mapping, so a deuteranopia/protanopia-verified palette is used.
 OPEN, NOT FAKE-IMPLEMENTED (stated, not silently stubbed): original sprite
 pixel codec (OQ-005 — the map draws documented circles instead of invented
 art), save/load (OQ-003), the exe's runtime data base (R1 in
-`docs/BLOCKED.md`), end-capt/end-unit victory evaluation (needs R1
-bookkeeping).
+`docs/BLOCKED.md`). All five vendor end-*.txt victory conditions ARE now
+evaluated (end-capt and end-unit under documented readings — turnloop.md §1;
+their exact vendor thresholds/priority remain R1).
 
 ## Layout
 

@@ -1,6 +1,6 @@
 # Headless playthrough record
 
-Regenerated 2026-10-04T17:17:15-04:00 by scripts/record_playthrough.sh from the
+Regenerated 2026-10-04T18:11:20-04:00 by scripts/record_playthrough.sh from the
 current binary. Victory conditions and their vendor files: docs/re/turnloop.md §1.
 
 ## Run A — headless, seed 2024

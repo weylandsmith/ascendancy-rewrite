@@ -20,7 +20,7 @@ namespace ascend::game {
 // docs/re/turnloop.md §2).
 constexpr int kPlayer = 0;
 
-enum class Victory { None, Control, Extinct, LastAlive };
+enum class Victory { None, Control, Captured, Unification, Extinct, LastAlive };
 const char* victoryName(Victory v);
 // The end-*.txt file whose vendor comment names this condition
 // (docs/re/turnloop.md §1). "" for None.
@@ -153,6 +153,7 @@ private:
     std::vector<DipPolicyState> dipState_;     // per AI owner
     // War table (symmetric bits, owner x owner) + capture fortify counter
     // per star. Model + constants: docs/re/turnloop.md §5 [inferred].
+    std::vector<int> homeStar_;                   // per owner, fixed pickHomeStars id
     std::vector<char> war_;
     std::vector<int> fortify_;
     // Species abilities (docs/re/abilities.md): ability_[o] = owner o's SA_

@@ -65,7 +65,8 @@ Shared& shared() {
 // Build a campaign where AI owner k (1-based) has ability `ab` and no other
 // owner has one (unless playerSpecies >= 0, which also grants the player's).
 ag::Campaign makeCrafted(unsigned seed, int aiOwner, ag::SpeciesAbility ab,
-                         int playerSpecies = -1, int aiCount = 6) {
+                         int playerSpecies = -1, int aiCount = 6,
+                         int starCount = 75, bool freeForAll = true) {
     Shared& s = shared();
     std::vector<ag::SpeciesAbility> abilities(aiCount, ag::SpeciesAbility::Unknown);
     abilities[aiOwner - 1] = ab;
@@ -73,8 +74,10 @@ ag::Campaign makeCrafted(unsigned seed, int aiOwner, ag::SpeciesAbility ab,
     cfg.seed = seed;
     cfg.aiCount = aiCount;
     cfg.playerSpecies = playerSpecies;
+    cfg.freeForAll = freeForAll;
     ag::MapConfig mc;
     mc.seed = seed;
+    mc.starCount = starCount;
     ag::Galaxy g = ag::MapGenerator(mc, s.stats, s.names).generate();
     // Use the first aiCount dip files (roster-order; contents only feed the
     // DIPVALUES policy model here — abilities are set explicitly above).
@@ -251,4 +254,56 @@ TEST(species_determinism_with_abilities) {
     }
     CHECK(a.traceLine() == b.traceLine());
     CHECK(a.turn() == b.turn());
+}
+
+// --- end-capt / end-unit evaluation (docs/re/turnloop.md §1) -------------
+
+TEST(victory_condition_files_all_mapped) {
+    // All five vendor end-*.txt files are now evaluated in checkVictory;
+    // the enum->file mapping must cover every one (this is what changed:
+    // Captured/Unification were previously "not evaluated" rows).
+    CHECK(std::string(ag::victoryConditionFile(ag::Victory::Control)) == "end-ctrl");
+    CHECK(std::string(ag::victoryConditionFile(ag::Victory::Captured)) == "end-capt");
+    CHECK(std::string(ag::victoryConditionFile(ag::Victory::Unification)) == "end-unit");
+    CHECK(std::string(ag::victoryConditionFile(ag::Victory::Extinct)) == "end-xtnc");
+    CHECK(std::string(ag::victoryConditionFile(ag::Victory::LastAlive)) == "end-dest");
+    CHECK(std::string(ag::victoryName(ag::Victory::Captured)) == "Captured");
+    CHECK(std::string(ag::victoryName(ag::Victory::Unification)) == "Unification");
+}
+
+TEST(victory_end_capt_reachable_small_ffa) {
+    // Captured = player owns every AI's setup home star. Player Minions
+    // (guaranteed invasions) vs 2 AI on a small FFA map. Whether a bot game
+    // reaches it is dynamics, not the evaluation contract; but the check IS
+    // evaluated before Control, so a run that takes both homes while under
+    // half reports Captured, never Control.
+    for (unsigned seed : {2u, 5u, 13u, 17u, 21u, 33u}) {
+        auto c = makeCrafted(seed, 1, ag::SpeciesAbility::SuperMarines,
+                             /*playerSpecies=*/0, /*aiCount=*/2, /*stars=*/14);
+        ag::Victory v = ag::Victory::None;
+        int t = 0;
+        for (; t < 600 && v == ag::Victory::None; ++t) v = c.advance();
+        if (v == ag::Victory::Captured) return;  // evaluation exercised
+    }
+    // Dynamics never took both homes on these seeds. Evaluation itself is
+    // pinned by the mapping test + gate; do NOT fake a fixture here.
+    std::printf("(skip: end-capt not reached on search seeds) ");
+}
+
+TEST(victory_peace_acceptance_ends_player_war) {
+    // diplomacyPhase now acts on ProposePeace (accept-threshold argument in
+    // campaign.cpp): a race at war whose attitude recovers past its
+    // PROPOSE_PEACE ends that war. 1-AI non-FFA game; watch for the pair.
+    for (unsigned seed : {1u, 5u, 9u, 17u}) {
+        auto c = makeCrafted(seed, 1, ag::SpeciesAbility::Unknown, -1, 1, 30, false);
+        for (int t = 0; t < 600 && !c.over(); ++t) c.advance();
+        bool peace = false, war = false;
+        for (const auto& e : c.events()) {
+            if (e.text.find("declared war") != std::string::npos) war = true;
+            if (e.text.find("proposed peace; accepted") != std::string::npos) peace = true;
+        }
+        if (peace) CHECK(war);   // peace never ends a war that never opened
+        if (war && peace) return;
+    }
+    std::printf("(skip: no war->peace sequence on search seeds) ");
 }

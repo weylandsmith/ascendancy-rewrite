@@ -6,7 +6,7 @@
 
 phase: P4
 milestone: 3  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
-updated: 2026-10-04T18:40
+updated: 2026-10-04T20:05
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -131,7 +131,23 @@ turn_log_recent:
      and silently diverged the campaign stream by t195 while t40 matched -
      abilities must never add/skip draws (documented in abilities.md §3).
      70/70 tests (15 new), gate 3m (ability_probe + smoke fires
-     SA_HealShips), PLAYTHROUGH regenerated (Control 201/211 + Extinct 215)."
+     SA_HealShips), PLAYTHROUGH regenerated (Control 201/211 + Extinct 215).",
+  - "2026-10-04f: ALL FIVE end-*.txt victory conditions now evaluated
+     (turnloop.md §1 rewritten). checkVictory gains Captured (owns every AI
+     setup home via new homeStar_, checked before Control) and Unification
+     (every live AI allied to player, no player-AI war bit; player-relative
+     because the dip model has no AI-AI relations). Real gap fixed on the
+     way: diplomacyPhase computed ProposePeace and DROPPED IT — now accepts
+     when attitude >= PROPOSE_PEACE, else refuses; peace event emitted.
+     Extinct fleetPending-grace kept; the redundant alive==1&&mine==0 dup
+     removed. FastLaneTravel bug: +1 hop was applied to drive LEVEL before
+     lvl/2 (no-op at odd quotients) — now +1 on hop count. Self-caught while
+     writing a test with memorized constants (*3<=100*2/2+52 nonsense) —
+     test rewritten to cite-only assertions per skill rule. 73/73 tests
+     (3 new: enum->file mapping pinned, end-capt reachability skip-logged,
+     peace-implies-war). Sweep: Control 198/201/211, Extinct x5 — victory
+     records machine-regenerated. OQ-021 filed (end-ctrl comment 'over half'
+     vs manual 'two-thirds'). Gate green pre-commit."
 
 ## CURRENT FOCUS
 P5b next. CONTRACT-CORE MET (see Run A/B/C + gate 3l). DONE P4: mapgen,
@@ -165,7 +181,7 @@ SA_ SPECIES ABILITIES WIRED 2026-10-04e (docs/re/abilities.md, gate 3m,
 70/70 tests; the species.md "?" for specnum 2 resolved = SA_BuildOnBlack).
 Remaining to full contract: P6 README + final STATE checklist pass.
 R1-blocked and stated-as-open in specs: exact combat arithmetic (OQ-010),
-end-capt/end-unit evaluation, save/load (OQ-003), AI orderings
+save/load (OQ-003), AI orderings
 (OQ-015/016), headerless sample-rate ground truth (OQ-006).
 AUDIT FINDING 2026-10-04d (session killed mid-audit by a model-latency
 timeout; loop stopped by user): the 21 species SA_<Ability> tokens are

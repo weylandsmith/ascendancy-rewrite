@@ -28,14 +28,29 @@ comment, `enddesc`..`endtext`, `ranks` + EXACTLY 10 rank-name lines (walker
 must stop at the next keyword — running past `congrat` miscounts 20),
 `congrat`..`endtext`, `end`. Asserted by `scripts/endtext_probe.py` / gate 3l.
 
-Rewrite implements (campaign.cpp):
+Rewrite implements (campaign.cpp — all five evaluated since 2026-10-04f):
 - `Control`  — player owns > 1/2 of all stars (end-ctrl; the "> half" IS the
-  vendor comment, the per-star unit of "galaxy" is [inferred]).
-- `Extinct`  — player owns 0 planets after turn 1 (end-xtnc).
-- `LastAlive`— all AI owners eliminated (end-dest; "captured all home
-  worlds" end-capt and alliance end-unit need combat/alliance accept
-  mechanics that are R1-blocked, so they are NOT evaluated — recorded, not
-  silently faked).
+  vendor comment, the per-star unit of "galaxy" is [inferred]; threshold
+  contradiction with "two-thirds" prose filed as OQ-021).
+- `Captured` — player owns every AI's setup home star (end-capt). The home
+  star is fixed at setup (`homeStar_`, the star pickHomeStars assigned each
+  owner) [inferred unit: "home worlds" = those stars]. Evaluated BEFORE
+  Control — taking all homes wins even at < half. Reachability by bot play
+  is dynamics (test v1: skip-note if search seeds never take both homes),
+  never a reason to fake a fixture.
+- `Unification` — every live AI allied to the player, no player-AI war bit
+  (end-unit). Player-relative ONLY: the diplomacy model has no AI-AI
+  relations (abilities.md), so "galaxy under one alliance" can only mean the
+  player's alliance web covers every survivor [documented reading]. Now
+  reachable because diplomacyPhase ACTS on ProposePeace: an AI at war whose
+  attitude recovers past its PROPOSE_PEACE threshold ends the war (2026-10-04f
+  — before that, propose-peace was computed and dropped into the void).
+- `Extinct`  — player owns 0 stars after turn 1, with a one-turn grace while
+  a player colony ship is in transit (it can colonise next turn).
+- `LastAlive`— player is the only owner with stars (end-dest).
+Evaluation order (documented choice; vendor priority unknown — R1):
+Extinct > LastAlive > Captured > Unification > Control.
+Gate stage 3 pins enum->file mapping (test victory_condition_files_all_mapped).
 
 ## 2. Players [verified keys]
 
