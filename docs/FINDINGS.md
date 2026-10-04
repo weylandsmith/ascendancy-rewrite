@@ -53,6 +53,25 @@ appears in ALL SEVEN .tsv and in NO .bin. They are sparse binary blobs of
 NUL-delimited strings (tech names / UI labels). Container grammar + which file
 the exe loads remain OQ-004.
 
+## 1c. .shp shape libraries [verified container 2026-10-03, scripts/shp_probe.py; OQ-005 container CLOSED, codec OPEN]
+208 libraries (ascend01 165, ascend02 43), 1557 shape records, all parsed.
+Container (LE): magic "1.10" @0; u32 N @4; u32 table_size==8*(N+1) @8; u32 0
+@12; then N+1 u64 slots @16. Record 0 sits at table_end (no slot); slots
+0..N-2 are strictly-increasing record pointers for records 1..N-1; the last
+record runs to EOF. Slots N-1 and N are library-level metadata, NEVER inside
+the data area (verified 208/208; e.g. bullet04: (39,39,20,20) then signed
+-10,-6). Record prefixes: rec0 packs dims u32 w + u32 h (198/208 — the other
+10 are opaque in 2 byte-identical patterns, first word 0x7FFFFFBB x9, or
+u32 18 + signed -5 x1); rec1+ pack dims u16 w + u16 h (163/163 observed).
+Raw w*h does not size a record (bullet04 rec0: 10x11 spans 331 B).
+CODEC UNRESOLVED: 5 RLE grammars x header 4/8/12 x u16/u32 dims searched
+with an exact-span discriminator on the 12 smallest libraries — 0 survivors.
+Per-record entropy 3.4-3.9 bits/byte over 20-31 distinct byte values: light
+RLE over palette indices, not LZ. Do not render until the exe's shape loader
+settles it (xrefs to 'DATA\DKSHIP%02d.SHP' @ascend.exe+0x86190). gate stage
+3c asserts container parseability of all 208. game.pal = 768 B = 256xRGB888.
+Aside: vesa480.dll is a Miles Design display shim, not game content.
+
 ## 2. Executables [verified]
 ascend.exe 587,475 B: MZ DOS header; strings show "WATCOM C Run-Time
   system code ... 1988-1993", DOS4GPATH/dos4gw.exe stub messages ->

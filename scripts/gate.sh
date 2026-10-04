@@ -40,6 +40,19 @@ else
   tail -20 /tmp/gate_probe.log; err "table_probe.py failed (.bin stride invariant broken?)"
 fi
 
+# 3c. P1c invariant: every .shp container parses (magic 1.10, table size
+# 8*(N+1), monotonic pointer slots, spans covering the data area). The probe
+# aborts on any violation; here we additionally pin the corpus size so a
+# silently-shrunk extracted/ tree cannot pass.
+NSH=$(find "$ROOT/extracted" -name '*.shp' -type f | wc -l)
+[ "$NSH" -ge 208 ] || err "only $NSH .shp files in extracted/ (expect >=208)"
+if /usr/bin/python3 "$ROOT/scripts/shp_probe.py" --out /tmp/gate_shp.md >/tmp/gate_shp.log 2>&1; then
+  grep -q 'parsed 208/208 libraries' /tmp/gate_shp.log \
+    || { tail -20 /tmp/gate_shp.log; err "shp_probe did not parse all 208 libraries"; }
+else
+  tail -20 /tmp/gate_shp.log; err "shp_probe.py failed (.shp container invariant broken?)"
+fi
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}

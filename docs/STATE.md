@@ -3,7 +3,7 @@
 
 phase: P1
 milestone: 1  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
-updated: 2026-10-03T09:55
+updated: 2026-10-03T12:30
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 468 files, Ghidra+MCP wired, plan written"
   - "crash: 2026-10-03T01:49 session 20261003_003843 died on 'Session DB append_message
@@ -19,18 +19,38 @@ turn_log_recent:
      exact 7/7). Seed's '.tsv = text form of .bin' claim FALSIFIED. OQ-001 CLOSED:
      offset table is N not N+1; fixed cob.py which had silently dropped each
      archive's last file (468 -> 471 extracted, existing 468 byte-identical)."
+  - "P1c: scripts/shp_probe.py + docs/re/shp.md + gate stage 3c. .shp CONTAINER
+     SOLVED 208/208 (magic 1.10; u32 N; table_size==8*(N+1); N+1 u64 slots where
+     slots 0..N-2 are strictly-increasing record pointers, rec0 sits at table_end,
+     last rec -> EOF; slots N-1/N are library metadata, never inside the data
+     area). CODEC NOT SOLVED: 5 RLE grammars x hdr 4/8/12 x u16/u32 dims,
+     exact-span discriminator, 12 smallest libs = 0 survivors (OQ-005 stays open).
+     NO PNG renders - rendering with an unknown codec fabricates pixels.
+     rec0 packs dims u32+u32 (198/208, 10 opaque); rec1+ packs u16+u16 (163/163)."
+  - "LESSON (this turn, three caught-in-review errors): do not write an
+     interpretation into docs/ without computing it. Wrong: 'cos_ship-style
+     variant' (rec0/rec1 differ only in dim PACKING, not a third header);
+     '0x7FFFFFBB = signed -4103' (it is positive as i32, 2147483579);
+     'h lands on byte 4' (u16 h is at byte 2). Verify the number, then write
+     the sentence. Also: read_file output carries LINE_NUM| prefixes - never
+     write it back into source (that corrupted and deleted shp_probe.py earlier;
+     it was untracked, git had no copy).
 
 ## CURRENT FOCUS
-P1 data formats. .bin tables are done (docs/re/tables.md). The .tsv container
-grammar and "which file does the exe load" are NOT resolvable from data alone —
-they need Ghidra xrefs, so they are carried into P2 as OQ-004 rather than guessed.
+P1 data formats. .bin tables (docs/re/tables.md) and the .shp container
+(docs/re/shp.md) are done and gate-asserted (stages 3b, 3c). Three open items
+all terminate at the same place — the exe's loaders: OQ-004 (.tsv grammar /
+which file is loaded), OQ-005 (.shp pixel codec), OQ-008 (Ghidra import). That
+is one Ghidra session, so P2 is the critical path; P1d/P1f are independent and
+can be done any time but do not unblock P2.
 
 ## NEXT ACTION (exactly one)
-P1c: write scripts/shp_probe.py for extracted/ascend01/data/*.shp (plus
-ascend02/data/dkship*.shp, lgrace*.shp): header fields, record/frame encoding,
-palette handling; render sample shapes to PNG under docs/assets/ and document in
-docs/re/shp.md. Closes OQ-005. OQ-004 and P2's Ghidra import are deliberately
-deferred behind this because P1c needs no binary RE; see PLAN ordering rule.
+Start P2: run scripts/ghidra_headless_up.sh, confirm /health on 127.0.0.1:8089,
+then import the Watcom LE payload per the PARKING LOT recipe (raw at imagebase,
+x86:LE:32:default + compiler 'gcc', never 'watcom'). First target: xrefs to the
+'DATA\DKSHIP%02d.SHP' string at ascend.exe+0x86190 -> shape loader -> settle
+OQ-005 (codec), then render PNGs to docs/assets/. Then the table loader for
+OQ-004.
 
 ## KNOWN-ISSUES / PARKING LOT
 - P2 BLOCKER (do not retry the old way): the Watcom LE payload at
@@ -78,7 +98,9 @@ See docs/PLAN.md P6 + goal contract. All P0-P6 items checked below.
 [~] P1b .tsv/.bin tables — .bin SPEC COMPLETE (docs/re/tables.md, 7/7 exact);
         .tsv characterised as binary string blobs, container grammar OPEN (OQ-004,
         needs Ghidra). Seed claim that .tsv = text .bin is falsified in FINDINGS 1b.
-[ ] P1c .shp sprites
+[~] P1c .shp sprites — CONTAINER SPEC COMPLETE + gate-asserted (docs/re/shp.md,
+        scripts/shp_probe.py, gate 3c; 208 libs / 1557 records). Pixel codec OPEN
+        (OQ-005, needs the P2 shape loader); no PNGs until the codec is known.
 [ ] P1d .gam saves
 [ ] P1e FLIC/audio inventory
 [ ] P1f text encodings
