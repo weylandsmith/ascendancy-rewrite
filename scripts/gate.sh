@@ -90,6 +90,26 @@ else
   cat /tmp/gate_text.log; err "text_probe.py failed"
 fi
 
+# 3h. P2 loader-model invariant: docs/re/loader.md exists (it is the P2
+# foundation every subsystem spec cites), the Ghidra bootstrap sources are
+# tracked, and the base-refutation probes still RUN (exit 0 = a base was found
+# later, which is an upgrade; exit 2 = refutation reproduced; anything else is
+# a crash). These need capstone/venv python; skipped with a note if absent.
+[ -s "$ROOT/docs/re/loader.md" ] || err "docs/re/loader.md missing (P2 foundation)"
+[ -s "$ROOT/docs/BLOCKED.md" ] || err "docs/BLOCKED.md missing"
+[ -s "$ROOT/scripts/ghidra/Seed2.java" ] || err "scripts/ghidra/Seed2.java missing"
+VENV_PY="$HOME/tools/revenv/bin/python"
+if [ -x "$VENV_PY" ] && [ -f "$ROOT/work/ascend_payload.bin" ] && [ -f "$ROOT/work/functions.tsv" ]; then
+  "$VENV_PY" "$ROOT/scripts/vtable_base_test.py" >/tmp/gate_vtb.log 2>&1
+  rc=$?
+  [ "$rc" -le 2 ] || { tail -20 /tmp/gate_vtb.log; err "vtable_base_test.py crashed (rc=$rc)"; }
+  "$VENV_PY" "$ROOT/scripts/c0_anchor_test.py" >/tmp/gate_c0.log 2>&1
+  rc=$?
+  [ "$rc" -le 2 ] || { tail -20 /tmp/gate_c0.log; err "c0_anchor_test.py crashed (rc=$rc)"; }
+else
+  note "venv/payload/functions.tsv not present: skipped loader-model probes"
+fi
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}

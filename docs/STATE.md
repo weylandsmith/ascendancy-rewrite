@@ -36,7 +36,17 @@ turn_log_recent:
      write it back into source (that corrupted and deleted shp_probe.py earlier;
      it was untracked, git had no copy).
 
-  - "P3 + exe model (this turn): (a) PROVED the LE payload is stored in file =
+  - "P2 loader model (turn 2026-10-04b): Seed2.java bootstraps 269 functions
+     (work/functions.tsv, gate stage 3h runs the probes). ABSOLUTE BASE C IS
+     REFUTED STATICALLY by four scripted tests (vtable_base_test,
+     ebx_relative_test — whose own first verdict I reversed with its spacing
+     control, c0_anchor_test, high-imm->ASCII) — full story docs/re/loader.md.
+     Data identities resolve at load time; only a RUNTIME base (R1 dosbox dump)
+     can restore them. docs/BLOCKED.md poses the R1/R2 methodology question;
+     working default = C hybrid, R2-priority. Gate 3h added; OQ-004/005/008/
+     011 updated. Two self-caught API bugs recorded in loader.md footer
+     (currentProgram is a FIELD; getBytes arg3 is an array offset -> silently
+     zero-filled images). Ghidra java sources now tracked in scripts/ghidra/. (a) PROVED the LE payload is stored in file =
      memory order (scripts/le_contiguity_test.py: rel32 call targets resolve
      76:1 in-page and 135:1 inter-page vs a page-shuffled control), so a raw
      load at imagebase 0 is valid for control flow; absolute base C is STILL
@@ -57,16 +67,13 @@ is one Ghidra session, so P2 is the critical path; P1d/P1f are independent and
 can be done any time but do not unblock P2.
 
 ## NEXT ACTION (exactly one)
-Check the background analyzeHeadless run (work/ghidra_headless.out and
-work/ghidra_bootstrap.log; it was launched with
-  analyzeHeadless work/ghproj ascend_proj -import work/ascend_payload.bin
-    -processor x86:LE:32:default -cspec gcc -postScript Bootstrap.java
-and started 2026-10-04 ~03:15). Read the 'BOOTSTRAP: ...' lines. If
-'bootstrapped functions' > 0, open work/ghproj with the MCP server
-(scripts/ghidra_headless_up.sh) and chase the shape loader from the strings
-SMRACE/LGRACE/DKSHIP (raw 0x86154/0x86168/... in the .rsrc cluster) to settle
-OQ-005. If the log shows 0 functions or an exception, fix Bootstrap.java — the
-prologue byte patterns and the DisassembleCommand address set are in there.
+Begin P4 map-gen from extracted files: inventory which files in
+extracted/ascend02/data hold map/galaxy parameters (gen*.tmp, mapdata,
+*.haz hazard tables — 26 DATA\ templates in docs/re/loader.md §5 name the
+canonical set), write docs/re/mapgen.md citing file offsets, then implement
+src/game/mapgen.{h,cpp} + unit tests. Constants MUST cite docs/re/mapgen.md;
+anything ambiguous goes to OPEN-QUESTIONS (never invent). Do NOT chase the
+static base again — read docs/re/loader.md §4 first.
 
 ## KNOWN-ISSUES / PARKING LOT
 - P2 BLOCKER (do not retry the old way): the Watcom LE payload at
