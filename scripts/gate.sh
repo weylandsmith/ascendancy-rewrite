@@ -148,6 +148,26 @@ grep -q 'PARSE TRAP' "$ROOT/docs/re/diplomacy.md" \
 grep -q 'SA_SuperMarines' "$ROOT/docs/re/species.md" \
   || err "species.md lost the ability roster"
 
+# 3l. Victory-condition grammar + CONTRACT smoke: end-*.txt blocks assert
+# (scripts/endtext_probe.py), and the rewrite binary must actually reach a
+# victory condition on a seeded headless campaign run (docs/PLAYTHROUGH.md).
+[ -s "$ROOT/docs/re/turnloop.md" ] || err "docs/re/turnloop.md missing"
+if ! /usr/bin/python3 "$ROOT/scripts/endtext_probe.py"; then
+  err "endtext_probe.py failed (end-*.txt grammar changed?)"
+fi
+grep -q 'VICTORY Control' "$ROOT/docs/PLAYTHROUGH.md" \
+  || err "PLAYTHROUGH.md lost the control-victory run"
+grep -q 'VICTORY Extinct' "$ROOT/docs/PLAYTHROUGH.md" \
+  || err "PLAYTHROUGH.md lost the extinction run"
+if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
+  if ! timeout 180 "$ROOT/rewrite/build/ascendancy" --headless --campaign 600 \
+       --seed 2024 >/tmp/gate_campaign.log 2>&1; then
+    tail -20 /tmp/gate_campaign.log; err "seeded campaign did not reach victory"
+  fi
+  grep -q '^VICTORY ' /tmp/gate_campaign.log \
+    || { tail -20 /tmp/gate_campaign.log; err "campaign log has no VICTORY line"; }
+fi
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}

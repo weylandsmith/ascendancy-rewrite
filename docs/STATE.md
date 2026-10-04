@@ -6,7 +6,7 @@
 
 phase: P4
 milestone: 3  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
-updated: 2026-10-04T10:40
+updated: 2026-10-04T12:30
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -93,27 +93,45 @@ turn_log_recent:
      dip_probe.py always parsed 15 correctly) -> docs/re/diplomacy.md +
      src/game/diplomacy.{h,cpp} (parse, sinusoidal mood model [inferred],
      %m%y%s%t renderer, threshold policy [inferred]) + 10 tests (35/35), gate
-     3k, OQ-015 (token table + DA_ selection order).
+     3k, OQ-015 (token table + DA_ selection order)."
+  - "P4 TURN LOOP + PLAYTHROUGH (this turn): end-*.txt SOLVED as the five
+     vendor victory conditions (docs/re/turnloop.md §1; scripts/endtext_probe
+     asserts comment+enddesc/congrat+10-ranks grammar - ranks walker must
+     stop at keywords, ran past congrat and miscounted 20 once).
+     campaign.{h,cpp}: homes spread + economy(stockpiled IND/RES) + logistic
+     pop w/ PROS + gated item builds + research(RES->cheapest/random) +
+     colonisation(one lane/turn) + WAR/capture [inferred model: pop/10 +
+     owned weapon level 1..13 vs pop/10 + shield 1..5 + terrain 2, fortify 2]
+     + diplomacy war table (START_ATTITUDE initialises relations - zero-init
+     would declare war turn 1, data says no). Victory: Control >1/2 (end-ctrl)
+     / Extinct (end-xtnc, waits for last colony ship) / LastAlive (end-dest);
+     end-capt + end-unit NOT evaluated (need R1 bookkeeping - stated, not
+     faked). --campaign N --seed S in main. 42/42 tests incl determinism +
+     no-op-after-victory. THREE self-caught model bugs via behaviour tests:
+     income-reassign starved economies (must stockpile); fortify checked on
+     ATTACKER star -> 5k oscillating captures, frozen front; docs/code drift
+     on PROS caught by re-read. PLAYTHROUGH.md = real captured runs: seed
+     2024 Control t51, seed 42 Extinct t55, Xvfb seed 13 Control t50. Gate
+     3l (grammar + both VICTORY lines + live binary smoke). OQ-016 = the
+     documented-default constants (R1 replaces §3-5 wholesale)."
 
 ## CURRENT FOCUS
-P4 systems, R2-first per docs/BLOCKED.md. DONE: mapgen, research, gizmos,
-economy/items, ui-manifest, species roster, diplomacy engine (docs/re/
-{mapgen,research,gizmos,economy,ui,species,diplomacy}.md + 35/35 tests,
-gates 3i/3j/3k). Next: the TURN LOOP itself - integrate mapgen+research+
-economy+diplomacy into a seeded campaign state in src/game/campaign.* with
-production/research per-turn deltas (constants from planitem/gizmo columns +
-documented defaults, OQ-tracked), then victory conditions -> docs/
-PLAYTHROUGH.md (contract needs turns-advance-to-victory). Still R1-blocked:
-combat application (OQ-010), save format (OQ-003), exact AI/turn orderings
-(OQ-015). Audio spec exists (media.md) but mixing is P5.
+P5 now. CONTRACT-CORE MET: seeded campaign plays to victory (headless AND
+Xvfb — docs/PLAYTHROUGH.md, gate 3l smoke). DONE P4: mapgen, research,
+gizmos, items, ui-manifest, species, diplomacy, turn loop (docs/re/ 10
+specs, 42/42 tests, gates 3i/3j/3k/3l). Remaining to full contract:
+rendered UI over the campaign (windows.txt grammar in ui.md + .shp codec
+OQ-005 gate on bitmaps — text-mode UI first is acceptable and honest),
+audio mixing (OQ-006 sample rate), and the P6 README. R1-blocked and
+stated-as-open in specs: exact combat arithmetic (OQ-010), end-capt/
+end-unit evaluation, save/load (OQ-003), AI orderings (OQ-015/016).
 
 ## NEXT ACTION (exactly one)
-Write rewrite/src/game/campaign.{h,cpp}: seeded campaign state (galaxy from
-mapgen, one home species + N AI from raceNN.dip, research/economy owned
-tables), advanceTurn() applying documented per-turn deltas, victory check
-(extinction/last-alive + surrender threshold - all cited or OQ'd), then a
---campaign N headless mode in main.cpp and docs/PLAYTHROUGH.md from a real
-seeded run. Constants from raw rows only; behaviour defaults OQ-tracked.
+P5a: minimal in-window UI over the live campaign — SDL render surface,
+cosmos star/lane view (positions from campaign galaxy; shapes can be
+plain circles until the .shp codec lands — NO fabricated sprites), turn
+button + status line (playerScorePct, traceLine), event log pane. Gate
+4c: Xvfb run of UI mode takes >=1 input event and repaints.
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr
@@ -156,9 +174,11 @@ See docs/PLAN.md P6 + goal contract. All P0-P6 items checked below.
 [~] P3 engine skeleton — BUILDS + BOOTS (gate 4/4b). C++17 + SDL2 2.32.4 /
         SDL2_mixer 2.8.1; readers ported 1:1; boots headless AND Xvfb/x11.
         Remaining: render surface + input pump (arrives with P5 UI).
-[~] P4 systems — mapgen, research, gizmos, items, ui-manifest, species,
-        diplomacy DONE (docs/re/*.md; gates 3i/3j/3k; OQ-012..015). 35/35
-        tests. Remaining: turn-loop integration (next), combat application
-        (R1), audio mixing (P5), victory/playthrough (next).
+[x] P4 systems — mapgen, research, gizmos, items, ui-manifest, species,
+        diplomacy, TURN LOOP + seeded VICTORY playthrough (docs/re/*.md
+        incl. turnloop.md; gates 3i/3j/3k/3l; OQ-012..016 tracked).
+        42/42 tests; PLAYTHROUGH.md shows Control + Extinct victories
+        headless and under Xvfb. Exact combat arithmetic stays open
+        (OQ-010) INSIDE the working loop — documented-default model.
 [ ] P5 UI+media parity pass
 [ ] P6 full campaign playable to victory; README

@@ -14,6 +14,12 @@
 
 #include "formats/bin_table.h"
 #include "formats/cob.h"
+#include "game/campaign.h"
+#include "game/diplomacy.h"
+#include "game/economy.h"
+#include "game/mapgen.h"
+#include "game/research.h"
+#include "game/starstat.h""
 
 #ifndef ASCENDANCY_SOURCE_DIR
 #define ASCENDANCY_SOURCE_DIR "."
@@ -29,6 +35,8 @@ struct Options {
     fs::path dataRoot = ASCENDANCY_SOURCE_DIR;  // repo root holds extracted/
     int turns = 0;                              // 0 = interactive
     bool headless = false;                      // SDL dummy driver, no audio
+    int campaign = 0;                           // N turns of seeded campaign
+    unsigned seed = 1;
 };
 
 bool parseArgs(int argc, char** argv, Options* o) {
@@ -40,6 +48,10 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->turns = std::atoi(argv[++i]);
         else if (a == "--headless")
             o->headless = true;
+        else if (a == "--campaign" && i + 1 < argc)
+            o->campaign = std::atoi(argv[++i]);
+        else if (a == "--seed" && i + 1 < argc)
+            o->seed = static_cast<unsigned>(std::atol(argv[++i]));
         else if (a == "--help")
             return false;
         else {
@@ -55,7 +67,9 @@ void usage() {
         "usage: ascendancy [--data ROOT] [--turns N] [--headless]\n"
         "  --data ROOT   directory containing extracted/ (default: repo root)\n"
         "  --turns N     run N turns of the turn loop then exit\n"
-        "  --headless    SDL dummy video driver, no audio device\n");
+        "  --headless    SDL dummy video driver, no audio device\n"
+        "  --campaign N  play N turns of a seeded campaign (docs/re/turnloop.md)\n"
+        "  --seed S      seed for --campaign (default 1)\n");
 }
 
 // Loads the three archives from the ORIGINAL game/ directory, because the
@@ -98,6 +112,56 @@ bool loadGameData(const Options& o, GameData* g, std::string* err) {
 
 }  // namespace
 
+
+// Seeded campaign to victory: docs/re/turnloop.md. Returns process exit code
+// (0 when a victory was reached within --campaign turns).
+int runCampaign(const Options& o) {
+    namespace ag = ascend::game;
+    const fs::path d0 = o.dataRoot / "extracted" / "ascend00";
+    std::string err;
+    auto stats = ag::StarStats::load(d0 / "starstat.txt", &err);
+    if (!stats) { std::printf("starstat: %s\n", err.c_str()); return 1; }
+    auto names = ag::loadStarNames(d0 / "names.txt", &err);
+    if (names.empty()) { std::printf("names: %s\n", err.c_str()); return 1; }
+    auto tree = ag::ResearchTree::loadFromFile((d0 / "restree.txt").string(), err);
+    auto items = ag::loadPlanItems((d0 / "planitem.txt").string(), err);
+    auto gizmos = ag::loadGizmos((d0 / "gizmos.txt").string(), err);
+    if (items.size() != 39 || gizmos.size() != 76) {
+        std::printf("table counts wrong: items %zu gizmos %zu\n", items.size(), gizmos.size());
+        return 1;
+    }
+    std::vector<ag::DipFile> ai;
+    for (int i = 0; i < 6; ++i) {
+        ag::DipFile df;
+        const fs::path p = d0 / ("race" + std::to_string(i / 10) + std::to_string(i % 10) + ".dip");
+        if (!df.loadFromFile(p.string(), &err)) { std::printf("dip: %s\n", err.c_str()); return 1; }
+        ai.push_back(std::move(df));
+    }
+    ag::CampaignConfig cfg;
+    cfg.seed = o.seed;
+    ag::MapConfig mc;
+    mc.seed = o.seed;
+    ag::Galaxy g = ag::MapGenerator(mc, *stats, names).generate();
+    ag::Campaign c(cfg, g, &tree, items, gizmos, ai, &err);
+    if (!err.empty()) { std::printf("campaign: %s\n", err.c_str()); return 1; }
+    std::printf("campaign seed=%u stars=%zu lanes=%zu ai=6\n", o.seed,
+                g.stars.size(), g.lanes.size());
+    for (int t = 0; t < o.campaign && !c.over(); ++t) {
+        c.advance();
+        std::printf("%s\n", c.traceLine().c_str());
+    }
+    for (const auto& ev : c.events())
+        std::printf("  [t%d] %s\n", ev.turn, ev.text.c_str());
+    if (c.over()) {
+        std::printf("VICTORY %s via %s.txt on turn %d (score %d%%)\n",
+                    ag::victoryName(c.victory()), ag::victoryConditionFile(c.victory()),
+                    c.turn(), c.playerScorePct());
+        return 0;
+    }
+    std::printf("no victory after %d turns\n", o.campaign);
+    return 1;
+}
+
 int main(int argc, char** argv) {
     Options o;
     if (!parseArgs(argc, argv, &o)) {
@@ -122,6 +186,12 @@ int main(int argc, char** argv) {
     }
     std::printf("SDL %d.%d.%d initialised (video driver: %s)\n", SDL_MAJOR_VERSION,
                 SDL_MINOR_VERSION, SDL_PATCHLEVEL, SDL_GetCurrentVideoDriver());
+
+    if (o.campaign > 0) {
+        const int rc = runCampaign(o);
+        SDL_Quit();
+        return rc;
+    }
 
     // Audio: the game's music is raw PCM whose sample rate is not yet known
     // (docs/re/media.md OQ-006), so P3 opens the device but plays nothing.
