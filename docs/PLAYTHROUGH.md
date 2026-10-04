@@ -352,3 +352,19 @@ in Run E, so the ONLY way turn count advances is injected input). Screenshot
 mid-run (scripts/ui_screenshot.sh): /tmp/ui_shot2.png shows cosmos, lanes,
 NEXT TURN, event pane; rendered pixel clusters measure separable under
 deuteranopia AND protanopia simulation (0/42 pair-checks fail).
+
+## Run F — P5b audio boot (gate 4d, dummy mixer device)
+
+```
+$ SDL_AUDIODRIVER=dummy xvfb-run -a ./rewrite/build/ascendancy \
+    --ui --audio --campaign 1 --autoplay --seed 4
+archives: 3 54 328 89  (.bin tables parsed: 7)
+SDL 2.32.4 initialised (video driver: x11)
+audio ok: 85 sfx chunks, music 8191719 B
+ui ok: turn 1                                          # exit code 0
+```
+85 = all 86 soundfx.txt entries ('shield' listed twice); music = theme00.raw
+wrapped from vendor PCM (docs/re/audio.md §2/§5). A first cut segfaulted
+here — Mix_LoadMUS_RW streams from the RWops, so the in-memory WAV must
+outlive the handle; gate 4d caught it before commit, and 3 back-to-back
+clean runs confirmed the fix.

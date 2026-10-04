@@ -208,6 +208,24 @@ else
   note "xvfb-run unavailable: skipped UI smoke"
 fi
 
+# 4d. Audio: SDL2_mixer must load ALL 86 manifest samples (85 unique — the
+# manifest lists 'shield' twice) + theme00 from the REAL vendor files, with
+# a dummy audio device (docs/re/audio.md §5). Any load failure aborts init
+# with exit 1, so grepping the ok line IS the load test.
+if [ -x "$ROOT/rewrite/build/ascendancy" ] && command -v xvfb-run >/dev/null 2>&1; then
+  if ! timeout 180 env SDL_AUDIODRIVER=dummy xvfb-run -a \
+       "$ROOT/rewrite/build/ascendancy" --ui --audio --campaign 1 \
+       --autoplay --seed 4 >/tmp/gate_audio.log 2>&1; then
+    tail -20 /tmp/gate_audio.log; err "audio boot failed"
+  fi
+  grep -q 'audio ok: 85 sfx chunks, music 8191719 B' /tmp/gate_audio.log \
+    || { cat /tmp/gate_audio.log; err "audio load line wrong (expect 85 chunks, theme00)"; }
+  grep -q 'ui ok: turn 1' /tmp/gate_audio.log \
+    || { cat /tmp/gate_audio.log; err "audio run did not complete a turn"; }
+else
+  note "xvfb-run unavailable: skipped audio smoke"
+fi
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}

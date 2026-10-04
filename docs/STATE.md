@@ -126,17 +126,24 @@ xdotool on host; SDL re-reads pointer for synthetic events -> warp first).
 Owner palette SEARCHED and pixel-verified: 0/42 pair-checks fail under
 deuteranopia AND protanopia simulation of the rendered framebuffer;
 neutrals also coded by dot SIZE. Font = Liberation substitute (vendor
-.fnt header/stride partly known, codec OPEN as OQ-017). 47/47 tests.
-Remaining to full contract: audio mixing (OQ-006 sample rate), P6 README,
-STATE checklist pass. R1-blocked and stated-as-open in specs: exact
-combat arithmetic (OQ-010), end-capt/end-unit evaluation, save/load
-(OQ-003), AI orderings (OQ-015/016).
+.fnt header/stride partly known, codec OPEN as OQ-017).
+DONE P5b (docs/re/audio.md): vendor sample container cracked on all 15
+headered .voc (rate/bits/ch explicit; PCM bytes 42..EOF-1); all 86 SFX +
+theme00 music load through SDL2_mixer (--audio, --mute); UI plays
+click08/laser01/bang01 on interactions; gate 4d + 5 audio unit tests.
+OQ-006 NARROWED to headerless-file rate only (22050 default documented,
+FFT check tried and recorded as inconclusive); OQ-018 for the remaining
+header fields + theme selection. 52/52 tests.
+Remaining to full contract: P6 README + final STATE checklist pass.
+R1-blocked and stated-as-open in specs: exact combat arithmetic (OQ-010),
+end-capt/end-unit evaluation, save/load (OQ-003), AI orderings
+(OQ-015/016), headerless sample-rate ground truth (OQ-006).
 
 ## NEXT ACTION (exactly one)
-P5b: audio. Probe the .wav/.voc candidates in extracted/ for format facts,
-fix or bound OQ-006 (sample-rate ambiguity), wire SDL2_mixer music+SFX
-behind a mute flag, gate 4d: Xvfb run boots mixer, loads >=1 real sample,
-prints mixer facts, exits 0.
+P6: README.md at repo root (build, run, flags, what-is-authentic vs
+documented-default, pointer to docs/re/ specs and OPEN-QUESTIONS); then
+walk the full STATE checklist marking every genuinely-complete item and
+re-stating the open ones explicitly, and give the completion statement.
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr

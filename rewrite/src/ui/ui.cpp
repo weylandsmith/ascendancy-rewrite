@@ -60,7 +60,7 @@ void filledCircle(SDL_Renderer* r, int cx, int cy, int rad) {
 }  // namespace
 
 int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
-                  const std::string& fontPath) {
+                  const std::string& fontPath, AudioEngine* audio) {
     if (TTF_Init() != 0) {
         std::printf("TTF_Init: %s\n", TTF_GetError());
         return 1;
@@ -92,10 +92,20 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     Uint32 nextAuto = autoplay ? SDL_GetTicks() + 250 : 0xFFFFFFFFu;
     bool quit = false;
 
+    // Advances one turn; plays bang01 iff a NEW "captured" event appeared
+    // (sample names verbatim from soundfx.txt, docs/re/audio.md §5).
     auto advanceOnce = [&] {
-        if (!camp.over()) {
-            camp.advance();
-            ++played;
+        if (camp.over()) return;
+        const size_t before = camp.events().size();
+        camp.advance();
+        ++played;
+        if (audio) {
+            const auto& ev = camp.events();
+            for (size_t i = before; i < ev.size(); i++)
+                if (ev[i].text.find("captured") != std::string::npos) {
+                    audio->play("bang01");
+                    break;
+                }
         }
     };
 
@@ -116,8 +126,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 Pt p{ev.button.x, ev.button.y};
                 if (inRect(kNextTurnBtn, p)) {
                     std::printf("ui click next-turn\n");
+                    if (audio) audio->play("click08");
                     advanceOnce();
                 } else if (inRect(kCosmosWnd, p)) {
+                    if (audio) audio->play("laser01");
                     selected = hitStar(view, camp.galaxy(), p);
                     std::printf("ui click map (%d,%d) -> %s\n", p.x, p.y,
                                 selected >= 0 ? camp.galaxy().stars[selected].name.c_str()

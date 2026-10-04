@@ -30,6 +30,7 @@ include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS} src)
 add_library(ascend_core STATIC
   src/formats/cob.cpp
   src/formats/bin_table.cpp
+  src/formats/voc.cpp
   src/game/starstat.cpp
   src/game/mapgen.cpp
   src/game/research.cpp
@@ -42,14 +43,15 @@ add_library(ascend_core STATIC
 add_library(ascend_ui STATIC
   src/ui/layout.cpp
   src/ui/ui.cpp
+  src/ui/audio.cpp
 )
-target_include_directories(ascend_ui PUBLIC src ${SDL2_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS})
-target_link_libraries(ascend_ui PUBLIC ascend_core ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
+target_include_directories(ascend_ui PUBLIC src ${SDL2_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS})
+target_link_libraries(ascend_ui PUBLIC ascend_core ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES} ${SDL2_MIXER_LIBRARIES})
 
 add_executable(ascendancy
   src/main.cpp
 )
-target_link_libraries(ascendancy PRIVATE ascend_ui ${SDL2_MIXER_LIBRARIES})
+target_link_libraries(ascendancy PRIVATE ascend_ui)
 
 # ---- tests ----------------------------------------------------------------
 enable_testing()
@@ -63,6 +65,7 @@ add_executable(run_tests
   tests/test_diplomacy.cpp
   tests/test_campaign.cpp
   tests/test_ui_layout.cpp
+  tests/test_audio.cpp
   src/ui/layout.cpp
 )
 target_link_libraries(run_tests PRIVATE ascend_core)

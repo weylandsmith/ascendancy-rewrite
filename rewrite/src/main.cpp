@@ -41,6 +41,8 @@ struct Options {
     unsigned seed = 1;
     bool ui = false;                            // P5a window (docs/re/ui-runtime.md)
     bool autoplay = false;
+    bool audio = false;                         // SDL2_mixer (docs/re/audio.md §5)
+    bool mute = false;                          // load everything, volume 0
 };
 
 bool parseArgs(int argc, char** argv, Options* o) {
@@ -60,6 +62,10 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->ui = true;
         else if (a == "--autoplay")
             o->autoplay = true;
+        else if (a == "--audio")
+            o->audio = true;
+        else if (a == "--mute")
+            o->mute = true;
         else if (a == "--help")
             return false;
         else {
@@ -76,6 +82,8 @@ void usage() {
         "  --data ROOT   directory containing extracted/ (default: repo root)\n"
         "  --turns N     run N turns of the turn loop then exit\n"
         "  --headless    SDL dummy video driver, no audio device\n"
+        "  --audio       SDL2_mixer: all 86 soundfx + theme00 (docs/re/audio.md)\n"
+        "  --mute        load audio but master volume 0\n"
         "  --campaign N  play N turns of a seeded campaign (docs/re/turnloop.md)\n"
         "  --seed S      seed for --campaign (default 1)\n"
         "  --ui          open the P5a campaign window (docs/re/ui-runtime.md)\n"
@@ -227,7 +235,21 @@ int main(int argc, char** argv) {
         // Substitute face (docs/re/ui-runtime.md §3; vendor .fnt = OQ-017).
         const std::string font =
             "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf";
-        const int rc = ascend::ui::runCampaignUi(*camp, o.campaign, o.autoplay, font);
+        std::unique_ptr<ascend::ui::AudioEngine> audio;
+        if (o.audio) {
+            audio = std::make_unique<ascend::ui::AudioEngine>();
+            std::string aerr;
+            if (!audio->init(o.dataRoot.string(), o.mute, &aerr)) {
+                std::printf("audio: %s\n", aerr.c_str());
+                SDL_Quit();
+                return 1;
+            }
+            std::printf("audio ok: %d sfx chunks, music %lu B\n",
+                        audio->chunksLoaded(), audio->musicBytes());
+            audio->playMusic();
+        }
+        const int rc = ascend::ui::runCampaignUi(*camp, o.campaign, o.autoplay,
+                                                 font, audio.get());
         SDL_Quit();
         return rc;
     }
