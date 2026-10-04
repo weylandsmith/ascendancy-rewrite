@@ -21,7 +21,7 @@
 #include "game/mapgen.h"
 #include "game/research.h"
 #include "game/starstat.h"
-#include "ui/ui.h""
+#include "ui/ui.h"
 
 #ifndef ASCENDANCY_SOURCE_DIR
 #define ASCENDANCY_SOURCE_DIR "."
