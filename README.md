@@ -27,7 +27,9 @@ condition.
 Flags: `--data DIR` data root (default: repo root) · `--headless` dummy
 video driver · `--ui` window (cosmos map, NEXT TURN, event pane) ·
 `--autoplay` 250 ms turns · `--audio` load + play all 86 vendor SFX and
-theme00 music · `--mute` load but silent · `--campaign N`/`--seed S`.
+theme00 music · `--mute` load but silent · `--campaign N`/`--seed S` ·
+`--species N` play as species specnum N (0..20 — each species' SA_ special
+ability fires every ~30 turns; default human = no ability).
 In the UI: click NEXT TURN or Enter/Space advances a turn, clicking a star
 selects it (status line), ESC quits.
 
@@ -47,13 +49,16 @@ AUTHENTIC (cited to extracted-file offsets or Ghidra addresses in
 `docs/re/*.md`, and asserted by the gate/unit tests): the .cob archive
 format; the seven .bin tables; star/planet statistics, research tree,
 gizmos, planetary items, species data, diplomacy files, star names,
-map-grid and lane rules, victory-condition files (end-*.txt), sound
-manifests and the vendor .voc sample container, CP437 text handling.
+map-grid and lane rules, victory-condition files (end-*.txt), the 21 species
+special-ability effects and their charged/passive split (help.txt L1713-2511,
+docs/re/abilities.md), sound manifests and the vendor .voc sample container,
+CP437 text handling.
 
 DOCUMENTED DEFAULTS (the original's exact rule is not recoverable from
 static data; each is listed in `docs/OPEN-QUESTIONS.md` and cited from
 code back to docs): campaign combat arithmetic (OQ-010); AI build/expansion
-orderings (OQ-015/016); sample rate of headerless audio files — 22050 Hz
+orderings (OQ-015/016); ability charge time — 30 turns for all 14 charged
+species abilities (OQ-020); sample rate of headerless audio files — 22050 Hz
 mono (OQ-006); UI font — Liberation Sans stands in for the vendor .fnt
 codec (OQ-017); window colours — BACKGRNDCOLOR indices have no documented
 palette mapping, so a deuteranopia/protanopia-verified palette is used.

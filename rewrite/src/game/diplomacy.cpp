@@ -112,15 +112,23 @@ bool DipFile::loadFromFile(const std::string& path, std::string* err) {
         const std::string& h = lines[i];
         auto forPos = h.find("for ");
         auto saPos = h.find("SA_");
-        if (forPos != std::string::npos && saPos != std::string::npos && saPos > forPos) {
-            displayName = h.substr(forPos + 4, saPos - forPos - 4);
+        if (forPos != std::string::npos) {
+            // Tokenless headers exist: race02.dip is "Diplomacy text for
+            // Orfa." with no SA_ token [verified]; displayName parses either
+            // shape, abilityToken stays "" when absent (resolved by
+            // game/species.cpp against help.txt help-abil02 title "Orfa").
+            const size_t nameEnd = (saPos != std::string::npos && saPos > forPos)
+                                       ? saPos : h.size();
+            displayName = h.substr(forPos + 4, nameEnd - forPos - 4);
             while (!displayName.empty() && (displayName.back() == '-' || displayName.back() == ' ' || displayName.back() == '.'))
                 displayName.pop_back();
-            abilityToken = h.substr(saPos);
-            size_t end = 0;
-            while (end < abilityToken.size() &&
-                   (isalnum(abilityToken[end]) || abilityToken[end] == '_')) ++end;
-            abilityToken.resize(end);
+            if (saPos != std::string::npos && saPos > forPos) {
+                abilityToken = h.substr(saPos);
+                size_t end = 0;
+                while (end < abilityToken.size() &&
+                       (isalnum(abilityToken[end]) || abilityToken[end] == '_')) ++end;
+                abilityToken.resize(end);
+            }
             break;
         }
     }

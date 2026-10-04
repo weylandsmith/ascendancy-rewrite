@@ -36,6 +36,7 @@ add_library(ascend_core STATIC
   src/game/research.cpp
   src/game/economy.cpp
   src/game/diplomacy.cpp
+  src/game/species.cpp
   src/game/campaign.cpp
 )
 
@@ -63,6 +64,7 @@ add_executable(run_tests
   tests/test_research.cpp
   tests/test_economy.cpp
   tests/test_diplomacy.cpp
+  tests/test_species.cpp
   tests/test_campaign.cpp
   tests/test_ui_layout.cpp
   tests/test_audio.cpp

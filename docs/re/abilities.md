@@ -1,0 +1,97 @@
+# Species special abilities — roster, effects, and wired semantics
+
+Closes the audit finding "SA_* tokens parsed but unwired".
+Roster source: docs/re/species.md (history.txt + raceNN.dip headers).
+Effect source: `extracted/ascend00/help.txt` blocks `help abilNN`
+(L1713-2511, [verified] 21 blocks, gate 3m via scripts/ability_probe.py).
+Code: rewrite/src/game/species.{h,cpp} (roster, charge split, effect notes),
+rewrite/src/game/campaign.cpp `abilityPhase()` + hook sites.
+
+## §1 Roster reconciliation [verified]
+
+Three sources agree on specnum order 0..20:
+- raceNN.dip header tokens `SA_<Name>` (20 of 21 files);
+- help.txt `// SA_<T>` + `help abilNN` blocks (all 21; indices contiguous,
+  tokens and titles unique — probe-asserted);
+- history.txt blurb names (docs/re/species.md mapping).
+
+**race02.dip is the exception**: its header is `Diplomacy text for Orfa.`
+with NO token [verified raw bytes]; its ability resolves to SA_BuildOnBlack
+via help-abil02 title "Orfa" + position agreement (loadAbilities cross-check;
+unit test species_roster_three_source). Header display names are NOT
+identity-checked on tokened headers — the two sources disagree on spelling
+("KAMBUCHA" in race03.dip vs "Kambuchka" in the help title), so the token is
+the identity.
+
+## §2 Effect mapping (vendor text -> wired behaviour)
+
+Charged abilities fire at the end of their charge (charge starts at the full
+value; first activation turn == abilityChargeTurns). One-shot flags clear at
+every turn boundary in abilityPhase(). Every token's one-line note lives in
+species.cpp `kNotes` (probe asserts 21/21 cite `[help.txt L`).
+
+| ability | help.txt | wired effect |
+|---|---|---|
+| SA_SuperMarines | L1723 "planetary invasions will always succeed" | invasion always captures, capped ONE per owner per turn and charged the Ship hull cost 20 (planitem.txt row, ships.md §1). Both constraints are documented consequences: the text guarantees an attempt, not N attempts; an invasion costs ships or the Minions take a star per border per turn (measured: extinction-of-all on 8/8 seeds, PLAYTHROUGH Control runs destroyed). |
+| SA_DoubleHull | L1743 "double-strength hulls" | halves incoming SA_SapAlienPower hits (15->8; the only damage channel the model has — see below). |
+| SA_BuildOnBlack | L1763 "build on black planet squares" | **FILED NO-OP**: the sim has no planetary grid/buildable-slot model; "black square" has no referent. Roster-visible, no state to change. |
+| SA_KnowHomeWorlds | L1783 "see all alien home stars" | **FILED NO-OP**: no fog of war (UI draws every star; no exploration bookkeeping). |
+| SA_KnowRaces | L1803 "talk to all other races from the start" | **FILED NO-OP**: dialogue is never gated by contact in the sim. |
+| SA_HealShips | L1824 "repair all damage to your ships" | clears own fleetDamage (the power pool). |
+| SA_ForcePeace | L1870 "force all aliens to make peace" | ends ALL of the user's wars (war table symmetric bits). |
+| SA_DoublePower | L1917 "double the power of all your ships" | attackScore x2 for the owner, this combat only (L1945 "for the rest of this turn"). |
+| SA_RepelAlienShips | L1965 "warp alien ships out of your colonies' stars" | removes in-transit enemy ships whose TARGET is a user-owned star. |
+| SA_SapAlienPower | L2012 "wipe out the power of all alien ships in systems you occupy" | +15 fleetDamage to each at-war owner of a star adjacent to a user star (8 vs DoubleHull). fleetDamage subtracts from attackScore and regens 5/turn (documented defaults). |
+| SA_Cornucopia | L2059 "turn your least populated colony into a rich world" | least-pop user colony gains richPros 2 (= Agriplot PROS, planitem.txt); "rich world" ~ static.txt #56 "Cornucopia" planet-type name. |
+| SA_BumpShipsInLanes | L2106 "bump all ships in star lanes backward to their stars of origin" | clears ALL in-transit fleets (model has no idle in-lane ships, so return-to-origin == removal; L2134 vendor result text says the same). |
+| SA_StealResearch | L2154 "steal any technology known by at least two other races" | acquires every tech held by >=2 other owners (exact holder-count rule from the text). |
+| SA_ShieldPlanets | L2201 "all your colonies invincible for one day" | own stars skip capture this combat (one-shot). |
+| SA_MoreMaxPop | L2248 "increase the maximum population of all your colonies" | +25 capBonus on every owned star (documented default step; pop growth uses cap). |
+| SA_KnowStarLanes | L2295 "see all star lanes" | **FILED NO-OP**: no fog of war. |
+| SA_BlockStarLanes | L2314 "block all star lanes entering your colonized systems" | launches and invasions into blocked stars forbidden this turn (one-shot). |
+| SA_CauseWar | L2361 "alien species to strongly dislike any species at war with you" | PARTIAL [documented]: the dip model has one attitude vector (AI->player) and no AI-AI relationships (R1-blocked). Wired: races at war with the Marmosian reduce their player-attitude by 250 (scale vs START_ATTITUDE 310..620, diplomacy.md §1); the third-party redirect is a no-op. |
+| SA_FastLaneTravel | L2409 "move quickly through star lanes" | +1 launch hop in driveHopsFor before the [1..3] clamp (hop scale itself OQ-019). |
+| SA_FreeResearch | L2429 "immediately achieve any discovery you are pursuing" | queued (else cheapest available) tech completes instantly (L2457 "complete in one day"). |
+| SA_IndustryBoost | L2476 "boost the progress on all your colonies' projects" | +20 IND stockpile (2 Factory-costs, planitem.txt; documented default). |
+
+## §3 Numeric defaults and RNG discipline
+
+- **Charge 30 turns** for all 14 charged abilities. The vendor proves a
+  day-count recharge exists ("%d day%s to amass", 14 blocks) but exposes no
+  number [verified: no data file carries it]. 30 == "a month" of the day-scale
+  turn loop. OQ-020.
+- **Turn order**: abilityPhase runs FIRST in advance() so ForcePeace shields
+  the user from that turn's combat and BlockStarLanes gates that turn's
+  launches. One-shot flags cleared here.
+- **RNG DISCIPLINE (hard rule)**: campaign dynamics draw exactly two
+  mt19937 values per evaluated border pair (atk noise, then def noise).
+  Ability branches must not add or skip draws. An earlier cut drew def noise
+  only on the non-SuperMarines branch; seed 2024 matched HEAD through t40 yet
+  diverged by t195 purely from stream drift (self-caught via head-vs-work
+  diff bisection). The def draw is now unconditional.
+- fleetDamage is a per-owner abstraction of "ship power" (no per-ship hull
+  bookkeeping exists — OQ-019); regen 5/turn, SapAlienPower +15, floor 0.
+  A generic per-capture damage channel was tried and REJECTED: it starved
+  non-healing empires into death spirals and turned 8/8 PLAYTHROUGH seeds
+  Extinct (self-caught by the victory-distribution sweep).
+
+## §4 Player species selection
+
+`--species N` (0..20) grants owner 0 the specnum-N ability; the AI slot that
+species would occupy is skipped (six AI = first six specnums excluding the
+player's). Default -1 = human (player.dip carries no SA_ token [verified]).
+traceLine() carries `SA_<Token>` when set. Slot-assignment policy of the
+original is runtime-blocked (documented default).
+
+## §5 Verification
+
+- gate 3m: ability_probe.py (21 blocks/14+7 split/race02 title match/kNotes
+  21 cited/4 filed no-ops) + a 40-turn smoke asserting SA_HealShips fired.
+- unit tests rewrite/tests/test_species.cpp (15 tests): roster three-source,
+  bad-dir rejection, charge split + counts, every-token-noted, firing
+  schedule (t30), ForcePeace ends war, ShieldPlanets one-shot,
+  BlockStarLanes flag, MoreMaxPop/Cornucopia, StealResearch bounds,
+  player-species selection + no self-duplicate, silence without abilities,
+  victory reachable with abilities, determinism with abilities.
+- 70/70 total tests green; seeds {1,42,2024} Control, {3,7,13,99,555}
+  Extinct — both victory files still exercised (PLAYTHROUGH regenerated).

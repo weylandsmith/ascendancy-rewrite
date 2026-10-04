@@ -1,13 +1,14 @@
 # species roster — `history.txt` specnum blocks [verified]
 Source: `extracted/ascend00/history.txt` (31,525 B). Each species block starts `specnum N`, then keyword, then display name, then historical blurb. Produced by `scripts/ui_probe.py`; gate 3k.
 - **21** species, specnum contiguous 0..20 (asserted). Same count as the 21 `raceNN.dip` AI parameter files -> one-to-one species<->AI-set mapping is consistent (OQ-009's single-evaluator picture).
+- **ABIILITIES ARE WIRED** (2026-10-04d): effect semantics, charge model, and per-token citations moved to **docs/re/abilities.md** (gate 3m). The "?" row for specnum 2 below is RESOLVED: race02.dip's header carries no SA_ token [verified]; the ability is SA_BuildOnBlack via the help-abil02 title "Orfa" cross-check (`loadAbilities`, scripts/ability_probe.py).
 
 ## Roster (display names from `raceNN.dip` headers [verified]; specnum N <-> raceNN mapping [inferred] from blurb cross-refs — race00=Minions appears in specnum 0's blurb, race01=Snovemdomas in 1, race10=Govorom in 10 — consistent with contiguous 0..20 both sides)
 | specnum | dip name | ability token | history title | keyword |
 |---|---|---|---|---|
 | 0 | the Minions | SA_SuperMarines | Supreme Planet Invaders | power |
 | 1 | SNOVEMDOMAS | SA_DoubleHull | Builders of Nigh-Indestructible Ships | power |
-| 2 | ? | ? | Black Square Dwellers | power |
+| 2 | Orfa | SA_BuildOnBlack (title-resolved; header tokenless) | Black Square Dwellers | power |
 | 3 | KAMBUCHA | SA_KnowHomeWorlds | Clairvoyants | power |
 | 4 | HANSHAKS | SA_KnowRaces | Telepathic Diplomats | power |
 | 5 | FLUDENTRI | SA_HealShips | Instant Healers | power |

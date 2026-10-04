@@ -148,6 +148,24 @@ grep -q 'PARSE TRAP' "$ROOT/docs/re/diplomacy.md" \
 grep -q 'SA_SuperMarines' "$ROOT/docs/re/species.md" \
   || err "species.md lost the ability roster"
 
+# 3m. Species special abilities (docs/re/abilities.md): the three-source
+# roster invariant (help.txt abil blocks == raceNN.dip header tokens, race02
+# tokenless -> title match) and the 14/7 charge split, via
+# scripts/ability_probe.py; plus the binary firing at least one SA_ event.
+[ -s "$ROOT/docs/re/abilities.md" ] || err "docs/re/abilities.md missing"
+if ! /usr/bin/python3 "$ROOT/scripts/ability_probe.py"; then
+  err "ability_probe.py failed (roster/charge invariant broken?)"
+fi
+if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
+  timeout 120 "$ROOT/rewrite/build/ascendancy" --headless --campaign 40 \
+    --seed 11 >/tmp/gate_ability.log 2>&1
+  rc=$?
+  # exit 1 = "no victory after 40 turns" (expected here); >1 = crash.
+  [ "$rc" -le 1 ] || { tail -10 /tmp/gate_ability.log; err "ability smoke crashed (rc=$rc)"; }
+  grep -q 'SA_HealShips' /tmp/gate_ability.log \
+    || { tail -10 /tmp/gate_ability.log; err "charged ability never fired by turn 40 (charge 30)"; }
+fi
+
 # 3l. Victory-condition grammar + CONTRACT smoke: end-*.txt blocks assert
 # (scripts/endtext_probe.py), and the rewrite binary must actually reach a
 # victory condition on a seeded headless campaign run (docs/PLAYTHROUGH.md).

@@ -46,6 +46,12 @@ const char* victoryConditionFile(Victory v) {
 Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree* tree,
                    const std::vector<PlanetItem>& items, const std::vector<Gizmo>& gizmos,
                    std::vector<DipFile> aiDip, std::string* errOut)
+    : Campaign(cfg, std::move(galaxy), tree, items, gizmos, std::move(aiDip), {}, errOut) {}
+
+Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree* tree,
+                   const std::vector<PlanetItem>& items, const std::vector<Gizmo>& gizmos,
+                   std::vector<DipFile> aiDip, std::vector<SpeciesAbility> abilities,
+                   std::string* errOut)
     : cfg_(cfg), galaxy_(std::move(galaxy)), tree_(tree), items_(&items),
       gizmos_(&gizmos), aiDip_(std::move(aiDip)), rng_(cfg.seed) {
     if (cfg_.aiCount < 0 || cfg_.aiCount > static_cast<int>(aiDip_.size())) {
@@ -76,6 +82,31 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     Nowner_ = cfg_.aiCount + 1;
     war_.assign(Nowner_ * Nowner_, 0);
     fortify_.assign(galaxy_.stars.size(), 0);
+    // Species ability assignment (docs/re/abilities.md §1): explicit vector
+    // wins; otherwise derive from dip header tokens (race02 stays Unknown —
+    // its header has no token, and the help.txt cross-check lives in
+    // loadAbilities, callers that care pass abilities explicitly).
+    ability_.assign(Nowner_, SpeciesAbility::Unknown);
+    if (!abilities.empty()) {
+        if (abilities.size() != aiDip_.size())
+            *errOut = "campaign: abilities vector size " + std::to_string(abilities.size()) +
+                      " != dip files " + std::to_string(aiDip_.size());
+        for (size_t i = 0; i < abilities.size() && i < aiDip_.size() && int(i) < cfg_.aiCount; ++i)
+            ability_[i + 1] = abilities[i];
+    } else {
+        for (size_t i = 0; i < aiDip_.size() && int(i) < cfg_.aiCount; ++i)
+            ability_[i + 1] = abilityFromToken(aiDip_[i].abilityToken);
+    }
+    if (cfg_.playerSpecies >= 0 && cfg_.playerSpecies < static_cast<int>(SpeciesAbility::kCount))
+        ability_[kPlayer] = static_cast<SpeciesAbility>(cfg_.playerSpecies);
+    charge_.assign(Nowner_, 0);  // first activation one full charge away
+    for (int o = 0; o < Nowner_; ++o)
+        if (abilityIsCharged(ability_[o])) charge_[o] = abilityChargeTurns(ability_[o]);
+    doublePower_.assign(Nowner_, 0);
+    sapActive_.assign(Nowner_, 0);
+    fleetDamage_.assign(Nowner_, 0);
+    invincible_.assign(galaxy_.stars.size(), 0);
+    laneBlock_.assign(galaxy_.stars.size(), 0);
     if (cfg_.freeForAll)  // arcade default; turnloop.md §5
         for (int x = 0; x < Nowner_; ++x)
             for (int y = 0; y < Nowner_; ++y)
@@ -146,6 +177,19 @@ void Campaign::pickHomeStars() {
     }
 }
 
+double Campaign::popCapFor(int star) const {
+    return cfg_.popCap + planets_[star].capBonus;  // SA_MoreMaxPop bonus
+}
+
+bool Campaign::lanePassable(int owner, int target) const {
+    // SA_BlockStarLanes (help.txt L2314 "block all star lanes entering your
+    // colonized systems"): lanes into a star blocked THIS turn admit no
+    // launches or invasions by anyone but the blocker itself. [inferred
+    // duration: one turn; vendor gives no number — abilities.md §3]
+    if (laneBlock_[target] && owner_[target] != owner) return false;
+    return true;
+}
+
 void Campaign::incomeAndGrow() {
     std::vector<double> income(res.size(), 0.0);
     for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
@@ -162,17 +206,24 @@ void Campaign::incomeAndGrow() {
         }
         res[o] += resGain;
         // Pop growth: logistic toward cap (turnloop.md §3 [inferred]); built
-        // items' PROS (Agriplot PROS=2 [verified]) adds while below cap (§3).
-        double pros = 0;
+        // items' PROS (Agriplot PROS=2 [verified planitem.txt]) adds while
+        // below cap (§3); SA_Cornucopia's richPros rides the same PROS channel.
+        double pros = planets_[s].richPros;
         for (int it : planets_[s].items) pros += (*items_)[it].pros;  // Agriplot PROS=2
         double g = 1.0;
         PlanetState& ps = planets_[s];
-        ps.pop += g * 4.0 * ps.pop * (cfg_.popCap - ps.pop) /
-                  (static_cast<double>(cfg_.popCap) * cfg_.popCap);
-        if (ps.pop < cfg_.popCap) ps.pop += pros;
-        if (ps.pop > cfg_.popCap) ps.pop = cfg_.popCap;
+        const double cap = popCapFor(static_cast<int>(s));  // SA_MoreMaxPop
+        ps.pop += g * 4.0 * ps.pop * (cap - ps.pop) / (cap * cap);
+        if (ps.pop < cap) ps.pop += pros;
+        if (ps.pop > cap) ps.pop = cap;
     }
     for (size_t i = 0; i < income.size(); ++i) ind_[i] += income[i];  // stockpile
+    // Fleet "power" regens at 5/turn once sapped [documented default,
+    // abilities.md §3 — no data exposes a repair rate or its precondition].
+    for (int o = 0; o < Nowner_; ++o) {
+        if (fleetDamage_[o] <= 0) continue;
+        fleetDamage_[o] = std::max(0, fleetDamage_[o] - 5);
+    }
 }
 
 void Campaign::buildPhase() {
@@ -263,7 +314,9 @@ void Campaign::expansionPhase() {
                 for (int it : planets_[s].items)
                     if (it == shipyardId) { hasYard = true; break; }
             if (!hasYard) continue;  // docs/re/ships.md §1
-            // BFS frontier up to `hops`, nearest-first.
+            // BFS frontier up to `hops`, nearest-first. Knowledge gate
+            // (starKnown: own star or adjacent-to-own; SA_KnowStarLanes sees
+            // everything — abilities.md §2) and SA_BlockStarLanes gate.
             std::vector<int> frontier = galaxy_.neighbours(static_cast<int>(s));
             std::vector<char> seen(galaxy_.stars.size(), 0);
             seen[s] = 1;
@@ -278,6 +331,10 @@ void Campaign::expansionPhase() {
                         taken = std::any_of(fleet_.begin(), fleet_.end(),
                                             [&](const ShipInTransit& x) { return x.target == nb; });
                     if (taken) { next.push_back(nb); continue; }
+                    if (!lanePassable(o, nb)) {
+                        next.push_back(nb);  // SA_BlockStarLanes: can't target it
+                        continue;
+                    }
                     ind_[o] -= shipCost;
                     fleet_.push_back({o, static_cast<int>(s), nb});
                     launched = true;
@@ -307,7 +364,12 @@ int Campaign::driveHopsFor(int owner) const {
             if (g.level > lvl) lvl = g.level;
         }
     }
-    return lvl > 0 ? std::max(1, std::min(3, lvl / 2)) : 0;
+    if (lvl <= 0) return 0;
+    // SA_FastLaneTravel (help.txt L2409-2410 "move quickly through star
+    // lanes"): +1 lane hop [documented mapping, abilities.md §2 — the vendor
+    // gives no numeric speed; hop scale itself is OQ-019].
+    if (ability_[owner] == SpeciesAbility::FastLaneTravel) ++lvl;
+    return std::max(1, std::min(3, lvl / 2));
 }
 
 void Campaign::diplomacyPhase() {
@@ -329,6 +391,166 @@ void Campaign::diplomacyPhase() {
     }
 }
 
+void Campaign::abilityPhase() {
+    // Turn-boundary: clear one-shot flags (vendor texts are all "this turn"
+    // scoped: DoublePower "for the rest of this turn" L1945-1946, Shield
+    // "invincible" + lanes until next amass; abilities.md §3 [inferred]).
+    std::fill(doublePower_.begin(), doublePower_.end(), 0);
+    std::fill(sapActive_.begin(), sapActive_.end(), 0);
+    std::fill(invincible_.begin(), invincible_.end(), 0);
+    std::fill(laneBlock_.begin(), laneBlock_.end(), 0);
+
+    for (int o = 0; o < Nowner_; ++o) {
+        const SpeciesAbility ab = ability_[o];
+        if (ab == SpeciesAbility::Unknown) continue;
+        if (abilityIsCharged(ab)) {
+            if (--charge_[o] > 0) continue;
+            charge_[o] = abilityChargeTurns(ab);
+        }
+        const std::string who = std::string(abilityName(ab)) + " (owner " +
+                                std::to_string(o) + "): ";
+        switch (ab) {
+            case SpeciesAbility::SuperMarines:
+            case SpeciesAbility::KnowHomeWorlds:
+            case SpeciesAbility::KnowRaces:
+            case SpeciesAbility::BuildOnBlack:
+                break;  // passives applied at their hook sites / filed no-ops
+            case SpeciesAbility::DoubleHull:
+                break;  // passive: halved hull damage in combatPhase
+            case SpeciesAbility::HealShips:  // help.txt L1824 "repair all damage to your ships"
+                fleetDamage_[o] = 0;
+                events_.push_back({turn_, who + "repaired all ships"});
+                break;
+            case SpeciesAbility::ForcePeace: {  // L1870-1871 "force all aliens to make peace"
+                int n = 0;
+                for (int e = 0; e < Nowner_; ++e)
+                    if (e != o && war_[o * Nowner_ + e]) { setWar(o, e, false); ++n; }
+                events_.push_back({turn_, who + (n ? "forced peace on " + std::to_string(n) + " enemies"
+                                                   : "no enemies to force peace")});
+                break;
+            }
+            case SpeciesAbility::DoublePower:  // L1917-1918 "double the power of all your ships"
+                doublePower_[o] = 1;
+                events_.push_back({turn_, who + "ships at double power this turn"});
+                break;
+            case SpeciesAbility::RepelAlienShips: {  // L1965-1966 "warp alien ships out of your colonies' stars"
+                const size_t before = fleet_.size();
+                fleet_.erase(std::remove_if(fleet_.begin(), fleet_.end(),
+                                            [&](const ShipInTransit& sh) {
+                                                return sh.owner != o && owner_[sh.target] == o;
+                                            }),
+                             fleet_.end());
+                events_.push_back({turn_, who + "warped " + std::to_string(before - fleet_.size()) +
+                                      " alien ships from colony stars"});
+                break;
+            }
+            case SpeciesAbility::SapAlienPower:  // L2012-2013 "wipe out the power of all alien ships in systems you occupy"
+                sapActive_[o] = 1;
+                events_.push_back({turn_, who + "sapping alien hulls in occupied systems"});
+                break;
+            case SpeciesAbility::Cornucopia: {  // L2059-2060 "turn your least populated colony into a rich world"
+                int best = -1;
+                for (size_t s = 0; s < galaxy_.stars.size(); ++s)
+                    if (owner_[s] == o && planets_[s].pop > 0 &&
+                        (best < 0 || planets_[s].pop < planets_[best].pop))
+                        best = static_cast<int>(s);
+                if (best >= 0) {
+                    planets_[best].richPros += 2;  // Agriplot PROS=2 [verified planitem.txt]
+                    events_.push_back({turn_, who + "enriched " + galaxy_.stars[best].name});
+                }
+                break;
+            }
+            case SpeciesAbility::BumpShipsInLanes: {  // L2106-2107 "bump all ships in star lanes backward to their stars of origin"
+                const size_t bumped = fleet_.size();
+                fleet_.clear();  // returned ships = no longer in transit (model has no idle fleets)
+                events_.push_back({turn_, who + "bumped " + std::to_string(bumped) +
+                                      " ships out of the lanes"});
+                break;
+            }
+            case SpeciesAbility::StealResearch: {  // L2154-2155 "steal any technology known by at least two other races"
+                int n = 0;
+                for (size_t t = 0; t < tree_->all().size(); ++t) {
+                    if (ownedTech[o][t]) continue;
+                    int holders = 0;
+                    for (int e = 0; e < Nowner_; ++e)
+                        if (e != o && ownedTech[e][t]) ++holders;
+                    if (holders >= 2) { ownedTech[o][t] = true; ++n; }
+                }
+                events_.push_back({turn_, who + "stole " + std::to_string(n) +
+                                      " shared technologies"});
+                break;
+            }
+            case SpeciesAbility::ShieldPlanets: {  // L2201-2202 "all your colonies invincible for one day"
+                int n = 0;
+                for (size_t s = 0; s < galaxy_.stars.size(); ++s)
+                    if (owner_[s] == o) { invincible_[s] = 1; ++n; }
+                events_.push_back({turn_, who + std::to_string(n) + " colonies invincible"});
+                break;
+            }
+            case SpeciesAbility::MoreMaxPop: {  // L2248-2249 "increase the maximum population of all your colonies"
+                for (size_t s = 0; s < galaxy_.stars.size(); ++s)
+                    if (owner_[s] == o) planets_[s].capBonus += 25;  // [documented default]
+                events_.push_back({turn_, who + "raised colony pop caps"});
+                break;
+            }
+            case SpeciesAbility::KnowStarLanes:
+                break;  // passive (no amass line, L2295 block); filed no-op —
+                        // the sim has no fog of war (see abilities.md §2)
+            case SpeciesAbility::BlockStarLanes: {  // L2314-2315 "block all star lanes entering your colonized systems"
+                int n = 0;
+                for (size_t s = 0; s < galaxy_.stars.size(); ++s)
+                    if (owner_[s] == o) { laneBlock_[s] = 1; ++n; }
+                events_.push_back({turn_, who + "blocked lanes into " + std::to_string(n) + " stars"});
+                break;
+            }
+            case SpeciesAbility::CauseWar: {  // L2361-2362 "alien species to strongly dislike any species at war with you"
+                // PARTIAL [documented, abilities.md §2]: the dip model carries
+                // one attitude vector (AI -> player); AI-vs-AI relationships
+                // do not exist (R1-blocked). Wired here: races at war with the
+                // Marmosians have their player-facing attitude reduced by 250
+                // (strong dislike scale vs START_ATTITUDE 310..620) and the
+                // effect is announced; third-party redirect is a no-op.
+                int n = 0;
+                for (int e = 1; e < Nowner_; ++e)
+                    if (e != o && war_[o * Nowner_ + e] && dipState_[e - 1].attitude > -1000) {
+                        dipState_[e - 1].attitude -= 250;
+                        ++n;
+                    }
+                events_.push_back({turn_, who + std::to_string(n) +
+                                      " belligerents marked for dislike"});
+                break;
+            }
+            case SpeciesAbility::FastLaneTravel:
+                break;  // passive: +1 launch hop in driveHopsFor
+            case SpeciesAbility::FreeResearch: {  // L2429-2430 "immediately achieve any discovery you are pursuing"
+                int t = queuedTech[o];
+                if (t < 0) {
+                    auto avail = tree_->available(ownedTech[o], true);
+                    t = -1;
+                    for (int c : avail)
+                        if (t < 0 || tree_->all()[c].cost < tree_->all()[t].cost) t = c;
+                }
+                if (t >= 0 && !ownedTech[o][t]) {
+                    ownedTech[o][t] = true;
+                    events_.push_back({turn_, who + "completed " + tree_->all()[t].name});
+                } else {
+                    events_.push_back({turn_, who + "nothing pending to complete"});
+                }
+                queuedTech[o] = -1;
+                techProgress[o] = 0;
+                break;
+            }
+            case SpeciesAbility::IndustryBoost:  // L2476-2477 "boost the progress on all your colonies' projects"
+                ind_[o] += 20;  // = 2 Factory-costs [planitem Factory cost; documented default]
+                events_.push_back({turn_, who + "boosted construction (+20 IND)"});
+                break;
+            case SpeciesAbility::kCount:
+            case SpeciesAbility::Unknown:
+                break;
+        }
+    }
+}
+
 int Campaign::attackScore(int owner) const {
     // [inferred, turnloop.md §5] empire fleet strength = total owned pop /10
     // (reserves model) + best OWNED weapon gizmo level (levels 1..13
@@ -346,7 +568,10 @@ int Campaign::attackScore(int owner) const {
             if (ok) wlvl = std::max(wlvl, g.level);
         }
     }
-    return static_cast<int>(pop / 10.0) + wlvl;
+    // SA_SapAlienPower / SA_HealShips semantics: fleetDamage_ IS the sapped
+    // "power" (abilities.md §2) — subtracted from fleet strength until
+    // repaired. Floor at 0 keeps a sapped empire able to defend its homes.
+    return std::max(0, static_cast<int>(pop / 10.0) + wlvl - fleetDamage_[owner]);
 }
 
 int Campaign::defenseScore(int owner, int star) const {
@@ -377,24 +602,73 @@ void Campaign::combatPhase() {
     // star instead and produced 5k oscillating captures with a frozen front,
     // caught by the no-victory test).
     for (int& f : fortify_) if (f > 0) --f;
+    // SA_SapAlienPower (help.txt L2012 "wipe out the power of all alien ships
+    // in systems you occupy"): enemies owning stars adjacent to the Shevar's
+    // stars take a power hit this combat — THE ONLY fleetDamage source (a
+    // generic capture-damage channel was tried first and self-caught: it
+    // starved every non-healing empire into death spirals and turned all
+    // eight checked PLAYTHROUGH seeds Extinct; the vendor has no empire-wide
+    // hull-damage pool — docs/re/abilities.md §2). Magnitude 15 is a
+    // documented default (abilities.md §3); SA_DoubleHull ("double-strength
+    // hulls", L1743) halves it.
+    for (int o = 0; o < Nowner_; ++o) {
+        if (!sapActive_[o]) continue;
+        for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
+            if (owner_[s] != o) continue;
+            for (int nb : galaxy_.neighbours(static_cast<int>(s))) {
+                const int e = owner_[nb];
+                if (e >= 0 && e != o && war_[o * Nowner_ + e]) {
+                    const int amt = ability_[e] == SpeciesAbility::DoubleHull ? 8 : 15;
+                    fleetDamage_[e] += amt;
+                }
+            }
+        }
+    }
     std::uniform_int_distribution<int> noise(0, 10);
+    // SA_SuperMarines: "your planetary invasions will always succeed"
+    // (L1723) — an ATTEMPT guarantee, not a multi-capture per turn, and an
+    // attempt still means ships: invasions charge the hull cost (planitem
+    // Ship 20, ships.md §1) and skip when the economy can't spare it.
+    // Without that gate the Minions took one free star per border per turn
+    // and exterminated every race by ~t170 on all eight checked seeds
+    // (self-caught: PLAYTHROUGH Control runs vanished). Cap: one always-
+    // success invasion per owner per turn. [documented default, abilities.md §2]
+    const int shipCostC = [&] {
+        int id = itemId("Ship");
+        return id < 0 ? 20 : (*items_)[id].cost;
+    }();
+    std::vector<char> superUsed(Nowner_, 0);
     for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
         const int a = owner_[s];
         if (a < 0) continue;
         for (int nb : galaxy_.neighbours(static_cast<int>(s))) {
             const int b = owner_[nb];
             if (b < 0 || b == a || !war_[a * Nowner_ + b]) continue;
+            if (invincible_[nb]) continue;             // SA_ShieldPlanets (L2201)
+            if (!lanePassable(a, nb)) continue;        // SA_BlockStarLanes (L2314)
             if (fortify_[nb] > 0) continue;
+            if (invadesAlwaysSucceeds(a) && (superUsed[a] || ind_[a] < shipCostC))
+                continue;
+            // RNG DISCIPLINE: exactly two draws per evaluated border pair, in
+            // the pre-abilities order (atk noise, def noise). Ability branch
+            // logic must never add or skip draws — an earlier cut did, and the
+            // whole campaign stream silently diverged by t195 while t40 still
+            // matched (self-caught by head-vs-work diff bisection).
             int atk = attackScore(a) + noise(rng_);
             int def = defenseScore(b, nb) + noise(rng_) / 2;
-            if (atk > def) {
-                owner_[nb] = a;
-                planets_[nb].pop = 10;  // settlement seed (turnloop.md §5)
-                fortify_[nb] = 2;
-                events_.push_back({turn_, "owner " + std::to_string(a) + " captured " +
-                                      galaxy_.stars[nb].name});
-                break;
+            if (doublePower_[a]) atk *= 2;             // SA_DoublePower (L1917, "this turn")
+            if (invadesAlwaysSucceeds(a)) {            // SA_SuperMarines (L1723 always succeed)
+                ind_[a] -= shipCostC;                  // the invasion ships
+                superUsed[a] = 1;
+            } else if (atk <= def) {
+                continue;
             }
+            owner_[nb] = a;
+            planets_[nb].pop = 10;  // settlement seed (turnloop.md §5)
+            fortify_[nb] = 2;
+            events_.push_back({turn_, "owner " + std::to_string(a) + " captured " +
+                                  galaxy_.stars[nb].name});
+            break;
         }
     }
 }
@@ -416,6 +690,7 @@ Victory Campaign::checkVictory() const {
 Victory Campaign::advance() {
     if (over()) return victory_;
     ++turn_;
+    abilityPhase();  // species abilities fire first (docs/re/abilities.md §3)
     incomeAndGrow();
     buildPhase();
     researchPhase();
@@ -455,6 +730,8 @@ std::string Campaign::traceLine() const {
     std::string out(buf);
     for (int o = 1; o <= cfg_.aiCount; ++o)
         out += " " + std::to_string(starsOwned(o));
+    if (ability_[kPlayer] != SpeciesAbility::Unknown)
+        out += std::string(" | SA ") + abilityName(ability_[kPlayer]);
     return out;
 }
 

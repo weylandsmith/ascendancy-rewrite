@@ -1,6 +1,6 @@
 # Headless playthrough record
 
-Regenerated 2026-10-04T09:09:57-04:00 by scripts/record_playthrough.sh from the
+Regenerated 2026-10-04T17:17:15-04:00 by scripts/record_playthrough.sh from the
 current binary. Victory conditions and their vendor files: docs/re/turnloop.md §1.
 
 ## Run A — headless, seed 2024
@@ -12,7 +12,7 @@ SDL 2.32.4 initialised (video driver: (null))
 campaign seed=2024 stars=75 lanes=83 ai=6
 turn   1 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
-  ... (398 lines elided)
+  ... (404 lines elided)
   [t201] owner 0 colonised Hope
   [t201] owner 2 colonised Chippendale
   [t201] VICTORY: Control (end-ctrl.txt)
@@ -28,7 +28,7 @@ SDL 2.32.4 initialised (video driver: (null))
 campaign seed=42 stars=75 lanes=82 ai=6
 turn   1 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
-  ... (619 lines elided)
+  ... (626 lines elided)
   [t211] owner 0 captured Arcturus
   [t211] owner 0 captured Menthol
   [t211] VICTORY: Control (end-ctrl.txt)
@@ -44,11 +44,11 @@ SDL 2.32.4 initialised (video driver: x11)
 campaign seed=13 stars=75 lanes=83 ai=6
 turn   1 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
-  ... (468 lines elided)
-  [t210] owner 1 captured Trovaricon
-  [t210] owner 1 captured Crell
-  [t210] VICTORY: Extinct (end-xtnc.txt)
-VICTORY Extinct via end-xtnc.txt on turn 210 (score 0%)
+  ... (508 lines elided)
+  [t215] owner 1 captured Ajax
+  [t215] owner 4 captured Vishnu
+  [t215] VICTORY: Extinct (end-xtnc.txt)
+VICTORY Extinct via end-xtnc.txt on turn 215 (score 0%)
 ```
 
 ## Run D — UI under Xvfb, autoplay 3 turns (gate 4c)

@@ -20,6 +20,7 @@
 #include "game/economy.h"
 #include "game/mapgen.h"
 #include "game/research.h"
+#include "game/species.h"
 #include "game/starstat.h"
 #include "ui/ui.h"
 
@@ -43,6 +44,7 @@ struct Options {
     bool autoplay = false;
     bool audio = false;                         // SDL2_mixer (docs/re/audio.md §5)
     bool mute = false;                          // load everything, volume 0
+    int playerSpecies = -1;                     // specnum 0..20 (docs/re/species.md)
 };
 
 bool parseArgs(int argc, char** argv, Options* o) {
@@ -66,6 +68,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->audio = true;
         else if (a == "--mute")
             o->mute = true;
+        else if (a == "--species" && i + 1 < argc)
+            o->playerSpecies = std::atoi(argv[++i]);
         else if (a == "--help")
             return false;
         else {
@@ -87,7 +91,9 @@ void usage() {
         "  --campaign N  play N turns of a seeded campaign (docs/re/turnloop.md)\n"
         "  --seed S      seed for --campaign (default 1)\n"
         "  --ui          open the P5a campaign window (docs/re/ui-runtime.md)\n"
-        "  --autoplay    with --ui: advance a turn every 250 ms\n");
+        "  --autoplay    with --ui: advance a turn every 250 ms\n"
+        "  --species N   play as species specnum N (0..20, docs/re/species.md);\n"
+        "                default -1 = human, no special ability\n");
 }
 
 // Loads the three archives from the ORIGINAL game/ directory, because the
@@ -154,19 +160,38 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(const Options& o,
                " gizmos " + std::to_string(gizmos.size());
         return nullptr;
     }
+    // Species roster cross-checked against help.txt (race02's tokenless
+    // header resolves via its help-abil02 title; docs/re/abilities.md §1).
+    static std::vector<ag::SpeciesInfo> roster;
+    if (roster.empty() && !ag::loadAbilities(d0.string(), &roster, err))
+        return nullptr;
+    if (o.playerSpecies < -1 || o.playerSpecies >= static_cast<int>(roster.size())) {
+        *err = "--species " + std::to_string(o.playerSpecies) +
+               " out of range 0.." + std::to_string(roster.size() - 1);
+        return nullptr;
+    }
+    // Six AI races = first six specnums that are not the player's [documented
+    // default policy; the original's slot assignment is runtime-blocked].
     std::vector<ag::DipFile> ai;
-    for (int i = 0; i < 6; ++i) {
+    std::vector<ag::SpeciesAbility> abilities;
+    for (const ag::SpeciesInfo& si : roster) {
+        if (static_cast<int>(abilities.size()) >= 6) break;
+        if (o.playerSpecies >= 0 && si.specnum == o.playerSpecies) continue;
+        char name[32];
+        std::snprintf(name, sizeof(name), "/race%02d.dip", si.specnum);
         ag::DipFile df;
-        const fs::path p = d0 / ("race" + std::to_string(i / 10) + std::to_string(i % 10) + ".dip");
-        if (!df.loadFromFile(p.string(), err)) return nullptr;
+        if (!df.loadFromFile(d0.string() + name, err)) return nullptr;
+        abilities.push_back(si.ability);
         ai.push_back(std::move(df));
     }
     ag::CampaignConfig cfg;
     cfg.seed = o.seed;
+    cfg.playerSpecies = o.playerSpecies;
     ag::MapConfig mc;
     mc.seed = o.seed;
     ag::Galaxy g = ag::MapGenerator(mc, *stats, names).generate();
-    return std::make_unique<ag::Campaign>(cfg, g, &tree, items, gizmos, ai, err);
+    return std::make_unique<ag::Campaign>(cfg, g, &tree, items, gizmos, ai,
+                                          abilities, err);
 }
 
 // Seeded campaign to victory: docs/re/turnloop.md. Returns process exit code

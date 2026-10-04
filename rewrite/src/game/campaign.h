@@ -11,6 +11,7 @@
 #include "game/economy.h"
 #include "game/mapgen.h"
 #include "game/research.h"
+#include "game/species.h"
 
 namespace ascend::game {
 
@@ -28,6 +29,12 @@ const char* victoryConditionFile(Victory v);
 struct PlanetState {
     double pop = 0;              // growth model: turnloop.md §3 [inferred]
     std::vector<int> items;      // indices into the planitem table
+    // Species-ability modifiers (docs/re/abilities.md §2): SA_MoreMaxPop adds
+    // capBonus to the effective pop ceiling; SA_Cornucopia sets richPros
+    // (= one Agriplot's PROS 2 [verified planitem.txt] on a "rich world",
+    // the static.txt #56 planet-type name list).
+    double capBonus = 0;
+    double richPros = 0;
 };
 
 struct ShipInTransit {
@@ -50,6 +57,10 @@ struct CampaignConfig {
     int starCount = 75;         // mapgen snapshot default (mapgen.md §3)
     double initialPop = 20;     // [inferred default, turnloop.md §3]
     int popCap = 100;           // [inferred default; UPOP units undocumented]
+    // Player species (specnum into docs/re/species.md): -1 = human, no SA_
+    // (player.dip carries no ability token [verified]). >=0 grants that
+    // species' ability to owner 0 like any AI race (docs/re/abilities.md).
+    int playerSpecies = -1;
 };
 
 class Campaign {
@@ -61,6 +72,15 @@ public:
     Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree* tree,
              const std::vector<PlanetItem>& items, const std::vector<Gizmo>& gizmos,
              std::vector<DipFile> aiDip, std::string* errOut);
+    // Same, with explicit species abilities: abilities[i] is the SA_ of the
+    // race behind aiDip_[i] (owner i+1); size must equal aiDip.size() or be
+    // empty (empty = derive from dip header tokens, which leaves race02/Orfa
+    // unresolved — see game/species.cpp). Roster: docs/re/species.md;
+    // effect mapping: docs/re/abilities.md.
+    Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree* tree,
+             const std::vector<PlanetItem>& items, const std::vector<Gizmo>& gizmos,
+             std::vector<DipFile> aiDip, std::vector<SpeciesAbility> abilities,
+             std::string* errOut);
 
     // Advance one full turn (income -> growth -> build -> research ->
     // expansion -> diplomacy -> victory). Idempotent per call; returns the
@@ -76,6 +96,21 @@ public:
     int driveHopsFor(int owner) const;  // docs/re/ships.md §3 (launch range)
     int techsOwned(int owner) const;
     double resources(int owner) const;
+    // --- read-only inspection (tests + UI; docs/re/abilities.md §5) ---
+    SpeciesAbility abilityOf(int owner) const { return ability_[owner]; }
+    int chargeFor(int owner) const { return charge_[owner]; }
+    bool atWar(int a, int b) const { return war_[a * Nowner_ + b] != 0; }
+    bool laneBlockedStar(int star) const { return laneBlock_[star] != 0; }
+    bool invincibleStar(int star) const { return invincible_[star] != 0; }
+    bool sapActiveFor(int owner) const { return sapActive_[owner] != 0; }
+    double richProsFor(int star) const { return planets_[star].richPros; }
+    double popCapBonusFor(int star) const { return planets_[star].capBonus; }
+    int fleetDamageFor(int owner) const { return fleetDamage_[owner]; }
+    bool invadesAlwaysSucceeds(int owner) const {
+        return ability_[owner] == SpeciesAbility::SuperMarines;
+    }
+    int attackScoreFor(int owner) const { return attackScore(owner); }
+    int defenseScoreFor(int owner, int star) const { return defenseScore(owner, star); }
     const std::vector<CampaignEvent>& events() const { return events_; }
     const Galaxy& galaxy() const { return galaxy_; }
     int playerScorePct() const;  // stars-owned share, static.txt '%'-template (§1)
@@ -88,12 +123,16 @@ private:
     void researchPhase();
     void expansionPhase();
     void combatPhase();
+    void abilityPhase();
     void diplomacyPhase();
     int attackScore(int owner) const;
     int defenseScore(int owner, int star) const;
     void setWar(int a, int b, bool on);
     Victory checkVictory() const;
     int itemId(const std::string& name) const;  // by NAME (verified rows), not index
+    // Species-ability hooks (docs/re/abilities.md §2-§3).
+    bool lanePassable(int owner, int target) const;  // SA_BlockStarLanes
+    double popCapFor(int star) const;                // cfg cap + SA_MoreMaxPop bonus
 
     CampaignConfig cfg_;
     Galaxy galaxy_;
@@ -116,6 +155,15 @@ private:
     // per star. Model + constants: docs/re/turnloop.md §5 [inferred].
     std::vector<char> war_;
     std::vector<int> fortify_;
+    // Species abilities (docs/re/abilities.md): ability_[o] = owner o's SA_
+    // (Unknown = none); charge_[o] counts down per abilityPhase, firing at 0
+    // and resetting to abilityChargeTurns(). Transient per-activation flags:
+    // doublePower_[o] (attack x2 this combat), invincible_[s] (star shield),
+    // laneBlock_[s] (star whose lanes are blocked this combat).
+    std::vector<SpeciesAbility> ability_;
+    std::vector<int> charge_;
+    std::vector<char> doublePower_, sapActive_, invincible_, laneBlock_;
+    std::vector<int> fleetDamage_;  // per owner: accumulated hull damage (SA_DoubleHull / SA_HealShips / SA_SapAlienPower)
     int Nowner_ = 0;
     int turn_ = 0;
     Victory victory_ = Victory::None;
