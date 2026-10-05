@@ -27,7 +27,7 @@ file := count-line row+
 - cost is **uniformly 20** on all 40 variant rows (main tree: 50..300).
 - field0 in 0..4 with histogram {0: 8, 1: 11, 2: 7, 3: 6, 4: 8}.
 - all variant prereqs point into the main tree: True (none point at other variant rows) -> variants are leaves that extend the tree.
-- variant names are unique file-wide (duplicates: 0); 3/40 variant names match a main-tree name in spaced form, and 3/66 main-tree names have a caps variant.
+- variant names are unique file-wide (duplicates: 0); 4/40 variant names match a main-tree name in spaced form, and 4/66 main-tree names have a caps variant.
 - [inferred] This matches a per-configurable-substitution table: 40 cheap (cost 20) techs gated by a small category index. Which game concept field0 selects (species? difficulty? expansion content?) is **OQ-013** — the file alone cannot say; 21 species vs field0 range 0..4 makes 'species index' doubtful.
 
 ## 5. Full table (global row id; f=field0, c=cost)

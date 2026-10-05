@@ -147,10 +147,15 @@ def main():
     vpreq_to_main = all(0 <= q < len(main_rows) for _, nums, _ in caps_rows for q in nums[2:-1])
     dup_names = n - len(set(r[0] for r in rows))
     caps_name_set = set(r[0] for r in caps_rows)
+    # BUGFIX 2026-10-05: the caps side must be '^'-normalised too, or multi-
+    # word variants (ORBITAL^STRUCTURES) can never match their spaced main
+    # name and the collision count under-reads (was 3/40, is 4/40).
     same_name_as_main = sum(1 for r in caps_rows
-                            if r[0] in {m[0].upper().replace("^", " ") for m in main_rows})
+                            if r[0].replace("^", " ").upper()
+                            in {m[0].upper().replace("^", " ") for m in main_rows})
     main_as_caps = sum(1 for m in main_rows
-                       if m[0].upper().replace("^", " ") in caps_name_set)
+                       if m[0].upper().replace("^", " ")
+                       in {c[0].replace("^", " ").upper() for c in caps_rows})
     w("- cost is **uniformly 20** on all %d variant rows (main tree: 50..300).\n" % len(caps_rows))
     w("- field0 in 0..4 with histogram %s.\n"
       % dict(sorted(collections.Counter(nums[0] for _, nums, _ in caps_rows).items())))

@@ -7,6 +7,8 @@ open. Gate stage 3f re-runs this script and pins the golden save's size.
 ## Measured properties [verified]
 
 - size 81647 B; NUL fraction 0.596; head u32s [0, 7, 0, 0]
+- **no version stamp** (OQ-003 half-answered): the header is plain LE ints starting `0000000007000000` — no magic word anywhere in the file.
+- **no ALL-CAPS variant name appears in the save** (0/40 exact): display names are title-case only, so a save can never show which variant-block row it came from by casing alone (feeds OQ-013).
 - `restree.txt` yields 107 tech rows (name + numeric fields)
 - 67/107 row names appear verbatim (CP437) in the save
 - consecutive-name delta histogram is dominated by one value: **75** (65 pairs); runner-ups: []

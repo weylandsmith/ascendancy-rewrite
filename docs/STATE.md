@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-05T00:02
+updated: 2026-10-05T01:15
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -229,6 +229,22 @@ turn_log_recent:
      83/83) + runtime --fonts smoke. Self-caught mid-session: test comments
      carried an unverified census (13718 -> measured 11877) and stale 'I'
      row strings (verified against raw bytes before build)."
+  - "2026-10-05c (OQ-003 half-answered + restree bugfix): resume.gam has NO
+     version stamp (plain LE header; pinned in scripts/gam_probe.py with the
+     new header-bytes + zero-exact-caps-variant-name assertions, both
+     gate-3f) and its research table is stride-75 records from +160 (name
+     +22/30B CP437). KEY for OQ-013: ZERO exact ALL-CAPS variant names
+     anywhere in the golden save; the 4 spaced-form collisions (ORBITAL
+     STRUCTURES, XENOBIOLOGY, HYPERRADIATION, NANOENERGONS) appear title-
+     cased like main rows -> save display names cannot separate variant
+     from main. BUGFIX restree_probe.py collision count 3/40 -> 4/40: the
+     caps side compared WITHOUT '^'-normalisation so multi-word variants
+     could never match; docs/re/research.md + OQ-013 row corrected. Root
+     cause of my own two parser misreads too: restree's separator is a
+     literal '^' byte (cat -A renders other things misleadingly).
+     Self-caught: wrote a whole new gam_probe.py before reading the
+     existing one (write refused, good); --quiet without --out silently
+     no-ops doc writes (checked the tail, re-ran with --out)."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.

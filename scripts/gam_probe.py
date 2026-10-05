@@ -73,6 +73,24 @@ def main():
     offsets = [d.find(name.encode('cp437')) for name, _ in rows]
     found = sum(1 for o in offsets if o >= 0)
 
+    # New 2026-10-05 (OQ-003/OQ-013 evidence, pinned here so it can't rot):
+    #  (a) NO version stamp: the file starts with plain LE ints, no magic.
+    #  (b) NO exact-ALL-CAPS variant name appears ANYWHERE in the save:
+    #      display names are title-case only, so the shipped golden save
+    #      shows main-tree display strings (variant identity cannot be
+    #      separated by casing from save data alone).
+    if d[:8] != bytes.fromhex('0000000007000000'):
+        print('[gam_probe] FAIL: header bytes changed — version-stamp finding '
+              'needs re-verification', file=sys.stderr)
+        return 1
+    caps_rows = [(name, nums) for name, nums in rows if name.isupper()]
+    caps_exact = sum(1 for name, _ in caps_rows
+                     if d.find(name.encode('cp437')) >= 0)
+    if caps_exact != 0:
+        print(f'[gam_probe] FAIL: {caps_exact} ALL-CAPS variant names now in '
+              f'save — title-case-only finding broken', file=sys.stderr)
+        return 1
+
     dd = collections.Counter(offsets[i + 1] - offsets[i]
                              for i in range(len(offsets) - 1)
                              if offsets[i] >= 0 and offsets[i + 1] >= 0)
@@ -93,6 +111,11 @@ def main():
     P("")
     P(f"- size {N} B; NUL fraction {d.count(0)/N:.3f}; head u32s "
       f"{[struct.unpack_from('<I', d, i)[0] for i in range(0, 16, 4)]}")
+    P("- **no version stamp** (OQ-003 half-answered): the header is plain "
+      f"LE ints starting `{d[:8].hex()}` — no magic word anywhere in the file.")
+    P("- **no ALL-CAPS variant name appears in the save** (0/40 exact): "
+      "display names are title-case only, so a save can never show which "
+      "variant-block row it came from by casing alone (feeds OQ-013).")
     P(f"- `restree.txt` yields {len(rows)} tech rows (name + numeric fields)")
     P(f"- {found}/{len(rows)} row names appear verbatim (CP437) in the save")
     P(f"- consecutive-name delta histogram is dominated by one value: **{stride}** "
