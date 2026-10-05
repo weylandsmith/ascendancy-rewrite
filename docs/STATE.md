@@ -4,9 +4,9 @@
 # swallowed the CURRENT FOCUS heading; entries merged). Repair-by-rewrite done.
 # Rule going forward: ONE patch per region, read_file verify after.
 
-phase: P4
-milestone: 3  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
-updated: 2026-10-04T21:05
+phase: P6
+milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
+updated: 2026-10-04T22:05
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -148,6 +148,21 @@ turn_log_recent:
      peace-implies-war). Sweep: Control 198/201/211, Extinct x5 — victory
      records machine-regenerated. OQ-021 filed (end-ctrl comment 'over half'
      vs manual 'two-thirds'). Gate green pre-commit."
+  - "2026-10-04h (completion walk): independent re-verification of the whole
+     contract from a cold session — gate.sh ALL PASS (game/ sha256 intact,
+     extractor, probes 132 windows/21 species/21 abilities/5 end files,
+     xsend click, victory smoke), run_tests 73/73, docs/PLAYTHROUGH.md
+     victory lines present (Control t201/t211, Extinct t215 + Runs D/E/F),
+     README build+play, docs/re/ 20 specs, CONTRACT CHECKLIST fully [x],
+     git clean. R1 cadence honoured by timestamp check (last attempt
+     20261004-205846 < 12 h -> no run this session, recorded, not retried).
+     EXPLICIT COMPLETION STATED (see NEXT ACTION). Also probed .shp once
+     more from a fresh angle: magic '1.10' occurs exactly ONCE per file
+     (208/208 — no nested sub-libraries), and metadata slot N-1 equals
+     rec0's u32 dims only on 61/208 libs, so the 'box = max over records'
+     reading is the live one; slot N-1/N remain metadata, codec still
+     OQ-005. dosbox-x -help hangs without -noautoexec-style guard — use
+     strings on the binary, never the pty-help route."
   - "2026-10-04g (option C activated): user chose C (hybrid, B-priority);
      docs/BLOCKED.md rewritten as the C runbook. R1 cadence is now CODED, not
      prose: scripts/r1_attempt.sh + scripts/r1_tracer.py, run at session
@@ -165,7 +180,8 @@ turn_log_recent:
      output head -c 4000. Gate 3n added. rsync absent on host; cp -a used."
 
 ## CURRENT FOCUS
-P5b next. CONTRACT-CORE MET (see Run A/B/C + gate 3l). DONE P4: mapgen,
+NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
+DONE P4: mapgen,
 research, gizmos, items, ui-manifest, species, diplomacy, turn loop.
 DONE P5a (docs/re/ui-runtime.md): SDL2+SDL2_ttf window over the LIVE
 campaign — cosmos view (circles; .shp sprites stay OQ-005), NEXT TURN
@@ -207,20 +223,15 @@ commits c1b6d3f..d85b281; d85b281 = committed one-char include-quote fix
 in main.cpp). Finding scheduled in NEXT ACTION — must not be lost.
 
 ## NEXT ACTION (exactly one)
-OPERATE UNDER OPTION C (user decision 2026-10-04g; docs/BLOCKED.md is the
-runbook). Per turn: do B-priority work (from docs/OPEN-QUESTIONS.md or the
-phase list), then run the R1 cadence check: `ls -t work/r1/attempt-* 2>/dev/null |
-head -1` — if missing or older than 12 h, run `bash scripts/r1_attempt.sh`
-ONCE (bounded by design; exit 1 = normal negative, record one line and move
-on; exit 0 = R1 LIVE -> begin formula upgrades per BLOCKED.md §DECISION.3;
-exit 2 = harness error, fix harness, do not log negative). SA_ ability wiring
-DONE (2026-10-04e; gate 3m). All five end-*.txt victory conditions evaluated
-2026-10-04f (73/73 tests). No open non-R1 item remains; CONTRACT CHECKLIST
-fully [x]. R1 = exe runtime base is the master key: unblocks
-OQ-003 saves, OQ-005 sprites, OQ-010 combat arithmetic, OQ-017 vendor font,
-OQ-006 headerless sample rate, OQ-020 exact ability charge days, and
-CauseWar's third-party redirect. Verification criterion holds: gate 0 +
-CONTRACT CHECKLIST + PLAYTHROUGH victory record, all green 2026-10-04f.
+GOAL CONTRACT COMPLETE (restated explicitly 2026-10-04h after an independent
+cold-session verification walk: gate ALL PASS, 73/73 tests, PLAYTHROUGH
+victory records, README, 20 cited subsystem specs, checklist fully [x]).
+Standing cadence if the loop continues: per turn honour the R1 rule ONLY by
+timestamp — `ls -t work/r1/attempt-* | head -1`; run `bash scripts/r1_attempt.sh`
+only when missing/older than 12 h (exit 1 = record one line, no retry; exit 0 =
+upgrade formulas per BLOCKED.md §DECISION.3; exit 2 = fix harness). Residual
+unknowns (OQ-003/005/006/010/017/019) stay filed and R1-bounded exactly as the
+contract's own evidence rules require; none blocks playability to victory.
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr
