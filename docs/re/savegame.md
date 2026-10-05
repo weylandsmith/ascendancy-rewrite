@@ -62,7 +62,7 @@ display name and the caps rows are grouping headings in the text file.
 
 - [x] stride 75 measured from 65 consecutive pairs
 - [x] 60-record chain located and byte-dumped
-- [ ] field meanings, the rest of the file's structure, and any version stamp
-      — needs the exe save/load subsystem (OQ-003). See docs/BLOCKED.md for the
-      default the project proceeds under.
+- [x] version stamp: NONE exists (header bytes pinned above) — OQ-003
+      closed on that half; the field meanings + packed regions below
+      remain unmapped and need the exe save/load subsystem (R1).
 

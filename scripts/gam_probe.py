@@ -156,11 +156,11 @@ def main():
     P("")
     P("## Status")
     P("")
-    P(f"- [x] stride {stride} measured from {pairs_at_stride} consecutive pairs")
-    P(f"- [x] {len(chain)}-record chain located and byte-dumped")
-    P("- [ ] field meanings, the rest of the file's structure, and any version stamp")
-    P("      — needs the exe save/load subsystem (OQ-003). See docs/BLOCKED.md for the")
-    P("      default the project proceeds under.")
+    P("- [x] stride {} measured from {} consecutive pairs".format(stride, pairs_at_stride))
+    P("- [x] {}-record chain located and byte-dumped".format(len(chain)))
+    P("- [x] version stamp: NONE exists (header bytes pinned above) — OQ-003")
+    P("      closed on that half; the field meanings + packed regions below")
+    P("      remain unmapped and need the exe save/load subsystem (R1).")
     P("")
 
     text = "\n".join(out) + "\n"
