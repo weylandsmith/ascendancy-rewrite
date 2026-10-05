@@ -31,7 +31,9 @@ theme00 music · `--mute` load but silent · `--campaign N`/`--seed S` ·
 `--species N` play as species specnum N (0..20 — each species' SA_ special
 ability fires every ~30 turns; default human = no ability) ·
 `--flic` decode both vendor intro videos end-to-end (codec report) ·
-`--intro N` play the vendor intro (intro65a.flc) at real speed, N-frame cap.
+`--intro N` play the vendor intro (intro65a.flc) at real speed, N-frame cap ·
+`--fonts` load all vendor .fnt faces with ink census (OQ-017 closed: 1 byte
+per pixel, 0xFF background, 0xF3 solid ink / 0xF0-FE anti-alias ramp).
 In the UI: click NEXT TURN or Enter/Space advances a turn, clicking a star
 selects it (status line), ESC quits.
 

@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-04T23:05
+updated: 2026-10-05T00:02
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -207,6 +207,15 @@ turn_log_recent:
      intro track selection is OQ-018. Self-caught: script used system python3
      (no PIL) — revenv interpreter is the PIL host; numpy absent host-wide,
      pure-PIL bytes compare."
+  - "2026-10-05a (OQ-017 CLOSED — .fnt): the old 'bit grammar not cracked'
+     verdict was a unit error — glyphs are 1 BYTE per pixel (slot == 4+w*h,
+     exactly; 384/384), 0xFF bg, ink intensity 255-v (sm/big solid 0xF3,
+     intro 0xF0..0xFE AA ramp; censuses 1075/1514/11877). Sheets vision-read
+     legible. scripts/fnt_probe.py validator + docs/re/fnt.md + gate 3p;
+     C++ rewrite/src/formats/fnt.{h,cpp} + tests/test_fnt.cpp (6 tests,
+     83/83) + runtime --fonts smoke. Self-caught mid-session: test comments
+     carried an unverified census (13718 -> measured 11877) and stale 'I'
+     row strings (verified against raw bytes before build)."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
@@ -259,7 +268,7 @@ Standing cadence if the loop continues: per turn honour the R1 rule ONLY by
 timestamp — `ls -t work/r1/attempt-* | head -1`; run `bash scripts/r1_attempt.sh`
 only when missing/older than 12 h (exit 1 = record one line, no retry; exit 0 =
 upgrade formulas per BLOCKED.md §DECISION.3; exit 2 = fix harness). Residual
-unknowns (OQ-003/005/006/010/017/019) stay filed and R1-bounded exactly as the
+unknowns (OQ-003/005/006/010/019) stay filed and R1-bounded exactly as the
 contract's own evidence rules require; none blocks playability to victory.
 
 ## KNOWN-ISSUES / PARKING LOT

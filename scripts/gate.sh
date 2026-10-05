@@ -198,6 +198,15 @@ fi
 [ -s "$ROOT/docs/re/flc.md" ] || err "docs/re/flc.md missing"
 [ -s "$ROOT/rewrite/tests/data/flc_golden.tsv" ] || err "flc_golden.tsv missing (C++ cross-check data)"
 
+# 3p. OQ-017 closure invariant: the .fnt law (1B/px, slot==4+w*h, EOF tiling,
+# per-font ink alphabet) must hold on all 384 vendor glyphs (docs/re/fnt.md).
+if /usr/bin/python3 "$ROOT/scripts/fnt_probe.py" --quiet; then
+  :
+else
+  err "fnt_probe.py failed (OQ-017 regressed?)"
+fi
+[ -s "$ROOT/docs/re/fnt.md" ] || err "docs/re/fnt.md missing"
+
 # 4e. Pixel proof the C++ path renders what the decoder says: play the intro
 # under Xvfb, capture the screen, demand an EXACT 640x480 match against the
 # Python-decoded frame (scripts/intro_pixelcheck.sh; verified 2026-10-04i:

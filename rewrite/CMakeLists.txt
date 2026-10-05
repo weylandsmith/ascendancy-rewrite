@@ -32,6 +32,7 @@ add_library(ascend_core STATIC
   src/formats/bin_table.cpp
   src/formats/voc.cpp
   src/formats/flic.cpp
+  src/formats/fnt.cpp
   src/game/starstat.cpp
   src/game/mapgen.cpp
   src/game/research.cpp
@@ -71,6 +72,7 @@ add_executable(run_tests
   tests/test_audio.cpp
   tests/test_ships.cpp
   tests/test_flic.cpp
+  tests/test_fnt.cpp
   src/ui/layout.cpp
 )
 target_link_libraries(run_tests PRIVATE ascend_core)

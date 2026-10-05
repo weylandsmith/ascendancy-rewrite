@@ -16,6 +16,7 @@
 #include "formats/bin_table.h"
 #include "formats/cob.h"
 #include "formats/flic.h"
+#include "formats/fnt.h"
 #include "game/campaign.h"
 #include "game/diplomacy.h"
 #include "game/economy.h"
@@ -47,6 +48,7 @@ struct Options {
     bool mute = false;                          // load everything, volume 0
     int playerSpecies = -1;                     // specnum 0..20 (docs/re/species.md)
     bool flic = false;                          // decode both vendor FLCs (docs/re/flc.md)
+    bool fonts = false;                         // load all vendor .fnt faces (docs/re/fnt.md)
     int introFrames = -1;                       // -1 off; >=0: play intro, cap N frames (0=all)
 };
 
@@ -75,6 +77,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->playerSpecies = std::atoi(argv[++i]);
         else if (a == "--flic")
             o->flic = true;
+        else if (a == "--fonts")
+            o->fonts = true;
         else if (a == "--intro" && i + 1 < argc)
             o->introFrames = std::atoi(argv[++i]);
         else if (a == "--help")
@@ -102,6 +106,7 @@ void usage() {
         "  --species N   play as species specnum N (0..20, docs/re/species.md);\n"
         "                default -1 = human, no special ability\n"
         "  --flic        decode both vendor FLC videos end-to-end (docs/re/flc.md)\n"
+        "  --fonts       load all vendor .fnt faces + ink census (docs/re/fnt.md)\n"
         "  --intro N     play the vendor intro (intro65a.flc), N frames cap (0=all)\n");
 }
 
@@ -261,6 +266,36 @@ int main(int argc, char** argv) {
             std::printf("flic ok: %s %dx%d speed %ums frames %d (repaired FLI_COPY %d)\n",
                         fs::path(p).filename().c_str(), f.width(), f.height(),
                         f.speedMs(), frames, repaired);
+        }
+        return rc;
+    }
+
+    // Vendor .fnt faces (docs/re/fnt.md, OQ-017): load all three, render a
+    // probe string, print per-font facts. Codec-only smoke (before archives).
+    if (o.fonts) {
+        int rc = 0;
+        for (const std::string& p : {(o.dataRoot / "extracted/ascend01/data/smfont.fnt").string(),
+                                     (o.dataRoot / "extracted/ascend01/data/bigfont.fnt").string(),
+                                     (o.dataRoot / "extracted/ascend02/data/intro.fnt").string()}) {
+            ascend::formats::Font f;
+            std::string err;
+            if (!f.load(p, &err)) {
+                std::printf("font load FAILED %s: %s\n", p.c_str(), err.c_str());
+                rc = 1;
+                continue;
+            }
+            // Render "Ascendancy 1995" to a scanline strip to prove glyph
+            // iteration works on the real bytes (sum of ink, like the test).
+            std::string probe = "Ascendancy 1995";
+            uint64_t ink = 0;
+            for (char c : probe) {
+                const auto& g = f.glyph(uint8_t(c));
+                for (uint32_t i = 0; i < g.width * uint32_t(f.height()); i++)
+                    ink += g.px[i] != 0xFF;
+            }
+            std::printf("font ok: %s h=%d ink('%s')=%llu census=%llu\n",
+                        fs::path(p).filename().c_str(), f.height(), probe.c_str(),
+                        (unsigned long long)ink, (unsigned long long)f.inkCensus());
         }
         return rc;
     }
