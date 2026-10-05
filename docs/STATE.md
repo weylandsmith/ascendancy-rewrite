@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-05T20:10
+updated: 2026-10-05T21:30
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -396,6 +396,25 @@ turn_log_recent:
      stale first-run restored.bin nearly validated as correct (re-ran the
      builder after the d-vs-rv fix, then verified); pyright unbound/None x2
      before any run."
+  - "2026-10-05j (Seed3 + MODULE ATTRIBUTION LIVE; third pointer-law frame
+     scare resolved same turn): Ghidra headless Seed3.java on the RESTORED
+     image (scripts/seed3_run.sh): 292 funcs (Seed2: 269), 741 code->data
+     refs / 280 targets, 21 vtables>=4 (work/vtables3.tsv, functions3.tsv,
+     code2data.tsv). Two Ghidra-API corrections found by the compiler:
+     Instruction.getReferencesFrom() -> Reference[] (not iterator); THIS
+     RefType build has no isCALL()/isJUMP(), use r.isCall()/r.isJump()
+     (javap SoftwareModeling.jar, not recall). Module attribution
+     (scripts/attribution_scan.py): 225 E1 debug-string refs, 62% on real
+     rewritten fixup sites (~2% coincidence expectation) — signal quality
+     measured, locality MIXED and NOT a validity test (flic spans 0x63e2f).
+     Core modules attributed: flic 43, winmgr 24, gsystem 23, race 20,
+     cosmos/batmode 10, planet 8 (33 modules; work/attribution.tsv). Gate
+     3r wired (skips w/ note absent restored.bin). Frame scare: an ad-hoc
+     check whose 'diffs' counted MATCHES briefly favoured d=rv-B; its own
+     printed evidence refuted it (D1 zeros-vs-batcon.cpp, page census 74@B,
+     game.pal phys P0+q). Law STANDS d=rv-P0; both scare and lesson pinned
+     in r1-savestate.md. OQ-010 NOT yet touched: attribution map now exists,
+     the formulas are the next extraction."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
@@ -454,16 +473,19 @@ POINTER LAW CLOSED 2026-10-05i: runtime_u32 = P0 + payload_file_offset(target)
 docs/re/r1-savestate.md; battery 12/12 slots, gate 3q). UPGRADE PASS 1 DONE:
 work/ascend_restored.bin + work/fixup_sites.tsv built by
 scripts/r1_restore_sites.py and validated (pointer runs -> Watcom starts
-60% vs 15% control). THE next action is:
-GHIDRA RE-ANALYSIS on work/ascend_restored.bin — import raw binary at base 0,
-run Seed2-equivalent bootstrap, then the NEW capability: data xrefs exist, so
-(1) correlate module-name debug strings (batcon.cpp at file 0x82bd0 region)
-with function ranges — try the Watcom debug-area structure (header +0x1c
-size 0x63774) with anchor validation first, fallback = xref-from-string walks;
-(2) lift the first exact combat formulas (OQ-010) for cited constants;
-(3) deeper captures (click into a real game via ref_capture.sh coords before
-autosave) raise data richness for OQ-003/015/016 and should precede
-any formula claimed from title-screen state only. Residual unknowns
+60% vs 15% control). SEED3 RE-ANALYSIS DONE 2026-10-05j (scripts/seed3_run.sh:
+292 funcs, 741 data refs, 21 vtables) and MODULE ATTRIBUTION is LIVE
+(scripts/attribution_scan.py, gate 3r, work/attribution.tsv: 225 E1 refs,
+62% on true fixup sites; batmode 10 sites span 0x4fd7, race 20, cosmos 10).
+THE next action is:
+OQ-010 COMBAT-FORMULA EXTRACTION inside the attributed ranges: take the
+batmode/batcon-attributed est_func ranges from work/attribution.tsv,
+decompile each (Ghidra headless or ghidra_bridge at 127.0.0.1:8089), and
+lift hit/damage/shield arithmetic as CITED constants (file offset + decoded
+data target); a deeper capture (click into a real game via ref_capture.sh
+coords before autosave) must precede any formula whose inputs are only
+populated in-game — title-screen state is enough for arithmetic shape, not
+for data-driven tables. Residual unknowns
 stay filed exactly as the contract's evidence rules require; none blocks
 playability to victory.
 

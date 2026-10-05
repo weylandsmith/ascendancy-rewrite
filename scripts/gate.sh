@@ -213,6 +213,20 @@ else
   echo "note: no R1 save-state captures present (work/r1/r1sav-*); pointer-law battery skipped"
 fi
 
+# 3r. MODULE ATTRIBUTION invariant (docs/re/r1-savestate.md 2026-10-05j):
+# the restored image must keep yielding debug-string attributions for the
+# core modules (flic/winmgr/gsystem/race, >=5 exact sites each). Needs the
+# restored artifact; skips with a note when no captures exist.
+if [ -s "$ROOT/work/ascend_restored.bin" ]; then
+  if ! "$HOME/tools/revenv/bin/python" "$ROOT/scripts/attribution_scan.py" \
+        >/tmp/gate_attr.log 2>&1; then
+    tail -12 /tmp/gate_attr.log
+    err "attribution_scan regressed (modules lost their >=5-site signal)"
+  fi
+else
+  echo "note: work/ascend_restored.bin absent (run scripts/r1_restore_sites.py); attribution skipped"
+fi
+
 # 3o. OQ-002 closure invariant: BOTH vendor FLC files must fully decode
 # (stock Autodesk chunks; zero-residue + OOB asserted per chunk). Fast path:
 # --decode-only skips the 50s golden hashing; the golden cross-check against

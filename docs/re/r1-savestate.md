@@ -66,6 +66,11 @@ attaching to a process.
   the code object starts at payload file 0x14bb0 with Watcom linked base
   0x1d4000 = P0 + 0x14bb0 (restored table entry file-intra 0x1349 ->
   d 0x15ef9 = 0x14bb0 + 0x1349, exact).
+* `scripts/seed3_run.sh` + `scripts/ghidra/Seed3.java` — headless Ghidra
+  bootstrap/xref-export on the RESTORED image (see Seed3 section below);
+  writes work/functions3.tsv, work/code2data.tsv, work/vtables3.tsv.
+* `scripts/attribution_scan.py` — module attribution via debug strings
+  (E1 exact / E2 hint; gate 3r). Writes work/attribution.tsv.
 
 ## Save-state internals — source-cited (subagent verified tag dosbox-x-v2025.02.01) + measured cross-checks
 
@@ -190,3 +195,45 @@ The next R1 work items, in order of leverage:
      0x22d820 across slots): stepping through gameplay is observable without
      any debugger — slot diffs of guest RAM around a clicked action isolate
      the code that ran (rv - P0 -> file offset -> disassemble).
+
+## Seed3 + MODULE ATTRIBUTION — 2026-10-05j
+
+scripts/seed3_run.sh runs scripts/ghidra/Seed3.java headless on
+work/ascend_restored.bin (-noanalysis; API fixes found by compiler:
+Instruction.getReferencesFrom() returns Reference[] not an iterator; this
+RefType build has no isCALL()/isJUMP(), test r.isCall()/r.isJump()). Result:
+292 functions (Seed2 static: 269), 741 code->data refs / 280 distinct targets.
+Vtable seeding found 21 pointer tables >=4 entries (work/vtables3.tsv), e.g.
+file 0x88400 -> 6 distinct code entries; extra seeds were few because table
+entries often sit mid-padding (isPrologue gate).
+
+ATTRIBUTION (scripts/attribution_scan.py, gate 3r): E1 = code u32 (any byte
+offset — immediates needn't be 4-aligned, e.g. push imm32 at site-3) equal to
+a data-object ..\module.ext string byte position, on the RESTORED image;
+E2 = raw-file intra-object value in imm32-operand position (hint column only,
+false-positive-prone; batcon.cpp E2=1825 is that noise, E1=5 real).
+SIGNIFICANCE (measured 2026-10-05j, do not re-derive): E1 total 225 sites.
+Random-position expectation for 7,656 distinct string byte-positions over
+0x6D000 code bytes at file-value density would be ~6,000 hits — observed 225,
+i.e. code u32s are NOT uniform (small immediates dominate), so raw count is
+not the quality signal. THE quality signal: 139/225 = 62% of E1 sites lie on
+(s..s+3 of) an actual rewritten fixup site from fixup_sites.tsv, vs ~2%
+expected if E1 were coincidence. The 86 off-site E1s are data blobs in code
+storage / heap-class diffs landing on strings, and are kept (attribution is
+per-site and usable either way). Locality per module is MIXED — batmode span
+0x4fd7 (one bucket), cosmos 0x4000, but flic spans 0x63e2f across buckets
+0,1,3,5,6 (Watcom interleaves template/util code; do not treat locality as a
+validity test). Per-module E1: flic 43, winmgr 24, gsystem 23, race 20,
+cosmos/batmode 10, planet 8; 33 modules total. Full table:
+work/attribution.tsv (module, site, encoding, est_func by
+nearest-preceding-prologue rule).
+
+FRAME SCARE, RESOLVED THE SAME TURN (third re-derivation of the pointer law,
+kept so it isn't re-walked): an ad-hoc check printed 'diffs' computed as
+MATCH counts and briefly suggested d = rv - B (+0x88 off). Its own printed
+evidence refuted it (D1: rv-B=0x82b48 lands on zero padding, rv-P0=0x82bd0
+lands on '..\batcon.cpp'; page census: 74 pages verbatim at delta B, and the
+'game.pal' live copy sits at physical P0+q, not B+q). The law as CLOSED above
+stands unchanged. Lesson already in memory: re-derive both directions before
+writing retraction language; addendum: also check WHICH way a helper counts
+before trusting its label.

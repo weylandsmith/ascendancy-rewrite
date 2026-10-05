@@ -1,13 +1,26 @@
 #!/usr/bin/env python3
 """r1_restore_sites.py — build the fixup-site-restored Ghidra image.
 
-POINTER LAW (docs/re/r1-savestate.md, CLOSED 2026-10-05i):
-    runtime_u32 = P0 + payload_file_offset(target), guest linear == physical.
-Therefore the captured runtime u32 at a fixup site, MINUS P0, IS the payload
-file offset of the target: writing runtime values into a copy of the payload
-turns the static image into one whose data pointers speak payload-offset
-units — exactly the address space Ghidra loads it in (base 0, file order ==
-memory order, loader.md §2).
+POINTER LAW (docs/re/r1-savestate.md, CLOSED 2026-10-05i; frame re-derived
+independently 2026-10-05j after a scare, and it HELD — do not re-litigate):
+    H = 0x88 is the DOSBox-X save-state Memory MEMBER HEADER, not a linear
+    skew: mem[0x88 + p] is guest-physical byte p (BDA scan finds the shift
+    that puts 0x280@0x413 and 80@0x44A in place; member length 0x1044088 -
+    0x88 = 16 MiB + 0x44000 UMB/EMS tail). The image loads at guest-physical
+    P0 = B - H where B = anchor-vote position of file offset 0 WITHIN THE
+    MEMBER. Guest linear == physical (flat DPMI). The verbatim-copy test
+    mem[B+f] == payload[f] holds ~95% (7796/8192 at f=0x20000; misses are
+    exactly the fixup sites). Code/data pointers stored at fixup sites are
+    runtime absolute addresses rv = P0 + payload_file_offset(target), so:
+        d = rv - P0          <- the ONLY correct decode into Ghidra space
+    (site 0x14fa0: rv=0x242020 -> d=0x82bd0 = start of the '..\\batcon.cpp'
+    debug string (the 8 preceding bytes are 'con.cpp\\0'); rv-B=0x82b48
+    lands mid-zero-padding. Prologue spike at d: 66% vs 19% control.
+    'game.pal': file q=0x83579, live copy at mem index B+q == physical
+    P0+q exactly.)
+    An 'rv-B' re-derivation attempt on 2026-10-05j briefly claimed the
+    opposite and was itself refuted by its own printed evidence — the
+    mislabeled statistic (matches-as-diffs) was the bug.
 
 OUTPUTS
   work/ascend_restored.bin   payload with every IMAGE-CLASS differing
