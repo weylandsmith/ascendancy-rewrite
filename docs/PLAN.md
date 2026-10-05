@@ -117,7 +117,8 @@ Option C (decided 2026-10-04, docs/BLOCKED.md; cadence window ABOLISHED
 docs/re/r1-savestate.md) with NO rate limit; per-run safety invariants are
 mandatory (scratch copy, -time-limit, pkill -x, bounded output). A negative
 (exit 1) is recorded in one line, never retried in-turn; exit 0 means the
-base was derived (pointer law still gates formula upgrades); exit 2 is a
+base was derived; pointer law CLOSED 2026-10-05i so formula upgrades are
+unlocked (docs/re/r1-savestate.md); exit 2 is a
 harness bug, not a research result.
 When ALL P6 items are done and gate passes: state EXPLICITLY that the
 goal contract is complete and stop.

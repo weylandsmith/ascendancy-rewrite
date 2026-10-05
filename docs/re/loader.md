@@ -19,6 +19,14 @@ measures it. Reproduce with the commands at the bottom.
   exists" conclusion was wrong in both directions: the table exists, and its
   page values are *memory* page numbers, not file offsets — which is why every
   "value must be a file offset in the data area" test returned 0/N.
+  CORRECTION 2026-10-05i: scripts/le_tables_anchored.py could not tie ANY
+  object-table parse to this run (no offset/entry-size combination from the
+  header values has sum(cbObject)==cbImage), and the longest stride run in the
+  file (256 at 0x789c4, first value 0x90c300cd = repeated `int3` code pattern)
+  shows flag-free stride runs occur in CODE too. The page-table reading of the
+  0x2b40 run is therefore PLAUSIBLE-BUT-UNTIED [inferred]; nothing downstream
+  depends on it — §2 stands on le_contiguity_test.py, and the runtime base now
+  comes from the capture (docs/re/r1-savestate.md POINTER LAW, CLOSED).
 
 ## 2. The image is stored in file order [verified]
 

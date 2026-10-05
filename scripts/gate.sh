@@ -196,6 +196,23 @@ grep -vE '^[[:space:]]*#' "$ROOT/scripts/r1_savestate.sh" | grep -q 'ascendancy/
 grep -q 'time-limit' "$ROOT/scripts/r1_savestate.sh" \
   || err "r1_savestate.sh lost the dosbox -time-limit bound"
 
+# 3q. POINTER LAW confirmation (docs/re/r1-savestate.md, CLOSED 2026-10-05i):
+# run the law battery against any captured slot present. Skips with a note
+# when no captures exist (work/ is not committed) so a fresh clone still gates.
+SAVDIR=""
+for d in "$ROOT"/work/r1/r1sav-*/save; do
+  [ -d "$d" ] && SAVDIR="$d"   # keep scanning: last existing wins
+done
+if [ -n "$SAVDIR" ] && ls "$SAVDIR"/*.sav >/dev/null 2>&1; then
+  RUNBASE=$(dirname "$SAVDIR")
+  if ! "$HOME/tools/revenv/bin/python" "$ROOT/scripts/r1_pointer_law.py" \
+        --run-dir "$RUNBASE" >/dev/null 2>&1; then
+    err "POINTER LAW battery failed on captured slots in $RUNBASE"
+  fi
+else
+  echo "note: no R1 save-state captures present (work/r1/r1sav-*); pointer-law battery skipped"
+fi
+
 # 3o. OQ-002 closure invariant: BOTH vendor FLC files must fully decode
 # (stock Autodesk chunks; zero-residue + OOB asserted per chunk). Fast path:
 # --decode-only skips the 50s golden hashing; the golden cross-check against

@@ -28,14 +28,12 @@ attaching to a process.
    128-byte anchors, 6/6 consistent, identical in all 6 slots.
    B is per-run data, not a constant to hard-code — scripts re-derive it
    every capture (the OQ-011 lesson: never trust an unreplicated vote).
-   B is a MEMBER offset. Whether member offset == guest linear address is
-   NOT established (IVT reads sane at member 0x0..0x3FF; BDA at 0x400 read
-   all-zero — census incomplete). The pointer law (stored u32 = linear
-   address = f(B, object layout)) needs more work: three candidate delta
-   laws all beat controls (D=R: 289 code-region hits; D=0x242000: 573;
-   D=0x1d4000: 329 data hits; random controls <=115) — ambiguous, do NOT
-   pick one yet; a per-object fixup table read from the LE header or
-   Ghidra-side relocation walk will settle it.
+   B is a MEMBER offset; member -> guest physical is member - H (H=136,
+   derived below), and guest LINEAR == guest PHYSICAL for this game (flat
+   DPMI — established by the POINTER LAW section below, 2026-10-05i).
+   The pointer law that was ambiguous here (D=R 289 / D=0x242000 573 vs
+   controls <=115) is CLOSED below: the clusters are artefacts of one law,
+   runtime_u32 = P0 + payload_file_offset(target).
 
 ## Tooling
 
@@ -49,6 +47,14 @@ attaching to a process.
 * `scripts/r1_base.py` — earlier exploration variant (kept; same vote core).
 * `scripts/r1_validate.py` — pointer-density base validator (set-based, one
   pass over guest RAM; results above recorded here).
+* `scripts/r1_pointer_law.py` — THE pointer-law battery (C1-C5 above); gate
+  3q runs it over every captured slot dir. Exit 0 iff the law holds.
+* `scripts/le_tables_anchored.py` — negative-result tool: object/page/fixup
+  table attempts anchored to le_header_dump.py values (all V1 parses refuted;
+  kept so the field-map route is not re-walked).
+* `scripts/r1_pointer_measure.py`, `scripts/r1_live_probe.py` — the two
+  measurement passes behind the CLOSED section's numbers (delta/pv censuses;
+  single-copy proof). Superseded by r1_pointer_law.py for gating.
 
 ## Save-state internals — source-cited (subagent verified tag dosbox-x-v2025.02.01) + measured cross-checks
 
@@ -87,29 +93,75 @@ c402:0010 mouse). The earlier "BDA all-zero" oddity was MY misalignment
 Consequence: this capture's image base in GUEST PHYSICAL = B - 136 =
 0x1BF450 (B=0x1BF4D8 member-offset, per-run data as always).
 
-### POINTER LAW — delta clusters measured, interpretation OPEN
-MEASURED FACT: the two dominant runtime-vs-file u32 deltas differ by
-exactly 0x6E000 (0x242000 - 0x1d4000). HYPOTHESIS [unverified, do not cite
-as fact]: 0x6E000 is the page-rounded CODE object size, i.e. the two clusters
-are per-object linear bases of ONE law (stored u32 = file u32 + object
-linear base). The object-size figure needed to confirm this was NOT found
-in the repo: a header parse attempted here with a recalled field map
-produced impossible object entries — the same failure `scripts/
-le_header_dump.py`'s docstring documents ("that judgement was made against a
-RECALLED field map"). The repo-anchored facts stand: 121-page table stepping
-+0x100 (loader.md §1), page size 0x1000, image size 0xa7710. FIRST step of
-the next action: extract object boundaries with a field map validated
-against those anchors (or empirically, where the delta census shifts),
-THEN the 31,514 disp-only operands resolve. The 0x2420/0x24 secondary
-clusters are byte-shift artefacts of unaligned u32 reads, not extra laws.
+### POINTER LAW — CLOSED 2026-10-05i [verified 6/6 slots, gate 3q]
+THE LAW: the payload image is loaded ONCE, verbatim, at guest-physical
+P0 = B - H (this capture: 0x1BF450), and guest LINEAR == guest PHYSICAL (flat
+DPMI). Watcom fixups were applied IN PLACE at load: every file u32 that was a
+pointer now reads
 
-## What this unlocks (per BLOCKED.md upgrade branch)
+    runtime_u32 = P0 + payload_file_offset(target)
 
-The captured Memory member contains the RUNTIME image AND the game's loaded
-data structures (e.g. the strings 'Xerxes' at 0x255f69, 'Knowledge' at
-0x2535fd — golden-save vocabulary present in live RAM). Route from here:
-resolve the pointer law (law #5 open point), then correlate the 31,514
-disp-only operands against extracted-file structures to lift exact combat
-arithmetic (OQ-010), AI orderings (OQ-015/016), .shp codec (OQ-005).
-Capture deeper saves (click into a real game first — ref_capture.sh proves
-the click coordinates) for post-load data richness.
+so a captured pointer rv maps back by `file_offset = rv - P0`. The delta
+clusters (0x1d4000 for code-region sites, 0x242000 for data-region sites)
+carry NO extra law: a delta is just P0 + (file offset of the object region
+containing the SITE) minus that region's start — hence their gap equals the
+file span 0x6E000 between those regions, and the per-object-base HYPOTHESIS of
+the previous revision is RETRACTED (it predicted `pay[fo0+(rv-L0)]` code bytes
+which matched only because fo0 was itself `L0 - P0`).
+
+CONFIRMATIONS (scripts/r1_pointer_law.py, exit 0 iff all hold, all 12 slots of
+r1sav-20261005-{151634,160721} pass):
+  C1 image windows at six spread file offsets are verbatim at member B+file
+     offset (>=12/16 bytes, window unique in the payload to <=2 occurrences);
+  C2 all 8 EXE-proven path-template strings (loader.md §5) occur live at
+     physical P0+file_offset (unique occurrences; duplicates found elsewhere
+     in RAM are game-loaded copies of the .txt data, not law violations);
+  C3 pointer tables (runs >=8 of image-span u32) hit Watcom function-start
+     bytes at pay[rv-P0] 100/151 = 66% vs 15% control (loader.md §4.1);
+  C4 252 of 9,927 fixed-up sites (scan to file 0x70000) decode to printable
+     ASCII — e.g. site 0x14fa0: runtime 0x242020 -> payload 0x82bd0
+     '..\\batcon.cpp' (Watcom debug source names; the 0x1c=0x63774 header
+     field is that debug/line-info area per loader.md §1);
+  C5 a CPU-member u32 (build offset +0x20 — EIP by value range; layout NOT
+     parsed) lies inside [P0, P0+0xa7710) in every slot: the captured CPU was
+     executing inside the image.
+
+REFUTED en route (do not re-try): (a) second-copy reading 'live code at
+linear 0x1d4000' — mem[H+0x1d4000] bytes match pay[0x15bb0] i.e. P0+0x15bb0 =
+0x1d4000, the SAME single copy; (b) the LE header field-map route — with
+offsets taken from header values measured by le_header_dump.py, no object
+table parse has sum(cbObject)==cbImage (scripts/le_tables_anchored.py V1), and
+the +0x100-stride u32 'page table' is code bytes (first value 0x90c300cd =
+`int3; xchg cl,al` pattern repeated — flag-free stride runs are NOT page
+tables; loader.md §1's reading of that run as the LE page table is WEAKENED
+accordingly: file order == memory order stands on le_contiguity_test.py, not
+on this run); (c) raw u32==0x1d4000/0x242000 searches in the payload: zero
+occurrences (the bases exist only after fixup).
+
+DECODED LANDMARKS (guest physical this capture; re-derive per run): lowest
+C1-verified verbatim code window at P0+0x14bb0 (`0xcc 0xebf 0x90-pad` then
+56 57 55 push triple); debug source-name strings begin at
+P0+0x82bd0 ('..\\batcon.cpp'); live game data (Xerxes etc.) lives at
+0x253000..0x256000+ as runtime structures, NOT in the image span's file bytes.
+
+## What this unlocks (per BLOCKED.md upgrade branch) — UPDATED 2026-10-05i
+
+Pointer law is CLOSED (above), so EVERY captured guest address now maps
+two ways without further evidence work:
+  guest phys -> payload file offset  (f = rv - P0)   [image bytes, code]
+  guest phys -> runtime structure    (direct member read)  [live game state]
+The next R1 work items, in order of leverage:
+  1. Ghidra fixed-base re-analysis: load the payload at base 0 (file order ==
+     memory order, loader.md §2) — every immediate/disp that the fixups
+     rewrote can be restored from the capture (site list = aligned u32 where
+     mem[B+f] != pay[f]), giving true data xrefs for the 269 bootstrap
+     functions and their callees: combat arithmetic (OQ-010), AI orderings
+     (OQ-015/016), .shp loader (OQ-005).
+  2. Deeper captures: click into a real game via ref_capture.sh coords before
+     autosave fires (60 s interval is plenty) so loaded DATA structures
+     (ships, techs, diplomacy) are present, not just title-screen state;
+     correlate against extracted/ tables for the savegame map (OQ-003).
+  3. The CPU member u32 at +0x20 tracks the executing address (0x20eeec ->
+     0x22d820 across slots): stepping through gameplay is observable without
+     any debugger — slot diffs of guest RAM around a clicked action isolate
+     the code that ran (rv - P0 -> file offset -> disassemble).

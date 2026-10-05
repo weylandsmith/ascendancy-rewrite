@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-05T14:05
+updated: 2026-10-05T18:40
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -357,6 +357,32 @@ turn_log_recent:
      RECALL and a parsed-header attempt produced garbage (the exact
      le_header_dump.py docstring footgun); doc retracted to measured scope
      same turn. Image guest-physical this capture = 0x1BF450."
+  - "2026-10-05i (POINTER LAW CLOSED; 2026-10-05h hypothesis RETRACTED):
+     the law is runtime_u32 = P0 + payload_file_offset(target), P0 = B - H
+     (0x1BF450 this capture), guest linear == guest physical (flat DPMI).
+     ONE verbatim copy at P0, fixups applied in place; delta clusters
+     0x1d4000/0x242000 are P0+(region file offset) artefacts of SITE
+     position, the per-object-base reading is dead (its 'confirmation' was
+     circular — fo0==L0-P0). Confirmed by scripts/r1_pointer_law.py battery
+     C1-C5 on ALL 12 slots of both captures (windows verbatim 6/6; all 8
+     EXE-proven strings at P0+file-offset; pointer-table prologue spike
+     100/151=66% vs 15% control; 252 fixed-up sites decode to ASCII incl
+     '..\\batcon.cpp' at 0x82bd0; CPU u32@+0x20 inside image span every
+     slot — 0x20eeec..0x22d820 = executing addresses). Gate 3q added (runs
+     the battery on any captured slots, skips with note when work/ absent).
+     LE FIELD-MAP ROUTE CLOSED AS NEGATIVE: le_tables_anchored.py — no
+     object-table parse has sum(cbObject)==cbImage; the +0x100-stride
+     'page table' run is code-pattern-ambiguous (0x90c300cd int3 run 256)
+     — loader.md §1 marked PLAUSIBLE-BUT-UNTIED. Web routes: LX spec
+     body OCR'd without its field tables (archive.org cached), searches
+     empty x4 — no more fetches on this. Docs updated: r1-savestate.md
+     POINTER LAW section rewritten (law + confirmations + REFUTED list +
+     decoded landmarks + unlocked next steps), loader.md correction.
+     Self-caught: C3 initially scanned only from 0x82bb0 (data region) and
+     found 0 tables — full-span rescan from 0x14bb0 found 151 slots; the
+     'verbatim code start matches file' check first compared P0+fo0 with
+     fo0 measured RECALL — caught by the byte print disagreeing with the
+     claim; two pyright unbound/None bugs before any run."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
@@ -410,17 +436,17 @@ CADENCE WINDOW ABOLISHED 2026-10-05 (user): no timestamp gate on R1 anymore;
 safety invariants stay. R1 is LIVE via save states (docs/re/r1-savestate.md).
 MEMBER->GUEST-PHYSICAL LAW CLOSED 2026-10-05h: member = physical + 136
 (census + BDA scan, cite r1-savestate.md; re-derive H per dosbox build).
-THE next action is: SETTLE THE POINTER LAW — the two runtime-vs-file delta
-clusters differ by exactly 0x6E000 (measured); determine object boundaries
-from the LE header with an ANCHOR-VALIDATED field map (validate against the
-121-page/+0x100 table and 0xa7710 image size BEFORE trusting any entry —
-a recalled map already produced garbage this session; fallback: locate the
-census boundary empirically in the capture). If 0x6E000 == page-rounded
-code-object size, the single law stored_u32 = file_u32 + object_linear_base
-holds and the 31,514 disp-only operands resolve against the capture. Only
-then may any R1-blocked OQ (010/015/016/005/003) be upgraded to exact
-formulas per BLOCKED.md DECISION.3; deeper captures (click into a real game
-via ref_capture.sh coords first) raise data richness. Residual unknowns
+POINTER LAW CLOSED 2026-10-05i: runtime_u32 = P0 + payload_file_offset(target)
+(battery scripts/r1_pointer_law.py, 12/12 slots, gate 3q). THE next action is:
+R1 UPGRADE PASS 1 — fixup-site restoration for Ghidra: build the site list
+(aligned u32 where mem[B+f] != pay[f] — the 2026-10-05i census measured
+~9,927 sites to file 0x70000, clusters exactly at +L0-region/+L1-region),
+then in the Ghidra image (base 0, file order == memory order) apply the
+RUNTIME values with the pointer law inverted, so data xrefs point at payload
+offsets; lift the first exact formulas into combat (OQ-010) per BLOCKED.md
+DECISION.3. Deeper captures (click into a real game via ref_capture.sh coords
+before autosave) raise data richness for OQ-003/015/016 and should precede
+any formula claimed from title-screen state only. Residual unknowns
 stay filed exactly as the contract's evidence rules require; none blocks
 playability to victory.
 
