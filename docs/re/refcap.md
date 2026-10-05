@@ -71,7 +71,45 @@ Refuted alternatives (do not re-try without new evidence):
    frame identity on the original's movie path is NOT achievable this way.
    Script kept at work/refcap/bbox_match.py (negative-result tooling).
 
-## 4. What this proves, honestly
+## 4. Golden-save tour [verified by capture, 2026-10-05e]
+
+"Return to Current Game" (title button 4; root (318,373) -> window (318,333))
+loads `resume.gam` straight from the scratch root — gameplay screens are
+reachable WITHOUT R1, one click from boot. Captures pinned:
+
+- `docs/assets/refcap/original-strategic-map.png` — cosmos view: green turn
+  counter reads `00069`; sidebar = Planets / Ships / Research / Special
+  Ability / Species + 2x3 command wheel.
+- `docs/assets/refcap/original-planet-view.png` — header "Minions (1 Planet
+  Occupied, 1 System Controlled)"; "Xerxes I (Enormous Supermineral Planet)",
+  "No Project". The strings assemble from the vendor pools EXACTLY as
+  modelled: `Xerxes` = names.txt line 32 and present in resume.gam at
+  0x2146 (30-byte field); `Enormous` = static.txt size list, `Supermineral`
+  = static.txt type list (ids 164/172 region). Species name comes from the
+  dip/history pool, not the save — corroborates OQ-004 string-pool reading.
+- `docs/assets/refcap/original-species-research.png` — research dialog title
+  "Minions Knowledge" = static.txt line 354 `"%s Knowledge %s"` with %s =
+  species display name [verified first instance]; three empty tech rings for
+  the specnum-0 (Minions, SA_SuperMarines) ability screen.
+
+OQ-003 NARROWING (first-pass readings were WRONG twice — alignment and a
+mislabelled offset; exact bytes recorded instead of interpretation):
+turn counter 69 appears EXACTLY ONCE in resume.gam as LE u32, and only
+UNALIGNED at byte 62290 (0 hits at every 4-aligned offset) — not a plain
+aligned field. Planet record: `Xerxes` at 0x2146; raw bytes name+12..+24 =
+`00 00 00 00 7F C2 1F 00 A1 C4 1F 00 E5 C8 1F 00` -> three ASCENDING
+u3s 0x001FC27F, 0x001FC4A1, 0x001FC8E5 (gaps 0x222 then 0x444 — NOT equal
+spacing; second gap is exactly 2x the first) —
+plausibly flat-model pointers (≈2 MB, far beyond the 81,647 B file) which
+would need the R1 runtime base to confirm; +30 region is zeros then 0x30000.
+Meaning still open.
+
+Coordinate law for future pilots: import screenshots are ROOT coords;
+tools/xsend takes WINDOW coords = root - 40 (window sits at +0+40, 640x480
+mode after the 640x400 title screen). Every pilot miss this session came
+from mixing these two frames.
+
+## 5. What this proves, honestly
 
 Chain: original's on-screen movie pixels obey the exact palette law of the
 intro65a decode (T1) while non-movie screens (menu controls) do not
@@ -83,6 +121,7 @@ decode. Therefore: original movie == reference decode == port render, on
 identical screenshot machinery. What it does NOT prove: the original's
 composite geometry (scale, band rect) or its caption text — port geometry
 differences in the movie presentation remain cosmetic and are recorded
-here, not in code. Gameplay-screen comparison (map/planet views) remains
-R1 territory (save state to reach them reproducibly = OQ-003); the menu is
-state-free, which is exactly why it was chosen as the control.
+here, not in code. Gameplay screens ARE reachable (the golden save loads
+with one click — §4), but pixel-exact comparison of THOSE screens against
+the port additionally needs the .shp codec (OQ-005); the string/label
+layer of map/planet views is verified (§4).
