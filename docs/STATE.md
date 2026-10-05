@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-05T12:20
+updated: 2026-10-05T12:45
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -272,6 +272,14 @@ turn_log_recent:
      R1 cadence: last attempt 20261005-111507 < 12 h at session start ->
      no run this session, recorded not retried; that attempt logged
      TRACABLE=no exit 1 (normal negative under C)."
+  - "2026-10-05e (golden-tour addendum landed in savegame.md): last turn's
+     addendum never committed (the two savegame.md patches cancelled:
+     merge then un-merge = net zero, caught by git status clean at session
+     start). Re-measured then wrote: Xerxes@0x2146, turn-69 unaligned-only
+     (0x45 at byte 62290, zero aligned hits), raw triple 0x1FC27F/C4A1/C8E5
+     gaps 0x222/0x444 kept as BYTES not interpretation, '%s Knowledge %s'
+     first verified instance. R1 cadence: attempt 20261005-111507 ~5 h old
+     -> no run, recorded not retried."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.

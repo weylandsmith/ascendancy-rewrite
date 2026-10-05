@@ -66,3 +66,29 @@ display name and the caps rows are grouping headings in the text file.
       closed on that half; the field meanings + packed regions below
       remain unmapped and need the exe save/load subsystem (R1).
 
+## Golden tour from the title screen (2026-10-05e) [verified by capture]
+
+The golden save loads WITHOUT R1: title menu -> "Return to Current Game"
+(window-relative (318,333) via tools/xsend, dosbox-x under Xvfb — harness
+scripts/ref_capture.sh) boots straight into the strategic map, planet view,
+and species-research dialog. Screenshots + coordinate law (root = window+40):
+docs/re/refcap.md §4.
+
+OQ-003 narrowings from the same tour:
+
+- Planet name `Xerxes` verbatim at offset **0x2146** (CP437 in a padded
+  field); matches names.txt line 32. The on-screen view renders "Xerxes I
+  (Enormous Supermineral Planet)" — size + type strings assemble exactly
+  from the static.txt lists.
+- Turn counter shows 69 on screen; LE u32 69 appears EXACTLY ONCE in the
+  file and only UNALIGNED at byte 62290 (0 hits at every 4-aligned offset)
+  — turn number is not a plain aligned field.
+- Raw bytes at Xerxes+12..+24: `00 00 00 00 7F C2 1F 00 A1 C4 1F 00 E5 C8
+  1F 00` = three ascending u3s 0x1FC27F/0x1FC4A1/0x1FC8E5 (gaps 0x222,
+  0x444 — not equal spacing). Pointer interpretation needs the R1 runtime
+  base; recorded raw, two preliminary readings retracted (refcap.md §4).
+- Species-research dialog title "Minions Knowledge" = static.txt line 354
+  `"%s Knowledge %s"` first verified instance (%s = species display name).
+  The species name is NOT in the save (dip/history pools) — corroborates
+  the OQ-004 string-pool reading.
+
