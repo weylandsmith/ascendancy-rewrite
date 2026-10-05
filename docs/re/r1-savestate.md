@@ -50,6 +50,59 @@ attaching to a process.
 * `scripts/r1_validate.py` — pointer-density base validator (set-based, one
   pass over guest RAM; results above recorded here).
 
+## Save-state internals — source-cited (subagent verified tag dosbox-x-v2025.02.01) + measured cross-checks
+
+Canonical repo is joncampbell123/dosbox-x. Primary paths:
+* src/misc/savestates.cpp:1113-1134 — slot path law: without `-savedir`,
+  `path = dirname(capturedir) + "/save"`, entry name `<slot>.sav` (1-based).
+  MATCHES the measured law exactly. `-savedir <abs>` overrides to
+  `<path>/<N>.sav` — prefer it for determinism.
+* savestates.cpp:1078-1084 + hardware.cpp:2145/2166-2173 — autosave never
+  prompts (dialog only when `!auto_save_state && !noremark`); remark entry
+  = literal "Auto-save"; interval is HOST wall-clock seconds checked at
+  vblank, first save just after t=interval; slot range walks A-B then wraps.
+  REQUIRES video timer activity — must run with real output (x11 under
+  Xvfb), NOT `output=dummy` for the *game* run (dummy smoke tests still
+  saved here because dosbox-x reset dummy->default; do not rely on it).
+* src/hardware/memory.cpp:2803-2853 (`SerializeMemory::getBytes`) — the
+  `Memory` entry layout: [0] MemoryBlock struct header, then MemBase =
+  COMPLETE guest RAM contiguous from guest PHYSICAL 0 (pages*4096), then
+  mhandles (pages*4), then pagehandler_idx (262,144 B; 1=ram 2=rom
+  3-16=VGA). MEASURED: header = 136 B EXACT (136 + 16 MiB + 16,384 +
+  262,144 = 17,055,880 = member size, zero slack). The subagent's compiled
+  estimate of 104 was 32 B short — trust the census AND the BDA scan below,
+  and DERIVE H per build rather than hard-coding.
+* dosbox.cpp:1708 — `savefile` replaces the slot name for ALL saves
+  INCLUDING autosave (savestates.cpp:1134 ternary): must stay EMPTY or the
+  slot rotation dies.
+
+### Derived law (2026-10-05, slot 46 of r1sav-20261005-151634)
+MEMBER OFFSET = GUEST PHYSICAL + H, H = 136 for this build. Two independent
+confirmations: (1) size census above; (2) BDA signature scan — the unique
+h in [0,0x2000) with u16@h+0x413 == 0x280 (640 KB) AND u16@h+0x44A == 80
+returns h=0x88 exactly; with that offset the IVT reads coherently
+(INT0 f000:ca60, INT10 c000:00ee video BIOS, INT21 f000:d0e0, INT33
+c402:0010 mouse). The earlier "BDA all-zero" oddity was MY misalignment
+(reading at member 0x400, not 0x488) — recorded so nobody re-chases it.
+Consequence: this capture's image base in GUEST PHYSICAL = B - 136 =
+0x1BF450 (B=0x1BF4D8 member-offset, per-run data as always).
+
+### POINTER LAW — delta clusters measured, interpretation OPEN
+MEASURED FACT: the two dominant runtime-vs-file u32 deltas differ by
+exactly 0x6E000 (0x242000 - 0x1d4000). HYPOTHESIS [unverified, do not cite
+as fact]: 0x6E000 is the page-rounded CODE object size, i.e. the two clusters
+are per-object linear bases of ONE law (stored u32 = file u32 + object
+linear base). The object-size figure needed to confirm this was NOT found
+in the repo: a header parse attempted here with a recalled field map
+produced impossible object entries — the same failure `scripts/
+le_header_dump.py`'s docstring documents ("that judgement was made against a
+RECALLED field map"). The repo-anchored facts stand: 121-page table stepping
++0x100 (loader.md §1), page size 0x1000, image size 0xa7710. FIRST step of
+the next action: extract object boundaries with a field map validated
+against those anchors (or empirically, where the delta census shifts),
+THEN the 31,514 disp-only operands resolve. The 0x2420/0x24 secondary
+clusters are byte-shift artefacts of unaligned u32 reads, not extra laws.
+
 ## What this unlocks (per BLOCKED.md upgrade branch)
 
 The captured Memory member contains the RUNTIME image AND the game's loaded

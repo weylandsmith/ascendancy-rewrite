@@ -335,6 +335,28 @@ turn_log_recent:
      (stored = B+P, not B+P-window-relative) — every bug caught before any
      claim left the tree. STATE.md patch footgun struck again (line join),
      repaired same turn."
+  - "2026-10-05h (savestate-format research landed; MEMBER->PHYSICAL law
+     CLOSED): the research child cited tag dosbox-x-v2025.02.01 (canonical
+     repo joncampbell123/dosbox-x — dosbox-x/ and r_jqx/ orgs 404):
+     savestates.cpp:1113-1134 confirms the measured slot-path law from
+     source; memory.cpp:2803-2853 gives the Memory-entry layout (header
+     struct, then FULL guest RAM from physical 0, then mhandles pages*4,
+     then 262,144-B pagehandler_idx 1=ram/2=rom/3-16=VGA). DERIVED H=136
+     (member = physical + H): size census 136+16MiB+16384+262144 =
+     17,055,880 EXACT, and BDA signature scan (u16@h+0x413==0x280 AND
+     u16@h+0x44A==80) uniquely returns 0x88; with it the IVT reads
+     coherently (INT10=c000:00ee etc.). The old 'BDA all-zero' oddity was
+     MY misalignment — closed, nobody re-chase. Child's COMPILED header
+     estimate (104) was 32 B short of the measurement: cite both, derive
+     per-build. Autosave source facts: host-clock interval checked at
+     vblank (needs real video output — don't run game captures on dummy),
+     never prompts, remark entry literal 'Auto-save', 'savefile' key would
+     override ALL slots (must stay empty). POINTER LAW update: the two
+     delta clusters differ by exactly 0x6E000 (measured); per-object-bases
+     reading is HYPOTHESIS — my confirming object-size figure came from
+     RECALL and a parsed-header attempt produced garbage (the exact
+     le_header_dump.py docstring footgun); doc retracted to measured scope
+     same turn. Image guest-physical this capture = 0x1BF450."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
@@ -386,16 +408,20 @@ cold-session verification walk: gate ALL PASS, tests green, PLAYTHROUGH
 victory records, README, cited subsystem specs, checklist fully [x]).
 CADENCE WINDOW ABOLISHED 2026-10-05 (user): no timestamp gate on R1 anymore;
 safety invariants stay. R1 is LIVE via save states (docs/re/r1-savestate.md).
-THE next action is: RESOLVE THE POINTER LAW from a savestate capture — parse
-the LE header's fixup/relocation records against a captured Memory member
-(base re-derived per run by scripts/r1_sav_scan.py; never hard-code
-0x1BF4D8), settle the D=R vs D=0x242000 ambiguity per OBJECT (the two delta
-clusters are object-relative bases, not one global base), then map member
-offsets to guest linear addresses. Only after that law is unanimous may any
-R1-blocked OQ (010/015/016/005/003) be upgraded to exact formulas per
-BLOCKED.md DECISION.3; deeper captures (click into a real game via
-ref_capture.sh coords first) raise data richness. Residual unknowns stay
-filed exactly as the contract's evidence rules require; none blocks
+MEMBER->GUEST-PHYSICAL LAW CLOSED 2026-10-05h: member = physical + 136
+(census + BDA scan, cite r1-savestate.md; re-derive H per dosbox build).
+THE next action is: SETTLE THE POINTER LAW — the two runtime-vs-file delta
+clusters differ by exactly 0x6E000 (measured); determine object boundaries
+from the LE header with an ANCHOR-VALIDATED field map (validate against the
+121-page/+0x100 table and 0xa7710 image size BEFORE trusting any entry —
+a recalled map already produced garbage this session; fallback: locate the
+census boundary empirically in the capture). If 0x6E000 == page-rounded
+code-object size, the single law stored_u32 = file_u32 + object_linear_base
+holds and the 31,514 disp-only operands resolve against the capture. Only
+then may any R1-blocked OQ (010/015/016/005/003) be upgraded to exact
+formulas per BLOCKED.md DECISION.3; deeper captures (click into a real game
+via ref_capture.sh coords first) raise data richness. Residual unknowns
+stay filed exactly as the contract's evidence rules require; none blocks
 playability to victory.
 
 ## KNOWN-ISSUES / PARKING LOT
