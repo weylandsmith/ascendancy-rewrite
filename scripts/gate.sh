@@ -280,6 +280,30 @@ else
   note "xvfb-run unavailable: skipped UI smoke"
 fi
 
+# 4f. Reference-capture comparison: screenshots of the ORIGINAL game running
+# under dosbox-x (produced by scripts/ref_capture.sh, pinned in
+# docs/assets/refcap/) must obey the intro65a union-palette law on movie
+# shots and its negation on the title-menu control (scripts/refcap_match.py;
+# law + measurements + refuted alternatives in docs/re/refcap.md). Fast path:
+# scored from pinned PNGs, no emulator. Refresh pins via refcap_gate.sh.
+if command -v "$HOME/tools/revenv/bin/python" >/dev/null 2>&1 \
+   && [ -f "$ROOT/docs/assets/refcap/original-title-menu.png" ]; then
+  RC_PY="$HOME/tools/revenv/bin/python"
+  "$RC_PY" "$ROOT/scripts/refcap_match.py" \
+    "$ROOT/docs/assets/refcap/original-title-menu.png" --expect not-movie \
+    >/tmp/gate_refcap.log 2>&1 \
+    || { cat /tmp/gate_refcap.log; err "refcap control (title menu) violated the law"; }
+  for PIN in original-intro-movie.png original-intro-caption.png original-intro-galaxy.png; do
+    "$RC_PY" "$ROOT/scripts/refcap_match.py" \
+      "$ROOT/docs/assets/refcap/$PIN" --expect movie \
+      >>/tmp/gate_refcap.log 2>&1 \
+      || { cat /tmp/gate_refcap.log; err "refcap movie pin $PIN not recognised as the reference intro"; }
+  done
+  note "refcap: 3 original movie shots obey the decode palette law, title-menu control does not"
+else
+  note "revenv or pinned refcap shots absent: skipped reference-capture comparison"
+fi
+
 # 4d. Audio: SDL2_mixer must load ALL 86 manifest samples (85 unique — the
 # manifest lists 'shield' twice) + theme00 from the REAL vendor files, with
 # a dummy audio device (docs/re/audio.md §5). Any load failure aborts init

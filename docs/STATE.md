@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-05T01:15
+updated: 2026-10-05T12:20
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -246,6 +246,30 @@ turn_log_recent:
      existing one (write refused, good); --quiet without --out silently
      no-ops doc writes (checked the tail, re-ran with --out)."
 
+  - "2026-10-05d (refcap harness — P5's last non-R1 subitem CLOSED): the
+     ORIGINAL boots in dosbox-x (output=x11, verbatim conf key) under Xvfb
+     and is CLICK-DRIVEN (tools/xsend, window-relative coords: title root
+     y=252 -> window 212; a root-coord first click hit Tutorial, caught by
+     vision-checking the capture). Play Introduction -> movie band composite
+     at root x32..608 y240..452 with game-drawn captions (ZERO caption pixels
+     in all 1144 decoded FLIC frames + strings absent from extracted/ ->
+     game draws them). Comparison law (scripts/refcap_match.py, gate 4f on
+     4 pinned docs/assets/refcap PNGs): screenshot colours bit-exact in the
+     intro65a union palette (719 cols) >=85% and far<2% -> movie; measured
+     90.6-100.0% movie vs 9.2-30.5% menus. THREE self-refuted comparisons
+     recorded in docs/re/refcap.md so they are not re-tried: (1) 1:1 blit
+     row search 'PASS 0.64' was BLACK-ROW DOMINANCE (content-aware rerun =
+     0 rows); (2) logic.flc palette control VACUOUS (shared engine palette,
+     99.5% vs 99.5%) -> live control is the menu shot's negation; (3) bbox-
+     normalised frame ID unscored (best 8.9 vs median 23.9, temporally
+     scattered). Chain: original pixels obey the decode's palette law +
+     golden pin + gate 4e pixel-exact => original==decode==port on identical
+     screenshot machinery; composite geometry/captions stay cosmetic-recorded,
+     gameplay-screen comparison remains OQ-003/R1. Scripts: ref_capture.sh
+     (scratch-copy + pkill -x + time-limit invariants inherited),
+     refcap_gate.sh end-to-end. Gate note: my patch ate the 4d header line
+     (same class as the STATE manglings) — repaired same turn, gate re-run."
+
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
 DONE P4: mapgen,
@@ -381,11 +405,14 @@ missing. CONTRACT CHECKLIST (the judge's list) follows the phase list.
         (OQ-010) INSIDE the working loop — documented-default model.
 [~] P5 UI+media — RENDERED UI shipped (ui-runtime.md; gates 4c/4c-b:
         Xvfb boot + injected-click advances a real turn) and AUDIO shipped
-        (audio.md; gate 4d: all 86 vendor SFX + theme00 load). Open
-        subitems are R1-blocked unknowns, filed: vendor .fnt codec (OQ-017
-        -> Liberation substitute), .shp pixel codec (OQ-005 -> documented
-        circles), headerless sample rate (OQ-006 -> 22050 default),
-        dosbox screenshot comparison (needs a reference capture harness).
+        (audio.md; gate 4d: all 86 vendor SFX + theme00 load) and DOSBOX
+        COMPARISON SHIPPED (refcap.md; gate 4f: original boots in dosbox-x
+        under Xvfb via scripts/ref_capture.sh, movie shots obey the
+        reference-decode palette law, menu control obeys its negation).
+        Open subitems are R1-blocked unknowns, filed: vendor .fnt codec
+        (OQ-017 -> Liberation substitute), .shp pixel codec (OQ-005 ->
+        documented circles), headerless sample rate (OQ-006 -> 22050
+        default).
 [x] P6 full campaign playable to victory (Run A: Control t201 seed 2024
         under full ship gating; B: Extinct; gate 3l re-runs it every
         commit) + README.md complete. Open-questions policy applied: the
