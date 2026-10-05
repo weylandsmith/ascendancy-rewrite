@@ -268,7 +268,10 @@ turn_log_recent:
      gameplay-screen comparison remains OQ-003/R1. Scripts: ref_capture.sh
      (scratch-copy + pkill -x + time-limit invariants inherited),
      refcap_gate.sh end-to-end. Gate note: my patch ate the 4d header line
-     (same class as the STATE manglings) — repaired same turn, gate re-run."
+     (same class as the STATE manglings) — repaired same turn, gate re-run.
+     R1 cadence: last attempt 20261005-111507 < 12 h at session start ->
+     no run this session, recorded not retried; that attempt logged
+     TRACABLE=no exit 1 (normal negative under C)."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.

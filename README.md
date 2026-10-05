@@ -82,4 +82,6 @@ their exact vendor thresholds/priority remain R1).
     rewrite/src/ui/        SDL2 window, layout math, SDL2_mixer engine
     docs/re/               every reverse-engineered format/system spec
     scripts/gate.sh        the one verification command
+    scripts/ref_capture.sh boots the ORIGINAL in dosbox-x/Xvfb for
+                           reference screenshots (docs/re/refcap.md, gate 4f)
     tools/xsend.c          synthetic-X-input helper used by the gate
