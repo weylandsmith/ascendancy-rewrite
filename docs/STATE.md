@@ -207,6 +207,19 @@ turn_log_recent:
      intro track selection is OQ-018. Self-caught: script used system python3
      (no PIL) — revenv interpreter is the PIL host; numpy absent host-wide,
      pure-PIL bytes compare."
+  - "2026-10-05b (shp OQ-005, 6th static angle CLOSED as negative):
+     scripts/shp_tokenize.py BFS over tokenisation GRAMMARS (FLAT runs,
+     EOL-lines, f2 cursor-segments, DOC1 ops), correct prefixes (rec0 u32
+     dims, rec1+ 24B prefix), 25 smallest libs x 4 recs = 100/100 negative.
+     Corpus-wide: u8-len segment tiling 3/1530 = noise; rec1+ +16 u32 pair
+     sane-but-!=-rec0 on 66% -> 'base dims' reading REFUTED; cos_ship
+     same-box byte-diff varies ONLY colour bytes [3,6,11] (stream pixel
+     counts cannot exist for that grammar); bullet04==sg45bull rec0 bytes.
+     Report docs/re/shp-tokenize.md. Per OQ-011 lesson: 7th blind sweep is
+     FORBIDDEN; resolution requires the exe shape loader (runtime base=R1)
+     or guided dims. Self-caught: wrote an over-strong docstring claim from
+     2 records, verified-then-walked-it-back to measured scope before
+     commit; committed once without STATE.md, fixed next action."
   - "2026-10-05a (OQ-017 CLOSED — .fnt): the old 'bit grammar not cracked'
      verdict was a unit error — glyphs are 1 BYTE per pixel (slot == 4+w*h,
      exactly; 384/384), 0xFF bg, ink intensity 255-v (sm/big solid 0xF3,
