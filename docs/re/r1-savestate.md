@@ -237,3 +237,50 @@ lands on '..\batcon.cpp'; page census: 74 pages verbatim at delta B, and the
 stands unchanged. Lesson already in memory: re-derive both directions before
 writing retraction language; addendum: also check WHICH way a helper counts
 before trusting its label.
+
+## FIRST DECOMPILE BATCH (OQ-010 attempt 1) — 2026-10-05j
+
+scripts/ghidra/DecompileCombat.java reads hex targets one-per-line from
+work/combat_decomp_targets.txt and writes work/combat_decomp/<addr>.c
+(against ghp4/ascend4; -process takes the IMPORTED FILE NAME
+ascend_restored.bin, not the project name — measured). Batch 1: the five
+batmode/batcon E1 functions (0x14bc0, 0x156d4, 0x1aef8, 0x1b91c, 0x1ce1c) +
+top callees (0x56ca4, 0x5cf96, 0x5caac, 0x336b4); 9/9 decompiled ok.
+
+HONEST RESULT: these are battle-MODE UI and window-message dispatch
+(batmode.cpp/batcon.cpp are the combat screens), e.g. FUN_000336b4 is a
+case-split message handler over param_2<7 touching object fields 0x35/0x39/
+0x41 + vtable calls (offset +0xc, +0x10 into vtable at field 0xa7);
+FUN_00056ca4 is a bounds-check + vtable thunk. No hit/damage arithmetic in
+this batch. STRUCTURAL GOLDMINE instead: Watcom thiscall confirmed
+(vtable at object+0xa7, methods at +8/+0xc/+0xc slots), fields carry packed
+16-bit pairs (>>0x10 idiom everywhere), 56 direct call sites of FUN_00056ca4
+including 6 inside FUN_0001aef8. The COMBAT ARITHMETIC therefore lives where
+the battle UI CALLS INTO. FOLLOW-UP MEASURED SAME TURN (attempt 2 batch:
+gsystem funcs 0x2fed0/0x528ec/0x70790 + the 'damage-ish' pair): FUN_0005cf96
+and FUN_0005caac are REFUTED as damage arithmetic — their bodies are packed
+comparisons *2 + quadrant-bit assembly (`((a<b)*2+(c<d))*2+...`) feeding
+byte >>1 draw loops: graphics/fill code shape, not combat (the earlier
+'heavy byte/uint mixing — damage-ish' label was a shape-overclaim caught by
+reading the bodies; only 3 of the 10 engine-module est_funcs were real
+functions, the rest mid-stream). STRATEGY CORRECTION for attempt 3: stop
+following shape hunches from 292 dark-stream functions; the ceiling problem
+is function-reach, so either (a) run Ghidra's FULL auto-analysis on the
+restored image (data refs now exist, which is exactly what makes auto
+function detection work — earlier Seed runs deliberately used -noanalysis
+because the raw image had none), then attribution-filter the resulting
+function set by module; or (b) deeper capture so slot-diff pinpoints
+executed code (unlock item 3).
+PRNG census in code storage: u32 0x343FD appears ONCE (0x30aa8) but the
+context bytes REFUTE it as a constant — the encoding there is `ret; mov
+edx,esi; mov eax,ecx; e8 fd 43 03 00`, i.e. a CALL whose rel32 coincidentally
+equals 0x343FD (target 0x34ea9). With its companion add 0x269EC3 also absent
+(zero u32 occurrences), the MSVC/Watcom rand() is NOT in code storage
+(runtime-lib call elsewhere or not used). The pair 0x41C64E6D + 0x3039 sits
+at 0x7825b/0x78261: `69 10 6d 4e c6 41` = `imul dword [eax],0x41c64e6d` then
+`81 c2 39 30 00 00` = `add edx,0x3039` — a hand-rolled LCG (glibc constants),
+container not yet mapped: NOT inside any of the 292 seeded functions. Lesson
+pinned: constant scans must check the instruction encoding before claiming a
+constant (immediate vs coincidental rel32). 'which RNG does combat use' =
+OQ-010 subquestion, answerable by call-graph reach once more functions are
+seeded.

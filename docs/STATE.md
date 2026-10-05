@@ -413,8 +413,13 @@ turn_log_recent:
      check whose 'diffs' counted MATCHES briefly favoured d=rv-B; its own
      printed evidence refuted it (D1 zeros-vs-batcon.cpp, page census 74@B,
      game.pal phys P0+q). Law STANDS d=rv-P0; both scare and lesson pinned
-     in r1-savestate.md. OQ-010 NOT yet touched: attribution map now exists,
-     the formulas are the next extraction."
+     in r1-savestate.md. OQ-010 attempt 1 DONE (batch 1 decompile, 9/9 ok):
+     batmode/batcon funcs are battle-UI/message dispatch, NOT the arithmetic
+     core — honest negative recorded with the structural harvest (vtable field
+     +0xa7 thiscall, packed u16 pairs >>0x10, damage-ish 5-arg shapes
+     FUN_0005cf96/5caac). Self-caught PRNG overclaim: u32 0x343FD hit was a
+     coincidental CALL rel32, not a constant (encoding checked, lesson pinned;
+     real find: hand-rolled glibc-constant LCG at 0x7825b, unmapped)."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
@@ -478,11 +483,16 @@ scripts/r1_restore_sites.py and validated (pointer runs -> Watcom starts
 (scripts/attribution_scan.py, gate 3r, work/attribution.tsv: 225 E1 refs,
 62% on true fixup sites; batmode 10 sites span 0x4fd7, race 20, cosmos 10).
 THE next action is:
-OQ-010 COMBAT-FORMULA EXTRACTION inside the attributed ranges: take the
-batmode/batcon-attributed est_func ranges from work/attribution.tsv,
-decompile each (Ghidra headless or ghidra_bridge at 127.0.0.1:8089), and
-lift hit/damage/shield arithmetic as CITED constants (file offset + decoded
-data target); a deeper capture (click into a real game via ref_capture.sh
+OQ-010 ATTEMPT 2 — arithmetic is NOT in batmode/batcon (attempt-1 measured
+negative, see r1-savestate.md FIRST DECOMPILE BATCH). Follow the harvest:
+(1) seed-and-decompile the cosmos.cpp/ship.cpp E1 est_func ranges from
+work/attribution.tsv (the engine modules the battle UI calls into) plus the
+damage-shaped FUN_0005cf96/FUN_0005caac bodies, via the now-scripted pipeline
+(work/combat_decomp_targets.txt; -process ascend_restored.bin);
+(2) map the LCG container around 0x7825b (seed a prologue there — it is
+outside all 292 seeded functions) and count its callers to answer 'which RNG
+combat uses'. Lift arithmetic as CITED constants (file offset + decoded data
+target); a deeper capture (click into a real game via ref_capture.sh
 coords before autosave) must precede any formula whose inputs are only
 populated in-game — title-screen state is enough for arithmetic shape, not
 for data-driven tables. Residual unknowns
