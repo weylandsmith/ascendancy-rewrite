@@ -8,9 +8,9 @@ namespace ascend::formats {
 // magic '1.'+0000, u32 N=128, u32 HEIGHT, u32 255, N u32 glyph offsets
 // (strictly increasing), each glyph = u32 width + EXACTLY width*HEIGHT
 // bytes, 1 byte per pixel row-major, no stride padding, last body at EOF.
-// 0xFF = background; other values = ink with intensity (255 - value):
-// smfont/bigfont are solid 0xF3 faces, intro.fnt is a 0xF0..0xFE ramp
-// (anti-aliased).
+// 0xFF = background; other values = ink, BRIGHTER with higher byte value
+// (measured edge/interior census, fnt.md): sm/bigfont are solid 0xF3 faces,
+// intro.fnt is a 0xF0(fringe)..0xFE(core) anti-alias ramp.
 class Font {
   public:
     struct Glyph {

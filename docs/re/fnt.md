@@ -22,7 +22,14 @@ glyph[i]  u32 width; width*HEIGHT bytes  1 byte per pixel, row-major,
 
 ## Pixel semantics [verified + vision-confirmed]
 
-- `0xFF` = background. Any other byte = ink, intensity (255 - value).
+- `0xFF` = background. Any other byte = ink. BRIGHTNESS INCREASES
+  WITH BYTE VALUE: measured edge/interior census of intro.fnt —
+  interior fraction of 0xF0..0xF5 = 0.022 (stroke fringe),
+  of 0xF7..0xFD = 0.417 (stroke interior). An AA face puts
+  its weak values beside the background and strong values inside
+  strokes, so higher byte = brighter ink. (255-value) is the
+  darkness of the BYTE, not of the rendered ink; the 2026-10-04
+  text here conflated the two.
 - smfont/bigfont use the SINGLE ink value `0xF3` throughout: solid
   faces (1-bit in practice). intro.fnt uses the full `0xF0..0xFE`
   ramp — anti-aliased 39 px intro face. Both render as clean,

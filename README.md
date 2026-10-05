@@ -9,8 +9,9 @@ data formats and game tables read from the extracted originals.
 
     cmake -S rewrite -B rewrite/build && cmake --build rewrite/build -j4
 
-Requires: libsdl2-dev (2.32), libsdl2-mixer-dev (2.8), libsdl2-ttf-dev,
+Requires: libsdl2-dev (2.32), libsdl2-mixer-dev (2.8),
 a C++17 compiler. Tests: `./rewrite/build/run_tests` (no display needed).
+(UI text renders from the vendor .fnt faces — no SDL2_ttf since 2026-10-05.)
 
 ## Run
 
@@ -64,9 +65,11 @@ static data; each is listed in `docs/OPEN-QUESTIONS.md` and cited from
 code back to docs): campaign combat arithmetic (OQ-010); AI build/expansion
 orderings (OQ-015/016); ability charge time — 30 turns for all 14 charged
 species abilities (OQ-020); sample rate of headerless audio files — 22050 Hz
-mono (OQ-006); UI font — Liberation Sans stands in for the vendor .fnt
-codec (OQ-017); window colours — BACKGRNDCOLOR indices have no documented
+mono (OQ-006); window colours — BACKGRNDCOLOR indices have no documented
 palette mapping, so a deuteranopia/protanopia-verified palette is used.
+The UI font is NOT a default: the vendor smfont/bigfont .fnt faces are
+decoded and rendered per docs/re/fnt.md (OQ-017 closed; the Liberation
+substitute was removed once the codec landed).
 
 OPEN, NOT FAKE-IMPLEMENTED (stated, not silently stubbed): original sprite
 pixel codec (OQ-005 — the map draws documented circles instead of invented

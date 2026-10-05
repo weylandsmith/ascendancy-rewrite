@@ -8,7 +8,11 @@ fonts):
   table   N u32 glyph offsets (strictly increasing), file offsets
   glyph   u32 width, then EXACTLY width*HEIGHT bytes — 1 byte per pixel,
           row-major, no stride padding. 0xFF = background; any other value
-          is ink with intensity (255 - value) (i.e. lower byte => darker).
+          is ink, BRIGHTER with higher byte value (measured edge/interior
+          census: 0xF0 hugs background = fringe, 0xFD sits in stroke
+          interiors). The 2026-10-04 phrasing "intensity (255 - value)"
+          inverted rendered brightness and is corrected (main() asserts the
+          direction every run).
           In the vendor fonts ink is 0xF3 for every glyph of smfont/bigfont
           (solid 1-bit-in-practice faces) and a 0xF0..0xFE ramp in intro.fnt
           (anti-aliased). Glyphs 0..31 and @^{|}~ in the ASCII block are all
@@ -63,6 +67,27 @@ def load_font(path):
     return dict(n=n, h=h, glyphs=glyphs, size=len(d), ink=ink)
 
 
+def edge_grade(fnt):
+    """Per ink value: (# pixels 4-adjacent to a 0xFF background pixel, # not).
+    For an anti-aliased face the WEAK ramp values must live at stroke edges
+    and the STRONG ones inside — the census direction settles brightness
+    order without rendering. Returns {value: (edge, interior)}."""
+    h = fnt['h']
+    out = {}
+    for w, body in fnt['glyphs']:
+        for y in range(h):
+            for x in range(w):
+                v = body[y * w + x]
+                if v == 0xFF:
+                    continue
+                nb_bg = any(nx < 0 or nx >= w or ny < 0 or ny >= h
+                            or body[ny * w + nx] == 0xFF
+                            for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)))
+                e, it = out.get(v, (0, 0))
+                out[v] = (e + 1, it + (0 if nb_bg else 1))
+    return out
+
+
 def render_rgb(fnt, ch):
     """Glyph -> rows of (r,g,b); background dark, ink bright by intensity."""
     w, body = fnt['glyphs'][ord(ch)]
@@ -102,6 +127,20 @@ def main():
     fnts = {p: load_font(os.path.join(ROOT, p)) for p in FONTS}
     total = sum(f['n'] for f in fnts.values())
 
+    # Anti-alias direction [verified 2026-10-05f on intro.fnt]: a ramp face
+    # grades strokes via WEAK pixels at the background-adjacent fringe and
+    # STRONG pixels in stroke interiors. Measured interior fractions:
+    # 0xF0..0xF5 = 0.005..0.106 (fringe), 0xF6..0xFD = 0.55..0.81 (interior).
+    # So HIGHER byte = BRIGHTER ink; the doc's earlier "(255 - value)" phrasing
+    # described darkness of byte and is corrected in the generated text below.
+    eg = edge_grade(fnts[FONTS[2]])
+    lo = [eg[v] for v in range(0xF0, 0xF6) if v in eg]
+    hi = [eg[v] for v in range(0xF7, 0xFE) if v in eg]
+    lo_int = sum(i for _, i in lo) / max(1, sum(e + i for e, i in lo))
+    hi_int = sum(i for _, i in hi) / max(1, sum(e + i for e, i in hi))
+    assert lo_int < 0.25 < hi_int, \
+        f"intro.fnt AA direction flipped (fringe interior {lo_int:.3f}, core {hi_int:.3f})"
+
     if args.sheets:
         chars = 'ABCDEFGHIJKLM abcdefghij 0123456789'
         write_sheet(fnts[FONTS[0]], os.path.join(ROOT, 'docs/assets/fnt-smfont-sheet.png'), chars, 2)
@@ -136,7 +175,14 @@ def main():
         P('')
         P('## Pixel semantics [verified + vision-confirmed]')
         P('')
-        P('- `0xFF` = background. Any other byte = ink, intensity (255 - value).')
+        P('- `0xFF` = background. Any other byte = ink. BRIGHTNESS INCREASES')
+        P(f'  WITH BYTE VALUE: measured edge/interior census of intro.fnt —')
+        P(f'  interior fraction of 0xF0..0xF5 = {lo_int:.3f} (stroke fringe),')
+        P(f'  of 0xF7..0xFD = {hi_int:.3f} (stroke interior). An AA face puts')
+        P('  its weak values beside the background and strong values inside')
+        P('  strokes, so higher byte = brighter ink. (255-value) is the')
+        P('  darkness of the BYTE, not of the rendered ink; the 2026-10-04')
+        P('  text here conflated the two.')
         P('- smfont/bigfont use the SINGLE ink value `0xF3` throughout: solid')
         P('  faces (1-bit in practice). intro.fnt uses the full `0xF0..0xFE`')
         P('  ramp — anti-aliased 39 px intro face. Both render as clean,')

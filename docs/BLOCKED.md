@@ -45,12 +45,14 @@ manually under a pty with `timeout` + exact-name kill before automating;
 the DOSBOX RULE EOF-spam trap (STATE.md KNOWN-ISSUES) applies exactly when a
 debugger prompt is left at EOF.
 
-## Residual R1-blocked items (unchanged by the decision)
+## Residual R1-blocked items (updated 2026-10-05f)
 
 OQ-003 (.gam save map), OQ-005 (.shp pixel codec), OQ-006 (headerless sample
-rate), OQ-010 (combat arithmetic), OQ-017 (vendor .fnt font), OQ-019 (ship
-design screen). Retrofitting exact formulas after completion stays cheap:
-they are constants and small arithmetic, each cited to its OQ entry.
+rate), OQ-010 (combat arithmetic), OQ-019 (ship design screen). OQ-017
+(vendor .fnt fonts) left this list on 2026-10-05f: the codec closed
+statically and the UI now renders with the vendor faces themselves.
+Retrofitting exact formulas after completion stays cheap: they are constants
+and small arithmetic, each cited to its OQ entry.
 
 ## The original question (kept for the record)
 

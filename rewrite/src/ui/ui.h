@@ -12,9 +12,11 @@ namespace ascend::ui {
 // Blocks until quit or `turns` turns elapsed (0 = until quit). Returns 0 on
 // clean exit and prints "ui ok: turn N". `autoplay` advances every 250 ms.
 // `audio` (optional, docs/re/audio.md §5) plays click/laser/bang on the
-// matching interactions.
+// matching interactions. `dataRoot` is the repo root holding extracted/;
+// text is rendered with the VENDOR .fnt faces (smfont/bigfont, docs/re/fnt.md
+// + ui-runtime.md §3 — OQ-017 CLOSED, substitute removed 2026-10-05f).
 int runCampaignUi(ascend::game::Campaign& camp, int turns, bool autoplay,
-                  const std::string& fontPath, AudioEngine* audio = nullptr);
+                  const std::string& dataRoot, AudioEngine* audio = nullptr);
 
 // Plays an FLC video 1:1 into a 640x480 window (docs/re/flc.md): palette +
 // indices converted on the CPU to ARGB, uploaded per frame via a streaming

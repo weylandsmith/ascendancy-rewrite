@@ -344,9 +344,9 @@ int main(int argc, char** argv) {
             SDL_Quit();
             return 1;
         }
-        // Substitute face (docs/re/ui-runtime.md §3; vendor .fnt = OQ-017).
-        const std::string font =
-            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf";
+        // Vendor .fnt faces are a hard requirement of the UI (docs/re/fnt.md,
+        // OQ-017 CLOSED; ui-runtime.md §3). runCampaignUi loads smfont/bigfont
+        // itself from dataRoot — no substitute TTF path anymore.
         std::unique_ptr<ascend::ui::AudioEngine> audio;
         if (o.audio) {
             audio = std::make_unique<ascend::ui::AudioEngine>();
@@ -361,7 +361,7 @@ int main(int argc, char** argv) {
             audio->playMusic();
         }
         const int rc = ascend::ui::runCampaignUi(*camp, o.campaign, o.autoplay,
-                                                 font, audio.get());
+                                                 o.dataRoot.string(), audio.get());
         SDL_Quit();
         return rc;
     }

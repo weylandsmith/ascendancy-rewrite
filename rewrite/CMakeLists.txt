@@ -18,7 +18,8 @@ add_compile_options(-Wall -Wextra -Wno-unused-parameter)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(SDL2 REQUIRED sdl2)
 pkg_check_modules(SDL2_MIXER REQUIRED SDL2_mixer)
-pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
+# NOTE: SDL2_ttf was dropped 2026-10-05f — UI text now renders from the
+# vendor .fnt faces (docs/re/fnt.md, OQ-017 CLOSED), no TTF substitute.
 
 # Project root lets the runtime locate extracted/ and docs/ without an install
 # step (the gate builds in-tree and runs headless).
@@ -48,8 +49,8 @@ add_library(ascend_ui STATIC
   src/ui/ui.cpp
   src/ui/audio.cpp
 )
-target_include_directories(ascend_ui PUBLIC src ${SDL2_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS})
-target_link_libraries(ascend_ui PUBLIC ascend_core ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES} ${SDL2_MIXER_LIBRARIES})
+target_include_directories(ascend_ui PUBLIC src ${SDL2_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS})
+target_link_libraries(ascend_ui PUBLIC ascend_core ${SDL2_LIBRARIES} ${SDL2_MIXER_LIBRARIES})
 
 add_executable(ascendancy
   src/main.cpp

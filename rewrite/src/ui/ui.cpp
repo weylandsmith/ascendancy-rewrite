@@ -1,12 +1,12 @@
 #include "ui/ui.h"
 
 #include <SDL.h>
-#include <SDL_ttf.h>
 
 #include <cstdio>
 #include <vector>
 
 #include "formats/flic.h"
+#include "formats/fnt.h"
 #include "game/campaign.h"
 #include "ui/layout.h"
 
@@ -23,33 +23,92 @@ const SDL_Color kLane{120, 120, 120, 255};
 const SDL_Color kText{235, 235, 235, 255};
 const SDL_Color kDim{150, 130, 110, 255};
 
-struct TextCache {
-    TTF_Font* f12 = nullptr;
-    TTF_Font* f16 = nullptr;
-    bool open(const std::string& path) {
-        f12 = TTF_OpenFont(path.c_str(), 12);
-        f16 = TTF_OpenFont(path.c_str(), 16);
-        return f12 && f16;
+// Vendor text faces (docs/re/fnt.md, OQ-017 CLOSED): SMALLFONT/BIGFONT as
+// windows.txt:30-32 maps them (ui-runtime.md §3). Each face is blitted from a
+// white-with-alpha atlas (one row, glyphs packed left-to-right with a 1px
+// gutter) tinted per draw call via SDL_SetTextureColorMod. sm/big ink is the
+// SINGLE value 0xF3 [verified corpus-wide, fnt_probe]: binary ink/background,
+// so atlas alpha is 255/0 — no intensity ramp is invented. advance == width,
+// no bearings [verified]; codes 0..31 and @^{|}~ carry no ink (blank, still
+// advance) exactly as in the vendor font.
+struct VendorText {
+    ascend::formats::Font sm, big;
+    struct Face {
+        SDL_Texture* tex = nullptr;
+        int gx[ascend::formats::Font::kGlyphCount] = {};
+        int gw[ascend::formats::Font::kGlyphCount] = {};
+        int h = 0;
+    };
+    Face smFace, bigFace;
+
+    bool buildFace(SDL_Renderer* r, const ascend::formats::Font& f, Face* out,
+                   std::string* err) {
+        out->h = f.height();
+        int total = 1;
+        for (int i = 0; i < ascend::formats::Font::kGlyphCount; i++) {
+            out->gx[i] = total;
+            out->gw[i] = int(f.glyph(i).width);
+            total += out->gw[i] + 1;  // 1px gutter, NEAREST sampling anyway
+        }
+        std::vector<uint32_t> px(size_t(total) * out->h, 0x00000000u);
+        for (int i = 0; i < ascend::formats::Font::kGlyphCount; i++) {
+            const auto& g = f.glyph(i);
+            for (int y = 0; y < out->h; y++)
+                for (uint32_t x = 0; x < g.width; x++)
+                    if (g.px[size_t(y) * g.width + x] != 0xFF)  // 0xFF = bg [fnt.md]
+                        px[size_t(y) * total + out->gx[i] + x] = 0xFFFFFFFFu;
+        }
+        out->tex = SDL_CreateTexture(r, SDL_PIXELFORMAT_ARGB8888,
+                                     SDL_TEXTUREACCESS_STATIC, total, out->h);
+        if (!out->tex) {
+            *err = std::string("atlas: ") + SDL_GetError();
+            return false;
+        }
+        SDL_SetTextureBlendMode(out->tex, SDL_BLENDMODE_BLEND);
+        SDL_UpdateTexture(out->tex, nullptr, px.data(), total * int(sizeof(uint32_t)));
+        return true;
     }
-    void draw(SDL_Renderer* r, int x, int y, const std::string& s, bool big,
+
+    bool load(SDL_Renderer* r, const std::string& root, std::string* err) {
+        const std::string smPath = root + "/extracted/ascend01/data/smfont.fnt";
+        const std::string bigPath = root + "/extracted/ascend01/data/bigfont.fnt";
+        if (!sm.load(smPath, err)) return false;
+        if (!big.load(bigPath, err)) return false;
+        if (!buildFace(r, sm, &smFace, err)) return false;
+        if (!buildFace(r, big, &bigFace, err)) return false;
+        return true;
+    }
+
+    void draw(SDL_Renderer* r, int x, int y, const std::string& s, bool large,
               SDL_Color c) {
         if (s.empty()) return;
-        TTF_Font* f = big ? f16 : f12;
-        SDL_Surface* su = TTF_RenderUTF8_Blended(f, s.c_str(), c);
-        if (!su) return;
-        SDL_Texture* t = SDL_CreateTextureFromSurface(r, su);
-        SDL_FreeSurface(su);
-        if (!t) return;
-        SDL_Rect dst{x, y, 0, 0};
-        SDL_QueryTexture(t, nullptr, nullptr, &dst.w, &dst.h);
-        SDL_RenderCopy(r, t, nullptr, &dst);
-        SDL_DestroyTexture(t);
+        Face& fa = large ? bigFace : smFace;
+        SDL_SetTextureColorMod(fa.tex, c.r, c.g, c.b);
+        for (unsigned char ch : s) {
+            // Vendor fonts define codes 0..127 only (docs/re/fnt.md). CP437
+            // high bytes in event text render as a space-width gap, not UB.
+            const int gw = ch < ascend::formats::Font::kGlyphCount
+                               ? fa.gw[ch]
+                               : fa.gw[' '];
+            if (gw > 0 && ch < ascend::formats::Font::kGlyphCount) {
+                // Whole-glyph clipping at the display edge: a half-drawn
+                // glyph reads as corruption; a missing one reads as wrap.
+                if (x + gw > kDisplayW) break;
+                SDL_Rect src{fa.gx[ch], 0, gw, fa.h};
+                SDL_Rect dst{x, y, gw, fa.h};
+                SDL_RenderCopy(r, fa.tex, &src, &dst);
+            }
+            x += gw;  // advance == width [verified, fnt.md]
+        }
     }
-    ~TextCache() {
-        if (f12) TTF_CloseFont(f12);
-        if (f16) TTF_CloseFont(f16);
+
+    void release() {
+        if (smFace.tex) SDL_DestroyTexture(smFace.tex), smFace.tex = nullptr;
+        if (bigFace.tex) SDL_DestroyTexture(bigFace.tex), bigFace.tex = nullptr;
     }
+    ~VendorText() { release(); }
 };
+
 
 void filledCircle(SDL_Renderer* r, int cx, int cy, int rad) {
     for (int dy = -rad; dy <= rad; ++dy)
@@ -61,30 +120,33 @@ void filledCircle(SDL_Renderer* r, int cx, int cy, int rad) {
 }  // namespace
 
 int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
-                  const std::string& fontPath, AudioEngine* audio) {
-    if (TTF_Init() != 0) {
-        std::printf("TTF_Init: %s\n", TTF_GetError());
-        return 1;
-    }
-    TextCache txt;
-    if (!txt.open(fontPath)) {
-        std::printf("font load failed: %s (%s)\n", fontPath.c_str(), TTF_GetError());
-        TTF_Quit();
-        return 1;
-    }
+                  const std::string& dataRoot, AudioEngine* audio) {
     SDL_Window* win = SDL_CreateWindow("Ascendancy rewrite (P5a)",
                                        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                        kDisplayW, kDisplayH, SDL_WINDOW_SHOWN);
     if (!win) {
         std::printf("CreateWindow: %s\n", SDL_GetError());
-        return 1;  // fonts freed by ~TextCache; see teardown note below
+        return 1;
     }
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     if (!ren) ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE);
     if (!ren) {
         std::printf("CreateRenderer: %s\n", SDL_GetError());
         SDL_DestroyWindow(win);
-        return 1;  // ditto
+        return 1;
+    }
+    // Vendor .fnt faces (OQ-017 CLOSED; ui-runtime.md §3 swap rule). Hard
+    // requirement, no silent TTF fallback: if the shipped faces fail to load
+    // the data tree is broken and the run must say so.
+    VendorText txt;
+    {
+        std::string ferr;
+        if (!txt.load(ren, dataRoot, &ferr)) {
+            std::printf("vendor font load failed: %s\n", ferr.c_str());
+            SDL_DestroyRenderer(ren);
+            SDL_DestroyWindow(win);
+            return 1;
+        }
     }
 
     CosmosView view;  // mapSize default matches MapConfig default (layout.h)
@@ -213,12 +275,9 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     }
 
     std::printf("ui ok: turn %d\n", camp.turn());
+    txt.release();  // atlases before their renderer (destructor is idempotent)
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
-    // NOTE: no TTF_Quit here — `txt` (which holds the open fonts) destructs
-    // AFTER this function returns; calling TTF_Quit before it segfaulted
-    // (caught by the Xvfb UI smoke, 2026-10-04). TTF shares one init ref
-    // across the process and the fonts are closed by ~TextCache.
     return 0;
 }
 

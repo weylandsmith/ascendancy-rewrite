@@ -37,11 +37,16 @@ lines — shape vocabulary is a placeholder until OQ-005.
 
 ## 3. Text
 
-Vendor faces (.fnt) are NOT yet decodable — partial header facts and the
-failed render attempts are recorded as OQ-017. Text uses system
-LiberationSans-Regular.ttf via SDL2_ttf 2.24.0 at sizes 12/16. This is an
-explicit SUBSTITUTE, not a reconstruction; swapping in the vendor faces is a
-mechanical change once OQ-017 closes.
+Vendor faces are LIVE since 2026-10-05f: the UI renders with the game's own
+`DATA\SMFONT.FNT` / `DATA\BIGFONT.FNT` (windows.txt:30-32 mapping) decoded per
+docs/re/fnt.md — 1 byte per pixel, 0xFF background, solid 0xF3 ink, advance ==
+width. `VendorText` in ui.cpp packs each face into one white-with-alpha atlas
+tinted per draw call (`SDL_SetTextureColorMod`); sm/big ink is binary
+[verified corpus-wide] so no intensity ramp is invented. Face load failure is
+a hard error (broken data tree), never a silent fallback. SDL2_ttf and the
+LiberationSans substitute are removed from the build. The earlier state of
+this section ("vendor faces NOT decodable") described pre-OQ-017 reality and
+is kept only here as history.
 
 ## 4. Colour
 
@@ -93,6 +98,6 @@ colour alone. Implementation (searched, not hand-picked; min hue spread
 
 pan/zoom/layer toggles (children exist in windows.txt but their exe
 behaviour is unverified), the 132-window chrome (SHAPEFRAME frames need
-OQ-005), vendor fonts (OQ-017), audio (mixing waits for OQ-006 sample
-rate; the mixer stays unused in UI mode), save/load (OQ-003). Each is a
-listed open item, not a silent omission.
+OQ-005), audio mixing of headerless rates (OQ-006), save/load (OQ-003).
+Vendor fonts were on this list until OQ-017 closed (§3). Each remaining item
+is a listed open question, not a silent omission.

@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-05T12:45
+updated: 2026-10-05T14:05
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -280,6 +280,31 @@ turn_log_recent:
      gaps 0x222/0x444 kept as BYTES not interpretation, '%s Knowledge %s'
      first verified instance. R1 cadence: attempt 20261005-111507 ~5 h old
      -> no run, recorded not retried."
+  - "2026-10-05f (vendor fonts LIVE in the UI + two measured corrections):
+     cold re-verification walk found the one real gap after the completion
+     claim — OQ-017 closed 2026-10-04i3 but ui.cpp still rendered all text
+     with the Liberation TTF substitute, and ui-runtime.md §3/fnt/BLOCKED/
+     README still described it (docs said the swap was 'mechanical once
+     OQ-017 closes'). Swap done: VendorText (white-alpha atlas per face,
+     SDL_SetTextureColorMod tint; sm/big ink binary so no ramp invented;
+     advance==width; code>127 -> space gap; whole-glyph clipping at the
+     display edge) replaces TextCache; SDL2_ttf dropped from CMake; face-load
+     failure is a hard error. Vision read of a live Xvfb screenshot: crisp
+     retro glyphs, quoted strings exact, map untouched. MEASURED
+     CORRECTIONS: (1) fnt ramp POLARITY — edge/interior census of intro.fnt
+     (interior frac 0.022 for 0xF0..0xF5 vs 0.72 for 0xF7..0xFD) settles
+     higher-byte=brighter-ink; the '(255-value)=intensity' doc phrasing
+     inverted rendered brightness (renderer was already right); direction now
+     asserted in fnt_probe.main() every gate run + generated into fnt.md.
+     (2) TWO refuted hypotheses recorded so they aren't re-tried: a
+     row-major geometric law for glyph bodies DIES on smfont (no majority
+     row in top 60% — orientation evidence stays the vision-read sheets);
+     'AA core = stroke width proxy' dead (run-length histograms of bright
+     vs dim classes indistinguishable); vendor palette greys: only index 0
+     (black) is R==G==B in intro65a, so font ink cannot be palette-relative.
+     R1 cadence: attempt 20261005-111507 < 12 h -> no run, recorded not
+     retried. Gate ALL PASS twice post-change; fnt.md regenerates identical
+     hash 3x; scripts/ui_vendor_shot.sh added (dev-only, not a gate stage)."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
@@ -292,8 +317,9 @@ button + status + event pane; gates 4c (Xvfb autoplay run) and 4c-b
 xdotool on host; SDL re-reads pointer for synthetic events -> warp first).
 Owner palette SEARCHED and pixel-verified: 0/42 pair-checks fail under
 deuteranopia AND protanopia simulation of the rendered framebuffer;
-neutrals also coded by dot SIZE. Font = Liberation substitute (vendor
-.fnt header/stride partly known, codec OPEN as OQ-017).
+neutrals also coded by dot SIZE. Font = VENDOR smfont/bigfont .fnt (OQ-017
+CLOSED 2026-10-04i3; wired into the UI and the Liberation substitute removed
+2026-10-05f, ui-runtime.md §3).
 DONE P5b (docs/re/audio.md): vendor sample container cracked on all 15
 headered .voc (rate/bits/ch explicit; PCM bytes 42..EOF-1); all 86 SFX +
 theme00 music load through SDL2_mixer (--audio, --mute); UI plays
@@ -425,10 +451,11 @@ missing. CONTRACT CHECKLIST (the judge's list) follows the phase list.
         COMPARISON SHIPPED (refcap.md; gate 4f: original boots in dosbox-x
         under Xvfb via scripts/ref_capture.sh, movie shots obey the
         reference-decode palette law, menu control obeys its negation).
-        Open subitems are R1-blocked unknowns, filed: vendor .fnt codec
-        (OQ-017 -> Liberation substitute), .shp pixel codec (OQ-005 ->
-        documented circles), headerless sample rate (OQ-006 -> 22050
-        default).
+        UI TEXT = vendor .fnt faces (2026-10-05f; Liberation substitute and
+        SDL2_ttf removed; vision-verified legible retro glyphs, ui-runtime.md
+        §3). Open subitems are R1-blocked unknowns, filed: .shp pixel codec
+        (OQ-005 -> documented circles), headerless sample rate (OQ-006 ->
+        22050 default).
 [x] P6 full campaign playable to victory (Run A: Control t201 seed 2024
         under full ship gating; B: Extinct; gate 3l re-runs it every
         commit) + README.md complete. Open-questions policy applied: the
