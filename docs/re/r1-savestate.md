@@ -55,6 +55,17 @@ attaching to a process.
 * `scripts/r1_pointer_measure.py`, `scripts/r1_live_probe.py` — the two
   measurement passes behind the CLOSED section's numbers (delta/pv censuses;
   single-copy proof). Superseded by r1_pointer_law.py for gating.
+* `scripts/r1_restore_sites.py` — UPGRADE PASS 1 artifact builder: writes
+  work/ascend_restored.bin (payload + 2,080 IMAGE-class pointer slots
+  rewritten to d = rv - P0, the payload-file-offset address space Ghidra
+  uses) and work/fixup_sites.tsv (ALL 34,326 differing slots, classed
+  image-payload / image-bss / conventional / heap-other; heap & conventional
+  are RUNTIME mutations of globals, deliberately not written). Verified on
+  the artifacts: restored pointer-table runs (>=8) hit Watcom function-start
+  bytes in the FILE at 101/167 = 60% vs the 15% static-refutation control;
+  the code object starts at payload file 0x14bb0 with Watcom linked base
+  0x1d4000 = P0 + 0x14bb0 (restored table entry file-intra 0x1349 ->
+  d 0x15ef9 = 0x14bb0 + 0x1349, exact).
 
 ## Save-state internals — source-cited (subagent verified tag dosbox-x-v2025.02.01) + measured cross-checks
 
@@ -93,21 +104,35 @@ c402:0010 mouse). The earlier "BDA all-zero" oddity was MY misalignment
 Consequence: this capture's image base in GUEST PHYSICAL = B - 136 =
 0x1BF450 (B=0x1BF4D8 member-offset, per-run data as always).
 
-### POINTER LAW — CLOSED 2026-10-05i [verified 6/6 slots, gate 3q]
+### POINTER LAW — CLOSED 2026-10-05i [verified 12/12 slots, gate 3q]
 THE LAW: the payload image is loaded ONCE, verbatim, at guest-physical
-P0 = B - H (this capture: 0x1BF450), and guest LINEAR == guest PHYSICAL (flat
-DPMI). Watcom fixups were applied IN PLACE at load: every file u32 that was a
-pointer now reads
+P0 = B - H (this capture: 0x1BF450), guest LINEAR == guest PHYSICAL (flat
+DPMI), in TWO objects (Watcom link layout, file order == memory order):
 
-    runtime_u32 = P0 + payload_file_offset(target)
+    obj0 code: storage payload [0x14bb0, 0x82bb0)  mem base 0x1d4000
+    obj1 data: storage payload [0x82bb0, 0x8cc83)  mem base 0x242000
 
-so a captured pointer rv maps back by `file_offset = rv - P0`. The delta
-clusters (0x1d4000 for code-region sites, 0x242000 for data-region sites)
-carry NO extra law: a delta is just P0 + (file offset of the object region
-containing the SITE) minus that region's start — hence their gap equals the
-file span 0x6E000 between those regions, and the per-object-base HYPOTHESIS of
-the previous revision is RETRACTED (it predicted `pay[fo0+(rv-L0)]` code bytes
-which matched only because fo0 was itself `L0 - P0`).
+The linker stored INTRA-OBJECT offsets at pointer slots; the loader added the
+target object's mem base:
+    runtime_u32 = mem_base(obj of target) + stored_intra_offset
+and since mem_base(obj) = P0 + storage_start(obj), this is IDENTICAL to the
+flat form
+    runtime_u32 = P0 + payload_file_offset(target)      (file_offset = rv-P0)
+The 2026-10-05h reading ("clusters are per-object linear bases; 0x6E000 =
+obj0 size") is CONFIRMED by this arithmetic: L1 - L0 = 0x6E000 = obj0 storage
+size exactly, and mid-session revisions of this file that called it retracted
+were WRONG — both formulations hold and convert through storage_start.
+CONFIRMED arithmetic anchors: restored vtable entry file-intra 0x1349 ->
+d 0x15ef9 = 0x14bb0 + 0x1349 exact (scripts/r1_restore_sites.py); obj0 mem
+base 0x1d4000 = P0 + 0x14bb0; obj1 mem base 0x242000 = P0 + 0x82bb0.
+OPEN SUBITEM (does NOT affect the law or the flat conversion): obj1's memory
+size. L1-delta sites carry stored values up to 0xa28e2 (max rv 0x2e48e2),
+so obj1 mem >= 0xa28e3; header dword +0x24 = 0xa7710 cannot then be the two
+objects' summed memory (0x6E000+0xa28e3 > 0xa7710) — its identity (cbImage?
+debug-area end?) stays [unverified]; the LE field-map route that would settle
+it is closed-negative below (le_tables_anchored.py). obj1 file storage is
+0xa0d3 B + BSS; the 885 L1 sites with stored >= 0x6E000 all sit in obj0's
+file range and point into obj1 BSS — consistent, no contradiction.
 
 CONFIRMATIONS (scripts/r1_pointer_law.py, exit 0 iff all hold, all 12 slots of
 r1sav-20261005-{151634,160721} pass):

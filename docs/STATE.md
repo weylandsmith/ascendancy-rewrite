@@ -357,32 +357,45 @@ turn_log_recent:
      RECALL and a parsed-header attempt produced garbage (the exact
      le_header_dump.py docstring footgun); doc retracted to measured scope
      same turn. Image guest-physical this capture = 0x1BF450."
-  - "2026-10-05i (POINTER LAW CLOSED; 2026-10-05h hypothesis RETRACTED):
-     the law is runtime_u32 = P0 + payload_file_offset(target), P0 = B - H
-     (0x1BF450 this capture), guest linear == guest physical (flat DPMI).
-     ONE verbatim copy at P0, fixups applied in place; delta clusters
-     0x1d4000/0x242000 are P0+(region file offset) artefacts of SITE
-     position, the per-object-base reading is dead (its 'confirmation' was
-     circular — fo0==L0-P0). Confirmed by scripts/r1_pointer_law.py battery
+  - "2026-10-05i (POINTER LAW CLOSED): runtime_u32 = P0 +
+     payload_file_offset(target) == mem_base(target_obj) + stored_intra, P0 =
+     B - H (0x1BF450 this capture), guest linear == guest physical (flat
+     DPMI). TWO objects: obj0 code storage [0x14bb0,0x82bb0) mem 0x1d4000,
+     obj1 data storage [0x82bb0,0x8cc83) mem 0x242000 — the 2026-10-05h
+     per-object reading is CONFIRMED (L1-L0 = 0x6E000 = obj0 storage size
+     exactly; obj0 mem base = P0+0x14bb0, obj1 = P0+0x82bb0). CAUTION
+     recorded: mid-turn this session I wrote a 'RETRACTION' of the
+     per-object reading claiming its fo0 confirmation was circular — WRONG,
+     the two formulations are equivalent via storage_start; corrected the
+     doc same turn (the episode is why both formulations + anchors are pinned
+     in r1-savestate.md). Confirmed by scripts/r1_pointer_law.py battery
      C1-C5 on ALL 12 slots of both captures (windows verbatim 6/6; all 8
      EXE-proven strings at P0+file-offset; pointer-table prologue spike
      100/151=66% vs 15% control; 252 fixed-up sites decode to ASCII incl
      '..\\batcon.cpp' at 0x82bd0; CPU u32@+0x20 inside image span every
-     slot — 0x20eeec..0x22d820 = executing addresses). Gate 3q added (runs
-     the battery on any captured slots, skips with note when work/ absent).
-     LE FIELD-MAP ROUTE CLOSED AS NEGATIVE: le_tables_anchored.py — no
-     object-table parse has sum(cbObject)==cbImage; the +0x100-stride
-     'page table' run is code-pattern-ambiguous (0x90c300cd int3 run 256)
-     — loader.md §1 marked PLAUSIBLE-BUT-UNTIED. Web routes: LX spec
-     body OCR'd without its field tables (archive.org cached), searches
-     empty x4 — no more fetches on this. Docs updated: r1-savestate.md
-     POINTER LAW section rewritten (law + confirmations + REFUTED list +
-     decoded landmarks + unlocked next steps), loader.md correction.
-     Self-caught: C3 initially scanned only from 0x82bb0 (data region) and
-     found 0 tables — full-span rescan from 0x14bb0 found 151 slots; the
-     'verbatim code start matches file' check first compared P0+fo0 with
-     fo0 measured RECALL — caught by the byte print disagreeing with the
-     claim; two pyright unbound/None bugs before any run."
+     slot — 0x20eeec..0x22d820 = executing addresses). UPGRADE PASS 1
+     artifacts (scripts/r1_restore_sites.py): work/ascend_restored.bin =
+     payload + 2,080 IMAGE-class slots rewritten to d=rv-P0 (Ghidra base-0
+     address space); work/fixup_sites.tsv = all 34,326 differing slots
+     classed (heap 28,937 + conventional 3,136 = runtime mutations of
+     globals, deliberately NOT written; image-bss 173). Restored-image
+     validation: pointer runs>=8 hit file Watcom-start bytes 101/167=60% vs
+     15% control; demo site 0x14fa0 -> 0x82bd0 exact. OPEN SUBITEM: obj1 mem
+     size >= 0xa28e3 (L1 stored max 0xa28e2) so header +0x24=0xa7710 is NOT
+     summed-object memory — identity unverified, LE field-map route closed
+     negative (le_tables_anchored.py: no parse sums cbObject==cbImage; the
+     +0x100-stride 'page table' run is code-pattern-ambiguous 0x90c300cd
+     int3 256 — loader.md §1 marked PLAUSIBLE-BUT-UNTIED). Web routes: LX
+     spec body OCR'd without its field tables (archive.org cached), searches
+     empty x4 — no more fetches on this. Gate 3q added (battery on captured
+     slots, skips w/ note when work/ absent); OQ-011 CLOSED; PLAN unblocked;
+     NEXT ACTION = Ghidra re-analysis on ascend_restored.bin -> OQ-010.
+     Self-caught: C3 initially scanned only from 0x82bb0 and found 0 tables
+     (full-span rescan found 151 slots); the 'RETRACTION' wrong-claim (above,
+     caught by redoing the arithmetic before it could anchor a formula);
+     stale first-run restored.bin nearly validated as correct (re-ran the
+     builder after the d-vs-rv fix, then verified); pyright unbound/None x2
+     before any run."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
