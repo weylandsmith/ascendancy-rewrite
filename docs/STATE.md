@@ -450,15 +450,19 @@ safety invariants stay. R1 is LIVE via save states (docs/re/r1-savestate.md).
 MEMBER->GUEST-PHYSICAL LAW CLOSED 2026-10-05h: member = physical + 136
 (census + BDA scan, cite r1-savestate.md; re-derive H per dosbox build).
 POINTER LAW CLOSED 2026-10-05i: runtime_u32 = P0 + payload_file_offset(target)
-(battery scripts/r1_pointer_law.py, 12/12 slots, gate 3q). THE next action is:
-R1 UPGRADE PASS 1 — fixup-site restoration for Ghidra: build the site list
-(aligned u32 where mem[B+f] != pay[f] — the 2026-10-05i census measured
-~9,927 sites to file 0x70000, clusters exactly at +L0-region/+L1-region),
-then in the Ghidra image (base 0, file order == memory order) apply the
-RUNTIME values with the pointer law inverted, so data xrefs point at payload
-offsets; lift the first exact formulas into combat (OQ-010) per BLOCKED.md
-DECISION.3. Deeper captures (click into a real game via ref_capture.sh coords
-before autosave) raise data richness for OQ-003/015/016 and should precede
+(= mem_base(target obj) + stored intra-offset; two objects pinned, see
+docs/re/r1-savestate.md; battery 12/12 slots, gate 3q). UPGRADE PASS 1 DONE:
+work/ascend_restored.bin + work/fixup_sites.tsv built by
+scripts/r1_restore_sites.py and validated (pointer runs -> Watcom starts
+60% vs 15% control). THE next action is:
+GHIDRA RE-ANALYSIS on work/ascend_restored.bin — import raw binary at base 0,
+run Seed2-equivalent bootstrap, then the NEW capability: data xrefs exist, so
+(1) correlate module-name debug strings (batcon.cpp at file 0x82bd0 region)
+with function ranges — try the Watcom debug-area structure (header +0x1c
+size 0x63774) with anchor validation first, fallback = xref-from-string walks;
+(2) lift the first exact combat formulas (OQ-010) for cited constants;
+(3) deeper captures (click into a real game via ref_capture.sh coords before
+autosave) raise data richness for OQ-003/015/016 and should precede
 any formula claimed from title-screen state only. Residual unknowns
 stay filed exactly as the contract's evidence rules require; none blocks
 playability to victory.
