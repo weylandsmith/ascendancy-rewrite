@@ -471,6 +471,16 @@ def main():
     P("rendered to `docs/assets/flc-intro-frame600.png` and visually inspected")
     P("(coherent artwork: rust-coloured planet + moon + glowing lane network).")
     P("")
+    P("## 4. Playback in the port")
+    P("")
+    P("`--intro N` (rewrite) plays intro65a.flc 1:1 into a 640x480 SDL window")
+    P("(palette+indices -> ARGB, streaming texture, delay-paced). Gate stage 4e")
+    P("proves the render path pixel-exact: `scripts/intro_pixelcheck.sh` runs")
+    P("the app under Xvfb, screenshots with ImageMagick `import`, and demands")
+    P("an EXACT 640x480 crop match against the Python-decoded frame (first")
+    P("verified result: frame 19 at (192,144), session 2026-10-04i). No audio")
+    P("accompaniment: intro music-track selection is unresolved (OQ-018).")
+    P("")
     full_hash = {}
     for base, nf, hs, h64 in hrows:
         P(f"- `{base}`: frame0 `{hs[0][:16]}`, frame_last `{hs[nf-1][:16]}`, "

@@ -330,7 +330,7 @@ bool Flic::applyChunk(const uint8_t* data, size_t size, uint16_t nchunks,
 }
 
 bool Flic::replay(const std::function<void(int, const uint8_t*, const uint8_t*)>& cb,
-                  std::string* err, int* repairedOut) const {
+                  std::string* err, int* repairedOut, int maxFrames) const {
     std::vector<uint8_t> px(static_cast<size_t>(w_) * h_, 0), pal(256 * 3, 0);
     int repaired = 0;
     int i = 0;
@@ -341,6 +341,7 @@ bool Flic::replay(const std::function<void(int, const uint8_t*, const uint8_t*)>
             return false;
         }
         cb(i++, px.data(), pal.data());
+        if (maxFrames > 0 && i >= maxFrames) break;
     }
     if (repairedOut) *repairedOut = repaired;
     return true;

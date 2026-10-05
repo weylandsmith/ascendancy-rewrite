@@ -198,6 +198,19 @@ fi
 [ -s "$ROOT/docs/re/flc.md" ] || err "docs/re/flc.md missing"
 [ -s "$ROOT/rewrite/tests/data/flc_golden.tsv" ] || err "flc_golden.tsv missing (C++ cross-check data)"
 
+# 4e. Pixel proof the C++ path renders what the decoder says: play the intro
+# under Xvfb, capture the screen, demand an EXACT 640x480 match against the
+# Python-decoded frame (scripts/intro_pixelcheck.sh; verified 2026-10-04i:
+# frame 19 at (192,144)).
+if [ -x "$ROOT/rewrite/build/ascendancy" ] && command -v Xvfb >/dev/null 2>&1 \
+   && command -v import >/dev/null 2>&1 && [ -x "$HOME/tools/revenv/bin/python" ]; then
+  if ! bash "$ROOT/scripts/intro_pixelcheck.sh" 40 1.5 91 >/tmp/gate_intro.log 2>&1; then
+    tail -20 /tmp/gate_intro.log; err "intro pixel check failed (window != decoded frame)"
+  fi
+else
+  note "Xvfb/ImageMagick/revenv unavailable: skipped intro pixel check"
+fi
+
 # 3l. Victory-condition grammar + CONTRACT smoke: end-*.txt blocks assert
 # (scripts/endtext_probe.py), and the rewrite binary must actually reach a
 # victory condition on a seeded headless campaign run (docs/PLAYTHROUGH.md).

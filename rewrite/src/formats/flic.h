@@ -53,9 +53,10 @@ public:
                     std::string* err) const;
 
     // Replays every frame chunk in order; cb(frame_index, pixels, palette)
-    // after each. Returns false on the first decode violation.
+    // after each. maxFrames > 0 stops after that many (smoke tests). Returns
+    // false on the first decode violation.
     bool replay(const std::function<void(int, const uint8_t*, const uint8_t*)>& cb,
-                std::string* err, int* repaired = nullptr) const;
+                std::string* err, int* repaired = nullptr, int maxFrames = 0) const;
 
 private:
     // Size-delimited walk from off+16; honours nchunks when non-zero. Tiles

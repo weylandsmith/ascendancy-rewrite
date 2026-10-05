@@ -198,6 +198,15 @@ turn_log_recent:
      media_probe FLIC section regenerated (PREFIX vs COLOR_256 palette fact
      corrected too). R1 cadence: last attempt 20261004-205846 < 12h -> no run,
      recorded not retried."
+  - "2026-10-04i2 (intro PLAYBACK): --intro N plays intro65a.flc 1:1 in the
+     port (ui.cpp playIntro: ARGB convert + streaming texture, 71ms pace);
+     scripts/intro_pixelcheck.sh Xvfb+import screenshot vs Python-decoded
+     frame = EXACT 640x480 match (frame 19 @ (192,144)) — gate stage 4e
+     (needs Xvfb+ImageMagick+revenv PIL; skips with a note otherwise).
+     Flic::replay gained maxFrames cap (smoke). Audio deliberately silent:
+     intro track selection is OQ-018. Self-caught: script used system python3
+     (no PIL) — revenv interpreter is the PIL host; numpy absent host-wide,
+     pure-PIL bytes compare."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.

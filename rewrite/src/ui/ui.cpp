@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <vector>
 
+#include "formats/flic.h"
 #include "game/campaign.h"
 #include "ui/layout.h"
 
@@ -218,6 +219,66 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // AFTER this function returns; calling TTF_Quit before it segfaulted
     // (caught by the Xvfb UI smoke, 2026-10-04). TTF shares one init ref
     // across the process and the fonts are closed by ~TextCache.
+    return 0;
+}
+
+int playIntro(const std::string& flicPath, int maxFrames) {
+    namespace afl = ascend::formats;
+    afl::Flic f;
+    std::string err;
+    if (!f.load(flicPath, &err)) {
+        std::printf("intro: %s\n", err.c_str());
+        return 1;
+    }
+    SDL_Window* win = SDL_CreateWindow("Ascendancy", SDL_WINDOWPOS_CENTERED,
+                                       SDL_WINDOWPOS_CENTERED, f.width(),
+                                       f.height(), SDL_WINDOW_SHOWN);
+    if (!win) {
+        std::printf("intro CreateWindow: %s\n", SDL_GetError());
+        return 1;
+    }
+    SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE);
+    SDL_Texture* tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                                         SDL_TEXTUREACCESS_STREAMING,
+                                         f.width(), f.height());
+    if (!ren || !tex) {
+        std::printf("intro render setup: %s\n", SDL_GetError());
+        SDL_DestroyWindow(win);
+        return 1;
+    }
+    std::vector<uint32_t> argb(static_cast<size_t>(f.width()) * f.height());
+    int shown = 0, aborted = 0;
+    const uint32_t baseSpeed = f.speedMs() ? f.speedMs() : 71;
+    f.replay(
+        [&](int i, const uint8_t* px, const uint8_t* pal) {
+            const size_t n = argb.size();
+            for (size_t k = 0; k < n; ++k) {
+                const uint8_t idx = px[k];
+                argb[k] = 0xFF000000u | (pal[idx * 3] << 16) |
+                          (pal[idx * 3 + 1] << 8) | pal[idx * 3 + 2];
+            }
+            SDL_UpdateTexture(tex, nullptr, argb.data(),
+                              f.width() * static_cast<int>(sizeof(uint32_t)));
+            SDL_RenderClear(ren);
+            SDL_RenderCopy(ren, tex, nullptr, nullptr);
+            SDL_RenderPresent(ren);
+            ++shown;
+            // Pacing uses the per-frame delay when set (flc.md §2). replay()
+            // does not hand us the Chunk, so pace off header speed; the
+            // gate/dummy runs stay fast because they never reach here with
+            // interactive timing expectations.
+            SDL_Delay(baseSpeed);
+            SDL_Event ev;
+            while (SDL_PollEvent(&ev))
+                if (ev.type == SDL_QUIT || ev.type == SDL_KEYDOWN) ++aborted;
+        },
+        &err, nullptr, maxFrames);
+    std::printf("intro ok: %s frames %d shown, aborted %s\n",
+                SDL_GetCurrentVideoDriver() ? SDL_GetCurrentVideoDriver() : "?",
+                shown, aborted ? "yes" : "no");
+    SDL_DestroyTexture(tex);
+    SDL_DestroyRenderer(ren);
+    SDL_DestroyWindow(win);
     return 0;
 }
 

@@ -67,6 +67,16 @@ walk on the very next instance). A third: frame 600 of intro65a.flc was
 rendered to `docs/assets/flc-intro-frame600.png` and visually inspected
 (coherent artwork: rust-coloured planet + moon + glowing lane network).
 
+## 4. Playback in the port
+
+`--intro N` (rewrite) plays intro65a.flc 1:1 into a 640x480 SDL window
+(palette+indices -> ARGB, streaming texture, delay-paced). Gate stage 4e
+proves the render path pixel-exact: `scripts/intro_pixelcheck.sh` runs
+the app under Xvfb, screenshots with ImageMagick `import`, and demands
+an EXACT 640x480 crop match against the Python-decoded frame (first
+verified result: frame 19 at (192,144), session 2026-10-04i). No audio
+accompaniment: intro music-track selection is unresolved (OQ-018).
+
 - `logic.flc`: frame0 `6c8bf570e4ba1ae8`, frame_last `6c8bf570e4ba1ae8`, all-226-combined `271e7a3d1810504b`
 - `intro65a.flc`: frame0 `68a06da26bf91155`, frame_last `68a06da26bf91155`, all-1144-combined `6ba07a79fb6d0ac2`
 

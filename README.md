@@ -30,7 +30,8 @@ video driver · `--ui` window (cosmos map, NEXT TURN, event pane) ·
 theme00 music · `--mute` load but silent · `--campaign N`/`--seed S` ·
 `--species N` play as species specnum N (0..20 — each species' SA_ special
 ability fires every ~30 turns; default human = no ability) ·
-`--flic` decode both vendor intro videos end-to-end (codec report).
+`--flic` decode both vendor intro videos end-to-end (codec report) ·
+`--intro N` play the vendor intro (intro65a.flc) at real speed, N-frame cap.
 In the UI: click NEXT TURN or Enter/Space advances a turn, clicking a star
 selects it (status line), ESC quits.
 

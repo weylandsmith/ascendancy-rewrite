@@ -47,6 +47,7 @@ struct Options {
     bool mute = false;                          // load everything, volume 0
     int playerSpecies = -1;                     // specnum 0..20 (docs/re/species.md)
     bool flic = false;                          // decode both vendor FLCs (docs/re/flc.md)
+    int introFrames = -1;                       // -1 off; >=0: play intro, cap N frames (0=all)
 };
 
 bool parseArgs(int argc, char** argv, Options* o) {
@@ -74,6 +75,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->playerSpecies = std::atoi(argv[++i]);
         else if (a == "--flic")
             o->flic = true;
+        else if (a == "--intro" && i + 1 < argc)
+            o->introFrames = std::atoi(argv[++i]);
         else if (a == "--help")
             return false;
         else {
@@ -98,7 +101,8 @@ void usage() {
         "  --autoplay    with --ui: advance a turn every 250 ms\n"
         "  --species N   play as species specnum N (0..20, docs/re/species.md);\n"
         "                default -1 = human, no special ability\n"
-        "  --flic        decode both vendor FLC videos end-to-end (docs/re/flc.md)\n");
+        "  --flic        decode both vendor FLC videos end-to-end (docs/re/flc.md)\n"
+        "  --intro N     play the vendor intro (intro65a.flc), N frames cap (0=all)\n");
 }
 
 // Loads the three archives from the ORIGINAL game/ directory, because the
@@ -258,6 +262,20 @@ int main(int argc, char** argv) {
                         fs::path(p).filename().c_str(), f.width(), f.height(),
                         f.speedMs(), frames, repaired);
         }
+        return rc;
+    }
+
+    // Vendor intro playback (docs/re/flc.md; intro = docs/re/media.md §1).
+    // Runs BEFORE the archive load so it is a self-contained media smoke.
+    if (o.introFrames >= 0) {
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
+            std::printf("SDL_Init failed: %s\n", SDL_GetError());
+            return 1;
+        }
+        const int rc = ascend::ui::playIntro(
+            (o.dataRoot / "extracted/ascend02/data/intro65a.flc").string(),
+            o.introFrames);
+        SDL_Quit();
         return rc;
     }
 
