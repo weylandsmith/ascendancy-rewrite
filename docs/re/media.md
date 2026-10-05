@@ -7,33 +7,34 @@ re-runs this script and asserts its summary line.
 
 | file | size | magic | frames decl/walked | dims | depth | top-level chunks |
 |---|---|---|---|---|---|---|
-| `extracted/ascend02/data/intro65a.flc` | 19054614 | 0xAF12 | 1143/1144 | 640x480 | 8 | FL_FRAMEx1144, FL_COLOR256x1 |
-| `game/logic.flc` | 3835618 | 0xAF12 | 225/226 | 640x480 | 8 | FL_FRAMEx226, FL_COLOR256x1 |
+| `extracted/ascend02/data/intro65a.flc` | 19054614 | 0xAF12 | 1143/1144 | 640x480 | 8 | FRAMEx1144, PREFIXx1 |
+| `game/logic.flc` | 3835618 | 0xAF12 | 225/226 | 640x480 | 8 | FRAMEx226, PREFIXx1 |
 
 Chunk-header form: `u32 size, u16 type` at every level; the chain tiles the file
 with zero residue (asserted per file above), which is what licenses the layout.
 
 **Encoding findings [verified by walking every frame]:**
 
-1. `num_chunks` (FL_FRAME +14) is 0 in *every* frame of both files, so frames
-   must be delimited by chunk size, never by the count field.
-2. Walking sub-chunks size-delimited, the first sub-chunk header of a frame
-   parses cleanly for only a minority of frames — see the per-file tallies.
-   The rest do not begin with a plausible `u32 size,u16 type` pair at +16, so
-   these frames are NOT standard FLI/FLC blit chunks; the payload format is
-   Ascendancy-specific and stays OPEN (OQ-002).
+1. Frame header is the 16 B compuphase FRAME_TYPE; `chunks` at +6 is
+   non-zero wherever sub-chunks exist (empty csz=16 frames are legal
+   'image unchanged' padding: 268/1144 in intro65a.flc, 176/226 in logic.flc).
+2. All sub-chunk types present are STOCK Autodesk chunks (COLOR_256,
+   BYTE_RUN, FLI_COPY, DELTA_FLC, PSTAMP). Full decode of both files —
+   every chunk zero-residue — is scripts/flc_probe.py / docs/re/flc.md;
+   the earlier 'Ascendancy-specific payload' reading was a probe bug
+   (chunk-name table omitted 0x0007 etc.; see FLI_NAMES comment).
 3. No `FL_DZ_IP` (0xF1CC) chunk appears anywhere, so DEFLATE is not involved —
    the seed plan's FLIC-with-dzlib assumption is falsified.
 
 | file | frames | parsed-clean frames | sub-chunk types seen |
 |---|---|---|---|
-| `extracted/ascend02/data/intro65a.flc` | 1144 | 1144 | UNK_0x0007x875, FLI_COLORx4, FLI_PARTx1, FLI_BRUSHx1 |
-| `game/logic.flc` | 226 | 225 | UNK_0x0007x48, FLI_PARTx1, FLI_COLORx1, FLI_BRUSHx1, UNK_0x0010x1 |
+| `extracted/ascend02/data/intro65a.flc` | 1144 | 1144 | DELTA_FLCx875, COLOR_256x4, PSTAMPx1, BYTE_RUNx1 |
+| `game/logic.flc` | 226 | 225 | DELTA_FLCx48, PSTAMPx1, COLOR_256x1, BYTE_RUNx1, FLI_COPYx1 |
 
-The top-level chain (header + FL_COLOR256 + FL_FRAME chunks tiling the file to
-the byte) is verified and is what the reimplementation can rely on; the frame
-bodies cannot be rendered until OQ-002 closes. Both files are intro/logo video,
-not gameplay, so this does not gate the campaign.
+The top-level chain (header + PREFIX + FL_FRAME chunks tiling the file to
+the byte) is verified, and the frame payloads decode stock (OQ-002 CLOSED,
+docs/re/flc.md). Both files are intro/logo video, not gameplay, so this
+never gated the campaign turn loop.
 
 - `extracted/ascend02/data/intro65a.flc`: FL_COLOR256 chunk present but declares 0 colours (a no-op chunk); the real palette for this file is therefore either in an `FLI_COLOR`(0x0004) chunk or supplied externally.
 - `game/logic.flc`: FL_COLOR256 chunk present but declares 0 colours (a no-op chunk); the real palette for this file is therefore either in an `FLI_COLOR`(0x0004) chunk or supplied externally.
@@ -171,8 +172,7 @@ pixel codec) and must be parsed by the same reader — no separate script format
 
 - OQ-006 audio sample rate (headerless `.voc` + `.raw`).
 - OQ-011 `.fnt` glyph stride/packing.
-- OQ-002 FLIC frame-payload format: top-level chunk chain verified, frame
-  bodies are not standard FLI/FLC blits. Intro/logo only; does not gate the
-  campaign turn loop.
+- OQ-002 CLOSED: FLIC payloads are stock Autodesk chunks; full decode in
+  scripts/flc_probe.py, spec in docs/re/flc.md (gate stages 3e/3o).
 - OQ-005 `.shp`/`.tmp` pixel codec (shared with docs/re/shp.md).
 

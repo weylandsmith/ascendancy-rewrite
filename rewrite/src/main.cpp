@@ -15,6 +15,7 @@
 
 #include "formats/bin_table.h"
 #include "formats/cob.h"
+#include "formats/flic.h"
 #include "game/campaign.h"
 #include "game/diplomacy.h"
 #include "game/economy.h"
@@ -45,6 +46,7 @@ struct Options {
     bool audio = false;                         // SDL2_mixer (docs/re/audio.md §5)
     bool mute = false;                          // load everything, volume 0
     int playerSpecies = -1;                     // specnum 0..20 (docs/re/species.md)
+    bool flic = false;                          // decode both vendor FLCs (docs/re/flc.md)
 };
 
 bool parseArgs(int argc, char** argv, Options* o) {
@@ -70,6 +72,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->mute = true;
         else if (a == "--species" && i + 1 < argc)
             o->playerSpecies = std::atoi(argv[++i]);
+        else if (a == "--flic")
+            o->flic = true;
         else if (a == "--help")
             return false;
         else {
@@ -93,7 +97,8 @@ void usage() {
         "  --ui          open the P5a campaign window (docs/re/ui-runtime.md)\n"
         "  --autoplay    with --ui: advance a turn every 250 ms\n"
         "  --species N   play as species specnum N (0..20, docs/re/species.md);\n"
-        "                default -1 = human, no special ability\n");
+        "                default -1 = human, no special ability\n"
+        "  --flic        decode both vendor FLC videos end-to-end (docs/re/flc.md)\n");
 }
 
 // Loads the three archives from the ORIGINAL game/ directory, because the
@@ -226,6 +231,35 @@ int main(int argc, char** argv) {
         return 2;
     }
     if (o.headless) SDL_SetHint(SDL_HINT_VIDEODRIVER, "dummy");
+
+    // FLC decode report (docs/re/flc.md): replay both vendor videos through
+    // the port and print the headline facts. Deliberately BEFORE the archive
+    // load so a --flic run is a codec-only smoke.
+    if (o.flic) {
+        int rc = 0;
+        for (const std::string& p : {(o.dataRoot / "game/logic.flc").string(),
+                                     (o.dataRoot / "extracted/ascend02/data/intro65a.flc").string()}) {
+            ascend::formats::Flic f;
+            std::string err;
+            if (!f.load(p, &err)) {
+                std::printf("flic load FAILED %s: %s\n", p.c_str(), err.c_str());
+                rc = 1;
+                continue;
+            }
+            int frames = 0, repaired = 0;
+            const bool ok = f.replay([&](int, const uint8_t*, const uint8_t*) { ++frames; },
+                                     &err, &repaired);
+            if (!ok) {
+                std::printf("flic replay FAILED %s: %s\n", p.c_str(), err.c_str());
+                rc = 1;
+                continue;
+            }
+            std::printf("flic ok: %s %dx%d speed %ums frames %d (repaired FLI_COPY %d)\n",
+                        fs::path(p).filename().c_str(), f.width(), f.height(),
+                        f.speedMs(), frames, repaired);
+        }
+        return rc;
+    }
 
     GameData g;
     std::string err;

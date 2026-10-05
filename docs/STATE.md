@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-04T22:05
+updated: 2026-10-04T23:05
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -178,6 +178,26 @@ turn_log_recent:
      output=dummy+nosound+stdin=/dev/null+-time-limit, kills by pkill -x
      (pkill -f matched the gate shell's own cmdline once — never again), all
      output head -c 4000. Gate 3n added. rsync absent on host; cp -a used."
+  - "2026-10-04i (OQ-002 CLOSED — FLIC codec): the earlier 'frame payloads are
+     Ascendancy-specific' verdict was a media_probe.py NAME-TABLE bug (FLI_NAMES
+     omitted 0x0007; stock chunks printed UNK_0x0007). New scripts/flc_probe.py
+     decodes EVERY frame of both vendor videos (logic.flc 226, intro65a 1144),
+     zero chunk residue, zero OOB; intro frame 600 renders to coherent artwork
+     (docs/assets/flc-intro-frame600.png, vision-checked). Three MEASURED facts
+     beyond compuphase.com/flic.htm: DELTA skip = -int16(op) (masked 0x3FFF
+     desyncs at intro frame 1: opcode 0xFF54 -> 16212 lines); BYTE_RUN has no
+     per-line pad, tolerates 1 even-pad byte at chunk end; logic.flc ring frame
+     is a wrong-sized FLI_COPY (307204 vs 6+640x480, the documented writer bug)
+     — repaired rule. C++ port rewrite/src/formats/flic.{h,cpp} is golden-pinned
+     frame-by-frame (rewrite/tests/data/flc_golden.tsv FNV-1a-64; 77/77 tests
+     incl 4 new flc_*), --flic flag decodes both files in the binary, gate 3o
+     added (--decode-only fast path 0.8s; hashing run regenerates golden).
+     3 self-caught errors: patch tool inheriting terminal cwd (use absolute
+     paths); docs block indexing empty hash maps under --decode-only (early
+     return before it); private nested Sub used by anon-namespace decoders.
+     media_probe FLIC section regenerated (PREFIX vs COLOR_256 palette fact
+     corrected too). R1 cadence: last attempt 20261004-205846 < 12h -> no run,
+     recorded not retried."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
@@ -292,8 +312,11 @@ missing. CONTRACT CHECKLIST (the judge's list) follows the phase list.
         gate 3c; 208 libs / 1557 records). Pixel codec OPEN (OQ-005).
 [~] P1d .gam saves — CORRELATION ONLY (docs/re/savegame.md, gate 3f). Full
         record map OPEN (OQ-003): needs runtime; P6 save/load depends on it.
-[~] P1e FLIC/audio inventory — COMPLETE inventory (docs/re/media.md, gate 3e);
-        sample rate OPEN (OQ-006).
+[~] P1e FLIC/audio inventory — FLIC CODEC SOLVED + PORTED (OQ-002 closed
+        2026-10-04i: docs/re/flc.md + scripts/flc_probe.py gate 3o +
+        rewrite/src/formats/flic.cpp golden-pinned); audio inventory
+        (docs/re/media.md, gate 3e); sample rate of headerless files OPEN
+        (OQ-006).
 [~] P1f text encodings — COMPLETE (docs/re/text.md, gate 3g): CP437, 0x1A EOF
         markers (NOT whitespace to C isspace), 34 exe module names.
 [~] P2 exe model — docs/re/loader.md: raw-load model usable for control flow

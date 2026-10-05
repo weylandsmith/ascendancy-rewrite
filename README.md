@@ -29,7 +29,8 @@ video driver · `--ui` window (cosmos map, NEXT TURN, event pane) ·
 `--autoplay` 250 ms turns · `--audio` load + play all 86 vendor SFX and
 theme00 music · `--mute` load but silent · `--campaign N`/`--seed S` ·
 `--species N` play as species specnum N (0..20 — each species' SA_ special
-ability fires every ~30 turns; default human = no ability).
+ability fires every ~30 turns; default human = no ability) ·
+`--flic` decode both vendor intro videos end-to-end (codec report).
 In the UI: click NEXT TURN or Enter/Space advances a turn, clicking a star
 selects it (status line), ESC quits.
 
@@ -52,7 +53,8 @@ gizmos, planetary items, species data, diplomacy files, star names,
 map-grid and lane rules, victory-condition files (end-*.txt), the 21 species
 special-ability effects and their charged/passive split (help.txt L1713-2511,
 docs/re/abilities.md), sound manifests and the vendor .voc sample container,
-CP437 text handling.
+the vendor FLC intro videos (both decode frame-exact to hashes + a visually
+checked PNG; docs/re/flc.md), CP437 text handling.
 
 DOCUMENTED DEFAULTS (the original's exact rule is not recoverable from
 static data; each is listed in `docs/OPEN-QUESTIONS.md` and cited from
@@ -72,7 +74,7 @@ their exact vendor thresholds/priority remain R1).
 
 ## Layout
 
-    rewrite/src/formats/   file parsers (cob, bin tables, voc) — no SDL
+    rewrite/src/formats/   file parsers (cob, bin tables, voc, flic) — no SDL
     rewrite/src/game/      simulation (mapgen, economy, research, campaign)
     rewrite/src/ui/        SDL2 window, layout math, SDL2_mixer engine
     docs/re/               every reverse-engineered format/system spec

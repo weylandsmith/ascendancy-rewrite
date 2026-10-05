@@ -16,16 +16,21 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VOC_MAGIC = b'Creative Voice File\x1a'
 
 FLI_NAMES = {
-    0x0004: 'FLI_COLOR', 0x000B: 'FLI_BLACK', 0x000C: 'FLI_CNTR',
-    0x000F: 'FLI_BRUSH', 0x0011: 'FLI_FULL', 0x0012: 'FLI_PART',
-    0x0013: 'FLI_DIFF', 0x0014: 'FLI_BLKROW', 0x0018: 'FLI_LWORD',
-    0x0019: 'FLI_XOR_SHORT',
-    0xF100: 'FL_COLOR256', 0xF101: 'FL_COLOR64', 0xF102: 'FL_COLOR256_PART',
-    0xF103: 'FL_BLACK', 0xF10C: 'FL_LC_DIRECT', 0xF10D: 'FL_COLOR256_YUDP',
-    0xF10E: 'FL_LF_FULL', 0xF10F: 'FL_LF_PART', 0xF110: 'FL_FL_FULL',
-    0xF111: 'FL_FL_PART', 0xF112: 'FL_FL_DIFF', 0xF113: 'FL_FL_BLKROW',
-    0xF117: 'FL_MINI_LOFF', 0xF119: 'FL_COLOR_SOS', 0xF1CC: 'FL_DZ_IP',
-    0xF1EC: 'FL_AUDIO', 0xF1FA: 'FL_FRAME', 0xF1FF: 'FL_GROUP_USER',
+    # Canonical Autodesk/compuphase names (compuphase.com/flic.htm "Overview of
+    # all chunks"). An earlier table here OMITTED 0x0007/0x0010/0x0012 and
+    # mislabelled 0x000F, which is how stock vendor chunks got reported as
+    # UNK_/FLI_BRUSH and OQ-002 was wrongly opened (closed by
+    # scripts/flc_probe.py, docs/re/flc.md).
+    0x0003: 'CEL_DATA', 0x0004: 'COLOR_256', 0x0007: 'DELTA_FLC',
+    0x000B: 'COLOR_64', 0x000C: 'DELTA_FLI', 0x000D: 'BLACK',
+    0x000F: 'BYTE_RUN', 0x0010: 'FLI_COPY', 0x0012: 'PSTAMP',
+    0x0019: 'DTA_BRUN', 0x001A: 'DTA_COPY', 0x001B: 'DTA_LC',
+    0x001F: 'LABEL', 0x0020: 'BMP_MASK', 0x0021: 'MLEV_MASK',
+    0x0022: 'SEGMENT', 0x0023: 'KEY_IMAGE', 0x0024: 'KEY_PAL',
+    0x0025: 'REGION', 0x0026: 'WAVE', 0x0027: 'USERSTRING',
+    0x0028: 'RGN_MASK', 0x0029: 'LABELEX', 0x002A: 'SHIFT', 0x002B: 'PATHMAP',
+    0xF100: 'PREFIX', 0xF1FA: 'FRAME', 0xF1FB: 'SEGMENT_TABLE',
+    0xF1FC: 'HUFFMAN_TABLE',
 }
 
 
@@ -64,12 +69,16 @@ def walk_flic(path):
         top[FLI_NAMES.get(ctype, f'UNK_{ctype:#06x}')] += 1
         if ctype == 0xF1FA:
             frames += 1
-            # 16-byte frame header: size,type,maxw,maxh,depth,flags,nchunks,pad
-            # [verified] num_chunks is 0 in every frame of both files, so frames
-            # are delimited by chunk SIZE, not by a sub-chunk count. Walking
-            # size-delimited yields valid headers for a subset of frames only;
-            # the remainder is reported, not papered over.
-            nchunks = struct.unpack_from('<H', data, o + 14)[0]
+            # 16-byte frame header: size,type,chunks,delay,reserved,width,height
+            # (compuphase FRAME_TYPE typedef). `chunks` sits at +6. Measured on
+            # both vendor files: sub-chunks tile EVERY frame except logic.flc's
+            # ring frame (wrong-sized FLI_COPY — a documented common writer
+            # error; scripts/flc_probe.py repairs and decodes it). Frames with
+            # csz=16 are legal EMPTY frames (image unchanged); an earlier
+            # revision of this probe mislabelled the stock chunk types here
+            # and wrongly concluded "Ascendancy-specific payloads" — see
+            # docs/re/flc.md §1 and the FLI_NAMES note above.
+            nchunks = struct.unpack_from('<H', data, o + 6)[0]
             if nchunks == 0:
                 sub_nc_zero += 1
             so = o + 16
@@ -82,11 +91,6 @@ def walk_flic(path):
                 so += isz
                 tiled += 1
             frame_stats.append((o, csz, so == o + csz, tiled))
-        if ctype == 0xF100 and not pal_triples:
-            first, cnt = struct.unpack_from('<HH', data, o + 6)
-            if cnt:
-                pb = data[o + 10:o + 10 + cnt * 3]
-                pal_triples = [tuple(pb[i:i + 3]) for i in range(0, len(pb) - 2, 3)]
         o += csz
     assert o == N, f"{rel(path)}: walk ended {o:#x} != {N:#x}"
     return dict(w=w, h=h, depth=depth, flags=flags, declared=nframes, frames=frames,
@@ -143,13 +147,16 @@ def main():
     P("")
     P("**Encoding findings [verified by walking every frame]:**")
     P("")
-    P("1. `num_chunks` (FL_FRAME +14) is 0 in *every* frame of both files, so frames")
-    P("   must be delimited by chunk size, never by the count field.")
-    P("2. Walking sub-chunks size-delimited, the first sub-chunk header of a frame")
-    P("   parses cleanly for only a minority of frames — see the per-file tallies.")
-    P("   The rest do not begin with a plausible `u32 size,u16 type` pair at +16, so")
-    P("   these frames are NOT standard FLI/FLC blit chunks; the payload format is")
-    P("   Ascendancy-specific and stays OPEN (OQ-002).")
+    P("1. Frame header is the 16 B compuphase FRAME_TYPE; `chunks` at +6 is")
+    P("   non-zero wherever sub-chunks exist (empty csz=16 frames are legal")
+    P("   'image unchanged' padding: " + ", ".join(
+        f"{infos[f]['sub_nc_zero']}/{infos[f]['frames']} in {os.path.basename(f)}"
+        for f in flcs) + ").")
+    P("2. All sub-chunk types present are STOCK Autodesk chunks (COLOR_256,")
+    P("   BYTE_RUN, FLI_COPY, DELTA_FLC, PSTAMP). Full decode of both files —")
+    P("   every chunk zero-residue — is scripts/flc_probe.py / docs/re/flc.md;")
+    P("   the earlier 'Ascendancy-specific payload' reading was a probe bug")
+    P("   (chunk-name table omitted 0x0007 etc.; see FLI_NAMES comment).")
     P("3. No `FL_DZ_IP` (0xF1CC) chunk appears anywhere, so DEFLATE is not involved —")
     P("   the seed plan's FLIC-with-dzlib assumption is falsified.")
     P("")
@@ -161,22 +168,18 @@ def main():
         s = ", ".join(f"{k}x{v}" for k, v in i['sub'].most_common()) or "(none)"
         P(f"| `{rel(f)}` | {i['frames']} | {clean} | {s} |")
     P("")
-    P("The top-level chain (header + FL_COLOR256 + FL_FRAME chunks tiling the file to")
-    P("the byte) is verified and is what the reimplementation can rely on; the frame")
-    P("bodies cannot be rendered until OQ-002 closes. Both files are intro/logo video,")
-    P("not gameplay, so this does not gate the campaign.")
+    P("The top-level chain (header + PREFIX + FL_FRAME chunks tiling the file to")
+    P("the byte) is verified, and the frame payloads decode stock (OQ-002 CLOSED,")
+    P("docs/re/flc.md). Both files are intro/logo video, not gameplay, so this")
+    P("never gated the campaign turn loop.")
     P("")
     for f in flcs:
         i = infos[f]
-        if i['pal']:
-            mx = [max(t[k] for t in i['pal']) for k in range(3)]
-            P(f"- `{rel(f)}` FL_COLOR256 palette: {len(i['pal'])} triples, "
-              f"max per channel {mx} -> "
-              f"{'8-bit RGB888 (do NOT 6-bit-scale)' if max(mx) > 63 else 'all<=63'}")
-        else:
-            P(f"- `{rel(f)}`: FL_COLOR256 chunk present but declares 0 colours "
-              f"(a no-op chunk); the real palette for this file is therefore either "
-              f"in an `FLI_COLOR`(0x0004) chunk or supplied externally.")
+        nc256 = i['sub'].get('COLOR_256', 0)
+        P(f"- `{rel(f)}`: palette arrives via COLOR_256(4) subchunks "
+          f"({nc256} in file — frame 0 carries the initial one; decoded by "
+          f"scripts/flc_probe.py, docs/re/flc.md §2). The top-level PREFIX "
+          f"(0xF100) chunk is settings data, not palette.")
     P("")
 
     # ---------------- audio ----------------
@@ -324,9 +327,8 @@ def main():
     P("")
     P("- OQ-006 audio sample rate (headerless `.voc` + `.raw`).")
     P("- OQ-011 `.fnt` glyph stride/packing.")
-    P("- OQ-002 FLIC frame-payload format: top-level chunk chain verified, frame")
-    P("  bodies are not standard FLI/FLC blits. Intro/logo only; does not gate the")
-    P("  campaign turn loop.")
+    P("- OQ-002 CLOSED: FLIC payloads are stock Autodesk chunks; full decode in")
+    P("  scripts/flc_probe.py, spec in docs/re/flc.md (gate stages 3e/3o).")
     P("- OQ-005 `.shp`/`.tmp` pixel codec (shared with docs/re/shp.md).")
     P("")
 

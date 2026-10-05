@@ -186,6 +186,18 @@ for f in "$ROOT"/work/r1/attempt-*/tracer.log; do
   [ "$(stat -c%s "$f")" -le 65536 ] || { tail -c 400 "$f"; err "R1 tracer log >64KB: $f"; }
 done
 
+# 3o. OQ-002 closure invariant: BOTH vendor FLC files must fully decode
+# (stock Autodesk chunks; zero-residue + OOB asserted per chunk). Fast path:
+# --decode-only skips the 50s golden hashing; the golden cross-check against
+# the C++ port lives in run_tests (flc_logic_golden / flc_intro_golden).
+if /usr/bin/python3 "$ROOT/scripts/flc_probe.py" --decode-only --quiet; then
+  :
+else
+  err "flc_probe.py decode failed (OQ-002 regressed?)"
+fi
+[ -s "$ROOT/docs/re/flc.md" ] || err "docs/re/flc.md missing"
+[ -s "$ROOT/rewrite/tests/data/flc_golden.tsv" ] || err "flc_golden.tsv missing (C++ cross-check data)"
+
 # 3l. Victory-condition grammar + CONTRACT smoke: end-*.txt blocks assert
 # (scripts/endtext_probe.py), and the rewrite binary must actually reach a
 # victory condition on a seeded headless campaign run (docs/PLAYTHROUGH.md).
