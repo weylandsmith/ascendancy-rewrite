@@ -29,19 +29,15 @@ tmux send-keys -t $SESSION "/goal gate add bash scripts/gate.sh" Enter
 sleep 3
 tmux send-keys -t $SESSION "/goal status" Enter
 sleep 3
-# Option C cadence (docs/BLOCKED.md): one bounded R1 attempt per session.
-# Skip if one ran within 12 h. Bounded by the script itself (timeout+kill);
-# bounded here too so a hung harness can never delay the loop's first turn.
-LAST=$(find "$PWD/work/r1" -maxdepth 1 -name 'attempt-*' -type d -mmin -720 2>/dev/null | head -1 || true)
-if [ -z "$LAST" ]; then
-  echo "R1 session attempt starting (bounded)..." > /tmp/r1_session.log
-  R1RC=0
-  timeout -s KILL 420 bash scripts/r1_attempt.sh >> /tmp/r1_session.log 2>&1 || R1RC=$?
-  echo "r1 exit=$R1RC (0=LIVE upgrade formulas, 1=negative-normal, 2=harness error)" >> /tmp/r1_session.log
-  tail -c 600 /tmp/r1_session.log
-else
-  echo "R1 attempt within 12 h already present: $LAST — skipping session attempt"
-fi
+# R1 at session start (cadence window ABOLISHED 2026-10-05 by user decision;
+# docs/re/r1-savestate.md). Route = save states, not the tracer. Bounded by
+# the script itself AND here so a hung harness can never delay the loop.
+# No 12 h timestamp gate anymore; safety invariants are inside the script.
+echo "R1 savestate capture starting (bounded, no cadence gate)..." > /tmp/r1_session.log
+R1RC=0
+timeout -s KILL 420 bash scripts/r1_savestate.sh >> /tmp/r1_session.log 2>&1 || R1RC=$?
+echo "r1 exit=$R1RC (0=LIVE base derived, 1=negative-normal, 2=harness error)" >> /tmp/r1_session.log
+tail -c 600 /tmp/r1_session.log
 echo "--- goal status as rendered by hermes: ---"
 tmux capture-pane -t $SESSION -p | grep -v '^$' | tail -12
 echo "-------------------------------------------"

@@ -8,12 +8,16 @@ Proceed under **C (hybrid), B-priority**. Operationally this means:
    plaintext tables, manual prose, targeted disassembly, cited to
    extracted-file offsets (contract-permitted), ambiguities to
    OPEN-QUESTIONS. Nothing changes about how work is done today.
-2. **R1 is attempted once per session** via `scripts/r1_attempt.sh`
-   (mechanically enforced: `scripts/launch_ralph.sh` runs it at session start
-   when `work/r1/attempt-*` is >12 h old; a long-lived session re-checks the
-   same timestamp at turn start per STATE.md NEXT ACTION). The attempt is
-   bounded by construction and NEVER mounts `game/` — dosbox runs from a
-   scratch copy in `work/r1/game/` (safety invariant, gate 3n pins it).
+2. **R1 runtime capture** — CADENCE WINDOW ABOLISHED 2026-10-05 (user
+   decision): the 12 h/once-per-session rate limit is gone. The route is now
+   `scripts/r1_savestate.sh` (docs/re/r1-savestate.md): dosbox-x autosave
+   writes full-guest-RAM ZIP save states; `scripts/r1_sav_scan.py` derives
+   the member-offset base of the live image from unanimous high-entropy
+   anchors (measured B=0x1BF4D8, 6/6 slots, per-run data — never hard-code).
+   The old tracer route (`scripts/r1_attempt.sh`, external ptrace) stays
+   dead on this box and is kept only for the record. Every run keeps the
+   safety invariants: scratch copy (never mounts `game/`), headless,
+   `-time-limit`, `pkill -x dosbox-x`, size-capped output.
 3. Whenever an attempt prints `R1 LIVE` (exit 0 + PAYLOAD HIT), the loop
    upgrades formulas to exact (Campaign::attackScore/defenseScore/economy
    phases, each cited to its OQ entry) and closes those OQs. Exit 1 = normal
@@ -35,15 +39,15 @@ Proceed under **C (hybrid), B-priority**. Operationally this means:
   processes, log bounded).
 - dosbox-x `-time-limit <n>` exists (help text) and is used by the harness.
 
-## Remaining R1 route [unverified — pilot before trusting]
+## Remaining R1 route — SUPERSEDED 2026-10-05 (savestate route LIVE)
 
-`dosbox-x -break-start` ("Break into debugger at startup" — strings verified
-in the binary; the debugger also prints an "Enter Debugger Command" prompt).
-The debugger runs IN-process, so it sidesteps the ptrace block. Its command
-grammar (memory dump syntax, output destination) is UNKNOWN — pilot it
-manually under a pty with `timeout` + exact-name kill before automating;
-the DOSBOX RULE EOF-spam trap (STATE.md KNOWN-ISSUES) applies exactly when a
-debugger prompt is left at EOF.
+Kept for the record: `dosbox-x -break-start` ("Break into debugger at
+startup" — strings verified in the binary) was the planned in-process route.
+It was never needed: the same session's SAVESTATE route (docs/re/
+r1-savestate.md) captured the live image without any debugger or ptrace.
+Do not pilot `-break-start` now; the DOSBOX RULE EOF-spam trap (STATE.md
+KNOWN-ISSUES) applies exactly when a debugger prompt is left at EOF, and
+there is nothing left for it to prove.
 
 ## Residual R1-blocked items (updated 2026-10-05f)
 

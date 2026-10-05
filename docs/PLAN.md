@@ -112,10 +112,12 @@ Every turn:
  6. Run bash scripts/gate.sh; fix failures before ending the turn.
 Never: modify game/; invent data; mark STATE.md items done without
 evidence; leave the tree broken (gate failing) at end of turn.
-Option C (decided 2026-10-04, docs/BLOCKED.md): before ending a turn, honour
-the R1 cadence in STATE.md NEXT ACTION — at most one bounded
-scripts/r1_attempt.sh per 12 h; a negative (exit 1) is recorded in one line,
-never retried in-turn; exit 0 triggers formula upgrades; exit 2 is a harness
-bug, not a research result.
+Option C (decided 2026-10-04, docs/BLOCKED.md; cadence window ABOLISHED
+2026-10-05 by user): R1 runs via save states (scripts/r1_savestate.sh,
+docs/re/r1-savestate.md) with NO rate limit; per-run safety invariants are
+mandatory (scratch copy, -time-limit, pkill -x, bounded output). A negative
+(exit 1) is recorded in one line, never retried in-turn; exit 0 means the
+base was derived (pointer law still gates formula upgrades); exit 2 is a
+harness bug, not a research result.
 When ALL P6 items are done and gate passes: state EXPLICITLY that the
 goal contract is complete and stop.

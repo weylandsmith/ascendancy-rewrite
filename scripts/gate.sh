@@ -185,6 +185,16 @@ for f in "$ROOT"/work/r1/attempt-*/tracer.log; do
   [ -f "$f" ] || continue
   [ "$(stat -c%s "$f")" -le 65536 ] || { tail -c 400 "$f"; err "R1 tracer log >64KB: $f"; }
 done
+# 2026-10-05: the SAVESTATE route (docs/re/r1-savestate.md) carries the SAME
+# invariants (cadence window abolished; safety per-run is not optional).
+[ -s "$ROOT/scripts/r1_savestate.sh" ] || err "scripts/r1_savestate.sh missing (R1 savestate route)"
+[ -s "$ROOT/scripts/r1_sav_scan.py" ] || err "scripts/r1_sav_scan.py missing (R1 savestate route)"
+grep -vE '^[[:space:]]*#' "$ROOT/scripts/r1_savestate.sh" | grep -Eq 'pkill[ ]+-f' \
+  && err "r1_savestate.sh uses pkill -f (exact-name only)"
+grep -vE '^[[:space:]]*#' "$ROOT/scripts/r1_savestate.sh" | grep -q 'ascendancy/game' \
+  && err "r1_savestate.sh references the pristine game/ tree for dosbox (copy to work/r1 first)"
+grep -q 'time-limit' "$ROOT/scripts/r1_savestate.sh" \
+  || err "r1_savestate.sh lost the dosbox -time-limit bound"
 
 # 3o. OQ-002 closure invariant: BOTH vendor FLC files must fully decode
 # (stock Autodesk chunks; zero-residue + OOB asserted per chunk). Fast path:

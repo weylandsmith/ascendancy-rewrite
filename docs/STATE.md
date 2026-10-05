@@ -305,6 +305,36 @@ turn_log_recent:
      R1 cadence: attempt 20261005-111507 < 12 h -> no run, recorded not
      retried. Gate ALL PASS twice post-change; fnt.md regenerates identical
      hash 3x; scripts/ui_vendor_shot.sh added (dev-only, not a gate stage)."
+  - "2026-10-05g (R1 LIVE via SAVESTATE; cadence window abolished by user):
+     user asked what remains and directed the 12 h cadence be dropped.
+     Cadence honoured-first then abolished as instructed: the tracer attempt
+     ran at window-open (attempt-20261005-141623, TRACABLE=no, exit 1,
+     normal negative) and the -break-start pilot was NOT needed — the
+     SAVESTATE route found the same session: dosbox-x autosave
+     (autosave=N slotrange + saveremark=false) writes ZIP save states whose
+     'Memory' member is full guest RAM (17,055,880 B @memsize=16); slot path
+     law <dirname(captures)>/save/NN.sav (measured twice). The live ascend
+     image located by unanimous high-entropy anchors: base 0x1BF4D8, 6/6
+     anchors 6/6 slots (Program_Name=ASCEND pins the capture). NEEDLE LAW:
+     payload file head is useless at runtime (fixups in first 0x18000, ~136
+     diff bytes/4KB block, low-word-dominated) — a mid-image high-entropy
+     window law replaced it. GOLDEN VOCAB in live RAM: 'Xerxes' x3,
+     'Knowledge' — the save state captured the RUNNING game's data. OPEN
+     (recorded, not guessed): pointer law ambiguous between D=R (289 code
+     hits) and D=0x242000 (573) vs controls <=115 — resolve per-object via
+     the LE fixup table before lifting ANY formula; member-offset vs guest-
+     linear mapping census incomplete (IVT sane, BDA@0x400 all-zero).
+     Changes: scripts/r1_savestate.sh + r1_sav_scan.py (safe by construction,
+     same invariants), scripts/r1_base.py + r1_validate.py (set-based, after
+     an O(n^2) first cut timed out), docs/re/r1-savestate.md; cadence removed
+     from GOAL.txt, launch_ralph.sh (now runs r1_savestate.sh unconditionally),
+     BLOCKED.md (break-start SUPERSEDED, do-not-pilot). Self-caught: weak-
+     vote 0.25 arithmetic produced a fake base (fixed: ambiguous windows
+     don't vote — OQ-011 pattern again); contiguity print subtracted p twice;
+     r1_validate sampled payload offsets against the WRONG pointer law
+     (stored = B+P, not B+P-window-relative) — every bug caught before any
+     claim left the tree. STATE.md patch footgun struck again (line join),
+     repaired same turn."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
@@ -352,19 +382,21 @@ in main.cpp). Finding scheduled in NEXT ACTION — must not be lost.
 
 ## NEXT ACTION (exactly one)
 GOAL CONTRACT COMPLETE (restated explicitly 2026-10-04h after an independent
-cold-session verification walk: gate ALL PASS, 73/73 tests, PLAYTHROUGH
-victory records, README, 20 cited subsystem specs, checklist fully [x]).
-Standing cadence if the loop continues: per turn honour the R1 rule ONLY by
-timestamp — `ls -t work/r1/attempt-* | head -1`; run `bash scripts/r1_attempt.sh`
-only when missing/older than 12 h (exit 1 = record one line, no retry; exit 0 =
-upgrade formulas per BLOCKED.md §DECISION.3; exit 2 = fix harness). When the
-cadence window is open, the FIRST R1 action is the manual -break-start pilot
-(BLOCKED.md "Remaining R1 route": pty + timeout + pkill -x, debugger prompt must
-NEVER face EOF — DOSBOX RULE): external ptrace is dead on this box but the
-in-process debugger is untested, and the golden-save tour (savegame.md 2026-10-05e)
-shows exactly which pointers a live dump would resolve (Xerxes+12 u3 triple). Residual
-unknowns (OQ-003/005/006/010/019) stay filed and R1-bounded exactly as the
-contract's own evidence rules require; none blocks playability to victory.
+cold-session verification walk: gate ALL PASS, tests green, PLAYTHROUGH
+victory records, README, cited subsystem specs, checklist fully [x]).
+CADENCE WINDOW ABOLISHED 2026-10-05 (user): no timestamp gate on R1 anymore;
+safety invariants stay. R1 is LIVE via save states (docs/re/r1-savestate.md).
+THE next action is: RESOLVE THE POINTER LAW from a savestate capture — parse
+the LE header's fixup/relocation records against a captured Memory member
+(base re-derived per run by scripts/r1_sav_scan.py; never hard-code
+0x1BF4D8), settle the D=R vs D=0x242000 ambiguity per OBJECT (the two delta
+clusters are object-relative bases, not one global base), then map member
+offsets to guest linear addresses. Only after that law is unanimous may any
+R1-blocked OQ (010/015/016/005/003) be upgraded to exact formulas per
+BLOCKED.md DECISION.3; deeper captures (click into a real game via
+ref_capture.sh coords first) raise data richness. Residual unknowns stay
+filed exactly as the contract's evidence rules require; none blocks
+playability to victory.
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr
