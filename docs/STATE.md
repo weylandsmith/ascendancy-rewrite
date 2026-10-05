@@ -331,7 +331,12 @@ victory records, README, 20 cited subsystem specs, checklist fully [x]).
 Standing cadence if the loop continues: per turn honour the R1 rule ONLY by
 timestamp — `ls -t work/r1/attempt-* | head -1`; run `bash scripts/r1_attempt.sh`
 only when missing/older than 12 h (exit 1 = record one line, no retry; exit 0 =
-upgrade formulas per BLOCKED.md §DECISION.3; exit 2 = fix harness). Residual
+upgrade formulas per BLOCKED.md §DECISION.3; exit 2 = fix harness). When the
+cadence window is open, the FIRST R1 action is the manual -break-start pilot
+(BLOCKED.md "Remaining R1 route": pty + timeout + pkill -x, debugger prompt must
+NEVER face EOF — DOSBOX RULE): external ptrace is dead on this box but the
+in-process debugger is untested, and the golden-save tour (savegame.md 2026-10-05e)
+shows exactly which pointers a live dump would resolve (Xerxes+12 u3 triple). Residual
 unknowns (OQ-003/005/006/010/019) stay filed and R1-bounded exactly as the
 contract's own evidence rules require; none blocks playability to victory.
 
