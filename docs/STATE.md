@@ -483,16 +483,17 @@ scripts/r1_restore_sites.py and validated (pointer runs -> Watcom starts
 (scripts/attribution_scan.py, gate 3r, work/attribution.tsv: 225 E1 refs,
 62% on true fixup sites; batmode 10 sites span 0x4fd7, race 20, cosmos 10).
 THE next action is:
-OQ-010 ATTEMPT 2 — arithmetic is NOT in batmode/batcon (attempt-1 measured
-negative, see r1-savestate.md FIRST DECOMPILE BATCH). Follow the harvest:
-(1) seed-and-decompile the cosmos.cpp/ship.cpp E1 est_func ranges from
-work/attribution.tsv (the engine modules the battle UI calls into) plus the
-damage-shaped FUN_0005cf96/FUN_0005caac bodies, via the now-scripted pipeline
-(work/combat_decomp_targets.txt; -process ascend_restored.bin);
-(2) map the LCG container around 0x7825b (seed a prologue there — it is
-outside all 292 seeded functions) and count its callers to answer 'which RNG
-combat uses'. Lift arithmetic as CITED constants (file offset + decoded data
-target); a deeper capture (click into a real game via ref_capture.sh
+OQ-010 ATTEMPT 3 IN FLIGHT 2026-10-05j: FULL auto-analysis of
+work/ascend_restored.bin into Ghidra project work/ghp5/ascend5 (base
+0x100000; viable now because restored data refs drive function detection —
+attempts 1-2 ceilings were function-reach, see r1-savestate.md FIRST
+DECOMPILE BATCH). On completion (log work/full_analysis.out, FULL_RC line):
+run scripts/ghidra/ExportFunctions.java (-process ascend_restored.bin) ->
+work/functions_full.tsv, join with work/attribution.tsv for per-module
+function sets, then decompile combat-arithmetic candidates in
+cosmos/ship/gsystem per module (pipeline: work/combat_decomp_targets.txt).
+Lift arithmetic as CITED constants (file offset = addr-0x100000 + decoded
+data target); a deeper capture (click into a real game via ref_capture.sh
 coords before autosave) must precede any formula whose inputs are only
 populated in-game — title-screen state is enough for arithmetic shape, not
 for data-driven tables. Residual unknowns
