@@ -6,7 +6,7 @@
 
 phase: P4
 milestone: 3  # 0..6 ; gate.sh keys build/test stages off milestone >= 3
-updated: 2026-10-04T20:05
+updated: 2026-10-04T21:05
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -148,6 +148,21 @@ turn_log_recent:
      peace-implies-war). Sweep: Control 198/201/211, Extinct x5 — victory
      records machine-regenerated. OQ-021 filed (end-ctrl comment 'over half'
      vs manual 'two-thirds'). Gate green pre-commit."
+  - "2026-10-04g (option C activated): user chose C (hybrid, B-priority);
+     docs/BLOCKED.md rewritten as the C runbook. R1 cadence is now CODED, not
+     prose: scripts/r1_attempt.sh + scripts/r1_tracer.py, run at session
+     start by launch_ralph.sh when work/r1/attempt-* is >12h old. Verified
+     env facts: dosbox-x 2025.02.01 makes itself UNTRACEABLE early (ATTACH=16
+     and SEIZE=0x4206 -> EPERM, /proc/pid/maps EACCES from t+2s; identical
+     probes on a plain child succeed — harness self-check pins this), so the
+     external-dump route is dead on this box; -break-start (in-process
+     debugger, strings-verified) is the remaining route, grammar UNVERIFIED
+     — pilot manually under pty+timeout before automating. Harness ran for
+     real (attempt 20261004-205846: TRACABLE=no, exit 1, no stray procs).
+     Safety invariants coded in: dosbox runs a COPY (work/r1/game), headless
+     output=dummy+nosound+stdin=/dev/null+-time-limit, kills by pkill -x
+     (pkill -f matched the gate shell's own cmdline once — never again), all
+     output head -c 4000. Gate 3n added. rsync absent on host; cp -a used."
 
 ## CURRENT FOCUS
 P5b next. CONTRACT-CORE MET (see Run A/B/C + gate 3l). DONE P4: mapgen,
@@ -192,14 +207,19 @@ commits c1b6d3f..d85b281; d85b281 = committed one-char include-quote fix
 in main.cpp). Finding scheduled in NEXT ACTION — must not be lost.
 
 ## NEXT ACTION (exactly one)
-SA_ ability wiring is DONE (2026-10-04e; audit finding closed, gate 3m).
-All five end-*.txt victory conditions evaluated 2026-10-04f (peace
-acceptance fixed; 73/73 tests). No open non-R1 item remains; CONTRACT
-CHECKLIST fully [x]. Any FUTURE work starts from docs/OPEN-QUESTIONS.md
-(R1 = exe runtime base is the master key: unblocks
+OPERATE UNDER OPTION C (user decision 2026-10-04g; docs/BLOCKED.md is the
+runbook). Per turn: do B-priority work (from docs/OPEN-QUESTIONS.md or the
+phase list), then run the R1 cadence check: `ls -t work/r1/attempt-* 2>/dev/null |
+head -1` — if missing or older than 12 h, run `bash scripts/r1_attempt.sh`
+ONCE (bounded by design; exit 1 = normal negative, record one line and move
+on; exit 0 = R1 LIVE -> begin formula upgrades per BLOCKED.md §DECISION.3;
+exit 2 = harness error, fix harness, do not log negative). SA_ ability wiring
+DONE (2026-10-04e; gate 3m). All five end-*.txt victory conditions evaluated
+2026-10-04f (73/73 tests). No open non-R1 item remains; CONTRACT CHECKLIST
+fully [x]. R1 = exe runtime base is the master key: unblocks
 OQ-003 saves, OQ-005 sprites, OQ-010 combat arithmetic, OQ-017 vendor font,
 OQ-006 headerless sample rate, OQ-020 exact ability charge days, and
-CauseWar's third-party redirect). Verification criterion holds: gate 0 +
+CauseWar's third-party redirect. Verification criterion holds: gate 0 +
 CONTRACT CHECKLIST + PLAYTHROUGH victory record, all green 2026-10-04f.
 
 ## KNOWN-ISSUES / PARKING LOT
@@ -208,8 +228,16 @@ CONTRACT CHECKLIST + PLAYTHROUGH victory record, all green 2026-10-04f.
   interactive prompt; dosbox-x re-prints "Are you sure to quit anyway now?"
   forever when kill-signalled or fed EOF at a prompt. Bound
   (`timeout 60 ... | head -c 1M`) or drive via pty. nosound=true (no audio hw).
-  dosbox-x has NO gdb stub (strings: 0 markers). Salvaged log head shows the
+  dosbox-x has NO gdb stub (strings: 0 markers; `-break-start` debugger is
+  separate and UNVERIFIED — see docs/BLOCKED.md). Salvaged log head shows the
   game DID boot under dosbox (XMS/EMS, videomode 69).
+- R1 harness invariants (2026-10-04g, enforced in scripts/r1_attempt.sh):
+  NEVER mount game/ in dosbox (scratch copy work/r1/game; gate 3n checks no
+  'ascendancy/game' path reaches a conf); kill ONLY by `pkill -x dosbox-x`
+  (`pkill -f dosbox` once matched the calling shell's own cmdline and killed
+  the gate mid-run); dosbox-x self-blocks ptrace (ATTACH/SEIZE EPERM within
+  2 s — do not hand-roll tracer probes outside scripts/r1_tracer.py, which
+  self-checks against a plain child first); rsync is NOT installed.
 - resume.gam may be a different game version than the shipped exe — verify
   version stamps before trusting it as golden data (OQ-003 territory).
 - radare2 unavailable on Debian 13; no LE-capable Python pkg cached offline;

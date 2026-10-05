@@ -1,64 +1,71 @@
-# BLOCKED — one question for the user
+# BLOCKED.md — RESOLVED 2026-10-04g: option C chosen by the user
 
-Date: 2026-10-04. One question. Everything else proceeds under the stated
-default; this file records the fork, not a halt to all work.
+## DECISION (2026-10-04g, user)
 
-## Question
+Proceed under **C (hybrid), B-priority**. Operationally this means:
 
-The shipped `ascend.exe` (OS/2 LE, Watcom) has been proven to expose its
-**control flow** statically (269 functions bootstrapped, file order == memory
-order) but NOT its **data identities**: no static constant base maps code-side
-addresses to the data the code actually reads (four independent tests, all
-refuted — `docs/re/loader.md` §4, scripts named there). The rule formulas and
-constants for combat/economy/A therefore have two extraction routes, and they
-imply different risk/fidelity/effort profiles for the rest of the project:
+1. All rule/formula work continues on the data-first route (B): extracted
+   plaintext tables, manual prose, targeted disassembly, cited to
+   extracted-file offsets (contract-permitted), ambiguities to
+   OPEN-QUESTIONS. Nothing changes about how work is done today.
+2. **R1 is attempted once per session** via `scripts/r1_attempt.sh`
+   (mechanically enforced: `scripts/launch_ralph.sh` runs it at session start
+   when `work/r1/attempt-*` is >12 h old; a long-lived session re-checks the
+   same timestamp at turn start per STATE.md NEXT ACTION). The attempt is
+   bounded by construction and NEVER mounts `game/` — dosbox runs from a
+   scratch copy in `work/r1/game/` (safety invariant, gate 3n pins it).
+3. Whenever an attempt prints `R1 LIVE` (exit 0 + PAYLOAD HIT), the loop
+   upgrades formulas to exact (Campaign::attackScore/defenseScore/economy
+   phases, each cited to its OQ entry) and closes those OQs. Exit 1 = normal
+   negative under C — record one line in STATE.md, do not retry the turn.
+   Exit 2 = harness error — fix the harness; never log it as a negative.
 
-  A. **Runtime dump (R1)**: drive the original game in dosbox-x (pty, bounded
-     logs), dump memory after data load, correlate pointers against extracted
-     files to recover the live base, then re-run Ghidra fixed-base and lift
-     formulas the conventional way. Exact fidelity to the original formulas.
-     Cost: significant dosbox forensics (the previous dosbox session caused a
-     12 GB log incident — the guardrails exist but the route is untested here;
-     no gdb stub in this dosbox-x build, dumping means INT hook tricks or an
-     external tracer). Could consume many turns before producing anything.
+## Verified environment facts (harness-building session 2026-10-04g)
 
-  B. **Data-first (R2)**: implement systems from what IS verified — extracted
-     plaintext tables (race*.dip DIPVALUES weights, restree.txt tech tree,
-     ship/item tables), the manual's rule prose (23 pp rasterised in
-     docs/assets/manual-jpg/), targeted narrow disassembly of the 269 bootstrapped
-     functions where control flow alone constrains behaviour, and seeded
-     deterministic choices documented as choices. Constants cite extracted-file
-     offsets (explicitly allowed by the goal contract: "cites Ghidra addresses
-     OR extracted-file offsets"). Behaviour where formulas remain ambiguous is
-     labelled OPEN-QUESTIONS with the admissible range, never silently invented.
-     Cost: faster, lower risk, but exact combat/economy formula fidelity is
-     NOT guaranteed — a replay-faithfulness purist would object; a "playable
-     game of Ascendancy" reader would not.
+- dosbox-x 2025.02.01 **makes itself untraceable early in startup**: from the
+  same-uid parent, `PTRACE_ATTACH` (16) and `PTRACE_SEIZE` (0x4206) both
+  return EPERM, and `/proc/<pid>/maps` is EACCES from t+2 s onward, while the
+  identical probes on a plain `sleep` child succeed (the harness self-check
+  in `scripts/r1_tracer.py`). yama ptrace_scope=0, TracerPid=0.
+  ⇒ the **external-tracer capture route is dead on this box** without
+  emulator-side changes. Do not write a fourth ptrace probe; the mechanism is
+  dosbox-side.
+- The first real attempt ran through the harness and recorded cleanly
+  (`work/r1/attempt-*/tracer.log`: `TRACABLE=no`, exit 1, no stray
+  processes, log bounded).
+- dosbox-x `-time-limit <n>` exists (help text) and is used by the harness.
 
-  C. Hybrid: B for everything, plus R1 attempts interleaved once per session,
-     upgrading formulas to exact whenever the dump succeeds.
+## Remaining R1 route [unverified — pilot before trusting]
 
-## Best default I can proceed under
+`dosbox-x -break-start` ("Break into debugger at startup" — strings verified
+in the binary; the debugger also prints an "Enter Debugger Command" prompt).
+The debugger runs IN-process, so it sidesteps the ptrace block. Its command
+grammar (memory dump syntax, output destination) is UNKNOWN — pilot it
+manually under a pty with `timeout` + exact-name kill before automating;
+the DOSBOX RULE EOF-spam trap (STATE.md KNOWN-ISSUES) applies exactly when a
+debugger prompt is left at EOF.
 
-**C (hybrid), B-priority.** Rationale: the verification target is a seeded
-campaign turning to victory with gate-green evidence, not bit-exact replay;
-route A's preconditions (memory dump from this dosbox-x build) are themselves
-unproven, and betting the critical path on them risks turns with no output;
-the contract explicitly admits extracted-file-offset citations, so B is
-compliant, and interleaved A attempts can only improve fidelity for free.
-Ambiguities go to OPEN-QUESTIONS as required; nothing is invented.
+## Residual R1-blocked items (unchanged by the decision)
 
-If the user instead requires formula-exact parity (A-only), say so — the
-project COMPLETED under default C (gate green, victory playthroughs,
-checklist closed at 5ac604d), and retrofitting exact formulas into the
-working systems stays cheap: they are constants and small arithmetic in
-Campaign::attackScore/defenseScore/economy phases, each cited to its
-OQ entry. Residual R1-blocked items after completion: OQ-003 (.gam save
-map), OQ-005 (.shp pixel codec), OQ-006 (headerless sample rate),
-OQ-010 (combat arithmetic), OQ-017 (vendor .fnt font), OQ-019 (ship
-design screen). Pursuing any of them needs a runtime-capture capability
-this box lacks: dosbox-x here has no gdb stub, and the safe capture
-routes (INT-hook memory dump inside dosbox, or an external tracer under a
-custom emulator) each change how the original binary is EXECUTED — that
-environmental commitment is the user's call, not a step to take
-unilaterally.
+OQ-003 (.gam save map), OQ-005 (.shp pixel codec), OQ-006 (headerless sample
+rate), OQ-010 (combat arithmetic), OQ-017 (vendor .fnt font), OQ-019 (ship
+design screen). Retrofitting exact formulas after completion stays cheap:
+they are constants and small arithmetic, each cited to its OQ entry.
+
+## The original question (kept for the record)
+
+The shipped `ascend.exe` (OS/2 LE, Watcom) exposes its control flow
+statically (269 functions bootstrapped, file order == memory order) but not
+its data identities: no static constant base maps code-side addresses to the
+data the code reads (four independent tests, all refuted — docs/re/loader.md
+§4). Routes considered:
+
+  A. Runtime dump (R1): drive the original in dosbox-x, dump memory after
+     data load, correlate pointers against extracted files, re-run Ghidra
+     fixed-base, lift formulas conventionally. Exact fidelity; untested
+     route; risk of turns with no output.
+  B. Data-first (R2): implement from verified extracted tables, manual
+     prose, targeted disassembly; constants cite extracted-file offsets
+     (explicitly contract-allowed); ambiguities to OPEN-QUESTIONS.
+  C. Hybrid: B for everything, plus R1 attempts interleaved once per
+     session, upgrading formulas to exact whenever a dump succeeds. ← CHOSEN

@@ -166,6 +166,26 @@ if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
     || { tail -10 /tmp/gate_ability.log; err "charged ability never fired by turn 40 (charge 30)"; }
 fi
 
+# 3n. Option-C R1 harness invariants (docs/BLOCKED.md runbook): the attempt
+# harness must exist, must be executable, must NEVER reference a mount of the
+# pristine game/ tree (the 12 GB incident's sibling risk is corrupting the
+# baseline), and must kill only by exact process name. Static checks only —
+# running an R1 attempt is the LOOP's job (STATE.md NEXT ACTION cadence),
+# never the gate's (the gate must stay fast and side-effect-free).
+[ -s "$ROOT/scripts/r1_attempt.sh" ] || err "scripts/r1_attempt.sh missing (option C cadence)"
+[ -s "$ROOT/scripts/r1_tracer.py" ] || err "scripts/r1_tracer.py missing (option C cadence)"
+grep -vE '^[[:space:]]*#' "$ROOT/scripts/r1_attempt.sh" | grep -Eq 'pkill[ ]+-f' \
+  && err "r1_attempt.sh uses pkill -f (matches its own cmdline — killed a gate shell once)"
+grep -vE '^[[:space:]]*#' "$ROOT/scripts/r1_attempt.sh" | grep -q 'ascendancy/game' \
+  && err "r1_attempt.sh references the pristine game/ tree for dosbox (mount the work/r1 copy)"
+grep -q 'time-limit' "$ROOT/scripts/r1_attempt.sh" \
+  || err "r1_attempt.sh lost the dosbox -time-limit bound"
+# attempts, if any ran, must have stayed bounded: every recorded log <= 64 KB
+for f in "$ROOT"/work/r1/attempt-*/tracer.log; do
+  [ -f "$f" ] || continue
+  [ "$(stat -c%s "$f")" -le 65536 ] || { tail -c 400 "$f"; err "R1 tracer log >64KB: $f"; }
+done
+
 # 3l. Victory-condition grammar + CONTRACT smoke: end-*.txt blocks assert
 # (scripts/endtext_probe.py), and the rewrite binary must actually reach a
 # victory condition on a seeded headless campaign run (docs/PLAYTHROUGH.md).
