@@ -36,8 +36,8 @@ the byte) is verified, and the frame payloads decode stock (OQ-002 CLOSED,
 docs/re/flc.md). Both files are intro/logo video, not gameplay, so this
 never gated the campaign turn loop.
 
-- `extracted/ascend02/data/intro65a.flc`: FL_COLOR256 chunk present but declares 0 colours (a no-op chunk); the real palette for this file is therefore either in an `FLI_COLOR`(0x0004) chunk or supplied externally.
-- `game/logic.flc`: FL_COLOR256 chunk present but declares 0 colours (a no-op chunk); the real palette for this file is therefore either in an `FLI_COLOR`(0x0004) chunk or supplied externally.
+- `extracted/ascend02/data/intro65a.flc`: palette arrives via COLOR_256(4) subchunks (4 in file — frame 0 carries the initial one; decoded by scripts/flc_probe.py, docs/re/flc.md §2). The top-level PREFIX (0xF100) chunk is settings data, not palette.
+- `game/logic.flc`: palette arrives via COLOR_256(4) subchunks (1 in file — frame 0 carries the initial one; decoded by scripts/flc_probe.py, docs/re/flc.md §2). The top-level PREFIX (0xF100) chunk is settings data, not palette.
 
 ## 2. Audio [verified]
 
@@ -114,7 +114,14 @@ Count vs names: MISMATCH (87 names).
 field and the three rate numbers above cannot be attributed to specific files
 without the exe's audio loader; guessing it yields wrong-pitched audio.
 
-## 3. Fonts (.fnt) [container only]
+## 3. Fonts (.fnt) [CLOSED — codec solved, see docs/re/fnt.md]
+
+Codec (verified 384/384, scripts/fnt_probe.py, gate 3p): glyph = u32
+width + EXACTLY width*height bytes, 1 byte per pixel row-major, no
+stride padding; 0xFF background, ink intensity 255-value (sm/big solid
+0xF3; intro.fnt anti-aliased 0xF0..0xFE). The old 'payload 52 for w=6'
+observation is exactly 4+6*8 read as BYTES — there was never a bit
+format. Vision-confirmed legible: docs/assets/fnt-*-sheet.png.
 
 - `extracted/ascend01/data/bigfont.fnt` — 7376 B; u32s 0x2e31 0x80 0xb 0xff (dec 11 at +8)
 - `extracted/ascend01/data/smfont.fnt` — 4792 B; u32s 0x2e31 0x80 0x8 0xff (dec 8 at +8)
@@ -171,7 +178,8 @@ pixel codec) and must be parsed by the same reader — no separate script format
 ## 7. Open items created/updated by this probe
 
 - OQ-006 audio sample rate (headerless `.voc` + `.raw`).
-- OQ-011 `.fnt` glyph stride/packing.
+- OQ-017 CLOSED: .fnt is 1 byte/pixel (validator scripts/fnt_probe.py,
+  spec docs/re/fnt.md, gate 3p; C++ port src/formats/fnt.cpp).
 - OQ-002 CLOSED: FLIC payloads are stock Autodesk chunks; full decode in
   scripts/flc_probe.py, spec in docs/re/flc.md (gate stages 3e/3o).
 - OQ-005 `.shp`/`.tmp` pixel codec (shared with docs/re/shp.md).

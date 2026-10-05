@@ -252,7 +252,14 @@ def main():
     P("")
 
     # ---------------- fonts ----------------
-    P("## 3. Fonts (.fnt) [container only]")
+    P("## 3. Fonts (.fnt) [CLOSED — codec solved, see docs/re/fnt.md]")
+    P("")
+    P("Codec (verified 384/384, scripts/fnt_probe.py, gate 3p): glyph = u32")
+    P("width + EXACTLY width*height bytes, 1 byte per pixel row-major, no")
+    P("stride padding; 0xFF background, ink intensity 255-value (sm/big solid")
+    P("0xF3; intro.fnt anti-aliased 0xF0..0xFE). The old 'payload 52 for w=6'")
+    P("observation is exactly 4+6*8 read as BYTES — there was never a bit")
+    P("format. Vision-confirmed legible: docs/assets/fnt-*-sheet.png.")
     P("")
     for f in sorted(glob.glob(os.path.join(ROOT, 'extracted', '**', '*.fnt'), recursive=True)):
         b = open(f, 'rb').read()
@@ -326,7 +333,8 @@ def main():
     P("## 7. Open items created/updated by this probe")
     P("")
     P("- OQ-006 audio sample rate (headerless `.voc` + `.raw`).")
-    P("- OQ-011 `.fnt` glyph stride/packing.")
+    P("- OQ-017 CLOSED: .fnt is 1 byte/pixel (validator scripts/fnt_probe.py,")
+    P("  spec docs/re/fnt.md, gate 3p; C++ port src/formats/fnt.cpp).")
     P("- OQ-002 CLOSED: FLIC payloads are stock Autodesk chunks; full decode in")
     P("  scripts/flc_probe.py, spec in docs/re/flc.md (gate stages 3e/3o).")
     P("- OQ-005 `.shp`/`.tmp` pixel codec (shared with docs/re/shp.md).")
