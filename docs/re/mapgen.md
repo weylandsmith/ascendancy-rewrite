@@ -62,11 +62,22 @@ starstat table (§1). The connective ALGORITHM (edge selection) is NOT in
 any extracted file — it is our documented choice, constrained to match the
 measured degree statistics:
 
-1. Place N stars (default **75** = snapshot; configurable 30..200).
-   Positions: uniform on a 1024x1024 logical map (snapshot coord bounds
-   <=639x479, §3; we use a power-of-two grid and scale at render — choice,
-   OQ-012), rejection-sampled to a minimum separation of 60 units so lane
-   geometry stays readable (choice).
+1. Place N stars (default **50** = fresh campaigns measured 5/5,
+   docs/re/r1-savestate.md 2026-10-06p; configurable 30..100).
+   Positions [MEASURED 2026-10-06p, supersedes the earlier uniform-box
+   choice]: star at table slot k sits at radius SHELL[k] from the map centre
+   in a uniformly random direction. SHELL = 440 (k 0..25), 365 (26..37),
+   290 (38..43), 215 (44..46), 140 (47), 65 (48), 50 (49) — populations
+   26/12/6/3/1/1/1, radius identity exact-float across 5 campaigns with 0
+   inversions of 1225 pairs. NO minimum separation (closest observed pair
+   24.4 < old 60 choice; rejection sampling removed). The original is 3D
+   (sphere r=440 shells, uniform-on-sphere direction); the rewrite keeps its
+   documented 2D model — the xy-projection of a uniform-on-sphere direction
+   is uniform in angle, so one uniform angle reproduces the projected law.
+   Scale note: default mapSize 1024 keeps radii at ORIGINAL values (centre
+   512,512, outer shell 440 <= 512-60); maps smaller than 2*(440+pad)
+   scale ALL shells uniformly by (mapSize/2 - pad)/440 so ordering and
+   populations are preserved (choice; OQ-012(a) may pin other sizes).
 2. Star type: weighted draw from the §1 percent column.
 3. Planets per star: **uniform 1..5** (choice, uniform-vs-biased indistingui-
    shable from the §3 histogram at n=75; OQ-012). Orbit index = index+1,

@@ -54,8 +54,12 @@ random direction (r(k): 440 k0-25, 365 k26-37, 290 k38-43, 215 k44-46, 140
 k47, 65 k48, 50 k49 — exact float identity across 5 campaigns, 0 inversions;
 no type/position coupling: rho(u1C,r3)=+0.02, rho(u25,r3)=+0.03 over 250
 stars; sub0 rho -0.59 is confounded by k-ordering. No min-separation enforced
-(min observed 24.4). Rewrite box-placement DIVERGENCE upgrade scheduled =
-STATE NEXT ACTION, code site mapgen.cpp:88-110).
+(min observed 24.4). Rewrite UPGRADED 2026-10-06q: mapgen.cpp placement =
+shell schedule x uniform angle (kShellR mapgen.cpp:93; starCount default
+75->50 at mapgen.h:50 + campaign.h:57; rejection sampling + capacity check removed;
+test galaxy_positions_follow_measured_shell_law pins radii/populations;
+84 tests 0 failed; gate 4b seeded seed-2024 campaign still wins Control t148;
+mapgen.md §4.1 rewritten with scale note).
 (d) CLOSED 2026-10-06k (extent = stars on sphere r~440, orbit-pair retraction;
 superseded/refined by (c) shells) | open | (a): setup-screen live RAM state from
 r1ad captures (options UI lives in RAM at pointer-law base).

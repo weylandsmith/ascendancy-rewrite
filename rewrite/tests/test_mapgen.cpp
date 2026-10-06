@@ -111,7 +111,7 @@ TEST(galaxy_invariants_over_many_seeds) {
         MapConfig cfg;
         cfg.seed = static_cast<unsigned>(s) * 7919u;
         Galaxy g = MapGenerator(cfg, *st, names).generate();
-        CHECK(g.stars.size() == 75u);
+        CHECK(g.stars.size() == 50u);
         CHECK(g.connected());                     // lanes spine (§4.4a)
         std::set<std::string> starNames, planetNames;
         for (const auto& star : g.stars) {
@@ -136,6 +136,36 @@ TEST(galaxy_invariants_over_many_seeds) {
     CHECK(maxOrbit <= 5);
 }
 
+TEST(galaxy_positions_follow_measured_shell_law) {
+    // docs/re/r1-savestate.md 2026-10-06p: radius-by-slot shells 440(k<26)
+    // 365(26..37) 290(38..43) 215(44..46) 140(47) 65(48) 50(49), identity
+    // across 5 campaigns; default mapSize keeps scale 1.0 so radii are exact.
+    auto st = shippedStats();
+    if (!st) return;
+    std::string err;
+    auto names = ascend::game::loadStarNames(kRepo / "extracted" / "ascend00" / "names.txt", &err);
+    auto shell = [](int k) {
+        return k < 26 ? 440 : k < 38 ? 365 : k < 44 ? 290 : k < 47 ? 215 : k == 47 ? 140 : k == 48 ? 65 : 50;
+    };
+    for (unsigned s = 1; s <= 10; ++s) {
+        MapConfig cfg;
+        cfg.seed = s * 104729u;
+        Galaxy g = MapGenerator(cfg, *st, names).generate();
+        int pops[7] = {0, 0, 0, 0, 0, 0, 0};
+        for (size_t k = 0; k < g.stars.size(); ++k) {
+            const double dx = g.stars[k].x - 512.0, dy = g.stars[k].y - 512.0;
+            const double r = std::sqrt(dx * dx + dy * dy);
+            // rounding of int coords: |r - shell| <= ~0.71
+            CHECK(std::abs(r - shell(static_cast<int>(k))) < 1.0);
+            int band = k < 26 ? 0 : k < 38 ? 1 : k < 44 ? 2 : k < 47 ? 3 : k == 47 ? 4 : k == 48 ? 5 : 5;
+            ++pops[band];
+        }
+        // measured populations 26/12/6/3/1/1/1 (bands merged: outer..5)
+        CHECK(pops[0] == 26 && pops[1] == 12 && pops[2] == 6 && pops[3] == 3 && pops[4] == 1 &&
+              pops[5] == 2);
+    }
+}
+
 TEST(galaxy_lanes_are_simple_and_bounds_checked) {
     auto st = shippedStats();
     if (!st) return;
@@ -146,7 +176,7 @@ TEST(galaxy_lanes_are_simple_and_bounds_checked) {
     Galaxy g = MapGenerator(cfg, *st, names).generate();
     std::set<std::pair<int, int>> seen;
     for (const auto& l : g.lanes) {
-        CHECK(l.a >= 0 && l.b >= 0 && l.a < 75 && l.b < 75);
+        CHECK(l.a >= 0 && l.b >= 0 && l.a < 50 && l.b < 50);
         CHECK(l.a != l.b);                                    // no self-loops
         CHECK(seen.insert({l.a, l.b}).second);                // no duplicates
         CHECK(seen.find({l.b, l.a}) == seen.end());           // undirected, one copy

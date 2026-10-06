@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-06T15:25
+updated: 2026-10-06T17:13
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -33,7 +33,9 @@ ledger:
     - "OQ-005 .shp pixel codec — static route exhausted (6 angles, docs/REFUTED-ROUTES.md); needs exe shape loader via live image"
     - "OQ-006 headerless sample rate — needs exe audio-init constant"
     - "OQ-004 which tables the exe loads + .tsv grammar — needs open-file thunk via live image"
-    - "OQ-012 mapgen (a) size options (b) pps distribution shape (c) type/position correlation (d) map extent"
+    - "OQ-012 mapgen: ONLY (a) size options open; (b) closed 06o (pps U{1..5}),
+      (c) closed 06p/06q (shell position law; rewrite upgraded + tested),
+      (d) closed 06k (sphere extent, refined by (c))"
     - "OQ-013 restree variant field0 semantics — needs research-screen code"
     - "OQ-014 planitem unknown fields (254 sentinel, 22/9, grids, item flag bits)"
     - "OQ-015 DA_ template selection order + full %token table"
@@ -76,20 +78,19 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-MAPGEN UPGRADE to the measured shell law (closes the OQ-012(c) rewrite-side
-DoD leg; coding task, no capture). rewrite/src/game/mapgen.cpp:88-110 places
-stars uniform-in-box with rejection sampling; the ORIGINAL (measured
-2026-10-06p, 5 campaigns, exact float identity) = star at table slot k sits
-at radius SHELL[k] from origin x uniformly-random direction on the sphere:
-  shell(k): 440 k<26 | 365 k<38 | 290 k<44 | 215 k<47 | 140 k=47 | 65 k=48 |
-  50 k=49; NO minimum separation (min observed 24.4 < rewrite's 60 - drop
-  rejection). Rewrite stores int x,y (2D); original is 3D float — preserve
-  the documented 2D model [x,y only], scale shells so the galaxy fits the
-  existing mapSize convention (record the scale factor + rationale in
-  docs/re/mapgen.md §4.1; the shell RANKS/populations must stay exact:
-  26/12/6/3/1/1/1). Update unit tests: shell-population invariant +
-  determinism; run the full test suite + gate. Exit: commit with STATE
-  updated. Do NOT touch lane-building or type assignment (separate OQs).
+OQ-013 RESTREE ACTIVE ROWS (offline, zero capture cost; banked fresh-campaign
+RAM + pointer-law base). Campaign default is "union of main tree + variants";
+the question is which research rows the ORIGINAL has live in a FRESH campaign.
+Plan: (1) locate the research-state block in a fresh capture (candidate:
+scan for the restree row-count shape near the pointer-law base window, same
+census method that cracked the planet/star tables); (2) diff fresh vs a
+banked mid-campaign capture for rows that flip 0->1 (researched) — rows that
+exist at all define "in play"; (3) if the variant tree is absent in RAM on a
+fresh map, campaign default flips union->main-tree with the measurement
+cited; if present, union stands, cited. Numbers go into a new section of docs/re/research.md + the ledger. If no research block is locatable in existing captures,
+record the exit-1 negative and move NEXT ACTION (do NOT spiral; the research-
+screen capture wedge needs a separate adaptive round). (Doc target:
+docs/re/research.md exists already; add the section there.)
 
 ## KNOWN-ISSUES / PARKING LOT (operational; research negatives live in
 ## docs/REFUTED-ROUTES.md)

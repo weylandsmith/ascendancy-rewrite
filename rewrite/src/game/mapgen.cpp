@@ -10,7 +10,6 @@
 namespace ascend::game {
 namespace {
 
-uint64_t sq(int v) { return static_cast<uint64_t>(v) * static_cast<uint64_t>(v); }
 uint64_t dist2(const Star& a, const Star& b) {
     const int64_t dx = a.x - b.x, dy = a.y - b.y;
     return static_cast<uint64_t>(dx * dx + dy * dy);
@@ -70,13 +69,10 @@ MapGenerator::MapGenerator(MapConfig cfg, const StarStats& stats, std::vector<st
 
 Galaxy MapGenerator::generate() const {
     if (cfg_.starCount < 2) throw std::logic_error("mapgen: need >= 2 stars");
-    if (cfg_.minSeparation <= 0 || cfg_.mapSize <= cfg_.minSeparation)
+    if (cfg_.minSeparation <= 0 || cfg_.mapSize <= 2 * cfg_.minSeparation)
         throw std::logic_error("mapgen: bad separation/mapSize");
-    // Rough capacity bound for rejection sampling; beyond it the grid cannot
-    // seat the requested count and we fail loudly instead of spinning.
-    const uint64_t cells = sq(cfg_.mapSize / cfg_.minSeparation);
-    if (static_cast<uint64_t>(cfg_.starCount) > cells)
-        throw std::logic_error("mapgen: starCount exceeds placement capacity for separation");
+    // (Shell placement has no capacity limit — the original overlaps stars on
+    // a shell freely — so the old rejection-grid capacity check is gone.)
     if (static_cast<int>(names_.size()) < cfg_.starCount)
         throw std::logic_error("mapgen: not enough star names for starCount (names.txt has 101)");
 
@@ -84,31 +80,47 @@ Galaxy MapGenerator::generate() const {
     g.seed = static_cast<int>(cfg_.seed);
     std::mt19937 rng(cfg_.seed);
 
-    // --- 1. positions: uniform in [pad, mapSize-pad], rejection-sampled to
-    //        minSeparation (docs/re/mapgen.md §4.1). Deterministic order.
-    const int pad = cfg_.minSeparation;
+    // --- 1. positions: measured SHELL law (docs/re/mapgen.md §4.1; measured
+    //        docs/re/r1-savestate.md 2026-10-06p: radius-by-slot table with
+    //        exact float identity across 5 fresh campaigns, 0 inversions of
+    //        1225 pairs). Star at table slot k sits at SHELL[k] x a uniformly
+    //        random direction. The original enforces NO minimum separation
+    //        (closest observed pair 24.4 units), so there is no rejection
+    //        loop. 2D model: the xy-projection of a uniform-on-sphere
+    //        direction is uniform in angle, so one uniform angle reproduces
+    //        the projected law exactly. Slots past the measured 50 cycle the
+    //        schedule [inferred; non-default starCount only — OQ-012(a)].
+    static const int kShellR[50] = {
+        440,440,440,440,440,440,440,440,440,440,
+        440,440,440,440,440,440,440,440,440,440,
+        440,440,440,440,440,440,
+        365,365,365,365,365,365,365,365,365,365,365,365,
+        290,290,290,290,290,290,
+        215,215,215,
+        140,
+        65,
+        50,
+    };
+    const double kOuterR = 440.0;  // outermost measured shell (original units)
+    // Default mapSize (1024) keeps the ORIGINAL radii untouched (scale 1.0);
+    // smaller maps scale the whole shell system down to fit
+    // (docs/re/mapgen.md §4.1 scale note).
+    const double scale =
+        static_cast<double>(cfg_.mapSize) >= 2.0 * (kOuterR + cfg_.minSeparation)
+            ? 1.0
+            : (cfg_.mapSize / 2.0 - cfg_.minSeparation) / kOuterR;
+    const double cx = cfg_.mapSize / 2.0, cy = cfg_.mapSize / 2.0;
+    const double kTau = 6.283185307179586;
+    std::uniform_real_distribution<double> uang(0.0, kTau);
     g.stars.reserve(cfg_.starCount);
     for (int i = 0; i < cfg_.starCount; ++i) {
-        std::uniform_int_distribution<int> coord(pad, cfg_.mapSize - pad);
-        bool placed = false;
-        for (int attempt = 0; attempt < 500 && !placed; ++attempt) {
-            Star s;
-            s.id = i;
-            s.x = coord(rng);
-            s.y = coord(rng);
-            bool ok = true;
-            for (const auto& t : g.stars) {
-                if (dist2(s, t) < static_cast<uint64_t>(sq(cfg_.minSeparation))) {
-                    ok = false;
-                    break;
-                }
-            }
-            if (ok) {
-                g.stars.push_back(s);
-                placed = true;
-            }
-        }
-        if (!placed) throw std::logic_error("mapgen: rejection sampling exhausted");
+        Star s;
+        s.id = i;
+        const double a = uang(rng);
+        const double r = kShellR[i % 50] * scale;
+        s.x = static_cast<int>(std::llround(cx + r * std::cos(a)));
+        s.y = static_cast<int>(std::llround(cy + r * std::sin(a)));
+        g.stars.push_back(std::move(s));
     }
 
     // --- 2. star types: weighted by the percent column (§4.2)
@@ -154,7 +166,7 @@ Galaxy MapGenerator::generate() const {
                 if (dd < bestD2) {
                     bestD2 = dd;
                     best = static_cast<int>(c);
-                    // remember the partner by re-deriving: cheap at n=75
+                    // remember the partner by re-deriving: cheap at n=50
                 }
             }
         }

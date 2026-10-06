@@ -42,8 +42,12 @@ struct Galaxy {
 };
 
 struct MapConfig {
-    // Defaults measured from the golden snapshot (docs/re/mapgen.md §3-4).
-    int starCount = 75;   // snapshot has 75 distinct star bases
+    // starCount: FRESH campaigns measured 50 systems exactly, 5/5 runs
+    // (docs/re/r1-savestate.md 2026-10-06p star battery); the old 75 was a
+    // restored-snapshot reading (mapgen.md §3) — different size selection,
+    // OQ-012(a). minSeparation no longer gates placement (shells allow
+    // overlap) but still pads the fit-to-map scale below.
+    int starCount = 50;
     int mapSize = 1024;   // OQ-012 (snapshot bounds <= 639x479)
     int minSeparation = 60;
     int maxPlanets = 5;   // orbit numerals never exceed V in the snapshot

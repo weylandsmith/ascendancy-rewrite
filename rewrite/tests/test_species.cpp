@@ -66,7 +66,7 @@ Shared& shared() {
 // owner has one (unless playerSpecies >= 0, which also grants the player's).
 ag::Campaign makeCrafted(unsigned seed, int aiOwner, ag::SpeciesAbility ab,
                          int playerSpecies = -1, int aiCount = 6,
-                         int starCount = 75, bool freeForAll = true) {
+                         int starCount = 50, bool freeForAll = true) {
     Shared& s = shared();
     std::vector<ag::SpeciesAbility> abilities(aiCount, ag::SpeciesAbility::Unknown);
     abilities[aiOwner - 1] = ab;

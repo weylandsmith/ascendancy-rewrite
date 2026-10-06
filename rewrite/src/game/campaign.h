@@ -54,7 +54,7 @@ struct CampaignConfig {
     // entry is evaluated too but not required — docs/re/turnloop.md §5).
     bool freeForAll = true;
     int aiCount = 6;            // <= 6: NUMCONTROLS 7 total controls (turnloop.md §2)
-    int starCount = 75;         // mapgen snapshot default (mapgen.md §3)
+    int starCount = 50;         // fresh campaigns measured 5/5 (r1-savestate 06p)
     double initialPop = 20;     // [inferred default, turnloop.md §3]
     int popCap = 100;           // [inferred default; UPOP units undocumented]
     // Player species (specnum into docs/re/species.md): -1 = human, no SA_
