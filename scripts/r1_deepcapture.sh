@@ -38,7 +38,10 @@ SCHEDULE="${SCHEDULE:-75:318:293}"
 # re-click on a 11 s cadence (autosave=10 law gives one save per check) and
 # STOP as soon as the needle shows up in the newest slot — so a screen that
 # already transitioned receives at most the one click that triggered it.
-VERIFY_NEEDLE="${VERIFY_NEEDLE:-cosmic exiles}"
+# NOTE `${VAR-default}` NOT `${VAR:-default}`: an EXPLICIT empty needle must
+# mean "no needle check" (the :- form silently resurrects the default and the
+# baseline guard then fires a false exit 2 — hit 2026-10-06).
+VERIFY_NEEDLE="${VERIFY_NEEDLE-cosmic exiles}"
 MAX_EXTRA_CLICKS="${MAX_EXTRA_CLICKS:-5}"
 OUT="$ROOT/work/r1/r1deep-$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$OUT" || exit 2

@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-05T23:55
+updated: 2026-10-05T23:40
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -499,21 +499,20 @@ joins resume.gam<->live RAM 151/151 (stride-123 records; +0x68/+0x69 are
 generation constants, NOT turn clock — refuted same-minute). names.txt pool
 resident in fresh-galaxy RAM (mapgen law confirmed at runtime).
 THE next action is:
-LONG IN-GAME CAPTURE (OQ-010 critical path). The new-game flow is now a
-PROVEN TWO-CLICK LAW: 75 s New Game (window 318,293) -> 115 s start
-(window 600,440); scripts/r1_campaign_probe.py verifies the campaign
-actually started (rec0 name at phys 0x26d07b). Run r1_deepcapture.sh with
-BOOT>=420 and SCHEDULE="75:318:293;115:600:440", keep slots, then diff
-adjacent mtime-consecutive slots of the LIVE campaign (not title-vs-game):
-turns advance in the original game, so consecutive-slot diffs isolate
-ECONOMY/COMBAT-adjacent mutations. Pointer law decodes heap refs in
-non-restored pages (rv-P0 = payload file offset inside image span; else
-runtime heap). Correlate mutated regions against extracted/ascend02 tables
-and the stride-123 planet record (+0x68/+0x69 are generation constants, do
-not mine; static boundary from ATTEMPT 3 still governs: trust only rel32
-edges + rewritten-site immediates). Exit codes drive the loop (0=upgrade,
-1=record one line, 2=fix harness). Residual unknowns stay filed exactly as
-the contract's evidence rules require; none blocks playability to victory.
+PLANET-FIELD SEMANTICS (OQ-010/OQ-003 joint). Laws now in hand: turn counter
+u16 phys 0x254e10 family (idle-pinned 0, NEXTTURN-advanced, click law
+75:318:293;115:600:440 then (511,67) cadence); planet records mutate ONLY on
+turn boundaries; hot block = older-convention +0x35..0x3F (name-based
++0x57..0x61) with high-entropy every-turn u16s. Do: (a) Ghidra xref pass —
+planet-table stride 0x7b accesses (FUN_0004ae24 family) and which code reads
+u16 at intra-offsets 0x35..0x3f; (b) targeted capture variants (settle one
+planet ownership/production via clicks between NEXTTURNs, diff ONLY the
+touched record); (c) map counter offset via a timed run (click NEXTTURN at a
+measured autosave phase, compare counter delta to expected turns). Decode
+changed u32s by pointer law; correlate hot regions against
+extracted/ascend02 tables. Exit codes drive the loop (0=upgrade, 1=record
+one line, 2=fix harness). Residual unknowns stay filed exactly as the
+contract's evidence rules require; none blocks playability to victory.
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr

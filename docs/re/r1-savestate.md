@@ -110,6 +110,63 @@ attaching to a process.
   tools/xsend grew a `key KEYSYM [ch]` mode (compiled clean; synthetic key
   delivery to the DOS guest still UNVERIFIED — prove with a text-entry
   screen before relying on it).
+  STRATEGY-SCREEN CONTROL COORDS [verified from extracted/ascend00/
+  windows.txt §TURNCOUNT/NEXTTURN/NEXTTURNCONT]: NEXTTURN rect X0 474 Y0 52
+  X1 548 Y1 82 -> click center (511,67), SENDMESSAGE 7; NEXTTURNCONT rect
+  557/52-632/82 -> center (594,67), SENDMESSAGE 8; TURNCOUNT display 474/7-
+  632/43 (SHAPEFRAME 65 + DIGITFRAMES 55 = digit-glyph rendering, ties to
+  shp spec). COORD LAW CONFIRMED INDEPENDENTLY: FRESHGAME rect 159/280-
+  477/310 -> center (318,295); measured landing click (318,293) — exact X
+  center, 2 px off center Y, both inside rect. Game coords == window-relative
+  for two windows.txt-derived predictions (FRESHGAME, and setup-start
+  elimination at (600,440)). Next capture
+  schedule: 75:318:293;115:600:440; then NEXTTURN every ~20 s to advance
+  turns; adjacent-slot deltas then isolate TURN-PROCESSING mutations
+  (scripts/r1_slot_delta.py, --mask 0x370000-0x3c0000).
+  IDLE-CHURN FINDING (run 221429, r1_slot_delta first blood): with the render
+  buffer masked, an IDLE campaign still mutates ~6 KB/10 s at phys 0x2e0000
+  (same page as the star-name pool), intermittently (pairs 54-56 ~zero);
+  0x1040000/0x1b0000 trickle ~50-100 B. 0x2e0000 is the primary game-state
+  mutation page candidate; idle churn source [unverified — animation/clock].
+  Render-buffer law: phys 0x370000-0x3bffff churns ~64 KB/10 s with smooth
+  byte gradients (entropy 6.4) while merely displaying — ALWAYS mask before
+  game-state census.
+
+TURN-CLOCK + TURN-BOUNDARY LAWS (run r1deep-20261005-230146 vs idle controls
+221429/224916, same harness, clicks 75:318:293;115:600:440 then 10x NEXTTURN
+at (511,67) every ~25 s):
+  TURN COUNTER u16 physical 0x254e10 (identical sequences at 0x254fb4/
+  0x2551a2/0x255390/0x25576c and planet-table-relative 0x26dbb2; doubled
+  mirrors at phys 0x26e080/82/830/832 = value*2 [field meanings unverified]).
+  Monotone nondecreasing across ALL slots; IDLE campaigns pin it at 0 in
+  EVERY slot of BOTH control runs; the click run walked 2->9. NEXTTURN at the
+  windows.txt-derived (511,67) WORKS — turn advancement confirmed byte-wise.
+  Counter offset semantics [unverified]: value 2 by the first autosave; do
+  NOT assume turn# == value until a timed run pins the mapping.
+  TURN-BOUNDARY LAW: planet records (phys 0x26d07b, stride 123) mutate ONLY
+  between slots whose turn counter differs — 0 changed record bytes across
+  all 12 non-boundary pairs; ~600-950 per hot offset across the 7 boundary
+  pairs. CONVENTION: offsets below are relative to rec0 NAME position
+  (phys 0x26d07b); the DEEP-HEAP census aligned records with the name at
+  +0x59, so a name-anchored 123-B window = [tail of anchored record
+  (name-rel 0x00..0x21 = old +0x59..0x7A)] + [head of the NEXT record
+  (name-rel 0x22.. = old +0x00..)]. All hot offsets below are >= 0x57 and
+  therefore HEAD fields of the record whose name anchors the next window:
+  convert with o'=o-0x22. Hot per-record fields: the +0x57..0x61
+  block (counts ~940/151 recs; = older-convention +0x35..+0x3F) plus +0x5a
+  (124) and +0x5e (91). The +0x57..0x5f u16 values read as high-
+  entropy per-record noise changing every turn (33281->9351 etc.) —
+  consistent with RNG/state-mixing fields, NOT counters [interpretation
+  flagged; the census is the fact]. Name fields +0x00..0x12 NEVER change.
+  IDLE CHURN REFINED: idle page 0x2e0000 churn (~6 KB/10 s) is NOT the planet
+  table (zero planet churn off-boundary) — name-pool neighborhood or adjacent
+  runtime animation; mask remains required.
+  Harness lessons: (1) VERIFY_NEEDLE="" was silently overridden by
+  ${VAR:-default} -> false exit-2 baseline fire; fixed to ${VAR-default}.
+  (2) A 420 s foreground tool timeout kills the WRAPPER mid-run while dosbox
+  and autosave continue (slots stayed 20/20, clicks all delivered) — read the
+  run dir directly; never trust the missing wrapper log as run failure.
+
   +0x69 IS NOT a turn clock: REFUTED same-minute (run 215445) — rec0
   (+0x68,+0x69) = (152,37) in all 20 slots across a campaign restart AND
   an idle stretch; rec0 reads (152,37) in BOTH independently-generated new
