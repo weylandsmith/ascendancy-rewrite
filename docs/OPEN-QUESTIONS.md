@@ -57,9 +57,10 @@ OQ-014 | rules | planitem unknowns: REQUIRES=254 (Interstellar Trucking),
 count triple 22/9, the 11x4 + 5x15x2 grids, item FLAG bits (current: 254
 ungated; grids parsed-unused) | open | W2/W3: grid consumers in code +
 controlled economy diffs.
-OQ-015 | dip | full %token table beyond %m %y %s %t; DA_ template selection
-order | open | W4: race module (20 E1 sites) — dialogue selection loop in
-code.
+OQ-015 | dip | DA_ template selection order (%token table CLOSED 2026-10-06g:
+exhaustive regex over 22/22 .dip files yields exactly %m %y %s %t — no other
+tokens exist) | open | W4: race module (20 E1 sites) — dialogue selection
+loop in code (obj1 call-edge route, same class as OQ-021(b)).
 OQ-016 | loop | campaign per-turn constants: income formula, pop growth
 curve/cap, starting items, build order, expansion cadence, home placement
 (all currently documented defaults in campaign.cpp) | open | W2: controlled
