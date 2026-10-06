@@ -17,6 +17,10 @@ asserts the summary line so a silently-changed golden save or a broken
 stride invariant fails the build.
 
 Usage: gam_probe.py [--out FILE] [--quiet]
+NOTE: --out DEFAULTS to docs/re/savegame.md, which carries hand-written
+sections BELOW the generated block (golden-tour notes 2026-10-05e). A bare
+run truncates them. Regenerating the doc must be followed by git review, or
+pass --out /tmp/... (what gate stage 3f does). [pitfall hit 2026-10-05k]
 """
 import argparse, os, re, re as RE, struct, sys, collections
 
