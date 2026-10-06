@@ -213,6 +213,13 @@ while kill -0 "$DB" 2>/dev/null; do
     rm -f "$OUT/cmd_shot"
     DISPLAY=":$DISP" import -window root "$OUT/live-$(printf %03d "$CKN").png" 2>/dev/null
   fi
+  if [ -f "$OUT/cmd_key" ]; then
+    K=$(tr -d '[:space:]' < "$OUT/cmd_key"); rm -f "$OUT/cmd_key"
+    [ -n "$K" ] && { checkpoint || true
+      WID=$(DISPLAY=":$DISP" xdotool search --name "DOSBox-X" | head -1)
+      DISPLAY=":$DISP" xdotool key --clearmodifiers --window "$WID" "$K" 2>>"$OUT/err.log" \
+        && echo "key $K" >> "$OUT/click.log"; }
+  fi
   if [ -f "$OUT/cmd_click" ]; then
     read -r CX CY < "$OUT/cmd_click" || true
     rm -f "$OUT/cmd_click"

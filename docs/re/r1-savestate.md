@@ -698,3 +698,17 @@ Harness fix queued: return to strategic map (escape/close the planet view)
 BEFORE NEXTTURN clicks. Also measured: fresh single-colony map has exactly 1
 planet with the colonized NAME+0x28..0x30 block non-default — block is
 per-settled-colony, consistent across three campaigns.
+
+### Round-2 crossread, run r1ad-20261006-142745 (2026-10-06h, exit-1):
+planet view is STICKY — no click-dismiss found; NEXTTURN blocked while open.
+Entry clean (grid law t=114). NEW FACT: the new-campaign flow includes a
+MINIONS LORE screen (4 paragraphs, vision-verified title header) that
+center-clicks (320,240) advance — 3 clicks returned to the strategic map.
+Planet view opened via Planets menu (window 508,137) straight to THIS map's
+colony MASTICON III ('Enormous Supermineral Planet', 4 view thumbnails);
+thumbnail 4 (root ~262,283) cycles an inner view (dot-grid dot-map), it does
+NOT close. Dismiss attempts that FAILED to close (turn stayed 0 throughout):
+thumbnail click, map-area click (150,200) [lands inside the view], sidebar
+re-click (511,67). HARNESS GAP: r1_adcapture has no key channel — MoO dialogs
+close on ESC. Fix queued (exit-2): add cmd_key (xdotool key) next round;
+NEXTTURN-while-open is CONFIRMED dead (two runs now).
