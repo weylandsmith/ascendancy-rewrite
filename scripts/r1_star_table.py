@@ -31,11 +31,13 @@ CONVENTION: star records are NAME-anchored; record k's NAME sits at
 
   PLANET RECORDS (name grid N_j = 0x26d07b + 123j, r1_campaign_probe law):
     star-pointer targets = N_j - 0x24 => the pointed-to record START precedes
-    the name by 0x24 bytes. The orbit pair sits at N_j+0x57 (f32) and
-    N_j+0x5f (f32): across 7 turn boundaries (run 230146) the PAIR's radius
-    sqrt(x^2+y^2) is CONSTANT to f32 precision for all 151 planets (0 drift
-    violations), while the pair VALUES change only between turn-counter
-    slots: planets ORBIT their star; the turn loop advances orbital phase.
+    the name by 0x24 bytes. The orbit pair sits at N_j+0x57 (f32 x) and
+    N_j+0x5f (f32 y) — 8-byte gap, +0x5b..5e zero padding. The pair orbits
+    the GALACTIC ORIGIN (0,0), NOT the owning star: radius sqrt(x^2+y^2)
+    about the origin is CONSTANT to f32 precision across all turn boundaries
+    (0 violations, 3 campaigns); star-centred radius drifts on 156/157
+    records. The pair VALUES change only between turn-counter slots: the
+    turn loop advances orbital phase (per-planet constant dtheta/turn).
     16 planets keep constant (x,y) every slot (Icarus, Masticon, Pendulon,
     Aquila II, Buntrusol) [semantics of the static set unverified].
 

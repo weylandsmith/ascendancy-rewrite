@@ -488,13 +488,14 @@ into the names.txt pool past record 50; every field offset is name-relative):
 
     name        char[]   star display name, NUL-terminated (chain start)
     name-0x18   u32      system index, 0-based == k — verified 50/50
-    name-0x14   f32[3]   star position (x, y, z). Extents run230146: x
-                         -391.4..379.2 y -426.7..410.8 z -346.1..432.5;
-                         center of mass ~origin (-13.9,-3.3,-23.2). Run
-                         233706 similar (all abs(coord) < 440). [012(d) map
-                         extent corroboration: the playable galaxy is a
-                         ~880-unit cube centred on (0,0,0) in this coord
-                         system; NOT a closure — generator controls untested.]
+    name-0x14   f32[3]   the STAR's own strategic-map position (x, y, z),
+                         NOT the planets' orbit centre (orbit pair is
+                         galacto-centric — see ORBIT LAW). Extents run230146:
+                         x -391.4..379.2 y -426.7..410.8 z -346.1..432.5;
+                         run 233706 similar (all abs(coord) < 440). [012(d)
+                         map extent corroboration: playable galaxy is a
+                         ~880-unit cube centred on (0,0,0); NOT a closure —
+                         generator controls untested.]
     name-0x1C   u32      small value 0..12 [semantics UNVERIFIED — measured
                          NOT moon count: agrees with live-assigned count 4/50,
                          raw-ptr count 6/50; Elwyssen reads 9 with 4 planets]
@@ -519,20 +520,26 @@ into the names.txt pool past record 50; every field offset is name-relative):
                          campaign carryover; the LIVE prefix rule is the law,
                          stale entries are allocator residue to ignore.
 
-PLANET ORBIT LAW (assigned planets, orbit pair f32 @ planet-name+0x57 (x) and
-+0x5f (y), star center from star name-0x14):
-  - CENTERED RADIUS sqrt(x^2+y^2) w.r.t. the owning star is CONSTANT to f32
-    precision across every slot and every turn boundary: 0 violations / 136
-    (run 230146) and 0 / 141 (run 233706). [The earlier STATE.md note
-    "planet0<->star distance 538..937 across slots" was UNCENTERED noise —
-    superseded by this measurement.]
+PLANET ORBIT LAW (orbit pair f32 x @ planet-name+0x57, f32 y @ +0x5f; 8-byte
+gap, +0x5b..0x5e zero padding):
+  - The pair is a position ORBITING THE GALACTIC ORIGIN (0,0), NOT the owning
+    star. RADIUS sqrt(x^2+y^2) about the ORIGIN is CONSTANT to f32 precision
+    across every slot and every turn boundary: 0 violations /151 (230146),
+    /157 (r1ad-131350), plus 233706. STAR-CENTRED radius is REFUTED: 156/157
+    records drift when measured w.r.t. star name-0x14 (r1ad-131350). [Both
+    '0-violation centered' claims earlier in this file came from analysis
+    CODE that never subtracted the center — the label was wrong, the number
+    was origin-based all along. Fixed 2026-10-06e.]
   - ANGULAR VELOCITY IS A PER-PLANET CONSTANT, applied by the turn loop:
-    dtheta/turn identical across all 7 boundaries of run 230146 for 135/151
-    planets (16 static planets contribute no samples). Direction is retrograde
-    in screen coords. Sample: r=544 -> -13.52 deg/turn; r=1983.5 -> -1.02;
-    r=2216.3 -> -0.81. NOT Kepler w*r^1.5=const (cv 0.178); closer to a w ~
-    1/r family but each planet carries its own constant (lift as a per-planet
-    table read from these fields, not as a derived formula).
+    dtheta/turn (origin-relative angles) identical across ALL boundaries for
+    every moving planet (135/151 run 230146; 139-row cross-run fit).
+    Retrograde. Sample: r=544 -> -13.52 deg/turn; r=1983.5 -> -1.02;
+    r=2216.3 -> -0.81. Cross-run fit w*r^2 cv 0.35 — NOT a clean power law
+    (w is effectively a per-planet constant, and same-radius planets share w:
+    only 3 of 25 distinct radii in the fit band showed >1 omega, all borderline
+    rounding). Lift per-planet (radius, dtheta) pairs, not a formula.
+    Fresh-map seed: all planets start theta 0 or 180 (y==0 exactly, radii
+    quantized 896/672/544/384...).
   - STATIC-PAIR SET: planets whose (x,y) never change any slot: 16/151 run
     230146, 28/167 run 233706. The UNASSIGNED set (no live star pointer) is a
     strict SUBSET of the static set in BOTH runs (orphan<=static verified) —
