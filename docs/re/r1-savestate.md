@@ -576,3 +576,53 @@ NOT proven: which loop is the turn-loop orbit writer; no f32 +0x57/+0x5f
 disp32 accesses exist in the payload (orbit reads are register-relative or
 through un-restored immediates — disp32 scan found only 2 bogus hits, both
 outside code ranges).
+
+### Controlled-boundary capture, run r1deep-20261006-123049 (2026-10-06c)
+
+Scheduled-click capture (8 clicks, 3 NEXTTURN landings, turn 0->3, battery
+green 20/20 slots). TWO OUTCOMES:
+
+(1) NEGATIVE (exit-1): the scheduled in-game clicks (map 115,251, planet
+screen 250,195) produced ZERO planet-record change on their bracketing
+intra-turn slot pairs (55->56, 58->59, 41->42 all 0/151). ROOT CAUSE
+[verified by reasoning + old-run cluster math]: the click point was a
+centroid of run 230146's map; every new campaign generates a NEW random map,
+so the point hit empty space. Static SCHEDULE schedules cannot target a
+random map — the click must be positioned from a LIVE screenshot of the SAME
+campaign. Next attempt = adaptive (background capture, vision-read a shot,
+xsend the click into the live run, autosaves bracket automatically).
+
+(2) POSITIVE (boundary census, new campaign, slots mtime-ordered
+56,57,58,59,60,41,42,43 = turns 0,1,1,2,2,2,3,3):
+  - MASS-WRITER LAW (clean): across all three turn boundaries the ONLY
+    planet-record offsets changing en masse (146/151 movers) are the orbit
+    f32 pair at NAME+0x57..0x5a (x) and NAME+0x5f..0x62 (y). 5 planets
+    static (this map's unassigned set). No other offset moves more than 5
+    records per boundary. Turn loop = orbit advance + a handful of state
+    fields; NOTHING else churns.
+  - COLONIZED-PLANET BLOCK (semantics UNVERIFIED, shapes pinned): exactly 5
+    records (the player's colonies: Tensoric I, Gasball III, Feculon II,
+    Freblinsee I, Smorgasbord III — all LIVE-owned, owner empire = player)
+    mutate at NAME+0x28..0x30 on turn boundaries ONLY:
+      NAME+0x28 u8   01 -> 02 at the FIRST boundary only (turn-counter-
+                     shaped? colonized-age?)
+      NAME+0x2a u8   per-turn increment PER-PLANET CONSTANT over 3 turns:
+                     +3/turn Tensoric+Feculon, +2/turn Gasball+Freblinsee,
+                     +1/turn Smorgasbord, and the byte STAYS 0 on all 146
+                     uncolonized planets (0,1,2,3 deltas over 3 turns;
+                     histogram {0:146, 3:1, 6:2, 9:2}). Production/income
+                     accumulator shape [UNVERIFIED which channel].
+      NAME+0x2c u8   0 -> 2 on the 4 faster-growing colonies, stays 0 on
+                     Smorgasbord III.
+      NAME+0x2e..30  ff ff ff -> small u24 value (35,21,36,19,0) at FIRST
+                     boundary — 'unset' sentinel initialising.
+  - The +3/+2/+1 per-planet rate is OQ-016 (income/growth formula) evidence:
+    it's a per-planet CONSTANT (not global), correlates with colony set, and
+    is measurable straight from these fields. Cross-check against
+    extracted/ascend02 size/production tables + more turns (need 5+ to
+    distinguish e.g. pop-growth vs build-queue accrual) rides with the
+    adaptive capture.
+  - Slot hygiene: slots 47..55 belong to the PREVIOUS campaign at the same
+    base (grid names Ajax/Almaviva); campaign identity check is planet
+    NAME@j, not slot index. Any census on a run MUST pin the campaign
+    boundary via turn counter first.
