@@ -284,3 +284,49 @@ pinned: constant scans must check the instruction encoding before claiming a
 constant (immediate vs coincidental rel32). 'which RNG does combat use' =
 OQ-010 subquestion, answerable by call-graph reach once more functions are
 seeded.
+
+## ATTEMPT 3: FULL AUTO-ANALYSIS + BATCH 3 — 2026-10-05j/early 05k
+
+ghp5/ascend5 (import ascend_restored.bin base 0x100000, FULL analysis,
+postScript ExportFunctions.java): 1,144 functions -> work/functions_full.tsv
+(vs 292 from the -noanalysis Seed bootstrap — confirms the reach hypothesis).
+analyzeHeadless mechanics measured: project DIRECTORY must pre-exist
+('Directory not found' abort); -process matches the IMPORTED FILE NAME
+(ascend_restored.bin), not the project name. Decompiler stream quality is now
+GOOD: only 3 of 40 exported batch files carry 'bad instruction data'
+warnings (156d4, 4ae24, 44848) — earlier warnings were the -noanalysis dark
+streams, not the code.
+
+BATCH 3 (27 engine-module E1 functions resolved under full analysis: cosmos
+8, race 6, gsystem 6, planet 6, ship 3, raceneg 3, ... joined
+attribution x functions_full; work/combat_decomp_targets.txt; files keyed by
+FILE OFFSET after the imgBase fix in DecompileCombat.java): arithmetic-scan
+top hits (imul/div/>> per file): 41e34 (race, 6087B), 25604 (flic+cosmos),
+41260 (race), 3f758 (race), 4ae24 (ship), 44a44 (raceneg). RESULT: 4ae24 is
+OPERATOR NEW / record allocation — `(x + -0x2b057)/0x7b` divides a pointer by
+record strides 0x7b/0x60/0x27 (three pooled record types), not combat math.
+No hit/damage/shield formula located yet. The E1-attributed corpus covers UI
++ allocators heavily because assert/trace strings cluster there.
+
+IMMEDIATE-ENCODING FRAME (hazard, pinned): absolute-address immediates come
+in THREE encodings and mixing them invents tables: (1) rewritten fixup sites
+(restored) = file offsets, trustworthy; (2) same-object link-time refs =
+intra-object offsets; (3) cross-object link-time refs = intra-TARGET-object
+offsets — NOT resolvable statically without the LE object table (route closed
+negative 05i). Worked refutation: immediate 0x7478b at site 0x41485
+(0x41260/race.cpp, payload==restored so encoding (2)/(3)): read as-is it
+lands mid-code-stream; an earlier draft of this section claimed the
+code-intra reading (+0x14bb0 -> 0x8933b) showed a 'u16-pair table' —
+REFUTED: 0x8933b bytes are UTF-16 text (0x64 'd', 0x3e '>', 0x4d 'M', 0x5a
+'Z', CJK 0x96, 0x46C). So for 0x7478b all file-readable interpretations are
+garbage -> it is an encoding-(3) cross-object value whose runtime target is
+unknowable from the static image. Corroborating tell: Ghidra itself labeled
+sibling constants in the same functions as 'bRam00077429' (EXTERNAL/RAM
+space), and the recurring race.cpp guard idiom
+`*(idx*0x4b + X) >> 0x18 & 1 << (bit & 0x1f)` (bitset, stride 0x4b=75) runs
+on such unresolvable X values. HARD BOUNDARY for OQ-010 static work: trust
+(a) rel32 call/cross edges always, (b) rewritten-site immediates always,
+(c) NOTHING else absolute. Data-driven inputs therefore need the DEEPER
+CAPTURE (slot-diff of in-battle RAM: pointer values there resolve by the
+pointer law even in pages we did not restore) — that is the critical path,
+not more static batches.

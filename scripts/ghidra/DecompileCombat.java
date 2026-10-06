@@ -34,7 +34,11 @@ public class DecompileCombat extends ghidra.app.script.GhidraScript {
         DecompInterface decomp = new DecompInterface();
         decomp.openProgram(currentProgram);
         AddressSpace is = currentProgram.getImageBase().getAddressSpace();
-        for (long t : targets) {
+        long imgBase = currentProgram.getImageBase().getOffset();
+        // targets are FILE offsets; program addresses are file_off + imgBase
+        // (0 for ghp4/ascend4, 0x100000 for ghp5/ascend5)
+        for (long t0 : targets) {
+            long t = t0 + imgBase;
             Address a = is.getAddress(t);
             Function f = currentProgram.getFunctionManager().getFunctionAt(a);
             if (f == null) { println("no function at " + a); continue; }
@@ -44,7 +48,7 @@ public class DecompileCombat extends ghidra.app.script.GhidraScript {
                 ? r.getDecompiledFunction().getC()
                 : "// FAILED: " + r.getErrorMessage();
             PrintWriter w = new PrintWriter(
-                new File(dir, Long.toHexString(t) + ".c"), "UTF-8");
+                new File(dir, Long.toHexString(t0) + ".c"), "UTF-8");
             w.print(out);
             w.close();
             println("decompiled " + a + " -> " + (r.decompileCompleted() ? "ok" : "FAIL"));

@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-05T21:30
+updated: 2026-10-05T23:30
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -419,7 +419,16 @@ turn_log_recent:
      +0xa7 thiscall, packed u16 pairs >>0x10, damage-ish 5-arg shapes
      FUN_0005cf96/5caac). Self-caught PRNG overclaim: u32 0x343FD hit was a
      coincidental CALL rel32, not a constant (encoding checked, lesson pinned;
-     real find: hand-rolled glibc-constant LCG at 0x7825b, unmapped)."
+     real find: hand-rolled glibc-constant LCG at 0x7825b, unmapped).
+     ATTEMPT 3 DONE: full auto-analysis ghp5/ascend5 -> 1,144 functions
+     (functions_full.tsv; reach hypothesis confirmed; decompiler streams now
+     clean — 3/40 warning files). Batch 3 (27 engine E1 funcs): NO combat
+     formula; 4ae24 = operator-new (pointer/stride divides); E1 corpus skews
+     UI+allocators. IMMEDIATE-ENCODING FRAME pinned with worked refutation
+     (0x7478b garbage under every file-readable reading; mid-turn 'u16 table'
+     overclaim self-killed as UTF-16 text). HARD STATIC BOUNDARY: trust rel32
+     edges + rewritten-site immediates only => OQ-010 critical path moved to
+     the DEEPER IN-BATTLE CAPTURE (slot-diff), not batch 4."
 
 ## CURRENT FOCUS
 NONE — contract complete (2026-10-04h walk; see NEXT ACTION). History below.
@@ -483,20 +492,20 @@ scripts/r1_restore_sites.py and validated (pointer runs -> Watcom starts
 (scripts/attribution_scan.py, gate 3r, work/attribution.tsv: 225 E1 refs,
 62% on true fixup sites; batmode 10 sites span 0x4fd7, race 20, cosmos 10).
 THE next action is:
-OQ-010 ATTEMPT 3 IN FLIGHT 2026-10-05j: FULL auto-analysis of
-work/ascend_restored.bin into Ghidra project work/ghp5/ascend5 (base
-0x100000; viable now because restored data refs drive function detection —
-attempts 1-2 ceilings were function-reach, see r1-savestate.md FIRST
-DECOMPILE BATCH). On completion (log work/full_analysis.out, FULL_RC line):
-run scripts/ghidra/ExportFunctions.java (-process ascend_restored.bin) ->
-work/functions_full.tsv, join with work/attribution.tsv for per-module
-function sets, then decompile combat-arithmetic candidates in
-cosmos/ship/gsystem per module (pipeline: work/combat_decomp_targets.txt).
-Lift arithmetic as CITED constants (file offset = addr-0x100000 + decoded
-data target); a deeper capture (click into a real game via ref_capture.sh
-coords before autosave) must precede any formula whose inputs are only
-populated in-game — title-screen state is enough for arithmetic shape, not
-for data-driven tables. Residual unknowns
+DEEPER IN-BATTLE CAPTURE (OQ-010 critical path per the static boundary in
+r1-savestate.md ATTEMPT 3 section — trust only rel32 edges + rewritten-site
+immediates statically; data-driven inputs need live RAM). Pipeline to build
+as scripts/r1_deepcapture.sh reusing r1_savestate.sh invariants (scratch
+copy, -time-limit, pkill -x, bounded log, autosave 60 s): boot via the
+save-state harness, drive menus into a REAL game with tools/xsend clicks at
+the title-menu coordinates the gate refcap stage already proves (button1
+press+release), then into a battle where possible; autosave slots then carry
+loaded DATA structures. Slot-diff two captures (title vs in-game) of guest
+RAM -> pointer law decodes every absolute pointer even in non-restored pages
+(rv - P0 -> file offset for image refs; rv outside image span -> runtime
+heap). Correlate heap regions against extracted/ tables for savegame map
+(OQ-003), AI weights (OQ-015/016), combat inputs (OQ-010). DecompileCombat
+targets from batch 3 stay in work/combat_decomp_targets.txt. Residual unknowns
 stay filed exactly as the contract's evidence rules require; none blocks
 playability to victory.
 
