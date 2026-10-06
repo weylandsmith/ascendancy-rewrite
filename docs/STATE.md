@@ -76,22 +76,26 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-(b) TARGETED CLICK-DIFF CAPTURE — the static half of the old plan (a) is
-DONE to its bound 2026-10-06 (shape tie FUN_00025604; no disp32 orbit reads
-in payload; see r1-savestate.md): in a deep-capture run, settle ONE planet
-(ownership/production via clicks) between two NEXTTURN clicks, take autosave
-slots bracketing each mutation, diff ONLY the touched 123-B record; decode
-changed u32s by the pointer law; correlate hot regions against
-extracted/ascend02 tables. Candidate fields to target first (measured shape,
-unverified semantics): planet rec+0x66 (0/2 flag, 20 planets run230146),
-rec+0x42..0x50 sparse u8 cluster (all zero on unassigned planets),
-name+65/+6b per-system values. Star-table context now decodes the record
-NEIGHBOURHOOD, so a touched-record diff has an owner map to check against.
-(c) COUNTER-OFFSET TIMING CHECK stays queued behind (b).
+PLANET-SCREEN VALUE CROSSREAD (closes into OQ-016 + OQ-010 field semantics).
+The churn census is DONE (boundary law + orbit law + colonized-block pinned
+2026-10-06c/d/e, docs/re/r1-savestate.md). What is left is SEMANTICS: which
+screen number equals which field. Procedure with scripts/r1_adcapture.sh:
+  1. launch (BOOT=600), grid-hash entry law fires the tour automatically;
+  2. when ckNNN shows a fresh map (grid names != residual), click Planets
+     list entry, then a colony we own (the 5 colonized planets are listed in
+     ck.log analysis; click their map dot: compute window pos = galacto-
+     centric orbit pair * scale + map origin — or click the Planets menu
+     name list which is position-independent — PREFER THE NAME LIST);
+  3. cmd_ck before + after opening the planet screen, then NEXTTURN
+     (511,67) + cmd_ck; diff ONLY that record across the three checkpoints;
+     the field that ticks equals the on-screen number you pixel-read (vision
+     500 fallback: crop the planet-window number region, template-match
+     digits against live-000 font renderings).
+Candidate fields: NAME+0x28 (1->2 first boundary), +0x2a (+1/+2/+3 per-planet
+per-turn), +0x2c, u24@+0x2e (init at first boundary; Sophia I NEVER inits).
 Exit codes drive the loop (R1: 0=upgrade formulas + close OQs, 1=record one
 line in this file, 2=fix harness). Do NOT re-run docs/REFUTED-ROUTES.md
-routes. If (b) lands clean, update the field map in docs/re/r1-savestate.md
-and docs/re/savegame.md with guest-phys addresses per field.
+routes. Do NOT re-derive the orbit/star laws (CLOSED + corrected 06e).
 
 ## KNOWN-ISSUES / PARKING LOT (operational; research negatives live in
 ## docs/REFUTED-ROUTES.md)
