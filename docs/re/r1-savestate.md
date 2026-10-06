@@ -843,3 +843,54 @@ mapgen.h:49) — code verified MATCHING original, no change required.
 Evidence is pointer-law guest-phys measurement (star count field verified per
 star-record law), not inference from names: counts come from the live planet
 pointer arrays.
+
+### OQ-012(c) star-type vs position (2026-10-06o, five fresh galaxies,
+offline; H2/H3 measured, H1 pending)
+
+- H2 FALSIFIED [verified]: star names are NOT fixed-per-slot. Slot k=0 across
+  the five campaigns: Elwyssen / Bindacia / Alpheratz / Fletcher / Ephemera;
+  k=1: Aglarond / Ajax / Masticon / Aglarond / Albireo. Only 3 names (Ajax,
+  Atropos, Drollwell) recur in all five campaigns (name pool ~50 drawn w/
+  replacement from a larger vendor pool - names.txt holds far more). Name is
+  not a per-slot type carrier.
+- H3 CONFIRMED [verified]: sphere position is RNG per campaign. For each of
+  the 3 shared names, slot index AND xyz differ every campaign (Ajax: k=15
+  (345.1,-79.9,-261.0) in 230146 vs k=1 (250.1,54.7,357.9) in 233706 vs k=24
+  (-98.4,419.6,88.6) in 221429 vs k=12 (361.6,226.7,106.8) in r1ad-144225 vs
+  k=4 (334.4,-22.5,285.1) in r1ad-131350). xy-plane radii 50/50 distinct in
+  r1ad-144225 (no in-plane quantization collisions; continuous per extent law
+  06k). Position carries no cross-campaign identity.
+- H1 (numeric star fields vs radius/octant correlation): NOT YET RUN - next
+  action.
+
+### OQ-012(c) CLOSED (measured) 2026-10-06p — POSITION LAW: fixed radius
+shells by table slot x random direction
+
+Five fresh galaxies (230146, 233706, 221429, r1ad-144225, r1ad-131350), 50
+star records each at pointer-law bases, name-0x14 f32[3]:
+
+  |r_j| as a function of table slot k is IDENTICAL in all five campaigns
+  (exact float equality, zero inversions out of 1225 pairs):
+    k  0-25 : r = 440.0   (26 stars)
+    k 26-37 : r = 365.0   (12 stars)
+    k 38-43 : r = 290.0   ( 6 stars)
+    k 44-46 : r = 215.0   ( 3 stars)
+    k    47 : r = 140.0   ( 1 star)
+    k    48 : r =  65.0   ( 1 star)
+    k    49 : r =  50.0   ( 1 star)
+  Shell radii step -75 (440,365,290,215,140,65); the last shell clamps to 50
+  [generator formula r = max(50, 440 - 75*j) fits 7/7 shells, formula itself
+  INFERRED, populations verified].
+  DIRECTION is random per campaign [verified: unit vectors at k=0 differ in
+  all runs, e.g. (0.654,0.743,-0.142) vs (-0.403,-0.525,-0.75)].
+
+- 'type vs position': NO independent coupling [verified over 250 pooled
+  stars]: Spearman rho(u1C@name-0x1C, r3) = +0.017, rho(u25@name-0x25, r3)
+  = +0.026; rho(sub0@name+0x10, r3) = -0.59 is CONFOUNDED (sub0 tracks k,
+  rho(sub0,k)=+0.74..+0.84 — sub-pool slots are drawn roughly in table order).
+- Earlier 'rho(k,r3)=-0.8' suspicion was thus NOT a sorting law: the table is
+  radius-band-ordered BY DESIGN (shells assigned to fixed slot ranges).
+- Rewrite DIVERGENCE (upgrade candidate, next action): mapgen.cpp places
+  stars uniform-in-box; original = shell schedule x random unit vector
+  (unit-vector generation: uniform on sphere [inferred; consistent with
+  observed z distribution]). minSeparation law unknown on shells - test.

@@ -46,10 +46,19 @@ OQ-004 | tables | which tables the exe loads; .tsv container grammar | open
 | W3: trace the open-file thunk once entry points are pinned via live-image
 call graph (no .cob strings in exe — the installer unpacks; loader.md §5).
 OQ-012 | mapgen | (a) new-game size options (labels baked in 3cfgnew.tmp
-glyphs) (b) pps distribution shape beyond uniform 1..5 (c) star type vs
-position (d) logical map extent | open | W2: read the new-game screen's
-live RAM state (deep capture stops there by design); (b)/(c) from a captured
-fresh galaxy vs generator controls.
+glyphs) — REMAINING OPEN. (b) CLOSED 2026-10-06o:
+pps ~ U{1..5} measured over 250 systems x 5 campaigns (chi2 2.84, 4df,
+p~0.58; rewrite uniform_int(1,5) mapgen.cpp:120 verified matching).
+(c) CLOSED 2026-10-06p: position law = FIXED RADIUS SHELLS BY TABLE SLOT x
+random direction (r(k): 440 k0-25, 365 k26-37, 290 k38-43, 215 k44-46, 140
+k47, 65 k48, 50 k49 — exact float identity across 5 campaigns, 0 inversions;
+no type/position coupling: rho(u1C,r3)=+0.02, rho(u25,r3)=+0.03 over 250
+stars; sub0 rho -0.59 is confounded by k-ordering. No min-separation enforced
+(min observed 24.4). Rewrite box-placement DIVERGENCE upgrade scheduled =
+STATE NEXT ACTION, code site mapgen.cpp:88-110).
+(d) CLOSED 2026-10-06k (extent = stars on sphere r~440, orbit-pair retraction;
+superseded/refined by (c) shells) | open | (a): setup-screen live RAM state from
+r1ad captures (options UI lives in RAM at pointer-law base).
 OQ-013 | rules | restree variant block: field0 (0..4) semantics; main tree
 vs variants vs union in play (current default union) | open | W2: which
 research rows are live in fresh-campaign RAM; research-screen code path.

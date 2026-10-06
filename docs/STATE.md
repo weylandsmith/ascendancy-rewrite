@@ -76,24 +76,20 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-STAR-SCREEN CROSSREAD, ROUND 4 (capture; closes OQ-003 field semantics on the
-SYSTEM screen + gives the OQ-016 home-placement wedge). Planet-view round
-gave zero numeric readouts (06f) — the SYSTEM/star screen (click a star dot
-on the strategic map, NOT via Planets menu) is the untried surface; the
-sidebar 'clock' region (root ~470..540, y~40..55 — vision-confirmed top of
-panel) shows the galactic date/turn: crop-digit it against known turn values
-(0,1,2 banked from r1ad-144225 shots live-010/013/017 region) to pin the
-display law. Procedure per CADENCE LAW (runbook BLOCKED.md 06m): launch
-BOOT=700, enter (grid law), 2-3 lore center-clicks, cmd_ck; click a star dot
-at a KNOWN orbit-pair-derived screen position [inferred: map dots are planets
-at orbit-pair screen coords — round 4 must CONFIRM by clicking (672,0)-type
-axis dots where fresh-map planets cluster and checking the shot names a
-planet]; cmd_ck; ESC; bracket NEXTTURN x2 verifying turns++ ; then diff the
-NAMED record's full 123-byte frame across the bracket. Exit codes drive the
-loop (R1: 0=upgrade formulas + close OQs, 1=record one line in this file,
-2=fix harness). Do NOT re-run docs/REFUTED-ROUTES.md routes. Do NOT re-derive
-the boundary/star/cadence laws (CLOSED; orbit law CORRECTED 06k — read the
-KNOWN-ISSUES block first).
+MAPGEN UPGRADE to the measured shell law (closes the OQ-012(c) rewrite-side
+DoD leg; coding task, no capture). rewrite/src/game/mapgen.cpp:88-110 places
+stars uniform-in-box with rejection sampling; the ORIGINAL (measured
+2026-10-06p, 5 campaigns, exact float identity) = star at table slot k sits
+at radius SHELL[k] from origin x uniformly-random direction on the sphere:
+  shell(k): 440 k<26 | 365 k<38 | 290 k<44 | 215 k<47 | 140 k=47 | 65 k=48 |
+  50 k=49; NO minimum separation (min observed 24.4 < rewrite's 60 - drop
+  rejection). Rewrite stores int x,y (2D); original is 3D float — preserve
+  the documented 2D model [x,y only], scale shells so the galaxy fits the
+  existing mapSize convention (record the scale factor + rationale in
+  docs/re/mapgen.md §4.1; the shell RANKS/populations must stay exact:
+  26/12/6/3/1/1/1). Update unit tests: shell-population invariant +
+  determinism; run the full test suite + gate. Exit: commit with STATE
+  updated. Do NOT touch lane-building or type assignment (separate OQs).
 
 ## KNOWN-ISSUES / PARKING LOT (operational; research negatives live in
 ## docs/REFUTED-ROUTES.md)

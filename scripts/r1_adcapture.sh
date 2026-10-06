@@ -113,7 +113,11 @@ sys.path.insert(0, "scripts")
 from r1_sav_scan import build_anchors, find_base
 save, needle = sys.argv[1], sys.argv[2]
 pay = open(needle, "rb").read()
-mem = zipfile.ZipFile(save).read("Memory")
+try:
+    mem = zipfile.ZipFile(save).read("Memory")
+except Exception:
+    print(save, "TORN")   # slot mid-write; checkpoint copy predates validity guard era
+    sys.exit(0)
 v, _ = find_base(mem, build_anchors(pay))
 if not v:
     print(save, "NOBASE")
@@ -156,7 +160,14 @@ import sys, zipfile, hashlib, re
 sys.path.insert(0, "scripts")
 from r1_sav_scan import build_anchors, find_base
 pay = open(sys.argv[2], "rb").read()
-mem = zipfile.ZipFile(sys.argv[1]).read("Memory")
+try:
+    mem = zipfile.ZipFile(sys.argv[1]).read("Memory")
+except Exception:
+    # slot mid-write (autosave rewrites in place): UNKNOWN, not an error.
+    # Entry law treats empty output as retry-next-tick (2026-10-06o: the
+    # traceback spam in every r1ad run's stdout was this read unguarded).
+    print("")
+    sys.exit(0)
 v, _ = find_base(mem, build_anchors(pay))
 if not v:
     print("NOBASE")
@@ -215,9 +226,10 @@ while kill -0 "$DB" 2>/dev/null; do
   fi
   if [ -f "$OUT/cmd_key" ]; then
     K=$(tr -d '[:space:]' < "$OUT/cmd_key"); rm -f "$OUT/cmd_key"
+    # NO xdotool on this host (measured 2026-10-06i): keys go through
+    # tools/xsend's key mode (XSendEvent KeyPress/Release, SDL accepts).
     [ -n "$K" ] && { checkpoint || true
-      WID=$(DISPLAY=":$DISP" xdotool search --name "DOSBox-X" | head -1)
-      DISPLAY=":$DISP" xdotool key --clearmodifiers --window "$WID" "$K" 2>>"$OUT/err.log" \
+      DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" key "$K" 2>>"$OUT/err.log" \
         && echo "key $K" >> "$OUT/click.log"; }
   fi
   if [ -f "$OUT/cmd_click" ]; then
