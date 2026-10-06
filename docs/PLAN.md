@@ -1,124 +1,83 @@
-# Ascendancy Reverse-Engineering & Reimplementation — MASTER PLAN
+# Ascendancy Closeout Plan (v2 loop)
 
-Objective: re-implement the complete single-player game of Ascendancy
-(Logic Factory, 1995, DOS/Watcom) natively in C++17 + SDL2/SDL2_mixer,
-driven entirely from reverse-engineered evidence in this repository.
+v1 plan: archive/ralph-v1/PLAN.md. Its phase list P0..P6 is COMPLETE (gate
+green, binary plays seeded campaigns to victory, docs/re/ specs cited). This
+file plans only what remains: converting documented defaults into lifted
+constants. Do not re-plan completed phases.
 
-Authoritative inputs (in this folder):
-  game/           original shipped files (DO NOT MODIFY — read-only ground truth)
-  extracted/      decoded from the .cob archives (regenerate: scripts/cob.py)
-  docs/           all RE findings; every claim cites its evidence
-  rewrite/        the C++17/SDL2 reimplementation (CMake project)
-  scripts/        tooling (cob.py, gate.sh, ghidra_headless_up.sh, ...)
-
---------------------------------------------------------------------------
-EVIDENCE RULES (violate none — the whole value of this repo is trust)
---------------------------------------------------------------------------
-1. Every constant, formula, or table entry copied into rewrite/ MUST cite a
-   docs/ file, which itself cites its source: a Ghidra address
-   (ascend.exe:OFFSET), an extracted data file + record offset, or a quoted
-   passage from the manual.
-2. If two sources conflict, record BOTH in docs/OPEN-QUESTIONS.md and pick
-   the one with better evidence; note the reasoning.
-3. Never invent formats. Unknown bytes are "unknown" until shown otherwise
-   by cross-referencing binary use (xrefs) or data correlation.
-4. game/ must stay byte-identical (gate checks checksums).
+Erratum carried from the v1 file (v1 text was falsified, keep this version in
+mind when reading old phases): the .tsv files are NOT text renderings of the
+.bin tables (FINDINGS 1b); they are per-context string pools with a numeric
+area; grammar open = OQ-004.
 
 --------------------------------------------------------------------------
-KNOWN FACTS (verified 2026-10-03, see docs/FINDINGS.md for detail)
+EVIDENCE RULES (unchanged from v1 — the value of this repo is trust)
 --------------------------------------------------------------------------
-- ascend.exe (587 KB) = DOS4GW (Watcom) stub+client, 32-bit LE, Watcom RT
-  1988-1993 strings present. dos4gw.exe is the extender.
-- .cob archives: u32 count | NUL-term names zero-padded to 4B | (N+1) u32
-  LE offsets | concatenated blobs. scripts/cob.py decodes all three files
-  cleanly; NO compression. 468 files extracted.
-- ascend00 = plaintext (.txt/.dip): help, help-gizmos, species diplomacy
-  text, music.txt, planitem.txt etc.
-- ascend01 = data\*.shp shape/sprite sets + misc; ascend02 = paired
-  name.bin + name.tsv tables (battle, beginnew, galactic, planet, ship,
-  species, tutintro) + data\ subdir. The .tsv are the SAME tables as
-  .bin in text form — cross-check both.
-- logic.flc = Autodesk Animator FLIC (magic 0xAF12... header starts
-  with size+magic little-endian: first u32=3835618=file size, magic
-  0xAF12 at +4 — VERIFY before assuming).
-- resume.gam = 81 KB savegame, plain u32 LE fields at least in part
-  (0x07, 0x02, 0x04, 0x03... readable at head).
-- Toolchain installed: Ghidra 12.1.4 (~/tools/ghidra, sha256 verified),
-  GhidraMCP headless+bridge (~/tools/ghidra-mcp; bridge registered in
-  Hermes as mcp_servers.ghidra), gcc 14, cmake 3.31, SDL2 + mixer/image/ttf,
-  dosbox 0.74, dosbox-x 2025.02, Xvfb, imagemagick, radare2 NO (not in
-  Debian 13 repos — use binutils+capstone+Ghidra instead), python venv
-  ~/tools/revenv (pyelftools, capstone, pillow, Pillow, mcp).
+1. Every constant/formula copied into rewrite/ cites a docs/ file which cites
+   a Ghidra address, an extracted-file offset, or a pointer-law-derived
+   guest-physical address from a named capture.
+2. Conflicting sources: record BOTH in OPEN-QUESTIONS, pick by evidence.
+3. Never invent formats. Unknown = unknown.
+4. game/ stays byte-identical (gate-enforced).
+5. NEW for v2: check docs/REFUTED-ROUTES.md before any research action.
 
 --------------------------------------------------------------------------
-PHASES (execute top to bottom; do NOT skip ahead past missing data)
+WORKSTREAMS (run strictly one action at a time; pick the STATE.md NEXT ACTION)
 --------------------------------------------------------------------------
-P0  Environment verify          — scripts/env_check.sh passes.            [done]
-P1  Data formats                — every extracted format has a docs/ spec
-      1a .cob (done — docs/FINDINGS.md)
-      1b .tsv/.bin table pair: column layout, types, cross-mapping
-      1c .shp sprite sets (format + sample renders to PNG in docs/assets/)
-      1d .gam save format (use resume.gam; correlate with .bin tables)
-      1e FLIC video + .bam/.dig audio inventory; music.txt mapping
-      1f .dip, .txt text encodings (CP437->UTF-8 conversion table)
-P2  Binary RE (Ghidra)          — import ascend.exe; analyze; name &
-      document by SUBSYSTEM (not function-by-function): startup/init,
-      main loop, map/planet gen, economy, research, production/ships,
-      combat, AI (per-race), diplomacy, save/load, UI/render primitives,
-      input, audio. Deliverable per subsystem: docs/re/<name>.md with
-      pseudocode-level spec + constants table + addresses.
-      Ghidra: headless server on 127.0.0.1:8089 (scripts/ghidra_headless_up.sh).
-      Watcom RE32 caveat: Ghidra parses with 'x86:LE:32:default' +
-      watcom calling convention conventions; overlay/flat model at
-      imagebase; verify function boundaries via Watcom RTTI/strings.
-P3  Engine skeleton (rewrite/)  — CMake C++17+SDL2; importer lib that reads
-      extracted/ (verified vs docs specs); headless sim core; deterministic
-      seeded map-gen matching original for the same seed (test vs
-      galaxy data from a fresh save created in dosbox).
-P4  Systems port                — in order: game setup/races -> turn
-      economy -> research/tech tree -> planetary dev -> ship design &
-      movement -> combat resolution -> AI -> diplomacy -> victory.
-      Each: unit tests + a golden comparison against original
-      behaviour where feasible (savegame N->N+1 diffs from dosbox).
-P5  UI & media                  — strategic map rendering, planet view,
-      sprite import, palette, text, dialogs, sound (SDL2_mixer);
-      screenshot comparisons vs dosbox captures in docs/assets/.
-P6  Integration & completeness  — full campaign playable to victory;
-      open-questions list empty or marked cosmetic-only; README with build
-      + play instructions.
+W1  PLANET FIELDS -> COMBAT (OQ-010, OQ-003)   [IN PROGRESS - see STATE.md]
+    click-diff capture -> field map -> Ghidra xrefs on writers/readers ->
+    lift damage application (hit prob, shield subtract-vs-absorb, overkill,
+    firing order) from batmode/cosmos-attributed ranges. Upgrade
+    Campaign::attackScore/defenseScore with citations; unit-test the lifted
+    arithmetic against a captured real battle outcome if one can be staged.
+
+W2  CAMPAIGN CONSTANTS (OQ-016, OQ-012, OQ-013, OQ-014, OQ-021, OQ-020)
+    With planet fields known, the same live-RAM method settles: income/
+    growth tables (diff stockpiles/population across turns with controlled
+    planet states), new-game size options (read 3cfgnew.tmp-driven UI state
+    in RAM at the new-game screen), variant-tree visibility (which research
+    rows are live in a fresh campaign's RAM), end-ctrl threshold (find the
+    constant in code: scan for comparisons against counts near the victory
+    check; attribution gsystem/cosmos), ability charge constant (vendor %d —
+    find the argument site).
+
+W3  FILE-FACING CODECS (OQ-005, OQ-006, OQ-018, OQ-004, OQ-019)
+    Via exe code located through attribution + call graph from proven entry
+    points: shape loader (dims + RLE grammar — the ONLY sanctioned route;
+    blind static sweeps are forbidden), audio init (rate of headerless
+    files, theme selection), open-file thunk (which tables load; .tsv
+    grammar), ship design screen structures.
+
+W4  DIPLOMACY ORDERING (OQ-015)
+    DA_ selection loop + full %token table via code (race module
+    attributed, 20 E1 sites).
+
+W5  HYGIENE (continuous)
+    gate green every commit; STATE.md ledger + OPEN-QUESTIONS updated in the
+    same commit; new refuted routes recorded immediately; capture artifacts
+    stay in work/ (gitignored); docs/re/ specs are the long-term record.
 
 --------------------------------------------------------------------------
-VERIFICATION (what the goal judge + gate use)
+VERIFICATION
 --------------------------------------------------------------------------
-Gate: bash scripts/gate.sh  (fast, deterministic, see script for stages:
-checksums always; extractor always; rewrite build+tests once
-STATE.md milestone >= P3).
-Playtest harness (P3+): dosbox-x headless (Xvfb) runs the ORIGINAL for
-reference captures; rewrite runs headless smoke tests; imagemagick compare
-for UI stages.
+bash scripts/gate.sh (exit 0 = healthy; includes build, 83 tests, boot
+smokes, victory smoke, probes, R1-harness static invariants).
+Launch: bash scripts/launch_ralph.sh (tmux session 'ascend', goal + gate
+registered, bounded R1 capture at session start).
+Definition of done for the whole loop: STATE.md ledger.open is empty, each
+closure carrying evidence per STATE.md DEFINITION-OF-DONE.
 
 --------------------------------------------------------------------------
-LOOP OPERATING PROCEDURE (for the autonomous /goal loop)
+LOOP OPERATING PROCEDURE (v2)
 --------------------------------------------------------------------------
 Every turn:
- 1. Read docs/STATE.md (phase, milestone, next-actions, known-issues).
- 2. Pick the SINGLE next action from the first unfinished item (do not
-    reorder phases unless STATE.md says why).
- 3. Do the work. Keep turns productive: if an action needs >30 min of
-    Ghidra analysis, checkpoint partial findings into docs/ before ending.
- 4. Update docs/STATE.md: what changed, current phase/milestone, exact next
-    action, anything learned that a fresh session must know.
- 5. git add -A && git commit -m "<phase>: <action>" (small, frequent).
- 6. Run bash scripts/gate.sh; fix failures before ending the turn.
-Never: modify game/; invent data; mark STATE.md items done without
-evidence; leave the tree broken (gate failing) at end of turn.
-Option C (decided 2026-10-04, docs/BLOCKED.md; cadence window ABOLISHED
-2026-10-05 by user): R1 runs via save states (scripts/r1_savestate.sh,
-docs/re/r1-savestate.md) with NO rate limit; per-run safety invariants are
-mandatory (scratch copy, -time-limit, pkill -x, bounded output). A negative
-(exit 1) is recorded in one line, never retried in-turn; exit 0 means the
-base was derived; pointer law CLOSED 2026-10-05i so formula upgrades are
-unlocked (docs/re/r1-savestate.md); exit 2 is a
-harness bug, not a research result.
-When ALL P6 items are done and gate passes: state EXPLICITLY that the
-goal contract is complete and stop.
+ 1. Read docs/STATE.md (ledger, in-hand tools, NEXT ACTION).
+ 2. Read the relevant docs/REFUTED-ROUTES.md section for the intended action.
+ 3. Execute EXACTLY the NEXT ACTION. Bounded >30-min work checkpoints into
+    docs/ before ending.
+ 4. Update STATE.md (turn note, ledger, exact next action) and
+    OPEN-QUESTIONS.md in the same commit.
+ 5. git add -A && git commit -m "W<n>: <action>".
+ 6. bash scripts/gate.sh; fix before ending the turn.
+Never: modify game/; invent data; close an OQ without measurement; re-run a
+refuted route; run an R1 capture outside the safety-invariant scripts.

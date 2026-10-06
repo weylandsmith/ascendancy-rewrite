@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# Launch the Ascendancy RE Ralph loop in tmux with the standing goal + gate set.
+# Launch the Ascendancy CLOSEOUT (v2) Ralph loop in tmux.
 # Usage:  bash scripts/launch_ralph.sh     (detached; watch: tmux attach -t ascend)
 # Stop:   /goal clear inside the session, or: tmux kill-session -t ascend
+# v1 launcher (kept for analysis): archive/ralph-v1/launch_ralph.sh
+# Evidence rules + strict-close policy: docs/GOAL.txt. Refuted routes are
+# binding: docs/REFUTED-ROUTES.md.
 set -eu
 cd "$(dirname "$0")/.."
 SESSION=ascend
@@ -29,10 +32,10 @@ tmux send-keys -t $SESSION "/goal gate add bash scripts/gate.sh" Enter
 sleep 3
 tmux send-keys -t $SESSION "/goal status" Enter
 sleep 3
-# R1 at session start (cadence window ABOLISHED 2026-10-05 by user decision;
-# docs/re/r1-savestate.md). Route = save states, not the tracer. Bounded by
-# the script itself AND here so a hung harness can never delay the loop.
-# No 12 h timestamp gate anymore; safety invariants are inside the script.
+# Session-start R1 save-state capture (cadence ABOLISHED 2026-10-05; safety
+# invariants live inside the script; docs/re/r1-savestate.md). Bounded here
+# too so a hung harness can never delay the loop. Exit codes drive the loop
+# (0=upgrade, 1=negative-normal, 2=harness bug) — NEVER a retry spiral.
 echo "R1 savestate capture starting (bounded, no cadence gate)..." > /tmp/r1_session.log
 R1RC=0
 timeout -s KILL 420 bash scripts/r1_savestate.sh >> /tmp/r1_session.log 2>&1 || R1RC=$?
