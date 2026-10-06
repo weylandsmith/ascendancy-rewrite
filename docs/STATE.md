@@ -76,21 +76,21 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-PLANET-SCREEN VALUE CROSSREAD (closes into OQ-016 + OQ-010 field semantics).
-The churn census is DONE (boundary law + orbit law + colonized-block pinned
-2026-10-06c/d/e, docs/re/r1-savestate.md). What is left is SEMANTICS: which
-screen number equals which field. Procedure with scripts/r1_adcapture.sh:
-  1. launch (BOOT=600), grid-hash entry law fires the tour automatically;
-  2. when ckNNN shows a fresh map (grid names != residual), click Planets
-     list entry, then a colony we own (the 5 colonized planets are listed in
-     ck.log analysis; click their map dot: compute window pos = galacto-
-     centric orbit pair * scale + map origin — or click the Planets menu
-     name list which is position-independent — PREFER THE NAME LIST);
-  3. cmd_ck before + after opening the planet screen, then NEXTTURN
-     (511,67) + cmd_ck; diff ONLY that record across the three checkpoints;
-     the field that ticks equals the on-screen number you pixel-read (vision
-     500 fallback: crop the planet-window number region, template-match
-     digits against live-000 font renderings).
+PLANET-VIEW CROSSREAD, ROUND 2 (closes into OQ-016 + OQ-010). Round 1
+(r1ad-20261006-135319, 2026-10-06f): entered campaign via grid law (t=124),
+opened the planet view of the colony BYZANTIUM III (player's only colony on
+fresh maps; vision: 'Minions (1 Planet Occupied, 1 System Controlled)',
+'(Enormous Supermineral Planet)', 'No Project', terrain thumbs, NO numeric
+readouts visible). NEXTTURN (511,67) is STRATEGIC-MAP-ONLY — swallowed by the
+modal view (turn stayed 0, ck007..ck014). Procedure: enter (grid law) ->
+Planets menu click (window 508,137) -> click list row y=134 (root; vision-
+confirmed) -> cmd_ck -> ESC/click map to CLOSE (verify closed by pixel or by
+shot) -> cmd_ck -> (511,67) NEXTTURN -> verify turn++ -> cmd_ck. Then diff
+record 'Byzantium III' across checkpoints, and dump rec+0x34..0x54 (u16
+fields: shields? income? +0x2e u24) before/after; a view-mode cycle inside
+the planet screen (click the thumbnails/tabs) may expose numeric screens —
+crop-digit-read those regions if the view shows numbers (vision 500 fallback:
+template-match digits vs live shots).
 Candidate fields: NAME+0x28 (1->2 first boundary), +0x2a (+1/+2/+3 per-planet
 per-turn), +0x2c, u24@+0x2e (init at first boundary; Sophia I NEVER inits).
 Exit codes drive the loop (R1: 0=upgrade formulas + close OQs, 1=record one
