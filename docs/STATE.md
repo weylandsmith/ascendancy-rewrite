@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-06T08:40
+updated: 2026-10-06T12:07
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -21,8 +21,13 @@ ledger:
     - "OQ-011 POINTER LAW: runtime_u32 = P0 + payload_file_offset(target); P0 = B - H per-run; guest linear == physical; obj0 code [0x14bb0,0x82bb0)@0x1d4000, obj1 data [0x82bb0,0x8cc83)@0x242000 (battery scripts/r1_pointer_law.py 12/12 slots, gate 3q)"
     - "OQ-017 vendor .fnt codec + wired into UI"
   open:
-    - "OQ-010 combat application formula — R1 frontier (planet-field semantics path; see NEXT ACTION)"
-    - "OQ-003 .gam full record map — joint with OQ-010 (planet records joined 151/151 @ stride 123; field semantics open)"
+    - "OQ-010 combat application formula — R1 frontier; static half bounded
+      2026-10-06 (no disp32 orbit/table reads; shape tie FUN_00025604), path =
+      click-diff capture (STATE NEXT ACTION)"
+    - "OQ-003 .gam full record map — joint with OQ-010 (planet records joined
+      151/151 @ stride 123; STAR TABLE + ORBIT laws closed 2026-10-06 give the
+      neighbourhood map: star stride 96, planet ptrs name+0x2A, orbit pair
+      planet-name+0x57/+0x5f; field semantics open)"
     - "OQ-021 end-ctrl threshold: comment 'over half' vs prose 'two-thirds' — needs code-side constant"
     - "OQ-020 ability charge days (%d in vendor text, no data file) — R1: read the constant in code"
     - "OQ-005 .shp pixel codec — static route exhausted (6 angles, docs/REFUTED-ROUTES.md); needs exe shape loader via live image"
@@ -48,6 +53,15 @@ ledger:
   byte-verified). TURN-BOUNDARY law: planet records mutate only across
   counter-changing slot pairs; hot head-block = older-convention
   +0x35..0x3F (name-based +0x57..0x61), high-entropy u16s every turn.
+- STAR TABLE LAW CLOSED 2026-10-06 (battery scripts/r1_star_table.py, gate 3s,
+  green 259/259 slots x 13 captures): stride-96 name-anchored star records;
+  idx u32 @name-0x18; pos f32[3] @name-0x14; planet ptrs u32[5] @name+0x2A
+  targeting planet-NAME-0x24, LIVE iff name prefix matches, single-owner law;
+  sub-pool 0x258xxx stride 39 permutation. ORBIT LAW: centered radius constant
+  (0 violations 277 planets); per-planet constant dtheta/turn applied by turn
+  loop (sample r=544 -> -13.52 deg); unassigned planets subset of static.
+  Full field table docs/re/r1-savestate.md "STAR TABLE + ORBIT LAWS". Census
+  tool scripts/r1_record_census.py (per-record per-offset planet churn).
 - Restored image for Ghidra: work/ascend_restored.bin (built by
   scripts/r1_restore_sites.py; base-0 address space; validation: pointer
   runs >=8 hit Watcom starts 60% vs 15% control). Full analysis ghp5:
@@ -62,19 +76,18 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-PLANET-FIELD SEMANTICS (closes into OQ-010 + OQ-003). Do in THIS order —
-(b) first is deliberate: it is the cheapest probe and its result tells you
-whether (a) is worth a Ghidra cycle:
-  (b) TARGETED CLICK-DIFF CAPTURE: in a deep-capture run, settle ONE planet
-      (ownership/production via clicks) between two NEXTTURN clicks, take
-      autosave slots bracketing each mutation, diff ONLY the touched 123-B
-      record; decode changed u32s by the pointer law; correlate hot regions
-      against extracted/ascend02 tables.
-  (a) GHIDRA XREF PASS: planet-table stride-0x7b accesses (FUN_0004ae24
-      family is allocator — start from work/attribution.tsv planet/cosmos
-      entries instead) and which code READS u16 at intra-offsets 0x35..0x3f.
-  (c) COUNTER-OFFSET TIMING CHECK: click NEXTTURN at a measured autosave
-      phase, compare counter delta to expected turns.
+(b) TARGETED CLICK-DIFF CAPTURE — the static half of the old plan (a) is
+DONE to its bound 2026-10-06 (shape tie FUN_00025604; no disp32 orbit reads
+in payload; see r1-savestate.md): in a deep-capture run, settle ONE planet
+(ownership/production via clicks) between two NEXTTURN clicks, take autosave
+slots bracketing each mutation, diff ONLY the touched 123-B record; decode
+changed u32s by the pointer law; correlate hot regions against
+extracted/ascend02 tables. Candidate fields to target first (measured shape,
+unverified semantics): planet rec+0x66 (0/2 flag, 20 planets run230146),
+rec+0x42..0x50 sparse u8 cluster (all zero on unassigned planets),
+name+65/+6b per-system values. Star-table context now decodes the record
+NEIGHBOURHOOD, so a touched-record diff has an owner map to check against.
+(c) COUNTER-OFFSET TIMING CHECK stays queued behind (b).
 Exit codes drive the loop (R1: 0=upgrade formulas + close OQs, 1=record one
 line in this file, 2=fix harness). Do NOT re-run docs/REFUTED-ROUTES.md
 routes. If (b) lands clean, update the field map in docs/re/r1-savestate.md

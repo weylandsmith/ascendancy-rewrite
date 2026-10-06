@@ -14,12 +14,18 @@ subtract-vs-absorb, overkill, firing order | open | W1: click-diff capture
 turn-boundary deltas (turn counter u16 phys 0x254e10), then Ghidra xrefs on
 the reader/writer functions (attribution: batmode/cosmos ranges,
 work/attribution.tsv). Device constants are already data-verified (gizmos
-damage 1..13, shields 1..5) — the application code is the target.
+damage 1..13, shields 1..5) — the application code is the target. Static
+route bounded 2026-10-06: payload has ZERO disp32 accesses at orbit offsets
++0x57/+0x5f (scan: 2 bogus hits, both outside code ranges); shape tie found
+(FUN_00025604 stride-constant table 0x60/0x7b/0x27 == live-measured record
+families, docs/re/r1-savestate.md).
 OQ-003 | gam | .gam full record map + field meanings; packed entropy regions
 | open | W1 joint: planet records already joined file<->live RAM 151/151
-(stride 123); field semantics fall out of controlled-mutation diffs
-(settle/capture turns), then the save writer code. Low priority otherwise:
-rewrite is fresh-start-only.
+(stride 123); STAR TABLE + ORBIT LAWS closed 2026-10-06 map the neighbourhood
+(star stride 96 name-anchored, planet ptrs star-name+0x2A -> planet-name-0x24,
+single-owner law, orbit pair planet-name+0x57/+0x5f); field semantics fall
+out of controlled-mutation diffs (settle/capture turns), then the save writer
+code. Low priority otherwise: rewrite is fresh-start-only.
 OQ-021 | victory | end-ctrl threshold: vendor comment "over half" vs same
 file's prose "two-thirds" — current default >1/2 | open | W2: find the
 constant/comparison near the victory check in code (ghp5 functions_full.tsv,
