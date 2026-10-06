@@ -809,3 +809,23 @@ pair-value table is CAMPAIGN-SPECIFIC, ordinally banded by radius
   measurement, not verbatim. Seed vectors at fresh map: I(320,-960)
   II(-1088,-768) III(-1344,992) IV(608,1888) (shared across campaigns
   [verified], V on-axis 672).
+
+### Star-screen crossread, round 4, run r1ad-20261006-153435 (2026-10-06n,
+exit-1): map star-dots are NOT clickable surfaces at dot centers
+
+- Entry clean (grid law t=114). LORE dismissal needs a VARIABLE click count:
+  this campaign required 7 center-clicks (3+4) where 144225 needed 2-3 —
+  never schedule blind; click-until-shot-classifies-MAP is the law.
+- scripts/r1_mapdots.py (new): finds isolated bright dots in the map rect
+  (root 40..470 x 40..460); requires revenv PIL python.
+- Clicking dot (268,73) (lum 765, zero bright neighbors — the most isolated)
+  opened NOTHING: post-click shot still MAP, no name, no readouts [verified
+  by vision]. The map dots mark star POSITIONS but hit-testing is apparently
+  generous elsewhere or requires the selection reticle; the green colony
+  marker IS clickable in earlier rounds via menu, not via dot.
+- Cadence law re-verified: two scheduled NEXTTURN clicks (511,67) from the
+  map = turns 0->1->2 across ck boundaries, zero intra-turn churn expected.
+- NEXT (if round 5): click exactly ON the green colony marker (~190,250
+  this campaign; vision coords) or the blue/red lane endpoints — those are
+  the confirmed interactive map objects; a SYSTEM screen has never yet been
+  opened by any route (planet menu opens the PLANET view directly).
