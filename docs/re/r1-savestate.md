@@ -712,3 +712,30 @@ thumbnail click, map-area click (150,200) [lands inside the view], sidebar
 re-click (511,67). HARNESS GAP: r1_adcapture has no key channel — MoO dialogs
 close on ESC. Fix queued (exit-2): add cmd_key (xdotool key) next round;
 NEXTTURN-while-open is CONFIRMED dead (two runs now).
+
+### Round-3 crossread, run r1ad-20261006-144225 (2026-10-06j): ESC closes the
+planet view; boundary law reproduces a FOURTH time; player-colony increments
+confirmed live
+
+- HARNESS (exit-2 fixed): this host has NO xdotool (measured) — keys go via
+  tools/xsend 'key KEYSYM' mode (rebuilt: gcc -O1 -o xsend xsend.c -lX11).
+  Escape via xsend CLOSED the sticky planet view [verified: post-ESC shot =
+  strategic map, and (511,67) then fired NEXTTURN: turns 0->1->2 across
+  ck013/14/17]. Close law recorded: ESC is the dismiss channel.
+- LORE screen: new-campaign intro (title header + 4 paragraphs) — 2-3 center
+  clicks (320,240) return to strategic map (click count varied 2 vs 3; drive
+  by shot-classify, not fixed count).
+- Boundary law 4th reproduction (scripts/r1_ckdiff.py): zero intra-turn churn
+  on 153 planets + orbit-pair movers (bytes +0x57-0x59, +0x5f-0x61 rel to
+  NAME = the two f32s) at BOTH boundaries; exponent bytes (+0x59? no: +90/+98
+  = NAME+0x5a/+0x62 tails) flicker when values cross magnitudes.
+- PLAYER COLONY (Flammifer II, 'Enormous Supermineral Planet'): block
+  NAME+0x28 = 01 00 | 00 00 | 00 00 | ff ff ff (residue); u16@NAME+0x2a went
+  0 -> 1 -> 2 across the two boundaries — +1/turn on the player's own colony
+  while the planet screen showed 'No Project' [verified RAM]. Consistent with
+  run 230146's per-planet +1/+2/+3 growth-channel reading. FletcherV (AI
+  colony) churns 0x28..0x30 at boundaries too.
+- ckdiff TOOL BUG (fixed, the window-base classic AGAIN): planets() must key
+  off H+0x255b00, not H; 'colonized' test should ignore the ffffff residue at
+  +0x2e..+0x30 (every planet carries it on fresh maps — do NOT treat ffffff
+  as colonized marker; the discriminator is u16@+0x28 or the +0x2a counter).

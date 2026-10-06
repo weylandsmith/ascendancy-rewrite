@@ -47,11 +47,12 @@ NAME_RE = re.compile(rb"([A-Za-z][A-Za-z\-'. ]{2,28}[\- ])(\d{1,2}|[IVX]{1,4})\x
 
 
 def planets(m, H):
-    """name-offset -> planet name (grid window law: 0x255b00..0x27a000)."""
+    """absolute mem offset -> planet name (grid window law: H+0x255b00)."""
     res = {}
-    for mm in NAME_RE.finditer(m[H + 0x255B00:H + 0x27A000]):
-        nm = mm.group(1).decode(errors="replace").strip()
-        res[mm.start() + H] = nm
+    base = H + 0x255B00          # WINDOW base, not H — the classic off-by-window bug
+    for mm in NAME_RE.finditer(m[base:H + 0x27A000]):
+        nm = mm.group(1).decode(errors="replace").strip() + mm.group(2).decode()
+        res[mm.start() + base] = nm
     return res
 
 
@@ -60,9 +61,13 @@ def turn(m, H):
 
 
 def colonized(m, H):
+    """Colonized = u16@NAME+0x28 nonzero. NOT the 9-byte block: the
+    ff ff ff at NAME+0x2e is ALLOCATOR RESIDUE on every planet of a fresh
+    map (measured r1ad-144225 Flammifer II: 01 00 00 00 00 00 ff ff ff with
+    the planet settled) — treating it as a marker marks all 153 planets."""
     res = {}
     for p, nm in planets(m, H).items():
-        if any(m[p + 0x28 + k] for k in range(9)):
+        if struct.unpack_from("<H", m, p + 0x28)[0]:
             res[p] = nm
     return res
 
