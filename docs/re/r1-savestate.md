@@ -774,3 +774,38 @@ to multiples of 16, shared per ordinal, rotate (movers at every boundary,
 constant |offset|). Remaining open: exact offset table (why ordinals I-IV map
 to those four vectors; mixed-ordinal groups 4/33), and the third offset
 component (+0x5b reads 0 — 2.5D storage? unverified).
+
+### Orbit-table structure pass (2026-10-06l, NEXT ACTION 06k; exit-1 partial):
+pair-value table is CAMPAIGN-SPECIFIC, ordinally banded by radius
+
+- Cross-campaign comparison (230146 t2 vs r1ad-144225 t0): per-ordinal value
+  sets OVERLAP only partially (I 4/17, II 5/16, III 2/10, IV 2/8, V 2/5).
+  RETRACT the 'identical on both campaigns' phrasing — the four seed values
+  I=(320,-960) II=(-1088,-768) III=(-1344,992) IV=(608,1888) recur exactly
+  (they are the t0/t-fresh SEED vectors for every campaign [verified shared]),
+  but the per-turn TRAJECTORY value-sets diverge: each campaign evolves the
+  shared table with its own initial phase mix. The table itself is a RUNTIME
+  structure (32-33 live value-slots), NOT static vendor data to lift verbatim.
+- RADIUS-BAND LAW (new, verified 230146 t2): ordinal I radii in {672..1218},
+  II {544..1568}, III {544..1901}, IV {544..2216}, V {544,672,896}: all
+  multiples of 32 now visible as the table evolves; the constant radii
+  544/672/896 recur across ALL ordinals (they are the SEED radii of small
+  systems); the LARGER radius per ordinal grows with ordinal because later
+  boundaries rotate the same vector to new positions — NO, radii are
+  per-planet constant (orbit law): the value-set per ordinal contains
+  DISTINCT-planet values. Reading: ordinal k exists only on systems with >=k
+  planets (I:54 planets, II:44, III:30, IV:16, V:7 = system-size pyramid);
+  within one ordinal the values are PER-PLANET (17 distinct for 54 ordinal-I
+  planets => ~3-4 planets share each value).
+- 4 MIXED groups (230146 fresh map) all have y==0 (on-axis: (672,0),(896,0),
+  (544,0),(-1216,0)) [verified]: the axis is where different ordinals'
+  rotating vectors CROSS — mixing is a trajectory artifact, not data. Group
+  with 20 members at (672,0) = ordinal V of 13 5-planet systems + crossing.
+- +0x5b third component: 0 in ALL slots of 230146 (t2..t9) and ck013: stays
+  2.5D (no z stored) [verified 23 slots].
+- CONCLUSION for rewrite docs: orbit evolution = shared runtime table of
+  ~(one vector per planet-slot-index) rotating per turn with per-planet
+  angular velocity w(r) (inverse-square band shape per 06e); lift PER-RUN by
+  measurement, not verbatim. Seed vectors at fresh map: I(320,-960)
+  II(-1088,-768) III(-1344,992) IV(608,1888) (shared across campaigns
+  [verified], V on-axis 672).
