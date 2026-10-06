@@ -13,8 +13,9 @@ CONVENTION: star records are NAME-anchored; record k's NAME sits at
     name+0x2A  u32[5]  planet pointers, 0-padded; TARGET = planet NAME
                        address - 0x24 (record start). Entry is LIVE iff the
                        target planet's name prefix == this star name. Tail
-                       slots beyond the moon count hold STALE pointers from
-                       earlier campaigns (observed mid-run, e.g. Syzygifer).
+                       slots beyond the live run hold GARBAGE pointers —
+                       present even on fresh maps (allocator residue, NOT
+                       campaign carryover; 43 on r1ad-131350 ck008).
     name-0x18  u32     system index, 0-based (== k) — all 50 records.
     name-0x14  f32 x   star position triple (x, y at +4, z at +8).
     name-0x20  u32     0xFFFFFFFF PRESENT in campaign runs (49/50 records,

@@ -513,9 +513,11 @@ into the names.txt pool past record 50; every field offset is name-relative):
                          target planet name prefix == this star name. Verified
                          law: at most ONE system live-owns any planet (136/151
                          run230146, 141/167 run233706, 158/158 idle 221429).
-                         Tail slots beyond the live run hold STALE pointers
-                         from earlier campaigns / off-grid values — legal, not
-                         corruption; stale counts 46/43/28 respectively.
+                         Tail slots beyond the live run hold GARBAGE pointers
+                         (off-grid or foreign-prefix) — present even on a
+                         BRAND-FRESH map (43 on fresh r1ad-131350), so NOT
+                         campaign carryover; the LIVE prefix rule is the law,
+                         stale entries are allocator residue to ignore.
 
 PLANET ORBIT LAW (assigned planets, orbit pair f32 @ planet-name+0x57 (x) and
 +0x5f (y), star center from star name-0x14):
@@ -626,3 +628,52 @@ xsend the click into the live run, autosaves bracket automatically).
     base (grid names Ajax/Almaviva); campaign identity check is planet
     NAME@j, not slot index. Any census on a run MUST pin the campaign
     boundary via turn counter first.
+
+### Adaptive capture run r1ad-20261006-131350 (2026-10-06d): boundary law holds
+on a THIRD campaign; orbit law NOT reproduced under unknown screen state;
+colonized-block increments refined.
+
+Harness lessons (all fixed in scripts/r1_adcapture.sh):
+  1. campaign-entry gate: 'cosmic exiles' needle is on the SETUP screen, not
+     campaign-only -> false breaks. Reliable law: planet-grid hash at the
+     pointer-law base changes when a game actually starts (residual residual
+     names until then).
+  2. autosave writes slots IN PLACE; a raw `cp` can catch a torn file
+     (BadZipFile — hit ck001/ck011). Checkpoint now requires two identical
+     Memory-member size reads 2 s apart before copying.
+  3. dosbox -time-limit kills the game mid-drive if the tour slips; the
+     adaptive phase must fit inside BOOT (600 s worked once the tour fired
+     at t=75/100).
+
+Verified this run (checkpoints ck008..ck016 = turns 0,0,0,0,0,1,1,2 on a
+fresh Ephemera map, 157 planets):
+  - TURN-BOUNDARY PLANET CHURN LAW reproduces: zero record change at five
+    intra-turn checkpoint pairs; exactly 156/157 records change per turn
+    boundary, mass-writer = NAME+0x57/0x5f pair again (offsets 87,88,89,95,
+    96,97 top), plus the SAME handful: +0x2a/+0x2c/+0x2e block on exactly the
+    5 colonized planets, +0x42..0x46 (4), +0x73 (4).
+  - COLONIZED BLOCK dynamics (2nd campaign, clean slots): u8@NAME+0x28: 1->2
+    at first boundary on 4/5 colonies (Ignatius I STAYS 1); u8@NAME+0x2a
+    increments per turn: +2 on four colonies, +1 on Sophia I (0->1->2 over
+    two boundaries; matches the 230146 per-planet +1/+2/+3 family — per-planet
+    CONSTANT confirmed across campaigns); u24@NAME+0x2e: ff.. -> small value
+    (65576, 65554, 65588, 1376273 = 0x150491) at first boundary EXCEPT
+    Sophia I, which KEEPS 0xFFFFFFFF (unset) — initialization is per-colony
+    conditional [semantics unverified; candidate: build-queue/economy slot].
+  - ORBIT LAW REPRODUCES on this THIRD campaign (0/157 radius violations at
+    both boundaries; same per-planet dtheta distribution family as 230146 —
+    modes 355.0/357.3/351.1 deg, e.g. Hurble IV -0.82 deg/turn constant;
+    quantized initial radii 896/672/544/384 all theta at 0/180 exactly on a
+    fresh map — the generator seeds phase 0/180 with x/y assignment by
+    sign). PITFALL THAT FAKED A CONTRADICTION for one full analysis pass:
+    the orbit pair is f32 x @NAME+0x57 and f32 y @NAME+0x5f (8-BYTE GAP);
+    NAME+0x5b..0x5e is padding that reads 0.0. Reading '<ff' CONSECUTIVELY
+    from 0x57 yields (x, 0.0) and makes every orbit look radial. Always
+    unpack the two components separately at their own offsets.
+  - Star-chain law holds on the new map (chain of 50 from Ephemera k=0,
+    idx==k; planet-pointer single-owner law: every planet LIVE-owned, 157
+    distinct owners map-wide). STALE pointers are NOT campaign carryover:
+    a brand-fresh map still has 43 off-grid/stale tail entries (2 stars even
+    hold a duplicate LIVE entry: 159 LIVE pointer slots for 157 planets).
+    Reading hardened: tails are allocator garbage; the LIVE prefix rule is
+    the law, per-map orphan membership is generation-shaped.

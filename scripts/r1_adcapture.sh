@@ -78,9 +78,31 @@ DB=$!
 CKN=0
 CKDIR="$OUT/ck"
 checkpoint() {
-  local newest
+  local newest tmp
   newest=$(ls -t "$OUT"/save/*.sav 2>/dev/null | head -1)
   [ -n "$newest" ] || return 1
+  # VALIDITY GUARD: autosave writes the slot in place; a raw cp can catch it
+  # mid-write (hit r1ad-131350 ck001/ck011 -> BadZipFile). Require a readable
+  # Memory member TWICE (2 s apart, stable size) before committing the copy.
+  tmp="$OUT/.ck.tmp"
+  for _try in 1 2 3; do
+    if python3 -c '
+import sys, zipfile
+z = zipfile.ZipFile(sys.argv[1]); print(z.getinfo("Memory").file_size)
+' "$newest" > "$tmp" 2>/dev/null; then
+      sleep 2
+      if python3 -c '
+import sys, zipfile
+z = zipfile.ZipFile(sys.argv[1]); print(z.getinfo("Memory").file_size)
+' "$newest" | cmp -s - "$tmp"; then
+        break
+      fi
+    fi
+    sleep 3
+    newest=$(ls -t "$OUT"/save/*.sav 2>/dev/null | head -1)
+    [ -n "$newest" ] || return 1
+  done
+  rm -f "$tmp"
   CKN=$((CKN + 1))
   cp "$newest" "$CKDIR/$(printf ck%03d "$CKN").sav"
   echo "$(basename "$newest") -> ck$(printf %03d "$CKN")" >> "$OUT/ck.log"
@@ -158,7 +180,9 @@ while kill -0 "$DB" 2>/dev/null; do
   fi
   if [ -n "$BASELINE" ] && [ -n "$newest" ]; then
     CUR=$(grid_hash "$newest")
-    if [ "$CUR" != "$BASELINE" ] && [ "$CUR" != "NOBASE" ]; then
+    # EMPTY output = slot file mid-write (zipfile raises) -> unknown, retry
+    # next tick; never treat as 'entered' (hit r1ad-131350: t=20 false break).
+    if [ -n "$CUR" ] && [ "$CUR" != "NOBASE" ] && [ "$CUR" != "$BASELINE" ]; then
       echo "campaign ENTERED at t=$NOW (grid $BASELINE -> $CUR)" >>"$OUT/click.log"
       break
     fi

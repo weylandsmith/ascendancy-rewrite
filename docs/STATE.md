@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-06T12:07
+updated: 2026-10-06T13:45
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -95,6 +95,16 @@ and docs/re/savegame.md with guest-phys addresses per field.
 
 ## KNOWN-ISSUES / PARKING LOT (operational; research negatives live in
 ## docs/REFUTED-ROUTES.md)
+- ORBIT PAIR OFFSET PITFALL: f32 x @planet-name+0x57, f32 y @+0x5f — 8-byte
+  gap, +0x5b..0x5e is zero padding. Reading "<ff" consecutively from 0x57
+  fakes a radial-motion law (hit 2026-10-06d, cost one full analysis pass).
+- ADAPTIVE CAPTURE (scripts/r1_adcapture.sh): campaign-entry law = planet
+  grid hash AT POINTER-LAW BASE CHANGES ('cosmic exiles' needle is the SETUP
+  screen, NOT campaign — false breaks); checkpoint must double-read slot
+  size (autosave rewrites in place -> torn BadZipFile copies); adaptive
+  phase fits inside BOOT (-time-limit kills the game mid-drive).
+- vision_analyze intermittent 500 ('image input is not supported') — pixel
+  statistics (panel dark-frac, color histogram) classify screens without it.
 - DOSBOX RULE: never launch dosbox with stdout/stderr to a log unless you
   first confirmed it will not sit at an interactive prompt (EOF at a prompt =
   infinite "Are you sure to quit anyway now?" -> the 12 GB incident). Bound
