@@ -213,6 +213,23 @@ else
   echo "note: no R1 save-state captures present (work/r1/r1sav-*); pointer-law battery skipped"
 fi
 
+# 3s. STAR TABLE LAW (docs/re/r1-savestate.md 2026-10-06): stride-96 name-
+# anchored star records, planet ptrs at name+0x2A targeting planet-name-0x24,
+# single-owner law. Battery on captured slots; skips with a note when no
+# captures exist (work/ is not committed).
+STARSAV=""
+for d in "$ROOT"/work/r1/r1sav-*/save; do
+  [ -d "$d" ] && STARSAV="$d"
+done
+if [ -n "$STARSAV" ] && ls "$STARSAV"/*.sav >/dev/null 2>&1; then
+  if ! "$HOME/tools/revenv/bin/python" "$ROOT/scripts/r1_star_table.py" \
+        --run-dir "$(dirname "$STARSAV")" >/dev/null 2>&1; then
+    err "STAR TABLE battery failed on captured slots in $(dirname "$STARSAV")"
+  fi
+else
+  echo "note: no R1 save-state captures present; star-table battery skipped"
+fi
+
 # 3r. MODULE ATTRIBUTION invariant (docs/re/r1-savestate.md 2026-10-05j):
 # the restored image must keep yielding debug-string attributions for the
 # core modules (flic/winmgr/gsystem/race, >=5 exact sites each). Needs the
