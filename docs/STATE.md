@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-06T13:45
+updated: 2026-10-06T15:25
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -76,37 +76,44 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-PLANET-VIEW CROSSREAD, ROUND 2 (closes into OQ-016 + OQ-010). Round 1
-(r1ad-20261006-135319, 2026-10-06f): entered campaign via grid law (t=124),
-opened the planet view of the colony BYZANTIUM III (player's only colony on
-fresh maps; vision: 'Minions (1 Planet Occupied, 1 System Controlled)',
-'(Enormous Supermineral Planet)', 'No Project', terrain thumbs, NO numeric
-readouts visible). NEXTTURN (511,67) is STRATEGIC-MAP-ONLY — swallowed by the
-modal view (turn stayed 0, ck007..ck014). Procedure: enter (grid law) ->
-Planets menu click (window 508,137) -> click list row y=134 (root; vision-
-confirmed) -> cmd_ck -> ESC/click map to CLOSE (verify closed by pixel or by
-shot) -> cmd_ck -> (511,67) NEXTTURN -> verify turn++ -> cmd_ck. Then diff
-record 'Byzantium III' across checkpoints, and dump rec+0x34..0x54 (u16
-fields: shields? income? +0x2e u24) before/after; a view-mode cycle inside
-the planet screen (click the thumbnails/tabs) may expose numeric screens —
-crop-digit-read those regions if the view shows numbers (vision 500 fallback:
-template-match digits vs live shots).
-Candidate fields: NAME+0x28 (1->2 first boundary), +0x2a (+1/+2/+3 per-planet
-per-turn), +0x2c, u24@+0x2e (init at first boundary; Sophia I NEVER inits).
-Exit codes drive the loop (R1: 0=upgrade formulas + close OQs, 1=record one
-line in this file, 2=fix harness). Do NOT re-run docs/REFUTED-ROUTES.md
-routes. Do NOT re-derive the orbit/star laws (CLOSED + corrected 06e).
+STAR-SCREEN CROSSREAD, ROUND 4 (capture; closes OQ-003 field semantics on the
+SYSTEM screen + gives the OQ-016 home-placement wedge). Planet-view round
+gave zero numeric readouts (06f) — the SYSTEM/star screen (click a star dot
+on the strategic map, NOT via Planets menu) is the untried surface; the
+sidebar 'clock' region (root ~470..540, y~40..55 — vision-confirmed top of
+panel) shows the galactic date/turn: crop-digit it against known turn values
+(0,1,2 banked from r1ad-144225 shots live-010/013/017 region) to pin the
+display law. Procedure per CADENCE LAW (runbook BLOCKED.md 06m): launch
+BOOT=700, enter (grid law), 2-3 lore center-clicks, cmd_ck; click a star dot
+at a KNOWN orbit-pair-derived screen position [inferred: map dots are planets
+at orbit-pair screen coords — round 4 must CONFIRM by clicking (672,0)-type
+axis dots where fresh-map planets cluster and checking the shot names a
+planet]; cmd_ck; ESC; bracket NEXTTURN x2 verifying turns++ ; then diff the
+NAMED record's full 123-byte frame across the bracket. Exit codes drive the
+loop (R1: 0=upgrade formulas + close OQs, 1=record one line in this file,
+2=fix harness). Do NOT re-run docs/REFUTED-ROUTES.md routes. Do NOT re-derive
+the boundary/star/cadence laws (CLOSED; orbit law CORRECTED 06k — read the
+KNOWN-ISSUES block first).
 
 ## KNOWN-ISSUES / PARKING LOT (operational; research negatives live in
 ## docs/REFUTED-ROUTES.md)
-- ORBIT PAIR OFFSET PITFALL: f32 x @planet-name+0x57, f32 y @+0x5f — 8-byte
-  gap, +0x5b..0x5e is zero padding. Reading "<ff" consecutively from 0x57
-  fakes a radial-motion law (hit 2026-10-06d, cost one full analysis pass).
+- ORBIT PAIR = ORDINAL-KEYED SHARED TABLE, NOT planet position: value is
+  keyed by planet ordinal (I=(320,-960) etc., identical across campaigns);
+  reading per-planet 'position' or extents from name+0x57/+0x5f is RETRACTED
+  law (2026-10-06k). f32 x @+0x57, f32 y @+0x5f (gap 8; +0x5b zero pad — the
+  "<ff" read fakes a radial law, hit 06d).
+- NO xdotool on this host: synthetic keys go via tools/xsend key KEYSYM
+  (rebuild: gcc -O1 -o xsend xsend.c -lX11). ESC closes the sticky planet
+  view. r1_adcapture has a cmd_key channel using this.
+- ckdiff planets() window-base law: name offsets key off H+0x255b00 (adding
+  only H silently decodes nothing / garbage — hit twice); colonized test =
+  u16@NAME+0x28 ONLY (ffffff@+0x2e is residue on every fresh-map planet).
 - ADAPTIVE CAPTURE (scripts/r1_adcapture.sh): campaign-entry law = planet
   grid hash AT POINTER-LAW BASE CHANGES ('cosmic exiles' needle is the SETUP
   screen, NOT campaign — false breaks); checkpoint must double-read slot
   size (autosave rewrites in place -> torn BadZipFile copies); adaptive
-  phase fits inside BOOT (-time-limit kills the game mid-drive).
+  phase fits inside BOOT (-time-limit kills the game mid-drive); fresh-
+  campaign LORE screen needs 2-3 center clicks (drive by shot-classify).
 - vision_analyze intermittent 500 ('image input is not supported') — pixel
   statistics (panel dark-frac, color histogram) classify screens without it.
 - DOSBOX RULE: never launch dosbox with stdout/stderr to a log unless you

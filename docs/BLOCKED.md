@@ -33,6 +33,15 @@ by gate 3n):
   saves); nosound=true; stdin=/dev/null
 - -time-limit always; all output bounded (head -c); DOSBOX RULE in STATE.md
 - kill ONLY pkill -x dosbox-x
+- CADENCE LAW (measured 2026-10-06m, 19 runs): host-clock autosave period is
+  a CONSTANT 10 s (median gap 10 s in every run's save dir). Turn advance is
+  NEVER automatic: 14 idle runs (zero landed clicks) hold turn constant for
+  the whole run. Each NEXTTURN click that lands ON THE STRATEGIC MAP advances
+  exactly +1 turn (r1ad-144225: 0->1->2; r1deep-230146: 8 scheduled clicks ->
+  7 boundaries, the missing one landed while a modal screen was open — modal
+  views SWALLOW clicks, see 06f/06j). Schedule by TIME and verify by TURN
+  number in checkpoints, never by counting slots: at 10 s autosaves a turn
+  may straddle 1-3 slot copies and slots rotate 41..60 cyclically.
 - exit codes: 0 = base derived / upgrade formulas; 1 = normal negative,
   record ONE line in STATE.md, no in-turn retry; 2 = harness bug, fix it
 
