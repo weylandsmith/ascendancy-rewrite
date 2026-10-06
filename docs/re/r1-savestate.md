@@ -540,6 +540,13 @@ gap, +0x5b..0x5e zero padding):
     rounding). Lift per-planet (radius, dtheta) pairs, not a formula.
     Fresh-map seed: all planets start theta 0 or 180 (y==0 exactly, radii
     quantized 896/672/544/384...).
+    SHARING LAW (2026-10-06k): the pair VALUE is keyed by planet ORDINAL, not
+    by planet — ordinal I = (320,-960), II = (-1088,-768), III = (-1344,992),
+    IV = (608,1888) identically on BOTH campaigns (149/154 planets in 33
+    value-groups; 29 pure-ordinal, 4 mixed) — i.e. a shared star-relative
+    offset TABLE, rotated per turn. This explains 'same-radius planets share
+    w' (22/25) above. The pair is NOT a planet's unique map position; do not
+    read extents from it (OQ-012(d) retraction, 2026-10-06k).
   - STATIC-PAIR SET: planets whose (x,y) never change any slot: 16/151 run
     230146, 28/167 run 233706. The UNASSIGNED set (no live star pointer) is a
     strict SUBSET of the static set in BOTH runs (orphan<=static verified) —
@@ -739,3 +746,31 @@ confirmed live
   off H+0x255b00, not H; 'colonized' test should ignore the ffffff residue at
   +0x2e..+0x30 (every planet carries it on fresh maps — do NOT treat ffffff
   as colonized marker; the discriminator is u16@+0x28 or the +0x2a counter).
+
+### OQ-012(d) logical map extent — ANSWERED 2026-10-06k, after one RETRACTED
+first answer (recorded so the trail stays honest):
+
+RETRACTION: a first pass "measured" a galacto-centric DISK r<=2216.3 from the
+planet orbit pair (name+0x57/+0x5f). WRONG FRAME: the pair is NOT a unique
+planet position — the same (x,y) value recurs across systems keyed by planet
+ORDINAL (all ordinal-I planets of run 230146 AND run r1ad-144225 read
+exactly (320.0,-960.0); ordinal-II (-1088,-768); III (-1344,992); IV
+(608,1888); 149/154 planets sit in 33 shared value-groups, 29 pure-ordinal)
+[verified]. It is a STAR-RELATIVE orbit-offset table value; extents taken
+from it are meaningless (the 'two-campaign agreement' was cross-campaign
+CONSTANCY, not geometry).
+
+ACTUAL EXTENT LAW (measured from STAR records, both campaigns, no capture):
+every star's f32[3] at star-name-0x14 lies on a SPHERE r ~= 440 — 230146:
+r_max 439.7, |r-440| max err 0.00 within float precision on the 50 clean
+candidates; r1ad-144225: r_max 439.2. (Candidate set of 54/52 included 2-4
+junk names with r 0 or 220; the 50-record star chain subset is clean.)
+Coordinates are CONTINUOUS 3D floats (quant-16 hits 3/54 = noise) — unlike
+the quantized 16-multiple orbit offsets. z spans +-431.
+SEMANTICS FOR REWRITE: original galaxy = ~50 stars scattered on a sphere of
+r 440 in continuous 3D; rewrite's uniform box placement (mapgen.cpp step 1)
+is a documented divergence, NOT vendor geometry. Orbit offsets: quantized
+to multiples of 16, shared per ordinal, rotate (movers at every boundary,
+constant |offset|). Remaining open: exact offset table (why ordinals I-IV map
+to those four vectors; mixed-ordinal groups 4/33), and the third offset
+component (+0x5b reads 0 — 2.5D storage? unverified).
