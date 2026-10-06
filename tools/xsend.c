@@ -41,34 +41,62 @@ static Window find_named(Display* d, Window w, const char* title, int depth) {
 }
 
 int main(int argc, char** argv) {
-    if (argc < 4) { fprintf(stderr, "usage: xsend title x y\n"); return 2; }
+    if (argc < 4) { fprintf(stderr, "usage: xsend title (click x y | key KEYSYM [ch])\n"); return 2; }
     const char* title = argv[1];
-    int x = atoi(argv[2]), y = atoi(argv[3]);
+    int is_key = strcmp(argv[2], "key") == 0;
+    int x = 0, y = 0; KeySym ks = 0;KeyCode kc = 0;
     Display* d = XOpenDisplay(NULL);
     if (!d) { fprintf(stderr, "no display\n"); return 1; }
+    if (is_key) {
+        ks = XStringToKeysym(argv[3]);
+        if (ks == 0L) { fprintf(stderr, "bad keysym '%s'\n", argv[3]); return 2; }
+        kc = XKeysymToKeycode(d, ks);
+    } else {
+        x = atoi(argv[2]); y = atoi(argv[3]);
+    }
     XSetErrorHandler(ignore_badwindow);
     Window root = DefaultRootWindow(d);
     Window w = find_named(d, root, title, 0);
     if (!w) { fprintf(stderr, "window '%s' not found\n", title); return 1; }
-    XWarpPointer(d, None, w, 0, 0, 0, 0, x, y);
-    XSync(d, False);
-    usleep(20000);
     XEvent e;
     memset(&e, 0, sizeof e);
-    e.xbutton.window = w;
-    e.xbutton.x = x; e.xbutton.y = y;
-    e.xbutton.button = Button1;
-    e.xbutton.same_screen = True;
-    e.xbutton.subwindow = None;  /* target IS the event window */
     int press;
+    if (!is_key) {
+        XWarpPointer(d, None, w, 0, 0, 0, 0, x, y);
+        XSync(d, False);
+        usleep(20000);
+        e.xbutton.window = w;
+        e.xbutton.x = x; e.xbutton.y = y;
+        e.xbutton.button = Button1;
+        e.xbutton.same_screen = True;
+        e.xbutton.subwindow = None;  /* target IS the event window */
+    }
     for (press = 1; press >= 0; press--) {
-        e.type = press ? ButtonPress : ButtonRelease;
-        e.xbutton.send_event = True;
-        XSendEvent(d, w, True, ButtonPressMask | ButtonReleaseMask, &e);
+        if (is_key) {
+            e.type = press ? KeyPress : KeyRelease;
+            e.xkey.window = w;
+            e.xkey.root = root;
+            e.xkey.subwindow = None;
+            e.xkey.same_screen = True;
+            /* XLookupString on a synthetic event reads keycode->keysym via
+             * the server keymap; a caller may override keycode with the
+             * KEYSYM OF THE LITERAL CHAR (argv[4]) so DOS text apps see it. */
+            const char* ch = (argc > 4) ? argv[4] : "";
+            e.xkey.keycode = (press && ch[0])
+                ? XKeysymToKeycode(d, XStringToKeysym(ch)) : kc;
+            /* state=0 intentionally: synthetic modifiers unverified */
+        } else {
+            e.type = press ? ButtonPress : ButtonRelease;
+            e.xbutton.send_event = True;
+        }
+        e.xkey.send_event = True;
+        XSendEvent(d, w, True, is_key ? (KeyPressMask|KeyReleaseMask)
+                                      : (ButtonPressMask | ButtonReleaseMask), &e);
         XFlush(d);
         usleep(50000);
     }
-    fprintf(stderr, "sent button1 to 0x%lx at %d,%d (press%s)\n", w, x, y,
+    fprintf(stderr, "sent %s to 0x%lx at %d,%d (press%s)\n",
+            is_key ? argv[3] : "button1", w, x, y,
             press == -1 ? "+release" : " only (window died)");
     XCloseDisplay(d);
     return 0;

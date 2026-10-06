@@ -6,7 +6,7 @@
 
 phase: P6
 milestone: 6  # 0..6 ; gate.sh keys build/test stages off milestone >= 3 (bumped to 6 at 2026-10-04h completion walk)
-updated: 2026-10-05T23:30
+updated: 2026-10-05T23:55
 turn_log_recent:
   - "seed: environment installed, cob.py extracts 471 files, Ghidra+MCP wired, plan written"
   - "crash forensics (2026-10-03): ENOSPC from a 12.39 GB dosbox probe log (see
@@ -491,23 +491,29 @@ scripts/r1_restore_sites.py and validated (pointer runs -> Watcom starts
 292 funcs, 741 data refs, 21 vtables) and MODULE ATTRIBUTION is LIVE
 (scripts/attribution_scan.py, gate 3r, work/attribution.tsv: 225 E1 refs,
 62% on true fixup sites; batmode 10 sites span 0x4fd7, race 20, cosmos 10).
+DEEP CAPTURE IS LIVE (2026-10-05k): scripts/r1_deepcapture.sh boots to title,
+clicks New Game (318,293), needle-gated; scripts/r1_campaign_probe.py proves
+campaign start byte-wise (planet table static-addr 0x26d07b, rec0 name flips
+'Ajax I'->'Bodkin I' at slot 52 run 215445); scripts/r1_planet_layout.py
+joins resume.gam<->live RAM 151/151 (stride-123 records; +0x68/+0x69 are
+generation constants, NOT turn clock — refuted same-minute). names.txt pool
+resident in fresh-galaxy RAM (mapgen law confirmed at runtime).
 THE next action is:
-DEEPER IN-BATTLE CAPTURE (OQ-010 critical path per the static boundary in
-r1-savestate.md ATTEMPT 3 section — trust only rel32 edges + rewritten-site
-immediates statically; data-driven inputs need live RAM). Pipeline to build
-as scripts/r1_deepcapture.sh reusing r1_savestate.sh invariants (scratch
-copy, -time-limit, pkill -x, bounded log, autosave 60 s): boot via the
-save-state harness, drive menus into a REAL game with tools/xsend clicks at
-the title-menu coordinates the gate refcap stage already proves (button1
-press+release), then into a battle where possible; autosave slots then carry
-loaded DATA structures. Slot-diff two captures (title vs in-game) of guest
-RAM -> pointer law decodes every absolute pointer even in non-restored pages
-(rv - P0 -> file offset for image refs; rv outside image span -> runtime
-heap). Correlate heap regions against extracted/ tables for savegame map
-(OQ-003), AI weights (OQ-015/016), combat inputs (OQ-010). DecompileCombat
-targets from batch 3 stay in work/combat_decomp_targets.txt. Residual unknowns
-stay filed exactly as the contract's evidence rules require; none blocks
-playability to victory.
+LONG IN-GAME CAPTURE (OQ-010 critical path). The new-game flow is now a
+PROVEN TWO-CLICK LAW: 75 s New Game (window 318,293) -> 115 s start
+(window 600,440); scripts/r1_campaign_probe.py verifies the campaign
+actually started (rec0 name at phys 0x26d07b). Run r1_deepcapture.sh with
+BOOT>=420 and SCHEDULE="75:318:293;115:600:440", keep slots, then diff
+adjacent mtime-consecutive slots of the LIVE campaign (not title-vs-game):
+turns advance in the original game, so consecutive-slot diffs isolate
+ECONOMY/COMBAT-adjacent mutations. Pointer law decodes heap refs in
+non-restored pages (rv-P0 = payload file offset inside image span; else
+runtime heap). Correlate mutated regions against extracted/ascend02 tables
+and the stride-123 planet record (+0x68/+0x69 are generation constants, do
+not mine; static boundary from ATTEMPT 3 still governs: trust only rel32
+edges + rewritten-site immediates). Exit codes drive the loop (0=upgrade,
+1=record one line, 2=fix harness). Residual unknowns stay filed exactly as
+the contract's evidence rules require; none blocks playability to victory.
 
 ## KNOWN-ISSUES / PARKING LOT
 - DOSBOX RULE (caused the 12 GB crash): never launch dosbox with stdout/stderr

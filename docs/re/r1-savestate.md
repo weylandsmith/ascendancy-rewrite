@@ -71,6 +71,95 @@ attaching to a process.
   writes work/functions3.tsv, work/code2data.tsv, work/vtables3.tsv.
 * `scripts/attribution_scan.py` — module attribution via debug strings
   (E1 exact / E2 hint; gate 3r). Writes work/attribution.tsv.
+* `scripts/r1_deepcapture.sh` + `scripts/r1_deep_diff.py` — DEEPER CAPTURE
+  (2026-10-05k): boots the game, clicks title New Game (window 318,293 =
+  root 333 law), VERIFY_NEEDLE-gated retry (needle = post-screen string,
+  checked against the newest autosave; max 5 extra clicks at 11 s cadence —
+  synthetic clicks are flaky, run2 warped without a button event), then
+  diffs earliest-vs-latest guest RAM. Exit 0 = payload anchored AND deep
+  (>=100k bytes changed, >=50 live image refs, >=5 new strings). First
+  verified run r1deep-20261005-204919: changed 744,840 / heap 741,556 /
+  live image refs 195 / new strings 3,932 (newgame.txt race blurbs — click
+  proven landed by needle in slot content, deep_census.txt persisted).
+  CORRELATION (same capture, scripts inline): word-like census strings (>=4
+  letter word + 2 more) = 22, ALL 22 substrings of extracted/ — 21 = every
+  newgame.txt race blurb (21/21 lines fully resident in late-slot RAM; the
+  New Game setup screen had loaded its complete table), rest = VOC headers
+  (audio bank load). Membership hazard: census lines carry the trailing
+  newline — strip before substring tests (un-stripped it falsely reported
+  0/22; artifact-encoding check before any membership claim).
+  LAWS learned: slot ORDER = file mtime not slot number (autosave rotates
+  41-60; post-wrap the LOWEST number is the NEWEST — numeric sort produced
+  a false shallow); BASELINE = early slot must lack the needle (first
+  autosave lands ~62 s after Xvfb start; a click before it leaves no
+  pre-click frame => exit 2, schedule click t>=75).
+  NEW-CAMPAIGN LAUNCH LAW (run r1deep-20261005-215445, byte-proved, NO
+  vision needed): planet table at phys 0x26d07b (same address as the resumed
+  campaign) changes its record-0 name between consecutive mtime-ordered
+  slots — 'Ajax I' (pre-launch campaign, slots 46-51) -> 'Bodkin I' (new
+  campaign, slots 52-45). Detector is now scripts/r1_campaign_probe.py
+  (exit 0 = transition captured in this run, 1 = single campaign, 2 =
+  harness). Detect campaign start byte-wise; vision is only for WHERE.
+  SETUP-SCREEN START CONTROL: WINDOW-RELATIVE (600,440) (run
+  r1deep-20261005-221429, proven by ELIMINATION: the run made exactly two
+  clicks, New Game at 75 s and (600,440) at 115 s; every one of the 20
+  autosave slots holds a FRESH campaign (rec0 'Alpheratz I', a names.txt
+  pool name; the boot campaign is 'Ajax I') => the second click completed
+  the new-game flow). Note the fresh campaign was already resident in the
+  FIRST post-click slot (10 s autosave cadence beats vision round-trips).
+  tools/xsend grew a `key KEYSYM [ch]` mode (compiled clean; synthetic key
+  delivery to the DOS guest still UNVERIFIED — prove with a text-entry
+  screen before relying on it).
+  +0x69 IS NOT a turn clock: REFUTED same-minute (run 215445) — rec0
+  (+0x68,+0x69) = (152,37) in all 20 slots across a campaign restart AND
+  an idle stretch; rec0 reads (152,37) in BOTH independently-generated new
+  campaigns (Ajax I, Bodkin I). Consistent with per-record STATIC
+  generation data (rec0 likely unowned-planet defaults) whose save-vs-live
+  delta (+192/+5/+6 on the resumed Xerxes campaign) is per-campaign init
+  state [unverified origin; do not mine further until code xrefs land].
+
+PLANET RECORD RECOVERED FROM DEEP HEAP (2026-10-05k, run r1deep-20261005-210149):
+the title screen ALREADY carries resume.gam's loaded map (game restores the
+current campaign at startup — 'Xerxes II', 'Mukwonago V' present pre-click;
+'Star Lane Anatomy' is a static.txt HELP topic name, not a screen name —
+needles must be proven absent from the title baseline, this one wasn't).
+CONFIRMED by file<->RAM join (scripts/r1_planet_layout.py, deterministic):
+game/resume.gam (81,647 B — gate 3f pins THIS size; the scratch copy under
+work/r1/game/ converges to the same 81,647 B by run end) holds 151 planet
+records, stride 123, first name at file 0x9b1a; the same
+151 records, same order, live verbatim at phys 0x26d07b in the resumed slot
+(pointer law H=0x88) with EXACTLY two differing fields (r1_planet_layout.py
+counter census): +0x68 u8 = a monotone-nondec order-preserving COUNTER on
+both sides (file 0..255 wraps=2, ram 0..255 wraps=2, constant delta +192
+mod 256 on all 150 differing records — NOT owner: 50 systems can't share one
+byte identity, so it is a per-slot scan/serial counter whose origin differs
+[unverified]) and +0x69 u8 {0..32} -> {..38}, delta +5 (98 recs) or +6 (52)
+— GROWTH-shaped: the live campaign advanced after the save [unverified
+semantics]. Earlier drafts of this paragraph claimed '+136' and 'owner-
+dependent'; both were wrong, superseded by the counter census.) Name field
++0x00..0x12 mismatch count 0. So resume.gam
+is an ON-DISK MIRROR of the live map tables: static file offsets read the
+same record layout the game uses at runtime [verified 151/151].
+Star-side settled WITHOUT new law: naming already closed in docs/re/mapgen.md
+(names.txt pool + shuffle); the pool is resident verbatim in new-game slots
+(phys 0x2e8338 run-204919 slot 48, stride-20 name[12]+f32+f32+u32 records)
+and absent from resumed slots — as expected for a loaded-save campaign. An
+interim "50-star roster stride-51" claim made mid-turn was NOT reproducible
+from any byte source and was retracted the same turn (vision text is not
+evidence; only mem/file searches are).
+Name-region census in physical 0x26d000+: 121 '[Star] [Roman]' planet names
+at a CONTIGUOUS stride of exactly 0x7b with the name at record offset +0x59
+(all 121 satisfy (o-base)%0x7b==0x59; base found by the +0x59 law). 50
+distinct star systems, up to V moons each (~150 record slots incl. blanks).
+SEMANTIC UPGRADE (honest chain): FUN_0004ae24, recorded this morning as bare
+'operator new (stride divides 0x7b/0x60/0x27)', divides exactly 0x7b AND
+addresses name-adjacent field +0x59 — it is the PLANET record
+allocator/accessor [inferred from the RAM-matching constants: stride 0x7b +
++0x59 both verified]. The other two strides (0x60=96, 0x27=39) are candidate
+record sizes for further correlation (star records? lanes?). rec0 byte census
+(31 nonzero-at-some-record u32 columns) is raw material for the savegame
+map (OQ-003); semantics of individual fields remain [unverified] until code
+xrefs or a gameplay-delta diff pin them.
 
 ## Save-state internals — source-cited (subagent verified tag dosbox-x-v2025.02.01) + measured cross-checks
 
