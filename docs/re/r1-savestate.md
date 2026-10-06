@@ -829,3 +829,17 @@ exit-1): map star-dots are NOT clickable surfaces at dot centers
   this campaign; vision coords) or the blue/red lane endpoints — those are
   the confirmed interactive map objects; a SYSTEM screen has never yet been
   opened by any route (planet menu opens the PLANET view directly).
+
+### OQ-012(b) pps distribution — CLOSED (measured) 2026-10-06o
+Planets-per-system over the FULL star tables of FIVE campaigns (250 systems;
+r1_star_table.py --verbose --all after lifting its 12-record print cap):
+hist {1:46, 2:60, 3:45, 4:50, 5:49}, mean 2.984. Uniform 1..5 expectation is
+50/system; chi-square = (4-46.. terms) = 2.84 on 4 df, p ~ 0.58 — uniform
+NOT rejected, and no shape (triangular/geo) is supported at n=250 over
+uniform. Per-campaign means 2.72..3.14 all consistent. LAW: pps ~ U{1..5},
+exactly the rewrite constant (rewrite/src/game/mapgen.cpp:120
+std::uniform_int_distribution<int> nplan(1, cfg_.maxPlanets), maxPlanets=5
+mapgen.h:49) — code verified MATCHING original, no change required.
+Evidence is pointer-law guest-phys measurement (star count field verified per
+star-record law), not inference from names: counts come from the live planet
+pointer arrays.

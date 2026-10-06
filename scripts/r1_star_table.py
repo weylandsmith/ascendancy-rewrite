@@ -120,7 +120,7 @@ def find_star_names(mem, H):
     return best
 
 
-def check(mem, H, verbose=False):
+def check(mem, H, verbose=None):  # True: 12 records; "all": 50; falsy: none
     fails, notes = [], []
     nplanets = 0
     while re.match(PNAME_RE, mem[PLANET_N + H + nplanets * STRIDE_P:][:40]):
@@ -180,7 +180,9 @@ def check(mem, H, verbose=False):
                  f"{live_first}/{len(names)}; live-owned {len(owned)}; "
                  f"stale/off-grid ptrs {stale}; sentinel {sent_hits}/{len(names)}")
     if verbose:
-        for k, (B, sn) in enumerate(names[:12]):
+        # --all lifts the historical 12-record print cap (needed for pps
+        # histograms over the full 50-system table, 2026-10-06o).
+        for k, (B, sn) in enumerate(names[: (None if verbose == "all" else 12)]):
             x, y, z = struct.unpack_from("<fff", mem, B + H + S_XYZ)
             ms = sorted(j for j in owned if owned[j] == sn)
             print(f"  k={k:<3}{B:#x} {sn:<13} ({x:8.1f},{y:8.1f},{z:8.1f}) "
@@ -193,6 +195,8 @@ def main():
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--slot", type=int, default=None)
     ap.add_argument("--verbose", action="store_true")
+    ap.add_argument("--all", action="store_true",
+                    help="with --verbose: print all 50 systems (default caps at 12)")
     args = ap.parse_args()
     if not os.path.exists(PAY):
         print("[star] no payload needle")
@@ -203,7 +207,7 @@ def main():
         return 2
     worst = 0
     for f, mem, H in slots:
-        fails, notes = check(mem, H, args.verbose)
+        fails, notes = check(mem, H, "all" if (args.verbose and args.all) else args.verbose)
         print(("OK  " if not fails else "FAIL") + f" {f}: {'; '.join(notes)}")
         for m in fails[:8]:
             print(f"      - {m}")
