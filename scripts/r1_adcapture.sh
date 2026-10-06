@@ -119,32 +119,63 @@ sys.exit(0 if needle in mem else 1)
 ' "$newest_f" "$VERIFY_NEEDLE"
 }
 
-# phase 1: enter campaign via the proven golden-tour schedule. Fire each
-# entry ONCE at its time; a flaky click is caught by the needle gate AFTER
-# the whole schedule: while the needle is absent, re-fire the LAST entry
-# every 11 s (deepcapture law; needle = 'cosmic exiles' on newgame screen).
+# phase 1: golden tour = two clicks (75: New Game 318,293; 100: start 600,440).
+# ENTRY LAW (measured 2026-10-06d): 'cosmic exiles' appears on the SETUP
+# screen, NOT campaign-only — it cannot gate campaign entry (hit run
+# r1ad-20261006-125117). Reliable discriminator: the planet NAME grid at the
+# pointer-law base is RESIDUAL (previous campaign's names) on title/setup and
+# gets regenerated with fresh names when the game actually starts. Baseline
+# = grid hash at t=10; entered = grid hash CHANGED. While not entered,
+# re-fire the start click every 11 s (bounded); if still not in by t=220,
+# re-fire the whole tour (bounded to one redo).
+grid_hash() {
+  python3 - "$1" "$ROOT/work/ascend_payload.bin" <<'PY'
+import sys, zipfile, hashlib, re
+sys.path.insert(0, "scripts")
+from r1_sav_scan import build_anchors, find_base
+pay = open(sys.argv[2], "rb").read()
+mem = zipfile.ZipFile(sys.argv[1]).read("Memory")
+v, _ = find_base(mem, build_anchors(pay))
+if not v:
+    print("NOBASE")
+else:
+    H = v.most_common(1)[0][0] - 0x1BF450
+    P0 = 0x26d07b
+    blob = mem[P0 + H: P0 + H + 123 * 16]
+    print(hashlib.md5(blob).hexdigest())
+PY
+}
+BASELINE=""
+LAST_FIRE=0
+TOUR_REDO=0
+T_REDO_START=0
 while kill -0 "$DB" 2>/dev/null; do
   NOW=$(( $(date +%s) - T0 ))
-  IFS=';' read -ra ENTRIES <<< "$SCHEDULE"
-  for e in "${ENTRIES[@]}"; do
-    [ -z "$e" ] && continue
-    case " $DONE_SCHED " in *" $e "*) continue;; esac
-    TS=${e%%:*}; REST=${e#*:}; X=${REST%%:*}; Y=${REST##*:}
-    if [ "$NOW" -ge "$TS" ]; then
-      checkpoint || true
-      DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" "$X" "$Y" >>"$OUT/click.log" 2>&1
-      LAST_X="$X"; LAST_Y="$Y"
-      DONE_SCHED="$DONE_SCHED $e"
-    fi
-  done
-  if [ -n "${LAST_X:-}" ] && [ "$NOW" -ge "$NEXT_EXTRA" ]; then
-    if needle_present; then
-      echo "campaign entered at t=$NOW" >>"$OUT/click.log"
+  newest=$(ls -t "$OUT"/save/*.sav 2>/dev/null | head -1)
+  if [ -z "$BASELINE" ] && [ "$NOW" -ge 10 ] && [ -n "$newest" ]; then
+    BASELINE=$(grid_hash "$newest")
+    echo "baseline grid $BASELINE at t=$NOW" >>"$OUT/click.log"
+  fi
+  if [ -n "$BASELINE" ] && [ -n "$newest" ]; then
+    CUR=$(grid_hash "$newest")
+    if [ "$CUR" != "$BASELINE" ] && [ "$CUR" != "NOBASE" ]; then
+      echo "campaign ENTERED at t=$NOW (grid $BASELINE -> $CUR)" >>"$OUT/click.log"
       break
     fi
-    echo "needle absent, re-firing last entry ($LAST_X,$LAST_Y)" >>"$OUT/click.log"
-    DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" "$LAST_X" "$LAST_Y" >>"$OUT/click.log" 2>&1
-    NEXT_EXTRA=$((NOW + 11))
+  fi
+  if [ "$NOW" -ge "$T_REDO_START" ] && [ "$NOW" -ge $((LAST_FIRE + 11)) ]; then
+    if [ "$NOW" -ge 220 ] && [ "$TOUR_REDO" -eq 0 ]; then
+      TOUR_REDO=1
+      echo "t=$NOW not entered -> whole-tour redo" >>"$OUT/click.log"
+      DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 318 293 >>"$OUT/click.log" 2>&1
+      sleep 12
+      DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 600 440 >>"$OUT/click.log" 2>&1
+    elif [ "$NOW" -ge 100 ] || [ "$TOUR_REDO" -eq 1 ]; then
+      DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 600 440 >>"$OUT/click.log" 2>&1
+    elif [ "$NOW" -ge 75 ]; then
+      DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 318 293 >>"$OUT/click.log" 2>&1
+    fi
+    LAST_FIRE=$NOW
   fi
   sleep 5
 done
