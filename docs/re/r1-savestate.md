@@ -476,3 +476,77 @@ on such unresolvable X values. HARD BOUNDARY for OQ-010 static work: trust
 CAPTURE (slot-diff of in-battle RAM: pointer values there resolve by the
 pointer law even in pages we did not restore) — that is the critical path,
 not more static batches.
+
+## STAR TABLE + ORBIT LAWS — 2026-10-06 (battery `scripts/r1_star_table.py`,
+## run green on ALL 13 captures, 259/259 slots; conventions: same per-run base
+## finder (H), name grids guest-phys 0x255b00-ish / planet NAME grid 0x26d07b
+## + 123j — hint anchors only, always re-derived)
+
+STAR RECORD (stride 96 exact — 49 consecutive name deltas all == 96, both
+campaign runs; records NAME-anchored, k capped at 50 because the chain runs
+into the names.txt pool past record 50; every field offset is name-relative):
+
+    name        char[]   star display name, NUL-terminated (chain start)
+    name-0x18   u32      system index, 0-based == k — verified 50/50
+    name-0x14   f32[3]   star position (x, y, z). Extents run230146: x
+                         -391.4..379.2 y -426.7..410.8 z -346.1..432.5;
+                         center of mass ~origin (-13.9,-3.3,-23.2). Run
+                         233706 similar (all abs(coord) < 440). [012(d) map
+                         extent corroboration: the playable galaxy is a
+                         ~880-unit cube centred on (0,0,0) in this coord
+                         system; NOT a closure — generator controls untested.]
+    name-0x1C   u32      small value 0..12 [semantics UNVERIFIED — measured
+                         NOT moon count: agrees with live-assigned count 4/50,
+                         raw-ptr count 6/50; Elwyssen reads 9 with 4 planets]
+    name-0x20   u32      sentinel 0xFFFFFFFF: present 49/50 (first record
+                         reads 0) in every campaign run, ABSENT (0/50) in
+                         idle run 221429 — presence is campaign-state-shaped,
+                         not structural law; battery counts it as a note only
+    name+0x10   u32[3]   sub-struct pointers into pool 0x258000..0x25a000 of
+                         stride-0x27 (39 B) records; systems draw pool slots
+                         in PERMUTATION order (every delta a multiple of 39;
+                         two systems may SHARE a slot — Elwyssen and Syzygifer
+                         both reference 0x258147) [semantics unverified]
+    name+0x2A   u32[5]   planet pointers, 0-padded; TARGET = planet NAME addr
+                         - 0x24 (the pointed-to record START precedes the
+                         planet name by 0x24 bytes). A pointer is LIVE iff the
+                         target planet name prefix == this star name. Verified
+                         law: at most ONE system live-owns any planet (136/151
+                         run230146, 141/167 run233706, 158/158 idle 221429).
+                         Tail slots beyond the live run hold STALE pointers
+                         from earlier campaigns / off-grid values — legal, not
+                         corruption; stale counts 46/43/28 respectively.
+
+PLANET ORBIT LAW (assigned planets, orbit pair f32 @ planet-name+0x57 (x) and
++0x5f (y), star center from star name-0x14):
+  - CENTERED RADIUS sqrt(x^2+y^2) w.r.t. the owning star is CONSTANT to f32
+    precision across every slot and every turn boundary: 0 violations / 136
+    (run 230146) and 0 / 141 (run 233706). [The earlier STATE.md note
+    "planet0<->star distance 538..937 across slots" was UNCENTERED noise —
+    superseded by this measurement.]
+  - ANGULAR VELOCITY IS A PER-PLANET CONSTANT, applied by the turn loop:
+    dtheta/turn identical across all 7 boundaries of run 230146 for 135/151
+    planets (16 static planets contribute no samples). Direction is retrograde
+    in screen coords. Sample: r=544 -> -13.52 deg/turn; r=1983.5 -> -1.02;
+    r=2216.3 -> -0.81. NOT Kepler w*r^1.5=const (cv 0.178); closer to a w ~
+    1/r family but each planet carries its own constant (lift as a per-planet
+    table read from these fields, not as a derived formula).
+  - STATIC-PAIR SET: planets whose (x,y) never change any slot: 16/151 run
+    230146, 28/167 run 233706. The UNASSIGNED set (no live star pointer) is a
+    strict SUBSET of the static set in BOTH runs (orphan<=static verified) —
+    [INFERRED] a planet not attached to a system's live pointer array has its
+    orbit advance skipped by the turn loop; not yet code-proven.
+  - Orphan system prefixes differ per campaign (230146: Icarus/Pendulon/
+    Masticon/Buntrusol — Pendulon is NOT a star in that run's chain; 233706
+    adds Ephemera/Pulveran/Phoebe): orphan membership is generated per-map,
+    NOT a fixed vendor reserve.
+
+Allocator tie (pinned): FUN_0004ae24 divides exactly by {0x7b, 0x60, 0x27};
+live strides now MEASURED for all three families: planet 123, star 96,
+sub-pool 39. The three pooled record families the allocator serves are
+IDENTIFIED.
+
+Battery: `python3 scripts/r1_star_table.py --run-dir work/r1/<run> [--slot N]
+[--verbose]`; exit 0 law confirmed every slot / 1 negative / 2 harness.
+Checks: stride law, chain length >=45, per-record idx==k, single-owner law,
+sub-ptr window + delta-multiple-of-39.
