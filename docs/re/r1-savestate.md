@@ -550,3 +550,29 @@ Battery: `python3 scripts/r1_star_table.py --run-dir work/r1/<run> [--slot N]
 [--verbose]`; exit 0 law confirmed every slot / 1 negative / 2 harness.
 Checks: stride law, chain length >=45, per-record idx==k, single-owner law,
 sub-ptr window + delta-multiple-of-39.
+
+### Static tie: FUN_00025604 stride table (2026-10-06, Ghidra re-analysis of
+work/ascend_payload.bin base-0, 980 functions)
+
+FUN_00025604 prologue loads an array of record-SIZE constants into locals:
+`0x60, 0x7b, 0x27, 0x1ee (494), 0x19e (414), 0xd (13)` (local_80..local_6c),
+and the SAME function contains a true indexed loop `base + idx*0x27` iterating
+`*(short*)(base+0x49c3)` records of >=0x27 bytes (fields at +0, +4 deref'd as
+pointers >>0x10, u16 @+0x21, u32 @+0x23) plus another `base + idx*0x19e` loop
+copying 100 dwords + u16 count + trailing fields. Trust status per the
+IMMEDIATE-ENCODING FRAME: the multipliers 0x27/0x19e and all field
+displacements are encodings (1)/(2)-safe ONLY at rewritten sites; in the raw
+payload this range differs from ascend_restored.bin, so the decompile is read
+as SHAPE evidence, not address evidence.
+
+WHAT IT PROVES (shape-level): the three live-measured record families are the
+same families the code indexes with literal size constants — planet 123
+(0x7b), star 96 (0x60), sub-pool 39 (0x27). Corroborates the earlier
+FUN_0004ae24 divide-by-{0x7b,0x60,0x27} tie with a second, independent site.
+Additional code-side stride constants 13, 414, 494 exist (13 = 0xd divides
+39; 75 (restree) = 13x5; blob-internal pointer census shows a pool whose
+targets are all multiples of 13 from pool base — consistent, [inferred]).
+NOT proven: which loop is the turn-loop orbit writer; no f32 +0x57/+0x5f
+disp32 accesses exist in the payload (orbit reads are register-relative or
+through un-restored immediates — disp32 scan found only 2 bogus hits, both
+outside code ranges).
