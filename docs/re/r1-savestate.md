@@ -684,3 +684,17 @@ fresh Ephemera map, 157 planets):
     hold a duplicate LIVE entry: 159 LIVE pointer slots for 157 planets).
     Reading hardened: tails are allocator garbage; the LIVE prefix rule is
     the law, per-map orphan membership is generation-shaped.
+
+### Planet-view crossread attempt, run r1ad-20261006-135319 (2026-10-06f,
+exit-1 negative, harness lesson): (511,67) NEXTTURN is STRATEGIC-MAP-ONLY.
+Sequence entered campaign cleanly (grid law, t=124), opened Planets -> planet
+view of Byzantium III (the one colony: 'Minions (1 Planet Occupied, 1 System
+Controlled)'; view shows name + '(Enormous Supermineral Planet)' + 'No
+Project' + 3 surface thumbnails, NO numeric readouts). Two (511,67) clicks
+bracketed with checkpoints: turn stayed 0 across ck007..ck014 — the planet
+view does not expose the sidebar next-turn control and swallows the click
+[verified: record diffs empty at all ck pairs; orbit pair static].
+Harness fix queued: return to strategic map (escape/close the planet view)
+BEFORE NEXTTURN clicks. Also measured: fresh single-colony map has exactly 1
+planet with the colonized NAME+0x28..0x30 block non-default — block is
+per-settled-colony, consistent across three campaigns.
