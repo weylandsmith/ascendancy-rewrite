@@ -17,7 +17,7 @@ no numeric grammar, filename refs exist only as runtime stack strings
 the comparator statically needs obj1 call-edge recovery — long horizon, not
 this loop. DEFAULT IN FORCE: rewrite keeps `mine * 2 > total`
 (rewrite/src/game/campaign.cpp:738), citing the header-comment title over
-display prose; unit tests pin it. What would settle it: (a) user ruling that
+display prose. What would settle it: (a) user ruling that
 marketing prose or the code comment wins, or (b) Ghidra obj1 call-edge
 recovery finding the evaluator, or (c) a capture where the player crosses
 50-66% and the game does/doesn't fire end-ctrl. Item STAYS OPEN per strict-
