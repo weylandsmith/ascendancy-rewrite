@@ -106,3 +106,44 @@ ascend01/data, race* in ascend02/data. Sizes 0.44-8.2 MB headerless PCM
   volume from the soundfx.txt header pairs, voice/panning, and any rate
   correction when OQ-006 closes. No synthesized sounds; if a sample is
   missing, nothing plays and the gate shows it.
+
+### 3.2 OQ-018 PARTIAL (2026-10-07) — soundfx.txt header-pair law, loader side
+Loader FUN_0004ff34 (unique referrer of `soundfx.txt` string, imm 0x2a08 @0x4ff42):
+- parses EXACTLY 3 header lines with sscanf format pool 0x2a14 (`%d %d`),
+  loop `CMP EDI,0x3` at 0x4ff66; per-group dword arrays via `ADD ECX,0x4`
+  (0x4ff60), i = 0..2. Per line (ESI = running cumulative, decompile
+  FUN_0004ff34 confirms):
+  group START `[obj+0xc50+4i] = ESI` (0x4ff83);
+  group END `[obj+0xc5c+4i] = ESI + n - 1` (0x4ff8f);
+  group THRESHOLD `[obj+0xc44+4i] = col2` (0x4ff99) — per-group stride 4
+  (NOT last-wins; corrected same-turn from the decompile);
+  acc += n*col2 (IMUL 0x4ffa2) — Σ = 2*10000+3*45000+1*65000 = 215000 sizes
+  the sample buffer allocation, and per-slot cursor bases are
+  base + Σ-of-preceding-group sizes (0x4ff34 tail loop `iVar2 += [obj+0xc44]`
+  per group crossing, written at `[obj+0xbb8+0x16i]`);
+  monotonicity gate: error line 839 (str 0x2a1a) when col2 decreases across
+  lines (file is ascending 10000/45000/65000);
+  Σ(col1) must equal 6 else error (decompile `if (iVar5 != 6)`), verified on
+  file 2+3+1=6;
+  then count line `%d` -> `[obj+0x700]` u16 (<100 enforced, line 873) and
+  entry names `%9s`-style at `[obj+0x702 + 10i]`; 6 voice slots stride 0x16
+  init: +0x00 ptr, +0x10 u16 0, +0x12 u16 0x5622 (=22050 — OQ-006 cross-ref:
+  the rate constant is stamped into every slot), +0x14 u16 0xffff.
+- play path FUN_000500e0 (callers 0x17488, 0x1749b, 0x4fb59): scalar
+  `FUN_000209d8()` (value = table[DAT_000102a4+i] - table[DAT_000102a0+i],
+  override scan over DAT_00010a74/DAT_00010b82 while DAT_00010b96>0) compared
+  against THREE dwords obj+0xc44/+0xc48/+0xc4c; group index = count of
+  thresholds <= scalar; a free voice slot is then searched inside that
+  group's [start,end] over the 6-slot table obj+0xbb8 stride 0x16 (slot
+  fields: +0x04/+0x08 buffer cursors, +0x0c end, +0x12 priority-ref u16
+  (the value scanned at 0x6df3e-area presets), +0x14 sound idx);
+  eviction: oldest active slot in-group via
+  FUN_000689ee()==4 (playing?).
+- REMAINING (do not guess): writer of obj+0xc40 (no disp32=0xc40 write found
+  in 0x200..0x82bb0; likely SIB/pointer form or constructor at 0x6ed50-area)
+  and the provenance of the FUN_000209d8 scalar (perf/clock table
+  DAT_000102a0/0x102a4) — together they decide whether the second header
+  column is a per-sample byte cap (allocation evidence says yes) or also a
+  playback threshold. VOC u16@25=0x0911 and race->theme mapping also open:
+  music.txt lists 29 entries (theme00..04, victory, intro00/01, race00..19
+  .raw; pool imm refs 0x2a66 `data\%s.voc`, theme00.raw ref @0x210f3).

@@ -158,24 +158,27 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-018 HEADER-PAIR CONSUMERS — find what reads the group params stored by
-the soundfx loader FUN_0004ff34 (BANKED 2026-10-07, all [verified] in
-ascend_payload.bin): the ONLY soundfx.txt referrer is imm 0x2a08 @0x4ff42.
-Loader law: 3 header lines via fscanf fmt pool-0x2a14 ("%d %d"); enforced
-law CMP ESI,0x6 (sum of one column == 6, error line 845 @0x4ffd5); group
-params land at obj +0xc40/+0xc44 (+0xc50 cumulative, +0xc5c = end index);
-sum(a*b) -> FUN_0002a51c allocates a 6-slot table at +0xbb8 stride 0x16
-(each slot: dword@0=0, u16@+0x10=0, u16@+0x12=0x5622=22050, u16@+0x14=0xffff);
-then count line (u16 at +0x700, must be <100, error line 873) and count
-entries at +0x702 stride 0xa (fscanf pool-0x2a54) with per-entry u16
-sentinel 0xffff written at +0xae8. TASK: xrefs to +0xc40/+0xc44/+0xbb8
-disp8-SIB scan + playback path to name what 10000/45000/65000 DO
-(volume/priority/band?) and the race->theme mapping (music.txt loader is
-separate: data\theme00.raw imm 0x8e0 ref @0x210f3). Also remaining: VOC
-u16@25=0x0911 + six zero bytes @36 semantics.
-DONE THIS TURN: OQ-006 CLOSED (22050 device-rate chain 0x4f690/0x4f90b ->
-0x68816 -> 0x68882 -> 0x6e000 [obj+0x3c]; constructor 11025 @0x6df3e;
-audio.md §3.1; pin test audio_open_rate_measured_oq006; 90 tests 0 fail).
+OQ-018 SCALAR PROVENANCE (consumers task DONE this turn). Decompiled
+FUN_0004ff34 confirms the loader law [verified, docs/re/audio.md §3.2]:
+3 header lines, per-group stride-4 arrays START obj+0xc50+4i / END +0xc5c+4i
+/ THRESHOLD +0xc44+4i = col2 (ADD ECX,0x4 @0x4ff60 — per-group, NOT
+last-wins; mid-turn note corrected); col1 = slot counts, Σ==6 enforced;
+ascending-col2 gate else vendor line 839 (str 0x2a1a); Σ(n*col2)=215000
+sizes the sample buffer and seeds per-slot cursor bases; slot init stamps
+u16 0x5622 (=22050, OQ-006 cross-ref) at slot+0x12. Play path
+FUN_000500e0 (callers 0x17488, 0x1749b, 0x4fb59): scalar = FUN_000209d8()
+(image globals: table DAT_000102a4[idx] - DAT_000102a0[idx], override scan
+DAT_00010a74 stride4 vs DAT_00010b82 stride2 while DAT_00010b96>0), then
+group = first i with scalar <= c44[4i]; all-three-below -> vendor error.
+TASK: disp32-write scan (C7 05 / C7 8? patterns) over
+work/ascend_restored.bin for writers of 0x102a0/0x102a4/0x10a74/0x10b82/
+0x10b96, then disassemble writer(s) to NAME the quantity (candidates:
+elapsed-ms, sample-length, frame count). That names what 10000/45000/65000
+DO. THEN remaining OQ-018 residues: VOC u16@25=0x0911 and race->theme map
+(theme00.raw imm ref @0x210f3 is in a setup/credit block — find its owner).
+DONE THIS TURN: OQ-006 CLOSED (22050 chain; audio.md §3.1; pin test
+audio_open_rate_measured_oq006; 90 tests 0 fail; committed e391fc2) +
+OQ-018 law banked (audio.md §3.2).
 Prior context: OQ-020 BLOCKED; OQ-016 capture-gated (idle ck ladder);
 OQ-012(a) setup-word candidate @EBP+0x223 area (audio-off check -1 seen at
 0x4f669 — setup block is the same screen).
