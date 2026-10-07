@@ -14,10 +14,13 @@ namespace ascend::ui {
 // per process; dtor frees chunks + closes the device.
 class AudioEngine {
   public:
-    // Opens the device (rate 22050 per OQ-006 default), loads every SFX
-    // from dataDir (ascend01/data) and theme00 music (ascend02/data).
-    // `mute` loads everything but sets master volume 0. Returns false with
-    // *err if the device or ANY referenced sample fails (no fakery, §5).
+    // Opens the device at 22050 Hz (MEASURED OQ-006: original open chain
+    // 0x4f690/0x4f90b PUSH 22050 -> 0x68816 -> 0x6e000 stores [obj+0x3c];
+    // constructor default 11025 at 0x6df3e is always overwritten), loads
+    // every SFX from dataDir (ascend01/data) and theme00 music
+    // (ascend02/data). `mute` loads everything but sets master volume 0.
+    // Returns false with *err if the device or ANY referenced sample fails
+    // (no fakery, §5).
     bool init(const std::string& dataDir, bool mute, std::string* err);
     void play(const std::string& sfxName);   // unknown name -> no-op
     void playMusic();                        // theme00, looping

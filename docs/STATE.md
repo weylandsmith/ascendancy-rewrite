@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T04:30
+updated: 2026-10-07T06:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,19 +158,33 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-016 PER-TURN CONSTANTS via idle-empire channel diffs on banked captures
-(offline, zero capture cost). r1ad-20261006-144225/ck holds turns 0->1->2
-(ck005 t0, ck014 t1, ck018 t2; turn counter verified at guest-phys 0x254e10,
-stride 0x110 between captures — re-verify per-run via r1_sav_scan). Steps:
-locate the per-empire state table (credits, IND/RES/PROS totals, pop) the way
-OQ-014 found the item table — anchor on values derivable from planitem/gizmos
-laws or cross-capture stability, verify stride across all present empires,
-then read each channel across the three turns to MEASURE income formula, pop
-growth, and treasury cadence. Negative results to avoid re-trying: the
-stride-494 (0x1ee) table at DAT 0x12fb3 is pointer/text, NOT dip params
-(BLOCKED.md OQ-020 note (5)); race00 dip-params heap copy at phys 0x255067
-is unpaced, no stride law (note (6)). OQ-020 itself BLOCKED 2026-10-07
-(static route exhausted, 7 probes; default 30 turns in force).
+OQ-018 HEADER-PAIR CONSUMERS — find what reads the group params stored by
+the soundfx loader FUN_0004ff34 (BANKED 2026-10-07, all [verified] in
+ascend_payload.bin): the ONLY soundfx.txt referrer is imm 0x2a08 @0x4ff42.
+Loader law: 3 header lines via fscanf fmt pool-0x2a14 ("%d %d"); enforced
+law CMP ESI,0x6 (sum of one column == 6, error line 845 @0x4ffd5); group
+params land at obj +0xc40/+0xc44 (+0xc50 cumulative, +0xc5c = end index);
+sum(a*b) -> FUN_0002a51c allocates a 6-slot table at +0xbb8 stride 0x16
+(each slot: dword@0=0, u16@+0x10=0, u16@+0x12=0x5622=22050, u16@+0x14=0xffff);
+then count line (u16 at +0x700, must be <100, error line 873) and count
+entries at +0x702 stride 0xa (fscanf pool-0x2a54) with per-entry u16
+sentinel 0xffff written at +0xae8. TASK: xrefs to +0xc40/+0xc44/+0xbb8
+disp8-SIB scan + playback path to name what 10000/45000/65000 DO
+(volume/priority/band?) and the race->theme mapping (music.txt loader is
+separate: data\theme00.raw imm 0x8e0 ref @0x210f3). Also remaining: VOC
+u16@25=0x0911 + six zero bytes @36 semantics.
+DONE THIS TURN: OQ-006 CLOSED (22050 device-rate chain 0x4f690/0x4f90b ->
+0x68816 -> 0x68882 -> 0x6e000 [obj+0x3c]; constructor 11025 @0x6df3e;
+audio.md §3.1; pin test audio_open_rate_measured_oq006; 90 tests 0 fail).
+Prior context: OQ-020 BLOCKED; OQ-016 capture-gated (idle ck ladder);
+OQ-012(a) setup-word candidate @EBP+0x223 area (audio-off check -1 seen at
+0x4f669 — setup block is the same screen).
+OQ-016 EVIDENCE (not offline-solvable 2026-10-07): r1deep-230146 t2..t9 is
+not an idle empire (orbital f32 churn, AI timers +256/turn at 0x255228/
+0x255605); planet grid 0x26d103 (stride 123) and star grid 0x255c69
+(stride 96) are byte-static over 8 turns; strict-increase u16 scan found only
+DOS tick clocks (0x4f4, 0xa467); 144225 turn-adjacent empire data is in
+relocated heap. Needs: New Game -> clean Next-Turn ck ladder capture.
 
 ## KNOWN-ISSUES / PARKING LOT (operational; research negatives live in
 ## docs/REFUTED-ROUTES.md)

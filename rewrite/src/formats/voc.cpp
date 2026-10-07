@@ -27,7 +27,10 @@ bool loadSample(const std::string& path, const std::string& name,
     std::vector<uint8_t> d(size);
     f.read(reinterpret_cast<char*>(d.data()), std::streamsize(size));
     out->name = name;
-    out->rate = 22050;   // docs/re/audio.md §3 default (OQ-006)
+    out->rate = 22050;   // MEASURED default (OQ-006 closed 2026-10-07):
+                        // original open chain stores 22050 at [audioObj+0x3c]
+                        // (PUSH 0x5622 @0x4f691/@0x4f90b -> 0x68816 ->
+                        // 0x6e000); headerless files play at this rate.
     out->channels = 1;
     if (size >= 42 && std::memcmp(d.data(), kMagic, 19) == 0 &&
         d[19] == 0x1A) {

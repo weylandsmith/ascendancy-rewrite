@@ -42,8 +42,13 @@ exe shape loader via call graph + live image. Blind static sweeps are
 FORBIDDEN (docs/REFUTED-ROUTES.md R2). Map currently draws documented
 circles.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
-(current default 22050 mono) | open | W3: exe audio-init constant, or
-dosbox measurement of output cadence.
+(current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
+— open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge
+0x68882 -> rate setter 0x6e000 stores [obj+0x3c]; constructor default 11025
+@0x6df3e always overwritten; docs/re/audio.md §3.1; rewrite cites chain
+(ui/audio.cpp, formats/voc.cpp), pin test audio_open_rate_measured_oq006.
+Channels: no vendor channels field in the chain; mono-by-convention,
+rewrite stereo mixer documented as presentation choice.
 OQ-004 | tables | which tables the exe loads; .tsv container grammar | CLOSED
 2026-10-06s: docs/re/datafiles.md (pool-relative immediate law, 337 verified
 sites; full census w/ referrer addresses; ascend02 .bin/.tsv loaded via RAM

@@ -42,6 +42,15 @@ std::vector<uint8_t> wrapWav(const af::Sample& s) {
 
 bool AudioEngine::init(const std::string& dataDir, bool mute,
                        std::string* err) {
+    // MEASURED rate law (OQ-006 CLOSED 2026-10-07): the original opens
+    // audio at 22050 Hz. Chain in ascend_payload.bin: PUSH 0x5622 (22050)
+    // at 0x4f690 and 0x4f90b -> CALL 0x68816 (audio-open wrapper, forwards
+    // at 0x68882 -- its ONLY call edge) -> 0x6e000 rate setter, which
+    // stores the argument at [audioObj+0x3c]. The constructor default at
+    // 0x6df3e is 11025 ([EAX+0x3c]=0x2b11), overwritten by both open sites
+    // -- so headerless samples play at 22050 (docs/re/audio.md §3).
+    // Channel count has no setter in this chain (0x44/+0x40 hold buffer
+    // size/volume plumbing), so stereo below remains a rewrite choice.
     if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 512) != 0) {
         if (err) *err = std::string("Mix_OpenAudio: ") + Mix_GetError();
         return false;

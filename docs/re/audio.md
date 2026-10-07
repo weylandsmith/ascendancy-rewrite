@@ -53,6 +53,36 @@ FFT anti-alias check was run and is NOT decisive (music spectra are
 bottom-heavy at either rate) — recorded so nobody re-tries it expecting
 an answer.
 
+### 3.1 Rate law MEASURED — OQ-006 CLOSED 2026-10-07 [verified, restored image]
+The exe plays ALL audio (headered, headerless, music) at **22050 Hz mono**.
+Chain in ascend_payload.bin (byte-identical to work/ascend_restored.bin):
+
+- **0x4f690** `PUSH 0x5622` (=22050) / `PUSH ESI` / **0x4f696**
+  `CALL 0x68816` — first audio-open site (inside the audio-config block
+  that reads the setup word at [EBP+0x223], -1 = audio-off bail @0x4f669).
+- **0x4f90b** `PUSH 0x5622` / `PUSH EBP` / **0x4f911** `CALL 0x68816` —
+  second open site (same block, post-`FUN_0004f9bc` branch).
+- **0x68816** wrapper (logging-guarded: call-count global 0xa2190, debug
+  format strings at pool 0x40fb/0x407c — same wrapper shape at 0x685e0,
+  0x68f6c) forwards arg2 verbatim at **0x68882** `CALL 0x6e000` — its
+  ONLY call edge in the whole image (E8-scan).
+- **0x6e000** rate setter: `MOV [EAX+0x3c], EDX` (arg2).
+- Constructor default at **0x6df3e** `MOV dword [EAX+0x3c], 0x2b11`
+  (=11025) — overwritten by both open sites at every startup; there is no
+  path where a file header rewrites +0x3c (no imm32 write sites at
+  disp8/disp32 0x3c outside these, C7-scan over the full code range).
+
+So the 11025 header of bullet.voc is honoured by the FILE loader (formats
+side, §2), while the DEVICE rate for everything else is the open-chain
+constant 22050. Rewrite: `Mix_OpenAudio(22050, …)` (ui/audio.cpp:55) and
+`Sample::rate = 22050` (formats/voc.cpp:30) now cite this chain; pin test
+`audio_open_rate_measured_oq006` checks the exact bytes at 0x4f690,
+0x4f90b, 0x6df3e. Channel count: the object exposes no channels field in
+this chain (+0x40/+0x44 are buffer-size/volume plumbing set from globals at
+0xa2570); vendor DOS audio is mono-by-convention, and the rewrite's stereo
+mixer is a documented presentation choice — mono samples upmix
+identically. OQ-018's soundfx.txt header pairs remain open.
+
 ## 4. music.txt [verified]
 
 29 entries `data\<name>.raw`: theme00-04, victory, intro00-01, race00-20.

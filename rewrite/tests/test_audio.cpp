@@ -3,7 +3,9 @@
 #include "formats/voc.h"
 #include "harness.h"
 
+#include <array>
 #include <cstdio>
+#include <filesystem>
 
 
 namespace af = ascend::formats;
@@ -58,6 +60,56 @@ TEST(audio_headerless_defaults) {
     CHECK(af::loadSample(kRepo + "/extracted/ascend02/data/theme00.raw",
                          "theme00", &m, &err));
     CHECK(m.pcm.size() == 8191719);
+}
+
+TEST(audio_open_rate_measured_oq006) {
+    // MEASURED law (OQ-006 CLOSED 2026-10-07, audio.md §3.1): the original's
+    // audio-open chain pushes 22050 (0x5622) and forwards it to the rate
+    // setter. Pin the exact bytes at the three cited sites of the restored
+    // image. work/ is not committed; skip cleanly when absent (test_cob
+    // precedent).
+    namespace fs = std::filesystem;
+    const std::string imgp = kRepo + "/work/ascend_restored.bin";
+    if (!fs::exists(imgp)) {
+        std::printf("(skip: work/ascend_restored.bin absent) ");
+        return;
+    }
+    std::FILE* f = std::fopen(imgp.c_str(), "rb");
+    CHECK(f != nullptr);
+    if (!f) return;
+    auto at = [&](long off) {
+        std::array<unsigned char, 8> b{};
+        std::fseek(f, off, SEEK_SET);
+        size_t n = std::fread(b.data(), 1, b.size(), f);
+        (void)n;
+        return b;
+    };
+    // 0x4f690: PUSH 0x5622 (68 22 56 00 00) then PUSH ESI (56 @0x4f695)
+    // then CALL 0x68816 (e8 7b 91 01 00 @0x4f696).
+    {
+        auto b = at(0x4f690);
+        CHECK(b[0] == 0x68 && b[1] == 0x22 && b[2] == 0x56 &&
+              b[3] == 0x00 && b[4] == 0x00);
+        CHECK(b[5] == 0x56);
+        auto c = at(0x4f696);
+        CHECK(c[0] == 0xe8 && c[1] == 0x7b && c[2] == 0x91 && c[3] == 0x01);
+    }
+    // 0x4f90b: same PUSH 0x5622 / PUSH EBP (55) / CALL 0x68816 shape.
+    {
+        auto b = at(0x4f90b);
+        CHECK(b[0] == 0x68 && b[1] == 0x22 && b[2] == 0x56);
+        CHECK(b[5] == 0x55);
+        auto c = at(0x4f911);
+        CHECK(c[0] == 0xe8 && c[1] == 0x00 && c[2] == 0x8f && c[3] == 0x01);
+    }
+    // 0x6df3e: constructor default MOV dword [EAX+0x3c], 0x2b11 (11025):
+    // c7 40 3c 11 2b 00 00 — always overwritten by the two open sites.
+    {
+        auto b = at(0x6df3e);
+        CHECK(b[0] == 0xc7 && b[1] == 0x40 && b[2] == 0x3c &&
+              b[3] == 0x11 && b[4] == 0x2b);
+    }
+    std::fclose(f);
 }
 
 TEST(audio_rejects_garbage_magic) {
