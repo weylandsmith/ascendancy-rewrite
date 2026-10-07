@@ -111,3 +111,29 @@ reads the extracted data dir directly; there is no .cob-loading or
 TOC-lookup behaviour to upgrade. Evidence is documentary (this file) plus the
 tool `scripts/r1_datafile_strings.py`. Gate coverage: RE static probe section
 already asserts payload attribution health.
+
+## 5. Span-override table (OQ-022 CLOSED 2026-10-07, MEASURED)
+FUN_000209d8 (decompiled) span law for file-table index i (1-based in keys,
+0-based arrays): if DAT_000102a0[i]==-1 -> -1; else span = DAT_000102a4[i] -
+DAT_000102a0[i], UNLESS a key/val override table (keys DAT_00010a74, vals
+DAT_00010b82, count [DAT_00010b96]) contains i -> span = val - start. Live
+values (ck005, member = B+0x82BB0+X): count 3; keys are 1-based table indices:
+key 54 -> idx 53 tutintro.txt span 2396 (disk 2396, ascend00); key 382 -> idx
+381 data\intro01.raw span 479670 (disk 479670, ascend01); key 471 -> idx 470
+data\intro65a.flc span 19054614 (disk 19054614, ascend02). All three negative
+base-end anomalies from section 4 (cross-archive files) are EXACTLY repaired
+by the override: val = orig_end + archive_base_delta. Corollaries:
+(i) t4's "sole mismatch intro01.raw" is resolved — spans are correct for all
+471 entries once overrides are applied [verified: 3/3 exact disk-size matches,
+and every remaining non-override entry was already span==disk].
+(ii) HONEST STATE: the 0x1d4d0 contradiction is NARROWED, not closed.
+FUN_00059c70 (callers: FUN_000598fc @0x54f6e with EDX=compressed-pool imm
+0x2cce; FUN_00059dfc, itself called only from FUN_000598a8 with the name in
+EDI from ITS caller) requires span <= 0x1d4d0 (error 0x1047 @0x59cc5) —
+theme00.raw (8,191,719 disk == span) CANNOT pass that check. So the menu
+music, if this is the path, opens some SMALL file whose name comes from the
+compressed pool (0x2cce is not statically decodable; runtime RAM shows a
+'DIGITALMUSICBUF' string at phys 0x2de1c9 — [inferred] working-buffer/temp
+name, no claim). OQ-022 stays open; next route: xrefs/flow into FUN_000598a8
+and 0x598fc to identify the EDX/EDI name sources, or decode the pool via
+routine 0x77ece.

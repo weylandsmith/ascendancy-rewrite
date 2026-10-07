@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T14:10
+updated: 2026-10-07T15:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,23 +158,23 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-022(b) — music span-vs-check contradiction. STATIC FIRST: get_function
-_callers of FUN_00059c70 (and sibling 0x598fc, called @0x54f6e with EDX=
-0x2cce, EBX=0); map which key codes (dispatch u16 [0x484c4], handler
-FUN_00054d18) reach the 0x1d4d0-checked open path vs the theme00 path;
-whichever site opens track 0 for the menu is the true music engine — decompile
-it and lift the real read law (chunked 0x1d4c0 hypothesis check). BANKED:
-DAT_00010ba0 sole writer 0x21309 (MOV -1 under 0x77ece option gate), value 0
-in ALL banked saves; audio object state fields +0x48a6/+0x48aa written ONLY
-0/-1 image-wide (SIB-aware scan); music.txt 29 tracks, span==disk 27/27 in
-ascend02 range 443..469. DO NOT: re-run format-string routes (negative image
-AND runtime RAM), re-scan DAT_00010ba0 xrefs, chase TUNEID (1 hit, capture
-heap debris at 0xfe9ddc). If static resolves, update docs §3.3 and close;
-options-menu capture is the fallback only after static.
-Ledger after this turn: OPEN = OQ-005, OQ-012(a), OQ-015, OQ-016 (capture-
+OQ-022 last static leg — disassemble FUN_000598fc HEAD (0x598fc..~0x59990):
+identify what screen/state supplies EDX=pool-name 0x2cce to the 0x1d4d0-
+checked player, and the sibling EDX stores 0x548c6/0x54911 (imm 0/-1 to
++0x48aa seen at 0x548xx = option handlers). If the head shows a MENU/menu-
+music opener, the checked path IS menu music and theme files must be read
+segment-by-segment (frame table obj+0x48c2) — then lift the segment law and
+close; if it shows a non-menu screen, menu music is NOT this engine and OQ-
+022 closes as "engine unmapped, vendor behaviour == theme00 (observed, all
+captures tune 0)" with an explicit non-claim. BANKED (do not re-derive):
+tune selector DAT_00010ba0 sole writer 0x21309, ==0 in all saves; callers of
+0x59c70 = {0x598fc, 0x59dfc}; span-override law datafiles.md §5 (keys
+DAT_00010a74 vals DAT_00010b82 count [DAT_00010b96]=3: 54->2396, 382->
+479670, 471->19054614, all exact disk); name table has no music buffer
+entry; DIGITALMUSICBUF = heap debris. Fallback after static: options-menu
+capture diff. Ledger: OPEN = OQ-005, OQ-012(a), OQ-015, OQ-016 (capture-
 gated), OQ-017, OQ-019, OQ-021 (user ruling pending, >1/2 in force), OQ-022;
-BLOCKED = OQ-020 (default 30 turns). OQ-018 CLOSED 2026-10-07 all three
-sub-questions (test audio_tune_selector_oq018; 92 tests 0 fail).
+BLOCKED = OQ-020 (30 turns). 92 tests 0 fail.
 CROSS-CUTTING WARNING STILL ACTIVE: pin bytes from RESTORED image, read
 semantics from Ghidra payload program, cross-check both (993 diff
 clusters; 850 imm-fixups, 143 other).

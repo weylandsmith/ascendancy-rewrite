@@ -33,17 +33,23 @@ gsystem attribution). A RAM measurement of a live galaxy at the trigger
 boundary corroborates.
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
-and reads in 0x1d4c0 chunks (@0x59cef), yet theme00.raw span == 8,191,719 in
-ck005 and DAT tune selector == 0 in every capture [verified facts]. Either
-+0x48a6 indexes a segmented view, or FUN_00059c70 is not the menu-theme path
-(no claim made) | open | (a) options-menu R1 capture: find the 0x77ece-gated
-option key (compressed pool imm 0x943 — decode via pool routine 0x77ece
-walk, or diff saves before/after toggling music option), set tune != 0,
-capture, read which file the 0x59c70 path opens; (b) or callers-of-FUN_00059c70
-chain + key handler FUN_00054d18 (dispatches on u16 [0x484c4], calls the
-sibling helpers 0x5987c/0x598a8 of the same object).
-Rewrite plays theme00 == observed vendor behaviour; NO default depends on
-this yet.
+and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719
+in ck005 and DAT tune selector == 0 in every capture [verified facts] |
+NARROWED 2026-10-07 t7, still open. Callers: only FUN_000598fc (@0x54f6e,
+EDX=compressed-pool imm 0x2cce) and FUN_00059dfc (via FUN_000598a8 only);
+decompiles confirm name comes from caller (pool), frame-table loop over
+obj+0x48c2 stride 24 with [EDI+6]>>16 field. Name-table census: NO music
+buffer entry exists (only idx 12 music.txt; .tmp entries = 10 UI screens;
+'DIGITALMUSICBUF' at phys 0x2de1c9 is runtime heap, NOT in table). SPAN LAW
+CLOSED meanwhile (docs/re/datafiles.md §5): FUN_000209d8 applies key/val
+overrides (keys DAT_00010a74, vals DAT_00010b82, count [DAT_00010b96]=3 in
+ck005): key54->tutintro.txt 2396, key382->intro01.raw 479670, key471->
+intro65a.flc 19054614 — ALL exact disk sizes; cross-archive negatives
+repaired. Next route: identify caller-side name source at FUN_000598fc head
+(what opens 0x2cce: menu screen?) or options capture; do NOT re-probe name
+table or tune selector. Rewrite plays theme00 == observed vendor state; no
+span-lookup code site exists in rewrite (opens extracted/ directly), so no
+default depends on this yet.
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
 (static route exhausted: 7 negative probes — string table is runtime-loaded,
