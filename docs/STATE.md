@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T15:40
+updated: 2026-10-07T17:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,23 +158,20 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-022 last static leg — disassemble FUN_000598fc HEAD (0x598fc..~0x59990):
-identify what screen/state supplies EDX=pool-name 0x2cce to the 0x1d4d0-
-checked player, and the sibling EDX stores 0x548c6/0x54911 (imm 0/-1 to
-+0x48aa seen at 0x548xx = option handlers). If the head shows a MENU/menu-
-music opener, the checked path IS menu music and theme files must be read
-segment-by-segment (frame table obj+0x48c2) — then lift the segment law and
-close; if it shows a non-menu screen, menu music is NOT this engine and OQ-
-022 closes as "engine unmapped, vendor behaviour == theme00 (observed, all
-captures tune 0)" with an explicit non-claim. BANKED (do not re-derive):
-tune selector DAT_00010ba0 sole writer 0x21309, ==0 in all saves; callers of
-0x59c70 = {0x598fc, 0x59dfc}; span-override law datafiles.md §5 (keys
-DAT_00010a74 vals DAT_00010b82 count [DAT_00010b96]=3: 54->2396, 382->
-479670, 471->19054614, all exact disk); name table has no music buffer
-entry; DIGITALMUSICBUF = heap debris. Fallback after static: options-menu
-capture diff. Ledger: OPEN = OQ-005, OQ-012(a), OQ-015, OQ-016 (capture-
-gated), OQ-017, OQ-019, OQ-021 (user ruling pending, >1/2 in force), OQ-022;
-BLOCKED = OQ-020 (30 turns). 92 tests 0 fail.
+OQ-017 (.fnt codec + UI wiring) — static route identical in shape to the
+soundfx.txt/music.txt wins: (1) find the ".fnt"/fnt-named imm string in the
+RESTORED image and its unique referrer (disp32 imm scan, pool offsets
+pre-0x82bb0), (2) disassemble/decompile the loader that consumes it, (3)
+compare a couple of extracted .fnt files (extracted/ascend00/*.fnt?) against
+the loader's field reads to lift the header/record grammar; pin as a byte
+test if a shipped-file invariant emerges. BANKED CONTEXT: name table idx
+space 0..470 (font files are among .raw/.shp entries — census first: names
+containing 'fnt'); string-pool strings are COMPRESSED (0x77ece decodes; do
+NOT expect readable imm names); use get_xrefs_to for SIB-indexed globals.
+DO NOT re-open: OQ-022 (closed t8 §3.4 non-claim), tune selector, name
+table music census. Ledger after t8: OPEN = OQ-005, OQ-012(a), OQ-015,
+OQ-016 (capture-gated), OQ-017, OQ-019, OQ-021 (user ruling pending, >1/2
+in force); BLOCKED = OQ-020 (30 turns). OQ-018, OQ-022 CLOSED. 92 tests.
 CROSS-CUTTING WARNING STILL ACTIVE: pin bytes from RESTORED image, read
 semantics from Ghidra payload program, cross-check both (993 diff
 clusters; 850 imm-fixups, 143 other).

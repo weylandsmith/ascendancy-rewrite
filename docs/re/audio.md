@@ -264,3 +264,30 @@ the DAT-gating option, capture, diff) or the compressed-pool decoder.
 REWRITE: audio.cpp playMusic uses data/theme00.raw == music.txt track 0 ==
 the vendor path observed in every captured configuration; no default change
 required for the captured domain. [verified] = image/capture facts above.
+
+### 3.4 OQ-022 CLOSED as "engine unreachable in captured states" (2026-10-07)
+Decision-rule result from the FUN_000598fc head disassembly:
+* The function copies the caller name (pool imm, e.g. 0x2cce) into static
+  buffer DS:0xa200c (WIDE copy loop — bytes kept at even offsets), appends a
+  suffix from pool 0x3561 (probably an extension), mirrors [0x484d0]/
+  [0x484d4] into DS:0xa2000/0xa2004, then GUARDS: if [obj+0x48a6] == -1 OR
+  [obj+0x48aa] == -1 it returns at 0x59984 with EAX=0 — the 0x1d4d0-checked
+  open FUN_00059c70 @0x59987 is NEVER reached [verified disasm].
+* Image-wide writer census (SIB-aware, t6): +0x48a6 stores = {0 @0x5454b,
+  -1 @0x5988f, 0 @0x598c9}; +0x48aa stores include -1 @0x54911, @0x59990,
+  @0x59a96. NOTE: these are heap-relative object fields (the audio object is
+  heap-allocated; reading DS base+0x48a6 returns unrelated text bytes), so
+  their per-capture values were NOT measured — the selector DAT_00010ba0
+  (static, DS) == 0 in all captures [verified].
+* Capture corroboration: static name buffer DS:0xa200c is ALL ZEROS in all
+  10 banked saves (ck005 x5 + ck010 x5, runs r1ad-20261006-131350..153435 —
+  the complete banked set) — no name was ever composed there during the
+  captured runs [verified via pointer law member B+0x82BB0+0xa200c].
+Conclusion [verified facts + inferred]: the DIGITALMUSIC-style engine path
+(0x598fc/0x59dfc -> 0x59c70) is INACTIVE in every captured game state — the
+menu music heard by the vendor in these states is therefore NOT served by
+this engine (no claim about what serves it; candidates: startup load of all
+29 tracks + a separate raw-play path, unmapped). The span-vs-check
+"contradiction" evaporates: no captured run feeds theme00 to the 0x1d4d0
+check. Rewrite loads theme00.raw directly == observed vendor state; code
+site rewrite/src/ui/audio.cpp playMusic (comment updated to cite §3.4).

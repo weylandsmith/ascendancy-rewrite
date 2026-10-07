@@ -34,22 +34,20 @@ boundary corroborates.
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719
-in ck005 and DAT tune selector == 0 in every capture [verified facts] |
-NARROWED 2026-10-07 t7, still open. Callers: only FUN_000598fc (@0x54f6e,
-EDX=compressed-pool imm 0x2cce) and FUN_00059dfc (via FUN_000598a8 only);
-decompiles confirm name comes from caller (pool), frame-table loop over
-obj+0x48c2 stride 24 with [EDI+6]>>16 field. Name-table census: NO music
-buffer entry exists (only idx 12 music.txt; .tmp entries = 10 UI screens;
-'DIGITALMUSICBUF' at phys 0x2de1c9 is runtime heap, NOT in table). SPAN LAW
-CLOSED meanwhile (docs/re/datafiles.md §5): FUN_000209d8 applies key/val
-overrides (keys DAT_00010a74, vals DAT_00010b82, count [DAT_00010b96]=3 in
-ck005): key54->tutintro.txt 2396, key382->intro01.raw 479670, key471->
-intro65a.flc 19054614 — ALL exact disk sizes; cross-archive negatives
-repaired. Next route: identify caller-side name source at FUN_000598fc head
-(what opens 0x2cce: menu screen?) or options capture; do NOT re-probe name
-table or tune selector. Rewrite plays theme00 == observed vendor state; no
-span-lookup code site exists in rewrite (opens extracted/ directly), so no
-default depends on this yet.
+in ck005 | CLOSED 2026-10-07 t8 as "engine INACTIVE in captured states"
+(docs/re/audio.md §3.4, decision-rule executed on FUN_000598fc head):
+head disasm shows name composed into static buffer DS:0xa200c then a guard
+([obj+0x48a6]==-1 || [obj+0x48aa]==-1 -> RET 0 @0x59984) that PRECEDES the
+0x1d4d0-checked call @0x59987; buffer DS:0xa200c all-zeros in ALL 10 banked
+saves (pointer law), tune selector DAT_00010ba0 == 0 in all saves. No
+captured run ever feeds theme00 (or any name) to the checked open — the
+"contradiction" cannot occur in observed states. EXPLICIT NON-CLAIM: what
+serves menu music in the original remains unmapped (candidates: the startup
+29-track load + an unmapped raw-play path); no rewrite default depends on
+it — playMusic() loads theme00.raw directly == observed vendor state
+(rewrite/src/ui/audio.cpp, comment cites §3.4). SPAN LAW byproduct CLOSED
+(docs/re/datafiles.md §5: key/val overrides DAT_00010a74/0x10b82 count
+[DAT_00010b96]=3, 3/3 exact disk sizes, cross-archive negatives repaired).
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
 (static route exhausted: 7 negative probes — string table is runtime-loaded,
