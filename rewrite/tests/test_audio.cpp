@@ -113,6 +113,47 @@ TEST(audio_open_rate_measured_oq006) {
     std::fclose(f);
 }
 
+TEST(audio_tune_selector_oq018) {
+    // MEASURED (docs/re/audio.md §3.3): global tune selector DAT_00010ba0
+    // has EXACTLY ONE writer in the image — MOV [0x10ba0],-1 @0x21309,
+    // guarded by an option-key check (CALL 0x77ece) inside the music.txt
+    // loader FUN_00020fd4. All banked saves read 0 == music.txt track 0 ==
+    // theme00.raw, which is what playMusic() plays.
+    namespace fs = std::filesystem;
+    const std::string imgp = kRepo + "/work/ascend_restored.bin";
+    if (!fs::exists(imgp)) {
+        std::printf("(skip: work/ascend_restored.bin absent) ");
+        return;
+    }
+    std::FILE* f = std::fopen(imgp.c_str(), "rb");
+    CHECK(f != nullptr);
+    if (!f) return;
+    auto at = [&](long off) {
+        std::array<unsigned char, 12> b{};
+        std::fseek(f, off, SEEK_SET);
+        size_t n = std::fread(b.data(), 1, b.size(), f);
+        (void)n;
+        return b;
+    };
+    // c7 05 a00b0100 ffffffff : MOV dword [0x00010ba0], 0xffffffff
+    {
+        auto b = at(0x21309);
+        CHECK(b[0] == 0xc7 && b[1] == 0x05);
+        CHECK(b[2] == 0xa0 && b[3] == 0x0b && b[4] == 0x01 && b[5] == 0x00);
+        CHECK(b[6] == 0xff && b[7] == 0xff && b[8] == 0xff && b[9] == 0xff);
+    }
+    // 0x212f6: option-key probe prologue MOV EDX,0x943 / MOV EAX,(0x945
+    // fixed up: 0x834f5 = 0x945+0x82BB0 in the restored image) / CALL
+    // 0x77ece — the gate whose store branch is the sole writer above.
+    {
+        auto b = at(0x212f6);
+        CHECK(b[0] == 0xba && b[1] == 0x43 && b[2] == 0x09);
+        CHECK(b[5] == 0xb8 && b[6] == 0xf5 && b[7] == 0x34 && b[8] == 0x08);
+        CHECK(b[10] == 0xe8);
+    }
+    std::fclose(f);
+}
+
 TEST(audio_voice_band_law_oq018) {
     // MEASURED (docs/re/audio.md §3.2 HEADER-PAIR LAW, FINAL): the vendor
     // bands sounds by FILE SIZE vs soundfx.txt col2 (2 10000 / 3 45000 /

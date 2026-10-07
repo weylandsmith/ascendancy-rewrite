@@ -31,6 +31,19 @@ file's prose "two-thirds" — current default >1/2 | open | W2: find the
 constant/comparison near the victory check in code (ghp5 functions_full.tsv,
 gsystem attribution). A RAM measurement of a live galaxy at the trigger
 boundary corroborates.
+OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
+validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
+and reads in 0x1d4c0 chunks (@0x59cef), yet theme00.raw span == 8,191,719 in
+ck005 and DAT tune selector == 0 in every capture [verified facts]. Either
++0x48a6 indexes a segmented view, or FUN_00059c70 is not the menu-theme path
+(no claim made) | open | (a) options-menu R1 capture: find the 0x77ece-gated
+option key (compressed pool imm 0x943 — decode via pool routine 0x77ece
+walk, or diff saves before/after toggling music option), set tune != 0,
+capture, read which file the 0x59c70 path opens; (b) or callers-of-FUN_00059c70
+chain + key handler FUN_00054d18 (dispatches on u16 [0x484c4], calls the
+sibling helpers 0x5987c/0x598a8 of the same object).
+Rewrite plays theme00 == observed vendor behaviour; NO default depends on
+this yet.
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
 (static route exhausted: 7 negative probes — string table is runtime-loaded,
@@ -128,18 +141,21 @@ OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | W3: ship design screen code + its data reads (live image).
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
-1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping | header
-pair CLOSED 2026-10-07 t4 (col1=voices/band, col2=size threshold; ck005 span
-table proof; voiceBand() + test audio_voice_band_law_oq018); VOC header CLOSED
-2026-10-07 t5 (byte map 15/15: u16@25==0x0911 CONSTANT constant-not-payload,
-u16@27==size-31, u32@30 rate 22050x14 + bullet.voc 11025/stereo exception,
-bytes36..41 reserved zero; audio.md §2.1; voc.cpp field pins). REMAINING:
-race->theme map only — static negatives banked t5 (no %s.raw/theme format
-strings; music.txt referrers: 0x212d4 opens music.txt then error-reports
-(code 0xb2, str 0x937) via 0x2a428 — setup/verify block, not selection;
-0x6ba76=data misdisassembly; all captures show all 5 themes loaded). Route:
-owner+callers of FUN_000210xx theme00 block, or New-Game-different-race
-capture reading span-table touches 443..469.
+1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
+CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:
+col1=voices/band, col2=size threshold; play path bands by FILE SIZE via
+span table; ck005 proof 327/328 spans == disk sizes; voiceBand() + test
+audio_voice_band_law_oq018. (2) VOC header byte map 15/15: ver@20 0x1A,
+type@24 0x1F, u16@25==0x0911 CONSTANT, u16@27==size-31, u32@30 rate
+(22050x14 + bullet.voc 11025/stereo), bytes36..41 reserved zero; audio.md
+§2.1; voc.cpp field pins. (3) race->theme map DOES NOT EXIST: global tune
+selector DAT_00010ba0 has exactly ONE writer image-wide (0x21309, MOV
+-1 under option gate inside music.txt loader FUN_00020fd4; get_xrefs_to
+census 14 refs/1 write + SIB-aware 89/C7 store scan of state fields
++0x48a6/+0x48aa: only 0/-1 state stores); DAT reads 0 in all banked saves
+(ck005/ck010 x5 runs) == music.txt track 0 == theme00.raw — the path
+playMusic() takes (audio.cpp init cited); test audio_tune_selector_oq018
+pins both sites; audio.md §3.3. Discovered follow-up filed as OQ-022.
 
 --- closed during v1 (kept here as a one-line index; evidence in archive and
 docs/re/): OQ-001 .cob offsets | OQ-002 FLIC codec | OQ-007 CP437 |

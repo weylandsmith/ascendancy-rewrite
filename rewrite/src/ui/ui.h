@@ -23,7 +23,9 @@ int runCampaignUi(ascend::game::Campaign& camp, int turns, bool autoplay,
 // texture, paced by the file's per-frame delay / header speed. Any key or
 // quit event stops playback (decode continues harmlessly to EOF). Returns 0
 // on clean finish/interrupt, 1 on load failure. No audio: the vendor intro's
-// music-track selection is unresolved (OQ-018), so silence is the honest
+// music-track selection resolved (OQ-018 closed 2026-10-07: tune selector
+// DAT_00010ba0 == 0 in every capture == theme00); residual engine detail
+// tracked as OQ-022, so the silence fallback below stays honest for audio-off.
 // default. The --intro path (intro65a.flc is the vendor intro per
 // docs/re/media.md §1). maxFrames > 0 caps playback (gate smoke).
 int playIntro(const std::string& flicPath, int maxFrames);

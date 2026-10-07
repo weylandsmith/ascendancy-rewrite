@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T12:30
+updated: 2026-10-07T14:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,22 +158,23 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-018 RACE->THEME MAP — LAST OQ-018 sub-question. VOC residue CLOSED t5
-(§2.1 byte map 15/15: ver@20 0x1A, type@24 0x1F, u16@25 0x0911 CONSTANT
-(no code read-site found; pinned as invariant in voc.cpp), u16@27==size-31,
-u32@30 play-rate 22050x14 + bullet.voc 11025/stereo, b34=8, b35 channels,
-bytes36..41 zero; rewrite honours per-file [inferred]; 91 tests). Route
-(decided): (1) owner of the theme00.raw imm block @0x210f3 — disassemble
-its head (block start < 0x210d8; find function boundary via preceding RET
-c3-scan) and get_function_callers; theme selection likely keys off race
-index there; (2) if static stays negative: one New-Game capture as a
-DIFFERENT race vs r1ad baseline, diff which span-table indices 443..469
-(raceNN = 443+NN for NN 0..20, theme00..04 = 464..468, victory=469 —
-BANKED from ck005) gain touched buffer pointers;
-capture per R1 invariants (scratch copy, headless, -time-limit).
-DO NOT re-probe: format-string routes (%s.raw/race%02d zero strings),
-music.txt referrer 0x6ba76 (data), config-block interpretation of 0x212d4
-(open+error-report only).
+OQ-022(b) — music span-vs-check contradiction. STATIC FIRST: get_function
+_callers of FUN_00059c70 (and sibling 0x598fc, called @0x54f6e with EDX=
+0x2cce, EBX=0); map which key codes (dispatch u16 [0x484c4], handler
+FUN_00054d18) reach the 0x1d4d0-checked open path vs the theme00 path;
+whichever site opens track 0 for the menu is the true music engine — decompile
+it and lift the real read law (chunked 0x1d4c0 hypothesis check). BANKED:
+DAT_00010ba0 sole writer 0x21309 (MOV -1 under 0x77ece option gate), value 0
+in ALL banked saves; audio object state fields +0x48a6/+0x48aa written ONLY
+0/-1 image-wide (SIB-aware scan); music.txt 29 tracks, span==disk 27/27 in
+ascend02 range 443..469. DO NOT: re-run format-string routes (negative image
+AND runtime RAM), re-scan DAT_00010ba0 xrefs, chase TUNEID (1 hit, capture
+heap debris at 0xfe9ddc). If static resolves, update docs §3.3 and close;
+options-menu capture is the fallback only after static.
+Ledger after this turn: OPEN = OQ-005, OQ-012(a), OQ-015, OQ-016 (capture-
+gated), OQ-017, OQ-019, OQ-021 (user ruling pending, >1/2 in force), OQ-022;
+BLOCKED = OQ-020 (default 30 turns). OQ-018 CLOSED 2026-10-07 all three
+sub-questions (test audio_tune_selector_oq018; 92 tests 0 fail).
 CROSS-CUTTING WARNING STILL ACTIVE: pin bytes from RESTORED image, read
 semantics from Ghidra payload program, cross-check both (993 diff
 clusters; 850 imm-fixups, 143 other).

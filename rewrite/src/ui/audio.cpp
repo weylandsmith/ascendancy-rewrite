@@ -87,6 +87,12 @@ bool AudioEngine::init(const std::string& dataDir, bool mute,
     }
 
     const std::string theme = dataDir + "/extracted/ascend02/data/theme00.raw";
+    // Track 0 is MEASURED-correct for every captured game state: the global
+    // tune selector DAT_00010ba0 (image) has exactly one writer (0x21309,
+    // writes -1 under an option check) and reads 0 in all banked saves
+    // (ck005/ck010 x5 runs); 0 == music.txt track 0 == theme00.raw.
+    // Residue: the 0x1d4d0 span check in FUN_00059c70 vs theme00 span
+    // 8,191,719 — see docs/re/audio.md §3.3 (chunked-read hypothesis).
     af::Sample ms;
     if (!af::loadSample(theme, "theme00", &ms, &merr)) {
         if (err) *err = merr;

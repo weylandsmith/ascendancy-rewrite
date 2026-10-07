@@ -237,3 +237,30 @@ Loader FUN_0004ff34 (unique referrer of `soundfx.txt` string, imm 0x2a08 @0x4ff4
   resolve to lowercase .voc files in ascend01/data; census over the 86
   lines: {band0:4, band1:81, band2:1, error:0}. Rewrite pins this as
   formats/voc.h voiceBand() + test audio_voice_band_law_oq018.
+
+### 3.3 Race->theme tune selection (2026-10-07, static chain + capture census)
+MEASURED facts:
+* music.txt loader = FUN_00020fd4 (unique caller FUN_0007b7d7); loads all 29
+  tracks (theme00..04, victory, intro00/01, race00..20) via name/span tables;
+  span-table check vs ascend02 files: 27/27 span == on-disk size.
+* Global tune state DAT_00010ba0 (image): get_xrefs_to -> 14 refs, exactly ONE
+  writer: 0x21309 inside FUN_00020fd4. Sequence @0x212f6: CALL 0x77ece
+  (key imm 0x943, second imm 0x945 — compressed string pool, name NOT
+  statically recoverable, same limitation class as OQ-020 runtime strings);
+  if returned nonzero -> MOV [DAT_00010ba0], -1. No other store exists in the
+  whole image (SIB-aware 89/C7 scan of disp32 a6480000/aa480000 confirms the
+  audio-object fields +0x48a6/+0x48aa are only written 0 / -1 state values,
+  never track numbers).
+* Capture census: DAT_00010ba0 == 0 in ALL banked saves (ck005 and ck010 x5
+  runs, r1ad-20261006-131350..153435) at member B+0x82BB0+0x10ba0.
+REFUTED: the "race->theme mapping TABLE" hypothesis — no table, no format
+strings (%s.raw/race%02d absent image AND runtime RAM), no per-race writes.
+OPEN CONTRADICTION [unverified]: music player FUN_00059c70 validates the
+opened-file span CMP EAX,0x1d4d0 @0x59cc5 (error 0x1047 if above), yet
+theme00.raw span == 8,191,719 bytes in ck005. So either +0x48a6 indexes a
+segmented/chunked view (0x1d4c0-byte reads seen @0x59cef) or FUN_00059c70 is
+not the main-menu theme path. Resolving needs the options-menu capture (set
+the DAT-gating option, capture, diff) or the compressed-pool decoder.
+REWRITE: audio.cpp playMusic uses data/theme00.raw == music.txt track 0 ==
+the vendor path observed in every captured configuration; no default change
+required for the captured domain. [verified] = image/capture facts above.
