@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T17:10
+updated: 2026-10-07T18:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,20 +158,24 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-017 (.fnt codec + UI wiring) — static route identical in shape to the
-soundfx.txt/music.txt wins: (1) find the ".fnt"/fnt-named imm string in the
-RESTORED image and its unique referrer (disp32 imm scan, pool offsets
-pre-0x82bb0), (2) disassemble/decompile the loader that consumes it, (3)
-compare a couple of extracted .fnt files (extracted/ascend00/*.fnt?) against
-the loader's field reads to lift the header/record grammar; pin as a byte
-test if a shipped-file invariant emerges. BANKED CONTEXT: name table idx
-space 0..470 (font files are among .raw/.shp entries — census first: names
-containing 'fnt'); string-pool strings are COMPRESSED (0x77ece decodes; do
-NOT expect readable imm names); use get_xrefs_to for SIB-indexed globals.
-DO NOT re-open: OQ-022 (closed t8 §3.4 non-claim), tune selector, name
-table music census. Ledger after t8: OPEN = OQ-005, OQ-012(a), OQ-015,
-OQ-016 (capture-gated), OQ-017, OQ-019, OQ-021 (user ruling pending, >1/2
-in force); BLOCKED = OQ-020 (30 turns). OQ-018, OQ-022 CLOSED. 92 tests.
+OQ-015 (dip dialogue selection order) — STATIC code hunt, no capture:
+(1) the 22 .dip files are read by some loader — find it via the open-helper
+callers list BANKED t7 (26 xrefs of 0x20728; candidates 0x26910 with EDX
+0xe55, 0x4ee1e, 0x4f1ef — check each head for dip-record parsing);
+(2) from the loader, follow DA_ keyword handling: templates are keyed DA_<n>
+in the .dip (verify: grep one file for 'DA_'); the selection-order question
+= how the module walks them (random? sequence counter? attitude-keyed);
+(3) lift the rule into docs/re/diplomacy.md + upgrade dialogue defaults in
+rewrite/src/game where the v1 default picks templates (grep DA_ in rewrite).
+BANKED THIS TURN (t9): OQ-017 was CLOSED at v1 (index line 168) — earlier
+NEXT ACTION was stale, fonts already load (formats/fnt, docs/re/fnt.md).
+OQ-021 RE-CONFIRMED decision-gated: end-*.txt pool literals have NO code
+refs (raw imm scan, matches BLOCKED.md); static DS 0x3a095 owner table reads
+ALL ZEROS in ck005 (heap-relocated — mutation capture needs the name-anchor
+route of r1_star_table.py, stride 96 name records, NOT the raw DS offset);
+capture route stays valid but prep required, pair with OQ-016 idle capture.
+Ledger: OPEN = OQ-005, OQ-012(a), OQ-015, OQ-016, OQ-019, OQ-021 (user
+ruling (a) or capture (c)); BLOCKED = OQ-020 (30 turns). 92 tests.
 CROSS-CUTTING WARNING STILL ACTIVE: pin bytes from RESTORED image, read
 semantics from Ghidra payload program, cross-check both (993 diff
 clusters; 850 imm-fixups, 143 other).
