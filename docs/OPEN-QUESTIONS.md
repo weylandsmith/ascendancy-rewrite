@@ -135,10 +135,12 @@ OQ-015 | dip | DA_ template selection order (%token table CLOSED 2026-10-06g:
 exhaustive regex over 22/22 .dip files yields exactly %m %y %s %t — no other
 tokens exist) | open | W4: chooser LAW measured t12 (docs/re/diplomacy.md
 §7 FUN_00044a44 return==ACTIONS pool idx, cadence+roll+third-party+trade
-ladder; pin test dip_action_chooser_law_oq015_t12 93 tests) + renderer/
-queue/dispatch laws t11 (§4–§6, stride 128, %m%y%s%t CODE-confirmed);
-remaining = state-byte/threshold-key mapping per STATE fifth leg; v1
-plausibility default stays until mapped (strict-close).
+ladder; pin test dip_action_chooser_law_oq015_t12) + renderer/queue/
+dispatch laws t11 (§4–§6 stride 128, %m%y%s%t CODE-confirmed) + FIELD MAP
+t13 (§8 DIPVALUES positional loader FUN_00044290, pool-base law verified;
+decideDipAction upgraded to STRICT thresholds, pin dip_strict_threshold_
+oq015_t13, 94 tests); sixth leg = closure audit per STATE (trade
+predicates scoped; no silent stubs).
 OQ-016 | loop | campaign per-turn constants: income formula, pop growth
 curve/cap, starting items, build order, expansion cadence, home placement
 (all currently documented defaults in campaign.cpp) | open | W2: controlled

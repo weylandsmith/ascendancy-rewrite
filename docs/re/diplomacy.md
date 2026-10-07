@@ -157,3 +157,43 @@ State-byte semantics {1,2,3} NOT yet mapped (writers next leg; do not guess
 in code). Rewrite decideDipAction stays the documented default until the
 state/threshold mapping lands; its order (alliance@hi vs war@lo) matches
 state==1's dual-threshold shape but NOT the cadence/roll/trade machinery.
+
+## 8. Field map: DIPVALUES -> record offsets (OQ-015 t13, MEASURED)
+- Loader FUN_00044290 (raceneg.cpp owner): opens `RACE%02d.DIP` (pool imm
+  0x21f0 -> decoded from banked RAM pool base P=0x242088 via soundfx.txt
+  anchor 0x2a08; `%s %d` format strings at pool 0x2216..0x22b5, 6-byte
+  pitch, verified verbatim in ck005 RAM), sequentially scan-parses the
+  DIPVALUES lines POSITIONALLY into fixed record offsets:
+  +0x1c9,+0x1cb,+0x1cd,+0x1cf,+0x1d1,+0x1d3,+0x1d5 (i16), +0x1b0 (i16),
+  +0x1d7,+0x1d9,+0x1db (i16), +0x1dd,+0x1e1,+0x1e5 (float), +0x1c7 (i16).
+  After each of the first six it enforces strictly ascending, else vendor
+  error 0x2a428.
+- Positional mapping == canonical key order (proved two ways: loader is
+  positional + every one of the 22 .dip files lists its keys as an IN-ORDER
+  SUBSEQUENCE of DECLARE_WAR, ACCEPT_PEACE, PROPOSE_PEACE, BREAK_ALLIANCE,
+  ACCEPT_ALLIANCE, PROPOSE_ALLIANCE, START_ATTITUDE, SHIP_PATIENCE,
+  BIO_PERIOD, BIO_MAXPOSITVE, BIO_MAXNEGATIVE, BIO_SIN_X, BIO_SIN_HALF_X,
+  BIO_SIN_TWICE_X, NEG_PLAYER_TURNS [verified regex over all 22 files]).
+  => +0x1c9=DECLARE_WAR, +0x1cb=ACCEPT_PEACE, +0x1cd=PROPOSE_PEACE,
+  +0x1cf=BREAK_ALLIANCE, +0x1d1=ACCEPT_ALLIANCE, +0x1d3=PROPOSE_ALLIANCE,
+  +0x1d5=START_ATTITUDE, +0x1b0=SHIP_PATIENCE, +0x1d7=BIO_PERIOD,
+  +0x1d9=BIO_MAXPOSITVE, +0x1db=BIO_MAXNEGATIVE, +0x1dd/0x1e1/0x1e5 =
+  BIO_SIN_X/HALF/TWICE (floats), +0x1c7=NEG_PLAYER_TURNS.
+- Chained-ascending check: first six values strictly ascending in 21/21
+  race files (matches the loader's six enforced comparisons).
+- Chooser §7 thresholds REKEYED: state1 declare-war iff att < DECLARE_WAR
+  (and tech-word DAT_00013b9c[race*6] hi > 2); state1 propose-alliance iff
+  PROPOSE_ALLIANCE < att; state3 offer-peace iff PROPOSE_PEACE < att;
+  state3 break-alliance iff att < BREAK_ALLIANCE. Cadence divisor reads
+  byte [rec+0x1c5] hi-half — NOT a DIPVALUES field (packs with an adjacent
+  runtime u32; unmapped, non-blocking for the selection ORDER).
+- Cross-check vs rewrite decideDipAction (v1): thresholds and directions
+  MATCH the original for all four primary branches; original comparison is
+  STRICT (PROPOSE_ALLIANCE < att, PROPOSE_PEACE < att) where the rewrite
+  used >= at the two propose sites -> upgrade to strict (t13 code site).
+  Original declare-war additionally gates on per-race tech level; rewrite
+  DipPolicyState carries no tech field — documented extension, not copied.
+- STATE-BYTE +0x1c0 writers: disp-scan sees only stack-slot writes
+  (0x19eef, 0x1d71e are [ESP+0x1c0]); record writes go through computed
+  pointers (FUN_00044848 family) — relationship-state semantics belong to
+  the negotiation-state family (OQ-012(a)), NOT to selection order.

@@ -186,3 +186,22 @@ TEST(dip_action_chooser_law_oq015_t12) {
     CHECK(b[7] == 0x3c && b[8] == 0x0e);            // CMP AL, 0xe
     std::fclose(f);
 }
+
+TEST(dip_strict_threshold_oq015_t13) {
+    // MEASURED (docs/re/diplomacy.md §7/§8): original comparisons STRICT —
+    // propose-alliance fires only when PROPOSE_ALLIANCE < att (not >=).
+    ag::DipValues v;
+    v.declareWar = 290; v.proposePeace = 450; v.proposeAlliance = 750;
+    v.breakAlliance = 510; v.negPlayerTurns = 99;  // race00 values (§8)
+    v.hasOscillation = false;
+    ag::AttitudeModel mood(v);
+    ag::DipPolicyState st; st.attitude = 750; st.atWar = false; st.allied = false;
+    // att == threshold exactly -> NO action (strict <)
+    CHECK(ag::decideDipAction(v, mood, 5, &st) == ag::DipAction::None);
+    st.attitude = 751;
+    CHECK(ag::decideDipAction(v, mood, 5, &st) == ag::DipAction::ProposeAlliance);
+    st.attitude = 290;
+    CHECK(ag::decideDipAction(v, mood, 5, &st) == ag::DipAction::None);  // not war
+    st.attitude = 289;
+    CHECK(ag::decideDipAction(v, mood, 5, &st) == ag::DipAction::DeclareWar);
+}

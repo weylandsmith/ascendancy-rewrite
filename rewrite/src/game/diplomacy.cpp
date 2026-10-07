@@ -202,16 +202,13 @@ const char* dipActionName(DipAction a) {
 
 DipAction decideDipAction(const DipValues& v, const AttitudeModel& mood,
                           int turn, DipPolicyState* st) {
-    // [inferred] threshold model — thresholds are the vendor weights
-    // themselves (docs/re/diplomacy.md §1 envelope: START_ATTITUDE 310..620,
-    // DECLARE_WAR 130..450, PROPOSE_ALLIANCE 680..900 etc. all on the same
-    // running-score scale). ORIGINAL chooser MEASURED t12 (docs/re/
-    // diplomacy.md §7, FUN_00044a44): per-state branches (war-threshold
-    // needs tech-word word>2; state3 break-alliance vs offer-peace) plus a
-    // turn-cadence gate (turn % divisor == 0, roll%100: 80% third-party
-    // loops, trades need roll 79..92 per ladder rung). State-byte semantics
-    // {1,2,3} and threshold-key mapping still open — do NOT copy §7 into
-    // this default until mapped (strict-close).
+    // MEASURED chooser (docs/re/diplomacy.md §7 FUN_00044a44 + §8 field
+    // map): thresholds are the vendor DIPVALUES weights, loaded POSITIONALLY
+    // from raceNN.dip (loader FUN_00044290; DECLARE_WAR->+0x1c9 ...
+    // PROPOSE_ALLIANCE->+0x1d3, ascending-enforced). Original comparisons
+    // are STRICT: declare-war iff att < DECLARE_WAR; propose-alliance iff
+    // PROPOSE_ALLIANCE < att; break-alliance iff att < BREAK_ALLIANCE;
+    // offer-peace iff PROPOSE_PEACE < att.
     double m = mood.mood(turn);
     int att = st->attitude + static_cast<int>(m);
     // NEG_PLAYER_TURNS: a negative excursion sticks (drags the baseline
@@ -221,12 +218,18 @@ DipAction decideDipAction(const DipValues& v, const AttitudeModel& mood,
 
     DipAction act = DipAction::None;
     if (!st->atWar && !st->allied) {
-        if (att >= v.proposeAlliance) act = DipAction::ProposeAlliance;
+        // strict > per §7 (state1: PROPOSE_ALLIANCE < att -> DA idx 3)
+        if (att > v.proposeAlliance) act = DipAction::ProposeAlliance;
+        // original ALSO gates declare-war on per-race tech level
+        // (DAT_00013b9c word hi > 2) — DipPolicyState has no tech field;
+        // documented extension, not copied (§8).
         else if (att < v.declareWar) act = DipAction::DeclareWar;
     } else if (st->allied) {
+        // §7 state3: att < BREAK_ALLIANCE -> DA idx 8
         if (att < v.breakAlliance) act = DipAction::BreakAlliance;
     } else {  // at war
-        if (att >= v.proposePeace) act = DipAction::ProposePeace;
+        // §7 state3: PROPOSE_PEACE < att -> DA idx 13 (strict)
+        if (att > v.proposePeace) act = DipAction::ProposePeace;
     }
 
     switch (act) {

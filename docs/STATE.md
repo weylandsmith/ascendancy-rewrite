@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T23:20
+updated: 2026-10-08T01:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,20 +158,22 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-015 fifth leg — complete the chooser semantics. t12 MEASURED the
-selection law (docs/re/diplomacy.md §7: FUN_00044a44 return == DA_ ACTIONS
-pool idx; call edge E8 6F 02 00 00 @0x447d0; 0xe=NO action gate; pin test
-dip_action_chooser_law_oq015_t12, 93 tests). REMAINING: (1) state-byte
-[rec+0x1c0+idx] writers — scan SIB-aware stores with disp 0x1c0 family in
-payload, then map values {1,2,3} to peace/war/allied via the DIPVALUES keys
-they gate against (state1 gates DECLARE_WAR-shape+tech word; state3 gates
-BREAK/PEACE-shape); (2) threshold fields +0x1c9/+0x1cd/+0x1cf/+0x1d3 —
-find their init sites (likely the .dip loader stamping 15 keys — check
-FUN_0004ff34-family record-offset law vs raceneg.cpp %s %d parse loop);
-(3) capture corroboration: read rec 0x1b0..0x1e0 for each race from ck005
-(pointer law) and check value plausibility vs DIPVALUES per race. Then
-upgrade decideDipAction in rewrite/src/game/diplomacy.cpp to the measured
-law + pin. Close ONLY when (1)+(2) map keys; else record exit 1 -> OQ-019.
+OQ-015 SIXTH leg — closure audit. t13 landed the FIELD MAP (docs/re/
+diplomacy.md §8: DIPVALUES positional load FUN_00044290 -> record offsets,
+proved 3 ways incl. pool-base law P=RAM(soundfx.txt)-0x2a08 verified) and
+UPGRADED decideDipAction to strict thresholds + pin dip_strict_threshold_
+oq015_t13 (94 tests). What §7/§8 do NOT yet cover: third-party/offer
+branches (10/7/9), trade ladder predicates FUN_000465fc/00046428/00046258,
+cadence-divisor provenance [rec+0x1c5 hi], and the mood->attitude pipeline
+vs original (original attitude update site NOT compared). NEXT: decompile
+the three trade predicates (cheap, static; if they need relation-table
+semantics DAT_00012fd6, decode rel enum from banked in-game saves IF the
+chain is heap-anchored — else bank exit 1). Decide at the end of that leg
+whether OQ-015's stated scope ("DA_ template selection order") is met by
+§7+§8 (argument: order + thresholds + firing conditions ARE the selection
+law) -> then CLOSE citing §4-§8 + both pin tests; trade predicates become
+an explicitly-scoped residual note, not a silent stub. If the audit
+finds the ORDER itself still ambiguous, keep open. Then move to OQ-019.
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;
 exactly {m,y,s,t} confirmed in CODE); queue cap 0x1d @0x363f1; dispatch
