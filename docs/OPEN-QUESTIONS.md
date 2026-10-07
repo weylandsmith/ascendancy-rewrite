@@ -129,11 +129,17 @@ hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | W3: ship design screen code + its data reads (live image).
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping | header
-pair CLOSED 2026-10-07 t4 (MEASURED: col1=voices/band, col2=size threshold —
-play path bands by FILE SIZE via the span table; ck005 proof 327/328 spans ==
-disk sizes; shipped census {4,81,1} zero errors; voiceBand() + test
-audio_voice_band_law_oq018; audio.md §3.2 SCALAR IDENTITY/HEADER-PAIR FINAL).
-STILL OPEN: VOC u16@25=0x0911 residue; race->theme theme-selection map.
+pair CLOSED 2026-10-07 t4 (col1=voices/band, col2=size threshold; ck005 span
+table proof; voiceBand() + test audio_voice_band_law_oq018); VOC header CLOSED
+2026-10-07 t5 (byte map 15/15: u16@25==0x0911 CONSTANT constant-not-payload,
+u16@27==size-31, u32@30 rate 22050x14 + bullet.voc 11025/stereo exception,
+bytes36..41 reserved zero; audio.md §2.1; voc.cpp field pins). REMAINING:
+race->theme map only — static negatives banked t5 (no %s.raw/theme format
+strings; music.txt referrers: 0x212d4 opens music.txt then error-reports
+(code 0xb2, str 0x937) via 0x2a428 — setup/verify block, not selection;
+0x6ba76=data misdisassembly; all captures show all 5 themes loaded). Route:
+owner+callers of FUN_000210xx theme00 block, or New-Game-different-race
+capture reading span-table touches 443..469.
 
 --- closed during v1 (kept here as a one-line index; evidence in archive and
 docs/re/): OQ-001 .cob offsets | OQ-002 FLIC codec | OQ-007 CP437 |

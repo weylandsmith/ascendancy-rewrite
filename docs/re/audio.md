@@ -99,6 +99,23 @@ ascend01/data, race* in ascend02/data. Sizes 0.44-8.2 MB headerless PCM
   load failure. `--audio` opts in; UI plays click08 on NEXT TURN, laser01
   on map click, bang01 when a new event line contains "captured" (names
   verbatim from soundfx.txt §1). `--mute` zeroes mixer volume.
+### 2.1 Headered-VOC byte map MEASURED 2026-10-07 (closes OQ-018 VOC residue)
+All 15 headered files (magic "Creative Voice File\0x1A" @0..19): ver@20 ==
+0x1A; type@24 == 0x1F; **u16@25 == 0x0911 on 15/15** — the long-standing
+"0x0911 mystery" resolves as a CONSTANT across every shipped headered file
+(no per-file payload; no code read-site located; loader-side validation
+pins it, rewrite/src/formats/voc.cpp). u16@27 == filesize − 31 on 15/15
+(PCM byte count); LE u32@30 = play rate, 22050 on 14 files, and
+**bullet.voc is the only exception: 11025 Hz + byte@35 == 2 (stereo)** —
+the vendor honours the header per file, which is why the OQ-006 device-rate
+law and the OQ-012a rate-setter chain remain about the DEVICE, not per-
+sample rates; byte@34 == 8 (bits); byte@35 == channels ({1,2}); bytes
+36..41 all zero on 15/15 (the "six zero bytes @36" residue: reserved,
+invariant — closed as a measured constant, nothing synthesises from them);
+PCM 42..EOF−1 with trailing 0x00. Census: stereo files == {bullet.voc};
+rates == {22050 x14, 11025 x1}. Test pins: audio_headered_voc (existing)
+now runs under the stricter field checks.
+
 - Gate 4d: SDL_AUDIODRIVER=dummy + `--ui --audio --campaign 1` must print
   the audio-ok line and `ui ok: turn 1`, exit 0.
 - NOT in P5b: music track SELECTION logic (which race gets which theme —

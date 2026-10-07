@@ -34,9 +34,20 @@ bool loadSample(const std::string& path, const std::string& name,
     out->channels = 1;
     if (size >= 42 && std::memcmp(d.data(), kMagic, 19) == 0 &&
         d[19] == 0x1A) {
-        // Headered vendor block (audio.md §2). Invariants on all 15 files:
-        // ver@20==26, type@24==0x1F, len@27==size-31, bits@34==8.
-        if (d[20] != 26 || d[24] != 0x1F || d[34] != 8) {
+        // Headered vendor block (audio.md §2.1, offsets MEASURED 2026-10-07
+        // over all 15 files). Byte map: ver@20==0x1A; type@24==0x1F;
+        // u16@25==0x0911 CONSTANT on 15/15 (uninterpreted field -- no code
+        // read site found; NOT a per-file property); u16@27==filesize-31 on
+        // 15/15; LE u32@30 = PLAY RATE, 22050 on 14/15, and bullet.voc is
+        // the ONE exception: 11025 Hz and byte@35==2 (stereo) — the rewrite
+        // honours the header per-file (vendor read-site for this field not
+        // located; header existence of per-file rate/channels is [verified],
+        // vendor honour is [inferred]);
+        // byte@34==8 (bits); bytes 36..41 all zero on 15/15 (the "six zero
+        // bytes @36" residue, CLOSED); PCM 42..EOF-1.
+        if (d[20] != 0x1A || d[24] != 0x1F || d[25] != 0x11 || d[26] != 0x09 ||
+            d[34] != 8 || d[35] < 1 || d[35] > 2 ||
+            le32(&d[36]) != 0 || d[40] != 0 || d[41] != 0) {
             if (err) *err = "unexpected vendor VOC header fields in " + path;
             return false;
         }
