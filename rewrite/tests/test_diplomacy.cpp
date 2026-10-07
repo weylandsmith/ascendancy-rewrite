@@ -4,9 +4,11 @@
 #include "harness.h"
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <string>
 
 #ifndef ASCENDANCY_SOURCE_DIR
@@ -135,4 +137,52 @@ TEST(dip_policy_war_on_low_attitude) {
     CHECK(act == ag::DipAction::DeclareWar);
     CHECK(st.atWar == true);
     CHECK(std::string(ag::dipActionName(act)) == "DeclareWar");
+}
+
+TEST(dip_action_chooser_law_oq015_t12) {
+    // MEASURED (docs/re/diplomacy.md §7): FUN_00044a44 return value == DA_
+    // ACTIONS pool index (file order). Pin the ACTIONS file order and the
+    // two decoded state-threshold branches' byte-level shape in the image.
+    namespace fs = std::filesystem;
+    const std::string dip = dipPath("race00.dip");
+    if (!fs::exists(dip)) { std::printf("(skip: race00.dip absent) "); return; }
+    std::FILE* f = std::fopen(dip.c_str(), "rb");
+    if (!f) { CHECK(false); return; }
+    std::fseek(f, 0, SEEK_END); long n = std::ftell(f); std::fseek(f, 0, SEEK_SET);
+    std::string d(static_cast<size_t>(n), '\0');
+    size_t got = std::fread(&d[0], 1, static_cast<size_t>(n), f);
+    std::fclose(f);
+    CHECK(got == static_cast<size_t>(n));
+    // Pool index law (file order, §4/§7 mapping used by return values):
+    const char* kOrder[] = {"DA_Discover", "DA_DiscoverAskHelp", "DA_DeclareWar",
+        "DA_ProposeAlliance", "DA_TradeStarlanes", "DA_TradeStars",
+        "DA_TradeResearch", "DA_OfferPeaceToOtherRace", "DA_BreakAlliance",
+        "DA_DeclareWarOnOtherRace", "DA_BreakAllianceWithOtherRace",
+        "DA_ProposeAllianceToOtherRace", "DA_HelpControlSystem",
+        "DA_OfferPeace", "DA_NoDipAction"};
+    size_t prev = d.find("ACTIONS");
+    CHECK(prev != std::string::npos);
+    for (const char* nm : kOrder) {
+        size_t p = d.find(nm, prev);
+        CHECK(p != std::string::npos);
+        prev = p + 1;  // strictly ascending positions == file order
+    }
+    // Image shape: chooser prologue compares state byte to 2 then 3, and
+    // call-site @0x447d0 gates AL==0xe (JZ epilogue 0x44713).
+    const std::string imgp = std::string(ASCENDANCY_SOURCE_DIR) + "/work/ascend_restored.bin";
+    if (!fs::exists(imgp)) { std::printf("(skip: work/ absent) "); return; }
+    f = std::fopen(imgp.c_str(), "rb");
+    if (!f) { CHECK(false); return; }
+    auto at = [&](size_t a, size_t k) {
+        std::array<unsigned char, 16> b{};
+        std::fseek(f, static_cast<long>(a), SEEK_SET);
+        std::fread(b.data(), 1, k, f);
+        return b;
+    };
+    // E8 6F 02 00 00 @0x447d0 -> CALL 0x44a44; 3C 0E @0x447d7; 0F84 rel.
+    auto b = at(0x447d0, 10);
+    CHECK(b[0] == 0xe8 && b[1] == 0x6f && b[2] == 0x02 && b[3] == 0x00 && b[4] == 0x00);
+    CHECK(b[5] == 0x88 && b[6] == 0xc3);            // MOV BL, AL
+    CHECK(b[7] == 0x3c && b[8] == 0x0e);            // CMP AL, 0xe
+    std::fclose(f);
 }

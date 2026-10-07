@@ -111,3 +111,49 @@ Sources: `extracted/ascend00/player.dip` (human species) and the 21 `raceNN.dip`
   the 0xe-gate just above), and the packed type writer for queue entries
   ([obj+0xc7] stride 8, type u32 >>0x18 indexes the ACTIONS pool @0x71c68+16
   per FUN_00036cd8).
+
+## 7. DA_ action chooser FUN_00044a44 — MEASURED selection law (t12)
+CALLER LOCATED t12: Ghidra's caller list is empty but the raw CALL exists —
+`E8 6F 02 00 00 @0x447d0` (relative target 0x44a44, verified byte row
+0x447d0..0x447e9: CALL / MOV BL,AL / CMP AL,0xe / JZ 0x44713). Post-call
+caller law: AL==0xe -> JZ epilogue 0x44713 (NO message queued); otherwise
+DL=player idx ([0x7458e]), EDI==DL required to continue, action byte stored
+[ESI+0x1e9] @0x44801 (negotiation obj), then msg box 0x7a35c via 0x55a60
+with EDX=2. Ghidra never formed the owning function (0x446d9-ish head, ep
+0x4482d..0x44836) — another caller-attribution gap, raw bytes authoritative.
+Call site: `CALL 0x44a44 @0x447d0` (inside the AI branch; Ghidra
+get_function_callers returns [] here — caller attribution gap at 0x447d0,
+raw bytes are the authority). Gate after return: AL==0xe -> JZ 0x44713
+(no message); other values flow into the queue as the entry type.
+Record layout (race-diplo record ptr param_1, per-target idx param_2):
+state byte [+0x1c0+idx]; per-target attitude i16 [+0x1b2+2*idx]; power-ish
+u32 [+0x1b0+?] (hi-byte compared); cadence divisor u32 hi [+0x1c5];
+thresholds i16 [+0x1c9], [+0x1cd], [+0x1cf], [+0x1d3]. [unverified] which
+DIPVALUES key each threshold comes from — next leg.
+Return value == DA_ ACTIONS pool index (file order, §4 census):
+- state==1: att < [rec+0x1c9] AND tech-word DAT_00013b9c[idx*6] hi > 2
+  -> 2 (DA_DeclareWar); elif [rec+0x1d3] < att -> 3 (DA_ProposeAlliance).
+- state==2: (no direct return; falls to cadence block; state==2 also means
+  eligible as third party in loop 3 -> caller gets 9).
+- state==3: [rec+0x1cd] < att -> 0xd (13 DA_OfferPeace); elif att <
+  [rec+0x1cf] -> 8 (DA_BreakAlliance).
+- Cadence block (gated DAT_00012e10 % (rec+0x1c5 hi) == 0 AND idx ==
+  DAT_0007458e AND state != 2): roll = RNG FUN_0007824f() % 100.
+  - roll < 0x50 (80), three third-party loops in ORDER over races
+    (count DAT_00013b96 hi-word), rel matrix (&DAT_00012fd6)[me*0x1ee+other]:
+    loop1: other.state==2 && rel==3 -> 10 (DA_BreakAllianceWithOtherRace),
+    loop2: other.state==3 && rel==2 -> 7  (DA_OfferPeaceToOtherRace),
+    loop3: other.state==2 && rel==1 -> 9  (DA_DeclareWarOnOtherRace),
+    each also requires other alive (DAT_00012e19 chain != -1) and
+    other != me, other != target. [unverified] rel enum semantics (1/2/3).
+  - then if [rec+0x1c9] <= att: bonus +0xf when state==3;
+    trade ladder in ORDER, each needing its FUN predicate nonzero:
+    (rec+0x1cd hi)+10 < power hi && roll > 0x5c (92) && FUN_000465fc ->
+    6 (DA_TradeResearch); [rec+0x1cf] < att && roll > 0x57 (87) &&
+    FUN_00046428 -> 5 (DA_TradeStars); (rec+0x1d3 hi)+0x14 < power hi &&
+    roll > 0x4f (79) && FUN_00046258 -> 4 (DA_TradeStarlanes).
+- else -> 0xe (14 DA_NoDipAction).
+State-byte semantics {1,2,3} NOT yet mapped (writers next leg; do not guess
+in code). Rewrite decideDipAction stays the documented default until the
+state/threshold mapping lands; its order (alliance@hi vs war@lo) matches
+state==1's dual-threshold shape but NOT the cadence/roll/trade machinery.

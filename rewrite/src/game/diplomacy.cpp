@@ -205,7 +205,13 @@ DipAction decideDipAction(const DipValues& v, const AttitudeModel& mood,
     // [inferred] threshold model — thresholds are the vendor weights
     // themselves (docs/re/diplomacy.md §1 envelope: START_ATTITUDE 310..620,
     // DECLARE_WAR 130..450, PROPOSE_ALLIANCE 680..900 etc. all on the same
-    // running-score scale). The original ordering/loop is R1-blocked.
+    // running-score scale). ORIGINAL chooser MEASURED t12 (docs/re/
+    // diplomacy.md §7, FUN_00044a44): per-state branches (war-threshold
+    // needs tech-word word>2; state3 break-alliance vs offer-peace) plus a
+    // turn-cadence gate (turn % divisor == 0, roll%100: 80% third-party
+    // loops, trades need roll 79..92 per ladder rung). State-byte semantics
+    // {1,2,3} and threshold-key mapping still open — do NOT copy §7 into
+    // this default until mapped (strict-close).
     double m = mood.mood(turn);
     int att = st->attitude + static_cast<int>(m);
     // NEG_PLAYER_TURNS: a negative excursion sticks (drags the baseline

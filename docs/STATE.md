@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T21:40
+updated: 2026-10-07T23:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,19 +158,20 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-015 fourth leg — DA_ message CHOOSER hunt continues. t11 decoded
-FUN_00044848 fully (4-case offer-state setter on race record, marker bytes
-2/3/0xd, table dwords at restored 0x44838 {0x448a2,0x448cd,0x448bc,0x44959};
-MECHANISM CAVEAT banked §6: encoded jump disp 0x2fc88 != materialised table
-site — 143-class fixup oddity, do not re-scan for a second table).
-NEXT (one action): decompile FUN_00044a44 (the callee gated at 0x447d0 whose
-byte-0xe answer steers the AI branch to FUN_00044848 — read the OTHER
-outcomes too by disassembling 0x44700..0x447d0 head context); the DA_ pool
-index writer for queue entries [obj+0xc7] stride 8 (type u32, >>0x18 selects
-ACTIONS entry, render law banked §5) is the selection evidence — scan for
-`shr 0x18` producers whose result feeds FUN_00036cd8's param_2. Close ONLY
-on a measured rule; else record exit 1 and move to OQ-019 (star-name label
-draw). Do NOT spiral on FUN_00044848.
+OQ-015 fifth leg — complete the chooser semantics. t12 MEASURED the
+selection law (docs/re/diplomacy.md §7: FUN_00044a44 return == DA_ ACTIONS
+pool idx; call edge E8 6F 02 00 00 @0x447d0; 0xe=NO action gate; pin test
+dip_action_chooser_law_oq015_t12, 93 tests). REMAINING: (1) state-byte
+[rec+0x1c0+idx] writers — scan SIB-aware stores with disp 0x1c0 family in
+payload, then map values {1,2,3} to peace/war/allied via the DIPVALUES keys
+they gate against (state1 gates DECLARE_WAR-shape+tech word; state3 gates
+BREAK/PEACE-shape); (2) threshold fields +0x1c9/+0x1cd/+0x1cf/+0x1d3 —
+find their init sites (likely the .dip loader stamping 15 keys — check
+FUN_0004ff34-family record-offset law vs raceneg.cpp %s %d parse loop);
+(3) capture corroboration: read rec 0x1b0..0x1e0 for each race from ck005
+(pointer law) and check value plausibility vs DIPVALUES per race. Then
+upgrade decideDipAction in rewrite/src/game/diplomacy.cpp to the measured
+law + pin. Close ONLY when (1)+(2) map keys; else record exit 1 -> OQ-019.
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;
 exactly {m,y,s,t} confirmed in CODE); queue cap 0x1d @0x363f1; dispatch
