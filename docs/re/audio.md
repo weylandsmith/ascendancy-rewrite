@@ -189,3 +189,34 @@ Loader FUN_0004ff34 (unique referrer of `soundfx.txt` string, imm 0x2a08 @0x4ff4
   LOADED-SAMPLE SPAN vs TIMER SPAN undetermined (see SCALAR IDENTITY);
   physical unit question defers to that identity. VOC u16@25=0x0911 and
   race->theme mapping open.
+- SCALAR IDENTITY CLOSED — MEASURED (turn 4, R1 capture ck005 + ck014 +
+  ck018 of r1ad-20261006-144225, base B=0x1bf4d8, index law member=B+
+  0x82BB0+X): the pair of tables DAT_000102a0/0x102a4 IS THE RESOURCE-FILE
+  SPAN TABLE, parallel to the name table at image 0xa0f8 (stride 50,
+  entries "data\NAME" + start u32 + end u32, count [DAT_0x10a70]=471 at
+  runtime). Proof: 327/328 disk-comparable entries have span (end-start)
+  EXACTLY equal to the on-disk file size (the single mismatch is
+  data\intro01.raw, whose negative span marks the ascend02 archive mount —
+  entries 0..52 ascend00 text set, 53+ ascend02 data set with its own
+  base). ALL 86 soundfx manifest names are present; laser01.voc span =
+  45277 = disk size exactly. Tables byte-identical across turns 0/1/2 —
+  file offsets, not timers (the timer-adjacent sibling FUN_00020a50 uses
+  the same start array for a different purpose; earlier "tick delta"
+  framing is dead).
+- HEADER-PAIR LAW, FINAL (closes the OQ-018 audio sub-question): at play
+  (FUN_000500e0) the sample's FILE SIZE (span, via FUN_000209d8 with the
+  file-table index at obj+0x108) selects the voice band = number of leading
+  col2 thresholds <= size (do-loop in FUN_000500e0: break when size <
+  c44[i]; all-three-below -> FUN_0002a428 vendor error); size >=
+  65000 (all three <= size) = vendor error. Measured census over the 86
+  manifest entries: band0 (<10000, 2 voices) = 4 files, band1 (10000..45000,
+  3 voices) = 81, band2 (45000..65000, 1 voice) = 1 (laser01),
+  WOULD-ERROR = 0 — shipped data is exactly consistent with the cap law.
+  Band = voices-per-size-class with in-band eviction (FUN_000689ee()==4
+  scan); region sizes n_i*col2_i. col1 = voices/band, col2 = size-class
+  threshold, BOTH [verified] static: file 2 10000 / 3 45000 / 1 65000.
+  CORRECTION (turn 4): earlier "77/86 resolve" was a case artifact — with
+  names lowercased ALL 86 manifest lines (85 unique, 'shield' twice)
+  resolve to lowercase .voc files in ascend01/data; census over the 86
+  lines: {band0:4, band1:81, band2:1, error:0}. Rewrite pins this as
+  formats/voc.h voiceBand() + test audio_voice_band_law_oq018.

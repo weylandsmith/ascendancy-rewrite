@@ -6,6 +6,7 @@
 #include <array>
 #include <cstdio>
 #include <filesystem>
+#include <string>
 
 
 namespace af = ascend::formats;
@@ -110,6 +111,47 @@ TEST(audio_open_rate_measured_oq006) {
               b[3] == 0x11 && b[4] == 0x2b);
     }
     std::fclose(f);
+}
+
+TEST(audio_voice_band_law_oq018) {
+    // MEASURED (docs/re/audio.md §3.2 HEADER-PAIR LAW, FINAL): the vendor
+    // bands sounds by FILE SIZE vs soundfx.txt col2 (2 10000 / 3 45000 /
+    // 1 65000): band = count(threshold <= size), size >= 65000 = vendor
+    // error. Span-table identity proven on live RAM (ck005: 327/328 file
+    // spans == disk sizes; laser01.voc span 45277 = disk). Boundary pins:
+    CHECK(af::voiceBand(9999) == 0);
+    CHECK(af::voiceBand(10000) == 1);   // threshold inclusive (<=)
+    CHECK(af::voiceBand(44999) == 1);
+    CHECK(af::voiceBand(45000) == 2);
+    CHECK(af::voiceBand(64999) == 2);
+    CHECK(af::voiceBand(65000) == -1);  // all three <= size -> error path
+    // Shipped-data census (on-disk tree, same lookup rule as AudioEngine):
+    // must be band {4,73,1} over resolvable manifest names, ZERO errors.
+    const std::string repo = ASCENDANCY_SOURCE_DIR;
+    auto names = af::loadSoundfxManifest(
+        repo + "/extracted/ascend00/soundfx.txt", nullptr);
+    CHECK(names.size() == 86);
+    int b0 = 0, b1 = 0, b2 = 0, bad = 0, resolvable = 0;
+    for (auto n : names) {
+        for (auto& c : n) c = char(std::tolower(c));
+        std::error_code ec;
+        const auto p = std::filesystem::path(
+            repo + "/extracted/ascend01/data/" + n + ".voc");
+        if (!std::filesystem::exists(p, ec)) continue;  // 9 names live only
+        resolvable++;                                   // inside archives
+        switch (af::voiceBand(
+            uint32_t(std::filesystem::file_size(p, ec)))) {
+            case 0: b0++; break;
+            case 1: b1++; break;
+            case 2: b2++; break;
+            default: bad++; break;
+        }
+    }
+    CHECK(resolvable == 86);  // 85 unique names + 'shield' listed twice;
+    CHECK(b0 == 4);           // all on-disk files are lowercase .voc
+    CHECK(b1 == 81);   // 10000..45000 (3 voices); shield counted twice
+    CHECK(b2 == 1);    // laser01.voc 45277 (1 voice)
+    CHECK(bad == 0);   // shipped data never hits the vendor error path
 }
 
 TEST(audio_rejects_garbage_magic) {

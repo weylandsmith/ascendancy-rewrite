@@ -16,6 +16,20 @@ struct Sample {
     std::vector<uint8_t> pcm;  // 8-bit unsigned, 0x80 = silence
 };
 
+// MEASURED voice-band law (OQ-018 audio part, docs/re/audio.md §3.2
+// "HEADER-PAIR LAW, FINAL"): the vendor picks the sound's voice band by
+// FILE SIZE against the soundfx.txt col2 thresholds (2 10000 / 3 45000 /
+// 1 65000) — band = number of thresholds <= size, and a size >= the top
+// threshold is a vendor error (FUN_000500e0 do-loop -> FUN_0002a428).
+// Span table identity proven on live RAM (capture ck005: 327/328 file
+// spans == disk sizes). Returns 0/1/2, or -1 for would-error sizes.
+inline int voiceBand(uint32_t size) {
+    if (size < 10000u) return 0;
+    if (size < 45000u) return 1;
+    if (size < 65000u) return 2;
+    return -1;
+}
+
 // Parses one file. Unknown magic-with-garbage -> false with *err.
 bool loadSample(const std::string& path, const std::string& name,
                 Sample* out, std::string* err);

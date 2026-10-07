@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T09:30
+updated: 2026-10-07T11:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,34 +158,31 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-018 SCALAR IDENTITY (turn 3: previous tick-unit route ABANDONED —
-DAT_0x9868/DAT_0x9814 have only 4/1 xrefs, all reads inside tickget
-0x7b1ad/0x7b202; search_byte_patterns "?? 68 09 00 00" zero hits; helper
-0x78db0 is an INT 21h AH=44h IOCTL test, not a pump. Turn-2 conclusions
-"tick delta" and "byte-cap refuted" RETRACTED in audio.md §3.2 — band
-selection is by scalar threshold (first c44[i]>=scalar), and the file
-census (zero .voc >65000, single >45000 lands in band 2) is consistent
-with col2 = band SIZE CAP. Verified now: col1=voices/band, col2=cap +
-region sizing). TASK: identify the FUN_000209d8 scalar = [0x102a4+4i] -
-[0x102a0+4i], i = audio-obj+0x108: (1) get_function_callers FUN_0002086c
-(the name-registering init that also reads 0xa0f8 stride 50 and
-DAT_0x10a70/DAT_0x102a0) — if the audio obj registers a NAME, hypothesis
-(b) timer-span; (2) raw scan for SIB writers of obj+0x108 (`89 8? 08 01`
-forms within audio ctor FUN_0006ed50-region) and what value flows in;
-(3) decisive: capture census of tables 0x102a0/0x102a4 (+0x82BB0 pointer
-law) at idle vs during-play — equal spans => sample-span. THEN residues:
-VOC u16@25=0x0911, race->theme map (owner of 0x210f3).
-CROSS-CUTTING WARNING BANKED (turn 3): payload vs restored images differ
-at 993 clusters; 850 are the imm+=0x82BB0 fixup, 143 are NOT (data/jump
-tables, e.g. 0x84e4, 0x156b4) — pin bytes from the RESTORED image, read
-semantics from the Ghidra payload program, cross-check both. Gate stage
-checksums unaffected (game/ untouched all session).
-DONE EARLIER THIS SESSION: OQ-006 CLOSED (22050 chain, e391fc2); OQ-018
-loader+play-path law banked (986b689); scalar provenance partial (478b98a,
-superseded notes corrected this turn).
+OQ-018 RESIDUES ONLY (turn 4: HEADER-PAIR LAW CLOSED MEASURED — the
+0x102a0/0x102a4 pair IS the resource-file span table parallel to the
+"data\NAME" name table at image 0xa0f8 stride 50, count [DAT_0x10a70]=471;
+proof on banked capture ck005 r1ad-20261006-144225 B=0x1bf4d8 member=
+B+0x82BB0+X: 327/328 disk-comparable spans == file sizes EXACTLY, sole
+mismatch data\intro01.raw negative-span = ascend02 archive base; play
+path bands by FILE SIZE vs col2 {10000,45000,65000}, census over all 86
+manifest lines {4,81,1} zero vendor-error cases; rewrite voiceBand() +
+test audio_voice_band_law_oq018, 91 tests 0 fail; audio.md §3.2 final).
+This ALSO strengthens datafiles.md §4(b): the RAM name table IS this
+0xa0f8 table (opens-by-TOC-lookup corroborated, spans included).
+TASK A (race->theme map): owner of the theme00.raw imm-ref block @0x210f3
+(E8 callers of FUN_000207ac-family + scan for music.txt loader callers;
+music.txt is index 12 of the span table) — find which index/param the
+game passes when starting music per race; live check: does any banked
+capture's audio obj (ctor FUN_0006ed50; obj+0x3c==22050 signature) carry
+a theme index? TASK B (VOC u16@25=0x0911 + six zero bytes @36): headered
+VOCs (15 files) carry it; scan code for reads at buffer offset 25/0x19
+after the 0x19-block parse (loader region 0x4f650..0x4f960 re-walk).
 Prior context: OQ-020 BLOCKED; OQ-016 capture-gated (idle ck ladder);
 OQ-012(a) setup-word candidate @EBP+0x223 area (audio-off check -1 seen at
 0x4f669 — setup block is the same screen).
+CROSS-CUTTING WARNING STILL ACTIVE: pin bytes from RESTORED image, read
+semantics from Ghidra payload program, cross-check both (993 diff
+clusters; 850 imm-fixups, 143 other).
 OQ-016 EVIDENCE (not offline-solvable 2026-10-07): r1deep-230146 t2..t9 is
 not an idle empire (orbital f32 churn, AI timers +256/turn at 0x255228/
 0x255605); planet grid 0x26d103 (stride 123) and star grid 0x255c69

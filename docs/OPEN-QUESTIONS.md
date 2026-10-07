@@ -128,15 +128,12 @@ OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | W3: ship design screen code + its data reads (live image).
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
-1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping | open
-(partial 2026-10-07 t3: col1 = voices-per-band, col2 = ascending band SIZE
-CAP with n*col2 region sizing Σ=215000 [verified; file census: 77/86 .voc
-resolve, zero >65000, consistent with threshold-band selection by first
-c44[i]>=scalar]; earlier "tick delta" and "byte-cap refuted" notes
-retracted — see audio.md §3.2 SCALAR IDENTITY. REMAINING: scalar identity
-(sample-span vs timer-span; no disp32 writers on tables 0x102a0/0x102a4 —
-next probe callers of FUN_0002086c + writer of audio-obj+0x108), VOC
-u16@25, race->theme map).
+1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping | header
+pair CLOSED 2026-10-07 t4 (MEASURED: col1=voices/band, col2=size threshold —
+play path bands by FILE SIZE via the span table; ck005 proof 327/328 spans ==
+disk sizes; shipped census {4,81,1} zero errors; voiceBand() + test
+audio_voice_band_law_oq018; audio.md §3.2 SCALAR IDENTITY/HEADER-PAIR FINAL).
+STILL OPEN: VOC u16@25=0x0911 residue; race->theme theme-selection map.
 
 --- closed during v1 (kept here as a one-line index; evidence in archive and
 docs/re/): OQ-001 .cob offsets | OQ-002 FLIC codec | OQ-007 CP437 |
