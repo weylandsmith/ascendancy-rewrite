@@ -113,3 +113,21 @@ Orbital Docks effects, the vendor cost hack (R1), fleet stacking.
 cost-hack location; per-ship inventory record (ship.bin table law?);
 sugar-cube numeric scale (drive Level in hop math at move code);
 Orbital Docks effect readers.
+
+## 8. init_global_gizmos located — and it is NOT the cost hack (t15b)
+- FUN_0004929c = sole caller of the loader; vendor owner string pool 0x2567
+  `..\ship.cpp` (verified verbatim in banked RAM pool). One-time guard
+  DAT_00076508. What it does: init ship-object template fields, copy 8
+  species names into 0x14-stride slots via FUN_00021a20, CALL the gizmo
+  loader, then compute a QUOTA-DISTRIBUTION bitmask over gizmo tables
+  (research-bit masks DAT_0000685c/DAT_0000686c, 14 columns) writing bytes
+  at &PTR_PTR_000764cc — the "available gizmos by level" spread using
+  fVar3 = count/(levels-1) float rounding with epsilon pool 0x2573.
+- ZERO writes to record+0x46 (Industry) here or in the loader. So the
+  JJTTODO "hack in Ship::init_global_gizmos()" is EITHER (a) this quota
+  spread changing *effective* acquisition cost semantics, or (b) removed by
+  ship date while the comment stayed. [unverified] which. DECISIVE cheap
+  probe queued NEXT: readers of +0x46 (build-cost sites) — if every reader
+  uses +0x46 unmodified, the shipped engine charges file values and the
+  rewrite ALREADY matches (file values unmodified, §2 v1 default stands,
+  closure cites the reader census).

@@ -161,12 +161,14 @@ ledger:
 OQ-019 second leg — cost hack + sugar-cube scale. t15 banked the gizmo
 record law (docs/re/ships.md §6: stride 0x6a x 76 == file rows exact, cat-
 switch = documented param interpretation NOT the hack; pool-base law
-image-off-0x82bb0 triple-confirmed). (1) COST HACK: scan SIB-aware writers
-of +0x46 (Industry) outside FUN_00049074, and readers of +0x46 near ship
-build-cost code (ship.bin referrers @ where? pool-off law gives ship.bin
-literal offset -> imm scan); the JJTTODO says init_global_gizmos ALTERS
-cost as read in — likely a post-load pass over the 76-record table right
-after FUN_00049074's callers; check callers first (cheap). (2) SUGAR-CUBE:
+image-off-0x82bb0 triple-confirmed). (1) COST HACK t15b: init_global_gizmos =
+FUN_0004929c (sole loader caller, owner string ..\ship.cpp pool 0x2567
+verified; guard DAT_00076508) contains NO +0x46 writes (ships.md §8) — it
+computes the research-quota spread instead. DECISIVE probe NOW: SIB-aware
+READER census of +0x46 image-wide; iff every build-cost site charges +0x46
+unmodified, the shipped engine = file values = rewrite default ALREADY
+(original-side cost law MEASURED-by-census; §8 wording carries the [un-
+verified] fork). Else the writer found IS the hack — lift its arithmetic. (2) SUGAR-CUBE:
 drive Level slot +0x5e readers -> movement code (COSMOS move, coswnd.cpp
 strings banked); the /2 vs x1 question resolves there. (3) per-ship
 inventory: ship.bin loader + record law (same census method as gizmos).
