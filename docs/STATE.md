@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T00:45
+updated: 2026-10-07T04:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -29,6 +29,21 @@ ledger:
       reproduced 66/66; row65 300->33000); resume.gam block byte-identical to
       fresh RAM (static data); rewrite upgraded (Tech::runtimeCost,
       includeVariants default false) + 2 pinned tests; docs/re/research.md 6"
+    - "OQ-014 PLANITEM LAWS: loader FUN_00037fc0 + checker FUN_0003830c +
+      init FUN_00037d80 (restored image; strings verified payload
+      0x8488d..0x848d6); record stride 0x28 IND@0 RES@+1 PROS@+2 MPOP@+3
+      UPOP@+4 REQUIRES@+5 FLAGS u16@+6 COST u16@+8 name30@+10, 39/39
+      byte-exact vs file (2 captures, table phys 0x2b5f50). REQUIRES law:
+      avail iff req==0xFF || (req<66 && owned) -> 254 DEAD (rewrite
+      requiresAvailable, gatedBy deleted). Count triple: 22=SURFACE
+      (RAM 0x73e3c==22 4/4) XOR placement law idx<=30 specials-exempt;
+      9=ORBITAL rows 22..30. Grid C row sums = size-class surface cells
+      {7,11,23,45,73}: live +0x18 2650/2650 x 17 captures, cap==cells+10
+      zero violations. MPOP=upkeep-demolition, UPOP=start-gate. FLAG bits
+      consumer-mapped (bit4 set by no shipped row, bit7 no consumer); RAM
+      census == file 39/39. Spec docs/re/economy.md §4; 3 pin tests (89
+      tests 0 fail); gate green incl seed-2024 Control t145. Per-cell
+      terrain/nuke laws documented, rewrite wiring PARKED (no cell model)"
     - "OQ-004 TABLE LOADING + .COB GRAMMAR: pool-relative immediate law (imm =
       str_off-0x82BB0 -> relocated P0+str_off; 337 RAM-verified sites; census
       docs/re/datafiles.md — every pool name has a referrer, refuting 06r .shp
@@ -54,7 +69,6 @@ ledger:
     - "OQ-012 mapgen: ONLY (a) size options open; (b) closed 06o (pps U{1..5}),
       (c) closed 06p/06q (shell position law; rewrite upgraded + tested),
       (d) closed 06k (sphere extent, refined by (c))"
-    - "OQ-014 planitem unknown fields (254 sentinel, 22/9, grids, item flag bits)"
     - "OQ-015 DA_ template selection order + full %token table"
     - "OQ-016 campaign per-turn constants (income, growth, build order, cadence, home placement)"
     - "OQ-019 ship design model (hull+gizmo inventory, cost hack, Orbital Docks)"
@@ -68,6 +82,22 @@ ledger:
   318,293 then (511,67) cadence, needle-gated); campaign start proven
   byte-wise (scripts/r1_campaign_probe.py); planet records resume.gam<->RAM
   join 151/151, stride 123 (scripts/r1_planet_layout.py).
+- POINTER-INDEX COROLLARY (OQ-014 turn, self-proved): for a Ghidra image
+  address X of runtime-loaded data (BSS/data globals like DAT_00073e40), the
+  SAVE-ZIP member index is B + 0x82BB0 + X (B = r1_sav_scan.find_base vote),
+  and guest PHYSICAL of a member byte is member - 0x88. Reading B + X instead
+  yields data 0x88 too low and fails SILENTLY (wrong grid, wrong values, no
+  error). Self-proof: item table name-anchored in member 0x2b5ec8 ==
+  B+0x82bb0+0x73e40 exactly, and the same index form returned file-identical
+  grids + sentinel -1 + growth 50 + research count 66. Heap pointers stored
+  in RAM remain physical addresses: member = ptr - 0x88. Helper pattern:
+  idx = lambda X,n: m[B+0x82BB0+X : B+0x82BB0+X+n].
+- PLANET SYSTEM OBJECT (runtime, OQ-014): base = planet-name - 0x24; +0x10 u32
+  slot-array ptr (physical; member = ptr-0x88), +0x12 growth-inc, +0x14 size
+  class 0..4, +0x18 surface cells {7,11,23,45,73}, +0x1a cap = cells+10, slot
+  = 4B {class, itemIdx (0xff empty), flags u8, shield u8}. Locator law:
+  cells in {7,11,23,45,73} AND cap==cells+10 AND ptr sane — 2650/2650 records
+  matched across 17 captures, zero false layout reads.
 - Turn counter: u16 guest-phys 0x254e10 (idle-pinned 0, NEXTTURN-advanced,
   byte-verified). TURN-BOUNDARY law: planet records mutate only across
   counter-changing slot pairs; hot head-block = older-convention
@@ -128,19 +158,22 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-014 PLANITEM FIELD SEMANTICS via the loader the 06s census just pinned
-(offline; Ghidra + banked RAM, zero capture cost). The planitem.txt string
-referrer is 0x37fcd (docs/re/datafiles.md S2) — get_function_by_address there
-(restored image), decompile, and read how each parsed column is stored into
-the live record: that DECIDES the open fields (254 sentinel meaning, the 22/9
-pair, name/help grids, flag bits) instead of inferring from file columns.
-Cross-check the decoded record against the live RAM planitem table (pointer
-law; r1deep slots) for identity like restree §6 did. If a field's semantics
-lift cleanly, upgrade the rewrite site (grep planitems/PlanItem in
-rewrite/src/game) + add a pinned unit test + update docs/re/ (the planitem
-spec lives in the research/docs set — locate before writing). Negative rule:
-if the decompile is unreadable twice, record ONE line in REFUTED-ROUTES/STATE
-with the address and move NEXT ACTION (no spiral).
+OQ-020 ABILITY CHARGE DAYS via the static constant route (offline; Ghidra +
+banked RAM; zero capture cost). The vendor help text says "%d day%s" with no
+data file (docs/OPEN-QUESTIONS.md OQ-020; help.txt region L1829 et al.). The
+06r/06s census gives help.txt 11 referrers (0x1bee3...). Route: in the
+restored image, find which help-string referrer feeds a number formatter —
+grep the SA_ ability strings (the 14 charged abilities are named in
+docs/re/abilities.md §2) to the presenting function, then read the charge
+value it prints. Candidate anchor: campaign.cpp charge_ resets to a constant;
+the original's per-ability charge is read from wherever that formatter reads.
+Cross-check: live RAM charge counters for an owned ability across two captures
+one turn apart (planet-module knowledge from OQ-014: system-object slot flags;
+ability charge likely a per-race global — census u32 candidates near the
+race-table base 0x12fb3, stride 0x1ee, using the B+0x82BB0+X index). If the
+constant lifts cleanly: upgrade abilityChargeTurns() in the rewrite + pin a
+test. Negative rule: if two unreadable decompiles, ONE line in
+REFUTED-ROUTES/STATE and move NEXT ACTION (no spiral).
 
 ## KNOWN-ISSUES / PARKING LOT (operational; research negatives live in
 ## docs/REFUTED-ROUTES.md)

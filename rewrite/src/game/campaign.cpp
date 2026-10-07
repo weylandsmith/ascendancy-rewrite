@@ -9,15 +9,20 @@ namespace ascend::game {
 namespace {
 
 // Build order policy [documented default, turnloop.md §4]: factories (IND),
-// labs (RES), then agriplots (PROS). Tech gates honoured when REQUIRES is a
-// valid tech index (economy.h requiresValidTech); sentinels are UNGATED per
-// the economy.md decision.
+// labs (RES), then agriplots (PROS). Tech gates use the MEASURED availability
+// law (economy.h requiresAvailable, OQ-014 CLOSED): req==255 ungated, real
+// row must be owned, 254 permanently dead.
 struct BuildStep {
     const char* name;
     int want;
 };
 const BuildStep kBuildOrder[] = {{"Factory", 2}, {"Laboratory", 1},
                                  {"Agriplot", 2}, {"Shipyard", 1}};
+
+// Planet SIZE classes map onto grid-C surface-cell counts {7,11,23,45,73};
+// the rewrite's mapgen does not yet assign per-star size classes (parking
+// lot, STATE.md), so builds are capped with the MEASURED class-2 default.
+constexpr int kDefaultSizeClass = 2;
 
 // (member impl below) — see Campaign::driveHopsFor
 
@@ -246,9 +251,21 @@ void Campaign::buildPhase() {
             int id = itemId(step.name);
             if (id < 0) continue;
             const PlanetItem& pi = (*items_)[id];
-            if (requiresValidTech(pi.requires, tree_->all().size()) &&
-                !ownedTech[o][pi.requires])
-                continue;  // gated and not researched
+            // OQ-014 CLOSED (economy.md §4): gate == req==255 || (req<count &&
+            // owned). 254 (Interstellar Trucking) is NEITHER -> permanently
+            // unavailable in the original; the old requiresValidTech-based
+            // test let it build. Surface items are additionally capped at the
+            // planet's surface slot count (size-class default until mapgen
+            // assigns classes — parking lot, STATE.md).
+            if (!requiresAvailable(pi.requires, static_cast<int>(tree_->all().size()),
+                                   ownedTech[o]))
+                continue;
+            if (itemIsSurface(id)) {
+                int surface = 0;
+                for (int it : ps.items)
+                    if (itemIsSurface(it)) ++surface;
+                if (surface >= planetSurfaceCells(kDefaultSizeClass)) break;
+            }
             if (ind_[o] >= pi.cost) {
                 ind_[o] -= pi.cost;
                 ps.items.push_back(id);
@@ -365,9 +382,9 @@ int Campaign::driveHopsFor(int owner) const {
     if (gizmos_ && owner >= 0 && owner < int(ownedTech.size())) {
         for (const Gizmo& g : *gizmos_) {
             if (g.cat != GizmoCat::Drive) continue;
-            if (requiresValidTech(g.resReq, tree_->all().size()) &&
-                !ownedTech[owner][g.resReq])
-                continue;
+            if (!requiresAvailable(g.resReq, static_cast<int>(tree_->all().size()),
+                                   ownedTech[owner]))
+                continue;  // OQ-014 gate law (economy.h)
             if (g.level > lvl) lvl = g.level;
         }
     }
@@ -585,9 +602,8 @@ int Campaign::attackScore(int owner) const {
     if (gizmos_) {
         for (const Gizmo& g : *gizmos_) {
             if (g.cat != GizmoCat::Weapon) continue;
-            bool ok = !gatedBy(g.resReq) ||
-                      (requiresValidTech(g.resReq, tree_->all().size()) &&
-                       ownedTech[owner][g.resReq]);
+            bool ok = requiresAvailable(g.resReq, static_cast<int>(tree_->all().size()),
+                                        ownedTech[owner]);
             if (ok) wlvl = std::max(wlvl, g.level);
         }
     }
@@ -605,9 +621,8 @@ int Campaign::defenseScore(int owner, int star) const {
     if (gizmos_) {
         for (const Gizmo& g : *gizmos_) {
             if (g.cat != GizmoCat::Shield) continue;
-            bool ok = !gatedBy(g.resReq) ||
-                      (requiresValidTech(g.resReq, tree_->all().size()) &&
-                       ownedTech[owner][g.resReq]);
+            bool ok = requiresAvailable(g.resReq, static_cast<int>(tree_->all().size()),
+                                        ownedTech[owner]);
             if (ok) slvl = std::max(slvl, g.level);
         }
     }

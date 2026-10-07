@@ -237,13 +237,13 @@ int bestDriveRange(const std::vector<Gizmo>& gz, const std::vector<bool>& owned)
     int best = 0;
     for (const auto& g : gz) {
         if (g.cat != GizmoCat::Drive) continue;
-        // Gate rule (economy.h): valid tech index -> must be owned; any
-        // sentinel (255 documented, 254 undocumented-but-ungated default) ->
-        // always available. Gizmo rows measured: all gated by real techs.
-        const bool gateOk = requiresValidTech(g.resReq, static_cast<int>(owned.size()))
-                                ? owned[g.resReq]
-                                : true;
-        if (gateOk && g.level > best) best = g.level;
+        // OQ-014 law (economy.h requiresAvailable): valid row -> owned;
+        // 255 -> ungated; anything else (e.g. 254) -> dead. Gizmo rows
+        // measured: all carry real techs or 255, so behaviour is unchanged
+        // for shipped data — the predicate is now shared with planitems.
+        if (requiresAvailable(g.resReq, static_cast<int>(owned.size()), owned) &&
+            g.level > best)
+            best = g.level;
     }
     return best;
 }

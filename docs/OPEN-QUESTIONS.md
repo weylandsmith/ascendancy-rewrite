@@ -87,9 +87,26 @@ selection :271/:554 on runtimeCost; tests
 research_runtime_cost_law_measured + research_variants_are_not_in_play (86
 tests 0 fail); gate green; seed-2024 campaign still wins Control t145.
 OQ-014 | rules | planitem unknowns: REQUIRES=254 (Interstellar Trucking),
-count triple 22/9, the 11x4 + 5x15x2 grids, item FLAG bits (current: 254
-ungated; grids parsed-unused) | open | W2/W3: grid consumers in code +
-controlled economy diffs.
+count triple 22/9, the 11x4 + 5x15x2 grids, item FLAG bits | CLOSED
+2026-10-07: loader FUN_00037fc0 + checker FUN_0003830c + init FUN_00037d80
+decompiled from the restored image; record layout stride 0x28 (IND@0 RES@+1
+PROS@+2 MPOP@+3 UPOP@+4 REQUIRES@+5 FLAGS u16@+6 COST u16@+8 name30@+10)
+byte-exact 39/39 vs file in 2 captures (item table phys 0x2b5f50, pointer-law
+index member = B + 0x82BB0 + X re-derived — naive B+X is 0x88 off). 254 =
+DEAD item, not ungated (checker: avail iff req==0xFF || (req<count && owned),
+count DAT_00074744==66). 22=SURFACE count (RAM 4/4), XOR placement law
+(slot<cells) XOR (item<22) for idx<=30, specials exempt; 9=ORBITAL (rows
+22..30). Grid C row sums = size-class surface cells {7,11,23,45,73} — live
++0x18 law 2650/2650 records x 17 captures, cap==cells+10 zero violations;
+grid A = per-type terrain mix (FUN_00037d80), grid B = ring/angle ranges
+(FUN_000395c4/0x3965c) + neighbour rule; MPOP gates demolition, UPOP gates
+start (FUN_0003830c/0x38840); FLAG bits consumer-mapped, bit4 set by NO
+shipped row, bit7 no consumer; RAM bit census == file (39/39). Full spec
+docs/re/economy.md §4. Rewrite: economy.h requiresAvailable() (gatedBy
+deleted), buildPhase gate+surface-cap, attack/defense/drive/bestDriveRange
+upgraded; 3 pin tests (89 tests 0 fail); gate green incl. seed-2024 Control
+t145. Per-cell planet model NOT in rewrite — terrain/nuke laws documented,
+wiring parked (STATE.md).
 OQ-015 | dip | DA_ template selection order (%token table CLOSED 2026-10-06g:
 exhaustive regex over 22/22 .dip files yields exactly %m %y %s %t — no other
 tokens exist) | open | W4: race module (20 E1 sites) — dialogue selection

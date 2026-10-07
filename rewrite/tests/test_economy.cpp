@@ -111,6 +111,62 @@ TEST(planitems_loads_39_with_requotes) {
     }
 }
 
+// OQ-014 CLOSED — MEASURED laws lifted from the original (docs/re/economy.md
+// §4; loader FUN_00037fc0, availability checker FUN_0003830c, init
+// FUN_00037d80; cross-checked against 17 banked captures).
+TEST(oq014_requires_law_254_is_dead_not_ungated) {
+    std::vector<bool> all(66, true), none(66, false);
+    CHECK(ag::requiresAvailable(255, 66, none));      // sentinel: ungated
+    CHECK(ag::requiresAvailable(26, 66, all));        // owned tech: available
+    CHECK(!ag::requiresAvailable(26, 66, none));      // not owned: gated
+    // THE law change: 254 passes neither branch in the original, so
+    // Interstellar Trucking is permanently unavailable even with ALL techs.
+    CHECK(!ag::requiresAvailable(254, 66, all));
+    CHECK(!ag::requiresAvailable(254, 106, all));     // even a bigger tree
+}
+
+TEST(oq014_count_triple_and_placement_classes) {
+    std::string err;
+    auto items = ag::loadPlanItems(d0("planitem.txt").string(), err);
+    CHECK(err.empty());
+    CHECK(items.size() == 39);                 // "39" == record count (0x38115)
+    CHECK(ag::kPlanitemSurfaceCount == 22);    // RAM 0x73e3c == 22 (4/4 runs)
+    CHECK(ag::kPlanitemOrbitalCount == 9);     // RAM 0x73e3e == 9  (4/4 runs)
+    // Boundary rows by NAME (economy.md §4): rows 0..21 surface, 22..30
+    // orbital, 31..38 specials.
+    CHECK(items[0].name == "Factory");
+    CHECK(items[21].name == "Transport Tubes");
+    CHECK(items[22].name == "Shipyard");
+    CHECK(items[30].name == "Long Range Orbital Whopper");
+    CHECK(items[31].name == "Alien Hospitality");
+    CHECK(items[38].name == "Xeno Archeological Dig");
+    for (int i = 0; i < 22; ++i) CHECK(ag::itemIsSurface(i));
+    for (int i = 22; i < 39; ++i) CHECK(!ag::itemIsSurface(i));
+}
+
+TEST(oq014_slot_law_surface_xor_and_size_cells) {
+    // FUN_00037d80: orbital pool is exactly 10 slots above the surface cells;
+    // live planet records 2650/2650 carry cap == cells + 10.
+    // Grid-C row sums = size-class surface cells (RAM +0x18, 5 classes).
+    CHECK(ag::planetSurfaceCells(0) == 7);
+    CHECK(ag::planetSurfaceCells(1) == 11);
+    CHECK(ag::planetSurfaceCells(2) == 23);
+    CHECK(ag::planetSurfaceCells(3) == 45);
+    CHECK(ag::planetSurfaceCells(4) == 73);
+    CHECK(ag::planetSurfaceCells(5) == 0);
+    const int cells = ag::planetSurfaceCells(0);  // 7
+    // Surface item: allowed strictly below cells, forbidden at/above.
+    CHECK(ag::itemSlotAllows(0 /*Factory*/, 6, cells));
+    CHECK(!ag::itemSlotAllows(0, 7, cells));
+    // Orbital item: allowed at/above cells, forbidden below.
+    CHECK(ag::itemSlotAllows(22 /*Shipyard*/, 7, cells));
+    CHECK(ag::itemSlotAllows(22, cells + 9, cells));
+    CHECK(!ag::itemSlotAllows(22, 0, cells));
+    // Specials are exempt from the XOR rule (checker bound DL <= 0x1e).
+    CHECK(ag::itemSlotAllows(31, 0, cells));
+    CHECK(ag::itemSlotAllows(38, cells + 9, cells));
+}
+
 TEST(best_drive_range_respects_research_gate) {
     std::string err;
     auto gz = ag::loadGizmos(d0("gizmos.txt").string(), err);
