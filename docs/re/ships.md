@@ -131,3 +131,33 @@ Orbital Docks effect readers.
   uses +0x46 unmodified, the shipped engine charges file values and the
   rewrite ALREADY matches (file values unmodified, §2 v1 default stands,
   closure cites the reader census).
+
+## 9. COST LAW CLOSED — Industry value is never modified (OQ-019 t16)
+Decisive probe per §8: image-wide access census of disp 0x46 (mod=1/2,
+direct+SIB, stack-ESP/EBP bases excluded as false positives): 26 non-stack
+accesses total. THE ONLY WRITE into a gizmo-table record (+0x46, base chain
+from PTR_DAT_0007650c) is the loader's own parse store `MOV [EDX+0x46],EAX
+@0x491b5` inside FUN_00049074. Every other non-stack access is a different
+struct: 0x23a83/0x37f4x/0x38edx write [reg+0x46] of ship/template copies
+(the 0x7b-stride ship record and design-screen temp), and the READS at
+0x46b6f/0x46b81 are u16 [rec+0x46] of the stride-0x7b SHIP record (owner
+byte [+0x57] == DAT_0007458e gate, per-owner stack tally), not gizmos.
+x87 sweep (0xd8..0xdf, mod1/2, non-stack): single hit 0x24297 `db7e46` =
+FNSTSW [ESI+0x46] — standard FPU-status idiom, not a field access.
+Three "ADD [reg+0x46]" candidates (0x2bc06/0x2bc6c/0x34837) verified as
+byte-boundary false positives of an INC ECX;INC ESI (`41 46`) string-
+sanitizer loop (tab->newline, '@'/'_'->space per Ghidra dump 0x2bbb0..
+0x2bc45) — recorded so nobody re-chases them.
+Writes into a gizmo record: (1) the loader parse store, (2) `MOV
+word ptr [ESI+0x46],AX @0x37f41` with AX=0 inside an ERROR/cleanup path in
+ship.cpp (owner string `..\planet.cpp` region; wipes fields 0x42..0x66 to
+0 — a bail-out reset, NOT a cost alter). FUN_0004929c (init_global_gizmos
+§8) zero +0x46 writes (read in full t15b). => gizmo-record Industry is
+NEVER altered post-parse. JJTTODO fork resolves to (b) stale-comment —
+with honest remainder: the DESIGN SCREEN computes design totals that may
+SUM gizmo Industry values into the ship record's own cost slots (write
+`MOV [EAX+0x46],EBP @0x23a83` inside design-record code); whether that sum
+is plain-addition or scaled is [unverified] and is the queued next probe.
+Rewrite status for GIZMO RECORDS: ALREADY MATCHES (file Industry used
+unmodified; §2 v1 default vindicated by census — measured no-op, not
+plausibility). Design-total summation law: still open under OQ-019.

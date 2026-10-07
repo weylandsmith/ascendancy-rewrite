@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-08T04:20
+updated: 2026-10-08T06:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,21 +158,9 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-019 second leg — cost hack + sugar-cube scale. t15 banked the gizmo
-record law (docs/re/ships.md §6: stride 0x6a x 76 == file rows exact, cat-
-switch = documented param interpretation NOT the hack; pool-base law
-image-off-0x82bb0 triple-confirmed). (1) COST HACK t15b: init_global_gizmos =
-FUN_0004929c (sole loader caller, owner string ..\ship.cpp pool 0x2567
-verified; guard DAT_00076508) contains NO +0x46 writes (ships.md §8) — it
-computes the research-quota spread instead. DECISIVE probe NOW: SIB-aware
-READER census of +0x46 image-wide; iff every build-cost site charges +0x46
-unmodified, the shipped engine = file values = rewrite default ALREADY
-(original-side cost law MEASURED-by-census; §8 wording carries the [un-
-verified] fork). Else the writer found IS the hack — lift its arithmetic. (2) SUGAR-CUBE:
-drive Level slot +0x5e readers -> movement code (COSMOS move, coswnd.cpp
-strings banked); the /2 vs x1 question resolves there. (3) per-ship
-inventory: ship.bin loader + record law (same census method as gizmos).
-Close per sub-question as measured; upgrade rewrite where laws land.
+
+(1) OQ-019 design-TOTAL law (cost-hack residue last half per Â§9): decompile around 0x23a83 (writes [designRec+0x46]=EBP; stride-0x1ee design-table chain at 0x23a47) and find where gizmo Industry values are SUMMED for a design and whether any scale/round applies; pin as test. Locate design-record loader (ship.bin via pool-offset scan) for the inventory half. (2) sugar-cube scale CONSTANT: readers of gizmo +0x5e / ship-record +0x2e in draw code (disassembly-level; no .shp codec needed). (3) ledger: gizmo-record cost sub-question CLOSED-by-census Â§9; item stays open for design-total + scale + W1-capture model render.
+
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;
 exactly {m,y,s,t} confirmed in CODE); queue cap 0x1d @0x363f1; dispatch

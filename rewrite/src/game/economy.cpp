@@ -154,6 +154,11 @@ std::vector<Gizmo> loadGizmos(const std::string& path, std::string& errOut) {
         g.range = v[2];
         g.level = v[3];
         g.numUses = v[4];
+        // Industry is charged AS THE FILE VALUE: image-wide +0x46 census
+        // (docs/re/ships.md §9) shows the gizmo-table parse store @0x491b5
+        // is the only writer of gizmo-record Industry in the shipped exe
+        // (JJTTODO "cost hack" absent; zero-wipe @0x37f41 is an error-path
+        // reset of fields 0x42..0x66, not an alter).
         g.industry = v[5];
         g.special1 = v[6];
         g.special2 = v[7];
