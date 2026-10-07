@@ -60,3 +60,85 @@ Terraforming           0 0 0 0 1 50 26 0 255
 Lush^Growth^Bomb       0 0 0 0 1 200 62 1 255
 Xeno^Archeological^Dig 0 0 0 0 1 50 6 0 255
 ```
+
+## 6. Colony income recomputation law — FUN_00038ba4 (OQ-016 income half, t18)
+
+Static law [verified, work/ascend_restored.bin disassembly 0x38ba4..0x38f65;
+the Ghidra decompiler mangles several slot offsets, so every claim below cites
+raw instructions]. Callers: FUN_00037d80 (build/dismantle), FUN_00038840
+(governor/slot ops), FUN_00038f68 (per-planet turn tick), FUN_0003a174,
+FUN_0003aa0a (system event dispatch).
+
+Planet record stride 123, base = planet-NAME - 0x24 (OQ-014 anchor law).
+Slot array pointer = u32[rec+0x10] READ RAW (@0x38c8b `MOV ESI,[EBX+0x10]`,
+loop @0x38c7d bounds `u16[rec+0x1a]` = cap; member = ESI+EDX, EDX += 4 —
+no -0x88 rebasing, an earlier draft of this section was WRONG). Slot dword:
+byte0 terrain class, byte1 itemIdx (0xff = empty), u16 flags @+2 (bit0 ACTIVE).
+Item record stride 0x28 at Ghidra 0x73e40 (`IMUL EAX,0x28; ADD 0x73e40`
+@0x38c97/0x38c9a): byte0 IND, +1 RES, +2 PROS, +3 MPOP, +4 UPOP, u16@6 flags.
+
+Accounting loop, per slot i in [0, cap):
+  empty (item 0xff) @0x38c4d:  i >= u16[rec+0x18]  -> c1e++            (+0x1e)
+                               else cls&8           -> nothing
+                               else c0++ (cls==0 additionally c20++)   (+0x1c/+0x20)
+  ACTIVE (u16 bit0) @0x38cbe..0x38d1f:
+       IND  += s8 item.IND  (+1 extra if slot cls==2) @0x38cc4/0x38cce
+       PROS += s8 item.PROS (+1 extra if slot cls==3) @0x38cde/0x38cf2
+       RES  += s8 item.RES  (+1 extra if slot cls==4) @0x38d07/0x38d17
+       item flags&4 -> c24++ (byte +0x58) and NOTHING ELSE for that slot
+         (@0x38d23 tests [item+6]&4, jumps past the MPOP block);
+       else { if item flags&8 -> c59++ (byte +0x59) @0x38be5; c4a += MPOP }
+  INACTIVE with item @0x38c07: skip item 23 (Ship), skip slot flag&2, skip
+       item flags&0x40, else c18 += UPOP                                (+0x4c)
+
+Post-loop @0x38d3f/0x38d7a/0x38db5 (slot finder FUN_0003958c = first slot
+whose byte1 == k, returns 0xffff if none): if that slot's u16 flag bit0 is set,
+  k=12 Hyperpower Plant -> IND  += IND>>1
+  k=13 Fertilization    -> PROS += PROS>>1
+  k=14 Internet         -> RES  += RES>>1
+Governor byte @+0x54 (0xff = none) @0x38df0: value 0x21 -> PROS += IND>>2;
+value 0x22 -> RES += IND>>2; value 0x23 -> c18 += (DAT_000743b9>>16).
+
+Compression @0x38e2d..0x38e89 (both channels, only if accumulator != 0):
+`FILD dword (V+1)` ; `FSTP qword` 0x3FEB333333333333 (=0.85) ; CALL 0x78a90
+(pow: FLD exp, FLD base, CALL 0x78954) ; CALL 0x76e08 (ROUND) ; `FISTP` back.
+i.e. V = round((V+1)^0.85) in double precision. Prosperity then loses upkeep:
+  PROS -= (i16[rec+0x42] SAR 2)  @0x38e8d (arithmetic shift = floor-div 4),
+  floored at 0 @0x38eac. Industry and Research are NOT reduced by +0x42.
+Research is LINEAR (no pow) — no compression block exists on that channel.
+
+Tail clamps @0x38f01..0x38f58: c4a = clamp(0..100) into +0x4a;
+u = max(0, min(u16[+0x42], c4a)) back into +0x42; c18 = clamp(0..u) into +0x4c.
+Stores @0x38eb4..0x38efe: +0x1c=c0 +0x20=c20 +0x1e=c1e +0x44=IND +0x46=RES
++0x48=PROS +0x4a=c4a +0x4c=c18 +0x58=c24 +0x59=c59.
+
+POP GROWTH (same tick path, FUN_00038f68, t18): counter word +0x4e accumulates
+`+ i16[+0x12]` (per-turn growth from slot ops) and gains +1 for non-owner when
+i16[+0x12] < 4; once `u16[+0x4e] >= DAT_000066e4` (Ghidra 0x66e4 = raw word
+0x0700 — value NOT yet interpreted; the region is pointer-fixup territory) the
+counter resets to 0, u16[+0x42] += 1, plus +1 more if the first ACTIVE slot's
+bit0 is set, then capped to +0x4a. `DAT_000066e4` semantics = OPEN below.
+
+LIVE VERIFICATION STATUS (battery scripts/r1_income_fit.py, 139 owned records
+across every R1 capture's last slot): accumulator structure reproduces the
+empty-slot census family exactly (u16[+0x1e]==10 on 153/153 records — the
+cap-cells reservation; u16[+0x1c]==cells on 115/153). It does NOT reproduce
++0x44/+0x48: 52/139 records match, and the dominant residual is exactly
+acc=(0,0) vs stored=(1,1) on facility-free owned planets (79 records), plus
+one non-monotone point (INDpre 3 -> stored 2). That pattern is NOT producible
+by any monotone post-transform of the accumulators, so at least one term is
+missing from the loop model — candidates in priority order: (a) species-record
+per-planet-type IND/PROS modifiers (species table DAT_00013bc4 stride 0x60
+holds nonzero small bytes at +0x15..+0x17 that no code site in the recalc
+reads — readers not yet censused), (b) captured slots are load-time stale
+values (recalc does not run on load, so early-game values bake a pre-pow
+base), (c) an accumulator initialised outside 0x38ba4 (all eight accumulators
+are zeroed at entry @0x38bb5..0x38bd0, which argues against (c)).
+HONEST STATUS: loop structure banked [verified]; curve and base OPEN.
+
+Rewrite status: campaign.cpp currently charges gizmo/facility IND as file
+values with no pow compression and no governor channel; DO NOT upgrade to
+round((V+1)^0.85) until the base term resolves — a pow-only upgrade would
+regress colony output against captured originals (stored values sit ABOVE
+the pow curve at V=0..1: stored 1 where pow gives 1, stored 2 where pow gives
+2/1 ambiguously). Blocked-on-decision entry: docs/BLOCKED.md OQ-016-base.
