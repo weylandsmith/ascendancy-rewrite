@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T08:10
+updated: 2026-10-07T09:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,25 +158,31 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-018 TICK UNIT (scalar provenance DONE this turn; audio.md §3.2 gained
-SCALAR PROVENANCE + BYTE-CAP REFUTED + TICK SOURCE PARTIAL blocks). Chain
-now [verified]: FUN_000209d8 = timerSlotSpan(obj+0x108) via tables
-DAT_000102a4[idx]-DAT_000102a0[idx]; sibling FUN_00020a50 =
-tickget(FUN_000779e6 -> FUN_0007b1ad) - DAT_000102a0[idx] (SUB @0x20a6e);
-FUN_0007b1ad returns [DAT_0x9868+id*4] (0x7b1fb), 0 if id>=[DAT_0x9814],
-PIT-port latch logic for ids<=5 (bit 0x40 at slot+1, helper 0x78db0).
-TASK: find the tick incrementer — Ghidra get_xrefs_to DAT_0x9868 and
-DAT_0x9814 (init + ISR paths; expect INT 08 chain or a task-loop tick
-pump; scan restored image for `int 0x8` (cd 08) and C7/C7-05 writes to
-0x9814), then disassemble to NAME the unit (DOS ticks 54.925ms vs 1ms vs
-game-frame). Unit completes the meaning of bands 10000/45000/65000
-(eviction-band duration limits). Then OQ-018 residues: VOC u16@25=0x0911
-(scan VOC-parse offset reads in the sample loader 0x4f650-region) and
-race->theme map (owner of 0x210f3 block). Measured census banked:
-77/86 soundfx .voc resolve in extracted/ascend01/data; max laser01=45277;
-ZERO files >65000 (byte-cap reading refuted; laser01 is group-1 by index).
+OQ-018 SCALAR IDENTITY (turn 3: previous tick-unit route ABANDONED —
+DAT_0x9868/DAT_0x9814 have only 4/1 xrefs, all reads inside tickget
+0x7b1ad/0x7b202; search_byte_patterns "?? 68 09 00 00" zero hits; helper
+0x78db0 is an INT 21h AH=44h IOCTL test, not a pump. Turn-2 conclusions
+"tick delta" and "byte-cap refuted" RETRACTED in audio.md §3.2 — band
+selection is by scalar threshold (first c44[i]>=scalar), and the file
+census (zero .voc >65000, single >45000 lands in band 2) is consistent
+with col2 = band SIZE CAP. Verified now: col1=voices/band, col2=cap +
+region sizing). TASK: identify the FUN_000209d8 scalar = [0x102a4+4i] -
+[0x102a0+4i], i = audio-obj+0x108: (1) get_function_callers FUN_0002086c
+(the name-registering init that also reads 0xa0f8 stride 50 and
+DAT_0x10a70/DAT_0x102a0) — if the audio obj registers a NAME, hypothesis
+(b) timer-span; (2) raw scan for SIB writers of obj+0x108 (`89 8? 08 01`
+forms within audio ctor FUN_0006ed50-region) and what value flows in;
+(3) decisive: capture census of tables 0x102a0/0x102a4 (+0x82BB0 pointer
+law) at idle vs during-play — equal spans => sample-span. THEN residues:
+VOC u16@25=0x0911, race->theme map (owner of 0x210f3).
+CROSS-CUTTING WARNING BANKED (turn 3): payload vs restored images differ
+at 993 clusters; 850 are the imm+=0x82BB0 fixup, 143 are NOT (data/jump
+tables, e.g. 0x84e4, 0x156b4) — pin bytes from the RESTORED image, read
+semantics from the Ghidra payload program, cross-check both. Gate stage
+checksums unaffected (game/ untouched all session).
 DONE EARLIER THIS SESSION: OQ-006 CLOSED (22050 chain, e391fc2); OQ-018
-loader+play-path law banked (986b689).
+loader+play-path law banked (986b689); scalar provenance partial (478b98a,
+superseded notes corrected this turn).
 Prior context: OQ-020 BLOCKED; OQ-016 capture-gated (idle ck ladder);
 OQ-012(a) setup-word candidate @EBP+0x223 area (audio-off check -1 seen at
 0x4f669 — setup block is the same screen).

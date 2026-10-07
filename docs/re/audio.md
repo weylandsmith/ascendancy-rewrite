@@ -153,25 +153,39 @@ Loader FUN_0004ff34 (unique referrer of `soundfx.txt` string, imm 0x2a08 @0x4ff4
   [idx*4+0x102a0] (0x20a6e `SUB EBX,[ECX*4+0x102a0]`), FUN_00020a7c starts
   timers, FUN_00020ad0 is a wait-until-expired loop (PUSH 5 tick sleep
   @0x20af0). FUN_000209d8 = table 0x102a4[idx] - 0x102a0[idx] (slot span),
-  with override scan 0x10a74/0x10b82 while [0x10b96]>0. So the play path
-  buckets by a TICK DELTA, not a byte length.
-- BYTE-CAP HYPOTHESIS REFUTED (measured census, extracted/ascend01/data):
-  77/86 soundfx entries resolve to .voc files; ZERO exceed 65000; max is
-  laser01 = 45277 bytes — but laser01 is entry index 2, i.e. GROUP 1
-  (indices 2..4, col2 45000), so a per-sound col2 byte-cap is violated by
-  277 bytes. Group membership is by INDEX (col1 cumulative), col2's role in
-  the play path is the eviction-band tick threshold (first c44[i] >= scalar;
-  all-below -> vendor error). Buffer geometry per loader tail: per-group
-  region n_i*col2_i, slot cursor bases cumulative.
-- STATUS: col1 = voices-per-index-band [verified]; col2 = ascending tick
-  threshold + alloc contribution [verified]; scalar physical unit [open —
-  next step: disassemble FUN_0007b1ad (tick source; DOS 18.2Hz vs ms) —
-  10000 ticks @18.2Hz = 549 s is implausible for per-sound play, ms would
-  give 10 s plausible bands 10/45/65 s]. VOC u16@25 and race->theme open.
-- TICK SOURCE PARTIAL (same turn): FUN_0007b1ad reads software timer slot
-  `[DAT_0x9868 + id*4]` (0x7b1fb), returns 0 when id >= [DAT_0x9814]
-  (slot-count global, unsigned JC), and for ids <= 5 pokes hardware PIT
-  port bytes ([0x9868]+id*4+1 bit 0x40 latch check, helper 0x78db0) — so
-  slots 0..5 shadow the DOS tick counter, higher slots are software-
-  incremented. Unit of the incrementer = the LAST unknown for the
-  10000/45000/65000 bands (find writers of [0x9868] slots / the ISR chain).
+  with override scan 0x10a74/0x10b82 while [0x10b96]>0. Whether the span is
+  ticks or loaded-sample bytes was OPEN at this point (see SCALAR IDENTITY).
+- BYTE-CAP STATUS CORRECTED (turn 3): the turn-2 "refuted" note was WRONG —
+  it grouped sound effects by MANIFEST INDEX, but FUN_000500e0 selects the
+  group by the SCALAR THRESHOLD rule (first c44[i] >= scalar). Under that
+  rule the measured census is CONSISTENT with col2 = per-group sample-size
+  cap: 77/86 .voc resolve in extracted/ascend01/data; ZERO files >65000;
+  the single file >45000 (laser01 = 45277) falls into band 2 (cap 65000),
+  and the 73 files in (10000,45000] max at 44633/45277 under caps 45000/
+  65000. Buffer regions n_i*col2_i (2*10000, 3*45000, 1*65000; Σ=215000)
+  are exactly sized for the band's cap x voice count. col1 = voices per
+  band [verified]; col2 = band size cap + group threshold [verified].
+- SCALAR IDENTITY (open, the real residue): FUN_000209d8 = [0x102a4+4i] -
+  [0x102a0+4i] with i = obj+0x108. NO disp32 WRITER exists for either table
+  (Ghidra get_xrefs_to: 5 refs, all READS @0x20955/0x20a0a/0x20a6e/0x20a99/
+  0x20b5b) — the tables are built through pointer indirection at init. Two
+  live hypotheses: (a) loaded-sample span (end-start) -> col2 cap reading
+  complete; (b) named-timer span (sibling FUN_0002086c registers timers by
+  NAME from a 50-byte-stride table at 0xa0f8; FUN_0007b1ad tickget reads
+  [DAT_0x9868+id*4], 0 if id>=[DAT_0x9814] @0x7b1b4, PIT-shadow for id<=5;
+  helper 0x78db0 = INT 21h AH=44h IOCTL input-status TEST, NOT a tick pump —
+  turn-2 note "PIT-port latch pump" over-stated, corrected). Decisive next
+  probe: callers of FUN_0002086c and what sets the AUDIO object's +0x108.
+- PAYLOAD vs RESTORED DISCREPANCY (turn 3, [verified]): the two files differ
+  at 6244 bytes / 993 clusters; 850 clusters match imm+=0x82BB0 exactly (the
+  documented fixup), 143 clusters are NOT imm-fixups (jump/data tables,
+  e.g. 0x84e4, 0x156b4). Ghidra program = payload (pre-fixup disps); use the
+  RESTORED file only for byte-pinning, and re-verify any disp-semantics
+  claim against BOTH. Test audio_open_rate_measured_oq006 pins restored-
+  image bytes — keep payload-semantics wording aligned (0x4f690 both).
+- STATUS (turn 3 restatement): col1 = voices-per-band [verified]; col2 =
+  ascending band size cap, n*col2 region sizing [verified]; band selection
+  scalar = FUN_000209d8(obj-handle) span of tables 0x102a0/0x102a4 —
+  LOADED-SAMPLE SPAN vs TIMER SPAN undetermined (see SCALAR IDENTITY);
+  physical unit question defers to that identity. VOC u16@25=0x0911 and
+  race->theme mapping open.

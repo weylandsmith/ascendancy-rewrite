@@ -129,13 +129,14 @@ hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | W3: ship design screen code + its data reads (live image).
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping | open
-(partial 2026-10-07: loader FUN_0004ff34 + play path FUN_000500e0 law
-[verified] — col1 = voices-per-index-band (Σ=6), col2 = ascending
-tick-threshold + n*col2 alloc (Σ=215000), scalar = timer-slot span
-(DAT_000102a4-0x102a0 indexed obj+0x108; tickget 0x7b1ad PIT-shadow slots,
-docs/re/audio.md §3.2; byte-cap reading REFUTED by file census: max sample
-laser01=45277, zero >65000, 77/86 resolve in ascend01). REMAINING: tick
-unit (incrementer of [DAT_0x9868] slots), VOC u16@25, race->theme map).
+(partial 2026-10-07 t3: col1 = voices-per-band, col2 = ascending band SIZE
+CAP with n*col2 region sizing Σ=215000 [verified; file census: 77/86 .voc
+resolve, zero >65000, consistent with threshold-band selection by first
+c44[i]>=scalar]; earlier "tick delta" and "byte-cap refuted" notes
+retracted — see audio.md §3.2 SCALAR IDENTITY. REMAINING: scalar identity
+(sample-span vs timer-span; no disp32 writers on tables 0x102a0/0x102a4 —
+next probe callers of FUN_0002086c + writer of audio-obj+0x108), VOC
+u16@25, race->theme map).
 
 --- closed during v1 (kept here as a one-line index; evidence in archive and
 docs/re/): OQ-001 .cob offsets | OQ-002 FLIC codec | OQ-007 CP437 |
