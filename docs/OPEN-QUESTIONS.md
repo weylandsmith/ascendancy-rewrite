@@ -133,8 +133,10 @@ t145. Per-cell planet model NOT in rewrite — terrain/nuke laws documented,
 wiring parked (STATE.md).
 OQ-015 | dip | DA_ template selection order (%token table CLOSED 2026-10-06g:
 exhaustive regex over 22/22 .dip files yields exactly %m %y %s %t — no other
-tokens exist) | open | W4: race module (20 E1 sites) — dialogue selection
-loop in code (obj1 call-edge route, same class as OQ-021(b)).
+tokens exist) | open | W4: loader law banked t10 (docs/re/diplomacy.md §4:
+FUN_00037114 per-pair cache, FUN_00037268 pools stride 112 cap 127, heap DA_
+order == file order); selection logic is in the AI consumer — next leg per
+STATE (pool-base u32 ref scan 0x705e8/0x71c78/0x70d68/0x723f8).
 OQ-016 | loop | campaign per-turn constants: income formula, pop growth
 curve/cap, starting items, build order, expansion cadence, home placement
 (all currently documented defaults in campaign.cpp) | open | W2: controlled

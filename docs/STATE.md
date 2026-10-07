@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T18:30
+updated: 2026-10-07T20:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,15 +158,22 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-015 (dip dialogue selection order) — STATIC code hunt, no capture:
-(1) the 22 .dip files are read by some loader — find it via the open-helper
-callers list BANKED t7 (26 xrefs of 0x20728; candidates 0x26910 with EDX
-0xe55, 0x4ee1e, 0x4f1ef — check each head for dip-record parsing);
-(2) from the loader, follow DA_ keyword handling: templates are keyed DA_<n>
-in the .dip (verify: grep one file for 'DA_'); the selection-order question
-= how the module walks them (random? sequence counter? attitude-keyed);
-(3) lift the rule into docs/re/diplomacy.md + upgrade dialogue defaults in
-rewrite/src/game where the v1 default picks templates (grep DA_ in rewrite).
+OQ-015 second leg — SELECTION logic lives in the AI consumer, not the loader
+(t10 banked: FUN_00037114/FUN_00037268 only populate 112-byte-stride pools,
+cap 127; DA_ order in heap == file order == pool index). Find the CONSUMER
+of the pool bases: scan payload+restored for u32 refs to 0x705e8 / 0x71c78 /
+0x70d68 / 0x723f8 (loader-immediate law, soundfx.txt pattern); the caller
+context (negwnd.cpp strings nearby) is the DA-selection function; read its
+order law (compare chain over pool entries vs DIPVALUES weights, which
+message fires first). If refs are empty the bases are computed — trace the
+writer of the base register (ADD EAX,base @0x372d6 family is the STORE side;
+the load side is what selects). Record whatever is found; close ONLY on a
+measured order law. CONSUMER SCAN DONE (t10 close): raw u32 refs identical
+payload==restored — ACTIONS bases 0x705e8 @0x4ce8,0x4fcb,0x36f56 / 0x71c78
+@0x4fc2,0x50d4,0x36f68 ; RESPONSES 0x70d68 @0x4d23,0x4fb9,0x36f7a / 0x723f8
+@0x4d1a,0x4fb0,0x36f88. Low-addr hits (0x4ce8..0x50d4) are load-time table
+data; the CODE sites are 0x36f56/0x36f68/0x36f7a/0x36f88 (just below loader
+0x37114) — disassemble FUN owning 0x36f56 first, then 0x4ce8-context.
 BANKED THIS TURN (t9): OQ-017 was CLOSED at v1 (index line 168) — earlier
 NEXT ACTION was stale, fonts already load (formats/fnt, docs/re/fnt.md).
 OQ-021 RE-CONFIRMED decision-gated: end-*.txt pool literals have NO code
