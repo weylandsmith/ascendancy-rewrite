@@ -42,9 +42,12 @@ circles.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | open | W3: exe audio-init constant, or
 dosbox measurement of output cadence.
-OQ-004 | tables | which tables the exe loads; .tsv container grammar | open
-| W3: trace the open-file thunk once entry points are pinned via live-image
-call graph (no .cob strings in exe — the installer unpacks; loader.md §5).
+OQ-004 | tables | which tables the exe loads; .tsv container grammar | CLOSED
+2026-10-06s: docs/re/datafiles.md (pool-relative immediate law, 337 verified
+sites; full census w/ referrer addresses; ascend02 .bin/.tsv loaded via RAM
+name table @0x250c1c from .cob TOC, NOT via exe literals; .cob grammar
+u32 N + N x 50B names + N x u32 offsets, ascend00 54/54 md5 round-trip).
+Gate: scripts/cob_probe.py 3i2. Field semantics of the tables stay OQ-010.
 OQ-012 | mapgen | (a) new-game size options (labels baked in 3cfgnew.tmp
 glyphs) — REMAINING OPEN. (b) CLOSED 2026-10-06o:
 pps ~ U{1..5} measured over 250 systems x 5 campaigns (chi2 2.84, 4df,

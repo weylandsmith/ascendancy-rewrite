@@ -2,14 +2,25 @@
 """r1_datafile_strings.py — which data files does the exe actually reference?
 
 OQ-004's first measurable half: the payload contains literal data-file names.
-A name that NO aligned u32 in live guest RAM points at is a dead/debug string;
+A name that NO u32 in the live image equals P0 + name_offset is a dead string;
 a name with referrers points at the code that opens it. Pointer law (CLOSED,
 docs/re/r1-savestate.md) converts a referrer's guest-physical address into the
-Ghidra address of the reference: d = (member_offset - H) - P0, then
+Ghidra address of the reference: d = (member_offset - H) - P0 (H = 0x88), then
 get_function_by_address(d) yields the loader.
 
+WHY A PLAIN POINTER SCAN WORKS HERE (verified 2026-10-06s, 337 sites): data
+file names sit in the obj string POOL at payload 0x82bb0 and the obj keeps
+immediates POOL-RELATIVE in the file (e.g. restree loader: PUSH imm 0x2464),
+but the loader relocation rewrites every such imm32 in the loaded image to the
+absolute runtime value GP + 0x82bb0 + imm == P0 + payload_string_offset -- so
+scanning RAM for u32 == P0 + offset finds them. Verified byte-exact on
+restree/end-ctrl/DATA\\planets.shp/BLACK%.2d.HAZ immediates in r1deep slot 41.
+CAVEAT that bit us: the name regex must accept backslash paths ('data\\
+planets.shp', 'DATA\\%s...'); with a [A-Za-z0-9_-] class the .shp census came
+out falsely ZERO (refuted claim, docs/STATE.md 06s).
+
 Method (no hard-coded addresses; per-run base re-derived from anchors):
-  1. every '<name>.txt' literal in work/ascend_payload.bin -> payload offset
+  1. every '<path>.<ext>' literal in work/ascend_payload.bin -> payload offset
   2. for each, scan the guest Memory member for u32 == P0 + offset
   3. report referrer count + the Ghidra addresses (deduped, sorted)
 
@@ -25,7 +36,11 @@ from r1_sav_scan import build_anchors, find_base
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAY = os.path.join(ROOT, "work", "ascend_payload.bin")
-NAME_RE = re.compile(rb"[A-Za-z0-9_\-]{3,24}\.(txt|bin|dat|shp|voc|raw)")
+# Optional DATA\ / data\ prefix so 'data\planets.shp' is captured at the
+# START of the full path string -- that is where the code immediate points.
+NAME_RE = re.compile(
+    rb"(?:[A-Za-z0-9_]{1,10}\\)?[A-Za-z0-9_%\-\.]{2,24}"
+    rb"\.(txt|shp|haz|pal|gif|voc|raw|dip|tmp|bin)", re.IGNORECASE)
 
 
 def load_mem(run_dir):
@@ -63,7 +78,7 @@ def main():
     pay = open(PAY, "rb").read()
     names = OrderedDict()
     for mm in NAME_RE.finditer(pay):
-        if mm.group(1).decode() != a.ext:
+        if mm.group(1).decode().lower() != a.ext.lower():
             continue
         names.setdefault(mm.group(0).decode(), []).append(mm.start())
 

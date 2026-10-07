@@ -17,10 +17,19 @@ no numeric grammar, filename refs exist only as runtime stack strings
 the comparator statically needs obj1 call-edge recovery — long horizon, not
 this loop. DEFAULT IN FORCE: rewrite keeps `mine * 2 > total`
 (rewrite/src/game/campaign.cpp:738), citing the header-comment title over
-display prose. What would settle it: (a) user ruling that
-marketing prose or the code comment wins, or (b) Ghidra obj1 call-edge
-recovery finding the evaluator, or (c) a capture where the player crosses
-50-66% and the game does/doesn't fire end-ctrl. Item STAYS OPEN per strict-
+display prose. UPDATE 2026-10-06s (pool-relative law, docs/re/datafiles.md):
+all five end-*.txt literals have exactly one referrer each (0x2c04e/0x2c065/
+0x2c07c/0x2c093/0x2c0aa), all inside the ending PRESENTER FUN_0002bfa8 (rank
+= clamp(DAT_0004350c/10 - 1, 0, 9), switch on DAT_00043510 selects the file).
+DAT_0004350c and DAT_00043510 have READERS ONLY — exhaustive writes search
+(moffs + disp32 + SIB-base + fixup_sites.tsv + Ghidra xrefs over full code
+range 0x200..0x82bb0) found ZERO writers, so the comparator is NOT in the
+image: former option (b) "obj1 call-edge recovery" is REFUTED, not merely
+long-horizon. What remains: (a) user ruling on comment-vs-prose, or (c) the
+controlled-mutation capture — set player-owned systems to just over 1/2 in
+RAM at the 0x3a095 owner table (stride 0x162, owner = +0x54 sar 16 per
+FUN_00040ec0) before an end-turn, and observe whether end-ctrl fires; a
+second run at 60% discriminates >1/2 from >=2/3. Item STAYS OPEN per strict-
 close policy; other workstreams unaffected.
 
 ## R1 runbook (mandatory safety invariants — a run without them is a bug, not research)

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-06T22:40
+updated: 2026-10-07T00:45
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -29,6 +29,14 @@ ledger:
       reproduced 66/66; row65 300->33000); resume.gam block byte-identical to
       fresh RAM (static data); rewrite upgraded (Tech::runtimeCost,
       includeVariants default false) + 2 pinned tests; docs/re/research.md 6"
+    - "OQ-004 TABLE LOADING + .COB GRAMMAR: pool-relative immediate law (imm =
+      str_off-0x82BB0 -> relocated P0+str_off; 337 RAM-verified sites; census
+      docs/re/datafiles.md — every pool name has a referrer, refuting 06r .shp
+      false-zero); ascend02 .bin/.tsv opened via RAM name table @0x250c1c
+      (3/3 captures) from .cob TOC, zero exe literals; .cob = u32 N + N x 50B
+      names + N x u32 blob offsets, ascend00 54/54 md5 round-trip; gate
+      scripts/cob_probe.py (3i2); NO rewrite delta — rewrite reads the
+      extracted dir directly, nothing TOC-side to upgrade (datafiles.md S5)"
   open:
     - "OQ-010 combat application formula — R1 frontier; static half bounded
       2026-10-06 (no disp32 orbit/table reads; shape tie FUN_00025604), path =
@@ -37,11 +45,12 @@ ledger:
       151/151 @ stride 123; STAR TABLE + ORBIT laws closed 2026-10-06 give the
       neighbourhood map: star stride 96, planet ptrs name+0x2A, orbit pair
       planet-name+0x57/+0x5f; field semantics open)"
-    - "OQ-021 end-ctrl threshold: comment 'over half' vs prose 'two-thirds' — needs code-side constant"
+    - "OQ-021 end-ctrl threshold: comment 'over half' vs prose 'two-thirds' —
+      static route REFUTED 06s (globals reader-only, no comparator in image);
+      path = controlled-mutation capture (docs/BLOCKED.md OQ-021 recipe)"
     - "OQ-020 ability charge days (%d in vendor text, no data file) — R1: read the constant in code"
     - "OQ-005 .shp pixel codec — static route exhausted (6 angles, docs/REFUTED-ROUTES.md); needs exe shape loader via live image"
     - "OQ-006 headerless sample rate — needs exe audio-init constant"
-    - "OQ-004 which tables the exe loads + .tsv grammar — needs open-file thunk via live image"
     - "OQ-012 mapgen: ONLY (a) size options open; (b) closed 06o (pps U{1..5}),
       (c) closed 06p/06q (shell position law; rewrite upgraded + tested),
       (d) closed 06k (sphere extent, refined by (c))"
@@ -95,18 +104,23 @@ ledger:
   0x35a7b, planitem 0x37fcd, restree 0x468d3 (== the independently-found
   loader site -- self-validating), reswin 0x4712b+0x47579, gizmos 0x49081,
   soundfx 0x4ff42, newgame 0x5212c, gizhelp 0x56105, planhelp 0x561f0,
-  windows 0x575c3. .shp names (data\planets.shp 0x83d2b..., DATA\planets.shp
-  0x85694, 02d/resring/suns/smhome) have ZERO direct u32 referrers -- shape
-  libs are not opened via an image-absolute string pointer; the open-file
-  thunk is FUN_000206c0 (what FUN_00046870 calls; enumerating ITS callers is
-  the sanctioned next step for OQ-004/OQ-005). Two verified caveats: (1) at
-  such a site the RESTORED image keeps the file/obj-relative immediate
-  (ascend_restored.bin @0x468d3 = 0x2464), so Ghidra's printed
-  'MOV EAX,0x2464' is not an address -- the live RAM imm there is 0x244464 =
-  P0+0x85014, and the referrer address comes from the RAM scan, not from
-  reading the image; (2) not every referrer address lands inside a Ghidra
-  function (end-ctrl.txt's 0x2c0aa -> 'No function found'), so use
-  disassemble/disassembly context around it rather than assuming a body.
+  windows 0x575c3. 06s REFUTES the 06r claim that .shp names had "zero direct
+  u32 referrers": the census regex dropped backslash paths and upper-case
+  extensions; re-censed correctly, ALL names have referrers (shp 6/6 e.g.
+  data\\planets.shp 0x2b224, DATA\\planets.shp 0x51921, MOUSE.SHP 0x309f9;
+  HAZ 3/3 in FUN_0001cf20; DIP 2/2; .tmp 10/10 at 0x5a2b3..0x5a39b). Root
+  mechanism now CLOSED (pool-relative immediate law, 337 verified sites):
+  the obj stores imm = str_off - 0x82BB0 and relocation rewrites it to
+  P0 + str_off -- full spec + census in docs/re/datafiles.md. Caveats kept:
+  (1) the RESTORED image keeps the unrelocated immediate (Ghidra prints
+  'MOV EAX,0x2464' at 0x468d3; live RAM imm 0x244464) -- referrer addresses
+  come from the RAM scan, never from image immediates; (2) not every referrer
+  lands inside a Ghidra function (end-ctrl.txt 0x2c0aa) -- use disassembly
+  context. OQ-004 CLOSED 06s (which tables load + .cob container grammar:
+  u32 N + N x 50B names + N x u32 blob offsets; ascend00 54/54 md5; gate
+  scripts/cob_probe.py): ascend02 .bin/.tsv have ZERO exe literals -- the
+  engine opens them from a RAM name table at guest-phys 0x250c1c (3/3
+  captures) sourced from the .cob TOC (anchor ascend01.cob:0x3f98).
 - Static trust boundary (from v1 attempt 3): trust rel32 edges + rewritten-
   site immediates ONLY; batch-4-style blind decompile sweeps of E1 batches
   skew UI/allocators (4ae24 = operator-new).
@@ -114,25 +128,19 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-021 END-CTRL THRESHOLD (offline, zero capture cost; the string->loader route
-was proven this turn and self-validated on restree). The end-ctrl.txt referrer
-is guest-phys -> Ghidra 0x2c0aa (scripts/r1_datafile_strings.py, verified 20
-slots), but get_function_by_address(0x2c0aa) says "No function found", so the
-route is: get_assembly_context(xref_sources="0x2c0aa", context_instructions=12)
-to read the surrounding instructions and walk to the enclosing function start
-(prologue = PUSH regs / SUB ESP pattern; the file is opened by the victory
-checker that also reads the "over half" comment file), then decompile that
-function and read the ACTUAL comparison and its constant/multiplier: vendor
-comment says "over half", same file's prose says "two-thirds" — decide with the
-cmp/operand, not the prose. Check the sibling end-*.txt referrers
-(0x2c04e/0x2c065/0x2c07c/0x2c093) the same way: they share the cluster, so one
-function walk likely covers all five conditions. If the lifted threshold differs
-from the rewrite's >1/2, upgrade the check in rewrite (grep the control-victory
-site; note 2026-10-06 entry correction: NO boundary test currently pins >1/2, so
-add one that pins the LIFTED value) + docs/re/ section + gate stays green. If
-the constant is not present (computed from a table read), record the exit-1 line
-with the disassembly quoted and move NEXT ACTION (no spiral). Doc target:
-docs/re/ (victory/endgame section; check what exists before creating).
+OQ-014 PLANITEM FIELD SEMANTICS via the loader the 06s census just pinned
+(offline; Ghidra + banked RAM, zero capture cost). The planitem.txt string
+referrer is 0x37fcd (docs/re/datafiles.md S2) — get_function_by_address there
+(restored image), decompile, and read how each parsed column is stored into
+the live record: that DECIDES the open fields (254 sentinel meaning, the 22/9
+pair, name/help grids, flag bits) instead of inferring from file columns.
+Cross-check the decoded record against the live RAM planitem table (pointer
+law; r1deep slots) for identity like restree §6 did. If a field's semantics
+lift cleanly, upgrade the rewrite site (grep planitems/PlanItem in
+rewrite/src/game) + add a pinned unit test + update docs/re/ (the planitem
+spec lives in the research/docs set — locate before writing). Negative rule:
+if the decompile is unreadable twice, record ONE line in REFUTED-ROUTES/STATE
+with the address and move NEXT ACTION (no spiral).
 
 ## KNOWN-ISSUES / PARKING LOT (operational; research negatives live in
 ## docs/REFUTED-ROUTES.md)

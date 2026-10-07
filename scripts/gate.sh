@@ -123,6 +123,21 @@ else
   err "restree_probe.py crashed"
 fi
 
+# 3i2. OQ-004 invariant: .cob container grammar (docs/re/datafiles.md S3) —
+# TOC parse + strictly-increasing blob offsets + ascend00 full 54/54 md5
+# round-trip against extracted/ascend00. Pure stdlib; skips if game/*.cob
+# absent (checksums are gate-checked separately; this never writes game/).
+[ -s "$ROOT/docs/re/datafiles.md" ] || err "docs/re/datafiles.md missing (OQ-004 spec)"
+if [ -f "$ROOT/game/ascend00.cob" ]; then
+  if /usr/bin/python3 "$ROOT/scripts/cob_probe.py"; then
+    :
+  else
+    err "cob_probe.py: .cob container grammar drifted (see docs/re/datafiles.md)"
+  fi
+else
+  note "game/ascend00.cob absent: .cob grammar probe skipped"
+fi
+
 # 3j. P4 gizmos/economy invariant: the probes' asserted invariants (76 gizmos,
 # 39 items, REQUIRES cross-range, sentinel counts) run on every gate; docs
 # must exist and keep the sentinel fact visible.

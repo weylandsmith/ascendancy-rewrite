@@ -518,8 +518,12 @@ Same-stem `.txt` files in ascend00 (these are HELP/screen text with `text`/
 - [x] Column type/range inventory for all 7 tables
 - [x] `.tsv` characterised: binary, low-entropy, not a text table, not the
       `.bin` data (seed claim falsified)
-- [ ] Which file the executable actually loads, and the `.tsv` container
-      grammar — needs Ghidra xrefs (P2). Tracked as OQ-004.
+- [x] Which file the executable actually loads, and the `.tsv` container
+      grammar — CLOSED 2026-10-06s: no exe literal names the `.bin`/`.tsv`
+      pair; the engine opens them from a RAM name table at guest-phys
+      0x250c1c (3/3 captures) built from the `.cob` archives, whose grammar is
+      `u32 N + N x 50-byte names + N x u32 blob offsets` (ascend00 round-trips
+      54/54 md5). See docs/re/datafiles.md; gate: scripts/cob_probe.py.
 - [ ] Field semantics (col0 looks index-like: strictly populated, one value
       per record in much of the file) — needs Ghidra. OQ-010.
 
