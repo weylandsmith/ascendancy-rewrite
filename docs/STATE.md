@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T20:05
+updated: 2026-10-07T21:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,22 +158,24 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-015 second leg — SELECTION logic lives in the AI consumer, not the loader
-(t10 banked: FUN_00037114/FUN_00037268 only populate 112-byte-stride pools,
-cap 127; DA_ order in heap == file order == pool index). Find the CONSUMER
-of the pool bases: scan payload+restored for u32 refs to 0x705e8 / 0x71c78 /
-0x70d68 / 0x723f8 (loader-immediate law, soundfx.txt pattern); the caller
-context (negwnd.cpp strings nearby) is the DA-selection function; read its
-order law (compare chain over pool entries vs DIPVALUES weights, which
-message fires first). If refs are empty the bases are computed — trace the
-writer of the base register (ADD EAX,base @0x372d6 family is the STORE side;
-the load side is what selects). Record whatever is found; close ONLY on a
-measured order law. CONSUMER SCAN DONE (t10 close): raw u32 refs identical
-payload==restored — ACTIONS bases 0x705e8 @0x4ce8,0x4fcb,0x36f56 / 0x71c78
-@0x4fc2,0x50d4,0x36f68 ; RESPONSES 0x70d68 @0x4d23,0x4fb9,0x36f7a / 0x723f8
-@0x4d1a,0x4fb0,0x36f88. Low-addr hits (0x4ce8..0x50d4) are load-time table
-data; the CODE sites are 0x36f56/0x36f68/0x36f7a/0x36f88 (just below loader
-0x37114) — disassemble FUN owning 0x36f56 first, then 0x4ce8-context.
+OQ-015 fourth leg — DA_ message CHOOSER hunt continues. t11 decoded
+FUN_00044848 fully (4-case offer-state setter on race record, marker bytes
+2/3/0xd, table dwords at restored 0x44838 {0x448a2,0x448cd,0x448bc,0x44959};
+MECHANISM CAVEAT banked §6: encoded jump disp 0x2fc88 != materialised table
+site — 143-class fixup oddity, do not re-scan for a second table).
+NEXT (one action): decompile FUN_00044a44 (the callee gated at 0x447d0 whose
+byte-0xe answer steers the AI branch to FUN_00044848 — read the OTHER
+outcomes too by disassembling 0x44700..0x447d0 head context); the DA_ pool
+index writer for queue entries [obj+0xc7] stride 8 (type u32, >>0x18 selects
+ACTIONS entry, render law banked §5) is the selection evidence — scan for
+`shr 0x18` producers whose result feeds FUN_00036cd8's param_2. Close ONLY
+on a measured rule; else record exit 1 and move to OQ-019 (star-name label
+draw). Do NOT spiral on FUN_00044848.
+BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
+DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;
+exactly {m,y,s,t} confirmed in CODE); queue cap 0x1d @0x363f1; dispatch
+FUN_0003634a event table incl. AI gate species byte 0x0e (&DAT_00012fff
+chain). See docs/re/diplomacy.md §5.
 BANKED THIS TURN (t9): OQ-017 was CLOSED at v1 (index line 168) — earlier
 NEXT ACTION was stale, fonts already load (formats/fnt, docs/re/fnt.md).
 OQ-021 RE-CONFIRMED decision-gated: end-*.txt pool literals have NO code

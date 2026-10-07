@@ -42,11 +42,12 @@ Sources: `extracted/ascend00/player.dip` (human species) and the 21 `raceNN.dip`
   party's dialogue only when the cached id at [obj+0xb9]/[obj+0xbb] (u16 high
   half test >>0x10) mismatches — on-demand per-pair caching.
 - FUN_00037268: reads three sections (keys 0x1c5d, 0x1c65=`RESPONSES`-adjacent,
-  0x1c6f) via line-helper 0x7892a into pools, stride 0x70 (112 bytes/entry),
-  cap 0x7f (127 entries), selecting AI-vs-player pool base by EDI:
+  0x1c6f) via line-helper 0x7892a into pools, stride **128** (loader
+  `SHL EAX,0x7`; renderer FUN_00036ed8 independently uses `param_2*0x80` —
+  earlier "112" in this section was my arithmetic slip, corrected 2026-10-07
+  t11), cap 0x7f (127 entries), selecting AI-vs-player pool base by EDI:
   ACTIONS AI 0x705e8 / player 0x71c78; RESPONSES-pair 0x70d68 / 0x723f8;
-  helper 0x776f0 stores each line. Pool gaps 5776 = 0x1690 (not 127*112 —
-  pools are 0x76=118-slot reserved; no claim).
+  helper 0x776f0 stores each line.
 - Capture corroboration (ck005 + ck010, byte-identical region): heap text at
   phys 0x39e267 holds the parsed DA_ templates in FILE ORDER
   (DA_Discover, DA_DiscoverAskHelp, DA_DeclareWar, DA_ProposeAlliance,
@@ -56,3 +57,57 @@ Sources: `extracted/ascend00/player.dip` (human species) and the 21 `raceNN.dip`
   selection/priority logic does NOT live in the loader — the loader only
   populates pools. Weighted choice lives in the negwnd/raceneg AI paths fed
   by the 15 DIPVALUES weights (docs/re/ai-data.md).
+
+## 5. Renderer + queue + dispatch laws (t11, 2026-10-07) [verified static]
+- Renderer FUN_00036ed8 (regparm3: EAX=param_1 negotiation ctx, EDX=param_2
+  template idx, EBX=perspective): pool selection CONFIRMS stride 0x80 —
+  param_3==0 (response): EBX==0 -> 0x723f8, else 0x70d68; else (action):
+  EBX==0 -> 0x71c78, else 0x705e8. Entry = base + idx*0x80.
+- %token substitution law (measured byte-dispatch on template byte after
+  '%'): 0x6d 'm' -> own-species name: DAT_00074590 + nameIdx*0x14 where
+  nameIdx = byte(&DAT_00012e17 + DAT_00006775*0x1ee) (player side) resp.
+  DAT_00007458e variant (other side); 0x79 'y' -> swapped pair;
+  0x73<=b<0x74 's' -> star-system name field *(int)(&DAT_00013000 +
+  idx*0x1ee) + 0x1c; 0x74<=b<0x75 't' -> third party name, via negotiation
+  pair table DAT_000066d8 + ([param_1+0xbd]>>0x10)*2 when (EBX==-1 &&
+  param_3==-1), else DAT_00013000 chain. Species name records stride 0x1ee,
+  names are 20 bytes (stride 0x14) at DAT_00074590. Exactly {m,y,s,t} —
+  v1's data-side token census is now corroborated by CODE.
+- Message queue (negotiation obj): count u16 +0x8c7, entries at +0xc7 stride
+  8, capacity init u16 0x1d (29) @0x363f1; reset FUN_00032fdc: count=0,
+  +0xcb=0, +0xcd=0, +0xcf=0xffff, +0x8dd=[obj+0x10]-1.
+- Event dispatch FUN_0003634a(ctx, event u16, param_3): event 0/1 dialogue
+  open -> build/alloc negotiation objs (+0xab,+0xaf,+0xb3), cap 0x1d, load
+  .dip via FUN_00037114, then AI-vs-human branch on species byte
+  (&DAT_00012fff)[playerIdx*0x1ee] == 0x0e: AI path FUN_00044848 ->
+  FUN_00036cd8 (render queue, max loop DAT_000701f4 entries at 0x701e0+1,
+  u32 packed type = >>0x18 indexes ACTIONS-pool base 0x71c68... note
+  0x71c68 vs 0x71c78: render base is 16 lower — header word per pool, no
+  claim) -> FUN_00036ea4; human path FUN_00044e20 -> FUN_00036dd4 ->
+  FUN_00036e6c. event 4..5 gated 0xAD<EBX<0x148 && 0x144<param_3<0x1D9 ->
+  FUN_0004fb30 + FUN_000369a4. event 0x1c01 -> FUN_00032f34 + FUN_00036a90.
+- CHOOSER (AI message pick) = FUN_00044848: switch on byte
+  [param_1+0x1c0+param_2] — Ghidra truncates its jumptable (bad-data).
+  NEXT: raw jumptable recovery (disassemble_bytes past 0x44848, manual
+  table decode), NOT re-deriving the loader.
+
+## 6. FUN_00044848 decoded = offer-state setter, NOT the DA_ chooser (t11)
+- Entry shuffle (regparm3): ESI=ctx, EBP=sx(param_2), race-record base
+  EDI = 0x12e16 + 494*EBP (0x1ee stride law again); always writes 0xe byte
+  to out-param [EBX] (human-species marker).
+- Switch var: byte [ctx + 0x1c0 + idx]; guard JA>3 -> 0x44a29; jump-mode
+  `JMP [EBP_disp + disp32]` with encoded disp32 0x2fc88 (EH-prologue bytes
+  live there in-file; the ACTUAL case dwords sit at RESTORED 0x44838:
+  {0x448a2, 0x448cd, 0x448bc, 0x44959} — the encoded-vs-materialised
+  mismatch is the known 143-not-simple-fixups class; do NOT re-scan for a
+  second table).
+- Case bodies (read through 0x448e4): case0 = vendor error 0x2a438
+  (EBX=0x126 line 294, msg 0x22ca); case1 writes bytes 2 then 3 into the
+  race record and reads [0x12e10]-[0x74734]; case2 writes byte 0xd,
+  returns 2; case3 @0x44959 not yet read.
+- Conclusion so far: this is the treaty/offer state machine on the race
+  record (marker bytes 2/3/0xd), keyed by per-(ctx,idx) state byte. The DA_
+  MESSAGE CHOOSER is elsewhere; candidates queued: FUN_00044a44 (callee of
+  the 0xe-gate just above), and the packed type writer for queue entries
+  ([obj+0xc7] stride 8, type u32 >>0x18 indexes the ACTIONS pool @0x71c68+16
+  per FUN_00036cd8).
