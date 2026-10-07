@@ -90,6 +90,49 @@ TEST(research_graph_is_acyclic_with_forward_refs) {
             for (int p : tech.prereqs) CHECK(p < t.mainCount());
 }
 
+TEST(research_runtime_cost_law_measured) {
+    // OQ-013 / docs/re/research.md §7. The original's loader FUN_00046870
+    // (work/ascend_restored.bin:00046870) multiplies the file cost by
+    // iVar4 = -20 + 2*row once row > 10 and clamps to 65000, storing the
+    // result at record +62. Measured in live RAM (scripts/r1_restree_law.py):
+    // 66/66 rows x 27 slots across 13 captures, and byte-identical to the
+    // vendor resume.gam's 4950-byte research block. These exact values are
+    // from the captures, not derived here.
+    std::string err;
+    auto t = loadOrDie(err);
+    const auto& all = t.all();
+    CHECK(all[0].runtimeCost() == 50);      // row <= 10: file cost verbatim
+    CHECK(all[10].runtimeCost() == 100);
+    CHECK(all[11].runtimeCost() == 280);    // 140 * 2
+    CHECK(all[15].runtimeCost() == 1800);   // 180 * 10
+    CHECK(all[30].runtimeCost() == 4400);   // 110 * 40
+    CHECK(all[57].runtimeCost() == 37600);  // 400 * 94
+    CHECK(all[65].runtimeCost() == 33000);  // 300 * 110
+    // Clamp branch (no shipped row hits it; the law must still hold).
+    CHECK(ascend::game::Tech::runtimeCost(700, 60) == 65000);  // 700*100 clamped
+    // The gameplay charge differs from the file column for every row > 10.
+    int scaled = 0;
+    for (int i : t.mainIndices())
+        if (all[i].runtimeCost() != all[i].cost) ++scaled;
+    CHECK(scaled == 55);  // rows 11..65 inclusive
+}
+
+TEST(research_variants_are_not_in_play) {
+    // OQ-013 CLOSED: available()'s default excludes variant rows because the
+    // original never loads them (count-line = 66 bounds the load loop).
+    std::string err;
+    auto t = loadOrDie(err);
+    std::vector<bool> owned(static_cast<int>(t.all().size()), false);
+    auto avail = t.available(owned);  // default argument, deliberately
+    for (int i : avail) CHECK(!t.all()[i].variant);
+    CHECK(!avail.empty());
+    // The three main-tree roots are the only openings with nothing owned
+    // (research.md §3) and no variant row can join them.
+    std::unordered_set<int> a(avail.begin(), avail.end());
+    CHECK(a.size() == 3);
+    CHECK(a.count(0) == 1 && a.count(2) == 1 && a.count(6) == 1);
+}
+
 TEST(research_availability_gating) {
     std::string err;
     auto t = loadOrDie(err);

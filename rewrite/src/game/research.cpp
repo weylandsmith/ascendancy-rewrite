@@ -118,6 +118,10 @@ ResearchTree ResearchTree::loadFromFile(const std::string& path, std::string& er
         for (size_t k = 2; k < nums.size(); ++k)
             t.prereqs.push_back(static_cast<int>(nums[k]));
         t.variant = allUpper(toks[0]);
+        // 0-based FILE row index: the original's cost multiplier is keyed to
+        // this, not to any later-filtered index (FUN_00046870 loops the
+        // count-line rows in file order; docs/re/research.md §7).
+        t.setRow(static_cast<int>(tree.techs_.size()));
         tree.techs_.push_back(std::move(t));
     }
 

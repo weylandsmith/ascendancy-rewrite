@@ -8,7 +8,7 @@ file := count-line row+
 ```
 - count line = `66`; data rows = **106** = **66** main-tree rows (Mixed-case names) + **40** variant rows (ALL-CAPS names). The count line counts the main tree only.
 - every row's last integer is the terminator 255; self-prerequisites: 0; duplicate prereqs within a row: 0
-- **field0**: == 0 on all 66 main rows; on variant rows takes values [0, 1, 2, 3, 4]. Semantics UNKNOWN -> OQ-013.
+- **field0**: == 0 on all 66 main rows; on variant rows takes values [0, 1, 2, 3, 4]. File-level semantics remain unknown, but the field is DEAD DATA at runtime — see §6c: the exe never loads rows past the count line. (OQ-013 CLOSED 2026-10-06r.)
 - **cost = field1**.
 - **prereqs = fields[2:-1]** as 0-based indices into the whole row list (effectively the main tree; see below).
 
@@ -139,3 +139,109 @@ file := count-line row+
 104 f=0 c=20   NANOENERGONS                 <- 33:Star^Lane^Anatomy
 105 f=0 c=20   PLANETARY^CONVERSION         <- 27:Momentum^Reflection, 38:Matter^Duplication
 ```
+
+## 6. LIVE TABLE LAW — CLOSED 2026-10-06r (OQ-013)
+
+Three independent evidence lines below (6a code, 6b cost arithmetic, 6c census);
+none is an inference from another.
+
+### 6a. The loader: `FUN_00046870` (work/ascend_restored.bin, body 0x46870..0x46ae9)
+Found by pointer law, not guessed: the payload holds exactly one
+`restree.txt` string (payload file offset 0x85014, inside a cluster with
+`..\research.cpp` at 0x85032..0x85052 — the research module's own string pool).
+The only u32 in guest RAM pointing at it sits at guest-phys 0x205d23, and
+0x205d23 - P0(0x1bf450) = 0x468d3, which is inside this function. Exactly two
+callers (`get_xrefs_to` total 2): `FUN_00022ce4` (new-game init) and
+`FUN_00046fa0` (serialize into .gam, reached from the save writer
+`FUN_00025604` whose stride families 0x60/0x7b/0x1ee were tied to the live
+record table on 2026-10-06). Load-once guard: global [0x00074740], tested at
+0x468a5, set to -1 at 0x46ab9. Entry clears the 100-slot capacity (100*75 =
+0x1d4c bytes) and sets each slot's byte 69 to 0xFF.
+
+Record = **75 bytes (0x4b)**; table base = address of the count u16, name at
+base+2. Field map from the DISASSEMBLY (the C pseudocode's `ushort*` arithmetic
+is not trustworthy — its `+0x25`/`+0x45` are word-indexed):
+
+| offset | width | field | instruction |
+|---|---|---|---|
+| base+0 | u16 | count, clamped `min(parsed,100)` | 0x4690b store; 0x46913 `CMP EAX,0x64`; 0x46918 cap |
+| base+2 | 60 B | name, `^` -> 0x20 | 0x46a0a `CMP byte [EDX+0x2],0x5e` -> 0x46a10 `MOV ...,CL` (CL=0x20 from 0x46930); scan `i<0x3c` |
+| base+62 | u16 | **runtime cost** (see 6b) | 0x469bc `MOV word [EDI+0x3e],AX` |
+| base+64 | <=5 B | prereq row indices, 0xFF-terminated | 0x469dd `MOV byte [EBX+0x40],AL`; 0x469f2 `CMP EDX,0x5` |
+| base+69..72 | 4 B | child list, second pass | 0x46a35 `CMP EBX,0xff` (free slot); 0x46a44 writes 0xFF to 69+k+1; 0x46a48 `MOV byte [EDX+0x45],AL` (AL = row index) |
+| base+76 | u8 | file field0 | 0x4698f `MOV byte [EDI+0x4c],AL` (format 0x2476, first output) |
+
+Second pass, verbatim from 0x46a21..0x46a48: for each row `j` in file order, for
+each prereq `q` of `j`, write `j` into q's first slot k<4 whose byte 69+k still
+reads 0xFF. Reproduced against live RAM: **66/66 rows exact, 0 mismatches**.
+
+### 6b. MEASURED COST LAW — the runtime cost is NOT the file cost
+The row loop (0x4691d..0x46a15) carries a running multiplier in EBP:
+```
+EBP = -0x14                       (0x4691d, = -20; before the loop)
+if (row > 10) cost *= EBP         (0x46992 CMP 0xa; 0x46999 IMUL EAX,EBP)
+if (cost > 65000) cost = 65000    (0x469a4 CMP 0xfde8; 0x469ae)
+store cost at base+62             (0x469bc)
+EBP += 2                          (0x4693b, loop tail, AFTER the store)
+```
+=> **runtime_cost(row) = file_cost for row <= 10, else file_cost * (2*row - 20),
+clamped to 65000.** Re-executing that loop reproduces the captured RAM costs for
+**66/66 rows with zero mismatches**. Multipliers are 2, 4, 6, 8 ... for rows 11,
+12, 13, 14; no shipped row reaches the clamp (largest product: row 57,
+400 * 94 = 37600). Worked examples from the captures: row 11 Momentum
+Deconservation 140 -> 280; row 15 Cloaking 180 -> 1800; row 30 Energy
+Redirection 110 -> 4400; row 65 Illusory Machinations 300 -> **33000**.
+
+The file column survives nowhere else: the verbatim u16[66] cost sequence
+appears nowhere in guest RAM and nowhere in the payload, so the scaled value at
+base+62 is the only cost the game holds. Two consequences for a rewrite: charging
+the file column makes late techs ~100x cheaper than the original, and
+"cheapest available tech" is not the same choice on the two scales — selection
+must compare runtime costs too.
+
+### 6c. In play = the 66 main rows; the 40 variants are never loaded
+The row loop is bounded by the count line (66, cap 100), so rows 66..105 — every
+ALL-CAPS variant — are never parsed. Checked by census rather than by trusting
+that reading:
+- Tool `scripts/r1_restree_law.py` (added 2026-10-06r): anchors on row 0's name,
+  walks stride 75, hard-codes no address, and exits 0 only if the 6b law
+  cross-checks >=90% of the located rows.
+- **27 slots x 13 banked captures** (`work/r1/r1deep-*`, `r1ad-*`, `r1sav-*`,
+  turns 0..9): main rows present **66/66** in every slot; variant rows
+  **0/40** — under both the `^` and space spellings, and multi-word substring
+  probes (`ADVANCED PLANETARY`, `CROP ENGINEERING`, `TERRAFORMING`, ...) are
+  also zero.
+- RAM names are the **space-substituted** forms: `^` is a file-level display
+  joiner replaced by 0x20 at load time, so a research name in RAM never contains
+  `^` (0 hits across the loaded block).
+- The vendor's mid-game save `game/resume.gam` carries the same stride-75 table
+  (count u16 = 66 at file offset 180, scaled costs included) and its
+  4950-byte research block is **byte-identical (0 diffs)** to a fresh-campaign
+  RAM copy. So this table is static definition data, not research progress —
+  who-researched-what lives elsewhere and is still unmapped.
+- Weak corroboration only: no extracted table *names* a variant tech (40 spaced
+  variant names searched in gizmos/static/cosmos/names/help -> 0 hits). This
+  proves little — the 66 main-tree names score 0 in the same files, so the test
+  cannot discriminate. What closes the question is the loader bound plus the RAM
+  census. `planitem.txt`'s RESEARCH-REQ column is deliberately NOT cited:
+  parsing that file's variable-width name column is OQ-014's open work and every
+  quick parse attempted here misaligned it.
+
+### 6d. Rewrite upgrade (2026-10-06r)
+- `rewrite/src/game/research.h`: `Tech::runtimeCost()` implements 6b (file
+  `cost` retained as the file column; the row index is captured at parse time
+  because the multiplier keys on FILE row order, not on a filtered index).
+  `available()`'s default flips `includeVariants` **true -> false** per 6c.
+- `rewrite/src/game/campaign.cpp`: researchPhase queries main-tree-only
+  (:265), the player's cheapest-tech comparison (:271-272) and the FreeResearch
+  pick (:551, :554) compare `runtimeCost()`, and the completion charge test
+  (:283) uses `runtimeCost()`.
+- Pins: `research_runtime_cost_law_measured` (280/1800/4400/37600/33000, the
+  clamp branch, and "55 of 66 rows scale") and `research_variants_are_not_in_play`
+  (default `available()` yields no variant rows, and exactly the 3 main roots on
+  an empty empire). 86 tests, 0 failed. Gate green. Seeded seed-2024 headless
+  campaign still wins Control, turn 145 (was 148) — the research curve moved, as
+  it should have.
+- Residue, stated not papered over: the file-level meaning of variant field0
+  (0..4) is still unknown, but it is dead data — rows past the count line never
+  reach memory, so no runtime behaviour can depend on it.

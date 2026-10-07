@@ -64,8 +64,25 @@ mapgen.md §4.1 rewritten with scale note).
 superseded/refined by (c) shells) | open | (a): setup-screen live RAM state from
 r1ad captures (options UI lives in RAM at pointer-law base).
 OQ-013 | rules | restree variant block: field0 (0..4) semantics; main tree
-vs variants vs union in play (current default union) | open | W2: which
-research rows are live in fresh-campaign RAM; research-screen code path.
+vs variants vs union in play (current default union) | CLOSED 2026-10-06r |
+IN PLAY = the 66 MAIN ROWS ONLY; variants are never loaded, field0 is dead
+runtime data (file-level meaning still unknown, stated as residue). Evidence:
+loader FUN_00046870 (ascend_restored.bin:0x46870..0x46ae9; found via the sole
+u32 -> payload-0x85014 'restree.txt' string site at guest-phys 0x205d23;
+2 callers: new-game init FUN_00022ce4, save serialize FUN_00046fa0) bounds its
+row loop by the count line (66, cap 100) => rows 66..105 never parsed. Census
+scripts/r1_restree_law.py over 27 slots x 13 captures (turns 0..9): main 66/66
+in every slot, variants 0/40 under both '^' and space spellings (RAM stores
+space-substituted names; loader rewrites '^'->0x20 at 0x46a10). resume.gam
+holds the same stride-75/66-row table, 4950 B byte-identical to fresh RAM =>
+static definition data, not progress. Record map + the MEASURED COST LAW
+(runtime u16@+62 = file_cost x (2row-20) for row>10, clamp 65000; reproduced
+66/66 from instructions 0x4691d..0x46a15; row 65: 300 -> 33000):
+docs/re/research.md §6. REWRITE UPGRADED: Tech::runtimeCost() (research.h),
+available() default includeVariants true->false, campaign.cpp charge :283 +
+selection :271/:554 on runtimeCost; tests
+research_runtime_cost_law_measured + research_variants_are_not_in_play (86
+tests 0 fail); gate green; seed-2024 campaign still wins Control t145.
 OQ-014 | rules | planitem unknowns: REQUIRES=254 (Interstellar Trucking),
 count triple 22/9, the 11x4 + 5x15x2 grids, item FLAG bits (current: 254
 ungated; grids parsed-unused) | open | W2/W3: grid consumers in code +

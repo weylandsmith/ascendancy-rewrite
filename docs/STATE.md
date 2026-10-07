@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-06T17:13
+updated: 2026-10-06T22:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -20,6 +20,15 @@ ledger:
     - "OQ-009 AI data side (21 raceNN.dip parameter sets)"
     - "OQ-011 POINTER LAW: runtime_u32 = P0 + payload_file_offset(target); P0 = B - H per-run; guest linear == physical; obj0 code [0x14bb0,0x82bb0)@0x1d4000, obj1 data [0x82bb0,0x8cc83)@0x242000 (battery scripts/r1_pointer_law.py 12/12 slots, gate 3q)"
     - "OQ-017 vendor .fnt codec + wired into UI"
+    - "OQ-013 RESTREE LIVE TABLE LAW: in play = 66 main rows only (loader
+      FUN_00046870 row loop bounded by count line 66; variants 0/40 in 27 slots
+      x 13 captures); record = stride 75 (count u16@+0, name 60B@+2 ^->space,
+      runtime cost u16@+62, prereq bytes@+64 (0FF term, <=5), child slots@+69..72
+      (second pass, 66/66 exact), field0 u8@+76); MEASURED COST LAW runtime =
+      file_cost x (2row-20) for row>10 clamp 65000 (instructions 0x4691d..0x46a15,
+      reproduced 66/66; row65 300->33000); resume.gam block byte-identical to
+      fresh RAM (static data); rewrite upgraded (Tech::runtimeCost,
+      includeVariants default false) + 2 pinned tests; docs/re/research.md 6"
   open:
     - "OQ-010 combat application formula — R1 frontier; static half bounded
       2026-10-06 (no disp32 orbit/table reads; shape tie FUN_00025604), path =
@@ -36,7 +45,6 @@ ledger:
     - "OQ-012 mapgen: ONLY (a) size options open; (b) closed 06o (pps U{1..5}),
       (c) closed 06p/06q (shell position law; rewrite upgraded + tested),
       (d) closed 06k (sphere extent, refined by (c))"
-    - "OQ-013 restree variant field0 semantics — needs research-screen code"
     - "OQ-014 planitem unknown fields (254 sentinel, 22/9, grids, item flag bits)"
     - "OQ-015 DA_ template selection order + full %token table"
     - "OQ-016 campaign per-turn constants (income, growth, build order, cadence, home placement)"
@@ -71,6 +79,34 @@ ledger:
 - Module attribution LIVE: scripts/attribution_scan.py + gate 3r,
   work/attribution.tsv (225 E1 refs, 62% on true fixup sites; flic 43,
   winmgr 24, gsystem 23, race 20, cosmos/batmode 10, planet 8).
+- Restree law tool LIVE: scripts/r1_restree_law.py (anchor on row-0 name, walk
+  stride 75, no hard-coded address; exit 0 only if the cost law cross-checks
+  >=90% of located rows). Green on every banked capture (66/66 rows, 27 slots).
+- DATA-FILE STRING -> LOADER ROUTE (proven on OQ-013, 2026-10-06r; the general
+  key to the "needs code path" items): the payload holds literal data-file
+  names next to their module's debug path (e.g. 'restree.txt' at payload
+  offset 0x85014 beside '..\research.cpp'). Tool scripts/r1_datafile_strings.py
+  scans guest RAM for u32 == P0 + payload_offset and prints the Ghidra address
+  d = (member_off - H) - P0 of every referrer (never hard-code bases). Census
+  06r (r1deep-20261006-123049, 20 slots): ALL 23 .txt names referenced --
+  batfx 0x1ad97, help 11 refs (0x1bee3...), music 0x212d5, cosmos 0x2140e,
+  static 0x218c1, names 0x22894, history 0x2b4d5, end-{xtnc,dest,capt,unit,
+  ctrl} 0x2c04e/0x2c065/0x2c07c/0x2c093/0x2c0aa, gwshare 0x31563, tutindex
+  0x35a7b, planitem 0x37fcd, restree 0x468d3 (== the independently-found
+  loader site -- self-validating), reswin 0x4712b+0x47579, gizmos 0x49081,
+  soundfx 0x4ff42, newgame 0x5212c, gizhelp 0x56105, planhelp 0x561f0,
+  windows 0x575c3. .shp names (data\planets.shp 0x83d2b..., DATA\planets.shp
+  0x85694, 02d/resring/suns/smhome) have ZERO direct u32 referrers -- shape
+  libs are not opened via an image-absolute string pointer; the open-file
+  thunk is FUN_000206c0 (what FUN_00046870 calls; enumerating ITS callers is
+  the sanctioned next step for OQ-004/OQ-005). Two verified caveats: (1) at
+  such a site the RESTORED image keeps the file/obj-relative immediate
+  (ascend_restored.bin @0x468d3 = 0x2464), so Ghidra's printed
+  'MOV EAX,0x2464' is not an address -- the live RAM imm there is 0x244464 =
+  P0+0x85014, and the referrer address comes from the RAM scan, not from
+  reading the image; (2) not every referrer address lands inside a Ghidra
+  function (end-ctrl.txt's 0x2c0aa -> 'No function found'), so use
+  disassemble/disassembly context around it rather than assuming a body.
 - Static trust boundary (from v1 attempt 3): trust rel32 edges + rewritten-
   site immediates ONLY; batch-4-style blind decompile sweeps of E1 batches
   skew UI/allocators (4ae24 = operator-new).
@@ -78,19 +114,25 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-013 RESTREE ACTIVE ROWS (offline, zero capture cost; banked fresh-campaign
-RAM + pointer-law base). Campaign default is "union of main tree + variants";
-the question is which research rows the ORIGINAL has live in a FRESH campaign.
-Plan: (1) locate the research-state block in a fresh capture (candidate:
-scan for the restree row-count shape near the pointer-law base window, same
-census method that cracked the planet/star tables); (2) diff fresh vs a
-banked mid-campaign capture for rows that flip 0->1 (researched) — rows that
-exist at all define "in play"; (3) if the variant tree is absent in RAM on a
-fresh map, campaign default flips union->main-tree with the measurement
-cited; if present, union stands, cited. Numbers go into a new section of docs/re/research.md + the ledger. If no research block is locatable in existing captures,
-record the exit-1 negative and move NEXT ACTION (do NOT spiral; the research-
-screen capture wedge needs a separate adaptive round). (Doc target:
-docs/re/research.md exists already; add the section there.)
+OQ-021 END-CTRL THRESHOLD (offline, zero capture cost; the string->loader route
+was proven this turn and self-validated on restree). The end-ctrl.txt referrer
+is guest-phys -> Ghidra 0x2c0aa (scripts/r1_datafile_strings.py, verified 20
+slots), but get_function_by_address(0x2c0aa) says "No function found", so the
+route is: get_assembly_context(xref_sources="0x2c0aa", context_instructions=12)
+to read the surrounding instructions and walk to the enclosing function start
+(prologue = PUSH regs / SUB ESP pattern; the file is opened by the victory
+checker that also reads the "over half" comment file), then decompile that
+function and read the ACTUAL comparison and its constant/multiplier: vendor
+comment says "over half", same file's prose says "two-thirds" — decide with the
+cmp/operand, not the prose. Check the sibling end-*.txt referrers
+(0x2c04e/0x2c065/0x2c07c/0x2c093) the same way: they share the cluster, so one
+function walk likely covers all five conditions. If the lifted threshold differs
+from the rewrite's >1/2, upgrade the check in rewrite (grep the control-victory
+site; note 2026-10-06 entry correction: NO boundary test currently pins >1/2, so
+add one that pins the LIFTED value) + docs/re/ section + gate stays green. If
+the constant is not present (computed from a table read), record the exit-1 line
+with the disassembly quoted and move NEXT ACTION (no spiral). Doc target:
+docs/re/ (victory/endgame section; check what exists before creating).
 
 ## KNOWN-ISSUES / PARKING LOT (operational; research negatives live in
 ## docs/REFUTED-ROUTES.md)

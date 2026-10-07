@@ -260,14 +260,16 @@ void Campaign::buildPhase() {
 
 void Campaign::researchPhase() {
     for (size_t o = 0; o < ownedTech.size(); ++o) {
-        auto avail = tree_->available(ownedTech[o], /*includeVariants=*/true);
+        // OQ-013 CLOSED (research.md §7): the original loads only the 66
+        // main-tree rows, so variants are not in play -> includeVariants=false.
+        auto avail = tree_->available(ownedTech[o], /*includeVariants=*/false);
         if (queuedTech[o] < 0 || ownedTech[o][queuedTech[o]]) {
             if (avail.empty()) continue;
             if (o == kPlayer) {
                 int best = avail[0];
                 for (int t : avail)
-                    if (tree_->all()[t].cost < tree_->all()[best].cost ||
-                        (tree_->all()[t].cost == tree_->all()[best].cost && t < best))
+                    if (tree_->all()[t].runtimeCost() < tree_->all()[best].runtimeCost() ||
+                        (tree_->all()[t].runtimeCost() == tree_->all()[best].runtimeCost() && t < best))
                         best = t;
                 queuedTech[o] = best;
             } else {
@@ -278,7 +280,7 @@ void Campaign::researchPhase() {
         const Tech& tq = tree_->all()[queuedTech[o]];
         techProgress[o] += res[o];  // all stockpiled RES goes into research
         res[o] = 0;
-        if (techProgress[o] >= tq.cost) {
+        if (techProgress[o] >= tq.runtimeCost()) {
             ownedTech[o][queuedTech[o]] = true;
             events_.push_back({turn_, "owner " + std::to_string(o) + " researched " + tq.name});
             queuedTech[o] = -1;
@@ -546,10 +548,10 @@ void Campaign::abilityPhase() {
             case SpeciesAbility::FreeResearch: {  // L2429-2430 "immediately achieve any discovery you are pursuing"
                 int t = queuedTech[o];
                 if (t < 0) {
-                    auto avail = tree_->available(ownedTech[o], true);
+                    auto avail = tree_->available(ownedTech[o], /*includeVariants=*/false);
                     t = -1;
                     for (int c : avail)
-                        if (t < 0 || tree_->all()[c].cost < tree_->all()[t].cost) t = c;
+                        if (t < 0 || tree_->all()[c].runtimeCost() < tree_->all()[t].runtimeCost()) t = c;
                 }
                 if (t >= 0 && !ownedTech[o][t]) {
                     ownedTech[o][t] = true;
