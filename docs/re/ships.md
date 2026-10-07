@@ -79,3 +79,37 @@ invented in this pass: when R1 lands, replace composition, not inputs.
   no-Shipyard = no-launch invariant.
 NOT modelled (stated): ship design screen, per-ship inventories,
 Orbital Docks effects, the vendor cost hack (R1), fleet stacking.
+
+## 6. Gizmo loader + record law (OQ-019 t15, 2026-10-08) [verified static]
+- gizmos.txt unique code referrer: pool imm 0x2538 @0x49081 inside
+  FUN_00049074. POOL-BASE LAW TRIPLE-CONFIRMED: pool offset = image offset
+  - 0x82bb0 (soundfx.txt 0x2a08->0x84bb8...; RACE%02d.DIP 0x21f0->0x84da0 ✓;
+  gizmos.txt 0x2538->0x850e8 ✓ literal verified).
+- Record: stride 0x6a, LOOP COUNT 76 (`CMP EBP,0x4c @0x490ed`), record base
+  = PTR_DAT_0007650c table. Parse: '%s' (name, '^'->' ' substitution loop
+  @0x4916x family) then EIGHT %d then a 255-terminated bit list:
+  +0x32 cat (byte), +0x36/+0x3a/+0x3e/+0x42/+0x46/+0x4a/+0x4e/+0x35 = the
+  eight fixed columns in file order, +0x33 u16 RESREQ BITMASK (bits set
+  from the list until value 0xff — v1's "column 8 ResReq" is this list,
+  refined: multi-node capable).
+- Derived slots (init to 0 @0x4923a..0x49250, then category switch):
+  cat 0 weapon -> +0x52 = Level[+0x3e]; cat 1 shield -> +0x56 = Level;
+  cat 2 drive -> +0x5e = Level; cat 3 scanner -> +0x62 = Level;
+  cat 4 generator -> +0x66 = POWER[+0x36] (matches vendor header "power
+  supplied by the generator"); cat >4 -> vendor error 0x2a438 (EBX=0x190?
+  msg pool 0x2567). Jump table RAW at 0x49060 (encoded disp 0x344b0 is the
+  usual 143-class fiction; REAL table sits BEFORE the function entry,
+  second instance of the t11 pattern — bank the pattern, stop re-scanning).
+  Switch default falls through to next-record path @0x490e6 (INC/ADD/CMP).
+- This switch is the DOCUMENTED per-category parameter interpretation, NOT
+  the JJTTODO cost hack. Cost-hack hunt = writers of +0x46 (Industry,
+  5th fixed col) OUTSIDE FUN_00049074, or build-cost sites reading +0x46.
+- Design-screen assets/edges banked: name-table idx 61 `data\8shipdes.tmp`,
+  74 `data\8shipdes.shp`, plus shipicon + 21 smshipNN + dkship shps;
+  strings SHIPDESIGN@0x83a69 (refs 0x26fcb,0x31da4,0x52630),
+  SHIPDESSCREEN@0x83aae (ref 0x27bba), shipdesx@0x83ac7 (ref 0x27c05),
+  owner coswnd.cpp. ship.bin (386)/ship.tsv (393) in table.
+## 7. NEXT residues (open, do not re-derive §6)
+cost-hack location; per-ship inventory record (ship.bin table law?);
+sugar-cube numeric scale (drive Level in hop math at move code);
+Orbital Docks effect readers.

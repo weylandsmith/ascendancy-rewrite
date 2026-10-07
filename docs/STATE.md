@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-08T02:40
+updated: 2026-10-08T04:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,19 +158,19 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-019 (star-name label draw) — the last non-capture open RE item.
-Route: static-first, same shape as prior wins. (1) star labels draw in the
-cosmos screen: find the draw path via the cosmos.txt loader chain (file
-already mapped v1? grep docs/re for cosmos label) and the font used (fnt
-module CLOSED OQ-017 — link draw law to it); (2) OQ-019's stated unknown
-(read its ledger line verbatim first!) — then lift exact positions/
-colors/colors-from-palette or the label-placement formula; (3) upgrade
-rewrite ui/cosmos draw site + pin. IF the stated unknown turns out
-closed-at-v1 (t9 precedent), record exit 1 in ONE line and re-audit the
-ledger: after OQ-019 the only remaining entries should be capture-gated
-(OQ-016, OQ-021(c) route), user-decision (OQ-021(a)), blocked (OQ-020),
-and build-work (OQ-023) — state that census explicitly in the commit.
-OQ-015 CLOSED t12-t14 (§4-§9 complete; pins x3; strict upgrade landed).
+OQ-019 second leg — cost hack + sugar-cube scale. t15 banked the gizmo
+record law (docs/re/ships.md §6: stride 0x6a x 76 == file rows exact, cat-
+switch = documented param interpretation NOT the hack; pool-base law
+image-off-0x82bb0 triple-confirmed). (1) COST HACK: scan SIB-aware writers
+of +0x46 (Industry) outside FUN_00049074, and readers of +0x46 near ship
+build-cost code (ship.bin referrers @ where? pool-off law gives ship.bin
+literal offset -> imm scan); the JJTTODO says init_global_gizmos ALTERS
+cost as read in — likely a post-load pass over the 76-record table right
+after FUN_00049074's callers; check callers first (cheap). (2) SUGAR-CUBE:
+drive Level slot +0x5e readers -> movement code (COSMOS move, coswnd.cpp
+strings banked); the /2 vs x1 question resolves there. (3) per-ship
+inventory: ship.bin loader + record law (same census method as gizmos).
+Close per sub-question as measured; upgrade rewrite where laws land.
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;
 exactly {m,y,s,t} confirmed in CODE); queue cap 0x1d @0x363f1; dispatch

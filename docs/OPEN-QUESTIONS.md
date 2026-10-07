@@ -160,7 +160,12 @@ multi-turn RAM diffs on an idle empire (deep capture + NEXTTURN cadence law
 planitem/turnloop anchors.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
-| open | W3: ship design screen code + its data reads (live image).
+| open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:
+FUN_00049074, stride 0x6a x 76 == file census exact, RESREQ BITMASK +0x33,
+cat-switch copies Level->+0x52/56/5e/62 and generator Power->+0x66, cat>4
+vendor error; design-screen edges + shp/tmp assets banked). Remaining: cost
+hack (+0x46 writers), sugar-cube scale (+0x5e readers), per-ship inventory
+(ship.bin law), Orbital Docks — per STATE second leg.
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:
