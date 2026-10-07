@@ -50,8 +50,8 @@ it — playMusic() loads theme00.raw directly == observed vendor state
 [DAT_00010b96]=3, 3/3 exact disk sizes, cross-archive negatives repaired).
 OQ-023 | dip | rewrite AI emits only the two-party threshold branch; original
 additionally sends TRADE (DA 4/5/6) on turn%NEG_PLAYER_TURNS cadence behind
-ownership share/multiple gates and THIRD-PARTY messages (DA 7/7? no: 10, 7,
-9) under roll<80 — law MEASURED §9 (t14), engine NOT built (needs star/
+ownership share/multiple gates and THIRD-PARTY messages (DA 10, 7, 9 under
+roll<80) — law MEASURED §9 (t14), engine NOT built (needs star/
 lane/tech ownership tables in rewrite + UI affordance for incoming trade
 offers). | open | W-B (option C hybrid): build only when ownership model
 lands; no RE unknowns remain for this item.
