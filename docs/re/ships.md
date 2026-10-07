@@ -161,3 +161,29 @@ is plain-addition or scaled is [unverified] and is the queued next probe.
 Rewrite status for GIZMO RECORDS: ALREADY MATCHES (file Industry used
 unmodified; §2 v1 default vindicated by census — measured no-op, not
 plausibility). Design-total summation law: still open under OQ-019.
+
+## 10. Starting-ship generation law (OQ-019 t17) [verified static]
+FUN_000238e8 (scenario init, per empire; ship slot chain param+0x18247
+stride 0x7b; design table stride 0x1ee, count [table+0xd86]>>16):
+- per design slot: gizmo count g = RNG()%5 + 1, cap 5 (@0x23a03-ish);
+  if a matching owned design exists (match by name ptr [designRec+0xd])
+  AND its stored count field ==0 -> g=1; then if design exists g =
+  RNG()%g (uniform 0..g-1).
+- g==0 slot ships get the TWO STARTER TEMPLATE LISTS copied verbatim:
+  DAT_000063e0 (84 bytes) + DAT_00006434 (84 bytes) verbatim (copy loops
+  21 dwords each). Banked as low-byte sequences ck005:
+  A=4 4 3 4 3 4 3 3 4 3 3 3 4 4 4 3 4 3 2 3 3, B=5 1 1 6 3 2 8 6 4 4 10 2
+  7 8 9 7 3 5 3 7 9. Semantics [unverified]: 21 dwords = race count, but
+  B max 10 too small for gizmo indices (76 exist) — likely per-race
+  default design parameters, NOT a gizmo index list. Docs-only landing
+  (rewrite models launches, not per-ship gizmo loadouts).
+- per-gizmo ship fields: [ship+0xc]=special1,[+0xe]=special2,[+0x1a]=0,
+  [+0x10]=0,[+0x5a]=0; gizmo table idx tracked at &DAT_00018245 stride 2;
+  error if per-design total >20000 (0x4e20) at @0x23b7d.
+- ship speed-ish field: [tmp+0xe0] = 0x168/g (360/g).
+- fleet tally per species short &DAT_00027283 += g; vendor error >499.
+- design name render: sprintf pool 0xb54/0xb68/0xb7c + `DATA\SMSHIP%02d
+  .SHP`(0xb81)/`DATA\DKSHIP%02d.SHP`(0xb90) referrers FUN_00023388 +
+  0x6ba86 (cosmos.cpp) — SM = small/standard, DK = deck/design-keeper
+  model set names; ACE%02d.SHP (0xb5c) zero direct refs (143-class or
+  data-only), do not re-scan blindly.

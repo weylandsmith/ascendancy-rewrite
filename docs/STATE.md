@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-08T06:10
+updated: 2026-10-08T07:50
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -159,7 +159,18 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-(1) OQ-019 design-TOTAL law (cost-hack residue last half per Â§9): decompile around 0x23a83 (writes [designRec+0x46]=EBP; stride-0x1ee design-table chain at 0x23a47) and find where gizmo Industry values are SUMMED for a design and whether any scale/round applies; pin as test. Locate design-record loader (ship.bin via pool-offset scan) for the inventory half. (2) sugar-cube scale CONSTANT: readers of gizmo +0x5e / ship-record +0x2e in draw code (disassembly-level; no .shp codec needed). (3) ledger: gizmo-record cost sub-question CLOSED-by-census Â§9; item stays open for design-total + scale + W1-capture model render.
+(1) OQ-019 design-TOTAL law, CORRECTED target (t17 killed the
+loader hunt: zero design files in the 471-entry name table -> designs
+are runtime-only, stride 0x1ee; summation lives in the design-screen
+compute path, find it via SHIPDESSCREEN owner FUN_0004b068 callees or
+writers of designRec cost fields e.g. [rec+0x42]/[rec+0x44] word pairs
+seen @0x37f28-0x37f4d; pin total formula as test when found). (2) sugar-
+cube scale CONSTANT: readers of gizmo +0x5e / ship-record +0x2e in draw
+code (disassembly-level, no .shp codec needed; DKSHIP/ACE format ref
+0x6ba86 cosmos.cpp banked as call-graph entry point permitted under
+OQ-005 exe-loader route). (3) ledger: cost sub-question CLOSED §9;
+starting-ship law banked §10 docs-only (rewrite has no per-ship gizmo
+model; honest [unverified] template semantics, no code change).
 
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;
