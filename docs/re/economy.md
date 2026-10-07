@@ -99,10 +99,15 @@ whose byte1 == k, returns 0xffff if none): if that slot's u16 flag bit0 is set,
 Governor byte @+0x54 (0xff = none) @0x38df0: value 0x21 -> PROS += IND>>2;
 value 0x22 -> RES += IND>>2; value 0x23 -> c18 += (DAT_000743b9>>16).
 
-Compression @0x38e2d..0x38e89 (both channels, only if accumulator != 0):
-`FILD dword (V+1)` ; `FSTP qword` 0x3FEB333333333333 (=0.85) ; CALL 0x78a90
-(pow: FLD exp, FLD base, CALL 0x78954) ; CALL 0x76e08 (ROUND) ; `FISTP` back.
-i.e. V = round((V+1)^0.85) in double precision. Prosperity then loses upkeep:
+Compression @0x38e2d..0x38e89 (both channels, ONLY if accumulator != 0;
+V==0 skips the block and stores 0): `FILD dword (V+1)` ; `FSTP qword` ; CALL
+0x78a90 = pow (stack args base=V+1 at [ESP'+4], exp=0x3FEB333333333333 at
+[ESP'+0xc], verified by manual ESP walk; callee 0x78954 = MSVC pow core) ;
+CALL 0x76e08 ; `FISTP` back. 0x76e08 is NOT round-half: it sets control word
+high byte to 0x1f -> RC=11 = FRNDINT TOWARD ZERO (@0x76e11). Banked:
+V = trunc((V+1)^0.85) double. Live check: acc1->1, acc2->2, acc3->2
+(trunc 4^0.85 = 2.9970) — all acc>=1 records fit; the earlier
+"round((V+1)^0.85)" draft was WRONG (banker's/round would give acc3->3). Prosperity then loses upkeep:
   PROS -= (i16[rec+0x42] SAR 2)  @0x38e8d (arithmetic shift = floor-div 4),
   floored at 0 @0x38eac. Industry and Research are NOT reduced by +0x42.
 Research is LINEAR (no pow) — no compression block exists on that channel.
