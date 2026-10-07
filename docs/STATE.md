@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-08T01:10
+updated: 2026-10-08T02:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,22 +158,19 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-015 SIXTH leg — closure audit. t13 landed the FIELD MAP (docs/re/
-diplomacy.md §8: DIPVALUES positional load FUN_00044290 -> record offsets,
-proved 3 ways incl. pool-base law P=RAM(soundfx.txt)-0x2a08 verified) and
-UPGRADED decideDipAction to strict thresholds + pin dip_strict_threshold_
-oq015_t13 (94 tests). What §7/§8 do NOT yet cover: third-party/offer
-branches (10/7/9), trade ladder predicates FUN_000465fc/00046428/00046258,
-cadence-divisor provenance [rec+0x1c5 hi], and the mood->attitude pipeline
-vs original (original attitude update site NOT compared). NEXT: decompile
-the three trade predicates (cheap, static; if they need relation-table
-semantics DAT_00012fd6, decode rel enum from banked in-game saves IF the
-chain is heap-anchored — else bank exit 1). Decide at the end of that leg
-whether OQ-015's stated scope ("DA_ template selection order") is met by
-§7+§8 (argument: order + thresholds + firing conditions ARE the selection
-law) -> then CLOSE citing §4-§8 + both pin tests; trade predicates become
-an explicitly-scoped residual note, not a silent stub. If the audit
-finds the ORDER itself still ambiguous, keep open. Then move to OQ-019.
+OQ-019 (star-name label draw) — the last non-capture open RE item.
+Route: static-first, same shape as prior wins. (1) star labels draw in the
+cosmos screen: find the draw path via the cosmos.txt loader chain (file
+already mapped v1? grep docs/re for cosmos label) and the font used (fnt
+module CLOSED OQ-017 — link draw law to it); (2) OQ-019's stated unknown
+(read its ledger line verbatim first!) — then lift exact positions/
+colors/colors-from-palette or the label-placement formula; (3) upgrade
+rewrite ui/cosmos draw site + pin. IF the stated unknown turns out
+closed-at-v1 (t9 precedent), record exit 1 in ONE line and re-audit the
+ledger: after OQ-019 the only remaining entries should be capture-gated
+(OQ-016, OQ-021(c) route), user-decision (OQ-021(a)), blocked (OQ-020),
+and build-work (OQ-023) — state that census explicitly in the commit.
+OQ-015 CLOSED t12-t14 (§4-§9 complete; pins x3; strict upgrade landed).
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;
 exactly {m,y,s,t} confirmed in CODE); queue cap 0x1d @0x363f1; dispatch

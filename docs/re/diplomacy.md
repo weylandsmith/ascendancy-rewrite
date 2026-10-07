@@ -197,3 +197,39 @@ state==1's dual-threshold shape but NOT the cadence/roll/trade machinery.
   (0x19eef, 0x1d71e are [ESP+0x1c0]); record writes go through computed
   pointers (FUN_00044848 family) — relationship-state semantics belong to
   the negotiation-state family (OQ-012(a)), NOT to selection order.
+
+## 9. Trade predicates + cadence REKEY — MEASURED (t14, 2026-10-08)
+Same-shape gates behind the §7 trade rungs; state byte == 3 short-circuits
+PAST all checks (predicate returns true when allied posture). PASS <=> ALL:
+- DA_TradeStarlanes gate FUN_00046258: starlane table 0x16147 stride 0x27
+  (count u16 [0x177d3]), owner byte [+0x20] per-race bits; mine = records
+  with my bit, theirs = with target bit.
+  PASS <=> mine >= 5 (@0x462e2 `CMP EAX,5`; bytes 83 F8 05)
+       AND mine/total <= 0.9  (FCOMP qword pool 0x2432 @0x4630f DC 1D 32 24
+          00 00; JBE pass direction -> FAILS iff ratio EXCEEDS floor)
+       AND mine/theirs <= 2.0 (FCOMP pool 0x243a @0x4632e DC 1D 3A 24 00 00;
+          theirs clamped >=1 first).
+- DA_TradeStars gate FUN_00046428: star table 0x13bc5 stride 0x60 (the
+  OQ-012(a) star table), owner byte [+0x17].
+  PASS <=> mine >= 3 AND mine/total <= 0.9 (pool 0x2442)
+       AND mine/theirs <= 1.6 (pool 0x244a).
+- DA_TradeResearch gate FUN_000465fc: tech table 0x74746 stride 0x4b,
+  owner byte [+0x45].
+  PASS <=> mine >= 5 AND mine/total <= 0.85 (pool 0x2452)
+       AND mine/theirs <= 1.7 (pool 0x245a).
+  Pool doubles read verbatim from banked ck005 RAM at P=0x242088 (§8
+  anchor law). Semantics [inferred]: the AI offers an exchange only when it
+  holds a real stake (min count) without dominating the commodity — a
+  >floor share or a big multiple of the partner's holdings kills the offer.
+- CADENCE REKEY (u32>>0x10 aliasing correction to §7): the "divisor
+  [rec+0x1c5 hi]" IS the u16 at +0x1c7 == NEG_PLAYER_TURNS (§8 map): the
+  block fires iff `turn % NEG_PLAYER_TURNS == 0`
+  (DAT_00012e10 % (dword[0x1c5] >> 0x10) == 0). §8's "packs with adjacent
+  runtime u32; unmapped" note RESOLVED — +0x1c5/0x1c6 are the low half of
+  the dword load.
+- "power hi" in §7 likewise aliases the target's ATTITUDE word:
+  dword[0x1b0 + 2*idx] >> 16 == word[0x1b2 + 2*idx]. RUNGS REKEYED:
+  research rung = BREAK_ALLIANCE + 10 < att (dword[0x1cd]>>16 = word[0x1cf]);
+  stars rung = BREAK_ALLIANCE < att (direct short cmp);
+  starlanes rung = START_ATTITUDE + 20 < att (dword[0x1d3]>>16 =
+  word[0x1d5]).

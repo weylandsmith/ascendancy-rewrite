@@ -205,3 +205,28 @@ TEST(dip_strict_threshold_oq015_t13) {
     st.attitude = 289;
     CHECK(ag::decideDipAction(v, mood, 5, &st) == ag::DipAction::DeclareWar);
 }
+
+TEST(dip_trade_predicate_bytes_oq015_t14) {
+    // MEASURED §9 pins from the restored image: each trade gate ends in
+    // FCOMP qword pool-const; min-count cmp bytes; state==3 skip.
+    namespace fs = std::filesystem;
+    const std::string imgp = std::string(ASCENDANCY_SOURCE_DIR) + "/work/ascend_restored.bin";
+    if (!fs::exists(imgp)) { std::printf("(skip: work/ absent) "); return; }
+    std::FILE* f = std::fopen(imgp.c_str(), "rb");
+    if (!f) { CHECK(false); return; }
+    auto at = [&](size_t a, std::initializer_list<int> want) {
+        unsigned char b[8] = {};
+        std::fseek(f, static_cast<long>(a), SEEK_SET);
+        size_t n = std::fread(b, 1, want.size(), f);
+        CHECK(n == want.size());
+        size_t i = 0;
+        for (int w : want) CHECK(b[i++] == static_cast<unsigned char>(w));
+    };
+    at(0x462e2, {0x83, 0xf8, 0x05});               // starlanes: CMP EAX,5
+    // FCOMP pool consts: first stays RAW (0x2432) -- imm-fixups apply only
+    // SOME imms (the 143-class); second is FIXED UP 0x243a+0x82BB0=0x804fea.
+    at(0x4630f, {0xdc, 0x1d, 0x32, 0x24});         // pool 0x2432 (0.9) raw
+    at(0x4632e, {0xdc, 0x1d, 0xea, 0x4f, 0x08, 0x00}); // pool 0x243a (2.0) fixed
+    at(0x46262, {0x80, 0xbc, 0x03, 0xc0, 0x01, 0x00, 0x00, 0x03}); // state==3 skip
+    std::fclose(f);
+}

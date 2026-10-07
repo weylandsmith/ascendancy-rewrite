@@ -48,6 +48,13 @@ it — playMusic() loads theme00.raw directly == observed vendor state
 (rewrite/src/ui/audio.cpp, comment cites §3.4). SPAN LAW byproduct CLOSED
 (docs/re/datafiles.md §5: key/val overrides DAT_00010a74/0x10b82 count
 [DAT_00010b96]=3, 3/3 exact disk sizes, cross-archive negatives repaired).
+OQ-023 | dip | rewrite AI emits only the two-party threshold branch; original
+additionally sends TRADE (DA 4/5/6) on turn%NEG_PLAYER_TURNS cadence behind
+ownership share/multiple gates and THIRD-PARTY messages (DA 7/7? no: 10, 7,
+9) under roll<80 — law MEASURED §9 (t14), engine NOT built (needs star/
+lane/tech ownership tables in rewrite + UI affordance for incoming trade
+offers). | open | W-B (option C hybrid): build only when ownership model
+lands; no RE unknowns remain for this item.
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
 (static route exhausted: 7 negative probes — string table is runtime-loaded,
@@ -131,16 +138,20 @@ deleted), buildPhase gate+surface-cap, attack/defense/drive/bestDriveRange
 upgraded; 3 pin tests (89 tests 0 fail); gate green incl. seed-2024 Control
 t145. Per-cell planet model NOT in rewrite — terrain/nuke laws documented,
 wiring parked (STATE.md).
-OQ-015 | dip | DA_ template selection order (%token table CLOSED 2026-10-06g:
-exhaustive regex over 22/22 .dip files yields exactly %m %y %s %t — no other
-tokens exist) | open | W4: chooser LAW measured t12 (docs/re/diplomacy.md
-§7 FUN_00044a44 return==ACTIONS pool idx, cadence+roll+third-party+trade
-ladder; pin test dip_action_chooser_law_oq015_t12) + renderer/queue/
-dispatch laws t11 (§4–§6 stride 128, %m%y%s%t CODE-confirmed) + FIELD MAP
-t13 (§8 DIPVALUES positional loader FUN_00044290, pool-base law verified;
-decideDipAction upgraded to STRICT thresholds, pin dip_strict_threshold_
-oq015_t13, 94 tests); sixth leg = closure audit per STATE (trade
-predicates scoped; no silent stubs).
+OQ-015 | dip | DA_ template selection order | CLOSED 2026-10-08 (t12-t14):
+full chain MEASURED — chooser FUN_00044a44 return == ACTIONS pool idx (file
+order, docs/re/diplomacy.md §7); DIPVALUES field map via positional loader
+FUN_00044290 (§8, pool-base law verified); trade gates + cadence REKEY (§9:
+turn % NEG_PLAYER_TURNS == 0; rungs BREAK_ALLIANCE+10 / BREAK_ALLIANCE /
+START_ATTITUDE+20 vs attitude; share/multiple floors 0.9/2.0, 0.9/1.6,
+0.85/1.7; min counts 5/3/5; state==3 auto-pass); %token sources CODE-
+confirmed (§5). Code sites: rewrite/src/game/diplomacy.cpp decideDipAction
+upgraded to STRICT thresholds (t13) + §9 scope comment (t14). Pins:
+dip_action_chooser_law_oq015_t12, dip_strict_threshold_oq015_t13,
+dip_trade_predicate_bytes_oq015_t14 (95 tests 0 fail). %token table CLOSED
+2026-10-06g (regex census 22/22 files: exactly %m %y %s %t). Trade/third-
+party offer ENGINE wiring in rewrite = build work with law in hand ->
+OQ-023 (not an RE unknown).
 OQ-016 | loop | campaign per-turn constants: income formula, pop growth
 curve/cap, starting items, build order, expansion cadence, home placement
 (all currently documented defaults in campaign.cpp) | open | W2: controlled

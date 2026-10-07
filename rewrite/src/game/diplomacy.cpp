@@ -209,6 +209,13 @@ DipAction decideDipAction(const DipValues& v, const AttitudeModel& mood,
     // are STRICT: declare-war iff att < DECLARE_WAR; propose-alliance iff
     // PROPOSE_ALLIANCE < att; break-alliance iff att < BREAK_ALLIANCE;
     // offer-peace iff PROPOSE_PEACE < att.
+    // §9 (t14): the original ALSO emits trade messages (DA idx 4/5/6) on a
+    // turn % NEG_PLAYER_TURNS cadence behind share/multiple floors
+    // (0.9/2.0, 0.9/1.6, 0.85/1.7; min counts 5/3/5) and third-party
+    // messages (10/7/9, roll<80). The rewrite's dialogue AI has no
+    // trade/third-party offer engine — §9 preserves the measured law for
+    // future wiring; decideDipAction stays the threshold-exact two-party
+    // main-branch model (scope decision, not a silent stub).
     double m = mood.mood(turn);
     int att = st->attitude + static_cast<int>(m);
     // NEG_PLAYER_TURNS: a negative excursion sticks (drags the baseline
