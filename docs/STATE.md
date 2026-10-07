@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-07T06:40
+updated: 2026-10-07T08:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -158,27 +158,25 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-018 SCALAR PROVENANCE (consumers task DONE this turn). Decompiled
-FUN_0004ff34 confirms the loader law [verified, docs/re/audio.md §3.2]:
-3 header lines, per-group stride-4 arrays START obj+0xc50+4i / END +0xc5c+4i
-/ THRESHOLD +0xc44+4i = col2 (ADD ECX,0x4 @0x4ff60 — per-group, NOT
-last-wins; mid-turn note corrected); col1 = slot counts, Σ==6 enforced;
-ascending-col2 gate else vendor line 839 (str 0x2a1a); Σ(n*col2)=215000
-sizes the sample buffer and seeds per-slot cursor bases; slot init stamps
-u16 0x5622 (=22050, OQ-006 cross-ref) at slot+0x12. Play path
-FUN_000500e0 (callers 0x17488, 0x1749b, 0x4fb59): scalar = FUN_000209d8()
-(image globals: table DAT_000102a4[idx] - DAT_000102a0[idx], override scan
-DAT_00010a74 stride4 vs DAT_00010b82 stride2 while DAT_00010b96>0), then
-group = first i with scalar <= c44[4i]; all-three-below -> vendor error.
-TASK: disp32-write scan (C7 05 / C7 8? patterns) over
-work/ascend_restored.bin for writers of 0x102a0/0x102a4/0x10a74/0x10b82/
-0x10b96, then disassemble writer(s) to NAME the quantity (candidates:
-elapsed-ms, sample-length, frame count). That names what 10000/45000/65000
-DO. THEN remaining OQ-018 residues: VOC u16@25=0x0911 and race->theme map
-(theme00.raw imm ref @0x210f3 is in a setup/credit block — find its owner).
-DONE THIS TURN: OQ-006 CLOSED (22050 chain; audio.md §3.1; pin test
-audio_open_rate_measured_oq006; 90 tests 0 fail; committed e391fc2) +
-OQ-018 law banked (audio.md §3.2).
+OQ-018 TICK UNIT (scalar provenance DONE this turn; audio.md §3.2 gained
+SCALAR PROVENANCE + BYTE-CAP REFUTED + TICK SOURCE PARTIAL blocks). Chain
+now [verified]: FUN_000209d8 = timerSlotSpan(obj+0x108) via tables
+DAT_000102a4[idx]-DAT_000102a0[idx]; sibling FUN_00020a50 =
+tickget(FUN_000779e6 -> FUN_0007b1ad) - DAT_000102a0[idx] (SUB @0x20a6e);
+FUN_0007b1ad returns [DAT_0x9868+id*4] (0x7b1fb), 0 if id>=[DAT_0x9814],
+PIT-port latch logic for ids<=5 (bit 0x40 at slot+1, helper 0x78db0).
+TASK: find the tick incrementer — Ghidra get_xrefs_to DAT_0x9868 and
+DAT_0x9814 (init + ISR paths; expect INT 08 chain or a task-loop tick
+pump; scan restored image for `int 0x8` (cd 08) and C7/C7-05 writes to
+0x9814), then disassemble to NAME the unit (DOS ticks 54.925ms vs 1ms vs
+game-frame). Unit completes the meaning of bands 10000/45000/65000
+(eviction-band duration limits). Then OQ-018 residues: VOC u16@25=0x0911
+(scan VOC-parse offset reads in the sample loader 0x4f650-region) and
+race->theme map (owner of 0x210f3 block). Measured census banked:
+77/86 soundfx .voc resolve in extracted/ascend01/data; max laser01=45277;
+ZERO files >65000 (byte-cap reading refuted; laser01 is group-1 by index).
+DONE EARLIER THIS SESSION: OQ-006 CLOSED (22050 chain, e391fc2); OQ-018
+loader+play-path law banked (986b689).
 Prior context: OQ-020 BLOCKED; OQ-016 capture-gated (idle ck ladder);
 OQ-012(a) setup-word candidate @EBP+0x223 area (audio-off check -1 seen at
 0x4f669 — setup block is the same screen).

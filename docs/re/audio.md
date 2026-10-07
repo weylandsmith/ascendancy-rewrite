@@ -147,3 +147,31 @@ Loader FUN_0004ff34 (unique referrer of `soundfx.txt` string, imm 0x2a08 @0x4ff4
   playback threshold. VOC u16@25=0x0911 and race->theme mapping also open:
   music.txt lists 29 entries (theme00..04, victory, intro00/01, race00..19
   .raw; pool imm refs 0x2a66 `data\%s.voc`, theme00.raw ref @0x210f3).
+- SCALAR PROVENANCE (2026-10-07 turn 2, xrefs via Ghidra get_xrefs_to):
+  DAT_000102a0/0x102a4 are indexed by obj+0x108 — a TICK-TIMER SLOT field:
+  sibling FUN_00020a50 computes tickget(FUN_000779e6->0x7b1ad) -
+  [idx*4+0x102a0] (0x20a6e `SUB EBX,[ECX*4+0x102a0]`), FUN_00020a7c starts
+  timers, FUN_00020ad0 is a wait-until-expired loop (PUSH 5 tick sleep
+  @0x20af0). FUN_000209d8 = table 0x102a4[idx] - 0x102a0[idx] (slot span),
+  with override scan 0x10a74/0x10b82 while [0x10b96]>0. So the play path
+  buckets by a TICK DELTA, not a byte length.
+- BYTE-CAP HYPOTHESIS REFUTED (measured census, extracted/ascend01/data):
+  77/86 soundfx entries resolve to .voc files; ZERO exceed 65000; max is
+  laser01 = 45277 bytes — but laser01 is entry index 2, i.e. GROUP 1
+  (indices 2..4, col2 45000), so a per-sound col2 byte-cap is violated by
+  277 bytes. Group membership is by INDEX (col1 cumulative), col2's role in
+  the play path is the eviction-band tick threshold (first c44[i] >= scalar;
+  all-below -> vendor error). Buffer geometry per loader tail: per-group
+  region n_i*col2_i, slot cursor bases cumulative.
+- STATUS: col1 = voices-per-index-band [verified]; col2 = ascending tick
+  threshold + alloc contribution [verified]; scalar physical unit [open —
+  next step: disassemble FUN_0007b1ad (tick source; DOS 18.2Hz vs ms) —
+  10000 ticks @18.2Hz = 549 s is implausible for per-sound play, ms would
+  give 10 s plausible bands 10/45/65 s]. VOC u16@25 and race->theme open.
+- TICK SOURCE PARTIAL (same turn): FUN_0007b1ad reads software timer slot
+  `[DAT_0x9868 + id*4]` (0x7b1fb), returns 0 when id >= [DAT_0x9814]
+  (slot-count global, unsigned JC), and for ids <= 5 pokes hardware PIT
+  port bytes ([0x9868]+id*4+1 bit 0x40 latch check, helper 0x78db0) — so
+  slots 0..5 shadow the DOS tick counter, higher slots are software-
+  incremented. Unit of the incrementer = the LAST unknown for the
+  10000/45000/65000 bands (find writers of [0x9868] slots / the ISR chain).

@@ -129,11 +129,13 @@ hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | W3: ship design screen code + its data reads (live image).
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping | open
-(partial 2026-10-07: loader FUN_0004ff34 law + play path FUN_000500e0
-decoded — col1 = slot count (Σ=6 enforced), col2 = per-group threshold
-[obj+0xc44+4i] AND n*col2 buffer size (Σ=215000), ascending-else-error line
-839, slot rate stamp u16 0x5622; docs/re/audio.md §3.2; REMAINING: meaning
-of the FUN_000209d8 scalar vs thresholds + VOC u16@25 + race->theme map).
+(partial 2026-10-07: loader FUN_0004ff34 + play path FUN_000500e0 law
+[verified] — col1 = voices-per-index-band (Σ=6), col2 = ascending
+tick-threshold + n*col2 alloc (Σ=215000), scalar = timer-slot span
+(DAT_000102a4-0x102a0 indexed obj+0x108; tickget 0x7b1ad PIT-shadow slots,
+docs/re/audio.md §3.2; byte-cap reading REFUTED by file census: max sample
+laser01=45277, zero >65000, 77/86 resolve in ascend01). REMAINING: tick
+unit (incrementer of [DAT_0x9868] slots), VOC u16@25, race->theme map).
 
 --- closed during v1 (kept here as a one-line index; evidence in archive and
 docs/re/): OQ-001 .cob offsets | OQ-002 FLIC codec | OQ-007 CP437 |
