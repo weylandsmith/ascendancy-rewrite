@@ -32,6 +32,27 @@ FUN_00040ec0) before an end-turn, and observe whether end-ctrl fires; a
 second run at 60% discriminates >1/2 from >=2/3. Item STAYS OPEN per strict-
 close policy; other workstreams unaffected.
 
+### OQ-020 — ability charge days (static route EXHAUSTED 2026-10-07; default in force: 30 turns)
+Seven static probes, all negative: (1) `%d day`/`amass`/`SA_*` count ZERO in
+the image and in ascend00 .cob/.bin tables — the help text reaches RAM as a
+runtime-loaded string table (phys 0x252f50..; entry array at phys 0x252ba8,
+u32-per-entry, ~0x330 entries), so no static string xref exists; (2) pointer
+scan of the r1deep capture for u32 == phys of a `%d day` string hit only two
+HEAP sites (0x252cc8/0x252d8c = the string table itself), no code/global
+holder; (3) no 21-entry or 14-entry all-(0,200] static table in image data
+except a triangular 1..10 ramp at 0x88f90 (economy-shaped, not charge);
+(4) race .dip DIPVALUES carry no charge parameter (15 params verified,
+diplomacy/bio only); (5) the stride-494 per-race table at DAT TB=0x12fb3 is
+pointer/text data, NOT the dip param block; (6) the one dip-params copy found
+(phys 0x255067, race00 6-u16 anchor 290,360,450,510,600,750 — byte-exact) is
+a single unpaced heap buffer, race01 absent within +-64 KB, no stride law;
+(7) the help blocks around all 14 `%d day` lines contain no other numeric
+token (template + `pos 10 160` only). REMAINING ROUTES: obj1 call-edge
+recovery of the help-formatter argument (same class as OQ-015/OQ-021) or a
+controlled-mutation capture (activate an ability, read the countdown field
+over end-turns). DEFAULT IN FORCE: 30 turns (abilities.md §Charge; no
+rewrite upgrade). Item STAYS OPEN per strict-close policy.
+
 ## R1 runbook (mandatory safety invariants — a run without them is a bug, not research)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base; never hard-code
 B). Deep capture: scripts/r1_deepcapture.sh. Invariants (enforced statically

@@ -158,22 +158,19 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
-OQ-020 ABILITY CHARGE DAYS via the static constant route (offline; Ghidra +
-banked RAM; zero capture cost). The vendor help text says "%d day%s" with no
-data file (docs/OPEN-QUESTIONS.md OQ-020; help.txt region L1829 et al.). The
-06r/06s census gives help.txt 11 referrers (0x1bee3...). Route: in the
-restored image, find which help-string referrer feeds a number formatter —
-grep the SA_ ability strings (the 14 charged abilities are named in
-docs/re/abilities.md §2) to the presenting function, then read the charge
-value it prints. Candidate anchor: campaign.cpp charge_ resets to a constant;
-the original's per-ability charge is read from wherever that formatter reads.
-Cross-check: live RAM charge counters for an owned ability across two captures
-one turn apart (planet-module knowledge from OQ-014: system-object slot flags;
-ability charge likely a per-race global — census u32 candidates near the
-race-table base 0x12fb3, stride 0x1ee, using the B+0x82BB0+X index). If the
-constant lifts cleanly: upgrade abilityChargeTurns() in the rewrite + pin a
-test. Negative rule: if two unreadable decompiles, ONE line in
-REFUTED-ROUTES/STATE and move NEXT ACTION (no spiral).
+OQ-016 PER-TURN CONSTANTS via idle-empire channel diffs on banked captures
+(offline, zero capture cost). r1ad-20261006-144225/ck holds turns 0->1->2
+(ck005 t0, ck014 t1, ck018 t2; turn counter verified at guest-phys 0x254e10,
+stride 0x110 between captures — re-verify per-run via r1_sav_scan). Steps:
+locate the per-empire state table (credits, IND/RES/PROS totals, pop) the way
+OQ-014 found the item table — anchor on values derivable from planitem/gizmos
+laws or cross-capture stability, verify stride across all present empires,
+then read each channel across the three turns to MEASURE income formula, pop
+growth, and treasury cadence. Negative results to avoid re-trying: the
+stride-494 (0x1ee) table at DAT 0x12fb3 is pointer/text, NOT dip params
+(BLOCKED.md OQ-020 note (5)); race00 dip-params heap copy at phys 0x255067
+is unpaced, no stride law (note (6)). OQ-020 itself BLOCKED 2026-10-07
+(static route exhausted, 7 probes; default 30 turns in force).
 
 ## KNOWN-ISSUES / PARKING LOT (operational; research negatives live in
 ## docs/REFUTED-ROUTES.md)

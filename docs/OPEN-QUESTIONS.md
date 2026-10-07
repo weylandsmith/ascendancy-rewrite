@@ -32,9 +32,11 @@ constant/comparison near the victory check in code (ghp5 functions_full.tsv,
 gsystem attribution). A RAM measurement of a live galaxy at the trigger
 boundary corroborates.
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
-"%d day%s", no data file) — current default 30 turns | open | W2: locate the
-formatting/argument site in code (help text lives in help.txt L1829 et al.;
-the value is a runtime constant).
+"%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
+(static route exhausted: 7 negative probes — string table is runtime-loaded,
+no image/cob presence, no static table, .dip has no charge param; docs/
+BLOCKED.md) | remaining: obj1 call-edge of the help formatter, or
+controlled-mutation capture; default 30 turns stays in force.
 OQ-005 | shp | .shp pixel codec (container CLOSED 208/208) | open | W3 ONLY:
 exe shape loader via call graph + live image. Blind static sweeps are
 FORBIDDEN (docs/REFUTED-ROUTES.md R2). Map currently draws documented
