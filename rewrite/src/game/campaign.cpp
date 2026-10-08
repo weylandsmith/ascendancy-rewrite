@@ -38,12 +38,16 @@ const BuildStep kBuildOrder[] = {{"Factory", 2}, {"Laboratory", 1},
 // value.
 constexpr double kColonyIncomeGrant = 1.0;
 
+}  // namespace
+
 double colonyChannel(int acc, bool firstDoubleActive, bool compress) {
     if (acc == 0) return kColonyIncomeGrant;  // grant survives recalc JZ-skip
     int v = acc + (firstDoubleActive ? acc >> 1 : 0);
     if (!compress) return static_cast<double>(v);
     return std::floor(std::pow(static_cast<double>(v + 1), 0.85));
 }
+
+namespace {
 
 // Planet SIZE classes map onto grid-C surface-cell counts {7,11,23,45,73};
 // the rewrite's mapgen does not yet assign per-star size classes (parking

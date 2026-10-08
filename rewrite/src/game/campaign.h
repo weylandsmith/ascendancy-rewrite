@@ -63,6 +63,11 @@ struct CampaignConfig {
     int playerSpecies = -1;
 };
 
+// Colony income channel stored value (MEASURED law, docs/re/income-law.md
+// S6/t18b + t19; battery scripts/r1_income_channels.py). Exposed for the
+// pinning test; semantics documented at campaign.cpp definition.
+double colonyChannel(int acc, bool firstDoubleActive, bool compress);
+
 class Campaign {
 public:
     // All tables must be loaded and well-formed; errOut on failure. Home

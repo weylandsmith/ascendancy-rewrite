@@ -91,6 +91,32 @@ TEST(campaign_total_owned_grows) {
     CHECK(totalPrev > 7);
 }
 
+TEST(campaign_channel_law_oq016) {
+    // MEASURED stored-channel law (docs/re/income-law.md S6/t18b compression
+    // + t19 grant; battery scripts/r1_income_channels.py IND 138/139,
+    // RES 136/139): acc==0 -> scenario grant 1 (colonization FUN_00025d30
+    // +1 both home records); IND = trunc((dbl(acc,f12)+1)^0.85)
+    // (0x38e2d FILD/pow/FISTP chain, RET 0x76e08 = trunc; t18b); RES is the
+    // raw accumulator (never compressed). dbl = v + (v>>1) when the FIRST
+    // slot is Hyperpower(IND,12)/Internet(RES,14) (FUN_0003958c +
+    // bit-tests 0x38d4b/0x38db5). Values from the battery curve:
+    //   v      1  2   3    4    5    6    7
+    //   v^.85  1  2  3.25 3.93 4.61 5.23 5.83   (truncated)
+    CHECK(ag::colonyChannel(0, false, true) == 1.0);  // grant, not pow(1)
+    CHECK(ag::colonyChannel(1, false, true) == 1.0);  // (2)^.85 = 1.80 -> 1
+    CHECK(ag::colonyChannel(2, false, true) == 2.0);  // (3)^.85 = 2.50 -> 2
+    CHECK(ag::colonyChannel(3, false, true) == 3.0);  // (4)^.85 = 3.25 -> 3
+    CHECK(ag::colonyChannel(4, false, true) == 3.0);  // (5)^.85 = 3.93 -> 3
+    CHECK(ag::colonyChannel(2, true, true) == 3.0);   // dbl v=3 -> (4)^.85
+    CHECK(ag::colonyChannel(4, true, true) == 5.0);   // dbl v=6 -> (7)^.85
+    // RES channel: accumulator + Internet doubling shift (v += v>>1, the
+    // same 0x38db5 site), never compressed.
+    CHECK(ag::colonyChannel(0, true, false) == 1.0);   // grant
+    CHECK(ag::colonyChannel(3, false, false) == 3.0);
+    CHECK(ag::colonyChannel(3, true, false) == 4.0);   // 3 + 3>>1
+    CHECK(ag::colonyChannel(9, true, false) == 13.0);  // 9 + 9>>1
+}
+
 TEST(campaign_research_progresses) {
     auto c = makeCampaign(3);
     for (int t = 0; t < 40 && !c.over(); ++t) c.advance();

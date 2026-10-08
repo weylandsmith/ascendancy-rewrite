@@ -159,25 +159,21 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-(1) OQ-016 REWRITE-TEST PIN for the new income law (t21 upgrade landed
-campaign.cpp colonyChannel: acc==0->grant 1 else trunc((dbl(acc,f)+1)^.85)
-IND / linear RES; unit tests green but NO test pins the channel law yet —
-add test_campaign.cpp case per income-law.md battery rows (acc 0->1,
-1->1, 2->2, 3->2, dbl 2->2 trunc(4^.85), dbl 4-> trunc(7^.85)=5) citing
-S6/t18b+t19. (2) OQ-016 GROWTH HALF residue (income-law.md S6b): locate
-POP storage + explain accumulation-36 wrap (r1deep-20261005-230146
-41->42.sav planet 0x26e0ba); whole-image diff on a threshold-hit
-transition; THEN pop-model upgrade replaces campaign.cpp logistic.
-(3) RESTORE availability law S4 (economy.h cites it; probe-destroyed
+(1) OQ-016 GROWTH HALF residue (income-law.md S6b): locate POP storage +
+explain accumulation-36 wrap (r1deep-20261005-230146 41->42.sav planet
+0x26e0ba counter 54->18, upkeep 1->2 = threshold hit, so accumulated
+PROS-since-last-growth = 36+ while one stored-PROS-per-turn predicts
+~2-3); whole-image byte diff across the 41->42 transition first; THEN
+pop-model upgrade replaces campaign.cpp logistic default.
+(2) RESTORE availability law S4 (economy.h cites it; probe-destroyed
 pre-t20) into income-law.md from FUN_0003830c re-verify +
 rewrite/tests/test_economy.cpp law text.
 
-T21 LANDED: OQ-019 design-TOTAL CLOSED-BY-CENSUS (ships.md S9 rewrite:
-three sweeps incl. full 370-insn FUN_0004ae24 dump = pure (de)serializer,
-pointer-reloc switch 0x13bc5/0x16147/0x2b057; no summation exists;
-rewrite matches); income UPGRADE shipped colonyChannel (gate green,
-ctest 1/1); OQ-019 ledger note pending (per-ship inventory + sugar-cube
-+ Orbital Docks legs remain, ships.md).
+T22 LANDED: channel-law test PIN (test_campaign.cpp
+campaign_channel_law_oq016, 11 checks; colonyChannel lifted to campaign.h
+free fn for testability; RES dbl-shift caught BY the pin — 3->4, 9->13,
+doubling 0x38db5 is per-RES-accumulator not IND-only, matches t18);
+ctest 100%, gate ALL CHECKS PASS.
 
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;
