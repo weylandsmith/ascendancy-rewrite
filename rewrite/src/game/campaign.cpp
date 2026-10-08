@@ -303,10 +303,18 @@ void Campaign::incomeAndGrow() {
 void Campaign::buildPhase() {
     // One item per owned star per turn if industry covers it (policy
     // [inferred]); order kBuildOrder until quotas, then cheapest Agriplot.
+    // CADENCE SHAPE MEASURED (income-law.md §7, FUN_00038840 cmd 0): the
+    // original places items ACTIVE IMMEDIATELY (word+2 := 1) and runs the
+    // recalc in every exit path — no build timer exists; legality is
+    // gated by free pop, UPOP(new) <= pop - SUM UPOP(active items)
+    // (+0x42 - +0x4c verbatim), so cadence is budget/pop-limited exactly
+    // as modelled here.
     for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
         int o = owner_[s];
         if (o < 0 || ind_[o] <= 0) continue;
         PlanetState& ps = planets_[s];
+        int usedPop = 0;  // +0x4c analogue: sum of UPOP of placed items
+        for (int it : ps.items) usedPop += (*items_)[it].upop;
         for (const BuildStep& step : kBuildOrder) {
             int have = 0;
             for (int it : ps.items)
@@ -315,6 +323,7 @@ void Campaign::buildPhase() {
             int id = itemId(step.name);
             if (id < 0) continue;
             const PlanetItem& pi = (*items_)[id];
+            if (pi.upop > ps.pop - usedPop) continue;  // §7 free-pop gate
             // OQ-014 CLOSED (income-law.md §4): gate == req==255 || (req<count &&
             // owned). 254 (Interstellar Trucking) is NEITHER -> permanently
             // unavailable in the original; the old requiresValidTech-based

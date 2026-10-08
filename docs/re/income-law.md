@@ -382,3 +382,45 @@ Rewrite mapping ALIVE in code today: economy.h requiresAvailable() ==
 gate 2 verbatim; buildPhase gate+surface-cap == XOR law; MPOP gates
 demolition, UPOP gates start (0x38840 caller). Citations repointed here
 from the destroyed economy.md §4.
+
+## 7. Planet build-command law FUN_00038840 (t26, decompile banked)
+
+__regparm3(planetRec, cellIdx, cmd) with item index passed implicitly in
+BL (caller-side load; decompiler shows unaff_BL). cmd values:
+
+ 0 = ADD/BUY item into cell. Gates (all [verified verbatim]):
+    slot byte1 == 0xFF (empty) AND BL < 39 AND
+    UPOP(BL) <= u16(+0x42) pop - u16(+0x4c) used-pop AND
+    surface/orbital XOR: (itemIdx < PTR_DAT_00073e3c==22) ==
+      (cellIdx >= terrainCells u16+0x18).
+    On accept: slot byte1 = item, word+2 = 1 — ACTIVE IMMEDIATELY, then
+    FUN_00038ba4 recalc is called in every exit path (LAB_00038b92 and
+    each branch). No timer, no progress counter anywhere in the handler:
+    build cadence = resource-budget-limited, not time-limited
+    [inferred from handler shape + recalc-per-write; a buy-click run
+    would upgrade this to measured].
+ 1 = DEMOLISH cell. Allowed iff slot occupied AND
+    ( MPOP(slot item) <= u16(+0x4a) cap - u16(+0x42) pop
+      OR slot word+2 bit0 == 0 (inactive) )   [verified verbatim].
+    Effect: byte1=0xFF, word+2=0; if cell was the +0x52 selected cell,
+    +0x52 := 0xFFFF and +0x54 := 0xFF; recalc.
+ 3 = SELECT/SET special ability: +0x52 := cell (when item FLAG bit2
+    clear), +0x54 := item idx (so +0x54 is the SELECTED-ABILITY field —
+    the S6 "governor" naming is retired; recalc values 0x21/0x22/0x23 =
+    items 33/34/35 Endless Party / Scientist Takeover / Automation).
+ 2 = swap selection: same path as 3 after re-running FUN_0003830c
+    legality (skip when item FLAG bit2 set); if previous +0x52 slot held
+    item 23 (Ship): FUN_000396cc + FUN_00049d2c (ship-order cancel),
+    then if old +0x52 slot inactive its byte1 is cleared to 0xFF.
+ >3 = error: recalc, return 0.
+
+ Slot FIELD MAP UPGRADED [verified verbatim]: for FLAG bit2/4 items
+ (specials): byte3 = 0 AND word+2 |= (FUN_00039b6c result << 8) — so
+ WORD+2 UPPER BYTE = ability charge/ammo count (FUN_00039b6c supplies
+ initial count). word+2 bit0 = active flag (queue writes 1). A writer
+ that CLEARS bit0 (pop-overflow deactivation?) is NOT yet located —
+ queued census `and 0xfe` / `mov word[..],0` on slot arrays.
+ COST (u16 item+8) is NOT deducted in this handler: deduction site is
+ the resource-budget path, still open (image-wide read census of the
+ item-table +8 offset finds only the stride-8 growth-cap table at
+ 0x73e48 — COST must be read via base+stride forms).

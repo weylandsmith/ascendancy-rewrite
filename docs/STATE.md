@@ -178,9 +178,22 @@ surface/orbital for idx<31, cell-bit3 -> idx38 Xeno-dig-only, idx36
 empty-slot, idx35 automation rule, idx23 Ship -> FUN_00039a9c on PASSED
 gate, unowned planet accepts only idx5 Colony Base); economy.h
 citations repointed, ctest green.
-NEXT: BUY-CLICK RUN geometry (windows.txt planet window), then
-OQ-012 mapgen seed law (supplies +0x4a caps + terrain grids).
-(2) RESTORE availability law S4 into income-law.md (economy.h cites it).
+(2) DONE t26: BUILD-COMMAND LAW CLOSED-STATIC (income-law.md S7,
+FUN_00038840 decompile): cmd 0 buy -> gates (empty cell, UPOP <=
+pop-used, surface/orbital XOR), slot byte1=item word+2=1 ACTIVE
+IMMEDIATELY, recalc every exit path => NO build timer exists; cadence =
+budget/pop-limited (buy-click run downgraded to optional confirmation).
+cmd 1 demolish gate MPOP <= cap-pop OR inactive, cmd 2/3 SELECT ability:
++0x52=cell +0x54=item => +0x54 is SELECTED-ABILITY (33/34/35 = the S6
+"governor" 0x21/0x22/0x23 values — naming retired), word+2 HIGH BYTE =
+ability charge count (FUN_00039b6c). Rewrite buildPhase gained the
+measured free-pop gate (UPOP sum vs pop) + cadence comment; ctest 100%.
+OPEN sub-residues banked S7: COST deduction site not in handler (image
+census of item+8 showed only stride-8 growth table; COST read via
+base+stride form — census `*0x*28*+8` readers next); slot bit0-CLEARER
+(inactivate path) census next.
+NEXT: (a) those two censuses; (b) OQ-012 mapgen seed law (+0x4a caps,
+terrain grids).
 
 T24b LANDED: pop-cap(+0x4a) source pinned to WORLD-GEN seed + verbatim
 build-struct copy (FUN_0003a558 @0x3a631.. disasm) — cross-run census
