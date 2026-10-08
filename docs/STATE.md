@@ -159,6 +159,11 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+NOTE t27d: goal-gate command is mis-composed harness-side (slash-commands
+appended to the shell string -> exit 2 after ALL CHECKS PASS). Gate truth
+= `bash scripts/gate.sh` exit 0 (verified 3x). docs/BLOCKED.md. LOOP
+PAUSED per /steer; resume below on next go.
+
 (1) AI BUILD-QUEUE FULL LAW (income-law.md S8 banked t27): the +0x50
 industry accumulator pays COST(item at +0x52, Ship=design cost x3) per
 turn; live-verified +IND/turn on all chase-capture planets. Open piece:

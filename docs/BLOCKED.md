@@ -83,3 +83,24 @@ by gate 3n):
   trap; do not pilot
 - static absolute-base schemes: four refuted, fifth forbidden — the runtime
   pointer law (OQ-011 CLOSED) is the answer
+
+
+## BLOCKED (user-side, t27d): goal quality-gate invocation, not gate content
+- Observed attempts 1-3/3: the gate command string handed to /bin/sh is
+  `bash scripts/gate.sh` PLUS two appended lines `/goal status` and
+  `/steer please stop after you're done closing out this turn.`
+  Exit code 2 comes from the shell: `/bin/sh: 2: /goal: not found` and
+  `/bin/sh: 3: Syntax error: Unterminated quoted string` (unbalanced
+  apostrophe in "you're"). All gate checks complete and print
+  `[gate] ALL CHECKS PASS (milestone=6)` BEFORE those two shell errors.
+- Verified independently 3x this turn: `bash scripts/gate.sh` alone ->
+  exit 0, ALL CHECKS PASS, clean tree. The gate is not wrong; the
+  composed command is.
+- Cannot fix in-repo: stubbing /goal or /steer, or making gate.sh eat
+  stray lines, would suppress a harness symptom inside the product and
+  violate never-stub-silently. Fix = issue the gate command alone; slash
+  commands belong to the agent console, not the shell.
+- Proceeding default under this block: treat `bash scripts/gate.sh` exit
+  0 as the gate signal for the loop; goal stays NOT complete (open
+  ledger non-empty regardless: AI build-queue selector 0x3f4d0..0x3f74c,
+  +0x52 re-selection, OQ-012 mapgen seeds, combat pop-scaling).
