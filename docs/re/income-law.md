@@ -193,3 +193,33 @@ clamp to cap, reset counter. The +0x50 IND-side gate stays open ONLY for
 the UPOP-unit pop storage question; pop is NOT in the planet record
 (bytes 0x00-0x7a verified) -- next probe: star-record stride-0x1ee table
 DAT_00012e10/0x12dda UPOP candidates.
+
+## 6d. Pop storage: static routes exhausted; decisive probe = R1 threshold chase (t24)
+
+NEGATIVES [verified this turn]: (a) no FPU opcode (D8-DF) anywhere in the
+image touches [reg+disp8=0x67] or disp32=0x67 — zero raw-census hits;
+(b) stride-96 star records never hold a planet pointer (target-scan m41
+and m42); (c) player stride-0x1ee block (S+0x12dda, base law re-verified
+via threshold constant S+0x66e4=0x32) changed only bytes +0x36/+0x1da
+(0x09->0x02, AI-state shaped) across 41->42 — no float moved; (d) 'PLPOP'
+occurs in the image only as the window-table name byte @0x84b4b
+(windows.txt:1587 TYPE 29 custom-draw widget) — not a data field name.
+
+CENSUS [verified]: max +0x4e EVER captured across ALL 32 r1*/runs = **18**
+(r1deep-20261005-230146 41.sav) < threshold 50. NO capture contains a
+growth-threshold hit; the pop storage question cannot be answered from
+existing windows — it requires an R1 run long enough that +0x4e crosses
+50 (at stored PROS ~1-2/turn: >=25 turns per colony growth, AI colonies
+accrue the +1 alien boost every turn; a 120+ turn headless run should hit
+many). NEXT ACTION queued: threshold-chase capture.
+
+HYPOTHESIS (labelled [inferred], supported by cited facts, NOT adopted):
+pop IS the +0x42 counter itself (UPOP units): colonization sets +0x42 :=
+2 verbatim (event 50-area write @0x3b0c8); growth threshold event does
++0x42 += 1; event 20 += 2; event 24 := cap; recalc charges (|+0x42|>>2)
+off PROS (pop consumes prosperity) — the 'upkeep' reading and a pop
+reading are the same word under both readings. Corroborates MPOP/UPOP
+item fields being pop-maintenance terms (economy.md header line).
+DECISIVE TEST: threshold-chase capture — if at a hit turn +0x42 increments
+while UI pop display increments, pop == +0x42 closes the item; rewrite
+growth model then replaces the logistic default with counter semantics.
