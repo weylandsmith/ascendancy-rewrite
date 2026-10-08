@@ -689,3 +689,101 @@ preset draw with barren%% = w0; popCapCap = clamp(0,100, capBase +
 sum active mpop) recomputed every tick where recalc runs; fixed 25 default
 DELETED. Residue (stays open): scenario-template source of word[+0x16]
 itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
+
+  T30 CALL-SITE + FIXITY FINDINGS (OQ-016 residue, free-data capture):
+  a) World-gen call-site law [verified disasm]: scenario-init loop
+     0x23a20..0x23d22 iterates stars; per star TWO rng draws — `call
+     0x7824f; IDIV 5` @0x23a86..0x23a95 (size-class feed; 0x37d80 clamps
+     [ESI+0x14] to 4 @0x37dc4) and `call 0x7824f; IDIV 11`
+     @0x23a97..0x23a9c; EDX (r2%11) is DESTROYED (`XOR EDX,EDX` @0x23ae7)
+     — the row that reaches +0x16 instead comes from the tables: TWO
+     21-dword static tables copied @0x23ac4..0x23ae9 (restored file
+     0x88f90 -> esp[0..20]; 0x88fe4 -> esp[0x54..]) IN THE SPECIAL MODE
+     ([ESP+0x108]==0 && [ESP+0xf8]==[ESP+0x114] @0x23aaa..0x23ac2), and
+     `MOV DL,[EAX+7]; MOV EBX,[ESP+EDX*4]; MOV EDX,[ESP+EDX*4+0x54]`
+     @0x23aeb..0x23af1 — byte[STAR+7] cluster indexes the row that
+     0x37d80 stores @0x37e33. The 0x88fe4 table = 5,1,1,6,3,2,8,6,4,4,
+     10,2,7,8,9,7,3,5,3,7,9 (signature also present in ascend.exe file
+     off 0x8ba34 — data-segment origin).
+  b) TERRAIN FIXITY PER GAME [verified]: r1deep-20261005-201915 vs
+     r1deep-20261005-204919 first saves, 151/151 same-ordinal records:
+     name, +0x16 row, capBase +0x55, AND terrain class hash IDENTICAL.
+     Worlds are built ONCE at new-game (0x37d80); resumes never re-draw.
+     The earlier 13-run battery that showed 285/309 planets 'differing'
+     conflated DISTINCT games (planet counts 151/154/160 differ) with
+     re-rolls — GENERATED-per-run is dead; per-planet rows are fixed at
+     new-game from rng stream + cluster tables.
+  c) ROW->HISTOGRAM CONTRADICTION STILL OPEN: binned by the save's
+     +0x16, row 0 (w0=100, predicts ~100% barren) measures 51.9% barren
+     over 6650 cells — contradicts the verified draw law at 0x37f20 for
+     the save-time row; resolution candidates: 0x744f4 rewritten during
+     scenario load before planet init (it is DS data — but measured
+     identical in all 13 captures, so only a pre-first-save rewrite
+     fits), or esp[0xc] argument != the weight-row index the table
+     lookup at 0x37e45 intends. NOT banked as law; R11 stands.
+
+  T30b SCENARIO-LOADER LAW [verified disasm FUN_00037fc0 @0x37fc0..0x3830b]:
+  first world-gen pass calls FUN_00037fc0 when [0x74458]==-1 (@0x37db4;
+  sentinel set to -1 @0x382f4 on exit). FUN_00037fc0 opens the scenario
+  data file and OVERWRITES both world-gen tables from records:
+  record 0x1ce0 -> byte [0x744f3 + 1 + 4*row] for rows 0..10 (the w0 slot
+  of every preset row) @0x3803c..0x38067; record 0x1ce3 -> [0x7445b+15i];
+  record 0x1ce6 -> [0x744a7 + 15i] (cell-count table 0x744a8)
+  @0x380c4..0x380ef; then item table: record counts words -> 0x73e3c/
+  0x73e3e (sum must be <= 0x27 else error 0x1d00), rows stride 0x28 ->
+  0x73e40 with byte-name (spaces 0x5e->0x20 @0x3818b), +5 REQUIRES,
+  +6 FLAGS (bitmask-recorded via `SHL` accumulation @0x381a6..0x381c5),
+  +8 COST word — full item-table LOAD law, closing the file-format
+  question for these records (Watcom fsopen 0x206c0/fread 0x77fe1).
+  IMPLICATION: the measured runtime tables ARE post-loader values, so
+  they cannot explain the row->histogram contradiction by late rewrite
+  (R11 stands; loader rewrite happens BEFORE any draw). Remaining live
+  hypothesis t30c: the cell array at word-rec[+0x10] is NOT 1:1 owned per
+  planet record (aliasing/shuffle in our extraction or in-game), which
+  would randomise per-row histograms while keeping per-planet terrain
+  fixity (b). Test t31: pointer-value uniqueness census across the 151
+  records (duplicate +0x10 values => extraction or game aliasing).
+
+  T30c WORLD-IDENTITY + ASSIGNMENT FACTS (free data, closes mis-hypotheses):
+  a) Five capture runs (201915, 204919, 210149, 202636, 204051 +
+     20261006-123049, 20261007-222504) share the SAME world: 151/151
+     same-ordinal name+row+capBase+terrain-hash identical on first saves;
+     the other six runs are DIFFERENT games (names diverge from record 0).
+     The earlier "285/309 planets differ" battery conflated distinct games
+     with re-rolls. Terrain is built ONCE (0x37d80) and never re-drawn on
+     resume [verified].
+  b) Pointer uniqueness census: planet cell arrays word-rec[+0x10] are
+     unique per record (150/151, 159/160) — extraction aliasing REFUTED
+     as the histogram-contradiction explanation.
+  c) Row assignment at generation is NOT byte[STAR+7] in our captures
+     (all records carry b7=0 yet 11 distinct +0x16 values), and NOT the
+     21-entry static tables T0/T1 indexed by planet ordinal (best
+     agreement 16/147 ~ chance; T1 = file 0x88fe4, signature also at
+     ascend.exe 0x8ba34). Call-site normal path @0x23b14..0x23b47 passes
+     EAX=r1%11-ish ([ESP+0x114]) as the row arg, consistent with the
+     MEASURED near-uniform +0x16 distribution (each of 151 planets ~11-
+     uniform); the two-table `REP MOVSD` path runs only in the special
+     mode [ESP+0x108]==0 && scenario-index match @0x23aaa..0x23ac2.
+  d) Per-system constancy test: only 12/50 systems have one row across
+     their planets (chance-ish for uniform draws) — no per-system row law.
+  e) Best-fit-static-row per planet (5-class log-lik, 927 samples):
+     152/927 match save row vs ~84 chance — WEAK signal, static rows do
+     NOT explain per-planet terrain. R11 REFINED: row index itself is
+     fresh-uniform per planet [a-d verified]; the OPEN kernel shrinks to:
+     why do observed per-row class histograms (row0 51.9% barren vs
+     w0=100 predicted ~100%) contradict the verified draw law — i.e. the
+     w-array in use at 0x37e4f is not 0x744f4[4*+0x16] as stored... or
+     the class bytes we read at [ptr+4i] are not the law's cell array
+     (offset +1 vs head? law writes [EDX+EAX+1] slot byte1 = item 0xFF,
+     byte0 = class at head — census used byte0: matches t22 terrain-law
+     usage, so unlikely). Next concrete step t31: live single-run probe —
+     patch-free: read [ESP+0xc]-equivalent is impossible from saves; INSTEAD
+     replay: start a NEW game capture (r1_deepcapture fresh new-game, not
+     resume) and measure the FIRST save's terrain vs its +0x16 rows; a
+     fresh game is the first time 0x37d80 ran with THIS session's rng —
+     if fresh histograms match w-rows, the banked captures' rows were
+     rewritten between generation and save (post-gen +0x16 writer then
+     exists and the census above (word writes @0x3a5cd scenario load)
+     shows HOW: loading a saved game RESTORES +0x16 from save/record data
+     while terrain grid came from the ORIGINAL generation rng — captures
+     are resumes, so they pair terrain(rowX) with a re-stored row).

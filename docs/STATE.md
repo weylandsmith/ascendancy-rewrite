@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-08T17:30
+updated: 2026-10-08T19:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -173,25 +173,36 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NOTE t29b: terrain row-provenance REFUTED by battery (banked S10
-OPEN RESIDUE t29b); mutation census closed; rng range corrected.
-Goal-gate harness note from t27d stands (gate truth = plain
-`bash scripts/gate.sh` exit 0).
+NOTE t30: scenario loader + world-identity facts banked (S10 T30/T30b/T30c);
+terrain row ASSIGNMENT kernel is now pinned (fresh uniform draw per planet
+via rng path @0x23af..0x23b45, tables only in special mode); the residual
+kernel is narrowed to the per-row w-histogram contradiction. Gate green.
 
-(1) OQ-016 terrain weight-row PROVENANCE: the class-draw law is verified
-    instruction-level (barren iff rng<scaled(w0) @0x37e51..0x37ea4,
-    cumulative chain @0x37eb7..0x37ee0, rng 0..32767 @0x78269) but the
-    SAVE-time +0x16 row does not generate the observed histograms (S10
-    t29b battery). Route: trace who WRITES +0x16 after world-gen (full
-    word-writer census like the +0x4a one) — if +0x16 is rewritten,
-    restore the generation-time value per planet and re-run the battery;
-    else lift scenario planet-setup data files (static.txt sibling) and
-    match rows there.
-(2) +2 pop-cap residual (S10): all direct word-writers of +0x4a accounted;
-    candidate register-offset/base-relative write — try disp16 census on
-    EIP-relative addressing near the tick function family 0x38f68..0x3958c.
-    Low priority (0.4% of samples).
+(1) OQ-016 w-histogram kernel: capture ONE FRESH new-game run (deep
+    capture starting from new-game setup, not title-resume; same safety
+    invariants as always) and compare first-save terrain histograms per
+    +0x16 row against 0x744f4 w-rows. If they match, bank the generator
+    law fully + wire rewrite cell-class generation; if they don't, the
+    w-array read at 0x37e4f is transformed somewhere — do the byte-writer
+    census on 0x744f3..0x744c0 next. scripts/r1_terrain_authored.py has
+    the extraction; reuse its battery binned-by-row output.
+(2) +2 pop-cap residual (S10): low priority (0.4% of samples); disp16
+    census near 0x38f68..0x3958c.
 (3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+
+T30 LANDED (measurement-only; harness script added): S10 T30 call-site law
+(scenario-init per-star rng%5 size + rng%11 row normal path; 21-dword
+T0/T1 table copies only in special mode @0x23aaa/0x23ac2; byte[STAR+7]
+index NOT used in our captures — all b7=0); T30b FUN_00037fc0 scenario
+loader law (record 0x1ce0 overwrites ALL FOUR w-bytes per preset row
+0..10 @0x3803c..0x38067, 0x1ce3/0x1ce6 -> 0x7445b/0x744a7, item-table
+record load incl. FLAGS bitmask accumulation and COST words, sentinel
+[0x74458]=-1 makes it run once); T30c world-identity census (7 captures
+share ONE world, 6 are distinct games — old '285 differ' battery conflated
+games with re-rolls; terrain built once at 0x37d80, never re-drawn on
+resume; cell-array pointer uniqueness kills aliasing hypothesis; static
+best-fit 152/927 vs 84 chance = no per-planet static-row law).
+scripts/r1_terrain_authored.py = terrain fixity/battery harness.
 
 T29B LANDED (measurement-only, no code change): terrain mutation CLOSED
 (40k consecutive-save census: base classes mutate ONLY via item-36
