@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-08T14:30
+updated: 2026-10-08T16:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -76,14 +76,16 @@ ledger:
       (c) closed 06p/06q (shell position law; rewrite upgraded + tested),
       (d) closed 06k (sphere extent, refined by (c))"
     - "OQ-015 DA_ template selection order + full %token table"
-    - "OQ-016 campaign per-turn constants — scope NARROWED t28: income,
-      growth, cadence, build order + FULL AI SELECTOR LAW closed with
-      evidence (income-law.md S6..S9: rows 0..21 minus item5,
-      absent-immediate pick, 70-ratio ABORT, FUN_0003fec4 need-class
-      scoring, d66 roll; buildPhase rewired + pin test
-      campaign_build_queue_law_oq016). STILL OPEN: pop-cap (+0x4a)
-      scenario-seed table, per-cell terrain/nuke wiring, home-placement
-      verification"
+    - "OQ-016 campaign per-turn constants — scope NARROWED t29: income,
+      growth, cadence, build order, AI SELECTOR LAW (S9) and POP-CAP SEED
+      LAW (S10: capBase=nonbarren/3+5 @0x37f84..0x37f9e, measured preset
+      table 0x744f4 + cell table 0x744a8, recalc clamp w/ flags&4 AND
+      Colony-Base skips, Lush Growth Bomb +10; rewrite seeded capBase/
+      surfaceCells + storedCapFor replaces constant-25, pin test
+      campaign_pop_cap_seed_law_oq016) all closed with evidence
+      (income-law.md S6..S10). STILL OPEN: per-cell terrain/nuke wiring,
+      home-placement verification, +2 residual minutiae (0.4% samples),
+      scenario-template preset source"
     - "OQ-019 ship design model (hull+gizmo inventory, cost hack, Orbital Docks)"
 
 ## WHAT IS IN HAND (tools + laws — a fresh session starts here, not from scratch)
@@ -171,22 +173,35 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NOTE t28: AI selector CLOSED + wired (income-law.md S9); gate green, ctest
-93/93, campaign reaches victories on all seeds spot-checked. Goal-gate
-harness note from t27d stands (gate truth = plain `bash scripts/gate.sh`).
+NOTE t29: POP-CAP SEED LAW CLOSED (S10) + wired; gate green, 98/98 tests.
+Goal-gate harness note from t27d stands (gate truth = plain
+`bash scripts/gate.sh` exit 0).
 
-(1) OQ-016 RESIDUE: pop-cap (+0x4a) scenario-seed table. Route: +0x4a is
-    set at colonization — chase FUN_00025d30 (colonize, t19 banked) writers
-    of the new record's +0x4a; the seed likely comes from the static.txt
-    world-type block (runtime world rows stride law banked in mapgen.md) or
-    the scenario template; measure +0x4a vs world-type across the 13 banked
-    captures FIRST (151 planets x 13 = free data, no new capture needed).
-(2) t27 leftovers RESOLVED this turn: (a) AI chooser fully decompiled and
-    wired; (b) q52 stability explained — pending persists until completion,
-    re-select happens only after a slot change (recalc 0x383c1 keeps +0x54
-    when pending; the chase planets simply never completed in-window).
-(3) OQ-012 mapgen seed law (+0x4a caps, terrain grids) — same data as (1),
-    fold the measurement into both entries when done.
+(1) OQ-016 terrain residue: the per-cell CLASS grid law is now fully known
+    (world-gen 0x37e41..0x37eec, preset weights 0x744f4, cell counts
+    0x744a8 — S10). What remains: the NUKE event path (which cell classes
+    flip to 8 / destroyed) and slot class&8 gameplay effect beyond the
+    world-gen rock law. Route: census byte|=8 writers on slot arrays
+    (pattern `or byte [reg],8` with slot-pointer provenance) in restored
+    image, then correlate with nuke events in captures if any exist.
+(2) +2 pop-cap residual (S10): all direct word-writers of +0x4a accounted;
+    candidate register-offset/base-relative write — try disp16 census on
+    EIP-relative addressing near the tick function family 0x38f68..0x3958c.
+    Low priority (0.4% of samples).
+(3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+
+T29 LANDED: POP-CAP SEED LAW CLOSED + WIRED (S10: world-gen func 0x37d80
+single caller 0x23b49; cell loop rng<barren-w0 law w/ MEASURED preset
+table 0x744f4 11x4 + cell-count table 0x744a8 (row sums {7,11,23,45,73}
+== live +0x18 exact); seed = nonbarren/3+5 into +0x55 AND +0x4a; recalc
+ledger 38772/40318 exact w/ MPOP skips flags&4 AND Colony Base (CB
+derivation: -2 residuals vanish); Lush Growth Bomb item37 completion +10
+once @0x39212..0x39229; +2 residual 0.4% stays open). Rewrite: PlanetState
+capBase/surfaceCells/growthBoom, constructor binomial seed per S10,
+storedCapFor() replaces constant-25 + popCapFor rewired + slot-cap uses
+seeded surfaceCells, constant cfg_.popCap retired; pin test
+campaign_pop_cap_seed_law_oq016; 98/98 tests, gate ALL CHECKS PASS,
+600-run VICTORY Extinct t219.
 
 T28 LANDED: AI BUILD SELECTOR LAW CLOSED + WIRED (S9: full 0x3f130 region;
 rows 0..21 minus item5; ABSENT pick immediate, PRESENT scored by

@@ -52,7 +52,8 @@ namespace {
 // Planet SIZE classes map onto grid-C surface-cell counts {7,11,23,45,73};
 // the rewrite's mapgen does not yet assign per-star size classes (parking
 // lot, STATE.md), so builds are capped with the MEASURED class-2 default.
-constexpr int kDefaultSizeClass = 2;
+// (kDefaultSizeClass retired t29: every star now carries its OWN seeded
+// surfaceCells + capBase per the world-gen seed law, income-law.md S10.)
 
 // (member impl below) — see Campaign::driveHopsFor
 
@@ -105,6 +106,29 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     const int n = static_cast<int>(galaxy_.stars.size());
     owner_.assign(n, -1);
     planets_.resize(n);
+    // WORLD-GEN POP-CAP SEED (income-law.md S10 t29): per planet the cell
+    // loop draws rng(0..99) < w0 -> barren (w0 = preset row [0] at runtime
+    // 0x744f4, MEASURED table {100,50,20,0,40,20,40,20,40,20,0}); non-barren
+    // surface cells counted; seed word = count/3 + 5 written to +0x55 AND
+    // +0x4a (@0x37f84..0x37f9e). Preset-per-planet assignment comes from the
+    // scenario template (open residue; measured near-uniform 0..10 over 151
+    // planets, so uniform draw [documented default]). Binomial law
+    // reproduces the measured per-size ranges {5..7,5..8,5..12,5..20,5..29}.
+    {
+        static const int kBarrenW[11] = {100, 50, 20, 0, 40, 20, 40, 20, 40, 20, 0};
+        std::uniform_int_distribution<int> presetDraw(0, 10);
+        std::uniform_int_distribution<int> cellDraw(0, 99);
+        std::uniform_int_distribution<int> sizeDraw(0, 4);
+        for (int s = 0; s < n; ++s) {
+            const int preset = presetDraw(rng_);
+            const int cells = planetSurfaceCells(sizeDraw(rng_));
+            planets_[s].surfaceCells = cells;  // +0x18 analog
+            int nonbarren = 0;
+            for (int c = 0; c < cells; ++c)
+                if (cellDraw(rng_) >= kBarrenW[preset]) ++nonbarren;
+            planets_[s].capBase = nonbarren / 3 + 5;  // @0x37f8b..0x37f9e
+        }
+    }
     const int owners = cfg_.aiCount + 1;
     ownedTech.resize(owners);
     for (auto& o : ownedTech) o.assign(tree_->all().size(), false);
@@ -217,8 +241,10 @@ void Campaign::pickHomeStars() {
     homeStar_ = assigned;  // fixed at setup; Captured tests these ids (§1)
 }
 
-double Campaign::popCapFor(int star) const {
-    return cfg_.popCap + planets_[star].capBonus;  // SA_MoreMaxPop bonus
+int Campaign::popCapFor(int star) const {
+    // +0x4a public accessor — now the MEASURED seed law (S10 t29), not the
+    // old cfg_.popCap default. cfg_.popCap remains only as a legacy field.
+    return storedCapFor(star);
 }
 
 int Campaign::storedIndFor(int star) const {
@@ -258,6 +284,29 @@ int Campaign::storedProsFor(int star) const {
     return static_cast<int>(pros);
 }
 
+int Campaign::storedCapFor(int star) const {
+    // +0x4a analog (income-law.md S10 t29): recalc head reads capBase
+    // (+0x55) raw, the item loop adds MPOP, the tail clamps 0..100
+    // (@0x38f01..0x38f18). MPOP sum skips items with flags&4 (measured rows
+    // 17/28/29/30) AND Colony Base (S10 residual derivation: including its
+    // +2 produced EXACTLY -2 residuals on every Colony-Base-active planet).
+    // capBonus keeps SA_MoreMaxPop [documented default; the original's
+    // ability site is not yet lifted].
+    const PlanetState& ps = planets_[star];
+    const int cb = itemId("Colony Base");
+    int mpopSum = 0;
+    for (int it : ps.items) {
+        if (it == cb) continue;
+        const PlanetItem& pi = (*items_)[it];
+        if (pi.flags & 4) continue;
+        mpopSum += pi.mpop;
+    }
+    int cap = ps.capBase + mpopSum;
+    if (cap < 0) cap = 0;
+    if (cap > 100) cap = 100;
+    return cap + static_cast<int>(ps.capBonus);
+}
+
 int Campaign::needClassFor(int star) const {
     // FUN_0003fec4 verbatim (income-law.md S9 t28). EAX field analogues:
     // +0x44 IND, +0x46 RES, +0x48 PROS, +0x42 pop, +0x4a cap, +0x4c pending.
@@ -265,7 +314,7 @@ int Campaign::needClassFor(int star) const {
     const int ind = storedIndFor(star);
     const int res = storedResFor(star);
     const int pros = storedProsFor(star);
-    const int capMinusPop = ps.popCapCap - static_cast<int>(ps.pop);
+    const int capMinusPop = storedCapFor(star) - static_cast<int>(ps.pop);
     const int popMinusPend = static_cast<int>(ps.pop) - (ps.pendingItem >= 0 ? (*items_)[ps.pendingItem].upop : 0);
     if (capMinusPop < 2 && popMinusPend < 2) return 3;  // 0x3fedc
     if (pros < 2) return 2;                              // 0x3fef2
@@ -346,7 +395,7 @@ void Campaign::incomeAndGrow() {
         for (int it : planets_[s].items)
             if (it == itemId("Cloning Plant")) hasClone = true;
         PlanetState& ps = planets_[s];
-        const int cap = ps.popCapCap + static_cast<int>(ps.capBonus);
+        const int cap = storedCapFor(s);  // storedCapFor already folds capBonus
         if (ps.pop < cap) {
             ps.growthCounter += static_cast<int>(pros);
             if (o != kPlayer && pros < 4) ps.growthCounter += 1;
@@ -407,6 +456,13 @@ void Campaign::buildPhase() {
             ps.buildAcc += storedIndFor(s);
             if (ps.buildAcc >= pend->cost) {
                 ps.items.push_back(ps.pendingItem);
+                // LUSH GROWTH BOMB completion (income-law.md S10): governor
+                // byte == item 37 && !(+0x66&1) -> capBase += 10 once, flag
+                // set (@0x39212..0x39229).
+                if (ps.pendingItem == itemId("Lush Growth Bomb") && !ps.growthBoom) {
+                    ps.capBase += 10;
+                    ps.growthBoom = 1;
+                }
                 ps.pendingItem = -1;
                 ps.buildAcc = 0;
             }
@@ -427,7 +483,7 @@ void Campaign::buildPhase() {
                 int id = itemId(step.name);
                 if (id < 0) continue;
                 const PlanetItem& pi = (*items_)[id];
-                if (pi.upop > ps.popCapCap - usedPop) continue;  // 0x3f574
+                if (pi.upop > storedCapFor(s) - usedPop) continue;  // 0x3f574
                 if (pi.upop > ps.pop - usedPop) continue;        // cmd0 gate
                 if (!requiresAvailable(pi.requires, static_cast<int>(tree_->all().size()),
                                        ownedTech[o]))
@@ -447,7 +503,7 @@ void Campaign::buildPhase() {
                 if (!requiresAvailable(pi.requires, static_cast<int>(tree_->all().size()),
                                        ownedTech[o]))
                     continue;  // S4 research law
-                if (pi.upop > ps.popCapCap - usedPop) continue;  // 0x3f587
+                if (pi.upop > storedCapFor(s) - usedPop) continue;  // 0x3f587
                 bool built = false;
                 for (int it : ps.items)
                     if (it == id) { built = true; break; }
@@ -476,7 +532,7 @@ void Campaign::buildPhase() {
             int surface = 0;
             for (int it : ps.items)
                 if (itemIsSurface(it)) ++surface;
-            if (surface >= planetSurfaceCells(kDefaultSizeClass)) continue;
+            if (surface >= ps.surfaceCells) continue;  // +0x18 seeded per S10
         }
         ps.pendingItem = pick;
         ps.buildAcc = 0;

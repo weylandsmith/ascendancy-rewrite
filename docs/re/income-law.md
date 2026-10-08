@@ -603,3 +603,68 @@ Full region 0x3f130..0x3f757 disassembled from work/ascend_restored.bin
  0xFFFF/+0x54 = 0xFF (no queue: human selects by UI, never auto-queued)
  while its +0x50 stays 0 (@0x39005 +0x54==0xFF -> skip accumulator, raw
  disasm — refines S8: the +IND tick requires a pending item).
+
+## 10. POP-CAP (+0x4a) SEED LAW CLOSED (t29) — world-gen 0x37d80..0x37fa8
+
+Recalc head reads the SEED word +0x55 raw: `MOV AX,[EBX+0x55]` @0x38bd4
+into c4a; item loop adds MPOP (skip item flags&4, AND skip Colony Base —
+see rule note below); tail clamps 0..100 into +0x4a. Ledger measurement
+(ALL 13 r1deep captures x every planet x every save slot, 40318 samples):
+  `+0x4a == clamp(0,100, capBase + sum MPOP(active slots; skip item
+   flags&4; skip item row 5 Colony Base))`
+holds 38772/40318 EXACTLY; the residual is +2 (never any other value,
+never negative) on 39 named planets in a minority of their slots.
+RULE DERIVATION (t29): with Colony Base INCLUDED the same ledger shows
+732 samples at EXACTLY -2, all of them Colony-Base-active, and no other
+negative residual exists; excluding CB removes every negative residual
+(38560 ok -> 38772 ok, failures become purely +2). [verified data;
+[inferred] conclusion: CB's MPOP=2 is excluded from the cap sum.] Runtime
+planitem MPOP column (identical in all 13 captures at B+0x82BB0+0x73e40,
+i*0x28+3): Habitat(+2), Metroplex(+2), Colony Base(+2, excluded),
+Habitat-class rows 3(+3),4(+2),5(+2); rows 17/28/29/30 carry flags&4
+(Tractor Beam, Orbital Cloaker/Shield/Mega-Shield class) — measured, not
+inferred. The +2 residual class itself = OPEN residue (candidate: uncensus-
+able register-offset write to +0x4a; every direct word-writer is accounted).
+
+WORLD-GEN SEED (FUNC at 0x37d80, single caller 0x23b49 scenario init):
+  cell loop 0x37e41..0x37eec over word[+0x1a] cells:
+    per-cell class from preset row = [EBX=0x744f4 + 4*word[+0x16]]:
+      rng(0x7824f, returns 0..99) vs scaled thresholds
+      T_i = w_i*(32768-1)/100 (`SHL 0xF; SUB; DIV 100` @0x37e51..0x37ea4);
+      barren when rng < w0; else class 3 / 4 / 1 chain @0x37eb7..0x37ee0
+      (ecx counts every NON-BARREN cell @0x37ebb).
+    orbital ring (cell index >= word[+0x18]) skips rng, class 1 @0x37f0e.
+  rock event @0x37f4d: rng%7==0 (idiv 7, test edx @0x37f5c) -> class|=8 on
+    rng%(surface-cells) slot; planet flag +0x66 |= 2.
+  SEED WORD @0x37f84..0x37f9e: `MOV EBX,3; MOV EAX,ECX; CDQ; IDIV EBX;
+    ADD EAX,5; MOV WORD [ESI+0x55],AX; MOV WORD [ESI+0x4A],AX` —
+    capBase = NONBARRENCOUNT/3 + 5, and +0x4a initialised to the SAME value.
+  word[+0x16] (planet preset 0..10, `CMP 0xB` @0x37e2e, default 2) comes
+    from the scenario template (caller esp+0xc); captured single-player
+    map has presets 0..10 roughly uniformly across 151 planets.
+  MEASURED RUNTIME TABLES (identical in all 13 captures, GVA B+0x82BB0+off):
+    0x744a8 per-size surface-cell counts (5 rows x 15): row sums
+      size0=7 size1=11 size2=23 size3=45 size4=73; live +0x18 matches
+      EXACTLY (Almaviva III s0:7, Mukwonago I s3:45, Almaviva I s4:73).
+    0x744f4 preset barren/class weights (11 x 4): [100,0,0,0] [50,2,2,2]
+      [20,3,5,3] [0,3,20,3] [40,10,2,2] [20,20,2,2] [40,2,2,10] [20,3,3,20]
+      [40,10,10,10] [20,15,15,15] [0,33,34,33].
+  Range cross-check: observed capBase per size class exactly
+    {5..7} {5..8} {5..12} {5..20} {5..29} == min 5, max ncells/3+5.
+EVENT MODIFIERS of the seed word (all cite +0x55 writers, full-code census):
+  +10 once per planet: governor byte == 0x25 (= item 37 Lush Growth Bomb,
+    planitem.txt row 37 '0 0 0 0 1 200 62 1 255') && !(+0x66&1)
+    @0x39212..0x39229 (sets +0x66|=1). Same law as the t27-banked
+    "item37 +0x55 += 10 once" completion effect, now at its exact site.
+  +2: scan 0x4402a (planet base 0x2b057 stride 123 = 0x7b) adds 2 to EVERY
+    owned planet's +0x55 then recalcs; no in-code caller found (data/vtable
+    driven — event dispatch), effect = same-law shift.
+  event 24 sets pop:=cap; event 48 documented S6d — unchanged.
+CROSS-VALIDATION vs earlier sections: supersedes S6e RESIDUE and S6f
+"inferred world-gen seed" with the measured law above; S6 tail-clamp law
+unchanged. REWRITE UPGRADE: PlanetState gains capBase (+0x55 analog)
+seeded at construction from MEASURED tables {7,11,23,45,73} + uniform
+preset draw with barren%% = w0; popCapCap = clamp(0,100, capBase +
+sum active mpop) recomputed every tick where recalc runs; fixed 25 default
+DELETED. Residue (stays open): scenario-template source of word[+0x16]
+itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.

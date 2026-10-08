@@ -30,11 +30,16 @@ struct PlanetState {
     // MEASURED pop law (docs/re/income-law.md S6e, R1 threshold-chase capture
     // r1deep-20261007-224831): pop is the +0x42 counter (UPOP units),
     // colonization SETS it to 2; growth increments it +1 per counter wrap;
-    // working population shown/used elsewhere = min(pop, popCapCap).
+    // working population shown/used elsewhere = min(pop, storedCapFor()).
     double pop = 2;              // +0x42 analog, colonization :=2 [verified]
-    int popCapCap = 25;          // +0x4a analog: scenario-template seeded per
-                                 // planet (measured mid-game spread 13..28;
-                                 // template table lift = open residue)
+    // POP-CAP SEED LAW (income-law.md S10 t29): world-gen @0x37f84..0x37f9e
+    // writes capBase = NONBARRENCOUNT/3 + 5 into +0x55 AND +0x4a; recalc
+    // then keeps +0x4a = clamp(0..100, capBase + sum MPOP(active items,
+    // skipping item flags&4 and Colony Base row 5)). capBase is seeded per
+    // star at Campaign construction (draw law in seedCapBase()).
+    int capBase = 0;             // +0x55 analog
+    int surfaceCells = 23;       // +0x18 analog (seeded; income-law.md S10)
+    int growthBoom = 0;          // +0x66 bit1 analog: Lush Growth Bomb fired
     int growthCounter = 0;       // +0x4e analog (PROS-side counter, S6c)
     std::vector<int> items;      // indices into the planitem table (ACTIVE slots)
     // BUILD QUEUE (income-law.md S8+t28): pending item id or -1 (original
@@ -76,7 +81,8 @@ struct CampaignConfig {
                                 // while counters accumulate (income-law.md
                                 // S6e); UPOP units, not the v1 logistic's
                                 // 0..100 scale
-    int popCap = 100;           // [inferred default; UPOP units undocumented]
+    // (popCap field retired t29 — pop caps are per-planet seeded values,
+    // income-law.md S10; see PlanetState::capBase / storedCapFor.)
     // Player species (specnum into docs/re/species.md): -1 = human, no SA_
     // (player.dip carries no ability token [verified]). >=0 grants that
     // species' ability to owner 0 like any AI race (docs/re/abilities.md).
@@ -137,6 +143,8 @@ public:
     int pendingItemFor(int star) const { return planets_[star].pendingItem; }
     int buildAccFor(int star) const { return planets_[star].buildAcc; }
     double popCapBonusFor(int star) const { return planets_[star].capBonus; }
+    // Public +0x4a analog for tests/UI (income-law.md S10 seed law).
+    int popCapAt(int star) const { return storedCapFor(star); }
     int fleetDamageFor(int owner) const { return fleetDamage_[owner]; }
     bool invadesAlwaysSucceeds(int owner) const {
         return ability_[owner] == SpeciesAbility::SuperMarines;
@@ -164,13 +172,16 @@ private:
     int itemId(const std::string& name) const;  // by NAME (verified rows), not index
     // Species-ability hooks (docs/re/abilities.md §2-§3).
     bool lanePassable(int owner, int target) const;  // SA_BlockStarLanes
-    double popCapFor(int star) const;                // cfg cap + SA_MoreMaxPop bonus
+    int popCapFor(int star) const;                 // +0x4a seed law (S10)
     // Stored-channel helpers (income-law.md S6 recalc): compressed IND /
     // raw RES of one star, Hyperpower(12)/Internet(14) first-occurrence
     // doubling per S6. needClassFor: FUN_0003fec4 need-class law (S9 t28).
     int storedIndFor(int star) const;
     int storedResFor(int star) const;
     int storedProsFor(int star) const;
+    // +0x4a analog (income-law.md S10): clamp(0..100, capBase + MPOP sum,
+    // items flags&4 and Colony Base excluded) + ability capBonus.
+    int storedCapFor(int star) const;
     int needClassFor(int star) const;
 
     CampaignConfig cfg_;

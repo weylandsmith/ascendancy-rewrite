@@ -144,6 +144,28 @@ TEST(campaign_build_queue_law_oq016) {
     CHECK(grown > 0);
 }
 
+TEST(campaign_pop_cap_seed_law_oq016) {
+    // POP-CAP SEED LAW (income-law.md S10 t29): seed = nonbarren/3 + 5 with
+    // nonbarren ~ Binomial(surfaceCells, 1-w0), w0 from the MEASURED preset
+    // table; bounds per surface size: min 5, max ncells/3+5 with ncells in
+    // {7,11,23,45,73} -> cap in [5..29] (home items carry MPOP 0, no
+    // ability bonus here). Old default was the constant 25.
+    auto c = makeCampaign(2);
+    int lo = 1000, hi = 0;
+    const int ns = static_cast<int>(c.galaxy().stars.size());
+    for (int s = 0; s < ns; ++s) {
+        int cap = c.popCapAt(s);
+        CHECK(cap >= 5 && cap <= 29);
+        lo = std::min(lo, cap);
+        hi = std::max(hi, cap);
+    }
+    CHECK(hi > lo);  // seeded spread, not a constant table
+    // Deterministic draw: same seed => same caps (law, not noise).
+    auto c2 = makeCampaign(2);
+    for (int s = 0; s < ns; ++s)
+        CHECK(c.popCapAt(s) == c2.popCapAt(s));
+}
+
 TEST(campaign_research_progresses) {
     auto c = makeCampaign(3);
     for (int t = 0; t < 40 && !c.over(); ++t) c.advance();
