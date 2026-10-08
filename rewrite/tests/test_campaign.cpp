@@ -117,6 +117,33 @@ TEST(campaign_channel_law_oq016) {
     CHECK(ag::colonyChannel(9, true, false) == 13.0);  // 9 + 9>>1
 }
 
+TEST(campaign_build_queue_law_oq016) {
+    // BUILD-QUEUE LAW (income-law.md S8 + S9 t28): pending item + per-planet
+    // IND accumulator; completion only when acc >= COST (0x3907b/0x390a3
+    // JA 0x392a2), selector runs only with no pending item (caller 0x3ead6).
+    auto c = makeCampaign(42);
+    // t1: every AI home queues its first pick (stored IND > 0 at start).
+    c.advance();
+    for (int o = 1; o <= 6; ++o) {
+        int s = -1;
+        for (size_t i = 0; i < 70 && s < 0; ++i)
+            if (c.starOwner(static_cast<int>(i)) == o) s = static_cast<int>(i);
+        CHECK(s >= 0);
+    }
+    // Factory COST 30 (planitem.txt row 0), home IND 1/turn (t19 grant):
+    // the first queue completes around turn 31 (t1 queue, acc >= COST then).
+    CHECK(c.turn() == 1);
+    for (int t = 0; t < 40 && !c.over(); ++t) c.advance();
+    // By turn ~41 every still-owned AI home has grown its built list by at
+    // least one completed queue item.
+    int grown = 0;
+    for (int o = 1; o <= 6; ++o)
+        for (size_t i = 0; i < c.galaxy().stars.size(); ++i)
+            if (c.starOwner(static_cast<int>(i)) == o &&
+                c.builtItemCount(static_cast<int>(i)) > 3) ++grown;
+    CHECK(grown > 0);
+}
+
 TEST(campaign_research_progresses) {
     auto c = makeCampaign(3);
     for (int t = 0; t < 40 && !c.over(); ++t) c.advance();

@@ -221,6 +221,74 @@ double Campaign::popCapFor(int star) const {
     return cfg_.popCap + planets_[star].capBonus;  // SA_MoreMaxPop bonus
 }
 
+int Campaign::storedIndFor(int star) const {
+    // S6 recalc IND channel (income-law.md §6): raw IND sum + Hyperpower
+    // doubling (v + v>>1), compressed trunc((v+1)^0.85); grant 1 at acc 0
+    // (t19). Same law incomeAndGrow charges into the empire budget.
+    int acc = 0;
+    bool dbl = false;
+    const int idHyper = itemId("Hyperpower Plant");
+    for (int it : planets_[star].items) {
+        acc += (*items_)[it].ind;
+        if (it == idHyper) dbl = true;
+    }
+    return static_cast<int>(colonyChannel(acc, dbl, /*compress=*/true));
+}
+
+int Campaign::storedResFor(int star) const {
+    // RES channel: raw accumulator + Internet doubling, never compressed (S6).
+    int acc = 0;
+    bool dbl = false;
+    const int idNet = itemId("Internet");
+    for (int it : planets_[star].items) {
+        acc += (*items_)[it].res;
+        if (it == idNet) dbl = true;
+    }
+    return static_cast<int>(colonyChannel(acc, dbl, /*compress=*/false));
+}
+
+int Campaign::storedProsFor(int star) const {
+    // PROS accumulator as the growth counter spends it (income-law.md S6c):
+    // raw item PROS + rich-world ability bonus. Upkeep (MPOP sum /4) is NOT
+    // deducted here — incomeAndGrow measured growth deltas against the RAW
+    // sum (chase capture 06e: +3 == stored PROS 3), so the rewrite's growth
+    // path consumes this value verbatim.
+    double pros = planets_[star].richPros;
+    for (int it : planets_[star].items) pros += (*items_)[it].pros;
+    return static_cast<int>(pros);
+}
+
+int Campaign::needClassFor(int star) const {
+    // FUN_0003fec4 verbatim (income-law.md S9 t28). EAX field analogues:
+    // +0x44 IND, +0x46 RES, +0x48 PROS, +0x42 pop, +0x4a cap, +0x4c pending.
+    const PlanetState& ps = planets_[star];
+    const int ind = storedIndFor(star);
+    const int res = storedResFor(star);
+    const int pros = storedProsFor(star);
+    const int capMinusPop = ps.popCapCap - static_cast<int>(ps.pop);
+    const int popMinusPend = static_cast<int>(ps.pop) - (ps.pendingItem >= 0 ? (*items_)[ps.pendingItem].upop : 0);
+    if (capMinusPop < 2 && popMinusPend < 2) return 3;  // 0x3fedc
+    if (pros < 2) return 2;                              // 0x3fef2
+    if (ind < 2) return 1;                               // 0x3ff0f
+    if (ind >= 4 && pros >= 2) {
+        // 0x3ff49: if 50/PROS > 15 (PROS < 4 impossible here since PROS>=2;
+        // PROS==3 -> 16 > 15) AND cap-pop > 3 AND pop-pending != 1 -> 2.
+        if (pros > 0 && 50 / pros > 15 && capMinusPop > 3 && popMinusPend != 1)
+            return 2;                                    // 0x3ff80
+        // 0x3ffba race-mask gate skipped (tail byte == 0 in every capture,
+        // S9): item12(Hyperpower) slot -> RES-side += IND>>1; item14
+        // (Internet) slot -> IND-side += RES>>1; pick the bigger side.
+        int indSide = ind, resSide = res;
+        const int h = itemId("Hyperpower Plant"), n = itemId("Internet");
+        for (int it : ps.items) {
+            if (it == h) resSide += ind >> 1;
+            if (it == n) indSide += res >> 1;
+        }
+        return indSide > resSide ? 1 : 0;                // 0x40002/0x40006
+    }
+    return 0;
+}
+
 bool Campaign::lanePassable(int owner, int target) const {
     // SA_BlockStarLanes (help.txt L2314 "block all star lanes entering your
     // colonized systems"): lanes into a star blocked THIS turn admit no
@@ -307,57 +375,111 @@ void Campaign::incomeAndGrow() {
 }
 
 void Campaign::buildPhase() {
-    // One item per owned star per turn if industry covers it (policy
-    // [inferred]); order kBuildOrder until quotas, then cheapest Agriplot.
-    // CADENCE SHAPE MEASURED (income-law.md §7, FUN_00038840 cmd 0): the
-    // original places items ACTIVE IMMEDIATELY (word+2 := 1) and runs the
-    // recalc in every exit path — no build timer exists; legality is
-    // gated by free pop, UPOP(new) <= pop - SUM UPOP(active items)
-    // (+0x42 - +0x4c verbatim), so cadence is budget/pop-limited exactly
-    // as modelled here.
+    // BUILD-QUEUE + SELECTOR LAW (income-law.md S8 + S9 t28), replacing the
+    // v1 instant-buy-from-stockpile default. Mechanics, each cited:
+    //  * Queue capacity 1 per planet (+0x52/+0x54 single pair). The per-turn
+    //    tick pays stored IND into the accumulator ONLY while pending
+    //    (FUN_00038f68 0x39005: +0x54==0xFF jumps the accumulator block);
+    //    completion at acc >= COST(item) (0x390a3 call 0x394d8 / JA 0x392a2),
+    //    then +0x50 resets (0x3929a).
+    //  * The AI selector (FUN_0003f130) runs ONLY on planets with no pending
+    //    item (caller law 0x3ead6) and requires stored IND > 0 (0x3f146).
+    //  * Candidates: surface rows 0..21, Colony Base row 5 excluded,
+    //    research-gated per S4, UPOP gate popCap - pendingUPOP >= UPOP(new)
+    //    (0x3f574/0x3f587) AND buy legality pop - pendingUPOP >= UPOP(new)
+    //    (cmd0 0x388f7..0x38922).
+    //  * Pick law (0x3f672..0x3f733): first candidate NOT already built wins
+    //    IMMEDIATELY, unless COST/storedIND >= 70, which ABORTS the scan
+    //    keeping the best already-built candidate (score = need-class column
+    //    FUN_0003fec4, 65% full-sum / 35% primary roll @0x3f6fb).
+    // Planet builds never touch the empire IND stockpile (payment is the
+    // per-planet accumulator, S8); ind_ remains the ship-launch budget only.
+    // Player planets: the original is UI-driven (no auto selector); the
+    // rewrite keeps kBuildOrder as the pick policy under the SAME queue law
+    // [documented default].
     for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
         int o = owner_[s];
-        if (o < 0 || ind_[o] <= 0) continue;
+        if (o < 0) continue;
         PlanetState& ps = planets_[s];
-        int usedPop = 0;  // +0x4c analogue: sum of UPOP of placed items
-        for (int it : ps.items) usedPop += (*items_)[it].upop;
-        for (const BuildStep& step : kBuildOrder) {
-            int have = 0;
-            for (int it : ps.items)
-                if ((*items_)[it].name == step.name) ++have;
-            if (have >= step.want) continue;
-            int id = itemId(step.name);
-            if (id < 0) continue;
-            const PlanetItem& pi = (*items_)[id];
-            if (pi.upop > ps.pop - usedPop) continue;  // §7 free-pop gate
-            // AI build POLICY (income-law.md S8, 0x3f6e9 IDIV / 0x3f6eb
-            // CMP 0x46): the original AI evaluator rejects candidates with
-            // COST / stored-IND(+0x44) >= 70. NOT wired: the evaluator
-            // SCORES all 39 items and selects by score (consumer chain at
-            // 0x3f5e9..0x3f672 unresolved); naively gating the rewrite's
-            // quota-head pick stalled AI expansion in 4 campaign tests.
-            // Rewiring needs the full selection law, not the filter alone.
-            // OQ-014 CLOSED (income-law.md §4): gate == req==255 || (req<count &&
-            // owned). 254 (Interstellar Trucking) is NEITHER -> permanently
-            // unavailable in the original; the old requiresValidTech-based
-            // test let it build. Surface items are additionally capped at the
-            // planet's surface slot count (size-class default until mapgen
-            // assigns classes — parking lot, STATE.md).
-            if (!requiresAvailable(pi.requires, static_cast<int>(tree_->all().size()),
-                                   ownedTech[o]))
-                continue;
-            if (itemIsSurface(id)) {
-                int surface = 0;
-                for (int it : ps.items)
-                    if (itemIsSurface(it)) ++surface;
-                if (surface >= planetSurfaceCells(kDefaultSizeClass)) break;
+        const PlanetItem* pend = ps.pendingItem >= 0 ? &(*items_)[ps.pendingItem] : nullptr;
+        // --- tick (FUN_00038f68 0x3907b) ---
+        if (pend) {
+            ps.buildAcc += storedIndFor(s);
+            if (ps.buildAcc >= pend->cost) {
+                ps.items.push_back(ps.pendingItem);
+                ps.pendingItem = -1;
+                ps.buildAcc = 0;
             }
-            if (ind_[o] >= pi.cost) {
-                ind_[o] -= pi.cost;
-                ps.items.push_back(id);
-            }
-            break;  // one build per star per turn
+            continue;  // selector never runs on a planet with a queue
         }
+        // --- selector (FUN_0003f130) ---
+        int ind0 = storedIndFor(s);
+        if (ind0 <= 0) continue;  // 0x3f146
+        int usedPop = pend ? pend->upop : 0;  // +0x4c analogue (queue draw)
+        const bool aiPick = (o != kPlayer);
+        int pick = -1;
+        if (!aiPick) {
+            for (const BuildStep& step : kBuildOrder) {
+                int have = 0;
+                for (int it : ps.items)
+                    if ((*items_)[it].name == step.name) ++have;
+                if (have >= step.want) continue;
+                int id = itemId(step.name);
+                if (id < 0) continue;
+                const PlanetItem& pi = (*items_)[id];
+                if (pi.upop > ps.popCapCap - usedPop) continue;  // 0x3f574
+                if (pi.upop > ps.pop - usedPop) continue;        // cmd0 gate
+                if (!requiresAvailable(pi.requires, static_cast<int>(tree_->all().size()),
+                                       ownedTech[o]))
+                    continue;
+                pick = id;
+                break;
+            }
+        } else {
+            const int needClass = needClassFor(s);
+            int bestScore = 0, bestItem = -1;
+            // roll law 0x3f6fb: rng%100 > 65 -> full-sum score, else primary
+            std::uniform_int_distribution<int> pct(0, 99);
+            const bool useSum = pct(rng_) > 65;
+            for (int id = 0; id < 22 && id < static_cast<int>(items_->size()); ++id) {
+                if (id == 5) continue;  // Colony Base excluded 0x3f52d
+                const PlanetItem& pi = (*items_)[id];
+                if (!requiresAvailable(pi.requires, static_cast<int>(tree_->all().size()),
+                                       ownedTech[o]))
+                    continue;  // S4 research law
+                if (pi.upop > ps.popCapCap - usedPop) continue;  // 0x3f587
+                bool built = false;
+                for (int it : ps.items)
+                    if (it == id) { built = true; break; }
+                if (!built) {
+                    if (pi.cost >= 70 * ind0) break;  // ABORT scan 0x3f6ee
+                    pick = id;                        // immediate pick 0x3f6f0
+                    break;
+                }
+                int col = 0;
+                switch (needClass) {  // stub columns (income-law.md S9)
+                    case 0: col = pi.ind; break;
+                    case 1: col = pi.res; break;
+                    case 2: col = pi.pros; break;
+                    default: col = pi.mpop; break;
+                }
+                int score = useSum ? (pi.ind + pi.res + pi.pros + pi.mpop) : col;
+                if (score > bestScore) {  // strict > 0x3f713 (jle keeps first)
+                    bestScore = score;
+                    bestItem = id;
+                }
+            }
+            if (pick < 0 && bestItem >= 0) pick = bestItem;  // scan end w/ built-best
+        }
+        if (pick < 0) continue;
+        if (itemIsSurface(pick)) {
+            int surface = 0;
+            for (int it : ps.items)
+                if (itemIsSurface(it)) ++surface;
+            if (surface >= planetSurfaceCells(kDefaultSizeClass)) continue;
+        }
+        ps.pendingItem = pick;
+        ps.buildAcc = 0;
     }
 }
 

@@ -155,15 +155,21 @@ party offer ENGINE wiring in rewrite = build work with law in hand ->
 OQ-023 (not an RE unknown).
 OQ-016 | loop | campaign per-turn constants: income formula, pop growth
 curve/cap, starting items, build order, expansion cadence, home placement
-(all currently documented defaults in campaign.cpp) | open (sub-laws
-CLOSED: income channel law 138/139 battery + t22 pin test
+| open (sub-laws CLOSED: income channel law 138/139 battery + t22 pin test
 campaign_channel_law_oq016; POP GROWTH CURVE t24 closed-by-measurement
 pop==+0x42 UPOP dots, counter-threshold-50, colonise :=2, alien +1-boost
-[verified chase capture r1deep-20261007-224831 slots 45->46]; shipped
-campaign.cpp growth upgrade) — REMAINING: per-planet pop-cap seed table
-(+0x4a scenario-template source), MPOP/UPOP runtime column byte, build
-order + expansion-cadence verification | income law docs/re/income-law.md
-S6..S6e; harness scripts/r1_income_channels.py; chase-capture law = deep-
+[verified chase capture r1deep-20261007-224831 slots 45->46]; BUILD QUEUE
++ FULL AI SELECTOR LAW t28 closed-by-decompile+live-match: queue 1/planet,
+acc += stored IND while pending (0x39005), complete acc>=COST (0x390a3),
+selector on queue-empty planets only (caller 0x3ead6), candidates surface
+rows 0..21 minus Colony Base, first ABSENT picked immediately unless
+COST/IND>=70 aborts scan to best PRESENT (need-class column FUN_0003fec4,
+d66 roll; income-law.md S9) — rewrite buildPhase REWIRED (pendingItem/
+buildAcc, instant ind_ deduction removed) + pin test
+campaign_build_queue_law_oq016) — REMAINING: per-planet pop-cap seed table
+(+0x4a scenario-template source), per-cell terrain/nuke wiring,
+home-placement verification | income law docs/re/income-law.md
+S6..S9; harness scripts/r1_income_channels.py; chase-capture law = deep-
 schedule End-Turn clicks 511:67 every 15s, save ring read by MTIME.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect

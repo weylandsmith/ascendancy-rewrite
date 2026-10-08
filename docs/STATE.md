@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-08T07:50
+updated: 2026-10-08T14:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -52,6 +52,12 @@ ledger:
       names + N x u32 blob offsets, ascend00 54/54 md5 round-trip; gate
       scripts/cob_probe.py (3i2); NO rewrite delta — rewrite reads the
       extracted dir directly, nothing TOC-side to upgrade (datafiles.md S5)"
+    - "OQ-018 soundfx.txt header pairs, VOC u16@25, theme selection mapping
+      — CLOSED 2026-10-07 (STATE index was stale, moved 2026-10-08 t28):
+      header pairs = voices/size-band law (voiceBand() +
+      test_audio_voice_band_law_oq018, 327/328 spans == disk sizes); VOC
+      field map 15/15 (u16@25==0x0911 constant, audio.md §2.1, voc.cpp
+      pins); race->theme map REFUTED (DAT_00010ba0 single writer 0x21309)"
   open:
     - "OQ-010 combat application formula — R1 frontier; static half bounded
       2026-10-06 (no disp32 orbit/table reads; shape tie FUN_00025604), path =
@@ -70,9 +76,15 @@ ledger:
       (c) closed 06p/06q (shell position law; rewrite upgraded + tested),
       (d) closed 06k (sphere extent, refined by (c))"
     - "OQ-015 DA_ template selection order + full %token table"
-    - "OQ-016 campaign per-turn constants (income, growth, build order, cadence, home placement)"
+    - "OQ-016 campaign per-turn constants — scope NARROWED t28: income,
+      growth, cadence, build order + FULL AI SELECTOR LAW closed with
+      evidence (income-law.md S6..S9: rows 0..21 minus item5,
+      absent-immediate pick, 70-ratio ABORT, FUN_0003fec4 need-class
+      scoring, d66 roll; buildPhase rewired + pin test
+      campaign_build_queue_law_oq016). STILL OPEN: pop-cap (+0x4a)
+      scenario-seed table, per-cell terrain/nuke wiring, home-placement
+      verification"
     - "OQ-019 ship design model (hull+gizmo inventory, cost hack, Orbital Docks)"
-    - "OQ-018 soundfx.txt header pairs, VOC u16@25, theme selection mapping"
 
 ## WHAT IS IN HAND (tools + laws — a fresh session starts here, not from scratch)
 - R1 save-state capture LIVE: scripts/r1_savestate.sh (boot -> autosave ZIP,
@@ -159,26 +171,32 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NOTE t27d: goal-gate command is mis-composed harness-side (slash-commands
-appended to the shell string -> exit 2 after ALL CHECKS PASS). Gate truth
-= `bash scripts/gate.sh` exit 0 (verified 3x). docs/BLOCKED.md. LOOP
-PAUSED per /steer; resume below on next go.
+NOTE t28: AI selector CLOSED + wired (income-law.md S9); gate green, ctest
+93/93, campaign reaches victories on all seeds spot-checked. Goal-gate
+harness note from t27d stands (gate truth = plain `bash scripts/gate.sh`).
 
-(1) AI BUILD-QUEUE FULL LAW (income-law.md S8 banked t27): the +0x50
-industry accumulator pays COST(item at +0x52, Ship=design cost x3) per
-turn; live-verified +IND/turn on all chase-capture planets. Open piece:
-WHAT SELECTS +0x52 — FUN_00038840 cmd 2/3 is the HUMAN select path; the
-AI chooser is the evaluator region 0x3f4d0..0x3f74c (score writes
-word [ESP+EDX*1+1] per item class 0..3, jump table via [ECX+0x2a570]
-per species) — decompile that region completely, then wire the rewrite
-buildPhase queue (pending item + accumulator) REPLACING the instant
-ind-deduction default. Naive 70-filter gate ALONE regressed 4 campaign
-victory tests (reverted; observation kept in comment).
-(2) +0x52/+0x54 persist across turns in captures with q52 != 0xFFFF
-(11/19/51/40 in chase run) BUT the completion path resets them — those
-planets' pending item must re-select each turn OR they finished t<41.
-Check q52 stability vs item-array stability next capture diff.
-(3) OQ-012 mapgen seed law (+0x4a caps, terrain grids) — unchanged.
+(1) OQ-016 RESIDUE: pop-cap (+0x4a) scenario-seed table. Route: +0x4a is
+    set at colonization — chase FUN_00025d30 (colonize, t19 banked) writers
+    of the new record's +0x4a; the seed likely comes from the static.txt
+    world-type block (runtime world rows stride law banked in mapgen.md) or
+    the scenario template; measure +0x4a vs world-type across the 13 banked
+    captures FIRST (151 planets x 13 = free data, no new capture needed).
+(2) t27 leftovers RESOLVED this turn: (a) AI chooser fully decompiled and
+    wired; (b) q52 stability explained — pending persists until completion,
+    re-select happens only after a slot change (recalc 0x383c1 keeps +0x54
+    when pending; the chase planets simply never completed in-window).
+(3) OQ-012 mapgen seed law (+0x4a caps, terrain grids) — same data as (1),
+    fold the measurement into both entries when done.
+
+T28 LANDED: AI BUILD SELECTOR LAW CLOSED + WIRED (S9: full 0x3f130 region;
+rows 0..21 minus item5; ABSENT pick immediate, PRESENT scored by
+FUN_0003fec4 need-class with d66 roll; 70-ratio rejects AND aborts scan;
+jump table image 0x3f120 live-relocation-verified; research tail byte
+0x7478b+75t measured 0 in 26 slots x 13 captures; live q54=0/Factory on
+all 4 AI planets matches law). Rewrite: PlanetState.pendingItem/buildAcc,
+buildPhase = tick+selector, storedIndFor/ResFor/ProsFor + needClassFor,
+instant ind_ deduction REMOVED (ind_ = launch budget); pin test 93/93;
+gate ALL CHECKS PASS; 600-run still ends Extinct t256.
 
 T27 LANDED: BUILD-QUEUE LAW CLOSED (S8: COST=item+8 via 0x73e40+8+28i
 [earlier stride-8 cap-table reading CORRECTED]; +0x50 += IND (+1 AI

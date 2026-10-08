@@ -482,3 +482,124 @@ accumulator, not a turn counter.
  with pop 3 -> 4 (Millitrin, gated at cap, held 40..42 and never
  grew). When pop >= cap the else-path FORCES [+0x4e] := 0 every turn
  (LAB_000393f9) — growth never even accrues at cap.
+
+## 9. AI BUILD SELECTOR LAW CLOSED (t28) — FUN_0003f130 + FUN_0003fc4c + FUN_0003fec4
+
+Full region 0x3f130..0x3f757 disassembled from work/ascend_restored.bin
+(capstone; functions_full.tsv entries 3f130 size 973, 3fc4c size 631,
+3fec4 size 350). The evaluator region t27 queued is COMPLETE:
+
+ ENTRY (0x3f130, EAX=empire ctx, EDX=planet rec; caller 0x3eade inside the
+ per-planet AI turn loop):
+   [+0x44]==0 -> return (no industry channel: no build, no queue) @0x3f146.
+   FUN_0003f758(ctx,planet) == 1 -> return @0x3f162. 0x3f758 is the
+   SPECIAL-PROJECT gate: when planet has NO Shipyard slot (0x3958c(22)==
+   0xffff) and (IND<4 or empty(+0x1c)-(+0x20) >= 5) and turn-gate
+   (DAT_00012e10 <= 0xAA or race-mask byte) -> BUY Shipyard (0x38818 cmd0,
+   item 22) and return 1 (consumed the turn); otherwise (FUN_00039a9c) ship
+   production via item 23 + FUN_00040de0 (design). Ship items therefore run
+   through 0x3f758 BEFORE the generic evaluator.
+
+ OVER-CAP EMERGENCY (0x3f178): if used(+0x4c) >= cap(+0x4a): scan cells
+ < +0x18, skip empty and item 5 (Colony Base); pick cell whose item has the
+ LARGEST MPOP (item byte +3, gate >0); FUN_00038840 cmd=1 DEMOLISH it
+ @0x3f1e9; if still used>=pop after demolish -> return; free-pop recheck
+ @0x3f1fb. Else branch: used(+0x4c) >= pop(+0x42) -> return @0x3f220;
+   FUN_0003f758==2 -> return @0x3f226.
+
+ TRANSPORT-TUBES PRIORITY (0x3f2c8): race-research mask (research runtime
+ array 0x7478b stride 75 — see layout note below) bit(owner) set -> if no
+ slot holds item 21 (Transport Tubes): DEMOLISH whatever occupies the
+ +0x1c-counter... actual code: FUN_00038840 cmd1 on the item-21 slot then
+ FUN_0003830c(23) legality; when legal place via FUN_00038718; when
+ slot-less BUY (0x38818(0,21)) @0x3f344.
+
+ MIN-REQUIRES DEMOLISH SWEEP (0x3f354, entered when free pop exists but the
+ over-cap path didn't fire): among occupied cells < +0x18 pick the item
+ with MPOP (item dword+0 SAR 24 @0x3f3bd) STRICTLY LESS than cap-pop AND
+ the smallest byte+5 (REQUIRES column, ecx sentinel 0x1869f never binds)
+ -> DEMOLISH cmd1 @0x3f403; free-pop recheck @0x3f414 else return. (The
+ byte+5 min makes research-prereq items the first to go.)
+
+ RANDOM-CELL FALLBACK (0x3f47d): FUN_00038818(0xffff) = FUN_0003875c
+ random-legal-empty-cell picker (FUN_0003830c legality over empty slots,
+ rng FUN_0x7824f uniform over count). If NO legal cell: if empty(+0x1c)>0
+ BUY TRANSPORT TUBES item 21 @0x3f4b3 (tubes create cell capacity ->
+ Outpost item 20 path parallel) and return; else return.
+
+ EVALUATOR (0x3f4d3, after cmd1 on current +0x52 target then FUN_0003fc4c):
+  FUN_0003fc4c(ctx,planet) returns a forced PENDING ITEM or -1 (full body
+  banked in work/ai_selector_disasm.txt): emergency item law — item 22
+  Shipyard / 25 Orbital Cloaker chain (0x3fc63 item 22 buy when byte+0x66
+  bit1 set), item 18 Surface Shield chain when IND>=4 && PROS>0 &&
+  (+0x1c)-(+0x20)>=3 && threat byte+0x59<6, item 19 Surface Mega Shield
+  (0x13) when (DAT_00012e10 - [+0x67]) / period > threat (period 200/225/
+  300/400 by threat class 0/1/>=4 lookup @0x45beb stride law), item 11
+  Surface Cloaker when owner odd && IND>=20 && rng%100<5, else a 5-entry
+  template list @RUNTIME 0x67b8 filtered by FUN_0003830c legality; return
+  -1 = none forced.
+  FUN_0003fec4(planet) returns the NEED CLASS (0..3) — @0x3fec4 verbatim:
+    cap(+0x4a)-pop < 2 && pop-used(+0x4c) < 2 -> 3 (pop-crunch);
+    PROS(+0x48) < 2 -> 2; IND(+0x44) < 2 -> 1; IND>=4 && PROS>=2: research
+    threshold DAT_000066e4/PROS <= 15 && cap-pop>=3 && pop-used!=1 -> 2
+    (keep prosperity); else Internet/Hyperpower slot comparison law:
+    RES(+0x46) vs IND(+0x44): (Internet slot ? RES>>1 : 0) vs
+    (Hyperpower slot ? IND>>1 : 0) -> 1 if RES-side bigger else 0;
+    otherwise default 0.
+  CLASS->SCORE STUBS (jump table image 0x3f120, RELOCATED live target
+  verified: live jmp imm = 0x1fe570 = P0+0x3f120 exactly; restored image
+  bytes 0x3f120 = c3f50300 d5f50300 aff50300 9af50300):
+    class 0 -> 0x3f5c3 score = item IND    (skip item if IND==0; movsx
+            cx,[eax] @0x3f5ca)
+    class 1 -> 0x3f5d5 score = item RES    (skip if RES==0;  [eax+1] @0x3f5dd)
+    class 2 -> 0x3f5af score = item PROS   (skip if PROS==0; [eax+2] @0x3f5b7)
+    class 3 -> 0x3f59a score = item MPOP   (skip if byte+3==0; dword [eax]
+            SAR 24 test @0x3f59c, score movsx [eax+3] @0x3f5a3)
+   Every stub falls through to 0x3f60a which OVERWRITES word+1 with the
+   FULL SUM IND+RES+PROS+MPOP and writes entry byte0 = item idx (5-byte
+   candidate entries; word+3 carries the stub primary for the d66 roll).
+  CANDIDATE GATE (loop 0x3f528..0x3f592): SURFACE rows 0..21 ONLY
+  (word[0x73e3c]==22 bound @0x3f52f; row 5 Colony Base skipped @0x3f52d;
+  orbital 22..30 + specials 31..38 NEVER enter this evaluator — they run
+  through the 0x3f758 special gate): research-owned (byte+5 == 0xFF
+  sentinel OR mask bit, above) AND UPOP(byte+4) <= popCap(word+0x4a) -
+  word[+0x4c]. FIELD NOTE: +0x4c sums UPOP of INACTIVE slots only (S6
+  recalc: ACTIVE slots never add to c18) = the PENDING queue's pop draw;
+  cmd0 buy legality instead uses pop(word+0x42) - [ +0x4c ] >= UPOP(new)
+  (0x388f7..0x38922 verbatim) — a purchase with pop already <= pending
+  draw FAILS the turn quietly (no queue written).
+  PICK LAW (0x3f672..0x3f733): roll = rng % 100 @0x3f67a (FUN_0x7824f =
+  LCG seed*0x41C64E6D+0x3039, value (seed>>16)&0x7FFF — full disasm banked).
+   For each recorded candidate IN TABLE ORDER:
+     if item NOT already occupying a slot (FUN_0x3958c == 0xffff):
+        if COST(item) / IND(+0x44) >= 70 -> REJECT and STOP scanning
+        (0x3f733, the t27 70-law; rejection ABORTS the whole pick, not the
+        row); else PICK IT IMMEDIATELY (absent item wins on first pass —
+        scores are NOT compared for absent items).
+     if item PRESENT: score = (roll > 0x41) ? entry.word+3 : entry.word+1
+        (d66 tie-break: 35% use the stub-primary, else full sum); keep
+        running max; tie -> earlier row wins (strict >).
+   Selected -> FUN_0x38818(0xffff-cell... actual: 0x3f747 FUN_0x38818
+   (dl=selected item, EAX=planet)) = random-legal-cell BUY.
+
+ RESEARCH GATE INPUT (selector + FUN_0003830c checker, same read law):
+  dword = [0x7478b + 75 * item.REQUIRES(byte+5)]; gate = (dword >> 24) &
+  (1 << owner(+0x57)) (raw 0x3f548..0x3f56e and 0x38378..0x383ad — the
+  S4 law's runtime materialisation). MEASURED t28: that byte (restree
+  runtime record tail offset +74; 0x7478b = row0-head 0x74744 + 71, stride
+  75, row0 = 'Orbital Structures' [verified]) == 0 for ALL 66 rows across
+  26 slots x 13 captures — no owner ever held a research-gated item
+  buildable in any captured game (all captured items are req-255 rows plus
+  colonization-placed Colony Base). Rewrite gates with ownedTech per S4
+  (equivalent iff the tail byte mirrors ownership [unverified mapping]);
+  captures never exercise the difference.
+
+ LIVE CONFIRMATION OF THE PICK LAW (r1deep-20261007-224831, mtime-ordered
+ ring, t35..t42): all four AI planets (Hannibal III, Albireo I, Phoebe I,
+ Vernunft I) hold pending +0x54 = 0 = FACTORY with +0x50 = 7..11 rising
+ +IND(=1)/turn: Factory is row 0 (first absent row passing research (req
+ 255) + free-pop (cap-pop 25..80 >= UPOP 1) + 70-gate (30/1 = 30 < 70) —
+ exactly the immediate-pick law); player Millitrin II carries +0x52 =
+ 0xFFFF/+0x54 = 0xFF (no queue: human selects by UI, never auto-queued)
+ while its +0x50 stays 0 (@0x39005 +0x54==0xFF -> skip accumulator, raw
+ disasm — refines S8: the +IND tick requires a pending item).

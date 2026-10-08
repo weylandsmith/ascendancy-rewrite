@@ -36,7 +36,15 @@ struct PlanetState {
                                  // planet (measured mid-game spread 13..28;
                                  // template table lift = open residue)
     int growthCounter = 0;       // +0x4e analog (PROS-side counter, S6c)
-    std::vector<int> items;      // indices into the planitem table
+    std::vector<int> items;      // indices into the planitem table (ACTIVE slots)
+    // BUILD QUEUE (income-law.md S8+t28): pending item id or -1 (original
+    // +0x54 == 0xFF) and the industry accumulator (+0x50). The original pays
+    // stored IND into +0x50 EVERY turn a pending item exists (tick law
+    // 0x39005/0x3907b) and completes when acc >= COST; the selector
+    // (FUN_0003f130) runs ONLY on planets with no pending item (caller law
+    // 0x3ea: `cmp byte [edx+0x54],0xff; jne skip`).
+    int pendingItem = -1;
+    int buildAcc = 0;
     // Species-ability modifiers (docs/re/abilities.md §2): SA_MoreMaxPop adds
     // capBonus to the effective pop ceiling; SA_Cornucopia sets richPros
     // (= one Agriplot's PROS 2 [verified planitem.txt] on a "rich world",
@@ -121,6 +129,13 @@ public:
     bool invincibleStar(int star) const { return invincible_[star] != 0; }
     bool sapActiveFor(int owner) const { return sapActive_[owner] != 0; }
     double richProsFor(int star) const { return planets_[star].richPros; }
+    // Completed queue items on a star (active-slot analogue; tests pin the
+    // BUILD-QUEUE law income-law.md S8/S9).
+    int builtItemCount(int star) const {
+        return static_cast<int>(planets_[star].items.size());
+    }
+    int pendingItemFor(int star) const { return planets_[star].pendingItem; }
+    int buildAccFor(int star) const { return planets_[star].buildAcc; }
     double popCapBonusFor(int star) const { return planets_[star].capBonus; }
     int fleetDamageFor(int owner) const { return fleetDamage_[owner]; }
     bool invadesAlwaysSucceeds(int owner) const {
@@ -150,6 +165,13 @@ private:
     // Species-ability hooks (docs/re/abilities.md §2-§3).
     bool lanePassable(int owner, int target) const;  // SA_BlockStarLanes
     double popCapFor(int star) const;                // cfg cap + SA_MoreMaxPop bonus
+    // Stored-channel helpers (income-law.md S6 recalc): compressed IND /
+    // raw RES of one star, Hyperpower(12)/Internet(14) first-occurrence
+    // doubling per S6. needClassFor: FUN_0003fec4 need-class law (S9 t28).
+    int storedIndFor(int star) const;
+    int storedResFor(int star) const;
+    int storedProsFor(int star) const;
+    int needClassFor(int star) const;
 
     CampaignConfig cfg_;
     Galaxy galaxy_;
