@@ -159,21 +159,23 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-(1) OQ-016 GROWTH HALF residue (income-law.md S6b): locate POP storage +
-explain accumulation-36 wrap (r1deep-20261005-230146 41->42.sav planet
-0x26e0ba counter 54->18, upkeep 1->2 = threshold hit, so accumulated
-PROS-since-last-growth = 36+ while one stored-PROS-per-turn predicts
-~2-3); whole-image byte diff across the 41->42 transition first; THEN
-pop-model upgrade replaces campaign.cpp logistic default.
+(1) OQ-016 POP STORAGE (last growth-half residue, income-law.md S6c):
+pop is NOT in planet rec 0x00-0x7a; probe star-record stride-0x1ee table
+(DAT_00012e10 / redistribution target DAT_00012dda+0x1ee*i -- governor-
+0x1f path splits IND into 10 shares there, STRONG UPOP hint: pop stored
+per-planet-slot-share? capture-delta scan of that table on growth
+threshold turns) + FUN_00055a60 event-args semantics. THEN growth-model
+upgrade replaces campaign.cpp logistic default.
 (2) RESTORE availability law S4 (economy.h cites it; probe-destroyed
-pre-t20) into income-law.md from FUN_0003830c re-verify +
-rewrite/tests/test_economy.cpp law text.
+pre-t20) into income-law.md from FUN_0003830c re-verify.
 
-T22 LANDED: channel-law test PIN (test_campaign.cpp
-campaign_channel_law_oq016, 11 checks; colonyChannel lifted to campaign.h
-free fn for testability; RES dbl-shift caught BY the pin — 3->4, 9->13,
-doubling 0x38db5 is per-RES-accumulator not IND-only, matches t18);
-ctest 100%, gate ALL CHECKS PASS.
+T23 LANDED: growth-counter semantics closed (income-law.md S6c): raw
+byte census proves EXACTLY two parallel counters (+0x4e PROS-side
+threshold 50; +0x50 IND+cap-side gate via FUN_000394d8 x3-at-itemIdx-23
+rule) + event-switch table (20:upkeep+2, 23:+0x50+=200, 24:=cap,
+48:growth pass, 50:+0x55 byte++ recalc); accumulation-36 RESOLVED as
+capture-window artifact (both counters dropped same 14 on 41->42,
+impossible for accrual, pre-window writer event). Gate: run green.
 
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;

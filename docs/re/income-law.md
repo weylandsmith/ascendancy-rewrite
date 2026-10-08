@@ -152,3 +152,44 @@ Model: stored = acc==0 ? grant : max(0, trunc((dbl(acc,f)+1)^0.85) -
 Rewrite upgrade UNBLOCKED for income channels (charge compressed stored
 value per colony); growth-model upgrade waits on the accumulation-36
 anomaly and pop storage.
+
+## 6c. Growth-counter semantics refined (t23) — accumulation-36 RESOLVED AS ARTIFACT
+
+Raw byte census (ascend_restored.bin, mask 66 89|01|29|21|81|c7|ff mod=1
+disp=0x4e/0x50): ONLY writers of +0x4e = 0x37f35 (FUN_00037d80 verbatim
+pair-copy site), 0x39315/0x3932b (accrual), 0x3a645 (FUN_0003a558 setup
+copy), 0x393f9 (reset 0). ONLY writers of +0x50 = 0x37f31 (same pair
+copy), 0x39084 (INC when IND<4 & alien-owned), 0x3909f (accumulate
+`[+0x50] += IND + cap(FUN_000394d8)`), 0x3a64d (setup copy), 0x3929a
+(reset 0 on governor-1f path), 0x3ad74 (event +200, see below).
+
+=> TWO PARALLEL COUNTERS: +0x4e accumulates STORED PROS (+1 alien boost,
+threshold DAT_000066e4=50 at 0x39337 -> upkeep+1 (+1 active-Hyperpower
+flag-bit 0x393d4..0x393e4), reset); +0x50 accumulates IND + growth-cap
+gate value (FUN_000394d8: item-table word DAT_00073e48+itemIdx*0x14,
+x3 when itemIdx==0x23 AND slot==[+0x52]; -1 sentinel). Gate at 0x390a8:
+if cap > [+0x50] -> skip growth (0x392a2: governor 0x1f + IND%10==0 ->
+redistribute IND/10 to all records table DAT_00012dda+0x1ee*i, a UPOP
+fed event). Live 60-turn series confirms: non-accrual turns FREEZE both
+counters; accrual turns move them together; +0x52 = slot index counter.
+
+The t20 "accumulation 36" was measured on turn-transition 41->42 of
+r1deep-20261005-230146 where BOTH counters dropped by the SAME 14 --
+impossible for accrual, consistent with a WRITER event between the two
+captures; the capture starts at 41 so the writing event is out of
+window. Deltas across planets differ per-planet (Corpuscle +2, Synthos
+-3) -- the counters are NOT the same quantity, confirmed.
+
+Event handler FUN_0003aa0a planet-event switch [verified decompile]:
+event 20 (0x14): upkeep +0x42 += 2; event 23: [+0x50] += 200 then
+FUN_00038f68; event 24 (0x18): upkeep := cap[+0x4a]; event 48 (0x30):
+FUN_00038f68 (per-planet growth pass); event 50: [+0x55] += 1 then
+FUN_00038ba4 (income recalc). Colonization sets upkeep := 2 verbatim
+(@0x3b0c8 region).
+
+REWRITE IMPLICATION: growth default upgrades to: counter += stored PROS
+(alien +1 if PROS<4); at >=50: upkeep += 1 (+1 if first-slot-12 active),
+clamp to cap, reset counter. The +0x50 IND-side gate stays open ONLY for
+the UPOP-unit pop storage question; pop is NOT in the planet record
+(bytes 0x00-0x7a verified) -- next probe: star-record stride-0x1ee table
+DAT_00012e10/0x12dda UPOP candidates.
