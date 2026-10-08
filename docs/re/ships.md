@@ -155,9 +155,10 @@ ship.cpp (owner string `..\planet.cpp` region; wipes fields 0x42..0x66 to
 §8) zero +0x46 writes (read in full t15b). => gizmo-record Industry is
 NEVER altered post-parse. JJTTODO fork resolves to (b) stale-comment —
 with honest remainder: the DESIGN SCREEN computes design totals that may
-SUM gizmo Industry values into the ship record's own cost slots (write
-`MOV [EAX+0x46],EBP @0x23a83` inside design-record code); whether that sum
-is plain-addition or scaled is [unverified] and is the queued next probe.
+SUM gizmo Industry values (t19 wording fix: @0x23a83 is `MOV word ptr
+[iVar8+0x1a],0` in FUN_000238e8 — a stride-0x7b SHIP-slot record field,
+per t16 correction, NOT a gizmo/design cost store); whether the design
+sum is plain-addition or scaled is [unverified] and is the queued probe.
 Rewrite status for GIZMO RECORDS: ALREADY MATCHES (file Industry used
 unmodified; §2 v1 default vindicated by census — measured no-op, not
 plausibility). Design-total summation law: still open under OQ-019.
