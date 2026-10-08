@@ -159,18 +159,22 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-(1) OQ-019 design-TOTAL law, CORRECTED target (t17 killed the
-loader hunt: zero design files in the 471-entry name table -> designs
-are runtime-only, stride 0x1ee; summation lives in the design-screen
-compute path, find it via SHIPDESSCREEN owner FUN_0004b068 callees or
-writers of designRec cost fields e.g. [rec+0x42]/[rec+0x44] word pairs
-seen @0x37f28-0x37f4d; pin total formula as test when found). (2) sugar-
-cube scale CONSTANT: readers of gizmo +0x5e / ship-record +0x2e in draw
-code (disassembly-level, no .shp codec needed; DKSHIP/ACE format ref
-0x6ba86 cosmos.cpp banked as call-graph entry point permitted under
-OQ-005 exe-loader route). (3) ledger: cost sub-question CLOSED §9;
-starting-ship law banked §10 docs-only (rewrite has no per-ship gizmo
-model; honest [unverified] template semantics, no code change).
+(1) OQ-016 income-half RESIDUE (t19 narrowed): the IND=1 seed on fresh
+colonies is explained — FUN_00025d30 colonization walk does
+`local_20=[rec+0x44]; [rec+0x44]=local_20+1` for BOTH linked home records
+(@0x25d30 decompile, stride-0x60 table) on top of FUN_00037d80 planet-init
+which zeros 0x42..0x50 THEN calls FUN_00038ba4 (recalc runs at creation).
+REMAINING: PROS=1 (+0x48) seed on acc-P=0 records — census w16 writes of
++0x48 (word ptr [E.. + 0x44]-style regex unsupported; use per-register
+searches or search_byte_patterns 66 89 4? 48 mask 66 89 F? 48) and the
+FUN_00021ad8 completion-path INC semantics; then bank IND/PROS base law +
+upgrade rewrite defaults. (2) OQ-019 design-TOTAL: FUN_0004b068 callees =
+{20b44,20c48,2a438,2a448,2a49c,48f80,78aa0,78ac4} — no summation helper
+(t19); t19 also CORRECTED §9 wording: @0x23a83 stores SHIP-slot field
+[iVar8+0x1a]=0 (stride 0x7b), not a cost store. Next probe: inline ADDs
+over gizmo stride-0x6a reads inside FUN_0004b068's 26K disasm (dump once,
+grep locally). (3) ledger: cost sub-question CLOSED §9; starting-ship law
+banked §10 docs-only.
 
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;
