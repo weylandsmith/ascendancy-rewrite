@@ -162,10 +162,13 @@ ledger:
 (1) OQ-016 POP STORAGE (last growth-half residue, income-law.md S6c):
 pop is NOT in planet rec 0x00-0x7a; probe star-record stride-0x1ee table
 (DAT_00012e10 / redistribution target DAT_00012dda+0x1ee*i -- governor-
-0x1f path splits IND into 10 shares there, STRONG UPOP hint: pop stored
-per-planet-slot-share? capture-delta scan of that table on growth
-threshold turns) + FUN_00055a60 event-args semantics. THEN growth-model
-upgrade replaces campaign.cpp logistic default.
+0x1f path splits IND into 10 shares there; capture-delta scan of that
+table on growth threshold turns). NEGATIVES ALREADY TAKEN t23: 0x66d8
+region = event-dispatch trampoline table NOT pop constants; 0x7a35c =
+code template (x86 bytes) NOT a string; no FADD/FSTP float-op to
+[reg+0x67] byte-census run yet (regex bug, not retried per
+no-loop rule). THEN growth-model upgrade replaces campaign.cpp
+logistic default.
 (2) RESTORE availability law S4 (economy.h cites it; probe-destroyed
 pre-t20) into income-law.md from FUN_0003830c re-verify.
 
