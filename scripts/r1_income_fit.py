@@ -2,24 +2,33 @@
 """r1_income_fit.py — candidate-model scoring for the colony income law
 (OQ-016 income half) against guest RAM. Companion to r1_income_law.py.
 
-Disassembly baseline (work/ascend_restored.bin, FUN_00038ba4 @0x38ba4):
-planet record stride 123, base = NAME - 0x24; slot array = u32[rec+0x10]
-(raw, member-walk delta fitted via empty census); slot dword {byte0 cls,
-byte1 itemIdx 0xff empty, u16 flags @+2 bit0 ACTIVE}; item record stride
-0x28 at Ghidra 0x73e40 -> B+0x82BB0+0x73e40: byte0 IND, +1 RES, +2 PROS,
-+3 MPOP, +4 UPOP, word@6 flags.
+Disassembly baseline (work/ascend_restored.bin, FUN_00038ba4 @0x38ba4,
+full-function dump 2026-10-07, byte-authoritative):
+planet record stride 123, base = NAME - 0x24; slot array = u32 at [rec+0x10]
+RAW (0x38c8b uses [EBX+0x10]+4*i directly); slot dword {byte0 terrain class
+(+0x8 impassable bit), byte1 itemIdx (0xff empty), u16 flags @+2 bit0
+ACTIVE bit1 skip}. item table stride 0x28 at Ghidra 0x73e40 -> B+0x82BB0+
+0x73e40: byte0 IND, byte1 RES, byte2 PROS, byte4 -> orbital channel.
 
-ACTIVE-slot accumulation @0x38cbe..0x38d1f: IND/PROS/RES += item value plus
-+1 when slot cls==2/3/4 respectively (VERIFIED bytes 0x38cce/0x38cf2/0x38d17).
-Doubling @0x38d3f+: first slot whose itemIdx==k AND active -> v += v>>1
-(k=12 IND, 13 PROS, 14 RES). Governor @+0x54: 0x21 PROS+=IND>>2, 0x22
-RES+=IND>>2 (@0x38e05/0x38e10). Compression @0x38e2d..: pow(V+1,0.85) double
-(FILD/FSTP/pow/ROUND/FISTP). i16[+0x42] SAR 2 subtracted from PROS only.
+Accumulation (active slots only, 0x38cbe..0x38d1f):
+  A += item.b0, +1 if slot cls==2   (IND channel)
+  P += item.b2, +1 if slot cls==3   (PROS channel)
+  R += item.b1, +1 if slot cls==4   (RES channel, NEVER pow-compressed)
+  O += item.b4 (orbital; governor 0x23 adds byte@0x743b9)
+Slot flags word @item+6: bit2 -> extra per-slot scan (+0x58 count), bit3 ->
++0x59 counter; itemIdx==0x17 (Ship) skips orbital sub-branch.
 
-OPEN (this battery scores them): pow arg V vs V+1; whether captured stored
-values include extra terms (observed IND=1/PROS=1 on facility-free owned
-planets in 3 captures — a possible unlocated per-planet base or a stale-value
-artefact of these saves).
+Doubling @0x38d3f..0x38df0: FUN_0003958c finds FIRST slot with itemIdx==k
+(k=12 IND, 13 PROS, 14 RES); caller requires that slot's ACTIVE bit; v +=
+v>>1 once.
+Governor byte @+0x54: 0x21 P+=A>>2 ; 0x22 R+=A>>2 ; 0x23 O+=byte@0x743b9.
+Compression @0x38e2d/0x38e5e: A and P only, V!=0 -> V = trunc((V+1)^0.85)
+(FILD/pow/RET/FISTP; t18b verified chop semantics).
+Upkeep i16 @+0x42: P = max(0, P - (|upk| >> 2))  [0x38e8d..0x38eb0].
+Stores: +0x44=A +0x46=R +0x48=P ; +0x1c=buildable-empty +0x20=zero-class
++0x1e=beyond-cells counts (ONLY meaningful after recalc ran; fresh
+placements write these from setup code with different semantics).
+Clamps @0x38f01..: +0x4a in [0,100], +0x42>=0, +0x4c<=+0x42.
 
 Exit 0 only if a model hits >=95% IND+PROS+RES equality on fitted records.
 """
@@ -40,11 +49,9 @@ RUNS = sorted(os.path.join(ROOT, "work", "r1", x)
               if os.path.isdir(os.path.join(ROOT, "work", "r1", x, "save")))
 
 
-def p85(v, shift):
-    x = (v + shift) ** 0.85
-    f = math.floor(x)
-    d = x - f
-    return f if d < 0.5 else (f + 1 if d > 0.5 else (f if f % 2 == 0 else f + 1))
+def trunc85(v):
+    """RET at 0x76e08 = trunc (0x78954 is RINT; verified disasm 2026-10-07)."""
+    return int(v ** 0.85)
 
 
 def item_table(m, B):
@@ -59,7 +66,7 @@ def item_table(m, B):
             "ind": st.unpack_from("<b", m, b + 0)[0],
             "res": st.unpack_from("<b", m, b + 1)[0],
             "pros": st.unpack_from("<b", m, b + 2)[0],
-            "mpop": st.unpack_from("<b", m, b + 3)[0],
+            "orb": st.unpack_from("<B", m, b + 4)[0],
             "flags": st.unpack_from("<H", m, b + 6)[0],
         })
     return rows
@@ -145,9 +152,8 @@ def main():
     pay = open(PAY, "rb").read()
     anch = build_anchors(pay)
 
-    score = defaultdict(int)
-    rows = []          # (INDraw, PROSraw, RESraw, dbl, gov, up42, INDs, PROSs, RESs, nindcls)
-    fits = fails = 0
+    rows = []
+    fails = 0
     for run in RUNS:
         src = os.path.join(run, "save")
         for f in sorted(f for f in os.listdir(src) if f.endswith(".sav"))[:1]:
@@ -158,83 +164,85 @@ def main():
             B = v.most_common(1)[0][0]
             items = item_table(m, B)
             if items is None or not names_ok(items):
-                if args.verbose:
-                    print(f"{os.path.basename(run)}: item table FAIL")
                 continue
             for base in find_records(m):
                 if m[base + 0x57] == 0xFF:
                     continue
-                arr = fit_slot_base(m, base)
-                if arr is None:
+                cap = st.unpack_from("<H", m, base + 0x1a)[0]
+                arr = st.unpack_from("<I", m, base + 0x10)[0]
+                if not (0 <= arr and arr + cap * 4 <= len(m)):
                     fails += 1
                     continue
-                fits += 1
-                cap = st.unpack_from("<H", m, base + 0x1a)[0]
-                IND = PROS = RES = 0
-                nind2 = 0
+                if any(not (m[arr + i * 4 + 1] == 0xFF or m[arr + i * 4 + 1] < N_ITEMS)
+                       for i in range(cap)):
+                    fails += 1
+                    continue
+                A = P = R = O = 0
                 dbl = {12: False, 13: False, 14: False}
                 for i in range(cap):
                     cls = m[arr + i * 4]
                     it = m[arr + i * 4 + 1]
                     fl = st.unpack_from("<H", m, arr + i * 4 + 2)[0]
-                    if it == 0xFF or it >= N_ITEMS or not (fl & 1):
+                    if it == 0xFF or not (fl & 1):
                         continue
                     d = items[it]
-                    if d["ind"]:
-                        IND += d["ind"]
-                        if cls == 2:
-                            nind2 += 1
-                    if d["pros"]:
-                        PROS += d["pros"] + (1 if cls == 3 else 0)
-                    if d["res"]:
-                        RES += d["res"] + (1 if cls == 4 else 0)
-                    if it in dbl:
-                        dbl[it] = True
-                rows.append((IND, PROS, RES, dbl, m[base + 0x54],
+                    A += d["ind"] + (1 if cls == 2 else 0)
+                    P += d["pros"] + (1 if cls == 3 else 0)
+                    R += d["res"] + (1 if cls == 4 else 0)
+                    O += d["orb"]
+                # per-k first-slot doubling per FUN_0003958c (first slot only)
+                first = {}
+                for i in range(cap):
+                    it = m[arr + i * 4 + 1]
+                    if it in (12, 13, 14) and it not in first:
+                        fl = st.unpack_from("<H", m, arr + i * 4 + 2)[0]
+                        first[it] = bool(fl & 1)
+                if first.get(12):
+                    A += A >> 1
+                if first.get(13):
+                    P += P >> 1
+                if first.get(14):
+                    R += R >> 1
+                gov = m[base + 0x54]
+                if gov == 0x21:
+                    P += A >> 2
+                elif gov == 0x22:
+                    R += A >> 2
+                rows.append((A, P, R, O, gov,
                              st.unpack_from("<h", m, base + 0x42)[0],
                              st.unpack_from("<H", m, base + 0x44)[0],
-                             st.unpack_from("<H", m, base + 0x48)[0],
                              st.unpack_from("<H", m, base + 0x46)[0],
-                             nind2, os.path.basename(run), f, base))
-    print(f"fitted owned records: {fits}, base-fit fails: {fails}")
+                             st.unpack_from("<H", m, base + 0x48)[0],
+                             os.path.basename(run), f, base))
+    print(f"records: {len(rows)}, arr-fails: {fails}")
 
-    # score models: cls-bonus on IND yes/no; pow shift 0/1; constant base 0/1
-    for cb in (0, 1):
-        for shift in (0, 1):
-            for cst in (0, 1):
-                good = 0
-                for (IND, PROS, RES, dbl, gov, up, si, sp, sr, nind2, rn, f, base) in rows:
-                    i0 = IND + (nind2 if cb else 0) + cst
-                    p0 = PROS + cst
-                    r0 = RES + cst
-                    if dbl[12]:
-                        i0 += i0 >> 1
-                    if dbl[13]:
-                        p0 += p0 >> 1
-                    if dbl[14]:
-                        r0 += r0 >> 1
-                    if gov == 0x21:
-                        p0 += i0 >> 2
-                    elif gov == 0x22:
-                        r0 += i0 >> 2
-                    iv = p85(i0, shift) if i0 else 0
-                    pv = max(0, (p85(p0, shift) if p0 else 0) - (up >> 2))
-                    if (iv, pv, r0) == (si, sp, sr):
-                        good += 1
-                score[f"cls{cb} pow+{shift} cst{cst}"] = good
+    # per-channel scores: pow shift 0/1; upkeep 0/1; fresh-record init guess IND=1/PROS=1
+    for shift in (0, 1):
+        for upk in (0, 1):
+            ic = pc = rc = 0
+            for (A, P, R, O, gov, up, si, sr, sp, rn, f, base) in rows:
+                iv = trunc85(A + shift) if (A if shift == 0 else A) else 0
+                pv = trunc85(P + shift) if P else 0
+                pv = max(0, pv - ((abs(up) >> 2) if upk else 0))
+                if iv == si:
+                    ic += 1
+                if pv == sp:
+                    pc += 1
+                if R == sr:
+                    rc += 1
+            print(f"  pow+{shift} upkeep{upk}: IND {ic}/{len(rows)}  "
+                  f"PROS {pc}/{len(rows)}  RES {rc}/{len(rows)}")
 
-    for name, sc in sorted(score.items(), key=lambda kv: -kv[1]):
-        print(f"  {name:18s} {sc}/{fits}")
-    if fits and max(score.values()) >= 0.95 * fits:
-        print("MODEL IDENTIFIED")
-        return 0
-    # residual dump for the best model
-    best = max(score.keys(), key=lambda k: score[k])
-    print(f"residuals under {best}:")
-    for (IND, PROS, RES, dbl, gov, up, si, sp, sr, nind2, rn, f, base) in rows[:40]:
-        print(f"  {rn}/{f} base={base:#x} acc I/P/R={IND}/{PROS}/{RES} dbl={[k for k in dbl if dbl[k]]}"
-              f" gov={gov:#x} up={up} stored {si}/{sp}/{sr}")
-    return 1
+    # residual dump under pow+0 upkeep1
+    n = 0
+    for (A, P, R, O, gov, up, si, sr, sp, rn, f, base) in rows:
+        iv = trunc85(A) if A else 0
+        pv = max(0, (trunc85(P) if P else 0) - (abs(up) >> 2))
+        if (iv, pv, R) != (si, sp, sr) and n < 25:
+            n += 1
+            print(f"  MISS {rn}/{f} base={base:#x} acc A/P/R={A}/{P}/{R} "
+                  f"gov={gov:#x} up={up} stored IND/RES/PROS {si}/{sr}/{sp}")
+    return 0
 
 
 if __name__ == "__main__":
