@@ -159,48 +159,31 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-(1) OQ-016 FINAL RESIDUES (income-law.md S6f corrected t24c): (a) MPOP
-accumulation on +0x4a is NOT an established mechanism — full recalc
-disasm sweep 0x38bb1..0x38d76 shows item bytes 0/1/2 feed IND/RES/PROS
-accums and byte+6 bit2 gates orbital (c24), NO MPOP addend; cap variance
-is per-run map RNG (deterministic seed on default setup, re-rolled on
-option variants — banked S6f). Rewrite keeps per-planet popCapCap seed;
-OQ-012 mapgen law will supply values. (b) CLOSED t25 as NEGATIVE (income-law.md S6g): zero build events in
-all 32 captures — slot arrays static t41..t60 both long runs while
-pop/upkeep ticked; FUN_00021ad8 = ship-completion NOT item-completion
-(decompile banked). Decisive route = BUY-CLICK RUN: geometry first from
-windows.txt planet-window entries (PLPOP precedent line 1587), then
-10s-cadence capture around scripted purchases; measure slot word+2 flag
-transition + budget drawdown vs COST column (planitem.txt, S6h index
-law). (c) DONE t25: income-law.md S4 REBUILT from FUN_0003830c primary
-decompile (research 254-dead, free-pop gate incl governor byte+3, XOR
-surface/orbital for idx<31, cell-bit3 -> idx38 Xeno-dig-only, idx36
-empty-slot, idx35 automation rule, idx23 Ship -> FUN_00039a9c on PASSED
-gate, unowned planet accepts only idx5 Colony Base); economy.h
-citations repointed, ctest green.
-(2) DONE t26: BUILD-COMMAND LAW CLOSED-STATIC (income-law.md S7,
-FUN_00038840 decompile): cmd 0 buy -> gates (empty cell, UPOP <=
-pop-used, surface/orbital XOR), slot byte1=item word+2=1 ACTIVE
-IMMEDIATELY, recalc every exit path => NO build timer exists; cadence =
-budget/pop-limited (buy-click run downgraded to optional confirmation).
-cmd 1 demolish gate MPOP <= cap-pop OR inactive, cmd 2/3 SELECT ability:
-+0x52=cell +0x54=item => +0x54 is SELECTED-ABILITY (33/34/35 = the S6
-"governor" 0x21/0x22/0x23 values — naming retired), word+2 HIGH BYTE =
-ability charge count (FUN_00039b6c). Rewrite buildPhase gained the
-measured free-pop gate (UPOP sum vs pop) + cadence comment; ctest 100%.
-OPEN sub-residues banked S7: COST deduction site not in handler (image
-census of item+8 showed only stride-8 growth table; COST read via
-base+stride form — census `*0x*28*+8` readers next); slot bit0-CLEARER
-(inactivate path) census next.
-NEXT: (a) those two censuses; (b) OQ-012 mapgen seed law (+0x4a caps,
-terrain grids).
+(1) AI BUILD-QUEUE FULL LAW (income-law.md S8 banked t27): the +0x50
+industry accumulator pays COST(item at +0x52, Ship=design cost x3) per
+turn; live-verified +IND/turn on all chase-capture planets. Open piece:
+WHAT SELECTS +0x52 — FUN_00038840 cmd 2/3 is the HUMAN select path; the
+AI chooser is the evaluator region 0x3f4d0..0x3f74c (score writes
+word [ESP+EDX*1+1] per item class 0..3, jump table via [ECX+0x2a570]
+per species) — decompile that region completely, then wire the rewrite
+buildPhase queue (pending item + accumulator) REPLACING the instant
+ind-deduction default. Naive 70-filter gate ALONE regressed 4 campaign
+victory tests (reverted; observation kept in comment).
+(2) +0x52/+0x54 persist across turns in captures with q52 != 0xFFFF
+(11/19/51/40 in chase run) BUT the completion path resets them — those
+planets' pending item must re-select each turn OR they finished t<41.
+Check q52 stability vs item-array stability next capture diff.
+(3) OQ-012 mapgen seed law (+0x4a caps, terrain grids) — unchanged.
 
-T24b LANDED: pop-cap(+0x4a) source pinned to WORLD-GEN seed + verbatim
-build-struct copy (FUN_0003a558 @0x3a631.. disasm) — cross-run census
-56/61 names stable, 5 differ by +3..4 = MPOP accumulation, reseeding
-ruled out (income-law.md S6f); rewrite default 25 inside measured
-envelope, flagged; chase-capture law banked (End-Turn 511:67/15s, ring
-by MTIME) so future runs skip rediscovery.
+T27 LANDED: BUILD-QUEUE LAW CLOSED (S8: COST=item+8 via 0x73e40+8+28i
+[earlier stride-8 cap-table reading CORRECTED]; +0x50 += IND (+1 AI
+catch-up when IND<4 && DAT_00013bc4==2); completion when +0x50 >= COST;
+item completion effects banked (Ship pop -= DAT_000741dc flag-gated,
+Terraforming sets byte0=1, Automation |= bit1, item37 +0x55+=10 once));
+GROWTH BONUS CORRECTED: active CLONING PLANT (item 15, 0x393ad MOV
+EDX,0xf + FUN_0003958c EDX signature) not Hyperpower — docs S6b/S6 +
+campaign.cpp hasClone shipped; AI 70-ratio policy observed, NOT wired
+(selector unresolved); ctest 100%, gate ALL CHECKS PASS.
 
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;

@@ -164,7 +164,7 @@ copy), 0x39084 (INC when IND<4 & alien-owned), 0x3909f (accumulate
 (reset 0 on governor-1f path), 0x3ad74 (event +200, see below).
 
 => TWO PARALLEL COUNTERS: +0x4e accumulates STORED PROS (+1 alien boost,
-threshold DAT_000066e4=50 at 0x39337 -> upkeep+1 (+1 active-Hyperpower
+threshold DAT_000066e4=50 -> upkeep+1 (+1 active-CLONING (CORRECTED t27:
 flag-bit 0x393d4..0x393e4), reset); +0x50 accumulates IND + growth-cap
 gate value (FUN_000394d8: item-table word DAT_00073e48+itemIdx*0x14,
 x3 when itemIdx==0x23 AND slot==[+0x52]; -1 sentinel). Gate at 0x390a8:
@@ -240,7 +240,10 @@ gate pop<cap(+0x4a) else counter(+0x4e):=0; counter += STORED PROS (+0x48,
 post-compression post-upkeep value); +1 more iff owner != current-turn
 player ([0x7458e]) AND stored PROS < 4 (the alien-freeloader term: the
 observed 4 AI wraps need 3/turn at pop-2 growth, player term 1/turn);
-counter >= 50 -> pop += 1 (+1 more if FIRST slot itemIdx 12 Hyperpower
+counter >= 50 -> pop += 1 (+1 more if FIRST slot itemIdx 15 CLONING PLANT
+ [CORRECTED t27 by raw disasm 0x393ad `MOV EDX,0xf` + FUN_0003958c
+ signature regparm2(itemIdx); the earlier "12 Hyperpower" reading was a
+ wrong literal — S6's 12/13/14 doubling triple is unaffected]
 ACTIVE — NOT observed at this wrap, banked disasm-only, cap-clamped),
 counter := 0. Colonization SETS pop := 2 verbatim; event 20 += 2, event
 24 := cap. help.txt L2556 '%s has %d free population' consistent with
@@ -420,7 +423,62 @@ BL (caller-side load; decompiler shows unaff_BL). cmd values:
  initial count). word+2 bit0 = active flag (queue writes 1). A writer
  that CLEARS bit0 (pop-overflow deactivation?) is NOT yet located —
  queued census `and 0xfe` / `mov word[..],0` on slot arrays.
- COST (u16 item+8) is NOT deducted in this handler: deduction site is
- the resource-budget path, still open (image-wide read census of the
- item-table +8 offset finds only the stride-8 growth-cap table at
- 0x73e48 — COST must be read via base+stride forms).
+ COST (u16 item+8) is NOT deducted in this handler -> see S8: the
+ industry accumulator +0x50 pays it over turns in FUN_00038f68.
+
+## 8. BUILD-QUEUE LAW: builds are industry-time, not free (t27) — CORRECTS S7
+
+S7's "no build timer exists" is REFUTED by the full FUN_00038f68
+decompile + live per-turn deltas. The timer is a per-planet INDUSTRY
+accumulator, not a turn counter.
+
+ COST IS ITEM-TABLE FIELD +8 [verified by offset arithmetic]: readers
+ write `word [EAX*0x8 + 0x73e48]` with EAX = idx*5 -> byte offset
+ 0x73e40 + 8 + 0x28*idx = item[idx].COST. The earlier reading of
+ DAT_00073e48 as a separate "stride-8 growth-cap table" was WRONG
+ (0x73e40 is the item-table base). FUN_000394d8 therefore RETURNS THE
+ COST of the item in cell [+0x52], with item 23 (Ship) costing the
+ ship-design value (FUN_000396cc/FUN_0004a41c) and TRIPLED when the
+ queried cell == +0x52 (0x39545..0x39550 IMUL EAX,3).
+
+ ACCUMULATOR LAW @0x3907b..0x390ac (raw disasm authoritative — the
+ decompiler mangles these field offsets, showing +0x11/+0x14):
+   if (owner != DAT_0007458e && DAT_00013bc4 == 2 && IND([+0x44]) < 4)
+       [+0x50] += 1;                      # AI catch-up boost
+   [+0x50] += IND([+0x44]);
+   cap = FUN_000394d8(rec, [+0x52]);      # = COST of pending item
+   if (cap > [+0x50]) JA 0x392a2;         # not paid yet -> no completion
+ On payment (fall-through) the pending item's slot is activated
+ (word+2 |= 1; if the cell carries the unbuildable bit3 it is cleared
+ and byte1 := 0xFF with FUN_00046e84), item-specific completion effects
+ run (item 23 Ship -> pop -= DAT_000741dc when ship flag byte+0x58==1;
+ item 36 Terraforming -> word+2 := 0, byte1 := 0xFF, byte0 := 1;
+ item 35 Automation -> word+2 |= 2; item 37 -> [+0x55] += 10 once),
+ then [+0x52] := 0xFFFF and the selected-item byte := 0xFF.
+
+ LIVE MEASUREMENT (chase capture r1deep-20261007-224831, mtime-ordered
+ ring, 20 slots covering ~10 in-game turns): every owned planet's +0x50
+ rose by EXACTLY IND each turn — IND=1 planets 4,5,6,7,7,8,9,10,11
+ (duplicated values are same-turn slots, clicks drive turns), and the
+ planet with IND=0-equivalent selection (+0x52=0xFFFF, Millitrin II)
+ held +0x50 at 0 throughout. No build completed in-window because the
+ pending COST was never reached (item arrays static, S6g). Inactive
+ items (word+2 == 0) are common in shipped RAM (Corpuscle I holds two:
+ items 1 and 2 both inactive) = builds awaiting payment.
+
+ AI BUILD POLICY [verified verbatim] @0x3f528..0x3f672: loop 39 item
+ rows; skip unless (research gate as S4) AND (cap(+0x4a) - used(+0x4c)
+ >= UPOP(item)); among survivors it rejects any item whose
+ COST(item) / IND(planet) >= 70 (0x3f6e9 IDIV EBX=IND, 0x3f6eb
+ CMP EAX,0x46 JGE reject). So the AI never starts a build that would
+ take 70+ turns on that planet.
+
+ GROWTH LAW CONFIRMED INDEPENDENTLY of the queue (same function):
+ [+0x4e] += PROS(+0x48) (+1 if owner != DAT_0007458e && PROS < 4);
+ measured per-turn deltas EXACTLY +3 (PROS=3 planets) and +1 (PROS=1
+ planet) across 10 turns; at [+0x4e] >= DAT_000066e4(50): pop(+0x42) +=
+ 1 (+1 more if the first slot with itemIdx 12 is ACTIVE), clamp to
+ +0x4a, [+0x4e] := 0. Threshold hit observed live: 44 -> 48 -> 48 -> 0
+ with pop 3 -> 4 (Millitrin, gated at cap, held 40..42 and never
+ grew). When pop >= cap the else-path FORCES [+0x4e] := 0 every turn
+ (LAB_000393f9) — growth never even accrues at cap.

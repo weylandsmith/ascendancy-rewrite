@@ -267,17 +267,23 @@ void Campaign::incomeAndGrow() {
         // FUN_00038f68 @0x392f4: gate upkeep < cap (else counter reset);
         // @0x39302: counter += stored PROS; @0x39319: +1 more when owner !=
         // current-turn player AND PROS < 4 (unmeasured [verified disasm,
-        // "why" open]); @0x3933b: at counter >= 50 (DAT_000066e4) pop += 1,
-        // counter := 0. Hyperpower first-slot bonus (+1 extra) is banked in
-        // S6b; the rewrite's item list has no slot order, so it rides the
-        // dblI flag detected above [inferred mapping].
+        // @0x3933b: at counter >= 50 (DAT_000066e4) pop += 1,
+        // counter := 0. The +1-extra bonus is an ACTIVE CLONING PLANT
+        // (CORRECTED t27: raw disasm 0x393ad MOV EDX,0xf = item 15, slot
+        // finder FUN_0003958c takes itemIdx in EDX — the old "Hyperpower"
+        // reading used the wrong literal; income-law.md S6b/S8). The
+        // rewrite's item list has no slot order, so active-ness maps to
+        // "item is built" [inferred mapping].
+        bool hasClone = false;
+        for (int it : planets_[s].items)
+            if (it == itemId("Cloning Plant")) hasClone = true;
         PlanetState& ps = planets_[s];
         const int cap = ps.popCapCap + static_cast<int>(ps.capBonus);
         if (ps.pop < cap) {
             ps.growthCounter += static_cast<int>(pros);
             if (o != kPlayer && pros < 4) ps.growthCounter += 1;
             if (ps.growthCounter >= 50) {  // DAT_000066e4 [verified value]
-                ps.pop += 1 + (dblI ? 1 : 0);
+                ps.pop += 1 + (hasClone ? 1 : 0);
                 if (ps.pop > cap) ps.pop = cap;
                 ps.growthCounter = 0;
             }
@@ -324,6 +330,13 @@ void Campaign::buildPhase() {
             if (id < 0) continue;
             const PlanetItem& pi = (*items_)[id];
             if (pi.upop > ps.pop - usedPop) continue;  // §7 free-pop gate
+            // AI build POLICY (income-law.md S8, 0x3f6e9 IDIV / 0x3f6eb
+            // CMP 0x46): the original AI evaluator rejects candidates with
+            // COST / stored-IND(+0x44) >= 70. NOT wired: the evaluator
+            // SCORES all 39 items and selects by score (consumer chain at
+            // 0x3f5e9..0x3f672 unresolved); naively gating the rewrite's
+            // quota-head pick stalled AI expansion in 4 campaign tests.
+            // Rewiring needs the full selection law, not the filter alone.
             // OQ-014 CLOSED (income-law.md §4): gate == req==255 || (req<count &&
             // owned). 254 (Interstellar Trucking) is NEITHER -> permanently
             // unavailable in the original; the old requiresValidTech-based
