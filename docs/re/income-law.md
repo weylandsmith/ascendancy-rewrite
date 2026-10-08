@@ -223,3 +223,35 @@ item fields being pop-maintenance terms (economy.md header line).
 DECISIVE TEST: threshold-chase capture — if at a hit turn +0x42 increments
 while UI pop display increments, pop == +0x42 closes the item; rewrite
 growth model then replaces the logistic default with counter semantics.
+
+## 6e. POP == upkeep counter +0x42 (OQ-016 pop storage CLOSED, t24 capture)
+
+DECISIVE capture r1deep-20261007-224831 (chase schedule: New Game 75s,
+setup 150s, End Turn 511:67 every 15s; save ring read by MTIME, numeric
+slot names wrap). Slots 45->46 (one End-Turn interval):
+  Hannibal III  4e 48->0  42 3->4   (AI, owner 2)
+  Albireo I     4e 48->0  42 3->4   (AI, owner 4)
+  Phoebe I      4e 48->0  42 3->4   (AI, owner 3)
+  Vernunft I    4e 48->0  42 3->4   (AI, owner 1)
+  Millitrin II  4e 40->41 42 2->2   (player, PROS 1)
++0x4a unchanged (18/20/25/22) — the growth path does NOT write cap.
+Law [verified live + disasm]: pop = word +0x42 in UPOP units; growth tick:
+gate pop<cap(+0x4a) else counter(+0x4e):=0; counter += STORED PROS (+0x48,
+post-compression post-upkeep value); +1 more iff owner != current-turn
+player ([0x7458e]) AND stored PROS < 4 (the alien-freeloader term: the
+observed 4 AI wraps need 3/turn at pop-2 growth, player term 1/turn);
+counter >= 50 -> pop += 1 (+1 more if FIRST slot itemIdx 12 Hyperpower
+ACTIVE — NOT observed at this wrap, banked disasm-only, cap-clamped),
+counter := 0. Colonization SETS pop := 2 verbatim; event 20 += 2, event
+24 := cap. help.txt L2556 '%s has %d free population' consistent with
+free = pop - working. RESIDUE (open): per-planet +0x4a cap seed source
+(scenario template table; measured mid-game spread 13..28, NOT derivable
+from slot census: cap==c1c 0/151, cap~c1e±3 14/151); MPOP/UPOP runtime
+column byte (0xff sentinel at item+5, byte4=1 for most items — the +0x4a/
++0x4c accumulators unused by rewrite). REWRITE UPGRADE: campaign.h/.cpp
+pop=+0x42 analog, growthCounter=+0x4e, threshold 50, alien+1 term,
+colonization :=2.
+
+Runtime item-table dump note: byte5 = 0xff sentinel / small values
+(Factory b3=0 b4=1; Habitat b3=3 PROS=2 — byte3 feeds nothing the rewrite
+uses; §6 column map stands for IND/RES/PROS which BATTERY-verified).

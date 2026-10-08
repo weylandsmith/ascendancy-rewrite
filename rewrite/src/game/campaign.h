@@ -27,7 +27,15 @@ const char* victoryName(Victory v);
 const char* victoryConditionFile(Victory v);
 
 struct PlanetState {
-    double pop = 0;              // growth model: turnloop.md §3 [inferred]
+    // MEASURED pop law (docs/re/income-law.md S6e, R1 threshold-chase capture
+    // r1deep-20261007-224831): pop is the +0x42 counter (UPOP units),
+    // colonization SETS it to 2; growth increments it +1 per counter wrap;
+    // working population shown/used elsewhere = min(pop, popCapCap).
+    double pop = 2;              // +0x42 analog, colonization :=2 [verified]
+    int popCapCap = 25;          // +0x4a analog: scenario-template seeded per
+                                 // planet (measured mid-game spread 13..28;
+                                 // template table lift = open residue)
+    int growthCounter = 0;       // +0x4e analog (PROS-side counter, S6c)
     std::vector<int> items;      // indices into the planitem table
     // Species-ability modifiers (docs/re/abilities.md §2): SA_MoreMaxPop adds
     // capBonus to the effective pop ceiling; SA_Cornucopia sets richPros
@@ -55,7 +63,11 @@ struct CampaignConfig {
     bool freeForAll = true;
     int aiCount = 6;            // <= 6: NUMCONTROLS 7 total controls (turnloop.md §2)
     int starCount = 50;         // fresh campaigns measured 5/5 (r1-savestate 06p)
-    double initialPop = 20;     // [inferred default, turnloop.md §3]
+    double initialPop = 2;      // MEASURED: home + colonized planets both
+                                // carry pop(+0x42)=2 in the chase capture
+                                // while counters accumulate (income-law.md
+                                // S6e); UPOP units, not the v1 logistic's
+                                // 0..100 scale
     int popCap = 100;           // [inferred default; UPOP units undocumented]
     // Player species (specnum into docs/re/species.md): -1 = human, no SA_
     // (player.dip carries no ability token [verified]). >=0 grants that

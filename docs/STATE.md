@@ -159,26 +159,28 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-(1) OQ-016 POP STORAGE (last growth-half residue, income-law.md S6c):
-pop is NOT in planet rec 0x00-0x7a; probe star-record stride-0x1ee table
-(DAT_00012e10 / redistribution target DAT_00012dda+0x1ee*i -- governor-
-0x1f path splits IND into 10 shares there; capture-delta scan of that
-table on growth threshold turns). NEGATIVES ALREADY TAKEN t23: 0x66d8
-region = event-dispatch trampoline table NOT pop constants; 0x7a35c =
-code template (x86 bytes) NOT a string; no FADD/FSTP float-op to
-[reg+0x67] byte-census run yet (regex bug, not retried per
-no-loop rule). THEN growth-model upgrade replaces campaign.cpp
-logistic default.
-(2) RESTORE availability law S4 (economy.h cites it; probe-destroyed
-pre-t20) into income-law.md from FUN_0003830c re-verify.
+(1) OQ-016 RESIDUES (income-law.md S6e): (a) per-planet pop-cap(+0x4a)
+seed table — template copy site FUN_0003a558 @0x3a611..0x3a64d writes it
+from a SCENARIO structure: trace the source pointer in that loader
+(Ghidra disasm-authoritative), find the on-disk file (scenario/scen*.?)
+in extracted/, lift the 6 home worlds' cap values + map to rewrite
+popCapCap per planet or per-planet-class; (b) MPOP/UPOP runtime column
+byte: item+5 0xff sentinel vs byte4 (dumped t24: Factory b3=0 b4=1,
+Habitat b3=3 b4=1) — resolve which column FUN_00038ba4's c4a/c18 reads
+re-reading @0x38cbe block byte offsets, then wire cap growth to buildable
+items if MPOP is real.
+(2) RESTORE availability law S4 into income-law.md (economy.h cites it).
 
-T23 LANDED: growth-counter semantics closed (income-law.md S6c): raw
-byte census proves EXACTLY two parallel counters (+0x4e PROS-side
-threshold 50; +0x50 IND+cap-side gate via FUN_000394d8 x3-at-itemIdx-23
-rule) + event-switch table (20:upkeep+2, 23:+0x50+=200, 24:=cap,
-48:growth pass, 50:+0x55 byte++ recalc); accumulation-36 RESOLVED as
-capture-window artifact (both counters dropped same 14 on 41->42,
-impossible for accrual, pre-window writer event). Gate: run green.
+T24 LANDED: POP STORAGE CLOSED-BY-MEASUREMENT — pop == planet +0x42 (UPOP
+units). Decisive chase capture r1deep-20261007-224831 (End-Turn click law
+511:67 every 15s, ring read by MTIME): 45->46 four AI colonies wrapped
+counter 48->0 with pop 3->4; player colony 40->41 pop 2 (PROS-gated).
+Law banked S6e: counter+=stored PROS +1(alien & PROS<4); >=50 -> pop+=1
+(cap-clamped by +0x4a), reset; gate pop<cap else reset; colonise :=2;
+event20 +=2, event24 :=cap. REWRITE UPGRADE SHIPPED campaign.h/.cpp:
+growthCounter + threshold-50 + alien-boost replaces logistic default;
+initialPop 20->2; settlement seeds 10->2; combat pop/10 scaling flagged
+open not re-fudged; ctest 100% x3 builds, gate green.
 
 BANKED t11: renderer FUN_00036ed8 token law (m/y swapped pair via
 DAT_00074590 stride-0x14 names, s/t via DAT_00013000/DAT_000066d8 chains;

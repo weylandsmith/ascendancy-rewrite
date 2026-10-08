@@ -256,20 +256,42 @@ void Campaign::incomeAndGrow() {
         }
         income[o] += colonyChannel(accI, dblI, /*compress=*/true);
         res[o] += colonyChannel(accR, dblR, /*compress=*/false);
-        // PROS: growth model upgrade waits on the open accumulation-36
-        // anomaly (income-law.md S6b), so pop growth keeps the v1 raw-PROS
-        // additive default [documented default, turnloop.md §3];
-        // SA_Cornucopia's richPros rides the same channel.
+        // PROS channel: raw accumulator + ability bonus (stored value is
+        // compressed-then-upkeep-deducted in the original, income-law.md S6;
+        // the empire budget does not spend PROS, only growth does below).
         double pros = planets_[s].richPros;
         for (int it : planets_[s].items) pros += (*items_)[it].pros;
-        double g = 1.0;
+        // POP GROWTH — MEASURED counter law (docs/re/income-law.md S6c+S6e;
+        // decisive capture r1deep-20261007-224831 slots 45->46: counter
+        // 48 -> wrap -> 0 with pop +1 on four AI colonies simultaneously).
+        // FUN_00038f68 @0x392f4: gate upkeep < cap (else counter reset);
+        // @0x39302: counter += stored PROS; @0x39319: +1 more when owner !=
+        // current-turn player AND PROS < 4 (unmeasured [verified disasm,
+        // "why" open]); @0x3933b: at counter >= 50 (DAT_000066e4) pop += 1,
+        // counter := 0. Hyperpower first-slot bonus (+1 extra) is banked in
+        // S6b; the rewrite's item list has no slot order, so it rides the
+        // dblI flag detected above [inferred mapping].
         PlanetState& ps = planets_[s];
-        const double cap = popCapFor(static_cast<int>(s));  // SA_MoreMaxPop
-        ps.pop += g * 4.0 * ps.pop * (cap - ps.pop) / (cap * cap);
-        if (ps.pop < cap) ps.pop += pros;
-        if (ps.pop > cap) ps.pop = cap;
+        const int cap = ps.popCapCap + static_cast<int>(ps.capBonus);
+        if (ps.pop < cap) {
+            ps.growthCounter += static_cast<int>(pros);
+            if (o != kPlayer && pros < 4) ps.growthCounter += 1;
+            if (ps.growthCounter >= 50) {  // DAT_000066e4 [verified value]
+                ps.pop += 1 + (dblI ? 1 : 0);
+                if (ps.pop > cap) ps.pop = cap;
+                ps.growthCounter = 0;
+            }
+        } else {
+            ps.growthCounter = 0;  // upkeep >= cap resets @0x393f9
+        }
     }
     for (size_t i = 0; i < income.size(); ++i) ind_[i] += income[i];  // stockpile
+    // SCALE NOTE (t24): pop fields now carry ORIGINAL dot units (colonise
+    // :=2, cap 13..28 — income-law.md S6e). The combat read sites below
+    // (pop/10 fleet + local defense) were calibrated on the v1 0..100
+    // logistic; original combat scaling is its own open item (OQ-017
+    // family), so the divisor stays a documented default rather than a
+    // silently re-fudged constant.
     // Fleet "power" regens at 5/turn once sapped [documented default,
     // abilities.md §3 — no data exposes a repair rate or its precondition].
     for (int o = 0; o < Nowner_; ++o) {
@@ -353,7 +375,7 @@ void Campaign::expansionPhase() {
     for (const ShipInTransit& sh : fleet_) {
         if (owner_[sh.target] < 0) {
             owner_[sh.target] = sh.owner;
-            planets_[sh.target].pop = 10;  // settlement seed [inferred]
+            planets_[sh.target].pop = 2;  // settlement seed :=2 MEASURED (income-law.md S6e)
             events_.push_back({turn_, "owner " + std::to_string(sh.owner) + " colonised " +
                                   galaxy_.stars[sh.target].name});
         }
@@ -744,7 +766,7 @@ void Campaign::combatPhase() {
                 continue;
             }
             owner_[nb] = a;
-            planets_[nb].pop = 10;  // settlement seed (turnloop.md §5)
+            planets_[nb].pop = 2;  // settlement seed :=2 MEASURED (income-law.md S6e)
             fortify_[nb] = 2;
             events_.push_back({turn_, "owner " + std::to_string(a) + " captured " +
                                   galaxy_.stars[nb].name});
