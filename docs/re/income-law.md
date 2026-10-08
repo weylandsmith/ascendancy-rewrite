@@ -281,3 +281,104 @@ the build struct; MPOP adds per active facility. REWRITE MAPPING:
 popCapCap per-planet seed from mapgen when OQ-012 law lands; interim the
 rewrite default 25 sits inside the measured envelope [documented default,
 flagged, not silent].
+
+## 6g. Build-order / expansion-cadence: capture census NEGATIVE (t25)
+
+Slot-array census ([rec+0x10], cap words at +0x1a; slot = {byte0 terrain
+class, byte1 itemIdx, word+2 flags, word+4 sub}) across BOTH long runs —
+r1deep-20261005-230146 (t41..t60) and the chase run r1deep-20261007-
+224831 (t41..t60): built-item sets are STATIC for every owned planet
+across all 40 turn-slots (Corpuscle I {4,5 active; 2,1 inactive},
+Tonsberg IV {1,5}, Philadelphia I {5}, others {}). Population(+0x42) and
+upkeep counters DID tick (S6e) while items never changed => growth/
+income laws are item-build-independent, and NO build event exists in any
+of the 32 captures. Build ORDER (policy) and cadence (turns-per-item)
+are therefore NOT measurable from existing windows.
+FUN_00021ad8 decompile confirms it is NOT the planet-item completion
+path: it allocates a ship object (FUN_00024834), stores it into two
+owner fleets ([+0x2c+slot*4] and param_2[+0xb]), and increments fleet
+count words — the +0x44 INC is ship-count bookkeeping, not income.
+Decisive route queued (NOT retried blindly): one click-run scripted to
+BUY an item (planet screen -> buy; planitem COST column = resource-turns
+per extracted planitem.txt) with slot cadence 10 s, then measure
+(slot flags word+2 transition + cost drawdown) per purchase.
+
+## 6h. planitem table index law (t25, verified)
+extracted/ascend00/planitem.txt parsed name+data-line pairs -> EXACTLY
+39 items, index order = runtime itemIdx: 0 Factory 1 Agriplot 2
+Laboratory 3 Habitat 4 Metroplex 5 Colony Base 6 Industrial Megafacility
+7 Artificial Hydroponifer 8 Research Campus 9 Logic Factory 10
+Engineering Retreat 11 Surface Cloaker 12 Hyperpower Plant 13
+Fertilization Plant 14 Internet 15 Cloning Plant 16 Observation Inst
+17 Tractor Beam 18 Surface Shield 19 Surface Mega Shield 20 Outpost 21
+Transport Tubes 22 Shipyard 23 Ship 24 Orbital Docks 25 Orbital Cloaker
+26 Orbital Shield 27 Orbital Mega Shield 28 Orbital Missile Base 29
+Short Range Orbital Whopper 30 Long Range Orbital Whopper 31 Alien
+Hospitality 32 Interstellar Trucking 33 Endless Party 34 Scientist
+Takeover 35 Automation 36 Terraforming 37 Lush Growth Bomb 38 Xeno
+Arch Dig. Matches live slot byte1 values {1,2,2,4,4,5} and the
+12/13/14 doubling + 0x23 x3 cap rules. Columns: IND RES PROS MPOP UPOP
+COST RESEARCH-REQ FLAG (header line 3).
+
+## 4. Planitem AVAILABILITY + item-table law (RECONSTRUCTED t25)
+
+Original economy.md S4 was destroyed by the gizmo_probe regeneration
+(see STATE.md banner); every line below is re-verified against the
+restored image this turn. Primary source: FUN_0003830c decompile (full
+text this turn) + OQ-014 closure ledger (OPEN-QUESTIONS.md).
+
+ITEM TABLE (FUN_00037fc0 loader): stride 0x28 — byte0 IND, +1 RES, +2 PROS,
++3 MPOP, +4 UPOP, +5 REQUIRES, u16 +6 FLAGS, u16 +8 COST, name30 +10.
+Pointer-law index: item N at phys B + 0x82BB0 + 0x73E40 + N*0x28 (naive
+B+X is 0x88 off). 39 rows, byte-exact 39/39 vs extracted/ascend00/
+planitem.txt in 2 captures (ledger OQ-014); index order = S6h above.
+
+AVAILABILITY (FUN_0003830c, __regparm3(planetRec, itemIdx) -> -1 allowed /
+0 refused), verified predicates in decompile order:
+ 1. owner gate: byte +0x57 == 0xFF (unowned) refuses everything except
+    itemIdx 5 (Colony Base) and itemIdx 0xFF (demolition, unaff_BX path).
+ 2. RESEARCH gate [re-verified verbatim this turn]: req = byte +5 of item
+    table (DAT_00073e45 stride 0x28); allowed iff req==0xFF, else
+    req < DAT_00074744 (==66 restree rows) AND owned-race bit set:
+    *(u32*)(req*0x4b + 0x7478b) >> 0x18 & (1 << (owner & 0x1f)).
+    254 (Interstellar Trucking) fails BOTH arms -> permanently DEAD item.
+ 3. POP gate [re-verified verbatim]: free = u16(+0x42) - u16(+0x4c), plus
+    byte +3 of the GOVERNOR item row (DAT_00073e41 + gov*0x28) when +0x54
+    != 0xFF; allowed iff sign-extended UPOP (byte +4 of item row,
+    DAT_00073e41[i]*10>>0x18) <= free.
+ 4. PLACEMENT gates (slot cell unaff_BX < u16 +0x1a cap). Item indices
+    below are DECIMAL; the decompile literals 0x1f/0x23/0x24/0x26 = 31/35/
+    36/38 per the S6h index law:
+    - FLAG bit0 (DAT_00073e46 stride 0x14) item-specific cell ban; race
+      exception when DAT_00012fb3[owner*0x1ee] == 2 (player-block state
+      byte, semantics [unverified]).
+    - occupied cell (byte0 != 0) refuses unless itemIdx==0xFF (demolish)
+      or FLAG bit2 set.
+    - XOR law [re-verified verbatim], only for itemIdx < 31:
+      (cellIdx < u16 +0x18 terrain cells) != (itemIdx <
+      PTR_DAT_00073e3c == 22) refuses — surface items need terrain,
+      orbital items (22..30, count 9) need the ring; indices 31..38
+      (Alien Hospitality .. Xeno Arch Dig) exempt.
+    - cell FLAG bit3 (unbuildable terrain) allowed ONLY for itemIdx 38
+      (Xeno Archeological Dig) — matches planhelp/gizhelp alien-dig text.
+    - itemIdx 36 (Terraforming) requires a fully empty slot
+      (byte0==0 && byte1==0xFF).
+    - itemIdx 35 (Automation) requires slot word+2 bit0 SET (active),
+      slot byte1 != 23 (not a Ship), and word+2 bit2 CLEAR.
+    - itemIdx 23 (Ship): when the research/pop gate PASSED
+      (iVar8 == -1 && bVar7 == 0x17), iVar8 is REPLACED by FUN_00039a9c's
+      return (shipyard-legality path) — ship build legality lives there.
+    Outer ownership gate also exempts itemIdx 5: an UNOWNED planet
+    accepts only Colony Base (colonisation entry, matches S6e :=2 seed).
+    - adjacency: new item on terrain cell with slot word+2 bit0 CLEAR runs
+      FUN_0003965c/0x395c4 four neighbour probes; any ACTIVE neighbour
+      (word+2 bit1) refuses.
+ 5. Research-gate overrides [re-verified verbatim]: itemIdx 5 (Colony
+    Base) ALWAYS passes the research/pop gate (`if (bVar7==5) iVar8=-1`
+    after the branch chain); itemIdx 23 (Ship) with research-gate still
+    refusing gets its legality from FUN_00039a9c (shipyard path) whose
+    return reassigns iVar8.
+Rewrite mapping ALIVE in code today: economy.h requiresAvailable() ==
+gate 2 verbatim; buildPhase gate+surface-cap == XOR law; MPOP gates
+demolition, UPOP gates start (0x38840 caller). Citations repointed here
+from the destroyed economy.md §4.

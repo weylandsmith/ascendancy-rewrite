@@ -165,9 +165,21 @@ disasm sweep 0x38bb1..0x38d76 shows item bytes 0/1/2 feed IND/RES/PROS
 accums and byte+6 bit2 gates orbital (c24), NO MPOP addend; cap variance
 is per-run map RNG (deterministic seed on default setup, re-rolled on
 option variants — banked S6f). Rewrite keeps per-planet popCapCap seed;
-OQ-012 mapgen law will supply values. (b) build-order + expansion-
-cadence verification vs chase captures (r1deep-20261007-224831 series).
-(c) economy.h doc-ref: restore S4 availability law into income-law.md.
+OQ-012 mapgen law will supply values. (b) CLOSED t25 as NEGATIVE (income-law.md S6g): zero build events in
+all 32 captures — slot arrays static t41..t60 both long runs while
+pop/upkeep ticked; FUN_00021ad8 = ship-completion NOT item-completion
+(decompile banked). Decisive route = BUY-CLICK RUN: geometry first from
+windows.txt planet-window entries (PLPOP precedent line 1587), then
+10s-cadence capture around scripted purchases; measure slot word+2 flag
+transition + budget drawdown vs COST column (planitem.txt, S6h index
+law). (c) DONE t25: income-law.md S4 REBUILT from FUN_0003830c primary
+decompile (research 254-dead, free-pop gate incl governor byte+3, XOR
+surface/orbital for idx<31, cell-bit3 -> idx38 Xeno-dig-only, idx36
+empty-slot, idx35 automation rule, idx23 Ship -> FUN_00039a9c on PASSED
+gate, unowned planet accepts only idx5 Colony Base); economy.h
+citations repointed, ctest green.
+NEXT: BUY-CLICK RUN geometry (windows.txt planet window), then
+OQ-012 mapgen seed law (supplies +0x4a caps + terrain grids).
 (2) RESTORE availability law S4 into income-law.md (economy.h cites it).
 
 T24b LANDED: pop-cap(+0x4a) source pinned to WORLD-GEN seed + verbatim

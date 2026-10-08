@@ -315,7 +315,7 @@ void Campaign::buildPhase() {
             int id = itemId(step.name);
             if (id < 0) continue;
             const PlanetItem& pi = (*items_)[id];
-            // OQ-014 CLOSED (economy.md §4): gate == req==255 || (req<count &&
+            // OQ-014 CLOSED (income-law.md §4): gate == req==255 || (req<count &&
             // owned). 254 (Interstellar Trucking) is NEITHER -> permanently
             // unavailable in the original; the old requiresValidTech-based
             // test let it build. Surface items are additionally capped at the

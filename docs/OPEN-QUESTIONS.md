@@ -133,7 +133,8 @@ grid A = per-type terrain mix (FUN_00037d80), grid B = ring/angle ranges
 (FUN_000395c4/0x3965c) + neighbour rule; MPOP gates demolition, UPOP gates
 start (FUN_0003830c/0x38840); FLAG bits consumer-mapped, bit4 set by NO
 shipped row, bit7 no consumer; RAM bit census == file (39/39). Full spec
-docs/re/economy.md §4. Rewrite: economy.h requiresAvailable() (gatedBy
+docs/re/economy.md §4 [spec prose lost to probe regen; REBUILT with
+re-verified predicates at docs/re/income-law.md §4, t25]. Rewrite: economy.h requiresAvailable() (gatedBy
 deleted), buildPhase gate+surface-cap, attack/defense/drive/bestDriveRange
 upgraded; 3 pin tests (89 tests 0 fail); gate green incl. seed-2024 Control
 t145. Per-cell planet model NOT in rewrite — terrain/nuke laws documented,

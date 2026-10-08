@@ -33,11 +33,11 @@ struct PlanetItem {
     int mpop = 0, upop = 0;          // MPOP/UPOP columns (units undocumented)
     int cost = 0;
     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
-    int flags = 0;                   // bitset; bit meanings MEASURED (economy.md §4)
+    int flags = 0;                   // bitset; bit meanings MEASURED (income-law.md §4)
 };
 
 // REQUIRES semantics MEASURED from the original loader FUN_00037fc0 and its
-// availability checker FUN_0003830c (docs/re/economy.md §4):
+// availability checker FUN_0003830c (docs/re/income-law.md S4, rebuilt t25):
 //   item available  <=>  req == 255 (sentinel)
 //                        || (req < techCount && ownedTech[req])
 // exactly one shipped row (Interstellar Trucking) carries 254, which is NOT
@@ -55,7 +55,7 @@ inline bool requiresValidTech(int req, int techCount) {
 }
 
 // MEASURED placement/size laws (loader FUN_00037fc0 + checker FUN_0003830c +
-// init FUN_00037d80; docs/re/economy.md §4). The count triple "39 22 9": 39
+// init FUN_00037d80; docs/re/income-law.md S4, rebuilt t25). The count triple "39 22 9": 39
 // items total (asserted == record count at 0x38115), 22 SURFACE items (global
 // 0x73e3c == 22 in 4/4 captures; drives the XOR placement law at
 // FUN_0003830c:0x384db — invalid iff (slot < surfaceCells) XOR (item < 22);
