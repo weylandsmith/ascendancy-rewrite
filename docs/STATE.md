@@ -168,9 +168,9 @@ one-wrap accumulation-36 transition (r1deep-20261005-230146 41->42.sav,
 planet 0x26e0ba). Then upgrade rewrite pop model (campaign.cpp:226-228
 logistic -> counter/threshold law + upkeep escalation). (2) income channel
 battery GREEN docs-only landing done (channels.py 138/139/136; JZ-skip
-mechanism at 0x38e31 banked S6b) -- campaign.cpp income lines may cite it:
+mechanism at 0x38e31 banked income-law.md S6b) -- campaign.cpp income lines may cite it:
 IND/PROS stored = per-accumulator value incl. grants; REWRITE INCOME
-UPGRADE candidate next turn (cite economy.md S6 + S6b, keep tests green).
+UPGRADE candidate next turn (cite income-law.md S6 + S6b, keep tests green).
 (3) OQ-019 design-TOTAL: inline-ADD probe over FUN_0004b068 26K disasm
 STILL QUEUED (zero-progress two turns; do it BEFORE any new OQ).
 
@@ -188,6 +188,14 @@ route of r1_star_table.py, stride 96 name records, NOT the raw DS offset);
 capture route stays valid but prep required, pair with OQ-016 idle capture.
 Ledger: OPEN = OQ-005, OQ-012(a), OQ-015, OQ-016, OQ-019, OQ-021 (user
 ruling (a) or capture (c)); BLOCKED = OQ-020 (30 turns). 92 tests.
+CROSS-CUTTING WARNING (t20, HARD): docs/re/economy.md and docs/re/gizmos.md
+are REGENERATED wholesale by scripts/gizmo_probe.py every gate run
+(gate.sh:146) — hand-written addenda THERE are silently destroyed (proved:
+dc9fb13 lost 87 lines; two mid-turn reverts 2026-10-07). Income/growth law
+now lives in docs/re/income-law.md (hand-maintained, probe-immune). §4
+(availability law, cited by economy.h) was already lost to the probe before
+this session — RESTORE it into income-law.md from rewrite/tests/test_economy
+.cpp law text + FUN_0003830c re-verification when that area is next touched.
 CROSS-CUTTING WARNING STILL ACTIVE: pin bytes from RESTORED image, read
 semantics from Ghidra payload program, cross-check both (993 diff
 clusters; 850 imm-fixups, 143 other).
