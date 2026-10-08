@@ -36,7 +36,7 @@ struct PlanetState {
     // writes capBase = NONBARRENCOUNT/3 + 5 into +0x55 AND +0x4a; recalc
     // then keeps +0x4a = clamp(0..100, capBase + sum MPOP(active items,
     // skipping item flags&4 and Colony Base row 5)). capBase is seeded per
-    // star at Campaign construction (draw law in seedCapBase()).
+    // star at Campaign construction (inline draw law, campaign.cpp ctor).
     int capBase = 0;             // +0x55 analog
     int surfaceCells = 23;       // +0x18 analog (seeded; income-law.md S10)
     int growthBoom = 0;          // +0x66 bit1 analog: Lush Growth Bomb fired

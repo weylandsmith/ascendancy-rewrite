@@ -176,9 +176,22 @@ flags&4 AND Colony Base) holds 38772/40318, residual purely +2 on 39
 planets (open minutiae); Lush Growth Bomb (item 37) completion = capBase
 +10 once (+0x66 flag, 0x39212..0x39229) — rewrite buildPhase/constructor
 REWIRED (capBase/surfaceCells seeded per star, storedCapFor() replaces
-constant-25 default, pin test campaign_pop_cap_seed_law_oq016) —
-REMAINING: per-cell terrain/nuke grid + nuke event law, home-placement
-verification, +2 residual minutiae, scenario-template preset source) |
+constant-25 default, pin test campaign_pop_cap_seed_law_oq016); t29b
+terrain-mutation CLOSED by 40k consecutive-save sample census: surface
+base classes change ONLY via item-36 Terraforming completion law + the
+world-gen |8 rock event (rng%7==0 @0x37f5c); all remaining save-to-save
+"class changes" coincide 1:1 with the slot-array pointer moving
+(extraction aliasing, not gameplay writes); rng 0x7824f CORRECTED to
+0..32767 (`SHR 16; AND 0x7FFF` @0x78269) — seed draw law is barren iff
+rng < scaled(w0) @0x37e51..0x37ea4 with cumulative class chain
+@0x37eb7..0x37ee0 [verified instruction-level] — BUT the preset-row ->
+observed-histogram mapping is REFUTED (13-run first-save battery, ~70k
+cells: preset 0 row [100,0,0,0] predicts all-barren yet preset-0 planets
+show 51% barren; no monotone reading of 0x744f4 fits, so the generation
+row is NOT the save-time +0x16 row) — per-cell terrain SHAPE therefore
+stays OPEN and rewrite does NOT model cell classes — REMAINING: terrain
+weight-row provenance (scenario data-file lift), nuke event law,
+home-placement verification, +2 residual minutiae) |
 income law docs/re/income-law.md S6..S10; harness scripts/r1_income_
 channels.py; chase-capture law = deep-schedule End-Turn clicks 511:67
 every 15s, save ring read by MTIME.

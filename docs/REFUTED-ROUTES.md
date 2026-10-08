@@ -86,6 +86,17 @@ smfont; 'AA core = stroke width' dead; font ink cannot be palette-relative
   v2's strict policy the open ledger still has 15 items — that sentence is
   not evidence anything in the ledger is done.
 
+## R11. Terrain preset-row == 0x744f4[+0x16] as GENERATION row — REFUTED (t29b)
+The class-draw law itself is verified instruction-level (barren iff
+rng<scaled(w0) @0x37e51..0x37ea4, cumulative chain @0x37eb7..0x37ee0,
+rng 0..32767 @0x78269). But a 13-run first-save battery (~70k surface
+cells binned by the SAVE's +0x16) refutes the row as the generation
+source: preset 0 row [100,0,0,0] predicts all-barren, preset-0 planets
+show 51% barren; no monotone reading fits. Do NOT wire rewrite cell-class
+generation off the save-time +0x16 row. Sanctioned route: +0x16 writer
+census post-world-gen, else scenario data-file lift (docs/re/income-law.md
+S10 OPEN RESIDUE t29b).
+
 ## Meta-lessons (how v1 self-corrected; keep doing this)
 - Verify the number, THEN write the sentence. Controls on every vote/census.
 - Ambiguous windows don't vote (fake-base incident).

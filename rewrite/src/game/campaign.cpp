@@ -106,14 +106,18 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     const int n = static_cast<int>(galaxy_.stars.size());
     owner_.assign(n, -1);
     planets_.resize(n);
-    // WORLD-GEN POP-CAP SEED (income-law.md S10 t29): per planet the cell
-    // loop draws rng(0..99) < w0 -> barren (w0 = preset row [0] at runtime
-    // 0x744f4, MEASURED table {100,50,20,0,40,20,40,20,40,20,0}); non-barren
-    // surface cells counted; seed word = count/3 + 5 written to +0x55 AND
-    // +0x4a (@0x37f84..0x37f9e). Preset-per-planet assignment comes from the
-    // scenario template (open residue; measured near-uniform 0..10 over 151
-    // planets, so uniform draw [documented default]). Binomial law
-    // reproduces the measured per-size ranges {5..7,5..8,5..12,5..20,5..29}.
+    // WORLD-GEN POP-CAP SEED (income-law.md S10 t29): the draw LAW is
+    // verified instruction-level — a surface cell is barren iff
+    // rng < scaled(w0) of the row actually used at generation
+    // (@0x37e51..0x37ea4; rng 0..32767 @0x78269); non-barren surface cells
+    // are counted; seed word = count/3 + 5 written to +0x55 AND +0x4a
+    // (@0x37f84..0x37f9e). WHICH row each planet gets is NOT the save-time
+    // +0x16 (REFUTED t29b, REFUTED-ROUTES R11): documented default here =
+    // uniform preset 0..10 over the MEASURED w0 table {100,50,20,0,40,20,
+    // 40,20,40,20,0} @0x744f4, which reproduces the observed aggregate
+    // barren rate (28.2% vs 28.3% measured) and the exact per-size capBase
+    // ranges {5..7,5..8,5..12,5..20,5..29}; per-planet terrain SHAPE stays
+    // open until row provenance closes.
     {
         static const int kBarrenW[11] = {100, 50, 20, 0, 40, 20, 40, 20, 40, 20, 0};
         std::uniform_int_distribution<int> presetDraw(0, 10);

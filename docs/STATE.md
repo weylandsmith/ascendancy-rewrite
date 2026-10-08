@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-08T16:40
+updated: 2026-10-08T17:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -173,22 +173,33 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NOTE t29: POP-CAP SEED LAW CLOSED (S10) + wired; gate green, 98/98 tests.
+NOTE t29b: terrain row-provenance REFUTED by battery (banked S10
+OPEN RESIDUE t29b); mutation census closed; rng range corrected.
 Goal-gate harness note from t27d stands (gate truth = plain
 `bash scripts/gate.sh` exit 0).
 
-(1) OQ-016 terrain residue: the per-cell CLASS grid law is now fully known
-    (world-gen 0x37e41..0x37eec, preset weights 0x744f4, cell counts
-    0x744a8 — S10). What remains: the NUKE event path (which cell classes
-    flip to 8 / destroyed) and slot class&8 gameplay effect beyond the
-    world-gen rock law. Route: census byte|=8 writers on slot arrays
-    (pattern `or byte [reg],8` with slot-pointer provenance) in restored
-    image, then correlate with nuke events in captures if any exist.
+(1) OQ-016 terrain weight-row PROVENANCE: the class-draw law is verified
+    instruction-level (barren iff rng<scaled(w0) @0x37e51..0x37ea4,
+    cumulative chain @0x37eb7..0x37ee0, rng 0..32767 @0x78269) but the
+    SAVE-time +0x16 row does not generate the observed histograms (S10
+    t29b battery). Route: trace who WRITES +0x16 after world-gen (full
+    word-writer census like the +0x4a one) — if +0x16 is rewritten,
+    restore the generation-time value per planet and re-run the battery;
+    else lift scenario planet-setup data files (static.txt sibling) and
+    match rows there.
 (2) +2 pop-cap residual (S10): all direct word-writers of +0x4a accounted;
     candidate register-offset/base-relative write — try disp16 census on
     EIP-relative addressing near the tick function family 0x38f68..0x3958c.
     Low priority (0.4% of samples).
 (3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+
+T29B LANDED (measurement-only, no code change): terrain mutation CLOSED
+(40k consecutive-save census: base classes mutate ONLY via item-36
+Terraforming law + world-gen rock; apparent changes = slot-aliasing);
+rng 0x7824f range CORRECTED 0..32767 in S10; preset-row->histogram
+mapping REFUTED (13 runs, ~70k cells; preset 0 predicts all-barren,
+observed 51%) — per-cell terrain shape stays OPEN, rewrite does NOT
+model cell classes (claim reverted before landing in campaign.h).
 
 T29 LANDED: POP-CAP SEED LAW CLOSED + WIRED (S10: world-gen func 0x37d80
 single caller 0x23b49; cell loop rng<barren-w0 law w/ MEASURED preset

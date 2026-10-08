@@ -627,30 +627,51 @@ inferred. The +2 residual class itself = OPEN residue (candidate: uncensus-
 able register-offset write to +0x4a; every direct word-writer is accounted).
 
 WORLD-GEN SEED (FUNC at 0x37d80, single caller 0x23b49 scenario init):
-  cell loop 0x37e41..0x37eec over word[+0x1a] cells:
-    per-cell class from preset row = [EBX=0x744f4 + 4*word[+0x16]]:
-      rng(0x7824f, returns 0..99) vs scaled thresholds
-      T_i = w_i*(32768-1)/100 (`SHL 0xF; SUB; DIV 100` @0x37e51..0x37ea4);
-      barren when rng < w0; else class 3 / 4 / 1 chain @0x37eb7..0x37ee0
-      (ecx counts every NON-BARREN cell @0x37ebb).
-    orbital ring (cell index >= word[+0x18]) skips rng, class 1 @0x37f0e.
-  rock event @0x37f4d: rng%7==0 (idiv 7, test edx @0x37f5c) -> class|=8 on
+  cell loop 0x37e41..0x37eec over word[+0x1a] cells (ORBITAL RING cells,
+  index >= word[+0x18], are forced class 1 @0x37f0e..0x37f19 — no rng):
+    rng = 0x7824f returns 0..32767 (LCG *0x41C64E6D +0x3039, `SHR 0x10;
+    AND 0x7FFF` @0x78269 — CORRECTED t29b: an earlier draft said 0..99).
+    Surface cell is BARREN (class 0) iff rng < scaled(w0), where the four
+    weights w0..w3 = row [EBX=0x744f4 + 4*word[+0x16]] scaled as
+    (w*32768 - w)/100 (`SHL 0xF; SUB; DIV 100` @0x37e51..0x37ea4);
+    non-barren cells increment the count ecx @0x37ebb and take their class
+    from the CUMULATIVE chain @0x37eb7..0x37ee0:
+      rng < w0+w1 -> class 2;  < +w2 -> class 3;  < +w3 -> class 4;  else 1
+    so the row's INTENDED shares are barren w0%, c2 w1%, c3 w2%, c4 w3%,
+    c1 the remainder.
+  ROCK event @0x37f4d: rng%7==0 (idiv 7, test edx @0x37f5c) -> class|=8 on
     rng%(surface-cells) slot; planet flag +0x66 |= 2.
   SEED WORD @0x37f84..0x37f9e: `MOV EBX,3; MOV EAX,ECX; CDQ; IDIV EBX;
     ADD EAX,5; MOV WORD [ESI+0x55],AX; MOV WORD [ESI+0x4A],AX` —
     capBase = NONBARRENCOUNT/3 + 5, and +0x4a initialised to the SAME value.
-  word[+0x16] (planet preset 0..10, `CMP 0xB` @0x37e2e, default 2) comes
-    from the scenario template (caller esp+0xc); captured single-player
-    map has presets 0..10 roughly uniformly across 151 planets.
+  word[+0x16] = the scenario-template weight-row index, clamped <11 else 2
+    (@0x37e2e..0x37e39).
   MEASURED RUNTIME TABLES (identical in all 13 captures, GVA B+0x82BB0+off):
     0x744a8 per-size surface-cell counts (5 rows x 15): row sums
       size0=7 size1=11 size2=23 size3=45 size4=73; live +0x18 matches
       EXACTLY (Almaviva III s0:7, Mukwonago I s3:45, Almaviva I s4:73).
-    0x744f4 preset barren/class weights (11 x 4): [100,0,0,0] [50,2,2,2]
+    0x744f4 preset weight rows (11 x 4): [100,0,0,0] [50,2,2,2]
       [20,3,5,3] [0,3,20,3] [40,10,2,2] [20,20,2,2] [40,2,2,10] [20,3,3,20]
       [40,10,10,10] [20,15,15,15] [0,33,34,33].
   Range cross-check: observed capBase per size class exactly
     {5..7} {5..8} {5..12} {5..20} {5..29} == min 5, max ncells/3+5.
+
+  OPEN RESIDUE t29b (row->histogram mapping REFUTED, first-save battery,
+  13 runs, ~70k surface cells binned by the SAVE's +0x16):
+    observed barren%% per row p0..p10: 51 25 22 15 29 23 25 25 25 20 14
+    chain-law intended        : 100 50 80 100 60 80 60 80 60 80 100
+    (p0 predicts ALL-barren and p3/p10 NONE, yet p0 shows 51%% barren and
+    p3/p10 15/14%%; no monotone reading of the table fits). Therefore the
+    weight row actually used at generation is NOT the +0x16 row read at
+    save time (either +0x16 is rewritten after generation or the scenario
+    passes a row the save does not record). Seed LAW +0x55=nb/3+5 itself
+    is unaffected (38772/40318 verified above); per-planet terrain SHAPE
+    and the barren law's effective source stay OPEN.
+  Terrain mutation: surface base classes change ONLY via the banked
+    item-36 Terraforming completion law (slot word2=0/byte1=0xFF/byte0=1)
+    and the |8 rock event; consecutive-save diffs on 40k samples show the
+    remaining 'changes' coincide 1:1 with the slot-array pointer moving
+    (extraction aliasing), not gameplay writes.
 EVENT MODIFIERS of the seed word (all cite +0x55 writers, full-code census):
   +10 once per planet: governor byte == 0x25 (= item 37 Lush Growth Bomb,
     planitem.txt row 37 '0 0 0 0 1 200 62 1 255') && !(+0x66&1)
