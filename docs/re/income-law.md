@@ -255,3 +255,29 @@ colonization :=2.
 Runtime item-table dump note: byte5 = 0xff sentinel / small values
 (Factory b3=0 b4=1; Habitat b3=3 PROS=2 — byte3 feeds nothing the rewrite
 uses; §6 column map stands for IND/RES/PROS which BATTERY-verified).
+
+## 6f. Pop-cap (+0x4a) source analysis (t24b) — seed is world-gen, not recalc
+
+Setup loader FUN_0003a558 @0x3a611..0x3a66c copies word fields 0x42..0x52
+VERBATIM from the caller's build struct ([ESP+0x42]->[+0x42], etc. — raw
+disasm; recalc does not seed it). Cross-run census across all captures
+(61 planet names): cap(+0x4a) stable per planet name 56/61. The 5
+exceptions are per-RUN map-RNG variance, NOT accumulation: Hannibal III
+shows 22 in 13 runs and 18 in exactly the two runs whose map start
+differed (r1deep-20261007-222504/224831 both 18); Ignatius I 15/22 and
+Sophia I 28/31 split exactly along the two r1ad setup variants;
+Philadelphia I 26/27 splits 224916 vs 230146. Default-option runs share
+a deterministic map seed (same caps), option/dud variants re-roll names
+->caps independently. MPOP accumulation on top of the seed therefore
+remains [inferred] (planitem MPOP values exist: Factory 0, Agriplot 0,
+Habitat 3, Metroplex 2, Colony Base 2 — planitem.txt lines 57-73) but is
+NOT established by these diffs; recalc's +0x4a addend in FUN_00038ba4 is
+the orbital/ability accumulation path banked in S6, no per-item MPOP add
+site found there. Mid-game observed spread 13..28
+with 0..2 built items => seed itself is 13..25ish per planet.
+CONCLUSION [inferred, strongly supported]: +0x4a seed = per-planet value
+produced by WORLD GENERATION (OQ-012(a) family / mapgen), carried through
+the build struct; MPOP adds per active facility. REWRITE MAPPING:
+popCapCap per-planet seed from mapgen when OQ-012 law lands; interim the
+rewrite default 25 sits inside the measured envelope [documented default,
+flagged, not silent].
