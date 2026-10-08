@@ -153,15 +153,27 @@ word ptr [ESI+0x46],AX @0x37f41` with AX=0 inside an ERROR/cleanup path in
 ship.cpp (owner string `..\planet.cpp` region; wipes fields 0x42..0x66 to
 0 — a bail-out reset, NOT a cost alter). FUN_0004929c (init_global_gizmos
 §8) zero +0x46 writes (read in full t15b). => gizmo-record Industry is
-NEVER altered post-parse. JJTTODO fork resolves to (b) stale-comment —
-with honest remainder: the DESIGN SCREEN computes design totals that may
-SUM gizmo Industry values (t19 wording fix: @0x23a83 is `MOV word ptr
-[iVar8+0x1a],0` in FUN_000238e8 — a stride-0x7b SHIP-slot record field,
-per t16 correction, NOT a gizmo/design cost store); whether the design
-sum is plain-addition or scaled is [unverified] and is the queued probe.
-Rewrite status for GIZMO RECORDS: ALREADY MATCHES (file Industry used
-unmodified; §2 v1 default vindicated by census — measured no-op, not
-plausibility). Design-total summation law: still open under OQ-019.
+NEVER altered post-parse. JJTTODO fork resolves to (b) stale-comment.
+Design-total sub-question CLOSED-BY-CENSUS (t21): three exhaustive
+sweeps found NO summation code anywhere in the image — (1) t16 w16/disp
+census of gizmo record fields: writers = parse-store @0x491b5 + error
+zero-wipe ONLY; (2) t18 callee list of design-screen owner FUN_0004b068
+= operators only; (3) t21 full 370-instruction dump of FUN_0004ae24
+(the function containing 0x4b068): pure design-record (de)serializer —
+0x162-byte stack buffer <-> record via MOVSD.REP @0x4af84/0x4b2e7,
+pointer-relocation switch on [rec+0x59] (constants 0x13bc5 species
+stride, 0x16147, 0x2b057), no gizmo reads, no accumulator. The @0x23a83
+store is `MOV word ptr [iVar8+0x1a],0` — a stride-0x7b SHIP-slot field
+(t16 correction), and the 20000-cap @0x23b7d reads the accumulated
+CELL-count u16 at +0x18245+iVar5 (sVar4 = FUN_00037d80 return = rec
++0x1a capacity), not any money total. LAW [closed by census; positive
+form inferred]: per-gizmo values charge as file values at use sites
+(t16 reader census, 26 non-stack readers of +0x46); no code in the image
+materialises a design cost total. (Example reader shape, range/power not
+industry: AI strike eval FUN_0004aa84 reads stride 0x6a +range/+0x6e and
+multiplies locally [verified t18].) Rewrite status: ALREADY MATCHES (file Industry used
+unmodified, §2 v1 default vindicated — measured no-op, not
+plausibility).
 
 ## 10. Starting-ship generation law (OQ-019 t17) [verified static]
 FUN_000238e8 (scenario init, per empire; ship slot chain param+0x18247

@@ -19,6 +19,32 @@ struct BuildStep {
 const BuildStep kBuildOrder[] = {{"Factory", 2}, {"Laboratory", 1},
                                  {"Agriplot", 2}, {"Shipyard", 1}};
 
+// Colony income channels, MEASURED law (docs/re/income-law.md S6/t18b +
+// t19/t20 battery r1_income_channels.py 138/139/136): the original stores
+// per planet  IND->rec+0x44, RES->+0x46, PROS->+0x48  as
+//   acc == 0            -> scenario grant (captured value 1: FUN_00025d30
+//                          colonization +1 on both linked home records)
+//   otherwise           -> trunc((dbl(acc, f) + 1) ^ 0.85)   [IND, PROS]
+//                          dbl(acc) + 1 - 1                   [RES: linear,
+//                            never pow-compressed; the +1/-1 keeps the same
+//                            shape — stored value is the accumulator]
+// dbl(v, f) = v + (v >> 1) when the FIRST table slot k is occupied+ACTIVE
+// (FUN_0003958c + bit-test @0x38d4b/0x38d90/0x38db5): k=12 Hyperpower Plant
+// doubles IND, k=13 Fertilization Plant doubles PROS, k=14 Internet doubles
+// RES. The rewrite has no per-slot terrain model, so the cls==2/3/4 +1
+// accumulation bonuses are absent [documented gap], and no planet upkeep
+// field exists to carry the PROS -= upkeep/4 penalty (growth-counter law
+// still open, income-law.md S6b) — PROS here is the pre-penalty stored
+// value.
+constexpr double kColonyIncomeGrant = 1.0;
+
+double colonyChannel(int acc, bool firstDoubleActive, bool compress) {
+    if (acc == 0) return kColonyIncomeGrant;  // grant survives recalc JZ-skip
+    int v = acc + (firstDoubleActive ? acc >> 1 : 0);
+    if (!compress) return static_cast<double>(v);
+    return std::floor(std::pow(static_cast<double>(v + 1), 0.85));
+}
+
 // Planet SIZE classes map onto grid-C surface-cell counts {7,11,23,45,73};
 // the rewrite's mapgen does not yet assign per-star size classes (parking
 // lot, STATE.md), so builds are capped with the MEASURED class-2 default.
@@ -202,24 +228,36 @@ bool Campaign::lanePassable(int owner, int target) const {
 
 void Campaign::incomeAndGrow() {
     std::vector<double> income(res.size(), 0.0);
+    const int idHyper = itemId("Hyperpower Plant");
+    const int idNet = itemId("Internet");
     for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
         int o = owner_[s];
         if (o < 0) continue;
-        // Base industry 1 per planet [inferred]; item IND/RES columns
-        // [verified planitem rows] drive income (turnloop.md §3).
-        income[o] += 1.0;  // industry income (spend currency) [inferred]
-        double resGain = 0;
+        // Per-planet stored channels under the MEASURED law (helper cites
+        // income-law.md). The original charges the COMPRESSED stored value
+        // into the empire budget each turn (turn tick FUN_00038f68 sums
+        // +0x44/+0x46 across owned planets; income accumulation site
+        // banked with the channel battery).
+        int accI = 0, accR = 0;
+        bool dblI = false, dblR = false;
         for (int it : planets_[s].items) {
             const PlanetItem& pi = (*items_)[it];
-            income[o] += pi.ind;  // Factory IND=1 [verified]
-            resGain += pi.res;    // Laboratory RES=1 [verified]
+            accI += pi.ind;
+            accR += pi.res;
+            // first-occupied-slot doubling law uses TABLE index order; the
+            // rewrite builds in kBuildOrder order, so "first occupied" is
+            // approximated by "first listed as built" per channel below.
+            if (!dblR && it == idNet) dblR = true;
+            if (!dblI && it == idHyper) dblI = true;
         }
-        res[o] += resGain;
-        // Pop growth: logistic toward cap (turnloop.md §3 [inferred]); built
-        // items' PROS (Agriplot PROS=2 [verified planitem.txt]) adds while
-        // below cap (§3); SA_Cornucopia's richPros rides the same PROS channel.
+        income[o] += colonyChannel(accI, dblI, /*compress=*/true);
+        res[o] += colonyChannel(accR, dblR, /*compress=*/false);
+        // PROS: growth model upgrade waits on the open accumulation-36
+        // anomaly (income-law.md S6b), so pop growth keeps the v1 raw-PROS
+        // additive default [documented default, turnloop.md §3];
+        // SA_Cornucopia's richPros rides the same channel.
         double pros = planets_[s].richPros;
-        for (int it : planets_[s].items) pros += (*items_)[it].pros;  // Agriplot PROS=2
+        for (int it : planets_[s].items) pros += (*items_)[it].pros;
         double g = 1.0;
         PlanetState& ps = planets_[s];
         const double cap = popCapFor(static_cast<int>(s));  // SA_MoreMaxPop
