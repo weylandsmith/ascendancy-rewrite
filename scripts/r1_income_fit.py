@@ -120,7 +120,7 @@ def fit_slot_base(m, base):
     cap = st.unpack_from("<H", m, base + 0x1a)[0]
     ptr = st.unpack_from("<I", m, base + 0x10)[0]
     s1c, s20, s1e = (st.unpack_from("<H", m, base + o)[0] for o in (0x1C, 0x20, 0x1E))
-    for d in (0, -4, -8, 4):
+    for d in (0x88, 0, -4, -8, 4):  # t33: +0x88 = heap header (pointer law)
         arr = ptr + d
         if not (0 <= arr and arr + cap * 4 <= len(m)):
             continue
@@ -169,7 +169,7 @@ def main():
                 if m[base + 0x57] == 0xFF:
                     continue
                 cap = st.unpack_from("<H", m, base + 0x1a)[0]
-                arr = st.unpack_from("<I", m, base + 0x10)[0]
+                arr = st.unpack_from("<I", m, base + 0x10)[0] + 0x88  # t33 pointer law
                 if not (0 <= arr and arr + cap * 4 <= len(m)):
                     fails += 1
                     continue

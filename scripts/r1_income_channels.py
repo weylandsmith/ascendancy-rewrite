@@ -48,7 +48,9 @@ def main():
                 if m[base + 0x57] == 0xFF:
                     continue
                 cap = st.unpack_from("<H", m, base + 0x1a)[0]
-                arr = st.unpack_from("<I", m, base + 0x10)[0]
+                # +0x10 = heap OBJECT address; member array at object+0x88
+                # (pointer law; see r1_income_law.find_records, t33).
+                arr = st.unpack_from("<I", m, base + 0x10)[0] + 0x88
                 if not (0 <= arr and arr + cap * 4 <= len(m)):
                     continue
                 ai = ap = ar = 0

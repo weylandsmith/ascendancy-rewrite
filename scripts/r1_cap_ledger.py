@@ -2,13 +2,15 @@
 """r1_cap_ledger.py — POP-CAP (+0x4a) exact-law ledger (OQ-016, S10).
 
 Three candidate recalc models for every planet record in every save slot:
-  model A (t31 harness):  clamp(+0x55 + MPOP(active, skip flags&4, skip CB))
+  model A:  clamp(+0x55 + MPOP(active, skip flags&4, CB included))
   model B (disasm byte-exact recompute): clamp(+0x55 + MPOP(ALL active
           slots incl flags&4 items and Colony Base))   [0x38bf8 is on
           BOTH the flags&4 and non-flags&4 paths]
   model C: B but skipping Colony Base
-Reports match counts per model; per-planet diff histograms for the winner's
-failures. Exit 0 if best model >= 99.5%; 1 negative; 2 harness error.
+t33 (corrected slot-array pointer +0x88): B and A 100.00% (72066/72066),
+C 96.23% — B is the law. Reports match counts per model; per-planet diff
+histograms for the winner's failures. Exit 0 if best model >= 99.5%;
+1 negative; 2 harness error.
 """
 import argparse, os, struct as st, sys, zipfile
 from collections import Counter, defaultdict
@@ -101,7 +103,10 @@ def main():
                     diffsB[act - sBc] += 1
                     badB[name] += 1
     print(f"samples: {tot}")
-    print(f"model A (skip flags&4 + skip CB): {totA} ({100.0*totA/max(1,tot):.2f}%)")
+    # labels match CODE (t33 audit): sA skips flags&4 (CB included — and all
+    # flags&4 rows have mpop=0 so A==B numerically always); sB = ALL active;
+    # sC = skips Colony Base.
+    print(f"model A (skip flags&4, incl CB): {totA} ({100.0*totA/max(1,tot):.2f}%)")
     print(f"model B (ALL active MPOP, disasm): {totB} ({100.0*totB/max(1,tot):.2f}%)")
     print(f"model C (B minus Colony Base):     {totC} ({100.0*totC/max(1,tot):.2f}%)")
     print("model B diff histogram (actual-pred):", dict(sorted(diffsB.items())))

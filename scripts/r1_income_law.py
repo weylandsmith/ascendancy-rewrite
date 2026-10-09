@@ -126,7 +126,13 @@ def find_records(m):
         if cells not in CELLS or cap != cells + 10:
             return False
         ptr = st.unpack_from("<I", m, base + 0x10)[0]
-        arr = ptr
+        # SLOT-ARRAY POINTER CORRECTION (t33): +0x10 holds the GUEST-PHYSICAL
+        # address of the heap OBJECT; the member array starts at object+H with
+        # H = 0x88 (pointer law, docs/re/r1-savestate.md:188). Reading raw gave
+        # 95.75% cap-law / 21.8% seed-law; +0x88 gives 100.00% / 98.6%
+        # (72066 samples, 27 worlds) — it was the sole cause of the t31/t32
+        # "+2 residual" and of model C (skip Colony Base) outscoring model B.
+        arr = ptr + 0x88
         if not (0 <= arr and arr + cap * 4 <= len(m)):
             return False
         return all(m[arr + i * 4 + 1] in (0xFF,) or m[arr + i * 4 + 1] < N_ITEMS
@@ -151,7 +157,7 @@ def find_records(m):
             best = chain
     return [(n - NAME_AT, st.unpack_from("<H", m, n - NAME_AT + 0x18)[0],
              st.unpack_from("<H", m, n - NAME_AT + 0x1a)[0],
-             st.unpack_from("<I", m, n - NAME_AT + 0x10)[0])
+             st.unpack_from("<I", m, n - NAME_AT + 0x10)[0] + 0x88)
             for n in best if good(n - NAME_AT)]
 
 

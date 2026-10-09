@@ -886,3 +886,60 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   Rewrite keeps model C (skip CB) — the strictly-better-of-two disasm-
   adjacent readings; OQ-016 pop-cap rows remain CLOSED on the SEED law
   (nb//3+5 @0x37f84..0x37f9e instruction-level) which is unaffected.
+
+  T33 T31/T32 RESIDUAL SOLVED — THE HARNESS READ THE SLOT ARRAY AT THE
+  WRONG ADDRESS (retracts T31/T31b negatives and the T32 model ranking):
+  find_records() returned the raw dword at planet+0x10 as the slot-array
+  base. EMPIRICAL LAW (verified): the slot array is at
+  (stored pointer value) + 0x88 inside the Memory image. The 0x88 equals
+  the pointer-law constant H (docs/re/r1-savestate.md:188 "pointer law
+  H=0x88"); the heap-header-vs-physical-base mechanism is [unverified] —
+  only the arithmetic is claimed. (The dword is stable between the
+  resume.gam file copy and RAM — r1_planet_layout's file<->RAM join finds
+  the 151 records verbatim with exactly two differing fields, +0x68/+0x69,
+  neither of which is +0x10; r1-savestate.md:184-196.) NOT the same
+  question as the r1-savestate.md:379 frame scare (that scare conflated
+  rv-B vs rv-P0 for IMAGE code pointers; this is runtime heap-member
+  dereference). All three offsets measured on the full 72066-sample
+  corpus: +0x88 100.00%/tail-all-1 99.5% | raw 95.75%/54.7% | -0x88
+  93.36%/49.0% (raw scores high because cap-seed and item-sum errors
+  cancel on item-light planets; the tail law cannot cancel and exposes
+  the misalignment). r1_cap_models.py reproduces the winner. One-line fix in
+  scripts/r1_income_law.find_records (+ mirrored in r1_income_channels,
+  r1_income_fit, r1_terrain_authored; r1_ship_record carried the OPPOSITE
+  sign, -0x88, citing r1_planet_layout which contains no such read).
+  Measured on 466 saves / 72066 (slot,planet) samples:
+    cap law  +0x4a = clamp(0..100, +0x55 + MPOP(active slots))   RAW 95.75%
+             (1268 of the failures +2 — the exact T32 paired-+-2 residual)
+                                                      +0x88 72066/72066 100.00%
+    seed law +0x55 = NONBARREN/3 + 5 over cells  RAW 21.79%  +0x88 71070/72066
+             (98.62%; first-save-per-distinct-world (27 worlds, 4160 samples)
+             = 98.63% — so the 1.4% is NOT replay noise: 85/911 residual
+             planets per world-run, signed -17..+7, concentrated on low-cell
+             worlds (Icarus V nb=7 r55=5, Gravitus III nb=44 r55=10) = the
+             scenario/preset-row path (T30: 21-dword static tables @0x88f90/
+             0x88fe4), NOT the random world-gen path. [inferred]
+    tail law EMPTY slots i>=cells carry byte0==1  RAW 54.7%  +0x88 99.5%
+    world-gen disasm FUN_00037d80 read in full this turn: the ECX loop
+             writes tail slots class 1 and mines ONLY below `cells` —
+             consistent with the +0x88 array (raw array showed tail classes
+             that the generator provably never writes).
+  MODEL RANKING IS NOW DISJOINT-FROM-ERROR (scripts/r1_cap_models.py, same
+  corrected corpus): DIS (disasm-exact: every fl&1 slot adds MPOP, Colony
+  Base INCLUDED) 5066/5066 100.00%; F, E identical; skip-CB models 4867
+  96.07% with pure +2 failures — skipping CB is now PROACTIVELY WRONG, it
+  subtracts 2 from every Colony-Base-active planet (199 samples). The T32
+  "live-table mpop divergence" hypothesis is DEAD: no live-RAM read needed,
+  no -break-start pilot, and the paired +-2 was one address off.
+  flags&4 rows 17 Tractor Beam / 28 Orbital Missile Base / 29/30 Whoppers:
+  all four measured mpop=0 in every capture's live table copy, so the
+  disasm branch skip is arithmetically invisible either way [verified].
+  REWRITE UPGRADE: storedCapFor drops both skips (CB + flags&4) — pure
+  clamp(capBase + sum mpop(items)); campaign.h seed-law comment cites t33;
+  98/98 tests pass, gate green. PLANET-SIDE SUBSYSTEMS THAT USED THE RAW
+  ARRAY MUST BE RE-READ BEFORE BEING TRUSTED: terrain-authored battery,
+  ship-record census (exit-1 negativity predates this fix on both signs —
+  separate harness issue), and any income-channel figure taken from
+  r1_income_channels pre-t33. IND/PROS 0/5 in r1_income_law.py --run-dir
+  is PRE-EXISTING (stash-verified identical before/after this fix) — that
+  is the next measurement target, not part of the cap law.

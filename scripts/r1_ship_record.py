@@ -81,8 +81,11 @@ def census(m, P0):
         if not (0x100000 < ptr < len(m) + 0x88 + 0x200000):
             continue
         owner = m[base + 0x57]
-        # slot array: member index = ptr - 0x88 (heap pointers are physical)
-        arr = ptr - 0x88  # verified against r1_planet_layout slot-array reads
+        # t33 CORRECTION: member array = object + 0x88 (pointer law,
+        # r1-savestate.md:188; cap law measures 72066/72066 at +0x88, 95.75%
+        # raw). The old -0x88 here cited r1_planet_layout, which contains no
+        # such read — stale; all census numbers from before t33 are suspect.
+        arr = ptr + 0x88
         if arr < 0 or arr + cap * 4 > len(m):
             continue
         # sanity: every slot gizmo byte in {0xff} or planitem range

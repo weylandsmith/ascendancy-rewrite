@@ -166,17 +166,19 @@ rows 0..21 minus Colony Base, first ABSENT picked immediately unless
 COST/IND>=70 aborts scan to best PRESENT (need-class column FUN_0003fec4,
 d66 roll; income-law.md S9) — rewrite buildPhase REWIRED (pendingItem/
 buildAcc, instant ind_ deduction removed) + pin test
-campaign_build_queue_law_oq016); POP-CAP LAW t29/t31
-closed-by-decompile+FULL-corpus ledger (298 slots x every planet = 46132
-samples): recalc +0x4a = clamp(0..100, +0x55 + MPOP sum, skip flags&4 items,
-skip Colony Base even when active) holds 43376 exact / 45179 (96.0%), all
-1816 failures POSITIVE +2; +0x55 world-gen seed law nb//3+5 verified
-instruction-level @0x37f84..0x37f9e (nb = non-barren SURFACE cells counted
-by the 0x37e30 generation loop); the saved cell grid does NOT reproduce it
-(T31b: fresh new-game run + corpus — +0x55 vs any class-count formula of the
-saved grid fails; generation-state vs render-state boundary, extraction
-limit not a gameplay-law gap; the t29 'ledger' numbers were a flawed
-extraction, RETRACTED and replaced by the t31 corpus rerun); Lush Growth
+campaign_build_queue_law_oq016); POP-CAP LAW t29/t31/t33
+closed-by-decompile+FULL-corpus ledger, t33-REPLACED numbers (466 saves x
+every planet = 72066 samples, slot array at stored-ptr+0x88): recalc
++0x4a = clamp(0..100, +0x55 + MPOP sum over ALL active slots — Colony
+Base INCLUDED, flags&4 skip is a measured no-op (rows 17/28/29/30 mpop=0))
+holds 72066/72066 100.00%; the t31/t32 "+2 residual" and the skip-CB
+model-C preference were HARNESS ARTEFACTS of the missing +0x88 offset
+(income-law.md T33; old t31 numbers RETRACTED); +0x55 world-gen seed law
+nb//3+5 verified instruction-level @0x37f84..0x37f9e (nb = non-barren
+SURFACE cells counted by the 0x37e30 generation loop) AND on the corrected
+array 98.6% corpus / 98.63% first-save-per-world (residual = scenario/
+preset-row worlds via FUN_00037fc0, not replay noise — generation-state
+claim RETRACTED, the array IS the generation output); Lush Growth
 Bomb (item 37) completion = +10 once (+0x66 flag, 0x39212..0x39229) — rewrite buildPhase/constructor
 REWIRED (capBase/surfaceCells seeded per star, storedCapFor() replaces
 constant-25 default, pin test campaign_pop_cap_seed_law_oq016); t29b
@@ -194,12 +196,10 @@ show 51% barren; no monotone reading of 0x744f4 fits, so the generation
 row is NOT the save-time +0x16 row) — per-cell terrain SHAPE therefore
 stays OPEN and rewrite does NOT model cell classes — REMAINING: terrain
 weight-row provenance (scenario data-file lift), nuke event law,
-home-placement verification. +2/+2 residual minutiae INVESTIGATED to
-exhaustion t32 (scripts/r1_cap_ledger.py + S10 T32: paired diffs survive
-world-identity and duplicate-table filtering; every direct +0x4a writer
-censused; rewrite keeps best model C skip-Colony-Base 96.17% — residual
-cause needs live-RAM item-table read, blocked by no-break-start standing
-decision, non-gating) |
+home-placement verification. +2/+2 residual minutiae RESOLVED t33
+(the paired +-2 class, the skip-CB model-C preference, and the live-RAM
+read requirement are all VOID — one wrong array offset; rewrite UPGRADED
+to model DIS incl-Colony-Base, income-law.md T33) |
 income law docs/re/income-law.md S6..S10; harness scripts/r1_income_
 channels.py; chase-capture law = deep-schedule End-Turn clicks 511:67
 every 15s, save ring read by MTIME.

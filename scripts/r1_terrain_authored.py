@@ -52,7 +52,7 @@ def find_records(m):
         cap = st.unpack_from("<H", m, base + 0x1a)[0]
         if not (7 <= cells <= 73) or cap != cells + 10:
             return False
-        ptr = st.unpack_from("<I", m, base + 0x10)[0]
+        ptr = st.unpack_from("<I", m, base + 0x10)[0] + 0x88  # t33 pointer law
         if not (0 <= ptr and ptr + cap * 4 <= len(m)):
             return False
         return all(m[ptr + i * 4 + 1] == 0xFF or m[ptr + i * 4 + 1] < N_ITEMS
@@ -106,7 +106,7 @@ def main():
                 row = st.unpack_from("<H", raw, rb + 0x16)[0]
                 ncells = st.unpack_from("<H", raw, rb + 0x18)[0]
                 capc = st.unpack_from("<H", raw, rb + 0x1a)[0]
-                ptr = st.unpack_from("<I", raw, rb + 0x10)[0]
+                ptr = st.unpack_from("<I", raw, rb + 0x10)[0] + 0x88  # t33 pointer law
                 cls = bytes(raw[ptr + i * 4] for i in range(ncells))
                 nb = sum(1 for c in cls if c & 7)
                 per_planet[name][os.path.basename(r)] = (

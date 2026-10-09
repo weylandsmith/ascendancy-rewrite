@@ -32,11 +32,12 @@ struct PlanetState {
     // colonization SETS it to 2; growth increments it +1 per counter wrap;
     // working population shown/used elsewhere = min(pop, storedCapFor()).
     double pop = 2;              // +0x42 analog, colonization :=2 [verified]
-    // POP-CAP SEED LAW (income-law.md S10 t29): world-gen @0x37f84..0x37f9e
+    // POP-CAP SEED LAW (income-law.md S10 t29+t33): world-gen @0x37f84..0x37f9e
     // writes capBase = NONBARRENCOUNT/3 + 5 into +0x55 AND +0x4a; recalc
-    // then keeps +0x4a = clamp(0..100, capBase + sum MPOP(active items,
-    // skipping item flags&4 and Colony Base row 5)). capBase is seeded per
-    // star at Campaign construction (inline draw law, campaign.cpp ctor).
+    // then keeps +0x4a = clamp(0..100, capBase + sum MPOP(active slots)) —
+    // Colony Base included; flags&4 rows all have mpop=0 so the skip is a
+    // no-op (72066/72066 exact, t33 corrected pointer array). capBase is
+    // seeded per star at Campaign construction (inline draw law, campaign.cpp ctor).
     int capBase = 0;             // +0x55 analog
     int surfaceCells = 23;       // +0x18 analog (seeded; income-law.md S10)
     int growthBoom = 0;          // +0x66 bit1 analog: Lush Growth Bomb fired

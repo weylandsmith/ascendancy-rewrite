@@ -173,6 +173,38 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+NOTE t33 SUPERSEDES NOTE t31 IN FULL: the slot-array pointer bug below
+("T33 LANDED") explains t31's grid-law failures, t31b's "generation-state
+vs render-state boundary", AND the t32 +-2 residual. All three were the
+same +0x88 heap-header offset missing from find_records.
+
+(1) IND/PROS channel regression (income-law.md T33 tail): r1_income_law.py
+    --run-dir reports IND 0/5 PROS 0/5 RES 5/5 on owned planets — PRE-EXISTING
+    on both pointer signs (stash-verified). Read the recalc store-side
+    disasm (0x38ee7..0x38f18 region + who stores IND/PROS words) and the
+    store offsets the harness compares (0x1c/0x20/0x24 vs 0x44/0x46/0x48)
+    against the corrected array; the cap half of recompute() is already
+    100%, so the failure is isolated to channel mapping/compression.
+(2) Re-audit pre-t33 subsystem claims that read the raw slot array:
+    terrain-authored battery results (S10 T29b/T30c numbers), ship-record
+    census (also: its exit-1 negativity needs a separate look — surface=0/
+    orbital=0 on a game with 5 homes + ships means its stride/owner filters
+    never fire on our captures), and any income_channels figure.
+(3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+
+T33 LANDED (POINTER-OFFSET FIX + FORMULA UPGRADE): find_records slot array
+= [planet+0x10] + 0x88 (heap object header; pointer law r1-savestate.md:188).
+Cap law now 72066/72066 (100.00%, 466 saves); seed law 21.79% -> 98.6%
+(residual = scenario/preset-row worlds, first-save-only census 98.63% — NOT
+replay noise); tail-all-1 54.7% -> 99.5%. K1 answer: NO post-gen byte0
+rewriter needed — the raw array showed churn because it was a misaligned
+window; disasm FUN_00037d80 (ECX loop: tail slots class 1, mines < cells)
+matches the +0x88 array exactly. Rewrite: storedCapFor drops skip-CB and
+skip-flags&4 (r1_cap_models.py: DIS incl-CB 100.00% vs skip-CB 96.07% pure
++2 fails; flags&4 rows all mpop=0), campaign.h cites t33; r1_ship_record
+sign corrected (+0x88; its -0x88 cited a nonexistent r1_planet_layout read);
+r1_cap_ledger model-A label fixed. 98/98 tests, gate ALL CHECKS PASS.
+
 NOTE t31: fresh new-game capture done (r1deep-20261008-190330, scratch
 resume.gam MOVED ASIDE to resume.gam.bak-20261008 — restore or re-move as
 needed; next capture starts a NEW world). Recalc cap law RE-CONFIRMED on
@@ -180,26 +212,6 @@ full corpus (46132 samples, 96.19%, +2-only residual; a mid-turn
 retraction was itself wrong and was un-retracted — the equation is
 +0x4a==clamp(+0x55+MPOP-sum), NOT grid nb//3+5). Grid battery results in
 S10 T31/T31b: saved cell array is NOT the verbatim generation output.
-
-(1) OQ-016 kernel K1 (income-law S10 T31): WHO REWRITES cell byte0 after
-    world-gen — full byte-store census with looser grammar than
-    `[reg+reg*4]` (include `[reg+reg]` walks with +=4 advance, rep-movsb,
-    and stores through pointers derived from word[rec+0x10]); correlate
-    writers with the fresh-run 48->47 diffs (only 8 planets mutated —
-    smallest possible corpus to attribute). If no post-gen writer exists,
-    the record the name-anchor finds is not the live planet record —
-    cross-check by taking the recalc-law-passing +0x55 records and
-    following THEIR heap pointers.
-(2) +2 pop-cap residual: INVESTIGATED TO EXHAUSTION t32 (S10 T32,
-    scripts/r1_cap_ledger.py): model space A/B/C enumerated and measured on
-    the clean corpus (38529 samples after dropping 209 duplicate-table
-    slots): C (skip Colony Base) best 96.17%; diffs are PAIRED +-2
-    (818/818) and survive world-identity filtering — NOT slot aliasing;
-    inactive-MPOP, flags&4, orbital placement, per-planet permanence all
-    ruled out; +0x4a direct-writer census complete (11 sites, none adds
-    outside recalc). Cause stays open (live-RAM item-table read required;
-    break-start pilot not-reopenable). Rewrite keeps model C.
-(3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
 
 T31 LANDED (measurement-only): fresh new-game capture proves terrain seed
 RANGES reproduce exactly ({5..7},{5..8},{5..12},{5..20},{5..29} per size

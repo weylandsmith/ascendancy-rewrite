@@ -289,23 +289,22 @@ int Campaign::storedProsFor(int star) const {
 }
 
 int Campaign::storedCapFor(int star) const {
-    // +0x4a analog (income-law.md S10 t29/t31): recalc head reads capBase
-    // (+0x55) raw, the item loop adds MPOP, the tail clamps 0..100
-    // (@0x38f01..0x38f18). MPOP sum skips items with flags&4 (measured rows
-    // 17/28/29/30) AND Colony Base (disasm: its MPOP is never added — with
-    // it included, every Colony-Base-active planet sits exactly -2; t31
-    // full-corpus ledger 43376/45179 exact, all 1816 failures POSITIVE +2,
-    // cause unidentified — candidates: orbital-slot MPOP, unlifted event).
+    // +0x4a law = clamp(0..100, capBase + MPOP sum) over ALL active items
+    // (income-law.md S10 t33). The t31/t32 "skip Colony Base" default and the
+    // +2 residual were BOTH artefacts of a harness bug: the slot-array pointer
+    // at planet+0x10 is the heap OBJECT address and the member array starts at
+    // object+0x88 (pointer law, r1-savestate.md:188). With the corrected array
+    // the disasm-exact model (add MPOP for every fl&1 slot; Colony Base IS
+    // included; flags&4 adds nothing since all four rows 17/28/29/30 carry
+    // mpop=0) is 72066/72066 exact across 466 saves. Orbital-slot items need
+    // no special case in the rewrite: planets_[s].items holds ACTIVE items
+    // only, so no orbital row can enter the sum here.
     // capBonus keeps SA_MoreMaxPop [documented default; the original's
     // ability site is not yet lifted].
     const PlanetState& ps = planets_[star];
-    const int cb = itemId("Colony Base");
     int mpopSum = 0;
     for (int it : ps.items) {
-        if (it == cb) continue;
-        const PlanetItem& pi = (*items_)[it];
-        if (pi.flags & 4) continue;
-        mpopSum += pi.mpop;
+        mpopSum += (*items_)[it].mpop;
     }
     int cap = ps.capBase + mpopSum;
     if (cap < 0) cap = 0;
