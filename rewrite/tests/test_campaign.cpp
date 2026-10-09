@@ -93,8 +93,11 @@ TEST(campaign_total_owned_grows) {
 
 TEST(campaign_channel_law_oq016) {
     // MEASURED stored-channel law (docs/re/income-law.md S6/t18b compression
-    // + t19 grant; battery scripts/r1_income_channels.py IND 138/139,
-    // RES 136/139): acc==0 -> scenario grant 1 (colonization FUN_00025d30
+    // + t19 grant; battery scripts/r1_income_channels.py post-t35:
+    // IND/PROS/RES 173/173/173 on the corrected +0x88 array with the
+    // channel-field gating — class-cell +1 bonuses apply only when the
+    // item's own channel field is non-zero, see income-law.md T35):
+    // acc==0 -> scenario grant 1 (colonization FUN_00025d30
     // +1 both home records); IND = trunc((dbl(acc,f12)+1)^0.85)
     // (0x38e2d FILD/pow/FISTP chain, RET 0x76e08 = trunc; t18b); RES is the
     // raw accumulator (never compressed). dbl = v + (v>>1) when the FIRST

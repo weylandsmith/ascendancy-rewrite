@@ -7,6 +7,13 @@ MODEL (disassembly-faithful; FUN_00038ba4 0x38e2d/0x38e31 JZ-skip):
   stored IND = accI == 0 ? G_I : trunc((dbl(accI,f12)+1)^0.85)
   stored PROS= accP == 0 ? G_P : max(0, trunc((dbl(accP,f13)+1)^0.85) - (|up|>>2))
   stored RES = accR (raw, never compressed)
+  t35 CORRECTION: every channel accumulator adds the class-cell +1 bonus
+  ONLY when the item's own channel field is non-zero (disasm nests the
+  bonus inside the field test; RES proof: 49 cls-4-on-res-0 slots in
+  exactly 49 distinct owned records == the 49 pre-fix failures). Battery
+  with corrected array + gating: IND 173/173 PROS 173/173 RES 173/173
+  (old banked 138/139 + 136/139 were raw-array runs; the RES misses were
+  the gating bug, not grants).
   dbl(v,f) = v + (v>>1 if f); f12/f13 = ACTIVE flag of the FIRST slot whose
   itemIdx==12/13 (FUN_0003958c + caller bit-test @0x38d4b..0x38dd9).
   G_I, G_P per-record grants: colonization +1 to both linked home records
@@ -69,9 +76,25 @@ def main():
                     if f13 is None and it == 13:
                         f13 = act
                     if it != 0xFF and act:
-                        ai += items[it]["ind"] + (1 if cls == 2 else 0)
-                        ap += items[it]["pros"] + (1 if cls == 3 else 0)
-                        ar += items[it]["res"] + (1 if cls == 4 else 0)
+                        # t35 GATING [verified two ways]: each channel's +1
+                        # class bonus is nested INSIDE the item's own
+                        # channel-field non-zero test (FUN_00038ba4: `if
+                        # (*(char*)(&DAT_00073e41+uVar3*10) != 0) { acc +=
+                        # field; if (cls == 4) acc += 1; }` — Ghidra shows
+                        # the comma-joined side effects on BOTH legs). An
+                        # item with res==0 sitting on a class-4 cell grants
+                        # NOTHING: 49 such slots in exactly 49 distinct
+                        # owned records == the battery's 49 pre-fix RES
+                        # failures, one-for-one. cls2-ind==0 / cls3-pros==0
+                        # never occur in this corpus (0 samples), so the
+                        # IND/PROS legs are instruction-level-verified only.
+                        d = items[it]
+                        if d["ind"]:
+                            ai += d["ind"] + (1 if cls == 2 else 0)
+                        if d["pros"]:
+                            ap += d["pros"] + (1 if cls == 3 else 0)
+                        if d["res"]:
+                            ar += d["res"] + (1 if cls == 4 else 0)
                 key = (os.path.basename(run), base)
                 gi0, gp0 = grants.get(key, (0, 0))
                 if ai == 0:

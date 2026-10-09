@@ -186,9 +186,14 @@ def main():
                     if it == 0xFF or not (fl & 1):
                         continue
                     d = items[it]
-                    A += d["ind"] + (1 if cls == 2 else 0)
-                    P += d["pros"] + (1 if cls == 3 else 0)
-                    R += d["res"] + (1 if cls == 4 else 0)
+                    # t35: channel +1 bonus gated on the item's own channel
+                    # field (see r1_income_channels.py for the 49/49 proof).
+                    if d["ind"]:
+                        A += d["ind"] + (1 if cls == 2 else 0)
+                    if d["pros"]:
+                        P += d["pros"] + (1 if cls == 3 else 0)
+                    if d["res"]:
+                        R += d["res"] + (1 if cls == 4 else 0)
                     O += d["orb"]
                 # per-k first-slot doubling per FUN_0003958c (first slot only)
                 first = {}

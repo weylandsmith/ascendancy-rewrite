@@ -988,3 +988,51 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   subsumption; the exact preset field that shifts the words stays OPEN,
   35/2720 IND and
   141/2720 PROS samples]
+
+  T35 PRE-T33 RE-AUDIT (NEXT ACTION "re-audit raw-array subsystems"; three
+  subsystems re-run on corrected arrays, two overturned):
+  (a) INCOME CHANNEL BATTERY scripts/r1_income_channels.py: IND 173/173
+      PROS 173/173 RES 173/173 — FULLY CLEAN FIRST TIME (old banked
+      138/139 + 136/139 were raw-array runs). Root cause of the RES
+      misses was NOT the array but a MODEL bug found while re-auditing:
+      the class-cell +1 bonus is NESTED inside the item's own channel-
+      field non-zero test (FUN_00038ba4: `if (field != 0) { acc += field;
+      if (cls == N) acc += 1; }`) — an item with res==0 on a class-4 cell
+      grants NOTHING. Proof one-for-one: exactly 49 slots with cls==4 on
+      res-field-0 items sit in exactly 49 distinct owned records == the
+      49 RES failures (corrected-array corpus, 29 first-saves, 173 owned
+      records). cls2-ind==0/cls3-pros==0: 0 samples in corpus (IND/PROS
+      gating legs instruction-level only). FIXED in r1_income_channels.py
+      + r1_income_fit.py; r1_income_law.recompute already gated correctly
+      (why it scored 5/5). Rewrite storedIndFor/ResFor add raw fields
+      with NO class-cell bonus (rewrite models no cell classes, t29b
+      scope) — the gating law agrees with the rewrite identically:
+      VERIFIED NO-OP change site, not a stub.
+  (b) TERRAIN-AUTHORED BATTERY scripts/r1_terrain_authored.py --runs
+      'work/r1/*' (29 runs, first saves, corrected arrays; previous
+      invocations passed the parent dir and skipped EVERY run — usage
+      bug, fixed by glob): barren% per +0x16 row now tracks the w0 table
+      MONOTONICALLY on EVERY row — row0 w0=100 -> 99.3%; w0=50 -> 48.1%;
+      w0=40 -> 41.3/37.8/40.3; w0=20 -> 20.9/22.8/20.8/20.8; w0=0 ->
+      0.7/0.2. R11 (REFUTED-ROUTES) RETRACTED: the t29b "preset-0 shows
+      51% barren" was the misaligned grid window; the save-time +0x16
+      ROW IS the generation row (barren leg). AUTHORED-vs-GENERATED
+      settled GENERATED: 410 planet names multi-hash across runs vs 13
+      identical (hash-collapsed barren-style grids). Residue: ~0.7%
+      barren leakage on w0=0 rows (rock event @0x37f5c rng%7==0 explains
+      part — [inferred]); class 2..7 chain shape unmeasured; rewrite
+      still does NOT model cell classes (scope note stands).
+  (c) SHIP-RECORD CENSUS scripts/r1_ship_record.py: harness locator
+      REFUTED by direct evidence — its filter (stride 0x7b, cells in
+      {7,11,23,45,73}, cap==cells+10) matches ONLY anchored PLANET
+      records (37/37 on chase capture 46.sav; name@+0x24 readable),
+      because the planet layout law already owns that shape. True ship
+      slots live in the FUN_000238e8 param+0x18247 chain (ships.md S10);
+      &DAT_00018245 -> RAM mapping unresolved this turn (both flat
+      candidate readings gave code-like dwords) — no retry spiral,
+      recorded. Orbital-slot law [cells,cap)->22..30 is UNTESTABLE on
+      current captures: corrected arrays contain ZERO filled slots in
+      orbital regions across 72066 samples (every one of 3192 filled
+      slots is a surface slot; t32's "226 orbital-CB" was array noise).
+      OQ-019 ship sub-items stay open; harness exit 1 is its OLD wrong
+      locator asking the wrong question, not missing ships.

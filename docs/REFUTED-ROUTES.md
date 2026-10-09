@@ -87,6 +87,21 @@ smfont; 'AA core = stroke width' dead; font ink cannot be palette-relative
   not evidence anything in the ledger is done.
 
 ## R11. Terrain preset-row == 0x744f4[+0x16] as GENERATION row — REFUTED (t29b)
+*** RETRACTED t35 — the refutation was the t33 raw-slot-array bug. ***
+Re-running the SAME first-save battery with the corrected array
+(+0x10 stored ptr + 0x88; 29 runs, ~150k cells, scripts/r1_terrain_authored.py
+--runs 'work/r1/*'): barren% tracks the row's w0 monotonically, every row —
+row0 w0=100 -> 99.3% barren; w0=50 -> 48.1%; w0=40 -> 41.3/37.8/40.3%;
+w0=20 -> 20.9/22.8/20.8/20.8%; w0=0 -> 0.7% and 0.2%. The old "preset-0
+planets show 51% barren" was a misaligned grid window. The save-time +0x16
+ROW IS the generation row for the barren draw. Also settled same run:
+AUTHORED-vs-GENERATED = GENERATED (410 planet names carry multiple grid
+hashes across capture runs vs 13 identical — the identical ones are the
+all-barren row-0 style grids that hash-collapse; 0x37d80 runs on every new
+game, never mid-game). Residual residue: the ~0.7% barren leakage on w0=0
+rows and full class-chain shape for classes 2..7 (only the barren leg is
+w0-predicted by this battery). See income-law.md T35.
+--- original text (kept for provenance) ---
 The class-draw law itself is verified instruction-level (barren iff
 rng<scaled(w0) @0x37e51..0x37ea4, cumulative chain @0x37eb7..0x37ee0,
 rng 0..32767 @0x78269). But a 13-run first-save battery (~70k surface

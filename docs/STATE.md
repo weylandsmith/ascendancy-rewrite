@@ -173,19 +173,35 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T34 LANDED (DISPLAY-WORD CHANNEL LAW + HARNESS FIXED — scripts/r1_income_law.py
-exits 0 for the first time, IND/RES/PROS 5/5 on all slots of both test
-captures, was 0/5-4/5): +0x44 = max(1, trunc((v+1)^0.85)) [raw ties on this
-corpus; banker's-round pow85 REFUTED 56.99% vs 97.98%, 2720 stored samples];
-+0x46 RES = raw accumulator 2720/2720; +0x48 = max(1, PROS - pop>>2) 94.82%
-(decompile's 0-clamp 40.99%). +0x54 = build-queue item id CONFIRMED by
-invariance (dropping the gov switch changes zero samples; observed values
-0xFF/0x00/0x01/0x15 all item ids); governor reading stays OPEN as its own
-ledger row. Residual 3 IND / 8 PROS planet-names ⊆ seed-law failure names
-(preset-vs-generated boundary, not a missing term; income-law.md T34).
-storedProsFor UPGRADED to the word law (sole consumer needClassFor ==
-FUN_0003fec4 reading +0x48; incomeAndGrow's raw-PROS growth path untouched,
-t24 law intact). 98/98 tests, gate ALL CHECKS PASS.
+T35 LANDED (PRE-T33 RE-AUDIT — the whole raw-array audit closes):
+(a) r1_income_channels.py 173/173/173 IND/PROS/RES first-ever full clean;
+RES misses were a MODEL bug (class-cell +1 bonus nests inside the item's
+channel-field non-zero test — 49 cls4-on-res0 slots == 49 records == 49
+failures, one-for-one), fixed in channels+fit; rewrite site verified
+no-op (no cell classes modeled, bonus inert). (b) terrain battery re-run
+correct (old invocations passed the parent dir, skipped every run):
+barren% tracks w0 monotonically on every row — R11 RETRACTED, the
+save-time +0x16 row IS the generation row (barren leg); terrain
+GENERATED not authored. (c) r1_ship_record.py locator REFUTED (its
+filter matches only anchored PLANET records, 37/37); orbital-slot law
+untestable — zero filled orbital slots in 72066 samples. Details:
+income-law.md T35. 98/98 tests, gate green.
+
+(1) TERRAIN GENERATION LAWFULNESS UPGRADE candidate (from T35b): the
+    barren leg is now measured law (row = +0x16, barren iff rng <
+    scaled(w0), rng 0..32767) — decide+lift the w0 scaling and the class
+    2..7 cumulative chain shape (same 0x37d80 disasm, draw loop
+    0x37e51..0x37ee0), then let the rewrite generate cell classes
+    instead of seeding bare surfaceCells. This closes OQ-016's
+    "terrain weight-row provenance" remnant for the barren leg and
+    finally replaces the last documented-default in the mapgen path.
+(2) GOVERNOR LEDGER (OQ-024): unchanged — needs governor-UI capture,
+    gated behind OQ-012(a).
+(3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+
+NOTE t34: DISPLAY-WORD CHANNEL LAW — see income-law.md T34 + commit
+91b90c0 (+0x44 max(1,trunc((v+1)^.85)) 97.98%, +0x46 raw, +0x48
+max(1,PROS-pop>>2) 94.82%; +0x54 = queue id, gov branch dead).
 
 NOTE t33 SUPERSEDES NOTE t31 IN FULL: the slot-array pointer bug below
 ("T33 LANDED") explains t31's grid-law failures, t31b's "generation-state

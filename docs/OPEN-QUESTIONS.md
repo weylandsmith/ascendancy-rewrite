@@ -200,12 +200,15 @@ world-gen |8 rock event (rng%7==0 @0x37f5c); all remaining save-to-save
 (extraction aliasing, not gameplay writes); rng 0x7824f CORRECTED to
 0..32767 (`SHR 16; AND 0x7FFF` @0x78269) — seed draw law is barren iff
 rng < scaled(w0) @0x37e51..0x37ea4 with cumulative class chain
-@0x37eb7..0x37ee0 [verified instruction-level] — BUT the preset-row ->
-observed-histogram mapping is REFUTED (13-run first-save battery, ~70k
-cells: preset 0 row [100,0,0,0] predicts all-barren yet preset-0 planets
-show 51% barren; no monotone reading of 0x744f4 fits, so the generation
-row is NOT the save-time +0x16 row) — per-cell terrain SHAPE therefore
-stays OPEN and rewrite does NOT model cell classes — REMAINING: terrain
+@0x37eb7..0x37ee0 [verified instruction-level] — t29b's preset-row ->
+observed-histogram REFUTATION IS ITSELF RETRACTED t35 (the 51%-barren-on-
+row-0 reading was the raw-array misalignment; corrected-array battery:
+barren% tracks w0 monotonically on every row — row0/100 -> 99.3%, 50 ->
+48.1%, 40 -> 41.3/37.8/40.3%, 20 -> ~21%, 0 -> 0.7/0.2%; the save-time
++0x16 row IS the generation row for the barren leg; terrain GENERATED not
+authored, 410 names multi-hash across runs; residual: w0=0 ~0.7% leakage
+and class 2..7 chain shape unmeasured) — rewrite still does NOT model
+cell classes — REMAINING: terrain
 weight-row provenance (scenario data-file lift), nuke event law,
 home-placement verification. +2/+2 residual minutiae RESOLVED t33
 (the paired +-2 class, the skip-CB model-C preference, and the live-RAM
