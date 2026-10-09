@@ -1167,3 +1167,66 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   (replaces t24 raw sum); storedProsFor comment cites verdict. CLI
   re-verify: seed 2024 species 4 -> VICTORY Control t953 (was t922
   pre-change; still finite, < test caps 1200). Tests 98/98, gate PASS.
+
+  T38 ROCK BIT |8 SEMANTICS CLOSED (per-PLANET event + SKIP law):
+  a) EVENT SHAPE [verified, corpus-shaped]: one rng%7 draw per PLANET,
+  then rng%(surfaceCells) picks ONE cell to |=8 (+0x66 |=2). Evidence:
+  12,264/72,066 owned records carry rock (17.0% ~ 1/7 [inferred]);
+  12,244/12,264 have EXACTLY ONE rock cell (99.8%); multi-rock only 20.
+  A per-cell draw would give binomial tails (~mean 0.17 rocks -> many
+  planets with none, few with 2+): measured one-rock dominance is only
+  consistent with per-planet. The 12 mid-game GREW samples (Luxor I
+  46->52.sav rock 0->1, flag 0x00->0x02) show the event ALSO fires
+  during play, not only world-gen; 25 grew / 39 "shrank" (shrink =
+  Terraforming overwrites raw 8 -> raw 1 @item-36 law, so no separate
+  de-rock event is needed).
+  b) ITEM INTERACTION = SKIP [verified]: ZERO of 3,192 active item slots
+  carry |8 (histogram {0:754,1:979,2:251,3:100,4:716}); 350 rock holes
+  sit BELOW the build prefix (mid-game event cells that builds later
+  avoid); 11,934 rocks beyond prefix. The 3 pre-event build samples
+  (Oslo I/Gasball III/Burphee I: rock 1->0 items 0->1) are Terraform-
+  cleared builds. k-th item -> k-th NON-ROCK cell is the placement law.
+  c) +0x1c IDENTIFIED [verified 71,762/72,066 = 99.58%]: the recalc's
+  local_50[2] (`(byte&8)==0` empty-slot counter @0x38c02-ish) IS word
+  +0x1c = EMPTY BUILDABLE (non-rock) surface count. The 304 mismatches
+  are the same planet-name preset-residual class as the seed law.
+  d) CLASS-BONUS FORFEIT [verified by disasm]: FUN_00038ba4 tests the
+  RAW byte with CMP 2 / CMP 3 / CMP 4 (strict equality), so a class+8
+  byte (10..12) matches none -> rock cell forfeits the channel bonus;
+  &8-gate on empty cells additionally blocks BUILD there (b).
+  e) capBase = PRE-MARK count [verified 20-0]: scripts/
+  r1_rock_convention.py first-save census over work/r1/*, planets whose
+  rock cell makes //3 differ between conventions — 20 discriminating
+  samples, ALL match the draw-time count (Amoroso IV +0x55=5: pre 5 vs
+  post 6; Elwyssen I 16 vs 17; ...), 0 post-mark, 0 neither, 876 tied
+  (non-discerning). Mechanism: the seed word @0x37f84 reads the draw
+  loop's nonbarren ECX (@0x37ebb) which predates @0x37f4d, and |= sets
+  only bit 3 — base class survives the mark (raw 10..12 stay non-barren;
+  raw 8 stays barren). The rock event NEVER moves capBase; it only
+  blocks BUILD placement (b) and forfeits class bonuses (d).
+  MID-GAME EVENTS [banked open sub-note]: 21 transitions show rock
+  APPEARING during play (Luxor I 46->52.sav, flag 0x00->0x02) — a second
+  firing site exists besides world-gen; their +0x55 deltas straddle
+  other turn-events and are UNATTRIBUTABLE (histogram spread -21..+18),
+  so mid-game-rock cap behaviour stays [unverified]; rewrite models
+  world-gen rock only.
+  f) SCATTER NOT ROCK [banked]: 80 records (4 scenario worlds x
+  20 slot-saves, e.g. Hannibal III Agriplot@5, Albireo I @14,
+  Phoebe I @49, Vernunft I Factory@40) have items at AUTHORED
+  scenario slots far above cell 0 with ZERO rocks below (80/80
+  rocks-before-first=0) — scenario-loader placement, same
+  preset-row residual family as the seed-law 1.4%, NOT a rock
+  interaction. Skip-evidence for rock: 2 DIRECT builds kept a
+  live rock cell while adding an item elsewhere (Discordia I,
+  Crell I: rocks 1->1, items 1->2) + zero |8 item bytes in
+  18,620 records (any active state) + 350 rock holes preserved
+  below live prefixes.
+  REWRITE: ctor draws one rock cell per planet AFTER the cell loop
+  (same local LCG — matches the pre-mark capBase window exactly, since
+  capBase is computed from the pre-mark count); channelAccFor skips |8
+  cells mapping items->cells (k-th item = k-th non-rock cell); build
+  capacity gate counts NON-ROCK cells (+0x1c analog 71762/72066); pin
+  test asserts raw in {0..4}|8 and recounts nonbarren as raw!=0&&raw!=8
+  (draw-time convention). 98/98 tests; CLI seed 2024 species 4 ->
+  VICTORY Control t918 (finite; rock draws perturb the stream as
+  designed).

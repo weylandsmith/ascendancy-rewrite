@@ -215,8 +215,11 @@ test FIRST (seed counts exactly chain cells), cumulative scaled sums
 never occur, rock |8 separate): rewrite ctor GENERATES cellClasses per
 planet through the identical integer chain on the banked LCG, capBase
 = nb/3+5 of the generated grid, pin test extended (ring +10 all-1,
-classes 0..4, capBase exact) — REMAINING: rock bit/event wiring,
-class-cell channel bonuses from cellClasses (T35 gating), nuke event
+classes {0..4}|8, capBase exact) — rock bit CLOSED t38 (per-PLANET
+rng%7 event, k-th item = k-th NON-rock cell, capBase = pre-mark count
+VERIFIED 20-0, +0x1c = empty buildable count 71762/72066, class bonuses
+CLOSED t37/t38 via cellClasses + T35 gating + rock-skip; income-law.md
+T38) — REMAINING: nuke event
 law, home-placement verification; extreme-row leak banked unexplained
 (row0 98.9 vs 99.997, row10 c1 1.6 vs 0.006 — scenario-row-override
 hypothesis, income-law.md T36d). +2/+2 residual minutiae RESOLVED t33

@@ -170,8 +170,17 @@ TEST(campaign_pop_cap_seed_law_oq016) {
             CHECK(ps.cellClasses[k] == 1);
         int nonbarren = 0;
         for (int k = 0; k < ps.surfaceCells; ++k) {
-            CHECK(ps.cellClasses[k] >= 0 && ps.cellClasses[k] <= 4);
-            if (ps.cellClasses[k]) ++nonbarren;
+            const int raw = ps.cellClasses[k];
+            // T38 RAW-BYTE CENSUS [verified]: classes are exactly
+            // {0..4} | 8-rock — 5..7 never occur (0 of 101948 corpus
+            // slots). Rock marks AFTER the draw loop (@0x37f4d before
+            // seed word @0x37f84), so a barren cell marked |8 (raw 8)
+            // WAS barren at draw time: the seed-law recount must treat
+            // raw 0 AND raw 8 as barren (FUN_00038ba4 counts buildable
+            // cells as &8==0 and barren as ==0 [verified]).
+            CHECK((raw & ~8) >= 0 && (raw & ~8) <= 4 &&
+                  (raw & ~8) == raw - (raw & 8));
+            if (raw != 0 && raw != 8) ++nonbarren;
         }
         // seed word consistency: capBase is EXACTLY nonbarren/3+5 of the
         // generated grid (before recalc adds item MPOP; home items MPOP 0).

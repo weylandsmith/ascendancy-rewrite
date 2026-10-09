@@ -172,6 +172,25 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
                 cls[c] = k;
                 if (k) ++nonbarren;
             }
+            // ROCK EVENT @0x37f4d [verified disasm, banked S10; ORDER is
+            // after the draw loop, before the seed word @0x37f84]: one
+            // rng%7 draw per PLANET (income-law.md T38: 1-rock on
+            // 12244/12264 rock planets = 99.8%, rock planets 16.9% ~ 1/7
+            // — per-cell draws would give ~99.9% multi-rock). If it hits,
+            // cls[rng % surfaceCells] |= 8 and planet flag +0x66 |= 2.
+            // Rock semantics [verified T38]: items NEVER occupy a |8 slot
+            // (0 of 3192 active slots corpus-wide); builds SKIP rock cells
+            // (350 mid-game-event holes below the build prefix + zero |8
+            // item bytes ever); strict class equality in FUN_00038ba4
+            // (~0x38bf0: CMP 2/3/4) means a |8 byte forfeits the class
+            // bonus; +0x1c = empty NON-rock surface count (71762/72066).
+            // capBase is NOT recomputed after the rock mark (the draw
+            // loop's nonbarren counter predates it @0x37ebb) [verified by
+            // the T36 first-save seed law holding with |8-stripped count].
+            if (next() % 7 == 0) {  // [ESP+rng] idiv 7, test EDX @0x37f5c
+                cls[next() % cells] |= 8;  // +0x66 |= 2 has no consumer
+                                           // in the rewrite; not stubbed
+            }
             planets_[s].capBase = nonbarren / 3 + 5;  // @0x37f8b..0x37f9e
         }
     }
@@ -299,13 +318,16 @@ Campaign::ChannelAcc Campaign::channelAccFor(int star) const {
     // field, plus +1 class-cell bonus ONLY when that field is non-zero
     // (the +1 nests inside the field test in FUN_00038ba4 — RES proof:
     // 49 cls-4-on-res-0 slots == 49 records == 49 pre-fix failures).
-    // Cell lookup from T36b PLACEMENT [verified]: first-empty-slot in
-    // slot order (surface contiguous 17980/18620; the 640 holed records
-    // are 1-2 item preset worlds), orbital prefix-packed 18620/18620,
-    // items on barren at exactly terrain rate (263/892 = 29.5% vs 31.6%)
-    // — so the k-th surface item occupies surface cell k, and orbital
-    // items read ring cells (always class 1 => never bonus-eligible:
-    // e.g. Shipyard ind=1 gets no IND bonus on the ring).
+    // Cell lookup from T36b PLACEMENT + T38 ROCK-SKIP [verified]: items
+    // are prefix-packed over NON-ROCK surface cells in slot order
+    // (surface contiguous 17980/18620; every one of the 640 holed
+    // records has rock cells explaining its holes OR 1-2 item preset
+    // rows; zero |8 item bytes ever in 3192 active slots), orbital
+    // prefix-packed 18620/18620, items on barren at exactly terrain rate
+    // (263/892 = 29.5% vs 31.6%) — so the k-th surface item occupies the
+    // k-th cell WITHOUT bit 3, and orbital items read ring cells
+    // (always class 1 => never bonus-eligible: e.g. Shipyard ind=1 gets
+    // no IND bonus on the ring).
     ChannelAcc a;
     const auto& ps = planets_[star];
     int si = 0, oi = 0;
@@ -316,16 +338,19 @@ Campaign::ChannelAcc Campaign::channelAccFor(int star) const {
         const PlanetItem& pi = (*items_)[it];
         int cls = 1;
         if (itemIsSurface(it)) {
+            // advance si past rocky cells (builds skip them, T38)
+            while (si < ps.surfaceCells && (ps.cellClasses[si] & 8)) ++si;
             if (si < ps.surfaceCells) cls = ps.cellClasses[si];
             ++si;
         } else if (it < kPlanitemSurfaceCount + kPlanitemOrbitalCount) {
             if (oi < 10) cls = ps.cellClasses[ps.surfaceCells + oi];
             ++oi;
         } else {
-            ++si;  // specials exempt from the XOR law; occupy surface
-                   // stream [placement of specials unmeasured — they add
-                   // 0 to every channel, so this only shifts later
-                   // items' bonus class]
+            // specials exempt from the XOR law; occupy the non-rock
+            // surface stream [placement of specials unmeasured — they add
+            // 0 to every channel, so this only shifts later items' bonus]
+            while (si < ps.surfaceCells && (ps.cellClasses[si] & 8)) ++si;
+            ++si;
         }
         if (pi.ind) a.ind += pi.ind + (cls == 2 ? 1 : 0);
         if (pi.pros) a.pros += pi.pros + (cls == 3 ? 1 : 0);
@@ -611,7 +636,15 @@ void Campaign::buildPhase() {
             int surface = 0;
             for (int it : ps.items)
                 if (itemIsSurface(it)) ++surface;
-            if (surface >= ps.surfaceCells) continue;  // +0x18 seeded per S10
+            // T38 ROCK-SKIP [verified]: builds prefix-pack over NON-ROCK
+            // cells (zero |8 item bytes ever; 350 mid-event rock holes
+            // below the prefix) — effective capacity is the buildable
+            // cell count, the +0x1c analog (empty NON-rock count,
+            // 71762/72066 recs).
+            int buildable = 0;
+            for (int k = 0; k < ps.surfaceCells; ++k)
+                if (!(ps.cellClasses[k] & 8)) ++buildable;
+            if (surface >= buildable) continue;  // +0x18 seeded per S10
         }
         ps.pendingItem = pick;
         ps.buildAcc = 0;

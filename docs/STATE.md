@@ -173,34 +173,36 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T37b LANDED (GROWTH-COUNTER INPUT CLOSED == STORED +0x48 WORD): turn-
-disciplined corpus battery scripts/r1_pros_growth.py (dt==1 via banked
-u16 clock 0x254e10, motion filter, 12 divergent + 5 GD rows) ELIMINATES
-raw (Feculon II +3 > raw 1 + boost cap 1) and gated (5 rich-world rows
-where disp alone fits; gated never beats disp) — VERDICT disp, 0 losses,
-matching FUN_00038f68 @0x39302 all along; the t24 "+3 == raw" reading
-was a TIE capture. incomeAndGrow growth input = storedProsFor(s); CLI
-re-verify seed 2024 species 4 -> Control t953; tests 98/98, gate PASS,
-banked income-law.md T37b. NEXT: rock bit |8 semantics (byte +0x00 raw
-census shows classes {0..4}|8; rewrite cellClasses drops the |8 —
-determine what bit 3 does: Ghidra consumers of the class byte reading
-with/without mask, e.g. draw chain 0x37eb7 comparisons and any terrain-
-render/penalty sites; if a penalty law exists (e.g. mining/movement),
-measure it against +0x44/+0x4a effects on rocky-planet samples in the
-corpus; else bank as cosmetic/purity bit and CLOSE OQ rock-bit row).
-PRIOR NOTE T37 LANDED (channelAccFor single accumulator, T35
-gating; placement law: k-th surface item on surface cell k,
-contiguous 17980/18620, ring never bonus-eligible; sentinel bars
-600->1200 after CLI proof Extinct t683) — its GROWTH-SPLIT
-paragraph is SUPERSEDED by T37b above.
+T38 LANDED (ROCK BIT |8 CLOSED + WIRED): per-PLANET rng%7 event marks
+ONE cell |=8 + flag +0x66|=2 (12244/12264 rock planets have exactly one;
+17.0% ~ 1/7); k-th item = k-th NON-rock cell (zero |8 item bytes in
+18,620 records; Discordia I/Crell I direct skip builds); capBase =
+PRE-mark count VERIFIED 20-0 (scripts/r1_rock_convention.py: raw-8 stays
+barren, rock on non-barren keeps its class — the event never moves
++0x55); word +0x1c = empty NON-rock (buildable) surface count
+71762/72066; class bonuses forfeited via strict CMP 2/3/4 on the RAW
+byte [FUN_00038ba4]. Scenario-slot scatter (80 recs / 4 preset worlds)
+banked as preset-residual, NOT rock interaction. Rewrite: ctor rock
+draw AFTER the cell loop (same local LCG), channelAccFor skips |8,
+build gate counts buildable cells, pin test raw {0..4}|8 + draw-time
+recount. Mid-game rock firing site banked [cap effect unverified].
+98/98 tests, gate PASS, CLI seed 2024 species 4 Control t918.
+income-law.md T38.
+NEXT: NUKE EVENT LAW — Ghidra pass over the event-effect space (string
+xrefs for nuke/destroy wording; FUN_00055a60 event-number neighborhood
+of 0x7a35c; the S10 event-24 pop:=cap writer shows the dispatch shape)
+-> lift exact nuke semantics (slots cleared, +0x66/class fallout,
+capBase/pop effects); verify against any capture with destroyed items;
+if none, BLOCKED.md with the capture requirement stated.
+PRIOR NOTE T37b LANDED stands (growth input == stored +0x48, VERDICT
+disp; income-law.md T37b). PRIOR NOTE T37: accumulator/placement law
+stands EXCEPT placement is refined by T38 (NON-rock prefix).
 
-(1) ROCK EVENT LAW wiring: @0x37f4d rng%7==0 -> class|=8 on
-    rng%(surfaceCells) slot, +0x66 |= 2 — law banked S10; decide model
-    effect (rocks currently inert in rewrite economy — check mine
-    paths before wiring; do NOT wire blind).
-(2) GOVERNOR LEDGER (OQ-024): unchanged — needs governor-UI capture,
+(1) GOVERNOR LEDGER (OQ-024): unchanged — needs governor-UI capture,
     gated behind OQ-012(a).
-(3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+(2) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+(3) TERRAIN REMAINING (T36 row): nuke event law (in progress above) +
+    home-placement verification; extreme-row leak banked unexplained.
 
 NOTE t36: terrain generation law closed end-to-end + ctor generates
 cellClasses (commit 0a0a4d7); NOTE t35: raw-array re-audit (383bb73).
