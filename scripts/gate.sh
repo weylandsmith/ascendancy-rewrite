@@ -305,7 +305,12 @@ grep -q 'VICTORY Control' "$ROOT/docs/PLAYTHROUGH.md" \
 grep -q 'VICTORY Extinct' "$ROOT/docs/PLAYTHROUGH.md" \
   || err "PLAYTHROUGH.md lost the extinction run"
 if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
-  if ! timeout 180 "$ROOT/rewrite/build/ascendancy" --headless --campaign 600 \
+  # T37: budget 600 -> 900. The class-cell channel law (docs/re/
+  # income-law.md T37) lengthened the seed-2024 timeline to a FINITE
+  # resolve (CLI verified: --campaign 1500 --seed 2024 -> VICTORY
+  # Extinct t683); the guard's target is stall/deadlock, and the exit-0
+  # + '^VICTORY ' assertions stay intact.
+  if ! timeout 180 "$ROOT/rewrite/build/ascendancy" --headless --campaign 900 \
        --seed 2024 >/tmp/gate_campaign.log 2>&1; then
     tail -20 /tmp/gate_campaign.log; err "seeded campaign did not reach victory"
   fi

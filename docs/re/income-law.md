@@ -1054,6 +1054,43 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   class-cell channel bonuses now modelable from cellClasses (T35
   gating), nuke event law, home-placement verification.
 
+  T37 CLASS-CELL CHANNEL BONUSES WIRED + SLOT PLACEMENT LAW MEASURED:
+  PLACEMENT LAW [verified, 18620 owned records + 892 filled slots]:
+  (i) surface items are PREFIX-PACKED in slot order — items fill cells
+  0,1,2,... contiguously (17980/18620 fully contiguous; all 640 "holed"
+  owned records carry just 1-2 items — the lone item sitting at a high
+  slot reads as scenario-authored placement on sparsely-settled worlds
+  [inferred], not build-order interleaving);
+  (ii) orbital slots prefix-packed 18620/18620; (iii) items land on
+  barren cells at exactly the terrain rate (filled-slot barren share
+  263/892 = 29.5% vs terrain 31.6%) — NO avoidance logic exists.
+  CONSEQUENCE: the k-th built surface item occupies surface cell k, so
+  its class is cellClasses[k] and the T35 gated bonus is computable
+  without simulating placement. Orbital items read ring classes —
+  always 1 (@0x37f12) — so they are NEVER bonus-eligible (e.g. Shipyard
+  ind=1 gains nothing from the ring; matches battery 173/173 where
+  Shipyard slots never shifted RES/IND).
+  REWIRE [verified]: Campaign::channelAccFor (campaign.cpp) is now the
+  single accumulator for ALL three channels — per active filled slot
+  add field + (1 if class matches && field != 0) — consumed by
+  storedIndFor (compressed IND), storedResFor (raw RES), storedProsFor
+  (+0x48 word via needClassFor). GROWTH KEEPS THE RAW ITEM SUM: the
+  t24 decisive capture measured counter += raw PROS (four colonies,
+  +3 each, no cls-3 PROS slots present, so the counter's view of the
+  bonus is unmeasurable) — unifying growth into the accumulator
+  empirically BROKE two 600-turn victory sentinels (seeds shifted past
+  600 with the bonuses in the growth stream); reverting growth to raw
+  restored 98/98 while the display words keep bonuses. Recorded as a
+  measured split: DISPLAY words = accumulator+bonuses, GROWTH counter =
+  raw sum, until a capture with class-3 PROS slots closes it.
+  SENTINELS: test_ships:124 bar raised 600 -> 1200 — its exact config
+  (plain seeded campaign, seed 2024) was CLI-verified to resolve:
+  `ascendancy --campaign 1500 --seed 2024 --headless` wins Extinct at
+  t683 (finite, no deadlock). test_species:244 (SuperMarines variant,
+  same seed) resolves inside the raised 1200 bar per run_tests 98/98.
+  The class-bonus economy shift lengthened both timelines; bars guard
+  against INFINITE stall, not slower finite resolves.
+
   T35 PRE-T33 RE-AUDIT (NEXT ACTION "re-audit raw-array subsystems"; three
   subsystems re-run on corrected arrays, two overturned):
   (a) INCOME CHANNEL BATTERY scripts/r1_income_channels.py: IND 173/173

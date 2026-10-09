@@ -235,12 +235,16 @@ TEST(species_unknown_ability_campaign_is_silent) {
 }
 
 TEST(species_campaign_with_abilities_reaches_victory) {
-    // The abilities must not deadlock the loop (no-victory-in-600 is the bar
-    // earlier turn-loop bugs died on).
+    // The abilities must not deadlock the loop (no-victory-in-N is the
+    // bar earlier turn-loop bugs died on). T37 note: the class-cell
+    // channel law (income-law.md T35/T36b) shifts this seed's timeline —
+    // seed 2024 resolves at finite turn count >600 post-law (CLI proxy
+    // --campaign 1500 --seed 2024 wins Extinct t683). The guard's target
+    // is INFINITE stall; 1200 keeps a wide margin over typical resolve.
     auto c = makeCrafted(2024, 1, ag::SpeciesAbility::SuperMarines);
     ag::Victory v = ag::Victory::None;
     int t = 0;
-    for (; t < 600 && v == ag::Victory::None; ++t) v = c.advance();
+    for (; t < 1200 && v == ag::Victory::None; ++t) v = c.advance();
     CHECK(v != ag::Victory::None);
 }
 

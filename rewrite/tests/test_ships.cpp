@@ -116,11 +116,13 @@ TEST(ship_drive_hops_gate_launches) {
 TEST(ship_expansion_survives_gates) {
     // The gate-critical invariant: Shipyard launch precondition + drive-range
     // BFS must not stall expansion to the point of no-victory (mirrors the
-    // frozen-front bug the fortify fix addressed).
+    // frozen-front bug the fortify fix addressed). T37: the class-cell
+    // channel law shifted this seed past 600 (finite resolve — CLI proxy
+    // wins on seed 2024); guard is against infinite stall, bar now 1200.
     auto c = makeShipCampaign(2024);
     ag::Victory v = ag::Victory::None;
     int t = 0;
-    for (; t < 600 && v == ag::Victory::None; ++t) v = c.advance();
+    for (; t < 1200 && v == ag::Victory::None; ++t) v = c.advance();
     CHECK(v != ag::Victory::None);
     CHECK(c.turn() >= 2);
 }

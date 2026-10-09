@@ -173,39 +173,34 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T36 LANDED (TERRAIN GENERATION LAW CLOSED END-TO-END + REWRITE UPGRADED):
-call-site 0x23a64..0x23b49 = size rng%5 + row rng%11 (captures ARE
-normal-mode draws: row histogram uniform over 0..10 incl. row 0, absent
-from the special-mode index table; special path 0x23aaa not exercised);
-header 0x37d80 fully decoded (+0x18 sums 0x744a8
-row, +0x1a=+0x18+10, row clamp, warning call >100); draw chain @0x37eb7
-barren-test-FIRST (seed counts exactly chain cells), cumulative scaled
-sums (w*32768-w)/100, orbital ring class 1 WITHOUT drawing, classes
-5..7 never occur (101948-slot census, rock |8 separate). Rewrite ctor
-now GENERATES PlanetState::cellClasses through the identical integer
-chain on the banked LCG (local stream — rng discipline held), capBase
-= nb/3+5 of the generated grid; pin test campaign_pop_cap_seed_law_oq016
-extended (ring +10 all-class-1, classes 0..4, capBase exact). Mid rows
-match shares; EXTREME rows leak (row0 98.9 vs 99.997, row10 c1 1.6 vs
-0.006) — scenario-row-override hypothesis banked [inferred], needs
-scenario-file lift to separate. income-law.md T36. 98/98, gate green.
+T37 LANDED (CLASS-CELL CHANNEL BONUSES WIRED + PLACEMENT LAW MEASURED):
+channelAccFor() is now the single battery-law accumulator (T35 gating)
+feeding storedIndFor/storedResFor/storedProsFor; placement verified
+first-empty-slot (surface contiguous 17980/18620, orbital 18620/18620,
+barren-occupancy at terrain rate 29.5% vs 31.6% => k-th surface item on
+cell k; ring items never bonus-eligible). GROWTH COUNTER KEEPS THE RAW
+PROS SUM (t24 measured; feeding it bonuses broke two victory sentinels
+— measured split banked, income-law.md T37: closing needs a capture
+with class-3 PROS slots). Sentinel bars 600->1200 after CLI proof
+(--campaign 1500 --seed 2024 -> Extinct t683). 98/98, gate green.
 
-(1) CLASS-CELL CHANNEL BONUSES: the T35 gating law (class-cell +1 only
-    when the item's own channel field != 0) is now IMPLEMENTABLE from
-    cellClasses + item fields — wire into storedIndFor/storedResFor/
-    incomeAndGrow (channel accumulators currently raw-sum only), pin
-    with battery-curve values; then IND/PROS residuals (3+8 names) get
-    one more shot at closing on cells rather than preset rows.
+(1) CLASS-3 PROS SLOTS: the growth-vs-display PROS split stays open
+    until a capture shows counter deltas with an item on a class-3
+    cell. Chase-capture route: the existing deep-capture schedule
+    already produces class-3 fills (100 filled cls-3 slots observed
+    corpus-wide) — re-measure t24-style consecutive-slot deltas on
+    those planets (r1deep-20261007-224831 slot scan filtered to
+    cls-3-filled active slots), no new run needed if deltas exist.
 (2) ROCK EVENT LAW wiring: @0x37f4d rng%7==0 -> class|=8 on
-    rng%(surfaceCells) slot, +0x66 |= 2 — law banked S10, rewrite has
-    growthBoom but never sets rock cells; decide whether rewrite models
-    rocks (they touch mine-ability paths — check economy before wiring).
+    rng%(surfaceCells) slot, +0x66 |= 2 — law banked S10; decide model
+    effect (rocks currently inert in rewrite economy — check mine
+    paths before wiring; do NOT wire blind).
 (3) GOVERNOR LEDGER (OQ-024): unchanged — needs governor-UI capture,
     gated behind OQ-012(a).
 (4) OQ-012(a): new-game size options — unchanged (glyph-lift route).
 
-NOTE t35: pre-t33 raw-array re-audit (channels 173/173/173, R11
-retracted, ship-record locator refuted) — see commit 383bb73.
+NOTE t36: terrain generation law closed end-to-end + ctor generates
+cellClasses (commit 0a0a4d7); NOTE t35: raw-array re-audit (383bb73).
 
 NOTE t34: DISPLAY-WORD CHANNEL LAW — see income-law.md T34 + commit
 91b90c0 (+0x44 max(1,trunc((v+1)^.85)) 97.98%, +0x46 raw, +0x48

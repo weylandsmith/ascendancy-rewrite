@@ -187,6 +187,17 @@ private:
     int storedIndFor(int star) const;
     int storedResFor(int star) const;
     int storedProsFor(int star) const;
+    // Shared raw-channel accumulator triple {IND, PROS, RES} under the
+    // battery law (income-law.md T35 gating + T36b placement): k-th surface
+    // item sits on surface cell k (first-empty-slot verified 17980/18620
+    // contiguous; items on barren at terrain rate 263/892 vs 31.6%),
+    // class-cell +1 bonus only when the item's own channel field != 0.
+    // Orbital items read ring classes (always 1 -> never bonus-eligible).
+    struct ChannelAcc {
+        int ind = 0, pros = 0, res = 0;
+        bool dblI = false, dblP = false, dblR = false;
+    };
+    ChannelAcc channelAccFor(int star) const;
     // +0x4a analog (income-law.md S10): clamp(0..100, capBase + MPOP sum,
     // items flags&4 and Colony Base excluded) + ability capBonus.
     int storedCapFor(int star) const;

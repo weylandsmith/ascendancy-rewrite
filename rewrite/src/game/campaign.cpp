@@ -293,43 +293,76 @@ int Campaign::popCapFor(int star) const {
     return storedCapFor(star);
 }
 
-int Campaign::storedIndFor(int star) const {
-    // S6 recalc IND channel (income-law.md §6): raw IND sum + Hyperpower
-    // doubling (v + v>>1), compressed trunc((v+1)^0.85); grant 1 at acc 0
-    // (t19). Same law incomeAndGrow charges into the empire budget.
-    int acc = 0;
-    bool dbl = false;
-    const int idHyper = itemId("Hyperpower Plant");
-    for (int it : planets_[star].items) {
-        acc += (*items_)[it].ind;
-        if (it == idHyper) dbl = true;
+Campaign::ChannelAcc Campaign::channelAccFor(int star) const {
+    // BATTERY LAW accumulator (scripts/r1_income_channels.py 173/173/173,
+    // income-law.md T35): per ACTIVE filled slot add the item's channel
+    // field, plus +1 class-cell bonus ONLY when that field is non-zero
+    // (the +1 nests inside the field test in FUN_00038ba4 — RES proof:
+    // 49 cls-4-on-res-0 slots == 49 records == 49 pre-fix failures).
+    // Cell lookup from T36b PLACEMENT [verified]: first-empty-slot in
+    // slot order (surface contiguous 17980/18620; the 640 holed records
+    // are 1-2 item preset worlds), orbital prefix-packed 18620/18620,
+    // items on barren at exactly terrain rate (263/892 = 29.5% vs 31.6%)
+    // — so the k-th surface item occupies surface cell k, and orbital
+    // items read ring cells (always class 1 => never bonus-eligible:
+    // e.g. Shipyard ind=1 gets no IND bonus on the ring).
+    ChannelAcc a;
+    const auto& ps = planets_[star];
+    int si = 0, oi = 0;
+    const int idHyper = itemId("Hyperpower Plant");       // IND doubler (12)
+    const int idPros = itemId("Fertilization Plant");     // PROS doubler (13)
+    const int idNet = itemId("Internet");                 // RES doubler (14)
+    for (int it : ps.items) {
+        const PlanetItem& pi = (*items_)[it];
+        int cls = 1;
+        if (itemIsSurface(it)) {
+            if (si < ps.surfaceCells) cls = ps.cellClasses[si];
+            ++si;
+        } else if (it < kPlanitemSurfaceCount + kPlanitemOrbitalCount) {
+            if (oi < 10) cls = ps.cellClasses[ps.surfaceCells + oi];
+            ++oi;
+        } else {
+            ++si;  // specials exempt from the XOR law; occupy surface
+                   // stream [placement of specials unmeasured — they add
+                   // 0 to every channel, so this only shifts later
+                   // items' bonus class]
+        }
+        if (pi.ind) a.ind += pi.ind + (cls == 2 ? 1 : 0);
+        if (pi.pros) a.pros += pi.pros + (cls == 3 ? 1 : 0);
+        if (pi.res) a.res += pi.res + (cls == 4 ? 1 : 0);
+        if (it == idHyper) a.dblI = true;
+        if (it == idPros) a.dblP = true;
+        if (it == idNet) a.dblR = true;
     }
-    return static_cast<int>(colonyChannel(acc, dbl, /*compress=*/true));
+    return a;
+}
+
+int Campaign::storedIndFor(int star) const {
+    // S6 recalc IND channel (income-law.md §6 + T35 gating): IND
+    // accumulator + class bonuses + Hyperpower doubling (v + v>>1),
+    // compressed trunc((v+1)^0.85); grant 1 at acc 0 (t19).
+    const ChannelAcc a = channelAccFor(star);
+    return static_cast<int>(colonyChannel(a.ind, a.dblI, /*compress=*/true));
 }
 
 int Campaign::storedResFor(int star) const {
-    // RES channel: raw accumulator + Internet doubling, never compressed (S6).
-    int acc = 0;
-    bool dbl = false;
-    const int idNet = itemId("Internet");
-    for (int it : planets_[star].items) {
-        acc += (*items_)[it].res;
-        if (it == idNet) dbl = true;
-    }
-    return static_cast<int>(colonyChannel(acc, dbl, /*compress=*/false));
+    // RES channel: raw accumulator (+ T35 class bonuses) + Internet
+    // doubling, never compressed (S6).
+    const ChannelAcc a = channelAccFor(star);
+    return static_cast<int>(colonyChannel(a.res, a.dblR, /*compress=*/false));
 }
 
 int Campaign::storedProsFor(int star) const {
     // +0x48 DISPLAY-WORD analog (income-law.md T34, 2720 stored samples):
-    // max(1, raw PROS + richPros - pop/4-floor(pop>>2)). The grant floor-1
-    // and the pop deduction are MEASURED (0-clamp scores 40.99% vs 94.82%;
-    // gov switch at +0x54 dead — queue id). NOTE incomeAndGrow charges the
-    // growth counter from its OWN raw PROS sum (t24 chase-capture law
-    // +3 == raw stored PROS), so this display law does NOT gate growth —
-    // it feeds needClassFor (FUN_0003fec4 reads the +0x48 WORD), which is
-    // exactly why the original's selector sees the deducted value.
-    double pros = planets_[star].richPros;
-    for (int it : planets_[star].items) pros += (*items_)[it].pros;
+    // max(1, PROS accumulator (class bonuses gated per T35) + richPros -
+    // pop>>2-floor). The grant floor-1 and the pop deduction are MEASURED
+    // (0-clamp scores 40.99% vs 94.82%; gov switch at +0x54 dead — queue
+    // id). NOTE incomeAndGrow charges the growth counter from its OWN raw
+    // PROS sum (t24 chase-capture law +3 == raw stored PROS), so this
+    // display law does NOT gate growth — it feeds needClassFor
+    // (FUN_0003fec4 reads the +0x48 WORD), which is exactly why the
+    // original's selector sees the deducted value.
+    double pros = planets_[star].richPros + channelAccFor(star).pros;
     pros -= static_cast<int>(planets_[star].pop) >> 2;
     return pros < 1.0 ? 1 : static_cast<int>(pros);
 }
@@ -400,33 +433,27 @@ bool Campaign::lanePassable(int owner, int target) const {
 
 void Campaign::incomeAndGrow() {
     std::vector<double> income(res.size(), 0.0);
-    const int idHyper = itemId("Hyperpower Plant");
-    const int idNet = itemId("Internet");
     for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
         int o = owner_[s];
         if (o < 0) continue;
-        // Per-planet stored channels under the MEASURED law (helper cites
-        // income-law.md). The original charges the COMPRESSED stored value
-        // into the empire budget each turn (turn tick FUN_00038f68 sums
+        // Per-planet stored channels under the MEASURED battery law
+        // (channelAccFor: T35 gating + T36b placement; income-law.md).
+        // The original charges the COMPRESSED stored value into the
+        // empire budget each turn (turn tick FUN_00038f68 sums
         // +0x44/+0x46 across owned planets; income accumulation site
         // banked with the channel battery).
-        int accI = 0, accR = 0;
-        bool dblI = false, dblR = false;
-        for (int it : planets_[s].items) {
-            const PlanetItem& pi = (*items_)[it];
-            accI += pi.ind;
-            accR += pi.res;
-            // first-occupied-slot doubling law uses TABLE index order; the
-            // rewrite builds in kBuildOrder order, so "first occupied" is
-            // approximated by "first listed as built" per channel below.
-            if (!dblR && it == idNet) dblR = true;
-            if (!dblI && it == idHyper) dblI = true;
-        }
-        income[o] += colonyChannel(accI, dblI, /*compress=*/true);
-        res[o] += colonyChannel(accR, dblR, /*compress=*/false);
-        // PROS channel: raw accumulator + ability bonus (stored value is
-        // compressed-then-upkeep-deducted in the original, income-law.md S6;
-        // the empire budget does not spend PROS, only growth does below).
+        const ChannelAcc a = channelAccFor(static_cast<int>(s));
+        income[o] += colonyChannel(a.ind, a.dblI, /*compress=*/true);
+        res[o] += colonyChannel(a.res, a.dblR, /*compress=*/false);
+        // PROS channel for GROWTH only: raw item sum + ability bonus —
+        // the t24 MEASURED counter law (decisive capture r1deep-20261007-
+        // 224831 slots 45->46: delta +3 == raw stored PROS on four AI
+        // colonies simultaneously). Whether the original's counter sees
+        // the T35 class bonuses is NOT measurable there (no cls-3 PROS
+        // slots in that capture) — the raw sum is the measured law, so
+        // growth keeps it; the display word below (storedProsFor) is the
+        // one the class-bonus accumulator feeds (needClassFor reads
+        // +0x48). Do not "unify" these without a new measurement.
         double pros = planets_[s].richPros;
         for (int it : planets_[s].items) pros += (*items_)[it].pros;
         // POP GROWTH — MEASURED counter law (docs/re/income-law.md S6c+S6e;
