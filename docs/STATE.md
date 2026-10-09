@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-08T19:20
+updated: 2026-10-08T21:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -190,10 +190,15 @@ S10 T31/T31b: saved cell array is NOT the verbatim generation output.
     the record the name-anchor finds is not the live planet record —
     cross-check by taking the recalc-law-passing +0x55 records and
     following THEIR heap pointers.
-(2) +2 pop-cap residual: CLOSED enough for S10 — modifier site verified
-    @0x4404b..0x44058 (event +2 to +0x55 for empire match then recalc);
-    only the event NUMBER/trigger table behind that scan stays open
-    (vtable-dispatched; low priority).
+(2) +2 pop-cap residual: INVESTIGATED TO EXHAUSTION t32 (S10 T32,
+    scripts/r1_cap_ledger.py): model space A/B/C enumerated and measured on
+    the clean corpus (38529 samples after dropping 209 duplicate-table
+    slots): C (skip Colony Base) best 96.17%; diffs are PAIRED +-2
+    (818/818) and survive world-identity filtering — NOT slot aliasing;
+    inactive-MPOP, flags&4, orbital placement, per-planet permanence all
+    ruled out; +0x4a direct-writer census complete (11 sites, none adds
+    outside recalc). Cause stays open (live-RAM item-table read required;
+    break-start pilot not-reopenable). Rewrite keeps model C.
 (3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
 
 T31 LANDED (measurement-only): fresh new-game capture proves terrain seed

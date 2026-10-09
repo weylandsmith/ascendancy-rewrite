@@ -194,7 +194,12 @@ show 51% barren; no monotone reading of 0x744f4 fits, so the generation
 row is NOT the save-time +0x16 row) — per-cell terrain SHAPE therefore
 stays OPEN and rewrite does NOT model cell classes — REMAINING: terrain
 weight-row provenance (scenario data-file lift), nuke event law,
-home-placement verification, +2 residual minutiae) |
+home-placement verification. +2/+2 residual minutiae INVESTIGATED to
+exhaustion t32 (scripts/r1_cap_ledger.py + S10 T32: paired diffs survive
+world-identity and duplicate-table filtering; every direct +0x4a writer
+censused; rewrite keeps best model C skip-Colony-Base 96.17% — residual
+cause needs live-RAM item-table read, blocked by no-break-start standing
+decision, non-gating) |
 income law docs/re/income-law.md S6..S10; harness scripts/r1_income_
 channels.py; chase-capture law = deep-schedule End-Turn clicks 511:67
 every 15s, save ring read by MTIME.

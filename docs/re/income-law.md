@@ -855,3 +855,34 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   255:5911} word+2 {0:5944 1:5 60:1} — item 5 appears on 5 home slots
   word+2==1 = the t27 active flag; word+2==60 anomaly x1 unexplained
   minutia.
+
+  T32 RESIDUAL MINUTIAE — MODEL SPACE EXHAUSTED, cause stays open (OQ-016
+  sub-item, non-gating): clean corpus = 460 slots, 209
+  duplicate-table slots dropped (find_records table with repeated planet
+  names = extraction ambiguity), 38529 planet samples:
+    B (disasm-exact: +0x55 + MPOP over ALL active slots)  36893 95.75%
+    C (B skipping item 5 Colony Base)                     37052 96.17%  <-- best
+    A (skip flags&4 rows: Habitat..Whopper mpop=0 anyway) = B exact
+  Diffs are a PAIRED +-2: 818 samples +2, 818 samples -2 (world-identity
+  filtered corpus: 1477/1477; the pair survives duplicate-table filtering,
+  so it is NOT slot aliasing). Ruled out by measurement: inactive-slot MPOP
+  sums (all +2 samples have inactive-mpop sum == 0), flags&4 rows (mpop 0),
+  orbital-slot placement (226 orbital-CB/906 surface-CB inside the +2 set —
+  CB placement does not decide it), per-planet permanence (0 always-+2
+  planets; the residual flips WITHIN slot runs, e.g. Hannibal III exact in
+  41..45, +2 in 46..51, exact again 52+ — the event at 0x4402a..0x44058
+  (+2 to +0x55 + recalc, per-empire) explains the -2 class only when the
+  snapshot predates a matching recalc... which the corpus shows it cannot
+  since both words sit in the same save). Direct +0x4a writer census
+  COMPLETE (11 sites restored-image-wide): 37f9e world-gen, 38ee7 recalc,
+  38f0b/38f18 clamps, 3a635 struct image copy, 295d9 stack, 46c4d/46f5f
+  (ship-space struct, different stride), 491bf/4e808/4e879 (non-planet
+  records). No writer adds to +0x4a outside recalc. LEADING HYPOTHESIS
+  (unproven): the -2 class = CB MPOP double-count where the ENGINE's live
+  item table has CB.mpop=0 while the save-held table copy reads 2 (i.e.
+  table mutated post-load), and the +2 class = its mirror; resolving needs
+  a LIVE-RAM item-table read mid-session (dosbox-x -break-start pilot is a
+  standing NOT-reopenable decision, so this stays open by constraint).
+  Rewrite keeps model C (skip CB) — the strictly-better-of-two disasm-
+  adjacent readings; OQ-016 pop-cap rows remain CLOSED on the SEED law
+  (nb//3+5 @0x37f84..0x37f9e instruction-level) which is unaffected.
