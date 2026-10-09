@@ -229,7 +229,10 @@ REFUTED at 56.99%; raw ties on this small-v corpus, compression law for
 large v = S6 battery 138/139), +0x46 = raw accumulator 2720/2720,
 +0x48 = max(1, PROS - pop>>2) 94.82% (decompile 0-clamp 40.99%); rewrite
 storedProsFor REWIRED to the +0x48 word law (sole consumer needClassFor/
-FUN_0003fec4; growth counter keeps its t24 raw-PROS law), harness
+FUN_0003fec4; GROWTH INPUT CLOSED t37b: counter += stored +0x48 VERDICT
+via scripts/r1_pros_growth.py turn-disciplined battery — raw eliminated
+(Feculon II +3 vs cap-2), gated eliminated (5 rich-world GD rows), disp
+0 losses; t24 raw reading was a tie capture, income-law.md T37b), harness
 r1_income_law.py pow85->trunc + floor-1 words, now EXITS 0 (5/5 all
 channels x 2 captures); residual 3+8 planet-names ⊆ seed-failure names =
 preset-vs-generated boundary (income-law.md T34). Governor @+0x54 branch

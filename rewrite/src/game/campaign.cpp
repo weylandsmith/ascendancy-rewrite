@@ -357,11 +357,11 @@ int Campaign::storedProsFor(int star) const {
     // max(1, PROS accumulator (class bonuses gated per T35) + richPros -
     // pop>>2-floor). The grant floor-1 and the pop deduction are MEASURED
     // (0-clamp scores 40.99% vs 94.82%; gov switch at +0x54 dead — queue
-    // id). NOTE incomeAndGrow charges the growth counter from its OWN raw
-    // PROS sum (t24 chase-capture law +3 == raw stored PROS), so this
-    // display law does NOT gate growth — it feeds needClassFor
-    // (FUN_0003fec4 reads the +0x48 WORD), which is exactly why the
-    // original's selector sees the deducted value.
+    // id). T37b: this WORD is also the GROWTH-COUNTER INPUT (corpus
+    // battery scripts/r1_pros_growth.py VERDICT disp, raw/gated
+    // eliminated 3/5) — incomeAndGrow charges it directly, matching
+    // FUN_00038f68 @0x39302, and needClassFor (FUN_0003fec4 reads the
+    // +0x48 WORD) sees the same value the original's selector saw.
     double pros = planets_[star].richPros + channelAccFor(star).pros;
     pros -= static_cast<int>(planets_[star].pop) >> 2;
     return pros < 1.0 ? 1 : static_cast<int>(pros);
@@ -445,17 +445,18 @@ void Campaign::incomeAndGrow() {
         const ChannelAcc a = channelAccFor(static_cast<int>(s));
         income[o] += colonyChannel(a.ind, a.dblI, /*compress=*/true);
         res[o] += colonyChannel(a.res, a.dblR, /*compress=*/false);
-        // PROS channel for GROWTH only: raw item sum + ability bonus —
-        // the t24 MEASURED counter law (decisive capture r1deep-20261007-
-        // 224831 slots 45->46: delta +3 == raw stored PROS on four AI
-        // colonies simultaneously). Whether the original's counter sees
-        // the T35 class bonuses is NOT measurable there (no cls-3 PROS
-        // slots in that capture) — the raw sum is the measured law, so
-        // growth keeps it; the display word below (storedProsFor) is the
-        // one the class-bonus accumulator feeds (needClassFor reads
-        // +0x48). Do not "unify" these without a new measurement.
-        double pros = planets_[s].richPros;
-        for (int it : planets_[s].items) pros += (*items_)[it].pros;
+        // PROS channel for GROWTH: the STORED +0x48 WORD (storedProsFor),
+        // NOT the raw item sum (T37b correction, docs/re/income-law.md):
+        // corpus battery scripts/r1_pros_growth.py over 13 runs — of the
+        // counter-moving transitions, `disp` never loses a divergent
+        // comparison while `raw` loses 3 (Feculon II: raw=1, alien boost
+        // caps at +1, observed +3 EXCLUDES raw) and `gated` loses 5
+        // (Delphinius II / Tensoric I rich worlds: raw=gated=1, stored
+        // disp=2, observed +3 matches disp alone; gated never wins where
+        // disp fails). The t24 "+3 == raw" reading was a TIE capture
+        // (raw=gated=disp=3 there — non-discriminating). Disasm agrees
+        // all along: FUN_00038f68 @0x39302 counter += stored PROS +0x48.
+        double pros = storedProsFor(static_cast<int>(s));
         // POP GROWTH — MEASURED counter law (docs/re/income-law.md S6c+S6e;
         // decisive capture r1deep-20261007-224831 slots 45->46: counter
         // 48 -> wrap -> 0 with pop +1 on four AI colonies simultaneously).

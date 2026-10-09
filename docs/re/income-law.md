@@ -1083,6 +1083,8 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   restored 98/98 while the display words keep bonuses. Recorded as a
   measured split: DISPLAY words = accumulator+bonuses, GROWTH counter =
   raw sum, until a capture with class-3 PROS slots closes it.
+  [SUPERSEDED T37B: the existing corpus WAS decisive once turn-
+  boundary discipline was applied — see T37b VERDICT below.]
   SENTINELS: test_ships:124 bar raised 600 -> 1200 — its exact config
   (plain seeded campaign, seed 2024) was CLI-verified to resolve:
   `ascendancy --campaign 1500 --seed 2024 --headless` wins Extinct at
@@ -1138,3 +1140,30 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
       slots is a surface slot; t32's "226 orbital-CB" was array noise).
       OQ-019 ship sub-items stay open; harness exit 1 is its OLD wrong
       locator asking the wrong question, not missing ships.
+
+  T37b GROWTH-COUNTER INPUT == STORED +0x48 WORD (VERDICT disp):
+  scripts/r1_pros_growth.py, corpus work/r1/* (13 runs), evidence =
+  mtime-consecutive save pairs at turn-delta EXACTLY 1 (banked u16 clock
+  phys 0x254e10 via H = base - 0x1BF450; histogram {0: 62729, 1: 3588} —
+  dt=0 pairs straddle no End-Turn and are excluded as non-evidence;
+  66197 frozen-counter pairs excluded by motion filter). Hypotheses:
+  raw item-PROS sum (t24 reading), gated accumulator (T35 field+cls3
+  bonus), stored display word. ELIMINATION: raw loses 3 (Feculon II
+  r1deep-20261006-123049 43/57/60: c 0->3, 3->6, 6->9 with raw=1; the
+  alien +1 boost (@0x39319, owner!=player AND stored<4) caps total at 2
+  — observed +3 EXCLUDES raw). gated loses 5 (Delphinius II
+  r1ad-20261006-144225 47/52 + Tensoric I r1deep-20261006-123049
+  43/57/60: raw=gated=1, stored disp=2, observed +3 == disp+boost;
+  gated NEVER wins where disp fails: dg=0). disp: 0 losses, consistent
+  on all 120 moved dt==1 transitions. Disasm was right all along:
+  FUN_00038f68 @0x39302 counter += stored PROS (+0x48) [verified
+  S6b]. The t24 "+3 == raw stored PROS" reading came from a TIE capture
+  (raw=gated=disp=3 on r1deep-20261007-224831 — non-discriminating);
+  [verified-as-inference: re-deriving the tie from that capture's item
+  table shows all three agree there, so t24 could not have known].
+  Aliasing caveat [inferred]: +0x4e deltas assume per-name identity
+  across saves (name-keyed records; rename impossible mid-run).
+  REWRITE: Campaign::incomeAndGrow growth input = storedProsFor(s)
+  (replaces t24 raw sum); storedProsFor comment cites verdict. CLI
+  re-verify: seed 2024 species 4 -> VICTORY Control t953 (was t922
+  pre-change; still finite, < test caps 1200). Tests 98/98, gate PASS.

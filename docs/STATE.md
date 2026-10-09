@@ -173,31 +173,34 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T37 LANDED (CLASS-CELL CHANNEL BONUSES WIRED + PLACEMENT LAW MEASURED):
-channelAccFor() is now the single battery-law accumulator (T35 gating)
-feeding storedIndFor/storedResFor/storedProsFor; placement verified
-first-empty-slot (surface contiguous 17980/18620, orbital 18620/18620,
-barren-occupancy at terrain rate 29.5% vs 31.6% => k-th surface item on
-cell k; ring items never bonus-eligible). GROWTH COUNTER KEEPS THE RAW
-PROS SUM (t24 measured; feeding it bonuses broke two victory sentinels
-— measured split banked, income-law.md T37: closing needs a capture
-with class-3 PROS slots). Sentinel bars 600->1200 after CLI proof
-(--campaign 1500 --seed 2024 -> Extinct t683). 98/98, gate green.
+T37b LANDED (GROWTH-COUNTER INPUT CLOSED == STORED +0x48 WORD): turn-
+disciplined corpus battery scripts/r1_pros_growth.py (dt==1 via banked
+u16 clock 0x254e10, motion filter, 12 divergent + 5 GD rows) ELIMINATES
+raw (Feculon II +3 > raw 1 + boost cap 1) and gated (5 rich-world rows
+where disp alone fits; gated never beats disp) — VERDICT disp, 0 losses,
+matching FUN_00038f68 @0x39302 all along; the t24 "+3 == raw" reading
+was a TIE capture. incomeAndGrow growth input = storedProsFor(s); CLI
+re-verify seed 2024 species 4 -> Control t953; tests 98/98, gate PASS,
+banked income-law.md T37b. NEXT: rock bit |8 semantics (byte +0x00 raw
+census shows classes {0..4}|8; rewrite cellClasses drops the |8 —
+determine what bit 3 does: Ghidra consumers of the class byte reading
+with/without mask, e.g. draw chain 0x37eb7 comparisons and any terrain-
+render/penalty sites; if a penalty law exists (e.g. mining/movement),
+measure it against +0x44/+0x4a effects on rocky-planet samples in the
+corpus; else bank as cosmetic/purity bit and CLOSE OQ rock-bit row).
+PRIOR NOTE T37 LANDED (channelAccFor single accumulator, T35
+gating; placement law: k-th surface item on surface cell k,
+contiguous 17980/18620, ring never bonus-eligible; sentinel bars
+600->1200 after CLI proof Extinct t683) — its GROWTH-SPLIT
+paragraph is SUPERSEDED by T37b above.
 
-(1) CLASS-3 PROS SLOTS: the growth-vs-display PROS split stays open
-    until a capture shows counter deltas with an item on a class-3
-    cell. Chase-capture route: the existing deep-capture schedule
-    already produces class-3 fills (100 filled cls-3 slots observed
-    corpus-wide) — re-measure t24-style consecutive-slot deltas on
-    those planets (r1deep-20261007-224831 slot scan filtered to
-    cls-3-filled active slots), no new run needed if deltas exist.
-(2) ROCK EVENT LAW wiring: @0x37f4d rng%7==0 -> class|=8 on
+(1) ROCK EVENT LAW wiring: @0x37f4d rng%7==0 -> class|=8 on
     rng%(surfaceCells) slot, +0x66 |= 2 — law banked S10; decide model
     effect (rocks currently inert in rewrite economy — check mine
     paths before wiring; do NOT wire blind).
-(3) GOVERNOR LEDGER (OQ-024): unchanged — needs governor-UI capture,
+(2) GOVERNOR LEDGER (OQ-024): unchanged — needs governor-UI capture,
     gated behind OQ-012(a).
-(4) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+(3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
 
 NOTE t36: terrain generation law closed end-to-end + ctor generates
 cellClasses (commit 0a0a4d7); NOTE t35: raw-array re-audit (383bb73).
