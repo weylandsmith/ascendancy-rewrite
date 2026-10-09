@@ -134,6 +134,36 @@ TEST(campaign_home_placement_law_t40) {
     }
 }
 
+TEST(campaign_colonised_plan_gets_colony_base_t41) {
+    // COLONISED-PLANET LAW (docs/re/income-law.md T41, census
+    // scripts/r1_colony_items.py): every in-run colonisation arrives with
+    // EXACTLY one Colony Base (2 same-world observations, CB-only pop 2),
+    // and corpus-wide 2720/2720 owned records hold an ACTIVE Colony Base.
+    // Rewrite invariant: after play begins, EVERY owned star carries a
+    // Colony Base (homes t40 + colonies t41; captures keep their items).
+    auto c = makeCampaign(2024);
+    bool colonised = false;
+    for (int t = 0; t < 300 && !c.over(); ++t) {
+        c.advance();
+        for (const auto& ev : c.events())
+            if (ev.turn == c.turn() && ev.text.find("colonised") != std::string::npos)
+                colonised = true;
+    }
+    CHECK(colonised);  // first colonization measured ~t164..t169 range
+    const auto& items = tables().items;
+    const int ns = static_cast<int>(c.galaxy().stars.size());
+    int owned = 0;
+    for (int s = 0; s < ns; ++s) {
+        if (c.starOwner(s) < 0) continue;
+        ++owned;
+        bool cb = false;
+        for (int it : c.planetAt(s).items)
+            if (items[it].name == "Colony Base") cb = true;
+        CHECK(cb);
+    }
+    CHECK(owned > 7);  // expansion happened, law covers the new planets too
+}
+
 TEST(campaign_channel_law_oq016) {
     // MEASURED stored-channel law (docs/re/income-law.md S6/t18b compression
     // + t19 grant; battery scripts/r1_income_channels.py post-t35:

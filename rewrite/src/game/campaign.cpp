@@ -129,17 +129,14 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     // (T36 battery, first saves 77k surface cells). Seed word
     // capBase = nonbarren/3 + 5 into +0x55/+0x4a @0x37f84..0x37f9e.
     // banked LCG (FUN_0007824f, income-law.md S10 t29b): state =
-    // state*0x41C64E6D + 0x3039; value = (state >> 16) & 0x7fff. ONE local
-    // stream serves terrain AND the t40 home-CB placement draw; it never
-    // touches the campaign rng_ sequence (REFUTED-ROUTES RNG discipline).
-    // Initial state := cfg.seed [inferred; the original's seed-injection path
-    // is unmeasured]. Hoisted out of the terrain block at t40 so home
-    // placement continues the same stream.
-    uint32_t lcg = static_cast<uint32_t>(cfg.seed);
-    auto next = [&lcg]() {
-        lcg = lcg * 0x41C64E6Du + 0x3039u;
-        return static_cast<int>((lcg >> 16) & 0x7fffu);
-    };
+    // state*0x41C64E6D + 0x3039; value = (state >> 16) & 0x7fff. ONE stream
+    // (member worldLcg_, advanced by worldNext()) serves the terrain draw,
+    // the t40 home-CB placement AND the t41 colonised-planet CB grant; it
+    // never touches the campaign rng_ sequence (REFUTED-ROUTES RNG
+    // discipline). Initial state := cfg.seed [inferred; the original's
+    // seed-injection path is unmeasured].
+    worldLcg_ = static_cast<uint32_t>(cfg.seed);
+    auto next = [this]() { return worldNext(); };
     {
         struct Row { int w[4]; };
         static const Row kRows[11] = {
@@ -407,6 +404,47 @@ Campaign::ChannelAcc Campaign::channelAccFor(int star) const {
         if (it == idNet) a.dblR = true;
     }
     return a;
+}
+
+int Campaign::worldNext() {
+    // banked LCG FUN_0007824f: state = state*0x41C64E6D + 0x3039;
+    // value = (state >> 16) & 0x7fff (income-law.md S10 t29b).
+    worldLcg_ = worldLcg_ * 0x41C64E6Du + 0x3039u;
+    return static_cast<int>((worldLcg_ >> 16) & 0x7fffu);
+}
+
+void Campaign::seedColonyBaseColony(int star) {
+    // COLONISED-PLANET LAW (t41, docs/re/income-law.md T41 +
+    // scripts/r1_colony_items.py): ownership flip arrives with EXACTLY one
+    // ACTIVE Colony Base, pop := 2 (income-law.md S6e); cap == seed + 2
+    // follows from the closed recalc law (CB MPOP 2), observed exact. The
+    // original's colonisation entry is the itemIdx-5 legality path
+    // (ownership gate exempts itemIdx 5 on UNOWNED planets —
+    // income-law.md §4/S9) feeding the same activation store, which is why
+    // the CB word-0 active bit is set immediately. Cell draw = measured
+    // buildable-rank envelope [2, nb-1] (mechanism [unverified], same as
+    // the t40 home draw; ONE worldLcg_ stream for both).
+    PlanetState& ps = planets_[star];
+    ps.pop = 2;
+    const int b = itemId("Colony Base");
+    if (b < 0) return;
+    int nb = 0;
+    for (int c = 0; c < ps.surfaceCells; ++c)
+        if (!(ps.cellClasses[c] & 8)) ++nb;
+    int cell = -1;
+    if (nb >= 3) {
+        int pick = 3 + worldNext() % (nb - 2);   // rank pick-1 in [2, nb-1]
+        for (int c = 0; c < ps.surfaceCells; ++c) {
+            if (ps.cellClasses[c] & 8) continue;
+            if (--pick == 0) { cell = c; break; }
+        }
+    }
+    if (cell < 0) {
+        for (int c = 0; c < ps.surfaceCells; ++c)
+            if (!(ps.cellClasses[c] & 8)) { cell = c; break; }
+    }
+    ps.items.push_back(b);
+    ps.itemCells.push_back(cell);
 }
 
 int Campaign::storedIndFor(int star) const {
@@ -759,7 +797,11 @@ void Campaign::expansionPhase() {
     for (const ShipInTransit& sh : fleet_) {
         if (owner_[sh.target] < 0) {
             owner_[sh.target] = sh.owner;
-            planets_[sh.target].pop = 2;  // settlement seed :=2 MEASURED (income-law.md S6e)
+            // settlement :=2 MEASURED (income-law.md S6e) + COLONY BASE
+            // grant MEASURED t41 (r1_colony_items.py: 2720/2720 owned
+            // records carry an active CB; every in-run colonisation
+            // observation is CB-only pop 2 cap==seed+2).
+            seedColonyBaseColony(sh.target);
             events_.push_back({turn_, "owner " + std::to_string(sh.owner) + " colonised " +
                                   galaxy_.stars[sh.target].name});
         }

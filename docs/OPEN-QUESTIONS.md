@@ -233,8 +233,14 @@ colonyChannel grant is IND-compressed-only; scripts/
 r1_home_placement.py; rewrite ctor + channel guard + pins) — built-item
 CELL SELECTION stays open (T40(6): never |8 verified, prefix-from-0
 refuted 0/2720, scenario scatter; rewrite lowest-free is a documented
-default); REMAINING: colonised-planet initial items (corpus has
-ZERO owned no-item records); extreme-row leak banked unexplained
+default); COLONISED-PLANET ITEMS CLOSED t41 (every in-run colonisation
+arrives with exactly one active Colony Base — 2 same-world earliest-
+owned observations + 2720/2720 owned records corpus-wide carry a CB; pop
+:=2, cap==seed+2 exact; dt-diff method found no flips (capture cadence),
+earliest-observation method resolved; scripts/r1_colony_items.py; rewrite
+seedColonyBaseColony + member worldLcg_); REMAINING: built-item cell
+selection mechanism + CB-cell draw mechanism (envelopes measured, [unver-
+ified]); extreme-row leak banked unexplained
 (row0 98.9 vs 99.997, row10 c1 1.6 vs 0.006 — scenario-row-override
 hypothesis, income-law.md T36d). +2/+2 residual minutiae RESOLVED t33
 (the paired +-2 class, the skip-CB model-C preference, and the live-RAM

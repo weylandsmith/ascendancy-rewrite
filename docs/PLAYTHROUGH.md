@@ -1,6 +1,6 @@
 # Headless playthrough record
 
-Regenerated 2026-10-04T18:11:20-04:00 by scripts/record_playthrough.sh from the
+Regenerated 2026-10-09T15:15:56-04:00 by scripts/record_playthrough.sh from the
 current binary. Victory conditions and their vendor files: docs/re/turnloop.md §1.
 
 ## Run A — headless, seed 2024
@@ -9,14 +9,14 @@ current binary. Victory conditions and their vendor files: docs/re/turnloop.md �
 $ ./rewrite/build/ascendancy --headless --campaign 600 --seed 2024
 archives: 3 54 328 89  (.bin tables parsed: 7)
 SDL 2.32.4 initialised (video driver: (null))
-campaign seed=2024 stars=75 lanes=83 ai=6
-turn   1 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
-turn   2 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
-  ... (404 lines elided)
-  [t201] owner 0 colonised Hope
-  [t201] owner 2 colonised Chippendale
-  [t201] VICTORY: Control (end-ctrl.txt)
-VICTORY Control via end-ctrl.txt on turn 201 (score 53%)
+campaign seed=2024 stars=50 lanes=53 ai=6
+turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
+turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
+  ... (822 lines elided)
+  [t728] owner 0 colonised Mira
+  [t729] owner 0 colonised Crimea
+  [t729] VICTORY: Control (end-ctrl.txt)
+VICTORY Control via end-ctrl.txt on turn 729 (score 52%)
 ```
 
 ## Run B — headless, seed 42
@@ -25,14 +25,14 @@ VICTORY Control via end-ctrl.txt on turn 201 (score 53%)
 $ ./rewrite/build/ascendancy --headless --campaign 600 --seed 42
 archives: 3 54 328 89  (.bin tables parsed: 7)
 SDL 2.32.4 initialised (video driver: (null))
-campaign seed=42 stars=75 lanes=82 ai=6
-turn   1 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
-turn   2 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
-  ... (626 lines elided)
-  [t211] owner 0 captured Arcturus
-  [t211] owner 0 captured Menthol
-  [t211] VICTORY: Control (end-ctrl.txt)
-VICTORY Control via end-ctrl.txt on turn 211 (score 52%)
+campaign seed=42 stars=50 lanes=53 ai=6
+turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
+turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
+  ... (645 lines elided)
+  [t556] owner 3 captured Ajax
+  [t557] owner 3 captured Feculon
+  [t557] VICTORY: Extinct (end-xtnc.txt)
+VICTORY Extinct via end-xtnc.txt on turn 557 (score 0%)
 ```
 
 ## Run C — Xvfb/X11, seed 13
@@ -41,14 +41,14 @@ VICTORY Control via end-ctrl.txt on turn 211 (score 52%)
 $ xvfb-run -a ./rewrite/build/ascendancy --campaign 600 --seed 13
 archives: 3 54 328 89  (.bin tables parsed: 7)
 SDL 2.32.4 initialised (video driver: x11)
-campaign seed=13 stars=75 lanes=83 ai=6
-turn   1 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
-turn   2 | player stars  1 score   1% techs  3 | ai stars 1 1 1 1 1 1
-  ... (508 lines elided)
-  [t215] owner 1 captured Ajax
-  [t215] owner 4 captured Vishnu
-  [t215] VICTORY: Extinct (end-xtnc.txt)
-VICTORY Extinct via end-xtnc.txt on turn 215 (score 0%)
+campaign seed=13 stars=50 lanes=53 ai=6
+turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
+turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
+  ... (411 lines elided)
+  [t345] owner 6 captured Binomer
+  [t346] owner 6 captured Phoebe
+  [t346] VICTORY: Extinct (end-xtnc.txt)
+VICTORY Extinct via end-xtnc.txt on turn 346 (score 0%)
 ```
 
 ## Run D — UI under Xvfb, autoplay 3 turns (gate 4c)

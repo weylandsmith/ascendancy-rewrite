@@ -1331,3 +1331,42 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   numbers. OPEN SIBLING (next action): what the original places on a
   COLONISED planet — corpus has ZERO owned records with no active item,
   mid-game colonies included.
+
+  T41 COLONISED-PLANET LAW CLOSED (scripts/r1_colony_items.py). The
+  dt==1 turn-clock diff method found NO flips (full corpus: 24 dt-pairs of
+  437 consecutive saves — the capture cadence rarely straddles exactly one
+  turn), so the harness switched to EARLIEST-OWNED-OBSERVATION: baseline =
+  each run's first save, record every planet unowned there that becomes
+  owned, at its first owned save. Colonisation cannot partially place a
+  Colony Base, and no build could complete within the same save window, so
+  the earliest observation equals the arrival state (a >1-item observation
+  would have flagged otherwise; none occurred). MEASURED:
+  (1) Every in-run colonisation arrives with EXACTLY ONE active Colony
+      Base — 2 same-world observations (r1deep-20261008-190330 first-
+      baseline world), both CB-only. Corroborating census: 2720/2720
+      owned (owner != 0xFF) records across the FULL corpus (all saves,
+      all worlds) hold an active Colony Base — there is NO owned planet
+      without one anywhere, so "colonisation = ownership flip only" is
+      REFUTED corpus-wide.
+  (2) pop := 2 at arrival (the S6e seed law; colonisation walk FUN_00025d30
+      does the +1 IND grants on the home pair, banked t19/t20, NOT a new
+      item on the colony — the CB itself enters through the itemIdx-5
+      ownership-gate-exempt legality path, banked §4/S9, which is why the
+      slot word0 active bit is set at once).
+  (3) cap == seed + 2 EXACT on arrivals (closed recalc law + CB MPOP 2;
+      seed word +0x55 unchanged by colonisation).
+  (4) Arriving-CB cell rank over buildable cells: observed ranks 4 and 40
+      (n=2), never rank 0 (consistent with the t40 home envelope [2..70]).
+      Cell-selection MECHANISM stays [unverified] — same draw envelope as
+      homes, ONE world-generation LCG stream for both in the rewrite.
+  Rewrite: Campaign::seedColonyBaseColony (campaign.cpp) — expansionPhase
+  arrival now sets pop :=2 + CB on a drawn buildable cell instead of the
+  pop-only default; worldLcg_ became a member (worldNext()) so terrain,
+  home draw, and colony draw share ONE stream WITHOUT touching rng_
+  (REFUTED-ROUTES RNG discipline). Pin
+  campaign_colonised_plan_gets_colony_base_t41 (test_campaign.cpp): after
+  300 turns every owned star carries a Colony Base.
+  TIMELINE (finite-proved by CLI, --campaign 1500 --headless): seed 2024
+  Control t729, seed 42 Extinct t557 — productive-from-arrival colonies
+  ACCELERATE play vs t40 (t976/t1414); PLAYTHROUGH.md regenerated after
+  this landing (gate greps VICTORY strings only).

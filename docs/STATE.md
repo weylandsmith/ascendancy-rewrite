@@ -173,36 +173,29 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T40 LANDED (HOME PLACEMENT CLOSED + RES-AT-0 FIX). Faithful campaign
-start now MEASURED: one home per empire, pop 2, COLONY BASE ONLY (no
-Factory/Lab/Shipyard; 153/157 worlds, scripts/r1_home_placement.py), CB
-on a RANDOM BUILDABLE CELL (rank 2..70, rank 0/1 zero occurrences, never
-orbital — ctor draws it from the hoisted local terrain LCG; mechanism
-[unverified] inside the measured envelope). BUILT-ITEM cell selection
-stays OPEN (T40(6): never |8 verified; prefix-from-0 refuted; scenario
-scatter) — buildPhase assigns the lowest free cell as a documented
-default and channelAccFor reads explicit cells when present. CB cell
-class x channel words == battery accumulator 153/157 — independent T35
-gating confirmation (class-4 home CB keeps RES 0). RES WORD IS 0 ON
-157/157 HOMES -> colonyChannel grant now applies ONLY to the compressed
-IND channel (acc==0 && compress); every owned planet has >=1 item so
-IND-at-acc-0 stays unobservable (no owned no-item record exists in the
-corpus — colonised-planet initial items = next open sibling). TIMELINE
-(moved, finite-proved by CLI): first colonization t169 seed 42; seeds
-1/2/2024 Control t979/t826/t961. Windows: tests 400->1200 x2, grown>3
-->grown>1, total-owned 20->220 turns; gate campaign 900->1200 timeout
-240. run_tests 98/0; gate ALL CHECKS PASS (milestone=6).
-NOTE t40: docs/PLAYTHROUGH.md turn numbers (t201/t211/t215) are STALE
-under the faithful-start timeline (Control t826..t979; gate greps only the
-victory STRINGS so it stays green) — regenerate alongside the next
-campaign-affecting landing.
-NEXT ACTION: colonised-planet initial-item census — corpus has ZERO
-owned records with no active item, so test the transition method
-(owner 0xFF->empire AND first item appearing same/next turn): does the
-original put a Colony Base on every colonised planet (rewrite assumes
-yes via kColonyItem grant-free model), or nothing? Harness over
-turn-adjacent dt==1 pairs; if transition never co-fires items, bank
-"colonisation = ownership flip only" with the item-arrival evidence.
+T41 LANDED (COLONISED-PLANET LAW CLOSED). Colonisation arrives with
+EXACTLY ONE active Colony Base + pop :=2, cap==seed+2 exact (scripts/
+r1_colony_items.py; dt-diff found no flips — capture cadence — earliest-
+owned-observation resolved: 2 same-world CB-only observations + 2720/
+2720 owned records corpus-wide carry an active CB). Cell = measured rank
+envelope [2, nb-1] on the SAME world LCG (now member worldLcg_/
+worldNext() — terrain + home draw + colony draw share it, rng_ untouched;
+expansionPhase calls seedColonyBaseColony). Pin
+campaign_colonised_plan_gets_colony_base_t41: every owned star holds a
+CB after 300 turns. TIMELINE (CLI finite-proved): 2024 Control t729, 42
+Extinct t557, 13 Extinct t346 — productive-from-arrival colonies
+ACCELERATE play; PLAYTHROUGH.md REGENERATED (record_playthrough.sh
+budgets 600->1200); gate campaign budget 1200 already covers t729. run_tests 100/0.
+NEXT ACTION: built-item CB-cell draw mechanism — static pass over the
+original's colonisation entry (itemIdx-5 ownership-gate-exempt path ->
+slot-selection function): find the rng call that picks the placement cell
+(hypothesis: FUN_0003958c-family slot finder is prefix-first-empty; the
+SCATTERED home/CB cells then come from world-gen pre-occupying cells,
+e.g. the original scatters a per-planet pseudo-random FREE-ITEM/ruin set
+at generation — test by counting active+empty-slot patterns vs a scatter
+model on first-save worlds). If the finder is first-empty AND homes are
+scattered, the missing law is a per-planet world-gen scatter — lift its
+parameters from 0x37d80/0x3a558 neighborhoods.
 NOTE t36: terrain generation law closed end-to-end + ctor generates
 cellClasses (commit 0a0a4d7); NOTE t35: raw-array re-audit (383bb73).
 

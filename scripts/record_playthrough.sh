@@ -18,9 +18,12 @@ capture() { # capture <name> <expected-substring> <cmd...>
   grep -q "$expect" "$TMP/$name.log" || { echo "MISSING '$expect' in $name"; cat "$TMP/$name.log"; exit 1; }
 }
 
-capture A "VICTORY"          "$BIN" --headless --campaign 600 --seed 2024
-capture B "VICTORY"          "$BIN" --headless --campaign 600 --seed 42
-capture C "VICTORY"          xvfb-run -a "$BIN" --campaign 600 --seed 13
+# T41: budgets 600 -> 1200. The faithful CB-only start (income-law.md T40)
+# lengthened seed-2024 to Control t729 (CLI); all three seeds FINITE:
+# 2024 Control t729, 42 Extinct t557, 13 Extinct t346.
+capture A "VICTORY"          "$BIN" --headless --campaign 1200 --seed 2024
+capture B "VICTORY"          "$BIN" --headless --campaign 1200 --seed 42
+capture C "VICTORY"          xvfb-run -a "$BIN" --campaign 1200 --seed 13
 capture D "ui ok: turn 3"    xvfb-run -a "$BIN" --ui --campaign 3 --autoplay --seed 9
 capture E "audio ok: 85 sfx chunks, music 8191719 B" \
         env SDL_AUDIODRIVER=dummy xvfb-run -a "$BIN" --ui --audio --campaign 1 --autoplay --seed 4

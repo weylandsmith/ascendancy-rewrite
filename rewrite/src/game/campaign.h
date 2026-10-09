@@ -202,6 +202,21 @@ private:
     int storedIndFor(int star) const;
     int storedResFor(int star) const;
     int storedProsFor(int star) const;
+    // World-generation LCG continuation (banked FUN_0007824f law; state
+    // seeded := cfg.seed at construction [injected-state inferred]). ONE
+    // stream serves the terrain draw, the t40 home-CB placement, AND the
+    // t41 colonised-planet CB grant — it NEVER touches campaign rng_
+    // (REFUTED-ROUTES RNG discipline: the campaign stream must stay put so
+    // combat/expansion timelines remain reproducible).
+    int worldNext();
+    // Seed a freshly-claimed planet: pop := 2 [verified S6e] + exactly one
+    // Colony Base on a buildable cell (t41 law, scripts/r1_colony_items.py:
+    // 2720/2720 owned records corpus-wide carry an ACTIVE Colony Base; the
+    // 2 same-world in-run colonisation observations both show CB-only,
+    // pop 2, cap == seed+2 exact). Cell = measured rank envelope [2, nb-1]
+    // (arrival ranks observed 4 and 40; rank 0 never in 157+2 samples);
+    // selection mechanism [unverified].
+    void seedColonyBaseColony(int star);
     // Shared raw-channel accumulator triple {IND, PROS, RES} under the
     // battery law (income-law.md T35 gating + T36b placement): k-th surface
     // item sits on surface cell k (first-empty-slot verified 17980/18620
@@ -225,6 +240,8 @@ private:
     const std::vector<Gizmo>* gizmos_ = nullptr;  // combat strength inputs (OQ-010)
     std::vector<DipFile> aiDip_;  // aiDip_[i] drives owner i+1
     std::mt19937 rng_;
+    // World-generation LCG state (banked FUN_0007824f law, see worldNext()).
+    uint32_t worldLcg_ = 0;
 
     std::vector<int> owner_;                   // per star
     std::vector<PlanetState> planets_;         // per star (only owned stars use it)
