@@ -1279,3 +1279,55 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   filed: capture requirement + best default = Phase Bomb NOT modelled
   (rewrite combat is an abstraction; no silent stub). Smart Bomb (38)
   is ship-weapon-disarm per gizhelp, out of the planet law either way.
+
+  T40 HOME-PLACEMENT LAW CLOSED; RES-AT-0 CORRECTED (scripts/
+  r1_home_placement.py, first-save per DISTINCT world identity across
+  work/r1/*, 27 worlds; owner byte +0x57, 0xFF empty [the first draft's
+  +0x12 filter was a stale guess and is retired]). MEASURED:
+  (1) EXACTLY ONE owned home per empire per world (157 (world,owner)
+      pairs, all count 1). pop==2 (= Colony Base MPOP, consistent with the
+      closed cap law: cap == seed+2 on every home).
+  (2) Opening position = COLONY BASE ONLY — 153/157 (the 4 Agriplot+CB
+      rows are the mid-game chase capture r1deep-20261007-224831, whose
+      earliest saves already show pend==0x1000-style built queues; no
+      Factory/Laboratory/Shipyard EVER appears on a first-save home,
+      surface or ring). The v1/tutorial Factory+Lab+Shipyard seeding is
+      RETIRED from the rewrite ctor (campaign.cpp).
+  (3) CB CELL = pseudo-random BUILDABLE cell: slot RANK over the non-rock
+      cells measured 2..70 across 157 samples; rank 0 and rank 1: ZERO
+      occurrences; never orbital (0/157); the CB cell class histogram
+      {0:39, 1:56, 2:14, 3:6, 4:38} tracks the terrain rate [mechanism of
+      the draw unverified — envelope only].
+  (4) Channel words on pure homes == battery accumulator on the CB cell
+      class EXACTLY 153/157: class0 IND1/RES0/PROS1 x39, class1 x56,
+      class2 IND2 x14, class3 PROS2 x6, class4 IND1/RES0/PROS1 x38 — an
+      independent confirmation of T35 gating (CB res-field 0 -> class-4
+      cell adds nothing) AND of the T36b placement law's class lookup.
+  (5) RES WORD 0 ON 157/157 HOMES -> colonyChannel(compress=false) at
+      acc==0 returns 0, NOT the grant; the grant survives ONLY for the
+      compressed IND channel (IND-at-acc-0 UNOBSERVABLE: corpus has zero
+      owned records with no active items). Rewrite: campaign.cpp
+      colonyChannel guard is now `acc==0 && compress`; pin updated in
+      test_campaign.cpp channel test.
+  (6) BUILT-ITEM CELL SELECTION REMAINS OPEN (corrected same-turn; the
+      first draft's "lowest free cell" reading was NOT supported): items
+      never sit on |8 cells [verified T38], but strict prefix-from-0 was
+      already 0/2720 in the T38 non-rock battery, and the T40 home census
+      shows the world-gen CB scattered at rank 2..70 — multi-item homes
+      (chase Hannibal III Agriplot@5 + CB@6, whose Agriplot@5 is one of
+      the four T38 SCENARIO-PRESET authored scatter examples) show
+      CONTIGUOUS ADJACENT runs, not prefix runs and not lowest-free
+      (cells 0..4 were free buildable there). Author-vs-draw of that row
+      is unresolvable from these captures. Rewrite: buildPhase completion
+      assigns the lowest free non-rock surface cell / lowest free ring
+      slot as a [documented default] (campaign.cpp, PlanetState::
+      itemCells) so explicit cells never desync the accumulator; the
+      selection law itself stays open.
+  TIMELINE EFFECT (finite-proved, cited): first colonization moved ~t20 ->
+  t169 (seed 42 CLI '[t169] owner 0 colonised Tensoric'); seed 1/2/2024
+  resolves Control t979/t826/t961 (--headless --campaign 1500). Test
+  windows 400->1200 (test_campaign.cpp x2, + grown threshold 4->2,
+  + total-owned 20->220 turns) and gate budget 900->1200 carry these
+  numbers. OPEN SIBLING (next action): what the original places on a
+  COLONISED planet — corpus has ZERO owned records with no active item,
+  mid-game colonies included.

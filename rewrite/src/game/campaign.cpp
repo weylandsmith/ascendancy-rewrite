@@ -41,7 +41,13 @@ constexpr double kColonyIncomeGrant = 1.0;
 }  // namespace
 
 double colonyChannel(int acc, bool firstDoubleActive, bool compress) {
-    if (acc == 0) return kColonyIncomeGrant;  // grant survives recalc JZ-skip
+    if (acc == 0 && compress) return kColonyIncomeGrant;  // IND-only grant
+    // (t19; IND-at-acc-0 is UNOBSERVABLE in captures — no owned planet ever
+    // has zero items — so the grant survives for the compressed channel.
+    // The uncompressed RES channel has NO grant: home worlds have acc 0 and
+    // +0x46 == 0 on 157/157 homes, t40 census; T34's raw-accumulator law
+    // 2720/2720 already implies this — the old grant here was a v1 default
+    // the battery never discriminated because its records all had items.)
     int v = acc + (firstDoubleActive ? acc >> 1 : 0);
     if (!compress) return static_cast<double>(v);
     return std::floor(std::pow(static_cast<double>(v + 1), 0.85));
@@ -122,6 +128,18 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     // all 11 measured rows matches these shares within sampling noise
     // (T36 battery, first saves 77k surface cells). Seed word
     // capBase = nonbarren/3 + 5 into +0x55/+0x4a @0x37f84..0x37f9e.
+    // banked LCG (FUN_0007824f, income-law.md S10 t29b): state =
+    // state*0x41C64E6D + 0x3039; value = (state >> 16) & 0x7fff. ONE local
+    // stream serves terrain AND the t40 home-CB placement draw; it never
+    // touches the campaign rng_ sequence (REFUTED-ROUTES RNG discipline).
+    // Initial state := cfg.seed [inferred; the original's seed-injection path
+    // is unmeasured]. Hoisted out of the terrain block at t40 so home
+    // placement continues the same stream.
+    uint32_t lcg = static_cast<uint32_t>(cfg.seed);
+    auto next = [&lcg]() {
+        lcg = lcg * 0x41C64E6Du + 0x3039u;
+        return static_cast<int>((lcg >> 16) & 0x7fffu);
+    };
     {
         struct Row { int w[4]; };
         static const Row kRows[11] = {
@@ -134,19 +152,6 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
         // are verified against live +0x18 (7/11/23/45/73, exact on sampled
         // planets), the per-byte split is not observed — carried as sums.
         static const int kSurfaceBySize[5] = {7, 11, 23, 45, 73};
-        // The draw source is the banked LCG (FUN_0007824f, income-law.md
-        // S10 t29b): state = state*0x41C64E6D + 0x3039; value =
-        // (state >> 16) & 0x7fff. One draw per planet (size), one (row),
-        // then one per SURFACE cell — the orbital ring does NOT advance
-        // the stream (@0x37f19 skips the CALL). Kept as a LOCAL stream so
-        // terrain never perturbs the campaign rng_ draw sequence
-        // (REFUTED-ROUTES RNG discipline). Initial state := cfg.seed
-        // [inferred; the original's seed-injection path is unmeasured].
-        uint32_t lcg = static_cast<uint32_t>(cfg.seed);
-        auto next = [&lcg]() {
-            lcg = lcg * 0x41C64E6Du + 0x3039u;
-            return static_cast<int>((lcg >> 16) & 0x7fffu);
-        };
         for (int s = 0; s < n; ++s) {
             const int size = next() % 5;  // rng%5 @0x23a86/95
             const int row = next() % 11;  // rng%11 @0x23a97/aa8
@@ -243,19 +248,52 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     for (int s = 0; s < n; ++s) {
         if (owner_[s] >= 0) planets_[s].pop = cfg_.initialPop;
     }
-    // Opening position on every home (documented default; tutorial.txt in
-    // ascend00 describes exactly this state: "we ended after beginning
-    // construction of our first Shipyard... Further research has been
-    // completed which will allow building a useful ship"; exact start list
-    // stays OQ-016). Factory+Lab = economy; Shipyard + restree rows
-    // {0 Orbital Structures, 1 Interplanetary Exploration, 2 Tonklin Diary}
-    // = the ability to launch a basic ship (docs/re/ships.md §1,§3).
+    // Opening position on every home: COLONY BASE ONLY, pop 2, CB on a
+    // RANDOM BUILDABLE CELL (MEASURED t40, scripts/r1_home_placement.py:
+    // first-save of every distinct world identity across work/r1/* (27
+    // worlds; owner byte +0x57 == empire, 0xFF empty): pop==2 + exactly one
+    // ACTIVE Colony Base, no Factory/Laboratory/Shipyard anywhere in the
+    // record including the orbital ring; 153/157 homes, the 4 Agriplot+CB
+    // worlds are mid-game chase captures, scenario worlds add only authored
+    // scatter). CB buildable-cell RANK 2..70 measured, ranks 0 and 1 never
+    // (0/157); rank draw here is [inferred] inside that measured envelope.
+    // The CB cell class feeds the channel words (class2 IND=2 x14, class3
+    // PROS=2 x6, class4 RES stays 0 — gating re-confirmed; income-law.md
+    // T40). The old Factory+Lab+Shipyard seeding (tutorial.txt scenario,
+    // not campaign start) is RETIRED. The constructor's opening-research
+    // grant is NOT measured (empire tech block unexamined) — banked open,
+    // not silently changed.
     for (int s = 0; s < n; ++s) {
         if (owner_[s] < 0) continue;
-        int f = itemId("Factory"), l = itemId("Laboratory"), y = itemId("Shipyard");
-        if (f >= 0) planets_[s].items.push_back(f);
-        if (l >= 0) planets_[s].items.push_back(l);
-        if (y >= 0) planets_[s].items.push_back(y);
+        int b = itemId("Colony Base");
+        if (b < 0) continue;
+        auto& ps = planets_[s];
+        int nb = 0;
+        for (int c = 0; c < ps.surfaceCells; ++c)
+            if (!(ps.cellClasses[c] & 8)) ++nb;
+        // Rank draw in the measured [2, nb-? ] envelope; mechanism
+        // unverified so the cell itself is drawn uniformly from buildable
+        // cells with the bottom two buildable RANKS excluded (0/157
+        // observation). Degenerate tiny planets fall back to first buildable.
+        int cell = -1;
+        if (nb >= 3) {
+            // The walk consumes `pick` buildable cells (rank pick-1).
+            // pick in [3, nb] -> rank in [2, nb-1] — the measured envelope
+            // INCLUDING the last buildable cell (t40 pin caught the earlier
+            // pick in [2, nb-2], which made rank 1 reachable and rank nb-1
+            // unreachable).
+            int pick = 3 + next() % (nb - 2);
+            for (int c = 0; c < ps.surfaceCells; ++c) {
+                if (ps.cellClasses[c] & 8) continue;
+                if (--pick == 0) { cell = c; break; }
+            }
+        }
+        if (cell < 0) {
+            for (int c = 0; c < ps.surfaceCells; ++c)
+                if (!(ps.cellClasses[c] & 8)) { cell = c; break; }
+        }
+        ps.items.push_back(b);
+        ps.itemCells.push_back(cell);
     }
     if (tree_ && tree_->all().size() > 2)
         for (auto& techSet : ownedTech)
@@ -331,13 +369,22 @@ Campaign::ChannelAcc Campaign::channelAccFor(int star) const {
     ChannelAcc a;
     const auto& ps = planets_[star];
     int si = 0, oi = 0;
+    // T40: when the planet carries EXPLICIT cell assignments (home CB drawn
+    // to a random buildable cell; buildPhase assigns the lowest free cell on
+    // completion), the class comes from that cell. The positional walk below
+    // remains only as a fallback for items added without assignment.
+    const bool explicitCells = ps.itemCells.size() == ps.items.size();
     const int idHyper = itemId("Hyperpower Plant");       // IND doubler (12)
     const int idPros = itemId("Fertilization Plant");     // PROS doubler (13)
     const int idNet = itemId("Internet");                 // RES doubler (14)
-    for (int it : ps.items) {
+    for (size_t ix = 0; ix < ps.items.size(); ++ix) {
+        const int it = ps.items[ix];
         const PlanetItem& pi = (*items_)[it];
         int cls = 1;
-        if (itemIsSurface(it)) {
+        if (explicitCells && ps.itemCells[ix] >= 0 &&
+            ps.itemCells[ix] < static_cast<int>(ps.cellClasses.size())) {
+            cls = ps.cellClasses[ps.itemCells[ix]];
+        } else if (itemIsSurface(it)) {
             // advance si past rocky cells (builds skip them, T38)
             while (si < ps.surfaceCells && (ps.cellClasses[si] & 8)) ++si;
             if (si < ps.surfaceCells) cls = ps.cellClasses[si];
@@ -560,6 +607,31 @@ void Campaign::buildPhase() {
             ps.buildAcc += storedIndFor(s);
             if (ps.buildAcc >= pend->cost) {
                 ps.items.push_back(ps.pendingItem);
+                // CELL ASSIGNMENT on completion [documented default,
+                // income-law.md T40(6): selection law OPEN — never |8 cell
+                // [verified t38], prefix-from-0 refuted 0/2720 (t38),
+                // scenario scatter observed (t40)]. Lowest free non-rock
+                // surface cell; orbital rows take the lowest free ring slot.
+                // The assignment exists to keep itemCells explicit so
+                // channelAccFor never falls back to the positional walk.
+                if (itemIsSurface(ps.pendingItem)) {
+                    std::vector<char> used(ps.surfaceCells, 0);
+                    for (size_t k = 0; k < ps.items.size() - 1; ++k)
+                        if (k < ps.itemCells.size() && ps.itemCells[k] >= 0 &&
+                            ps.itemCells[k] < ps.surfaceCells)
+                            used[ps.itemCells[k]] = 1;
+                    int c = 0;
+                    while (c < ps.surfaceCells && (ps.cellClasses[c] & 8 || used[c])) ++c;
+                    ps.itemCells.push_back(c < ps.surfaceCells ? c : -1);
+                } else {
+                    int ring = ps.surfaceCells;
+                    std::vector<char> usedo(10, 0);
+                    for (size_t k = 0; k < ps.items.size() - 1; ++k)
+                        if (k < ps.itemCells.size() && ps.itemCells[k] >= ps.surfaceCells)
+                            usedo[ps.itemCells[k] - ps.surfaceCells] = 1;
+                    while (ring < ps.surfaceCells + 10 && usedo[ring - ps.surfaceCells]) ++ring;
+                    ps.itemCells.push_back(ring);
+                }
                 // LUSH GROWTH BOMB completion (income-law.md S10): governor
                 // byte == item 37 && !(+0x66&1) -> capBase += 10 once, flag
                 // set (@0x39212..0x39229).

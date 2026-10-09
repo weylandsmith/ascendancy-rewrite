@@ -48,6 +48,21 @@ struct PlanetState {
     int growthBoom = 0;          // +0x66 bit1 analog: Lush Growth Bomb fired
     int growthCounter = 0;       // +0x4e analog (PROS-side counter, S6c)
     std::vector<int> items;      // indices into the planitem table (ACTIVE slots)
+    // EXPLICIT cell assignment parallel to `items` (surface: index into the
+    // surface cells; orbital: surfaceCells + ring index). MEASURED t40
+    // (scripts/r1_home_placement.py, 157 homes / 27 worlds): the HOME Colony
+    // Base sits at a pseudo-random buildable cell — RANK over the non-rock
+    // cells measured 2..70 across 157 samples, rank 0/1: ZERO occurrences
+    // (never the last cell either; mechanism of the draw [unverified]), cell
+    // class histogram {0:39,1:56,2:14,3:6,4:38} = terrain rate (barren CBs
+    // exist!). Chase
+    // BUILT-ITEM cell selection is OPEN (income-law.md T40(6): never on |8
+    // [verified], prefix-from-0 refuted 0/2720 (t38), scatter observed);
+    // the rewrite assigns the lowest free cell as a [documented default]
+    // so explicit cells and the accumulator never desync. Cell class drives
+    // channel bonuses (class-2 home IND=2 x14, class-3 home PROS=2 x6,
+    // income-law.md T40).
+    std::vector<int> itemCells;
     // BUILD QUEUE (income-law.md S8+t28): pending item id or -1 (original
     // +0x54 == 0xFF) and the industry accumulator (+0x50). The original pays
     // stored IND into +0x50 EVERY turn a pending item exists (tick law

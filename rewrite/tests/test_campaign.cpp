@@ -81,7 +81,12 @@ TEST(campaign_total_owned_grows) {
     // (some owner always has surplus industry; turnloop.md §4).
     auto c = makeCampaign(42);
     int totalPrev = 7;
-    for (int t = 0; t < 20 && !c.over(); ++t) {
+    // T40 window 20 -> 220: the faithful CB-only start (income-law.md T40)
+    // moves FIRST colonization to ~t169 (CLI: --campaign 300 --seed 42 ->
+    // '[t169] owner 0 colonised Tensoric'); a bare home needs the full
+    // Factory->drive->Shipyard queue chain before any colony ship launches,
+    // which is exactly what the vendor's own tutorial pacing describes.
+    for (int t = 0; t < 220 && !c.over(); ++t) {
         c.advance();
         int total = 0;
         for (int o = 0; o <= 6; ++o) total += c.starsOwned(o);
@@ -89,6 +94,44 @@ TEST(campaign_total_owned_grows) {
         totalPrev = total;
     }
     CHECK(totalPrev > 7);
+}
+
+TEST(campaign_home_placement_law_t40) {
+    // HOME-PLACEMENT LAW (docs/re/income-law.md T40, census
+    // scripts/r1_home_placement.py over 27 world identities): exactly one
+    // home per empire; opening position = Colony Base ONLY (no
+    // Factory/Lab/Shipyard ever on a first-save home); the CB sits on a
+    // BUILDABLE (non-rock) SURFACE cell whose non-rock RANK is >= 2 (rank
+    // 0/1: 0 occurrences in 157 originals; never orbital).
+    for (unsigned seed : {2u, 7u}) {
+        auto c = makeCampaign(seed);
+        const auto& items = tables().items;
+        for (int o = 0; o <= 6; ++o) {
+            int star = -1;
+            const int ns = static_cast<int>(c.galaxy().stars.size());
+            for (int s = 0; s < ns; ++s)
+                if (c.starOwner(s) == o) star = s;
+            CHECK(star >= 0);
+            if (star < 0) continue;
+            const auto& ps = c.planetAt(star);
+            CHECK(ps.items.size() == 1);            // Colony Base ONLY
+            CHECK(ps.itemCells.size() == 1);
+            if (ps.items.size() != 1 || ps.itemCells.size() != 1) continue;
+            CHECK(items[ps.items[0]].name == "Colony Base");
+            const int cell = ps.itemCells[0];
+            CHECK(cell >= 0 && cell < ps.surfaceCells);   // never orbital
+            if (cell < 0 || cell >= ps.surfaceCells) continue;
+            CHECK((ps.cellClasses[cell] & 8) == 0);       // buildable
+            int rank = 0, nb = 0;
+            for (int k = 0; k < ps.surfaceCells; ++k) {
+                if (ps.cellClasses[k] & 8) continue;
+                if (k < cell) ++rank;
+                ++nb;
+            }
+            CHECK(rank >= 2 || nb < 3);  // ctor envelope (tiny planets fall
+                                         // back to first buildable)
+        }
+    }
 }
 
 TEST(campaign_channel_law_oq016) {
@@ -113,8 +156,13 @@ TEST(campaign_channel_law_oq016) {
     CHECK(ag::colonyChannel(2, true, true) == 3.0);   // dbl v=3 -> (4)^.85
     CHECK(ag::colonyChannel(4, true, true) == 5.0);   // dbl v=6 -> (7)^.85
     // RES channel: accumulator + Internet doubling shift (v += v>>1, the
-    // same 0x38db5 site), never compressed.
-    CHECK(ag::colonyChannel(0, true, false) == 1.0);   // grant
+    // same 0x38db5 site), never compressed. T40: NO grant at acc 0 for the
+    // raw channel — home worlds sit at acc 0 with +0x46 == 0 on 157/157
+    // homes (scripts/r1_home_placement.py census; income-law.md T40), while
+    // the compressed IND channel keeps the t19 grant (IND-at-acc-0 is
+    // unobservable in captures: every owned record has >= 1 item).
+    CHECK(ag::colonyChannel(0, false, true) == 1.0);   // IND grant survives
+    CHECK(ag::colonyChannel(0, true, false) == 0.0);   // RES raw: no grant
     CHECK(ag::colonyChannel(3, false, false) == 3.0);
     CHECK(ag::colonyChannel(3, true, false) == 4.0);   // 3 + 3>>1
     CHECK(ag::colonyChannel(9, true, false) == 13.0);  // 9 + 9>>1
@@ -138,12 +186,15 @@ TEST(campaign_build_queue_law_oq016) {
     CHECK(c.turn() == 1);
     for (int t = 0; t < 40 && !c.over(); ++t) c.advance();
     // By turn ~41 every still-owned AI home has grown its built list by at
-    // least one completed queue item.
+    // least one completed queue item. T40: threshold 4 -> 2 (v1's '>3' was
+    // '3 seeded structures + 1 completion'; the MEASURED start is Colony
+    // Base only, and Factory cost 30 at stored IND 1-2/turn completes
+    // t16..t31, so '>1' still pins the queue law end-to-end).
     int grown = 0;
     for (int o = 1; o <= 6; ++o)
         for (size_t i = 0; i < c.galaxy().stars.size(); ++i)
             if (c.starOwner(static_cast<int>(i)) == o &&
-                c.builtItemCount(static_cast<int>(i)) > 3) ++grown;
+                c.builtItemCount(static_cast<int>(i)) > 1) ++grown;
     CHECK(grown > 0);
 }
 
@@ -214,10 +265,14 @@ TEST(campaign_reaches_a_victory) {
     // CONTRACT: a seeded run reaches a victory condition (docs/PLAYTHROUGH.md
     // is generated from such a run). Combat (turnloop.md §5) makes Control or
     // LastAlive reachable; 400-turn cap bounds the search.
+    // T40: cap 400 -> 1200. Faithful start (income-law.md T40) lengthens the
+    // finite resolves to t826 / t979 / t961 (CLI --campaign 1500 --headless
+    // seeds 1 / 2 / 2024, all Control) — still FINITE, so the stall
+    // contract is unchanged.
     bool anyVictory = false;
     for (unsigned seed : {1u, 2u, 2024u}) {
         auto c = makeCampaign(seed);
-        for (int t = 0; t < 400 && !c.over(); ++t) c.advance();
+        for (int t = 0; t < 1200 && !c.over(); ++t) c.advance();
         if (c.over()) { anyVictory = true; break; }
     }
     CHECK(anyVictory);
@@ -233,7 +288,9 @@ TEST(campaign_victory_files_named) {
 TEST(campaign_advance_after_victory_is_noop) {
     auto c = makeCampaign(1);
     ag::Victory v = ag::Victory::None;
-    for (int t = 0; t < 400; ++t) {
+    // T40 cap 400 -> 1200 (seed 1 finite resolve moved to t979; see
+    // campaign_reaches_a_victory note above).
+    for (int t = 0; t < 1200; ++t) {
         v = c.advance();
         if (v != ag::Victory::None) break;
     }
