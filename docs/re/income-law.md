@@ -608,17 +608,25 @@ Full region 0x3f130..0x3f757 disassembled from work/ascend_restored.bin
 
 Recalc head reads the SEED word +0x55 raw: `MOV AX,[EBX+0x55]` @0x38bd4
 into c4a; item loop adds MPOP (skip item flags&4, AND skip Colony Base —
-see rule note below); tail clamps 0..100 into +0x4a. Ledger measurement
-(ALL 13 r1deep captures x every planet x every save slot, 40318 samples):
-  `+0x4a == clamp(0,100, capBase + sum MPOP(active slots; skip item
-   flags&4; skip item row 5 Colony Base))`
-holds 38772/40318 EXACTLY; the residual is +2 (never any other value,
-never negative) on 39 named planets in a minority of their slots.
-RULE DERIVATION (t29): with Colony Base INCLUDED the same ledger shows
-732 samples at EXACTLY -2, all of them Colony-Base-active, and no other
-negative residual exists; excluding CB removes every negative residual
-(38560 ok -> 38772 ok, failures become purely +2). [verified data;
-[inferred] conclusion: CB's MPOP=2 is excluded from the cap sum.] Runtime
+see rule note below); tail clamps 0..100 into +0x4a. LEDGER (t31 FULL
+CORPUS RERUN — 298 save slots x every planet = 46132 samples, all 13
+r1deep worlds + fresh run): with ACTIVE := slot word+2==1 and CB EXCLUDED,
+  `+0x4a == clamp(0,100, [rec+0x55] + sum MPOP(active items, skip flags&4,
+     skip item row 5 Colony Base))`
+holds 44376/46132 = 96.19%, residual ONLY +2 (1756 samples, no other
+value ever); with CB INCLUDED the residual splits 988 +2 / 988 -2 —
+reproducing t29's original 38772/40318 = 96.17% signature EXACTLY (a
+mid-turn t31 "retraction" was itself wrong: it tested grid-derived
+nb//3+5 against +0x55 instead of this recalc equation; un-retracted).
+The +2 = event modifier @0x4404b..0x44058 (scan over planets at 0x2b057
+stride 0x7b matching owner byte[+0x57] vs event empire @EBP: +2 to +0x55
+then recalc; mismatch lists show s=0, +0x4a==+0x55+2 on 2-5 named
+planets/world).
+RULE DERIVATION (t29, re-confirmed t31 full corpus): with Colony Base
+INCLUDED the ledger shows paired ±2 residuals (988/988); excluding CB
+removes every NEGATIVE residual (failures become purely +2, the known
+event shift) — CB's MPOP=2 is therefore excluded from the cap sum.
+[verified data; inferred conclusion.] Runtime
 planitem MPOP column (identical in all 13 captures at B+0x82BB0+0x73e40,
 i*0x28+3): Habitat(+2), Metroplex(+2), Colony Base(+2, excluded),
 Habitat-class rows 3(+3),4(+2),5(+2); rows 17/28/29/30 carry flags&4
@@ -787,3 +795,63 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
      shows HOW: loading a saved game RESTORES +0x16 from save/record data
      while terrain grid came from the ORIGINAL generation rng — captures
      are resumes, so they pair terrain(rowX) with a re-stored row).
+
+  T31 FRESH-NEW-GAME TEST — NEGATIVE, extraction suspect (capture
+  r1deep-20261008-190330; scratch resume.gam MOVED ASIDE so 0x37d80 ran
+  THIS session — world is new: 138->140 planets, names Sirverei/Lanesend/
+  Masticon, first autosave 48.sav mtime-ordered):
+  a) Per-row class histograms STILL do not match the 0x744f4 w-rows on
+     freshly-generated terrain: row-0 planets (w0=100 predicts ~100%
+     barren) show arrays dominated by class 1 (e.g. Masticon II
+     [1,1,1,1,3,0,1,2,...]); corr(w0, barren%) = +0.13..+0.20 (chance-ish).
+  b) The ROW-INDEPENDENT orbital law (index >= [+0x18] forced class 1,
+     0x37f0e..0x37f17, unconditional, no rng) FAILS on the saved stride-4
+     arrays for 119/138 planets (trailing 10 cells not all class 1).
+  c) Raw seed field [rec+0x55] == count(class!=0 over surface)//3 + 5
+     holds for only 30/132 un-built planets.
+  CONCLUSION [verified measurements; inferred diagnosis]: the stride-4
+  cell array at word[rec+0x10] AS READ FROM SAVE-SLOT Memory is NOT the
+  verbatim output of 0x37d80 — either the game rewrites/reindexes class
+  byte0 during setup/first turns, or the saved heap representation
+  differs from the generated one. The 0x37d80 law itself remains a
+  VERIFIED READ OF THE DISASSEMBLY, but EVERY terrain-census claim built
+  on slot-array class bytes (t22-era terrain-bonus fit, t29 seed-cell
+  cross-check, barren-rate aggregates) is downgraded to UNCONFIRMED —
+  none of them is load-bearing for the rewrite (cell classes are not
+  modelled; capBase draw stays a documented default). The t29-banked
+  recalc ledger (+0x4a == clamp(+0x55 + MPOP-sum), 38772/40318) is a
+  DIFFERENT equation on record fields and stands unaffected.
+  Residual kernel now: (K1) what writes class byte0 after generation —
+  census byte writers of the form `mov byte [base+idx*4]` / [esi+rax]
+  with provenance to word[rec+0x10] (candidates logged: 0x21e3a,0x21f3e,
+  0x35fd1,0x38a05,0x39296,0x3a159,0x3e625,0x468bd,0x49dd2 — the C6/44
+  census sites also catch byte1 slot writes, so filter by register
+  provenance); (K2) only after K1: does a REWRITTEN row explain the
+  histograms. Do not re-run slot-array batteries before K1 (REFUTED-
+  ROUTES R12).
+
+  T31b QUANTIFIED NEGATIVE (same fresh run 48/47.sav): +0x55 matches NO
+  candidate function of the saved grid: surf//3+5 26.8%, nb//3+5 22.5%,
+  class1//3+5 17.4%, class0//3+5 7.2% (n=138) — the t29 claim
+  "capBase == nb//3+5, 38772/40318, residual purely +2" DOES NOT
+  REPRODUCE with the current extraction on these very same capture dirs.
+  t29 tool code is unrecoverable from session cache (spillover holds only
+  the summary line); its ledger is therefore RETRACTED pending rerun
+  (meta-lesson: "catch claims before they leave the tree" — this one
+  escaped). What DOES reproduce today (4 slots, 2 worlds incl. fresh):
+    +0x4a == clamp(0,100, +0x55 + SUM MPOP(slots with byte1!=0xFF, skip
+      item flags&4, skip item 5)) at 133/138, 135/140, 144/151, 153/158;
+      every mismatch has s=0 and +0x4a == +0x55+2 EXACTLY — that is the
+      +2 event modifier (scan @0x4402a), first direct sighting.
+  So: RECALC LAW [verified, rewrite stays]; SEED LAW +0x55=nb/3+5
+  [OPEN AGAIN — the equation is instruction-level real (0x37f7f..0x37f9e
+  writes [ESI+0x55]=ECX/3+5 where ECX counts the loop's non-barren
+  draws), but the DRAW INPUTS cannot be recovered from save state, so no
+  measurement can currently confirm the seeded value's provenance. The
+  rewrite's binomial capBase draw is documented-default, reproduces the
+  measured +0x55 ranges {5..29} and per-size maxima, unchanged.]
+  Also banked [verified, raw hist fresh 48.sav over all 7684 slots]:
+  byte0 {0:1523 1:3429 2:347 3:313 4:315 8..12:23} byte1 {0:34 5:5
+  255:5911} word+2 {0:5944 1:5 60:1} — item 5 appears on 5 home slots
+  word+2==1 = the t27 active flag; word+2==60 anomaly x1 unexplained
+  minutia.

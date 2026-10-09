@@ -166,15 +166,18 @@ rows 0..21 minus Colony Base, first ABSENT picked immediately unless
 COST/IND>=70 aborts scan to best PRESENT (need-class column FUN_0003fec4,
 d66 roll; income-law.md S9) — rewrite buildPhase REWIRED (pendingItem/
 buildAcc, instant ind_ deduction removed) + pin test
-campaign_build_queue_law_oq016); POP-CAP SEED LAW t29
-closed-by-decompile+40318-sample-ledger: capBase = nonbarren_surface/3 + 5
-written to +0x55 AND +0x4a at world-gen (0x37f84..0x37f9e), nonbarren ~
-Binomial(ncells, 1-w0) with MEASURED preset table 0x744f4 {100,50,20,0,40,
-20,40,20,40,20,0} and cell counts 0x744a8 row sums {7,11,23,45,73} (live
-+0x18 exact); recalc +0x4a = clamp(0..100, capBase + MPOP sum skipping
-flags&4 AND Colony Base) holds 38772/40318, residual purely +2 on 39
-planets (open minutiae); Lush Growth Bomb (item 37) completion = capBase
-+10 once (+0x66 flag, 0x39212..0x39229) — rewrite buildPhase/constructor
+campaign_build_queue_law_oq016); POP-CAP LAW t29/t31
+closed-by-decompile+FULL-corpus ledger (298 slots x every planet = 46132
+samples): recalc +0x4a = clamp(0..100, +0x55 + MPOP sum, skip flags&4 items,
+skip Colony Base even when active) holds 43376 exact / 45179 (96.0%), all
+1816 failures POSITIVE +2; +0x55 world-gen seed law nb//3+5 verified
+instruction-level @0x37f84..0x37f9e (nb = non-barren SURFACE cells counted
+by the 0x37e30 generation loop); the saved cell grid does NOT reproduce it
+(T31b: fresh new-game run + corpus — +0x55 vs any class-count formula of the
+saved grid fails; generation-state vs render-state boundary, extraction
+limit not a gameplay-law gap; the t29 'ledger' numbers were a flawed
+extraction, RETRACTED and replaced by the t31 corpus rerun); Lush Growth
+Bomb (item 37) completion = +10 once (+0x66 flag, 0x39212..0x39229) — rewrite buildPhase/constructor
 REWIRED (capBase/surfaceCells seeded per star, storedCapFor() replaces
 constant-25 default, pin test campaign_pop_cap_seed_law_oq016); t29b
 terrain-mutation CLOSED by 40k consecutive-save sample census: surface

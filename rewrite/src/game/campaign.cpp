@@ -289,11 +289,13 @@ int Campaign::storedProsFor(int star) const {
 }
 
 int Campaign::storedCapFor(int star) const {
-    // +0x4a analog (income-law.md S10 t29): recalc head reads capBase
+    // +0x4a analog (income-law.md S10 t29/t31): recalc head reads capBase
     // (+0x55) raw, the item loop adds MPOP, the tail clamps 0..100
     // (@0x38f01..0x38f18). MPOP sum skips items with flags&4 (measured rows
-    // 17/28/29/30) AND Colony Base (S10 residual derivation: including its
-    // +2 produced EXACTLY -2 residuals on every Colony-Base-active planet).
+    // 17/28/29/30) AND Colony Base (disasm: its MPOP is never added — with
+    // it included, every Colony-Base-active planet sits exactly -2; t31
+    // full-corpus ledger 43376/45179 exact, all 1816 failures POSITIVE +2,
+    // cause unidentified — candidates: orbital-slot MPOP, unlifted event).
     // capBonus keeps SA_MoreMaxPop [documented default; the original's
     // ability site is not yet lifted].
     const PlanetState& ps = planets_[star];

@@ -173,22 +173,37 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NOTE t30: scenario loader + world-identity facts banked (S10 T30/T30b/T30c);
-terrain row ASSIGNMENT kernel is now pinned (fresh uniform draw per planet
-via rng path @0x23af..0x23b45, tables only in special mode); the residual
-kernel is narrowed to the per-row w-histogram contradiction. Gate green.
+NOTE t31: fresh new-game capture done (r1deep-20261008-190330, scratch
+resume.gam MOVED ASIDE to resume.gam.bak-20261008 — restore or re-move as
+needed; next capture starts a NEW world). Recalc cap law RE-CONFIRMED on
+full corpus (46132 samples, 96.19%, +2-only residual; a mid-turn
+retraction was itself wrong and was un-retracted — the equation is
++0x4a==clamp(+0x55+MPOP-sum), NOT grid nb//3+5). Grid battery results in
+S10 T31/T31b: saved cell array is NOT the verbatim generation output.
 
-(1) OQ-016 w-histogram kernel: capture ONE FRESH new-game run (deep
-    capture starting from new-game setup, not title-resume; same safety
-    invariants as always) and compare first-save terrain histograms per
-    +0x16 row against 0x744f4 w-rows. If they match, bank the generator
-    law fully + wire rewrite cell-class generation; if they don't, the
-    w-array read at 0x37e4f is transformed somewhere — do the byte-writer
-    census on 0x744f3..0x744c0 next. scripts/r1_terrain_authored.py has
-    the extraction; reuse its battery binned-by-row output.
-(2) +2 pop-cap residual (S10): low priority (0.4% of samples); disp16
-    census near 0x38f68..0x3958c.
+(1) OQ-016 kernel K1 (income-law S10 T31): WHO REWRITES cell byte0 after
+    world-gen — full byte-store census with looser grammar than
+    `[reg+reg*4]` (include `[reg+reg]` walks with +=4 advance, rep-movsb,
+    and stores through pointers derived from word[rec+0x10]); correlate
+    writers with the fresh-run 48->47 diffs (only 8 planets mutated —
+    smallest possible corpus to attribute). If no post-gen writer exists,
+    the record the name-anchor finds is not the live planet record —
+    cross-check by taking the recalc-law-passing +0x55 records and
+    following THEIR heap pointers.
+(2) +2 pop-cap residual: CLOSED enough for S10 — modifier site verified
+    @0x4404b..0x44058 (event +2 to +0x55 for empire match then recalc);
+    only the event NUMBER/trigger table behind that scan stays open
+    (vtable-dispatched; low priority).
 (3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+
+T31 LANDED (measurement-only): fresh new-game capture proves terrain seed
+RANGES reproduce exactly ({5..7},{5..8},{5..12},{5..20},{5..29} per size
+class on fresh world) but per-planet grid/array equations (nb//3+5,
+orbital tail-all-1) FAIL on saved state (22.5% / 19-138) — recorded
+S10 T31/T31b with raw slot hist (byte0/byte1/word+2); +2 event modifier
+first direct sighting @0x4404b..0x44058; word2==1 ACTIVE definition for
+the cap ledger (item5 CB on 5 home slots, t27 law re-observed); full
+corpus = 298 slots / 46132 samples now the standing recalc ledger.
 
 T30 LANDED (measurement-only; harness script added): S10 T30 call-site law
 (scenario-init per-star rng%5 size + rng%11 row normal path; 21-dword
