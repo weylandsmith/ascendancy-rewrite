@@ -203,14 +203,23 @@ rng < scaled(w0) @0x37e51..0x37ea4 with cumulative class chain
 @0x37eb7..0x37ee0 [verified instruction-level] — t29b's preset-row ->
 observed-histogram REFUTATION IS ITSELF RETRACTED t35 (the 51%-barren-on-
 row-0 reading was the raw-array misalignment; corrected-array battery:
-barren% tracks w0 monotonically on every row — row0/100 -> 99.3%, 50 ->
-48.1%, 40 -> 41.3/37.8/40.3%, 20 -> ~21%, 0 -> 0.7/0.2%; the save-time
-+0x16 row IS the generation row for the barren leg; terrain GENERATED not
-authored, 410 names multi-hash across runs; residual: w0=0 ~0.7% leakage
-and class 2..7 chain shape unmeasured) — rewrite still does NOT model
-cell classes — REMAINING: terrain
-weight-row provenance (scenario data-file lift), nuke event law,
-home-placement verification. +2/+2 residual minutiae RESOLVED t33
+barren% tracks w0 monotonically on every row — row0/100 -> 99.997% pred/
+98.9% meas, 40 -> 41.3/37.8/40.3%, 20 -> ~21%, 0 -> 0.7/0.2%; terrain
+GENERATED not authored, 410 names multi-hash across runs) — T36 CLOSED
+terrain GENERATION LAW end-to-end (call-site 0x23a64..0x23b49: size =
+rng%5, row = rng%11 — captures are normal-mode draws (row hist uniform
+0..10 incl 0, absent from special-mode table); header 0x37d80: +0x18 sums
+0x744a8, +0x1a=+0x18+10, row clamp>=0xb->2; draw chain @0x37eb7 barren
+test FIRST (seed counts exactly chain cells), cumulative scaled sums
+(w*32768-w)/100, orbital ring class 1 WITHOUT drawing; classes 5..7
+never occur, rock |8 separate): rewrite ctor GENERATES cellClasses per
+planet through the identical integer chain on the banked LCG, capBase
+= nb/3+5 of the generated grid, pin test extended (ring +10 all-1,
+classes 0..4, capBase exact) — REMAINING: rock bit/event wiring,
+class-cell channel bonuses from cellClasses (T35 gating), nuke event
+law, home-placement verification; extreme-row leak banked unexplained
+(row0 98.9 vs 99.997, row10 c1 1.6 vs 0.006 — scenario-row-override
+hypothesis, income-law.md T36d). +2/+2 residual minutiae RESOLVED t33
 (the paired +-2 class, the skip-CB model-C preference, and the live-RAM
 read requirement are all VOID — one wrong array offset; rewrite UPGRADED
 to model DIS incl-Colony-Base, income-law.md T33); DISPLAY-WORD LAWS t34

@@ -173,31 +173,39 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T35 LANDED (PRE-T33 RE-AUDIT — the whole raw-array audit closes):
-(a) r1_income_channels.py 173/173/173 IND/PROS/RES first-ever full clean;
-RES misses were a MODEL bug (class-cell +1 bonus nests inside the item's
-channel-field non-zero test — 49 cls4-on-res0 slots == 49 records == 49
-failures, one-for-one), fixed in channels+fit; rewrite site verified
-no-op (no cell classes modeled, bonus inert). (b) terrain battery re-run
-correct (old invocations passed the parent dir, skipped every run):
-barren% tracks w0 monotonically on every row — R11 RETRACTED, the
-save-time +0x16 row IS the generation row (barren leg); terrain
-GENERATED not authored. (c) r1_ship_record.py locator REFUTED (its
-filter matches only anchored PLANET records, 37/37); orbital-slot law
-untestable — zero filled orbital slots in 72066 samples. Details:
-income-law.md T35. 98/98 tests, gate green.
+T36 LANDED (TERRAIN GENERATION LAW CLOSED END-TO-END + REWRITE UPGRADED):
+call-site 0x23a64..0x23b49 = size rng%5 + row rng%11 (captures ARE
+normal-mode draws: row histogram uniform over 0..10 incl. row 0, absent
+from the special-mode index table; special path 0x23aaa not exercised);
+header 0x37d80 fully decoded (+0x18 sums 0x744a8
+row, +0x1a=+0x18+10, row clamp, warning call >100); draw chain @0x37eb7
+barren-test-FIRST (seed counts exactly chain cells), cumulative scaled
+sums (w*32768-w)/100, orbital ring class 1 WITHOUT drawing, classes
+5..7 never occur (101948-slot census, rock |8 separate). Rewrite ctor
+now GENERATES PlanetState::cellClasses through the identical integer
+chain on the banked LCG (local stream — rng discipline held), capBase
+= nb/3+5 of the generated grid; pin test campaign_pop_cap_seed_law_oq016
+extended (ring +10 all-class-1, classes 0..4, capBase exact). Mid rows
+match shares; EXTREME rows leak (row0 98.9 vs 99.997, row10 c1 1.6 vs
+0.006) — scenario-row-override hypothesis banked [inferred], needs
+scenario-file lift to separate. income-law.md T36. 98/98, gate green.
 
-(1) TERRAIN GENERATION LAWFULNESS UPGRADE candidate (from T35b): the
-    barren leg is now measured law (row = +0x16, barren iff rng <
-    scaled(w0), rng 0..32767) — decide+lift the w0 scaling and the class
-    2..7 cumulative chain shape (same 0x37d80 disasm, draw loop
-    0x37e51..0x37ee0), then let the rewrite generate cell classes
-    instead of seeding bare surfaceCells. This closes OQ-016's
-    "terrain weight-row provenance" remnant for the barren leg and
-    finally replaces the last documented-default in the mapgen path.
-(2) GOVERNOR LEDGER (OQ-024): unchanged — needs governor-UI capture,
+(1) CLASS-CELL CHANNEL BONUSES: the T35 gating law (class-cell +1 only
+    when the item's own channel field != 0) is now IMPLEMENTABLE from
+    cellClasses + item fields — wire into storedIndFor/storedResFor/
+    incomeAndGrow (channel accumulators currently raw-sum only), pin
+    with battery-curve values; then IND/PROS residuals (3+8 names) get
+    one more shot at closing on cells rather than preset rows.
+(2) ROCK EVENT LAW wiring: @0x37f4d rng%7==0 -> class|=8 on
+    rng%(surfaceCells) slot, +0x66 |= 2 — law banked S10, rewrite has
+    growthBoom but never sets rock cells; decide whether rewrite models
+    rocks (they touch mine-ability paths — check economy before wiring).
+(3) GOVERNOR LEDGER (OQ-024): unchanged — needs governor-UI capture,
     gated behind OQ-012(a).
-(3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+(4) OQ-012(a): new-game size options — unchanged (glyph-lift route).
+
+NOTE t35: pre-t33 raw-array re-audit (channels 173/173/173, R11
+retracted, ship-record locator refuted) — see commit 383bb73.
 
 NOTE t34: DISPLAY-WORD CHANNEL LAW — see income-law.md T34 + commit
 91b90c0 (+0x44 max(1,trunc((v+1)^.85)) 97.98%, +0x46 raw, +0x48

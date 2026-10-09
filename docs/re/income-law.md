@@ -989,6 +989,71 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   35/2720 IND and
   141/2720 PROS samples]
 
+  T36 TERRAIN GENERATION LAW CLOSED + REWRITE UPGRADED (disasm of the
+  call-site 0x23a64..0x23b49 and header 0x37d80..0x37e40 this session):
+  a) ROW/SIZE PROVENANCE [verified]: per planet the caller draws
+  size = rng1 % 5 (0x23a86 CALL 0x7824f; IDIV 5 @0x23a95; r1%5 survives
+  the second CALL in EDX, moved @0x23a9c) and weight row = rng2 % 11
+  (0x23a97 CALL; IDIV 11 @0x23a97..0x23aa8; EDX=r2%11 -> AX @0x23b38 ->
+  EBX param @0x23b45; size -> DX @0x23b40). Special/scenario mode
+  (0x23aaa..0x23ac2, gate [ESP+0x108]==0 && F8==114) REPLACES both from
+  the 21-dword index tables — NOT exercised by our captures: with
+  b7 = byte[planet+7] == 0 in every capture (t31), special mode would
+  hand EVERY planet the CONSTANT pair table1[0] (-> EBX row) and
+  table2[0] (-> EDX size; the banked [5,1,1,6,3,2,...] signature at
+  0x88fe4 feeds EDX per this session's 0x23adb/af1, so its values are
+  size indices — no 0 present, and >=5 clamp to 4 @0x37dcf). Observed
+  size AND row both vary planet-to-planet: sizes spread across all of
+  {7,11,23,45,73}, rows uniform over exactly 0..10 ({171..262} per
+  row, E=210.9 over 2320 planets) — the captures ARE normal-mode
+  rng%5 / rng%11 draws.
+  b) HEADER LAW [verified]: +0x14 = min(size,4) @0x37dc4..0x37dcf;
+  +0x18 = sum_{j<15} byte[0x744a8 + 15*size + j] @0x37ddd..0x37dfd
+  (IMUL 0xF; sums 7/11/23/45/73 — only the SUMS are observed, not the
+  byte split); warning call @0x37e09 if >100; +0x1a = +0x18+10 @0x37e1e;
+  +0x16 = row (clamp: >=0xb -> 2) @0x37e29..0x37e39; +0x66 := 0
+  @0x37f28; first pass runs the scenario loader FUN_00037fc0 sentinel
+  @0x37db4 (t30).
+  c) DRAW LOOP, exact structure @0x37eb7..0x37f24: barren test FIRST
+  (CMP EAX,EBP where EBP = scaled(w0) @0x37f20; rng < w0' -> class 0
+  @0x37f24, and the non-barren counter ECX @0x37ebb is NOT incremented
+  on that path — the seed word counts exactly the chain cells); chain
+  rng < s1 -> 2, < s2 -> 3, < s3 -> 4, else 1 (cumulative scaled sums
+  [ESP+8]/[ESP]/[ESP+4] built @0x37e77..0x37eaf, scaling (w*32768-w)/100
+  integer @0x37e55); orbital ring i >= +0x18 takes class 1 @0x37f12
+  WITHOUT calling rng (rng survives the ring); loop covers all +0x1a
+  slots @0x37ef0.
+  d) MEASUREMENT AGREEMENT [verified, first saves 101948 slots]: raw
+  class bytes are exactly {0..4} | 8-rock — classes 5..7 NEVER appear
+  (rock bits 428/101948 = 0.42%, +0x66==2 on 418/2320 planets, rock
+  event @0x37f4d banked in S10). Mid-weight rows match the chain within
+  sampling noise (row2 21.2/2.8/3.9/4.7 vs 20/3/5/3; row5 23.0/19.2/
+  1.7/1.9 vs 20/20/2/2; row9 20.6/15.2/14.1/14.9 vs 20/15/15/15).
+  EXTREME rows leak [banked, unexplained]: row0 (100,0,0,0) measures
+  98.9% barren vs scale(100)=32767 -> 99.997% predicted; row10
+  (0,33,34,33, chain covers 32766/32768) measures c1 1.6% + barren 0.5%
+  vs ~0.006%/0 predicted; row3 (0,...) measures barren 1.0% vs 0.
+  UNIFYING HYPOTHESIS [inferred]: the scenario loader FUN_00037fc0
+  (t30) overwrites the live 0x744f4 rows from the scenario data file,
+  so a save's +0x16 INDEX points at an overridden row whose weights
+  differ from the static benchmark rows — same mechanism as the seed-
+  law 1.4% residual (both would move together). Not yet separated
+  (needs one scenario-file-lifted world to replay against). The t29b
+  "chain shape unmeasured" residue is CLOSED by c)+d) for mid rows;
+  extremes carry the banked leak above.
+  e) REWRITE UPGRADED: Campaign ctor now draws per planet size rng%5,
+  row rng%11, and per-surface-cell class through the identical integer
+  chain (rewrite/src/game/campaign.cpp ctor block, cites this section);
+  PlanetState::cellClasses (campaign.h) carries +0x00-byte analogs
+  incl. the class-1 orbital ring; capBase = nonbarren/3+5 of the
+  generated grid. pin test campaign_pop_cap_seed_law_oq016 extended:
+  ring size +10, ring all class 1, classes 0..4, capBase ==
+  nb/3+5 EXACT. 98/98 tests pass unchanged (victory/timing laws
+  unaffected — the new draw stream is statistically the old w0 table).
+  REMAINING (banked, not this action): rock bit |8 + event law wiring,
+  class-cell channel bonuses now modelable from cellClasses (T35
+  gating), nuke event law, home-placement verification.
+
   T35 PRE-T33 RE-AUDIT (NEXT ACTION "re-audit raw-array subsystems"; three
   subsystems re-run on corrected arrays, two overturned):
   (a) INCOME CHANNEL BATTERY scripts/r1_income_channels.py: IND 173/173

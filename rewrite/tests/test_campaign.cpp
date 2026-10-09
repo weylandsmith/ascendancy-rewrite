@@ -148,9 +148,10 @@ TEST(campaign_build_queue_law_oq016) {
 }
 
 TEST(campaign_pop_cap_seed_law_oq016) {
-    // POP-CAP SEED LAW (income-law.md S10 t29): seed = nonbarren/3 + 5 with
-    // nonbarren ~ Binomial(surfaceCells, 1-w0), w0 from the MEASURED preset
-    // table; bounds per surface size: min 5, max ncells/3+5 with ncells in
+    // POP-CAP SEED LAW (income-law.md S10 t29/t36): seed = nonbarren/3 + 5
+    // with nonbarren from the per-cell class draw (T36: size rng%5 @0x23a86,
+    // row rng%11 @0x23a97, chain @0x37eb7..0x37f24); bounds per surface
+    // size: min 5, max ncells/3+5 with ncells in
     // {7,11,23,45,73} -> cap in [5..29] (home items carry MPOP 0, no
     // ability bonus here). Old default was the constant 25.
     auto c = makeCampaign(2);
@@ -161,6 +162,20 @@ TEST(campaign_pop_cap_seed_law_oq016) {
         CHECK(cap >= 5 && cap <= 29);
         lo = std::min(lo, cap);
         hi = std::max(hi, cap);
+        // T36 CELL-CLASS LAW pins: ring size, orbital ring forced class 1
+        // (@0x37f12, drawn WITHOUT rng), classes in the generated range.
+        const auto& ps = c.planetAt(s);
+        CHECK(static_cast<int>(ps.cellClasses.size()) == ps.surfaceCells + 10);
+        for (int k = ps.surfaceCells; k < ps.surfaceCells + 10; ++k)
+            CHECK(ps.cellClasses[k] == 1);
+        int nonbarren = 0;
+        for (int k = 0; k < ps.surfaceCells; ++k) {
+            CHECK(ps.cellClasses[k] >= 0 && ps.cellClasses[k] <= 4);
+            if (ps.cellClasses[k]) ++nonbarren;
+        }
+        // seed word consistency: capBase is EXACTLY nonbarren/3+5 of the
+        // generated grid (before recalc adds item MPOP; home items MPOP 0).
+        CHECK(ps.capBase == nonbarren / 3 + 5);
     }
     CHECK(hi > lo);  // seeded spread, not a constant table
     // Deterministic draw: same seed => same caps (law, not noise).

@@ -106,30 +106,72 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     const int n = static_cast<int>(galaxy_.stars.size());
     owner_.assign(n, -1);
     planets_.resize(n);
-    // WORLD-GEN POP-CAP SEED (income-law.md S10 t29): the draw LAW is
-    // verified instruction-level — a surface cell is barren iff
-    // rng < scaled(w0) of the row actually used at generation
-    // (@0x37e51..0x37ea4; rng 0..32767 @0x78269); non-barren surface cells
-    // are counted; seed word = count/3 + 5 written to +0x55 AND +0x4a
-    // (@0x37f84..0x37f9e). WHICH row each planet gets is NOT the save-time
-    // +0x16 (REFUTED t29b, REFUTED-ROUTES R11): documented default here =
-    // uniform preset 0..10 over the MEASURED w0 table {100,50,20,0,40,20,
-    // 40,20,40,20,0} @0x744f4, which reproduces the observed aggregate
-    // barren rate (28.2% vs 28.3% measured) and the exact per-size capBase
-    // ranges {5..7,5..8,5..12,5..20,5..29}; per-planet terrain SHAPE stays
-    // open until row provenance closes.
+    // WORLD-GEN TERRAIN LAW (income-law.md S10 + T36): per planet the
+    // original draws size = rng%5 (call-site 0x23a86 IDIV 5) and weight row
+    // = rng%11 (0x23a97 IDIV 11; special scenario mode 0x23aaa..0x23ac2
+    // overwrites BOTH from the 21-dword tables — normal mode is the law).
+    // 0x37d80 header: size clamp min(,4) @0x37dcd, surfaceCells = sum of
+    // 15 table bytes 0x744a8[15*size..] @0x37de3, +0x1a = +0x18+10
+    // @0x37e23, row clamp >=0xb -> 2 @0x37e39. Class draw loop
+    // @0x37eb7..0x37f24 per surface cell: rng (0..32767, FUN_0007824f) is
+    // scaled ONCE w -> (w*32768-w)/100 (@0x37e55 SHL 0xF; SUB; DIV 100);
+    // cumulative chain rng<s1 -> 2, <s2 -> 3, <s3 -> 4, else 1; then
+    // rng<s0 -> 0 BARREN @0x37f22/24 (0x37ec0 sets 2 BEFORE that test, so
+    // barren overrides class 2). Orbital cells i >= surfaceCells take
+    // class 1 @0x37f12 WITHOUT drawing (rng survives). Row histogram on
+    // all 11 measured rows matches these shares within sampling noise
+    // (T36 battery, first saves 77k surface cells). Seed word
+    // capBase = nonbarren/3 + 5 into +0x55/+0x4a @0x37f84..0x37f9e.
     {
-        static const int kBarrenW[11] = {100, 50, 20, 0, 40, 20, 40, 20, 40, 20, 0};
-        std::uniform_int_distribution<int> presetDraw(0, 10);
-        std::uniform_int_distribution<int> cellDraw(0, 99);
-        std::uniform_int_distribution<int> sizeDraw(0, 4);
+        struct Row { int w[4]; };
+        static const Row kRows[11] = {
+            {{100,0,0,0}},   {{50,2,2,2}},   {{20,3,5,3}},   {{0,3,20,3}},
+            {{40,10,2,2}},   {{20,20,2,2}},  {{40,2,2,10}},  {{20,3,3,20}},
+            {{40,10,10,10}}, {{20,15,15,15}},{{0,33,34,33}},
+        };  // 0x744f4 rows [verified identical in all captures]
+        // +0x18 surface counts per size class 0..4: the original sums 15
+        // table bytes 0x744a8[15*size+j] (@0x37de3 loop); only the row SUMS
+        // are verified against live +0x18 (7/11/23/45/73, exact on sampled
+        // planets), the per-byte split is not observed — carried as sums.
+        static const int kSurfaceBySize[5] = {7, 11, 23, 45, 73};
+        // The draw source is the banked LCG (FUN_0007824f, income-law.md
+        // S10 t29b): state = state*0x41C64E6D + 0x3039; value =
+        // (state >> 16) & 0x7fff. One draw per planet (size), one (row),
+        // then one per SURFACE cell — the orbital ring does NOT advance
+        // the stream (@0x37f19 skips the CALL). Kept as a LOCAL stream so
+        // terrain never perturbs the campaign rng_ draw sequence
+        // (REFUTED-ROUTES RNG discipline). Initial state := cfg.seed
+        // [inferred; the original's seed-injection path is unmeasured].
+        uint32_t lcg = static_cast<uint32_t>(cfg.seed);
+        auto next = [&lcg]() {
+            lcg = lcg * 0x41C64E6Du + 0x3039u;
+            return static_cast<int>((lcg >> 16) & 0x7fffu);
+        };
         for (int s = 0; s < n; ++s) {
-            const int preset = presetDraw(rng_);
-            const int cells = planetSurfaceCells(sizeDraw(rng_));
-            planets_[s].surfaceCells = cells;  // +0x18 analog
+            const int size = next() % 5;  // rng%5 @0x23a86/95
+            const int row = next() % 11;  // rng%11 @0x23a97/aa8
+            const int cells = kSurfaceBySize[size];  // +0x18 analog
+            planets_[s].surfaceCells = cells;
+            auto scaled = [](int w) { return (w * 32768 - w) / 100; };
+            const int lim[4] = {scaled(kRows[row].w[0]), scaled(kRows[row].w[1]),
+                                scaled(kRows[row].w[2]), scaled(kRows[row].w[3])};
+            const int s1 = lim[0] + lim[1], s2 = s1 + lim[2], s3 = s2 + lim[3];
+            auto& cls = planets_[s].cellClasses;
+            cls.assign(cells + 10, 1);  // orbital ring is class 1, no draw
             int nonbarren = 0;
-            for (int c = 0; c < cells; ++c)
-                if (cellDraw(rng_) >= kBarrenW[preset]) ++nonbarren;
+            for (int c = 0; c < cells; ++c) {
+                const int r = next();  // one draw per SURFACE cell
+                // Equivalent mapping to the original's execution order
+                // (rng -> barren pre-test @0x37f20 -> chain @0x37eb7 on
+                // JGE; addresses run out of order): chain picks 2/3/4/1,
+                // and r < lim[0] forces the barren store 0 @0x37f24 —
+                // exactly what the original's pre-test yields, incl. the
+                // non-barren count (barren path skips INC ECX @0x37ebb).
+                int k = r < s1 ? 2 : (r < s2 ? 3 : (r < s3 ? 4 : 1));
+                if (r < lim[0]) k = 0;
+                cls[c] = k;
+                if (k) ++nonbarren;
+            }
             planets_[s].capBase = nonbarren / 3 + 5;  // @0x37f8b..0x37f9e
         }
     }

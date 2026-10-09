@@ -40,6 +40,11 @@ struct PlanetState {
     // seeded per star at Campaign construction (inline draw law, campaign.cpp ctor).
     int capBase = 0;             // +0x55 analog
     int surfaceCells = 23;       // +0x18 analog (seeded; income-law.md S10)
+    // CELL CLASSES +0x00-byte analog per slot (income-law.md T36): the
+    // 0x37d80 draw loop writes one class byte per slot — surface slots
+    // [0,surfaceCells) from the row chain (barren 0 overrides 2; rng 0..
+    // 32767), orbital ring [surfaceCells,+10) forced 1 WITHOUT drawing.
+    std::vector<int> cellClasses;
     int growthBoom = 0;          // +0x66 bit1 analog: Lush Growth Bomb fired
     int growthCounter = 0;       // +0x4e analog (PROS-side counter, S6c)
     std::vector<int> items;      // indices into the planitem table (ACTIVE slots)
@@ -136,6 +141,8 @@ public:
     bool invincibleStar(int star) const { return invincible_[star] != 0; }
     bool sapActiveFor(int owner) const { return sapActive_[owner] != 0; }
     double richProsFor(int star) const { return planets_[star].richPros; }
+    // Full planet state for law pin-tests (cellClasses/capBase, T36).
+    const PlanetState& planetAt(int star) const { return planets_[star]; }
     // Completed queue items on a star (active-slot analogue; tests pin the
     // BUILD-QUEUE law income-law.md S8/S9).
     int builtItemCount(int star) const {
