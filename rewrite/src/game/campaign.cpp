@@ -278,14 +278,18 @@ int Campaign::storedResFor(int star) const {
 }
 
 int Campaign::storedProsFor(int star) const {
-    // PROS accumulator as the growth counter spends it (income-law.md S6c):
-    // raw item PROS + rich-world ability bonus. Upkeep (MPOP sum /4) is NOT
-    // deducted here — incomeAndGrow measured growth deltas against the RAW
-    // sum (chase capture 06e: +3 == stored PROS 3), so the rewrite's growth
-    // path consumes this value verbatim.
+    // +0x48 DISPLAY-WORD analog (income-law.md T34, 2720 stored samples):
+    // max(1, raw PROS + richPros - pop/4-floor(pop>>2)). The grant floor-1
+    // and the pop deduction are MEASURED (0-clamp scores 40.99% vs 94.82%;
+    // gov switch at +0x54 dead — queue id). NOTE incomeAndGrow charges the
+    // growth counter from its OWN raw PROS sum (t24 chase-capture law
+    // +3 == raw stored PROS), so this display law does NOT gate growth —
+    // it feeds needClassFor (FUN_0003fec4 reads the +0x48 WORD), which is
+    // exactly why the original's selector sees the deducted value.
     double pros = planets_[star].richPros;
     for (int it : planets_[star].items) pros += (*items_)[it].pros;
-    return static_cast<int>(pros);
+    pros -= static_cast<int>(planets_[star].pop) >> 2;
+    return pros < 1.0 ? 1 : static_cast<int>(pros);
 }
 
 int Campaign::storedCapFor(int star) const {

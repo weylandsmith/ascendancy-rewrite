@@ -162,21 +162,14 @@ def find_records(m):
 
 
 def pow85(v):
+    """+0x44/+0x48 compression chain (FUN_00038ba4 FILD/(x+1)^0.85/FISTP
+    trunc, income-law.md T34): TRUNCATION, not banker's rounding — the
+    round variant scores 56.99% vs 97.98% on 2720 stored-word samples.
+    (Raw vs compressed TIES on this corpus — small v — the compression law
+    for large v rests on the S6 battery 138/139.)"""
     if v == 0:
         return 0
-    x = (v + 1) ** 0.85
-    f = math.floor(x)
-    d = x - f
-    return f if d < 0.5 else (f + 1 if d > 0.5 else (f if f % 2 == 0 else f + 1))
-
-
-def pow85(v):
-    if v == 0:
-        return 0
-    x = (v + 1) ** 0.85
-    f = math.floor(x)
-    d = x - f
-    return f if d < 0.5 else (f + 1 if d > 0.5 else (f if f % 2 == 0 else f + 1))
+    return math.floor((v + 1) ** 0.85)
 
 
 def recompute(m, rec, items):
@@ -228,15 +221,17 @@ def recompute(m, rec, items):
                     else:
                         RES += RES >> 1
                 break
-    gov = m[base + 0x54]
-    if gov == ord("!"):
-        PROS += IND >> 2
-    elif gov == ord('"'):
-        RES += IND >> 2
-    ind = pow85(IND)
-    pros = pow85(PROS)
+    # (+0x54 gov switch REMOVED t34: the byte is the build-queue item id
+    # (observed 0xFF/0x00/0x01/0x15 = none/Factory/Agriplot/Transport
+    # Tubes); dropping it changes no score — income-law.md T34. The
+    # 'governor' reading of @0x38df0 stays OPEN for non-item values.)
+    # DISPLAY WORDS (income-law.md T34, stored-word measurement 2720
+    # samples): +0x44 grant-floored compression; +0x48 grant-floored PROS
+    # minus pop>>2 — the decompile's 0-clamp scores 40.99% vs 94.82% for
+    # the floor-1 form, and banker's rounding scores 56.99% for IND.
+    ind = max(1, pow85(IND))
     u = st.unpack_from("<h", m, base + 0x42)[0]
-    pros = max(0, pros - (u >> 2))
+    pros = max(1, PROS - (u >> 2))
     c4a = min(100, max(0, c4a))
     u = min(u, c4a) if u >= 0 else 0
     c4c = min(max(0, c4c), u)

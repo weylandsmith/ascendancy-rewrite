@@ -173,23 +173,34 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+T34 LANDED (DISPLAY-WORD CHANNEL LAW + HARNESS FIXED — scripts/r1_income_law.py
+exits 0 for the first time, IND/RES/PROS 5/5 on all slots of both test
+captures, was 0/5-4/5): +0x44 = max(1, trunc((v+1)^0.85)) [raw ties on this
+corpus; banker's-round pow85 REFUTED 56.99% vs 97.98%, 2720 stored samples];
++0x46 RES = raw accumulator 2720/2720; +0x48 = max(1, PROS - pop>>2) 94.82%
+(decompile's 0-clamp 40.99%). +0x54 = build-queue item id CONFIRMED by
+invariance (dropping the gov switch changes zero samples; observed values
+0xFF/0x00/0x01/0x15 all item ids); governor reading stays OPEN as its own
+ledger row. Residual 3 IND / 8 PROS planet-names ⊆ seed-law failure names
+(preset-vs-generated boundary, not a missing term; income-law.md T34).
+storedProsFor UPGRADED to the word law (sole consumer needClassFor ==
+FUN_0003fec4 reading +0x48; incomeAndGrow's raw-PROS growth path untouched,
+t24 law intact). 98/98 tests, gate ALL CHECKS PASS.
+
 NOTE t33 SUPERSEDES NOTE t31 IN FULL: the slot-array pointer bug below
 ("T33 LANDED") explains t31's grid-law failures, t31b's "generation-state
 vs render-state boundary", AND the t32 +-2 residual. All three were the
 same +0x88 heap-header offset missing from find_records.
 
-(1) IND/PROS channel regression (income-law.md T33 tail): r1_income_law.py
-    --run-dir reports IND 0/5 PROS 0/5 RES 5/5 on owned planets — PRE-EXISTING
-    on both pointer signs (stash-verified). Read the recalc store-side
-    disasm (0x38ee7..0x38f18 region + who stores IND/PROS words) and the
-    store offsets the harness compares (0x1c/0x20/0x24 vs 0x44/0x46/0x48)
-    against the corrected array; the cap half of recompute() is already
-    100%, so the failure is isolated to channel mapping/compression.
-(2) Re-audit pre-t33 subsystem claims that read the raw slot array:
+(1) Re-audit pre-t33 subsystem claims that read the raw slot array:
     terrain-authored battery results (S10 T29b/T30c numbers), ship-record
     census (also: its exit-1 negativity needs a separate look — surface=0/
     orbital=0 on a game with 5 homes + ships means its stride/owner filters
     never fire on our captures), and any income_channels figure.
+(2) GOVERNOR LEDGER ROW (new, from T34): the @0x38df0 '+0x54 governor'
+    branch never fires in 466 saves (byte always a queue id) — needs a
+    capture where a governor is actually assigned; route = deep-schedule
+    click capture with the governor UI (OQ-012(a) glyph route unlocks it).
 (3) OQ-012(a): new-game size options — unchanged (glyph-lift route).
 
 T33 LANDED (POINTER-OFFSET FIX + FORMULA UPGRADE): find_records slot array

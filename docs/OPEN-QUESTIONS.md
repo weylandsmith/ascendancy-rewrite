@@ -55,6 +55,17 @@ roll<80) — law MEASURED §9 (t14), engine NOT built (needs star/
 lane/tech ownership tables in rewrite + UI affordance for incoming trade
 offers). | open | W-B (option C hybrid): build only when ownership model
 lands; no RE unknowns remain for this item.
+OQ-024 | loop | planet GOVERNOR assignment law (@0x38df0 branch of
+FUN_00038ba4: '!' -> PROS += IND>>2, '"' -> RES += IND>>2; S6 line 45 read
++0x54 as a governor byte) | open | UNCAPTURABLE SO FAR [verified negative]:
+in all 466 banked saves the +0x54 byte holds only build-queue item ids
+(0xFF none, 0x00 Factory, 0x01 Agriplot, 0x15 Transport Tubes) and the
+branch never fires — dropping it from the model changes ZERO stored-word
+samples (income-law.md T34). Needs a capture where a governor is actually
+assigned: route = deep-schedule click capture driving the governor UI
+(gated behind OQ-012(a) glyph lift). Rewrite proceeds WITHOUT it: the
+branch is arithmetically inert on all measured state, so omitting it is a
+VERIFIED no-op rather than a stub.
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
 (static route exhausted: 7 negative probes — string table is runtime-loaded,
@@ -199,7 +210,18 @@ weight-row provenance (scenario data-file lift), nuke event law,
 home-placement verification. +2/+2 residual minutiae RESOLVED t33
 (the paired +-2 class, the skip-CB model-C preference, and the live-RAM
 read requirement are all VOID — one wrong array offset; rewrite UPGRADED
-to model DIS incl-Colony-Base, income-law.md T33) |
+to model DIS incl-Colony-Base, income-law.md T33); DISPLAY-WORD LAWS t34
+closed-by-stored-word measurement (2720 owned samples, full 466-save
+corpus): +0x44 = max(1, trunc((v+1)^0.85)) 97.98% (banker's-round pow85
+REFUTED at 56.99%; raw ties on this small-v corpus, compression law for
+large v = S6 battery 138/139), +0x46 = raw accumulator 2720/2720,
++0x48 = max(1, PROS - pop>>2) 94.82% (decompile 0-clamp 40.99%); rewrite
+storedProsFor REWIRED to the +0x48 word law (sole consumer needClassFor/
+FUN_0003fec4; growth counter keeps its t24 raw-PROS law), harness
+r1_income_law.py pow85->trunc + floor-1 words, now EXITS 0 (5/5 all
+channels x 2 captures); residual 3+8 planet-names ⊆ seed-failure names =
+preset-vs-generated boundary (income-law.md T34). Governor @+0x54 branch
+never fires in corpus (byte always queue id) -> OQ-024 |
 income law docs/re/income-law.md S6..S10; harness scripts/r1_income_
 channels.py; chase-capture law = deep-schedule End-Turn clicks 511:67
 every 15s, save ring read by MTIME.

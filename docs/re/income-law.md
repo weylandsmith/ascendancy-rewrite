@@ -941,5 +941,50 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   ship-record census (exit-1 negativity predates this fix on both signs —
   separate harness issue), and any income-channel figure taken from
   r1_income_channels pre-t33. IND/PROS 0/5 in r1_income_law.py --run-dir
-  is PRE-EXISTING (stash-verified identical before/after this fix) — that
-  is the next measurement target, not part of the cap law.
+  is PRE-EXISTING (stash-verified identical before/after this fix) — the
+  T34 measurement below resolves it.
+
+  T34 DISPLAY-WORD CHANNEL LAW (2720 owned (save,planet) samples across the
+  full 466-save corpus; corrected +0x88 array;
+  accumulators = fl&1 slots with w0-bonuses, THEN item-12/13/14 v+=v>>1
+  doubling in slot order, exactly the FUN_00038ba4 loop + 3958c scans):
+    +0x44 IND  = max(1, v) and max(1, trunc((v+1)^0.85)) TIE at
+      2665/2720 = 97.98% [verified tie]. Corpus IND values are small enough
+      that raw and 0.85-compressed are indistinguishable here — the
+      compression's existence for large v rests on the banked S6 battery
+      (income-channels 138/139), NOT on this sample set. The banker's-round
+      pow85() currently in r1_income_law.py scores 56.99% and IS refuted
+      for the display word [verified]; floor-1 is the banked grant
+      [verified — raw-accumulator 0 stores as 1].
+    +0x46 RES  = raw accumulator (v, no compression, no floor) 2720/2720
+      100.00% [verified]
+    +0x48 PROS = max(1, v - (pop>>2))                 2579/2720 = 94.82%
+      (decompile says clamp-to-0; 0-floor scores 40.99% — the stored word
+      has a FLOOR 1, matching IND's grant shape; residual: +1 x96, +2 x10,
+      -1 x35)
+  +0x54 BRANCH IS DEAD IN OUR CORPUS, AND ITS MEANING IS THE BUILD QUEUE,
+  NOT A GOVERNOR: dropping the gov switch ('!'/0x21, '"'/0x22 — banked S6
+  line 45 calls it Governor @0x38df0) changes NOTHING (2665/1115 identical
+  before/after), because the byte's observed values are 0xFF/0x00/0x01/0x15
+  = queue item ids (none / Factory / Agriplot / Transport Tubes) — the t28
+  SELECTED-ABILITY law (line 411: '+0x54 := item idx') supersedes the S6
+  governor reading; cVar2==-1 gate @0x38df0 only fires for 0xFF. S6 line 45
+  and line 349 gov-row references need re-derivation when a capture ever
+  shows a non-item value there. [verified for our corpus; governor law
+  itself stays OPEN]
+  RESIDUAL SETS ARE SCENARIO-PRESET-WORLD BOUNDED (subsumption census over
+  the full 466-save corpus, 478 planet names): seed-law failures span 340
+  names, IND failures {Bindacia IV, Corpuscle I, Sentril I} and PROS
+  failures {Corpuscle I, Delphinius II, Feculon II, Parsimony I, Phoebe I,
+  Sentril I, Tensoric I, Vernunft I} are BOTH strict subsets (IND∪PROS ⊆
+  seed-failures, neither ⊆ the other). Spot-dump of preset-name records in
+  the special-mode runs shows them UNOWNED with all channel words zeroed
+  (owner 0xFF, s44=s46=s48=0) and grids loaded from the 21-dword rows
+  (T30/T30b FUN_00037fc0) — consistent with the scenario path writing the
+  grid without re-running the channel/cap recalc, though zero words on an
+  unowned record prove that mechanism only weakly [unverified]. The FACT is
+  the subsumption: channel residuals are the same preset-vs-generated
+  boundary as the seed residual, NOT a missing formula term. [verified
+  subsumption; the exact preset field that shifts the words stays OPEN,
+  35/2720 IND and
+  141/2720 PROS samples]
