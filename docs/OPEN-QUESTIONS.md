@@ -219,8 +219,14 @@ classes {0..4}|8, capBase exact) — rock bit CLOSED t38 (per-PLANET
 rng%7 event, k-th item = k-th NON-rock cell, capBase = pre-mark count
 VERIFIED 20-0, +0x1c = empty buildable count 71762/72066, class bonuses
 CLOSED t37/t38 via cellClasses + T35 gating + rock-skip; income-law.md
-T38) — REMAINING: nuke event
-law, home-placement verification; extreme-row leak banked unexplained
+T38); completion-law branches CLOSED t39 (rock-consume AND 0xF7 +
+slot stays empty @0x39164; Terraform->class1 / Automation |=2 / LGB
++0x55+=10 branch table banked income-law.md T39b; pop==0 clears Colony
+Base, 2 weak samples T39c; world-restart artifact filter T39d) — NUKE
+LAW capture-gated -> docs/BLOCKED.md (Phase Bomb gizmo 70: static dead
+ends T39e, zero device events in 13 runs, default NOT modelled, one-
+run closing route written); REMAINING: home-placement
+verification; extreme-row leak banked unexplained
 (row0 98.9 vs 99.997, row10 c1 1.6 vs 0.006 — scenario-row-override
 hypothesis, income-law.md T36d). +2/+2 residual minutiae RESOLVED t33
 (the paired +-2 class, the skip-CB model-C preference, and the live-RAM

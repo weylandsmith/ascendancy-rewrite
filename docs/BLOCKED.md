@@ -53,6 +53,29 @@ controlled-mutation capture (activate an ability, read the countdown field
 over end-turns). DEFAULT IN FORCE: 30 turns (abilities.md §Charge; no
 rewrite upgrade). Item STAYS OPEN per strict-close policy.
 
+### Nuke law (Phase Bomb gizmo 70) — capture-gated; default in force: NOT modelled (2026-10-09)
+What is blocked: the exact per-structure destruction law of the Phase
+Bomb (which slots it clears, in what order, whether orbital structures
+and Colony Base are exempt, class/rock fallout on destroyed cells).
+Why static died: special-device effects are DATA-DISPATCHED (no in-code
+caller; same shape as the S10 event-24 dispatch at 0x4402a). Every
+CMP-imm70 site in the restored binary resolves to ASCII parsing
+(0x796ad/0x7a49a), the AI 70-turn reject (0x3f6eb), message-id
+constants (0x3ddc0 region), or data (0x820xx) — income-law.md T39e.
+Why no capture has it: 13 runs of scripted AI play never research/build
+Phase Bomb; r1_destruction_census.py over the full corpus finds ZERO
+device-destruction events (all structure losses are depopulation or
+world-restart artifacts, T39c/d).
+Best default proceeding under: Phase Bomb NOT modelled in rewrite
+combat (rewrite combat is a documented abstraction, ships.md). No
+silent stub: OQ-016 row names this sub-law open.
+Closing route (one R1 run): scripted campaign forcing Phase Bomb —
+research path per restree tree (its tech prereqs), build on any ship at
+a Shipyard, launch at an owned planet with >=3 surface items; capture
+slot states before/launch/after via the pointer law. Identify the
+dispatch table entry by which code first writes FF into a mid-record
+slot byte at launch time (whole-image watch not needed: 3-save diff +
+static sweep of the launch handler reached through the gizmo-use UI).
 ## R1 runbook (mandatory safety invariants — a run without them is a bug, not research)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base; never hard-code
 B). Deep capture: scripts/r1_deepcapture.sh. Invariants (enforced statically

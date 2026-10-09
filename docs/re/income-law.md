@@ -1230,3 +1230,52 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   (draw-time convention). 98/98 tests; CLI seed 2024 species 4 ->
   VICTORY Control t918 (finite; rock draws perturb the stream as
   designed).
+
+  T39 BUILD-COMPLETION BRANCHES (FUN_00038f68 decompile banked) + NUKE
+  LAW BLOCKED (capture required, scripts/r1_destruction_census.py):
+  a) COMPLETION ROCK-CONSUME [verified disasm @0x39164..0x39191]: when
+  the pending build's slot cell byte has bit 3, completion does
+  AND 0xF7 (clear rock) + MOV byte1,0xFF (slot stays EMPTY) instead of
+  the normal word2|=1 activation. A queued build that lands on a cell
+  that TURNED rocky burns the rock and builds nothing. Rewrite note:
+  unreachable in the current model (no mid-game rock; pending slot not
+  modelled) — banked, NOT silently stubbed: new open item.
+  b) COMPLETION TABLE (same branch chain, decompile-cited; slot base =
+  [param+0x10] law): non-rock -> word2 |= 1 (activation, matches the
+  measured word2&1 law); item '$'=36 Terraforming -> word2:=0, byte1:=
+  0xFF, byte0:=1 (cell becomes class 1 — EXACTLY the S10 banked
+  terrain-mutation observation, site now pinned); item '#'=35
+  Automation -> word2 |= 2; item '%'=37 Lush Growth Bomb && !(+0x66&1)
+  -> +0x55 += 10 && +0x66 |= 1 (confirms S10 at its source). Generic
+  flag&8 items -> byte3 := 0, word2 |= (id==0x1b ? 0x23 : 0xf) << 8.
+  Then pending reset +0x52:=0xFFFF and completion gate value from
+  CALL FUN_000394d8 @0x390a8 (compares vs the accumulator word t28
+  banked). CAVEAT [unverified mapping]: this function's pending-item
+  byte sits at decompiler offset +0x15 while captures show the pending
+  id at record +0x54 — layout aliasing of the runtime colony block;
+  only slot-base/word/byte RELATIONSHIPS are claimed, both self-
+  consistent with measured laws above.
+  c) DEPOPULATION CLEARS COLONY BASE [2 samples, weak]: owner-unchanged
+  transitions with item set [5]->[] and +0x42 2->0 (Hurble I
+  r1deep-20261005-215445 51->52; Verithil I r1deep-20261008-190330
+  50->51). Pop hitting 0 empties the Colony Base slot. Banked as
+  observation; single-transition evidence, do not wire yet.
+  d) WORLD-RESTART ARTIFACT [verified, Hannibal III + Xerxes I
+  51->52.sav]: +0x16 row AND +0x18 size AND most class bytes changed at
+  turn 0 — the .sav ring resumed a NEW world; identical planet names
+  are DIFFERENT planets. Any shrink census MUST filter +0x18 changes
+  (census script updated: 9 raw -> 2 real).
+  e) NUKE (Phase Bomb gizmo 70, gizmos.txt row '5 4 25 0 1 40 0 0 13 3
+  255'; gizhelp: "launched at a planet and destroys structures on the
+  planet's surface. used only once... short range") LAW UNMEASURABLE:
+  census 0 device events in 13 runs (no capture ever built/carried one);
+  static sweep of CMP-imm70 sites dead-ends: 0x796ad/0x79a02/0x7a49a
+  are ASCII char-range parsing ('N','d','f','l','m','w'), 0x3f6eb is
+  the banked AI 70-TURN reject, 0x3ddc0 region is FUN_00021a20
+  MESSAGE-ID constants (0x45..0x4c), 0x820xx is data. Special-device
+  effects are DATA-DISPATCHED (same shape as the S10 event-24 scan
+  site 0x4402a with no in-code caller) — the per-gizmo handler needs a
+  live capture to identify which table entry fires. BLOCKED.md entry
+  filed: capture requirement + best default = Phase Bomb NOT modelled
+  (rewrite combat is an abstraction; no silent stub). Smart Bomb (38)
+  is ship-weapon-disarm per gizhelp, out of the planet law either way.

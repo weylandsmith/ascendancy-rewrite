@@ -173,36 +173,38 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T38 LANDED (ROCK BIT |8 CLOSED + WIRED): per-PLANET rng%7 event marks
-ONE cell |=8 + flag +0x66|=2 (12244/12264 rock planets have exactly one;
-17.0% ~ 1/7); k-th item = k-th NON-rock cell (zero |8 item bytes in
-18,620 records; Discordia I/Crell I direct skip builds); capBase =
-PRE-mark count VERIFIED 20-0 (scripts/r1_rock_convention.py: raw-8 stays
-barren, rock on non-barren keeps its class — the event never moves
-+0x55); word +0x1c = empty NON-rock (buildable) surface count
-71762/72066; class bonuses forfeited via strict CMP 2/3/4 on the RAW
-byte [FUN_00038ba4]. Scenario-slot scatter (80 recs / 4 preset worlds)
-banked as preset-residual, NOT rock interaction. Rewrite: ctor rock
-draw AFTER the cell loop (same local LCG), channelAccFor skips |8,
-build gate counts buildable cells, pin test raw {0..4}|8 + draw-time
-recount. Mid-game rock firing site banked [cap effect unverified].
-98/98 tests, gate PASS, CLI seed 2024 species 4 Control t918.
-income-law.md T38.
-NEXT: NUKE EVENT LAW — Ghidra pass over the event-effect space (string
-xrefs for nuke/destroy wording; FUN_00055a60 event-number neighborhood
-of 0x7a35c; the S10 event-24 pop:=cap writer shows the dispatch shape)
--> lift exact nuke semantics (slots cleared, +0x66/class fallout,
-capBase/pop effects); verify against any capture with destroyed items;
-if none, BLOCKED.md with the capture requirement stated.
-PRIOR NOTE T37b LANDED stands (growth input == stored +0x48, VERDICT
-disp; income-law.md T37b). PRIOR NOTE T37: accumulator/placement law
-stands EXCEPT placement is refined by T38 (NON-rock prefix).
+T39 LANDED (COMPLETION-LAW BRANCHES BANKED + NUKE LAW FILED BLOCKED):
+FUN_00038f68 decompile banked (income-law.md T39): completion rock-
+consume (cell&8 -> AND 0xF7 + slot STAYS empty @0x39164; unreachable in
+rewrite, banked open), completion table (non-rock |=1 activation;
+Terraform 36 -> word2:=0/byte1:=FF/byte0:=1 class-1 — S10 law now at
+its source; Automation 35 -> |=2; LGB 37 -> +0x55+=10 && +0x66|=1,
+rewrite line 566 ALREADY agrees), pop==0 clears Colony Base (2 weak
+samples, not wired), WORLD-RESTART ARTIFACT filter (51->52.sav row+size
+rewrite at turn 0: same names, new worlds — census updated 9->2 real
+shrinks). NUKE (Phase Bomb gizmo 70) capture-gated: static sweep dead
+ends (ASCII parsing / AI-70 reject / message ids / data), zero device
+events in 13 runs -> docs/BLOCKED.md with one-run closing route;
+default NOT modelled (no silent stub). 98/98 (doc-only turn), gate
+PASS. income-law.md T39.
+NEXT: HOME-PLACEMENT VERIFICATION — measure the ORIGINAL home world
+setup against the rewrite ctor: in FIRST saves of real-game captures
+(t31 fresh world r1deep-20261008-190330 + any slot-41 first saves), for
+each empire record (owner +0x12 != 0xFF, home flag candidates: pop==2
+colonise law): home planet cap vs capBase law (t29), starting item set
+vs rewrite ctor seeding (Factory/Agriplot/hyper? which ids, which
+planet), +0x16 row of home planets (authored vs drawn), star-system
+position law if observable (planet-table order vs owner grouping).
+Diff against rewrite ctor home seeding (campaign.cpp lines ~230-240)
+and UPGRADE or bank residuals.
+PRIOR NOTE T38 LANDED stands. PRIOR NOTES T37b/T37 stand.
 
 (1) GOVERNOR LEDGER (OQ-024): unchanged — needs governor-UI capture,
     gated behind OQ-012(a).
 (2) OQ-012(a): new-game size options — unchanged (glyph-lift route).
-(3) TERRAIN REMAINING (T36 row): nuke event law (in progress above) +
-    home-placement verification; extreme-row leak banked unexplained.
+(3) TERRAIN REMAINING (T36 row): home-placement verification (in
+    progress above); extreme-row leak banked unexplained; nuke law ->
+    BLOCKED.md (capture-gated, route written).
 
 NOTE t36: terrain generation law closed end-to-end + ctor generates
 cellClasses (commit 0a0a4d7); NOTE t35: raw-array re-audit (383bb73).
