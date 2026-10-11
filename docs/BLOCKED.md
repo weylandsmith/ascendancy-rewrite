@@ -214,3 +214,12 @@ in the scripted run; correlate shown % with owned-star share (over-half vs
 two-thirds discriminates in ONE observation once any end fires; seeds already
 known to hit Extinct t557/t583 — Extinct screen path shares the score block
 per static.txt template). Do NOT re-scan statics for this constant.
+
+
+## t54 — scenario-table RAM join: naive chain scan TIMED OUT (harness, not negative)
+Round-2 probe scanned 17 MB Memory byte-by-byte with per-position chain
+extension (O(n^2) worst case) -> 300 s kill. RECIPE for the retry: anchor on
+ONE known scenario type-name string (starstat/names pool), then verify
+stride-0x1ee chain ONLY at anchor +-small window; bound total work with
+mem.find loops (no nested extension per position). Budget: one retry inside
+the t51 capture session (step 2), never as a standalone idle probe.

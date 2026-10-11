@@ -74,10 +74,15 @@ From `planitem.txt` raw rows (docs/re/economy.md; verbatim rows re-read
 - RES income = built Laboratories (+1 each per Laboratory's RES column).
 - PROS (prosperity) adds a one-time-ish growth nudge; modelled as +2 growth
   per Agriplot while pop < cap.
-- Population per planet: logistic growth pop += g*(pop*(cap-pop))/cap^2 *4,
-  g=1 base, cap = 100 (UPOP=1 column present on every built item — units
-  undocumented, economy.md §1). Growth shape echoes the vendor '50' grid
-  documented as pop growth (economy.md) but the exact curve is OQ-016.
+- Population per planet: [CLOSED t24 — the earlier logistic default was
+  REPLACED by measured counter semantics] pop = word +0x42 (UPOP units);
+  growth tick: gate pop<cap(+0x4a) else counter(+0x4e):=0; counter +=
+  stored PROS(+0x48); +1 iff owner != turn-player AND stored PROS < 4;
+  counter >= 50 -> pop += 1 (+1 if first active slot Cloning Plant),
+  clamp to cap, counter := 0; colonization SETS pop := 2 verbatim.
+  Evidence: income-law.md §6e (live + disasm, chase capture
+  r1deep-20261007-224831 slots 45->46); rewrite growthPhase matches
+  (campaign.cpp growthCounter law).
 
 ## 4. Production + expansion decisions [inferred policy, OQ-016]
 

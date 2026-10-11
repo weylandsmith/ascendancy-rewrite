@@ -1592,3 +1592,45 @@ deltas on a synthetic 3-Factory home (CB acc 1 alone cannot light the
 branch — measured corollary: the original needs IND acc >= 4 for ANY
 visible governor effect). Timelines UNCHANGED (branch inert by default):
 2024 Control t777 / 42 Extinct t583 / 13 Control t593 re-verified.
+
+
+## T54 — WORLD-GEN DRIVER FUN_000238e8 DECOMPILE (OQ-016 increment; T36d mechanism FOUND)
+
+Decompiled the t42-era entry FUN_000238e8 (the home-seed / galaxy-fill
+driver; call-site region T36 banked as 0x23a64..0x23b49). Verbatim content:
+
+1. SIZE DRAW [verified, refines t36 wording]: `iVar6 = FUN_0007824f();
+   iVar6 = iVar6 % 5 + 1;` then a clamp `if (5 < iVar6) = 5` — size is
+   rng%5 **+ 1** (1..5); the clamp is dead code under the banked rng range
+   law (0..32767). t36's "size = rng%5" understated by one; the *observed*
+   grid-size histogram was already 1..5, this is the code-side confirmation.
+2. PRESET-ROW OVERRIDE MECHANISM EXISTS [verified copy sites]: inside the
+   per-planet loop, when `puVar7[0x3e] == puVar7[0x45]` (generation counter
+   equals a fixed control field; the pointer-compare half of the guard is
+   always-true) the code copies 21 dwords from `DAT_00088f90` and 21 from
+   `DAT_00088fe4` into the per-planet buffer. Static contents (restored
+   image, read this turn): table A = 21 u32 in 2..4 (class-weight shape);
+   table B = 21 u32 in 1..10. This is a code-visible index-conditional
+   preset injection during generation — the structural home of T36d's
+   scenario-row-override hypothesis. Attribution of WHICH worlds receive
+   it stays OPEN (field 0x45 semantics unverified).
+   Runtime check: both 40-byte static patterns appear EXACTLY ONCE in the
+   mut-run save RAM (0x248468 / 0x2484bc) — the image copy; no mutated
+   second copy (tables not rewritten at runtime in that session).
+3. Record/layout facts confirmed verbatim in-driver: planet records stride
+   0x7b (123) walked by `puVar7[0x42] += 0x7b`; scenario/entry table stride
+   0x1ee with count at `+0xd86 >> 0x10` (sibling-match scan); race records
+   stride 0x60; per-race short table DAT_00006392 (per-star orbital input);
+   colonize branch sets owner byte from +0x41 and `+0x42 := 2` then
+   FUN_00038818 (matches t41/t42 colonise-:=2 law, now seen AT SOURCE).
+4. Driver guards (error-stub FUN_0002a428 again): per-type sum `>>16 > 20000`
+   and total `DAT_00027281[i]>>16 > 499` — generation caps 500 stars/type
+   [verified comparison constants; semantics of the 27281 array = running
+   star counts [inferred]].
+
+T36d extreme-row leak: mechanism found (2), attribution open. Scenario-entry
+table RAM join attempt timed out with naive chain scan — harness recipe
+(bounded regex-DP, never O(n^2) per-byte chains) recorded BLOCKED t54.
+OQ-016 stays open (residues: leak attribution; +0x45 semantics; the
+turnloop.md §3 logistic text is STALE — pop law closed t24, counter
+semantics implemented; text fix queued next turn with the code-comment).

@@ -276,9 +276,12 @@ drawItemCell); CARGO-SLOT CHAIN CLOSED t44 (placement = EVENT 4 +0xae
 from EVENT 8 FUN_0003a880 coord->slot converter, rule-G re-gated — income-law.md
 S13.5); AI LANDING-COORD CHOOSER OPEN -> docs/BLOCKED.md (dispatch-site
 recipe banked; rewrite default = picker draw, observation-consistent);
-REMAINING: extreme-row leak banked unexplained
-(row0 98.9 vs 99.997, row10 c1 1.6 vs 0.006 — scenario-row-override
-hypothesis, income-law.md T36d). +2/+2 residual minutiae RESOLVED t33
+REMAINING: extreme-row leak MECHANISM FOUND t54, attribution open —
+FUN_000238e8 copies 21+21 preset dwords (DAT_00088f90 weights 2..4,
+DAT_00088fe4 1..10) into the per-planet gen buffer when control field 0x45
+matches (income-law.md T54); WHICH worlds = field-0x45 semantics +
+scenario-table join (join retry recipe BLOCKED t54, rides t51 step 2).
+Row0 98.9 vs 99.997, row10 c1 1.6 vs 0.006 unchanged. +2/+2 residual minutiae RESOLVED t33
 (the paired +-2 class, the skip-CB model-C preference, and the live-RAM
 read requirement are all VOID — one wrong array offset; rewrite UPGRADED
 to model DIS incl-Colony-Base, income-law.md T33); DISPLAY-WORD LAWS t34

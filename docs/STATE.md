@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-11T09:45
+updated: 2026-10-11T10:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -173,21 +173,22 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T53 LANDED (CONTROLLED-MUTATION CAPTURE STEP 1 — OQ-003 LOAD PATH CLOSED,
-r1-savestate.md t53 section; run r1mut-20261011-092253): scratch RESUME.GAM
-layout law (78 rec, stride 123, NAME+0x00, chain 0xAAE2); Resume click
-(318,333) lands first try (needle-verify loop); 15 slots all identical:
-HERMESSEN in RAM member 0x26edd7, rec blob VERBATIM file->RAM (only the 8
-injected bytes differ), t50+0x10 pointer preserved not rebuilt, sentinel
-outside-hits == untouched-baseline counts (noise, zero derived copies).
-Harness banked: scripts/r1_mutation_inject.py (name-relative, self-checking,
-restore trap), r1_mutation_run.sh (deepcapture law), r1_mutation_read.py
-(offline). OQ-003 stays OPEN for field MEANINGS (mutation exhausted; play-
-state variants parked low-priority). NEXT: OQ-016 turn-arithmetic statics
-per t52 exit-1 pivot plan (turnloop.md [inferred] constant rows; arith-
-motive IMUL/shift scans on producer families, budget 2 rounds, Ghidra-
-verify every hit; exit 1 -> BLOCKED line, capture carries it). Do NOT
-re-run the t53 capture (banked); do NOT re-scan OQ-021 statics.
+T54 LANDED (WORLD-GEN DRIVER DECOMPILE, income-law.md T54; OQ-016
+increment): size = rng%5+1 clamp-5 (verbatim; t36 wording refined);
+T36d PRESET-OVERRIDE MECHANISM FOUND at FUN_000238e8 copy sites (21+21
+dwords DAT_00088f90/DAT_00088fe4, index-guard field 0x45 unverified);
+tables image-copy-only in RAM (single pattern hits); colonise +0x42:=2
+seen AT SOURCE; gen caps 20000/type + 499/total verbatim; scenario stride
+0x1ee count@+0xd86>>16. Round-2 join probe TIMED OUT (harness; bounded-
+recipe banked BLOCKED t54, rides t51 step 2 — no standalone retry).
+turnloop.md S3 stale logistic REPLACED with t24 counter law (doc-vs-code
+sync, code unchanged). NEXT: T36d attribution — cheapest static path:
+enumerate the scenario/preset ROW SOURCE for FUN_00037fc0's per-world
+control fields: decompile FUN_00037d80 header region +0x18/+0x1a already
+banked; new probe = which file/table carries per-world row+control (the
+static.txt 523-line pool is loaded at boot; check FUN_00037fc0 caller
+context for an index into it) budget 1 round; dead -> BLOCKED line, ride
+t51. Do NOT re-decompile FUN_000238e8 whole; do NOT re-run t53.
 PRIOR T45 LANDED (SELECTED-ABILITY / GOVERNOR BRANCH CLOSED, income-law.md S14):
 branch @0x38df0..0x38e29 pinned verbatim; the [0x743b9]>>0x18 operand IS
 item-table UPOP(35) (row base 0x73e40+35*0x28=0x743b8, runtime value 1
