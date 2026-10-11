@@ -244,4 +244,12 @@ FUN_00031660 = trivial row helper (closed). CONCRETE t63b: FUN_0005caac
 prologue stack-arg mapping (stream cursor vs shape struct; clip pushes
 0x14 survive per ADD ESP,0x14 @0x31467) + PLANETS.SHP inter-ck
 in-place-rewrite test.
-OQ-005 stays OPEN until revalidated across corpus.
+OQ-005 stays OPEN until revalidated across corpus.T64 LANDED (shp.md S12): blit input law code-pinned (5 cdecl args; stream
+cursor = payload + u32[payload+8+8*sel] + 0x18); cache anatomy measured
+([0x88][verbatim 1.10], base 0x242088); .tmp ARE libraries; DECISIVE
+NEGATIVE: 0/12 loaded payloads satisfy the blit law autoplay — raw !=
+draw-time payload. t65 RUNNING (r1ad-20261011-180908, proc_965332c0bf73 +
+r1_intel_drive.sh proc_c5780e49dc24): intel panel opened via verified
+(553,318) + 12 turns; post-run = strict blit-input scan on loaded/
+rewritten payloads; survivor -> RAM-pin entry law + grep the transform
+writer; null -> OQ-005 wrapper BLOCKED-USER-LEVEL (draw-path class).
