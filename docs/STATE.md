@@ -184,10 +184,20 @@ thin; c1c -1 co-occurrence with queue flip 4/4 (cell reservation at queue
 time [inferred]); T56b per-pair offset census + heap BASE-DRIFT hazard law
 (never one absolute base across a session's checkpoints). Player home sits
 at RECORD 89 — parsers must scan 151.
-NEXT: OQ-012(a) ONE-OBSERVATION probe: default-size new-game run via r1ad +
-step2 driver (New Game (318,333) banked refcap.md:21; entry via grid-hash;
-then star count in fresh RAM = size->count datapoint). Static value-path
-returned NULL and is banked (mapgen.md), so no further static attempts.
+T57 LANDED (OQ-012(a) density probe AMBIGUOUS -> best default fixed-50,
+BLOCKED t57: one-click (65,427) during setup, fresh-map star count 50 ==
+cosmos.txt default; click-inert vs cycle-wrap inseparable (glyph readout,
+R13); scripts/r1_t57_density.sh banked.
+T57b LANDED (income-law.md): OQ-020 item SUPPLY side closed verbatim
+(FUN_00039b6c + raw-asm slot-writer attribution 0x38fc8..0x39003: top-up
+OR word+2 hi |= p3; p3=7 MissileBase/ShortWhopper, 8 LongWhopper, 0
+TractorBeam skips write; flag&4 items exactly 17/28/29/30 [battery];
+EBX 45/45/90/200 + p4 slots UNATTRIBUTED; same-turn draft mislabels
+retracted in-place). Decrement period capture-gated (zero flag&4 slots in
+corpus, T49); r1_ability_charge.py banked; OQ-020 stays OPEN (period half).
+NEXT: OQ-006 headerless-sample rate — static probe of the audio-init path
+(check REFUTED-ROUTES R10 media dead-ends first; FUN_00055a60/FUN_00046e84
+are NOT audio, ignore).
 Do NOT re-run t56 capture; parser
 r1_turn_delta.py banked (turns.log 3-field format).
 PRIOR T55+T55b LANDED (PRESET GUARD LAW income-law T55: copy iff

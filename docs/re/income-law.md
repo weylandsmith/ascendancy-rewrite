@@ -1807,3 +1807,49 @@ t45 name-pointer law applies here too). Consequences:
 (b) item identity resolution is MOOT for this run's +0x52 values: T56(3)
     established +0x52 is a CELL INDEX (values 0..59 > item count 39); the
     activated item is byte +0x54 (=0x01 Agriplot 4/4), read directly.
+
+
+## T57b — OQ-020 ability SUPPLY law closed verbatim (FUN_00039b6c); decrement period capture-gated
+
+FUN_00039b6c (out params EBX / param_3 / param_4) per special-ability item,
+decompile verbatim:
+  28 Orbital Missile Base         EBX=45  p3=7  p4=1
+  29 ShortRangeOrbitalWhopper     EBX=45  p3=7  p4=3
+  30 LongRangeOrbitalWhopper      EBX=90  p3=8  p4=3
+  17 Tractor Beam                 EBX=200 p3=0  p4=2
+  all other items: no writes.
+Item identity + FLAG&4 membership runtime-verified against the item-table
+battery (r1mut run, names_ok green): 17/28/29/30 are exactly the flags&4
+rows among measured items.
+
+WHICH OUT REACHES THE SLOT [verified raw asm, context 0x38fc8..0x39003 —
+decompiler stack-slot attribution is not trustworthy here]: caller computes
+LEA ECX,[ESP+0x24] pre-push (= post-call [ESP1+0x28]); the zero-test
+(CMP dword [ESP+0x28],0 @0x38fe7) and the value read (MOV EAX,[ESP+0x28]
+@0x38ff2) both address that SAME slot = the callee's param_3 out. So the
+slot writer consumes ONLY p3:
+  @0x38fee MOV byte[EDI+3],0        (slot byte3 := 0)
+  @0x38ffa SHL EAX,8 / OR word[EDI+2]  (word+2 UPPER BYTE |= p3)
+p3 in {7,8}: Missile Base + both Whopper classes; Tractor Beam p3=0 means
+the gate SKIPS this write entirely. EBX (45/45/90/200) and p4 (1/3/3/2)
+land at adjacent caller slots ([ESP1+0x30], [ESP1+0x2c]); consumers not
+located this turn — semantics [unverified], deliberately unnamed.
+
+SCOPE OF THE WRITE: the OR loop sits in FUN_00038f68's unconditional slot
+walk (every active flag&4 slot, every invocation of that per-planet turn
+function — t39 banked it as the per-planet completion/recalc body), i.e. a
+TOP-UP at OR semantics, not a store-once. Any decrement law therefore lives
+in another loop and cannot be OR-ed into this closure.
+
+CORRECTION (same-turn draft, retracted before banking): draft labelled EBX
+"charge", gave item 29 EBX=90, and p4=3 for item 28. Actual: 29 is 45 (only
+30 is 90); the slot-counter value is p3 (7/8/0), not EBX; p4(item 28)=1.
+
+REMAINING OQ-020 HALF (decrement period = "charge days"): UNMEASURED,
+capture-gated. scripts/r1_ability_charge.py censored word+2 hi and
+consecutive-pair decrements across the FULL corpus: ZERO flag&4 slot
+observations — consistent with the T49 zero-ship structural law (idle corpus
+builds only Agriplot/Colony Base). Closing needs a write-verified built
+campaign holding an Orbital Missile Base across >7 turns. rewrite has no
+ability-item code path in campaign mode — no default to upgrade until the
+period is measured; OQ-020 stays OPEN.

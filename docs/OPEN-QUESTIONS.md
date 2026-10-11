@@ -95,7 +95,16 @@ OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
 (static route exhausted: 7 negative probes — string table is runtime-loaded,
 no image/cob presence, no static table, .dip has no charge param; docs/
-BLOCKED.md) | remaining: obj1 call-edge of the help formatter, or
+BLOCKED.md) | T57b: ITEM ability supply side CLOSED verbatim (FUN_00039b6c + raw asm
+slot-writer chain 0x38fc8..0x39003: top-up OR word+2 hi |= p3, p3=7
+MissileBase/ShortWhopper, 8 LongWhopper, 0 TractorBeam (write skipped);
+EBX 45/45/90/200 + p4 land in adjacent unattributed slots).
+ITEM-table flag&4 population == exactly those 4 rows [verified battery]
+— the ledger's '14 SA_' is the SPECIES-ability pool, separate object.
+Decrement period still unmeasured: corpus census zero flag&4 slots
+(T49 law); capture-gated. Default 30 turns stays (no rewrite code path).
+income-law.md T57b;
+remaining: obj1 call-edge of the help formatter, or
 controlled-mutation capture; default 30 turns stays in force.
 OQ-005 | shp | .shp pixel codec (container CLOSED 208/208) | open | W3 ONLY:
 exe shape loader via call graph + live image. Blind static sweeps are
@@ -133,7 +142,9 @@ mapgen.md §4.1 rewritten with scale note).
 (d) CLOSED 2026-10-06k (extent = stars on sphere r~440, orbit-pair retraction;
 superseded/refined by (c) shells) | open | (a): setup-screen live RAM state from
 r1ad captures (options UI lives in RAM at pointer-law base). Static value-path probed t56 cycle: NULL — only pps in
-driver; terminator cap is runtime table (mapgen.md OQ-012(a) probe note).
+driver; terminator cap is runtime table (mapgen.md OQ-012(a) probe note). t57 one-click density probe AMBIGUOUS (fresh count 50 = cosmos.txt
+default; click-inert vs cycle-wrap inseparable, no glyph readout —
+BLOCKED t57, best default fixed-50, rewrite unchanged).
 OQ-013 | rules | restree variant block: field0 (0..4) semantics; main tree
 vs variants vs union in play (current default union) | CLOSED 2026-10-06r |
 IN PLAY = the 66 MAIN ROWS ONLY; variants are never loaded, field0 is dead

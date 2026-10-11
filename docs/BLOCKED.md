@@ -240,3 +240,23 @@ to mouse-only flakiness. Idle-campaign value from today's run already
 banked (income-law.md T55 RUN RESULTS: pop=2 + cap==seed+2 + one-CB 4/4 on
 banked +0x88 law for a 5th campaign; acc0->stored(1,0,1) fresh-campaign
 corroboration of the S6 recalc residual).
+
+
+## t57 — OQ-012(a) density-control probe: AMBIGUOUS (count==50), closed to best-default
+
+Run r1ad-20261011-122006: ONE click at (65,427) = GALAXY_MORE center
+(windows.txt absolute-root coord law) landed during setup (dens.log
+timestamps), campaign entered with fresh grid t=114, and the star-table
+battery counts 50 stars at presetup, postclick2, AND fresh entry ck001.
+Two readings survive and cannot be separated: (a) the click was inert
+(synthetic-click flakiness law — End-Turn showed 2 inert tries before
+working); (b) one cycle step happened to land back on STARS=50 (cosmos.txt
+default). Discriminating needs a change-VERIFIED click loop with a visible
+option readout — the only readout is glyph-rendered (R13), so no needle
+exists. Not retried (exit-1 discipline; this probe budget was ONE click by
+design).
+BEST DEFAULT (proceeding, rewrite unchanged): star count = 50 = cosmos.txt
+scenario default AND measured fresh-map count across every banked campaign
+(5 campaigns + this run). New-game size options are scenario-layer values
+not wired into any image constant (t56c static NULL); rewrite fixed-50
+matches the only measured campaign behaviour.
