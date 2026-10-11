@@ -251,5 +251,9 @@ NEGATIVE: 0/12 loaded payloads satisfy the blit law autoplay — raw !=
 draw-time payload. t65 RUNNING (r1ad-20261011-180908, proc_965332c0bf73 +
 r1_intel_drive.sh proc_c5780e49dc24): intel panel opened via verified
 (553,318) + 12 turns; post-run = strict blit-input scan on loaded/
-rewritten payloads; survivor -> RAM-pin entry law + grep the transform
-writer; null -> OQ-005 wrapper BLOCKED-USER-LEVEL (draw-path class).
+rewritten payloads; RESULT t65 NULL (S13): 71 ck x 200 slots x sel 0..7
+= 0 survivors despite verified click delivery + mid-run cache misses ->
+blit-5arg path does not consume raw payloads; NEXT: static attribution
+of the 19 remaining FUN_0001fc34 callers (arg pattern + pointer use:
+table-law consumers vs direct file-table walks). dosbox reaped by
+-time-limit; run dir retained.

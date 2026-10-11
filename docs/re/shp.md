@@ -503,3 +503,33 @@ is RAM-pinned and the transform pass becomes greppable from that state
 (whoever writes u32s at payload+8+8k). If null again: OQ-005 payload
 wrapper joins BLOCKED-USER-LEVEL (draw-path capture class like OQ-019);
 grammar laws (S9/S12.1) remain banked, no rewrite renderer change.
+
+## 13. W3 round 8 (t65): intel-panel draw capture ran; payload wrapper STILL null in RAM — route refined to static caller attribution
+
+Capture: r1ad-20261011-180908 (scripts/r1_intel_drive.sh): campaign
+entry t0, intel click (553,318) [windows.txt Intelligence button
+X0 474 Y0 303 X1 632 Y1 333, SENDPARAM1 14], End-Turn acquired try 2,
+advanced to turn 16 with per-cycle intel re-click, 71 checkpoints.
+Mid-run cache misses prove cache activity: slots 46/147 (1STARMAP.SHP,
+1starmap.tmp) loaded during the drive (not loaded at ck0).
+
+STRICT SCAN (all 71 ck x 200 slots x sel 0..7; blit law u32[P+8+8sel] in
+(0,size), entry rect fields <=1200, >=3 well-formed rows at entry+0x18):
+ZERO survivors — including the two newly-loaded slots. [measured]
+
+INTERPRETATION [inferred]: the 5-arg blit FUN_0005caac never executes
+against raw 1.10 slot payloads in this build's UI flow (dereferencing
+heap garbage at payload+8 would be a crash, and the game does not crash).
+The widget type-1 path's payload table law must apply to a DIFFERENT
+producer, or the in-game UI draws shapes through one of the other 19
+FUN_0001fc34 callers. R13 prevents screen-verifying the panel actually
+opened; cache-miss evidence says the click had SOME effect.
+
+QUEUED (static, in-hand): attribute the remaining FUN_0001fc34 callers
+(0x171c8, 0x17848, 0x185d8, 0x1a1e0, 0x1a270, 0x30fb8, 0x311bc, 0x317bc,
+0x31a30, 0x32318, 0x32afc, 0x32c5c, 0x335e8, 0x34a04, 0x3db80, 0x4e6fc,
+0x53dd8, 0x55748, 0x5a980) by arg pattern — which pass widget-style
+slot indices + selector, and what they do with the returned pointer
+(table-law consumers vs direct stream walks). The consumer that walks
+records DIRECTLY (e.g. via the file u64 table at +0x98 = verbatim+0x10)
+is the real codec driver and settles the per-record prefix law.
