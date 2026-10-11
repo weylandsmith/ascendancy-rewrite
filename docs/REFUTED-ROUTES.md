@@ -135,3 +135,10 @@ S10 OPEN RESIDUE t29b).
 - DO NOT re-run: u32 scans of string addresses, search_byte_patterns on these
   VAs, get_xrefs_to on the same DATs. To find a field WRITER use runtime
   memory-modification capture or controlled save mutation instead.
+
+## R13. Screenshot-reading for UI geometry — UNAVAILABLE (t55)
+- vision_analyze returns 500 'image input is not supported' for this
+  deployment's model group (measured 2026-10-11). UI button geometry comes
+  ONLY from windows.txt X0/Y0/X1/Y1 offsets (file evidence) + the banked
+  click law (root = window + 40); verify every new click target by a RAM
+  signal (turn counter / grid hash / needle), never by looking at pixels.

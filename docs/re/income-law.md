@@ -1656,3 +1656,40 @@ semantics implemented; text fix queued next turn with the code-comment).
   ambiguous in Ghidra output; decompiler showed [0x3e]==[0x45] with the
   pointer half always-true). Static route EXHAUSTED per budget; ride t51
   step-2 session (correlate generated grids vs a fresh scenario draw there).
+
+
+## T55 — PRESET-COPY GUARD LAW RESOLVED FROM RAW ASM (income-law T54b follow-up)
+
+Byte-scan found the two table-address immediates at 0x23acc/0x23adc
+(single occurrences), which sat MID-INSTRUCTION (Ghidra: no instruction at
+address — R7 pattern again); the enclosing window 0x23ab2..0x23af5 reads
+verbatim:
+
+    0x23a97 CALL rng            ; second per-planet draw
+    0x23a9c MOV EBX,EDX / ...   ; (first draw: %5 size, T54)
+    0x23aa0 MOV ECX,0xb         ; 11
+    0x23aa8 IDIV ECX            ; row = rng % 11   (T36 row law AT SOURCE)
+    0x23aaa CMP [ESP+0x108],0   ; found-index >= 0 ?
+    0x23ab2 JL  0x23af5         ;   no -> skip preset
+    0x23ab4 MOV EAX,[ESP+0xf8]  ; presetSlot = rng % size  (0x23a97 draw)
+    0x23abb CMP EAX,[ESP+0x114] ; == current planet index within group ?
+    0x23ac2 JNZ 0x23af5         ;   no -> skip preset
+    0x23ac4 MOV ECX,0x15 / MOV ESI,0x88f90 / MOVSD.REP  ; copy 21 dwords -> buffer[0]
+    0x23ad2 MOV ECX,0x15 / LEA EDI,[ESP+0x54] / MOV ESI,0x88fe4 / MOVSD.REP
+                                                     ; copy 21 dwords -> buffer[84]
+
+GUARD LAW [verified raw-asm]: the preset copy fires for the ONE planet whose
+within-group index equals a fresh uniform draw `rng % size` (and only if the
+scenario-entry match succeeded, [0x108] >= 0). Per-planet probability 1/size
+size in 1..5 [inferred uniformity of the mod draw]; ~one preset world per
+race group, not a per-row class law.
+
+Consequence for T36d [inferred]: the extreme-row leak cannot be a systematic
+row-class bias from these tables (their guard is index-uniform). Whether the
+copied weights still perturb that ONE world's terrain draw downstream is
+separate: post-copy loop @0x23aeb..0x23af1 reads dwords via `[ESP+EDX*4]`
+(table A base) and `[ESP+EDX*4+0x54]` (= table B window EXACTLY at copy
+offset 84) — banked raw, downstream semantics open. The scenario-row-
+override hypothesis for the leak class as a WHOLE stays open pending the
+in-flight fresh-campaign capture (r1ad-20261011-102543), whose guard-field
+correlation (step-2 driver) is the planned closure probe.

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-11T11:10
+updated: 2026-10-11T12:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -173,23 +173,23 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T54 LANDED+T54b PROBE (budget spent; income-law.md T54/T54b): preset
-tables = compiled image constants (exact 32-B signatures: zero hits across
-entire extracted corpus, 1 each in image 0x88f90/0x88fe4, 1 image-copy
-each in session RAM) — file-driven scenario-row hypothesis REFUTED for
-these tables; T36 draw sites corroborated verbatim in raw asm (%5 then
-%11 back-to-back @0x23a86/0x23a97). T36d attribution reduces to the guard
-field (Ghidra stack-relative slots ambiguous) -> statics EXHAUSTED, rides
-t51 step 2. NEXT: BEGIN t51 step 2 = scripted step sequence on the PROVEN
-resume path (r1mut law: needle-verified verified clicks landed first try;
-scheduled-unverified clicks remain refuted 2026-10-06c): (a) this turn's
-prep = map in-game UI from windows.txt VERIFIED keys + banked strategic-
-map screenshot (End Turn button, planet panel, ship build queue), design
-click script ship-build -> End Turns x N -> per-turn autosaves; (b) launch
-bounded run; parse offline incl. guard-field/preset correlation, ability
-obs (step 3), score screen if any end fires (step 4), scenario-table join
-with bounded recipe. Exit-1 nulls banked once. Do NOT re-grep preset
-signatures; do NOT decompile FUN_000238e8 again whole.
+T55 IN FLIGHT + PRESET GUARD LAW CLOSED (income-law.md T55;
+REFUTED-ROUTES R13: vision unavailable, geometry from windows.txt only):
+raw asm 0x23ab2..0x23af5 verbatim — preset copy guard = scenario-match
+found (0x108>=0) AND (rng%size == within-group index); copies 21 dwords
+A -> buffer+0, 21 dwords B -> buffer+84 (post-copy loop reads exactly those
+windows @0x23aeb/0x23af1 banked raw). Uniform 1/size NOT systematic row bias
+-> T36d needs the capture correlation. RUN r1ad-20261011-102543: campaign
+ENTERED t114 (grid-hash law), outer r1_step2_drive.sh relaunched (race fix:
+turns.log lags first checkpoint); End-Turn candidates A=(511,67) B=(511,413)
+from windows.txt NEXTTURN 474/52/548/82 [file-verified geometry, mapping
+unverified — turn-counter-verified selection], 6 turn advances planned,
+checkpoints bracket every click. NEXT (after run completes): offline parse
+ck/ timeline — (1) guard-field correlation fresh-world terrain vs preset
+table values (T36d closure probe), (2) +0x44..+0x48 channel growth per turn
+vs rewrite recalc (OQ-016 income application law!), (3) ship item-23/ring
+if built, (4) score screen text in RAM. Exit-1 nulls banked once. Do NOT
+re-decompile gen driver; do NOT click unverified coords in analysis.
 PRIOR T45 LANDED (SELECTED-ABILITY / GOVERNOR BRANCH CLOSED, income-law.md S14):
 branch @0x38df0..0x38e29 pinned verbatim; the [0x743b9]>>0x18 operand IS
 item-table UPOP(35) (row base 0x73e40+35*0x28=0x743b8, runtime value 1
