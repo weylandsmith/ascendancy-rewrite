@@ -131,3 +131,10 @@ new-game run (New Game click banked at (318,333), docs/re/refcap.md:21),
 campaign-entry detection via the grid-hash law, then COUNT stars in fresh
 campaign RAM — size->star-count data point; repeated per option only if the
 first two differ.
+STATIC LEADS ALSO NEGATIVE (t57 prep): message-id 501 appears as NO
+CMP-immediate/PUSH-immediate anywhere in the image (dispatch not visible to
+the generalized immediate sweep — do not re-sweep); option display names
+(Tiny/Enormous/Star Density) absent from the image (glyph/shp-resident,
+consistent with R13 no-screenshot law). Launch: scripts/r1_t57_density.sh,
+click (65,427) = GALAXY_MORE center between New Game tour click and start
+re-fire; measurement via banked star-table law on entry checkpoint.
