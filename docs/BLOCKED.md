@@ -133,3 +133,20 @@ data-resident handler table (no direct call/immediate anywhere in the
 image DATA scan for table-shaped dword runs then call-shape validation —
 that exceeds the bounded recipe. Stays BLOCKED under the picker-draw
 default (observation-consistent, unchanged).
+
+## t48 drive-hop conversion route (BLOCKED-by-design, one-run closing route)
+The executor family (FUN_0004b8e4 + walk snapshot +0x4b3xx, sweep-exhaustive
+sites for +0x88/+0x90) contains NO term converting drive Level (or the +0x90
+speed accumulator) into per-turn float displacement. The only observed
+per-turn coordinate rewrites use gizmo STEP dword[row+0x1a]<<5. CLOSING
+ROUTE (next session, ONE R1 run): capture consecutive saves (End-Turn x3,
+deep-schedule law), identify ships in flight (state +0x58 == 4 with order
+type 1), diff float coords [+0x9e/+0xa2/+0xa6] per turn, regress against
+(sum drive Levels + design base [+0x10]) per ship; if the regression is
+exact the sugar-cube scale := the float coefficient; if not, the per-turn
+flight law lives in the animation/walk code and the campaign model uses
+the queued-order TURN WORD +0xac only (delay law, S11) — in which case the
+rewrite's immediate-arrival model is the CORRECT campaign-level reading
+and OQ-019's scale sub-item closes as NOT-MODELLED-BY-DESIGN with this
+census cited. Default under which we proceed meanwhile: [1,3] launch
+adjacency (AI-layer fact, verified; execution layer has no hop term).

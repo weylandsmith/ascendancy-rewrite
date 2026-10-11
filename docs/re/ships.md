@@ -333,3 +333,52 @@ turn. NEXT ROUTE (round-capped 2): readers of +0x88/+0x90 in the turn-
 advance family (0x4c4xx walk per S11). S11 assert polarity RE-CONFIRMED
 raw: gradient-not-found falls through to FUN_0002a428 ("..\race.cpp"
 string @0x84cb4); found-flag 0xffffffff @0x41b15 skips it @0x41b28.
+
+
+## 13. SCALE-LAW INCREMENTS (t48): x32 gizmo units, +0x88/+0x8c budgets; drive-hop conversion NOT in executor — BLOCKED route recorded
+
+SWEEP COMPLETENESS [verified, generalized method]: dword[rec+0x88] has
+exactly 9 instruction sites, dword[rec+0x90] exactly 4; ALL within
+0x4b0xx-0x4c7xx (walk snapshot @0x4b376/@0x4b390 copies the ship record
+fields to a local shadow; executor FUN_0004b8e4; bookkeeping @0x42447,
+@0x4dbce). The scale law CAN only live there.
+FUN_0004b8e4 @0x4b8e4 order executor (param_1=issuer, iVar6=[ship+0x68]
+target, row=slot type*0x6a) [verified verbatim]:
+- x32 UNIT LAW: gizmo RANGE = dword[row+0x0a] << 5 world-float units
+  (ranged orders fire only if sqrt-sq-distance(target,ship) <= that;
+  status +0x9c bit2 scales the compare); gizmo STEP arithmetic
+  dword[row+0x1a] << 5 floats appears in case 0x34 (@0x4be05:
+  distance(iVar6,ship) minus step, floor float 64.0f via written
+  0x42800000, coordinate triple [iVar6+0x9e..] rewritten through
+  FUN_00052ff4) and case 0x28 (@0x4c2b8: scans ALL ships, applies the
+  same step-clip to coordinate triples of ships within range). WHICH
+  gizmo rows 0x34/0x28 belong to is identity-resolvable but the
+  who-moves-whom semantics are NOT banked here. Runtime MEASURED (32
+  saves, extended r1_gizmo_fuel_table.py fields): range dwords nonzero
+  on weapon/scanner/special rows (25..1000); STEP dwords on rows
+  0x26..0x4e (5..255). The two float multipliers
+  _DAT_00002743/_DAT_00002747 are NOT image-constant floats (image
+  bytes decode as denormals/garbage) — runtime-initialized floats,
+  values [unverified] here.
+- BUDGETS: +0x88 fuel pool (capacity dword +0x18): upkeep burn per S12;
+  executor 0x44 'D' REFUEL transfer min(step, cap - cur) target += /
+  issuer -= (@0x4c1b0..0x4c1c5); 0x23 '#' drain-to-zero; AFFORD GATE at
+  entry: [ship+0x88] < dword[row+0x06] -> order power field zeroed.
+  +0x8c parallel budget (capacity dword +0x98): per-gizmo steps case
+  0x3b ';' clamped by dword[row+0x1a], default letter-family decrements
+  by per-queue class counts, pool < 1 -> FUN_00049d2c cancel.
+- IMMOBILISE case 0x30 '0'/'8' family: [rec+0x90] := 0, status |= 8.
+DRIVES DO NOT PARTICIPATE IN THE EXECUTOR [verified runtime]: rows
+10..15 (the six drives, S12) have RANGE=STEP=0 dwords — no x32 term.
+Their entire static footprint is: stat +0x10 sum @0x49b67 (S10) and the
+S12 upkeep/propulsion bookkeeping into +0x90. No consumer of +0x90 as a
+per-turn distance was found in the executor, the walk-snapshot family,
+or anywhere the +0x88/+0x90 sweep reaches. WHERE A TURN OF FLIGHT
+CONSUMES FUEL/COMPUTES POSITION REMAINS OPEN — closing route recorded
+in BLOCKED.md (t48): consecutive-save trajectory diff of in-flight ships
+([+0x9e] float delta per turn vs drive-Level sum + design base).
+AI-vs-EXECUTION SPLIT [inferred from verified pieces]: inter-system
+adjacency exists ONLY in the lane matrix S11, used by AI targeting and
+time budgets — never by order execution. Rewrite [1,3] launch default:
+NOT contradicted (execution layer has no hop term; AI prefers <4 but
+does not forbid), held unchanged.

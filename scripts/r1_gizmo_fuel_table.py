@@ -48,6 +48,8 @@ def main():
         return 2
     saves = 0
     prop_hist = collections.Counter()
+    step_hist = collections.Counter()
+    rng_hist = collections.Counter()
     gate_rows = collections.Counter()
     cost_hist = collections.Counter()
     for p in runs():
@@ -73,6 +75,8 @@ def main():
                 pflag = m[r + 2]
                 if pflag == 1:
                     prop_hist[(t, struct.unpack_from("<I", m, r + 0x26)[0])] += 1
+                    step_hist[(t, struct.unpack_from("<I", m, r + 0x1a)[0])] += 1
+                    rng_hist[(t, struct.unpack_from("<I", m, r + 0xa)[0])] += 1
                 if n_gate and (struct.unpack_from("<H", m, r + 3)[0] & 0x20):
                     gate_rows[t] += 1
                     cost_hist[struct.unpack_from("<I", m, r + 6)[0]] += 1
@@ -80,6 +84,12 @@ def main():
     print("propulsion rows (idx, bonus dword) -> count:")
     for (t, v), c in sorted(prop_hist.items()):
         print(f"  idx {t:2d} bonus {v:<6d} in {c} saves")
+    print("step dword[row+0x1a] (idx, units) -> count:")
+    for (t, v), c in sorted(step_hist.items()):
+        print(f"  idx {t:2d} step {v:<6d} (x32 -> {v*32} float) in {c} saves")
+    print("range dword[row+0x0a] (idx, units) -> count:")
+    for (t, v), c in sorted(rng_hist.items()):
+        print(f"  idx {t:2d} range {v:<6d} (x32 -> {v*32} float) in {c} saves")
     print("gated (bit5) row idx -> saves:", sorted(gate_rows.items())[:40])
     print("cost dwords on gated rows:", sorted(cost_hist.items())[:20])
     vals = {k[1] for k in prop_hist}
