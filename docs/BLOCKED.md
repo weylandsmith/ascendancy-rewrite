@@ -179,12 +179,13 @@ scripted interactive session against a scratch copy (all t49 invariants:
 scratch copy never mounts game/, headless xvfb, -time-limit, pkill -x
 dosbox-x only, bounded output):
 
-1. CONTROLLED MUTATION (closes OQ-003 field load-paths): take the banked
-   resume.gam, flip ONE per-planet u16 per boot in a scratch tree (e.g.
-   +0x22 channel word on one named planet), boot to main map, dump RAM,
-   diff vs file mirror law (t50: byte-identical except +0x11). The record
-   that shows the injected value identifies the field's load path; iterate
-   ~5 cheapest fields.
+1. CONTROLLED MUTATION [DONE t53 — r1mut-20261011-092253, evidence
+   r1-savestate.md t53 section]: load path PROVEN (verbatim 123-B blob copy,
+   HERMESSEN needle at member 0x26edd7, sentinels landed, zero collateral);
+   pointer fields preserved not rebuilt. REMAINING for OQ-003 = field
+   MEANINGS, which mutation cannot supply — needs play-mutation variants
+   (see step 2 session: mutate channel words +0x44..+0x4f before turns
+   advance and watch production) OR is parked per strict-close.
 2. MOVE SCRIPT (closes t49 sugar-cube scale residue): new game, build one
    scout-ish design if reachable, issue order to a lane neighbour, save
    every turn while in flight, run scripts/r1_trajectory_regression.py —

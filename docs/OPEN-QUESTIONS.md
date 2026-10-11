@@ -33,7 +33,13 @@ snapshot-pair delta constant 1472). Measured closed-field shapes: type
 +0x14 <-> surface +0x18 bijection {(0,7)(1,11)(2,23)(3,45)(4,73)} 151/151
 (upgrades sizeClassFor EVIDENCE to direct-file; rewrite code already
 agrees, no change); +0x1a == surface+10 per class; +0x0c 0..49 = star
-idx [inferred]; owner byte MIRRORED (8 distinct incl 0xFF). Still open:
+idx [inferred]; owner byte MIRRORED (8 distinct incl 0xFF). STATUS t53:
+LOAD PATH CLOSED (r1mut-20261011-092253: HERMESSEN needle + 123-B verbatim
+blob diff — records copied not parsed; pointer fields preserved byte-wise,
+not rebuilt; sentinel noise baseline-controlled. r1-savestate.md t53).
+Mutation route exhausted for MEANINGS; remaining semantics need play-state
+mutation (channel words before turns advance) — parked, low priority
+(rewrite fresh-start-only). Still open:
 +0x0a/+0x20/+0x4a/+0x55 semantics, counter identity, star join,
 packed-entropy. Save-writer string xref route dead round 1 (0x857de
 zero refs, byte-pattern 0); one LEA-form probe budget remains.

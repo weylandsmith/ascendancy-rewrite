@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-11T00:20
+updated: 2026-10-11T09:45
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -173,26 +173,21 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T52 LANDED (DISTANCE-MATRIX PRODUCER LAW ships.md S15 + OQ-021 static
-route exhausted): IMUL-imm100 arith scan (R12-legit method) -> 12 sites,
-5 mid-instruction false discarded; FUN_00023e00 VERIFIED producer of
-DAT_00045beb (star coord floats +0x08/0c/10, stride 0x60, ROUND(sqrt)
-nearest-neighbour gate 5000, diagonal [i*101]=1) + lane matrix
-DAT_00032ddb (y+100x skip-gate); 101-vs-100 stride split banked
-[unverified]; runtime sample mapping tension banked honestly (NOT resolved;
-pointer-law P0 translation vs B+VA candidate named). FUN_0002a428 =
-3-line error stub (t51 lead closed). OQ-021 stays open; closing route =
-BLOCKED t51 STEP 4 (win/score screen correlation; BLOCKED t52 line).
-NEXT: CONSOLIDATED CAPTURE SESSION STEP 1 (controlled mutation, OQ-003):
-first LOCATE the existing click driver (grep scripts/ for click.log writer /
-r1deep runner; do NOT hand-roll a new driver if one exists), then scratch
-copy + ONE injected u16 (planet +0x22 channel word, one named world) into
-resume.gam, boot headless to main map, dump RAM, diff vs t50 mirror law
-(byte-identical except +0x11). Injected value visible in RAM at the record
-= field load-path named. Exit 1 = one line, pivot OQ-016 turn-arithmetic
-statics (turnloop.md still has [inferred] constant rows that arith-motive
-scans can target, budget 2). Do NOT re-scan OQ-021 statics (BLOCKED t52);
-do NOT re-run t50/t51 censuses.
+T53 LANDED (CONTROLLED-MUTATION CAPTURE STEP 1 — OQ-003 LOAD PATH CLOSED,
+r1-savestate.md t53 section; run r1mut-20261011-092253): scratch RESUME.GAM
+layout law (78 rec, stride 123, NAME+0x00, chain 0xAAE2); Resume click
+(318,333) lands first try (needle-verify loop); 15 slots all identical:
+HERMESSEN in RAM member 0x26edd7, rec blob VERBATIM file->RAM (only the 8
+injected bytes differ), t50+0x10 pointer preserved not rebuilt, sentinel
+outside-hits == untouched-baseline counts (noise, zero derived copies).
+Harness banked: scripts/r1_mutation_inject.py (name-relative, self-checking,
+restore trap), r1_mutation_run.sh (deepcapture law), r1_mutation_read.py
+(offline). OQ-003 stays OPEN for field MEANINGS (mutation exhausted; play-
+state variants parked low-priority). NEXT: OQ-016 turn-arithmetic statics
+per t52 exit-1 pivot plan (turnloop.md [inferred] constant rows; arith-
+motive IMUL/shift scans on producer families, budget 2 rounds, Ghidra-
+verify every hit; exit 1 -> BLOCKED line, capture carries it). Do NOT
+re-run the t53 capture (banked); do NOT re-scan OQ-021 statics.
 PRIOR T45 LANDED (SELECTED-ABILITY / GOVERNOR BRANCH CLOSED, income-law.md S14):
 branch @0x38df0..0x38e29 pinned verbatim; the [0x743b9]>>0x18 operand IS
 item-table UPOP(35) (row base 0x73e40+35*0x28=0x743b8, runtime value 1

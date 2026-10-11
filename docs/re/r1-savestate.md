@@ -979,3 +979,49 @@ byte-identical mirror law t50), boot it, and diff live RAM — identity between
 file value and post-boot RAM value names the field's load path for free.
 Scheduled together with the t49 move-scripted capture (one R1 session, both
 questions). BLOCKED.md carries the consolidated entry.
+
+
+## t53 CONTROLLED-MUTATION CAPTURE — RESUME LOAD PATH PROVEN (OQ-003 increment)
+
+Run `work/r1/r1mut-20261011-092253` (r1_mutation_run.sh; inject -> boot ->
+click "Return to Current Game" (window 318,333, golden-save law refcap.md S4)
+-> 15 autosave slots; scratch restored at exit; game/ untouched).
+Scratch-file layout law [verified]: scratch RESUME.GAM (75,603 B) carries
+78 planet records, stride 123, NAME AT +0x00, chain start 0xAAE2. Needle
+rec0 renamed HERMESSEN; sentinels u16 BEEF/CAFE injected at name+0x0e,
++0x20, +0x4a, +0x55 of rec1/rec2.
+
+MEASURED (identical across all 15 slots):
+1. LOAD PATH [verified]: HERMESSEN present in live RAM at member 0x26edd7 —
+   Resume reads the scratch RESUME.GAM verbatim; the planet table base is
+   needle-relative (rec i = needle + 123*i).
+2. VERBATIM BLOB LOAD [verified]: full 123-byte record compared file-vs-RAM
+   name-aligned: rec1 differs ONLY at the 8 injected sentinel bytes;
+   ZERO other differences. The record blob is copied, not parsed —
+   runtime state mutates in place later, not at load.
+3. SENTINEL-NOISE DISCIPLINE [verified]: stray sentinel hits outside the
+   injected records are pre-existing corpus noise — baseline untouched
+   session 210149 already holds 4x BEEF + 6x CAFE; this run's outside counts
+   are EXACTLY 4 + 6. No sentinel was copied/derived anywhere.
+4. t50+0x10 POINTER FIELD [verified behavior]: file value survives into RAM
+   VERBATIM (rec0 0x25c3fd file == RAM). Baseline NEW-GAME table holds 0
+   there (unallocated state) and its 150 s run never faulted — zero is a
+   tolerated state [verified]. In THIS session the address reads back a
+   region shaped like the banked item-slot pattern (u32 pairs `01 ff 00 00`,
+   id/owner-FF/empty shape per t44 law) [inferred shape match only].
+   Interpretation [inferred]: pointers are runtime state copied byte-for-
+   byte at save and NOT rebuilt at load (the stale file value lands in RAM
+   unchanged); the engine's zero-tolerance suggests validity is checked or
+   pointers are only used after re-allocation paths.
+5. t50+0x11 counter: file == RAM (delta 0) in this resume-only run —
+   consistent with (2): nothing advanced turns, nothing mutated. The t50
+   delta-1472 census (long-running session) stays banked as
+   snapshot-pair-specific behavior.
+6. Owner byte (t50+0x57) and owning-star u16 (t50+0x0c) census mirrored
+   file==RAM (77x 0xFF + 1x 0x00; star values 29 distinct 21..49) — further
+   blob-verbatim corroboration; no new semantic claims claimed.
+
+OQ-003 status: load-path question CLOSED (verbatim blob + pointer
+preservation, this section is the evidence). Field MEANINGS (+0x0a/+0x20/
++0x4a/+0x55 packed regions) STAY OPEN — this capture proved HOW records
+arrive in RAM, not what every word means.
