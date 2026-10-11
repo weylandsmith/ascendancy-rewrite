@@ -142,3 +142,13 @@ S10 OPEN RESIDUE t29b).
   ONLY from windows.txt X0/Y0/X1/Y1 offsets (file evidence) + the banked
   click law (root = window + 40); verify every new click target by a RAM
   signal (turn counter / grid hash / needle), never by looking at pixels.
+
+## R12 amendment (t60): file-provenance law for image scans
+
+u32-immediate scans over ascend.exe MUST use work/ascend_restored.bin (the
+Ghidra image with reconstructed VA immediates), NOT work/ascend_payload.bin
+(same length 576643, 6244 differing bytes in 1069 clusters). The t59
+"shp-string u32 scans zero hits" negative was a wrong-file artifact and is
+VOID; corrected restored-image scan hit 6 of 16 shp/asset strings at base 0
+(LGRACE/SMSHIP registration, planal, planets->FUN_0001fe20 chain, suns x2).
+Absence remains uninformative (R12); presence is a lead.

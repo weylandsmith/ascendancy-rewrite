@@ -212,20 +212,20 @@ before quoting numbers; the constant-7 byte at 0x1BF450+H is NOT the turn
 counter (T42 law needs a KNOWN phys).
 NEXT (t59): full-ledger classification DONE t58b — remaining open: OQ-005
 (W3 in progress: recon banked docs/re/shp.md S7 — registration pass
-FUN_00023388 sole-caller of FUN_0001fa60; u32/xref routes on shp strings
-NEGATIVE; INT21 wrapper cluster 0x777xx-0x77dxx found, 74 CD21 sites),
+FUN_00023388 sole-caller of FUN_0001fa60; t59 u32-scan NEGATIVE VOID by t60
+file-provenance law (wrong file); INT21 wrapper cluster 0x777xx-0x77dxx
+found, 74 CD21 sites),
 OQ-010 combat application (static route bounded; scripted campaigns have NO
 combat -> capture class same as scale), OQ-012(a) blocked glyph-readout,
 OQ-016 attribution + OQ-003 meanings replay-only, OQ-019 scale
 BLOCKED-USER (t58), OQ-020 amass capture-gated-unreachable, OQ-021
 end-screen rides multi-hour gameplay BLOCKED-USER, OQ-023 build-work parked
-by standing option-C decision (not RE). CONCRETE NEXT ACTION (t59b): INT21 IDs landed
-(OPEN=FUN_00077776 AH=0x3d verified; READ candidate=FUN_00077a03, 5 callers
-in two clusters; wrapper chain 77deb->77eb3->77ece). Resolve WHICH file each
-READ caller serves: raw-asm context (string-immediate pushes) of FUN_00020b44
-/ 0x20b84 / 0x20e28 and consumers of FUN_00077ece + FUN_000660e7 cluster.
-The .SHP-serving reader is the decoder neighborhood. Restree-tension banked
-shp.md S7 (FUN_00046870 not a READ caller -> call-graph recovery may be
-partial; if a caller's asm shows CALL-through-register, note it, do not
-guess). If neither cluster serves .SHP, W3 pivot = cache-lookup accessor
-sweep (slot loaded-flag byte ctx+2000+idx*0x32 byte3, STRUCTURAL sweep).
+by standing option-C decision (not RE). CONCRETE NEXT ACTION (t60b): W3 continues. Banked t60 (shp.md S8): file-
+provenance law (scan RESTORED image not payload; t59 zero-hit negative VOID;
+R12 amendment banked). OPEN-family fully attributed (text/ini/log/BMP only);
+shape libs load via FUN_00030018/FUN_0003026c -> FUN_0006642c(path,flags,dest)
+with appended-extension law. NEXT micro-steps queued in order: (1) callers of
+FUN_00030018 and FUN_0003026c (which subsystem loads which lib; extension
+identity via caller-side strings if DAT route stays blocked); (2) resource-
+slot accessor sweep (loads of slot dword at ctx+2000+idx*0x32 = the decoder
+neighborhood). Decoder not yet located; OQ-005 stays open.

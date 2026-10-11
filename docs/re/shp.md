@@ -162,3 +162,75 @@ detail in work/oq005_w3.md; headline law (all Ghidra /ascend_restored.bin):
   no consumer); get_xrefs_to(MOUSE.SHP, planets.shp cluster) zero; no libc
   file strings in image; 'SHAPE CACHE'/'** %d SHAPES USING %lu BYTES'
   (@0x83224/0x865b8) have no u32 sites.
+## 8. W3 recon round 3 (t60): CRITICAL file-provenance discovery + OPEN-family attribution
+
+CRITICAL HARNESS LAW [verified]: work/ascend_payload.bin and
+work/ascend_restored.bin are SAME LENGTH (576643) but DIFFER — md5
+9b614f3aa43467c98b70d758cd094e6a vs b3cc18929cfe4bb86700164efb2bc143, 6244
+bytes in 1069 clusters. The RESTORED image carries reconstructed u32 VA
+immediates at sites where the raw payload holds unreconstructed values
+(sample: 0x14fa0 payload `20 00 00 00` vs restored `d0 2b 08 00`). ALL
+u32-immediate scans MUST run against ascend_restored.bin (the Ghidra image).
+The t59 "u32 scans zero hits at 5 bases" negative is VOID — it scanned the
+payload. Re-scan law banked; no base schemes needed (base 0 on restored is
+correct).
+
+Corrected u32 scan (restored image, base 0) [verified]:
+  DATA\LGRACE%02d.SHP  0x83718 -> 0x23400   (registration pass, known)
+  DATA\SMSHIP%02d.SHP  0x8372c -> 0x23428   (registration pass, known)
+  data\planal%02d.shp  0x84a20 -> 0x3a7e7   PUSH 0x84a20 (format-path site)
+  data\planets.shp    0x83d1f -> 0x2b223    MOV EDX,0x83d1f then
+                                            MOV EAX,0x9f10c; CALL FUN_0001fe20
+  DATA\suns.shp       0x856a7 -> 0x51964 ; 0x856ff -> 0x51e10
+  ZERO u32 sites: SMRACE, DKSHIP, MOUSE.SHP, resring (both spellings),
+  planets.shp(b) 0x856e0, smhome.shp, SHAPE CACHE, '** %d SHAPES' — per R12
+  these are absence-of-immediate, not absence-of-consumer (paths are built
+  by concat/sprintf; see FUN_00030018 law below).
+
+OPEN-family attribution [verified via get_function_callers + decompiles]:
+- FUN_00077ece callers (7): FUN_00020f74, FUN_00020fd4 (music.txt loader —
+  banked OQ-008), FUN_00024f24 (NEW-GAME INIT: calls FUN_000238e8 world-gen,
+  FUN_00023388 shape registration, FUN_000232ec race-colour draw; plus a
+  debug/trace file writer via FUN_0007865a with format string
+  'T_%04d_%s_flags__%d__show_R_d_sh...' @0x838cf), FUN_00059dfc (state-dump
+  trace writer, stride-0x18 records), FUN_00066c2f (AIL audio init log),
+  FUN_0007198d (INI text parser: line loop, ';' comment skip, 4-value key),
+  FUN_00075008 (UVBE/VESA setup + .ini read — 'UVBELib' strings). NO shape
+  files among them.
+- FUN_00077752 callers (7): FUN_0002086c, FUN_00020e28 (generic FD helpers),
+  FUN_00035ea8 (screen-grab BMP writer: 640x480, palette scale
+  v*0xff/0x3f, 'wb' flags 0x262, filename via format @0x838f... + counter
+  DAT_000701e0 — a DEBUG screenshot dump), FUN_000662fd, FUN_0006642c,
+  FUN_000668ba, FUN_00066906 (0x66xxx binary reader family).
+- 0x66xxx BINARY LIBRARY READER LAW [verified structure]:
+  FUN_000660e7(fd, offset, flags, dst, size) = positional read (called with
+  explicit offsets everywhere). FUN_000662fd reads header @0x3c (60 B),
+  2-byte count, 0xac block, count x 0x18-B entries. FUN_0006642c(path,
+  flags, dest) full loader: same header walk, then per-entry reads 8-B
+  records and copies span (clamped), and a TRAILING FIXUP TABLE: u32 count,
+  u32 id per section, then triples (u8, u8, u16) writing
+  `*(u32*)(dest[sec] + u16off) = auStack90[flagbyte] + fixup` — a
+  base-relocation pass over loaded blocks. Flag bytes tested `(v&7)==0` /
+  `(v&4)&&!(v&0x20)` / `(v&0x20)!=0` -> bail.
+  Callers: FUN_00030018 and FUN_0003026c. FUN_00030018 [verified]: builds
+  filename from param_2 by APPENDING an extension from image DATs
+  (&DAT_000016d6 first choice, &DAT_000016d8 fallback when name empty),
+  opens via FUN_0002acc, calls FUN_0006642c(h,5,0), on failure appends the
+  OTHER extension and calls FUN_0003026c; success -> name transform via
+  FUN_0005bd78. NOTE the .shp extension itself is DATA at DAT_000016d6/8 —
+  consumers need no 'shp' literal, explaining the R12 zero-xrefs on the
+  path strings. Extension bytes UNRESOLVED: raw bytes at 0x16d6/0x16d8 are
+  non-printable (00 07 00 28...) in BOTH images — decompiler DAT VAs in the
+  low 0x2000 range do not map 1:1 to raw-file offsets; queued.
+- FUN_0001fe20 (path-open accessor used by planets/suns sites; 3 callers:
+  FUN_0001acd0, FUN_00051834 = main status screen (param_2==1 branch opens
+  TWO handles via FUN_0001fe20 cached-once DAT_000069d0/_DAT_000069ce, then
+  per-planet loop FUN_00032d1c/FUN_00032ee0), FUN_000575e4).
+
+Interpretation [inferred from verified above]: the .shp libraries load via
+FUN_00030018/FUN_0003026c -> FUN_0006642c with path-as-parameter; decoded
+shapes land in the FUN_0001fa60-registered resource-table slots
+(ctx+2000+idx*0x32 payload ptrs). OQ-005 decoder = the draw path consuming
+those slots. NEXT micro-steps queued: (1) DAT_000016d6/8 extension bytes;
+(2) FUN_00030018/FUN_0003026c callers (which subsystem loads which lib);
+(3) resource-slot accessor sweep for the consumer/decoder.
