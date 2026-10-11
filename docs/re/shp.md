@@ -451,3 +451,55 @@ QUEUED (t63b): FUN_0005caac stack-arg mapping from ITS prologue (which
 register/stack slot is the stream cursor vs shape struct), and the
 PLANETS.SHP inter-checkpoint in-place-rewrite test (ck pair spanning a
 status-screen open, if any ck shows race-status activity).
+
+## 12. W3 round 7 (t64): BLIT INPUT LAW fully code-pinned + stack-discipline arg map; cache buffer anatomy [0x88 prefix][verbatim 1.10]; DECISIVE NEGATIVE: loaded raw payloads are NOT draw-time payloads
+
+1. ARG MAP [verified, FUN_0005caac prologue 0x5caac..0x5cb85 + widget
+push order 0x3143a..0x31467 + fc34 RET leaves caller pushes]: cdecl stack,
+5 args (ADD ESP,0x14). [EBP+8]=shape-struct ptr (widget+4 copy): [s]=hdr
+ptr, hdr=[pixptr][W-1][H-1]; s+4..+0x10 = clip rect (clamped [0,W-1]/
+[0,H-1]). [EBP+0xc]=payload base. [EBP+0x10]=selector u32 (widget desc+5).
+[EBP+0x14]/[EBP+0x18]=screen x/y (desc+7>>16, desc+9>>16).
+   STREAM CURSOR LAW @0x5cb4d..0x5cb5b: ESI := payload +
+   u32[payload + 8 + 8*sel]; entry fields rect +8/+0xc/+0x10/+0x14 (u32,
+   +screen), stream = entry+0x18 (ADD ESI,0x18 @0x5cb85).
+   Error codes: -1 missing dims @0x5cb2b, -2 empty clip @0x5cb36,
+   -3 fully outside @0x5cea5. Full-rect path -> FUN_0005ceb0.
+
+2. CACHE BUFFER ANATOMY [measured ck113]: slot payload pointer -> buffer
+whose VERBATIM 1.10 file copy begins at slot+0x88 (14intel: slot
+0x3cd6e0, file copy 0x3cd768, constant-delta first-0x400 0 diffs);
+bookkeeping size = filelen+2 (136-byte prefix region holds non-offset
+content for raw libs). Same +0x88 delta holds for 12start.tmp (slot
+0x3e7d14, verbatim 0x3e7d9c).
+
+3. .tmp = LIBRARIES [verified]: 12start.tmp / 1starmap.tmp / 3cfgnew.tmp
+all carry magic b'1.10' and verbatim copies exist in ck113 RAM; their
+slot payload HEADS are NOT verbatim (control-byte-looking data at +0).
+
+4. LOADED-SLOT INVENTORY (ck113, autoplay, no UI interaction): 12 slots —
+LGRACE00, raceflag, racering, smhome, listbox, 14intel, smraces,
+1STARMAP, 3CFGNEW + 3 .tmp. Runtime cache base = 0x242088
+(RAM ctx 0x2e1194 - image VA 0x9f10c).
+
+5. DECISIVE NEGATIVE [measured]: strict blit-input scan over ALL 12
+loaded payloads x sel 0..3 (u32[payload+8+8sel] in (0,size), rect fields
+<=1200, >=4 well-formed rows from entry+0x18): ZERO survivors. The
+1.10-library payload satisfying the blit law requires a transform that
+HAD NOT RUN on any autoplay-loaded slot. Consistent story: transform
+runs at/near first widget DRAW (never happens in headless autoplay) or
+consumers pass a built payload from elsewhere. The t61 "27/208 exact
+span" population is therefore validation of the GRAMMAR on file data,
+not of the payload wrapper.
+
+6. FUN_0005bd78 CLOSED as trivial name-copy thunk (vtable call + strcpy
+to DAT_0008965c) — not a shape transform.
+
+QUEUED t65 (capture-class, sanctioned mechanics): R1 run with one UI
+panel OPENED via known windows.txt geometry click (intel panel button),
+checkpoint while open, rerun strict blit-input scan on the newly-loaded
+/rewritten payloads. If a survivor appears: the entry+0x18 stream start
+is RAM-pinned and the transform pass becomes greppable from that state
+(whoever writes u32s at payload+8+8k). If null again: OQ-005 payload
+wrapper joins BLOCKED-USER-LEVEL (draw-path capture class like OQ-019);
+grammar laws (S9/S12.1) remain banked, no rewrite renderer change.
