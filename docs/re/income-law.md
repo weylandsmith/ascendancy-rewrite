@@ -1693,3 +1693,43 @@ offset 84) — banked raw, downstream semantics open. The scenario-row-
 override hypothesis for the leak class as a WHOLE stays open pending the
 in-flight fresh-campaign capture (r1ad-20261011-102543), whose guard-field
 correlation (step-2 driver) is the planned closure probe.
+
+
+## T55 RUN RESULTS (r1ad-20261011-102543, 7 checkpoints, campaign entered t114)
+
+END-TURN CLICK: geometry (511,67) is HISTORICALLY WORKED
+(r1ad-20261006-131350 click.log: three clicks at 511,67 -> turns 0->1->2),
+but today 3 clicks (both candidates + one diagnostic) advanced nothing —
+synthetic-click flakiness law re-confirmed (same class as the 2026-10-05k
+'run1 landed, run2 warped' note). Not a geometry refutation; driver stays
+BLOCKED-eligible, see BLOCKED t55 line. Idle checkpoints were still
+collected and analyzed below.
+
+FRESH-CAMPAIGN TURNO-0 SNAPSHOT (ck007, H=0x88, grid member 0x26d103):
+- 4 owned home worlds, owners 0x01..0x04 (distinct empires): Phoebe I,
+  Atropos I, Fletcher I, Gravitus II. pop=2 on ALL FOUR (t41 colonise/home
+  pop := 2, re-confirmed on a FIFTH independent campaign).
+- cap == seed + 2 EXACT on all 4 (26/24, 16/14, 26/24, 31/29) — t41's
+  cap law holds fresh, not just mid-game.
+- Slot array read at STORED-PTR + 0x88 (t33 banked law): every owned world
+  carries EXACTLY ONE active item 5 (Colony Base) — 4/4. The naive +0 read
+  shows 3/4 (misaligned artifact, disclosed not banked).
+- Channel words fresh-owned: IND-stored 1, RES-stored 0, PROS-stored 1
+  ([1,0,1] on all four). This is EXACTLY the acc=(0,0)->stored=(1,1) idle-
+  home pattern income-law S6 already logs as an OPEN recalc residual — on a
+  genuinely fresh campaign (not a loaded save), which weighs against
+  residual candidate (b) 'captured slots are load-time stale' and toward
+  candidate (a) a term outside FUN_00038ba4 (species modifiers) — stated as
+  [inferred] preference, residual stays open, no closure claimed.
+
+SCENARIO-ROW ATTRIBUTION (T36d follow-up): probed the driver's record
+stores @0x23b10/0x23b22 on the fresh snapshot — rec+0x0c carries the world
+group index (31 distinct), rec+0x0e correlates PERFECTLY with surface cells
+(0..4 vs cells 7/11/23/45/73) => type class, NOT the scenario row (the
+t55 draft word 'row index' is CORRECTED here pre-bank). The rng%11 row is
+consumed at generation and never stored. CONSEQUENCE: preset/row
+attribution is NOT recoverable from save-state correlation (no stored key);
+only a campaign-LCG replay replaying draw order per world could attribute
+the one preset world per group. That build is deferred (BLOCKED t55);
+T36d closes as 'mechanism + guard law banked; per-world attribution
+unrecoverable from data, replay-only' — leak NUMBERS stay banked either way.

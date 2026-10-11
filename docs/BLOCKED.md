@@ -223,3 +223,16 @@ ONE known scenario type-name string (starstat/names pool), then verify
 stride-0x1ee chain ONLY at anchor +-small window; bound total work with
 mem.find loops (no nested extension per position). Budget: one retry inside
 the t51 capture session (step 2), never as a standalone idle probe.
+
+
+## t55 — synthetic End-Turn click flakiness blocks step-2 turn advance (driver ready)
+(511,67) advanced turns in run 20261006-131350 (three clicks, turn 0->2)
+but did nothing in 20261011-102543 (3 clicks, both frame candidates). Same
+flakiness law as the 2026-10-05k title-click note; NOT a geometry refutation.
+NEXT attempt recipe (one bounded run): adaptive phase, click (511,67) with
+25 s spacing up to 8 tries, turn-counter verification per try; if still
+dead, try key mode ('key Return') once before conceding the End-Turn route
+to mouse-only flakiness. Idle-campaign value from today's run already
+banked (income-law.md T55 RUN RESULTS: pop=2 + cap==seed+2 + one-CB 4/4 on
+banked +0x88 law for a 5th campaign; acc0->stored(1,0,1) fresh-campaign
+corroboration of the S6 recalc residual).
