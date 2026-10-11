@@ -108,3 +108,19 @@ by gate 3n):
   pointer law (OQ-011 CLOSED) is the answer
 
 
+
+## OQ-CARGO AI landing-site chooser (opened t44, BLOCKED-static route)
+Chain CLOSED (income-law.md S13.5): cargo placement = EVENT 4 with
++0xae from EVENT 8's FUN_0003a880 coord->slot converter; legality re-gated
+by FUN_0003830c (rule G). WHAT'S MISSING: who picks the AI's landing COORDS
+before dispatching event 8 — the dispatch site of event types 8/4 in the AI
+ship-control code is unidentified (31 +0xae xrefs are all handler/UI code;
+player provenance is the mouse). Search for the event DISPATCH (calls into
+FUN_0003aa0a or a dispatcher with (obj, 8|4, payload)) failed to bound the
+space cheaply; a blind sweep is a retry spiral. BEST DEFAULT PROCEEDING
+UNDER: rewrite places arrival CBs by the uniform non-rock picker draw
+(consistent with the rule-G-exempt CB + 26% barren + ranks 4/40;
+campaign.cpp seedColonyBaseColony). ONE-ROUTE CLOSING RECIPE (future):
+find callers of FUN_0003aa0a via the event dispatcher table, read the AI
+branch that builds the event payload for transports with cargo item 5; the
+coordinate pick IS the law.

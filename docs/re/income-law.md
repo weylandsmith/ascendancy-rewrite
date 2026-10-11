@@ -1498,3 +1498,42 @@ Two static findings upgrade the t40(6) "cell selection OPEN" default:
  consumption): 2024 Control t777, 42 Extinct t583, 13 Control t593
  (seed 13 FLIPPED Extinct->Control — chain adjacency changes where
  production lands; PLAYTHROUGH.md regenerated).
+
+## 13.5 CARGO-SLOT CHAIN (t44, PARTIAL close — chooser law pinned, AI choice open)
+
+The +0xae writer search (search_instructions "xae", 31 hits, all in
+FUN_0003aa0a/FUN_0003a7b0 ship/event code) resolves the t43 open sub-item
+into a CHAIN, not a chooser function:
+
+ - The planet/command object fields are a triple: +0xab pending item byte
+   ('05' Colony Base, '17' automation, 0xff none), +0xac CHOSEN slot,
+   +0xae CARGO slot, +0xb0 follow-up slot, +0xb2.. 39-entry candidate
+   queue (stride 5, event 0x34 fills via FUN_0003830c legality per item).
+ - EVENT 8 (handler FUN_0003aa0a param_2 < 9 branch @0x3ac14): +0xac :=
+   FUN_0003a880(coords from the event payload). FUN_0003a880 (45 instr) is
+   a PURE COORDINATE->SLOT CONVERTER — no RNG:
+     orbital-direct (13 < X < 153, 119 < Y < 469):
+       slot = surfaceCells + 5*((X-13)/70) + (Y-119)/70   (ring slots)
+     else fallback: (row<<16|col) = FUN_0003a820(X,Y) [linear coord decode:
+       ((Y*15)*2 + X*15*? ...) / -0x484 family], then slot =
+       FUN_000395c4(current-planet, row, col).
+   Post-validation @0x3ac23..0x3aca5: if owner != player AND item != 5 AND
+   slot != -1, the slot survives only when the cell byte == 0x17 (the
+   '17'-automation interaction), else +0xac := 0xffff.
+ - EVENT 4 (colonisation @0x3af4c..0x3af6d): +0xae := +0xac; NOTHING
+   happens unless +0xae < 0xffff; legality re-runs FUN_0003830c @0x3afed;
+   item '05' branch = owner := transport byte [ship+0x56], pop := 2,
+   +0x67 := DAT_00012e10 (turn), FUN_00038840 explicit-slot activator
+   @0x3b0d6 — exactly the t41-observed arrival state.
+ - Player provenance: coords = mouse click (UI event payload). AI
+   provenance: every AI arrival MUST carry a valid +0xac, so the AI
+   dispatches EVENT 8 with landing coordinates picked in the AI ship-
+   control code — NOT recovered (the chooser is not in the placement
+   chain; hypothesis space = FUN_0003xxxx AI family, needs the dispatch
+   site of event type 8/4 first).
+
+ Rewrite impact: NONE. Placement in the original is an explicit slot gated
+ by the SAME checker (rule G binds cargo picks), and Colony Base is rule-G
+ EXEMPT, so the rewrite's uniform non-rock draw for arrival CBs is
+ observation-consistent (barren share + ranks 4/40). AI landing-site law
+ -> docs/BLOCKED.md (default: picker draw).

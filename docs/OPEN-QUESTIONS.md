@@ -247,7 +247,10 @@ drawCbCell); BUILT-ITEM CELL LAW CLOSED t43 (picker ignores caller slot —
 all 16 EBX=0 build sites are uniform draws; rule G active-neighbour adjacency
 CONFIRMED 0/362 final-state violations on continuous-x hex geometry from
 fingerprint-anchored runtime tables — income-law.md S13; rewrite
-drawItemCell; sub-item OPEN: cargo-slot chooser upstream of +0xae);
+drawItemCell); CARGO-SLOT CHAIN CLOSED t44 (placement = EVENT 4 +0xae
+from EVENT 8 FUN_0003a880 coord->slot converter, rule-G re-gated — income-law.md
+S13.5); AI LANDING-COORD CHOOSER OPEN -> docs/BLOCKED.md (dispatch-site
+recipe banked; rewrite default = picker draw, observation-consistent);
 REMAINING: extreme-row leak banked unexplained
 (row0 98.9 vs 99.997, row10 c1 1.6 vs 0.006 — scenario-row-override
 hypothesis, income-law.md T36d). +2/+2 residual minutiae RESOLVED t33

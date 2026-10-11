@@ -209,16 +209,26 @@ pin campaign_built_cell_rule_g_t43 (symmetry x5 types, degree 1..4, draw
 spread). run_tests 102/0. TIMELINES (CLI finite-proved): 2024 Control
 t777, 42 Extinct t583, 13 CONTROL t593 (seed 13 flipped Extinct->Control
 under adjacency production); PLAYTHROUGH.md regenerated; gate ALL CHECKS
-PASS. NEXT ACTION: CARGO-SLOT CHOOSER (sub-item of t41/t43,
-income-law.md S13.5) — who writes word +0xae (the transport-cargo CB slot
-the EVENT handler FUN_0003aa0a @0x3b0bd feeds to activator FUN_00038840,
-legality re-gated @0x3afed via FUN_0003830c)? Static pass: Ghidra
-get_xrefs_to + writes-to on the planet-record +0xae offset (search data
-refs, disassemble writers); hypothesis candidates: same picker at a 20th
-site, or a first-empty scan like FUN_0003958c over the CARGO planet. If
-writers stay ambiguous, bank a BLOCKED entry (rewrite already uses the
-picker draw; arrival ranks 4/40 consistent). NOTE t36: terrain law
-closed; NOTE t35: raw-array re-audit.
+PASS. T44 LANDED (CARGO-SLOT CHAIN, docs-only): +0xae writer sweep
+(search_instructions "xae", 31 hits, all handler/UI) resolves the sub-item
+into a CHAIN — EVENT 8 +0xac := FUN_0003a880 PURE coord->slot converter
+(orbital-direct band 13<X<153,119<Y<469 -> surfaceCells + 5*((X-13)/70) +
+(Y-119)/70; fallback FUN_0003a820 decode + FUN_000395c4), EVENT 4 copies
++0xac->+0xae, nothing fires unless <0xffff, legality re-runs FUN_0003830c
+@0x3afed, item '05' branch = owner/pop2/activator @0x3b0d6 = the exact t41
+arrival state; player coords come from the mouse. AI landing COORD chooser
+-> docs/BLOCKED.md (dispatch-site recipe; rewrite picker default stands,
+observation-consistent — CB is rule-G exempt). income-law.md S13.5; gate
+ALL CHECKS PASS (docs-only). NEXT ACTION: AI EVENT DISPATCHER — find
+callers of FUN_0003aa0a (get_xrefs_to 0x3aa0a + dispatcher-table scan for
+the (obj,type,payload) call shape; the decompiled handler shows the
+triple-field event protocol, param_2<9/==3/>=0x33 bands) and locate the AI
+ship-control site that builds type-8 payloads for transports with cargo
+item 5 — that coordinate pick is the AI landing law (closes the t44
+BLOCKED entry). If the dispatch scan fails to bound in ~2 rounds, leave
+BLOCKED (record one line) and move to OQ-024 governor-assignment law
+(@0x38df0 branch, docs/OPEN-QUESTIONS.md line 58) — static route exists.
+NOTE t36: terrain law closed; NOTE t35: raw-array re-audit.
 NOTE t34: DISPLAY-WORD CHANNEL LAW — see income-law.md T34 + commit
 91b90c0 (+0x44 max(1,trunc((v+1)^.85)) 97.98%, +0x46 raw, +0x48
 max(1,PROS-pop>>2) 94.82%; +0x54 = queue id, gov branch dead).
