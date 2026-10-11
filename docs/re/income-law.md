@@ -1853,3 +1853,40 @@ builds only Agriplot/Colony Base). Closing needs a write-verified built
 campaign holding an Orbital Missile Base across >7 turns. rewrite has no
 ability-item code path in campaign mode — no default to upgrade until the
 period is measured; OQ-020 stays OPEN.
+
+
+## T57c — OQ-020 USE-PATH located (FUN_00039c10); counter location + per-use write pinned; amass formula stays open
+
+FUN_00039c10 (EAX = ability-object, EDX/param_2 = query-vs-use flag) calls the
+banked supply routine FUN_00039b6c then:
+- RANGE GATE [verified asm 0x39cae..0x39d40]: callee EBX-out (45/45/90/200)
+  x32 (SHL 5) compared (sqrt via FUN_00076da0) against distance from object
+  position ([obj+0x9e] f32[3]) to the target — the EBX parameter's consumer is
+  located at last: RANGE, not ammo. (45*32=1440 > map extent ~880: range-
+  unbounded in practice for Missile Base/Whoppers [inferred].)
+- CHARGE READ [verified 0x39d55..0x39d64]: remaining counter = slot word+2
+  UPPER BYTE (word [slot+2] SAR 8), gated by the callee p4-out (1/3/3/2)
+  being non-zero. p3-out (7/8/0) initialises the usable flag (0x39d44..
+  0x39d7f OR-into [obj+0x73]).
+- USE (param_2==1 only) [verified tail 0x39ec4..0x39eeb]: if counter > 0:
+  slot byte3 := 0 and word+2 |= (counter-1) << 8; separately a parallel
+  countdown dword at ability-object +0x70 is decremented when positive
+  (decompile tail). param_2==0 callers (order issuer FUN_00041e34 @0x427d1,
+  one UI path) are pure queries — no write.
+- Callers passing use=1: 0x16e1d (UI event handler region, after event
+  dispatch FUN_00049f28), 0x25579, 0x16eee; plus FUN_00039c10's own tail
+  feeds result byte [obj+0x73] bit0 back to callers (@0x427d6 TEST).
+
+OR-SEMANTICS HAZARD [flagged, NOT resolved]: both writers to word+2 hi are
+OR (top-up @0x38ff2..0x38fff and per-use @0x39eeb). OR-ing (c-1) over c is a no-op
+whenever bits(c-1) subset bits(c) (7->6 leaves 7). So the per-turn top-up OR
+in FUN_00038f68 restores FULL counter every turn (6|7==7), and the per-use
+write may be a bit-MASK idiom, not an arithmetic decrement. Whether the
+counter is monotone ammo, a bitmask, or a once-per-turn usable flag is NOT
+decidable statically at this granularity and the corpus has ZERO flag&4
+slots (T49) to observe. OQ-020 STAYS OPEN; the "%d day%s" amass-wait number
+is most plausibly the +0x70 countdown or EBX-derived (45/90/200), formula
+unmeasured — do NOT wire any of this into rewrite.
+
+STATE NOTE: OQ-006 was already CLOSED (2026-10-07 rate chain); a stale NEXT
+line pointing at it was corrected this turn.

@@ -64,7 +64,8 @@ advance() {
   esac
 }
 ADV=0
-while [ $ADV -lt 6 ]; do
+MAX_ADV="${MAX_ADV:-6}"
+while [ $ADV -lt "$MAX_ADV" ]; do
   [ -n "$GEO" ] || break
   before=$T0
   advance

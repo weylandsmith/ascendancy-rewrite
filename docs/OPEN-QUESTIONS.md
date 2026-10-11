@@ -104,6 +104,13 @@ ITEM-table flag&4 population == exactly those 4 rows [verified battery]
 Decrement period still unmeasured: corpus census zero flag&4 slots
 (T49 law); capture-gated. Default 30 turns stays (no rewrite code path).
 income-law.md T57b;
+T57c: USE path located (FUN_00039c10 tail 0x39ec4..0x39eeb: use=1 only,
+counter=word+2 hi [SAR8 @0x39d61], write word+2 |= (c-1)<<8 OR-semantics
+HAZARD flagged — top-up OR in FUN_00038f68 may make the per-use write a
+no-op/mask, monotone-ammo reading NOT decidable statically; EBX-out 45/45/
+90/200 consumer LOCATED = range gate x32 vs distance (0x39cae..0x39d40);
+p4-out gates counter read; parallel countdown dword at ability-object+0x70.
+Amass-wait formula UNMEASURED — OQ-020 stays OPEN, nothing wired.
 remaining: obj1 call-edge of the help formatter, or
 controlled-mutation capture; default 30 turns stays in force.
 OQ-005 | shp | .shp pixel codec (container CLOSED 208/208) | open | W3 ONLY:
