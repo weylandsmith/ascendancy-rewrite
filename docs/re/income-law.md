@@ -1634,3 +1634,25 @@ table RAM join attempt timed out with naive chain scan — harness recipe
 OQ-016 stays open (residues: leak attribution; +0x45 semantics; the
 turnloop.md §3 logistic text is STALE — pop law closed t24, counter
 semantics implemented; text fix queued next turn with the code-comment).
+
+
+### T54b probe (round-2 of the T54 lead, budget spent) — preset tables are IMAGE constants, not file-loaded
+
+- Signature grep of the ENTIRE extracted corpus (all files, exact 32-byte
+  patterns of both tables): ZERO hits. Within the restored image: exactly
+  one hit each (0x88f90, 0x88fe4). Within t53 session RAM: one copy each
+  (image-mapped). [verified negative] The 21+21-dword preset blocks ship
+  compiled into the EXE — no .txt/.dat scenario row feeds them; the
+  scenario-row-override HYPOTHESIS as stated (file-driven per-world rows)
+  is REFUTED for these two tables. Any per-world selection happens in code
+  via the guard field, not in data.
+- Raw asm around the draw sites corroborates banked T36 verbatim:
+  0x23a86 CALL rng; 0x23a8d MOV EBX,0x5; IDIV — then 0x23a97 CALL rng;
+  0x23aa0 MOV ECX,0xb; 0x23aa8 IDIV — two back-to-back draws, %5 then %11
+  (size, row per T36). CMP [ESP+0x108],0 / JL follows the row draw (the
+  found-index branch of the scenario-entry scan).
+- T36d attribution (WHICH worlds get the preset copy) now reduces purely to
+  the guard-field semantics at the copy branch (stack-relative slots
+  ambiguous in Ghidra output; decompiler showed [0x3e]==[0x45] with the
+  pointer half always-true). Static route EXHAUSTED per budget; ride t51
+  step-2 session (correlate generated grids vs a fresh scenario draw there).

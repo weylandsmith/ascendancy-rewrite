@@ -279,8 +279,10 @@ recipe banked; rewrite default = picker draw, observation-consistent);
 REMAINING: extreme-row leak MECHANISM FOUND t54, attribution open —
 FUN_000238e8 copies 21+21 preset dwords (DAT_00088f90 weights 2..4,
 DAT_00088fe4 1..10) into the per-planet gen buffer when control field 0x45
-matches (income-law.md T54); WHICH worlds = field-0x45 semantics +
-scenario-table join (join retry recipe BLOCKED t54, rides t51 step 2).
+matches (income-law.md T54); T54b CLOSED file-provenance: tables are
+COMPILED image constants (zero corpus signature hits), scenario-FILE
+override hypothesis REFUTED — attribution is guard-field semantics only,
+statics exhausted, rides t51 step 2 (fresh-scenario grid correlation).
 Row0 98.9 vs 99.997, row10 c1 1.6 vs 0.006 unchanged. +2/+2 residual minutiae RESOLVED t33
 (the paired +-2 class, the skip-CB model-C preference, and the live-RAM
 read requirement are all VOID — one wrong array offset; rewrite UPGRADED
