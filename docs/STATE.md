@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-11T12:05
+updated: 2026-10-11T12:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -173,30 +173,25 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T55 IN FLIGHT + PRESET GUARD LAW CLOSED (income-law.md T55;
-REFUTED-ROUTES R13: vision unavailable, geometry from windows.txt only):
-raw asm 0x23ab2..0x23af5 verbatim — preset copy guard = scenario-match
-found (0x108>=0) AND (rng%size == within-group index); copies 21 dwords
-A -> buffer+0, 21 dwords B -> buffer+84 (post-copy loop reads exactly those
-windows @0x23aeb/0x23af1 banked raw). Uniform 1/size NOT systematic row bias
--> T36d needs the capture correlation. RUN r1ad-20261011-102543: campaign
-ENTERED t114 (grid-hash law), outer r1_step2_drive.sh relaunched (race fix:
-turns.log lags first checkpoint); End-Turn candidates A=(511,67) B=(511,413)
-from windows.txt NEXTTURN 474/52/548/82 [file-verified geometry, mapping
-unverified — turn-counter-verified selection], 6 turn advances planned,
-checkpoints bracket every click. RUN DONE + PARSED (income-law.md T55 RUN RESULTS): End-Turn clicks died
-to synthetic flakiness ((511,67) worked run 20261006-131350 turn 0->2,
-inert today; BLOCKED t55 retry recipe incl key-Return fallback). Idle value
-banked: 5th-campaign pop=2 + cap==seed+2 + one-CB 4/4 on the +0x88 law;
-fresh acc0 -> stored [1,0,1] = the S6 idle-home residual pattern
-(candidate-(b) load-staleness weighs OUT, [inferred] only); +0x0e CORRECTED
-= type class NOT scenario row, and the row index is NEVER STORED -> T36d
-per-world attribution unrecoverable from saves (replay-only, deferred).
-NEXT: ONE bounded End-Turn retry per BLOCKED t55 recipe (25 s spacing x8,
-key Return once); advance -> per-turn channel-delta parse closes OQ-016
-income-application; dead -> final BLOCKED line, pivot OQ-012(a) glyph lift
-(zero-capture static). Do NOT re-run today's idle capture; do NOT
-re-decompile the gen driver.
+T56 LANDED + CORRECTED (PER-TURN BRACKET PARSE, income-law.md T56/T56b;
+BLOCKED t55 CLOSED): End-Turn (511,67) works-but-flaky (advance try 3, then
+6/6 at 25 s); channel words +0x44/+0x46/+0x48 = RATES not stockpiles
+(verified across all 19 ck); growth tick player +PROS / AI +PROS+1 fresh
+40/40 (t24 law re-measured); word +0x52 = CELL INDEX NOT item id (corpus
+0..59 > 39 items; S10 map confirmed) — mid-turn correction of an earlier
+wrong reading; FRESH-RUN AI opening build = AGRIPLOT (+0x54 := 0x01) 4/4
+thin; c1c -1 co-occurrence with queue flip 4/4 (cell reservation at queue
+time [inferred]); T56b per-pair offset census + heap BASE-DRIFT hazard law
+(never one absolute base across a session's checkpoints). Player home sits
+at RECORD 89 — parsers must scan 151.
+NEXT: OQ-012(a) size-option glyph lift (zero-capture static route, listed
+open; check REFUTED-ROUTES first). Do NOT re-run t56 capture; parser
+r1_turn_delta.py banked (turns.log 3-field format).
+PRIOR T55+T55b LANDED (PRESET GUARD LAW income-law T55: copy iff
+scenario-match AND rng%size==within-group index, uniform not row-bias; RUN
+PARSE T55b: 5th-campaign pop=2/cap==seed+2/one-CB 4/4, acc0->stored[1,0,1]
+fresh; +0x0e = type class NOT row; row never stored -> T36d save-
+unrecoverable replay-only; REFUTED R13 vision unavailable).
 PRIOR T45 LANDED (SELECTED-ABILITY / GOVERNOR BRANCH CLOSED, income-law.md S14):
 branch @0x38df0..0x38e29 pinned verbatim; the [0x743b9]>>0x18 operand IS
 item-table UPOP(35) (row base 0x73e40+35*0x28=0x743b8, runtime value 1

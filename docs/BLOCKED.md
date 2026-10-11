@@ -226,6 +226,10 @@ the t51 capture session (step 2), never as a standalone idle probe.
 
 
 ## t55 — synthetic End-Turn click flakiness blocks step-2 turn advance (driver ready)
+CLOSED t56: recipe worked exactly as designed — (511,67) advanced on try 3
+of 8 in run r1ad-20261011-110013 (2 inert tries first = flakiness, then 6
+clean 1-turn advances). Treat End-Turn as WORKING-but-flaky: always verify
+per click (turn counter), always allow >=3 tries at 25 s spacing.
 (511,67) advanced turns in run 20261006-131350 (three clicks, turn 0->2)
 but did nothing in 20261011-102543 (3 clicks, both frame candidates). Same
 flakiness law as the 2026-10-05k title-click note; NOT a geometry refutation.

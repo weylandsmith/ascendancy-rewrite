@@ -276,7 +276,14 @@ drawItemCell); CARGO-SLOT CHAIN CLOSED t44 (placement = EVENT 4 +0xae
 from EVENT 8 FUN_0003a880 coord->slot converter, rule-G re-gated — income-law.md
 S13.5); AI LANDING-COORD CHOOSER OPEN -> docs/BLOCKED.md (dispatch-site
 recipe banked; rewrite default = picker draw, observation-consistent);
-REMAINING: extreme-row leak MECHANISM FOUND t54, attribution open —
+PER-TURN BRACKET LAWS t56 (r1ad-20261011-110013 turns 0..8, full-151
+window): channel words +0x44/46/48 are RATES not stockpiles (unchanged
+8 turns idle, all worlds); growth tick measured at turn resolution —
+player world counter +=1/turn == stored PROS, AI worlds +=2 (PROS+1 alien
+term) 40/40 — t24 law re-verified fresh; AI homes queue at first End Turn
+(0xFFFF->id, cell c1c -1 co-occurrence 4/4, ids banked un-named), player
+home never queues. income-law.md T56; rewrite model structurally matches,
+no code change. REMAINING: extreme-row leak MECHANISM FOUND t54, attribution open —
 FUN_000238e8 copies 21+21 preset dwords (DAT_00088f90 weights 2..4,
 DAT_00088fe4 1..10) into the per-planet gen buffer when control field 0x45
 matches (income-law.md T54); T54b CLOSED file-provenance: tables are
@@ -304,7 +311,8 @@ never fires in corpus (byte always queue id) -> OQ-024 |
 income law docs/re/income-law.md S6..S10; harness scripts/r1_income_
 channels.py; chase-capture law = deep-schedule End-Turn clicks 511:67
 every 15s, save ring read by MTIME. Governor @+0x54 CLOSED t45 (S14:
-same field as queue; fires only on special-item cell-SELECT; 0/2810).
+same field as queue; fires only on special-item cell-SELECT; 0/2810). T56: fresh-run AI opening queue = Agriplot (+0x54=0x01) 4/4 thin; word
++0x52 = CELL INDEX not item id (corpus 0..59>39, income-law T56).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

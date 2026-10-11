@@ -1733,3 +1733,77 @@ only a campaign-LCG replay replaying draw order per world could attribute
 the one preset world per group. That build is deferred (BLOCKED t55);
 T36d closes as 'mechanism + guard law banked; per-world attribution
 unrecoverable from data, replay-only' — leak NUMBERS stay banked either way.
+
+
+## T56 — PER-TURN BRACKET PARSE (r1ad-20261011-110013, turns 0..8, 19 ck): income-APPLICATION facts
+
+Campaign entered t≈114 grid-hash; End-Turn (511,67) ACQUIRED try 3, then
+6 clean advances (driver r1_step2_drive.sh; parser r1_turn_delta.py; FULL
+151-record window — the player home sits at record 89, a 78-window parse
+misses it, corrected mid-turn before any conclusion).
+
+1. GROWTH TICK AT TURN RESOLUTION [verified 40/40 records-turns]: growth
+   counter (+0x4e) delta per End Turn == stored PROS (+0x48) on the PLAYER
+   world exactly, == stored PROS + 1 on EVERY AI world (PROS=1 throughout:
+   player +1/turn, AI +2/turn). This is the t24 law (counter += stored
+   PROS; +1 iff owner != current-turn player AND PROS < 4) measured fresh
+   at one-turn resolution — recalc evidently runs once per End Turn with
+   the session player as turn-owner [inferred]. No wraps (counter max 16
+   of threshold 50); pop constant 2 (caps 16..31). rewrite growthPhase
+   matches (no code change).
+2. CHANNEL WORDS ARE RATES, NOT STOCKPILES [verified]: stored IND/RES/PROS
+   (+0x44/+0x46/+0x48) UNCHANGED turn-to-turn on all 5 idle-bracket worlds
+   across 8 turns. Per-turn income does NOT accumulate into the planet
+   record; accumulation is the per-queue build accumulator (t28 law
+   @0x39005) and empire-side stockpile. The rewrite's global ind_[]
+   vector + per-queue buildAcc is the structurally matching model.
+3. AI OPENING BUILD QUEUES [verified]: at the FIRST End Turn all 4 AI
+   homes flipped word +0x52 0xFFFF -> a CELL INDEX (observed 49, 1, 52, 10)
+   with byte +0x54 := 0x01 (Agriplot) and word +0x53 := 0; the PLAYER home
+   stayed 0xFFFF (manual control has no queue). WORD +0x52 IS A SLOT/CELL
+   INDEX, NOT AN ITEM ID [verified]: full-corpus census 35 runs x 1444
+   owned records gives idle 0xFFFF 1032, values 0..59 including 63
+   out-of-table (>38 = item count) — impossible for item ids, exactly the
+   cell-rank space; matches the banked S10 field map (+0x52 selected/
+   pending cell, +0x54 activated item index written @0x38b26, completions
+   clear +0x52 := 0xFFFF t39). An earlier same-turn reading of these flips
+   as "item ids 0x31/0x34" was WRONG and is corrected here. FRESH-RUN AI
+   OPENING ITEM = AGRIPLOT 4/4 (one run — thin population, noted).
+   EXACT CORRELATION [verified]: empty->pending co-occurred with c1c
+   (empty-buildable count) 72->71 (43->42) on exactly those 4 records and
+   nowhere else — queue-time cell selection reserves the cell, consistent
+   with the T43 picker + t44 EVENT-4 +0xae placement chain [inferred
+   semantics; reservation-vs-completion timing not separated by this
+   cadence — autosave granularity].
+4. END-TURN GEOMETRY CLOSED: (511,67) confirmed working (advance on try 3
+   after two inert; then every 25 s click advanced exactly one turn, 6/6)
+   — geometry law banked, flakiness law stands; BLOCKED t55 recipe CLOSED.
+
+
+## T56b — CONSECUTIVE-CHECKPOINT OFFSET CENSUS (20 pairs, run 110013) + BASE-DRIFT HAZARD
+
+Offsets that changed between CONSECUTIVE checkpoints (owned records):
++0x00/+0x01/+0x02/+0x08..+0x0b name/coordinate region (new colonies being
+named — consistent with fresh settlements claiming rows); +0x42 pop; +0x4c
+word 1->2 (n=4); +0x4e growth counter (0->2 x4, 2->4 x4); +0x50 word +1 x3;
++0x52 word 0xFFFF -> {0x0a, 0x34, 0x31, 0x1e-ish} x4 with +0x53->0 and
++0x54 byte 0xFF->0x01 simultaneously x4.
+
+PENDING-COMPLETION CADENCE [weak, n=4]: the simultaneous triple (word+0x52
+leaves 0xFFFF, +0x53:=0, byte+0x54:=0x01) is the pending-item firing
+signature; word+0x50 incrementing by 1 alongside suggests word+0x50 counts
+turns since/for queue events. NOT yet law: n=4, item identities unresolved
+(see hazard below), and the completion-gate FUN_000394d8 (S9) already
+cites the authoritative mechanism. Logged as corroborating observation.
+
+BASE-DRIFT HAZARD (harness law): within ONE dosbox session the heap base
+MOVES. Re-reading ck019 of run 110013 via the name-anchored absolute base
+returned owner 0xFF on worlds the per-pair census had owned, and a garbage
+item-table (runtime table +0x0a name fields = pointers into the flat image,
+NOT inline text; item_table() inline-text reading failed names_ok — the
+t45 name-pointer law applies here too). Consequences:
+(a) census-style laws must use PER-PAIR aligned reads (this census), never
+    a single absolute base across a session's checkpoints;
+(b) item identity resolution is MOOT for this run's +0x52 values: T56(3)
+    established +0x52 is a CELL INDEX (values 0..59 > item count 39); the
+    activated item is byte +0x54 (=0x01 Agriplot 4/4), read directly.

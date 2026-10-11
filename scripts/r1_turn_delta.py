@@ -27,7 +27,7 @@ def owned_view(mem, pay):
     H = v.most_common(1)[0][0] - 0x1BF450
     base = 0x26d07b + H - 0x24
     out = {}
-    for i in range(78):
+    for i in range(151):
         b = base + 123 * i
         owner = mem[b + 0x57]
         if owner == 0xFF:
@@ -51,8 +51,11 @@ def main():
     turn_lines = []
     for line in open(os.path.join(run, "turns.log")):
         parts = line.split()
-        if len(parts) >= 4 and parts[2] == "turn":
-            turn_lines.append((int(parts[3]), os.path.basename(parts[0])))
+        if len(parts) >= 3 and parts[1] == "turn":
+            try:
+                turn_lines.append((int(parts[2]), os.path.basename(parts[0])))
+            except ValueError:
+                pass  # TORN / NOBASE lines
     views = {}
     for t, slot in sorted(turn_lines):
         ckn = slot2ck.get(slot)
