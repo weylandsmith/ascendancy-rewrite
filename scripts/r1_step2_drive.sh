@@ -35,25 +35,39 @@ for i in $(seq 1 15); do T0=$(turn_now); [ -n "$T0" ] && break; sleep 4; done
 log "entered; baseline turn=${T0:-none}"
 [ -n "${T0:-}" ] || { log "FAIL: turn counter unreadable after 60s"; touch "$SHOT"; exit 1; }
 
-# phase 2: acquire End-Turn geometry
-CAND_A="511 67"; CAND_B="511 413"; GEO=""
-for cand in "$CAND_A" "$CAND_B"; do
-  send_click $cand
-  # turn advance shows up in the NEXT autosave: allow ~75 s
+# phase 2: acquire End-Turn per BLOCKED t55 recipe: (511,67) 25 s apart x8,
+# then ONE key Return; B-frame once only if both above died.
+GEO=""; TRIES=0
+while [ $TRIES -lt 8 ]; do
+  send_click 511 67; TRIES=$((TRIES+1))
   j=0
-  while [ $j -lt 8 ]; do sleep 10; j=$((j+1)); t=$(turn_now); [ "${t:-0}" -gt "$T0" ] && break; done
+  while [ $j -lt 2 ]; do sleep 10; j=$((j+1)); t=$(turn_now); [ "${t:-0}" -gt "$T0" ] && break; done
   t=$(turn_now)
-  if [ "${t:-0}" -gt "$T0" ]; then GEO="$cand"; T0=$t; log "ENDTURN acquired at (cand $cand) turn $t"; break; fi
-  log "cand ($cand) no turn advance (turn=${t:-?})"
+  if [ "${t:-0}" -gt "$T0" ]; then GEO="511 67"; T0=$t; log "ENDTURN acquired at (511,67) try $TRIES turn $t"; break; fi
+  log "try $TRIES (511,67): no advance (turn=${t:-?})"
+  sleep 5
 done
-[ -n "$GEO" ] || log "BOTH EndTurn candidates failed; idle checkpoints still useful"
+if [ -z "$GEO" ]; then
+  printf 'Return\n' > "$OUT/cmd_key"; wait_cmd "$OUT/cmd_key"
+  j=0
+  while [ $j -lt 4 ]; do sleep 10; j=$((j+1)); t=$(turn_now); [ "${t:-0}" -gt "$T0" ] && break; done
+  t=$(turn_now)
+  if [ "${t:-0}" -gt "$T0" ]; then GEO="KEY Return"; T0=$t; log "ENDTURN acquired via key Return turn $t"; fi
+fi
+[ -n "$GEO" ] || log "ALL EndTurn attempts failed (clicks x$TRIES + key); idle checkpoints only"
 
-# phase 3: advance turns
+# phase 3: advance turns (dispatch click vs key by acquired GEO mode)
+advance() {
+  case "$GEO" in
+    "KEY Return") printf 'Return\n' > "$OUT/cmd_key"; wait_cmd "$OUT/cmd_key" ;;
+    *) send_click $GEO ;;
+  esac
+}
 ADV=0
 while [ $ADV -lt 6 ]; do
   [ -n "$GEO" ] || break
   before=$T0
-  send_click $GEO
+  advance
   j=0
   while [ $j -lt 8 ]; do sleep 10; j=$((j+1)); t=$(turn_now); [ "${t:-0}" -gt "$before" ] && break; done
   t=$(turn_now)
