@@ -120,4 +120,5 @@ def main():
     for k, v in sorted(tally.items()): print(f"  {k}: {v}")
     for d in details[:40]: print("  -", *d)
 
-main()
+if __name__ == "__main__":
+    main()

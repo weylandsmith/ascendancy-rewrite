@@ -126,7 +126,12 @@ the FUN_0001fa60 resource-table slots. t61 DECODER LOCATED: FUN_0005caac
 shape blit + control-byte RLE grammar (S9, from raw asm); cache module
 FUN_0001fc34/FUN_00020acc mapped. Validation: rec0 grammar well-formed
 198/208, full exact-span 27/208; rec1+ stream-start ambiguity OPEN —
-live-RAM anchor queued. NOT closed; no rewrite change yet.
+live-RAM anchor t62 done (S10): cache payload = VERBATIM whole-library
+copy [measured, ck RAM 0x3cd768 == file byte 0], so codec input IS the
+file layout; no runtime shape structs exist for raw libs (scan null),
+per-record stream start not RAM-anchored; t62b lead banked: runtime
+built-shape header dword = 0x22, draw-time parser = unique
+FUN_0001fc34 caller FUN_00031384. NOT closed; no rewrite change yet.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge

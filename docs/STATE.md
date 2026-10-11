@@ -230,4 +230,12 @@ banked ck heap spans for loaded-shape run patterns (e.g. listbox stream
 bytes) to pin per-record stream start; then full-corpus revalidation; then
 REWRITE upgrade (PNG/sample renderer decision per shp.md S6 — rendering
 before codec closure fabricates pixels; after closure it is legitimate).
+t62 live-RAM anchor (shp.md S10): cache payload = VERBATIM whole-library
+file copy (constant-delta image match ck113); runtime shape structs DO NOT
+exist in RAM (negative) — [ptr][W-1][H-1] assembled per draw (widget
+descriptor law: array +0x6d, u16 count +0xa1, stride 0x0d, type byte0,
++5 u32 -> FUN_0001fc34 -> FUN_0005caac). Payload-array base offsets from
+regparm decompiles NOT trustworthy (ASCII-hit artifact banked; t61 slot-
+flag readings VOID). CONCRETE: raw asm 0x3144a..0x31470 arg order +
+FUN_00031660 to pin dims/pixel-ptr provenance, then corpus revalidation.
 OQ-005 stays OPEN until revalidated across corpus.

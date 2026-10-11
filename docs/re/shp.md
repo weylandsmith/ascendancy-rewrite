@@ -290,3 +290,108 @@ banked ck heap span contains loaded shape data (grep a distinctive run
 pattern like '7f ff 2e f2' law from listbox stream) — a live-RAM anchor
 closes prefix ambiguity; else OQ-005 stays OPEN (27/208 != closure;
 strict-close).
+## 10. W3 round 5 (t62): live-RAM cache anchor — cache = VERBATIM whole-library copies [measured]; stream-start NOT pinned (no runtime shape structs exist for raw libs)
+
+Method: ck113.sav Memory (run r1ad-20261011-132306) searched for path
+fragments, then file images, then struct heuristics.
+
+1. CACHE NAME TABLE LIVE [verified]: registered names present as printed
+   strings — templates 'DATA\SMRACE%02d.SHP' family @0x242bdc..0x242c18
+   (boot data copy) and FORMATTED results 'DATA\SMRACE00.SHP', LGRACE00/
+   19/09/13/02, SMSHIP..., DKSHIP..., plus data\smrace05.shp lowercase
+   style, data\gizmos/planets/raceflag/racering/smhome/listbox/smraces,
+   DATA\0OPENING/1STARMAP/3CFGNEW/7RACESEL/8SHIPDES/13NEGOT/16BATTLE/
+   20RES.SHP, DATA\TESTDLG.SHP. 148/200 slots populated in the stride-
+   0x32 name-array reading (names at 0x2e1964 + idx*0x32; decompile law
+   ctx+2000+idx*0x32 consistent with ctx=0x2e1194 for the NAME region).
+   RACES PRESENT 00,19,09,13,02,05,06 = 7 races (cosmos scenario).
+2. PAYLOAD = RAW VERBATIM FILE [verified]: 14intel.shp file image present
+   contiguously in ck RAM; every probed record region (all 10 records,
+   multiple prefix offsets incl. rec0 stream @file 112) maps at CONSTANT
+   delta buf=0x3cd768. Whole-library raw copy, exactly the FUN_00020acc
+   chunk-read law. Library buffers pack consecutively in heap (next magic
+   '1.10' follows the 14intel image end).
+3. NO RUNTIME SHAPE STRUCTS for cached raw libs [measured negative]:
+   heap-wide scan for dword == buf+start+pfx with following u16 plausible
+   W-1,H-1 found ZERO for pfx in {4,8,12,16} and all 10 records. The
+   [ptr][W-1][H-1] blit struct is TRANSIENT — built at draw time from the
+   raw payload, never cached. So the rec1+ stream-start question cannot be
+   answered from save-state RAM; it lives in the draw-time record parser.
+4. LAYOUT RESIDUAL: payload-pointer array base NOT resolved from RAM —
+   both candidate reads (decompile 'ctx+idx*4' at ctx=0x2e1194) hit ASCII
+   ('DATA' = 0x41544144 at +41*4), meaning param_1 in
+   FUN_0001fc34/0x1fc34-model != name-region-derived ctx (register-merge
+   artifacts in decompilation of this regparm module). Do NOT trust the
+   +4/+800/+0x640 offsets as literal ctx bases until re-derived from raw
+   asm. Slot flag byte read earlier (raw[ctx+0x7cd+4*i]) used WRONG STRIDE
+   (0x32 slots, not 4) — flag values quoted at t61 turn are VOID.
+5. HARNESS: r1_shp_decode_law.py main() ran at import (fixed this turn,
+   guarded). parse() takes a PATH not bytes.
+
+QUEUED (sharpened): WIDGET DESCRIPTOR LAW observed in FUN_00031384
+[verified structure]: widget object fields +0x6d (descriptor array ptr),
++0xa1 (u16 count); entries stride 0x0d; byte0: 0 = solid fill
+(FUN_00031660), 1 = shape draw. Shape-draw entry fields: +5 u32, +7/+9
+u16s; the +5 u32 feeds FUN_0001fc34 and the returned payload flows into
+FUN_0005caac. The blit struct [ptr][W-1][H-1] is thus ASSEMBLED PER DRAW
+(raw-struct absence in RAM explained). NEXT micro-step: raw asm of
+0x3144a..0x31470 (arg order of FUN_0001fc34 and FUN_0005caac calls —
+regparm decompile merges regs; which value is slot-index vs struct ptr)
+and FUN_00031660; then decompile FUN_0005ceb0 (full-rect path) if needed.
+That pins where W-1/H-1/pixel-ptr come from for cached raw libraries:
+either directly at record start inside the payload (dims at record+0) or
+via the widget descriptor +5 field pointing at a dims-pair. OQ-005 stays
+OPEN until that read + corpus revalidation.
+
+## 10. W3 round 5 (t62): live-RAM cache anchor — cache = VERBATIM whole-library copies [measured]; stream-start NOT pinned (no runtime shape structs exist for raw libs)
+
+Method: ck113.sav Memory (run r1ad-20261011-132306) searched for path
+fragments, then file images, then struct heuristics.
+
+1. CACHE NAME TABLE LIVE [verified]: registered names present as printed
+   strings — templates 'DATA\SMRACE%02d.SHP' family @0x242bdc..0x242c18
+   (boot data copy) and FORMATTED results 'DATA\SMRACE00.SHP', LGRACE00/
+   19/09/13/02, SMSHIP..., DKSHIP..., plus data\smrace05.shp lowercase
+   style, data\gizmos/planets/raceflag/racering/smhome/listbox/smraces,
+   DATA\0OPENING/1STARMAP/3CFGNEW/7RACESEL/8SHIPDES/13NEGOT/16BATTLE/
+   20RES.SHP, DATA\TESTDLG.SHP. 148/200 slots populated in the stride-
+   0x32 name-array reading (names at 0x2e1964 + idx*0x32; decompile law
+   ctx+2000+idx*0x32 consistent with ctx=0x2e1194 for the NAME region).
+   RACES PRESENT 00,19,09,13,02,05,06 = 7 races (cosmos scenario).
+2. PAYLOAD = RAW VERBATIM FILE [verified]: 14intel.shp file image present
+   contiguously in ck RAM; every probed record region (all 10 records,
+   multiple prefix offsets incl. rec0 stream @file 112) maps at CONSTANT
+   delta buf=0x3cd768. Whole-library raw copy, exactly the FUN_00020acc
+   chunk-read law. Library buffers pack consecutively in heap (next magic
+   '1.10' follows the 14intel image end).
+3. NO RUNTIME SHAPE STRUCTS for cached raw libs [measured negative]:
+   heap-wide scan for dword == buf+start+pfx with following u16 plausible
+   W-1,H-1 found ZERO for pfx in {4,8,12,16} and all 10 records. The
+   [ptr][W-1][H-1] blit struct is TRANSIENT — built at draw time from the
+   raw payload, never cached. So the rec1+ stream-start question cannot be
+   answered from save-state RAM; it lives in the draw-time record parser.
+4. LAYOUT RESIDUAL: payload-pointer array base NOT resolved from RAM —
+   both candidate reads (decompile 'ctx+idx*4' at ctx=0x2e1194) hit ASCII
+   ('DATA' = 0x41544144 at +41*4), meaning param_1 in
+   FUN_0001fc34/0x1fc34-model != name-region-derived ctx (register-merge
+   artifacts in decompilation of this regparm module). Do NOT trust the
+   +4/+800/+0x640 offsets as literal ctx bases until re-derived from raw
+   asm. Slot flag byte read earlier (raw[ctx+0x7cd+4*i]) used WRONG STRIDE
+   (0x32 slots, not 4) — flag values quoted at t61 turn are VOID.
+5. HARNESS: r1_shp_decode_law.py main() ran at import (fixed this turn,
+   guarded). parse() takes a PATH not bytes.
+
+QUEUED (sharpened): WIDGET DESCRIPTOR LAW observed in FUN_00031384
+[verified structure]: widget object fields +0x6d (descriptor array ptr),
++0xa1 (u16 count); entries stride 0x0d; byte0: 0 = solid fill
+(FUN_00031660), 1 = shape draw. Shape-draw entry fields: +5 u32, +7/+9
+u16s; the +5 u32 feeds FUN_0001fc34 and the returned payload flows into
+FUN_0005caac. The blit struct [ptr][W-1][H-1] is thus ASSEMBLED PER DRAW
+(raw-struct absence in RAM explained). NEXT micro-step: raw asm of
+0x3144a..0x31470 (arg order of FUN_0001fc34 and FUN_0005caac calls —
+regparm decompile merges regs; which value is slot-index vs struct ptr)
+and FUN_00031660; then decompile FUN_0005ceb0 (full-rect path) if needed.
+That pins where W-1/H-1/pixel-ptr come from for cached raw libraries:
+either directly at record start inside the payload (dims at record+0) or
+via the widget descriptor +5 field pointing at a dims-pair. OQ-005 stays
+OPEN until that read + corpus revalidation.
