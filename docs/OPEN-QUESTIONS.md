@@ -243,9 +243,12 @@ earliest-observation method resolved; scripts/r1_colony_items.py; rewrite
 seedColonyBaseColony + member worldLcg_); CB-CELL DRAW CLOSED t42 (picker
 FUN_0003875c uniform among checker-legal empties; CB legal on all non-rock
 surface incl. barren — income-law.md S12, KS PASS 72 homes; rewrite
-drawCbCell); REMAINING: built-item (non-CB) cell
-selection mechanism (envelope measured, [unver-
-ified]); extreme-row leak banked unexplained
+drawCbCell); BUILT-ITEM CELL LAW CLOSED t43 (picker ignores caller slot —
+all 16 EBX=0 build sites are uniform draws; rule G active-neighbour adjacency
+CONFIRMED 0/362 final-state violations on continuous-x hex geometry from
+fingerprint-anchored runtime tables — income-law.md S13; rewrite
+drawItemCell; sub-item OPEN: cargo-slot chooser upstream of +0xae);
+REMAINING: extreme-row leak banked unexplained
 (row0 98.9 vs 99.997, row10 c1 1.6 vs 0.006 — scenario-row-override
 hypothesis, income-law.md T36d). +2/+2 residual minutiae RESOLVED t33
 (the paired +-2 class, the skip-CB model-C preference, and the live-RAM

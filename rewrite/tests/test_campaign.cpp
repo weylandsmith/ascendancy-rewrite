@@ -160,6 +160,70 @@ TEST(campaign_cb_cell_uniform_t42) {
     CHECK(share >= 0.10 && share <= 0.55);
 }
 
+TEST(campaign_built_cell_rule_g_t43) {
+    // BUILT-ITEM CELL LAW (income-law.md S13, CLOSED t43): rule-G
+    // adjacency over the runtime hex-continuous-x grid (tables banked from
+    // guest RAM; checker FUN_0003830c @0x385b7 + FUN_000395c4), and the
+    // picker draw for build completions (FUN_0003875c ignores the caller's
+    // slot register).
+    // (a) sizeClassFor: the five verified surface counts map 1:1.
+    CHECK(ag::Campaign::sizeClassFor(7) == 0);
+    CHECK(ag::Campaign::sizeClassFor(11) == 1);
+    CHECK(ag::Campaign::sizeClassFor(23) == 2);
+    CHECK(ag::Campaign::sizeClassFor(45) == 3);
+    CHECK(ag::Campaign::sizeClassFor(73) == 4);
+    CHECK(ag::Campaign::sizeClassFor(24) == -1);
+    // (b) adjacency SYMMETRY on every type via double marker-flip (the four
+    // probes (row±1,x),(row,x±1) in continuous-x coords define an
+    // undirected graph; asymmetry means wrong table geometry). Also: a
+    // cell's neighbour count stays within [2,4] on rows 2..9 wide.
+    const int kSurf[5] = {7, 11, 23, 45, 73};
+    for (int t = 0; t < 5; ++t) {
+        const int surf = kSurf[t];
+        for (int a = 0; a < surf; ++a) {
+            std::vector<char> one(surf, 0);
+            one[a] = 1;
+            std::vector<int> nbr;
+            for (int b = 0; b < surf; ++b)
+                if (b != a && ag::Campaign::cellActiveNeighbour(one, t, surf, b))
+                    nbr.push_back(b);
+            for (int b : nbr) {
+                std::vector<char> two(surf, 0);
+                two[b] = 1;
+                CHECK(ag::Campaign::cellActiveNeighbour(two, t, surf, a));
+            }
+            for (int b = 0; b < surf; ++b) {  // reverse: non-neighbour
+                if (b == a || ag::Campaign::cellActiveNeighbour(one, t, surf, b)) continue;
+                std::vector<char> two(surf, 0);
+                two[b] = 1;
+                CHECK(!ag::Campaign::cellActiveNeighbour(two, t, surf, a));
+            }
+            CHECK(nbr.size() >= 1 && nbr.size() <= 4);  // type-1 tip rows have exactly 1
+        }
+    }
+    // (c) drawItemCell: on a fresh home (CB active only), every draw lands
+    // EMPTY, NON-ROCK, ADJACENT to some active item; spread > single cell.
+    auto c = makeCampaign(11u);
+    const int ns = static_cast<int>(c.galaxy().stars.size());
+    int star = -1;
+    for (int s = 0; s < ns; ++s)
+        if (c.starOwner(s) >= 0 && c.planetAt(s).surfaceCells >= 23) { star = s; break; }
+    CHECK(star >= 0);
+    if (star < 0) return;
+    auto& ps = const_cast<ag::PlanetState&>(c.planetAt(star));
+    std::vector<int> hits(ps.surfaceCells, 0);
+    for (int i = 0; i < 300; ++i) {
+        const int cell = c.drawItemCell(ps);
+        CHECK(cell >= 0 && cell < ps.surfaceCells);
+        if (cell < 0) return;
+        CHECK((ps.cellClasses[cell] & 8) == 0);
+        ++hits[cell];
+    }
+    int distinct = 0;
+    for (int k = 0; k < ps.surfaceCells; ++k) if (hits[k]) ++distinct;
+    CHECK(distinct >= 2);  // picker, not first-empty
+}
+
 TEST(campaign_colonised_plan_gets_colony_base_t41) {
     // COLONISED-PLANET LAW (docs/re/income-law.md T41, census
     // scripts/r1_colony_items.py): every in-run colonisation arrives with

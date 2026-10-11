@@ -1,6 +1,6 @@
 # Headless playthrough record
 
-Regenerated 2026-10-10T19:13:02-04:00 by scripts/record_playthrough.sh from the
+Regenerated 2026-10-10T23:48:19-04:00 by scripts/record_playthrough.sh from the
 current binary. Victory conditions and their vendor files: docs/re/turnloop.md §1.
 
 ## Run A — headless, seed 2024
@@ -12,11 +12,11 @@ SDL 2.32.4 initialised (video driver: (null))
 campaign seed=2024 stars=50 lanes=53 ai=6
 turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-  ... (858 lines elided)
-  [t761] owner 0 colonised Xerxes
-  [t762] owner 0 colonised Arcturus
-  [t762] VICTORY: Control (end-ctrl.txt)
-VICTORY Control via end-ctrl.txt on turn 762 (score 52%)
+  ... (872 lines elided)
+  [t776] owner 0 colonised Xerxes
+  [t777] owner 0 colonised Arcturus
+  [t777] VICTORY: Control (end-ctrl.txt)
+VICTORY Control via end-ctrl.txt on turn 777 (score 52%)
 ```
 
 ## Run B — headless, seed 42
@@ -28,11 +28,11 @@ SDL 2.32.4 initialised (video driver: (null))
 campaign seed=42 stars=50 lanes=53 ai=6
 turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-  ... (374 lines elided)
-  [t324] owner 6 captured Feculon
-  [t324] owner 6 captured Ajax
-  [t324] VICTORY: Extinct (end-xtnc.txt)
-VICTORY Extinct via end-xtnc.txt on turn 324 (score 0%)
+  ... (670 lines elided)
+  [t582] owner 3 captured Ajax
+  [t583] owner 3 captured Feculon
+  [t583] VICTORY: Extinct (end-xtnc.txt)
+VICTORY Extinct via end-xtnc.txt on turn 583 (score 0%)
 ```
 
 ## Run C — Xvfb/X11, seed 13
@@ -44,11 +44,11 @@ SDL 2.32.4 initialised (video driver: x11)
 campaign seed=13 stars=50 lanes=53 ai=6
 turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-  ... (676 lines elided)
-  [t561] owner 3 captured Amoroso
-  [t561] owner 3 captured Masticon
-  [t561] VICTORY: Extinct (end-xtnc.txt)
-VICTORY Extinct via end-xtnc.txt on turn 561 (score 0%)
+  ... (700 lines elided)
+  [t589] owner 1 researched Spacetime Surfing
+  [t593] owner 0 colonised Terpsichore
+  [t593] VICTORY: Control (end-ctrl.txt)
+VICTORY Control via end-ctrl.txt on turn 593 (score 52%)
 ```
 
 ## Run D — UI under Xvfb, autoplay 3 turns (gate 4c)

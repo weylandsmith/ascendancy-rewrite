@@ -443,6 +443,100 @@ int Campaign::drawCbCell(const PlanetState& ps) {
     return -1;
 }
 
+// SURFACE GRID GEOMETRY (runtime tables read byte-for-byte from guest RAM,
+// kRows-anchored at (terrain weight rows - 152 / - 76; verified identical
+// across 484 saves, row sums == live +0x18 per type). Planet-type index
+// 0..4 (== surfaceCells 7/11/23/45/73 1:1): ROW_START[r] is the continuous-x
+// origin of row r, row width kRowW[type][r]; cell index within surface =
+// cumulative width + (x - start). This is FUN_0003965c (row/col from slot)
+// and FUN_000395c4 (slot from row/col) rolled into one table walk.
+static const int kRowStart[5][15] = {
+    {0, 0, 0, 0, 4, 4, 5, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 4, 3, 4, 5, 6, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 3, 2, 3, 3, 4, 5, 7, 0, 0, 0, 0, 0, 0},
+    {0, 2, 1, 1, 2, 2, 3, 4, 5, 7, 0, 0, 0, 0, 0},
+    {1, 0, 0, 0, 1, 1, 2, 3, 4, 5, 7, 0, 0, 0, 0},
+};
+static const int kRowW[5][15] = {
+    {0, 0, 0, 0, 2, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 1, 3, 3, 3, 1, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 1, 4, 4, 5, 4, 4, 1, 0, 0, 0, 0, 0, 0},
+    {0, 2, 5, 6, 6, 7, 6, 6, 5, 2, 0, 0, 0, 0, 0},
+    {3, 6, 7, 8, 8, 9, 8, 8, 7, 6, 3, 0, 0, 0, 0},
+};
+
+int Campaign::sizeClassFor(int surfaceCells) {
+    for (int t = 0; t < 5; ++t) {
+        int sum = 0;
+        for (int r = 0; r < 15; ++r) sum += kRowW[t][r];
+        if (sum == surfaceCells) return t;  // 7/11/23/45/73, distinct
+    }
+    return -1;
+}
+
+bool Campaign::cellActiveNeighbour(const std::vector<char>& active,
+                                   int sizeClass, int surfaceCells, int cell) {
+    if (sizeClass < 0 || cell < 0 || cell >= surfaceCells) return false;
+    const int* ws = kRowW[sizeClass];
+    const int* w0 = kRowStart[sizeClass];
+    int cum = 0, row = -1, col = 0;
+    for (int r = 0; r < 15; ++r) {
+        if (!ws[r]) continue;
+        if (cell < cum + ws[r]) {
+            row = r;
+            col = w0[r] + (cell - cum);
+            break;
+        }
+        cum += ws[r];
+    }
+    if (row < 0) return false;
+    for (int d = 0; d < 4; ++d) {
+        const int nr = row + (d < 2 ? (d ? 1 : -1) : 0);
+        const int nx = col + (d < 2 ? 0 : (d == 2 ? -1 : 1));
+        if (nr < 0 || nr >= 15 || !ws[nr]) continue;
+        if (nx < w0[nr] || nx >= w0[nr] + ws[nr]) continue;
+        // rowStart is NOT an independent table: a neighbour cell exists only
+        // when within the neighbour row's span; its surface index:
+        int nsum = 0;
+        for (int r = 0; r < nr; ++r) nsum += ws[r];
+        const int ncell = nsum + nx - w0[nr];
+        if (ncell >= 0 && ncell < surfaceCells && active[ncell]) return true;
+    }
+    return false;
+}
+
+int Campaign::drawItemCell(const PlanetState& ps) {
+    // t43 BUILT-ITEM cell law (income-law.md S13): ONE worldNext() draw over
+    // the EMPTY, NON-ROCK, rule-G-legal (active-neighbour) surface cells.
+    // Picker FUN_0003875c collects checker-legal empties then ONE rng%count
+    // — and the picker IGNORES the caller's slot register (59-instr listing:
+    // item stashed @0x38769, no re-read of pushed EBX), so all 16 build
+    // sites passing EBX=0 are picker draws too (refutes T40(6)
+    // prefix-from-0 for the second time). Rule G adjacency from the same
+    // checker @0x385b7 (CB exempt 0x385f9). Census r1_built_cell_law.py:
+    // 213 worlds, 0/362 active Factories w/o active neighbour, 0
+    // transitional anomalies. -1 = no legal empty cell.
+    std::vector<char> active(ps.surfaceCells, 0);
+    std::vector<char> used(ps.surfaceCells, 0);
+    const int szc = sizeClassFor(ps.surfaceCells);
+    for (size_t k = 0; k < ps.items.size() && k < ps.itemCells.size(); ++k) {
+        const int c = ps.itemCells[k];
+        if (c >= 0 && c < ps.surfaceCells) {
+            used[c] = 1;
+            if (itemIsSurface(ps.items[k])) active[c] = 1;
+        }
+    }
+    std::vector<int> legal;
+    for (int c = 0; c < ps.surfaceCells; ++c) {
+        if (used[c] || (ps.cellClasses[c] & 8)) continue;
+        if (szc >= 0 && !cellActiveNeighbour(active, szc, ps.surfaceCells, c))
+            continue;
+        legal.push_back(c);
+    }
+    if (legal.empty()) return -1;
+    return legal[worldNext() % legal.size()];
+}
+
 int Campaign::storedIndFor(int star) const {
     // S6 recalc IND channel (income-law.md §6 + T35 gating): IND
     // accumulator + class bonuses + Hyperpower doubling (v + v>>1),
@@ -640,23 +734,33 @@ void Campaign::buildPhase() {
         if (pend) {
             ps.buildAcc += storedIndFor(s);
             if (ps.buildAcc >= pend->cost) {
-                ps.items.push_back(ps.pendingItem);
-                // CELL ASSIGNMENT on completion [documented default,
-                // income-law.md T40(6): selection law OPEN — never |8 cell
-                // [verified t38], prefix-from-0 refuted 0/2720 (t38),
-                // scenario scatter observed (t40)]. Lowest free non-rock
-                // surface cell; orbital rows take the lowest free ring slot.
-                // The assignment exists to keep itemCells explicit so
-                // channelAccFor never falls back to the positional walk.
+            ps.items.push_back(ps.pendingItem);
+                // CELL ASSIGNMENT on completion — LAW CLOSED t43
+                // (income-law.md S13): the original routes EVERY build
+                // completion through the picker (FUN_0003875c ignores the
+                // caller's slot register; the 16 sites passing EBX=0 are
+                // draws too) = uniform among EMPTY non-rock cells with an
+                // ACTIVE neighbour (checker rule G @0x385b7; CB exempt
+                // @0x385f9). Census scripts/r1_built_cell_law.py: 0/362
+                // active Factories w/o active neighbour across 213 worlds.
+                // Degenerate fallback when NO rule-G-legal empty exists
+                // (selector gate is capacity-based so the original CAN
+                // queue into one): lowest free non-rock — keeps
+                // itemCells/channelAccFor in sync [documented default,
+                // degenerate case only].
                 if (itemIsSurface(ps.pendingItem)) {
-                    std::vector<char> used(ps.surfaceCells, 0);
-                    for (size_t k = 0; k < ps.items.size() - 1; ++k)
-                        if (k < ps.itemCells.size() && ps.itemCells[k] >= 0 &&
-                            ps.itemCells[k] < ps.surfaceCells)
-                            used[ps.itemCells[k]] = 1;
-                    int c = 0;
-                    while (c < ps.surfaceCells && (ps.cellClasses[c] & 8 || used[c])) ++c;
-                    ps.itemCells.push_back(c < ps.surfaceCells ? c : -1);
+                    int cell = drawItemCell(ps);
+                    if (cell < 0) {
+                        std::vector<char> used(ps.surfaceCells, 0);
+                        for (size_t k = 0; k < ps.items.size() - 1; ++k)
+                            if (k < ps.itemCells.size() && ps.itemCells[k] >= 0 &&
+                                ps.itemCells[k] < ps.surfaceCells)
+                                used[ps.itemCells[k]] = 1;
+                        int c = 0;
+                        while (c < ps.surfaceCells && (ps.cellClasses[c] & 8 || used[c])) ++c;
+                        cell = c < ps.surfaceCells ? c : -1;
+                    }
+                    ps.itemCells.push_back(cell);
                 } else {
                     int ring = ps.surfaceCells;
                     std::vector<char> usedo(10, 0);

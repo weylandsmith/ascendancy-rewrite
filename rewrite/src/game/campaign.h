@@ -49,17 +49,16 @@ struct PlanetState {
     int growthCounter = 0;       // +0x4e analog (PROS-side counter, S6c)
     std::vector<int> items;      // indices into the planitem table (ACTIVE slots)
     // EXPLICIT cell assignment parallel to `items` (surface: index into the
-    // surface cells; orbital: surfaceCells + ring index). MEASURED t40
-    // (scripts/r1_home_placement.py, 157 homes / 27 worlds): the HOME Colony
-    // Base sits at a pseudo-random buildable cell — RANK over the non-rock
-    // cells measured 2..70 across 157 samples, rank 0/1: ZERO occurrences
-    // (never the last cell either; mechanism of the draw [unverified]), cell
-    // class histogram {0:39,1:56,2:14,3:6,4:38} = terrain rate (barren CBs
-    // exist!). Chase
-    // BUILT-ITEM cell selection is OPEN (income-law.md T40(6): never on |8
-    // [verified], prefix-from-0 refuted 0/2720 (t38), scatter observed);
-    // the rewrite assigns the lowest free cell as a [documented default]
-    // so explicit cells and the accumulator never desync. Cell class drives
+    // surface cells; orbital: surfaceCells + ring index). HOME CB cell:
+    // picker-uniform over non-rock surface cells, barren included (t42;
+    // picker FUN_0003875c uniform-among-legal-empty, census
+    // r1_cb_rank_final.py — the older t40 rank-2..70 envelope was a
+    // nonbarren-filter artifact). BUILT-ITEM cell: picker-uniform among
+    // legal non-rock EMPTY cells ADJACENT to an active item (rule G,
+    // income-law.md S13, census scripts/r1_built_cell_law.py: 0/362
+    // final-state violations). Orbital ring slots keep lowest-free
+    // [documented default — rule G is surface-only (slot < +0x18), the
+    // original's orbital assignment path is unrecovered]. Cell class drives
     // channel bonuses (class-2 home IND=2 x14, class-3 home PROS=2 x6,
     // income-law.md T40).
     std::vector<int> itemCells;
@@ -187,6 +186,23 @@ public:
     // picker yields 0xffff and placement silently no-ops). PUBLIC for the
     // t42 uniformity pin; consumes one worldLcg_ draw per call.
     int drawCbCell(const PlanetState& ps);
+    // Rule-G neighbour test (income-law.md S13, CLOSED t43): true iff one of
+    // the FOUR graph neighbours of `cell` — (row-1,x),(row+1,x),(row,x-1),
+    // (row,x+1) in continuous-x coords over the runtime row-width/row-start
+    // tables (verified byte-for-byte from guest RAM, kRows-anchored) — is
+    // marked active. Mirrors checker FUN_0003830c @0x385b7..0x386fe
+    // (FUN_0003965c row lookup + four FUN_000395c4 probes; any active word2
+    // bit0 -> legal). PUBLIC for the t43 pin. sizeClass: 0..4 from
+    // sizeClassFor(); unknown geometry -> false.
+    static bool cellActiveNeighbour(const std::vector<char>& active,
+                                    int sizeClass, int surfaceCells, int cell);
+    // SurfaceCells -> runtime planet-type index (verified 1:1 across 484
+    // saves: 7->0, 11->1, 23->2, 45->3, 73->4; else -1).
+    static int sizeClassFor(int surfaceCells);
+    // t43 built-item cell draw (income-law.md S13): ONE worldNext() over
+    // EMPTY non-rock surface cells with an ACTIVE neighbour; -1 if none.
+    // PUBLIC for the t43 pin; mutates worldLcg_.
+    int drawItemCell(const PlanetState& ps);
 
 private:
     void pickHomeStars();

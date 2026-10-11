@@ -1438,3 +1438,63 @@ item id and EBX = explicit slot at the call sites):
  campaign_cb_cell_uniform_t42 (every non-rock cell reachable, none of the
  rock, barren share band). Timelines: 2024 Control t762, 13 Extinct t324,
  42 Extinct t561 (PLAYTHROUGH.md regenerated).
+
+## 13. BUILT-ITEM CELL LAW CLOSED (t43) — picker-ignores-slot + rule G adjacency
+
+Two static findings upgrade the t40(6) "cell selection OPEN" default:
+
+ 1. THE PICKER IGNORES THE CALLER'S SLOT. Listing of FUN_0003875c (59
+    instr): item is stashed at 0x38769 (MOV [ESP+0xd0],DL) BEFORE EDX is
+    clobbered at 0x38770; pushed EBX/ECX are never re-read (no stack reads
+    of their slots in the listing); the wrapper FUN_00038818 forwards the
+    PICKED value into the activator, not the caller's EBX. All 19 xrefs to
+    FUN_00038818 were enumerated; the 16 build/completion sites in
+    FUN_0003f130/FUN_0003f758/FUN_0003fc4c pass EBX=0 (XOR EBX,EBX at
+    0x3f7f2/0x3fc6a/0x3fd1c...) — under this law those zeros are inert:
+    EVERY placement including Factory/Lab/rock-item 0x26 completions is the
+    uniform random draw over checker-legal empty cells. This is the second
+    independent refutation of prefix-from-0 (first: measurement 0/2720).
+ 2. RULE G ADJACENCY (checker FUN_0003830c @0x385b7..0x386fe): for surface
+    slots, EXEMPT item 5 (0x385f9) and item 0x23 (0x38602): if target
+    word2 bit0 -> exit (legal, irrelevant for empty picks); else row =
+    FUN_0003965c(planet,slot) ((row<<16)|(col+rowStart[row])), four
+    FUN_000395c4 probes (row-1,x),(row+1,x),(row,x-1),(row,x+1); ANY probe
+    landing on a word2-bit0 slot jumps to the exit WITHOUT zeroing EDI =>
+    LEGAL; no probe active => XOR EDI,EDI => ILLEGAL. BUILT ITEMS REQUIRE
+    AN ACTIVE NEIGHBOUR.
+ 3. GRID GEOMETRY (decompile FUN_0003965c/FUN_000395c4): continuous-x hex
+    offset layout via planet-type (byte +0x14) row tables. IMAGE copies of
+    DAT_0007445c/0x744a8 are STALE CODE BYTES in our restored bin AND the
+    static RAM region reads ZERO in save dumps; the RUNTIME tables live at
+    (terrain weight rows 0x744f4-copy - 76) widths / - 152 starts, located
+    per save by the 44-byte kRows fingerprint — verified IDENTICAL across
+    484 saves, row sums == live +0x18 (7/11/23/45/73 1:1 with type 0..4):
+      starts t0 [0,0,0,0,4,4,5]      widths t0 [0,0,0,0,2,3,2]
+      starts t1 [0,0,0,4,3,4,5,6]    widths t1 [0,0,0,1,3,3,3,1]
+      starts t2 [0,0,3,2,3,3,4,5,7]  widths t2 [0,0,1,4,4,5,4,4,1]
+      starts t3 [0,2,1,1,2,2,3,4,5,7] widths t3 [0,2,5,6,6,7,6,6,5,2]
+      starts t4 [1,0,0,0,1,1,2,3,4,5,7] widths t4 [3,6,7,8,8,9,8,8,7,6,3]
+    (trailing rows 0). HARNESS LAW: any DAT table measured from saves MUST
+    be located by content fingerprint, never by VA+H (t42 turn-clock lesson
+    generalised; first t43 run "REFUTED 4 violations" was exactly the
+    zeroed-table artifact, caught before landing).
+ 4. MEASUREMENT (scripts/r1_built_cell_law.py; geometry fixed via (3)):
+    213 worlds; item census {0:107, 1(Factory):362, 5(CB):2810, 21:3};
+    ACTIVE non-CB items with ZERO active neighbours in the FINAL save = 0;
+    4/4 zero->later-active transitional rows resolved as geometry artifact
+    (re-zero transitional = 0). RULE G CONFIRMED on the observable item mix
+    (Factory dominates; rarer items unpopulated in captures [unverified
+    beyond the code reading]).
+ 5. NOT RECOVERED (stays open, sub-item): the cargo-slot chooser upstream
+    of word +0xae for the transport-cargo path @0x3b0bd (the checker gate
+    @0x3afed re-runs FUN_0003830c on the chosen slot, so rule G binds the
+    cargo pick too, wherever it comes from).
+ Rewrite: buildPhase completion surface assignment = drawItemCell (ONE
+ worldNext() over empty non-rock rule-G-legal cells; degenerate no-legal-
+ cell fallback = lowest free non-rock, documented), homes/colonies keep
+ drawCbCell; static cellActiveNeighbour + sizeClassFor bank the geometry
+ (pin campaign_built_cell_rule_g_t43: symmetry all 5 types, neighbour
+ degree 1..4, draw spread + adjacency). Timelines shift (new worldLcg_
+ consumption): 2024 Control t777, 42 Extinct t583, 13 Control t593
+ (seed 13 FLIPPED Extinct->Control — chain adjacency changes where
+ production lands; PLAYTHROUGH.md regenerated).

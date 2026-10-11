@@ -191,14 +191,34 @@ campaign_home_placement_law_t40 + campaign_cb_cell_uniform_t42; timelines
 regenerated. HARNESS LESSON: member = phys + (base-0x1BF450) per run —
 hard-coded +136 and corpus-first dedupe BOTH silently corrupt populations
 (mis-mapped mid-run worlds inflated 72->162; retracted before landing).
-NEXT ACTION: BUILT-ITEM (non-CB) CELL SELECTION — xrefs to FUN_00038818
-show 16 build/completion sites in FUN_0003f130/FUN_0003f758/FUN_0003fc4c
-(bank: EDX=item e.g. 0x26 rock-item site 0x3fc6c). Resolve EBX at those
-sites (0x3f7f2 XOR EBX,EBX — explicit slot 0?? vs T40(6) prefix-from-0
-REFUTED 0/2720): read raw listing + census Factory/Lab ranks over non-rock
-empties mid-game. If picker-uniform (EBX=0xffff or wrapper ignores
-explicit-0), upgrade buildPhase lowest-free -> draw; if explicit-slot,
-lift the chooser. NOTE t36: terrain law closed; NOTE t35: raw-array re-audit.
+T43 LANDED (BUILT-ITEM CELL LAW CLOSED). Picker FUN_0003875c IGNORES
+the caller's slot register (item stashed @0x38769 pre-EDX-clobber, pushed
+EBX never re-read) — all 16 EBX=0 build sites in FUN_0003f130/3f758/fc4c
+are uniform draws; checker rule G @0x385b7..0x386fe: non-CB items need an
+ACTIVE neighbour (exemptions items 5 @0x385f9, 0x23 @0x38602); graph =
+continuous-x hex over RUNTIME row tables (fingerprint-anchor: kRows-44B
+fingerprint, widths at -76, starts at -152; identical 484/484 saves, sums
+== live +0x18) — image DAT copies are stale code bytes, static RAM reads
+ZERO in dumps (harness law: locate DAT tables by CONTENT, never VA).
+Census scripts/r1_built_cell_law.py: 213 worlds, 0/362 Factory active w/o
+neighbour, 0 transitional anomalies (first-run "REFUTED 4" was the
+zeroed-table artifact, caught pre-landing). Rewrite: buildPhase completion
+-> drawItemCell (one worldNext over empty non-rock rule-G-legal cells;
+degenerate fallback documented), static cellActiveNeighbour/sizeClassFor,
+pin campaign_built_cell_rule_g_t43 (symmetry x5 types, degree 1..4, draw
+spread). run_tests 102/0. TIMELINES (CLI finite-proved): 2024 Control
+t777, 42 Extinct t583, 13 CONTROL t593 (seed 13 flipped Extinct->Control
+under adjacency production); PLAYTHROUGH.md regenerated; gate ALL CHECKS
+PASS. NEXT ACTION: CARGO-SLOT CHOOSER (sub-item of t41/t43,
+income-law.md S13.5) — who writes word +0xae (the transport-cargo CB slot
+the EVENT handler FUN_0003aa0a @0x3b0bd feeds to activator FUN_00038840,
+legality re-gated @0x3afed via FUN_0003830c)? Static pass: Ghidra
+get_xrefs_to + writes-to on the planet-record +0xae offset (search data
+refs, disassemble writers); hypothesis candidates: same picker at a 20th
+site, or a first-empty scan like FUN_0003958c over the CARGO planet. If
+writers stay ambiguous, bank a BLOCKED entry (rewrite already uses the
+picker draw; arrival ranks 4/40 consistent). NOTE t36: terrain law
+closed; NOTE t35: raw-array re-audit.
 NOTE t34: DISPLAY-WORD CHANNEL LAW — see income-law.md T34 + commit
 91b90c0 (+0x44 max(1,trunc((v+1)^.85)) 97.98%, +0x46 raw, +0x48
 max(1,PROS-pop>>2) 94.82%; +0x54 = queue id, gov branch dead).
