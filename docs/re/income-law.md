@@ -1537,3 +1537,58 @@ into a CHAIN, not a chooser function:
  EXEMPT, so the rewrite's uniform non-rock draw for arrival CBs is
  observation-consistent (barren share + ranks 4/40). AI landing-site law
  -> docs/BLOCKED.md (default: picker draw).
+
+## 14. SELECTED-ABILITY ("GOVERNOR") BRANCH CLOSED (t45) — FUN_00038ba4 @0x38df0..0x38e29
+
+Field identity (writer census scripts/r1_0x54_writer_sweep.py, exhaustive
+over the restored image for every memory-writing encoding at [reg+0x54]:
+88/89/8a/8b/c6/c7/80-group/86/87/8f + SIB counting — 23 writes, 130 reads/
+cmps, 61 SIB-form): the ONLY value-writing writer in planet-record context
+is the cell ACTIVATOR @0x38b26 (activates slot byte1 AND stores the same
+item id into planet +0x54; the CMP DL,0x23 skip at @0x38af3 covers the
+SLOT store, not the planet byte), plus six immediate :=0xFF clearers
+(0x21f3e, 0x37f93, 0x38a1f, 0x39296, 0x3a159, 0x49dd2 — queue-complete /
+demolish / new-record paths). The 0x6xxxx-0x70xxx cluster (imm 0/1 stores
++ dword readers with *0x10 scaling) is a DIFFERENT structure (no function
+body contains them; values 0/1 never appear in the +0x54 corpus histogram).
+XCHG/POP writes at +0x54: zero. So +0x54 = selected/activated item id,
+0xFF when none — the S8 queue reading and the S6e "governor" reading are
+THE SAME FIELD; a governor value 33/34/35 arises only when the player/AI
+cell-SELECTS a special item (§413 mode 3 writes +0x54 := item idx).
+
+CORPUS (scripts/r1_governor_census.py, 484 saves, 2810 owned records via
+the t33-corrected walk): values 0xFF x2418, 0x01 x282, 0x00 x107, 0x15 x3
+— trigger values 33/34/35 NEVER occur (0/2810). The branch is inert on ALL
+measured state (consistent with T34's 2720-sample battery), which is why
+earlier captures could not close it from the POSITIVE side. Closure route:
+the static branch is now pinned verbatim AND its every operand resolved —
+that is the measurement (code + corpus + runtime config).
+
+BRANCH LAW (raw disasm, accumulator identity cross-verified by the three
+doubler blocks immediately above: item 12 Hyperpower doubles [ESP+0x28] at
+@0x38d6a = IND, item 13 Fertilization [ESP+0x10] @0x38da5 = PROS, item 14
+Internet [ESP+0x20] @0x38de0 = RES; matches T35 gating):
+  @0x38df0 CMP byte [rec+0x54],0xFF -> skip when empty-queue
+  @0x38df6 EAX = [ESP+0x28] >> 2    ; IND accumulator AFTER doubling
+  0x38e00 DL==0x21 (33 Endless Party)         -> [ESP+0x10] += EAX  (PROS)
+  0x38e0b DL==0x22 (34 Scientist Takeover)    -> [ESP+0x20] += EAX  (RES)
+  0x38e16 DL==0x23 (35 Automation)            -> [ESP+0x18] += dword [0x743b9]>>0x18
+The 0x743b9 operand is ITEM-TABLE DATA, not an immediate: row 35 base =
+0x73e40 + 35*0x28 = 0x743b8, dword = row bytes +1..+4 = (res,pros,mpop,
+UPOP), SAR 0x18 lands on UPOP(35) — RUNTIME-MEASURED 1 in 32/32 saves
+(item-table dump via pointer law; row 35 name verified 'Automation').
+Downstream order is exact: PROS bonus joins the accumulator BEFORE the
+pow-compression block (@0x38e62 trunc((v+1)^0.85)); RES is raw so word =
+dbl(acc) + bonus; the Automation bonus lands in the +0x4c used-pop word
+(then chain-clamped 0..100 / 0..pop / 0..+0x42 at @0x38f01..0x38f5c).
+Bonus is NOT itself re-doubled (branch sits after all three doublers).
+
+Rewrite: PlanetState::governor (+0x54 analog, default -1 = measured corpus
+state); storedProsFor adds rawIndAccFor>>2 when governor==33, storedResFor
+adds it raw when governor==34, usedPopFor adds UPOP(35) when governor==35
+(consumers needClassFor + selector gates routed through usedPopFor). Pin
+campaign_governor_law_t45: corpus-default inertness + per-branch exact
+deltas on a synthetic 3-Factory home (CB acc 1 alone cannot light the
+branch — measured corollary: the original needs IND acc >= 4 for ANY
+visible governor effect). Timelines UNCHANGED (branch inert by default):
+2024 Control t777 / 42 Extinct t583 / 13 Control t593 re-verified.

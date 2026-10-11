@@ -224,6 +224,51 @@ TEST(campaign_built_cell_rule_g_t43) {
     CHECK(distinct >= 2);  // picker, not first-empty
 }
 
+TEST(campaign_governor_law_t45) {
+    // SELECTED-ABILITY / "GOVERNOR" LAW (docs/re/income-law.md S14 t45,
+    // recalc FUN_00038ba4 @0x38df0..0x38e29 raw disasm): byte +0x54 == 33
+    // Endless Party adds IND acc >>2 to the PROS accumulator (before its
+    // pow block), 34 Scientist Takeover adds it to the RAW RES word, 35
+    // Automation adds item-35 UPOP (=1, runtime table measured 32/32) to
+    // used-pop +0x4c. Corpus: 0/2810 owned records ever hold 33/34/35
+    // (scripts/r1_governor_census.py over 484 saves) — every planet runs
+    // with the byte at 0xFF (queue id or none), so the branch must be
+    // INERT by default and exact when set.
+    auto c = makeCampaign(2024);
+    const int ns = static_cast<int>(c.galaxy().stars.size());
+    int tested = 0;
+    for (int s = 0; s < ns && tested < 8; ++s) {
+        if (c.starOwner(s) < 0) continue;
+        auto& ps = const_cast<ag::PlanetState&>(c.planetAt(s));
+        CHECK(ps.governor == -1);  // corpus-default state
+        // Synthetic IND feed so the >>2 operand is non-zero: homes at t0
+        // carry ONLY a Colony Base (t40 law, acc 1 -> bonus 0), so the
+        // branch needs extra items to be exercised at all. Three Factories
+        // (IND 1 each) over the CB give acc >= 4. itemCells left short on
+        // purpose -> channelAccFor takes the documented rock-skip fallback.
+        for (int k = 0; k < 3; ++k) ps.items.push_back(0);  // Factory
+        const auto base = c.channelWordsFor(s);
+        const int bonus = c.rawIndAccFor(s) >> 2;  // IND acc after Hyperpower
+        CHECK(bonus >= 1);
+        // 33 -> PROS side: monotone increase under compression.
+        ps.governor = 33;
+        CHECK(c.channelWordsFor(s).pros > base.pros);
+        ps.governor = -1;
+        CHECK(c.channelWordsFor(s).pros == base.pros);  // cleanly reversible
+        // 34 -> RES word: RAW channel, so the delta is exactly bonus.
+        ps.governor = 34;
+        CHECK(c.channelWordsFor(s).res == base.res + bonus);
+        ps.governor = -1;
+        // 35 -> used-pop word: + Automation UPOP (measured 1).
+        const int u0 = c.usedPopFor(s);
+        ps.governor = 35;
+        CHECK(c.usedPopFor(s) == u0 + 1);  // UPOP(35) == 1 [verified table]
+        ps.governor = -1;
+        ++tested;
+    }
+    CHECK(tested >= 4);
+}
+
 TEST(campaign_colonised_plan_gets_colony_base_t41) {
     // COLONISED-PLANET LAW (docs/re/income-law.md T41, census
     // scripts/r1_colony_items.py): every in-run colonisation arrives with

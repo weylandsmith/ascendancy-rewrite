@@ -76,6 +76,15 @@ struct PlanetState {
     // the static.txt #56 planet-type name list).
     double capBonus = 0;
     double richPros = 0;
+    // SELECTED-ABILITY byte (+0x54 analogue; income-law.md S14 t45). Full
+    // image writer census (scripts/r1_0x54_writer_sweep.py): queue writes
+    // the pending item id, completion/demolish clear to 0xFF (-1 here);
+    // the ONLY source of a governor value 33/34/35 is the activator
+    // mode-3 cell SELECT @0x38b26 over a special item (Endless Party /
+    // Scientist Takeover / Automation, runtime-table IDs measured 33/34/35).
+    // Corpus: 0/2810 owned records hold 33/34/35 (scripts/r1_governor_
+    // census.py, 484 saves) — default -1 mirrors the measured state.
+    int governor = -1;
 };
 
 struct ShipInTransit {
@@ -167,6 +176,40 @@ public:
     double popCapBonusFor(int star) const { return planets_[star].capBonus; }
     // Public +0x4a analog for tests/UI (income-law.md S10 seed law).
     int popCapAt(int star) const { return storedCapFor(star); }
+    // Per-planet channel words +0x44/+0x46/+0x48 incl. the t45 governor
+    // branch (the original's recalc produces exactly these three words;
+    // the city screen reads them). Public for law-pin tests, precedent
+    // drawCbCell.
+    struct ChannelWords { int ind, res, pros; };
+    ChannelWords channelWordsFor(int star) const {
+        return {storedIndFor(star), storedResFor(star), storedProsFor(star)};
+    }
+    // Selected-ability/governor byte (+0x54 analogue, income-law.md S14
+    // t45): -1 (0xFF) unless the activator mode-3 SELECT put a special
+    // item id (33/34/35) there. Corpus default: never set (0/2810).
+    int governorFor(int star) const { return planets_[star].governor; }
+    // RAW doubled IND accumulator (pre-compression) = the value the
+    // recalc governor branch shifts >>2 (FUN_00038ba4 @0x38df6 loads
+    // [ESP+0x28] AFTER the Hyperpower doubler block @0x38d3f..0x38d76).
+    int rawIndAccFor(int star) const {
+        const ChannelAcc a = channelAccFor(star);
+        return a.ind + (a.dblI ? a.ind >> 1 : 0);
+    }
+    // +0x4c USED-POP analog (income-law.md S9): the queue item's UPOP,
+    // plus the governor AUTOMATION bonus — branch @0x38e16 of
+    // FUN_00038ba4 adds dword [0x743b9]>>0x18, which is ITEM-TABLE DATA,
+    // not an immediate: row 35 base = 0x73e40 + 35*0x28 = 0x743b8, so the
+    // dword spans row 35 bytes +1..+4 (res,pros,mpop,UPPOP) and SAR >>0x18
+    // lands on UPOP — Automation UPOP, runtime-measured 1 in 32/32 saves.
+    // Governor is -1 corpus-wide (scripts/r1_governor_census.py), so the
+    // bonus is inert on all measured state; wired for law completeness,
+    // pinned by campaign_governor_law_t45.
+    int usedPopFor(int star) const {
+        const PlanetState& ps = planets_[star];
+        int u = ps.pendingItem >= 0 ? (*items_)[ps.pendingItem].upop : 0;
+        if (ps.governor == 35) u += (*items_)[35].upop;  // Automation UPOP
+        return u;
+    }
     int fleetDamageFor(int owner) const { return fleetDamage_[owner]; }
     bool invadesAlwaysSucceeds(int owner) const {
         return ability_[owner] == SpeciesAbility::SuperMarines;

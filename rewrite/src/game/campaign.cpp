@@ -547,9 +547,19 @@ int Campaign::storedIndFor(int star) const {
 
 int Campaign::storedResFor(int star) const {
     // RES channel: raw accumulator (+ T35 class bonuses) + Internet
-    // doubling, never compressed (S6).
+    // doubling, never compressed (S6). GOVERNOR BRANCH (S14 t45,
+    // FUN_00038ba4): @0x38df6 EAX = [ESP+0x28]>>2 (IND accumulator AFTER
+    // the Hyperpower x1.5 block @0x38d6a, BEFORE both pow blocks), then
+    // @0x38e10 (DL==0x22 Scientist Takeover) ADDs it to the RES acc. The
+    // branch is after the Internet doubler @0x38dbc, so the bonus is NOT
+    // itself doubled; RES is never compressed (T34 +0x46 raw), so word =
+    // dbl(acc) + bonus. Governor is -1 on 2810/2810 corpus records
+    // (r1_governor_census.py) — inert on all measured state, wired for
+    // law completeness, pinned by campaign_governor_law_t45.
+    const PlanetState& ps = planets_[star];
     const ChannelAcc a = channelAccFor(star);
-    return static_cast<int>(colonyChannel(a.res, a.dblR, /*compress=*/false));
+    const int bonus = ps.governor == 34 ? (a.ind + (a.dblI ? a.ind >> 1 : 0)) >> 2 : 0;
+    return static_cast<int>(colonyChannel(a.res, a.dblR, /*compress=*/false)) + bonus;
 }
 
 int Campaign::storedProsFor(int star) const {
@@ -562,7 +572,15 @@ int Campaign::storedProsFor(int star) const {
     // eliminated 3/5) — incomeAndGrow charges it directly, matching
     // FUN_00038f68 @0x39302, and needClassFor (FUN_0003fec4 reads the
     // +0x48 WORD) sees the same value the original's selector saw.
-    double pros = planets_[star].richPros + channelAccFor(star).pros;
+    // GOVERNOR BRANCH (S14 t45, FUN_00038ba4 @0x38df0): DL==0x21 (Endless
+    // Party) adds IND acc >>2 to the PROS acc — BEFORE the pow block
+    // (@0x38e62), so the word is max(1, round((dbl(pros+bonus)+1)^0.85));
+    // the >>2 operand is post-Hyperpower (@0x38d6a). richPros joins inside
+    // the accumulator in the original (loop @0x38cce adds its 2) — added
+    // here for equivalence. Branch inert corpus-wide (governor -1,
+    // r1_governor_census.py); pinned by campaign_governor_law_t45.
+    const int govBonus = planets_[star].governor == 33 ? rawIndAccFor(star) >> 2 : 0;
+    double pros = planets_[star].richPros + channelAccFor(star).pros + govBonus;
     pros -= static_cast<int>(planets_[star].pop) >> 2;
     return pros < 1.0 ? 1 : static_cast<int>(pros);
 }
@@ -599,7 +617,9 @@ int Campaign::needClassFor(int star) const {
     const int res = storedResFor(star);
     const int pros = storedProsFor(star);
     const int capMinusPop = storedCapFor(star) - static_cast<int>(ps.pop);
-    const int popMinusPend = static_cast<int>(ps.pop) - (ps.pendingItem >= 0 ? (*items_)[ps.pendingItem].upop : 0);
+    // +0x4c analog now routes through usedPopFor (governor Automation
+    // bonus included, S14 t45 — inert corpus-wide).
+    const int popMinusPend = static_cast<int>(ps.pop) - usedPopFor(star);
     if (capMinusPop < 2 && popMinusPend < 2) return 3;  // 0x3fedc
     if (pros < 2) return 2;                              // 0x3fef2
     if (ind < 2) return 1;                               // 0x3ff0f
@@ -785,7 +805,7 @@ void Campaign::buildPhase() {
         // --- selector (FUN_0003f130) ---
         int ind0 = storedIndFor(s);
         if (ind0 <= 0) continue;  // 0x3f146
-        int usedPop = pend ? pend->upop : 0;  // +0x4c analogue (queue draw)
+        int usedPop = usedPopFor(s);  // +0x4c analogue incl. t45 Automation bonus
         const bool aiPick = (o != kPlayer);
         int pick = -1;
         if (!aiPick) {

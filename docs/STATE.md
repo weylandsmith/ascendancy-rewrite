@@ -173,7 +173,30 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T42 LANDED (CB-CELL DRAW LAW CLOSED). Home seed FUN_000238e8
+T45 LANDED (SELECTED-ABILITY / GOVERNOR BRANCH CLOSED, income-law.md S14):
+branch @0x38df0..0x38e29 pinned verbatim; the [0x743b9]>>0x18 operand IS
+item-table UPOP(35) (row base 0x73e40+35*0x28=0x743b8, runtime value 1
+32/32); accumulator identities cross-verified by the three doubler blocks;
+exhaustive +0x54 writer census (scripts/r1_0x54_writer_sweep.py — 88/89/
+8a/8b/c6/c7/80-group/86/87/8f + SIB; 23w/130r/61sib, zero XCHG/POP): only
+trigger path = activator @0x38b26 (queue+selected = SAME field, closing
+the S6/S8 naming tension); corpus 0/2810 records hold 33/34/35 (484 saves,
+scripts/r1_governor_census.py). Rewrite: PlanetState::governor (default -1
+= measured), branches in storedProsFor/storedResFor/usedPopFor, consumers
+routed; pin campaign_governor_law_t45; run_tests 103/0; branch inert so
+timelines UNCHANGED (2024 Control t777 / 42 Extinct t583 / 13 Control
+t593, CLI finite-proved); OQ-024 ledger CLOSED. NEXT: OQ-019 SUB-ITEM
+vendor cost hack — record field +0x46 WRITER census on the GIZMO record
+(stride 0x6a, ships.md S6) using the t45 sweep method (r1_0x54_writer_
+sweep.py generalized to offset 0x46 + stride-context check via runtime
+gizmo-table anchor), then decompile whatever writes it. Fallback if sweep
+inconclusive in 2 rounds: record one line and take the OQ-003 planet
+field-semantics walk (star table join already banked).
+NOTE t45 HARNESS LESSON: an operand that LOOKS like a magic constant
+(MOV EAX,[abs]; SAR 0x18) may be ITEM-TABLE DATA — compute base+row*stride
+before calling it a constant (this turned OQ-024's last open operand into
+a runtime-measured value).
+PRIOR T42 LANDED (CB-CELL DRAW LAW CLOSED). Home seed FUN_000238e8
 @0x23ca2..0x23cb2: owner:=empire, pop:=2, EBX:=0xffff EDX:=5 CALL
 FUN_00038818 = PICKER; FUN_0003875c collects checker-legal empty cells,
 ONE FUN_0007824f draw, IDIV count, list[rem] = UNIFORM AMONG LEGAL

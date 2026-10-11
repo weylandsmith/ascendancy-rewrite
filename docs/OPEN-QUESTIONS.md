@@ -57,15 +57,21 @@ offers). | open | W-B (option C hybrid): build only when ownership model
 lands; no RE unknowns remain for this item.
 OQ-024 | loop | planet GOVERNOR assignment law (@0x38df0 branch of
 FUN_00038ba4: '!' -> PROS += IND>>2, '"' -> RES += IND>>2; S6 line 45 read
-+0x54 as a governor byte) | open | UNCAPTURABLE SO FAR [verified negative]:
-in all 466 banked saves the +0x54 byte holds only build-queue item ids
-(0xFF none, 0x00 Factory, 0x01 Agriplot, 0x15 Transport Tubes) and the
-branch never fires — dropping it from the model changes ZERO stored-word
-samples (income-law.md T34). Needs a capture where a governor is actually
-assigned: route = deep-schedule click capture driving the governor UI
-(gated behind OQ-012(a) glyph lift). Rewrite proceeds WITHOUT it: the
-branch is arithmetically inert on all measured state, so omitting it is a
-VERIFIED no-op rather than a stub.
++0x54 as a governor byte) | CLOSED t45 | FULL STATIC MEASUREMENT
+(income-law.md S14): branch pinned verbatim from raw disasm incl. operand
+resolution — the [0x743b9]>>0x18 "constant" IS item-table UPOP(35)
+(row base 0x73e40+35*0x28=0x743b8; runtime value 1, 32/32 saves via
+pointer law); accumulator identity cross-verified by the three doubler
+blocks; exhaustive writer census (scripts/r1_0x54_writer_sweep.py: 23
+writes/130 reads/61 SIB, zero XCHG/POP) shows the ONLY trigger path is
+activator @0x38b26 storing the activated item id — queue+selected are the
+SAME field, and 0/2810 corpus records (484 saves, r1_governor_census.py)
+hold 33/34/35: the original only fires after a cell-SELECT of a special,
+which our captures never contain — the static+corpus+runtime triple IS
+the closing measurement. Code site: PlanetState::governor +
+storedProsFor/storedResFor/usedPopFor branches (campaign.cpp/.h), pinned
+by campaign_governor_law_t45; branch inert by default so timelines
+unchanged (2024 Control t777 / 42 Extinct t583 / 13 Control t593).
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
 (static route exhausted: 7 negative probes — string table is runtime-loaded,
@@ -273,7 +279,8 @@ preset-vs-generated boundary (income-law.md T34). Governor @+0x54 branch
 never fires in corpus (byte always queue id) -> OQ-024 |
 income law docs/re/income-law.md S6..S10; harness scripts/r1_income_
 channels.py; chase-capture law = deep-schedule End-Turn clicks 511:67
-every 15s, save ring read by MTIME.
+every 15s, save ring read by MTIME. Governor @+0x54 CLOSED t45 (S14:
+same field as queue; fires only on special-item cell-SELECT; 0/2810).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:
