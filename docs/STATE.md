@@ -173,18 +173,20 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T48 LANDED (SCALE-LAW INCREMENTS, ships.md S13): +0x88/+0x90 sweep-
-exhaustive (9/4 sites, all 0x4b0xx-0x4c7xx); x32 unit law pinned (range
-dword[row+0x0a]<<5, step arithmetic dword[row+0x1a]<<5 in cases 0x34/0x28);
-+0x88 fuel pool (cap +0x18, refuel case 0x44, drain 0x23, afford gate) and
-+0x8c parallel budget (cap +0x98) mapped; drives measured RANGE=STEP=0 —
-NO drive->distance term exists in the executor. Drive-hop residue now
-BLOCKED with a ONE-RUN closing route (consecutive-save trajectory diff,
-docs/BLOCKED.md t48 entry). NEXT: RUN that trajectory capture + regression
-(R1 invariants: scratch copy, headless, -time-limit, pkill -x dosbox-x,
-bounded output). Exit 0 -> upgrade/replace scale; exit 1 -> record one
-line (immediate-arrival = campaign-level law, cite census) and move to
-OQ-003 field-semantics walk. Do NOT re-sweep +0x88/+0x90 (exhausted).
+T49 LANDED (ZERO-SHIP-ACTIVITY NEGATIVE CENSUS, ships.md S14; t48 route
+exit-1 branch): trajectory regression harness fixed (heap-span array,
+count WORD @0x43483) and run — 452 consecutive pairs, ZERO state-4,
+ZERO movement; cross-checked by orbit-ring census (ids {1 Agriplot, 5
+Colony Base} only, ZERO item-23 landings ever). Idle corpus is
+STRUCTURALLY unable to evidence interaction-state laws (flight,
+combat, OQ-020 charge). Scale stays OPEN under [1,3]+immediate-arrival
+(default NOT contradicted); new R1 move-scripted capture is the only
+closing route, budgeted when cheaper items run out (docs/BLOCKED.md t49).
+NEXT: OQ-003 .gam field-semantics walk using the idle corpus (records
+already joined 151/151; field meanings via cross-planet value
+correlations + already-banked law fields; zero-capture-cost). Then
+OQ-020/OQ-021 fold into the move-scripted capture budget. Do NOT rerun
+the trajectory regression (null banked twice now).
 PRIOR T45 LANDED (SELECTED-ABILITY / GOVERNOR BRANCH CLOSED, income-law.md S14):
 branch @0x38df0..0x38e29 pinned verbatim; the [0x743b9]>>0x18 operand IS
 item-table UPOP(35) (row base 0x73e40+35*0x28=0x743b8, runtime value 1

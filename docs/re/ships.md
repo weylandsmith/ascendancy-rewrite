@@ -382,3 +382,37 @@ adjacency exists ONLY in the lane matrix S11, used by AI targeting and
 time budgets — never by order execution. Rewrite [1,3] launch default:
 NOT contradicted (execution layer has no hop term; AI prefers <4 but
 does not forbid), held unchanged.
+
+
+## 14. CORPUS CONTAINS ZERO SHIP ACTIVITY (t49 negative census; scale route needs NEW capture)
+
+Two independent probes over the full banked corpus (484 saves):
+1. SHIP SLOT ARRAY probe (runtime ship-table read, stride 0x162 per
+   FUN_00022304 law, count word at runtime DAT_00043483 family):
+   EVERY save exposes 5 slots, ALL owner 0xFFFF, state 0, coords
+   (0,0,0); 2,260 consecutive-save slot-pair observations: ZERO state-4
+   (in-flight), ZERO coordinate movement. [caveat banked: the count
+   dword DAT_00043489>>16 read 200 uniformly (wrong mapping — image-
+   span vs heap-span trap); the word read giving 5 internally-
+   consistent empty slots is what this census reports; whether a
+   populated array would decode cleanly under this mapping is UNTESTED,
+   no populated save exists.]
+2. ORBIT-RING probe (verified slot-array law [planet+0x10]+0x88 stride
+   4, byte1 = gizmo id): active rows across all 484 saves contain ids
+   {1: 327, 5: 777} — runtime item table names verified id1 Agriplot,
+   id5 Colony Base — and ZERO id-0x17(23) rows. Per §10 landing law (a landed
+   ship IS an active item-23 ring entry), NO SHIP HAS EVER LANDED IN
+   THE CORPUS. Consistent: no ship launched either (array empty).
+CONSEQUENCE for the sugar-cube scale: the t48 BLOCKED regression route
+CANNOT run against the existing corpus — there is no flight to regress.
+The one-run closing route is REFINED (docs/BLOCKED.md): a NEW R1
+capture that ISSUES A MOVE ORDER (scripted map click sequence — click
+ship at home orbit, click destination star, End-Turn x2) then reads
+ring item-23 rows + ship coords across the saves. That is a capture-
+capability extension, not a static or refuted route. Until then scale
+stays OPEN under the standing default [1,3] AI-preference adjacency +
+immediate arrival (unchanged, still not contradicted).
+Idle-corpus meta-lesson banked: EVERY prior corpus law (income,
+placement, governor inertness) shares this scope limit — the 511:67
+End-Turn deep schedule never interacts; laws about interaction states
+(ships, combat, abilities) are structurally uncapturable from it.

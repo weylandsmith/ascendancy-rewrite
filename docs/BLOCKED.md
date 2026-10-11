@@ -150,3 +150,21 @@ rewrite's immediate-arrival model is the CORRECT campaign-level reading
 and OQ-019's scale sub-item closes as NOT-MODELLED-BY-DESIGN with this
 census cited. Default under which we proceed meanwhile: [1,3] launch
 adjacency (AI-layer fact, verified; execution layer has no hop term).
+
+## t49 update to t48 trajectory route: corpus CANNOT support it (exit-1 branch taken)
+Ran scripts/r1_trajectory_regression.py over all 484 saves: 452 consecutive pairs,
+5 ship slots all owner 0xFFFF state 0 pos (0,0,0), ZERO state-4, ZERO movement
+(harness fixed this turn: heap-span arr B+0x82bb0+0x3a095, count WORD B+0x82bb0+
+0x43483; the image-span dword read 200 uniformly = wrong mapping). Independent
+cross-check: orbit-ring census 484 saves, active ids {1 Agriplot, 5 Colony Base}
+only, ZERO item-23 rows -> no ship has EVER LANDED in the corpus (§10 law: landed
+ship = active item-23 ring entry). The 511:67 End-Turn deep schedule never issues
+orders; interaction-state laws (flight, combat, abilities incl. OQ-020 charge,
+partly OQ-021) are STRUCTURALLY uncapturable from existing saves.
+BEST DEFAULT TO PROCEED UNDER (unchanged, explicitly NOT contradicted by any
+measurement): ship adjacency [1,3] AI-preference launch + immediate arrival at
+campaign level; sugar-cube scale remains OPEN. CLOSING ROUTE REQUIRES a new R1
+capture that SCRIPTS A MOVE (click home-orbit ship, click destination star,
+End-Turn x2, save ring each step) — capture-capability extension; first R1 run
+budget for it starts when no cheaper ledger item remains (OQ-003 field semantics
+is cheaper: same idle corpus suffices for record-map diffs).
