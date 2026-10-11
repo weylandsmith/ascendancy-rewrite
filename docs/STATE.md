@@ -220,12 +220,14 @@ combat -> capture class same as scale), OQ-012(a) blocked glyph-readout,
 OQ-016 attribution + OQ-003 meanings replay-only, OQ-019 scale
 BLOCKED-USER (t58), OQ-020 amass capture-gated-unreachable, OQ-021
 end-screen rides multi-hour gameplay BLOCKED-USER, OQ-023 build-work parked
-by standing option-C decision (not RE). CONCRETE NEXT ACTION (t60b): W3 continues. Banked t60 (shp.md S8): file-
-provenance law (scan RESTORED image not payload; t59 zero-hit negative VOID;
-R12 amendment banked). OPEN-family fully attributed (text/ini/log/BMP only);
-shape libs load via FUN_00030018/FUN_0003026c -> FUN_0006642c(path,flags,dest)
-with appended-extension law. NEXT micro-steps queued in order: (1) callers of
-FUN_00030018 and FUN_0003026c (which subsystem loads which lib; extension
-identity via caller-side strings if DAT route stays blocked); (2) resource-
-slot accessor sweep (loads of slot dword at ctx+2000+idx*0x32 = the decoder
-neighborhood). Decoder not yet located; OQ-005 stays open.
+by standing option-C decision (not RE). CONCRETE NEXT ACTION (t61b): DECODER FOUND t61 (docs/re/shp.md S9):
+FUN_0005caac shape blit w/ control-byte grammar (C==0 end-row, C==1 skip,
+odd literal C>>1, even run of next byte C>>1); cache module mapped
+(FUN_0001fc34 accessor + 20 callers, FUN_00020acc raw-load, cache.cpp
+strings). Corpus exact-span 27/208 libs clean, rec0 grammar well-formed
+198/208; rec1+ prefix law NOT universal -> live-RAM anchor queued: grep
+banked ck heap spans for loaded-shape run patterns (e.g. listbox stream
+bytes) to pin per-record stream start; then full-corpus revalidation; then
+REWRITE upgrade (PNG/sample renderer decision per shp.md S6 — rendering
+before codec closure fabricates pixels; after closure it is legitimate).
+OQ-005 stays OPEN until revalidated across corpus.

@@ -122,8 +122,11 @@ FUN_00077776, wrappers fully attributed text/ini/log/BMP only); FILE
 PROVENANCE LAW t60 — scan ascend_restored.bin (t59 zero-hit negative VOID).
 Shape libs load via FUN_00030018/FUN_0003026c -> FUN_0006642c(path,flags,
 dest) binary-library reader w/ trailing fixup table; decoded shapes land in
-the FUN_0001fa60 resource-table slots. Decoder = slot-consumer draw path,
-NOT YET LOCATED. Resource-table layout UNVERIFIED recon, not citable.
+the FUN_0001fa60 resource-table slots. t61 DECODER LOCATED: FUN_0005caac
+shape blit + control-byte RLE grammar (S9, from raw asm); cache module
+FUN_0001fc34/FUN_00020acc mapped. Validation: rec0 grammar well-formed
+198/208, full exact-span 27/208; rec1+ stream-start ambiguity OPEN —
+live-RAM anchor queued. NOT closed; no rewrite change yet.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge

@@ -234,3 +234,59 @@ shapes land in the FUN_0001fa60-registered resource-table slots
 those slots. NEXT micro-steps queued: (1) DAT_000016d6/8 extension bytes;
 (2) FUN_00030018/FUN_0003026c callers (which subsystem loads which lib);
 (3) resource-slot accessor sweep for the consumer/decoder.
+## 9. W3 round 4 (t61): DECODER LOCATED — FUN_0005caac shape blit, control-byte grammar from raw asm; corpus validation 27/208 exact-span, residuals open
+
+DECODER [verified, work/ascend_restored.bin 0x5caac..0x5ceaf, full 433-instr
+disassembly]: shape blit + RLE decoder.
+- Shape struct param_1: [0]=pixel base ptr, [+4]=W-1, [+8]=H-1 (stride used
+  as (field+1) everywhere; clamped >=0), [+0x0c/+0x10/+0x14]=clip rect
+  x1,y1,x2,y2. Dest: window base from param_2 chain (stride 8) + palette
+  rect fields at +8/+0xc/+0x10/+0x14.
+- Control grammar (asm 0x5cca3..0x5ce77): read C:
+    C==0            end of row
+    C==1            L=next byte; ADVANCE DEST ONLY by L (transparent skip)
+    C odd,  C>1     literal copy of C>>1 bytes (REP MOVSB/MOVSD)
+    C even, C>0     run: next byte repeated C>>1 times (REP STOSB/STOSD)
+  Row loop iterates the CLIP rect rows; rows outside rect are stream-skipped
+  by the 0x5cc42 loop (control + payload; +1 after skip byte; C==0 advances).
+  Full-rect fast path dispatches to FUN_0005ceb0 (0x5cc1f).
+- Error codes -1 bad dims, -2 empty clip, -3 fully-outside, -4 rect flip.
+
+CALL CHAIN [verified]: cache accessor FUN_0001fc34 (module = cache.cpp per
+strings 'SHAPE CACHE' @0x83224, 'Cache filename too long' @0x83257, 'Single
+item too big for cache' @0x8332b, 'Cache unable to load file' @0x8335e;
+slot payload ptr at ctx+idx*4, byte size at ctx+800+idx*4, LRU list at
+ctx+0x640 u16) -> 20 callers; FUN_00030fb8 (sprite widget draw) takes the
+payload ptr into FUN_0005caac(param_1+4). Cache-load on miss: FUN_0001fc34
+calls alloc (FUN_00020728/0x207ac/0x209d8), FUN_0001fe8c (evict-to-fit),
+FUN_00020acc (the file->slot load, 'Cache unable to load file' on 0).
+
+CORPUS VALIDATION (scripts/r1_shp_decode_law.py, exact-span discriminator):
+- rec0 u32 dims pair + stream @+8 + grammar + per-row pixels <= W: 198/208
+  rec0 streams parse well-formed; 10 expl-family opaque header variants
+  still fail (S6 law).
+- FULL-LIBRARY exact-span (rec0 + all rec1+ with u16 dims pair at record
+  start + prefix 8): 27/208 libraries decode cleanly end-to-end.
+- rec1+ prefix law is NOT universal: per-record sweep over prefixes
+  {4,8,12,16,20,24} (structural walk) shows record populations: 182
+  records match NO prefix, 115 match many (0-payload degenerate), 32 match
+  only 24, etc. The S3 'zero u32 vs two u16s' census split does not decide
+  per-record stream start. RESIDUAL OPEN.
+- Exact-sum row law (each row sums EXACTLY W): rec0-level 67 libs exact vs
+  141 struct-only; rejected as universal at rec1+ (muddle flagged: first
+  pass had a label bug, numbers directional only). Do not bank.
+
+BRIDGE probes (same turn): cache file-load FUN_00020acc = RAW read —
+FUN_00020b44 chunk loop fills the pre-allocated slot buffer, no record
+parsing; regparm-mangled arg passing prevents reading WHICH loader boot
+chains (in FUN_00030018: FUN_0002acc returns the file handle, then
+FUN_0006642c(handle,5,0) loads; 0x21187 region = boot error-report strings
+@0x834a4, not a bridge). So the
+file-buffer->shape-struct interpretation happens at boot via FUN_0006642c
+fixups (u64 table offsets -> RAM pointers); per-shape cache files load raw.
+NEXT micro-step (queued): pin the per-record rec1+ stream start by
+comparing a VALIDATED library's runtime slot bytes vs file bytes IF any
+banked ck heap span contains loaded shape data (grep a distinctive run
+pattern like '7f ff 2e f2' law from listbox stream) — a live-RAM anchor
+closes prefix ambiguity; else OQ-005 stays OPEN (27/208 != closure;
+strict-close).
