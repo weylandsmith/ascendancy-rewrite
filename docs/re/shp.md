@@ -123,3 +123,42 @@ values (listbox.shp) -> light RLE over palette indices, not LZ.
 - [ ] pixel codec + PNG sample renders — BLOCKED on the Ghidra P2 shape
       loader; rendering before the codec is known would fabricate pixels.
 
+## 7. W3 recon round 1 (t59): registration pass + resource table + INT21 cluster
+
+Recon findings and negatives for the shape-loader call-graph route — full
+detail in work/oq005_w3.md; headline law (all Ghidra /ascend_restored.bin):
+
+- Shape path family (cosmos.cpp strings @0x83702..0x83754) has exactly ONE
+  code xref (LGRACE): FUN_00023388 @0x233ff — per-race registration pass
+  (race count ctx+0xd88, stride 0x1ee), sprintf via FUN_00076c79, then
+  FUN_0001fa60 per name. Registration only: sole caller of FUN_0001fa60 is
+  FUN_00023388 itself [verified via get_function_callers].
+- Resource-table shape (UNVERIFIED recon from regparm decompiles): 200
+  slots x 0x32, names at ctx+2000+idx*0x32, slot-dword byte3 = loaded flag,
+  counter word at ctx+0x2ee0 (load ++) / unload FUN_0001fbb0 (--) with
+  FUN_0001ff04 block-eviction + u16 index compaction at ctx+0x640. Do NOT
+  cite in rewrite code until independently verified.
+- INT 21h: 74 CD 21 sites; file-I/O wrapper cluster 0x777xx-0x77dxx.
+  RAW asm ID [verified]: OPEN primitive FUN_00077776 (literal MOV AH,0x3d
+  @0x777a6 then INT 21 @0x777a8). READ primitive candidate FUN_00077a03
+  (B4 3F at 0x77a46/0x77a7e within 28B of CD21; 3rd candidate 0x7d09f other
+  cluster). Pattern caveat banked: byte-pattern B4 3F/3D misses wrappers
+  whose function number is loaded from memory, so counts are lower bounds.
+  get_function_callers(READ FUN_00077a03) = 5: FUN_00020b44, FUN_00020b84,
+  FUN_00020e28 (0x20xxx cluster — same neighborhood as the banked text-file
+  loaders music.txt FUN_00020fd4) + FUN_000660e7, FUN_00066906 (0x66xxx
+  cluster; raw asm at 0x66906 context shows [0x8b1fc] state machine +
+  CALL 0x668ba — binary reader, subsystem UNRESOLVED).
+  get_function_callers(OPEN FUN_00077776) = 2 wrappers (FUN_00077752,
+  FUN_00077deb); chain continues FUN_00077deb->FUN_00077eb3->FUN_00077ece —
+  deep wrapper stack, walk with care (each hop = 1 call).
+  TENSION banked: restree loader FUN_00046870 (OQ-013, CLOSED) is NOT among
+  READ callers — either restree loads via another primitive/wrapper (so
+  shape loading may too) or Ghidra call-graph recovery is incomplete for
+  this layer. Resolution micro-step next turn: raw-asm context of the three
+  0x20xxx callers (which files open them) + who consumes FUN_00077ece.
+- Negatives (each once): u32 scans of shp strings at bases {0,0x2a50,
+  0x10000,0x15000,0x400000} zero hits (R12: absence = no immediate ref, not
+  no consumer); get_xrefs_to(MOUSE.SHP, planets.shp cluster) zero; no libc
+  file strings in image; 'SHAPE CACHE'/'** %d SHAPES USING %lu BYTES'
+  (@0x83224/0x865b8) have no u32 sites.

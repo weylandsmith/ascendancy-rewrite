@@ -116,7 +116,10 @@ controlled-mutation capture; default 30 turns stays in force.
 OQ-005 | shp | .shp pixel codec (container CLOSED 208/208) | open | W3 ONLY:
 exe shape loader via call graph + live image. Blind static sweeps are
 FORBIDDEN (docs/REFUTED-ROUTES.md R2). Map currently draws documented
-circles.
+circles. t59 recon banked docs/re/shp.md S7: registration pass FUN_00023388
+(sole caller of FUN_0001fa60); INT21 wrapper cluster 0x777xx-0x77dxx; next
+micro-step raw-asm ID of the read primitive -> get_function_callers.
+Resource-table layout UNVERIFIED recon, not citable in rewrite.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge
