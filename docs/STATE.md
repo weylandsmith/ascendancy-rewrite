@@ -238,4 +238,10 @@ descriptor law: array +0x6d, u16 count +0xa1, stride 0x0d, type byte0,
 regparm decompiles NOT trustworthy (ASCII-hit artifact banked; t61 slot-
 flag readings VOID). CONCRETE: raw asm 0x3144a..0x31470 arg order +
 FUN_00031660 to pin dims/pixel-ptr provenance, then corpus revalidation.
+T63 LANDED (shp.md S11): both raw-asm reads done — widget pass passes the
+UNADJUSTED lib base (record selection excluded there and in the cache);
+FUN_00031660 = trivial row helper (closed). CONCRETE t63b: FUN_0005caac
+prologue stack-arg mapping (stream cursor vs shape struct; clip pushes
+0x14 survive per ADD ESP,0x14 @0x31467) + PLANETS.SHP inter-ck
+in-place-rewrite test.
 OQ-005 stays OPEN until revalidated across corpus.
