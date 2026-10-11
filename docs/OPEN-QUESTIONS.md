@@ -130,9 +130,9 @@ live-RAM anchor t62 done (S10): cache payload = VERBATIM whole-library
 copy [measured, ck RAM 0x3cd768 == file byte 0]. t64 blit input law
 code-pinned (S12): stream = payload + u32[payload+8+8*sel] + 0x18;
 DECISIVE NEGATIVE 0/12 autoplay payloads satisfy it. t65 intel-panel
-draw capture (S13, r1ad-20261011-180908: 16 turns, 71 ck, verified
+draw capture (S13, r1ad-20261011-180908: 16 turns, 72 ck, verified
 click delivery (553,318), mid-run cache misses slots 46/147): strict
-scan 71x200x8 = 0 survivors -> 5-arg blit never runs on raw payloads in
+scan 72x200x8 = 0 survivors -> 5-arg blit never runs on raw payloads in
 this flow; real codec driver = one of the other 19 FUN_0001fc34 callers
 (static attribution queued). NOT closed; no rewrite change yet.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw

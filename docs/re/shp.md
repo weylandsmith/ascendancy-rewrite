@@ -509,11 +509,11 @@ grammar laws (S9/S12.1) remain banked, no rewrite renderer change.
 Capture: r1ad-20261011-180908 (scripts/r1_intel_drive.sh): campaign
 entry t0, intel click (553,318) [windows.txt Intelligence button
 X0 474 Y0 303 X1 632 Y1 333, SENDPARAM1 14], End-Turn acquired try 2,
-advanced to turn 16 with per-cycle intel re-click, 71 checkpoints.
+advanced to turn 16 with per-cycle intel re-click, 72 checkpoints (inner completed ADAPTIVE CAPTURE OK ck=72 after -time-limit reap).
 Mid-run cache misses prove cache activity: slots 46/147 (1STARMAP.SHP,
 1starmap.tmp) loaded during the drive (not loaded at ck0).
 
-STRICT SCAN (all 71 ck x 200 slots x sel 0..7; blit law u32[P+8+8sel] in
+STRICT SCAN (all 72 ck x 200 slots x sel 0..7; blit law u32[P+8+8sel] in
 (0,size), entry rect fields <=1200, >=3 well-formed rows at entry+0x18):
 ZERO survivors — including the two newly-loaded slots. [measured]
 
