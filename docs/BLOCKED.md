@@ -168,3 +168,33 @@ capture that SCRIPTS A MOVE (click home-orbit ship, click destination star,
 End-Turn x2, save ring each step) — capture-capability extension; first R1 run
 budget for it starts when no cheaper ledger item remains (OQ-003 field semantics
 is cheaper: same idle corpus suffices for record-map diffs).
+
+
+## t51 — ONE consolidated R1 capture session closes three questions (scheduled route, NOT yet run)
+
+Static code routes for the save-writer / OQ-003 field meanings are DEAD
+(REFUTED-ROUTES R12: direct-reference scanning is provably blind in this
+image — even CLOSED parsers show zero xrefs). Remaining closure needs ONE
+scripted interactive session against a scratch copy (all t49 invariants:
+scratch copy never mounts game/, headless xvfb, -time-limit, pkill -x
+dosbox-x only, bounded output):
+
+1. CONTROLLED MUTATION (closes OQ-003 field load-paths): take the banked
+   resume.gam, flip ONE per-planet u16 per boot in a scratch tree (e.g.
+   +0x22 channel word on one named planet), boot to main map, dump RAM,
+   diff vs file mirror law (t50: byte-identical except +0x11). The record
+   that shows the injected value identifies the field's load path; iterate
+   ~5 cheapest fields.
+2. MOVE SCRIPT (closes t49 sugar-cube scale residue): new game, build one
+   scout-ish design if reachable, issue order to a lane neighbour, save
+   every turn while in flight, run scripts/r1_trajectory_regression.py —
+   nonzero (x,y,z) deltas vs lane distance = scale law; all-idle again =
+   second independent null (then BLOCKED stands as permanent, rewrite
+   immediate-arrival closes as correct-by-absence).
+3. ABILITY CHARGE OBSERVATION (OQ-020 free ride): while scripted, buy/use
+   one cell-special and record planet +0x54 + +0x66 across saves.
+
+Best default proceeding under this block (already in rewrite): scale stays
+[1,3] hops + immediate arrival (explicitly uncontradicted); OQ-003 unknown
+fields stay unwired (never stubbed). Budget rule: one session, parse
+offline; exit-1 nulls recorded once, not re-attempted.

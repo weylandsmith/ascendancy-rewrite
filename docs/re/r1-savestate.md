@@ -958,3 +958,24 @@ next round should search LEA/LEA-style forms or the open/create API
 wrapper, capped at one more probe. OQ-003 STAYS OPEN: full field
 meanings (+0x0a/+0x20/+0x4a/+0x55, counter identity, star join) and
 packed-entropy regions remain unnamed; nothing here is stubbed.
+
+
+### t51 addendum — save-writer route CLOSED AS METHOD (REFUTED-ROUTES R12)
+
+Round 2 of the named probe (decompile the string sites / scan all string VAs):
+the five `resume.gam` copies (0x8355d 0x8359a 0x857de 0x85ac4 0x85acf),
+`cosmos.txt` 0x83543, `newgame.txt` 0x85730 and the planet-array DAT_00074508
+all have ZERO Ghidra xrefs AND zero u32-immediate byte references.
+BLINDNESS PROOF [verified]: the `planitem.txt` string 0x84888 shows the same
+zero/zero pattern although its parser FUN_00037fc0 is CLOSED (OQ-014; format
+strings verified verbatim at 0x8488d "%d"x4 + 0x84899 "%d %d %d", target
+0x73e40 stride 0x28, loop bound 0x618 = 39*0x28 — matches the banked
+item-table law ind/res/pros/mpop/upop + REQUIRES byte-list bitmask + name30).
+So references
+in this image are LEA-computed or lost;
+direct-reference scanning cannot find the save-writer. OQ-003's closing route
+switches to CONTROLLED-MUTATION capture: edit ONE resume.gam field (per the
+byte-identical mirror law t50), boot it, and diff live RAM — identity between
+file value and post-boot RAM value names the field's load path for free.
+Scheduled together with the t49 move-scripted capture (one R1 session, both
+questions). BLOCKED.md carries the consolidated entry.

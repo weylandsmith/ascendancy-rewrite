@@ -120,3 +120,18 @@ S10 OPEN RESIDUE t29b).
 - Behaviour tests catch wrong inference even when constants are uncheckable
   (stockpile starvation, fortify-on-wrong-star oscillation).
 - RNG discipline: features must never add/skip draws on the campaign stream.
+
+## R12. Direct-reference scans for string/DAT sites in ascend_restored.bin — DEAD METHOD (t51)
+
+- Proven-blindness demonstration: `planitem.txt` string @0x84888 has ZERO
+  u32-immediate references and Ghidra `get_xrefs_to(0x84888)` == 0, yet its
+  loader FUN_00037fc0 is CLOSED (OQ-014) — references are LEA-computed or the
+  restored image lacks the reference metadata. Same for `resume.gam` (five
+  string copies, all zero-xref), `cosmos.txt`, `DAT_00074508`.
+- The 12 byte-scan hits for packed u32 0x857de (and kin) are MID-INSTRUCTION
+  false positives: Ghidra reports 'No instruction at address' for every one.
+  The lone contextable hit 0x38205 is PUSH EAX inside the item-table parser —
+  unrelated bytes.
+- DO NOT re-run: u32 scans of string addresses, search_byte_patterns on these
+  VAs, get_xrefs_to on the same DATs. To find a field WRITER use runtime
+  memory-modification capture or controlled save mutation instead.

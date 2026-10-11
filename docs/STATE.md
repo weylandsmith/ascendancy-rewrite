@@ -173,23 +173,24 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T50 LANDED (PLANET RECORD MAP UNIFIED BASE, docs/re/r1-savestate.md
-appended; OQ-003 NARROWED not closed): rec = name-0x24 == IL walker
-exact; mirror law = byte-identical EXCEPT u16 +0x11 (the +0x68/+0x69
-per-byte artifact resolved into ONE field); measured closed shapes:
-type<->surface bijection 151/151 (sizeClassFor code already agrees —
-evidence upgraded, no code change), +0x1a == surface+10, +0x0c star
-idx [inferred], owner MIRRORED in resume.gam (8 distinct). Save-writer
-direct-xref route DEAD round 1 (0x857de zero refs/pattern 0).
-NEXT: save-writer probe ROUND 2 FINAL (one probe: LEA-style/string-
-region scan around 0x8355d/0x85ac4 for the open-filename path
-construction; if dead, one BLOCKED line naming controlled-mutation
-capture as the only remaining field-semantics route and PIVOT to the
-move-scripted R1 capture (kills OQ-019-scale + OQ-020 together, per
-BLOCKED.md t49 ordering rule now that cheaper items are exhausted:
-OQ-021 threshold law is static — do that FIRST instead if the writer
-dies, cost zero). Do NOT rerun the t50 census (banked); do NOT
-re-attempt direct xrefs to 0x857de.
+T51 LANDED (SAVE-WRITE ROUTE CLOSED AS METHOD; REFUTED-ROUTES R12;
+BLOCKED.md t51 consolidated-capture entry): round-2 probe = u32 scans of
+ALL string VAs + Ghidra xrefs on 0x8355d/0x85ac4/0x85acf/0x8359a/0x74508
+-> zero everywhere; BLINDNESS PROOF banked (planitem.txt 0x84888
+zero/zero despite CLOSED parser FUN_00037fc0, format strings 0x8488d/
+0x84899 verified verbatim; 0x857de byte-hits all mid-instruction false —
+'No instruction at address'). OQ-003 field-meanings route switched to
+CONTROLLED-MUTATION capture (BLOCKED t51 steps 1-3: one scratch session
+= mutation boot + move script + ability observation; defaults stand
+unwired/[1,3]). NEXT: OQ-021 END-CTRL THRESHOLD static law — string
+end-ctrl.txt @0x83ef8 is player-facing text, NOT the law; find the
+comparison: grep docs for prior end-game census (victory-condition scan
+banked? OQ-021 text in OPEN-QUESTIONS names current default), then
+sweep for control-ratio comparisons: start by decompiling FUN_0002a428 — called from
+two guards inside loader FUN_00037fc0 (scenario count !=0x27; coord-sum
+>0x27) — semantics UNVERIFIED (could be scenario-validity error path).
+Budget 2 rounds Ghidra; exit 1 -> BLOCKED line naming interaction-state
+capture, do not spiral. Do NOT rerun t50 census / t51 zero-scans.
 PRIOR T45 LANDED (SELECTED-ABILITY / GOVERNOR BRANCH CLOSED, income-law.md S14):
 branch @0x38df0..0x38e29 pinned verbatim; the [0x743b9]>>0x18 operand IS
 item-table UPOP(35) (row base 0x73e40+35*0x28=0x743b8, runtime value 1
