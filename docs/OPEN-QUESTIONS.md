@@ -25,7 +25,18 @@ OQ-003 | gam | .gam full record map + field meanings; packed entropy regions
 (star stride 96 name-anchored, planet ptrs star-name+0x2A -> planet-name-0x24,
 single-owner law, orbit pair planet-name+0x57/+0x5f); field semantics fall
 out of controlled-mutation diffs (settle/capture turns), then the save writer
-code. Low priority otherwise: rewrite is fresh-start-only.
+code. Low priority otherwise: rewrite is fresh-start-only. STATUS t50:
+UNIFIED BASE pinned (rec = name-0x24 == IL walker, exact); mirror law
+refined — 151/151 records byte-identical file vs live EXCEPT u16 +0x11
+(single field; banked +0x68/+0x69 pair was this one u16 per-byte;
+snapshot-pair delta constant 1472). Measured closed-field shapes: type
++0x14 <-> surface +0x18 bijection {(0,7)(1,11)(2,23)(3,45)(4,73)} 151/151
+(upgrades sizeClassFor EVIDENCE to direct-file; rewrite code already
+agrees, no change); +0x1a == surface+10 per class; +0x0c 0..49 = star
+idx [inferred]; owner byte MIRRORED (8 distinct incl 0xFF). Still open:
++0x0a/+0x20/+0x4a/+0x55 semantics, counter identity, star join,
+packed-entropy. Save-writer string xref route dead round 1 (0x857de
+zero refs, byte-pattern 0); one LEA-form probe budget remains.
 OQ-021 | victory | end-ctrl threshold: vendor comment "over half" vs same
 file's prose "two-thirds" — current default >1/2 | open | W2: find the
 constant/comparison near the victory check in code (ghp5 functions_full.tsv,

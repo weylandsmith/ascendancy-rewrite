@@ -894,3 +894,67 @@ star records each at pointer-law bases, name-0x14 f32[3]:
   stars uniform-in-box; original = shell schedule x random unit vector
   (unit-vector generation: uniform on sphere [inferred; consistent with
   observed z distribution]). minSeparation law unknown on shells - test.
+
+
+## PLANET RECORD MAP, UNIFIED BASE (t50) — resume.gam == live RAM byte-identical; OQ-003 narrowed, not closed
+
+BASE LAW RECONCILED [verified]: the IL find_records walker base and the
+file/RAM table base are the SAME convention: record base = NAME - 0x24
+(stride 123; name field at rec +0x24..+0x36). Measured on run
+r1deep-20261005-210149 slot 41: file base resume.gam 0x9af8 (names
+0x9b1a), RAM member base 0x26d0df (phys 0x26d059 = member - H), IL
+walker rec0 = 0x26d0df EXACT. Names 151/151 file vs RAM. The older
+"0x9966 grid" and name-window (+0x59-anchored) conventions from
+r1_planet_layout.py era are DIFFERENT VIEWS of the same table; all
+offsets below are UNIFIED-BASE (== IL offsets, == live offsets).
+MIRROR LAW REFINED [verified]: across all 151 records the file and
+live-RAM records are BYTE-IDENTICAL except the u16 at +0x11 — the sole
+live-mutation field visible to the resume snapshot for an idle game;
+between the resume.gam snapshot and slot 41 its delta is the single
+constant 0x5C0 (=1472) for all 151 records (per-byte it LOOKS like
++0xC0 low with +5/+6 high-carry carryover — the banked "+0x68/+0x69
+two-field" finding was this ONE u16 seen per-byte). Do not treat the
+high-byte deltas as independent.
+FIELD SHAPE CENSUS (resume.gam, 151 records; Z=all-zero, F=all-FF,
+s=all<=12, n=distinct count):
+- +0x02 dword: coords (lane-matrix indexing consumer S11 reads the two
+  i16 halves; static values present).
+- +0x0c u16 EXACTLY 50 distinct values 0..49: owning STAR index
+  [inferred from bijection vs the 50 star slots; not yet joined].
+- +0x14 u16 {0..4} planet TYPE <-> +0x18 u16 SURFACE CELLS: bijection
+  {(0,7):24, (1,11):26, (2,23):32, (3,45):34, (4,73):35} MEASURED
+  151/151 [verified direct — the strongest evidence yet for
+  Campaign::sizeClassFor; previously banked only as kRowW row sums].
+- +0x1a u16 == surface + 10 exactly per class (7/11/23/45/73 ->
+  17/21/33/55/83) [verified pattern; semantics (ring+surface slot
+  capacity?) unnamed].
+- +0x10 dword slot-array pointer: runtime-filled (file values are the
+  counter-region artifacts, NOT valid pointers — the misaligned-base
+  '26 CB records' probe of t50 was this artifact, discarded).
+- +0x20 u16 0..73 (35 distinct), +0x0a (23 distinct, 0..50328 packed
+  look), +0x4a u16 5..29, +0x55 u16 5..29 (SAME range as +0x4a):
+  unnamed; +0x52..+0x54 bytes all-0xFF (governor +0x54 in F region =
+  the banked unowned/governor-FF state).
+- +0x32..+0x43 s-region (small ints incl. banked tech/pop-req bytes);
+  +0x44..+0x4f channel words all zero in the FRESH-START snapshot —
+  consistent with income law S6 (channels are runtime accumulators).
+LIVE-ONLY FIELDS: slot pointer +0x10 (file values are counter-region
+artifacts — the misaligned '26 CB records' probe of this census hit
+exactly that, discarded). OWNER IS MIRRORED [correction banked]: byte
++0x57 shows 8 distinct values in resume.gam (0xFF plus 7 others) —
+the earlier t40-era framing "ownership = live-only" holds for
+NEW-GAME slots vs resume.gam generally, but THIS resume snapshot does
+carry owner bytes; which value maps to which empire id is UNVERIFIED
+(the 7-others join is future work). CAVEAT banked honestly: this census ran against
+ONE campaign snapshot pair (resume.gam vs run 210149/41 + 52 for the
+diff census) — shape shapes are per-record-class facts and the type/
+surface bijection replicated across classes, but the counter-delta
+constancy is snapshot-pair-specific, NOT a universal law.
+SAVE-WRITER ROUTE (ledger's named closing route) PROBE ROUND 1: string
+'resume.gam' at image 0x8355d/0x8359a/0x857de/0x85ac4/0x85acf;
+get_xrefs_to(0x857de) = 0; operand search '0x857de' = 0; byte-pattern
+'de 57 08 00' = 0. Direct-immediate reference route DEAD in round 1 —
+next round should search LEA/LEA-style forms or the open/create API
+wrapper, capped at one more probe. OQ-003 STAYS OPEN: full field
+meanings (+0x0a/+0x20/+0x4a/+0x55, counter identity, star join) and
+packed-entropy regions remain unnamed; nothing here is stubbed.

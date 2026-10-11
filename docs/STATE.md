@@ -173,20 +173,23 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T49 LANDED (ZERO-SHIP-ACTIVITY NEGATIVE CENSUS, ships.md S14; t48 route
-exit-1 branch): trajectory regression harness fixed (heap-span array,
-count WORD @0x43483) and run — 452 consecutive pairs, ZERO state-4,
-ZERO movement; cross-checked by orbit-ring census (ids {1 Agriplot, 5
-Colony Base} only, ZERO item-23 landings ever). Idle corpus is
-STRUCTURALLY unable to evidence interaction-state laws (flight,
-combat, OQ-020 charge). Scale stays OPEN under [1,3]+immediate-arrival
-(default NOT contradicted); new R1 move-scripted capture is the only
-closing route, budgeted when cheaper items run out (docs/BLOCKED.md t49).
-NEXT: OQ-003 .gam field-semantics walk using the idle corpus (records
-already joined 151/151; field meanings via cross-planet value
-correlations + already-banked law fields; zero-capture-cost). Then
-OQ-020/OQ-021 fold into the move-scripted capture budget. Do NOT rerun
-the trajectory regression (null banked twice now).
+T50 LANDED (PLANET RECORD MAP UNIFIED BASE, docs/re/r1-savestate.md
+appended; OQ-003 NARROWED not closed): rec = name-0x24 == IL walker
+exact; mirror law = byte-identical EXCEPT u16 +0x11 (the +0x68/+0x69
+per-byte artifact resolved into ONE field); measured closed shapes:
+type<->surface bijection 151/151 (sizeClassFor code already agrees —
+evidence upgraded, no code change), +0x1a == surface+10, +0x0c star
+idx [inferred], owner MIRRORED in resume.gam (8 distinct). Save-writer
+direct-xref route DEAD round 1 (0x857de zero refs/pattern 0).
+NEXT: save-writer probe ROUND 2 FINAL (one probe: LEA-style/string-
+region scan around 0x8355d/0x85ac4 for the open-filename path
+construction; if dead, one BLOCKED line naming controlled-mutation
+capture as the only remaining field-semantics route and PIVOT to the
+move-scripted R1 capture (kills OQ-019-scale + OQ-020 together, per
+BLOCKED.md t49 ordering rule now that cheaper items are exhausted:
+OQ-021 threshold law is static — do that FIRST instead if the writer
+dies, cost zero). Do NOT rerun the t50 census (banked); do NOT
+re-attempt direct xrefs to 0x857de.
 PRIOR T45 LANDED (SELECTED-ABILITY / GOVERNOR BRANCH CLOSED, income-law.md S14):
 branch @0x38df0..0x38e29 pinned verbatim; the [0x743b9]>>0x18 operand IS
 item-table UPOP(35) (row base 0x73e40+35*0x28=0x743b8, runtime value 1
