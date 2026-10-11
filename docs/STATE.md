@@ -200,14 +200,24 @@ T57c LANDED (income-law.md): OQ-020 use path FUN_00039c10 fully mapped
 flagged unresolved, EBX=range x32 gate consumer located, +0x70 parallel
 countdown). Amass formula UNMEASURED, OQ-020 stays OPEN, capture-gated
 (zero flag&4 slots, T49). OQ-006 stale-NEXT corrected: CLOSED 2026-10-07.
-NEXT (verified against full ledger 2026-10-11: OQ-022 CLOSED t8,
-OQ-006 CLOSED 2026-10-07 — stale pointers corrected): FIRST LEG of the
-consolidated capture (BLOCKED t51 step 3 / t49 route): fresh-campaign
-turn-advance run via t56 driver recipe (ENDTURN (511,67) 25s x8 + key
-Return), then per-checkpoint reads of (a) ship heap span B+0x82bb0+0x3a095
-count word +0x43483 — state-4 flights = scale closure (OQ-019), (b) orbit
-rings for item-23 landings, (c) owned-record channel/guard fields en
-passant (OQ-016 correlation). 600 s boot + ~8 min turn phase is enough to
-observe whether ANY ship activity exists on a fresh map; null result closes
-the fresh-campaign route too and leaves scale strictly BLOCKED (user-level:
-needs original-hardware capture).
+T58 LANDED (income-law.md T58; ledger OQ-019 escalated BLOCKED-USER-LEVEL,
+OQ-016 queue-chain note): deep run turns 0..52, 113 ck. Scale leg NULL at
+depth (565 slot obs, 0 state-4/0 owned/0 moved, 0 landings) — no save-
+observable route contains flight; only original-hardware capture remains.
+First live t28 queue completion (Tubes->Agriplot re-queue, cheap-first,
+player never queues). Threshold-50 wrap exactly once at pop 2->3, 8 AI
+drops on pop steps; rewrite growthPhase unchanged. HARNESS LESSONS:
+r1_trajectory_regression.py IGNORES argv (scans ALL runs) — read its header
+before quoting numbers; the constant-7 byte at 0x1BF450+H is NOT the turn
+counter (T42 law needs a KNOWN phys).
+NEXT: full-ledger classification DONE t58b — remaining open: OQ-005 (only
+in-hand RE route = W3 shape-loader via call graph + live image; sweeps
+FORBIDDEN), OQ-010 combat application (static route bounded; scripted
+campaigns have NO combat -> capture class same as scale), OQ-012(a) blocked
+glyph-readout, OQ-016 attribution + OQ-003 meanings replay-only, OQ-019
+scale BLOCKED-USER (t58), OQ-020 amass capture-gated-unreachable, OQ-021
+end-screen rides multi-hour gameplay BLOCKED-USER, OQ-023 build-work parked
+by standing option-C decision (not RE). CONCRETE NEXT ACTION: OQ-005 W3 —
+locate the .shp loader via call graph (entry: RAM name-table law OQ-004
+@0x250c1c + windows.txt verbatim 'DATA\3CFGNEW.SHP' consumers), NOT a
+codec sweep. If loader found, codec from its instruction stream.

@@ -331,7 +331,10 @@ income law docs/re/income-law.md S6..S10; harness scripts/r1_income_
 channels.py; chase-capture law = deep-schedule End-Turn clicks 511:67
 every 15s, save ring read by MTIME. Governor @+0x54 CLOSED t45 (S14:
 same field as queue; fires only on special-item cell-SELECT; 0/2810). T56: fresh-run AI opening queue = Agriplot (+0x54=0x01) 4/4 thin; word
-+0x52 = CELL INDEX not item id (corpus 0..59>39, income-law T56).
++0x52 = CELL INDEX not item id (corpus 0..59>39, income-law T56). T58: LIVE queue chain observed to completion at 52 turns — Tonklinus
+queued Transport Tubes (id 21 COST 10, completed ~obs20) then re-queued
+Agriplot; 3 others held Agriplot; cheap-first pattern (not uniform-random,
+consistent t28 selector); player never queued. income-law.md T58.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:
@@ -343,10 +346,11 @@ hack (+0x46 writers), sugar-cube scale (+0x5e readers), per-ship inventory
 CLOSED re-confirmed t47 (generalized sweep, §9/§13); inventory law CLOSED
 t46 (landed ship = active item-23 ring row, §10); Orbital Docks readers
 banked t47-48 (upkeep/propulsion/range/step/fuel laws §12-13 — drives
-RANGE=STEP=0, executor has NO drive->distance term). sugar-cube scale
-OPEN: idle corpus has ZERO ship activity ever (t49 §14: 2260 slot-pair
-observations 0 state-4, 0 landings) — closing route = new move-scripted
-R1 capture, budgeted per docs/BLOCKED.md t49; default [1,3]+immediate
+RANGE=STEP=0, executor has NO drive->distance term). sugar-cube scale BLOCKED-USER-LEVEL t58: idle corpus zero ship activity
+ever (t49 §14: 2260 slot-pair obs 0 state-4) AND scripted fresh campaign
+to turn 52 zero too (t58: 565 slot obs, 0 state-4/0 owned/0 moved, 0
+item-23 landings) — NO save-observable route contains flight; closure
+needs original-hardware/manual-gameplay capture. Default [1,3]+immediate
 arrival stands NOT contradicted.
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |

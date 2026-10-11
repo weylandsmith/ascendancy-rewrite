@@ -1890,3 +1890,43 @@ unmeasured — do NOT wire any of this into rewrite.
 
 STATE NOTE: OQ-006 was already CLOSED (2026-10-07 rate chain); a stale NEXT
 line pointing at it was corrected this turn.
+
+
+## T58 — DEEP FRESH-CAMPAIGN RUN (r1ad-20261011-132306, turns 0..52, 113 ck): scale leg + live queue completion + growth wraps
+
+1. SHIP/SCALE LEG NULL AT 52 TURNS [verified, direct per-ck census]: over
+   all 113 checkpoints of this run, ship-array slots (heap span
+   B+0x82bb0+0x3a095 stride 0x162, count word B+0x82bb0+0x43483 = 5): 565
+   slot observations, ZERO state-4, ZERO owner != 0xFFFF, ZERO position
+   changes. Orbit rings hold ZERO active item-23 at ck001/040/080/113.
+   A 52-turn fresh campaign produced no ship production, launches, or
+   landings. Consequence: with the T49 idle-corpus null and now the
+   scripted-fresh null, NO save-observable route remains that contains
+   flight — scale closure needs original-hardware/manual-gameplay capture
+   (user-level); BLOCKED t49/t55 escalated to that wording.
+
+2. LIVE BUILD-QUEUE SEQUENCES (first direct observation of the t28 law
+   cycling): per-planet byte +0x54 (pending item; 0xFF idle) over the run:
+   3 of 4 AI homes queued Agriplot (id 1) at first End Turn and held it;
+   Tonklinus I queued Transport Tubes (id 21, COST 10) and COMPLETED it
+   (~obs 20-21) then immediately re-queued Agriplot — selector -> queue ->
+   acc -> complete -> re-queue chain observed end to end for the first time.
+   AI opening picks are CHEAP-FIRST (10-IND Tubes once, 30-IND Agriplot
+   otherwise), consistent with the banked need-class/COST-ratio selector
+   (t28), NOT uniform-random; population 4 openings, thin, recorded not
+   law. Player home (Rhovid II) NEVER queued (0xFF whole run, manual).
+
+3. GROWTH WRAPS + POP GROWTH [verified base-relative]: player counter
+   (+0x4e) climbed 0->49 by ~t45, WRAPPED EXACTLY once (49->0) at the pop
+   2->3 event; AI worlds show 8 counter-drop observations each coinciding
+   with their pop steps (final pops 4/4/4/4, caps 14..26). Threshold-50 +
+   wrap + pop+1 (t24 law) confirmed at depth; rewrite growthPhase unchanged.
+   Player-vs-AI rate ratio held ~1:2 across the whole run (ck deltas 4 vs 8,
+   16 vs 32, 22 vs 44), re-confirming the alien term at 10x the t56 sample.
+
+4. HARNESS NOTE: an ad-hoc turn read at index 0x1BF450+H returned constant 7
+   across ck001..ck113 while turns.log/spin.log show 0->52: that address is
+   NOT the turn counter (the banked T42 law is phys + base - 0x1BF450 for a
+   KNOWN phys; I plugged the wrong VA). For ck-timeline work use turns.log /
+   spin.log (inner/driver-maintained, authoritative here); all banked numbers
+   in items 2-3 are base-relative base-offset fields, unaffected.
