@@ -533,3 +533,67 @@ slot indices + selector, and what they do with the returned pointer
 (table-law consumers vs direct stream walks). The consumer that walks
 records DIRECTLY (e.g. via the file u64 table at +0x98 = verbatim+0x10)
 is the real codec driver and settles the per-record prefix law.
+
+## 14. W3 round 9 (t66): t65 NULL REFUTED — base was wrong; blit table law HOLDS on verbatim library copies [measured 3504 survivors]
+
+1. HARNESS FIX [verified]: r1_x86walk bailed on opcodes 0x88..0x8b
+(mov family missing). After patch, walking the 20 FUN_0001fc34 callers
+produces 4215 instructions (was 81) and 12 call-0x1fc34 sites.
+
+2. CALLER ATTRIBUTION (12/20 reachable sites; 8 entries decode dead-ends
+via other paths — queued): UNIFORM idiom at every widget site:
+EAX := 0x9f10c (cache singleton); slot u16 := [widget+24]; record
+selector := [widget+28]>>16 (or local variant); fc34 payload flows
+UNMODIFIED as blit arg2 (push order verified at 0x3233e..0x32348,
+0x32be9.., 0x31030.., 0x5a9a2..). Three non-blit sites (0x171e7, 0x179d8,
+0x1a292) pass payload to FUN_0x61193 instead — separate consumer
+queued. 0x32c8f feeds FUN_0x61058 (measured-size helper). So the raw
+.shp slot + record selector IS the draw input — NO transform pass.
+
+3. BASE-LAW CORRECTION (the t65 null was a scan bug) [measured]:
+blit deref verbatim @0x5cb4d..0x5cb5b: ESI := arg3; SHL 3; ADD 8;
+ADD arg2; MOV ESI,[ESI]; ADD ESI,arg2 => entry E = arg2 +
+u32[arg2+8+8·sel]; rect E+8..E+0x14; stream E+0x18 (@0x5cb85).
+t64/t65 scans used arg2 = P (slot bookkeeping base). But the VERBATIM
+copy lives at P+0x88 (S12.2 anatomy), and the file's own u64 table sits
+at file+0x10 = P+0x98: u64 read at 8-byte stride == u32 stride-8 window
+starting at P+0x88+8. raceflag ck071 [measured]: u32[P+0x90+8k] =
+(0xb0, 0x21f, 0x38a, 0x4d9, 0x637, ...) = (tsz, table[0], table[1], ...)
+— exactly the selector series. The file tsz field doubles as rec0's
+virtual slot: tsz + 0x18 = rec0 + 8 (holds because rec0 = 0x10 + tsz and
+rec0 header is the 8-byte u32 dims pair; rec1+ header is 0x18 bytes —
+dims u16 pair + zero fill — matching E+0x18 prefix 24).
+
+4. STRICT SCAN RE-RUN with arg2 = PAY = P+0x88 (r1ad-20261011-180908,
+all 72 ck x loaded slots x sel 0..11; blit-faithful walk, magic guard
+'1.10' at PAY): 3504 survivors, stable per (slot,sel) across every ck
+(e.g. slot 32 raceflag sels 0..11 all 72/72; slot 41 14intel, slot 36
+listbox, slot 7 LGRACE00). Pixel equality RAM-vs-file on raceflag sel1
+(25x15 record decoded row-for-row IDENTICAL) [measured]. The t64
+"DECISIVE NEGATIVE" and the t65 null are BOTH VOID — same base bug.
+
+5. VALIDATOR SEMANTICS [verified from asm]: row-stream consumption has
+NO x limit — the blit CLAMPS writes at row end (0x5cd31/0x5cd62) but
+advances the stream unconditionally; the row loop stops after the clip-
+rect rows (<= H-1), never demanding stream exhaustion. So a record stream
+may legally contain EXTRA FRAMES: planal00/sm race00/bullet00/planets
+rec0 = exactly 2xH well-formed frames consuming span exactly [measured];
+dkship00 rec1 walk desynced mid-record (queued: dims-vs-frames for that
+family). pfx24 ok population re-run under clamp semantics: 25/208 strict
+(exhaustive) — but exhaustive-span was the WRONG criterion for drawing;
+per-record law = stream at rec+0x18, first (h+1) rows drawn, remainder
+animation frames or padding.
+
+6. UNIFIED PER-RECORD STREAM LAW (proposed, evidence = 3+4):
+stream(k) = PAY + seloff(k) + 0x18 where seloff(0)=tsz, seloff(k)=u32lo
+of directory slot k-1 at file+0x10. Selector semantics: blit arg3 =
+widget+28>>16 indexes the SAME series. Frame sub-selection law open
+(frame2 follows frame1 headerlessly).
+
+QUEUED t67: (a) corpus-wide strict under law 5 semantics (draw-first-
+frame: walk h+1 rows from PAY+seloff+0x18, no span requirement) ->
+expect ~all libs pass except 10 expl dims variants + dkship class;
+(b) frame-count law per library (frames = span-fit); (c) FUN_0x61193
+consumer attribution; (d) 8 remaining caller entries. OQ-005 is ONE
+law away from closure of the stream-start item; strict-close still
+requires (a)+(b) numbers.

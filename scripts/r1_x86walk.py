@@ -127,6 +127,18 @@ def walk(entry, out, seen):
             elif op == 0x8d:
                 rm, j = modrm(d, i + 1, namesz)
                 text, nxt = f"lea {REGS[(d[i+1]>>3)&7]}, {rm}", j
+            elif op == 0x88:
+                rm, j = modrm(d, i + 1, 8)
+                text, nxt = f"mov byte {rm}, {REG8[(d[i+1]>>3)&7]}", j
+            elif op == 0x89:
+                rm, j = modrm(d, i + 1, namesz)
+                text, nxt = f"mov {rm}, {REGS[(d[i+1]>>3)&7]}", j
+            elif op == 0x8a:
+                rm, j = modrm(d, i + 1, 8)
+                text, nxt = f"mov {REG8[(d[i+1]>>3)&7]}, byte {rm}", j
+            elif op == 0x8b:
+                rm, j = modrm(d, i + 1, namesz)
+                text, nxt = f"mov {REGS[(d[i+1]>>3)&7]}, {rm}", j
             elif op == 0x85:
                 rm, j = modrm(d, i + 1, namesz)
                 text, nxt = f"test {rm}, {REGS[(d[i+1]>>3)&7]}", j

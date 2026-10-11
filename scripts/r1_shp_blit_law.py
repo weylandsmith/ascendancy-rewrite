@@ -47,8 +47,6 @@ def walk(d, i, end, W, strict):
             if i >= end: return None, "truncated"
             C = d[i]; i += 1
             if C == 0:
-                if x > W:
-                    if strict: return None, "over-W"
                 break
             if C == 1:
                 if i >= end: return None, "truncated"
@@ -59,7 +57,9 @@ def walk(d, i, end, W, strict):
             else:
                 n = C >> 1; i += 1; x += n
                 if i > end: return None, "truncated"
-            if x > W and strict: return None, "over-W"
+            # blit mirrors: writes CLAMP at row end (0x5cd31/0x5cd62) but
+            # the stream is consumed unconditionally; x>W rows are LEGAL
+            # (spill discarded). No x limit in either mode.
         rows += 1
         if i >= end: return rows, (None if i == end else "ran-past")
 
