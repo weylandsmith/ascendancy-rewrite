@@ -245,52 +245,30 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     for (int s = 0; s < n; ++s) {
         if (owner_[s] >= 0) planets_[s].pop = cfg_.initialPop;
     }
-    // Opening position on every home: COLONY BASE ONLY, pop 2, CB on a
-    // RANDOM BUILDABLE CELL (MEASURED t40, scripts/r1_home_placement.py:
-    // first-save of every distinct world identity across work/r1/* (27
-    // worlds; owner byte +0x57 == empire, 0xFF empty): pop==2 + exactly one
-    // ACTIVE Colony Base, no Factory/Laboratory/Shipyard anywhere in the
-    // record including the orbital ring; 153/157 homes, the 4 Agriplot+CB
-    // worlds are mid-game chase captures, scenario worlds add only authored
-    // scatter). CB buildable-cell RANK 2..70 measured, ranks 0 and 1 never
-    // (0/157); rank draw here is [inferred] inside that measured envelope.
-    // The CB cell class feeds the channel words (class2 IND=2 x14, class3
-    // PROS=2 x6, class4 RES stays 0 — gating re-confirmed; income-law.md
-    // T40). The old Factory+Lab+Shipyard seeding (tutorial.txt scenario,
-    // not campaign start) is RETIRED. The constructor's opening-research
-    // grant is NOT measured (empire tech block unexamined) — banked open,
-    // not silently changed.
+    // Opening position on every home: COLONY BASE ONLY, pop 2, CB UNIFORM
+    // over the planet's NON-ROCK surface cells (barren INCLUDED). LAW CLOSED
+    // t42 by raw disasm + census (income-law.md T42): home seed
+    // FUN_000238e8 @0x23ca2 calls FUN_00038818 with EBX=0xffff (no slot) ->
+    // picker FUN_0003875c (collect checker-legal empty slots, ONE rng %
+    // count). Checker FUN_0003830c never zeroes legality for item 5 on a
+    // surface non-rock cell (rule B's barren path enters rule C, which
+    // SKIPS zeroing for item 5; only rock and orbital placement zero).
+    // Census scripts/r1_cell_choice_census.py + r1_cb_rank_final.py: 19/72
+    // (26%) turn<=1 home CBs on barren ~ terrain barren rate; zero CB on
+    // rock in 2810 corpus CB cells; KS PASS uniform (D=0.085, crit 0.192).
+    // t40's barren-exclusion is SUPERSEDED by the rule chain; the t40
+    // rank>=2 floor is NOT refuted by data (rank<2 0/72, uniform-expected
+    // 2.6, p~0.07) but has NO code counterpart — uniform draw per disasm.
+    // Factory/Lab/Shipyard never on a first-save home (t40) — v1 seeding
+    // stays RETIRED. The CB cell class feeds the channel words (T40).
+    // Constructor opening-research grant unmeasured — banked open.
     for (int s = 0; s < n; ++s) {
         if (owner_[s] < 0) continue;
         int b = itemId("Colony Base");
         if (b < 0) continue;
         auto& ps = planets_[s];
-        int nb = 0;
-        for (int c = 0; c < ps.surfaceCells; ++c)
-            if (!(ps.cellClasses[c] & 8)) ++nb;
-        // Rank draw in the measured [2, nb-? ] envelope; mechanism
-        // unverified so the cell itself is drawn uniformly from buildable
-        // cells with the bottom two buildable RANKS excluded (0/157
-        // observation). Degenerate tiny planets fall back to first buildable.
-        int cell = -1;
-        if (nb >= 3) {
-            // The walk consumes `pick` buildable cells (rank pick-1).
-            // pick in [3, nb] -> rank in [2, nb-1] — the measured envelope
-            // INCLUDING the last buildable cell (t40 pin caught the earlier
-            // pick in [2, nb-2], which made rank 1 reachable and rank nb-1
-            // unreachable).
-            int pick = 3 + next() % (nb - 2);
-            for (int c = 0; c < ps.surfaceCells; ++c) {
-                if (ps.cellClasses[c] & 8) continue;
-                if (--pick == 0) { cell = c; break; }
-            }
-        }
-        if (cell < 0) {
-            for (int c = 0; c < ps.surfaceCells; ++c)
-                if (!(ps.cellClasses[c] & 8)) { cell = c; break; }
-        }
         ps.items.push_back(b);
-        ps.itemCells.push_back(cell);
+        ps.itemCells.push_back(drawCbCell(ps));
     }
     if (tree_ && tree_->all().size() > 2)
         for (auto& techSet : ownedTech)
@@ -414,37 +392,55 @@ int Campaign::worldNext() {
 }
 
 void Campaign::seedColonyBaseColony(int star) {
-    // COLONISED-PLANET LAW (t41, docs/re/income-law.md T41 +
-    // scripts/r1_colony_items.py): ownership flip arrives with EXACTLY one
-    // ACTIVE Colony Base, pop := 2 (income-law.md S6e); cap == seed + 2
-    // follows from the closed recalc law (CB MPOP 2), observed exact. The
-    // original's colonisation entry is the itemIdx-5 legality path
-    // (ownership gate exempts itemIdx 5 on UNOWNED planets —
-    // income-law.md §4/S9) feeding the same activation store, which is why
-    // the CB word-0 active bit is set immediately. Cell draw = measured
-    // buildable-rank envelope [2, nb-1] (mechanism [unverified], same as
-    // the t40 home draw; ONE worldLcg_ stream for both).
+    // Seed a freshly-claimed planet (COLONISED-PLANET LAW, t41 + t42
+    // upgrade, docs/re/income-law.md T41/T42): ownership flip arrives with
+    // EXACTLY one ACTIVE Colony Base, pop := 2 (income-law.md S6e); cap ==
+    // seed + 2 follows from the closed recalc law (CB MPOP 2), observed
+    // exact. Original paths (t42 raw disasm): the EVENT handler
+    // FUN_0003aa0a @0x3b0bd..0x3b0d1 runs the ACTIVATOR FUN_00038840 mode 0
+    // with the cargo slot record (+0xae); FUN_00041d64..0x41d7b runs pop
+    // :=2 + the PICKER FUN_00038818 (uniform among checker-legal empty
+    // cells). Cargo-slot chooser upstream of +0xae unrecovered [open]; the
+    // rewrite uses the picker draw for arrivals (ranks 4/40 observed are
+    // consistent). Cell = drawCbCell: ONE worldLcg_ draw over non-rock
+    // cells, same stream as terrain and the home draw (REFUTED-ROUTES RNG
+    // discipline).
     PlanetState& ps = planets_[star];
     ps.pop = 2;
     const int b = itemId("Colony Base");
     if (b < 0) return;
+    ps.items.push_back(b);
+    ps.itemCells.push_back(drawCbCell(ps));
+}
+
+int Campaign::drawCbCell(const PlanetState& ps) {
+    // Uniform over the planet's picker-legal EMPTY cells for Colony Base =
+    // ALL NON-ROCK SURFACE CELLS, BARREN INCLUDED. Disasm law (raw listing
+    // of checker FUN_0003830c, income-law.md T42): legality = EDI!=0 &&
+    // EBP!=0, EDI starts -1 (legal) and every rule only SETS it. For item
+    // 5 (RAM flags word +6 == 0x0001, table dump t42): rule A (0x38446)
+    // fires on item flags bit0 -> EDI:=-1; rule B (0x38493) NEVER zeroes
+    // (barren branch only adds legality); rule C (0x384db) zeroes for
+    // orbital placement (item 5 surface-bound); rule D (0x38519) zeroes on
+    // ROCK (only exemption item 38); rule G adjacency is SKIPPED for items
+    // 5/35 (0x385f6 CMP DL,5; JZ end). Net: CB legal on every non-rock
+    // cell, barren included — census agrees (39/162 first-save CBs barren
+    // ~ terrain rate; ZERO CB on rock in 2810 corpus CB cells; KS PASS on
+    // turn<=1 homes: D=0.085 vs crit 0.192, z=+0.49, n=72 — scripts
+    // r1_cb_rank_final.py). Picker FUN_0003875c: ONE rng % count (uniform).
+    // ONE worldNext() draw here; returns -1 iff no non-rock cell (original:
+    // picker yields 0xffff, FUN_00038718 no-ops, no CB placed).
     int nb = 0;
     for (int c = 0; c < ps.surfaceCells; ++c)
         if (!(ps.cellClasses[c] & 8)) ++nb;
-    int cell = -1;
-    if (nb >= 3) {
-        int pick = 3 + worldNext() % (nb - 2);   // rank pick-1 in [2, nb-1]
-        for (int c = 0; c < ps.surfaceCells; ++c) {
-            if (ps.cellClasses[c] & 8) continue;
-            if (--pick == 0) { cell = c; break; }
-        }
+    if (nb == 0) return -1;
+    const int pick = worldNext() % nb;
+    int seen = -1;
+    for (int c = 0; c < ps.surfaceCells; ++c) {
+        if (ps.cellClasses[c] & 8) continue;
+        if (++seen == pick) return c;
     }
-    if (cell < 0) {
-        for (int c = 0; c < ps.surfaceCells; ++c)
-            if (!(ps.cellClasses[c] & 8)) { cell = c; break; }
-    }
-    ps.items.push_back(b);
-    ps.itemCells.push_back(cell);
+    return -1;
 }
 
 int Campaign::storedIndFor(int star) const {

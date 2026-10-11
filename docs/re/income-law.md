@@ -1370,3 +1370,71 @@ itself (data-file lift), per-cell terrain/nuke grid, +/-2 event-order edge.
   Control t729, seed 42 Extinct t557 — productive-from-arrival colonies
   ACCELERATE play vs t40 (t976/t1414); PLAYTHROUGH.md regenerated after
   this landing (gate greps VICTORY strings only).
+
+## 12. CB-CELL PICKER LAW CLOSED (t42) — FUN_0003875c + FUN_0003830c raw disasm
+
+The t40/t41 "mechanism [unverified]" envelope is CLOSED by raw listing of the
+picker chain (Ghidra disassemble_function on the restored image; the
+decompiler FLATTENS the __regparm edge setup — only the listing shows EDX =
+item id and EBX = explicit slot at the call sites):
+
+ 1. HOME SEED FUN_000238e8 @0x23ca2..0x23cb2: world-gen loop, on the
+    per-empire home planet: owner byte := empire (0x23ca7), pop +0x42 := 2
+    (0x23cac), then MOV EBX,0xffff / MOV EDX,0x5 / CALL 0x38818 — the
+    PICKER path, NO explicit slot. Second site FUN_00041d5c..0x41d7b:
+    pop := 2, owner := event byte [EDI], +0x67 := DAT_00012e10, then
+    EBX := 0xffff / EDX := 5 / CALL 0x38818 (picker, no explicit slot).
+ 2. PICKER WRAPPER FUN_00038818 (20 instr): EAX=planet, DL=item, EBX=slot-or
+    -1; calls FUN_0003875c then FUN_00038718 (guard: slot byte1==0xFF, then
+    FUN_00038840 ECX=0 picker-cell / ECX=2 explicit-cell; the ECX=2 path
+    RE-RUNS FUN_0003830c @0x38a6a and refuses on 0, so a picked cell is
+    gated by the checker twice; the activator writes byte1:=item, word2:=1).
+ 3. PICKER FUN_0003875c (59 instr, listing banked): for slot k in
+    [0, word[+0x1a]) with byte1==0xFF and FUN_0003830c(planet,k,item)!=0,
+    COLLECT k into a 100-entry list; if count>0: CALL FUN_0007824f (ONE LCG
+    draw), IDIV count, list[remainder] -> UNIFORM AMONG LEGAL EMPTY
+    CELLS. Not first-empty. 0xffff if none.
+ 4. CHECKER FUN_0003830c slot-legality chain (325 instr listing): legal iff
+    EDI!=0 && EBP!=0; EDI := -1 at entry and EVERY rule only SETS it
+    (SETC/SETNZ + XOR-xor patterns read carefully). For item 5 (Colony Base,
+    RAM flags word +6 == 0x0001 — dump scripts in §12 evidence):
+      rule A @0x38446  item flags bit0 -> EDI := -1 (CB always legal here);
+      rule B @0x38493  cell class != 0 -> EDI := -1; class==0 stays legal
+                       unless item 0xff or flags bit1 — the barren path
+                       FALLS THROUGH to rule C and is NOT zeroed for item 5;
+      rule C @0x384db  illegal iff (slot<+0x18) != (item < PTR_DAT_00073e3c
+                       =22): CB (5<22) legal ONLY on surface, orbital illegal;
+      rule D @0x38519  illegal iff rock XOR (item==0x26) — CB illegal on rock;
+      rule E 0x38554 / rule F 0x38576 gated to items 36/35 — N/A;
+      rule G @0x385b7  adjacency, SKIPPED for item 5/35 (0x385f6 CMP DL,5
+                       JZ end). NET: CB legal on EVERY non-rock surface cell,
+                       barren INCLUDED.
+ 5. CENSUS (scripts/r1_cb_rank_final.py per-world rows, r1_cb_picker_law.py
+    battery, r1_cell_choice_census.py Q1-Q3): 72 turn<=1 home CBs, ranks over
+    the A-set (non-rock, barren-included) span 2..69 with KS D=0.085 (crit
+    0.192 alpha .01) and z=+0.49 -> UNIFORM CONFIRMED; 19/72 (26%) on barren
+    ~ terrain barren share (rule-B reading confirmed; the t40 nonbarren-only
+    rank space was a filter artefact — raw dump Stavern I turn 0 shows CB
+    ALONE on a class-0 cell, every other slot empty). ZERO CBs on rock in
+    2810 corpus CB cells (all saves) — rule D holds absolutely.
+    Residual: rank<2 never observed (0/72; uniform expectation ~2.4,
+    p~0.09) — NO code counterpart exists in the chain, treated as sampling,
+    NOT pinned.
+ 6. HARNESS LAWS LEARNED (turn clock!): member index = GUEST-PHYS + (base -
+    0x1BF450) (r1_pros_growth.turn_of). A hard-coded "+136" H and a
+    member[phys] read BOTH silently mis-map mid-run runs whose base differs —
+    the t42 "rank 0/1 observed" mid-population reading was exactly this
+    artefact and was retracted before landing. Population selection MUST
+    filter turn<=1 on each save file, not on a corpus-first dedupe (luring
+    mid-game worlds with matching identities inflated 72 -> 162).
+ 7. COLONY-ARRIVAL CELLS: the event handler FUN_0003aa0a @0x3b0bd..0x3b0d1
+    runs the activator FUN_00038840 mode 0 with the CARGO SLOT record word
+    +0xae (legality gated at @0x3afed via FUN_0003830c); the upstream
+    cargo-slot chooser is NOT recovered [open]. FUN_00041d64 (picker + pop:=2)
+    is the site consistent with the t41 arrival observations (ranks 4, 40).
+ Rewrite: Campaign::drawCbCell = ONE worldLcg_ draw % nb over non-rock cells
+ (homes ctor + seedColonyBaseColony); t40 barren-exclusion + rank>=2 floor
+ REPLACED. Pins campaign_home_placement_law_t40 (non-rock, barren allowed) +
+ campaign_cb_cell_uniform_t42 (every non-rock cell reachable, none of the
+ rock, barren share band). Timelines: 2024 Control t762, 13 Extinct t324,
+ 42 Extinct t561 (PLAYTHROUGH.md regenerated).

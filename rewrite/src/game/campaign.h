@@ -178,6 +178,15 @@ public:
     const Galaxy& galaxy() const { return galaxy_; }
     int playerScorePct() const;  // stars-owned share, static.txt '%'-template (§1)
     std::string traceLine() const;  // one-line status for playthrough logs
+    // Pick a Colony-Base cell the way the original's picker does: ONE
+    // worldNext() draw over the planet's NON-ROCK surface cells, barren
+    // class 0 INCLUDED (picker FUN_0003875c uniform-among-legal-empty;
+    // legality of class 0 for item 5 per FUN_0003830c rule order —
+    // income-law.md T42, census scripts/r1_cell_choice_census.py).
+    // Returns -1 only if the planet has no non-rock cell (original: the
+    // picker yields 0xffff and placement silently no-ops). PUBLIC for the
+    // t42 uniformity pin; consumes one worldLcg_ draw per call.
+    int drawCbCell(const PlanetState& ps);
 
 private:
     void pickHomeStars();
@@ -210,12 +219,17 @@ private:
     // combat/expansion timelines remain reproducible).
     int worldNext();
     // Seed a freshly-claimed planet: pop := 2 [verified S6e] + exactly one
-    // Colony Base on a buildable cell (t41 law, scripts/r1_colony_items.py:
+    // Colony Base via drawCbCell (t41 law, scripts/r1_colony_items.py:
     // 2720/2720 owned records corpus-wide carry an ACTIVE Colony Base; the
     // 2 same-world in-run colonisation observations both show CB-only,
-    // pop 2, cap == seed+2 exact). Cell = measured rank envelope [2, nb-1]
-    // (arrival ranks observed 4 and 40; rank 0 never in 157+2 samples);
-    // selection mechanism [unverified].
+    // pop 2, cap == seed+2 exact). Original paths producing that state
+    // (t42 raw disasm): EVENT handler FUN_0003aa0a @0x3b0bd..0x3b0d1 =
+    // activator FUN_00038840 mode 0 with the CARGO slot record (+0xae),
+    // legality gated at @0x3afed; and FUN_00041d64..0x41d7b = POP:=2 +
+    // PICKER FUN_00038818 (uniform among legal empties). The cargo-slot
+    // chooser upstream of +0xae is not yet recovered [open]; the rewrite
+    // uses the picker draw for arrivals (observed arrival ranks 4 and 40
+    // are consistent with it; income-law.md T42).
     void seedColonyBaseColony(int star);
     // Shared raw-channel accumulator triple {IND, PROS, RES} under the
     // battery law (income-law.md T35 gating + T36b placement): k-th surface

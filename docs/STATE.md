@@ -173,32 +173,32 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T41 LANDED (COLONISED-PLANET LAW CLOSED). Colonisation arrives with
-EXACTLY ONE active Colony Base + pop :=2, cap==seed+2 exact (scripts/
-r1_colony_items.py; dt-diff found no flips — capture cadence — earliest-
-owned-observation resolved: 2 same-world CB-only observations + 2720/
-2720 owned records corpus-wide carry an active CB). Cell = measured rank
-envelope [2, nb-1] on the SAME world LCG (now member worldLcg_/
-worldNext() — terrain + home draw + colony draw share it, rng_ untouched;
-expansionPhase calls seedColonyBaseColony). Pin
-campaign_colonised_plan_gets_colony_base_t41: every owned star holds a
-CB after 300 turns. TIMELINE (CLI finite-proved): 2024 Control t729, 42
-Extinct t557, 13 Extinct t346 — productive-from-arrival colonies
-ACCELERATE play; PLAYTHROUGH.md REGENERATED (record_playthrough.sh
-budgets 600->1200); gate campaign budget 1200 already covers t729. run_tests 100/0.
-NEXT ACTION: built-item CB-cell draw mechanism — static pass over the
-original's colonisation entry (itemIdx-5 ownership-gate-exempt path ->
-slot-selection function): find the rng call that picks the placement cell
-(hypothesis: FUN_0003958c-family slot finder is prefix-first-empty; the
-SCATTERED home/CB cells then come from world-gen pre-occupying cells,
-e.g. the original scatters a per-planet pseudo-random FREE-ITEM/ruin set
-at generation — test by counting active+empty-slot patterns vs a scatter
-model on first-save worlds). If the finder is first-empty AND homes are
-scattered, the missing law is a per-planet world-gen scatter — lift its
-parameters from 0x37d80/0x3a558 neighborhoods.
-NOTE t36: terrain generation law closed end-to-end + ctor generates
-cellClasses (commit 0a0a4d7); NOTE t35: raw-array re-audit (383bb73).
-
+T42 LANDED (CB-CELL DRAW LAW CLOSED). Home seed FUN_000238e8
+@0x23ca2..0x23cb2: owner:=empire, pop:=2, EBX:=0xffff EDX:=5 CALL
+FUN_00038818 = PICKER; FUN_0003875c collects checker-legal empty cells,
+ONE FUN_0007824f draw, IDIV count, list[rem] = UNIFORM AMONG LEGAL
+EMPTIES. Checker FUN_0003830c rule chain (raw listing — decompiler
+flattens EDI): CB legal on EVERY non-rock surface cell, BARREN INCLUDED
+(rule B class!=0 rule falls through for item 5 — RAM flags 0x0001
+verified), illegal rock (rule D), illegal orbital (rule C: (slot<surf)
+XOR (item<22)). Census: 72 turn<=1 homes KS D=0.085 (crit .192) PASS,
+19/72 barren ~= terrain share, 0/2810 CB-on-rock corpus-wide (scripts/
+r1_cb_rank_final.py + r1_cb_picker_law.py VERDICT 0; t40 rank 2..70 was
+a nonbarren-filter artifact — RETRACTED, rank0/1 0/72 residual p~.09 unpinned).
+Rewrite drawCbCell = ONE worldNext draw % nb over non-rock cells; pins
+campaign_home_placement_law_t40 + campaign_cb_cell_uniform_t42; timelines
+2024 Control t762 / 13 Extinct t324 / 42 Extinct t561; PLAYTHROUGH.md
+regenerated. HARNESS LESSON: member = phys + (base-0x1BF450) per run —
+hard-coded +136 and corpus-first dedupe BOTH silently corrupt populations
+(mis-mapped mid-run worlds inflated 72->162; retracted before landing).
+NEXT ACTION: BUILT-ITEM (non-CB) CELL SELECTION — xrefs to FUN_00038818
+show 16 build/completion sites in FUN_0003f130/FUN_0003f758/FUN_0003fc4c
+(bank: EDX=item e.g. 0x26 rock-item site 0x3fc6c). Resolve EBX at those
+sites (0x3f7f2 XOR EBX,EBX — explicit slot 0?? vs T40(6) prefix-from-0
+REFUTED 0/2720): read raw listing + census Factory/Lab ranks over non-rock
+empties mid-game. If picker-uniform (EBX=0xffff or wrapper ignores
+explicit-0), upgrade buildPhase lowest-free -> draw; if explicit-slot,
+lift the chooser. NOTE t36: terrain law closed; NOTE t35: raw-array re-audit.
 NOTE t34: DISPLAY-WORD CHANNEL LAW — see income-law.md T34 + commit
 91b90c0 (+0x44 max(1,trunc((v+1)^.85)) 97.98%, +0x46 raw, +0x48
 max(1,PROS-pop>>2) 94.82%; +0x54 = queue id, gov branch dead).

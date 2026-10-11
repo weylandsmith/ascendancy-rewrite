@@ -97,12 +97,13 @@ TEST(campaign_total_owned_grows) {
 }
 
 TEST(campaign_home_placement_law_t40) {
-    // HOME-PLACEMENT LAW (docs/re/income-law.md T40, census
-    // scripts/r1_home_placement.py over 27 world identities): exactly one
-    // home per empire; opening position = Colony Base ONLY (no
-    // Factory/Lab/Shipyard ever on a first-save home); the CB sits on a
-    // BUILDABLE (non-rock) SURFACE cell whose non-rock RANK is >= 2 (rank
-    // 0/1: 0 occurrences in 157 originals; never orbital).
+    // HOME-PLACEMENT LAW (docs/re/income-law.md T40 + T42 upgrade, census
+    // scripts/r1_cell_choice_census.py): exactly one home per empire;
+    // opening position = Colony Base ONLY (no Factory/Lab/Shipyard ever on
+    // a first-save home); the CB sits on a NON-ROCK SURFACE cell, barren
+    // class 0 ALLOWED (picker legality chain FUN_0003830c never zeroes
+    // item 5 on surface non-rock — T42; the t40 rank>=2 floor has no code
+    // counterpart and is not pinned here).
     for (unsigned seed : {2u, 7u}) {
         auto c = makeCampaign(seed);
         const auto& items = tables().items;
@@ -121,17 +122,42 @@ TEST(campaign_home_placement_law_t40) {
             const int cell = ps.itemCells[0];
             CHECK(cell >= 0 && cell < ps.surfaceCells);   // never orbital
             if (cell < 0 || cell >= ps.surfaceCells) continue;
-            CHECK((ps.cellClasses[cell] & 8) == 0);       // buildable
-            int rank = 0, nb = 0;
-            for (int k = 0; k < ps.surfaceCells; ++k) {
-                if (ps.cellClasses[k] & 8) continue;
-                if (k < cell) ++rank;
-                ++nb;
-            }
-            CHECK(rank >= 2 || nb < 3);  // ctor envelope (tiny planets fall
-                                         // back to first buildable)
+            CHECK((ps.cellClasses[cell] & 8) == 0);       // non-rock
         }
     }
+}
+
+TEST(campaign_cb_cell_uniform_t42) {
+    // PICKER UNIFORMITY (income-law.md T42): drawCbCell must spread CBs
+    // across ALL non-rock cells (barren included) and never land on rock.
+    // 4000 draws on a mid-size planet: every non-rock cell hit at least
+    // once; barren share within [0.10, 0.55] for a terrain mix around the
+    // measured 26.9%.
+    auto c = makeCampaign(11u);
+    const int ns = static_cast<int>(c.galaxy().stars.size());
+    int star = -1;
+    for (int s = 0; s < ns; ++s)
+        if (static_cast<int>(c.planetAt(s).cellClasses.size()) >= 33) { star = s; break; }
+    CHECK(star >= 0);
+    if (star < 0) return;
+    const auto& ps = c.planetAt(star);
+    std::vector<int> hits(ps.surfaceCells, 0);
+    int nrock = 0, nb = 0, nbar = 0;
+    for (int t = 0; t < 4000; ++t) {
+        const int cell = c.drawCbCell(ps);
+        CHECK(cell >= 0 && cell < ps.surfaceCells);
+        if (cell < 0 || cell >= ps.surfaceCells) return;
+        CHECK((ps.cellClasses[cell] & 8) == 0);
+        ++hits[cell];
+    }
+    for (int k = 0; k < ps.surfaceCells; ++k) {
+        if (ps.cellClasses[k] & 8) { ++nrock; CHECK(hits[k] == 0); continue; }
+        ++nb;
+        CHECK(hits[k] > 0);   // uniform: every legal cell reachable
+        if (ps.cellClasses[k] == 0) ++nbar;
+    }
+    const double share = static_cast<double>(nbar) / nb;
+    CHECK(share >= 0.10 && share <= 0.55);
 }
 
 TEST(campaign_colonised_plan_gets_colony_base_t41) {

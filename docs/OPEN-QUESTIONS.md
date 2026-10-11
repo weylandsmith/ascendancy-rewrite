@@ -225,9 +225,11 @@ slot stays empty @0x39164; Terraform->class1 / Automation |=2 / LGB
 Base, 2 weak samples T39c; world-restart artifact filter T39d) — NUKE
 LAW capture-gated -> docs/BLOCKED.md (Phase Bomb gizmo 70: static dead
 ends T39e, zero device events in 13 runs, default NOT modelled, one-
-run closing route written); HOME-PLACEMENT CLOSED t40 (one home/empire,
-pop 2, Colony Base ONLY 153/157, CB on random buildable cell rank 2..70
-(rank0/1 0/157, never orbital), CB-class channel words == accumulator
+run closing route written); HOME-PLACEMENT CLOSED t40 + DRAW MECHANISM
+CLOSED t42 (one home/empire,
+pop 2, Colony Base ONLY 153/157, CB cell = picker-uniform over non-rock
+surface cells incl. barren (t42; the t40 rank 2..70 envelope was a
+nonbarren-filter artifact, rank0/1 0/72 residual unpinned, never orbital), CB-class channel words == accumulator
 153/157 incl. class4 RES0 gating re-confirmation, RES word 0 157/157 ->
 colonyChannel grant is IND-compressed-only; scripts/
 r1_home_placement.py; rewrite ctor + channel guard + pins) — built-item
@@ -238,8 +240,11 @@ arrives with exactly one active Colony Base — 2 same-world earliest-
 owned observations + 2720/2720 owned records corpus-wide carry a CB; pop
 :=2, cap==seed+2 exact; dt-diff method found no flips (capture cadence),
 earliest-observation method resolved; scripts/r1_colony_items.py; rewrite
-seedColonyBaseColony + member worldLcg_); REMAINING: built-item cell
-selection mechanism + CB-cell draw mechanism (envelopes measured, [unver-
+seedColonyBaseColony + member worldLcg_); CB-CELL DRAW CLOSED t42 (picker
+FUN_0003875c uniform among checker-legal empties; CB legal on all non-rock
+surface incl. barren — income-law.md S12, KS PASS 72 homes; rewrite
+drawCbCell); REMAINING: built-item (non-CB) cell
+selection mechanism (envelope measured, [unver-
 ified]); extreme-row leak banked unexplained
 (row0 98.9 vs 99.997, row10 c1 1.6 vs 0.006 — scenario-row-override
 hypothesis, income-law.md T36d). +2/+2 residual minutiae RESOLVED t33
