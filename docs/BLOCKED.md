@@ -124,3 +124,12 @@ campaign.cpp seedColonyBaseColony). ONE-ROUTE CLOSING RECIPE (future):
 find callers of FUN_0003aa0a via the event dispatcher table, read the AI
 branch that builds the event payload for transports with cargo item 5; the
 coordinate pick IS the law.
+
+### t44 dispatch-route probe result (round 1-2, STOPPED per no-spiral rule)
+get_xrefs_to(0x3aa0a) = 0 refs; byte-pattern '0a aa 03 00' = 0 hits;
+operand scan '0x3aa0a' = 0 hits — the event handler is reached ONLY via a
+data-resident handler table (no direct call/immediate anywhere in the
+97,413-instruction listing). The closing route as written needs a whole-
+image DATA scan for table-shaped dword runs then call-shape validation —
+that exceeds the bounded recipe. Stays BLOCKED under the picker-draw
+default (observation-consistent, unchanged).
