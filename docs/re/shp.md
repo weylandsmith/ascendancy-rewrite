@@ -395,3 +395,59 @@ That pins where W-1/H-1/pixel-ptr come from for cached raw libraries:
 either directly at record start inside the payload (dims at record+0) or
 via the widget descriptor +5 field pointing at a dims-pair. OQ-005 stays
 OPEN until that read + corpus revalidation.
+
+## 11. W3 round 6 (t63): widget descriptor + shape-cache INTERNALS verified from raw asm; multi-record selection remains the sole OQ-005 residual
+
+All from work/ascend_restored.bin raw disassembly (instruction-level,
+not decompiler pseudocode).
+
+1. WIDGET PASS FUN_00031384 (0x31384..0x314a4) [verified]: iterates a
+descriptor array at widget+0x6d, u16 count at widget+0xa1, stride 0x0d,
+index EBP stepping +0x0d. byte0 = type: 0 = rect fill (copies 5 dwords
+from widget+4 to static 0x7d3aa and calls FUN_0002fb38 with EAX=0x7d3a2);
+1 = shape blit; >1 = error stub. Shape blit sequence @0x3143a..0x31467:
+PUSH [desc+9]>>16, PUSH [desc+7]>>16, PUSH [desc+5] (u32), then
+XOR EDX,EDX; MOV DX,[desc+1] (u16 CACHE SLOT INDEX), EAX := 0x9f10c
+(the shape-cache singleton lives AT IMAGE VA 0x9f10c [verified —
+immediate load, not a deref]), CALL FUN_0001fc34, PUSH EAX (payload
+ptr, UNADJUSTED), PUSH [ESP+0x14], CALL FUN_0005caac. So the blit is
+handed the WHOLE verbatim library copy base with no per-record offset.
+
+2. CACHE INTERNALS FUN_0001fc34 (0x1fc34..0x1fe1f) [verified] — exact
+layout, reproducing every t62 live-RAM offset from code:
+   - magic/registry word at ctx+0x2eec (nonzero assert);
+   - slot index u16, must be < 0xc8 (200 slots);
+   - REGISTERED check = byte at slot+0x7d0 != 0 (SAR 0x18 of dword
+     [ctx + idx*0x32 + 0x7cd]; the stride math ADD EAX,EAX after
+     *(25) gives idx*0x32 — names live at ctx+0x7d0+idx*0x32, i.e.
+     the t62 base 0x2e1194 == VA 0x9f10c image-relative + load base,
+     CONFIRMED structurally);
+   - payload pointer array u32 at ctx + 4*idx;
+   - payload byte-size array u32 at ctx + 0x320 + 4*idx;
+   - LRU: u16 chain at ctx+0x63e (+2/pos), head counter dword
+     ctx+0x2ee0 (SAR 16 = count), tail word ctx+0x2ee2;
+   - MISS path: size via FUN_00020728 then FUN_000209d8 (aligned
+     size = (n+3)&~0xfc vs budget ctx+0x2ee8), eviction FUN_0001fe8c
+     (ctx, idx, aligned size) returns buffer, RAW read FUN_00020acc
+     (ctx-slot name path -> buffer) — store ptr+size, LRU touch;
+   - HIT path @0x1fdb8: LRU relink loop over chain, return
+     [ctx + 4*idx].
+   The file bytes land in the buffer VERBATIM (t62 measured) and the
+   fixup pass of FUN_0006642c demonstrably did NOT touch the first
+   0x400 bytes of the 14intel buffer (re-checked ck113: 0 diffs).
+
+3. CONSEQUENCE [inferred from 1+2]: per-record selection for N>1
+libraries CANNOT happen in the widget pass (base passed unadjusted) nor
+in the cache (raw copy). It must happen either (a) inside FUN_0005caac
+via its stack args (the [desc+5] u32 pushed third, or the record count
+walked per draw), or (b) a pre-pass rewrites the payload in place at
+load/registration. (b) is testable in RAM: compare a MULTI-record
+library's buffer between two checkpoints where the consumer drew
+different records — t62 constant-delta held for 14intel (intel panel,
+player race fixed) so inconclusive there; PLANETS.SHP (4/4 AI + player
+status screens draw many records) is the discriminator.
+
+QUEUED (t63b): FUN_0005caac stack-arg mapping from ITS prologue (which
+register/stack slot is the stream cursor vs shape struct), and the
+PLANETS.SHP inter-checkpoint in-place-rewrite test (ck pair spanning a
+status-screen open, if any ck shows race-status activity).
