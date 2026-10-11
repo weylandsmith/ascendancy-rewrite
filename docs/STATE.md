@@ -253,7 +253,13 @@ r1_intel_drive.sh proc_c5780e49dc24): intel panel opened via verified
 (553,318) + 12 turns; post-run = strict blit-input scan on loaded/
 rewritten payloads; RESULT t65 NULL (S13): 71 ck x 200 slots x sel 0..7
 = 0 survivors despite verified click delivery + mid-run cache misses ->
-blit-5arg path does not consume raw payloads; NEXT: static attribution
-of the 19 remaining FUN_0001fc34 callers (arg pattern + pointer use:
-table-law consumers vs direct file-table walks). dosbox reaped by
--time-limit; run dir retained.
+blit-5arg path does not consume raw payloads. REFUTED t66 as a
+SCAN-BASE BUG (shp.md S14): correct arg2 = slot+0x88 verbatim base (file
+u64 dir at file+0x10 == u32 stride-8 series at PAY+8; tsz doubles as
+rec0 virtual slot) -> 3504 strict survivors over 72 ck, raceflag sel1
+pixels RAM==FILE. Caller idiom: slot=[widget+24], sel=[widget+28]>>16,
+payload UNMODIFIED to blit — no transform pass. Rows x-unbounded
+(writes clamp @0x5cd31/0x5cd62); exact-span 2xH = animation frames.
+NEXT t67: corpus pass under draw-first-frame semantics (h+1 rows from
+PAY+seloff(k)+0x18, no span requirement) + per-library frame-count fit;
+then stream-start closure decision.

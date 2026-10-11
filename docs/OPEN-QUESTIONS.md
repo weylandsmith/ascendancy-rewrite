@@ -129,12 +129,15 @@ FUN_0001fc34/FUN_00020acc mapped. Validation: rec0 grammar well-formed
 live-RAM anchor t62 done (S10): cache payload = VERBATIM whole-library
 copy [measured, ck RAM 0x3cd768 == file byte 0]. t64 blit input law
 code-pinned (S12): stream = payload + u32[payload+8+8*sel] + 0x18;
-DECISIVE NEGATIVE 0/12 autoplay payloads satisfy it. t65 intel-panel
-draw capture (S13, r1ad-20261011-180908: 16 turns, 72 ck, verified
-click delivery (553,318), mid-run cache misses slots 46/147): strict
-scan 72x200x8 = 0 survivors -> 5-arg blit never runs on raw payloads in
-this flow; real codec driver = one of the other 19 FUN_0001fc34 callers
-(static attribution queued). NOT closed; no rewrite change yet.
+t64/t65 zeros REFUTED t66 (S14): SCAN-BASE BUG — with correct arg2 =
+slot+0x88 verbatim base, 3504 strict survivors over 72 ck, raceflag
+sel1 pixels RAM==FILE [measured]. Callers pass slot=[widget+24],
+sel=[widget+28]>>16, payload unmodified (no transform exists). Law:
+stream(k) = PAY + (tsz | u64dir[k-1]) + 0x18; rows x-unbounded (write-
+clamp); exact-span 2xH rows = appended animation frames [measured 4
+families]. OPEN residue: corpus pass under draw-first-frame semantics,
+frame-count law, dkship walk desync, 10 expl dims variants, 8 caller
+entries. NOT closed; no rewrite change yet.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge
