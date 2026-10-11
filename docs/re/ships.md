@@ -416,3 +416,51 @@ Idle-corpus meta-lesson banked: EVERY prior corpus law (income,
 placement, governor inertness) shares this scope limit — the 511:67
 End-Turn deep schedule never interacts; laws about interaction states
 (ships, combat, abilities) are structurally uncapturable from it.
+
+
+## 15. DISTANCE-MATRIX PRODUCER LAW (t52, static) — FUN_00023e00 fills DAT_00045beb; OQ-021 threshold NOT found (round 2 dead, see BLOCKED t52)
+
+Method note first: t51's R12 says direct-reference scans are blind; this
+round used an arith-motive scan instead (IMUL-imm100 encodings 6B /r 64 and
+69 /r 64 00 00 00 over the whole code span) — 12 sites total, ALL verified
+against the Ghidra listing before use (5 of 12 were mid-instruction false
+positives, 'No instruction at address' — R7 trap re-confirmed, discarded).
+
+PRODUCER [verified verbatim, FUN_00023e00 decompile]:
+- Star coordinate floats live at star-record +0x08/+0x0c/+0x10 (x,y,z,
+  float); star-record stride 0x60 (index math `idx*0x60 + base`).
+- Pairwise loop: for star i vs every star j, dx/dy/dz = coord_i - coord_j,
+  squared-sum -> sqrt (FUN_00076da0/FUN_00076e08 return-address-tagged call
+  pattern @0x23fad/0x23fb2) -> INT(ROUND(...)) kept as MIN against running
+  gate initialized 5000; nearest neighbour index stored (short).
+- DAT_00045beb diagonal law [verified at its write site]:
+  `(&DAT_00045beb)[sVar2 * 0x65] = 1` for sVar2 in [0, starCount) —
+  stride 0x65 = 101. NOTE the producer's pair-fill bytes are written by
+  the FUN_00023e00 helper cluster at DAT_00032ddb offsets `row + coord*100`
+  (linear 100); whether the 101-stride writes and the 100-linear consumer
+  read (@0x41b03 byte `[100*x + y + 0x45beb]`) address ONE padded matrix or
+  two overlapping buffers is [unverified] — not resolvable from this
+  decompile alone.
+- Lane availability byte matrix DAT_00032ddb indexed `y_row + 100*x`,
+  consulted by the producer as a skip-gate (`== 0` -> candidate), and an
+  owner/name short-compare via table DAT_000063c6 (`+ owner*2`) gates
+  self-pairs; a not-found path runs FUN_00021ad8 with FUN_0002a428 as the
+  error stub (FUN_0002a428 measured this turn: 3-line `if (param_1==0)
+  FUN_0002a4cc(param_2)` — NOT an endgame check; t51 STATE lead closed
+  as method-dead, one round spent).
+
+RAW RUNTIME SAMPLE [unverified — mapping tension banked, do not cite as law]:
+reading 100x+y-linear bytes at member B+0x45beb (41.sav, r1deep slot) gives
+1113 nonzero pairs, 1192 asymmetric pairs, 79 cells 0xFF, diagonal values
+{0,1,2,...} NOT all-1. This CONTRADICTS the producer diagonal law under the
+B+VA mapping — either obj0 DAT runtime placement needs the pointer-law
+translation (P0 + payload-offset, OQ-011 form, not B+VA) or the sampled
+region is a different consumer buffer. Deliberately NOT resolved this turn
+(one probe each way printed above; naming the tension beats guessing).
+
+OQ-021 status: threshold comparison (over-half vs two-thirds) NOT located.
+Static leads exhausted within budget (FUN_0002a428 dead; arith scan aimed at
+score% not threshold; string xrefs R12-blind). Closing route: t51
+consolidated capture session adds step 4 — reach/view the victory screen or
+score screen in the scripted run and correlate. Default >1/2 (vendor comment,
+turnloop.md S1) stands.

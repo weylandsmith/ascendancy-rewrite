@@ -38,10 +38,12 @@ idx [inferred]; owner byte MIRRORED (8 distinct incl 0xFF). Still open:
 packed-entropy. Save-writer string xref route dead round 1 (0x857de
 zero refs, byte-pattern 0); one LEA-form probe budget remains.
 OQ-021 | victory | end-ctrl threshold: vendor comment "over half" vs same
-file's prose "two-thirds" — current default >1/2 | open | W2: find the
-constant/comparison near the victory check in code (ghp5 functions_full.tsv,
-gsystem attribution). A RAM measurement of a live galaxy at the trigger
-boundary corroborates.
+file's prose "two-thirds" — current default >1/2 | open | t52: static route
+EXHAUSTED (FUN_0002a428 = 3-line error stub verbatim; functions_full.tsv has
+no names (offset/size only, ledger pointer was stale); IMUL-100 arith scan
+found the score%% producer family (ships.md S15) not the threshold). Closing
+route = t51 capture STEP 4 (win/score screen correlation, BLOCKED t52).
+Default >1/2 stands.
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719

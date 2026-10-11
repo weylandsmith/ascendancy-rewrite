@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-08T21:30
+updated: 2026-10-11T00:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -173,24 +173,26 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T51 LANDED (SAVE-WRITE ROUTE CLOSED AS METHOD; REFUTED-ROUTES R12;
-BLOCKED.md t51 consolidated-capture entry): round-2 probe = u32 scans of
-ALL string VAs + Ghidra xrefs on 0x8355d/0x85ac4/0x85acf/0x8359a/0x74508
--> zero everywhere; BLINDNESS PROOF banked (planitem.txt 0x84888
-zero/zero despite CLOSED parser FUN_00037fc0, format strings 0x8488d/
-0x84899 verified verbatim; 0x857de byte-hits all mid-instruction false —
-'No instruction at address'). OQ-003 field-meanings route switched to
-CONTROLLED-MUTATION capture (BLOCKED t51 steps 1-3: one scratch session
-= mutation boot + move script + ability observation; defaults stand
-unwired/[1,3]). NEXT: OQ-021 END-CTRL THRESHOLD static law — string
-end-ctrl.txt @0x83ef8 is player-facing text, NOT the law; find the
-comparison: grep docs for prior end-game census (victory-condition scan
-banked? OQ-021 text in OPEN-QUESTIONS names current default), then
-sweep for control-ratio comparisons: start by decompiling FUN_0002a428 — called from
-two guards inside loader FUN_00037fc0 (scenario count !=0x27; coord-sum
->0x27) — semantics UNVERIFIED (could be scenario-validity error path).
-Budget 2 rounds Ghidra; exit 1 -> BLOCKED line naming interaction-state
-capture, do not spiral. Do NOT rerun t50 census / t51 zero-scans.
+T52 LANDED (DISTANCE-MATRIX PRODUCER LAW ships.md S15 + OQ-021 static
+route exhausted): IMUL-imm100 arith scan (R12-legit method) -> 12 sites,
+5 mid-instruction false discarded; FUN_00023e00 VERIFIED producer of
+DAT_00045beb (star coord floats +0x08/0c/10, stride 0x60, ROUND(sqrt)
+nearest-neighbour gate 5000, diagonal [i*101]=1) + lane matrix
+DAT_00032ddb (y+100x skip-gate); 101-vs-100 stride split banked
+[unverified]; runtime sample mapping tension banked honestly (NOT resolved;
+pointer-law P0 translation vs B+VA candidate named). FUN_0002a428 =
+3-line error stub (t51 lead closed). OQ-021 stays open; closing route =
+BLOCKED t51 STEP 4 (win/score screen correlation; BLOCKED t52 line).
+NEXT: CONSOLIDATED CAPTURE SESSION STEP 1 (controlled mutation, OQ-003):
+first LOCATE the existing click driver (grep scripts/ for click.log writer /
+r1deep runner; do NOT hand-roll a new driver if one exists), then scratch
+copy + ONE injected u16 (planet +0x22 channel word, one named world) into
+resume.gam, boot headless to main map, dump RAM, diff vs t50 mirror law
+(byte-identical except +0x11). Injected value visible in RAM at the record
+= field load-path named. Exit 1 = one line, pivot OQ-016 turn-arithmetic
+statics (turnloop.md still has [inferred] constant rows that arith-motive
+scans can target, budget 2). Do NOT re-scan OQ-021 statics (BLOCKED t52);
+do NOT re-run t50/t51 censuses.
 PRIOR T45 LANDED (SELECTED-ABILITY / GOVERNOR BRANCH CLOSED, income-law.md S14):
 branch @0x38df0..0x38e29 pinned verbatim; the [0x743b9]>>0x18 operand IS
 item-table UPOP(35) (row base 0x73e40+35*0x28=0x743b8, runtime value 1

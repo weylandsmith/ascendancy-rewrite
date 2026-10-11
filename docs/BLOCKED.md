@@ -193,8 +193,23 @@ dosbox-x only, bounded output):
    immediate-arrival closes as correct-by-absence).
 3. ABILITY CHARGE OBSERVATION (OQ-020 free ride): while scripted, buy/use
    one cell-special and record planet +0x54 + +0x66 across saves.
+4. END-CTRL CORRELATION (OQ-021, added t52): reach/view the victory or score
+   screen; correlate displayed % against owned-star share — over-half vs
+   two-thirds discriminates in ONE observation (Extinct fires early on known
+   seeds t557/t583; score block shared per static.txt template).
 
 Best default proceeding under this block (already in rewrite): scale stays
 [1,3] hops + immediate arrival (explicitly uncontradicted); OQ-003 unknown
 fields stay unwired (never stubbed). Budget rule: one session, parse
 offline; exit-1 nulls recorded once, not re-attempted.
+
+
+## t52 — OQ-021 end-ctrl threshold static route exhausted (round 2 dead)
+Leads tried: FUN_0002a428 (measured = 3-line error stub), R12 (string xrefs
+blind), IMUL-100 arith scan (score% producer family only, banked ships.md
+S15). Default >1/2 (vendor comment) stands, unwired difference unknown.
+Closing route: t51 capture session STEP 4 — trigger/view victory+score screen
+in the scripted run; correlate shown % with owned-star share (over-half vs
+two-thirds discriminates in ONE observation once any end fires; seeds already
+known to hit Extinct t557/t583 — Extinct screen path shares the score block
+per static.txt template). Do NOT re-scan statics for this constant.
