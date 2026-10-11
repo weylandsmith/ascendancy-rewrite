@@ -173,27 +173,17 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-T46 LANDED (ORDER/ARRIVAL CHAIN INCREMENT + cost-hack RE-CONFIRMED,
-ships.md S10): t16 +0x46 census re-run with the generalized sweep — §9
-stands verbatim (gizmo Industry never modified post-parse; 0x38ed8 =
-planet RES-word store, not a gizmo write). NEW verified: ship order
-fields (+0x5d state, +0x67 type, +0x68 payload; type-1 move dispatch
-@0x4a322 -> FUN_00049880); landing = planet orbital-ring slot byte1 :=
-0x17 word2 := 1 via FUN_00039810 (owner gate + combat check + free-ring-
-slot scan) — per-ship inventory lives on the PLANET slot array (first
-measured answer, OQ-019 inventory sub-item); no free slot => +0x58 := 4 +
-3x RNG scatter (FUN_0007824f %1000 - 500) via FUN_00052ff4/FUN_00049aa8;
-queued-order list (count +0x15a, stride 7, type byte +0xab, turn word
-+0xac) decrements per completion. Sugar-cube scale STILL OPEN: +0x5e is
-summed into ship stat +0x10 (@0x49b67) but NO distance arithmetic in the
-completion chain; DAT_0007e582 = session/scenario tag (low word 0x12 in
-32/32, high varies — not a distance table). Rewrite [1,3] launch default
-unchanged (strict-close not met — do NOT bank). NEXT: order-ISSUE range
-test — walk FUN_00041260 0x41260..0x41b60 for the drive-level compare
-that rejects out-of-range MOVE targets (the issuer holds drive in +0x5e;
-the reject path writes [ESI+0x5d] := 0 paths at @0x41bff/@0x41c26); if no
-compare there, probe FUN_000533e0 (position setter) for the pixel/hop
-conversion; 2-round bound, else BLOCKED line + fallback OQ-003 field walk.
+T47 LANDED (FUEL/PROPULSION LAW BANKED + issuer gradient scan re-verified
+against raw disasm, ships.md S12). Fuel law FUN_0004a658 pinned verbatim
+(bonus nesting: upkeep gate w16[row+3]&0x20 AND payable burn AND
+byte[row+2]==1 -> +0x90 += dword[row+0x26]); runtime 484/484: ONLY drive
+rows 10..15, costs 0,1,2,2,3,4 / bonuses 1,2,1,3,4,5. NEXT: sugar-cube
+CONSUMER -- readers of +0x88/+0x90 in the turn-advance family (0x4c4xx;
+FUN_0004a6b6/0x4a766 walks) to pin how one turn of movement is spent vs
+the lane matrix; 2-round cap, then BLOCKED line + OQ-003 field-semantics
+walk. Do NOT re-litigate S11 (gradient law + assert polarity raw-
+verified this turn) and do NOT re-scan matrix read sites (7, all
+classified).
 PRIOR T45 LANDED (SELECTED-ABILITY / GOVERNOR BRANCH CLOSED, income-law.md S14):
 branch @0x38df0..0x38e29 pinned verbatim; the [0x743b9]>>0x18 operand IS
 item-table UPOP(35) (row base 0x73e40+35*0x28=0x743b8, runtime value 1

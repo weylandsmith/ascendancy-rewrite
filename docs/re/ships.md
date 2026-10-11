@@ -251,3 +251,85 @@ NEW [verified raw disasm + decompile]:
   order-ISSUE section of FUN_00041260 (0x41260..0x41c10) for the range
   test, else FUN_000533e0. Rewrite launch law (Level/2 clamp [1,3]) stays
   a documented default — strict-close NOT met, do not bank as law.
+
+## 11. LANE DISTANCE MATRIX + ORDER-ISSUE GATES (t47 increment; scale still open)
+
+LANE MATRIX BANKED [verified disasm + runtime RAM]: DAT_00045beb, byte
+grid indexed 100*x + y from planet coord pair dword [planet+0x2] (two
+i16 halves). Index math verbatim @0x41e61..0x41e7f: y from EDX=coord,
+LEA*4;SUB -> 3y; SHL 3 -> 24y; ADD y -> 25y; SHL 2 -> 100y; + x. Static
+image bytes are CODE (stale-DAT trap, t43 law) — runtime copy at
+B + 0x82bb0 + 0x45beb. MEASURED runtime values: small non-negative
+integers 0..25 plus 0xFF markers, zero where no lane path, 1-count ~110-
+168 per save (lane-pair symmetry), i.e. a PLANET-TO-PLANET LANE DISTANCE
+grid recomputed per scenario. 7 read sites: 0x3fa0d, 0x3fd65 (AI scoring),
+0x41a84/0x41b03 (issuer), 0x41e7f (FUN_00041e34 multi-ship task planner),
+0x45cb6 (AI objective eval), 0x4aa74 (helper returning dist of ship's
+planet).
+- ISSUER RESOLUTION LAW (raw decompile FUN_00041260 case state-1
+  @0x41adf..0x41b60): with A = ship's pending target ([ship+0x5e]) and
+  B = the new focus, the code computes D0 = MAT[hi16(A+2)+100*hi16(B+2)],
+  scans B's lane list ([B+0x2c] pointer array, count w16 [B+0x44]) and
+  sets a flag when some lane-end N satisfies MAT[hi16(A+2)+100*hi16(N+2)]
+  == D0-1 (strict gradient along the lane graph), THEN issues the order
+  with payload +0x68 := [ESP+0x390] = a LANE-ENTRY pointer — i.e. the
+  order target is the graph neighbour on the descending-distance path,
+  not the far planet [verified structure; "one hop per issue, re-issued
+  until arrival" is [inferred] from the cancel-at-destination branch
+  @0x41a0b..0x41a4a which clears +0x5d when +0x5e == focus]. Failure of
+  the gradient scan hits vendor assert FUN_0002a428.
+- AI cost model @0x3fa0d: penalty (3-D)*2 when D < 3 (closer = cheaper);
+  @0x3fd65: time budget by distance class {0->200, 1->225, <4->300, else
+  400} divided by (turn - DAT_00012e10).
+- QUEUE-TURN LAW: queued orders live in the ship record (count dword
+  +0x15a; slot entries stride 7: type byte +0xab, turn w16 +0xac). The
+  ONLY writer of a queued slot turn-word is @0x3ac1c inside the EVENT
+  handler (word store [EDX+0xac] where EDX = ship+99+idx*7 — the pending
+  slot pointer set at @0x415ca/@0x416?? in the issuer; ship+0x67 := 5) =
+  the delayed-move (N-turn wait) issue path.
+- AUTO-ORDER LAW (FUN_00040178 @0x40178): every ship with NO active order
+  at turn start: if +0x28 == -1 (target slot empty) -> FUN_0004105c picks
+  a target: unowned planets (+0x57 == 0xFF) scored by FUN_00039b28;
+  threshold local_18 = 0x1e (30), reduced to 0xf (15) when the empire is
+  at war / enemy home visible (lane state 2/3 rules over war table
+  DAT_00012fd6 stride 0x1ee); best score > threshold -> +0x5d := 2
+  (ENGAGE), +0x5e := target. Else min-distance helper FUN_0004aa10 over
+  empire planets (lane-adjacency test reads the SAME matrix @0x4aa74).
+- SCALE STATUS [still OPEN, strict-close held]: the drive Level (+0x5e is
+  the ISSUED TARGET here, NOT the drive value — correction of the t46
+  note: drive levels are summed into ship stat dword +0x10 @0x49b67 per
+  §10) NEVER appears in a distance compare on the issue/completion paths;
+  NO range reject exists in the issuer. NEXT ROUTE: turn-advance code
+  (0x4c4xx family reads +0x15a list per ship; FUN_0004a6b6/0x4a766 walk)
+  for the move-points consumption math (stat +0x10 vs matrix distance) —
+  that is where the sugar-cube scale must land. Rewrite [1,3] launch
+  default stands (NOT contradicted, NOT upgraded this turn).
+
+
+## 12. GIZMO FUEL / PROPULSION LAW (t47, static CLOSED + runtime MEASURED; hop-scale consumer still open)
+
+FUN_0004a658 @0x4a658 (per ship, per turn) [verified verbatim, full
+decompile]: if ship status w16 +0x9c bit0 set -> design-list pointer
++0x94 := 0; else +0x94 := [ship+0x10] (direct, or PTR_DAT_00077f6c +
+[ship+0x10] when bit2 clear). Speed accumulator dword +0x90 := 0 ALWAYS.
+Then for EVERY queued order slot i < dword [ship+0x15a] (stride 7 from
+ship+0xab): if slot type byte != 0xFF AND (w16[row+3] AND 0x20) AND slot
+dword +3 == -1 (row = type*0x6a + gizmo table base): THEN if dword
+[row+6] <= dword[ship+0x88]: dword[ship+0x88] -= dword[row+6]
+(MAINTENANCE BURN from movement budget +0x88), and IF IN ADDITION
+byte[row+2] == 1: dword[ship+0x90] += dword[row+0x26] (PROPULSION BONUS
+-- note the nesting: a propulsion bonus ONLY accrues when the upkeep
+gate bit is set AND the burn was payable). Finally bit3 of +0x9c zeroes
++0x90 again.
+RUNTIME MEASURED 484/484 saves (scripts/r1_gizmo_fuel_table.py, base =
+B + 0x82bb0 + 0x7653c): EXACTLY rows 10..15 carry BOTH the upkeep gate
+bit and the propulsion flag -- the six drive gizmos. Upkeep costs
+dword[row+6] = 0,1,2,2,3,4 ascending; propulsion dwords @+0x26 =
+1,2,1,3,4,5. All other 60+ rows: no upkeep, no propulsion.
+CONSUMER STILL OPEN: which of +0x88 (budget minus upkeep) or +0x90
+(speed accumulator incl. design base at +0x10) feeds the per-turn
+advance, and against WHICH distance measure -- the sugar-cube scale
+turn. NEXT ROUTE (round-capped 2): readers of +0x88/+0x90 in the turn-
+advance family (0x4c4xx walk per S11). S11 assert polarity RE-CONFIRMED
+raw: gradient-not-found falls through to FUN_0002a428 ("..\race.cpp"
+string @0x84cb4); found-flag 0xffffffff @0x41b15 skips it @0x41b28.
