@@ -184,8 +184,11 @@ thin; c1c -1 co-occurrence with queue flip 4/4 (cell reservation at queue
 time [inferred]); T56b per-pair offset census + heap BASE-DRIFT hazard law
 (never one absolute base across a session's checkpoints). Player home sits
 at RECORD 89 — parsers must scan 151.
-NEXT: OQ-012(a) size-option glyph lift (zero-capture static route, listed
-open; check REFUTED-ROUTES first). Do NOT re-run t56 capture; parser
+NEXT: OQ-012(a) ONE-OBSERVATION probe: default-size new-game run via r1ad +
+step2 driver (New Game (318,333) banked refcap.md:21; entry via grid-hash;
+then star count in fresh RAM = size->count datapoint). Static value-path
+returned NULL and is banked (mapgen.md), so no further static attempts.
+Do NOT re-run t56 capture; parser
 r1_turn_delta.py banked (turns.log 3-field format).
 PRIOR T55+T55b LANDED (PRESET GUARD LAW income-law T55: copy iff
 scenario-match AND rng%size==within-group index, uniform not row-bias; RUN

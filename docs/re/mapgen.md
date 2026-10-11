@@ -115,3 +115,19 @@ isspace-trim, and the original Python count `strip()`ped it as a line.
 - Whether star positions influenced type (hub-stars central?) — no
   position/type joint evidence in the snapshot strings.
 - galactic.bin column semantics (OQ-004, runtime-dependent).
+
+## OQ-012(a) static value-path probe — NULL (t56 cycle)
+
+Full re-decompile of the galaxy-fill driver FUN_000238e8 confirms the ONLY
+map-size-shaped quantity in it is per-star pps = rng%5+1 (banked OQ-012(b));
+the loop terminates on `(*(int)(&DAT_00003333 + base*4) >> 16) <=
+star_index` where base walks the scenario table (stride 0x1ee) — i.e. a
+PER-SCENARIO star cap from a runtime-initialised table whose image bytes at
+VA 0x3333 are mid-instruction noise (0x0a 02 aa d3, R7 pattern), NOT a
+static constant. Total star count is therefore runtime/scenario-capped, and
+the new-game SIZE OPTION's numeric effect is not reachable through any
+static constant in the image. Closing route (one observation): default-size
+new-game run (New Game click banked at (318,333), docs/re/refcap.md:21),
+campaign-entry detection via the grid-hash law, then COUNT stars in fresh
+campaign RAM — size->star-count data point; repeated per option only if the
+first two differ.

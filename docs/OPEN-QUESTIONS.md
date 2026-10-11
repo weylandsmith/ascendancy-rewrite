@@ -132,7 +132,8 @@ test galaxy_positions_follow_measured_shell_law pins radii/populations;
 mapgen.md §4.1 rewritten with scale note).
 (d) CLOSED 2026-10-06k (extent = stars on sphere r~440, orbit-pair retraction;
 superseded/refined by (c) shells) | open | (a): setup-screen live RAM state from
-r1ad captures (options UI lives in RAM at pointer-law base).
+r1ad captures (options UI lives in RAM at pointer-law base). Static value-path probed t56 cycle: NULL — only pps in
+driver; terminator cap is runtime table (mapgen.md OQ-012(a) probe note).
 OQ-013 | rules | restree variant block: field0 (0..4) semantics; main tree
 vs variants vs union in play (current default union) | CLOSED 2026-10-06r |
 IN PLAY = the 66 MAIN ROWS ONLY; variants are never loaded, field0 is dead
