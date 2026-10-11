@@ -200,3 +200,54 @@ stride 0x7b; design table stride 0x1ee, count [table+0xd86]>>16):
   0x6ba86 (cosmos.cpp) — SM = small/standard, DK = deck/design-keeper
   model set names; ACE%02d.SHP (0xb5c) zero direct refs (143-class or
   data-only), do not re-scan blindly.
+
+## 10. ORDER/ARRIVAL CHAIN (t46 increment; cost-hack RE-CONFIRMED closed)
+
+Cost-hack sub-item re-verified with the generalized t45 sweep (every
+memory-writing encoding incl. 80-group/XCHG/POP, non-stack filter): 17
+non-stack [X+0x46] accesses, 8 writes — NONE in gizmo-record context
+except the §9 pair (parse store @0x491b5 + error zero-wipe @0x37f42;
+the 0x38ed8 write is the PLANET recalc store +0x44..0x4c run covering
++0x46 = RES word, the 0x306cc/0x46a44 byte-stores are other structs, the
+0x7f038 pair is data-region noise). §9 conclusion STANDS verbatim.
+
+NEW [verified raw disasm + decompile]:
+- Ship order fields (record stride 0x7b): +0x5d order-state byte,
+  +0x67 order TYPE byte, +0x68 order PAYLOAD (type-1 move: pointer to a
+  3-dword coordinate/planet triple — @0x49fb9/@0x49fd7 dereference
+  [payload],[payload+4],[payload+8]; type-2 reads payload+0x14..; the
+  dispatch switch @0x4a322/@0x4a333 routes type 1 -> FUN_00049880,
+  type 2 -> FUN_00049a34).
+- MOVE COMPLETION FUN_00049880 (EAX=ship, EDX=payload coords):
+  1. ORDER BOOKKEEPING — FUN_00049768 scans the ship's queued-order list
+     (count dword +0x15a, stride 7, order-type byte +0xab) for a matching
+     type; when found and its turn word +0xac != 0 it DECREMENTED (and a
+     float poison write lands at +0x88 — animation timer [inferred]).
+     Queued orders with remaining turns SUPPRESS the move [verified shape].
+  2. LANDING ATTEMPT FUN_00039810 (EAX=destination planet, EDX=ship):
+     gate = (planet+0x57 owner != ship+0x54>>16) requires FUN_00039a00
+     (combat/capture check) != 0 else FAIL; scans the orbital RING slots
+     u16 +0x18..+0x1a for slot byte1 == 0xFF; on find: ship +0x58 := 3,
+     +0x59 := planet record, ring slot byte1 := 0x17 (item 23 Ship) and
+     word2 := 1 (ACTIVE), FUN_00039760, return -1 = LANDED. A landed ship
+     IS an active item-23 entry of the destination planet — the first
+     MEASURED answer to the per-ship-inventory sub-question: the inventory
+     lives on the PLANET record's slot array, not a parallel ship table.
+  3. NO LANDING (return 0): ship +0x58 := 4 and THREE RNG draws
+     (FUN_0007824f %1000 - 500 each) seed a scatter offset handed to
+     FUN_00052ff4/FUN_00049aa8 (position setter, writes float triple
+     +0x9e/+0xa2/+0xa6 then FUN_000533e0) — the state-4 ship is removed
+     from play at a jittered position [state semantics: vanished/
+     destroyed-at-sea inferred from the scatter; the exact rule that a
+     ship arriving with NO FREE ORBITAL SLOT does not land is VERIFIED].
+- SUGAR-CUBE SCALE STILL OPEN: +0x5e reads are all bookkeeping — the
+  order-issuer FUN_00041260 writes/copies it (warning compare @0x41be1
+  against [DAT_0007e582] pair, low word 0x12 constant across 32/32
+  runtime samples, high word {0,1,3,12,17} — scenario/session tag
+  [unverified], NOT a distance table), completion clears it to 0, and the
+  gizmo-sum @0x49b67 ADDs drive +0x5e into ship stat dword +0x10 (with
+  shields +0x52 -> +0x4, scanners +0x62 -> +0x20, power +0x66 -> +0x18).
+  NO distance/hop arithmetic anywhere in the completion chain. NEXT ROUTE:
+  order-ISSUE section of FUN_00041260 (0x41260..0x41c10) for the range
+  test, else FUN_000533e0. Rewrite launch law (Level/2 clamp [1,3]) stays
+  a documented default — strict-close NOT met, do not bank as law.
