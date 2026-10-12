@@ -323,16 +323,27 @@ data bitmask ramp. STRUCT MAP: 0x4348d queue (count/counters 0x43502/04/08),
 campaign (19 slots, 2 runs incl deep ck067) — the BLOCKED recipe's inject
 site is WRONG TABLE. Live copy = heap: found at corollary X=0x38ad8 in ck067
 (16 owner-0 + 85 x0xFF of 101 cap; candidates cluster stride-0x162 phase-4,
-43 hits — pin with two checkpoints before injecting). Owner dword +0x54 in the
+(43 hits — pin with two checkpoints before injecting). Owner dword +0x54 in the
 STATIC table reads 0xFFFF always (do not confuse with live +0x56).
-CONCRETE NEXT t75 (capture, exit-code driven per R1 law): RESUME.GAM side —
-locate system/owner record chain (star-name anchored, t53 injector proves
-resume reads scratch .gam); map .gam owner field -> live heap copy; inject
-owner0 = 61 systems (60.4% of 101) [discriminates >1/2 from >=2/3], boot via
-r1_mutation_run.sh pattern, end-turn x2, read DAT_43510 byte via corollary idx
-+ screenshot end-screen. Fire @61 => >1/2 confirmed; no fire => run 2 at 33/34
-vs 67/68 band. If .gam has no owner chain -> record one line (capture class),
-move to OQ-003 replay semantics.
+T74b SCENARIO CORRECTIONS (offline, RESUME.GAM + ck067): total stars T=50
+(hi-u16 DAT_16143 measured — NOT 101; my 101-record table scans over-ran the
+table). .gam STAR CHAIN FOUND: 0x1e46 stride 96 x 50 records (names verified:
+Masticon..Barataria); .gam contains NO 0x162-stride owner table (exhaustive
+offset scan) -> owner encoding rides the planet/system records (t50 join
+class), NOT a star-table copy. Discriminating injection band at T=50:
+owned 26..33 (fires >1/2, not >=2/3) — use 30. RAM star chain is NOT
+contiguous at name+stride 96 in ck067 (allocator scatters; chain-walk law
+holds per-record via idx/pos anchors only).
+CONCRETE NEXT t75 (capture, exit-code driven per R1 law): via r1_planet_layout
+join, find the RAM byte within the 123B planet record that is player-owned in
+a colonized AI/player planet (ground truth: banked ck corpus mid-campaign)
+vs unowned; verify same offset in .gam planet chain (0xaae2 stride 123, t53
+convention); inject owned=player at 30 systems' home-planet records in scratch
+RESUME.GAM, boot r1_mutation_run pattern, end-turn x2, read DAT_43510 byte
+(corollary idx) + end-screen screenshot. Fire @30 => >1/2; no fire => 2/3. If
+owner ground truth unresolvable from banked corpora -> record one line
+(capture class, needs interactive colonization), move to OQ-003 replay
+semantics.
 
 T73 LANDED + CORRECTED (OQ-021 static, dark-zone HIT; docs/re/score.md NEW):
 (1) ATTRIBUTION CORRECTION: work/attribution.tsv est_func is a BACKWARD-SCAN
