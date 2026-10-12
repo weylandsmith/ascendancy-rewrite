@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-12T03:05
+updated: 2026-10-12T05:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -75,9 +75,14 @@ ledger:
     - "OQ-020 ability charge days (%d in vendor text, no data file) — R1: read the constant in code"
     - "OQ-005 .shp pixel codec — static route exhausted (6 angles, docs/REFUTED-ROUTES.md); needs exe shape loader via live image"
     - "OQ-006 headerless sample rate — needs exe audio-init constant"
-    - "OQ-012 mapgen: ONLY (a) size options open; (b) closed 06o (pps U{1..5}),
+    - "OQ-012 mapgen CLOSED t78: (a) size options measured 2026-10-12
+      (density cycle 50/75/100/15/25, wraps; rewrite --stars knob),
+      (b) closed 06o (pps U{1..5}),
       (c) closed 06p/06q (shell position law; rewrite upgraded + tested),
       (d) closed 06k (sphere extent, refined by (c))"
+    - "OQ-025 mapgen non-default-density POSITION law open (shell-slot
+      schedule measured non-applicable at T=100; uniform-in-disc lead KS
+      not rejected; banked offline in r1size-* slots)"
     - "OQ-015 DA_ template selection order + full %token table"
     - "OQ-016 campaign per-turn constants — scope NARROWED t29: income,
       growth, cadence, build order, AI SELECTOR LAW (S9) and POP-CAP SEED
@@ -176,6 +181,27 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+T78 LANDED (OQ-012(a) CLOSED BY MEASUREMENT + OQ-025 opened): GALAXY_MORE
+button (windows.txt NEWGAMEWND rect 7,381..122,472 -> (64,426)) cycles FIVE
+densities, each arm a fresh New Game, T read from slots via pointer law
+(scripts/r1_t78_read.py over save/*.sav Memory): Average 50 -> Dense 75 ->
+Very Dense 100 -> Vacuous 15 -> Sparse 25 -> wraps Average (runs
+r1size-{033341,040859,041459,042719,043229,044658,045501}; labels from
+screenshot crops, click law per run click.log). Harness bug found+fixed
+mid-turn: env var is NCLICKS (CLICKS silently no-op'd two arms, re-ran
+them). GATE FIX: the t78 capture harnesses leaked their Xvfb servers on
+exit (t75 has a cleanup trap; the t78 scripts didn't) -> 9 orphan Xvbfs
+held displays :90-:98, and the intro pixelcheck on :91 captured a stale
+root window (1024x768) instead of the game; pkill -x Xvfb + EXIT traps
+added to all three t78 harnesses, gate re-green (GATE_EXIT=0). Non-default-T POSITION law measured NON-shell-slot (T=100 chain
+idx==k verified: 3537/4950 slot-radius inversions vs 0/1225 at T=50;
+envelope max r=440.0 holds) -> new OQ-025 open, banked offline-solvable
+from r1size-* slots. Rewrite UPGRADED: --stars CLI knob (main.cpp
+Options::stars -> MapConfig::starCount, usage text), default 50 re-cited
+mapgen.h, mapgen.cpp:92 comment re-marked DOCUMENTED DEFAULT (OQ-025);
+test galaxy_density_ladder_matches_measured_sizes pins the five sizes +
+connectedness + r<=441 envelope; 108 tests 0 failed; CLI spot-verified
+T=100 and T=15 campaigns run. mapgen.md new §OQ-012(a) CLOSED section.
 T76 LANDED (OQ-021 CLOSED-EXHAUSTIVE FINAL + OQ-023 lead): all 10 code
 readers of the star-owner block DAT_00013bc5 decompiled (work/coswnd_decomp/
 3ecb8.c 220a8.c 3a4e0.c 3eb88.c 439f4.c 44634.c 49c14.c 49d2c.c 500e0.c):
@@ -192,7 +218,14 @@ BLOCKED T75 POST-MORTEM). Corpus adjudication: 745 banked slots across
 every r1* run, 0 with DAT_43510/DAT_4350c armed — idle scripts never
 colonize, so no banked evidence can ever close OQ-021. LEDGER UPDATED:
 OQ-021 BLOCKED-USER-LEVEL, default >1/2 unchanged.
-NEXT t77 (OQ-023, DIPLOMACY — the ledger's one cheap open item): the
+NEXT t79 (OQ-025, offline — no capture needed): per the ledger caveat,
+extract LIVE star records (planet-pointer name-prefix gate,
+r1_star_table.py law) capped/cross-checked by each slot's DAT_00016143>>16
+across the five r1size arms (T=15/25/75/100 + T=50 controls), test the
+uniform-in-disc lead per size (KS D vs crit; angle uniformity too), and
+either upgrade kShellR's non-default extension to the measured law (pin a
+test) or bank the per-size distributions and keep the default. Then t77.
+OLD t77 plan (OQ-023, DIPLOMACY — the ledger's one cheap open item): the
 attitude law above IS the original's multi-branch offer machinery OQ-023
 says the rewrite lacks (rewrite/src/game only emits the two-party
 threshold branch; OQ-023 W-B gate = ownership model). Step 1: map

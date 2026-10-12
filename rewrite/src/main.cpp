@@ -47,6 +47,9 @@ struct Options {
     bool audio = false;                         // SDL2_mixer (docs/re/audio.md §5)
     bool mute = false;                          // load everything, volume 0
     int playerSpecies = -1;                     // specnum 0..20 (docs/re/species.md)
+    int stars = 50;                             // galaxy density (t78 ladder
+                                                // 15/25/50/75/100; mapgen.md
+                                                // OQ-012(a))
     bool flic = false;                          // decode both vendor FLCs (docs/re/flc.md)
     bool fonts = false;                         // load all vendor .fnt faces (docs/re/fnt.md)
     int introFrames = -1;                       // -1 off; >=0: play intro, cap N frames (0=all)
@@ -75,6 +78,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->mute = true;
         else if (a == "--species" && i + 1 < argc)
             o->playerSpecies = std::atoi(argv[++i]);
+        else if (a == "--stars" && i + 1 < argc)
+            o->stars = std::atoi(argv[++i]);
         else if (a == "--flic")
             o->flic = true;
         else if (a == "--fonts")
@@ -105,6 +110,8 @@ void usage() {
         "  --autoplay    with --ui: advance a turn every 250 ms\n"
         "  --species N   play as species specnum N (0..20, docs/re/species.md);\n"
         "                default -1 = human, no special ability\n"
+        "  --stars N     galaxy size; original density ladder measured\n"
+        "                15/25/50/75/100 stars (mapgen.md OQ-012(a); default 50)\n"
         "  --flic        decode both vendor FLC videos end-to-end (docs/re/flc.md)\n"
         "  --fonts       load all vendor .fnt faces + ink census (docs/re/fnt.md)\n"
         "  --intro N     play the vendor intro (intro65a.flc), N frames cap (0=all)\n");
@@ -203,6 +210,7 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(const Options& o,
     cfg.playerSpecies = o.playerSpecies;
     ag::MapConfig mc;
     mc.seed = o.seed;
+    mc.starCount = o.stars;   // t78 density ladder (mapgen.md OQ-012(a))
     ag::Galaxy g = ag::MapGenerator(mc, *stats, names).generate();
     return std::make_unique<ag::Campaign>(cfg, g, &tree, items, gizmos, ai,
                                           abilities, err);

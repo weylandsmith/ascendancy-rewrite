@@ -43,9 +43,13 @@ struct Galaxy {
 
 struct MapConfig {
     // starCount: FRESH campaigns measured 50 systems exactly, 5/5 runs
-    // (docs/re/r1-savestate.md 2026-10-06p star battery); the old 75 was a
-    // restored-snapshot reading (mapgen.md §3) — different size selection,
-    // OQ-012(a). minSeparation no longer gates placement (shells allow
+    // (docs/re/r1-savestate.md 2026-10-06p star battery). The original's
+    // GALAXY_MORE density cycle is MEASURED 2026-10-12 (mapgen.md
+    // OQ-012(a)): Average 50 -> Dense 75 -> Very Dense 100 -> Vacuous 15
+    // -> Sparse 25 -> wrap; default here = Average. Shell-slot schedule
+    // verified exact only at 50; other sizes cycle kShellR (documented
+    // default — non-default position sub-law open, mapgen.md §OQ-012(a)).
+    // minSeparation no longer gates placement (shells allow
     // overlap) but still pads the fit-to-map scale below.
     int starCount = 50;
     int mapSize = 1024;   // OQ-012 (snapshot bounds <= 639x479)

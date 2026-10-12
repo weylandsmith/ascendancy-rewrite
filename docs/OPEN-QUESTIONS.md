@@ -104,6 +104,18 @@ the closing measurement. Code site: PlanetState::governor +
 storedProsFor/storedResFor/usedPopFor branches (campaign.cpp/.h), pinned
 by campaign_governor_law_t45; branch inert by default so timelines
 unchanged (2024 Control t777 / 42 Extinct t583 / 13 Control t593).
+OQ-025 | mapgen | star-position law at NON-default density: at T=50 the
+shell-by-slot schedule is exact (OQ-012(c)), but the T=100 measured chain
+has 3537/4950 slot-vs-radius inversions (r1size-20261012-042719 slot 41,
+scripts/r1_t78_shell.py) — so the original does NOT cycle a 50-entry shell
+table for larger galaxies. Remaining question: the position distribution
+law at T in {15,25,75,100} (uniform-in-disc? fewer shells + jitter?) and
+whether OQ-012(c)'s outer-envelope r<=440 holds for all sizes (measured so
+far: max 440.0 at T=100). Rewrite default: cycle kShellR (mapgen.cpp:92
+comment re-marked as documented default 2026-10-12); envelope pinned by
+galaxy_density_ladder_matches_measured_sizes | open | Banked runs with
+measured T per arm (mapgen.md OQ-012(a) table) make this solvable offline
+from work/r1/r1size-* slots; no new capture needed to start.
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
 (static route exhausted: 7 negative probes — string table is runtime-loaded,
@@ -173,11 +185,25 @@ test galaxy_positions_follow_measured_shell_law pins radii/populations;
 84 tests 0 failed; gate 4b seeded seed-2024 campaign still wins Control t148;
 mapgen.md §4.1 rewritten with scale note).
 (d) CLOSED 2026-10-06k (extent = stars on sphere r~440, orbit-pair retraction;
-superseded/refined by (c) shells) | open | (a): setup-screen live RAM state from
-r1ad captures (options UI lives in RAM at pointer-law base). Static value-path probed t56 cycle: NULL — only pps in
-driver; terminator cap is runtime table (mapgen.md OQ-012(a) probe note). t57 one-click density probe AMBIGUOUS (fresh count 50 = cosmos.txt
-default; click-inert vs cycle-wrap inseparable, no glyph readout —
-BLOCKED t57, best default fixed-50, rewrite unchanged).
+superseded/refined by (c) shells). (a) CLOSED 2026-10-12 t78 MEASUREMENT:
+GALAXY_MORE (setup rect 7,381..122,472 -> (64,426)) cycles five densities —
+Average T=50 / Dense 75 / Very Dense 100 / Vacuous 15 / Sparse 25 -> wraps
+to Average (r1size-{033341,040859,041459,042719,043229,044658,045501};
+T via pointer law DAT_00016143>>16 anchor-vote reader scripts/r1_t78_read.py;
+labels via screenshot crops). Evidence mapgen.md OQ-012(a) section; code
+site: --stars knob main.cpp (Options::stars -> MapConfig::starCount),
+default 50 re-cited mapgen.h; test galaxy_density_ladder_matches_measured_sizes
+pins sizes+connectedness+r<=441 envelope (108 tests 0 failed) | CLOSED (a-d) |
+Non-default-T position law split out as OQ-025 (measured non-shell-slot at
+T=100: 3537/4950 slot-radius inversions vs 0/1225 at T=50; KS against
+uniform-in-disc NOT rejected (D=0.078 < crit 0.136), uniform-RADIUS
+rejected (D=0.226) — lead only, n=1). Harness caveat banked: the stride-96
+NAME-anchored chain walk runs past the LIVE run at low T (Vacuous 043229
+slot 41: chain 100 vs slot DAT T=15, idx==k even past 15 — consistent with
+either name-pool text or allocated-but-dead records; r1_star_table banked
+tail-garbage precedent). t79 extractor MUST gate each record with the LIVE
+test (planet-pointer slot name-prefix == star name, r1_star_table.py law)
+and cross-check live count against the slot's own DAT_00016143>>16.
 OQ-013 | rules | restree variant block: field0 (0..4) semantics; main tree
 vs variants vs union in play (current default union) | CLOSED 2026-10-06r |
 IN PLAY = the 66 MAIN ROWS ONLY; variants are never loaded, field0 is dead

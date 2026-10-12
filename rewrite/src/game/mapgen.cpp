@@ -89,7 +89,9 @@ Galaxy MapGenerator::generate() const {
     //        loop. 2D model: the xy-projection of a uniform-on-sphere
     //        direction is uniform in angle, so one uniform angle reproduces
     //        the projected law exactly. Slots past the measured 50 cycle the
-    //        schedule [inferred; non-default starCount only — OQ-012(a)].
+    //        schedule [DOCUMENTED DEFAULT — the original's non-default-size
+    //        position law is measured NON-shell-slot (mapgen.md OQ-012(a)
+    //        note, 3537/4950 inversions at T=100); open as OQ-025].
     static const int kShellR[50] = {
         440,440,440,440,440,440,440,440,440,440,
         440,440,440,440,440,440,440,440,440,440,

@@ -166,6 +166,32 @@ TEST(galaxy_positions_follow_measured_shell_law) {
     }
 }
 
+TEST(galaxy_density_ladder_matches_measured_sizes) {
+    // docs/re/mapgen.md OQ-012(a) (t78, 2026-10-12): the original's
+    // GALAXY_MORE cycle measures T = 50/75/100/15/25 (Average/Dense/Very
+    // Dense/Vacuous/Sparse, wraps at 5). Pin: our generator produces the
+    // exact same sizes, every star respects the measured outer envelope
+    // r <= 440 (verified across all measured runs), and the map is
+    // connected at every rung.
+    auto st = shippedStats();
+    if (!st) return;
+    std::string err;
+    auto names = ascend::game::loadStarNames(kRepo / "extracted" / "ascend00" / "names.txt", &err);
+    const int ladder[5] = {50, 75, 100, 15, 25};
+    for (int n = 0; n < 5; ++n) {
+        MapConfig cfg;
+        cfg.seed = 77u + static_cast<unsigned>(n);
+        cfg.starCount = ladder[n];
+        Galaxy g = MapGenerator(cfg, *st, names).generate();
+        CHECK(static_cast<int>(g.stars.size()) == ladder[n]);
+        CHECK(g.connected());
+        for (const auto& s : g.stars) {
+            const double dx = s.x - 512.0, dy = s.y - 512.0;
+            CHECK(dx * dx + dy * dy <= 441.0 * 441.0);
+        }
+    }
+}
+
 TEST(galaxy_lanes_are_simple_and_bounds_checked) {
     auto st = shippedStats();
     if (!st) return;

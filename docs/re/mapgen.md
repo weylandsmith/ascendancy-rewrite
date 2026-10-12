@@ -109,12 +109,47 @@ isspace-trim, and the original Python count `strip()`ped it as a line.
 
 ## 5. Open [-> OPEN-QUESTIONS OQ-012]
 
-- UI map-size options (the original's new-game config strings are glyph
-  data in `3cfgnew.tmp`, not text — no size knobs recoverable statically).
-- Planets-per-star distribution shape beyond uniform.
+- UI map-size options: CLOSED-BY-MEASUREMENT 2026-10-12 (t78, below) —
+  GALAXY_MORE button cycles five densities with measured star totals.
+- Planets-per-star distribution shape beyond uniform. (OQ-012(b) closed.)
 - Whether star positions influenced type (hub-stars central?) — no
   position/type joint evidence in the snapshot strings.
 - galactic.bin column semantics (OQ-004, runtime-dependent).
+
+## OQ-012(a) CLOSED — density cycle measured live (t78, 2026-10-12)
+
+The setup screen's GALAXY_MORE button (windows.txt NEWGAMEWND child, rect
+7,381..122,472 -> click (64,426)) CYCLES five galaxy densities; total star
+count DAT_00016143>>16 (pointer law, per-slot anchor vote >=5) per click
+count N, fresh New Game each arm (harness scripts/r1_t78c_cycle.sh, reader
+scripts/r1_t78_read.py; preview labels read off screenshot crops):
+
+  N=0  "Average Star Cluster"         T=50   (r1size-033341, 040859)
+  N=1  "Dense Star Cluster"           T=75   (r1size-041459; label 034418)
+  N=2  "Very Dense Star Cluster"      T=100  (r1size-042719)
+  N=3  "Vacuous Star Cluster"         T=15   (r1size-043229)
+  N=4  "Sparse Star Cluster"          T=25   (r1size-044658)
+  N=5  "Average Star Cluster" (wrap)  T=50   (r1size-045501)
+
+Five-state cycle: Average -> Dense -> Very Dense -> Vacuous -> Sparse ->
+Average. Order is the click-cycle order; N=3/N=4/N=5 prove the control
+WRAPS (no ceiling monotonicity). Slot-value law note: in-campaign slots carry the
+armed T while pre-entry/post-quit slots read 50 (default), so each arm's
+in-game majority T is the measured value.
+
+POSITION LAW AT NON-DEFAULT T does NOT extend the §4.1 exact shell-slot
+schedule: over the T=100 chain (stride-96 records, idx==k verified 0..99,
+names Zoroaster.. genuine) slot-vs-radius inversions are 3537/4950
+(r1size-042719 slot 41; scripts/r1_t78_shell.py) vs 0/1225 at T=50.
+Radii still respect the outer envelope (max <= 440.0). The rewrite's
+cycled-kShellR extension for non-default starCount (mapgen.cpp:92 comment)
+is therefore a DOCUMENTED DEFAULT, not a closed law — OQ-012(a) closes the
+SIZE OPTIONS question; the non-default position sub-law stays banked here
+as open sub-item (caveat) without holding the ledger.
+
+Rewrite upgrade: --stars CLI knob (main.cpp Options) so campaign runs can
+play all five measured densities; default remains 50 = "Average"
+(measurement-consistent, mapgen.h:50 comment re-cited).
 
 ## OQ-012(a) static value-path probe — NULL (t56 cycle)
 
