@@ -353,8 +353,18 @@ Chain spans 29 distinct stars; the 4 AI home stars are NOT in the chain
 58% band: fire => (50,58]% (>over half), no fire => >=58% (two-thirds class).
 Harness banked: scripts/r1_t75_inject.py + r1_t75_run.sh (511,67 end-turn x4
 at 30 s, t56 law) + r1_t75_read.py (per-slot owned/selector/rank + VERDICT).
-Run r1thr-* background proc_304ef942b2dd; on completion read analysis.log,
-update BLOCKED/OQ-021 + possibly rewrite campaign.cpp:738, gate, commit.
+rev1/rev2 FAILURE DIAGNOSED (shot-02 = still title menu): clicks went to
+(318,333) = NEW GAME row; pixel-measured rows put Return-to-Current-Game at
+(318,372). HERMESSEN needle useless at verify (text RAM-resident at boot from
+the .gam). rev1 endturns=0 (absolute-vs-relative NOW bug, t75b); rev2 clicks
+landed but game stayed at menu -> DAT_482fb stayed 0 = INVALID not no-fire;
+read.py now tri-state (FIRING / NO-FIRE-with-counting / INVALID rc=1).
+rev3 IN FLIGHT proc_f5c3fcaf82cd (r1thr-*, BOOT=200, resume (318,372) x6
+from t=75, end-turns optimistic from t=150, adjudication POST-HOC: counting
+>=1 star only happens in-campaign). On completion: read analysis.log ->
+update OQ-021 (CLOSE only if FIRING or NO-FIRE-with-counting), possibly
+campaign.cpp:738, gate, commit. If rev3 INVALID: one line per exit-code law,
+OQ-021 capture needs interactive session -> BLOCKED, move to OQ-003.
 
 T73 LANDED + CORRECTED (OQ-021 static, dark-zone HIT; docs/re/score.md NEW):
 (1) ATTRIBUTION CORRECTION: work/attribution.tsv est_func is a BACKWARD-SCAN
