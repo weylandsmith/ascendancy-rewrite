@@ -92,3 +92,57 @@ OQ-003 narrowings from the same tour:
   The species name is NOT in the save (dip/history pools) — corroborates
   the OQ-004 string-pool reading.
 
+## t80 star-table mirror + planet-pointer law (2026-10-12) [verified]
+
+World = scratch RESUME.GAM (work/r1/game/RESUME.GAM, 75603 B), live side =
+r1thr-20261012-001410/save/41.sav (same world: rev1 injected only the
+78-chain owner bytes; star chain untouched).
+
+Star chain (file base 0x1e46, stride 96, exactly 50 rows, names
+Masticon..Barataria): the 96-byte record is copied BYTE-VERBATIM into live
+RAM at (chain-walk base + k*96), name at +0x00 — total image diff across
+all 50 records = 12 bytes, ALL inside the last row (Barataria, slot +0x44
+..+0x5d gam=0xFF-class vs ram=0x00 + one u16 0x3e17->0 at +0x44). Star
+records are static scenario storage with load-time repair of the 0xFF
+sentinel tail, consistent with the t53 records-copied-not-parsed law.
+
+PLANET POINTER LAW (closes the star->planet join that OQ-003 flagged):
+star record u32 slots at +0x2A / +0x2E / +0x32 (<=3 planets per star) hold
+pointer values P; the target planet NAME sits at FILE OFFSET (P - K) with
+K = 2507337 = 0x264249 for this file (116/116 non-null pointers resolve to
+planet-style names; P-K == exact name offset verified on Masticon I).
+Corollary banked-base form: the t50 unified record base (name-0x24) =
+P - K - 0x24.
+
+Planet-record fields, measured on the 116 pointer-resolved records of
+RESUME.GAM (offsets relative to the NAME = file offset P-K):
+- name-0x18 u8 == owning star index (star chain row idx). 116/116 EXACT.
+  (This is the field t50 banked as "+0x0c 0..49 star idx [inferred]" under
+  the banked base name-0x24: -0x24+0x0c == -0x18 relative to name — same
+  byte, now UPGRADED [verified] 116/116, join direction file-side.)
+- name+0x33 owner byte: {0..4 player slots, 255 = unowned}; RESUME world
+  shows exactly the 5 AI home planets + Verithil I (player) owned in the
+  POINTER region.
+- name+0x57 / +0x5f u32 pair = banked orbit pair (planet-name+0x57/+0x5f,
+  closed 2026-10-06): 30 distinct values across 116 records (many 0);
+  values are runtime pointer-shaped (high-entropy heap), consistent with
+  the copied-not-rebuilt law — scenario-file copies carry seed-era heap
+  values that load-time repair zeroes or overwrites.
+- t50 shape-law re-verified name-side: type +0x38 (=banked +0x14 rel.
+  name-0x24) vs surface +0x3c bijection unchanged (not re-tabulated; t50
+  banked 151/151).
+
+ONE CONTIGUOUS PLANET POOL (corrects a mid-turn "two regions" reading,
+which was a bad walk-back base): stride-123 records from file 0x8e0e to
+0xd05c, 138 rows in RESUME.GAM. Star star-pointer slots (+0x2A..+0x32)
+cover only 116 of them (max 3 planets/star) — the extra 22 are the IV/V
+bodies mapgen creates beyond the 3-pointer capacity, present in the pool
+and NOT linked from any star record; slot +0x32 is the third and last.
+MEMBERSHIP LAW for the whole pool: u8 at name-0x18 == owning star index
+and the planet-name prefix matches that star's name — 138/138 EXACT
+(including the 22 unlinked rows, which is why this field, not the pointer
+slot, is the authoritative star->planet join for full population counts).
+The t75 "chain at 0xaae2" was this same pool entered mid-way (0xaae2 is
+row 36); its 83/83 owner join stood because it is one table. Live-side
+r1deep chain (151 rows, owners {0..4,255}) = that world's pool size
+(50 stars, 3+ planets each) — pool sizes vary by world, law is constant.

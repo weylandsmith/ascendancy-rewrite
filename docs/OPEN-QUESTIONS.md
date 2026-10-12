@@ -42,7 +42,16 @@ mutation (channel words before turns advance) — parked, low priority
 (rewrite fresh-start-only). Still open:
 +0x0a/+0x20/+0x4a/+0x55 semantics, counter identity, star join,
 packed-entropy. Save-writer string xref route dead round 1 (0x857de
-zero refs, byte-pattern 0); one LEA-form probe budget remains.
+zero refs, byte-pattern 0); one LEA-form probe budget remains. STATUS t80: star->planet JOIN CLOSED
+both directions — pointer law star+0x2A/2E/32 u32 P -> planet NAME at
+file offset P-2507337 (116/116 RESUME.GAM; banked-base P-K-0x24), and pool
+membership u8 name-0x18 == star idx 138/138 incl. the 22 unlinked IV/V
+rows (star-idx field t50 [inferred] UPGRADED verified). Star chain 96-B
+records: live mirror byte-verbatim (50/50, single 12-B repair window on
+Barataria tail) — copied-not-parsed re-confirmed on the star side. One
+contiguous stride-123 planet pool 0x8e0e..0xd05c (t75 "0xaae2 chain" =
+mid-pool entry, law stands). STILL OPEN: +0x0a/+0x20/+0x4a/+0x55
+semantics, counter identity, packed-entropy regions (savegame.md t80).
 OQ-021 | victory | end-ctrl threshold: vendor comment "over half" vs same
 file's prose "two-thirds" — current default >1/2 | open | t73 dark-zone HIT
 (docs/re/score.md): score strings ARE referenced — pool-relative immediates

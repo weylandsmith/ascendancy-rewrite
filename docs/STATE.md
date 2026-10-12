@@ -182,6 +182,27 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+T80 LANDED (OQ-003 join leg, offline): star->planet JOIN CLOSED by
+measurement — pointer law star-rec +0x2A/2E/32 u32 P -> planet NAME at
+file offset P-2507337 (116/116 RESUME.GAM; banked-base form P-K-0x24),
+plus pool-membership law u8 name-0x18 == owning star idx 138/138 over the
+whole contiguous stride-123 planet pool 0x8e0e..0xd05c (22 IV/V rows are
+beyond the 3-pointer capacity and unlinked — membership field is the
+authoritative join). Star chain: 96-B records mirror BYTE-VERBATIM into
+live RAM (50/50 rows; single 12-byte repair window on Barataria's 0xFF
+tail) — copied-not-parsed re-confirmed star-side. Mid-turn "two planet
+regions" reading caught and corrected before commit (bad walk-back base;
+t75 0xaae2 chain = mid-pool entry, its owner-join law stands). Star-idx
+field t50 [inferred] -> [verified]. OQ-003 stays OPEN: +0x0a/+0x20/+0x4a/
++0x55 meanings, counter identity, packed-entropy regions remain; no
+rewrite behaviour change (rewrite is fresh-start-only; mapgen already
+generates 3+ planets/star).
+NEXT t81 (OQ-003 field-meanings leg): the t50 banked unknowns +0x0a/
++0x20/+0x4a/+0x55 (name-0x24-base) — census each across the r1deep 20-slot
+timeline for monotone/turn-coupled behaviour (population/shield/production
+candidates), and cross-check candidate meanings against the banked income-
+law channel words; every field either gets a cited meaning or an explicit
+UNMAPPED verdict.
 T77b LANDED (diplomacy state-enum: honest block, one retraction banked):
 static re-read of the chooser entry @0x447ba (`cmp byte [ebp+0x1c0],0 / JE
 skip`) proves the relation-state byte gates ALL diplomacy emission, but
@@ -264,7 +285,7 @@ BLOCKED T75 POST-MORTEM). Corpus adjudication: 745 banked slots across
 every r1* run, 0 with DAT_43510/DAT_4350c armed — idle scripts never
 colonize, so no banked evidence can ever close OQ-021. LEDGER UPDATED:
 OQ-021 BLOCKED-USER-LEVEL, default >1/2 unchanged.
-NEXT t80 (see the T77b block below — moved to the top).
+(t80 NEXT superseded — see T80 block above.)
 
 T56 LANDED + CORRECTED (PER-TURN BRACKET PARSE, income-law.md T56/T56b;
 BLOCKED t55 CLOSED): End-Turn (511,67) works-but-flaky (advance try 3, then
