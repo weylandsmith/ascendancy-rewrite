@@ -144,10 +144,14 @@ while kill -0 "$DB" 2>/dev/null; do
   fi
   if [ "$REL" -ge "$NEXT_CLICK" ] && [ "$REL" -ge $((LAST_FIRE + 12)) ] && [ "$CLICK_LEFT" -gt 0 ]; then
     [ "$LAST_FIRE" -eq 0 ] && { shot $i; i=$((i+1)); }
-    DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 318 372 >>"$OUT/click.log" 2>&1
-    echo "resume-click (318,372) left=$CLICK_LEFT at t=$REL" >>"$OUT/click.log"
+    # REV5 MENU MAP (two verified anchors + band scan of a banked menu shot):
+    # Intro ~252 | New Game band 273-297 (r1ad (318,293) entered new campaign)
+    # | RETURN band 313-337 | Load band 353-377 (rev4 (318,372) opened Load
+    # Game — shot-02 adjudicated) | Save ~403. Return-to-Current-Game = 325.
+    DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 318 325 >>"$OUT/click.log" 2>&1
+    echo "resume-click (318,325) left=$CLICK_LEFT at t=$REL" >>"$OUT/click.log"
     # r1ad playbook: (600,440) is the OK/continue position — absorbs any
-    # resume-confirm dialog; harmless on the title background itself.
+    # resume-confirm dialog; harmless on the campaign map (r1deep corpus).
     sleep 6
     DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 600 440 >>"$OUT/click.log" 2>&1
     CLICK_LEFT=$((CLICK_LEFT-1)); LAST_FIRE=$((REL + 6))
