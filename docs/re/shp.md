@@ -597,3 +597,30 @@ expect ~all libs pass except 10 expl dims variants + dkship class;
 consumer attribution; (d) 8 remaining caller entries. OQ-005 is ONE
 law away from closure of the stream-start item; strict-close still
 requires (a)+(b) numbers.
+
+## 15. t67: per-record stream-start discriminator + widget arg1 = DEST struct
+
+1. WIDGET ARGLAW [verified @0x30fb8 walk, push site 0x31001..0x31032 raw
+asm]: blit arg1 = widget+4 (inline pixptr/W-1/H-1+clip struct); slot u16
+[widget+24]; selector = [widget+28] >> 16; payload = FUN_0001fc34 return
+pushed RAW; screen x=y=0 pushed constant HERE (0x31015/0x31017).
+selector == -1 takes branch 0x3103f (uses [widget+159]) — blit skipped.
+=> blit W/H clamp governs the DESTINATION surface row width, not source
+record width (S14 clamp reading stands; source streams are width-free).
+
+2. STREAM-START DISCRIMINATOR [measured, scripts/r1_shp_streamlaw.py,
+end-bound FIXED to next-record start]: three candidates per record header
+at rec: (rec+8, u32 W,H pair), (rec+0x18, u16 W,H pair), (rec+0, u32pair
+shift). Row-walk consumes H rows x-unbounded inside [rec,nxt):
+   all-records-pass: 57/208 libraries
+   fail x3: 65   fail x9: 24   fail x10: 14   (scattered remainder)
+NOT closure: 151/208 libs hold records that fail every candidate under
+header-pair dims. Failures cluster in UI libraries (0opening, 13negot,
+14intel tail records, 16battle, 17np, 1starmap).
+
+3. HYPOTHESIS REGISTERED (unbanked, [inferred]): records that fail both
+header-pair candidates may carry dims elsewhere or be NON-IMAGE records
+(mask/masked pair per S14.2 raceflag observation — rec8/9 were mask
+pairs). Closure route: live draw capture of first frame (arg1 struct in
+RAM pins dest W-1/H-1; compare stream consumption) or dkship-style
+desync autopsy per failing record class.
