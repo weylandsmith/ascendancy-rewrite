@@ -265,6 +265,12 @@ DEST struct => W/H clamp is DESTINATION; slot [widget+24], selector
 [widget+28]>>16, -1 skips); header-pair stream-start discriminator ran
 with fixed bounds: 57/208 libs all-records-pass, 151 hold failing
 records (UI-lib cluster) — NOT closure (shp.md S15).
-NEXT t67b: failing-record autopsy by class (mask-pair dims-location per
-S15.3 hypothesis; 14intel rec8/9 mask precedent); draw-first-frame live
-capture is the fallback closure class.
+DONE t67b/t67c: autopsy + unified law (shp.md S16,
+scripts/r1_shp_unifiedlaw.py): V(k0 rec+8)/A(k>=1 rec+0x18 dims@+0x10)/
+B(k>=1 rec+0x20 dims u16@+0x18) -> 1477/1557 records pass, 176/208 libs
+clean; residual 80 records/31 files in 3 classes (span-undersized
+planind+3cfgnew 26, simple-format cos_star 12, stragglers 42).
+NEXT t68: fixup-table walk per failing record — does the library
+fixup pass (u8,u8,u16 triples, S8) rewrite header fields / explain
+variable header size? If fixups are image-reloc only, dims-location
+residue goes BLOCKED-class draw-first-frame capture.

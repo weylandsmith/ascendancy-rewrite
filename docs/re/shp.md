@@ -624,3 +624,37 @@ header-pair candidates may carry dims elsewhere or be NON-IMAGE records
 pairs). Closure route: live draw capture of first frame (arg1 struct in
 RAM pins dest W-1/H-1; compare stream consumption) or dkship-style
 desync autopsy per failing record class.
+
+## 16. t67c: unified stream-start law — 176/208 libs clean; residual anatomy [scripts/r1_shp_unifiedlaw.py]
+
+1. UNIFIED LAW CANDIDATES (per record `rec`, span [rec,nxt), x-unbounded
+rowwalk, both dim orientations tried):
+   V  (k==0): stream rec+8, dims u32 pair at rec   [blit virtual slot:
+      entry = PAY+tsz, +0x18 = rec0+8 since te = 0x10+tsz]
+   A  (k>=1): stream rec+0x18, dims u32 pair at rec+0x10
+   B  (k>=1): stream rec+0x20, dims u16 mirror pair at rec+0x18
+      [1starmap family]
+CORPUS [measured 2026-10-11]: records V 187 + A 1289 + B/F1 ~2 = 1477
+pass; FAIL 80; libraries passing EVERY record 176/208.
+This supersedes S15's 57/208 (S15 tested only header-pair-at-rec offsets).
+
+2. RESIDUAL CLASSES [measured, 80 records in 31 files]:
+   a. SPAN-UNDERSIZED (dims frame > record span): planind.shp 13,
+      3cfgnew.shp 13. planind rec1: mirrored dims (107,99), free 99-row
+      walk consumes 0x2215 > span 0x1a25 — record physically holds LESS
+      than one frame at its own dims. [inferred] records may store a
+      delta/second frame only, or dims live elsewhere. NOT resolved.
+   b. SIMPLE-FORMAT: cos_star.shp 12 (rec dims 2x2-class u32 pair at rec
+      + stream +8 for k>=1 rescued only 1/12 — remaining k>=1 records
+      carry +0x10 blocks + stream at +0x18 per rec1 hex, dims NOT at
+      +0x10 pair (values feffffff...). dims location OPEN.
+   c. SINGLETON/PAIR stragglers: 1starmap 4, expl*/sg*expl 23 across 16
+      files, mouse 2, orbex00 2, misc UI 8 — per-record dims location
+      OPEN (same hunt as b).
+
+3. CODE BRIDGE RESTATED: blit selects ONLY via table u32 @PAY+8+8sel ->
+entry, stream ALWAYS entry+0x18 [verified S12/S14]. File records have
+variable header (0x8/0x10/0x18/0x20) BEFORE stream; the fixup fixups
+(u8,u8,u16) (S8) plausibly rewrites recorded absolute pointers to
+runtime values — the header form may BE fixup-dependent per record.
+Testing that requires walking the fixup table: NEXT t68.
