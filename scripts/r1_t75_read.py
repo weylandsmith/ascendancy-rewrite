@@ -67,18 +67,25 @@ def main():
         print(f"{os.path.basename(sp)}: owned={n}/{T} "
               f"pct={100*n//T if T else 0} selector={sel:#04x} rank={rank:#010x}")
     counted = maxn > 0
-    if fired:
-        verdict = ("FIRING (selector nonzero) at band 29/50 => threshold "
+    in_band = maxn >= 26  # injection band 29/50; allow off-by-a-couple settling
+    if fired and in_band:
+        verdict = ("FIRING (selector nonzero) at band ~29/50 => threshold "
                    "in (50%,58%] => >1/2 class (vendor comment 'over half')")
+    elif fired:
+        verdict = (f"ANOMALY: selector nonzero but max owned {maxn}/50 below "
+                   "band — fire unattributable to the injected set; rerun")
     elif counted:
         verdict = ("NO FIRE with counting observed (max owned "
-                   f"{maxn}/50 in-band) => threshold ABOVE 58% => 2/3-class")
+                   f"{maxn}/50 in-band) => threshold ABOVE 58% => 2/3-class"
+                   if in_band else
+                   f"INCONCLUSIVE: counting only {maxn}/50 (fabrication did "
+                   "not stick for the injected stars); no threshold claim")
     else:
         verdict = ("INVALID RUN: selector zero AND count never left 0 — the "
                    "campaign was never entered (resume click missed) or "
                    "ownership is not counted at .gam load; no threshold claim")
     print("VERDICT:", verdict, "| injected band 29 stars of 50")
-    return 0 if (fired or counted) else 1
+    return 0 if (fired and in_band) or (counted and not fired and in_band) else 1
 
 if __name__ == "__main__":
     sys.exit(main())

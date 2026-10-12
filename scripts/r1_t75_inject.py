@@ -58,19 +58,23 @@ def main():
     for base, nm in recs:
         stars.setdefault(star_of(nm), []).append(base)
     injected, kept = [], []
-    # COLONIZATION MARKERS (rev5 ground truth): owner=0 alone is NOT counted by
-    # the end-turn scorer — the one counted rec (Verithil I, home) differs from
-    # unowned chain recs at +0x1e=02 +0x20=01 +0x24=01 +0x28=01 (byte-diff vs
-    # Xerxes I and Aquila I; +0x26/+0x31 are per-planet production values and
-    # +0x59.. are coordinates — left alone). Replicate the full owned pattern.
-    MARKS = {0x1E: 0x02, 0x20: 0x01, 0x24: 0x01, 0x28: 0x01}
+    # REV7 COLONIZATION FABRICATION: rev5/rev6 proved a bare owner byte (even
+    # with the +0x1e/+0x20/+0x24/+0x28 marks) is NOT counted — load-derived
+    # star bitmaps (RAM 0x13bc5 stride 0x60, bitmaps +0x14/+0x15 tested at
+    # 0x3ed12/0x3ed2e) key on COLONY state, and the only counted star was the
+    # one real colony in the scenario (Verithil I). So clone Verithil's whole
+    # 123-byte record body into every chain star's first planet record,
+    # restoring each record's own name. Scenario fabrication is fine: we
+    # measure the comparator threshold, not the scenario.
+    VBASE = next(b for b, nm in recs if nm.startswith(b"Verithil"))
+    body = bytes(data[VBASE:VBASE + STRIDE])
     for star, bases in sorted(stars.items()):
         if star in KEEP_STARS:
             kept.append(star); continue
-        for b in bases:
-            data[b + OWNER_OFF] = 0x00
-            for off, val in MARKS.items():
-                data[b + off] = val
+        b = bases[0]
+        nm_own = bytes(data[b:b + 30])
+        data[b:b + STRIDE] = body
+        data[b:b + 30] = nm_own
         injected.append(star)
     # load-path needle (t53 law): rec0 planet renamed HERMESSEN
     nm0 = bytes(data[NBASE:recs[0][0] + 30]).split(b"\0")[0]
