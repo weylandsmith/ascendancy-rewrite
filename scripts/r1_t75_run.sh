@@ -114,13 +114,16 @@ PY
 
 T0=$(date +%s); i=1
 BASELINE=""; ENTERED=0
-CLICK_LEFT=6; NEXT_CLICK=$((T0 + 75)); LAST_FIRE=0
-ENDS_DONE=0; NEXT_END=0
-# Entry law for REV3: grid-hash churn was measured on the NEW-GAME flow only,
+# ALL timer math is in REL seconds (rev3 died from mixing absolute NEXT_*
+# with relative REL, and NEXT_END=0 defeated its own ${NEXT_END:-} default —
+# end-turns fired at t=0 before the window existed).
+CLICK_LEFT=6; NEXT_CLICK=75; LAST_FIRE=0
+ENDS_DONE=0; NEXT_END=150
+# Entry law for REV4: grid-hash churn was measured on the NEW-GAME flow only,
 # and owned planets are RAM-visible at title (world boots from .gam) — neither
 # gates a RESUME. Adjudication is POST-HOC in r1_t75_read.py: counting a
 # player star count (DAT_482fb >= injected) only happens in-campaign, so
-# end-turns fire optimistically from t>=150 and the slots tell the truth.
+# end-turns fire optimistically from REL>=150 and the slots tell the truth.
 while kill -0 "$DB" 2>/dev/null; do
   NOW=$(date +%s); REL=$((NOW - T0))
   f=$(newest)
@@ -139,19 +142,23 @@ while kill -0 "$DB" 2>/dev/null; do
       ENTERED=1
     fi
   fi
-  if [ "$REL" -ge "$NEXT_CLICK" ] && [ "$NOW" -ge $((LAST_FIRE + 12)) ]; then
+  if [ "$REL" -ge "$NEXT_CLICK" ] && [ "$REL" -ge $((LAST_FIRE + 12)) ] && [ "$CLICK_LEFT" -gt 0 ]; then
     [ "$LAST_FIRE" -eq 0 ] && { shot $i; i=$((i+1)); }
     DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 318 372 >>"$OUT/click.log" 2>&1
     echo "resume-click (318,372) left=$CLICK_LEFT at t=$REL" >>"$OUT/click.log"
-    CLICK_LEFT=$((CLICK_LEFT-1)); LAST_FIRE=$NOW
-    if [ "$CLICK_LEFT" -le 0 ]; then NEXT_CLICK=99999999999; else NEXT_CLICK=$((NOW + 15)); fi
+    # r1ad playbook: (600,440) is the OK/continue position — absorbs any
+    # resume-confirm dialog; harmless on the title background itself.
+    sleep 6
+    DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 600 440 >>"$OUT/click.log" 2>&1
+    CLICK_LEFT=$((CLICK_LEFT-1)); LAST_FIRE=$((REL + 6))
+    NEXT_CLICK=$((REL + 21))
   fi
-  if [ "$ENDS_DONE" -lt "$ENDTURNS" ] && [ "$NOW" -ge "${NEXT_END:-$((T0 + 150))}" ] \
-     && [ "$NOW" -ge $((LAST_FIRE + 20)) ]; then
+  if [ "$ENDS_DONE" -lt "$ENDTURNS" ] && [ "$REL" -ge "$NEXT_END" ] \
+     && [ "$REL" -ge $((LAST_FIRE + 20)) ]; then
     DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 511 67 >>"$OUT/click.log" 2>&1
     ENDS_DONE=$((ENDS_DONE+1))
     echo "end-turn click $ENDS_DONE at t=$REL" >>"$OUT/click.log"
-    NEXT_END=$((NOW + 30))
+    NEXT_END=$((REL + 30))
     [ "$ENDS_DONE" -eq "$ENDTURNS" ] && { sleep 45; shot $i; i=$((i+1)); }
   fi
   sleep 5
