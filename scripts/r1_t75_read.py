@@ -43,6 +43,7 @@ def main():
     run = sys.argv[1]
     fired = False
     seen = 0
+    maxn = 0
     for sp in sorted(glob.glob(os.path.join(run, "save", "*.sav"))):
         try:
             mem = zipfile.ZipFile(sp).read("Memory")
@@ -61,14 +62,23 @@ def main():
         seen += 1
         if sel != 0:
             fired = True
+        if n > maxn:
+            maxn = n
         print(f"{os.path.basename(sp)}: owned={n}/{T} "
               f"pct={100*n//T if T else 0} selector={sel:#04x} rank={rank:#010x}")
-    print("VERDICT:", ("FIRING (selector nonzero) => threshold BELOW/EQUAL band"
-                       if fired else
-                       f"NO FIRE across {seen} slots (band 29/50..injected) "
-                       "=> threshold above band; 2/3-class survives"),
-          "| injected band was 29..30 stars of 50")
-    return 0
+    counted = maxn > 0
+    if fired:
+        verdict = ("FIRING (selector nonzero) at band 29/50 => threshold "
+                   "in (50%,58%] => >1/2 class (vendor comment 'over half')")
+    elif counted:
+        verdict = ("NO FIRE with counting observed (max owned "
+                   f"{maxn}/50 in-band) => threshold ABOVE 58% => 2/3-class")
+    else:
+        verdict = ("INVALID RUN: selector zero AND count never left 0 — the "
+                   "campaign was never entered (resume click missed) or "
+                   "ownership is not counted at .gam load; no threshold claim")
+    print("VERDICT:", verdict, "| injected band 29 stars of 50")
+    return 0 if (fired or counted) else 1
 
 if __name__ == "__main__":
     sys.exit(main())
