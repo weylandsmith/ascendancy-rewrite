@@ -260,6 +260,11 @@ rec0 virtual slot) -> 3504 strict survivors over 72 ck, raceflag sel1
 pixels RAM==FILE. Caller idiom: slot=[widget+24], sel=[widget+28]>>16,
 payload UNMODIFIED to blit — no transform pass. Rows x-unbounded
 (writes clamp @0x5cd31/0x5cd62); exact-span 2xH = animation frames.
-NEXT t67: corpus pass under draw-first-frame semantics (h+1 rows from
-PAY+seloff(k)+0x18, no span requirement) + per-library frame-count fit;
-then stream-start closure decision.
+DONE t67 (b1b20b8): widget arglaw pinned (@0x31001..32: arg1=widget+4
+DEST struct => W/H clamp is DESTINATION; slot [widget+24], selector
+[widget+28]>>16, -1 skips); header-pair stream-start discriminator ran
+with fixed bounds: 57/208 libs all-records-pass, 151 hold failing
+records (UI-lib cluster) — NOT closure (shp.md S15).
+NEXT t67b: failing-record autopsy by class (mask-pair dims-location per
+S15.3 hypothesis; 14intel rec8/9 mask precedent); draw-first-frame live
+capture is the fallback closure class.
