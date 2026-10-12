@@ -52,10 +52,17 @@ disproducer LAW percent = TRUNC(100*DAT_000482fb/T), T = hi-u16 DAT_00016143
 (total stars, cross-checked vs FUN_00028fc0 stride-0x60 record loop);
 presenter = eventwnd.cpp jump-table cluster 0x2c03a..0x2c0b6 (selector byte
 mov al,[0x43510] @0x2c01d). Comparator itself: ZERO direct-address writes to
-0x43510/0x4350c (8-encoding scan over 0x200..0x82bb0) -> evaluator writes via
-base+disp, hunt = dark-zone function enumeration (objdump raw bytes, harness
-banked). t51 STEP-4 capture (win screen) remains the fallback. Default >1/2
-stands.
+0x43510/0x4350c (8-encoding scan over 0x200..0x82bb0). t75: .gam-capture
+route MEASURED DEAD (3 escalating fabrications all count 1/50 — load-side
+star bitmaps are colony-derived, not .gam-owner-derived; BLOCKED.md T75
+POST-MORTEM); harness itself proven (menu row (318,325) enters campaign).
+t76: ALL 10 code readers of the star-owner block DAT_00013bc5 decompiled —
+0x3ecb8 = AI attitude scorer, 0x44634 = two-race adjacency, rest UI/counting;
+comparator ABSENT from image (confirms 06s at exhaustive scope). Corpus
+adjudication: 745 banked slots, 0 with selector armed (idle scripts never
+colonize). Now BLOCKED-USER-LEVEL (needs interactive original session with a
+real colony past 50%, or original scenario at >50% owned). Default >1/2
+stands (campaign.cpp:738 unchanged).
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719

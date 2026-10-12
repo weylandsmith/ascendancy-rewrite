@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-11T23:40
+updated: 2026-10-12T03:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -175,6 +175,35 @@ ledger:
   R1 attempts are NEVER gate stages (gate stays fast, side-effect-free).
 
 ## NEXT ACTION (exactly one)
+
+T76 LANDED (OQ-021 CLOSED-EXHAUSTIVE FINAL + OQ-023 lead): all 10 code
+readers of the star-owner block DAT_00013bc5 decompiled (work/coswnd_decomp/
+3ecb8.c 220a8.c 3a4e0.c 3eb88.c 439f4.c 44634.c 49c14.c 49d2c.c 500e0.c):
+NONE is the end-ctrl comparator — 0x3ecb8 = per-race AI ATTITUDE scorer
+(state table [obj+r+0x1c0]: 1=ally-ish path sums star-bitmap +0x14/+0x15
+product with 0x67aa 31-byte record entries and 0x13b9c stride-6 weights,
+applies -1/+3 on the two-others-ally comparison and -2/+4 on relative-
+strength deltas; state 2 = rank-distance path clamp(0,3); accumulator
+u16@(obj+r*2+0x1b2) clamped [50(0x32), 950(0x3b6)] with hi-word gate
+(obj+r*2+0x1b0)>>16); 0x439f4 = ally-bitmask builder (state==2 races);
+0x44634 = pair-adjacency test on star bitmap +0x17. => comparator ABSENT
+from image at full scope (confirms 06s; t74 S5 + t75 capture death, see
+BLOCKED T75 POST-MORTEM). Corpus adjudication: 745 banked slots across
+every r1* run, 0 with DAT_43510/DAT_4350c armed — idle scripts never
+colonize, so no banked evidence can ever close OQ-021. LEDGER UPDATED:
+OQ-021 BLOCKED-USER-LEVEL, default >1/2 unchanged.
+NEXT t77 (OQ-023, DIPLOMACY — the ledger's one cheap open item): the
+attitude law above IS the original's multi-branch offer machinery OQ-023
+says the rewrite lacks (rewrite/src/game only emits the two-party
+threshold branch; OQ-023 W-B gate = ownership model). Step 1: map
+param_1 (the 0x1ee-planet-table-adjacent session object: fields r*2+0x1b0
+hi=turn?, +0x1b2=attitude u16, +0x1c0=relation-state byte per race) and
+the callers of 0x3ecb8/0x439f4 (Ghidra xrefs on work/ghp6 or raw
+rel32-call scan over 0x200..0x82bb0). Step 2:
+dump per-race attitude/state words from banked r1deep slots (corollary
+idx; bases known) to ground-truth states {0,1,2,3} semantics. Step 3: if
+semantics land, upgrade rewrite diplomacy offer branches citing
+0x3ecb8/0x439f4 + slot evidence; pin a test; gate; commit.
 
 T56 LANDED + CORRECTED (PER-TURN BRACKET PARSE, income-law.md T56/T56b;
 BLOCKED t55 CLOSED): End-Turn (511,67) works-but-flaky (advance try 3, then

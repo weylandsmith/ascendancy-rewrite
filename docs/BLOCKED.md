@@ -43,6 +43,32 @@ copy (score.md S5 / STATE T74: candidate at corollary X=0x38ad8 in ck067, to
 be pinned across two checkpoints). Static writer hunt is now CLOSED-EXHAUSTIVE
 (all direct encodings + runtime-relocated full-RAM scans negative; f32 2/3
 (absent image-wide); closing = the capture with the corrected live site.
+T75 POST-MORTEM (2026-10-12, runs r1thr-001410/004333/010746/013404/015525/
+023112, harnesses r1_t75_inject/run/read committed): the .gam-capture route is
+MEASURED DEAD. Harness now WORKS (rev5 churn=1 proves campaign entry via
+menu row (318,325); menu law pinned by two empirical anchors (318,293)=New
+Game (r1ad corpus) and (318,372)=Load-Game (rev4 shot — five <EMPTY> slots:
+.gam resume is NOT a save slot); end-turn (511,67) fires per t56 cadence).
+But THREE escalating fabrications — (r5) owner byte .gam+0x33=0 on 29 chain
+stars, (r6) + colonization marks +0x1e=02/+0x20/+0x24/+0x28, (r7) full
+clone of the one real colony's 123B body (Verithil I) onto every chain star —
+ALL count exactly 1/50 (owned DAT_482fb=1, selector 0x43510=0x00, every
+post-end-turn slot). Load-side star bitmaps (star-record stride 96 RAM,
++0x14/+0x15) do NOT derive from the .gam planet chain's owner bytes; only
+in-game colony state populates them. RECLASSIFIED: BLOCKED-USER-LEVEL, same
+class as OQ-010/OQ-019 (needs an interactive original session where a
+colony is really founded, or a scenario file from real play at >50% owned).
+LAST SURVIVING STATIC LEAD (t75 raw objdump, work/ascend_restored.bin):
+function @0x3ecb8 (Ghidra-blind zone) is an owned-star PREDICATE loop:
+count u16 ds:0x13b98 (0x3ecc5, jle exit), iterate rec base 0x13bc5 stride
+0x60 while edx < (ds:0x16143 sar 0x10) (0x3ecfd..0x3ed08 — same hi-word as
+the score law); per rec test bitmap +0x14 bit (1<<[ebp]) AND bitmap +0x15
+bit (1<<([esp+6] sar 0x10)) (0x3ed12..0x3ed30); survivors copy the 0x67aa
+31-byte record and fall through to 0x1ee-stride planet rec 0x12e16+0x1ee*k
+(0x3ed52) with two calls to 0x439f4. Third u32-site of 0x16143 = 0x44659
+(also unexamined). NEXT t76 = one decompile batch {0x3ecb8 callers/callees,
+0x44659 region}; if the comparator still isn't there, OQ-021 stands BLOCKED
+with default >1/2 (campaign.cpp:738 unchanged).
 Item STAYS OPEN per strict-close policy; other workstreams unaffected.
 
 ### OQ-020 — ability charge days (static route EXHAUSTED 2026-10-07; default in force: 30 turns)
