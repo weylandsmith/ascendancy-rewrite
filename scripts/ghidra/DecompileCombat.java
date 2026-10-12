@@ -18,8 +18,16 @@ import ghidra.program.model.address.*;
 public class DecompileCombat extends ghidra.app.script.GhidraScript {
     public void run() throws Exception {
         java.util.List<Long> tl = new java.util.ArrayList<Long>();
+        // t73: env-overridable targets/output so one script serves many batches.
+        // Defaults preserve the original combat-batch behaviour.
+        String tpath = System.getenv("DECOMP_TARGETS");
+        if (tpath == null || tpath.isEmpty())
+            tpath = "/home/hrethric/projects/ascendancy/work/combat_decomp_targets.txt";
+        String opath = System.getenv("DECOMP_OUT");
+        if (opath == null || opath.isEmpty())
+            opath = "/home/hrethric/projects/ascendancy/work/combat_decomp";
         java.util.Scanner sc = new java.util.Scanner(
-            new File("/home/hrethric/projects/ascendancy/work/combat_decomp_targets.txt"), "UTF-8");
+            new File(tpath), "UTF-8");
         while (sc.hasNextLine()) {
             String s = sc.nextLine().trim();
             if (s.isEmpty() || s.startsWith("//")) continue;
@@ -29,7 +37,7 @@ public class DecompileCombat extends ghidra.app.script.GhidraScript {
         long[] targets = new long[tl.size()];
         for (int i = 0; i < tl.size(); i++) targets[i] = tl.get(i).longValue();
         println("DECOMPILE-COMBAT: targets=" + targets.length);
-        File dir = new File("/home/hrethric/projects/ascendancy/work/combat_decomp");
+        File dir = new File(opath);
         dir.mkdirs();
         DecompInterface decomp = new DecompInterface();
         decomp.openProgram(currentProgram);

@@ -25,11 +25,18 @@ DAT_0004350c and DAT_00043510 have READERS ONLY — exhaustive writes search
 (moffs + disp32 + SIB-base + fixup_sites.tsv + Ghidra xrefs over full code
 range 0x200..0x82bb0) found ZERO writers, so the comparator is NOT in the
 image: former option (b) "obj1 call-edge recovery" is REFUTED, not merely
-long-horizon. What remains: (a) user ruling on comment-vs-prose, or (c) the
-controlled-mutation capture — set player-owned systems to just over 1/2 in
-RAM at the 0x3a095 owner table (stride 0x162, owner = +0x54 sar 16 per
+long-horizon. CORRECTION 2026-10-11 (t73, docs/re/score.md): the 06s
+conclusion overreached — Ghidra never analysed the dark zone 0x26b32..0x284bb
+(0 functions in functions_full.tsv) where the score disproducer and the
+end-*.txt presenter (eventwnd.cpp cluster 0x2c03a..0x2c0b6) both live; a
+zero-Ghidra-xref result there is vacuous (R12-class). The evaluator still has
+no located writer under 8 DIRECT-address encodings (score.md S4), but a base+
+disp writer inside the dark zone remains fully open — route t73b = raw-objdump
+function enumeration of 0x26b32..0x2c600 + threshold-idiom grep, then the
+controlled-mutation capture (set player-owned systems to just over 1/2 in RAM
+at the 0x3a095 owner table (stride 0x162, owner = +0x54 sar 16 per
 FUN_00040ec0) before an end-turn, and observe whether end-ctrl fires; a
-second run at 60% discriminates >1/2 from >=2/3. Item STAYS OPEN per strict-
+second run at 60% discriminates >1/2 from >=2/3). Item STAYS OPEN per strict-
 close policy; other workstreams unaffected.
 
 ### OQ-020 — ability charge days (static route EXHAUSTED 2026-10-07; default in force: 30 turns)

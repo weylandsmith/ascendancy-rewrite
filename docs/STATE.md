@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-11T12:55
+updated: 2026-10-11T22:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -67,8 +67,11 @@ ledger:
       neighbourhood map: star stride 96, planet ptrs name+0x2A, orbit pair
       planet-name+0x57/+0x5f; field semantics open)"
     - "OQ-021 end-ctrl threshold: comment 'over half' vs prose 'two-thirds' —
-      static route REFUTED 06s (globals reader-only, no comparator in image);
-      path = controlled-mutation capture (docs/BLOCKED.md OQ-021 recipe)"
+      t73 dark-zone hit (docs/re/score.md S1-S3): score strings referenced at
+      0x2807b/0x280e7 (pool-rel), score law TRUNC(100*DAT_482fb/T), presenter
+      eventwnd.cpp 0x2c03a cluster; comparator writes = ZERO direct encodings
+      -> evaluator hunt via dark-zone enumeration (t73b); capture fallback.
+      Default >1/2 stands"
     - "OQ-020 ability charge days (%d in vendor text, no data file) — R1: read the constant in code"
     - "OQ-005 .shp pixel codec — static route exhausted (6 angles, docs/REFUTED-ROUTES.md); needs exe shape loader via live image"
     - "OQ-006 headerless sample rate — needs exe audio-init constant"
@@ -304,7 +307,46 @@ a GAMEWND/..\coswnd.cpp pool => consumer module identified); VA==file
 offset encoding re-inverted from known-good 0x2b224; zero u32 code-region
 refs (R12: lead-out not proof). NEW bounded angle banked: 36 coswnd.cpp
 functions never decompiled (batches 1/3 skipped coswnd).
-NEXT t73: ONE coswnd decompile batch (36 funcs via DecompileCombat.java
-targets file), grep imul/cmp threshold idioms (x*2 vs N, x*3 vs N*2,
-percent-producer reuse ships.md S15); hit -> close OQ-021 w/ citation;
-nil -> BLOCKED rides capture, move to OQ-003 semantics or harness debt.
+NEXT t73: DONE (see T73 block) — t73b = eventwnd.cpp module decompile batch
+(OQ-021 comparator hunt).
+
+T73 LANDED + CORRECTED (OQ-021 static, dark-zone HIT; docs/re/score.md NEW):
+(1) ATTRIBUTION CORRECTION: work/attribution.tsv est_func is a BACKWARD-SCAN
+estimate, NOT a function start — all 36 coswnd est_func values landed mid-
+function (0/36 in functions_full.tsv); re-resolved to 12 CONTAINING functions,
+decompiled all 12 (scripts/coswnd_run.sh, fresh ghp6 project, DecompileCombat
+.java now env-driven DECOMP_TARGETS/DECOMP_OUT; ghp4/ghp5 untouched).
+(2) t72's "zero u32 refs to the score strings" is REFUTED by corrected scan
+base (t66 lesson): OQ-004 pool-relative immediates = str_off - 0x82BB0 (NOT
+VA). push 0xf66/push 0xf7a sites = 0x2807b/0x280e7, inside the DARK ZONE
+0x26b32..0x284bb which holds ZERO Ghidra functions (auto-analysis never
+reached it) — that is why every static-xref route was blind there. Runtime
+law re-verified live (r1deep-20261007-224831/41.sav): code relocates
+0xf66->P0+0x83b16, 0xf7a->P0+0x83b2a exactly at the anchored site (window
+0x280de.., block base == B vote); obj1 data at B+0x82bb0+X law re-confirmed
+(item table 'Factory' name anchor).
+(3) SCORE-DISPRODUCER LAW (dark zone 0x280be..0x280e7, raw objdump
+-b binary -M intel on work/ascend_restored.bin — banked harness tool):
+percent = TRUNC( DAT_000482fb * 100 / (DAT_00016143 >> 16) ) — mul-100 idiom:
+lea eax,[edx*4]; sub eax,edx (=3N); shl 3 (=24N); add edx,eax (=25N);
+shl edx,2 (=100N); mov eax,edx; sar edx,1f; idiv ebx (ebx = signed hi-word
+of DAT_00016143 = total stars). "STARS CONTROLLED %d" prints DAT_000482fb
+itself (push eax @0x28079 after mov eax,ds:0x482fb @0x28074); shown only
+when DAT_0010ba0 == -1 == [ebp+0x58e] (0x28059..0x2806e gates). [inferred:
+DAT_482fb = player-owned star count; producer not yet traced.]
+(4) end-ctrl PRESENTER is eventwnd.cpp (NOT coswnd): jump-table handler
+cluster 0x2c03a..0x2c0b6 pushes pool-rel end-*.txt names (0x130c/0x1319/
+0x1333/0x1340/0x134d -> end-xtnc/-dest/-unit/-ctrl.txt + "Couldn't open %s",
+payload 0x83ebc.. verified); file-name dispatch by ReadFile (0x7739d) +
+strcmp (0x775aa) against 0x1371/0x1375 strings. DAT_43510/4350c: ZERO write
+encodings in image (A0/A2/88/8A/89-05/c7-05/A3/80-grp scans over 0x200..
+0x82bb0) — comparator consumer is a BYTE reader (a0 at 0x2c01d) fed by the
+END-CONDITION EVALUATOR, which must live in the same dark zone (0x26b32..) as
+its 0x280be sibling. CONCRETE t73b: enumerate dark-zone functions by
+prologue/epilogue walk (objdump whole 0x26b32..0x2c600 span; find the block
+containing 0x2c01d), grep for cmp idioms x*2 vs N / x*3 vs N*2 feeding the
+DAT_43510 byte; default >1/2 stands until cited comparator.
+HARNESS LESSONS: objdump -b binary -m i386 -M intel works directly on the
+restored image (no Ghidra round-trip for dark zones); Ghidra function names
+FUN_ + 8 hex digits (6-digit regex = silent zero); r1_sav_scan.find_base
+returns (votes,positions) tuple — vote most_common(1) with >=5 threshold.
