@@ -86,7 +86,7 @@ T0=$(date +%s); i=1
 CLICKED=""; NEXT_CLICK=$((T0 + 70)); NEXT_CHECK=$((T0 + 80)); EXTRA_LEFT=5
 ENDS_DONE=0
 while kill -0 "$DB" 2>/dev/null; do
-  NOW=$(($(date +%s) - T0))
+  NOW=$(date +%s)
   if [ "$CLICKED" != "ok" ]; then
     if [ -z "$CLICKED" ] && [ "$NOW" -ge "$NEXT_CLICK" ]; then
       shot $i; i=$((i+1))
@@ -102,7 +102,7 @@ while kill -0 "$DB" 2>/dev/null; do
       fi
     fi
   else
-    if [ "$ENDS_DONE" -lt "$ENDTURNS" ] && [ "$NOW" -ge "${NEXT_END:-$((T0+10**9))}" ]; then
+    if [ "$ENDS_DONE" -lt "$ENDTURNS" ] && [ "$NOW" -ge "${NEXT_END:-99999999999}" ]; then
       DISPLAY=":$DISP" "$ROOT/tools/xsend" "DOSBox-X" 511 67 >>"$OUT/click.log" 2>&1
       ENDS_DONE=$((ENDS_DONE+1))
       echo "end-turn click $ENDS_DONE at t=${NOW}s" >>"$OUT/click.log"
