@@ -345,6 +345,17 @@ owner ground truth unresolvable from banked corpora -> record one line
 (capture class, needs interactive colonization), move to OQ-003 replay
 semantics.
 
+T75 LAUNCH (in flight): join SOLVED offline — .gam planet chain 0xaae2/123
++0x33 == RAM planet +0x57 (83/83 join rows on r1mut world incl owned Verithil
+I==0; star-chain +0x33 writes VOID — unowned stars legitimately hold 18/250).
+Chain spans 29 distinct stars; the 4 AI home stars are NOT in the chain
+(zero-collision verified) -> injecting owner=0 on ALL chain planets = 29/50 =
+58% band: fire => (50,58]% (>over half), no fire => >=58% (two-thirds class).
+Harness banked: scripts/r1_t75_inject.py + r1_t75_run.sh (511,67 end-turn x4
+at 30 s, t56 law) + r1_t75_read.py (per-slot owned/selector/rank + VERDICT).
+Run r1thr-* background proc_304ef942b2dd; on completion read analysis.log,
+update BLOCKED/OQ-021 + possibly rewrite campaign.cpp:738, gate, commit.
+
 T73 LANDED + CORRECTED (OQ-021 static, dark-zone HIT; docs/re/score.md NEW):
 (1) ATTRIBUTION CORRECTION: work/attribution.tsv est_func is a BACKWARD-SCAN
 estimate, NOT a function start — all 36 coswnd est_func values landed mid-
