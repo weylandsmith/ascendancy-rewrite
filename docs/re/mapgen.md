@@ -137,19 +137,48 @@ WRAPS (no ceiling monotonicity). Slot-value law note: in-campaign slots carry th
 armed T while pre-entry/post-quit slots read 50 (default), so each arm's
 in-game majority T is the measured value.
 
-POSITION LAW AT NON-DEFAULT T does NOT extend the §4.1 exact shell-slot
-schedule: over the T=100 chain (stride-96 records, idx==k verified 0..99,
-names Zoroaster.. genuine) slot-vs-radius inversions are 3537/4950
-(r1size-042719 slot 41; scripts/r1_t78_shell.py) vs 0/1225 at T=50.
-Radii still respect the outer envelope (max <= 440.0). The rewrite's
-cycled-kShellR extension for non-default starCount (mapgen.cpp:92 comment)
-is therefore a DOCUMENTED DEFAULT, not a closed law — OQ-012(a) closes the
-SIZE OPTIONS question; the non-default position sub-law stays banked here
-as open sub-item (caveat) without holding the ledger.
+POSITION LAW AT NON-DEFAULT T: the 2D hypot(x,y) reading initially
+suggested NON-shell-slot behaviour (3537/4950 slot-radius inversions) —
+that reading was a MEASUREMENT BUG. The original stores positions as f32
+[x,y,z] at name-0x14 on a SPHERE (OQ-012(c)+(d)); the law is on the 3D
+radius r3, and the xy-projection is disc-scattered by geometry, not by
+the generator. Corrected measurement (t79, scripts/r1_t79_pos.py — the
+law below): see §OQ-025, CLOSED same turn.
 
 Rewrite upgrade: --stars CLI knob (main.cpp Options) so campaign runs can
 play all five measured densities; default remains 50 = "Average"
 (measurement-consistent, mapgen.h:50 comment re-cited).
+
+## OQ-025 CLOSED — shell populations follow a halving law at every density
+(t79, 2026-10-12)
+
+MEASUREMENT (scripts/r1_t79_pos.py over the banked r1size arms + r1deep
+control; slot chosen = in-ladder-T with longest gated chain; records gated
+idx==k + first-planet-pointer-on-grid; radii = r3 = hypot(x,y,z) at
+name-0x14; in-play set = chain HEAD cut at the slot's own DAT T):
+
+  T    shell runs (radius, pop)                                   viol
+  15   440:8  365:3  290:2  215:1  140:1                            0
+  25   440:13 365:6  290:3  215:1  140:1  65:1                      0
+  50   440:26 365:12 290:6  215:3  140:1  65:1  50:1                0
+  75   440:38 365:18 290:9  215:5  140:2  65:1  50:2                0
+  100  440:51 365:24 290:12 215:6  140:3  65:2  50:2                0
+
+LAW: shell radii FIXED (440,365,290,215,140,65,50 — the same seven as the
+T=50 battery); populations = start rem=T: shell0 takes rem/2+1, shells
+1..5 take rem/2 (a remainder of 1 keeps it), shell6 (r=50) takes the
+final remainder; slots in table order fill shells outer->inner, and the
+radius sequence is non-increasing with ZERO violations at every arm.
+At T=50 the law reproduces the 2026-10-06p k0..k49 table EXACTLY — the
+battery was one instance of the general law, not its own law.
+Chain past the DAT-T cut may hold allocated-but-not-in-play records
+(low-T arms show gated chain > T; their slots are tail residue).
+
+Rewrite UPGRADED: shellRadiiFor(n) in mapgen.cpp (anonymous namespace)
+implements the halving law; the old i%50 wrap-around is REMOVED (measured
+wrong for T>50 — slot 50 sits on shell 440 with population 51, the wrap
+put it at 365); test galaxy_density_ladder_matches_measured_sizes extended
+to pin per-size shell runs (108 tests 0 failed).
 
 ## OQ-012(a) static value-path probe — NULL (t56 cycle)
 

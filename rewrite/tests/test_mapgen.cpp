@@ -173,11 +173,24 @@ TEST(galaxy_density_ladder_matches_measured_sizes) {
     // exact same sizes, every star respects the measured outer envelope
     // r <= 440 (verified across all measured runs), and the map is
     // connected at every rung.
+    // OQ-025 (t79) ADDS the shell-population law per size: slot-ordered
+    // radii are NON-INCREASING runs at (440,365,290,215,140,65,50) with
+    // populations = halving law (shell0 = T/2+1, halve remainder, last
+    // shell takes tail) — verified vs live RAM at all five densities
+    // (scripts/r1_t79_pos.py).
     auto st = shippedStats();
     if (!st) return;
     std::string err;
     auto names = ascend::game::loadStarNames(kRepo / "extracted" / "ascend00" / "names.txt", &err);
     const int ladder[5] = {50, 75, 100, 15, 25};
+    const std::vector<std::vector<int>> expect = {
+        {26, 12, 6, 3, 1, 1, 1},   // 50 (== 2026-10-06p battery table)
+        {38, 18, 9, 5, 2, 1, 2},   // 75 (measured r1size-041459)
+        {51, 24, 12, 6, 3, 2, 2},  // 100 (measured r1size-042719)
+        {8, 3, 2, 1, 1},           // 15 (measured r1size-043229 head-15)
+        {13, 6, 3, 1, 1, 1},       // 25 (measured r1size-044658 head-25)
+    };
+    const double kR[7] = {440, 365, 290, 215, 140, 65, 50};
     for (int n = 0; n < 5; ++n) {
         MapConfig cfg;
         cfg.seed = 77u + static_cast<unsigned>(n);
@@ -185,10 +198,30 @@ TEST(galaxy_density_ladder_matches_measured_sizes) {
         Galaxy g = MapGenerator(cfg, *st, names).generate();
         CHECK(static_cast<int>(g.stars.size()) == ladder[n]);
         CHECK(g.connected());
+        std::vector<int> radii;
+        radii.reserve(g.stars.size());
         for (const auto& s : g.stars) {
             const double dx = s.x - 512.0, dy = s.y - 512.0;
             CHECK(dx * dx + dy * dy <= 441.0 * 441.0);
+            radii.push_back(static_cast<int>(std::llround(std::sqrt(dx * dx + dy * dy))));
         }
+        // runs of the NEAREST shell index (integer-rounded coords carry
+        // <=0.71 radius error; shells are >=15 apart, so nearest is exact)
+        auto nearestShell = [&kR](double r) {
+            int best = 0;
+            for (int j = 1; j < 7; ++j)
+                if (std::abs(r - kR[j]) < std::abs(r - kR[best])) best = j;
+            return best;
+        };
+        std::vector<int> pops;
+        for (size_t i = 0; i < radii.size();) {
+            const int sh = nearestShell(radii[i]);
+            size_t j = i;
+            while (j < radii.size() && nearestShell(radii[j]) == sh) ++j;
+            pops.push_back(static_cast<int>(j - i));
+            i = j;
+        }
+        CHECK(pops == expect[n]);
     }
 }
 

@@ -10,6 +10,26 @@
 namespace ascend::game {
 namespace {
 
+// Measured shell-population law (docs/re/mapgen.md §OQ-025, t79): build the
+// per-slot shell-radius table for ANY galaxy size: shell0 = n/2+1 stars at
+// r=440, each next shell (365,290,215,140,65) takes half the remainder
+// (a remainder of 1 keeps it), shell6 (r=50) takes the final tail. At
+// n=50 this reproduces the k0..k49 battery table exactly (26/12/6/3/1/1/1).
+std::vector<int> shellRadiiFor(int n) {
+    static const int kRadii[7] = {440, 365, 290, 215, 140, 65, 50};
+    std::vector<int> out;
+    out.reserve(static_cast<size_t>(n));
+    int rem = n;
+    for (int j = 0; j < 7 && rem > 0; ++j) {
+        const int c = (j == 0) ? rem / 2 + 1
+                      : (j == 6) ? rem
+                      : (rem >= 2 ? rem / 2 : rem);
+        for (int i = 0; i < c; ++i) out.push_back(kRadii[j]);
+        rem -= c;
+    }
+    return out;
+}
+
 uint64_t dist2(const Star& a, const Star& b) {
     const int64_t dx = a.x - b.x, dy = a.y - b.y;
     return static_cast<uint64_t>(dx * dx + dy * dy);
@@ -80,29 +100,24 @@ Galaxy MapGenerator::generate() const {
     g.seed = static_cast<int>(cfg_.seed);
     std::mt19937 rng(cfg_.seed);
 
-    // --- 1. positions: measured SHELL law (docs/re/mapgen.md §4.1; measured
-    //        docs/re/r1-savestate.md 2026-10-06p: radius-by-slot table with
-    //        exact float identity across 5 fresh campaigns, 0 inversions of
-    //        1225 pairs). Star at table slot k sits at SHELL[k] x a uniformly
-    //        random direction. The original enforces NO minimum separation
-    //        (closest observed pair 24.4 units), so there is no rejection
-    //        loop. 2D model: the xy-projection of a uniform-on-sphere
-    //        direction is uniform in angle, so one uniform angle reproduces
-    //        the projected law exactly. Slots past the measured 50 cycle the
-    //        schedule [DOCUMENTED DEFAULT — the original's non-default-size
-    //        position law is measured NON-shell-slot (mapgen.md OQ-012(a)
-    //        note, 3537/4950 inversions at T=100); open as OQ-025].
-    static const int kShellR[50] = {
-        440,440,440,440,440,440,440,440,440,440,
-        440,440,440,440,440,440,440,440,440,440,
-        440,440,440,440,440,440,
-        365,365,365,365,365,365,365,365,365,365,365,365,
-        290,290,290,290,290,290,
-        215,215,215,
-        140,
-        65,
-        50,
-    };
+    // --- 1. positions: measured SHELL law (docs/re/mapgen.md §4.1 +
+    //        §OQ-025). Star at table slot k sits at shell radius SHELL[k]
+    //        x a random direction. The ORIGINAL's law is on the 3D radius
+    //        name-0x14 f32[x,y,z] over a sphere (OQ-012(d)+(c)); this 2D
+    //        engine maps that 3D radius onto the plane radius directly —
+    //        the v1 hybrid model choice that reproduces the measured mean
+    //        degree 2.225 (§4.4b) — so shell rings here, sphere there.
+    //        SHELL POPULATIONS for any total n follow the MEASURED halving
+    //        law (OQ-025 t79, scripts/r1_t79_pos.py: fits T = 15/25/50/75/
+    //        100 exactly — shell0 = n/2+1, each next shell halves the
+    //        remainder (rem 1 keeps it), shell6 (r=50) takes the tail):
+    //        50 -> 26/12/6/3/1/1/1 (identical to the k0..k49 battery table
+    //        of 2026-10-06p), 75 -> 38/18/9/5/2/1/2, 100 -> 51/24/12/6/3/
+    //        2/2, 15 -> 8/3/2/1/1, 25 -> 13/6/3/1/1/1. This REPLACES the
+    //        old i%50 wrap-around, which was measured WRONG for T>50 (the
+    //        original keeps slot 50+ on shell 440, not back on 365). No
+    //        min-separation is enforced (closest observed pair 24.4 units).
+    const std::vector<int> shellR = shellRadiiFor(cfg_.starCount);
     const double kOuterR = 440.0;  // outermost measured shell (original units)
     // Default mapSize (1024) keeps the ORIGINAL radii untouched (scale 1.0);
     // smaller maps scale the whole shell system down to fit
@@ -119,7 +134,7 @@ Galaxy MapGenerator::generate() const {
         Star s;
         s.id = i;
         const double a = uang(rng);
-        const double r = kShellR[i % 50] * scale;
+        const double r = shellR[static_cast<size_t>(i)] * scale;
         s.x = static_cast<int>(std::llround(cx + r * std::cos(a)));
         s.y = static_cast<int>(std::llround(cy + r * std::sin(a)));
         g.stars.push_back(std::move(s));

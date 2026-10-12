@@ -46,9 +46,9 @@ struct MapConfig {
     // (docs/re/r1-savestate.md 2026-10-06p star battery). The original's
     // GALAXY_MORE density cycle is MEASURED 2026-10-12 (mapgen.md
     // OQ-012(a)): Average 50 -> Dense 75 -> Very Dense 100 -> Vacuous 15
-    // -> Sparse 25 -> wrap; default here = Average. Shell-slot schedule
-    // verified exact only at 50; other sizes cycle kShellR (documented
-    // default — non-default position sub-law open, mapgen.md §OQ-012(a)).
+    // -> Sparse 25 -> wrap; default here = Average. Shell populations for
+    // any size follow the MEASURED halving law (mapgen.md §OQ-025 t79;
+    // shellRadiiFor in mapgen.cpp) — exact at all five densities.
     // minSeparation no longer gates placement (shells allow
     // overlap) but still pads the fit-to-map scale below.
     int starCount = 50;

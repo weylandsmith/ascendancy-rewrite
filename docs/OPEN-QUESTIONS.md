@@ -104,18 +104,24 @@ the closing measurement. Code site: PlanetState::governor +
 storedProsFor/storedResFor/usedPopFor branches (campaign.cpp/.h), pinned
 by campaign_governor_law_t45; branch inert by default so timelines
 unchanged (2024 Control t777 / 42 Extinct t583 / 13 Control t593).
-OQ-025 | mapgen | star-position law at NON-default density: at T=50 the
-shell-by-slot schedule is exact (OQ-012(c)), but the T=100 measured chain
-has 3537/4950 slot-vs-radius inversions (r1size-20261012-042719 slot 41,
-scripts/r1_t78_shell.py) — so the original does NOT cycle a 50-entry shell
-table for larger galaxies. Remaining question: the position distribution
-law at T in {15,25,75,100} (uniform-in-disc? fewer shells + jitter?) and
-whether OQ-012(c)'s outer-envelope r<=440 holds for all sizes (measured so
-far: max 440.0 at T=100). Rewrite default: cycle kShellR (mapgen.cpp:92
-comment re-marked as documented default 2026-10-12); envelope pinned by
-galaxy_density_ladder_matches_measured_sizes | open | Banked runs with
-measured T per arm (mapgen.md OQ-012(a) table) make this solvable offline
-from work/r1/r1size-* slots; no new capture needed to start.
+OQ-025 | mapgen | star-position law at NON-default density | CLOSED
+2026-10-12 t79 MEASUREMENT: the t78 3537/4950 "non-shell-slot" reading was
+a MEASUREMENT BUG (2D hypot(x,y) is the xy-PROJECTION of a sphere point —
+disc-scattered by geometry, not by the generator). Correct law, measured
+on 3D radius r3=hypot(x,y,z) at name-0x14 with records gated idx==k +
+planet-pointer-on-grid, in-play = chain head cut at slot DAT T: shell
+radii FIXED (440,365,290,215,140,65,50) at every size; populations follow
+the halving law (shell0 = T//2+1, then halve the remainder, shell6 keeps
+the tail): T=15 -> 8/3/2/1/1, T=25 -> 13/6/3/1/1/1, T=50 -> 26/12/6/3/1/
+1/1 (reproduces the 2026-10-06p battery table EXACTLY), T=75 -> 38/18/9/
+5/2/1/2, T=100 -> 51/24/12/6/3/2/2; zero monotonicity violations in all
+five arms (scripts/r1_t79_pos.py, runs r1size-{041459,042719,043229,
+044658,045501} + r1deep-230146 control). Evidence mapgen.md §OQ-025; code
+site: shellRadiiFor(n) rewrite/src/game/mapgen.cpp replaces the i%50 wrap
+(measured wrong for T>50); test galaxy_density_ladder_matches_measured_
+sizes pins per-size shell runs (108 tests 0 failed) | CLOSED |
+Tail-residue note: gated chains exceed DAT T at low densities (records
+stay allocated past the in-play cut — consistent with the t78 caveat).
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
 (static route exhausted: 7 negative probes — string table is runtime-loaded,

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-12T05:30
+updated: 2026-10-12T06:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -80,9 +80,10 @@ ledger:
       (b) closed 06o (pps U{1..5}),
       (c) closed 06p/06q (shell position law; rewrite upgraded + tested),
       (d) closed 06k (sphere extent, refined by (c))"
-    - "OQ-025 mapgen non-default-density POSITION law open (shell-slot
-      schedule measured non-applicable at T=100; uniform-in-disc lead KS
-      not rejected; banked offline in r1size-* slots)"
+    - "OQ-025 mapgen non-default-density POSITION law CLOSED t79: shell
+      radii fixed at every size, populations = halving law (T//2+1 then
+      halve); reproduces the T=50 battery table exactly; rewrite
+      shellRadiiFor() replaces the wrong i%50 wrap; ladder test extended"
     - "OQ-015 DA_ template selection order + full %token table"
     - "OQ-016 campaign per-turn constants — scope NARROWED t29: income,
       growth, cadence, build order, AI SELECTOR LAW (S9) and POP-CAP SEED
@@ -181,6 +182,25 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+T79 LANDED (OQ-025 CLOSED same-turn it was opened): the t78 "non-shell-slot
+at T=100" lead was a MEASUREMENT BUG — hypot(x,y) is the xy-PROJECTION of
+the sphere point f32[x,y,z]@name-0x14; projection scatters discs by
+geometry. Correct measurement (scripts/r1_t79_pos.py; records gated idx==k
++ planet-pointer-on-grid; in-play = chain head cut at slot DAT T) across
+T=15/25/50/75/100 arms + r1deep control: shell radii FIXED (440,365,290,
+215,140,65,50) at every size; shell POPULATIONS = halving law (shell0 =
+T//2+1, shells 1..5 halve the remainder (rem 1 keeps), shell6 keeps tail):
+15->8/3/2/1/1, 25->13/6/3/1/1/1, 50->26/12/6/3/1/1/1 (== the 2026-10-06p
+battery table EXACTLY — the battery was an instance of the general law),
+75->38/18/9/5/2/1/2, 100->51/24/12/6/3/2/2; zero monotonicity violations
+everywhere (viol=0 all arms). Self-caught on the positive control (deep
+run disagreed with the banked 0/1225 law -> checked my own reading before
+doubting the banked law). Rewrite UPGRADED: shellRadiiFor(n) (mapgen.cpp
+anon namespace) replaces the i%50 wrap (measured WRONG for T>50: slot 50
+lives on shell 440 pop 51); at n=50 output identical to old table so
+default timelines untouched; ladder test extended with per-size shell-run
+expectations (108 tests 0 failed); mapgen.md §OQ-025 + ledger + mapgen.h
+comment re-cited.
 T78 LANDED (OQ-012(a) CLOSED BY MEASUREMENT + OQ-025 opened): GALAXY_MORE
 button (windows.txt NEWGAMEWND rect 7,381..122,472 -> (64,426)) cycles FIVE
 densities, each arm a fresh New Game, T read from slots via pointer law
@@ -218,15 +238,8 @@ BLOCKED T75 POST-MORTEM). Corpus adjudication: 745 banked slots across
 every r1* run, 0 with DAT_43510/DAT_4350c armed — idle scripts never
 colonize, so no banked evidence can ever close OQ-021. LEDGER UPDATED:
 OQ-021 BLOCKED-USER-LEVEL, default >1/2 unchanged.
-NEXT t79 (OQ-025, offline — no capture needed): per the ledger caveat,
-extract LIVE star records (planet-pointer name-prefix gate,
-r1_star_table.py law) capped/cross-checked by each slot's DAT_00016143>>16
-across the five r1size arms (T=15/25/75/100 + T=50 controls), test the
-uniform-in-disc lead per size (KS D vs crit; angle uniformity too), and
-either upgrade kShellR's non-default extension to the measured law (pin a
-test) or bank the per-size distributions and keep the default. Then t77.
-OLD t77 plan (OQ-023, DIPLOMACY — the ledger's one cheap open item): the
-attitude law above IS the original's multi-branch offer machinery OQ-023
+NEXT t77 (OQ-023, DIPLOMACY — the ledger's cheapest open item; t79 done):
+the attitude law below IS the original's multi-branch offer machinery OQ-023
 says the rewrite lacks (rewrite/src/game only emits the two-party
 threshold branch; OQ-023 W-B gate = ownership model). Step 1: map
 param_1 (the 0x1ee-planet-table-adjacent session object: fields r*2+0x1b0
