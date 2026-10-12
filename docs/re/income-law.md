@@ -1930,3 +1930,34 @@ line pointing at it was corrected this turn.
    KNOWN phys; I plugged the wrong VA). For ck-timeline work use turns.log /
    spin.log (inner/driver-maintained, authoritative here); all banked numbers
    in items 2-3 are base-relative base-offset fields, unaffected.
+
+## T71 (2026-10-11): recalc RESIDUAL CLOSED — t55b's open term was a MODEL ARTIFACT [measured]
+
+Test: scripts/r1_income_law.py recompute() (byte-exact FUN_00038ba4 chain
+incl. t33 slot-array +0x88 correction and t34 grant-floored display words
+ind=max(1,trunc((IND+1)^.85)), pros=max(1,PROS-(upk>>2))) against stored
++0x44/+0x46/+0x48 on EVERY captured run:
+
+  r1ad-20261011-132306 (52-turn fresh campaign): ck001, ck020, ck060,
+    ck100 — IND 5/5 RES 5/5 PROS 5/5 at EVERY timeline point (before and
+    after the observed Transport-Tubes completion ~obs20).
+  r1mut-20261011-092253 (.gam-RESTORED slots): 5/5 x 4 slots.
+  r1ad-20261011-110013, r1ad-20261011-180908: 5/5.
+
+CONSEQUENCES:
+1. The t55b "acc=(0,0) vs stored=(1,1) OPEN recalc residual" and the S6
+   52/139 battery score are REFUTED as evidence of a missing term: they
+   came from harness-era issues (pre-t33 raw slot reads / stale model),
+   not from the original. Candidates (a) species modifiers and (c)
+   outside-0x38ba4 accumulator init: NO SUPPORT on any capture.
+2. (b) load-time staleness also REFUTED for observable values: .gam-
+   restored slots reproduce the formula exactly.
+3. LAW (banked): stored channel words ARE the byte-exact recalc outputs
+   including grant floors; no out-of-function term exists in any capture.
+   Code site unchanged: rewrite/src/game/campaign.cpp channel law already
+   implements this chain (t33/t34/t45 upgrades); pin campaign_channel_
+   law_oq016.
+HARNESS FIX this turn: load_slots --slot now searches ck/ AND save/
+(the old first-subdir binding made --slot ckNNN always "no readable
+slot" in checkpoint runs — masked late-timeline verification for two
+turns).

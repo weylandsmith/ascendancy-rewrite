@@ -292,8 +292,15 @@ analysis; static route at banked hard boundary; headless corpora zero ships
 -> in-battle capture = OQ-019 class (BLOCKED entry filed w/ one-battle
 closing recipe). Ledger open set now: OQ-010/OQ-019/OQ-021 (capture-class),
 OQ-003/OQ-016 (replay-only/documented), OQ-012(a) (R13), OQ-023 (parked).
-NEXT t71: OQ-016 application residue — per-world channel ACCUMULATOR
-recalc check on r1ad-20261011-132306 grown worlds (t55b open recalc term:
-fresh-owned stored=(1,1) vs acc=(0,0)); decide whether stored channel =
-rate-table lookup (already banked) rather than accumulator, closing the
-sub-law or sharpening its class.
+DONE t71: RECALC RESIDUAL CLOSED (income-law.md T71; ledger).
+byte-exact FUN_00038ba4 recompute == stored +0x44/46/48 at ck001/020/060/
+100 of the 52-turn run AND .gam-restored slots (5/5 everywhere). t55b
+"missing term" + S6 52/139 were harness-era artifacts (pre-t33 raw slot
+reads). Harness: r1_income_law.py --slot now finds ck/ AND save/ (was
+silently failing late-timeline verification). Rewrite code UNCHANGED —
+existing channel chain verified exact, pin campaign_channel_law_oq016.
+NEXT t72: OQ-021 last static angle within banked boundary — u32 VA scans
+for the score-screen strings against ascend_restored.bin ONLY (t58
+payload scan VOID per file-provenance law); if zero leads, OQ-021 rides
+the one-battle/end-screen capture recipe (BLOCKED) and the loop moves to
+replay-only OQ-003 field-meaning work.

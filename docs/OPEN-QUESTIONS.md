@@ -347,7 +347,17 @@ same field as queue; fires only on special-item cell-SELECT; 0/2810). T56: fresh
 +0x52 = CELL INDEX not item id (corpus 0..59>39, income-law T56). T58: LIVE queue chain observed to completion at 52 turns — Tonklinus
 queued Transport Tubes (id 21 COST 10, completed ~obs20) then re-queued
 Agriplot; 3 others held Agriplot; cheap-first pattern (not uniform-random,
-consistent t28 selector); player never queued. income-law.md T58.
+consistent t28 selector); player never queued. income-law.md T58. RECALC
+RESIDUAL CLOSED t71 (income-law.md T71, measured): byte-exact FUN_00038ba4
+recompute reproduces stored +0x44/46/48 at EVERY timeline point (ck001/
+020/060/100 of the 52-turn run, incl. across the Transport-Tubes completion)
+AND on .gam-RESTORED slots (r1mut run) — 5/5 x all; the t55b acc=(0,0) vs
+stored=(1,1) "open recalc term" and S6 52/139 score were harness-era
+artifacts (pre-t33 raw reads), not original behaviour; species-modifier and
+outside-recalc-init candidates have NO support; load-time staleness refuted
+for observable values. Code site: rewrite/src/game/campaign.cpp channel
+chain (lines 27/53/543 implement, pin campaign_channel_law_oq016); harness
+r1_income_law.py --slot now searches ck/ AND save/ (t71 fix).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

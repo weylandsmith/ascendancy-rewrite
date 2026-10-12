@@ -66,13 +66,26 @@ def load_slots(run_dir, slot=None):
         if os.path.isdir(os.path.join(run_dir, sub)):
             src = os.path.join(run_dir, sub)
             break
-    slots = sorted(f for f in os.listdir(src) if f.endswith(".sav"))
-    if slot:
-        slots = [s for s in slots if s == slot]
+    dirs = [run_dir] + [os.path.join(run_dir, s) for s in ("save", "ck")
+                        if os.path.isdir(os.path.join(run_dir, s))]
+    cand = []
+    for d in dirs:
+        for f in sorted(os.listdir(d)):
+            if f.endswith(".sav") and (not slot or f == slot):
+                cand.append((f, os.path.join(d, f)))
+    # t71: de-dupe preferring ck/ (checkpoint runs keep BOTH save/ ring and
+    # ck/ timeline; a --slot ckNNN lives in ck/ even when src bound to save/).
+    seen = set()
+    slots = []
+    for f, p in cand:
+        if f in seen:
+            continue
+        seen.add(f)
+        slots.append((f, p))
     out = []
-    for f in slots:
+    for f, path in slots:
         try:
-            m = zipfile.ZipFile(os.path.join(src, f)).read("Memory")
+            m = zipfile.ZipFile(path).read("Memory")
         except Exception:
             continue
         v, _ = find_base(m, anch)
