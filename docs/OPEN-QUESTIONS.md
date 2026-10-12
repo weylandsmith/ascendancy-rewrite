@@ -183,6 +183,9 @@ recs/1484 decode-pass/185 clean (floors 1477/176 from scripts/r1_shp_unifiedlaw.
 py). OPEN residue BLOCKED-USER-LEVEL (docs/BLOCKED.md t68): 80 records/31 files
 (planind+3cfgnew span-undersized, cos_star simple-format, stragglers) + non-
 verbatim .tmp/1starmap cached heads: in-record DIMS-FIELD LOCATION unknown;
+W3 sanctioned route EXECUTED t83 negative (shp.md W3: all 75 decoder sites
+read dims ONLY from the record-start header; cache load = verbatim copy, no
+dims transform) — no other reader exists in the image;
 closure class = human-verifiable drawn frame (R13 blocks self-verification);
 blind sweeps FORBIDDEN (R2). Map draws documented circles; ShapeLibrary is a
 validation asset (option C).

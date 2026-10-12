@@ -689,3 +689,31 @@ is draw-first-frame capture (R13-blocked: cannot verify panel drawn).
 OQ-005 status: codec grammar CLOSED [S9+S12+S14+S16+this]; record
 header dims-location residue recorded BLOCKED-USER-LEVEL (capture
 needs human-verifiable drawn frame or original-hardware guidance).
+
+## W3 route executed to its boundary (t83, 2026-10-12) [verified static]
+
+The sanctioned route (R2: "find the exe shape loader via call graph + live
+image") is now DONE with a negative dims finding:
+
+1. Decoder FUN_0005caac has 75 direct E8 call sites, in 32 caller
+   functions (census over work/ascend_restored.bin; tsv is HEX offsets —
+   first bisect with decimal parse was wrong and discarded mid-turn).
+2. Header law re-read verbatim at the decoder head (0x5cabe/0x5cac7):
+   dims are ALWAYS read from the 12-byte record header [ptr][W-1][H-1]
+   at the record start (u32s at rec+0x04/rec+0x08, +1 each; error -1
+   bad-dims returns BEFORE any stream touch). Clip fields at descriptor
+   +0x0c..+0x10 come from the CALLER (widget widget-rect), never from
+   inside the shape record. Two raw-[reg] arg-prep sites (0x50535,
+   0x50e60) inspected: they push screen coords (0x4b=75) and a dst
+   surface pointer — NOT record-internal dims.
+3. Cache-load path (FUN_0001fc34 -> FUN_00020acc) = raw
+   read(file -> alloc'd slot) via FUN_00020b44 byte-count compare;
+   NO dims parse, rewrite, or relocation happens at load (slot == file
+   bytes verbatim — corroborates the verbatim-cache finding).
+
+=> For the 80 span-undersized records there is NO code site anywhere in
+the image that reads dims from anywhere other than the standard record-
+start header. The dims-location question cannot be answered statically
+beyond this; closure class UNCHANGED (human-verifiable drawn frame,
+R13), now with the sanctioned-route negative cited. No rewrite change
+(ShapeLibrary reports garbage dims, never allocates — unchanged).

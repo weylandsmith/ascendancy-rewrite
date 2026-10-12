@@ -182,6 +182,24 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+T83 LANDED (OQ-005 W3 sanctioned route executed to its boundary):
+decoder FUN_0005caac caller census = 75 direct sites / 32 functions;
+header law re-read verbatim @0x5cabe/0x5cac7 (dims ALWAYS record-start
+[ptr][W-1][H-1], clip rect comes from caller widgets); both raw-[reg]
+arg-prep sites (0x50535,0x50e60) adjudicated as screen-coord/dst pushes,
+not dims; cache load FUN_0001fc34->FUN_00020acc = verbatim file->slot
+copy, no dims parse/transform anywhere. Net: NO non-standard dims reader
+exists in the image — residue closure class unchanged (drawn-frame, R13),
+sanctioned negative now cited in shp.md W3 + ledger. Mid-turn trap:
+functions_full.tsv offsets are HEX (decimal bisect gave garbage func
+0x142ca, discarded). No code change (ShapeLibrary garbage-dims behaviour
+already matches original: report, never allocate).
+NEXT t84 (contract-compliance sweep, offline): verification criterion
+demands EVERY closed item names evidence AND the changed code site —
+scripted audit over docs/OPEN-QUESTIONS.md closed rows (heuristic:
+contains a hex address|offset AND a rewrite/ path|'no code change'|
+'documented default'); fix any row missing a leg by tracing its doc;
+this directly de-risks the final gate-of-gates and has zero capture need.
 T82 LANDED (ledger triage + capture readiness): open set confirmed
 exactly {OQ-003 packed-entropy residue (OQ-005 closure class), OQ-005,
 OQ-010, OQ-019, OQ-021, OQ-023}; every one states its closure class in
