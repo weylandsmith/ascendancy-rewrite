@@ -277,7 +277,14 @@ S16 V/A law holds code-side; fixup-vary theory dead for table region.
 OQ-005: codec grammar CLOSED (S9+S12+S14+S16+S17); dims-location
 residue (80 recs/31 files + non-verbatim .tmp heads) recorded
 BLOCKED-USER-LEVEL (needs human-verifiable drawn frame).
-NEXT t69: IMPLEMENT the banked .shp codec in rewrite/ (library reader
-per S8 container law + control-byte decoder per S9 grammar + V/A
-stream-start law per S16/S17) with corpus test asserting 176/208
-libraries decode every record; documented skip for residual class.
+DONE t69: rewrite/src/formats/shp.{h,cpp} ShapeLibrary (container laws
+S1, V/A stream-start S16/S17, S9 control-byte grammar with blit-faithful
+write-clamp + untouched-destination semantics) + tests/test_shp.cpp
+(raceflag law pins, in-memory container rejection, corpus parity floors
+from the measured Python run). MEASURED: 107 tests 0 failed; corpus
+208 libs / 1557 recs / 1484 decode-pass / 185 clean libs — EXCEEDS the
+1477/176 floors (4096 dims cap added after a FAIL-class record's
+garbage dim words triggered bad_alloc: decode REPORTS, never allocates).
+NEXT t70: ledger hygiene pass — re-mark OQ-005 sub-parts in
+OPEN-QUESTIONS per S17 closure split (grammar CLOSED, dims-location
+residue BLOCKED-USER-LEVEL), then first non-blocked ledger item.
