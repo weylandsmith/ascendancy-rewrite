@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-11T22:30
+updated: 2026-10-11T23:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -309,6 +309,30 @@ refs (R12: lead-out not proof). NEW bounded angle banked: 36 coswnd.cpp
 functions never decompiled (batches 1/3 skipped coswnd).
 NEXT t73: DONE (see T73 block) — t73b = eventwnd.cpp module decompile batch
 (OQ-021 comparator hunt).
+
+T74 LANDED (OQ-021 static CLOSED-EXHAUSTIVE + capture de-risked; score.md S5):
+selector-writer hunt negative under ALL direct encodings (moffs, mod00/disp32
+incl SIB-25, mod10 base, cmp grp, f6/f7) AND under runtime-relocated
+full-RAM scans: relocated 0x43510 addr occurs EXACTLY 3x in 16MiB (= the 3
+known readers), struct base 0x4348d EXACTLY 1x (0x1d740 end-EVENT-QUEUE
+builder: c6 35 byte-stores, sub-record stride 13, type bytes 0..8 measured,
+count u16@0x43502==9 both runs). f32 2/3: ZERO image-wide; f32 0.5: only a
+data bitmask ramp. STRUCT MAP: 0x4348d queue (count/counters 0x43502/04/08),
+0x4350c rank, 0x43510 fired-selector. LIVE OWNER LAW MEASURED: static table
+0x3a095 (stride 0x162, owner byte +0x56) stays ALL-0xFF for the ENTIRE
+campaign (19 slots, 2 runs incl deep ck067) — the BLOCKED recipe's inject
+site is WRONG TABLE. Live copy = heap: found at corollary X=0x38ad8 in ck067
+(16 owner-0 + 85 x0xFF of 101 cap; candidates cluster stride-0x162 phase-4,
+43 hits — pin with two checkpoints before injecting). Owner dword +0x54 in the
+STATIC table reads 0xFFFF always (do not confuse with live +0x56).
+CONCRETE NEXT t75 (capture, exit-code driven per R1 law): RESUME.GAM side —
+locate system/owner record chain (star-name anchored, t53 injector proves
+resume reads scratch .gam); map .gam owner field -> live heap copy; inject
+owner0 = 61 systems (60.4% of 101) [discriminates >1/2 from >=2/3], boot via
+r1_mutation_run.sh pattern, end-turn x2, read DAT_43510 byte via corollary idx
++ screenshot end-screen. Fire @61 => >1/2 confirmed; no fire => run 2 at 33/34
+vs 67/68 band. If .gam has no owner chain -> record one line (capture class),
+move to OQ-003 replay semantics.
 
 T73 LANDED + CORRECTED (OQ-021 static, dark-zone HIT; docs/re/score.md NEW):
 (1) ATTRIBUTION CORRECTION: work/attribution.tsv est_func is a BACKWARD-SCAN

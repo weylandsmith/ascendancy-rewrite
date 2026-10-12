@@ -71,7 +71,36 @@ selector byte is read with `mov al,ds:0x43510` @0x2c01d; clamped then jumped
 read at 0x2bfcb (`mov eax,ds:0x4350c; sar eax,18; dec; cmp 4; a`) — the rank
 index law 06s found, inside the same function family.
 
-## S4. Comparator status [open]
+## S5. Selector-writer hunt, t73b/t73c [verified negative, exhaustive-class]
+
+Window 0x434d0..0x43540 (struct @0x4348d: count u16@+0x15=0x43502 measured 9;
+u32@0x43504 = score-screen ptr field, WRITTEN at 0x51ac9/0x55c52 (modrm 15/2d)
+— UI bookkeeping, reads at ~20 sites 0x3a89e..0x3e370 family; 0x43508 written
+at 0x51a8e; DAT_43510 selector byte + DAT_4350c rank read-only at 0x2bf23/
+0x2bfba/0x2bfca/0x2c01d/0x2c52b + 0x1d717/0x1d774 region uses 0x43502 count).
+
+ZERO accesses to 0x4350c/0x4350d/0x43510 under: a0/a1/a2/a3 moffs; 88/89/c6/
+c7/80/81 modrm mod=00 rm=05 disp32 (incl. SIB-0x25 form); mod=10 disp32 base
+form; 39/3b/38/3a cmp; f6/f7; plus RUNTIME-RELOCATED full-16MiB scans of
+banked saves (payload law P0+0x82bb0+X): relocated selector addr occurs
+EXACTLY 3x (the 3 known readers 0x2bf23/0x2c01d/0x2c52b), struct base
+0x4348d relocated occurs EXACTLY 1x (0x1d740 arm-builder mov edx,0x4348d ->
+runtime 0x1dcc19 c6 35 (mov byte [edx+d8],imm8 — the END-EVENT QUEUE builder,
+sub-record stride 13, type byte [0..8] measured identical across 2 runs)).
+mod=10 [reg+0x4348d]: zero. f32 0.5 constant: single DATA site (bitmask ramp
+0x7f720..0x7f738, zero refs); 2/3 float: ZERO occurrences image-wide.
+
+CONCLUSION [strong inference]: the end-ctrl threshold is NOT an IEEE constant
+and the selector is written via base+disp8 from a register loaded with the
+struct base — whose ONLY loader site (0x1d740) builds end-EVENT records, not a
+comparator. Remaining possibilities are a second base-loader via computed
+address (unfindable statically by this method) or evaluator-side write inside
+the dark zone via rep-movs block copy. STATIC ROUTE CLOSED-EXHAUSTIVE for this
+method class; closing route = controlled-mutation capture (BLOCKED OQ-021:
+inject owners >50% vs 60% at the 0x3a095 table, end-turn, observe DAT_43510
+byte 0x2c01d-fires). Score law S2 stands (independent of threshold).
+
+## S4. Comparator status [open] — superseded evidence, kept for the record
 
 ZERO write encodings to DAT_00043510/0x4350c anywhere in 0x200..0x82bb0 for
 A0/A2/88/8A/89 /r modrm-05/c7 /0 modrm-05/A3/80-group (byte-exact pattern

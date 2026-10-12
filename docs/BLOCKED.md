@@ -36,8 +36,14 @@ function enumeration of 0x26b32..0x2c600 + threshold-idiom grep, then the
 controlled-mutation capture (set player-owned systems to just over 1/2 in RAM
 at the 0x3a095 owner table (stride 0x162, owner = +0x54 sar 16 per
 FUN_00040ec0) before an end-turn, and observe whether end-ctrl fires; a
-second run at 60% discriminates >1/2 from >=2/3). Item STAYS OPEN per strict-
-close policy; other workstreams unaffected.
+second run at 60% discriminates >1/2 from >=2/3). CORRECTION 2026-10-11 t74:
+that recipe's SITE IS WRONG — the static 0x3a095 table stays all-0xFF (never
+written) across every banked campaign slot; the LIVE owner state is a heap
+copy (score.md S5 / STATE T74: candidate at corollary X=0x38ad8 in ck067, to
+be pinned across two checkpoints). Static writer hunt is now CLOSED-EXHAUSTIVE
+(all direct encodings + runtime-relocated full-RAM scans negative; f32 2/3
+(absent image-wide); closing = the capture with the corrected live site.
+Item STAYS OPEN per strict-close policy; other workstreams unaffected.
 
 ### OQ-020 — ability charge days (static route EXHAUSTED 2026-10-07; default in force: 30 turns)
 Seven static probes, all negative: (1) `%d day`/`amass`/`SA_*` count ZERO in
