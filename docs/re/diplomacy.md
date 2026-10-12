@@ -233,3 +233,37 @@ PAST all checks (predicate returns true when allied posture). PASS <=> ALL:
   stars rung = BREAK_ALLIANCE < att (direct short cmp);
   starlanes rung = START_ATTITUDE + 20 < att (dword[0x1d3]>>16 =
   word[0x1d5]).
+
+## 10. Session-matrix window census + RETRACTION (t77b, 2026-10-12)
+
+Static re-read (objdump, authoritative): the chooser entry at 0x447ba is
+`cmp BYTE PTR [ebp+0x1c0],0 / JE skip` — the chooser runs ONLY when the
+relation-state byte is NONZERO (0 = no active relationship: matrix cell
+default/self). What the nonzero values MEAN is NOT settled by the banked
+corpus: §7 pairs state 1 with DA_DeclareWar/DA_ProposeAlliance, state 3
+with DA_OfferPeace/DA_BreakAlliance, and the third-party loops pair the
+SAME matrix cells with both break-alliance and declare-war actions; no
+injective enum ({war, allied, ?}) fits every rung from idle data alone,
+and the corpus contains NO value other than 1. State-enum semantics are
+therefore OPEN sub-items, capture-gated (need a session that fights
+and/or accepts an alliance).
+
+CORRECTION TO AN EARLIER §10 DRAFT (same turn, retracted before any code
+site depended on it): a raw census of the window base 0x12e16 stride 0x1ee
+across 945 banked idle slots reported an off-diagonal relation census of
+{0,1}-only with 'war pairs present at turn 0'. Those readings ARE NOT
+TRUSTED: (a) 0x12e16 static base was never re-validated per-run by an
+independent law in those slots (heap can relocate; the t56b BASE-DRIFT
+hazard law applies); (b) 'state 1 = at war' contradicted the chooser gate
+above — caught by cross-audit, so the state semantics in the draft are
+VOID; (c) a follow-up drift-filter rerun mis-implemented the row test and
+returned a meaningless all-drifted result (noted so nobody re-reads the
+first census as confirmed).
+
+What IS kept: the window STRUCTURE law (attitude i16 +0x1b2+2t, state byte
++0x1c0+t per row 0x1ee) stands from §7's static decode; START_ATTITUDE
+values (310..620) genuinely appear in that window in banked RAM. Closing
+the OBSERVED state-transition law (contact->war fires, alliance formation)
+needs a campaign that actually fights/accepts — capture-gated like OQ-021,
+banked in BLOCKED.md. OQ-023 ledger status unchanged (open, W-B engine
+gate, 'no RE unknowns for selection ORDER').

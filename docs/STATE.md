@@ -182,6 +182,32 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+T77b LANDED (diplomacy state-enum: honest block, one retraction banked):
+static re-read of the chooser entry @0x447ba (`cmp byte [ebp+0x1c0],0 / JE
+skip`) proves the relation-state byte gates ALL diplomacy emission, but
+the banked corpus cannot settle WHICH nonzero value is war vs allied: an
+idle-slots census (945 slots) shows ONLY value 1 off-diagonal and the §7
+rung structure admits no injective enum from idle data alone. A first
+window-census draft claiming '1 = AT WAR' was CAUGHT BY CROSS-AUDIT
+against the chooser gate and RETRACTED in diplomacy.md §10 before any code
+site consumed it (also recorded: the base-0x12e16 window needs per-run
+re-validation before any future census trusts it; the drift-filter rerun
+was itself mis-implemented — noted so its all-drifted output is not
+re-read as confirmation). Kept facts: matrix structure law (attitude i16
++0x1b2+2t, state +0x1c0+t, row stride 0x1ee @0x12e16 static) + live
+START_ATTITUDE values 310..620 match race files verbatim. LEDGER: OQ-023
+stays open with the state-enum RESIDUAL RE UNKNOWN named explicitly
+(same closure class as OQ-021: interactive session); diplomacy.h header
+comments updated MEASURED->[inferred]-retired ( DECLARE_WAR range
+re-measured 130..450 across 21 race files mid-turn, my draft's 150 fixed
+before commit). No rewrite behaviour change this turn; 108 tests stand.
+NEXT t80 (OQ-003 field-semantics leg, offline): star-record fields
+(name-0x1C small per-system value; name+0x10 stride-0x39 sub-pool; star
++0x17 owner byte per §9; starlanes table 0x16147 stride 0x27 owner bits
++0x20) cross-joined against .gam star chain (0x1e46 stride 96) and
+planet chain (0xaae2 stride 123) over the banked r1deep slots — every
+field gets a join or an explicit UNMAPPED note; save-writer code dive
+(FUN_0004* save family) only if joins suffice to name the packed regions.
 T79 LANDED (OQ-025 CLOSED same-turn it was opened): the t78 "non-shell-slot
 at T=100" lead was a MEASUREMENT BUG — hypot(x,y) is the xy-PROJECTION of
 the sphere point f32[x,y,z]@name-0x14; projection scatters discs by
@@ -238,18 +264,7 @@ BLOCKED T75 POST-MORTEM). Corpus adjudication: 745 banked slots across
 every r1* run, 0 with DAT_43510/DAT_4350c armed — idle scripts never
 colonize, so no banked evidence can ever close OQ-021. LEDGER UPDATED:
 OQ-021 BLOCKED-USER-LEVEL, default >1/2 unchanged.
-NEXT t77 (OQ-023, DIPLOMACY — the ledger's cheapest open item; t79 done):
-the attitude law below IS the original's multi-branch offer machinery OQ-023
-says the rewrite lacks (rewrite/src/game only emits the two-party
-threshold branch; OQ-023 W-B gate = ownership model). Step 1: map
-param_1 (the 0x1ee-planet-table-adjacent session object: fields r*2+0x1b0
-hi=turn?, +0x1b2=attitude u16, +0x1c0=relation-state byte per race) and
-the callers of 0x3ecb8/0x439f4 (Ghidra xrefs on work/ghp6 or raw
-rel32-call scan over 0x200..0x82bb0). Step 2:
-dump per-race attitude/state words from banked r1deep slots (corollary
-idx; bases known) to ground-truth states {0,1,2,3} semantics. Step 3: if
-semantics land, upgrade rewrite diplomacy offer branches citing
-0x3ecb8/0x439f4 + slot evidence; pin a test; gate; commit.
+NEXT t80 (see the T77b block below — moved to the top).
 
 T56 LANDED + CORRECTED (PER-TURN BRACKET PARSE, income-law.md T56/T56b;
 BLOCKED t55 CLOSED): End-Turn (511,67) works-but-flaky (advance try 3, then

@@ -85,8 +85,13 @@ additionally sends TRADE (DA 4/5/6) on turn%NEG_PLAYER_TURNS cadence behind
 ownership share/multiple gates and THIRD-PARTY messages (DA 10, 7, 9 under
 roll<80) — law MEASURED §9 (t14), engine NOT built (needs star/
 lane/tech ownership tables in rewrite + UI affordance for incoming trade
-offers). | open | W-B (option C hybrid): build only when ownership model
-lands; no RE unknowns remain for this item.
+offers). RESIDUAL RE UNKNOWN (t77b, docs/re/diplomacy.md §10): the nonzero
+relation-state ENUM semantics (which of 1/2/3 = war vs allied in the
+session matrix; idle corpus contains ONLY 1, no injected transition) —
+same closure class as OQ-021 (interactive original session). Two-party
+main-branch law itself stays MEASURED (§7/§8) and implemented. | open |
+W-B (option C hybrid): build only when ownership model lands; engine
+build additionally awaits the state-enum capture above.
 OQ-024 | loop | planet GOVERNOR assignment law (@0x38df0 branch of
 FUN_00038ba4: '!' -> PROS += IND>>2, '"' -> RES += IND>>2; S6 line 45 read
 +0x54 as a governor byte) | CLOSED t45 | FULL STATIC MEASUREMENT

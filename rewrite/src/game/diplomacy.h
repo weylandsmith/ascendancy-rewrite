@@ -1,8 +1,9 @@
 #pragma once
 // Diplomacy: .dip parameter files + attitude model + dialogue templates.
-// Spec: docs/re/diplomacy.md (cites extracted/ascend00/raceNN.dip,
-// player.dip). Decision thresholds are [inferred] there and marked at each
-// use site; the original decision loop is runtime-blocked (docs/BLOCKED.md).
+// Spec: docs/re/diplomacy.md — chooser law §7 (t12), DIPVALUES field map §8
+// (t13), trade/share gates + cadence §9 (t14) are MEASURED; the nonzero
+// relation-state ENUM semantics are capture-gated (§10, t77b). Decision
+// logic below mirrors §7 for the two-party main branch only.
 #include <cstdint>
 #include <map>
 #include <string>
@@ -61,9 +62,11 @@ std::string renderDialogue(const std::string& body, const std::string& me,
                            const std::string& you, const std::string& star,
                            const std::string& third);
 
-// Minimal policy engine [inferred thresholds, one place to re-check vs R1]:
-// scale is the original 0..1000-ish attitude implied by START_ATTITUDE 310..620
-// and DECLARE_WAR 130..450 in docs/re/diplomacy.md §1.
+// Two-party policy engine mirroring the MEASURED chooser §7/§8 (thresholds
+// are vendor DIPVALUES, strict comparisons); trade/third-party rungs of §9
+// are intentionally NOT modelled here (W-B ownership-model gate, OQ-023).
+// Scale is the original 0..1000-ish attitude implied by START_ATTITUDE
+// 310..620 and DECLARE_WAR 130..450 in docs/re/diplomacy.md §1.
 enum class DipAction { None, ProposePeace, ProposeAlliance, AcceptPeace,
                        AcceptAlliance, BreakAlliance, DeclareWar };
 const char* dipActionName(DipAction a);
