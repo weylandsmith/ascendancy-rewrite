@@ -182,6 +182,29 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+T81 LANDED (OQ-003 field-meanings leg): growth pass decompiled
+(FUN_00038f68 -> work/coswnd_decomp/38f68.c) and revalidated against the
+FULL 20-slot r1deep timeline: 90/90 owned-planet transitions agree
+(rate = stored PROS + 1 iff owner != DAT_0007458e and PROS<4; threshold
+DAT_000066e4; cap clamp to +0x4a; upkeep>=cap resets accumulator; slot0
+excluded as banked seed residue, slot n in {0,1} fitted because
+DAT_00012e10 reads 0 across all r1deep slots). Live global votes 20/20:
+DAT_000066e4=50, DAT_0007458e=0 — rewrite campaign.cpp growth block
+matches EXACTLY, evidence upgraded, no code change. +0x4a=POP CAP and
++0x55=population SEED named (equation re-measured; uniform +2 = banked
+event-50 bonus, not a gap); +0x0a explicit UNMAPPED. Mid-turn trap:
+payload-FILE reads at 0x82bb0+X are pre-relocation garbage (returned
+threshold 100); only live member P0+0x82bb0+X is valid — banked so no
+future turn re-trusts the file read. scripts: r1_t81_census.py,
+r1_t81_mpop.py. OQ-003 residue now = packed-entropy regions only (shares
+OQ-005 blocked closure class).
+NEXT t82 (ledger triage + capture-class prep): the open ledger is now
+OQ-003 (packed-entropy residue), OQ-005 (blocked), OQ-010 (one-battle
+recipe banked), OQ-019 (blocked), OQ-021 (BLOCKED-USER-LEVEL), OQ-023
+(state-enum capture). Verify each still states its closure class and
+exit-code route; prepare (do not run blind) the cheapest R1 capture that
+would close a real item: the one-battle OQ-010 recipe — confirm its
+harness still exists and gate-cleans, record readiness, no spiral.
 T80 LANDED (OQ-003 join leg, offline): star->planet JOIN CLOSED by
 measurement — pointer law star-rec +0x2A/2E/32 u32 P -> planet NAME at
 file offset P-2507337 (116/116 RESUME.GAM; banked-base form P-K-0x24),

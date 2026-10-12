@@ -1961,3 +1961,46 @@ HARNESS FIX this turn: load_slots --slot now searches ck/ AND save/
 (the old first-subdir binding made --slot ckNNN always "no readable
 slot" in checkpoint runs — masked late-timeline verification for two
 turns).
+
+## t81 growth-law live revalidation + +0x4a/+0x55 naming (2026-10-12)
+
+FULL 20-SLOT TIMELINE (r1deep-20261005-230146) adjudication of the growth
+pass FUN_00038f68 (decompiled this turn, work/coswnd_decomp/38f68.c):
+model per slot-step, per owned planet: n in {0,1} turns elapsed;
+rate = stored PROS(+0x48) + 1 if owner != DAT_0007458e AND PROS < 4;
+acc = growth(+0x4e) + n*rate; while acc >= DAT_000066e4: acc -= threshold,
+pop(+0x42) += 1 (clamped to cap +0x4a); if upkeep(+0x42) >= cap: acc := 0.
+Result: 90/90 owned-planet transitions agree, ZERO violations (model n
+bins: 35 one-turn + 55 no-turn steps; slot0 excluded — banked seed
+residue). Slot alignment note: DAT_00012e10 reads 0 in every r1deep slot
+(auto-save during setup phase), so n is fitted per-transition, not read.
+
+Global values, live via pointer law member P0+0x82bb0+X, 20/20 slot votes:
+  DAT_000066e4 = 50  (growth threshold; rewrite campaign.cpp:701 [verified
+                      value] re-confirmed — note the payload-FILE file
+                      offset 0x82bb0+X is NOT a valid pre-relocation read;
+                      a bad read there returned 100 mid-turn and was
+                      discarded, not banked)
+  DAT_0007458e = 0   (home-race id used by the alien-bonus compare;
+                      player == 0 consistent with rewrite kPlayer)
+
+FIELD NAMING (OQ-003 residue; disasm + live):
+  +0x4a = POPULATION CAP. Clamp targets in FUN_00038f68 @0x393f0 (pop
+    clamped down to it) and recalc clamp(0,100,...) @0x38f03..@0x38f18;
+    equation stored = clamp(0,100, seed(+0x55) + sum MPOP_f32(active
+    slots, skip slot-flags bit1, skip item-table-flag bit6)) re-measured
+    this turn on all 5 owned records: EXACT for all EXCEPT a uniform
+    +2 residue on every owned planet — which is the banked event-50
+    population bonus (L622-623: same run, recorded '+0x4a == +0x55+2 on
+    2-5 named planets'). No unexplained residual.
+  +0x55 = NATURAL POPULATION SEED (float-MPOP base population). File-side
+    RESUME.GAM values 5..26 per planet; event 37 adds +10 once (banked
+    L456), growth recalc head reads it @0x38bd4.
+  +0x0a = still UNMAPPED (file-side two value bands ~17.5k/~50.2k,
+    live value churns on UNOWNED records too — pointer-like seed field
+    repaired at load; not read by income recalc).
+
+No rewrite behaviour change: campaign.cpp growth block already implements
+exactly this law (threshold 50, alien +1 at PROS<4, cap clamp, upkeep-
+reset); this turn UPGRADES its evidence to full-timeline 90/90 + live
+global votes (scripts/r1_t81_mpop.py for the +0x4a equation).

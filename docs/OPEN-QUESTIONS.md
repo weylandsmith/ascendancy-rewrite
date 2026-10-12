@@ -52,6 +52,17 @@ Barataria tail) — copied-not-parsed re-confirmed on the star side. One
 contiguous stride-123 planet pool 0x8e0e..0xd05c (t75 "0xaae2 chain" =
 mid-pool entry, law stands). STILL OPEN: +0x0a/+0x20/+0x4a/+0x55
 semantics, counter identity, packed-entropy regions (savegame.md t80).
+STATUS t81: counter identity + two field meanings CLOSED by measurement —
+growth law revalidated 90/90 owned transitions over the full 20-slot
+r1deep timeline (model incl. alien +1 at PROS<4; scripts banked), live
+global votes DAT_000066e4=50 (20/20) and DAT_0007458e=0, and the +0x4a
+equation re-measured: +0x4a = POPULATION CAP (clamp targets @0x393f0/
+@0x38f03), +0x55 = natural-population SEED (uniform +2 residue = the
+banked event-50 bonus, L622). +0x0a gets an explicit UNMAPPED verdict
+(seed-band bytes churn live even unowned; not read by recalc). OQ-003
+residue now = packed-entropy regions only (star-map heads class, shared
+with OQ-005 blocked closure). Rewrite growth block already implements
+this law exactly — evidence upgraded, no code change (income-law.md t81).
 OQ-021 | victory | end-ctrl threshold: vendor comment "over half" vs same
 file's prose "two-thirds" — current default >1/2 | open | t73 dark-zone HIT
 (docs/re/score.md): score strings ARE referenced — pool-relative immediates
