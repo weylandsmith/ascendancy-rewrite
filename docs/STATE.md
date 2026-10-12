@@ -182,6 +182,28 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+T82 LANDED (ledger triage + capture readiness): open set confirmed
+exactly {OQ-003 packed-entropy residue (OQ-005 closure class), OQ-005,
+OQ-010, OQ-019, OQ-021, OQ-023}; every one states its closure class in
+the ledger. Harness fact surfaced: OQ-021's scratch build is
+work/r1/game/ascend.exe (lowercase; mounted as C:\ASCEND.EXE). NEW
+scripts/r1_playcap.sh BANKED READY: one user-run session of the original
+closes OQ-021+OQ-023+OQ-010 together (colonize >50%; war+alliance
+accepted; one fire exchange), autosave ring + instant per-slot readout
+of T/scored-stars/selector/rank; title-menu T=0 slots carry uninitialized
+selector heap (0xC500 observed) -> analyzer law: trust T>0 slots only.
+Safety invariants kept (scratch-only mount, -time-limit, pkill -x only);
+interactive BY DESIGN for the user, agent never plays.
+NEXT t83 (offline, sanctioned route ONLY): my first t83 idea (grammar-
+differential of well-formed vs undersized heads) was checked against R2
+and RETIRED pre-attempt — R2's six angles include span/dims/metadata-slot
+variants, and R2 names the sole sanctioned route: the exe shape loader
+via call graph + live image (W3). t83 = caller analysis of the banked
+decoder FUN_0005caac (control-byte grammar source): find its callers in
+the restored image, decompile the loader caller, and look for where an
+in-record DIMS field would be READ (the grammar asm never mentions dims;
+a consumer read site would name the offset). If no caller reads dims,
+bank that as the hard static boundary for the residue.
 T81 LANDED (OQ-003 field-meanings leg): growth pass decompiled
 (FUN_00038f68 -> work/coswnd_decomp/38f68.c) and revalidated against the
 FULL 20-slot r1deep timeline: 90/90 owned-planet transitions agree

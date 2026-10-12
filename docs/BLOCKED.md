@@ -330,3 +330,24 @@ documented research-gated attack/defense scores (ships.md §4) stay;
 rewrite combatPhase unchanged. Closing needs: user-run original game to
 ONE fire event with autosave capture running (single battle = enough for
 slot-diff of the two combatant records + damage application).
+
+## t82 — the three user-level blocks collapse to ONE played session
+(scripts/r1_playcap.sh, banked ready 2026-10-12)
+
+OQ-021 (victory selector), OQ-023 (relation-state enum), OQ-010 (combat
+application) all close from ONE real playthrough of the ORIGINAL game in
+the scratch build with the autosave ring running. The script boots
+work/r1/game/ascend.exe (scratch copy only, game/ never mounted), ring
+autosave=10 41-60, -time-limit default 1500 s (TL= override), pkill -x
+dosbox-x cleanup only, and prints an instant offline readout per slot
+(T, owned records, scored-stars DAT_000482fb, selector DAT_00043510,
+rank DAT_0004350c). Nothing is scripted — real play is the whole point.
+Head-invocation note: the per-run headless invariant serves agent-
+automated runs; a user-run session is interactive BY DESIGN (user's own
+DISPLAY). What the user must do inside the game, minimum: colonize past
+50% of stars (OQ-021), declare war once AND accept/join an alliance once,
+end turn (OQ-023), and let two fleets exchange fire once, end turn
+(OQ-010). Zero-slot edge measured pre-deploy: title-menu slots read T=0
+with selector = uninitialized heap (e.g. 0xC500) — slot-adjudication
+law for the analyzer: trust slots with T>0 only.
+Status: READY, not yet run (agent does not play; needs the user).
