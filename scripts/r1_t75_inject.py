@@ -58,12 +58,19 @@ def main():
     for base, nm in recs:
         stars.setdefault(star_of(nm), []).append(base)
     injected, kept = [], []
+    # COLONIZATION MARKERS (rev5 ground truth): owner=0 alone is NOT counted by
+    # the end-turn scorer — the one counted rec (Verithil I, home) differs from
+    # unowned chain recs at +0x1e=02 +0x20=01 +0x24=01 +0x28=01 (byte-diff vs
+    # Xerxes I and Aquila I; +0x26/+0x31 are per-planet production values and
+    # +0x59.. are coordinates — left alone). Replicate the full owned pattern.
+    MARKS = {0x1E: 0x02, 0x20: 0x01, 0x24: 0x01, 0x28: 0x01}
     for star, bases in sorted(stars.items()):
         if star in KEEP_STARS:
             kept.append(star); continue
         for b in bases:
-            if data[b + OWNER_OFF] != 0x00:
-                data[b + OWNER_OFF] = 0x00
+            data[b + OWNER_OFF] = 0x00
+            for off, val in MARKS.items():
+                data[b + off] = val
         injected.append(star)
     # load-path needle (t53 law): rec0 planet renamed HERMESSEN
     nm0 = bytes(data[NBASE:recs[0][0] + 30]).split(b"\0")[0]
