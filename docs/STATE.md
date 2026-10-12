@@ -270,7 +270,14 @@ scripts/r1_shp_unifiedlaw.py): V(k0 rec+8)/A(k>=1 rec+0x18 dims@+0x10)/
 B(k>=1 rec+0x20 dims u16@+0x18) -> 1477/1557 records pass, 176/208 libs
 clean; residual 80 records/31 files in 3 classes (span-undersized
 planind+3cfgnew 26, simple-format cos_star 12, stragglers 42).
-NEXT t68: fixup-table walk per failing record — does the library
-fixup pass (u8,u8,u16 triples, S8) rewrite header fields / explain
-variable header size? If fixups are image-reloc only, dims-location
-residue goes BLOCKED-class draw-first-frame capture.
+DONE t68: runtime table UNIFORM [measured ck072,
+scripts/r1_shp_ramtable.py]: 4 verbatim-cached libs x all selectors,
+hist {sel0 delta 8, k>=1 delta 24} zero exceptions (shp.md S17) —
+S16 V/A law holds code-side; fixup-vary theory dead for table region.
+OQ-005: codec grammar CLOSED (S9+S12+S14+S16+S17); dims-location
+residue (80 recs/31 files + non-verbatim .tmp heads) recorded
+BLOCKED-USER-LEVEL (needs human-verifiable drawn frame).
+NEXT t69: IMPLEMENT the banked .shp codec in rewrite/ (library reader
+per S8 container law + control-byte decoder per S9 grammar + V/A
+stream-start law per S16/S17) with corpus test asserting 176/208
+libraries decode every record; documented skip for residual class.

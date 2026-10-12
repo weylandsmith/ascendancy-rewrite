@@ -260,3 +260,18 @@ scenario default AND measured fresh-map count across every banked campaign
 (5 campaigns + this run). New-game size options are scenario-layer values
 not wired into any image constant (t56c static NULL); rewrite fixed-50
 matches the only measured campaign behaviour.
+
+## t68 — OQ-005 .shp dims-location residue (BLOCKED-USER-LEVEL)
+State: control-byte grammar, blit 5-arg law, uniform runtime table
+(sel0->rec0+8, k>=1->rec+0x18) all CLOSED with citations (shp.md
+S9/S12/S14/S16/S17). Residual: 80/1557 records in 31 files whose
+in-record dims-field location is unknown (classes: span-undersized
+planind/3cfgnew, simple-format cos_star, stragglers), and .tmp/1starmap
+cached heads are non-verbatim so file-space inference is unsound there.
+Why blocked: closing needs a human-verifiable drawn frame (r1-savestate
+capture exists, but R13 means we cannot confirm the panel drew; blind
+sweeps are FORBIDDEN and the fixup-vary theory is measured dead).
+Best default to proceed under: decode records per S16 V/A law, dims at
+rec (k0) / rec+0x10 (k>=1); for the 80-record residual class, mark
+skip-and-warn in tooling, never in game-visible paths (rewrite renders
+its own vector art; the codec is a validation asset).

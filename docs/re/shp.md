@@ -658,3 +658,34 @@ variable header (0x8/0x10/0x18/0x20) BEFORE stream; the fixup fixups
 (u8,u8,u16) (S8) plausibly rewrites recorded absolute pointers to
 runtime values — the header form may BE fixup-dependent per record.
 Testing that requires walking the fixup table: NEXT t68.
+
+## 17. t68: runtime table is UNIFORM [measured live-RAM] — V/A law confirmed; fixup-vary theory dead
+
+scripts/r1_shp_ramtable.py on ck072 (r1ad-20261011-180908): for every
+loaded slot with magic 1.10 at PAY+0x88 and a file content match, read
+u32[C+8+8·sel] (blit table law space, C := PAY+0x88) and record
+delta = val+0x18 - nearest record start:
+
+  slot33 racering  hist {sel0: 8,  k>=1: 24}
+  slot34 smhome    hist {sel0: 8,  k>=1: 24}
+  slot36 listbox   hist {sel0: 8,  k>=1: 24}
+  slot41 14intel   hist {sel0: 8,  k>=1: 24}
+  (43 selectors total, zero exceptions; 24 dec = 0x18)
+
+=> RUNTIME ENTRY->STREAM MAPPING IS EXACTLY THE S16 UNIFIED LAW:
+   sel0 -> rec0+8 (virtual tsz slot), sel k>=1 -> rec_k+0x18.
+   No per-record variation exists code-side. The table values in RAM
+   equal file header directory values (verbatim; no fixup rewrite of
+   the table region was observed for these libraries).
+
+CONSEQUENCE for S16 residual (80 records): the stream START is uniform
+law (rec_k+0x18 k>=1); what varies is DATA LAYOUT INSIDE records —
+dims-field location and (span-undersized class) frame completeness.
+t67c §3 "fixup-dependent header form" theory: REFUTED for the table
+region [measured above]. Remaining hunt is dims-field location inside
+record kinds; for libraries whose RAM copy is NOT verbatim (1starmap/
+.tmp heads, S12) file-space inference is unsound and the closure class
+is draw-first-frame capture (R13-blocked: cannot verify panel drawn).
+OQ-005 status: codec grammar CLOSED [S9+S12+S14+S16+this]; record
+header dims-location residue recorded BLOCKED-USER-LEVEL (capture
+needs human-verifiable drawn frame or original-hardware guidance).
