@@ -113,31 +113,23 @@ p4-out gates counter read; parallel countdown dword at ability-object+0x70.
 Amass-wait formula UNMEASURED — OQ-020 stays OPEN, nothing wired.
 remaining: obj1 call-edge of the help formatter, or
 controlled-mutation capture; default 30 turns stays in force.
-OQ-005 | shp | .shp pixel codec (container CLOSED 208/208) | open | W3 ONLY:
-exe shape loader via call graph + live image. Blind static sweeps are
-FORBIDDEN (docs/REFUTED-ROUTES.md R2). Map currently draws documented
-circles. t59/t60 recon banked docs/re/shp.md S7+S8: registration pass
-FUN_00023388 (sole caller of FUN_0001fa60); INT21 IDs done (OPEN
-FUN_00077776, wrappers fully attributed text/ini/log/BMP only); FILE
-PROVENANCE LAW t60 — scan ascend_restored.bin (t59 zero-hit negative VOID).
-Shape libs load via FUN_00030018/FUN_0003026c -> FUN_0006642c(path,flags,
-dest) binary-library reader w/ trailing fixup table; decoded shapes land in
-the FUN_0001fa60 resource-table slots. t61 DECODER LOCATED: FUN_0005caac
-shape blit + control-byte RLE grammar (S9, from raw asm); cache module
-FUN_0001fc34/FUN_00020acc mapped. Validation: rec0 grammar well-formed
-198/208, full exact-span 27/208; rec1+ stream-start ambiguity OPEN —
-live-RAM anchor t62 done (S10): cache payload = VERBATIM whole-library
-copy [measured, ck RAM 0x3cd768 == file byte 0]. t64 blit input law
-code-pinned (S12): stream = payload + u32[payload+8+8*sel] + 0x18;
-t64/t65 zeros REFUTED t66 (S14): SCAN-BASE BUG — with correct arg2 =
-slot+0x88 verbatim base, 3504 strict survivors over 72 ck, raceflag
-sel1 pixels RAM==FILE [measured]. Callers pass slot=[widget+24],
-sel=[widget+28]>>16, payload unmodified (no transform exists). Law:
-stream(k) = PAY + (tsz | u64dir[k-1]) + 0x18; rows x-unbounded (write-
-clamp); exact-span 2xH rows = appended animation frames [measured 4
-families]. OPEN residue: corpus pass under draw-first-frame semantics,
-frame-count law, dkship walk desync, 10 expl dims variants, 8 caller
-entries. NOT closed; no rewrite change yet.
+OQ-005 | shp | .shp shape-library codec (container CLOSED 208/208; grammar
+CLOSED t61-t69; dims-location residue open) | open | CLOSED PORTION, cited:
+control-byte grammar verbatim from raw asm FUN_0005caac 0x5cca3..0x5ce77
+(shp.md S9); blit 5-arg law + stream=PAY+(tsz|u64dir[k-1])+0x18 (S12/S14);
+runtime table UNIFORM delta{sel0:8, k>=1:24} zero exceptions across 4
+verbatim-cached libs x 43 selectors (live-RAM S17, scripts/r1_shp_ramtable.py);
+rows x-unbounded write-clamp, 2xH rows = appended animation frames. CODE SITE:
+rewrite/src/formats/shp.{h,cpp} ShapeLibrary (container laws enforced,
+blit-faithful clamp, dst-untouched transparency, 4096 dims cap: garbage dims
+reported not allocated) + tests/test_shp.cpp; corpus MEASURED 208 libs/1557
+recs/1484 decode-pass/185 clean (floors 1477/176 from scripts/r1_shp_unifiedlaw.
+py). OPEN residue BLOCKED-USER-LEVEL (docs/BLOCKED.md t68): 80 records/31 files
+(planind+3cfgnew span-undersized, cos_star simple-format, stragglers) + non-
+verbatim .tmp/1starmap cached heads: in-record DIMS-FIELD LOCATION unknown;
+closure class = human-verifiable drawn frame (R13 blocks self-verification);
+blind sweeps FORBIDDEN (R2). Map draws documented circles; ShapeLibrary is a
+validation asset (option C).
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge

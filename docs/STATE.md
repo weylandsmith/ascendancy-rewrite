@@ -285,6 +285,15 @@ from the measured Python run). MEASURED: 107 tests 0 failed; corpus
 208 libs / 1557 recs / 1484 decode-pass / 185 clean libs — EXCEEDS the
 1477/176 floors (4096 dims cap added after a FAIL-class record's
 garbage dim words triggered bad_alloc: decode REPORTS, never allocates).
-NEXT t70: ledger hygiene pass — re-mark OQ-005 sub-parts in
-OPEN-QUESTIONS per S17 closure split (grammar CLOSED, dims-location
-residue BLOCKED-USER-LEVEL), then first non-blocked ledger item.
+DONE t70: ledger OQ-005 rewritten (closed portion cites S9/S12/S14/S17 +
+code site rewrite/src/formats/shp.cpp + measured corpus; residue
+BLOCKED-USER-LEVEL). OQ-010 triaged: batmode join=6 small funcs under full
+analysis; static route at banked hard boundary; headless corpora zero ships
+-> in-battle capture = OQ-019 class (BLOCKED entry filed w/ one-battle
+closing recipe). Ledger open set now: OQ-010/OQ-019/OQ-021 (capture-class),
+OQ-003/OQ-016 (replay-only/documented), OQ-012(a) (R13), OQ-023 (parked).
+NEXT t71: OQ-016 application residue — per-world channel ACCUMULATOR
+recalc check on r1ad-20261011-132306 grown worlds (t55b open recalc term:
+fresh-owned stored=(1,1) vs acc=(0,0)); decide whether stored channel =
+rate-table lookup (already banked) rather than accumulator, closing the
+sub-law or sharpening its class.

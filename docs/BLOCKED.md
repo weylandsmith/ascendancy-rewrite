@@ -275,3 +275,19 @@ Best default to proceed under: decode records per S16 V/A law, dims at
 rec (k0) / rec+0x10 (k>=1); for the 80-record residual class, mark
 skip-and-warn in tooling, never in game-visible paths (rewrite renders
 its own vector art; the codec is a validation asset).
+
+## t70 — OQ-010 combat application laws (capture class = OQ-019's)
+State: device constants data-verified (gizmos damage 1..13, shields 1..5);
+combat APPLICATION (hit prob, shield subtract-vs-absorb, overkill, firing
+order) has NO known code site. Static route hits its banked HARD BOUNDARY
+(r1-savestate.md 05k: absolute immediates unresolvable; inputs are runtime
+pointers; "critical path not more static batches"). batmode-module join
+under full analysis = 6 real functions (0x5b47c..0x5ba30), all small UI-ish;
+E1 batch 1+3 REFUTED their candidates. Headless autoplay corpora contain
+ZERO ships (T49 2,260 obs, T58 565 obs) so in-battle click-diff capture is
+UNREACHABLE without manual gameplay reaching combat -> same
+BLOCKED-USER-LEVEL class as OQ-019 scale. Best default to proceed under:
+documented research-gated attack/defense scores (ships.md §4) stay;
+rewrite combatPhase unchanged. Closing needs: user-run original game to
+ONE fire event with autosave capture running (single battle = enough for
+slot-diff of the two combatant records + damage application).
