@@ -203,6 +203,9 @@ sites; full census w/ referrer addresses; ascend02 .bin/.tsv loaded via RAM
 name table @0x250c1c from .cob TOC, NOT via exe literals; .cob grammar
 u32 N + N x 50B names + N x u32 offsets, ascend00 54/54 md5 round-trip).
 Gate: scripts/cob_probe.py 3i2. Field semantics of the tables stay OQ-010.
+CODE SITE: rewrite/src/formats/bin_table.h (BinTable::parse, vendor columns
+documented as open per OQ-004 scope; consumer main.cpp:151 counts parsed
+tables only — no semantics claimed).
 OQ-012 | mapgen | (a) new-game size options (labels baked in 3cfgnew.tmp
 glyphs) — REMAINING OPEN. (b) CLOSED 2026-10-06o:
 pps ~ U{1..5} measured over 250 systems x 5 campaigns (chi2 2.84, 4df,
@@ -466,7 +469,12 @@ playMusic() takes (audio.cpp init cited); test audio_tune_selector_oq018
 pins both sites; audio.md §3.3. Discovered follow-up filed as OQ-022.
 
 --- closed during v1 (kept here as a one-line index; evidence in archive and
-docs/re/): OQ-001 .cob offsets | OQ-002 FLIC codec | OQ-007 CP437 |
-OQ-008 loader control-flow model | OQ-009 AI data side | OQ-011 POINTER LAW
-(scripts/r1_pointer_law.py 12/12 slots, gate 3q) |
-OQ-017 .fnt codec + UI wiring.
+docs/re/; code sites cited or marked analysis-only). Entries prefixed "- >"
+so ledger tooling (which keys on ^OQ-) does not misparse this index:
+- > OQ-001 .cob offsets -> formats/cob.h reader (format block cites this ledger + FINDINGS P1a)
+- > OQ-002 FLIC codec -> formats/flic.h (cites docs/re/flc.md)
+- > OQ-007 CP437 -> decode sites game/species.cpp, game/research.cpp, game/starstat.cpp, game/economy.cpp, game/diplomacy.cpp
+- > OQ-008 loader control-flow model -> ANALYSIS-ONLY (rewrite is fresh-start-only; no loader in rewrite; spec docs/re/loader.md)
+- > OQ-009 AI data side -> ANALYSIS-ONLY input to the W-B-gated diplomacy/AI build (docs/re/ai-data.md; nothing shipped reads it yet)
+- > OQ-011 POINTER LAW (scripts/r1_pointer_law.py 12/12 slots, gate 3q) -> measurement instrument only, cited by capture scripts + campaign.cpp:593
+- > OQ-017 .fnt codec + UI wiring -> formats/fnt.h (cites docs/re/fnt.md) + ui/ui.cpp wiring

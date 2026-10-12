@@ -182,6 +182,26 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+T84 LANDED (contract-compliance sweep): every CLOSED ledger row audited
+for BOTH legs (cited evidence + changed-code-site-or-explicit-disposition)
+-> 12 full rows PASS; two real gaps fixed: OQ-004 row now names its code
+site (formats/bin_table.h, consumer main.cpp:151 counts-only) and the
+7-item closed-index block now cites code sites per item or marks
+ANALYSIS-ONLY (OQ-008 fresh-start-only, OQ-009 W-B input) — all cited
+paths verified to exist before commit (ai-data.md, loader.md present;
+ui.cpp has 9 fnt refs). Tooling traps banked mid-audit: (1) '| open |'
+wraps across lines -> whitespace-join rows before status match; (2) the
+index block must not start lines with bare ^OQ- or row tools misparse it
+-> entries now prefixed '- >'. NEW scripts/ledger_audit.py reruns the
+whole check (open-set equality + leg audit): AUDIT_RC=0, open set
+exactly {003,005,010,019,021,023}. OQ-020 confirmed status BLOCKED (not
+open) + legs present. Docs-only turn, no code change.
+NEXT t85: open items are ALL capture/user-blocked; remaining productive
+offline work is thin by design. Do one honest loop-state consolidation
+pass (STATE/BLOCKED single-source the user-ask; verify scripts/
+ledger_audit + r1_playcap are referenced from STATE), then STOP-REPORT
+to the user: the loop cannot close the last six items without the
+r1_playcap session (repeat exact command + what to do in-game).
 T83 LANDED (OQ-005 W3 sanctioned route executed to its boundary):
 decoder FUN_0005caac caller census = 75 direct sites / 32 functions;
 header law re-read verbatim @0x5cabe/0x5cac7 (dims ALWAYS record-start
