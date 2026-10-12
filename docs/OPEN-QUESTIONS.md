@@ -47,9 +47,18 @@ OQ-021 | victory | end-ctrl threshold: vendor comment "over half" vs same
 file's prose "two-thirds" — current default >1/2 | open | t52: static route
 EXHAUSTED (FUN_0002a428 = 3-line error stub verbatim; functions_full.tsv has
 no names (offset/size only, ledger pointer was stale); IMUL-100 arith scan
-found the score%% producer family (ships.md S15) not the threshold). Closing
-route = t51 capture STEP 4 (win/score screen correlation, BLOCKED t52).
-Default >1/2 stands.
+found the score%% producer family (ships.md S15) not the threshold). t72
+restored-image scan (file-provenance-law compliant): string pool located
+(STARS CONTROLLED %d @0x83b16, PERCENT CONTROLLED %d @0x83b2a, inside a
+GAMEWND/..\\coswnd.cpp pool => CONSUMER IS coswnd.cpp); encoding inverted
+from known-good site (0x2b224 holds 0x83d1f = full path start, VA==file
+offset); ZERO u32 code-region refs to either string — R12-correct reading:
+absence is a lead-out, not proof (base+disp access needs no immediate).
+NEW BOUNDED STATIC ANGLE: attribution has 36 coswnd.cpp functions
+(work/attribution.tsv) NOT covered by any prior decompile batch (batch 3 =
+engine modules only). Closing route = t73 one-batch coswnd decompile grep
+threshold idioms; if none, t51 STEP 4 capture (win/score screen, BLOCKED
+t52). Default >1/2 stands.
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719

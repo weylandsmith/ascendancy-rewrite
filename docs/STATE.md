@@ -299,8 +299,12 @@ byte-exact FUN_00038ba4 recompute == stored +0x44/46/48 at ck001/020/060/
 reads). Harness: r1_income_law.py --slot now finds ck/ AND save/ (was
 silently failing late-timeline verification). Rewrite code UNCHANGED —
 existing channel chain verified exact, pin campaign_channel_law_oq016.
-NEXT t72: OQ-021 last static angle within banked boundary — u32 VA scans
-for the score-screen strings against ascend_restored.bin ONLY (t58
-payload scan VOID per file-provenance law); if zero leads, OQ-021 rides
-the one-battle/end-screen capture recipe (BLOCKED) and the loop moves to
-replay-only OQ-003 field-meaning work.
+DONE t72: OQ-021 restored-image scan — strings FOUND (0x83b16/0x83b2a in
+a GAMEWND/..\coswnd.cpp pool => consumer module identified); VA==file
+offset encoding re-inverted from known-good 0x2b224; zero u32 code-region
+refs (R12: lead-out not proof). NEW bounded angle banked: 36 coswnd.cpp
+functions never decompiled (batches 1/3 skipped coswnd).
+NEXT t73: ONE coswnd decompile batch (36 funcs via DecompileCombat.java
+targets file), grep imul/cmp threshold idioms (x*2 vs N, x*3 vs N*2,
+percent-producer reuse ships.md S15); hit -> close OQ-021 w/ citation;
+nil -> BLOCKED rides capture, move to OQ-003 semantics or harness debt.
