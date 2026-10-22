@@ -111,8 +111,8 @@ S6. STATUS t85c (testimony): player confirms NO Control-victory screen
 ever appeared, through t1131 — CONSISTENT with >1/2 on DAT_482fb (max
 23/50 = 46%, never crossed). The score-screen percent discriminator is
 DEAD: the player UI has no score screen (buttons = Planets/Ships/
-Research/Special Ability/Species; disproducer gated by esi==-1 +
-multiplayer-off checks, docs/re/score.md S7). Replacement closer:
+Research/Special Ability/Species; the disproducer is an internal
+readout gated by the nougat.lf file-probe flag, docs/re/score.md S7/S8). Replacement closer:
 continue the live campaign past boundary DAT_482fb >= 25 and observe
 whether the 0x2c01d end-ctrl arm fires — banked max is 23 and the player
 is still expanding, so this may close passively during normal play.

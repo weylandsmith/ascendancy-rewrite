@@ -163,3 +163,44 @@ whether the end-ctrl event (0x2c01d selector arm -> end-ctrl.txt window)
 fires. systems_full ALREADY reads 26 without selector arming, which does
 NOT contradict the law: DAT_482fb != systems_full (banked 23 vs 26), so
 the comparator input remains the DAT, producer untraced.
+
+## S8. t85d: the esi gate DECODED — file-probe debug flags, no multiplayer
+
+The S2 "gate 1 (esi)" and its label "multiplayer-off screen" were EARLY
+GUESSES; t85d replaces them with a measured chain:
+* DAT_00010ba0 has EXACTLY ONE writer image-wide: 0x21309
+  `mov [0x10ba0],-1`, guarded by FUN_00077ece(eax="nougat.lf", edx="r")
+  — fopen(path,"r") non-NULL. Pool neighbours (image 0x834e8..):
+  'music.txt','..\corn.cpp','r','nougat.lf','r','flash.pop' [verified].
+* Sibling flag DAT_00010ba4: one writer 0x2132b, probe edx="flash.pop".
+* FUN_00077ece has 10 callers, all file probes: cob.cfg, nougat.lf,
+  flash.pop, cosmos.txt, numships.dbg (mode-gated BY nougat: 0x250aa
+  cmp DAT_10ba0,-1 / jne skips the open), reswin.txt(w), + 4 dynamic.
+* neither nougat.lf nor flash.pop exists in any shipped tree (game/,
+  work/r1/game/, recursive search) [verified]; cob.cfg DOES exist
+  (lists ascend00..02.cob).
+* Reader clusters (attribution.tsv): flag-0 (nougat) 24 sites —
+  batcon.cpp 16, batmode.cpp 4, coswnd/batfx/batfxa/cosmos 1 each;
+  flag-4 (flash.pop) 27 sites — batcon.cpp 14, race.cpp 6, raceneg.cpp
+  4, winmgr.cpp 3.
+* The score disproducer pool neighbourhood (0x83b16 "STARS CONTROLLED
+  %d", 0x83b2a "PERCENT CONTROLLED %d") continues into
+  "numships.dbg", "T%04d: %s flags (%d) show R%d ship, but none
+  found.", "T%04d: R%d ship exists at %s, flags (%d) indicate
+  otherwise.", "R%d %10s %d\n" — internal consistency-assertion strings.
+CONCLUSION [verified chain + inferred reading]: this is NOT a debug
+build, it is the SHIPPED release with its developer tooling compiled
+in, gated by zero-byte flag files in the game directory ("nougat" =
+internal mode name [meaning unverified]). The score disproducer is an
+internal readout that needs the flag; the player-facing score screen
+(static.txt #15 string) was cut from the image entirely.
+MULTIPLAYER CAPABILITY CENSUS [verified, negative]: raw ascend.exe
+(0x8f6d3) + restored image contain ZERO of: wsock/winsock/ws2_32/
+netbios/ipx/modem/tapi/hotseat/'2 Player'/'multiplayer'/'network'
+tokens (case-insensitive regex over full bytes); only DLL refs =
+VESA480/VFXSCAN/MCGA (video); game text corpus (.txt x28) has no
+multiplayer content. exe is LE (Linear Exec, DOS/4GW family;
+dos4gw.exe ships in game/). NOTHING multiplayer exists in the code —
+the prior score.md 'gate 2 (multiplayer-off screen)' label is hereby
+corrected: gate 2 compares DAT_10ba0 against window field [ebp+0x58e]
+(a toggled toggle per 0x2736f-0x27397), not a multiplayer state.
