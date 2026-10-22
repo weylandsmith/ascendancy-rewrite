@@ -19,16 +19,25 @@ route bounded 2026-10-06: payload has ZERO disp32 accesses at orbit offsets
 +0x57/+0x5f (scan: 2 bogus hits, both outside code ranges); shape tie found
 (FUN_00025604 stride-constant table 0x60/0x7b/0x27 == live-measured record
 families, docs/re/r1-savestate.md). STATUS t85b (first long original-game
-capture banked: turns 37..1131, war on Minions t887): ZERO ship destruction
-in the whole stream — 27 array events (22 APPEAR / 5 VANISH, ALL owner 0 =
-player fleet bookkeeping), zero AI-ship events ever, zero state 3/4
-transitions, exactly TWO design-aggregate changes in 1100 turns (shield
-2->0 @t663 and 1->6 @t923, both turn-boundary refit class, no damage
-signature). Combat RAN 244 turns (systems changed hands, score.md S6) but
-autosaves sample turn boundaries only: losses land mid-resolution. Closing
-route unchanged (in-battle recording or static application-code site);
-t85b also fixed the combat analyzer to STREAM the 4.3 GB jsonl (measured
-290 MB peak; the old load-everything version was OOM-killed on this data).
+capture banked: turns 37..1131, war on Minions t887): combat RAN 244 turns
+but autosaves sample turn boundaries only, so mid-resolution damage never
+lands in a sample. t85b also fixed the combat analyzer to STREAM the 4.3 GB
+jsonl (measured 290 MB peak; the load-everything version was OOM-killed on
+this data). STATUS t85c (CORRECTION + testimony): the t85b "ZERO AI-ship
+events" claim was a FILTER ARTIFACT — it discarded free-record owners
+(65535), which is exactly what a destroyed ship record looks like at the
+next boundary sample. Corrected presence-law census (scripts/
+r1_t85c_focus.py): 9 owner->free DELETIONS banked — 4 Minion-owneed
+(slot12 t888 = the war-declaration boundary itself, slot8 t902, slot5
+t910, slot0 t1018) and 5 player-owned — plus slot flips (0<->2) that are
+free+realloc between samples, not captures. Player testimony CONSISTENT:
+"Minions only had one ship for me to destroy, it didn't shoot back" —
+Minions fielded exactly 4 ships in 1100 turns (slots 0,5,8,12) and all
+four died in the war window; zero-shot-back matches a crewed-population/
+power edge. Deletion-vs-turn-boundary correlation is now banked, but the
+damage APPLICATION law itself (hit prob, shields, shields vs power) is
+still unseen; closing route unchanged (in-battle recording or static
+application-code site).
 OQ-003 | gam | .gam full record map + field meanings; packed entropy regions
 | open | W1 joint: planet records already joined file<->live RAM 151/151
 (stride 123); STAR TABLE + ORBIT LAWS closed 2026-10-06 map the neighbourhood
@@ -98,9 +107,12 @@ systems_full at the end) banked DAT_482fb every slot and the selector
 NEVER armed — DAT_482fb max 23/50, so >1/2 on DAT_482fb is CONSISTENT
 (never contradicted), while systems_full crossing without arming shows
 systems_full is NOT the comparator variable. Full census docs/re/score.md
-S6. Closing observation still needed: the turn the selector DOES arm (or
-player-reported end screen), and player testimony on whether any victory
-screen appeared by t1131.
+S6. STATUS t85c (testimony): player confirms NO Control-victory screen
+ever appeared, through t1131 — CONSISTENT with >1/2 on DAT_482fb (max
+23/50 = 46%, never crossed). Decisive discriminator at near-zero cost:
+the score screen's own percent (law percent = TRUNC(100*DAT_482fb/50),
+t73): 46 pins DAT_482fb as the presenter input; any other number
+falsifies the law and the threshold read together.
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719
@@ -131,10 +143,14 @@ main-branch law itself stays MEASURED (§7/§8) and implemented.
 STATUS t85b: first real transitions banked (docs/re/diplomacy.md §11):
 player war-declaration fires the cell 1->2 RECIPROCALLY (both empires,
 t887->888, sustained 244 turns) while AI contact fires 0->1 both ways;
-alliance proposal shows NO cell change, only attitude +280 (sustained ~600
-against Orfa ACCEPT_ALLIANCE=570). WORKING: 2=war, 1=peacetime, alliance
-NOT in the +0x1c0 cell (n=1 each, needs acceptance/peace/break transitions
-to close). | open |
+alliance proposal shows NO cell change, only attitude +280 on the
+PLAYER-side cell. STATUS t85c: player confirms the Orfa NEVER accepted —
+and the banked AI-side cell explains it: att[Orfa->Chamachies] peaked 485
+and decayed to 451, never crossing Orfa's ACCEPT_ALLIANCE=570, and a
+player PROPOSE does not move the AI-side attitude (docs/re/diplomacy.md
+§12). WORKING: 2=war, 1=peacetime/no-active-relationship; an accepted
+alliance (state-3 candidate) remains capture-gated — a future sitting must
+first raise Orfa attitude above 570 by other means, then propose. | open |
 W-B (option C hybrid): build only when ownership model lands; engine
 build additionally awaits the state-enum capture above.
 OQ-024 | loop | planet GOVERNOR assignment law (@0x38df0 branch of

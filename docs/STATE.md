@@ -632,3 +632,27 @@ HARNESS LESSONS: objdump -b binary -m i386 -M intel works directly on the
 restored image (no Ghidra round-trip for dark zones); Ghidra function names
 FUN_ + 8 hex digits (6-digit regex = silent zero); r1_sav_scan.find_base
 returns (votes,positions) tuple — vote most_common(1) with >=5 threshold.
+T85c LANDED (user testimony adjudicated against the banked stream):
+(a) CONTROL: player saw NO victory screen through t1131 -> consistent with
+>1/2 on DAT_482fb (max 23/50=46%); cheapest closer is the score screen's
+own percent (law percent=TRUNC(100*DAT_482fb/50)).
+(b) ORFA: never accepted because att[Orfa->Chamachies] peaked 485, never
+crossing their ACCEPT_ALLIANCE=570; player PROPOSE moves only the
+player-side cell (600). docs/re/diplomacy.md §12.
+(c) COMBAT OQ-010 CORRECTED: t85b's "zero AI-ship events" was a
+free-record (65535) filter artifact; presence-law census banks 9
+owner->free deletions, 4 of them Minion ships (slots 0/5/8/12 — the
+Minions fielded exactly 4 ships in 1100 turns, all died in-war; matches
+"only one ship, it didn't shoot back"). scripts/r1_t85c_focus.py.
+(d) NIMBULOIDS: NOT in the campaign window — every trusted row n=4
+[Chamachies,Orfa,Ungooma,Minions], ship owners ever {0,1,2,3}; the
+repulsion cannot be their SA_IndustryBoost (or Frutmaka's, also absent).
+Only Ungooma holds a lane effect (SA_BumpShipsInLanes); reversal census
+is proportional-to-movement (cannot isolate firing race by kinematics).
+OPEN USER CHECK (10 s): read the race NAMES off the in-game diplomacy
+screen — if it shows "Nimbuloids" where memory decodes "Ungooma", the
++0x1c0 name-byte decode is wrong, not the player.
+NEXT: war on the real 5th power is NOT possible in this campaign (n=4);
+combat-law closure needs either in-battle frame recording or the static
+application-code site (Ghidra, no capture). Gate GATE_EXIT=0, audit
+AUDIT_RC=0, open {003,005,010,016,019,020,021,023}.

@@ -307,3 +307,51 @@ CAVEAT (why older drafts of this §11 were wrong): the raw stream contains
 12.5k stale-instance rows (a second dosbox picking up an older save, always
 rewinding); diffing in file order fabricates bounce transitions
 (780->692->782). All numbers above use scripts/r1_stream.py trusted order.
+
+## §12. t85c adjudication: alliance REJECTION explained, campaign race window
+
+Player testimony (2026-10-22, this campaign): the Orfa NEVER accepted the
+alliance; war was indeed declared on the Minions at the manual-save-3
+boundary. Banked stream + §7 threshold law adjudicate both:
+
+* ACCEPTANCE GATE IS THE AI-SIDE CELL. The proposal bonus landed on
+  att[Chamachies->Orfa] (315->595 at t887->888, held ~600 to t1131) but
+  att[Orfa->Chamachies] peaked ~485 (t908..964) and decayed to 451 by
+  t1131 — ORFA's own ACCEPT_ALLIANCE=570 (its row th) was NEVER crossed.
+  A player-initiated PROPOSE does not move the AI-side attitude, so
+  re-proposing at att 451/570 cannot flip the decision [inferred from the
+  banked two-cell trajectories; n=1]. The §7 chooser law is CONSISTENT:
+  no accept fired, no accept was due.
+* CAMPAIGN RACE WINDOW n=4, CONSTANT. Every trusted row t=37..1131
+  (28,843 rows) carries n=4, names [Chamachies, Orfa, Ungooma, Minions];
+  ship-array owner census ever-seen = {0(player), 1(Orfa), 2(Ungooma),
+  3(Minions)} + 65535 free-record. The player-visible "Nimbuloids" is
+  NOT in the campaign window (race20 holds SA_IndustryBoost, help.txt
+  L2476; the only static.txt hit is flavor prose). Nor is Frutmaka
+  (race08, SA_RepelAlienShips "warp alien ships out of your colonies'
+  stars"). Therefore the "continually repelled in the red link" CANNOT be
+  a Nimbuloid or Frutmaka ability firing [verified against the window +
+  ability table]. Closest documented effect: UNGOOMA (owner 2, the power-
+  rival present at the contested link, 8-9 ships at war end) holds
+  SA_BumpShipsInLanes "bump all ships in star lanes backward to their
+  stars of origin" — the player's stuck ships were exactly in a lane.
+  [INFERRED attribution; un-modelled red-lane/territory rules are the
+  alternative.] Verify cheaply next sitting: read the live relation
+  window (n + names); if the game shows a 5th race on screen while the
+  window says 4, the window law (not the memory) is wrong.
+
+Frame-to-frame DIRECTION-REVERSAL census (displacement >25u two frames in
+a row, dot<0; the kinematic signature of a bump/warp-back), whole capture:
+  owner 0 (player): 454 reversals / 885 moves   owner 1 (Orfa): 263/394
+  owner 2 (Ungooma): 256/372                    owner 3 (Minion): 62/101
+  during the Minion war (t>=888): 246 / 91 / 115 / 3.
+Honest reading: reversals are roughly PROPORTIONAL to movement for every
+owner, so kinematics alone cannot isolate WHO fired the lane ability —
+the attribution above rests on the ability table (in this window only
+Ungooma holds any lane effect). One open adjudication the player can close
+in ten seconds: read the four RACE NAMES off the in-game diplomacy screen.
+Memory decodes row 2 as "Ungooma"; if the screen instead shows
+"Nimbuloids", the +0x1c0 window NAME decode (not the player's memory) is
+wrong and §12's attribution flips to whoever the screen names — the row
+STRUCTURE (att i16 @+0x1b2+2t, state byte @+0x1c0+t, stride 0x1ee) is
+unaffected either way.
