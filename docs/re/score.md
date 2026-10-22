@@ -144,3 +144,22 @@ Readings:
     t1128..1131 boundaries). A held-turn word that zeroes on long idle is
     NOT a pure owned-systems counter; treat any single DAT_482fb read
     outside a turn-boundary pair as UNTRUSTED for score-law purposes.
+
+## S7. t85c testimony: no score screen exists in the single-player UI
+
+Player cannot find any score screen (game-screen options: Planets,
+Ships, Research, Special Ability, Species). Consistent with S2's gates
+(0x2805f esi==-1, 0x28068 multiplayer-off check): the disproducer is
+gated off. The S2 pushes land on pool strings
+"STARS CONTROLLED %d"/"PERCENT CONTROLLED %d" (image 0x83b16/0x83b2a,
+neighbouring cosmos.cpp .dbg strings — debug-pool class); the
+static.txt #15 string "Your score is %d%%.\nThis gives you the title
+of %s" appears NOWHERE in ascend_restored.bin or ascend_payload.bin
+(grep: None) [verified] — its presenter screen, if any, is
+unlocated. CONSEQUENCE: the score-screen percent as OQ-021 discriminator
+is DEAD; replacement closer = continue the live campaign until
+boundary-measured DAT_482fb crosses T/2 = 25 (max banked 23) and watch
+whether the end-ctrl event (0x2c01d selector arm -> end-ctrl.txt window)
+fires. systems_full ALREADY reads 26 without selector arming, which does
+NOT contradict the law: DAT_482fb != systems_full (banked 23 vs 26), so
+the comparator input remains the DAT, producer untraced.

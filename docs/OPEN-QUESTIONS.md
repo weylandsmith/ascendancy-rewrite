@@ -109,10 +109,13 @@ NEVER armed — DAT_482fb max 23/50, so >1/2 on DAT_482fb is CONSISTENT
 systems_full is NOT the comparator variable. Full census docs/re/score.md
 S6. STATUS t85c (testimony): player confirms NO Control-victory screen
 ever appeared, through t1131 — CONSISTENT with >1/2 on DAT_482fb (max
-23/50 = 46%, never crossed). Decisive discriminator at near-zero cost:
-the score screen's own percent (law percent = TRUNC(100*DAT_482fb/50),
-t73): 46 pins DAT_482fb as the presenter input; any other number
-falsifies the law and the threshold read together.
+23/50 = 46%, never crossed). The score-screen percent discriminator is
+DEAD: the player UI has no score screen (buttons = Planets/Ships/
+Research/Special Ability/Species; disproducer gated by esi==-1 +
+multiplayer-off checks, docs/re/score.md S7). Replacement closer:
+continue the live campaign past boundary DAT_482fb >= 25 and observe
+whether the 0x2c01d end-ctrl arm fires — banked max is 23 and the player
+is still expanding, so this may close passively during normal play.
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719

@@ -656,3 +656,13 @@ NEXT: war on the real 5th power is NOT possible in this campaign (n=4);
 combat-law closure needs either in-battle frame recording or the static
 application-code site (Ghidra, no capture). Gate GATE_EXIT=0, audit
 AUDIT_RC=0, open {003,005,010,016,019,020,021,023}.
+T85c-followup (player answers): race-name check RESOLVED — decode says
+Ungooma, screen says Ungooma; "Nimbuloids" was a player typo. Name-byte
+law validated; repulsion attribution (Ungooma SA_BumpShipsInLanes) stands
+unopposed. Score-screen closer DEAD — no score screen exists in the SP UI
+(disproducer is debug-pool/gated, score.md S7). OQ-021 closer is now
+passive: keep playing; when a turn-boundary DAT_482fb sample reaches 25+
+(26 systems_any currently, but boundary sample 23; the current held-turn
+autosave reads DAT_482fb=0 — turn-boundary reads only), watch whether the
+0x2c01d end-ctrl arm fires. Combat (OQ-010) needs in-battle recording or
+the static app-code site; Nimbuloid war is impossible (campaign is n=4).

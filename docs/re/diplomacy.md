@@ -355,3 +355,15 @@ Memory decodes row 2 as "Ungooma"; if the screen instead shows
 wrong and §12's attribution flips to whoever the screen names — the row
 STRUCTURE (att i16 @+0x1b2+2t, state byte @+0x1c0+t, stride 0x1ee) is
 unaffected either way.
+
+§12 CHECK RESOLVED (player, 2026-10-22): the in-game race names match the
+memory decode — "Ungooma" is correct; the earlier "Nimbuloids" was a
+typo by the player, not a decode failure. The +0x1c0 window name-byte law
+is therefore VALIDATED by testimony, the campaign really is n=4
+[Chamachies, Orfa, Ungooma, Minions], and the red-link repulsion
+attribution (only Ungooma holds a lane effect, SA_BumpShipsInLanes)
+stands with no surviving alternative race candidate. Nimbuloids and
+Frutmaka: confirmed ABSENT.
+UI INVENTORY (player): the game-screen buttons are Planets, Ships,
+Research, Special Ability, Species — NO score screen, NO diplomacy button
+(contact/alliance flows are reached through map interaction).
