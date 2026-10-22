@@ -50,50 +50,32 @@ ASCEND.EXE
 EOF
 
 echo "playcap: scratch=$SCRATCH out=$OUT TL=${TL}s display=$DISPLAY"
-echo "playcap: autosave ring 41-60 (every 10 min of play + on save)."
+echo "playcap: autosave ring 41-60 (10 s host-clock cadence law — a slot is"
+echo "         overwritten ~200 s after it lands; the live watcher below"
+echo "         parses each slot the moment it appears)."
 echo "playcap: to close OQ-021 colonize past 50% of stars (T=50 -> 26)."
 echo "playcap: to close OQ-023 declare war AND propose/join alliance, then End Turn."
 echo "playcap: to close OQ-010 let two fleets exchange fire once, then End Turn."
 DISPLAY="$DISPLAY" timeout -s KILL $((TL + 30)) dosbox-x -conf "$CONF" -nogui \
   -time-limit "$TL" >"$OUT/dosbox.out" 2>&1 &
 DB=$!
+# LIVE collector (t85): parses every new slot into $OUT/live-timeline.jsonl
+# while you play; exits by itself ~5 s after dosbox-x is gone.
+(cd "$ROOT" && python3 scripts/r1_playcap_watch.py "$OUT" >"$OUT/watch.out" 2>&1) &
+WATCH=$!
 wait $DB || true
+sleep 8
+kill "$WATCH" 2>/dev/null || true
 
 SLOTS=$(ls "$OUT/save"/*.sav 2>/dev/null | wc -l)
 echo "playcap: slots captured = $SLOTS"
 if [ "$SLOTS" -gt 0 ]; then
-  # instant offline readout while the session is fresh: counted stars +
-  # relation-state census over the ring (failures are non-fatal advisories)
-  python3 - "$OUT" "$ROOT" <<'PY' || echo "playcap: offline analyzer hit an issue; slots still banked for offline work"
-import os, struct as st, sys, sys as _s, zipfile
-out, root = sys.argv[1], sys.argv[2]
-_s.path.insert(0, os.path.join(root, "scripts"))
-from r1_sav_scan import build_anchors, find_base
-from r1_income_law import find_records
-pay = open(os.path.join(root, "work", "ascend_payload.bin"), "rb").read()
-anch = build_anchors(pay)
-best = None
-for f in sorted(os.listdir(os.path.join(out, "save"))):
-    if not f.endswith(".sav"):
-        continue
-    m = zipfile.ZipFile(os.path.join(out, "save", f)).read("Memory")
-    v, _ = find_base(m, anch)
-    if not v:
-        print(f"  {f}: no base")
-        continue
-    P0 = v.most_common(1)[0][0]
-    def g16(X):
-        return st.unpack_from("<H", m, P0 + 0x82bb0 + X)[0]
-    tot = g16(0x16143) >> 16
-    stars = sum(1 for r in find_records(m) if m[r[0] + 0x57] != 0xFF)
-    print(f"  {f}: T={tot} owned-records={stars} "
-          f"scored-stars(DAT_482fb)={g16(0x482FB)} "
-          f"selector(DAT_43510)={g16(0x43510)} rank(DAT_4350c)={g16(0x4350C)}")
-    best = (f, tot, stars)
-if best:
-    print(f"playcap: last slot {best[0]} T={best[1]} owned={best[2]} "
-          f"(OQ-021 closes when scored-stars pass the tested fraction and "
-          f"selector state is banked; all readings above are the evidence)")
-PY
+  # instant offline readout (t85: shared r1_slot layer; v1 read DAT_00016143
+  # as u16-then->>16, which is ALWAYS 0; selector now BYTE per score.md)
+  (cd "$ROOT" && python3 scripts/r1_slot.py "$OUT") || echo "playcap: offline analyzer hit an issue; slots still banked for offline work"
+  echo "playcap: OQ closeouts run these from $ROOT:"
+  echo "  python3 scripts/r1_t85_victory.py  $OUT   # OQ-021 threshold"
+  echo "  python3 scripts/r1_t85_relation.py $OUT   # OQ-023 state enum"
+  echo "  python3 scripts/r1_t85_combat.py   $OUT   # OQ-010 battle evidence"
 fi
 echo "playcap: done. Evidence lives in $OUT — tell the assistant this path."

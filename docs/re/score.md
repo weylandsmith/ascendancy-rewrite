@@ -109,3 +109,38 @@ write it via base+disp addressing (not moffs), plausibly from the same dark
 zone as S2 (never analysed). The >1/2-vs-2/3 threshold constant is NOT in the
 S2 evidence; OQ-021 stays open. Rewrite default `mine*2 > total`
 (rewrite/src/game/campaign.cpp:738) unchanged.
+
+## S6. DAT_482fb behavioural census, t85b [measured, one long campaign]
+
+The user-run playcap (turns 37..1131, 28k trusted observations via
+scripts/r1_stream.py trusted order — dedup + stale-instance laws) is the
+first long original-game campaign with DAT_482fb banked every slot.
+Observations (turn -> value; owned-systems census in parens):
+  t367 1->2 (2); t486 2->3; t534 3->5; t560 5->6; t674 6->7; t678 7->9;
+  t687 9->11 (11); t888 11->13 (12 any / 7 full); t910 13->11 (14);
+  t912 11->22 (14!); t925 22->23; t1128 23->22; never 24+; selector byte
+  DAT_43510 == 0 in EVERY trusted observation including the full capture at
+  t=1131 with 27 systems_any / 26 systems_full / 27 planets.
+Readings:
+  * DAT_482fb tracks owned SYSTEMS closely for most of the run (equal to
+    systems_any for long stretches), DROPS when systems are lost (t910
+    13->11 == Minions capturing systems after the player's war), spikes
+    11->22 at t912 with NO systems change (any stayed 14) — the one clear
+    counter-example: it is not a pure owned-systems mirror. [unverified what
+    t912 was: likely a one-shot score event; no screenshot evidence]
+  * DECISIVE-ADJACENT FACT: at t=1131 the player holds 26 fully-owned
+    systems (systems_full) with selector byte still 0. If systems_full were
+    the comparator variable, >1/2 AND >=2/3 would both have queued an ending
+    long before. Combined with the selector-writer absence (S5), the
+    consistent picture is: the comparator evaluates DAT_482fb (never
+    >= 24 in this run, so >1/2 of 50 never fires) — CONSISTENCY with >1/2
+    on DAT_482fb, NOT a closing measurement (what closes: an observation
+    where the selector ARMS, plus a screenshot of the end screen; R13).
+  * Player testimony pending: did NOT report seeing a Control-victory screen
+    by t1131 (capture still live as of t85b). Default >1/2 (campaign.cpp:738)
+    stands unchanged.
+  * t85b same-day follow-up: while the session sat AT t=1131 (no End Turn
+    for hours, 27 systems), DAT_482fb read 0 in the live ring (was 22 at
+    t1128..1131 boundaries). A held-turn word that zeroes on long idle is
+    NOT a pure owned-systems counter; treat any single DAT_482fb read
+    outside a turn-boundary pair as UNTRUSTED for score-law purposes.

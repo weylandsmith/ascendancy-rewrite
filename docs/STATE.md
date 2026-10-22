@@ -202,6 +202,38 @@ pass (STATE/BLOCKED single-source the user-ask; verify scripts/
 ledger_audit + r1_playcap are referenced from STATE), then STOP-REPORT
 to the user: the loop cannot close the last six items without the
 r1_playcap session (repeat exact command + what to do in-game).
+T85b LANDED (playcap harness repair + first-capture analysis; user report:
+combat analyzer OOM-killed mid-run on the multi-sitting capture):
+(1) ROOT CAUSE measured: r1_t85_combat loaded ALL of live-timeline.jsonl
+(4.3 GB, 191k rows x up to 107 ship windows) = 65 MB/1k points, projected
+12.1 GB on the 16 GB VM -> thrash then SIGKILL. New scripts/r1_stream.py
+streams: offset index only, ONE point in RAM; whole 4.3 GB pass = 290 MB
+measured. All three t85 analyzers rewritten onto it (victory now prints
+per-turn, not per-slot; combat caps stdout 400 lines and keeps counting).
+(2) DATA-HYGIENE LAWS (each measured first, r1_stream docstring): trusted
+ORDER = (file_mtime_ns, file); DEDUP first-per-(file,mtime) — watcher
+`seen=set()` re-init AFTER the jsonl re-ingest banked 73,052 dup rows
+(FIXED at source r1_playcap_watch.py); STALE-INSTANCE = a second dosbox
+picked up an older save and autosaved one End-Turn BEHIND live for days
+(12,516 rows; file-order diffing FABRICATED bounce transitions — the first
+relation-analyzer run showed 260 transitions, the true set is 24).
+(3) HARNESS LEAK: 12 stale watchers (up to 6 days old) were alive at once
+— each sitting's setsid watcher never died (--no-exit kept it looping;
+single watch.pid tracked only the newest). Killed all 12 by recorded-PID
++ /proc/cmdline verify; vnc harness now REAPS watch*.pid before relaunch;
+live watcher replaced with fixed code (session untouched, dosbox alive).
+(4) FIRST-EVIDENCE BANKED from the user's campaign (turns 37..1131):
+diplomacy.md §11 (war = cell 1->2 reciprocal at t887->888 per user's
+stated war-on-Minions; Orfa alliance = attitude +280 sustained, NO cell
+change; values {1,2} only) + score.md S6 (DAT_482fb census: never crossed
+half, max 23/50, selector never armed at 26 systems_full; t912 spike
+11->22 unexplained; >1/2-on-DAT_482fb stands CONSISTENT, not closed) +
+ledger rows OQ-010/021/023 status notes. OQ-010: ZERO destruction in 1100
+turns incl 244 war turns — turn-boundary sampling cannot see combat; the
+capture class that could is in-battle recording, banked in the row.
+NEXT: user asks remain open (victory screen seen by t1131? alliance
+ACCEPTED or just proposed?); analyzers run clean on all future sittings.
+gate GATE_EXIT=0, ledger_audit AUDIT_RC=0 (open set unchanged).
 T83 LANDED (OQ-005 W3 sanctioned route executed to its boundary):
 decoder FUN_0005caac caller census = 75 direct sites / 32 functions;
 header law re-read verbatim @0x5cabe/0x5cac7 (dims ALWAYS record-start

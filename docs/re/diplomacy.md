@@ -267,3 +267,43 @@ the OBSERVED state-transition law (contact->war fires, alliance formation)
 needs a campaign that actually fights/accepts — capture-gated like OQ-021,
 banked in BLOCKED.md. OQ-023 ledger status unchanged (open, W-B engine
 gate, 'no RE unknowns for selection ORDER').
+
+## 11. FIRST BANKED TRANSITIONS (t85b, playcap multi-sitting capture, races Chamachies=player/Orfa/Ungooma/Minions)
+
+The user-run playcap (work/r1/playcap, turns 37..1131, 28k trusted
+observations after the t85b streaming/dedup/stale-instance laws — see
+scripts/r1_stream.py) produced the FIRST real relation transitions. Distinct
+nonzero cell values across the whole trusted stream: {1, 2} (rec matrix and
+third-party mirror move together, cell-for-cell).
+
+Player-stated actions (user): declared war on the Minions and proposed an
+alliance with the Orfa around in-game day 887 (manual slot 3 saved then).
+Banked transitions at that boundary (t887->t888, wall 10-19 15:17..15:21):
+  * rec[Chamachies->Minions] 1->2 AND rec[Minions->Chamachies] 1->2
+    (reciprocal, sustained >240 turns to the end of capture; att 318/318,
+    far below both DW thresholds 210/290 — so state, not attitude, carries
+    the war: per §7 a state-1 cell with att<DW would re-fire declare-war
+    every cadence, which is NOT what a war looks like).
+  * rec[Chamachies->Orfa] stays 1; attitude i16 jumps 315 -> 595 in the SAME
+    boundary and holds ~600 for the rest of capture (live t=1131 slot:
+    att=600; Orfa ACCEPT_ALLIANCE=570, PROPOSE_ALLIANCE=750).
+WORKING ADJUDICATION [inferred from banked transition + player statement;
+one campaign, n=1 each]: 2 = AT WAR; 1 = peacetime/no active relationship
+(pre-war EVERY pair sat at 1, so 1 cannot mean allied); alliance state does
+NOT appear in the +0x1c0 cell — the Orfa proposal shows ONLY as the attitude
+bonus (+280, sustained). If true, 'allied' is carried elsewhere (candidate:
+the chooser's state-3 rows are what the ORIGINAL sets on alliance formation
+— unobserved here; or a separate all-you-can-see alliance table). What is
+NOT banked: an ACCEPTED alliance transition, peace, break-alliance — those
+transitions remain capture-gated.
+Cross-empire AI wars banked the same 0->1 pattern with no player action
+(Orfa<->Ungooma t536->541, Chamachies<->Minions t566->567, Orfa<->Minions
+t642->643, Ungooma<->Minions t719->720, Chamachies<->Orfa t791->792,
+Chamachies<->Ungooma t1016->1017): AI contact fires 0->1 BOTH directions on
+one turn boundary. None of these AI 0->1 cells ever advanced to 2 without
+the player's declared war, supporting state 2 being set by an actual
+war-declaration action, not by hostile attitude alone.
+CAVEAT (why older drafts of this §11 were wrong): the raw stream contains
+12.5k stale-instance rows (a second dosbox picking up an older save, always
+rewinding); diffing in file order fabricates bounce transitions
+(780->692->782). All numbers above use scripts/r1_stream.py trusted order.
