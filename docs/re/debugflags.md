@@ -43,6 +43,49 @@ integrity/orders — that is gate 0x1d9fe working exactly as decoded.
 * winmgr 0x5529d/0x55a66/0x55b6e + batcon 0x5549a/0x55fa1: turn-continue
   window ('NEXTTURNCONT' windows.txt) message path alters.
 
+## t85f: THE KEYMAP — user-observed keys + external corroboration
+
+User (web build, nougat.lf on): 's' lists all star systems, 'l' all lanes
+(both STICKY — cannot be turned off), 'c' toggles a screen headed
+"0 Biorythym (Neutral)" + per-player diplomacy figures + stars-controlled.
+Independent community doc (b-sting.nl/ascendancy/cheats.html, content
+lineage: Darth's Ascendancy page <- "The Way" by Jason Goldman) lists the
+same cheat set from play. Codes it documents, mapped to our decode:
+
+Starmap dispatch 0x79969..0x79c62 (key char at [esi+0x15], case-sensitive
+binary search; uppercase leaves exist as distinct branches — b-sting uses
+uppercase S/L/C for the sticky ones):
+
+| key | leaf | = |
+|---|---|---|
+| s/S | 0x79985 -> 0x79ace | REVEAL-ALL (gates 0x273a0 map-family 0x27-stride |=, 0x27401 star-family 0x60-stride |= b-sting "All stars explored"). STICKY LAW: reveal paths are OR-only, no inverse exists in code — matches user "can't be removed". |
+| l   | (lane reveal) | b-sting "All starlanes exposed"; same OR-only stickiness. |
+| c   | 0x799e2 -> 0x79c35 (sets [esi+0x8]=1, clears flag bits 0x06 = redraw) | STATE-OF-GALAXY screen = 0x28059 displayer. Header "STARS CONTROLLED %d" (DAT_482fb) + "PERCENT CONTROLLED %d" (formula LIVE-VERIFIED in code 0x280c4..0x280e3: score*4-score=3*score, <<3=24*score, +score=25*score, <<2=100*score, idiv T -> TRUNC(100*score/T), T=(0x16143)>>16) + "BIORYTHM" header copied from 0x4850c + "%d Biorythym (%s)\n" + per-race rows "R%d %10s %d\n" (0x28128..0x28185: name tables PHASES@0x89050 = Peaceful/Neutral/Hostile stride12, RELNAMES@0x89074 = Unknown/Peace/War/Alliance stride10 — THE relation-state enum spelled out by the vendor: 3=Alliance, directly informs OQ-023). |
+| 'c' toggle | gate 0x2736f handler: NOT [obj+0x58e] | user-confirmed toggle; displayer test at 0x2805f: shows only when [ebp+0x58e]==flag value (-1). |
+| 1..7 | 0x799b7.. region | PLAY AS OTHER SPECIES (b-sting) — race-swap; art mismatch documented. Static hook sites [not individually pinned]. |
+| 8   | [not pinned] | SEE EVERYTHING (b-sting) — candidate the 0x47828 family-0x4b reveal. |
+| Alt-E | e-leaf 0x79971 | STEAL TECHNOLOGY each turn, re-press = off — a persistent toggle like 0x58e. |
+| O / I | o-leaf / i-leaf | planet screen: MAX POP / FINISH PROJECT. |
+| C / D / F (research screen) | C/D/F leaves | complete current / learn all / forget-all research. |
+| T / R (planet screen) | [not pinned] | create colony / take over planet. |
+| Shift-M | shift-state in handler | +1 pop slot (Yarrow credit in b-sting). |
+| Alt-D | | show coordinates (x,y) — candidate the 0x28059-adjacent sprintf cluster. |
+| Alt-W | | "useless internal data" window. |
+| Alt-G | | GIF screenshot into ascend dir (b-sting: overwrites prior!). |
+
+FLASH.POP EXTERNALLY = "let the game play itself" (continuous-advance
+autopilot, crashes after 4h+). Matches our gate census: flash.pop gates
+restructure the AI turn path + arm vendor asserts (raceneg) — a
+self-driving QA harness, not cosmetics. Do NOT run in the capture dir.
+
+b-sting CRASH/WIN NOTE: "the cheats below can cause the game to think you
+have won. In order to prevent this, you must build something (or perform
+any task) before going to the next day." => behavioural law candidate for
+OQ-021: DAT_482fb is refreshed by player ACTIONS during the turn, and the
+cheats inflate it without the reset path — score.md S6 live-slot zero
+reads get consistent with action-driven recompute instead of boundary-only.
+[unverified beyond the doc + S6]
+
 ## OPERATIONAL NOTES
 
 1. HIGHEST PROJECT VALUE if the dumps fire on the web build: play a few
