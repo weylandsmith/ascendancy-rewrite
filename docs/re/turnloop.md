@@ -95,24 +95,32 @@ From `planitem.txt` raw rows (docs/re/economy.md; verbatim rows re-read
 - Expansion: when a player has spare production, spend cost-20 Ship [verified
   cost] at an owned star; next turn it claims the nearest UNOWNED adjacent
   star (movement one lane per turn, [inferred]; drives/gizmo ranges not
-  applied to expansion until OQ-010/OQ-016 resolve). Ships never attack —
-  combat arithmetic is not implemented (OQ-010), stated loudly in code.
+  applied to expansion until OQ-016 resolve). Ships never attack — the
+  rewrite models capture resolution as an empire-level aggregate law
+  (t89, §5 below + combat.md S2i); per-ship combat is OQ-019 territory.
 
-## 5. War + capture [weights/levels verified; resolution inferred]
+## 5. War + capture [t89-UPGRADED to cited laws — evidence docs/re/combat.md S2d..S2j]
 
 Diplomacy (docs/re/diplomacy.md, weights [verified] from raceNN.dip) sets a
 symmetric war table; `START_ATTITUDE` initialises each AI-vs-player relation
 [verified field] - starting at zero would put every race under its own
 DECLARE_WAR threshold on turn 1, which the data clearly does not intend. The
 campaign default `freeForAll=true` starts everyone at war (arcade setting;
-diplomacy-triggered declares also fire). Capture resolution [INFERRED -
-original combat arithmetic is OQ-010 and is NOT claimed]:
+diplomacy-triggered declares also fire). Capture resolution (rewrite sites
+campaign.cpp attackScore/defenseScore/combatPhase; original laws instruction-
+verified t85g..t88a):
 
-- attack(empire) = total owned pop/10 + max owned weapon-gizmo `level`
-  (levels 1..13, gating via `ResReq` -> owned techs [verified gizmos.md])
-  + uniform noise 0..10.
-- defend(star) = local pop/10 + max owned shield `level` (1..5 [verified])
-  + terrain 2 + noise 0..5.
+- volley(empire) = total owned pop/10 + SUM of researched weapon-gizmo
+  `level`s with NumUses!=0 — the original volley loop 0x4a5c1 engages EVERY
+  cat-0 weapon per engagement, damage per hit = Level (design[+0x52], map
+  t87); v1's max-level reading is SUPERSEDED.
+- shield absorb = MIN(volley, SUM researched shield `level`s) (charge law
+  0x49f15 + hit-path clamp 0x4b7c4..0x4b7d1); hull = volley - absorb.
+- defend(star) = local pop/10 + 2 (hull/reserves layer only — shields never
+  join a defense total in the original).
+- Capture iff hull > defend. NO NOISE: combat has no hit roll (measured-
+  negative, combat.md S2g) — v1's uniform 0..10/0..5 draws were an uncited
+  abstraction and are removed (t89); timelines regenerated accordingly.
 - Star-id-ordered sequential pass over borders; a capture fortifies the star
   for 2 turns. Captured pop resets to the settlement seed.
 

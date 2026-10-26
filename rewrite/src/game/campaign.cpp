@@ -1202,41 +1202,74 @@ void Campaign::abilityPhase() {
 }
 
 int Campaign::attackScore(int owner) const {
-    // [inferred, turnloop.md §5] empire fleet strength = total owned pop /10
-    // (reserves model) + best OWNED weapon gizmo level (levels 1..13
-    // [verified gizmos.md]; gating via resReq -> ownedTech).
+    // UPGRADED t89 (OQ-010) to the cited original law. The original's volley
+    // loop (0x4a5c1..0x4a5fc, docs/re/combat.md S2g, S2h-audited) fires
+    // EVERY cat-0 weapon in the ship's gizmo slots in STORED order per
+    // engagement, and each in-range hit applies design[+0x52] (= the file
+    // Level column, column map CLOSED 76/76 t87, scripts/r1_t87_gizmo_table.py)
+    // with NO hit roll (measured-negative, S2g "HIT PROBABILITY"). So the
+    // aggregate volley damage of an empire's researched weapon set is the
+    // SUM of researched weapon Levels, replacing v1's MAX (turnloop.md §5
+    // [inferred]). Empires field whatever they can build, so the per-empire
+    // scale still rides total owned pop /10 (reserves model, unchanged).
     double pop = 0;
     for (size_t s = 0; s < galaxy_.stars.size(); ++s)
         if (owner_[s] == owner) pop += planets_[s].pop;
-    int wlvl = 0;
+    int volley = 0;
     if (gizmos_) {
         for (const Gizmo& g : *gizmos_) {
             if (g.cat != GizmoCat::Weapon) continue;
             bool ok = requiresAvailable(g.resReq, static_cast<int>(tree_->all().size()),
                                         ownedTech[owner]);
-            if (ok) wlvl = std::max(wlvl, g.level);
+            // NumUses gate [verified gizmos.txt header + dispatcher 0x4a373..
+            // 0x4a390 S2g]: a 0-use row engages nothing (every shipped cat-0
+            // row has NumUses >= 1 — {1,1,1,1,5,1,2,2,2,3} — so this arm
+            // never fires on shipped data, it refuses a 0-use row).
+            if (ok && g.numUses != 0) volley += g.level;
         }
     }
     // SA_SapAlienPower / SA_HealShips semantics: fleetDamage_ IS the sapped
     // "power" (abilities.md §2) — subtracted from fleet strength until
     // repaired. Floor at 0 keeps a sapped empire able to defend its homes.
-    return std::max(0, static_cast<int>(pop / 10.0) + wlvl - fleetDamage_[owner]);
+    return std::max(0, static_cast<int>(pop / 10.0) + volley - fleetDamage_[owner]);
 }
 
 int Campaign::defenseScore(int owner, int star) const {
-    // [inferred] local pop /10 + best owned SHIELD level (1..5 [verified])
-    // + terrain/fortify 2.
+    // UPGRADED t89 (OQ-010) to the cited TWO-LAYER model. The original's hit
+    // path 0x4b740 (whole body disassembled, S2h-audited) never folds shields
+    // into a single defense total: shield absorb = MIN(damage, [t+0x90]) with
+    // the overflow SPILLING to hull [t+0x8c], both clamped, death at hull < 1
+    // (0x4b7c4..0x4b8a6). So defenseScore is the HULL layer only — local-pop
+    // reserves model — and the shield absorb is applied as a clamped split at
+    // the engagement site (combatPhase). Fortify +2 is the rewrite's own
+    // capture-protection term [documented default, unchanged].
     double pop = planets_[star].pop;
-    int slvl = 0;
+    return static_cast<int>(pop / 10.0) + 2;
+}
+
+int Campaign::shieldChargesFor(int owner) const {
+    // SUM of researched CAT==1 (Shield) gizmo Levels == the original's
+    // shield-charge law 0x49f15 (ship+0x90 += design[+0x56], +0x56 == file
+    // Level for shields, S2d/S2f; 6 shipped shield rows, Levels 1..5
+    // [verified gizmos.md]). The rewrite has no per-ship slot inventory
+    // (S2i), so this is the empire-level aggregate analogue.
+    int charges = 0;
     if (gizmos_) {
         for (const Gizmo& g : *gizmos_) {
             if (g.cat != GizmoCat::Shield) continue;
-            bool ok = requiresAvailable(g.resReq, static_cast<int>(tree_->all().size()),
-                                        ownedTech[owner]);
-            if (ok) slvl = std::max(slvl, g.level);
+            if (requiresAvailable(g.resReq, static_cast<int>(tree_->all().size()),
+                                  ownedTech[owner]))
+                charges += g.level;
         }
     }
-    return static_cast<int>(pop / 10.0) + slvl + 2;
+    return charges;
+}
+
+void Campaign::setAllTechs(int owner, bool owned) {
+    if (owner < 0 || owner >= static_cast<int>(ownedTech.size())) return;
+    // NOTE: vector<bool>::reference proxy — no `for (bool& b : ...)` here.
+    auto& v = ownedTech[owner];
+    for (size_t i = 0; i < v.size(); ++i) v[i] = owned;
 }
 
 void Campaign::setWar(int a, int b, bool on) {
@@ -1272,7 +1305,6 @@ void Campaign::combatPhase() {
             }
         }
     }
-    std::uniform_int_distribution<int> noise(0, 10);
     // SA_SuperMarines: "your planetary invasions will always succeed"
     // (L1723) — an ATTEMPT guarantee, not a multi-capture per turn, and an
     // attempt still means ships: invasions charge the hull cost (planitem
@@ -1297,18 +1329,35 @@ void Campaign::combatPhase() {
             if (fortify_[nb] > 0) continue;
             if (invadesAlwaysSucceeds(a) && (superUsed[a] || ind_[a] < shipCostC))
                 continue;
-            // RNG DISCIPLINE: exactly two draws per evaluated border pair, in
-            // the pre-abilities order (atk noise, def noise). Ability branch
-            // logic must never add or skip draws — an earlier cut did, and the
-            // whole campaign stream silently diverged by t195 while t40 still
-            // matched (self-caught by head-vs-work diff bisection).
-            int atk = attackScore(a) + noise(rng_);
-            int def = defenseScore(b, nb) + noise(rng_) / 2;
-            if (doublePower_[a]) atk *= 2;             // SA_DoublePower (L1917, "this turn")
+            // DETERMINISTIC COMBAT LAW (t89, OQ-010): the original has NO hit
+            // roll — full-body reads of the gun handler 0x4b8e4 + hit path
+            // 0x4b740 contain no rng call and no random-compare, and zero
+            // rel32 rng edges exist in the whole combat module family
+            // [0x4a360,0x4f097) (docs/re/combat.md S2g "HIT PROBABILITY:
+            // MEASURED NEGATIVE", S2h-audited). v1's uniform(0,10) draws here
+            // were an UNCITED abstraction; removing them re-diverts campaign
+            // rng_ ON PURPOSE (the combat-phase draws were never cited — the
+            // remaining rng_ consumers incomeAndGrow/buildPhase keep their
+            // sequences). RNG discipline still holds downstream: no feature
+            // may ADD or SKIP draws around the remaining streams.
+            //
+            // TWO-LAYER CLAMPED ABSORB (0x4b7c4..0x4b8a6, S2h): the defender's
+            // shield charges absorb the volley FIRST, clamped at the volley
+            // (min law at 0x4b7c4), and only the SPILL reaches the hull layer.
+            // Aggregate mapping (S2i: no per-ship inventory exists):
+            //   volley  = attackScore(a)          (every researched cat-0 gun)
+            //   absorb  = MIN(volley, shield charges of b)
+            //   hullHit = volley - absorb  vs  defenseScore(b, nb) (hull/pop)
+            // (SA_ShieldPlanets is the guard above — it skips the engagement,
+            // the aggregate stand-in for the +0x9c 0x10 null-shield bit.)
+            int volley = attackScore(a);
+            if (doublePower_[a]) volley *= 2;          // SA_DoublePower (L1917)
+            int absorb = 0, hullHit = 0;
+            absorbSplit(volley, shieldChargesFor(b), absorb, hullHit);
             if (invadesAlwaysSucceeds(a)) {            // SA_SuperMarines (L1723 always succeed)
                 ind_[a] -= shipCostC;                  // the invasion ships
                 superUsed[a] = 1;
-            } else if (atk <= def) {
+            } else if (hullHit <= defenseScore(b, nb)) {
                 continue;
             }
             owner_[nb] = a;

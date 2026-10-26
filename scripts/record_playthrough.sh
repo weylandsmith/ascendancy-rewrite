@@ -19,8 +19,10 @@ capture() { # capture <name> <expected-substring> <cmd...>
 }
 
 # T41: budgets 600 -> 1200. The faithful CB-only start (income-law.md T40)
-# lengthened seed-2024 to Control t729 (CLI); all three seeds FINITE:
-# 2024 Control t729, 42 Extinct t557, 13 Extinct t346.
+# lengthened seed-2024 to Control t729 (CLI); all three seeds FINITE.
+# t89 RE-VERIFY (deterministic combat, no hit roll — docs/re/combat.md S2j):
+# 2024 Control t777, 42 Extinct t581, 13 Extinct t503; test seeds 1/2/2024
+# also finite (Control t842 / t677 / t777, CLI --campaign 1200).
 capture A "VICTORY"          "$BIN" --headless --campaign 1200 --seed 2024
 capture B "VICTORY"          "$BIN" --headless --campaign 1200 --seed 42
 capture C "VICTORY"          xvfb-run -a "$BIN" --campaign 1200 --seed 13
@@ -53,9 +55,9 @@ echo "current binary. Victory conditions and their vendor files: docs/re/turnloo
 echo
 for r in A B C; do
   case $r in
-    A) title="Run A — headless, seed 2024"; cmd="$BIN --headless --campaign 600 --seed 2024";;
-    B) title="Run B — headless, seed 42";   cmd="$BIN --headless --campaign 600 --seed 42";;
-    C) title="Run C — Xvfb/X11, seed 13";   cmd="xvfb-run -a $BIN --campaign 600 --seed 13";;
+    A) title="Run A — headless, seed 2024"; cmd="$BIN --headless --campaign 1200 --seed 2024";;
+    B) title="Run B — headless, seed 42";   cmd="$BIN --headless --campaign 1200 --seed 42";;
+    C) title="Run C — Xvfb/X11, seed 13";   cmd="xvfb-run -a $BIN --campaign 1200 --seed 13";;
   esac
   echo "## $title"
   echo

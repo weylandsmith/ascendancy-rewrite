@@ -368,3 +368,7 @@ exists. If t89's noise removal changes timeline outcomes, that is expected
 regeneration (PLAYTHROUGH.md is generated output), not a regression; the
 gate 3l budget (1200 turns) must still end VICTORY on seed 2024 or t89
 reverts the (b) leg and keeps the draws with a documented-default note.
+RESOLVED t89 (2026-10-26): executed as scoped. Noise removal stands (cited
+determinism); seed 2024 resolves Control t777 FINITE inside the 1200 budget
+(42 Extinct t581, 13 Extinct t503, 1/2 Control t842/t677), 109 tests 0 failed,
+PLAYTHROUGH regenerated. OQ-010 CLOSED; this block is closed history.

@@ -1,8 +1,10 @@
 #pragma once
 // Seeded campaign state + turn loop. Behaviour model and the verified/inferred
 // split: docs/re/turnloop.md (cites end-*.txt vendor comments, planitem.txt
-// rows, raceNN.dip). Combat is NOT implemented (OQ-010) — war is a recorded
-// production penalty, stated in turnloop.md §5.
+// rows, raceNN.dip). Combat laws t89-upgraded to the cited original
+// (docs/re/combat.md S2d..S2i: deterministic volley, two-layer clamped
+// absorb); aggregate-model caveats in S2i.
+#include <algorithm>
 #include <random>
 #include <string>
 #include <vector>
@@ -216,6 +218,19 @@ public:
     }
     int attackScoreFor(int owner) const { return attackScore(owner); }
     int defenseScoreFor(int owner, int star) const { return defenseScore(owner, star); }
+    // t89 (OQ-010): aggregate shield-charge analogue, shield absorb of
+    // hit-path 0x4b740 (docs/re/combat.md S2d/S2h).
+    int shieldChargesFor(int owner) const;
+    // Set every research row for one owner (law-pinning + scenario hook).
+    void setAllTechs(int owner, bool owned);
+    // TWO-LAYER CLAMPED ABSORB SPLIT [verified 0x4b7c4..0x4b7d1 + apply
+    // 0x4b87a..0x4b890, S2h-audited]: the shield layer absorbs
+    // min(volley, charges) and ONLY the remainder spills to the hull layer.
+    // Exposed as a pure function so the law is pinned by test.
+    static void absorbSplit(int volley, int charges, int& absorb, int& spill) {
+        absorb = std::min(volley, charges);
+        spill = volley - absorb;
+    }
     const std::vector<CampaignEvent>& events() const { return events_; }
     const Galaxy& galaxy() const { return galaxy_; }
     int playerScorePct() const;  // stars-owned share, static.txt '%'-template (§1)

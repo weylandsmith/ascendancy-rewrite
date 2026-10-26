@@ -428,12 +428,11 @@ TEST(campaign_deterministic_same_seed) {
 
 TEST(campaign_reaches_a_victory) {
     // CONTRACT: a seeded run reaches a victory condition (docs/PLAYTHROUGH.md
-    // is generated from such a run). Combat (turnloop.md §5) makes Control or
-    // LastAlive reachable; 400-turn cap bounds the search.
-    // T40: cap 400 -> 1200. Faithful start (income-law.md T40) lengthens the
-    // finite resolves to t826 / t979 / t961 (CLI --campaign 1500 --headless
-    // seeds 1 / 2 / 2024, all Control) — still FINITE, so the stall
-    // contract is unchanged.
+    // is generated from such a run). Combat (combat.md S2g/S2j) makes Control
+    // or LastAlive reachable; 1200-turn cap bounds the search.
+    // t89 re-pin (deterministic combat, no hit roll): seeds 1 / 2 / 2024
+    // resolve Control t842 / t677 / t777 (CLI --campaign 1200) — still FINITE,
+    // so the stall contract is unchanged.
     bool anyVictory = false;
     for (unsigned seed : {1u, 2u, 2024u}) {
         auto c = makeCampaign(seed);
@@ -441,6 +440,68 @@ TEST(campaign_reaches_a_victory) {
         if (c.over()) { anyVictory = true; break; }
     }
     CHECK(anyVictory);
+}
+
+TEST(campaign_combat_law_oq010) {
+    // t89 UPGRADE pin (docs/re/combat.md S2d/S2f/S2g/S2h/S2i). Laws lifted:
+    //  (1) VOLLEY = SUM of researched cat-0 weapon Levels — every weapon
+    //      engages per engagement (volley loop 0x4a5c1..0x4a5fc); damage per
+    //      hit = design[+0x52] == file Level column (map CLOSED 76/76,
+    //      scripts/r1_t87_gizmo_table.py). Shipped file rows (re-verified
+    //      t89a, extracted/ascend00/gizmos.txt): Levels
+    //      {1,2,4,4,1,4,6,4,10,13}, NumUses {1,1,1,1,5,1,2,2,2,3} (0 =
+    //      unlimited, none shipped).
+    //  (2) SHIELD CHARGES = SUM of researched cat-1 Levels (charge law
+    //      0x49f15: ship+0x90 += design[+0x56], +0x56 == Level for the 6
+    //      shipped shields {1,2,1,3,4,5}).
+    //  (3) TWO-LAYER CLAMPED ABSORB SPLIT (0x4b7c4..0x4b7d1, apply 0x4b87a..
+    //      0x4b890): absorb = min(volley, charges), ONLY the remainder spills
+    //      to hull; never negative, absorb+spill == volley always.
+    //  (4) DETERMINISTIC: no hit roll exists in the combat module family
+    //      (measured-negative, S2g) — the combat phase draws NOTHING from
+    //      campaign rng_.
+    const auto& gz = tables().gizmos;
+    // File-constant pins (not memory — re-extracted values must match).
+    int sumWeapon = 0, sumShield = 0, nW = 0, nS = 0;
+    for (const auto& g : gz) {
+        if (g.cat == ag::GizmoCat::Weapon) { sumWeapon += g.level; ++nW; CHECK(g.numUses != 0); }
+        if (g.cat == ag::GizmoCat::Shield) { sumShield += g.level; ++nS; }
+    }
+    CHECK(nW == 10); CHECK(nS == 6);
+    CHECK(sumWeapon == 49);   // 1+2+4+4+1+4+6+4+10+13
+    CHECK(sumShield == 16);   // 1+2+1+3+4+5
+
+    // (1): the volley delta of full tech over no-tech is EXACTLY the sum
+    // (a MAX-era model would move by max-level minus start-level, not 49).
+    auto full = makeCampaign(77);
+    auto none = makeCampaign(77);
+    full.setAllTechs(0, true);
+    none.setAllTechs(0, false);
+    CHECK(full.attackScoreFor(0) - none.attackScoreFor(0) == sumWeapon);
+    CHECK(full.shieldChargesFor(0) == sumShield);
+    CHECK(none.shieldChargesFor(0) == 0);
+
+    // (3): the split law, edge-on.
+    {
+        int a = -1, sp = -1;
+        ag::Campaign::absorbSplit(10, 16, a, sp);
+        CHECK(a == 10 && sp == 0);            // shields absorb the whole volley
+        ag::Campaign::absorbSplit(20, 5, a, sp);
+        CHECK(a == 5 && sp == 15);            // clamp + spill to hull
+        ag::Campaign::absorbSplit(7, 0, a, sp);
+        CHECK(a == 0 && sp == 7);             // no shields: full hull hit
+        ag::Campaign::absorbSplit(0, 9, a, sp);
+        CHECK(a == 0 && sp == 0);
+    }
+    // (4): determinism — equal seeds trace identically through 40 FFA-war
+    // turns with the deterministic capture law in force.
+    auto x = makeCampaign(2026);
+    auto y = makeCampaign(2026);
+    for (int t = 0; t < 40; ++t) {
+        x.advance();
+        y.advance();
+        CHECK(x.traceLine() == y.traceLine());
+    }
 }
 
 TEST(campaign_victory_files_named) {
@@ -453,8 +514,8 @@ TEST(campaign_victory_files_named) {
 TEST(campaign_advance_after_victory_is_noop) {
     auto c = makeCampaign(1);
     ag::Victory v = ag::Victory::None;
-    // T40 cap 400 -> 1200 (seed 1 finite resolve moved to t979; see
-    // campaign_reaches_a_victory note above).
+    // t89 re-pin: seed 1 finite resolve Control t842 (deterministic combat;
+    // see campaign_reaches_a_victory note above).
     for (int t = 0; t < 1200; ++t) {
         v = c.advance();
         if (v != ag::Victory::None) break;

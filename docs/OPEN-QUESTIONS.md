@@ -10,7 +10,9 @@ Do-not-retry prohibitions: docs/REFUTED-ROUTES.md.
 Format: ID | area | question | status | what closes it (in-hand route)
 
 OQ-010 | rules | combat damage APPLICATION: hit probability, shield
-subtract-vs-absorb, overkill, firing order | open | W1: click-diff capture
+subtract-vs-absorb, overkill, firing order | CLOSED t89 (all four named legs
+cited + rewrite code site changed + 109-test pin; see STATUS t89 at row end and
+docs/re/combat.md S2d..S2j) | W1: click-diff capture
 turn-boundary deltas (turn counter u16 phys 0x254e10), then Ghidra xrefs on
 the reader/writer functions (attribution: batmode/cosmos ranges,
 work/attribution.tsv). Device constants are already data-verified (gizmos
@@ -131,7 +133,27 @@ target = attackScore :1204-1224 / defenseScore :1226-1240 + the noise draws
 uncited v1 abstraction vs S2g measured-negative determinism — removal
 re-diverts rng_ and requires PLAYTHROUGH regeneration), full scoping in
 docs/re/combat.md S2i. Row STAYS OPEN (strict-close: the code-site change
-plus its pinning test is the closing measurement).
+plus its pinning test is the closing measurement). STATUS t89 (CODE task,
+CLOSED same session): all four named legs carried to the rewrite at cited
+code sites — attackScore volley = SUM researched cat-0 Levels NumUses!=0
+(0x4a5c1 every-weapon law + design[+0x52]==Level t87 map) replacing v1 MAX;
+defenseScore = HULL layer only (pop/10 + fortify), the v1 shield-addend
+refuted by hit-path 0x4b740 (shields never join the defense total, they
+clamped-absorb at 0x4b7c4..0x4b7d1 and spill); combatPhase noise draws
+REMOVED per the measured-negative hit roll (S2g/S2h) — capture iff
+volley - MIN(volley, shieldChargesFor(b)) > defenseScore; shield charges =
+SUM researched cat-1 Levels (charge law 0x49f15). Sites:
+rewrite/src/game/campaign.cpp (attackScore/defenseScore/shieldChargesFor/
+setAllTechs/combatPhase) + campaign.h (absorbSplit mirrors 0x4b7c4 clamp) +
+tests TEST(campaign_combat_law_oq010) (file sums 49/16 re-extracted,
+full-vs-no-tech volley delta == 49, absorb/clamp/spill edges, seed
+determinism 40 FFA turns). MEASURED closing evidence: 109 tests 0 failed;
+rng_ re-diversion regenerated timelines — 2024 Control t777, 42 Extinct
+t581, 13 Extinct t503, 1/2 Control t842/t677, all FINITE in the 1200 gate
+budget; PLAYTHROUGH.md regenerated (stale 600 echo-literal fixed). Caveats
+carried: aggregate model only (S2i) — per-ship slots, same-system gate
+0x4b982, range gate 0x4ba57, per-shot power accounting NOT modelled; a
+per-ship model (OQ-019) must re-use S2d..S2h literally.
 OQ-003 | gam | .gam full record map + field meanings; packed entropy regions
 | open | W1 joint: planet records already joined file<->live RAM 151/151
 (stride 123); STAR TABLE + ORBIT LAWS closed 2026-10-06 map the neighbourhood

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-26T16:05
+updated: 2026-10-26T17:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -58,14 +58,23 @@ ledger:
       test_audio_voice_band_law_oq018, 327/328 spans == disk sizes); VOC
       field map 15/15 (u16@25==0x0911 constant, audio.md §2.1, voc.cpp
       pins); race->theme map REFUTED (DAT_00010ba0 single writer 0x21309)"
+    - "OQ-010 combat application law CLOSED t89 (static law S2d..S2h
+      instruction-verified t85g..t88a + rewrite UPGRADE S2j): firing order =
+      stored gizmo-slot order every cat-0 engages (0x4a5c1); damage =
+      design[+0x52] guns / [+0x4a] specials, NO hit roll (measured-negative);
+      two-layer clamped absorb shield-then-hull + death 0x49d2c; commit law
+      mode==1 only 0x25560/0x25570. Code sites: rewrite/src/game/
+      campaign.cpp attackScore (volley = SUM researched cat-0 Levels,
+      replaces MAX), defenseScore (hull layer only), combatPhase (noise draws
+      REMOVED per cited determinism; capture iff volley - MIN(volley,
+      shieldChargesFor) > hull), shieldChargesFor/setAllTechs + campaign.h
+      absorbSplit; pin TEST(campaign_combat_law_oq010) (file sums 49/16,
+      volley delta 49 full-vs-none tech, split edges, determinism). 109 tests
+      0 failed; timelines regenerated: 2024 Control t777 / 42 Extinct t581 /
+      13 Extinct t503 / 1 Control t842 / 2 Control t677, all FINITE <1200;
+      PLAYTHROUGH.md regenerated. AGGREGATE model caveats S2i (no per-ship
+      slots/same-system/range gates; per-ship = OQ-019)"
   open:
-    - "OQ-010 combat application formula — R1 frontier; t88a: FULL static law
-      banked + instruction-audited (combat.md S2d/S2f/S2g/S2h): firing order =
-      stored gizmo-slot order 0x4a5c1, damage = design[+0x52] guns / [+0x4a]
-      specials, NO hit roll (measured-negative), two-layer clamped absorb +
-      death 0x49d2c, COMMIT law = mode==1 only at 0x25560/0x25570
-      (player-command-exec 0x2547c); residual = rewrite combatPhase upgrade
-      at a cited code site (t89 CODE task)"
     - "OQ-003 .gam full record map — joint with OQ-010 (planet records joined
       151/151 @ stride 123; STAR TABLE + ORBIT laws closed 2026-10-06 give the
       neighbourhood map: star stride 96, planet ptrs name+0x2A, orbit pair
@@ -186,37 +195,61 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t89 (CODE task, closes OQ-010 if it passes tests — t89a scoping pass
-2026-10-26 confirmed the site EXISTS, see T89a block below; run it in a fresh
-session with a full budget: build + 108 tests + record_playthrough + gate):
-UPGRADE the rewrite's
-combat resolution to the now fully-cited original law (docs/re/combat.md
-S2d+S2f+S2g+S2h — every leg instruction-verified in work/ascend_restored.bin):
-(1) FIRING ORDER = ship gizmo slots in STORED order, every cat-0 weapon
-engages per volley (0x4a5c1); (2) same-system gate (both ships
-system-state==4 && same system id, 0x4b982) + RANGE gate dist <=
-design[+0x3a]<<5 (0x4ba57, x2 when moves-flag flag&4 [inferred]); (3) DAMAGE
-= design Level-derived design[+0x52] GUNS / [+0x4a] specials (0x4bb2a,
-0x4d184);
-(4) DETERMINISTIC damage — no hit roll (measured-negative, S2h); (5) TWO-
-LAYER clamped absorb shield(+0x90-equiv) first, hull spill, death at
-integrity<1 (0x4b7c4..0x4b8a6); (6) POWER cost MIN(design power, moves)
-charged ONLY on commit (mode==1) paths 0x25560/0x25570, NumUses DEC on
-commit (0x4a390), unlimited when NumUses==0. Change site: rewrite/src/game/
-campaign.cpp combat phase (grep combatPhase/combat there — main.cpp and
-campaign.{h,cpp} are the files already carrying the 'combat' string), + a
-pinned behaviour test (volley order + shield-then-hull split + deterministic
-step, mirroring the t85g live sequence 40>38>36>34 and Ungooma 20>12->4>0).
-Rationale: t88a answered EVERY named OQ-010 residual with cited static
-evidence; the only remaining closure leg under strict-close is the contract's
-"names the code site that changed" — this is the last static step before the
-row can close with no capture at all. Do NOT re-verify the asm (S2h audited
-it); if the rewrite has no combat phase to upgrade (check first), that is an
-honest BLOCKED entry (rewrite never modelled combat), NOT a licence to close.
-Sitting watch: work/r1/playcap/live-timeline.jsonl was 5.68 GB, user idle at
-t1254 all day (watch.log latest readouts all t=1254, DAT_482fb=14); a NEW
-turn-boundary sitting outranks this -> scripts/r1_t85g_sitting.py first.
-OQ-021 passive watch continues: boundary sample 23/50, selector never armed.
+NEXT t90 (STATIC task, docs/re/aicode.md): W6-A3 AI TURN LOOP MAP —
+entry via the race.cpp-attributed ranges around the proven attitude scorer
+0x3ecb8 + build selector caller 0x3ead6 (income-law S9): map the AI turn
+structure (phase order, which functions decide research / expansion / fleet
+build / ship orders), bank as laws in docs/re/aicode.md (CREATE it — no
+regenerator touches docs/re/*; verify with git status that only your edit
+appears). If a cheap rewrite delta falls out of the map, do NOT implement it
+this iteration — bank it for t91 (one task per session; t89a showed budget
+splits die mid-edit).
+Rationale: OQ-010 CLOSED t89 (first ledger closure with a code change since
+t79) — every remaining open row is capture/user-blocked (OQ-003 packed
+entropy = OQ-005 class; OQ-016 residue, OQ-019 per-ship model + scale,
+OQ-020 amass period, OQ-021 end-ctrl threshold, OQ-023 state enum) or
+documented. The productive offline frontier is exactly the PLAN.md W6 queue;
+A1/A2 landed with t85g..t89, so A3 is next by the queue's own cheapest-first
+ordering, and it is the prerequisite for A4 (AI research selection) and A5
+(order dispatch). Sitting watch: work/r1/playcap/live-timeline.jsonl 5.69 GB,
+user idle at t=1254 DAT_482fb=14 all day 2026-10-26; a NEW turn-boundary
+sitting outranks this -> scripts/r1_t85g_sitting.py first.
+OQ-021 passive watch continues: boundary sample 23/50, selector never armed;
+now that combat is deterministic in the rewrite, any new sitting's combat
+frames are also a FREE cross-check against combat.md S2j (volley steps must
+equal design Levels).
+T89 LANDED (CODE task — OQ-010 CLOSED, the loop's first static-law closure
+with changed code sites): the assignment executed in full: (1) rewrite/src/
+game/campaign.cpp attackScore volley = SUM of researched cat-0 weapon Levels
+(NumUses!=0 gate) replacing v1 MAX — cites volley loop 0x4a5c1 every-weapon
+law + design[+0x52]==file Level (t87 t87_gizmo_table map); (2) defenseScore
+= HULL layer only (pop/10 + fortify 2) — the v1 shield-addend was REFUTED by
+the cited hit path 0x4b740, which never adds shields to a defense total but
+clamped-absorbs MIN(damage,[t+0x90]) and spills (0x4b7c4..0x4b7d1); the split
+is now Campaign::absorbSplit (campaign.h) used by combatPhase: capture iff
+volley - absorb > defenseScore; (3) the uniform(0,10) noise draws REMOVED per
+the S2g measured-negative hit roll — decision (b) of S2i taken explicitly,
+rng_ re-diversion regenerated ALL timelines and every checked seed stays
+FINITE inside the 1200 gate budget: 2024 Control t777, 42 Extinct t581,
+13 Extinct t503, 1 Control t842, 2 Control t677; PLAYTHROUGH.md regenerated
+(record_playthrough.sh echo-lines carried a stale 600 literal since T41 —
+fixed, display-only); (4) new shieldChargesFor() = SUM researched cat-1
+Levels (charge law 0x49f15); (5) TEST(campaign_combat_law_oq010) pins
+re-extracted file sums (10 weapons SUM=49, 6 shields SUM=16), the full-vs-
+no-tech volley delta == 49 (a MAX model cannot produce 49), absorb/clamp/
+spill edges, seed determinism over 40 FFA turns: 109 tests 0 failed.
+Ledger: OQ-010 row CLOSED (status cell + STATUS t89 with sites + caveats);
+ledger_audit default open set updated to
+{003,005,016,019,020,021,023}; STATE ledger block mirrors. combat.md gains
+S2j (landing + honest aggregate-model caveats: per-ship slots, same-system
+gate 0x4b982, range gate 0x4ba57, per-shot power accounting are NOT modelled
+— OQ-019 territory); turnloop.md §5 rewritten from [INFERRED] to the cited
+law. BLOCKED t89a budget-block marked RESOLVED. Mid-task self-corrections
+recorded: first defenseScore draft folded shields into the total (contradicts
+0x4b740, fixed before build), vector<bool> proxy trap in setAllTechs (fixed),
+const-qualified atk blocked SA_DoublePower doubling (compiler caught, fixed).
+Sitting watch: no new turn (all readouts t=1254). Gate GATE_EXIT=0, ledger_audit
+LEDGER AUDIT OK (open set now {003,005,016,019,020,021,023}).
 T89A LANDED (scoping pass for the t89 CODE task — budget-interrupted, honest
 negative, NO code change): the assignment's own "check first" gate EXECUTED
 and PASSED — rewrite/src/game/campaign.cpp:1247-1322 IS a combat phase
