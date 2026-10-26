@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-26T17:10
+updated: 2026-10-26T17:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -195,29 +195,72 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t90 (STATIC task, docs/re/aicode.md): W6-A3 AI TURN LOOP MAP —
-entry via the race.cpp-attributed ranges around the proven attitude scorer
-0x3ecb8 + build selector caller 0x3ead6 (income-law S9): map the AI turn
-structure (phase order, which functions decide research / expansion / fleet
-build / ship orders), bank as laws in docs/re/aicode.md (CREATE it — no
-regenerator touches docs/re/*; verify with git status that only your edit
-appears). If a cheap rewrite delta falls out of the map, do NOT implement it
-this iteration — bank it for t91 (one task per session; t89a showed budget
-splits die mid-edit).
-Rationale: OQ-010 CLOSED t89 (first ledger closure with a code change since
-t79) — every remaining open row is capture/user-blocked (OQ-003 packed
-entropy = OQ-005 class; OQ-016 residue, OQ-019 per-ship model + scale,
-OQ-020 amass period, OQ-021 end-ctrl threshold, OQ-023 state enum) or
-documented. The productive offline frontier is exactly the PLAN.md W6 queue;
-A1/A2 landed with t85g..t89, so A3 is next by the queue's own cheapest-first
-ordering, and it is the prerequisite for A4 (AI research selection) and A5
-(order dispatch). Sitting watch: work/r1/playcap/live-timeline.jsonl 5.69 GB,
-user idle at t=1254 DAT_482fb=14 all day 2026-10-26; a NEW turn-boundary
-sitting outranks this -> scripts/r1_t85g_sitting.py first.
-OQ-021 passive watch continues: boundary sample 23/50, selector never armed;
-now that combat is deterministic in the rewrite, any new sitting's combat
-frames are also a FREE cross-check against combat.md S2j (volley steps must
-equal design Levels).
+NEXT t91 (STATIC task, docs/re/aicode.md): W6-A4 AI RESEARCH PICKER —
+find the writer of race research-target word row+0x1d4e (and its partner
++0x1d5c accumulator reset sites) in the restored image. t90 narrowed the
+field: the completion consumer FUN_00046aec READS +0x1d4e and clears it
+to 0xffff on completion (aicode.md §3); the 0x257cf call site of
+FUN_00046fa0 is only a 0x1d72-byte restree buffer COPY (0x46870 loader
+fallback + 0x20c48 copy primitive) — so the PICK happens in the AI
+command executor FUN_00041260 (callees 0x38818 build-cmd/0x39894 —
+aicode.md §1 P8) or in the research module around 0x46fa0 (grep the
+image for moffs/disp disp reads+stores of 0x1d4e relative to row base
+0x2b057+race-row and of the restree runtime 0x7478b preferred mask).
+Method: objdump full-code scan for imm 0x1d4e / 0x1d5c operands
+(store-form census pattern = scripts/r1_t86_write_census.py), then
+decompile the enclosing function(s). Bank the PICK law in aicode.md §3
+(rewrite researchPhase uniform-random pick is UNCITED — if the original
+law is e.g. preferred-list-first like expansion 0x40018, bank the exact
+tier order + rng thresholds; rewrite delta = t92, one task per session).
+Rationale: t90 mapped the AI turn loop end-to-end; the two W6 items the
+map feeds directly are A4 (research picker — the ONLY AI decision still
+with zero cited law: build=done t28, expansion=selection half closed
+t90, diplomacy=structure cited) and A5 (order enum). A4 is cheaper
+(single field-writer census) and closes a rewrite placeholder the user
+explicitly named. A5 next after. Sitting watch: live-timeline 5.69 GB,
+user idle at t=1254 all week (sitting check 2026-10-26 16:40 ran clean:
+no new turn-boundary rows past t=1254, t85g sitting stands as newest); a
+NEW turn-boundary sitting outranks this -> scripts/r1_t85g_sitting.py
+first, and any new sitting's combat frames are a free cross-check of
+combat.md S2j (volley steps == design Levels).
+OQ-021 passive watch continues (boundary sample 23/50, selector never
+armed).
+T90 LANDED (STATIC task — W6-A3 AI TURN LOOP MAP CLOSED to docs/re/
+aicode.md, first content of that file): full phase-ordered map of the
+original turn: master FUN_00024f24 (single caller 0x55f06 in the
+END-TURN dispatcher FUN_00055df4) = random-event window -> income
+0x2501c -> ship orders 0x25023 -> research 0x2502f (FUN_00046aec) ->
+growth 0x2503c (t81 law) -> pop-cap 0x25056 -> per-race AI 0x25083/
+0x250a5 (FUN_0003e6e0, SKIP iff row idx == DAT_0007458e player idx) ->
+scored-star ownership scan (the INC-word producer at 0x251a2 for
+DAT_00048300 — first cited producer path near the OQ-021 field) ->
+command-exec tail incl. 0x2554f FUN_00041260 (the AI acts through the
+SAME gun/ability primitives 0x49f28/0x39c10 as the player — callee-set
+verified). Per-race decision block FUN_0003e6e0: eliminated-race fleet
+DEATH law (0x40ec0 collect -> 0x49d2c per ship), extinction writer
+(row+3 := 0xffffffff + event 0xa), decision block 0x3ea54 order =
+diplomacy chain (0x3ecb8->0x3ef2c->0x44690->0x3eb88) -> build-selector
+loop (0x3f130 called ONLY at 0x3eade on queue-empty own planets, gate
+[+0x5a]==0 && [+0x54]==0xff — t28 law re-verified from the caller side)
+-> expansion 0x40018 -> race maintenance 0x43b50 (integrity restore
+ship+0x8c := +0x98; global attitude FLOOR enemy-strength+20 write at
+0x43c36; moves x2 recharge loop 0x43c5b — the t85g boundary recharge is
+THESE TWO sites) -> per-ship orders 0x40178 (kind/target +0x58/+0x59;
+congregation-to-nearest-friend via 0x4aa10 starlane-cost table 0x45beb).
+Expansion SELECTION law cited: tech-legal candidates (0x46d3c prereq
+chain, restree rows) -> preferred-list scan (runtime 0x67be 11 u32) ->
+rng%100<45 sentinel -2 -> uniform rng fallback; store DAT_00076492[race]
+(19-site census). Research COMPLETION law cited (progress = +1/planet
+gated govtype==2&&word<15, + planet RES word; x1.2 f64 pair
+0x3feb3333; >= cost -> owned-mask +0x4a/+0x4b). NEW tool
+scripts/r1_t90_callgraph.py (rel32 edge census over obj0 + pinned caller
+sets, RC=0; pkl at work/t90_callgraph.pkl). NO ledger closure (strict-
+close — structure map, not a constant/formula closure): OQ-016 row
+annotated with the t90 status + explicit STILL-OPEN set (research PICKER
+= A4, order ENUM = A5, 0x43b50 tail/0x2ef60 cases = A6/A7, random-event
+module). No rewrite code change (map task by design; delta candidates
+listed aicode.md §5). Gate GATE_EXIT=0, ledger_audit LEDGER AUDIT OK.
+
 T89 LANDED (CODE task — OQ-010 CLOSED, the loop's first static-law closure
 with changed code sites): the assignment executed in full: (1) rewrite/src/
 game/campaign.cpp attackScore volley = SUM of researched cat-0 weapon Levels

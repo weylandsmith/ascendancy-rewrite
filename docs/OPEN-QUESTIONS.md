@@ -616,7 +616,27 @@ artifacts (pre-t33 raw reads), not original behaviour; species-modifier and
 outside-recalc-init candidates have NO support; load-time staleness refuted
 for observable values. Code site: rewrite/src/game/campaign.cpp channel
 chain (lines 27/53/543 implement, pin campaign_channel_law_oq016); harness
-r1_income_law.py --slot now searches ck/ AND save/ (t71 fix).
+r1_income_law.py --slot now searches ck/ AND save/ (t71 fix). t90 AI
+TURN-LOOP MAP (W6-A3, docs/re/aicode.md, tool scripts/r1_t90_callgraph.py
+RC=0): master turn FUN_00024f24 phase order pinned (income 0x2501c ->
+orders 0x25023 -> research 0x2502f -> growth 0x2503c -> cap 0x25056 ->
+per-race AI 0x25083/0x250a5 skip-player -> scored-star scan 0x250aa);
+build-selector caller-side CONFIRMED (0x3f130 called ONLY from the
+queue-empty planet loop 0x3eade, gate [+0x5a]==0 && [+0x54]==0xff — t28
+law re-verified); EXPANSION LAW closed-by-decompile for the SELECTION
+half: FUN_00040018 = tech-legal candidates (0x46d3c prereq-chain law)
+-> preferred-list scan (runtime 0x67be, 11 u32 template) -> rng%100<45
+sentinel -> uniform fallback; target stored DAT_00076492[race]
+(19-site writer/reader census cited); RESEARCH COMPLETION law cited
+(FUN_00046aec: progress = +1/planet gated (govtype 0x13bc4==2 && word
+<15) + planet RES word; x1.2 (0x3feb3333 pair); >= cost -> mask +0x4a/+0x4b
+set); ship orders FUN_00040178 kind/target +0x58/+0x59 + congregation-
+to-nearest-friend via starlane table 0x45beb (0x4aa10) [verified]. STILL
+OPEN (rides this row's expansion-cadence + remaining minutiae): research
+PICKER (who sets race+0x1d4e = W6-A4), order-ENUM numeric law (W6-A5),
+0x43b50 tail + 0x2ef60 case bodies (A6/A7), random-event module P0. No
+rewrite code change this iteration (map task; delta candidates banked in
+aicode.md §5 for t91).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:
