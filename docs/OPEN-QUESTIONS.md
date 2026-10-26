@@ -70,6 +70,58 @@ STILL OPEN: hit probability, firing order, 0x43a4c star-defense contribution,
 exact gizmos.txt column->+0x4a map (t86 check matched 1/76 on a strict
 5-field equality — see combat.md S2d caveats; power/range/level legs verified
 weapon-side, level verified shield-side). No rewrite change (strict-close).
+STATUS t87 (W6-A2 static, no capture): COLUMN MAP CLOSED 76/76 + TWO
+IDENTITY CORRECTIONS. Tool scripts/r1_t87_gizmo_table.py: loader
+FUN_00049074 store sites + runtime join (save/50.sav B=0x1bf4d8, member=
+B+0x82bb0+X) -> file cols Cat/Power/Range/Level/NumUses/Industry/Special1/
+Special2/ResReq/flags == design +0x32/+0x36/+0x3a/+0x3e/+0x42/+0x46/+0x4a/
++0x4e/+0x35/+0x33, ALL 76 rows + 76/76 names (exit 0). CORRECTION: +0x4a =
+FILE Special1 NOT Industry (t86 75/75 coincidence); Cat jump table 0x344b0
+copies Level->derived +0x56 (shields) etc. Case table decoded (combat.md
+S2f): dispatcher 0x4cd90 = SPECIAL-GIZMO ACTIVATION (13 singleton cases,
+cl==active gizmo id: 0x24 Recaller, 0x26 Smart Bomb AT-WAR-gated area
+0x4b740, 0x2e Catapult xyz-negate, 0x35 Cannibalizer self-damage, 0x3a
+Repair clamp at NEW field +0x98=max integrity, 0x41 Replenisher restores
+NumUses slot[+1], 0x45 Invulnerablizer sets +0x9c bit 0x10 (the absorb-null
+flag identity), 0x48 Self Destructotron = the t85g "combat loop" 0x4d075,
+0x4b Hyperfuel +40 moves; mode==1 charges power first at 0x4d594). CAT-0
+guns have NO case here => generic gun fire is in the other 0x4b740 callers
+(0x4bb56 nearest, t88). 0x43a4c identity CLOSED: NOT star defense — the
+DIPLOMACY-ON-ATTACK handler (attitude -= 10*(word[0x13bc4]+1), doubled if
+state==3, at-war returns 0, sets attacked-bitmap bit at
+[[edi+2]>>16+0x48304]). Row STAYS OPEN (strict-close): hit probability still
+no roll seen, firing order = caller 0x4a3c4 chain + generic-gun caller
+0x4bb56 undecoded. No rewrite change.
+STATUS t88 (W6-A3 static, no capture): GENERIC VOLLEY PATH FOUND, FIRING
+ORDER CLOSED, HIT PROBABILITY ANSWERED BY CITED ABSENCE. 0x4bb56 is inside
+cat-0 handler 0x4b8e4 (prologue verified; sole caller 0x4a3a0 in dispatcher
+0x4a360, which t87 mislabelled: it CATEGORY-dispatches design[+0x32] ->
+cat0 0x4b8e4 / cat1 0x4c794 / cat2 0x4ca50 / cat5 0x4cd90, and DEC slot[+1]
+NumUses at 0x4a390 on mode==1). FIRING ORDER: loop 0x4a5c1 iterates ship
+gizmo slots +0xab stride 7 in STORED order, fires EVERY cat-0 weapon
+(set [ship+0x63], call 0x49f28->0x4a360); stance setter 0x4a55c writes
+[ship+0x67]/[ship+0x68]=target. Gun law (combat.md S2g): same-system gate
+(+0x58==4 && +0x59 equal), range gate dist<=design[+0x3a]<<5 (+0x9c&4
+doubles), damage=design[+0x52] (derived Level), 0x4b740 two-layer clamped
+absorb shield+0x90 then hull+0x8c, death 0x49d2c, power charged at 0x4c614.
+HIT ROLL MEASURED NEGATIVE: zero rng edges in [0x4a360,0x4f097), LCG
+constant unique 0x7825b, full-body reads of 0x4b8e4/0x4b740 show no
+comparison of a random value — damage is deterministic per shot (matches
+t85g steps 40>38>36>34). Row STAYS OPEN (strict-close): closure needs the
+rewrite combatPhase UPGRADE at a cited code site (next task t89). Tool
+scripts/r1_t88_caller_census.py exit 0.
+STATUS t88a (audit pass, same day): S2g INSTRUCTION-RE-VERIFIED (dispatcher
+0x4a360, gate 0x49f28, volley loop 0x4a5c1, gun handler 0x4b8e4 gates +
+damage select + call 0x4bb56, hit path 0x4b740 whole body — all literal,
+combat.md S2h) + census tool re-run RC=0. NEW: COMMIT LAW CLOSED — of the
+13 callers of 0x49f28 exactly TWO pass mode==1 (0x25560 gun-commit, 0x25570
+->0x39c10 ability-commit, both inside player-command-exec 0x2547c after the
+0x41260 movement resolver; ah>=4 = assert trap 0x2a438); every AI-attack and
+volley path is a mode-0 dry-run (no DEC uses, no power charge). Self-destruct
+sites 0x4d191/0x4d2dd pass the dispatcher's mode variable (0x4d2dd gated
+at-war [edx+0x12fd6]==2). Row STAYS OPEN: all named residuals answered by
+cited absence/measurement, contract closure still needs the rewrite
+combatPhase code-site change (t89).
 OQ-003 | gam | .gam full record map + field meanings; packed entropy regions
 | open | W1 joint: planet records already joined file<->live RAM 151/151
 (stride 123); STAR TABLE + ORBIT LAWS closed 2026-10-06 map the neighbourhood

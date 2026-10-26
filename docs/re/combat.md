@@ -157,6 +157,190 @@ change this iteration (no shipped-behaviour claim touched). OQ-010 stays
 OPEN (strict-close): residual = order + 0x43a4c + column map + in-battle
 multi-hit verification.
 
+## 2f. t87 W6-A2: gizmo dispatcher case table, 0x43a4c identity, COLUMN MAP CLOSED
+
+### (c) gizmos.txt column -> design record — CLOSED 76/76 (tool scripts/r1_t87_gizmo_table.py)
+
+Loader FUN_00049074 (gizmos.txt referrer 0x49081) is the law, and its
+push/lea idiom 0x49126..0x49165 + `add esp,0x2c` pins the slot arithmetic:
+name->rec+0; then col1 Cat->BYTE +0x32 (S+0xc8), col2 Power->+0x36,
+col3 Range->+0x3a, col4 Level->+0x3e, col5 NumUses->+0x42, col6 Industry->
++0x46, col7 Special1->+0x4a, col8 Special2->+0x4e, col9 ResReq->BYTE +0x35
+(S+0xe8); flag bits -> WORD +0x33 (bits OR'd per listed bitpos, 255-terminated
+loop 0x491ff..0x49238). Runtime join (save/50.sav, B=0x1bf4d8 6/6 anchors,
+member = B+0x82bb0+X law): ALL 76 names byte-match AND all 10 mapped fields
+match the file 76/76 (VERDICT: FULL COLUMN MAP CLOSED, exit 0).
+CORRECTION to S2d: +0x4a == FILE Special1 column, NOT Industry (+0x46 is
+Industry). The t86 "+0x4a==Industry 75/76" was coincidence — Special1 values
+happen to lie in the same 0..100 range. Post-pass 0x4923a zeroes +0x52..+0x66
+then the Cat jump table at 0x344b0 copies Level(+0x3e) [cats 0,1,2,3] or
+Power(+0x36) [cat 4] into ONE derived slot per row (+0x52 scanner-ish, +0x56
+SHIELD strength, +0x5e, +0x62, +0x66=power-supplied) — explains t86's
++0x56==Level for shields. Weapon DAMAGE PER HIT = design[+0x3e] Level
+(Mass Barrage 1 .. Nanomanipulator 13), used at the cat-0 path 0x4d075;
+special gizmos apply design[+0x4a] Special1 (e.g. Gravity Distorter 65).
+
+### (a) Dispatcher 0x4cd90 = SPECIAL-GIZMO ACTIVATION HANDLER (tree re-read CORRECTS draft + t85g)
+
+Entry law (verified disasm 0x4cd90..0x4ce33): EAX=ship->ESI; EDX=mode arg
+(saved +0x73c); cl = BYTE[ [ship+0x63] ] = ACTIVE GIZMO ID (0xff -> assert
+0x2a428 msg 0x277d); EDI = 0x7650c+0x6a*cl (design row, t86 law); ebp =
+MIN(design[+0x36] Power, ship+0x88 Moves); accumulator (esp+0x72c, entry
+value 1-bit family computed 0x4cda4..0x4cdfd) gates everything: bit0==0 ->
+return 0x4d680. mode==1 -> 0x4d594 FIRST ([ship+0x88] -= ebp = POWER COST OF
+ACTIVATION), then FALLS INTO the case compare-tree 0x4d59a..0x4d680. Tree
+decoding trap: each `jbe target` follows `cmp cl,K` + `jb elsewhere` and
+therefore captures the SINGLE value cl==K, not a range. FULL CASE TABLE
+(every target body disassembled this session; gizmo names from the 76-row
+file list above):
+
+| cl | gizmo | target | effect (verified disasm) |
+|---|---|---|---|
+| 0x24 | Recaller | 0x4d033 | ship+0x59 := dword[[ship-owner-rel*2 + 0x12e1d]] (target-list reset to own-race law); calls 0x220a8, 0x21f58 |
+| 0x26 | Smart Bomb | 0x4d274 | loop ships (0x22304); per ship: call 0x4b740 ONLY when relation BYTE [0x12fd6 + att_row + def] == 2 (AT-WAR gate through the diplomacy matrix) — area damage is LAW-GATED, not indiscriminate |
+| 0x27 | Gravity Distorter | 0x4d332 | loop ALL ships, skip self (cmp esi,ecx @0x4d360), per-pair f32[3] delta of +0x9e (kinematic field build 0x4d332..0x4d4f6) |
+| 0x2e | Gravimetric Catapult | 0x4ce4c | ship xyz +0x9e/+0xa2/+0xa6 := NEGATED f32[3] in place |
+| 0x35 | Cannibalizer | 0x4d1e7 | [ship+0x8c] INTEGRITY -= design[+0x4a] (=5); [ship+0x88] += design[+0x4e] (=20); hull<1 -> 0x49d2c death |
+| 0x38 | Gravimetric Condensor | 0x4cf05 | loop ships; filter [t+0x58]==4; f64 distance (0x76da0) of t+0x9e vs design[+0x4e]*32 (=10*32) |
+| 0x39 | Accutron | 0x4d546 | OR BYTE [ship+0x9c], 4 |
+| 0x3a | Remote Repair Facility | 0x4cffb | [ship+0x8c] += design[+0x4a] (=5), CLAMPED at [ship+0x98] (max integrity — first sighting of a +0x98 MAX-INTEGRITY field) |
+| 0x3f | Toroidal Blaster | 0x4d50e | 0x49714(ship,2) slot-find (-1 -> exit); 0x496e4 rebuild; OR [ship+0x9c], 2 |
+| 0x41 | Replenisher | 0x4d228 | loop own gizmo slots ([ship+0x15a] count, stride 7 from ship+0xab): skip 0xff/0x41; slot[+1] WORD := design[gizmo][+0x42] NumUses — RESTORES PER-GIZMO USE COUNTS |
+| 0x45 | Invulnerablizer | 0x4d560 | OR BYTE [ship+0x9c], 0x10 (the t85g flag that NULLS the +0x90 shield absorb at 0x4b7bc — identity now MEASURED: this bit = INVULNERABLE, set by the Invulnerablizer) then slot rebuild (esi+0xab + 7*((ship+0x63 - EAX)/7) via 0x496e4) |
+| 0x48 | Self Destructotron | 0x4d075 | THE FIRE LOOP: per-target over ship list, squared dist (double) vs design[+0x3a]Range*32 (=40*32) -> call 0x4b740 hit path |
+| 0x4b | Hyperfuel | 0x4d1a9 | [ship+0x88] MOVES += design[+0x4a] (=40); slot rebuild/removal via 0x496e4 |
+
+NO CASE (falls to ret): all CAT-0 guns 0x00..0x09, shields, drives,
+scanners, generators, and specials 0x25,0x3b..0x3e,0x40,0x42..0x44,0x46..0x47,
+0x49,0x4a. => CORRECTIONS: (1) t85g's "function 0x4d075 = the ship-combat
+loop" is now scoped — it is the SELF-DESTRUCTOTRON case body (area blast),
+not the generic gun path; (2) this dispatcher handles ONLY cat-5 special
+activation + power accounting. GENERIC GUN FIRE must live in one of the
+OTHER 0x4b740 callers: {0x1a146, 0x39d9f, 0x3a0b3, 0x4bb56} (call-site scan
+for rel32 e8 edges this session) — 0x4bb56 is in the same module family
+(neighbouring the dispatcher) and is the t88 candidate. Dispatcher's sole
+caller in the image: 0x4a3c4 (inside the 0x4a6a6 fire-loop module that also
+zeroes/charges +0x90 — t86). FIRING-ORDER: within this dispatcher, mode==1
+charges power BEFORE the effect runs (0x4d594 fall-through); per-gizmo
+NumUses decrement sites = slot[+1] WORD (writer set 0x4d228 family + the
+rebuild helper 0x496e4) — the FULL multi-gizmo ordering is the caller 0x4a3c4
+loop, t88 target.
+
+### (b) 0x43a4c — IDENTITY CORRECTED: NOT star defense, the DIPLOMACY-ON-ATTACK handler
+
+Verified disasm 0x43a4c..0x43b0e. Args EAX=obj(relations base), EDX=dx target
+race idx (asserts dx>=0 and dx < word[0x13b98] race count 0x21d8; EBX=edi
+non-null assert msg 0x84d94). Law: state=BYTE[obj+dx+0x1c0]; if state==2
+(AT WAR) -> return 0 (no hostility change needed); else hostility DELTA
+d = 10*(word[0x13bc4]+1), DOUBLED if state==3; obj+dx word+0x1b2 ATTITUDE
+-= d; if state==3 clamp attitude <= word[obj+0x1cf]-10; then set a bit in the
+global "attacked" bitmap: BYTE[[edi+2]sar16 + 0x48304] |= 1<<byte[obj];
+return -1 on the bitmap path, 0 on the at-war path. So the t85g hit path's
+"star-defense contribution?" call is the ATTITUDE/WRITING-MARK consequence of
+firing at a non-at-war power — directly explains the t85g diplomacy observations
+(att moves on combat) and is the SAME 0x1b2/0x1c0 law as docs/re/diplomacy.md.
+
+OQ-010 residual after t87: multi-hit/RNG roll still unseen (no roll in any
+case body disassembled — damage per call IS deterministic design[+0x3e] or
+design[+0x4a]); caller chain 0x4a3c4 (who orders firing, ORDER law); case
+0x4cf05 distance-use tail + cl==0x47 routing re-read. NO rewrite code change
+(no shipped behaviour claim touched this iteration).
+
+## 2g. t88 W6-A3: GENERIC CAT-0 GUN PATH + FIRING ORDER + HIT PROBABILITY (all measured, restored image objdump)
+
+Sitting check first: live-timeline.jsonl 238,216 rows, watch.log tail all
+t=1254 — NO new turn since t87, assignment stands. Census tool
+scripts/r1_t88_caller_census.py re-run GREEN (exit 0): callers(0x4b740) ==
+exactly {0x1a146,0x39d9f,0x3a0b3,0x4bb56,0x4d191,0x4d2dd}; callers(0x4a360)
+== {0x49f45}; LCG 0x41c64e6d embedded EXACTLY once (0x7825b); zero rel32 rng
+edges {0x78249,0x7824f,0x78273} in [0x4a360,0x4f097) — the FULL combat
+module family, extended this turn past t86's window.
+
+### Unified gizmo-use dispatcher 0x4a360 (whole body decoded, corrects t87 "shot dispatcher")
+
+EAX=ship, EDX=mode (1 = commit). ecx=[ship+0x63]=ACTIVE slot ptr; edi =
+0x7650c+0x6a*gizmo design row. NumUses law 0x4a373..0x4a394: esi=0 iff
+slot[+1] WORD==0 (0 = unlimited per gizmos.txt header — VERIFIED consumer);
+mode==1 -> DEC WORD[slot+1] at 0x4a390 = THE USE CONSUMPTION SITE. Then
+CATEGORY dispatch on BYTE design[+0x32] (0x4a399..0x4a3c4):
+cat 0 -> 0x4b8e4 (WEAPONS, below); cat 2 -> 0x4ca50 (drives);
+cat 1 -> 0x4c794 (shields + gizmo-0x46 build leg); cat 5 -> 0x4cd90 (t87
+specials). Caller 0x49f28 gates on BYTE[ship+0x62]: 0 -> 0x49f54 (movement/
+target bookkeeping from +0x67/+0x68), 1 -> 0x4a360; result -> [ship+0x84].
+Power accounting: ebp = MIN(design[+0x36], ship+0x88) at entry; charged at
+handler tail on mode 1 (e.g. 0x4c614: [ship+0x88] -= cost).
+
+### FIRING-ORDER LAW CLOSED — loop 0x4a55c (stance setter + ordered volley)
+
+0x4a55c (EAX=ship, DL stance arg, ebx=target; callers 0x41b4e/0x421d0/
+0x42351/0x42e24/0x43153/0x43301 in the AI-attack module): if [ship+0x88]
+MOVES==0 return 0; sets [ship+0x62]:=1 and stance map (verified 0x4a570..
+0x4a586): arg 0 -> +0x67=2, arg 1 -> +0x67=1, arg 2 -> +0x67=0 (default
+assert 0x2623); [ship+0x68] := target. VOLLEY LOOP 0x4a5c1..0x4a5fc: for i in
+0..[ship+0x15a) stride 7 over ship+0xab gizmo slots IN STORED ORDER, skip
+0xff, gate design[gizmo][+0x32]==0 (CAT==0 weapons ONLY), set [ship+0x63] :=
+slot ptr, call 0x49f28 (-> 0x4a360 -> cat0 -> 0x4b8e4); remember slot on
+result bit0. => FIRING ORDER = ship slot-array order (build order), EVERY
+cat-0 weapon fires per engagement, no interleaving across ships here.
+0x4a602 = companion slot-scan (first cat-0 slot with power/uses, -1 none).
+
+### GENERIC GUN HANDLER 0x4b8e4 (t88 primary target; 0x4bb56 call site inside)
+
+Prologue 0x4b8e4 verified (push*5; sub esp,0x50c; EAX=ship -> ebp, mode ->
+esp+0x4d0). Law (all disasm-verified this session):
+1. active gizmo = BYTE[[ship+0x63]] (0xff assert 0x2a428), EDI design row,
+   ebp = MIN(Power, ship+0x88).
+2. TARGET = [ship+0x68] (null assert 0x2734); SAME-SYSTEM GATE 0x4b982..
+   0x4b99d: BYTE[ship+0x58]==4 && BYTE[target+0x58]==4 && ship[+0x59]==
+   target[+0x59] (system-object identity) — guns only hit ships in the
+   same system (matches t85g mid-turn frames: combat is per-system).
+3. RANGE GATE 0x4b9bd..0x4bab2: 3D distance (f64 0x76da0) of +0x9e f32[3]
+   vs design[+0x3a]<<5; flag [ship+0x9c]&4 doubles the limit (fmul const —
+   CAVEAT: the const disp32 ds:0x2743/0x2747 land BELOW code start 0x14bb0
+   in the restored image (header region unrestored) — value not readable
+   statically; the cat-1 twin uses ds:0x85312==2.0 [verified f32], so 2x is
+   the [inferred] reading). Gizmo 0x2f has a second tighter gate.
+4. DAMAGE ebx = (BYTE design[+0x32]==0) ? DWORD design[+0x52] : 0 — the
+   t87-derived derived-Level slot (jump table 0x344b0 copy of +0x3e);
+   gizmo 0x2f overrides to design[+0x4a].
+5. CALL 0x4b740 hit path (0x4bb56): EAX=target ship, EDX=mode, ECX=
+   [ship+0x54]>>16 (ATTACKER race idx), EBX=damage.
+6. mode==1 tail 0x4c614: [ship+0x88] -= power cost, then PER-GIZMO
+   AFTER-EFFECT TREE on the gizmo id (0x4c623..0x4c777: cases 0x21..0x44 —
+   incl the 0x4c70c case zeroing target [esi+0x90] shields + setting +0x9c
+   bit8 = shield-strip after-effect).
+
+### HIT PATH 0x4b740 whole-body re-read (t85g partial -> now complete)
+
+Asserts attacker/target race idx < word[0x13b98]. INVULNERABLE gate:
+[ship+0x9c]&0x10 -> shield absorb zeroed (t87 flag identity re-confirmed
+in-consumer). TWO-LAYER CLAMP: absorb = MIN(damage, shield +0x90) else
+remainder spills to hull, set return-flag bit2; hull clamp at +0x8c sets
+bit4. mode==1: owner-state word 0x1b2 row via 0x13bc5 star-owner stride-96
+index, then CALL 0x43a4c (t87 diplomacy-on-attack). APPLY 0x4b87a: [t+0x90]
+-= shield_absorb; [t+0x8c] -= hull_absorb; hull<1 -> CALL 0x49d2c death
+(eax=target, edx=[t+0xa7]); if victim owner == DAT_0007458e and
+DAT_0007e582>>16 != 0x10 -> event call 0x55a60(0xc, msg 0x7a35c). RETURN =
+flags byte (bit0 ok / bit2 shield-overflow / bit4 lethal) — matches
+t85g's observed +0x8c volley steps.
+
+### HIT PROBABILITY: MEASURED NEGATIVE — there is NO roll
+
+Full disassembly of 0x4b8e4 + 0x4b740 + all dispatcher/handler bodies shows
+NO rng call and NO comparison of a random value against anything; combined
+with zero rel32 rng edges across [0x4a360,0x4f097) and the single-image LCG
+embedding (0x7825b), combat damage is DETERMINISTIC: every in-range,
+gate-passing shot applies design[+0x52] damage split shield-then-hull. The
+rng hits at 0x39922/39944/39962 are AI target-position JITTER (rng%1000-500
+per axis, clamp 250.0f push 0x437a0000), not a hit roll. OQ-010's
+"hit probability" residual is answered by cited absence (scan + full-body
+read), consistent with t85g live steps 40>38>36>34 (always-hit, step 2).
+
+REMAINING OQ-010 LEG (next task): rewrite UPGRADE of combatPhase to the now-
+cited laws (ordered cat-0 volley, 2-layer clamped absorb, deterministic
+damage design-derived, same-system gate, power/uses accounting) — a CODE
+task, contract requires a changed code site before the row closes.
+
 ## 2e. The t86-remaining queue (static, no capture needed)
 1. Writers of ship [reg+0x90] (u16/u32 stores; subtract census done for
    +0x8c only) + init sites -> shield-layer identity test.
@@ -167,6 +351,98 @@ multi-hit verification.
    dispatch via the SOPatrol table at the ref site near 0x27d-offset
    family and the battle-control module).
 4. Named-key AI parameters: SHIP_PATIENCE (+0x1b0) readers.
+
+## 2h. t88a AUDIT of the S2g draft (same-day verification pass, objdump
+## work/ascend_restored.bin; census tool scripts/r1_t88_caller_census.py RC=0
+## re-confirmed: callers(0x4b740) == 6-set, callers(0x4a360)=={0x49f45}, LCG
+## constant unique @0x7825b, zero rel32 rng edges in the three windows)
+
+The t88 draft died mid-session with S2g written but UNCOMMITTED. This pass
+re-verified every load-bearing S2g claim instruction-by-instruction and adds
+the caller-mode census below.
+
+VERIFIED AS DRAFTED:
+* Dispatcher 0x4a360 (disasm 0x4a360..0x4a3cf): ecx=[ship+0x63] slot, edi
+  = sx32(slot[0])*0x6a design row; esi=0 iff WORD[slot+1]==0 (unlimited);
+  mode==1 -> dec WORD[slot+1] at 0x4a390; dispatch BYTE design[+0x32]
+  (0x4a399..0x4a3c4): 0->0x4b8e4, 2->0x4ca50, 1->0x4c794, 5->0x4cd90;
+  result -> ebx -> eax. Gate 0x49f28 (0x49f28..0x49f52): BYTE[ship+0x62]
+  0 -> call 0x49f54 (movement/target bookkeeping), 1 -> call 0x4a360
+  (sole caller edge 0x49f45), result -> [ship+0x84].
+* Volley loop 0x4a5c1..0x4a5fc: ebx=i, ecx=&slot(i*7 from ship+0xab);
+  gate i < [ship+0x15a]; skip 0xff; skip unless BYTE design[+0x32]==0
+  (cmp [eax+0x7653e],0); [ship+0x63]:=slot; call 0x49f28 (0x4a5f1);
+  test al,1 -> remember slot. FIRING ORDER = stored slot order, every
+  cat-0 gun fires per engagement. Stance setter 0x4a55c verified:
+  [ship+0x88]==0 -> return 0; [ship+0x62]:=1; arg->+0x67 map (0->2,
+  1->1, 2->0, default assert 0x2623); [ship+0x68]:=target. 0x4a602 is a
+  real second function (first cat-0 slot with power/uses, -1 none) with
+  ZERO rel32 callers (batmode-table or dead — not load-bearing).
+* Gun handler 0x4b8e4 (prologue push*5 sub esp,0x50c verified):
+  same-system gate 0x4b982..0x4b99d verified literally ([ebp+0x58]==4 &&
+  ==[esi+0x58] && [ebp+0x59]==[esi+0x59]); range: xyz sumsquares -> call
+  0x76da0 sqrt, limit design[+0x3a]<<5 (0x4ba57), [ship+0x9c]&4 -> fmul
+  ds:0x2743 (header-region const, unrestored — 2x stays [inferred],
+  cat-1 twin ds:0x85312==2.0 verified); gizmo 0x2f second tighter gate
+  ds:0x2747. DAMAGE 0x4bb2a..0x4bb43 verified: ebx=0; if design[+0x32]==0
+  ebx=design[+0x52]; if gizmo==0x2f ebx=design[+0x4a]; ebx==0 -> skip
+  (or flag 0x10). Hit call 0x4bb56 verified (eax=target esi, edx=mode,
+  ecx=[ship+0x54]>>16, ebx=damage). mode!=1 exits at 0x4bb7a WITHOUT
+  charging; mode==1 -> 0x4c614: [ship+0x88] -= MIN(design[+0x36],
+  ship+0x88) then per-gizmo after-effect tree 0x4c623.. (verified
+  0x4c614..0x4c638).
+* Hit path 0x4b740 whole body (0x4b740..0x4b8e3 disassembled this pass):
+  two-layer clamp verified literally (shield absorb edi=min(dmg,[esi+0x90])
+  else spill ebp, or-flag bit2 at 0x4b7d1; hull clamp at +0x8c sets bit4
+  0x4b7e8; [esi+0x9c]&0x10 zeroes edi at 0x4b7bc); apply 0x4b87a..
+  0x4b890 (sub then store, shield first then hull); death ebx<1 ->
+  call 0x49d2c(eax=target, edx=[t+0xa7]) 0x4b89b..0x4b8a6; victim-owner
+  event 0x55a60(0xc) gated on DAT_0007458e && DAT_0007e582>>16!=0x10;
+  return flags byte [esp+0xc]. NO rng edge, NO random-compare anywhere in
+  0x4b740..0x4b8e3 (hit-probability MEASURED NEGATIVE stands).
+
+NEW THIS PASS — mode census at ALL 13 callers of 0x49f28 (which paths
+commit with mode==1):
+* mode==0 (probe/no-charge): 0x15cc5, 0x15df0, 0x16ee1 (batmode), 0x415c5,
+  0x4240a, 0x4247f, 0x433ba, 0x4342f, 0x438af, 0x439c9 (AI-attack module —
+  AI plans with mode 0; several set stance byte +0x67:=5 FIRST, a stance
+  value the 0x4a55c setter never writes: 5 = "use gizmo <slot>" mode),
+  0x4a5f1 (volley loop itself probes mode 0!).
+* mode==1 (commit: DEC uses, charge power, apply damage) — THE ONLY TWO:
+  0x25560 and 0x25570, inside the PLAYER command-execution function
+  0x2547c (per-system loop over [campaign+0x3335] stride 0x60, ownership
+  bits [ship+0x14]|[ship+0x15] masked by 1<<DAT_0007458e, after the
+  0x41260 movement resolver returns a command byte ah): ah==3 -> commit
+  call 0x49f28(ship,1); ah==2 -> commit call 0x39c10(ship,1) (ability
+  use path); ah>=4 -> runtime error 0x2a438(0x8f5, 0xd92) (bounds trap,
+  string line 0xd92). => COMMIT LAW CLOSED: gizmo effects apply ONLY in
+  the player-command-exec phase via these two edges; all AI/volley paths
+  are mode-0 dry-run probes that charge nothing. [verified disasm
+  0x2547c..0x2559d this session]
+* Self-destruct sites (dispatcher 0x4cd90 case, t87): 0x4d191 and 0x4d2dd
+  pass edx=[esp+0x73c] (dispatcher's own mode copy, not a constant);
+  0x4d2dd additionally gated on relation byte [edx+0x12fd6]==2 (at-war)
+  at 0x4d2ca. Damage ebx=design[+0x4a] at both (0x4d184/0x4d2da) —
+  consistent with t86's [edi+0x4a] reading for SPECIALS (column map
+  t87: +0x4a = file Special1; cat-0 GUNS use +0x52, NOT +0x4a).
+* Orbital/other hit callers: 0x1a146 passes edx=0 (probe; mov edx,1 at
+  0x1a112 is stored to the stack at 0x1a12b and edx is re-zeroed at
+  0x1a13f — mode-0 dry-run from batmode family; damage ebx=[reg+0x4a] of a
+  0x4f48-offset table object; result bit4 (lethal) tested at 0x1a14b);
+  0x3a0b3 edx=1, damage = 2*x (add ebx,ebx 0x3a0b1) gated on table byte
+  ==0x17; 0x39d9f edx=ebp (variable). These three are the non-gun
+  ability/defense fire edges — all also mode-1-capable.
+
+HONEST STATUS: every named OQ-010 residual now has a cited static answer
+(firing order = stored slot order 0x4a5c1; hit probability = none,
+measured-negative; damage = design[+0x52] guns / [+0x4a] specials; two-
+layer absorb + death + power/uses accounting all instruction-verified;
+commit law = 0x25560/0x25570 only). Row STAYS OPEN under strict-close:
+closure additionally requires the rewrite combatPhase UPGRADE at a cited
+code site (contract: closed rows name the changed code site) — NEXT TASK.
+Vendor gizmos.txt header (work/r1/game/gizmos.txt lines 15-40) confirms
+the semantics lifted: Level=damage(weapons)/strength(shields), Power=cost,
+NumUses=uses per turn (0=no limit).
 
 ## 3. Cross-effects banked same sitting (diplomacy)
 

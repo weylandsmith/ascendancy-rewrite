@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-26T12:10
+updated: 2026-10-26T15:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -59,11 +59,13 @@ ledger:
       field map 15/15 (u16@25==0x0911 constant, audio.md §2.1, voc.cpp
       pins); race->theme map REFUTED (DAT_00010ba0 single writer 0x21309)"
   open:
-    - "OQ-010 combat application formula — R1 frontier; t86: shield layer =
-      +0x90 charged from CAT==1 gizmo Level design[+0x56]; attacker operand =
-      static design table 0x7650c+0x6a*g (dispatcher 0x4cd90, NOT battle obj);
-      residual = hit prob, firing order, 0x43a4c, +0x4a column identity
-      (docs/re/combat.md S2d; NEXT t87 case-table decode)"
+    - "OQ-010 combat application formula — R1 frontier; t88a: FULL static law
+      banked + instruction-audited (combat.md S2d/S2f/S2g/S2h): firing order =
+      stored gizmo-slot order 0x4a5c1, damage = design[+0x52] guns / [+0x4a]
+      specials, NO hit roll (measured-negative), two-layer clamped absorb +
+      death 0x49d2c, COMMIT law = mode==1 only at 0x25560/0x25570
+      (player-command-exec 0x2547c); residual = rewrite combatPhase upgrade
+      at a cited code site (t89 CODE task)"
     - "OQ-003 .gam full record map — joint with OQ-010 (planet records joined
       151/151 @ stride 123; STAR TABLE + ORBIT laws closed 2026-10-06 give the
       neighbourhood map: star stride 96, planet ptrs name+0x2A, orbit pair
@@ -184,23 +186,73 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t87 (W6-A2, static, offline): finish the gizmo dispatcher decode —
-(a) the 0x4cd90 case table: every case target (0x4ce4c,0x4cf05,0x4d033,
-0x4d075,0x4d1a9,0x4d1e7,0x4d228,0x4d274,0x4d332,0x4d50e,0x4d546,0x4d560,
-0x4d594) gets a one-line identity (which gizmo category/mode, which fields
-it reads/writes) — this names FIRING ORDER and the remaining effect modes;
-(b) call 0x43a4c (star-defense contribution inside hit path 0x4b740 @
-0x4b875) decompiled; (c) settle the gizmos.txt column -> design-record map
-with a runtime-vs-file join done RIGHT (the t86 5-field equality failed
-1/76 because I asserted a wrong column set, not because the table is wrong
-— power@+36/range@+3a/level@+3e=+56 legs verified; +0x4a identity open).
-Rationale: t86 proved the attacker operand is the static design table, so
-the whole OQ-010 application law is now statically reachable; the case
-table is the cheapest next probe and directly feeds the rewrite's
-combatPhase upgrade decision. Check work/r1/playcap/live-timeline.jsonl
-growth first; re-run scripts/r1_t85g_sitting.py after any new user sitting
-(a NEW turn-boundary sitting outranks this assignment; t86 re-check
-measured t1254 idle: zero +0x8c/+0x90 mid-turn diffs in the 1064 today rows).
+NEXT t89 (CODE task, closes OQ-010 if it passes tests): UPGRADE the rewrite's
+combat resolution to the now fully-cited original law (docs/re/combat.md
+S2d+S2f+S2g+S2h — every leg instruction-verified in work/ascend_restored.bin):
+(1) FIRING ORDER = ship gizmo slots in STORED order, every cat-0 weapon
+engages per volley (0x4a5c1); (2) same-system gate (both ships
+system-state==4 && same system id, 0x4b982) + RANGE gate dist <=
+design[+0x3a]<<5 (0x4ba57, x2 when moves-flag flag&4 [inferred]); (3) DAMAGE
+= design Level-derived design[+0x52] GUNS / [+0x4a] specials (0x4bb2a,
+0x4d184);
+(4) DETERMINISTIC damage — no hit roll (measured-negative, S2h); (5) TWO-
+LAYER clamped absorb shield(+0x90-equiv) first, hull spill, death at
+integrity<1 (0x4b7c4..0x4b8a6); (6) POWER cost MIN(design power, moves)
+charged ONLY on commit (mode==1) paths 0x25560/0x25570, NumUses DEC on
+commit (0x4a390), unlimited when NumUses==0. Change site: rewrite/src/game/
+campaign.cpp combat phase (grep combatPhase/combat there — main.cpp and
+campaign.{h,cpp} are the files already carrying the 'combat' string), + a
+pinned behaviour test (volley order + shield-then-hull split + deterministic
+step, mirroring the t85g live sequence 40>38>36>34 and Ungooma 20>12->4>0).
+Rationale: t88a answered EVERY named OQ-010 residual with cited static
+evidence; the only remaining closure leg under strict-close is the contract's
+"names the code site that changed" — this is the last static step before the
+row can close with no capture at all. Do NOT re-verify the asm (S2h audited
+it); if the rewrite has no combat phase to upgrade (check first), that is an
+honest BLOCKED entry (rewrite never modelled combat), NOT a licence to close.
+Sitting watch: work/r1/playcap/live-timeline.jsonl was 5.68 GB, user idle at
+t1254 all day (watch.log latest readouts all t=1254, DAT_482fb=14); a NEW
+turn-boundary sitting outranks this -> scripts/r1_t85g_sitting.py first.
+OQ-021 passive watch continues: boundary sample 23/50, selector never armed.
+T88A LANDED (S2g audit + COMMIT LAW): re-verified instruction-by-instruction
+every load-bearing t88 draft claim (dispatcher 0x4a360 category legs, gate
+0x49f28 [ship+0x62], volley loop 0x4a5c1 stored-order law, gun handler
+0x4b8e4 same-system/range/damage gates, hit call 0x4bb56 arg law, hit path
+0x4b740 full body incl. two-layer clamp + death 0x49d2c + event 0x55a60) —
+census tool scripts/r1_t88_caller_census.py RC=0 (6 callers of 0x4b740,
+LCG unique 0x7825b, zero rng edges [0x4a360,0x4f097)). NEW MEASUREMENT: mode
+census of all 13 callers of 0x49f28 — mode==1 COMMIT edges are EXACTLY
+0x25560 (gun) and 0x25570 (ability 0x39c10) inside player-command-exec
+0x2547c (per-system loop stride 0x60 @campaign+0x3335, ah==3 gun / ah==2
+ability / ah>=4 assert 0x2a438); AI-attack module + volley loop all pass
+mode==0 dry-run. Self-destruct 0x4d191/0x4d2dd pass the dispatcher mode var
+(0x4d2dd at-war-gated [edx+0x12fd6]==2). Banked docs/re/combat.md S2h +
+OPEN-QUESTIONS t88a status. OQ-010 STAYS OPEN (strict-close: needs the code
+site change = t89). No code change this iteration. Gate + audit green.
+T87 LANDED (W6-A2 gizmo dispatcher case table + column map CLOSED):
+(c) CLOSED-BY-MEASUREMENT: gizmos.txt -> design record map 76/76 rows,
+76/76 names, 10/10 fields (tool scripts/r1_t87_gizmo_table.py exit 0;
+loader FUN_00049074 store sites 0x49183..0x491d3 + runtime join save/50.sav,
+B=0x1bf4d8 6/6 anchors, member=B+0x82bb0+X). CORRECTS t86: +0x4a = FILE
+Special1 column, NOT Industry (the t86 75/76 "Industry" match was value
+coincidence); +0x46 is Industry. Post-pass 0x4923a + Cat jump table 0x344b0
+derive +0x52/+0x56/+0x5e/+0x62/+0x66 from Level (cats 0-3) or Power (cat 4).
+(a) case table decoded (combat.md S2f, all 13 case bodies disassembled):
+0x4cd90 is the SPECIAL-GIZMO ACTIVATION handler (tree trap: every jbe after
+cmp+jb captures a SINGLE cl value, not a range) — 0x24 Recaller target-list
+reset, 0x26 Smart Bomb area fire GATED on relation byte==2 (0x12fd6 matrix),
+0x2e Gravimetric Catapult negates ship xyz, 0x35 Cannibalizer self-damage +
+moves gain, 0x38 Condensor range scan, 0x3a Remote Repair heals clamped at
+NEW FIELD +0x98 = max integrity, 0x3f/0x39/0x41/0x45 flag/charge ops
+(+0x9c bits 2/4/0x10 — Invulnerablizer sets the absorb-null bit t85g saw at
+0x4b7bc), 0x48 Self Destructotron = 0x4d075 (t85g's "combat loop" SCOPED to
+this case), 0x4b Hyperfuel +40 moves; mode==1 charges power before the
+effect (0x4d594). (b) 0x43a4c identity CLOSED: NOT star-defense — the
+DIPLOMACY-ON-ATTACK handler (attitude -= 10*(word[0x13bc4]+1), doubled at
+state==3, at-war short-circuits, attacked-bitmap [[edi+2]>>16 + 0x48304]
+bit-set). OQ-010 stays OPEN (strict-close): hit-probability roll still
+unseen anywhere, firing order lives in the generic-gun caller chain (t88);
+the four 0x4b740 callers banked. No rewrite code change. Gate + audit green.
 T86 LANDED (W6-A1 shield-layer census + attacker-object correction):
 tool scripts/r1_t86_write_census.py (store-form byte census, objdump
 boundary-verified, R12-safe; control passed: finds 0x4d1ea). Results
