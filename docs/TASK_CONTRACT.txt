@@ -1,0 +1,41 @@
+One iteration of the Ascendancy closeout loop. You are a FRESH session with no
+memory of previous iterations — everything you need is on disk.
+
+READ FIRST (in this order, they are the control plane):
+  1. docs/STATE.md  — "## NEXT ACTION (exactly one)" is your assigned task.
+  2. docs/GOAL.txt  — outcome, strict-close policy, standing constraints.
+  3. docs/REFUTED-ROUTES.md — binding negatives; a refuted route is DEAD,
+     re-trying it wastes the iteration.
+  4. docs/OPEN-QUESTIONS.md — the ledger your work must move forward.
+  5. work/r1/playcap/live-timeline.jsonl growth — if the user played since the
+     last iteration, re-run scripts/r1_t85g_sitting.py BEFORE starting the
+     NEXT ACTION (a new sitting outranks a stale assignment).
+
+DO EXACTLY ONE TASK: the STATE.md NEXT ACTION (or the steering note, if the
+harness prepended one). Work it to a real conclusion with tool output, not a
+plan. Do not start a second task afterwards — the harness starts a fresh
+session for that, and continuing here only burns context toward compaction.
+
+FINISH SEQUENCE (mandatory, in order, before you stop):
+  a. Bank findings in docs/re/*.md (hand-authored; check nothing regenerates
+     the file — see docs/BLOCKED.md traps).
+  b. Update docs/OPEN-QUESTIONS.md status for any row you touched. STRICT-CLOSE:
+     a plausible default NEVER closes a row; only cited measurement does. If
+     nothing closed, write the honest negative and keep the row open.
+  c. Rewrite docs/STATE.md "## NEXT ACTION (exactly one)" to name the ONE next
+     task, with its ordering rationale inline, and append a dated LANDED block
+     summarizing what this iteration proved. The next session must be able to
+     resume from STATE.md ALONE — assume you will not be remembered.
+  d. bash scripts/gate.sh > /dev/null 2>&1; echo GATE_EXIT=$? — must be 0.
+     Also python3 scripts/ledger_audit.py must print LEDGER AUDIT OK.
+  e. git add the docs/scripts you touched and git commit (message names the
+     task id, e.g. "t86: ..."). Never commit game/ changes or secrets.
+
+NEVER: modify game/ (gate enforces checksums); mount the pristine game dir for
+capture runs (scratch copies only, see docs/BLOCKED.md); run a second
+long-running capture; spawn subagents with web/browser toolsets.
+
+If you hit a genuine blocker: write it into docs/BLOCKED.md with the best
+default you can proceed under, still run the FINISH SEQUENCE (a green gate and
+a commit on a blocked iteration are REQUIRED — the loop must never end red),
+and stop.
