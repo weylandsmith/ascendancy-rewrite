@@ -57,6 +57,41 @@ W5  HYGIENE (continuous)
     same commit; new refuted routes recorded immediately; capture artifacts
     stay in work/ (gitignored); docs/re/ specs are the long-term record.
 
+W6  AI BEHAVIOR DECODE (t85g standing worklist — closes the rewrite's
+    placeholder behaviors; findings bank to docs/re/aicode.md as laws, and
+    UPGRADE the matching rewrite phase functions with citations)
+    Motivation (user request 2026-10-23): rewrite placeholders like
+    researchPhase uniform-random AI tech pick, expansionPhase nearest-
+    unowned BFS, and the aggregate combatPhase are KNOWN-simpler than the
+    original; the original's decision code is statically present and
+    mostly unread. Queued actions (one per loop turn, cheapest first):
+    A1 ship [reg+0x90] writer/init census (shield layer identity;
+       combat.md S2c-1; feeds OQ-010).
+    A2 finish combat loop 0x4d075..0x4d20e + death handler 0x49d2c + hit
+       path 0x4b740 remainder (firing order, overkill, [edi+0x4a] build
+       site = the combat-object snapshot; combat.md S2c-2).
+    A3 AI turn loop map: entry via race.cpp-attributed ranges around the
+       proven attitude scorer 0x3ecb8 + build selector caller 0x3ead6
+       (income-law S9) -> phase order + which functions decide research,
+       expansion, fleet build, ship orders (feeds aicode.md + OQ-016).
+    A4 AI RESEARCH selection: within A3, the function choosing the next
+       tech per race (rewrite placeholder = uniform random; original
+       law = target measurement). Cross-check flash.pop gates at
+       0x417aa/0x4193c (race.cpp) which restructure these loops.
+    A5 ship ORDER dispatch: order-name block 0x88e60 (SOGoStar..SOGoSpace;
+       only proven code ref = SONothing pool-imm at 0x1dae6, next to the
+       hover gate 0x1d9fe — the order-string display path; a SOPatrol
+       pool-imm at 0x27d is LE-header noise, NOT a ref). Decode 0x1dae6's
+       enclosing function + find the numeric order-enum (display strings
+       may index a separate enum) -> how AI assigns SOAttack/
+       SODefendPlanet/SOColonize (the "system defense / offensive thrust"
+       question; feeds aicode.md).
+    A6 SHIP_PATIENCE (+0x1b0) readers (named key, unbound semantics).
+    A7 state-byte stores of imm3 into [+0x1c0+idx] (OQ-023 static route).
+    LAWFUL SOURCE: mid-turn capture frames t1244..1254 (banked) + static
+    decode; NO new user sessions required for any item in this list.
+
+
 --------------------------------------------------------------------------
 VERIFICATION
 --------------------------------------------------------------------------

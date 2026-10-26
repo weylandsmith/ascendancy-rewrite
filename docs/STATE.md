@@ -182,6 +182,38 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+NEXT t86 (W6-A1, static, offline): ship [reg+0x90] writer/init census —
+u16/u32 stores and subtracts at [reg+0x90] across work/ascend_restored.bin
+(same byte-scan technique that found the single +0x8c subtract at
+0x4d1ea), plus the combat-object build site that initializes the [edi+0x4a]
+attacker snapshot and [edi+0x3a] range field (t85g S2/S2b context: loop
+0x4d075, hit path 0x4b740). Rationale: cheapest probe with the biggest
+OQ-010 residual payoff (shield-layer identity + damage split), and it
+unblocks W6-A2. All prior NEXT pointers are superseded; standing
+user-blocked items (score C-screen readout, state-3 alliance capture)
+continue passively from the live watcher — check work/r1/playcap/
+live-timeline.jsonl growth each turn, re-run scripts/r1_t85g_sitting.py
+after any new user sitting.
+T85g LANDED (t1253 sitting adjudication — FIRST mid-turn combat frames):
+user played turn 1253 (alliance proposal #2 to Orfa DECLINED, war on
+Ungooma, one Ungooma fleet destroyed, return fire) and saved slot 4 at
+t1254. Captured: ring + banked copy work/r1/playcap/evidence_slot04_t1254.
+SAV (nine stale watchers killed first; one live kept). Findings (docs/re/
+combat.md S1-S3, scripts/r1_t85g_sitting.py + r1_t85g2_slots.py): ship
++0x8c = INTEGRITY with volley-step decrements to 0 then owner->free
+(death law, MEASURED mid-turn for the first time); +0x88 = MOVES with
+boundary recharge; +0x90 = SHIELD LAYER live in-battle (0->10->5->0
+cycles, design-dependent, always 0 at boundary); return fire VERIFIED
+(player slot14 40->38->36->34, matches testimony "fired back once or
+twice"); static: the ONLY +0x8c subtract in the image at 0x4d1ea inside
+combat loop 0x4d075 (distance-squared range gate, xyz law cross-confirm)
+-> hit path 0x4b740 two-layer clamped absorb -> death handler 0x49d2c.
+Diplomacy: PROPOSAL moves the AI-side cell (+39, corrects t85c); war
+reciprocity law reproduced a second time. OQ-021: DAT_482fb OSCILLATES
+(8..15) independent of territory — systems_full hypothesis FALSIFIED
+(0/786 rows match). PLAN.md gains W6 (AI behavior decode A1..A7, user-
+requested loop for closing rewrite placeholders). OQ-010/021/023 rows
+updated with t85g statuses; all remain open (strict-close).
 T84 LANDED (contract-compliance sweep): every CLOSED ledger row audited
 for BOTH legs (cited evidence + changed-code-site-or-explicit-disposition)
 -> 12 full rows PASS; two real gaps fixed: OQ-004 row now names its code

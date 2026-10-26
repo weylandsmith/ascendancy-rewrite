@@ -37,7 +37,25 @@ four died in the war window; zero-shot-back matches a crewed-population/
 power edge. Deletion-vs-turn-boundary correlation is now banked, but the
 damage APPLICATION law itself (hit prob, shields, shields vs power) is
 still unseen; closing route unchanged (in-battle recording or static
-application-code site).
+application-code site). STATUS t85g (t1253 sitting, FIRST mid-turn damage
+frames banked): MAJOR ADVANCE, still open. MEASURED both-sides field law:
+ship +0x8c = INTEGRITY (design constants d2/d4/d6=20, d12=40 at peace;
+volley-step decrements 20>12->4>0 observed on 9 Ungooma slots; death at
++0x8c==0 then owner->free per presence law), +0x88 = MOVES (decrements
+1..2/sample, recharges at boundary, never feeds death). Return fire
+VERIFIED: player slot14 40>38>36>34 same frames ("fired back once or
+twice" = exactly this). STATIC: exhaustive write census of [reg+0x8c]
+finds ONE subtract in the image — 0x4d1ea sub [esi+0x8c],[edi+0x4a] inside
+combat loop 0x4d075..0x4d20e: per-target distance-squared (shooter xyz
++0x9e, cross-confirms xyz law) vs attacker field [edi+0x3a]<<5, in-range
+-> call 0x4b740 -> integrity subtract. Damage values vary per hit (steps
+{16,8,12,13,7,4,3}) so [edi+0x4a] is a per-shot combat-object value
+(ship records read +0x4a=0 at boundary). UNSEEN: shields subtract-vs-
+absorb (candidate: inside 0x4b740), hit probability, firing order. Next:
+static decode 0x4b740 + 0x4d075 body (docs/re/combat.md S2). Evidence:
+scripts/r1_t85g_sitting.py + r1_t85g2_slots.py over live-timeline.jsonl
+t1244..1254; rewrite combatPhase stays the documented aggregate default
+(OQ-010 unclosed => no code change).
 OQ-003 | gam | .gam full record map + field meanings; packed entropy regions
 | open | W1 joint: planet records already joined file<->live RAM 151/151
 (stride 123); STAR TABLE + ORBIT LAWS closed 2026-10-06 map the neighbourhood
@@ -116,6 +134,18 @@ readout gated by the nougat.lf file-probe flag, docs/re/score.md S7/S8). Replace
 continue the live campaign past boundary DAT_482fb >= 25 and observe
 whether the 0x2c01d end-ctrl arm fires — banked max is 23 and the player
 is still expanding, so this may close passively during normal play.
+STATUS t85g: passive test continues; NEW NEGATIVE DATA sharpens the
+comparator hunt. DAT_482fb OSCILLATES independently of territory:
+t1157=8 -> t1158=14 -> t1170=12 -> t1186=15 -> t1238=12 -> t1251=13 ->
+t1254=14 while systems_full is monotonically 26..32 and systems_any
+28..36; score==systems_full matched 0/786 trusted rows t>=1250. The
+variable is NOT a territory count and can go DOWN without losing a
+system (t1151 10 -> t1157 8 with no systems loss: candidate drivers =
+fleet losses [t1157 window had ship deaths], economy, or a rolling
+window). Passive capture keeps banking it every slot; a DECLARATIVE test
+exists now that nougat.lf is live: press C on the starmap (debug State-
+of-Galaxy, docs/re/debugflags.md S t85f) and read PERCENT CONTROLLED —
+that prints the comparator's own formula output 100*DAT_482fb/T.
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719
@@ -154,6 +184,17 @@ player PROPOSE does not move the AI-side attitude (docs/re/diplomacy.md
 §12). WORKING: 2=war, 1=peacetime/no-active-relationship; an accepted
 alliance (state-3 candidate) remains capture-gated — a future sitting must
 first raise Orfa attitude above 570 by other means, then propose. | open |
+STATUS t85g (t1253 sitting): CORRECTION to t85c — a player PROPOSAL DOES
+move the AI-side cell (att[Orfa->Chamachies] 487->526, +39); t85c's "+280
+player-side only" understated it (the t85c proposal window simply didn't
+catch a delta). Acceptance law unchanged: 526 < 570, no alliance, cells
+stay 1. Second proposal (this sitting) also declined per player report.
+STATE-3 remains UNOBSERVED across 42k trusted rows. Vendor name table
+RELNAMES@0x89074 = Unknown/Peace/War/Alliance (debugflags.md t85f)
+corroborates the working enum 1=Peace 2=War 3=Alliance — but the CLOSING
+measurement still needs a row whose cell actually holds 3. Residual route:
+attitude-raising (gifts/trades?) then accept, OR static: writers of the
+state byte that store 3 (t85h: scan stores of imm3 into [+0x1c0+idx]).
 W-B (option C hybrid): build only when ownership model lands; engine
 build additionally awaits the state-enum capture above.
 OQ-024 | loop | planet GOVERNOR assignment law (@0x38df0 branch of
