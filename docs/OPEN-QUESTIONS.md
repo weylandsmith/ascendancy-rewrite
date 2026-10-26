@@ -653,11 +653,22 @@ table only values 1 and 47 can ever match a candidate row; sentinel flag
 DAT_00074902 measured LIVE 0x0f (all 4 AI flagged) in playcap 60.sav,
 0x00 in r1deep slots (probe self-validated rowcount 66 + row-0 mask);
 -2-consumer semantics named residual; full t93 implementation decision +
-pin-test spec banked aicode.md §3c. Remaining: rewrite delta (t93),
-order-ENUM numeric law (W6-A5),
-0x43b50 tail + 0x2ef60 case bodies (A6/A7), random-event module P0. No
-rewrite code change this iteration (map task; delta candidates banked in
-aicode.md §5 for t91).
+pin-test spec banked aicode.md §3c. t93 CODE LANDED (picker sub-law
+CLOSED-with-code-site): §3c's sentinel model CORRECTED by re-verifying the
+disassembly — uniform leg 0x40134 tests chosen>=0, so -2 is OVERWRITTEN
+before the 0x40164 store; sentinel skips ONLY the preferred scan (0x400fb),
+flag-0x0f shipped AI research uniformly at 100% of pick opportunities,
+-2-consumer residual UNREACHABLE (aicode.md §3d). rewrite delta:
+campaign.h aiResearchPreferred (tier decision, membership {1,47} §3c math)
++ campaign.cpp researchPhase AI branch = FUN_00040018 tier chain
+(row-order candidates cap 32, rng%100<45 roll, preferred-first else
+uniform 0x4013f; player path unchanged); TEST
+campaign_research_picker_law_oq016 (edges + campaign leg), 110 tests 0
+failed; timelines re-measured FINITE <1200: 2024 Control t737 / 42 Extinct
+t688 / 13 Extinct t503 / 1 Control t836 / 2 Control t657; PLAYTHROUGH
+regenerated. Remaining (row STAYS open, strict-close): order-ENUM numeric
+law (W6-A5),
+0x43b50 tail + 0x2ef60 case bodies (A6/A7), random-event module P0.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

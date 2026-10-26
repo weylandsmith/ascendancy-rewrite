@@ -527,3 +527,30 @@ TEST(campaign_advance_after_victory_is_noop) {
     CHECK(c.turn() == turn);
     CHECK(c.events().size() == evs);
 }
+
+TEST(campaign_research_picker_law_oq016) {
+    // t93 AI RESEARCH PICK LAW (FUN_00040018 0x40018..0x40175 re-verified
+    // from the disassembly; docs/re/aicode.md §3c/§3d). Tiers: sentinel
+    // (rng%100<45) skips ONLY the preferred scan (guard 0x400fb); the
+    // uniform fallback 0x40134 tests chosen>=0 so -2 is never stored
+    // (§3d CORRECTION of §3c's "no pick" note); preferred membership on
+    // the live 66-row table == {1,47} (0x67be math, §3c); first candidate
+    // (lowest row) wins (0x40129 store once under re-guards 0x400fb/
+    // 0x4010d); candidate cap 0x20 (0x40044).
+    using C = ag::Campaign;
+    CHECK(C::aiResearchPreferred({0, 1, 2}, false) == 1);   // first member wins
+    CHECK(C::aiResearchPreferred({1, 47}, false) == 1);     // lowest row
+    CHECK(C::aiResearchPreferred({47}, false) == 47);
+    CHECK(C::aiResearchPreferred({40, 47, 60}, false) == 47);
+    CHECK(C::aiResearchPreferred({0, 2, 40}, false) == -1); // no member
+    CHECK(C::aiResearchPreferred({1, 47}, true) == -1);     // sentinel skips
+    // Campaign-level: research still happens every ~turn under the new
+    // law (sentinel skips the preferred bias only; the uniform fallback
+    // always picks when candidates exist) — a "sentinel => never research"
+    // model would show zero AI completions.
+    auto c = makeCampaign(2024);
+    for (int t = 0; t < 60 && !c.over(); ++t) c.advance();
+    int totalOwned = 0;
+    for (int o = 1; o <= 6; ++o) totalOwned += c.techsOwned(o);
+    CHECK(totalOwned > 0);
+}

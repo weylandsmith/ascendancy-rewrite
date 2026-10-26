@@ -231,6 +231,26 @@ public:
         absorb = std::min(volley, charges);
         spill = volley - absorb;
     }
+    // t93 (OQ-016): AI RESEARCH PICK tier decision — pure form of the
+    // sentinel + preferred tiers of FUN_00040018 (0x400b3..0x40134, body
+    // 0x40018..0x40175, disassembly re-verified t93; docs/re/aicode.md
+    // §3c/§3d). 'cand' = row-order, legality-filtered, cap-32 candidates
+    // (0x4002e..0x40083); 'sentinelHit' = the race's rng%100 < 45 roll
+    // succeeded (flag DAT_00074902, live-measured 0x0f = every shipped
+    // scenario AI, t92; the rewrite applies it to all AI owners as the
+    // shipped-scenario mirror). Preferred membership on the live 66-row
+    // table is {1,47} (§3c membership math: no other raw entry can equal
+    // a row index). Returns the preferred row (first candidate that is a
+    // member wins, 0x40129..0x4012d), or -1 = no preferred hit — sentinel
+    // skip (chosen=-2 exits the scan at guard 0x400fb) OR plain miss — in
+    // which case the caller runs the uniform fallback 0x4013f. Pinned by
+    // TEST(campaign_research_picker_law_oq016).
+    static int aiResearchPreferred(const std::vector<int>& cand, bool sentinelHit) {
+        if (sentinelHit) return -1;
+        for (int t : cand)
+            if (t == 1 || t == 47) return t;
+        return -1;
+    }
     const std::vector<CampaignEvent>& events() const { return events_; }
     const Galaxy& galaxy() const { return galaxy_; }
     int playerScorePct() const;  // stars-owned share, static.txt '%'-template (§1)

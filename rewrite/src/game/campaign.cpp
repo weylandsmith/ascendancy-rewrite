@@ -896,8 +896,40 @@ void Campaign::researchPhase() {
                         best = t;
                 queuedTech[o] = best;
             } else {
-                std::uniform_int_distribution<size_t> pick(0, avail.size() - 1);
-                queuedTech[o] = avail[pick(rng_)];
+                // t93 (OQ-016): AI PICK LAW = FUN_00040018 (body
+                // 0x40018..0x40175, disassembly re-verified t93 —
+                // docs/re/aicode.md §3c/§3d). Replaces the UNCITED
+                // uniform-random pick. Tiers:
+                //  1. Candidates: avail above IS the 0x4002e..0x40083
+                //     build (row order, skip owned, prereq-chain legality
+                //     == FUN_00046d3c), truncated to the vendor cap 0x20
+                //     (cmp edi,0x20 @0x40044).
+                //  2. Sentinel (0x400b3..0x400da): DAT_00074902 bit —
+                //     live-measured 0x0f, EVERY shipped-scenario AI (t92).
+                //     rng%100 < 45 (idiv 0x400d3, cmp edx,0x2d) sets
+                //     chosen=-2, which exits the preferred scan at guard
+                //     0x400fb. The uniform leg 0x40134 tests chosen>=0,
+                //     so -2 is OVERWRITTEN, never stored: the sentinel
+                //     skips the PREFERRED BIAS, not the pick (§3d — this
+                //     corrects §3c's "no pick this turn" note). Modelled
+                //     as aiResearchPreferred(sentinelHit) + fallback
+                //     below; one rng draw per pick opportunity mirrors
+                //     0x400c4, the fallback draw mirrors 0x4013f.
+                //  3. Preferred scan (0x400e1..0x40134): first candidate
+                //     (lowest row index) that is a member of the 23-word
+                //     static list 0x67be wins — membership degenerates to
+                //     {1,47} on the live 66-row table (§3c math); match
+                //     stores once (re-guards 0x400fb/0x4010d).
+                //  4. Fallback (0x4013f): uniform rng % candidate-count.
+                const size_t ncand = std::min<size_t>(avail.size(), 32);  // cap 0x20 @0x40044
+                const bool sentinelHit = (rng_() % 100) < 45;  // 0x400c4..0x400d8
+                int chosen = aiResearchPreferred(
+                    std::vector<int>(avail.begin(), avail.begin() + ncand), sentinelHit);
+                if (chosen < 0) {
+                    std::uniform_int_distribution<size_t> pick(0, ncand - 1);
+                    chosen = avail[pick(rng_)];  // 0x4013f
+                }
+                queuedTech[o] = chosen;
             }
         }
         const Tech& tq = tree_->all()[queuedTech[o]];

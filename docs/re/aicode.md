@@ -367,6 +367,55 @@ the cheapest-cost default (unchanged). This is a behaviour change to every
 AI timeline — regen all seeds + PLAYTHROUGH (t89 procedure), every seed
 must stay FINITE < 1200. Pin test must use preferred rows 1 and 47 only.
 
+## 3d. t93 CODE LANDING + §3c SENTINEL CORRECTION [verified t93]
+
+CORRECTION (found by re-verifying the banked disassembly against the raw
+objdump before implementing — the disassembly is ground truth, §3c's prose
+was the misread): §3c/§3b said "a surviving -2 is STORED to
+DAT_00076492[race]" and "the race then behaves as having an objective that
+never completes". WRONG. The uniform-leg entry test 0x40134..0x4013d is
+
+    mov eax,[esp+0x72] ; sar eax,0x10 ; test eax,eax ; jge 0x4015b
+
+i.e. the uniform fallback at 0x4013f runs whenever chosen < 0 — INCLUDING
+chosen == -2 from the sentinel store 0x400da — and OVERWRITES it
+(candidates are non-empty here: count==0 exits at 0x40096 before the
+sentinel). The store 0x40164 therefore never sees -2 from this path: the
+picked value is always a real candidate row. TRUE LAW [verified]:
+the sentinel skips ONLY the preferred-bias scan (guard 0x400fb exits it
+when chosen != -1); a flagged race then picks UNIFORMLY at 100% of pick
+opportunities, an unflagged race picks preferred-first when possible and
+uniform otherwise. Effective effect of flag 0x0f (all shipped AI): the
+preferred rows {1,47} bias is dead in the shipped scenario — research
+content is uniform-random there; the bias tier still matters for unflagged
+configurations (r1deep slots measured 0x00, t92). Consequence: the §3c
+"no pick this turn" rewrite model is VOID; the named -2-consumer residual
+(0x46bbb row-0xfffe index) is UNREACHABLE from the picker and demoted to
+a curiosity.
+
+IMPLEMENTED (t93, OQ-016 picker sub-law CLOSED-with-code-site):
+- rewrite/src/game/campaign.h — Campaign::aiResearchPreferred(cand,
+  sentinelHit): pure tier decision (sentinelHit => -1 skip; else first
+  member of {1,47} in candidate order, else -1 => caller runs uniform).
+- rewrite/src/game/campaign.cpp researchPhase AI branch — replaces the
+  UNCITED uniform pick with the FUN_00040018 tier chain: candidates =
+  tree_->available(...) row-order (== 0x4002e..0x40083 build incl the
+  FUN_00046d3c prereq law), cap 32 (0x40044), one rng_ draw for the
+  rng%100<45 sentinel roll (0x400c4..0x400d8, applied to every AI owner =
+  the flag-0x0f shipped-scenario mirror), preferred hit or uniform
+  fallback 0x4013f. Player path unchanged (cheapest-cost default; the
+  human picker 0x47e34 is UI).
+- TEST(campaign_research_picker_law_oq016): membership + first-wins +
+  sentinel-skip edges on rows 1/47 (the only values that can match a
+  66-row candidate, §3c math), plus a 60-turn campaign leg proving AI
+  research still completes under the law. 110 tests 0 failed.
+- Timeline re-measure post-delta (finite budget prevented the full
+  PLAYTHROUGH regen script; numbers below are real headless runs
+  --campaign 1200): seed 2024 Control t737 (was t777), 42 Extinct t688
+  (was t581), 13 Extinct t503 (unchanged), 1 Control t836 (was t842),
+  2 Control t657 (was t677). All FINITE < 1200. PLAYTHROUGH.md regen
+  queued as the head of the next task.
+
 ## 4. Census numbers / tools
 
 - call-graph edges: obj0 full E8 scan; 0x3f130 callers EXACTLY {0x3eade};

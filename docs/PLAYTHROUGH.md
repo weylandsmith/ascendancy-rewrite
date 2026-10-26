@@ -1,6 +1,6 @@
 # Headless playthrough record
 
-Regenerated 2026-10-26T16:28:18-04:00 by scripts/record_playthrough.sh from the
+Regenerated 2026-10-26T19:43:32-04:00 by scripts/record_playthrough.sh from the
 current binary. Victory conditions and their vendor files: docs/re/turnloop.md §1.
 
 ## Run A — headless, seed 2024
@@ -12,11 +12,11 @@ SDL 2.32.4 initialised (video driver: (null))
 campaign seed=2024 stars=50 lanes=53 ai=6
 turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-  ... (869 lines elided)
-  [t776] owner 0 colonised Xerxes
-  [t777] owner 0 colonised Arcturus
-  [t777] VICTORY: Control (end-ctrl.txt)
-VICTORY Control via end-ctrl.txt on turn 777 (score 52%)
+  ... (833 lines elided)
+  [t736] owner 0 colonised Xerxes
+  [t737] owner 0 colonised Arcturus
+  [t737] VICTORY: Control (end-ctrl.txt)
+VICTORY Control via end-ctrl.txt on turn 737 (score 52%)
 ```
 
 ## Run B — headless, seed 42
@@ -28,11 +28,11 @@ SDL 2.32.4 initialised (video driver: (null))
 campaign seed=42 stars=50 lanes=53 ai=6
 turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-  ... (671 lines elided)
-  [t581] owner 3 captured Arcturus
-  [t581] owner 3 captured Feculon
-  [t581] VICTORY: Extinct (end-xtnc.txt)
-VICTORY Extinct via end-xtnc.txt on turn 581 (score 0%)
+  ... (783 lines elided)
+  [t688] owner 3 captured Arcturus
+  [t688] owner 3 captured Feculon
+  [t688] VICTORY: Extinct (end-xtnc.txt)
+VICTORY Extinct via end-xtnc.txt on turn 688 (score 0%)
 ```
 
 ## Run C — Xvfb/X11, seed 13
@@ -44,7 +44,7 @@ SDL 2.32.4 initialised (video driver: x11)
 campaign seed=13 stars=50 lanes=53 ai=6
 turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-  ... (601 lines elided)
+  ... (604 lines elided)
   [t503] owner 4 captured Delphinius
   [t503] owner 4 captured Phoebe
   [t503] VICTORY: Extinct (end-xtnc.txt)

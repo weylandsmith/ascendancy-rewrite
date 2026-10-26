@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-26T18:35
+updated: 2026-10-26T19:50
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -195,33 +195,58 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t93 (CODE task, rewrite/src/game/campaign.cpp researchPhase :884):
-IMPLEMENT the t91/t92 PICKER LAW per aicode.md §3c — the full
-implementation spec is banked there; execute it, do not re-derive:
-AI owners: if no pending tech -> build legal candidates (ownedTech skip +
-tree prereq law = FUN_00046d3c semantics, row order), then (i) sentinel
-rng%100<45 -> NO pick this turn (queuedTech stays -1; §3c MODEL NOTE —
-do NOT store a -2 pseudo-target), (ii) else FIRST candidate in preferred
-set {1,47} (static 0x67be membership, §3c math) wins, (iii) else uniform
-rng fallback; player path UNCHANGED (cheapest-cost default). Add pin
-TEST(campaign_research_picker_law_oq016): candidate-set equality vs the
-available() prereq law, preferred-first determinism at fixed seeds using
-rows 1/47, sentinel skips both tiers (statistical check over many seeds:
-pick-rate ~55% for AI). REGEN all timelines + PLAYTHROUGH (t89
-procedure); every seed FINITE < 1200. Strict-close: annotate OQ-016
-picker sub-law CLOSED-with-code-site; row stays open (A5/A6/A7 minutiae).
-Rationale: t92 banked every measurement the delta needs (precedence order
-corrected via guards 0x400fb/0x4010d/0x4013b; preferred membership
-degenerates to {1,47}; sentinel flag live-measured 0x0f => applies to all
-AI in the shipped scenario). GOAL: "upgrade each rewrite default to the
-cited original" — this is the last AI decision with a law but no code.
-The uniform-random pick currently in researchPhase is UNCITED behavior
-being replaced by cited law. A5 (order enum) follows after.
-Sitting watch unchanged: live-timeline 5.69 GB, last rows t=1254 re-checked
-clean 2026-10-26 18:20; a NEW turn-boundary sitting outranks this ->
-scripts/r1_t85g_sitting.py first.
+NEXT t94 (STATIC task, W6-A5): decode the SHIP ORDER-KIND ENUM numeric law.
+FUN_00040178 (aicode.md §2f) stores order-kind byte ship+0x58 with values
+{1,2,3,4,5} verified, names inferred; the 0x88e60 string block (payload)
+holds the vendor order names (SOGoStar../SOAttack family — re-locate the
+block: string-anchor base vote per the R12-amendment file law,
+work/ascend_restored.bin, NEVER the payload FILE for immediates). Method:
+(1) dump the 0x88e60-block strings; (2) census code sites storing literals
+1..5 into +0x58 across obj0 (store-form census pattern
+scripts/r1_t86_write_census.py) and sites READING +0x58 with cmp ladders
+(the consumer's dispatch names each kind); (3) tie each numeric value to a
+string via the reader's window/message path (pool-relative immediate law,
+imm = str_off - 0x82BB0). Bank as aicode.md §2f-supplement: value -> name
+-> consumer-site table. rewrite delta: NONE expected (rewrite is
+aggregate-only, no per-ship orders — disposition = ANALYSIS-ONLY, cite in
+the OQ-016 row like the t90 map). Strict-close: numeric mappings only from
+cited readers; anything unmappeable stays named-open (A5 residual).
+Rationale: t93 CLOSED the picker sub-law with code site; A5 is the next
+AI-decode item named by both the t90 map and the t93 assignment, needs no
+capture, and its reader-census technique is fully banked (t86/t88 tools).
+After A5: A6/A7 (0x43b50 tail, 0x2ef60 case bodies).
+Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44),
+last rows t=1254 re-checked clean t93 start; a NEW turn-boundary sitting
+outranks this -> scripts/r1_t85g_sitting.py first.
 OQ-021 passive watch continues (boundary sample 23/50, selector never
 armed).
+T93 LANDED (CODE task — OQ-016 RESEARCH PICKER sub-law CLOSED-with-code-
+site + §3c CORRECTED): before implementing, the banked §3c disassembly was
+re-verified against raw objdump and FOUND WRONG in its load-bearing claim:
+the uniform-leg entry test 0x40134..0x4013d (`test eax,eax; jge 0x4015b`
+on sign-extended chosen) means the uniform fallback 0x4013f runs for
+chosen<0 INCLUDING the sentinel -2 and OVERWRITES it — a -2 NEVER reaches
+the DAT_00076492 store from the picker path. TRUE LAW [verified]:
+sentinel(flag DAT_00074902, live 0x0f=all shipped AI) skips ONLY the
+preferred-bias scan (guard 0x400fb); flagged races pick uniform at 100% of
+pick opportunities; the §3c "no pick this turn" model is VOID and the
+-2-consumer residual is UNREACHABLE (aicode.md §3d). Delta implemented on
+the true law: campaign.h Campaign::aiResearchPreferred (pure tier decision;
+preferred membership {1,47} per §3c math) + campaign.cpp researchPhase AI
+branch = FUN_00040018 tier chain (row-order legal candidates cap 32
+@0x40044, one rng_ draw rng%100<45 @0x400c4, preferred-first else uniform
+@0x4013f); player path UNCHANGED. TEST(campaign_research_picker_law_oq016)
+pins membership/first-wins/sentinel-skip edges on rows 1/47 + 60-turn
+campaign leg; 110 tests 0 failed. UNCITED uniform-random pick replaced by
+cited law — the GOAL's core verb executed. Timelines re-measured after
+delta, ALL FINITE <1200: 2024 Control t737 (was t777) / 42 Extinct t688
+(was t581) / 13 Extinct t503 (unchanged) / 1 Control t836 / 2 Control t657;
+PLAYTHROUGH.md regenerated by record_playthrough.sh PT_RC=0 (script's
+t89 echo-comment updated? NO — header comment still cites t89 numbers;
+display-only, fixed next docs touch). OQ-016 row annotated, STAYS OPEN
+(A5/A6/A7 minutiae, strict-close). Lesson banked in §3d: re-verify banked
+prose against the raw disassembly BEFORE implementing — the disassembly
+was right twice now (t87 table, t93 guard) and the prose wrong once.
 T92 LANDED (measurement pass for the CODE task — budget-interrupted,
 honest negative, NO code change, NO closure): the picker disassembly was
 completed and CORRECTED the tier order: §3b's "sentinel skips preferred
