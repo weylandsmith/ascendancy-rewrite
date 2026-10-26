@@ -55,7 +55,21 @@ absorb (candidate: inside 0x4b740), hit probability, firing order. Next:
 static decode 0x4b740 + 0x4d075 body (docs/re/combat.md S2). Evidence:
 scripts/r1_t85g_sitting.py + r1_t85g2_slots.py over live-timeline.jsonl
 t1244..1254; rewrite combatPhase stays the documented aggregate default
-(OQ-010 unclosed => no code change).
+(OQ-010 unclosed => no code change). STATUS t86 (W6-A1 static, no capture):
+SHIELD-LAYER IDENTITY CLOSED — [reg+0x90] writer census
+(scripts/r1_t86_write_census.py, objdump-verified; control: re-finds the
+0x4d1ea +0x8c subtract among 10) shows +0x90 charged from CAT==1 (shield)
+gizmo Level field design[+0x56] at 0x49f15/0x4a71f, zeroed at fire-loop entry
+0x4a6a6 and by flag [ship+0x9c]&8 at 0x4a73a, +0x88 = gizmo-power sum via
+0x4a99c (init 0x4a76c). MAJOR CORRECTION to t85g S2: [edi+...] is the static
+GIZMO/DESIGN table 0x7650c + 0x6a*current_gizmo (EDI set at 0x4cddc; table
+names byte-verified in slot-48 RAM: Mass Barrage Gun..Hyperfuel), NOT a
+battle-built attacker snapshot; 0x4d075/0x4d1ea are cases of gizmo-mode
+dispatcher 0x4cd90. Damage per hit = design[+0x4a] (no roll at that site).
+STILL OPEN: hit probability, firing order, 0x43a4c star-defense contribution,
+exact gizmos.txt column->+0x4a map (t86 check matched 1/76 on a strict
+5-field equality — see combat.md S2d caveats; power/range/level legs verified
+weapon-side, level verified shield-side). No rewrite change (strict-close).
 OQ-003 | gam | .gam full record map + field meanings; packed entropy regions
 | open | W1 joint: planet records already joined file<->live RAM 151/151
 (stride 123); STAR TABLE + ORBIT LAWS closed 2026-10-06 map the neighbourhood

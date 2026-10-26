@@ -107,7 +107,57 @@ narrows to: hit probability (no roll seen), firing ORDER, the exact split
 of [edi+0x4a] into shield-hit vs hull-hit amounts, and the +0x9c bit-0x10
 flag identity (skips the 0x90 layer at 4b7bc).
 
-## 2c. The t85h queue (static, no capture needed)
+## 2d. t86 W6-A1: [reg+0x90] writer census + attacker-object ID (CORRECTS S2)
+
+Tool: scripts/r1_t86_write_census.py (byte scan for mov/sub/add store forms,
+disp8 mod=01 + disp32 mod=10, plain + SIB scale00; every candidate boundary-
+verified with objdump -D -b binary -M intel; R12 trap handled). Control:
+finds the known 0x4d1ea +0x8c subtract + 9 more writers, 10 verified / 4
+rejected.
+
++0x90 writers, ship-record class (13 verified image-wide; 0x6f540/0x70c9d are
+UI-struct, [ebp] ones are stack locals):
+* INIT 0x4a756 (ship reset/init family): WORD [ship+0x9c]=0 then
+  0x4a76c: [ship+0x88] = call 0x4a99c (MOVES total from gizmos).
+* CHARGE 0x49f15 (0x49e78, per-gizmo loop step 7 over ship+0xab, count
+  [ship+0x15a]; gizmo rec = idx*0x6a + 0x7650c; gate gizmo[+0x33]&0x20):
+  ship+0x88 -= gizmo[+0x36] (POWER cost); if gizmo[+0x32]==1 (CAT_SHIELD)
+  ship+0x90 += gizmo[+0x56] (SHIELD STRENGTH).
+* FIRING 0x4a71f same law in the fire loop 0x4a6a6..0x4a725; 0x4a6a6 zeroes
+  +0x90 at fire-loop entry; 0x4a73a: flag [ship+0x9c]&8 -> +0x90=0.
+* ABSORB 0x4b88a (hit path, known).
+=> SHIELD-LAYER IDENTITY CLOSED: +0x90 is shield charges; capacity/charge
+   comes from CAT==1 gizmos' Level field (+0x56, == file Level for the 6
+   shields: 1/2/1/2/4/3/5 [verified design table dump, slot-48 t1254]),
+   power at +0x36, range at +0x3a. +0x88 MOVES = sum over gizmos (0x4a99c).
+
+CORRECTION to S2 [verified disasm 0x4cd90..0x4cde3]: EDI is NOT a battle-
+built attacker snapshot. Dispatcher 0x4cd90 sets
+  EDI = 0x7650c + 0x6a * byte[ [ship+0x63] ]   (gizmo/design table),
+so [edi+0x4a] = attacker's CURRENT FIRING GIZMO damage field, [edi+0x3a]
+its range, [edi+0x4e] a second range-ish field. The static table reads
+(76 rows, names byte-verified Mass Barrage Gun..Hyperfuel): weapons
++0x36=Power +0x3a=Range +0x3e=Level(=damage per gizmo semantics per vendor
+gizmos.txt header) +0x4a=15..100 (== file Industry column VALUES at my parse
+offset — COLUMN MAP NOT SETTLED, see caveat) +0x56=Level (shields).
+0x4d075 is a JUMP TARGET of dispatcher case cl==0x38 family (0x4d5bb) — the
+function is a gizmo-mode dispatcher, each case a firing/effect mode; case
+mode==1 routes 0x4ce33 -> 0x4d594 (sub [ship+0x88], ebp) which reaches
+0x4b740. Damage per hit = design[+0x4a] (single gizmo per call — the t1253
+variable step sizes {8,16,12,...} [inferred] = different shooter gizmos /
+multi-call sums, NOT a random roll at 0x4d1ea).
+
+CAVEATS (honest): (1) file<->design-record column mapping only PARTIALLY
+aligned in the t86 check (f36/f3a/f3e == file cols 2/3/4 for weapons,
+f56 == Level for shields, but f4a matched Industry 75/76 with one row off —
+row-74/75 parse slip; the exact gizmos.txt column -> +0x4a identity and the
+0x4cde3 prologue guard law stay OPEN); (2) hit probability, firing ORDER,
+star-defense call 0x43a4c contribution still unseen; (3) no rewrite code
+change this iteration (no shipped-behaviour claim touched). OQ-010 stays
+OPEN (strict-close): residual = order + 0x43a4c + column map + in-battle
+multi-hit verification.
+
+## 2e. The t86-remaining queue (static, no capture needed)
 1. Writers of ship [reg+0x90] (u16/u32 stores; subtract census done for
    +0x8c only) + init sites -> shield-layer identity test.
 2. Rest of 0x4d075..0x4d20e (the +0x88 MOVES write at 0x4d1a9 pairs with

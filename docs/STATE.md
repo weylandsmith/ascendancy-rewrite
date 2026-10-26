@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-12T06:40
+updated: 2026-10-26T12:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -59,9 +59,11 @@ ledger:
       field map 15/15 (u16@25==0x0911 constant, audio.md §2.1, voc.cpp
       pins); race->theme map REFUTED (DAT_00010ba0 single writer 0x21309)"
   open:
-    - "OQ-010 combat application formula — R1 frontier; static half bounded
-      2026-10-06 (no disp32 orbit/table reads; shape tie FUN_00025604), path =
-      click-diff capture (STATE NEXT ACTION)"
+    - "OQ-010 combat application formula — R1 frontier; t86: shield layer =
+      +0x90 charged from CAT==1 gizmo Level design[+0x56]; attacker operand =
+      static design table 0x7650c+0x6a*g (dispatcher 0x4cd90, NOT battle obj);
+      residual = hit prob, firing order, 0x43a4c, +0x4a column identity
+      (docs/re/combat.md S2d; NEXT t87 case-table decode)"
     - "OQ-003 .gam full record map — joint with OQ-010 (planet records joined
       151/151 @ stride 123; STAR TABLE + ORBIT laws closed 2026-10-06 give the
       neighbourhood map: star stride 96, planet ptrs name+0x2A, orbit pair
@@ -182,18 +184,42 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t86 (W6-A1, static, offline): ship [reg+0x90] writer/init census —
-u16/u32 stores and subtracts at [reg+0x90] across work/ascend_restored.bin
-(same byte-scan technique that found the single +0x8c subtract at
-0x4d1ea), plus the combat-object build site that initializes the [edi+0x4a]
-attacker snapshot and [edi+0x3a] range field (t85g S2/S2b context: loop
-0x4d075, hit path 0x4b740). Rationale: cheapest probe with the biggest
-OQ-010 residual payoff (shield-layer identity + damage split), and it
-unblocks W6-A2. All prior NEXT pointers are superseded; standing
-user-blocked items (score C-screen readout, state-3 alliance capture)
-continue passively from the live watcher — check work/r1/playcap/
-live-timeline.jsonl growth each turn, re-run scripts/r1_t85g_sitting.py
-after any new user sitting.
+NEXT t87 (W6-A2, static, offline): finish the gizmo dispatcher decode —
+(a) the 0x4cd90 case table: every case target (0x4ce4c,0x4cf05,0x4d033,
+0x4d075,0x4d1a9,0x4d1e7,0x4d228,0x4d274,0x4d332,0x4d50e,0x4d546,0x4d560,
+0x4d594) gets a one-line identity (which gizmo category/mode, which fields
+it reads/writes) — this names FIRING ORDER and the remaining effect modes;
+(b) call 0x43a4c (star-defense contribution inside hit path 0x4b740 @
+0x4b875) decompiled; (c) settle the gizmos.txt column -> design-record map
+with a runtime-vs-file join done RIGHT (the t86 5-field equality failed
+1/76 because I asserted a wrong column set, not because the table is wrong
+— power@+36/range@+3a/level@+3e=+56 legs verified; +0x4a identity open).
+Rationale: t86 proved the attacker operand is the static design table, so
+the whole OQ-010 application law is now statically reachable; the case
+table is the cheapest next probe and directly feeds the rewrite's
+combatPhase upgrade decision. Check work/r1/playcap/live-timeline.jsonl
+growth first; re-run scripts/r1_t85g_sitting.py after any new user sitting
+(a NEW turn-boundary sitting outranks this assignment; t86 re-check
+measured t1254 idle: zero +0x8c/+0x90 mid-turn diffs in the 1064 today rows).
+T86 LANDED (W6-A1 shield-layer census + attacker-object correction):
+tool scripts/r1_t86_write_census.py (store-form byte census, objdump
+boundary-verified, R12-safe; control passed: finds 0x4d1ea). Results
+(docs/re/combat.md S2d): ship +0x90 = SHIELD CHARGES with full writer set —
+charged by CAT==1 gizmo Level design[+0x56] (0x49f15 per-gizmo loop over
+ship+0xab count [ship+0x15a], gate gizmo[+0x33]&0x20; fire loop 0x4a71f;
+zeroed at fire-loop entry 0x4a6a6, by flag [ship+0x9c]&8 at 0x4a73a, and in
+0x4a756 init which also sets +0x88 = gizmo-power sum 0x4a99c). CORRECTED
+t85g: EDI at 0x4cddc = 0x7650c + 0x6a*gizmo (static design table; 76 rows
+names byte-verified from held-turn slot 48 via string-anchor base vote —
+note r1_sav_scan anchors need payload strings, 'Factory' needle alone gets
+zero votes on this slot) — NOT a battle-built combat object; dispatcher
+0x4cd90 case cl==0x3x/0x4x family routes the fire modes, 0x4b740 hit path
+re-read whole (flag +0x9c bit0x10 zeroes the +0x90 absorb; +0x9c bit2/bit3
+set on shield/hull overflow). Design table values measured live (weapons
++0x3a=range 25..1000, +0x56=level only for shields 1..5). OQ-010: shield
+identity CLOSED-with-evidence-in-doc, row STAYS OPEN (hit prob / order /
+0x43a4c / +0x4a column identity remain — strict-close). OQ-021: no new
+boundary frames, passive watch continues. Gate + ledger_audit green.
 T85g LANDED (t1253 sitting adjudication — FIRST mid-turn combat frames):
 user played turn 1253 (alliance proposal #2 to Orfa DECLINED, war on
 Ungooma, one Ungooma fleet destroyed, return fire) and saved slot 4 at
