@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-26T17:30
+updated: 2026-10-26T18:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -195,7 +195,76 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t91 (STATIC task, docs/re/aicode.md): W6-A4 AI RESEARCH PICKER —
+NEXT t93 (CODE task, rewrite/src/game/campaign.cpp researchPhase :884):
+IMPLEMENT the t91/t92 PICKER LAW per aicode.md §3c — the full
+implementation spec is banked there; execute it, do not re-derive:
+AI owners: if no pending tech -> build legal candidates (ownedTech skip +
+tree prereq law = FUN_00046d3c semantics, row order), then (i) sentinel
+rng%100<45 -> NO pick this turn (queuedTech stays -1; §3c MODEL NOTE —
+do NOT store a -2 pseudo-target), (ii) else FIRST candidate in preferred
+set {1,47} (static 0x67be membership, §3c math) wins, (iii) else uniform
+rng fallback; player path UNCHANGED (cheapest-cost default). Add pin
+TEST(campaign_research_picker_law_oq016): candidate-set equality vs the
+available() prereq law, preferred-first determinism at fixed seeds using
+rows 1/47, sentinel skips both tiers (statistical check over many seeds:
+pick-rate ~55% for AI). REGEN all timelines + PLAYTHROUGH (t89
+procedure); every seed FINITE < 1200. Strict-close: annotate OQ-016
+picker sub-law CLOSED-with-code-site; row stays open (A5/A6/A7 minutiae).
+Rationale: t92 banked every measurement the delta needs (precedence order
+corrected via guards 0x400fb/0x4010d/0x4013b; preferred membership
+degenerates to {1,47}; sentinel flag live-measured 0x0f => applies to all
+AI in the shipped scenario). GOAL: "upgrade each rewrite default to the
+cited original" — this is the last AI decision with a law but no code.
+The uniform-random pick currently in researchPhase is UNCITED behavior
+being replaced by cited law. A5 (order enum) follows after.
+Sitting watch unchanged: live-timeline 5.69 GB, last rows t=1254 re-checked
+clean 2026-10-26 18:20; a NEW turn-boundary sitting outranks this ->
+scripts/r1_t85g_sitting.py first.
+OQ-021 passive watch continues (boundary sample 23/50, selector never
+armed).
+T92 LANDED (measurement pass for the CODE task — budget-interrupted,
+honest negative, NO code change, NO closure): the picker disassembly was
+completed and CORRECTED the tier order: §3b's "sentinel skips preferred
+scan" was wrong in one direction — guards 0x400fb (outer head, chosen!=-1
+-> exit) + 0x4010d + 0x4013b prove precedence sentinel(-2) > FIRST-
+preferred-member > uniform rng, all [verified] (aicode.md §3c). NEW
+MEASUREMENTS: (1) preferred list 0x67be re-dumped byte-exact; membership
+math over rows 0..65 => ONLY values 1,47 can match (pin-test spec flows
+from this); (2) sentinel flag DAT_00074902 LIVE: 0x0f in the user's
+playcap 60.sav (every AI race flagged — sentinel is ACTIVE in the shipped
+scenario) vs 0x00 in r1deep scripted slots; probe self-validated (rowcount
+66, row-0 mask +0x47) on all three slots via the corollary member index
+B+0x82bb0+X; (3) sole-code-referrer census for 0x74902 (only data false
+hits); (4) named residual: -2 pseudo-target consumer semantics (completion
+guard 0x46bbb is zero-extended cmp >= 0xffff, so -2 indexes row 0xfffe —
+NOT safe to copy blindly; rewrite models sentinel as "no pick, no progress
+this turn", §3c). OQ-016 row annotated with t92 status; rewrite delta
+remains = t93 by the one-task rule. Gate GATE_EXIT=0, ledger_audit LEDGER
+AUDIT OK.
+
+T91 LANDED (STATIC task — W6-A4 AI RESEARCH PICKER CLOSED to docs/re/
+aicode.md §3b): the field "race+0x1d4e" identity was the lock: turn call
+site 0x2502f passes EAX=0x74744 to FUN_00046aec, and 0x74744+0x1d4e ==
+DAT_00076492 — the SAME table t90 censused as the expansion target (0x1d5c
+== DAT_000764a0 accumulator). Exhaustive write census over obj0: raw u16
+0x1d4e scan = exactly 6 hits (all in FUN_00046aec completion/clear +
+FUN_00046e84 indexed read); disp32 0x76492 = 19 insn sites, VALUE writers
+only 0x40164 (FUN_00040018) and 0x47e34 (research-window UI = human path);
+0xffff writers 0x22db7 init / 0x43f5b completion-clear / 0x47880 / 0x47985
+(UI); disp window 0x1d00..0x1dff confirms no second base. PICK LAW: gate
+0x3eb1d calls FUN_00040018 iff target==0xffff -> legal candidates (skip
+owned, FUN_00046d3c prereq chain, cap 0x20) -> preferred-list scan (static
+0x67be 23 u16, zero writers) -> DAT_00074902-bit race rng%100<45 sentinel
+-2 -> uniform rng — research and expansion are ONE per-race slot picked by
+ONE law. Build-completion grant FUN_00046e84 (sole caller 0x39173, item-
+completion branch) rng-picks a legal tech and sets owned mask +0x4a/0x4b
+directly, never touching the target word — the t90 "picker may be in
+0x41260" hypothesis is RESOLVED: it was the grant path, not a pick. NEW
+tool scripts/r1_t91_picker_census.py (boundary-verified disp censuses +
+pinned sites, RC=0; objdump --start-address needs 0x prefix — trap fixed
+mid-run). rewrite delta deferred to t92 by one-task rule. Gate
+GATE_EXIT=0, ledger_audit LEDGER AUDIT OK.
+
 find the writer of race research-target word row+0x1d4e (and its partner
 +0x1d5c accumulator reset sites) in the restored image. t90 narrowed the
 field: the completion consumer FUN_00046aec READS +0x1d4e and clears it

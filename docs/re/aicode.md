@@ -233,6 +233,140 @@ Per race r (count DAT_00013b96 hi-word):
    0x46fa0 caller 0x257cf only; 0x20c48 = copy primitive). rewrite's
    uniform-random pick remains UNCITED (do not believe it).
 
+## 3b. RESEARCH PICKER — W6-A4 CLOSED (t91) [verified]
+
+FIELD IDENTITY IS THE KEY. Turn call site 0x25028: `mov eax,0x74744;
+call 0x46aec` — so inside FUN_00046aec the row base ESI = 0x74744 (restree
+runtime), and 0x74744+0x1d4e == **0x76492** and 0x74744+0x1d5c ==
+**0x764a0**: the "race research-target word race+0x1d4e" and the
+accumulator +0x1d5c ARE the SAME table DAT_00076492[race]/DAT_000764a0[race]
+whose writer census t90 ran for the expansion target. One table, one picker.
+
+WRITE CENSUS (t91, exhaustive over obj0 code [0x14bb0,0x82bb0)):
+- raw-byte scan for u16 0x1d4e: 6 hits whole-file, all INSIDE aligned
+  insns 0x46bbb/0x46c11/0x46c36/0x46c53 (reads) and 0x46c67 (clear to
+  0xffff) in FUN_00046aec + 0x46eea (indexed read in FUN_00046e84).
+- raw-byte scan for u32 disp32 0x76492: 19 insn sites. WRITERS of a VALUE:
+  **0x40164** (inside FUN_00040018 — the t90 "expansion picker"),
+  **0x47e34** (research-window UI tail: stores selected row word
+  [esi+0x9db] -> DAT_00076492[player] + sets owned-mask bit via
+  FUN_0x46d3c legality + FUN_0004fb30 — the HUMAN picker); WRITERS of
+  0xffff (clears): 0x22db7 (init loop, 8 races, paired 0x764a0:=0 at
+  0x22dc0), 0x43f5b (row target == completed row -> clear + delta into
+  0x764a0), 0x47880/0x47985 (UI clears). READERS: 0x390c7, 0x3dc7f,
+  0x3eb05, 0x43f50, 0x44155, 0x467b9/0x4683b, 0x478b4/0x478d5, 0x48137.
+- disp window scan 0x1d00..0x1dff over all mem operands: no other writer
+  of the 0x1d4e/+0x1d5c pair anywhere in the image.
+
+PICK GATE (0x3eaef..0x3eb1d inside FUN_0003ea54 decision block, §2a step 3):
+  if DAT_00076492[race] == 0xffff -> FUN_00040018(row). Player row is
+  skipped while DAT_00010ba4 == 0 (human controls; UI writer 0x47e34 is
+  the human path) UNLESS DAT_000764ae != -1.
+
+=> THE AI RESEARCH PICKER IS FUN_00040018 — the same function t90 banked
+   as the expansion-target picker. The original models research target and
+   expansion target as ONE per-race slot picked by ONE law:
+   (i) rows 0..DAT_00074744 (restree runtime, stride 0x4b), skip rows whose
+       owned-mask word [row+0x47]>>24 has the race bit, legality =
+       FUN_00046d3c (row prereq chain +0x40, five slots, 0xff terminator,
+       all must be owned); collect up to 0x20 candidates;
+   (ii) copy 23 static u16s from 0x67be (preferred list — NO writers found
+       at 0x67be..0x67d2, i.e. static data), scan candidates in order for
+       the first member of the preferred list;
+   (iii) if race has bit DAT_00074902>>24 (sole reader is 0x400b4):
+       rng%100 < 45 -> chosen := -2 sentinel (skips the preferred scan,
+       which only accepts candidates != -1/-2);
+   (iv) fallback rng % candidate_count (0x4013f);
+   store -> DAT_00076492[race] (0x40164). Preferred-list raw values
+   (static, t91): 1007 f56 eb02 45b 700 aa10 200 2e10 1 1007 73 1002 12e
+   700 4710 200 2e10 1 1007 2f c402 13b 700 (u16 LE; entry semantics
+   interpretation NOT required for the law — the scan is membership-only).
+
+ACCUMULATOR +0x1d5c / DAT_000764a0 reset sites (the "partner" t91 asked
+for): FUN_00046aec zeroes it per-race at loop edges 0x46b90 and at
+completion 0x46c75; per-turn value = SUM over owned planets of planet
++0x46 (RES word) + +1/planet gated (gov 0x13bc4==2 && word<15 && owner !=
+DAT_0007458e), x1.2 f64 (0x3feb3333/0x33333333 pair) when nonzero — §3.
+
+BUILD-COMPLETION CROSS-CHECK (kills the "AI picks research when a build
+finishes" hypothesis): sole caller of FUN_00046e84 is 0x39173 inside the
+item-completion branch of the build engine. FUN_00046e84 (EAX=0x74744,
+DX=race) builds the candidate array (same skip-owned + FUN_00046d3c
+legality), then if count>0: rng%count -> **marks that row OWNED directly**
+(mask bytes +0x4a/0x4b |= 1<<race) and if race == player posts event
+0x55a60(code 0x16). It NEVER writes the target word. So research can be
+granted by build completion (AI free-tech grant) while the PICK stays in
+FUN_00040018.
+
+rewrite DELTA (t92 candidate, NOT done t91): researchPhase uniform-random
+pick should become the FUN_00040018 law (legal-candidate build -> preferred
+list -> rng%100<45 sentinel -> uniform), and the completion consumer stays
+§3. [verified law; no code site changed this iteration — docs task.]
+
+## 3c. t92 MEASUREMENT PASS toward the rewrite delta (no code site yet)
+
+Picker body FUN_00040018 fully disassembled this pass (objdump -b binary -M
+intel 0x40018..0x40175 on the restored image) — law as banked in §3b, with
+three pinned details the rewrite implementation needs:
+- candidate loop 0x4002e..0x40083: iterate rows 0..DAT_00074744-1 in ROW
+  ORDER, skip if owned-mask [0x7478b + 0x4b*r]>>24 has race bit, legality
+  call FUN_00046d3c(race,row) (prereq slots +0x40..+0x44, 0xff terminator,
+  ALL must be owned — body read this pass: any-unowned -> eax=0 false),
+  collect into stack array cap 0x20 ([esp+edi*2]).
+- preferred scan 0x400e1..0x40134: OUTER loop over candidates in ascending
+  order; head guard 0x400f4/0x400fb loads the chosen word ([esp+0x72]>>16
+  == WORD [esp+0x74]) and `jne 0x40134` EXITS the scan whenever chosen !=
+  -1. Inner loop 0x40105..0x40127 scans the 23 preferred words with its
+  own chosen!=-1 re-guard (0x4010d) — so the match store 0x4012d executes
+  exactly ONCE: the FIRST candidate (lowest row index) that is a member of
+  the preferred list WINS [verified]. Preferred array = 46-byte copy
+  (rep movsd 0x400af x11 + movsw 0x400b1) at [esp+0x40] from static
+  0x67be; scan cap edx<0x17.
+- sentinel 0x400b3..0x400da PRECEDES the scan: read moffs ds:0x74902
+  (sole code referrer whole-image, re-censused this pass — only
+  data-region false hits at 0x74903/9/13), bit test (flag>>24) & (1<<race);
+  if set: rng%100 < 45 (idiv remainder compare 0x2d) -> chosen := 0xfffe.
+  With -2 set, the very first outer iteration hits the 0x400fb exit (and
+  0x4013b skips the uniform fallback for negative chosen), so the
+  sentinel SHORT-CIRCUITS BOTH tiers. TRUE PRECEDENCE [verified]:
+  sentinel(-2) > FIRST-preferred-member > uniform rng (0x4013f). A
+  surviving -2 is STORED to DAT_00076492[race] at 0x40164 — and readers
+  treat it as "target set" (gate 0x3eb1d tests ==0xffff), i.e. the race
+  then behaves as having an objective that never completes until cleared
+  elsewhere; semantics of -2 in consumers NOT re-measured (named
+  residual).
+
+LIVE FLAG MEASUREMENT (t92, scripts/r1_sav_scan anchors + corollary member
+index B+0x82bb0+X): DAT_00074902 high byte = **0x0f** in the user's live
+campaign slot (work/r1/playcap/save/60.sav, t=1254, 4 AI races) and **0x00**
+in both r1deep scripted slots (50/52.sav). Same probe self-validated:
+rowcount DAT_00074744==66 and row-0 mask +0x47==0xff030000 in all three.
+=> the sentinel is SCENARIO-DRIVEN and in the shipped 4-race scenario EVERY
+AI race is flagged: 45% of pick opportunities the AI researches NOTHING.
+rewrite has no scenario flag model — t93 decision banked below.
+
+PREFERRED LIST RAW VALUES re-verified byte-exact (0x67be, 23 u16 LE):
+4103 3926 60162 1115 1792 43536 512 11792 1 4103 115 4098 302 1792 18192
+512 11792 1 4103 47 50178 315 1792. MEMBERSHIP MATH FOR ROWS 0..65: only
+the values **1** (twice) and **47** are in range — every other entry can
+never equal a candidate row index (0x40123 cmp is a raw u16 equality). So
+on the 66-main-row table the "preferred list" degenerates to {1,47}
+[verified membership set; WHY vendor data holds junk entries is not needed
+for the law]. The rewrite pin test must therefore use rows 1 and 47.
+
+t93 IMPLEMENTATION DECISION (banked): apply the sentinel UNCONDITIONALLY
+for AI owners to mirror the shipped 4-race scenario the measured flag 0x0f
+represents. MODEL NOTE: the original stores -2 into the target slot; the
+completion consumer 0x46bbb guard is `cmp eax,0xffff; jge skip` with a
+zero-extended load, so -2 (0xfffe) PASSES the guard and indexes tech-cost
+at row 0xfffe — vendor pseudo-target semantics NOT safe to copy blindly
+(named residual §3c). SAFEST REWRITE MODEL: sentinel => that AI owner does
+not pick and does not progress research this turn (queuedTech stays -1),
+re-evaluated next turn — cite §3c in the code comment. The player keeps
+the cheapest-cost default (unchanged). This is a behaviour change to every
+AI timeline — regen all seeds + PLAYTHROUGH (t89 procedure), every seed
+must stay FINITE < 1200. Pin test must use preferred rows 1 and 47 only.
+
 ## 4. Census numbers / tools
 
 - call-graph edges: obj0 full E8 scan; 0x3f130 callers EXACTLY {0x3eade};

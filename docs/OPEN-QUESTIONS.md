@@ -632,8 +632,29 @@ sentinel -> uniform fallback; target stored DAT_00076492[race]
 <15) + planet RES word; x1.2 (0x3feb3333 pair); >= cost -> mask +0x4a/+0x4b
 set); ship orders FUN_00040178 kind/target +0x58/+0x59 + congregation-
 to-nearest-friend via starlane table 0x45beb (0x4aa10) [verified]. STILL
-OPEN (rides this row's expansion-cadence + remaining minutiae): research
-PICKER (who sets race+0x1d4e = W6-A4), order-ENUM numeric law (W6-A5),
+OPEN (rides this row's expansion-cadence + remaining minutiae):
+research PICKER CLOSED t91 (W6-A4): field identity 0x74744+0x1d4e ==
+DAT_00076492 (turn call site 0x2502f EAX=0x74744; exhaustive disp census —
+raw u16 0x1d4e scan 6/6 sites all in FUN_00046aec/0x46e84, disp32 0x76492
+19 insn sites, pin tool scripts/r1_t91_picker_census.py RC=0); AI picker ==
+FUN_00040018 (value-writers 0x40164 picker + 0x47e34 UI; gate 0x3eb1d calls
+it iff target==0xffff): legal-candidate build (skip owned, FUN_00046d3c
+prereq chain) -> preferred-list scan (static 0x67be, 23 u16, zero writers)
+-> DAT_00074902-bit race rng%100<45 sentinel -2 -> uniform rng — SAME law
+as the t90 expansion pick: research + expansion target are ONE per-race
+slot. Build-completion path FUN_00046e84 (sole caller 0x39173) GRANTS rng-
+chosen legal tech directly (mask +0x4a/4b) and never writes the target word
+(aicode.md §3b). rewrite researchPhase uniform pick = delta t92. t92 PASS
+(budget-interrupted, honest negative, NO code change): picker body
+0x40018..0x40175 fully disassembled — precedence MEASURED-CORRECTED to
+sentinel(-2) > FIRST-preferred-member > uniform (guards 0x400fb/0x4010d/
+0x4013b, aicode.md §3c); preferred-list membership math: on the 66-main
+table only values 1 and 47 can ever match a candidate row; sentinel flag
+DAT_00074902 measured LIVE 0x0f (all 4 AI flagged) in playcap 60.sav,
+0x00 in r1deep slots (probe self-validated rowcount 66 + row-0 mask);
+-2-consumer semantics named residual; full t93 implementation decision +
+pin-test spec banked aicode.md §3c. Remaining: rewrite delta (t93),
+order-ENUM numeric law (W6-A5),
 0x43b50 tail + 0x2ef60 case bodies (A6/A7), random-event module P0. No
 rewrite code change this iteration (map task; delta candidates banked in
 aicode.md §5 for t91).
