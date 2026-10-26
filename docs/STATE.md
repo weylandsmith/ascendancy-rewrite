@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-26T15:55
+updated: 2026-10-26T16:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -186,7 +186,10 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t89 (CODE task, closes OQ-010 if it passes tests): UPGRADE the rewrite's
+NEXT t89 (CODE task, closes OQ-010 if it passes tests — t89a scoping pass
+2026-10-26 confirmed the site EXISTS, see T89a block below; run it in a fresh
+session with a full budget: build + 108 tests + record_playthrough + gate):
+UPGRADE the rewrite's
 combat resolution to the now fully-cited original law (docs/re/combat.md
 S2d+S2f+S2g+S2h — every leg instruction-verified in work/ascend_restored.bin):
 (1) FIRING ORDER = ship gizmo slots in STORED order, every cat-0 weapon
@@ -214,6 +217,27 @@ Sitting watch: work/r1/playcap/live-timeline.jsonl was 5.68 GB, user idle at
 t1254 all day (watch.log latest readouts all t=1254, DAT_482fb=14); a NEW
 turn-boundary sitting outranks this -> scripts/r1_t85g_sitting.py first.
 OQ-021 passive watch continues: boundary sample 23/50, selector never armed.
+T89A LANDED (scoping pass for the t89 CODE task — budget-interrupted, honest
+negative, NO code change): the assignment's own "check first" gate EXECUTED
+and PASSED — rewrite/src/game/campaign.cpp:1247-1322 IS a combat phase
+(attackScore :1204 / defenseScore :1226 / capture walk :1289-1321, advance()
+:1376), so the "rewrite never modelled combat" BLOCKED branch is DEAD.
+Scoping measured the structural constraint (S2i): no per-ship gizmo
+inventory exists in the rewrite (ShipInTransit {owner,from,target} only,
+fleet_ cleared every turn campaign.cpp:929), so the upgrade is an
+AGGREGATE-law change: (a) volley = SUM of researched cat-0 Levels replaces
+MAX (:1217, cites 0x4a5c1 every-weapon law; file cat-0 rows re-verified
+this pass: Levels 1,2,4,4,1,4,6,4,10,13 / NumUses 1,1,1,1,5,1,2,2,2,3);
+(b) the :1275/:1305-1306 noise draws are an UNCITED v1 abstraction the S2g
+measured-negative determinism forbids — removal decision + PLAYTHROUGH
+regeneration procedure banked; (c) shield-then-hull maps to fleetDamage_
+ordering, no new pool invented. docs/re/combat.md S2i + OPEN-QUESTIONS
+t89a status + BLOCKED t89a (budget interrupt, supersession note for the
+t70 research-block entry) written. OQ-010 STAYS OPEN (strict-close: closing
+measurement = the code change + its pin test). Sitting watch: live-timeline
+5.68 GB, all readouts t=1254 DAT_482fb=14 — no new turn, assignment stands.
+Gate GATE_EXIT=0, ledger_audit LEDGER AUDIT OK (open set unchanged
+{003,005,010,016,019,020,021,023}).
 T88A LANDED (S2g audit + COMMIT LAW): re-verified instruction-by-instruction
 every load-bearing t88 draft claim (dispatcher 0x4a360 category legs, gate
 0x49f28 [ship+0x62], volley loop 0x4a5c1 stored-order law, gun handler

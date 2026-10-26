@@ -121,7 +121,17 @@ volley path is a mode-0 dry-run (no DEC uses, no power charge). Self-destruct
 sites 0x4d191/0x4d2dd pass the dispatcher's mode variable (0x4d2dd gated
 at-war [edx+0x12fd6]==2). Row STAYS OPEN: all named residuals answered by
 cited absence/measurement, contract closure still needs the rewrite
-combatPhase code-site change (t89).
+combatPhase code-site change (t89). STATUS t89a (scoping pass, no code
+change — session budget exhausted mid-task, docs/BLOCKED.md t89a): the
+"does the rewrite have a combat phase" gate PASSED — Campaign::combatPhase
+exists rewrite/src/game/campaign.cpp:1247-1322 (advance() :1376); upgrade
+target = attackScore :1204-1224 / defenseScore :1226-1240 + the noise draws
+:1275/:1305-1306. Aggregate-model constraints and the exact honest delta
+(SUM-of-Levels volley replacing MAX per 0x4a5c1 every-weapon law; noise =
+uncited v1 abstraction vs S2g measured-negative determinism — removal
+re-diverts rng_ and requires PLAYTHROUGH regeneration), full scoping in
+docs/re/combat.md S2i. Row STAYS OPEN (strict-close: the code-site change
+plus its pinning test is the closing measurement).
 OQ-003 | gam | .gam full record map + field meanings; packed entropy regions
 | open | W1 joint: planet records already joined file<->live RAM 151/151
 (stride 123); STAR TABLE + ORBIT LAWS closed 2026-10-06 map the neighbourhood

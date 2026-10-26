@@ -351,3 +351,20 @@ end turn (OQ-023), and let two fleets exchange fire once, end turn
 with selector = uninitialized heap (e.g. 0xC500) — slot-adjudication
 law for the analyzer: trust slots with T>0 only.
 Status: READY, not yet run (agent does not play; needs the user).
+
+## t89a — OQ-010 code-site upgrade: session budget interrupt (NOT a research block)
+
+The t70 entry above is SUPERSEDED for the research leg: t85g..t88a closed
+every named OQ-010 residual with cited static evidence (docs/re/combat.md
+S2d-S2h). What remains is the contract's second leg — the rewrite
+combatPhase code-site change + pin test — and that work was CUT OFF this
+iteration by the run-time budget, not by a research or tool blocker.
+Best default to proceed under: t89 runs next session exactly as scoped in
+docs/re/combat.md S2i (site campaign.cpp:1247-1322; edit = SUM-of-researched-
+weapon-Levels volley + explicit decision on the uncited noise draws; then
+run_tests + scripts/record_playthrough.sh regeneration + gate). The
+"rewrite has no combat phase" BLOCKED branch is MEASURED DEAD — the phase
+exists. If t89's noise removal changes timeline outcomes, that is expected
+regeneration (PLAYTHROUGH.md is generated output), not a regression; the
+gate 3l budget (1200 turns) must still end VICTORY on seed 2024 or t89
+reverts the (b) leg and keeps the draws with a documented-default note.

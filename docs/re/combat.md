@@ -463,3 +463,46 @@ t1252=15, t1253=14, t1254=14 — while systems_full is flat 26->28->32.
 score_stars == systems_full matched 0/786 rows t>=1250. The variable is
 NOT a system count; it MOVES (up and down) with no matching system
 change. See docs/re/score.md S9.
+
+## 2i. t89a SCOPING pass for the combatPhase UPGRADE (docs only, no code change — session budget exhausted before the edit; block recorded docs/BLOCKED.md)
+
+SITE CONFIRMED (the STATE "check first" gate PASSED — the rewrite does model
+combat): Campaign::combatPhase exists at rewrite/src/game/campaign.cpp:1247
+..1322, called from advance() :1376. The upgrade target is the capture
+resolution block: the attackScore/defenseScore border walk at :1305..1306
+plus the two score functions attackScore :1204 / defenseScore :1226.
+
+STRUCTURAL FACT the upgrade must design around (read this pass):
+the rewrite has NO per-ship gizmo inventory anywhere —
+* ShipInTransit is {owner, from, target} only (campaign.h:90-94) and
+  fleet_ is emptied every turn (expansionPhase, campaign.cpp:929);
+* the only gizmo consumers are attackScore (:1212-1218, MAX researched
+  weapon Level) and defenseScore (:1231-1237, MAX researched shield Level);
+* nothing stores a per-ship slot array, so the original's stored-order
+  volley law (0x4a5c1) and the per-hit two-layer clamp (0x4b7c4..0x4b8a6)
+  have NO rewrite data structure to be "wired into" as-is.
+
+WHAT THE AGGREGATE MODEL CAN CARRY WITH CITATION (the honest delta):
+(a) VOLLEY TOTAL: the cited law fires EVERY researched cat-0 weapon per
+    engagement (0x4a5c1..0x4a5fc, S2h-audited), so empire volley damage
+    = SUM of researched weapon Levels, replacing the MAX at :1217.
+    File values re-verified fresh this pass (extracted/ascend00/gizmos.txt,
+    10 cat-0 rows): Level/damage {1,2,4,4,1,4,6,4,10,13}, NumUses
+    {1,1,1,1,5,1,2,2,2,3} (0=unlimited per vendor header).
+(b) DETERMINISTIC DAMAGE: the shipped uniform noise draws (:1275,
+    :1305..1306) are an UNCITED v1 abstraction — the cited law has NO hit
+    roll (S2g measured-negative). Removing the draws is the faithful edit
+    BUT it re-diverts campaign rng_ and changes ALL timelines: every
+    PLAYTHROUGH turn count, the gate 3l 1200-turn budget, and
+    campaign_reaches_a_victory. KEEPING the draws keeps timelines but only
+    partially matches "deterministic". This is the ONE decision t89 must
+    make explicitly (recommend: remove the noise per the cited law and
+    regenerate docs/PLAYTHROUGH.md with scripts/record_playthrough.sh,
+    then re-verify finite victory on seeds 2024/42/13 + 1/2/2024 — that
+    IS the closing measurement).
+(c) SHIELD-THEN-HULL: maps to ordering fleetDamage_ subtraction by shield
+    absorb first (fleetDamage_ is the rewrite's integrity analogue,
+    campaign.h:341); death-at-integrity<1 already maps to the capture /
+    Extinct verdict path — cite the mapping, do not invent a hull pool.
+ORDERING RATIONALE for t89: (a)+(b) are one edit in one function; do them
+together, rebuild, run run_tests (108), record_playthrough.sh, gate.sh.
