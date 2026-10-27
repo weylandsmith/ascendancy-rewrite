@@ -334,6 +334,38 @@ advance family (0x4c4xx walk per S11). S11 assert polarity RE-CONFIRMED
 raw: gradient-not-found falls through to FUN_0002a428 ("..\race.cpp"
 string @0x84cb4); found-flag 0xffffffff @0x41b15 skips it @0x41b28.
 
+*** t101 CORRECTIONS + CLOSURE [verified raw objdump; trail
+docs/re/_wip_t101.md F4/F5; tool scripts/r1_t101_field_verify.py RC=0]:
+(1) RECORD-START CONVENTION: this section's "row" base 0x7653c sits
+0x30 ABOVE the raw design-record start 0x7650c (t87 map) — every quoted
+[row+K] here == raw design[+0x30+K]: row+6 == +0x36 (POWER COST), row+2
+== +0x32 (category byte), row+0x26 == +0x56 (SHIELD level, CAT==1 rows).
+The VALUES were measured on the RIGHT BYTES; the semantics were not: the
+row+2==1 gate == design[+0x32]==1 == the shield family (combat.md S2d
+CAT_SHIELD), [ship+0x90] is SHIELD CHARGES (t86 closed), and the
+"propulsion dwords 1,2,1,3,4,5" are EXACTLY t86's six shield Levels at
+raw +0x56 — same bytes, so rows 10..15 are shields by the raw table
+[LIVE-NAMED 60.sav: Ion Wrap, Concussion Shield, Wave Scatterer,
+Deactotron, Hyperwave Nullifier, Nanoshell; drives are cat2 rows 16..20
+Tonklin Motor..Nanowave Space Bender], and t47's "gizmo fuel" law IS the
+shield-power/shield-charge law t86 independently closed at 0x49f15;
+drives' entire footprint remains the stat +0x10 sum @0x49b67.
+(2) "+0x94 design-list pointer" label VOID: +0x94 is the per-turn MOVES
+budget (integer; panel 'POWER %d MOVES %d INTEGRITY %d' 0x1da8a..0x1daaf);
+re-granted EVERY turn to [ship+0x10] (drive stat sum, S10), optionally
++ ds:0x77f6c (identity UNMEASURED — a global addend read only here) by
+status bit1, zeroed by bit0 — FUN_0004a658 raw.
+(3) THE OPEN CONSUMER IS CLOSED: travel consumes BOTH budgets at the
+commit-gated site 0x4a2d4..0x4a314 (`cmp edi,0x1` = S2h mode law):
+fild [ship+0x94]; fsub travelled-float; fistp [ship+0x94] AND
+[ship+0x88] -= int arg (POWER burn). Order-completion leg 0x41df4..
+0x41e07 drains +0x94/+0x88 to 0 folding the remainder into a build word.
+The "sugar-cube scale" question becomes: distance is the RAW float world
+distance walked per step call 0x533e0 — no hop/turn abstraction exists.
+The +0x88 recharge law (trunc([+0x18]*(1+clamp((T-[+0x52])//100,0,10)/
+10))) is F7/F4. Rewrite: still no delta (aggregate model; per-ship fields
+= OQ-019). ***
+
 
 ## 13. SCALE-LAW INCREMENTS (t48): x32 gizmo units, +0x88/+0x8c budgets; drive-hop conversion NOT in executor — BLOCKED route recorded
 

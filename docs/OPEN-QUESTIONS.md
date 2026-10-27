@@ -764,7 +764,16 @@ help.txt ability text (5 HealShips .. 20 IndustryBoost, 15/18 NOP);
 row+0x19e = counter (+1/turn iff [[row+7]+0x14]&0x80, reset on fire, exact
 == cad fires event 24); 0x6780 = CHARGE-DAYS table (feeds OQ-020). Row
 STAYS OPEN (strict-close): rewrite deltas unimplemented (t100), event-24
-consumer + dx-switch adjudication open.
+consumer + dx-switch adjudication open. t101 RE-ATTRIBUTION PASS CLOSED
+THE §6.4 NOTE (tool scripts/r1_t101_field_verify.py RC=0): vendor panel
+arm 0x1da8a..0x1daaf bytes pin [ship+0x88]=POWER, +0x94=MOVES, +0x8c=
+INTEGRITY into 'POWER %d MOVES %d INTEGRITY %d' F 0x831c9; the t90 §2e
+"race-maintenance legs" (0x43bd0/0x43c0a/0x43c5b) are REFUTED — all three
+loops are edx==1 ABILITY bodies (jump table FILE 0x43b10 16/16); per-turn
+recharge = FUN_0004a74c [ship+0x88] := trunc([+0x18]*(1+clamp((T-[+0x52])
+//100,0,10)/10)) at 0x3e7b0 (T = ds:0x12e10 live 1254) — law verified
+25/35 exact + 35/35 bounded live, five zero-POWER war-fleet rows remain
+[unverified mechanism] (docs/re/_wip_t101.md F8b). Row STAYS OPEN.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:
@@ -781,7 +790,17 @@ ever (t49 §14: 2260 slot-pair obs 0 state-4) AND scripted fresh campaign
 to turn 52 zero too (t58: 565 slot obs, 0 state-4/0 owned/0 moved, 0
 item-23 landings) — NO save-observable route contains flight; closure
 needs original-hardware/manual-gameplay capture. Default [1,3]+immediate
-arrival stands NOT contradicted.
+arrival stands NOT contradicted. STATUS t101 (re-attribution fallout):
+the two budget fields are now CITED — MOVES = [ship+0x94], re-granted
+each turn to the drive stat sum [ship+0x10] (FUN_0004a658; live == drive
+32/35 rows), consumed by travel as RAW float distance (fild/fsub/fistp
+0x4a30f..0x4a314 under the mode==1 commit gate); POWER = [ship+0x88]
+recharge trunc([+0x18]*(1+age/100-step)). t47's §12/§13 "design-list
+pointer / fuel / propulsion" labels RETRACTED to the +0x30 base-offset
+artifact (ships.md §12 t101 block — rows 10..15 live-NAMED shields).
+Remaining per-ship: the per-turn step CLAMP law (how far a ship walks vs
+its MOVES budget — the walk body 0x533e0 + callers) and the build/redesign
+inventory path. Row STAYS OPEN.
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T06:40
+updated: 2026-10-27T08:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,40 +202,67 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t101 (STATIC task): the +0x88-vs-+0x94 SHIP-FIELD RE-ATTRIBUTION PASS
-named by aicode.md §6.4's NOTE — resolve the standing banked-law conflict.
-CONFLICT: t85g's live readout labels ship +0x88 = MOVES (boundary recharge,
-turn-coupled churn), S2d banks +0x88 = gizmo-POWER sum (0x4a756 init from
-0x4a99c); t99 shows profile 7 DOUBLES +0x88 (help.txt DoublePower "power")
-and profile 9 ZEROES it (SapAlienPower "wipe out power") — both POWER
-semantics — and proposes MOVES candidate = +0x94 (panel fmt order
-POWER,MOVES,INTEGRITY == +0x88,+0x94,+0x8c per t96 display fn F 0x831c9).
-Also suspect: t90's "moves x2 recharge loop 0x43c5b" sits INSIDE the
-DoublePower body region (0x43c3f..0x43c79) — may have mislabelled that body.
-METHOD (~25 probes): (1) objdump writer/reader census +0x88 and +0x94
-(r1_t86_write_census pattern, both offsets, whole obj0); (2) the movement
-law: find where launching/traversal CONSUMES a per-ship field (callers of
-0x4aa10 starlane-cost, order exec 0x40178 region — MOVES must be
-decremented by distance or hops); (3) adjudicate 0x43c5b fully (disasm
-0x43c3f..0x43c79 with body boundary from §6.3 profile-7 start 0x43c3f);
-(4) live cross-check on 60.sav + one held-turn slot: sample +0x88/+0x94
-across a turn boundary for a moving fleet (t85g evidence_slot04_t1254).
-BANK: combat.md S2d amendment + aicode.md §6 NOTE adjudication; correct the
-t90 moves-loop claim if refuted. NO rewrite code expected (fleetDamage_/
-power model is aggregate; per-ship fields = OQ-019 territory) — verdict is
-docs + OQ-016/OQ-019 annotations.
-Rationale: t100 landed the last placeholder with a cited table (OQ-020
-CLOSED); of the three named static residuals this is the cheapest, resolves
-a KNOWN contradiction between two banked laws (the t93 lesson: banked prose
-breaks where raw asm doesn't), and the answer gates how the event-24
-consumer decode (next candidate, larger P0 effort) reads ship fields —
-decoding a consumer with a mis-attributed offset wastes that iteration.
-The 0x37b6c dx-switch adjudication stays third.
-Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44), no
-new sitting at t100; a NEW turn-boundary sitting outranks this ->
-scripts/r1_t85g_sitting.py first (its combat frames are also a free
-+0x88/+0x94 differential for this very task).
+NEXT t102 (STATIC task): the EVENT-24 (SA_) CONSUMER DECODE — what the
+queued event 0x18 on game object 0x7a35c (producer 0x55a60 from the
+FUN_0003e6e0 tail 0x3e807, counter==cad exact) does WHEN DISPATCHED: the
+random-event module that pops the stride-10 queue at +0x475e on 0x7a35c
+(depth 32, count word, event table), and whether the SA_ effects re-run
+through the t99 bodies — the bodies are gated by the edx==1 path (dispatch
+site 0x441c1, t101-verified), so the consumer must be the caller passing
+edx==1, or the effect is deferred elsewhere.
+METHOD (~30 probes): (1) live queue state on 60.sav via the corollary index
+(head/count words at +0x475e region on the game object — locate the object
+first, it is the 0x7a35c-image-address data, member B+0x82bb0+0x7a35c+);
+(2) rel32 caller census of FUN_00043b50 + register flow proving the edx
+const per caller (expect the event dispatcher with edx=1); (3) decode the
+dispatch window for event id 24 + neighbours in the random-event module;
+(4) resolve t101 residue F8b (five Ungooma war-fleet rows POWER=0 with
+[+0x52] AHEAD of T=1254: attribute the 0x41d80 dec / 0x41e07 zero sites
+reached via jmp 0x41b8f — the drain that runs post-re-init on AI warships).
+Fallback if the queue proves dead in live saves: the 0x37b6c dx-switch
+adjudication (third in the queue since t101).
+Rationale: t101 landed the re-attribution exactly so this decode reads ship
+fields right (panel bytes pinned; t90 §2e REFUTED; recharge law cited).
+Event-24 has been the named next candidate since t99 and is the LAST
+uncited link in the SA_ chain (cadence CLOSED t99/t100, bodies CLOSED t99,
+EFFECTS-at-fire OPEN); the zero-POWER residue sits inside the same
+dispatch chain, so one task covers both.
+Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44),
+no new sitting at t101 (ring slots 56-60 byte-identical, user holds
+turns); a NEW turn-boundary sitting outranks this ->
+scripts/r1_t85g_sitting.py first.
 OQ-021 passive watch continues (boundary sample 23/50, selector never armed).
+
+T101 LANDED (STATIC task — +0x88-vs-+0x94 RE-ATTRIBUTION CLOSED, verify
+tool scripts/r1_t101_field_verify.py RC=0 three legs): (1) PANEL LAW byte-
+pinned 0x1da8a..0x1daaf: cdecl pushes [ship+0x8c],[+0x94],[+0x88] R-to-L
+into 'POWER %d MOVES %d INTEGRITY %d' F 0x831c9 (only 'MOVES' string
+image-wide) => +0x88=POWER, +0x94=MOVES, +0x8c=INTEGRITY (+0x98 max,
++0x18 POWER cap, +0x52 birth day); t85g '+0x88=MOVES' label REFUTED (raw
+observations stand verbatim in combat.md S1), t99 aicode S6.4 NOTE
+CONFIRMED + annotated. (2) t90 S2e REFUTED: the 'race-maintenance legs'
+0x43bd0 (integrity:=max), 0x43c0a (attitude floor), 0x43c5b (+0x88<<=1)
+are the SA_HealShips/ForcePeace/DoublePower BODIES (jump table FILE
+0x43b10 re-resolved 16/16 == t99; 0x43c3d = jmp, no fallthrough into
+0x43c3f); 'boundary recharge is THESE TWO sites' VOID. (3) RECHARGE LAW
+CLOSED: FUN_0004a74c [ship+0x88] := trunc([+0x18]*(1+clamp((T-[+0x52])//
+100,0,10)/10)) (0x4a96c idiv+clamp, 0x4a99c float mul; live constants
+0x851f3=0.1 and 0x2647=2.0 verified on 60.sav), called per-turn per-ship
+at 0x3e7b0 + build completion 0x49d0d; live fit 25/35 exact + 35/35
+bounded (10 deviations = same-day upkeep/travel burns; 5 zero-POWER
+Ungooma rows = F8b residue [unverified mechanism], NOT SapAlienPower —
+no shipped race has ability 9). (4) FUN_0004a658 raw: MOVES re-grant
+[+0x94]:=[+0x10] (+ds:0x77f6c by status bit1, zero bit0); t47 S12/S13
+corrected to the +0x30 record-start artifact — rows 10..15 are the SHIELD
+family (LIVE-NAMED Ion Wrap..Nanoshell, drives = cat2 16..20), values
+stood on the right bytes; travel consumes BOTH budgets at 0x4a2d4..0x4a314
+(mode==1 gate): fsub/fistp +0x94 AND int-dec +0x88 — the t47 CONSUMER-OPEN
+item CLOSED. Docs: combat.md S1/S2d/S2f/S2g amended, aicode.md S2e
+REFUTATION + S6.4 ADJUDICATED, ships.md S12 t101 block, full trail
+docs/re/_wip_t101.md; OQ-016/OQ-019 annotated, BOTH STAY OPEN (strict-
+close — no ledger closure, no rewrite delta: per-ship fields are OQ-019
+territory, aggregate model unaffected). Gate
+GATE_EXIT=0, LEDGER AUDIT OK.
 
 T100 LANDED (CODE task — OQ-020 CLOSED, the measured per-ability cadence
 table wired): abilityChargeTurns (rewrite/src/game/species.cpp) now returns

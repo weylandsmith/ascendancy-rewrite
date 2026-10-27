@@ -176,6 +176,21 @@ strength+20) [verified]; per-ship moves DOUBLING loop 0x43c5b
 recharge: the recharge is x2, race-gated]. Star-table walk tail
 0x43c79.. [not fully decoded this pass — W6-A3 residual].
 
+*** t101 REFUTATION of the two "main leg" claims above [verified raw
+objdump 0x43b50..0x43cc3 + FILE 0x43b10 jump table 16/16]: there is NO
+edx==0 maintenance leg containing these loops. 0x43bd0..0x43bee
+(integrity := max), 0x43bf0..0x43c3d (attitude floor) and 0x43c3f..0x43c77
+(+0x88 <<= 1) are the SA_HealShips / SA_ForcePeace / SA_DoublePower
+ABILITY case bodies, reachable only via the edx==1 dispatch (0x43c3d is
+`jmp 0x43bf9`, no fallthrough into 0x43c3f). The t90 sentence "the t85g
+boundary recharge is THESE TWO sites" is VOID — the per-turn recharge is
+FUN_0004a74c [ship+0x88] := 0x4a99c result = trunc([+0x18]*(1 +
+clamp((T-[+0x52])//100,0,10)/10)), T = ds:0x12e10, called from the
+FUN_0003e6e0 ship loop at 0x3e7b0 and from build completion 0x49d0d
+(recharge multiplier maxes at x2 by age, which is what t85g saw as an x2
+recharge). +0x88 = POWER (panel law, §6.4 NOTE below). Full trail:
+docs/re/_wip_t101.md F1/F4/F7 + scripts/r1_t101_field_verify.py. ***
+
 ## 2f. SHIP ORDER DECIDER FUN_00040178(race row, ship) [verified]
 
 ship+0x58 = ORDER KIND byte; ship+0x59 = ORDER TARGET ptr; ship+0x5d =
@@ -954,6 +969,15 @@ profile 9 zeroes it (help.txt POWER texts) — t85g's '+0x88=MOVES' label is
 WRONG at these sites (MOVES candidate = +0x94, panel fmt order POWER,
 MOVES, INTEGRITY = +0x88,+0x94,+0x8c); re-attribution pass named, t85g
 raw observations stand.
+*** t101 ADJUDICATED [verified]: CONFIRMED as proposed. The panel display
+arm 0x1da8a..0x1daaf pushes [eax+0x8c],[eax+0x94],[eax+0x88] R-to-L into
+'POWER %d MOVES %d INTEGRITY %d' (F 0x831c9 re-dumped byte-exact; the
+only 'MOVES' string image-wide). +0x88=POWER, +0x94=MOVES (re-granted
+per turn = drive stat [ship+0x10], FUN_0004a658; travel fsub/fistp
+0x4a30f..0x4a314), +0x8c=INTEGRITY, +0x98=MAX, +0x18=POWER capacity,
++0x52=birth day. The 16 ability bodies hit POWER only — NO moves-targeting
+ability exists. Verify tool scripts/r1_t101_field_verify.py RC=0 (panel
+bytes + jump table + live laws). ***
 OPEN RESIDUALS (strict-close keeps OQ-016 open): event-24 CONSUMER
 module (P0 random-event family); GOVOROM +0x42-vs-pop relation uncited
 (vendor-text only); the 0x37b6c dx-switch full adjudication; stride-45

@@ -33,12 +33,26 @@ Per-slot u16 diffs between consecutive autosaves WITHIN turn 1253
   damage across the engagement). No other player +0x8c drop t>=1240
   (census over full stream) — matches testimony "they fired back once or
   twice".
-* **+0x88 = MOVES (movement budget).** Decrements of 1..2 per autosave on
-  BOTH sides during the battle (Ungooma 12->11->10->9..., player
-  90->88->85, 40->38->36->35) and RECHARGE at turn boundary
+* **+0x88 = POWER (gizmo power budget)** — t101 RE-ATTRIBUTION: this
+  section's original label "+0x88 = MOVES" was WRONG; the vendor ship
+  panel (0x1da8a..0x1daaf, cdecl pushes into 'POWER %d MOVES %d INTEGRITY
+  %d' F 0x831c9) prints [ship+0x88]=POWER, [ship+0x94]=MOVES,
+  [ship+0x8c]=INTEGRITY (scripts/r1_t101_field_verify.py leg1, byte-
+  pinned). The t85g RAW observations stand unchanged: decrements of 1..2
+  per autosave on BOTH sides during the battle (Ungooma 12->11->10->9...,
+  player 90->88->85, 40->38->36->35) and RECHARGE at turn boundary
   (slot34 85->90 at t1249, slot21 10->11 mid... design max 90/40/20
   [inferred max per design = the peace-constant]). Distinct from +0x8c:
   +0x88 never feeds death (dying ships show +0x88>=0 with +0x8c=0).
+  MECHANISM (t101, cited): the decrements are per-gizmo POWER upkeep
+  `[ship+0x88] -= design[+0x36]` @0x4a710 (FUN_0004a658) and the travel
+  burn @0x4a307; the boundary RECHARGE is FUN_0004a74c->0x4a76c =
+  trunc([ship+0x18] * (1 + clamp((T - [ship+0x52])//100, 0, 10)/10)),
+  cap = [+0x18], T = u32 guest X 0x12e10 — verified 25/35 exact + 35/35
+  bounded on 60.sav (r1_t101_field_verify.py leg3). MOVES = +0x94 is
+  re-granted each turn from the drive stat [ship+0x10] and consumed by
+  travel fsub/fistp @0x4a30f..0x4a314. Full probe trail:
+  docs/re/_wip_t101.md F2/F4/F5/F7.
 
 ## 2. Static site: the ONLY integrity subtract in the image [verified disasm]
 
@@ -118,7 +132,9 @@ rejected.
 +0x90 writers, ship-record class (13 verified image-wide; 0x6f540/0x70c9d are
 UI-struct, [ebp] ones are stack locals):
 * INIT 0x4a756 (ship reset/init family): WORD [ship+0x9c]=0 then
-  0x4a76c: [ship+0x88] = call 0x4a99c (MOVES total from gizmos).
+  0x4a76c: [ship+0x88] = call 0x4a99c (POWER re-init = trunc([ship+0x18] *
+  (1 + clamp((T-[ship+0x52])//100,0,10)/10)) — t101 corrects the earlier
+  "(MOVES total from gizmos)" gloss; 0x4a99c never touches gizmos).
 * CHARGE 0x49f15 (0x49e78, per-gizmo loop step 7 over ship+0xab, count
   [ship+0x15a]; gizmo rec = idx*0x6a + 0x7650c; gate gizmo[+0x33]&0x20):
   ship+0x88 -= gizmo[+0x36] (POWER cost); if gizmo[+0x32]==1 (CAT_SHIELD)
@@ -129,7 +145,10 @@ UI-struct, [ebp] ones are stack locals):
 => SHIELD-LAYER IDENTITY CLOSED: +0x90 is shield charges; capacity/charge
    comes from CAT==1 gizmos' Level field (+0x56, == file Level for the 6
    shields: 1/2/1/2/4/3/5 [verified design table dump, slot-48 t1254]),
-   power at +0x36, range at +0x3a. +0x88 MOVES = sum over gizmos (0x4a99c).
+   power at +0x36, range at +0x3a. +0x88 is the POWER budget itself
+   (t101: re-init trunc([+0x18]*(1+age/1000-style multiplier, F7); the
+   t86 "MOVES = sum over gizmos (0x4a99c)" tag was wrong — 0x4a99c reads
+   only [+0x18]/[+0x52]/ds:0x12e10, no gizmo loop).
 
 CORRECTION to S2 [verified disasm 0x4cd90..0x4cde3]: EDI is NOT a battle-
 built attacker snapshot. Dispatcher 0x4cd90 sets
@@ -208,7 +227,7 @@ file list above):
 | 0x41 | Replenisher | 0x4d228 | loop own gizmo slots ([ship+0x15a] count, stride 7 from ship+0xab): skip 0xff/0x41; slot[+1] WORD := design[gizmo][+0x42] NumUses — RESTORES PER-GIZMO USE COUNTS |
 | 0x45 | Invulnerablizer | 0x4d560 | OR BYTE [ship+0x9c], 0x10 (the t85g flag that NULLS the +0x90 shield absorb at 0x4b7bc — identity now MEASURED: this bit = INVULNERABLE, set by the Invulnerablizer) then slot rebuild (esi+0xab + 7*((ship+0x63 - EAX)/7) via 0x496e4) |
 | 0x48 | Self Destructotron | 0x4d075 | THE FIRE LOOP: per-target over ship list, squared dist (double) vs design[+0x3a]Range*32 (=40*32) -> call 0x4b740 hit path |
-| 0x4b | Hyperfuel | 0x4d1a9 | [ship+0x88] MOVES += design[+0x4a] (=40); slot rebuild/removal via 0x496e4 |
+| 0x4b | Hyperfuel | 0x4d1a9 | [ship+0x88] POWER += design[+0x4a] (=40) (t101: field is POWER, not MOVES — the help.txt "moves" prose conflates the two budgets; the panel prints +0x88 as POWER); slot rebuild/removal via 0x496e4 |
 
 NO CASE (falls to ret): all CAT-0 guns 0x00..0x09, shields, drives,
 scanners, generators, and specials 0x25,0x3b..0x3e,0x40,0x42..0x44,0x46..0x47,
@@ -274,7 +293,9 @@ handler tail on mode 1 (e.g. 0x4c614: [ship+0x88] -= cost).
 
 0x4a55c (EAX=ship, DL stance arg, ebx=target; callers 0x41b4e/0x421d0/
 0x42351/0x42e24/0x43153/0x43301 in the AI-attack module): if [ship+0x88]
-MOVES==0 return 0; sets [ship+0x62]:=1 and stance map (verified 0x4a570..
+MOVES==0 return 0 (t101: [+0x88] is POWER — firing REQUIRES nonzero power,
+guns draw the per-shot power the S2h/S2j accounting charges at handler
+tail); sets [ship+0x62]:=1 and stance map (verified 0x4a570..
 0x4a586): arg 0 -> +0x67=2, arg 1 -> +0x67=1, arg 2 -> +0x67=0 (default
 assert 0x2623); [ship+0x68] := target. VOLLEY LOOP 0x4a5c1..0x4a5fc: for i in
 0..[ship+0x15a) stride 7 over ship+0xab gizmo slots IN STORED ORDER, skip
