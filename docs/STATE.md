@@ -195,38 +195,68 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t95 (STATIC task, W6-A5 CONTINUATION): decode the ship-order-kind JUMP
-TABLE at image 0x8c90 (the six-slot table indexed by order-kind 0..5 at
-0x1de40 `cmp bl,0x5; ja; jmp [ebx*4+0x8c90]`), then read the six case
-bodies and tie each to its SO name (name table 0x88e60, pool-rel imm law
-imm = str_off-0x82BB0, base 0x62b0 + 20k). The raw restored-image u32s at
-0x8c90 are garbage (0x8e020fc5 ..) because the region sits BELOW obj0 code
-start 0x14bb0 and was never relocated in the restored file — TWO sanctioned
-routes: (1) LIVE: the pointer law — table runtime u32 = P0 + 0x8c90 for a
-guest-relocated image member; read the six relocated u32s from a banked save
-slot (B vote via scripts/r1_sav_scan.py, member = physical + 136) and self-
-validate (targets must land in obj0 code [0x14bb0,0x82bb0)); (2) STATIC:
-parse the Watcom LE fixup subobject records covering offset 0x8c90 (header
-walk per docs/re/loader.md; do NOT re-open refuted R3 header-field reads —
-fixup-record iteration only). Case-body rule of thumb: each case pushes a
-pool-rel string (the kind name shown on the ship panel) or calls the exec
-primitives (0x21f58 travel / 0x39894 ability). The t94 census (aicode.md
-§2f-supplement) already names exec semantics: 5=travel-to-star consumed
-into 4 by 0x21f58; issuer 0x220a8; {3,1,2}->4 retreat downgrade 0x220f2 —
-a case body that calls 0x21f58 IS SOGoStar/SOGoSpace-class; use the NAMES
-pushed, not kinematics. Strict-close: numeric->name mappings ONLY from a
-cited case body that pushes the name; anything unmappeable stays named-open.
-rewrite delta: NONE (ANALYSIS-ONLY, cite in the OQ-016 row like the t90 map).
-Rationale: t94 mapped the enum's stores, readers, and exec semantics but the
-value->NAME tie runs exclusively through this fixup-encoded table — it is the
-single named blocker for A5, needs no capture beyond banked slots, and the
-pointer-law read + self-validation pattern is fully banked. After A5:
-A6/A7 (0x43b50 tail, 0x2ef60 case bodies — same fixup-table technique).
+NEXT t97 (STATIC task, W6-A5 FINAL RESIDUAL): find the code that CONSUMES
+the SO-name block (restored FILE 0x88e60, pool-rel imm 0x62b0, 10 records
+stride 20: SONothing/SOGoStar/SOColonize/SOOrbitPlanet/SOPatrol/
+SODefendPlanet/SOAttack/SOGoSpace/BAD/BAD) and tie kind numeric -> name.
+DO NOT re-open the 0x8c90/0x1d840 jump table as the closer — REFUTED-ROUTES
+R13: it is the panel STATUS-template dispatcher, not the name map (t95/t96
+settled this; tools still read it correctly if needed: static table = FILE
+0x1d840, live entries = FILE + P0, six clean pointers). Hammers (~<=30 probes, t96-banked
+aicode.md §2h): (1) disasm helper 0x2fb38 (called right before every
+`rep movsd` string-block copy; t94 called it the R12-adjust helper — verify:
+if it converts pool-rel->linear or relocates, its LAW must be banked; the
+one kind-adjacent call site is the display-fn copy 0x1dae5 which copies the
+WHOLE 200-B block to [esp+0x10] with NO reader in 0x1c000..0x1e500 — so
+check the display fn's FULL extent (prologue hunt above 0x1d000) and its
+CALLEES for one taking edi/esi = that buffer); (2) census 20-stride indexed
+reads: regex imul/lea *,0x14 sites in obj0 whose base traces to a pool
+string-base (callers of 0x2fb38 are the shortlist — census them, they are
+few); (3) if both die, disasm the twin dispatcher region 0x1dd290 + the
+remaining undecoded arms of the 0x1d989 display function family for the
+ORDER MENU builder (menu code indexes names per-menu; the SO block may be a
+debug-only symbol table — if census shows NO indexed consumer, that itself
+is the honest answer: SO names are internal debug identifiers and the
+kind->USER-visible-name mapping lives in static.txt templates only, at which
+point annotate OQ-016 accordingly and A5 closes ONLY if that reading is
+supported by a cited debug-format string (e.g. an assert '%s'-names table
+tie); otherwise row STAYS open named-hammers). Strict-close unchanged.
+rewrite delta: NONE expected (ANALYSIS-ONLY). Rationale: after t96 this is
+the ONLY unmapped piece of A5; both A6/A7 items (0x43b50 tail, 0x2ef60 case
+bodies) remain queued behind it because A5 names the vocabulary they reuse.
 Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44),
-last rows t=1254 re-checked clean at t94 start; a NEW turn-boundary sitting
+last rows t=1254 re-checked clean at t96 start; a NEW turn-boundary sitting
 outranks this -> scripts/r1_t85g_sitting.py first.
 OQ-021 passive watch continues (boundary sample 23/50, selector never
 armed).
+T96 LANDED (CORRECTION task — adopted + committed the killed t94/t95 tree
+first as f66cb55, then refuted its load-bearing premises and banked two
+CLOSED sub-laws): ADDRESS LAW RE-CHECK killed the t95 story — cs-relative
+0x8c90 == restored FILE 0x1d840 (code-object intra +0x14bb0 + 0x8c90), where
+a CLEAN 6-pointer jump table sits (bodies F 0x1d989/0x1db4f/0x1dc1b/0x1dcfd/
+0x1d9ab/0x1d9ab; live = FILE+P0 exactly per the CLOSED pointer law; the
+"LE-fixup garbage" at restored[0x8c90] was obj1 pool data read at a member
+index; no fixup decoding was EVER needed). STATIC disasm of all six bodies:
+the dispatcher is the batmode.cpp SHIP-PANEL STATUS builder mapping kind ->
+static.txt TEMPLATE (kind0 'Sun %s' star-name; kind1 'Planet %s' + [+0x57]
+planet idx, 0xff sentinel; kind2 star-name + '\nMoving to Star Lane/Planet'
+chosen by +0x5d (1/else) when in own system & act!=0, else '\nOwned by %s';
+kind3 'Star Lane', [+0x23]&1 -> 'Red Link', owner-bitmap fail -> tail; kind4
+== kind5 -> shared tail POWER/MOVES/INTEGRITY fmt F 0x831c9; 'INVALID ORDER'
+staged with guard cmp [+0x5d],7) — NOT the SO-name map: REFUTED-ROUTES R13
+added, t95 tool header warning added. STRING-GETTER LAW CLOSED (FUN_00021a20
++ init FUN_000218b4): getter(n) = nth quoted string of game/static.txt
+(191 strings; runtime table data-intra 0x10ba8 -> P0+0x93758, count ds
+P0+0x959bc live 0xbf; live dump matches FILE ORDER exactly). +0x5d ACT ENUM
+census CLOSED-with-sites (imm stores 0:{0x41a30,0x41bff,0x41c26,0x41c98,
+0x41ced,0x41dab,0x460d9,0x499e5} 1:{0x45e31,0x4aa50} 2:{0x40224}; +0x5e =
+act-target object ptr paired; t93's "FUN_0004105c (+0x5d:=2)" corrected —
+0x4105c decides legality, caller stores). SO-name->kind numeric tie STILL
+NOT MEASURED (strict-close honest negative; block = 8 names + 2 'BAD' vs
+kind domain 0..5 -> indices != kinds [inferred]; sole ref 0x1dae5 whole-block
+copy, no stack reader found in 0x1c000..0x1e500). OQ-016 annotated, STAYS
+OPEN. Banked aicode.md §2g-correction/-2, §2h. No rewrite, no game/ change.
+Gate GATE_EXIT=0, ledger_audit LEDGER AUDIT OK (rows=18 open=7 closed=11).
 T94 LANDED (STATIC task — W6-A5 order-ENUM MEASUREMENT PASS, honest
 negative, NO closure, NO code change): the SO name block dumped byte-exact
 (8 names stride 20 @0x88e60 SONothing..SOGoSpace, pool-rel 0x62b0+20k);

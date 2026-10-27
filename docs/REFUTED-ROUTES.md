@@ -152,3 +152,15 @@ Ghidra image with reconstructed VA immediates), NOT work/ascend_payload.bin
 VOID; corrected restored-image scan hit 6 of 16 shp/asset strings at base 0
 (LGRACE/SMSHIP registration, planal, planets->FUN_0001fe20 chain, suns x2).
 Absence remains uninformative (R12); presence is a lead.
+
+## R13. "The 0x8c90 jump table ties order-KIND to SO NAME" — REFUTED (t96)
+The table at cs-relative 0x8c90 (= FILE 0x1d840 restored; static and clean,
+6 pointers to batmode.cpp panel bodies) is the SHIP-PANEL STATUS-text
+dispatcher: each case builds a static.txt TEMPLATE string ('Sun %s',
+'Planet %s', '\nMoving to Star Lane', 'Star Lane'/'Red Link', shared
+POWER/MOVES/INTEGRITY tail). No case pushes an SO-name; the string getter
+(FUN_00021a20) indexes game/static.txt (191 quoted strings), NOT the SO
+block. Chasing kind->name through this table is dead (killed aicode.md §2h
+disasm). Related banked trap: cs-relative immediates need the code-object
+intra base (+0x14bb0), NOT member-index or section-base arithmetic;
+t95's "0x8c90+0x1d4000 fixup decode" and "img 0x8dd9 case bodies" are VOID.

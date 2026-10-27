@@ -692,7 +692,27 @@ tail (fmt '%s %s' star-name + 'POWER %d MOVES %d INTEGRITY %d' via 0x2360c9,
 blit 0x1eef88). A5 residual = ONE read: 0x1e0e70's string-table base+stride
 (img 0x140e70, normal obj0 law — not in the gap) maps indices->names; NOT
 done this session (budget), names NOT tied, row STAYS OPEN (strict-close).
-aicode.md §2g. No rewrite change (ANALYSIS-ONLY).
+aicode.md §2g. No rewrite change (ANALYSIS-ONLY). t96 CORRECTION PASS (t95's
+decode PREMISES refuted by address-law re-check; two sub-laws CLOSED-with-
+code-site, row STAYS open): the "fixup-encoded garbage / unreadable gap" was
+a member-index artifact — cs-base 0x8c90 == FILE 0x1d840 in the restored
+image, where a CLEAN 6-pointer table sits (0x1d989/0x1db4f/0x1dc1b/0x1dcfd/
+0x1d9ab/0x1d9ab; live entries = file+P0 exactly, banked law; no fixup decode
+needed). Disassembled statically: the dispatcher is the SHIP-PANEL STATUS
+text builder, mapping kind->static.txt TEMPLATE (kind0 'Sun %s', kind1
+'Planet %s'+[+0x57], kind2 star-name + '\nMoving to Star Lane/Planet' by
++0x5d, kind3 'Star Lane'/'Red Link', kind4==5 tail POWER/MOVES/INTEGRITY)
+— IT IS NOT THE ORDER-NAME MAPPING, so t94/t95's named closer was chasing a
+wrong target (REFUTED-ROUTES R13). STRING-GETTER LAW CLOSED (FUN_00021a20 +
+init FUN_000218b4): getter(n) = nth quoted string of game/static.txt (191
+strings, runtime table data-intra 0x10ba8 => P0+0x93758, count ds:P0+0x959bc
+live 191 — file order verified live, entry 3='Sun %s'); +0x5d ACT ENUM
+census (9 imm sites 0/1/2, pairs +0x5e=act target; display guard cmp 7).
+SO-name->kind numeric tie STILL NOT MEASURED: block F 0x88e60 has 8 names +
+2 'BAD' (kind domain 0..5 — block indices != kinds [inferred]); sole code
+ref 0x1dae5 copies the 200-B block to stack, no [esp+0x10] reader found in
+window scan 0x1c000..0x1e500. Banked aicode.md §2g-correction, §2h with 3
+named hammers. No rewrite change (ANALYSIS-ONLY).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

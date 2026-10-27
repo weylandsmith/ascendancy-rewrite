@@ -563,3 +563,139 @@ resolve by measurement, do NOT assume.
   STRUCTURE (phase order + decision-site ownership), sufficient to
   de-risk A4/A5, not a constant/formula closure. OQ-016 row annotated
   with the caller-side confirmation + phase-order citation.
+
+## 2g-correction (t96): the "low gap" was a member-index artifact; case
+## bodies ARE statically disassemblable, and the 0x8c90 table holds real
+## Watcom LE fixup records (NOT pre-relocated reloc entries)
+
+ADDRESS LAW RE-STATED (all three spaces, self-checked against
+r1-savestate.md CLOSED law, [verified] t96 on playcap/41 B=0x1bf4d8,
+H=136, P0=B-H=0x1bf450):
+  F = restored/payload FILE offset (= image offset; files same size 0x8cc83)
+  R = guest RUNTIME physical; obj0: R = F + P0
+  M = save member index; M = R + H
+  (1) r1_sav_scan B is a MEMBER index; the banked read form mem[B+x] ==
+      P0+x is the POOL law (B = P0+H), NOT the code law — for obj0 CODE at
+      file F the live bytes are at member F + P0 + H.
+  (2) t95's "case bodies live at img 0x8dd9 etc." and "static region unread-
+      able" were BOTH wrong: t95 read member indices as image offsets. The
+      bodies' REAL file offsets are kind0 0x1d989 / kind1 0x1db4f / kind2
+      0x1dc1b / kind3 0x1dcfd / SHARED tail 0x1d9ab, runtime = P0+F exactly
+      (banked CLOSED law; t95's "img+0x1d4000" mislabels P0+F — 0x1d4000 is
+      merely the Watcom SECTION base = P0+0x14bb0 for this object).
+      Gate-check proof: restored[0x1d989:0x1d9a1] == live mem[0x1dcdd9+136:
+      +152] EXACT (opcodes, no fixups inside); kind1/kind2/kind3 likewise.
+  (3) restored[u32 @0x8c90] = 0x8e020fc5 ... are NOT garbage — they are the
+      WATCOM LE FIXUP RECORDS for the jmp's memory-reference operand (0x8e =
+      142 byte record length; the LE object header + fixup subobject were
+      stripped in the restore, so the table region must be read per the LE
+      fixup-record format, see loader.md; the t95 "disp+136" table read was
+      reading 136 bytes PAST the real table start in member space and only
+      accidentally returned sensible values — re-verify before use).
+
+## 2g-correction-2 (t96): string-getter LAW + ACT enum (+0x5d) + display
+## function identity — the 0x8c90 table is NOT reachable as "img 0x8c90"
+## and its case bodies display static.txt strings, NOT the SO block
+
+STRING GETTER LAW [verified, restored-file disasm 0x21a20 (t95's "live
+0x1e0e70" = file 0x21a20 region, same function family; getter body:
+bounds-check EAX against ds:0x12e0c count, table load `mov eax,[ecx*4+
+0x10ba8]`): the table at DATA img 0x10ba8 is a RUNTIME-built array of char*
+(count u32 at img 0x12e0c, arena img 0x10ec8..0x12e08 = 0x1f40 bytes, cap
+assert 200 @0x218f5). INIT FUN_000218b4 [verified disasm]: opens
+pool-rel 0xa1f = file 0x835cf = "static.txt", reads 200-byte records via
+0x340e8, per record: first byte must be '"' (0x22), strips quotes, unescapes
+\n, NUL-terminates, appends pointer to the table, count++ — i.e.
+**getter(n) == nth quoted string of game/static.txt** (the Corn debug-string
+catalog; error-arm file string '..\\corn.cpp' at 0x835da confirms module).
+Live slot playcap/41 showed count 0 at runtime 0x12e0c (lazy init; never
+called in that sitting). work/r1/game/static.txt EXISTS on disk — the n->
+string map is a FILE, not the 0x88e60 SO block.
+
+DISPLAY FUNCTION IDENTITY [verified]: the 0x1de40-family dispatcher + case
+bodies + shared tail 0x1d9ab live in module batmode.cpp (pool strings
+'%s %s' 0x60d/0x613, 'POWER %d MOVES %d INTEGRITY %d' 0x619=file 0x831c9,
+'INVALID ORDER' 0x638=file 0x831e8). Case bodies call getter(n) with STATIC
+n for LOCATION/STATUS text, not order names: case 0x1db4f (jmp-slot 1)
+= getter(4) + 'Planet %s'-style build off [+0x57] (planet idx, 0xff=sentinel
+-> tail); slot-2 body 0x1dc1b builds '%s %s' from star-name (0x74590
+stride-57 table, name@+0x13, owner byte@0x12e18, idx*57=(idx*32-idx)*8
+verified AGAIN) + getter(5)/getter(6)/(7); slot-3 body 0x1dcfd getter(8)
+'Star Lane', bit [+0x23]&1 -> getter(9), owner-bitmap test via race byte
+ds:0x7458e -> getter(10); tail 0x1d9ab = '%s %s' + POWER/MOVES/INTEGRITY
+via 0x76c79 (sprintf). => THE 0x8c90 JUMP TABLE IS THE SHIP-PANEL STATUS
+DISPATCHER, NOT THE ORDER-NAME MAPPING. The A5 name tie does NOT run
+through it (t95's premise, voided).
+
++0x5d ACT ENUM CENSUS (imm8 stores, verified, regex C6 4x 5d over obj0):
+  0 (NO_ACT): 0x41a30 (target==self/own star reset), 0x41bff, 0x41c26
+    (target kind!=4), 0x41c98 ([+0x84]&8), 0x41ced ([+0x57]!=0xff), 0x41dab,
+    0x460d9, 0x499e5  — 8 sites, all in command-clear paths (fn 2010 family
+    0x41b8f shared exit).
+  1: 0x45e31, 0x4aa50 — 0x4aa50 site: target==[ship+0x59] guard, then
+    +0x5d:=1 AND +0x5e:=esi (object) — MOVE-TO-OWNED-TARGET class (t94
+    already saw +0x5e; the +0x5d half was missed).
+  2: 0x40224 — after FUN_0004105c(ship,+0x59 target) returns nonzero then
+    +0x5d:=2, +0x5e:=eax (result) — 0x4105c = "legal act on target?"
+    decider (walks table ds:0x13b98 count).
+  Companion dwords: +0x5e = ACT TARGET OBJECT POINTER (0x4aa54, 0x40228
+  store pair; display reads it at 0x1deb9/0x1dee5 adding +0x1c/+0x24 =
+  object NAME fields (star rec +0x1c, planet rec +0x24 — consistent with
+  0x1ddd5 tail append ebx+0x1c)).
+  NOTE t93's aicode claim "FUN_0004105c (+0x5d:=2 act target)" is
+  CORRECTED: 0x4105c DECIDES legality; the store is at the CALLER 0x40224.
+
+SO NAME BLOCK remains the only order-name evidence; code-side tie NOT yet
+measured (exec paths use +0x58 kind numerically; display uses static.txt).
+
+## 2h (t96 FINAL BANK). GETTER LAW CLOSED + PANEL STATUS-TEXT LAW + SO-BLOCK
+## residual. Honest state of W6-A5.
+
+STRING GETTER CLOSED SUB-LAW [verified, restored disasm FUN_00021a20 +
+init FUN_000218b4 + LIVE playcap/41]:
+  getter(n): bounds-check n vs count ds:0x12e0c (= P0+0x959bc runtime),
+  return table[n], table at data-intra 0x10ba8 => F 0x93758 => runtime
+  P0+0x93758 (live dump of 191 entries decodes to the static.txt strings IN
+  FILE ORDER: 3 'Sun %s', 4 'Planet %s', 5 '\nOwned by %s', 6 '\nMoving to
+  Star Lane', 7 '\nMoving to Planet', 8 'Star Lane', 9 'Red Link', 10 ' to '
+  — exact match to work/r1/game/static.txt, 191 quoted strings, count live
+  = 0xbf = 191). INIT reads pool-rel 0xa1f = 'static.txt' (file 0x835cf),
+  200-byte records via 0x340e8, quote-strip + \n unescape, arena
+  0x10ec8..0x12e08 intra (0x1f40 B, cap assert 200). So index->string is
+  FILE-DRIVEN (static.txt), NOT the 0x88e60 SO block.
+
+PANEL PANEL-STATUS DISPATCHER, law entry-0x1d4000+0x14bb0=F [verified,
+clean STATIC table at F 0x1d840 = live entries - 0x1d4000 exactly; NO fixup
+decoding was ever needed — t95's "fixup-encoded garbage" came from reading
+member B+0x8c90 (obj1 pool data) and from forgetting the +0x14bb0 code-obj
+intra base: cs-relative 0x8c90 == F 0x1d840, cs base = code obj start]:
+  kind0 F 0x1d989: sprintf(getter(3) 'Sun %s', star->name [objptr+0x1c])
+  kind1 F 0x1db4f: getter(4) 'Planet %s' + [+0x57] planet idx (0xff sentinel
+          -> shared tail); then '\n...' append via [0x12e18+idx*57 owner byte]
+  kind2 F 0x1dc1b: '%s %s' (0x60d) star-name; if star==own star (ds:0x7458e)
+          && act!=0: act==1 -> getter(6) '\nMoving to Star Lane' else
+          getter(7) '\nMoving to Planet'; else getter(5) '\nOwned by %s'
+          (display's OWN copy of the +0x5d law, consistent w/ census)
+  kind3 F 0x1dcfd: getter(8) 'Star Lane'; [+0x23]&1 -> getter(9) 'Red Link';
+          owner-bitmap (race shl ds:0x7458e vs [owner+0x17]) fail -> tail
+  kind4==kind5: entry IS shared tail F 0x1d9ab (panel default: name+coords+
+          'POWER %d MOVES %d INTEGRITY %d' fmt 0x831c9 via sprintf 0x76c79);
+          'INVALID ORDER' (0x831e8) staged at 0x1daf6 with guard cmp
+          [ship+0x5d],7 (act enum valid 0..7 — display-side corroboration).
+  => THE TABLE MAPS KIND -> STATUS TEMPLATE, NOT KIND -> SO NAME. t95's
+  premise that this table was the A5 name tie is VOID.
+
+SO NAME BLOCK RESIDUAL (A5 stays OPEN, strict-close): block = 10 entries
+stride 20 @F 0x88e60: SONothing SOGoStar SOColonize SOOrbitPlanet SOPatrol
+SODefendPlanet SOAttack SOGoSpace BAD BAD. Tension: kinds verified {0..5}
+(cmp bl,5) vs 8 named entries — block indices are NOT kind indices
+[inferred from entry count; NOT closed]. Only code reference: 0x1dae5
+`mov esi,0x62b0; call 0x2fb38 (R12 adjust helper); rep movsd ecx=0x32`
+= copy the whole 200-B block to [esp+0x10] inside the display fn; NO reader
+of [esp+0x10] found in scan window 0x1c000..0x1e500 (8- and 32-bit esp-rel
+patterns) — the kind->SO-name tie is made by some OTHER consumer (order
+menu builder, likely adjacent batmode.cpp UI) or the block feeds a callee
+by address; NOT measured this session. NEXT hammers: (1) disasm R12 helper
+0x2fb38 law bank; (2) census ALL adjust-helper sites + 20-stride indexed
+reads; (3) the two dispatcher twins 0x1de40/0x1dd290 region's remaining
+undecoded arms. rewrite delta: NONE (ANALYSIS-ONLY).

@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """t95 / W6-A5: decode the ship-order-kind JUMP TABLE via the dispatch site.
 
+WARNING (t96): the table read below IS valid (live entries == restored FILE
+0x1d840 + P0, clean pointers), but its PURPOSE was misidentified — it is the
+ship-PANEL STATUS dispatcher (static.txt templates), NOT the order-name
+mapping; see REFUTED-ROUTES R13 and docs/re/aicode.md §2h. Do not spend a
+session "decoding fixups" here; the A5 residual is the SO-block CONSUMER.
+
 THE MEASURED DECODE LAW (this replaces the first draft's B+TABLE read, which
 this session proved WRONG — member B+0x8c90 holds the obj0 DATA pool there,
 not the table):
