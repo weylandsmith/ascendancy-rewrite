@@ -195,36 +195,60 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t99 (STATIC task, W6-A6): decode the FUN_00043b50 race-maintenance
-TAIL and the 0x2ef60 JUMP-TABLE CASE BODIES — the last named A-code
-residuals (aicode.md §2e skeleton + §5 "located, NOT decoded"). ORDER OF
-WORK: (1) full objdump of FUN_00043b50 0x43b50..ret-walk extent (t97 ret-
-walk pattern; bounds: next function head — the integrity-reset loop
-0x43bd0 and attitude-floor write 0x43c36 are already banked, the tail past
-0x43c5b moves-x2-recharge is the OPEN part); (2) dump the 11 entries at
-restored FILE 0x2ef60 — CHECK FIRST whether 0x2ef60 is inside obj0 code
-[obj0 code = restored FILE 0x14bb0..0x82bb0 — 0x2ef60 qualifies; entries
-are plain u32 file addresses per t96 address law, NO fixup decode] and
-disassemble each case body at cases 5..0xf (0x441c1..0x441d2 dispatch);
-(3) for every field write found, run the store-form census pattern
-(scripts/r1_t86_write_census.py) so the law is the FULL writer set, not
-one site; (4) key semantics: row+0x19d (jump index), row+0x19e counter,
-0x6780 cadence-table word — each gets a cited meaning or explicit
-UNMAPPED. Bank in aicode.md §2e-expansion; if a case body implements a
-constant/formula the rewrite placeholders carry (OQ-016 residual list:
-per-cell terrain/nuke wiring, home-placement verification, scenario-
-template preset source), file the rewrite delta as the NEXT task, don't
-implement it this session (one-task rule). Rationale: t98 closed the A5
-route to an honest UNMEASURABLE (R14 — no debug info in the exe), so the
-assignment's own fail-branch unblocks A6; A6/A7 are the only remaining
-NAMED static leads feeding the open OQ-016 scope, and both are decode-
-work with banked tools (objdump on restored image, write censuses, call-
-graph pkl) — no capture dependency.
-Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44),
-last rows t=1254 re-checked clean at t98 start; a NEW turn-boundary
-sitting outranks this -> scripts/r1_t85g_sitting.py first.
-OQ-021 passive watch continues (boundary sample 23/50, selector never
-armed).
+NEXT t100 (REWRITE task): implement the MEASURED per-ability cadence table
+(aicode.md §6, t99) in the rewrite — abilityChargeTurns currently returns a
+plausible-default 30 (rewrite/src/game/species.cpp, OQ-020 note); replace it
+with the cited word table (ability number -> u16 days: 5=60, 6=100, 7=62,
+8=..., FULL TABLE CITED in aicode.md §6 — copy verbatim, do not re-derive),
+wire abilityPhase (campaign.cpp:1076 region) to the same law (counter :=
++0x19e semantics: +1/turn iff [[row+7]+0x14]&0x80, reset-on-fire, fire when
+counter == word), extend the existing pins/tests to pin the new table, and
+RUN the rewrite test suite. ORDER OF WORK: (1) read species.cpp
+abilityChargeTurns/abilityIsCharged + campaign.cpp abilityPhase fully first;
+(2) transcribe the §6 table + semantics; (3) tests first-pin against the
+banked live-save facts (60.sav t1254: rows 0..3 active, +0x19d =
+19/2/11/0, row4 stale — docs/re/_wip_t99.md F9/F10); (4) suite green.
+Rationale: t99 closed the last NAMED static decode (A6/A7, aicode.md §6)
+and its single highest-value output is the OQ-020 charge-days table that
+directly falsifies the rewrite's 30-day placeholder — that delta is the one
+task whose value grows every session it waits; the remaining static leads
+(event-24 consumer module = random-event P0 territory; dx-switch adjudication
+at 0x43f73) are larger decode efforts that should each be sized as their own
+task after OQ-020 lands. OQ-016 stays open (strict-close); OQ-020 flips
+open->measured by this task landing.
+Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44), no
+new sitting at t99 start; a NEW turn-boundary sitting outranks this ->
+scripts/r1_t85g_sitting.py first.
+OQ-021 passive watch continues (boundary sample 23/50, selector never armed).
+
+T99 LANDED (STATIC task — W6-A6 CLOSED THE A6/A7 RESIDUAL, cited, NO ledger
+closure, tool scripts/r1_t99_maint_census.py RC=0): FUN_00043b50 = the
+PER-RACE SPECIAL-ABILITY CADENCE ENGINE, decoded end-to-end (extent
+0x43b50..0x44029 + dispatch): the cs:[eax*4+0x2ef60] jump table resolves via
+the t96 code-object law to restored FILE 0x43b10 (raw 0x2ef60 pinned as pool
+garbage — 16/16 entries outside the function); key row+0x19d = the race's
+SPECIAL ABILITY NUMBER (sole writer 0x4460f inside the RACE%02d.DIP loader
+FUN_00044290; scenario row byte+1 source; live 60.sav rows 0..3 active ==
+19/2/11/0, row4 stale); row+0x19e = charge counter (+1/turn iff
+[[row+7]+0x14]&0x80, stores at exit 0x4400a, reset on fire); counter ==
+cadence word fires EVENT 24 via 0x55a60 on game object 0x7a35c (299 sites;
+consumer = named P0 random-event territory). ALL 16 case bodies disassembled
+AND matched 1:1 to help.txt abil%02d/abres%02d vendor text (5 HealShips,
+6 KnowGalaxy, 8 FastedResearch, 9 DisruptBuild, 10 Plague, 11 BumpShipsIn-
+Lanes, 12 StealTech [popcount(owners mask)>>=2, own bit ORed into row byte
++3, re-pick target 0xffff], 13 Shield [planet +0x62 := 0xffffffff], 15/18
+NOP/passive, 17 Hatred [dyadic, skips self, [r+0x1c0]==2 gate, [r+0x1b2]
+attitude], 20 IndustryBoost; full bodies aicode.md §6). THE HEADLINE: data
+table 0x6780 (FILE 0x89330, data-intra law) is the CHARGE-DAYS-PER-ABILITY
+table — the measurement t57's seven negative probes failed to find; its
+nonzero set == the rewrite's kCharged set {5..14,16,17,19,20} exactly, which
+falsifies the rewrite's 30-day OQ-020 placeholder -> t100 assigned. Cadence
+table/pick-pool reads fixed to data-intra law (CADENCE_FILE 0x89330, pick
+pool {2,3,4} u32 validated). Ledger: OQ-016 t99 annotation appended (row
+STAYS OPEN), OQ-020 corrected to open-with-measurement (the t57 BLOCKED
+"static route exhausted" claim refuted by t99 itself). Banked: aicode.md §6
+(permanent), docs/re/_wip_t99.md (full probe trail F1..F18). Gate 0,
+LEDGER AUDIT OK.
 
 T98 LANDED (STATIC task — W6-A5 WLINK VERDICT, cited negative, NO closure,
 NO code change): spec-first per the t97 rule (IBM OS/2 LX spec rev 11

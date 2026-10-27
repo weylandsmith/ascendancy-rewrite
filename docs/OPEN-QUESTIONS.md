@@ -331,10 +331,16 @@ sizes pins per-size shell runs (108 tests 0 failed) | CLOSED |
 Tail-residue note: gated chains exceed DAT T at low densities (records
 stay allocated past the in-play cut — consistent with the t78 caveat).
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
-"%d day%s", no data file) — current default 30 turns | BLOCKED 2026-10-07
-(static route exhausted: 7 negative probes — string table is runtime-loaded,
-no image/cob presence, no static table, .dip has no charge param; docs/
-BLOCKED.md) | T57b: ITEM ability supply side CLOSED verbatim (FUN_00039b6c + raw asm
+"%d day%s", no data file) — current default 30 turns | open (t99 MEASURED
+THE TABLE — the t57 "static route exhausted" claim is VOID: route was the
+ability-cadence engine, found via W6-A6. Charge period = cadence word
+WORD[0x6780+2*ability]: 5:60 6:100 7:62 8:77 9:90 10:150 11:70 12:63 13:66
+14:72 16:92 17:100 19:89 20:68, ZERO exactly at {0..4,15,18,21} == the
+charged set (rewrite chargedIdx matches exactly); live 60.sav words ==
+restored FILE 0x89330; zero writers image-wide (constant table); UI
+countdown 0x37b6c cad-counter + gate law aicode.md §6.4. STAYS OPEN
+strict-close: closing measurement = rewrite abilityChargeTurns reading the
+lifted table (t100, + pin test). | T57b: ITEM ability supply side CLOSED verbatim (FUN_00039b6c + raw asm
 slot-writer chain 0x38fc8..0x39003: top-up OR word+2 hi |= p3, p3=7
 MissileBase/ShortWhopper, 8 LongWhopper, 0 TractorBeam (write skipped);
 EBX 45/45/90/200 + p4 land in adjacent unattributed slots).
@@ -749,7 +755,16 @@ mapping lives in game/static.txt ONLY (t96 string-getter law). The
 index==act-value reading (act domain 0..7 matches 8-name extent) STAYS
 [inferred], never measured. Row remains OPEN for its remaining A6/A7
 minutiae (0x43b50 tail, 0x2ef60 cases). LE-debug route -> REFUTED-ROUTES
-R14. rewrite delta: NONE (ANALYSIS-ONLY).
+R14. rewrite delta: NONE (ANALYSIS-ONLY). t99 W6-A6 CLOSED THE A6/A7
+RESIDUAL ITSELF (aicode.md §6, tool scripts/r1_t99_maint_census.py RC=0):
+FUN_00043b50 = per-race SPECIAL-ABILITY CADENCE ENGINE; jump table FILE
+0x43b10 (+0x14bb0 law); key row+0x19d = ability number (sole writer 0x4460f
+in the RACE%02d.DIP loader); ALL 16 bodies cited and matched 1:1 to
+help.txt ability text (5 HealShips .. 20 IndustryBoost, 15/18 NOP);
+row+0x19e = counter (+1/turn iff [[row+7]+0x14]&0x80, reset on fire, exact
+== cad fires event 24); 0x6780 = CHARGE-DAYS table (feeds OQ-020). Row
+STAYS OPEN (strict-close): rewrite deltas unimplemented (t100), event-24
+consumer + dx-switch adjudication open.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

@@ -867,3 +867,92 @@ way, unmeasured.
 ROUTE STATUS: LE-debug route KILLED (REFUTED-ROUTES R14). Next named work
 per assignment branch (fail): W6-A6 = 0x43b50 race-maintenance tail +
 0x2ef60 jump-table case bodies (aicode.md §438 reference).
+
+## 6. (t99) W6-A6 CLOSED: FUN_00043b50 = PER-RACE SPECIAL-ABILITY CADENCE
+## ENGINE — tail, dispatch, all 16 bodies, field meanings CITED.
+Tool scripts/r1_t99_maint_census.py (RC=0; table/callers/store-census;
+objdump needs -D not -d on binary-format images). Full working notes:
+docs/re/_wip_t99.md F1-F20.
+
+### 6.1 Extent + shape [verified]
+0x43b50..0x44029. Gate: WORD[0x6780 + 2*(row+0x19a>>24)] > row+0x19e ->
+return -1 (not-due). edx==1 -> dispatch 0x441c1; ELSE return -1 IMMEDIATELY
+(0x43b9c — every body is reachable ONLY through the jump table). Jump-table
+operand `jmp cs:[eax*4+0x2ef60]` = restored FILE 0x43b10 (+0x14bb0 law, t96;
+raw 0x2ef60 = pool garbage, pinned by tool). Key = (row+0x19d-5)&0xff,
+in-range 0..15; out-of-range -> 0x4400a = counter-bump exit.
+EXITS: T1 0x4400a row+0x19e := [esp+0x6c8] (0 for all bodies — counter
+RESET on fire); T2 0x43fe5 (profile-13 body tail) row+0x19e := cad - cnt.
+
+### 6.2 THE DISPATCH KEY IS THE SPECIAL ABILITY NUMBER [verified]
+row+0x19d sole writer 0x4460f (raceneg.cpp loader FUN_00044290,
+RACE%02d.DIP parser: 15 DIPVALUE keys -> row+0x1c7..+0x1e5 words, incl
++0x1c9=DECLARE_WAR/+0x1cb=ACCEPT_PEACE per diplomacy.md L177) stores
+[row+1]; runtime law live-verified (60.sav rows 0..3: +0x19d == byte+1 ==
+dword[+0x19a]>>24 = 19/2/11/0 = Chamachies/Orfa/Ungooma/eliminated).
+help.txt 'abil%02d'/'abres%02d' sections (rewrite species.cpp ALREADY
+parses, 21 blocks) name the ability per index; the UI caller 0x37cb1 opens
+'abres%02d' with the profile. LIVE: player=19, Orfa=2, Ungooma=11.
+
+### 6.3 CASE BODIES (profile -> cited effect; vendor text 1:1)
+ 5 SA_HealShips 0x43baf: every own ship +0x8c := +0x98 (integrity=max).
+ 6 SA_ForcePeace 0x43bf0: every other row: if [x+0x1b0]>>16 <
+   ([self+0x1cb]>>16)+20 -> [x+0x1b2] := that (attitude floor toward self
+   at ACCEPT_PEACE threshold + 20 — the forced-peace push).
+ 7 SA_DoublePower 0x43c3f: every own ship +0x88 <<= 1.
+ 8 SA_RepelAlienShips 0x43c79: stars with own owner-bit byte+0x14: ships
+   with owner!=self && order-kind [s+0x58]==4: 0x220a8(star)+0x21f58(self,
+   ship) re-place at the star (jittered).
+ 9 SA_SapAlienPower 0x43d33: stars byte+0x15 (lane/in-system) own: alien
+   ships +0x88 := 0.
+10 SA_Cornucopia 0x43de4: own planets (skip [p+0x16]==10): track MIN word
+   [p+0x42]; on that planet every slot class byte in {0,1} := uniform pick
+   {2,3,4} (pool 0x6838 u32 x3, rng 0x7824f %3) — "least populated colony
+   into a rich world"; class values = t35 chain barren0/normal/rich.
+11 SA_BumpShipsInLanes 0x43e98: live sys table 0x3a095 stride 0x162 (count
+   DAT_0x43489 hi): [sys+0x58]==5 lanes with owner: ship := at lane star
+   via 0x21f58 (the t85c reversal!).
+12 SA_StealTech 0x43eec: research rows i (cursor edi=i*0x4b added to the
+   raw data-intra 0x7478b — operand = research RUNTIME ROW byte +3 =
+   per-race OWNERSHIP bitmask; live row0 dword 0x0f000000 -> mask 0x0f =
+   all 4 races own it at t1254, consistent): popcount(mask)>>=2 -> own bit
+   ORed INTO the mask (the steal); if row == own target (0x76492[2self]==i):
+   target := 0xffff (re-pick next turn) + accumulator recompute.
+13 SA_Shield 0x43fba: own planets: dword [p+0x62] := 0xffffffff
+   ("invincible for one day"; T2 exit preserves phase).
+15 SA_KnowStarLanes NOP (passive) | 18 SA_FastLaneTravel NOP (0x4400a).
+16 SA_BlockStarLanes 0x4405f: own stars' lane entries (sub-array [star
+   +0x42] words, entries [star+0x2c+4k]): byte[+0x23] |= 2 (block bit).
+17 SA_Hatred 0x440b5: every other row state [r+0x1c0]==2 (AT WAR): for
+   every third x (not self, not r): if [x toward self +0x1b2] >
+   [r+0x1c9] (war's DECLARE_WAR threshold) -> [x+0x1b2] := [r+0x1c9]
+   (make aliens dislike the enemy down to the war threshold).
+19 SA_FreeResearch 0x4414e: own target t!=0xffff: 0x764a0[2self] :=
+   WORD[0x74782 + 45*t] (research cost word — live 50/90/100 for rows
+   0..4) = set progress to cost = "complete in one day".
+20 SA_IndustryBoost 0x4418e: own planets ([p+0x54]!=0xff): WORD [p+0x50]
+   += 100 (build accumulator per income-law live measurement).
+
+### 6.4 CADENCE LAW + TABLE (0x6780 = ABILITY CHARGE DAYS) [verified]
+Counter row+0x19e: +1 per turn in FUN_0003e6e0 tail (0x3e7cf..0x3e805) iff
+[[row+7]+0x14]&0x80 (AI-enable scenario bit); player row excluded; when
+counter EXACTLY equals cad -> EVENT 0x18 (24) queued on game obj 0x7a35c
+(0x55a60, queue depth 32, stride-10 records at +0x475e).
+TABLE words (live == restored FILE 0x89330; ZERO stores image-wide):
+cad[5]=60 6=100 7=62 8=77 9=90 10=150 11=70 12=63 13=66 14=72 16=92
+17=100 19=89 20=68; ZERO at 0,1,2,3,4,15,18,21 -> CHARGED SET {5..14,16,
+17,19,20} == rewrite chargedIdx EXACTLY (species.cpp:30) — the 14 charged
+SA_ abilities. *** OQ-020 CLOSER: charge period = cad[ability] days from
+this table (Baliflids 100, Nimbuloids 68 ...); rewrite default 30 is WRONG
+per-ability. Delta task = t100. ***
+UI leg 0x37b6c dx==1: countdown = cad - counter shown with static.txt
+strings [0x1c]=''/[0x1d]='s' plural law; dx==2 opens 'abres%02d' window.
+NOTE +0x88 LABEL: S2d banks +0x88=gizmo POWER sum; profile 7 doubles it,
+profile 9 zeroes it (help.txt POWER texts) — t85g's '+0x88=MOVES' label is
+WRONG at these sites (MOVES candidate = +0x94, panel fmt order POWER,
+MOVES, INTEGRITY = +0x88,+0x94,+0x8c); re-attribution pass named, t85g
+raw observations stand.
+OPEN RESIDUALS (strict-close keeps OQ-016 open): event-24 CONSUMER
+module (P0 random-event family); GOVOROM +0x42-vs-pop relation uncited
+(vendor-text only); the 0x37b6c dx-switch full adjudication; stride-45
+table 0x74782 identity beyond cost-word.
