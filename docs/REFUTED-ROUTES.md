@@ -164,3 +164,18 @@ block. Chasing kind->name through this table is dead (killed aicode.md §2h
 disasm). Related banked trap: cs-relative immediates need the code-object
 intra base (+0x14bb0), NOT member-index or section-base arithmetic;
 t95's "0x8c90+0x1d4000 fixup decode" and "img 0x8dd9 case bodies" are VOID.
+
+## R14. "WLINK ID-Info / LE symbol records will tie the SO name block" — REFUTED (t98)
+ascend.exe was shipped WITHOUT debug info: DEBUG INFO OFF = DW(le+0x98) = 0
+and LEN = DW(le+0x9c) = 0 (IBM LX spec rev 11 §2.2: zero offset = table
+absent; header reads sealed by byte-exact tiling objtab(2x24B)->obj-page-
+table(121x4B)->resident-name 'corn'->entry table, and loader-section end ==
+DATA PAGES OFFSET 0x17600). Whole-file signature scan: NB03/NB00/NB02/
+ODIAG/DWARF/OS21001 all ZERO; each SON* name occurs exactly once (the block
+at exe-file 0x8b8b0 itself); no non-resident name table; no module-name
+vocabulary. Tool scripts/r1_t98_wlink.py RC=0 prints the verdict. Do NOT
+re-parse LE tables hunting for symbols — there are none; the SO block is
+demand-page image data consumed by nothing (t97 censuses). A5 closes as
+debug-only identifiers per the t97 rule (docs/re/aicode.md §2i). Related:
+t97c's "object table at DW(le+0x30)" was FIXUP SECTION SIZE misread — the
+correct offsets are DW(le+0x40)/DW(le+0x48) header-relative.

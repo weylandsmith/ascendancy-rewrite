@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T02:40
+updated: 2026-10-27T03:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -195,44 +195,61 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t98 (STATIC task, W6-A5 LAST NAMED HAMMER): parse the WATCOM WLINK
-debug records of game/ascend.exe to try once, properly, to tie the SO
-name block (image FILE 0x88e60 == exe-file 0x8b8b0, delta +0x2a50 pinned
-t97c) to kind numerics via a SYMBOL TABLE. ORDER OF WORK (t97 lessons are
-binding): (0) FETCH the WLINK ID-Info / LE object-table record-layout spec
-FIRST (firecrawl pre-approved by user policy; GOAL's no-network clause is
-overridden by the standing user rule for spec fetches — one URL) — t97
-guessed the object-record format TWICE and broke at obj 47 with garbage
-names; do not guess a third time. (1) re-parse the object table at
-DW(le+0x30) per spec (211 objects; names should be .OBJ module names — if
-names decode, module list alone is bankable progress: a shiporders.cpp /
-batmode.obj owning the block tells us where the enum lives); (2) locate
-the ID Info records (per spec, pointed from header or appended after the
-image at a documented record type 0x8x/Ax) and search for DefName/
-DatName/LinName records whose offset resolves (object/segment-relative —
-t97c proved NO raw u32==0x8b8b0/0x88e60 exists anywhere in the exe) to the
-SO block base or to names 'SONothing'..'SOGoSpace'; a symbol record naming
-the array = the cited tie, kind index = array subscript ONLY IF a second
-symbol names an enum/type; (3) if the records name the block but no enum,
-bank it as the t97 §2i reading's SUPPORTING evidence: names are debug
-identifiers, kind->USER-visible mapping lives in static.txt ONLY — and
-that was the t97 rule for closing A5: annotate OQ-016 (A5-minutiae
-component CLOSED as debug-only identifiers, remaining OQ-016 scope
-unchanged) and queue A6 (0x43b50 tail) as t99. If debug info was stripped
-at ship time (plausible: shipping exe, WATCOM string but maybe no ID Info;
-t97c already found zero raw pointers), write the cited negative (record
-absent per spec walk), append REFUTED-ROUTES entry killing the LE-debug
-route, and ALSO go straight to A6 as t99's assignment — after that negative
-there is no cheaper path to A5 than its closing note. rewrite delta: NONE
-expected (ANALYSIS-ONLY). Rationale: t97 exhausted all three t96 hammers
-with honest negatives; this is the only remaining named lead; A6/A7 sit
-behind it ONLY because A5 names their vocabulary — the (3)-fail branch
-unblocks that ordering.
+NEXT t99 (STATIC task, W6-A6): decode the FUN_00043b50 race-maintenance
+TAIL and the 0x2ef60 JUMP-TABLE CASE BODIES — the last named A-code
+residuals (aicode.md §2e skeleton + §5 "located, NOT decoded"). ORDER OF
+WORK: (1) full objdump of FUN_00043b50 0x43b50..ret-walk extent (t97 ret-
+walk pattern; bounds: next function head — the integrity-reset loop
+0x43bd0 and attitude-floor write 0x43c36 are already banked, the tail past
+0x43c5b moves-x2-recharge is the OPEN part); (2) dump the 11 entries at
+restored FILE 0x2ef60 — CHECK FIRST whether 0x2ef60 is inside obj0 code
+[obj0 code = restored FILE 0x14bb0..0x82bb0 — 0x2ef60 qualifies; entries
+are plain u32 file addresses per t96 address law, NO fixup decode] and
+disassemble each case body at cases 5..0xf (0x441c1..0x441d2 dispatch);
+(3) for every field write found, run the store-form census pattern
+(scripts/r1_t86_write_census.py) so the law is the FULL writer set, not
+one site; (4) key semantics: row+0x19d (jump index), row+0x19e counter,
+0x6780 cadence-table word — each gets a cited meaning or explicit
+UNMAPPED. Bank in aicode.md §2e-expansion; if a case body implements a
+constant/formula the rewrite placeholders carry (OQ-016 residual list:
+per-cell terrain/nuke wiring, home-placement verification, scenario-
+template preset source), file the rewrite delta as the NEXT task, don't
+implement it this session (one-task rule). Rationale: t98 closed the A5
+route to an honest UNMEASURABLE (R14 — no debug info in the exe), so the
+assignment's own fail-branch unblocks A6; A6/A7 are the only remaining
+NAMED static leads feeding the open OQ-016 scope, and both are decode-
+work with banked tools (objdump on restored image, write censuses, call-
+graph pkl) — no capture dependency.
 Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44),
-last rows t=1254 re-checked clean at t97 start; a NEW turn-boundary sitting
-outranks this -> scripts/r1_t85g_sitting.py first.
+last rows t=1254 re-checked clean at t98 start; a NEW turn-boundary
+sitting outranks this -> scripts/r1_t85g_sitting.py first.
 OQ-021 passive watch continues (boundary sample 23/50, selector never
 armed).
+
+T98 LANDED (STATIC task — W6-A5 WLINK VERDICT, cited negative, NO closure,
+NO code change): spec-first per the t97 rule (IBM OS/2 LX spec rev 11
+fetched, cached ~/.hermes/cache/web/archive.org-c9e087b277.md); tool
+scripts/r1_t98_wlink.py RC=0 with structural seals (objtab 2x24B -> obj
+page table 121x4B -> resident name 'corn' -> entry table tile BYTE-EXACT;
+loader-section end == DATA PAGES OFFSET 0x17600). MEASURED: DEBUG INFO
+OFF/LEN (le+0x98/0x9c) = 0/0 -> no debug section exists at all (spec §2.2
+zero = absent); file-wide signatures NB03/NB00/NB02/ODIAG/DWARF/OS21001
+ALL ZERO; each of the 8 SO names occurs EXACTLY ONCE in the whole exe
+(the block itself at 0x8b8b0); non-res name table absent (DW(le+0x88)=0);
+module-name vocabulary absent ('.obj' 0, 'shiporders' 0). SO block lies
+inside the demand-page span = plain image data. t97c ROOT CAUSE found:
+DW(le+0x30) is FIXUP SECTION SIZE, not the object table (correct: DW(le+
+0x40)/DW(le+0x48) header-relative); LE object table has no name strings at
+all (spec §2.4) — t97's twice-guessed "name-count semantics" was a
+phantom premise. VERDICT per t97 closing rule: A5 component CLOSED as
+debug-only identifiers — the kind->SO-name tie is UNMEASURABLE by ANY
+remaining route (no symbol table, no consumer, no live pointer); user-
+visible mapping lives in game/static.txt only (t96 string-getter law);
+index==act reading stays [inferred] (act domain 0..7 vs 8 names — closer
+fit than the old kind-domain note, still unmeasured). REFUTED-ROUTES R14
+kills the LE-debug route. OQ-016 row annotated, STAYS OPEN (A6/A7
+minutiae remain). Banked aicode.md §2i. No rewrite delta (ANALYSIS-ONLY).
+Gate GATE_EXIT=0, ledger_audit LEDGER AUDIT OK.
 T97 LANDED (STATIC task — W6-A5 CONSUMER PASS, all three t96 hammers
 executed to conclusion, honest negative, NO closure, NO code change):
 helper 0x2fb38 identity MEASURED (disasm + 106 rel32 caller census):

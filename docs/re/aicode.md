@@ -798,3 +798,72 @@ t97 COMPLETION (same session, hammers (1)-(3) exhausted):
   exists in the whole exe (t97c), so a symbol tie, if present, encodes
   the address in object/segment-relative form — parse segment table
   (offSegTab DW(le+0x34)) before object-relative arithmetic.
+
+## §2i — t98 WLINK DEBUG-INFO VERDICT: exe carries NO symbol table; the
+## SO-name tie is UNMEASURABLE from the binary (cited negative)
+
+Spec-first per t97 rule. Layout source: IBM OS/2 16/32-bit Linear eXecutable
+Module Format (LX) Specification rev 11 (14 Jun 2001), fetched
+https://archive.org/download/IBMOS2Warp4ToolkitDocuments2/lxref.htm (cached
+~/.hermes/cache/web/archive.org-c9e087b277.md). Tool:
+scripts/r1_t98_wlink.py (RC=0; structural seals below, verdict printed).
+
+STRUCTURE [verified byte-wise on game/ascend.exe, 0x8f6d3 B]:
+- LE header at DW(0x3c) = 0x2a50, sig 'LE'. WATCOM variant KEEPS IBM field
+  positions: objtab = le+DW(le+0x40) = file 0x2b14; obj page table =
+  le+DW(le+0x48) = 0x2b44; resident name table = le+DW(le+0x58) = 0x2d28
+  parses CLEAN per spec §2.7 as module name 'corn'; entry table = 0x2d30
+  (adjacent). TILING SEAL: objtab 2 objects x 24 B (WLINK object entry = 20
+  IBM fields + 4) ends EXACTLY at the obj-page-table pointer; page table
+  121 x u32 (DW(le+0x14)=121) ends EXACTLY at the resident-name-table
+  pointer. Three independent header pointers tile byte-exactly -> the
+  header reading is sound.
+- LOADER SECTION (DW(le+0x38)=0x149b1) at le+0xb8=0x2b08 ENDS EXACTLY at
+  DATA PAGES OFFSET DW(le+0x80)=0x17600. Demand pages run 0x17600..EOF.
+- THE SO BLOCK (exe-file 0x8b8b0, t94/t97 pinned) lies INSIDE the demand-
+  page span: it is plain loaded image data, not a table of the container.
+- t97c BUG ROOT-CAUSED [verified]: it parsed "object table" at DW(le+0x30),
+  which per spec fig 3-7 is FIXUP SECTION SIZE (value 0x14794 -> parse
+  started in the loader-tables/file-pages border = garbage at obj 47). The
+  "name-count semantics" premise was a phantom — the LE object table has NO
+  name strings AT ALL (spec §2.4: 20-byte fixed numeric entries).
+
+DEBUG INFO [verified, two independent ways]:
+1. Header walk: DEBUG INFO OFF = DW(le+0x98) = 0, DEBUG INFO LEN =
+   DW(le+0x9c) = 0. Per spec §2.2 note ("Table offsets ... may be set to
+   zero to indicate that the table does not exist in the EXE file") the
+   debug section DOES NOT EXIST in ascend.exe.
+2. Brute signature scan whole file: 'NB03' 0, 'NB00' 0, 'NB02' 0, 'ODIAG'
+   0, 'DWARF' 0, 'OS21001' 0 (spec §2.18 defines the NB0n signature; the
+   'WATCOM' 4 hits are the DOS-stub stub-strings 0x371/0x3c7 and two
+   runtime in-image strings 0x7ad76/0x7ada7 — not debug records). No
+   '.obj'/'.OBJ' module-name vocabulary anywhere; 'shiporders' 0.
+3. Each of the eight SO names occurs EXACTLY ONCE in the whole file — at
+   its own slot in the block (0x8b8b0..0x8b93c). No second copy, no
+   nonresident name table (DW(le+0x88)=0), no symbol referencing them.
+
+VERDICT (strict-close): the kind/act -> SO-name mapping CANNOT be tied by
+symbol table because ascend.exe was SHIPPED WITHOUT DEBUG INFO (cited
+header fields + zero signatures). Combined with t97 (no live-RAM pointer
+into the block; sole static referrer = whole-200-B copy at 0x1dae5 whose
+stack slot is never read; zero pool-rel immediates to name entries beyond
+that copy), NO measurement route to the association remains: the block is
+a debug-leftover name array that survived into the shipping image,
+consumed by nothing. A5's residual is reclassified: UNMEASURABLE-BY-ANY-
+REMAINING-ROUTE, closing note per t97 rule (debug-only identifiers; the
+kind->USER-visible mapping lives in game/static.txt ONLY — t96 STRING-
+GETTER LAW).
+
+SUPPORTING READING [inferred, kept for the record, NOT a closure]: the
+eight names SONothing/SOGoStar/SOColonize/SOOrbitPlanet/SOPatrol/
+SODefendPlanet/SOAttack/SOGoSpace index 0..7, and the ship-panel display
+fn stages 'INVALID ORDER' behind guard cmp [+0x5d],7 (t96 §2h) — the ACT
+field domain matches the array extent. Whether index==act value was NEVER
+measured (no consumer reads the array), so per strict-close it stays an
+inference. The earlier t96 note "block indices != kinds [inferred]" used
+kind domain 0..5 (+0x58); the act domain 0..7 is the closer fit — either
+way, unmeasured.
+
+ROUTE STATUS: LE-debug route KILLED (REFUTED-ROUTES R14). Next named work
+per assignment branch (fail): W6-A6 = 0x43b50 race-maintenance tail +
+0x2ef60 jump-table case bodies (aicode.md §438 reference).

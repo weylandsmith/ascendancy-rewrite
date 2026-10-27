@@ -731,8 +731,25 @@ signature is now STRONG but no cited debug-format tie exists in reach, so
 strict-close keeps the row open. Next hammer (named): WLINK ID-Info parse
 of ascend.exe debug region (LE delta +0x2a50 pinned; raw u32==block-foff
 census already NEGATIVE — any tie is object/segment-relative; fetch the
-record-layout spec before parsing, format guessed wrong twice).
-rewrite delta: NONE (ANALYSIS-ONLY).
+record-layout spec before parsing, format guessed wrong twice). t98 WLINK
+VERDICT PASS (spec-first, IBM LX spec rev 11; tool scripts/r1_t98_wlink.py
+RC=0, seals: objtab->optab->resname tiling byte-exact, module name 'corn'):
+ascend.exe SHIPS WITH NO DEBUG INFO — DEBUG INFO OFF/LEN (header +0x98/
++0x9c) = 0/0 (spec: zero = table absent), zero debugger signatures file-
+wide (NB03/NB00/ODIAG/DWARF/OS21001), each SO name occurs exactly ONCE
+(the block itself; no nonresident name table DW(le+0x88)=0), no module-
+name vocabulary ('.obj' 0). The SO block lies inside the demand-page span
+(0x17600..EOF) = plain image data, not a container table; t97c's parse bug
+root-caused (DW(le+0x30)=FIXUP SECTION SIZE, not objtab; LE object table
+has NO name strings per spec §2.4). CONCLUSION: the name->kind tie is
+UNMEASURABLE by any remaining route — A5 component CLOSED as debug-only
+identifiers (t97 rule): names survive from a stripped debug build, are
+consumed by NOTHING (t97 live+static censuses), and the kind->USER-visible
+mapping lives in game/static.txt ONLY (t96 string-getter law). The
+index==act-value reading (act domain 0..7 matches 8-name extent) STAYS
+[inferred], never measured. Row remains OPEN for its remaining A6/A7
+minutiae (0x43b50 tail, 0x2ef60 cases). LE-debug route -> REFUTED-ROUTES
+R14. rewrite delta: NONE (ANALYSIS-ONLY).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:
