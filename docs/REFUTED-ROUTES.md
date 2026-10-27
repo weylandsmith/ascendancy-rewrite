@@ -112,6 +112,20 @@ generation off the save-time +0x16 row. Sanctioned route: +0x16 writer
 census post-world-gen, else scenario data-file lift (docs/re/income-law.md
 S10 OPEN RESIDUE t29b).
 
+## R12. Scenario-template PRESET SOURCE for the +0x55 seed deviation — REFUTED (t106)
+The "[inferred] residual = scenario/preset-row worlds" reading of the seed-law
+1.4% is dead as an attribution and the file-search route with it. Evidence
+(docs/re/income-law.md T106, tools r1_t106_*): deviations are run-local (7/15
+runs zero-deviation, 41/424 names ever deviate, none consistently), frozen for
+the run (constant d + single grid fingerprint across 20 saves), not array
+aliasing (6/322), and the contiguous slot-block join finds deviating grids in
+NO data file at a rate BELOW the law-holding control (3/29 vs 12/72) — with
+T54b (preset blocks are EXE constants) every file-loaded-grid variant is dead.
+Do NOT re-census scenario files / RESUME.GAM for a per-world grid or seed
+table, and do not re-test per-name consistency (grids are per-run instances;
+R11). The residual's remaining question is WHICH event dispatch mutates +0x55
+between generation and the first banked save (41..56.sav = mid-campaign) —
+capture-class, alongside the rest of the OQ-016 open set.
 ## Meta-lessons (how v1 self-corrected; keep doing this)
 - Verify the number, THEN write the sentence. Controls on every vote/census.
 - Ambiguous windows don't vote (fake-base incident).

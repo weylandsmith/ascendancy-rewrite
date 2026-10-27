@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T18:55
+updated: 2026-10-27T20:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,36 +202,71 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t106 (STATIC task): SCENARIO-TEMPLATE PRESET SOURCE for the +0x55
-pop-cap seed deviation — the last offline-named item on the OQ-016 open
-set after t105 consumed both S6.4 statics. The t29/t33 corpus law holds
-98.63% on first-save-per-world (income-law.md; "residual = scenario/
-preset-row worlds via FUN_00037fc0, not replay noise" is CITED, but the
-PRESET SOURCE itself was never named). Work: (1) census the deviation
-worlds (the ~1.4% where +0x55 != nonbarren/3+5) across banked corpora —
-are they a fixed world-name set per run / do they cluster in one scenario
-(New Game vs resume vs r1size special-mode rows)? (2) the named carrier
-FUN_00037fc0 (planitem/scenario loader, OQ-014 image) plus the newgame.txt
-referrer 0x5212c (datafile census) — find a store site into +0x55 or a
-template row copy (store-form census pattern r1_t86_write_census.py on
-offset 0x55 over the planet pool walk, + disp32 0x55 near 0x37fc0..0x3830c).
-(3) check RESUME.GAM / scenario files for a preset row table (the
-0x744f4 preset table t29 measured is the GENERATION row source; a
-scenario-preset source would be a SECOND carrier). Close = cited writer
-or cited template file+offset for the deviating worlds; else honest
-negative naming what was excluded. OQ-016 annotated either way; STAYS
-OPEN (terrain/nuke wiring, home-placement verification, minutiae,
-live-UI-trace armer all remain — the first three are user/capture-class
-or parked-by-decision, so a t106 negative effectively ends productive
-offline work: next iteration should then stop-report per GOAL "stop when
-blocked"). Rationale: every capture-class target is user-gated
-(OQ-003/005/019/021/023 state BLOCKED-USER/passive-watch); t105 closed
-the last two aicode ability-engine residuals; the preset source is the
-only remaining offline item with a NAMED carrier function.
-Sitting watch: live-timeline 5.69 GB mtime 2026-10-26 15:44, no new
-sitting at t105 (re-verified at session start); a NEW turn-boundary
-sitting outranks this -> scripts/r1_t85g_sitting.py first. OQ-021 passive
-watch continues (boundary sample 23/50, selector never armed).
+NEXT t107 (STATIC task): WORD-WRITER CENSUS AUDIT — re-validate every banked
+"writers accounted / no writer exists" claim that was produced by a
+byte-pattern store census, using the FIXED r1_t86_write_census.py (or
+r1_t106_writers.py). t106 proved the banked census tool NEVER INCLUDED 16-BIT
+WORD WRITES (encodings() dropped the 0x66 prefix; dis_at window desync —
+docs/re/income-law.md S-T106-TOOL): +0x55 gained 4 word sites including the
+world-gen seed itself, +0x42 gained the colonise site 0x23cac among 20 new
+sites. Every CLOSED row whose closure argument cites a t86-style census is a
+potential false-negative dependency. Work: (1) grep docs/OPEN-QUESTIONS.md +
+docs/re/*.md for census-cited closures (grep 'census' near 'writer|writers');
+(2) for each offset cited (priority: +0x88 ship POWER, +0x5d order state,
++0x66 planet flags, +0x4e growth counter, +0x50/+0x52 build queue, +0x44/46/48
+channel words), run the fixed tool and diff vs the banked site list; (3) where
+NEW word-writer sites appear, read each site's function context (objdump from
+function start, functions_full.tsv hex offsets) and adjudicate: harmless
+(controlled write already implied by the law) vs load-bearing (the banked law
+statement must be amended in-place, same-day, like the S10 t106 annotations).
+Close = per-offset table banked in docs/re/census-audit.md (hand-authored; no
+generator touches it) + amendments where needed. A zero-new-sites result also
+closes the audit and PROVES the banked closures safe. Rationale: this is the
+only remaining high-value offline task — the other OQ-016 residues
+(terrain/nuke wiring, home placement, event-dispatch caller of 0x4402a,
+live-UI-trace armer) are capture/user-gated per REFUTED-ROUTES R12 +
+BLOCKED; a t107 clean pass converts the t106 tool bug from an open validity
+liability into a bounded, bounded-by-table fact, after which the loop should
+stop-report per GOAL "stop when blocked". (The t106 assignment expected
+stop-report after a preset-source negative; t106 returned the tool-bug
+finding instead, which reorders priorities — say so here rather than lose it.)
+Do NOT re-run per-name consistency tests or scenario-file searches (R12).
+Sitting watch: live-timeline 5.69 GB mtime 2026-10-26 15:44 unchanged at t106
+session start (no new sitting; re-verify — a NEW turn-boundary sitting
+outranks this -> scripts/r1_t85g_sitting.py first). OQ-021 passive watch
+continues.
+
+T106 LANDED (STATIC task — the scenario-template PRESET SOURCE for the +0x55
+seed deviation: ASSIGNMENT PREMISE REFUTED; a banked census-tool bug found and
+fixed; working notes docs/re/_wip_t106.md P1-P12, tools scripts/r1_t106_*):
+(1) RESIDUAL CHARACTERISED, PRESET ATTRIBUTION DEAD — deviations are RUN-LOCAL
+not NAME-LOCAL (r1_t106_deviation: 15 r1deep runs x first save, 2320 samples,
+43 dev; 7/15 runs ZERO dev; 41/424 names ever deviate, none consistently; flat
+across +0x16 rows and sizes; all on owner 0xFF), FROZEN for the run
+(r1_t106_drift: one fingerprint + constant d across all 20 saves of the
+15-dev run => mid-capture terrain writers and aliasing both out), NOT array
+aliasing (r1_t106_alias: 6/322), NOT in any data file (r1_t106_srcscan v2
+contiguous-block join, DEV 3/29 vs CTRL 12/72 — v1 was invalid, stride-4
+compressed pattern searched contiguously, disclosed before use), and header-
+INDISTINGUISHABLE (r1_t106_hdrdiff +0x6b==105 "discriminator" was 1-record
+noise via two-proportion recount over 8282 records). Framing correction: banked
+"first saves" are MID-campaign (41..56.sav) — a generation law audited after
+40+ turns of event drift; +2 scan @0x4402a..0x44054 explains small positives
+[inferred]. (2) TOOL BUG FIXED (the iteration's load-bearing find):
+r1_t86_write_census.py encodings() never prepended the 0x66 operand-size prefix
+AND dis_at() decoded one objdump window at addr&~0xF (desync = R7 self-inflicted)
+=> NO 16-bit word write had ever entered a banked byte-pattern census. Fixed
+tool: +0x55 = 12 verified sites (4 WORD: 0x37f9a seed nb/3+5, 0x39224 item-37
++10, 0x44054 owner-scan +2, 0x3a664 planet-record CONSTRUCTOR copy — FUN
+0x3a558 field-at-identical-offset copy, callers 0x258dd/0x26044), +0x42 = 28
+sites incl. colonise 0x23cac. New boundary-checked variant
+r1_t106_writers.py. (3) Ledger: income-law.md T106 + S-T106-TOOL appended;
+OQ-016 annotated, STAYS OPEN (open set rewritten: preset-source item REMOVED
+as refuted; remaining = terrain/nuke wiring, home placement, +2 minutiae,
+event-dispatch caller of 0x4402a [capture-class], live-UI-trace armer);
+REFUTED-ROUTES R12 added. REWRITE: no delta (seed/cap laws unchanged; the
+residual class does not alter the aggregate model). No new capture run.
+Gate GATE_EXIT=0, LEDGER AUDIT OK.
 
 T105 LANDED (STATIC task — the last two aicode.md S6.4 residuals CLOSED;
 verify tool scripts/r1_t105_verify.py RC=0 FIVE legs; working notes

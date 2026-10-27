@@ -54,12 +54,12 @@ def encodings(off):
                     # plain [reg+disp]
                     for rm in BASE_REGS:
                         modrm = mod | (reg << 3) | rm
-                        out.add((bytes([op, modrm]) + disp, k))
+                        out.add((pfx + bytes([op, modrm]) + disp, k))
                     # SIB scale=00 index=none(100): [base+disp]
                     for sb in BASE_REGS:
                         modrm = mod | (reg << 3) | 4
                         sib = (0 << 6) | (4 << 3) | sb
-                        out.add((bytes([op, modrm, sib]) + disp, k))
+                        out.add((pfx + bytes([op, modrm, sib]) + disp, k))
     return out
 
 
@@ -98,31 +98,43 @@ DIS_CACHE = {}
 
 
 def dis_at(addr):
-    """First instruction disassembly at addr, via objdump single insn window."""
-    lo = addr & ~0xF  # 16B window base to reuse cache lines
-    if lo not in DIS_CACHE:
-        r = subprocess.run(
-            ["objdump", "-b", "binary", "-D", "-m", "i386", "-M", "intel",
-             f"--start-address={lo}", f"--stop-address={lo + 48}", IMG],
-            capture_output=True, text=True)
-        ins = {}
-        for ln in r.stdout.splitlines():
-            if ":" in ln and ln[:8].strip() and all(c in "0123456789abcdef" for c in ln[:8].strip()):
-                hexpart, rest = ln.split(":", 1)
-                try:
-                    a = int(hexpart.strip(), 16)
-                except Exception:
-                    continue
-                # strip objdump byte column: '  4d1ea: 8b 46 04   mov ...'
-                parts = rest.split("\t")
-                if len(parts) >= 2:
-                    ins[a] = parts[-1].strip()
-                else:
-                    toks = rest.split(None, 2)
-                    if len(toks) == 3:
-                        ins[a] = toks[2].strip()
-        DIS_CACHE[lo] = ins
-    return DIS_CACHE[lo].get(addr)
+    """First instruction disassembly at addr, via objdump windows.
+
+    t106 FIX: the original decoded only the window at addr & ~0xF; objdump
+    starts at the WINDOW BASE, so a base mid-instruction desyncures the stream
+    and real sites were rejected as false negatives (the banked +0x55 seed
+    store 0x37f9a was one of them). Try the aligned base and the two previous
+    16-byte bases; accept only an instruction that STARTS at addr.
+    """
+    out = None
+    for base in (addr & ~0xF, (addr & ~0xF) - 16, (addr & ~0xF) - 32):
+        if base < 0:
+            continue
+        if base not in DIS_CACHE:
+            r = subprocess.run(
+                ["objdump", "-b", "binary", "-D", "-m", "i386", "-M", "intel",
+                 f"--start-address={base}", f"--stop-address={base + 64}", IMG],
+                capture_output=True, text=True)
+            ins = {}
+            for ln in r.stdout.splitlines():
+                if ":" in ln and ln[:8].strip() and all(c in "0123456789abcdef" for c in ln[:8].strip()):
+                    hexpart, rest = ln.split(":", 1)
+                    try:
+                        a = int(hexpart.strip(), 16)
+                    except Exception:
+                        continue
+                    parts = rest.split("\t")
+                    if len(parts) >= 2:
+                        ins[a] = parts[-1].strip()
+                    else:
+                        toks = rest.split(None, 2)
+                        if len(toks) == 3:
+                            ins[a] = toks[2].strip()
+            DIS_CACHE[base] = ins
+        d = DIS_CACHE[base].get(addr)
+        if d is not None:
+            out = d
+    return out
 
 
 def main():

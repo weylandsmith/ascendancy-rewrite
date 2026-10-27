@@ -511,7 +511,9 @@ nb//3+5 verified instruction-level @0x37f84..0x37f9e (nb = non-barren
 SURFACE cells counted by the 0x37e30 generation loop) AND on the corrected
 array 98.6% corpus / 98.63% first-save-per-world (residual = scenario/
 preset-row worlds via FUN_00037fc0, not replay noise — generation-state
-claim RETRACTED, the array IS the generation output); Lush Growth
+claim RETRACTED, the array IS the generation output) [t106 UPDATE: the
+scenario/preset-row ATTRIBUTION ITSELF IS NOW REFUTED — see the t106
+block at the end of this row and income-law.md T106]; Lush Growth
 Bomb (item 37) completion = +10 once (+0x66 flag, 0x39212..0x39229) — rewrite buildPhase/constructor
 REWIRED (capBase/surfaceCells seeded per star, storedCapFor() replaces
 constant-25 default, pin test campaign_pop_cap_seed_law_oq016); t29b
@@ -821,6 +823,32 @@ pointer garbage, GOVOROM = ability number 10, no GOVOROM race row in the
 campaign); (b) the "stride-45 table 0x74782" REFUTED — index math 75*t
 byte-pinned, word = restree runtime cost (base 0x74744, cost@+62, live
 66/66 vs the OQ-013 law). Row status UNCHANGED (the same open set stands).
+t106 REFUTED the scenario-template PRESET-SOURCE attribution for the +0x55
+seed residual [verified, six independent measurements, docs/re/income-law.md
+T106]: deviations are RUN-LOCAL not NAME-LOCAL (7/15 r1deep runs have zero
+deviating planets; 41/424 names ever deviate; none deviates consistently; flat
+across +0x16 rows 0.58-3.00% and sizes 1.17-2.76%), FROZEN for the run (single
+grid fingerprint + constant d across all 20 saves of the 15-deviation run ->
+rules out mid-capture terrain writers and extraction aliasing), NOT array
+aliasing (6/322), NOT found in any data file (contiguous slot-block join: DEV
+3/29 vs CTRL 12/72 external hits across Memory + restored image + 471-file
+corpus; T54b already proved the preset blocks are EXE constants), and
+header-INDISTINGUISHABLE from law-holding records (a +0x6b==105
+"discriminator" was a single-event artifact, z-test over 8282 records). The
+complete corrected word-writer census for +0x55 is FOUR sites — 0x37f9a seed,
+0x39224 item-37 +10, 0x44054 owner-scan +2, 0x3a664 planet-record constructor
+copy (FUN 0x3a558, callers 0x258dd/0x26044) — none able to store an arbitrary
+per-planet value. Residual reading [inferred]: the banked "first saves" are
+MID-campaign states (41..56.sav), so a generation-scoped law was audited after
+40+ turns of event drift; the +2 scan explains the small positives. TOOL LEG
+same turn: r1_t86_write_census.py never prepended the 0x66 operand-size prefix
+and desynced its objdump window, so NO 16-bit word write had ever been in its
+candidate set — fixed, +0x55 now 12 verified sites (4 word), +0x42 28
+(including colonise 0x23cac); r1_t106_writers.py is the boundary-checked
+variant. Row STAYS OPEN (remaining: per-cell terrain/nuke wiring, home-
+placement verification, +2 residual minutiae, event-dispatch caller of 0x4402a
+(capture-class), live-UI-trace armer residual; "scenario-template preset
+source" REMOVED as refuted).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

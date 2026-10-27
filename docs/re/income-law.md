@@ -2004,3 +2004,74 @@ No rewrite behaviour change: campaign.cpp growth block already implements
 exactly this law (threshold 50, alien +1 at PROS<4, cap clamp, upkeep-
 reset); this turn UPGRADES its evidence to full-timeline 90/90 + live
 global votes (scripts/r1_t81_mpop.py for the +0x4a equation).
+
+## T106 — THE +0x55 SEED RESIDUAL: PRESET ATTRIBUTION REFUTED; RESIDUAL IS POST-GENERATION EVENT DRIFT (tools r1_t106_deviation.py / r1_t106_drift.py / r1_t106_alias.py / r1_t106_srcscan.py / r1_t106_writers.py / r1_t106_hdrdiff.py)
+
+The S10/T33 attribution "residual = scenario/preset-row worlds via
+FUN_00037fc0 [inferred]" is now TESTED AND REFUTED, and the residual gets a
+named mechanism class. Measurements (all on banked corpora; no new capture):
+
+1. RUN-LOCAL, NOT NAME-LOCAL (r1_t106_deviation, r1deep corpus, 15 runs x
+   first save, 2320 samples, 43 deviating = 1.85%): 7 of 15 runs have ZERO
+   deviating planets; 424 distinct names, only 41 ever deviate, and NO name
+   deviates in every save where it appears (top: 2/13). Deviation is FLAT
+   across +0x16 rows (0.58-3.00%) and size classes (1.17-2.76%). All 43 sit on
+   UNOWNED (0xFF) planets; 0/93 owned. An authored per-world preset cannot
+   switch on/off between runs for the same name. NB record names are NOT
+   unique keys — "Aglarond I" occurs twice in one save with different grids.
+2. FROZEN FOR THE RUN (r1_t106_drift, r1deep-20261005-233706, 20 saves): all
+   15 deviating planets keep ONE surface fingerprint and constant d across the
+   whole capture — rules out mid-capture terrain writers AND extraction
+   aliasing for this set. d ranges -17..+7 within one run, clustering by star
+   system with per-planet values (not a uniform per-system offset).
+3. ALIASING REFUTED (r1_t106_alias, all 46 non-inject banked runs): shared
+   array pointers explain 6/322 seed failures; 316 sit on unique arrays.
+4. DATA-TEMPLATE JOIN NEGATIVE (r1_t106_srcscan v2; v1 was invalid — it
+   searched the stride-4 compressed class sequence which exists nowhere
+   contiguously, every hit a -1 artifact, disclosed before use): contiguous
+   slot blocks m[arr..arr+4*cells] of 29 deviating vs 72 control planets,
+   searched across Memory, ascend_restored.bin, and the 471-file extracted
+   corpus: DEV external-hit 3/29 vs CTRL 12/72 — no signal. With T54b (preset
+   blocks are EXE constants) the file-loaded-grid route is dead.
+5. HEADER INDISTINGUISHABLE (r1_t106_hdrdiff + significance recount): a +0x6b
+   "discriminator" (105 in 1/204 dev, 0/8078 ctrl) is a single-event artifact;
+   every structural field (+0x0c group, +0x0e class, +0x14/16/18/1a, +0x57,
+   +0x66/68/69) has identical DEV/CTRL value sets. No in-record marker of a
+   second construction path.
+6. WRITER CENSUS COMPLETE (see S-T106-TOOL below): exactly FOUR word writers
+   touch +0x55 — 0x37f9a (seed nb/3+5), 0x39224 (item-37 +10), 0x44054 (owner-
+   scan +2: 0x4402a base 0x2b057 stride 123, count hi16 ds:0x3a091, cmp
+   [ebp+0], cx=[edx+0x55]+2, store, call 0x38ba4 recalc), and 0x3a664 — the
+   498-byte planet-record CONSTRUCTOR copy (FUN 0x3a558; fields at identical
+   offsets +0x00..+0x67 incl. +0x10 array pointer and the 30-byte name via rep
+   movsd ECX=7; callers 0x258dd (loop over WORD [eax+0x27283], the star-count
+   field) and 0x26044). None of the four can set an arbitrary per-planet value;
+   0x3a664 copies what the parameter block holds, and the parameter block for a
+   generated world is filled by 0x37d80.
+
+CONCLUSION [inferred from 1-6, no direct observation of the drift write]:
+the residual set is planet records whose +0x55 (and grid) pair was fixed before
+the capture window by a modifier applied between generation and save 41 — the
+owner-scan +2 (0x44054) explains the small positive residuals directly, and the
+banked first saves are mid-campaign states (41..56.sav), so generation-scoped
+laws were being audited after 40+ turns. The residual is NOT per-world
+scenario data: it does not follow names, rows, sizes, or files. The OQ-016
+scenario-template-preset-source item therefore CLOSES as a REFUTATION of its
+premise (the cited measurement being 1-5 + T54b), with the residual's exact
+write-site (which event dispatch invokes 0x4402a / who perturbs the rest) a
+capture-class question like the remaining OQ-016 open set.
+
+## S-T106-TOOL — r1_t86_write_census.py FALSE-NEGATIVE BUG FIXED (affects every prior census)
+
+Two bugs made the banked census tool blind to 16-bit WORD writes entirely:
+(a) encodings() looped `for pfx in (b"", b"\x66")` but never prepended pfx, and
+(b) dis_at() decoded only the window at addr & ~0xF, and objdump desyncs from a
+mid-instruction base (the R7 pattern, self-inflicted) — the seed store 0x37f9a
+(`66 89 46 55`) was a verified-rejected site under the old tool.
+Corrected counts: +0x55 candidates=39 verified=12 (4 word writers above + 8
+byte-add sites in data regions); +0x42 candidates=51 verified=28 (incl.
+0x23cac mov WORD [ebp+0x42],0x2 colonise, 0x3b0a6/7, 0x37f49, 0x38f28/f39
+growth reset, 0x391b4, 0x393b5/f5). Priors banked from the BROKEN tool's
+byte-only output remain valid as far as they go (they claimed byte writers, not
+completeness), but any future "no writer exists" argument MUST re-run the fixed
+tool or r1_t106_writers.py (boundary-checked variant, adds C6 imm8 form).
