@@ -195,31 +195,61 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t94 (STATIC task, W6-A5): decode the SHIP ORDER-KIND ENUM numeric law.
-FUN_00040178 (aicode.md §2f) stores order-kind byte ship+0x58 with values
-{1,2,3,4,5} verified, names inferred; the 0x88e60 string block (payload)
-holds the vendor order names (SOGoStar../SOAttack family — re-locate the
-block: string-anchor base vote per the R12-amendment file law,
-work/ascend_restored.bin, NEVER the payload FILE for immediates). Method:
-(1) dump the 0x88e60-block strings; (2) census code sites storing literals
-1..5 into +0x58 across obj0 (store-form census pattern
-scripts/r1_t86_write_census.py) and sites READING +0x58 with cmp ladders
-(the consumer's dispatch names each kind); (3) tie each numeric value to a
-string via the reader's window/message path (pool-relative immediate law,
-imm = str_off - 0x82BB0). Bank as aicode.md §2f-supplement: value -> name
--> consumer-site table. rewrite delta: NONE expected (rewrite is
-aggregate-only, no per-ship orders — disposition = ANALYSIS-ONLY, cite in
-the OQ-016 row like the t90 map). Strict-close: numeric mappings only from
-cited readers; anything unmappeable stays named-open (A5 residual).
-Rationale: t93 CLOSED the picker sub-law with code site; A5 is the next
-AI-decode item named by both the t90 map and the t93 assignment, needs no
-capture, and its reader-census technique is fully banked (t86/t88 tools).
-After A5: A6/A7 (0x43b50 tail, 0x2ef60 case bodies).
+NEXT t95 (STATIC task, W6-A5 CONTINUATION): decode the ship-order-kind JUMP
+TABLE at image 0x8c90 (the six-slot table indexed by order-kind 0..5 at
+0x1de40 `cmp bl,0x5; ja; jmp [ebx*4+0x8c90]`), then read the six case
+bodies and tie each to its SO name (name table 0x88e60, pool-rel imm law
+imm = str_off-0x82BB0, base 0x62b0 + 20k). The raw restored-image u32s at
+0x8c90 are garbage (0x8e020fc5 ..) because the region sits BELOW obj0 code
+start 0x14bb0 and was never relocated in the restored file — TWO sanctioned
+routes: (1) LIVE: the pointer law — table runtime u32 = P0 + 0x8c90 for a
+guest-relocated image member; read the six relocated u32s from a banked save
+slot (B vote via scripts/r1_sav_scan.py, member = physical + 136) and self-
+validate (targets must land in obj0 code [0x14bb0,0x82bb0)); (2) STATIC:
+parse the Watcom LE fixup subobject records covering offset 0x8c90 (header
+walk per docs/re/loader.md; do NOT re-open refuted R3 header-field reads —
+fixup-record iteration only). Case-body rule of thumb: each case pushes a
+pool-rel string (the kind name shown on the ship panel) or calls the exec
+primitives (0x21f58 travel / 0x39894 ability). The t94 census (aicode.md
+§2f-supplement) already names exec semantics: 5=travel-to-star consumed
+into 4 by 0x21f58; issuer 0x220a8; {3,1,2}->4 retreat downgrade 0x220f2 —
+a case body that calls 0x21f58 IS SOGoStar/SOGoSpace-class; use the NAMES
+pushed, not kinematics. Strict-close: numeric->name mappings ONLY from a
+cited case body that pushes the name; anything unmappeable stays named-open.
+rewrite delta: NONE (ANALYSIS-ONLY, cite in the OQ-016 row like the t90 map).
+Rationale: t94 mapped the enum's stores, readers, and exec semantics but the
+value->NAME tie runs exclusively through this fixup-encoded table — it is the
+single named blocker for A5, needs no capture beyond banked slots, and the
+pointer-law read + self-validation pattern is fully banked. After A5:
+A6/A7 (0x43b50 tail, 0x2ef60 case bodies — same fixup-table technique).
 Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44),
-last rows t=1254 re-checked clean t93 start; a NEW turn-boundary sitting
+last rows t=1254 re-checked clean at t94 start; a NEW turn-boundary sitting
 outranks this -> scripts/r1_t85g_sitting.py first.
 OQ-021 passive watch continues (boundary sample 23/50, selector never
 armed).
+T94 LANDED (STATIC task — W6-A5 order-ENUM MEASUREMENT PASS, honest
+negative, NO closure, NO code change): the SO name block dumped byte-exact
+(8 names stride 20 @0x88e60 SONothing..SOGoSpace, pool-rel 0x62b0+20k);
+reference census over the restored image (NEW scripts/r1_t94_so_xref.py +
+r1_t94_so_imm.py): exactly ONE code u32-imm to any name (0x1dae5 -> SONothing
+base, ship-info display copying the whole 200-B block — engine indexes the
+table at runtime, no per-name immediates; zero u32 anywhere points into the
+block). +0x58 store/READ census (NEW scripts/r1_t94_order_census.py —
+complements r1_t86 which lacks C6/0 mov-imm8; 56 verified obj0 sites, zero
+outside): imm stores 1:{0x3fb3e} 3:{0x39859,0x49cd6} 4:{0x2202f,0x22127,
+0x49db9} 5:{0x22243,0x2228f}, no imm-0/2 stores. EXEC SEMANTICS measured:
+0x21f58 consumes kind==5 (target [+0x59] = star record; copies 3 f32 star
+offsets, rng%200 jitter each, places via 0x49aa8, stores kind:=4); 0x220a8
+issues kind:=5; 0x220f2 downgrades kinds {3,1,2} with lost targets to 4 with
+[+0x59]:=owning star (0x13bc5 stride-0x60 law); the 0x40178 decider returns
+early on {1,2,5} and asserts kind==4 at 0x553 fallthrough. THE BLOCKER: the
+UI 6-way dispatcher 0x1de40 indexes a jump table at image 0x8c90 — region
+below obj0 code start 0x14bb0, fixup-encoded in the restored file (raw u32s
+garbage), so no static case-body read exists YET; named closer = t95 above.
+Banked in aicode.md §2f-supplement; OQ-016 row annotated, STAYS OPEN
+(strict-close — no numeric->name mapping cited). Game checksums untouched;
+no rewrite change (enum is per-ship, rewrite aggregate-only). Gate
+GATE_EXIT=0, ledger_audit LEDGER AUDIT OK.
 T93 LANDED (CODE task — OQ-016 RESEARCH PICKER sub-law CLOSED-with-code-
 site + §3c CORRECTED): before implementing, the banked §3c disassembly was
 re-verified against raw objdump and FOUND WRONG in its load-bearing claim:

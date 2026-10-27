@@ -437,7 +437,128 @@ IMPLEMENTED (t93, OQ-016 picker sub-law CLOSED-with-code-site):
 - FUN_0004105c (+0x5d:=2 act target) full body = W6-A5 adjacent.
 - 0x43b50 star-table tail + 0x2ef60 jump-table case bodies = W6-A6/A7.
 - ORDER KIND names {1,2,4,3,5} mapping to SOGoStar../SOAttack strings
-  (0x88e60 block) — order enum numeric law STILL OPEN (A5).
+  (0x88e60 block) — order enum numeric law STILL OPEN (A5); t94 pass below.
+
+## 2f-supplement. ORDER ENUM CENSUS (t94) — values/stores/dispatch measured,
+## numeric->name tie NOT made (honest negative, A5 stays open)
+
+NAME TABLE [verified, restored image]: 8 NUL-strings stride 20 at
+0x88e60 SONothing / 0x88e74 SOGoStar / 0x88e88 SOColonize / 0x88e9c
+SOOrbitPlanet / 0x88eb0 SOPatrol / 0x88ec4 SODefendPlanet / 0x88ed8 SOAttack
+/ 0x88eec SOGoSpace; pool-rel imms (imm=str_off-0x82BB0) 0x62b0 +20k.
+R12-consistent reference census (scripts/r1_t94_so_imm.py + r1_t94_so_xref.py):
+EXACTLY ONE code u32-imm to any of the 8 pool-rel names: 0x1dae5 -> 0x62b0
+(SONothing base) inside the ship-info display function (formats ship pos
+[+0x88]/[+0x8c]/[+0x94] floats against 0x831c9 at 0x1da83..0x1daac); the
+site does `mov esi,0x62b0; call 0x2fb38; mov ecx,0x32; rep movsd` = relocate
++ copy the WHOLE 200-byte block to stack — i.e. the engine indexes names at
+RUNTIME base + 20*k, no per-name immediate exists (this is why 7/7 other
+names have zero direct refs — presence/absence R12 law, not proof of no
+consumer). No u32 anywhere in the image points into 0x88e60..0x88f00
+[verified, full-image scan].
+
+STORE SITES (mov byte [ship+0x58], imm) [verified, scripts/r1_t94_order_census.py
+— complements r1_t86 op set which lacks C6 /0; boundary-checked; 56 verified
+sites in obj0, ZERO outside obj0]:
+  imm 1: 0x3fb3e (fn 1267)
+  imm 3: 0x39859, 0x49cd6
+  imm 4: 0x2202f, 0x22127, 0x49db9
+  imm 5: 0x22243, 0x2228f
+  (no imm-0 or imm-2 stores; §2f says kind 2 written by 0x4aa50 — reg-form)
+CMP-READER clusters: 0x40186..0x401fd (the 0x40178 decider itself: kind in
+{1,2,5} -> early return; kind==3 -> 0x39894 targetable then 0x2a428 assert
+0x54f; kind==4 assert-else 0x553), 0x21f7a/0x22035 (kind==5 exec path),
+0x220f5..0x220ff (kinds 3/1/2 downgrade), 0x39510, 0x3e928, 0x41357..0x41d0f
+(command-exec fn 2010), 0x42100..0x434c7 (fn 6087, five kind==4 gates),
+0x49a44/0x49c1a/0x49c20/0x49f69, 0x4a7a6, 0x4aa2c, 0x4ab0a, 0x4cf2c,
+0x5115f; plain reg-reads 0x4b18a/0x4b2fb/0x4b5f0/0x4b7fc/0x4e0e3/0x50d98/
+0x52059/0x55c17 (UI/tooltip candidates — none shown indexing a 20-stride
+name table within this pass).
+
+EXEC SEMANTICS MEASURED (names the VALUES functionally, [verified]):
+- 0x21f58(ship): iff kind==5: reads [+0x59] as STAR record ptr, matches
+  ship-star against two slots ([eax] / [eax+0x4]), copies 3 f32 offsets
+  (+0x08 / +0x14), jitters each with rng%200 (0x7824f), places via 0x49aa8,
+  THEN stores kind:=4 (0x2202f). kind==4: just updates [+0x59]. => 5 is a
+  "go-to-star" TRAVEL order consumed into 4 on arrival-at-star processing.
+- 0x220a8(ship...): sets kind:=5 (+0x59 target) via 0x22243/0x2228f then
+  calls 0x21f58 — the travel-order ISSUER.
+- 0x220f2: kinds {3,1,2} whose FUN_00039894 target became un-targetable ->
+  kind:=4 with [+0x59] := owning STAR record (0x13bc5, idx*0x60 law
+  (idx*4-idx)<<5) — the "retreat to system" downgrade.
+- UI dispatcher 0x1de40: `cmp bl,0x5; ja 0x1d9ab; jmp [ebx*4+0x8c90]` —
+  a SIX-slot (values 0..5) jump table at image 0x8c90 whose entries are
+  LE-FIXUP-encoded (raw u32 reads are garbage: 0x8e020fc5 etc. — NOT yet
+  decoded; this is the A5 closer candidate: decode fixup records -> 6 case
+  bodies -> each case's pushed string names its kind).
+
+=> A5 STATE: value set {0..5} confirmed end-to-end (stores 1/3/4/5 + reg-form
+2 + zero-default; 6-way UI dispatch table); functional semantics cited for
+5 (travel-to-star) and 4 (in-system/after-arrival); SONothing is block slot 0
+matching the zero-default reading [inferred, NOT closed]. rewrite delta: NONE
+(aggregate-only rewrite, ANALYSIS-ONLY like the t90 map — cite in OQ-016 row).
+NEXT A5 step: decode the 0x8c90 fixup table (LE fixup record format — see
+docs/re/loader.md §4 notes on unapplied fixups) and/or live-capture the
+relocated table via the pointer law, then read the six case bodies.
+
+## 2g. JUMP-TABLE DECODE LAW + CASE BODIES (t95) — table cracked, name
+## binding ONE step short (string-getter table base unreached, budget stop)
+
+DECODE LAW [verified, scripts/r1_t95_jumptable.py RC=0, VALIDATED_SLOTS=3:
+playcap/41, r1deep-20261008-190330/41, r1deep-20261007-224831/41]:
+the 0x8c90 table is NOT at member B+0x8c90 (that member index holds obj1 POOL
+data — the naive pointer-law read reads pool garbage, silently). The live LE
+loader relocated the DISPATCHER'S OWN jmp disp32: image 0x1de4f is
+`2e ff 24 9d <disp32 @0x1de53> jmp [ebx*4+0x8c90]`; live disp32 (member
+B+0x1de53) = 0x1dcc90 = 0x8c90 + 0x1d4000 on all 3 slots (delta identical).
+Table ENTRIES at member (live disp + 136), six u32 runtime addrs = img +
+0x1d4000 with img in the gap [0x2a50,0x14bb0) (the sub-0x14bb0 CODE region
+the restore tool never reconstructed):
+  kind0 0x1dcdd9 img 0x8dd9 | kind1 0x1dcf9f img 0x8f9f | kind2 0x1dd06b img 0x906b
+  kind3 0x1dd14d img 0x914d | kind4 == kind5 0x1dcdfb img 0x8dfb  (SHARED body)
+obj0 code-region law REFINED [verified]: runtime = img + 0x1d4000 holds for
+the WHOLE obj0 code span (low gap included, via the jmp-disp delta == the
+OQ-011 0x140000+0x34000 home); pool law runtime = P0 + img (P0 = B-136) is
+SEPARATE. BANKED TRAP: mem.find() hits are MEMBER indices — subtract H=136
+before applying either law (name block found at member 0x248338 -> runtime
+0x2482b0 == P0+0x88e60 EXACTLY, self-validating the pool law on t94's block).
+
+CASE BODIES (live disasm, objdump on member windows; batmode.cpp is the
+module whose debug strings sit inside the bodies' pool immediates):
+- SHARED TAIL 0x1dcdfb (the SOPatrol-class tail; every case reaches it):
+  formats via 0x2360c9 (sprintf-class) fmt '%s %s' (pool 0x24260d) with
+  ship+0x54 hi-word -> (idx*57)*4 table 0x2b6590 entry (star record name),
+  then 'POWER %d MOVES %d INTEGRITY %d' fmt 0x242619 with ship+0x88/+0x94/
+  +0x8c (moves/z/?/integrity — matches t85g field identities), blit via
+  0x1eef88, second dispatcher copy at 0x1dd290 (jmp [ebx*4+0x1dcc90],
+  already-relocated encoding visible LIVE at runtime img 0x929f).
+- kind0 0x1dcdd9: eax=3 -> call 0x1e0e70; body reads [eax+1]+0x1c.
+- kind1 0x1dcf9f: eax=4 -> call 0x1e0e70; reads [ship+0x57], ==0xff falls to
+  SHARED tail, else star-record indexed (idx*57 law).
+- kind2 0x1dd06b: (no 0x1e0e70 head) builds '%s %s' from [ship+0x54]>>16 star
+  + [ship+0x34].
+- kind3 0x1dd14d: eax=8 -> 0x1e0e70; if [ship+0x23]&1 eax=9 -> 0x1e0e70
+  (SECOND string); tests owner-bitmap bit ([ship+0x17] shl race DAT_2b658e)
+  against star record [ebx+0x17]; fail -> shared tail.
+- kind4/kind5: entry IS the shared tail (both kinds display identically —
+  consistent with t94: 5 collapses to 4 on arrival).
+STRING GETTER 0x1e0e70 [verified head]: EAX = index; bounds-checks EAX
+against ds:0x254e0c (count) and on failure loads ebx=0x1ea ('INVALID ORDER'
+at pool 0x242636 is in the error arm's string neighborhood); init gate call
+0x1e0d04 when ds:0x254e08==0. THE TABLE ITSELF (base + stride) was NOT
+reached before the budget stop — that is ALL that separates kind{0,1,3(+9)}
+indices from the 8 SO-name strings.
+
+A5 STATE after t95: the named t94 blocker (fixup table unreadable) is GONE —
+table decoded, six case bodies disassembled, per-kind string-index calls
+(3, 4, 8, 9) cited. NOT closed (strict-close): no case body pushes a name
+literal; the numeric->name tie needs the 0x1e0e70 table dump. NEXT: read
+0x1e0e70's full body live (member runtime 0x1e0e70-0x1d4000+0x14bb0+... i.e.
+obj0 normal law — img 0x140e70, member B+0x140e70) to find its string-table
+base+stride; dump entries; match to SONothing..SOGoSpace at pool 0x88e60.
+Index set observed {3,4,8,9} > 8 names — either the getter table is a DIFFERENT
+(order-description) string array than the SO block, or stride/base differ;
+resolve by measurement, do NOT assume.
 - No ledger row closed this iteration (strict-close): findings are
   STRUCTURE (phase order + decision-site ownership), sufficient to
   de-risk A4/A5, not a constant/formula closure. OQ-016 row annotated

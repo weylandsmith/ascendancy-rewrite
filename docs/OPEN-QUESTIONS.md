@@ -668,7 +668,31 @@ failed; timelines re-measured FINITE <1200: 2024 Control t737 / 42 Extinct
 t688 / 13 Extinct t503 / 1 Control t836 / 2 Control t657; PLAYTHROUGH
 regenerated. Remaining (row STAYS open, strict-close): order-ENUM numeric
 law (W6-A5),
-0x43b50 tail + 0x2ef60 case bodies (A6/A7), random-event module P0.
+0x43b50 tail + 0x2ef60 case bodies (A6/A7), random-event module P0. t94
+W6-A5 MEASUREMENT PASS (honest negative, NO closure): SO name table
+dumped (8 names stride 20 @0x88e60, pool-rel 0x62b0+20k); +0x58 store/
+reader census 56 verified obj0 sites (new tool r1_t94_order_census.py);
+exec semantics cited: kind5=travel-to-star consumed into 4 by 0x21f58,
+issuer 0x220a8, {3,1,2}->4 retreat downgrade 0x220f2; UI 6-way dispatch
+0x1de40 on jump table 0x8c90 = LE-fixup-encoded, UNDECODED (the named A5
+closer: fixup-decode or live pointer-law capture -> case bodies -> name
+tie). Numeric->name mapping NOT made; aicode.md §2f-supplement. t95 PASS
+(jump table CRACKED, name tie one step short, NO closure): decode law
+MEASURED — the table is NOT at member B+0x8c90 (pool data sits there; naive
+pointer-law read is silently wrong); the live loader relocated the DISPATCH
+jmp disp32 (member B+0x1de53) to 0x1dcc90 == 0x8c90+0x1d4000, and the six
+entries at member (disp+136) are case-body runtime addrs img+0x1d4000 in the
+sub-0x14bb0 code gap: kind0 0x8dd9 / kind1 0x8f9f / kind2 0x906b / kind3
+0x914d / kind4==kind5 0x8dfb (SHARED display tail — consistent with 5->4
+collapse). VALIDATED on 3 slots (playcap/41, r1deep-…190330/41, r1deep-…
+224831/41), tool scripts/r1_t95_jumptable.py RC=0. All six bodies
+disassembled live: each calls string-getter 0x1e0e70 with EAX=index (kind0
+3, kind1 4, kind3 8 then 9; kind2/kind4/5 none) then the shared batmode.cpp
+tail (fmt '%s %s' star-name + 'POWER %d MOVES %d INTEGRITY %d' via 0x2360c9,
+blit 0x1eef88). A5 residual = ONE read: 0x1e0e70's string-table base+stride
+(img 0x140e70, normal obj0 law — not in the gap) maps indices->names; NOT
+done this session (budget), names NOT tied, row STAYS OPEN (strict-close).
+aicode.md §2g. No rewrite change (ANALYSIS-ONLY).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:
