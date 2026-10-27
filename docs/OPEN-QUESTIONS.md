@@ -848,7 +848,13 @@ candidate set — fixed, +0x55 now 12 verified sites (4 word), +0x42 28
 variant. Row STAYS OPEN (remaining: per-cell terrain/nuke wiring, home-
 placement verification, +2 residual minutiae, event-dispatch caller of 0x4402a
 (capture-class), live-UI-trace armer residual; "scenario-template preset
-source" REMOVED as refuted).
+source" REMOVED as refuted). t107 AUDIT OF CENSUS-CITED CLOSURES
+(docs/re/census-audit.md): fixed-tool + NEW full-op tool
+(scripts/r1_t107_writers_full.py) re-ran +0x44/46/48/4e/50/52/54/58/5d/66/67/
+88/90 — NO closed row falsified (planet-field laws trace to the t23 w16-mask
+census, not r1_t86); three in-place doc amendments (combat.md S2d +0x90 14th
+writer 0x49307; aicode S6 kind imm-0 0x24a00 + imm-2 0x3ca60; aicode S7.4
+third burn path 0x41d80 DEC +0x88). Row status UNCHANGED.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

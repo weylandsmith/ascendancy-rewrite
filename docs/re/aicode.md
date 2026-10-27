@@ -480,6 +480,14 @@ sites in obj0, ZERO outside obj0]:
   imm 4: 0x2202f, 0x22127, 0x49db9
   imm 5: 0x22243, 0x2228f
   (no imm-0 or imm-2 stores; §2f says kind 2 written by 0x4aa50 — reg-form)
+  [t107 CORRECTION (census-audit P2/P4, fixed tool r1_t106_writers.py +
+  r1_t107_writers_full.py, both boundary-checked): imm-0 EXISTS at 0x24a00
+  (assert-guarded `cmp BYTE [ecx+0x58],0` @0x249e3 then kind:=0 with WORD
+  [+0x56]:=0xffff — command CLEAR path) and imm-2 at 0x3ca60 (ship ptr
+  [edi+0xab]: kind:=2, [+0x59]:=[0x43508], then WORD [edi+0xb0]:=0xffff —
+  a SECOND move-order issuer beside 0x22243/0x2228f). The t94 tool's window
+  rejected both. Kind VALUE semantics unchanged: 0 = no-order/cleared,
+  2 = move order, consistent with the §exec-semantics law.]
 CMP-READER clusters: 0x40186..0x401fd (the 0x40178 decider itself: kind in
 {1,2,5} -> early return; kind==3 -> 0x39894 targetable then 0x2a428 assert
 0x54f; kind==4 assert-else 0x553), 0x21f7a/0x22035 (kind==5 exec path),
@@ -1081,6 +1089,13 @@ the NEXT boundary (678->679 P4, 945->946 P5, 1017->1018 P8) == the
 FUN_0004a74c pass one End-Turn later. CONTROL: b5d-UNCHANGED same-day
 P->0 burns = 126 members (travel/upkeep 0x4a2d4..0x4a314) — the b5d-clear
 gate genuinely separates completion from burns.
+[t107 ADDITION (census-audit): a THIRD burn path exists in the CONTROL
+class — 0x41d80 `dec DWORD [ship+0x88]` in command-exec fn 2010 (block
+0x41d60..0x41daf: [+0x67]:=ptr 0x12e10, DEC POWER, BYTE +0x5d:=0), a
+per-order one-POWER spend invisible to every banked census (FF /1 DEC is
+outside the mov/sub/add op set r1_t86/r1_t106 generate). Law unchanged
+(recharge/re-grant laws intact); the burn-class enumeration was
+incomplete, not wrong. Aggregate rewrite has no per-ship POWER -> no delta.]
 REFUTED (the t102 mechanism for the static five zero-POWER rows): the
 rows on 59.sav+60.sav (both T=1254, slots 2/4/11/12/15, own2, b5d==0,
 +0x52 1257..1264 > T) are POST-DEATH FREE-RECORD REUSE, not mid-transit

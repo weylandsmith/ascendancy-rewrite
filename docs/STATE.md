@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T20:05
+updated: 2026-10-27T21:25
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,39 +202,66 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t107 (STATIC task): WORD-WRITER CENSUS AUDIT — re-validate every banked
-"writers accounted / no writer exists" claim that was produced by a
-byte-pattern store census, using the FIXED r1_t86_write_census.py (or
-r1_t106_writers.py). t106 proved the banked census tool NEVER INCLUDED 16-BIT
-WORD WRITES (encodings() dropped the 0x66 prefix; dis_at window desync —
-docs/re/income-law.md S-T106-TOOL): +0x55 gained 4 word sites including the
-world-gen seed itself, +0x42 gained the colonise site 0x23cac among 20 new
-sites. Every CLOSED row whose closure argument cites a t86-style census is a
-potential false-negative dependency. Work: (1) grep docs/OPEN-QUESTIONS.md +
-docs/re/*.md for census-cited closures (grep 'census' near 'writer|writers');
-(2) for each offset cited (priority: +0x88 ship POWER, +0x5d order state,
-+0x66 planet flags, +0x4e growth counter, +0x50/+0x52 build queue, +0x44/46/48
-channel words), run the fixed tool and diff vs the banked site list; (3) where
-NEW word-writer sites appear, read each site's function context (objdump from
-function start, functions_full.tsv hex offsets) and adjudicate: harmless
-(controlled write already implied by the law) vs load-bearing (the banked law
-statement must be amended in-place, same-day, like the S10 t106 annotations).
-Close = per-offset table banked in docs/re/census-audit.md (hand-authored; no
-generator touches it) + amendments where needed. A zero-new-sites result also
-closes the audit and PROVES the banked closures safe. Rationale: this is the
-only remaining high-value offline task — the other OQ-016 residues
-(terrain/nuke wiring, home placement, event-dispatch caller of 0x4402a,
-live-UI-trace armer) are capture/user-gated per REFUTED-ROUTES R12 +
-BLOCKED; a t107 clean pass converts the t106 tool bug from an open validity
-liability into a bounded, bounded-by-table fact, after which the loop should
-stop-report per GOAL "stop when blocked". (The t106 assignment expected
-stop-report after a preset-source negative; t106 returned the tool-bug
-finding instead, which reorders priorities — say so here rather than lose it.)
-Do NOT re-run per-name consistency tests or scenario-file searches (R12).
-Sitting watch: live-timeline 5.69 GB mtime 2026-10-26 15:44 unchanged at t106
-session start (no new sitting; re-verify — a NEW turn-boundary sitting
-outranks this -> scripts/r1_t85g_sitting.py first). OQ-021 passive watch
-continues.
+NEXT t108 (STATIC task): FULL-OP RE-AUDIT OF THE REMAINING CENSUS-CITED
+CLOSURES + +0x66 PER-STRUCT ATTRIBUTION TABLE. t107 audited the 13 offsets
+named in its assignment (docs/re/census-audit.md has the table; zero closures
+falsified, 3 doc amendments: combat.md S2d 14th +0x90 writer 0x49307,
+aicode.md S6 kind imm-0 0x24a00/imm-2 0x3ca60, aicode.md S7.4 burn path
+0x41d80). Two residue classes t107 disclosed but did not finish, and they are
+the last offline work of this shape worth an iteration:
+(1) OTHER census-cited claims outside the t107 offset list still ride the
+    pre-t106 op set: grep docs/re/*.md for "census" lines citing a disp other
+    than the audited 13 — known candidates: income-law.md:200 "no FPU
+    (D8-DF) [reg+0x67]" (D8-DF-only scan: AND/OR/XOR stores at +0x67 DO exist
+    per full-op run — re-read the claim's scope: it says FPU touches, which
+    holds, but annotate so nobody re-opens), aicode.md:1056 0x7458e "EXACTLY
+    two store sites (opcode census)", aicode.md:1154/OPEN-QUESTIONS:799
+    [ui+0xccb] disp32 census, combat.md:272 caller census tool re-run,
+    diplomacy.md:252 stride-0x1ee raw census. For each: re-run with
+    scripts/r1_t107_writers_full.py, apply the CODE-SPAN FILTER
+    ([0x14bb0,0x82bb0), t107 §1b law) + per-struct check, annotate in-place
+    or amend. Close = per-claim table appended to docs/re/census-audit.md.
+(2) +0x66 byte-OR site attribution (27 in-code sites, t107 §4.5): decide per
+    site which record class the base walks (planet stride 123 vs ship 0x6a vs
+    UI) via base-register provenance in fn context; any site that turns out
+    to OR planet flag bits must join the banked |=1/|=2 law (income-law
+    S-T30). A clean "no planet carriers" result also closes item (2).
+Rationale: remaining OQ rows are capture/user-gated (OQ-005/006 need exe
+capture-class probes per REFUTED-ROUTES; OQ-016 residue set capture-class;
+OQ-021 static route closed-exhaustive score.md S5, closure class =
+interactive session; OQ-023 residual RE same class; OQ-019 open sub-questions
+need controlled-mutation capture per its row text). After (1)+(2) land, the
+loop should stop-report per GOAL "stop when blocked" — no further offline
+work of this shape remains and the t106 tool liability is fully bounded.
+Do NOT re-run the 13 t107 offsets (table banked); do NOT per-name consistency
+tests or scenario-file searches (R12). Sitting watch: live-timeline 5.69 GB
+mtime 2026-10-26 15:44 unchanged at t107 session start (no new sitting; a NEW
+turn-boundary sitting outranks this -> scripts/r1_t85g_sitting.py first).
+
+T107 LANDED (STATIC task — WORD-WRITER CENSUS AUDIT; deliverable
+docs/re/census-audit.md hand-authored + new tool scripts/r1_t107_writers_full.py;
+working notes docs/re/_wip_t107.md P1-P3): (1) t106 claim REPRODUCED: the
+pre-fix tool (git d8dda8f — the working-tree copy was already t106-patched,
+baseline taken from git, disclosed) yields ZERO 16-bit word sites on all 13
+audited offsets (+0x44/46/48/4e/50/52/54/58/5d/66/67/88/90); fixed tool: 40
+word sites, EVERY one in a family already banked via INDEPENDENT evidence
+(planet-field laws trace to the t23 w16-mask census, colonisation RMW named,
+SA_IndustryBoost/event+200 named) or proven other-struct (fn 792/147 +0x5d
+words, fn 111 data region). NO CLOSED ROW FALSIFIED. (2) SECOND BLIND SPOT
+found and fixed: the t86 op set also lacked AND/OR/XOR/ADC/SBB/XCHG/INC/DEC/
+NEG/NOT/shift stores -> full-op tool; it re-found every banked non-census
+site (0x21b85 INC word +0x44, 0x39084 INC +0x50, +0x66 |=2/|=1) and surfaced
+three doc gaps amended in-place: aicode S7.4 THIRD power-burn path 0x41d80
+`dec DWORD [ship+0x88]` (per-order spend, fn 2010), combat S2d 14th +0x90
+writer 0x49307 (template-time zeroer inside banked init_global_gizmos),
+aicode S6 order-kind imm-0 0x24a00 + imm-2 0x3ca60 (banked text claimed
+"no imm-0 or imm-2 stores"). Laws themselves unchanged everywhere; REWRITE
+no delta (no per-ship POWER/slot model in aggregate). (3) METHOD LAWS banked
+(census-audit S1/§5): "WORD PTR" substring matches DWORD (use (?<!D));
+byte-family byte censuses over a flat image REQUIRE the obj0 code-span filter
++ per-record-class attribution before any "only writers" claim. (4) Ledger:
+OQ-016 annotated, STAYS OPEN (same residual set — strict-close, the audit
+moved tool-validity not behaviour). Gate GATE_EXIT=0, LEDGER AUDIT OK.
 
 T106 LANDED (STATIC task — the scenario-template PRESET SOURCE for the +0x55
 seed deviation: ASSIGNMENT PREMISE REFUTED; a banked census-tool bug found and

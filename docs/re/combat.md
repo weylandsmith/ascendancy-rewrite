@@ -131,6 +131,14 @@ rejected.
 
 +0x90 writers, ship-record class (13 verified image-wide; 0x6f540/0x70c9d are
 UI-struct, [ebp] ones are stack locals):
+[t107 CORRECTION: fixed-tool census = 14 image-wide — this section's tool
+missed 0x49307 (desync reject): WORD[+0x56]:=0xffff, DWORD +0x90:=0,
++0x8c:=1, BYTE +0x5d:=0, then +0x88:=[+0x90], +0x98:=[+0x8c]. Owner:
+FUN_0004929c = init_global_gizmos per ships.md S8 (t15b read in full) —
+this is the banked "init ship-object template fields" step, an ADDITIONAL
+template-time zeroer beside runtime INIT 0x4a756, not a mid-game writer.
+Semantics consistent (fresh template carries +0x90=0); no law change. See
+docs/re/census-audit.md S4.]
 * INIT 0x4a756 (ship reset/init family): WORD [ship+0x9c]=0 then
   0x4a76c: [ship+0x88] = call 0x4a99c (POWER re-init = trunc([ship+0x18] *
   (1 + clamp((T-[ship+0x52])//100,0,10)/10)) — t101 corrects the earlier
