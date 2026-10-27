@@ -331,33 +331,33 @@ sizes pins per-size shell runs (108 tests 0 failed) | CLOSED |
 Tail-residue note: gated chains exceed DAT T at low densities (records
 stay allocated past the in-play cut — consistent with the t78 caveat).
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
-"%d day%s", no data file) — current default 30 turns | open (t99 MEASURED
-THE TABLE — the t57 "static route exhausted" claim is VOID: route was the
-ability-cadence engine, found via W6-A6. Charge period = cadence word
-WORD[0x6780+2*ability]: 5:60 6:100 7:62 8:77 9:90 10:150 11:70 12:63 13:66
-14:72 16:92 17:100 19:89 20:68, ZERO exactly at {0..4,15,18,21} == the
-charged set (rewrite chargedIdx matches exactly); live 60.sav words ==
-restored FILE 0x89330; zero writers image-wide (constant table); UI
-countdown 0x37b6c cad-counter + gate law aicode.md §6.4. STAYS OPEN
-strict-close: closing measurement = rewrite abilityChargeTurns reading the
-lifted table (t100, + pin test). | T57b: ITEM ability supply side CLOSED verbatim (FUN_00039b6c + raw asm
-slot-writer chain 0x38fc8..0x39003: top-up OR word+2 hi |= p3, p3=7
-MissileBase/ShortWhopper, 8 LongWhopper, 0 TractorBeam (write skipped);
-EBX 45/45/90/200 + p4 land in adjacent unattributed slots).
-ITEM-table flag&4 population == exactly those 4 rows [verified battery]
-— the ledger's '14 SA_' is the SPECIES-ability pool, separate object.
-Decrement period still unmeasured: corpus census zero flag&4 slots
-(T49 law); capture-gated. Default 30 turns stays (no rewrite code path).
-income-law.md T57b;
-T57c: USE path located (FUN_00039c10 tail 0x39ec4..0x39eeb: use=1 only,
-counter=word+2 hi [SAR8 @0x39d61], write word+2 |= (c-1)<<8 OR-semantics
-HAZARD flagged — top-up OR in FUN_00038f68 may make the per-use write a
-no-op/mask, monotone-ammo reading NOT decidable statically; EBX-out 45/45/
-90/200 consumer LOCATED = range gate x32 vs distance (0x39cae..0x39d40);
-p4-out gates counter read; parallel countdown dword at ability-object+0x70.
-Amass-wait formula UNMEASURED — OQ-020 stays OPEN, nothing wired.
-remaining: obj1 call-edge of the help formatter, or
-controlled-mutation capture; default 30 turns stays in force.
+"%d day%s", no data file) — rewrite placeholder was 30 turns | CLOSED t100 | THE
+MEASUREMENT (aicode.md §6.4 + docs/re/_wip_t99.md F7-F11): charge period =
+cadence word WORD[0x6780 + 2*ability] embedded in ascend.exe — 5:60 6:100
+7:62 8:77 9:90 10:150 11:70 12:63 13:66 14:72 16:92 17:100 19:89 20:68;
+ZERO exactly at {0..4,15,18,21} == the passive set == exactly !chargedIdx;
+live playcap/save/60.sav words == restored FILE 0x89330 byte-exact, ZERO
+stores image-wide (constant table; gate 0x43b58 cad>counter rejects,
+equality fires EVENT-24 dispatch; reset-on-fire exit T1 0x4400a; UI
+countdown cad-counter 0x37b6c). The t57 "static route exhausted" claim was
+VOID (route = the W6-A6 ability-cadence engine). CODE SITE: rewrite/src/
+game/species.cpp abilityChargeTurns = kCad[21] verbatim table (replaces the
+30-turn placeholder); campaign.cpp abilityPhase rewired to the cited
+COUNT-UP law (charge_ == row+0x19e: +1/turn, fires iff == cad exactly,
+resets 0; T2 0x43fe5 stores 0 at the equality point too — one reset models
+both). Pins: TEST(species_charge_split_verified) full 21-word table +
+nonzero==charged set; TEST(species_charged_ability_fires_on_schedule) t60
+first fire, reset 0, second fire t120 (period == cad); per-ability
+activation tests moved to their cadence words (ForcePeace 100,
+ShieldPlanets 66, BlockStarLanes 92, MoreMaxPop 72, Cornucopia 150,
+StealResearch 63); gate 3m bound 40->65 (HealShips cad 60). Verify tool
+scripts/r1_t100_cad_verify.py RC=0 (C++ == FILE leg == LIVE save leg,
+item-table-anchored B=0x1bf4d8). 110 tests 0 failed; timeline seeds
+unchanged (2024 t737 / 42 t688 / 13 t503, all finite). CAVEAT (out of this
+row's scope per T57b's separate-object finding): the ITEM-ability supply/
+amass path (FUN_00039b6c/0x39c10 slot word+2) remains an UNATTRIBUTED
+decrement-period question — it is the gizmo-slot object, not the SA_
+species pool this row's vendor text and table govern. |
 OQ-005 | shp | .shp shape-library codec (container CLOSED 208/208; grammar
 CLOSED t61-t69; dims-location residue open) | open | CLOSED PORTION, cited:
 control-byte grammar verbatim from raw asm FUN_0005caac 0x5cca3..0x5ce77

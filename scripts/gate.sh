@@ -172,13 +172,13 @@ if ! /usr/bin/python3 "$ROOT/scripts/ability_probe.py"; then
   err "ability_probe.py failed (roster/charge invariant broken?)"
 fi
 if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
-  timeout 120 "$ROOT/rewrite/build/ascendancy" --headless --campaign 40 \
+  timeout 120 "$ROOT/rewrite/build/ascendancy" --headless --campaign 65 \
     --seed 11 >/tmp/gate_ability.log 2>&1
   rc=$?
-  # exit 1 = "no victory after 40 turns" (expected here); >1 = crash.
+  # exit 1 = "no victory after 65 turns" (expected here); >1 = crash.
   [ "$rc" -le 1 ] || { tail -10 /tmp/gate_ability.log; err "ability smoke crashed (rc=$rc)"; }
   grep -q 'SA_HealShips' /tmp/gate_ability.log \
-    || { tail -10 /tmp/gate_ability.log; err "charged ability never fired by turn 40 (charge 30)"; }
+    || { tail -10 /tmp/gate_ability.log; err "charged ability never fired by turn 65 (cad[HealShips]==60, aicode.md §6.4)"; }
 fi
 
 # 3n. Option-C R1 harness invariants (docs/BLOCKED.md runbook): the attempt

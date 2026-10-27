@@ -229,9 +229,10 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     }
     if (cfg_.playerSpecies >= 0 && cfg_.playerSpecies < static_cast<int>(SpeciesAbility::kCount))
         ability_[kPlayer] = static_cast<SpeciesAbility>(cfg_.playerSpecies);
-    charge_.assign(Nowner_, 0);  // first activation one full charge away
-    for (int o = 0; o < Nowner_; ++o)
-        if (abilityIsCharged(ability_[o])) charge_[o] = abilityChargeTurns(ability_[o]);
+    charge_.assign(Nowner_, 0);  // count-up == original row+0x19e (t100):
+    // scenario init counter 0, first fire exactly cadence word turns in.
+    // (Old t30 model pre-loaded a full countdown — replaced by the measured
+    // cadence law, docs/re/aicode.md §6.4.)
     doublePower_.assign(Nowner_, 0);
     sapActive_.assign(Nowner_, 0);
     fleetDamage_.assign(Nowner_, 0);
@@ -1086,8 +1087,20 @@ void Campaign::abilityPhase() {
         const SpeciesAbility ab = ability_[o];
         if (ab == SpeciesAbility::Unknown) continue;
         if (abilityIsCharged(ab)) {
-            if (--charge_[o] > 0) continue;
-            charge_[o] = abilityChargeTurns(ab);
+            // MEASURED CADENCE LAW (t100, docs/re/aicode.md §6.4 + _wip_t99
+            // F7/F9): charge_ == original row+0x19e COUNT-UP. The FUN_0003e6e0
+            // tail bumps it +1/turn; FUN_00043b50 fires iff counter == cadence
+            // word EXACTLY (gate 0x43b58 rejects cad > counter; equality routes
+            // to the jump-table body). Reset-on-fire == 0x441c9 pre-stores
+            // temp=0 -> exit T1 0x4400a stores row+0x19e := 0. The T2 variant
+            // (0x43fe5, profile 13 ShieldPlanets: counter := cad - counter)
+            // also stores 0 at the equality point — under the cited law it
+            // only preserves phase on the not-due leg, so one reset models
+            // both. The original EXCLUDES the player row from firing (tail
+            // exit after the bump, F7); the rewrite auto-fires the player's
+            // species ability as the documented sim model (abilities.md §2).
+            if (++charge_[o] != abilityChargeTurns(ab)) continue;
+            charge_[o] = 0;
         }
         const std::string who = std::string(abilityName(ab)) + " (owner " +
                                 std::to_string(o) + "): ";

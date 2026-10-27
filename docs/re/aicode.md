@@ -944,7 +944,9 @@ cad[5]=60 6=100 7=62 8=77 9=90 10=150 11=70 12=63 13=66 14=72 16=92
 17,19,20} == rewrite chargedIdx EXACTLY (species.cpp:30) — the 14 charged
 SA_ abilities. *** OQ-020 CLOSER: charge period = cad[ability] days from
 this table (Baliflids 100, Nimbuloids 68 ...); rewrite default 30 is WRONG
-per-ability. Delta task = t100. ***
+per-ability. Delta task = t100 — LANDED t100: kCad[21] in
+rewrite/src/game/species.cpp + abilityPhase count-up law, verified three-leg
+(scripts/r1_t100_cad_verify.py RC=0). ***
 UI leg 0x37b6c dx==1: countdown = cad - counter shown with static.txt
 strings [0x1c]=''/[0x1d]='s' plural law; dx==2 opens 'abres%02d' window.
 NOTE +0x88 LABEL: S2d banks +0x88=gizmo POWER sum; profile 7 doubles it,

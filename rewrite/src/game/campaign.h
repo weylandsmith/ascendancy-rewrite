@@ -366,8 +366,10 @@ private:
     std::vector<char> war_;
     std::vector<int> fortify_;
     // Species abilities (docs/re/abilities.md): ability_[o] = owner o's SA_
-    // (Unknown = none); charge_[o] counts down per abilityPhase, firing at 0
-    // and resetting to abilityChargeTurns(). Transient per-activation flags:
+    // (Unknown = none); charge_[o] is the MEASURED count-up counter (original
+    // row+0x19e, aicode.md §6.4): +1 per abilityPhase, fires the body iff it
+    // equals abilityChargeTurns() exactly, resets to 0 on fire. Transient
+    // per-activation flags:
     // doublePower_[o] (attack x2 this combat), invincible_[s] (star shield),
     // laneBlock_[s] (star whose lanes are blocked this combat).
     std::vector<SpeciesAbility> ability_;

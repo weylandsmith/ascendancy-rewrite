@@ -28,8 +28,9 @@ SpeciesAbility abilityFromToken(const std::string& token);  // Unknown if no mat
 // 14 of the 21 abilNN blocks carry it; 7 (indices 0,1,2,3,4,15,18) are
 // always-on passive abilities [verified, scripts/ability_probe.py].
 bool abilityIsCharged(SpeciesAbility a);
-// Charge time in days = documented default (abilities.md §3): turns until the
-// ability recharges; 0 for passives.
+// Charge time in days = MEASURED cadence word WORD[0x6780+2*ability]
+// (t100, aicode.md §6.4; abilities.md §3): turns between activations; 0 for
+// passives (the vendor table's zero entries are exactly the passive set).
 int abilityChargeTurns(SpeciesAbility a);
 // One-line effect/no-op citation for EVERY token ("SA_X: <effect> [help.txt
 // L<nnnn>]" or "... FILED NO-OP ..."). Non-empty for all 21 — a unit test

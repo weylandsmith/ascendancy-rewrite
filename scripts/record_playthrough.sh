@@ -23,6 +23,9 @@ capture() { # capture <name> <expected-substring> <cmd...>
 # t89 RE-VERIFY (deterministic combat, no hit roll — docs/re/combat.md S2j):
 # 2024 Control t777, 42 Extinct t581, 13 Extinct t503; test seeds 1/2/2024
 # also finite (Control t842 / t677 / t777, CLI --campaign 1200).
+# t93 picker law re-measured: 2024 t737 / 42 t688 / 13 t503 / 1 t836 / 2 t657.
+# t100 cadence law re-measured: IDENTICAL (2024 t737 / 42 t688 / 13 t503) —
+# the FFA smoke seeds' AI abilities do not gate these seeds' victories.
 capture A "VICTORY"          "$BIN" --headless --campaign 1200 --seed 2024
 capture B "VICTORY"          "$BIN" --headless --campaign 1200 --seed 42
 capture C "VICTORY"          xvfb-run -a "$BIN" --campaign 1200 --seed 13

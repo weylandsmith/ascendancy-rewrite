@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T03:30
+updated: 2026-10-27T06:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -85,7 +85,14 @@ ledger:
       eventwnd.cpp 0x2c03a cluster; comparator writes = ZERO direct encodings
       -> evaluator hunt via dark-zone enumeration (t73b); capture fallback.
       Default >1/2 stands"
-    - "OQ-020 ability charge days (%d in vendor text, no data file) — R1: read the constant in code"
+    - "OQ-020 ability charge days CLOSED t100: cadence word
+      WORD[0x6780+2*ability] (live 60.sav == FILE 0x89330, zero writers;
+      5:60 6:100 7:62 8:77 9:90 10:150 11:70 12:63 13:66 14:72 16:92
+      17:100 19:89 20:68, zeros == passive set) wired as kCad[21] in
+      species.cpp abilityChargeTurns + abilityPhase COUNT-UP law (counter
+      == row+0x19e semantics, fires at == cad exactly, reset 0); pins +
+      verify tool r1_t100_cad_verify.py both legs; item-ability (gizmo
+      slot) amass path out of scope per T57b separate-object finding"
     - "OQ-005 .shp pixel codec — static route exhausted (6 angles, docs/REFUTED-ROUTES.md); needs exe shape loader via live image"
     - "OQ-006 headerless sample rate — needs exe audio-init constant"
     - "OQ-012 mapgen CLOSED t78: (a) size options measured 2026-10-12
@@ -195,31 +202,69 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t100 (REWRITE task): implement the MEASURED per-ability cadence table
-(aicode.md §6, t99) in the rewrite — abilityChargeTurns currently returns a
-plausible-default 30 (rewrite/src/game/species.cpp, OQ-020 note); replace it
-with the cited word table (ability number -> u16 days: 5=60, 6=100, 7=62,
-8=..., FULL TABLE CITED in aicode.md §6 — copy verbatim, do not re-derive),
-wire abilityPhase (campaign.cpp:1076 region) to the same law (counter :=
-+0x19e semantics: +1/turn iff [[row+7]+0x14]&0x80, reset-on-fire, fire when
-counter == word), extend the existing pins/tests to pin the new table, and
-RUN the rewrite test suite. ORDER OF WORK: (1) read species.cpp
-abilityChargeTurns/abilityIsCharged + campaign.cpp abilityPhase fully first;
-(2) transcribe the §6 table + semantics; (3) tests first-pin against the
-banked live-save facts (60.sav t1254: rows 0..3 active, +0x19d =
-19/2/11/0, row4 stale — docs/re/_wip_t99.md F9/F10); (4) suite green.
-Rationale: t99 closed the last NAMED static decode (A6/A7, aicode.md §6)
-and its single highest-value output is the OQ-020 charge-days table that
-directly falsifies the rewrite's 30-day placeholder — that delta is the one
-task whose value grows every session it waits; the remaining static leads
-(event-24 consumer module = random-event P0 territory; dx-switch adjudication
-at 0x43f73) are larger decode efforts that should each be sized as their own
-task after OQ-020 lands. OQ-016 stays open (strict-close); OQ-020 flips
-open->measured by this task landing.
+NEXT t101 (STATIC task): the +0x88-vs-+0x94 SHIP-FIELD RE-ATTRIBUTION PASS
+named by aicode.md §6.4's NOTE — resolve the standing banked-law conflict.
+CONFLICT: t85g's live readout labels ship +0x88 = MOVES (boundary recharge,
+turn-coupled churn), S2d banks +0x88 = gizmo-POWER sum (0x4a756 init from
+0x4a99c); t99 shows profile 7 DOUBLES +0x88 (help.txt DoublePower "power")
+and profile 9 ZEROES it (SapAlienPower "wipe out power") — both POWER
+semantics — and proposes MOVES candidate = +0x94 (panel fmt order
+POWER,MOVES,INTEGRITY == +0x88,+0x94,+0x8c per t96 display fn F 0x831c9).
+Also suspect: t90's "moves x2 recharge loop 0x43c5b" sits INSIDE the
+DoublePower body region (0x43c3f..0x43c79) — may have mislabelled that body.
+METHOD (~25 probes): (1) objdump writer/reader census +0x88 and +0x94
+(r1_t86_write_census pattern, both offsets, whole obj0); (2) the movement
+law: find where launching/traversal CONSUMES a per-ship field (callers of
+0x4aa10 starlane-cost, order exec 0x40178 region — MOVES must be
+decremented by distance or hops); (3) adjudicate 0x43c5b fully (disasm
+0x43c3f..0x43c79 with body boundary from §6.3 profile-7 start 0x43c3f);
+(4) live cross-check on 60.sav + one held-turn slot: sample +0x88/+0x94
+across a turn boundary for a moving fleet (t85g evidence_slot04_t1254).
+BANK: combat.md S2d amendment + aicode.md §6 NOTE adjudication; correct the
+t90 moves-loop claim if refuted. NO rewrite code expected (fleetDamage_/
+power model is aggregate; per-ship fields = OQ-019 territory) — verdict is
+docs + OQ-016/OQ-019 annotations.
+Rationale: t100 landed the last placeholder with a cited table (OQ-020
+CLOSED); of the three named static residuals this is the cheapest, resolves
+a KNOWN contradiction between two banked laws (the t93 lesson: banked prose
+breaks where raw asm doesn't), and the answer gates how the event-24
+consumer decode (next candidate, larger P0 effort) reads ship fields —
+decoding a consumer with a mis-attributed offset wastes that iteration.
+The 0x37b6c dx-switch adjudication stays third.
 Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44), no
-new sitting at t99 start; a NEW turn-boundary sitting outranks this ->
-scripts/r1_t85g_sitting.py first.
+new sitting at t100; a NEW turn-boundary sitting outranks this ->
+scripts/r1_t85g_sitting.py first (its combat frames are also a free
++0x88/+0x94 differential for this very task).
 OQ-021 passive watch continues (boundary sample 23/50, selector never armed).
+
+T100 LANDED (CODE task — OQ-020 CLOSED, the measured per-ability cadence
+table wired): abilityChargeTurns (rewrite/src/game/species.cpp) now returns
+the CITED vendor table kCad[21] = WORD[0x6780+2*ability] (5:60 6:100 7:62
+8:77 9:90 10:150 11:70 12:63 13:66 14:72 16:92 17:100 19:89 20:68; zeros
+exactly at the passive set) replacing the falsified 30-turn placeholder;
+abilityPhase (campaign.cpp:1076) rewired from count-DOWN to the cited
+COUNT-UP law: charge_ == original row+0x19e, +1/turn, fires iff counter ==
+cad EXACTLY (gate 0x43b58), resets 0 on fire (exit T1 0x4400a; T2 0x43fe5
+stores 0 at the equality point too — one reset models both); init all-zeros
+(first fire exactly at turn cad). Verify tool scripts/r1_t100_cad_verify.py
+RC=0 — THREE legs byte-exact: C++ kCad == restored FILE 0x89330 == LIVE
+playcap/save/60.sav (item-table-anchored B=0x1bf4d8). TRAP BANKED: the
+high-entropy anchor vote against the CURRENT game/ascend.exe is WEAK on
+playcap saves (capture-time needle differs; t98 exe-identity context) —
+use the deterministic b"\x1e\x00Factory" anchor at B+0x82bb0+0x73e40+8.
+Tests: species_charge_split_verified pins the full 21-word table +
+nonzero==charged set; species_charged_ability_fires_on_schedule pins t60
+fire / reset 0 / t120 second fire (period == cad); six per-ability tests
+moved to their cadence words (100/66/92/72/150/63). GATE: stage 3m smoke
+40->65 turns (HealShips cad 60). 110 tests 0 failed; timeline seeds
+UNCHANGED (2024 Control t737 / 42 Extinct t688 / 13 Extinct t503 / 1 t836 /
+2 t657, all finite <1200) — PLAYTHROUGH.md already matches, no regen;
+record_playthrough.sh comment updated (closes t93's self-noted stale-echo).
+Docs: abilities.md §2/§3/§5 rewritten to the measured law; ledger row
+CLOSED with evidence + code sites + the T57b separate-object caveat (the
+gizmo-slot amass path is NOT the SA_ species pool); ledger_audit default
+open set now {003,005,016,019,021,023} (rows=18 open=6 closed=12 OK).
+Working notes docs/re/_wip_t100.md. Gate GATE_EXIT=0, LEDGER AUDIT OK.
 
 T99 LANDED (STATIC task — W6-A6 CLOSED THE A6/A7 RESIDUAL, cited, NO ledger
 closure, tool scripts/r1_t99_maint_census.py RC=0): FUN_00043b50 = the

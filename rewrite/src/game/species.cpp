@@ -83,10 +83,28 @@ const char* abilityEffectNote(SpeciesAbility a) {
 }
 
 int abilityChargeTurns(SpeciesAbility a) {
-    // [documented default, docs/re/abilities.md §3]: the vendor text proves a
-    // day-count recharge exists ("%d day%s") but no data file exposes the
-    // number; ~a month of the day-scale turn loop. Passives never charge.
-    return abilityIsCharged(a) ? 30 : 0;
+    // MEASURED CADENCE TABLE (OQ-020 CLOSED t100; docs/re/aicode.md §6.4):
+    // WORD[0x6780 + 2*ability] embedded in ascend.exe — live playcap/save/
+    // 60.sav words == restored FILE 0x89330 byte-exact, ZERO stores image-
+    // wide (constant scenario table; gate + reads 0x43b58/0x37bf1/0x3e7f6/
+    // 0x43fee). ZERO entries {0..4,15,18,21} == the 7 passives == exactly
+    // !chargedIdx (nonzero set {5..14,16,17,19,20}). The old 30-turn
+    // documented default is FALSIFIED per-ability (HealShips 60, ForcePeace
+    // 100, Cornucopia 150 ...).
+    static const int kCad[static_cast<int>(SpeciesAbility::kCount)] = {
+        0,   0,  0,   0,  0,   // 0-4  passives
+        60, 100, 62,  77, 90,  // 5 HealShips, 6 ForcePeace, 7 DoublePower,
+                                //   8 RepelAlienShips, 9 SapAlienPower
+        150, 70, 63, 66, 72,   // 10 Cornucopia, 11 BumpShipsInLanes,
+                                //   12 StealResearch, 13 ShieldPlanets,
+                                //   14 MoreMaxPop
+        0,                      // 15 KnowStarLanes (passive)
+        92, 100,                // 16 BlockStarLanes, 17 CauseWar
+        0,                      // 18 FastLaneTravel (passive)
+        89, 68                  // 19 FreeResearch, 20 IndustryBoost
+    };
+    const int i = static_cast<int>(a);
+    return (i >= 0 && i < static_cast<int>(SpeciesAbility::kCount)) ? kCad[i] : 0;
 }
 
 bool loadAbilities(const std::string& dataDir0, std::vector<SpeciesInfo>* out,

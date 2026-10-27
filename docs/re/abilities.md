@@ -25,10 +25,12 @@ the identity.
 
 ## §2 Effect mapping (vendor text -> wired behaviour)
 
-Charged abilities fire at the end of their charge (charge starts at the full
-value; first activation turn == abilityChargeTurns). One-shot flags clear at
-every turn boundary in abilityPhase(). Every token's one-line note lives in
-species.cpp `kNotes` (probe asserts 21/21 cite `[help.txt L`).
+Charged abilities fire on the MEASURED cadence law (t100): a per-owner
+counter counts up from 0 and the body runs on the turn it equals
+abilityChargeTurns() exactly (first activation turn == cad), then resets.
+One-shot flags clear at every turn boundary in abilityPhase(). Every
+token's one-line note lives in species.cpp `kNotes` (probe asserts 21/21
+cite `[help.txt L`).
 
 | ability | help.txt | wired effect |
 |---|---|---|
@@ -56,10 +58,16 @@ species.cpp `kNotes` (probe asserts 21/21 cite `[help.txt L`).
 
 ## §3 Numeric defaults and RNG discipline
 
-- **Charge 30 turns** for all 14 charged abilities. The vendor proves a
-  day-count recharge exists ("%d day%s to amass", 14 blocks) but exposes no
-  number [verified: no data file carries it]. 30 == "a month" of the day-scale
-  turn loop. OQ-020.
+- **Charge period: MEASURED per-ability cadence table** (t100, OQ-020
+  CLOSED; docs/re/aicode.md §6.4). WORD[0x6780+2*ability] embedded in
+  ascend.exe (live playcap/save/60.sav == restored FILE 0x89330, zero
+  writers image-wide): cad = {5:60, 6:100, 7:62, 8:77, 9:90, 10:150, 11:70,
+  12:63, 13:66, 14:72, 16:92, 17:100, 19:89, 20:68}, zero exactly at
+  {0..4,15,18,21} == the passives. Semantics (campaign.cpp abilityPhase):
+  counter counts UP from 0 (original row+0x19e), fires iff counter == cad
+  EXACTLY, resets to 0 on fire (exit T1 0x4400a). The earlier 30-turn
+  "a month" default is FALSIFIED per-ability. Verify tool:
+  scripts/r1_t100_cad_verify.py (C++ table == FILE leg == LIVE save leg).
 - **Turn order**: abilityPhase runs FIRST in advance() so ForcePeace shields
   the user from that turn's combat and BlockStarLanes gates that turn's
   launches. One-shot flags cleared here.
@@ -86,10 +94,12 @@ original is runtime-blocked (documented default).
 ## §5 Verification
 
 - gate 3m: ability_probe.py (21 blocks/14+7 split/race02 title match/kNotes
-  21 cited/4 filed no-ops) + a 40-turn smoke asserting SA_HealShips fired.
-- unit tests rewrite/tests/test_species.cpp (15 tests): roster three-source,
-  bad-dir rejection, charge split + counts, every-token-noted, firing
-  schedule (t30), ForcePeace ends war, ShieldPlanets one-shot,
+  21 cited/4 filed no-ops) + a 65-turn smoke asserting SA_HealShips fired
+  (cad 60, t100).
+- unit tests rewrite/tests/test_species.cpp: roster three-source,
+  bad-dir rejection, charge split + MEASURED cadence table pin (t100),
+  every-token-noted, firing schedule (t60 count-up law), ForcePeace ends
+  war, ShieldPlanets one-shot,
   BlockStarLanes flag, MoreMaxPop/Cornucopia, StealResearch bounds,
   player-species selection + no self-duplicate, silence without abilities,
   victory reachable with abilities, determinism with abilities.

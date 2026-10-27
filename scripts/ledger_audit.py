@@ -65,7 +65,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", default="docs/OPEN-QUESTIONS.md")
     ap.add_argument("--expect", default="OQ-003,OQ-021,OQ-023,"
-                                        "OQ-005,OQ-019,OQ-016,OQ-020")
+                                        "OQ-005,OQ-019,OQ-016")
     a = ap.parse_args()
     want = {x.strip() for x in a.expect.split(",")}
     R = rows(a.ledger)

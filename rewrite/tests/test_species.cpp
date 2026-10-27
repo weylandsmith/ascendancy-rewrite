@@ -123,19 +123,25 @@ TEST(species_roster_rejects_bad_dir) {
 }
 
 TEST(species_charge_split_verified) {
-    // 7 passive blocks (no amass line) [verified help.txt; gate 3m re-checks
-    // the split against the file]; 14 charged at the 30-turn documented
-    // default (kNotes cites the choice).
+    // Split: 7 passive blocks (no amass line) [verified help.txt; gate 3m
+    // re-checks against the file]. PERIODS: the MEASURED cadence table
+    // WORD[0x6780+2*ability] (aicode.md §6.4, live 60.sav == FILE 0x89330,
+    // zero writers) — pinned verbatim; the old 30-turn default is falsified.
     const int passive[] = {0, 1, 2, 3, 4, 15, 18};
     for (int p : passive) {
         auto a = static_cast<ag::SpeciesAbility>(p);
         CHECK(!ag::abilityIsCharged(a));
         CHECK(ag::abilityChargeTurns(a) == 0);
     }
+    const int cad[21] = {0, 0, 0, 0, 0, 60, 100, 62, 77, 90, 150,
+                         70, 63, 66, 72, 0, 92, 100, 0, 89, 68};
     int charged = 0;
     for (int i = 0; i < (int)ag::SpeciesAbility::kCount; ++i) {
         auto a = static_cast<ag::SpeciesAbility>(i);
-        if (ag::abilityIsCharged(a)) { ++charged; CHECK(ag::abilityChargeTurns(a) == 30); }
+        CHECK(ag::abilityChargeTurns(a) == cad[i]);
+        // nonzero set == charged set (measured exactly in the vendor table)
+        CHECK(ag::abilityIsCharged(a) == (cad[i] != 0));
+        if (ag::abilityIsCharged(a)) ++charged;
     }
     CHECK(charged == 14);
     CHECK(ag::abilityFromToken("SA_BuildOnBlack") == ag::SpeciesAbility::BuildOnBlack);
@@ -156,26 +162,37 @@ TEST(species_every_token_has_effect_or_filed_noop) {
 }
 
 TEST(species_charged_ability_fires_on_schedule) {
-    // charge 30 -> first activation on turn 30 [documented default].
+    // MEASURED CADENCE LAW (t100, aicode.md §6.4): counter counts UP from 0,
+    // fires EXACTLY at the cadence word, resets to 0. SA_HealShips cad=60:
+    // first activation turn 60, then every 60 turns (period == cad).
     auto c = makeCrafted(11, 1, ag::SpeciesAbility::HealShips);
-    for (int t = 0; t < 29; ++t) c.advance();
+    CHECK(c.chargeFor(1) == 0);  // scenario init (original row+0x19e starts 0)
+    for (int t = 0; t < 59; ++t) c.advance();
     CHECK(!hasEvent(c, "SA_HealShips"));
-    c.advance();  // turn 30
+    CHECK(c.chargeFor(1) == 59);
+    c.advance();  // turn 60 == cad -> fire
     CHECK(hasEvent(c, "SA_HealShips"));
-    CHECK(c.chargeFor(1) == 30);  // reset for the next cycle
+    CHECK(c.chargeFor(1) == 0);  // reset-on-fire (exit T1 0x4400a)
+    for (int t = 0; t < 59; ++t) c.advance();
+    CHECK(c.chargeFor(1) == 59);
+    c.advance();  // turn 120 -> second fire, period == cad exactly
+    int fires = 0;
+    for (const auto& e : c.events())
+        if (e.text.find("SA_HealShips") != std::string::npos) ++fires;
+    CHECK(fires == 2);
 }
 
 TEST(species_force_peace_ends_the_owner_wars) {
     auto c = makeCrafted(12, 1, ag::SpeciesAbility::ForcePeace);
     CHECK(c.atWar(1, 0));  // free-for-all start
-    for (int t = 0; t < 30; ++t) c.advance();
+    for (int t = 0; t < 100; ++t) c.advance();  // cad[6] == 100 (aicode.md §6.4)
     CHECK(!c.atWar(1, 0));
     CHECK(hasEvent(c, "forced peace"));
 }
 
 TEST(species_shield_planets_blocks_captures_that_turn) {
     auto c = makeCrafted(13, 1, ag::SpeciesAbility::ShieldPlanets);
-    for (int t = 0; t < 30; ++t) c.advance();
+    for (int t = 0; t < 66; ++t) c.advance();  // cad[13] == 66 (aicode.md §6.4)
     CHECK(c.invincibleStar(homeOf(c, 1)));
     CHECK(hasEvent(c, "colonies invincible"));
     c.advance();  // next turn clears the one-shot flag
@@ -184,17 +201,17 @@ TEST(species_shield_planets_blocks_captures_that_turn) {
 
 TEST(species_block_star_lanes_flag_set_on_activation) {
     auto c = makeCrafted(14, 1, ag::SpeciesAbility::BlockStarLanes);
-    for (int t = 0; t < 30; ++t) c.advance();
+    for (int t = 0; t < 92; ++t) c.advance();  // cad[16] == 92 (aicode.md §6.4)
     CHECK(c.laneBlockedStar(homeOf(c, 1)));
     CHECK(hasEvent(c, "blocked lanes"));
 }
 
 TEST(species_more_max_pop_raises_caps_and_cornucopia_adds_pros) {
     auto c = makeCrafted(15, 1, ag::SpeciesAbility::MoreMaxPop);
-    for (int t = 0; t < 30; ++t) c.advance();
+    for (int t = 0; t < 72; ++t) c.advance();  // cad[14] == 72 (aicode.md §6.4)
     CHECK(c.popCapBonusFor(homeOf(c, 1)) > 0);
     auto d = makeCrafted(16, 1, ag::SpeciesAbility::Cornucopia);
-    for (int t = 0; t < 30; ++t) d.advance();
+    for (int t = 0; t < 150; ++t) d.advance();  // cad[10] == 150 (aicode.md §6.4)
     bool enriched = false;
     for (size_t s = 0; s < d.galaxy().stars.size(); ++s)
         if (d.richProsFor((int)s) > 0) enriched = true;
@@ -205,12 +222,12 @@ TEST(species_more_max_pop_raises_caps_and_cornucopia_adds_pros) {
 TEST(species_steal_research_fires_and_is_capped_by_ownership_rule) {
     auto c = makeCrafted(17, 1, ag::SpeciesAbility::StealResearch);
     const int before = c.techsOwned(1);
-    for (int t = 0; t < 30; ++t) c.advance();
+    for (int t = 0; t < 63; ++t) c.advance();  // cad[12] == 63 (aicode.md §6.4)
     CHECK(hasEvent(c, "SA_StealResearch"));
     CHECK(c.techsOwned(1) >= before);  // never loses techs
     // Steal fires again after recharge and must not grow unboundedly beyond
-    // tree size: run 30 more turns, still a legal count.
-    for (int t = 0; t < 30; ++t) c.advance();
+    // tree size: run a full cadence period more, still a legal count.
+    for (int t = 0; t < 63; ++t) c.advance();
     CHECK(c.techsOwned(1) <= 106);  // 66 main + 40 variant rows (research.md)
 }
 
