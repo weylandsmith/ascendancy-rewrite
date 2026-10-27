@@ -773,7 +773,20 @@ loops are edx==1 ABILITY bodies (jump table FILE 0x43b10 16/16); per-turn
 recharge = FUN_0004a74c [ship+0x88] := trunc([+0x18]*(1+clamp((T-[+0x52])
 //100,0,10)/10)) at 0x3e7b0 (T = ds:0x12e10 live 1254) — law verified
 25/35 exact + 35/35 bounded live, five zero-POWER war-fleet rows remain
-[unverified mechanism] (docs/re/_wip_t101.md F8b). Row STAYS OPEN.
+[unverified mechanism] (docs/re/_wip_t101.md F8b). t102 CLOSED THE
+EVENT-24 CONSUMER RESIDUAL (aicode.md S7, tool
+scripts/r1_t102_event24_verify.py RC=0 five legs): pump FUN_00055ae8
+type-switch decoded EXHAUSTIVELY — type 24 (and 10..14/21/22/24/25/>=26)
+has NO effect arm (ring-maintenance null, 0x55d02/05/d10 -> 0x55d69);
+SPLIT LAW: producer gate race==ds:0x7458e (0x3e7d5..0x3e7e7) == the
+0x3eb3c sync-dispatch skip gate — AI races run SA_ bodies SYNCHRONOUSLY
+in the FUN_0003e6e0 turn tail, the local race's due-ability event is a
+pure EVENTWIN UI refresh, human abilities fire via UI path FUN_00037b6c
+dx==1 (0x37cb1, edx=1). F8b drain sites attributed (completion leg
+0x41ded ZEROS POWER+MOVES, jump table FILE 0x41244 7/7; five rows =
+post-recharge drains with +0x52 ETA re-stamp 5/5 on 59+60.sav) but NOT
+capture-observed — direct playcap at order-completion is the closure
+path. Row STAYS OPEN.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

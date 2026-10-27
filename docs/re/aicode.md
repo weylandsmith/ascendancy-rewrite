@@ -982,3 +982,92 @@ OPEN RESIDUALS (strict-close keeps OQ-016 open): event-24 CONSUMER
 module (P0 random-event family); GOVOROM +0x42-vs-pop relation uncited
 (vendor-text only); the 0x37b6c dx-switch full adjudication; stride-45
 table 0x74782 identity beyond cost-word.
+*** t102 CLOSED the first residual (S7 below): the consumer IS
+FUN_00055ae8 (EVENTWIN pump, sole caller 0x54b74) and type 24 has NO
+effect arm — queue = UI refresh; SA_ effects are synchronous-only per the
+SPLIT LAW S7.2. Remaining residuals stand. ***
+
+
+## 7. (t102) EVENT-24 CONSUMER DECODE CLOSED: THE QUEUE IS A UI SIGNAL;
+## SA_ EFFECTS ARE SYNCHRONOUS ONLY. Verify tool
+## scripts/r1_t102_event24_verify.py RC=0 (5 legs). Working notes
+## docs/re/_wip_t102.md F1-F8.
+
+### 7.1 The pump and its type switch [verified 0x55ae8..0x55db1 raw]
+FUN_00055ae8 (sole rel32 caller 0x54b74 inside FUN_00054650, the
+EVENTWIN/message pump; gated [[obj+0x4226]>>16]==1 and ds:0x7a358!=-1)
+pops the stride-10 ring on the game object 0x7a35c (write cursor = hi
+word dword[+0x4758], read cursor = hi word dword[+0x475a], wrap-zero both
+at 0x55d8a..0x55d9a) and dispatches on record TYPE:
+  0 -> edi=0x14 | 1,2,15 -> edi=0x11, ds:0x43508:=queued obj |
+  3..9,20 -> ship-availability write family (assert dl==4; row=ctx*166
+  onto 0x12e16; call 0x45d4c; [0x12fff+off]:=1/0, [0x13000+off]:=[obj+0x59])
+  | 16,17 -> edi=0x11, ds:0x43508:=ctx | 18,19 -> [obj+0x24d9c]:=-1
+  (ctx==7 sub-arm DEAD: t[esp+8] is 0 from 0x55b74 and never rewritten) |
+  23 -> ds:0x6775:=ctx byte | 10..14, 21, 22, 24, 25, >=26 -> NOTHING
+  (ring maintenance only; edi stays 0 from 0x55b99 -> tail 0x55da1 je
+  0x55db1 SKIPS the 0x56ad4 re-arm).
+*** TYPE 24 HAS NO EFFECT ARM (0x55d02/0x55d05/0x55d10 -> 0x55d69 null).
+The queued event 0x18 advances the ring and nothing else. ***
+
+### 7.2 The SPLIT LAW (producer gate == sync-dispatch gate) [verified]
+FUN_00043b50(edx=1) rel32 callers EXACTLY {0x37baf (edx=0 probe),
+0x37cb1 (UI path, FUN_00037b6c dx==1), 0x3eb3c}. The 0x3eb3c gate
+(0x3eb22..0x3eb33): race byte != ds:0x7458e -> CALL bodies; race ==
+0x7458e -> call ONLY if ds:0x10ba4 == -1. The event-24 producer (t101 F4,
+0x3e7d5..0x3e815) pushes ONLY for race == 0x7458e rows (counter==cad
+exact). Both are the same equality on the same rows: AI races execute
+SA_ bodies SYNCHRONOUSLY in the per-race turn tail FUN_0003e6e0 (caller
+of FUN_0003ea54 at 0x3e7bb); the local race's due-ability event 24 goes
+to the ring as an EVENTWIN refresh and the local ability fires through
+the UI command path 0x37b6c dx==1 -> 0x37cb1 call. Live 60.sav:
+ds:0x10ba4==0, ds:0x7458e==0==race0 byte, queue hi word 0 (drained).
+*** CONSEQUENCE FOR THE REWRITE: no deferred-execution queue needed.
+abilityPhase counter == cad => fire immediately for AI races; for the
+player race, fire on the UI activate action (same body, same reset law
+T1 0x4400a). The cadence gate INSIDE 0x43b50 (cad > counter -> 0x44017,
+t101) is the single authority. ***
+
+### 7.3 ds:0x7458e / ds:0x10ba4 identity [verified stores + live]
+0x7458e has EXACTLY two store sites image-wide (opcode census on
+8e 45 07): 0x21aa0 (idx->0x7458e, 1<<idx->0x89324 bitmask; 0xff sentinel
+-> 0/0xff) and 0x52cc6 (reset both-ish to 0; also 0x12e17). Live: 0 =
+race0 byte; race rows row+0x7 -> AI-controller blocks with [+0x14]&0x80
+set for races 0-2 (t102 probe, pointer law H=136; member = P - 0x242000).
+[inferred] 0x7458e = local player's race index; 0x10ba4 = netplay flag
+(-1 = all races local; 0 = singleplayer/HOTSEAT-off).
+
+### 7.4 F8b drain sites adjudicated (t101 residue) [verified static,
+correlated live]: jump table FILE 0x41244 7/7 [0x419cf,0x41cc6,0x41bb3,
+0x41ded x3, 0x41c56]; order-state dispatch 0x41e1e on BYTE [ship+0x5d].
+The completion leg 0x41ded..0x41e19 ZEROS [ship+0x94] and [ship+0x88]
+folding the delta into stack budget [esp+0x3a0]; arrival leg 0x41d80
+decl [ship+0x88]. FUN_0003e6e0 leg (c) recharges every ship via
+FUN_0004a74c, so zero POWER at save time means a post-recharge drain:
+the five rows carry [rec+0x52] > T (per §7.5 the +0x52 field of this
+record family is re-stamped into the future as a transit ETA [inferred:
+same-offset writer, target-object identity not pinned]) and state
++0x5d == 0 (cleared by 0x41c98/0x41ca7/0x41ced legs) — 5/5 on 59.sav AND
+60.sav, and 59.sav row2/row4 already show MOVES 2 < drive 4 (partial
+burn) while row11/12/15 sit full-MOVES zero-POWER. MECHANISM ATTRIBUTED:
+mid-transit war-fleet rows whose completion leg drained POWER to 0 and
+whose +0x52 carries the transit-ETA stamp written by 0x40e96 AFTER the
+race recharge pass; NOT a recharge-law exception. The t101 verify bound
+0 <= POWER <= init(trunc law on age) stays valid (negative age clamps
+b to 0 -> init == cap >= 0 == POWER). SapAlienPower (ability 9) remains
+excluded (no shipped race carries it — t101 census).
+NOTE leg (a) EVENT 11 pushes per item for local-race ships when
+FUN_000402d8(race) < 0; leg (b) EVENT 10 race-death (row+0x3 := -1).
+Both feed the SAME null-for-UI ring: types 10/11 also have no effect arm
+(10..14 -> NOTHING), i.e. ALL of 0x3e6e0's queue traffic is UI refresh.
+
+### 7.5 [+0x52] ETA OVERWRITE (context for F8b) [verified bytes, target
+object identity open]: FUN_00040de0 leg 0x40e96..0x40ea6 sets
+[obj+0x52] := ds:0x12e10 + (idiv quotient 0x40e91, dividend from call
+0x4a41c(obj), divisor WORD [obj_arg+0x44]) + 1, plus BYTE [obj+0x58] := 1
+and [obj+0x59] := ptr; FUN_00040eb4 then SUBTRACTS two +0x52 fields
+(earliest-arrival compare). The birth-day field is therefore REUSED as a
+transit ETA stamp — this is the provenance of [rec+0x52] > T on the five
+zero-POWER rows, independent of the recharge law. Direct capture of the
+drain executing (playcap at order-completion) would upgrade the F8b path
+from attributed to observed; row STAYS OPEN (strict-close).

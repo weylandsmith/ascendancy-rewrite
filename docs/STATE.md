@@ -202,36 +202,68 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t102 (STATIC task): the EVENT-24 (SA_) CONSUMER DECODE — what the
-queued event 0x18 on game object 0x7a35c (producer 0x55a60 from the
-FUN_0003e6e0 tail 0x3e807, counter==cad exact) does WHEN DISPATCHED: the
-random-event module that pops the stride-10 queue at +0x475e on 0x7a35c
-(depth 32, count word, event table), and whether the SA_ effects re-run
-through the t99 bodies — the bodies are gated by the edx==1 path (dispatch
-site 0x441c1, t101-verified), so the consumer must be the caller passing
-edx==1, or the effect is deferred elsewhere.
-METHOD (~30 probes): (1) live queue state on 60.sav via the corollary index
-(head/count words at +0x475e region on the game object — locate the object
-first, it is the 0x7a35c-image-address data, member B+0x82bb0+0x7a35c+);
-(2) rel32 caller census of FUN_00043b50 + register flow proving the edx
-const per caller (expect the event dispatcher with edx=1); (3) decode the
-dispatch window for event id 24 + neighbours in the random-event module;
-(4) resolve t101 residue F8b (five Ungooma war-fleet rows POWER=0 with
-[+0x52] AHEAD of T=1254: attribute the 0x41d80 dec / 0x41e07 zero sites
-reached via jmp 0x41b8f — the drain that runs post-re-init on AI warships).
-Fallback if the queue proves dead in live saves: the 0x37b6c dx-switch
-adjudication (third in the queue since t101).
-Rationale: t101 landed the re-attribution exactly so this decode reads ship
-fields right (panel bytes pinned; t90 §2e REFUTED; recharge law cited).
-Event-24 has been the named next candidate since t99 and is the LAST
-uncited link in the SA_ chain (cadence CLOSED t99/t100, bodies CLOSED t99,
-EFFECTS-at-fire OPEN); the zero-POWER residue sits inside the same
-dispatch chain, so one task covers both.
+NEXT t103 (STATIC task): THE 0x37b6c DX-SWITCH ADJUDICATION — third
+time queued (since t101), now chain-critical: t102 S7.2 PROVED the
+local/human race's SA_ abilities fire ONLY through FUN_00037b6c
+(dx==1 gate 0x37c9c -> call 0x43b50(edx=1) at 0x37cb1), so the UI-side
+law of that function IS the human ability-activation spec. Decode the
+whole dx-switch (entry 0x37b6c, extent per functions_full.tsv 0x37b6c
+..0x37f02): cases dx==1/2 at 0x37b90 (cmp $1 dx jb 0x37ca1 / cmp $0x32
+je 0x37c9c), the 0xccb(:=2 'not-due' marker at 0x37bb9, rewrite delta —
+what consumes 0xccb+2 state), the string-table leg 0x37cc0 (push cad,
+push 0x1ca1 = countdown text), and which caller arms ebx==1 (rel32
+caller census of FUN_00037b6c + register flow of ebx per caller — expect
+the special-ability UI button window 'abres%02d' dx==2 per aicode S6).
+Verify tool scripts/r1_t103_dxswitch_verify.py: cited bytes per leg +
+live 60.sav consistency (row+0x19e counters vs cad: race0 8/89, race1
+1/0, race2 64/70 [t102 probe]). SECOND QUEUE if the dx-switch dies to a
+refuted route: F8b OBSERVATION — scripted playcap at an order-completion
+boundary (aicode S7.4: capture [ship+0x88] transitioning to 0 at 0x41e07
+via r1_adcapture window on a moving warship; closure requires the drain
+OBSERVED, attribution alone does not close per strict-close).
+Rationale: the ledger's SA_ chain now has exactly one uncited link
+(human activation semantics inside 0x37b6c); everything downstream
+(cadence t99/t100, bodies t99, consumer t102, EFFECTS law S7.2
+sync-only) is cited. Static task fits ~30 probes; F8b sits behind it
+because it needs capture machinery re-arm.
 Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44),
-no new sitting at t101 (ring slots 56-60 byte-identical, user holds
-turns); a NEW turn-boundary sitting outranks this ->
-scripts/r1_t85g_sitting.py first.
-OQ-021 passive watch continues (boundary sample 23/50, selector never armed).
+no new sitting at t102 (timeline figure re-verified at session start); a
+NEW turn-boundary sitting outranks this -> scripts/r1_t85g_sitting.py
+first.
+OQ-021 passive watch continues (boundary sample 23/50, selector never
+armed).
+
+T102 LANDED (STATIC task — EVENT-24 CONSUMER DECODE CLOSED, verify tool
+scripts/r1_t102_event24_verify.py RC=0 five legs): (1) PUMP LAW:
+FUN_00055ae8 (sole caller 0x54b74 in FUN_00054650; gates ds:0x7a358!=-1,
+write cursor !=0, [[obj+0x4226]>>16]==1, EVENTWIN lookup 0x85943) pops
+the stride-10 ring on 0x7a35c; TYPE SWITCH 0x55cbc..0x55d69 decoded
+EXHAUSTIVELY — type 24 arms to 0x55d69 ring-maintenance NULL (bytes
+83 f9 17 / 72 0b / 83 f9 19 / eb->0x55d69 pinned); edi=0 -> tail 0x55da1
+je skips the 0x56ad4 re-arm. The queued event does NOTHING but advance
+the ring: the queue is a UI signal. (2) SPLIT LAW (cited both gates):
+FUN_00043b50 rel32 callers EXACTLY {0x37baf edx=0 probe, 0x37cb1 UI
+edx=1, 0x3eb3c turn-tail}; the 0x3eb3c gate skips the local race
+(race==ds:0x7458e) unless ds:0x10ba4==-1 — the SAME equality as the
+event-24 producer: AI races fire SYNCHRONOUSLY in FUN_0003e6e0 (via
+FUN_0003ea54 call 0x3e7bb), local race event-24 = EVENTWIN refresh,
+human ability activation = UI path FUN_00037b6c dx==1. REWRITE: no
+deferred queue needed; abilityPhase == cad fires immediately (AI),
+player fires on UI activate (same bodies, same T1 reset). (3) ds:0x7458e
+identity: two store sites only (0x21aa0 idx+bitmask 0x89324; 0x52cc6
+zero); live 0 == race0 byte. ds:0x10ba4 live 0 (netplay flag [inferred]).
+(4) F8b drain sites ATTRIBUTED not observed: FUN_00041260 order-state
+dispatch on BYTE [ship+0x5d] jump table FILE 0x41244 7/7; completion leg
+0x41ded..0x41e19 ZEROS [ship+0x94]+[ship+0x88] (delta into stack budget),
+arrival 0x41d80 decl; five zero-POWER rows = post-recharge drains, [rec
++0x52] > T ETA re-stamp 5/5 on 59.sav AND 60.sav (b5d==0 signature).
+(5) FUN_0003e6e0 adjudicated = per-race turn tail: leg (a) EVENT 11 per
+item (local race, FUN_000402d8<0), leg (b) EVENT 10 race-death row+3:=-1,
+leg (c) recharge pass per ship FUN_0004a74c, leg (d) event-24 producer —
+ALL queue traffic (types 10/11 too) hits null arms = UI refresh. Docs:
+aicode.md S7 NEW (S6 OPEN-RESIDUALS first item CLOSED). Ledger: OQ-016
+annotated, STAYS OPEN (strict-close: human dx-switch law + F8b capture
+remain). Gate 0, LEDGER AUDIT OK.
 
 T101 LANDED (STATIC task — +0x88-vs-+0x94 RE-ATTRIBUTION CLOSED, verify
 tool scripts/r1_t101_field_verify.py RC=0 three legs): (1) PANEL LAW byte-
