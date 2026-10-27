@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T10:30
+updated: 2026-10-27T15:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,31 +202,59 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t104 (CAPTURE task, harness re-arm sized): F8b OBSERVATION — the
-order-completion POWER DRAIN must be OBSERVED, not just attributed
-(t101/t102 attribution banked; strict-close requires the capture). Plan:
-scratch copy + r1_adcapture-style window on a MOVING warship (order-state
-[rec+0x5d] != 0 with +0x52 ETA > T — the signature is already census-
-proven on 59+60.sav: five zero-POWER rows, race0 Ungooma), drive turns
-until a tracked row's [ship+0x88] transitions to 0 at the completion leg
-(0x41ded..0x41e19, jump table FILE 0x41244), window samples per End-Turn.
-An AI race reaches completion without user input; pick the seed/slot with
-the most in-transit ships. Closure = the sample sequence power>0 -> 0 on
-one tracked record across a turn boundary; negative = drain absent at
-arrival -> F8b mechanism reopens (the +0x52 ETA theory then needs a
-re-read). Rationale: the t103 SA_ chain is fully cited except this one
-capture-observation; every cheaper static target is now consumed (dx-switch
-closed t103; event-24 consumer closed t102). If dosbox capture harness
-breaks, fix harness (exit-code law 2) and re-run ONCE, else BLOCKED.
-Standing alternatives if the capture route is dead on arrival: (i) OQ-021
-passive watch continues untouched (boundary sample 23/50, selector never
-armed); (ii) t99 S6 residual list still holds GOVOROM +0x42-vs-pop and the
-stride-45 table 0x74782-identity items (static, cheap, low ledger value).
-Sitting watch: live-timeline 5.69 GB (mtime 2026-10-26 15:44), no new
-sitting at t103 (re-verified at session start); a NEW turn-boundary
-sitting outranks this -> scripts/r1_t85g_sitting.py first, and any sitting
-whose turns show a ship arriving (order-state churn) is the F8b capture
-vehicle FOR FREE — check before building any harness.
+NEXT t105 (STATIC task): t99 S6 RESIDUAL PAIR — the last cheap static
+items named by the t104 assignment's standing alternatives. (a) GOVOROM
++0x42-vs-population: race-row field +0x42 shows a population-correlated
+value on GOVOROM rows in 60.sav; find its writer census (store-form byte
+pattern on disp disp 0x42 relative to row base 0x12e16+0x1ee*r — pattern
+from scripts/r1_t86_write_census.py) and decide whether it is a derived
+cache (recharge-style) or a stored decision. (b) stride-45 table at
+0x74782: identify what loads it (data-file string census law
+r1_datafile_strings.py already maps every .txt referrer; 0x74782 sits
+near the restree runtime 0x7478b — check whether it is restree-adjacent
+memory or an independent table, then attribute). Both are OQ-016-adjacent,
+low ledger value but the only offline-productive statics left; close them
+or bank honest negatives, annotate OQ-016, no rewrite delta expected
+(aggregate model). Rationale: every capture-class target is
+user-gated (OQ-005/019/021/023 state their closure class as
+BLOCKED-USER/passive-watch); the F8b observation consumed the last
+capture vehicle the banked stream could give (t104); a new sitting
+re-check runs first regardless.
+Sitting watch: live-timeline 5.69 GB mtime 2026-10-26 15:44, no new
+sitting at t104 (re-verified at session start); a NEW turn-boundary
+sitting outranks this -> scripts/r1_t85g_sitting.py first. OQ-021 passive
+watch continues (boundary sample 23/50, selector never armed; scripts/
+r1_t104_drain_watch.py output is NOT OQ-021 evidence).
+
+T104 LANDED (CAPTURE task — F8b ORDER-COMPLETION POWER DRAIN OBSERVED +
+the five-rows mystery CLOSED BY SUBSTITUTION; verify tool
+scripts/r1_t104_drain_verify.py RC=0 four legs; working notes
+docs/re/_wip_t104.md P1-P5): (1) NO new harness needed — the banked
+playcap stream (44,928 rows, 17,170 boundary pairs) already contained
+the closure vehicle (tool scripts/r1_t104_drain_watch.py + gate-gated
+scripts/r1_t104c_fulllaw.py). (2) OBSERVED: completion drain executing on
+CONTINUOUS tracked records (same owner+design+state both sides) — 4
+events (day369 slot3, 678 slot14, 945 slot10, 1017 slot28, owner0):
+POWER +0x88 >0 -> 0 WITH order-state +0x5d CLEARED 0x3->0 in the same
+sample pair; MOVES net-unchanged (zero leg 0x41ded + FUN_0004a658
+re-grant); POWER restored at the NEXT boundary (679 P4 / 946 P5 / 1018
+P8) == recharge FUN_0004a74c one End-Turn later. CONTROL burn class
+(b5d unchanged same-day P->0) = 126 members = travel/upkeep
+0x4a2d4..0x4a314 — gate separates completion from burns. (3) REFUTED:
+the t102 "five zero-POWER rows = post-recharge completion drains"
+mechanism — rows on 59+60.sav (both T=1254) sit EXACTLY on slots
+2/4/11/12/15, ALL FIVE observed state->0 mid-t1253 (t85g war turn;
+r1_t85g2_slots.py independently named them), reappearing t1254 as
+post-death FREE-RECORD REUSE (slot4 design 2->4, xyz frozen, ETA
+1257..1264 > T = the 0x40e96 order stamp); P=0 = fresh record awaiting
+next recharge. No recharge-law exception (t101 bound stands). (4)
+METHOD LAW banked: any P>0->0 transition census MUST gate on record
+continuity or it counts death/recycle as drains (t104b proved via
+battle-frame trace). (5) Docs: aicode.md S7.4 adjudicated (observation-
+cited), S7.5 amended; OQ-016 annotated, STAYS OPEN (terrain/nuke,
+home-placement, minutiae, preset source, live-UI-trace armer). REWRITE:
+no delta (aggregate model never models per-ship POWER). Gate
+GATE_EXIT=0, LEDGER AUDIT OK.
 
 T103 LANDED (STATIC task — 0x37b6c DX-SWITCH / HUMAN ABILITY ACTIVATION
 CLOSED, verify tool scripts/r1_t103_dxswitch_verify.py RC=0 five legs):

@@ -798,7 +798,21 @@ bytes pinned); dx 1|2 = PROBE 0x43b50(row,0) + 'N day(s)' countdown
 direction CITED counter-cad (0x44001) — t100 reset-0 model unaffected.
 Positive armer of (msg 50, ebx 1) not provable statically (all 9 pump + 56
 relay sites traced; input relay 0x54976 verbatim from DOSBox event record)
-— live-UI-trace residual carried. Row STAYS OPEN.
+— live-UI-trace residual carried. t104 CLOSED THE F8b CAPTURE RESIDUAL
+OBSERVATIONALLY (aicode.md S7.4 adjudication, tool
+scripts/r1_t104_drain_verify.py RC=0 four legs, pass over the banked
+playcap stream 44,928 rows): completion drain OBSERVED executing on
+continuous tracked records (4 events, days 369/678/945/1017 owner0 slots
+3/14/10/28: POWER +0x88 >0 -> 0 WITH order-state +0x5d cleared 0x3->0 in
+one sample pair; POWER restored at the NEXT boundary == FUN_0004a74c);
+CONTROL burn class (b5d unchanged, 126) separated. The five static zero-
+POWER rows on 59/60.sav are REFUTED as completion drains — all five slots
+2/4/11/12/15 DIED mid-t1253 (war turn) and reappeared at t1254 as post-
+death free-record reuse (slot4 design 2->4, ETA re-stamped 1257..1264 >
+T=1254 per the 0x40e96 stamp law); no recharge-law exception. Row STAYS
+OPEN (remaining: per-cell terrain/nuke wiring, home-placement
+verification, +2 residual minutiae, scenario-template preset source,
+live-UI-trace armer residual).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

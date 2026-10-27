@@ -1047,18 +1047,32 @@ The completion leg 0x41ded..0x41e19 ZEROS [ship+0x94] and [ship+0x88]
 folding the delta into stack budget [esp+0x3a0]; arrival leg 0x41d80
 decl [ship+0x88]. FUN_0003e6e0 leg (c) recharges every ship via
 FUN_0004a74c, so zero POWER at save time means a post-recharge drain:
-the five rows carry [rec+0x52] > T (per §7.5 the +0x52 field of this
-record family is re-stamped into the future as a transit ETA [inferred:
-same-offset writer, target-object identity not pinned]) and state
-+0x5d == 0 (cleared by 0x41c98/0x41ca7/0x41ced legs) — 5/5 on 59.sav AND
-60.sav, and 59.sav row2/row4 already show MOVES 2 < drive 4 (partial
-burn) while row11/12/15 sit full-MOVES zero-POWER. MECHANISM ATTRIBUTED:
-mid-transit war-fleet rows whose completion leg drained POWER to 0 and
-whose +0x52 carries the transit-ETA stamp written by 0x40e96 AFTER the
-race recharge pass; NOT a recharge-law exception. The t101 verify bound
-0 <= POWER <= init(trunc law on age) stays valid (negative age clamps
-b to 0 -> init == cap >= 0 == POWER). SapAlienPower (ability 9) remains
-excluded (no shipped race carries it — t101 census).
+*** t104 ADJUDICATION — CAPTURE-OBSERVED, AND THE FIVE-ROWS HYPOTHESIS
+REFUTED (tools scripts/r1_t104_drain_verify.py RC=0 + r1_t104c_fulllaw.py,
+stream pass over playcap/live-timeline.jsonl 44,928 rows):
+OBSERVED (the closure class t102 named): completion drain EXECUTING on
+CONTINUOUS tracked records (same owner+design+state both sides): 4 events
+day369 slot3, day678 slot14, day945 slot10, day1017 slot28 (repeats on
+slot3 at 370/372); EVERY one POWER(word +0x88) > 0 -> 0 WITH order-state
++0x5d CLEARED 0x3 -> 0 in the same sample pair; MOVES net-unchanged
+(zero leg + FUN_0004a658 re-grant between autosaves); POWER returns at
+the NEXT boundary (678->679 P4, 945->946 P5, 1017->1018 P8) == the
+FUN_0004a74c pass one End-Turn later. CONTROL: b5d-UNCHANGED same-day
+P->0 burns = 126 members (travel/upkeep 0x4a2d4..0x4a314) — the b5d-clear
+gate genuinely separates completion from burns.
+REFUTED (the t102 mechanism for the static five zero-POWER rows): the
+rows on 59.sav+60.sav (both T=1254, slots 2/4/11/12/15, own2, b5d==0,
++0x52 1257..1264 > T) are POST-DEATH FREE-RECORD REUSE, not mid-transit
+completion drains: ALL FIVE slots went state->0 mid-t1253 (the t85g war
+turn; r1_t85g2_slots.py had independently named them "Ungooma slots that
+died"; slot4 reappears t1254 with design 2->4, xyz frozen, ETA re-stamped
+1264). P=0 on a reused record simply awaits its race's NEXT recharge
+(owner-2 boundary refills 4 counted); ETA-ahead = the 0x40e96 order stamp
+on new orders (§7.5 stands). The "five rows = post-recharge completion
+drains" reading is VOID; no recharge-law exception exists.
+RESIDUAL kept honest: autosave granularity cannot order drain-vs-recharge
+WITHIN one turn tick; observed events carry b5d-before == 0x3 (state
+domain only partially mapped, t96). ***
 NOTE leg (a) EVENT 11 pushes per item for local-race ships when
 FUN_000402d8(race) < 0; leg (b) EVENT 10 race-death (row+0x3 := -1).
 Both feed the SAME null-for-UI ring: types 10/11 also have no effect arm
@@ -1070,10 +1084,13 @@ object identity open]: FUN_00040de0 leg 0x40e96..0x40ea6 sets
 0x4a41c(obj), divisor WORD [obj_arg+0x44]) + 1, plus BYTE [obj+0x58] := 1
 and [obj+0x59] := ptr; FUN_00040eb4 then SUBTRACTS two +0x52 fields
 (earliest-arrival compare). The birth-day field is therefore REUSED as a
-transit ETA stamp — this is the provenance of [rec+0x52] > T on the five
-zero-POWER rows, independent of the recharge law. Direct capture of the
-drain executing (playcap at order-completion) would upgrade the F8b path
-from attributed to observed; row STAYS OPEN (strict-close).
+transit ETA stamp — this is the provenance of [rec+0x52] > T on the t1254
+reused-record rows (t104: all five slots 2/4/11/12/15 carry 1257..1264 vs
+T=1254), independent of the recharge law. t104 OBSERVED the drain
+executing on the user's playcap stream (§7.4 adjudication: completion =
+POWER->0 with +0x5d cleared, next-boundary recharge restores) — the F8b
+path is upgrade-complete from attributed to observed; the ledger residue
+that remains is only the within-tick ordering granularity note.
 
 ## 8. (t103) HUMAN ABILITY ACTIVATION CLOSED: THE 0x37b6c DX-SWITCH.
 ## Verify tool scripts/r1_t103_dxswitch_verify.py RC=0 (5 legs). Working
