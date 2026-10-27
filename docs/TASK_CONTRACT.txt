@@ -40,9 +40,19 @@ default you can proceed under, still run the FINISH SEQUENCE (a green gate and
 a commit on a blocked iteration are REQUIRED — the loop must never end red),
 and stop.
 
-BANK EARLY (wall-clock law): the harness kills you at 90 minutes and Hermes
-warns at 80% of the budget. If the task is still open when that warning
-appears, STOP digging and run the FINISH SEQUENCE on the partial results —
-commit the tools written so far and the docs as they stand, with remaining
-residuals named in STATE.md's NEXT. A committed partial beats a killed perfect
-run: two killed runs in a row on one task parks the loop anyway.
+BANK EARLY (context law): you run on a 262k-token window with compaction at
+50% — a mid-task compaction costs you the working detail in your head, so the
+file must always hold what you know. Two rules:
+  1. WRITE AS YOU GO. After each meaningful finding, append it to the doc
+     section (or a scratch docs/re/_wip_<task>.md) BEFORE your next probe.
+     Never hold more than one finding's worth of unwritten conclusions.
+  2. STREAM, NEVER INHALE. Never cat/read a whole large doc, tool output, or
+     binary window into context: grep with -n and small -A/-B, read_file with
+     offset/limit, head/tail pipes. A single full-read of a big file can cost
+     more context than an hour of targeted probes.
+Compaction is no longer fatal to an iteration (events now stream; a handoff
+continues from your files) — but a compaction-free run is still the cheap
+path, and tasks sized by PROBE COUNT (~<=35 tool calls) hit it. If you feel
+context pressure before the task is done, run the FINISH SEQUENCE on the
+partial results instead of digging further: a committed partial beats an
+uncommitted masterwork.

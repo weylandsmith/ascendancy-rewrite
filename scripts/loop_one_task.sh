@@ -29,8 +29,8 @@ LOOPDIR="work/r1/loop"
 mkdir -p "$LOOPDIR"
 MAX_ITERS="${MAX_ITERS:-0}"          # 0 = unlimited
 MAX_TURNS="${MAX_TURNS:-500}"        # tool-iteration cap inside the one turn
-RUN_BUDGET="${RUN_BUDGET:-5400}"     # 90 min wall per task
-GRACE="${GRACE:-900}"                # +15 min for the FINISH SEQUENCE after 80% warning
+RUN_BUDGET="${RUN_BUDGET:-10800}"    # 3 h wall per task (slow local model:
+GRACE="${GRACE:-1800}"               # time is cheap, context is not — see contract)
 KILL_AT=$((RUN_BUDGET + GRACE))
 COOLDOWN="${COOLDOWN:-15}"           # seconds between iterations
 CONTRACT="docs/TASK_CONTRACT.txt"
@@ -104,11 +104,15 @@ while :; do
   # One session, one task, exits on completion (or on the caps). Hermes injects
   # its own wrap-up warning at 80% of --run-budget; GRACE is what we give the
   # session after that warning to bank docs + commit before the wall kills it.
+  # --format stream-json: NDJSON events land in $out AS THEY HAPPEN (a -Q run
+  # writes nothing until the final response, so a working session looks dead
+  # and a killed session leaves a 0-byte log). tee keeps the tmux pane live.
   timeout -s KILL "$KILL_AT" \
-    hermes chat --query-file "$LOOPDIR/prompt-$n.txt" --oneshot -Q \
+    hermes chat --query-file "$LOOPDIR/prompt-$n.txt" --oneshot \
+      --format stream-json \
       --yolo --max-turns "$MAX_TURNS" --run-budget "$RUN_BUDGET" \
-      > "$out" 2>&1
-  rc=$?
+      2>&1 | tee "$out"
+  rc=${PIPESTATUS[0]}
   log "iter $n: session exited rc=$rc (log: $out)"
   [ "$rc" = 137 ] && log "iter $n: KILLED at budget+grace (${KILL_AT}s wall)"
 
