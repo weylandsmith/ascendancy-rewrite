@@ -279,6 +279,11 @@ populated by the loader FUN_00044290 leg or scenario init; writer at
 research-runtime 75 — a DIFFERENT parallel table (0x74782 word0=50=cost?
 [unverified]); refreshes progress accumulator 0x764a0[2*self]. SEMANTICS
 PARTIAL: cited store, uncited meaning of the stride-45 word.
+*** t105 REFUTED [verified]: stride is 75, not 45 — the body's index math
+lea [edx*4]/add edx/shl 4/sub = 75t byte-pinned 0x4416b..0x44179; the word
+IS the restree runtime cost (base 0x74744 = this file's research runtime,
+cost u16 @ record+62; live fit 66/66 vs the OQ-013 cost law). No parallel
+table. scripts/r1_t105_verify.py legs 2-3. ***
 
 ### F18. *** THE ABILITY MAP (help.txt, extracted/ascend00/help.txt §abil*/abres*) ***
 The dispatcher key row+0x19d = SPECIAL ABILITY NUMBER; help.txt carries

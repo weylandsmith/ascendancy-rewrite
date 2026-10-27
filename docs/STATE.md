@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T15:40
+updated: 2026-10-27T18:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,29 +202,61 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t105 (STATIC task): t99 S6 RESIDUAL PAIR — the last cheap static
-items named by the t104 assignment's standing alternatives. (a) GOVOROM
-+0x42-vs-population: race-row field +0x42 shows a population-correlated
-value on GOVOROM rows in 60.sav; find its writer census (store-form byte
-pattern on disp disp 0x42 relative to row base 0x12e16+0x1ee*r — pattern
-from scripts/r1_t86_write_census.py) and decide whether it is a derived
-cache (recharge-style) or a stored decision. (b) stride-45 table at
-0x74782: identify what loads it (data-file string census law
-r1_datafile_strings.py already maps every .txt referrer; 0x74782 sits
-near the restree runtime 0x7478b — check whether it is restree-adjacent
-memory or an independent table, then attribute). Both are OQ-016-adjacent,
-low ledger value but the only offline-productive statics left; close them
-or bank honest negatives, annotate OQ-016, no rewrite delta expected
-(aggregate model). Rationale: every capture-class target is
-user-gated (OQ-005/019/021/023 state their closure class as
-BLOCKED-USER/passive-watch); the F8b observation consumed the last
-capture vehicle the banked stream could give (t104); a new sitting
-re-check runs first regardless.
+NEXT t106 (STATIC task): SCENARIO-TEMPLATE PRESET SOURCE for the +0x55
+pop-cap seed deviation — the last offline-named item on the OQ-016 open
+set after t105 consumed both S6.4 statics. The t29/t33 corpus law holds
+98.63% on first-save-per-world (income-law.md; "residual = scenario/
+preset-row worlds via FUN_00037fc0, not replay noise" is CITED, but the
+PRESET SOURCE itself was never named). Work: (1) census the deviation
+worlds (the ~1.4% where +0x55 != nonbarren/3+5) across banked corpora —
+are they a fixed world-name set per run / do they cluster in one scenario
+(New Game vs resume vs r1size special-mode rows)? (2) the named carrier
+FUN_00037fc0 (planitem/scenario loader, OQ-014 image) plus the newgame.txt
+referrer 0x5212c (datafile census) — find a store site into +0x55 or a
+template row copy (store-form census pattern r1_t86_write_census.py on
+offset 0x55 over the planet pool walk, + disp32 0x55 near 0x37fc0..0x3830c).
+(3) check RESUME.GAM / scenario files for a preset row table (the
+0x744f4 preset table t29 measured is the GENERATION row source; a
+scenario-preset source would be a SECOND carrier). Close = cited writer
+or cited template file+offset for the deviating worlds; else honest
+negative naming what was excluded. OQ-016 annotated either way; STAYS
+OPEN (terrain/nuke wiring, home-placement verification, minutiae,
+live-UI-trace armer all remain — the first three are user/capture-class
+or parked-by-decision, so a t106 negative effectively ends productive
+offline work: next iteration should then stop-report per GOAL "stop when
+blocked"). Rationale: every capture-class target is user-gated
+(OQ-003/005/019/021/023 state BLOCKED-USER/passive-watch); t105 closed
+the last two aicode ability-engine residuals; the preset source is the
+only remaining offline item with a NAMED carrier function.
 Sitting watch: live-timeline 5.69 GB mtime 2026-10-26 15:44, no new
-sitting at t104 (re-verified at session start); a NEW turn-boundary
+sitting at t105 (re-verified at session start); a NEW turn-boundary
 sitting outranks this -> scripts/r1_t85g_sitting.py first. OQ-021 passive
-watch continues (boundary sample 23/50, selector never armed; scripts/
-r1_t104_drain_watch.py output is NOT OQ-021 evidence).
+watch continues (boundary sample 23/50, selector never armed).
+
+T105 LANDED (STATIC task — the last two aicode.md S6.4 residuals CLOSED;
+verify tool scripts/r1_t105_verify.py RC=0 FIVE legs; working notes
+docs/re/_wip_t105.md P1-P3): (1) "stride-45 table 0x74782" REFUTED — no
+such table: SA_FreeResearch body index math lea[edx*4]/add/shl4/sub ==
+75*t byte-pinned 0x4416b..0x44189, and WORD[0x74782 + 75*i] IS the restree
+runtime COST word (record base 0x74744 stride 75, cost @+62; row-0 spaced
+name at corollary X 0x74746; 65 consecutive stride-75 deltas; live fit
+66/66 vs the OQ-013 cost law). aicode S6.3 corrected; _wip_t99 F17 marked
+REFUTED. (2) GOVOROM +0x42 CLOSED: assignment premise FALSE (race-row
++0x42 = pointer garbage rows 0..20; no GOVOROM race row in campaign —
+GOVOROM = ability NUMBER 10). Real residual (t99 F12/F18 min key)
+resolved: SA_Cornucopia body 0x43de4..0x43e96 (pinned incl pool base
+0x2b057 stride 123, owner [rec+0x57], skip [rec+0x16]==10, idiv 3 pick
+pool 0x6838) min-walks WORD[planet_rec+0x42] == the population counter
+per the t24 CLOSED pop law (38f68.c:154-177 same layout); STORED COUNTER,
+not a cache. Writer census r1_t86 0x42: 10 verified sites, zero race-row
+carriers; 0x3b0a7 low-word==2 corroborates colonize pop:=2. Live 60.sav:
+pool 145 rows (count law hi16 ds 0x3a091), max counter +0x4e 48 < 50, all
+64 pop>=cap rows carry counter 0 (LAB_000393f9). (3) Ledger: aicode.md
+S6.4 residuals ALL CLOSED + S6.3 correction + F17 refutation; OQ-016 row
+annotated, STAYS OPEN (same open set; strict-close). REWRITE: no delta
+(FreeResearch already completes the queued tech; Cornucopia already keys
+on pop — laws confirm existing behaviour, aggregate model unaffected).
+Gate GATE_EXIT=0, LEDGER AUDIT OK.
 
 T104 LANDED (CAPTURE task — F8b ORDER-COMPLETION POWER DRAIN OBSERVED +
 the five-rows mystery CLOSED BY SUBSTITUTION; verify tool

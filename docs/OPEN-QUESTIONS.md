@@ -812,7 +812,15 @@ death free-record reuse (slot4 design 2->4, ETA re-stamped 1257..1264 >
 T=1254 per the 0x40e96 stamp law); no recharge-law exception. Row STAYS
 OPEN (remaining: per-cell terrain/nuke wiring, home-placement
 verification, +2 residual minutiae, scenario-template preset source,
-live-UI-trace armer residual).
+live-UI-trace armer residual). t105 CLOSED the last two aicode.md S6.4
+ability-engine residuals [verified, scripts/r1_t105_verify.py RC=0 five
+legs]: (a) SA_Cornucopia min key WORD[planet_rec+0x42] IS the population
+counter (identity with the t24 CLOSED pop law; body 0x43de4 pinned, pool
+0x2b057 stride 123; race-row +0x42 premise in the assignment was FALSE —
+pointer garbage, GOVOROM = ability number 10, no GOVOROM race row in the
+campaign); (b) the "stride-45 table 0x74782" REFUTED — index math 75*t
+byte-pinned, word = restree runtime cost (base 0x74744, cost@+62, live
+66/66 vs the OQ-013 law). Row status UNCHANGED (the same open set stands).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

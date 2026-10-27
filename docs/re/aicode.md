@@ -945,6 +945,12 @@ parses, 21 blocks) name the ability per index; the UI caller 0x37cb1 opens
 19 SA_FreeResearch 0x4414e: own target t!=0xffff: 0x764a0[2self] :=
    WORD[0x74782 + 45*t] (research cost word — live 50/90/100 for rows
    0..4) = set progress to cost = "complete in one day".
+   *** t105 CORRECTION [verified, byte-pinned 0x4416b..0x44189 + live
+   66/66]: the index math is lea 4t / add t / shl 4 / sub = 75*t, NOT
+   45*t: 0x74782 is the ROW-0 runtime COST WORD of the research-state
+   table (record base 0x74744, stride 75 == the OQ-013 restree runtime
+   law cost@+62). There is NO independent stride-45 table. Verify tool
+   scripts/r1_t105_verify.py leg 2+3. ***
 20 SA_IndustryBoost 0x4418e: own planets ([p+0x54]!=0xff): WORD [p+0x50]
    += 100 (build accumulator per income-law live measurement).
 
@@ -989,6 +995,21 @@ table 0x74782 identity beyond cost-word.
 FUN_00055ae8 (EVENTWIN pump, sole caller 0x54b74) and type 24 has NO
 effect arm — queue = UI refresh; SA_ effects are synchronous-only per the
 SPLIT LAW S7.2. Remaining residuals stand. ***
+*** t105 CLOSED the LAST two residuals [verified, tools
+scripts/r1_t105_verify.py RC=0 five legs + r1_t86_write_census 0x42]:
+(1) GOVOROM +0x42 IS pop — SA_Cornucopia body (0x43de4..0x43e96, pinned)
+min-walks WORD[planet_rec+0x42] over the static pool 0x2b057 stride 123
+(owner BYTE [rec+0x57], skip [rec+0x16]==10); that exact word is the
+population counter per the t24 CLOSED pop law (income-law.md §6e:
+colonize :=2 / growth +1 / clamp cap +0x4a; growth-pass decompile
+38f68.c:154-177 reads +0x42/+0x4a/+0x4e on the same layout) — a STORED
+counter, not a derived cache, and not a race-row field (race-row +0x42 is
+pointer garbage; "GOVOROM" names the ability NUMBER 10, no GOVOROM race
+row exists in the shipped campaign). (2) the "stride-45 table 0x74782"
+never existed — see the S6.3 correction above (index math = 75*t, word =
+restree runtime cost). The F12 sub-note "planet-choice key +0x42 semantic
+UNMAPPED" is likewise resolved by (1). S6.4 OPEN-RESIDUALS list: ALL FOUR
+ITEMS NOW CLOSED; OQ-016 itself stays open on its own listed grounds. ***
 
 
 ## 7. (t102) EVENT-24 CONSUMER DECODE CLOSED: THE QUEUE IS A UI SIGNAL;
