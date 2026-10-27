@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T08:30
+updated: 2026-10-27T10:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,36 +202,65 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t103 (STATIC task): THE 0x37b6c DX-SWITCH ADJUDICATION — third
-time queued (since t101), now chain-critical: t102 S7.2 PROVED the
-local/human race's SA_ abilities fire ONLY through FUN_00037b6c
-(dx==1 gate 0x37c9c -> call 0x43b50(edx=1) at 0x37cb1), so the UI-side
-law of that function IS the human ability-activation spec. Decode the
-whole dx-switch (entry 0x37b6c, extent per functions_full.tsv 0x37b6c
-..0x37f02): cases dx==1/2 at 0x37b90 (cmp $1 dx jb 0x37ca1 / cmp $0x32
-je 0x37c9c), the 0xccb(:=2 'not-due' marker at 0x37bb9, rewrite delta —
-what consumes 0xccb+2 state), the string-table leg 0x37cc0 (push cad,
-push 0x1ca1 = countdown text), and which caller arms ebx==1 (rel32
-caller census of FUN_00037b6c + register flow of ebx per caller — expect
-the special-ability UI button window 'abres%02d' dx==2 per aicode S6).
-Verify tool scripts/r1_t103_dxswitch_verify.py: cited bytes per leg +
-live 60.sav consistency (row+0x19e counters vs cad: race0 8/89, race1
-1/0, race2 64/70 [t102 probe]). SECOND QUEUE if the dx-switch dies to a
-refuted route: F8b OBSERVATION — scripted playcap at an order-completion
-boundary (aicode S7.4: capture [ship+0x88] transitioning to 0 at 0x41e07
-via r1_adcapture window on a moving warship; closure requires the drain
-OBSERVED, attribution alone does not close per strict-close).
-Rationale: the ledger's SA_ chain now has exactly one uncited link
-(human activation semantics inside 0x37b6c); everything downstream
-(cadence t99/t100, bodies t99, consumer t102, EFFECTS law S7.2
-sync-only) is cited. Static task fits ~30 probes; F8b sits behind it
-because it needs capture machinery re-arm.
-Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44),
-no new sitting at t102 (timeline figure re-verified at session start); a
-NEW turn-boundary sitting outranks this -> scripts/r1_t85g_sitting.py
-first.
-OQ-021 passive watch continues (boundary sample 23/50, selector never
-armed).
+NEXT t104 (CAPTURE task, harness re-arm sized): F8b OBSERVATION — the
+order-completion POWER DRAIN must be OBSERVED, not just attributed
+(t101/t102 attribution banked; strict-close requires the capture). Plan:
+scratch copy + r1_adcapture-style window on a MOVING warship (order-state
+[rec+0x5d] != 0 with +0x52 ETA > T — the signature is already census-
+proven on 59+60.sav: five zero-POWER rows, race0 Ungooma), drive turns
+until a tracked row's [ship+0x88] transitions to 0 at the completion leg
+(0x41ded..0x41e19, jump table FILE 0x41244), window samples per End-Turn.
+An AI race reaches completion without user input; pick the seed/slot with
+the most in-transit ships. Closure = the sample sequence power>0 -> 0 on
+one tracked record across a turn boundary; negative = drain absent at
+arrival -> F8b mechanism reopens (the +0x52 ETA theory then needs a
+re-read). Rationale: the t103 SA_ chain is fully cited except this one
+capture-observation; every cheaper static target is now consumed (dx-switch
+closed t103; event-24 consumer closed t102). If dosbox capture harness
+breaks, fix harness (exit-code law 2) and re-run ONCE, else BLOCKED.
+Standing alternatives if the capture route is dead on arrival: (i) OQ-021
+passive watch continues untouched (boundary sample 23/50, selector never
+armed); (ii) t99 S6 residual list still holds GOVOROM +0x42-vs-pop and the
+stride-45 table 0x74782-identity items (static, cheap, low ledger value).
+Sitting watch: live-timeline 5.69 GB (mtime 2026-10-26 15:44), no new
+sitting at t103 (re-verified at session start); a NEW turn-boundary
+sitting outranks this -> scripts/r1_t85g_sitting.py first, and any sitting
+whose turns show a ship arriving (order-state churn) is the F8b capture
+vehicle FOR FREE — check before building any harness.
+
+T103 LANDED (STATIC task — 0x37b6c DX-SWITCH / HUMAN ABILITY ACTIVATION
+CLOSED, verify tool scripts/r1_t103_dxswitch_verify.py RC=0 five legs):
+(1) IDENTITY: FUN_00037b6c (real extent 0x37b6c..0x37cf7) has ZERO rel32
+callers; sole u32 ref = FILE 0x8893c = pool 0x5d84 +0x8 = ABILITY-WINDOW
+CLASS RECORD (ctor 0x37ac5 stores 0x5d84; +0 create 0x37ad0 loads abil%02d
+description file 0x8483f; +c paint 0x37cf8 draws race ability glyph — shp
+lib 0x9f10c sel 250 + BYTE [race*2+0x12e18]); dispatched via pump
+FUN_00056b5c (call [class+0x8] @0x56c74) and relay FUN_00056ca4 (msg code
+= caller ebx arrives as dx; handler ebx = caller ecx; @0x56cd1..0x56cda).
+(2) LAW: head esi = 0x12e16 + ds:0x7458e*0x1ee (local race row);
+dx 1|2 -> PROBE 0x43b50(row,0): -1 READY -> dead marker [ui+0xccb]:=2
+(disp32 census: store 0x37bbb ONLY hit, zero readers); not-due -> countdown
+'N day(s)' cad-counter (0x37bf1 cad read, 0x37bfb singular iff ==1,
+static.txt 191-string blob idx 28=''/29='s'/30='OK' via ascend00.cob,
+0x76c79 snprintf-family). dx 50 -> gate cmp ebx,1 @0x37c9c -> FIRE
+0x43b50(row,1) + 'abres%02d' (pool 0x1ca1 = file 0x84851, byte-pinned;
+0x1cab='help.txt') result window via FUN_00033f40; else base filter
+0x33ff8. Tail 0x37c78 resets [ui+0x35]/[ui+0x39]:=-1 + repaint [class+0xc].
+(3) FUN_00043b50 edx PARAMETER LAW cited: gate cad>counter -> 0; ready:
+edx==0 returns -1 (probe); edx==1 dispatches bodies (al=[row+0x19d]-5,
+cs:[eax*4+0x2ef60]); RESET row+0x19e := counter - cad (0x44001 sub edx,eax
+— DIRECTION correction vs t99 prose; zero exactly at fire, t100 model
+stands). (4) CORRECTION banked in aicode S6.4: 'abres%02d at dx==2'
+REFUTED (abres = dx-50 result resource). (5) ARRIVAL honest negative: all
+9 pump + 56 relay sites register-traced; msg-50 relays exist (0x3b6ac,
+0x3d8xx family) none arms ecx==1; input relay 0x54976 pumps ds:0x484c4/c6
+verbatim from the DOSBox event record (+0xc/+0x10) — positive armer needs
+live UI trace (carried residual). Live 60.sav leg: rows 0..3 ability
+19/2/11/0, counters 8/1/64/0 all < cad (89/0/70/0) — consistent, no
+pending fire. Docs: aicode.md S8 NEW (S6 OPEN-RESIDUALS dx-switch item
+CLOSED). Ledger: OQ-016 annotated, STAYS OPEN (strict-close: F8b capture
++ live-UI-trace residual). REWRITE: no delta (human path is UI input; AI
+sync law already wired t99/t100). Gate 0, LEDGER AUDIT OK.
 
 T102 LANDED (STATIC task — EVENT-24 CONSUMER DECODE CLOSED, verify tool
 scripts/r1_t102_event24_verify.py RC=0 five legs): (1) PUMP LAW:

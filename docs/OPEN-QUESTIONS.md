@@ -786,7 +786,19 @@ dx==1 (0x37cb1, edx=1). F8b drain sites attributed (completion leg
 0x41ded ZEROS POWER+MOVES, jump table FILE 0x41244 7/7; five rows =
 post-recharge drains with +0x52 ETA re-stamp 5/5 on 59+60.sav) but NOT
 capture-observed — direct playcap at order-completion is the closure
-path. Row STAYS OPEN.
+path. t103 CLOSED THE DX-SWITCH RESIDUAL (aicode.md S8, tool
+scripts/r1_t103_dxswitch_verify.py RC=0 five legs): FUN_00037b6c =
+ability-window class-record handler (class pool 0x5d84 file 0x88934, +8
+slot, zero rel32 callers; pump FUN_00056b5c / relay FUN_00056ca4 [class+8]
+bytes pinned); dx 1|2 = PROBE 0x43b50(row,0) + 'N day(s)' countdown
+(static.txt 28/29 singular iff cad-counter==1, 'OK' label), dx 50 && ebx==1
+= FIRE 0x43b50(row,1) + abres%02d-from-help.txt result window (aicode S6
+'abres at dx==2' expectation REFUTED), else base filter 0x33ff8;
+[ui+0xccb]:=2 marker has ZERO readers (disp32 census); FUN_00043b50 reset
+direction CITED counter-cad (0x44001) — t100 reset-0 model unaffected.
+Positive armer of (msg 50, ebx 1) not provable statically (all 9 pump + 56
+relay sites traced; input relay 0x54976 verbatim from DOSBox event record)
+— live-UI-trace residual carried. Row STAYS OPEN.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

@@ -964,6 +964,9 @@ rewrite/src/game/species.cpp + abilityPhase count-up law, verified three-leg
 (scripts/r1_t100_cad_verify.py RC=0). ***
 UI leg 0x37b6c dx==1: countdown = cad - counter shown with static.txt
 strings [0x1c]=''/[0x1d]='s' plural law; dx==2 opens 'abres%02d' window.
+*** t103 CORRECTION [verified]: dx 1|2 = probe + countdown (that part
+stood); 'abres%02d' belongs to the dx==50 FIRE leg (result text), NOT
+dx==2 — full adjudication S8 below. ***
 NOTE +0x88 LABEL: S2d banks +0x88=gizmo POWER sum; profile 7 doubles it,
 profile 9 zeroes it (help.txt POWER texts) — t85g's '+0x88=MOVES' label is
 WRONG at these sites (MOVES candidate = +0x94, panel fmt order POWER,
@@ -1071,3 +1074,66 @@ transit ETA stamp — this is the provenance of [rec+0x52] > T on the five
 zero-POWER rows, independent of the recharge law. Direct capture of the
 drain executing (playcap at order-completion) would upgrade the F8b path
 from attributed to observed; row STAYS OPEN (strict-close).
+
+## 8. (t103) HUMAN ABILITY ACTIVATION CLOSED: THE 0x37b6c DX-SWITCH.
+## Verify tool scripts/r1_t103_dxswitch_verify.py RC=0 (5 legs). Working
+## notes docs/re/_wip_t103.md P1-P14.
+
+### 8.1 Identity: ability-window class record [verified bytes]
+Zero rel32 callers image-wide; the ONLY u32 == 0x37b6c is FILE 0x8893c =
+pool 0x5d84 (+0x8 slot). Class record (file 0x88934, stored by ctor
+FUN_00037ac0 `mov [eax+0xa7],0x5d84` at 0x37ac5):
+  +0 create FUN_00037ad0 (cl,4 -> load template 0x888f8 via 0x76cac;
+     cl,2 -> 0x76cd4 loads DESCRIPTION resource 'abil%02d' file 0x8483f +
+     'help.txt' 0x84848 — the window opens showing the ability description)
+  +4 shared 0x30d08   +8 HANDLER FUN_00037b6c (extent 0x37b6c..0x37cf7)
+  +c PAINT FUN_00037cf8: shp lib 0x9f10c sel 250 base + race ability glyph
+     BYTE [race*2+0x12e18] (race row +0x2) via FUN_0001fc34/FUN_0005caac.
+Dispatch: pump FUN_00056b5c (0x56c6b mov ebp,[eax+0xa7]; 0x56c74 call
+[ebp+0x8]) for the TOP window (WORD [game+0x4226]>>16 into stride-0x8e table
+at +0x3068); relay FUN_00056ca4 (0x56cd1/0x56cd7/0x56cda) targets a slot from
+[[game+0x4]]. REGISTER LAW (relay): caller ebx = MESSAGE CODE (arrives as dx
+via movsx), caller ecx arrives as handler ebx, caller edx = slot idx >>16.
+
+### 8.2 The switch [verified bytes, leg 1]
+Head: esi = 0x12e16 + ds:0x7458e * 0x1ee (LOCAL race row — the SAME
+equality that gates t102 S7.2; ability [row+0x19a]>>24 == [row+0x19d]).
+  dx 0 / other -> FUN_00033ff8 (base-class msg filter: passes 0-5,6/7,7,
+    0xc9/0xca arms, default forwards 0x336b4).
+  dx 1|2 -> PROBE: call 0x43b50(eax=row, edx=0). eax==-1 (READY) ->
+    BYTE [ui+0xccb] := 2 -> tail. NOT-due -> countdown text:
+    cad-counter (u16), singular iff ==1 (0x37bfb cmp edx,1) picks
+    static.txt [0x1c]='' vs [0x1d]='s', formatted 0x76c79 into [ui+0xcd0],
+    plus [0x1e]='OK' copied to [[ui+0x67]+4]+0x20. The child relay at
+    0x37bdb is FUN_00056ca4 msg 2 (ecx=0).
+  dx 50 -> gate cmp ebx,1 (0x37c9c): ebx==1 -> FIRE call 0x43b50(row, 1),
+    then snprintf 'abres%02d' (pool 0x1ca1 = file 0x84851, byte-pinned)
+    with the ABILITY ID, and FUN_00033f40 opens (help.txt, abres<NN>) —
+    the result-text window; ebx!=1 -> base-class filter.
+  Tail 0x37c78: [ui+0x35]:=[0x39]:=-1; call [class+0xc] (repaint).
+CORRECTION: the S6.4-era expectation 'dx==2 opens abres%02d' is REFUTED —
+abres is the dx-50 result resource; dx 1|2 is probe+countdown.
+[ui+0xccb] marker: disp32 census EXACTLY one hit (the store 0x37bbb), zero
+readers — dead marker (UI re-probes instead; honest negative under the
+disp32 law).
+
+### 8.3 FUN_00043b50 edx parameter law [verified bytes, leg 2]
+cad = WORD[0x6780+2*ability]; gate `cad > counter` -> return 0 (charging).
+Ready: sentinel := -1; `cmp edx,1 / je 0x441c1`:
+  edx==0 (UI probe, 0x37baf): return eax=-1 = READY signal only.
+  edx==1 (commit; UI fire 0x37cb1 AND AI sync 0x3eb3c): body dispatch
+    al = BYTE[row+0x19d] - 5; >0xf -> no body; else cs:[eax*4+0x2ef60]
+    (FILE 0x43b10, the 16 bodies of S6.3).
+  RESET tail 0x43fe5..0x44011: row+0x19e := counter - cad (sub edx,eax at
+  0x44001 — DIRECTION corrected vs t99 prose; == 0 exactly at the fire
+  moment, so t100's reset-0 model stands; over-fire carries the residue).
+
+### 8.4 Dispatch arrival [static exhausted; honest negative on positive arm]
+All (pump 9 + relay 56) dispatch sites register-traced. The input relay
+0x54976 pumps msg=WORD ds:0x484c4 / ebx=WORD ds:0x484c6 verbatim from the
+DOSBox event record (record+0xc/+0x10, readers 0x2a875/0x2a8fe; INT 16h
+scan/char pairing corroborates at 0x2a5f0/0x2a6d0). Msg-50 relays exist
+(0x3b6ac, 0x3d83f..0x3daf9 family, ship-context gates) but none arms ecx==1.
+Which user action POSITIVELY delivers (50,1) to this window needs a live UI
+trace — carried as residual (same closure class as F8b observation); the
+handler-internal law (dx==50 && ebx==1 -> fire) is cited either way.
