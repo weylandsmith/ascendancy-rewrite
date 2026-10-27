@@ -45,8 +45,8 @@ if [ "${1:-}" = "--status" ]; then
   echo "needs human      : $([ -f "$LOOPDIR/NEEDS_HUMAN.txt" ] && echo PRESENT || echo absent)"
   echo "dirty tree       : $([ -n "$(git status --porcelain)" ] && echo YES || echo no)"
   echo "next action      : $(awk '/^#+ *NEXT ACTION/{f=1;next} f&&NF{print;exit}' docs/STATE.md)"
-  echo "last 5 journal rows (time, iter, VERDICT, rc, task, HEAD):"
-  tail -5 "$LOOPDIR/journal.tsv" 2>/dev/null | cut -f1-5 | sed 's/^/  /' || echo "  (none)"
+  echo "last 6 journal rows (time, iter, VERDICT, rc, task, HEAD subject):"
+  tail -6 "$LOOPDIR/journal.tsv" 2>/dev/null | awk -F'\t' '{printf "  %s  %-3s  %-10s rc=%-4s %-7s %.100s\n", $1, $2, $3, $4, $5, substr($6,1,100)}' || echo "  (none)"
   exit 0
 fi
 
