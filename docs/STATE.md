@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-26T19:50
+updated: 2026-10-27T02:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -195,40 +195,72 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t97 (STATIC task, W6-A5 FINAL RESIDUAL): find the code that CONSUMES
-the SO-name block (restored FILE 0x88e60, pool-rel imm 0x62b0, 10 records
-stride 20: SONothing/SOGoStar/SOColonize/SOOrbitPlanet/SOPatrol/
-SODefendPlanet/SOAttack/SOGoSpace/BAD/BAD) and tie kind numeric -> name.
-DO NOT re-open the 0x8c90/0x1d840 jump table as the closer — REFUTED-ROUTES
-R13: it is the panel STATUS-template dispatcher, not the name map (t95/t96
-settled this; tools still read it correctly if needed: static table = FILE
-0x1d840, live entries = FILE + P0, six clean pointers). Hammers (~<=30 probes, t96-banked
-aicode.md §2h): (1) disasm helper 0x2fb38 (called right before every
-`rep movsd` string-block copy; t94 called it the R12-adjust helper — verify:
-if it converts pool-rel->linear or relocates, its LAW must be banked; the
-one kind-adjacent call site is the display-fn copy 0x1dae5 which copies the
-WHOLE 200-B block to [esp+0x10] with NO reader in 0x1c000..0x1e500 — so
-check the display fn's FULL extent (prologue hunt above 0x1d000) and its
-CALLEES for one taking edi/esi = that buffer); (2) census 20-stride indexed
-reads: regex imul/lea *,0x14 sites in obj0 whose base traces to a pool
-string-base (callers of 0x2fb38 are the shortlist — census them, they are
-few); (3) if both die, disasm the twin dispatcher region 0x1dd290 + the
-remaining undecoded arms of the 0x1d989 display function family for the
-ORDER MENU builder (menu code indexes names per-menu; the SO block may be a
-debug-only symbol table — if census shows NO indexed consumer, that itself
-is the honest answer: SO names are internal debug identifiers and the
-kind->USER-visible-name mapping lives in static.txt templates only, at which
-point annotate OQ-016 accordingly and A5 closes ONLY if that reading is
-supported by a cited debug-format string (e.g. an assert '%s'-names table
-tie); otherwise row STAYS open named-hammers). Strict-close unchanged.
-rewrite delta: NONE expected (ANALYSIS-ONLY). Rationale: after t96 this is
-the ONLY unmapped piece of A5; both A6/A7 items (0x43b50 tail, 0x2ef60 case
-bodies) remain queued behind it because A5 names the vocabulary they reuse.
+NEXT t98 (STATIC task, W6-A5 LAST NAMED HAMMER): parse the WATCOM WLINK
+debug records of game/ascend.exe to try once, properly, to tie the SO
+name block (image FILE 0x88e60 == exe-file 0x8b8b0, delta +0x2a50 pinned
+t97c) to kind numerics via a SYMBOL TABLE. ORDER OF WORK (t97 lessons are
+binding): (0) FETCH the WLINK ID-Info / LE object-table record-layout spec
+FIRST (firecrawl pre-approved by user policy; GOAL's no-network clause is
+overridden by the standing user rule for spec fetches — one URL) — t97
+guessed the object-record format TWICE and broke at obj 47 with garbage
+names; do not guess a third time. (1) re-parse the object table at
+DW(le+0x30) per spec (211 objects; names should be .OBJ module names — if
+names decode, module list alone is bankable progress: a shiporders.cpp /
+batmode.obj owning the block tells us where the enum lives); (2) locate
+the ID Info records (per spec, pointed from header or appended after the
+image at a documented record type 0x8x/Ax) and search for DefName/
+DatName/LinName records whose offset resolves (object/segment-relative —
+t97c proved NO raw u32==0x8b8b0/0x88e60 exists anywhere in the exe) to the
+SO block base or to names 'SONothing'..'SOGoSpace'; a symbol record naming
+the array = the cited tie, kind index = array subscript ONLY IF a second
+symbol names an enum/type; (3) if the records name the block but no enum,
+bank it as the t97 §2i reading's SUPPORTING evidence: names are debug
+identifiers, kind->USER-visible mapping lives in static.txt ONLY — and
+that was the t97 rule for closing A5: annotate OQ-016 (A5-minutiae
+component CLOSED as debug-only identifiers, remaining OQ-016 scope
+unchanged) and queue A6 (0x43b50 tail) as t99. If debug info was stripped
+at ship time (plausible: shipping exe, WATCOM string but maybe no ID Info;
+t97c already found zero raw pointers), write the cited negative (record
+absent per spec walk), append REFUTED-ROUTES entry killing the LE-debug
+route, and ALSO go straight to A6 as t99's assignment — after that negative
+there is no cheaper path to A5 than its closing note. rewrite delta: NONE
+expected (ANALYSIS-ONLY). Rationale: t97 exhausted all three t96 hammers
+with honest negatives; this is the only remaining named lead; A6/A7 sit
+behind it ONLY because A5 names their vocabulary — the (3)-fail branch
+unblocks that ordering.
 Sitting watch unchanged: live-timeline 5.69 GB (mtime 2026-10-26 15:44),
-last rows t=1254 re-checked clean at t96 start; a NEW turn-boundary sitting
+last rows t=1254 re-checked clean at t97 start; a NEW turn-boundary sitting
 outranks this -> scripts/r1_t85g_sitting.py first.
 OQ-021 passive watch continues (boundary sample 23/50, selector never
 armed).
+T97 LANDED (STATIC task — W6-A5 CONSUMER PASS, all three t96 hammers
+executed to conclusion, honest negative, NO closure, NO code change):
+helper 0x2fb38 identity MEASURED (disasm + 106 rel32 caller census):
+Watcom staging scaffolding (byte-writes [[esi+4]+0xf3], conditional
+0x5e940(eax, esi+8)), NOT the R12/relocation helper and NOT a block
+consumer (t96 note corrected: relocation remains loader-side; live imm at
+0x1dae6 reads P0+0x88e60 exactly, re-verified playcap/save/60.sav B=
+0x1bf4d8). Display fn FULL extent 0x1d989..0x1df18 (ret walk) has NO
+reader of the [esp+0x10] SO slot; act-arms 0x1de9c append [+0x5e]+0x1c/
++0x24 target names (static.txt law unchanged). 20-stride indexed census
+(152,831 obj0 insns, tool r1_t97_so_consumer.py): 6 sites, all esp-frame
+printf arg tables — no pool-backed stride-20 reader. CENSUS-BLIND-SPOT FIX
+(t94 used static-file form only): pool-rel-form imm scan found 14 block
+candidates, disassembly adjudicated 13 decode artifacts (mov [reg+0x63],0
+class) + 1 real (0x1dae6). LIVE proof of disuse: ZERO u32 in the full
+16 MiB save RAM (every byte phase, tool r1_t97b_liveptr.py) holds any
+address into the relocated block. Jump-table census (tool
+r1_t97d_jmptables.py, decode-boundary-verified): 9 computed-jump sites in
+obj0, only batmode-zone one is t96's F 0x1d840 status table — no second
+kind-keyed dispatcher; t96's suspected 'twin 0x1dd290' is inside the
+kind3 arm (fully disassembled). CONTRAST: dip-state name cluster = 62 imm
+referrers (shape of a CONSUMED table). Verdict: SO block = debug symbol
+table signature is strong, but strict-close demands a cited debug-format
+tie -> row STAYS OPEN; next hammer named = WLINK ID-Info parse (fetch the
+spec first; two failed format guesses banked so t98 doesn't repeat them).
+OQ-016 row annotated with the full t97 negative. No rewrite delta
+(ANALYSIS-ONLY). Gate GATE_EXIT=0, ledger_audit LEDGER AUDIT OK.
+
 T96 LANDED (CORRECTION task — adopted + committed the killed t94/t95 tree
 first as f66cb55, then refuted its load-bearing premises and banked two
 CLOSED sub-laws): ADDRESS LAW RE-CHECK killed the t95 story — cs-relative

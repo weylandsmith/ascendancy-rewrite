@@ -712,7 +712,27 @@ SO-name->kind numeric tie STILL NOT MEASURED: block F 0x88e60 has 8 names +
 2 'BAD' (kind domain 0..5 — block indices != kinds [inferred]); sole code
 ref 0x1dae5 copies the 200-B block to stack, no [esp+0x10] reader found in
 window scan 0x1c000..0x1e500. Banked aicode.md §2g-correction, §2h with 3
-named hammers. No rewrite change (ANALYSIS-ONLY).
+named hammers. No rewrite change (ANALYSIS-ONLY). t97 CONSUMER PASS (all 3
+hammers executed, honest negative, row STAYS open): helper 0x2fb38 disasm =
+Watcom staging scaffolding (byte-writes [obj+0xf3], conditional 0x5e940
+call; 106 callers = every string zone), NOT a relocating helper and NOT a
+consumer; display fn full extent 0x1d989..0x1df18 has NO reader of the
+[esp+0x10] SO slot (act-arms 0x1de9c use [+0x5e]+0x1c/+0x24 names, static
+.txt only); 20-stride indexed census (152,831 insns) = 6 sites, all esp-frame
+printf arg tables, none pool-backed; pool-rel imm census (t94 blind spot:
+static-file form only) found 14 candidates, 13 decode artifacts under
+disassembly, 1 real = 0x1dae6 (known copy); LIVE census (playcap/save/60.sav
+self-validated): ZERO u32 in 16 MiB RAM points into the relocated block
+(P0+0x88e60..+0xc8) in any byte phase; computed-jump table census obj0:
+9 sites, the only batmode-zone one is t96's F 0x1d840 status table — no
+second kind-keyed table; contrast: dip-state name cluster has 62 imm
+referrers (a consumed table looks like THAT). Block's debug-symbol-table
+signature is now STRONG but no cited debug-format tie exists in reach, so
+strict-close keeps the row open. Next hammer (named): WLINK ID-Info parse
+of ascend.exe debug region (LE delta +0x2a50 pinned; raw u32==block-foff
+census already NEGATIVE — any tie is object/segment-relative; fetch the
+record-layout spec before parsing, format guessed wrong twice).
+rewrite delta: NONE (ANALYSIS-ONLY).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

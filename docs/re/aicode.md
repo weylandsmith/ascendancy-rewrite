@@ -757,3 +757,44 @@ documented WLINK ID Info record layout or a known tool, not guesswork);
 (B) the twin dispatcher region 0x1dd290 undecoded arms; (C) live-RAM: read
 the [esp+0x10] copy at runtime is NOT possible from saves (stack transient).
 rewrite delta: NONE (ANALYSIS-ONLY, unchanged).
+
+t97 COMPLETION (same session, hammers (1)-(3) exhausted):
+- POOL-REL IMM CENSUS CORRECTION [verified]: t94 scanned only the static
+  file form (0x88e60+); a pool-rel form census (0x62b0..+200) yields 14
+  byte-scan candidates, of which disassembly adjudicates 13 as DECODE
+  ARTIFACTS (unaligned u32 windows overlapping mov-immediates: e.g.
+  0x30b2d/0x41b74/0x41c33/0x41dcd `mov [reg+0x63],0`, 0x52884 `mov
+  ecx,0x62`, 0x6007b/0x174f2/0x6ae7b mid-data). REAL imm into the block:
+  ONLY 0x1dae6 (the display whole-block copy). Lesson banked: string-imm
+  censuses must be decode-boundary-verified (scripts/r1_t97d_jmptables.py
+  shows the pattern).
+- LIVE-POINTER CENSUS (t97b, scripts/r1_t97b_liveptr.py, self-validated
+  playcap/save/60.sav, B=0x1bf4d8, P0=0x242088): ZERO u32 anywhere in the
+  full 16-MiB guest RAM (all byte phases) holds a relocated address into
+  the SO block 0x2caee8..0x2cafb0. The block is never pointed at from any
+  heap/BSS/stack structure at turn-boundary state.
+- JUMP-TABLE FULL CENSUS (t97d, decode-verified, obj0): 9 computed-jump
+  sites total; the ONLY one in the batmode display zone is 0x1de50 -> F
+  0x1d840 (the t96 status-template table, entries re-dumped identical:
+  0x1d989/0x1db4f/0x1dc1b/0x1dcfd/0x1d9ab/0x1d9ab). NO second kind-keyed
+  table exists; hammer (3) (0x1dd290 "twin") is INSIDE the kind3 arm
+  already fully disassembled at t96/t97 — no order-menu builder there.
+- CONTRAST EVIDENCE [verified]: sibling pool name tables that the engine
+  DOES consume are referenced per-name by immediates — dip-state cluster
+  (pool-rel 0x64a4 'Peaceful'/0x64b8 'Hostile'/0x64cc 'Peace'/'War'@
+  0x64e0/'Alliance') has 62 aligned imm referrers in obj0. The SO block
+  has exactly ONE referrer (a whole-block copy whose slot is never read).
+  Structural signature of a DEBUG symbol table, NOT a UI table — but no
+  cited debug-format string ties names to kind numerics, so A5 REMAINS
+  OPEN (strict-close).
+- LE HEADER (t97c, scripts/r1_t97c_le_debug.py): ascend.exe delta
+  exe-file = image-FILE + 0x2a50 confirmed byte-wise (block at exe
+  0x8b8b0). Object-table parse at DW(le+0x30) breaks at obj 47 — format
+  assumptions wrong TWICE (name-count semantics); do NOT re-guess in
+  t98 — fetch the WLINK ID-Info/object-table spec FIRST (user policy:
+  firecrawl pre-approved; GOAL says no network fetches — the firecrawl
+  pre-approval is the standing user override, confirm with user if in
+  doubt), or scan the debug region structurally: no u32==0x8b8b0/0x88e60
+  exists in the whole exe (t97c), so a symbol tie, if present, encodes
+  the address in object/segment-relative form — parse segment table
+  (offSegTab DW(le+0x34)) before object-relative arithmetic.
