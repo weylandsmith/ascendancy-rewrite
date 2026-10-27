@@ -699,3 +699,61 @@ by address; NOT measured this session. NEXT hammers: (1) disasm R12 helper
 0x2fb38 law bank; (2) census ALL adjust-helper sites + 20-stride indexed
 reads; (3) the two dispatcher twins 0x1de40/0x1dd290 region's remaining
 undecoded arms. rewrite delta: NONE (ANALYSIS-ONLY).
+
+## 2i (t97 BANK). SO-BLOCK CONSUMER PASS — honest negative, hammers (1)/(2)
+## exhausted, helper 0x2fb38 identity + live block verification + tail-pool law
+
+HELPER 0x2fb38 OBSERVED LAW [verified, restored disasm + 106 rel32 caller
+census, tool scripts/r1_t97_so_consumer.py]: it is NOT an "R12 adjust" and
+NOT the string-relocation mechanism. Body: saves esi/edi/ebp; EAX=arg1 ->
+esi; EDX spooled; stack args [esp+0x44..0x50]; tests arg bit (al&0x80);
+conditionally calls 0x5e940(esi+8, value); writes ONE byte at [[esi+4]+0xf3];
+restores regs. Caller census = 106 sites across the whole string-staging
+zones (0x14cf8..0x5aa5f) — it accompanies the Watcom staging idiom (5x movs
+copy 20 B code->BSS @0x7d382/0x7d38a + fixed sentinel pushes), i.e. debug/
+bookkeeping scaffolding around staged immediates, NOT a pointer converter.
+RELOCATION IS STILL THE LOADER'S JOB (OQ-004 law stands): the imm at site
+0x1dae5 (static 0x62b0) reads P0+0x88e60 in LIVE RAM — RE-VERIFIED t97 in
+work/r1/playcap/save/60.sav (B=0x1bf4d8, member index B+F): block bytes at
+B+0x88e60 decode SONothing/SOGoStar/SOColonize/SOOrbitPlanet/SOPatrol/
+SODefendPlanet/SOAttack/SOGoSpace/BAD/BAD exactly (tool
+scripts/r1_t97_pooltail.py RC=0). Harness note: playcap saves live under
+work/r1/playcap/save/*.sav (not playcap/*.sav).
+
+POOL-TAIL NOTE [verified]: pool-rel immediates in the display fn range go
+past the restored image end — pool-rel 0xa0e0 -> F 0x8cc90 > image end
+0x8cc83; live B+0x8cc90 reads BSS zeros/binary (NOT a string); B+0x8ccd8+
+carries the .txt name table ('batfx.txt','cosmos.txt','end-capt.txt'...).
+The invalid-act tail 0x1defe (mov edx,0xa0e0; mov eax,0x7a35c; call 0x55240)
+takes a BSS buffer + a CODE address (0x7a35c bytes are code) = debug/assert
+scaffolding; NO SO-name tie there.
+
+DISPLAY FN FULL EXTENT [verified, objdump walk 0x1d989..0x1df18 ret, rets
+at 0x1df18/0x1e695/0x1e9d9/0x1ef98 bound adjacent fns]: the fn containing
+the 0x1dae5 whole-block copy ENDS at 0x1df18; across that extent NO read of
+the [esp+0x10] SO staging slot exists (t94's window conclusion extends to
+the whole function). The act-dispatch arms 0x1de9c (cmp [+0x5d],1/2) build
+the target-name APPENDAGE from [+0x5e]+0x1c (star name) / +0x24 (planet
+name) via staged-copy + call 0x2fb38, then fall to 0x1defe; names used are
+static.txt + record names, NOT the SO block.
+
+20-STRIDE INDEXED CENSUS (hammer 2) [verified, 152,831 insns obj0,
+imul *,*,0x14 | lea *,...,*0x14]: exactly 6 sites — 0x22904, 0x22a60
+(debug printf arg tables indexing ESP frames, fmt pool-rel 0xb42/0xb49,
+NOT any string pool) and 0x36fb8/0x36fe5/0x37027/0x3705a (context = order
+validation printf cluster, same esp-frame indexing class). NO indexed read
+of a pool-string base exists anywhere in obj0.
+
+VERDICT (strict-close): kind->SO-name numeric tie STILL NOT MEASURED. The
+block's only code touch remains the whole-200-B copy at 0x1dae5 whose
+destination slot is never read inside its function. The "internal debug
+identifier" reading is PLAUSIBLE but NOT supported by any cited
+debug-format/assert-name string tie, so per the t97 rule the OQ-016 row
+STAYS OPEN. Named hammers for t98: (A) WATCOM DEBUG INFO in game/ascend.exe
+(LE format; SO block @file 0x8b8b0; a symbol table naming the block directly
+is the cleanest possible closer — first ID-Info/object-table parse attempt
+this session failed on record-format assumptions TWICE, so use the
+documented WLINK ID Info record layout or a known tool, not guesswork);
+(B) the twin dispatcher region 0x1dd290 undecoded arms; (C) live-RAM: read
+the [esp+0x10] copy at runtime is NOT possible from saves (stack transient).
+rewrite delta: NONE (ANALYSIS-ONLY, unchanged).
