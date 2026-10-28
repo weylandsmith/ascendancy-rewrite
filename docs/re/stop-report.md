@@ -2625,3 +2625,48 @@ x11vnc.log mtime 2026-10-27 17:30:18 size 30114 — zero connects). Transients
 214163/214215 are the harness and the probe child per the t118 noise law.
 NO row closed (strict-close honest negative), no law falsified.
 NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (60 idle turns).
+
+## 67. IDLE re-check #61 (t174, 2026-10-28 07:21) — both triggers negative
+
+Per the t113 idle law this turn is the two-trigger probe and nothing else. The
+single tool run (`python3 scripts/r1_idle_probe.py` at 07:21:04, before any
+edit; RC=0) plus the belt-and-braces `ledger_index_check.py` is the whole
+iteration. Hand-authored bank; `grep -rln stop-report scripts/` still shows no
+script that writes this file (gate.sh comment + probe/audit docstrings + stale
+.pyc mirror only).
+
+(1) TRIGGER A (new capture) NEGATIVE, and — important for the t147 rule —
+FULLY ADJUDICATED: A4 reports the watcher ALIVE (pid 27774
+`scripts/r1_playcap_watch.py .../work/r1/playcap`), so (A) was not left
+un-adjudicated by dead signal machinery. Newest playcap dir
+playcap-20261014-224611 (unchanged); live-timeline.jsonl
+mtime_ns=1793043841304000000 size=5691796463 == frozen baseline on BOTH fields
+(63rd byte-identical reading — the file has not been touched since the sitting
+that landed at t1253/1254); no dosbox procs; `find work/r1 -newermt <session
+start>` = 4 files, all non-loop non-capture transients (probe artifacts);
+A5 un-ingestable save files: none, save/*.sav = 20 all matching the watcher's
+lowercase glob.
+
+(2) TRIGGER B (user decision) NEGATIVE on every leg. HEAD 619b352 (t173);
+`git diff HEAD --name-only` empty; `git status --porcelain` (tracked) empty;
+no untracked paths at all (loop-owned or foreign, so B4 arms nothing); delta
+outside loop-owned paths: none; no STEERING file; B3 HEAD == journal sha
+619b352 => no commits outside the loop since the last iteration; prompt pair
+prompt-96.txt vs prompt-95.txt (58/58 lines) digit-stripped delta 0 lines.
+§3 answers outstanding after sixty-one idle turns.
+
+(3) `python3 scripts/ledger_index_check.py` before any edit: LEDGER INDEX OK
+(record rows=18, open=OQ-003/005/016/019/021/023, closed=12; STATE index open
+set identical). No ledger row touched this iteration, so nothing to close and
+nothing re-opened.
+
+(4) No new finding, stated honestly: no watch, no census, no code change, no
+harness change, game/ untouched (read-only). stop-report.md was 2627 lines,
+zero-diff vs HEAD, before appending this section; the append was anchored on
+content unique to the last section (`grep -c '... stands (60 idle turns)'` == 1)
+and re-checked with `git diff --numstat` for N insertions / 0 deletions.
+Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log mtime 2026-10-27 17:30:18 size 30114 — zero connects). Transients
+216019/216103 are the harness and the probe child per the t118 noise law.
+NO row closed (strict-close honest negative), no law falsified.
+NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (61 idle turns).
