@@ -368,3 +368,28 @@ noting for loop economics: idle turns t114..t120 are now near-zero-cost
 reproductions of the same verdict (tool encodes every leg); each additional
 idle turn adds bookkeeping but zero measurement. No re-arm, no row closed
 (strict-close honest negative), no law falsified. NEXT stays IDLE.
+
+## 14. IDLE re-check #8 (t121, 2026-10-27 22:29 EDT) — steady-state negative
+
+Session start 22:28:18 (probe cutoff) / 22:29:23 (probe run).
+`python3 scripts/r1_idle_probe.py` RC=0: newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns=1793043841304000000 /
+5691796463 B (11th consecutive byte-identical reading t111..t121); zero
+dosbox procs; find sweep -> 4 files, all work/r1/loop/. (B) negative: clean
+tracked tree at e7d736c, no STEERING file, prompt-43.txt identical to
+prompt-42.txt after digit-stripping (diff empty), no delta outside
+loop-owned paths. r1_t85g_sitting.py correctly not run.
+
+Infra unchanged since t112 (Xvfb 1196, x11vnc 1207, watcher 27774;
+x11vnc.log 17:30:18/30114 — zero connects against the t111-FIXED launch
+path). INFRA-leg transients 131136/131252 (this session's runner + probe
+child) per the t118 noise law, correctly ignored.
+
+Bank-hygiene check done fresh this turn (per the BLOCKED.md traps rule):
+`grep -rln stop-report scripts/` matches only r1_idle_probe.py, and there
+merely in its docstring line 3 — no script writes the file, so §14 here is
+hand-authored and safe from regeneration.
+
+§3 answer still outstanding after eight idle turns; the §6 t113 observation
+holds and sharpens: idle turns are now pure bookkeeping. No re-arm, no row
+closed (strict-close honest negative), no law falsified. NEXT stays IDLE.
