@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T02:58
+updated: 2026-10-28T03:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #41 done at t154; stop-report.md §47): loop awaits a user
+IDLE (re-check #42 done at t155; stop-report.md §48): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -215,15 +215,31 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     NOT ADJUDICATED (see the A4 line in its output; repair via
     `bash scripts/r1_playcap_vnc.sh`, re-run the probe, and do NOT record
     the turn as a clean steady-state negative).
+    VERDICT WORDING (t155/B5): at SESSION START a clean tree prints
+    "IDLE — neither trigger". If it prints "IDLE with CANDIDATE" you are
+    almost certainly running it MID-ITERATION after editing a loop-owned
+    file (STATE.md itself counts) — finish normally. But if you edited
+    NOTHING this session and it prints CANDIDATE, the uncommitted diff in
+    docs/OPEN-QUESTIONS.md / docs/BLOCKED.md / docs/re/ IS either the §3
+    answer or crash residue: read `git diff HEAD` before keeping the IDLE
+    block. RC stays 0 by design either way (crash residue and a typed
+    answer are byte-identical states; mtime cannot separate them).
     It encodes the probe laws that cost iterations to earn:
     session-start cutoff on the find sweep; CONTENT-diff (never mtime)
     for (B); `ps -eo comm` matching (never `pgrep -af`, t114 self-match
-    trap); untracked files are informational, never a (B) trigger (the
-    loop's own _wip_*.md would otherwise arm it every turn). Timeline
+    trap); untracked files split by LOOP_OWNED ownership (t153/B4;
+    loop-owned _wip_*.md informational, foreign untracked ARMS). Timeline
     path is work/r1/playcap/live-timeline.jsonl. Run it at SESSION START,
     before editing docs — a loop-owned-only delta (STATE.md/stop-report.md)
     prints a CAUTION and stays NEGATIVE, while a delta outside loop-owned
     paths (rewrite/, PLAN.md, game docs) IS the user answer.
+    MEASURED SCOPE NOTE (t155): LOOP_OWNED's "work/" entry is inert for the
+    git legs (nothing under work/ is tracked; .gitignore ignores work/
+    wholesale) — work/r1 is covered by the (A) find sweep instead, and both
+    capture launch paths pin their out-dir under work/r1 (r1_playcap.sh:22,
+    r1_playcap_vnc.sh:30), so every real capture sits inside a leg. The
+    residual blind surface (a user editing scratch under work/ OUTSIDE
+    work/r1) is an accepted boundary, not a hole to chase.
     AS OF t149 trigger (A) also has an (A5) ingestion leg: it walks the capture
     dir (skipping caps/, loop/) and reports save-looking files the watcher's
     `save/*.sav` glob (r1_playcap_watch.py:161, lowercase) CANNOT read — a
@@ -312,6 +328,59 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T155 LANDED (IDLE re-check #42 — no trigger fired; deliverables:
+scripts/r1_idle_probe.py (B5) leg + docstring B4/B5 laws,
+docs/re/stop-report.md §48, docs/re/_wip_t155.md; no ledger row touched,
+game/ untouched, no watch or census run against the live capture). (1)
+Trigger (A) NEGATIVE — probe RC=0 at 03:16:34 (cutoff 03:14:49): newest
+playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (45th consecutive byte-identical reading
+t111..t155; independently re-statted, equal to BASE_MTIME_NS/BASE_SIZE at
+r1_idle_probe.py:55-56); t151 content baseline reproduced a FOURTH time
+(head 42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f,
+last row still t1254); zero dosbox procs; find sweep non-loop none; A4
+watcher ALIVE pid 27774; A5 none (save/*.sav = 20). (2) THE FINDING — hole
+(B5), the t145 method aimed at the last leg whose OUTPUT SHAPE had never been
+questioned: trigger_b demoted every tracked delta under LOOP_OWNED to a buried
+CAUTION reason line while the printed VERDICT asserted "neither trigger" and
+RC=0 — and LOOP_OWNED contains docs/OPEN-QUESTIONS.md and docs/BLOCKED.md,
+the two files stop-report §3 invites the user to answer INTO. STATE.md quotes
+the RC line, so the caution never reached any decision. Fix: trigger_b returns
+decision_candidate; the (B) header prints "CANDIDATE — read the CAUTION" and
+the VERDICT "IDLE with CANDIDATE ... read `git diff HEAD` before keeping the
+IDLE block". DELIBERATELY NOT ARMED (RC stays 0): t117 law — a crashed
+pre-commit iteration leaves byte-identical state and mtime cannot separate the
+origins, so escalation-not-arming is the only sound resolution; the
+mtime-discriminator was considered and rejected. Five branches validated by
+REAL execution, fixtures deleted: real CANDIDATE RC=0 (self-demonstrating —
+the patched probe is itself loop-owned); clean tree + old code NEGATIVE RC=0
+(regression control); clean tree + new code CANDIDATE RC=0; foreign untracked
+docs/ANSWER-t155test.md ARMED RC=1 (B4 precedence holds); fixture removed ->
+CANDIDATE RC=0. LAW GENERALISED (extends t145): "the leg prints a CAUTION" !=
+"the VERDICT carries it" — adjudication that never reaches the line the caller
+reads is an unenacted leg. (3) TWO MEASURED SCOPE FACTS, banked as accepted
+boundaries, not chased: prompt corpus = 77 files / only 3 distinct
+digit-stripped bodies (41x15, 63x3, 58x59), so B2's newest-pair rule has no
+multi-shape drift exposure; LOOP_OWNED's "work/" entry is INERT for B1/B3/B4
+(git ls-files work/ empty + .gitignore ignores work/ wholesale) — the only
+leg that sees work/ is the (A) find sweep, scoped to work/r1, and BOTH capture
+launch paths pin OUT under work/r1 (r1_playcap.sh:22 per-run dir,
+r1_playcap_vnc.sh:30 shared), so every real capture sits inside a leg; the
+residual (user edits scratch under work/ outside work/r1) has no documented
+route and broadening the sweep re-creates the t149 self-arm shape. (4)
+Trigger (B) NEGATIVE at session start — clean tracked tree at f0e9527, no
+STEERING, B3 HEAD == journal sha f0e9527 (re-extracted via rev/cut outside
+the probe), prompt pair prompt-77 vs prompt-76 (58/58) digit-stripped delta 0
+by tool AND by hand ls -1v. §3 answers outstanding after forty-two idle
+turns. (5) NEXT ACTION block: stale t117-era untracked wording replaced with
+the t153/B4 ownership law + the new B5 verdict-wording guidance. Bank hygiene
+fresh (grep -rln stop-report scripts/ -> only r1_idle_probe.py + .pyc;
+stop-report.md 1683 lines zero diff vs HEAD before appending §48). Infra
+unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log
+2026-10-27 17:30:18/30114 — zero connects). NO row closed (strict-close honest
+negative), no law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL
+stands. Gate 0.
 
 T154 LANDED (IDLE re-check #41 — no trigger fired; deliverables:
 docs/re/stop-report.md §47, docs/re/_wip_t154.md; no scripts changed, no ledger

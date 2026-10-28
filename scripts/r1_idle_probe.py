@@ -28,6 +28,21 @@ Laws encoded here (each earned the hard way, do not "simplify" them away):
       files and ARM only on a path outside LOOP_OWNED (loop-own divergence,
       e.g. a crashed iteration whose row never landed, is a CAUTION like the
       t117 untracked-files law). Env R1_JOURNAL overrides the journal path.
+  (B4) untracked files split by LOOP_OWNED ownership (t153): loop-owned
+      (docs/re/_wip_*.md etc.) informational, a FOREIGN untracked path ARMS —
+      a §3 answer left as a NEW file moved no leg before t153. `.gitignore`
+      covers the loop's scratch surface and porcelain never lists ignored
+      paths, so a non-ignored foreign path has no loop-tool origin. NOTE
+      (t155 measurement): LOOP_OWNED's "work/" entry is INERT for B1/B3/B4 —
+      nothing under work/ has ever been tracked (`git ls-files work/` empty)
+      and .gitignore ignores work/ wholesale; work/r1 is owned by the (A)
+      find-sweep instead, which both capture launch paths land inside.
+  (B5) a tracked delta confined to LOOP_OWNED is escalated, not silenced
+      (t155): LOOP_OWNED contains docs/OPEN-QUESTIONS.md and docs/BLOCKED.md
+      — the files stop-report §3 invites the user to answer INTO — so the
+      VERDICT line must say "IDLE with CANDIDATE" (RC stays 0: a crashed
+      pre-commit iteration is byte-identical, mtime cannot tell them apart).
+      "The leg prints a CAUTION" != "the verdict carries it" (t145 method).
   (A4) legs (a)-(c) are produced BY scripts/r1_playcap_watch.py: if it is dead,
       every (A) leg reads NEGATIVE over a real sitting (t147 hole). Adjudicate
       by matching the script name in `ps -eo pid=,args=` in Python — never
@@ -280,6 +295,16 @@ def trigger_b():
     if foreign_delta:
         armed = True
     own = [f for f in diff.splitlines() if f.startswith(LOOP_OWNED)]
+    # (B5) t155: `own` is the uncommitted-decision-file case. LOOP_OWNED
+    # contains docs/OPEN-QUESTIONS.md and docs/BLOCKED.md -- the two files a
+    # §3 answer would naturally be written INTO -- so demoting this case to a
+    # buried CAUTION while the printed VERDICT said "neither trigger"
+    # contradicted itself, and the loop quotes the RC line, not the caution.
+    # Kept NOT armed (t117: only an observed user event arms; a crashed
+    # iteration that edited the ledger before committing leaves the identical
+    # file state, and mtime cannot separate the two origins), but the flag now
+    # reaches main() so the VERDICT line carries it.
+    decision_candidate = bool(own)
     if own and not armed:
         reasons.append("CAUTION: loop-owned file(s) modified since HEAD: %s. "
                        "Run this probe at SESSION START and these are the "
@@ -393,7 +418,7 @@ def trigger_b():
             reasons.append("PROMPT CONTENT CHANGED: %d line(s) -- read %s, a"
                            " prepended steering note is the loop's assignment"
                            % (len(stripped), newest))
-    return armed, reasons
+    return armed, reasons, decision_candidate
 
 
 def infra():
@@ -420,8 +445,9 @@ def main():
           ("NOT ADJUDICATED (watcher down)" if not adj_a else "NEGATIVE")))
     for r in r_a:
         print("  - " + r)
-    b_b, r_b = trigger_b()
-    print("\n== TRIGGER B (user decision): %s" % ("ARMED" if b_b else "NEGATIVE"))
+    b_b, r_b, cand_b = trigger_b()
+    print("\n== TRIGGER B (user decision): %s" % ("ARMED" if b_b else
+          ("CANDIDATE — read the CAUTION" if cand_b else "NEGATIVE")))
     for r in r_b:
         print("  - " + r)
     print("\n== INFRA (liveness of the watch path)")
@@ -431,6 +457,11 @@ def main():
                if (a_a or b_b) else
                ("IDLE on (B); (A) UNVERIFIED — watcher down, re-check after "
                 "repair" if not adj_a else
+                "IDLE with CANDIDATE — uncommitted edit(s) in a file the loop "
+                "also owns (docs/OPEN-QUESTIONS.md, docs/BLOCKED.md, ...): "
+                "either a §3 answer or a crashed iteration. Read `git diff "
+                "HEAD` BEFORE keeping the IDLE block (t155)"
+                if cand_b else
                 "IDLE — neither trigger; honest negative, keep the IDLE block"))
     print("\nVERDICT: %s" % verdict)
     if a_a or b_b:

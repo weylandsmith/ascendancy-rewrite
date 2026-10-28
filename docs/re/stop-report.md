@@ -1681,3 +1681,47 @@ unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log
 2026-10-27 17:30:18/30114 — zero connects). NO row closed (strict-close honest
 negative), no law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL
 stands. Gate 0.
+
+## 48. IDLE re-check #42 (t155, 2026-10-28 03:16 EDT) — verdict/CAUTION contradiction fixed (B5)
+
+Trigger (A) NEGATIVE — probe RC=0 at 03:16:34 (cutoff 03:14:49): newest playcap
+dir playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (45th consecutive byte-identical reading t111..t155; re-statted
+independently, equal to BASE_MTIME_NS/BASE_SIZE at r1_idle_probe.py:55-56); t151
+content baseline reproduced a FOURTH time (head 42a0bed0507f9052e2009ec94e9c27f1 /
+tail 1529ab1ad70ac360f441d819703f943f; last row still t1254); zero dosbox procs;
+find sweep non-loop none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20).
+THE FINDING — hole (B5), found by running the t145 method against the last leg
+whose OUTPUT shape had never been questioned. trigger_b() demoted every tracked
+delta under LOOP_OWNED to a buried CAUTION line while the printed VERDICT asserted
+"neither trigger" and RC=0. LOOP_OWNED (:59-60) contains docs/OPEN-QUESTIONS.md
+and docs/BLOCKED.md — the two files stop-report §3 invites the user to answer
+INTO. The loop quotes the RC line (STATE.md's (A)/(B) block says "RC=0 both
+negative (stay IDLE)"), so the caution never reached the decision. FIX: trigger_b
+returns a third value `decision_candidate`; main() prints "CANDIDATE — read the
+CAUTION" as the (B) header and an "IDLE with CANDIDATE ... Read `git diff HEAD`
+BEFORE keeping the IDLE block" VERDICT. Deliberately NOT armed (RC stays 0): t117
+law says only an observed user event arms, and a crashed iteration that edited
+the ledger pre-commit leaves byte-identical state — mtime cannot separate the
+origins, so escalation-not-arming is the only sound choice. Validated by REAL
+execution on five branches: real state CANDIDATE RC=0 (self-demonstrating — the
+patched probe is itself loop-owned); clean tree + OLD code NEGATIVE RC=0
+(regression control); clean tree + NEW code CANDIDATE RC=0; NEW code + foreign
+untracked docs/ANSWER-t155test.md ARMED RC=1 (B4 precedence, fixture deleted);
+fixture removed → CANDIDATE again RC=0. Also measured, not assumed: the prompt
+corpus is 77 files with only 3 distinct digit-stripped bodies (41x15, 63x3,
+58x59), so B2's newest-pair rule has no multi-shape drift exposure; and
+LOOP_OWNED's "work/" entry is inert for B1/B3/B4 because git ls-files work/ is
+empty and .gitignore ignores work/ wholesale — the blind surface that leaves
+(new/modified files under work/ outside work/r1) is ACCEPTED: both capture
+launch paths pin OUT under work/r1 (r1_playcap.sh:22, r1_playcap_vnc.sh:30) so
+the (A) sweep owns every real capture, and broadening the sweep to all of work/
+re-creates the t149 self-inflicted-arm shape. Trigger (B) NEGATIVE at session
+start — clean tracked tree at f0e9527, no STEERING, B3 HEAD == journal sha
+f0e9527 (re-extracted via rev/cut), prompt pair prompt-77 vs prompt-76
+(58/58) digit-stripped delta 0 both by tool and by hand ls -1v. §3 answers
+outstanding after forty-two idle turns. Bank hygiene fresh (grep -rln
+stop-report scripts/ -> only r1_idle_probe.py + .pyc; stop-report.md 1683 lines
+zero diff vs HEAD before appending §48). Infra unchanged since t112. NO row
+closed (strict-close honest negative), no law falsified. NEXT stays IDLE; the
+t113 LOOP-END PROPOSAL stands. Gate 0.
