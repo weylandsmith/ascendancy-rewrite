@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T23:55
+updated: 2026-10-27T21:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,35 +202,54 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t112 = SITTING WATCH ONLY (idle turn #2) — the loop is event-driven,
-BUT t111 changed the odds of the event: the capture harness was BROKEN on
-this host and is now FIXED (see T111 LANDED; scripts/r1_playcap.sh DISPLAY
-autodetect, verified end-to-end by a TL=90 self-test that captured 9 slots).
-The user connected to the capture display EIGHT times today (x11vnc bursts
-08:02-17:30) yet no playcap-<ts>/ dir ever appeared — consistent with them
-trying to launch and hitting the :0 defect. Re-check in this order:
-(1) NEW CAPTURE: any new work/r1/playcap-<ts>/ dir (NOTE: selftest dir is
-    renamed work/r1/selftest-t111-playcap — NOT a capture; ignore it), OR
-    work/r1/playcap/live-timeline.jsonl mtime advanced past 2026-10-26
-    15:44:01. THAT outranks everything: run scripts/r1_t85g_sitting.py-style
-    adjudication on the new turn-boundary sitting (T>0-only slot law PLUS
-    the t111 hygiene law: an idle boot also yields in_game=true/T=50 with
-    score=0 — require score/star/turn MOVEMENT across slots before treating
-    it as played), then bank into OQ-021/023/019 as the evidence supports
-    (protocol + checklist: docs/re/stop-report.md §4, now corrected with
-    the VNC route localhost:5910).
+NEXT t113 = FINAL WATCH + LOOP-END PROPOSAL (idle turn #3 — the t111 rule
+fires: t112 came back empty, so this is the LAST watch the loop owes).
+Ordering rationale: the only event that can move a ledger row is a capture
+sitting run against the t111-FIXED scripts/r1_playcap.sh; every static route
+is exhausted (stop-report + REFUTED-ROUTES R1-R14) and re-running green
+tools is not progress, so one more existence-check then hand the decision
+back to the user. Check in this order:
+(1) NEW CAPTURE: any new work/r1/playcap-<ts>/ dir (NOTE:
+    work/r1/selftest-t111-playcap is the t111 self-test — NOT a capture;
+    ignore it), OR work/r1/playcap/live-timeline.jsonl mtime advanced past
+    2026-10-26 15:44:01.304 / size past 5691796463 B. THAT outranks
+    everything: run scripts/r1_t85g_sitting.py-style adjudication on the new
+    turn-boundary sitting (T>0-only slot law PLUS the t111 hygiene law —
+    idle boots ALSO yield in_game=true and flat t=/score; require turn or
+    score MOVEMENT across slots), then bank OQ-021/023/019 per
+    docs/re/stop-report.md §4 (VNC route localhost:5910).
 (2) USER DECISION (stop-report §3): accept/reject documented defaults
     (OQ-003 entropy, OQ-005 dims, OQ-019 sugar-cube [1,3]+immediate,
     OQ-023 threshold-only branch); authorize/refuse capture sittings; resume
     t89a follow-on code work or not. That answer becomes the next STATE.md
-    assignment verbatim.
-(3) NEITHER: run gates, commit, stop. Do NOT invent t112+ static censuses —
-    re-running green tools is not progress. Idle-watch tally: t111 was the
-    FIRST pure watch and it paid for itself (found a real harness defect);
-    t111's own VNC evidence says one more watch is cheap precisely because
-    the launch path now works. If t112 AND t113 both come back empty, the
-    honest proposal to the user is to end the loop at 12-closed/capture-gated
-    rather than keep spinning sessions.
+    assignment verbatim and REOPENS the loop.
+(3) NEITHER (expected): append a dated LOOP-END PROPOSAL to
+    docs/re/stop-report.md — recommend ending the loop at 12 closed /
+    6 open, the six open rows being capture-gated (OQ-016/019/021/023) or
+    user-decision-gated (OQ-003/005), with the fixed one-command resume path
+    (bash scripts/r1_playcap.sh — autodetects :9; checklist stop-report §4).
+    Update this NEXT ACTION to "IDLE: loop awaits user event; re-arm only on
+    capture dir or §3 answer", run gates, commit, stop. Do NOT start any
+    further watch or census.
+
+T112 LANDED (WATCH task — SITTING WATCH NEGATIVE #2; deliverables:
+docs/re/_wip_t112.md; no ledger row touched, no code changed): (1) all watch
+signals re-measured fresh 21:20 EDT — newest playcap dir still
+2026-10-14 22:46; live-timeline.jsonl mtime 2026-10-26 15:44:01.304 /
+5691796463 B UNCHANGED; no dosbox-x process; watch infra alive (Xvfb :9,
+x11vnc :5910, r1_playcap_watch.py) so the negative is trustworthy;
+r1_t85g_sitting.py correctly not run. (2) TIMING INSIGHT: x11vnc.log ends
+17:30:18 today and ALL of today's connect bursts (08:02..17:30) predate the
+t111 DISPLAY-autodetect fix (self-test 21:09) — zero VNC attempts have yet
+been made against the FIXED launch path, so the t111 root-cause story is
+intact and the event is still plausibly imminent, just not observed.
+(3) NEW CHECK: disk 30% used / 64 G avail — rules out a full-disk residual
+behind capture failure. (4) t111 self-test artifact re-read confirms the
+hygiene law signature (9 slots t=1131 flat, DAT_482fb=0/50); the same flat-t
+signature retro-reads the Oct-26 shared-timeline tail (slots 49-60 all
+t=1254) as idle autosave churn. NO row closed (strict-close honest
+negative); no banked law falsified. NEXT t113 = final watch + loop-end
+proposal (see above). Gate 0, LEDGER AUDIT OK
 
 T111 LANDED (WATCH task — sitting watch NEGATIVE + CAPTURE-HARNESS DEFECT
 FOUND AND FIXED; deliverables: scripts/r1_playcap.sh DISPLAY autodetect,
