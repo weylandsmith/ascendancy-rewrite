@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T21:30
+updated: 2026-10-27T21:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,35 +202,46 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t113 = FINAL WATCH + LOOP-END PROPOSAL (idle turn #3 — the t111 rule
-fires: t112 came back empty, so this is the LAST watch the loop owes).
-Ordering rationale: the only event that can move a ledger row is a capture
-sitting run against the t111-FIXED scripts/r1_playcap.sh; every static route
-is exhausted (stop-report + REFUTED-ROUTES R1-R14) and re-running green
-tools is not progress, so one more existence-check then hand the decision
-back to the user. Check in this order:
-(1) NEW CAPTURE: any new work/r1/playcap-<ts>/ dir (NOTE:
-    work/r1/selftest-t111-playcap is the t111 self-test — NOT a capture;
-    ignore it), OR work/r1/playcap/live-timeline.jsonl mtime advanced past
-    2026-10-26 15:44:01.304 / size past 5691796463 B. THAT outranks
-    everything: run scripts/r1_t85g_sitting.py-style adjudication on the new
+IDLE: loop awaits a user event; re-arm ONLY on one of these two triggers
+(t113 issued the LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after
+three consecutive empty watches t111/t112/t113; do NOT run another watch
+or census while idle):
+(A) NEW CAPTURE: a new work/r1/playcap-<ts>/ dir (selftest-t111-playcap
+    is a self-test artifact, NOT a capture), OR
+    work/r1/playcap/live-timeline.jsonl mtime past 2026-10-26
+    15:44:01.304 / size past 5691796463 B. If armed: run
+    scripts/r1_t85g_sitting.py-style adjudication on the new
     turn-boundary sitting (T>0-only slot law PLUS the t111 hygiene law —
-    idle boots ALSO yield in_game=true and flat t=/score; require turn or
+    idle boots also yield in_game=true and flat t=/score; require turn or
     score MOVEMENT across slots), then bank OQ-021/023/019 per
-    docs/re/stop-report.md §4 (VNC route localhost:5910).
-(2) USER DECISION (stop-report §3): accept/reject documented defaults
+    docs/re/stop-report.md §4 (VNC route localhost:5910, launch via
+    `bash scripts/r1_playcap.sh` — autodetects :9).
+(B) USER DECISION (stop-report §3): accept/reject documented defaults
     (OQ-003 entropy, OQ-005 dims, OQ-019 sugar-cube [1,3]+immediate,
-    OQ-023 threshold-only branch); authorize/refuse capture sittings; resume
-    t89a follow-on code work or not. That answer becomes the next STATE.md
-    assignment verbatim and REOPENS the loop.
-(3) NEITHER (expected): append a dated LOOP-END PROPOSAL to
-    docs/re/stop-report.md — recommend ending the loop at 12 closed /
-    6 open, the six open rows being capture-gated (OQ-016/019/021/023) or
-    user-decision-gated (OQ-003/005), with the fixed one-command resume path
-    (bash scripts/r1_playcap.sh — autodetects :9; checklist stop-report §4).
-    Update this NEXT ACTION to "IDLE: loop awaits user event; re-arm only on
-    capture dir or §3 answer", run gates, commit, stop. Do NOT start any
-    further watch or census.
+    OQ-023 threshold-only branch); authorize/refuse capture sittings;
+    resume t89a follow-on code work or not. That answer becomes the next
+    STATE.md assignment verbatim and REOPENS the loop.
+If neither trigger is present when a session starts, write the honest
+negative, keep this IDLE block, run gates, commit, stop.
+
+T113 LANDED (FINAL WATCH + LOOP-END PROPOSAL — idle turn #3; deliverables:
+docs/re/stop-report.md §6 NEW dated block, docs/re/_wip_t113.md; no ledger
+row touched, no code changed): (1) all watch signals re-measured fresh
+21:30 EDT, THIRD consecutive negative — live-timeline.jsonl mtime
+2026-10-26 15:44:01.304 / 5691796463 B byte-identical to t111/t112;
+newest playcap dir still 20261014-224611; no dosbox process; watch infra
+alive (Xvfb :9 pid 1196, x11vnc :5910 pid 1207, watcher pid 27772) so the
+negative is trustworthy; r1_t85g_sitting.py correctly NOT run. (2) VNC
+signal via /proc/1207/fd — log is work/r1/vnc/x11vnc.log, mtime
+2026-10-27 17:30:18.172 UNCHANGED since t112: still zero connect attempts
+against the t111-FIXED launch path. (3) NO user decision arrived: git
+clean, no docs/ file modified after the t112 commit — assignment branch
+(3) applies. (4) LOOP-END PROPOSAL appended (stop-report §6): end at 12
+closed / 6 open — capture-gated OQ-016/019/021/023, user-decision-gated
+OQ-003/005; re-arm triggers (A) capture dir/timeline growth, (B) §3
+answer. NEXT ACTION rewritten to IDLE (no further watches while idle).
+NO row closed (strict-close honest negative); no banked law falsified; no
+new tool. Gate 0, LEDGER AUDIT OK
 
 T112 LANDED (WATCH task — SITTING WATCH NEGATIVE #2; deliverables:
 docs/re/_wip_t112.md; no ledger row touched, no code changed): (1) all watch

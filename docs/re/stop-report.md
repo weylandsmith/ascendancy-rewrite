@@ -120,3 +120,34 @@ uninitialized selector).
 - No ledger row moved (strict-close; no measurement this session).
 - No new tool. No banked law falsified. Static routes: exhausted for
   every open row (this session's re-check, rows + REFUTED-ROUTES).
+
+## 6. LOOP-END PROPOSAL (t113, 2026-10-27 21:35 EDT)
+
+The t111 rule fires: three consecutive watches (t111, t112, t113) came
+back empty. Final watch re-measured 2026-10-27 21:30 EDT —
+live-timeline.jsonl mtime 2026-10-26 15:44:01.304 / 5691796463 B
+byte-identical; newest playcap dir still 20261014-224611; no dosbox
+process; watch infra alive (Xvfb :9, x11vnc :5910,
+r1_playcap_watch.py --no-exit) so the negative is trustworthy; x11vnc.log
+unchanged at 17:30:18 (still zero connect attempts against the
+t111-FIXED launch path); git clean and no doc edited by the user since
+t112 (no §3 answer arrived).
+
+PROPOSAL: end the autonomous loop at 12 closed / 6 open. The six open
+rows cannot be moved autonomously:
+- capture-gated: OQ-016 (residual minutiae + live-UI-trace armer),
+  OQ-019 (per-ship model), OQ-021 (end-ctrl threshold), OQ-023
+  (state-enum value for war/allied) — each needs a real sitting per §2.
+- user-decision-gated: OQ-003 (packed-entropy residue), OQ-005 (.shp
+  dims; closure class = human-verifiable drawn frame) — plus the §3
+  default accept/reject list.
+
+Re-open path (either event, any time):
+1. A capture: `bash scripts/r1_playcap.sh` (autodetects the :9 display;
+   one-sitting checklist in §4). The new playcap dir or timeline growth
+   is the trigger.
+2. A §3 answer: answer the default/capture/code-work questions in §3;
+   that answer becomes the next loop assignment verbatim.
+
+Until one of those arrives, docs/STATE.md NEXT ACTION is IDLE and the
+loop should not burn further iterations on watches.
