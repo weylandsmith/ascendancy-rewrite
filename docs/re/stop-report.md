@@ -2463,3 +2463,36 @@ r1_idle_probe.py + ledger_audit.py docstrings + gate.sh comment only (same set
 as t163..t168 — no script writes this file); stop-report.md was 2418 lines
 zero-diff vs HEAD before appending this section. NEXT stays IDLE; the t113
 LOOP-END PROPOSAL stands (56 idle turns).
+
+## 63. IDLE re-check #57 (t170, 2026-10-28 06:55) — both triggers negative
+
+Probe RC=0 at 06:54:58 on a clean tree at 3e089ea (session start; verdict
+wording "IDLE — neither trigger" is valid per t155/B5 because nothing was
+edited before the run). Trigger (A): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B — 59th consecutive byte-identical reading
+t111..t170; independently re-statted in Python by reproducing the probe's
+edge_md5 SEEK path (seek size-64 KiB, per the t167 misalignment lesson rather
+than bs-multiples): head 42a0bed0507f9052e2009ec94e9c27f1 / tail
+1529ab1ad70ac360f441d819703f943f — 16th reproduction of the t151 baseline.
+Last row re-parsed with json.loads from a 200 KiB tail window (29868 B row):
+still {"file":"60.sav","turn":1254,...}. Zero dosbox procs; find sweep since
+06:53:16 -> 4 files, non-loop none; A4 watcher ALIVE pid 27774 (so (A) IS
+adjudicated, t147); A5 none (save/*.sav = 20). Trigger (B): diff HEAD and
+tracked porcelain empty, zero untracked paths inside and outside loop-owned,
+no STEERING file, B3 HEAD == journal sha 3e089ea (journal row 91, ct 06:52:23,
+fail_streak 0), prompt pair prompt-92.txt vs prompt-91.txt (58/58 lines)
+digit-stripped delta 0.
+
+Ledger: ledger_index_check printed LEDGER INDEX OK before any edit (record
+rows=18, open=OQ-003/005/016/019/021/023, closed=12) — the open menu a
+re-armed session picks from is truthful. NO row closed this turn (strict-close:
+an idle turn yields an honest negative, never a plausible default), and no
+existing law was falsified. Infra unchanged since t112 (Xvfb 1196 / x11vnc
+1207 / watcher 27774; x11vnc.log 2026-10-27 17:30:18 / 30114 B — zero
+connects; 208515/208567 are this probe's own children per the t118 noise law).
+Bank hygiene fresh: grep -rln stop-report scripts/ -> gate.sh :12 COMMENT plus
+the r1_idle_probe.py / ledger_audit.py docstrings only (same set as
+t163..t169 — no script writes this file); stop-report.md was 2465 lines
+zero-diff vs HEAD before appending this section. NEXT stays IDLE; the t113
+LOOP-END PROPOSAL stands (57 idle turns).

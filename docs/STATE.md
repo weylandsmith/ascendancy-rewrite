@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T06:55
+updated: 2026-10-28T07:00
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -232,7 +232,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #56 done at t169; stop-report.md §62): loop awaits a user
+IDLE (re-check #57 done at t170; stop-report.md §63): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -389,6 +389,28 @@ missing from STATE index entirely", the record gained/kept a closed row the bloc
 omits — paste the stub the tool prints (id + one-line summary copied FROM the
 record; keep the two-quote-per-entry YAML shape, no raw inner quotes). It is a
 hard DIVERGENCE by design; do not delete the leg to go green.
+
+T170 LANDED (IDLE re-check #57 — no trigger fired; deliverables:
+docs/re/stop-report.md §63, docs/STATE.md; no ledger row touched, no harness
+change, game/ untouched, no watch or census run against the live capture).
+(1) Trigger (A) NEGATIVE — probe RC=0 at 06:54:58 on a clean tree at 3e089ea
+("IDLE — neither trigger" wording valid per t155/B5): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (59th consecutive byte-identical reading t111..t170; re-statted
+independently by reproducing the probe's edge_md5 SEEK path in Python — head
+42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f, 16th
+reproduction of the t151 baseline; last row json.loads-verified from a 200 KiB
+tail window, 29868 B row — still {"file":"60.sav","turn":1254,...}); zero
+dosbox procs; find sweep since 06:53:16 -> 4 files non-loop none; A4 watcher
+ALIVE pid 27774; A5 none (save/*.sav = 20). (2) Trigger (B) NEGATIVE —
+diff/porcelain empty, zero untracked paths, no STEERING, B3 HEAD == journal sha
+3e089ea (row 91, ct 06:52:23, fail_streak 0), prompt pair prompt-92 vs
+prompt-91 (58/58) digit-stripped delta 0. (3) ledger_index_check LEDGER INDEX
+OK before any edit (rows=18 open=OQ-003/005/016/019/021/023 closed=12). Infra
+unchanged since t112. NO row closed (strict-close honest negative), no law
+falsified — per the t113 idle law this turn was the two-trigger probe and
+nothing else.
+NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (57 idle turns). Gate 0.
 
 T169 LANDED (IDLE re-check #56 — no trigger fired; deliverables:
 docs/re/stop-report.md §62, docs/STATE.md; no ledger row touched, no harness
