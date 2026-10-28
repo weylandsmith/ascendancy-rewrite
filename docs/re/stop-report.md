@@ -345,3 +345,26 @@ dosbox procs + capture files only.
 §3 answer (accept/reject documented defaults, authorize capture sittings,
 resume t89a code work) still outstanding after six idle turns. No re-arm,
 no row closed, no law falsified. NEXT stays IDLE.
+
+## 13. IDLE re-check #7 (t120, 2026-10-27 22:24 EDT) — steady-state negative
+
+Session start 22:22:27. `python3 scripts/r1_idle_probe.py` RC=0 at
+22:24:09 (10th consecutive byte-identical timeline reading t111..t120):
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns=1793043841304000000 / 5691796463 B; zero dosbox procs; find sweep
+cutoff 22:22:27 -> 4 files, all work/r1/loop/. (B) negative: clean tracked
+tree at 9b9c291, no STEERING file, prompt-42.txt identical to prompt-41.txt
+after digit-stripping (diff empty), no delta outside loop-owned paths.
+r1_t85g_sitting.py correctly not run.
+
+Infra unchanged since t112 (Xvfb 1196, x11vnc 1207, watcher 27774;
+x11vnc.log 17:30:18/30114 — zero connects against the t111-FIXED launch
+path). INFRA-leg transients 130014 (started 22:22:27 = the harness loop
+runner itself) and 130066 (probe child, gone on `ps -p` re-check) — per the
+t118 noise law, correctly ignored.
+
+§3 answer still outstanding after seven idle turns. Observation worth
+noting for loop economics: idle turns t114..t120 are now near-zero-cost
+reproductions of the same verdict (tool encodes every leg); each additional
+idle turn adds bookkeeping but zero measurement. No re-arm, no row closed
+(strict-close honest negative), no law falsified. NEXT stays IDLE.
