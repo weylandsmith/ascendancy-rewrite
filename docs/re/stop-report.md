@@ -393,3 +393,32 @@ hand-authored and safe from regeneration.
 §3 answer still outstanding after eight idle turns; the §6 t113 observation
 holds and sharpens: idle turns are now pure bookkeeping. No re-arm, no row
 closed (strict-close honest negative), no law falsified. NEXT stays IDLE.
+
+## 15. IDLE re-check #9 (t122, 2026-10-27 22:35 EDT) — steady-state negative
+
+Session start 22:33:22 (probe cutoff) / 22:35:06.625 (probe run).
+`python3 scripts/r1_idle_probe.py` RC=0: newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns=1793043841304000000 /
+5691796463 B (12th consecutive byte-identical reading t111..t122); zero
+dosbox procs; find sweep -> 4 files, all work/r1/loop/. (B) negative: clean
+tracked tree at 7c9a18f, no STEERING file, prompt-44.txt identical to
+prompt-43.txt after digit-stripping (`sed -E 's/[0-9]+/N/g'` then diff:
+empty), no delta outside loop-owned paths. r1_t85g_sitting.py correctly not
+run; no watch/census executed per §6 discipline.
+
+Infra unchanged since t112 (Xvfb 1196, x11vnc 1207, watcher 27774;
+x11vnc.log 17:30:18/30114 — still zero connects against the t111-FIXED
+launch path, so a user-side capture attempt remains possible but unobserved).
+INFRA-leg transients 132359/132412 (this session's runner + probe child) per
+the t118 noise law, correctly ignored.
+
+Bank-hygiene check re-run fresh (BLOCKED.md traps rule):
+`grep -rln stop-report scripts/` matches r1_idle_probe.py and its
+`__pycache__` bytecode only — no script writes the file, so §15 here is
+hand-authored and safe from regeneration.
+
+§3 answer outstanding after nine idle turns. Ledger unchanged 12 closed /
+6 open (OQ-003, 005, 016, 019, 021, 023); the t113 LOOP-END PROPOSAL (§6)
+stands: re-arm ONLY on trigger (A) new capture dir / timeline growth or
+trigger (B) a §3 answer. No row closed (strict-close honest negative), no
+banked law falsified, no new tool. NEXT stays IDLE.
