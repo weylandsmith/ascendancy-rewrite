@@ -459,3 +459,21 @@ outcome, not a failure — every remaining row is capture-gated or user-decision
 gated and none can be closed by another idle session. No row closed
 (strict-close honest negative), no banked law falsified, no new tool.
 NEXT stays IDLE.
+
+## 17. IDLE re-check #11 (t124, 2026-10-27 22:47 EDT) — steady-state negative
+
+`python3 scripts/r1_idle_probe.py` RC=0 at 22:47:01 (session start 22:45:19).
+(A) NEGATIVE: newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B (14th consecutive byte-identical
+reading t111..t124); zero dosbox procs; session-start find sweep 4 files, all
+work/r1/loop/. r1_t85g_sitting.py correctly not run. (B) NEGATIVE: clean
+tracked tree at 17846a7 (diff HEAD empty, status --porcelain empty), no
+STEERING file, prompt-46.txt identical to prompt-45.txt after digit-stripping
+(diff empty), no delta outside loop-owned paths. §3 answer outstanding after
+eleven idle turns. Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 /
+watcher 27774; x11vnc.log 17:30:18 / 30114 B); transient 134591 (this
+session's runner) and its probe child 134644 (gone on re-check) ignored per
+the t118 noise law. Bank-hygiene re-checked fresh: grep -rln stop-report
+scripts/ hits only r1_idle_probe.py + its __pycache__ bytecode — no
+regeneration trap. No row closed (strict-close honest negative), no banked
+law falsified, no new tool. NEXT stays IDLE.
