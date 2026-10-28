@@ -40,6 +40,11 @@ default you can proceed under, still run the FINISH SEQUENCE (a green gate and
 a commit on a blocked iteration are REQUIRED — the loop must never end red),
 and stop.
 
+IDLE IS THE HARNESS'S PROBLEM (t178): you are launched only because work
+exists — a trigger report was appended to your prompt, or a dirty tree needs
+adoption, or a human started you and named the task. Never spend a session
+re-checking whether new work arrived; do the work you were given.
+
 BANK EARLY (context law): you run on a 262k-token window with compaction at
 50% — a mid-task compaction costs you the working detail in your head, so the
 file must always hold what you know. Two rules:

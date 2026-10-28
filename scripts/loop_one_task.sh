@@ -34,6 +34,13 @@ GRACE="${GRACE:-1800}"               # time is cheap, context is not — see con
 KILL_AT=$((RUN_BUDGET + GRACE))
 COOLDOWN="${COOLDOWN:-15}"           # seconds between iterations
 CONTRACT="docs/TASK_CONTRACT.txt"
+# IDLE GATE (t178): the trigger check runs HERE in shell, zero model calls.
+# r1_idle_probe.py RC=0 stay idle / RC=1 trigger armed / RC=2 probe broken.
+# This replaces ~66 model sessions that existed only to re-verify "nothing
+# new" — an idle poll must cost nothing but a python run.
+IDLE_PROBE="scripts/r1_idle_probe.py"
+IDLE_GATE="${IDLE_GATE:-1}"
+IDLE_SLEEP="${IDLE_SLEEP:-900}"      # 15 min between idle polls
 
 log() { echo "[$(date '+%F %T')] $*"; }
 
@@ -42,6 +49,7 @@ if [ "${1:-}" = "--status" ]; then
   echo "iteration id at  : $(cat "$LOOPDIR/iter.count" 2>/dev/null || echo 0)"
   echo "fail streak      : $(cat "$LOOPDIR/fail_streak" 2>/dev/null || echo 0)"
   echo "stop flag        : $([ -f "$LOOPDIR/STOP" ] && echo PRESENT || echo absent)"
+  echo "idle polls       : $(grep -c 'idle poll' "$LOOPDIR/loop.log" 2>/dev/null || echo 0) (shell-gated, no model) last: $(grep 'idle poll' "$LOOPDIR/loop.log" 2>/dev/null | tail -1 | cut -c2-40)"
   echo "needs human      : $([ -f "$LOOPDIR/NEEDS_HUMAN.txt" ] && echo PRESENT || echo absent)"
   echo "dirty tree       : $([ -n "$(git status --porcelain)" ] && echo YES || echo no)"
   echo "next action      : $(awk '/^#+ *NEXT ACTION/{f=1;next} f&&NF{print;exit}' docs/STATE.md)"
@@ -52,13 +60,50 @@ fi
 
 [ -f "$CONTRACT" ] || { echo "missing $CONTRACT"; exit 1; }
 command -v hermes >/dev/null || { echo "hermes not on PATH"; exit 1; }
+if [ "${DRYRUN:-0}" = "1" ]; then IDLE_GATE=0; fi   # dryrun must reach prompt build
 
-i=0
+i=0          # real sessions launched this run (MAX_ITERS counts these)
+idle_skips=0
+n=$(cat "$LOOPDIR/iter.count" 2>/dev/null || echo 0)
+armed_report=""
 while :; do
-  i=$((i+1))
-  [ "$MAX_ITERS" -gt 0 ] && [ "$i" -gt "$MAX_ITERS" ] && { log "MAX_ITERS reached"; break; }
+  [ "$MAX_ITERS" -gt 0 ] && [ "$i" -ge "$MAX_ITERS" ] && { log "MAX_ITERS reached"; break; }
   [ -f "$LOOPDIR/STOP" ] && { log "STOP flag present — exiting"; break; }
 
+  # Adoption check FIRST: a dirty tree is interrupted work, not idleness, and
+  # outranks the idle gate entirely.
+  dirty=""
+  [ -n "$(git status --porcelain)" ] && dirty=1
+
+  # IDLE GATE (t178): poll triggers in SHELL before spending any model budget.
+  # dirty tree => adopt interrupted work (launch regardless of probe);
+  # probe RC=0 clean => IDLE: sleep, check STOP, no session, no journal row;
+  # probe RC=1 => trigger armed: launch with the probe report appended;
+  # probe RC=2 => trigger detector broken: park, never grade idle on it.
+  armed_report=""
+  if [ "$IDLE_GATE" = "1" ] && [ -z "$dirty" ]; then
+    timeout 300 python3 "$IDLE_PROBE" > "$LOOPDIR/probe-last.log" 2>&1
+    prc=$?
+    if [ "$prc" = "0" ]; then
+      idle_skips=$((idle_skips+1))
+      log "idle poll $idle_skips: IDLE — no session launched (sleep ${IDLE_SLEEP}s)"
+      elapsed=0
+      while [ "$elapsed" -lt "$IDLE_SLEEP" ]; do
+        [ -f "$LOOPDIR/STOP" ] && break
+        sleep 30; elapsed=$((elapsed+30))
+      done
+      continue
+    elif [ "$prc" = "1" ]; then
+      log "IDLE-GATE: TRIGGER ARMED — launching with probe context"
+      armed_report=1
+    else
+      echo "r1_idle_probe.py exited $prc (probe broken, not idle): see $LOOPDIR/probe-last.log. Fix the probe; triggers cannot be judged without it." > "$LOOPDIR/NEEDS_HUMAN.txt"
+      log "idle probe RC=$prc — parking"
+      break
+    fi
+  fi
+
+  i=$((i+1))
   # Monotonic iteration id survives relaunches (journal rows never collide).
   n=$(( $(cat "$LOOPDIR/iter.count" 2>/dev/null || echo 0) + 1 ))
   echo "$n" > "$LOOPDIR/iter.count"
@@ -75,15 +120,16 @@ while :; do
   log "iter $n: NEXT[$task] = ${next:-<unparsed>}"
   pre_head=$(git rev-parse --short HEAD 2>/dev/null)
 
-  # Adoption rule: a killed session leaves uncommitted work behind. It is gold,
-  # not garbage — the next session finishes and commits it before new work.
-  dirty=""
-  [ -n "$(git status --porcelain)" ] && dirty=1
-
   out="$LOOPDIR/iter-$(date +%Y%m%d-%H%M%S)-$n.log"
   # Steering hook: if LOOPSTEER.txt exists, its contents replace the task text
   # for THIS iteration only (then get archived, so it can't go stale).
   { cat "$CONTRACT"
+    if [ -n "$armed_report" ]; then
+      echo; echo "IDLE-GATE TRIGGER ARMED — r1_idle_probe.py report follows. The task is"
+      echo "to act on the armed trigger (inspect the new capture / the user delta),"
+      echo "not to re-run the idle protocol:"
+      cat "$LOOPDIR/probe-last.log"
+    fi
     if [ -s "$LOOPDIR/LOOPSTEER.txt" ]; then
       echo; echo "STEERING FOR THIS ITERATION (overrides the NEXT ACTION assignment):"
       cat "$LOOPDIR/LOOPSTEER.txt"
