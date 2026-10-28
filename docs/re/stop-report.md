@@ -2670,3 +2670,45 @@ x11vnc.log mtime 2026-10-27 17:30:18 size 30114 — zero connects). Transients
 216019/216103 are the harness and the probe child per the t118 noise law.
 NO row closed (strict-close honest negative), no law falsified.
 NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (61 idle turns).
+
+## 68. IDLE re-check #62 (t175, 2026-10-28 07:29) — both triggers negative
+
+(1) Trigger (A) NEGATIVE and ADJUDICATED — `python3 scripts/r1_idle_probe.py`
+RC=0 at 07:29:04 as the FIRST action on a clean tree at c4c3aa7, printing the
+t155/B5 session-start wording "IDLE — neither trigger" (no edits preceded it, so
+the CANDIDATE caveat does not apply). Newest playcap dir playcap-20261014-224611;
+live-timeline.jsonl mtime_ns=1793043841304000000 / 5691796463 B == the frozen
+baseline on BOTH fields (64th consecutive byte-identical reading t111..t175).
+No edge-md5 re-derivation this turn: per the t117 RUN-THE-DO-NOT-RE-DERIVE rule
+the (A6) leg hashes head/tail 65536 itself when size/mtime differ, so re-running
+its SEEK path by hand measures my own arithmetic, not the file; the frozen values
+42a0bed0…/1529ab1a… remain t151's, last independently reproduced t173. Zero
+dosbox procs; `find work/r1 -newermt 2026-10-28 07:27:18` -> 4 files, non-loop
+none; A4 watcher ALIVE pid 27774 (t147: (A) is adjudicated, not vacuous); A5 none
+(save/*.sav = 20, all matching the lowercase glob).
+`r1_t85g_sitting.py` correctly NOT run — there is no new sitting to adjudicate.
+
+(2) Trigger (B) NEGATIVE — `git diff HEAD --name-only` empty and tracked
+porcelain empty; ZERO untracked paths either side of LOOP_OWNED (so B4 arms
+nothing); no delta outside loop-owned paths; no STEERING file; B3 HEAD == journal
+sha c4c3aa7 => no commits outside the loop since the last iteration; prompt pair
+prompt-97.txt vs prompt-96.txt (58/58 lines) digit-stripped delta 0 lines.
+§3 answers outstanding after sixty-two idle turns.
+
+(3) `python3 scripts/ledger_index_check.py` before any edit: LEDGER INDEX OK
+(record rows=18, open=OQ-003/005/016/019/021/023, closed=12; STATE index open
+set identical). No ledger row touched this iteration, so nothing to close and
+nothing re-opened.
+
+(4) No new finding, stated honestly: no watch, no census, no code change, no
+harness change, game/ untouched (read-only). Bank hygiene checked before
+editing: `grep -rln stop-report scripts/` -> gate.sh (comment only),
+r1_idle_probe.py + ledger_audit.py (docstrings) + one .pyc — nothing regenerates
+stop-report.md; the file was 2672 lines, zero-diff vs HEAD, before this section.
+The append was anchored on content unique to the last section
+(`grep -c 'LOOP-END PROPOSAL stands (61 idle turns)'` == 1, line 2672 == last
+line of file) and re-checked with `git diff --numstat` for N insertions / 0
+deletions per the t171 APPEND-SAFETY LAW. Infra unchanged since t112 (Xvfb 1196
+/ x11vnc 1207 / watcher 27774; x11vnc.log mtime 2026-10-27 17:30:18 size 30114 —
+zero connects). NO row closed (strict-close honest negative), no law falsified.
+NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (62 idle turns).
