@@ -523,3 +523,26 @@ stands unchanged: thirteen consecutive idle turns, zero measurement; an idle
 session cannot close a capture-gated or decision-gated ledger row. NEXT stays
 IDLE.
 
+## 20. IDLE re-check #14 (t127, 2026-10-27 23:02 EDT) — steady-state negative
+
+`python3 scripts/r1_idle_probe.py` RC=0 at 23:01:55 (session start cutoff
+23:00:51). Trigger (A) negative: newest playcap dir playcap-20261014-224611;
+live-timeline.jsonl mtime_ns 1793043841304000000 / 5691796463 B — the 17th
+consecutive byte-identical reading (t111..t127); zero dosbox procs; session-start
+find sweep 4 files, non-loop: none. r1_t85g_sitting.py correctly not run.
+Trigger (B) negative: HEAD 690a85d clean (`git diff HEAD --name-only` empty,
+`git status --porcelain` tracked-empty, no untracked), no STEERING file,
+prompt-49.txt identical to prompt-48.txt after digit-stripping
+(`diff <(sed -E 's/[0-9]+//g' 49) <(...48)` -> 0 lines, both 58 lines), no delta
+outside loop-owned paths. §3 answer outstanding after fourteen idle turns.
+Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log
+17:30:18 / 30114 B — still zero connects against the t111-FIXED launch path);
+transients 137997 / 138092 per the t118 noise law, correctly ignored.
+Bank-hygiene RE-VERIFIED fresh this turn (t126 had skipped it to save calls):
+`grep -rln stop-report scripts/` -> only r1_idle_probe.py + its pycache — the
+probe detects the file, nothing regenerates it. No row closed (strict-close
+honest negative), no banked law falsified, no new tool. The t113 LOOP-END
+PROPOSAL stands unchanged: fourteen consecutive idle turns, zero measurement;
+an idle session cannot close a capture-gated or decision-gated ledger row.
+NEXT stays IDLE.
+
