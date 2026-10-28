@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T21:25
+updated: 2026-10-27T23:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,41 +202,76 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t108 (STATIC task): FULL-OP RE-AUDIT OF THE REMAINING CENSUS-CITED
-CLOSURES + +0x66 PER-STRUCT ATTRIBUTION TABLE. t107 audited the 13 offsets
-named in its assignment (docs/re/census-audit.md has the table; zero closures
-falsified, 3 doc amendments: combat.md S2d 14th +0x90 writer 0x49307,
-aicode.md S6 kind imm-0 0x24a00/imm-2 0x3ca60, aicode.md S7.4 burn path
-0x41d80). Two residue classes t107 disclosed but did not finish, and they are
-the last offline work of this shape worth an iteration:
-(1) OTHER census-cited claims outside the t107 offset list still ride the
-    pre-t106 op set: grep docs/re/*.md for "census" lines citing a disp other
-    than the audited 13 — known candidates: income-law.md:200 "no FPU
-    (D8-DF) [reg+0x67]" (D8-DF-only scan: AND/OR/XOR stores at +0x67 DO exist
-    per full-op run — re-read the claim's scope: it says FPU touches, which
-    holds, but annotate so nobody re-opens), aicode.md:1056 0x7458e "EXACTLY
-    two store sites (opcode census)", aicode.md:1154/OPEN-QUESTIONS:799
-    [ui+0xccb] disp32 census, combat.md:272 caller census tool re-run,
-    diplomacy.md:252 stride-0x1ee raw census. For each: re-run with
-    scripts/r1_t107_writers_full.py, apply the CODE-SPAN FILTER
-    ([0x14bb0,0x82bb0), t107 §1b law) + per-struct check, annotate in-place
-    or amend. Close = per-claim table appended to docs/re/census-audit.md.
-(2) +0x66 byte-OR site attribution (27 in-code sites, t107 §4.5): decide per
-    site which record class the base walks (planet stride 123 vs ship 0x6a vs
-    UI) via base-register provenance in fn context; any site that turns out
-    to OR planet flag bits must join the banked |=1/|=2 law (income-law
-    S-T30). A clean "no planet carriers" result also closes item (2).
-Rationale: remaining OQ rows are capture/user-gated (OQ-005/006 need exe
-capture-class probes per REFUTED-ROUTES; OQ-016 residue set capture-class;
-OQ-021 static route closed-exhaustive score.md S5, closure class =
-interactive session; OQ-023 residual RE same class; OQ-019 open sub-questions
-need controlled-mutation capture per its row text). After (1)+(2) land, the
-loop should stop-report per GOAL "stop when blocked" — no further offline
-work of this shape remains and the t106 tool liability is fully bounded.
-Do NOT re-run the 13 t107 offsets (table banked); do NOT per-name consistency
-tests or scenario-file searches (R12). Sitting watch: live-timeline 5.69 GB
-mtime 2026-10-26 15:44 unchanged at t107 session start (no new sitting; a NEW
-turn-boundary sitting outranks this -> scripts/r1_t85g_sitting.py first).
+NEXT t109 (STATIC task): COUNT-COLUMN PURGE — RE-RUN THE CENSUS-OFFSET SET
+WITH THE t108-FIXED TOOL, THEN STOP-REPORT. t108 found a THIRD verifier
+defect (census-audit.md S7): boundary_ok's addr&~0xF fallback == candidate
+base made every 16-aligned byte-op candidate self-verify, and objdump
+wrapped-tail lines hid mid-insn coverage. Both tools are patched
+(scripts/r1_t106_writers.py, scripts/r1_t107_writers_full.py) with
+controls green (0x544f6 reject / 0x37f7b, 0x41d80 accept). Consequence:
+EVERY "verified N" count produced by the OLD verifier is inflated by byte-op
+phantoms — census-audit S2's table (30/12/19/26/22/33/26/39/29/43/31/23/14),
+the t106 +0x55=12 and +0x42=28 site lists (OPEN-QUESTIONS OQ-016 row text),
+and the "+0x66 fixed verified 43" line. t109 = one mechanical pass:
+(1) re-run the fixed full-op tool over +0x44/46/48/4e/50/52/54/58/5d/66/67/
+88/90 (and +0x55, +0x42 via r1_t106_writers), replacing the S2 table with a
+corrected table IN PLACE (keep old numbers as a struck-through column headed
+"old verifier"); code-span filter + fn-start authoritative rule are already
+in the tool.
+(2) re-adjudicate ONLY the t106 +0x55 four-WORD site list (0x37f9a, 0x39224,
+0x44054, 0x3a664) and the t107 three amendments (0x49307, 0x24a00, 0x3ca60,
+0x41d80) against the new rule — t108's spot audit says all survive, but
+re-cite the counts next to them in the docs.
+(3) append to census-audit S8 the honest statement that no banked LAW changed
+(WORD/DWORD sites always passed fn-start decode; phantoms concentrated in
+byte-op families), then run scripts/r1_t108_disp32_audit.py as the closing
+control and STOP-REPORT: after (1)-(3) the t106/t107/t108 tool liability is
+fully bounded and every remaining open row (OQ-003 residue, OQ-005, OQ-006,
+OQ-016 residual set, OQ-019, OQ-021, OQ-023) is capture/user-gated per
+REFUTED-ROUTES + its row text — no offline work of any shape remains.
+Rationale: the defect is bounded and known ONLY because counts are suspect,
+not laws; a purge pass converts "S2 numbers superseded" into corrected
+numbers so no future session re-trusts them, at the cost of one compute pass.
+Do NOT re-audit the five t108 claims (S6 table banked, all HOLD); do NOT
+per-name consistency tests or scenario-file searches (R12). Sitting watch:
+live-timeline 5.69 GB mtime 2026-10-26 15:44 unchanged at t108 session end
+(no new sitting; a NEW turn-boundary sitting outranks this ->
+scripts/r1_t85g_sitting.py first).
+
+T108 LANDED (STATIC task — FULL-OP RE-AUDIT OF REMAINING CENSUS-CITED
+CLAIMS + +0x66 ATTRIBUTION; deliverable docs/re/census-audit.md S6-S8 +
+new tool scripts/r1_t108_disp32_audit.py + tool fixes in r1_t106_writers.py
+and r1_t107_writers_full.py; working notes docs/re/_wip_t108.md P1-P4):
+(1) ALL FIVE outstanding census-cited claims HOLD under the whole-code-span
+function-start decode method (140,902 insns, generator-free): ds:0x7458e
+EXACTLY-two-stores law re-proved two independent ways (owning-insn map over
+all 277 raw u32 runs + span decode; 0x52cc6 = dark-zone site beyond tsv
+extent, adjudicable only by the sequential chain); [ui+0xccb] one-store
+zero-readers confirmed and address corrected 0x37bbb->0x37bb9; FPU-no-+0x67
+negative holds + scope-annotated in income-law 6d (non-FPU +0x67 stores
+exist, none is pop storage); r1_t88_caller_census re-run GREEN RC=0 with
+identical caller set; diplomacy stride-0x1ee census = RAM-value census
+already retracted in S10, no code-census tool liability. (2) THIRD TOOL
+DEFECT FOUND + FIXED (the iteration's load-bearing find): boundary_ok
+accepted decode base == candidate for 16-aligned addrs (objdump starts AT
+the candidate -> every byte pattern self-verifies; proof 0x41835 mid-insn in
+fn 0x41260's real chain) AND objdump wraps long-insn tails as bytes-only
+lines (0x544ff = tail of the mov at 0x544f8; skipping them hid coverage).
+Rule banked: fn-start chain is AUTHORITATIVE — mid-insn coverage = reject,
+no fallback vote; merge wrapped tails. Effect: +0x66 "27 in-code / 43
+verified" -> 15 true code sites. BLAST-RADIUS SPOT AUDIT 36/37 banked sites
+OK; 1 phantom citation (0x390a0 range fragment) corrected in S3 — NO banked
+law falsified (WORD/DWORD sites always fn-start-solid; phantoms were
+byte-op families). (3) +0x66 FLAG LAW PROVEN COMPLETE among all
+boundary-verified writes: |=2 0x37f7b + |=1 0x39229 are the ONLY
+planet-record flag ORs image-wide; others attribute clean: planet template
+copy 0x3a696 (fn 0x3a558 ctor law), SHIP DESIGN table 0x490e3/0x4923a (edx
+walks 0x7650c stride 0x6a, in-window cited), 9 stack-local slots in shp-cache
+callers (fn 0x3db80/0x4e6fc `sub ebp,0x82` frame rebase + fn 0x34148 loop
+counter vs [obj+0x69]>>16). Item (2) closed by the assignment's own clean-
+no-carriers clause. (4) Ledger: OQ-016 annotated, STAYS OPEN (open set
+unchanged; strict-close — tool-validity + law-completeness, no new constant).
+REWRITE: no delta. Gate GATE_EXIT=0, LEDGER AUDIT OK.
 
 T107 LANDED (STATIC task — WORD-WRITER CENSUS AUDIT; deliverable
 docs/re/census-audit.md hand-authored + new tool scripts/r1_t107_writers_full.py;

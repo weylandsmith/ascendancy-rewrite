@@ -1063,7 +1063,18 @@ t101) is the single authority. ***
 ### 7.3 ds:0x7458e / ds:0x10ba4 identity [verified stores + live]
 0x7458e has EXACTLY two store sites image-wide (opcode census on
 8e 45 07): 0x21aa0 (idx->0x7458e, 1<<idx->0x89324 bitmask; 0xff sentinel
--> 0/0xff) and 0x52cc6 (reset both-ish to 0; also 0x12e17). Live: 0 =
+-> 0/0xff) and 0x52cc6 (reset both-ish to 0; also 0x12e17).
+[t108 RE-AUDIT HOLDS, two independent methods, docs/re/census-audit.md S6:
+(1) whole-code-span function-start decode: exactly these two
+memory-destination insns (`mov BYTE PTR ds:0x7458e,dh/dl`), 275 reads, zero
+writes by any other op family, zero FPU; (2) owning-instruction map over
+all 277 raw u32 occurrences (each byte-run attributed to the fn-start decode
+chain that contains it): stores = {0x21aa0} inside analysed code + 0x52cc6
+confirmed separately — it lies BEYOND the tsv extent of fn 0x520ec(+0x39)
+(dark zone; tsv windows cannot adjudicate it, the span decode can, and does,
+from its own sequential chain). The 0x12e17 store at 0x52ccc is a DISTINCT
+disp (race-row static base neighbourhood), unaffected by this law.]
+Live: 0 =
 race0 byte; race rows row+0x7 -> AI-controller blocks with [+0x14]&0x80
 set for races 0-2 (t102 probe, pointer law H=136; member = P - 0x242000).
 [inferred] 0x7458e = local player's race index; 0x10ba4 = netplay flag
@@ -1166,9 +1177,15 @@ equality that gates t102 S7.2; ability [row+0x19a]>>24 == [row+0x19d]).
   Tail 0x37c78: [ui+0x35]:=[0x39]:=-1; call [class+0xc] (repaint).
 CORRECTION: the S6.4-era expectation 'dx==2 opens abres%02d' is REFUTED —
 abres is the dx-50 result resource; dx 1|2 is probe+countdown.
-[ui+0xccb] marker: disp32 census EXACTLY one hit (the store 0x37bbb), zero
+[ui+0xccb] marker: disp32 census EXACTLY one hit (the store 0x37bb9 —
+t108 correction: an earlier note here cited 0x37bbb, the address of the
+instruction's imm byte; the insn starts at 0x37bb9
+`c6 85 cb 0c 00 00 02  mov BYTE PTR [ebp+0xccb],0x2`), zero
 readers — dead marker (UI re-probes instead; honest negative under the
-disp32 law).
+disp32 law). t108 RE-AUDIT [verified, docs/re/census-audit.md S6]: raw u32
+0x00000ccb occurs exactly ONCE in the whole code span (that disp field);
+whole-span function-start decode names 0xccb in exactly that one store —
+claim holds.)
 
 ### 8.3 FUN_00043b50 edx parameter law [verified bytes, leg 2]
 cad = WORD[0x6780+2*ability]; gate `cad > counter` -> return 0 (charging).

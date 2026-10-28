@@ -854,7 +854,21 @@ source" REMOVED as refuted). t107 AUDIT OF CENSUS-CITED CLOSURES
 88/90 — NO closed row falsified (planet-field laws trace to the t23 w16-mask
 census, not r1_t86); three in-place doc amendments (combat.md S2d +0x90 14th
 writer 0x49307; aicode S6 kind imm-0 0x24a00 + imm-2 0x3ca60; aicode S7.4
-third burn path 0x41d80 DEC +0x88). Row status UNCHANGED.
+third burn path 0x41d80 DEC +0x88). Row status UNCHANGED. t108 RE-AUDIT OF
+REMAINING CENSUS CLAIMS + +0x66 ATTRIBUTION (census-audit.md S6-S8): all five
+outstanding census-cited claims HOLD under whole-span function-start decode
+(0x7458e two-store law, [ui+0xccb] dead marker (store addr corrected
+0x37bbb->0x37bb9), FPU-no-+0x67 negative scope-annotated, t88 caller census
+re-run green RC=0, diplomacy stride-0x1ee census = retracted RAM-value census,
+no tool liability). THIRD tool defect found + fixed: boundary_ok fallback base
+== addr self-verified 16-aligned byte-op candidates (27 "+0x66 in-code" sites
+-> 15 real) AND objdump wrapped-tail lines broke mid-insn coverage — both
+tools patched, controls green. +0x66 flag law now PROVEN COMPLETE: the banked
+|=1/|=2 pair (0x39229/0x37f7b) is the only planet-record flag OR-ing in the
+image (others = planet template copy 0x3a696, ship-design table 0x490e3/23a
+stride 0x6a, stack-locals in shp-cache callers). One phantom citation (0x390a0)
+corrected in S3. Row STAYS OPEN (open set unchanged: terrain/nuke wiring, home
+placement, +2 minutiae, 0x4402a caller [capture-class], live-UI-trace armer).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

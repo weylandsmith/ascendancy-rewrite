@@ -57,12 +57,18 @@ def find_all(data, pat):
 
 
 def ins_window(lo, hi):
-    """{addr: (nbytes, text)} via one objdump run [lo,hi)."""
+    """{addr: (nbytes, text)} via one objdump run [lo,hi).
+    t108: objdump WRAPS long instructions: the tail appears as an address
+    line with bytes but no mnemonic (e.g. '544ff: 00 ff ff' = tail of the
+    insn at 0x544f8). Those tails are merged into the previous instruction's
+    length so mid-inspection coverage is accurate; without merging, the
+    gap left open lets fallback bases re-accept phantom boundaries."""
     r = subprocess.run(["objdump", "-b", "binary", "-D", "-m", "i386",
                         "-M", "intel", f"--start-address={lo}",
                         f"--stop-address={hi}", IMG],
                        capture_output=True, text=True)
     ins = {}
+    last = None
     for ln in r.stdout.splitlines():
         m = ln.split(":", 1)
         if len(m) != 2 or not m[0].strip() or \
@@ -71,20 +77,36 @@ def ins_window(lo, hi):
         a = int(m[0].strip(), 16)
         parts = m[1].split("\t")
         if len(parts) < 3:
+            # t108: wrapped tail — bytes live in parts[1] (normal field);
+            # merge into the previous instruction's length
+            bs = parts[1].replace(" ", "") if len(parts) > 1 else ""
+            if last is not None and bs and len(bs) % 2 == 0:
+                n, t = ins[last]
+                ins[last] = (n + len(bs) // 2, t)
             continue
         bytestr = parts[1].replace(" ", "")
         if len(bytestr) % 2:
             continue
         ins[a] = (len(bytestr) // 2, parts[2].strip())
+        last = a
     return ins
 
 
 def boundary_ok(addr, tok, fstart):
-    """Decode from the containing FUNCTION START (reliable boundary) through
-    addr; accept iff an instruction starts exactly at addr and mentions tok."""
-    bases = [a for a in (fstart, addr & ~0xF, (addr & ~0xF) - 16)
-             if a is not None and a <= addr]
-    for base in bases:
+    """t108 AUTHORITATIVE RULE: decode from the containing FUNCTION START
+    (objdump is sequential, so the chain covers [fstart, addr]); accept iff
+    an insn starts exactly at addr and names tok; if the chain puts addr
+    mid-instruction, REJECT. A fallback whose base equals addr (16-aligned
+    candidate) self-verifies every pattern (R7 recurrence) — bases must be
+    strictly below addr and are used only when the fn-start chain does not
+    cover addr (dark zone)."""
+    if fstart is not None and fstart <= addr:
+        ins = ins_window(fstart, addr + 32)
+        if addr in ins and tok in ins[addr][1]:
+            return ins[addr][1]
+        if any(a <= addr < a + ln for a, (ln, _) in ins.items()):
+            return None
+    for base in [a for a in ((addr & ~0xF) - 16, (addr & ~0xF)) if a < addr]:
         ins = ins_window(base, addr + 32)
         if addr in ins and tok in ins[addr][1]:
             return ins[addr][1]

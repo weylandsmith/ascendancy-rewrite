@@ -67,7 +67,8 @@ independent evidence, or in a proven other-struct context:
 
 - FUN_00037d80 / FUN_00038ba4 / FUN_00038f68 / FUN_00038840 / FUN_0003a558
   word stores +0x44/46/48/4e/50/52 (0x37f31..0x37f45, 0x38ecf..0x38edf,
-  0x3909f/0x390a0, 0x39290/0x3929a/0x39315/0x3932b/0x393f9, 0x3a61d..0x3a655):
+  0x3909f/0x390a0 [t108: 0x3909f verified; 0x390a0 is NOT an insn start —
+  range-notation fragment, see S7], 0x39290/0x3929a/0x39315/0x3932b/0x393f9, 0x3a61d..0x3a655):
   init pair-copy, recalc store, accrual, reset, and the 1:1 template copy —
   i.e. exactly the writer set income-law.md 6c banked FROM A DIFFERENT TOOL
   (w16 byte-mask `66 89|01|29|21|81|c7|ff`, t23). The pop/income closures
@@ -150,3 +151,108 @@ In-code NEW full-op sites after code-span filter, and their cost:
   (b) filter candidates to the obj0 code span, and (c) attribute hits per
   record class before any "only writers" claim (offset collision across
   planet/ship/UI structs is the norm at these disp values).
+
+---
+
+# t108 FULL-OP RE-AUDIT OF REMAINING CENSUS-CITED CLAIMS + +0x66
+# ATTRIBUTION (2026-10-27)
+
+Hand-authored continuation. Assignment: STATE.md t108. Tools:
+scripts/r1_t108_disp32_audit.py (NEW), r1_t106_writers.py +
+r1_t107_writers_full.py (both FIXED this iteration), whole-span decode
+workbench `objdump -b binary -D -m i386 -M intel --start-address=0x14bb0
+--stop-address=0x82bb0 work/ascend_restored.bin` (session scratch
+/tmp/t108_spanspan.txt, 140,902 insns, sequential from the obj0 start =
+authoritative instruction boundaries).
+
+## 6. Item (1): the five census-cited claims outside the t107 offset list
+
+METHOD: for disp32 questions the pattern generator is REPLACED by
+encoding-agnostic whole-span decode (no blind spots by construction). This
+immediately exposed a THIRD generator blind spot: r1_t106/t107 generate
+mod=01/10 + SIB forms only — never the mod=00 rm=101 absolute-direct form
+(`88 35 disp32`) nor moffs A0-A3. (The banked 0x7458e law came from a raw
+byte-scan of `8e 45 07`, not that generator, and survives.)
+
+| claim | verdict | evidence |
+|-------|---------|----------|
+| aicode S7.3 "ds:0x7458e EXACTLY two store sites" | HOLDS | span decode: exactly `mov BYTE PTR ds:0x7458e,dh` 0x21aa0 + `mov BYTE PTR ds:0x7458e,dl` 0x52cc6 memory-destination; 275 reads; zero other-op writes; zero FPU. Owning-instruction map over all 277 raw u32 runs agrees. 0x52cc6 sits beyond the tsv extent of fn 0x520ec(+0x39) — dark-zone site, adjudicable only by the span chain (t103 banked it independently). |
+| aicode S8.2 "[ui+0xccb] one store, zero readers" | HOLDS (addr corrected) | store starts at 0x37bb9 (aicode note said 0x37bbb = imm-byte address; corrected in-place). Raw u32 0x00000ccb occurs exactly ONCE in the whole span (that disp); span decode names 0xccb in exactly that store. |
+| income-law 6d(a) "no FPU touches [reg+0x67]" | HOLDS, scope annotated | zero FPU mnemonics with +0x67 any form (span decode + tool LEG C); 8 raw u32 0x67 runs = branch displacements/imm32 only. Annotation added in-place: NON-FPU stores at +0x67 exist (S7 table) and are planet-recalc/template/design-table/UI-local — none is pop storage. |
+| combat.md S2g caller-census re-run | RE-RUN GREEN RC=0 | callers(0x4b740) = {0x1a146,0x39d9f,0x3a0b3,0x4bb56,0x4d191,0x4d2dd} identical to banked set; LCG 0x7825b unique; zero rng edges. |
+| diplomacy.md:252 stride-0x1ee raw census | ANNOTATE-ONLY, no tool liability | it is a RAM-window VALUE census (values at fixed offsets in save slots), not a code store-pattern census — the t106/t107 tool blindness classes do not apply; already RETRACTED in diplomacy.md S10 by cross-audit. |
+
+## 7. Item (2): +0x66 attribution — and the BOUNDARY VERIFICATION DEFECT
+
+While attributing the 27 "+0x66 in-code full-op sites" of S4.5, re-checking
+each candidate against the containing function's decode chain from its
+function start (functions_full.tsv start+size window) left 15/68. The rest
+never had an instruction starting at the candidate address. Example:
+0x41835 "add BYTE PTR [eax+0x66],al" decodes when objdump is started at
+0x41835 or 0x41830, but the real chain from fn 0x41260 runs ...0x41830
+pushf / 0x41831 and al,0xb0 / 0x41833 add eax,[eax] / 0x41838 cmp eax,ebx —
+0x41835 is mid-instruction.
+
+ROOT CAUSE [verified]: boundary_ok accepted decode bases addr&~0xF and
+(addr&~0xF)-16 IN ADDITION to the function start; for a 16-byte-aligned
+candidate, base==addr means objdump starts decoding AT the candidate and any
+pattern self-verifies (R7 recurrence inside our own verifier). Two further
+holes found while fixing and fixed:
+(a) objdump WRAPS long instructions: the tail prints as an address line with
+    bytes in the normal bytes-field but no mnemonic (`544ff: 00 ff ff` =
+    tail of the 10-byte mov at 0x544f8). Skipping such lines left holes the
+    mid-inspection test fell through; tails are now merged into the previous
+    instruction's length.
+(b) the fn-start chain must be AUTHORITATIVE: if it covers the candidate and
+    puts it mid-insn, REJECT — no fallback vote (a fallback base can always
+    be found whose misaligned decode puts a boundary at the candidate).
+Both tools patched (r1_t106_writers.py, r1_t107_writers_full.py); control
+checks: boundary_ok(0x544f6)=None, (0x37f7b)=OR ok, (0x41d80)=DEC ok.
+
+Blast-radius spot audit: 37 banked site addresses cited in this file S2/S3/S4
++ income-law/aicode bank text, re-verified by fn-start decode: 36 OK, 1
+phantom — 0x390a0, cited as part of the range notation "0x3909f/0x390a0" in
+S3; the real store is 0x3909f (4-byte `mov WORD PTR [esi+0x50],cx`), the
+"/0x390a0" fragment was a second address that never existed as an insn
+start. WORD/DWORD sites (what the laws were actually banked from) are solid;
+byte-op families carried the artifact load. S4.5's "27 in-code" and S2's
+"+0x66 fixed verified 43" are SUPERSEDED by the table below.
+
+FINAL +0x66 store census (fixed tools, code span [0x14bb0,0x82bb0),
+function-start authoritative; file /tmp/t108_0x66_final.txt):
+
+| site | fn | insn | record class of base |
+|------|----|------|----------------------|
+| 0x37f28 | 0x37d80 recalc/init | mov BYTE [esi+0x66],0 | PLANET — banked clear |
+| 0x37f7b | 0x37d80 | or BYTE [esi+0x66],2 | PLANET — BANKED |=2 |
+| 0x39229 | 0x38f68 growth | or BYTE [esi+0x66],1 | PLANET — BANKED |=1 |
+| 0x3a696 | 0x3a558 ctor | mov BYTE [ebp+0x66],al | PLANET 1:1 template field COPY (t106 ctor law), not a flag setter |
+| 0x490e3 | 0x49074 gizmos loader | mov DWORD [edx+0x66],eax | SHIP DESIGN table: edx walks 0x7650c stride 0x6a (in-window 0x490b7 mov edx,0x7650c; 0x490c3 [+0x52] law) |
+| 0x4923a | 0x49074 | mov DWORD [edx+0x66],0 | same design-table post-pass |
+| 0x341ac, 0x34447 | 0x34148 shp-cache UI family (shp.md queued callers) | mov DWORD [ebp+0x66],edx/ebx | STACK-LOCAL: classic frame (push ebp; mov ebp,esp); loop counter scaled `shl 2`, compared to [obj+0x69]>>16 = the banked shp record-count/selector >>16 law; object arg is [ebp+0x76] |
+| 0x3de7c..0x3df3e (6 sites) | 0x3db80 shp-cache caller | mov DWORD [ebp+0x66],eax | STACK-LOCAL: prologue `sub ebp,0x82` rebases the frame, so [ebp+0x66] = caller-local below original ebp |
+| 0x4ec97 | 0x4e6fc shp-cache caller | mov DWORD [ebp+0x66],eax | STACK-LOCAL (same `sub ebp,0x82` rebase) |
+
+Data-region entries (0x87757/0x8790b/0x87a94/0x88158/0x8822b/0x88bd4, obj1
+pool bytes decoded as code) are excluded by the S1(b) code-span law.
+
+ITEM (2) VERDICT: clean no-new-carriers result — among ALL
+boundary-verified +0x66 writes, the ONLY flag-bit OR-ing on a planet record
+is the banked pair 0x37f7b (|=2) + 0x39229 (|=1) (income-law S-T30 region).
+Zero additional planet flag carriers exist in the image; the banked +0x66
+law is COMPLETE.
+
+## 8. t108 ledger effect
+
+- NO open row closes (strict-close): items (1)+(2) confirmed tool-validity
+  and law-completeness; no open behaviour was measured to a new constant.
+- NO banked law falsified. One citation defect (0x390a0 phantom address in
+  S3 range notation) and one address slip (0x37bbb -> 0x37bb9) corrected.
+- Method law UPGRADED (supersedes S5 item (b)): function-start decode chain
+  is the ONLY acceptable boundary evidence — (i) never seed objdump at or
+  above the candidate, (ii) merge wrapped tail lines into the previous insn
+  length, (iii) mid-insn coverage on the fn-start chain = definitive REJECT.
+  Prefer whole-span decode for disp32 questions: it is generator-free.
+- OQ-016 annotated (completeness of the +0x66 flag law is now a cited
+  closure-grade fact inside the row's open residue list — the row stays
+  open on its remaining capture-class items).

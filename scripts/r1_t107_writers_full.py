@@ -87,6 +87,7 @@ def ins_window(lo, hi):
                         f"--stop-address={hi}", IMG],
                        capture_output=True, text=True)
     ins = {}
+    last = None
     for ln in r.stdout.splitlines():
         m = ln.split(":", 1)
         if len(m) != 2 or not m[0].strip() or \
@@ -95,18 +96,37 @@ def ins_window(lo, hi):
         a = int(m[0].strip(), 16)
         parts = m[1].split("\t")
         if len(parts) < 3:
+            # t108: wrapped tail of a long insn — bytes live in parts[1]
+            # (same field as a normal line); merge into previous length
+            bs = parts[1].replace(" ", "") if len(parts) > 1 else ""
+            if last is not None and bs and len(bs) % 2 == 0:
+                n, t = ins[last]
+                ins[last] = (n + len(bs) // 2, t)
             continue
         bytestr = parts[1].replace(" ", "")
         if len(bytestr) % 2:
             continue
         ins[a] = (len(bytestr) // 2, parts[2].strip())
+        last = a
     return ins
 
 
 def boundary_ok(addr, tok, fstart):
-    bases = [a for a in (fstart, addr & ~0xF, (addr & ~0xF) - 16)
-             if a is not None and a <= addr]
-    for base in bases:
+    # t108 AUTHORITATIVE RULE: decode from the containing function start;
+    # objdump runs sequentially, so the decoded chain covers [fstart, addr].
+    # Accept iff an insn STARTS at addr and names tok; if the chain shows
+    # addr mid-instruction, REJECT (no fallback — a fallback base can always
+    # be found whose misaligned decode puts a boundary at addr: R7
+    # recurrence, 27->0 phantom class for byte ops). If fstart is missing or
+    # its decode desyncs before addr (dark zone), fall back to strictly-
+    # below windows with a DISCLOSED caveat; never base == addr.
+    if fstart is not None and fstart <= addr:
+        ins = ins_window(fstart, addr + 32)
+        if addr in ins and tok in ins[addr][1]:
+            return ins[addr][1]
+        if any(a <= addr < a + ln for a, (ln, _) in ins.items()):
+            return None  # authoritative: mid-instruction
+    for base in [a for a in ((addr & ~0xF) - 16, (addr & ~0xF)) if a < addr]:
         ins = ins_window(base, addr + 32)
         if addr in ins and tok in ins[addr][1]:
             return ins[addr][1]

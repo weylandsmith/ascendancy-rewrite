@@ -198,6 +198,14 @@ DAT_00012e10/0x12dda UPOP candidates.
 
 NEGATIVES [verified this turn]: (a) no FPU opcode (D8-DF) anywhere in the
 image touches [reg+disp8=0x67] or disp32=0x67 — zero raw-census hits;
+(t108 SCOPE ANNOTATION: the FPU-only claim HOLDS under whole-span
+function-start decode — zero FPU mnemonics reference +0x67 in any
+addressing form, and the 8 raw u32 0x67 byte-runs in the code span are all
+branch displacements/imm32, zero disp operands. NON-FPU stores at +0x67 DO
+exist (15 boundary-verified image-wide) — they are planet-recalc/template/
+design-table/UI-local slots per docs/re/census-audit.md S6, and nothing
+about them touches pop storage. Do not re-open this row on the strength of
+the +0x67 write census.)
 (b) stride-96 star records never hold a planet pointer (target-scan m41
 and m42); (c) player stride-0x1ee block (S+0x12dda, base law re-verified
 via threshold constant S+0x66e4=0x32) changed only bytes +0x36/+0x1da

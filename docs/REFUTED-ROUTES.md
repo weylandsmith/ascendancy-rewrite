@@ -60,6 +60,14 @@ checkout). Always pass --out or read the script first.
   (refuted same-minute in v1). The turn counter is u16 phys 0x254e10.
 - member-offset H: compiled-header estimate 104 was 32 B short; measurement
   says 136 (size census exact + unique BDA signature). Re-derive per build.
+- t108 BOUNDARY LAW (supersedes any pattern-census accept rule): the
+  containing function's sequential objdump chain is AUTHORITATIVE for
+  instruction boundaries — never seed objdump at or above the candidate
+  (base==addr self-verifies every byte pattern), merge wrapped-tail lines
+  into the previous insn length, and mid-insn coverage = definitive reject
+  with no fallback vote. Prefer whole-span decode for disp32 questions
+  (generator-free; also covers mod=00 rm=101 absolute-direct + moffs forms
+  the r1_t106/t107 generators never produced). docs/re/census-audit.md S7.
 
 ## R8. Comparison-method traps in refcap (docs/re/refcap.md)
 1:1 blit row search passes on black-row dominance; logic.flc palette control
