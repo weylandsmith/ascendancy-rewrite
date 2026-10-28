@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #36 done at t149; stop-report.md §42): loop awaits a user
+IDLE (re-check #37 done at t150; stop-report.md §43): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -287,6 +287,41 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T150 LANDED (IDLE re-check #37 — no trigger fired; deliverables:
+docs/re/stop-report.md §43 appended, docs/re/_wip_t150.md; no ledger row
+touched, no scripts/ change, no watch/census run against the live capture).
+(1) Trigger (A) NEGATIVE — probe RC=0 at 02:10:24 (session-start cutoff
+02:09:27): newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B (40th consecutive byte-identical
+reading t111..t150; re-statted independently via `stat -c '%Y %y %s'`, exact
+match, and equal to the probe's own BASE_MTIME_NS/BASE_SIZE at
+r1_idle_probe.py:55-56); zero dosbox procs (`ps -eo pid,comm`); find sweep
+non-loop none; A4 watcher ALIVE pid 27774, wchan=hrtimer_nanosleep State S
+(5 s poll tick, not wedged), fds 1/2->watch.out, 3->live-timeline.jsonl,
+4->watch.log; A5 none (save/*.sav = 20, all match the watcher glob).
+(2) Trigger (B) NEGATIVE — clean tracked tree at 61d32e2, no STEERING file,
+B3 HEAD == journal row 71 sha 61d32e2 (journal re-read independently). The
+prompt route was additionally cross-checked BY HAND this turn (numeric
+enumeration -> pair prompt-72.txt vs prompt-71.txt, 58/58 lines,
+digit-stripped diff 0 lines exit 0): identical verdict to the tool leg. §3
+answer outstanding after thirty-seven idle turns. (3) THE ITERATION'S VALUE —
+t149's two load-bearing guards and both cited code sites re-verified from
+source rather than trusted (t148 law): bank-hygiene `grep -rln stop-report
+scripts/` -> only r1_idle_probe.py docstring (line 3) + its .pyc, so nothing
+regenerates stop-report.md; r1_playcap_watch.py:161 IS the lowercase
+`glob.glob(os.path.join(out,"save","*.sav"))` poll line; r1_slot.py:49 IS the
+`.anch-cache.json` path inside anchors_cached(), so the TOOL_ARTIFACTS
+exclusion (r1_idle_probe.py:118) still names the right file. Honest scope
+note recorded (not fixed): A5 walks only the capture dir
+(r1_idle_probe.py os.walk over os.path.dirname(TIMELINE)), so a slot written
+OUTSIDE work/r1/playcap would still be invisible to it; no such file exists
+and the game writes its ring slots into the watched save dir (20/20 t149), so
+it is an accepted boundary. Infra unchanged since t112 (Xvfb 1196 / x11vnc
+1207 / watcher 27774; x11vnc.log 2026-10-27 17:30:18/30114 — zero connects);
+probe children 169020/169107 per the t118 noise law; /tmp/{a,b}.txt scratch
+deleted. NO row closed (strict-close honest negative), no law falsified. NEXT
+stays IDLE; the t113 LOOP-END PROPOSAL stands. Gate 0.
 
 T149 LANDED (IDLE re-check #36 — no trigger fired; deliverables:
 docs/re/stop-report.md §42 appended, docs/re/_wip_t149.md, scripts/r1_idle_probe.py

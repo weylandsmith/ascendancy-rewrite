@@ -1414,3 +1414,55 @@ hygiene: grep -rln stop-report scripts/ -> only r1_idle_probe.py + pycache;
 zero diff vs HEAD at 1336 lines before appending §42. NO row closed
 (strict-close honest negative — an idle turn yields no cited measurement), no
 law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands.
+
+## 43. IDLE RE-CHECK #37 (t150, 2026-10-28 02:10 EDT) — negative; no new hole; t149's two guards and both cited code sites re-verified
+
+(1) Trigger (A) NEGATIVE — probe RC=0 at 02:10:24 (session-start cutoff
+02:09:27): newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B — 40th consecutive byte-identical
+reading t111..t150, re-statted independently with `stat -c '%Y %y %s'` (exact
+match, incl. the .304000000 fractional part) and equal to the tool's own
+BASE_MTIME_NS/BASE_SIZE (r1_idle_probe.py:55-56). Zero dosbox procs
+(`ps -eo pid,comm` — t114 no-self-match form). Find sweep non-loop: none.
+A4 watcher ALIVE pid 27774; /proc read outside the probe again shows
+wchan=hrtimer_nanosleep, State S (the 5 s poll tick, not wedged in I/O), fds
+1/2->watch.out, 3->live-timeline.jsonl, 4->watch.log. A5: none, 20/20 slots
+match the watcher glob. r1_t85g_sitting.py correctly not run.
+
+(2) Trigger (B) NEGATIVE — clean tracked tree at 61d32e2 (diff HEAD empty,
+`git status --porcelain` tracked empty, no untracked), no STEERING file, B3
+HEAD == journal row 71 sha 61d32e2 (journal re-read independently). The prompt
+route — the one that cost t144/t145 — was additionally re-checked BY HAND as a
+cross-check on the tool leg: numeric enumeration (`sed 's/prompt-//' | sort -n`)
+pairs prompt-72.txt with prompt-71.txt, 58/58 lines each, digit-stripped
+`diff` 0 lines and exit 0 — identical verdict to the tool. No new prompt
+appeared since the last iteration.
+
+(3) NO NEW COVERAGE HOLE SOUGHT OR FOUND, and t149's load-bearing pieces were
+re-verified rather than trusted. Per the t113 loop-end rule this turn ran the
+two-trigger probe and nothing else, so the only digging was the cheapest form
+of the t148 law (re-check constants/citations before they mislead a later
+turn): the two `grep -rn 'stop-report' scripts/` bank-hygiene hits are
+r1_idle_probe.py (its own docstring, line 3) plus its .pyc — nothing
+regenerates stop-report.md, so the hand-authored append below is safe; the
+file was at 1416 lines with zero diff vs HEAD before appending. Both code
+sites the IDLE block cites were re-read at the cited line, not from memory:
+r1_playcap_watch.py:161 IS the lowercase `glob.glob(os.path.join(out, "save",
+"*.sav"))` poll line, and r1_slot.py:49 IS
+`cache = os.path.join(root, "work", "r1", ".anch-cache.json")` inside
+anchors_cached() — so the TOOL_ARTIFACTS exclusion (r1_idle_probe.py:118) still
+names the file that any analyzer run refreshes. Honest scope note on A5, not a
+new task: A5 walks the capture dir only (`os.walk(os.path.dirname(TIMELINE))`,
+r1_idle_probe.py:191), so a hypothetical slot written outside
+work/r1/playcap would still be invisible to it. No such file exists and the
+game writes its ring slots into the watched save dir (20/20 measured t149), so
+this is an accepted boundary of the leg, recorded rather than fixed.
+
+(4) Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 2026-10-27 17:30:18 / 30114 B — zero connects against the
+t111-FIXED launch path); probe children 169020/169107 per the t118 noise law.
+Scratch: only /tmp/{a,b}.txt for the hand prompt diff, deleted. game/
+untouched; no watch or census run against the live capture. NO row closed
+(strict-close honest negative — an idle turn yields no cited measurement), no
+law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands. §3 answer
+outstanding after thirty-seven idle turns.
