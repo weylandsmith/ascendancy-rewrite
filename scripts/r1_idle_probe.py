@@ -19,6 +19,15 @@ Laws encoded here (each earned the hard way, do not "simplify" them away):
       only a CONTENT diff of the newest prompt vs its numeric predecessor arms
       it (t145 coverage hole). Enumerate with NUMERIC sort, never `ls -1`
       lexical order (t144 law: `tail -1` returns prompt-9.txt).
+  (B3) a COMMITTED user decision is invisible to every tree-vs-HEAD leg
+      (t146 hole: user edits rewrite//PLAN.md and commits -> `git diff HEAD`
+      is empty, 32 turns adjudicated (B) on uncommitted state only). Law: the
+      harness writes journal.tsv AFTER each iteration's commit and field 6's
+      first token is that iteration's HEAD sha, so at session start HEAD must
+      equal the journal sha; divergence = enumerate <journal-sha>..HEAD with
+      files and ARM only on a path outside LOOP_OWNED (loop-own divergence,
+      e.g. a crashed iteration whose row never landed, is a CAUTION like the
+      t117 untracked-files law). Env R1_JOURNAL overrides the journal path.
   Process check uses `ps -eo comm` matching, NOT `pgrep -af` (self-match
   false-positive trap, t114).
   Watcher pids 27772+27774 are bash-wrapper + python-child — the PAIR is
@@ -39,6 +48,10 @@ TIMELINE = os.path.join(PLAYCAP, "playcap", "live-timeline.jsonl")
 # lands (the sitting-adjudication task), never to silence a real trigger.
 BASE_MTIME_NS = 1793043841_304_000_000  # 2026-10-26 15:44:01.304 -0400 (stat %Y verified t117)
 BASE_SIZE = 5691796463
+# Paths the loop edits every iteration; a delta here is never the user's
+# answer (t117). Shared by the tree leg and the (B3) committed-commit leg.
+LOOP_OWNED = ("docs/STATE.md", "docs/OPEN-QUESTIONS.md", "docs/BLOCKED.md",
+              "docs/re/", "scripts/r1_idle_probe.py", "work/")
 
 
 def sh(cmd):
@@ -120,8 +133,6 @@ def trigger_b():
     # The loop itself owns these paths and edits them every iteration, so a
     # tracked delta there is NOT a user answer. A change OUTSIDE this set
     # (e.g. rewrite/, game/ docs, PLAN.md) is what a real decision looks like.
-    LOOP_OWNED = ("docs/STATE.md", "docs/OPEN-QUESTIONS.md", "docs/BLOCKED.md",
-                  "docs/re/", "scripts/r1_idle_probe.py", "work/")
     foreign_delta = [f for f in diff.splitlines()
                      if not f.startswith(LOOP_OWNED)]
     reasons.append("delta outside loop-owned paths: %s"
@@ -141,6 +152,67 @@ def trigger_b():
     reasons.append("STEERING file: %s" % (steer or "none"))
     if steer:
         armed = True
+    # (B3) t146: every leg above adjudicates the WORKING TREE vs HEAD, so a
+    # user decision delivered as a COMMIT (the normal way work lands here) is
+    # invisible: HEAD moves, tree clean, diff empty. The harness appends a
+    # journal row AFTER each iteration's commit whose field 6 starts with that
+    # iteration's sha, so HEAD != last-journal-sha at session start means
+    # commits landed outside the loop. ARM only on a foreign path.
+    jpath = os.environ.get("R1_JOURNAL", os.path.join(PLAYCAP, "loop", "journal.tsv"))
+    jsha = None
+    try:
+        rows = [l for l in open(jpath, encoding="utf-8", errors="replace")
+                if l.strip()]
+        if rows:
+            # sha is the FIRST token of the LAST tab field (measured on the real
+            # journal: normal rows "date\titer\tOK\t0\t<sha> subj", re-check rows
+            # carry an extra '(re-check' field before it — last-field-first-token
+            # is the invariant that holds for both shapes).
+            last_field = rows[-1].rstrip("\n").split("\t")[-1]
+            m = re.match(r"^([0-9a-f]{7,40})\b", last_field)
+            jsha = m.group(1) if m else None
+            if jsha is None:
+                reasons.append("B3 journal leg: last row has no leading sha "
+                               "(%r) — committed-decision route NOT adjudicated"
+                               % last_field[:40])
+    except OSError as exc:
+        reasons.append("B3 journal leg: UNREADABLE (%s) — committed-decision "
+                       "route NOT adjudicated this run" % exc)
+    if jsha:
+        head_full = sh("git rev-parse HEAD").strip()
+        if head_full.startswith(jsha):
+            reasons.append("B3 HEAD == journal sha %s: no commits outside the "
+                           "loop since last iteration" % jsha)
+        else:
+            # 'C ' prefixes each commit line so file paths are the only bare
+            # lines (subject text can contain spaces but never starts a line).
+            # %% escapes: the git format must survive Python %-interpolation.
+            log = sh("git log --format='C %%h %%s' --name-only %s..%s"
+                     % (jsha, head_full)).strip()
+            if not log or "fatal:" in log:
+                reasons.append("B3 journal sha %s NOT an ancestor of HEAD %s "
+                               "(diverged/unknown history) — read `git log` "
+                               "before treating as idle" % (jsha, head_full[:12]))
+                armed = True
+            else:
+                commits = [l for l in log.splitlines() if l.startswith("C ")]
+                files = [l.strip() for l in log.splitlines()
+                         if not l.startswith("C ") and l.strip()]
+                foreign = [f for f in files if not f.startswith(LOOP_OWNED)]
+                reasons.append("B3 commits since journal sha %s: %d commit(s), "
+                               "foreign paths: %s\n%s" %
+                               (jsha, len(commits), foreign or "none",
+                                log[:1500]))
+                if foreign:
+                    armed = True
+                    reasons.append("COMMITTED USER DECISION: %d commit(s) touch "
+                                   "paths outside loop-owned since the last "
+                                   "iteration — read them, they are the §3 "
+                                   "answer" % len(commits))
+                else:
+                    reasons.append("CAUTION: divergence confined to loop-owned "
+                                   "paths (crashed iteration whose journal row "
+                                   "never landed?) — NOT a trigger (t117 law)")
     # (B2) t145: the STEERING glob above is file-EXISTENCE only. The other
     # documented steering route -- the harness PREPENDING a note to this
     # iteration's prompt file -- is invisible to it, so adjudicate it by

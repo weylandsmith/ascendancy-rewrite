@@ -1190,3 +1190,48 @@ Verdict: NO ledger row closed (strict-close — an idle turn produces no cited
 measurement). The t113 LOOP-END PROPOSAL stands: thirty-two consecutive idle
 turns, zero measurement — but from t145 onward the IDLE verdict is backed by a
 probe that actually covers both documented (B) inputs. NEXT stays IDLE.
+
+## §39 — t146: IDLE RE-CHECK #33 + (B3) COVERAGE FIX — a COMMITTED user
+## decision was invisible to every trigger-(B) leg
+
+Probe: `python3 scripts/r1_idle_probe.py` RC=0 at 01:01:44 (session-start
+cutoff 01:00:00). (A) NEGATIVE — newest playcap dir playcap-20261014-224611;
+timeline mtime_ns 1793043841304000000 / 5691796463 B, 36th consecutive
+byte-identical reading (t111..t146); zero dosbox procs; find sweep 4 files,
+all work/r1/loop/. (B) NEGATIVE at run time — clean tracked tree at 7d2ccd7,
+no STEERING, prompt-68 vs prompt-67 digit-stripped delta 0.
+
+THE HOLE (found by the t145 method — ask what the tool DOES, not what it
+reads): all four (B) legs adjudicate the WORKING TREE (git diff/status) or
+UNCOMMITTED files (STEERING glob, prompt note). A user who answers §3 the way
+work normally lands in this repo — edit rewrite/ or PLAN.md, COMMIT — moves
+HEAD, leaves the tree clean, and every leg prints NEGATIVE. Thirty-two turns
+adjudicated (B) under an unexamined assumption that a user answer is never
+committed. Subject-convention is no backstop either: 123 commits repo-wide do
+not match `^t<digits>:`.
+
+THE LAW (measured): the harness writes work/r1/loop/journal.tsv AFTER each
+iteration's commit and the LAST tab field starts with that iteration's sha
+(row 67 `7d2ccd7` == git rev-parse HEAD, commit ct 00:58:12; re-check rows
+carry an extra `(re-check` field before it, so LAST-FIELD-FIRST-TOKEN is the
+invariant that holds for both row shapes). Therefore at session start,
+HEAD != last-journal-sha <=> commits landed outside the loop. The leg
+enumerates <journal-sha>..HEAD via `git log --format='C %h %s' --name-only`
+('C ' prefix keeps file paths the only bare lines), ARMS only on a path
+outside LOOP_OWNED, and downgrades loop-confined divergence to a CAUTION
+(crashed iteration whose journal row never landed — t117 shape). Unreadable
+journal = explicit NOT-adjudicated annotation, verdict unchanged. Env
+R1_JOURNAL overrides the path for testing.
+
+VALIDATION (real execution, fixtures deleted after): real state ->
+"HEAD == journal sha 7d2ccd7", RC=0; truncated journal at row 66 (t144 sha)
+-> CAUTION, not armed (t145 touched only loop-owned paths — correct); journal
+at row 1 (t85g sha 2e50020) -> ARMED RC=1 listing rewrite/, gate.sh, t86..t145
+scripts as foreign; garbage ancestor deadbeef -> diverged-history ARM RC=1;
+missing file -> UNREADABLE annotation, RC=0. Two self-inflicted patch bugs
+caught by post-patch reading before any run: `'C %h %s'` inside a Python
+%-format (invalid conversion), then one-%s format with a 2-tuple (TypeError) —
+the double-%% + two-%s form is what shipped.
+
+Working notes docs/re/_wip_t146.md. NO ledger row closed (strict-close honest
+negative), no law falsified. NEXT stays IDLE.

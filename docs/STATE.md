@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T00:40
+updated: 2026-10-28T01:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,12 +202,12 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #32 done at t145; stop-report.md §38): loop awaits a user
+IDLE (re-check #33 done at t146; stop-report.md §39): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
 idle — an idle turn is the two-trigger probe and nothing else).
-RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145):
+RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146):
     `python3 scripts/r1_idle_probe.py` — RC=0 both negative (stay IDLE),
     RC=1 a trigger armed (it prints which and why), RC=2 probe failure.
     It encodes the probe laws that cost iterations to earn:
@@ -219,11 +219,18 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145):
     before editing docs — a loop-owned-only delta (STATE.md/stop-report.md)
     prints a CAUTION and stays NEGATIVE, while a delta outside loop-owned
     paths (rewrite/, PLAN.md, game docs) IS the user answer.
-    AS OF t145 the tool covers BOTH (B) routes, including the prompt note:
-    `trigger_b()` numerically sorts prompt-*.txt and digit-stripped-diffs
-    newest vs its numeric predecessor (arms on content delta, annotates
-    numbering drift). The hand `ls -1v` diff is therefore no longer
-    required; run it only if the tool's prompt leg errors.
+    AS OF t145 the tool covers BOTH (B) routes including the prompt note;
+    AS OF t146 it also covers the COMMITTED-decision route (B3): HEAD vs
+    the last journal.tsv sha (last tab field, first token), arming on a
+    commit outside loop-owned paths since the last iteration. The hand
+    checks are no longer required; run any by hand only if its tool leg
+    errors, and then re-check the probe's OWN paths/baseline first.
+    T146 LESSON (generalising t145): every (B) leg WAS a working-tree
+    comparison, so a user answer delivered as a clean commit moved HEAD and
+    read as idle for an unlimited number of turns. The invariant that
+    catches it: the harness writes journal.tsv AFTER each iteration's commit
+    with that iteration's sha first in the last tab field, so
+    HEAD != journal-sha at session start == commits outside the loop.
     t145 LESSON (how to trust a probe): "the tool touches X" != "the tool
     adjudicates X". t144 cited `r1_idle_probe.py:82-84` (getmtime on the
     prompt glob) as proof the tool was immune to the lexical-sort trap;
@@ -263,6 +270,44 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T146 LANDED (IDLE re-check #33 — no trigger fired; deliverables:
+scripts/r1_idle_probe.py (B3) leg, docs/re/stop-report.md §39,
+docs/re/_wip_t146.md; no ledger row touched, no rewrite/ change, no
+watch/census run per §6 discipline). (1) Trigger (A) NEGATIVE — probe RC=0 at
+01:01:44 (cutoff 01:00:00 from the iter-*.log name): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (36th consecutive byte-identical reading t111..t146); zero dosbox
+procs; find sweep 4 files, non-loop: none; r1_t85g_sitting.py correctly not
+run. (2) Trigger (B) NEGATIVE — clean tracked tree at 7d2ccd7, no STEERING,
+prompt-68 vs prompt-67 (58/58 lines) digit-stripped delta 0. §3 answer
+outstanding after thirty-three idle turns. (3) THE ITERATION'S VALUE — hole
+(B3) found by generalising the t145 method: ALL four (B) legs compared the
+WORKING TREE, so a user decision delivered as a clean COMMIT (the normal way
+work lands here — edit rewrite/, commit) moved HEAD and every leg printed
+NEGATIVE; 32 turns adjudicated (B) on uncommitted state only, and subject
+convention is no backstop (123 repo commits don't match ^t<digits>:). Fixed
+via the measured journal law (journal.tsv is written AFTER each commit, last
+tab field starts with that iteration's sha — verified row 67 7d2ccd7 == HEAD,
+ct 00:58:12): B3 compares HEAD vs journal sha, enumerates the range with
+--name-only ('C ' commit-line prefix), arms ONLY on a foreign path, CAUTION
+(not trigger) for loop-confined divergence, explicit NOT-adjudicated note if
+the journal is unreadable; R1_JOURNAL env override for testing. Validated by
+real execution on five branches then fixtures deleted: real NEGATIVE RC=0;
+journal-at-row-66 CAUTION RC=0 (t145 was loop-owned-only — correct);
+journal-at-row-1 (2e50020) ARMED RC=1 naming rewrite/+gate.sh+t86..t145
+scripts; deadbeef ancestor diverged ARM RC=1; missing file NOT-adjudicated
+RC=0. Two self-inflicted patch bugs caught pre-run by post-patch reading:
+git format '%h' inside a Python %-format, then a 1-specifier format with a
+2-tuple — double-%% + two %s is what shipped. Infra unchanged since t112
+(Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log 2026-10-27 17:30:18/
+30114 — zero connects); transients 161126 (harness runner) / 161175 (probe
+child) per the t118 noise law. Bank hygiene checked fresh: grep -rln
+stop-report scripts/ -> only r1_idle_probe.py + pycache; zero diff vs HEAD
+before appending §39. NO row closed (strict-close honest negative):
+ledger_audit rows=18 open=[OQ-003,OQ-005,OQ-016,OQ-019,OQ-021,OQ-023]
+closed=12, LEDGER AUDIT OK. NEXT stays IDLE. Gate 0. Commit subject kept
+short per the t145 law.
 
 T145 LANDED (IDLE re-check #32 — no trigger fired; deliverables:
 scripts/r1_idle_probe.py (B2) leg + HEAD-echo trim, docs/re/stop-report.md §38,
