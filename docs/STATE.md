@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T08:45
+updated: 2026-10-28T15:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -232,29 +232,34 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t179 (STATIC/doc task, no play needed): CONSOLIDATED STOCK-AI DOSSIER —
-docs/re/ai-dossier.md synthesizing what t90..t105 decoded into an answer to
-the user's open question ("does the AI defend systems and choose offensive
-thrusts, or is it haphazard?"). Must cover, each section citing aicode.md/
-combat.md sections or addresses: diplomacy machine (attitude cells, BIO mood,
-thresholds), build selector FUN_0003f130 (need classes, 65/35 roll, threat
-bytes +0x59, shield chains), research picker (t93 tier chain), expansion
-selector (0x40018), special-ability cadence engine 0x43b50 (16 bodies vs
-help.txt), ship-order decider 0x40178 + kind exec semantics + second issuer
-0x3ca60, congregation law 0x4aa10, and — the verdict section — what military
-doctrine EXISTED (per-ship orders, targetability gate 0x39894, defense-of-
-planet order kind) vs what demonstrably did not (no system-level threat plan
-found anywhere; state that as scope-of-search, not as fact). Explicitly map
-which dossier facts the rewrite already models and which remain gaps
-(campaign.cpp buildPhase/researchPhase/combatPhase/expansionPhase sites).
-User-facing deliverable: this answers the deferred AI question.
+LANDED t179 (2026-10-28, this session): CONSOLIDATED STOCK-AI DOSSIER
+SHIPPED — docs/re/ai-dossier.md answers the deferred player question (does
+the AI defend systems / choose thrusts, or haphazard?) with a cited verdict:
+POLICY-DRIVEN, NOT PLAN-DRIVEN. Seven cited doctrines (threat-byte shield
+buying 0x3fc4c, congregation 0x40178, strongest-first 0x40ec0/0x40eb4,
+retreat-downgrade 0x220f2, sticky orders, Invasion-Module-gated assault
+(gizmo 0x49, row 73), diplomacy-on-attack 0x43a4c) vs the BOUNDED negative
+(no enemy-scoring site anywhere in coverage; DAT_00076492 = research row
+index not a star; engagement resolver 0x42c60..0x42e6e picks first-eligible
+in list order — new t179 P3 objdump probe; rel32 census: 0x41260 exactly 2
+callers, 0x39894 exactly 8 — new P2 probe). 17-row rewrite gap map (three
+big gaps: no per-ship model, no threat input, no demolish channel). Ledger:
+OQ-016 row annotated, NO row closed (synthesis task; honest — the negative's
+force is its stated scope-of-search, dossier §7). No ledger movement;
+gate green. aicode.md carries a pointer header only.
 
-THEN t180 (STATIC, bounded): OQ-023 STATE-3 WRITER SCAN — the route t85g
+NEXT t180 (STATIC, bounded): OQ-023 STATE-3 WRITER SCAN — the route t85g
 named and nobody ran: find code storing imm 3 into the relation-state cell
 (row stride, base 0x1c0 name-byte family; use ledger row OQ-023 + diplomacy.md
 §10-§12 laws; work/ascend_restored.bin per R12). If a site writes 3 under a
 decidable condition, the enum closes statically; if zero writers of 3 exist,
 that is itself the measurement (bank negative + enum stays play-gated).
+ORDERING RATIONALE: t180 first among the queued statics because the dossier
+just made the state ladder load-bearing for the AI verdict (§2, §7 residual
+3) — closing or bounding it sharpens the strongest bounded negative we hold;
+it is also the only queued item whose answer could change a rewrite
+behaviour claim (diplomacy.h:67 explicitly defers to it), whereas t181/t182
+feed evidence to player eyeballs and t183 needs a fresh capture window.
 
 THEN t181 (STATIC, offline): OQ-003 THREE-CLASS RAM DIFF — classify
 packed-entropy regions against three classes ALREADY ON DISK: (i) title-boot

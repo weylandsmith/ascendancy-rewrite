@@ -913,6 +913,19 @@ survive the fix verbatim; closing control r1_t108_disp32_audit RC=0 reproduces
 S6 exactly. Tool liability (t106/t107/t108) BOUNDED CLOSED; no banked law
 changed. Row STAYS OPEN, same residual set — all remaining open rows are
 capture/user-gated (no offline static work remains).
+t179 CONSOLIDATED STOCK-AI DOSSIER (docs/re/ai-dossier.md, synthesis + verdict,
+no ledger movement): the deferred player question ("does the AI defend systems
+and choose offensive thrusts or is it haphazard?") is ANSWERED with citations —
+policy-driven not plan-driven: cited doctrines (threat-byte shield buying
+0x3fc4c/income-law S9, fleet congregation 0x40178, strongest-first 0x40eb4,
+retreat-downgrade 0x220f2, sticky orders, Invasion-Module-gated assault) vs the
+bounded negative that NO site scores enemies or plans at system level (target
+slot DAT_00076492 = research row index; engagement resolver 0x42c60..0x42e6e =
+first-eligible in list order, t179 P3 probes; rel32 census: 0x41260 has exactly
+2 callers, 0x39894 gate has 8 — t179 P2). Row STAYS OPEN; residuals unchanged
+(A5 name tie, P0 event window, OQ-023 state-3 writer) — dossier §7 states the
+scope of search explicitly. Gap map dossier §8 (17 rows; threat input, demolish
+channel, per-ship model = the three big rewrite gaps).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

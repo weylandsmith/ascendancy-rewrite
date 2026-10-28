@@ -1,5 +1,9 @@
 # aicode.md — AI turn-loop map (W6-A3, t90)
 
+> t179: consolidated player-facing synthesis of this file + combat/diplomacy/
+> income-law decodes lives in docs/re/ai-dossier.md (verdict + rewrite gap
+> map). This file remains the per-address record of measurements.
+
 Static decode from work/ascend_restored.bin (base-0, OQ-011 pointer-law
 image). Method: rel32 call-graph census over obj0 code [0x14bb0,0x82bb0)
 (tool scripts/r1_t90_callgraph.py, RC=0, work/t90_callgraph.pkl) + raw
