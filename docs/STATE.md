@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T21:40
+updated: 2026-10-27T21:47
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #1 done at t114; stop-report.md §7): loop awaits a user
+IDLE (re-check #2 done at t115; stop-report.md §8): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -224,6 +224,31 @@ idle — an idle turn is the two-trigger probe below and nothing else):
     STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T115 LANDED (IDLE re-check #2 — no trigger fired; deliverables:
+docs/re/_wip_t115.md, stop-report.md §8 appended; no ledger row touched,
+no code changed, no watch/census run per §6 discipline): (1) trigger (A)
+measured NEGATIVE fresh at 21:42:23.745 EDT — newest playcap dir
+20261014-224611; live-timeline.jsonl mtime 2026-10-26 15:44:01.304 /
+5691796463 B, 5th consecutive byte-identical reading (t111..t115); no
+dosbox process (`ps -eo comm`, t114's pgrep self-match trap avoided).
+PROBE UPGRADE worth keeping: `find work/r1 -type f -newermt <session start>`
+returns ONLY harness bookkeeping under work/r1/loop/ (loop.log, iter-*.log,
+prompt-37.txt, preflight_gate.log, iter.count, journal.tsv, fail_streak,
+post_audit.log) — proves no capture-side file exists anywhere, stronger than
+the mtime check alone. r1_t85g_sitting.py correctly not run. (2) trigger (B)
+NEGATIVE — clean tree at f1b1fde, no STEERING file, no harness note, no doc
+edited post-commit; stop-report §3 answer still outstanding. (3) Infra alive
+so the negatives are trustworthy: Xvfb 1196, x11vnc 1207, watcher 27772 +
+27774 (bash wrapper + python child; the PAIR is normal, not a duplicate
+watcher — do not "fix" it); x11vnc.log mtime 2026-10-27 17:30:18.172 / 30114 B
+unchanged since t112 — zero connects against the t111-FIXED launch path.
+(4) Bank-law pre-check: grep shows no script generates stop-report.md or
+_wip_*.md (hits are comment cross-refs only); PLAYTHROUGH.md untouched.
+NEXT = same two-trigger probe on the next idle session (stop-report §8
+wording); loop stays IDLE at 12 closed / 6 open. NO row closed
+(strict-close honest negative); no banked law falsified; no new tool.
+Gate 0, LEDGER AUDIT OK
 
 T114 LANDED (IDLE re-check #1 — no trigger fired; deliverables:
 docs/re/_wip_t114.md, stop-report.md §7 appended; no ledger row touched,

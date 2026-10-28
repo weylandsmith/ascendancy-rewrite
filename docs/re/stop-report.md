@@ -175,3 +175,29 @@ census, it only tested the two re-arm triggers once, fresh.
 Consequence: §6 stands unchanged (12 closed / 6 open). Honest negative
 banked to docs/re/_wip_t114.md; no ledger row touched. Future idle turns
 should repeat exactly this two-trigger probe and nothing else.
+
+## 8. IDLE re-check #2 (t115, 2026-10-27 21:42 EDT)
+
+Two-trigger probe only, per §7. Both measured NEGATIVE on fresh reads
+(full measurements in docs/re/_wip_t115.md):
+
+- (A) NEW CAPTURE — negative. Newest `work/r1/playcap-*` dir
+  `20261014-224611`; `live-timeline.jsonl` mtime 2026-10-26 15:44:01.304 /
+  5691796463 B (5th byte-identical reading t111..t115); no dosbox process
+  (`ps -eo comm`, no `pgrep -af` self-match). Strengthened probe added this
+  turn: `find work/r1 -type f -newermt <session start>` returns ONLY
+  harness bookkeeping under `work/r1/loop/` — no capture-side file anywhere.
+  `r1_t85g_sitting.py` correctly not run.
+- (B) USER DECISION — negative. Clean tree at f1b1fde, no STEERING file, no
+  harness note, no doc edited after the t114 commit. §3 answer outstanding.
+- Infra alive so the negatives are trustworthy: Xvfb 1196, x11vnc 1207,
+  watcher 27772/27774 (bash wrapper + python child — the pair is normal,
+  not a duplicate watcher); `x11vnc.log` mtime unchanged at 17:30:18.172,
+  still zero connects against the t111-fixed launch path.
+- Bank-law pre-check: no script generates `stop-report.md` or `_wip_*.md`
+  (grep hits are comment cross-refs only); PLAYTHROUGH.md untouched.
+
+Consequence: §6 LOOP-END PROPOSAL unchanged, 12 closed / 6 open. NO row
+closed this turn (strict-close honest negative). Future idle turns: run
+exactly this probe — timeline/dir mtime + the `find -newermt` sweep + ps,
+then gates, commit, stop.
