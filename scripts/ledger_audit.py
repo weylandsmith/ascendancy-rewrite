@@ -86,7 +86,16 @@ def main():
     ap.add_argument("--expect", default="OQ-003,OQ-021,OQ-023,"
                                         "OQ-005,OQ-019,OQ-016")
     a = ap.parse_args()
-    want = {x.strip() for x in a.expect.split(",")}
+    # t159: drop empty tokens. "".split(",") == [""], so `--expect ''` — the
+    # ONLY way to express the completion state (zero open rows) — compared the
+    # empty open set against {""} and printed OPEN-SET MISMATCH RC=1 forever.
+    # With every row closed, gate stage 3t (which calls this with the DEFAULT)
+    # or an explicit --expect '' could never exit green, making GOAL.txt's own
+    # completion condition (gate 0 AND no open rows) unreachable by
+    # construction. Measured on fixture /tmp/t159-f6.md (all 18 rows CLOSED):
+    # pre-patch --expect '' => RC=1 MISMATCH; post-patch => RC=0; the real
+    # ledger with the real default is byte-identical OK either way.
+    want = {x.strip() for x in a.expect.split(",") if x.strip()}
     R = rows(a.ledger)
     st = {oid: status_of(b) for oid, b in R}
     nost = [oid for oid, s in st.items() if s is None]

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T04:35
+updated: 2026-10-28T04:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -219,7 +219,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #45 done at t158; stop-report.md §51): loop awaits a user
+IDLE (re-check #46 done at t159; stop-report.md §52): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -367,6 +367,62 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+CLOSURE NOTE (t159): if a future turn closes the LAST open row, the terminal
+green needs BOTH index legs done right — empty STATE's `open:` list AND edit
+ledger_audit.py's --expect default to "" (an empty open set now passes an empty
+expect; before t159 it could not). Do NOT delete either check to go green.
+
+T159 LANDED (IDLE re-check #46 — no trigger fired; deliverables:
+scripts/ledger_audit.py (completion-state fix), docs/re/stop-report.md §52,
+docs/re/_wip_t159.md; no ledger row touched, game/ untouched, no watch or census
+run against the live capture). (1) Trigger (A) NEGATIVE — probe RC=0 at 04:40:29:
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (49th consecutive byte-identical reading
+t111..t159; independently re-statted, equal to BASE_MTIME_NS/BASE_SIZE); (A6)
+content baseline reproduced an EIGHTH time head 42a0bed0507f9052e2009ec94e9c27f1
+/ tail 1529ab1ad70ac360f441d819703f943f, last row still t1254; zero dosbox procs;
+find sweep non-loop none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20).
+(2) Trigger (B) NEGATIVE — clean tracked tree at 0e8c8e9 at session start
+(verdict wording valid per t155/B5), no STEERING, B3 HEAD == journal sha 0e8c8e9,
+prompt pair prompt-81 vs prompt-80 (58/58) digit-stripped delta 0. (3) THE
+FINDING — t158's corollary (audit the grader) run against the one input
+ledger_audit had never seen in 158 iterations: ZERO open rows, which IS
+GOAL.txt:2's completion condition. Measured on an all-18-rows-CLOSED fixture
+(verified via the tool's own rows()/status_of): `--expect ''` => "OPEN-SET
+MISMATCH vs expected ['']" RC=1, because "".split(",")==[""] makes want={""} —
+an empty open set can never equal it. The strict-close grader therefore made the
+project's terminal green unreachable by construction (a completing session would
+gate RED forever). ledger_index_check was already correct on the same fixture
+(RC=0 with an emptied STATE block). FIX one line: `want = {x.strip() for x in
+a.expect.split(",") if x.strip()}`. Four branches validated by REAL execution,
+fixtures deleted after: real ledger + real default OK (byte-identical
+regression); fixture + --expect '' OK; clone with the default string itself
+emptied + fixture OK (the completing session's actual edit shape; t89/t100
+history shows the default is hand-edited per closure); that clone vs the REAL
+open ledger FAILED RC=1 (an empty default cannot silently bless open rows).
+py_compile clean. LAW (extends t158): when a grader encodes a set as a literal,
+ask what its EMPTY case does — a checker that cannot represent success converts
+"done" into "broken" (mirror image of t157's cannot-represent-drift bug).
+(4) MEASURED BOUNDARIES kept, not fixed: status_of is position-dependent (first
+pipe-wrapped status-shaped cell wins, ledger_audit.py:52-61, t85 design) —
+fixture F5 pasted "| CLOSED t40 note |" into OQ-021's question field and the row
+flipped CLOSED, but BOTH gate-3t legs caught it (audit RC=1 mismatch, index RC=1
+naming the row): lousy message, no silent green; a strict column-2 rule was
+rejected because OQ-016-style rows legitimately hold status words in prose.
+--expect stays a hand-maintained duplicate (deriving it from the record is
+circular). (5) RE-ARM MEASURED ALIVE, first explicit record: tmux `ascendloop`
+78558 (PPid 1) -> 78559 -> loop_one_task.sh 78561; this session = iteration 81
+(timeout -s KILL 12600 hermes chat --query-file work/r1/loop/prompt-81.txt);
+journal iter 80 OK 0e8c8e9; fail_streak 0; no crontab. Supervisor death is
+un-adjudicated by design (A4 covers the watcher only); repair = check for
+work/r1/loop/STOP, then relaunch the exact 78558 command line. (6) Gate
+traversal: stage 3t unavoidable — set -u not set -e, err() only sets fail=1,
+sole exit `exit $fail` at gate.sh:464, post-flight runs the whole script
+(loop_one_task.sh:119) — t158's open question answered in the negative. Bank
+hygiene fresh (grep -rln stop-report scripts/ -> only the two docstrings; 1901
+lines zero diff vs HEAD before appending §52). NO row closed (strict-close honest
+negative — harness hardening, not measurement), no law falsified. NEXT stays
+IDLE; the t113 LOOP-END PROPOSAL stands (46 idle turns). Gate 0.
 
 T158 LANDED (IDLE re-check #45 — no trigger fired; deliverables:
 scripts/gate.sh (stage 3t), scripts/ledger_audit.py (tightened EVIDENCE),

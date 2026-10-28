@@ -1899,3 +1899,69 @@ NO row closed this iteration (no new measurement; strict-close honest negative);
 no law falsified; game/ untouched; no watch or census run against the live
 capture. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (45 idle turns, zero
 user input).
+
+## 52. IDLE re-check #46 (t159, 2026-10-28 04:40 EDT) — both triggers negative; the audit grader could never pass the COMPLETION state; fixed
+
+(1) TRIGGER A NEGATIVE — `python3 scripts/r1_idle_probe.py` RC=0 at 04:40:29:
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (49th consecutive byte-identical reading
+t111..t159; independently re-statted via `stat -c '%Y %y %s'`, exact match to
+the probe's BASE constants); (A6) content baseline reproduced an EIGHTH time
+(head 64 KiB md5 42a0bed0507f9052e2009ec94e9c27f1 / tail
+1529ab1ad70ac360f441d819703f943f, recomputed outside the probe, match True);
+zero dosbox procs; find sweep 4 files, non-loop: none; A4 watcher ALIVE pid
+27774; A5 none (save/*.sav = 20). r1_t85g_sitting.py correctly not run.
+(2) TRIGGER B NEGATIVE — clean tracked tree at 0e8c8e9 at session start (verdict
+wording valid per t155/B5), no STEERING, B3 HEAD == journal sha 0e8c8e9, prompt
+pair prompt-81 vs prompt-80 (58/58) digit-stripped delta 0; ledger both legs OK
+at session start. §3 answers outstanding after forty-six idle turns.
+(3) THE FINDING — the t158 corollary ("audit the grader") aimed at the one case
+the audit had NEVER seen in 158 iterations: a ledger with zero open rows, which
+is GOAL.txt:2's own completion condition. Fixture (all 18 rows CLOSED, verified
+via ledger_audit's own rows()/status_of) executed against both gate-3t legs:
+`ledger_audit.py --ledger <all-closed> --expect ''` printed "OPEN-SET MISMATCH
+vs expected ['']" RC=1 — because `"".split(",") == [""]`, want became {""} and
+an empty open set can never equal it. `--expect ''` is the only CLI form of the
+completion state, so the strict-close grader made the project's terminal green
+unreachable by construction: a future session that legitimately closed the last
+row would gate RED forever (or be tempted to delete the check). ledger_index_check
+was already fine on the same fixture (RC=0 with an emptied STATE block — F7).
+FIX, one line in scripts/ledger_audit.py main(): `want = {x.strip() for x in
+a.expect.split(",") if x.strip()}`. Four branches validated by REAL execution,
+fixtures deleted after: (a) real ledger + real default OK RC=0 (regression,
+byte-identical verdict); (b) all-closed fixture + `--expect ''` OK RC=0;
+(c) clone with the default string itself emptied (the completing session's
+actual edit shape — history shows t89/t100 edited it per closure) + fixture
+OK RC=0; (d) that clone vs the REAL open ledger FAILED RC=1 (an empty default
+cannot silently bless open rows). py_compile clean. LAW (extends t158): when a
+grader encodes a set as a literal, ask what its EMPTY case does — a checker that
+cannot represent success converts "done" into "broken", the mirror image of the
+t157 cannot-represent-drift bug.
+(4) MEASURED BOUNDARIES, documented and deliberately NOT fixed: (a) status_of
+is position-dependent (first pipe-wrapped status-shaped cell wins,
+ledger_audit.py:52-61, t85 design); fixture F5 pasted "| CLOSED t40 note |" into
+OQ-021's QUESTION field and the row flipped CLOSED — but BOTH gate-3t legs
+caught it (audit RC=1 mismatch, index RC=1 naming the row), so the failure mode
+is a lousy message, not silent green; a strict column-2 rule was rejected
+because real rows legitimately put status words elsewhere (OQ-016 "| open
+(sub-laws CLOSED: ...)"), so it would false-positive before the record is
+reformatted. (b) `--expect` stays a hand-maintained duplicate of the open set
+(deriving it from the record would be circular; the mismatch message names both
+sets so repair is mechanical).
+(5) RE-ARM MECHANISM MEASURED ALIVE, first explicit record anywhere: tmux
+`ascendloop` pid 78558 (PPid 1) -> bash 78559 -> `bash scripts/loop_one_task.sh`
+78561; this session is iteration 81 under `timeout -s KILL 12600 hermes chat
+--query-file work/r1/loop/prompt-81.txt`; journal last row iter 80 OK 0e8c8e9;
+fail_streak 0; no crontab. The supervisor is NOT inside gate.sh or the idle
+probe (A4 adjudicates the watcher only), so its death is un-adjudicated by
+design; repair = relaunch the exact 78558 command line after checking for
+work/r1/loop/STOP. (6) Gate traversal: stage 3t is unavoidable — gate.sh uses
+`set -u` (NOT `set -e`), err() only sets fail=1, the sole exit is `exit $fail`
+at :464, and the harness post-flight runs the whole script
+(loop_one_task.sh:119) — t158's enforcement question answered in the negative,
+nothing to repair.
+Bank hygiene fresh (grep -rln stop-report scripts/ -> r1_idle_probe.py +
+ledger_audit.py docstrings only; 1901 lines zero diff vs HEAD before appending
+§52). NO row closed (strict-close honest negative — harness hardening, not
+measurement), no law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL
+stands (46 idle turns). Gate 0.
