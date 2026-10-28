@@ -202,31 +202,55 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t110 = FINAL STOP-REPORT + SITTING WATCH (no offline build work
-assigned). The t109 purge closed the tool-liability epoch: every count in
-docs/re/census-audit.md now names a fixed tool + code-span rule, and the
-S9/S10 statement — banked with cross-method agreement (tool == hand on the
-+0x66 15-site set; closing control r1_t108_disp32_audit RC=0 reproducing S6
-exactly) — records that NO banked law fell across t106-t109. Remaining open
-rows OQ-003 (residue), OQ-005 (7th .shp sweep FORBIDDEN per GOAL), OQ-006,
-OQ-016 (residual set: per-cell terrain/nuke wiring, home placement, +2
-minutiae, 0x4402a event-dispatch caller, live-UI-trace armer), OQ-019,
-OQ-021, OQ-023 are capture/user-gated per their row text and REFUTED-ROUTES
-R11-R14: there is no offline static task left that can move a row under
-strict-close. t110 procedure: (1) if work/r1/playcap/live-timeline.jsonl
-mtime has advanced past 2026-10-26 15:44 (last check, t109 session end),
-THAT outranks this assignment -> run scripts/r1_t85g_sitting.py on the new
-turn-boundary sitting first and bank into OQ-010/021/023 rows as appropriate;
-(2) otherwise write/refresh docs/re/stop-report.md for the user: outcome
-status (12 closed / 6 open), the exact list of what only a new capture or a
-user decision can lift, and the recommended capture protocol (one long
-normal-mode sitting incl. a battle and an alliance event; scratch-copy
-invariants per docs/BLOCKED.md); then run gates and commit. Do NOT invent a
-t111 static census to stay busy — re-running green tools is not progress,
-and GOAL's exit-code rule (1=record one line and move on) is satisfied by
-the stop-report itself. If the user replies to the stop-report with a
-decision (e.g. accept defaults, or authorize a capture), that answer becomes
-the next STATE.md assignment.
+NEXT t111 = SITTING WATCH ONLY (idle turn; NO offline build work exists).
+The t110 stop-report LANDED (docs/re/stop-report.md): outcome status 12
+closed / 6 open verified by fresh ledger_audit re-derivation; every open
+row (OQ-003, OQ-005, OQ-016, OQ-019, OQ-021, OQ-023 — note OQ-006 is
+CLOSED, t109's NEXT-ACTION text listed it in error) re-checked THIS
+session against its row text + REFUTED-ROUTES R1-R14: static routes are
+exhausted for all six. The loop is now purely event-driven. Waiting
+signals, in priority order:
+(1) NEW CAPTURE: any new work/r1/playcap-<ts>/ dir, OR
+work/r1/playcap/live-timeline.jsonl mtime advanced past 2026-10-26
+15:44:01 (re-verified t110; newest playcap dir is 2026-10-14). THAT
+outranks everything: run scripts/r1_t85g_sitting.py-style adjudication
+on the new turn-boundary sitting (T>0-only slot law), bank into
+OQ-021/023/019 rows as the evidence supports; capture protocol + play
+checklist are IN docs/re/stop-report.md §4 (r1_playcap.sh, scratch-copy
+invariants per docs/BLOCKED.md).
+(2) USER DECISION (stop-report §3): accept/reject documented defaults
+(OQ-003 entropy, OQ-005 dims, OQ-019 sugar-cube [1,3]+immediate,
+OQ-023 threshold-only branch); authorize/refuse capture sittings; resume
+t89a follow-on code work or not. That answer becomes the next STATE.md
+assignment verbatim.
+(3) NEITHER: run gates, commit, stop. Do NOT invent t111+ static censuses
+to stay busy — re-running green tools is not progress and GOAL's
+exit-1 rule (record one line and move on) is already satisfied by the
+t110 stop-report. If idle-watches pile up (>3), the honest proposal to
+the user is to end the loop at 12-closed/capture-gated rather than keep
+spinning sessions.
+
+T110 LANDED (STOP-REPORT task — FINAL STOP-REPORT + SITTING WATCH;
+deliverable docs/re/stop-report.md NEW + working notes
+docs/re/_wip_t110.md; no ledger row touched, no new tool): (1) sitting
+watch re-verified — work/r1/playcap/live-timeline.jsonl mtime
+2026-10-26 15:44:01 unchanged, no new work/r1/playcap-<ts>/ dir since
+2026-10-14 -> stale assignment worked, r1_t85g_sitting.py not run.
+(2) Ledger re-derived fresh this session (ledger_audit: rows=18,
+closed=12, open=OQ-003/005/016/019/021/023 — OQ-006 CLOSED, the t109
+NEXT-ACTION text's inclusion of it was a transcription error, corrected
+here). (3) stop-report.md banks: outcome status; per-row capture lift
+(OQ-021 via >50% colonization or debug-'C' percent readout; OQ-023 via
+attitude>570-then-accept for a state-3 cell [UNOBSERVED in 42k rows];
+OQ-016 0x4402a caller + 4 minutiae; OQ-019 step-CLAMP + inventory path,
+sugar-cube BLOCKED-USER-LEVEL on two zero-corpora t49/t58; OQ-003
+play-mutation variants); user-decision lift list (defaults
+accept/reject, capture authorization, t89a code-work resumption); full
+r1_playcap.sh protocol + one-sitting play checklist + cadence/slot laws
+restated from docs/BLOCKED.md. NO row closed (strict-close honest
+negative: bookkeeping, not measurement); no banked law falsified. Loop
+is now event-driven: NEXT t111 = sitting watch only (see above). Gate 0,
+LEDGER AUDIT OK
 
 T109 LANDED (STATIC task — COUNT-COLUMN PURGE; deliverable
 docs/re/census-audit.md S2 replaced in place + S9/S10 stop-report; OQ-016
