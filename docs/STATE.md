@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T01:45
+updated: 2026-10-28T02:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #35 done at t148; stop-report.md §41): loop awaits a user
+IDLE (re-check #36 done at t149; stop-report.md §42): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -224,6 +224,18 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     before editing docs — a loop-owned-only delta (STATE.md/stop-report.md)
     prints a CAUTION and stays NEGATIVE, while a delta outside loop-owned
     paths (rewrite/, PLAN.md, game docs) IS the user answer.
+    AS OF t149 trigger (A) also has an (A5) ingestion leg: it walks the capture
+    dir (skipping caps/, loop/) and reports save-looking files the watcher's
+    `save/*.sav` glob (r1_playcap_watch.py:161, lowercase) CANNOT read — a
+    healthy watcher can still be blind to a slot it cannot name, and no other
+    (A) leg reports that shape. CAUTION only, never a trigger (t117). Two
+    false-positive guards are load-bearing and measured, not stylistic: only
+    files that are valid save-state ZIPs containing a "Memory" member count
+    (work/r1/playcap/evidence_slot04_t1254.SAV is a raw 88 KB memory excerpt,
+    is_zipfile False — naming it every turn is permanent noise), and the
+    find-sweep now excludes work/r1/.anch-cache.json via TOOL_ARTIFACTS because
+    t149 PROVED any analyzer run refreshes it (r1_slot.py:49) and it armed all
+    of (A) by itself. Do not "simplify" either guard away.
     AS OF t145 the tool covers BOTH (B) routes including the prompt note;
     AS OF t146 it also covers the COMMITTED-decision route (B3): HEAD vs
     the last journal.tsv sha (last tab field, first token), arming on a
@@ -276,6 +288,45 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
 
+T149 LANDED (IDLE re-check #36 — no trigger fired; deliverables:
+docs/re/stop-report.md §42 appended, docs/re/_wip_t149.md, scripts/r1_idle_probe.py
+(+A5 leg, +TOOL_ARTIFACTS); no ledger row touched, game/ untouched, no watch or
+census run against the live capture). (1) Trigger (A) NEGATIVE — probe RC=0 at
+01:47:58 (cutoff 01:47:06): newest playcap dir playcap-20261014-224611; timeline
+mtime_ns 1793043841304000000 / 5691796463 B (39th consecutive byte-identical
+reading t111..t149; independently re-statted outside the probe — exact match);
+zero dosbox procs; find sweep non-loop none; A4 watcher ALIVE pid 27774, and a
+deeper read outside the probe shows it parked in hrtimer_nanosleep (State S, i.e.
+the 5 s poll tick, not wedged in I/O) with fds 1/2->watch.out,
+3->live-timeline.jsonl, 4->watch.log open for append. (2) Trigger (B) NEGATIVE —
+clean tracked tree at 082866b, no STEERING, prompt-71 vs prompt-70 (58/58)
+digit-stripped delta 0, B3 HEAD == journal sha 082866b. §3 outstanding after
+thirty-six idle turns. (3) NEW EVIDENCE CLASS FOR THE (A) NEGATIVE — the
+collector was shown FUNCTIONAL, not merely alive (t145 law one level deeper):
+`python3 scripts/r1_playcap_watch.py /tmp/t149-watch --once` over two copied ring
+slots emitted 2 valid JSONL rows (t=1254, mine_any=36 full=32 planets=36,
+DAT_482fb=14/50, 38 ships) and a second pass re-deduped to 0 new rows (t85b `seen`
+law holds); the live timeline was never written and the pristine dir never
+mounted. (4) THE FINDING THAT MATTERS — that same test exposed an ingestion
+asymmetry: the watcher reads only lowercase `save/*.sav`, so a save file it cannot
+name is invisible to every (A) leg at once (no new playcap dir, no timeline
+growth, no dosbox proc). All 20 real ring slots are lowercase and valid ZIPs, so
+there is no live blind spot today [verified]; A5 now makes the shape visible
+instead of changing the watcher (restarting pid 27774 to make the glob
+case-insensitive trades a provably-inert asymmetry for the t147 failure shape —
+declined). (5) SELF-INFLICTED FALSE POSITIVE FOUND AND FIXED — my scratch run
+refreshed work/r1/.anch-cache.json (r1_slot.py:49) and the find sweep armed all of
+(A) on that single file; encoded as TOOL_ARTIFACTS. LESSON GENERALISED: the probe
+must not treat its OWN toolchain's writes as user evidence — before trusting a
+find-sweep arm, ask which loop tools can write that path. One patch bug
+self-inflicted, caught by running the tool: a dropped closing quote in the
+find-sweep line (SyntaxError line 112) — py_compile before the fixture matrix
+caught the repair. A5 fixture matrix validated by real execution (all-lowercase ->
+none; uppercase VALID-zip -> flagged; non-zip .SAV -> correctly not listed;
+uppercase removed -> none) and post-patch real state RC=0 "A5 ... none
+(save/*.sav = 20, all match the watcher glob)". FUTURE TURNS: if the user ever
+places a played slot with a non-matching name, A5 CAUTION means adjudicate that
+file directly — do not read the (A) NEGATIVE as "no sitting happened".
 T148 LANDED (IDLE re-check #35 — no trigger fired; deliverables:
 docs/re/stop-report.md §41 appended, docs/re/_wip_t148.md; no ledger row
 touched, no code changed, no watch/census run per §6 discipline). (1) Trigger

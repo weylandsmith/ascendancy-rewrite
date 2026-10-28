@@ -1334,3 +1334,83 @@ per the t118 noise law. Bank hygiene checked fresh: grep -rln stop-report
 scripts/ -> only r1_idle_probe.py + pycache; zero diff vs HEAD at 1292 lines
 before appending §41. NO row closed (strict-close honest negative), no law
 falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands.
+
+## 42. IDLE RE-CHECK #36 (t149, 2026-10-28 02:02 EDT) — negative + (A5) coverage FIX: a healthy watcher can still be blind to a save file it cannot name
+
+(1) Trigger (A) NEGATIVE — probe RC=0 at 01:47:58 (cutoff 01:47:06 from the
+iter-*.log name): newest playcap dir playcap-20261014-224611; timeline
+mtime_ns 1793043841304000000 / 5691796463 B (39th byte-identical reading
+t111..t149, independently re-statted outside the probe — exact match); zero
+dosbox procs; find sweep non-loop none; A4 watcher ALIVE pid 27774. Deeper
+liveness read outside the probe: /proc/27774 wchan=hrtimer_nanosleep, State S —
+parked in the 5 s poll sleep, not wedged in I/O — with fd 1/2->watch.out,
+3->live-timeline.jsonl, 4->watch.log open for append. r1_t85g_sitting.py
+correctly not run.
+(2) Trigger (B) NEGATIVE — clean tracked tree at 082866b, no STEERING,
+prompt-71 vs prompt-70 (58/58 lines) digit-stripped delta 0, B3 HEAD == journal
+sha 082866b (journal row 70 re-read independently). §3 answer outstanding after
+thirty-six idle turns.
+
+(3) THE (A) CLAIM, ONE LEVEL DEEPER (measured, scratch-only). t147's A4 leg
+establishes the watcher PROCESS is up. "Process up" != "collector records a
+sitting" — the t145 law applied to the layer below. Direct functional test
+against a scratch dir (live timeline never touched, pristine game dir never
+mounted):
+    rm -rf /tmp/t149-watch && mkdir -p /tmp/t149-watch/save
+    cp work/r1/playcap/save/41.sav work/r1/playcap/save/42.sav /tmp/t149-watch/save/
+    python3 scripts/r1_playcap_watch.py /tmp/t149-watch --once        # cwd = repo root
+Real execution 01:53:38, RC=0: two lines emitted —
+`41.sav t=1254 SYSTEMS mine_any=36 full=32 planets=36 | DAT_482fb=14/50 sel=0
+ships=38 rel_nonzero_cells=12` (42.sav identical) — and
+/tmp/t149-watch/live-timeline.jsonl held 2 valid JSON rows with file/turn/T/
+score_stars/in_game=true/systems_any/planets_mine/ships(38)/file_mtime_ns set.
+Second `--once` pass: "(2 prior observations deduped)", 0 new rows — the t85b
+jsonl-derived `seen` dedup law holds, no 73k-dup regression. Post-run stat of
+the LIVE timeline: unchanged. So (A) is not merely falsifiable here, its
+reporting path (payload -> anchor cache -> base vote -> slot parse -> JSONL
+append) is demonstrated working end to end: a new sitting WOULD be recorded.
+
+(4) THE COVERAGE HOLE THE FUNCTIONAL TEST EXPOSED, AND ITS FIX. The watcher
+polls `save/*.sav` LOWERCASE (r1_playcap_watch.py:161). All 20 ring slots are
+lowercase and all 20 are valid save-state ZIPs (`is_zipfile` 20/20), so the
+game's own writes match today — no live blind spot [verified]. But a save file
+the glob cannot match is invisible even to a healthy watcher: no new
+playcap-<ts> dir, no timeline growth, no dosbox proc — every (A) leg reads
+NEGATIVE over a real sitting. That shape is unreported, so `trigger_a()` now
+has an (A5) leg: walk the capture dir (skipping caps/, loop/), compare every
+save-looking file against what the watcher CAN read, and report strays as a
+CAUTION — never a trigger (t117: only an observed user event arms). Two
+false-positive guards earned by measurement, not taste: (i) only files that are
+valid save-state ZIPs containing a "Memory" member count, because
+work/r1/playcap/evidence_slot04_t1254.SAV is a raw 88 KB memory excerpt
+(`is_zipfile` False, first bytes 346 004 00 00) read by r1_t87_gizmo_table.py,
+not a slot — naming it every turn would be permanent noise; (ii) SEPARATELY, my
+own scratch run refreshed work/r1/.anch-cache.json (r1_slot.anchors_cached,
+r1_slot.py:49) and the find sweep armed the WHOLE of (A) on that one file — a
+pre-existing self-inflicted false positive for any analyzer run, which STATE.md
+had already declared an artifact but the code never encoded; now a
+TOOL_ARTIFACTS exclusion, with the cache justified as a pure function of
+work/ascend_payload.bin.
+VALIDATION (real executions; fixtures under /tmp deleted after): all-lowercase
+valid slot -> "none (save/*.sav = N, all match the watcher glob)"; uppercase
+VALID-zip .SAV in save/ -> flagged; non-zip .SAV alongside it -> correctly NOT
+listed (only the real blind spot shown); uppercase removed -> back to "none".
+Real state after the patch: RC=0, "A5 un-ingestable save files: none
+(save/*.sav = 20, all match the watcher glob)", VERDICT IDLE. One patch bug
+self-inflicted and caught by running the tool: a dropped closing quote in the
+find-sweep line (SyntaxError at line 112) — the pre-existing `%s` string was
+rewritten, not left alone; py_compile before the fixture matrix confirmed the
+repair. The live watcher was NOT restarted (its glob stays lowercase): making
+the collector case-insensitive means killing pid 27774 and relaunching via
+scripts/r1_playcap_vnc.sh, trading a provably-inert asymmetry for the t147
+failure shape — declined; A5 makes the asymmetry visible instead.
+
+(5) Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 2026-10-27 17:30:18 / 30114 B — zero connects); transients 166484
+(harness mcp_death_supervisor, via `ps -o args=`) / probe children, per the
+t118 noise law. Scratch dirs /tmp/t149-watch, /tmp/t149-a5, /tmp/t149-a5b all
+removed; game/ untouched; no watch/census run against the live capture. Bank
+hygiene: grep -rln stop-report scripts/ -> only r1_idle_probe.py + pycache;
+zero diff vs HEAD at 1336 lines before appending §42. NO row closed
+(strict-close honest negative — an idle turn yields no cited measurement), no
+law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands.

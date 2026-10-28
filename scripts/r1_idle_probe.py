@@ -110,7 +110,15 @@ def trigger_a(now_wall):
         start = os.path.getmtime(prompts[-1]) if prompts else now_wall
     cutoff = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(start))
     sweep = sh("find work/r1 -type f -newermt '%s'" % cutoff).split()
-    foreign = [p for p in sweep if not p.startswith("work/r1/loop/")]
+    # Loop-owned artifacts under work/r1 that are NOT captures. .anch-cache.json
+    # is written by r1_slot.anchors_cached (r1_slot.py:49) on ANY analyzer run
+    # -- proven t149: a scratch-dir `r1_playcap_watch.py --once` refreshed it and
+    # armed this leg by itself, a pure self-inflicted false positive. It is a
+    # pure function of work/ascend_payload.bin, so it can never carry a sitting.
+    TOOL_ARTIFACTS = ("work/r1/.anch-cache.json",)
+    foreign = [p for p in sweep
+               if not p.startswith("work/r1/loop/")
+               and p not in TOOL_ARTIFACTS]
     reasons.append("find work/r1 -newermt %s (session start) -> %d files, "
                    "non-loop: %s" % (cutoff, len(sweep), foreign or "none"))
     if foreign:
@@ -161,6 +169,62 @@ def trigger_a(now_wall):
             "as a caution, not a trigger (t117: only an observed user event "
             "arms)." % wscript)
         adjudicated = False
+    # (A5) t149: t147 proved the watcher PROCESS is up, which is a different
+    # claim than the collector WORKING (t145 law, one level deeper). t149
+    # measured function directly: scratch-dir `--once` over two ring slots
+    # emitted 2 valid JSONL rows (t=1254, 38 ships) and re-deduped to 0 new
+    # rows on a second pass. That run also exposed an ingestion asymmetry:
+    # scripts/r1_playcap_watch.py:161 globs save/*.sav LOWERCASE, so a save file
+    # the glob cannot match is never read even with a healthy watcher, and the
+    # timeline stays flat. An un-ingested played slot is precisely a sitting no
+    # other (A) leg reports (no new playcap-<ts> dir, no timeline growth), so
+    # surface it. CAUTION, never a trigger (t117 law: only an observed user
+    # event arms). Env R1_SAVE_DIR overrides the save dir for testing.
+    savedir = os.environ.get("R1_SAVE_DIR",
+                             os.path.join(os.path.dirname(TIMELINE), "save"))
+    try:
+        save_root = os.path.abspath(savedir)
+        ingestable = (set(n for n in os.listdir(save_root)
+                          if n.endswith(".sav"))
+                      if os.path.isdir(save_root) else set())
+        stray = []
+        for dirpath, subdirs, fnames in os.walk(os.path.dirname(TIMELINE)):
+            subdirs[:] = [d for d in subdirs if d not in ("caps", "loop")]
+            for f in fnames:
+                if not f.lower().endswith(".sav"):
+                    continue
+                full = os.path.abspath(os.path.join(dirpath, f))
+                # A file that is not a valid dosbox save-state ZIP cannot hold a
+                # sitting, so it is not an ingestion blind spot:
+                # work/r1/playcap/evidence_slot04_t1254.SAV is a raw 88 KB memory
+                # excerpt (is_zipfile False, measured t149) used by
+                # r1_gizmo_table, not a ring slot. Naming it every turn would be
+                # a permanent false positive.
+                try:
+                    with __import__("zipfile").ZipFile(full) as zf:
+                        if "Memory" not in zf.namelist():
+                            continue
+                except Exception:
+                    continue
+                in_save = (os.path.dirname(full) == save_root)
+                if in_save and f.endswith(".sav"):
+                    continue          # matches the watcher glob exactly
+                stray.append((os.path.relpath(full, ROOT), f))
+        if stray:
+            reasons.append(
+                "A5 un-ingestable save files under playcap (watcher reads only "
+                "save/*.sav, r1_playcap_watch.py:161): %s - if any is a COPY OF "
+                "A PLAYED SLOT the loop is blind to that sitting: adjudicate it "
+                "directly. CAUTION, not a trigger (t117)." % ", ".join(
+                    "%s (%s)" % (p, time.strftime("%Y-%m-%d %H:%M", time.localtime(
+                        os.stat(os.path.join(ROOT, p)).st_mtime)))
+                    for p, _ in stray[:6]))
+        else:
+            reasons.append("A5 un-ingestable save files: none (save/*.sav = %d, "
+                           "all match the watcher glob)" % len(ingestable))
+    except Exception as e:
+        reasons.append("A5 leg ERROR (%s) - ingestion asymmetry NOT adjudicated"
+                       % repr(e)[:100])
     return armed, reasons, adjudicated
 
 
