@@ -1512,3 +1512,70 @@ x11vnc.log 2026-10-27 17:30:18/30114 — zero connects); probe children
 /tmp/t149-watch fixture dir t149 left on disk. NO row closed (strict-close
 honest negative), no law falsified. NEXT stays IDLE; the t113 LOOP-END
 PROPOSAL stands.
+
+
+## 45. IDLE RE-CHECK #39 (t152, 2026-10-28 02:28 EDT) — negative; (A) re-arm INSTRUCTION defect found and fixed: the sitting adjudicator could not address the capture dir the trigger names
+
+(1) Trigger (A) NEGATIVE — `python3 scripts/r1_idle_probe.py` RC=0 at
+02:28:41 (session-start cutoff 02:26:59): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (42nd consecutive byte-identical reading t111..t152;
+re-statted independently, exact match, equal to BASE_MTIME_NS/BASE_SIZE at
+r1_idle_probe.py:55-56); zero dosbox procs; find sweep non-loop none; A4
+watcher ALIVE pid 27774; A5 none (save/*.sav = 20, all match the glob).
+
+(2) T151'S CONTENT BASELINE REPRODUCED — head 64 KiB md5
+42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f,
+both byte-identical to the values banked at §44. The (A) timeline leg now has
+a CONTENT baseline whose reproducibility is itself measured: tail-md5 match +
+moved mtime == a touch, differing tail-md5 == real ingest.
+
+(3) THE FINDING — defect in the (A) re-arm PATH, downstream of the trigger.
+Every idle turn hands the next session the instruction "run
+scripts/r1_t85g_sitting.py-style adjudication on the NEW sitting", but that
+tool pinned `RUN = ".../work/r1/playcap"` (r1_t85g_sitting.py:18). There are
+TWO capture harnesses writing TWO different evidence dirs [verified from
+source]: r1_playcap_vnc.sh accumulates into work/r1/playcap (the shared 5.7 GB
+timeline), while r1_playcap.sh — the user-facing one-shot that STATE/(A) and
+§4 name as the launch path — creates work/r1/playcap-<ts>/ and at line 78
+starts `r1_playcap_watch.py "$OUT"`, a PER-RUN watcher writing a PER-RUN
+timeline. A playcap.sh sitting therefore writes evidence the named
+adjudicator never opens. On disk: 4 of 5 playcap-* dirs hold their own
+live-timeline.jsonl (4.8 KB..284 KB).
+
+(4) HAZARD PROVEN BY EXECUTION (not review):
+    `r1_t85g_sitting.py work/r1/playcap-20261014-224611`
+      -> trusted turn-change rows: 0   (correct: that dir is 65 rows, ALL
+         turn=0, a t82-law idle boot)
+    `r1_t85g_sitting.py`  (legacy default, exactly what the bare instruction
+         invites)
+      -> trusted turn-change rows: 45050  (the OLD shared t1253/1254 sitting,
+         printed WITH relation snapshots, ship events and damage deltas)
+   So a future re-arm on a playcap.sh capture would have banked the STALE
+   sitting's battle/alliance evidence as if it were the user's new game —
+   silently, no error, no dir named. Same family as the 0x88 pointer-law trap:
+   wrong input, plausible output.
+
+(5) FIX — scripts/r1_t85g_sitting.py: `RUN = sys.argv[1] if len(sys.argv)>1
+else DEFAULT_RUN` (default kept for t85g's own historical re-runs), and the
+row-count header now echoes the source dir. py_compile clean; both branches
+run above. LAW banked (generalising t145): when a procedure names a tool AND
+an object, verify the tool can address THAT object — a pinned default that was
+right for the last 30 turns proves nothing about the next. The trigger itself
+was never blind: a new playcap-<ts> dir arms r1_idle_probe.py:74 regardless of
+name.
+
+(6) Trigger (B) NEGATIVE — clean tracked tree at 6ff9ded, no STEERING file,
+B3 HEAD == journal row 73 sha 6ff9ded (re-read independently, ct 02:26:06);
+prompt pair prompt-74 vs prompt-73 (58/58 lines) digit-stripped delta 0. §3
+answer outstanding after thirty-nine idle turns.
+
+(7) Re-verification from source (t147 law): r1_idle_probe.py:335-341 IS the
+numeric _num sort; r1_playcap_watch.py:161 IS the lowercase save-glob poll
+line; r1_slot.py:49 IS the .anch-cache.json path in anchors_cached(). Bank
+hygiene: grep -rln stop-report scripts/ -> only r1_idle_probe.py + .pyc; file
+1514 lines zero diff vs HEAD before appending. Infra unchanged since t112
+(Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log 2026-10-27
+17:30:18/30114 — zero connects); probe children 171676/171728 per the t118
+noise law. NO row closed (strict-close honest negative), no law falsified.
+NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands.

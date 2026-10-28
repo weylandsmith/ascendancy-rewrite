@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T02:26
+updated: 2026-10-28T02:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #38 done at t151; stop-report.md §44): loop awaits a user
+IDLE (re-check #39 done at t152; stop-report.md §45): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -271,7 +271,17 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     15:44:01.304 / size past 5691796463 B, OR a capture-side file newer
     than session start (only work/r1/loop/* = negative). If armed: run
     scripts/r1_t85g_sitting.py-style adjudication on the new
-    turn-boundary sitting (T>0-only slot law PLUS the t111 hygiene law —
+    turn-boundary sitting — PASS THE CAPTURE DIR AS ARGV[1] (t152 law;
+    since t152 it prints which dir it read). TWO HARNESS ROUTES, TWO
+    TIMELINES [verified]: r1_playcap_vnc.sh accumulates into
+    work/r1/playcap (the 5.7 GB shared file the probe baselines), while
+    r1_playcap.sh:78 starts a PER-RUN watcher writing
+    work/r1/playcap-<ts>/live-timeline.jsonl. Bare
+    `r1_t85g_sitting.py` defaults to the SHARED dir, so on a playcap.sh
+    capture it silently replayed the stale t1253/1254 sitting (measured: 45050
+    trusted rows vs 0 for the per-run dir) and printed its alliance/ship/
+    damage evidence as if it were the user's new game. Check the dir echo.
+    (T>0-only slot law PLUS the t111 hygiene law —
     idle boots also yield in_game=true and flat t=/score; require turn or
     score MOVEMENT across slots), then bank OQ-021/023/019 per
     docs/re/stop-report.md §4 (VNC route localhost:5910, launch via
@@ -294,6 +304,51 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T152 LANDED (IDLE re-check #39 — no trigger fired; deliverables:
+scripts/r1_t85g_sitting.py (argv[1] RUN + dir echo), docs/re/stop-report.md
+§45, docs/re/_wip_t152.md; no ledger row touched, game/ untouched, no watch or
+census run against the live capture). (1) Trigger (A) NEGATIVE — probe RC=0 at
+02:28:41 (cutoff 02:26:59): newest playcap dir playcap-20261014-224611;
+live-timeline.jsonl mtime_ns 1793043841304000000 / 5691796463 B (42nd
+consecutive byte-identical reading t111..t152; re-statted independently, exact
+match, equal to BASE_MTIME_NS/BASE_SIZE at r1_idle_probe.py:55-56); zero
+dosbox procs; find sweep non-loop none; A4 watcher ALIVE pid 27774; A5 none
+(save/*.sav = 20, all match the glob). (2) T151'S NEW CONTENT BASELINE
+REPRODUCED byte-for-byte — head 64 KiB md5 42a0bed0507f9052e2009ec94e9c27f1,
+tail 1529ab1ad70ac360f441d819703f943f: the touch-vs-ingest rule is now
+measured-reproducible, not merely recorded. (3) THE FINDING — a defect in the
+(A) re-arm PATH, downstream of the trigger. The instruction every idle turn
+hands forward ("run r1_t85g_sitting.py-style adjudication on the new sitting")
+named a tool that pinned its evidence dir (r1_t85g_sitting.py:18 == the shared
+work/r1/playcap). Two harnesses, two dirs [verified from source]:
+r1_playcap_vnc.sh ACCUMULATES into work/r1/playcap, while r1_playcap.sh — the
+user-facing one-shot STATE/(A) and stop-report §4 name as the launch path —
+creates work/r1/playcap-<ts>/ and at :78 starts a PER-RUN watcher writing a
+PER-RUN live-timeline.jsonl (4 of 5 playcap-* dirs hold one, 4.8 KB..284 KB).
+HAZARD PROVEN BY EXECUTION: per-run dir -> "0 trusted rows" (correct: 65 rows,
+ALL turn=0, a t82-law idle boot); legacy default -> "45050 trusted rows", the
+OLD shared t1253/1254 sitting printed WITH relation snapshots, ship events and
+damage deltas. A re-arm on a playcap.sh capture would have banked stale
+evidence as the user's new game — no error, no dir named. Same family as the
+0x88 pointer-law trap. FIX: RUN = sys.argv[1] else DEFAULT_RUN (back-compat
+for t85g's own historical re-runs) + the header echoes the source dir;
+py_compile clean, BOTH branches executed. LAW banked (generalising t145): when
+a procedure names a tool AND an object, verify the tool can address THAT
+object — a pinned default that was right for 30 turns proves nothing about the
+next. The trigger itself was never blind (r1_idle_probe.py:74 arms on any new
+playcap-<ts> name). (4) Trigger (B) NEGATIVE — clean tracked tree at 6ff9ded,
+no STEERING, B3 HEAD == journal row 73 sha 6ff9ded (re-read independently, ct
+02:26:06), prompt pair prompt-74 vs prompt-73 (58/58) digit-stripped delta 0.
+§3 answer outstanding after thirty-nine idle turns. (5) t147 law run again —
+r1_idle_probe.py:335-341 numeric sort, r1_playcap_watch.py:161 lowercase glob,
+r1_slot.py:49 .anch-cache.json all re-read from source; bank hygiene -> only
+r1_idle_probe.py docstring + .pyc, stop-report.md 1514 lines zero diff vs HEAD
+before appending. Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 /
+watcher 27774; x11vnc.log 2026-10-27 17:30:18/30114 — zero connects); probe
+children 171676/171728 per the t118 noise law. NO row closed (strict-close
+honest negative), no law falsified. NEXT stays IDLE; the t113 LOOP-END
+PROPOSAL stands. Gate 0.
 
 T151 LANDED (IDLE re-check #38 — no trigger fired; deliverables:
 docs/re/stop-report.md §44 appended, docs/re/_wip_t151.md; no ledger row

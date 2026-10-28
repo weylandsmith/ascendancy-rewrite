@@ -15,7 +15,16 @@ import sys
 sys.path.insert(0, "/home/hrethric/projects/ascendancy/scripts")
 import r1_stream
 
-RUN = "/home/hrethric/projects/ascendancy/work/r1/playcap"
+# t152: RUN was hard-coded to the SHARED accumulating dir (the one
+# scripts/r1_playcap_vnc.sh writes). scripts/r1_playcap.sh instead writes a
+# PER-RUN dir work/r1/playcap-<ts>/ with its own watcher and its own
+# live-timeline.jsonl, so adjudicating a playcap.sh capture with the old
+# constant silently replayed the stale shared sitting (t1253/1254) as if it
+# were the user's new game — the same silent-wrong-input shape as the 0x88
+# pointer-law trap. Default keeps back-compat; a sitting adjudication MUST
+# pass the capture dir the trigger named.
+DEFAULT_RUN = "/home/hrethric/projects/ascendancy/work/r1/playcap"
+RUN = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_RUN
 
 prev_rel = None          # first-row matrix of previous turn
 first_at = {}            # turn -> (states, atts) first row
@@ -94,7 +103,7 @@ for j in r1_stream.observations(RUN, trust=True, stats={}):
         prev_owner = owners
     n_rows += 1
 
-print(f"\ntrusted turn-change rows: {n_rows}")
+print(f"\ntrusted turn-change rows: {n_rows} (from {RUN})")
 print("\n== relation first-row snapshots t>=1250 ==")
 for t in sorted(first_at):
     if t >= 1250:
