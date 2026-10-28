@@ -422,3 +422,40 @@ hand-authored and safe from regeneration.
 stands: re-arm ONLY on trigger (A) new capture dir / timeline growth or
 trigger (B) a §3 answer. No row closed (strict-close honest negative), no
 banked law falsified, no new tool. NEXT stays IDLE.
+
+## 16. IDLE re-check #10 (t123, 2026-10-27 22:41 EDT) — steady-state negative
+
+Session start 22:39:11 (probe cutoff) / 22:40:57 (probe run).
+`python3 scripts/r1_idle_probe.py` RC=0, verdict IDLE from the tool's own
+printed evidence — no hand re-derivation needed (third fresh-reader run
+after t117 authored the tool, second clean steady-state reading).
+(A) NEGATIVE: newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns=1793043841304000000 / 5691796463 B — 13th consecutive byte-identical
+reading (t111..t123); zero dosbox procs; `find work/r1 -newermt <session
+start>` -> 4 files, non-loop: none. r1_t85g_sitting.py correctly not run; no
+watch/census executed per §6 discipline.
+(B) NEGATIVE: clean tracked tree at 00728b4 (`git diff HEAD --name-only` empty,
+`git status --porcelain` empty, no untracked), no STEERING file, no delta
+outside loop-owned paths. Steering check via the t118 digit-strip law:
+prompt-45.txt vs prompt-44.txt after `sed 's/[0-9]\+/N/g'` -> diff empty
+(generic loop prompt, no prepended note).
+
+Infra unchanged since t112 (Xvfb 1196, x11vnc 1207, watcher 27774; x11vnc.log
+2026-10-27 17:30:18 / 30114 B — still zero connects against the t111-FIXED
+launch path, so a user-side capture attempt remains possible but unobserved).
+INFRA-leg transients 133462 / 133529 (this session's runner + probe child)
+ignored per the t118 noise law.
+
+Bank-hygiene re-run fresh: `grep -rln stop-report scripts/` -> only
+r1_idle_probe.py and its `__pycache__` bytecode; no script regenerates the
+bank, so §16 is hand-authored and safe.
+
+§3 answer outstanding after TEN idle turns. Idle turns are now pure cost:
+each yields one commit and zero measurement, and the two-trigger probe is
+the cheapest possible form of that cost. Ledger unchanged 12 closed / 6 open
+(OQ-003, 005, 016, 019, 021, 023). The t113 LOOP-END PROPOSAL (§6) stands and
+is re-endorsed here: if no trigger arms, ending the loop at 12/6 is the honest
+outcome, not a failure — every remaining row is capture-gated or user-decision-
+gated and none can be closed by another idle session. No row closed
+(strict-close honest negative), no banked law falsified, no new tool.
+NEXT stays IDLE.
