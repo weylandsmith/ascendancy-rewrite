@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T21:55
+updated: 2026-10-27T22:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,17 +202,32 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #3 done at t116; stop-report.md §9): loop awaits a user
+IDLE (re-check #4 done at t117; stop-report.md §10): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
-idle — an idle turn is the two-trigger probe below and nothing else):
+idle — an idle turn is the two-trigger probe and nothing else).
+RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117):
+    `python3 scripts/r1_idle_probe.py` — RC=0 both negative (stay IDLE),
+    RC=1 a trigger armed (it prints which and why), RC=2 probe failure.
+    It encodes the four probe laws that cost iterations to earn:
+    session-start cutoff on the find sweep; CONTENT-diff (never mtime)
+    for (B); `ps -eo comm` matching (never `pgrep -af`, t114 self-match
+    trap); untracked files are informational, never a (B) trigger (the
+    loop's own _wip_*.md would otherwise arm it every turn). Timeline
+    path is work/r1/playcap/live-timeline.jsonl. Run it at SESSION START,
+    before editing docs — a loop-owned-only delta (STATE.md/stop-report.md)
+    prints a CAUTION and stays NEGATIVE, while a delta outside loop-owned
+    paths (rewrite/, PLAN.md, game docs) IS the user answer. If the tool's verdict
+    contradicts a hand reading, re-check the tool's OWN paths/baseline
+    before trusting either (t117 shipped two such defects, both caught
+    by execution).
 (A) NEW CAPTURE: a new work/r1/playcap-<ts>/ dir (selftest-t111-playcap
-    is a self-test artifact, NOT a capture), OR
-    work/r1/playcap/live-timeline.jsonl mtime past 2026-10-26
-    15:44:01.304 / size past 5691796463 B. Cross-check with
-    `find work/r1 -type f -newermt <session start>` — only
-    work/r1/loop/* files = negative. If armed: run
+    is a self-test artifact, NOT a capture, mtime 21:10 — ditto
+    work/r1/.anch-cache.json, written by scripts/r1_slot.py:49 during
+    that self-test), OR live-timeline.jsonl mtime past 2026-10-26
+    15:44:01.304 / size past 5691796463 B, OR a capture-side file newer
+    than session start (only work/r1/loop/* = negative). If armed: run
     scripts/r1_t85g_sitting.py-style adjudication on the new
     turn-boundary sitting (T>0-only slot law PLUS the t111 hygiene law —
     idle boots also yield in_game=true and flat t=/score; require turn or
@@ -223,14 +238,46 @@ idle — an idle turn is the two-trigger probe below and nothing else):
     (OQ-003 entropy, OQ-005 dims, OQ-019 sugar-cube [1,3]+immediate,
     OQ-023 threshold-only branch); authorize/refuse capture sittings;
     resume t89a follow-on code work or not. MEASURE WITH CONTENT, NOT
-    MTIME (t116 law): `git diff HEAD` + `git status --porcelain
-    --untracked-files=all` are decisive; `find docs -newermt <last
-    commit>` is NOT — the preflight gate runs after each commit and
-    mtime-touches docs/re/{text,modules,economy,gizmos,fnt}.md with zero
-    content delta. A real answer becomes the next STATE.md assignment
-    verbatim and REOPENS the loop.
+    MTIME (t116 law): `git diff HEAD` plus TRACKED `git status
+    --porcelain` lines are decisive; `find docs -newermt <last commit>`
+    is NOT — the preflight gate runs after each commit and mtime-touches
+    docs/re/{text,modules,economy,gizmos,fnt}.md with zero content delta;
+    and `--untracked-files=all` is NOT decisive (t117: it lists this
+    iteration's own files). Also check the harness prompt
+    work/r1/loop/prompt-<n>.txt for a prepended steering note. A real
+    answer becomes the next STATE.md assignment verbatim and REOPENS the
+    loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T117 LANDED (IDLE re-check #4 — no trigger fired; deliverables: NEW
+scripts/r1_idle_probe.py RC=0, docs/re/_wip_t117.md, stop-report.md §10
+appended; no ledger row touched, no code changed, no watch/census run per
+§6 discipline). The iteration's value is cost reduction: four consecutive
+idle turns had re-implemented the same probe by hand, so it is now a script
+that carries the probe laws with it. (1) Trigger (A) NEGATIVE at 21:56:50
+manual / re-confirmed by the tool at 22:01:45 — newest playcap dir
+20261014-224611; live-timeline.jsonl mtime 2026-10-26 15:44:01.304 /
+5691796463 B, 7th consecutive byte-identical reading (t111..t117); zero
+dosbox processes; session-start find sweep 4 files, all work/r1/loop/.
+r1_t85g_sitting.py correctly not run. (2) Trigger (B) NEGATIVE — clean
+tracked tree at 50f098e, no STEERING file, this iteration's harness prompt
+(prompt-39.txt) is the generic loop prompt (grep -i steering hits only the
+standing instruction line); §3 answer still outstanding. (3) TOOL DEFECTS
+found and fixed by execution while authoring (both are traps the next
+session hits blind — see stop-report §10): wrong timeline path printed
+"timeline missing" while a manual stat succeeded; and `--untracked-files=
+all` ARMED trigger (B) on the loop's own mid-iteration files. Hand-typed
+baseline ns was also wrong (stat %Y = 1793043841304000000), which produced
+an accidental POSITIVE CONTROL: the tool correctly reported ARMED + "timeline
+grew past frozen baseline", proving the growth leg is live. (4) Infra alive
+so the negatives are trustworthy: Xvfb 1196, x11vnc 1207, watcher
+27772+27774 (wrapper+child, normal); x11vnc.log 17:30:18.172 / 30114 B
+unchanged since t112, all 138 Client lines predate the t111 DISPLAY fix.
+(5) Bank-law pre-check: no script generates stop-report.md or _wip_*.md.
+NEXT = `python3 scripts/r1_idle_probe.py` on the next idle session; loop
+stays IDLE at 12 closed / 6 open. NO row closed (strict-close honest
+negative); no banked law falsified. Gate 0, LEDGER AUDIT OK
 
 T116 LANDED (IDLE re-check #3 — no trigger fired; deliverables:
 docs/re/_wip_t116.md, stop-report.md §9 appended; no ledger row touched,

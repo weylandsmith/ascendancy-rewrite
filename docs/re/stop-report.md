@@ -229,3 +229,64 @@ Three-probe probe, same result. Working notes `docs/re/_wip_t116.md`.
 Consequence: §6 LOOP-END PROPOSAL unchanged, 12 closed / 6 open. NO row
 closed (strict-close honest negative). Future idle turns: run the same
 three probes with the CONTENT-diff rule for (B).
+
+
+## 10. IDLE re-check #4 (t117, 2026-10-27 22:01 EDT) — probe TOOLIZED
+
+Three-probe probe, same result, plus the iteration's one real deliverable: the
+hand-run probe is now a script. Working notes `docs/re/_wip_t117.md`.
+
+- **NEW `scripts/r1_idle_probe.py`** (RC=0 = both triggers negative, RC=1 = a
+  trigger armed, RC=2 = probe failure). Idle turns should run this instead of
+  re-implementing the probes, so the four hard-won probe laws cannot be
+  "simplified" away by a fresh session: session-start cutoff for the find
+  sweep; CONTENT-diff (never mtime) for (B); `ps -eo comm` matching (never
+  `pgrep -af`); untracked files are informational, never a (B) trigger.
+  Two defects were found and fixed by execution during authoring — worth
+  keeping because they are the traps the NEXT session would hit blind:
+  (1) the timeline lives at `work/r1/playcap/live-timeline.jsonl`, NOT
+      `work/r1/live-timeline.jsonl` (wrong path printed "timeline missing"
+      while a manual `stat` read it fine);
+  (2) `git status --porcelain --untracked-files=all` ARMS (B) on this loop's
+      own mid-iteration files (`_wip_*.md`, the probe itself) — so (B) keys on
+      `git diff HEAD` + TRACKED porcelain lines only, untracked shown for
+      information. Baseline mtime_ns re-derived with `stat %Y` =
+      1793043841304000000 after a hand-typed value was wrong by 29536000000 ns.
+  Accidental positive control: with the wrong baseline the tool correctly
+  reported ARMED/"timeline grew past frozen baseline", so the growth-detect
+  leg is live, not decorative.
+  Two more refinements after the first green run: (3) the find sweep's
+  session-start cutoff prefers the timestamp the harness bakes into the
+  `iter-*.log` NAME (written at spawn; on t117 it equals the prompt-39 mtime
+  21:54:50 exactly — no drift measured here, NAME is just the more direct
+  source; prompt mtime remains the fallback). The manual manual sweep this
+  turn ran with cutoff 21:47:01 (t116's start — looser), still negative, so
+  the negative holds a fortiori at the true 21:54:50 cutoff.
+  (4) a mid-iteration re-run armed (B) on the loop's OWN edits (STATE.md,
+  stop-report.md). The fix is deliberately NOT silent: `docs/STATE.md` is the
+  assignment carrier, so a delta OUTSIDE loop-owned paths arms (B), while a
+  loop-owned-only delta prints a CAUTION naming the files and stays NEGATIVE.
+  Idle turns run the probe at session start, before editing anything, where the
+  distinction is moot.
+- (A) NEW CAPTURE: negative at 21:56:50 (manual) re-confirmed by the tool at
+  22:01:45 — newest playcap dir `20261014-224611`; `live-timeline.jsonl`
+  mtime 2026-10-26 15:44:01.304 / 5691796463 B, 7th consecutive
+  byte-identical reading (t111..t117); zero dosbox processes; session-start
+  find sweep -> 4 files, all `work/r1/loop/`. `r1_t85g_sitting.py` not run.
+  Sweep hygiene note: a LOOSER cutoff (~21:00) additionally lists
+  `work/r1/selftest-t111-playcap/*` and `work/r1/.anch-cache.json` (mtime
+  21:10:54, written by the t111 self-test analyzer via `scripts/r1_slot.py:49`)
+  — attribute both to the t111 harness, they are not capture activity.
+- (B) USER DECISION: negative. Clean tracked tree at 50f098e, no STEERING file,
+  and the harness prompt for this iteration (`work/r1/loop/prompt-39.txt`) is
+  the generic loop prompt — `grep -n -i steering` matches only the standing
+  instruction line. §3 answer still outstanding.
+- Infra alive so the negatives are trustworthy: Xvfb 1196, x11vnc 1207,
+  watcher 27772+27774 (wrapper+child, normal); `x11vnc.log` 17:30:18.172 /
+  30114 B unchanged since t112; all 138 `Client` lines predate the t111
+  DISPLAY fix — zero connects against the fixed launch path.
+
+Consequence: §6 LOOP-END PROPOSAL unchanged, 12 closed / 6 open. NO row closed
+(strict-close honest negative — bookkeeping plus tooling, no measurement of
+game behaviour). Future idle turns: `python3 scripts/r1_idle_probe.py`, read
+the verdict, and do not re-derive the probes by hand.
