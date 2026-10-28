@@ -2285,3 +2285,44 @@ ledger_audit.py docstrings + gate.sh comment only (same set as t163/t164);
 stop-report.md was 2253 lines / 138522 B zero-diff vs HEAD before appending
 this section. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (52 idle
 turns).
+
+## 59. t166 — IDLE re-check #53: both triggers negative (53rd idle turn)
+
+Fresh session; ran scripts/r1_idle_probe.py BEFORE any edit per the t117 law.
+
+TRIGGER A NEGATIVE — probe RC=0 at 06:30:16 on a clean tree at 488ea34
+("IDLE — neither trigger" wording valid per t155/B5): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B — byte-identical to BASE_MTIME_NS/BASE_SIZE, (A6) content
+baseline satisfied (55th consecutive identical reading t111..t166). Re-statted
+INDEPENDENTLY of the probe this turn (`stat -c '%y %s'` -> 2026-10-26
+15:44:01.304000000 -0400 / 5691796463) and the edge md5s re-derived by hand
+(head 42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f,
+last row still {"file":"60.sav","turn":1254,...}) — 12th reproduction of the
+t151 content baseline, matching edge_md5()'s own values exactly. Zero dosbox
+procs; find sweep since session start 06:28:36 -> 4 files, non-loop none; A4
+watcher ALIVE pid 27774; A5 none (save/*.sav = 20, all match the watcher glob).
+
+TRIGGER B NEGATIVE — git diff HEAD --name-only empty; tracked porcelain empty;
+no untracked paths at all (loop-owned or foreign); no STEERING file; B3 HEAD ==
+journal sha 488ea34 (journal row 87, ct 06:27:43, OK, fail_streak 0 —
+re-read independently from work/r1/loop/journal.tsv); prompt pair
+prompt-88.txt vs prompt-87.txt (58/58 lines) digit-stripped delta 0.
+
+LEDGER — ledger_index_check.py LEDGER INDEX OK before any edit (record
+rows=18 open=OQ-003/005/016/019/021/023 closed=12; STATE index mirrors it
+exactly). No OPEN-QUESTIONS row touched, so nothing to status-update this turn.
+
+INFRA unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 2026-10-27 17:30:18 / 30114 B — zero connects). Transients 201171 /
+201221 (harness supervisor + this session's probe child) per the t118 noise
+law, correctly ignored.
+
+HONEST NEGATIVE: no measurement, NO ledger row closed, no law falsified, no
+harness change this turn (per the t113 idle law: an idle turn is the
+two-trigger probe and nothing else — no watch, no census, no re-derivation of
+probes). Bank hygiene re-checked fresh: grep -rln stop-report scripts/ ->
+r1_idle_probe.py + ledger_audit.py docstrings + gate.sh:12 COMMENT only (same
+set as t163/t164/t165 — no script writes this file); stop-report.md was 2287
+lines / 140318 B zero-diff vs HEAD before appending this section. NEXT stays
+IDLE; the t113 LOOP-END PROPOSAL stands (53 idle turns).
