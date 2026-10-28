@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #11 done at t124; stop-report.md §17): loop awaits a user
+IDLE (re-check #12 done at t125; stop-report.md §18): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -249,6 +249,26 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117):
     loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T125 LANDED (IDLE re-check #12 — no trigger fired; deliverables:
+docs/re/stop-report.md §18 appended; no ledger row touched, no code changed,
+no watch/census run per §6 discipline). (1) Trigger (A) NEGATIVE —
+`python3 scripts/r1_idle_probe.py` RC=0 at 22:51:57 (session start 22:50:52):
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (15th consecutive byte-identical reading
+t111..t125); zero dosbox procs; session-start find sweep 4 files, non-loop:
+none. r1_t85g_sitting.py correctly not run. (2) Trigger (B) NEGATIVE — clean
+tracked tree at 86900c5 (diff HEAD empty, status --porcelain empty, no
+untracked), no STEERING file, prompt-47.txt identical to prompt-46.txt after
+digit-stripping (diff 0 lines), no delta outside loop-owned paths. §3 answer
+outstanding after twelve idle turns. Infra unchanged since t112 (Xvfb 1196 /
+x11vnc 1207 / watcher 27774; x11vnc.log 17:30:18 / 30114 B — zero connects
+against the t111-FIXED launch path); transients 135661 / 135777 per the t118
+noise law, correctly ignored. Bank-hygiene re-checked fresh: grep -rln
+stop-report scripts/ hits only r1_idle_probe.py + its pycache, no
+regeneration trap. NO row closed (strict-close honest negative), no law
+falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands.
+Gate 0, LEDGER AUDIT OK
 
 T124 LANDED (IDLE re-check #11 — no trigger fired; deliverables:
 docs/re/stop-report.md §17 appended; no ledger row touched, no code changed,

@@ -477,3 +477,25 @@ the t118 noise law. Bank-hygiene re-checked fresh: grep -rln stop-report
 scripts/ hits only r1_idle_probe.py + its __pycache__ bytecode — no
 regeneration trap. No row closed (strict-close honest negative), no banked
 law falsified, no new tool. NEXT stays IDLE.
+
+## 18. IDLE re-check #12 (t125, 2026-10-27 22:52 EDT) — steady-state negative
+
+`python3 scripts/r1_idle_probe.py` RC=0 at 22:51:57 (session start 22:50:52).
+(A) NEGATIVE: newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B (15th consecutive byte-identical
+reading t111..t125); zero dosbox procs; session-start find sweep 4 files, all
+work/r1/loop/. r1_t85g_sitting.py correctly not run. (B) NEGATIVE: clean
+tracked tree at 86900c5 (diff HEAD empty, status --porcelain empty, no
+untracked), no STEERING file, prompt-47.txt identical to prompt-46.txt after
+digit-stripping (`diff <(sed 's/[0-9]\+//g' 46) <(...47)` → 0 lines), no delta
+outside loop-owned paths. §3 answer outstanding after twelve idle turns. Infra
+unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log
+17:30:18 / 30114 B — still zero connects against the t111-FIXED launch path);
+transients 135661 / 135777 (this session's runner + probe child) ignored per
+the t118 noise law. Bank-hygiene re-checked fresh: `grep -rln stop-report
+scripts/` hits only r1_idle_probe.py plus its __pycache__ bytecode — no
+regeneration trap, hand-authoring safe. No row closed (strict-close honest
+negative), no banked law falsified, no new tool. The t113 LOOP-END PROPOSAL
+stands unchanged: twelve consecutive idle turns have produced zero
+measurement, and an idle session cannot close a capture-gated or
+decision-gated ledger row. NEXT stays IDLE.
