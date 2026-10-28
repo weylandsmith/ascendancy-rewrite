@@ -938,3 +938,35 @@ hand-authoring §32 is safe.
 Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
 measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
 twenty-six consecutive idle turns, zero measurement. NEXT stays IDLE.
+
+## 33. IDLE RE-CHECK #27 (t140, 2026-10-28 00:14 EDT) — negative
+
+`python3 scripts/r1_idle_probe.py` RC=0 at 00:14:34 (session start 00:12:50):
+newest playcap dir `playcap-20261014-224611`; `work/r1/playcap/live-timeline.jsonl`
+mtime_ns 1793043841304000000 / size 5691796463 — thirtieth consecutive
+byte-identical reading (t111..t140); zero dosbox processes; session-start find
+sweep 4 files, non-loop: none. `r1_t85g_sitting.py` correctly not run.
+
+Trigger (B) NEGATIVE: clean tracked tree at 52d8b81 (`git diff HEAD --name-only`
+empty, `git status --porcelain` empty, no untracked), no STEERING file, and
+`prompt-62.txt` identical to `prompt-61.txt` after digit-stripping (unified diff
+0 lines, both 58 lines) — the content-diff law from t116, not mtime. No delta
+outside loop-owned paths. The §3 user-decision list (accept/reject documented
+defaults OQ-003 entropy / OQ-005 dims / OQ-019 sugar-cube / OQ-023
+threshold-only; authorize capture sittings; resume t89a code work) is
+outstanding after twenty-seven idle turns.
+
+Infra unchanged since t112: Xvfb :9 pid 1196, x11vnc :5910 pid 1207, watcher
+pid 27774; `work/r1/vnc/x11vnc.log` mtime 2026-10-27 17:30:18 / size 30114 —
+still zero connect attempts against the t111-FIXED launch path. Transient pids
+153003 (harness loop runner, elapsed matches session start) and 153055 (probe
+child, gone on the follow-up `ps -p`) ignored per the t118 noise law.
+
+Bank hygiene re-checked fresh before appending: `grep -rln stop-report scripts/`
+hits only `r1_idle_probe.py` + its `__pycache__` bytecode; the file was at 940
+lines with zero diff against HEAD (§32's committed total), so hand-authoring
+§33 is safe.
+
+Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
+measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
+twenty-seven consecutive idle turns, zero measurement. NEXT stays IDLE.
