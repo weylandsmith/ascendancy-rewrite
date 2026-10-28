@@ -1037,3 +1037,36 @@ is safe.
 Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
 measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
 twenty-nine consecutive idle turns, zero measurement. NEXT stays IDLE.
+
+## 36. IDLE RE-CHECK #30 (t143, 2026-10-28 00:30 EDT) — negative
+
+`python3 scripts/r1_idle_probe.py` RC=0 at 00:30:54 (session start 00:29:08):
+newest playcap dir `playcap-20261014-224611`; `work/r1/playcap/live-timeline.jsonl`
+mtime_ns 1793043841304000000 / size 5691796463 — thirty-third consecutive
+byte-identical reading (t111..t143); zero dosbox processes; session-start find
+sweep 4 files, non-loop: none. `r1_t85g_sitting.py` correctly not run.
+
+Trigger (B) NEGATIVE: clean tracked tree at 2c6c274 (`git diff HEAD --name-only`
+empty, `git status --porcelain` empty, no untracked files), no STEERING file, and
+`prompt-65.txt` identical to `prompt-64.txt` after digit-stripping (`diff -u`
+0 lines, both 58 lines; `grep -in steering` hits only the standing instruction
+line 14) — content-diff law from t116, not mtime. No delta outside loop-owned
+paths. The §3 user-decision list (accept/reject documented defaults OQ-003
+entropy / OQ-005 dims / OQ-019 sugar-cube / OQ-023 threshold-only; authorize
+capture sittings; resume t89a code work) is outstanding after thirty idle turns.
+
+Infra unchanged since t112: Xvfb :9 pid 1196, x11vnc :5910 pid 1207, watcher
+pid 27774; `work/r1/vnc/x11vnc.log` mtime 2026-10-27 17:30:18 / size 30114 —
+still zero connect attempts against the t111-FIXED launch path. Transient pids
+156466 (`ps -o args=`: harness's own `mcp_death_supervisor.py --parent-pgid
+156446`) and 156528 (this session's own kernel/probe child, gone on follow-up
+`ps -p`) — harness/harness-adjacent python, ignored per the t118 noise law.
+
+Bank hygiene re-checked fresh before appending: `grep -rln stop-report scripts/`
+hits only `r1_idle_probe.py` + its `__pycache__` bytecode; the file was at 1039
+lines with zero diff against HEAD (§35's committed total), so hand-authoring §36
+is safe.
+
+Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
+measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
+thirty consecutive idle turns, zero measurement. NEXT stays IDLE.
