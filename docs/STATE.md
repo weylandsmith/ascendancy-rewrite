@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T23:12
+updated: 2026-10-27T23:24
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #16 done at t129; stop-report.md §22): loop awaits a user
+IDLE (re-check #17 done at t130; stop-report.md §23): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -249,6 +249,26 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117):
     loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T130 LANDED (IDLE re-check #17 — no trigger fired; deliverables:
+docs/re/stop-report.md §23 appended; no ledger row touched, no code changed,
+no watch/census run per §6 discipline). (1) Trigger (A) NEGATIVE —
+`python3 scripts/r1_idle_probe.py` RC=0 at 23:21:02 (session start 23:20:07):
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (20th consecutive byte-identical reading
+t111..t130); zero dosbox procs; session-start find sweep 4 files, non-loop:
+none. r1_t85g_sitting.py correctly not run. (2) Trigger (B) NEGATIVE — clean
+tracked tree at 69ed9b9 (diff HEAD empty, status --porcelain empty, no
+untracked), no STEERING file, prompt-52.txt identical to prompt-51.txt after
+digit-stripping (unified diff 0 lines, both 58 lines). §3 answer outstanding
+after seventeen idle turns. Infra unchanged since t112 (Xvfb 1196 / x11vnc
+1207 / watcher 27774; x11vnc.log 17:30:18/30114 — zero connects against the
+t111-FIXED launch path); transients 141762/141834/141847 per the t118 noise
+law, correctly ignored. Bank-hygiene re-checked fresh via probe output:
+grep -rln stop-report scripts/ hits only r1_idle_probe.py + its pycache — no
+regeneration trap. NO row closed (strict-close honest negative), no law
+falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands. Gate 0,
+LEDGER AUDIT OK
 
 T129 LANDED (IDLE re-check #16 — no trigger fired; deliverables:
 docs/re/stop-report.md §22 appended; no ledger row touched, no code changed,

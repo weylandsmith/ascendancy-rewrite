@@ -618,3 +618,31 @@ The t113 LOOP-END PROPOSAL stands unchanged: sixteen consecutive idle turns,
 zero measurement; an idle session cannot close a capture-gated or
 decision-gated row. NEXT stays IDLE.
 
+
+## 23. IDLE re-check #17 (t130, 2026-10-27 23:21 EDT) — steady-state negative
+
+Trigger (A) NEGATIVE. `python3 scripts/r1_idle_probe.py` RC=0 at 23:21:02
+(session start 23:20:07): newest playcap dir playcap-20261014-224611;
+live-timeline.jsonl mtime_ns 1793043841304000000 / 5691796463 B — the 20th
+consecutive byte-identical reading (t111..t130); zero dosbox procs;
+session-start find sweep 4 files, non-loop: none. `scripts/r1_t85g_sitting.py`
+correctly NOT run.
+
+Trigger (B) NEGATIVE. Clean tracked tree at 69ed9b9 (diff HEAD empty, status
+--porcelain empty, no untracked); no STEERING file in work/r1/loop/;
+prompt-52.txt identical to prompt-51.txt after digit-stripping (unified diff
+0 lines, both 58 lines). §3 answer outstanding after seventeen idle turns.
+
+Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 17:30:18/30114 — zero connects against the t111-FIXED launch path);
+transients 141762/141834/141847 are this iteration's own probe and shells per
+the t118 noise law, correctly ignored.
+
+Bank hygiene re-checked fresh (probe output): `grep -rln stop-report scripts/`
+hits only r1_idle_probe.py + its __pycache__ — no regeneration trap;
+hand-authoring §23 is safe.
+
+Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
+measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
+seventeen consecutive idle turns, zero measurement; an idle session cannot
+close a capture-gated or decision-gated row. NEXT stays IDLE.
