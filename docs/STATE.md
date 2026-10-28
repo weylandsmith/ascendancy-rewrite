@@ -238,7 +238,48 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-LANDED t182 (2026-10-28, this session): OQ-005 SHAPE-PNG DUMPER SHIPPED +
+LANDED t183 (2026-10-28, this session): OQ-019 SCALE MEASURED + TWO-TIER
+TURN CODE-MAPPED (row stays OPEN — strict-close; live flight delta still
+missing). Ships.md S17 is the artifact. Headline numbers [MEASURED 20/20
+playcap saves]: travel body FUN_00049f54 walks min(d_world/160, MOVES
+[ship+0x94]) SUGAR-CUBE units per resolver call; steps = max(1, round(walk))
+capped by fuel [ship+0x88] (fuel burned == steps); per-step displacement =
+unit_dir * (walk/steps) * 32.0 * 5.0 (const pool read LIVE IN SITU via the
+save's own FLD-moffs operands: 1/160 @RVA 0x25ff, 32.0 @0x2603, 5.0 @0x2607;
+data-slot law m = VA + 0x88, code-slot law m = payload_off + P0 — both
+re-verified). Grid quantizer FUN_000533e0 DAT_000895dc = 32 (20/20); live
+corroboration 23/35 ships exactly on the 32-grid, all 12 off-grid ships are
+mid-transit kind-2 orders. ROUND-ROBIN: turn loop FUN_00024f24 (turn u32
+++ at end, sole caller 0x55f06) -> 0x25400/0x255a4 -> FUN_0002547c sweeps
+until no resolver reports work; FUN_00041260 picks per call the MIN-FUEL
+ship with an order and refills MOVES to drive-stat sum (0x3ea08 <- 0x412d4).
+DAT_00012e10: 41 xrefs, ZERO obj0 writers -> no autonomous day-tick in
+obj0 code (R12: no byte-scan). LANE TRANSIT = same walk law gated by
+lane-matrix DAT_00045beb -1-gradient hop choice (verified, FUN_00041260
+case 1). KIND-5 emergency branch (0x4159a, slot-index immediate 0x24) is
+NOT the Lane Magnetron — index-36 == Disarmer by t46 file-order law, slot
+census 15/35 carry idx36 / 0 carry idx59; S16 item-3 magnetron tie stays
+UNMEASURED (corrects this session's mid-run overreach, caught by census).
+Tooling lesson: Ghidra headless load_program(work/ascend_restored.bin)
+after scripts/ghidra_headless_up.sh + connect_instance(ascend5) — project
+work/ghp5. Gate 0 + LEDGER AUDIT OK. WIP: docs/re/_wip_t183.md.
+
+NEXT t184 (STATIC): OQ-019 REMAINING LEG — the build/redesign inventory
+path (the one explicitly-listed offline residue of the row: how a design's
+gizmo list is committed to the ship record ring at build/redesign time,
+i.e. writers of the slot array law [ship+0xab]+i*7 {cidx u8, u8, u16} and
+the [ship+0x15a] count). Start: xrefs to +0x15a writers, FUN_0004a658's
+caller FUN_0004a74c (the other 0x4a658 edge, t47 upkeep side) and the
+design-screen handlers near the 0x46aec turn-loop bookkeeping call.
+Deliverable: cited build-time inventory law (or the measured reason it is
+UI-driven-only). RATIONALE: t183 landed; every other open row (OQ-005
+player eyeball on work/r1/shp_png/index.txt — surface at next decision
+trigger; OQ-016-tail, OQ-021, OQ-023 per t180, and OQ-019's flight delta
+per BLOCKED t48) needs a capture window or the player. This is the last
+fully-offline leg queued.
+
+(Prior LANDED t182 block follows; its NEXT/THEN paragraphs are SUPERSEDED
+by t183/t184/t185 above.) LANDED t182 (2026-10-28): OQ-005 SHAPE-PNG DUMPER SHIPPED +
 VALIDATOR OFF-BY-8 CORRECTION (ledger row stays OPEN — evidence packet now
 ready for the player's ruling; nothing closes today). Tooling:
 scripts/r1_t182_pngdump.py (run with ~/tools/revenv/bin/python — PIL only
@@ -264,23 +305,7 @@ ship art; 10status rec0 = legible "Empire status" panel. Banked: shp.md §18,
 OPEN-QUESTIONS OQ-005 STATUS t182 block, BLOCKED t68 amended count, ledger
 index unchanged (OQ-005 still open — correct). Gate 0 + both ledger checks.
 
-NEXT t183 (STATIC hunt): OQ-019 SCALE + TWO-TIER TURN — map the day-tick
-coupling and sub-turn round-robin per ships.md §16 testimony: start at the
-cited per-star stride-0x60 pass 0x2547c and DAT_00012e10 readers; seek the
-scale factor converting drive stat [+0x10] to walk units per sub-turn (walk
-body 0x533e0 callers), and whether lane transit is a separate law (magnetron
-candidate 0x21f58 tie, §16 item 3). Deliverable: tier-specific scale laws or
-the measured reason they are runtime-only.
-ORDERING RATIONALE: t182 landed (was first; the off-by-8 correction is the
-kind of ledger-integrity work the loop exists for). t183 is next because it
-is the only remaining queued item that is fully offline — OQ-016-tail/
-OQ-021/OQ-023 all need a capture window or live play (t180 closed the static
-route for OQ-023 explicitly; re-scan forbidden per diplomacy.md §13.5).
-OQ-005 now needs only ~30 min of the player's eyeball time on
-work/r1/shp_png/index.txt — surface it at the next decision trigger. t184
-stays deferred per t179c (user hold on the `l` key route).
-
-THEN t184 (DEFERRED — user hold, t179c): the `l` star-map key route. Player
+THEN t185 (DEFERRED — user hold, t179c): the `l` star-map key route. Player
 reports the original observation may have been key-mashing error; hold until
 the player re-tests live. Evidence so far: user testimony t85f + b-sting page
 ("All starlanes exposed", OR-sticky); ZERO cmp al,'l' sites in image. If

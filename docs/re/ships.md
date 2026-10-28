@@ -524,3 +524,84 @@ The player (who has ~1250 turns of play in the captured campaign) reports:
 Implication for the sugar-cube scale question: scale must be sought per tier
 (within-system walk units per sub-turn; lane transit as its own law), not as
 one global hop count. The [1,3] default is likely tier-blind.
+
+## 17. TRAVEL + SCALE LAWS CLOSED-EXCEPT-UNITS; ROUND-ROBIN RESOLVER CODE-MAPPED (t183)
+
+Method: Ghidra headless over work/ascend_restored.bin (load_program;
+project work/ghp5) + live float reads from the const pool IN SITU (read the
+FLD-moffs operand inside the save's copy of the function, then resolve
+operand VA -> m = VA + 0x88; cross-checked 20/20 playcap saves).
+
+T1 TRAVEL LAW FUN_00049f54 (sole caller FUN_00049f28 = the mode-gated
+commit entry; guard [ship+0x58]==4) [verified disasm 0x4a034..0x4a23d +
+decompile]:
+  delta   = target3 - [ship+0x9e]                      (world f32 units)
+  d_w     = sqrt(dot(delta,delta))                     (FUN_00076da0)
+  d       = d_w * 0.00625                              (= /160; f@0x25ff)
+  walk    = min(d, float[ship+0x94])                   (MOVES is SUGAR units)
+  steps   = max(1, round(walk))                        (never zero)
+  if int[ship+0x88] < steps: walk := walk*[+0x88]/steps; steps := [+0x88]
+  arrived := (walk == d)                               (flag 8)
+  per-step displacement = normalize(delta) * (walk/steps) * 32.0 * 5.0
+      (f@0x2603, f@0x2607 — decompiler's double-multiply is REAL: two
+       separate FMUL moffs verified; 32*5 = 160 inverts the /160)
+  commit (param_2==1 only — the standing COMMIT LAW): [ship+0x9e] := new
+  pos; [+0x88] -= steps; [+0x94] := round(remaining walk); arrival hooks
+  kind1->FUN_00049880, kind2->FUN_00049a34. Order kinds read at +0x67:
+  3=abs triple +0x6c, 1=ptr f[0..2], 2=handle (star ptr f0/1/2 or int
+  fields), other (incl 5) -> no walk (placement elsewhere).
+T2 SCALE CONSTANTS [MEASURED, stable 20/20 saves 41..60]:
+  restored RVA -> live VA + 0x88 -> m; pool sits in DATA seg right before a
+  '..\ship.cpp' debug string:
+    0x25ff -> 0.00625 (= 1/160, world->sugar)
+    0x2603 -> 32.0 ; 0x2607 -> 5.0  (sugar->world per-step pair, product 160)
+  => ONE SUGAR CUBE == 160 WORLD UNITS; MOVES budget is spent 1 sugar unit
+  per step. Vendor gizmos.txt 'Level: drives = max distance in sugar cube
+  units' now has its numeric meaning.
+T3 GRID QUANTIZER: walk body calls FUN_000533e0 which snaps coords to
+  g=DAT_000895dc multiples: coord := round(coord/g)*g (sign-directed).
+  DAT_000895dc = 32 MEASURED (20/20 saves; m = RVA + 0x1bf4d8 law).
+  LIVE CORROBORATION: 35 ship records (t101 locator, stride 0x162),
+  23/35 on the 32-grid exactly; the 12 off-grid ships are ALL order-kind-2
+  (star-targeted, mid-transit) with deviations {149.333=160*14/15 x3, 42,
+  28 x4, 14, 1 x4} — raw walk/place offsets, not quantized. Grid law reads
+  [verified] for stationary positions, [inferred] as arrival-time-only.
+T4 ROUND-ROBIN / SUB-TURN STRUCTURE [verified decompile FUN_0002547c +
+FUN_00041260 + FUN_0003ea08]: per-system exec builds the eligible-player
+list, then REPEATS sweeps while any ship reports work; each resolver call
+(1) refills MOVES [ship+0x94] := drive stat sum for all player ships
+(FUN_0003ea08 @0x412d4 -> FUN_0004a658), (2) collects ships with fuel>0,
+[ship+0x58]!=1, ownership bits, (3) picks the ONE with MINIMUM fuel [+0x88]
+(strict <, first-in-list on ties) that has an order [+0x5d]!=0, (4) commits
+its move, returns 'more work'. => interleaving is by REMAINING FUEL; FUEL
+(+0x88) is the multi-turn budget (only REFUEL orders restore it — S13 case
+'D'), MOVES is the per-call budget. Player testimony 'one sub-turn per day'
+maps to one sweep per turn-loop run; the day counter (*campaign u32 in
+FUN_00024f24, incremented at end, sole caller 0x55f06) has NO autonomous
+advancement in obj0: DAT_00012e10 (campaign+? cached turn) has 41 xrefs,
+ZERO writers in obj0 (R12: do not byte-scan for the writer).
+T5 LANE TRANSIT IS THE SAME WALK LAW UNDER A GRADIENT [verified in
+FUN_00041260 case 1]: hop target only accepted when lane matrix
+DAT_00045beb[srcIdx + dstIdx*100] of chosen neighbour == target entry
+MINUS 1; order then kind 2 (walk to star coords). No separate lane speed
+term: two engine classes exist only as gizmo categories feeding the SAME
+[ship+0x10] drive-stat SUM (stacking explained). Testimony item 2 'different
+speeds' is not contradicted (different Level values feed one stat sum) but
+no lane-specific multiplier exists in the walk body.
+T6 KIND-5 EMERGENCY BRANCH (0x4159a): FUN_00049768(ship, 0x24) slot-finder
+(sole immediate call site image-wide; FUN_00049768 = first slot with
+[ship+0xab+i*7]==edx), then [ship+0x62]=1, [ship+0x63]=slot ptr,
+[ship+0x67]=5, FUN_00049f28(ship,1) — no walk, placement-type order.
+MAGNETRON TIE NOT ESTABLISHED: if gizmo index == file row order (t46
+census law), immediate 36 = 'Disarmer', not 'Lane Magnetron' (file row 59);
+slot census: 15 of 35 ships carry idx36, ZERO carry idx59. The kind-5
+branch is therefore SOME one-shot placement gizmo, identity UNVERIFIED;
+§16 item 3 stays UNMEASURED — do not bank magnetron law.
+UNIT-SYSTEM STATUS: travel distance, MOVES spend, and the 160/32 constants
+are CITED; the remaining unit question (ship +0x9e units == star-table f32
+units, both world, vs a coarser star unit) is RESOLVED by T2/T3 reading as
+one consistent system (nearest-star distances 123-2278 world units / 160 =
+0.8-14.3 sugar per hop vs drive 2-12 live — plausible in-system/lane hops;
+[inferred]). Closure of OQ-019 still requires the live consecutive-save
+flight delta (BLOCKED t48 — zero flights in every passive corpus) plus the
+per-ship redesign inventory path; row stays OPEN.

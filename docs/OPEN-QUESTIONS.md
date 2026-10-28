@@ -1049,6 +1049,22 @@ go-to-star order handler 0x21f58 is cited). Queue t183: static hunt for the
 scale factor + the per-day tier (per-star 0x60-stride pass 0x2547c is the
 candidate). DECISION OPTIONS: accept default scale [1,3]+immediate arrival as
 documented default, or let t183 run first.
+STATUS t183 (static hunt RUN, ships.md §17): SCALE MEASURED AT LAST —
+travel body FUN_00049f54 walks min(d/160, MOVES[+0x94]) sugar units per
+resolver call, steps=max(1,round(walk)) capped by fuel [+0x88] (fuel==steps
+burned; MOVES refilled to drive sum EVERY resolver call via 0x3ea08<-
+0x412d4); const pool MEASURED live 20/20 saves: 1/160 @0x25ff, 32.0 @0x2603,
+5.0 @0x2607, grid quantizer DAT_000895dc=32 (§17 T2/T3). Round-robin is a
+MIN-FUEL one-ship-per-call resolver inside the turn loop FUN_00024f24
+(0x12e10: 41 xrefs ZERO obj0 writers — no autonomous day-tick found);
+lane transit = same walk law gated by lane matrix -1 gradient (§17 T4/T5).
+Rewrite default NOT changed this iteration: campaign.cpp:1022 driveHopsFor
+[1,3] is the LAUNCH-range default (ships.md §3, separate question); the
+per-tick movement layer has no sugar-scale site to upgrade until the live
+flight delta pins arrival granularity — row STAYS OPEN
+(pending: live consecutive-save flight delta per BLOCKED t48, per-ship
+redesign inventory, magnetron identity — index-36 census REFUTES the
+Magnetron tie: Disarmer row, §17 T6).
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:
