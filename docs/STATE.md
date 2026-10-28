@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T01:20
+updated: 2026-10-28T01:45
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #34 done at t147; stop-report.md §40): loop awaits a user
+IDLE (re-check #35 done at t148; stop-report.md §41): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -275,6 +275,35 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T148 LANDED (IDLE re-check #35 — no trigger fired; deliverables:
+docs/re/stop-report.md §41 appended, docs/re/_wip_t148.md; no ledger row
+touched, no code changed, no watch/census run per §6 discipline). (1) Trigger
+(A) NEGATIVE — probe RC=0 at 01:41:11 (cutoff 01:39:21 from the iter-*.log
+name): newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B (38th consecutive byte-identical
+reading t111..t148); zero dosbox procs; find sweep 4 files, non-loop: none;
+A4 watcher ALIVE pid 27774 => (A) fully adjudicated; r1_t85g_sitting.py
+correctly not run. (2) Trigger (B) NEGATIVE — clean tracked tree at 153a6f4,
+no STEERING, prompt-70 vs prompt-69 (58/58 lines) digit-stripped delta 0, B3
+HEAD == journal sha 153a6f4. §3 answer outstanding after thirty-five idle
+turns. (3) THE ITERATION'S VALUE — t147's NEAR-MISS law run PREEMPTIVELY:
+every load-bearing constant in the verdict resolved from source
+(r1_idle_probe.py:51-56) and independently re-statted before banking (size
+5691796463 / mtime_ns 1793043841304000000 — exact match); fresh-reader
+reproducibility confirmed, zero divergence. No new coverage hole: reviewed
+the full (A)/(B) trigger surface against stop-report §3/§6 — every documented
+user-answer route has an adjudicating leg. One asymmetry documented and
+deliberately declined: the find-sweep cutoff is session-start, but a real
+capture always also makes a playcap-<ts> dir and grows the timeline, so the
+leg is redundant-not-blind there; tightening it would add false-positive
+surface for no proven gain. Infra unchanged since t112 (Xvfb 1196 / x11vnc
+1207 / watcher 27774; x11vnc.log 2026-10-27 17:30:18/30114 — zero connects);
+transients 165351 (harness) / 165418 (probe child) per the t118 noise law.
+Bank hygiene checked fresh: grep -rln stop-report scripts/ -> only
+r1_idle_probe.py + pycache; zero diff vs HEAD at 1292 lines before appending
+§41. NO row closed (strict-close honest negative), no law falsified. NEXT
+stays IDLE; the t113 LOOP-END PROPOSAL stands. Gate 0.
 
 T147 LANDED (IDLE re-check #34 — no trigger fired; deliverables:
 scripts/r1_idle_probe.py (A4) leg, docs/re/stop-report.md §40,

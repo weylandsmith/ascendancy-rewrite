@@ -1290,3 +1290,47 @@ from variable NAMES. A false bug report costs more than a real one.
 
 Working notes docs/re/_wip_t147.md. NO ledger row closed (strict-close honest
 negative), no law falsified. NEXT stays IDLE.
+
+## 41. IDLE RE-CHECK #35 (t148, 2026-10-28 01:41 EDT) — negative; no new hole; probe self-consistency re-verified
+
+(1) TRIGGER (A) NEGATIVE — `python3 scripts/r1_idle_probe.py` RC=0 at
+01:41:11 (cutoff 01:39:21 from iter-20261028-013921-70.log): newest playcap
+dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (38th consecutive byte-identical reading
+t111..t148); zero dosbox procs; find sweep 4 files, non-loop: none; A4
+watcher ALIVE pid 27774, so (A) is fully adjudicated. r1_t85g_sitting.py
+correctly not run.
+
+(2) TRIGGER (B) NEGATIVE — clean tracked tree at 153a6f4 (diff HEAD empty,
+status --porcelain empty), no STEERING file, prompt-70 vs prompt-69 (58/58
+lines) digit-stripped delta 0, B3 HEAD == journal sha 153a6f4 (no commits
+outside the loop since the last iteration). §3 answer outstanding after
+thirty-five idle turns.
+
+(3) THE ITERATION'S VALUE — the t147 NEAR-MISS law executed preemptively
+instead of reactively: every load-bearing constant in the probe's verdict
+was resolved from source and re-measured independently BEFORE banking
+(`grep PLAYCAP|TIMELINE|BASELINE` -> r1_idle_probe.py:51-56,51 = work/r1 so
+TIMELINE = work/r1/playcap/live-timeline.jsonl; os.stat returned exactly the
+printed size 5691796463 / mtime_ns 1793043841304000000). Zero divergence
+between the tool's numbers and a fresh-reader stat: the verdict is
+reproducible without trusting the tool's prose.
+
+(4) NO new coverage hole this turn. Reviewed the trigger surface against the
+stop-report §3/§6 routes: (A) has dir/timeline/process/find/watcher-liveness
+legs; (B) has worktree-delta, STEERING, prompt-content, and committed-decision
+(B3) legs — every documented user-answer route now has an adjudicating leg.
+The one asymmetry noted and deliberately NOT changed: the find sweep's cutoff
+is session-start, so a capture-side file created BETWEEN iterations is missed
+by that leg only — but a real capture necessarily also creates a playcap-<ts>
+dir (leg 1) and grows the timeline (leg 2), and a stray file with neither is
+not a capture. Tightening the cutoff would trade a provably redundant check
+for new false-positive surface; declined.
+
+(5) Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 2026-10-27 17:30:18 / 30114 B — zero connects against the
+t111-FIXED launch path); transients 165351 (harness) / 165418 (probe child)
+per the t118 noise law. Bank hygiene checked fresh: grep -rln stop-report
+scripts/ -> only r1_idle_probe.py + pycache; zero diff vs HEAD at 1292 lines
+before appending §41. NO row closed (strict-close honest negative), no law
+falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands.
