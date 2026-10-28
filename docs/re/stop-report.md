@@ -2218,3 +2218,36 @@ work/) rather than the absence of one bad literal, because the literal's
 presence was never what made a launcher safe. Enforcement per t158: 3n2 lives
 inside gate.sh itself. NO ledger row closed (harness hardening, not
 measurement).
+
+## 57. t164 — IDLE re-check #51: both triggers negative (51st idle turn)
+
+Session start 2026-10-28 06:16:47 EDT, clean tree at ac43aa4 (verdict wording
+"IDLE — neither trigger" valid per t155/B5 — nothing edited before the probe
+run).
+
+TRIGGER A NEGATIVE — scripts/r1_idle_probe.py RC=0. Newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B — byte-identical to the frozen baseline for the 53rd consecutive
+reading (t111..t164); (A6) content-baseline leg satisfied; zero dosbox procs;
+find sweep since 06:15:29 -> 4 files, non-loop none; A4 watcher ALIVE pid
+27774; A5 none (save/*.sav = 20, all match the watcher glob).
+
+TRIGGER B NEGATIVE — git diff HEAD empty; tracked porcelain empty; no
+untracked paths at all (loop-owned or foreign); no STEERING file; B3 HEAD ==
+journal sha ac43aa4 (no commits outside the loop); prompt pair prompt-86.txt
+vs prompt-85.txt (58/58 lines) digit-stripped delta 0.
+
+LEDGER — ledger_index_check.py LEDGER INDEX OK before any edit (record
+rows=18 open=OQ-003/005/016/019/021/023 closed=12; STATE index mirrors it
+exactly).
+
+INFRA unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 2026-10-27 17:30:18 / 30114 B — zero connects).
+
+HONEST NEGATIVE: no measurement, NO ledger row closed, no law falsified, no
+harness change this turn (per the t113 idle law: an idle turn is the
+two-trigger probe and nothing else — no watch, no census, no re-derivation of
+probes). Bank hygiene: grep -rln stop-report scripts/ -> r1_idle_probe.py +
+ledger_audit.py docstrings + gate.sh comment only (same set as t163); stop-report.md
+was 2220 lines / 136735 B zero-diff vs HEAD before appending this section.
+NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (51 idle turns).
