@@ -271,9 +271,15 @@ THEN t182 (TOOL BUILD): OQ-005 SHAPE-PNG DUMPER — scripts/r1_t182_pngdump.py
 renders the 80 residue records (classes per BLOCKED t68) to
 work/r1/shp_png/<file>--<record>--<dims>.png via the rewrite ShapeLibrary
 (build tree exists per gate stage 4), each PNG validated non-empty +
-dimension-sane by the tool itself; produce index.txt for a ~20-sample human
-eyeball session. NO self-grading of correctness (R13 + strict-close): the
-dumper ships evidence, the player's ruling closes the row.
+dimension-sane by the tool itself. ALSO renders 3-5 CONTROL samples per the
+player's request: records from the 1477 decode-pass corpus spanning size
+classes (pick verbatim-verified libs; include one per class sel0/k>=1, at
+least one LARGE e.g. cos_star/sun-class and one small UI icon) into
+work/r1/shp_png/CONTROL--<name>.png so the eyeball has scale reference.
+index.txt lists CONTROLS first, then the 80 (grouped by class: span-undersized
+planind/3cfgnew, simple-format cos_star, stragglers). NO self-grading of
+correctness (R13 + strict-close): the dumper ships evidence, the player's
+ruling closes the row.
 
 THEN t183 (STATIC hunt): OQ-019 SCALE + TWO-TIER TURN — map the day-tick
 coupling and sub-turn round-robin per ships.md §16 testimony: start at the
@@ -283,10 +289,12 @@ body 0x533e0 callers), and whether lane transit is a separate law (magnetron
 candidate 0x21f58 tie, §16 item 3). Deliverable: tier-specific scale laws or
 the measured reason they are runtime-only.
 
-THEN t184 (STATIC, bounded, demoted not dropped): the `l` star-map key route —
-zero cmp al,'l' sites; check scancode paths (0x1e), dispatch tables,
-shift-state chains near 0x79950..0x79c20. One session; negative banked to
-debugflags.md + REFUTED-ROUTES if not found.
+THEN t184 (DEFERRED — user hold, t179c): the `l` star-map key route. Player
+reports the original observation may have been key-mashing error; hold until
+the player re-tests live. Evidence so far: user testimony t85f + b-sting page
+("All starlanes exposed", OR-sticky); ZERO cmp al,'l' sites in image. If
+re-test confirms, resume (scancode 0x1e paths, dispatch tables near
+0x79950..0x79c20); if refuted, mark both sources corrected in debugflags.md.
 
 IDLE RULE (t178) still stands for everything else: the harness polls in shell;
 a model session runs ONLY on armed trigger, dirty tree, or human queue

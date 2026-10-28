@@ -59,7 +59,7 @@ uppercase S/L/C for the sticky ones):
 | key | leaf | = |
 |---|---|---|
 | s/S | 0x79985 -> 0x79ace | REVEAL-ALL (gates 0x273a0 map-family 0x27-stride |=, 0x27401 star-family 0x60-stride |= b-sting "All stars explored"). STICKY LAW: reveal paths are OR-only, no inverse exists in code — matches user "can't be removed". |
-| l   | (lane reveal) | b-sting "All starlanes exposed"; same OR-only stickiness. |
+| l   | (lane reveal) | b-sting "All starlanes exposed"; same OR-only stickiness. CAUTION t179c: player may have been mashing keys when first reporting 'l' — observation UNCONFIRMED until re-test; zero cmp al,'l' sites exist image-wide (t85f). Hunt deferred (STATE t184). |
 | c   | 0x799e2 -> 0x79c35 (sets [esi+0x8]=1, clears flag bits 0x06 = redraw) | STATE-OF-GALAXY screen = 0x28059 displayer. Header "STARS CONTROLLED %d" (DAT_482fb) + "PERCENT CONTROLLED %d" (formula LIVE-VERIFIED in code 0x280c4..0x280e3: score*4-score=3*score, <<3=24*score, +score=25*score, <<2=100*score, idiv T -> TRUNC(100*score/T), T=(0x16143)>>16) + "BIORYTHM" header copied from 0x4850c + "%d Biorythym (%s)\n" + per-race rows "R%d %10s %d\n" (0x28128..0x28185: name tables PHASES@0x89050 = Peaceful/Neutral/Hostile stride12, RELNAMES@0x89074 = Unknown/Peace/War/Alliance stride10 — THE relation-state enum spelled out by the vendor: 3=Alliance, directly informs OQ-023). |
 | 'c' toggle | gate 0x2736f handler: NOT [obj+0x58e] | user-confirmed toggle; displayer test at 0x2805f: shows only when [ebp+0x58e]==flag value (-1). |
 | 1..7 | 0x799b7.. region | PLAY AS OTHER SPECIES (b-sting) — race-swap; art mismatch documented. Static hook sites [not individually pinned]. |
