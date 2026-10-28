@@ -571,3 +571,50 @@ tool. The t113 LOOP-END PROPOSAL stands unchanged: fifteen consecutive idle
 turns, zero measurement; an idle session cannot close a capture-gated or
 decision-gated ledger row. NEXT stays IDLE.
 
+## 22. IDLE re-check #16 (t129, 2026-10-27 23:16 EDT) — steady-state negative
+
+Ran the tool, did not re-derive the probes (t117 discipline):
+`python3 scripts/r1_idle_probe.py` at 23:16:09 (session start cutoff
+23:15:04), RC=0 before any doc edit.
+
+Trigger (A) NEW CAPTURE — NEGATIVE. Newest playcap dir still
+playcap-20261014-224611. `work/r1/playcap/live-timeline.jsonl`
+mtime_ns=1793043841304000000 / size=5691796463 B — the 19th consecutive
+byte-identical reading (t111..t129), i.e. the game has not been played since
+2026-10-26 15:44:01.304. Zero dosbox procs (`ps -eo comm` law, not
+`pgrep -af`). Session-start find sweep hit 4 files, all under
+work/r1/loop/* — loop-owned, so negative by law.
+`scripts/r1_t85g_sitting.py` correctly NOT run (no new turn-boundary sitting
+to adjudicate).
+
+Trigger (B) USER DECISION — NEGATIVE. HEAD at c933845 (t128) with a clean
+tracked tree: `git diff HEAD --name-only` empty, `git status --porcelain`
+empty, no untracked files at all. No STEERING file in work/r1/loop/. The
+harness prompt advanced to prompt-51.txt; after digit-stripping
+(`sed 's/[0-9]\+/N/g'`) it is byte-identical to prompt-50.txt — unified diff
+0 lines, both 58 lines — so there is no prepended steering note, only the
+standard iteration template. No delta outside loop-owned paths
+(rewrite/, docs/PLAN.md, game docs all untouched since their last commits).
+The §3 decision request (accept/reject the documented defaults for OQ-003
+entropy, OQ-005 dims, OQ-019 sugar-cube [1,3]+immediate, OQ-023
+threshold-only branch; authorize capture sittings; resume t89a code work) is
+still outstanding after sixteen idle turns.
+
+Infra — unchanged since t112: Xvfb 1196, x11vnc 1207, watcher 27774;
+x11vnc.log mtime 2026-10-27 17:30:18 / 30114 B, i.e. zero VNC connects
+against the t111-FIXED launch path. The two new python3 entries in the liveness
+listing (140640 / 140735, ages 01:03 and <1s) are this iteration's own probe
+and its parent shell — per the t118 noise law they are transients, not new
+infrastructure, and correctly ignored.
+
+Bank hygiene re-checked fresh this turn rather than assumed:
+`grep -rln stop-report scripts/` hits only scripts/r1_idle_probe.py and its
+__pycache__ entry — no script writes or regenerates this report, so
+hand-authoring §22 is safe (BLOCKED.md trap re-verified, not inherited).
+
+Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
+measurement, so nothing may close), no banked law falsified, no new tool.
+The t113 LOOP-END PROPOSAL stands unchanged: sixteen consecutive idle turns,
+zero measurement; an idle session cannot close a capture-gated or
+decision-gated row. NEXT stays IDLE.
+
