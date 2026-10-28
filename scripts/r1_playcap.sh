@@ -21,7 +21,21 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRATCH="$ROOT/work/r1/game"
 OUT="$ROOT/work/r1/playcap-$(date +%Y%m%d-%H%M%S)"
 TL="${TL:-1500}"                       # seconds of play; default 25 min
-DISPLAY="${DISPLAY:-:0}"               # your screen
+# DISPLAY (t111 fix): this host has NO :0 at all — /tmp/.X11-unix holds a
+# single socket (X9), fronted by x11vnc on localhost:5910. The old default
+# ":0" made a bare invocation die inside dosbox with zero slots and no
+# diagnostic, which is why the capture sessions never landed despite VNC
+# clients connecting. Respect an explicit DISPLAY; otherwise AUTO-DETECT the
+# first local socket that actually answers, and never guess a number.
+if [ -z "${DISPLAY:-}" ]; then
+  for s in /tmp/.X11-unix/X*; do
+    [ -S "$s" ] || continue
+    d=":${s##*/X}"
+    if DISPLAY="$d" timeout 5 xdpyinfo >/dev/null 2>&1; then DISPLAY="$d"; break; fi
+    DISPLAY=""
+  done
+  [ -n "$DISPLAY" ] || { echo "playcap: no answering X display (sockets: $(ls /tmp/.X11-unix 2>/dev/null | tr '\n' ' ')) — start Xvfb+x11vnc or pass DISPLAY=..."; exit 2; }
+fi
 command -v dosbox-x >/dev/null || { echo "dosbox-x not found"; exit 2; }
 [ -f "$SCRATCH/ascend.exe" ] || { echo "scratch build missing"; exit 2; }
 mkdir -p "$OUT/save"

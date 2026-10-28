@@ -351,6 +351,14 @@ end turn (OQ-023), and let two fleets exchange fire once, end turn
 with selector = uninitialized heap (e.g. 0xC500) — slot-adjudication
 law for the analyzer: trust slots with T>0 only.
 Status: READY, not yet run (agent does not play; needs the user).
+t111 AMENDMENT: the script's DISPLAY default was :0, which does not exist
+on this host (only socket X9 / Xvfb :9 + x11vnc localhost:5910) — a bare
+invocation silently failed, the probable reason ten VNC connection bursts on
+2026-10-27 produced no capture. Default is now autodetect (verified: a
+TL=90 self-test on :9 captured 9 slots end-to-end; artifact renamed
+work/r1/selftest-t111-playcap). Watch hygiene: idle boots still write slots
+with in_game=true, T=50, score=0 — mtimes + score movement, not in_game,
+prove a sitting.
 
 ## t89a — OQ-010 code-site upgrade: session budget interrupt (NOT a research block)
 

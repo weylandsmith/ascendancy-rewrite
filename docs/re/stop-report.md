@@ -81,7 +81,13 @@ real play is the whole point).
 
     cd ~/projects/ascendancy && ./scripts/r1_playcap.sh
     # TL=1500 default (25 min); override: TL=3600 ./scripts/r1_playcap.sh
-    # DISPLAY defaults to :0 — run on your own screen (interactive by design).
+    # DISPLAY (t111): the old default ":0" does NOT exist on this host
+    # (/tmp/.X11-unix has only socket X9) — a bare run died inside dosbox
+    # with zero slots and no diagnostic. The script now auto-detects the
+    # answering display (verified: resolves :9, self-test captured 9
+    # slots). To play visually: VNC viewer -> localhost:5910 (x11vnc on
+    # Xvfb :9; 800x600, viewer resize requests are refused by design),
+    # then run the script; the game window appears on that screen.
 
 Invariants (enforced by the script + gate 3n, docs/BLOCKED.md):
 - runs ONLY against the scratch copy work/r1/game — game/ is NEVER
