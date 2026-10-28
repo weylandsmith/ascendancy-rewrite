@@ -202,15 +202,15 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #31 done at t144; stop-report.md §37): loop awaits a user
+IDLE (re-check #32 done at t145; stop-report.md §38): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
 idle — an idle turn is the two-trigger probe and nothing else).
-RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117):
+RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145):
     `python3 scripts/r1_idle_probe.py` — RC=0 both negative (stay IDLE),
     RC=1 a trigger armed (it prints which and why), RC=2 probe failure.
-    It encodes the four probe laws that cost iterations to earn:
+    It encodes the probe laws that cost iterations to earn:
     session-start cutoff on the find sweep; CONTENT-diff (never mtime)
     for (B); `ps -eo comm` matching (never `pgrep -af`, t114 self-match
     trap); untracked files are informational, never a (B) trigger (the
@@ -218,10 +218,21 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117):
     path is work/r1/playcap/live-timeline.jsonl. Run it at SESSION START,
     before editing docs — a loop-owned-only delta (STATE.md/stop-report.md)
     prints a CAUTION and stays NEGATIVE, while a delta outside loop-owned
-    paths (rewrite/, PLAN.md, game docs) IS the user answer. If the tool's verdict
-    contradicts a hand reading, re-check the tool's OWN paths/baseline
-    before trusting either (t117 shipped two such defects, both caught
-    by execution).
+    paths (rewrite/, PLAN.md, game docs) IS the user answer.
+    AS OF t145 the tool covers BOTH (B) routes, including the prompt note:
+    `trigger_b()` numerically sorts prompt-*.txt and digit-stripped-diffs
+    newest vs its numeric predecessor (arms on content delta, annotates
+    numbering drift). The hand `ls -1v` diff is therefore no longer
+    required; run it only if the tool's prompt leg errors.
+    t145 LESSON (how to trust a probe): "the tool touches X" != "the tool
+    adjudicates X". t144 cited `r1_idle_probe.py:82-84` (getmtime on the
+    prompt glob) as proof the tool was immune to the lexical-sort trap;
+    those lines are the FALLBACK session-start cutoff and the tool then
+    had NO prompt-content check at all — the only steering leg was an
+    existence glob `ls docs/STEERING* STEERING*`, so a PREPENDED prompt
+    note could never arm (B). If a probe's verdict contradicts a hand
+    reading, re-check the probe's OWN paths/baseline AND ask what it does
+    with each documented input, not merely whether it reads the file.
 (A) NEW CAPTURE: a new work/r1/playcap-<ts>/ dir (selftest-t111-playcap
     is a self-test artifact, NOT a capture, mtime 21:10 — ditto
     work/r1/.anch-cache.json, written by scripts/r1_slot.py:49 during
@@ -243,15 +254,53 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117):
     is NOT — the preflight gate runs after each commit and mtime-touches
     docs/re/{text,modules,economy,gizmos,fnt}.md with zero content delta;
     and `--untracked-files=all` is NOT decisive (t117: it lists this
-    iteration's own files). Also check the harness prompt
-    work/r1/loop/prompt-<n>.txt for a prepended steering note — ENUMERATE
-    WITH `ls -1v` (t144 law: `ls -1 | tail -1` returns prompt-9.txt, a
-    single-digit prompt from ~57 turns ago, so the digit-strip diff is
-    silently against the wrong pair; the probe tool itself is immune — it
-    picks the prompt by mtime, see r1_idle_probe.py:82-84). A real answer
-    becomes the next STATE.md assignment verbatim and REOPENS the loop.
+    iteration's own files). Steering note route: the harness prepends a
+    note to work/r1/loop/prompt-<n>.txt — the TOOL now adjudicates this by
+    digit-stripped content diff (t145); if you must do it by hand,
+    enumerate with NUMERIC sort, never `ls -1` (t144 law: `ls -1 | tail
+    -1` returns prompt-9.txt, a single-digit prompt ~57 turns old, so the
+    diff silently compares the wrong pair). A real answer becomes the
+    next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T145 LANDED (IDLE re-check #32 — no trigger fired; deliverables:
+scripts/r1_idle_probe.py (B2) leg + HEAD-echo trim, docs/re/stop-report.md §38,
+docs/re/_wip_t145.md; no ledger row touched, no rewrite/ change, no watch/census
+run per §6 discipline). (1) Trigger (A) NEGATIVE — probe RC=0 at 00:44:23
+(cutoff 00:43:18 from the iter-*.log name): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (35th consecutive byte-identical reading t111..t145); zero dosbox
+procs; find sweep 4 files, non-loop: none; r1_t85g_sitting.py correctly not run.
+(2) Trigger (B) NEGATIVE — clean tracked tree at de16f04 pre-edit, no STEERING
+file, prompt-67 vs prompt-66 (58/58 lines) digit-stripped delta 0, no delta
+outside loop-owned paths. §3 answer outstanding after thirty-two idle turns.
+(3) THE ITERATION'S VALUE — a coverage hole in the idle probe, found by asking
+what the tool DOES with prompts rather than whether it reads them: t144 banked
+"the TOOL is immune (r1_idle_probe.py:82-84 picks the prompt by mtime)" while
+those lines are the fallback session-start cutoff and the tool's only steering
+leg was an existence glob over docs/STEERING* — so the documented prepended-
+prompt-note route could NEVER arm (B), for every idle turn since the tool
+shipped, and the hand check that did cover it was discouraged by the NEXT ACTION
+text. Fixed in code (numeric prompt sort + digit-stripped unified diff, arms on
+content delta, annotates numbering drift) and verified on all four branches by
+real execution: real state NEGATIVE RC=0; prepended note RE-ARM; word-level edit
+ARMED RC=1; digit-only diff line NEGATIVE RC=0 with the drift annotation. Also
+trimmed the HEAD echo to 130 chars — trigger_b() printed `git log --oneline -1`
+whole and idle subjects grow monotonically (800->1310 chars over the last 25
+commits), so each re-check re-read the previous LANDED summary; FUTURE TURNS:
+keep commit subjects under ~200 chars, STATE.md's LANDED block is the record.
+Tester lesson banked §38: delete the positive fixture BEFORE running the negative
+control (my first control compared prompt-99-vs-98 because prompt-98 had been
+removed but 99 was still there), and `RC=$?` after a pipe reads grep, not the
+probe. Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 2026-10-27 17:30:18/30114 — zero connects); transient 158952 (harness
+mcp_death_supervisor --parent-pgid 158932) per the t118 noise law. Bank hygiene
+checked fresh: grep -rln stop-report scripts/ -> only r1_idle_probe.py + pycache;
+1117 lines zero diff vs HEAD before appending §38. NO row closed (strict-close
+honest negative): ledger_audit rows=18 open=[OQ-003,OQ-005,OQ-016,OQ-019,OQ-021,
+OQ-023] closed=12, LEDGER AUDIT OK. NEXT stays IDLE. Gate 0.
+
 
 T144 LANDED (IDLE re-check #31 — no trigger fired; deliverables:
 docs/re/stop-report.md §37 appended; no ledger row touched, no code changed,

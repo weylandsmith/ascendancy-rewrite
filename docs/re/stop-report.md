@@ -1115,3 +1115,78 @@ is safe.
 Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
 measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
 thirty-one consecutive idle turns, zero measurement. NEXT stays IDLE.
+
+## 38. IDLE RE-CHECK #32 (t145, 2026-10-28 00:44 EDT) — negative + probe coverage-hole FIX
+
+`python3 scripts/r1_idle_probe.py` RC=0 (session start 00:43:18 per the
+iter-*.log-name law; wall clock 00:44:23): newest playcap dir
+`playcap-20261014-224611`; `work/r1/playcap/live-timeline.jsonl` mtime_ns
+1793043841304000000 / size 5691796463 — thirty-fifth consecutive byte-identical
+reading (t111..t145); zero dosbox processes; session-start find sweep 4 files,
+non-loop: none. `r1_t85g_sitting.py` correctly not run. Trigger (B) NEGATIVE by
+content: clean tracked tree at de16f04 before this iteration's edits, no STEERING
+file, prompt-67 vs prompt-66 (58/58 lines) digit-stripped delta 0. §3 answer
+outstanding after thirty-two idle turns.
+
+FINDING — t144's "the TOOL is not affected" claim was WRONG, and the error is a
+COVERAGE HOLE, not a wrong answer. `r1_idle_probe.py:82-84` (mtime prompt pick)
+is real but is only the FALLBACK session-start cutoff (used when no `iter-*.log`
+name parses) — it has nothing to do with steering. The tool's actual steering
+check was `steer = sh("ls docs/STEERING* STEERING*")` (existence glob, two
+paths). Grepping the whole file for `prompt|steer` before t145's edit hit only
+lines 65/69/82/84 (cutoff) and 130-133 (glob): the tool NEVER diffs prompt
+contents. But the loop's own contract ("the steering note, if the harness
+prepended one", prompt line 14) and §(B) name the PREPENDED PROMPT NOTE as the
+steering mechanism — so for every idle turn since the tool shipped, trigger (B)
+was carried by a probe blind to one of its two documented inputs, while the only
+procedure that covered it (the hand `ls -1v` diff) was actively discouraged by
+the t144 NEXT ACTION text. Silent in the benign direction: "STEERING file: none"
+reads identically whether or not a note was prepended. (t144 misattribution
+mechanism: it saw `getmtime` on the prompt glob, pattern-matched "prompt handled",
+and never asked what the tool DOES with prompts.)
+
+FIX APPLIED (scripts/r1_idle_probe.py, loop-owned file, gate does not checksum
+scripts/ contents — verified: gate.sh greps scripts/ only for stage existence and
+r1_attempt.sh invariants): (1) new (B2) leg in `trigger_b()` — numeric sort of
+`prompt-*.txt` (t144 law enforced in code, not prose), digit-stripped unified
+diff of newest vs numeric predecessor, ARM on stripped delta > 0, print pair +
+line counts + delta size; raw-vs-stripped annotation distinguishes
+iteration-numbering drift from content change. (2) HEAD echo truncated to 130
+chars: `trigger_b()` used to print `git log --oneline -1` whole, and idle-turn
+subjects summarise the previous iteration (lengths over last 25 commits: 800 ->
+1310, monotonically growing), so every re-check paid ~1.3k chars to re-read the
+last LANDED summary; full text lives in STATE.md where successors actually read
+it.
+
+TEST MATRIX (real executions, all four branches; temp files created and deleted
+inside the same command, prompt dir verified back to prompt-67 as newest):
+  a. real state (prompt-67 vs 66): delta 0 -> NEGATIVE, RC=0.
+  b. prepended note (temp prompt-99 = "STEERING: accept the OQ-019
+     sugar-cube default..." + full 67 text): stripped delta > 0 -> verdict
+     RE-ARM; RC=1 confirmed on the analogous stripped-delta case (c).
+  c. word-level content edit ("READ FIRST" -> "READ 77 FIRST", raw 2,
+     stripped 2): ARMED, RC=1 (captured before grepping).
+  d. pure digit-only DIFF line ("1." -> "9.", raw 2 stripped 0): NEGATIVE, RC=0,
+     prints "[raw delta 2 line(s) but digit-stripped delta 0 =
+     iteration-numbering drift only]".
+First control attempt was INVALID and is kept as a lesson: prompt-98 and
+prompt-99 were both present when control 1 ran, so the numeric pair compared
+99-vs-98 (note included) instead of drift-only 98-vs-67 — the probe reported the
+truth about the state it saw; the tester's cleanup order was wrong. A control
+must delete the positive fixture BEFORE running the negative leg, and `RC=$?`
+after a pipe reads the LAST command (grep), not the probe — capture RC before
+grepping.
+
+Ledger untouched: `ledger_audit.py` -> rows=18 open=['OQ-003','OQ-005','OQ-016',
+'OQ-019','OQ-021','OQ-023'] closed=12, LEDGER AUDIT OK. Infra unchanged since
+t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log 2026-10-27
+17:30:18/30114 — zero connects). Transients 158952 (harness mcp_death_supervisor
+--parent-pgid 158932, via `ps -o args=`) per the t118 noise law. Bank hygiene
+checked before appending: `grep -rln stop-report scripts/` -> only
+r1_idle_probe.py + pycache; file at 1117 lines with zero diff vs HEAD (§37's
+committed total).
+
+Verdict: NO ledger row closed (strict-close — an idle turn produces no cited
+measurement). The t113 LOOP-END PROPOSAL stands: thirty-two consecutive idle
+turns, zero measurement — but from t145 onward the IDLE verdict is backed by a
+probe that actually covers both documented (B) inputs. NEXT stays IDLE.

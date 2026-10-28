@@ -14,13 +14,20 @@ Laws encoded here (each earned the hard way, do not "simplify" them away):
       the preflight gate runs after each commit and mtime-touches
       docs/re/{text,modules,economy,gizmos,fnt}.md with zero content delta
       (t116 pitfall).
+  (B2) the steering NOTE route (harness prepends text to
+      work/r1/loop/prompt-<n>.txt) is NOT covered by the STEERING-file glob:
+      only a CONTENT diff of the newest prompt vs its numeric predecessor arms
+      it (t145 coverage hole). Enumerate with NUMERIC sort, never `ls -1`
+      lexical order (t144 law: `tail -1` returns prompt-9.txt).
   Process check uses `ps -eo comm` matching, NOT `pgrep -af` (self-match
   false-positive trap, t114).
   Watcher pids 27772+27774 are bash-wrapper + python-child — the PAIR is
   normal, not a duplicate (t115).
 """
+import difflib
 import glob
 import os
+import re
 import subprocess
 import sys
 import time
@@ -100,7 +107,10 @@ def trigger_b():
     # untracked mid-iteration and must not read as a user answer (t117).
     status = sh("git status --porcelain").strip()
     head = sh("git log --oneline -1").strip()
-    reasons.append("HEAD: %s" % head)
+    # t145: idle-turn subjects summarise the previous iteration, so printing the
+    # whole thing taxes every re-check (~1.3k chars, growing monotonically). The
+    # full text lives in docs/STATE.md's LANDED block, where it is actually read.
+    reasons.append("HEAD: %.130s%s" % (head, "..." if len(head) > 130 else ""))
     reasons.append("git diff HEAD --name-only: %s" % (diff.splitlines() or "empty"))
     tracked = [l for l in status.splitlines() if not l.startswith("??")]
     reasons.append("git status --porcelain (tracked): %s" % (tracked or "empty"))
@@ -131,6 +141,46 @@ def trigger_b():
     reasons.append("STEERING file: %s" % (steer or "none"))
     if steer:
         armed = True
+    # (B2) t145: the STEERING glob above is file-EXISTENCE only. The other
+    # documented steering route -- the harness PREPENDING a note to this
+    # iteration's prompt file -- is invisible to it, so adjudicate it by
+    # content here. NUMERIC sort (t144: `ls -1 | tail -1` -> prompt-9.txt).
+    def _num(path):
+        m = re.search(r"(\d+)", os.path.basename(path))
+        return int(m.group(1)) if m else -1
+
+    prompts = sorted(glob.glob(os.path.join(PLAYCAP, "loop", "prompt-*.txt")),
+                     key=_num)
+    if len(prompts) < 2:
+        reasons.append("prompt content delta: UNKNOWN (<2 prompt files)")
+    else:
+        newest, prev = prompts[-1], prompts[-2]
+        with open(newest, encoding="utf-8", errors="replace") as fh:
+            n_txt = fh.read()
+        with open(prev, encoding="utf-8", errors="replace") as fh:
+            p_txt = fh.read()
+        strip = lambda t: re.sub(r"\d+", "N", t)  # noqa: E731
+        n_lines, p_lines = len(n_txt.splitlines()), len(p_txt.splitlines())
+        raw = [l for l in difflib.unified_diff(p_txt.splitlines(),
+                                               n_txt.splitlines(), lineterm="")
+               if l[:1] in "+-" and l[:3] not in ("+++", "---")]
+        stripped = [l for l in difflib.unified_diff(strip(p_txt).splitlines(),
+                                                    strip(n_txt).splitlines(),
+                                                    lineterm="")
+                    if l[:1] in "+-" and l[:3] not in ("+++", "---")]
+        note = ""
+        if raw and not stripped:
+            note = (" [raw delta %d line(s) but digit-stripped delta 0 ="
+                    " iteration-numbering drift only]" % len(raw))
+        reasons.append("prompt pair %s vs %s (%d/%d lines): digit-stripped delta"
+                       " %d line(s)%s" % (os.path.basename(newest),
+                                          os.path.basename(prev),
+                                          n_lines, p_lines, len(stripped), note))
+        if stripped:
+            armed = True
+            reasons.append("PROMPT CONTENT CHANGED: %d line(s) -- read %s, a"
+                           " prepended steering note is the loop's assignment"
+                           % (len(stripped), newest))
     return armed, reasons
 
 
