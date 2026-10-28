@@ -151,3 +151,27 @@ Re-open path (either event, any time):
 
 Until one of those arrives, docs/STATE.md NEXT ACTION is IDLE and the
 loop should not burn further iterations on watches.
+
+## 7. IDLE re-check #1 (t114, 2026-10-27 21:45 EDT)
+
+Per §6 the loop is event-driven: this turn did NOT run a watch or a
+census, it only tested the two re-arm triggers once, fresh.
+
+- (A) NEW CAPTURE — negative. Newest playcap dir still
+  `work/r1/playcap-20261014-224611`; `live-timeline.jsonl` mtime
+  2026-10-26 15:44:01.304 / 5691796463 B (4th consecutive byte-identical
+  reading vs t111/t112/t113); no dosbox process (`pgrep -x dosbox-x`
+  empty — an `pgrep -af dosbox` self-match on the probing command line
+  is a false positive, re-verified via `ps -eo comm`).
+  `scripts/r1_t85g_sitting.py` correctly not run.
+- (B) USER DECISION — negative. Clean tree (`git status -uall` empty),
+  no harness steering note, no STEERING file, nothing edited after
+  commit fd49364.
+- Infra alive (Xvfb :9 pid 1196, x11vnc :5910 pid 1207, watcher pid
+  27772) so the negative is trustworthy; `x11vnc.log` mtime unchanged at
+  2026-10-27 17:30:18.172 — still zero connects against the t111-fixed
+  launch path.
+
+Consequence: §6 stands unchanged (12 closed / 6 open). Honest negative
+banked to docs/re/_wip_t114.md; no ledger row touched. Future idle turns
+should repeat exactly this two-trigger probe and nothing else.

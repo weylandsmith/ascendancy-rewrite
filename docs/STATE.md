@@ -202,10 +202,11 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE: loop awaits a user event; re-arm ONLY on one of these two triggers
-(t113 issued the LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after
-three consecutive empty watches t111/t112/t113; do NOT run another watch
-or census while idle):
+IDLE (re-check #1 done at t114; stop-report.md §7): loop awaits a user
+event; re-arm ONLY on one of these two triggers (t113 issued the
+LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
+empty watches t111/t112/t113; do NOT run another watch or census while
+idle — an idle turn is the two-trigger probe below and nothing else):
 (A) NEW CAPTURE: a new work/r1/playcap-<ts>/ dir (selftest-t111-playcap
     is a self-test artifact, NOT a capture), OR
     work/r1/playcap/live-timeline.jsonl mtime past 2026-10-26
@@ -223,6 +224,25 @@ or census while idle):
     STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T114 LANDED (IDLE re-check #1 — no trigger fired; deliverables:
+docs/re/_wip_t114.md, stop-report.md §7 appended; no ledger row touched,
+no code changed, no watch run per §6 discipline): (1) trigger (A)
+measured NEGATIVE fresh — newest playcap dir 20261014-224611;
+live-timeline.jsonl mtime 2026-10-26 15:44:01.304 / 5691796463 B,
+4th consecutive byte-identical reading (t111/t112/t113/t114); no dosbox
+process (ps -eo comm empty for dosbox; NOTE: `pgrep -af dosbox` can
+self-match the probing shell's own command line — false positive,
+confirm with `pgrep -x dosbox-x` / ps). r1_t85g_sitting.py correctly not
+run. (2) trigger (B) measured NEGATIVE — git tree clean at fd49364, no
+harness steering note, no STEERING file, no post-commit doc edits.
+(3) Watch infra verified alive (Xvfb :9 pid 1196, x11vnc :5910 pid 1207,
+watcher pid 27772) so the negative is trustworthy; x11vnc.log mtime
+2026-10-27 17:30:18.172 unchanged — still zero VNC connects against the
+t111-FIXED launch path. NEXT = same two-trigger probe on the next idle
+session (stop-report §7 wording); loop stays IDLE at 12 closed / 6 open.
+NO row closed (strict-close honest negative); no banked law falsified;
+no new tool. Gate 0, LEDGER AUDIT OK
 
 T113 LANDED (FINAL WATCH + LOOP-END PROPOSAL — idle turn #3; deliverables:
 docs/re/stop-report.md §6 NEW dated block, docs/re/_wip_t113.md; no ledger
