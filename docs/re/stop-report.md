@@ -1579,3 +1579,58 @@ hygiene: grep -rln stop-report scripts/ -> only r1_idle_probe.py + .pyc; file
 17:30:18/30114 — zero connects); probe children 171676/171728 per the t118
 noise law. NO row closed (strict-close honest negative), no law falsified.
 NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands.
+
+## 46. IDLE RE-CHECK #40 (t153, 2026-10-28 02:50 EDT) — negative; (B4) coverage FIX: a decision delivered as a NEW untracked file was invisible to every (B) leg
+
+(1) Trigger (A) NEGATIVE — `python3 scripts/r1_idle_probe.py` RC=0 at 02:50:35
+(session-start cutoff 02:48:55): newest playcap dir playcap-20261014-224611;
+live-timeline.jsonl mtime_ns 1793043841304000000 / 5691796463 B (43rd
+consecutive byte-identical reading t111..t153; re-statted independently, size
+exact match, equal to BASE_MTIME_NS/BASE_SIZE at r1_idle_probe.py:55-56
+re-read from source); zero dosbox procs; find sweep non-loop none; A4 watcher
+ALIVE pid 27774; A5 none (save/*.sav = 20, all match the glob). r1_t85g_sitting.py
+correctly NOT run; its t152 argv law re-verified from source (:26-27
+DEFAULT_RUN / RUN = sys.argv[1]).
+
+(2) T151 CONTENT BASELINE REPRODUCED a third time, byte-identical: head-64KiB
+md5 42a0bed0507f9052e2009ec94e9c27f1, tail-64KiB md5
+1529ab1ad70ac360f441d819703f943f.
+
+(3) THE FINDING — a hole in trigger (B), found by asking what each leg DOES
+with its input (t145 law), not whether it reads it. B1 diffs TRACKED files,
+B3 compares commits, B2 diffs prompt text, and the STEERING leg globs the
+literal names `docs/STEERING* STEERING*`. The one line that could see a brand
+new file printed `??` entries as blanket "informational, NOT a trigger". t117's
+law justified that against the LOOP'S OWN untracked files (docs/re/_wip_*.md,
+probe scratch) but was applied to every path — so a user answer delivered as a
+new file (docs/ANSWER.md, notes.md, a RESTORE-ME note, a re-added deleted doc)
+read IDLE forever.
+
+(4) FIX (B4): split untracked by OWNERSHIP instead of deleting the leg.
+`git status --porcelain --untracked-files=all` `??` entries under LOOP_OWNED
+stay informational (t117 preserved); foreign untracked paths ARM. Measured
+safety first: porcelain never lists gitignored paths, and .gitignore covers the
+loop's whole scratch surface (build/, build-*/, rewrite/build/, .logs/,
+__pycache__/, *.pyc, .venv/, .cache/, .cache_check, *.log, work/) — verified by
+creating a fixture in each and watching it stay unlisted — so a non-ignored
+untracked file outside loop-owned has no loop-tool origin.
+Validated by real execution on FOUR branches, fixtures deleted afterwards:
+real state (only docs/re/_wip_t153.md untracked) -> none / RC=0; foreign
+`t153_fixture_ANSWER.md` at repo root -> ARMS RC=1 naming the path and saying
+why; gitignored scratch (.logs/*.log, work/r1/*) -> (B4) prints none (an
+(A) find-sweep arm on the work/r1 fixture fired instead — correct division of
+labour, the sweep owns work/r1); after fixture removal, control RC=0 with both
+legs clean.
+
+(5) Trigger (B) NEGATIVE — clean tracked tree at 1abf176, no STEERING file,
+B3 HEAD == journal row sha 1abf176, prompt pair prompt-75 vs prompt-74 (58/58)
+digit-stripped delta 0. §3 answer outstanding after forty idle turns.
+
+(6) Bank hygiene fresh: grep -rln stop-report scripts/ -> only r1_idle_probe.py
++ its .pyc; file 1581 lines zero diff vs HEAD before appending. Infra unchanged
+since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log 2026-10-27
+17:30:18/30114 — zero connects); probe children per the t118 noise law. NO row
+closed (strict-close honest negative), no law falsified. NEXT stays IDLE; the
+t113 LOOP-END PROPOSAL stands. FUTURE TURNS: an (A) find-sweep arm at
+work/r1/<file> you did not create is capture-side evidence; check it against
+(A4)/(A5) before calling the turn idle. Gate 0.

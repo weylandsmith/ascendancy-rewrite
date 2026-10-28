@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T02:40
+updated: 2026-10-28T02:58
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #39 done at t152; stop-report.md §45): loop awaits a user
+IDLE (re-check #40 done at t153; stop-report.md §46): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -295,7 +295,15 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     is NOT — the preflight gate runs after each commit and mtime-touches
     docs/re/{text,modules,economy,gizmos,fnt}.md with zero content delta;
     and `--untracked-files=all` is NOT decisive (t117: it lists this
-    iteration's own files). Steering note route: the harness prepends a
+    iteration's own files). AS OF t153 the untracked line is split by
+    OWNERSHIP instead of being blanket-informational: `??` paths under
+    LOOP_OWNED are informational, a FOREIGN untracked path ARMS (B4) — a §3
+    answer left as a NEW file (docs/ANSWER.md, notes.md, a RESTORE-ME note, a
+    re-added deleted doc) previously moved no leg at all, because B1 diffs
+    tracked files, B3 compares commits, B2 reads prompt text and the STEERING
+    leg globs literal names only. Gitignored scratch never appears in porcelain
+    and .gitignore covers the loop's scratch surface, so no loop tool can arm
+    it; do not re-blanket the leg. Steering note route: the harness prepends a
     note to work/r1/loop/prompt-<n>.txt — the TOOL now adjudicates this by
     digit-stripped content diff (t145); if you must do it by hand,
     enumerate with NUMERIC sort, never `ls -1` (t144 law: `ls -1 | tail
@@ -304,6 +312,44 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T153 LANDED (IDLE re-check #40 — no trigger fired; deliverables:
+scripts/r1_idle_probe.py (B4) leg, docs/re/stop-report.md §46,
+docs/re/_wip_t153.md; no ledger row touched, game/ untouched, no watch or
+census run against the live capture). (1) Trigger (A) NEGATIVE — probe RC=0 at
+02:50:35 (cutoff 02:48:55): newest playcap dir playcap-20261014-224611;
+live-timeline.jsonl mtime_ns 1793043841304000000 / 5691796463 B (43rd
+consecutive byte-identical reading t111..t153; independently re-statted, equal
+to BASE_MTIME_NS/BASE_SIZE at r1_idle_probe.py:55-56 re-read from source); zero
+dosbox procs; find sweep non-loop none; A4 watcher ALIVE pid 27774; A5 none
+(save/*.sav = 20). t151 CONTENT BASELINE reproduced a third time byte-identical
+(head 42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f
+— the touch-vs-ingest rule now measured-reproducible twice over). (2) THE
+FINDING — hole (B4), t145 method (what the leg DOES with its input) applied to
+the last un-adjudicated (B) surface: the untracked line printed `??` entries as
+blanket "informational, NOT a trigger". t117's law was earned against the
+LOOP'S OWN _wip_*.md but applied to every path, so a §3 answer delivered as a
+NEW FILE (docs/ANSWER.md, notes.md, RESTORE-ME, a re-added deleted doc) moved
+nothing — B1 diffs tracked files only, B3 compares commits, B2 reads prompt
+text, the STEERING leg globs literal names. FIX: split untracked by LOOP_OWNED
+ownership; loop-owned informational (t117 kept), foreign ARMS. Safety measured
+BEFORE patching: porcelain never lists gitignored paths and .gitignore covers
+the loop's scratch surface (build/, .logs/, __pycache__/, *.pyc, work/, *.log,
+.cache/...), verified by fixtures in each. Four-branch validation by REAL
+execution, fixtures deleted: real state none/RC=0; foreign root ANSWER file
+ARMED RC=1 naming the path; gitignored scratch correctly prints none (the (A)
+find-sweep armed on a work/r1 fixture instead — correct division of labour,
+and a useful discovery: the sweep already owns work/r1, so (B4) only needs to
+own the rest of the tree); post-cleanup control RC=0. (3) Trigger (B) NEGATIVE
+— clean tracked tree at 1abf176, no STEERING, B3 HEAD == journal sha 1abf176,
+prompt pair prompt-75 vs prompt-74 (58/58) digit-stripped delta 0. §3 answer
+outstanding after forty idle turns. (4) Bank hygiene fresh: grep -rln
+stop-report scripts/ -> only r1_idle_probe.py docstring + .pyc; stop-report.md
+1581 lines zero diff vs HEAD before appending §46. Infra unchanged since t112
+(Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log 2026-10-27
+17:30:18/30114 — zero connects); probe children per the t118 noise law. NO row
+closed (strict-close honest negative), no law falsified. NEXT stays IDLE; the
+t113 LOOP-END PROPOSAL stands. Gate 0.
 
 T152 LANDED (IDLE re-check #39 — no trigger fired; deliverables:
 scripts/r1_t85g_sitting.py (argv[1] RUN + dir echo), docs/re/stop-report.md

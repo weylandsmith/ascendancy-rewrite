@@ -242,9 +242,34 @@ def trigger_b():
     reasons.append("git diff HEAD --name-only: %s" % (diff.splitlines() or "empty"))
     tracked = [l for l in status.splitlines() if not l.startswith("??")]
     reasons.append("git status --porcelain (tracked): %s" % (tracked or "empty"))
-    reasons.append("untracked (informational, NOT a trigger — mid-iteration"
-                   " _wip_/probe files): %s"
-                   % ([l for l in status.splitlines() if l.startswith("??")] or "none"))
+    # (B4) t153: the untracked line used to be blanket-"informational". t117's
+    # law was earned against the LOOP'S OWN untracked files (docs/re/_wip_*.md,
+    # probe scratch) but it was applied to every path, so a user decision
+    # delivered as a NEW FILE (docs/ANSWER.md, notes.txt, a restored doc) is
+    # invisible to every (B) leg: B1 diffs the working tree of TRACKED files,
+    # B3 compares commits, B2 reads prompt text, and the STEERING leg globs the
+    # literal names only. Split by OWNERSHIP instead of deleting the leg:
+    # untracked under LOOP_OWNED stays informational (t117 preserved), foreign
+    # untracked ARMS. Measured safety: `.gitignore` covers the loop's whole
+    # scratch surface (build/, build-*/, .logs/, __pycache__/, *.pyc, .venv/,
+    # .cache/, *.log, work/) and porcelain never lists ignored files, so a
+    # non-ignored untracked path outside LOOP_OWNED has no loop-tool origin.
+    untracked = sh("git status --porcelain --untracked-files=all").splitlines()
+    untracked = [l[3:].strip() for l in untracked if l.startswith("??")]
+    own_untracked = [p for p in untracked if p.startswith(LOOP_OWNED)]
+    foreign_untracked = [p for p in untracked if p not in own_untracked]
+    reasons.append("untracked loop-owned (informational — this loop writes"
+                   " _wip_*.md here): %s" % (own_untracked or "none"))
+    reasons.append("untracked OUTSIDE loop-owned: %s" % (foreign_untracked or "none"))
+    if foreign_untracked:
+        armed = True
+        reasons.append("UNTRACKED USER FILE: %d path(s) outside loop-owned paths"
+                       " appeared since the last iteration — a decision left as a"
+                       " new file (answer/notes/RESTORE-ME) is the §3 answer; read"
+                       " it before treating the turn as idle (it may also be the"
+                       " user re-adding a file the loop deleted, which is a"
+                       " decision about that file either way)"
+                       % len(foreign_untracked))
     # The loop itself owns these paths and edits them every iteration, so a
     # tracked delta there is NOT a user answer. A change OUTSIDE this set
     # (e.g. rewrite/, game/ docs, PLAN.md) is what a real decision looks like.
