@@ -843,8 +843,11 @@ MID-campaign states (41..56.sav), so a generation-scoped law was audited after
 40+ turns of event drift; the +2 scan explains the small positives. TOOL LEG
 same turn: r1_t86_write_census.py never prepended the 0x66 operand-size prefix
 and desynced its objdump window, so NO 16-bit word write had ever been in its
-candidate set — fixed, +0x55 now 12 verified sites (4 word), +0x42 28
-(including colonise 0x23cac); r1_t106_writers.py is the boundary-checked
+candidate set — fixed, ~~+0x55 now 12 verified sites (4 word), +0x42 28
+(including colonise 0x23cac)~~ [t109 PURGE: those counts were inflated by the
+third verifier defect; corrected = +0x55 6 verified / 5 in-code / 4 WORD,
++0x42 23 verified / 19 in-code / 13 WORD, colonise 0x23cac survives —
+census-audit.md S2/S9]; r1_t106_writers.py is the boundary-checked
 variant. Row STAYS OPEN (remaining: per-cell terrain/nuke wiring, home-
 placement verification, +2 residual minutiae, event-dispatch caller of 0x4402a
 (capture-class), live-UI-trace armer residual; "scenario-template preset
@@ -869,6 +872,15 @@ image (others = planet template copy 0x3a696, ship-design table 0x490e3/23a
 stride 0x6a, stack-locals in shp-cache callers). One phantom citation (0x390a0)
 corrected in S3. Row STAYS OPEN (open set unchanged: terrain/nuke wiring, home
 placement, +2 minutiae, 0x4402a caller [capture-class], live-UI-trace armer).
+t109 COUNT-COLUMN PURGE (census-audit.md S9-S10): S2's inflated per-offset
+counts replaced in place with authoritative-rule numbers (full-op in-code:
+44:22 46:7 48:10 4e:8 50:13 52:23 54:22 58:32 5d:25 66:15 67:30 88:23 90:14;
+WORD counts unchanged on all 13 offsets — phantom load was byte-op-only);
++0x55 FOUR-site word list and all four t107 amendment sites re-verified to
+survive the fix verbatim; closing control r1_t108_disp32_audit RC=0 reproduces
+S6 exactly. Tool liability (t106/t107/t108) BOUNDED CLOSED; no banked law
+changed. Row STAYS OPEN, same residual set — all remaining open rows are
+capture/user-gated (no offline static work remains).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

@@ -202,41 +202,53 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t109 (STATIC task): COUNT-COLUMN PURGE — RE-RUN THE CENSUS-OFFSET SET
-WITH THE t108-FIXED TOOL, THEN STOP-REPORT. t108 found a THIRD verifier
-defect (census-audit.md S7): boundary_ok's addr&~0xF fallback == candidate
-base made every 16-aligned byte-op candidate self-verify, and objdump
-wrapped-tail lines hid mid-insn coverage. Both tools are patched
-(scripts/r1_t106_writers.py, scripts/r1_t107_writers_full.py) with
-controls green (0x544f6 reject / 0x37f7b, 0x41d80 accept). Consequence:
-EVERY "verified N" count produced by the OLD verifier is inflated by byte-op
-phantoms — census-audit S2's table (30/12/19/26/22/33/26/39/29/43/31/23/14),
-the t106 +0x55=12 and +0x42=28 site lists (OPEN-QUESTIONS OQ-016 row text),
-and the "+0x66 fixed verified 43" line. t109 = one mechanical pass:
-(1) re-run the fixed full-op tool over +0x44/46/48/4e/50/52/54/58/5d/66/67/
-88/90 (and +0x55, +0x42 via r1_t106_writers), replacing the S2 table with a
-corrected table IN PLACE (keep old numbers as a struck-through column headed
-"old verifier"); code-span filter + fn-start authoritative rule are already
-in the tool.
-(2) re-adjudicate ONLY the t106 +0x55 four-WORD site list (0x37f9a, 0x39224,
-0x44054, 0x3a664) and the t107 three amendments (0x49307, 0x24a00, 0x3ca60,
-0x41d80) against the new rule — t108's spot audit says all survive, but
-re-cite the counts next to them in the docs.
-(3) append to census-audit S8 the honest statement that no banked LAW changed
-(WORD/DWORD sites always passed fn-start decode; phantoms concentrated in
-byte-op families), then run scripts/r1_t108_disp32_audit.py as the closing
-control and STOP-REPORT: after (1)-(3) the t106/t107/t108 tool liability is
-fully bounded and every remaining open row (OQ-003 residue, OQ-005, OQ-006,
-OQ-016 residual set, OQ-019, OQ-021, OQ-023) is capture/user-gated per
-REFUTED-ROUTES + its row text — no offline work of any shape remains.
-Rationale: the defect is bounded and known ONLY because counts are suspect,
-not laws; a purge pass converts "S2 numbers superseded" into corrected
-numbers so no future session re-trusts them, at the cost of one compute pass.
-Do NOT re-audit the five t108 claims (S6 table banked, all HOLD); do NOT
-per-name consistency tests or scenario-file searches (R12). Sitting watch:
-live-timeline 5.69 GB mtime 2026-10-26 15:44 unchanged at t108 session end
-(no new sitting; a NEW turn-boundary sitting outranks this ->
-scripts/r1_t85g_sitting.py first).
+NEXT t110 = FINAL STOP-REPORT + SITTING WATCH (no offline build work
+assigned). The t109 purge closed the tool-liability epoch: every count in
+docs/re/census-audit.md now names a fixed tool + code-span rule, and the
+S9/S10 statement — banked with cross-method agreement (tool == hand on the
++0x66 15-site set; closing control r1_t108_disp32_audit RC=0 reproducing S6
+exactly) — records that NO banked law fell across t106-t109. Remaining open
+rows OQ-003 (residue), OQ-005 (7th .shp sweep FORBIDDEN per GOAL), OQ-006,
+OQ-016 (residual set: per-cell terrain/nuke wiring, home placement, +2
+minutiae, 0x4402a event-dispatch caller, live-UI-trace armer), OQ-019,
+OQ-021, OQ-023 are capture/user-gated per their row text and REFUTED-ROUTES
+R11-R14: there is no offline static task left that can move a row under
+strict-close. t110 procedure: (1) if work/r1/playcap/live-timeline.jsonl
+mtime has advanced past 2026-10-26 15:44 (last check, t109 session end),
+THAT outranks this assignment -> run scripts/r1_t85g_sitting.py on the new
+turn-boundary sitting first and bank into OQ-010/021/023 rows as appropriate;
+(2) otherwise write/refresh docs/re/stop-report.md for the user: outcome
+status (12 closed / 6 open), the exact list of what only a new capture or a
+user decision can lift, and the recommended capture protocol (one long
+normal-mode sitting incl. a battle and an alliance event; scratch-copy
+invariants per docs/BLOCKED.md); then run gates and commit. Do NOT invent a
+t111 static census to stay busy — re-running green tools is not progress,
+and GOAL's exit-code rule (1=record one line and move on) is satisfied by
+the stop-report itself. If the user replies to the stop-report with a
+decision (e.g. accept defaults, or authorize a capture), that answer becomes
+the next STATE.md assignment.
+
+T109 LANDED (STATIC task — COUNT-COLUMN PURGE; deliverable
+docs/re/census-audit.md S2 replaced in place + S9/S10 stop-report; OQ-016
+t106 tool-leg counts struck + t109 block appended; working notes
+docs/re/_wip_t109.md): (1) all 13 S2 offsets re-censused with BOTH
+t108-patched tools (limited-op + full-op) under the authoritative fn-start
+rule + code-span filter [0x14bb0,0x82bb0); corrected truth column = full-op
+in-code (44:22 46:7 48:10 4e:8 50:13 52:23 54:22 58:32 5d:25 66:15 67:30
+88:23 90:14); WORD counts identical to pre-purge on all 13 offsets —
+structural confirmation the phantom class was byte-op-only. Cross-check:
+tool-derived +0x66 in-code set == S7 hand-adjudicated 15 exactly. (2) t106
++0x55 FOUR-word list (0x37f9a/0x39224/0x44054/0x3a664) re-verified verbatim
+(6 verified / 5 in-code / 4 WORD; stale "12 verified" struck in OQ-016);
++0x42 corrected 23/19/13 with colonise 0x23cac surviving; all four t107
+amendments (0x49307 +0x90-of-14, 0x24a00+0x3ca60 +0x58-of-32-in-code,
+0x41d80 DEC +0x88-of-23) survive with counts re-cited. Op-family note banked:
+r1_t106_writers alone cannot see group-80 /1 — even the banked +0x66 |=1/|=2
+pair requires the full-op tool. (3) closing control r1_t108_disp32_audit.py
+RC=0 reproduces S6 numbers exactly (277/58/0 FPU; 0xccb 1/0/0; +0x67 8/0/0).
+NO row closed (strict-close honest negative: bookkeeping, not measurement);
+NO banked law falsified; no new tool. Sitting watch unchanged. NEXT t110 =
+final stop-report + sitting watch (see above). Gate 0, LEDGER AUDIT OK
 
 T108 LANDED (STATIC task — FULL-OP RE-AUDIT OF REMAINING CENSUS-CITED
 CLAIMS + +0x66 ATTRIBUTION; deliverable docs/re/census-audit.md S6-S8 +

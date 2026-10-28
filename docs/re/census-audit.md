@@ -25,29 +25,56 @@ was structurally blind to 16-bit word writes (income-law.md S-T106-TOOL).
   pointer law is [0x14bb0,0x82bb0) — byte-family op results MUST be
   code-span filtered).
 
-## 2. Per-offset table (fixed tool; WORD = true 16-bit sites)
+## 2. Per-offset table (t109 PURGED: re-run 2026-10-27 with the t108-FIXED
+## boundary rule + code-span filter [0x14bb0,0x82bb0); the pre-t109 numbers
+## were produced by the DEFECTIVE verifier and are kept struck-through only)
+
+Purge method (t109): every offset re-censused twice — limited-op tool
+(`r1_t106_writers.py`, the S2 op set) and full-op tool
+(`r1_t107_writers_full.py`) — both carrying the S8 authoritative
+function-start rule; sites then split in-code vs data-region. Raw dumps
+session scratch: /tmp/t109_lim.txt, /tmp/t109_full.txt (+0x55/+0x42:
+/tmp/t109_t106.txt). Cross-check: full-op in-code +0x66 = 15, reproducing
+the hand-adjudicated S7 count exactly.
 
 Offsets audited: ship POWER +0x88, order state +0x5d, planet flags +0x66,
 +0x67, growth counter +0x4e, build accumulator +0x50, build queue/slot +0x52,
 +0x54 (selected item), order kind +0x58, IND +0x44, +0x46, +0x48, shield
-+0x90. Full site lists: /tmp/t107_census.txt (session scratch) reproducible
-via `python3 scripts/r1_t106_writers.py <offs>` and the full-op tool.
++0x90.
 
-| off | fixed verified | pre-fix (d8dda8f) | WORD sites (fixed) | pre-fix WORD | verdict |
-|-----|----------------|-------------------|--------------------|--------------|---------|
-| +0x44 | 30 | 19 | 9  | 0 | safe (all in banked families, see 3) |
-| +0x46 | 12 | 4  | 3  | 0 | safe |
-| +0x48 | 19 | 13 | 3  | 0 | safe |
-| +0x4e | 26 | 20 | 5  | 0 | safe |
-| +0x50 | 22 | 11 | 8  | 0 | safe |
-| +0x52 | 33 | 23 | 9  | 0 | safe |
-| +0x54 | 26 | 12 | 0  | 0 | safe |
-| +0x58 | 39 | 20 | 0  | 0 | safe + 1 doc fix (kind-2 writer) |
-| +0x5d | 29 | 6  | 3  | 0 | safe (word sites other-struct) |
-| +0x66 | 43 | 38 | 0  | 0 | safe |
-| +0x67 | 31 | 8  | 0  | 0 | safe |
-| +0x88 | 23 (full-op) | 18, 4 desync-rejects | 0 | 0 | safe + burn-class doc fix |
-| +0x90 | 14 | 13 | 0  | 0 | 1 site MISSING from S2d -> amended |
+CORRECTED TRUTH COLUMN = full-op IN-CODE sites. WORD = true 16-bit sites
+(`(?<!D)WORD PTR`), in-code. The old verifier inflated every byte-op-heavy
+offset; inflation was concentrated in byte families (S8).
+
+| off | ~~fixed verified (old verifier)~~ | lim-op ver | lim in-code | **full-op in-code** | WORD | ~~pre-fix WORD~~ | verdict |
+|-----|------------------------------|------------|-------------|---------------------|------|------------------|---------|
+| +0x44 | ~~30~~ | 24 | 20 | **22** | 11 | 0 | safe (all in banked families, see 3) |
+| +0x46 | ~~12~~ | 11 | 7 | **7** | 3 | 0 | safe |
+| +0x48 | ~~19~~ | 16 | 9 | **10** | 3 | 0 | safe |
+| +0x4e | ~~26~~ | 25 | 8 | **8** | 5 | 0 | safe |
+| +0x50 | ~~22~~ | 17 | 13 | **13** | 8 | 0 | safe |
+| +0x52 | ~~33~~ | 27 | 23 | **23** | 9 | 0 | safe |
+| +0x54 | ~~26~~ | 26 | 22 | **22** | 0 | 0 | safe |
+| +0x58 | ~~39~~ | 38 | 32 | **32** | 0 | 0 | safe + 1 doc fix (kind-2 writer) |
+| +0x5d | ~~29~~ | 25 | 25 | **25** | 3 | 0 | safe (word sites other-struct) |
+| +0x66 | ~~43~~ | 14 | 13 | **15** | 0 | 0 | safe — S7 law COMPLETE |
+| +0x67 | ~~31~~ | 31 | 30 | **30** | 0 | 0 | safe |
+| +0x88 | ~~23~~ | 22 | 22 | **23** | 0 | 0 | safe + burn-class doc fix |
+| +0x90 | ~~14~~ | 14 | 14 | **14** | 0 | 0 | 1 site MISSING from S2d -> amended |
+
+Word-site counts are UNCHANGED from the pre-purge S2 table on all 13 offsets
+(9/3/3/5/8/9/0/0/3/0/0/0/0 -> full-op adds +0x44: 9->11, +0x50: ->8 equal).
+That is the structural confirmation of the S8 claim: WORD/DWORD sites always
+passed the fn-start decode; the phantom load was byte-op-only. Data-region
+exclusions (verified-but-outside-code-span, full-op): +0x44:4 +0x46:4 +0x48:7
++0x4e:22 +0x50:5 +0x52:8 +0x54:5 +0x58:6 +0x66:6 +0x67:2 (the fn-111
+`and8`/pool cluster of S4.5 + obj1 pool bytes).
+
+Full-op-minus-limited-op op-family gap sites (all banked S4 items, now with
+correct counts around them): 0x21b77+0x21b85 (INC WORD +0x44 ship-completion),
+0x467b6 (+0x48), 0x39084 (INC +0x50 alien IND<4), 0x37f7b+0x39229 (the +0x66
+|=2/|=1 pair — the limited-op op set does NOT generate group-80 /1, so the
+banked flag pair is found ONLY by the full-op tool), 0x41d80 (DEC +0x88 burn).
 
 CONFIRMED [verified]: the pre-fix tool produced ZERO 16-bit-word sites on
 every offset — t106's claim reproduces exactly (the `mov3216` kind labels it
@@ -256,3 +283,65 @@ law is COMPLETE.
 - OQ-016 annotated (completeness of the +0x66 flag law is now a cited
   closure-grade fact inside the row's open residue list — the row stays
   open on its remaining capture-class items).
+
+---
+
+# t109 COUNT-COLUMN PURGE (2026-10-27)
+
+Hand-authored continuation. Assignment: STATE.md t109. Mechanical pass only:
+S2 replaced in place with corrected counts (task item 1), the t106 +0x55
+four-WORD list and the four t107 amendment sites re-cited against the
+authoritative rule (item 2), this section (item 3), then the closing control.
+Working notes: docs/re/_wip_t109.md.
+
+## 9. STOP-REPORT: the tool-liability bound, and what survives
+
+HONEST STATEMENT (item 3): **no banked LAW changed in t106/t107/t108, and
+none changed in this purge either.** What the three tool iterations cost the
+corpus was COUNTS in byte-op families and two phantom citations; every law
+that was banked from WORD/DWORD stores or from call-graph/decompile evidence
+was never exposed to the defect. Evidence for that claim, from this pass:
+
+1. Word-site counts are identical pre- and post-purge on all 13 offsets
+   (S2 table): the defect class (self-verifying 16-aligned byte patterns +
+   wrapped-tail coverage holes) only manufactured BYTE hits. Inflation
+   magnitude was byte-dominated and offset-dependent — worst absolute:
+   +0x66 43 -> 15 (S7), +0x4e 26 -> 8 (17 verified sites sit in the obj1
+   data pool / fn 3938 data-decode region, 22 of 30 full-op verified sites
+   for +0x4e are data-region); zero inflation at +0x54/+0x58/+0x5d/+0x67/+0x88/
+   +0x90 in-code (lim in-code == old count minus at most data-region entries).
+2. Every law-bearing site cited in the last three iterations survives the
+   authoritative fn-start decode with its claimed disassembly: +0x55 quartet
+   0x37f9a / 0x39224 / 0x44054 / 0x3a664 (the ONLY four word writers of +0x55
+   in the code span — OQ-016's "FOUR sites" claim re-verified verbatim),
+   colonise 0x23cac, t107 amendments 0x49307 (+0x90 set now cited as 14,
+   combat S2d), 0x24a00 + 0x3ca60 (+0x58 set now cited as 32 in-code, aicode
+   S6), 0x41d80 DEC +0x88 (+0x88 set now cited as 23, aicode S7.4), the
+   +0x66 |=1/|=2 pair 0x39229/0x37f7b, and the op-family gap sites 0x21b77/
+   0x21b85/0x467b6/0x39084.
+3. Cross-method agreement: the t109 full-op in-code +0x66 set is EXACTLY the
+   15 addresses S7 hand-adjudicated (tool == hand, no drift).
+4. Closing control `scripts/r1_t108_disp32_audit.py` re-run RC=0 reproduces
+   the S6 numbers exactly: 0x7458e = 277 raw u32 runs in span, 58 moffs-verified
+   refs, 0 FPU-verified; 0xccb = exactly 1 raw occurrence, 0 moffs, 0 FPU;
+   +0x67 = 8 raw runs, 0 moffs, 0 FPU. (Label note: the tool prints WRITE only
+   for operand forms it decodes; the two absolute-direct stores 0x21aa0/0x52cc6
+   are span-decode evidence per S6, not moffs-p-generator output — the scan2
+   list here reads 58 refs / 0 WRITE, same as the t108 run it replaced.)
+
+AMENDED IN-PLACE this pass: S2 table (replaced); OPEN-QUESTIONS OQ-016 t106
+tool-leg sentence ("+0x55 now 12 verified sites (4 word), +0x42 28" ->
+corrected counts struck in).
+
+LIABILITY CLOSURE: after t109 every count in this file names a tool AND a
+code-span rule; no doc anywhere is asked to trust the pre-t108 verifier.
+Remaining open rows (OQ-003 residue, OQ-005, OQ-006, OQ-016 residual set,
+OQ-019, OQ-021, OQ-023) are capture/user-gated per their row text and
+REFUTED-ROUTES R11-R14 — no offline static work of any shape remains.
+
+## 10. t109 ledger effect
+
+- NO open row closes (strict-close): a purge produces corrected bookkeeping,
+  not a measurement of open behaviour. OQ-016 STAYS OPEN, same residual set.
+- NO banked law falsified (see S9 items 1-4).
+- No new tool. No tool change (both purge runs used the t108-patched code).
