@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T21:47
+updated: 2026-10-27T21:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #2 done at t115; stop-report.md §8): loop awaits a user
+IDLE (re-check #3 done at t116; stop-report.md §9): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -210,7 +210,9 @@ idle — an idle turn is the two-trigger probe below and nothing else):
 (A) NEW CAPTURE: a new work/r1/playcap-<ts>/ dir (selftest-t111-playcap
     is a self-test artifact, NOT a capture), OR
     work/r1/playcap/live-timeline.jsonl mtime past 2026-10-26
-    15:44:01.304 / size past 5691796463 B. If armed: run
+    15:44:01.304 / size past 5691796463 B. Cross-check with
+    `find work/r1 -type f -newermt <session start>` — only
+    work/r1/loop/* files = negative. If armed: run
     scripts/r1_t85g_sitting.py-style adjudication on the new
     turn-boundary sitting (T>0-only slot law PLUS the t111 hygiene law —
     idle boots also yield in_game=true and flat t=/score; require turn or
@@ -220,10 +222,41 @@ idle — an idle turn is the two-trigger probe below and nothing else):
 (B) USER DECISION (stop-report §3): accept/reject documented defaults
     (OQ-003 entropy, OQ-005 dims, OQ-019 sugar-cube [1,3]+immediate,
     OQ-023 threshold-only branch); authorize/refuse capture sittings;
-    resume t89a follow-on code work or not. That answer becomes the next
-    STATE.md assignment verbatim and REOPENS the loop.
+    resume t89a follow-on code work or not. MEASURE WITH CONTENT, NOT
+    MTIME (t116 law): `git diff HEAD` + `git status --porcelain
+    --untracked-files=all` are decisive; `find docs -newermt <last
+    commit>` is NOT — the preflight gate runs after each commit and
+    mtime-touches docs/re/{text,modules,economy,gizmos,fnt}.md with zero
+    content delta. A real answer becomes the next STATE.md assignment
+    verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T116 LANDED (IDLE re-check #3 — no trigger fired; deliverables:
+docs/re/_wip_t116.md, stop-report.md §9 appended; no ledger row touched,
+no code changed, no watch/census run per §6 discipline): (1) trigger (A)
+measured NEGATIVE fresh at 21:48:52.130 EDT — newest playcap dir
+20261014-224611; live-timeline.jsonl mtime 2026-10-26 15:44:01.304 /
+5691796463 B, 6th consecutive byte-identical reading (t111..t116); no
+dosbox process (`ps -eo comm`, pgrep self-match trap avoided);
+find-newermt sweep returned only work/r1/loop/ harness files.
+r1_t85g_sitting.py correctly not run. (2) trigger (B) NEGATIVE with a
+NEW PROBE PITFALL banked: five docs (re/text, re/modules, re/economy,
+re/gizmos, re/fnt) showed post-commit mtimes 21:46:27-41 — cause is THIS
+ITERATION'S preflight gate (ran ~21:46, after the t115 commit 21:45:13,
+before session start 21:47:01; gate.sh:144-150/281 verify gizmos/economy/
+fnt directly) touching them with ZERO content delta (`git diff HEAD`
+empty, tree clean incl. untracked). LAW: trigger (B) is adjudicated by
+CONTENT diff, never mtime. No STEERING file; §3 answer still outstanding.
+(3) Infra alive so the negatives are trustworthy: Xvfb 1196, x11vnc 1207,
+watcher 27772+27774 (bash wrapper + python child, normal pair);
+x11vnc.log mtime 2026-10-27 17:30:18.172 / 30114 B unchanged since t112 —
+zero connects against the t111-FIXED launch path. (4) Bank-law pre-check:
+no script generates stop-report.md or _wip_*.md; PLAYTHROUGH.md untouched.
+NEXT = same two-trigger probe on the next idle session (stop-report §9
+wording + the content-diff rule); loop stays IDLE at 12 closed / 6 open.
+NO row closed (strict-close honest negative); no banked law falsified; no
+new tool. Gate 0, LEDGER AUDIT OK
 
 T115 LANDED (IDLE re-check #2 — no trigger fired; deliverables:
 docs/re/_wip_t115.md, stop-report.md §8 appended; no ledger row touched,

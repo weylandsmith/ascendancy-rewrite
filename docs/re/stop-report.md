@@ -201,3 +201,31 @@ Consequence: §6 LOOP-END PROPOSAL unchanged, 12 closed / 6 open. NO row
 closed this turn (strict-close honest negative). Future idle turns: run
 exactly this probe — timeline/dir mtime + the `find -newermt` sweep + ps,
 then gates, commit, stop.
+
+## 9. IDLE re-check #3 (t116, 2026-10-27 21:52 EDT)
+
+Three-probe probe, same result. Working notes `docs/re/_wip_t116.md`.
+
+- (A) NEW CAPTURE: negative at 21:48:52. Newest playcap dir
+  `20261014-224611`; `live-timeline.jsonl` mtime 2026-10-26 15:44:01.304 /
+  5691796463 B — 6th consecutive byte-identical reading (t111..t116); zero
+  dosbox processes (`ps -eo comm`); `find work/r1 -newermt <session start>`
+  returned only `work/r1/loop/` harness bookkeeping.
+- (B) USER DECISION: negative, plus a NEW PROBE PITFALL worth keeping.
+  `find docs -newermt <HEAD commit time>` listed five docs
+  (re/text, re/modules, re/economy, re/gizmos, re/fnt) with post-commit
+  mtimes — yet `git diff HEAD` was EMPTY. Root cause: this iteration's
+  preflight gate ran ~21:46, after the t115 commit and before the session
+  started, and its verification stages touch those files (gate.sh checks
+  gizmos/economy/fnt contents directly) with ZERO content delta. LAW: for
+  trigger (B) trust `git diff HEAD` (content), never mtime — an mtime-only
+  doc touch after the last commit is harness noise, not a user answer.
+  Tree clean at a0d3c2a, no STEERING file, §3 answer still outstanding.
+- Infra alive so the negatives are trustworthy: Xvfb 1196, x11vnc 1207,
+  watcher 27772+27774 (wrapper+child, normal); `x11vnc.log` mtime
+  17:30:18.172 / 30114 B unchanged since t112 — zero connects against the
+  t111-FIXED launch path.
+
+Consequence: §6 LOOP-END PROPOSAL unchanged, 12 closed / 6 open. NO row
+closed (strict-close honest negative). Future idle turns: run the same
+three probes with the CONTENT-diff rule for (B).
