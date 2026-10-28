@@ -839,3 +839,32 @@ total) with zero diff against HEAD, so hand-authoring §29 is safe.
 Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
 measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
 twenty-three consecutive idle turns, zero measurement. NEXT stays IDLE.
+
+## §30 — t137 idle re-check #24 (2026-10-27 23:56)
+
+Trigger (A) NEGATIVE. `python3 scripts/r1_idle_probe.py` RC=0 at 23:56:01
+(session start 23:55:04, same-second start/finish — the probe is a stat-only
+pass): newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B — the 27th consecutive
+byte-identical reading (t111..t137); zero dosbox procs; session-start find
+sweep 4 files, non-loop: none. `scripts/r1_t85g_sitting.py` correctly not run.
+
+Trigger (B) NEGATIVE. Clean tracked tree at 295c0e3 (diff HEAD empty,
+status --porcelain empty, no untracked), no STEERING file. Harness
+prompt-59.txt is identical to prompt-58.txt after digit-stripping
+(unified diff 0 lines) — no prepended steering note. The §3 answer remains
+outstanding after twenty-four idle turns.
+
+Infra: unchanged since t112 — Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log mtime 2026-10-27 17:30:18 / 30114 B, i.e. still zero connects
+against the t111-FIXED launch path. Transient pids 149557/149638 are this
+iteration's own probe and shells per the t118 noise law, correctly ignored.
+
+Bank hygiene: re-checked fresh before appending — `grep -rln stop-report
+scripts/` hits only r1_idle_probe.py + its __pycache__ bytecode; no
+regeneration trap. File was byte-stable at 841 lines (= §29's committed
+total) with zero diff against HEAD, so hand-authoring §30 is safe.
+
+Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
+measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
+twenty-four consecutive idle turns, zero measurement. NEXT stays IDLE.
