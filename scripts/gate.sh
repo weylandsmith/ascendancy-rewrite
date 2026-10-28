@@ -228,6 +228,35 @@ grep -vE '^[[:space:]]*#' "$ROOT/scripts/r1_savestate.sh" | grep -q 'ascendancy/
   && err "r1_savestate.sh references the pristine game/ tree for dosbox (copy to work/r1 first)"
 grep -q 'time-limit' "$ROOT/scripts/r1_savestate.sh" \
   || err "r1_savestate.sh lost the dosbox -time-limit bound"
+# 3n2 (t163): the SAME invariants over a DERIVED audit set, because the two legs
+# above name files by hand — {audited} was a copy of {the last file that broke},
+# not {scripts that can launch dosbox}. Measured t163: 12 scripts/*.sh hold a
+# comment-stripped "MOUNT" line (the autoexec mount is what actually touches the
+# game tree); the hand list covered 2. Also refuted the hand leg's FORM:
+# `grep 'ascendancy/game'` cannot fire for 10/12 launchers (the string appears
+# nowhere in their code), so the invariant is stated positively instead — every
+# MOUNT target is $SCRATCH and $SCRATCH is under work/. Static checks only, as
+# above: running an emulator is the LOOP's job, never the gate's.
+SDIR="${R1_SCRIPTS_DIR:-$ROOT/scripts}"
+LAUNCH=""
+for f in "$SDIR"/*.sh; do
+  [ -f "$f" ] || continue
+  grep -vE '^[[:space:]]*#' "$f" | grep -qE '^[[:space:]]*I?MOUNT ' && LAUNCH="$LAUNCH $f"
+done
+[ -n "$LAUNCH" ] || err "3n2: no launcher matched the MOUNT predicate in $SDIR (leg inert — inspect predicate)"
+note "3n2: auditing $(echo $LAUNCH | wc -w) dosbox launcher(s) derived from the MOUNT predicate"
+for f in $LAUNCH; do
+  b=$(basename "$f")
+  code=$(grep -vE '^[[:space:]]*#' "$f")
+  echo "$code" | grep -Eq 'pkill[ ]+-f' \
+    && err "3n2: $b uses pkill -f (exact-name only; self-match killed a gate shell once)"
+  echo "$code" | grep -E '^[[:space:]]*I?MOUNT ' | grep -v '\$SCRATCH' | grep -q . \
+    && err "3n2: $b has a MOUNT line that does not target \$SCRATCH (pristine game/ risk, docs/BLOCKED.md:122)"
+  grep -E '^[[:space:]]*SCRATCH=' "$f" | head -1 | grep -q '/work/' \
+    || err "3n2: $b SCRATCH= does not point under work/ (scratch copy required)"
+  echo "$code" | grep -qE -- '-time-limit|timeout -s KILL' \
+    || err "3n2: $b has no dosbox bound (-time-limit or timeout -s KILL)"
+done
 
 # 3q. POINTER LAW confirmation (docs/re/r1-savestate.md, CLOSED 2026-10-05i):
 # run the law battery against any captured slot present. Skips with a note

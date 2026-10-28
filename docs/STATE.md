@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T06:00
+updated: 2026-10-28T06:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -232,7 +232,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #49 done at t162; stop-report.md §55): loop awaits a user
+IDLE (re-check #50 done at t163; stop-report.md §56): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -389,6 +389,62 @@ missing from STATE index entirely", the record gained/kept a closed row the bloc
 omits — paste the stub the tool prints (id + one-line summary copied FROM the
 record; keep the two-quote-per-entry YAML shape, no raw inner quotes). It is a
 hard DIVERGENCE by design; do not delete the leg to go green.
+
+T163 LANDED (IDLE re-check #50 — no trigger fired; deliverables:
+scripts/gate.sh (stage 3n2 derived launcher-safety leg),
+docs/re/stop-report.md §56, docs/re/_wip_t163.md; no ledger row touched, game/
+untouched (read-only; gate stage 1 green), no watch or census run against the
+live capture). (1) Trigger (A) NEGATIVE — probe RC=0 at 05:53:28: newest playcap
+dir playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (52nd consecutive byte-identical reading t111..t163); (A6) content
+baseline equal per the leg; zero dosbox procs; find sweep since 05:51:47 -> 4
+files non-loop none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20).
+(2) Trigger (B) NEGATIVE — clean tracked tree at d806d3a at session start
+(verdict wording "IDLE — neither trigger" valid per t155/B5), no STEERING, B3
+HEAD == journal sha d806d3a, prompt pair prompt-85 vs prompt-84 (58/58)
+digit-stripped delta 0. ledger_index_check LEDGER INDEX OK before any edit
+(record rows=18 open=OQ-003/005/016/019/021/023 closed=12). (3) THE FINDING —
+t162's SET-PAIRS law aimed at the dosbox SAFETY invariants (GOAL.txt:5,
+BLOCKED.md:122-127: never mount pristine game/, pkill -x only, -time-limit
+always). Measured on comments-stripped scripts/*.sh: {launchers} = 12 by the
+derived predicate "has ^\s*I?MOUNT line" (the generated conf's autoexec mount is
+what touches the tree); {gate.sh audits} = 2 by hand (r1_attempt.sh :208-215,
+r1_savestate.sh :223-230; the :380 ref_capture.sh hit is a comment). Ten
+launchers earned after t49..t85g — including BOTH user-facing capture paths
+r1_playcap.sh and r1_playcap_vnc.sh — held ZERO safety legs. The hand legs' FORM
+was dead too: `grep ascendancy/game` cannot fire for 10/12 launchers (string
+absent — they mount `MOUNT C $SCRATCH`); the invariant graded the absence of a
+bad literal instead of the presence of the good target. And r1_attempt.sh passes
+gate.sh:214 only because 'time-limit' sits in a COMMENT (real bound:
+`timeout -s KILL 300` r1_attempt.sh:56 + -time-limit argv r1_tracer.py:94).
+(The two .py files that DO name ascendancy/game — r1_t97c_le_debug.py:13,
+r1_t98_wlink.py:33 — are read-only 'rb' reads, allowed.) Current state CLEAN:
+11/12 launchers satisfy all three invariants un-graded — the hole is exposure
+to the NEXT edit, not a live violation. (4) FIX: stage 3n2 DERIVES the audit set
+each run from the MOUNT predicate (err loudly if it matches nothing — t159
+empty-case law), then per launcher asserts the POSITIVE contract: no pkill -f;
+EVERY comment-stripped MOUNT line targets $SCRATCH; SCRATCH= under work/; a bound
+exists (-time-limit OR timeout -s KILL, honestly accepting the tracer route).
+R1_SCRIPTS_DIR overrides for fixtures; hand legs kept as belt-and-braces. Seven
+branches validated by REAL execution on the leg extracted VERBATIM (sed -n
+'231,260p' -> /tmp/t163-leg.sh sourced with t162 note()/err shims; fixtures
+/tmp/t163-fix deleted after): F1 clean RC=0; F2 pristine-game/ mount ERR; F3
+SCRATCH outside work/ ERR; F4 pkill -f ERR; F5 no bound ERR; F6 empty set
+inert-scream ERR; F7 comment-only MOUNT correctly not a launcher. Self-inflicted
+harness bug caught pre-run: fixture v1 DUPLICATED the leg instead of sourcing it
+(a copy drifts — same family as the section itself). Real gate GATE_EXIT=0 zero
+FAIL lines with "3n2: auditing 12 dosbox launcher(s)" (log line 7), ALL CHECKS
+PASS; ledger_audit LEDGER AUDIT OK. LAW (sixth recursion t157..t162->t163):
+{audited} must be derived from the property that makes a file dangerous, never
+hand-listed from memory of what broke; and safety legs must assert the positive
+contract, not the absence of one bad literal. Enforcement per t158: 3n2 lives
+inside gate.sh. (5) Bank hygiene fresh (grep -rln stop-report scripts/ ->
+r1_idle_probe.py + ledger_audit.py docstrings + gate.sh:12 COMMENT only; 2158
+lines zero diff vs HEAD before appending §56). Infra unchanged since t112
+(Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log 2026-10-27 17:30:18/30114 —
+zero connects). NO row closed (strict-close honest negative — grader hardening,
+not measurement), no law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL
+stands (50 idle turns). Gate 0.
 
 T162 LANDED (IDLE re-check #49 — no trigger fired; deliverables:
 scripts/gate.sh (stage 1 bidirectional P0), docs/re/stop-report.md §55,

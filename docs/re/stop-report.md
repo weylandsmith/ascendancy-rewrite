@@ -2156,3 +2156,65 @@ consistency check ask "which direction does it enumerate, and what happens to
 the set members it cannot see". Modification-detection was tested for 161 turns
 because it is the failure mode people imagine; ADDITION and baseline-destruction
 were never imagined, so never tested.
+
+## 56. t163 — IDLE re-check #50: the dosbox-launcher safety set was hand-listed (2 of 12)
+
+Both triggers negative (probe RC=0, "IDLE — neither trigger", clean tree at
+d806d3a at session start; ledger_index_check OK pre-edit). The iteration's
+finding continues the t157..t162 grader-audit recursion, this time aimed at the
+GOAL.txt:5 / BLOCKED.md:122-127 dosbox safety invariants — the graders for the
+ONE rule the whole loop treats as top-critical ("never mount pristine game/",
+"pkill -x only", "-time-limit always").
+
+SET-PAIR MEASUREMENT (scripts/*.sh, comments stripped):
+- {scripts that can launch dosbox} = 12 by the derived predicate "has a
+  comment-stripped ^\s*I?MOUNT line": r1_adcapture, r1_attempt, r1_deepcapture,
+  r1_mutation_run, r1_playcap, r1_playcap_vnc, r1_savestate, r1_t75_run,
+  r1_t78b_panel, r1_t78c_cycle, r1_t78_size, ref_capture.
+- {scripts gate.sh audits} = 2 by hand (gate.sh:208-215 r1_attempt.sh,
+  :223-230 r1_savestate.sh). gate.sh:380's ref_capture.sh hit is a COMMENT
+  (refcap provenance), not a leg. The ten unaudited launchers are exactly the
+  ones earned later (t49..t85g) — the hand list was a copy of {the last file
+  that broke}, never re-grown.
+- The hand leg's FORM was also dead: `grep 'ascendancy/game'` cannot fire for
+  10/12 launchers because the string appears nowhere in their code — they
+  generate a dosbox conf whose only mount is `MOUNT C $SCRATCH` with
+  SCRATCH="$ROOT/work/r1/game". The invariant was graded by the ABSENCE of a
+  bad string instead of the PRESENCE of the good target. (Two .py files DO hold
+  ascendancy/game — r1_t97c_le_debug.py:13, r1_t98_wlink.py:33 — both read-only
+  'rb' reads of game/ascend.exe, which the rule never forbade; mounting does.)
+- Current-state check: 11/12 launchers satisfy all three invariants on their
+  own. r1_attempt.sh passes gate.sh:214's `grep 'time-limit'` ONLY because the
+  word sits in a comment (its real bound is `timeout -s KILL 300` at
+  r1_attempt.sh:56 and r1_tracer.py:94's -time-limit argv) — a comment word
+  satisfying a bound check is exactly the t158 "regex IS the policy" shape.
+
+FIX (gate.sh stage 3n2, static-only like 3n): derive the audit set each run
+from the MOUNT predicate; err loudly if the predicate matches nothing (a leg
+whose set is empty must scream, not pass — t159's empty-case law); per launcher
+check pkill -f absence, EVERY MOUNT line targets $SCRATCH, SCRATCH= points under
+work/, and a bound exists (-time-limit OR timeout -s KILL, accepting the tracer
+route honestly instead of by comment). R1_SCRIPTS_DIR env-overridable for
+fixtures. Belt-and-braces: the two hand legs stay (their messages are better);
+3n2 is the superset.
+
+VALIDATION by real execution on the leg code extracted VERBATIM from the patched
+gate (sed -n '231,260p' -> /tmp/t163-leg.sh, sourced with note()/err shims per
+the t162 trap), fixtures under /tmp/t163-fix, all deleted after: F1 clean
+launcher RC=0; F2 MOUNT of pristine game/ ERR; F3 SCRATCH outside work/ ERR;
+F4 pkill -f ERR; F5 no bound ERR; F6 empty dir ERR (inert-leg scream); F7
+comment-only MOUNT correctly NOT counted as a launcher (inert-scream fires,
+proving comment-stripping is load-bearing). Real gate: GATE_EXIT=0, zero FAIL
+lines, "3n2: auditing 12 dosbox launcher(s)" at log line 7, ALL CHECKS PASS.
+ledger_audit LEDGER AUDIT OK. One self-inflicted harness bug caught pre-run:
+first draft of the fixture script DUPLICATED the leg code instead of sourcing it
+(a copy drifts from the shipped leg — the exact failure family this section is
+about); rewritten to source the extracted file.
+
+LAW (sixth recursion t157->t163): {audited} must be DERIVED from the property
+that makes a file dangerous, never hand-listed from memory of what broke — and
+the check must assert the POSITIVE contract (mount target IS scratch under
+work/) rather than the absence of one bad literal, because the literal's
+presence was never what made a launcher safe. Enforcement per t158: 3n2 lives
+inside gate.sh itself. NO ledger row closed (harness hardening, not
+measurement).
