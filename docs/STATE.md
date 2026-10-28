@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T03:40
+updated: 2026-10-28T03:52
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -258,13 +258,20 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     commit outside loop-owned paths since the last iteration. The hand
     checks are no longer required; run any by hand only if its tool leg
     errors, and then re-check the probe's OWN paths/baseline first.
-    t151 ADDS A CONTENT BASELINE for the timeline leg (the growth leg stays
-    mtime/size): the frozen live-timeline.jsonl head/tail 64 KiB md5s are
-    42a0bed0507f9052e2009ec94e9c27f1 / 1529ab1ad70ac360f441d819703f943f
-    (stop-report §44; last line {"file":"60.sav","turn":1254,...}). If the
-    leg ever ARMS, check the md5s BEFORE running sitting adjudication:
-    tail-md5 match + moved mtime = a touch, not a sitting; differing tail-md5 = real ingest.
-    Never md5 the whole 5.7 GB file.
+    t151 ADDS A CONTENT BASELINE for the timeline leg; t156 ENACTS it in
+    code (hole A6: grep -c 'md5|hashlib' in the probe was 0 — the rule lived
+    only in this file's prose, so a session that armed on (A) without re-reading
+    it replayed the stale shared sitting, the exact t152 hazard). The leg now
+    hashes head/tail 64 KiB ITSELF when mtime/size differ: same size + both
+    md5s == the frozen values => prints "TOUCHED not grown", does NOT arm
+    (sound: the watcher appends, r1_playcap_watch.py:146, so an ingest cannot
+    be md5-neutral); anything else => arms naming the measured values;
+    unreadable => arms without the content check. Frozen values: head
+    42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f
+    (stop-report §44; last row {"file":"60.sav","turn":1254,...}), pinned as
+    BASE_HEAD_MD5/BASE_TAIL_MD5 — re-freeze ONLY when a sitting legitimately
+    lands, never to silence a trigger. R1_TIMELINE overrides the path for
+    fixtures. Never md5 the whole 5.7 GB file (edge-hashes are 0.02 s).
     T146 LESSON (generalising t145): every (B) leg WAS a working-tree
     comparison, so a user answer delivered as a clean commit moved HEAD and
     read as idle for an unlimited number of turns. The invariant that
@@ -328,6 +335,52 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T156 LANDED (IDLE re-check #43 — no trigger fired; deliverables:
+scripts/r1_idle_probe.py ((A6) leg + edge_md5() + R1_TIMELINE + docstring law),
+docs/re/stop-report.md §49, docs/re/_wip_t156.md; no ledger row touched, game/
+untouched, no watch or census run against the live capture). (1) Trigger (A)
+NEGATIVE — probe RC=0 at 03:39:49 (cutoff 03:38:08): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (46th consecutive byte-identical reading t111..t156;
+independently re-statted, equal to BASE_MTIME_NS/BASE_SIZE); t151 content
+baseline reproduced a FIFTH time head 42a0bed0507f9052e2009ec94e9c27f1 / tail
+1529ab1ad70ac360f441d819703f943f, last row still t1254; zero dosbox procs; find
+sweep non-loop none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20).
+(2) THE FINDING — hole (A6), t145 method aimed at the timeline growth leg: it
+compared ONLY mtime/size — `grep -c 'md5|hashlib' scripts/r1_idle_probe.py` ==
+0 — while the t151 touch-vs-ingest rule lived ONLY in STATE.md prose. A session
+arming on (A) without re-reading that prose would adjudicate the SHARED
+stale t1253/1254 sitting as the user's new game (the exact t152 hazard, no
+error, default path prints no warning). FIX: edge_md5() (first/last 64 KiB,
+seek-based, 0.019 s measured on the real 5.7 GB file; a file <= one window is
+its own head and tail) + the (A6) leg inside trigger_a: same size AND both md5s
+== frozen values => "TOUCHED not grown", NOT armed (sound because the watcher
+appends r1_playcap_watch.py:146, so an ingest strictly grows the file and can
+never be md5-neutral); anything else => armed naming measured values; OSError =>
+armed without content check. TIMELINE env-overridable (R1_TIMELINE) per loop
+convention so the leg is testable. Five validations by REAL execution, fixtures
+deleted: t1 growth arms CONTENT CHANGED; t2 touch does NOT arm; t3 same-size
+content-diff arms; t4 unreadable arms without content check; helper MATCHes the
+hand-measured dd/tail md5s on the real file. One self-inflicted patch bug caught
+by the tests: v1 edge_md5 left the position at EOF after the head read, so sub-
+window files hashed an empty tail (d41d8cd9) contrary to its docstring — inert
+for the real file, latent lie for any small fixture; rewritten with an explicit
+size<=window branch. LAW GENERALISED (extends t145/t155): a rule recorded in
+STATE.md prose is NOT a leg — adjudication that depends on a human re-reading
+the doc at trigger time will not happen; encode it in the tool or declare the
+surface un-adjudicated. (3) Trigger (B) NEGATIVE — clean tracked tree at
+1767c28, no STEERING, B3 HEAD == journal sha 1767c28 (row 77 ct 03:37:15,
+re-extracted by hand outside the probe), prompt pair prompt-78 vs prompt-77
+(58/58) digit-stripped delta 0; verdict printed "IDLE — neither trigger", valid
+per t155/B5 because the tree was clean AT SESSION START. §3 answers outstanding
+after forty-three idle turns. (4) Bank hygiene fresh (grep -rln stop-report
+scripts/ -> only r1_idle_probe.py + .pyc; gate.sh only -s/grep -q docs/re,
+never writes stop-report.md; 1727 lines zero diff vs HEAD before appending
+§49). Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 2026-10-27 17:30:18/30114 — zero connects). NO row closed
+(strict-close honest negative), no law falsified. NEXT stays IDLE; the t113
+LOOP-END PROPOSAL stands. Gate 0.
 
 T155 LANDED (IDLE re-check #42 — no trigger fired; deliverables:
 scripts/r1_idle_probe.py (B5) leg + docstring B4/B5 laws,

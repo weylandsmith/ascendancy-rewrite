@@ -1725,3 +1725,55 @@ stop-report scripts/ -> only r1_idle_probe.py + .pyc; stop-report.md 1683 lines
 zero diff vs HEAD before appending §48). Infra unchanged since t112. NO row
 closed (strict-close honest negative), no law falsified. NEXT stays IDLE; the
 t113 LOOP-END PROPOSAL stands. Gate 0.
+
+## 49. IDLE re-check #43 (t156, 2026-10-28 03:40 EDT) — both triggers negative; (A6) coverage FIX: the t151 content baseline was documented, not enacted
+
+Trigger (A) NEGATIVE (probe RC=0 at 03:39:49, session-start cutoff 03:38:08):
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (46th consecutive byte-identical reading,
+independently re-statted with stat -c '%Y %y %s' and equal to the probe's own
+BASE_MTIME_NS/BASE_SIZE at r1_idle_probe.py:75-76); zero dosbox procs; find
+sweep non-loop none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20, all
+match the watcher glob). Trigger (B) NEGATIVE: clean tracked tree at 1767c28,
+no STEERING file, untracked none inside/outside LOOP_OWNED, B3 HEAD == journal
+sha 1767c28 (row 77 ct 03:37:15, last tab field re-extracted by hand outside
+the probe), prompt pair prompt-78 vs prompt-77 (58/58) digit-stripped delta 0.
+The VERDICT printed "IDLE — neither trigger", valid because the tree was clean
+AT SESSION START (t155/B5 semantics).
+
+THE FINDING — hole (A6), the t145 method ("ask what the leg DOES with its
+input") aimed at the timeline growth leg. trigger_a compared ONLY st_mtime_ns
+and st_size; `grep -c 'md5|hashlib' scripts/r1_idle_probe.py` returned 0. The
+t151 rule — tail-md5 match + moved mtime = a touch, differing tail-md5 = real
+ingest — lived ONLY in STATE.md prose, quoted forward ever since. So on the
+loop's highest-stakes path, a fresh session that arms on (A) and does not
+re-read the prose would run r1_t85g_sitting.py on the SHARED shared dir and
+print the stale t1253/1254 sitting with alliance/ship/damage snapshots as if it
+were the user's new game: the exact t152 hazard, with no error and (via the
+default) no dir echo warning anyone.
+
+FIX (scripts/r1_idle_probe.py): edge_md5() (first/last 64 KiB only, seek-based,
+measured 0.019 s on the real 5.7 GB file; a file no larger than one window IS
+its own head and tail) + the (A6) leg. Same size AND both md5s == baseline =>
+"TOUCHED not grown", NOT armed; anything else => armed with the actual values;
+OSError => armed without content check (cannot disprove growth). Demotion is
+sound BECAUSE the watcher appends (r1_playcap_watch.py:146 jl=open(jlp,"a")):
+an ingest strictly grows the file, so it can never be md5-and-size-neutral.
+TIMELINE is now env-overridable (R1_TIMELINE) like R1_JOURNAL/R1_WATCH_SCRIPT,
+so the leg is testable. Baseline constants pinned as BASE_HEAD_MD5 /
+BASE_TAIL_MD5 next to the size baseline, with the re-freeze law inherited.
+
+VALIDATION BY REAL EXECUTION (fixtures deleted): t1 growth arms "CONTENT
+CHANGED"; t2 touch (new mtime, same size, same md5s) does NOT arm; t3 same-size
+content-diff arms; t4 unreadable arms without content check; helper
+cross-checked against the hand-measured dd/tail md5s on the REAL file (MATCH
+True); t5 real-state control RC=0. One patch bug self-inflicted and caught by
+running the tests: the first edge_md5 left the file position at EOF after the
+head read, so files under one 64 KiB hashed an empty tail (d41d8cd9) while the
+docstring promised otherwise — inert for the real file, a latent lie for any
+future small fixture; rewritten with an explicit size<=window branch.
+
+LAW GENERALISED (extends t145/t155): a rule recorded in STATE.md prose is NOT a
+leg. If the adjudication depends on a human re-reading the doc at the moment of
+the trigger, it will not happen — encode it in the tool or keep saying out loud
+that the trigger is un-adjudicated.

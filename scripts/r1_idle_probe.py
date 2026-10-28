@@ -10,6 +10,13 @@ Laws encoded here (each earned the hard way, do not "simplify" them away):
       law); the find-sweep cutoff MUST be session start — a looser window
       also lists work/r1/selftest-t111-playcap/* and work/r1/.anch-cache.json
       (t111 self-test artifacts, not captures).
+  (A6) an mtime/size delta on the timeline is NOT proof of an ingest. The t151
+      head/tail 64 KiB md5 baselines are ENACTED in the leg (t156), so the
+      touch-vs-ingest call no longer lives in prose the caller may not re-read:
+      same size + both md5s == baseline => TOUCH, not armed; anything else =>
+      armed. Sound because the watcher appends (r1_playcap_watch.py:146), so a
+      real sitting cannot be md5-neutral. Edge-hashes only; never md5 5.7 GB.
+      Env R1_TIMELINE overrides the path for fixtures.
   (B) trigger (B) is adjudicated by CONTENT (`git diff HEAD`), never mtime:
       the preflight gate runs after each commit and mtime-touches
       docs/re/{text,modules,economy,gizmos,fnt}.md with zero content delta
@@ -64,11 +71,18 @@ import time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLAYCAP = os.path.join(ROOT, "work", "r1")
-TIMELINE = os.path.join(PLAYCAP, "playcap", "live-timeline.jsonl")
+TIMELINE = os.environ.get("R1_TIMELINE",
+                          os.path.join(PLAYCAP, "playcap", "live-timeline.jsonl"))
 # Frozen baseline per STATE.md t116; re-freeze only when a sitting legitimately
 # lands (the sitting-adjudication task), never to silence a real trigger.
 BASE_MTIME_NS = 1793043841_304_000_000  # 2026-10-26 15:44:01.304 -0400 (stat %Y verified t117)
 BASE_SIZE = 5691796463
+# t151 CONTENT baseline, ENACTED t156 (was STATE.md prose only — see (A6) below).
+# md5 of the FIRST and LAST 64 KiB of the frozen 5,691,796,463 B timeline;
+# reproduced byte-identically t151..t156. Never hash the whole file.
+BASE_EDGE_MD5 = 64 * 1024
+BASE_HEAD_MD5 = "42a0bed0507f9052e2009ec94e9c27f1"
+BASE_TAIL_MD5 = "1529ab1ad70ac360f441d819703f943f"
 # Paths the loop edits every iteration; a delta here is never the user's
 # answer (t117). Shared by the tree leg and the (B3) committed-commit leg.
 LOOP_OWNED = ("docs/STATE.md", "docs/OPEN-QUESTIONS.md", "docs/BLOCKED.md",
@@ -78,6 +92,21 @@ LOOP_OWNED = ("docs/STATE.md", "docs/OPEN-QUESTIONS.md", "docs/BLOCKED.md",
 def sh(cmd):
     return subprocess.run(cmd, shell=True, cwd=ROOT, capture_output=True,
                           text=True).stdout
+
+
+def edge_md5(path):
+    """md5 of the first and last BASE_EDGE_MD5 bytes only (seek-based; never
+    hashes the whole 5.7 GB timeline — t151 law). A file no larger than one
+    edge window IS its own head and tail, so both md5s are equal."""
+    import hashlib
+    size = os.path.getsize(path)
+    with open(path, "rb") as f:
+        head = f.read(BASE_EDGE_MD5)
+        head_md5 = hashlib.md5(head).hexdigest()
+        if size <= BASE_EDGE_MD5:
+            return head_md5, head_md5
+        f.seek(size - BASE_EDGE_MD5)
+        return head_md5, hashlib.md5(f.read(BASE_EDGE_MD5)).hexdigest()
 
 
 def trigger_a(now_wall):
@@ -94,8 +123,39 @@ def trigger_a(now_wall):
         reasons.append("live-timeline.jsonl mtime_ns=%d size=%d (baseline %d/%d)"
                        % (st.st_mtime_ns, st.st_size, BASE_MTIME_NS, BASE_SIZE))
         if st.st_mtime_ns > BASE_MTIME_NS or st.st_size > BASE_SIZE:
-            armed = True
-            reasons.append("timeline grew past frozen baseline")
+            # (A6) t156: the t151 content baseline was prose only — the leg
+            # armed on mtime/size and left the touch-vs-ingest call to a human
+            # re-reading STATE.md mid-iteration. Enacted here: the watcher
+            # APPENDS (r1_playcap_watch.py:146 jl=open(jlp,"a")), so a real
+            # sitting strictly GROWS the file; a same-size same-edge-md5 delta
+            # is a touch (backup/copy tooling), not a sitting. demote-TOUCH
+            # therefore cannot suppress a real ingest.
+            try:
+                head_md5, tail_md5 = edge_md5(TIMELINE)
+            except OSError as exc:
+                armed = True  # cannot disprove growth; arm (absence of
+                reasons.append("timeline edge-md5 unreadable (%s) — growth "
+                               "leg armed without content check" % exc)
+            else:
+                same_content = (st.st_size == BASE_SIZE
+                                and head_md5 == BASE_HEAD_MD5
+                                and tail_md5 == BASE_TAIL_MD5)
+                if same_content:
+                    reasons.append(
+                        "timeline TOUCHED not grown: size==baseline and head/"
+                        "tail 64KiB md5 == t151 baseline (%s/%s) — NOT armed "
+                        "(watcher appends, so an ingest cannot be md5-neutral)"
+                        % (head_md5[:8], tail_md5[:8]))
+                else:
+                    armed = True
+                    reasons.append(
+                        "timeline CONTENT CHANGED: size=%d head_md5=%s "
+                        "tail_md5=%s vs baseline %d/%d/%s/%s — real ingest "
+                        "(or anomaly; investigate either way); run sitting "
+                        "adjudication on the dir the trigger "
+                        "names" % (st.st_size, head_md5[:8], tail_md5[:8],
+                                   BASE_SIZE, BASE_MTIME_NS,
+                                   BASE_HEAD_MD5[:8], BASE_TAIL_MD5[:8]))
     else:
         reasons.append("WARNING: timeline missing")
     dosbox = sh("ps -eo pid,comm | awk '$2 ~ /dosbox/ {print}'").strip()
