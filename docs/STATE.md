@@ -6,11 +6,16 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T03:52
+updated: 2026-10-28T04:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
-## resolution evidence — this block is the fast index. Update BOTH or neither.)
+## resolution evidence — this block is the fast index. Update BOTH or neither.
+## t157 LESSON: hand-mirroring drifted 6 rows (5 closed rows still listed open,
+## OQ-023 missing) and nothing caught it — gate.sh never runs ledger_audit.py,
+## and ledger_audit only checks the record against its own --expect list.
+## RE-DERIVE, don't hand-maintain: python3 scripts/ledger_index_check.py prints
+## the true open set from the record and diffs this block against it.)
 ledger:
   closed:
     - "OQ-001 .cob offsets = N not N+1"
@@ -74,48 +79,57 @@ ledger:
       13 Extinct t503 / 1 Control t842 / 2 Control t677, all FINITE <1200;
       PLAYTHROUGH.md regenerated. AGGREGATE model caveats S2i (no per-ship
       slots/same-system/range gates; per-ship = OQ-019)"
+    - "OQ-006 headerless sample rate CLOSED 2026-10-07: DEVICE rate = 22050
+      MEASURED — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 ->
+      unique edge 0x68882 -> rate setter 0x6e000 stores [obj+0x3c]; constructor
+      default 11025 @0x6df3e always overwritten; audio.md 3.1; pin
+      audio_open_rate_measured_oq006 (channels: no vendor field, mono by
+      convention)"
+    - "OQ-012 mapgen CLOSED t78: (a) size options measured 2026-10-12 (density
+      cycle 50/75/100/15/25, wraps; rewrite --stars knob), (b) closed 06o (pps
+      U{1..5}), (c) closed 06p/06q (shell position law; rewrite upgraded +
+      tested), (d) closed 06k (sphere extent, refined by (c))"
+    - "OQ-015 DA_ template selection order + full %token table CLOSED
+      2026-10-08 (t12-t14): chooser FUN_00044a44 return == ACTIONS pool idx;
+      DIPVALUES field map via FUN_00044290; trade gates/cadence rekeyed into
+      OQ-023 as BUILD work (law in hand, engine unwired); %token census 22/22
+      files == {%m,%y,%s,%t}; pins dip_action_chooser_law_oq015_t12 +
+      dip_strict_threshold_oq015_t13 + dip_trade_predicate_bytes_oq015_t14"
+    - "OQ-020 ability charge days CLOSED t100: cadence word
+      WORD[0x6780+2*ability] (live 60.sav == FILE 0x89330, zero writers;
+      5:60 6:100 7:62 8:77 9:90 10:150 11:70 12:63 13:66 14:72 16:92 17:100
+      19:89 20:68, zeros == passive set) wired as kCad[21] in species.cpp
+      abilityChargeTurns + abilityPhase COUNT-UP law; pins + verify tool
+      r1_t100_cad_verify.py both legs"
+    - "OQ-025 mapgen non-default-density POSITION law CLOSED t79: shell radii
+      fixed at every size, populations = halving law (T//2+1 then halve);
+      reproduces the T=50 battery table exactly; rewrite shellRadiiFor()
+      replaces the wrong i%50 wrap; ladder test extended"
   open:
     - "OQ-003 .gam full record map — joint with OQ-010 (planet records joined
       151/151 @ stride 123; STAR TABLE + ORBIT laws closed 2026-10-06 give the
       neighbourhood map: star stride 96, planet ptrs name+0x2A, orbit pair
       planet-name+0x57/+0x5f; field semantics open)"
-    - "OQ-021 end-ctrl threshold: comment 'over half' vs prose 'two-thirds' —
-      t73 dark-zone hit (docs/re/score.md S1-S3): score strings referenced at
-      0x2807b/0x280e7 (pool-rel), score law TRUNC(100*DAT_482fb/T), presenter
-      eventwnd.cpp 0x2c03a cluster; comparator writes = ZERO direct encodings
-      -> evaluator hunt via dark-zone enumeration (t73b); capture fallback.
-      Default >1/2 stands"
-    - "OQ-020 ability charge days CLOSED t100: cadence word
-      WORD[0x6780+2*ability] (live 60.sav == FILE 0x89330, zero writers;
-      5:60 6:100 7:62 8:77 9:90 10:150 11:70 12:63 13:66 14:72 16:92
-      17:100 19:89 20:68, zeros == passive set) wired as kCad[21] in
-      species.cpp abilityChargeTurns + abilityPhase COUNT-UP law (counter
-      == row+0x19e semantics, fires at == cad exactly, reset 0); pins +
-      verify tool r1_t100_cad_verify.py both legs; item-ability (gizmo
-      slot) amass path out of scope per T57b separate-object finding"
-    - "OQ-005 .shp pixel codec — static route exhausted (6 angles, docs/REFUTED-ROUTES.md); needs exe shape loader via live image"
-    - "OQ-006 headerless sample rate — needs exe audio-init constant"
-    - "OQ-012 mapgen CLOSED t78: (a) size options measured 2026-10-12
-      (density cycle 50/75/100/15/25, wraps; rewrite --stars knob),
-      (b) closed 06o (pps U{1..5}),
-      (c) closed 06p/06q (shell position law; rewrite upgraded + tested),
-      (d) closed 06k (sphere extent, refined by (c))"
-    - "OQ-025 mapgen non-default-density POSITION law CLOSED t79: shell
-      radii fixed at every size, populations = halving law (T//2+1 then
-      halve); reproduces the T=50 battery table exactly; rewrite
-      shellRadiiFor() replaces the wrong i%50 wrap; ladder test extended"
-    - "OQ-015 DA_ template selection order + full %token table"
+    - "OQ-005 .shp pixel codec — static route exhausted (6 angles,
+      docs/REFUTED-ROUTES.md); needs exe shape loader via live image"
     - "OQ-016 campaign per-turn constants — scope NARROWED t29: income,
-      growth, cadence, build order, AI SELECTOR LAW (S9) and POP-CAP SEED
-      LAW (S10: capBase=nonbarren/3+5 @0x37f84..0x37f9e, measured preset
-      table 0x744f4 + cell table 0x744a8, recalc clamp w/ flags&4 AND
-      Colony-Base skips, Lush Growth Bomb +10; rewrite seeded capBase/
-      surfaceCells + storedCapFor replaces constant-25, pin test
-      campaign_pop_cap_seed_law_oq016) all closed with evidence
-      (income-law.md S6..S10). STILL OPEN: per-cell terrain/nuke wiring,
-      home-placement verification, +2 residual minutiae (0.4% samples),
-      scenario-template preset source"
-    - "OQ-019 ship design model (hull+gizmo inventory, cost hack, Orbital Docks)"
+      growth, cadence, build order, AI SELECTOR LAW (S9) and POP-CAP SEED LAW
+      (S10) closed (income-law.md S6..S10). STILL OPEN: per-cell
+      terrain/nuke wiring, home-placement verification, +2 residual minutiae
+      (0.4% samples), scenario-template preset source"
+    - "OQ-019 ship design model (hull+gizmo inventory, cost hack, Orbital
+      Docks); per-ship combat application = OQ-010 aggregate caveats S2i"
+    - "OQ-021 end-ctrl threshold: comment 'over half' vs prose 'two-thirds' —
+      t73 dark-zone hit: score strings at 0x2807b/0x280e7 (pool-rel), score law
+      TRUNC(100*DAT_482fb/T), presenter eventwnd.cpp 0x2c03a cluster;
+      comparator writes = ZERO direct encodings -> evaluator hunt via
+      dark-zone enumeration (t73b); capture fallback. Default >1/2 stands"
+    - "OQ-023 dip third-party/trade branch — RE residual OPEN: nonzero
+      relation-state ENUM semantics (which of 1/2/3 = war vs allied; idle
+      corpus holds ONLY 1, no injected transition), same closure class as
+      OQ-021 (interactive original session). Two-party main-branch law itself
+      MEASURED diplomacy.md 7/8/9 and implemented; the ENGINE build for
+      TRADE/third-party offers is separate build work, not measurement"
 
 ## WHAT IS IN HAND (tools + laws — a fresh session starts here, not from scratch)
 - R1 save-state capture LIVE: scripts/r1_savestate.sh (boot -> autosave ZIP,
@@ -202,7 +216,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #42 done at t155; stop-report.md §48): loop awaits a user
+IDLE (re-check #44 done at t157; stop-report.md §50): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -215,6 +229,12 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     NOT ADJUDICATED (see the A4 line in its output; repair via
     `bash scripts/r1_playcap_vnc.sh`, re-run the probe, and do NOT record
     the turn as a clean steady-state negative).
+    SEPARATELY RUN `python3 scripts/ledger_index_check.py` (t157): diff of
+    THIS file's ledger block vs docs/OPEN-QUESTIONS.md using the audit's own
+    classifier; LEDGER INDEX OK means the open menu a re-armed session picks
+    from is truthful. t157 measured it had drifted 6 rows un-noticed by every
+    existing check (see §50). If it FAILS, re-derive the block from the
+    record (the record wins) before anything else this turn.
     VERDICT WORDING (t155/B5): at SESSION START a clean tree prints
     "IDLE — neither trigger". If it prints "IDLE with CANDIDATE" you are
     almost certainly running it MID-ITERATION after editing a loop-owned
@@ -335,6 +355,51 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T157 LANDED (IDLE re-check #44 — no trigger fired; deliverables:
+scripts/ledger_index_check.py (NEW), docs/STATE.md ledger block re-derived,
+docs/re/stop-report.md §50, docs/re/_wip_t157.md; no ledger row touched, game/
+untouched, no watch or census run against the live capture). (1) Trigger (A)
+NEGATIVE — probe RC=0 at 03:55:39 (cutoff 03:53:57): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (47th consecutive byte-identical reading t111..t157;
+independently re-statted, equal to BASE_MTIME_NS/BASE_SIZE); (A6) content
+baseline reproduced a SIXTH time head 42a0bed0507f9052e2009ec94e9c27f1 / tail
+1529ab1ad70ac360f441d819703f943f, last row still t1254; zero dosbox procs; find
+sweep non-loop none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20).
+(2) THE FINDING — a control-plane hole OUTSIDE the trigger surface: STATE.md's
+ledger fast index had drifted SIX rows from the authoritative record
+docs/OPEN-QUESTIONS.md, measured by importing ledger_audit's own classifier:
+OQ-006/012/015/020/025 listed open while the record CLOSED them, OQ-023 open
+but MISSING from the index. STATE's header said "Update BOTH or neither" — a
+prose invariant with zero enforcement: gate.sh never runs ledger_audit.py
+(verified by grep), and ledger_audit checks the record only against its
+hard-coded --expect list, never against STATE.md (its docstring even describes
+an index format STATE never used). Hazard: a re-armed session obeys "resume
+from STATE.md ALONE" and would pick tasks from a 10-row menu with 5 stale rows
+and 1 missing row. Mechanism: scope-narrowing narrative — closed sub-legs
+stayed INLINE in open-entry text while the row never moved lists. FIX shipped:
+ledger_index_check.py diffs STATE's block vs the record (same parser, so the
+two checks cannot disagree by classifier; v1 ids exempt because they close in
+the record's "- > OQ-" block ledger_audit skips). Validated by REAL execution:
+HEAD's pre-repair STATE.md => RC=1 naming all six drifts; repaired block =>
+RC=0 LEDGER INDEX OK; fixture deleted. Index re-derived from the record (open
+= OQ-003/005/016/019/021/023). NEXT ACTION block now instructs running the
+index check every session start. LAW GENERALISED (extends t145/t146/t155/
+t156): a documented invariant between TWO files is enforced by nobody who only
+reads one of them — each artifact satisfied its own check while they disagreed;
+if a fact must hold across artifacts, ship a checker that reads BOTH and point
+the prose at the checker, not at manual discipline. (3) Trigger (B) NEGATIVE —
+clean tracked tree at 1f62e45 at session start (verdict wording valid per
+t155/B5), no STEERING, B3 HEAD == journal sha 1f62e45 (re-extracted by hand
+from journal.tsv last tab field), prompt pair prompt-79 vs prompt-78 (58/58)
+digit-stripped delta 0. §3 answers outstanding after forty-four idle turns.
+(4) Bank hygiene fresh (grep -rln stop-report scripts/ -> only
+r1_idle_probe.py + .pyc; stop-report.md zero diff vs HEAD at 1779 lines before
+appending §50). Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher
+27774; x11vnc.log 2026-10-27 17:30:18/30114 — zero connects). NO row closed
+(strict-close honest negative — the repair is bookkeeping, not measurement),
+no law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands. Gate 0.
 
 T156 LANDED (IDLE re-check #43 — no trigger fired; deliverables:
 scripts/r1_idle_probe.py ((A6) leg + edge_md5() + R1_TIMELINE + docstring law),

@@ -1777,3 +1777,56 @@ LAW GENERALISED (extends t145/t155): a rule recorded in STATE.md prose is NOT a
 leg. If the adjudication depends on a human re-reading the doc at the moment of
 the trigger, it will not happen — encode it in the tool or keep saying out loud
 that the trigger is un-adjudicated.
+
+## 50. IDLE re-check #44 (t157, 2026-10-28 03:55 EDT) — both triggers negative; ledger-index drift found and repaired
+
+Trigger (A) NEGATIVE — probe RC=0 at 03:55:39 (cutoff 03:53:57): newest playcap
+dir playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (47th consecutive byte-identical reading t111..t157; independently
+re-statted, equal to BASE_MTIME_NS/BASE_SIZE); (A6) content baseline reproduced
+a SIXTH time head 42a0bed0507f9052e2009ec94e9c27f1 / tail
+1529ab1ad70ac360f441d819703f943f, last row still t1254; zero dosbox procs; find
+sweep non-loop none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20).
+Trigger (B) NEGATIVE — clean tracked tree at 1f62e45 at session start (so the
+"IDLE — neither trigger" verdict wording is valid per t155/B5), no STEERING,
+B3 HEAD == journal sha 1f62e45 (re-extracted by hand from journal.tsv last tab
+field), prompt pair prompt-79 vs prompt-78 (58/58 lines) digit-stripped delta 0.
+
+THE FINDING — a control-plane hole OUTSIDE the trigger surface: STATE.md's
+"ledger:" fast index had silently diverged from the authoritative record
+docs/OPEN-QUESTIONS.md by SIX rows, measured with ledger_audit.py's own status
+classifier (imported, not eyeballed): OQ-006, OQ-012, OQ-015, OQ-020, OQ-025
+were listed open while the record CLOSED them, and OQ-023 (genuinely open) was
+absent from the index entirely. STATE.md's header says "Update BOTH or neither"
+— the invariant existed in prose and had been violated for an unknown number of
+turns. Why nothing caught it: gate.sh never runs ledger_audit.py (grep: no
+match); loop_one_task.sh runs it post-flight but the audit only checks the
+RECORD against its own hard-coded --expect list — it cannot see STATE.md, whose
+index ledger_audit's docstring even describes in a format ("- > OQ-") STATE
+never used. A fresh session that obeys "resume from STATE.md ALONE" reads a
+10-row menu with 5 stale rows and misses the 1 missing open row. Idle turns
+never acted on it because they don't pick tasks from the index — the day the
+loop RE-ARMS, it picks from this menu.
+
+REPAIR: index re-derived from the record (open = OQ-003/005/016/019/021/023,
+closed = the 12 record rows + 7 v1 ids); and scripts/ledger_index_check.py
+shipped — same classifier as ledger_audit (imported), diffs STATE's block
+against the record, exit 1 naming each divergence. Validation by REAL
+execution: HEAD's pre-repair STATE.md -> RC=1 naming all six drifts; repaired
+STATE.md -> RC=0 "LEDGER INDEX OK"; fixtures deleted. The drift mechanism was
+scope-narrowing narrative: each closed sub-leg stayed INLINE in the open-entry
+text (e.g. OQ-012 "(a)...(d) all closed") while the row never moved to the
+closed list — so a reader of the index sees "open" and a grepper of the body
+sees all-closed. v1 ids (OQ-001/002/007/008/009/011/017) are exempt by design:
+they close in the record's "- > OQ-" index block that ledger_audit skips.
+
+LAW GENERALISED (extends t145/t146/t155/t156): a documented invariant between
+two files is not enforced by anyone reading one of them. ledger_audit checked
+file A against a constant; STATE's prose told humans to keep B equal to A; both
+were satisfied in their own terms while A and B disagreed. If a fact must be
+true across two artifacts, ship a checker that reads BOTH — and point the prose
+at the checker, not at the manual discipline.
+
+NO row closed (strict-close honest negative — the repair is bookkeeping, not
+measurement); no law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL
+stands (now 44 idle turns with zero user input).
