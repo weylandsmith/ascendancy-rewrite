@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T02:10
+updated: 2026-10-28T02:26
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #37 done at t150; stop-report.md §43): loop awaits a user
+IDLE (re-check #38 done at t151; stop-report.md §44): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -242,6 +242,13 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     commit outside loop-owned paths since the last iteration. The hand
     checks are no longer required; run any by hand only if its tool leg
     errors, and then re-check the probe's OWN paths/baseline first.
+    t151 ADDS A CONTENT BASELINE for the timeline leg (the growth leg stays
+    mtime/size): the frozen live-timeline.jsonl head/tail 64 KiB md5s are
+    42a0bed0507f9052e2009ec94e9c27f1 / 1529ab1ad70ac360f441d819703f943f
+    (stop-report §44; last line {"file":"60.sav","turn":1254,...}). If the
+    leg ever ARMS, check the md5s BEFORE running sitting adjudication:
+    tail-md5 match + moved mtime = a touch, not a sitting; differing tail-md5 = real ingest.
+    Never md5 the whole 5.7 GB file.
     T146 LESSON (generalising t145): every (B) leg WAS a working-tree
     comparison, so a user answer delivered as a clean commit moved HEAD and
     read as idle for an unlimited number of turns. The invariant that
@@ -287,6 +294,39 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T151 LANDED (IDLE re-check #38 — no trigger fired; deliverables:
+docs/re/stop-report.md §44 appended, docs/re/_wip_t151.md; no ledger row
+touched, no scripts/ change, no watch/census run against the live capture).
+(1) Trigger (A) NEGATIVE — probe RC=0 at 02:19:44 (session-start cutoff
+02:17:58): newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B (41st consecutive byte-identical
+reading t111..t151; re-statted independently, exact match, equal to
+BASE_MTIME_NS/BASE_SIZE at r1_idle_probe.py:55-56); zero dosbox procs; find
+sweep non-loop none; A4 watcher ALIVE pid 27774 (PPid 27772 wrapper pair,
+t115), wchan=hrtimer_nanosleep State S, fds 1/2->watch.out,
+3->live-timeline.jsonl, 4->watch.log; A5 none (save/*.sav = 20, all match the
+watcher glob). (2) THE ITERATION'S VALUE — the (A) timeline baseline was
+mtime+size only, so it could not distinguish a touch from an ingest and could
+not be re-proved content-stable cheaply. Banked a CONTENT signature of the
+frozen timeline (t116 law aimed at the baseline itself): head/tail 64 KiB md5s
+42a0bed0507f9052e2009ec94e9c27f1 / 1529ab1ad70ac360f441d819703f943f, last
+line {"file":"60.sav","turn":1254,...} — now recorded in the (A) block above
+with the adjudication rule; no probe change (the growth leg is proven, t117
+positive control). (3) Trigger (B) NEGATIVE — clean tracked tree at 39dcdc2,
+no STEERING file, B3 HEAD == journal row 72 sha 39dcdc2 (re-read
+independently); prompt pair prompt-73 vs prompt-72 (58/58) digit-stripped
+delta 0, hand cross-check agrees with the tool leg. §3 answer outstanding
+after thirty-eight idle turns. (4) t147 law run again — every cited site
+re-read from source before banking: r1_idle_probe.py:335-341 numeric prompt
+sort, r1_playcap_watch.py:161 lowercase glob, r1_slot.py:49 .anch-cache.json;
+bank hygiene grep -> only r1_idle_probe.py docstring + .pyc, stop-report.md
+1468 lines zero diff vs HEAD pre-append. Infra unchanged since t112 (Xvfb
+1196 / x11vnc 1207 / watcher 27774; x11vnc.log 2026-10-27 17:30:18/30114 —
+zero connects); probe children 170331/170382 per the t118 noise law; removed
+the stale /tmp/t149-watch fixture t149 left behind. NO row closed (strict-close
+honest negative), no law falsified. NEXT stays IDLE; the t113 LOOP-END
+PROPOSAL stands. Gate 0.
 
 T150 LANDED (IDLE re-check #37 — no trigger fired; deliverables:
 docs/re/stop-report.md §43 appended, docs/re/_wip_t150.md; no ledger row

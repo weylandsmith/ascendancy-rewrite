@@ -1466,3 +1466,49 @@ untouched; no watch or census run against the live capture. NO row closed
 (strict-close honest negative — an idle turn yields no cited measurement), no
 law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands. §3 answer
 outstanding after thirty-seven idle turns.
+
+## 44. IDLE RE-CHECK #38 (t151, 2026-10-28 02:19 EDT) — negative; timeline CONTENT signature added to the (A) baseline
+
+(1) Trigger (A) NEGATIVE — probe RC=0 at 02:19:44 (session-start cutoff
+02:17:58): newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B (41st consecutive byte-identical
+reading t111..t151; re-statted independently, exact match, equal to the
+probe's own BASE_MTIME_NS/BASE_SIZE at r1_idle_probe.py:55-56); zero dosbox
+procs; find sweep non-loop: none; A4 watcher ALIVE pid 27774 (PPid 27772 =
+the normal bash-wrapper pair, t115), wchan=hrtimer_nanosleep State S, fds
+1/2->watch.out, 3->live-timeline.jsonl, 4->watch.log; A5 none (save/*.sav =
+20, all match the watcher glob).
+
+(2) THE ITERATION'S VALUE — the (A) baseline was mtime+size only, which
+cannot distinguish a real ingest from a touch, and cannot be re-proved
+content-stable without reading 5.7 GB. Recorded a CONTENT signature of the
+frozen timeline as a second invariant (t116 content-over-mtime law pointed at
+the baseline itself instead of at candidate deltas):
+`head -c 65536 live-timeline.jsonl | md5sum` == 42a0bed0507f9052e2009ec94e9c27f1,
+`tail -c 65536` == 1529ab1ad70ac360f441d819703f943f, last line
+{"file":"60.sav","turn":1254,"T":50,"score_stars":14,...} (the t111 idle-boot
+signature). Reading rule for future turns: if mtime/size move but the tail md5
+matches, it is a touch not a sitting; if the tail md5 differs, a real ingest
+happened regardless of what size says. NEVER md5 the whole file — head/tail
+64 KiB only (stream-never-inhale). No probe change made: the md5s are a banked
+baseline, and the growth leg already works (t117 positive control).
+
+(3) Trigger (B) NEGATIVE — clean tracked tree at 39dcdc2, no STEERING file,
+B3 HEAD == journal row 72 sha 39dcdc2 (re-read independently, ct 02:17:05);
+prompt pair prompt-73 vs prompt-72 (58/58 lines) digit-stripped delta 0,
+cross-checked by hand against the tool leg — identical verdict. §3 answer
+outstanding after thirty-eight idle turns.
+
+(4) Re-verification from source (t147 law), not trust: prompt enumeration
+r1_idle_probe.py:335-341 IS the numeric _num sort; r1_playcap_watch.py:161 IS
+the lowercase `glob.glob(os.path.join(out, "save", "*.sav"))` poll line;
+r1_slot.py:49 IS the `.anch-cache.json` path inside anchors_cached(). Bank
+hygiene: `grep -rln stop-report scripts/` -> only r1_idle_probe.py docstring
++ its .pyc; file 1468 lines zero diff vs HEAD before appending. Ledger audit
+rows=18 open=[OQ-003,OQ-005,OQ-016,OQ-019,OQ-021,OQ-023] closed=12, OK.
+Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 2026-10-27 17:30:18/30114 — zero connects); probe children
+170331/170382 per the t118 noise law. Housekeeping: removed the stale
+/tmp/t149-watch fixture dir t149 left on disk. NO row closed (strict-close
+honest negative), no law falsified. NEXT stays IDLE; the t113 LOOP-END
+PROPOSAL stands.
