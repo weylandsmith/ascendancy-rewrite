@@ -324,3 +324,24 @@ against the t111-FIXED launch path).
 Consequence: §6 LOOP-END PROPOSAL unchanged, 12 closed / 6 open. NO row closed
 (strict-close honest negative), no banked law falsified, no code change.
 Future idle turns: run the tool, read the verdict, bank the reading — nothing else.
+
+## 12. IDLE re-check #6 (t119, 2026-10-27 22:18 EDT) — steady-state negative, no new findings
+
+Session start 22:18:56.820 EDT. `python3 scripts/r1_idle_probe.py` RC=0 at
+22:18:56 (9th consecutive byte-identical timeline reading t111..t119):
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns=1793043841304000000 / 5691796463 B; zero dosbox procs; find sweep
+cutoff 22:18:03 -> 4 files, all work/r1/loop/. (B) negative: clean tracked
+tree at 110ea35, no STEERING file, prompt-41.txt identical to prompt-40.txt
+after digit-stripping (diff empty), no delta outside loop-owned paths.
+r1_t85g_sitting.py correctly not run.
+
+Infra unchanged since t112 (Xvfb 1196, x11vnc 1207, watcher 27774;
+x11vnc.log 17:30:18/30114 — zero connects against the t111-FIXED launch
+path). Two short-lived python3 128932/128996 in the INFRA leg are the
+probe's own shell children — per the t118 noise law, trigger evidence is
+dosbox procs + capture files only.
+
+§3 answer (accept/reject documented defaults, authorize capture sittings,
+resume t89a code work) still outstanding after six idle turns. No re-arm,
+no row closed, no law falsified. NEXT stays IDLE.
