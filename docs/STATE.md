@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T00:34
+updated: 2026-10-28T00:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #30 done at t143; stop-report.md §36): loop awaits a user
+IDLE (re-check #31 done at t144; stop-report.md §37): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -244,11 +244,46 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117):
     docs/re/{text,modules,economy,gizmos,fnt}.md with zero content delta;
     and `--untracked-files=all` is NOT decisive (t117: it lists this
     iteration's own files). Also check the harness prompt
-    work/r1/loop/prompt-<n>.txt for a prepended steering note. A real
-    answer becomes the next STATE.md assignment verbatim and REOPENS the
-    loop.
+    work/r1/loop/prompt-<n>.txt for a prepended steering note — ENUMERATE
+    WITH `ls -1v` (t144 law: `ls -1 | tail -1` returns prompt-9.txt, a
+    single-digit prompt from ~57 turns ago, so the digit-strip diff is
+    silently against the wrong pair; the probe tool itself is immune — it
+    picks the prompt by mtime, see r1_idle_probe.py:82-84). A real answer
+    becomes the next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T144 LANDED (IDLE re-check #31 — no trigger fired; deliverables:
+docs/re/stop-report.md §37 appended; no ledger row touched, no code changed,
+no watch/census run per §6 discipline). (1) Trigger (A) NEGATIVE —
+`python3 scripts/r1_idle_probe.py` RC=0 at 00:37:04 (session start 00:35:19):
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (34th consecutive byte-identical reading
+t111..t144); zero dosbox procs; session-start find sweep 4 files, non-loop:
+none. r1_t85g_sitting.py correctly not run. (2) Trigger (B) NEGATIVE — clean
+tracked tree at ffd9e55 (diff HEAD --name-only empty, status --porcelain empty,
+no untracked), no STEERING file, prompt-66.txt identical to prompt-65.txt after
+digit-stripping (diff -u 0 lines, both 58 lines), no delta outside loop-owned
+paths. §3 answer outstanding after thirty-one idle turns. THE ITERATION'S
+VALUE — NEW PROBE PITFALL banked in §37 and in the NEXT ACTION block: the hand
+steering check enumerated prompts with `ls -1 | tail -1`, which on
+`prompt-*.txt` returns prompt-9.txt (lexical order) and diffs the iteration's
+real prompt against a prompt ~57 turns old. SILENT defect: the loop prompt text
+is stable, so the verdict came out NEGATIVE for the wrong reason and would
+mask any steering note added after single-digit numbering. Re-ran with `ls -1v`
+(prompt-66 vs prompt-65, 58 lines, diff 0) before accepting. Checked the tool:
+`r1_idle_probe.py:82-84` picks the session-start prompt by mtime
+(`sorted(glob, key=getmtime)[-1]`), so the tool was never exposed — same lesson
+as t117: trust the tool's enumeration over a hand-globbed glob. No tool change
+made (the defect is in the hand procedure, now documented). Infra unchanged
+since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log
+2026-10-27 17:30:18/30114 — zero connects against the t111-FIXED launch path);
+transients 157622 (harness mcp_death_supervisor.py, identified via ps -o args=)
+/ 157674 (own probe child) per the t118 noise law, correctly ignored. Bank
+hygiene re-checked fresh: grep -rln stop-report scripts/ hits only
+r1_idle_probe.py + its pycache, zero diff vs HEAD at 1072 lines pre-append, no
+regeneration trap. NO row closed (strict-close honest negative), no law
+falsified. NEXT stays IDLE. Gate 0, LEDGER AUDIT OK
 
 T143 LANDED (IDLE re-check #30 — no trigger fired; deliverables:
 docs/re/stop-report.md §36 appended; no ledger row touched, no code changed,

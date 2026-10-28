@@ -1070,3 +1070,48 @@ is safe.
 Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
 measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
 thirty consecutive idle turns, zero measurement. NEXT stays IDLE.
+
+## 37. IDLE RE-CHECK #31 (t144, 2026-10-28 00:37 EDT) — negative
+
+`python3 scripts/r1_idle_probe.py` RC=0 at 00:37:04 (session start 00:35:19):
+newest playcap dir `playcap-20261014-224611`; `work/r1/playcap/live-timeline.jsonl`
+mtime_ns 1793043841304000000 / size 5691796463 — thirty-fourth consecutive
+byte-identical reading (t111..t144); zero dosbox processes; session-start find
+sweep 4 files, non-loop: none. `r1_t85g_sitting.py` correctly not run.
+
+Trigger (B) NEGATIVE: clean tracked tree at ffd9e55 (`git diff HEAD --name-only`
+empty, `git status --porcelain` empty, no untracked files), no STEERING file, and
+`prompt-66.txt` identical to `prompt-65.txt` after digit-stripping (`diff -u`
+0 lines, both 58 lines; `grep -in steering` hits only the standing instruction
+line 14). No delta outside loop-owned paths. The §3 user-decision list is
+outstanding after thirty-one idle turns.
+
+NEW PROBE PITFALL banked (steering check): enumerate harness prompts with
+`ls -1v`, NOT `ls -1`. `prompt-*.txt` is lexically ordered, so `tail -1` on the
+lexical list returns `prompt-9.txt` — which exists alongside
+`prompt-63..66.txt` — and compares the iteration's true prompt against a prompt
+from ~57 turns ago. That comparison happens to come out empty (the loop prompt
+text is stable), so the defect is SILENT: it yields the correct NEGATIVE verdict
+while reading the wrong pair, and would only ever mislead by masking a steering
+note added after single-digit numbering. Verified this session both ways:
+lexical pair prompt-9/prompt-8 = 41 lines, 0 diff; version-sorted pair
+prompt-66/prompt-65 = 58 lines, 0 diff. The TOOL is not affected:
+`r1_idle_probe.py:82-84` selects the session-start prompt with
+`sorted(glob(...), key=os.path.getmtime)[-1]` (mtime order), which is why the
+tool's cutoff was correct while this hand check was wrong. Same class as the t117 tool-path defect:
+trust the tool's enumeration, not a hand-globbed glob.
+
+Infra unchanged since t112: Xvfb :9 pid 1196, x11vnc :5910 pid 1207, watcher
+pid 27774; `work/r1/vnc/x11vnc.log` mtime 2026-10-27 17:30:18 / size 30114 —
+still zero connect attempts against the t111-FIXED launch path. Transient pid
+157622 (`ps -o args=`: harness's own `mcp_death_supervisor.py`) and 157674 (this
+session's probe child) — ignored per the t118 noise law.
+
+Bank hygiene re-checked fresh before appending: `grep -rln stop-report scripts/`
+hits only `r1_idle_probe.py` + its `__pycache__` bytecode; the file was at 1072
+lines with zero diff against HEAD (§36's committed total), so hand-authoring §37
+is safe.
+
+Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
+measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
+thirty-one consecutive idle turns, zero measurement. NEXT stays IDLE.
