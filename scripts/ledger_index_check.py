@@ -18,11 +18,30 @@ Legs:
   2. parse STATE.md's `ledger:` block (two-space `closed:`/`open:` keys,
      four-space `- "OQ-NNN` entries; continuation lines are indented).
   3. DIVERGENCE = record-open rows missing from the index open list; index-open
-     rows the record calls CLOSED; index entries for ids absent from the record
-     entirely (v1 ids OQ-001..011/017 are exempt: they close in the record's
-     "- > OQ-" index block which ledger_audit ignores BY DESIGN).
+     rows the record calls CLOSED *or* closes in the v1 block; index entries for
+     ids absent from the record entirely (v1 ids OQ-001..011/017 are exempt from
+     THAT leg only: they close in the record's "- > OQ-" index block which
+     ledger_audit ignores BY DESIGN); record-CLOSED rows missing from the index
+     closed list (t161 leg E -- see below); duplicate ids in the record (t161 leg F).
 Exit 0 = index consistent; 1 = divergence listed (never silent).
 Env R1_STATE / R1_LEDGER override paths for fixtures.
+
+t161 (legs E, F + tightening of the v1 exemption). t157's legs are each indexed on
+the OPEN side or on entries the index ALREADY has (see the four loops below), so
+"the record has a CLOSED row the index never mentions" moved nothing and printed
+LEDGER INDEX OK. That was not hypothetical: docs/OPEN-QUESTIONS.md closes OQ-022
+(t8) and OQ-024 (t45) and STATE.md's block listed neither -- 19 closed ids in the
+record vs 17 in the index, found by importing this tool's own sets and asking which
+record ids no leg compares. t157's repair re-derived the open side (the side its
+legs could see) and hand-copied the closed list. The closed side matters because
+STATE.md is what a fresh session reads ALONE: it cannot learn those rows exist, so
+it can re-open closed work, and t159's terminal-green CLOSURE NOTE is graded off
+the same block. Second shape: st = {oid: ... for oid, b in R} collapses a
+DUPLICATED record id silently (last wins); measured zero duplicates in the real
+record today, so this is a deterministic early trip rather than a live fix. Third:
+the v1 exemption was scoped to "absent from the record", but it was applied to the
+OPEN side too, so STATE listing a v1 id as open -- a dead route offered as a menu
+item, the exact t160-era hazard -- printed OK. It now diverges.
 """
 import os
 import re
@@ -113,7 +132,14 @@ def main():
     for o in sorted(idx_open - rec_open):
         if o in rec_closed:
             problems.append(f"STATE lists {o} open; record says CLOSED")
-        elif o not in V1_IDS:
+        elif o in V1_IDS:
+            # t161: the v1 exemption belongs ONLY to the "absent from record"
+            # leg. These ids ARE closed (in the skipped block), so listing one
+            # open is a false menu item, not an absence to forgive.
+            problems.append(
+                f"STATE lists {o} open; record closes it in the v1 '- > OQ-' "
+                "block")
+        else:
             problems.append(f"STATE lists {o} open; id absent from record")
     for o in sorted(idx_closed - rec_closed - V1_IDS):
         if o not in rec_open:
@@ -122,13 +148,39 @@ def main():
             problems.append(f"STATE lists {o} closed; record says OPEN")
     for o in sorted(idx_open & idx_closed):
         problems.append(f"{o} listed in BOTH index lists")
+    # leg E (t161): the direction t157 never had — a CLOSED row in the record
+    # the index omits entirely. Without it the closed list is decoration: it
+    # could lose any row and every leg above would still print OK. Repair stub
+    # is pasteable because STATE.md's own header says "Update BOTH or neither".
+    for o in sorted((rec_closed | V1_IDS) - idx_closed - idx_open):
+        problems.append(
+            f"record-CLOSED {o} missing from STATE index entirely — add "
+            f'\'    - "{o} <one-line summary from the record>"\' to the '
+            "closed: list (every closed row must appear in exactly one list)")
+    # leg F (t161): rows() may yield the same id twice (a continuation line that
+    # wraps to start with 'OQ-' + a pipe passes t85's guard). The dict above
+    # keeps the LAST body silently, so the first copy's status/status/evidence
+    # legs evaporate. Count from R, not from the dict.
+    seen = [oid for oid, _b in R]
+    dupes = sorted({o for o in seen if seen.count(o) > 1})
+    if dupes:
+        problems.append(
+            f"duplicate id(s) in the record: {dupes} — status dict keeps the "
+            "LAST copy silently; merge the rows or fix the wrap line")
 
     print(f"record rows={len(R)} open={sorted(rec_open)} closed={len(rec_closed)}"
           + (f" NO-STATUS={nost}" if nost else ""))
     print(f"STATE index open={sorted(idx_open)}")
     print(f"closed={sorted(idx_closed)}")
     if nost:
-        print("LEDGER INDEX FAILED (record row without a status cell)")
+        # t161: print the other legs too. A realistic duplicate (a wrap line
+        # with no status cell) used to stop here, so leg F could never name the
+        # duplicated id even though it had detected it — t155 law: a signal that
+        # does not reach the output is an unenacted signal.
+        for p in problems:
+            print("DIVERGENCE:", p)
+        print("LEDGER INDEX FAILED (record row without a status cell"
+              + (", and duplicate id(s) above)" if dupes else ")"))
         return 1
     for p in problems:
         print("DIVERGENCE:", p)

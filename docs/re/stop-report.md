@@ -2028,3 +2028,86 @@ another artifact, ask which artifact is the contract and derive from it — but
 KEEP the constant as a reconciliation pin so a silent edit of the contract
 becomes a loud failure. Derive-and-reconcile, not copy-and-hope and not
 delete-and-trust.
+
+## 54. IDLE re-check #48 (t161, 2026-10-28 05:15 EDT) — both triggers negative; ledger_index_check had NO closed-side leg: two real CLOSED rows were missing from STATE.md and it printed OK
+
+Triggers (A) and (B) both NEGATIVE at session start (clean tree at b9cf937,
+probe RC=0, timeline byte-identical for the 50th consecutive reading, (A6)
+content baseline reproduced a tenth time, watcher alive pid 27774, B3 HEAD ==
+journal sha, prompt pair 83/82 delta 0). Full readings in docs/STATE.md's
+T161 LANDED block.
+
+THE FINDING — t160's audit-the-grader method applied one level deeper: instead
+of asking whether each leg of ledger_index_check.py fires, ask which record ids
+NO leg compares. Importing the tool's own sets (ledger_audit.rows/status_of,
+v1_block_ids, state_index) on the real file pair gave:
+
+    LEG A  rec_open - idx_open                = []
+    LEG B  idx_open - rec_open                = []
+    LEG C  idx_closed - rec_closed - V1_IDS   = []
+    LEG D  idx_open & idx_closed              = []   (leg exists)
+    UNCOVERED  rec_closed - idx_closed        = ['OQ-022','OQ-024']  <- LIVE DRIFT
+
+Every t157 leg is indexed on the OPEN side or on entries the index ALREADY has
+(ledger_index_check.py:111-124 pre-patch). "The record has a CLOSED row the
+index never mentions" moved nothing and printed LEDGER INDEX OK. Not
+hypothetical: the record closes OQ-022 (t8, music span check) and OQ-024 (t45,
+governor law) and STATE.md's block listed neither — 19 closed ids in the record
+(12 main-table + 7 v1-block) vs 17 in the index, while the header asserts
+"statuses mirror ... Update BOTH or neither".
+
+ORIGIN (git-archaeologied, not assumed): `git log -S'OQ-022' -- docs/STATE.md`
+newest hit t57c; OQ-024 newest t44 — neither id has been touched in the ledger
+block since t157 re-derived it. So this is residue of t157's own repair: it
+re-derived the OPEN side (the side its legs could see) and hand-copied the
+closed list, dropping 2 rows. Fourth recursion in the family: t158 found t157's
+law unenforced, t159 found the grader couldn't represent done, t160 found the
+exemption constant hand-duplicated, t161 finds t157's fix covered only one
+direction. LAW (extends t159): when writing a bidirectional consistency check,
+enumerate the directions as SET PAIRS (record-vs-index on open AND on closed);
+a leg list derived from "what drifted last time" inherits last time's blind
+side, because t157's drift was an open-side drift and every leg it shipped
+fires on the open side.
+
+WHY IT MATTERS even though the closed list is not the task menu: STATE.md is
+what a fresh session reads ALONE. A session cannot learn OQ-022/OQ-024 exist,
+so it can re-file closed work as novel, and t159's CLOSURE NOTE (terminal green
+= empty open ledger) is graded off the same block that silently loses ids.
+
+FIX (scripts/ledger_index_check.py, hard DIVERGENCE not CAUTION — t155 law: a
+signal that only reaches a buried line is unenacted):
+  leg E  record-CLOSED (main table OR v1 block) missing from STATE's closed
+         list -> names the id and prints a pasteable `- "OQ-NNN ..."` stub.
+  leg F  duplicate id in the RECORD (rows() can yield one twice; the status
+         dict keeps the LAST body silently). Real record measured 18 rows /
+         18 distinct today, so this is an early trip, not a live fix. The
+         nost early-return previously skipped printing leg F's finding even
+         when it had fired — fixed to print all problems on that path too.
+  tightened leg B: the v1 exemption was scoped to "absent from record" but was
+         applied to the OPEN side too, so STATE listing a v1 id as open (a
+         dead route offered as a menu item) printed OK. It now diverges.
+
+VALIDATION by real execution, fixtures deleted after (T-numbering per session):
+T1 un-repaired real pair -> RC=1 naming OQ-022 AND OQ-024 with stubs (negative
+control FIRST, before any repair); T2 v1 closed id removed from STATE -> RC=1
+names it via leg E; T3 v1 id injected into STATE's open list -> RC=1 naming the
+v1 block (pre-patch this printed OK); T4a duplicate CLOSED row appended -> RC=1
+names the dupe; T4b duplicate WITHOUT status cell (the realistic wrap shape,
+nost path) -> RC=1 and the dupe line still prints; T5 real repaired pair ->
+LEDGER INDEX OK RC=0. STATE.md repaired with OQ-022/OQ-024 summaries copied
+from the record; kept the file's YAML convention of exactly two quotes per
+entry (first draft used raw '"' inside a double-quoted scalar — caught by
+awk-counting quotes per line against HEAD's block, where every entry holds
+exactly 2; reworded to item 33/34 instead of escaping).
+
+TEST-HARNESS NOTE: one fixture silently failed to build because a heredoc-in-
+execute_code swallowed its own quoting (the file never existed; the tool
+correctly reported FileNotFoundError RC=1 for a MISSING file — do not read a
+missing-fixture RC=1 as a passing divergence test). Rebuilt with a direct
+pathlib one-liner and confirmed by grep before trusting the verdict.
+
+BOUNDARY kept, not chased: ledger_audit's --expect stays a hand-maintained
+duplicate (deriving it from the record is circular — t159). gate.sh stage 3t
+runs BOTH ledger tools, so this fix is enforcement, not a suggestion (t158
+grep law re-satisfied: gate.sh:421 invokes ledger_index_check.py).
+

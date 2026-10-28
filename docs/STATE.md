@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T05:15
+updated: 2026-10-28T05:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -23,6 +23,19 @@ ledger:
   closed:
     - "OQ-001 .cob offsets = N not N+1"
     - "OQ-002 FLIC codec (both vendor videos, golden-pinned)"
+    - "OQ-022 music span-vs-check contradiction CLOSED 2026-10-07 t8 — player
+      FUN_00059c70's 0x1d4d0 span check never sees theme00 (guard @0x59984
+      precedes the checked call; DS:0xa200c all-zeros 10/10 saves,
+      DAT_00010ba0==0); engine INACTIVE in captured states, audio.md §3.4,
+      no rewrite dependency; menu-music server explicitly unmapped (non-claim
+      banked)"
+    - "OQ-024 planet GOVERNOR assignment law CLOSED t45 — @0x38df0 branch of
+      FUN_00038ba4 pinned verbatim (item 33 -> PROS+=IND>>2, item 34 ->
+      RES+=IND>>2); [0x743b9]>>0x18 == item-table UPOP(35), 32/32 saves;
+      writer census r1_0x54_writer_sweep.py, activator @0x38b26 sole trigger,
+      0/2810 corpus records hold 33/34/35; rewrite PlanetState::governor +
+      storedProsFor/storedResFor (campaign.cpp/.h), pin
+      campaign_governor_law_t45"
     - "OQ-007 text encodings CP437"
     - "OQ-008 loader model usable for control flow (imagebase 0)"
     - "OQ-009 AI data side (21 raceNN.dip parameter sets)"
@@ -219,7 +232,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #46 done at t159; stop-report.md §52): loop awaits a user
+IDLE (re-check #48 done at t161; stop-report.md §54): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -371,6 +384,62 @@ CLOSURE NOTE (t159): if a future turn closes the LAST open row, the terminal
 green needs BOTH index legs done right — empty STATE's `open:` list AND edit
 ledger_audit.py's --expect default to "" (an empty open set now passes an empty
 expect; before t159 it could not). Do NOT delete either check to go green.
+INDEX-FAILURE REPAIR (t161): if ledger_index_check prints "record-CLOSED OQ-NNN
+missing from STATE index entirely", the record gained/kept a closed row the block
+omits — paste the stub the tool prints (id + one-line summary copied FROM the
+record; keep the two-quote-per-entry YAML shape, no raw inner quotes). It is a
+hard DIVERGENCE by design; do not delete the leg to go green.
+
+T161 LANDED (IDLE re-check #48 — no trigger fired; deliverables:
+scripts/ledger_index_check.py (legs E+F, tightened leg B, nost-path printing),
+docs/STATE.md ledger block repaired (+OQ-022, +OQ-024), docs/re/stop-report.md
+§54, docs/re/_wip_t161.md; no OPEN-QUESTIONS row touched, game/ untouched, no
+watch or census run against the live capture). (1) Trigger (A) NEGATIVE — probe
+RC=0 at 05:15:28: newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B (50th consecutive byte-identical
+reading t111..t161); (A6) content baseline reproduced a TENTH time head
+42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f, last
+row still t1254; zero dosbox procs; find sweep non-loop none; A4 watcher ALIVE
+pid 27774; A5 none (save/*.sav = 20). NOTE for hand re-stats: `stat -c %Y` is
+SECONDS — comparing it to the probe's nanosecond baseline naively "diverges"
+(1793043841 vs 1793043841304000000); use %y+size or python st_mtime_ns (t147
+near-miss family). (2) Trigger (B) NEGATIVE — clean tracked tree at b9cf937 at
+session start (verdict wording valid per t155/B5), no STEERING, B3 HEAD ==
+journal sha b9cf937 (journal row 82 ct 05:12:48, OK, fail_streak 0), prompt pair
+prompt-83 vs prompt-82 (58/58) digit-stripped delta 0. (3) THE FINDING — t160's
+audit-the-grader law one level deeper: ask which ids NO leg compares, not whether
+each leg fires. ledger_index_check had FOUR legs, all indexed on the open side or
+on entries the index already has — a record-CLOSED row absent from STATE's block
+moved nothing and printed LEDGER INDEX OK. Live drift: OQ-022 (closed t8) and
+OQ-024 (closed t45) absent from the block; record has 19 closed ids (12 main + 7
+v1), index listed 17. git log -S proves neither id was touched in the block since
+t157 re-derived it — the drift is residue of t157's own repair (open side
+re-derived, closed list hand-copied). Fourth recursion t157/t158/t159/t160/t161:
+every grader fix audits clean except its own blind direction. LAW: a
+bidirectional consistency checker must enumerate directions as SET PAIRS
+(record→index on open AND closed; index→record on open AND closed); legs built
+from "what drifted last time" inherit last time's blind side. (4) FIX by real
+execution, fixtures deleted: leg E (record-CLOSED missing -> names id + pasteable
+stub), leg F (duplicate id in record — dict kept LAST copy silently; measured 18
+rows/18 distinct today so early trip only; nost early-return no longer swallows
+the finding), leg B tightened (the v1 exemption now excuses ONLY "absent from
+record" — STATE listing a v1 id OPEN now fails, pre-patch it printed OK).
+Six-branch validation: un-repaired real pair RC=1 naming both rows (negative
+control run BEFORE repairing); v1 closed id removed RC=1; v1 id injected open
+RC=1; duplicate status-bearing row RC=1; duplicate no-status (nost path) RC=1
+with dupe line still printed; repaired real pair OK RC=0. STATE repaired with
+record-sourced summaries; YAML convention kept (exactly 2 quotes/entry — first
+draft's raw inner quote caught by awk vs HEAD). One test-harness trap banked
+§54: a fixture-building heredoc silently produced NO file and the checker's
+correct RC=1 (FileNotFoundError) briefly read as a passing divergence test —
+grep the fixture into existence before trusting any RC. Enforcement holds per
+t158: gate.sh:421 stage 3t invokes the fixed tool. (5) Bank hygiene fresh
+(grep -rln stop-report scripts/ -> r1_idle_probe.py + ledger_audit.py docstrings
+only; 2030 lines zero diff vs HEAD before appending §54). Infra unchanged since
+t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log 2026-10-27
+17:30:18/30114 — zero connects). NO row closed (strict-close honest negative —
+harness hardening, not measurement), no law falsified. NEXT stays IDLE; the t113
+LOOP-END PROPOSAL stands (48 idle turns). Gate 0.
 
 T160 LANDED (IDLE re-check #47 — no trigger fired; deliverables:
 scripts/ledger_index_check.py (V1_IDS derived+reconciled), docs/re/stop-report.md
