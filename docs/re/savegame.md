@@ -146,3 +146,79 @@ The t75 "chain at 0xaae2" was this same pool entered mid-way (0xaae2 is
 row 36); its 83/83 owner join stood because it is one table. Live-side
 r1deep chain (151 rows, owners {0..4,255}) = that world's pool size
 (50 stars, 3+ planets each) — pool sizes vary by world, law is constant.
+
+## t181 packed-entropy residue: THREE-CLASS DIFF — DISCLAIM (2026-10-28) [verified]
+
+Closing measurement for the last OQ-003 residue. Re-producible with
+`scripts/r1_t181_banddiff.py` (exit 0, prints the full class table).
+
+PROBE-BUG CORRECTION banked first [verified]: an earlier t181 probe treated
+`mem.find(b'')` hits (== 0) as verbatim chunk matches, and RESUME-014 is only
+75,603 B (EOF 0x12753), so its "band chunks verbatim in title slots" results
+were artifacts and are WITHDRAWN. With length-checked, content-bearing
+needles (>=25% nonzero): the title-boot slots of
+work/r1/playcap-20261014-224611 (t=0) DO carry the OCT-14 world tables
+verbatim (R14 file 0x3200 -> member 0x25996f, 0x4000 -> 0x25a76f, constant
+delta 0x25676f; header/pool needles locate too). Title boot is NOT
+world-free — it boots the world on disk. Class (i) per the original tasking
+therefore compares against the on-disk world, and the comparison below is
+done at LOCATED addresses instead.
+
+Classes used (zero capture, all on disk): same world =
+work/r1/game/RESUME.GAM (R21, 87,663 B): CLASS-FILE = R21 vs work/r1/game/
+01.SAV (same world, later save, identical size); CLASS-BOOT =
+selftest-t111-playcap slot41 (R21 loaded, zero play, t=1131 score 0);
+CLASS-PLAYED = playcap slot41 (same world, t=1254 score 14); CLASS-BASELINE
+= playcap-20261014-224611 slot41 (t=0, carries the OCT-14 world).
+
+SAVE LAYOUT FACT (new) [verified]: a .gam save is a MULTI-BLOCK image —
+chunk-verbatim scan locates blocks at DIFFERENT deltas: file 0x00200.. ->
+delta 0x2b6718 (P0+0xf72c8); 0x02000.. -> 0x253e23; 0x03200..0x09000 ->
+0x25676f; 0x09200..0x0d600 -> 0x263fb1 (P0+0xa4b61); 0x11200..0x12600 ->
+0x276b0c; 0x14000..0x14800 -> 0x2d3a0e. Every block lands byte-verbatim
+(file==boot 100% in every located region) — consistent with the t53
+copied-not-parsed law; comparisons must discover a per-region delta.
+
+CLASS TABLE at located addresses (scripts/r1_t181_banddiff.py):
+  region          len      file==boot  boot==played  file==played
+  HEADER          4608     100%        99.5%         99.5%
+  S-TABLE-lo      4096     100%        98.9%         98.9%
+  S-TABLE         24064    100%        93.8%         93.8%
+  POOL            17408    100%        87.2%         87.2%  (diffs = play
+      counters: arithmetic byte-lane deltas, e.g. top u32 deltas 0xffffff00
+      x22, 0x02000000 x21 between same-world saves)
+  BLOCK11200      5120     100%        100.0%        100.0%
+  ENTROPY-BAND    2048     100%        21.1%         21.1%
+Wider manual read of the same band span (0x13c00..0x15200 at delta 0x2d3a0e,
+including its sub-chunks at other deltas): boot==played 1987/5632 = 35.3%.
+Band character across the FILE class: its >=5.0-b/B blocks MOVE offsets
+between saves/worlds and between same-world boots; between R21 and 01.SAV the
+differences are ASYMMETRIC-ZERO at identical offsets (54 u32 have-data-vs-
+zero, 34 the reverse; whole-file max run 16 B); values are full-range u32
+(byte-length hist 1B:243 2B:127 3B:223 4B:355 of 950 nonzero) — NOT
+compressed (max block entropy across all 7 native saves = 5.60 b/B, 0/2316
+blocks >=6.8; compressed signature >7.7 per tables.md S-threshold), and the
+float reading (c511a487 = -2346.6) FAILS the shape test: only 13%/9% of band
+u32/pairs parse as sane f32 vs 3-5% baseline in the pool CONTROL — so no
+coordinate-buffer claim is made either.
+Baseline class at the band's located address: oct14-slot member 0x2e7a0e
+(where the R21 band lives) reads ZERO u32 0/16 — the address range is empty
+session memory in a boot of a world that never had the band.
+GAME-RUNS-WITHOUT-IT evidence (three independent observations): vendor golden
+game/resume.gam has 133 nonzero bytes (ent 0.64) in the 0x13800..0x15200 span
+yet boots the full strategic map (golden tour, this file §Golden tour);
+R14-1014 ENDS at EOF 0x12753 with no band region at all yet played Oct 14;
+post-0x11200 tail size varies by session 776 -> 14,561 nonzero bytes across
+the seven native saves.
+VERDICT [measured]: the packed-entropy residue satisfies the disclaim test —
+churning across all classes (baseline empty, saves differ at identical
+offsets, played boot differs 78.9% at the located address), located at a
+constant DELTA but with no fixed file-space presence, and provably not
+required for load or play. It is WRITER-SIDE COPIED SESSION MEMORY (the save
+writer's block span covers scratch addresses; whatever the process held gets
+serialized verbatim and lands at fresh scratch addresses on load), NOT a
+save-format field set. The real regions (header, S-table, planet pool,
+BLOCK11200) are 87-100% stable across a 123-turn session and stay mapped.
+Residual honesty: WHAT the scratch was (star-draw cache vs heap) is
+UNNAMED — naming needs a live-UI trace; the disclaim does not depend on it.
+OQ-005's .tmp-HEAD half is untouched by this and stays in OQ-005's own row.

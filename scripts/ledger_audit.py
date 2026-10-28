@@ -83,8 +83,12 @@ def rows(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", default="docs/OPEN-QUESTIONS.md")
-    ap.add_argument("--expect", default="OQ-003,OQ-021,OQ-023,"
+    ap.add_argument("--expect", default="OQ-021,OQ-023,"
                                         "OQ-005,OQ-019,OQ-016")
+    # t181 re-triage: OQ-003 CLOSED by measured three-class disclaim
+    # (scripts/r1_t181_banddiff.py; docs/re/savegame.md §t181) — removed from
+    # this default so gate stage 3t (which calls with NO --expect) stays
+    # meaningful: the default IS the triaged open set, per the docstring.
     a = ap.parse_args()
     # t159: drop empty tokens. "".split(",") == [""], so `--expect ''` — the
     # ONLY way to express the completion state (zero open rows) — compared the

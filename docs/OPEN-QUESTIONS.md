@@ -155,7 +155,8 @@ carried: aggregate model only (S2i) — per-ship slots, same-system gate
 0x4b982, range gate 0x4ba57, per-shot power accounting NOT modelled; a
 per-ship model (OQ-019) must re-use S2d..S2h literally.
 OQ-003 | gam | .gam full record map + field meanings; packed entropy regions
-| open | W1 joint: planet records already joined file<->live RAM 151/151
+| CLOSED t181 2026-10-28 (measured disclaim; was the row's own decision option
+"let the three-class diff run first") | W1 joint: planet records already joined file<->live RAM 151/151
 (stride 123); STAR TABLE + ORBIT LAWS closed 2026-10-06 map the neighbourhood
 (star stride 96 name-anchored, planet ptrs star-name+0x2A -> planet-name-0x24,
 single-owner law, orbit pair planet-name+0x57/+0x5f); field semantics fall
@@ -209,6 +210,24 @@ captured through the watcher in straddling pairs (one save before, one after a
 state-change turn). Low priority: the rewrite starts games fresh and never
 loads originals. DECISION OPTIONS: accept "unknown, disclaimed" as closure,
 or let the three-class diff run first (queued t181).
+STATUS t181: THREE-CLASS DIFF RUN — CLOSED BY MEASURED DISCLAIM.
+scripts/r1_t181_banddiff.py (exit 0) locates every save block in live RAM
+(multi-block image: per-region deltas 0x2b6718/0x25676f/0x263fb1/0x276b0c/
+0x2d3a0e; file==boot 100% per region) then diffs classes at the LOCATED
+addresses: ENTROPY-BAND boot-vs-played 432/2048 = 21.1% stable while HEADER
+99.5 / S-TABLE 93.8 / POOL 87.2 / BLOCK11200 100.0 (play-counter deltas
+0xffffff00 x22, 0x02000000 x21 arithmetic); baseline oct14 slot at the band's
+address (member 0x2e7a0e) reads 0/16 nonzero; band deltas between same-world
+saves are asymmetric-zeros (54/34) at identical offsets; not compressed
+(0/2316 blocks >=6.8 b/B, max 5.60); float-shape REFUTED (13%/9% sane f32 vs
+3-5% pool control). Game runs without it x3: golden resume.gam band span =
+133 nonzero bytes yet boots (golden tour §), RESUME-014 EOF 0x12753 has no
+band region yet played, tail varies 776..14,561 nonzero by session.
+EVIDENCE docs/re/savegame.md §t181 (class table + probe-bug correction:
+mem.find(b'') artifacts WITHDRAWN; title slots DO carry the on-disk world —
+0x25996f/0x25a76f located needles). What the scratch WAS stays UNNAMED
+(live-UI-trace class; the disclaim does not depend on it — non-claim banked).
+CODE SITE: rewrite unchanged — fresh-start-only row, nothing loads originals.
 OQ-021 | victory | end-ctrl threshold: vendor comment "over half" vs same
 file's prose "two-thirds" — current default >1/2 | open | t73 dark-zone HIT
 (docs/re/score.md): score strings ARE referenced — pool-relative immediates

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T17:05
+updated: 2026-10-28T18:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -121,11 +121,17 @@ ledger:
       fixed at every size, populations = halving law (T//2+1 then halve);
       reproduces the T=50 battery table exactly; rewrite shellRadiiFor()
       replaces the wrong i%50 wrap; ladder test extended"
+    - "OQ-003 .gam packed-entropy residue CLOSED t181 by MEASURED DISCLAIM
+      (the row's own decision option): three-class diff
+      scripts/r1_t181_banddiff.py at located RAM addresses — band boot-vs-
+      played 432/2048 (21.1%) vs header/S-table/pool/block11200 87-100%;
+      baseline member 0x2e7a0e = 0/16 nonzero; not compressed (0/2316 blocks
+      >=6.8 b/B); game runs without it x3 (golden resume.gam band span 133
+      nonzero bytes boots; RESUME-014 EOF 0x12753). Writer-side copied
+      session memory, not a format field set; scratch identity stays
+      UNNAMED non-claim. docs/re/savegame.md §t181; rewrite unchanged
+      (fresh-start-only)"
   open:
-    - "OQ-003 .gam full record map — joint with OQ-010 (planet records joined
-      151/151 @ stride 123; STAR TABLE + ORBIT laws closed 2026-10-06 give the
-      neighbourhood map: star stride 96, planet ptrs name+0x2A, orbit pair
-      planet-name+0x57/+0x5f; field semantics open)"
     - "OQ-005 .shp pixel codec — static route exhausted (6 angles,
       docs/REFUTED-ROUTES.md); needs exe shape loader via live image"
     - "OQ-016 campaign per-turn constants — scope NARROWED t29: income,
@@ -232,49 +238,33 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-LANDED t180 (2026-10-28, this session): OQ-023 STATE-3 WRITER SCAN RUN —
-THE t85g-NAMED ROUTE ANSWERS YES. Three imm-3 writers exist (0x4562f,
-0x45af1, 0x45aff), all inside FUN_000454a4 (state mutator, exactly 3 callers
-0x36b2f/0x36c47/0x4470e, dispatch cmp bl,0xe via cs:[ebp+0x308b8] table at
-image 0x45468, 15/15 in-range — scripts/r1_t180_switchtbl.py). ALLIANCE
-FORMATION LAW derived at instruction level (docs/re/diplomacy.md §13.2):
-FUN_00044fc0 rung 0x44ffc compares att[self][other] against [row+0x1d1] =
-ACCEPT_ALLIANCE (§8) and returns verdict 4/5; FUN_000454a4 case bl=3 writes
-3 to BOTH cells (0x4562f/0x45641, +10 attitude both) iff cl==4; cl is the
-verdict code (caller law 0x446d9..0x4470e). Second channel case bl=11
-(gate cl==19 + att > other-10), cl provenance unresolved. Enum semantics now
-backed BOTH ways: readers exhaust {0,1,2,3} (23/6/20/23 sites) and the
-third-party rungs lock meanings (0x44c1a 2&3->DA10, 0x44c71 3&2->DA7,
-0x44ce0 2&1->DA9); vendor RELNAMES@0x89074 byte-verified (indexed 0x2817b).
-Bonus laws: row law code-confirmed (imul 0x1ee + baked 0x12e16; row-relative
-+0x1c0 == absolute +0x12fd6); scenario seeding 0x27476..0x27511 is the
-state-1 writer of the "pre-war everyone at 1" observation. LEDGER: OQ-023
-row annotated, NOT closed (strict-close: the closing measurement is an
-OBSERVED cell==3; none in 42k rows — static route now EXHAUSTED, capture-
-only). No rewrite change justified (accept-test lives in the receiver's
-rung; diplomacy.cpp:227 consistent; W-B gate unchanged). Gate 0, audit OK.
-Raw disasm kept at work/r1/t180/code0.txt; WIP docs/re/_wip_t180.md.
+LANDED t181 (2026-10-28, this session): OQ-003 THREE-CLASS RAM DIFF RUN —
+OQ-003 CLOSED by measured disclaim (13 closed / 5 open). scripts/
+r1_t181_banddiff.py (new, exit 0, rerunnable) locates every .gam save block
+in live-RAM captures by content-bearing chunk needles — NEW LAYOUT FACT: the
+save is a MULTI-BLOCK image (deltas 0x2b6718 header / 0x25676f S-table /
+0x263fb1 planet pool / 0x276b0c block11200 / 0x2d3a0e entropy band; every
+region file==boot 100% = load is memcpy per block). At the LOCATED addresses
+the disclaim test fires: entropy band boot-vs-played 432/2048 = 21.1% stable
+vs real tables 87-100%; baseline (oct14 title) slot at the band's address
+0/16 nonzero u32; same-world save pair churns at identical offsets with
+asymmetric zeros (54/34); NOT compressed (0/2316 blocks >= 6.8 b/B, max
+5.60); float-shape REFUTED (13%/9% sane f32 vs 3-5% pool control); game runs
+without the region x3 (golden resume.gam band span = 133 nonzero bytes yet
+boots the golden tour; RESUME-014 EOF 0x12753 has no band at all; tail varies
+776..14,561 nonzero by session). VERDICT banked: writer-side copied session
+memory, disclaim per the row's own decision option; scratch identity stays
+an explicit UNNAMED non-claim (live-UI-trace class). CORRECTIONS banked:
+(1) probe bug mem.find(b'')==0 artifacts withdrawn (RESUME-014 past-EOF
+"matches"); (2) with valid needles the title-boot slots DO carry the on-disk
+world tables verbatim (0x25996f/0x25a76f delta 0x25676f) — title boot is NOT
+world-free. Ledger: OPEN-QUESTIONS OQ-003 row CLOSED + STATUS t181 block;
+ledger_audit default --expect re-triaged (OQ-003 removed); STATE index
+mirrored. Evidence docs/re/savegame.md §t181; WIP docs/re/_wip_t181.md;
+scripts/r1_t181_corr.py keeps the correction reproducible. Rewrite
+unchanged (fresh-start-only row). Gate 0, both ledger checks green.
 
-NEXT t181 (STATIC, offline): OQ-003 THREE-CLASS RAM DIFF — classify
-packed-entropy regions against three classes ALREADY ON DISK: (i) title-boot
-idle ring slots (pre-game uninitialized baseline — t111 self-test ring +
-r1_playcap scratch rings; the 0xC500 law proves they carry heap garbage),
-(ii) fresh-New-Game saves (t58 scripted-campaign early saves), (iii) long
-campaign saves (01.SAV..04.SAV + playcap stream). Region stable in (iii) but
-garbage in (i) => play-initialized (name it via mutation correlation later);
-churns in all three => disclaim as writer-side uninitialized RAM in
-savegame.md and OQ-003 closes as documented-unknown (player decision
-whichever way the diff falls).
-ORDERING RATIONALE: t180 (was first) landed; t181 is next because it is the
-only remaining queued item that is fully offline AND can MOVE a ledger row
-either way, while t182 ships an eyeball artifact (no row moves until the
-player rules) and t183/t184 and the OQ-023 residual all need a capture
-window or the player. When a capture DOES arm, the OQ-023 test is now
-precise (§13.5): raise a target above ITS OWN ACCEPT_ALLIANCE, propose,
-expect both cells 3 + DA-10 selectability — cheaper than any static re-scan,
-which is now forbidden for this row.
-
-THEN t182 (TOOL BUILD): OQ-005 SHAPE-PNG DUMPER — scripts/r1_t182_pngdump.py
+NEXT t182 (TOOL BUILD): OQ-005 SHAPE-PNG DUMPER — scripts/r1_t182_pngdump.py
 renders the 80 residue records (classes per BLOCKED t68) to
 work/r1/shp_png/<file>--<record>--<dims>.png via the rewrite ShapeLibrary
 (build tree exists per gate stage 4), each PNG validated non-empty +
@@ -287,6 +277,12 @@ index.txt lists CONTROLS first, then the 80 (grouped by class: span-undersized
 planind/3cfgnew, simple-format cos_star, stragglers). NO self-grading of
 correctness (R13 + strict-close): the dumper ships evidence, the player's
 ruling closes the row.
+ORDERING RATIONALE: t181 landed (was first); t182 is next because it is the
+only queued item that is fully offline AND moves a ledger row toward the
+player's closure gate (OQ-005 is now the sole row an artifact can advance —
+OQ-016/OQ-019/OQ-021/OQ-023 all need a capture window or live play; the
+OQ-023 test is now precise per diplomacy.md §13.5 and capture-only, static
+re-scan forbidden for that row). t183/t184 stay after it per t179 ordering.
 
 THEN t183 (STATIC hunt): OQ-019 SCALE + TWO-TIER TURN — map the day-tick
 coupling and sub-turn round-robin per ships.md §16 testimony: start at the
@@ -320,8 +316,8 @@ WHEN A CAPTURE TRIGGER ARMS, the menu (docs/re/stop-report.md §2, t110):
     scripts/r1_t85g_sitting.py on the new ring.
   - OQ-019: per-turn step CLAMP law + build/redesign inventory: needs real
     flights (two zero-observation corpora t49/t58 prove no offline route).
-  - OQ-003 / OQ-016 tails: play-mutation variants and per-cell wiring, same
-    class (stop-report §2).
+  - OQ-016 tail: per-cell terrain/nuke wiring, same class (stop-report §2).
+    (OQ-003 CLOSED t181 — nothing capture-side left on that row.)
   - A battle in the same sitting additionally banks slot-diff damage evidence
     (strengthens OQ-019 caveats at zero protocol cost).
 
