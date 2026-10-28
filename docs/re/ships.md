@@ -496,3 +496,31 @@ score% not threshold; string xrefs R12-blind). Closing route: t51
 consolidated capture session adds step 4 — reach/view the victory screen or
 score screen in the scripted run and correlate. Default >1/2 (vendor comment,
 turnloop.md S1) stands.
+
+## 16. PLAYER TESTIMONY t179: two-tier turn structure + lane transit (attribution: player, UNVERIFIED until code-mapped)
+
+The player (who has ~1250 turns of play in the captured campaign) reports:
+1. TWO TURN TIERS. Within a day there are sub-turns governing ship movement:
+   with multiple ships holding orders in a system, each ship executes ONE
+   move per sub-turn, round-robin (ship A's second move waits until every
+   other ship has had one). If days advance before an order completes, ONE
+   sub-turn runs per day until the ship arrives. Consistent with the cited
+   per-star stride-0x60 command-exec pass 0x2547c (a campaign+0x3335 loop per
+   docs/combat S2h) — but the day-tick coupling (DAT_00012e10 advancing daily
+   independent of player End Turn) and the round-robin cursor are NOT yet
+   code-mapped. Hunt = queue t183.
+2. TWO ENGINE CLASSES. Within-system engines vs star-lane drives are distinct
+   gizmo categories with different speeds; MULTIPLE lane drives stack to
+   increase speed. Consistent [inferred] with the cited MOVES law
+   [ship+0x94] := sum([ship+0x10] drive stat sum) re-granted per processing
+   tick (FUN_0004a658) — a SUM naturally stacks.
+3. LANE MAGNETRON = one-shot instant lane transit: vendor text verbatim
+   (gizhelp.txt:1173-1181 'slip through the star lane almost instantly...
+   can be used only once'; gizmos.txt row 'Lane^Magnetron 5 10 50 0 1 50 0 0
+   50 1 255', category 5, NumUses 1). Candidate consumer: the cited kind==5
+   go-to-star placement handler 0x21f58 (places at star coords with rng%200
+   jitter, then kind 5->4) — UNMEASURED tie; do not bank as law until the
+   magnetron's use-site reads it.
+Implication for the sugar-cube scale question: scale must be sought per tier
+(within-system walk units per sub-turn; lane transit as its own law), not as
+one global hop count. The [1,3] default is likely tier-blind.

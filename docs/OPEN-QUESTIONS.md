@@ -198,6 +198,17 @@ banked event-50 bonus, L622). +0x0a gets an explicit UNMAPPED verdict
 residue now = packed-entropy regions only (star-map heads class, shared
 with OQ-005 blocked closure). Rewrite growth block already implements
 this law exactly — evidence upgraded, no code change (income-law.md t81).
+PLAIN (t179): The save-file format is decoded; the only unread parts are
+byte regions that look random. Working theory: the save writer copies dirty
+memory, so some regions are leftover uninitialized RAM, not game data. The
+test (no play needed): compare the same region across title-screen boot slots
+(before any game exists), fresh-game saves, and long campaign saves - data
+that only stabilizes after play is play-initialized; churn in all three
+classes is true residue and gets disclaimed. Recent player saves also help if
+captured through the watcher in straddling pairs (one save before, one after a
+state-change turn). Low priority: the rewrite starts games fresh and never
+loads originals. DECISION OPTIONS: accept "unknown, disclaimed" as closure,
+or let the three-class diff run first (queued t181).
 OQ-021 | victory | end-ctrl threshold: vendor comment "over half" vs same
 file's prose "two-thirds" — current default >1/2 | open | t73 dark-zone HIT
 (docs/re/score.md): score strings ARE referenced — pool-relative immediates
@@ -295,6 +306,17 @@ attitude-raising (gifts/trades?) then accept, OR static: writers of the
 state byte that store 3 (t85h: scan stores of imm3 into [+0x1c0+idx]).
 W-B (option C hybrid): build only when ownership model lands; engine
 build additionally awaits the state-enum capture above.
+PLAIN (t179): Our rewrite AI only sends war/peace decisions; the original
+also sends trade offers and third-party messages. Building the full trade
+engine is deferred (option C: build when the ownership model lands). The
+narrower open question: we measured relation cells 0=unknown, 1=peace, 2=war
+(real transitions banked) but never actually SAW a cell hold 3 (alliance) -
+no captured game ever had an alliance accepted (both player proposals fell
+below the Orfa's 570 attitude threshold, measured). Vendor debug names
+(Unknown/Peace/War/Alliance) corroborate 3=Alliance. Closure routes: play
+(raise attitude with gifts, propose, watch the cell) OR the queued static
+scan t180: find code that stores the value 3 into a relation-state byte -
+named by t85g, never run.
 OQ-024 | loop | planet GOVERNOR assignment law (@0x38df0 branch of
 FUN_00038ba4: '!' -> PROS += IND>>2, '"' -> RES += IND>>2; S6 line 45 read
 +0x54 as a governor byte) | CLOSED t45 | FULL STATIC MEASUREMENT
@@ -378,6 +400,16 @@ dims transform) — no other reader exists in the image;
 closure class = human-verifiable drawn frame (R13 blocks self-verification);
 blind sweeps FORBIDDEN (R2). Map draws documented circles; ShapeLibrary is a
 validation asset (option C).
+PLAIN (t179): The shape/sprite library format is decoded for 1477 of 1557
+records; 80 records in 31 files don't fit the law - every reader in the game
+reads image size only from the record header, but these 80 have header sizes
+that don't match their data. Question: where does the real size come from, or
+are these simply broken vendor data? Closure needs human eyes (vision tooling
+is down on this deployment; strict-close forbids self-grading). Plan (queued
+t182): a dumper renders all 80 as PNGs; the player eyeballs ~20 and rules
+"fine" (our size law was too strict - fix the doc) or "garbage" (broken
+records - close with evidence). ~30 minutes of human time total. DECISION
+OPTIONS: run the dumper, or accept the current validation-asset treatment.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge
@@ -908,6 +940,20 @@ artifact (ships.md §12 t101 block — rows 10..15 live-NAMED shields).
 Remaining per-ship: the per-turn step CLAMP law (how far a ship walks vs
 its MOVES budget — the walk body 0x533e0 + callers) and the build/redesign
 inventory path. Row STAYS OPEN.
+PLAIN (t179): Ships move by walking raw distance per processing tick (no
+hop abstraction - measured). What's unpinned is the UNIT SCALE: the help text
+measures drive range in "sugar cubes" (map grid cells), but the conversion
+from drive stat to world-units-per-tick was never observed (zero ship flights
+in every passive corpus). Player testimony t179 adds structure: two turn
+tiers (per-day ship moves, round-robin across ships, orders persist across
+days), separate within-system engines vs star-lane drives (stacking multiple
+lane drives increases speed - consistent with the cited [ship+0x10] stat-SUM
+law), and the Lane Magnetron = one-shot instant lane transit (vendor text
+verbatim gizhelp.txt:1173-1181, gizmos.txt row category 5; the kind==5
+go-to-star order handler 0x21f58 is cited). Queue t183: static hunt for the
+scale factor + the per-day tier (per-star 0x60-stride pass 0x2547c is the
+candidate). DECISION OPTIONS: accept default scale [1,3]+immediate arrival as
+documented default, or let t183 run first.
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

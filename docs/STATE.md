@@ -249,11 +249,44 @@ which dossier facts the rewrite already models and which remain gaps
 (campaign.cpp buildPhase/researchPhase/combatPhase/expansionPhase sites).
 User-facing deliverable: this answers the deferred AI question.
 
-THEN t180 (STATIC hunt, bounded): the `l` star-map key route — user-observed
-lane reveal with ZERO cmp al,'l' sites in the image; check scancode-vs-ASCII
-paths (0x1e is 'l' scancode), key->action dispatch tables, shift-state chains
-around the known 0x79950..0x79c20 handler. Budget: one session; if not found,
-bank the negative in debugflags.md and REFUTED-ROUTES.
+THEN t180 (STATIC, bounded): OQ-023 STATE-3 WRITER SCAN — the route t85g
+named and nobody ran: find code storing imm 3 into the relation-state cell
+(row stride, base 0x1c0 name-byte family; use ledger row OQ-023 + diplomacy.md
+§10-§12 laws; work/ascend_restored.bin per R12). If a site writes 3 under a
+decidable condition, the enum closes statically; if zero writers of 3 exist,
+that is itself the measurement (bank negative + enum stays play-gated).
+
+THEN t181 (STATIC, offline): OQ-003 THREE-CLASS RAM DIFF — classify
+packed-entropy regions against three classes ALREADY ON DISK: (i) title-boot
+idle ring slots (pre-game uninitialized baseline — t111 self-test ring +
+r1_playcap scratch rings; the 0xC500 law proves they carry heap garbage),
+(ii) fresh-New-Game saves (t58 scripted-campaign early saves), (iii) long
+campaign saves (01.SAV..04.SAV + playcap stream). Region stable in (iii) but
+garbage in (i) => play-initialized (name it via mutation correlation later);
+churns in all three => disclaim as writer-side uninitialized RAM in
+savegame.md and OQ-003 closes as documented-unknown (player decision
+whichever way the diff falls).
+
+THEN t182 (TOOL BUILD): OQ-005 SHAPE-PNG DUMPER — scripts/r1_t182_pngdump.py
+renders the 80 residue records (classes per BLOCKED t68) to
+work/r1/shp_png/<file>--<record>--<dims>.png via the rewrite ShapeLibrary
+(build tree exists per gate stage 4), each PNG validated non-empty +
+dimension-sane by the tool itself; produce index.txt for a ~20-sample human
+eyeball session. NO self-grading of correctness (R13 + strict-close): the
+dumper ships evidence, the player's ruling closes the row.
+
+THEN t183 (STATIC hunt): OQ-019 SCALE + TWO-TIER TURN — map the day-tick
+coupling and sub-turn round-robin per ships.md §16 testimony: start at the
+cited per-star stride-0x60 pass 0x2547c and DAT_00012e10 readers; seek the
+scale factor converting drive stat [+0x10] to walk units per sub-turn (walk
+body 0x533e0 callers), and whether lane transit is a separate law (magnetron
+candidate 0x21f58 tie, §16 item 3). Deliverable: tier-specific scale laws or
+the measured reason they are runtime-only.
+
+THEN t184 (STATIC, bounded, demoted not dropped): the `l` star-map key route —
+zero cmp al,'l' sites; check scancode paths (0x1e), dispatch tables,
+shift-state chains near 0x79950..0x79c20. One session; negative banked to
+debugflags.md + REFUTED-ROUTES if not found.
 
 IDLE RULE (t178) still stands for everything else: the harness polls in shell;
 a model session runs ONLY on armed trigger, dirty tree, or human queue
