@@ -2111,3 +2111,48 @@ duplicate (deriving it from the record is circular — t159). gate.sh stage 3t
 runs BOTH ledger tools, so this fix is enforcement, not a suggestion (t158
 grep law re-satisfied: gate.sh:421 invokes ledger_index_check.py).
 
+
+## 55. t162 — the P0 grader (gate.sh stage 1) was one-directional: additions to game/ invisible, absent manifest silently re-blessed
+
+t161's SET-PAIRS law applied to the grader protecting the project's top NEVER
+("never modify game/"), which 161 iterations had never audited. Stage 1 in
+source: sha256sum -c manifest, plus a regen-from-glob path when the manifest is
+absent. Measured on a scratch copy under work/r1 (pristine game/ never touched):
+
+- T0 control (23/23 match): silent.
+- T1 DELETE a listed file: ARMED — sha256sum -c prints "FAILED open or read",
+  grep finds the non-OK line. Covered direction.
+- T2 ADD a foreign file (NOTES.TXT): ZERO signal. Nothing enumerates disk->set;
+  the checksum loop only walks the manifest's own names.
+- T3 ABSENT manifest: the gate ran `sha256sum * > MAN` itself, bless-ing the
+  tampered tree (regenerated manifest held 24 entries incl. NOTES.TXT) — after
+  one such run the tree passes forever. Self-healing grader = the tamper IS the
+  baseline.
+- Static: game/ is flat (0 dirs, 0 dotfiles, 0 nested, 0 unreadable); manifest
+  set == disk set == 23 on the real tree (comm -3 empty); manifest git-tracked
+  since seed 3792dc5 (revertable, but revertable != detected).
+
+Fix (scripts/gate.sh stage 1): absence of docs/BASELINE.sha256 is now a hard
+err with a restore-from-git instruction (never regen); added the second
+direction — LC_ALL=C comm -3 of manifest names (awk substr($0,67), tolerant of
+spaces) vs find game -maxdepth 1 -type f, any delta => err naming it. Five
+branches validated by real execution on stage-1 code extracted verbatim from
+the patched file (fixtures deleted): F0 silent flag 0; F1 ADD flags NOTES.TXT
+only; F2 REMOVE fires BOTH legs; F3 absent-manifest errs with NO regen; F4
+tampered manifest hash errs. Full gate green (exit 0, zero FAIL lines) with the
+new leg running.
+
+Fixture-harness traps banked (neither was a gate bug): (1) `err: command not
+found` / RC=127 — sourcing extracted stage-1 code needs note()/err shims; my
+first run's "RC_line_after=127" briefly read as a leg failure. (2) LC_ALL=C on
+sort but NOT on comm: comm re-parses under the session collation, disagreed
+with the C-sorted inputs, and dumped ALL 23 names as unpaired while the real
+delta sat buried at the end — a grader whose own output is 23x noise is
+functionally blind; the fix pins LC_ALL=C on comm itself.
+
+LAW (fifth recursion t157/t158/t159/t160/t161 -> t162): audit the SAFETY
+graders with the same SET-PAIRS question as the bookkeeping graders — for every
+consistency check ask "which direction does it enumerate, and what happens to
+the set members it cannot see". Modification-detection was tested for 161 turns
+because it is the failure mode people imagine; ADDITION and baseline-destruction
+were never imagined, so never tested.

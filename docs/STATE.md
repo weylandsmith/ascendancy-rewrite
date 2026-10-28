@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T05:35
+updated: 2026-10-28T06:00
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -232,7 +232,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #48 done at t161; stop-report.md §54): loop awaits a user
+IDLE (re-check #49 done at t162; stop-report.md §55): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -389,6 +389,54 @@ missing from STATE index entirely", the record gained/kept a closed row the bloc
 omits — paste the stub the tool prints (id + one-line summary copied FROM the
 record; keep the two-quote-per-entry YAML shape, no raw inner quotes). It is a
 hard DIVERGENCE by design; do not delete the leg to go green.
+
+T162 LANDED (IDLE re-check #49 — no trigger fired; deliverables:
+scripts/gate.sh (stage 1 bidirectional P0), docs/re/stop-report.md §55,
+docs/re/_wip_t162.md; no ledger row touched, game/ untouched (read-only
+verified), no watch or census run against the live capture). (1) Trigger (A)
+NEGATIVE — probe RC=0 at 05:36:18: newest playcap dir playcap-20261014-224611;
+live-timeline.jsonl mtime_ns 1793043841304000000 / 5691796463 B (51st
+consecutive byte-identical reading t111..t162); (A6) content baseline reproduced
+an 11th time head 42a0bed0507f9052e2009ec94e9c27f1 / tail
+1529ab1ad70ac360f441d819703f943f, last row still t1254; zero dosbox procs; find
+sweep 4 files non-loop none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav =
+20). (2) Trigger (B) NEGATIVE — clean tracked tree at 506d825 at session start
+(verdict wording valid per t155/B5), no STEERING, B3 HEAD == journal sha 506d825
+(journal row 83 ct 05:33:44, OK, fail_streak 0), prompt pair prompt-84 vs
+prompt-83 (58/58) digit-stripped delta 0. ledger_index_check LEDGER INDEX OK
+before any edit. (3) THE FINDING — t161's SET-PAIRS law aimed at the ONE grader
+protecting the top NEVER ("never modify game/"), unaudited for 161 iterations:
+gate.sh stage 1 enumerated manifest->disk ONLY. Measured on a scratch copy under
+work/r1 (pristine never touched): DELETE of a listed file ARMED (sha256sum -c
+"FAILED open or read"); ADD of a foreign file gave ZERO signal (nothing
+enumerates disk->set); ABSENT manifest made the gate run `sha256sum * > MAN`
+itself, blessing the tampered tree forever (regenerated manifest held 24 entries
+incl. the planted NOTES.TXT) — a self-healing grader where the tamper IS the
+baseline. Static: game/ flat (0 dirs/dotfiles/nested/unreadable), manifest set ==
+disk == 23, manifest git-tracked since seed 3792dc5. (4) FIX: stage 1 now errs
+hard on an absent manifest with a restore-from-git instruction (regen path
+deleted), and adds the second direction — LC_ALL=C comm -3 of manifest names
+(awk substr($0,67), space-tolerant) vs find game -maxdepth 1 -type f, any delta
+=> err. Five branches validated by REAL execution on stage-1 code extracted
+verbatim from the patched file (fixtures deleted): F0 silent flag 0; F1 ADD names
+NOTES.TXT only; F2 REMOVE fires BOTH legs; F3 absent-manifest errs with NO regen;
+F4 tampered-hash errs. Full gate green GATE_EXIT=0 zero FAIL lines ("ALL CHECKS
+PASS") with the leg running; ledger_audit LEDGER AUDIT OK; pristine game/
+re-verified clean after the fixture work. Two FIXTURE-harness traps banked §55
+(neither a gate bug): running extracted stage-1 code standalone needs note()/err
+shims (RC=127 briefly read as a leg failure), and LC_ALL=C on sort but NOT on
+comm made comm disagree with its own inputs and dump ALL 23 names unpaired — a
+grader whose output is 23x noise buries its real delta, now pinned LC_ALL=C on
+comm itself. LAW (fifth recursion t157..t161->t162): audit SAFETY graders with
+the same set-pairs question as bookkeeping graders — modification-detection was
+tested for 161 turns because it is the failure mode people imagine; ADDITION and
+baseline-destruction were never imagined, so never tested. (5) Bank hygiene fresh
+(grep -rln stop-report scripts/ -> r1_idle_probe.py + ledger_audit.py docstrings
+only; 2113 lines zero diff vs HEAD before appending §55). Infra unchanged since
+t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log 2026-10-27
+17:30:18/30114 — zero connects). NO row closed (strict-close honest negative —
+grader hardening, not measurement), no law falsified. NEXT stays IDLE; the t113
+LOOP-END PROPOSAL stands (49 idle turns). Gate 0.
 
 T161 LANDED (IDLE re-check #48 — no trigger fired; deliverables:
 scripts/ledger_index_check.py (legs E+F, tightened leg B, nost-path printing),

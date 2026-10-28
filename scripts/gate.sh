@@ -8,12 +8,30 @@ fail=0
 note() { echo "[gate] $*"; }
 err()  { echo "[gate FAIL] $*"; fail=1; }
 
-# 1. Originals untouched (P0 invariant) — checksum manifest
+# 1. Originals untouched (P0 invariant) — checksum manifest, BIDIRECTIONAL (t162).
+# t162 audit (docs/re/stop-report.md SS55): the pre-t162 leg enumerated
+# manifest->disk only. Measured on a scratch copy: DELETE of a listed file armed
+# (sha256sum -c "FAILED open or read"), but an ADDED file produced zero signal
+# (nothing compares disk->manifest), and an ABSENT manifest silently rebuilt
+# itself from whatever was on disk, blessing a tampered tree forever.
+# Manifest set == disk == 23 files verified on the real tree before landing.
 MAN="$ROOT/docs/BASELINE.sha256"
 if [ ! -f "$MAN" ]; then
-  (cd "$ROOT/game" && sha256sum * > "$MAN") && note "created baseline manifest"
+  # docs/BASELINE.sha256 has been git-tracked since seed 3792dc5, so a healthy
+  # tree can never legitimately lack it; absence = restore from git, NEVER
+  # regenerate from disk (the regen path WAS the bless-the-tamper hole).
+  err "P0: docs/BASELINE.sha256 missing — restore it (git checkout -- docs/BASELINE.sha256); NEVER regenerate the baseline from disk"
+else
+  (cd "$ROOT/game" && sha256sum -c "$MAN" --quiet 2>&1) | grep -v ': OK' && err "game/ files modified!"
+  # Second direction: every file on disk must be named by the manifest.
+  # substr($0,67): sha256sum prints 64-hex + 2 spaces + name (handles spaces).
+  # LC_ALL=C on comm ITSELF (t162 fixture run): comm re-parses its inputs under
+  # the CURRENT collation, so LC_ALL=C sorts + a UTF-8 locale comm disagree and
+  # dump every line as unpaired (measured: 23 false entries, real delta buried).
+  LC_ALL=C comm -3 <(awk '{print substr($0,67)}' "$MAN" | LC_ALL=C sort) \
+              <(cd "$ROOT/game" && find . -maxdepth 1 -type f -printf '%f\n' | LC_ALL=C sort) \
+    | grep . && err "P0: game/ file SET != manifest (file added/removed outside the baseline)"
 fi
-(cd "$ROOT/game" && sha256sum -c "$MAN" --quiet 2>&1) | grep -v ': OK' && err "game/ files modified!"
 
 # 2. Extractor round-trip works
 TMP=$(mktemp -d)
