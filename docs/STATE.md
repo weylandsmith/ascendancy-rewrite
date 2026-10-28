@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T07:00
+updated: 2026-10-28T07:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -232,7 +232,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #57 done at t170; stop-report.md §63): loop awaits a user
+IDLE (re-check #58 done at t171; stop-report.md §64): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -389,6 +389,42 @@ missing from STATE index entirely", the record gained/kept a closed row the bloc
 omits — paste the stub the tool prints (id + one-line summary copied FROM the
 record; keep the two-quote-per-entry YAML shape, no raw inner quotes). It is a
 hard DIVERGENCE by design; do not delete the leg to go green.
+
+T171 LANDED (IDLE re-check #58 — no trigger fired; deliverables:
+docs/re/stop-report.md §64, docs/STATE.md; no ledger row touched, no harness
+change, game/ untouched, no watch or census run against the live capture).
+(1) Trigger (A) NEGATIVE — probe RC=0 at 07:00:20 as the FIRST action on a
+clean tree at c876705 ("IDLE — neither trigger" wording valid per t155/B5):
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns=1793043841304000000 / 5691796463 B == the frozen baseline (60th
+consecutive byte-identical reading t111..t171); re-statted independently by
+reproducing the probe's edge_md5 SEEK path (seek size-64 KiB) in Python — head
+42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f, 17th
+reproduction of the t151 baseline (the t170 tail-row json.loads re-parse was
+NOT repeated this turn — mtime+size+both edge md5s are the adjudicating
+signals, and an ingest cannot be md5-neutral per r1_playcap_watch.py:146).
+Zero dosbox procs; find work/r1 -newermt 2026-10-28 06:59:25 -> 4 files,
+non-loop none; A4 watcher ALIVE pid 27774 (so (A) IS adjudicated, t147);
+A5 none (save/*.sav = 20). (2) Trigger (B) NEGATIVE — diff HEAD and tracked
+porcelain empty, zero untracked paths inside/outside loop-owned, no STEERING,
+B3 HEAD == journal sha c876705 (row 92, ct 06:58:32, fail_streak 0), prompt
+pair prompt-93 vs prompt-92 (58/58) digit-stripped delta 0. (3)
+ledger_index_check LEDGER INDEX OK before any edit (rows=18
+open=OQ-003/005/016/019/021/023 closed=12). Infra unchanged since t112.
+(4) HARNESS LESSON (banked, cost 3 repair calls): appending a new section to a
+long hand-authored log by patching a boilerplate closing sentence is UNSAFE —
+"Bank hygiene fresh: grep -rln stop-report scripts/ … LOOP-END PROPOSAL stands
+(N idle turns)" recurs near-verbatim in dozens of sections, so the patch tool's
+fuzzy matcher landed the new §64 in the MIDDLE of §63 and duplicated §63's tail
+after it. Law: to append, anchor on content unique to the LAST section (the
+per-turn measurements: timestamped journal row, pid list) or truncate-and-append
+(`head -n <last-line-of-section-N> file > tmp && mv`) and then PROVE the repair
+with `git diff --numstat` — a clean append MUST read N insertions / 0 deletions;
+deletions in an append-diff mean you rewrote history by accident. Final
+stop-report.md diff this turn: 36/0 (pure append, 2534 lines).
+NO row closed (strict-close honest negative), no law falsified — per the t113
+idle law this turn was the two-trigger probe and nothing else.
+NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (58 idle turns). Gate 0.
 
 T170 LANDED (IDLE re-check #57 — no trigger fired; deliverables:
 docs/re/stop-report.md §63, docs/STATE.md; no ledger row touched, no harness
