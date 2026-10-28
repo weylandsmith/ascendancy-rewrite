@@ -290,3 +290,37 @@ Consequence: §6 LOOP-END PROPOSAL unchanged, 12 closed / 6 open. NO row closed
 (strict-close honest negative — bookkeeping plus tooling, no measurement of
 game behaviour). Future idle turns: `python3 scripts/r1_idle_probe.py`, read
 the verdict, and do not re-derive the probes by hand.
+
+## 11. IDLE re-check #5 (t118, 2026-10-27 22:12 EDT) — probe validated by a fresh reader
+
+`python3 scripts/r1_idle_probe.py` at 22:12:21.769 EDT -> **RC=0**, both
+triggers negative; `scripts/r1_t85g_sitting.py` correctly not run. (A) newest
+playcap dir `playcap-20261014-224611`; live-timeline.jsonl mtime_ns
+1793043841304000000 (2026-10-26 15:44:01.304) / 5691796463 B — 8th consecutive
+byte-identical reading (t111..t118); zero dosbox procs; session-start find
+sweep (cutoff 22:10:42) 4 files, all work/r1/loop/. (B) clean tracked tree at
+35a9027, no STEERING file, prompt-40.txt byte-identical to prompt-39.txt modulo
+digits, no delta outside loop-owned paths; the §3 answer is still outstanding
+after five idle turns.
+
+THE ITERATION'S FINDING: the t117 tool survives its first use by a session
+that did not author it. Every leg prints its own evidence (mtime_ns, size, dir
+name, pid table, diff output), so the verdict is reproducible WITHOUT hand
+re-derivation — which was the whole point of toolizing. No defect found.
+
+INFRA NOISE NOTE (do not chase, do not treat as a trigger): the probe's INFRA
+leg lists two python3 rows beyond the watcher pair — pid 127729
+`tools/mcp_death_supervisor.py` (ppid 127711, started 22:10:42 = this session's
+own harness) and pid 127778, which was gone by the time `ps -p` re-checked it.
+The probe shells out with `shell=True`, so its own git/find/stat children are
+visible in a mid-run `ps -eo` snapshot. Harmless by construction: the load-
+bearing (A) leg is the capture-file sweep (no non-loop file) and the dosbox leg
+matches `comm`, not a full command line. LAW: trigger evidence is dosbox
+processes and capture-side files ONLY — Hermes-own and probe-own processes are
+noise. Infra alive: Xvfb :9 1196, x11vnc :5910 1207, watcher 27774;
+x11vnc.log 2026-10-27 17:30:18 / 30114 B unchanged since t112 (zero connects
+against the t111-FIXED launch path).
+
+Consequence: §6 LOOP-END PROPOSAL unchanged, 12 closed / 6 open. NO row closed
+(strict-close honest negative), no banked law falsified, no code change.
+Future idle turns: run the tool, read the verdict, bank the reading — nothing else.

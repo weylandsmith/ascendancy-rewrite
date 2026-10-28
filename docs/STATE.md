@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-27T22:05
+updated: 2026-10-27T22:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #4 done at t117; stop-report.md §10): loop awaits a user
+IDLE (re-check #5 done at t118; stop-report.md §11): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -249,6 +249,37 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117):
     loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T118 LANDED (IDLE re-check #5 — no trigger fired; deliverables:
+docs/re/_wip_t118.md, stop-report.md §11 appended; no ledger row touched, no
+code changed, no watch/census run per §6 discipline). (1) Trigger (A)
+NEGATIVE — `python3 scripts/r1_idle_probe.py` at 22:12:21.769 EDT RC=0:
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B, 8th consecutive byte-identical reading
+(t111..t118); zero dosbox procs; session-start (22:10:42) find sweep 4 files,
+all work/r1/loop/. r1_t85g_sitting.py correctly not run. (2) Trigger (B)
+NEGATIVE — clean tracked tree at 35a9027, no STEERING file, prompt-40.txt
+byte-identical to prompt-39.txt modulo digits (diff after digit-stripping:
+empty — cheaper steering check than grepping instruction prose, since the
+standing instruction line itself contains the word "steering"), no delta
+outside loop-owned paths; §3 answer outstanding after five idle turns.
+(3) TOOL VALIDATED BY A FRESH READER (the iteration's value): t118 is the
+first session that ran r1_idle_probe.py without having authored it, and the
+verdict was reproducible from the tool's printed evidence alone — every leg
+prints its own number, no hand re-derivation needed. No defect found.
+(4) NEW NOISE LAW banked (stop-report §11): the probe's INFRA leg also lists
+Hermes-own processes (pid 127729 tools/mcp_death_supervisor.py, started at the
+harness's own 22:10:42) and the probe's transient children (pid 127778, gone
+on `ps -p` re-check — the probe shells out with shell=True, so its git/find/
+stat children appear in a mid-run `ps -eo` snapshot). Trigger evidence is
+dosbox processes and capture-side files ONLY; never arm on Hermes/probe-own
+python rows. (5) Infra alive so the negatives are trustworthy: Xvfb :9 1196,
+x11vnc :5910 1207, watcher 27774; x11vnc.log 2026-10-27 17:30:18 / 30114 B
+unchanged since t112. (6) Bank-law pre-check: only scripts/r1_idle_probe.py
+mentions stop-report (docstring cross-ref), nothing regenerates it.
+NEXT = `python3 scripts/r1_idle_probe.py` on the next idle session; loop
+stays IDLE at 12 closed / 6 open. NO row closed (strict-close honest
+negative); no banked law falsified. Gate 0, LEDGER AUDIT OK
 
 T117 LANDED (IDLE re-check #4 — no trigger fired; deliverables: NEW
 scripts/r1_idle_probe.py RC=0, docs/re/_wip_t117.md, stop-report.md §10
