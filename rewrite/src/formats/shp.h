@@ -68,7 +68,12 @@ class ShapeLibrary {
     // underlay, mirroring the original's untouched-destination semantics.
     // Tries height rows, then width rows (S16 orientation residue);
     // returns false only when neither walk completes inside the span.
-    bool decode(int i, std::vector<uint8_t>& out) const;
+    // *swapped (optional, docs/BLOCKED.md t68 evidence tooling t182): true
+    // iff only the swapped walk completed — the buffer then holds
+    // record().width rows of stride record().height (the canonical walk
+    // yields height rows of stride width).
+    bool decode(int i, std::vector<uint8_t>& out,
+                bool* swapped = nullptr) const;
 
     static constexpr uint32_t kMagic = 0x30312E31u;  // '1.10' LE
 

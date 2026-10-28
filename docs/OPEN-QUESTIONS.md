@@ -480,6 +480,17 @@ t182): a dumper renders all 80 as PNGs; the player eyeballs ~20 and rules
 "fine" (our size law was too strict - fix the doc) or "garbage" (broken
 records - close with evidence). ~30 minutes of human time total. DECISION
 OPTIONS: run the dumper, or accept the current validation-asset treatment.
+STATUS t182 (2026-10-28): DUMPER SHIPPED — work/r1/shp_png/ (index.txt +
+15 validated PNGs: 5 CONTROLS spanning size classes + 10 RESTORED), driver
+scripts/r1_t182_pngdump.py + tools/shp_pngdump.cpp over the rewrite's own
+ShapeLibrary; palette game.pal labelled UNVERIFIED. MEASURED CORRECTION
+(shp.md S18): the ledger script's k==0 V-trial walked from rec instead of
+the closed rec+8 law — 10 k==0 records (10status/2savegam/4loadgam/planpro/
+planres/smship11/smship15/lgrace07-09-10 rec0) were FALSE FAILs, promoted
+with zero demotions; corpus now V 197 + A 1289 + FAIL 71 = 1557, libs clean
+186/208. Genuine residue 71 records/28 files (planind 13, 3cfgnew 13,
+cos_star 12, stragglers 46). Row stays OPEN — closure = player eyeball of
+the packet (R13); packet is ready to rule on.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge

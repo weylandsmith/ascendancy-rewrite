@@ -117,7 +117,9 @@ bool ShapeLibrary::parse(std::vector<uint8_t> img, std::string* err) {
     return true;
 }
 
-bool ShapeLibrary::decode(int i, std::vector<uint8_t>& out) const {
+bool ShapeLibrary::decode(int i, std::vector<uint8_t>& out,
+                          bool* swapped) const {
+    if (swapped) *swapped = false;
     if (i < 0 || i >= count()) return false;
     const Record& r = records_[i];
     // Dims sanity bound == the Python validator's (4096): FAIL-class
@@ -137,6 +139,7 @@ bool ShapeLibrary::decode(int i, std::vector<uint8_t>& out) const {
         if (walkRows(img_, r.stream, r.end, r.height, r.width, alt,
                      r.height)) {
             out.swap(alt);
+            if (swapped) *swapped = true;
             return true;
         }
     }

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T18:40
+updated: 2026-10-28T19:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -238,59 +238,47 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-LANDED t181 (2026-10-28, this session): OQ-003 THREE-CLASS RAM DIFF RUN —
-OQ-003 CLOSED by measured disclaim (13 closed / 5 open). scripts/
-r1_t181_banddiff.py (new, exit 0, rerunnable) locates every .gam save block
-in live-RAM captures by content-bearing chunk needles — NEW LAYOUT FACT: the
-save is a MULTI-BLOCK image (deltas 0x2b6718 header / 0x25676f S-table /
-0x263fb1 planet pool / 0x276b0c block11200 / 0x2d3a0e entropy band; every
-region file==boot 100% = load is memcpy per block). At the LOCATED addresses
-the disclaim test fires: entropy band boot-vs-played 432/2048 = 21.1% stable
-vs real tables 87-100%; baseline (oct14 title) slot at the band's address
-0/16 nonzero u32; same-world save pair churns at identical offsets with
-asymmetric zeros (54/34); NOT compressed (0/2316 blocks >= 6.8 b/B, max
-5.60); float-shape REFUTED (13%/9% sane f32 vs 3-5% pool control); game runs
-without the region x3 (golden resume.gam band span = 133 nonzero bytes yet
-boots the golden tour; RESUME-014 EOF 0x12753 has no band at all; tail varies
-776..14,561 nonzero by session). VERDICT banked: writer-side copied session
-memory, disclaim per the row's own decision option; scratch identity stays
-an explicit UNNAMED non-claim (live-UI-trace class). CORRECTIONS banked:
-(1) probe bug mem.find(b'')==0 artifacts withdrawn (RESUME-014 past-EOF
-"matches"); (2) with valid needles the title-boot slots DO carry the on-disk
-world tables verbatim (0x25996f/0x25a76f delta 0x25676f) — title boot is NOT
-world-free. Ledger: OPEN-QUESTIONS OQ-003 row CLOSED + STATUS t181 block;
-ledger_audit default --expect re-triaged (OQ-003 removed); STATE index
-mirrored. Evidence docs/re/savegame.md §t181; WIP docs/re/_wip_t181.md;
-scripts/r1_t181_corr.py keeps the correction reproducible. Rewrite
-unchanged (fresh-start-only row). Gate 0, both ledger checks green.
+LANDED t182 (2026-10-28, this session): OQ-005 SHAPE-PNG DUMPER SHIPPED +
+VALIDATOR OFF-BY-8 CORRECTION (ledger row stays OPEN — evidence packet now
+ready for the player's ruling; nothing closes today). Tooling:
+scripts/r1_t182_pngdump.py (run with ~/tools/revenv/bin/python — PIL only
+there) + C++ driver tools/shp_pngdump.cpp linking rewrite/build/
+libascend_core.a, so every plane comes from the rewrite's OWN
+ShapeLibrary::decode (which gained an optional bool* swapped out-param;
+110 tests 0 failed, no behaviour change). Output work/r1/shp_png/: 15 PNGs
+all self-validated (5 CONTROLS spanning size classes 10x11..639x479 incl.
+3 S17-RAM-verified libs; 10 RESTORED — see below) + index.txt (CONTROLS
+first, residue grouped by class; palette game.pal labelled UNVERIFIED).
+Core measured finding (docs/re/shp.md S18): scripts/r1_shp_unifiedlaw.py:49
+k==0 V-trial walked the stream from rec while its own docstring, shp.md S16,
+the S17 live-RAM table law (sel0 -> rec0+8), and shp.cpp:106 all say rec+8.
+A/B over 208 libs same-function: promoted EXACTLY 10 k==0 records (10status/
+2savegam/4loadgam rec0 639x479, planpro/planres 107x99, smship11 45x30,
+smship15 39x6, lgrace07/09/10 296x199), DEMOTED zero of 187; all 10 render
+canonical (swapped=0). Corpus after fix: V 197 + A 1289 + FAIL 71 = 1557,
+libs clean 186/208 (was 176). Genuine residue corrected 80/31 -> 71/28
+(planind 13, 3cfgnew 13, cos_star 12, stragglers 46; 3cfgnew rec0 re-
+verified still-failing from rec+8). Pipeline proof via vision pass on the
+OUTPUT (tool sanity, NOT OQ closure — R13 stands): dkship20 rec3 = coherent
+ship art; 10status rec0 = legible "Empire status" panel. Banked: shp.md §18,
+OPEN-QUESTIONS OQ-005 STATUS t182 block, BLOCKED t68 amended count, ledger
+index unchanged (OQ-005 still open — correct). Gate 0 + both ledger checks.
 
-NEXT t182 (TOOL BUILD): OQ-005 SHAPE-PNG DUMPER — scripts/r1_t182_pngdump.py
-renders the 80 residue records (classes per BLOCKED t68) to
-work/r1/shp_png/<file>--<record>--<dims>.png via the rewrite ShapeLibrary
-(build tree exists per gate stage 4), each PNG validated non-empty +
-dimension-sane by the tool itself. ALSO renders 3-5 CONTROL samples per the
-player's request: records from the 1477 decode-pass corpus spanning size
-classes (pick verbatim-verified libs; include one per class sel0/k>=1, at
-least one LARGE e.g. cos_star/sun-class and one small UI icon) into
-work/r1/shp_png/CONTROL--<name>.png so the eyeball has scale reference.
-index.txt lists CONTROLS first, then the 80 (grouped by class: span-undersized
-planind/3cfgnew, simple-format cos_star, stragglers). NO self-grading of
-correctness (R13 + strict-close): the dumper ships evidence, the player's
-ruling closes the row.
-ORDERING RATIONALE: t181 landed (was first); t182 is next because it is the
-only queued item that is fully offline AND moves a ledger row toward the
-player's closure gate (OQ-005 is now the sole row an artifact can advance —
-OQ-016/OQ-019/OQ-021/OQ-023 all need a capture window or live play; the
-OQ-023 test is now precise per diplomacy.md §13.5 and capture-only, static
-re-scan forbidden for that row). t183/t184 stay after it per t179 ordering.
-
-THEN t183 (STATIC hunt): OQ-019 SCALE + TWO-TIER TURN — map the day-tick
+NEXT t183 (STATIC hunt): OQ-019 SCALE + TWO-TIER TURN — map the day-tick
 coupling and sub-turn round-robin per ships.md §16 testimony: start at the
 cited per-star stride-0x60 pass 0x2547c and DAT_00012e10 readers; seek the
 scale factor converting drive stat [+0x10] to walk units per sub-turn (walk
 body 0x533e0 callers), and whether lane transit is a separate law (magnetron
 candidate 0x21f58 tie, §16 item 3). Deliverable: tier-specific scale laws or
 the measured reason they are runtime-only.
+ORDERING RATIONALE: t182 landed (was first; the off-by-8 correction is the
+kind of ledger-integrity work the loop exists for). t183 is next because it
+is the only remaining queued item that is fully offline — OQ-016-tail/
+OQ-021/OQ-023 all need a capture window or live play (t180 closed the static
+route for OQ-023 explicitly; re-scan forbidden per diplomacy.md §13.5).
+OQ-005 now needs only ~30 min of the player's eyeball time on
+work/r1/shp_png/index.txt — surface it at the next decision trigger. t184
+stays deferred per t179c (user hold on the `l` key route).
 
 THEN t184 (DEFERRED — user hold, t179c): the `l` star-map key route. Player
 reports the original observation may have been key-mashing error; hold until

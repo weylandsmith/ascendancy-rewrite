@@ -307,6 +307,9 @@ S9/S12/S14/S16/S17). Residual: 80/1557 records in 31 files whose
 in-record dims-field location is unknown (classes: span-undersized
 planind/3cfgnew, simple-format cos_star, stragglers), and .tmp/1starmap
 cached heads are non-verbatim so file-space inference is unsound there.
+[AMENDED t182: count corrected by measurement to 71 records/28 files —
+10 k==0 records were validator off-by-8 false FAILs, see shp.md S18;
+classes otherwise unchanged.]
 Why blocked: closing needs a human-verifiable drawn frame (r1-savestate
 capture exists, but R13 means we cannot confirm the panel drew; blind
 sweeps are FORBIDDEN and the fixup-vary theory is measured dead).

@@ -46,7 +46,15 @@ def rec_state(d, k, rec, nxt):
     """return candidate tag or FAIL."""
     trials = []
     if k == 0:
-        trials.append(("V", rec, rec))
+        # t182 FIX: V stream starts at rec+8, not rec. The old ("V", rec, rec)
+        # walked 8 header bytes as control codes; when they happened to parse
+        # as valid ops the walk desynced and either consumed the span with a
+        # bogus row count or failed spuriously. Measured (t182): the rec+8 law
+        # -- S16 text, S17 live-RAM table (sel0 -> rec0+8, 43/43 selectors),
+        # rewrite shp.cpp -- promotes EXACTLY 10 k==0 records (10status,
+        # 2savegam, 4loadgam, planpro, planres, smship11, smship15, lgrace07/
+        # 09/10 rec0) from FAIL to V-canonical and DEMOTES ZERO of the 187.
+        trials.append(("V", rec + 8, rec))
     else:
         trials.append(("A", rec + 0x18, rec + 0x10))
     for tag, s_off, d_off in trials:

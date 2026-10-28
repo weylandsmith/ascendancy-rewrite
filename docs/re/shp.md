@@ -717,3 +717,57 @@ start header. The dims-location question cannot be answered statically
 beyond this; closure class UNCHANGED (human-verifiable drawn frame,
 R13), now with the sanctioned-route negative cited. No rewrite change
 (ShapeLibrary reports garbage dims, never allocates — unchanged).
+
+## 18. t182: evidence dumper SHIPPED + validator off-by-8 CORRECTION — residue 80 -> 71 [measured]
+
+1. TOOLING. scripts/r1_t182_pngdump.py (+ C++ driver tools/shp_pngdump.cpp
+   linked against rewrite/build/libascend_core.a) renders (library, record)
+   pairs THROUGH THE REWRITE'S OWN ShapeLibrary::decode — not a second
+   implementation — to work/r1/shp_png/*.png, each PNG self-validated
+   (non-empty, reopens via PIL, size == decoder W/H, >=1 non-index-0 pixel).
+   index.txt lists CONTROLS first: 17np rec0 639x479 (LARGE), dkship20 rec3
+   314x222 (A-law), racering rec0 53x53, listbox rec1 24x24, bullet04 rec0
+   10x11 (all every-record-passing libs; racering/listbox/bullet04 also S17
+   RAM-verified). Palette extracted/ascend01/data/game.pal (768 B RGB) is an
+   UNVERIFIED DEFAULT, labelled so in index.txt. NO candidate dims/stream
+   search anywhere (GOAL 7th-sweep ban; REFUTED-ROUTES R2). Run exit 0:
+   sets=86 rendered=15 validated=15 decode-fail=71.
+   Pipeline proof (vision pass on the OUTPUT, evidence-of-tool not closure):
+   CONTROL--dkship20--rec3 renders a coherent ship-like assembly;
+   RESTORED--10status--rec0 renders a legible "Empire status" UI panel with
+   header, table grid, planet-type icons, TOTEM/MOBY stat box — real vendor
+   art, not noise. OQ-005 closure remains the player's ruling (R13).
+   decode() gained optional bool* swapped (orientation report only; 110
+   tests 0 failed, no behaviour change).
+
+2. CORRECTION [measured, scripts/r1_shp_unifiedlaw.py:49 bug]. The k==0 V
+   trial walked the row stream from `rec` while its own docstring (line 5),
+   the S16 law text, the S17 live-RAM table law (sel0 -> rec0+8, 43/43
+   selectors), and rewrite shp.cpp:106 all specify rec+8. Walking 8 header
+   bytes as control codes desyncs the stream; records spuriously FAILed.
+   Measured A/B over 208 libs, same interpreter, same walk function:
+   rec-start V-pass 187, rec+8-start V-pass 197; PROMOTED exactly 10,
+   DEMOTED zero: 10status/2savegam/4loadgam rec0 (639x479), planpro/planres
+   rec0 (107x99), smship11 rec0 (45x30), smship15 rec0 (39x6), lgrace07/09/
+   10 rec0 (296x199). Direct rowwalk probes: e.g. 10status canonical walk
+   ends 0x5499 inside budget 0x54a8; swapped walk fails — canonical
+   orientation, dims AT the S16 slot, stream at +8. All 10 render
+   canonical (swapped=0) and pass PNG validation; banked in the tool as the
+   RESTORED set (PNG prefix RESTORED--).
+   => These 10 are class-(i) NO LONGER residue: they satisfy the CLOSED
+   S16/S17 V/A law. Corpus after fix [measured]: V 197 + A 1289 + FAIL 71
+   = 1557; libraries passing EVERY record 186/208 (was 176).
+
+3. COUNT RECONCILIATION. S16 banked "FAIL 80" with "B/F1 ~2"; the live
+   corpus run of the SAME script (git: unchanged since 4f11708 t67c) yields
+   FAIL 81 with no B tag pre-fix. 81 was the measured number; 80 in banked
+   prose was already inconsistent with its own tool. Post-fix genuine
+   residue = 71 records / 28 files. Classes unchanged otherwise:
+   span-undersized planind 13 + 3cfgnew 13 (3cfgnew rec0 walk from rec+8
+   still does NOT complete — verified, stays residue); simple-format
+   cos_star 12 (dims 0,0 at V slot; k>=1 "+0x10 blocks" anatomy per S16
+   stands); stragglers 46 across 23 files (garbage-dword and short-span
+   members incl. the non-verbatim 1starmap heads).
+   OQ-005 status UNCHANGED open: dims-location question lives in the 71;
+   closure class remains human-verifiable drawn frame (R13), now served by
+   an evidence packet at work/r1/shp_png/index.txt.
