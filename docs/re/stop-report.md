@@ -2251,3 +2251,37 @@ probes). Bank hygiene: grep -rln stop-report scripts/ -> r1_idle_probe.py +
 ledger_audit.py docstrings + gate.sh comment only (same set as t163); stop-report.md
 was 2220 lines / 136735 B zero-diff vs HEAD before appending this section.
 NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (51 idle turns).
+
+## 58. t165 — IDLE re-check #52: both triggers negative (52nd idle turn)
+
+Fresh session; ran scripts/r1_idle_probe.py BEFORE any edit per the t117 law.
+
+TRIGGER A NEGATIVE — probe RC=0 at 06:22:36 on a clean tree at 2a53dd6
+("IDLE — neither trigger" wording valid per t155/B5): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B — byte-identical to BASE_MTIME_NS/BASE_SIZE, (A6) content
+baseline satisfied (54th consecutive identical reading t111..t165); zero
+dosbox procs; find sweep since session start 06:21:37 -> 4 files, non-loop
+none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20, all match the
+watcher glob).
+
+TRIGGER B NEGATIVE — git diff HEAD empty; tracked porcelain empty; no
+untracked paths at all (loop-owned or foreign); no STEERING file; B3 HEAD ==
+journal sha 2a53dd6 (no commits outside the loop); prompt pair prompt-87.txt
+vs prompt-86.txt (58/58 lines) digit-stripped delta 0.
+
+LEDGER — ledger_index_check.py LEDGER INDEX OK before any edit (record
+rows=18 open=OQ-003/005/016/019/021/023 closed=12; STATE index mirrors it
+exactly).
+
+INFRA unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 2026-10-27 17:30:18 / 30114 B — zero connects).
+
+HONEST NEGATIVE: no measurement, NO ledger row closed, no law falsified, no
+harness change this turn (per the t113 idle law: an idle turn is the
+two-trigger probe and nothing else — no watch, no census, no re-derivation of
+probes). Bank hygiene: grep -rln stop-report scripts/ -> r1_idle_probe.py +
+ledger_audit.py docstrings + gate.sh comment only (same set as t163/t164);
+stop-report.md was 2253 lines / 138522 B zero-diff vs HEAD before appending
+this section. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (52 idle
+turns).

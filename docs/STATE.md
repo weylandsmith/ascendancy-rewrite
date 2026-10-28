@@ -232,7 +232,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #51 done at t164; stop-report.md §57): loop awaits a user
+IDLE (re-check #52 done at t165; stop-report.md §58): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -389,6 +389,23 @@ missing from STATE index entirely", the record gained/kept a closed row the bloc
 omits — paste the stub the tool prints (id + one-line summary copied FROM the
 record; keep the two-quote-per-entry YAML shape, no raw inner quotes). It is a
 hard DIVERGENCE by design; do not delete the leg to go green.
+
+T165 LANDED (IDLE re-check #52 — no trigger fired; deliverables:
+docs/re/stop-report.md §58, docs/STATE.md; no ledger row touched, no harness
+change, game/ untouched, no watch or census run against the live capture).
+(1) Trigger (A) NEGATIVE — probe RC=0 at 06:22:36 on a clean tree at 2a53dd6
+("IDLE — neither trigger" wording valid per t155/B5): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (54th consecutive byte-identical reading t111..t165; A6 content
+baseline satisfied); zero dosbox procs; find sweep since 06:21:37 -> 4 files
+non-loop none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20).
+(2) Trigger (B) NEGATIVE — diff/porcelain empty, zero untracked paths, no
+STEERING, B3 HEAD == journal sha 2a53dd6, prompt pair prompt-87 vs prompt-86
+(58/58) digit-stripped delta 0. (3) ledger_index_check LEDGER INDEX OK before
+any edit (rows=18 open=OQ-003/005/016/019/021/023 closed=12). Infra unchanged
+since t112. NO row closed (strict-close honest negative), no law falsified —
+per the t113 idle law this turn was the two-trigger probe and nothing else.
+NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (52 idle turns). Gate 0.
 
 T164 LANDED (IDLE re-check #51 — no trigger fired; deliverables:
 docs/re/stop-report.md §57, docs/STATE.md; no ledger row touched, no harness
