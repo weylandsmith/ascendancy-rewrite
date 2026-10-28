@@ -777,3 +777,36 @@ hand-authoring §27 is safe.
 Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
 measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
 twenty-one consecutive idle turns, zero measurement. NEXT stays IDLE.
+
+## §28 — t135 IDLE re-check #22 (2026-10-27 23:45)
+
+Both triggers probed with the sanctioned tool only (no watch, no census, per
+§6 discipline). `python3 scripts/r1_idle_probe.py` RC=0 at 23:45:53 (session
+start cutoff 23:44:08).
+
+(A) NEW CAPTURE: NEGATIVE. Newest playcap dir playcap-20261014-224611;
+live-timeline.jsonl mtime_ns 1793043841304000000 / 5691796463 B — the 25th
+consecutive byte-identical reading (t111..t135); zero dosbox procs; session-
+start find sweep over work/r1 = 4 files, non-loop: none.
+r1_t85g_sitting.py correctly not run (no sitting to adjudicate).
+
+(B) USER DECISION: NEGATIVE. Tracked tree clean at 815a9fe (diff HEAD empty,
+status --porcelain empty, no untracked files at probe time, no delta outside
+loop-owned paths, no STEERING file). Harness prompt-57.txt (58 lines) is
+identical to prompt-56.txt after digit-stripping (unified diff 0 lines) — no
+prepended steering note. The §3 answer remains outstanding after twenty-two
+idle turns.
+
+Infra: unchanged since t112 — Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log mtime 2026-10-27 17:30:18 / 30114 B, i.e. zero connects against
+the t111-FIXED launch path. Transient pids 147254/147306 are this iteration's
+own probe and shell per the t118 noise law, correctly ignored.
+
+Bank hygiene: re-checked fresh — `grep -rln stop-report scripts/` hits only
+r1_idle_probe.py + its __pycache__ bytecode; no regeneration trap. File was
+byte-stable at 779 lines (= §27's committed 746 + 33) with zero diff against
+HEAD before this append, so hand-authoring §28 is safe.
+
+Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
+measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
+twenty-two consecutive idle turns, zero measurement. NEXT stays IDLE.
