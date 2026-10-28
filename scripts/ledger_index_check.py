@@ -35,7 +35,30 @@ STATE = os.environ.get("R1_STATE", "docs/STATE.md")
 LEDGER = os.environ.get("R1_LEDGER", "docs/OPEN-QUESTIONS.md")
 # ids the record closes in its "- > OQ-" v1 block (ledger_audit skips those
 # rows by design), so their absence from rows() is not a divergence.
-V1_IDS = {"OQ-001", "OQ-002", "OQ-007", "OQ-008", "OQ-009", "OQ-011", "OQ-017"}
+# t160: this literal was a hand-maintained DUPLICATE of the record's v1 block
+# (fourth instance of the family: t157 index, t158 grader regex, t159
+# --expect, t160 exemption set) and was never compared to anything, so BOTH
+# drift directions were bad: the block gaining/losing an id silently re-scoped
+# which ids escape every cross-check (deleted block => 7 v1 closures vanish from
+# grader AND index while both print OK), while the literal going stale armed
+# false DIVERGENCE on a legitimate edit. Now DERIVED from the record each run
+# and RECONCILED against V1_IDS_EXPECTED below, so the duplicate became the
+# leg: block-vs-code disagreement fails loudly in both directions.
+V1_IDS_EXPECTED = {"OQ-001", "OQ-002", "OQ-007", "OQ-008", "OQ-009",
+                   "OQ-011", "OQ-017"}
+
+
+def v1_block_ids(path):
+    """Ids closed in the record's '- > OQ-' index block (the region
+    ledger_audit.rows() skips). t84 contract shapes these lines; grep-verified
+    the ONLY 7 lines matching '^- > ' in the real record are '^- > OQ-' ones,
+    so no non-id line can pollute the set."""
+    ids = set()
+    for l in open(path, encoding="utf-8"):
+        m = re.match(r"^- > (OQ-\d+)\b", l)
+        if m:
+            ids.add(m.group(1))
+    return ids
 
 
 def state_index(path):
@@ -69,8 +92,22 @@ def main():
     rec_closed = {o for o, s in st.items() if s == "CLOSED"}
     nost = sorted(o for o, s in st.items() if s is None)
     idx_open, idx_closed = state_index(STATE)
+    V1_IDS = v1_block_ids(LEDGER)
 
     problems = []
+    # t160 reconciliation leg: the record's v1 block IS the source of truth for
+    # which ids legitimately escape rows(); the code literal is the pin that
+    # notices the block being edited away. Disagreement fails in BOTH
+    # directions — a deleted block (7 closures silently ungraded) and an
+    # added/renamed id (a v2 row wrongly exempted from every cross-check) each
+    # print the exact delta.
+    if V1_IDS != V1_IDS_EXPECTED:
+        problems.append(
+            "v1 BLOCK vs code literal drift: block_only="
+            f"{sorted(V1_IDS - V1_IDS_EXPECTED)} literal_only="
+            f"{sorted(V1_IDS_EXPECTED - V1_IDS)} — reconcile the record's "
+            "'- > OQ-' block and V1_IDS_EXPECTED (the block is the contract; "
+            "update the literal ONLY to match a real record edit)")
     for o in sorted(rec_open - idx_open):
         problems.append(f"record-OPEN {o} missing from STATE open list")
     for o in sorted(idx_open - rec_open):

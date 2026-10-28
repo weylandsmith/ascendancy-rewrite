@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T04:55
+updated: 2026-10-28T05:15
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -371,6 +371,47 @@ CLOSURE NOTE (t159): if a future turn closes the LAST open row, the terminal
 green needs BOTH index legs done right — empty STATE's `open:` list AND edit
 ledger_audit.py's --expect default to "" (an empty open set now passes an empty
 expect; before t159 it could not). Do NOT delete either check to go green.
+
+T160 LANDED (IDLE re-check #47 — no trigger fired; deliverables:
+scripts/ledger_index_check.py (V1_IDS derived+reconciled), docs/re/stop-report.md
+§53, docs/re/_wip_t160.md; no ledger row touched, game/ untouched, no watch or
+census run against the live capture). (1) Trigger (A) NEGATIVE — probe RC=0 at
+05:01:53: newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B (50th consecutive byte-identical
+reading t111..t160; independently re-statted, equal to BASE_MTIME_NS/BASE_SIZE);
+(A6) content baseline reproduced a NINTH time head
+42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f, last
+row still t1254; zero dosbox procs; find sweep non-loop none; A4 watcher ALIVE
+pid 27774; A5 none (save/*.sav = 20). (2) Trigger (B) NEGATIVE — clean tracked
+tree at 87b41a4 at session start (verdict wording valid per t155/B5), no
+STEERING, B3 HEAD == journal sha 87b41a4, prompt pair prompt-82 vs prompt-81
+(58/58) digit-stripped delta 0. (3) THE FINDING — the t158 audit-the-grader law
+applied to the last hand-maintained literal left in the ledger checks after
+t159: ledger_index_check.py's V1_IDS exemption set (ids skipping both
+"absent from record" legs because the record closes them in the "- > OQ-" v1
+block ledger_audit skips by design). Measured first: derived-from-record == the
+literal exactly 7/7, zero live drift — but nothing compared them, so a record
+v1-block edit armed FALSE divergence while an id ADDED to the block silently
+exempted a row from every cross-check. FIX: V1_IDS derived each run from the
+record (v1_block_ids(), ^- > OQ-(\d+)) and RECONCILED against kept code pin
+V1_IDS_EXPECTED; disagreement fails RC=1 naming the delta in both directions.
+LAW (fourth family instance t157/t158/t159/t160): a constant in a checker that
+names objects in another artifact must DERIVE from the contract artifact and
+KEEP the literal as a reconciliation pin — derive-and-reconcile, not
+copy-and-hope, not delete-and-trust. Four-branch validation by REAL execution
+(fixtures deleted): real OK RC=0; block deleted RC=1 (drift line + 7 absent-id
+lines, double signal); spurious OQ-099 in block RC=1 naming it; pre-t157 drifted
+STATE RC=1 naming all six original drifts. One self-inflicted TEST-harness bug
+(a "; true" truncating the invocation so t4 ran nothing and printed RC=0) —
+caught by verifying the fixture existed; the checker itself was never wrong.
+Enforcement holds per t158: gate.sh:421 stage 3t invokes the fixed tool.
+(4) Bank hygiene fresh (grep -rln stop-report scripts/ -> r1_idle_probe.py +
+ledger_audit.py docstrings only; 1967 lines zero diff vs HEAD before appending
+§53). Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log 2026-10-27 17:30:18/30114 — zero connects). NO row closed
+(strict-close honest negative — harness hardening, not measurement), no law
+falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (47 idle turns).
+Gate 0.
 
 T159 LANDED (IDLE re-check #46 — no trigger fired; deliverables:
 scripts/ledger_audit.py (completion-state fix), docs/re/stop-report.md §52,

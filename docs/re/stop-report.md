@@ -1965,3 +1965,66 @@ ledger_audit.py docstrings only; 1901 lines zero diff vs HEAD before appending
 §52). NO row closed (strict-close honest negative — harness hardening, not
 measurement), no law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL
 stands (46 idle turns). Gate 0.
+
+## 53. IDLE re-check #47 (t160, 2026-10-28 05:05 EDT) — both triggers negative; the last hand-maintained duplicate in the ledger checks (V1_IDS) derived + reconciled
+
+(1) TRIGGER (A) NEGATIVE — probe RC=0 at 05:01:53 (session start ~05:00):
+newest playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (50th consecutive byte-identical reading
+t111..t160; independently re-statted via stat -c, exact match to
+BASE_MTIME_NS/BASE_SIZE); (A6) content baseline reproduced a NINTH time head
+42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f, last
+row still {"file":"60.sav","turn":1254,...}; zero dosbox procs; find sweep 4
+files, non-loop: none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20).
+r1_t85g_sitting.py correctly not run.
+
+(2) TRIGGER (B) NEGATIVE — clean tracked tree at 87b41a4 at session start
+(verdict wording valid per t155/B5), no STEERING, B3 HEAD == journal sha
+87b41a4 (row 81, ct 04:59:16, re-read independently), prompt pair prompt-82 vs
+prompt-81 (58/58) digit-stripped delta 0. §3 answers outstanding after
+forty-seven idle turns.
+
+(3) THE FINDING — the t145/t158 method (audit the grader's own inputs) run
+against the one hand-maintained literal left in the ledger checks after t159:
+ledger_index_check.py:38 `V1_IDS = {OQ-001,002,007,008,009,011,017}`. That set
+is an EXEMPTION list: ids it names skip both "absent from record" divergence
+legs, because the record closes them in the "- > OQ-" v1 block that
+ledger_audit.rows() skips by design (t84 contract). Measured BEFORE patching:
+the derived set from grep '^- > OQ-' over the real record == the literal
+exactly (7/7), so no live drift existed — but nothing ever compared the two.
+Drift shapes and their costs: (a) the record's v1 block deleted or reflowed ->
+7 closed v1 rows silently stop being exempt, and the check would arm FALSE
+divergence on a legitimate doc edit; (b) worse direction — the block gaining an
+id (someone filing a v2 closure into the v1 region) silently EXEMPTS that row
+from every cross-check, and worse still, with the block gone AND the literal
+gone, both gate-3t legs print OK over vanished v1 closures. Fourth instance of
+the t157/t158/t159 family: any fact restated as a literal inside a checker is a
+duplicate that needs a leg.
+
+FIX (scripts/ledger_index_check.py): V1_IDS is now DERIVED each run from the
+record itself (v1_block_ids(): ^- > OQ-(\d+) lines; grep-verified the real
+record's only 7 '^- > ' lines are all '^- > OQ-', so no non-id line pollutes
+the set) and RECONCILED against a deliberately-kept code pin
+V1_IDS_EXPECTED — disagreement fails RC=1 naming the exact delta in BOTH
+directions. The literal became the leg rather than being deleted: deleting it
+would recreate hazard (b) silently, keeping it unreconciled was hazard (a)+(b)
+unwatched; the reconciliation makes the pair self-policing.
+
+VALIDATION by REAL execution (fixtures /tmp/t160-f-*.md deleted after):
+t1 real tree LEDGER INDEX OK RC=0 (byte-identical verdict to pre-patch);
+t2 v1 block deleted -> RC=1, drift line names all 7 literal_only ids PLUS the
+7 "id absent from record" divergences (double signal, no silent green);
+t3 block gains spurious OQ-099 -> RC=1 naming block_only=['OQ-099'];
+t4 pre-t157 drifted STATE (git 1f62e45, R1_STATE) -> RC=1 naming all six
+original drifts (the t157 leg still works through the new code path). First t4
+attempt printed RC=0 — that was MY test-harness bug (`env_extra + "; true"`
+truncated before the python invocation, nothing ran), caught by checking the
+fixture existed and re-running; py_compile clean after both patches.
+Enforcement per t158 law: grep ledger_index_check scripts/gate.sh -> gate.sh:421
+(stage 3t) already invokes it; nothing new to wire.
+
+LAW (extends the family): when a checker holds a constant that names objects in
+another artifact, ask which artifact is the contract and derive from it — but
+KEEP the constant as a reconciliation pin so a silent edit of the contract
+becomes a loud failure. Derive-and-reconcile, not copy-and-hope and not
+delete-and-trust.
