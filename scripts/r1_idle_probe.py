@@ -28,6 +28,12 @@ Laws encoded here (each earned the hard way, do not "simplify" them away):
       files and ARM only on a path outside LOOP_OWNED (loop-own divergence,
       e.g. a crashed iteration whose row never landed, is a CAUTION like the
       t117 untracked-files law). Env R1_JOURNAL overrides the journal path.
+  (A4) legs (a)-(c) are produced BY scripts/r1_playcap_watch.py: if it is dead,
+      every (A) leg reads NEGATIVE over a real sitting (t147 hole). Adjudicate
+      by matching the script name in `ps -eo pid=,args=` in Python — never
+      shell grep (t114), never pgrep (comm truncates to 15 chars = "python3").
+      Dead => (A) NOT ADJUDICATED: caution + exit 2, never arm (absence of
+      signal is not absence of event). Env R1_WATCH_SCRIPT tests the leg.
   Process check uses `ps -eo comm` matching, NOT `pgrep -af` (self-match
   false-positive trap, t114).
   Watcher pids 27772+27774 are bash-wrapper + python-child — the PAIR is
@@ -60,7 +66,7 @@ def sh(cmd):
 
 
 def trigger_a(now_wall):
-    reasons, armed = [], False
+    reasons, armed, adjudicated = [], False, True
     dirs = sorted([d for d in os.listdir(PLAYCAP)
                    if d.startswith("playcap-")], reverse=True)
     newest = dirs[0] if dirs else None
@@ -110,7 +116,52 @@ def trigger_a(now_wall):
     if foreign:
         armed = True
         reasons.append("capture-side file newer than session start")
-    return armed, reasons
+    # (A4) t147: legs (a)/(b)/(c) above are only observable if the watcher that
+    # WRITES them is alive. scripts/r1_playcap_watch.py appends the timeline and
+    # the capture-side files, so a dead watcher on an otherwise-healthy box
+    # (Xvfb/x11vnc up, dosbox exited because the user finished playing) makes
+    # every (A) leg print NEGATIVE over a real sitting, indefinitely. infra()
+    # cannot cover this: it pattern-matches `Xvfb|x11vnc|python3` and prints
+    # python3 pids without naming the watcher ("touches X" != "adjudicates X",
+    # t145 law). Match the cmdline in Python, never shell grep (t114 self-match)
+    # and never pgrep -x (comm truncates to 15 chars, so it can only ever see
+    # "python3"). Dead => CANNOT ADJUDICATE, do NOT arm: arming asserts a user
+    # decision that was never made (t117 law).
+    wscript = os.environ.get("R1_WATCH_SCRIPT", "scripts/r1_playcap_watch.py")
+    procs = []
+    for line in sh("ps -eo pid=,args=").splitlines():
+        parts = line.strip().split(None, 1)
+        if len(parts) == 2:
+            procs.append((parts[0], parts[1]))
+    watchers = []
+    wbase = os.path.basename(wscript)
+    for pid, args in procs:
+        argv = args.split()
+        # Match the INTERPRETED script at argv[1] ("python3 watch.py dir").
+        # argv[0] is always "python3" (never matches); whole-cmdline substring
+        # matching is the t114 trap in a new costume: measured — my test shell
+        # `R1_WATCH_SCRIPT=<path> python3 probe.py | ...` had the path in its
+        # OWN ps args, so the elif-substring fallback false-matched (and a
+        # `bash -c`-launched probe self-matches the same way). argv[1] of a
+        # shell is its -c string or another script, so neither can hit it.
+        if len(argv) > 1 and os.path.basename(argv[0]).startswith("python") \
+                and os.path.basename(argv[1]) == wbase:
+            watchers.append((pid, args))
+    if watchers:
+        reasons.append("A4 watcher: ALIVE %s" % ", ".join(
+            "pid %s (%s)" % (pid, args[:90]) for pid, args in watchers))
+    else:
+        reasons.append(
+            "A4 watcher: NOT RUNNING (%s absent from ps) — TRIGGER (A) IS "
+            "NOT ADJUDICATED this run: timeline growth and capture-side files "
+            "are produced by that process, so its absence cannot PROVE no "
+            "sitting happened, it only means the loop is blind to one. Do NOT "
+            "treat the (A) NEGATIVE above as a steady-state result; repair via "
+            "`bash scripts/r1_playcap_vnc.sh` then re-run this probe. Reported "
+            "as a caution, not a trigger (t117: only an observed user event "
+            "arms)." % wscript)
+        adjudicated = False
+    return armed, reasons, adjudicated
 
 
 def trigger_b():
@@ -275,8 +326,9 @@ def main():
     now_wall = time.time()
     print("r1_idle_probe @ %s" % time.strftime("%Y-%m-%d %H:%M:%S",
                                                time.localtime(now_wall)))
-    a_a, r_a = trigger_a(now_wall)
-    print("\n== TRIGGER A (new capture): %s" % ("ARMED" if a_a else "NEGATIVE"))
+    a_a, r_a, adj_a = trigger_a(now_wall)
+    print("\n== TRIGGER A (new capture): %s" % ("ARMED" if a_a else
+          ("NOT ADJUDICATED (watcher down)" if not adj_a else "NEGATIVE")))
     for r in r_a:
         print("  - " + r)
     b_b, r_b = trigger_b()
@@ -286,10 +338,18 @@ def main():
     print("\n== INFRA (liveness of the watch path)")
     for r in infra():
         print("  " + r)
-    print("\nVERDICT: %s" % ("RE-ARM — a trigger fired, do NOT treat this as idle"
-                             if (a_a or b_b) else
-                             "IDLE — neither trigger; honest negative, keep the IDLE block"))
-    return 1 if (a_a or b_b) else 0
+    verdict = ("RE-ARM — a trigger fired, do NOT treat this as idle"
+               if (a_a or b_b) else
+               ("IDLE on (B); (A) UNVERIFIED — watcher down, re-check after "
+                "repair" if not adj_a else
+                "IDLE — neither trigger; honest negative, keep the IDLE block"))
+    print("\nVERDICT: %s" % verdict)
+    if a_a or b_b:
+        return 1
+    # rc=2 documented as probe failure: with the watcher down the (A) legs are
+    # blind, so "both negative" cannot be honestly asserted (t117 law cuts the
+    # other way too — don't print a clean verdict you didn't measure).
+    return 0 if adj_a else 2
 
 
 if __name__ == "__main__":

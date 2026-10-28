@@ -1235,3 +1235,58 @@ the double-%% + two-%s form is what shipped.
 
 Working notes docs/re/_wip_t146.md. NO ledger row closed (strict-close honest
 negative), no law falsified. NEXT stays IDLE.
+
+## 40. IDLE RE-CHECK #34 (t147, 2026-10-28 01:22 EDT) — negative + (A4) coverage FIX: a dead watcher made every trigger-(A) leg unfalsifiable
+
+(1) Trigger (A) NEGATIVE — `python3 scripts/r1_idle_probe.py` RC=0 at
+01:22:47 (session-start cutoff 01:21:48 from iter-*.log name): newest
+playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (37th consecutive byte-identical reading
+t111..t147); zero dosbox procs; find sweep 4 files, non-loop: none;
+r1_t85g_sitting.py correctly not run.
+(2) Trigger (B) NEGATIVE — clean tracked tree at 4ad8a23, no STEERING, B3
+HEAD == journal sha 4ad8a23 (journal row 68 re-verified by hand with
+cat -A), prompt-69 vs prompt-68 (58/58 lines) digit-stripped delta 0.
+§3 answer outstanding after thirty-four idle turns.
+
+(3) THE HOLE (A4). Every (A) leg is an OBSERVATION of something
+scripts/r1_playcap_watch.py WRITES: timeline growth, capture-side mtimes.
+If the watcher dies while the box stays up (Xvfb/x11vnc persist as daemons;
+dosbox is gone because the user FINISHED playing — the exact situation a
+capture would produce), all legs print NEGATIVE over a real sitting, forever,
+and the loop reports steady-state IDLE with total confidence. infra() could
+not catch it: it greps `Xvfb|x11vnc|python3` and printed python3 pids
+(163246 harness mcp_death_supervisor, 163362 probe child — t118 noise) while
+asserting liveness in prose, without naming the watcher. Third instance of
+the same meta-law: t114 (pgrep self-match), t145 ("touches X" !=
+"adjudicates X"), t146 (all (B) legs read only the worktree) — a probe that
+PRINTS a signal's neighborhood is not a probe that ADJUDICATES it.
+
+(4) THE FIX (scripts/r1_idle_probe.py, trigger_a tail + main): match the
+INTERPRETED script at argv[1] of a python process over `ps -eo pid=,args=`
+in Python. Dead => CAUTION + header "NOT ADJUDICATED (watcher down)" +
+VERDICT "IDLE on (B); (A) UNVERIFIED" + RC=2 (documented meaning: probe
+could not run cleanly) — deliberately NOT RC=1: absence of signal is not
+absence of event, arming would assert a user decision never made (t117).
+R1_WATCH_SCRIPT env overrides the script name to test the dead branch.
+First draft had an elif-substring fallback matching the whole cmdline — the
+t114 trap in a new costume, caught by REAL EXECUTION: the test shell
+`R1_WATCH_SCRIPT=<path> python3 probe.py` carries <path> in its OWN ps args
+and false-matched the fallback. argv[1] cannot self-match (a shell's argv[1]
+is its -c string; the probe's own argv[1] is r1_idle_probe.py). Validated
+three ways by real execution: real box ALIVE pid 27774 RC=0;
+R1_WATCH_SCRIPT=no_such_watcher.py => RC=2 + NOT ADJUDICATED; probe launched
+via `bash -c` still resolves ALIVE exactly (pid 27772 bash wrapper correctly
+no longer counted as a watcher — t115's pair law describes harnessing, not
+matching).
+
+(5) NEAR-MISS banked as a law. I accused the infra leg of FABRICATING the
+x11vnc.log line after stat failed on work/r1/playcap/vnc/x11vnc.log — my
+composed path was wrong: PLAYCAP=work/r1 (line 45), real path
+work/r1/vnc/x11vnc.log exists with exactly the printed mtime 17:30:18.172 /
+30114 B / 404 lines. LAW: before accusing a probe of inventing output,
+resolve its constants from source (grep '^[A-Z_]* ='), don't compose paths
+from variable NAMES. A false bug report costs more than a real one.
+
+Working notes docs/re/_wip_t147.md. NO ledger row closed (strict-close honest
+negative), no law falsified. NEXT stays IDLE.

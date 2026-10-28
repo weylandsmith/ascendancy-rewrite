@@ -202,14 +202,19 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #33 done at t146; stop-report.md §39): loop awaits a user
+IDLE (re-check #34 done at t147; stop-report.md §40): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
 idle — an idle turn is the two-trigger probe and nothing else).
-RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146):
+RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     `python3 scripts/r1_idle_probe.py` — RC=0 both negative (stay IDLE),
-    RC=1 a trigger armed (it prints which and why), RC=2 probe failure.
+    RC=1 a trigger armed (it prints which and why), RC=2 probe failure —
+    as of t147 this INCLUDES the watcher being down: trigger (A)'s signals
+    are produced BY scripts/r1_playcap_watch.py, so with it dead, (A) is
+    NOT ADJUDICATED (see the A4 line in its output; repair via
+    `bash scripts/r1_playcap_vnc.sh`, re-run the probe, and do NOT record
+    the turn as a clean steady-state negative).
     It encodes the probe laws that cost iterations to earn:
     session-start cutoff on the find sweep; CONTENT-diff (never mtime)
     for (B); `ps -eo comm` matching (never `pgrep -af`, t114 self-match
@@ -270,6 +275,37 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T147 LANDED (IDLE re-check #34 — no trigger fired; deliverables:
+scripts/r1_idle_probe.py (A4) leg, docs/re/stop-report.md §40,
+docs/re/_wip_t147.md; no ledger row touched, no rewrite/ change, no
+watch/census run per §6 discipline). (1) Trigger (A) NEGATIVE — probe RC=0 at
+01:22:47 (cutoff 01:21:48 from the iter-*.log name): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (37th consecutive byte-identical reading t111..t147); zero dosbox
+procs; find sweep 4 files, non-loop: none; r1_t85g_sitting.py correctly not
+run. (2) Trigger (B) NEGATIVE — clean tracked tree at 4ad8a23, no STEERING,
+prompt-69 vs prompt-68 (58/58 lines) digit-stripped delta 0, B3 HEAD == journal
+sha 4ad8a23 (row 68 hand-re-verified with cat -A). §3 answer outstanding after
+thirty-four idle turns. (3) THE ITERATION'S VALUE — hole (A4): every (A) leg
+observes what scripts/r1_playcap_watch.py WRITES, so a dead watcher on an
+otherwise-healthy box (daemons persist, dosbox exits after a completed sitting)
+reads NEGATIVE over a real sitting forever; infra() only pattern-matched
+Xvfb|x11vnc|python3 and asserted liveness in prose. Fixed by matching the
+interpreted script at argv[1] over ps -eo pid=,args= in Python; dead => CAUTION
++ NOT ADJUDICATED + RC=2, never armed (absence of signal != absence of event).
+First draft's substring fallback self-matched through the test shell's own env
+assignment — t114 trap caught by REAL EXECUTION, not review. Three-branch
+validation: real ALIVE RC=0; forced-dead RC=2; bash -c launch no self-match.
+NEAR-MISS LAW banked: before accusing the probe of fabricating output, resolve
+its constants from source (PLAYCAP=work/r1 => work/r1/vnc/x11vnc.log exists
+exactly as printed 17:30:18.172/30114) — my composed playcap/vnc path was the
+bug. Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774 with
+fds on live-timeline.jsonl + watch.out + watch.log verified this run);
+transients 163246 (harness mcp_death_supervisor) / 163362 (probe child) per the
+t118 noise law. Bank hygiene checked fresh: zero diff vs HEAD before appending
+§40; grep -rln stop-report scripts/ -> only r1_idle_probe.py + pycache. NO row
+closed (strict-close honest negative). NEXT stays IDLE. Gate 0.
 
 T146 LANDED (IDLE re-check #33 — no trigger fired; deliverables:
 scripts/r1_idle_probe.py (B3) leg, docs/re/stop-report.md §39,
