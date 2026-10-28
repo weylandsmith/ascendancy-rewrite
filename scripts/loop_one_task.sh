@@ -10,6 +10,12 @@
 #   bash scripts/loop_one_task.sh --status     # where is the loop at?
 # Stop: Ctrl-C (finishes the current iteration first), or:
 #   touch work/r1/loop/STOP   (checked between iterations)
+# Queue work while idle (wakes the loop WITHOUT a capture trigger):
+#   echo "TASK TEXT" > work/r1/loop/LOOPSTEER.txt   (one-shot, consumed)
+#   touch work/r1/loop/FORCE_RUN                    (run NEXT ACTION once)
+# DO NOT redirect stdout to a file at launch (">> loop.log"): tee writes the
+# per-iteration event log itself, and a launch redirect starves the tmux pane
+# (the t178 "blank window" report — server showed 78k events, pane saw zero).
 #
 # Why not /goal in one tmux session: a single long-lived session keeps grinding
 # in the same context, so it chains task after task through compaction cycles.
@@ -71,9 +77,14 @@ while :; do
   [ -f "$LOOPDIR/STOP" ] && { log "STOP flag present — exiting"; break; }
 
   # Adoption check FIRST: a dirty tree is interrupted work, not idleness, and
-  # outranks the idle gate entirely.
+  # outranks the idle gate entirely. A LOOPSTEER.txt is a human assigning work
+  # — that also wakes the loop (queue: write the file, or edit NEXT ACTION and
+  # set FORCE_RUN once).
   dirty=""
   [ -n "$(git status --porcelain)" ] && dirty=1
+  steer_wake=""
+  [ -s "$LOOPDIR/LOOPSTEER.txt" ] && steer_wake=1
+  [ -f "$LOOPDIR/FORCE_RUN" ] && { steer_wake=1; rm -f "$LOOPDIR/FORCE_RUN"; }
 
   # IDLE GATE (t178): poll triggers in SHELL before spending any model budget.
   # dirty tree => adopt interrupted work (launch regardless of probe);
@@ -81,7 +92,8 @@ while :; do
   # probe RC=1 => trigger armed: launch with the probe report appended;
   # probe RC=2 => trigger detector broken: park, never grade idle on it.
   armed_report=""
-  if [ "$IDLE_GATE" = "1" ] && [ -z "$dirty" ]; then
+  if [ -n "$steer_wake" ] && [ -z "$dirty" ]; then log "WAKE: human steering queued (LOOPSTEER.txt/FORCE_RUN) — bypassing idle gate"; fi
+  if [ "$IDLE_GATE" = "1" ] && [ -z "$dirty" ] && [ -z "$steer_wake" ]; then
     timeout 300 python3 "$IDLE_PROBE" > "$LOOPDIR/probe-last.log" 2>&1
     prc=$?
     if [ "$prc" = "0" ]; then

@@ -232,13 +232,32 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE — EVENT-DRIVEN. The loop harness (scripts/loop_one_task.sh, t178 idle
-gate) polls scripts/r1_idle_probe.py in SHELL every 15 min; a model session is
-launched ONLY when a trigger arms, the tree is dirty, or a human names the
-task. If you are reading this on a fresh launched session, your prompt carries
-the trigger report (or steering) — act on THAT. Do not run the idle protocol
-yourself; that job moved out of the model (66 idle sessions proved it costs
-~35k tokens per poll to learn "nothing new").
+NEXT t179 (STATIC/doc task, no play needed): CONSOLIDATED STOCK-AI DOSSIER —
+docs/re/ai-dossier.md synthesizing what t90..t105 decoded into an answer to
+the user's open question ("does the AI defend systems and choose offensive
+thrusts, or is it haphazard?"). Must cover, each section citing aicode.md/
+combat.md sections or addresses: diplomacy machine (attitude cells, BIO mood,
+thresholds), build selector FUN_0003f130 (need classes, 65/35 roll, threat
+bytes +0x59, shield chains), research picker (t93 tier chain), expansion
+selector (0x40018), special-ability cadence engine 0x43b50 (16 bodies vs
+help.txt), ship-order decider 0x40178 + kind exec semantics + second issuer
+0x3ca60, congregation law 0x4aa10, and — the verdict section — what military
+doctrine EXISTED (per-ship orders, targetability gate 0x39894, defense-of-
+planet order kind) vs what demonstrably did not (no system-level threat plan
+found anywhere; state that as scope-of-search, not as fact). Explicitly map
+which dossier facts the rewrite already models and which remain gaps
+(campaign.cpp buildPhase/researchPhase/combatPhase/expansionPhase sites).
+User-facing deliverable: this answers the deferred AI question.
+
+THEN t180 (STATIC hunt, bounded): the `l` star-map key route — user-observed
+lane reveal with ZERO cmp al,'l' sites in the image; check scancode-vs-ASCII
+paths (0x1e is 'l' scancode), key->action dispatch tables, shift-state chains
+around the known 0x79950..0x79c20 handler. Budget: one session; if not found,
+bank the negative in debugflags.md and REFUTED-ROUTES.
+
+IDLE RULE (t178) still stands for everything else: the harness polls in shell;
+a model session runs ONLY on armed trigger, dirty tree, or human queue
+(LOOPSTEER.txt / FORCE_RUN). Capture triggers re-arm the menu below.
 
 WHEN A CAPTURE TRIGGER ARMS, the menu (docs/re/stop-report.md §2, t110):
   - OQ-021: colonize past 50% of stars with the autosave ring running, or
