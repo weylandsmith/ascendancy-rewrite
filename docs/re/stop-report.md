@@ -868,3 +868,36 @@ total) with zero diff against HEAD, so hand-authoring §30 is safe.
 Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
 measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
 twenty-four consecutive idle turns, zero measurement. NEXT stays IDLE.
+
+## §31 — t138 idle re-check #25 (2026-10-28 00:01)
+
+Trigger (A) NEGATIVE. `python3 scripts/r1_idle_probe.py` RC=0 at 00:01:59
+(session start 00:00:16 — first idle turn after the calendar rollover to
+2026-10-28): newest playcap dir playcap-20261014-224611; live-timeline.jsonl
+mtime_ns 1793043841304000000 / 5691796463 B — the 28th consecutive
+byte-identical reading (t111..t138); zero dosbox procs; session-start find
+sweep 4 files, non-loop: none. `scripts/r1_t85g_sitting.py` correctly not run.
+Note: the probe's session-start cutoff is computed from process start, not
+from a hard-coded date, so the midnight rollover needed no adjustment —
+`find work/r1 -newermt "2026-10-28 00:00:16"` is the leg that ran.
+
+Trigger (B) NEGATIVE. Clean tracked tree at 9b75419 (diff HEAD empty,
+status --porcelain empty, no untracked), no STEERING file. Harness
+prompt-60.txt is identical to prompt-59.txt after digit-stripping
+(unified diff 0 lines, both 58 lines) — no prepended steering note. The §3
+answer remains outstanding after twenty-five idle turns.
+
+Infra: unchanged since t112 — Xvfb 1196 / x11vnc 1207 / watcher 27774;
+x11vnc.log mtime 2026-10-27 17:30:18 / 30114 B, i.e. still zero connects
+against the t111-FIXED launch path. Transient pids 150738/150789 are this
+iteration's own probe and shells per the t118 noise law — both verified gone
+on a follow-up `ps -p` (exit 1), correctly ignored.
+
+Bank hygiene: re-checked fresh before appending — `grep -rln stop-report
+scripts/` hits only r1_idle_probe.py + its __pycache__ bytecode; no
+regeneration trap. File was byte-stable at 870 lines (= §30's committed
+total) with zero diff against HEAD, so hand-authoring §31 is safe.
+
+Verdict: NO ledger row closed (strict-close: an idle turn produces no cited
+measurement), no banked law falsified. The t113 LOOP-END PROPOSAL stands:
+twenty-five consecutive idle turns, zero measurement. NEXT stays IDLE.
