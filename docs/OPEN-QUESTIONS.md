@@ -317,6 +317,57 @@ below the Orfa's 570 attitude threshold, measured). Vendor debug names
 (raise attitude with gifts, propose, watch the cell) OR the queued static
 scan t180: find code that stores the value 3 into a relation-state byte -
 named by t85g, never run.
+
+STATUS t180 (2026-10-28, STATIC route RUN — the t85h/t85g-named scan nobody
+ran): ANSWER TO "does code store 3 into a relation-state byte" = YES, three
+sites, all conditional. tools scripts/r1_t180_state3_writers.py (census,
+agrees site-for-site with scripts/r1_t107_writers_full.py 0x1c0 via an
+independent encoding+boundary method), scripts/r1_t180_switchtbl.py and
+scripts/r1_t180_offer_switch.py (both cs-relative switch tables resolve
+15/15 and 13/13 inside their functions using the R13 +0x14bb0 code-object
+base). Raw disasm work/r1/t180/code0.txt. Law banked docs/re/diplomacy.md
+S13. FINDINGS: FUN_000454a4 (0x454a4..0x45c30, exactly 3 callers 0x36b2f /
+0x36c47 / 0x4470e) is the state mutator, dispatched on bl = DA index (cmp
+bl,0xe); its cl argument is FUN_00044fc0's VERDICT CODE (caller 0x446d9..
+0x4470e: `call 0x44fc0` -> `movsx ecx,al`, out-param -> bl). Case bl=3 gate
+`cmp cl,0x4` at 0x4561f -> writes 0x3 to SELF cell 0x4562f AND mirror 0x45641
+with attitude +10 both sides; the accept verdict 4 comes from FUN_00044fc0
+rung 0x44ffc comparing att[self][other] against WORD [row+0x1d1], and +0x1d1
+is ACCEPT_ALLIANCE per the MEASURED S8 field map -> ALLIANCE FORMATION LAW:
+cell := 3 both ways iff att > race.ACCEPT_ALLIANCE (S13.2). Case bl=11
+(0x45aa3) is a second alliance-shaped channel, gate cl==19 plus att >
+(other-10), cl provenance UNRESOLVED. Reader side exhausts the enum at
+{0,1,2,3} (23/6/20/23 compare sites) and the three third-party rungs SEMAN-
+TICALLY LOCK the meanings: 0x44c1a self==2 AND third==3 -> DA 10
+BreakAllianceWithOtherRace; 0x44c71 self==3 AND third==2 -> DA 7
+OfferPeaceToOtherRace; 0x44ce0 self==2 AND third==1 -> DA 9
+DeclareWarOnOtherRace. Vendor RELNAMES@0x89074 = Unknown/Peace/War/Alliance
+(byte-verified in-image this turn; indexed 0x2817b by the `c` state-of-galaxy
+displayer) names the same ordering. STRUCTURE BONUS: row law code-confirmed —
+`imul ebx,edx,0x1ee` + baked `mov edi/eax,0x12e16` (0x446bf, 0x454d4,
+0x2748c), and row-relative [rowbase+other+0x1c0] == absolute
+[other+owner*0x1ee+0x12fd6] (0x12e16+0x1c0), so the S10 window law no longer
+rests on RAM inference alone; and 0x27476..0x27511 is the SCENARIO SEEDING
+writer of state 1 (copies attitude from +0x12feb, skips the player row) — the
+static origin of the S11 "pre-war every pair sat at 1" observation.
+NOT CLOSED, honestly: the row's own closing measurement is a cell OBSERVED
+holding 3, and 42k trusted rows contain none. S13 is instruction-level
+derivation from the static image plus semantic locks, corroborated live only
+for 1 and 2 — stronger than a default, but not the named observation, so
+strict-close holds and the row stays open. WHAT CHANGED: the residual is
+downgraded from "semantics unknown / static route unrun" to "mechanism derived,
+STATIC ROUTE EXHAUSTED — capture-only". The capture test is now precise rather
+than exploratory: raise the target's attitude above ITS OWN ACCEPT_ALLIANCE
+(per-race, S8 — the Orfa's 570 was the binding number in the banked campaign)
+and propose; expected signal = BOTH cells 3 with +10 attitude, and DA 10
+becoming selectable against any empire the acceptor is at war with. Do NOT
+re-queue a static scan for this row. Rewrite code site: unchanged —
+diplomacy.cpp:227 `!atWar && !allied` is consistent with a single neither-
+state, and AcceptAlliance cannot be returned because the original's accept
+test lives in the RECEIVER's rung (0x44ffc vs its own +0x1d1) while
+decideDipAction takes no incoming-offer parameter; wiring it is the W-B
+ownership-model gate, not an RE unknown. The comment at diplomacy.cpp:244
+("state changes only on accept") is now cited rather than assumed.
 OQ-024 | loop | planet GOVERNOR assignment law (@0x38df0 branch of
 FUN_00038ba4: '!' -> PROS += IND>>2, '"' -> RES += IND>>2; S6 line 45 read
 +0x54 as a governor byte) | CLOSED t45 | FULL STATIC MEASUREMENT
@@ -923,7 +974,8 @@ bounded negative that NO site scores enemies or plans at system level (target
 slot DAT_00076492 = research row index; engagement resolver 0x42c60..0x42e6e =
 first-eligible in list order, t179 P3 probes; rel32 census: 0x41260 has exactly
 2 callers, 0x39894 gate has 8 — t179 P2). Row STAYS OPEN; residuals unchanged
-(A5 name tie, P0 event window, OQ-023 state-3 writer) — dossier §7 states the
+(A5 name tie, P0 event window; OQ-023 state-3 WRITER FOUND t180 —
+residual is now the live cell==3 observation only, diplomacy.md §13) — dossier §7 states the
 scope of search explicitly. Gap map dossier §8 (17 rows; threat input, demolish
 channel, per-ship model = the three big rewrite gaps).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->

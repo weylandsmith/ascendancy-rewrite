@@ -3508,3 +3508,20 @@ passive: keep playing; when a turn-boundary DAT_482fb sample reaches 25+
 autosave reads DAT_482fb=0 — turn-boundary reads only), watch whether the
 0x2c01d end-ctrl arm fires. Combat (OQ-010) needs in-battle recording or
 the static app-code site; Nimbuloid war is impossible (campaign is n=4).
+
+--- rotated out of docs/STATE.md NEXT ACTION (t180) ---
+LANDED t179 (2026-10-28, this session): CONSOLIDATED STOCK-AI DOSSIER
+SHIPPED — docs/re/ai-dossier.md answers the deferred player question (does
+the AI defend systems / choose thrusts, or haphazard?) with a cited verdict:
+POLICY-DRIVEN, NOT PLAN-DRIVEN. Seven cited doctrines (threat-byte shield
+buying 0x3fc4c, congregation 0x40178, strongest-first 0x40ec0/0x40eb4,
+retreat-downgrade 0x220f2, sticky orders, Invasion-Module-gated assault
+(gizmo 0x49, row 73), diplomacy-on-attack 0x43a4c) vs the BOUNDED negative
+(no enemy-scoring site anywhere in coverage; DAT_00076492 = research row
+index not a star; engagement resolver 0x42c60..0x42e6e picks first-eligible
+in list order — new t179 P3 objdump probe; rel32 census: 0x41260 exactly 2
+callers, 0x39894 exactly 8 — new P2 probe). 17-row rewrite gap map (three
+big gaps: no per-ship model, no threat input, no demolish channel). Ledger:
+OQ-016 row annotated, NO row closed (synthesis task; honest — the negative's
+force is its stated scope-of-search, dossier §7). No ledger movement;
+gate green. aicode.md carries a pointer header only.

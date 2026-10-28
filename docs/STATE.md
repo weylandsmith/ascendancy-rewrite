@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T15:30
+updated: 2026-10-28T17:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -232,36 +232,30 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-LANDED t179 (2026-10-28, this session): CONSOLIDATED STOCK-AI DOSSIER
-SHIPPED — docs/re/ai-dossier.md answers the deferred player question (does
-the AI defend systems / choose thrusts, or haphazard?) with a cited verdict:
-POLICY-DRIVEN, NOT PLAN-DRIVEN. Seven cited doctrines (threat-byte shield
-buying 0x3fc4c, congregation 0x40178, strongest-first 0x40ec0/0x40eb4,
-retreat-downgrade 0x220f2, sticky orders, Invasion-Module-gated assault
-(gizmo 0x49, row 73), diplomacy-on-attack 0x43a4c) vs the BOUNDED negative
-(no enemy-scoring site anywhere in coverage; DAT_00076492 = research row
-index not a star; engagement resolver 0x42c60..0x42e6e picks first-eligible
-in list order — new t179 P3 objdump probe; rel32 census: 0x41260 exactly 2
-callers, 0x39894 exactly 8 — new P2 probe). 17-row rewrite gap map (three
-big gaps: no per-ship model, no threat input, no demolish channel). Ledger:
-OQ-016 row annotated, NO row closed (synthesis task; honest — the negative's
-force is its stated scope-of-search, dossier §7). No ledger movement;
-gate green. aicode.md carries a pointer header only.
+LANDED t180 (2026-10-28, this session): OQ-023 STATE-3 WRITER SCAN RUN —
+THE t85g-NAMED ROUTE ANSWERS YES. Three imm-3 writers exist (0x4562f,
+0x45af1, 0x45aff), all inside FUN_000454a4 (state mutator, exactly 3 callers
+0x36b2f/0x36c47/0x4470e, dispatch cmp bl,0xe via cs:[ebp+0x308b8] table at
+image 0x45468, 15/15 in-range — scripts/r1_t180_switchtbl.py). ALLIANCE
+FORMATION LAW derived at instruction level (docs/re/diplomacy.md §13.2):
+FUN_00044fc0 rung 0x44ffc compares att[self][other] against [row+0x1d1] =
+ACCEPT_ALLIANCE (§8) and returns verdict 4/5; FUN_000454a4 case bl=3 writes
+3 to BOTH cells (0x4562f/0x45641, +10 attitude both) iff cl==4; cl is the
+verdict code (caller law 0x446d9..0x4470e). Second channel case bl=11
+(gate cl==19 + att > other-10), cl provenance unresolved. Enum semantics now
+backed BOTH ways: readers exhaust {0,1,2,3} (23/6/20/23 sites) and the
+third-party rungs lock meanings (0x44c1a 2&3->DA10, 0x44c71 3&2->DA7,
+0x44ce0 2&1->DA9); vendor RELNAMES@0x89074 byte-verified (indexed 0x2817b).
+Bonus laws: row law code-confirmed (imul 0x1ee + baked 0x12e16; row-relative
++0x1c0 == absolute +0x12fd6); scenario seeding 0x27476..0x27511 is the
+state-1 writer of the "pre-war everyone at 1" observation. LEDGER: OQ-023
+row annotated, NOT closed (strict-close: the closing measurement is an
+OBSERVED cell==3; none in 42k rows — static route now EXHAUSTED, capture-
+only). No rewrite change justified (accept-test lives in the receiver's
+rung; diplomacy.cpp:227 consistent; W-B gate unchanged). Gate 0, audit OK.
+Raw disasm kept at work/r1/t180/code0.txt; WIP docs/re/_wip_t180.md.
 
-NEXT t180 (STATIC, bounded): OQ-023 STATE-3 WRITER SCAN — the route t85g
-named and nobody ran: find code storing imm 3 into the relation-state cell
-(row stride, base 0x1c0 name-byte family; use ledger row OQ-023 + diplomacy.md
-§10-§12 laws; work/ascend_restored.bin per R12). If a site writes 3 under a
-decidable condition, the enum closes statically; if zero writers of 3 exist,
-that is itself the measurement (bank negative + enum stays play-gated).
-ORDERING RATIONALE: t180 first among the queued statics because the dossier
-just made the state ladder load-bearing for the AI verdict (§2, §7 residual
-3) — closing or bounding it sharpens the strongest bounded negative we hold;
-it is also the only queued item whose answer could change a rewrite
-behaviour claim (diplomacy.h:67 explicitly defers to it), whereas t181/t182
-feed evidence to player eyeballs and t183 needs a fresh capture window.
-
-THEN t181 (STATIC, offline): OQ-003 THREE-CLASS RAM DIFF — classify
+NEXT t181 (STATIC, offline): OQ-003 THREE-CLASS RAM DIFF — classify
 packed-entropy regions against three classes ALREADY ON DISK: (i) title-boot
 idle ring slots (pre-game uninitialized baseline — t111 self-test ring +
 r1_playcap scratch rings; the 0xC500 law proves they carry heap garbage),
@@ -271,6 +265,14 @@ garbage in (i) => play-initialized (name it via mutation correlation later);
 churns in all three => disclaim as writer-side uninitialized RAM in
 savegame.md and OQ-003 closes as documented-unknown (player decision
 whichever way the diff falls).
+ORDERING RATIONALE: t180 (was first) landed; t181 is next because it is the
+only remaining queued item that is fully offline AND can MOVE a ledger row
+either way, while t182 ships an eyeball artifact (no row moves until the
+player rules) and t183/t184 and the OQ-023 residual all need a capture
+window or the player. When a capture DOES arm, the OQ-023 test is now
+precise (§13.5): raise a target above ITS OWN ACCEPT_ALLIANCE, propose,
+expect both cells 3 + DA-10 selectability — cheaper than any static re-scan,
+which is now forbidden for this row.
 
 THEN t182 (TOOL BUILD): OQ-005 SHAPE-PNG DUMPER — scripts/r1_t182_pngdump.py
 renders the 80 residue records (classes per BLOCKED t68) to
@@ -309,9 +311,13 @@ WHEN A CAPTURE TRIGGER ARMS, the menu (docs/re/stop-report.md §2, t110):
   - OQ-021: colonize past 50% of stars with the autosave ring running, or
     press `c` on the starmap with nougat.lf armed — prints PERCENT CONTROLLED
     = the comparator's own formula output.
-  - OQ-023: needs one matrix cell holding 3 (Alliance): gifts/trades to raise
-    Orfa attitude > ACCEPT_ALLIANCE=570 (proposal alone = +39, 487->526 t85g),
-    then propose; run scripts/r1_t85g_sitting.py on the new ring.
+  - OQ-023: needs one matrix cell holding 3 (Alliance). PRECISE PER t180
+    (docs/re/diplomacy.md §13.2/§13.5 — do NOT re-scan statically): raise the
+    target above ITS OWN ACCEPT_ALLIANCE (per-race, §8; Orfa=570 was the
+    binding number in the banked campaign, proposals only give +39), then
+    propose. Expected signal: BOTH cells -> 3 with +10 attitude each; DA 10
+    becomes selectable against any empire the acceptor is at war with. Run
+    scripts/r1_t85g_sitting.py on the new ring.
   - OQ-019: per-turn step CLAMP law + build/redesign inventory: needs real
     flights (two zero-observation corpora t49/t58 prove no offline route).
   - OQ-003 / OQ-016 tails: play-mutation variants and per-cell wiring, same

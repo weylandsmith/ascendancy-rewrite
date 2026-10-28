@@ -367,3 +367,104 @@ Frutmaka: confirmed ABSENT.
 UI INVENTORY (player): the game-screen buttons are Planets, Ships,
 Research, Special Ability, Species — NO score screen, NO diplomacy button
 (contact/alliance flows are reached through map interaction).
+
+
+## §13. STATE-ENUM WRITER LAW — OQ-023 RESIDUAL BOUNDED STATICALLY (t180, 2026-10-28)
+
+The t85g-named route nobody ran (find code storing imm 3 into the relation
+cell) is RUN AND ANSWERED. Method: one linear objdump of code object 0
+[0x14bb0,0x82bb0) over work/ascend_restored.bin (t60 file-provenance law),
+grepped at mnemonic level for stores to the cell displacement, cross-checked
+against scripts/r1_t107_writers_full.py 0x1c0 (independent encoding-
+enumeration + function-start boundary verification). Both methods return the
+SAME site set. Tools: scripts/r1_t180_state3_writers.py (census),
+scripts/r1_t180_switchtbl.py, scripts/r1_t180_offer_switch.py (switch tables).
+Raw disasm retained at work/r1/t180/code0.txt (140,902 lines).
+
+### 13.1 The mutation funnel and its two arguments
+FUN_000454a4 (0x454a4..0x45c30, exactly THREE callers: 0x36b2f, 0x36c47,
+0x4470e) is the relation-state mutator:
+    454dd  cmp bl,0xe / ja 0x45c30        ; bl = DA_ index (0..14)
+    454ea  lea ebp,[eax*4]                 ; EBP reused as switch index
+    45560  jmp DWORD PTR cs:[ebp+0x308b8]  ; cs base +0x14bb0 (R13 law)
+                                          ; -> table image 0x45468, 15/15
+                                          ; targets inside the body range
+The sweep caller 0x446d9..0x4470e establishes the argument law: FUN_00044fc0
+(the §6 offer-state setter) is called first, `movsx ecx,al` puts its VERDICT
+CODE in cl, and the out-param at [esp+8] (the chosen DA index) goes to bl.
+So transition = f(DA index, verdict code). cl provenance is cited for this
+caller ONLY; the other two load ecx differently and are not claimed.
+
+### 13.2 ALLIANCE-FORMATION LAW [verified at instruction level, n=0 observed]
+FUN_00044fc0 rung for bl=3 (DA_ProposeAlliance), 0x44ffc..0x45029:
+    mov ax, WORD [esi + other*2 + 0x1b2]    ; att[self][other]
+    cmp ax, WORD [esi+0x1d1]                ; +0x1d1 = ACCEPT_ALLIANCE (§8,
+                                            ; loader FUN_00044290 positional)
+    jle -> al = 5 (reject)   else al = 4 (accept)
+FUN_000454a4 case bl=3 (0x45608) then:
+    4561f  cmp cl,0x4 / jne 0x45674
+    4562f  mov BYTE [edi+eax*1+0x1c0], 0x3          ; SELF row
+    45641  mov BYTE [edx+esi*1+0x1c0], al(re-read)  ; MIRROR row
+    45648..66  attitude += 10 on BOTH cells
+=> state 3 is written to both cells IFF att > race.ACCEPT_ALLIANCE. This is
+causal, not correlative: it explains why 28,843 trusted rows never produced
+a 3 (Orfa att 485 peak vs its 570, §12) without needing any new capture.
+A second alliance-shaped channel exists at case bl=11 (0x45aa3): requires
+cl == 19 (emitted at 0x45420) AND att > (other_att - 10), then writes 3 to
+both cells with +5/+5/+0xf/+10/+10 attitude bumps. Its cl provenance is
+UNRESOLVED — banked as a lead, not a law.
+
+### 13.3 THE FOUR-VALUE ENUM, each value backed two ways
+  0 NO ACTIVE RELATIONSHIP — chooser entry 0x447ba skips the whole dialogue
+    rung iff the cell is 0; scenario seeding never writes 0.
+  1 PEACETIME / CONTACTED (not allied) — live: pre-war every pair sat at 1
+    and AI contact fires 0->1 both ways (§11); static: case bl=0 (0x45567)
+    sets 1 while COPYING attitude from [+0x1d5]=START_ATTITUDE (§8); lock:
+    consumer 0x44ce0 needs self==2 AND third==1 to emit DA 9
+    DA_DeclareWarOnOtherRace, so 1 must be non-allied.
+  2 AT WAR — live: player declaration 1->2 reciprocal, sustained 244 turns
+    (§11); static: case bl=2 (0x455cb) sets 2 both ways with attitude -40;
+    lock: 0x44c71 needs self==3 AND third==2 to emit DA 7
+    DA_OfferPeaceToOtherRace, so 2 must be at war.
+  3 ALLIED — static formation law 13.2; lock: 0x44c1a needs self==2 AND
+    third==3 to emit DA 10 DA_BreakAllianceWithOtherRace, so 3 must be the
+    alliance; consumer set exhausts {0,1,2,3} and no other value.
+Ordering none < peace < war < alliance is therefore carried by cited
+comparators on BOTH the writer and reader sides. The §10 "no injective enum
+fits every rung" position is SUPERSEDED: it was derived before the third-
+party rungs were keyed, and each rung's state pair is now named.
+
+### 13.4 Two structural laws learned for free
+(a) ROW LAW CODE-CONFIRMED: `imul ebx, edx, 0x1ee` at 0x44bf3/0x44c14/
+    0x44c62/... plus base constant `mov edi/eax,0x12e16` baked at 0x446bf,
+    0x454d4, 0x2748c. Row-relative [rowbase + other + 0x1c0] and absolute
+    [other + owner*0x1ee + 0x12fd6] are the SAME cell (0x12e16+0x1c0 =
+    0x12fd6). The §10 window structure no longer rests on RAM inference
+    alone. Per-run relocation is a separate, untouched capture question.
+(b) SCENARIO SEEDING IS A STATE-1 WRITER: 0x27476..0x27511 loops races
+    (count WORD ds:0x13b98), copies attitude from [+0x12feb] into both
+    cells, writes `mov cl,1; mov BYTE [edi+0x12fd6],cl` and the row-form
+    equivalent, skipping the player's own row, gated on ds:0x10ba0 != 0.
+    This is the static origin of "pre-war EVERY pair sat at 1".
+
+### 13.5 What is NOT closed (honest scope — strict-close holds)
+* No observed cell==3 anywhere in the corpus. 13.2 is an instruction-level
+  derivation from static image only; the enum reading in 13.3 is corroborated
+  live for 1 and 2 only. A plausible enum is still not a measurement.
+* Case bl=11's trigger (cl==19 rung, 0x4536a) unresolved.
+* The 0x45xxx cases beyond {0,2,3,8,8',9,9',10,11} are enumerated in the
+  switch table but their attitude deltas were not each read.
+* cl provenance for callers 0x36b2f / 0x36c47 (non-sweep paths).
+OQ-023 therefore STAYS OPEN but is downgraded from "semantics unknown" to
+"mechanism derived statically, one live observation of state 3 outstanding".
+The capture test is now PRECISE rather than exploratory: raise the target's
+attitude above ITS OWN ACCEPT_ALLIANCE (per-race, §8) and propose — cell 3
+is then expected in BOTH directions with +10 attitude, and DA 10 should
+become selectable against any empire the acceptor is at war with.
+
+Census artefacts worth naming so nobody re-reads them as cells: the tool also
+surfaces `mov DWORD PTR [esi+0x1c0],0x1df` @0x2d24f and a reader comparing
+against 0x162 @0x260eb. Those are a DWORD store and a non-{0..3} compare, so
+they are a DIFFERENT record's +0x1c0/+0x162 fields, not the relation-state
+byte (the cell is written byte-wise with imm in {0,1,2,3} and read byte-wise
+against exactly {0,1,2,3} — 23/6/20/23 compare sites respectively).
