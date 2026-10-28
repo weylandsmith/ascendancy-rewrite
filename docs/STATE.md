@@ -232,7 +232,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #63 done at t176; stop-report.md §69): loop awaits a user
+IDLE (re-check #64 done at t177; stop-report.md §70): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -263,12 +263,24 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     VERDICT WORDING (t155/B5): at SESSION START a clean tree prints
     "IDLE — neither trigger". If it prints "IDLE with CANDIDATE" you are
     almost certainly running it MID-ITERATION after editing a loop-owned
-    file (STATE.md itself counts) — finish normally. But if you edited
-    NOTHING this session and it prints CANDIDATE, the uncommitted diff in
-    docs/OPEN-QUESTIONS.md / docs/BLOCKED.md / docs/re/ IS either the §3
-    answer or crash residue: read `git diff HEAD` before keeping the IDLE
-    block. RC stays 0 by design either way (crash residue and a typed
-    answer are byte-identical states; mtime cannot separate them).
+    file (STATE.md itself counts, and since t177 so does
+    scripts/r1_idle_probe.py — editing the probe is the loop's own work).
+    If you edited NOTHING this session and it prints CANDIDATE, the
+    uncommitted diff in docs/OPEN-QUESTIONS.md / docs/BLOCKED.md / docs/re/
+    IS either the §3 answer or crash residue: read `git diff HEAD` before
+    keeping the IDLE block. RC stays 0 by design either way (crash residue
+    and a typed answer are byte-identical states; mtime cannot separate
+    them).
+    INFRA LEG IS MEASURED, NOT ASSERTED (t177): it prints
+    "x11vnc.log mtime=... size=... vs baseline ... => UNCHANGED|CHURNED" plus
+    "RFB accepts=N (baseline 1; last: ...) => ZERO NEW CONNECTS|NEW
+    CONNECT(s)". Read BOTH: a CHURNED log with accepts==1 is a persistent
+    viewer's ExtDesktopSize resolution probes, NOT a connect, and stays
+    negative; accepts>1 names a viewer session that opened (a user at the
+    display — treat as a probable (A) lead and check the capture legs).
+    work/r1/vnc/* is excluded from the (A) find sweep's arming set and prints
+    a CAUTION instead (a churn can no longer false-arm; real play arms via
+    dosbox procs / the (A6) timeline content leg / a new playcap-<ts>/ dir).
     It encodes the probe laws that cost iterations to earn:
     session-start cutoff on the find sweep; CONTENT-diff (never mtime)
     for (B); `ps -eo comm` matching (never `pgrep -af`, t114 self-match
@@ -389,6 +401,40 @@ missing from STATE index entirely", the record gained/kept a closed row the bloc
 omits — paste the stub the tool prints (id + one-line summary copied FROM the
 record; keep the two-quote-per-entry YAML shape, no raw inner quotes). It is a
 hard DIVERGENCE by design; do not delete the leg to go green.
+
+T177 LANDED (IDLE re-check #64 + probe INFRA-leg fix; deliverables:
+docs/re/stop-report.md §70, docs/STATE.md, scripts/r1_idle_probe.py,
+docs/re/_wip_t177.md; NO ledger row closed, game/ untouched, no watch or census
+run against the live capture). (1) Both triggers NEGATIVE at session start — probe
+RC=0 at 07:42:25 clean tree at c924ebe: timeline mtime_ns/size == frozen baseline
+(66th consecutive byte-identical reading t111..t177), zero dosbox procs, A4 watcher
+ALIVE pid 27774, A5 none (save/*.sav=20); (B) diff HEAD + porcelain empty, zero
+untracked, no STEERING, B3 HEAD==journal sha c924ebe, prompt-99 vs prompt-98
+digit-stripped delta 0. r1_t85g_sitting.py correctly NOT run (no sitting; t152 moot).
+(2) DEFECT: infra() printed a FROZEN literal "(unchanged 2026-10-27
+17:30:18/30114 since t112 => zero connects)" beside a live os.stat with no
+comparison — this session the two lines contradicted (printed 07:37:29/30597).
+Onset pinned via loop logs: iter-97/98 printed the old values, iter-99 the new; the
+literal went false ~4 min before this session and no leg noticed (t145 "touches !=
+adjudicates", t156 A6 "rule in prose not code" class). (3) Underlying fact MEASURED
+— t112's claim survives, its evidence didn't: `grep -c 'incr accepted_client'` == 1
+across the whole 12-day x11vnc.log (line 90, 16/10 15:39:20, ::1:53822) = one RFB
+session ever; all 128 resolution-change pairs are that persistent viewer's
+ExtDesktopSize probes. LAW banked (probe docstring A7): churn != connect; the
+connect verdict comes from the accept COUNT, never mtime; infra() prints no
+conclusion it didn't measure. Fix compares stat vs X11VNC_BASE_MTIME_S=1793136618/
+BASE_SIZE=30114 and accepts vs BASE_ACCEPTS=1; unreadable => "NOT adjudicated".
+(4) LATENT FALSE-ARM (A7) fixed: work/r1/vnc/* joined the find-sweep's
+non-arming exclusions (CAUTION names the files) — a few-hourly log churn landing
+after the iter-log cutoff would otherwise arm (A) (t149 self-arm class).
+FUNCTIONALLY TESTED BOTH WAYS: vnc churn alone => NEGATIVE + CAUTION, RC=0; churn +
+scratch foreign file => ARMED naming it, RC=1; scratch removed. Post-fix run prints
+"CHURNED" + "accepts=1 => ZERO NEW CONNECTS" — consistent by construction.
+(5) ledger_index_check LEDGER INDEX OK pre-edit (rows=18
+open=OQ-003/005/016/019/021/023 closed=12). NEXT unchanged: IDLE two-trigger probe
+— ordered ahead of everything because nothing else is admissible while both
+triggers stay negative (t113 idle law); t146 precedent (harness fix on an idle
+turn) applied. LOOP-END PROPOSAL stands (64 idle turns).
 
 T176 LANDED (IDLE re-check #63 — no trigger fired; deliverables:
 docs/re/stop-report.md §69, docs/STATE.md; no ledger row touched, no harness

@@ -2748,3 +2748,59 @@ NO row closed (strict-close honest negative — no cited measurement moved any o
 OQ), no law falsified; per the t113 idle law this turn was the two-trigger probe
 and nothing else.
 NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (63 idle turns).
+
+## 70. IDLE re-check #64 + INFRA-leg fix (t177, 2026-10-28 08:00) — probe asserted a conclusion it never measured; both triggers still negative
+
+(1) Trigger (A) NEGATIVE and ADJUDICATED — probe RC=0 at 07:42:25 as the FIRST
+action on a clean tree at c924ebe (session-start wording "IDLE — neither trigger";
+no edits preceded it). Timeline mtime_ns=1793043841304000000 / 5691796463 B ==
+frozen baseline on BOTH fields (66th consecutive byte-identical reading
+t111..t177); zero dosbox procs; A4 watcher ALIVE pid 27774 (== watch.pid 27772
+wrapper + child, normal); A5 none (save/*.sav = 20). r1_t85g_sitting.py correctly
+NOT run — no new sitting exists (t152 law moot).
+(2) DEFECT FOUND AND FIXED — the probe's own INFRA leg. scripts/r1_idle_probe.py
+printed an unconditional string literal "(unchanged 2026-10-27 17:30:18/30114
+since t112 => zero connects against the t111-FIXED launch path)" beside a LIVE
+os.stat with no comparison between them. This session they contradicted each
+other: printed mtime=2026-10-28 07:37:29 size=30597 while asserting
+unchanged/zero-connects. Measured onset via loop logs: iter-97 (07:27:18) and
+iter-98 (07:33:37) still printed 17:30:18/30114; iter-99 (07:41:25) printed
+07:37:29/30597 — the literal became false ~4 min before this session and the
+probe never noticed. Same class as t156 hole A6 (a rule that lives in the printed
+string, not in code) and t145 "touches X != adjudicates X".
+(3) THE UNDERLYING FACT, measured (the t112 claim survives, its evidence didn't):
+work/r1/vnc/x11vnc.log, 410 lines, x11vnc 0.9.17 pid 1207 (16/10 15:38:35).
+grep -c 'incr accepted_client' == 1 for the WHOLE 12-day log (line 90, 16/10
+15:39:20, ::1:53822) — ONE RFB session ever, never disconnected. All other churn
+is that persistent viewer's ExtDesktopSize chatter: 128 "Client requested
+resolution change" + 128 "resize prohibited" pairs (2560x1325/3000x1573), spread
+26/10(132 lines) 27/10(50) 28/10(6). So churn != connect; the connect verdict must
+come from the accept COUNT, never from mtime. Fix: infra() now compares
+stat vs pinned X11VNC_BASE_MTIME_S=1793136618 / BASE_SIZE=30114 and prints
+accepts vs X11VNC_BASE_ACCEPTS=1 with the last accept line; unreadable accepts =>
+"NOT adjudicated", and no clause prints an unmeasured conclusion.
+(4) LATENT FALSE-ARM FIXED (A7): the (A) find sweep armed on ANY work/r1 file
+newer than session start except loop/ and .anch-cache.json — work/r1/vnc/*
+included. The log churns every few hours, so a resize landing between the harness
+iter-log cutoff and the sweep armed (A) => a fresh session hunting a nonexistent
+sitting (t149 self-arm class). vnc/ is now excluded from the arming set and
+printed as a CAUTION naming the files. Blinding cost: none — real play arms via
+the dosbox-proc leg, the timeline CONTENT leg (A6), or a new playcap-<ts>/ dir.
+FUNCTIONALLY TESTED BOTH WAYS: touched x11vnc.log alone => TRIGGER A NEGATIVE +
+CAUTION naming it, RC=0; plus a scratch foreign file under work/r1 => TRIGGER A
+ARMED naming it, RC=1; scratch removed after. Post-fix run prints "CHURNED (log
+grew)" + "accepts=1 ... ZERO NEW CONNECTS" — consistent by construction.
+(5) Trigger (B) NEGATIVE at session start (diff HEAD + porcelain empty, zero
+untracked, no STEERING, B3 HEAD == journal sha c924ebe, prompt-99 vs prompt-98
+digit-stripped delta 0). Mid-session the probe correctly prints CANDIDATE for my
+own edits to scripts/r1_idle_probe.py (loop-owned per the t155/B5 wording) — this
+turn's diff IS the harness fix below, not a §3 answer; §3 outstanding 64 idle
+turns. ledger_index_check LEDGER INDEX OK before edits (rows=18
+open=OQ-003/005/016/019/021/023 closed=12). Bank hygiene before editing:
+grep -rln stop-report scripts/ -> gate.sh comment + two docstrings + one .pyc —
+nothing regenerates stop-report.md (2750 lines, zero-diff vs HEAD, anchor
+"LOOP-END PROPOSAL stands (63 idle turns)" count==1 at last line before append).
+NO ledger row closed (strict-close honest negative — no cited measurement moved
+any open OQ), no law falsified; this turn ran the two-trigger probe plus the
+probe-repair it exposed (t146 precedent: a harness coverage fix on an idle turn).
+NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (64 idle turns).

@@ -17,6 +17,17 @@ Laws encoded here (each earned the hard way, do not "simplify" them away):
       armed. Sound because the watcher appends (r1_playcap_watch.py:146), so a
       real sitting cannot be md5-neutral. Edge-hashes only; never md5 5.7 GB.
       Env R1_TIMELINE overrides the path for fixtures.
+  (A7) t177: work/r1/vnc/* (pid files, dosbox.log, x11vnc.log, playcap.log,
+      session.conf) is DAEMON INFRA, not a capture: it is excluded from the
+      find-sweep's arming set and printed as a CAUTION instead. A persistent
+      VNC viewer churns x11vnc.log every few hours with ExtDesktopSize
+      resolution probes; before this exclusion such a churn could arm (A) and
+      send a session hunting a sitting that does not exist (t149 self-arm
+      class). Corollary, measured: churn != connect — the connect verdict comes
+      from `grep -c 'incr accepted_client'` (1 for the whole 12-day log), never
+      from mtime, and infra() must print no conclusion it did not measure
+      (pre-t177 it printed a frozen "unchanged => zero connects" literal beside
+      a live mtime that contradicted it).
   (B) trigger (B) is adjudicated by CONTENT (`git diff HEAD`), never mtime:
       the preflight gate runs after each commit and mtime-touches
       docs/re/{text,modules,economy,gizmos,fnt}.md with zero content delta
@@ -83,6 +94,18 @@ BASE_SIZE = 5691796463
 BASE_EDGE_MD5 = 64 * 1024
 BASE_HEAD_MD5 = "42a0bed0507f9052e2009ec94e9c27f1"
 BASE_TAIL_MD5 = "1529ab1ad70ac360f441d819703f943f"
+# t177 VNC baseline (work/r1/vnc/x11vnc.log). The log CHURNS (a persistent viewer
+# sends ExtDesktopSize resolution probes every few hours: measured 6-line deltas
+# at 26/10 22:16 and 23:25, 27/10 08:02...17:30, 28/10 07:37) while CONNECTS are
+# constant: x11vnc logs one "incr accepted_client=" line per RFB session
+# (measured: exactly 1 for the whole 12-day log, line 90, 16/10 15:39:20, ::1).
+# So churn must never be read as a connect, and mtime alone can never be the
+# liveness statement (t177 defect: infra() printed a frozen "unchanged => zero
+# connects" literal beside a live mtime that contradicted it).
+X11VNC_LOG = os.path.join(PLAYCAP, "vnc", "x11vnc.log")
+X11VNC_BASE_MTIME_S = 1793136618  # 2026-10-27 17:30:18 -0400 (local, verified t177)
+X11VNC_BASE_SIZE = 30114
+X11VNC_BASE_ACCEPTS = 1
 # Paths the loop edits every iteration; a delta here is never the user's
 # answer (t117). Shared by the tree leg and the (B3) committed-commit leg.
 LOOP_OWNED = ("docs/STATE.md", "docs/OPEN-QUESTIONS.md", "docs/BLOCKED.md",
@@ -191,11 +214,27 @@ def trigger_a(now_wall):
     # armed this leg by itself, a pure self-inflicted false positive. It is a
     # pure function of work/ascend_payload.bin, so it can never carry a sitting.
     TOOL_ARTIFACTS = ("work/r1/.anch-cache.json",)
+    # t177: work/r1/vnc/* is infra state, never a sitting — pid files for
+    # Xvfb/x11vnc/watcher/dosbox plus dosbox.log/x11vnc.log/playcap.log/
+    # session.conf. The VNC logs churn every few hours from a persistent
+    # viewer's resolution probes (measured: 6-line delta at 28/10 07:37), so a
+    # churn landing between the harness iter-log cutoff and this sweep would
+    # arm (A) -> a session hunts a sitting that cannot exist (t149 self-arm
+    # class). They are reported as CAUTION naming the file, never armed; a real
+    # play still arms via the dosbox-proc leg, the timeline CONTENT leg, or a
+    # new playcap-<ts>/ dir, none of which vnc/ touches.
+    INFRA_DIR = "work/r1/vnc/"
     foreign = [p for p in sweep
                if not p.startswith("work/r1/loop/")
+               and not p.startswith(INFRA_DIR)
                and p not in TOOL_ARTIFACTS]
+    infra_new = [p for p in sweep if p.startswith(INFRA_DIR)]
     reasons.append("find work/r1 -newermt %s (session start) -> %d files, "
                    "non-loop: %s" % (cutoff, len(sweep), foreign or "none"))
+    if infra_new:
+        reasons.append("CAUTION: %d vnc infra file(s) newer than session start "
+                       "(%s) — viewer/daemon churn, NOT a capture (t177)"
+                       % (len(infra_new), ", ".join(infra_new[:5])))
     if foreign:
         armed = True
         reasons.append("capture-side file newer than session start")
@@ -485,14 +524,41 @@ def infra():
     lines = []
     out = sh("ps -eo pid,etime,comm | awk '$3 ~ /Xvfb|x11vnc|python3/'").strip()
     lines.append(out or "NO Xvfb/x11vnc/python3 — negatives UNTRUSTWORTHY")
-    log = os.path.join(PLAYCAP, "vnc", "x11vnc.log")
+    # t177: this leg used to print a FROZEN literal ("unchanged 2026-10-27
+    # 17:30:18/30114 since t112 => zero connects") beside a live os.stat, with
+    # no comparison — so on 2026-10-28 07:41 it asserted "unchanged/zero
+    # connects" while printing mtime=2026-10-28 07:37:29 size=30597. Now every
+    # clause is MEASURED: (a) stat vs the pinned baseline, (b) the accept count
+    # (grep -c 'incr accepted_client' — x11vnc logs one per RFB session; a
+    # persistent viewer's ExtDesktopSize resolution probes churn mtime every
+    # few hours WITHOUT connecting, so churn != connect and the connect verdict
+    # must come from the count, never from mtime).
+    log = X11VNC_LOG
     if os.path.exists(log):
         st = os.stat(log)
-        lines.append("x11vnc.log mtime=%s size=%d"
-                     % (time.strftime("%Y-%m-%d %H:%M:%S",
-                                      time.localtime(st.st_mtime)), st.st_size))
-        lines.append("  (unchanged 2026-10-27 17:30:18/30114 since t112 => zero"
-                     " connects against the t111-FIXED launch path)")
+        m = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(st.st_mtime))
+        b = time.strftime("%Y-%m-%d %H:%M:%S",
+                          time.localtime(X11VNC_BASE_MTIME_S))
+        accepts = sh("grep -c 'incr accepted_client' '%s'" % log).strip() or "0"
+        try:
+            n_accepts = int(accepts.splitlines()[-1])
+        except ValueError:
+            n_accepts = -1
+        lines.append("x11vnc.log mtime=%s size=%d vs baseline %s/%d => %s"
+                     % (m, st.st_size, b, X11VNC_BASE_SIZE,
+                        "UNCHANGED" if (int(st.st_mtime) == X11VNC_BASE_MTIME_S
+                                        and st.st_size == X11VNC_BASE_SIZE)
+                        else "CHURNED (log grew)"))
+        if n_accepts < 0:
+            lines.append("  accepts: UNREADABLE — connect verdict NOT adjudicated"
+                         "; do not claim 'zero connects' this run")
+        else:
+            last = sh("grep 'incr accepted_client' '%s' | tail -1" % log).strip()
+            lines.append("  RFB accepts=%d (baseline %d; last: %s) => %s"
+                         % (n_accepts, X11VNC_BASE_ACCEPTS, last[:70] or "none",
+                            "ZERO NEW CONNECTS" if n_accepts
+                            == X11VNC_BASE_ACCEPTS else
+                            "NEW CONNECT(s) — a viewer session opened; name it"))
     return lines
 
 
