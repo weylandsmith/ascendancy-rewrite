@@ -1634,3 +1634,50 @@ closed (strict-close honest negative), no law falsified. NEXT stays IDLE; the
 t113 LOOP-END PROPOSAL stands. FUTURE TURNS: an (A) find-sweep arm at
 work/r1/<file> you did not create is capture-side evidence; check it against
 (A4)/(A5) before calling the turn idle. Gate 0.
+
+## 47. IDLE RE-CHECK #41 (t154, 2026-10-28 03:06 EDT) — negative; no new hole; t153's (B4) split and the sweep/B4 division of labour verified IN SOURCE
+
+Idle turn per the IDLE block: two-trigger probe and nothing else (t113
+LOOP-END PROPOSAL still stands; no watch, no census against the live capture).
+
+(1) Trigger (A) NEGATIVE — `python3 scripts/r1_idle_probe.py` RC=0 at
+03:06:14 (cutoff 03:05:19 from the iter-log name stamp): newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B — 44th consecutive byte-identical reading (t111..t154), and
+re-statted independently (`stat -c`), EQUAL to BASE_MTIME_NS/BASE_SIZE as
+re-read from source at r1_idle_probe.py:55-56, not from this doc. t151
+CONTENT baseline reproduced byte-identical a THIRD time (head64K
+42a0bed0507f9052e2009ec94e9c27f1 / tail64K 1529ab1ad70ac360f441d819703f943f);
+last timeline line still the t1254 row (file 60.sav, wall 15:44:01). Zero
+dosbox procs (`ps -eo comm`, t114 law); find sweep non-loop none; A4 watcher
+ALIVE pid 27774; A5 none (save/*.sav = 20, all match the watcher glob).
+
+(2) NO NEW HOLE — the t145 method (ask what each leg DOES with its input) was
+applied to the surfaces t153 touched, and this time they hold. Verified in
+source rather than by behaviour alone: LOOP_OWNED (r1_idle_probe.py:59-60) is
+STATE/OPEN-QUESTIONS/BLOCKED/docs/re//r1_idle_probe.py/work/; the (A)
+find-sweep filter excludes only the `work/r1/loop/` PREFIX plus TOOL_ARTIFACTS
+— NOT LOOP_OWNED wholesale — so a foreign file anywhere under work/r1 still
+arms (A) while (B4) (ownership split at :259/:277) owns the rest of the tree.
+That is the t153 division of labour confirmed structurally: the two legs are
+complementary by construction, not accidentally consistent at run time. B2's
+numeric sort (int() key, :361-364) re-checked against the t144 trap.
+
+(3) Trigger (B) NEGATIVE — clean tracked tree at d62b1f3; `git diff HEAD
+--name-only` empty; porcelain tracked empty; untracked loop-owned none;
+FOREIGN untracked none (the new (B4) leg clean on real state on its first
+production turn); delta outside loop-owned none; STEERING none; B3 HEAD ==
+journal last-tab-field sha d62b1f3 (re-checked independently with
+`tail -1 journal.tsv | awk -F'\t' '{print $NF}'`, per the t146 invariant);
+prompt pair prompt-76.txt vs prompt-75.txt (58/58 lines) digit-stripped
+delta 0. §3 answers (OQ-003 entropy, OQ-005 dims, OQ-019 sugar-cube,
+OQ-023 threshold-only branch, capture authorization, t89a follow-on) still
+outstanding after forty-one idle turns.
+
+(4) Bank hygiene fresh: grep -rln stop-report scripts/ -> only
+r1_idle_probe.py (+ .pyc); gate.sh contains no touch/write of docs/re. File
+was 1636 lines with zero diff vs HEAD before appending this section. Infra
+unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log
+2026-10-27 17:30:18/30114 — zero connects). NO row closed (strict-close honest
+negative), no law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL
+stands. Gate 0.

@@ -202,7 +202,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #40 done at t153; stop-report.md §46): loop awaits a user
+IDLE (re-check #41 done at t154; stop-report.md §47): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -312,6 +312,36 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T154 LANDED (IDLE re-check #41 — no trigger fired; deliverables:
+docs/re/stop-report.md §47, docs/re/_wip_t154.md; no scripts changed, no ledger
+row touched, game/ untouched, no watch or census run against the live capture).
+(1) Trigger (A) NEGATIVE — probe RC=0 at 03:06:14 (cutoff 03:05:19): newest
+playcap dir playcap-20261014-224611; live-timeline.jsonl mtime_ns
+1793043841304000000 / 5691796463 B (44th consecutive byte-identical reading
+t111..t154; independently re-statted, equal to BASE_MTIME_NS/BASE_SIZE at
+r1_idle_probe.py:55-56 re-read from source); t151 content baseline reproduced
+a THIRD time (head 42a0bed0507f9052e2009ec94e9c27f1 / tail
+1529ab1ad70ac360f441d819703f943f; last line still the t1254 row); zero dosbox
+procs; find sweep non-loop none; A4 watcher ALIVE pid 27774; A5 none
+(save/*.sav = 20). (2) THE FINDING — none this turn, honestly: the t145 method
+applied to the t153 surfaces found no hole, but yielded a structural
+confirmation worth keeping — the (A) find-sweep filter (r1_idle_probe.py:118-
+124) excludes only the `work/r1/loop/` PREFIX + TOOL_ARTIFACTS, NOT LOOP_OWNED
+wholesale, so foreign files under work/r1 arm (A) while (B4)'s ownership split
+(:259/:277) owns the rest of the tree: the t153 division of labour is
+complementary BY CONSTRUCTION, verified in source not just at run time. B2
+numeric sort (:361-364 int() key) re-verified vs the t144 trap. (3) Trigger (B)
+NEGATIVE — clean tracked tree at d62b1f3, no STEERING, B3 HEAD == journal sha
+d62b1f3 (independently re-extracted from journal.tsv last tab field), prompt
+pair prompt-76 vs prompt-75 (58/58) digit-stripped delta 0; (B4) clean on real
+state on its first production turn. §3 answers outstanding after forty-one
+idle turns. (4) Bank hygiene fresh (grep -rln stop-report scripts/ -> only
+r1_idle_probe.py + .pyc; gate.sh has no docs/re write; stop-report.md 1636
+lines zero diff vs HEAD before appending §47). Infra unchanged since t112
+(Xvfb 1196 / x11vnc 1207 / watcher 27774; x11vnc.log 2026-10-27
+17:30:18/30114 — zero connects). NO row closed (strict-close honest negative),
+no law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands. Gate 0.
 
 T153 LANDED (IDLE re-check #40 — no trigger fired; deliverables:
 scripts/r1_idle_probe.py (B4) leg, docs/re/stop-report.md §46,
