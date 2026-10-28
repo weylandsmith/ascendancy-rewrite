@@ -6,16 +6,19 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T04:20
+updated: 2026-10-28T04:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
 ## resolution evidence — this block is the fast index. Update BOTH or neither.
 ## t157 LESSON: hand-mirroring drifted 6 rows (5 closed rows still listed open,
-## OQ-023 missing) and nothing caught it — gate.sh never runs ledger_audit.py,
-## and ledger_audit only checks the record against its own --expect list.
+## OQ-023 missing) and nothing caught it — at t157 gate.sh ran NEITHER ledger
+## check, and ledger_audit only checked the record against its own --expect
+## list (both statements pre-t158; see the t158 note below for current state).
 ## RE-DERIVE, don't hand-maintain: python3 scripts/ledger_index_check.py prints
-## the true open set from the record and diffs this block against it.)
+## the true open set from the record and diffs this block against it. AS OF
+## t158 gate.sh stage 3t RUNS that check plus ledger_audit on every gate, so
+## this block cannot drift out green anymore.)
 ledger:
   closed:
     - "OQ-001 .cob offsets = N not N+1"
@@ -216,7 +219,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-IDLE (re-check #44 done at t157; stop-report.md §50): loop awaits a user
+IDLE (re-check #45 done at t158; stop-report.md §51): loop awaits a user
 event; re-arm ONLY on one of these two triggers (t113 issued the
 LOOP-END PROPOSAL — docs/re/stop-report.md §6 — after three consecutive
 empty watches t111/t112/t113; do NOT run another watch or census while
@@ -235,6 +238,15 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     from is truthful. t157 measured it had drifted 6 rows un-noticed by every
     existing check (see §50). If it FAILS, re-derive the block from the
     record (the record wins) before anything else this turn.
+    AS OF t158 BOTH ledger checks are WIRED INTO gate.sh (stage 3t: audit +
+    index), so drift cannot exit green via the harness post-flight or the
+    finish sequence anymore — the run above is belt-and-braces confirmation,
+    not the enforcement. t158 also tightened ledger_audit's EVIDENCE leg to
+    demand a SPECIFIC handle (0x address / FUN_ / DAT_ / md5 / capture run dir
+    / N-of-M / scripts/*.py / docs/re/*.md); the words "measured"/"verified"/
+    "law" alone no longer close a row. LAW: shipping a checker is not
+    enforcement — `grep -l <name> scripts/gate.sh scripts/loop_one_task.sh`
+    with zero hits means you shipped a suggestion (stop-report §51).
     VERDICT WORDING (t155/B5): at SESSION START a clean tree prints
     "IDLE — neither trigger". If it prints "IDLE with CANDIDATE" you are
     almost certainly running it MID-ITERATION after editing a loop-owned
@@ -355,6 +367,50 @@ RUN THE TOOL, DO NOT RE-DERIVE THE PROBES (t117, amended t145/t146/t147):
     next STATE.md assignment verbatim and REOPENS the loop.
 If neither trigger is present when a session starts, write the honest
 negative, keep this IDLE block, run gates, commit, stop.
+
+T158 LANDED (IDLE re-check #45 — no trigger fired; deliverables:
+scripts/gate.sh (stage 3t), scripts/ledger_audit.py (tightened EVIDENCE),
+docs/re/stop-report.md §51, docs/re/_wip_t158.md; no ledger row touched, game/
+untouched, no watch or census run against the live capture). (1) Trigger (A)
+NEGATIVE — probe RC=0 at 04:17:08: newest playcap dir playcap-20261014-224611;
+live-timeline.jsonl mtime_ns 1793043841304000000 / 5691796463 B (48th
+consecutive byte-identical reading t111..t158; independently re-statted, equal
+to BASE_MTIME_NS/BASE_SIZE); (A6) content baseline reproduced a SEVENTH time
+head 42a0bed0507f9052e2009ec94e9c27f1 / tail 1529ab1ad70ac360f441d819703f943f,
+last row still t1254; zero dosbox procs; find sweep non-loop none; A4 watcher
+ALIVE pid 27774; A5 none (save/*.sav = 20). (2) Trigger (B) NEGATIVE — clean
+tracked tree at ec8a5ee at session start (verdict wording valid per t155/B5),
+no STEERING, B3 HEAD == journal sha ec8a5ee, prompt pair prompt-80 vs
+prompt-79 (58/58) digit-stripped delta 0. (3) THE FINDING — t157's law
+recursed onto t157's own fix: ledger_index_check.py was pointed at by prose but
+referenced by ZERO automatic paths (grep -c ledger_index_check: gate.sh 0,
+loop_one_task.sh 0; the only post-flight checks are gate.sh + ledger_audit.py at
+loop_one_task.sh:119-124), so one careless future turn that edits STATE.md's
+block without running the tool re-introduces the 6-row drift invisibly. FIX:
+gate.sh stage 3t runs ledger_audit.py AND ledger_index_check.py (/usr/bin/
+python3 like every other python stage); validated BOTH directions by real
+execution — clean tree GATE_EXIT=0; pre-t157 drifted STATE.md (from 1f62e45,
+via R1_STATE) GATE_EXIT=1 naming all six drifts + the repair instruction;
+fixture deleted. (4) SECOND HOLE — the strict-close grader itself: ledger_audit's
+EVIDENCE regex accepted the generic words measured/verified/law/slots/.sav/...
+as citation (a prose default grading itself CLOSED — exactly what GOAL.txt
+forbids) while having no FUN_/DAT_ alternative at all, blind to the project's
+dominant citation form. FIX: >=1 specific handle required (0x/FUN_/DAT_/md5/
+run-dir r1xxx-NNNNNN/N-of-M/scripts/*.py/docs/re/*.md). Measured first over all
+12 real closed rows — every row has >=1 handle (per-row counts in §51), so zero
+retroactive false positives — then verified: real record LEDGER AUDIT OK
+unchanged; synthetic prose-only row -> "MISSING evidence: OQ-100" RC=1;
+handle-bearing row passes. LAW (third t145-family instance, first inside the
+previous iteration's own fix): shipping a checker is not enforcement; the
+checker must sit in a path the loop cannot exit through — grep -l it against
+gate.sh/loop_one_task.sh before calling the fix done. Corollary: when a policy
+is restated, audit the GRADER (the regex IS the policy, not the docstring).
+(5) Bank hygiene fresh (stop-report.md zero diff vs HEAD at 1832 lines before
+appending §51). Infra unchanged since t112 (Xvfb 1196 / x11vnc 1207 / watcher
+27774; x11vnc.log 2026-10-27 17:30:18/30114 — zero connects). NO row closed
+(strict-close honest negative — harness hardening, not measurement), no law
+falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (45 idle turns).
+Gate 0.
 
 T157 LANDED (IDLE re-check #44 — no trigger fired; deliverables:
 scripts/ledger_index_check.py (NEW), docs/STATE.md ledger block re-derived,

@@ -1830,3 +1830,72 @@ at the checker, not at the manual discipline.
 NO row closed (strict-close honest negative — the repair is bookkeeping, not
 measurement); no law falsified. NEXT stays IDLE; the t113 LOOP-END PROPOSAL
 stands (now 44 idle turns with zero user input).
+
+## 51. IDLE re-check #45 (t158, 2026-10-28 04:17 EDT) — both triggers negative; t157's law recursed onto t157's own fix; strict-close evidence leg tightened
+
+Trigger (A) NEGATIVE — probe RC=0 at 04:17:08: newest playcap dir
+playcap-20261014-224611; live-timeline.jsonl mtime_ns 1793043841304000000 /
+5691796463 B (48th consecutive byte-identical reading t111..t158; independently
+re-statted with `stat -c`, equal to BASE_MTIME_NS/BASE_SIZE); (A6) content
+baseline reproduced a SEVENTH time head 42a0bed0507f9052e2009ec94e9c27f1 / tail
+1529ab1ad70ac360f441d819703f943f, last row still t1254; zero dosbox procs; find
+sweep non-loop none; A4 watcher ALIVE pid 27774; A5 none (save/*.sav = 20).
+Trigger (B) NEGATIVE — clean tracked tree at ec8a5ee at session start (verdict
+wording "IDLE — neither trigger" valid per t155/B5), no STEERING, B3 HEAD ==
+journal sha ec8a5ee (journal row 79 last tab field), prompt pair prompt-80 vs
+prompt-79 (58/58 lines) digit-stripped delta 0. ledger_index_check at session
+start: LEDGER INDEX OK.
+
+HOLE 1 — t157's own fix was prose-enforced, which is what t157's generalised law
+forbids. t157 shipped ledger_index_check.py and then pointed the NEXT ACTION
+prose at a HUMAN RUNNING IT. Measured: `grep -c ledger_index_check` == 0 in
+scripts/gate.sh AND 0 in scripts/loop_one_task.sh; the only automatic post-flight
+checks are gate.sh + ledger_audit.py (loop_one_task.sh:119-124). Consequence: a
+future session that edits STATE.md's ledger block and never runs the tool moves
+HEAD green, and the 6-row drift shape returns within one careless turn. The loop
+is alive (pids 78558/78559/78561), so this is the live enforcement surface.
+FIX: gate.sh stage 3t runs BOTH ledger checks (/usr/bin/python3, matching every
+other python stage in the file). gate.sh is the single command both the harness
+post-flight and each iteration's finish sequence already run, so the invariant
+becomes automatic. Cost measured: ~0.1 s. VALIDATED BY REAL EXECUTION, both
+directions: (i) HEAD's clean tree -> GATE_EXIT=0 with the stage silent; (ii) the
+pre-t157 drifted STATE.md restored from 1f62e45 via R1_STATE -> GATE_EXIT=1
+naming all six drifts plus "re-derive the block from docs/OPEN-QUESTIONS.md (the
+record wins)". Fixture deleted.
+
+HOLE 2 — the strict-close auditor graded prose as citation. ledger_audit.py's
+t84 EVIDENCE regex accepted the generic words \bmeasured\b, \bverified\b, law\b,
+slots?\b, .sav/.gam/.cob/.dip as a satisfying evidence leg, so a CLOSED row
+reading "verified and measured, the law holds" with NO address, offset, run dir,
+digest or test name printed LEDGER AUDIT OK. That is GOAL.txt's forbidden state
+(a plausible default grading itself as closed) wearing the auditor's own clothes.
+The same regex had NO FUN_/DAT_ alternative, so Ghidra-style citations
+(FUN_00044a44, DAT_00013bc5) did not match it at all — the leg was simultaneously
+too weak and blind to the project's dominant citation form.
+FIX: EVIDENCE now requires >=1 SPECIFIC handle: 0x-address | FUN_ | DAT_ | md5 |
+capture run dir (r1xxx-NNNNNN) | N-of-M count | scripts/*.py probe path |
+docs/re/*.md banked section. Old pattern kept as EVIDENCE_GENERIC for reference.
+MEASURED before tightening (imported classifier over the 12 real closed rows):
+every row carries >=1 handle — OQ-010 82 hex; OQ-022 13; OQ-020 9; OQ-006 7;
+OQ-013 7; OQ-024 5; OQ-018 5; OQ-014 4; OQ-004 1 hex + md5; OQ-025 0 hex but
+1 rundir + 15 ratios + probe path + docsec; OQ-012 2 rundirs + 2 ratios +
+docsec; OQ-015 2 FUN_ + 5 ratios + docsec — so zero retroactive false positives.
+VALIDATED: real record -> LEDGER AUDIT OK unchanged (rows=18 open=6 closed=12);
+synthetic prose-only row -> "MISSING evidence: OQ-100" RC=1; synthetic
+handle-bearing row -> passes. First fixture attempt was thrown (concatenation
+without a trailing newline glued onto the last row and shifted the row count to
+8/4 — a fixture bug, not an auditor bug; re-tested on a clean minimal ledger).
+
+LAW (third instance of the t145 family, and the first where the hole was in the
+PREVIOUS iteration's fix): shipping a checker is not enforcement. Enforcement is
+the checker sitting in a path the loop cannot exit through. Audit every new
+checker with `grep -l <name> scripts/gate.sh scripts/loop_one_task.sh` — zero
+hits means you shipped a suggestion. Corollary for policy text: a strictness rule
+written in a docstring ("only measurement closes a row") is not the policy; the
+regex that grades the evidence IS the policy, so audit the grader whenever the
+policy is restated.
+
+NO row closed this iteration (no new measurement; strict-close honest negative);
+no law falsified; game/ untouched; no watch or census run against the live
+capture. NEXT stays IDLE; the t113 LOOP-END PROPOSAL stands (45 idle turns, zero
+user input).

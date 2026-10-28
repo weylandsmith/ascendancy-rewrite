@@ -400,6 +400,29 @@ else
   note "xvfb-run unavailable: skipped audio smoke"
 fi
 
+# 3t. LEDGER CONSISTENCY (t158) — the two ledger checks run HERE, not in prose.
+# Why: t157 found STATE.md's fast index had drifted 6 rows from the record while
+# every existing check passed, then fixed it with a checker the prose told humans
+# to run by hand. A checker nobody is forced to run is a suggestion: gate.sh had
+# 0 references to ledger_index_check.py and loop_one_task.sh only ran
+# ledger_audit.py. gate.sh is the one command both the harness post-flight and
+# every iteration's finish sequence already run, so wiring it here makes the
+# invariant automatic instead of discipline-dependent.
+#   audit : record's own contract (CLOSED rows name evidence + code site; OPEN
+#           set == triaged set). t158 also tightened EVIDENCE to require a
+#           specific handle (address / FUN_ / DAT_ / md5 / run dir / N-of-M /
+#           probe path / banked section) instead of accepting the words
+#           "measured"/"verified"/"law".
+#   index : STATE.md's `ledger:` block vs the record, same classifier — the menu
+#           a fresh session is told to resume from must be truthful.
+if ! /usr/bin/python3 "$ROOT/scripts/ledger_audit.py" >/tmp/gate_ledger.log 2>&1; then
+  cat /tmp/gate_ledger.log; err "ledger audit failed (see docs/OPEN-QUESTIONS.md rows above)"
+fi
+if ! /usr/bin/python3 "$ROOT/scripts/ledger_index_check.py" >/tmp/gate_ledger_index.log 2>&1; then
+  cat /tmp/gate_ledger_index.log
+  err "STATE ledger index != record: re-derive the block from docs/OPEN-QUESTIONS.md (the record wins)"
+fi
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}

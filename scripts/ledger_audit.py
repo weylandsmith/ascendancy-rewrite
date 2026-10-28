@@ -20,10 +20,29 @@ Exit 0 = all legs present and open set matches; 1 = report printed.
 """
 import argparse, re, sys
 
-EVIDENCE = re.compile(
+# t158 (strict-close): the evidence leg requires at least one SPECIFIC,
+# re-checkable handle. The t84 regex also accepted generic words
+# (\bmeasured\b, \bverified\b, law\b, slots?\b, .sav/.gam/.cob/.dip ...), so a
+# row closed with "verified by measurement, the law holds" and NO address,
+# offset, run dir or test name printed LEDGER AUDIT OK — a prose default grading
+# itself as cited, exactly what GOAL.txt forbids. Measured over the 12 real
+# closed rows: every one carries >=1 handle below, so tightening adds zero false
+# positives (counts in docs/re/stop-report.md §51). NOTE the old regex had no
+# FUN_/DAT_ alternative at all, so Ghidra-style citations did not match it.
+EVIDENCE_GENERIC = re.compile(
     r"0x[0-9a-fA-F]{3,}|\bmeasured\b|\bverified\b|md5|pointer law|"
     r"live[- ]RAM|\.dip\b|\.gam\b|\.sav\b|\.cob\b|windows\.txt|planitem|"
     r"slots?\b|law\b", re.I)
+EVIDENCE = re.compile(
+    r"0x[0-9a-fA-F]{3,}"            # Ghidra address / guest-physical address
+    r"|FUN_[0-9a-fA-F]{4,}"         # decompiled function name
+    r"|DAT_[0-9a-fA-F]{4,}"         # decompiled data symbol
+    r"|\bmd5\b"                     # pinned digest
+    r"|\br1[a-z0-9]*-\d{6}"         # capture run dir (a reproducible sitting)
+    r"|\b\d{1,6}/\d{1,6}\b"         # measured N-of-M reproduction count
+    r"|scripts/[A-Za-z0-9_\-]+\.py" # the probe that made the measurement
+    r"|docs/re/[a-z0-9_\-]+\.md",   # the banked section holding the law
+    re.I)
 SITE = re.compile(
     r"rewrite\b|\bunchanged\b|no code change|documented default|"
     r"fresh-start|W-B|not modelled|BLOCKED-USER-LEVEL", re.I)
