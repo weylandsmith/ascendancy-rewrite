@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T00:15
+updated: 2026-10-29T01:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -238,35 +238,54 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t188: EXTRACT THE FLIGHT SCALE LAW from the banked sitting corpus
-(work/r1/t187_scale_dump.txt + work/r1/playcap, turns 1255..1335+; tools
-scripts/r1_t187_scale.py / r1_t187_delta.py — re-run against the LATEST
-timeline first, it may have grown far past t1335). Three decisions the
-dump forces, in order: (1) COORDINATE FRAME of ship xyz [+0x9e] vs star
-table f32 coords — the 1100-2500u "discontinuities" that coincide with
-state4<->5 flips and [+0x59] order changes are UNVERIFIED; disambiguate
-system-local reframe vs real instant transit (check whether the jump
-landed a ship ON a star-table record position, and whether k59 became/
-left kind-5 per the magnetron path 0x220a8 — a 5->4->5 round trip one
-turn apart argues AGAINST magnetron). (2) THE SCALE NUMBER: lane movers
-step exactly 14/28/56 u/turn paired with MOVES=6/12; owner-1 4.67=14/3 —
-derive units-per-MOVES-per-day and tie (or refute) the sugar-cube=160u
-hypothesis from ships.md §17 (walk/steps)*32*5 — if 14 = 160*MOVES/6.857
-nonsense, the honest output is the measured ratio plus a citation of
-which constant pool word the walk body reads live. (3) state4 vs state5
-SEMANTICS from the cited writers (0x4a034..0x4a23d landing path sets +0x58
-:=4; 0x4cd16 placement :=5 — check the 0x21f58 commit path). Output =
-ships.md §21 + OQ-019 status update; row CLOSES ONLY if the numbers tie
-with citations (strict-close). PRE-CHECK before any of it: cheap greps —
-`grep -o 'sel=[1-9]' work/r1/playcap/watch.out` and
-`grep -c 'DAT_482fb=2[5-9]'` — if either fires, THAT measurement
-(OQ-021 comparator / victory screen testimony) OVERRIDES this task per
-the flight-delta menu; and if relation cell 3 appears
-(r1_t187_delta.py), bank + surface OQ-023 acceptance first.
-RATIONALE: t187 proved the capture-gated premise dead — first state-4
-corpus EVER is on disk and unsqueezed; every offline question else is
-closed and the OQ-021/OQ-023 closers need player outcomes we can only
-watch for, not work.
+NEXT t189: MAP THE LANE-STEP WORD IN CODE (close the S21 residue, OQ-019).
+The Ghidra bridge is ALIVE (verified t188: instance tcp 127.0.0.1:8089,
+program ascend_restored.bin connected) — do the static leg NOW while it is
+up. Task: find WHO computes the per-turn lane displacement for state-5
+orders: start from the resolver FUN_00041260 (t183 law) and the order-kind
+dispatch, find the st5 (kind-5 order / lane) branch that writes the ship
+position per turn WITHOUT calling FUN_00049f54 (walk) — the measured corpus
+(S21 items 1-3) proves that path exists and reads a speed value scoped to
+the +0x52 route/target handle (steps {14, 28, 14/3}: look for a /3 or *
+0.3333 const-pool word and a lane-record field read through the handle).
+Pin the offset + citation into ships.md S22. Row CLOSES only if the step
+AND its divisor are tied to named record fields with cited disasm
+(strict-close); the honest output if not is the narrowed writer chain.
+PRE-CHECKS first (cheap greps, may override): (1) if
+work/r1/playcap/live-timeline.jsonl has REAL new turns again (turn > 0
+rows past 1335 — the tail is currently the NEW GAME: 172 t=0 rows, ring
+overwrote the campaign star table; run r1_t85g_sitting.py only if A
+re-arms with content change AND turn>0 rows appear); (2)
+`grep -o 'sel=[1-9]' work/r1/playcap/watch.out | head` and
+`grep -c 'DAT_482fb=2[5-9]' work/r1/playcap/watch.out` — OQ-021 override;
+(3) any relation cell==3 (OQ-023) — note the OLD game ended at t1335 with
+Orfa att 613 (past the 570 extrapolation, NO alliance observed: honest
+negative banked; a NEW alliance must come from the new game at t=0).
+RATIONALE: every capture-gated closer is watching-only; the lane-step word
+is the ONE open question with a static path, and the bridge being up is
+time-sensitive.
+
+LANDED t188 (2026-10-29, this session): TRIGGER A RE-ADJUDICATED + FLIGHT
+SCALE/FRAME LAWS BANKED (ships.md S21; OQ-019 row status updated, stays
+OPEN on strict-close). Intake: sitting re-run RC=0 (45227 trusted rows,
+work/r1/t188_sitting_dump.txt) — NO new real turns; the +2.9MB growth is
+the player's NEW GAME saving into the same ring (t=0 rows; campaign star
+table OVERWRITTEN, do not expect old-map reads); dosbox not running.
+Pre-checks all negative (sel never armed, DAT_482fb stuck 21/50, no cell
+3; Orfa old-game att crossed 570 at t1285 unattended -> 613@t1335 with NO
+alliance: t187's proposal-extrapolation is now a MEASURED non-event).
+Proved this iteration (tools r1_t188_speedword.py RC=0, words dump, frame
+probe): (a) st5 lane march is NOT the T1 walk law — MOVES+0x94/FUEL+0x88
+frozen every turn of the march (measured-negative, 20+ rows); (b) lane x =
+k*step exactly from lane entry, steps {14, 28, 14/3} to 4dp; (c) STEP IS
+LANE-SCOPED NOT SHIP-SCOPED — one ship (slot13) marched 14 on z=±1824 and
+14/3 on z=544 with identical d10/MOVES/POW; slots 13 vs 17 differ only in
+the +0x52 route handle among all stable words; (d) st5 coords are LANE-
+LOCAL (y exactly 0/1, z multiple of 32 outside star extent ±402 live-read)
+— the 1100-2500u "discontinuities" are the state/frame switches (25/27
+big rows are 5<->4 flips), magnetron EXONERATED (jitter would break the
+observed 32-grid st4 positions). Residue -> t189 static hunt. Gate 0 +
+LEDGER AUDIT OK. WIP: docs/re/_wip_t188.md.
 
 LANDED t187 (2026-10-28/29, this session): TRIGGER A WAS REAL AND THE
 PLAYER IS FLYING SHIPS. Live at launch: dosbox pid 260973, timeline

@@ -1124,7 +1124,22 @@ MOVES=6/12; owner-1 4.67=14/3 sub-steps; state4<->5 flips coincide with
 frame-law reading is UNVERIFIED — coordinate reframe vs real instant
 transit must be disambiguated). t188 TASK: extract the scale law from
 scripts/r1_t187_scale.py output + the star table (star f32 coords vs
-ship xyz frames) and pin or refute; row stays OPEN until cited. | open |
+ship xyz frames) and pin or refute; row stays OPEN until cited.
+STATUS t188 (2026-10-29, ships.md S21, cited): frame question ANSWERED
+with measurement — the st5 lane coordinates are a LANE-LOCAL frame (pure-
+x march, y exactly 0/1, z a fixed multiple of 32 outside the galactic star
+extent ±402 read live), the 1100-2500u discontinuities ARE the state/frame
+switches (25/27 big-mover rows are 5->4/4->5 flips; zero big steps on
+st5->5 rows), and the T1 walk law is MEASURED-NEGATIVE for the march
+(MOVES+0x94 and FUEL+0x88 frozen every turn while x+=14/28). New law banked:
+lane step = {14, 28, 14/3} units/turn, LANE/ROUTE-scoped not ship-scoped
+(one ship slot13: step 14 on lanes z=±1824, step 14/3 on lane z=544 with
+d10/MOVES/POW unchanged; slots 13 vs 17 differ ONLY in +0x52 route handle).
+Residue keeps the row OPEN (strict-close): which lane-record word carries
+the step/divisor is UNMAPPED in code; galactic-frame per-turn transit
+distance unmeasurable from this corpus (st4 spans single-turn). Magnetron
+exonerated for these rows (rng%200 jitter would break the observed 32-grid
+st4 positions). | open |
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

@@ -818,3 +818,59 @@ the extraction itself is the t188 task, nothing here closes OQ-019:
 4. slot13 series shows a lane FLIP mid-window (z=1824 -> z=-1824 at
    t1277->1280, xy reset 224 -> 28): same lane line opposite direction —
    turn-around or re-order; k59 stays 244.
+
+## S21 — t188 LANE-MARCH LAWS FROM THE FLIGHT CORPUS (word trace, cited)
+
+Tools: scripts/r1_t188_speedword.py RC=0, r1_t188_words_dump.txt +
+work/r1/t188_words_dump.txt, r1_t188_frame.py (star-grid extent probe);
+corpus = trusted first-row snapshots t1250..1340 (r1_t85g_sitting.py re-run
+RC=0, 45227 rows — NO new turns past 1335; the +2.9MB timeline growth is the
+new-game save ring re-reading, see STATE t188 intake).
+
+1. THE ST5 LANE MARCH IS NOT THE T1 WALK LAW. MOVES [+0x94] and FUEL
+   [+0x88] are FROZEN for the whole march (all consecutive-turn deltas
+   measured 0; slot10 12/90 while x+=28/turn x6 rows; slot13 4/12 while
+   x+=14/turn x14 rows). T1 (FUN_00049f54 commit, 0x4a034..0x4a23d) spends
+   both. MEASURED-NEGATIVE: lane transit does not run the walk-commit path.
+2. LANE POSITION IS A STEP COUNTER: x = k*step exactly, k = turns since
+   lane entry (entry row x == step: slot13 x=14.0000@t1252, slot10
+   x=28.0000@t1262, slot17 x=4.6667@t1262). Steps observed {14.0000,
+   28.0000, 14/3=4.6667} to 4dp; t187's "4.670" and "28/56 pairing vs
+   MOVES" are rounding + missing-turn artifacts. No tie to 160/sugar:
+   d/step independent of MOVES (10,14,21,7.005 across rows).
+3. STEP IS LANE/ROUTE-SCOPED, NOT A SHIP STAT [verified two ways]:
+   (a) slots 13 vs 17 same owner, 23-turn whole-record diff: the ONLY u16
+   stable-within-slot yet differing-between-slots is +0x52 (629 vs 770,
+   the route handle); (b) ONE ship (slot 13) marched step=14 on lanes
+   z=1824 and z=-1824, then step=14/3 on lane z=544 (t1301 x=28.0000 ->
+   t1306 x=51.3333) with d10=4/MOVES=4/POW=12 unchanged. The 3:1 speed
+   factor lives with the lane/target record, not drive sum or species.
+   NB owner-1 = Snovemdomas (SA_DoubleHull) — NO speed ability exists in
+   the species table, species hypothesis dead on arrival anyway.
+4. TWO COORDINATE FRAMES, SWITCH = THE STATE FLIP [verified geometry]:
+   st4 (in-system) coords are EXACT multiples of 32 in x AND z (-1376,
+   416, 1600, 2272) — the DAT_000895dc=32 quantizer law holds there;
+   st5 lane coords are pure-x with y EXACTLY 0 or 1 and z an exact multiple
+   of 32 (1824=57*32, 544=17*32, 352=11*32), lane z OUTSIDE the galactic
+   star extent (new-game map read live from ring save: extent ±402/±430,
+   star-star med 515 max 880) — st5 xyz is a LANE-LOCAL frame. All 27
+   big-mover (>300u) rows in the corpus are state-flip rows (5->4 x14,
+   4->5 x11, 4->4 x2), ZERO on st5->5 rows: the t187 "1100-2500u
+   discontinuities" ARE the frame switches, not instant flights. None of
+   the observed step values matches any star-star distance (nearest-pair
+   check: all |d|>158u). MAGNETRON EXONERATED for these rows: 0x21f58
+   placement adds rng%200 jitter which would put ships OFF the 32-grid;
+   no observed st4 row is off-grid. CENSUS DIRECTION: every state flip
+   observed in the corpus is also a frame switch (25/27 big-mover rows are
+   5->4/4->5); the converse (frame switch => state flip) rests on the
+   slot10 case study (t1253 st5 -> t1254 st4 -> t1255 st5, each with a
+   frame jump), NOT a census — st4->st5 may persist across turns untested.
+5. LANE-END HANDLING: x saturates at ~224 then the next sampled turn is the
+   opposite lane at x=step (slot13 t1277 z=+1824 x=224 -> t1280 z=-1824
+   x=28): lane change/turn-around at lane end, k59 unchanged.
+HONEST RESIDUE (OQ-019 stays OPEN, strict-close): the lane step CONSTANT
+(14 base units) and which lane word carries the 1/3 divisor are UNMAPPED
+in code (static hunt needs the st5 order-executor / route-record writer —
+NOT the walk body); galactic-frame per-turn displacement for lane transits
+is not measurable from this corpus (st4 spans are single-turn, re-entry
+erases them); campaign star table overwritten by the ring rotation.
