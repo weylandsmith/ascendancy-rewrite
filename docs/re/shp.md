@@ -794,6 +794,25 @@ DARKNESS BUG FIXED; all-15-real verdict; interface-style anomaly noted
   backgrounds). Candidate explanation to test cheaply BEFORE any deletion:
   800x600 SVGA variants vs the VESA480/MCGA modes actually in play, or unused
   menu art. Do NOT delete rows on non-recognition alone.
+- t193 UPDATE (player, 2026-10-29, screenshot
+  work/r1/shp_png/reference/Screenshot_2026-10-29_12-31-38.png):
+  planpro/planres NON-recognition REVOKED — they are the planet-UI gauge
+  backdrops: planpro (green nature scene) = PROSPERITY production indicator,
+  planres (blue nebula scene) = RESEARCH production indicator; each gauge
+  carries a bottom fill-bar (green/blue) that grows with production level
+  (top panel row, flanking the surface view + construction panel). Vision-
+  pass on the reference shot corroborates placement (nebula panel far-left,
+  nature panel center-right; fill bars bottom of each). Consequence: the
+  planet UI is a SHP-composed screen — economy.cpp rewrite must eventually
+  present both channels with these backdrops (visual affordance law banked
+  here; per-planet field offsets still uncited -> queue t196). The
+  10status/2savegam/4loadgam style anomaly stays OPEN (still unseen).
+- VISION-ORACLE LAW (t193): vision_analyze on EXTERNAL images (player
+  screenshots, vendor art) is a legitimate identification instrument — the
+  R13 ban covers only self-graded grading of our own renders' correctness.
+  Recipe that worked: ask for layout, verbatim labels, backdrop-class
+  attribution in one pass. Opens: batch triage of the 71 residues via
+  labelled contact sheets (t194).
 - lgrace07/09/10 identity content-VERIFIED (Swaparamans/Shevar/Govorom) —
   law banked docs/re/species.md (lgraceNN = race-NN portrait, race-description
   + diplomacy screens).

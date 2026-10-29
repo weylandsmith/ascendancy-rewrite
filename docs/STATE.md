@@ -280,6 +280,55 @@ byte+0x23 (t190), the scancode cascade (t191), or the share-law legs
 (t192). NOTE t192 re-froze r1_idle_probe.py baselines to the adjudicated
 Oct-29 00:12:44 timeline state — a fresh arm now means REAL new play.
 
+QUEUE AFTER t193 (authored by the pairing session 2026-10-29; user has NO
+gameplay or rulings available — everything here must be offline-static,
+corpus-based, rewrite-side, or vision-on-external-images):
+
+  t194 RESIDUE TRIAGE VIA VISION ORACLE (OQ-005 forward motion, no eyeball
+  needed for IDENTITY — codec-correctness grading stays R13-reserved):
+  render ALL 71 residue records with the corrected 6-bit palette (extend
+  scripts/r1_t182_pngdump.py or write r1_t194_sheet.py reusing it), pack
+  ~4 LABELED contact sheets (record name under each tile, failure-class
+  grouped), then vision_analyze each sheet (proven recipe: layout, verbatim
+  text, "what game-screen does each tile belong to"). Bank per-record
+  identifications to docs/re/shp.md S20 + work/r1/shp_png/ids.tsv. GOAL: any
+  residue identified into a known screen gives that screen's geometry as a
+  dims candidate — that is the OQ-005 dims-location route arriving WITHOUT
+  play. Flag any tiles matching the 10status/2savegam/4loadgam style cluster
+  (still-unseen SVGA question).
+  t195 OQ-021 DISPLAYED-COUNT WRITE SITE: DAT_482fb oscillates 12..22 while
+  systems_any=36/full=34 are flat (t188b measurement, ships.md/score.md
+  cite). Find WHO computes it: t191 method — runtime-slot member search in
+  the 20-sav corpus (NOT static file dwords), then disasm the writer chain;
+  candidates: per-star percent-controlled aggregate, production-weighted
+  count, recompute-only-on-screen-open. Tie the oscillation to a loop or
+  bank the narrowed chain as honest residue.
+  t196 PER-PLANET ECONOMY FIELDS: planet UI now KNOWN to show prosperity
+  (planpro backdrop) + research (planres backdrop) gauges with fill bars
+  (shp.md S19 t193 UPDATE + reference screenshot). Census per-planet records
+  in the banked .SAV corpus for the two fields driving those gauges;
+  correlate owner/pop/worker inputs; pin offsets with citations to
+  docs/re/economy.md (create if absent; check nothing regenerates it).
+  Also cheap sub-leg: hunt a DAY COUNTER dword (static: day-rollover site
+  near the TURNADVANCE path) — watcher schema lacks one and t187 testimony
+  (two-tier turns) is untestifiable without it; if found, note watcher field
+  addition for the next live session.
+  t197 REWRITE ALLIANCE STATE (pure code): verify rewrite/src/game/
+  diplomacy.cpp implements the now-corroborated law (att > ACCEPT_ALLIANCE
+  -> BOTH cells = 3, +10/+10 both cells; refusals leave cells at 1), and add
+  a regression pin using the t1335 capture as fixture sequence: atti0
+  526/529/532/535/566/569 refuse -> 631 ACCEPTS with both cells 3. Cite
+  docs/re/diplomacy.md S15/S16 + the flip frame wall 23:47:43. Gate + tests
+  must pass.
+  t198 AI GAP ROWS 3+4 (docs/re/ai-dossier.md gap map): threat-byte input
+  + emergency chain (period tiers 200/225/300/400) and the min-REQUIRES/
+  over-pop demolish channel in rewrite buildPhase. Split into t198a/t198b if
+  context pressure appears; bank law citations from aicode.md S3a first.
+WATCH-ONLY (need the user's future play — DO NOT burn iterations on these):
+OQ-021 end-ctrl firing (colonize past ~50% + press `c`); OQ-019 single-ship
+flight straddling the /160 clamp + a magnetron USE frame; OQ-005 the player's
+remaining index.txt ruling; day-tick observation post-watcher-field-addition.
+
 LANDED t192 (2026-10-29, this session): TRIGGER-A RE-ARM ADJUDICATED
 (stale baseline, NOT new play) + THE LANE-VISIBILITY SHARE LAW CLOSED WITH
 MEASUREMENT (ships.md S23 L6; debugflags.md t192; OQ-019 STATUS t192
