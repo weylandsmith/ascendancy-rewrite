@@ -264,19 +264,42 @@ Tooling lesson: Ghidra headless load_program(work/ascend_restored.bin)
 after scripts/ghidra_headless_up.sh + connect_instance(ascend5) — project
 work/ghp5. Gate 0 + LEDGER AUDIT OK. WIP: docs/re/_wip_t183.md.
 
-NEXT t184 (STATIC): OQ-019 REMAINING LEG — the build/redesign inventory
-path (the one explicitly-listed offline residue of the row: how a design's
-gizmo list is committed to the ship record ring at build/redesign time,
-i.e. writers of the slot array law [ship+0xab]+i*7 {cidx u8, u8, u16} and
-the [ship+0x15a] count). Start: xrefs to +0x15a writers, FUN_0004a658's
-caller FUN_0004a74c (the other 0x4a658 edge, t47 upkeep side) and the
-design-screen handlers near the 0x46aec turn-loop bookkeeping call.
-Deliverable: cited build-time inventory law (or the measured reason it is
-UI-driven-only). RATIONALE: t183 landed; every other open row (OQ-005
-player eyeball on work/r1/shp_png/index.txt — surface at next decision
-trigger; OQ-016-tail, OQ-021, OQ-023 per t180, and OQ-019's flight delta
-per BLOCKED t48) needs a capture window or the player. This is the last
-fully-offline leg queued.
+LANDED t184 (2026-10-28, this session): OQ-019 BUILD/REDESIGN INVENTORY
+PATH CLOSED WITH CITED MEASUREMENT (row stays OPEN — flight-delta residue
+only). Ships.md §18 is the artifact. Law: gizmo ring rec+0xab stride 7 x25
+physical slots {cidx u8 (0xFF empty), u16, u32}; CAP dword[+0x15a] :=
+dword_live(0x6842+2*hull)>>16 (hull = byte3 of design ptr dword[+0xa7]) —
+MEASURED EXACT 1234/1234 owned rows 20/20 saves (tool
+scripts/r1_t184_inv_law.py RC=0; table is scenario-loaded, static image
+bytes at 0x6842 are code — t43 law re-confirmed); FILLED dword[+0x15e] ==
+occupied count over slots 0..cap INCLUSIVE incl. a MEASURED vendor
+phantom-slot off-by-one (100 rows, 4 designs, slot idx==cap occupied,
+missed by every i<cap walker — 0x49698 bound is jg). Commit = explicit
+per-slot cidx adds (production builder FUN_00040358 jumptable cs:[cls*4+
+0x2b798] starter kits; design-apply FUN_00040d1c race-filtered RNG-shuffle
+over DAT_0x67ec; UI FUN_0004dd50 0x4e425/0x4e4f9) then FUN_00049acc
+RE-MATERIALIZE sums (no gizmo record copy ever; supersedes t46 §10's
+"queued-order list" label on the ring). Redesign FUN_000497a8 REFUSES iff
+new-hull cap < filled (0x497da). Init side-law: integrity [+0x8c]=(hull+1)
+*10 doubled if war byte DAT_00012fb3+emp*0x1ee==1; player-designed ships
+skip the hull-name copy. Gate 0 + LEDGER AUDIT OK. WIP: docs/re/_wip_t184.md.
+
+NEXT t185 (STATIC, LAST FULLY-OFFLINE CANDIDATE): OQ-019 magnetron identity
++ the two §18-adjacent loose ends folded in ONE pass — (a) enumerate what
+gizmo category 5 (the kind-5 go-to-star orders, §17 T6/§16 item 3) rows
+EXIST in the scenario-LOADED gizmo table live copy (base law t47:
+B+0x82bb0+0x7653c), names via the loaded name-pointer table, and re-run the
+slot census against the LOADED rows not file order (t183 refuted the file-
+order tie; the loaded table may name row 59/idx-36 differently per
+scenario); (b) if a loaded row is named Lane Magnetron, cite the row-index
+law linking it to immediate 0x24 at 0x4159a. RATIONALE: after t184 the
+only OQ-019 residues are flight-delta (BLOCKED t48 — capture window) and
+this identity question; every other open row needs a capture or the player
+(OQ-005 eyeball index.txt, OQ-016-tail, OQ-021, OQ-023 per t180). If the
+loaded table still says Disarmer, that is the honest negative to bank and
+MAGNETRON-TEXT vs CODE stays a documented vendor-contradiction, then the
+offline queue is EMPTY: re-arm idle and surface OQ-005 at the decision
+trigger.
 
 (Prior LANDED t182 block follows; its NEXT/THEN paragraphs are SUPERSEDED
 by t183/t184/t185 above.) LANDED t182 (2026-10-28): OQ-005 SHAPE-PNG DUMPER SHIPPED +

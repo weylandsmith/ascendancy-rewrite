@@ -1065,6 +1065,19 @@ flight delta pins arrival granularity — row STAYS OPEN
 (pending: live consecutive-save flight delta per BLOCKED t48, per-ship
 redesign inventory, magnetron identity — index-36 census REFUTES the
 Magnetron tie: Disarmer row, §17 T6).
+STATUS t184 (static+runtime RUN, ships.md §18): THE LAST OFFLINE RESIDUE —
+build/redesign inventory path — CLOSED WITH CITED MEASUREMENT: gizmo ring
+rec+0xab stride 7 x25 physical slots {cidx u8, u16, u32}; cap dword[+0x15a]
+:= live-table dword(0x6842+2*hull)>>16, hull=byte3[+0x94 design ptr +0xa7];
+MEASURED 1234/1234 owned rows across 20/20 saves (scripts/r1_t184_inv_law.py
+RC=0, caps {10,15,25}); filled[+0x15e] == occupied-slot count over 0..cap
+INCLUSIVE (phantom-slot off-by-one at idx==cap MEASURED 100 rows, vendor
+0x49698 bound jg); commit = per-slot cidx adds (scenario builder FUN_00040358
+jumptable kits + design-apply FUN_00040d1c race-filtered RNG shuffle + UI
+FUN_0004dd50) then FUN_00049acc RE-MATERIALIZE (no record copy ever);
+redesign FUN_000497a8 REFUSES iff new hull cap < filled (0x497da). Row
+STAYS OPEN on strict-close: ONLY the live flight-delta residue remains
+(BLOCKED t48 capture window) plus magnetron identity (t183 census).
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

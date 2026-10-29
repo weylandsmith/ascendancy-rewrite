@@ -605,3 +605,79 @@ one consistent system (nearest-star distances 123-2278 world units / 160 =
 [inferred]). Closure of OQ-019 still requires the live consecutive-save
 flight delta (BLOCKED t48 — zero flights in every passive corpus) plus the
 per-ship redesign inventory path; row stays OPEN.
+
+## 18. BUILD/REDESIGN INVENTORY COMMIT LAW (t184; static decode + runtime 1234/1234)
+
+The ship record's gizmo ring at rec+0xab, stride 7, 25 physical slots
+(0xab+25*7 = 0x15a where the cap dword abuts). Slot layout {cidx u8
+(0xFF=empty), u16 @+1, u32 @+3}. dword[rec+0x15a] = CAPACITY,
+dword[rec+0x15e] = FILLED COUNT. NO gizmo record is ever copied into the
+ship — the ship holds only cidx bytes; stats are re-materialized on every
+mutation by FUN_00049acc (0x49acc..0x49c10 verbatim): zeroes ship
++0x0/4/10/18/1c/20/24/28/2c/30, [ship+0x10] := hull base [+0x14], then per
+non-empty slot row = cidx*0x6a+0x7650c adds row+0x52->ship+0x0,
++0x56->+0x4, +0x5e->+0x10 (drive), +0x62->+0x20, +0x66->+0x18,
+byte[row+0x32]==2 -> dword[row+0x36]->+0x1c; cidx 0x47 -> +0x28:=-1;
+0x2b/0x2c/0x2a -> counts at +0x24 and (count*ds:0x2583/0x258b fistp) at
++0x8/+0xc. This SUPERSEDES the t46 §10 "queued-order list" label on the
+ring: it is the INVENTORY (gizmo cidx law measured); the order fields are
++0x5d/0x67/0x68, untouched by any of these writers.
+
+BUILD/INIT FUN_00049534 (kind arg asserted <4; 5 callers: 0x40441, 0x40492
+in production builder FUN_00040358; 0x49059; 0x4982a in redesign; 0x49d06):
+CAP := dword_live(0x6842 + 2*hull) >> 16 with hull = byte3 dword[rec+0xa7]
+(design pointer; UI dialogs store design-image pointers there, ship-side
+writer 0x49359). RUNTIME MEASURED [MEASURED 20/20 playcap saves, 1234
+owned rows, scripts/r1_t184_inv_law.py RC=0]: cap == table[hull] EXACTLY
+1234/1234, caps {10:956, 15:20, 25:258}. The 0x6842 table is
+scenario-LOADED data (static image bytes there are code — t43 stale-DAT
+law re-confirmed). NAME: hull-name string DAT_00078484+hull*0x14
+stride-2 copy into rec+0x34, SKIPPED for player-designed ships
+(byte3[rec+0x31]!=0 && owner hi16 == player race DAT_0007458e); INTEGRITY
+[+0x8c] := (hull+1)*10, doubled when race-war byte
+DAT_00012fb3+empire*0x1ee==1; [+0x98]:=[+0x8c]; hull base [+0x14]:=0.
+
+MUTATORS (all call recalc): FUN_00049698 set-slot(EBX=idx, EDX=cidx) —
+rejects idx>cap (0x4969b jg: idx==cap ADMITTED, see phantom law below),
+rejects same-cidx in the target slot only (0x496b4 — duplicates across
+slots LEGAL, live rows carry 1d 1d / 47 47 / 49 49); FUN_000496e4
+clear-slot(EDX=idx) — NO index bound at all; FUN_00049624 fill-first-empty
+(no bound either — scans all 25); FUN_0004929c init-clear (zero stats,
+cap-window 0xff/0/0).
+
+DESIGN-APPLY FUN_00040d1c (callers inside the class handlers
+FUN_000405f8/0x40674/0x407f4/0x40a6c, reached via jumptable cs:[cls*4 +
+0x2b798] from production builder FUN_00040358, cls 0..3 from scenario DATs
+0x747d6/0x74d1c/0x750a0): filters a 22-entry list at DAT_0x67ec by race
+knowledge (FUN_0004a4e0 tests bit in dword live 0x7478b + known-gizmo
+class*0x4b) and fills slots up to cap in RNG-SHUFFLED order (FUN_0007824f
+% remaining, verbatim 0x40d7b..0x40daf). The class handlers additionally
+hardcode starter-kit cidx adds (FUN_00049698 call census: ~10-30 per
+handler). UI add/remove: FUN_0004dd50 arms 0x4e425/0x4e4f9 (ship ptr
+[ebp+0xab], cidx [ebp+0xb8]>>24, success stamp [ebp+0xbd]:=-1).
+
+REDESIGN FUN_000497a8 (sole caller 0x4e6d2): if new kind == [rec+0xaa]
+no-op(-1); new_cap := table[new_hull]; REFUSE -1 iff new_cap < FILLED
+[+0x15e] (0x497da) — redesign blocked when inventory exceeds the new
+hull's slots; else sweep remove+re-add compacting into low slots, re-init
+via FUN_00049534, then copy the hull name UNCONDITIONALLY (bypasses the
+player-name gate, 0x4982f..0x49867).
+
+PHANTOM-SLOT OFF-BY-ONE [MEASURED 100/1234 rows, stable 20/20 saves]:
+filled == count of cidx!=0xFF over slots 0..cap INCLUSIVE on ALL rows;
+100 rows (4 designs {0x143b000,0x1440000,0x1448c00,0x144ac00}, cap 10)
+carry an occupied slot AT INDEX == cap, counted by +0x15e but missed by
+every i<cap walker (recalc 0x49acc, upkeep FUN_0004a658, scans
+FUN_00049714/0x49768) — the gizmo is inert for stats/upkeep yet inflates
+the filled count; reachable because 0x49698 admits idx==cap and 0x496e4/
+0x49624 take no bound. Origin of the 100 loaded rows [inferred]: loaded
+scenario/design data committed through an idx==cap add.
+
+COST SIDE: per-hull cost table live 0x687c (4 dwords) via FUN_0004a41c ->
+FUN_0004a3d4; production loop multiplies by CAP at 0x40454
+(imul edx,[esi+0x15a]). Design-parse cost store stays t46 §9.
+
+STATUS vs OQ-019: this closes the row's named residue "the build/redesign
+inventory path" with cited measurement (static law + 1234/1234 runtime).
+Row itself STAYS OPEN — sugar-cube flight-delta closure still blocked per
+t48/BLOCKED (needs a capture window with actual flight).
