@@ -238,32 +238,70 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t189: MAP THE LANE-STEP WORD IN CODE (close the S21 residue, OQ-019).
-The Ghidra bridge is ALIVE (verified t188: instance tcp 127.0.0.1:8089,
-program ascend_restored.bin connected) — do the static leg NOW while it is
-up. Task: find WHO computes the per-turn lane displacement for state-5
-orders: start from the resolver FUN_00041260 (t183 law) and the order-kind
-dispatch, find the st5 (kind-5 order / lane) branch that writes the ship
-position per turn WITHOUT calling FUN_00049f54 (walk) — the measured corpus
-(S21 items 1-3) proves that path exists and reads a speed value scoped to
-the +0x52 route/target handle (steps {14, 28, 14/3}: look for a /3 or *
-0.3333 const-pool word and a lane-record field read through the handle).
-Pin the offset + citation into ships.md S22. Row CLOSES only if the step
-AND its divisor are tied to named record fields with cited disasm
-(strict-close); the honest output if not is the narrowed writer chain.
-PRE-CHECKS first (cheap greps, may override): (1) if
-work/r1/playcap/live-timeline.jsonl has REAL new turns again (turn > 0
-rows past 1335 — the tail is currently the NEW GAME: 172 t=0 rows, ring
-overwrote the campaign star table; run r1_t85g_sitting.py only if A
-re-arms with content change AND turn>0 rows appear); (2)
-`grep -o 'sel=[1-9]' work/r1/playcap/watch.out | head` and
-`grep -c 'DAT_482fb=2[5-9]' work/r1/playcap/watch.out` — OQ-021 override;
-(3) any relation cell==3 (OQ-023) — note the OLD game ended at t1335 with
-Orfa att 613 (past the 570 extrapolation, NO alliance observed: honest
-negative banked; a NEW alliance must come from the new game at t=0).
-RATIONALE: every capture-gated closer is watching-only; the lane-step word
-is the ONE open question with a static path, and the bridge being up is
-time-sensitive.
+NEXT t190: IDENTIFY THE LANE-RECORD STRUCT AND THE WRITER OF ITS BYTE
++0x23 (close the S22 L4/L6 residue, OQ-019).
+t189 pinned the march law in FUN_0004a74c (ships.md S22): handle H :=
+[ship+0x59] is a LANE-RECORD pointer — ptr[H] and ptr[H+4] are two
+endpoint records whose f32 coords at +8/+c/+10 feed the chord length
+(same layout as star records), and byte[H+0x23] bit0 selects the 1/3
+multiplier (moffs 0x263b pool word, live-measured 0.333333 all saves
+41..60).
+Task: static hunt of WHO builds these records and what +0x23 means.
+Hammer 1: in a save where st5 rows exist the pointer window sits at
+linear 0x258000..0x258FFF — but those saves are GONE (ring rotation);
+rebuild structurally instead: xref FUN_0004a74c's H consumers, walk
+backwards to the writer of [ship+0x59] for kind-5 lane orders (issuer
+FUN_000220a8 t185 validates the lane choice — follow its lane-record
+lookup), and find the loader/allocator of the record table (candidates:
+t52 matrix producer FUN_00023e00 fills DAT_00045beb — check whether it
+ALSO builds pointer records, and whether the record +0x23 byte derives
+from the lane matrix value or a starlanes.txt field). Close byte[H+0x23]
+with cited disasm (what sets it, per-lane) and pin into ships.md S23;
+row closes only if the flag's SEMANTICS are cited (strict-close) —
+honest output otherwise is the writer chain + record layout.
+PRE-CHECKS first (cheap greps, may override): (1) REAL new turns? tail
+work/r1/playcap/live-timeline.jsonl for turn>0 rows past 1335 — the
+ring currently holds only t=0 new-game rows; if real campaign rows
+reappear AND dosbox is running, that changes everything (live handle
+window readable = direct gate witness, skip straight to the dump:
+ship windows + linear bytes 0x258000..0x259000 per frame); (2) `grep -o
+'sel=[1-9]' work/r1/playcap/watch.out` / `grep -c 'DAT_482fb=2[5-9]'` —
+OQ-021 override; (3) relation cell==3 — OQ-023 override.
+SECONDARY if t190 runs dry early (same session, same doc): identify the
+stride-0x1ee species table at DAT_00012fb3 (base = diplomacy race-table
+base 0x12e16 + 0x19d — NB row+0x19d is the t99 ABILITY NUMBER, so the
+lane code reads byte(race-row + 0x19d + 0x12): find what lives at +0x1af
+and who writes it; a row where col byte == 0x12 doubles lane speed).
+RATIONALE: every capture-gated closer stays watching-only (dosbox down,
+new game at t=0); the lane-record writer is the last OQ-019 residue with
+a static path, and S22 just narrowed it to one byte.
+
+LANDED t189 (2026-10-29, this session): LANE-STEP WORD MAPPED — FUN_0004a74c
+IS THE STATE-5 LANE MARCH BODY (ships.md S22; OQ-019 updated, stays OPEN
+strict-close). Intake: pre-checks all negative (no turn>0 past 1335, sel
+never armed, DAT_482fb=2[5-9] 0, dosbox down); adopted+committed prior
+residue 87dcab9 (game.pal = 6-bit VGA, re-measured: max byte 0x3f, 0/256
+entries over; pngdump was rendering at 25% brightness — fix scales
+v*255//63; plus t187 session + t188 state3 arbiter scripts). Proved
+(disasm 0x4a74c..0x4a968 verbatim + r1_t189_lawcheck.py RC=0): march =
+chord advance x := min(x + step, |A-B|) at [ship+0x9e], y/z untouched
+(pure-x law STRUCTURAL); step base = float(ship[+8]+ship[+0xc]) — the
+words measured (14,0)/(0,28): S21's 14/28 ARE RECORD FIELDS, not
+MOVES-derived (every consecutive st5 delta == step0 or step0/3, ZERO
+exceptions); gate1 byte[handle+0x23] bit0 -> x moffs 0x263b POOL WORD
+LIVE 0.333333 all saves 41..60 (THE 1/3 IS RUNTIME, handle-gated);
+gate2 species (dword[+0x54]>>16) row col 0x12 == 0x12 -> x2 (moffs 0x263f
+word = 2.0; branch construction assigns the words) with max(step,1) clamp
+at 0x4a87c, ZERO observed witnesses.
+Handle law in play: SLOW only under handles 0x258933/9cf/9f6 (254 pairs,
+zero fast), 15 other handles all fast; slot13 vs slot17 SAME owner,
+records byte-identical 0x00..0x27, opposite speed — t188's "+0x52 route
+handle" SUPERSEDED (+0x52 is the ETA stamp; +0x59 is the lane pointer).
+Identity tie: the function prologue IS t101's POWER-recharge site
+(0x4a76c) — explains S21's "POW frozen" (refill lands before autosave
+row). Residue -> t190: byte[handle+0x23] writer/semantics + species
+table col 0x12 identity. Gate 0 + LEDGER AUDIT OK. WIP:
+docs/re/_wip_t189.md.
 
 LANDED t188 (2026-10-29, this session): TRIGGER A RE-ADJUDICATED + FLIGHT
 SCALE/FRAME LAWS BANKED (ships.md S21; OQ-019 row status updated, stays

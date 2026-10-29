@@ -1139,7 +1139,31 @@ Residue keeps the row OPEN (strict-close): which lane-record word carries
 the step/divisor is UNMAPPED in code; galactic-frame per-turn transit
 distance unmeasurable from this corpus (st4 spans single-turn). Magnetron
 exonerated for these rows (rng%200 jitter would break the observed 32-grid
-st4 positions). | open |
+st4 positions).
+STATUS t189 (2026-10-29, ships.md S22, cited): THE LANE-STEP WRITER FOUND —
+FUN_0004a74c IS the state-5 march body (guard [+0x58]==5 at 0x4a7a6; callers
+exactly FUN_0003e6e0 + FUN_00049c14; its prologue at 0x4a76c IS t101's
+POWER-recharge site — the two citations are ONE function). Law [verified
+disasm 0x4a7a6..0x4a8af]: step0 = float(ship[+0x8]+ship[+0xc]); gate1 byte
+[handle+0x23] bit0 -> step *= moffs(0x263b) MEASURED 1/3; gate2 species row
+(dword [+0x54]>>16) col 0x12 == 0x12 -> step = max(step,1)*moffs(0x263f)
+MEASURED 2.0 (never witnessed firing); x :=
+min(x+step, |A-B|), A/B = ptr[handle]/ptr[handle+4] star-coordinate records;
+y/z untouched. MEASURED: base law EXACT on every consecutive st5 pair (delta
+== step0 or step0/3 to 4dp, ZERO exceptions); step0 words are (14,0)/(0,28) —
+S21's 14/28 ARE record fields, NOT MOVES-derived; SLOW pairs live ONLY under
+handles 0x258933/cf/f6 (254 pairs, ZERO fast) vs 15 other handles all FAST
+(0 slow); slot13 vs slot17 same owner, records byte-identical 0x00..0x27,
+opposite speed — handle-gated in play; slot13's ~224 saturation == the
+lane_len clamp. THE DIVISOR MEASURED LIVE: pool word = relocated operand
++0x88 (control 32.0 verbatim at 0x2603 law) — 0x263b word reads 0.333333
+and 0x263f word 2.000000 in ALL saves 41..60; by branch construction the
+HANDLE gate carries the 1/3, the species gate the 2.0. Row STAYS OPEN
+(strict-close): gate2 has zero observed witnesses and byte[handle+0x23] /
+species-col-0x12 semantics are unmapped (old-game handle bytes destroyed by
+the ring rotation).
+Closure path: ONE watcher run dumping the handle window ptr+0x20..+0x28 (and
+the species row) during a known march. | open |
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

@@ -874,3 +874,81 @@ in code (static hunt needs the st5 order-executor / route-record writer —
 NOT the walk body); galactic-frame per-turn displacement for lane transits
 is not measurable from this corpus (st4 spans are single-turn, re-entry
 erases them); campaign star table overwritten by the ring rotation.
+
+## S22 — t189 THE STATE-5 LANE MARCH BODY FOUND (FUN_0004a74c)
+
+Tools: Ghidra bridge (ascend_restored.bin) decompile+disasm 0x4a74c..
+0x4a968; scripts/r1_t189_lawcheck.py RC=0 (first-row snapshots t1250..1340,
+slots 10,13,16,17,20,22,26,29,30,34); save reads 41..60.sav.
+IDENTITY TIE: this is the SAME function t101 cited for the POWER-recharge
+law ([ship+0x88] := FUN_0004a99c() at 0x4a76c — verbatim in the prologue;
+t101's 0x3e7b0 citation is the CALLER FUN_0003e6e0 turn-tail into it).
+Callers: exactly FUN_0003e6e0 (AI/local turn tail) and FUN_00049c14.
+Prologue does three things every call: zero [ship+0x9c]; POWER refill
+[+0x88] := FUN_0004a99c(); slot-refresh loop (cidx -> design word
+0x7654e+cidx*0x6a into slot+1). S21's "POW frozen" is EXPLAINED: the burn
+happens mid-turn elsewhere and the refill restores it before the autosave
+row — first-row sampling cannot see the dip.
+
+L1 LANE MARCH IS A CHORD-ADVANCE [verified disasm 0x4a7a6..0x4a8af]:
+  guard byte[ship+0x58]==5; handle H := dword[ship+0x59] (kind-5 order
+  target = LANE-RECORD pointer; NB t188's S21 "+0x52 route handle" is
+  SUPERSEDED — +0x52 is the ETA day-stamp per aicode t101, ETAs differ
+  between lanes trivially; the +0x59 pointer is what the law reads);
+  A := ptr[H], B := ptr[H+4] (two endpoint objects, star-rec layout
+  +8/+c/+10 f32); lane_len = |A - B| (FUN_00076da0 after explicit dot);
+  step0 = float(int32[ship+0x8] + int32[ship+0xc]);
+  (gate 1) if byte[H+0x23] bit0: step *= moffs 0x263b (relocated operand
+  in the save copy = 0x24463b; pool word = operand+0x88 LIVE 0.333333 —
+  THE DIVISOR BELONGS TO THE HANDLE GATE);
+  (gate 2) species row idx = (dword[ship+0x54]>>16) into stride-0x1ee
+  table (relocated base 0x254fb3 = DAT_00012fb3+seg): iff col byte 0x12
+  == 0x12: step = max(step,1.0); step *= moffs 0x263f (relocated
+  0x24463f; pool word LIVE 2.000000 — the species gate is a DOUBLE);
+  x := min(x + step, lane_len) at [ship+0x9e] (FADD then clamp MOV);
+  y/z untouched (S21's pure-x law = structural, not coincidental).
+L2 BASE LAW MEASURED EXACT (r1_t189_lawcheck.py): every consecutive-turn
+  st5 delta equals float([+8]+[+0xc]) or that value x 0.333333(3) —
+  BASE-LAW-EXACT tags on all lanes with handles outside
+  0x258933/0x2589cf/0x2589f6; every delta under those three handles is the
+  1/3 ratio (63+186+5 slow pairs, ZERO fast pairs; 15 other handles all
+  fast, ZERO slow). Ship words measured (+8,+0xc) = (14,0) or (0,28):
+  S21's 14 and 28 ARE THESE RECORD FIELDS, not derived from MOVES/drive.
+  Slot13 (handle 0x25820a, FAST 14.0) vs slot17 (0x2589cf, SLOW 4.6667)
+  are BOTH owner-1 ships with byte-identical records at 0x00..0x27 —
+  species alone cannot gate; the handle is the discriminator in play.
+  Lane-end behavior: x saturates at lane_len (slot13 saturating ~224 = L
+  computed from that lane's endpoint pair) — S21 item 5 confirmed.
+L3 BOTH MULTIPLIERS ARE RUNTIME CONSTS, MEASURED LIVE: save-linear pool
+  word = relocated operand + 0x88 (t183 law; control 32.0 verbatim at
+  0x24468b = 0x2603+0x242000+0x88); in ALL 20 SAVES 41..60: 0x263b word =
+  0.333333, 0x263f word = 2.000000. ASSIGNMENT BY CONSTRUCTION: operand
+  0x24463b sits in the byte[H+0x23] branch, 0x24463f in the species branch
+  -- handle gate is x1/3, species gate is x2. CONSISTENT with the corpus
+  (slow steps are handle-keyed). Gate-2's max(step,1) clamp matches the
+  0x3f800000 store bytes at 0x4a87c.
+L4 GATE ATTRIBUTION NOT SEPARATED (honest): gate 1 (handle byte) vs gate 2
+  (species col) — corpus confound: every SLOW window also had its handle
+  change (re-order) or owner-1 status at the boundary; the ONLY save set
+  (41..60) is POST ring-rotation (new game t=0 overwrote the old world), so
+  live values of byte[H+0x23] and the species col cannot be read for any
+  old-game lane. In 41..60 the species col byte == 0 for rows 0..23, but
+  those saves cannot prove that column was ever live, so the zero is NOT
+  evidence gate 2 is dead. WHAT IS PINNED: the divisor word (pool slot
+  0x263f, live 1/3), the two gate FORMS with cited bytes, and step0's
+  record fields. RESIDUE: which gate fires in play + what byte[H+0x23] /
+  col 0x12 mean (lane-class flag vs species-table semantic id) — needs ONE
+  watcher run that also dumps the handle window (ptr+0x20..+0x28) while a
+  known ship marches.
+L5 THE x2 (species) GATE HAS NEVER BEEN SEEN FIRING: no old-corpus delta
+  equals 2*step0 where step0 came from a single record pair (t187's "56"
+  rows pair with record (0,28) directly at 2x-gap artifacts). UNVERIFIED
+  whether any shipped species row hits col 0x12 == 0x12.
+L6 ATTRIBUTION UPGRADE (still not separation-grade): with gate1 pinned as
+  the x1/3 handle gate, the SLOW-handle corpus (0x258933/cf/f6 x 254 pairs,
+  zero fast) plus slot13-fast/slot17-slow same-owner is now consistent with
+  gate 1 ALONE explaining every observed slow row; gate 2 has NO observed
+  witness. The remaining doubt is only whether byte[H+0x23] also varies
+  within the three slow handles mid-march (unreadable post-rotation).
+CORPUS CAVEAT: 41..60.sav handle bytes read at 0x258xxx are dead old-game
+  residue in new-game saves — never cite them as lane state.
