@@ -94,14 +94,19 @@ TIMELINE = os.environ.get("R1_TIMELINE",
 # scripts/r1_t192_window_adjudicate.py RC=0). New edge state measured t192:
 # size 5,702,731,088 B, mtime 1793247164.180000000 (2026-10-29 00:12:44),
 # head md5 unchanged (42a0bed0), tail md5 25cca2cb.
-BASE_MTIME_NS = 1793294532_000_000_000  # 2026-10-29 13:22:12 -0400 (stat t193)
+BASE_MTIME_NS = 1793294532_100_000_000  # 2026-10-29 13:22:12.10 -0400 (stat -c %N t194;
+# t193 froze 13:22:12 at SECOND resolution -> 100ns phantom delta; freeze FULL ns from `stat`)
 BASE_SIZE = 5721578066
 # t151 CONTENT baseline, ENACTED t156 (was STATE.md prose only — see (A6) below).
 # md5 of the FIRST and LAST 64 KiB of the frozen timeline; reproduced
 # byte-identically t151..t156 (old frozen file). Never hash the whole file.
+# t194 NOTE: re-freeze the TAIL md5 whenever the timeline GROWS — the t193
+# sitting appended ~18.8 MB, invalidating the t151-era tail edge, but only
+# size+mtime were re-frozen, so A6 re-armed every session re-hashing a
+# pre-append tail (false arm witnessed t194, tail 9054cc6c vs stale 25cca2cb).
 BASE_EDGE_MD5 = 64 * 1024
 BASE_HEAD_MD5 = "42a0bed0507f9052e2009ec94e9c27f1"
-BASE_TAIL_MD5 = "25cca2cba62407edfd9a5876496c109d"
+BASE_TAIL_MD5 = "9054cc6c66802e6f80431d4ffa1416ee"
 # t177 VNC baseline (work/r1/vnc/x11vnc.log). The log CHURNS (a persistent viewer
 # sends ExtDesktopSize resolution probes every few hours: measured 6-line deltas
 # at 26/10 22:16 and 23:25, 27/10 08:02...17:30, 28/10 07:37) while CONNECTS are

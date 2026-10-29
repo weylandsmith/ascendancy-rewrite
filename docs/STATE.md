@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T13:40
+updated: 2026-10-29T15:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -249,42 +249,72 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t194: HUNT THE VISIBILITY CONSUMER — decide OQ-026 (does the vendor
-UI/AI ever WITHHOLD a fogged lane or star?). t193 proved the masks are LIVE
-per-empire game data (100/1160 multi-bit lane recs mid-game, per-empire fog
-9/8/25/32 of 58 lanes, star +0x16/+0x17 twins — ships.md S23 L7) and KILLED
-the t191 'painter 0x20c48' lead (alloc wrapper; FUN_00025604 = state
-snapshot serialiser, ships.md S23 L8). Legs in ONE static pass (~30 probes):
-(a) ENUMERATE CONSUMERS of lane rec+0x20 / star-obj +0x16 that the
-imm-operand census misses: Ghidra search_instructions WITHOUT mnemonic
-filter for operand substrings '+0x20]' scoped to plausible paint functions
-(function= filter per function found from LAB/star-draw call chains — the
-lane-paint entry is reachable from the cosmos handler 0x26b34 block, NOT
-0x20c48), plus BYTE-register forms (mov al,[reg+0x20] then test al,dl /
-shift by [0x7458e]-derived count) and the read-form of the t191 cheat
-0x273ca neighbourhood (that function READS all lanes to OR — its siblings
-in the same repaint chain 0x28fc0/0x284bc + vtable ARE the paint path: walk
-THOSE, they were named but never decompiled);
-(b) DECIDE: if a consumer skips drawing when the viewer bit is clear,
-OQ-026 CLOSURE moves to implement+pin (reveal at explore/alliance per
-FUN_00046354 N=rand%3|6+1 law) and SA_KnowHomeWorlds/SA_KnowStarLanes get
-real effects; if bookkeeping feeds only diplomacy/AI (e.g. 0x55f6e's
-receive-loop consumer), bank the negative with the citation and close OQ-026
-as 'data modelled, UI shows all' — the abilities.md filings then need only
-their t193 parenthetical kept;
-(c) RE-RUN the sitting adjudication FIRST if TRIGGER-A re-armed (baselines
-re-frozen by t193 at 5,721,578,066 B / Oct-29 13:22:12; the game was LIVE at
-session end at t=1086 and had NOT advanced a turn — if the next sitting
-shows turn advances with st4 ships present, that falsifies OQ-019's
-sole-residue clause and outranks this item; the t192 wmark window script is
-WRONG for resumed games — sequential suffix read + per-game grouping, see
-docs/re/_wip_t193.md F1).
-RATIONALE: OQ-026 is the only open row with a static path to a decision;
-OQ-005 needs the user's eyeball ruling (index.txt), OQ-016/OQ-021 residuals
-are capture/user-gated, OQ-019 needs turn-advancing play. Do NOT re-open
-byte+0x23 (t190), the scancode cascade (t191), the share law or the
-LIST==mask law (t192/t193 supersede cleanly), and do NOT re-run the cmp/
-test imm-operand census (t193 did it: 22 hits, zero lane-pool-scoped).
+NEXT t195: IMPLEMENT THE OQ-026 VISIBILITY LAYER IN THE REWRITE + PIN — the
+RE question was DECIDED t194 (ships.md S23 L9): vendor cosmos builder
+FUN_00028fc0 admits lane i iff lane rec+0x20 & viewer_mask != 0 (fogged lanes
+never drawn/clickable); stars always drawn, click gated by star+0x16/+0x17 &
+viewer (FUN_00028e70); viewer setter FUN_00021a84(idx): mask=(idx==0xff?0xff:
+1<<idx), also sets X_CUR; grants OR bits via the 0x46354-shape share law
+(t192: N=rand%3|6+1 per call, alliance doubles). Legs: (a) rewrite-side model
+per-empire lane visibility (bitmask per lane keyed to the existing star/lane
+map), reveal on explore/contact per the documented share-equivalent, plus a
+viewer concept for the player; keep it inside the sim's existing turn model —
+NO new file formats; (b) SA_KnowHomeWorlds / SA_KnowStarLanes get REAL effects
+(KnowStarLanes = all lane bits for the player; KnowHomeWorlds = star mask
+covering alien home stars) and leave FILED NO-OP in abilities.md ONLY AFTER
+the pin lands; (c) pin TEST(name: campaign_visibility_law_oq026_t195): hidden
+lane -> not visible -> reveal via share/contact -> visible; abilities flip
+visibility immediately; run full test suite + gate. Cite S23 L6/L7/L9 in the
+rewrite comments. Close OQ-026 when the pinned test + citations land
+(strict-close: the row's own closure bar is the rewrite surface).
+RATIONALE: this is the ONLY open row with a fully-cited law in hand and no
+user/capture dependency (OQ-005 needs the player's eyeball ruling; OQ-016/
+OQ-021 residuals are capture/user-gated; OQ-019 needs turn-advancing play;
+queue items t194-vision-oracle/t196/t197 remain queued — the pairing session
+ranked OQ-026 work above sheet work, and implementation is the remaining
+half of exactly that ranking). Do NOT re-open: the consumer hunt (t194 closed
+it — filter @0x2914e, sole reader of 0x89324), the regpair/shift enumeration
+plan (RETIRED), the share law (t192), LIST==mask (t193 superseded), byte+0x23
+(t190), the cmp/test imm census (t193). TRIGGER-A NOTE: baselines re-frozen
+t194 (tail md5 + full-ns mtime) — if a REAL sitting arms next session,
+adjudication (r1_t85g_sitting.py on the named dir, sequential-suffix window
+per _wip_t193 F1) still outranks everything: turn advances with st4 ships
+present would falsify OQ-019's sole-residue clause.
+
+LANDED t194 (2026-10-29, this session): OQ-026 RE QUESTION DECIDED
+AFFIRMATIVE — VISIBILITY CONSUMER MAPPED + LIVE WITNESSED, and the t193 FALSE
+ARM ROOT-CAUSED. (1) TRIGGER-A was a STALE-BASELINE false arm, not a new
+sitting: size == BASE_SIZE exactly (no append since t193), mtime delta 100 ns
+= t193 froze seconds-only, tail md5 differed because the 18.8 MB t193 append
+invalidated the t151-era tail edge that was never re-frozen; named dir's
+timeline tail = the adjudicated t=1086/13:22:12 rows; dosbox down; no new
+caps. FIX ENACTED: idle_probe BASE_TAIL_MD5 -> 9054cc6c..., BASE_MTIME_NS ->
+full ns 1793294532100000000, re-freeze rule documented; probe re-run prints
+TRIGGER A NEGATIVE. (2) STATIC (Ghidra ascend_restored.bin, decompiles +
+censuses): cosmos LIST BUILDER FUN_00028fc0 lane loop filters
+rec+0x20 & DAT_00089324 (the viewer mask) — withheld lanes get no entry, so
+painter FUN_000284bc never draws them (kind 0 star / 1 lane / 2 encounter)
+and they are unclickable; all 5 builder call sites are cosmos repaints.
+DAT_00089324 has EXACTLY one writer FUN_00021a84 (mask = idx==0xff?0xff:
+1<<idx; ALSO writes X_CUR 0x7458e — t192(c) 'paired mask' weak witness
+explained: same setter) and one reader (the filter). Second setter site
+0x2754f = debug species-toggle cascade (AL=[ESP+0x2c]-4 bounded by
+nraces@0x13b96>>16, or 0xff). STAR SIDE: builder adds stars unconditionally
+(+0x16 NOT consumed there — honest negative for star-withholding-by-draw),
+but star-click FUN_00028e70 gates select/lane-follow on star+0x17/+0x16 &
+DAT_00006774 (data-seg twin of the viewer mask, == 1<<X_CUR measured t192(c))
+— invisible star = unselectable. (3) RAM WITNESS (new
+scripts/r1_t194_viewer_mask_witness.py, RC=0): 20/20 Oct-29 mid-game saves
+mask@B+0x89324 == 0x01 (race-0 viewer), X_CUR==0, law 20/20, filter admits
+49/58 lanes => the 9 AI-only lanes (value 6, only bit-0-free value) WERE
+WITHHELD during real play. Addressing pitfall banked: 0x89324 lives in the
+RELOCATED IMAGE (B+X), X_CUR in the DATA SEG (B+D+X) — mixing them reads code
+bytes / zeros. (4) DOCS: ships.md S23 L9 (full law supersedes L8 'consumer
+UNMAPPED'); OPEN-QUESTIONS OQ-026 rewritten (open, closure bar now = rewrite
+implement+pin; residues: boot-arg value, AI-side audit); abilities.md
+SA_KnowHomeWorlds/SA_KnowStarLanes justifications updated (real original
+effects, disposition held until rewrite lands); docs/re/_wip_t194.md A1-A6.
+Gate 0 + LEDGER AUDIT OK (open = 005/016/019/021/026).
 
 LANDED t193 (2026-10-29, this session): TRIGGER-A = REAL MID-GAME SITTING
 adjudicated + THE SHARE PATH WITNESSED + t191 PAINTER LEAD DEAD + LEDGER ROW

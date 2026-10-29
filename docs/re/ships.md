@@ -1158,3 +1158,40 @@ L7 t193 MEASURED (mid-game witnesses; supersedes the L6 new-game negative):
   war (UI draws every star)" REPLACED with the measured mask facts +
   UNPROVEN-consumer status (GOAL.txt: a false justification must not stand
   as the cited reason; the FILED NO-OP disposition stands pending OQ-026).
+L9 t194 STATIC+RAM (CONSUMER MAPPED — supersedes L8's "consumer UNMAPPED" and
+  retires its regpair/shift enumeration plan): THE LANE-VISIBILITY FILTER IS
+  THE COSMOS LIST BUILDER ITSELF. FUN_00028fc0 (decompiled verbatim) builds
+  the cosmos display list (obj+0xb3 entries base, stride 0x15, entry {ptr,
+  kind u8 @+4}, count obj+0xb7, cap obj+0xb9, FUN_0002a428 grow). Its lane
+  loop (bound word [0x177d3]=nlanes): entry admitted IFF
+  `byte[lane_pool 0x16147 + 0x27*i + 0x20] & DAT_00089324 != 0`, kind=1 —
+  a lane without the viewer bit gets NO ENTRY => never drawn (FUN_000284bc
+  iterates exactly this list: kind 0 star sprite, kind 1 lane line via both
+  endpoint stars, kind 2 encounter), never clickable. All 5 call sites of
+  FUN_00028fc0 (0x26f67, 0x273df, 0x27454, 0x2758e, 0x2771c) are cosmos
+  repaints in the t191 cascade => filter applies to EVERY repaint.
+  VIEWER MASK LAW (0x89324, image segment): exactly one writer
+  FUN_00021a84 (0x21aa6 `MOV byte [0x89324],DL`) and exactly one reader
+  (0x2914e, the filter) — instruction census agrees with xrefs (2 refs).
+  FUN_00021a84(idx): mask = (idx==0xff ? 0xff : 1<<(idx&0x1f)); ALSO sets
+  DAT_0007458e = idx — THE t193 X_CUR IS THE VIEWER INDEX (t192(c) weak
+  witness mask==1<<[0x7458e] EXPLAINED: same setter). Callers: boot 0x21408
+  in FUN_00020fd4 (init/bootstrap; arg value [unverified] — regparm loss)
+  and 0x2754f (cosmos cascade debug species-toggle: AL=[ESP+0x2c]-4 bounded
+  by dword[0x13b96]>>16==nraces, or 0xff = reveal-everything viewer).
+  STAR SIDE: stars are ALWAYS listed/drawn (builder kind-0 adds un-
+  conditionally; the star+0x16/+0x17 masks are NOT consumed there), but
+  FUN_00028e70 (cosmos star-click handler) gates INTERACTION: select needs
+  star+0x17 & DAT_00006774, lane-follow needs star+0x16 & DAT_00006774 —
+  DAT_00006774 == the t192(c) data-segment paired mask byte (0x82bb0+0x6774):
+  same viewer mask seen from the data seg. Invisible star = unselectable.
+  LIVE WITNESS (Oct-29 mid-game saves 20/20, scripts/r1_t194_viewer_mask_
+  witness.py): runtime mask byte at B+0x89324 == 0x01 (race-0 Chamachies),
+  X_CUR == 0, law mask==(xcur==0xff?0xff:1<<xcur) 20/20 (weak: idx==0),
+  filter admits 49/58 lanes => 9 AI-only lanes (census value 6 = 180/20 per
+  save, the only bit-0-free value) WERE BEING WITHHELD from the cosmos
+  window during real play. OQ-026 ANSWERED AFFIRMATIVE: the UI withholds
+  fogged LANES (draw+click) and gates fogged STARS (click); closure route is
+  now rewrite-side implement+pin, NOT more RE (abilities.md SA_KnowHomeWorlds
+  / SA_KnowStarLanes: real effects exist -> the FILED NO-OP disposition must
+  be revisited when the rewrite models the layer).

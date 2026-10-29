@@ -472,19 +472,30 @@ site: shellRadiiFor(n) rewrite/src/game/mapgen.cpp replaces the i%50 wrap
 pins per-size shell runs (108 tests 0 failed) | CLOSED |
 Tail-residue note: gated chains exceed DAT T at low densities (records
 stay allocated past the in-play cut — consistent with the t78 caveat).
-OQ-026 | visibility | original HAS live per-empire lane/star visibility masks
-(lane rec+0x20, star obj +0x16/+0x17; share law FUN_00046354/FUN_00046524,
-t192) — rewrite models NO visibility layer at all; whether the vendor UI
-WITHHIDES fogged lanes/stars is UNPROVEN (consumer unmapped, ships.md S23 L8)
-| open | t193 MEASURED mid-game (Oct-29 sitting, 20/20 saves): pool +0x20
-census {1,3,6,7,11,15} x1160 recs, 100/1160 MULTI-BIT (share path fired),
-per-empire fog 9/8/25/32 of 58 lanes; scripts/r1_t193_midgame_witness.py;
-docs/re/ships.md S23 L7/L8. CLOSURE ROUTE: (1) enumerate mask consumers
-(byte-regpair/shift test forms beyond the 22 cmp/test hits; star-painter via
-LAB_00013bc5 consumers); (2a) if consumer HIDES -> implement reveal/sharing +
-pin test, upgrade SA_KnowHomeWorlds/SA_KnowStarLanes from FILED NO-OP
-(abilities.md t193 rows); (2b) if bookkeeping-only (AI/diplomacy) -> bank
-negative, close with that citation |
+OQ-026 | visibility | original WITHHIDES fogged lanes and gates fogged stars
+— CONSUMER MAPPED t194 (ships.md S23 L9): cosmos list builder FUN_00028fc0
+admits lane i iff lane rec+0x20 & viewer_mask(DAT_00089324) != 0 (no entry =>
+never drawn by painter FUN_000284bc, never clickable; all 5 builder call
+sites are cosmos repaints); viewer setter FUN_00021a84(idx): mask=(idx==0xff?
+0xff:1<<idx), ALSO sets [0x7458e] — X_CUR IS THE VIEWER INDEX (t192(c) weak
+witness explained); star obj +0x16/+0x17 gate selection/lane-follow in
+FUN_00028e70 (& DAT_00006774 = data-seg twin of the viewer mask); stars are
+always DRAWN. rewrite still models NO visibility layer | open | t194 MEASURED
++ STATIC (scripts/r1_t194_viewer_mask_witness.py, 20/20 Oct-29 mid-game
+saves): runtime mask byte B+0x89324 == 0x01 (race-0 viewer), law
+mask==(xcur==0xff?0xff:1<<xcur) 20/20, filter admits 49/58 lanes => 9
+AI-only lanes (mask value 6, the only bit-0-free value; 180/20 per-save
+census t193) WERE WITHHELD from the cosmos window during real play. RE
+question DECIDED AFFIRMATIVE — the t193 "consumer UNMAPPED" state (S23 L8)
+is SUPERSEDED; regpair/shift enumeration route RETIRED (the filter is a
+direct byte AND at 0x2914e, sole reader of 0x89324 program-wide). Row stays
+OPEN per strict-close until the rewrite SURFACE exists: implement the
+visibility layer (reveal = 0x46354-share-equivalent ORs; paint/click filter
+= viewer_mask AND) + pinned test; then upgrade SA_KnowHomeWorlds /
+SA_KnowStarLanes from FILED NO-OP (abilities.md t194 rows say the original
+effects are real). Residue inside this row: boot-site arg value at 0x21408
+[unverified regparm]; AI-side consumption of the masks (0x55f6e receive
+loop) not re-audited — UI answer does not depend on it. |
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — rewrite placeholder was 30 turns | CLOSED t100 | THE
 MEASUREMENT (aicode.md §6.4 + docs/re/_wip_t99.md F7-F11): charge period =
