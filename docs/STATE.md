@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T16:20
+updated: 2026-10-29T18:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,40 +253,82 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t196: OQ-005 RESIDUE TRIAGE VIA VISION ORACLE (queue item authored by
-the 2026-10-29 pairing session; full text in the "QUEUE AFTER t193" block
-below): render ALL 71 residue records with the corrected 6-bit palette
-(extend scripts/r1_t182_pngdump.py or write r1_t196_sheet.py reusing it),
-pack ~4 LABELED contact sheets (record name under each tile, failure-class
-grouped), vision_analyze each (proven recipe: layout, verbatim text, "what
-game-screen does each tile belong to"), bank per-record identifications to
-docs/re/shp.md S20 + work/r1/shp_png/ids.tsv. GOAL (pairing-session words):
-any residue identified into a known screen gives that screen's geometry as a
-dims candidate -- the OQ-005 dims-location route arriving WITHOUT play; flag
-tiles matching the 10status/2savegam/4loadgam style cluster (unseen SVGA
-question). The gauge-library item (queue entry then-labelled t196: render
-planres/planpro/planind/planitem, derive the planet-screen paint routine
-from the BINARY per user directive (a2), census per-planet level fields)
-FOLLOWS this one -- planind's 13 span-undersized residues are live UI art
-and sit inside this render set, so identification here feeds its dims
-evidence directly.
-RATIONALE: OQ-026 CLOSED t195 -- the last fully-cited, no-dependency RE row
-is gone; every remaining open row is user/capture-gated (OQ-005 eyeball
-rulings/dims, OQ-016 per-cell wiring, OQ-019 turn-advancing play, OQ-021
-end-ctrl firing). The pairing session ranked OQ-026 above the queue's sheet
-work and said the queue RE-QUEUES once OQ-026 is decided -- the vision-
-oracle item is its first re-queued entry and the only decision-bearing
-offline move (identification needs no eyeball; codec-correctness grading
-stays R13-reserved). If a REAL sitting arms first (TRIGGER-A baselines:
-full-ns mtime 1793294532100000000 / tail md5 9054cc6c, idle_probe re-frozen
-t194), adjudication via scripts/r1_t85g_sitting.py on the named dir STILL
-outranks everything (sequential-suffix window per _wip_t193 F1; a turn
-advance with st4 ships present would falsify OQ-019's sole-residue clause).
-Do NOT re-open: the visibility layer (CLOSED t195 -- consumer, share law,
-ability wiring; closed-ledger entry + ships.md S23 L10), the regpair/shift
-enumeration plan (RETIRED), LIST==mask (superseded), byte+0x23 (t190), the
-cmp/test imm census (t193), a 7th BLIND .shp codec sweep (FORBIDDEN -- this
-task is identification-by-context, not codec).
+NEXT t197: SHP SPAN-BOUND CORRECTION — VALIDATOR X-CLASS + REWRITE decode()
+FIDELITY (arrives from t196, docs/re/shp.md S20 items 2-3): (1) extend
+scripts/r1_shp_unifiedlaw.py with tag X = "canonical stream slot, canonical
+dims, EXACT-H row walk with NO [rec,nxt) bound" (keep V/A/B semantics and the
+FAIL definition otherwise; paint-profile note per record: trailing all-skip
+rows vs header-desync tail via the painted-per-row probe in
+docs/re/_wip_t196.md S4); re-run corpus -> new V/A/X/FAIL tally + libs-clean
+count, pin as its own gate stage ONLY if cheap (else cite in shp.md S21).
+(2) Rewrite decision with citation: rewrite/src/formats/shp.cpp decode()
+currently fails these 29 frames on the span bound; the blit (FUN_0005caac) has
+NO length arg and NO overrun error (-1 dims/@0x5cb2b, -2 empty clip/@0x5cb36,
+-3 outside/@0x5cea5 only) and draws from a verbatim whole-library cache copy —
+so faithful behaviour = walk exactly H rows unbounded, W/H sanity clamp 4096
+KEPT (1starmap k1-class dims 0x7ffffdbb must still be rejected). Update
+decode() contract comment (rows past span are real stream bytes; destination
+semantics unchanged), add pin test campaign/shp_span_free_t197: planind k0
+walks 99 rows, row-96+ content equals next-header-junk walk (deterministic),
+1starmap k1 still rejected, 3cfgnew k12 still rejected (EOF short), mouse k6/7
+still rejected (dims word invalid). (3) Regenerate work/r1/shp_png evidence
+via r1_t182_pngdump.py + ids.tsv X-tags; update the numbers cited in
+OPEN-QUESTIONS OQ-005 + shp.md S18/S20 headers. DO NOT re-open the dims-location
+claim for the 29 (t196 measured it); DO NOT touch cos_star k40..k51/mouse/
+1starmap k1/sg50expl k9 (paint-routine census is their next gate, queue item
+PER-PLANET ECONOMY FIELDS + GAUGE LIBRARY LAW keeps that slot — its (a2)
+paint-routine leg also decides those 16 + the level->record compression map).
+RATIONALE: t196 PROVED the OQ-005 "80 unknown-dims residue" framing is mostly
+a validator artifact — 29 records are full frames under the CLOSED dims law,
+and the rewrite (a validation asset per option C) currently refuses to decode
+live UI art (planind = the manufacturing gauge). Leaving decode() knowingly
+unfaithful is the one state worse than fixing it; the fix is offline, offline-
+sized, and testable without play. Vision oracle is INTERMITTENT on this
+deployment (works, occasional 500 'image input is not supported' — retry);
+R13 substantive ban unchanged: never self-grade codec correctness by pixels,
+never derive UI geometry from screenshots; label-digit misreads are a vision
+pitfall (trust triage_report.txt numbers).
+Do NOT re-open: the visibility layer (CLOSED t195), span-bounded-walk-as-vendor
+law (t196 refuted: blit has no length arg), planalNN-as-population-poses
+(killed t196 S20.4), the regpair/shift enumeration plan (RETIRED), LIST==mask
+(superseded), byte+0x23 (t190), a 7th BLIND .shp codec sweep (FORBIDDEN; the
+X-class tag is a bound correction on the CLOSED grammar, not a codec sweep).
+If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
+1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c), adjudication
+via scripts/r1_t85g_sitting.py on the named dir STILL outranks everything.
+
+LANDED t196 (2026-10-29, this session): RESIDUE TRIAGE VIA VISION ORACLE —
+the OQ-005 residue is LARGELY A VALIDATOR ARTIFACT. Trigger triage: timeline
+size == frozen baseline (no sitting), tree clean at t195. STRUCTURAL CUT
+[verified]: 71 FAILs = 26 EMPTY (zero stream bytes; expl*/sg*expl ladder-tail
++ k0-variant slots, dims word 0x7FFFFFFB-class) + 13 TINY (cos_star k40..k51,
+sg50expl k9) + 32 ART. UNBOUNDED WALK [verified]: from the canonical stream
+slot (rec+8 k0 / rec+0x18 k>=1) with canonical dims and NO span bound, 29/71
+complete EXACT-H (planind k0-12, 3cfgnew k0-11, 14intel k8, 1starmap k3/4/6);
+tail probe proves past-span rows are transparent skips (planind rows 96-98
+all-zero; row 95 = next-record header bytes 6b 00.. desynced into a fill run;
+1starmap/14intel tails paint 0.0 px/row). BLIT WITNESS [static S12]:
+FUN_0005caac has no stream-length arg, no overrun error code; cache = verbatim
+library copy => [rec,nxt) bound = OUR invention (t182 off-by-8 species).
+3cfgnew k12 = genuinely truncated at FILE EOF (55/79 rows). dims-location stays
+honestly open for exactly 16 non-walkable-dims records (cos_star x12, mouse
+k6/7, 1starmap k1, sg50expl k9) + the empty class. VISION IDs banked (5 passes
++ 1 retry after a 500 blip): planind=manufacturing factory ladder (+1 grey
+tank/level k8->k12); planres/planpro = monotonic k0..k20 level ladders (index =
+plausible level; ~60-level testimony implies a compression map, uncited);
+3cfgnew = new-game/race-config art (dot-wheels/shields/orbs — NOT a gauge);
+1starmap = star-map sprites ("NEXT TURN <ENTER>" verbatim); mouse = cursors
+("Exit <ESC>"); planitem = distinct item icons (not animation); planets = biome
+spheres; planal00 = cratered-surface crops -> population-pose hypothesis
+KILLED. VISION PITFALL banked: misreads small label digits (rows=77-95 read as
+7-9) — numbers from triage_report.txt only. ARTIFACTS: tools/shp_partialdump.
+{cpp,bin} (permissive walk, NO candidate search), scripts/r1_t196_sheet.py
+(RC=0), work/r1/shp_png/{ids.tsv, _t196_probe.json, sheets/sheet1..5 +
+triage_report.txt}. DOCS: shp.md S20 (law + amendment + pitfall),
+OPEN-QUESTIONS OQ-005 STATUS t196 (row stays OPEN — strict-close: 16 unknowns
++ player ruling remain), _wip_t196.md S0-S4. Ledger open set UNCHANGED =
+005/016/019/021. Gate 0 + LEDGER AUDIT OK + LEDGER INDEX OK.
+
 
 LANDED t195 (2026-10-29, this session): OQ-026 CLOSED — VISIBILITY LAYER
 IMPLEMENTED IN THE REWRITE + PINNED (the row's own closure bar). Trigger

@@ -572,6 +572,28 @@ with zero demotions; corpus now V 197 + A 1289 + FAIL 71 = 1557, libs clean
 186/208. Genuine residue 71 records/28 files (planind 13, 3cfgnew 13,
 cos_star 12, stragglers 46). Row stays OPEN — closure = player eyeball of
 the packet (R13); packet is ready to rule on.
+STATUS t196 (2026-10-29): VISION-ORACLE TRIAGE + SPAN-BOUND ARTIFACT FOUND —
+residue re-cut 71 -> 29 FULL-FRAME false FAILs + 16 non-drawable dims words +
+26 zero-stream EMPTY slots (1 overlap: 3cfgnew k12 EOF-truncated). MEASURED
+(shp.md S20): running the closed S9 grammar from the canonical stream slot at
+the canonical dims with NO directory-span bound completes EXACT-H for planind
+k0..k12, 3cfgnew k0..k11, 14intel k8, 1starmap k3/k4/k6; the blit
+(FUN_0005caac, S12) takes no length arg and has no overrun error code, and the
+cache is a verbatim whole-library copy, so the [rec,nxt) bound in
+scripts/r1_shp_unifiedlaw.py + rewrite ShapeLibrary::decode() is OUR validator
+artifact, not vendor law (same species as the t182 off-by-8 set). For these 29
+the dims-location answer is: canonical slots, exactly like every passing
+record. What stays OPEN honestly: dims-location for 16 records whose dims word
+is non-walkable (cos_star k40..k51 =0, mouse k6/k7, 1starmap k1, sg50expl k9)
+— closure class = paint-routine census or player ruling, not file probing —
+plus 3cfgnew k12 truncated at file EOF. Vision identifications banked
+(work/r1/shp_png/ids.tsv + sheets/): planind = manufacturing gauge ladder
+(factory grows +1 tank/level), planres/planpro ladders monotonic k0..k20
+(record index = plausible level index; player's ~60-level testimony implies a
+compression map, uncited), 3cfgnew = new-game/race-config art, 1starmap =
+star-map sprites ("NEXT TURN <ENTER>" verbatim), mouse = cursors + "Exit
+<ESC>", planitem = distinct item icons, planets = biome spheres, planal00 =
+cratered-surface crops (population-pose hypothesis KILLED). Row status OPEN.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge

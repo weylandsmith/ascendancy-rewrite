@@ -853,3 +853,103 @@ DARKNESS BUG FIXED; all-15-real verdict; interface-style anomaly noted
 - lgrace07/09/10 identity content-VERIFIED (Swaparamans/Shevar/Govorom) —
   law banked docs/re/species.md (lgraceNN = race-NN portrait, race-description
   + diplomacy screens).
+
+## 20. t196: residue TRIAGE via vision oracle + SPAN-BOUND was OUR artifact —
+## ART class dims ARE canonical [measured], residue 71 -> 16 real unknowns
+
+1. STRUCTURAL TRIAGE [verified, scripts/r1_t196_sheet.py + probe census,
+   snapshot work/r1/shp_png/_t196_probe.json, report work/r1/shp_png/sheets/
+   triage_report.txt]: per stream-bytes-available (span_end - stream_start):
+     EMPTY (0 B)  26 recs — 1starmap k1, destroy k14, expl00 k9, expl01 k8/9,
+       expl03 k0/9, expl04 k0/9, expl05 k9, expl07 k0, expl08 k0/9, orbex00
+       k8/9, sg37/45/47/49expl k0+k9, sg66expl k0/9, sg70expl k9. All carry
+       the S3 variant dims word (0x7FFFFFBB-class). Animation ladders truncated
+       at their last frame + whole-lib-0 variants.
+     TINY (1..8 B) 13 recs — cos_star k40..k51 (span 0x1b, dims word 0) +
+       sg50expl k9. Near-empty placeholder slots.
+     ART (>8 B) 32 recs — planind k0..k12, 3cfgnew k0..k12, 1starmap k3/k4/k6,
+       14intel k8, mouse k6/k7.
+
+2. THE DECISIVE MEASUREMENT — UNBOUNDED ROW WALK [verified]: running the S9
+   grammar from the canonical stream slot (rec+8 k0 / rec+0x18 k>=1) with the
+   dims AT THE CANONICAL SLOTS (rec / rec+0x10) and NO directory-span bound,
+   walking exactly H rows:
+     planind  k0..k12  13/13 EXACT-H (rows complete; walk crosses nxt)
+     3cfgnew  k0..k11  12/12 EXACT-H; k12 short 55/79 AT FILE EOF (the only
+              genuinely truncated record in the residue set)
+     14intel  k8       EXACT-H
+     1starmap k3/k4/k6 EXACT-H
+     mouse    k6/k7    not walkable: dims WORD invalid (W=0/H=0 at canonical
+              slots) — dims truly unknown OR slot never selected.
+   Cross-checks [verified]: tail rows past the span are transparent garbage —
+   planind rows 96..98 all-zero (skip ops), row 95 differs per record (sim
+   k8-vs-k12 = 0.234) while row 0 is IDENTICAL (sim 1.0): real frames are
+   ~95 rows, the tail is the walk desyncing over the NEXT record's header
+   bytes (visible in raw: row 95 begins 00 6b 00 00 ... = 107/99 header words).
+   BLIT CODE WITNESS [verified static, S12 arg map]: FUN_0005caac takes NO
+   stream-length argument (5 args: shape-struct, payload base, selector, x, y)
+   and its error set is {-1 missing dims @0x5cb2b, -2 empty clip @0x5cb36,
+   -3 fully outside @0x5cea5} — NO stream-overrun error exists. The blit walks
+   H rows and cannot know or care about the file directory span; the cache is
+   a VERBATIM whole-library copy (S10/S12), so the past-boundary bytes are
+   resident at draw time.
+   => THE [rec,nxt) WALK BOUND IN scripts/r1_shp_unifiedlaw.py + rewrite
+   ShapeLibrary::decode() is OUR VALIDATOR'S INVENTION, not vendor law. 29 of
+   the 71 "residues" decode EXACT-H with the closed dims law; they were FALSE
+   FAILs of the same species as the t182 off-by-8 set. The OQ-005
+   dims-location question for the ART class answers itself: dims live at the
+   canonical slots exactly like every passing record.
+
+3. HONEST REMAINDER after this correction (16 records, dims-location unknown
+   or never-drawable): mouse k6,k7 + 1starmap k1 + sg50expl k9 (dims word
+   invalid: 0-class or 0x7FFFFFFC-class, not walkable at any tested slot) and
+   cos_star k40..k51 (dims word 0 — blit would hit -1 missing dims @0x5cb2b;
+   [inferred] placeholder slots never selected); 3cfgnew k12 truncated at EOF
+   is broken vendor data outright. Closure of the placeholder class still
+   wants the player ruling / draw capture (R13 amendment below), but the
+   residue is no longer "80 records with unknown dims": it is 16 slot records
+   plausibly never drawn.
+
+4. VISION IDENTIFICATIONS [identification-by-context only, t193 oracle law;
+   per-record tsv work/r1/shp_png/ids.tsv; sheets work/r1/shp_png/sheets/
+   sheet1..sheet5, driver scripts/r1_t196_sheet.py, permissive renderer
+   tools/shp_partialdump.cpp]:
+   - planind.shp = MANUFACTURING gauge ladder CONFIRMED (factory on red soil;
+     k8->k12 adds exactly one grey storage tank per level — vision-counted;
+     growth sequence, k index = level [hypothesis pending paint routine]).
+   - planres.shp = research crystal ladder k0..k20 MONOTONIC (empty -> line/
+     triangle -> polyhedra -> dense faceted sphere); planpro.shp = prosperity
+     plant ladder k0..k20 MONOTONIC (bare grass -> sprout -> leafy -> flowering
+     bush). Vision: "no repeats, no out-of-order" — record index is a
+     plausible LEVEL index for BOTH (21 steps; player's ~60-level testimony
+     then implies a level->record compression map, still uncited).
+   - 3cfgnew.shp = NEW-GAME/race-configuration art: circular wheel-menus with
+     colored dots (k0-4, k7-9), purple/gold heraldic shields (k5-6), glowing
+     orbs (k10-12). NOT a gauge; distinct UI assets, no evolution.
+   - 1starmap.shp = STAR-MAP sprites + buttons; verbatim text seen on PASSED
+     neighbours: "NEXT TURN <ENTER>" (k0), "Exit <ESC>" (mouse.shp k6 tile).
+     k3/k4 = green/blue ship-class sprites, k6 = golden canisters.
+   - mouse.shp = cursor set (arrows on PASSED k0/k1); k6 partial shows an
+     "Exit <ESC>"-style button panel.
+   - planitem.shp = DISTINCT item/project icons (factory, crystal spire, military
+     base, domes ...), NOT animation frames -> current-project panel art,
+     consistent with OQ-014's 39-row item table (40 recs vs 39 items: one
+     spare/blank candidate, uncited).
+   - planets.shp = planet spheres varying by BIOME colour (grey/brown/green/
+     orange/rust/blue-purple) — planet-type set.
+   - planal00.shp = GREY CRATERED SURFACE crops (crescent + 4 closeups).
+     POSE-SET HYPOTHESIS KILLED: planalNN are NOT population-slot poses
+     (vision, asked directly: "No, these are surface textures"). Population
+     slot icons library remains UNIDENTIFIED (candidates narrowed by exclusion
+     heading into the paint-routine item).
+
+5. R13 AMENDMENT t196 [verified]: vision_analyze WORKS on this deployment
+   again (measured success on sheets 1,3,4,5 + CONTROL 17np) but INTERMITTENTLY
+   returns the old 500 'image input is not supported' (sheet2 first attempt);
+   retry succeeds. R13's substantive ban stands: never self-grade OUR codec
+   correctness by pixels, never derive UI GEOMETRY from screenshots;
+   identification-by-context of external/vendor art is legitimate (t193 law).
+   NEW PITFALL [verified]: vision misreads small label digits on contact
+   sheets (claimed "rows=7-9" where labels said rows=77-95; claimed k8 tile
+   text at a spot it wasn't) — trust the triage_report.txt numbers, never the
+   vision transcript's; icon counting stays player-wins (S19 law).
