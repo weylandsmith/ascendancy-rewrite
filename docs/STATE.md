@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T18:30
+updated: 2026-10-29T19:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,48 +253,67 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t198: GAUGE-LIBRARY PAINT-ROUTINE CENSUS (leg (a2) of the PER-PLANET
-ECONOMY queue item, docs/STATE.md queue; user directive 2026-10-29 "derive
-the visualization laws from the binary")
-FIND THE PLANET-SCREEN PAINT ROUTINE and read off, as cited asm: (1) the
-level->record select for the four gauges — which planres/planpro/planind
-record index is drawn for a given level, resolving the 21-records-vs-~60-
-level compression question (player testimony = hypothesis; the call site =
-the citation); (2) the population-slot fill rule (capacity-sized,
-uncolonized=empty circle, free=yellowish-forward vs busy=reddish-sideways —
-which selector values, and WHICH library the slot icons come from: t196
-killed the planalNN pose hypothesis, candidates now narrowed to
-planitem/planets or an unlisted lib); (3) as a by-product, whether ANY of
-the 44 residue records (cos_star k40-51, mouse k5/6/7, 1starmap k1,
-3cfgnew k12, 26 zero-stream EMPTY ladder slots) is ever SELECTED — a
-selected residue record means its dims come from somewhere other than the
-header (the honest OQ-005 remainder), an unselected one closes the
-"never-drawable placeholder" claim as evidence-backed residue.
-METHOD: Ghidra headless (scripts/ghidra_headless_up.sh, 127.0.0.1:8089);
-anchor on the shape blit FUN_0005caac's caller set (75 decoder sites
-already censused t83 — shp.md W3) intersected with the planet-screen
-cluster; widget descriptor law S11/S15 (desc+5 arg) identifies gauge
-widgets; .SAV corpus per-planet fields feed the level->record census only
-IF the paint routine reads a level dword (leg (b) of the queue item,
-economy.md — create, check nothing regenerates it). Bank to
-docs/re/planets-ui.md (create) + shp.md S22.
-SCOPE ~35 tool calls: if the paint routine is not localised by call 20,
-bank the narrowed chain as honest residue and run FINISH SEQUENCE.
-RATIONALE: this single routine decides FOUR open things (gauge level->
-record law, population slot law, slot-icon library, OQ-005 residue
-selection census) and is the user's explicit standing directive. The
-competing offline queue item (OQ-021 displayed-count write site) ends in a
-user ruling regardless of what static finds, and its t73b site recipe was
-refuted twice — it ranks below. Do NOT re-open: span-bounded-walk-as-vendor
-law (t197 final: walk bound = FILE; shp.md S21), the X-class tag as a
-"codec sweep" (it is a bound correction on the CLOSED grammar; a 7th BLIND
-sweep remains FORBIDDEN), dims-location for the 29 X records (canonical —
-t196/t197 measured), planalNN-as-population-poses (killed t196 S20.4), the
-visibility layer (CLOSED t195), the regpair/shift enumeration plan
-(RETIRED), LIST==mask (superseded), byte+0x23 (t190). If a REAL sitting
-arms first (TRIGGER-A baselines: full-ns mtime 1793294532100000000 / size
-5,721,578,066 / tail md5 9054cc6c), adjudication via
-scripts/r1_t85g_sitting.py on the named dir STILL outranks everything.
+NEXT t199: REWRITE WIRING OF THE t198 PLANET-UI VIS LAWS + POP-BAND PIN
+(pure code + docs; the t198 paint census left TWO rewrite-adjacent facts
+unwired): (1) the gauge record law selector(level)=clamp0..20(round(level^
+0.75)) for IND/RES (fields +0x44/+0x46) and identity-clamp for PROS (+0x48)
+is the CITED visual-compression law (docs/re/planets-ui.md S3) — the
+rewrite's UI currently draws plain circles (ui-runtime.md S2); at minimum
+add ShapeLibrary-side selector mapping + a pinned test over the t198 corpus
+distribution (IND max 77 -> rec20 at level>=53; PROS max 16 never
+saturates), OR document why rendering stays blocked on OQ-005 and pin ONLY
+the map law; (2) population band law SEL(i)=1+[i>=used(+0x4c)]+[i>=pop(
++0x42)] over i<cap(+0x4a), 10/row (planets-ui.md S4, 2900/2900 census) —
+rewrite campaign.cpp pop fields already exist (pop +0x42, usedPopFor +0x4c
+analog, cap +0x4a): add popBandsFor() + pin incl the used<=pop<=cap law;
+(3) fold the t196/t198 ids into shp.md S22 pointer line. Do NOT re-open:
+slot-library identity of [0x6fd90/2/4/9c] (zero direct writers — t198
+honest negative; needs live capture of the registration, BLOCKED class),
+cos_star 0x2925c selector semantics (next static candidate AFTER this),
+span-bounded-walk (t197), planalNN poses (t196), visibility (t195 closed).
+If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
+1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c), adjudication
+via scripts/r1_t85g_sitting.py STILL outranks everything.
+RATIONALE: the t198 directive output is a LAW with numbers; per GOAL.txt the
+loop's job is lifting such laws INTO the rewrite ("upgrading each rewrite
+default to the cited original behaviour"), and this is the cheapest possible
+landing (no Ghidra, no capture). The alternative static candidate (cos_star
+selector) only re-feeds OQ-005 residue, which needs the player anyway.
+
+LANDED t198 (2026-10-29, this session): PLANET-SCREEN PAINT ROUTINE CENSUS —
+THE GAUGE COMPRESSION LAW AND POPULATION BAND LAW MEASURED (user directive
+"derive the visualization laws from the binary"). Trigger triage: timeline
+size == frozen baseline (no sitting); tree clean at ab28629. ARTIFACT
+docs/re/planets-ui.md (hand-authored; economy.md deliberately NOT touched —
+gate-regenerated by gizmo_probe.py). KEY LAWS [all cited]: paint body
+0x3b96c (planwin.cpp; 12 blit sites; listing work/t198_planwin.asm);
+selector switch 0x3cc9f jmp *cs:0x27fe8(,key,4) with the TABLE READ LIVE
+(41.sav member image_off 0x3cb98 == [3cca7,3cd3b,3cdcf,3ce39,3cefd] —
+jump tables relocate, image bytes are code); gauge cases clamp0..20(
+round(pow(LEVEL,0.75))) with the double built as push 0x3fe80000/push 0
+(= 0.75, NOT 1.8125 — a caught mid-run misread of the f64 pair), FUN_00078a90
+=pow, FUN_00076e08=x87 round-to-nearest; fields IND=+0x44 RES=+0x46
+PROS=+0x48 (matches campaign.cpp:768); POP grid SEL(i)=1+[i>=+0x4c]+
+[i>=+0x42] over i<+0x4a, 10 per row (planets-ui.md S4). CORPUS CENSUS
+[measured 2900 records/20 saves via locator law; DAT_00043508 ptr law
+member=ptr+0x88 verified 20/20, 60.sav="Icarus II"]: IND max 77, RES max 52,
+PROS max 16; selectors span 0..20 non-uniformly; used<=pop<=cap 2900/2900
+-> the three band classes ARE the player's idle/free/empty testimony, now
+cited. OQ-005 by-product: planind k0..k12 X-class all inside drawable
+selector range (placeholder reading REFUTED); t197 past-span-band question
+ANSWERED (no clip override; one complete record per draw); 1starmap k3/k4 +
+3cfgnew k0 selected per windows.txt SHAPEITEM lines. HONEST NEGATIVES (row
+OQ-005 stays OPEN): slot-library identity of cache globals [0x6fd90/2/4/9c]
+(zero direct writers A3/89 05/C7 05 corpus-wide; registration path = live-
+capture class), cos_star 0x2925c selector semantics, 44 dims-unknowns.
+TOOLS: scripts/r1_t198_blit_callers.py (E8 byte-pass + module attribution:
+reproduces t83's 75 sites/53 functions; gwindow/planwin/planet/sssystem/
+shipwin map), scripts/r1_t198_site_context.py (context disasm + pool-string
+annots). PITFALLS BANKED (_wip_t198.md S0): Ghidra get_function_callers
+reports only 15 of 75 callers — byte-pass is authoritative; run_script_inline
+is POISONED by three pre-existing broken scripts in ~/ghidra_scripts (whole
+build skips); switch tables only readable from save members. Gate 0 +
+LEDGER AUDIT OK + LEDGER INDEX OK; open = 005/016/019/021.
 
 LANDED t197 (2026-10-29, this session): SPAN BOUND REMOVED + PYTHON/C++ SHP
 LAWS RECORD-EXACT UNIFIED. Trigger triage: timeline size == frozen baseline

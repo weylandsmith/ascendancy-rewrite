@@ -612,6 +612,21 @@ stays OPEN: dims-location unknown for the 44 (cos_star k40-51, mouse k5/6/7,
 1starmap k1, 3cfgnew k12 EOF-trunc, 26 zero-stream EMPTY + sg*/expl ladder
 singles + sg64expl k0); closure class unchanged = player ruling / draw
 capture (R13), never file-probing self-grading.
+STATUS t198 (2026-10-29): PAINT ROUTINE CENSUS (docs/re/planets-ui.md).
+Planet-screen paint body 0x3b96c (planwin.cpp cluster; 12 blit sites cited);
+selector switch 0x3cc9f table READ LIVE (41.sav member image_off 0x3cb98 ->
+[0x3cca7,0x3cd3b,0x3cdcf,0x3ce39,0x3cefd]). SELECTION CENSUS PARTIAL, cited:
+planind records are addressed by gauge selectors 0..20 (law:
+clamp0..20(round(IND^0.75)), IND=word [planet+0x44]) -> the 13 X-class
+records k0..k12 are ALL WITHIN THE DRAWABLE RANGE, "never-drawable
+placeholder" REFUTED for planind; t197's "do widgets show the past-span
+bands" question ANSWERED (no clip-rect override; each draw = one complete
+record's own stream per the S17 runtime table). 1starmap k3/k4 SELECTED via
+windows.txt SHAPEITEM lines (:456/:477), k6 not per those lines; 3cfgnew
+only record 0 selected (:612). OPEN remains: cos_star selector semantics at
+0x2925c (its k40-51 residue), slot-library identity of gauge/pop cache
+globals [0x6fd90/2/4/9c] (zero direct writers found — A3/89 05/C7 05 census
+over the whole image), and the 44 dims-unknowns. Row stays OPEN.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge

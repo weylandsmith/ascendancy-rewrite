@@ -1019,3 +1019,10 @@ DARKNESS BUG FIXED; all-15-real verdict; interface-style anomaly noted
    the 44 FAIL + 29 X non-V/A records. The SPAN-FREE renders' bottom bands
    are desynced bytes, NOT vendor art — labelled in index.txt; judge shape
    on the upper rows. Player eyeball remains the only closer (R13).
+
+## 22. t198 pointer
+
+Planet-screen SELECTION laws (gauge record map, population bands, per-record
+selected-ness census for planind/1starmap/3cfgnew) are banked in
+docs/re/planets-ui.md (paint body 0x3b96c; switch 0x3cc9f table read live).
+OQ-005 STATUS t198 in docs/OPEN-QUESTIONS.md carries the residue verdict.
