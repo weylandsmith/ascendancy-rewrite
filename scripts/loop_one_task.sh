@@ -86,6 +86,24 @@ while :; do
   [ -s "$LOOPDIR/LOOPSTEER.txt" ] && steer_wake=1
   [ -f "$LOOPDIR/FORCE_RUN" ] && { steer_wake=1; rm -f "$LOOPDIR/FORCE_RUN"; }
 
+  # TRIGGER C (t199): OFFLINE-QUEUE DRAIN. Triggers A (capture) and B (human
+  # edit) cannot see a queue the LOOP itself staged into NEXT ACTION, so the
+  # loop idled forever with t195 pending (t199: ran the two wake-woken tasks,
+  # then slept on a full queue). Marker law kept per t186: compare NEXT's task
+  # TAG (single awk field) against $LOOPDIR/last_task, written by POST-FLIGHT
+  # ONLY on an OK verdict of a NON-STEERED run — no prose diffs, and a steered
+  # run never marks the queue task done. Sentinels WAIT*/IDLE*/PARK*/steer/
+  # empty NEVER arm; empty last_task (fresh install) never arms.
+  next=$(awk '/^#+ *NEXT ACTION/{f=1;next} f&&NF{print;exit}' docs/STATE.md)
+  task=$(echo "$next" | awk 'NF{print $2; exit}' | tr -d ':')
+  [ -n "$task" ] || task=steer
+  queue_wake=""; steer_used=""
+  last_ok_tag=$(cat "$LOOPDIR/last_task" 2>/dev/null)
+  case "$task" in
+    WAIT*|IDLE*|PARK*|steer) : ;;
+    *) if [ -n "$last_ok_tag" ] && [ "$task" != "$last_ok_tag" ]; then queue_wake=1; fi ;;
+  esac
+
   # IDLE GATE (t178): poll triggers in SHELL before spending any model budget.
   # dirty tree => adopt interrupted work (launch regardless of probe);
   # probe RC=0 clean => IDLE: sleep, check STOP, no session, no journal row;
@@ -93,7 +111,8 @@ while :; do
   # probe RC=2 => trigger detector broken: park, never grade idle on it.
   armed_report=""
   if [ -n "$steer_wake" ] && [ -z "$dirty" ]; then log "WAKE: human steering queued (LOOPSTEER.txt/FORCE_RUN) — bypassing idle gate"; fi
-  if [ "$IDLE_GATE" = "1" ] && [ -z "$dirty" ] && [ -z "$steer_wake" ]; then
+  if [ -n "$queue_wake" ] && [ -z "$dirty" ] && [ -z "$steer_wake" ]; then log "WAKE: TRIGGER C queue drain ($last_ok_tag -> $task) — bypassing idle gate"; fi
+  if [ "$IDLE_GATE" = "1" ] && [ -z "$dirty" ] && [ -z "$steer_wake" ] && [ -z "$queue_wake" ]; then
     timeout 300 python3 "$IDLE_PROBE" > "$LOOPDIR/probe-last.log" 2>&1
     prc=$?
     if [ "$prc" = "0" ]; then
@@ -126,9 +145,7 @@ while :; do
     sleep 60; continue
   fi
 
-  next=$(awk '/^#+ *NEXT ACTION/{f=1;next} f&&NF{print;exit}' docs/STATE.md)
-  task=$(echo "$next" | awk 'NF{print $2; exit}' | tr -d ':')
-  [ -n "$task" ] || task=steer
+  # (t199) task/next extracted EARLIER (trigger C needs the tag pre-gate).
   log "iter $n: NEXT[$task] = ${next:-<unparsed>}"
   pre_head=$(git rev-parse --short HEAD 2>/dev/null)
 
@@ -146,6 +163,7 @@ while :; do
       echo; echo "STEERING FOR THIS ITERATION (overrides the NEXT ACTION assignment):"
       cat "$LOOPDIR/LOOPSTEER.txt"
       mv "$LOOPDIR/LOOPSTEER.txt" "$LOOPDIR/steer-used-$n.txt"
+      steer_used=1
     fi
     if [ -n "$dirty" ]; then
       echo; echo "INTERRUPTED PRIOR WORK DETECTED: git status is not clean — a previous"
@@ -190,6 +208,12 @@ while :; do
   else echo $((streak+1)) > "$LOOPDIR/fail_streak"; streak=$((streak+1)); fi
   printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$(date '+%F %T')" "$n" "$verdict" "$rc" "$task" "$committed" \
     >> "$LOOPDIR/journal.tsv"
+  # (t199) trigger-C marker: an OK verdict on a NON-steered run means NEXT's
+  # task tag was actually done, so the queue advances; a steered run ran
+  # different work and MUST NOT mark it. NO_COMMIT/KILLED/GATE_RED never mark.
+  if [ "$verdict" = OK ] && [ -z "$steer_used" ]; then
+    echo "$task" > "$LOOPDIR/last_task"
+  fi
   if [ "$post_head" != "$pre_head" ]; then
     log "iter $n: $verdict rc=$rc task=$task | HEAD $pre_head -> $post_head (ADVANCED)"
   else
