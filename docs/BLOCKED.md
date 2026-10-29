@@ -409,3 +409,17 @@ contradicts it: adjudicate the pair, then act.
 CONSEQUENCE: with B2 fixed, the loop will now genuinely IDLE while the offline
 queue is empty. That is correct behaviour, not a stall — re-arming requires a
 new capture or a user decision (see the decision surface in docs/STATE.md).
+
+## t187 (2026-10-29) — decision surface for the LIVE sitting (not a work
+## block; the loop keeps working). Player is mid-campaign (turns 1335+,
+## dosbox pid 260973). Asks, in priority order: (1) if a Control-victory
+## screen EVER appears (DAT_482fb is at 21/50, boundary 25), say so
+## immediately — that testimony closes OQ-021 under strict-close; (2)
+## propose alliance to Orfa while attitude is high (AI-side drifting
+## 526->535+ unattended, ACCEPT=570) — acceptance closes OQ-023; (3) one
+## line of testimony on which ships were given magnetron/instant-transit
+## orders vs plain lane orders — disambiguates the 1100-2500u position
+## discontinuities in the t188 scale-law extraction. Best default while
+## unanswered: treat the discontinuities as UNVERIFIED frame reframes
+## (a 5->4->5 round trip one turn apart argues against magnetron) and
+## keep all rows open.

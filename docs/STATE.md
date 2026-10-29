@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T21:50
+updated: 2026-10-29T00:15
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -238,28 +238,56 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t187: IDLE — SLEEP, DO NOT LAUNCH-BY-EXCITEMENT. As of t186 the idle
-gate is TRUSTWORTHY: the trigger-B arm we kept seeing for nine iterations was
-the probe quoting the loop's own commit subject back to itself (fixed in
-scripts/r1_idle_probe.py B2, pinned by gate stage 3u +
-scripts/r1_t186_b2_regression.py; docs/BLOCKED.md t186). With the offline queue
-EMPTY (t185 closed the last static candidate), a correct VERDICT is now
-"IDLE — neither trigger" and loop_one_task.sh will sleep IDLE_SLEEP between
-polls. THAT IS THE EXPECTED STEADY STATE, not a stall. A session may only be
-launched when: (A) live-timeline.jsonl actually grew (then run
-scripts/r1_t85g_sitting.py on the new ring, then the OQ-021/OQ-023/OQ-019
-flight-delta menu — stop-report.md §2/§4); (B) VERIFIED trigger B: human-region
-prompt delta or foreign untracked/committed file — READ the cross-checks
-(B3/journal, tree-clean lines) before believing any single arm line; or (C) a
-human names a task. The decision surface the player owes is on disk and
-unchanged: (1) OQ-005 eyeball packet work/r1/shp_png/index.txt (15
-RENDERED/VALIDATED PNGs, 65 DECODE-FAIL rows; CONTROLS first); (2) accept/reject
-documented defaults OQ-003/OQ-005/OQ-019/OQ-023 (stop-report.md §3); (3)
-authorize a capture sitting that FLIES ships; (4) resume t89a-scale code work if
-strict-close is relaxed. RATIONALE: inventing offline work is forbidden
-(R1/GOAL standing decisions: no fifth static base scheme, no 7th shp sweep);
-spending sessions re-checking triggers is what t178 forbade and what the t186
-self-arm bug made unavoidable until now.
+NEXT t188: EXTRACT THE FLIGHT SCALE LAW from the banked sitting corpus
+(work/r1/t187_scale_dump.txt + work/r1/playcap, turns 1255..1335+; tools
+scripts/r1_t187_scale.py / r1_t187_delta.py — re-run against the LATEST
+timeline first, it may have grown far past t1335). Three decisions the
+dump forces, in order: (1) COORDINATE FRAME of ship xyz [+0x9e] vs star
+table f32 coords — the 1100-2500u "discontinuities" that coincide with
+state4<->5 flips and [+0x59] order changes are UNVERIFIED; disambiguate
+system-local reframe vs real instant transit (check whether the jump
+landed a ship ON a star-table record position, and whether k59 became/
+left kind-5 per the magnetron path 0x220a8 — a 5->4->5 round trip one
+turn apart argues AGAINST magnetron). (2) THE SCALE NUMBER: lane movers
+step exactly 14/28/56 u/turn paired with MOVES=6/12; owner-1 4.67=14/3 —
+derive units-per-MOVES-per-day and tie (or refute) the sugar-cube=160u
+hypothesis from ships.md §17 (walk/steps)*32*5 — if 14 = 160*MOVES/6.857
+nonsense, the honest output is the measured ratio plus a citation of
+which constant pool word the walk body reads live. (3) state4 vs state5
+SEMANTICS from the cited writers (0x4a034..0x4a23d landing path sets +0x58
+:=4; 0x4cd16 placement :=5 — check the 0x21f58 commit path). Output =
+ships.md §21 + OQ-019 status update; row CLOSES ONLY if the numbers tie
+with citations (strict-close). PRE-CHECK before any of it: cheap greps —
+`grep -o 'sel=[1-9]' work/r1/playcap/watch.out` and
+`grep -c 'DAT_482fb=2[5-9]'` — if either fires, THAT measurement
+(OQ-021 comparator / victory screen testimony) OVERRIDES this task per
+the flight-delta menu; and if relation cell 3 appears
+(r1_t187_delta.py), bank + surface OQ-023 acceptance first.
+RATIONALE: t187 proved the capture-gated premise dead — first state-4
+corpus EVER is on disk and unsqueezed; every offline question else is
+closed and the OQ-021/OQ-023 closers need player outcomes we can only
+watch for, not work.
+
+LANDED t187 (2026-10-28/29, this session): TRIGGER A WAS REAL AND THE
+PLAYER IS FLYING SHIPS. Live at launch: dosbox pid 260973, timeline
++2.47MB, turns 1255->1335 during the session (dir named by trigger
+playcap-20261014-224611 = stale Oct-14 all-turn-0 dir, NOT the ingest;
+shared work/r1/playcap is). Adjudication (r1_t85g_sitting.py RC=0 +
+r1_t187_delta.py RC=0, 45140 trusted pts): (a) FIRST state-4 rows ever
+observed x1115 (state5 x584) — t49/t58 zero-flight corpora argument
+SUPERSEDED, ships.md S20 banks the raw regularities (14/28/56-u lane
+steps vs MOVES 6/12; 4.67=14/3 owner-1 steps; frame-reframe ambiguity
+flagged); OQ-019 residue capture IN HAND, law extraction queued t188.
+(b) FIRST 2->1 WAR->PEACE transition banked (diplomacy.md S15); state 3
+still UNOBSERVED (honest negative, row open) BUT Orfa AI-side attitude
+drifted 526->535 unattended (+3/~3-4 turns) — extrapolated 570 crossing
+~t1295-1300; PLAYER ASK: propose alliance when high. (c) OQ-021: new
+DAT_482fb highs 16 then 21/50 with systems_full=34/50=68% and selector
+still never armed in ANY trusted row (score.md S8) — boundary is 4 units
+away, passive test continues. (d) mid-turn POWER burn now census-observed
+for all three AI owners (live corroboration of the t183 round-robin min-
+fuel law). Dumps archived work/r1/t187_{sitting,scale,delta}_dump.txt.
+Gate 0 + LEDGER AUDIT OK + LEDGER INDEX OK. WIP: docs/re/_wip_t187.md.
 
 LANDED t186 (2026-10-28, this session): THE IDLE GATE WAS ARMING ITSELF —
 diagnosed, fixed, pinned. Trigger A re-confirmed NEGATIVE from the report

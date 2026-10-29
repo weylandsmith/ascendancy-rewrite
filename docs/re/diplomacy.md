@@ -468,3 +468,28 @@ against 0x162 @0x260eb. Those are a DWORD store and a non-{0..3} compare, so
 they are a DIFFERENT record's +0x1c0/+0x162 fields, not the relation-state
 byte (the cell is written byte-wise with imm in {0,1,2,3} and read byte-wise
 against exactly {0,1,2,3} — 23/6/20/23 compare sites respectively).
+
+## §15 — t187 LIVE sitting (2026-10-28 23:40 EDT, turns 1255..1335+):
+### first WAR->PEACE transition banked; Orfa attitude drifting UP unattended
+
+First-row relation snapshots per turn (scripts/r1_t85g_sitting.py RC=0 on
+work/r1/playcap, 45140 trusted pts):
+- t1254 row: states0 = [0,1,2,2] AND states2[0] = 2 — the reciprocal 1->2
+  war-declaration pair (t85b law re-confirmed in a fresh window), att2[0]
+  477->437 (-40 DECLINE penalty consistent).
+- t1255 row: BOTH cells are back to 1. This 2->1 direction had NEVER been
+  banked (§12 explicitly listed "peace ... NOT banked"). One reciprocal
+  WAR->PEACE transition, MEASURED, sustained 0 turns (declared and made
+  peace inside the same ~1-turn autosave granularity — player action,
+  exact UI sequence untestified).
+- STATE-3 CELLS: ZERO across every trusted row t1255..1335
+  (scripts/r1_t187_delta.py). Row OQ-023 STAYS OPEN — honest negative.
+- NEW UNATTENDED TREND: att[Orfa->Chamachies] (AI side, the row t85g put
+  at 526 after the proposal) is DRIFTING UP on its own: 526@1254,
+  529@1261, 532@1271, 535@1284 — +3 per ~3-4-turn interval, consistent
+  with vendor AI-side trade cadence rather than player action
+  (att0[1] is frozen at 590 the whole window, so the player is NOT
+  gifting). Linear extrapolation crosses ACCEPT_ALLIANCE=570 around
+  t1295-1300 IF the cadence holds. PLAYER ASK (banks the closure):
+  propose alliance to Orfa once in-game attitude reads high; acceptance
+  writes a cell holding 3 -> row CLOSES.

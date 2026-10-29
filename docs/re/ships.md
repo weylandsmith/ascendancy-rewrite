@@ -789,3 +789,32 @@ CORPUS NOTE (corrects t184's "20/20 saves" phrasing): the cap-law corpus is
 1234 owned rows spread over 49 save FILES across work/r1 run dirs (t184's
 own print says saves_with_ships=49); empty-scenario probe boots
 (dword@0x43489>>16 == 0) are headless thread-probe runs, not corrupt saves.
+
+## S20 — t187 FIRST FLIGHT CORPUS EVER (live sitting 2026-10-28, t1255..1335)
+
+The BLOCKED-USER premise is DEAD: with the player flying ships, state-4
+rows are OBSERVED (new-window census: state3 x717, state4 x1115, state5
+x584; scripts/r1_t187_delta.py). t49's "2260 obs 0 state-4" and t58's
+zero-flight corpora are superseded as *arguments* (still valid as what
+idle play yields). Full dump: work/r1/t187_scale_dump.txt (scripts/
+r1_t187_scale.py, RC=0). Raw regularities banked BEFORE law extraction —
+the extraction itself is the t188 task, nothing here closes OQ-019:
+1. state5 steady movers step EXACTLY 14/28/56 world-units per turn along
+   a pure-x lane line (slots 10,13,16,22,22,26,30,34: d=(14|28|56,0),
+   z frozen). Pairing: MOVES[+0x94]=12 -> 28/day; MOVES=6 -> 14/day;
+   owner-1 MOVES=4 -> 4.67/day (= 14/3, THREE sub-steps? interpolation
+   across autosave rows). 14 = 160/11.43 no clean sugar tie; 28 = 14x2.
+2. state4 <-> state5 flips coincide with the [+0x59] order byte changing
+   (e.g. 244->165->244, 27->69->27) and with position DISCONTINUITIES of
+   1100-2500 units at turn boundaries (slots 17,20,29: 5->4 jump -1905,
+   then 4->5 back +1732 one turn later, z small deltas). DO NOT read
+   these as instant 1200-unit flights — the working reading (UNVERIFIED)
+   is coordinate reframe between system-local and lane frames; t188 must
+   disambiguate (magnetron would show kind-5->4 via 0x220a8, not a 5->4->5
+   round trip one turn apart).
+3. mid-turn POWER [+0x88] diffs now span ALL THREE AI owners (x149/x50/
+   x57 sitting window t>=1240): AI ships burn fuel per resolver sweep,
+   corroborates t183 round-robin FUN_00041260 min-fuel pick law live.
+4. slot13 series shows a lane FLIP mid-window (z=1824 -> z=-1824 at
+   t1277->1280, xy reset 224 -> 28): same lane line opposite direction —
+   turn-around or re-order; k59 stays 244.

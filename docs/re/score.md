@@ -204,3 +204,16 @@ dos4gw.exe ships in game/). NOTHING multiplayer exists in the code —
 the prior score.md 'gate 2 (multiplayer-off screen)' label is hereby
 corrected: gate 2 compares DAT_10ba0 against window field [ebp+0x58e]
 (a toggled toggle per 0x2736f-0x27397), not a multiplayer state.
+
+## S8 — t187 passive test continues (2026-10-28 live sitting):
+DAT_482fb new highs WITHOUT selector arming: series t1255:14, t1261:12,
+t1262..1267:15, t1271..1277:16, t1284:21 (T=50, systems_full=34,
+systems_any=36 in the same rows). selector_byte == 0 in ALL 45140
+trusted rows (r1_t187_delta.py; still zero-ever-armed across the whole
+file scan). systems_full at 68% share with no arming re-confirms §S6's
+systems_full-is-NOT-the-variable law at a NEW operating point. The
+comparator boundary test (>=25 on DAT_482fb) is now 4 units away — if a
+victory screen appears or sel arms, THAT is the closing measurement;
+until then row OQ-021 STAYS OPEN (strict-close; consistent-with >1/2
+only). Watch.out grep for sel=[1-9] and DAT_482fb>=25 is the cheap
+next-iteration check.

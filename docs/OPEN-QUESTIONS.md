@@ -274,6 +274,14 @@ window). Passive capture keeps banking it every slot; a DECLARATIVE test
 exists now that nougat.lf is live: press C on the starmap (debug State-
 of-Galaxy, docs/re/debugflags.md S t85f) and read PERCENT CONTROLLED —
 that prints the comparator's own formula output 100*DAT_482fb/T.
+STATUS t187 (2026-10-28 LIVE sitting, rows t1255..1335): passive test
+continues with NEW HIGHS and still no arming — DAT_482fb 14->15->16->21
+(T=50; systems_full=34, systems_any=36 same rows), selector_byte 0 in
+every trusted row (45140 pts, docs/re/score.md S8). 68% full-system share
+with zero arming re-confirms systems_full-is-not-the-variable at a new
+operating point. Boundary test is 4 units away (>=25); row STAYS OPEN —
+if a Control-victory screen appears in this sitting, bank it IMMEDIATELY,
+that is the closing measurement. | open |
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719
@@ -336,6 +344,16 @@ below the Orfa's 570 attitude threshold, measured). Vendor debug names
 (raise attitude with gifts, propose, watch the cell) OR the queued static
 scan t180: find code that stores the value 3 into a relation-state byte -
 named by t85g, never run.
+
+STATUS t187 (2026-10-28 LIVE sitting): FIRST-EVER reciprocal WAR->PEACE
+(2->1) banked (declared and made peace within one autosave granularity,
+docs/re/diplomacy.md S15) — the enum rung transitions are now 0->1, 1->2,
+2->1; state 3 remains UNOBSERVED across 45140 fresh trusted pts (honest
+negative, row stays open). NEW: the Orfa AI-side attitude is drifting up
+UNATTENDED 526->535 over t1254->1284 (+3 per ~3-4 turns, player-side
+att frozen); extrapolated 570-crossing ~t1295-1300. PLAYER ASK banked in
+STATE.md: propose alliance to Orfa while playing — an accepted alliance
+writes the cell holding 3 and CLOSES this row.
 
 STATUS t180 (2026-10-28, STATIC route RUN — the t85h/t85g-named scan nobody
 ran): ANSWER TO "does code store 3 into a relation-state byte" = YES, three
@@ -1095,6 +1113,18 @@ OPEN on strict-close: the sole residue is the live flight-delta
 arrival-granularity capture (BLOCKED t48); every offline question named on
 the row is now closed. NEXT: offline queue EMPTY — re-arm idle, surface
 the decision list (OQ-005 eyeball index.txt first).
+STATUS t187 (2026-10-28 LIVE sitting — THE FLIGHT CORPUS EXISTS NOW):
+state-4 rows OBSERVED for the first time (x1115 in t1255..1335; state5
+x584, state3 x717) — the t49/t58 zero-flight corpora argument is
+SUPERSEDED; the capture BLOCKED t48 demanded is IN HAND and the sitting
+was still live at session end (turns 1335+). Raw regularities banked
+docs/re/ships.md S20 (14/28/56-unit-per-turn lane steps paired with
+MOVES=6/12; owner-1 4.67=14/3 sub-steps; state4<->5 flips coincide with
+[+0x59] order changes AND 1100-2500u position discontinuities whose
+frame-law reading is UNVERIFIED — coordinate reframe vs real instant
+transit must be disambiguated). t188 TASK: extract the scale law from
+scripts/r1_t187_scale.py output + the star table (star f32 coords vs
+ship xyz frames) and pin or refute; row stays OPEN until cited. | open |
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:
