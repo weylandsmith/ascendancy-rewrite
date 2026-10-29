@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T01:55
+updated: 2026-10-29T05:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -242,52 +242,55 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t190: IDENTIFY THE LANE-RECORD STRUCT AND THE WRITER OF ITS BYTE
-+0x23 (close the S22 L4/L6 residue, OQ-019).
-t189 pinned the march law in FUN_0004a74c (ships.md S22): handle H :=
-[ship+0x59] is a LANE-RECORD pointer — ptr[H] and ptr[H+4] are two
-endpoint records whose f32 coords at +8/+c/+10 feed the chord length
-(same layout as star records), and byte[H+0x23] bit0 selects the 1/3
-multiplier (moffs 0x263b pool word, live-measured 0.333333 all saves
-41..60).
-Task: static hunt of WHO builds these records and what +0x23 means.
-Hammer 1: in a save where st5 rows exist the pointer window sits at
-linear 0x258000..0x258FFF — but those saves are GONE (ring rotation);
-rebuild structurally instead: xref FUN_0004a74c's H consumers, walk
-backwards to the writer of [ship+0x59] for kind-5 lane orders (issuer
-FUN_000220a8 t185 validates the lane choice — follow its lane-record
-lookup), and find the loader/allocator of the record table (candidates:
-t52 matrix producer FUN_00023e00 fills DAT_00045beb — check whether it
-ALSO builds pointer records, and whether the record +0x23 byte derives
-from the lane matrix value or a starlanes.txt field). Close byte[H+0x23]
-with cited disasm (what sets it, per-lane) and pin into ships.md S23;
-row closes only if the flag's SEMANTICS are cited (strict-close) —
-honest output otherwise is the writer chain + record layout.
-PRE-CHECKS first (cheap greps, may override): (1) REAL new turns? tail
-work/r1/playcap/live-timeline.jsonl for turn>0 rows past 1335 — the
-ring currently holds only t=0 new-game rows; if real campaign rows
-reappear AND dosbox is running, that changes everything (live handle
-window readable = direct gate witness, skip straight to the dump:
-ship windows + linear bytes 0x258000..0x259000 per frame); (2) `grep -o
-'sel=[1-9]' work/r1/playcap/watch.out` / `grep -c 'DAT_482fb=2[5-9]'` —
-OQ-021 override; (3) MOOT since t189b: OQ-023 is CLOSED (state-3 event
-observed t1335, docs/re/diplomacy.md §16) — do NOT re-open, do NOT re-scan;
-if a SECOND alliance appears, bank it in §16 as corroboration only.
-SECONDARY if t190 runs dry early (same session, same doc): identify the
-stride-0x1ee species table at DAT_00012fb3 (base = diplomacy race-table
-base 0x12e16 + 0x19d — NB row+0x19d is the t99 ABILITY NUMBER, so the
-lane code reads byte(race-row + 0x19d + 0x12): find what lives at +0x1af
-and who writes it; a row where col byte == 0x12 doubles lane speed).
-THEN QUEUED (t189b un-deferred, do not drop): t184 'l'-reveal static hunt —
-the OBSERVATION is now player re-confirmed (docs/re/debugflags.md, caution
-lifted 2026-10-29) but zero `cmp al,'l'` sites exist image-wide; hunt the
-scancode 0x1E path / dispatch-table indirection near 0x79950..0x79c20.
-Also queued: OQ-021 comparator sweep over the NEW window against per-star
-control fields (docs/re/diplomacy-adjacent: OPEN-QUESTIONS OQ-021 STATUS
-t189b — the displayed count itself needs its producing write-site).
-RATIONALE: every capture-gated closer stays watching-only (dosbox down,
-new game at t=0); the lane-record writer is the last OQ-019 residue with
-a static path, and S22 just narrowed it to one byte.
+NEXT t191: THE `l` STAR-MAP REVEAL STATIC HUNT (OQ-unrowed debugflags item;
+t184 queue item, re-armed and un-deferred by t189b — the OBSERVATION is
+player re-confirmed 2026-10-29: 'l' displays all star lanes; docs/re/
+debugflags.md). Anomaly: ZERO `cmp al,'l'` sites image-wide (t85f). Hunt
+the scancode 0x1E path / dispatch-table indirection near 0x79950..0x79c20
+(keydown dispatcher region banked t85f); the b-sting page proves an
+"All starlanes exposed" flag with OR-sticky semantics — find the FLAG
+WRITER (lane-drawing predicate candidates: readers of any byte/word that
+also gates lane painting in the cosmos window, e.g. near the S23 hop-
+matrix consumers 0x25b81/0x2624a or the shp lane-paint path). Deliverable:
+cited key->flag chain in debugflags.md, or the honest negative (no static
+path: flag set by a cheat-code string compare table, then locate THAT).
+SECONDARY if the hunt runs dry early (same session): lane rec+0x20 side-
+field writers (power-of-two values {1,2,4,8,16} MEASURED in the S23 pool
+census, zeroed at alloc 0x248ab — grep writers of [rec+0x20] over lane-
+pool-congruent pointer derefs; ships.md S23 L5).
+RATIONALE: capture-gated closers all stay watching-only (dosbox down, ring
+holds only t=0 new-game rows; OQ-019's sole residue is now the LIVE st4
+march window, OQ-021 needs colonize-past-50%/`c` press, OQ-005 needs the
+player's eyeball ruling) — the 'l' hunt is the only queued item with a
+static path and a human-confirmed observation. t190 closed the lane-record
+question completely (ships.md S23): do NOT re-open byte+0x23.
+
+LANDED t190 (2026-10-29, this session): LANE-RECORD STRUCT + byte+0x23
+SEMANTICS CLOSED WITH MEASUREMENT (ships.md S23; OQ-019 updated, stays OPEN
+on the live-st4 residue). Intake: steering note in prompt-112 was t189b =
+already landed at HEAD 6f4ad8d (tree clean) -> worked STATE NEXT; all
+pre-checks negative (ring tail = turn 0 rows wall 00:12:43, dosbox down,
+'sel=[1-9]' zero, DAT_482fb=2[5-9] 0). Proved: (a) lane record = 39-byte
+pool rec at data-seg+0x3337 (member B+0x82bb0+0x16147, physical 0x258147
+this run; rec+0/+4 = star OBJECT ptrs per allocator FUN_00024834
+0x248af/0x248b1; cap 148 0x2485f; LIVE congruence: rec.b star-idx
+39/29/27/16/37 all integral 20/20 saves); (b) bit0 writer census =
+EXACTLY {0x247f7 OR 0x1} (bridge-lane creator FUN_0002446c; never cleared);
+(c) r1_t190_lane_pool.py RC=0: nlanes=58 on 50 stars, +0x23 {0:recs0..49,
+1:recs50..57} 20/20 — bit0 == BRIDGE-LANE MARKER, x1/3 gate slows the
+connectivity filler lanes, and t189's fast/slow handles are pool-congruent
+mod 39 (deltas 39x{5,52,56,57}) — handle==lane-ptr CONFIRMED, the S22
+L4/L6 confound is resolved (no species difference needed); (d) gate2 species
+col +0x12 has NO 0x12 in rows 0..23 in ANY of the 20 LIVE tables (stronger
+non-witness; scenario-scoped non-claim); (e) t52 en route: ONE 100-linear
+hop matrix data+0x32ddb == folded DAT_00045beb (FUN_0002351c loads authored
+lanes from the SAME pool then BFS-fills hop counts; t52's "two buffers /
+diagonal not 1" = wrong base window), pipeline = FUN_000234a4 {0x2351c;
+loop{23e00 NN-phase; 24018+2446c bridge-phase} while components>1}; (f) the
+"scenario object" == the obj0 DATA SEGMENT (every S+offset folds: S+0x2ea ==
+species table 0x12fb3 exact). Side-found unattributed: rec+0x20
+power-of-two field {1,2,4,8,16} (S23 L5). Gate 0 + LEDGER AUDIT OK. WIP:
+docs/re/_wip_t190.md; tool work dump work/r1/t190_pool_dump.txt.
 
 LANDED t189b (2026-10-29, this session; steering-note merge iteration):
 OQ-023 CLOSED — first state-3 (ALLIANCE) event banked and INDEPENDENTLY

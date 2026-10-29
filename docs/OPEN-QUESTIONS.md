@@ -1194,8 +1194,28 @@ HANDLE gate carries the 1/3, the species gate the 2.0. Row STAYS OPEN
 (strict-close): gate2 has zero observed witnesses and byte[handle+0x23] /
 species-col-0x12 semantics are unmapped (old-game handle bytes destroyed by
 the ring rotation).
-Closure path: ONE watcher run dumping the handle window ptr+0x20..+0x28 (and
-the species row) during a known march. | open |
+STATUS t190 (2026-10-29, ships.md S23, cited): THE LANE-RECORD STRUCT AND
+byte+0x23 SEMANTICS CLOSED WITH MEASUREMENT — lane record = 39-byte pool
+rec (data-seg+0x3337, stride 0x27, cap 148; rec+0/+4 = star-A/star-B OBJECT
+ptrs, allocator FUN_00024834 0x248af/0x248b1; +0x23 never initialized);
+bit0 has EXACTLY ONE writer image-wide (0x247f7 OR 0x1 inside FUN_0002446c,
+the connectivity-BRIDGE creator; never cleared) and MEASURED 20/20 live
+new-game saves: +0x23==1 on recs 50..57, ==0 on recs 0..49 (nlanes=58, 50
+stars, matrix one-pairs=58; scripts/r1_t190_lane_pool.py RC=0) — bit0 =
+"bridge lane, not a real starlane" => THE x1/3 GATE SLOWS BRIDGE LANES;
+t189 fast/slow handles congruent to the pool base mod 39 (deltas
+39x{5,52,56,57}) = handle identity CONFIRMED, corpus fully explained.
+Gate2: species col +0x12 (table img 0x12fb3 stride 0x1ee) has NO 0x12 in
+rows 0..23 in ANY of the 20 LIVE tables — stronger non-witness (scenario-
+scoped non-claim). t52 matrix-buffer identity tension CLOSED en route (one
+100-linear hop matrix at data+0x32ddb == folded DAT_00045beb; FUN_0002351c
+loads authored lanes + BFS flood-fills hop counts). Row STAYS OPEN on
+strict-close: sole residue = the LIVE st4 in-system per-turn displacement
+observation (BLOCKED t48 capture window; dosbox down, ring holds t=0 rows);
+byte+0x20 (power-of-two side-field) banked unattributed S23 L5.
+Closure path: ONE watcher run dumping st4 world coords + species row during
+a known march (the +0x23 window question is answered statically — do NOT
+re-open it). | open |
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

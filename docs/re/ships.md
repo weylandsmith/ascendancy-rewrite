@@ -952,3 +952,78 @@ L6 ATTRIBUTION UPGRADE (still not separation-grade): with gate1 pinned as
   within the three slow handles mid-march (unreadable post-rotation).
 CORPUS CAVEAT: 41..60.sav handle bytes read at 0x258xxx are dead old-game
   residue in new-game saves — never cite them as lane state.
+
+## S23 — t190 LANE-RECORD STRUCT CLOSED; byte+0x23 bit0 = BRIDGE-LANE MARKER
+
+Tools: Ghidra disasm verbatim (ascend_restored.bin) + scripts/
+r1_t190_lane_pool.py RC=0 over 20/20 saves (dump work/r1/t190_pool_dump.txt).
+Working detail: docs/re/_wip_t190.md F1..F11.
+
+L1 LANE RECORD == 39-BYTE POOL RECORD [verified disasm + live save]
+  Pool base = data-segment + 0x3337 (0x248a1 `LEA EDX,[ECX+0x3337]`,
+  ECX=data base — see F9: every "scenario object" offset folds onto the
+  obj0 DATA SEGMENT; S+0x49c1 == folded DAT_00045beb region, S+0x2ea ==
+  DAT_00012fb3 species table, exact). Member form: B + 0x82bb0 + 0x16147;
+  physical 0x258147 in saves 41..60 (run base B=0x1bf4d8).
+  rec+0x00 u32 star-A OBJECT ptr, rec+0x04 u32 star-B obj ptr
+  (allocator writes 0x248af/0x248b1 verbatim); rec+0x08..+0x1c f32[6] =
+  B-A then A-B negates (FUN_00021ad8 fill); rec+0x20 u8 ZEROED at alloc
+  (0x248ab); rec+0x23 u8 the gate byte (NEVER initialized); stride 0x27
+  (IMUL chain 0x24895..0x248a7). Cap guard 0x2485f `CMP EBX,0x94` = 148;
+  lane count u16 = data+0x49c3 (image 0x177D3), star count u16 image 0x16145.
+  LIVE PROOF: rec[0]/rec[4] congruent to star-table base (B+0x82bb0+
+  0x13bc5-0x88, stride 96): rec0.b idx 39.0, rec1 29.0, rec2 27.0, rec3
+  16.0, rec4 37.0 — all integral, 20/20 saves (58 recs each).
+  t189 handle congruence: old-game fast 0x25820a and slow 0x258933/9cf/9f6
+  are ALL pool-congruent mod 39 (deltas to 0x258147 = 39x{5,52,56,57};
+  pairwise +47/+51/+52). Handle == lane-record pointer CONFIRMED. (Old
+  absolute idx [inferred]: slow handles lie fast+47..+52; with the old map
+  50-star the NN prefix is ~50 recs => the +51/+52 handles ARE bridge recs.)
+
+L2 PRODUCER CHAIN (FUN_000234a4 = scenario map-build pipeline):
+  FUN_0002351c (from loader FUN_00020fd4 + turn loop 0x24f24 re-run):
+  zeroes the 100x100 matrix at data+0x32ddb, loads AUTHORED 39-byte lane
+  records from the SAME pool base (piVar13 = S+0x3335+2; count image
+  0x177D1 — 0 in random-map new games), sets matrix pair=1 both dirs, then
+  BFS-fills SHORTEST-PATH HOP COUNTS 2,3,... (0xFF unreachable). t52's
+  raw-sample oddities (diagonal not 1, 79x 0xFF, 1192 asymmetric) = wrong
+  base window over this buffer; BUFFER IDENTITY QUESTION CLOSED (one matrix;
+  0x45beb folded == data+0x32ddb == the 0x41b03 consumer buffer).
+  FUN_00023e00 (nearest-neighbour phase): per star picks nearest star with
+  matrix==0, calls FUN_00021ad8->FUN_00024834 (alloc + symmetric matrix set)
+  — this creator NEVER touches byte+0x23.
+  FUN_00024018/FUN_0002446c (bridge phase, looped while components>1):
+  per star-GROUP (S+0x30701 stride 0x19e, centroid f32[3] at +0x192) picks
+  nearest star PAIR with matrix==0 across components, creates the lane and
+  at 0x247f7 `OR byte ptr [ESI+0x23], 0x1` (bytes 804e2301) — the ONLY
+  writer of bit0 image-wide (instruction census '0x23], 0x': writer set =
+  {0x247f7 OR 0x1}; no site ever clears bit0 => a flagged lane stays
+  1/3-speed forever).
+
+L3 byte[H+0x23] bit0 SEMANTICS CLOSED WITH MEASUREMENT (S22 L4/L6):
+  New-game live census (both pipelines ran at scenario init): nlanes=58,
+  +0x23 == {0x00: recs idx 0..49, 0x01: recs idx 50..57} in ALL 20 SAVES
+  EXACTLY; matrix off-diagonal one-pairs = 58 = lane count; star count 50.
+  The flag is precisely the NN-phase / BRIDGE-phase split: bit0 = "lane
+  added by the connectivity-bridge phase, not a real (authored/NN) starlane".
+  The march gate 0x4a842 (x moffs 0x263b = LIVE 0.333333, t189) therefore
+  slows BRIDGE lanes to 1/3 — gameplay-coherent (long filler links are slow)
+  and it EXPLAINS the t189 corpus entirely: slow handles were the bridge
+  recs (L1 congruence), fast the NN recs; slot13-fast/slot17-same-owner-
+  slow needs no species difference at all.
+  bit1 of the same byte is magnetron territory: writers 0x4cbfd AND 0xfd /
+  0x4cc0e OR 0x2 (FUN_0004ca50), readers TEST bit0x2 at 0x41b42, 0x49a21,
+  0x1d621 — NOT re-derived here, attribution only (t185 chain).
+
+L4 GATE 2 (species col 0x12 -> x2) NEGATIVE MEASUREMENT STRENGTHENED:
+  table image 0x12fb3 stride 0x1ee (0x4a867 `CMP byte ptr [EAX*2+0x12fb3],
+  0x12`), rows 0..23, col byte +0x12: values {0 x17, 27, 38, 40, 110, 115,
+  116, 172} — NO row equals 0x12 in ANY of the 20 LIVE new-game tables
+  (t189's zero could not exclude dead residue; this one is live scenario
+  data). x2 branch has zero shipped-campaign witnesses in this scenario;
+  non-claim: cannot generalize to all vendor scenarios.
+
+L5 UNEXPLAINED SIDE-FOUND (banked, not pursued): lane rec+0x20 census
+  {0:47, 1:2, 2:3, 4:2, 8:2, 16:2} — powers of two, zeroed at alloc, some
+  writer sets single bits; candidate = per-group/visibility mask. Also
+  rec+0x24..0x26 (tail past +0x23) unwritten by any cited site.
