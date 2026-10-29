@@ -1042,3 +1042,63 @@ L5 t191 CLOSED (was UNEXPLAINED SIDE-FOUND): lane rec+0x20 = PER-EMPIRE
   (identity to lane recs UNPROVEN); 0x30b95 zeros +0x20 of the SHIP record
   (sets ship+0x59=0xffff — different struct, not a lane clear).
   rec+0x24..0x26 tail still unwritten by any cited site.
+
+L6 t192 CLOSED (was L5 "semantics INFERRED / base structs UNPROVEN"):
+FUN_00046354 = MUTUAL LANE-VISION SHARE between two empires, and the
+0x22074/0x22e60/0x22f28 group walks PER-RACE LANE-POINTER LISTS.
+  __regparm3: EAX = diplo row base (image 0x12e16 + 0x1ee*idx -- the law
+  reads [row+0x1c0+target] state bytes and [row+0x1b2+2*target] attitudes,
+  docs/re/diplomacy.md S7), EDX = OTHER empire's row index, EBX = mode flag.
+  0x46367/0x46370 state = byte[row1 + 0x1c0 + p2]; if == 3 (ALLIANCE,
+  diplomacy.md S16.3) the RNG modulus is 6 else 3 => N = rand%(3|6)+1 GRANTS
+  PER CALL (0x4638f..0x46395). ALLIANCE DOUBLES THE LANE-SHARE BUDGET.
+  PARTY-1 MASK 0x46399..0x4639d DH = 1 << byte[row1 + 0x00] (row's OWN empire
+  index); PARTY-2 MASK 0x463a2..0x463c3 DL = 1 << byte[0x12e16 + 0x1ee*p2].
+  t191's "[0x12e16] = species lanes-shared-at-contact COLUMN" hypothesis is
+  DEAD: 0x12e16 is the diplo-row table BASE and the byte is that row's empire
+  index (verified 60.sav: rows 0..4 hold empire idx 0,1,2,3,4).
+  LOOP 0x463d0..0x46424 over word[0x177d3] lanes at 0x16147 + 0x27*i:
+  dispatch 0x46402 tests the INCOMING EBX (stored 0x4635f before EBX is zeroed
+  -- the decompiler conflates it with its counter reuse; raw listing governs):
+    EBX != 0 (receive-only): if rec+0x20 & DL and not rec+0x20 & DH and EBX<N
+      -> 0x463eb OR rec+0x20, DH   (party-1 RECEIVES a lane party-2 sees)
+    EBX == 0 (bidirectional): the same test mirrored at 0x46408/0x4641c
+      -> 0x46421 OR rec+0x20, DL   (party-1 LENDS a lane to party-2)
+  Both counters are per-call (stack), grants are OR-only.
+  CALLERS (get_xrefs_to; get_function_callers returns 0 -- t191 caveat):
+    0x45778 EBX=0 BIDIRECTIONAL, inside the alliance-formation handler
+      (same block chain writes row+0x1c0 state 0x45722 and the +10/+5 attitude
+      bumps 0x4577d/0x4578a) => lane share fires WHEN AN ALLIANCE IS MADE.
+    0x55f6e EBX=-1 RECEIVE-ONLY, inside the per-race event loop 0x55f1b..0x55f2e
+      (bound word[0x13b98]), party-1 = current player row ([0x7458e] set up
+      0x55f35/0x55f55) => the PLAYER receives lanes from each race in turn.
+  STAR TWIN FUN_00046524 (same shape): base LAB_00013bc5 stride 0x60, count
+    u16 0x16145, mask pair bytes +0x16/+0x17, modulus 4 if state==3 else 2.
+  MEASURED (scripts/r1_t192_share_mask_scan.py rev2, 20/20 new-game saves):
+    per-race lane list = [dword(0x12e1d + 0x1ee*r) + 0x2c + 4*i], i <
+    u16[sub+0x44]; 220 pointers, 220 lane-pool congruent (mod 39 == 0), ZERO
+    star-slot, ZERO other => leg (b) base structs ARE lane-pool records.
+    race r's list == EXACTLY {lanes with rec+0x20 == 1<<r}: 100 of 100
+    race-lists across the 20 saves, 0 disagreements (60.sav race1 -> lanes
+    14/54/56, masks 0x2/0x2/0x2, bridge bit +0x23 0x0/0x1/0x1).
+    pool +0x20 census over 20 saves x 58 lanes: {0:940, 1:40, 2:60, 4:40,
+    8:40, 16:40} -- ALL single-bit => in a fresh campaign NO lane is visible
+    to two empires: the 0x46354 share path has ZERO witnesses in the
+    new-game corpus (honest negative; needs a mid-game/alliance save).
+    PAIRED MASK BYTE: member B+0x82bb0+0x6774 == 1<<[0x7458e] in 20/20 saves
+    (payload bytes 0x21aa6 = 88 15 74 67 00 00 = mov byte [0x6774],DL --
+    Ghidra's restored-image DAT_00089324 IS payload 0x6774; reading
+    B+0x82bb0+0x89324 double-offsets and is meaningless). Corroboration is
+    WEAK by construction: [0x7458e] == 0 in 20/20 new-game saves, so only
+    the idx=0 case is witnessed. Spectator branch writes DL=0xff (0x21a94).
+  STICKINESS CAVEAT ON t191's "NO CLEAR IMAGE-WIDE" (now CONDITIONAL):
+  0x22e60 DOES clear rec+0x20 (and both endpoint stars' +0x16) for every lane
+  in a race's list -- the clear exists but is only reachable through
+  FUN_00022ce4 <- FUN_000226e4, whose 4 callers are 0x2271e/0x22878-path,
+  FUN_00020fd4 x2, FUN_00024f24 (0x24f8f, the new-game/galaxy builder region
+  -- the call sits between RNG setup and the authored-lane loader 0x2351c)
+  and 0x52cb6 (adjacent to the [0x7458e] new-game reset 0x52cc6). All four
+  read as SETUP paths; whether any fires during play is UNMEASURED (the ring
+  no longer holds mid-game states). t191's stickiness law therefore holds for
+  the CHEAT and SHARE paths (0x273ca / 0x463eb / 0x46421 have no inverse),
+  which is what the player testimony observed.

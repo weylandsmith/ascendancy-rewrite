@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T08:05
+updated: 2026-10-29T09:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -242,36 +242,89 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t192: THE LANE-VISIBILITY SHARE LAW (residues t191 banked flagged,
-ships.md S23 L5 + debugflags.md t191). Three legs in ONE static pass:
-(a) CLOSE the semantics of function 0x46354 (rec+0x20 OR-writers
-0x463eb/0x46421): enumerate its callers (branch-scan edges — the t191
-lesson: dispatch tables are UNRELOCATED in the file image, so find
-callers via call rel32 AND via RAM pointer-law scan member==P0+X; the
-0x46354 handler-slot census decides), pin what gates the grant (the count
-arg [ESP+4], the DL/DH mask sources byte[ECX] and table byte
-[0x12e16+2*idx] — is [0x12e16] the species 'lanes-shared-at-contact' column
-or diplo-state-dependent?);
-(b) IDENTIFY the base structs of the 0x22074/0x22e60/0x22f28 writer group
-(pointer arrays [reg+0x2c+4*i] walked off rows stride 0x1ee = species
-block; do they target the SAME lane pool (member base B+0x82bb0+0x16147)
-— measure in a save: follow one pointer and compare mod-39 congruence to
-the pool base like t190 did for handles);
-(c) LIVE-READ the paired mask byte: store 0x21aa6 writes payload-imm 0x6774
-vs restored-image print 0x89324 (t43 law) — read data-seg+0x6774 in >=5
-saves (member B+0x82bb0+0x6774), expect == 1<<[0x7458e]-byte for every save
-(0x7458e census already shows values; t190 tooling r1_t190_lane_pool.py
-pattern + r1_sav_scan.find_base, no new tools needed beyond a small script).
-RATIONALE: t191 closed the 'l' hunt + rec+0x20 identity and left exactly
-these flagged sub-questions; they are the only queued items with a static/
-save path while every capture-gated closer stays watch-only (dosbox down,
-ring holds t=0 rows; OQ-019 live-st4 residue, OQ-021 needs colonize-past-
-50%/`c` press — now FULLY specified: press C = scancode 0x2e per t191,
-OQ-005 needs the player's eyeball ruling on work/r1/shp_png/index.txt).
-IF (a) shows 0x46354 is diplo-vision sharing, fold the law into
-diplomacy.md; if it is the explore/contact grant, ships.md S23 or economy
-per call-site. Do NOT re-open byte+0x23 (t190) or the scancode cascade
-(t191).
+NEXT t193: WALK THE LANE PAINTER — does the vendor UI actually WITHHOLD
+an unrevealed lane? (t192's flagged open half; debugflags.md t192 block +
+ships.md S23 L6.) Three legs in ONE static pass:
+(a) WALK FUN_00020c48 (lane painter, fed by loop 0x25aa2..0x25b6d which
+copies lane rec +0x20/+0x21/+0x23 into the painter record, stride 0x27):
+pin how the copied +0x20 mask byte is CONSUMED (test against
+1<<byte[0x7458e]? against a per-empire loop? skipped-draw jump?). MAP
+byte +0x21 too: live pool reads ALL ZERO in the 20-save corpus (60.sav
+dump) and the only cited copier is the paint loop — find its WRITER via
+the disp8-store census form (ships.md t191 method: 88/89/c6/c7/81/83 over
+the pool window; caveat: 0x22049's [EDI+0x15] is the SHIP record, not a
+lane writer);
+(b) DECIDE the fog-of-war question for abilities.md: if the painter
+skips drawing iff the viewer bit is absent, SA_KnowStarLanes/
+SA_KnowHomeWorlds are REAL reveal abilities in the original and the
+rewrite's FILED NO-OP justification text ("no fog of war (UI draws every
+star)") MUST be corrected (disposition itself may stand — the rewrite has
+no visibility layer — but GOAL.txt forbids a false justification standing
+as the cited reason; if REAL, also note whether the star-reveal twin
+field star-obj +0x16/+0x17 gates the star painter the same way — star
+painter address via xrefs to LAB_00013bc5 consumers, not file dwords);
+(c) RETRACT/OR-CREATE ledger row: if (b) says the original HAS working
+lane/star fog, that is a rewrite GAP (rewrite/src/game/campaign.cpp:1193
+'the sim has no fog of war') — open a NEW OQ row (suggested OQ-026
+visibility layer) with the closure route = implement + pin, citing
+ships.md S23 L6; if the painter is unconditional (mask bookkeeping only
+feeds diplomacy/AI contact), keep abilities.md filings with corrected
+parenthetical and bank the negative.
+RATIONALE: t192 closed the share law + per-race lists + paired mask byte
+and left EXACTLY this consumption-side question flagged; it is the only
+queued item with a static path (capture-gated closers stay watch-only:
+dosbox down, ring holds t=0 rows; OQ-019 live-st4 residue, OQ-021 needs
+colonize-past-50% + `c` press = scancode 0x2e per t191, OQ-005 needs the
+player's eyeball ruling on work/r1/shp_png/index.txt). Do NOT re-open
+byte+0x23 (t190), the scancode cascade (t191), or the share-law legs
+(t192). NOTE t192 re-froze r1_idle_probe.py baselines to the adjudicated
+Oct-29 00:12:44 timeline state — a fresh arm now means REAL new play.
+
+LANDED t192 (2026-10-29, this session): TRIGGER-A RE-ARM ADJUDICATED
+(stale baseline, NOT new play) + THE LANE-VISIBILITY SHARE LAW CLOSED WITH
+MEASUREMENT (ships.md S23 L6; debugflags.md t192; OQ-019 STATUS t192
+appended, row stays OPEN on the live-st4 residue). Trigger A armed on
+timeline growth (baseline Oct-26 15:44 vs 5,702,731,088 B / Oct-29 00:12:44;
+the named dir playcap-20261014-224611 is stale — growth is in the SHARED
+timeline). Adjudicated the NEW BYTES EXACTLY (scripts/
+r1_t192_window_adjudicate.py RC=0: 280 entries, 178 trusted rows, turns
+1131..1335, wall 23:28:02..23:58:42, states outside enum NONE, only
+transition = the banked t1335 Chamachies<->Orfa 1->3 ALLIANCE): the growth
+IS the Oct-28 night sitting already consumed/banked (diplomacy.md S15/S16,
+OQ-023 CLOSED at t189b) -> no ledger row moved; r1_idle_probe.py baselines
+RE-FROZEN to the adjudicated state (the probe's own re-freeze clause; six
+iterations had re-armed on consumed bytes). t192 legs: (a) FUN_00046354 =
+MUTUAL LANE-VISION SHARE between empires' diplo rows (party masks
+1<<byte[row+0] / 1<<byte[0x12e16+0x1ee*p2] -- t191's 'contact column'
+hypothesis DEAD, 0x12e16 = diplo-row table base, 60.sav rows hold empire
+idx 0..4), N = rand%(state==3?6:3)+1 grants/call = ALLIANCE DOUBLES THE
+BUDGET; raw listing (not decompiler -- EBX-incoming vs EBX-counter
+conflation at 0x4635f/0x46402); callers 0x45778 EBX=0 bidirectional
+(alliance-formation block) + 0x55f6e EBX=-1 receive-only per-race event
+loop, party-1 = current player; star twin FUN_00046524 (mod 4/2, star-obj
++0x16/+0x17). (b) MEASURED 20/20 saves (scripts/r1_t192_share_mask_scan.py
+rev2): per-race list [dword(0x12e1d+0x1ee*r)+0x2c+4*i], i<u16[sub+0x44] =
+EXCLUSIVELY lane-pool recs (220/220 mod-39 congruent, 0 star, 0 other) AND
+race r's list == EXACTLY {lanes with rec+0x20 == 1<<r} (100/100 lists);
+pool +0x20 census {0:940,1:40,2:60,4:40,8:40,16:40} -- all single-bit =
+share path ZERO witnesses in the new-game corpus (honest negative; needs a
+mid-game shared-lane save). (c) paired mask byte member B+0x82bb0+0x6774
+(payload 0x21aa6 = 88 15 74 67 00 00; DAT_00089324 IS payload 0x6774 --
+rev1's B+D+0x89324 read was a DOUBLE-OFFSET error caught by race-name
+validation at B+D+0x74590) == 1<<[0x7458e] 20/20, WEAK (idx==0 all saves).
+CAVEAT BANKED (t191 stickiness now CONDITIONAL): 0x22e60 DOES clear
+rec+0x20 via the per-race list (FUN_00022ce4, single caller 0x2271e in
+FUN_000226e4; 4 xrefs 0x2142e/0x214b0/0x24f8f/0x52cb6 all read as setup/
+new-game paths -- mid-play firing UNMEASURED); sticky law stands for the
+cheat/share writers (no inverse of 0x273ca/0x463eb/0x46421). FLAG BANKED:
+abilities.md's 'no fog of war (UI draws every star)' parenthetical is FALSE
+OF THE ORIGINAL (rec+0x20/star+0x16 exist and the paint loop copies them)
+-- FILED NO-OP disposition may stand (rewrite has no visibility layer) but
+the justification needs correction; consumption-side question queued t193.
+Ring note: 20 distinct Memory blobs, ship count 0, [0x7458e]=0 -- the ring
+is title-screen/new-game states only; no 0-loss pair in the ring =
+stickiness NOT falsifiable there. Gate 0 + LEDGER AUDIT OK. WIP:
+docs/re/_wip_t192.md.
 
 LANDED t191 (2026-10-29, this session): THE 'l' STAR-MAP REVEAL CHAIN
 CLOSED WITH CITED MEASUREMENT (debugflags.md t191; ships.md S23 L5 CLOSED;

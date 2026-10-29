@@ -86,14 +86,22 @@ TIMELINE = os.environ.get("R1_TIMELINE",
                           os.path.join(PLAYCAP, "playcap", "live-timeline.jsonl"))
 # Frozen baseline per STATE.md t116; re-freeze only when a sitting legitimately
 # lands (the sitting-adjudication task), never to silence a real trigger.
-BASE_MTIME_NS = 1793043841_304_000_000  # 2026-10-26 15:44:01.304 -0400 (stat %Y verified t117)
-BASE_SIZE = 5691796463
+# t192 RE-FREEZE: the 2026-10-28 night sitting (wall 23:28..00:12, turns
+# 0/1254..1335) landed but the baseline stayed at the Oct-26 value for six
+# iterations, so trigger A re-armed on ALREADY-ADJUDICATED bytes every turn
+# (t192 PART 0: offset-filtered window walk of the 10,934,625 new bytes = 178
+# trusted rows, only relation transition = the banked t1335 1->3 alliance,
+# scripts/r1_t192_window_adjudicate.py RC=0). New edge state measured t192:
+# size 5,702,731,088 B, mtime 1793247164.180000000 (2026-10-29 00:12:44),
+# head md5 unchanged (42a0bed0), tail md5 25cca2cb.
+BASE_MTIME_NS = 1793247164_180_000_000  # 2026-10-29 00:12:44 -0400 (stat t192)
+BASE_SIZE = 5702731088
 # t151 CONTENT baseline, ENACTED t156 (was STATE.md prose only — see (A6) below).
-# md5 of the FIRST and LAST 64 KiB of the frozen 5,691,796,463 B timeline;
-# reproduced byte-identically t151..t156. Never hash the whole file.
+# md5 of the FIRST and LAST 64 KiB of the frozen timeline; reproduced
+# byte-identically t151..t156 (old frozen file). Never hash the whole file.
 BASE_EDGE_MD5 = 64 * 1024
 BASE_HEAD_MD5 = "42a0bed0507f9052e2009ec94e9c27f1"
-BASE_TAIL_MD5 = "1529ab1ad70ac360f441d819703f943f"
+BASE_TAIL_MD5 = "25cca2cba62407edfd9a5876496c109d"
 # t177 VNC baseline (work/r1/vnc/x11vnc.log). The log CHURNS (a persistent viewer
 # sends ExtDesktopSize resolution probes every few hours: measured 6-line deltas
 # at 26/10 22:16 and 23:25, 27/10 08:02...17:30, 28/10 07:37) while CONNECTS are

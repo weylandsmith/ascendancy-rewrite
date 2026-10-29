@@ -1224,6 +1224,34 @@ file image), normal-play writers 0x463eb/0x46421 (function 0x46354 share
 loop; semantics inferred, flagged), reader = lane-paint loop 0x25aa2..0x25b6d
 into painter 0x20c48; NO clear site image-wide = sticky law proven. Row
 STAYS OPEN: live-st4 residue unchanged. | open |
+STATUS t192 (2026-10-29, ships.md S23 L6, cited): THE rec+0x20 SHARE LAW AND
+THE 0x22-GROUP BASES CLOSED WITH MEASUREMENT — (a) FUN_00046354 is a MUTUAL
+LANE-VISION SHARE between two empires' diplo rows (party masks 1<<byte[row+0]
+and 1<<byte[0x12e16+0x1ee*p2]; t191's "0x12e16 = lanes-shared-at-contact
+column" hypothesis DEAD — 0x12e16 is the diplo-row table base), N =
+rand%(state==3?6:3)+1 grants/call => ALLIANCE DOUBLES THE SHARE BUDGET;
+callers 0x45778 (EBX=0 bidirectional, alliance-formation block) and 0x55f6e
+(EBX=-1 receive-only, per-race event loop 0x55f1b..0x55f2e, party-1 = current
+player); star twin FUN_00046524 same shape (mod 4/2, star-obj +0x16/+0x17).
+(b) MEASURED 20/20 saves (scripts/r1_t192_share_mask_scan.py): the per-race
+list [dword(0x12e1d+0x1ee*r)+0x2c+4*i] holds EXCLUSIVELY lane-pool records
+(220/220 mod-39 congruent, 0 star, 0 other) and race r's list == EXACTLY
+{lanes with rec+0x20 == 1<<r} (100/100 lists, 0 disagreements). Pool +0x20
+census {0:940,1:40,2:60,4:40,8:40,16:40}: every visible lane single-bit =>
+the share path has ZERO witnesses in the new-game corpus (honest negative;
+closing a share-event observation needs a mid-game save where two empires
+share a lane). (c) paired mask byte = member B+0x82bb0+0x6774 (payload bytes
+0x21aa6 = 88 15 74 67 00 00) == 1<<[0x7458e] 20/20 (weak: idx==0 all saves).
+CAVEAT BANKED: 0x22e60 DOES clear rec+0x20 via the per-race list (reachable
+only through FUN_00022ce4 <- FUN_000226e4, 4 callers all reading as setup/
+new-game paths — 0x24f8f sits before the authored-lane loader 0x2351c, 0x52cb6
+next to the [0x7458e] reset 0x52cc6); t191's image-wide-no-clear form is now
+CONDITIONAL, the sticky law stands for the cheat/share writers (no inverse of
+0x273ca/0x463eb/0x46421 exists). Rewrite surface: NONE (rewrite has no lane-
+visibility layer; ships.md L6/debugflags.md flag that abilities.md's "no fog
+of war in original" parenthetical is false-of-original — filing disposition
+unchanged, justification text queued for the next abilities pass). Row
+STAYS OPEN: live-st4 residue unchanged. | open |
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

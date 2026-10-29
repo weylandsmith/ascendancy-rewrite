@@ -80,9 +80,23 @@ matches player "cannot be turned off".
 mask too, DL=0x0100/DH=0 when idx==0xFF spectator case — and 0x52cc6
 new-game reset). Normal-play lane-visibility GRANT path (not a cheat):
 function 0x46354, OR sites 0x463eb/0x46421, same rec+0x20 byte between two
-empire masks — semantics inferred, flagged UNVERIFIED. Lane-paint READER of
+empire masks — SEMANTICS CLOSED t192 (ships.md S23 L6): mutual lane-vision
+share between the two diplo rows' empires, N = rand%(state==3 ? 6 : 3) + 1
+grants per call (alliance doubles the budget), caller EBX selects
+bidirectional (0x45778 alliance-formation) vs receive-only-for-the-player
+(0x55f6e per-race event loop). Lane-paint READER of
 rec+0x20: loop 0x25aa2..0x25b6d (stride 0x27, pool base data+0x3337, copies
 +0x20/+0x21/+0x23 for painter 0x20c48).
+
+t192 CONSEQUENCE FOR THE ABILITY ROWS BELOW (flagged, not re-derived): the
+parenthetical "no exploration bookkeeping" in the SA_KnowStarLanes /
+SA_KnowHomeWorlds filings is FALSE OF THE ORIGINAL — rec+0x20 (lanes) and
+star-obj +0x16/+0x17 (stars) ARE per-empire exploration bookkeeping, and the
+lane-paint loop copies rec+0x20 into its painter record. The rewrite's FILED
+NO-OP disposition can still be right (the rewrite has no visibility layer at
+all), but it must not be justified by claiming the original lacks one. What
+remains UNMEASURED is whether the vendor UI actually withholds a lane whose
+rec+0x20 lacks the viewer's bit (painter 0x20c48 was not walked t192).
 
 ## t85f: user-observed keys + external corroboration (LEAF ADDRESSES REJECTED BY t191)
 
