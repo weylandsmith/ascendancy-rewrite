@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T05:40
+updated: 2026-10-29T08:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -242,28 +242,65 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t191: THE `l` STAR-MAP REVEAL STATIC HUNT (OQ-unrowed debugflags item;
-t184 queue item, re-armed and un-deferred by t189b — the OBSERVATION is
-player re-confirmed 2026-10-29: 'l' displays all star lanes; docs/re/
-debugflags.md). Anomaly: ZERO `cmp al,'l'` sites image-wide (t85f). Hunt
-the scancode 0x1E path / dispatch-table indirection near 0x79950..0x79c20
-(keydown dispatcher region banked t85f); the b-sting page proves an
-"All starlanes exposed" flag with OR-sticky semantics — find the FLAG
-WRITER (lane-drawing predicate candidates: readers of any byte/word that
-also gates lane painting in the cosmos window, e.g. near the S23 hop-
-matrix consumers 0x25b81/0x2624a or the shp lane-paint path). Deliverable:
-cited key->flag chain in debugflags.md, or the honest negative (no static
-path: flag set by a cheat-code string compare table, then locate THAT).
-SECONDARY if the hunt runs dry early (same session): lane rec+0x20 side-
-field writers (power-of-two values {1,2,4,8,16} MEASURED in the S23 pool
-census, zeroed at alloc 0x248ab — grep writers of [rec+0x20] over lane-
-pool-congruent pointer derefs; ships.md S23 L5).
-RATIONALE: capture-gated closers all stay watching-only (dosbox down, ring
-holds only t=0 new-game rows; OQ-019's sole residue is now the LIVE st4
-march window, OQ-021 needs colonize-past-50%/`c` press, OQ-005 needs the
-player's eyeball ruling) — the 'l' hunt is the only queued item with a
-static path and a human-confirmed observation. t190 closed the lane-record
-question completely (ships.md S23): do NOT re-open byte+0x23.
+NEXT t192: THE LANE-VISIBILITY SHARE LAW (residues t191 banked flagged,
+ships.md S23 L5 + debugflags.md t191). Three legs in ONE static pass:
+(a) CLOSE the semantics of function 0x46354 (rec+0x20 OR-writers
+0x463eb/0x46421): enumerate its callers (branch-scan edges — the t191
+lesson: dispatch tables are UNRELOCATED in the file image, so find
+callers via call rel32 AND via RAM pointer-law scan member==P0+X; the
+0x46354 handler-slot census decides), pin what gates the grant (the count
+arg [ESP+4], the DL/DH mask sources byte[ECX] and table byte
+[0x12e16+2*idx] — is [0x12e16] the species 'lanes-shared-at-contact' column
+or diplo-state-dependent?);
+(b) IDENTIFY the base structs of the 0x22074/0x22e60/0x22f28 writer group
+(pointer arrays [reg+0x2c+4*i] walked off rows stride 0x1ee = species
+block; do they target the SAME lane pool (member base B+0x82bb0+0x16147)
+— measure in a save: follow one pointer and compare mod-39 congruence to
+the pool base like t190 did for handles);
+(c) LIVE-READ the paired mask byte: store 0x21aa6 writes payload-imm 0x6774
+vs restored-image print 0x89324 (t43 law) — read data-seg+0x6774 in >=5
+saves (member B+0x82bb0+0x6774), expect == 1<<[0x7458e]-byte for every save
+(0x7458e census already shows values; t190 tooling r1_t190_lane_pool.py
+pattern + r1_sav_scan.find_base, no new tools needed beyond a small script).
+RATIONALE: t191 closed the 'l' hunt + rec+0x20 identity and left exactly
+these flagged sub-questions; they are the only queued items with a static/
+save path while every capture-gated closer stays watch-only (dosbox down,
+ring holds t=0 rows; OQ-019 live-st4 residue, OQ-021 needs colonize-past-
+50%/`c` press — now FULLY specified: press C = scancode 0x2e per t191,
+OQ-005 needs the player's eyeball ruling on work/r1/shp_png/index.txt).
+IF (a) shows 0x46354 is diplo-vision sharing, fold the law into
+diplomacy.md; if it is the explore/contact grant, ships.md S23 or economy
+per call-site. Do NOT re-open byte+0x23 (t190) or the scancode cascade
+(t191).
+
+LANDED t191 (2026-10-29, this session): THE 'l' STAR-MAP REVEAL CHAIN
+CLOSED WITH CITED MEASUREMENT (debugflags.md t191; ships.md S23 L5 CLOSED;
+OQ-019 STATUS t191 appended, row stays OPEN on the live-st4 residue).
+Adopted the prior killed session's uncommitted WIP (Findings 1-2 banked;
+its regex census had MISSED the 80/7 and 83/r compare forms — corrected).
+Proved: (a) the t85f "keymap" region 0x798de..0x79d26 is a vprintf
+format-spec engine — ALL t85f leaf addresses REJECTED; every 'l'/'L'
+compare immediate in the payload is a printf LENGTH MODIFIER
+(0x79694/0x796b4/0x7a4b1/0x7a4bf cmp CL,h/l/L/L); (b) THE REAL DISPATCH:
+cosmos-window message handler image 0x26b34, RUNTIME slot member 0x247adc
+holds P0+0x26b34 (60.sav, B=0x1bf4d8 — pointer law pointer==P0+X; the
+static hunt was structurally dead because the table is UNRELOCATED in the
+file image: zero dwords == 0x26b34/reveal-heads); DX==3 = KEYDOWN; (c)
+ECX = RAW AT SET-1 SCANCODE, cascade 0x27614..0x27669: 0x13 'R'->0x27476
+diplo clone, 0x1f 'S'->0x27401 star reveal, 0x26 'L'->0x273a0 LANE REVEAL
+(nougat-gated OR 1<<byte[0x7458e] into every lane rec+0x20, stride 0x27,
+then repaint 0x28fc0/0x284bc/vtable), 0x2e 'C'->0x2736f score-overlay
+toggle (OQ-021's `c`-press ask is now statically pinned to scancode 0x2e),
+0x0c/0x0d -> zoom DAT_0009f108; (d) [0x7458e] = CURRENT-PLAYER INDEX
+(writers 0x21aa0 pair-setter with DL=1<<idx / 0x0100 spectator case,
+0x52cc6 new-game reset); (e) rec+0x20 = PER-EMPIRE LANE-VISIBILITY MASK:
+writers 0x273ca cheat + 0x463eb/0x46421 normal-play share loop (0x46354,
+semantics INFERRED flagged) + 0x22074/0x22e60/0x22f28 (base structs
+UNPROVEN flagged), reader = lane-paint loop 0x25aa2..0x25b6d -> painter
+0x20c48, NO lane-pool-scoped clear except pool-create 0x248ab = STICKY LAW
+(player testimony matched). Method bank: search BRANCH EDGES or RAM, never
+file-image dwords, for handler bindings. Gate 0 + LEDGER AUDIT OK + LEDGER
+INDEX OK. WIP: docs/re/_wip_t191.md.
 
 LANDED t190 (2026-10-29, this session): LANE-RECORD STRUCT + byte+0x23
 SEMANTICS CLOSED WITH MEASUREMENT (ships.md S23; OQ-019 updated, stays OPEN

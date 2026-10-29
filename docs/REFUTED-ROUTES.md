@@ -201,3 +201,20 @@ demand-page image data consumed by nothing (t97 censuses). A5 closes as
 debug-only identifiers per the t97 rule (docs/re/aicode.md §2i). Related:
 t97c's "object table at DW(le+0x30)" was FIXUP SECTION SIZE misread — the
 correct offsets are DW(le+0x40)/DW(le+0x48) header-relative.
+
+## R15. "0x79950..0x79c20 is the starmap key dispatch" + file-image dword
+## hunts for handler bindings — REFUTED/DEAD METHOD (t191)
+The t85f leaf table (0x79ace "s reveal", 0x79c35 "c overlay" ...) is inside a
+vprintf FORMAT-SPEC engine (width/precision/sign/zero-pad; disasm
+0x798de..0x79d26) — every leaf address in it is void. Separately: searching
+the payload file for a dword == a code address to find dispatch-table
+bindings is STRUCTURALLY DEAD — Watcom LE fixups patch those slots at load,
+so the file image holds unrelocated offsets (t191: ZERO dwords == 0x26b34
+(cosmos msg handler) or any reveal-block head, yet 60.sav RAM member 0x247adc
+holds P0+0x26b34). THE ANSWER: (1) enumerate branch edges (linear decode
+e9/eb/jcc8/jcc32) to find cascade entries; (2) scan RAM with the OQ-011
+pointer law (member == P0+X). Char-immediate key compares do not exist in
+this engine family — cheats are RAW AT SCANCODE keyed (debugflags.md t191:
+0x1f S / 0x26 L / 0x2e C / 0x13 R, handler 0x26b34 DX==3). Full census banked:
+'l'/'L' compare immediates exist ONLY as printf length modifiers
+(0x79694/0x796b4/0x7a4b1/0x7a4bf). Do not re-hunt `cmp al,'l'`.

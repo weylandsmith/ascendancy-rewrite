@@ -1023,7 +1023,22 @@ L4 GATE 2 (species col 0x12 -> x2) NEGATIVE MEASUREMENT STRENGTHENED:
   data). x2 branch has zero shipped-campaign witnesses in this scenario;
   non-claim: cannot generalize to all vendor scenarios.
 
-L5 UNEXPLAINED SIDE-FOUND (banked, not pursued): lane rec+0x20 census
-  {0:47, 1:2, 2:3, 4:2, 8:2, 16:2} — powers of two, zeroed at alloc, some
-  writer sets single bits; candidate = per-group/visibility mask. Also
-  rec+0x24..0x26 (tail past +0x23) unwritten by any cited site.
+L5 t191 CLOSED (was UNEXPLAINED SIDE-FOUND): lane rec+0x20 = PER-EMPIRE
+  LANE-VISIBILITY MASK (bit e = 1<<empire-index). Cited writers:
+  0x273ca (nougat.lf 'l' cheat: OR 1<<[0x7458e] over all lanes — debugflags.md
+  t191 scancode cascade ECX==0x26), 0x463eb/0x46421 (normal-play SHARE loop
+  in function 0x46354: masks DL=1<<byte[ECX], DH=1<<species-table byte
+  [0x12e16+2*idx], gated by a count arg — grant semantics INFERRED, flagged),
+  0x22074/0x22e60/0x22f28 (base = [reg+0x2c+4*i] pointer arrays walked off
+  species rows stride 0x1ee — shape says same mask concept on related
+  structs; lane-pool identity of these bases NOT proven, flagged).
+  Reader = the lane-paint path itself: loop 0x25aa2..0x25b6d copies
+  rec+0x20/+0x21/+0x23 into the painter 0x20c48 record (stride 0x27, pool
+  base data+0x3337). NO CLEAR SITE against the lane-pool addressing form
+  (pool imm 0x16147 / base+0x3337, stride 0x27) exists image-wide (t191
+  census over 88/89/c6/c7/81/83 disp8 stores); pool-create zero 0x248ab is
+  the only lane-pool-scoped clear => reveal sticky, matching the player
+  testimony. CAVEAT: 0x22e60 clears +0x20 via [reg+0x2c+4*i] pointer arrays
+  (identity to lane recs UNPROVEN); 0x30b95 zeros +0x20 of the SHIP record
+  (sets ship+0x59=0xffff — different struct, not a lane clear).
+  rec+0x24..0x26 tail still unwritten by any cited site.

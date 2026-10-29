@@ -1215,7 +1215,15 @@ observation (BLOCKED t48 capture window; dosbox down, ring holds t=0 rows);
 byte+0x20 (power-of-two side-field) banked unattributed S23 L5.
 Closure path: ONE watcher run dumping st4 world coords + species row during
 a known march (the +0x23 window question is answered statically — do NOT
-re-open it). | open |
+re-open it). STATUS t191 (2026-10-29, cited; ships.md S23 L5 CLOSED,
+debugflags.md t191): lane rec+0x20 = PER-EMPIRE LANE-VISIBILITY MASK —
+cheat writer 0x273ca (scancode-keyed: cosmos handler 0x26b34, DX==3 keydown,
+ECX==0x26='l', nougat.lf-gated; runtime slot member 0x247adc holds P0+0x26b34,
+60.sav — static hunts fail because the dispatch table is unrelocated in the
+file image), normal-play writers 0x463eb/0x46421 (function 0x46354 share
+loop; semantics inferred, flagged), reader = lane-paint loop 0x25aa2..0x25b6d
+into painter 0x20c48; NO clear site image-wide = sticky law proven. Row
+STAYS OPEN: live-st4 residue unchanged. | open |
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

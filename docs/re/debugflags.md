@@ -43,7 +43,48 @@ integrity/orders — that is gate 0x1d9fe working exactly as decoded.
 * winmgr 0x5529d/0x55a66/0x55b6e + batcon 0x5549a/0x55fa1: turn-continue
   window ('NEXTTURNCONT' windows.txt) message path alters.
 
-## t85f: THE KEYMAP — user-observed keys + external corroboration
+## t191: THE REAL KEY DISPATCH (supersedes the t85f leaf-address table)
+
+t191 MEASURED (branch scan + disasm 0x27560..0x27e7f + runtime pointer scan):
+the cosmos-window MESSAGE HANDLER is image 0x26b34 (prologue 56 57 55 83 ec
+3c); its slot in the runtime dispatch table = member 0x247adc (physical
+0x247a54 == data-seg image 0x88604) holding P0+0x26b34 (60.sav, B=0x1bf4d8;
+pointer law pointer==P0+X). The static file image has ZERO dwords equal to
+0x26b34 or to any reveal-block head — the binding exists only POST-RELOCATION
+(OQ-011 law), which is exactly why every static hunt (t85f, t179c, t191 WIP
+first pass) failed. Handler arg convention: DX = message class, ECX = payload.
+DX==3 = KEYDOWN (cascade 0x27dcb..0x27e1b -> sub-cascade head 0x27614);
+DX>3 does rect-bounds hit tests on [ESI+8/0xc/0x10/0x14] (mouse).
+
+ECX = RAW AT SET-1 SCancode, binary-search cascade 0x27614..0x27669:
+
+| scancode | char | leaf | behavior (disasm-grounded) |
+|---|---|---|---|
+| 0x13 | R | 0x27476 | DIPLO ROW CLONE (nougat-gated; DANGEROUS, see gate table) |
+| 0x1f | S | 0x27401 | STAR REVEAL: for i<T: [0x13bdc+i*0x60] |= 1<<[0x7458e] (+[0x13bdb]) |
+| 0x26 | L | 0x273a0 | LANE REVEAL: for i<word[0x177d3]: lane_pool[0x16147+i*0x27+0x20] |= 1<<byte[0x7458e]; then redraw CALL 0x28fc0 + 0x284bc + vtable [ESI+0xa7]+0xc. GATE CMP [0x10ba0],0 = nougat.lf |
+| 0x2e | C | 0x2736f | SCORE-OVERLAY TOGGLE [ESI+0x58e] = NOT (nougat-gated) — consistent with t85f's player-observed 'c' screen; note ECX here is TESTed against 0x1f/0x2e ranges in the FIRST cascade (0x2762c JZ) |
+| 0x0c | - | 0x275b0 | ZOOM OUT: float DAT_0009f108 *= pool const |
+| 0x0d | = | 0x275e4 | ZOOM IN: DAT_0009f108 *= pool const |
+
+THE 'l' ANOMALY IS RESOLVED: b-sting's sticky cheats are scancode-keyed, not
+char-keyed — there is (and never was) a `cmp al,'l'`; the WIP's full
+linear-decode census (80/81/83 /7 + 3c/3d, whole code region) found 'l'/'L'
+compare immediates ONLY inside the printf/scanf front-end 0x795be..0x7a4bf
+(length modifiers h/l/L/w, WIP Findings 1+3). STICKINESS LAW: no clear site
+against the lane-pool addressing form exists image-wide (ships.md S23 L5
+census; caveats there) — allocator zeros only at pool-create 0x248ab —
+matches player "cannot be turned off".
+
+[0x7458e] = CURRENT-PLAYER INDEX byte (writers 0x21aa0 pair-setter — sets
+mask too, DL=0x0100/DH=0 when idx==0xFF spectator case — and 0x52cc6
+new-game reset). Normal-play lane-visibility GRANT path (not a cheat):
+function 0x46354, OR sites 0x463eb/0x46421, same rec+0x20 byte between two
+empire masks — semantics inferred, flagged UNVERIFIED. Lane-paint READER of
+rec+0x20: loop 0x25aa2..0x25b6d (stride 0x27, pool base data+0x3337, copies
++0x20/+0x21/+0x23 for painter 0x20c48).
+
+## t85f: user-observed keys + external corroboration (LEAF ADDRESSES REJECTED BY t191)
 
 User (web build, nougat.lf on): 's' lists all star systems, 'l' all lanes
 (both STICKY — cannot be turned off), 'c' toggles a screen headed
@@ -55,6 +96,12 @@ same cheat set from play. Codes it documents, mapped to our decode:
 Starmap dispatch 0x79969..0x79c62 (key char at [esi+0x15], case-sensitive
 binary search; uppercase leaves exist as distinct branches — b-sting uses
 uppercase S/L/C for the sticky ones):
+
+t191 REJECTION: the entire leaf-address table below sits inside the vprintf
+format-spec parser (WIP Findings 1+3, disasm 0x798de..0x79d26 = width/
+precision/sign engine) — every LEAF column value is void. The b-sting
+code->behavior MAPPINGS (s/l/c/1..7/Alt-E rows) remain corroborated by the
+t191 scancode cascade above; only the address column died.
 
 | key | leaf | = |
 |---|---|---|
