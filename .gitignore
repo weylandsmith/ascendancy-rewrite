@@ -12,3 +12,4 @@ __pycache__/
 work/
 xsend/build/rewrite
 tools/xsend
+tools/shp_pngdump

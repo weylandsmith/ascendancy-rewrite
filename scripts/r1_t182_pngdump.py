@@ -110,7 +110,11 @@ def load_palette():
     raw = open(os.path.join(ROOT, "extracted", "ascend01", "data",
                             "game.pal"), "rb").read()
     assert len(raw) == 768, f"game.pal size {len(raw)} != 768"
-    return list(raw[i] for i in range(768))  # RGB triplets
+    # t188 FIX: game.pal is a 6-bit VGA palette (measured max byte 0x3f, 0/256
+    # entries with any channel > 0x3f). Feeding it raw to putpalette() capped
+    # every render at 25% brightness — player eyeball (2026-10-29): "They're
+    # all too dark, INCLUDING the controls." Scale 6->8 bit (v*255//63).
+    return list(min(255, v * 255 // 63) for v in raw)  # RGB triplets
 
 
 def main():
