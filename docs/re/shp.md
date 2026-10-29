@@ -816,6 +816,27 @@ DARKNESS BUG FIXED; all-15-real verdict; interface-style anomaly noted
   'industrial view' ARE this gauge); population panel illustration law
   UNSTATED (vision saw rows of small red icons there — identity open).
   Current-project panel shows item art + "N days until completion".
+- POPULATION PANEL LAW (player, 2026-10-29, third message — the definitive
+  spec for the unidentified 4th gauge): an ARRAY OF SLOTS proportional to
+  the planet's population CAPACITY. Uncolonized planet = all EMPTY CIRCLES.
+  Colonization fills slots with person figures: FREE population = yellowish
+  person facing FORWARD; BUSY population = reddish person facing SIDEWAYS,
+  working on something. Evidence: shot 12-31-38 = 4 busy + rest circles
+  (player count; vision counted 5 figures — icon-counting is NOT what the
+  vision model is reliable for, player count wins, re-examine when slot
+  icons render individually at t196); shot 12-57-35 = mostly busy + 1 idle
+  (the idle figure being the yellow forward type = the pose law's own
+  confirmation). Vision pass on 12-31-38 confirms shape classes (circles
+  vs figures), all figures reddish, all same sideways direction, slots ==
+  circles+figures. LIBRARY HUNT for the slot icons (t196 leg a): candidate
+  sets by header shape — planets.shp (55 recs), planal00..10 (11 libs x 5
+  recs each; 5 could be the pose/state set: circle, yellow-front, red-side,
+  +2 unknown — [unverified], name may mean planet-alert), shipicon.shp ruled
+  out by name+size. GOVERNING LAW NOTE: the ultimate target is DERIVING the
+  production-visualization laws (level->record select + slot-fill rules)
+  FROM THE ORIGINAL BINARY (UI paint routine census near the planet-screen
+  presenter cluster), not just describing the art — player testimony is the
+  hypothesis; the paint routine is the citation.
   Consequence: (a) 4 gauge libraries' worth of level->record SELECT laws to
   find (planpro.shp + planres.shp header dword[1]=21 each — candidate
   record count [unverified], ~21 steps fits a level ladder); t196 sub-leg:

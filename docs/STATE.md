@@ -311,9 +311,12 @@ corpus-based, rewrite-side, or vision-on-external-images):
   flowering plant (planpro.shp), manufacturing 'increasingly convoluted
   factory' (planind.shp — its 13 SPAN-UNDERSIZED residue records are NOW
   LIVE UI ART: dims-location evidence sits in this library, OQ-005
-  priority!), population library UNIDENTIFIED — the panel showed a ROW OF
-  SMALL RED ICONS (vision shot 1; per-icon ladder? law open); candidates by
-  header shape: planets.shp 55 recs, planalNN 5-rec libs; NOTE planitem.shp
+  priority!), POPULATION PANEL LAW (player 2026-10-29, shp.md S19): slot
+  array sized to planet CAPACITY; uncolonized = empty circles; free pop =
+  yellowish figure facing FORWARD, busy pop = reddish figure facing
+  SIDEWAYS; shots corroborate (12-57-35 mostly busy + 1 idle). Slot-icon
+  library UNIDENTIFIED — candidates planets.shp (55 recs) / planal00..10
+  (11x5 — 5 could be the pose set); NOTE planitem.shp
   40 recs is probably the CURRENT-PROJECT item art (name + item-image in
   that panel), verify both by rendering, don't assume. All three named libs header dword[1]=21
   [unverified record count]. Legs: (a) render EVERY record of planres/
@@ -323,7 +326,13 @@ corpus-based, rewrite-side, or vision-on-external-images):
   shp.md S20); (b) census per-planet records in the .SAV corpus for the
   research/manufacturing/prosperity/population level fields driving those
   gauges, pin offsets with citations to docs/re/economy.md (create if
-  absent; check nothing regenerates it); (c) cheap sub-leg: hunt the DAY
+  absent; check nothing regenerates it); (a2) DERIVE THE VISUALIZATION LAWS
+  FROM THE BINARY (user directive 2026-10-29): find the planet-screen paint
+  routine that selects gauge records by level + fills population slots by
+  capacity/free/busy — player testimony = hypothesis, the paint routine =
+  the citation (level->record map for planres ~60-levels-vs-21-records,
+  prosperity/industry select, slot-fill rule, idle-vs-busy branch);
+  (c) cheap sub-leg: hunt the DAY
   COUNTER dword near the TURNADVANCE path (watcher schema lacks one;
   two-tier-turn testimony untestifiable without it — if found, note watcher
   field addition for next live session).
