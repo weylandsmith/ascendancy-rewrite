@@ -594,6 +594,24 @@ compression map, uncited), 3cfgnew = new-game/race-config art, 1starmap =
 star-map sprites ("NEXT TURN <ENTER>" verbatim), mouse = cursors + "Exit
 <ESC>", planitem = distinct item icons, planets = biome spheres, planal00 =
 cratered-surface crops (population-pose hypothesis KILLED). Row status OPEN.
+STATUS t197 (2026-10-29): SPAN BOUND REMOVED + LAWS UNIFIED (shp.md S21).
+Validator gained X-class (span-free EXACT-H walk): residue re-cut 71 -> 29 X
+(false FAILs, now decodable) + 44 real FAILs; dims-gate unification demoted
+exactly 2 degenerate walks the vendor blit refuses (mouse k5 W=0, sg64expl k0
+H=0xfffffffb). FINAL [measured, pinned gate stage 3c-2 + test_shp floors]:
+V196+A1288+X29+FAIL44=1557, clean libs 187/208; Python validator and rewrite
+ShapeLibrary::decode() now agree RECORD-EXACT (1513 decode-pass). CODE SITE:
+rewrite/src/formats/shp.cpp walkRows bound img.size() + decode() (4096 clamp
+kept), pin test shp_span_free_t197; scripts/r1_shp_unifiedlaw.py X tag +
+--profiles. Evidence packet regenerated: 44 rendered/44 validated incl. 29
+XREC-- full frames (work/r1/shp_png, ids.tsv validator-tagged). Measured
+correction to S20: past-span rows PAINT (planind tail 40 distinct indices),
+they are desynced next-record bytes, NOT transparent — whether widgets SHOW
+those bands is the paint-routine question (gauge-library queue item). Row
+stays OPEN: dims-location unknown for the 44 (cos_star k40-51, mouse k5/6/7,
+1starmap k1, 3cfgnew k12 EOF-trunc, 26 zero-stream EMPTY + sg*/expl ladder
+singles + sg64expl k0); closure class unchanged = player ruling / draw
+capture (R13), never file-probing self-grading.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge

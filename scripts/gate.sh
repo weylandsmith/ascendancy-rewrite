@@ -71,6 +71,20 @@ else
   tail -20 /tmp/gate_shp.log; err "shp_probe.py failed (.shp container invariant broken?)"
 fi
 
+# 3c-2. t197: unified record law pinned on the REWRITE-EXACT validator
+# (span-free walk + both-components dims gate; shp.md S21). The X class
+# (29 span-crossing full frames) must stay decodable and the dims-gate
+# demotions (mouse k5, sg64expl k0) must not silently drift. ~0.2 s.
+if /usr/bin/python3 "$ROOT/scripts/r1_shp_unifiedlaw.py" >/tmp/gate_shplaw.log 2>&1; then
+  for TV in "record V: 196" "record A: 1288" "record X: 29" "record FAIL: 44" \
+            "libraries passing EVERY record: 187/208"; do
+    grep -qF "$TV" /tmp/gate_shplaw.log \
+      || { tail -20 /tmp/gate_shplaw.log; err "shp unified law drift (missing '$TV')"; }
+  done
+else
+  tail -20 /tmp/gate_shplaw.log; err "r1_shp_unifiedlaw.py crashed"
+fi
+
 # 3d. P2-input invariant: all 21 race*.dip parse with the SAME DIPVALUES key
 # set (that identity is what makes per-race AI data-driven rather than 21
 # bespoke scripts). Also pins the corpus size.

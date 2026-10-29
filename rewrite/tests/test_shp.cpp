@@ -93,9 +93,86 @@ TEST(shp_corpus_parity_with_python_validator) {
     }
     std::printf("    shp corpus: %d libs, %d records, %d decode-pass, "
                 "%d clean libs\n", libs, recs, passed, clean_libs);
-    // Parity floors banked from scripts/r1_shp_unifiedlaw.py (measured):
+    // Parity floors banked from scripts/r1_shp_unifiedlaw.py (measured).
+    // t197 pins EXACT parity: span-bound removed (shp.md S21) promotes the
+    // X class (29: planind k0..k12, 3cfgnew k0..k11, 14intel k8, 1starmap
+    // k3/k4/k6); the both-components dims gate demotes exactly 2 degenerate
+    // walks the vendor refuses (mouse k5 W=0, sg64expl k0 H=0xfffffffb).
+    // Measured this session BOTH SIDES: 1513 decode-pass / 187 clean libs.
+    // Pre-t197 baselines: C++ decode 1484/185, Python validator 1486/186
+    // (t182 numbers) — the 2-record C++/Python gap was exactly mouse k5 +
+    // sg64expl k0 (Python walked them despite a garbage dims component),
+    // now unified on the blit-faithful both-components rule.
     CHECK(libs >= 200);
     CHECK(recs >= 1500);
-    CHECK(passed >= 1477);
-    CHECK(clean_libs >= 176);
+    CHECK(passed >= 1513);
+    CHECK(clean_libs >= 187);
+}
+
+TEST(shp_span_free_t197) {
+    // The span bound was our validator's invention (shp.md S20.2: blit
+    // FUN_0005caac has no length arg, no overrun error; cache = verbatim
+    // whole-library copy). Pins BOTH sides of the t197 correction.
+    ShapeLibrary planind, cfg, star, mous;
+    std::string err;
+    CHECK(planind.load(kA01 + "planind.shp", &err));
+    CHECK(cfg.load(kA01 + "3cfgnew.shp", &err));
+    CHECK(star.load(kA01 + "1starmap.shp", &err));
+    CHECK(mous.load(kA01 + "mouse.shp", &err));
+
+    // (1) planind k0 walks its FULL declared 99 rows although its directory
+    // span [rec0, rec1) holds only ~89 rows at declared W (t196 triage:
+    // 77..95 of 99 bounded). Compare row content past the span against a
+    // second decode: deterministic (pure function of file bytes), and the
+    // plane is fully sized W*H.
+    std::vector<uint8_t> a, b;
+    bool sw = true;
+    CHECK(planind.decode(0, a, &sw));
+    CHECK(!sw);  // canonical orientation completes
+    CHECK(planind.decode(0, b));
+    CHECK(a.size() == size_t(planind.record(0).width) *
+                        planind.record(0).height);
+    CHECK(a == b);  // determinism
+    const auto& r0 = planind.record(0);
+    CHECK(r0.end > r0.stream);  // span sanity
+    // Rows past the span must be file bytes walked as ops: the past-span
+    // band is NOT uniformly zero in planind (t197 pastrows probe: 40
+    // distinct indices in k0's tail). Two value-free witnesses below.
+    bool tail_nonuniform = false;
+    // Distinct indices over the whole plane: a truncated/blocked decode
+    // stops early and cannot reach 30 (probe: k0 tail band alone has 40).
+    {
+        std::vector<bool> seen(256, false);
+        int distinct = 0;
+        for (uint8_t v : a) if (!seen[v]) { seen[v] = true; ++distinct; }
+        CHECK(distinct >= 30);  // pastrows probe: k0 tail alone has 40
+    }
+    for (uint32_t y = r0.height - 4; y < r0.height; ++y) {
+        const uint8_t* p = a.data() + size_t(y) * r0.width;
+        for (uint32_t x = 0; x < r0.width; ++x)
+            if (p[x]) { tail_nonuniform = true; break; }
+    }
+    CHECK(tail_nonuniform);  // bottom band was written (span-crossing walk)
+
+    // (2) 3cfgnew k0..k11 decode; k12 stays REJECTED (EOF-truncated at
+    // 55/79 rows — real broken vendor data, strict-close discipline).
+    for (int k = 0; k <= 11; ++k) {
+        std::vector<uint8_t> px;
+        CHECK(cfg.decode(k, px));
+    }
+    { std::vector<uint8_t> px; CHECK(!cfg.decode(12, px)); }
+
+    // (3) Garbage dims still rejected despite the unbounded walk:
+    // 1starmap k1 dims word 0x7ffffdbb-class; mouse k6/k7 dims 0-class.
+    { std::vector<uint8_t> px; CHECK(!star.decode(1, px)); }
+    { std::vector<uint8_t> px; CHECK(!mous.decode(6, px)); }
+    { std::vector<uint8_t> px; CHECK(!mous.decode(7, px)); }
+
+    // (4) 14intel k8 + 1starmap k3/k4/k6 (the other X members) decode.
+    ShapeLibrary intel;
+    CHECK(intel.load(kA01 + "14intel.shp", &err));
+    { std::vector<uint8_t> px; CHECK(intel.decode(8, px)); }
+    { std::vector<uint8_t> px; CHECK(star.decode(3, px)); }
+    { std::vector<uint8_t> px; CHECK(star.decode(4, px)); }
+    { std::vector<uint8_t> px; CHECK(star.decode(6, px)); }
 }

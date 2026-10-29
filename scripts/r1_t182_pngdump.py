@@ -89,8 +89,11 @@ def find_lib(name):
 
 
 def residue_records():
-    """Re-derive the FAIL set live (never a hard-coded snapshot)."""
+    """Re-derive the FAIL set live (never a hard-coded snapshot).
+    t197: also returns the X set (span-free decodes) so the packet shows
+    what the corrected law renders, FAIL and X side by side."""
     out = []
+    xset = []
     tally = collections.Counter()
     for p in sorted(glob.glob(os.path.join(ROOT, "extracted", "**", "*.shp"),
                               recursive=True)):
@@ -103,7 +106,9 @@ def residue_records():
             tally[tag] += 1
             if tag == "FAIL":
                 out.append((p, k, ends[k] - starts[k]))
-    return out, tally
+            elif tag in ("X", "XS"):
+                xset.append((p, k, ends[k] - starts[k]))
+    return out, xset, tally
 
 
 def load_palette():
@@ -132,13 +137,19 @@ def main():
                  "g++ -std=c++17 -O1 -I rewrite/src -o tools/shp_pngdump "
                  "tools/shp_pngdump.cpp rewrite/build/libascend_core.a")
 
-    residue, tally = residue_records()
+    residue, xset, tally = residue_records()
     sets = []  # (kind, lib_path, rec, note)
     for name, k, why in CONTROLS:
         sets.append(("CONTROL", find_lib(name), k, why))
     for name, k in RESTORED:
         sets.append(("RESTORED-V", find_lib(name), k,
                      "t182 off-by-8 fix: canonical V law, was false FAIL"))
+
+    # t197: X-class records render through decode() now (span-free walk);
+    # they lead the packet as their own set.
+    for p_, k, span in xset:
+        sets.append(("SPAN-FREE", p_, k,
+                     f"X-class (span-free law), span={span}"))
 
     def cls_of(base):
         return ("span-undersized" if base in UNDERSIZED else
@@ -176,6 +187,13 @@ def main():
     index.append("#")
     index.append("# status: RENDERED(<WxH>,stride,stride,swapped,validated) | "
                  "DECODE-FAIL(report is the evidence) | PNG-BAD")
+    index.append("# t197: walk bound = FILE, not directory span (shp.md S21; "
+                 "blit has no length arg, cache verbatim). SPAN-FREE set = X "
+                 "records the old bound refused; XREC--*.png are full frames "
+                 "(planind factory ladder, 3cfgnew race-config art). Past-span "
+                 "rows desync into the next record and paint (r1_t197_"
+                 "pastrows.py) — bottom bands of SPAN-FREE renders are NOT "
+                 "vendor art, judge the upper rows.")
     n_rendered = n_valid = n_fail = 0
     ok = True
     for kind, p, k, note in sets:
@@ -197,7 +215,8 @@ def main():
         imgw, imgh = (H, W) if sw == "1" else (W, H)
         stem = base.rsplit('.', 1)[0]
         prefix = ("CONTROL--" if kind == "CONTROL" else
-                  "RESTORED--" if kind == "RESTORED-V" else "")
+                  "RESTORED--" if kind == "RESTORED-V" else
+                  "XREC--" if kind == "SPAN-FREE" else "")
         png_name = f"{prefix}{stem}--rec{k}--{imgw}x{imgh}.png"
         png_path = os.path.join(out, png_name)
         plane = open(os.path.join(out, c[7]), "rb").read()

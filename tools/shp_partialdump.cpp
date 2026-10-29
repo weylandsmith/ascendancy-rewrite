@@ -1,10 +1,12 @@
 // shp_partialdump.cpp — t196 OQ-005 residue TRIAGE dumper (docs/re/_wip_t196.md).
 //
-// Why this exists: ShapeLibrary::decode() correctly FAILS the 71 residue
-// records (dims/stream walk incomplete within the span — that IS the OQ-005
-// residue definition, rewrite/src/formats/shp.cpp decode()). For triage we
-// need to see what a residue record PHYSICALLY HOLDS: the grammar walk run to
-// span exhaustion yields a row-prefix of the declared frame. NO candidate
+// Why this exists: at t196 ShapeLibrary::decode() FAILed the 71 residue
+// records (dims/stream walk incomplete within the span). t197 PROVED the span
+// bound was our artifact (shp.md S21): decode() now walks span-free and 29 of
+// those records decode fully, so THIS tool's remaining reason to exist is the
+// 44-record residue (garbage dims words + EOF truncation) plus the paint
+// profile that started the correction (span-exhaustion row prefixes).
+// NO candidate
 // search happens here (GOAL.txt / REFUTED-ROUTES R2): dims come from the same
 // S16/S17 slots decode() reads, the stream start from the same uniform law,
 // and the row grammar is VERBATIM from shp.cpp walkRows() (control bytes C:

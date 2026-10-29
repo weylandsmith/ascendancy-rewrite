@@ -28,11 +28,21 @@
 //   clamp branches at 0x5cd31/0x5cd62) but the stream still advances;
 //   a completed row may exceed W without failing the walk (S14).
 //
-// DIMS ORIENTATION RESIDUE (S16, [inferred], NOT law): the 80-record
-// residual class stores dims whose pair orientation at the V/A slots is
-// unknown; decode therefore tries H rows, then W rows, before failing.
-// Records failing both are the banked BLOCKED-USER-LEVEL residue
-// (docs/BLOCKED.md t68 entry) — reported, never silently stubbed.
+// DIMS ORIENTATION RESIDUE (S16, [inferred], NOT law): the residual class
+// stores dims whose pair orientation at the V/A slots is unknown; decode
+// therefore tries H rows, then W rows, before failing.
+//
+// WALK BOUND (t197, docs/re/shp.md S20.2/S21): the row walk is bounded by
+// the FILE, not by the directory span [rec,nxt). The blit FUN_0005caac has
+// no stream-length argument and no stream-overrun error code, and the
+// draw-time cache is a verbatim whole-library copy (S10/S12) — the span
+// bound was our validator's invention. Records whose streams cross the
+// span (X class: planind k0..k12, 3cfgnew k0..k11, 14intel k8, 1starmap
+// k3/k4/k6) decode; past-span rows desync into the next record's bytes and
+// paint whatever the vendor would paint. Records that still fail: garbage
+// dims words (cos_star k40..k51, mouse k6/k7, 1starmap k1-class) and
+// genuine EOF truncation (3cfgnew k12) — reported, never silently stubbed
+// (docs/BLOCKED.md t68 residue, now 44 after the t197 dims-gate unification).
 
 #include <cstdint>
 #include <string>
@@ -67,7 +77,8 @@ class ShapeLibrary {
     // overflow) keep whatever out held on entry: caller chooses the
     // underlay, mirroring the original's untouched-destination semantics.
     // Tries height rows, then width rows (S16 orientation residue);
-    // returns false only when neither walk completes inside the span.
+    // returns false only when neither walk completes inside the FILE
+    // (t197: no directory-span bound; see WALK BOUND above).
     // *swapped (optional, docs/BLOCKED.md t68 evidence tooling t182): true
     // iff only the swapped walk completed — the buffer then holds
     // record().width rows of stride record().height (the canonical walk

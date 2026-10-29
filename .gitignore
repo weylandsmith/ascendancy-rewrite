@@ -13,3 +13,4 @@ work/
 xsend/build/rewrite
 tools/xsend
 tools/shp_pngdump
+tools/shp_partialdump

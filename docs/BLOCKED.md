@@ -310,6 +310,16 @@ cached heads are non-verbatim so file-space inference is unsound there.
 [AMENDED t182: count corrected by measurement to 71 records/28 files —
 10 k==0 records were validator off-by-8 false FAILs, see shp.md S18;
 classes otherwise unchanged.]
+[AMENDED t197: count 71 -> 44 (shp.md S21). The [rec,nxt) SPAN BOUND was a
+second validator artifact: the blit has no length arg and the cache is a
+verbatim whole-library copy, so 29 records (planind k0..k12, 3cfgnew
+k0..k11, 14intel k8, 1starmap k3/k4/k6) are FULL FRAMES at canonical dims —
+they now decode through rewrite ShapeLibrary and render as XREC--*.png in
+the packet. Dims-gate unification (both pair components sane, matching the
+blit's -1/-2 branches) demoted 2 degenerate walks (mouse k5, sg64expl k0).
+The remaining 44 = dims WORD garbage (cos_star k40-51 =0, mouse k5/6/7,
+1starmap k1-class) + EOF truncation (3cfgnew k12) + zero-stream EMPTY ladder
+slots; for these the dims-location question stands exactly as before.]
 Why blocked: closing needs a human-verifiable drawn frame (r1-savestate
 capture exists, but R13 means we cannot confirm the panel drew; blind
 sweeps are FORBIDDEN and the fixup-vary theory is measured dead).

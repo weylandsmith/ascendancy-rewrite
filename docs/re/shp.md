@@ -719,6 +719,7 @@ R13), now with the sanctioned-route negative cited. No rewrite change
 (ShapeLibrary reports garbage dims, never allocates — unchanged).
 
 ## 18. t182: evidence dumper SHIPPED + validator off-by-8 CORRECTION — residue 80 -> 71 [measured]
+## (RESIDUE COUNT SUPERSEDED by S21 t197: 71 -> 44; dumper/tooling facts stand)
 
 1. TOOLING. scripts/r1_t182_pngdump.py (+ C++ driver tools/shp_pngdump.cpp
    linked against rewrite/build/libascend_core.a) renders (library, record)
@@ -953,3 +954,68 @@ DARKNESS BUG FIXED; all-15-real verdict; interface-style anomaly noted
    sheets (claimed "rows=7-9" where labels said rows=77-95; claimed k8 tile
    text at a spot it wasn't) — trust the triage_report.txt numbers, never the
    vision transcript's; icon counting stays player-wins (S19 law).
+
+## 21. t197: SPAN BOUND REMOVED — validator X-class + rewrite decode() +
+## dims-gate unification — residue 71 -> 44, C++/Python law EXACTLY unified
+
+1. VALIDATOR X-CLASS [verified, scripts/r1_shp_unifiedlaw.py]. rec_state
+   gained tag X (XS = swapped-only; ZERO XS corpus-wide): canonical stream
+   slot (rec+8 k0 / rec+0x18 k>=1) + canonical dims, EXACT-H row walk with
+   NO directory-span bound (file EOF the only hard bound); evaluated only
+   AFTER bounded V/A/B fail, so nothing demotes spuriously. --no-x restores
+   pre-t197 semantics for A/B experiments. Paint-profile probe included
+   (--profiles): 14intel k8 5 rows/16B past span; 1starmap k3/k4/k6 1-5
+   rows/<=11B; planind 4-22 rows/114-2032B; 3cfgnew 24-25 rows/~0.9-1.5kB.
+   The X set is EXACTLY the t196 EXACT-H set (planind k0..k12, 3cfgnew
+   k0..k11, 14intel k8, 1starmap k3/k4/k6 = 29). 3cfgnew k12 fails even the
+   UNBOUNDED walk (EOF-truncated 55/79 rows) — broken vendor data outright.
+
+2. DIMS-GATE UNIFICATION [verified both sides]. The V/A trials skipped an
+   invalid dims COMPONENT (`continue` on W<=0 or >4096) and still walked the
+   other orientation — "passing" degenerate frames the vendor blit refuses
+   (-1 missing dims @0x5cb2b / -2 empty clip @0x5cb36). Affected records
+   corpus-wide: mouse k5 (W=0,H=46), sg64expl k0 (W=18,H=0xfffffffb). Both
+   demoted to FAIL in Python; the rule now matches rewrite decode() exactly
+   (BOTH components in (0,4096]).
+   FINAL CORPUS [measured 2026-10-29, pinned as gate stage 3c-2]: 208 libs,
+   1557 recs, V 196 + A 1288 + X 29 + FAIL 44, libraries clean 187/208.
+   Rewrite corpus test (real decode through ShapeLibrary) prints EXACTLY
+   1513 decode-pass / 187 clean = 1557 - 44: the two laws are now the same
+   law, floor-raised test_shp.cpp. Pre-t197: Python 1486/186, C++ 1484/185.
+
+3. REWRITE decode() [shp.cpp walkRows/decode + shp.h WALK BOUND contract].
+   The walk bound changed from r.end to img.size(); 4096 dims clamp KEPT
+   (models the vendor dims check; the span bound modelled nothing that
+   exists in the image). Destination semantics untouched (clamp-at-W,
+   untouched-skip). TEST shp_span_free_t197 pins BOTH sides: planind k0
+   decodes full 99x107 canonical, deterministic across calls, bottom band
+   written, >=30 distinct indices; 3cfgnew k0..k11 decode, k12 rejected;
+   1starmap k1 + mouse k6/k7 rejected (garbage dims words survive as FAIL
+   even span-free); 14intel k8 + 1starmap k3/k4/k6 decode. 112 tests
+   0 failed.
+
+4. PAST-SPAN ROWS PAINT — t196 phrasing corrected [verified,
+   scripts/r1_t197_pastrows.py + r1_t197_pastrows2.py]. The unbounded decode
+   WRITES pixels into past-span rows: planind k0 tail band = 40 distinct
+   palette indices, only 1.4% index-0; 3cfgnew tails 21-92 distinct. They
+   are NOT the next record's leading rows (row-sim vs successor row0
+   0.21-0.98, control vs own row0 the SAME magnitude — no reproduction).
+   t196's "transparent tail / rows 96-98 all-zero" was an artifact of the
+   span-exhausting PARTIAL DUMPER never painting those rows. Whether any
+   widget SHOWS the bottom bands (blit clip rect, or planind widgets drawing
+   fewer rows) is a paint-routine question owned by the gauge-library queue
+   item; the DECODE law (what bytes produce what plane) is settled and
+   faithful either way. 14intel/1starmap tails are near-blank (frac0
+   0.96-1.00), consistent with their short 5-22B past-span runs.
+
+5. EVIDENCE PACKET REGENERATED [work/r1/shp_png/, driver
+   scripts/r1_t182_pngdump.py over the rewrite's own decode()]: sets=88
+   rendered=44 validated=44 decode-fail=44 (law snapshot V196/A1288/X29/
+   FAIL44 printed in index.txt). New SPAN-FREE set renders as
+   XREC--<lib>--rec<k>--<W>x<H>.png (29 full frames: planind gauge ladder,
+   3cfgnew race-config art, 1starmap sprites, 14intel spark). ids.tsv now
+   validator-tagged ("X (validator tag t197, span-free)") for all 29 + two
+   DEGENERATE t197 rows for the dims-gate demotions; 73 data rows = exactly
+   the 44 FAIL + 29 X non-V/A records. The SPAN-FREE renders' bottom bands
+   are desynced bytes, NOT vendor art — labelled in index.txt; judge shape
+   on the upper rows. Player eyeball remains the only closer (R13).

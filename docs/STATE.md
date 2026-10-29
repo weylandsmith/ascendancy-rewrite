@@ -253,49 +253,84 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t197: SHP SPAN-BOUND CORRECTION — VALIDATOR X-CLASS + REWRITE decode()
-FIDELITY (arrives from t196, docs/re/shp.md S20 items 2-3): (1) extend
-scripts/r1_shp_unifiedlaw.py with tag X = "canonical stream slot, canonical
-dims, EXACT-H row walk with NO [rec,nxt) bound" (keep V/A/B semantics and the
-FAIL definition otherwise; paint-profile note per record: trailing all-skip
-rows vs header-desync tail via the painted-per-row probe in
-docs/re/_wip_t196.md S4); re-run corpus -> new V/A/X/FAIL tally + libs-clean
-count, pin as its own gate stage ONLY if cheap (else cite in shp.md S21).
-(2) Rewrite decision with citation: rewrite/src/formats/shp.cpp decode()
-currently fails these 29 frames on the span bound; the blit (FUN_0005caac) has
-NO length arg and NO overrun error (-1 dims/@0x5cb2b, -2 empty clip/@0x5cb36,
--3 outside/@0x5cea5 only) and draws from a verbatim whole-library cache copy —
-so faithful behaviour = walk exactly H rows unbounded, W/H sanity clamp 4096
-KEPT (1starmap k1-class dims 0x7ffffdbb must still be rejected). Update
-decode() contract comment (rows past span are real stream bytes; destination
-semantics unchanged), add pin test campaign/shp_span_free_t197: planind k0
-walks 99 rows, row-96+ content equals next-header-junk walk (deterministic),
-1starmap k1 still rejected, 3cfgnew k12 still rejected (EOF short), mouse k6/7
-still rejected (dims word invalid). (3) Regenerate work/r1/shp_png evidence
-via r1_t182_pngdump.py + ids.tsv X-tags; update the numbers cited in
-OPEN-QUESTIONS OQ-005 + shp.md S18/S20 headers. DO NOT re-open the dims-location
-claim for the 29 (t196 measured it); DO NOT touch cos_star k40..k51/mouse/
-1starmap k1/sg50expl k9 (paint-routine census is their next gate, queue item
-PER-PLANET ECONOMY FIELDS + GAUGE LIBRARY LAW keeps that slot — its (a2)
-paint-routine leg also decides those 16 + the level->record compression map).
-RATIONALE: t196 PROVED the OQ-005 "80 unknown-dims residue" framing is mostly
-a validator artifact — 29 records are full frames under the CLOSED dims law,
-and the rewrite (a validation asset per option C) currently refuses to decode
-live UI art (planind = the manufacturing gauge). Leaving decode() knowingly
-unfaithful is the one state worse than fixing it; the fix is offline, offline-
-sized, and testable without play. Vision oracle is INTERMITTENT on this
-deployment (works, occasional 500 'image input is not supported' — retry);
-R13 substantive ban unchanged: never self-grade codec correctness by pixels,
-never derive UI geometry from screenshots; label-digit misreads are a vision
-pitfall (trust triage_report.txt numbers).
-Do NOT re-open: the visibility layer (CLOSED t195), span-bounded-walk-as-vendor
-law (t196 refuted: blit has no length arg), planalNN-as-population-poses
-(killed t196 S20.4), the regpair/shift enumeration plan (RETIRED), LIST==mask
-(superseded), byte+0x23 (t190), a 7th BLIND .shp codec sweep (FORBIDDEN; the
-X-class tag is a bound correction on the CLOSED grammar, not a codec sweep).
-If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
-1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c), adjudication
-via scripts/r1_t85g_sitting.py on the named dir STILL outranks everything.
+NEXT t198: GAUGE-LIBRARY PAINT-ROUTINE CENSUS (leg (a2) of the PER-PLANET
+ECONOMY queue item, docs/STATE.md queue; user directive 2026-10-29 "derive
+the visualization laws from the binary")
+FIND THE PLANET-SCREEN PAINT ROUTINE and read off, as cited asm: (1) the
+level->record select for the four gauges — which planres/planpro/planind
+record index is drawn for a given level, resolving the 21-records-vs-~60-
+level compression question (player testimony = hypothesis; the call site =
+the citation); (2) the population-slot fill rule (capacity-sized,
+uncolonized=empty circle, free=yellowish-forward vs busy=reddish-sideways —
+which selector values, and WHICH library the slot icons come from: t196
+killed the planalNN pose hypothesis, candidates now narrowed to
+planitem/planets or an unlisted lib); (3) as a by-product, whether ANY of
+the 44 residue records (cos_star k40-51, mouse k5/6/7, 1starmap k1,
+3cfgnew k12, 26 zero-stream EMPTY ladder slots) is ever SELECTED — a
+selected residue record means its dims come from somewhere other than the
+header (the honest OQ-005 remainder), an unselected one closes the
+"never-drawable placeholder" claim as evidence-backed residue.
+METHOD: Ghidra headless (scripts/ghidra_headless_up.sh, 127.0.0.1:8089);
+anchor on the shape blit FUN_0005caac's caller set (75 decoder sites
+already censused t83 — shp.md W3) intersected with the planet-screen
+cluster; widget descriptor law S11/S15 (desc+5 arg) identifies gauge
+widgets; .SAV corpus per-planet fields feed the level->record census only
+IF the paint routine reads a level dword (leg (b) of the queue item,
+economy.md — create, check nothing regenerates it). Bank to
+docs/re/planets-ui.md (create) + shp.md S22.
+SCOPE ~35 tool calls: if the paint routine is not localised by call 20,
+bank the narrowed chain as honest residue and run FINISH SEQUENCE.
+RATIONALE: this single routine decides FOUR open things (gauge level->
+record law, population slot law, slot-icon library, OQ-005 residue
+selection census) and is the user's explicit standing directive. The
+competing offline queue item (OQ-021 displayed-count write site) ends in a
+user ruling regardless of what static finds, and its t73b site recipe was
+refuted twice — it ranks below. Do NOT re-open: span-bounded-walk-as-vendor
+law (t197 final: walk bound = FILE; shp.md S21), the X-class tag as a
+"codec sweep" (it is a bound correction on the CLOSED grammar; a 7th BLIND
+sweep remains FORBIDDEN), dims-location for the 29 X records (canonical —
+t196/t197 measured), planalNN-as-population-poses (killed t196 S20.4), the
+visibility layer (CLOSED t195), the regpair/shift enumeration plan
+(RETIRED), LIST==mask (superseded), byte+0x23 (t190). If a REAL sitting
+arms first (TRIGGER-A baselines: full-ns mtime 1793294532100000000 / size
+5,721,578,066 / tail md5 9054cc6c), adjudication via
+scripts/r1_t85g_sitting.py on the named dir STILL outranks everything.
+
+LANDED t197 (2026-10-29, this session): SPAN BOUND REMOVED + PYTHON/C++ SHP
+LAWS RECORD-EXACT UNIFIED. Trigger triage: timeline size == frozen baseline
+(no sitting); tree carried only tools/shp_partialdump (t196 renderer BINARY,
+orphaned by t196 — gitignored per tools/shp_pngdump parity, adopted).
+(1) VALIDATOR: scripts/r1_shp_unifiedlaw.py gained tag X (canonical slots +
+EXACT-H walk + NO [rec,nxt) bound; rowwalk_free; --profiles paint probe;
+--no-x escape). X set == EXACTLY the t196 EXACT-H set (29). PAINT-PROFILE
+MEASUREMENT CORRECTS t196 S20.2: past-span rows PAINT (planind k0 tail = 40
+distinct indices, 1.4% index-0; 3cfgnew 21-92 distinct) and are NOT the
+successor record's rows (sims ~0.5 both sides) — the "transparent tail" was
+the span-exhausting partial dumper never painting them. Whether widgets SHOW
+those bands is the paint-routine question (now t198).
+(2) DIMS GATE: Python's per-component `continue` walked degenerate frames
+the blit refuses (-1/-2 branches); demoted exactly mouse k5 (W=0,H=46) +
+sg64expl k0 (H=0xfffffffb), zero other changes corpus-wide.
+(3) REWRITE rewrite/src/formats/shp.{h,cpp}: walkRows bound r.end ->
+img.size(), decode() 4096 clamp KEPT, contract comments rewritten; TEST
+shp_span_free_t197 pins both sides (planind k0 99-row canonical deterministic
++ bottom band written; 3cfgnew k0-11 decode / k12 rejected EOF; 1starmap k1
++ mouse k6/7 rejected dims; 14intel k8 + 1starmap k3/4/6 decode). 112 tests
+0 failed.
+(4) NUMBERS PINNED BOTH SIDES [measured]: V196+A1288+X29+FAIL44=1557, libs
+clean 187/208, rewrite decode-pass 1513 = 1557-44 EXACTLY (pre-t197 Python
+1486/186, C++ 1484/185). NEW GATE STAGE 3c-2 greps the five law lines
+(~0.2s). Evidence packet regenerated (r1_t182_pngdump.py + SPAN-FREE set):
+44 rendered/44 validated incl. 29 XREC-- full frames; ids.tsv
+validator-tagged (73 rows = 29 X + 44 FAIL) + 2 DEGENERATE t197 rows;
+index.txt warns past-span bands are desynced bytes not vendor art. Docs:
+shp.md S21 (+S18 supersession header), OPEN-QUESTIONS OQ-005 STATUS t197
+(row stays OPEN — strict-close: 44 dims-unknown remain, closure class =
+player ruling / t198 selection census), BLOCKED.md t68 AMENDED t197.
+PITFALLS: enumerate unpack must be (idx,value) (null-result bug,
+r1_t197_pastrows2.py); never splice tsv by index math — repair lost rows
+explicitly (ids.tsv near-miss this session). Gate 0 + LEDGER AUDIT OK +
+LEDGER INDEX OK; open = 005/016/019/021
 
 LANDED t196 (2026-10-29, this session): RESIDUE TRIAGE VIA VISION ORACLE —
 the OQ-005 residue is LARGELY A VALIDATOR ARTIFACT. Trigger triage: timeline
