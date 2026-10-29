@@ -1078,6 +1078,23 @@ FUN_0004dd50) then FUN_00049acc RE-MATERIALIZE (no record copy ever);
 redesign FUN_000497a8 REFUSES iff new hull cap < filled (0x497da). Row
 STAYS OPEN on strict-close: ONLY the live flight-delta residue remains
 (BLOCKED t48 capture window) plus magnetron identity (t183 census).
+STATUS t185 (static RUN, ships.md §19): MAGNETRON IDENTITY CLOSED WITH
+CITED MEASUREMENT — (a) loaded design table == gizmos.txt file order
+MEASURED 76/76 names x 1368 save members, ZERO mismatches
+(scripts/r1_t185_magnetron_census.py RC=0); immediate 0x24 at 0x4159a =
+RECALLER (gizhelp.txt:695-699 help-tag gizmo36 too), NOT the Disarmer —
+t183's off-by-one corrected; the branch is an emergency auto-recall inside
+the movement resolver. (b) THE MAGNETRON USE-SITE FOUND: FUN_0004ca50
+(kind-2 target-order dispatcher) case cl==0x3c at 0x4cd5c — Range*32 lane-
+distance gate + design flag bit1 + Power burn, placement via 0x220a8 +
+0x21f58 (star coords + (0,-200,0) + rng%200 x2, jitter const LIVE -200.0
+MEASURED at B+0x82bb0+0xaee), slot rebuild 0x496e4; 0x4a360 guard
+decrements the slot use-word iff design[+0x42] != 0 (semantics of col5 NOT
+re-derived). §16 item 3 UNMEASURED tie => MEASURED law. Row OQ-019 STILL
+OPEN on strict-close: the sole residue is the live flight-delta
+arrival-granularity capture (BLOCKED t48); every offline question named on
+the row is now closed. NEXT: offline queue EMPTY — re-arm idle, surface
+the decision list (OQ-005 eyeball index.txt first).
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

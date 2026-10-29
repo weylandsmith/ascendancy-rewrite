@@ -520,7 +520,14 @@ The player (who has ~1250 turns of play in the captured campaign) reports:
    50 1 255', category 5, NumUses 1). Candidate consumer: the cited kind==5
    go-to-star placement handler 0x21f58 (places at star coords with rng%200
    jitter, then kind 5->4) — UNMEASURED tie; do not bank as law until the
-   magnetron's use-site reads it.
+   magnetron's use-site reads it. UPDATE t185: USE-SITE FOUND AND MEASURED
+   — the magnetron rides the kind-2 target path into FUN_0004ca50, case
+   cl==0x3c at 0x4cd5c: Range*32 + flag-bit gates, Power burn, placement
+   via FUN_000220a8 + kind-5 handler FUN_00021f58 (star coords + (0,-200,0)
+   + rng%200 on the other two axes, jitter const LIVE -200.0 @B+0x82bb0+
+   +0xaee), slot rebuild 0x496e4. docs/re/ships.md §19 T3 SUPERSEDES this
+   item; the resolver branch at 0x4159a is the RECALLER (literal 0x24),
+   not the Magnetron (0x3c) — t183's off-by-one naming corrected.
 Implication for the sugar-cube scale question: scale must be sought per tier
 (within-system walk units per sub-turn; lane transit as its own law), not as
 one global hop count. The [1,3] default is likely tier-blind.
@@ -597,6 +604,11 @@ census law), immediate 36 = 'Disarmer', not 'Lane Magnetron' (file row 59);
 slot census: 15 of 35 ships carry idx36, ZERO carry idx59. The kind-5
 branch is therefore SOME one-shot placement gizmo, identity UNVERIFIED;
 §16 item 3 stays UNMEASURED — do not bank magnetron law.
+[t185 CORRECTION: this block's row map was off by one — idx36 == RECALLER
+(loaded table 76/76 verified, gizhelp help tag gizmo36), idx59 ==
+Sacrificial Orb, Magnetron == 60. The 0x4159a branch is the Recaller
+emergency recall; the Magnetron's own use-site is in FUN_0004ca50 case
+0x3c. See §19 — this paragraph's conclusion is SUPERSEDED.]
 UNIT-SYSTEM STATUS: travel distance, MOVES spend, and the 160/32 constants
 are CITED; the remaining unit question (ship +0x9e units == star-table f32
 units, both world, vs a coarser star unit) is RESOLVED by T2/T3 reading as
@@ -681,3 +693,99 @@ STATUS vs OQ-019: this closes the row's named residue "the build/redesign
 inventory path" with cited measurement (static law + 1234/1234 runtime).
 Row itself STAYS OPEN — sugar-cube flight-delta closure still blocked per
 t48/BLOCKED (needs a capture window with actual flight).
+
+## 19. KIND-5 PLACEMENT CONSUMERS: MAGNETRON USE-SITE FOUND; RESOLVER BRANCH = RECALLER (t185)
+
+Task t185 (last fully-offline OQ-019 residue). Tools:
+scripts/r1_t185_magnetron_census.py (RC=0) + Ghidra headless disasm bytes.
+
+T1 LOADED TABLE == FILE ORDER, MEASURED: across 1368 save members under
+work/r1, all 76 loaded design-row names at B+0x82bb0+0x7650c+0x6a*g match
+extracted/ascend00/gizmos.txt row order EXACTLY (0 mismatches). Row 36 =
+Recaller, row 37 = Disarmer, row 60 = Lane Magnetron. t183's §17-T6
+parenthetical ("index-36 == Disarmer, Magnetron = file row 59") was an
+ad-hoc row map off by one; the t87 parser (and gizhelp.txt's own
+help tags: gizhelp.txt:695-699 '#Recaller ... help gizmo36',
+gizhelp.txt:1173-1176 '#Lane^Magnetron ... help gizmo60') give the correct
+indices. Slot census over owned ship rows (t101 locator): cidx 36 present
+129 occurrences, cidx 60 present 360 — ships carry BOTH.
+
+T2 THE RESOLVER'S KIND-5 BRANCH IS THE RECALLER, NOT THE MAGNETRON
+[verified bytes 0x4159a: ba 24 00 00 00 = literal MOV EDX,0x24]:
+FUN_00041260 calls FUN_00049768(ship, 36) = first slot whose cidx==36
+(decompile 0x49768: scan 0..cap[+0x15a], stride 7 from +0xab), then sets
+[+0x62]=1, [+0x63]=slot ptr, [+0x67]=5, calls FUN_00049f28(ship,1). The
+0x4a360 dispatcher routes kind-5 to 0x4cd90 whose tree case cl==0x24
+(combat.md §(a) table row, already banked) IS the Recaller:
+ship+0x59 := own-race target-list dword, then calls 0x220a8 + 0x21f58 = the
+travel issuer + placement handler. Vendor law (gizhelp.txt:699-701):
+"creates an unstable shunt through star lane space to a ship's home
+system... arrives immediately at its home system." An EMERGENCY RECALL
+fires automatically inside the movement resolver — semantics consistent
+with the branch sitting in FUN_00041260. NOTE the magnetron tie §16 item 3
+asked about was NEVER in question for THIS branch once indices were fixed;
+§16 item 3's "candidate consumer 0x21f58" survives but for the MAGNETRON
+via a different path (T3).
+
+T3 MAGNETRON USE-SITE FOUND — §16 item 3 NOW MEASURED [verified disasm
+0x4ca50 body + 0x4cd05..0x4cd2f bytes]: the unified gizmo dispatcher
+FUN_0004a360 (combat.md §286) routes order-kind [+0x67]==2 (star-target)
+to FUN_0004ca50 (0x4a3ac). Inside 0x4ca50:
+  lane-d = sqrt(|target_star.pos - ship[+0x9e]|^2)   (pos = star rec f32
+      at +8/+0xc/+0x10, alternate triple +0/+4 used when ptr[0]==ship+0x59)
+  GATE 1 (range): if design[+0x3a]Range != 0 and Range*32 < lane-d:
+      power spend 0 -> activation fails (decompile 0x4ca50:
+      `(FUN_00076544+iVar4+2 != 0) && (<<5 as float < local_38)` -> local_28=0)
+  GATE 2 (flag): bit1 of WORD design[+0x33] must be set
+      (decompile: `(*(ushort *)(iVar4 + 0x7653f) & 2)`; 0x7653f = raw
+      +0x33 flag word per t101 convention)
+  on commit (mode==1): [+0x88] -= min(Power, fuel)
+  CASE TREE on slot cidx (0x4cd51..0x4cd66; each `jc/jbe` pair captures a
+  single value): 0x20 -> OR target[+0x23],2 ; 0x33 -> loop ships,
+  recompute-distance bookkeeping for other kind-5 orders sharing the same
+  target ptr (decompile writes the float distance into [s+0x9e] —
+  position-field aliasing flagged, NOT banked as law); 0x34..0x3b -> ret;
+  0x3e -> OR target[+0x17], 1<<(ship+0x56) ; 0x3c = LANE MAGNETRON
+  (cmp cl,0x3c @0x4cd5c; jc ret; jbe 0x4ccfe):
+        0x4cd0d FUN_000220a8(ship,star)   (travel issuer: validates order
+            kind in {1,2,2-ish}, lane-connect check via 0x39894)
+        0x4cd16 byte [ship+0x58] = 5      (order kind PLACEMENT)
+        0x4cd19 dword [ship+0x59] = star ptr
+        0x4cd1f FUN_00021f58()            (THE SHARED PLACEMENT HANDLER)
+        0x4cd24.. slot-index recompute then FUN_000496e4 slot rebuild at
+            0x4cd3f (bytes 29 d0 / 89 c2 / bb 07 / idiv ebx / call 0x496e4)
+  USE-ACCOUNTING GUARD (0x4a360 prologue, bytes 0x4a373-0x4a390): reads
+      dword design[+0x42]; if 0 -> no decrement; if slot word [slot+1]==0
+      -> block; else dec word [slot+1] when mode==1. Recaller's col5 == 0
+      and Magnetron's == 1 per gizmos.txt; what col5 numerically MEANS is
+      NOT re-derived this session (t87 mapped the COLUMN, not the
+      semantics) — do not read "NumUses" as proven until its consumer law
+      is cited.
+  PLACEMENT HANDLER FUN_00021f58 (body 0x21f58..0x22034 fully read):
+      EBX!=0 -> assert 0x2a428 ('..\\ship.cpp' 0xfc); requires
+      byte[ship+0x58]==5 (kind 4 at 0x22035 just re-points +0x59);
+      target = ptr [ship+0x59]; f32 triple chosen = target[+8..+0x10] if
+      EDI==target[0], else target[+0x14..+0x1c] if EDI==target[4], else
+      assert 0x2a438 (0x109/0xae0); y := y + f32 DAT_00000aee — LIVE
+      VALUE -200.0 MEASURED at B+0x82bb0+0xaee (static payload bytes at
+      0xaee are code — t43 stale-static law applies to const pool too);
+      TWO rng draws via FUN_0007824f (the single-image LCG, combat.md),
+      each reduced idiv 200 (%200) and ADDED to the other two slots of the
+      triple (third @0x21ffc..0x22008, first @0x22018..0x22027); commit
+      via FUN_00049aa8 (EDX=triple ptr) then byte[ship+0x58] := 4.
+      => PLACEMENT LAW = star coords + (0,-200,0) + rng%200 on the other
+      two axes (axis naming assumes the triple is (x,y,z) like the
+      +0x9e/+0xa2/+0xa6 ship triple) — §16's "rng%200 jitter" CONFIRMED
+      with addresses; no distance clamp inside the handler.
+=> LAW: Lane Magnetron = player-activated, star-targeted (kind-2 order)
+   gizmo, gated by Range*32 lane-distance + design flag bit1, burns Power
+   into [+0x88], places the ship via the shared kind-5 placement handler
+   0x21f58, then rebuilds the slot (0x496e4). t183's "MAGNETRON TIE NOT
+   ESTABLISHED" is SUPERSEDED; combat.md's tree-table "NO CASE" gap list
+   did not cover 0x3c because 0x3c lives in the OTHER dispatcher (0x4ca50,
+   target-order path), not 0x4cd90.
+
+CORPUS NOTE (corrects t184's "20/20 saves" phrasing): the cap-law corpus is
+1234 owned rows spread over 49 save FILES across work/r1 run dirs (t184's
+own print says saves_with_ships=49); empty-scenario probe boots
+(dword@0x43489>>16 == 0) are headless thread-probe runs, not corrupt saves.

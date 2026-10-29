@@ -238,6 +238,51 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
+NEXT t186: IDLE RE-ARM + DECISION SURFACE — the offline queue is EMPTY.
+Every OQ-019 residue is closed except the live flight-delta capture
+(BLOCKED t48), and every other open row needs a capture or the player
+(OQ-005 eyeball work/r1/shp_png/index.txt, OQ-016-tail, OQ-021, OQ-023
+per t180/stop-report §2-§3). A model session runs only on an armed
+trigger, dirty tree, or human queue (t178 IDLE RULE): do NOT spend a
+session re-checking for new work. WHEN THE CAPTURE TRIGGER ARMS, run
+scripts/r1_t85g_sitting.py on the new ring, then the OQ-021/OQ-023/OQ-019
+flight-delta menu (STATE HISTORY region + stop-report.md §2). WHEN THE
+DECISION TRIGGER ARMS, surface: (1) OQ-005 PNG packet for the player's
+eyeball ruling (index.txt, CONTROLS first); (2) accept/reject documented
+defaults for static-only rows; (3) authorize a capture sitting that
+FLIES ships (two zero-observation corpora t49/t58 prove flights only
+come from real play); (4) t89a-scale code work resumption if strict-close
+is relaxed. RATIONALE: t185 closed the last fully-offline candidate
+(magnetron identity); any session that invents a fifth static scheme
+violates R1/GOAL standing decisions.
+
+LANDED t185 (2026-10-28, this session): OQ-019 MAGNETRON IDENTITY CLOSED
+WITH CITED MEASUREMENT (row stays OPEN — flight-delta residue only).
+Ships.md §19 is the artifact. (a) LOADED DESIGN TABLE == FILE ORDER:
+76/76 gizmos.txt name matches at B+0x82bb0+0x7650c+0x6a*g across 1368
+save members, ZERO mismatches (scripts/r1_t185_magnetron_census.py RC=0).
+Immediate 0x24 at 0x4159a = RECALLER (gizhelp.txt:695-699 help tag
+gizmo36), NOT Disarmer — t183's row map was off by one (Disarmer=37,
+Magnetron=60); slot census across saves: cidx36 x129, cidx60 x360, ships
+carry both. The FUN_00041260 branch is an emergency auto-recall (0x49768
+scan -> kind 5 -> 0x49f28 -> 0x4cd90 case 0x24 -> 0x220a8+0x21f58,
+already in combat.md §(a)). (b) MAGNETRON USE-SITE FOUND: FUN_0004ca50
+(kind-2 target dispatcher, called from 0x4a3ac) case cl==0x3c at 0x4cd5c
+— gate Range*32 >= lane-dist + design flag word bit1, Power burn into
++0x88, placement 0x4cd0d 0x220a8 + kind5 + 0x4cd1f 0x21f58, slot rebuild
+0x4cd3f 0x496e4; 0x4a360 guard 0x4a373..0x4a390 decs slot use-word iff
+design[+0x42]!=0 (col5 semantics NOT re-derived — flagged). 0x21f58 body
+fully read: star triple + f32 DAT_00000aee (LIVE -200.0 MEASURED at
+B+0x82bb0+0xaee; static payload bytes there are code, t43 law again) +
+TWO rng%200 draws (0x7824f LCG, idiv 200) added to the other two axis
+slots, commit 0x49aa8, kind 5->4. §16 item 3 tie now MEASURED; §17-T6
+paragraph marked SUPERSEDED. Corpus phrasing corrected: t184's fleet
+corpus = 1234 rows over 49 FILES (empty-scenario probe boots are
+headless thread runs, not corrupt saves). Tooling lesson: census slice
+m[a:m[a+0x40]] is a byte-value end — grep your own slices when a
+"76/76 empty names" anomaly appears next to a tool that reads fine.
+Gate 0 + LEDGER AUDIT OK. WIP: docs/re/_wip_t185.md.
+
 LANDED t183 (2026-10-28, this session): OQ-019 SCALE MEASURED + TWO-TIER
 TURN CODE-MAPPED (row stays OPEN — strict-close; live flight delta still
 missing). Ships.md S17 is the artifact. Headline numbers [MEASURED 20/20
@@ -284,7 +329,8 @@ new-hull cap < filled (0x497da). Init side-law: integrity [+0x8c]=(hull+1)
 *10 doubled if war byte DAT_00012fb3+emp*0x1ee==1; player-designed ships
 skip the hull-name copy. Gate 0 + LEDGER AUDIT OK. WIP: docs/re/_wip_t184.md.
 
-NEXT t185 (STATIC, LAST FULLY-OFFLINE CANDIDATE): OQ-019 magnetron identity
+NEXT t185 (SUPERSEDED by t185 LANDED above — was DONE this session;
+STATIC, LAST FULLY-OFFLINE CANDIDATE): OQ-019 magnetron identity
 + the two §18-adjacent loose ends folded in ONE pass — (a) enumerate what
 gizmo category 5 (the kind-5 go-to-star orders, §17 T6/§16 item 3) rows
 EXIST in the scenario-LOADED gizmo table live copy (base law t47:
@@ -350,8 +396,11 @@ WHEN A CAPTURE TRIGGER ARMS, the menu (docs/re/stop-report.md §2, t110):
     propose. Expected signal: BOTH cells -> 3 with +10 attitude each; DA 10
     becomes selectable against any empire the acceptor is at war with. Run
     scripts/r1_t85g_sitting.py on the new ring.
-  - OQ-019: per-turn step CLAMP law + build/redesign inventory: needs real
-    flights (two zero-observation corpora t49/t58 prove no offline route).
+  - OQ-019: needs real FLIGHTS only now (two zero-observation corpora
+    t49/t58 prove no offline route; inventory path closed t184, magnetron
+    + recall consumers closed t185, scale t183) — consecutive-save flight
+    delta pins arrival granularity. A Recaller-triggered jump in the ring
+    is itself a bankable observation (0x4159a auto-recall law).
   - OQ-016 tail: per-cell terrain/nuke wiring, same class (stop-report §2).
     (OQ-003 CLOSED t181 — nothing capture-side left on that row.)
   - A battle in the same sitting additionally banks slot-diff damage evidence
