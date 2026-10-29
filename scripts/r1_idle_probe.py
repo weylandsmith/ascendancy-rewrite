@@ -94,8 +94,8 @@ TIMELINE = os.environ.get("R1_TIMELINE",
 # scripts/r1_t192_window_adjudicate.py RC=0). New edge state measured t192:
 # size 5,702,731,088 B, mtime 1793247164.180000000 (2026-10-29 00:12:44),
 # head md5 unchanged (42a0bed0), tail md5 25cca2cb.
-BASE_MTIME_NS = 1793247164_180_000_000  # 2026-10-29 00:12:44 -0400 (stat t192)
-BASE_SIZE = 5702731088
+BASE_MTIME_NS = 1793294532_000_000_000  # 2026-10-29 13:22:12 -0400 (stat t193)
+BASE_SIZE = 5721578066
 # t151 CONTENT baseline, ENACTED t156 (was STATE.md prose only — see (A6) below).
 # md5 of the FIRST and LAST 64 KiB of the frozen timeline; reproduced
 # byte-identically t151..t156 (old frozen file). Never hash the whole file.

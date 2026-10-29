@@ -468,10 +468,23 @@ the tail): T=15 -> 8/3/2/1/1, T=25 -> 13/6/3/1/1/1, T=50 -> 26/12/6/3/1/
 five arms (scripts/r1_t79_pos.py, runs r1size-{041459,042719,043229,
 044658,045501} + r1deep-230146 control). Evidence mapgen.md §OQ-025; code
 site: shellRadiiFor(n) rewrite/src/game/mapgen.cpp replaces the i%50 wrap
-(measured wrong for T>50); test galaxy_density_ladder_matches_measured_
-sizes pins per-size shell runs (108 tests 0 failed) | CLOSED |
+(measured wrong for T>50); test galaxy_density_ladder_matches_measured_sizes
+pins per-size shell runs (108 tests 0 failed) | CLOSED |
 Tail-residue note: gated chains exceed DAT T at low densities (records
 stay allocated past the in-play cut — consistent with the t78 caveat).
+OQ-026 | visibility | original HAS live per-empire lane/star visibility masks
+(lane rec+0x20, star obj +0x16/+0x17; share law FUN_00046354/FUN_00046524,
+t192) — rewrite models NO visibility layer at all; whether the vendor UI
+WITHHIDES fogged lanes/stars is UNPROVEN (consumer unmapped, ships.md S23 L8)
+| open | t193 MEASURED mid-game (Oct-29 sitting, 20/20 saves): pool +0x20
+census {1,3,6,7,11,15} x1160 recs, 100/1160 MULTI-BIT (share path fired),
+per-empire fog 9/8/25/32 of 58 lanes; scripts/r1_t193_midgame_witness.py;
+docs/re/ships.md S23 L7/L8. CLOSURE ROUTE: (1) enumerate mask consumers
+(byte-regpair/shift test forms beyond the 22 cmp/test hits; star-painter via
+LAB_00013bc5 consumers); (2a) if consumer HIDES -> implement reveal/sharing +
+pin test, upgrade SA_KnowHomeWorlds/SA_KnowStarLanes from FILED NO-OP
+(abilities.md t193 rows); (2b) if bookkeeping-only (AI/diplomacy) -> bank
+negative, close with that citation |
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — rewrite placeholder was 30 turns | CLOSED t100 | THE
 MEASUREMENT (aicode.md §6.4 + docs/re/_wip_t99.md F7-F11): charge period =
@@ -1252,6 +1265,26 @@ visibility layer; ships.md L6/debugflags.md flag that abilities.md's "no fog
 of war in original" parenthetical is false-of-original — filing disposition
 unchanged, justification text queued for the next abilities pass). Row
 STAYS OPEN: live-st4 residue unchanged. | open |
+STATUS t193 (2026-10-29, ships.md S23 L7/L8, cited): MID-GAME WITNESSES
+IN — the Oct-29 12:30..13:22 sitting re-wrote all 20 saves at t=1086
+(4 empires, war with Minions): pool +0x20 census {1:160,3:80,6:180,7:220,
+11:260,15:260} of 1160 recs = 100/1160 MULTI-BIT (the 0x463eb/0x46421 SHARE
+OR HAS FIRED; e.g. 11 = player+Orfa+Minions), per-empire fog 9/8/25/32 of 58
+lanes; star twin +0x16/+0x17 multi-bit too; masks md5-static across the
+window (no grant fired inside it). t192's LIST=={mask==1<<r} law SUPERSEDED
+(0/80 mid-game): per-race lists = OWN claimed lanes (cnt=2, second entry a
+t190 BRIDGE lane), subset of nonzero-mask pool. rec+0x21 {0:720,1:440} mid-
+game, NOT a function of +0x20 (mask 11 with both values) — writer/semantics
+still open (flag). STATIC: t191's 'paint loop 0x25aa2..0x25b6d -> painter
+0x20c48' REJECTED — 0x20c48 is an alloc wrapper (FUN_00077b40/0x77b47) and
+FUN_00025604 is a state-SNAPSHOT serialiser; NO rec+0x20 UI consumer found
+(census: 4 TEST + 18 CMP imm hits, none lane-pool-scoped; Ghidra
+search_instructions 98,819 instrs) — visibility-asked consumption moved to
+OQ-026. OQ-019's OWN residue re-probed and still NOT falsifiable: 2238 st4
+samples in the sitting window, 10 (turn,slot) pairs, ZERO mid-turn
+displacement, and the game never left t=1086 (639 rows 12:55:59..13:22:12,
+turn advance absent) — the live in-system march needs a sitting that PASSES
+turns while a ship is in-system. | open |
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

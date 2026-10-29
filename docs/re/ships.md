@@ -1102,3 +1102,59 @@ FUN_00046354 = MUTUAL LANE-VISION SHARE between two empires, and the
   no longer holds mid-game states). t191's stickiness law therefore holds for
   the CHEAT and SHARE paths (0x273ca / 0x463eb / 0x46421 have no inverse),
   which is what the player testimony observed.
+
+L7 t193 MEASURED (mid-game witnesses; supersedes the L6 new-game negative):
+  THE SHARE PATH HAS FIRED — rec+0x20 IS A LIVE MULTI-BIT PER-EMPIRE MASK.
+  Corpus: the Oct-29 12:30..13:03 LIVE sitting (user played; shared timeline
+  grew 5,702,731,088 -> 5,721,578,066 B; all 20 save/*.sav re-written, game
+  at t=1086 wall-clock save cadence; 4 empires Chamachies(player, idx0)/
+  Orfa/Ungooma/Minions, states peace x5 + war Chamachies<->Minions, no
+  state-3 cell in the captured rows). Probe scripts/r1_t193_midgame_witness.py
+  (addresses/PTR2OFF law identical to r1_t192_share_mask_scan.py rev2):
+    pool +0x20 census (20 saves x 58 lanes = 1160 recs):
+      {1:160, 3:80, 6:180, 7:220, 11:260, 15:260} -- ZERO zeros, 100/1160
+      MULTI-BIT. 11=0b1011 (player+Orfa+Minions), 15=all four, 6=bits1+2
+      (no player bit: AI-only-visible lanes EXIST). Per-empire lane FOG:
+      bit0 visible 49/fogged 9; bit1 50/8; bit2 33/25; bit3 26/32 -- every
+      empire holds fogged lanes mid-game; the player's fog is the SHALLOWEST
+      [inferred: AI<->AI sharing outpaces AI->player at this attitude
+      profile]. Star twin +0x16 {1:160,6:180,7:160,11:240,15:260} /
+      +0x17 {1:260,6:240,7:180,11:220,15:100} (byte views of the u16 pair):
+      FUN_00046524 share witnesses TOO.
+    MASK STATIC across the whole sitting: md5 of the 58-byte +0x20 vector =
+    4ca8c5c6 and of +0x21 = 99522cd0 in 20/20 saves -- no grant fired during
+    the captured window (consistent with the t192 caller law: bidirectional
+    grants fire at ALLIANCE formation 0x45778 and the receive leg 0x55f6e at
+    race-event boundaries; no state-3 transition inside the window).
+    t192's LIST=={mask==1<<r} LAW IS SUPERSEDED (0 ok / 80 bad mid-game):
+    [sub+0x2c] lists hold exactly 2 lanes per race (r0 25,50 / r1 27,55 /
+    r2 18,54 / r3 2,57 -- all four second entries are t190 BRIDGE lanes
+    50..57), every list a STRICT SUBSET of the nonzero-mask pool. RE-READ:
+    the per-race list is the race's OWN claimed lanes, not the visibility
+    mirror; t192's 100/100 equality was a new-game artifact (own lanes ==
+    only reveals).
+    rec+0x21 NOT all-zero mid-game: {0:720, 1:440}. Pairs (mask,b21):
+    (1,1)x8 (3,1)x4 (6,0)x9 (7,0)x11 (11,0)x3 (11,1)x10 (15,0)x13 -- mask 11
+    occurs with BOTH b21 values => b21 is NOT a function of +0x20; semantics
+    and writer still OPEN (t191 flag stands).
+  L8 t193 STATIC (leg a): the t191 "lane-paint loop 0x25aa2..0x25b6d ->
+  painter 0x20c48" LABEL IS DEAD. FUN_00020c48 decompiles to an ALLOCATION
+  wrapper (stack-link walk, FUN_00077b40 alloc, 0x20c84 continuation,
+  FUN_00077b47 free) -- not a painter. The cited loop sits in FUN_00025604,
+  a GAME-STATE SNAPSHOT writer: it serialises the lane pool (data+0x3337
+  stride 0x27, fields rec+8..+0x23 incl. +0x20/+0x21 u16/+0x23 u32 and
+  endpoint obj *rec+2>>0x10), diplo rows (stride 0x1ee, 100 dwords + tail
+  +0x192), star refs, count words 0x49c3/0x32dd1/0x3067b -- save/AI-scan
+  shape, not drawing. Consequence: the CONSUMER that would HIDE a fogged
+  lane is STILL UNMAPPED. Instruction-wide census (Ghidra
+  search_instructions, 98,819 scanned): TEST byte [reg+0x20],imm = 4 hits
+  (0x80cc8/0x80cdf/0x80d1b/0x80d37, EBP-frame runtime region); CMP *0x20],imm
+  = 18 hits, NONE on lane-pool addressing (0x7a11e CMP byte [EAX+0x20],DL is
+  the vprintf engine). The mask is consumed via regpair/shift forms not yet
+  enumerated. Fog-of-war EXISTENCE in the UI therefore remains UNPROVEN --
+  but the mask is now PROVEN live per-empire game data with real fog bits
+  (above), which the rewrite does not model at all: ledger row OQ-026
+  visibility layer OPENED; abilities.md L40/L52 parentheticals "no fog of
+  war (UI draws every star)" REPLACED with the measured mask facts +
+  UNPROVEN-consumer status (GOAL.txt: a false justification must not stand
+  as the cited reason; the FILED NO-OP disposition stands pending OQ-026).

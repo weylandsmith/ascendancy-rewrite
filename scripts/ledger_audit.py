@@ -84,7 +84,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", default="docs/OPEN-QUESTIONS.md")
     ap.add_argument("--expect", default="OQ-021,"
-                                        "OQ-005,OQ-019,OQ-016")
+                                        "OQ-005,OQ-019,OQ-016,OQ-026")
+    # t193: OQ-026 (visibility layer / rec+0x20+star+0x16 consumer) OPENED by
+    # the mid-game share-path witnesses (ships.md S23 L7/L8) — added to this
+    # default the same way t181/t189b re-triaged rows.
     # t189b re-triage: OQ-023 CLOSED by the observed state-3 event
     # (cell0i=celli0=3 @t1335, +10/+10, arbiter scripts/r1_t188_state3_arbiter.py
     # RC=0 re-run; docs/re/diplomacy.md §13+§16) — removed from this default the

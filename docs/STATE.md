@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T09:40
+updated: 2026-10-29T13:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -156,6 +156,13 @@ ledger:
       dark-zone enumeration (t73b); capture fallback. Default >1/2 stands.
       t189b STATUS: 14->21 drift real, NOT systems count; displayed-count
       write-site is now the residue"
+    - "OQ-026 visibility layer: original HAS live per-empire lane/star masks
+      (lane rec+0x20, star +0x16/+0x17) — t193 MEASURED mid-game multi-bit
+      share witnesses (100/1160 recs, per-empire fog 9/8/25/32 of 58;
+      scripts/r1_t193_midgame_witness.py, ships.md S23 L7); UI consumer
+      UNMAPPED (t191 'painter 0x20c48' DEAD = alloc wrapper, ships.md L8).
+      Closure route: consumer hunt (byte/shift test forms, star-painter via
+      LAB_00013bc5 consumers) -> implement+pin or bank negative"
 
 ## WHAT IS IN HAND (tools + laws — a fresh session starts here, not from scratch)
 - R1 save-state capture LIVE: scripts/r1_savestate.sh (boot -> autosave ZIP,
@@ -242,47 +249,78 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t193: WALK THE LANE PAINTER — does the vendor UI actually WITHHOLD
-an unrevealed lane? (t192's flagged open half; debugflags.md t192 block +
-ships.md S23 L6.) Three legs in ONE static pass:
-(a) WALK FUN_00020c48 (lane painter, fed by loop 0x25aa2..0x25b6d which
-copies lane rec +0x20/+0x21/+0x23 into the painter record, stride 0x27):
-pin how the copied +0x20 mask byte is CONSUMED (test against
-1<<byte[0x7458e]? against a per-empire loop? skipped-draw jump?). MAP
-byte +0x21 too: live pool reads ALL ZERO in the 20-save corpus (60.sav
-dump) and the only cited copier is the paint loop — find its WRITER via
-the disp8-store census form (ships.md t191 method: 88/89/c6/c7/81/83 over
-the pool window; caveat: 0x22049's [EDI+0x15] is the SHIP record, not a
-lane writer);
-(b) DECIDE the fog-of-war question for abilities.md: if the painter
-skips drawing iff the viewer bit is absent, SA_KnowStarLanes/
-SA_KnowHomeWorlds are REAL reveal abilities in the original and the
-rewrite's FILED NO-OP justification text ("no fog of war (UI draws every
-star)") MUST be corrected (disposition itself may stand — the rewrite has
-no visibility layer — but GOAL.txt forbids a false justification standing
-as the cited reason; if REAL, also note whether the star-reveal twin
-field star-obj +0x16/+0x17 gates the star painter the same way — star
-painter address via xrefs to LAB_00013bc5 consumers, not file dwords);
-(c) RETRACT/OR-CREATE ledger row: if (b) says the original HAS working
-lane/star fog, that is a rewrite GAP (rewrite/src/game/campaign.cpp:1193
-'the sim has no fog of war') — open a NEW OQ row (suggested OQ-026
-visibility layer) with the closure route = implement + pin, citing
-ships.md S23 L6; if the painter is unconditional (mask bookkeeping only
-feeds diplomacy/AI contact), keep abilities.md filings with corrected
-parenthetical and bank the negative.
-RATIONALE: t192 closed the share law + per-race lists + paired mask byte
-and left EXACTLY this consumption-side question flagged; it is the only
-queued item with a static path (capture-gated closers stay watch-only:
-dosbox down, ring holds t=0 rows; OQ-019 live-st4 residue, OQ-021 needs
-colonize-past-50% + `c` press = scancode 0x2e per t191, OQ-005 needs the
-player's eyeball ruling on work/r1/shp_png/index.txt). Do NOT re-open
-byte+0x23 (t190), the scancode cascade (t191), or the share-law legs
-(t192). NOTE t192 re-froze r1_idle_probe.py baselines to the adjudicated
-Oct-29 00:12:44 timeline state — a fresh arm now means REAL new play.
+NEXT t194: HUNT THE VISIBILITY CONSUMER — decide OQ-026 (does the vendor
+UI/AI ever WITHHOLD a fogged lane or star?). t193 proved the masks are LIVE
+per-empire game data (100/1160 multi-bit lane recs mid-game, per-empire fog
+9/8/25/32 of 58 lanes, star +0x16/+0x17 twins — ships.md S23 L7) and KILLED
+the t191 'painter 0x20c48' lead (alloc wrapper; FUN_00025604 = state
+snapshot serialiser, ships.md S23 L8). Legs in ONE static pass (~30 probes):
+(a) ENUMERATE CONSUMERS of lane rec+0x20 / star-obj +0x16 that the
+imm-operand census misses: Ghidra search_instructions WITHOUT mnemonic
+filter for operand substrings '+0x20]' scoped to plausible paint functions
+(function= filter per function found from LAB/star-draw call chains — the
+lane-paint entry is reachable from the cosmos handler 0x26b34 block, NOT
+0x20c48), plus BYTE-register forms (mov al,[reg+0x20] then test al,dl /
+shift by [0x7458e]-derived count) and the read-form of the t191 cheat
+0x273ca neighbourhood (that function READS all lanes to OR — its siblings
+in the same repaint chain 0x28fc0/0x284bc + vtable ARE the paint path: walk
+THOSE, they were named but never decompiled);
+(b) DECIDE: if a consumer skips drawing when the viewer bit is clear,
+OQ-026 CLOSURE moves to implement+pin (reveal at explore/alliance per
+FUN_00046354 N=rand%3|6+1 law) and SA_KnowHomeWorlds/SA_KnowStarLanes get
+real effects; if bookkeeping feeds only diplomacy/AI (e.g. 0x55f6e's
+receive-loop consumer), bank the negative with the citation and close OQ-026
+as 'data modelled, UI shows all' — the abilities.md filings then need only
+their t193 parenthetical kept;
+(c) RE-RUN the sitting adjudication FIRST if TRIGGER-A re-armed (baselines
+re-frozen by t193 at 5,721,578,066 B / Oct-29 13:22:12; the game was LIVE at
+session end at t=1086 and had NOT advanced a turn — if the next sitting
+shows turn advances with st4 ships present, that falsifies OQ-019's
+sole-residue clause and outranks this item; the t192 wmark window script is
+WRONG for resumed games — sequential suffix read + per-game grouping, see
+docs/re/_wip_t193.md F1).
+RATIONALE: OQ-026 is the only open row with a static path to a decision;
+OQ-005 needs the user's eyeball ruling (index.txt), OQ-016/OQ-021 residuals
+are capture/user-gated, OQ-019 needs turn-advancing play. Do NOT re-open
+byte+0x23 (t190), the scancode cascade (t191), the share law or the
+LIST==mask law (t192/t193 supersede cleanly), and do NOT re-run the cmp/
+test imm-operand census (t193 did it: 22 hits, zero lane-pool-scoped).
+
+LANDED t193 (2026-10-29, this session): TRIGGER-A = REAL MID-GAME SITTING
+adjudicated + THE SHARE PATH WITNESSED + t191 PAINTER LEAD DEAD + LEDGER ROW
+OQ-026 OPENED. The sitting (Oct-29 12:30..13:22, still live at session end,
+game t=1086 wall-clock, 4 empires, war vs Minions) re-wrote all 20 saves.
+MEASURED (scripts/r1_t193_midgame_witness.py, 20/20 saves): lane pool +0x20
+census {1:160,3:80,6:180,7:220,11:260,15:260} of 1160 recs — 100/1160
+MULTI-BIT => FUN_00046354's OR-share HAS fired in normal play (t192's
+new-game zero-witness negative superseded); per-empire fog bit0 9 / bit1 8 /
+bit2 25 / bit3 32 of 58; value 6 lanes = AI-only-visible EXIST; star twin
++0x16/+0x17 multi-bit witnesses too; masks md5-STATIC across the window
+(4ca8c5c6/99522cd0 — no grant inside it). SUPERSEDED: t192's
+LIST=={mask==1<<r} law FALSE mid-game (0/80) — per-race [sub+0x2c] lists are
+OWN claimed lanes (cnt=2, second entry always a t190 bridge lane 50..57),
+strict subset of the visible pool. rec+0x21 NOT all-zero mid-game {0:720,
+1:440}, not a function of +0x20 (writer still open). STATIC: FUN_00020c48 =
+ALLOC WRAPPER (FUN_00077b40/FUN_00077b47), the 0x25aa2 loop lives in
+FUN_00025604 = game-state SNAPSHOT serialiser (lane pool, diplo rows 0x1ee
+x100 dwords, star refs) — the t191 'reader = lane-paint loop' claim is DEAD;
+imm-operand census over 98,819 instrs: 4 TEST + 18 CMP byte/dword [reg+0x20]
+hits, ZERO lane-pool-scoped => consumer UNMAPPED. Ledger: OQ-026 visibility
+layer OPENED (audit default updated); abilities.md SA_KnowHomeWorlds /
+SA_KnowStarLanes NO-OP JUSTIFICATIONS corrected (the t192 false-of-original
+parenthetical is gone; disposition stands pending OQ-026); OQ-019 STATUS
+t193 appended — its st4 residue NOT falsifiable in this window (2238 st4
+samples, zero mid-turn displacement, turn never advanced). Banked: ships.md
+S23 L7+L8; docs/re/_wip_t193.md F1-F4 (incl. the resumed-game window-method
+caveat + idle-probe baselines re-frozen at 5,721,578,066/13:22:12).
+Gate 0 + LEDGER AUDIT OK + LEDGER INDEX OK.
 
 QUEUE AFTER t193 (authored by the pairing session 2026-10-29; user has NO
 gameplay or rulings available — everything here must be offline-static,
-corpus-based, rewrite-side, or vision-on-external-images):
+corpus-based, rewrite-side, or vision-on-external-images. t193 NOTE: the
+NEXT ACTION above (visibility consumer = OQ-026) OUTRANKS this queue's
+"t194 vision oracle" — the queue item re-queues after OQ-026 is decided;
+OQ-026 is decision-bearing for the rewrite, the sheet work is not):
 
   t194 RESIDUE TRIAGE VIA VISION ORACLE (OQ-005 forward motion, no eyeball
   needed for IDENTITY — codec-correctness grading stays R13-reserved):
