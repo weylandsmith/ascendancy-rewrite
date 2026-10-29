@@ -794,18 +794,34 @@ DARKNESS BUG FIXED; all-15-real verdict; interface-style anomaly noted
   backgrounds). Candidate explanation to test cheaply BEFORE any deletion:
   800x600 SVGA variants vs the VESA480/MCGA modes actually in play, or unused
   menu art. Do NOT delete rows on non-recognition alone.
-- t193 UPDATE (player, 2026-10-29, screenshot
-  work/r1/shp_png/reference/Screenshot_2026-10-29_12-31-38.png):
-  planpro/planres NON-recognition REVOKED — they are the planet-UI gauge
-  backdrops: planpro (green nature scene) = PROSPERITY production indicator,
-  planres (blue nebula scene) = RESEARCH production indicator; each gauge
-  carries a bottom fill-bar (green/blue) that grows with production level
-  (top panel row, flanking the surface view + construction panel). Vision-
-  pass on the reference shot corroborates placement (nebula panel far-left,
-  nature panel center-right; fill bars bottom of each). Consequence: the
-  planet UI is a SHP-composed screen — economy.cpp rewrite must eventually
-  present both channels with these backdrops (visual affordance law banked
-  here; per-planet field offsets still uncited -> queue t196). The
+- t193 UPDATE (player, 2026-10-29, screenshots in
+  work/r1/shp_png/reference/): planpro/planres NON-recognition REVOKED —
+  they are planet-UI gauge BACKDROPS. CORRECTED LAYOUT LAW (player
+  2026-10-29, second message — my first write-up was wrong twice over):
+  the planet UI top strip is FIVE panels left-to-right: RESEARCH,
+  MANUFACTURING, PROSPERITY, POPULATION, CURRENT PROJECT. Each of the four
+  gauges shows an EVOLVING SHAPE, NOT a fill bar (three independent vision
+  passes on three screenshots: "no horizontal fill bar" — my first write-up
+  hallucinated bars; the vision model did too on the first shot — agreement
+  only after the player said otherwise. LAW: never assert UI affordances
+  without player confirmation). Backdrops: planres (nebula) = research
+  gauge; planpro (nature) = prosperity gauge. Evolution (player): research
+  = triangular lattice at level 1 -> increasingly complex crystalline
+  structure up to ~60 (vision confirms: hexagonal core + radiating struts,
+  complexity grows across the three shots); prosperity = small sprout ->
+  larger plant with more leaves then flowers/berries (vision: shot 1 has
+  flowers, shots 2-3 bare sprouts — consistent with different levels);
+  MANUFACTURING = "increasingly convoluted picture of a factory" (the
+  red-soil industrial panels vision previously mislabelled a separate
+  'industrial view' ARE this gauge); population panel illustration law
+  UNSTATED (vision saw rows of small red icons there — identity open).
+  Current-project panel shows item art + "N days until completion".
+  Consequence: (a) 4 gauge libraries' worth of level->record SELECT laws to
+  find (planpro.shp + planres.shp header dword[1]=21 each — candidate
+  record count [unverified], ~21 steps fits a level ladder); t196 sub-leg:
+  render all records of both libs, order the ladder by eye/vision against
+  player description; (b) rewrite economy UI (eventual) obeys the 5-panel
+  composition; (c) per-planet field offsets still uncited -> t196. The
   10status/2savegam/4loadgam style anomaly stays OPEN (still unseen).
 - VISION-ORACLE LAW (t193): vision_analyze on EXTERNAL images (player
   screenshots, vendor art) is a legitimate identification instrument — the

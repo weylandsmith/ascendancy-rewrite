@@ -303,16 +303,30 @@ corpus-based, rewrite-side, or vision-on-external-images):
   candidates: per-star percent-controlled aggregate, production-weighted
   count, recompute-only-on-screen-open. Tie the oscillation to a loop or
   bank the narrowed chain as honest residue.
-  t196 PER-PLANET ECONOMY FIELDS: planet UI now KNOWN to show prosperity
-  (planpro backdrop) + research (planres backdrop) gauges with fill bars
-  (shp.md S19 t193 UPDATE + reference screenshot). Census per-planet records
-  in the banked .SAV corpus for the two fields driving those gauges;
-  correlate owner/pop/worker inputs; pin offsets with citations to
-  docs/re/economy.md (create if absent; check nothing regenerates it).
-  Also cheap sub-leg: hunt a DAY COUNTER dword (static: day-rollover site
-  near the TURNADVANCE path) — watcher schema lacks one and t187 testimony
-  (two-tier turns) is untestifiable without it; if found, note watcher field
-  addition for the next live session.
+  t196 PER-PLANET ECONOMY FIELDS + GAUGE LIBRARY LAW: planet UI top strip
+  CORRECTED (player 2026-10-29 twice + vision x3, shp.md S19 t193 UPDATE):
+  FIVE panels L->R research / manufacturing / prosperity / population /
+  current-project; the four gauges are EVOLVING SHAPES (no fill bars):
+  research lattice->crystal ~60 levels (planres.shp), prosperity sprout->
+  flowering plant (planpro.shp), manufacturing 'increasingly convoluted
+  factory' (planind.shp — its 13 SPAN-UNDERSIZED residue records are NOW
+  LIVE UI ART: dims-location evidence sits in this library, OQ-005
+  priority!), population library UNIDENTIFIED — the panel showed a ROW OF
+  SMALL RED ICONS (vision shot 1; per-icon ladder? law open); candidates by
+  header shape: planets.shp 55 recs, planalNN 5-rec libs; NOTE planitem.shp
+  40 recs is probably the CURRENT-PROJECT item art (name + item-image in
+  that panel), verify both by rendering, don't assume. All three named libs header dword[1]=21
+  [unverified record count]. Legs: (a) render EVERY record of planres/
+  planpro/planind/planitem (reuse r1_t182 machinery, corrected palette),
+  order ladders visually against the player's descriptions, bank
+  level->record select law + per-record ids (work/r1/shp_png/ids.tsv +
+  shp.md S20); (b) census per-planet records in the .SAV corpus for the
+  research/manufacturing/prosperity/population level fields driving those
+  gauges, pin offsets with citations to docs/re/economy.md (create if
+  absent; check nothing regenerates it); (c) cheap sub-leg: hunt the DAY
+  COUNTER dword near the TURNADVANCE path (watcher schema lacks one;
+  two-tier-turn testimony untestifiable without it — if found, note watcher
+  field addition for next live session).
   t197 REWRITE ALLIANCE STATE (pure code): verify rewrite/src/game/
   diplomacy.cpp implements the now-corroborated law (att > ACCEPT_ALLIANCE
   -> BOTH cells = 3, +10/+10 both cells; refusals leave cells at 1), and add
