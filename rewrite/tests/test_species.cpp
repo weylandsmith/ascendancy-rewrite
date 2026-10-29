@@ -158,7 +158,9 @@ TEST(species_every_token_has_effect_or_filed_noop) {
         CHECK(std::strstr(n, "[help.txt L") != nullptr);
         if (std::strstr(n, "FILED NO-OP")) ++filedNoops;
     }
-    CHECK(filedNoops == 4);  // BuildOnBlack + the three knowledge abilities
+    CHECK(filedNoops == 2);  // BuildOnBlack + KnowRaces (t195: KnowHomeWorlds
+                             // and KnowStarLanes LEFT the no-op set — the
+                             // OQ-026 visibility layer landed, ships.md S23 L9)
 }
 
 TEST(species_charged_ability_fires_on_schedule) {

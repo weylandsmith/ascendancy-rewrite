@@ -84,7 +84,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", default="docs/OPEN-QUESTIONS.md")
     ap.add_argument("--expect", default="OQ-021,"
-                                        "OQ-005,OQ-019,OQ-016,OQ-026")
+                                        "OQ-005,OQ-019,OQ-016")
+    # t195: OQ-026 CLOSED by the rewrite visibility layer + pin
+    # (campaign_visibility_law_oq026_t195; ships.md S23 L10) — removed from
+    # this default the same way t189b/t181 removed their closed rows.
     # t193: OQ-026 (visibility layer / rec+0x20+star+0x16 consumer) OPENED by
     # the mid-game share-path witnesses (ships.md S23 L7/L8) — added to this
     # default the same way t181/t189b re-triaged rows.

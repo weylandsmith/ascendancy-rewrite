@@ -477,25 +477,32 @@ OQ-026 | visibility | original WITHHIDES fogged lanes and gates fogged stars
 admits lane i iff lane rec+0x20 & viewer_mask(DAT_00089324) != 0 (no entry =>
 never drawn by painter FUN_000284bc, never clickable; all 5 builder call
 sites are cosmos repaints); viewer setter FUN_00021a84(idx): mask=(idx==0xff?
-0xff:1<<idx), ALSO sets [0x7458e] — X_CUR IS THE VIEWER INDEX (t192(c) weak
-witness explained); star obj +0x16/+0x17 gate selection/lane-follow in
-FUN_00028e70 (& DAT_00006774 = data-seg twin of the viewer mask); stars are
-always DRAWN. rewrite still models NO visibility layer | open | t194 MEASURED
-+ STATIC (scripts/r1_t194_viewer_mask_witness.py, 20/20 Oct-29 mid-game
-saves): runtime mask byte B+0x89324 == 0x01 (race-0 viewer), law
-mask==(xcur==0xff?0xff:1<<xcur) 20/20, filter admits 49/58 lanes => 9
-AI-only lanes (mask value 6, the only bit-0-free value; 180/20 per-save
-census t193) WERE WITHHELD from the cosmos window during real play. RE
-question DECIDED AFFIRMATIVE — the t193 "consumer UNMAPPED" state (S23 L8)
-is SUPERSEDED; regpair/shift enumeration route RETIRED (the filter is a
-direct byte AND at 0x2914e, sole reader of 0x89324 program-wide). Row stays
-OPEN per strict-close until the rewrite SURFACE exists: implement the
-visibility layer (reveal = 0x46354-share-equivalent ORs; paint/click filter
-= viewer_mask AND) + pinned test; then upgrade SA_KnowHomeWorlds /
-SA_KnowStarLanes from FILED NO-OP (abilities.md t194 rows say the original
-effects are real). Residue inside this row: boot-site arg value at 0x21408
-[unverified regparm]; AI-side consumption of the masks (0x55f6e receive
-loop) not re-audited — UI answer does not depend on it. |
+0xff:1<<idx), ALSO sets [0x7458e] — X_CUR IS THE VIEWER INDEX; star obj
++0x16/+0x17 gate selection/lane-follow in FUN_00028e70 (& DAT_00006774 =
+data-seg twin); stars always DRAWN | CLOSED 2026-10-29 t195 | THE ROW'S OWN
+closure bar was rewrite implement+pin (set t194); LANDED: rewrite/src/game/
+campaign.{h,cpp} visibility layer (laneVis_ = rec+0x20 analog; starLaneVis_/
+starSelVis_ = obj +0x16/+0x17 twins kept separate per the differing t193
+censuses; viewerMaskFor() == FUN_00021a84 verbatim; laneVisibleTo/
+cosmosLanesFor == 0x2914e filter; cosmosStarsFor unconditional == L9 honest
+negative; shareLaneVision == FUN_00046354 shape N=rand%(3|6)+1 OR-only,
+BIDIRECTIONAL at alliance formation (cited caller 0x45778) + RECEIVE-ONLY
+one-shot first-contact leg (cited shape 0x55f6e); shareStarVision ==
+FUN_00046524 twin modulus 4|2; init seed = own claim exactly per the t192/
+t193 witness law). PIN TEST(campaign_visibility_law_oq026_t195): 25 checks —
+mask law {0:1,1:2,5:20,255:255}, init fog pattern, spectator AND (mask-0
+lanes stay hidden even under 0xff), receive direction + N envelope, sticky
+monotonicity over 30 turns, alliance bidirectional share incl star twin,
+SA_KnowStarLanes + SA_KnowHomeWorlds both routes (player species + race
+token) — 111 tests 0 fail. MEASURED base (scripts/r1_t194_viewer_mask_
+witness.py 20/20 saves; r1_t193_midgame_witness.py censuses) cited ships.md
+S23 L5..L10. CODE SITES: campaign.cpp seedVisibility/visibilityPhase/
+diplomacyPhase ProposeAlliance branch + species.cpp kNotes rows 3/15 (filed
+no-op count 4->2, ability_probe 3m updated); abilities.md §2 rows WIRED.
+Residues DOCUMENTED inside the closure (not open laws): init path of the
+first 1<<r bits unidentified; twin caller pairing [unverified]; AI-AI share
+has no rewrite producer (no AI-AI dip relations — t193 mask-6 class has no
+rewrite analog); boot-arg at 0x21408 [unverified regparm]. |
 OQ-020 | abilities | charge time for the 14 charged SA_ abilities (vendor
 "%d day%s", no data file) — rewrite placeholder was 30 turns | CLOSED t100 | THE
 MEASUREMENT (aicode.md §6.4 + docs/re/_wip_t99.md F7-F11): charge period =

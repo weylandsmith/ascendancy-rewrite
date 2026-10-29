@@ -1195,3 +1195,35 @@ L9 t194 STATIC+RAM (CONSUMER MAPPED — supersedes L8's "consumer UNMAPPED" and
   now rewrite-side implement+pin, NOT more RE (abilities.md SA_KnowHomeWorlds
   / SA_KnowStarLanes: real effects exist -> the FILED NO-OP disposition must
   be revisited when the rewrite models the layer).
+L10 t195 REWRITE SURFACE LANDED (OQ-026 CLOSED — implement+pin, the row's own
+  closure bar): rewrite/src/game/campaign.{h,cpp} models the layer 1:1 with
+  the cited fields — laneVis_ (rec+0x20), starLaneVis_/starSelVis_ (obj
+  +0x16/+0x17; kept SEPARATE because the t193 censuses of the twin bytes
+  differ, so they are not one value), viewerMaskFor() == FUN_00021a84 law
+  verbatim, laneVisibleTo/cosmosLanesFor == the 0x2914e filter over pool
+  order, cosmosStarsFor == unconditional (L9 honest negative pinned),
+  shareLaneVision == FUN_00046354 shape (N=rand%(3|6)+1, receive prefix leg
+  + mirrored lend leg, OR-only), shareStarVision == FUN_00046524 twin
+  (modulus 4|2). Fire sites: BIDIRECTIONAL at alliance formation (cited
+  caller 0x45778, wired in diplomacyPhase's ProposeAlliance branch);
+  RECEIVE-ONLY one-shot per empire pair on first lane-adjacency contact
+  (cited shape 0x55f6e; rewrite-site [documented default]). Seeds: an empire
+  sees EXACTLY its own claim at init (t192 new-game law + t193 re-read);
+  unowned lanes fogged for all (t193 {0:940} census). SA_KnowStarLanes =
+  owner bit on EVERY lane; SA_KnowHomeWorlds = owner bits on both twin bytes
+  of every alien HOME star (help.txt laws; vendor flag consumer unmapped —
+  flagged [documented model]). Separate LCG stream visLcg_ (REFUTED-ROUTES
+  RNG discipline: campaign rng_ untouched; gate-relevant seeds reproduce).
+  PIN: TEST(campaign_visibility_law_oq026_t195) (tests/test_campaign.cpp) —
+  mask law, init law, fog, spectator AND-behaviour (mask-0 lanes stay hidden
+  even for 0xff: AND at 0x2914e has no spectator bypass), receive-only
+  directionality, N envelope, sticky monotonicity over turns, alliance
+  bidirectional share incl. star twin, both ability routes (player species +
+  race token). 111 tests 0 fail; gate green. ability_probe 3m no-op count
+  4->2; species.cpp kNotes rows rewritten; abilities.md §2 rows WIRED.
+  Honest residues carried (row CLOSED per its own bar = implement+pin; the
+  residues are documented-model flags, not open laws): the init PATH writing
+  the first 1<<r bits is still unidentified; the twin's caller pairing at
+  both share sites is [unverified]; AI-AI share has NO rewrite producer (the
+  dip model has no AI-AI relations), so the t193 mask-6 AI-only class has no
+  rewrite analog.

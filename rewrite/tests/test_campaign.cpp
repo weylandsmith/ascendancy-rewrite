@@ -554,3 +554,158 @@ TEST(campaign_research_picker_law_oq016) {
     for (int o = 1; o <= 6; ++o) totalOwned += c.techsOwned(o);
     CHECK(totalOwned > 0);
 }
+
+
+
+// ---------------------------------------------------------------------------
+// OQ-026 VISIBILITY LAW PIN (t195). Law source docs/re/ships.md S23:
+//  L5  lane rec+0x20 = per-empire bitmask, OR-only (sticky — no clear site),
+//  L6  FUN_00046354 share: N = rand%(3|6)+1 grants per call, ALLIANCE
+//      doubles; receive leg (EBX!=0, player<-race, cited site 0x55f6e),
+//      mirrored lend leg (EBX==0, alliance-formation site 0x45778),
+//  L7  unowned/unshared lanes are FOGGED (new-game census {0:940} of 1160:
+//      most lanes carried NO bit at all),
+//  L9  consumer FUN_00028fc0 admits lane i iff rec+0x20 & viewer_mask;
+//      viewer setter FUN_00021a84: mask = idx==0xff ? 0xff : 1<<idx;
+//      stars ALWAYS drawn (honest negative); star-click gated by
+//      obj +0x17 (select) / +0x16 (lane-follow) & mask.
+// Fixture map (chain): s0(P home)-s1-s2-s3-s4(A home); lanes 0..3 in pool
+// order (0,1),(1,2),(2,3),(3,4). Own-claim law at init: P sees EXACTLY
+// {lane0}, A EXACTLY {lane3} (t192 new-game law); s1/s2 and lanes 1/2 are
+// fogged for both (t193 census: value-0/foreign-only lanes exist).
+// ---------------------------------------------------------------------------
+TEST(campaign_visibility_law_oq026_t195) {
+    using C = ag::Campaign;
+    // (0) VIEWER MASK LAW verbatim (FUN_00021a84 + 0x21a94 spectator leg).
+    CHECK(C::viewerMaskFor(0) == 0x01);
+    CHECK(C::viewerMaskFor(1) == 0x02);
+    CHECK(C::viewerMaskFor(5) == 0x20);
+    CHECK(C::viewerMaskFor(255) == 0xff);
+
+    ag::Galaxy g;
+    g.seed = 1;
+    const char* nm[5] = {"Alpha", "Betel", "Gamma", "Cet", "Delta"};
+    for (int i = 0; i < 5; ++i) {
+        ag::Star st; ag::Planet pl; pl.index = 0; pl.name = std::string(nm[i]) + " I";
+        st.id = i; st.x = 100 * i; st.y = 0; st.name = nm[i]; st.planets.push_back(pl);
+        g.stars.push_back(st);
+    }
+    for (int i = 0; i + 1 < 5; ++i) g.lanes.push_back({i, i + 1});
+
+    ag::CampaignConfig cfg;
+    cfg.seed = 4242;
+    cfg.aiCount = 1;
+    cfg.freeForAll = false;
+    std::string err;
+    std::vector<ag::SpeciesAbility> ab{ag::SpeciesAbility::HealShips};
+    ag::Campaign c(cfg, g, &tables().tree, tables().items, tables().gizmos,
+                   {tables().ai[0]}, ab, &err);
+
+    // (1) SCENARIO INIT (t192: race r == EXACTLY its own claim).
+    CHECK(c.starOwner(0) == ag::kPlayer);
+    CHECK(c.starOwner(4) == 1);
+    CHECK(c.visibleLaneCountFor(0) == 1);          // {lane0} only
+    CHECK(c.laneVisibleTo(0, 0));
+    CHECK(!c.laneVisibleTo(1, 0) && !c.laneVisibleTo(2, 0) &&
+          !c.laneVisibleTo(3, 0));
+    CHECK(c.visibleLaneCountFor(1) == 1);          // {lane3} only
+    CHECK(c.laneVisibleTo(3, 1) && !c.laneVisibleTo(0, 1));
+    // t194 witness analog: filter admits STRICTLY fewer than the pool
+    // (mid-game measured 49 of 58); spectator mask 0xff admits all.
+    CHECK(c.cosmosLanesFor(0).size() == 1);
+    // Spectator 0xff reveals shared/owned lanes but AND-law (0x2914e) still
+    // WITHHOLDS mask-0 lanes (0 & 0xff == 0): lanes 1/2 (unowned chain) stay
+    // hidden. t193's mid-game pool had ZERO zero-mask lanes, so a live
+    // spectator saw all 58 — consistent.
+    CHECK(c.cosmosLanesFor(255).size() == 2);
+    // HONEST NEGATIVE (S23 L9): stars ALWAYS listed (builder kind-0
+    // unconditional); visibility gates CLICKS, not drawing.
+    CHECK(c.cosmosStarsFor(0).size() == 5);
+    CHECK(!c.starSelectableBy(3, 0) && !c.starLaneFollowableBy(3, 0));
+    CHECK(c.starSelectableBy(0, 0) && c.starSelectableBy(4, 1));
+    CHECK(!c.starSelectableBy(0, 1) && !c.starLaneFollowableBy(1, 1));
+
+    // (2) RECEIVE LEG = FUN_00046354 EBX=-1 shape (cited 0x55f6e "the PLAYER
+    // receives lanes from each race in turn"). AI-viewed-not-player set ==
+    // {lane3}: pool-order prefix with N = rand%3+1 >= 1 => lane3 EXACTLY.
+    const int got = c.shareLaneVision(ag::kPlayer, 1, /*bidirectional=*/false,
+                                      /*allied=*/false);
+    CHECK(got == 1);
+    CHECK(c.laneVisibleTo(3, 0));
+    CHECK(c.visibleLaneCountFor(0) == 2);
+    // receive-only: the AI gained NOTHING (mirrored leg absent).
+    CHECK(!c.laneVisibleTo(0, 1) && !c.laneVisibleTo(1, 1));
+    // STICKY (L5 OR-only): a repeat call grants nothing more (set exhausted)
+    // and never un-reveals.
+    const int again = c.shareLaneVision(ag::kPlayer, 1, false, false);
+    CHECK(again == 0);
+    CHECK(c.laneVisibleTo(3, 0));
+    CHECK(c.visibleLaneCountFor(0) == 2);
+
+    // (3) ALLIANCE = BIDIRECTIONAL share (cited caller 0x45778 inside the
+    // alliance-formation handler). Fixture dip file: PROPOSE_ALLIANCE below
+    // start attitude so the MEASURED chooser fires it on turn 1 (decide-
+    // DipAction: strict att > threshold; race00 START_ATTITUDE 340).
+    ag::DipFile df;
+    if (!df.loadFromFile((kRepo / "extracted/ascend00/race00.dip").string(), &err))
+        std::abort();
+    df.values.proposeAlliance = 100;
+    ag::Campaign c2(cfg, g, &tables().tree, tables().items, tables().gizmos,
+                    {df}, ab, &err);
+    CHECK(err.empty());
+    CHECK(!c2.starSelectableBy(4, 0));   // player blind to AI home pre-share
+    bool sawAllianceEvent = false;
+    for (int t = 0; t < 5 && !sawAllianceEvent; ++t) {
+        c2.advance();
+        for (const auto& ev : c2.events())
+            if (ev.text.find("allied with the player") != std::string::npos)
+                sawAllianceEvent = true;
+    }
+    CHECK(sawAllianceEvent);
+    // Lend leg 0x46421 (OR rec+0x20, DL): AI receives a prefix of the
+    // player-viewed set it lacked == {lane0} (exhaustive, N=rand%6+1>=1).
+    CHECK(c2.laneVisibleTo(0, 1));
+    // Receive leg of the same call: P receives {lane3}.
+    CHECK(c2.laneVisibleTo(3, 0));
+    // Star twin rode the event (FUN_00046524 same shape, allied modulus 4):
+    // P can now select/follow the AI home star s4; A likewise gained s0.
+    CHECK(c2.starSelectableBy(4, 0) && c2.starLaneFollowableBy(4, 0));
+    CHECK(c2.starSelectableBy(0, 1));
+    // STICKY monotonicity over 30 further turns (no clear site -> S23 L5).
+    const int v0 = c2.visibleLaneCountFor(0), v1 = c2.visibleLaneCountFor(1);
+    const int starsAlways = c2.cosmosStarsFor(0).size();
+    for (int t = 0; t < 30 && !c2.over(); ++t) c2.advance();
+    CHECK(c2.visibleLaneCountFor(0) >= v0);
+    CHECK(c2.visibleLaneCountFor(1) >= v1);
+    CHECK(c2.cosmosStarsFor(0).size() == starsAlways);  // stars ALWAYS listed
+
+    // (4) SA_KnowStarLanes (L2295 "see all star lanes") on the PLAYER
+    // (cfg.playerSpecies is the SA_ index; abilities[i] belongs to owner
+    // i+1 — a fixture with ab vector {X} grants X to the AI, tested too):
+    // owner bit ORs into EVERY lane mask at scenario init.
+    ag::CampaignConfig cfgP = cfg;
+    cfgP.playerSpecies = static_cast<int>(ag::SpeciesAbility::KnowStarLanes);
+    ag::Campaign c3(cfgP, g, &tables().tree, tables().items, tables().gizmos,
+                    {tables().ai[0]}, ab, &err);
+    CHECK(c3.visibleLaneCountFor(0) == 4);         // player: all lanes
+    CHECK(c3.visibleLaneCountFor(1) == 1);         // AI unaffected
+    // AI token-holder route:
+    std::vector<ag::SpeciesAbility> abKsl{ag::SpeciesAbility::KnowStarLanes};
+    ag::Campaign c3b(cfg, g, &tables().tree, tables().items, tables().gizmos,
+                     {tables().ai[0]}, abKsl, &err);
+    CHECK(c3b.visibleLaneCountFor(1) == 4);
+    CHECK(c3b.visibleLaneCountFor(0) == 1);
+
+    // (5) SA_KnowHomeWorlds (L1783 "see all alien home stars") on the
+    // PLAYER: owner bits land on every ALIEN HOME star's twin and NOTHING
+    // else (lanes stay fogged; the AI gets nothing back).
+    ag::CampaignConfig cfgH = cfg;
+    cfgH.playerSpecies = static_cast<int>(ag::SpeciesAbility::KnowHomeWorlds);
+    ag::Campaign c4(cfgH, g, &tables().tree, tables().items, tables().gizmos,
+                    {tables().ai[0]}, ab, &err);
+    CHECK(c4.starSelectableBy(4, 0));        // alien HOME revealed
+    CHECK(c4.starLaneFollowableBy(4, 0));
+    CHECK(!c4.starSelectableBy(3, 0));       // non-home star NOT revealed
+    CHECK(!c4.starSelectableBy(0, 1));       // one-way per owner
+    CHECK(c4.visibleLaneCountFor(0) == 1);   // lanes NOT blanket-revealed
+}

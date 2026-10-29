@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T15:05
+updated: 2026-10-29T16:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -21,6 +21,17 @@ policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement
 ## this block cannot drift out green anymore.)
 ledger:
   closed:
+    - "OQ-026 visibility layer CLOSED 2026-10-29 t195 (implement+pin, the
+      row's own closure bar set t194): rewrite campaign.{h,cpp} models
+      laneVis_ (rec+0x20) + starLaneVis_/starSelVis_ (obj +0x16/+0x17 twins,
+      kept separate per differing t193 censuses); viewerMaskFor == FUN_00021a84
+      verbatim; filter == 0x2914e AND; stars unconditional (L9 honest negative);
+      shareLaneVision == FUN_00046354 shape (N=rand%(3|6)+1, OR-only; BIDIR at
+      alliance formation 0x45778 wired, RECEIVE-only first-contact one-shot
+      per cited shape 0x55f6e); SA_KnowStarLanes/SA_KnowHomeWorlds wired at
+      scenario init, LEFT the FILED NO-OP set (kNotes 4->2). Pin
+      campaign_visibility_law_oq026_t195, 111 tests 0 fail; ships.md S23 L10;
+      residues documented in the ledger row."
     - "OQ-001 .cob offsets = N not N+1"
     - "OQ-002 FLIC codec (both vendor videos, golden-pinned)"
     - "OQ-023 relation-state enum semantics CLOSED 2026-10-29 t189b — state-3
@@ -156,13 +167,6 @@ ledger:
       dark-zone enumeration (t73b); capture fallback. Default >1/2 stands.
       t189b STATUS: 14->21 drift real, NOT systems count; displayed-count
       write-site is now the residue"
-    - "OQ-026 visibility layer: original HAS live per-empire lane/star masks
-      (lane rec+0x20, star +0x16/+0x17) — t193 MEASURED mid-game multi-bit
-      share witnesses (100/1160 recs, per-empire fog 9/8/25/32 of 58;
-      scripts/r1_t193_midgame_witness.py, ships.md S23 L7); UI consumer
-      UNMAPPED (t191 'painter 0x20c48' DEAD = alloc wrapper, ships.md L8).
-      Closure route: consumer hunt (byte/shift test forms, star-painter via
-      LAB_00013bc5 consumers) -> implement+pin or bank negative"
 
 ## WHAT IS IN HAND (tools + laws — a fresh session starts here, not from scratch)
 - R1 save-state capture LIVE: scripts/r1_savestate.sh (boot -> autosave ZIP,
@@ -249,37 +253,73 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t195: IMPLEMENT THE OQ-026 VISIBILITY LAYER IN THE REWRITE + PIN — the
-RE question was DECIDED t194 (ships.md S23 L9): vendor cosmos builder
-FUN_00028fc0 admits lane i iff lane rec+0x20 & viewer_mask != 0 (fogged lanes
-never drawn/clickable); stars always drawn, click gated by star+0x16/+0x17 &
-viewer (FUN_00028e70); viewer setter FUN_00021a84(idx): mask=(idx==0xff?0xff:
-1<<idx), also sets X_CUR; grants OR bits via the 0x46354-shape share law
-(t192: N=rand%3|6+1 per call, alliance doubles). Legs: (a) rewrite-side model
-per-empire lane visibility (bitmask per lane keyed to the existing star/lane
-map), reveal on explore/contact per the documented share-equivalent, plus a
-viewer concept for the player; keep it inside the sim's existing turn model —
-NO new file formats; (b) SA_KnowHomeWorlds / SA_KnowStarLanes get REAL effects
-(KnowStarLanes = all lane bits for the player; KnowHomeWorlds = star mask
-covering alien home stars) and leave FILED NO-OP in abilities.md ONLY AFTER
-the pin lands; (c) pin TEST(name: campaign_visibility_law_oq026_t195): hidden
-lane -> not visible -> reveal via share/contact -> visible; abilities flip
-visibility immediately; run full test suite + gate. Cite S23 L6/L7/L9 in the
-rewrite comments. Close OQ-026 when the pinned test + citations land
-(strict-close: the row's own closure bar is the rewrite surface).
-RATIONALE: this is the ONLY open row with a fully-cited law in hand and no
-user/capture dependency (OQ-005 needs the player's eyeball ruling; OQ-016/
-OQ-021 residuals are capture/user-gated; OQ-019 needs turn-advancing play;
-queue items t194-vision-oracle/t196/t197 remain queued — the pairing session
-ranked OQ-026 work above sheet work, and implementation is the remaining
-half of exactly that ranking). Do NOT re-open: the consumer hunt (t194 closed
-it — filter @0x2914e, sole reader of 0x89324), the regpair/shift enumeration
-plan (RETIRED), the share law (t192), LIST==mask (t193 superseded), byte+0x23
-(t190), the cmp/test imm census (t193). TRIGGER-A NOTE: baselines re-frozen
-t194 (tail md5 + full-ns mtime) — if a REAL sitting arms next session,
-adjudication (r1_t85g_sitting.py on the named dir, sequential-suffix window
-per _wip_t193 F1) still outranks everything: turn advances with st4 ships
-present would falsify OQ-019's sole-residue clause.
+NEXT t196: OQ-005 RESIDUE TRIAGE VIA VISION ORACLE (queue item authored by
+the 2026-10-29 pairing session; full text in the "QUEUE AFTER t193" block
+below): render ALL 71 residue records with the corrected 6-bit palette
+(extend scripts/r1_t182_pngdump.py or write r1_t196_sheet.py reusing it),
+pack ~4 LABELED contact sheets (record name under each tile, failure-class
+grouped), vision_analyze each (proven recipe: layout, verbatim text, "what
+game-screen does each tile belong to"), bank per-record identifications to
+docs/re/shp.md S20 + work/r1/shp_png/ids.tsv. GOAL (pairing-session words):
+any residue identified into a known screen gives that screen's geometry as a
+dims candidate -- the OQ-005 dims-location route arriving WITHOUT play; flag
+tiles matching the 10status/2savegam/4loadgam style cluster (unseen SVGA
+question). The gauge-library item (queue entry then-labelled t196: render
+planres/planpro/planind/planitem, derive the planet-screen paint routine
+from the BINARY per user directive (a2), census per-planet level fields)
+FOLLOWS this one -- planind's 13 span-undersized residues are live UI art
+and sit inside this render set, so identification here feeds its dims
+evidence directly.
+RATIONALE: OQ-026 CLOSED t195 -- the last fully-cited, no-dependency RE row
+is gone; every remaining open row is user/capture-gated (OQ-005 eyeball
+rulings/dims, OQ-016 per-cell wiring, OQ-019 turn-advancing play, OQ-021
+end-ctrl firing). The pairing session ranked OQ-026 above the queue's sheet
+work and said the queue RE-QUEUES once OQ-026 is decided -- the vision-
+oracle item is its first re-queued entry and the only decision-bearing
+offline move (identification needs no eyeball; codec-correctness grading
+stays R13-reserved). If a REAL sitting arms first (TRIGGER-A baselines:
+full-ns mtime 1793294532100000000 / tail md5 9054cc6c, idle_probe re-frozen
+t194), adjudication via scripts/r1_t85g_sitting.py on the named dir STILL
+outranks everything (sequential-suffix window per _wip_t193 F1; a turn
+advance with st4 ships present would falsify OQ-019's sole-residue clause).
+Do NOT re-open: the visibility layer (CLOSED t195 -- consumer, share law,
+ability wiring; closed-ledger entry + ships.md S23 L10), the regpair/shift
+enumeration plan (RETIRED), LIST==mask (superseded), byte+0x23 (t190), the
+cmp/test imm census (t193), a 7th BLIND .shp codec sweep (FORBIDDEN -- this
+task is identification-by-context, not codec).
+
+LANDED t195 (2026-10-29, this session): OQ-026 CLOSED — VISIBILITY LAYER
+IMPLEMENTED IN THE REWRITE + PINNED (the row's own closure bar). Trigger
+triage first: timeline size/mtime EXACTLY the t194 re-frozen baseline (no new
+sitting); harness-reported dirty loop_one_task.sh was a STALE snapshot (git
+diff empty, HEAD=t199 already committed) — nothing to adopt. REWRITE
+(campaign.{h,cpp}): laneVis_ (rec+0x20), starLaneVis_/starSelVis_ (obj
++0x16/+0x17 twins KEPT SEPARATE — t193 censuses differ), viewerMaskFor() ==
+FUN_00021a84 verbatim (0xff->0xff else 1<<(idx&0x1f)); laneVisibleTo/
+cosmosLanesFor == the 0x2914e AND-filter over pool order; cosmosStarsFor
+UNCONDITIONAL (L9 honest negative pinned); shareLaneVision == FUN_00046354
+shape (N=rand%(3|6)+1, OR-only, receive prefix leg + mirrored lend leg);
+shareStarVision == FUN_00046524 twin (modulus 4|2). Fire sites: BIDIRECTIONAL
+at alliance formation (cited caller 0x45778, wired in diplomacyPhase
+ProposeAlliance branch) + visibilityPhase() per-advance one-shot per pair on
+FIRST lane-adjacency contact (cited shape 0x55f6e; rewrite-site documented
+default). Init seed = own claim EXACTLY (t192 law + t193 re-read); unowned
+lanes fogged for all (t193 {0:940}). SA_KnowStarLanes = owner bit on every
+lane; SA_KnowHomeWorlds = owner bits on both twin bytes of every alien HOME
+star — both LEFT the FILED NO-OP set (species.cpp kNotes rows 3/15;
+ability_probe 3m 4->2; abilities.md rows WIRED). Separate visLcg_ stream —
+campaign rng_ untouched (RNG discipline). PIN TEST
+(campaign_visibility_law_oq026_t195): 25 checks incl spectator AND (mask-0
+lanes stay hidden even for viewer 0xff — no bypass at 0x2914e), receive-only
+directionality, N envelope, sticky monotonicity over 30 turns, alliance BIDIR
+share incl star twin both directions, both ability routes (player species +
+race token). Fixture law caught by the first run: homes are ONE star per
+empire. 111 tests 0 failed. Docs: ships.md S23 L10 (surface + residues),
+OPEN-QUESTIONS row CLOSED (residues documented inside the closure: init path
+of first bits, twin caller pairing [unverified], no AI-AI share producer),
+ledger_audit --expect drops OQ-026, STATE index mirrored both sides,
+_wip_t195.md design D1-D7 + outcomes R1-R6. Gate 0 + LEDGER AUDIT OK + LEDGER
+INDEX OK (open = 005/016/019/021).
 
 LANDED t194 (2026-10-29, this session): OQ-026 RE QUESTION DECIDED
 AFFIRMATIVE — VISIBILITY CONSUMER MAPPED + LIVE WITNESSED, and the t193 FALSE

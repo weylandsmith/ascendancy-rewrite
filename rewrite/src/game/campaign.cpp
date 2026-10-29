@@ -243,6 +243,18 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
             for (int y = 0; y < Nowner_; ++y)
                 if (x != y) war_[x * Nowner_ + y] = 1;
     pickHomeStars();
+    // OQ-026 visibility seed (after homes exist; masks per ships.md S23 L5
+    // + L9, seeding law per L6/L7 witnesses — see seedVisibility()).
+    laneVis_.assign(galaxy_.lanes.size(), 0);   // rec+0x20 analog, zeroed
+                                                // like pool-create 0x248ab
+    starLaneVis_.assign(galaxy_.stars.size(), 0);
+    starSelVis_.assign(galaxy_.stars.size(), 0);
+    contacted_.assign(Nowner_ * Nowner_, 0);
+    visLcg_ = static_cast<uint32_t>(cfg.seed) ^ 0x5eedu;  // own stream; the
+                                    // original's share-rng identity is
+                                    // unmapped [unverified], so it provably
+                                    // cannot perturb campaign rng_ draws
+    seedVisibility();
     for (int s = 0; s < n; ++s) {
         if (owner_[s] >= 0) planets_[s].pop = cfg_.initialPop;
     }
@@ -318,6 +330,147 @@ void Campaign::pickHomeStars() {
         assigned.push_back(best);
     }
     homeStar_ = assigned;  // fixed at setup; Captured tests these ids (§1)
+}
+
+// ---------------------------------------------------------------------------
+// OQ-026 PER-EMPIRE VISIBILITY LAYER.
+// Law source: docs/re/ships.md S23 — L5 (t191: lane rec+0x20 is a per-empire
+// bitmask, OR-only, no lane-pool-scoped clear), L6 (t192: FUN_00046354 share
+// shape + N law + caller sites), L7 (t193: mid-game multi-bit witnesses),
+// L9 (t194: the CONSUMER — cosmos list builder FUN_00028fc0 lane filter
+// rec+0x20 & DAT_00089324; viewer setter FUN_00021a84; star-click
+// FUN_00028e70 gates on obj +0x17/+0x16).
+// The layer is a DISPLAY/INTERACTION surface exactly as measured: no sim rule
+// consults it (there is no cited law that fog gates the AI's moves).
+// ---------------------------------------------------------------------------
+
+int Campaign::visNext() {
+    // Same FUN_0007824f form as worldNext() (income-law.md S10 t29b) on its
+    // OWN state: state = state*0x41C64E6D + 0x3039, value = (state>>16)&0x7fff.
+    visLcg_ = visLcg_ * 0x41C64E6Du + 0x3039u;
+    return static_cast<int>((visLcg_ >> 16) & 0x7fff);
+}
+
+bool Campaign::contactSeen(int a, int b) const {
+    // Rewrite-side trigger condition for the receive leg (documented default:
+    // the original's per-race event loop 0x55f1b..0x55f2e has no rewrite
+    // counterpart). Two empires are "in contact" when a starlane joins a star
+    // each of them holds.
+    for (const Lane& l : galaxy_.lanes)
+        if ((owner_[l.a] == a && owner_[l.b] == b) ||
+            (owner_[l.a] == b && owner_[l.b] == a))
+            return true;
+    return false;
+}
+
+void Campaign::seedVisibility() {
+    const int nl = static_cast<int>(galaxy_.lanes.size());
+    for (int o = 0; o < Nowner_; ++o) {
+        const int bit = viewerMaskFor(o);
+        // Own claimed stars: interaction is impossible without them (the
+        // click handler would refuse to select the player's own system).
+        for (size_t s = 0; s < galaxy_.stars.size(); ++s)
+            if (owner_[s] == o) { starLaneVis_[s] |= bit; starSelVis_[s] |= bit; }
+        // Lanes of the empire's own claim (t192 new-game law: race r's list ==
+        // EXACTLY {mask == 1<<r}; t193 re-read: the list is the race's OWN
+        // claimed lanes).
+        for (int i = 0; i < nl; ++i)
+            if (owner_[galaxy_.lanes[i].a] == o || owner_[galaxy_.lanes[i].b] == o)
+                laneVis_[i] |= bit;
+    }
+    // SPECIES ABILITIES wired into the same mask surface the UI filter reads.
+    // [documented model: the vendor's internal consumer of the two ability
+    // flags is unmapped; help.txt is the effect law.]
+    for (int o = 0; o < Nowner_; ++o) {
+        const int bit = viewerMaskFor(o);
+        if (ability_[o] == SpeciesAbility::KnowStarLanes)   // L2295 "see all star lanes"
+            for (int i = 0; i < nl; ++i) laneVis_[i] |= bit;
+        if (ability_[o] == SpeciesAbility::KnowHomeWorlds)  // L1783 "see all alien home stars"
+            for (int e = 0; e < Nowner_; ++e)
+                if (e != o && homeStar_[e] >= 0) {
+                    starLaneVis_[homeStar_[e]] |= bit;
+                    starSelVis_[homeStar_[e]] |= bit;
+                }
+    }
+}
+
+int Campaign::shareLaneVision(int a, int b, bool bidirectional, bool allied) {
+    // FUN_00046354 shape (S23 L6): __regparm3 EAX=diplo row of party-1,
+    // EDX=party-2 index, EBX=mode. RNG modulus 6 iff relation state == 3
+    // (ALLIANCE) else 3; N = rand%mod + 1 grants per call, counters per-call.
+    const int mod = allied ? 6 : 3;
+    const int N = visNext() % mod + 1;
+    const int maskA = viewerMaskFor(a), maskB = viewerMaskFor(b);
+    const int nl = static_cast<int>(galaxy_.lanes.size());
+    int n = 0;
+    // Receive leg (EBX != 0 shape 0x46402): party-1 takes lanes party-2 sees.
+    for (int i = 0; i < nl && n < N; ++i)
+        if ((laneVis_[i] & maskB) && !(laneVis_[i] & maskA)) { laneVis_[i] |= maskA; ++n; }
+    if (bidirectional) {
+        // Mirrored lend leg (0x46408/0x4641c -> OR rec+0x20, DL): party-2 takes
+        // lanes party-1 sees, on its OWN per-call counter.
+        int m = 0;
+        for (int i = 0; i < nl && m < N; ++i)
+            if ((laneVis_[i] & maskA) && !(laneVis_[i] & maskB)) { laneVis_[i] |= maskB; ++m; }
+        n += m;
+    }
+    return n;
+}
+
+void Campaign::shareStarVision(int a, int b, bool bidirectional, bool allied) {
+    // FUN_00046524 (S23 L6 "star twin ... same shape", modulus 4 if state==3
+    // else 2). Each twin byte is shared with its own draw [inferred].
+    const int mod = allied ? 4 : 2;
+    const int maskA = viewerMaskFor(a), maskB = viewerMaskFor(b);
+    const int ns = static_cast<int>(galaxy_.stars.size());
+    for (int which = 0; which < 2; ++which) {
+        std::vector<char>& v = which ? starSelVis_ : starLaneVis_;
+        const int N = visNext() % mod + 1;
+        int n = 0;
+        for (int i = 0; i < ns && n < N; ++i)
+            if ((v[i] & maskB) && !(v[i] & maskA)) { v[i] |= maskA; ++n; }
+        if (bidirectional) {
+            int m = 0;
+            for (int i = 0; i < ns && m < N; ++i)
+                if ((v[i] & maskA) && !(v[i] & maskB)) { v[i] |= maskB; ++m; }
+        }
+    }
+}
+
+bool Campaign::laneVisibleTo(int lane, int viewer) const {
+    if (lane < 0 || lane >= static_cast<int>(laneVis_.size())) return false;
+    return (laneVis_[lane] & viewerMaskFor(viewer)) != 0;   // filter 0x2914e
+}
+bool Campaign::starSelectableBy(int star, int viewer) const {
+    if (star < 0 || star >= static_cast<int>(starSelVis_.size())) return false;
+    return (starSelVis_[star] & viewerMaskFor(viewer)) != 0; // FUN_00028e70 select
+}
+bool Campaign::starLaneFollowableBy(int star, int viewer) const {
+    if (star < 0 || star >= static_cast<int>(starLaneVis_.size())) return false;
+    return (starLaneVis_[star] & viewerMaskFor(viewer)) != 0; // FUN_00028e70 follow
+}
+int Campaign::visibleLaneCountFor(int viewer) const {
+    int n = 0;
+    for (size_t i = 0; i < laneVis_.size(); ++i)
+        if (laneVisibleTo(static_cast<int>(i), viewer)) ++n;
+    return n;
+}
+std::vector<int> Campaign::cosmosLanesFor(int viewer) const {
+    // Builder lane loop: bound word[0x177d3] = nlanes, index order, kind=1
+    // entry ONLY when the mask admits it (S23 L9).
+    std::vector<int> out;
+    for (size_t i = 0; i < laneVis_.size(); ++i)
+        if (laneVisibleTo(static_cast<int>(i), viewer)) out.push_back(static_cast<int>(i));
+    return out;
+}
+std::vector<int> Campaign::cosmosStarsFor(int viewer) const {
+    // HONEST NEGATIVE (S23 L9): the builder's kind-0 star entries are added
+    // UNCONDITIONALLY — the star masks are not consumed there. Every star is
+    // always drawn; visibility gates CLICKS, not star drawing.
+    (void)viewer;
+    std::vector<int> out(galaxy_.stars.size());
+    for (size_t i = 0; i < out.size(); ++i) out[i] = static_cast<int>(i);
+    return out;
 }
 
 int Campaign::popCapFor(int star) const {
@@ -982,8 +1135,12 @@ void Campaign::expansionPhase() {
                     if (it == shipyardId) { hasYard = true; break; }
             if (!hasYard) continue;  // docs/re/ships.md §1
             // BFS frontier up to `hops`, nearest-first. Knowledge gate
-            // (starKnown: own star or adjacent-to-own; SA_KnowStarLanes sees
-            // everything — abilities.md §2) and SA_BlockStarLanes gate.
+            // (starKnown: own star or adjacent-to-own. SA_KnowStarLanes is
+            // NOT a sim-side expansion cheat: since t195 its real effect is
+            // the COSMOS-VISIBILITY layer (seedVisibility ORs the owner bit
+            // into every lane mask — ships.md S23 L6/L9), a UI surface; this
+            // AI targeting law stays as measured for the sim.) The frontier
+            // gate itself and the SA_BlockStarLanes gate are unchanged.
             std::vector<int> frontier = galaxy_.neighbours(static_cast<int>(s));
             std::vector<char> seen(galaxy_.stars.size(), 0);
             seen[s] = 1;
@@ -1043,6 +1200,30 @@ int Campaign::driveHopsFor(int owner) const {
     return std::max(1, std::min(3, hops));
 }
 
+// OQ-026 receive-leg sweep. Cited shape (ships.md S23 L6): caller 0x55f6e
+// calls FUN_00046354 with EBX=-1 (receive-only) inside the per-race event
+// loop 0x55f1b..0x55f2e, party-1 always the CURRENT player row ([0x7458e]
+// set 0x55f35/0x55f55) => "the PLAYER receives lanes from each race in turn".
+// Rewrite trigger: FIRST turn the player's holdings are lane-adjacent to that
+// empire's holdings (one-shot per pair; the original's loop cadence is not
+// recovered, so repeating the call every turn would over-grant against the
+// t193 witness "masks md5-STATIC across a window with no alliance
+// transition").
+void Campaign::visibilityPhase() {
+    for (int e = 1; e < Nowner_; ++e) {
+        if (contacted_[kPlayer * Nowner_ + e]) continue;
+        if (!contactSeen(kPlayer, e)) continue;
+        contacted_[kPlayer * Nowner_ + e] = 1;
+        const int allied = dipState_[e - 1].allied ? true : false;
+        const int n = shareLaneVision(kPlayer, e, /*bidirectional=*/false, allied);
+        shareStarVision(kPlayer, e, /*bidirectional=*/false, allied);
+        if (n > 0 && e - 1 < static_cast<int>(aiDip_.size()))
+            events_.push_back({turn_, "Shared star-lane intelligence with " +
+                                          aiDip_[e - 1].displayName + " (" +
+                                          std::to_string(n) + " lanes)"});
+    }
+}
+
 void Campaign::diplomacyPhase() {
     for (int i = 0; i < cfg_.aiCount; ++i) {
         const DipValues& v = aiDip_[i].values;
@@ -1069,6 +1250,12 @@ void Campaign::diplomacyPhase() {
             // already at war; nothing to break (alliance bookkeeping R1-blocked)
         } else if (act == DipAction::ProposeAlliance && !st.allied) {
             st.allied = true;
+            // LANE SHARE fires WHEN AN ALLIANCE IS MADE — cited caller 0x45778
+            // (EBX=0 bidirectional, inside the alliance-formation handler that
+            // writes row+0x1c0 state and the +10/+5 attitude bumps; ships.md
+            // S23 L6). allied=true -> modulus 6 (lane budget doubles).
+            shareLaneVision(kPlayer, owner, /*bidirectional=*/true, /*allied=*/true);
+            shareStarVision(kPlayer, owner, /*bidirectional=*/true, /*allied=*/true);
             events_.push_back({turn_, aiDip_[i].displayName + " allied with the player"});
         }
     }
@@ -1189,8 +1376,10 @@ void Campaign::abilityPhase() {
                 break;
             }
             case SpeciesAbility::KnowStarLanes:
-                break;  // passive (no amass line, L2295 block); filed no-op —
-                        // the sim has no fog of war (see abilities.md §2)
+                break;  // PASSIVE (no amass line, L2295 block; cadence word 0).
+                        // REAL EFFECT since t195: wired at scenario init in
+                        // seedVisibility() (owner bit ORed into every lane
+                        // mask; ships.md S23 L6/L9) — not a no-op any more.
             case SpeciesAbility::BlockStarLanes: {  // L2314-2315 "block all star lanes entering your colonized systems"
                 int n = 0;
                 for (size_t s = 0; s < galaxy_.stars.size(); ++s)
@@ -1469,6 +1658,7 @@ Victory Campaign::advance() {
     researchPhase();
     combatPhase();
     expansionPhase();
+    visibilityPhase();
     diplomacyPhase();
     victory_ = checkVictory();
     if (victory_ != Victory::None) {

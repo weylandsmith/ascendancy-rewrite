@@ -253,6 +253,48 @@ public:
     }
     const std::vector<CampaignEvent>& events() const { return events_; }
     const Galaxy& galaxy() const { return galaxy_; }
+    // --- OQ-026 PER-EMPIRE VISIBILITY LAYER (docs/re/ships.md S23 L5/L6/L9) ---
+    // The original stores a per-empire bitmask on every lane record
+    // (lane rec+0x20, bit e = 1<<empire-index, S23 L5 t191) and a twin pair
+    // on every star (obj +0x16 lane-follow / +0x17 select, S23 L9 t194).
+    // The UI CONSUMER is the cosmos list builder FUN_00028fc0: lane i gets a
+    // display entry IFF rec+0x20 & viewer_mask != 0 (no entry => never drawn
+    // by painter FUN_000284bc, never clickable); stars are ALWAYS listed,
+    // but star-click FUN_00028e70 gates select on star+0x17 & mask and
+    // lane-follow on star+0x16 & mask. Grants are OR-only (no lane-pool-scoped
+    // clear exists => reveal is sticky, S23 L5).
+    static int viewerMaskFor(int viewer) {
+        // FUN_00021a84 law verbatim (S23 L9): mask = idx==0xff ? 0xff :
+        // 1<<(idx&0x1f). 255 = spectator/reveal-everything viewer.
+        return viewer == 0xff ? 0xff : (1 << (viewer & 0x1f));
+    }
+    // Filter law 0x2914e analog: would the cosmos builder admit lane `lane`
+    // for this viewer?
+    bool laneVisibleTo(int lane, int viewer) const;
+    // Star-click FUN_00028e70 analogs (star +0x17 / +0x16 & viewer mask).
+    bool starSelectableBy(int star, int viewer) const;
+    bool starLaneFollowableBy(int star, int viewer) const;
+    // Mid-game witness analog (t193 measured 49/58 admitted for the player).
+    int visibleLaneCountFor(int viewer) const;
+    // Display-list builders: lanes filtered by the mask (pool order, the
+    // builder's iteration order); stars UNCONDITIONALLY (S23 L9 honest
+    // negative — the builder kind-0 adds stars with no mask test).
+    std::vector<int> cosmosLanesFor(int viewer) const;
+    std::vector<int> cosmosStarsFor(int viewer) const;
+    // FUN_00046354 shape (S23 L6 t192): mutual lane-vision share between
+    // empires a and b. N = vis-rng % (allied ? 6 : 3) + 1 grants PER CALL
+    // (ALLIANCE doubles the budget). Receive leg: a receives every lane b
+    // sees and a doesn't, up to N; bidirectional adds the mirrored lend leg.
+    // Fires BIDIRECTIONAL at alliance formation (cited site 0x45778) and
+    // RECEIVE-ONLY in the per-race contact loop (cited shape 0x55f6e).
+    // Returns the number of lane grants made (event text).
+    int shareLaneVision(int a, int b, bool bidirectional, bool allied);
+    // Star twin FUN_00046524 (S23 L6: "same shape", modulus 4 if state==3
+    // else 2). Each mask byte (+0x16/+0x17 -> starLaneVis_/starSelVis_) is
+    // shared INDEPENDENTLY [inferred: t193 census shows the two bytes with
+    // different distributions]; OR-only. Pairing this twin to both share
+    // sites is [unverified] (the twin's callers are not in the banked set).
+    void shareStarVision(int a, int b, bool bidirectional, bool allied);
     int playerScorePct() const;  // stars-owned share, static.txt '%'-template (§1)
     std::string traceLine() const;  // one-line status for playthrough logs
     // Pick a Colony-Base cell the way the original's picker does: ONE
@@ -290,6 +332,12 @@ private:
     void expansionPhase();
     void combatPhase();
     void abilityPhase();
+    // OQ-026: per-turn receive-leg sweep (cited shape 0x55f6e EBX=-1 inside
+    // the per-race event loop, party-1 = current player row [0x7458e]; ships
+    // .md S23 L6). One-shot per empire pair: fires the first turn a starlane
+    // joins a star the player holds to a star that empire holds
+    // [documented default site — the rewrite has no per-race event loop].
+    void visibilityPhase();
     void diplomacyPhase();
     int attackScore(int owner) const;
     int defenseScore(int owner, int star) const;
@@ -376,6 +424,29 @@ private:
     std::vector<int> charge_;
     std::vector<char> doublePower_, sapActive_, invincible_, laneBlock_;
     std::vector<int> fleetDamage_;  // per owner: accumulated hull damage (SA_DoubleHull / SA_HealShips / SA_SapAlienPower)
+    // OQ-026 visibility state (docs/re/ships.md S23). Masks are OR-only
+    // (sticky law, S23 L5): laneVis_ per galaxy lane (rec+0x20 analog),
+    // starLaneVis_ / starSelVis_ per star (obj +0x16 / +0x17 analogs — two
+    // separate vectors because t193's mid-game census censuses the twin
+    // bytes with DIFFERENT distributions {1:160,6:180,...} vs {1:260,6:240,...},
+    // so they are not one value). Seeded at construction: an empire sees
+    // every lane incident to a star it owns and both bits of its own stars
+    // (t192 new-game witness "race r's list == EXACTLY {mask==1<<r}" + t193
+    // re-read "the per-race list is the race's OWN claimed lanes"; the init
+    // PATH that writes the first 1<<r bits is not among the cited writers ->
+    // [documented default]). SA_KnowStarLanes ORs its bit into every lane
+    // (help.txt L2295 through the only consumer surface t194 proved exists);
+    // SA_KnowHomeWorlds ORs its bit into both bytes of every ALIEN HOME star
+    // (L1783 "see all alien home stars"). Separate draw stream visLcg_ — the
+    // campaign rng_ must stay untouched (REFUTED-ROUTES RNG discipline) and
+    // the terrain worldLcg_ is reserved for world-gen laws.
+    std::vector<int> laneVis_;
+    std::vector<char> starLaneVis_, starSelVis_;
+    uint32_t visLcg_ = 0;
+    int visNext();  // same FUN_0007824f form as worldNext(), own stream
+    void seedVisibility();
+    bool contactSeen(int a, int b) const;  // colony-star adjacency (share trigger)
+    std::vector<char> contacted_;          // owner x owner: receive-leg fired
     int Nowner_ = 0;
     int turn_ = 0;
     Victory victory_ = Victory::None;

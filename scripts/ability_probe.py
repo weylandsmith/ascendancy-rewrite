@@ -72,7 +72,11 @@ for n in notes:
     if "[help.txt L" not in n:
         fail(f"kNotes entry missing help.txt line citation: {n!r}")
 noops = [n for n in notes if n.startswith("FILED NO-OP")]
-if len(noops) != 4:
-    fail(f"FILED NO-OP count = {len(noops)}, want 4 (the knowledge/build-on-black family)")
+# t195: count 4 -> 2. SA_KnowHomeWorlds and SA_KnowStarLanes LEFT the no-op
+# set when the OQ-026 visibility layer landed (ships.md S23 L9 mapped the
+# real original effects; rewrite implements + pins them). Remaining no-ops:
+# BuildOnBlack + KnowRaces + (dialogue-gating family keeps its filing).
+if len(noops) != 2:
+    fail(f"FILED NO-OP count = {len(noops)}, want 2 (BuildOnBlack + KnowRaces; t195 OQ-026)")
 
 print(f"OK: 21 abilities, 14 charged / 7 passive, race02 tokenless->'{titles[2]}', kNotes 21/21 cited ({len(noops)} filed no-ops)")
