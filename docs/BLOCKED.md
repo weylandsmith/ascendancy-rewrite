@@ -383,3 +383,29 @@ RESOLVED t89 (2026-10-26): executed as scoped. Noise removal stands (cited
 determinism); seed 2024 resolves Control t777 FINITE inside the 1200 budget
 (42 Extinct t581, 13 Extinct t503, 1/2 Control t842/t677), 109 tests 0 failed,
 PLAYTHROUGH regenerated. OQ-010 CLOSED; this block is closed history.
+
+## t186 — the idle gate armed ITSELF: whole-file prompt diffs are a footgun (harness, FIXED)
+
+Not a research block: no OQ row moved this iteration, and none could. The loop
+ran nine consecutive "trigger fired" sessions (polls 101-108 and this one)
+because r1_idle_probe.py's B2 leg compared whole prompt files.
+loop_one_task.sh:135-143 builds prompt-N as [contract][cat probe-last.log]
+[steering][interrupted-note], so region 2 IS the previous iteration's report —
+and that report quotes the loop's own commit subject ("HEAD: ...") plus the
+journal sha. Digit-stripping neutralises numbers, not prose, so the diff was
+never empty: every iteration armed on its own last commit message while the
+same report's B3 leg printed "HEAD == journal sha: no commits outside the loop".
+FIX (scripts/r1_idle_probe.py, B2): diff only HUMAN-authored regions — contract
+text and the STEERING section — and report the whole-file count as a diagnostic
+only. Pinned by scripts/r1_t186_b2_regression.py (gate stage 3u): replays all
+107 historical pairs, old 13 arms -> new 5, 8 flipped to idle (exactly polls
+101-108), and asserts every ignored delta line provably sits in a loop-authored
+region. NO prompt file in history ever contained a STEERING section, so the
+filter cannot swallow a real steering note.
+LAW for future iterations: never diff a whole generated artifact to decide
+"did a human change something" — segment by authorship first. And a single
+trigger line in a report is not a finding when the report's own cross-check
+contradicts it: adjudicate the pair, then act.
+CONSEQUENCE: with B2 fixed, the loop will now genuinely IDLE while the offline
+queue is empty. That is correct behaviour, not a stall — re-arming requires a
+new capture or a user decision (see the decision surface in docs/STATE.md).

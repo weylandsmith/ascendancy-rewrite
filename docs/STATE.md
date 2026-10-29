@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-28T19:20
+updated: 2026-10-28T21:50
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -238,23 +238,54 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t186: IDLE RE-ARM + DECISION SURFACE — the offline queue is EMPTY.
-Every OQ-019 residue is closed except the live flight-delta capture
-(BLOCKED t48), and every other open row needs a capture or the player
-(OQ-005 eyeball work/r1/shp_png/index.txt, OQ-016-tail, OQ-021, OQ-023
-per t180/stop-report §2-§3). A model session runs only on an armed
-trigger, dirty tree, or human queue (t178 IDLE RULE): do NOT spend a
-session re-checking for new work. WHEN THE CAPTURE TRIGGER ARMS, run
+NEXT t187: IDLE — SLEEP, DO NOT LAUNCH-BY-EXCITEMENT. As of t186 the idle
+gate is TRUSTWORTHY: the trigger-B arm we kept seeing for nine iterations was
+the probe quoting the loop's own commit subject back to itself (fixed in
+scripts/r1_idle_probe.py B2, pinned by gate stage 3u +
+scripts/r1_t186_b2_regression.py; docs/BLOCKED.md t186). With the offline queue
+EMPTY (t185 closed the last static candidate), a correct VERDICT is now
+"IDLE — neither trigger" and loop_one_task.sh will sleep IDLE_SLEEP between
+polls. THAT IS THE EXPECTED STEADY STATE, not a stall. A session may only be
+launched when: (A) live-timeline.jsonl actually grew (then run
 scripts/r1_t85g_sitting.py on the new ring, then the OQ-021/OQ-023/OQ-019
-flight-delta menu (STATE HISTORY region + stop-report.md §2). WHEN THE
-DECISION TRIGGER ARMS, surface: (1) OQ-005 PNG packet for the player's
-eyeball ruling (index.txt, CONTROLS first); (2) accept/reject documented
-defaults for static-only rows; (3) authorize a capture sitting that
-FLIES ships (two zero-observation corpora t49/t58 prove flights only
-come from real play); (4) t89a-scale code work resumption if strict-close
-is relaxed. RATIONALE: t185 closed the last fully-offline candidate
-(magnetron identity); any session that invents a fifth static scheme
-violates R1/GOAL standing decisions.
+flight-delta menu — stop-report.md §2/§4); (B) VERIFIED trigger B: human-region
+prompt delta or foreign untracked/committed file — READ the cross-checks
+(B3/journal, tree-clean lines) before believing any single arm line; or (C) a
+human names a task. The decision surface the player owes is on disk and
+unchanged: (1) OQ-005 eyeball packet work/r1/shp_png/index.txt (15
+RENDERED/VALIDATED PNGs, 65 DECODE-FAIL rows; CONTROLS first); (2) accept/reject
+documented defaults OQ-003/OQ-005/OQ-019/OQ-023 (stop-report.md §3); (3)
+authorize a capture sitting that FLIES ships; (4) resume t89a-scale code work if
+strict-close is relaxed. RATIONALE: inventing offline work is forbidden
+(R1/GOAL standing decisions: no fifth static base scheme, no 7th shp sweep);
+spending sessions re-checking triggers is what t178 forbade and what the t186
+self-arm bug made unavoidable until now.
+
+LANDED t186 (2026-10-28, this session): THE IDLE GATE WAS ARMING ITSELF —
+diagnosed, fixed, pinned. Trigger A re-confirmed NEGATIVE from the report
+(timeline mtime_ns/size == baseline, no dosbox procs; NOT re-probed, t178
+rule). Trigger B was a FALSE ARM and structurally so: loop_one_task.sh:135-143
+embeds `cat probe-last.log` in every prompt, so prompt-N contains prompt-(N-1)'s
+report; the report's "HEAD:" line is the loop's own commit SUBJECT and digit-
+stripping (r1_idle_probe.py:498) kills digits, not prose; :515 armed on any
+surviving delta. So: loop commits -> subject changes -> next report differs ->
+B2 arms -> loop launches, forever. Pair 107/106 delta was literally t184's own
+subject, beside the same report's "B3 HEAD == journal sha 5aed299: no commits
+outside the loop". Tree fully clean, no STEERING/LOOPSTEER, no foreign paths —
+MEASURED this session, not assumed. FIX: B2 diffs only human-authored regions
+(contract + STEERING); whole-file delta is a diagnostic line ("report echo /
+loop noise -- NOT an arm"). PIN: scripts/r1_t186_b2_regression.py RC=0 —
+replays all 107 pairs: old 13 arms -> new 5 (15/17/23/24/99 are real contract
+edits: t178-rule insert, BANK-EARLY insert, blank-line noise), 8 flipped to
+IDLE = exactly polls 101-108; asserts every ignored delta line provably lies in
+a loop-authored region; SKIPs rc=0 if the prompt history is rotated; wired as
+gate stage 3u. Live re-run post-fix: B2 prints "human-region delta 0 line(s)"
+and the residual arm is my own mid-iteration untracked regression script under
+B4 (scripts/ is outside LOOP_OWNED) — disappears at commit. Nine sessions were
+burned on this feedback loop (t178-era idle re-checks); the honest negative is
+banked in docs/BLOCKED.md t186 with the authorship-segmentation law. No OQ row
+moved and none could: queue empty. Gate 0 + LEDGER AUDIT OK. WIP:
+docs/re/_wip_t186.md.
 
 LANDED t185 (2026-10-28, this session): OQ-019 MAGNETRON IDENTITY CLOSED
 WITH CITED MEASUREMENT (row stays OPEN — flight-delta residue only).

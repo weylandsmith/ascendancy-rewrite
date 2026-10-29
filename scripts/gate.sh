@@ -470,6 +470,17 @@ if ! /usr/bin/python3 "$ROOT/scripts/ledger_index_check.py" >/tmp/gate_ledger_in
   err "STATE ledger index != record: re-derive the block from docs/OPEN-QUESTIONS.md (the record wins)"
 fi
 
+# 3u. IDLE-GATE B2 REGRESSION (t186). The probe's prompt-delta leg armed the
+# loop on ITS OWN previous report (echo of the loop's commit subject) for nine
+# straight iterations before it was diagnosed. The replay script asserts on the
+# real prompt history that (a) the fix strictly reduces arms and (b) every
+# delta the fix ignores is provably inside a loop-authored region. Runs in ~1s;
+# SKIPs (rc 0) if work/r1/loop is ever rotated away.
+if ! /usr/bin/python3 "$ROOT/scripts/r1_t186_b2_regression.py" >/tmp/gate_b2_regression.log 2>&1; then
+  cat /tmp/gate_b2_regression.log
+  err "idle-gate B2 regression failed: the probe could arm on loop echo again (see docs/STATE.md t186 LANDED block)"
+fi
+
 # 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
 MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
 MS=${MS:-0}

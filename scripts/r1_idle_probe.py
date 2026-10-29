@@ -481,9 +481,53 @@ def trigger_b():
     # documented steering route -- the harness PREPENDING a note to this
     # iteration's prompt file -- is invisible to it, so adjudicate it by
     # content here. NUMERIC sort (t144: `ls -1 | tail -1` -> prompt-9.txt).
+    #
+    # t186 SEGMENTING (the idle gate armed ITSELF every iteration until this).
+    # loop_one_task.sh:135-143 builds prompt-N as
+    #   [1 CONTRACT] [2 cat probe-last.log] [3 STEERING] [4 INTERRUPTED note].
+    # Region 2 is the PREVIOUS iteration's probe report, which this probe
+    # itself wrote and which contains prose that changes every iteration by
+    # construction: the "HEAD: <subject>" line (:355) is the loop's own commit
+    # message, and "B3 HEAD == journal sha ..." (:448) names that sha. Digit-
+    # stripping (:498) neutralises NUMBERS, not commit-subject PROSE, so a
+    # whole-file digit-stripped diff of two adjacent prompts always differs
+    # wherever region 2 sits -> :515 armed every single iteration -> the loop
+    # could never idle. MEASURED by scripts/r1_t186_b2_regression.py replaying
+    # all 107 historical pairs: old logic armed 13, new arms 5 (the 5 are genuine
+    # contract edits at pairs 15/17/23/24/99), 8 pairs flipped to idle — exactly
+    # the t178-era polls 101-108, each launched on the previous session's commit
+    # message the report had quoted to itself. Proof, pair 107/106: both surviving
+    # delta lines are "HEAD:/B3 ... 46dd6ea t183..." -> "a239b27 t184...", i.e.
+    # t184's own subject echoed, while the same report's B3 leg asserted "HEAD ==
+    # journal sha: no commits outside the loop". FIX: diff ONLY the human-authored
+    # regions (1 and 3); region 2/4 are loop noise, reported as a count for
+    # visibility but never an arm. Safety: no prompt-*.txt in the loop's
+    # history (all 107 pairs replayed) ever contained region 3 unless a real
+    # LOOPSTEER.txt was consumed, so this filter cannot swallow a steering note.
     def _num(path):
         m = re.search(r"(\d+)", os.path.basename(path))
         return int(m.group(1)) if m else -1
+
+    ECHO = "IDLE-GATE TRIGGER ARMED"          # start of region 2
+    STEER_HDR = "STEERING FOR THIS ITERATION"  # start of region 3
+    INTERRUPT = "INTERRUPTED PRIOR WORK DETECTED"  # start of region 4
+
+    def human_regions(txt):
+        """Lines a human authored: contract text + steering text."""
+        out, keep = [], True
+        for l in txt.splitlines():
+            if ECHO in l:
+                keep = False
+                continue
+            if STEER_HDR in l:
+                keep = True
+                continue
+            if INTERRUPT in l:
+                keep = False
+                continue
+            if keep:
+                out.append(l)
+        return out
 
     prompts = sorted(glob.glob(os.path.join(PLAYCAP, "loop", "prompt-*.txt")),
                      key=_num)
@@ -497,26 +541,34 @@ def trigger_b():
             p_txt = fh.read()
         strip = lambda t: re.sub(r"\d+", "N", t)  # noqa: E731
         n_lines, p_lines = len(n_txt.splitlines()), len(p_txt.splitlines())
-        raw = [l for l in difflib.unified_diff(p_txt.splitlines(),
-                                               n_txt.splitlines(), lineterm="")
-               if l[:1] in "+-" and l[:3] not in ("+++", "---")]
-        stripped = [l for l in difflib.unified_diff(strip(p_txt).splitlines(),
-                                                    strip(n_txt).splitlines(),
-                                                    lineterm="")
-                    if l[:1] in "+-" and l[:3] not in ("+++", "---")]
+        nh, ph = human_regions(n_txt), human_regions(p_txt)
+        human = [l for l in difflib.unified_diff([strip(x) for x in ph],
+                                                 [strip(x) for x in nh],
+                                                 lineterm="")
+                 if l[:1] in "+-" and l[:3] not in ("+++", "---")]
+        # Whole-file delta kept ONLY as a diagnostic: it is the number that
+        # used to arm, so if it is large while `human` is empty, the delta is
+        # report echo (loop noise), which is exactly the t186 case.
+        whole = [l for l in difflib.unified_diff(strip(p_txt).splitlines(),
+                                                 strip(n_txt).splitlines(),
+                                                 lineterm="")
+                 if l[:1] in "+-" and l[:3] not in ("+++", "---")]
         note = ""
-        if raw and not stripped:
-            note = (" [raw delta %d line(s) but digit-stripped delta 0 ="
-                    " iteration-numbering drift only]" % len(raw))
-        reasons.append("prompt pair %s vs %s (%d/%d lines): digit-stripped delta"
+        if whole and not human:
+            note = (" [whole-file delta %d line(s) is report echo / loop noise"
+                    " -- NOT an arm (t186); human regions identical]"
+                    % len(whole))
+        reasons.append("prompt pair %s vs %s (%d/%d lines): human-region delta"
                        " %d line(s)%s" % (os.path.basename(newest),
                                           os.path.basename(prev),
-                                          n_lines, p_lines, len(stripped), note))
-        if stripped:
+                                          n_lines, p_lines, len(human), note))
+        if human:
             armed = True
-            reasons.append("PROMPT CONTENT CHANGED: %d line(s) -- read %s, a"
-                           " prepended steering note is the loop's assignment"
-                           % (len(stripped), newest))
+            reasons.append("PROMPT CONTENT CHANGED: %d line(s) in the contract"
+                           " or steering region -- read %s; the contract is"
+                           " docs/TASK_CONTRACT.txt and a steering note is the"
+                           " loop's assignment (report echo excluded, t186)"
+                           % (len(human), newest))
     return armed, reasons, decision_candidate
 
 
