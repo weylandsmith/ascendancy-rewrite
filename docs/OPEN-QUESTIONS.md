@@ -281,7 +281,21 @@ every trusted row (45140 pts, docs/re/score.md S8). 68% full-system share
 with zero arming re-confirms systems_full-is-not-the-variable at a new
 operating point. Boundary test is 4 units away (>=25); row STAYS OPEN —
 if a Control-victory screen appears in this sitting, bank it IMMEDIATELY,
-that is the closing measurement. | open |
+that is the closing measurement.
+STATUS t189b (merge of pairing-session findings 2026-10-29): the 14->21 drift
+the player saw is REAL and is NOT any systems count — same frames t1253..1335
+score_stars walks 14,15,12,16,21,19,22 (goes DOWN too) while systems_any=36
+and systems_full=34 are dead flat (player saw 14->21 and 36 planets: both
+match). DAT_482fb tracks something oscillating +-several per turn despite
+constant ownership; untested candidates: per-star "percent controlled"
+aggregates, production-weighted counts, or a value recomputed only when the
+'c' overlay opens (player opened it on different turns -> saw different
+numbers). t187's falsification of systems_full as comparator re-confirmed at
+a second operating point. RESIDUE REFINED: not just the threshold — the
+DISPLAYED count itself needs its producing write-site pinned (comparator
+sweep within the new window against per-star control fields per
+scripts/r1_slot.py, if in watcher schema). | open (threshold residue +
+displayed-count write-site residue; RE unknown, passive capture live) |
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719
@@ -319,7 +333,7 @@ and decayed to 451, never crossing Orfa's ACCEPT_ALLIANCE=570, and a
 player PROPOSE does not move the AI-side attitude (docs/re/diplomacy.md
 §12). WORKING: 2=war, 1=peacetime/no-active-relationship; an accepted
 alliance (state-3 candidate) remains capture-gated — a future sitting must
-first raise Orfa attitude above 570 by other means, then propose. | open |
+first raise Orfa attitude above 570 by other means, then propose.
 STATUS t85g (t1253 sitting): CORRECTION to t85c — a player PROPOSAL DOES
 move the AI-side cell (att[Orfa->Chamachies] 487->526, +39); t85c's "+280
 player-side only" understated it (the t85c proposal window simply didn't
@@ -405,6 +419,24 @@ test lives in the RECEIVER's rung (0x44ffc vs its own +0x1d1) while
 decideDipAction takes no incoming-offer parameter; wiring it is the W-B
 ownership-model gate, not an RE unknown. The comment at diplomacy.cpp:244
 ("state changes only on accept") is now cited rather than assumed.
+STATUS t188b/t189b (2026-10-29) — THE CLOSING MEASUREMENT IS IN: cell0i=3
+AND celli0=3 OBSERVED at t=1335 (wall 23:47:43) with attitude +10/+10
+(605->615 player-side, 631->644 AI-side), sustained 68 raw rows; re-run of
+scripts/r1_t188_state3_arbiter.py this session RC=0 reproduces frame-for-
+frame. Flip comparator = AI-side atti0=631 > Orfa ACCEPT_ALLIANCE=570 —
+EXACTLY the t180 static law (0x4562f/0x45641 writes), now corroborated
+end-to-end by capture (docs/re/diplomacy.md §16). ENUM IDENTITY
+CLOSED BY OBSERVED TRANSITIONS: 2=WAR (t85b reciprocal 1->2, sustained 244
+turns), 1=PEACE (t187 reciprocal 2->1), 3=ALLIANCE (this event) — matches
+vendor RELNAMES@0x89074 and the §13 third-party semantic locks. The t180
+"NOT CLOSED, honestly" paragraph above is SUPERSEDED by this observation;
+iter-110's "no cell3 = non-event" pre-check was correct at scan time but
+the mid-turn write (§16 methodology law: walk RAW rows) had not yet landed.
+| CLOSED 2026-10-29 t189b (observation: live-capture cell==3 both ways
+t1335, scripts/r1_t188_state3_arbiter.py RC=0 re-run; law docs/re/
+diplomacy.md §13+§16; rewrite code site unchanged, diplomacy.cpp:227/:244
+cited; engine-build residual — trade/third-party emitter + receiver-rung
+parameter — tracked in docs/PLAN.md A7, NOT an RE unknown) |
 OQ-024 | loop | planet GOVERNOR assignment law (@0x38df0 branch of
 FUN_00038ba4: '!' -> PROS += IND>>2, '"' -> RES += IND>>2; S6 line 45 read
 +0x54 as a governor byte) | CLOSED t45 | FULL STATIC MEASUREMENT

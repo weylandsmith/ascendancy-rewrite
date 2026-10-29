@@ -3,7 +3,10 @@ Source: `extracted/ascend00/history.txt` (31,525 B). Each species block starts `
 - **21** species, specnum contiguous 0..20 (asserted). Same count as the 21 `raceNN.dip` AI parameter files -> one-to-one species<->AI-set mapping is consistent (OQ-009's single-evaluator picture).
 - **ABIILITIES ARE WIRED** (2026-10-04d): effect semantics, charge model, and per-token citations moved to **docs/re/abilities.md** (gate 3m). The "?" row for specnum 2 below is RESOLVED: race02.dip's header carries no SA_ token [verified]; the ability is SA_BuildOnBlack via the help-abil02 title "Orfa" cross-check (`loadAbilities`, scripts/ability_probe.py).
 
-## Roster (display names from `raceNN.dip` headers [verified]; specnum N <-> raceNN mapping [inferred] from blurb cross-refs — race00=Minions appears in specnum 0's blurb, race01=Snovemdomas in 1, race10=Govorom in 10 — consistent with contiguous 0..20 both sides)
+## Roster (display names from `raceNN.dip` headers [verified]; specnum N <-> raceNN mapping: CONTENT-VERIFIED at three points via race-portrait renders — player identification 2026-10-29 of lgrace07=Swaparamans (specnum 7), lgrace09=Shevar (9), lgrace10=Govorom (10), see docs/re/shp.md S19; the remaining rows stay [inferred] from blurb cross-refs — race00=Minions appears in specnum 0's blurb, race01=Snovemdomas in 1 — consistent with contiguous 0..20 both sides)
+BANKED LAW (t189b): `lgraceNN` = the race-NN portrait image, displayed on the
+race-description screen and the diplomacy screen [verified by render + player
+eyeball; new-game circle-crop provenance unknown].
 | specnum | dip name | ability token | history title | keyword |
 |---|---|---|---|---|
 | 0 | the Minions | SA_SuperMarines | Supreme Planet Invaders | power |

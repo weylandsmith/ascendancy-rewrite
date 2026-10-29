@@ -771,3 +771,29 @@ R13), now with the sanctioned-route negative cited. No rewrite change
    OQ-005 status UNCHANGED open: dims-location question lives in the 71;
    closure class remains human-verifiable drawn frame (R13), now served by
    an evidence packet at work/r1/shp_png/index.txt.
+
+## 19. t189b (2026-10-29, merge of pairing-session findings): 6-BIT PALETTE
+DARKNESS BUG FIXED; all-15-real verdict; interface-style anomaly noted
+- THE "ALL TOO DARK" VERDICT WAS OUR RENDERER'S BUG, not the data. game.pal
+  max byte = 0x3f and 0/256 channels exceed 0x3f: a 6-bit VGA palette fed
+  RAW to putpalette() capped every pixel at 25% brightness, controls included
+  (player: "They're all too dark, including the controls"). Fix:
+  scripts/r1_t182_pngdump.py load_palette() scales v*255//63 (:117). Re-run
+  RC=0: sets=86 rendered=15 validated=15 residue 71; mean luminance lgrace10
+  29->125, max 255. tools/shp_pngdump had gone MISSING from tools/ — rebuilt:
+  `cmake --build rewrite/build && g++ -std=c++17 -O1 -I rewrite/src -o
+  tools/shp_pngdump tools/shp_pngdump.cpp rewrite/build/libascend_core.a`.
+- PLAYER VERDICT on the (dark) set: all 15 rendered images are REAL IMAGES
+  with varying recognizability — the decoder produces valid pictures even for
+  all 71 residue records. OQ-005 core (dims-location) stays open, but the
+  residue is NOT junk: the "undecodable garbage" framing is retired.
+- STYLE ANOMALY, KEPT OPEN: 10status/2savegam/4loadgam render in a visual
+  style the player has NEVER seen in-game ("possibly junk data" — the style
+  difference is REAL, junk-ness is NOT: filenames and decodes are genuine).
+  Same non-recognition for planpro/planres (nondescript nature/space
+  backgrounds). Candidate explanation to test cheaply BEFORE any deletion:
+  800x600 SVGA variants vs the VESA480/MCGA modes actually in play, or unused
+  menu art. Do NOT delete rows on non-recognition alone.
+- lgrace07/09/10 identity content-VERIFIED (Swaparamans/Shevar/Govorom) —
+  law banked docs/re/species.md (lgraceNN = race-NN portrait, race-description
+  + diplomacy screens).

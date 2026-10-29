@@ -88,6 +88,14 @@ W6  AI BEHAVIOR DECODE (t85g standing worklist — closes the rewrite's
        question; feeds aicode.md).
     A6 SHIP_PATIENCE (+0x1b0) readers (named key, unbound semantics).
     A7 state-byte stores of imm3 into [+0x1c0+idx] (OQ-023 static route).
+       DONE t180 (three conditional sites, docs/re/diplomacy.md §13) and the
+       closing OBSERVATION banked t188b/§16 (cell0i=celli0=3 @t1335, +10/+10,
+       atti0=631>570) — enum semantics CLOSED. WHAT REMAINS HERE (engine
+       build, NOT an RE unknown): the rewrite trade/third-party emitter
+       (DA 4/5/6 + DA 10/7/9 gates) needs star/lane/tech ownership tables +
+       incoming-offer UI; receiver-side accept rung (FUN_00044fc0 0x44ffc vs
+       own +0x1d1) has no decideDipAction parameter yet (diplomacy.cpp:227/
+       :244, OQ-023 row).
     LAWFUL SOURCE: mid-turn capture frames t1244..1254 (banked) + static
     decode; NO new user sessions required for any item in this list.
 

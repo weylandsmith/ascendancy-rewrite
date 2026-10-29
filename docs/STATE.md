@@ -23,6 +23,14 @@ ledger:
   closed:
     - "OQ-001 .cob offsets = N not N+1"
     - "OQ-002 FLIC codec (both vendor videos, golden-pinned)"
+    - "OQ-023 relation-state enum semantics CLOSED 2026-10-29 t189b — state-3
+      ALLIANCE event OBSERVED (cell0i=celli0=3 @t1335 wall 23:47:43, att
+      +10/+10, 68 sustained raw rows, scripts/r1_t188_state3_arbiter.py RC=0
+      re-run); flip comparator atti0=631 > Orfa ACCEPT_ALLIANCE 570 = the t180
+      static law (0x4562f/0x45641) corroborated end-to-end; identity
+      2=WAR(t85b)/1=PEACE(t187)/3=ALLIANCE(this); docs/re/diplomacy.md §13+§16;
+      rewrite unchanged diplomacy.cpp:227/:244; engine-build residual ->
+      docs/PLAN.md A7"
     - "OQ-022 music span-vs-check contradiction CLOSED 2026-10-07 t8 — player
       FUN_00059c70's 0x1d4d0 span check never sees theme00 (guard @0x59984
       precedes the checked call; DS:0xa200c all-zeros 10/10 saves,
@@ -145,13 +153,9 @@ ledger:
       t73 dark-zone hit: score strings at 0x2807b/0x280e7 (pool-rel), score law
       TRUNC(100*DAT_482fb/T), presenter eventwnd.cpp 0x2c03a cluster;
       comparator writes = ZERO direct encodings -> evaluator hunt via
-      dark-zone enumeration (t73b); capture fallback. Default >1/2 stands"
-    - "OQ-023 dip third-party/trade branch — RE residual OPEN: nonzero
-      relation-state ENUM semantics (which of 1/2/3 = war vs allied; idle
-      corpus holds ONLY 1, no injected transition), same closure class as
-      OQ-021 (interactive original session). Two-party main-branch law itself
-      MEASURED diplomacy.md 7/8/9 and implemented; the ENGINE build for
-      TRADE/third-party offers is separate build work, not measurement"
+      dark-zone enumeration (t73b); capture fallback. Default >1/2 stands.
+      t189b STATUS: 14->21 drift real, NOT systems count; displayed-count
+      write-site is now the residue"
 
 ## WHAT IS IN HAND (tools + laws — a fresh session starts here, not from scratch)
 - R1 save-state capture LIVE: scripts/r1_savestate.sh (boot -> autosave ZIP,
@@ -266,15 +270,51 @@ reappear AND dosbox is running, that changes everything (live handle
 window readable = direct gate witness, skip straight to the dump:
 ship windows + linear bytes 0x258000..0x259000 per frame); (2) `grep -o
 'sel=[1-9]' work/r1/playcap/watch.out` / `grep -c 'DAT_482fb=2[5-9]'` —
-OQ-021 override; (3) relation cell==3 — OQ-023 override.
+OQ-021 override; (3) MOOT since t189b: OQ-023 is CLOSED (state-3 event
+observed t1335, docs/re/diplomacy.md §16) — do NOT re-open, do NOT re-scan;
+if a SECOND alliance appears, bank it in §16 as corroboration only.
 SECONDARY if t190 runs dry early (same session, same doc): identify the
 stride-0x1ee species table at DAT_00012fb3 (base = diplomacy race-table
 base 0x12e16 + 0x19d — NB row+0x19d is the t99 ABILITY NUMBER, so the
 lane code reads byte(race-row + 0x19d + 0x12): find what lives at +0x1af
 and who writes it; a row where col byte == 0x12 doubles lane speed).
+THEN QUEUED (t189b un-deferred, do not drop): t184 'l'-reveal static hunt —
+the OBSERVATION is now player re-confirmed (docs/re/debugflags.md, caution
+lifted 2026-10-29) but zero `cmp al,'l'` sites exist image-wide; hunt the
+scancode 0x1E path / dispatch-table indirection near 0x79950..0x79c20.
+Also queued: OQ-021 comparator sweep over the NEW window against per-star
+control fields (docs/re/diplomacy-adjacent: OPEN-QUESTIONS OQ-021 STATUS
+t189b — the displayed count itself needs its producing write-site).
 RATIONALE: every capture-gated closer stays watching-only (dosbox down,
 new game at t=0); the lane-record writer is the last OQ-019 residue with
 a static path, and S22 just narrowed it to one byte.
+
+LANDED t189b (2026-10-29, this session; steering-note merge iteration):
+OQ-023 CLOSED — first state-3 (ALLIANCE) event banked and INDEPENDENTLY
+RE-VERIFIED this session (r1_t188_state3_arbiter.py re-run RC=0: cell0i=
+celli0=3 @t=1335 wall 23:47:43, att +10/+10 615/644, 68 sustained raw rows;
+flip comparator atti0=631 > Orfa 570 = the t180 static law 0x4562f/0x45641
+corroborated end-to-end). Enum identity closed by OBSERVED transitions
+2=WAR(t85b)/1=PEACE(t187)/3=ALLIANCE(this); engine-build residual moved to
+PLAN.md A7; ledger_audit.py --expect re-triaged (t181 pattern) — open set is
+now OQ-005,OQ-016,OQ-019,OQ-021. Merged pairing-session findings from
+work/r1/t188b_findings.md (file DELETED after merge) into: diplomacy.md §16
+(event + METHODOLOGY LAW: first-row-per-turn scripts miss mid-turn relation
+writes — adjudicators must walk raw rows); OPEN-QUESTIONS OQ-021 STATUS
+(score_stars 14->21 drift is REAL, not any systems count — systems_any=36/
+full=34 dead flat same frames; residue refined to the displayed-count
+write-site); debugflags.md ('l' caution LIFTED, player re-confirmed
+2026-10-29; zero-cmp-al-'l' anomaly kept as open hunt t184); species.md
+(lgraceNN = race-NN portrait law; specnum<->raceNN content-VERIFIED at 7/9/
+10 = Swaparamans/Shevar/Govorom); shp.md S19 (6-bit palette darkness bug was
+OURS — r1_t182_pngdump.py load_palette() now scales v*255//63, mean luminance
+lgrace10 29->125; player verdict all-15-real, residue NOT junk; 10status/
+2savegam/4loadgam + planpro/planres style-anomaly note kept open — do NOT
+delete on non-recognition). t188b §7 (flight-delta ladder 14/3,14,28) was
+already banked by iter-111's t189 ships.md S22 — no double-bank. Pre-checks:
+no new turns past 1335 (ring = t=0 new-game rows, dosbox down) -> t85g
+re-run not triggered; NEXT t190 (lane-record byte +0x23 writer) stands
+unchanged, lane hunt stays queued behind nothing — it IS next.
 
 LANDED t189 (2026-10-29, this session): LANE-STEP WORD MAPPED — FUN_0004a74c
 IS THE STATE-5 LANE MARCH BODY (ships.md S22; OQ-019 updated, stays OPEN

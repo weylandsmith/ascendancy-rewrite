@@ -493,3 +493,43 @@ work/r1/playcap, 45140 trusted pts):
   t1295-1300 IF the cadence holds. PLAYER ASK (banks the closure):
   propose alliance to Orfa once in-game attitude reads high; acceptance
   writes a cell holding 3 -> row CLOSES.
+
+## §16 — FIRST STATE-3 (ALLIANCE) EVENT BANKED; mid-turn-write methodology law
+(t189b merge 2026-10-29 of the pairing-session findings — material produced
+alongside iter-111; raw sources work/r1/t188b_findings.md (deleted on merge),
+scripts/r1_t187_session.py + scripts/r1_t188_state3_arbiter.py, both RC=0,
+over work/r1/playcap. Supersedes iter-110's "no cell3 = measured non-event"
+pre-check: correct AT SCAN TIME, but the ring grew and the alliance frame
+exists.)
+
+### 16.1 The event (raw-per-row walk, arbiter), t=1335 wall-clock sequence
+    23:47:22 atti0=613 state0i=1
+    23:47:33 att0i=605 atti0=631 state0i=1
+    23:47:43 cell0i=3 celli0=3, att bumps +10/+10 (615/644) — sustained 68 rows
+This CORROBORATES the §13 static alliance law end-to-end by capture: state 3
+written to BOTH cells IFF att > race ACCEPT_ALLIANCE=570 with +10 on both
+cells (§13 case bl=3: write 0x3 to self cell @0x4562f AND mirror @0x45641,
+attitude +10 both sides). The flipping comparator is the
+AI-side cell atti0 (=631 > 570 at the flip frame); the UI "disposition" the
+player reads (605) is the att0i cell. Player testimony matches the frame walk
+exactly: proposals refused at UI-disposition 590/595 while atti0 sat BELOW 570
+(refusal frames show atti0 526/529/532/535...569), drifting +3/turn unattended
+(the §15 gift/trade-drift note), crossing 570 around the 595-proposal,
+acceptance landing when atti0=631. The +10/+10 is EXACTLY the §13 bl=3
+prediction.
+
+### 16.2 METHODOLOGY LAW (applies to every future sitting adjudicator)
+Scripts that take only the FIRST row per turn MISS mid-turn relation writes —
+alliance/peace flips happen mid-autosave (the flip here sits inside turn 1335's
+autosave cadence at 23:47:43). Adjudicators must walk RAW rows per frame, as
+scripts/r1_t188_state3_arbiter.py does; r1_t85g_sitting.py's first-row-per-turn
+view is fine for trends but is NOT an event witness.
+
+### 16.3 Enum semantics CLOSED by observed transitions
+2=WAR (t85b bank), 1=PEACE (t187 first 2->1 bank), 3=ALLIANCE (this event).
+Full enum identity {1,2,3} is now cited by OBSERVED transitions, matching the
+vendor RELNAMES@0x89074 ordering (Unknown/Peace/War/Alliance, §t85f
+debugflags.md) and the third-party semantic locks (§13). OQ-023's RE-unknown
+residual is closed; the row's remaining residual is ENGINE-BUILD (rewrite
+still emits only the two-party threshold branch — tracked in PLAN, not an RE
+unknown).

@@ -83,8 +83,13 @@ def rows(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", default="docs/OPEN-QUESTIONS.md")
-    ap.add_argument("--expect", default="OQ-021,OQ-023,"
+    ap.add_argument("--expect", default="OQ-021,"
                                         "OQ-005,OQ-019,OQ-016")
+    # t189b re-triage: OQ-023 CLOSED by the observed state-3 event
+    # (cell0i=celli0=3 @t1335, +10/+10, arbiter scripts/r1_t188_state3_arbiter.py
+    # RC=0 re-run; docs/re/diplomacy.md §13+§16) — removed from this default the
+    # same way t181 removed OQ-003. The row's engine-build residual (trade/
+    # third-party emitter) is tracked in docs/PLAN.md A7, not the RE ledger.
     # t181 re-triage: OQ-003 CLOSED by measured three-class disclaim
     # (scripts/r1_t181_banddiff.py; docs/re/savegame.md §t181) — removed from
     # this default so gate stage 3t (which calls with NO --expect) stays
