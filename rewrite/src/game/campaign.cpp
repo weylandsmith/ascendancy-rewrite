@@ -1949,6 +1949,23 @@ void Campaign::combatPhase() {
             } else if (hullHit <= defenseScore(b, nb)) {
                 continue;
             }
+            // t207 GUARANTEE-WAR CLAMP (FUN_0003a174 post-handler site
+            // 0x3a25a..0x3a291, cited docs/re/_wip_t207.md S7b): the
+            // INVASION path pays the t204 handler at 0x3a255 and on the -1
+            // (not-at-war) return re-reads the cell and, while STILL
+            // strictly above the victim's DECLARE_WAR line, slams it to
+            // declareWar-10 — the t180 chooser then GUARANTEES war. Wiring
+            // site = the rewrite's capture branch (below the repel test):
+            // the one place an invasion resolution is KNOWN to have run.
+            // DOCUMENTED DIVERGENCE (banked S7e): the original's 0x3a174
+            // clamp position vs repel is undetermined statically and its
+            // gun-bombard caller 0x39f00 pays WITHOUT clamping — the
+            // rewrite conflates gunnery+invasion in one aggregate
+            // engagement, so a repelled attack pays only the t204 -20.
+            if (a == kPlayer && b >= 1 && b - 1 < static_cast<int>(dipState_.size())) {
+                DipPolicyState& vst = dipState_[b - 1];
+                guaranteeWarOnInvasion(aiDip_[b - 1].values, vst.atWar, &vst.attitude);
+            }
             owner_[nb] = a;
             planets_[nb].pop = 2;  // settlement seed :=2 MEASURED (income-law.md S6e)
             fortify_[nb] = 2;

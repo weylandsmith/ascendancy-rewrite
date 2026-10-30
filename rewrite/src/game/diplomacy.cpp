@@ -272,4 +272,25 @@ bool applyAttackDipCost(const DipValues& v, bool victimAtWar, bool victimAllied,
     return true;
 }
 
+void guaranteeWarOnInvasion(const DipValues& v, bool victimAtWar, int* attitude) {
+    // t207 GUARANTEE-WAR LAW — FUN_0003a174's post-handler clamp, verbatim
+    // 0x3a25a..0x3a291 (docs/re/_wip_t207.md S7b). After the invasion path
+    // pays the handler 0x43a4c at 0x3a255, the -1 return (== victim NOT
+    // already at war; the WAR guard 0x43a97 is the only 0-path) triggers:
+    //   di = WORD row(v)+0x1c9 (DECLARE_WAR, §8 map);
+    //   cmp di, WORD[row(v)+0x1b2+2a]  (the attitude cell attacker->victim);
+    //   jge skip; else  WORD[...] := DECLARE_WAR - 10.
+    // Operand identities MEASURED 20/20 playcap saves (scripts/
+    // r207_opinion_census.py): the scale-2 disp [eax*2+0x12fb3] with
+    // eax=247*a is diplo-row(a)+0x19d (ability byte distribution
+    // {0,2,11,19} == the t202 census); 0x12fdf+494v = row(v)+0x1c9; 0x12fc8
+    // +494v+2a = the SAME attitude cell the handler just penalized (200/200
+    // non-war pairs sit above their DECLARE line, so in fresh campaigns the
+    // slam always fires). The t180 chooser (att < row+0x1c9 -> DA_DeclareWar)
+    // then fires: invading a non-at-war owner GUARANTEES war. Same
+    // line-10 CEILING shape as the t204 BREAK_ALLIANCE clamp.
+    if (victimAtWar) return;  // 0x3a25d: no clamp when the handler returned 0
+    if (*attitude > v.declareWar) *attitude = v.declareWar - 10;
+}
+
 }  // namespace ascend::game

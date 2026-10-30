@@ -71,6 +71,7 @@ add_executable(run_tests
   tests/test_species.cpp
   tests/test_campaign.cpp
   tests/test_diponattack_t204.cpp
+  tests/test_invasion_war_t207.cpp
   tests/test_emergency_t201.cpp
   tests/test_demolish_t202b.cpp
   tests/test_freetech_t203.cpp

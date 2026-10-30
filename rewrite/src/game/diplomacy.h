@@ -98,6 +98,14 @@ DipAction decideDipAction(const DipValues& v, const AttitudeModel& mood,
 bool applyAttackDipCost(const DipValues& v, bool victimAtWar, bool victimAllied,
                         int govByte, int* attitude);
 
+// t207 GUARANTEE-WAR clamp — FUN_0003a174's post-handler site 0x3a25a..
+// 0x3a291: after an INVASION pays applyAttackDipCost, iff that call took
+// the non-war (-1) path and the victim's attitude cell is STILL strictly
+// above the victim's DECLARE_WAR line (+0x1c9), slam it to declareWar-10 —
+// the t180 chooser (att < +0x1c9 -> DA_DeclareWar) then guarantees war.
+// No-op on the at-war path (the original skips on the handler's 0 return).
+void guaranteeWarOnInvasion(const DipValues& v, bool victimAtWar, int* attitude);
+
 // Live-measured scenario value of the subtrahend key byte [0x13bc4]
 // (20/20 saves in work/r1/playcap/save, pointer law, t204 S3).
 constexpr int kAttackDipGovByte = 1;

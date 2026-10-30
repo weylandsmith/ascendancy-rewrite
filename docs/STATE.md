@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-30T11:20
+updated: 2026-10-30T14:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,46 +253,73 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t207: THE PLANET-EVENT CALLERS OF THE DIPLOMACY-ON-ATTACK HANDLER —
-0x39fba and 0x3a255 (planet-event module; the two of 0x43a4c's three callers
-that t204 left explicitly UNWIRED as "no planet-attack-event model",
-OPEN-QUESTIONS OQ-016 STATUS t204 residue list). The combat caller 0x4b875
-is fully modelled (t204 S17 + t205 EBX=star correction); what fires these
-two, and what the -1 return drives at 0x3a255 (t204 banked "0x3a255
-branches on the -1 return"), has never been read. PROBE PLAN
-(~corpus-static; r205d_windows.py + functions_full.tsv attribution + the
-E8 caller-edge census pattern all proven in t205/t206):
-(1) disasm 0x39f00..0x3a000 and 0x3a1e0..0x3a2a0 verbatim; name the
-    enclosing functions (0x38ba4-family? t45 governor recalc is in that
-    span) and find their callers — is this the planet INVASION/OCCUPATION
-    event dispatch (cf. t206 W6 occupant loop's [occ+0x54] owner reads)
-    or the ground-combat resolver;
-(2) pin the victim law (esi+0x57 byte, 0xff sentinel skips) against the
-    planet-record +0x57 field identity (t85 hot-block note: name-based
-    +0x57..0x61 — CHECK it is not the same family's turn-churn bytes),
-    and what EDX (attacker idx) is sourced from;
-(3) decide: if the planet-event is ground combat on a planet, the rewrite
-    has no ground-combat model -> bank the law + honest no-delta (like t206
-    bit-0), shrinking the OQ-016 residue line; if it is an occupation/
-    bombing-event the rewrite CAN see, wire-or-file with pins (t204
-    discipline: both return states pinned).
-RATIONALE: it is the last unaccounted caller of the t204 handler (the
-family's caller census is EXACTLY 3 — after this pass, nothing in the
-0x48304/0x43a4c thread stays unread); it directly attacks an OQ-016
-documented residue; and it is corpus-static. Alternatives stay worse:
-gap row 12's inter-race ladder is design-shaped (BLOCKED-USER projection
-decision), OQ-005/019/021 need play (WATCH-ONLY), the 0x13bc4 scalar needs
-other-family saves, and t206's bit-0 event-code semantics are ring codes
-with ZERO corpus witnesses (nothing left to cite there).
-Do NOT re-open: t206's consumer law itself (victim bits = order/display
-only, bit-0 = call-scoped notice latch — _wip_t206 S7/diplomacy S18, and
-do NOT re-read 0x46144's relation-0->1 as a t189 contradiction: it is
-first-contact PEACE init, distinct from the proposal path), the 0x13bc5 =
-per-STAR identity (t205 W1..W4), t204's handler law (BYTE key, CEILING,
-3 callers), t203, t202/t202b, t201, t200, t195, t199, t189b.
+NEXT t208: POSITIVE END-TO-END PIN FOR THE t207 GUARANTEE-WAR CLAMP +
+CLOSE THE t204 PLANET-EVENT RESIDUE LINE — three small, cited items:
+(1) give the REWRITE PLAYER a guaranteed capture in the test fixture
+    (the ability vector indexes OWNER: buildFixture207 gives owner 1
+    SuperMarines, not owner 0; add a test-only ability hook or force the
+    hullHit branch) so invasion_combat_phase_clamp_t207 can assert the
+    340 -> -20 -> clamp 280 -> chooser-DeclareWar cascade END-TO-END
+    (the pure-law cascade pin already passes; only the e2e wiring side is
+    unpinned). Update the pin + _wip_t207 S7e residue (a) when done.
+(2) in docs/OPEN-QUESTIONS.md OQ-016 + ai-dossier gap row 13, amend the
+    'planet-event callers unwired' residue: both are now READ (t207) —
+    bombard = honest no-delta, invasion = clamp wired-attempt-time-
+    under-fire documented; residue shrinks to 'per-ship invasion/bombard
+    channel = OQ-019 family'.
+(3) re-run gate + ledger checks (they must stay green).
+RATIONALE: it finishes the ONLY wiring the t207 law left half-proven
+(residue (a) is a test-coverage gap, not a law gap — cheapest possible
+closure), and the caller thread of 0x43a4c is otherwise fully closed.
+Alternatives stay worse: gap row 12 ladder is a BLOCKED-USER design
+projection decision, OQ-005/019/021 need play (WATCH-ONLY), [0x13bc4]
+semantics need other-family saves, 0x3a174 out-param/0x3d951 context
+have no corpus witnesses to cite, and the t207 defense law is per-ship
+(OQ-019 boundary — do NOT model it in the aggregate rewrite without the
+user's OQ-019 decision).
+Do NOT re-open: the t207 scale-2 algebra correction S7a (247x split is
+VERBATIM in the encodings), the caller census EXACTLY-{0x39fba,0x3a255,
+0x4b875}, t206's two-channel consumer law, the t205 per-STAR identity,
+t204's handler law, t203, t202/t202b, t201, t200, t195, t199, t189b.
 If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
 adjudication via scripts/r1_t85g_sitting.py STILL outranks everything.
+
+LANDED t207 (2026-10-30): PLANET-EVENT CALLERS OF 0x43a4c CLOSED +
+GUARANTEE-WAR LAW CODED/PINNED. Triage: timeline frozen-baseline size,
+tree clean at 099e6c4 -> no sitting; STATE t207 stood. LAWS [all cited,
+docs/re/_wip_t207.md S1..S7e; windows work/t207_w1..w16 via
+r205d_windows (REVENV python -- project .venv lacks capstone, re-hit);
+tools r207_disp_cluster.py + r207_opinion_census.py RC=0]:
+(1) E8 full-image caller census of 0x43a4c EXACTLY {0x39fba,0x3a255,
+    0x4b875} -- t204's thread fully accounted.
+(2) 0x39f00 = GUN-BOMBARDMENT planet path (sole caller 0x4c97f inside the
+    gizmo-attack shared tail; success+mode1+cat-0 gated after power
+    subtract): victim = planet owner byte +0x57 (0xff skips), dip price
+    FIRE-AND-FORGET + one-item loss tail; rewrite HONEST NO-DELTA.
+(3) 0x3a174 = INVASION/CAPTURE resolution (0x42c8e = t179 invasion leg):
+    item-0x17 slot -> ship 0x3a095+0x162*i via 0x396cc; on the handler's
+    -1 return, CLAMPS attitude cell to DECLARE_WAR-10 while still above
+    the line => INVASION GUARANTEES WAR (t180 chooser fires; 200/200
+    fresh pairs slam-eligible MEASURED). Defense law (invmod vs 0x12 +
+    2*0x13, strip via 0x496e4, deactivate via 0x38840, event 0xd)
+    measured, per-ship = OQ-019 boundary, unmodelled.
+(4) SCALE-2 ALGEBRA CORRECTION: compiler splits 494 as 247x read scale-2
+    -- [eax*2+0x12fb3] is diplo-row+0x19d ability byte (distribution
+    {0,2,11,19} == t202 census), 0x12fdf+494v = +0x1c9, 0x12fc8+494v+2a =
+    the ATTITUDE cell (NOT the third-party matrix -- my S4 draft was
+    wrong, corrected same session).
+CODE: guaranteeWarOnInvasion (diplomacy.{h,cpp}) wired at combatPhase
+capture branch; pins test_invasion_war_t207.cpp x3, 133 tests 0 failed;
+BLAST RADIUS UNCHANGED Control t1255 / Extinct t979. OQ-016 STAYS OPEN
+(strict-close): zero in-corpus clamp witnesses; positive e2e needs
+owner-0 guaranteed capture (fixture self-caught 320!=280); clamp-vs-repel
+position undetermined statically. PITFALLS capstone disasm() STOPS at
+first undecodable byte -- seed-and-restart loop (r207_disp_cluster
+pattern); compiler 494=247x scale-2 split on diplo rows; test ability
+vector indexes OWNER not attacker. Gate 0 + LEDGER AUDIT OK + LEDGER
+INDEX OK; NEXT=t208 player-guaranteed-capture e2e pin for the clamp +
+residue-line housekeeping.
 
 LANDED t206 (2026-10-30, this session): ATTACKED-MARK CONSUMER LAW
 MEASURED — THE 0x48304 BYTE IS TWO INDEPENDENT CHANNELS, AND NEITHER FEEDS

@@ -645,3 +645,33 @@ row stays open): the whole bit-0 machinery has ZERO witnesses in the 20-save
 corpus (post-first-contact, nobody-fires scenarios — C3 re-measured
 [0x48304..+0x3f] all-zero 20/20); event codes 3/8/9/0x13/0x14 are ring codes
 decoded only as "queued announcement".
+
+## 19. t207 — the invasion path's GUARANTEE-WAR clamp (0x3a174, post-handler 0x3a25a..0x3a291)
+
+The invasion/capture resolver FUN_0003a174 (callers EXACTLY {0x3d951,
+0x42c8e}; 0x42c8e is the t179 engagement invasion leg) pays the §17
+handler at 0x3a255 and then, IFF the handler took its non-war (-1) path:
+
+    di  = WORD row(victim)+0x1c9          ; DECLARE_WAR (S8 positional map)
+    cmp di, WORD[row(victim)+0x1b2+2*att] ; the attitude cell attacker->victim
+    jge skip
+    WORD[...] := DECLARE_WAR - 10
+
+An invasion attempt against a NOT-at-war owner therefore SLAMS the victim's
+attitude below its own declare-war line (measured: 200/200 fresh-campaign
+non-war pairs sit at START_ATTITUDE 600 > DECL 210, so it always fires),
+and the t180 chooser (att < row+0x1c0-state 1's +0x1c9 -> DA_DeclareWar)
+then guarantees war. Same line-10 CEILING shape as §17's alliance clamp,
+one offset over. Operand identities MEASURED 20/20 playcap saves
+(scripts/r207_opinion_census.py): the scale-2 disp [eax*2+0x12fb3]
+(eax = 247*a; the compiler splits 494 as 247x) is diplo-row(a)+0x19d —
+the t202 ability byte, distribution {0,2,11,19}; 0x12fdf+494v = row(v)+
+0x1c9; 0x12fc8+494v+2a = the attitude cell itself (NOT the third-party
+matrix this time). Rewrite: guaranteeWarOnInvasion (diplomacy.{h,cpp}),
+wired at the combatPhase capture branch (documented under-fire vs an
+attempt-time reading — banked _wip_t207 S7e). HONEST NEGATIVE: zero
+in-corpus clamp witnesses (mark window all-zero 20/20 — no invasion
+against a non-at-war owner executed in captured play). The sibling
+caller 0x39f00 (gun bombardment, sole caller 0x4c97f in the gizmo-
+attack shared tail) pays §17 fire-and-forget WITHOUT any clamp plus an
+item-loss tail — per-ship channels, OQ-019 boundary.
