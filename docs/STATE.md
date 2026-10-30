@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-31T00:40
+updated: 2026-10-31T01:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -259,14 +259,17 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t215: SITTING ADJUDICATION, AND ONLY THAT (static corpus formally
-EXHAUSTED at t213 S7; t214 added no new static route, only instrument health —
-do not invent any).
+NEXT t216: SITTING ADJUDICATION, AND ONLY THAT (static corpus formally
+EXHAUSTED at t213 S7; t214 + t215 added no static route, only instrument
+health — do not invent any).
 TRIGGER-A baselines for work/r1/playcap/live-timeline.jsonl — full-ns mtime
-1793294532100000000 / size 5,721,578,066 / tail-64KiB md5 9054cc6c66802e6f80431d4ffa1416ee (re-verified byte-identical t214 via scripts/r214_triage.py).
-Prefer running scripts/r214_triage.py as the single triage call: it checks all
-three baselines, censuses watcher instances, and reports the tail collapse
-factor in one RC=0 pass (cheaper than hand-rolled stat+md5+pgrep).
+1793294532100000000 / size 5,721,578,066 / tail-64KiB md5 9054cc6c66802e6f80431d4ffa1416ee (re-verified byte-identical t214 AND t215 via scripts/r214_triage.py).
+Run scripts/r214_triage.py as the single triage call (three baselines + watcher
+census + tail collapse in one RC=0 pass), and ONE save-axis check beside it
+(t215 law, docs/BLOCKED.md NO-SITTING CORROBORATION AXIS: find /home/hrethric
+-xdev for newest *.sav/*.gam — the newest save anywhere == playcap/save/60.sav
+2026-10-29 13:22 while no sitting is the healthy-idle signature; a newer save
+with an unchanged timeline means the WATCHERS died, which is itself actionable).
 If ANY baseline differs: (1) run scripts/r214_triage.py FIRST (watcher census +
 collapse), (2) run scripts/r1_t85g_sitting.py adjudication on the named dir,
 (3) mine the two named witnesses — (a) a multi-volley battle vs a non-at-war
@@ -275,7 +278,8 @@ residue), (b) a MID-CAMPAIGN slot (V=dword[0x482fb] > 1 AND some byte[star+0x15]
 nonzero) settling the OQ-021 S6 semantic non-join + P7 label question. Mine
 COUNTS ONLY through r1_stream.observations(trust=True) — raw row arithmetic is
 writer-multiplicity garbage (t214: 4.26x overall, up to ~12x locally, no global
-constant; docs/BLOCKED.md R1-runbook TIMELINE-MINING LAW).
+constant; t215 measured the writer population at exactly 4 open fds right now;
+docs/BLOCKED.md R1-runbook TIMELINE-MINING LAW).
 If NO sitting: write the honest idle-wait line into STATE and STOP (t212 law:
 re-running a censused instrument without new inputs is net-negative). The open
 rows are ALL play-gated (OQ-021 comparator firing, OQ-016 clamp witnesses),
@@ -284,19 +288,20 @@ dims residue), or watchpoint-class (OQ-021 writer; dosbox-x IS installed at
 /usr/bin/dosbox-x — the blocker is the supervised session, not tooling).
 USER ASKS (standing): (1) play a few turns attacking a non-at-war power
 mid-campaign + save (kills OQ-016 witness + OQ-021 firing asks at once); (2) an
-OQ-019 ruling on whether the rewrite may model per-commit attack pricing;
-(3) NEW t214, cheap hygiene: the shared capture dir has 4 live
-r1_playcap_watch.py instances (27774 + orphans 260988/290953/292085) and the
-next sitting will inherit them — retire the orphans before the next capture
-(a supervised-session decision; research iterations must NOT kill them).
-RATIONALE: t214 confirmed no sitting on three independent signals and produced
-the capture-health audit (four-writer multiplicity measured, inflation profile
-over the whole file, and the claim-safety check proving every banked count came
-through the deduped trusted path — no restatements owed). Nothing open has a
-corpus-free static route; only new play or user decisions move the ledger.
-Do NOT re-open: t214's no-sitting adjudication and mining law (the collapse
-factor is MEASURED with content-conflict controls; do not "verify" it again
-without a new sitting; do not kill watchers as research side effects),
+OQ-019 ruling on whether the rewrite may model per-commit attack pricing; (3)
+watcher-retirement hygiene — t215 UPGRADED this from inference to fd-level fact:
+exactly FOUR processes hold live-timeline.jsonl open for append right now
+(27774 + orphans 260988/290953/292085, all --no-exit; wrapper 27772 holds no
+writer fd) — retire the orphans before the next capture (a supervised-session
+decision; research iterations must NOT kill them).
+RATIONALE: t215 re-confirmed no sitting on the three TRIGGER-A signals plus a
+new independent save axis, and converted the writer-population question into a
+measured fact (/proc/<pid>/fd census). Nothing open has a corpus-free static
+route; only new play or user decisions move the ledger.
+Do NOT re-open: t215's no-sitting adjudication + fd-census method (writerhood =
+open fd, not process presence; do not kill watchers), t214's no-sitting
+adjudication and mining law (the collapse factor is MEASURED with content-
+conflict controls; do not "verify" it again without a new sitting),
 t213's al-form verdict (site 1 ==1 / site 2 ==0 are dominance-PROVED — do not
 re-trace [esp+0x50]/[esp] defs), t212's writer-negative (a ZERO census with
 controls IS the result; next instrument = runtime watchpoint), t212's P7
@@ -305,6 +310,34 @@ re-scan only with a new save), t210's stacking law + tool pitfalls, t209's
 out-param law + ATTEMPT-TIME clamp, t207 scale-2 algebra S7a + caller census,
 t208 e2e pin semantics, t206 two-channel consumer law, t205 per-STAR identity,
 t204, t203, t202/t202b, t201, t200, t199, t195, t189b.
+
+LANDED t215 (2026-10-31): NO SITTING + WRITER POPULATION MEASURED (NO ledger
+row moved — strict-close honored; docs/re/_wip_t215.md S1..S3 NEW; no new tools
+needed — r214_triage.py did the triage job exactly as designed, RC=0). Trigger
+triage: all three TRIGGER-A baselines byte-identical a second consecutive
+iteration (ns 1793294532100000000 / size 5721578066 / tail-md5
+9054cc6c66802e6f80431d4ffa1416ee), zero dosbox/ascend.exe comm-class processes,
+caps/ absent, no vfat/msdos mount => sitting script correctly NOT run (t152
+trap). THE ANSWERS:
+(1) NEW INDEPENDENT AXIS closes the "watcher died and hid a sitting" gap: the
+    newest .sav/.gam ANYWHERE under /home/hrethric (1409 files, no date filter)
+    is playcap/save/60.sav at 2026-10-29 13:22 — exactly the save the last
+    sitting ended on — and ZERO saves modified since 2026-10-29 18:00. A player
+    who advanced the game leaves a newer autosave slot regardless of watcher
+    health, so idle is confirmed on a signal the capture pipeline cannot mask.
+(2) WRITERHOOD MEASURED at fd level (/proc/<pid>/fd, not pgrep presence):
+    EXACTLY four processes hold live-timeline.jsonl open for append — 27774
+    (child of wrapper 27772, which holds NO writer fd) plus orphans
+    260988/290953/292085, all r1_playcap_watch.py --no-exit. t214's 4.26x
+    inflation figure now has its producer population verified; the
+    orphan-retirement user ask is upgraded from inference to measurement.
+    Method law banked in BLOCKED.md R1 runbook (writerhood = open fd; plus the
+    save-axis corroboration recipe).
+(3) LEDGER: OQ-016 + OQ-021 STATUS t215 lines appended (both rows STAY OPEN —
+    witness classes unobservable without new play); nothing re-censused per the
+    t212 law; no static route re-trod per t213 S7.
+Gate 0 + LEDGER AUDIT OK + LEDGER INDEX OK; NEXT=t216 sitting adjudication ONLY
+(r214_triage.py + the one save-axis find), else honest idle-wait + standing asks.
 
 LANDED t214 (2026-10-31): NO SITTING + CAPTURE-HEALTH AUDIT (four-writer
 multiplicity measured; NO ledger row moved — strict-close honored; docs/re/

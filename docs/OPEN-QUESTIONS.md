@@ -330,7 +330,17 @@ locally, factor drifts over the capture life) while ALL banked counts
 (t187 x1115, t189 68-sustained, 28k trusted obs) were produced through
 r1_stream.observations(trust=True) and verified safe — duplicate (file,mtime_ns)
 groups carry ZERO content conflicts (tail-1200 audit), so no restatement is
-needed; future sittings get scripts/r214_triage.py as a pre-mining gate. Row
+needed; future sittings get scripts/r214_triage.py as a pre-mining gate. STATUS t215
+(2026-10-31, no-sitting iteration): trigger-A re-verified byte-identical
+(r214_triage.py RC=0) plus a NEW independent axis — newest .sav/.gam under
+/home/hrethric (1409 files, no date filter) is playcap/save/60.sav 2026-10-29
+13:22, i.e. the save the last sitting ended on, and zero saves modified since
+2026-10-29 18:00 — so "watcher died and hid a sitting" is independently
+excluded, not just assumed. WRITER POPULATION MEASURED (docs/re/_wip_t215.md S2,
+/proc/<pid>/fd census): EXACTLY four processes hold live-timeline.jsonl open
+(27774 + orphans 260988/290953/292085, all --no-exit; wrapper 27772 holds no
+writer fd) — t214's process-presence inference is now a direct fd-level fact,
+and the retirement ask (supervised-session decision) stands upgraded. Row
 STAYS OPEN: play-gated threshold/comparator residue + watchpoint-class writer. | open (threshold
 residue = play witness; displayed-count write-site = RESIDUE NOW NARROWED TO
 RUNTIME-WATCHPOINT CLASS, static route exhausted this iteration) |
@@ -1220,7 +1230,11 @@ channel, per-ship model = the three big rewrite gaps). STATUS t201 (AI GAP ROW 3
 STATUS t214 (2026-10-30): sitting adjudication ran (trigger-A byte-identical,
 zero dosbox processes, zero new saves — scripts/r214_triage.py RC=0): the
 multi-volley-vs-non-at-war clamp witness did NOT arrive; row unchanged, witness
-ask stands. docs/re/_wip_t214.md S1.
+ask stands. docs/re/_wip_t214.md S1. STATUS t215 (2026-10-31, no-sitting
+iteration): trigger-A byte-identical again (r214_triage.py RC=0) + independent
+save-axis (newest .sav anywhere == 60.sav 10-29 13:22, zero modified since
+10-29 18:00) — witness still UNOBSERVABLE, nothing re-censused (t212 law); row
+unchanged, witness ask stands. docs/re/_wip_t215.md S1/S3.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

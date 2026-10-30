@@ -137,11 +137,23 @@ by gate 3n):
 - TIMELINE-MINING LAW (t214, docs/re/_wip_t214.md S6..S7): event COUNTS from
   live-timeline.jsonl come ONLY through r1_stream.observations(trust=True) —
   the shared capture dir accumulates watcher instances (4 live at t214, up to
-  12 writers historically), so raw row counts are inflated 4.26x overall and up
-  to ~12x locally with no global correction constant. Duplicate (file,mtime_ns)
-  rows carry zero content conflicts, so the trusted path stays lossless. Run
-  scripts/r214_triage.py as the pre-mining gate (watcher census + tail collapse)
-  before mining any fresh sitting.
+  12 writers historically), so raw row counts are writer-multiplicity garbage:
+  4.26x overall and up ~12x locally with no global correction constant.
+  Duplicate (file,mtime_ns) rows carry zero content conflicts, so the trusted
+  path stays lossless. Run scripts/r214_triage.py as the pre-mining gate
+  (watcher census + tail collapse) before mining any fresh sitting.
+- WRITER CENSUS METHOD (t215, docs/re/_wip_t215.md S2): process PRESENCE is not
+  writerhood — count /proc/<pid>/fd symlinks resolving to the capture file.
+  Verified shape: the bash wrapper holds NO writer fd; each python3
+  r1_playcap_watch.py --no-exit holds one. As of t215 exactly four processes
+  (27774 + orphans 260988/290953/292085) append to the file simultaneously.
+  Retiring orphans is a supervised-session decision; research iterations must
+  never kill watchers.
+- NO-SITTING CORROBORATION AXIS (t215): timeline mtime can go stale if the
+  watcher dies, so also check the save axis — find /home/hrethric -xdev
+  \( -name '*.sav' -o -name '*.gam' \) newest-first; a player who advanced the
+  game leaves a newer autosave slot regardless of watcher health. At t215 the
+  newest save anywhere == the last sitting's 60.sav (2026-10-29 13:22).
 - exit codes: 0 = base derived / upgrade formulas; 1 = normal negative,
   record ONE line in STATE.md, no in-turn retry; 2 = harness bug, fix it
 
