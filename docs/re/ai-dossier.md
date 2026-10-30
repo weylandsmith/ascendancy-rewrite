@@ -61,11 +61,14 @@ ladder tests 0x4492c..0x44a0e, adjacency 0x44634, escalation 0x44a44) →
 `0x3eb88` ally-bitmask rebuild via 0x439f4 (§2 step 1, call order verified).
 
 Combat writes diplomacy back: `0x43a4c`, the DIPLOMACY-ON-ATTACK handler
-(identity corrected t87 — combat.md S2f-b; it is NOT star defense), firing at a
-non-at-war power
-subtracts `10*(word[0x13bc4]+1)` from their attitude toward you, DOUBLED if the
-relation state was 3, clamps under `word[obj+0x1cf]-10`, and sets a permanent
-bit in the global "attacked" bitmap `[..+0x48304] |= 1<<race`. That is the
+(identity corrected t87 — combat.md S2f-b; it is NOT star defense; law fully
+re-verified + call-closed t204 — diplomacy.md §17), firing at a
+non-at-war power subtracts `10*(byte[0x13bc4]+1)` from their attitude toward
+you (the key is a BYTE, not a word — t204; live scenario value 1 in 20/20
+saves => -20, DOUBLED -40 if the relation state was 3), forces the victim
+under its own BREAK_ALLIANCE line when the shot left it above (a CEILING at
+0x43ae4, not a floor), and sets a permanent bit in the global "attacked"
+bitmap `[..+0x48304] |= 1<<race`. That is the
 closest thing in the engine to a reputation system, and it is a *consequence*
 of shooting, never an input to the decision to shoot.
 
@@ -317,7 +320,7 @@ engine never evaluates the enemy's order of battle.
 | 10 | Ability cadence = cad[ability] days from image 0x6780, fire-on-exact-equality, reset (§6.4) | MODELLED (t100 kCad + abilityPhase) | abilityPhase :1077, species.cpp:30 |
 | 11 | 16 SA_ bodies incl. Repel/Sap/Block-lanes/Force-Peace/Hatred attitude arithmetic (§6.3) | PARTIAL — Sap/Heal/DoubleHull/SuperMarines wired; Repel, BlockStarLanes, ForcePeace, Hatred are FILED NO-OPs (no lane-block/attitude-cell model) | abilities.md §2, abilityPhase :1077 |
 | 12 | Diplomacy: attitude word + relation-STATE ladder 0..3 + proposal emitter + attacked-bitmap (§2) | PARTIAL — two-party war/peace/alliance from DIPVALUES thresholds (decideDipAction); no inter-race state ladder, no attacked marks | diplomacyPhase :1046, diplomacy.h:67 |
-| 13 | Diplomacy-on-attack attitude cost (0x43a4c) | **GAP** — attacking never changes rewrite relations | combatPhase :1325 |
+| 13 | Diplomacy-on-attack attitude cost (0x43a4c) | MODELLED t204 (law re-verified verbatim + first caller census — exactly 3 callers, combat damage-apply 0x4b875 fires BEFORE the shield/hull subtraction; subtrahend key is the BYTE at [0x13bc4] (t87 said word), live ==1 20/20 saves => -20/-40; state-3 CEILING guarantees alliance death (diplomacy.md §17); attacked-bitmap [0x48304] mirrored by Campaign::attacked_ PERMANENT; pins test_diponattack_t204.cpp x4 incl. e2e cascade + ceiling; residues: zero in-corpus attack-event witnesses [0x48304]==0 20/20, AI-AI engagements have no attitude cell (row-12 projection), planet-event callers 0x39fba/0x3a255 unwired, per-shot stacking vs per-engagement aggregate) | combatPhase (0x4b875-position call) + applyAttackDipCost (diplomacy.cpp) |
 | 14 | Combat: deterministic damage, ordered cat-0 volley, shield-then-hull two-layer absorb, death at <1 (S2g/S2h, OQ-010 CLOSED t89) | MODELLED at empire-aggregate level (volley = Σ researched weapon Levels; shield absorb as clamped split) | attackScore :1249, defenseScore :1282, shieldChargesFor :1295 |
 | 15 | Same-system gate (order kind 4 + identical system object) | NOT REPRESENTABLE — rewrite has no ship positions or system objects | combatPhase :1325 |
 | 16 | Per-ship order kinds {0..5}, stickiness, congregation, retreat-downgrade, invasion-module carrier (§5, t179 P1/P3) | **GAP (largest)** — rewrite has no per-ship model whatsoever; A5 name tie still open | none |

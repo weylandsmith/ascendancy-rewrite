@@ -1918,6 +1918,23 @@ void Campaign::combatPhase() {
             if (doublePower_[a]) volley *= 2;          // SA_DoublePower (L1917)
             int absorb = 0, hullHit = 0;
             absorbSplit(volley, shieldChargesFor(b), absorb, hullHit);
+            // t204 DIPLOMACY-ON-ATTACK — FUN_00043a4c AT ITS CITED CALL SITE
+            // 0x4b875: the hostility cost lands BEFORE the shield/hull
+            // subtraction (0x4b87a/0x4b888) — the price of FIRING, not of
+            // capturing; a repelled attack still pays. Fires per engagement
+            // resolution (original: per shot; aggregate S2i mapping). Two-
+            // party projection (gap row 12): dipState_ rows are AI->PLAYER,
+            // the original's cell is victim->attacker, so the cell exists
+            // exactly when the attacker is the player; AI-AI engagements
+            // have NO attitude cell to charge (banked residue, _wip_t204 D2).
+            // State proxy: dipState_.atWar/.allied == the row's state byte
+            // 0x1c0 (2=WAR t85b / 3=ALLIANCE t189b).
+            if (a == kPlayer && b >= 1 && b - 1 < static_cast<int>(dipState_.size())) {
+                DipPolicyState& vst = dipState_[b - 1];
+                if (applyAttackDipCost(aiDip_[b - 1].values, vst.atWar, vst.allied,
+                                       kAttackDipGovByte, &vst.attitude))
+                    attacked_ |= static_cast<unsigned char>(1 << b);  // 0x43afa
+            }
             if (invadesAlwaysSucceeds(a)) {            // SA_SuperMarines (L1723 always succeed)
                 ind_[a] -= shipCostC;                  // the invasion ships
                 superUsed[a] = 1;

@@ -166,6 +166,14 @@ public:
     Victory victory() const { return victory_; }
     int starsOwned(int owner) const;
     int starOwner(int starId) const { return owner_[starId]; }
+    // t204 pin surface (established harness idiom — planetAt const_cast,
+    // freeTechGrantFor PUBLIC): force a star's owner for wiring an attack
+    // scenario. Does NOT seed pop/CB (the engagement math only needs owner).
+    void setStarOwnerForTest(int starId, int owner) { owner_[starId] = owner; }
+    // t204 pin surface: scenario peace/war toggle (pins "peace never clears
+    // the attacked mark" — permanence is the measured property, so the pin
+    // must be able to make peace). Thin wrapper over the private setWar.
+    void setWarForTest(int a, int b, bool on) { setWar(a, b, on); }
     int driveHopsFor(int owner) const;  // docs/re/ships.md §3 (launch range)
     int techsOwned(int owner) const;
     double resources(int owner) const;
@@ -425,6 +433,16 @@ public:
     // sites is [unverified] (the twin's callers are not in the banked set).
     void shareStarVision(int a, int b, bool bidirectional, bool allied);
     int playerScorePct() const;  // stars-owned share, static.txt '%'-template (§1)
+    // t204 DIPLOMACY-ON-ATTACK readbacks (gap map row 13; law in
+    // diplomacy.h::applyAttackDipCost). attackedMarks(): the rewrite analog
+    // of the global byte at [0x48304] the handler ORs 1<<victim-race into
+    // (0x43afa) — PERMANENT (nothing ever clears it; the obj0 corpus shows
+    // no reader-side clear and none exists here, incl. peace). Bit r = race r
+    // was once fired at while NOT at war with the attacker (the -1 return
+    // path). dipStateAt(): the diplo-row analog cell (pin surface; tests
+    // const_cast like planetAt()).
+    unsigned char attackedMarks() const { return attacked_; }
+    const DipPolicyState& dipStateAt(int ai) const { return dipState_[ai]; }
     std::string traceLine() const;  // one-line status for playthrough logs
     // Pick a Colony-Base cell the way the original's picker does: ONE
     // worldNext() draw over the planet's NON-ROCK surface cells, barren
@@ -548,6 +566,10 @@ private:
     // per star. Model + constants: docs/re/turnloop.md §5 [inferred].
     std::vector<int> homeStar_;                   // per owner, fixed pickHomeStars id
     std::vector<char> war_;
+    // t204: global attacked-bitmap analog of [0x48304] (one byte, bit r set
+    // by 0x43afa when race r was fired at while NOT at war). PERMANENT —
+    // zero clear sites in the original corpus; none here (docs/re/_wip_t204).
+    unsigned char attacked_ = 0;
     std::vector<int> fortify_;
     // Species abilities (docs/re/abilities.md): ability_[o] = owner o's SA_
     // (Unknown = none); charge_[o] is the MEASURED count-up counter (original

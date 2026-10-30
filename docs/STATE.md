@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-30T02:10
+updated: 2026-10-30T04:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,51 +253,93 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t204: DIPLOMACY-ON-ATTACK CODED + PINNED — gap map row 13
-(ai-dossier.md §8 row 13, the LAST pure-GAP row reachable statically now
-that row 7 is MODELLED t203). LAW IS ALREADY BANKED (ai-dossier.md §2,
-identity corrected t87 combat.md S2f-b, cited 0x43a4c): firing at a
-non-at-war power subtracts 10*(word[0x13bc4]+1) from their attitude
-toward you, DOUBLED if the relation state was 3 (ALLIANCE — t189b
-identity), clamps under word[obj+0x1cf]-10, and sets a PERMANENT bit in
-the global attacked-bitmap [..+0x48304] |= 1<<race. The rewrite attacks
-never touch relations (combatPhase). SCOPE (t202b pattern: transcribe +
-wire + pin, ZERO new measurement unless a probe is free):
-(1) re-verify 0x43a4c VERBATIM from work/ascend_restored.bin (capstone
-via ~/tools/revenv/bin/python — .venv has NO capstone, t203 pitfall)
-before transcribing: confirm the subtrahend, the state-3 doubling guard,
-the clamp WORD semantics (under-clamp = floor), the bitmap base, and
-find its CALL SITE(s) (combat path — cite addresses);
-(2) map onto the rewrite diplomacy model: attitude storage is
-DipPolicyState/dipState_ (diplomacy.h:67 — two-party, no inter-race
-ladder per gap row 12, so the state-3 doubling needs the t189b
-alliance() relation as the state proxy — DOCUMENT the mapping, do not
-invent a ladder); the attacked-bitmap has NO rewrite analogue yet — add
-one (per-race bitmask, permanent) + a public readback for the pin;
-(3) wire into combatPhase at the FIRST attack resolution per
-victim-race per battle (cite the original call-site ordering you found
-in (1); if the original fires per-shot vs per-battle, follow the
-disasm, note stream effects);
-(4) pins test_diponattack_t204.cpp: subtrahend law incl. the
-word[0x13bc4] scenario word (live-measured ==2 t202 census => 30 / 60
-doubled), alliance-double, floor clamp, bitmap permanence (survives
-peace), non-at-war-only gate (attacking an existing war costs 0);
-(5) docs: ai-dossier row 13 GAP -> MODELLED/GAP-honest, OQ-016 STATUS
-t204, diplomacy.md new section with the cited law.
-RATIONALE: rows 7/4/3 (the other static GAPs) are all MODELLED now
-(t203/t202b/t201); row 13's law is fully cited in the dossier and its
-blast radius is attitude arithmetic ONLY — the cheapest measured win
-left, and the same transcribe-and-pin shape t202b executed cleanly.
-Do NOT re-open: free-tech grant (t203 _wip_t203 S1..S4 — gate is the
-ROCK bit and there is NO prereq check, do not "restore" legality),
-demolish (t202+t202b), threat/emergency (t201; S12 — caller wiring
-faithful), triage gate (S2 FINAL), +0x4c model (S11 — pacing windows
-DONE, do not re-fudge), cos_star (t200), visibility (t195), pop/gauge
-(t199), relation enum (t189b). Rows OQ-005/OQ-019/OQ-021 = harder
-residue families, not single-iteration targets.
+NEXT t205: ADJUDICATE THE 0x13bc4/0x13bc5 TABLE IDENTITY — the ONE table
+two banked readings disagree about, surfaced by t204's law work:
+(a) t200 (planets-ui.md S6, scripts/r200_kcensus.py) reads STAR TYPE K from
+0x13bc5 + 0x60*star_idx (census {0..12} over 20 saves x 50 stars);
+(b) the 0x43a4c callers (t204 S2, cited 0x39f85/0x4b84b) build EBX =
+0x13bc5 + 0x60*RACE_IDX calling it the species record, and 0x43a99 reads
+BYTE[0x13bc4] as the subtrahend key (live 1 in 20/20 saves);
+(c) aicode §3/income-law S6 read DAT_00013bc4==2 as a SCALAR gov-type byte
+gate, and income-law S6-caveat(a) calls 0x13bc4 "species table stride 0x60
+holds nonzero small bytes at +0x15..+0x17". One table cannot be per-star AND
+per-race (race count word[0x13b98]==4, ~50 stars) — at least one reading
+consumes the wrong base or the wrong stride.
+PROBE PLAN (~corpus-static, saves + restored image only):
+(1) dump the region 0x13b98..0x13b98+0x60*60 from >=5 saves with the
+pointer law; print per-0x60-row byte signatures; compare against t200's K
+census AND against the race-count boundary (rows >= 4 should look like star
+data if the table is per-race, or K continues if per-star);
+(2) re-derive the t200 selection law's base from the COSMOSWnd star list
+(the builder 0x28fc0 stores record ptrs; follow one live ptr from a save and
+check it lands in 0x13bc5+k*0x60 for which k) — ptr law settles per-star vs
+per-race directly;
+(3) census writers of 0x13bc4..0x13bc5+0x60 in obj0 (r201_threat_writers
+pattern, resume-past-gaps) — a new-game init writer loop bounded by
+word[0x13b98] (races) vs the star count is decisive;
+(4) LAND whichever identity holds: correct the LOSER reading in place
+(planets-ui.md S6 and/or aicode §3 + income-law S6 caveat) with the cited
+witness; kAttackDipGovByte comment in diplomacy.h gets the row identity.
+RATIONALE: it is the only open operand-identity question a corpus-static
+iteration can settle; t204 shipped its law with this byte parameterized BE-
+CAUSE of the ambiguity (the pins cover 0/1/2 so no law depends on the ans-
+wer), but the dossier can't stay self-contradictory and every future diplo/
+species law that touches this table inherits the doubt. Cheaper and more
+decision-bearing than the alternatives: gap rows 11/12 leftovers are rewire
+work gated on row 12's ladder design; rows OQ-005/019/021 need play or the
+player (WATCH-ONLY).
+HOUSEKEEPING for whoever lands here (doc-only, not a second task): ai-dossier
+S8 row 11 still says ForcePeace/Hatred FILED NO-OPs — ForcePeace is WIRED
+(campaign.cpp SA_ForcePeace case, setWar loop); re-check Hatred vs CauseWar
+case and update the row text.
+Do NOT re-open: diplomacy-on-attack (t204 _wip_t204 S1..S5 — BYTE key,
+CEILING not floor, 3 callers exactly), free-tech grant (t203), demolish
+(t202/t202b), threat/emergency (t201), cos_star (t200), visibility (t195),
+pop/gauge (t199), relation enum (t189b). If t205's witness shows BOTH bases
+legitimate (e.g. 0x13bc5 == star table AND race rows live elsewhere with a
+caller miscomputation), THAT is the finding to bank — do not force a single
+loser.
 If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
 adjudication via scripts/r1_t85g_sitting.py STILL outranks everything.
+
+LANDED t204 (2026-10-30, this session): DIPLOMACY-ON-ATTACK CODED + PINNED
+(gap map row 13 GAP -> MODELLED — the last pure-GAP static row). Trigger
+triage: timeline size 5,721,578,066 == frozen baseline exactly, dosbox down,
+tree clean at 38f728c -> no sitting; STATE NEXT stood. LAWS [all cited,
+docs/re/_wip_t204.md S1..S4 + diplomacy.md §17]: FUN_00043a4c 0x43a4c..
+0x43b0e verbatim (capstone revenv). TWO CORRECTIONS vs t87 S2f-b: (1) the
+subtrahend key is MOVSX of the BYTE at [0x13bc4] (not word) — live census
+20/20 playcap saves == 1 => d=20, state-3 doubled 40 (the assignment's
+"word==2 => 30" did NOT reproduce — banked as correction, pins parameterize
+govByte 0/1/2); (2) the state-3 clamp is a CEILING (0x43acc..0x43ae7: JLE
+skips when att <= word[obj+0x1cf]=BREAK_ALLIANCE; slams to line-10 ONLY when
+still above) => firing at an ALLY GUARANTEES the alliance dies — T4 pins
+this end-to-end (560->520>510->500->break; without the ceiling no break).
+CALLER CENSUS (E8 byte-pass, first ever): EXACTLY {0x39fba, 0x3a255, 0x4b875};
+the combat one fires BEFORE the shield/hull subtraction 0x4b87a/0x4b888 (the
+price of FIRING — repelled attacks pay too); row=VICTIM (0x12e16+0x1ee*r),
+EDX=attacker; EBX=record at 0x13bc5+0x60*r (identity question -> t205);
+bitmap base [dword[edi+2]>>16], bit = 1<<victim (0x43afa). Rewrite:
+applyAttackDipCost + kAttackDipGovByte=1 (diplomacy.{h,cpp}); Campaign::
+attacked_ byte + attackedMarks() mirror [0x48304] PERMANENT (no clear incl.
+peace); combatPhase wired at the 0x4b875 position, player-attacker only
+(two-party projection, gap row 12 — documented, no ladder invented). Pins
+test_diponattack_t204.cpp x4 — 128 tests 0 failed. BLAST RADIUS: MEASURED
+Control t1255 / Extinct t979 FINITE, unchanged (CLI). Mechanism: under the
+FFA default dipState_.atWar is FALSE (only DeclareWar latches it), so player
+attacks DO pay -20/engagement there — no threshold crossed an outcome on the
+checked seeds (falling attitude only makes ProposePeace rarer). HONEST NEGATIVES (OQ-016 STAYS OPEN, strict-
+close): zero in-corpus attack-event witnesses ([0x48304]==0 20/20 — nobody
+fired at a non-at-war power in captured play); [0x13bc4] row identity open
+(-> t205); planet-event callers unwired (no planet-attack-event model); per-
+engagement aggregate vs per-shot stacking (S2i pattern). PITFALLS BANKED:
+(1) an aiCount-1 alliance fixture trips end-unit Unification at t1 -> over()
+-> later advance()s silently no-op — pins need a second never-allied AI
+(race02 Orfa works); (2) CEILING engage/skip direction bites (low line
+ENGAGES). Docs: ai-dossier row 13 MODELLED + §2 para corrected; combat.md
+S2f-b t204 block ("star-defense contribution" VOID). Gate 0 + LEDGER AUDIT
+OK + LEDGER INDEX OK; open = 005/016/019/021. NEXT = t205 table identity.
 
 LANDED t203 (2026-10-30, this session): FREE-TECH GRANT MEASURED + CODED +
 PINNED (gap map row 7 GAP -> MODELLED). Trigger triage: timeline size

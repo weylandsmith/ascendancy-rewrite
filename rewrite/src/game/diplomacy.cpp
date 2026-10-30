@@ -250,4 +250,26 @@ DipAction decideDipAction(const DipValues& v, const AttitudeModel& mood,
     return act;
 }
 
+bool applyAttackDipCost(const DipValues& v, bool victimAtWar, bool victimAllied,
+                        int govByte, int* attitude) {
+    // 0x43a90: byte[obj+dx+0x1c0]==2 (AT WAR) -> xor eax,eax; ret — the ONLY
+    // no-write path (attacking an existing war costs nothing).
+    if (victimAtWar) return false;
+    // 0x43a99..0x43aa2: d = 10*(sign-extended byte[0x13bc4] + 1).
+    int d = 10 * (govByte + 1);
+    // 0x43aa5..0x43aae: state==3 (ALLIANCE) -> add edx,edx (double).
+    if (victimAllied) d += d;
+    // 0x43abc..0x43ac5: attitude -= d (original stores an i16; the rewrite
+    // keeps a wider int — wrap only differs below -32768, unreachable from
+    // DIPVALUES-scale attitudes 310..620 minus repeated 20/40 hits).
+    *attitude -= d;
+    // 0x43acc..0x43ae7 CEILING (state==3 only): cmp new,bx; JLE skip ->
+    // ceiling applies iff new > breakAlliance(+0x1cf); new := break-10.
+    if (victimAllied && *attitude > v.breakAlliance)
+        *attitude = v.breakAlliance - 10;
+    // 0x43aee..0x43b00: bitmap OR + return -1 (caller sets victim's bit in
+    // the global attacked byte; Campaign::attackedMarks() mirrors it).
+    return true;
+}
+
 }  // namespace ascend::game

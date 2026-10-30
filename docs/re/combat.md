@@ -273,6 +273,17 @@ design[+0x4a]); caller chain 0x4a3c4 (who orders firing, ORDER law); case
 0x4cf05 distance-use tail + cl==0x47 routing re-read. NO rewrite code change
 (no shipped behaviour claim touched this iteration).
 
+t204 CORRECTION + CLOSURE of this handler (docs/re/diplomacy.md §17,
+docs/re/_wip_t204.md): the subtrahend key read at 0x43a99 is MOVSX of the
+BYTE at [0x13bc4] (not word), live value 1 in 20/20 playcap saves; the
+state-3 clamp is a CEILING (0x43ade JLE skips when att is already <= the
++0x1cf line; slam to line-10 only when still above), not a floor; callers
+census EXACTLY {0x39fba,0x3a255,0x4b875}, the combat one fires BEFORE the
+shield/hull subtraction (0x4b87a/0x4b888) — the price of firing, so a
+repelled attack still pays; global [0x48304]==0 20/20 (zero in-corpus
+witnesses). Rewrite MODELLED + pinned (test_diponattack_t204.cpp, gap map
+row 13). The "star-defense contribution" question is VOID.
+
 ## 2g. t88 W6-A3: GENERIC CAT-0 GUN PATH + FIRING ORDER + HIT PROBABILITY (all measured, restored image objdump)
 
 Sitting check first: live-timeline.jsonl 238,216 rows, watch.log tail all

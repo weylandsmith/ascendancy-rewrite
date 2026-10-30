@@ -533,3 +533,47 @@ debugflags.md) and the third-party semantic locks (§13). OQ-023's RE-unknown
 residual is closed; the row's remaining residual is ENGINE-BUILD (rewrite
 still emits only the two-party threshold branch — tracked in PLAN, not an RE
 unknown).
+
+## §17 — DIPLOMACY-ON-ATTACK HANDLER FUN_00043a4c CLOSED VERBATIM (t204, 2026-10-30)
+
+Capstone re-verification of 0x43a4c..0x43b0e (work/ascend_restored.bin) plus
+the first caller census of the handler; full working detail docs/re/_wip_t204.md.
+
+17.1 LAW (verbatim, corrected against the t87 S2f-b summary):
+args EAX=obj=victim's diplo row (0x12e16+0x1ee*r), EDX=attacker race idx,
+EBX=species record 0x13bc5+0x60*r (holds the per-run handle at +2 used for
+the bitmap base). state=byte[obj+dx+0x1c0]: state==2 (WAR) -> return 0, NO
+write. Else d = 10*(MOVSX(byte[0x13bc4])+1) — a BYTE read (t87 said word;
+0x43a99 is movsx dx,BYTE) — doubled (add edx,edx) iff state==3; word
+[obj+2*dx+0x1b2] -= d. CEILING iff state==3 (0x43acc..0x43ae7): cmp new,
+word[obj+0x1cf] (=BREAK_ALLIANCE, §8); JLE skips -> iff new is STILL
+strictly above the victim's own break line, slam new := line-10. Net effect:
+firing at an ALLY always leaves the victim below its break line (either the
+-40 already got there, or the ceiling forces it) — an alliance violation is
+a guaranteed alliance death, not a probabilistic cooling.
+Then BYTE[[dword[edi+2]>>16]+0x48304] |= 1<<byte[obj+0] (victim's bit in the
+global attacked byte) and return -1.
+
+17.2 CALLERS (E8 byte-pass 0x14bb0..0x8cc83: EXACTLY three, zero packed-u32):
+0x4b875 combat damage-apply (fires BEFORE the shield/hull subtraction at
+0x4b87a/0x4b888 — the price of FIRING, not of capturing; obj row = the
+DAMAGED ship's owner [esi+0x54]>>16, attacker = [esp+0xe]>>16); 0x39fba and
+0x3a255 in the planet-event module (esi+0x57 victim race, 0xff sentinel
+skips the call; 0x3a255 branches on the -1 return). Direction: the cell is
+VICTIM's attitude toward the ATTACKER.
+
+17.3 LIVE CENSUS (pointer law, work/r1/playcap/save/*.sav, 20 saves):
+byte[0x13bc4]==1 in 20/20 (=> shipped-scenario subtrahend 20 / doubled 40;
+the STATE-assignment's "==2 => 30" claim did NOT reproduce), race count
+word[0x13b98]==4 20/20, global [0x48304]==0 20/20 — HONEST NEGATIVE: zero
+attacked-bit witnesses in the ring (nobody fired at a non-at-war power in
+captured play). [0x13bc4] row-identity (species table base vs standalone
+word) stays open residue; the law consumes the byte as measured.
+
+17.4 REWRITE: applyAttackDipCost (diplomacy.h/.cpp) verbatim + kAttackDipGovByte=1;
+combatPhase wires it at the 0x4b875 position (per engagement resolution,
+player-attacker only — two-party projection, gap row 12; AI-AI has no cell);
+Campaign::attacked_ byte + attackedMarks() mirror [0x48304] PERMANENTLY (no
+clear incl. peace). Pins test_diponattack_t204.cpp x4 (battery/e2e cascade/
+alliance violation/ceiling e2e); 128 tests 0 failed; blast radius unchanged
+(seed 2024 Control t1255, seed 42 Extinct t979). Gap map row 13 -> MODELLED.
