@@ -1178,7 +1178,7 @@ first-eligible in list order, t179 P3 probes; rel32 census: 0x41260 has exactly
 (A5 name tie, P0 event window; OQ-023 state-3 WRITER FOUND t180 —
 residual is now the live cell==3 observation only, diplomacy.md §13) — dossier §7 states the
 scope of search explicitly. Gap map dossier §8 (17 rows; threat input, demolish
-channel, per-ship model = the three big rewrite gaps).
+channel, per-ship model = the three big rewrite gaps). STATUS t201 (AI GAP ROW 3 CLOSED, gap row 4 queued t202): THREAT-BYTE INPUT LAW MEASURED + EMERGENCY CHAIN FUN_0003fc4c CITED + REWRITE WIRED — +0x59 = #{ACTIVE slots, item FLAGS bit8} (shields 18/19/26/27) EXACT 2900/2900 corpus records; +0x58 = bit4 set (17/28/29/30) 2880/2900 (20 misses = evaluator self-init 0x3fb3e); recalc FUN_00038ba4 zeroes+derives both every run (tools r201_threat_writers/census/law_verify RC=0). Chain: XenoDig(+0x66 bit1, rock-arm 0x37f7b) > Shield18 (IND>=4,PROS,Shipyard present,freeCells>=3,+0x59<6) > MegaShield19 period tiers 200/225/300/400 VERBATIM 0x3fd73..92, UNSIGNED (day-+0x67)/period > +0x59 @0x3fda1 > Cloaker11 (owner odd, IND>20 STRICT, rng<4) > template MEASURED {12,13,14,15,37}. Rewrite: emergencyChainPick+periodFor+threatFor wired into buildPhase pre-scoring (0x3f4d5 ordering) + pin campaign_emergency_chain_law_t201 (115 tests 0 failed). Row STAYS OPEN (strict-close): gap row 4 (over-pop/min-REQUIRES demolish, t202), chain-C row-operand identity [+ctx7->+2>>16] UNVERIFIED, +0x67 buy-path stamp write-site uncensused-to-hit — all documented ai-dossier.md S10.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

@@ -303,7 +303,7 @@ engine never evaluates the enemy's order of battle.
 |---|---|---|---|
 | 1 | Build queue 1/planet, selector on empty queue only, IND>0 (income-law §9) | MODELLED | buildPhase :726 |
 | 2 | First-absent-item wins; 70-cost ABORT; d66 65/35 score roll; need classes 0..3 (§3a) | MODELLED | buildPhase :726 (kBuildOrder policy for the player is a documented default) |
-| 3 | Threat byte +0x59 / Surface-Shield + Mega-Shield emergency chain, period tiers 200/225/300/400 (§3a) | **GAP** — no threat input at all (`grep -in threat rewrite/src/game/campaign.{cpp,h}` → zero hits) | buildPhase :726 |
+| 3 | Threat byte +0x59 / Surface-Shield + Mega-Shield emergency chain, period tiers 200/225/300/400 (§3a) | MODELLED t201 (S10: threat law 2900/2900 + 2880/2900 corpus-verified; chain verbatim + pin campaign_emergency_chain_law_t201; residues: chain-C row-operand identity, +0x67 stamp site) | buildPhase emergency block + emergencyChainPick |
 | 4 | Over-pop emergency demolish; min-REQUIRES demolish; tubes priority (§3a) | **GAP** — rewrite has no demolish channel | buildPhase :726 |
 | 5 | Research PICK = FUN_00040018 tier chain, 66-main-row law (§3b/§3d, OQ-013) | MODELLED (t93, pin test campaign_research_picker_law_oq016) | researchPhase :885 |
 | 6 | Research PROGRESS = Σ(RES+1-gated) ×1.2 vs runtime cost (§3) | MODELLED (income channel law, OQ-016 closed sub-law) | researchPhase :885 / incomeAndGrow :655 |
@@ -341,3 +341,69 @@ engine just lets the first eligible ship in list order shoot. So an AI empire
 that seemed to be defending a frontier or pushing a corridor was an accident
 of economics and tech order — a good opponent to play against, and the reason
 our rewrite doesn't need to copy any "AI strategy" it can't already show you.
+
+## S10 (t201) — THREAT-BYTE INPUT + EMERGENCY CHAIN CLOSED WITH MEASUREMENT
+
+Raw listings: work/t201_fc4c.txt (FUN_0003fc4c 0x3fc4c..0x3fec3, fresh
+capstone) + work/t201_recalc_scan.txt (FUN_00038ba4 esp-annotated).
+Tools (RC=0 all): scripts/r201_threat_writers.py (obj0-wide disp32∈{58,59}
+census; PITFALL: sequential capstone stops at the first data gap — the
+resume-by-1-byte pass finds 325 sites vs 36 blind), r201_threat_census.py,
+r201_threat_law_verify.py. Working notes docs/re/_wip_t201.md.
+
+THREAT INPUT (gap row 3). +0x58/+0x59 are PURE DERIVED COUNTERS the planet
+recalc FUN_00038ba4 zeroes and recomputes EVERY run (locals esp+0x24/esp+4
+xored @0x38baf; stores @0x38ef7/0x38efe):
+  +0x59 = #{ACTIVE slots (word[slot+2]&1) whose item file FLAGS (u16@+6,
+          OQ-014 map) bit 8}  — bit8 items EXACTLY {18 Surface Shield,
+          19 Surface Mega Shield, 26 Orbital Shield, 27 Orbital Mega
+          Shield} (live table witness 60.sav).
+  +0x58 = #{ACTIVE slots whose item FLAGS bit 4} — bit4 items EXACTLY
+          {17 Tractor Beam, 28 Orbital Missile Base, 29 SR Orbital
+          Whopper, 30 LR Orbital Whopper}.
+VERIFIED 2900 corpus records / 20 saves: +0x59 EXACT 2900/2900; +0x58
+2880/2900 (all 20 misses = one record, the evaluator self-init 0x3fb3e
+signature). Census +0x58 {0:2400,1:240,2:260}, +0x59
+{0:2120,1:320,2:300,3:120,4:20,5:20}; self-check IND/RES/PROS maxima ==
+t198 (77/52/16). Static writers are ONLY recalc exits + evaluator
+self-inits 0x3fa36/0x3fb3e + save round-trip FUN_0003a558 (callers
+0x258dd/0x26044 snapshot deserialisers). SEMANTICS: threat is SELF-
+ASSESSED defence infrastructure, not an enemy scan; enemy proximity
+enters only via the chain-C hop tier.
+
+EMERGENCY CHAIN (FUN_0003fc4c, sole caller 0x3f4d5 inside FUN_0003f130 —
+return -1 SKIPS need-class scoring @0x3f4ec). Order verbatim:
+  A Xeno dig item 38 when byte+0x66 bit1 (arm site world-gen 0x37f7b —
+    the ROCK branch; clear-on-success 0x3fc78). [t28's "item 22" was an
+    immediate misread; 0x26=38]
+  B Surface Shield 18: IND>=4 && PROS!=0 && item22 PRESENT (0x3fcb9) &&
+    empty-nonrock-noclass0 (+0x1c - +0x20) >= 3 && +0x59 < 6 && legal
+    && absent. IND/PROS/shipyard/freeCells failures EXIT the evaluator
+    (0x3feb9 ret 0) — no D, no fallback for those planets.
+  C Mega Shield 19, REACHED ONLY when 18 legal+PRESENT (0x3fd0e):
+    period tiers MEASURED VERBATIM 0xc8/0xe1/0x12c/0x190 = 200/225/300/
+    400 selected by hop byte DAT_00045beb[4*starIdx(+row)] : 0->200,
+    1->225, <4->300, >=4->400 (0x3fd73..0x3fd92); FIRE iff UNSIGNED
+    (DAT_00012e10 - dword+0x67)/period > +0x59 (DIV @0x3fda1). Stamp
+    +0x67 writer on the buy path NOT found statically (census: only
+    UI-side 0x3a4c9 pre-recalc + zero + save round-trip) — HONEST
+    NEGATIVE; rewrite stamps on C-purchase [documented default]. Mega
+    ILLEGAL + fire -> buys 18 AGAIN (shared block, no absence test).
+  D Surface Cloaker 11: owner ODD && IND STRICTLY > 20 (cmp 0x14 jle
+    @0x3fdfb — corrects t28's ">=20") && rng%100 < 4 && legal && ABSENT.
+  E Fallback template MEASURED live at relocated 0x67b8 pool bytes =
+    items {12 Hyperpower, 13 Fertilization, 14 Internet, 15 Cloning,
+    37 Lush Growth Bomb}, first legal+absent. (The OTHER template, imm
+    0x89360 inside FUN_0003f758 = obj1 data == pool 0x67b0 window, is
+    {28,29,30,0,26} orbital-defence set — belongs to the shipyard tail,
+    not this chain.)
+OPEN residues (row keeps them): chain-C row operand [ctx+7]->[+2]>>16
+identity UNVERIFIED (rewrite: lane-BFS distance to nearest enemy star,
+documented default); +0x67 buy-path stamp write site; DAT hop-matrix
+stride-100 (t190) vs chain-C index-stride tension.
+REWRITE LANDED: Campaign::emergencyChainPick (pure, verbatim control
+flow incl. the hard exits) + emergencyPeriodFor + shieldThreatFor/
+orbitalThreatFor wired into buildPhase AI branch BEFORE scoring
+(0x3f4d5 ordering); digQueuedOrDone armed by the rock event (same
+original branch); pin TEST(campaign_emergency_chain_law_t201) — 115
+tests 0 failed.

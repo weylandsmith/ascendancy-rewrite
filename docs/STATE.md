@@ -253,33 +253,86 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t201: AI GAP ROWS — THREAT-BYTE INPUT + EMERGENCY CHAIN (queue item
-"t198 AI GAP ROWS 3+4" STATE.md:580-583, first half). t200 CLOSED its
-assignment outright (cos_star selector law measured; OQ-005 residue shrunk
-to a cited bound), so the offline-static route to OQ-005 is EXHAUSTED as
-predicted — the remaining OQ-005 movement is player-ruling class (WATCH-
-ONLY, do not burn iterations). Work: derive from the binary (static-only;
-Ghidra headless up via scripts/ghidra_headless_up.sh, objdump spans from
-work/functions_full.tsv HEX sizes, E8 byte-pass for callers) (1) the AI
-threat-byte INPUT: who writes the per-target threat value the AI reads
-(ai-dossier.md gap map row 3; anchor aicode.md S3a — bank its citations
-FIRST), and (2) the EMERGENCY CHAIN period tiers 200/225/300/400: find the
-tier table + the consumer loop, cite addresses, and upgrade the rewrite's
-AI threat/emergency defaults wherever they differ (rewrite/src/game/ai*.
-cpp). Sizing per PROBE COUNT ~35. If the threat-byte writer census is dead
-(zero static writers = live-capture class), bank the honest negative and
-stop at the chain half — do NOT spiral.
-Do NOT re-open: cos_star selector law (t200 landed, planets-ui.md S6 — the
-SEL=4K+cls law + K census are MEASURED, do not re-derive), slot-library
-identity [0x6fd90/2/4/9c] (live-capture class), span-bounded-walk (t197),
-visibility (t195 closed), gauge/pop laws (t199), relation-state enum
-(t189b closed).
-RATIONALE: it is the last authored offline-static queue item with real
-rewrite value; the second half (min-REQUIRES/over-pop demolish channel in
-buildPhase) queues as t202. If a REAL sitting arms first (TRIGGER-A
-baselines: full-ns mtime 1793294532100000000 / size 5,721,578,066 / tail
-md5 9054cc6c), adjudication via scripts/r1_t85g_sitting.py STILL outranks
-everything.
+NEXT t202: AI GAP ROW 4 — DEMOLISH CHANNEL IN buildPhase (queue item
+"t198 AI GAP ROWS 3+4" second half; t201 CLOSED its half outright, so
+this is the direct continuation). LAWS ALREADY BANKED (do not re-derive;
+income-law.md S9 + work/ai_selector_disasm.txt lines 60-230):
+(1) OVER-CAP EMERGENCY 0x3f178: used(+0x4c)>=cap(+0x4a) -> among occupied
+cells <+0x18 skip empty & item 5, pick item with LARGEST MPOP (byte+3,
+gate >0), DEMOLISH FUN_00038840 cmd1 @0x3f1e9; if still used>=pop after
+demolish -> RETURN; free-pop recheck @0x3f1fb.
+(2) ELSE used>=pop -> return @0x3f220 (the "no free pop, no build" law).
+(3) MIN-REQUIRES DEMOLISH SWEEP 0x3f354 (free pop exists): occupied cells
+<+0x18 with MPOP < cap-pop AND smallest byte+5 REQUIRES (ecx sentinel
+0x1869f never binds) -> DEMOLISH cmd1 @0x3f403; free-pop recheck @0x3f414
+else return.
+(4) TRANSPORT-TUBES PRIORITY 0x3f2c8 (research-mask bit set & no item 21:
+demolish/buy path @0x3f344) — include if context allows, else queue t203.
+Rewrite: Campaign::buildPhase models none of this (gap map row 4 "no
+demolish channel"); add demolish on the ps.items/itemCells analog + pins
+(edge classes: used>=cap fires; used==cap-1 no; largest-MPOP tie -> first
+cell; empty/CB skipped; post-demolish recheck return). NOTE the t201
+chain runs AFTER the sweeps at 0x3f4d5 (ordering already wired correctly:
+emergency block precedes scoring, and t201's block sits where the sweeps
+WILL go — insert the sweeps BEFORE the emergency block, keeping the
+0x3f178 early-return semantics). Sizing ~25 probes (pure code + tests;
+disasm already banked).
+Do NOT re-open: threat/emergency laws (t201 landed, ai-dossier.md S10 +
+pin campaign_emergency_chain_law_t201), cos_star selector (t200), slot-
+library identity (live-capture class), visibility (t195), gauge/pop laws
+(t199), relation enum (t189b). WATCH-ONLY unchanged (STATE tail).
+RATIONALE: gap map S8 names #3+#4 as the pair that would make AI economic
+behaviour visibly match stock; #3 landed t201, #4 is its exact twin sweep;
+everything else open needs play, the player, or is t203-scoped minutiae.
+If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
+1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
+adjudication via scripts/r1_t85g_sitting.py STILL outranks everything.
+
+LANDED t201 (2026-10-29, this session): AI THREAT-BYTE INPUT + EMERGENCY
+CHAIN CLOSED WITH MEASUREMENT; REWIRED + PINNED (gap map row 3 ->
+MODELLED). Trigger triage: timeline size == frozen baseline exactly,
+dosbox down, tree clean at 8ac9dd8 -> no sitting.
+KEY LAWS [all cited, ai-dossier.md S10 + _wip_t201.md S1d/S1e/S1f]:
+(1) THREAT INPUT: +0x59 = #{ACTIVE slots whose item file FLAGS word bit8}
+(shield class EXACTLY {18,19,26,27}) VERIFIED 2900/2900 corpus records;
++0x58 = bit4 set ({17 Tractor Beam, 28,29,30 orbital whoppers}) 2880/2900
+(all 20 misses = ONE record, the evaluator self-init 0x3fb3e signature);
+recalc FUN_00038ba4 ZEROES+rederives both every run (xored locals @0x38baf
+-> stores @0x38ef7/0x38efe); only other writers = self-inits + save
+round-trip FUN_0003a558 (snapshot deserialiser callers 0x258dd/0x26044).
+Threat = SELF-ASSESSED defence infra, not enemy scan. (2) EMERGENCY CHAIN
+FUN_0003fc4c full verbatim control flow re-disassembled (t28's summary was
+directionally right; THREE corrections banked: chain-A item is 38 Xeno dig
+not 22; chain-B needs item 22 PRESENT and its precondition failures are
+HARD EXITS skipping D+E; chain-D IND gate is STRICTLY >20): A rock-armed
+Xeno dig > B Shield18 > C MegaShield19 with period tiers 200/225/300/400
+VERBATIM at 0x3fd73/7f/8b/92 (hop==0/1/<4/>=4, hop byte DAT_00045beb,
+FIRE iff UNSIGNED (day-[+0x67])/period > +0x59 @0x3fda1; mega-illegal
+falls to buy-18-AGAIN shared block) > D Cloaker11 > E fallback template
+MEASURED live {12,13,14,15,37}; ret -1 skips scoring @0x3f4da. (3) The
+0x89360 template belongs to FUN_0003f758's shipyard tail (obj1 data ==
+pool 0x67b0 window {28,29,30,0,26} orbital-defence) — NOT this chain.
+REWRITE: emergencyChainPick (pure) + emergencyPeriodFor +
+shieldThreatFor/orbitalThreatFor + digQueuedOrDone armed by the rock event
+(same original branch 0x37f7b) wired into buildPhase AI branch BEFORE
+scoring (0x3f4d5 ordering); documented defaults INSIDE code comments
+(hop = lane-BFS to nearest enemy star; stamp on C-buy; rng draw timing).
+PIN campaign_emergency_chain_law_t201 (period table, chain-A illegal-stays-
+armed, all four B hard exits, B fire + shields==6 skip, C unsigned-quotient
+edges 599/600 x2, mega-illegal->18, D strict-gate edges x5, E first-legal-
+absent + file-table flag-bits leg) — 115 tests 0 failed.
+HONEST NEGATIVES (OQ-016 stays OPEN, STATUS t201 appended): chain-C row
+operand [ctx+7]->[+2]>>16 identity UNVERIFIED; +0x67 buy-path stamp WRITE
+site not found by the obj0 writer census; DAT hop-matrix stride-100 (t190)
+vs chain-C index-stride tension unresolved. Gap row 4 (demolish sweeps) =
+t202. TOOLS NEW: r201_threat_writers.py (capstone-resume census; PITFALL
+banked: sequential capstone STOPS at first data gap — blind pass found 36
+of 325 sites), r201_threat_census.py (self-check IND/RES/PROS maxima ==
+t198 exactly), r201_threat_law_verify.py. Docs: ai-dossier.md S10 NEW +
+gap row 3 -> MODELLED; OPEN-QUESTIONS OQ-016 STATUS t201 (insertion pit-
+fall: annotation must land at the block's LAST line, not the next row's
+header — caught and repaired same session). Gate + ledger checks below.
+
 
 LANDED t200 (2026-10-29, this session): COS_STAR SELECTOR SEMANTICS — THE
 LAST UN-ADJUDICATED SELECTION CLASS MEASURED; OQ-005 RESIDUE SHRUNKS TO A

@@ -47,8 +47,19 @@ struct PlanetState {
     // [0,surfaceCells) from the row chain (barren 0 overrides 2; rng 0..
     // 32767), orbital ring [surfaceCells,+10) forced 1 WITHOUT drawing.
     std::vector<int> cellClasses;
-    int growthBoom = 0;          // +0x66 bit1 analog: Lush Growth Bomb fired
+    int growthBoom = 0;          // +0x66 bit0 analog: Lush Growth Bomb fired
     int growthCounter = 0;       // +0x4e analog (PROS-side counter, S6c)
+    // t201 EMERGENCY-CHAIN state (FUN_0003fc4c, docs/re/ai-dossier.md S10):
+    // +0x67 analog — day stamp read by the Surface-Mega-Shield chain
+    // ((day - stamp)/period > shields). The original's per-turn stamp WRITE
+    // site was NOT found statically (census r201, honest negative); the
+    // rewrite stamps on a chain-C purchase [documented default].
+    int emergencyStamp = 0;
+    // Chain-A consumed flag: the original arms +0x66 bit1 at world-gen
+    // (0x37f7b, same branch that rocks a cell) and chain A CLEARS it when
+    // the Xeno dig buy succeeds (0x3fc78). Rewrite arms on the observable
+    // trace cellClasses[0] rock [documented default].
+    int digQueuedOrDone = 0;
     std::vector<int> items;      // indices into the planitem table (ACTIVE slots)
     // EXPLICIT cell assignment parallel to `items` (surface: index into the
     // surface cells; orbital: surfaceCells + ring index). HOME CB cell:
@@ -235,6 +246,38 @@ public:
                  storedCapFor(star), v);
         return v;
     }
+    // ------------------------------------------------------------------
+    // t201 EMERGENCY CHAIN — FUN_0003fc4c (docs/re/ai-dossier.md S10,
+    // evidence work/t201_fc4c.txt + docs/re/_wip_t201.md S1d/S1f).
+    // Pure law for the pin; gates carry per-item legal/absent facts.
+    // Returns the FORCED item id, or -1 (original "none forced" -> the
+    // selector's normal pick continues; 0x3f4da cmp eax,-1; je end).
+    struct EmergencyGate {
+        bool digArmed = false;                            // +0x66 bit1
+        bool digLegal = false, digAbsent = false;         // item 38
+        bool shipyard = false;                            // item 22 PRESENT
+        bool shieldLegal = false, shieldPresent = false;  // item 18
+        bool megaLegal = false;                           // item 19: NO
+                                                          // absence check
+        bool cloakLegal = false, cloakAbsent = false;     // item 11
+        // Chain-E fallback template MEASURED (live pool bytes at the
+        // relocated 0x67b8 immediate): items {12,13,14,15,37}.
+        bool templateLegal[5] = {false, false, false, false, false};
+        bool templateAbsent[5] = {true, true, true, true, true};
+    };
+    static int emergencyChainPick(int ind, int pros, int freeCells,
+                                  int shields, int owner, unsigned deltaDays,
+                                  unsigned period, const EmergencyGate& g,
+                                  int rngPct);
+    static unsigned emergencyPeriodFor(int hop) {  // 0x3fd73..0x3fd92
+        return hop == 0 ? 200u : hop == 1 ? 225u : hop < 4 ? 300u : 400u;
+    }
+    // Derived threat counters (recalc FUN_00038ba4 law, verified
+    // 2880/2900 + 2900/2900 this session): ACTIVE slots whose item file
+    // FLAGS word has bit 0x8 (shields 18/19/26/27) / bit 0x4 (orbital
+    // defences 17/28/29/30).
+    int shieldThreatFor(int star) const;   // +0x59 analog
+    int orbitalThreatFor(int star) const;  // +0x58 analog
     int fleetDamageFor(int owner) const { return fleetDamage_[owner]; }
     bool invadesAlwaysSucceeds(int owner) const {
         return ability_[owner] == SpeciesAbility::SuperMarines;

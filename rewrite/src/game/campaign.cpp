@@ -190,8 +190,11 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
             // loop's nonbarren counter predates it @0x37ebb) [verified by
             // the T36 first-save seed law holding with |8-stripped count].
             if (next() % 7 == 0) {  // [ESP+rng] idiv 7, test EDX @0x37f5c
-                cls[next() % cells] |= 8;  // +0x66 |= 2 has no consumer
-                                           // in the rewrite; not stubbed
+                cls[next() % cells] |= 8;  // +0x66 |= 2 [t201: IS consumed —
+                                           // emergency chain A (0x3fc57) buys
+                                           // the Xeno dig off this bit;
+                                           // digQueuedOrDone is the model]
+                planets_[s].digQueuedOrDone = 1;
             }
             planets_[s].capBase = nonbarren / 3 + 5;  // @0x37f8b..0x37f9e
         }
@@ -763,6 +766,73 @@ int Campaign::storedCapFor(int star) const {
     return cap + static_cast<int>(ps.capBonus);
 }
 
+// ---------------------------------------------------------------------------
+// t201 EMERGENCY CHAIN — FUN_0003fc4c verbatim control flow (banked with
+// addresses in docs/re/_wip_t201.md S1d/S2; raw listing
+// work/t201_fc4c.txt). NOTE the original's distinctive shapes:
+//  * chain-B PRECONDITION failures (IND<4, PROS==0, no Shipyard,
+//    freeCells<3) EXIT the evaluator entirely (jl/je 0x3feb9 -> ret 0):
+//    a planet failing them gets neither the Cloaker chain nor the
+//    fallback template. threat>=6 and an ILLEGAL Surface Shield instead
+//    SKIP to chain D (je/jge 0x3fde0).
+//  * chain C (Mega Shield) is reached ONLY when item 18 is legal AND
+//    already PRESENT (0x3fd0e jne 0x3fd30); ratio fires (unsigned
+//    DIV @0x3fda1, jbe 0x3fde0 else) -> buy 19 if legal, buy 18 AGAIN
+//    (0x3fdbf je 0x3fd15 shared buy block, no absence test).
+//  * chain D present-cloaker skips WITHOUT buying (jne 0x3fe5e).
+// Returns the FORCED item id (a buy was queued at the original site) or
+// -1 == "none forced" (original ret 0 @0x3feb9; sole caller 0x3f4d5 tests
+// only eax==-1 @0x3f4da).
+// ---------------------------------------------------------------------------
+int Campaign::emergencyChainPick(int ind, int pros, int freeCells,
+                                 int shields, int owner,
+                                 unsigned deltaDays, unsigned period,
+                                 const EmergencyGate& g, int rngPct) {
+    // A (0x3fc57): bit1 armed -> attempt the Xeno dig buy (the original's
+    // 0x38818 does legality internally; failure falls through with the bit
+    // STILL armed; success clears bit1 @0x3fc78).
+    if (g.digArmed && g.digLegal && g.digAbsent) return 38;
+    // B (0x3fc86..0x3fcd5): every precondition failure is a hard exit.
+    if (ind < 4) return -1;
+    if (pros == 0) return -1;
+    if (!g.shipyard) return -1;
+    if (freeCells < 3) return -1;
+    if (shields < 6 && g.shieldLegal) {
+        if (!g.shieldPresent) return 18;       // 0x3fd0e fallthrough buy
+        // C (0x3fd30): UNSIGNED ratio fire.
+        if (deltaDays / period > static_cast<unsigned>(shields))
+            return g.megaLegal ? 19 : 18;          // illegal mega -> 18 again
+    }
+    // D (0x3fde0): odd owner, IND STRICTLY > 20 (cmp 0x14 jle @0x3fdfb —
+    // t28's ">=20" corrected), rng%100 < 4 (0x3fe11), legal + ABSENT.
+    if ((owner & 1) && ind > 20 && rngPct < 4 &&
+        g.cloakLegal && g.cloakAbsent) return 11;
+    // E (0x3fe5e): template MEASURED live {12,13,14,15,37}; first legal +
+    // absent buys.
+    static const int kTemplate[5] = {12, 13, 14, 15, 37};
+    for (int i = 0; i < 5; ++i)
+        if (g.templateLegal[i] && g.templateAbsent[i]) return kTemplate[i];
+    return -1;
+}
+
+// Threat counters (recalc FUN_00038ba4 law, docs/re/_wip_t201.md S1e —
+// MEASURED 2880/2900 (+0x58; the 20 misses are the evaluator self-init
+// 0x3fb3e) and 2900/2900 (+0x59) over 2900 corpus records via
+// scripts/r201_threat_law_verify.py). The rewrite stores no INACTIVE
+// slots, so ACTIVE-count == items-count by construction.
+int Campaign::shieldThreatFor(int star) const {
+    int n = 0;
+    for (int it : planets_[star].items)
+        if ((*items_)[it].flags & 8) ++n;
+    return n;
+}
+int Campaign::orbitalThreatFor(int star) const {
+    int n = 0;
+    for (int it : planets_[star].items)
+        if ((*items_)[it].flags & 4) ++n;
+    return n;
+}
+
 int Campaign::needClassFor(int star) const {
     // FUN_0003fec4 verbatim (income-law.md S9 t28). EAX field analogues:
     // +0x44 IND, +0x46 RES, +0x48 PROS, +0x42 pop, +0x4a cap, +0x4c pending.
@@ -980,6 +1050,84 @@ void Campaign::buildPhase() {
                 break;
             }
         } else {
+            // t201 EMERGENCY CHAIN (FUN_0003fc4c, called at 0x3f4d5 BEFORE
+            // the need-class scorer at 0x3f4ec; ret -1 skips scoring —
+            // 0x3f4da cmp eax,-1; je 0x3f74c). Gates measured this session;
+            // threat counters derived per recalc law (S1e). RNG note: the
+            // original draws only at 0x3fe00 (chain D); here one pct draw
+            // happens whenever owner is odd && IND>20 — stream DETERMINISM
+            // kept, exact draw TIMING differs [documented default].
+            {
+                EmergencyGate g;
+                g.digArmed = ps.digQueuedOrDone != 0;
+                auto legal = [&](int id) {
+                    return id >= 0 && id < static_cast<int>(items_->size()) &&
+                           requiresAvailable((*items_)[id].requires,
+                                             static_cast<int>(tree_->all().size()),
+                                             ownedTech[o]);
+                };
+                auto absent = [&](int id) {
+                    for (int it : ps.items)
+                        if (it == id) return false;
+                    return true;
+                };
+                g.digLegal = legal(38);      g.digAbsent = absent(38);
+                g.shieldLegal = legal(18);   g.shieldPresent = !absent(18);
+                g.megaLegal = legal(19);
+                g.cloakLegal = legal(11);    g.cloakAbsent = absent(11);
+                g.shipyard = !absent(22);
+                static const int kTpl[5] = {12, 13, 14, 15, 37};
+                for (int i = 0; i < 5; ++i) {
+                    g.templateLegal[i] = legal(kTpl[i]);
+                    g.templateAbsent[i] = absent(kTpl[i]);
+                }
+                int freeCells = 0;  // (+0x1c)-(+0x20): empty, non-rock, non-
+                                    // class-0 surface cells (recalc loop law,
+                                    // income-law.md S6/T36 accounting)
+                for (int c = 0; c < ps.surfaceCells; ++c) {
+                    if (ps.cellClasses[c] & 8 || ps.cellClasses[c] == 0) continue;
+                    bool usedc = false;
+                    for (size_t k = 0; k < ps.items.size(); ++k)
+                        if (k < ps.itemCells.size() && ps.itemCells[k] == c)
+                            usedc = true;
+                    if (!usedc) ++freeCells;
+                }
+                // Hop = lane BFS to nearest OTHER owner's star; none/no
+                // enemies -> 4 (tier 400; unreachable rows read 0xff>=4 in
+                // the original) [documented default — the original's row
+                // operand [ctx+7]->[+2]>>16 identity is UNVERIFIED].
+                int hop = 4;
+                {
+                    std::vector<int> dist(galaxy_.stars.size(), -1);
+                    std::vector<int> q{static_cast<int>(s)};
+                    dist[s] = 0;
+                    for (size_t h = 0; h < q.size() && hop == 4; ++h) {
+                        for (int nb : galaxy_.neighbours(q[h])) {
+                            if (dist[nb] >= 0) continue;
+                            dist[nb] = dist[q[h]] + 1;
+                            if (owner_[nb] >= 0 && owner_[nb] != o) {
+                                hop = dist[nb];
+                                break;
+                            }
+                            q.push_back(nb);
+                        }
+                    }
+                }
+                int rngPct = 100;
+                if ((o & 1) && storedIndFor(s) > 20) {
+                    std::uniform_int_distribution<int> pct(0, 99);
+                    rngPct = pct(rng_);
+                }
+                pick = emergencyChainPick(storedIndFor(s), storedProsFor(s),
+                                          freeCells, shieldThreatFor(s),
+                                          static_cast<int>(o),
+                                          static_cast<unsigned>(turn_ > ps.emergencyStamp
+                                               ? turn_ - ps.emergencyStamp : 0),
+                                          emergencyPeriodFor(hop), g, rngPct);
+                if (pick == 38) ps.digQueuedOrDone = 0;  // bit1 clear 0x3fc78
+                if (pick == 19) ps.emergencyStamp = turn_;  // stamp default
+            }
+            if (pick < 0) {
             const int needClass = needClassFor(s);
             int bestScore = 0, bestItem = -1;
             // roll law 0x3f6fb: rng%100 > 65 -> full-sum score, else primary
@@ -1014,6 +1162,7 @@ void Campaign::buildPhase() {
                 }
             }
             if (pick < 0 && bestItem >= 0) pick = bestItem;  // scan end w/ built-best
+            }  // t201: normal-scorer guard (chain pick skips scoring entirely)
         }
         if (pick < 0) continue;
         if (itemIsSurface(pick)) {
