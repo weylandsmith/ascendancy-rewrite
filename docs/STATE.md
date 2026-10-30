@@ -253,46 +253,78 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t202b: DEMOLISH CHANNEL — PURE CODE + PINS (t202 measured every
-law; nothing left to probe). Scope, all inputs already on disk in
-docs/re/_wip_t202.md (S1..S14 — READ IT FIRST; gate polarity was
-mid-session flipped twice there, the FINAL law is S2/S13):
- (1) usedPopFor UPGRADE (campaign.h): pending-UPOP -> UPOP sum over
-     ps.items (excl item 23, excl item flags&0x40) + gov-35 term kept
-     (S11: 2760/2900 M4 + 140 M3 Automation-shape). CHECK blast radius:
-     campaign_pop_band_law_t199 histograms + needClassFor popMinusPend
-     (t199 pin expectations shift from pending-only to full sum — update
-     the test, keep the band FORMULA untouched) + t45 governor pin stays.
- (2) buildPhase AI branch (campaign.cpp :1032ff), insert BEFORE the t201
-     emergency block, verbatim order S13: over-cap gate usedPop>=
-     storedCap -> victim = cell-order scan (skip empty, skip item 5, skip
-     mpop!=0, LARGEST upop strict>, upop>0 floor) -> erase items[k]+
-     itemCells[k] -> post recheck used'>=pop -> skip selector; else
-     used>=pop -> skip; TRIAGE gate runs iff emptyNR<2 OR (emptyNR==
-     emptyB && abilityOf(o)==BuildOnBlack==false) -> sweep = min-requires
-     (skip mpop >= cap-pop; strict-< requires incl 255; first-cell ties)
-     -> demolish; shared gate 0x3f41e (emptyNR==0 -> skip; emptyB==emptyNR
-     && !BB -> skip) then t201 chain + scorer UNCHANGED (S12 proves the
-     t201 caller wiring faithful — do NOT touch its -1 semantics).
- (3) PINS: two pure static pickers (overCapDemolishPick /
-     minRequiresDemolishPick, edge classes per S1/S4/S13: tie-first-cell,
-     CB-skipped-in-overcap but NOT in sweep, mpop-0 UPOP-0 never wins,
-     255-requires participates) + end-to-end: synthetic planet pinned at
-     used==cap demollishes within one advance() and queues next turn.
- (4) DOCS: ai-dossier gap row 4 GAP -> MODELLED (tubes sub-item = cited
-     dead path); income-law.md S9 OVER-CAP paragraph corrected (largest-
-     MPOP -> largest-UPOP-among-MPOP-0, cite _wip_t202 S1; file is NOT
-     gate-regenerated — verified t202); OQ-016 STATUS t202b appended.
-RATIONALE: t202 banked the full law set + corpus fire-rates (220/2900
-over-cap LIVE); the code is mechanical transcription + pins, ~25 probes,
-zero new measurement. Do NOT re-open: threat/emergency (t201+t202 S12),
-triage-gate re-derivation (S2 FINAL), +0x4c model (S11), cos_star (t200),
-visibility (t195), pop/gauge laws (t199), relation enum (t189b). Then
-t203 candidate banked: gap row 7 free-tech grant FUN_00046e84 on build
-completion (ai-dossier S3c; static).
+NEXT t203: FREE-TECH GRANT ON BUILD COMPLETION — gap map row 7
+(ai-dossier.md §8 row 7 = the last pure-GAP row reachable statically).
+The original grants a free tech when a build completes: FUN_00046e84,
+sole caller 0x39173 (inside the completion path), ai-dossier.md S3c:
+picks uniformly among legal rows, marks OWNED, NEVER touches the target
+slot. The rewrite completion path (buildPhase :995ff cell-assignment
+block) grants NOTHING. SCOPE: (1) re-derive 0x46e84 verbatim from the
+Ghidra/headless disasm (uniform-over-what census: legal = unowned rows?
+research-mask gate? rng call site + stride interaction with the t202b
+demolish block — check the per-turn rng stream order in buildPhase);
+(2) wire into the rewrite completion path at the ORIGINAL call position
+(0x39173 is inside FUN_00038818's completion tail — decide whether the
+rewrite grants on player completions too or AI-only, cite whichever the
+caller guard says); (3) pin: determinism pin (seeded grant distribution
+over N completions) + "target slot untouched" pin; (4) docs: ai-dossier
+row 7 GAP -> MODELLED/GAP-honest, OQ-016 STATUS t203.
+RATIONALE: t202b closed the demolish channel CODE + PINS (119 tests 0
+failed, gate 0); row 7 is the only remaining pure-GAP row and the
+dossier already banks its shape (S3c), so it is the cheapest measured
+win left. Do NOT re-open: demolish (t202+t202b _wip files, S1..S13 +
+T4), threat/emergency (t201; S12 CORRECTION — caller wiring faithful,
+do not "fix"), triage gate (S2 FINAL), +0x4c model (S11: item-UPOP sum
+2760/2900 — the pacing-window widening in t202b is DONE, do not
+re-fudge it), cos_star (t200), visibility (t195), pop/gauge laws (t199),
+relation enum (t189b). Rows OQ-005/OQ-019/OQ-021 are the harder residue
+families (cited-bound / sugar-cube scale BLOCKED-USER-LEVEL / diplomacy
+live-cell) — not single-iteration targets.
 If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
 adjudication via scripts/r1_t85g_sitting.py STILL outranks everything.
+
+LANDED t202b (2026-10-30, this session): DEMOLISH CHANNEL CODED + PINNED
+(gap map row 4 GAP -> MODELLED; t202's measured law set transcribed with
+zero new measurement). Trigger triage: timeline size 5,721,578,066 ==
+frozen baseline exactly, tail md5 faa71c20, dosbox down, tree clean at
+9520c9a -> no sitting; STATE NEXT stood.
+WHAT LANDED [all cited, docs/re/_wip_t202b.md T4 + _wip_t202 S1..S13]:
+(1) usedPopFor UPGRADED to the MEASURED M4 law = item-UPOP sum over
+slotted items (excl item 23 Ship, excl flags&0x40 rows 20/21, gov-35
+Automation term kept) — pending-term removed (INERT 2900/2900).
+(2) buildPhase AI branch = original order: over-cap 0x3f178 (picker
+overCapDemolishPick — skip CB, skip MPOP!=0, STRICT max UPOP, first-cell
+ties, UPOP==0 never wins; no candidate -> skip selector = 0x3f20b assert
+path; post recheck used'>=pop -> skip) -> no-free-pop 0x3f220 -> PRE-
+TRIAGE 0x3f252 (runs iff eNR<2 OR eNR==eB && !BuildOnBlack) -> sweep
+0x3f354 minRequiresDemolishPick (NO CB skip, 0xFF REQUIRES participates)
+-> shared gate 0x3f41e -> t201 chain + scorer UNCHANGED. Cell-order slot
+view via stable_sort on itemCells; demolishAt rebases indices (both
+sweeps can fire in ONE turn via the 0x3f22f fallthrough).
+(3) BLAST RADIUS MEASURED: 0x3f220 is now real traffic — AI builds
+serialize behind pop growth (seed 42 first colony t169->t279, seed 2024
+Control win t831->t1255, both CLI-verified FINITE). Three pacing guards
++ gate.sh budget widened WITH dated comments (pacing windows, NOT laws):
+test_campaign 220->420 turns, test_species/test_ships 1200->1600, gate
+1200->1600.
+(4) PINS tests/test_demolish_t202b.cpp (4 tests): picker edge classes
+O1-O6/S1-S5, used-pop exclusions + gov-35 reversibility + band formula
+intact, end-to-end over-cap (one Factory gone in ONE advance(), CB
+alive, queues), end-to-end barren-triage CB sweep (REQUIRES 5 < 255).
+119 tests 0 FAILED.
+(5) DOCS: income-law.md S9 OVER-CAP para CORRECTED (largest-MPOP ->
+largest-UPOP-among-MPOP-0 with 0x3f1bb/0x3f1c1 byte identities) +
+pre-triage gate + sentinel reason + M4 line folded; ai-dossier gap row 4
+-> MODELLED; OQ-016 STATUS t202b appended — row STAYS OPEN (strict-close:
+still zero in-corpus demolition EVENT witnesses; residues +0x54 mid-game
+identity, 0x3f4b8 cmd1-on-tail, M3-shape 140-row discriminator).
+TOOLS: scripts/r202b_item_table.py (planitem dump mirroring
+loadPlanItems; PITFALL: rows are NAME-line THEN numeric-line, names may
+contain spaces, flags = OR 1<<pos over v[7:-1] — first two naive parses
+mis-aligned silently).
+Gate 0 + LEDGER AUDIT OK (open OQ-005/016/019/021). NEXT = t203 free-tech
+grant above.
 
 LANDED t202 (2026-10-30, this session): AI GAP ROW 4 DEMOLISH CHANNEL —
 LAWS FULLY MEASURED; CODE DEFERRED to t202b (budget stop; measurements

@@ -260,10 +260,14 @@ TEST(species_campaign_with_abilities_reaches_victory) {
     // seed 2024 resolves at finite turn count >600 post-law (CLI proxy
     // --campaign 1500 --seed 2024 wins Extinct t683). The guard's target
     // is INFINITE stall; 1200 keeps a wide margin over typical resolve.
+    // T202B 1200 -> 1600: the measured usedPopFor (item-UPOP sum, t202b)
+    // activates 0x3f220 no-free-pop — builds serialize behind pop growth and
+    // this seed now resolves Control at t1255 (CLI --campaign 1500 --seed
+    // 2024, finite: not a stall). Window widens; the law stands.
     auto c = makeCrafted(2024, 1, ag::SpeciesAbility::SuperMarines);
     ag::Victory v = ag::Victory::None;
     int t = 0;
-    for (; t < 1200 && v == ag::Victory::None; ++t) v = c.advance();
+    for (; t < 1600 && v == ag::Victory::None; ++t) v = c.advance();
     CHECK(v != ag::Victory::None);
 }
 

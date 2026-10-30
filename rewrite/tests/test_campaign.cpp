@@ -69,6 +69,11 @@ ag::Campaign makeCampaign(unsigned seed, int aiCount = 6, bool ffa = true) {
 
 }  // namespace
 
+// Exported shim (t202b): test_demolish_t202b.cpp needs the same seeded
+// campaign + table wiring without duplicating the loader. Fully-qualified:
+// the `ag` alias lives inside the anonymous namespace above.
+ascend::game::Campaign makeCampaignForDemolish(unsigned seed) { return makeCampaign(seed); }
+
 TEST(campaign_homes_distinct) {
     auto c = makeCampaign(7);
     for (int o = 0; o <= 6; ++o) CHECK(c.starsOwned(o) == 1);
@@ -86,7 +91,14 @@ TEST(campaign_total_owned_grows) {
     // '[t169] owner 0 colonised Tensoric'); a bare home needs the full
     // Factory->drive->Shipyard queue chain before any colony ship launches,
     // which is exactly what the vendor's own tutorial pacing describes.
-    for (int t = 0; t < 220 && !c.over(); ++t) {
+    // T202B window 220 -> 420: usedPopFor is now the MEASURED item-UPOP sum
+    // (docs/re/_wip_t202.md S11, r202d 2760/2900), which activates the
+    // 0x3f220 no-free-pop law — an AI planet with used==pop queues NOTHING
+    // until growth, so early builds serialize one-per-pop-growth (seed 42
+    // first colony t169 -> t279 CLI-verified). The guard's target is INFINITE
+    // stall and the behaviour resolves finitely (seed 42 reaches 13 owned by
+    // t620; seed 2024 wins Control t1255), so the window widens, not the law.
+    for (int t = 0; t < 420 && !c.over(); ++t) {
         c.advance();
         int total = 0;
         for (int o = 0; o <= 6; ++o) total += c.starsOwned(o);

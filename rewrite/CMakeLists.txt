@@ -71,6 +71,7 @@ add_executable(run_tests
   tests/test_species.cpp
   tests/test_campaign.cpp
   tests/test_emergency_t201.cpp
+  tests/test_demolish_t202b.cpp
   tests/test_ui_layout.cpp
   tests/test_audio.cpp
   tests/test_ships.cpp

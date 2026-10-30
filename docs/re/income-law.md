@@ -510,10 +510,23 @@ Full region 0x3f130..0x3f757 disassembled from work/ascend_restored.bin
 
  OVER-CAP EMERGENCY (0x3f178): if used(+0x4c) >= cap(+0x4a): scan cells
  < +0x18, skip empty and item 5 (Colony Base); pick cell whose item has the
- LARGEST MPOP (item byte +3, gate >0); FUN_00038840 cmd=1 DEMOLISH it
+ LARGEST UPOP AMONG MPOP==0 ITEMS — CORRECTED t202 (raw disasm
+ work/ai_selector_disasm.txt + docs/re/_wip_t202.md S1/S5; the pre-t202
+ "largest MPOP (gate >0)" text had the byte identities inverted): @0x3f1bb
+ `cmp byte[item+3],0; jne next` SKIPS every item with MPOP != 0, and @0x3f1c1
+ `mov ebx,[ebx+1]; sar ebx,0x18` reads byte+4 = UPOP as the SCORING operand;
+ cmp ebx,best jle next (STRICT >, best init 0 @0x3f17c -> UPOP==0 never wins,
+ ties keep the FIRST cell). FUN_00038840 cmd=1 DEMOLISH it
  @0x3f1e9; if still used>=pop after demolish -> return; free-pop recheck
- @0x3f1fb. Else branch: used(+0x4c) >= pop(+0x42) -> return @0x3f220;
+ @0x3f1fb. No candidate -> assert 0x2a424 + recalc 0x3a4e0 + RETURN (0x3f20b;
+ not modelled in the rewrite — honest negative). Else branch: used(+0x4c) >=
+ pop(+0x42) -> return @0x3f220;
    FUN_0003f758==2 -> return @0x3f226.
+ +0x4c ITSELF (t202b): model M4 = UPOP sum over ALL slotted items skipping
+ item 23 / item flags&0x40 / slot flags&2, exact 2760/2900 corpus records
+ (scripts/r202d_usedpop_models.py) — supersedes the inactive-only line above
+ as the whole story (the INACTIVE-term reading predicts 0/1 where mature
+ planets read 51/61).
 
  TRANSPORT-TUBES PRIORITY (0x3f2c8): race-research mask (research runtime
  array 0x7478b stride 75 — see layout note below) bit(owner) set -> if no
@@ -523,9 +536,15 @@ Full region 0x3f130..0x3f757 disassembled from work/ascend_restored.bin
  slot-less BUY (0x38818(0,21)) @0x3f344.
 
  MIN-REQUIRES DEMOLISH SWEEP (0x3f354, entered when free pop exists but the
- over-cap path didn't fire): among occupied cells < +0x18 pick the item
+ over-cap path didn't fire; gated by PRE-TRIAGE 0x3f252 — banked t202,
+ docs/re/_wip_t202.md S2/S13 FINAL: triage RUNS iff empty-non-rock(+0x1c)<2
+ OR (empty-non-rock == empty-barren(+0x20) AND ability byte != 2 ==
+ SA_BuildOnBlack); healthy planets NEVER triage): among occupied cells < +0x18 pick the item
  with MPOP (item dword+0 SAR 24 @0x3f3bd) STRICTLY LESS than cap-pop AND
- the smallest byte+5 (REQUIRES column, ecx sentinel 0x1869f never binds)
+ the smallest byte+5 (REQUIRES column, ecx sentinel 0x1869f never binds —
+ t202 reason-correction: 0xFF=255 < 99999, so a 0xFF-requires item
+ PARTICIPATES and wins whenever it is the first minimal candidate; NO
+ item-5 skip in the sweep — a Colony Base CAN be swept)
  -> DEMOLISH cmd1 @0x3f403; free-pop recheck @0x3f414 else return. (The
  byte+5 min makes research-prereq items the first to go.)
 

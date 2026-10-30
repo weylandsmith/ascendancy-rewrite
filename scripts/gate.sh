@@ -369,9 +369,13 @@ if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
   # T37: budget 600 -> 900 (class-cell channel law). T40: 900 -> 1200 — the
   # faithful CB-only start (docs/re/income-law.md T40) moved the seed-2024
   # finite resolve to Control t961 (CLI verified: --headless --campaign 1500
-  # --seed 2024; seeds 1/2 resolve Control t979/t826). The guard's target is
-  # stall/deadlock; exit-0 + '^VICTORY ' assertions stay intact.
-  if ! timeout 240 "$ROOT/rewrite/build/ascendancy" --headless --campaign 1200 \
+  # --seed 2024; seeds 1/2 resolve Control t979/t826). T202B: 1200 -> 1600 —
+  # the measured usedPopFor (item-UPOP sum, _wip_t202 S11) activates the
+  # 0x3f220 no-free-pop law, so AI builds serialize behind pop growth and
+  # seed 2024 now resolves Control at t1255 (CLI --headless --campaign 1500
+  # --seed 2024 — FINITE, verified this session; the guard's target remains
+  # stall/deadlock; exit-0 + '^VICTORY ' assertions stay intact).
+  if ! timeout 240 "$ROOT/rewrite/build/ascendancy" --headless --campaign 1600 \
        --seed 2024 >/tmp/gate_campaign.log 2>&1; then
     tail -20 /tmp/gate_campaign.log; err "seeded campaign did not reach victory"
   fi

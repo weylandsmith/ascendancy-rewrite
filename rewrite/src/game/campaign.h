@@ -208,20 +208,77 @@ public:
         const ChannelAcc a = channelAccFor(star);
         return a.ind + (a.dblI ? a.ind >> 1 : 0);
     }
-    // +0x4c USED-POP analog (income-law.md S9): the queue item's UPOP,
-    // plus the governor AUTOMATION bonus — branch @0x38e16 of
-    // FUN_00038ba4 adds dword [0x743b9]>>0x18, which is ITEM-TABLE DATA,
-    // not an immediate: row 35 base = 0x73e40 + 35*0x28 = 0x743b8, so the
-    // dword spans row 35 bytes +1..+4 (res,pros,mpop,UPPOP) and SAR >>0x18
-    // lands on UPOP — Automation UPOP, runtime-measured 1 in 32/32 saves.
-    // Governor is -1 corpus-wide (scripts/r1_governor_census.py), so the
-    // bonus is inert on all measured state; wired for law completeness,
-    // pinned by campaign_governor_law_t45.
+    // +0x4c USED-POP analog. LAW UPGRADED t202b (docs/re/_wip_t202.md S11,
+    // scripts/r202d_usedpop_models.py RC=0 over 2900 corpus planet records):
+    // +0x4c = SUM OF ITEM UPOP over ALL SLOTTED items, skipping item 23
+    // (Ship), item-table flags&0x40 (20 Outpost, 21 Transport Tubes) and
+    // slot-flags bit1 — model M4 exact on 2760/2900 (95.2%); the 140-row
+    // residual is the M3 shape (active UPOP + 1) i.e. the Automation bonus
+    // below. The t199/t45 reading "pending-item UPOP only" is SUPERSEDED:
+    // the pending term measures 0 on 2900/2900 records (the autosave ring
+    // never catches pending != 0xFFFF -> INERT in the corpus), while mature
+    // planets read 51/61 where the inactive-only sum predicts 0/1.
+    // The governor AUTOMATION bonus is kept: branch @0x38e16 of
+    // FUN_00038ba4 adds dword [0x743b9]>>0x18 = row-35 UPOP (item-table base
+    // 0x73e40 + 35*0x28 = 0x743b8, dword +1..+4, SAR >>0x18 lands on UPOP;
+    // runtime-measured 1 in 32/32 saves). Governor is -1 corpus-wide
+    // (scripts/r1_governor_census.py), so the bonus stays inert on measured
+    // state; pinned by campaign_governor_law_t45.
+    // The rewrite stores ACTIVE items only, so the slot-flags&2 skip is a
+    // no-op by construction (same mapping as shieldThreatFor, t201).
     int usedPopFor(int star) const {
         const PlanetState& ps = planets_[star];
-        int u = ps.pendingItem >= 0 ? (*items_)[ps.pendingItem].upop : 0;
+        int u = 0;
+        for (int it : ps.items) {
+            if (it == 23) continue;                      // Ship excluded
+            if ((*items_)[it].flags & 0x40) continue;    // Outpost / Tubes
+            u += (*items_)[it].upop;
+        }
         if (ps.governor == 35) u += (*items_)[35].upop;  // Automation UPOP
         return u;
+    }
+    // ------------------------------------------------------------------
+    // t202b DEMOLISH CHANNEL pickers — the two victim scans inside the AI
+    // build evaluator FUN_0003f130 (docs/re/_wip_t202.md S1/S3/S5/S13;
+    // verbatim disasm work/ai_selector_disasm.txt 0x3f178..0x3f209 and
+    // 0x3f354..0x3f418). `items`/`mpop`/`upop`/`requires` are parallel
+    // arrays in SLOT order (the original walks the slot pointer +4i); the
+    // return value is the SLOT index to demolish, or -1 for "no candidate".
+    // OVER-CAP VICTIM 0x3f1bb..0x3f1c7: skip item 5 (Colony Base, 0x3f1a8),
+    // skip any item with MPOP != 0, keep the STRICT largest UPOP (best init
+    // 0 @0x3f17c -> UPOP == 0 never wins), ties keep the FIRST cell.
+    // t28's "largest MPOP" summary had the byte identity inverted: byte+3 is
+    // MPOP and is the SKIP test; byte+4 = [ebx+1] sar 0x18 is UPOP and is the
+    // scored operand.
+    static int overCapDemolishPick(const std::vector<int>& items,
+                                   const std::vector<int>& mpop,
+                                   const std::vector<int>& upop) {
+        int best = -1, bestU = 0;  // 0x3f17c xor ebp,ebp
+        for (size_t i = 0; i < items.size(); ++i) {
+            if (items[i] < 0 || items[i] == 5) continue;  // empty / Colony Base
+            if (mpop[i] != 0) continue;                   // 0x3f1bb
+            if (upop[i] > bestU) { bestU = upop[i]; best = static_cast<int>(i); }
+        }
+        return best;
+    }
+    // MIN-REQUIRES SWEEP VICTIM 0x3f354..0x3f3d5: NO item-5 skip (a Colony
+    // Base CAN be swept); skip items whose MPOP >= margin, where margin =
+    // cap - pop, the FREE-cell figure ([esp+0xcc]); keep the STRICT smallest
+    // REQUIRES, ties keep the FIRST cell. The 0x1869f init sentinel never
+    // prunes (any u8 REQUIRES < 99999), so a 0xFF-requires item PARTICIPATES
+    // and wins whenever it is the first minimal candidate — t28's "sentinel
+    // never binds" stands with this corrected reason.
+    static int minRequiresDemolishPick(const std::vector<int>& items,
+                                       const std::vector<int>& mpop,
+                                       const std::vector<int>& requires,
+                                       int margin) {
+        int best = -1, bestR = 99999;  // 0x3f354 mov ecx,0x1869f
+        for (size_t i = 0; i < items.size(); ++i) {
+            if (items[i] < 0) continue;
+            if (mpop[i] >= margin) continue;
+            if (requires[i] < bestR) { bestR = requires[i]; best = static_cast<int>(i); }
+        }
+        return best;
     }
     // POPULATION BAND LAW (t199, docs/re/planets-ui.md S4 [verified
     // 0x3ce39..0x3cef8]): the PLPOP grid paints one shape per slot

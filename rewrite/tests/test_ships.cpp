@@ -119,10 +119,15 @@ TEST(ship_expansion_survives_gates) {
     // frozen-front bug the fortify fix addressed). T37: the class-cell
     // channel law shifted this seed past 600 (finite resolve — CLI proxy
     // wins on seed 2024); guard is against infinite stall, bar now 1200.
+    // T202B 1200 -> 1600: measured usedPopFor (item-UPOP sum) activates the
+    // 0x3f220 no-free-pop law — AI builds serialize behind pop growth and
+    // this seed resolves at ~t1420 (CLI --campaign 1600 --seed 2024), still
+    // FINITE, which is what this guard actually tests. Window widens; law
+    // stands.
     auto c = makeShipCampaign(2024);
     ag::Victory v = ag::Victory::None;
     int t = 0;
-    for (; t < 1200 && v == ag::Victory::None; ++t) v = c.advance();
+    for (; t < 1600 && v == ag::Victory::None; ++t) v = c.advance();
     CHECK(v != ag::Victory::None);
     CHECK(c.turn() >= 2);
 }

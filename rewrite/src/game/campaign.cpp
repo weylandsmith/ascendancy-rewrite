@@ -835,14 +835,16 @@ int Campaign::orbitalThreatFor(int star) const {
 
 int Campaign::needClassFor(int star) const {
     // FUN_0003fec4 verbatim (income-law.md S9 t28). EAX field analogues:
-    // +0x44 IND, +0x46 RES, +0x48 PROS, +0x42 pop, +0x4a cap, +0x4c pending.
+    // +0x44 IND, +0x46 RES, +0x48 PROS, +0x42 pop, +0x4a cap, +0x4c USED-POP
+    // (item-UPOP sum per t202b — the t28 "pending" label is superseded; the
+    // pending term measures 0 on 2900/2900 corpus records).
     const PlanetState& ps = planets_[star];
     const int ind = storedIndFor(star);
     const int res = storedResFor(star);
     const int pros = storedProsFor(star);
     const int capMinusPop = storedCapFor(star) - static_cast<int>(ps.pop);
-    // +0x4c analog now routes through usedPopFor (governor Automation
-    // bonus included, S14 t45 — inert corpus-wide).
+    // +0x4c analog = usedPopFor (item-UPOP sum + governor Automation
+    // bonus, t202b upgrade of the pending-UPOP reading).
     const int popMinusPend = static_cast<int>(ps.pop) - usedPopFor(star);
     if (capMinusPop < 2 && popMinusPend < 2) return 3;  // 0x3fedc
     if (pros < 2) return 2;                              // 0x3fef2
@@ -1029,8 +1031,122 @@ void Campaign::buildPhase() {
         // --- selector (FUN_0003f130) ---
         int ind0 = storedIndFor(s);
         if (ind0 <= 0) continue;  // 0x3f146
-        int usedPop = usedPopFor(s);  // +0x4c analogue incl. t45 Automation bonus
+        int usedPop = usedPopFor(s);  // +0x4c analogue: item-UPOP sum (t202b)
         const bool aiPick = (o != kPlayer);
+        // ------------------------------------------------------------------
+        // t202b DEMOLISH CHANNEL — original order inside FUN_0003f130:
+        // over-cap 0x3f178 -> no-free-pop 0x3f220 -> pre-triage gate 0x3f252
+        // -> min-requires sweep 0x3f354 -> shared gate 0x3f41e -> emergency
+        // chain 0x3f4d5 -> scorer 0x3f4ec (docs/re/_wip_t202.md S13 FINAL;
+        // corpus fire-rates: over-cap LIVE 220/2900, always used==pop==cap).
+        if (aiPick) {
+            // Slot-order parallel arrays for the pickers. The original walks
+            // the slot pointer +4i in CELL order (0xff empties skipped), so
+            // ties ("first cell") mean lowest cell index — sort the rewrite's
+            // push-ordered items by their assigned cell first.
+            auto cellOf = [&](size_t k) {
+                return k < ps.itemCells.size() ? ps.itemCells[k] : -1;
+            };
+            std::vector<size_t> order(ps.items.size());
+            for (size_t k = 0; k < order.size(); ++k) order[k] = k;
+            std::stable_sort(order.begin(), order.end(),
+                             [&](size_t a, size_t b) {
+                                 const int ca = cellOf(a), cb = cellOf(b);
+                                 if (ca < 0 || cb < 0) return ca >= 0 && cb < 0;
+                                 return ca < cb;
+                             });
+            std::vector<int> slotItems, slotMpop, slotUpop, slotReq;
+            slotItems.reserve(order.size());
+            for (size_t j : order) {
+                const PlanetItem& pi = (*items_)[ps.items[j]];
+                slotItems.push_back(ps.items[j]);
+                slotMpop.push_back(pi.mpop);
+                slotUpop.push_back(pi.upop);
+                slotReq.push_back(pi.requires);
+            }
+            auto demolishAt = [&](size_t j) {
+                const size_t k = order[j];
+                ps.items.erase(ps.items.begin() + k);
+                if (k < ps.itemCells.size()) ps.itemCells.erase(ps.itemCells.begin() + k);
+                order.erase(order.begin() + j);
+                // `order` entries are raw indices into ps.items: after the
+                // erase, every survivor with a higher original index shifts
+                // down by one (over-cap + sweep can BOTH fire in one turn —
+                // 0x3f22f fallthrough — so a stale index would delete the
+                // wrong item's cell on the second demolish).
+                for (size_t& e : order)
+                    if (e > k) --e;
+                slotItems.erase(slotItems.begin() + j);
+                slotMpop.erase(slotMpop.begin() + j);
+                slotUpop.erase(slotUpop.begin() + j);
+                slotReq.erase(slotReq.begin() + j);
+            };
+            // Empty-cell figures per the recalc law (income-law.md S6/T36):
+            // eNR = empty NON-rock surface cells (+0x1c analog), eB = the
+            // empty class-0/barren subset (+0x20 analog).
+            auto emptyCells = [&](int& eNR, int& eB) {
+                eNR = 0; eB = 0;
+                for (int c = 0; c < ps.surfaceCells; ++c) {
+                    bool occ = false;
+                    for (size_t k = 0; k < ps.items.size(); ++k)
+                        if (cellOf(k) == c) { occ = true; break; }
+                    if (occ) continue;
+                    if (ps.cellClasses[c] & 8) continue;  // rock: not countable
+                    ++eNR;
+                    if (ps.cellClasses[c] == 0) ++eB;
+                }
+            };
+            const int pop = static_cast<int>(ps.pop);
+            const int cap = storedCapFor(s);
+            bool skipSelector = false;
+            if (usedPop >= cap) {
+                // 0x3f178 OVER-CAP EMERGENCY: victim = LARGEST UPOP among
+                // MPOP==0 non-Colony-Base cells; NO candidate -> the original
+                // takes the assert/recalc path 0x3f20b and RETURNS (rewrite
+                // recomputes everything per turn -> skip selector outright).
+                const int v = overCapDemolishPick(slotItems, slotMpop, slotUpop);
+                if (v < 0) skipSelector = true;
+                else {
+                    demolishAt(static_cast<size_t>(v));
+                    usedPop = usedPopFor(s);  // recheck 0x3f1fb re-reads +0x4c
+                    if (usedPop >= pop) skipSelector = true;  // 0x3f203
+                }
+            } else if (usedPop >= pop) {
+                skipSelector = true;  // 0x3f220 no-free-pop-no-build law
+            }
+            if (!skipSelector) {
+                // 0x3f252 PRE-TRIAGE GATE (S2/S5 FINAL): triage RUNS iff
+                // eNR<2 OR (eNR==eB AND ability != SA_BuildOnBlack) — the
+                // emergency vacancy channel; healthy planets NEVER triage
+                // (ability byte = diplo row +0x19d, census {0:19,1:2,2:11,
+                // 3:0,4:8} over 60.sav; BuildOnBlack == 2).
+                int eNR = 0, eB = 0;
+                emptyCells(eNR, eB);
+                const bool bb = abilityOf(o) == SpeciesAbility::BuildOnBlack;
+                if (eNR < 2 || (eNR == eB && !bb)) {
+                    // Tubes leg 0x3f2c8 DEAD CODE in the shipped scenario:
+                    // research-mask bytes [0x743e5..0x7478b tail] measured
+                    // all-zero 26 slots x 13 captures (t28) -> straight to
+                    // the 0x3f354 min-REQUIRES sweep.
+                    const int v = minRequiresDemolishPick(
+                        slotItems, slotMpop, slotReq, cap - pop);
+                    if (v >= 0) {
+                        demolishAt(static_cast<size_t>(v));
+                        usedPop = usedPopFor(s);
+                        // Post-demolish free-pop recheck 0x3f414 provably
+                        // unreachable (S13: pre-guard guarantees used<pop and
+                        // demolish only lowers used).
+                    }
+                }
+                // 0x3f41e SHARED GATE on post-demolish facts: eNR==0 ->
+                // RETURN; eB==eNR && !BuildOnBlack -> RETURN (no scoring at
+                // all; the ability-2 race can score on barren-only vacancy).
+                emptyCells(eNR, eB);
+                if (eNR == 0 || (eB == eNR && !bb)) skipSelector = true;
+            }
+            if (skipSelector) continue;  // consumes the selector turn only;
+                                         // queue/tick effects above stand.
+        }
         int pick = -1;
         if (!aiPick) {
             for (const BuildStep& step : kBuildOrder) {
