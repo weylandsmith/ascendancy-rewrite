@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-30T15:05
+updated: 2026-10-30T17:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,57 +253,94 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t209: ADJUDICATE THE LAST TWO STATIC-LAW RESIDUES OF THE 0x3a174
-INVASION LEG (the only open items on this thread that a corpus-free static
-pass can actually close; t208 left the clamp law itself coded+pinned both
-directions). Two legs, in order:
-(1) OUT-PARAM LAW [t207 residue S7e(b)]: enumerate callers of 0x3a174 with
-    the E8 full-image byte-pass idiom (t204/t207 pattern — functions_full.tsv
-    spans OVERLAP, tightest wins), then disassemble each call site (0x42c8e
-    order-resolver invasion leg, 0x3d951 race-family) to answer a STATIC,
-    citable question: what address is the third arg, and does any caller
-    pre-initialise it, or does the callee's 'ability byte==0 -> store 1'
-    arm (witness reading [unverified]) really be the ONLY writer before the
-    read? If both call sites agree verbatim, bank the law and update
-    _wip_t207 S7e(b) + diplomacy.md §19; if they disagree, that is itself
-    the finding — write the honest negative, semantics stay open (they need
-    runtime data we do NOT have: no invasion-vs-non-war witness exists).
-(2) CLAMP-vs-REPEL POSITION [the t207 DOCUMENTED DIVERGENCE, _wip_t207
-    S7e + campaign.cpp:1960 comment]: the answer lives in the CALLER tail,
-    not the callee. Disassemble 0x42c8e..(function end) and determine what
-    control flow branches on the 0x3a174 return: does an order stay live /
-    a ship survive when the defense held (repel is REAL in the original),
-    and does the clamp at 0x3a25a run BEFORE that repel decision? If the
-    tail shows the clamp path precedes any repel branch, an attempt-time
-    reading is the faithful one and the rewrite's under-fire wiring is the
-    documented under-model (state it in campaign.cpp + keep OQ-019 boundary;
-    do NOT rebuild combatPhase on a projection); if it shows the reverse,
-    the wiring position is right and the residue closes. Either way cite
-    addresses and amend the divergence note — do NOT change semantic
-    behaviour this iteration without the cited tail.
-RATIONALE: the t207/t208 clamp law is closed at the pure-law, cascade, and
-e2e levels; the ONLY things this thread still owes are these two
-address-level questions, both static and both bounded (~10-15 probes).
-Everything else open is play-gated or design-gated: OQ-005 = 7th .shp sweep
-FORBIDDEN (GOAL.txt); OQ-021 needs play (WATCH-ONLY); OQ-016's remaining
-residues need other-family saves ([0x13bc4]) or in-corpus clamp witnesses
-(user play, WATCH-ONLY); gap row 12 ladder = BLOCKED-USER design
-projection; OQ-019 per-ship model = BLOCKED-USER (docs/BLOCKED.md t70
-class). Modelling per-ship invasion/bombard without the user's OQ-019
-decision stays forbidden.
-Do NOT re-open: the t207 scale-2 algebra correction S7a (247x split is
-VERBATIM in the encodings), the caller census EXACTLY-{0x39fba,0x3a255,
-0x4b875} of 0x43a4c, the t208 e2e pin semantics (player ability via
-playerSpecies + setIndustryForTest — the hook has NO production call site,
-keep it that way), t206's two-channel consumer law, the t205 per-STAR
-identity, t204's handler law, t203, t202/t202b, t201, t200, t195, t199,
-t189b.
+NEXT t210: ADJUDICATE THE LAST STATIC RESIDUE ON THE OQ-016 ATTACK-PRICE
+THREAD — PER-SHOT STACKING vs PER-ENGAGEMENT AGGREGATE at the 0x4b875
+handler call (the residue t204..t209 all carried as 'unverified'). The
+rewrite charges applyAttackDipCost ONCE per aggregate engagement; the
+original's 0x43a4c cost = 10*(MOVSX([0x13bc4])+1) PER CALL, so if the
+call site sits inside a per-shot / per-gizmo / per-attacker-ship loop,
+the original stacks -20 (or -40 vs ally) multiple times per battle and
+the rewrite's per-engagement charge is quantifiably under-firing. Task
+legs, in order:
+(1) Disassemble 0x4b740..0x4b8e3 END-TO-END (r205d_windows seed-restart;
+    t207 pitfall: capstone stops at first undecodable byte) and map the
+    control-flow nesting of the 0x4b875 call: is it inside a loop whose
+    induction variable iterates shots/gizmos/ships? Cite loop head, bound,
+    and the back-edge that re-reaches 0x4b875 (or its absence).
+(2) Census the SIX callers of 0x4b740 (E8 byte-pass idiom — spans
+    OVERLAP, tightest wins): which fire the handler-bearing path, once
+    per order-resolution or once per volley-round? Correlate with the
+    t89 commit law (mode==1 only 0x25560/0x25570) so the counting is per
+    REAL engagement, not per dead-path.
+(3) BANK the answer as a LAW with addresses either way. If stacking is
+    REAL, quantify (shots-per-engagement upper bound if computable from
+    the loop bound) and state the rewrite's under-count as a DOCUMENTED
+    divergence — do NOT change combatPhase semantics: converting the
+    aggregate model to per-shot charges is a projection across the
+    OQ-019 per-ship boundary (BLOCKED-USER, docs/BLOCKED.md t70 class),
+    same rule t209 applied to the clamp position. If the call is once
+    per engagement, the residue line closes outright (rewrite faithful).
+(4) Update in the same commit: docs/re/_wip_t210.md (new), _wip_t204.md
+    residue line, ai-dossier gap row 13 residue, OPEN-QUESTIONS OQ-016
+    STATUS t210, STATE.md.
+RATIONALE: after t209 closed both 0x3a174 residues, this is the ONLY
+corpus-free static question left anywhere in the open ledger — every
+other residue is play-gated (OQ-016 clamp witness, OQ-021 end-ctrl
+boundary, [0x13bc4] gate-firing save) or BLOCKED-USER design projection
+(OQ-019 per-ship model, gap rows 12/15/16). Bounded ~10-15 probes.
+Do NOT re-open: t209's out-param law (sole writer 0x3a35e; caller 0x42c8e
+discards out-param AND return; 0x3d951 = UI message family) and
+ATTEMPT-TIME clamp position (repelled invasions pay the clamp too;
+rewrite capture-branch = documented under-model, diplomacy.md §19 t209),
+the t207 scale-2 algebra S7a, the caller census EXACTLY-{0x39fba,0x3a255,
+0x4b875} of 0x43a4c, t208's e2e pin semantics (setIndustryForTest has NO
+production call site — keep it that way), t206's two-channel consumer
+law, t205's per-STAR identity, t204's handler law (byte-key, CEILING
+shape), t203, t202/t202b, t201, t200, t195, t199, t189b.
 If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
 adjudication via scripts/r1_t85g_sitting.py STILL outranks everything —
-and a mid-game save where the player invades a non-at-war owner would
-finally give the clamp its first runtime witness (grease the OQ-016
-residue too; report it, do not fabricate it).
+and a save where the player fights a multi-volley battle vs a non-at-war
+owner would witness BOTH the clamp AND the stacking question at once
+(report it, do not fabricate it).
+
+LANDED t209 (2026-10-30): LAST TWO STATIC-LAW RESIDUES OF THE 0x3a174
+INVASION LEG CLOSED — OUT-PARAM CALLER LAW + CLAMP-VS-REPEL POSITION.
+Trigger triage: timeline mtime 1793294532 / size 5,721,578,066 == frozen
+baselines, dosbox down, tree clean at 1b00c13 -> no sitting; STATE t209
+stood. LAWS [all cited, docs/re/_wip_t209.md S1..S6; windows via
+r205d_windows + REVENV python (project .venv lacks capstone)]:
+(1) OUT-PARAM LAW CLOSED: 3rd arg = pointer in EBX (->ECX @0x3a17f);
+    sole writer 0x3a35e `mov [ecx],eax` (284-insn full-body operand pass:
+    zero other [ecx] writes, ECX unrewritten before the store, NO ret in
+    [0x3a174,0x3a35e), assert arms -> 0x2a428 vendor reporter never
+    returns); value = defense result [esp+0x14] FORCED 1 iff ability byte
+    row+0x19d == 0 — t207's [unverified] witness reading VERIFIED; value
+    doubles as strip-loop bound (min-1 defense consumption).
+(2) CALLERS DISAGREE (the finding): engine caller 0x42c8e never pre-inits
+    [esp+0x30c], DISCARDS the return (0x42c97 clobbers EAX; 0x42c9c =
+    identity assert 0xbc4), overwrites the slot @0x42cba with the 0x39894
+    return -> out param DEAD in the engine path; 0x3d951 = UI announcement
+    family (residue (c) closed by measurement): reads [ebp-0x24]==1 ->
+    message 0x1c vs 0x1d (0x21a20), ids 0x1fc5/0x1fd3 (0x56d1c), UI words
+    [ecx+0xcb1/0xcb3/0xccc].
+(3) CLAMP POSITION CLOSED (t207 DOCUMENTED DIVERGENCE): clamp 0x3a25a..
+    0x3a291 runs AT ATTEMPT TIME — before the defense score is even
+    counted (loop 0x3a2c9..0x3a325, result select 0x3a327); success-vs-
+    repel branches ONLY at 0x3a45c; caller tail outcome-INDEPENDENT. =>
+    original pays the guarantee-war clamp on a REPELLED invasion too;
+    rewrite capture-branch wiring = documented UNDER-MODEL (per-attempt
+    wiring = OQ-019 boundary, NOT done). NO semantic change: campaign.cpp
+    divergence comment replaced with the cites (blast radius trivially
+    nil), _wip_t207 S7e (b)+(c)+divergence lines closed, diplomacy.md §19
+    t209 update, OQ-016 STATUS t209 appended. Row STAYS OPEN (strict-
+    close): zero in-corpus clamp witnesses unchanged; defense law
+    unmodelled; per-shot stacking (-> t210); [0x13bc4] other-family.
+PITFALLS banked: capstone operand pass must skip cmp/test when hunting
+writes and must know ECX reg-id mapping (rname check, not magic ints);
+0x2a428-style assert reporters make 'no early ret' claims conditional on
+assert arms not returning. Gate 0 + LEDGER AUDIT OK + LEDGER INDEX OK;
+NEXT = t210 per-shot stacking vs per-engagement aggregate at 0x4b875.
 
 LANDED t208 (2026-10-30): POSITIVE E2E PIN FOR THE GUARANTEE-WAR CLAMP +
 RESIDUE-LINE HOUSEKEEPING. Trigger triage: timeline mtime 1793294532 /

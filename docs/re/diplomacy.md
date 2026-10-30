@@ -681,3 +681,20 @@ CampaignConfig::playerSpecies; industry via setIndustryForTest) runs
 capture -> handler -20 -> clamp 320->280 -> chooser DeclareWar (atWar
 flipped, post-advance att == 280 - negPlayerTurns/4 exactly; docs/re/
 _wip_t208.md). The clamp-vs-repel POSITION question stands unchanged.
+t209 UPDATE — POSITION CLOSED [verified, docs/re/_wip_t209.md S5]: the
+clamp is ATTEMPT-TIME. Inside 0x3a174 the clamp site 0x3a25a..0x3a291
+runs BEFORE the defense score is even counted (shield loop 0x3a2c9..
+0x3a325, result select 0x3a327..0x3a33e); success-vs-repel branches ONLY
+at 0x3a45c (invmod > shieldscore -> success tail 0x3a46c: event-0xd
+announce path + planet+0x67 := [0x12e10]; else activator tail), and the
+engine caller 0x42c8e DISCARDS the 0x3a174 return (0x42c93/0x42c97
+re-call 0x396cc clobbers EAX; 0x42c9c = ship-identity assert 0xbc4) with
+zero order/ship-survival branches on the outcome. => the original pays
+the guarantee-war clamp on a REPELLED invasion too; the rewrite's
+capture-branch wiring is a DOCUMENTED UNDER-MODEL of that law (per-
+attempt wiring = OQ-019 boundary, not authorised without the user's
+per-ship decision). OUT-PARAM LAW (S4): 3rd arg EBX = out pointer; sole
+writer 0x3a35e `mov [ecx],eax` (value = defense result, FORCED 1 iff the
+attacker's ability byte row+0x19d == 0); neither caller pre-inits; the
+engine path never reads it, the UI caller 0x3d951 reads ==1 to pick
+message 0x1c vs 0x1d (0x21a20 @0x3d9bb).

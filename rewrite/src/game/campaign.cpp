@@ -1957,11 +1957,19 @@ void Campaign::combatPhase() {
             // declareWar-10 — the t180 chooser then GUARANTEES war. Wiring
             // site = the rewrite's capture branch (below the repel test):
             // the one place an invasion resolution is KNOWN to have run.
-            // DOCUMENTED DIVERGENCE (banked S7e): the original's 0x3a174
-            // clamp position vs repel is undetermined statically and its
-            // gun-bombard caller 0x39f00 pays WITHOUT clamping — the
-            // rewrite conflates gunnery+invasion in one aggregate
-            // engagement, so a repelled attack pays only the t204 -20.
+            // t209 POSITION LAW (MEASURED, docs/re/_wip_t209.md S5): the
+            // original clamps AT ATTEMPT TIME — 0x3a25a runs before the
+            // defense score is even counted (loop 0x3a2c9.., result select
+            // 0x3a327), success/repel branches only at 0x3a45c, and the
+            // engine caller 0x42c8e DISCARDS the return (0x42c97 clobbers
+            // EAX; no order/ship-survival branch keys on the outcome). So
+            // a repelled invasion pays the clamp too in the original.
+            // DOCUMENTED UNDER-MODEL (kept, no semantic change t209): the
+            // rewrite's single aggregate volley cannot represent an
+            // attempt independent of its outcome; clamping at the capture
+            // branch under-fires vs the attempt-time law, and the gun-
+            // bombard caller 0x39f00 pays WITHOUT clamping (t207 S7c).
+            // Per-attempt wiring = OQ-019 boundary (BLOCKED-USER).
             if (a == kPlayer && b >= 1 && b - 1 < static_cast<int>(dipState_.size())) {
                 DipPolicyState& vst = dipState_[b - 1];
                 guaranteeWarOnInvasion(aiDip_[b - 1].values, vst.atWar, &vst.attitude);

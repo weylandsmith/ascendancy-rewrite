@@ -302,13 +302,24 @@ vs an attempt-time reading. RESIDUES BANKED (keep row open):
     CampaignConfig::playerSpecies -> ability_[kPlayer], industry cleared over
     the ship-cost gate via new setIndustryForTest; asserts capture ran +
     atWar flipped + att == 280 - negPlayerTurns/4 exactly. See
-    docs/re/_wip_t208.md. (b) 0x3a174 ability-gate out-param semantics (byte==0
--> forced 1, witness reading [unverified]); (c) 0x3d951 caller context
-(slot idx from word [rec+0xab]) [unverified], likely UI/cheat family;
-(d) invasion DEFENSE LAW measured but unmodelled (invmod vs 0x12 +
+    docs/re/_wip_t208.md. (b) [CLOSED t209 — OUT-PARAM LAW MEASURED: callee
+    0x3a35e `mov [ecx],eax` is the sole writer (full-body operand pass, no
+    early ret, assert arms 0x2a428 don't return; ecx never rewritten before
+    the store); value = defense-result, FORCED 1 iff ability byte==0 witness;
+    neither caller pre-inits its slot; 0x42c8e DISCARDS out param AND return,
+    0x3d951 (UI message family — context now MEASURED, closes (c)) reads
+    [ebp-0x24] ==1 to pick message 0x1c vs 0x1d. docs/re/_wip_t209.md S1..S4.]; (c) [CLOSED t209
+    via (b): 0x3d951 block = UI announcement family (0x56ca4/0x56d1c message
+    ids 0x1fc5/0x1fd3, format call 0x76c79, UI words [ecx+0xcb1..0xccc])]
+    (d) invasion DEFENSE LAW measured but unmodelled (invmod vs 0x12 +
 2*0x13 shields, strip via 0x496e4/0x38840, event code 0xd) — per-ship
 family, OQ-019 boundary; (e) ZERO in-corpus clamp witnesses (mark window
 all-zero 20/20 — no invasion-vs-non-war-owner executed in captured play).
+[DIVERGENCE NOTE CLOSED t209: clamp-vs-repel position MEASURED — clamp is
+ATTEMPT-TIME (0x3a25a precedes defense-score loop; outcome branches only at
+0x3a45c; caller 0x42c8e return discarded, outcome-independent control flow).
+Rewrite capture-branch wiring = documented UNDER-MODEL, not divergence-by-
+ignorance; per-attempt wiring stays OQ-019. docs/re/_wip_t209.md S5.]
 Tests: invasion_guarantee_war_battery_t207 (6 arms incl JLE boundary,
 idempotence, ceiling-not-floor), invasion_declare_war_cascade_t207
 (340 -> -20 -> clamp 280 < DECL 290 -> chooser DeclareWar),
