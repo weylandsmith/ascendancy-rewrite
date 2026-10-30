@@ -174,6 +174,13 @@ public:
     // the attacked mark" — permanence is the measured property, so the pin
     // must be able to make peace). Thin wrapper over the private setWar.
     void setWarForTest(int a, int b, bool on) { setWar(a, b, on); }
+    // t208 pin surface: scenario industry stockpile set (mirror of ind_,
+    // §3 stockpile semantics). Exists so an e2e pin can clear the
+    // SuperMarines invasion gate (ind_[a] >= ship cost, campaign.cpp:1895)
+    // DETERMINISTICALLY instead of depending on the turn-1 income accrual.
+    // Header-inline scenario hook, NO production call site: zero semantic
+    // delta (t206 no-re-run rule).
+    void setIndustryForTest(int owner, double v) { ind_[owner] = v; }
     int driveHopsFor(int owner) const;  // docs/re/ships.md §3 (launch range)
     int techsOwned(int owner) const;
     double resources(int owner) const;

@@ -675,3 +675,9 @@ against a non-at-war owner executed in captured play). The sibling
 caller 0x39f00 (gun bombardment, sole caller 0x4c97f in the gizmo-
 attack shared tail) pays §17 fire-and-forget WITHOUT any clamp plus an
 item-loss tail — per-ship channels, OQ-019 boundary.
+t208 UPDATE: the clamp's POSITIVE end-to-end wiring is now pinned —
+invasion_capture_war_e2e_t208 (player = SA_SuperMarines via
+CampaignConfig::playerSpecies; industry via setIndustryForTest) runs
+capture -> handler -20 -> clamp 320->280 -> chooser DeclareWar (atWar
+flipped, post-advance att == 280 - negPlayerTurns/4 exactly; docs/re/
+_wip_t208.md). The clamp-vs-repel POSITION question stands unchanged.

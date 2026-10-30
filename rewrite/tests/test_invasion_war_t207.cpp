@@ -108,7 +108,8 @@ struct T207Tables {
 };
 
 ag::Campaign buildFixture207(std::vector<ag::DipFile> dips,
-                             std::vector<ag::SpeciesAbility> ab) {
+                             std::vector<ag::SpeciesAbility> ab,
+                             int playerSpecies = -1) {
     static T207Tables* tabs = nullptr;
     if (!tabs) {
         tabs = new T207Tables();
@@ -146,6 +147,7 @@ ag::Campaign buildFixture207(std::vector<ag::DipFile> dips,
     cfg.seed = 4242;
     cfg.aiCount = static_cast<int>(dips.size());
     cfg.freeForAll = false;
+    cfg.playerSpecies = playerSpecies;  // t208: -1 keeps T3's no-ability player
     std::string err;
     ag::Campaign c(cfg, g, &tabs->tree, tabs->items, tabs->gizmos, std::move(dips),
                    ab, &err);
@@ -181,5 +183,47 @@ TEST(invasion_combat_phase_clamp_t207) {
     c.setWarForTest(ag::kPlayer, 1, true);   // engagement gate open (t204 style)
     c.advance();                              // one s0->s1 engagement, repelled
     CHECK(c.dipStateAt(0).attitude == 320);   // -20 handler, NO clamp (no capture)
+    CHECK((c.attackedMarks() & (1 << 1)) != 0);
+}
+
+// ---- T4 (t208): POSITIVE end-to-end — the clamp fires at the capture
+// branch and the chooser cascade runs. Closes _wip_t207 S7e residue (a)
+// (the ability vector indexes OWNER, so the player needs the ability via
+// CampaignConfig::playerSpecies -> ability_[kPlayer], campaign.cpp:234-235,
+// plus industry over the invasion ship-cost gate at campaign.cpp:1895 —
+// setIndustryForTest makes that deterministic instead of riding turn-1
+// accrual). Law: 340 -> handler -20 = 320 (still > DECL 290) -> clamp
+// 0x3a291 -> 280 (strictly below the line) -> t180 chooser DeclareWar.
+TEST(invasion_capture_war_e2e_t208) {
+    std::string err;
+    ag::DipFile df;
+    if (!df.loadFromFile((kRepo / "extracted/ascend00/race00.dip").string(), &err))
+        std::abort();
+    ag::DipFile df2;
+    if (!df2.loadFromFile((kRepo / "extracted/ascend00/race02.dip").string(), &err))
+        std::abort();
+    // PLAYER = SA_SuperMarines (invadesAlwaysSucceeds -> the capture branch
+    // at campaign.cpp:1946 is reached regardless of the hull math).
+    auto c = buildFixture207({df, df2},
+                             {ag::SpeciesAbility::SuperMarines,
+                              ag::SpeciesAbility::HealShips},
+                             /*playerSpecies=*/static_cast<int>(
+                                 ag::SpeciesAbility::SuperMarines));
+    CHECK(c.dipStateAt(0).attitude == 340);
+    CHECK(!c.dipStateAt(0).atWar);            // diplo STATE still peace
+    c.setWarForTest(ag::kPlayer, 1, true);    // engagement gate (scenario war bit)
+    c.setIndustryForTest(ag::kPlayer, 50.0);  // clears the 1895 ship-cost gate
+    c.advance();
+    // (E1) the capture RAN: star1 flipped to the player (owner flip 1969).
+    CHECK(c.starOwner(1) == ag::kPlayer);
+    // (E2) diplo STATE flipped: mood(1)==0 is already proven by T3's exact
+    // 320 post-advance reading (green CI), so the full expected cascade
+    // value is exact: clamp 280, chooser DeclareWar subtracts
+    // negPlayerTurns/4 (diplomacy.cpp:243). Without the clamp the cell
+    // would sit at 320 - neg/4 >= 290 -> act None -> atWar STAYS false;
+    // both arms below are therefore distinguishing witnesses of the clamp.
+    CHECK(c.dipStateAt(0).atWar);
+    CHECK(c.dipStateAt(0).attitude == 280 - df.values.negPlayerTurns / 4);
+    // (E3) the t204 mark still rides the engagement.
     CHECK((c.attackedMarks() & (1 << 1)) != 0);
 }

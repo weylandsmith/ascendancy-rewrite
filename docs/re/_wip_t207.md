@@ -297,11 +297,12 @@ function — arguably attempt-time faithful), and its gun-bombard caller
 0x39f00 pays WITHOUT clamping; the rewrite conflates gunnery+invasion in
 one aggregate engagement, so clamping at the capture branch UNDER-fires
 vs an attempt-time reading. RESIDUES BANKED (keep row open):
-(a) positive end-to-end pin needs a guaranteed PLAYER capture — the
-ability vector indexes OWNER and the t204 fixture gives owner 1
-SuperMarines, not the player (self-caught: first e2e pin failed 320!=280
-exactly because no capture ran); next iteration add owner-0 ability hook
-or force hullHit; (b) 0x3a174 ability-gate out-param semantics (byte==0
+(a) [CLOSED t208] positive end-to-end pin LANDED:
+    invasion_capture_war_e2e_t208 — player gets SA_SuperMarines via
+    CampaignConfig::playerSpecies -> ability_[kPlayer], industry cleared over
+    the ship-cost gate via new setIndustryForTest; asserts capture ran +
+    atWar flipped + att == 280 - negPlayerTurns/4 exactly. See
+    docs/re/_wip_t208.md. (b) 0x3a174 ability-gate out-param semantics (byte==0
 -> forced 1, witness reading [unverified]); (c) 0x3d951 caller context
 (slot idx from word [rec+0xab]) [unverified], likely UI/cheat family;
 (d) invasion DEFENSE LAW measured but unmodelled (invmod vs 0x12 +

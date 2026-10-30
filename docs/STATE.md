@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-30T14:10
+updated: 2026-10-30T15:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,37 +253,86 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t208: POSITIVE END-TO-END PIN FOR THE t207 GUARANTEE-WAR CLAMP +
-CLOSE THE t204 PLANET-EVENT RESIDUE LINE — three small, cited items:
-(1) give the REWRITE PLAYER a guaranteed capture in the test fixture
-    (the ability vector indexes OWNER: buildFixture207 gives owner 1
-    SuperMarines, not owner 0; add a test-only ability hook or force the
-    hullHit branch) so invasion_combat_phase_clamp_t207 can assert the
-    340 -> -20 -> clamp 280 -> chooser-DeclareWar cascade END-TO-END
-    (the pure-law cascade pin already passes; only the e2e wiring side is
-    unpinned). Update the pin + _wip_t207 S7e residue (a) when done.
-(2) in docs/OPEN-QUESTIONS.md OQ-016 + ai-dossier gap row 13, amend the
-    'planet-event callers unwired' residue: both are now READ (t207) —
-    bombard = honest no-delta, invasion = clamp wired-attempt-time-
-    under-fire documented; residue shrinks to 'per-ship invasion/bombard
-    channel = OQ-019 family'.
-(3) re-run gate + ledger checks (they must stay green).
-RATIONALE: it finishes the ONLY wiring the t207 law left half-proven
-(residue (a) is a test-coverage gap, not a law gap — cheapest possible
-closure), and the caller thread of 0x43a4c is otherwise fully closed.
-Alternatives stay worse: gap row 12 ladder is a BLOCKED-USER design
-projection decision, OQ-005/019/021 need play (WATCH-ONLY), [0x13bc4]
-semantics need other-family saves, 0x3a174 out-param/0x3d951 context
-have no corpus witnesses to cite, and the t207 defense law is per-ship
-(OQ-019 boundary — do NOT model it in the aggregate rewrite without the
-user's OQ-019 decision).
+NEXT t209: ADJUDICATE THE LAST TWO STATIC-LAW RESIDUES OF THE 0x3a174
+INVASION LEG (the only open items on this thread that a corpus-free static
+pass can actually close; t208 left the clamp law itself coded+pinned both
+directions). Two legs, in order:
+(1) OUT-PARAM LAW [t207 residue S7e(b)]: enumerate callers of 0x3a174 with
+    the E8 full-image byte-pass idiom (t204/t207 pattern — functions_full.tsv
+    spans OVERLAP, tightest wins), then disassemble each call site (0x42c8e
+    order-resolver invasion leg, 0x3d951 race-family) to answer a STATIC,
+    citable question: what address is the third arg, and does any caller
+    pre-initialise it, or does the callee's 'ability byte==0 -> store 1'
+    arm (witness reading [unverified]) really be the ONLY writer before the
+    read? If both call sites agree verbatim, bank the law and update
+    _wip_t207 S7e(b) + diplomacy.md §19; if they disagree, that is itself
+    the finding — write the honest negative, semantics stay open (they need
+    runtime data we do NOT have: no invasion-vs-non-war witness exists).
+(2) CLAMP-vs-REPEL POSITION [the t207 DOCUMENTED DIVERGENCE, _wip_t207
+    S7e + campaign.cpp:1960 comment]: the answer lives in the CALLER tail,
+    not the callee. Disassemble 0x42c8e..(function end) and determine what
+    control flow branches on the 0x3a174 return: does an order stay live /
+    a ship survive when the defense held (repel is REAL in the original),
+    and does the clamp at 0x3a25a run BEFORE that repel decision? If the
+    tail shows the clamp path precedes any repel branch, an attempt-time
+    reading is the faithful one and the rewrite's under-fire wiring is the
+    documented under-model (state it in campaign.cpp + keep OQ-019 boundary;
+    do NOT rebuild combatPhase on a projection); if it shows the reverse,
+    the wiring position is right and the residue closes. Either way cite
+    addresses and amend the divergence note — do NOT change semantic
+    behaviour this iteration without the cited tail.
+RATIONALE: the t207/t208 clamp law is closed at the pure-law, cascade, and
+e2e levels; the ONLY things this thread still owes are these two
+address-level questions, both static and both bounded (~10-15 probes).
+Everything else open is play-gated or design-gated: OQ-005 = 7th .shp sweep
+FORBIDDEN (GOAL.txt); OQ-021 needs play (WATCH-ONLY); OQ-016's remaining
+residues need other-family saves ([0x13bc4]) or in-corpus clamp witnesses
+(user play, WATCH-ONLY); gap row 12 ladder = BLOCKED-USER design
+projection; OQ-019 per-ship model = BLOCKED-USER (docs/BLOCKED.md t70
+class). Modelling per-ship invasion/bombard without the user's OQ-019
+decision stays forbidden.
 Do NOT re-open: the t207 scale-2 algebra correction S7a (247x split is
 VERBATIM in the encodings), the caller census EXACTLY-{0x39fba,0x3a255,
-0x4b875}, t206's two-channel consumer law, the t205 per-STAR identity,
-t204's handler law, t203, t202/t202b, t201, t200, t195, t199, t189b.
+0x4b875} of 0x43a4c, the t208 e2e pin semantics (player ability via
+playerSpecies + setIndustryForTest — the hook has NO production call site,
+keep it that way), t206's two-channel consumer law, the t205 per-STAR
+identity, t204's handler law, t203, t202/t202b, t201, t200, t195, t199,
+t189b.
 If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
-adjudication via scripts/r1_t85g_sitting.py STILL outranks everything.
+adjudication via scripts/r1_t85g_sitting.py STILL outranks everything —
+and a mid-game save where the player invades a non-at-war owner would
+finally give the clamp its first runtime witness (grease the OQ-016
+residue too; report it, do not fabricate it).
+
+LANDED t208 (2026-10-30): POSITIVE E2E PIN FOR THE GUARANTEE-WAR CLAMP +
+RESIDUE-LINE HOUSEKEEPING. Trigger triage: timeline mtime 1793294532 /
+size 5,721,578,066 == frozen baselines, dosbox down, tree clean at e77fd03
+-> no sitting; STATE t208 stood. CODE: NEW header-inline scenario hook
+setIndustryForTest (campaign.h — mirror of ind_, NO production call site,
+zero semantic delta); buildFixture207 gained a playerSpecies param (-1
+default keeps T3's negative arm). PIN invasion_capture_war_e2e_t208:
+player = SA_SuperMarines via CampaignConfig::playerSpecies ->
+ability_[kPlayer] (campaign.cpp:234-235), industry 50 clears the invasion
+ship-cost gate (:1895), one advance(): capture RAN (starOwner(1)==0),
+handler -20, clamp 320->280, chooser DeclareWar flipped dipState_.atWar
+and the post-advance cell == 280 - negPlayerTurns/4 EXACTLY (mood(1)==0
+carried from t204's 320 pin); without the clamp atWar stays false
+(320-neg/4 >= DECL 290 -> act None) — both arms distinguishing.
+SELF-CAUGHT: first run failed 3/3 arms — the playerSpecies param existed
+but was never assigned into cfg (capture never ran); fixed. 134 tests
+0 failed. BLAST RADIUS UNCHANGED (header-inline hook + test only per the
+t206 rule; Control t1255 / Extinct t979 stand). OQ-016 STAYS OPEN
+(strict-close): the e2e pin proves REWRITE wiring, not original runtime —
+zero in-corpus clamp witnesses unchanged; out-param + 0x3d951 context +
+clamp position + OQ-019 boundary all banked for t209. Docs: OQ-016 STATUS
+t208 appended; ai-dossier gap row 13 residue amended ('planet-event
+callers unwired' STALE -> per-ship channel = OQ-019 family);
+diplomacy.md §19 t208 update; _wip_t207 S7e(a) CLOSED; new doc
+_wip_t208.md. PITFALLS: e2e pins must wire the lever they add (param ->
+cfg) or they silently test the negative arm twice. Gate 0 + LEDGER AUDIT OK
++ LEDGER INDEX OK; NEXT = t209 out-param caller-law + 0x42c8e repel-position
+tail.
 
 LANDED t207 (2026-10-30): PLANET-EVENT CALLERS OF 0x43a4c CLOSED +
 GUARANTEE-WAR LAW CODED/PINNED. Triage: timeline frozen-baseline size,
