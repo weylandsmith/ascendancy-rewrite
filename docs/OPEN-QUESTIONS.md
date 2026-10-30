@@ -627,6 +627,22 @@ only record 0 selected (:612). OPEN remains: cos_star selector semantics at
 0x2925c (its k40-51 residue), slot-library identity of gauge/pop cache
 globals [0x6fd90/2/4/9c] (zero direct writers found — A3/89 05/C7 05 census
 over the whole image), and the 44 dims-unknowns. Row stays OPEN.
+STATUS t199 (2026-10-29): REWRITE WIRING OF THE PLANET-UI VIS LAWS (pure
+code; no new residue evidence — row stays OPEN on the same residues). The
+t198 laws are now CODE: ui::gaugeSelector = clamp0..20(lround(L^0.75)) and
+ui::prosSelector = identity-clamp (rewrite/src/ui/layout.{h,cpp}; tie-proof
+in planets-ui.md S3 — no integer L^0.75 lands on .5, so lround == the x87
+frndint the original used); Campaign::popBands/popBandsFor implements
+SEL(i)=1+[i>=used]+[i>=pop] over i<cap verbatim (src/game/campaign.h on the
++0x4c/+0x42/+0x4a analogs usedPopFor/pop/storedCapFor). Pins:
+layout_planet_gauge_selector_law_t199 (corpus anchors RES52->19, IND53->20,
+IND77->clamp, boundary-exact both sides at all 21 selectors) and
+campaign_pop_band_law_t199 (edge-class shapes + independent band histograms
+count1==used/count2==pop-used/count3==cap-pop + used<=pop<=cap over seeded
+state). Arithmetic correction: planets-ui.md S3's "pow(53,0.75)=20.2" is
+19.64 (conclusion unchanged). Id fold into shp.md S22. Rendering stays
+blocked on OQ-005 per ui-runtime.md §2 (no vendor sprites, lookalikes
+banned) — documented in ui-runtime.md §2a.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge

@@ -35,6 +35,18 @@ OQ-005 and fabricating lookalike sprites is banned (STATE rule). Stars are
 filled circles (r=4 owner fill, r=6 white ring when selected-free), lanes are
 lines — shape vocabulary is a placeholder until OQ-005.
 
+### 2a. Planet-panel selection LAWS are landed (t199)
+
+While the SPRITES stay blocked, the cited level->record selection math from
+docs/re/planets-ui.md S3/S4 is implemented and pinned as pure no-SDL code:
+`ui::gaugeSelector` (clamp0..20(round(L^0.75)), IND/RES words +0x44/+0x46),
+`ui::prosSelector` (identity clamp, +0x48) and
+`game::Campaign::popBands/popBandsFor` (SEL(i)=1+[i>=used]+[i>=pop] over
+i<cap, ten per row) — tests `layout_planet_gauge_selector_law_t199` and
+`campaign_pop_band_law_t199`. When OQ-005 unblocks drawing, the planet panel
+feeds these selectors to ShapeLibrary record indices directly; no law work
+remains on that screen.
+
 ## 3. Text
 
 Vendor faces are LIVE since 2026-10-05f: the UI renders with the game's own

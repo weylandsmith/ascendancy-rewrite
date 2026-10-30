@@ -43,4 +43,25 @@ void simulateDeuteranopia(const RGB& c, RGB* out);
 void simulateProtanopia(const RGB& c, RGB* out);
 unsigned luminance601(const RGB& c);  // 0..255
 
+// ---- planet-panel visual laws (t199; docs/re/planets-ui.md S3/S4) ---------
+// Rendering vendor shapes stays blocked on OQ-005 (ui-runtime.md §2: no
+// vendor .shp sprites are drawn, lookalikes banned), but the level->record
+// SELECTION law is cited code-side and lands here as pure math.
+//
+// GAUGE COMPRESSION LAW [verified planets-ui.md S3, planwin paint body
+// 0x3b96c cases 0/1 at 0x3cca7/0x3cd3b]: selector = clamp0..20(round(L^0.75))
+// for the IND (+0x44) and RES (+0x46) words; the exponent double is built
+// from push pair 0x0 / 0x3fe80000 (== 0.75), pow = FUN_00078a90, round =
+// FUN_00076e08 (x87 frndint nearest). No exact .5 tie is possible for any
+// integer L (16*L^3 == odd^4 has no solution), so lround matches the x87
+// result on every input. Negative inputs clamp to 0.
+int gaugeSelector(int level);
+// PROSPERITY selector [verified planets-ui.md S3, case 2 at 0x3cdcf]: the
+// +0x48 word is used IDENTITY (no pow), clamped 0..20. Corpus PROS max 16
+// (2900 records) — the ladder's top records are never reached in play.
+int prosSelector(int pros);
+// Record-index table for the first-level-per-selector anchors cited in
+// planets-ui.md S3 (used by the pin test; 0..20).
+int gaugeFirstLevelFor(int selector);
+
 }  // namespace ascend::ui

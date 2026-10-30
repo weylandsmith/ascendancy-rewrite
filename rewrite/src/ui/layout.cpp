@@ -29,6 +29,30 @@ bool inRect(Rect r, Pt p) {
     return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1;
 }
 
+int gaugeSelector(int level) {
+    // planets-ui.md S3 (t198): FILD level -> pow(L, 0.75) -> frndint ->
+    // clamp [0,20]. See layout.h for the tie-proof note (lround == frndint
+    // nearest for every integer input since no L^0.75 lands on .5).
+    if (level <= 0) return 0;
+    const long r = std::lround(std::pow(static_cast<double>(level), 0.75));
+    return r > 20 ? 20 : static_cast<int>(r);
+}
+
+int prosSelector(int pros) {
+    // planets-ui.md S3 case 2 (0x3cdcf): identity word, clamp only.
+    if (pros <= 0) return 0;
+    return pros > 20 ? 20 : pros;
+}
+
+int gaugeFirstLevelFor(int selector) {
+    // Measured anchors (docs/re/_wip_t199.md S0; recompute:
+    // min{L : clamp0..20(round(L^0.75)) == k}).
+    static const int kFirst[21] = {0, 1, 2, 4, 6, 8, 10, 13, 15, 18, 21,
+                                   23, 26, 30, 33, 36, 39, 43, 46, 49, 53};
+    if (selector < 0 || selector > 20) return -1;
+    return kFirst[selector];
+}
+
 // Palette: searched (not hand-tuned) under the ui-runtime.md §4 rule; the
 // same rule is unit-tested via simulateDeuteranopia below, so any future
 // edit that breaks CVD separability fails run_tests.

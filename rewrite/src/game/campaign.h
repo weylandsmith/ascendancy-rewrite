@@ -212,6 +212,29 @@ public:
         if (ps.governor == 35) u += (*items_)[35].upop;  // Automation UPOP
         return u;
     }
+    // POPULATION BAND LAW (t199, docs/re/planets-ui.md S4 [verified
+    // 0x3ce39..0x3cef8]): the PLPOP grid paints one shape per slot
+    // i = 0..cap-1 (ten per row, +0x0a column step) with
+    //   SEL(i) = 1 + [i >= used] + [i >= pop]
+    // so with the corpus law used <= pop <= cap (2900/2900 planet records,
+    // r1_t198 census) the three bands are exactly the player's testimony:
+    // SEL 1 = working pop ("busy"), SEL 2 = pop not working ("free"),
+    // SEL 3 = empty slot. out has cap entries (values 1..3; above the corpus
+    // law the formula still matches the vendor: both increments fire, giving
+    // 3). Pure function of the three words so the law is pinned without the
+    // table tables; pop is the +0x42 double truncated to int exactly as the
+    // original's u16 word holds an integer count.
+    static void popBands(int used, int pop, int cap, std::vector<int>& out) {
+        out.assign(cap < 0 ? 0 : cap, 0);
+        for (int i = 0; i < static_cast<int>(out.size()); ++i)
+            out[i] = 1 + (i >= used ? 1 : 0) + (i >= pop ? 1 : 0);
+    }
+    std::vector<int> popBandsFor(int star) const {
+        std::vector<int> v;
+        popBands(usedPopFor(star), static_cast<int>(planets_[star].pop),
+                 storedCapFor(star), v);
+        return v;
+    }
     int fleetDamageFor(int owner) const { return fleetDamage_[owner]; }
     bool invadesAlwaysSucceeds(int owner) const {
         return ability_[owner] == SpeciesAbility::SuperMarines;

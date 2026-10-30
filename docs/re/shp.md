@@ -1026,3 +1026,21 @@ Planet-screen SELECTION laws (gauge record map, population bands, per-record
 selected-ness census for planind/1starmap/3cfgnew) are banked in
 docs/re/planets-ui.md (paint body 0x3b96c; switch 0x3cc9f table read live).
 OQ-005 STATUS t198 in docs/OPEN-QUESTIONS.md carries the residue verdict.
+
+SELECTED-NESS FOLD (t199; per-record ids from the t196 vision pass,
+work/r1/shp_png/ids.tsv + shp.md S20, cross-checked against the t198
+selection census): planind k0..k20 = manufacturing-factory ladder
+(+1 grey tank per step) addressed by gaugeSelector(IND) 0..20 — ALL 13
+X-class residue records k0..k12 ARE drawn in play (placeholder reading
+REFUTED, planets-ui.md S5.1); planres k0..k20 / planpro k0..k20 = research
+lattice->crystal / prosperity sprout->plant ladders addressed by
+gaugeSelector(RES) / prosSelector(PROS) [corpus: RES reaches sel 19, PROS
+never exceeds 16]; 1starmap: windows.txt SHAPEITEM selects k3,k4,k5,k7
+(t196 EXACT-H residue k3/k4 among them; k6 not); 3cfgnew = new-game /
+race-config art, SHAPEITEM selects k0 only; population slot icons come from
+the [0x6fd9c] library — library IDENTITY STILL OPEN (zero direct writers,
+t198 honest negative; gwshare.txt:35-37 lists planets.shp + planitem.shp as
+the adjacent candidates); cos_star k40..k51 selection not adjudicated
+(selector site 0x2925c). The rewrite's selection math landed t199
+(ui::gaugeSelector/prosSelector, Campaign::popBands — planets-ui.md
+S3/S4 landing blocks); drawing vendor records stays blocked on OQ-005.

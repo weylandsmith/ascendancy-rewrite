@@ -83,14 +83,30 @@ slot-ptr sane; DAT_00043508 pointer law member = ptr+0x88 verified 20/20,
 60.sav target = "Icarus II", law-valid]:
   +0x44 IND max 77, +0x46 RES max 52, +0x48 PROS max 16 (never saturates);
   pow-0.75 selectors span 0..20 (IND rec 20 reached from level >= 53:
-  pow(53,0.75)=20.2 -> round 20; IND max 77 -> clamped), RES reaches 19 at
-  52 and would hit 20 above ~57. Non-uniform histogram (e.g. IND sel0 x820,
+  pow(53,0.75)=19.64 -> round 20 [t199 recompute; the t198 line said 20.2 —
+  wrong arithmetic, same conclusion]; IND max 77 -> clamped), RES reaches 19
+  at 52 and would hit 20 above ~57. Non-uniform histogram (e.g. IND sel0 x820,
   sel2 x640) — the map COMPRESSES exactly like the vendor's 21-record ladder
   (header dword[1]=21 for planres/planpro, t196) while the PLAYER SEES ~60
   levels of IND/RES growth. The "~60-levels-vs-21-records" question is
   ANSWERED: pow(0.75) + round + clamp0..20 is the compression map.
   Cross-check vs the rewrite's own field law (campaign.cpp:768 "+0x44 IND,
   +0x46 RES, +0x48 PROS" — income-law.md): consistent.
+
+T199 RECOMPUTE + LANDINGS [verified]: the full first-level-per-selector table
+(k=0..20 -> L=) is
+  0,1,2,4,6,8,10,13,15,18,21,23,26,30,33,36,39,43,46,49,53
+(unclamped 21 from L=57, so clamp20 is a REAL branch at IND>=57). Exact .5
+ties are IMPOSSIBLE: L^0.75=(2n+1)/2 requires 16*L^3=(2n+1)^4, whose 2-adic
+valuations differ (even vs odd), so C++ lround == the x87 frndint-nearest
+result on every integer input. The laws are now CODE in the rewrite:
+ui::gaugeSelector / ui::prosSelector (src/ui/layout.{h,cpp}, pinned by
+tests/layout_planet_gauge_selector_law_t199 over the corpus anchors 52/53/77
+plus both-side boundary-exactness at all 21 selectors) and
+Campaign::popBands/popBandsFor (src/game/campaign.h, pinned by
+tests/campaign_pop_band_law_t199 incl. the independent band-histogram check
+count1==used / count2==pop-used / count3==cap-pop over a seeded campaign).
+Rendering stays blocked on OQ-005 (ui-runtime.md §2/§2a).
 
 ## 4. POPULATION SLOT LAW [verified 0x3ce39..0x3cef8, key 3 = PLPOP]
 ```
@@ -120,6 +136,17 @@ The 0x3b9df trio (header strip: 3 blits incl. an overlay gated by
 byte[widget+0x18b]&4 at fixed (0x198,0x128)) and the 0x3be7d quad (4 x
 FUN_0005bf71 rect fills gated by byte[widget+0xab]==0xff) are the panel
 frame/backdrop draws — cache slots from widget fields, no level logic.
+
+T199 LANDING [verified]: the band law is CODE in the rewrite as
+Campaign::popBands (pure, src/game/campaign.h) + popBandsFor (operates on
+usedPopFor()/pop/storedCapFor = the +0x4c/+0x42/+0x4a analogs), pinned by
+tests/campaign_pop_band_law_t199: synthetic shapes for all four edge classes
+(used<pop<cap, all-empty, all-busy-full, all-free, zero-cap) plus the corpus
+invariant used<=pop<=cap checked against the rewrite's own seeded state, and
+band HISTOGRAMS counted independently of the formula (count1==used,
+count2==pop-used, count3==cap-pop). Vendor-formula fidelity past the corpus
+law (used>pop input -> values still in 1..3 per verbatim increments) is
+pinned too.
 
 ## 5. CONSEQUENCES BANKED
 1. OQ-005 SELECTION CENSUS (partial, cited): the planind library's records

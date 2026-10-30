@@ -709,3 +709,55 @@ TEST(campaign_visibility_law_oq026_t195) {
     CHECK(!c4.starSelectableBy(0, 1));       // one-way per owner
     CHECK(c4.visibleLaneCountFor(0) == 1);   // lanes NOT blanket-revealed
 }
+
+TEST(campaign_pop_band_law_t199) {
+    // POPULATION BAND LAW pin (docs/re/planets-ui.md S4 [verified
+    // 0x3ce39..0x3cef8], t198; wiring t199). SEL(i) = 1 + [i>=used] +
+    // [i>=pop] over i < cap.
+    // (1) Synthetic shapes matching the three vendor band classes.
+    std::vector<int> b;
+    ag::Campaign::popBands(3, 5, 9, b);   // used<pop<cap
+    CHECK(b.size() == 9);
+    CHECK((b == std::vector<int>{1, 1, 1, 2, 2, 3, 3, 3, 3}));
+    ag::Campaign::popBands(0, 0, 4, b);   // uncolonized-looking: all EMPTY
+    CHECK((b == std::vector<int>{3, 3, 3, 3}));
+    ag::Campaign::popBands(7, 7, 7, b);   // full + all busy
+    CHECK((b == std::vector<int>(7, 1)));
+    ag::Campaign::popBands(0, 10, 10, b); // all free, no empties
+    CHECK((b == std::vector<int>(10, 2)));
+    ag::Campaign::popBands(0, 0, 0, b);   // zero-cap planet: nothing drawn
+    CHECK(b.empty());
+    // Out-of-corpus-order input (used > pop, NOT seen in the corpus) still
+    // follows the vendor formula verbatim: 1+[i>=5]+[i>=2] -> i=0,1 SEL 1,
+    // i=2..4 SEL 2 (pop passed), i=5 SEL 3 (both increments) — never 0 or 4.
+    ag::Campaign::popBands(5, 2, 6, b);
+    CHECK((b == std::vector<int>{1, 1, 2, 2, 2, 3}));
+
+    // (2) THE CORPUS-LAW CHECK the paint law relies on: used <= pop <= cap
+    // (measured 2900/2900 records in the 20-save playcap corpus, t198).
+    // Runs here on the rewrite's own state across a seeded campaign.
+    auto c = makeCampaign(2024);
+    const int ns = static_cast<int>(c.galaxy().stars.size());
+    int checkedPlanets = 0;
+    for (int t = 0; t < 300 && !c.over(); ++t) {
+        for (int s = 0; s < ns; ++s) {
+            const int used = c.usedPopFor(s);
+            const int pop = static_cast<int>(c.planetAt(s).pop);
+            const int cap = c.popCapAt(s);
+            const std::vector<int>& bands = c.popBandsFor(s);
+            CHECK(bands.size() == static_cast<size_t>(std::max(0, cap)));
+            if (used <= pop && pop <= cap) {
+                // Band histograms counted INDEPENDENTLY of the formula:
+                int c1 = 0, c2 = 0, c3 = 0;
+                for (int v : bands) { c1 += v == 1; c2 += v == 2; c3 += v == 3; }
+                CHECK(c1 == used);            // busy band  = +0x4c used
+                CHECK(c2 == pop - used);      // free band  = pop - used
+                CHECK(c3 == cap - pop);       // empty band = cap - pop
+            }
+        }
+        ++checkedPlanets;
+        c.advance();
+    }
+    CHECK(checkedPlanets > 0);
+}
+

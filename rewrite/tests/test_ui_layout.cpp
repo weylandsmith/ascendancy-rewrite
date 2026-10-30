@@ -99,3 +99,38 @@ TEST(layout_hit_test_finds_nearest) {
     CHECK(au::hitStar(v, g, {q.x + 2, q.y}) == 1);        // radius 6
     CHECK(au::hitStar(v, g, {q.x + 400, q.y + 400}) == -1);  // far away
 }
+
+TEST(layout_planet_gauge_selector_law_t199) {
+    // GAUGE COMPRESSION LAW (docs/re/planets-ui.md S3 [verified planwin
+    // 0x3b96c switch cases; t198]): sel = clamp0..20(round(level^0.75)).
+    // Round-to-nearest ties are IMPOSSIBLE (16*L^3 == odd^4 has no integer
+    // solution — docs/re/_wip_t199.md S0), so this pins the x87 frndint
+    // result exactly for every L.
+    // Cited corpus anchors (planets-ui.md S3 measurement):
+    CHECK(au::gaugeSelector(52) == 19);   // RES corpus max 52 reaches rec 19
+    CHECK(au::gaugeSelector(53) == 20);   // "IND rec 20 from level >= 53"
+    CHECK(au::gaugeSelector(77) == 20);   // IND corpus max 77 -> clamped
+    CHECK(au::gaugeSelector(56) == 20);   // last level before unclamped 21
+    CHECK(au::gaugeSelector(57) == 20);   // raw 21 clamps to 20
+    CHECK(au::gaugeSelector(0) == 0);
+    CHECK(au::gaugeSelector(-5) == 0);    // clamp0 side (word is u16; defensive)
+    // The first-level table is anchored against the implementation itself
+    // at every selector (kFirst monotone, boundary-exact both sides):
+    for (int k = 1; k <= 20; ++k) {
+        const int f = au::gaugeFirstLevelFor(k);
+        CHECK(au::gaugeSelector(f) == k);
+        CHECK(au::gaugeSelector(f - 1) == k - 1);
+    }
+    CHECK(au::gaugeFirstLevelFor(0) == 0);
+    CHECK(au::gaugeFirstLevelFor(21) == -1);
+    // Non-decreasing over the whole drawable+overflow range.
+    for (int L = 1; L <= 300; ++L) CHECK(au::gaugeSelector(L) >= au::gaugeSelector(L - 1));
+    // PROSPERITY identity law (case 2 @0x3cdcf): no pow, clamp only.
+    // Corpus PROS max 16 NEVER saturates (planets-ui.md S3, 2900 records).
+    for (int p = 0; p <= 16; ++p) CHECK(au::prosSelector(p) == p);
+    CHECK(au::prosSelector(17) == 17);    // identity above the corpus range too
+    CHECK(au::prosSelector(20) == 20);
+    CHECK(au::prosSelector(21) == 20);
+    CHECK(au::prosSelector(-1) == 0);
+}
+

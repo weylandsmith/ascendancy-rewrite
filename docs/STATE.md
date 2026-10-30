@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T19:55
+updated: 2026-10-29T21:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,32 +253,62 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t199: REWRITE WIRING OF THE t198 PLANET-UI VIS LAWS + POP-BAND PIN
-(pure code + docs; the t198 paint census left TWO rewrite-adjacent facts
-unwired): (1) the gauge record law selector(level)=clamp0..20(round(level^
-0.75)) for IND/RES (fields +0x44/+0x46) and identity-clamp for PROS (+0x48)
-is the CITED visual-compression law (docs/re/planets-ui.md S3) — the
-rewrite's UI currently draws plain circles (ui-runtime.md S2); at minimum
-add ShapeLibrary-side selector mapping + a pinned test over the t198 corpus
-distribution (IND max 77 -> rec20 at level>=53; PROS max 16 never
-saturates), OR document why rendering stays blocked on OQ-005 and pin ONLY
-the map law; (2) population band law SEL(i)=1+[i>=used(+0x4c)]+[i>=pop(
-+0x42)] over i<cap(+0x4a), 10/row (planets-ui.md S4, 2900/2900 census) —
-rewrite campaign.cpp pop fields already exist (pop +0x42, usedPopFor +0x4c
-analog, cap +0x4a): add popBandsFor() + pin incl the used<=pop<=cap law;
-(3) fold the t196/t198 ids into shp.md S22 pointer line. Do NOT re-open:
-slot-library identity of [0x6fd90/2/4/9c] (zero direct writers — t198
-honest negative; needs live capture of the registration, BLOCKED class),
-cos_star 0x2925c selector semantics (next static candidate AFTER this),
-span-bounded-walk (t197), planalNN poses (t196), visibility (t195 closed).
+NEXT t200: cos_star SELECTOR SEMANTICS (0x2925c) — the last un-adjudicated
+selection class of the OQ-005 census (explicitly queued by t198 as "next
+static candidate AFTER this", and t199 consumed that "after this"). Work:
+disassemble the COSMOSWnd star-paint caller cluster around 0x2925c (listing
+route per t198 method: objdump span of the enclosing function from
+work/functions_full.tsv + scripts/r1_t198_site_context.py for pool-string
+annots; E8 byte-pass if callers needed, NOT Ghidra get_function_callers —
+t198 pitfall), derive how the STAR_SHAPES (windows.txt:208 DATA\COS_STAR.SHP)
+record index is computed from ship/star state, and adjudicate whether the
+t196 dims-non-walkable residue k40..k51 is addressable by that selector at
+all (if the selector's range provably excludes 40..51, that is a CITED
+shrink of the OQ-005 residue toward the "broken/unused vendor records"
+reading; if it includes them, the dims-location question stays fully live).
+Bank to planets-ui.md S5 / shp.md; do NOT close OQ-005 either way
+(strict-close: player ruling on the 44 dims-unknowns still outstanding).
+Do NOT re-open: slot-library identity [0x6fd90/2/4/9c] (zero direct writers,
+live-capture class), span-bounded-walk (t197), planalNN poses (t196),
+visibility (t195 closed), gauge/pop laws (t199 landed — do not re-derive).
+RATIONALE: every other static candidate is spent or capture-gated; the AI
+gap rows (queue t198a/b) remain as fallback if 0x2925c decodes trivially
+early. After t200 the offline-static route to OQ-005 is exhausted and the
+loop should surface the decision trigger (player eyeball of
+work/r1/shp_png/index.txt).
 If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c), adjudication
 via scripts/r1_t85g_sitting.py STILL outranks everything.
-RATIONALE: the t198 directive output is a LAW with numbers; per GOAL.txt the
-loop's job is lifting such laws INTO the rewrite ("upgrading each rewrite
-default to the cited original behaviour"), and this is the cheapest possible
-landing (no Ghidra, no capture). The alternative static candidate (cos_star
-selector) only re-feeds OQ-005 residue, which needs the player anyway.
+
+LANDED t199 (2026-10-29, this session): REWRITE WIRING OF THE t198
+PLANET-UI VIS LAWS + POP-BAND PIN (pure code + docs; the cheapest landing
+t198 predicted). Trigger triage: timeline size 5,721,578,066 == frozen
+baseline (mtime 13:22:12.10), dosbox down -> no sitting; tree clean at
+d3b7ee6. CODE: ui::gaugeSelector (clamp0..20(lround(L^0.75))),
+ui::prosSelector (identity clamp) in rewrite/src/ui/layout.{h,cpp};
+Campaign::popBands (pure static) + popBandsFor on the +0x4c/+0x42/+0x4a
+analogs in campaign.h. LAWFULNESS EXTRA [proved before coding]: .5 ties in
+L^0.75 are IMPOSSIBLE (16*L^3 == odd^4, mismatched 2-adic valuations), so
+lround == the x87 frndint-nearest the original called — the C++ law is
+bit-identical on all inputs; full first-level table banked (0,1,2,4,6,8,10,
+13,15,18,21,23,26,30,33,36,39,43,46,49,53; unclamped 21 from L=57 -> the
+clamp20 branch is REAL for IND>=57). ARITHMETIC CORRECTION banked:
+planets-ui.md S3's "pow(53,0.75)=20.2" is actually 19.64 (t198 conclusion
+unaffected; doc amended). PINS: layout_planet_gauge_selector_law_t199
+(corpus anchors RES52->19 / IND53->20 / IND77->20-clamped, boundary-exact
+both sides at all 21 selectors, monotone 0..300, PROS identity 0..16 + clamp
+21->20) and campaign_pop_band_law_t199 (all five edge-class shapes verified
+against the verbatim formula — one synthetic expectation was wrong in MY
+first draft (used>pop), implementation correct, test fixed; independent band
+histograms count1==used/count2==pop-used/count3==cap-pop + used<=pop<=cap
+over 300 turns x all planets of seed 2024). 114 tests 0 failed. Rendering
+stays blocked on OQ-005 (ui-runtime.md §2 no-vendor-sprites rule) — landing
+documented as §2a; selection census ids folded into shp.md S22 (1starmap
+k3,k4,k5,k7 per windows.txt:456/477/498/517 re-verified this session;
+3cfgnew k0; planind ladder addressed 0..20). OQ-005 row stays OPEN (STATUS
+t199 appended — no residue evidence moved, wiring only). WIP:
+_wip_t199.md S0-S1. Gate 0 + LEDGER AUDIT OK + LEDGER INDEX OK; open =
+005/016/019/021.
 
 LANDED t198 (2026-10-29, this session): PLANET-SCREEN PAINT ROUTINE CENSUS —
 THE GAUGE COMPRESSION LAW AND POPULATION BAND LAW MEASURED (user directive
