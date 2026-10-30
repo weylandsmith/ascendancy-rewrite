@@ -253,55 +253,94 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t205: ADJUDICATE THE 0x13bc4/0x13bc5 TABLE IDENTITY — the ONE table
-two banked readings disagree about, surfaced by t204's law work:
-(a) t200 (planets-ui.md S6, scripts/r200_kcensus.py) reads STAR TYPE K from
-0x13bc5 + 0x60*star_idx (census {0..12} over 20 saves x 50 stars);
-(b) the 0x43a4c callers (t204 S2, cited 0x39f85/0x4b84b) build EBX =
-0x13bc5 + 0x60*RACE_IDX calling it the species record, and 0x43a99 reads
-BYTE[0x13bc4] as the subtrahend key (live 1 in 20/20 saves);
-(c) aicode §3/income-law S6 read DAT_00013bc4==2 as a SCALAR gov-type byte
-gate, and income-law S6-caveat(a) calls 0x13bc4 "species table stride 0x60
-holds nonzero small bytes at +0x15..+0x17". One table cannot be per-star AND
-per-race (race count word[0x13b98]==4, ~50 stars) — at least one reading
-consumes the wrong base or the wrong stride.
-PROBE PLAN (~corpus-static, saves + restored image only):
-(1) dump the region 0x13b98..0x13b98+0x60*60 from >=5 saves with the
-pointer law; print per-0x60-row byte signatures; compare against t200's K
-census AND against the race-count boundary (rows >= 4 should look like star
-data if the table is per-race, or K continues if per-star);
-(2) re-derive the t200 selection law's base from the COSMOSWnd star list
-(the builder 0x28fc0 stores record ptrs; follow one live ptr from a save and
-check it lands in 0x13bc5+k*0x60 for which k) — ptr law settles per-star vs
-per-race directly;
-(3) census writers of 0x13bc4..0x13bc5+0x60 in obj0 (r201_threat_writers
-pattern, resume-past-gaps) — a new-game init writer loop bounded by
-word[0x13b98] (races) vs the star count is decisive;
-(4) LAND whichever identity holds: correct the LOSER reading in place
-(planets-ui.md S6 and/or aicode §3 + income-law S6 caveat) with the cited
-witness; kAttackDipGovByte comment in diplomacy.h gets the row identity.
-RATIONALE: it is the only open operand-identity question a corpus-static
-iteration can settle; t204 shipped its law with this byte parameterized BE-
-CAUSE of the ambiguity (the pins cover 0/1/2 so no law depends on the ans-
-wer), but the dossier can't stay self-contradictory and every future diplo/
-species law that touches this table inherits the doubt. Cheaper and more
-decision-bearing than the alternatives: gap rows 11/12 leftovers are rewire
-work gated on row 12's ladder design; rows OQ-005/019/021 need play or the
-player (WATCH-ONLY).
-HOUSEKEEPING for whoever lands here (doc-only, not a second task): ai-dossier
-S8 row 11 still says ForcePeace/Hatred FILED NO-OPs — ForcePeace is WIRED
-(campaign.cpp SA_ForcePeace case, setWar loop); re-check Hatred vs CauseWar
-case and update the row text.
-Do NOT re-open: diplomacy-on-attack (t204 _wip_t204 S1..S5 — BYTE key,
-CEILING not floor, 3 callers exactly), free-tech grant (t203), demolish
-(t202/t202b), threat/emergency (t201), cos_star (t200), visibility (t195),
-pop/gauge (t199), relation enum (t189b). If t205's witness shows BOTH bases
-legitimate (e.g. 0x13bc5 == star table AND race rows live elsewhere with a
-caller miscomputation), THAT is the finding to bank — do not force a single
-loser.
+NEXT t206: CONSUMER LAW OF THE PER-STAR ATTACKED-MARK ARRAY [0x48304] —
+t205 resolved WHAT WRITES IT (byte[0x48304 + star_idx] |= 1<<victim-race,
+0x43afa, engagement star; docs/re/_wip_t205.md S6..S8); nobody has ever
+censused what READS it, and the rewrite currently treats the marks as pure
+bookkeeping (attackedMarks() has no game-logic consumer) — if the original
+feeds them into a decision (diplo emitter, AI target pick, event text), the
+rewrite is silently missing a channel. The reader census t205 ran
+(scripts/r205b_operand_census.py + imm pass; full site list banked _wip_t205
+L3) found EXACTLY: readers 0x4162f (inside guard ebx == [0x7458e] current
+player, dword[ebx+2]>>16 index form — same shape as the writer), 0x42bd2
+(inside a cmp byte[ebx+0x1c0],2 diplo-state guard block, index from
+dword[esp+0x394+2]>>16), 0x45e8d, the read/write pair 0x4610b/0x4611c
+(cl = [ebx+0x48304] then [ebx+0x48304] = cl — an OR/COPY with a neighbour
+byte?), 0x46213; plus the BIT-0 set/clear pair 0x24e84 (or 1) / 0x24e39
+(and 0xfe) inside star-record init 0x24f24 (its 0x25008 mov eax,0x48304 /
+call 0x76e30 = a fill — figure out what bit 0 means and who clears it).
+PROBE PLAN (~corpus-static; the r205d_windows.py disasm-window tool +
+functions_full.tsv attribution did all of t205's context work):
+(1) disasm 0x41600..0x416a0, 0x42bb0..0x42c60, 0x45e40..0x45ee0,
+    0x460f0..0x46260, 0x24e10..0x24ea0 + 0x24fb0..0x25020 CONTEXT and name
+    the enclosing functions (functions_full.tsv spans); decide for each
+    reader whether the value reaches a branch (decision), an event-text arg,
+    or another record's byte (propagation);
+(2) the 0x4610b/0x4611c pair is the highest-value site: a READ-MODIFY-WRITE
+    means marks TRANSFER or CARRY between stars/races (candidate: captured-
+    star mark inheritance, or a per-turn decay/clear — decay would FALSIFY
+    t204's PERMANENT claim; check it head-on);
+(3) land: per-consumer law into diplomacy.md (new S18) + ai-dossier row 12/
+    13 text; IF a decision-consumer exists, wire-or-file in campaign.cpp
+    with pins (mirror t204's discipline: pins cover both consumer states);
+    if all readers are display/text-only, bank the honest negative and keep
+    attackedMarks() bookkeeping (row 12 residue shrinks by the display part).
+RATIONALE: it is the direct open end of the thread t205 just finished (the
+mark array was DISCOVERED mid-task, its consumers were explicitly deferred,
+and t204's PERMANENT mirror claim is only safe once the 0x4611c write-pair
+is read); it is decision-bearing for the rewrite (a missing channel or a
+falsified permanence both change code); and it is the last corpus-static
+step of this family. Alternatives stay worse: gap row 12's inter-race state
+ladder is a design-shaped rewire (needs a BLOCKED-USER decision on
+projection), OQ-005/019/021 need play or the player (WATCH-ONLY), and the
+0x13bc4 scalar semantics need saves from other scenario families.
+Do NOT re-open: the 0x13bc5 = per-STAR identity (t205 W1..W4: 36 base sites
+vs zero strided on 0x13bc4, 20/20 save census, boundary == 50 stars,
+self-handle dword[+2]>>16 == k) — including "species table" re-reads of
+0x13bc4/0x13bc5; t205 CLOSED that argument in _wip_t205.md; also do not
+re-open t204's handler law itself (BYTE key, CEILING not floor, exactly 3
+callers — only the EBX/index identity and the [0x48304] shape changed),
+t203, t202/t202b, t201, t200, t195, t199, t189b.
 If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
 adjudication via scripts/r1_t85g_sitting.py STILL outranks everything.
+
+LANDED t205 (2026-10-30, this session): TABLE IDENTITY ADJUDICATED — 0x13bc5
+stride 0x60 is the per-STAR runtime STAR RECORD TABLE (t200 wins; the per-
+race/"species table" readings are the losers). Trigger triage: timeline size
+5,721,578,066 == frozen baseline, dosbox down, tree clean at 6c144fe -> no
+sitting; STATE t205 stood. WITNESSES [docs/re/_wip_t205.md S1..S8; tools
+r205_table_identity.py (20-save census), r205b_operand_census.py (disp32 +
+indexed), r205c_strided_consumers.py (IMMEDIATE-form bases — PITFALL:
+capstone CS_OP_IMM==2, an interim rev used type==1 and printed a FALSE zero),
+r205d_windows.py (verbatim windows) all RC=0]: rows 0..49 initialised 20/20,
+u32[+0] in {0..12} ALL 50 rows, name "Vega" row0, boundary == star count
+(u16[0x16145]==50) NOT race count (4); 36 absolute-base sites on 0x13bc5;
+stride-96 idiom verbatim 0x39f8b..0x39f9c/0x4b823..0x4b834; self-handle law
+MEASURED dword[0x13bc5+96k+2]>>16 == k (20/20). 0x13bc4 = ABSOLUTE SCALAR
+global: all 8 refs scalar byte reads (0x2b848/932/a19 three-way switch,
+0x39070/0x40bdd ==2 gates, 0x3f086, 0x40955, 0x43a99), ZERO strided refs,
+ZERO enumerated writers (rep-stos/copy init — outside operand enumeration);
+live value 1 20/20, ==2 arms never fire in captured scenarios (semantics need
+other-family saves — banked open). CONSEQUENCES LANDED: (1) t204's EBX =
+"species record per race" CORRECTED to the engagement-location STAR record
+(0x4b81a [esi+0x59] -> 0x4b82c -> 0x4b868); (2) [0x48304] is a PER-STAR BYTE
+ARRAY (byte[0x48304+star_idx] |= 1<<victim) — rewrite attacked_ upgraded from
+one byte to per-star vector + attackedAt(star), attackedMarks() OR-reduce
+keeps the t204 pin surface; honest negative SURVIVES (full window
+0x48304..+0x3f all-zero 20/20 — re-measured under the array reading); pin
+diponattack_mark_is_per_star_t205 discriminates array-vs-global; 129 tests
+0 failed; BLAST RADIUS UNCHANGED seed 2024 Control t1255 / seed 42 Extinct
+t979 CLI. (3) Docs corrected in place: diplomacy.md S17.1 (EBX + bitmap
+shape) + S17.3 (identity RESOLVED), income-law.md S6-caveat(a) (species
+table REFUTED, star-modifier candidate survives), ai-dossier S2 para + row
+11 housekeeping DONE (ForcePeace WIRED :1636, CauseWar WIRED-PARTIAL :1720,
+"Hatred" is NOT a 21-token roster token). OQ-016 STATUS t205 appended; row
+STAYS OPEN (mark consumer law unmapped -> t206; zero in-corpus witnesses;
+0x13bc4 semantics). PITFALLS BANKED: capstone imm-operand type == 2 (a
+type==1 census silently reports zero bases); test fixture owners referencing
+race 2 with aiCount=1 SEGFAULTS buildPhase (no dip row) — use default owners
+or supply every dip file. NEXT = t206 attacked-mark CONSUMER law.
 
 LANDED t204 (2026-10-30, this session): DIPLOMACY-ON-ATTACK CODED + PINNED
 (gap map row 13 GAP -> MODELLED — the last pure-GAP static row). Trigger

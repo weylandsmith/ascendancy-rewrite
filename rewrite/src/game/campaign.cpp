@@ -215,6 +215,7 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     Nowner_ = cfg_.aiCount + 1;
     war_.assign(Nowner_ * Nowner_, 0);
     fortify_.assign(galaxy_.stars.size(), 0);
+    attacked_.assign(galaxy_.stars.size(), 0);  // [0x48304] per-star array (t205)
     // Species ability assignment (docs/re/abilities.md §1): explicit vector
     // wins; otherwise derive from dip header tokens (race02 stays Unknown —
     // its header has no token, and the help.txt cross-check lives in
@@ -1932,8 +1933,15 @@ void Campaign::combatPhase() {
             if (a == kPlayer && b >= 1 && b - 1 < static_cast<int>(dipState_.size())) {
                 DipPolicyState& vst = dipState_[b - 1];
                 if (applyAttackDipCost(aiDip_[b - 1].values, vst.atWar, vst.allied,
-                                       kAttackDipGovByte, &vst.attitude))
-                    attacked_ |= static_cast<unsigned char>(1 << b);  // 0x43afa
+                                       kAttackDipGovByte, &vst.attitude)) {
+                    // t205 INDEX CORRECTION: original 0x43afa ORs into
+                    // byte[0x48304 + star_index] where the star is the
+                    // ENGAGEMENT LOCATION (the handler's EDX is a STAR record
+                    // built from the ship's +0x59 star pointer — 0x4b82c; the
+                    // index is dword[star_record+2]>>16 == the star's own
+                    // index). Not a per-race global byte as t204 mirrored.
+                    attacked_[nb] |= static_cast<unsigned char>(1 << b);
+                }
             }
             if (invadesAlwaysSucceeds(a)) {            // SA_SuperMarines (L1723 always succeed)
                 ind_[a] -= shipCostC;                  // the invasion ships

@@ -284,6 +284,16 @@ repelled attack still pays; global [0x48304]==0 20/20 (zero in-corpus
 witnesses). Rewrite MODELLED + pinned (test_diponattack_t204.cpp, gap map
 row 13). The "star-defense contribution" question is VOID.
 
+t205 OPERAND CORRECTIONS to the above (docs/re/_wip_t205.md): the handler's
+third arg (EBX at 0x4b875) is the STAR record of the engagement location
+(chain 0x4b81a mov eax,[esi+0x59] -> 0x4b82c lea 0x13bc5+96*star -> 0x4b868
+mov ebx,ecx), not a per-race species record; dword[star_record+2]>>16 == the
+star's own row index (20/20 saves), so 0x43afa writes a PER-STAR mark byte
+byte[0x48304+star_idx] |= 1<<victim-race. 0x13bc5 stride 0x60 is the runtime
+STAR table (t200 vindicated); 0x13bc4 is a scalar global (zero strided refs
+image-wide). Rewrite mirror corrected to a per-star vector (campaign.h
+attacked_/attackedAt; 129 tests 0 failed, blast radius unchanged).
+
 ## 2g. t88 W6-A3: GENERIC CAT-0 GUN PATH + FIRING ORDER + HIT PROBABILITY (all measured, restored image objdump)
 
 Sitting check first: live-timeline.jsonl 238,216 rows, watch.log tail all

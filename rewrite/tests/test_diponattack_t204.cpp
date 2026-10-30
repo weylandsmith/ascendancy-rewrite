@@ -236,6 +236,31 @@ TEST(diponattack_alliance_violation_t204) {
     CHECK((c.attackedMarks() & (1 << 1)) != 0);    // hostility mark
 }
 
+// ---- T5 (t205): the [0x48304] mirror is a PER-STAR ARRAY ------------------
+// t205 adjudication (docs/re/_wip_t205.md): 0x43afa ORs 1<<victim into
+// byte[0x48304 + star_index] (dword[edi+2]>>16 == the arg-2 STAR record's own
+// index, measured k<50 20/20 saves), NOT one global race-bitmap byte. A
+// per-race global would light the bit for every star; the array lights ONLY
+// the engagement-location cell. Fixture: s1 owner 1, s2..s4 owner 2 (never
+// fired at here) — after the s0->s1 shot, attackedAt(1) carries bit 1<<1 and
+// every other cell is zero.
+TEST(diponattack_mark_is_per_star_t205) {
+    std::string err;
+    ag::DipFile df;
+    if (!df.loadFromFile((kRepo / "extracted/ascend00/race00.dip").string(), &err))
+        std::abort();
+    auto c = buildFixture({df}, {ag::SpeciesAbility::HealShips});
+    c.setWarForTest(ag::kPlayer, 1, true);
+    c.advance();  // one s0->s1 engagement at star 1 -> d=20, mark written
+    CHECK((c.attackedMarks() & (1 << 1)) != 0);   // reduce-view still works
+    CHECK((c.attackedAt(1) & (1 << 1)) != 0);     // the ENGAGEMENT STAR cell
+    CHECK(c.attackedAt(0) == 0);                  // player's own star: clean
+    CHECK(c.attackedAt(2) == 0);                  // other stars: clean
+    CHECK(c.attackedAt(3) == 0);
+    CHECK(c.attackedAt(4) == 0);
+    CHECK(c.attackedAt(99) == 0);                 // out-of-range safe
+}
+
 TEST(diponattack_alliance_ceiling_t204) {
     // The 0x43acc CEILING end-to-end: attitude high enough that even the
     // doubled hit leaves it ABOVE the victim's break-alliance line.

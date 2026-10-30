@@ -434,14 +434,24 @@ public:
     void shareStarVision(int a, int b, bool bidirectional, bool allied);
     int playerScorePct() const;  // stars-owned share, static.txt '%'-template (§1)
     // t204 DIPLOMACY-ON-ATTACK readbacks (gap map row 13; law in
-    // diplomacy.h::applyAttackDipCost). attackedMarks(): the rewrite analog
-    // of the global byte at [0x48304] the handler ORs 1<<victim-race into
-    // (0x43afa) — PERMANENT (nothing ever clears it; the obj0 corpus shows
-    // no reader-side clear and none exists here, incl. peace). Bit r = race r
-    // was once fired at while NOT at war with the attacker (the -1 return
-    // path). dipStateAt(): the diplo-row analog cell (pin surface; tests
-    // const_cast like planetAt()).
-    unsigned char attackedMarks() const { return attacked_; }
+    // diplomacy.h::applyAttackDipCost), t205-corrected INDEX IDENTITY:
+    // [0x48304] is a BYTE ARRAY indexed by STAR INDEX, not one global byte —
+    // 0x43afa writes byte[0x48304 + (dword[edi+2]>>16)] and t205 measured
+    // dword[0x13bc5+0x60k+2]>>16 == k for every row k<50 (self-handle law;
+    // the EDX arg is a STAR record, cf. 0x4b806/0x4b82c building it from the
+    // ship's +0x59 star pointer). Byte value = mask of VICTIM races fired at
+    // at that star while NOT at war (the -1 return path). PERMANENT for the
+    // attack channel (no clear site for bits 1<<r exists; bit 0 has its own
+    // set/clear pair 0x24e84/0x24e39). attackedMarks() OR-reduces the array
+    // (the t204 pin surface); attackedAt(star) reads one cell.
+    unsigned char attackedMarks() const {
+        unsigned char m = 0;
+        for (size_t i = 0; i < attacked_.size(); ++i) m |= attacked_[i];
+        return m;
+    }
+    unsigned char attackedAt(int star) const {
+        return star >= 0 && star < static_cast<int>(attacked_.size()) ? attacked_[star] : 0;
+    }
     const DipPolicyState& dipStateAt(int ai) const { return dipState_[ai]; }
     std::string traceLine() const;  // one-line status for playthrough logs
     // Pick a Colony-Base cell the way the original's picker does: ONE
@@ -566,10 +576,14 @@ private:
     // per star. Model + constants: docs/re/turnloop.md §5 [inferred].
     std::vector<int> homeStar_;                   // per owner, fixed pickHomeStars id
     std::vector<char> war_;
-    // t204: global attacked-bitmap analog of [0x48304] (one byte, bit r set
-    // by 0x43afa when race r was fired at while NOT at war). PERMANENT —
-    // zero clear sites in the original corpus; none here (docs/re/_wip_t204).
-    unsigned char attacked_ = 0;
+    // t204: attacked-mark array analog of [0x48304] — t205 CORRECTED the
+    // index identity: one byte PER STAR (0x43afa writes
+    // byte[0x48304 + (dword[edi+2]>>16)], dword[star_record+2]>>16 == the
+    // row's OWN star index, measured k<50 20/20 saves), value = mask of
+    // victim races fired at at that star while NOT at war. PERMANENT for the
+    // attack channel (no clear site for 1<<r bits; bit 0 has an unrelated
+    // set/clear pair 0x24e39/0x24e84). docs/re/_wip_t205.md S2/S4.
+    std::vector<unsigned char> attacked_;
     std::vector<int> fortify_;
     // Species abilities (docs/re/abilities.md): ability_[o] = owner o's SA_
     // (Unknown = none); charge_[o] is the MEASURED count-up counter (original

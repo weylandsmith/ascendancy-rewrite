@@ -67,8 +67,10 @@ non-at-war power subtracts `10*(byte[0x13bc4]+1)` from their attitude toward
 you (the key is a BYTE, not a word — t204; live scenario value 1 in 20/20
 saves => -20, DOUBLED -40 if the relation state was 3), forces the victim
 under its own BREAK_ALLIANCE line when the shot left it above (a CEILING at
-0x43ae4, not a floor), and sets a permanent bit in the global "attacked"
-bitmap `[..+0x48304] |= 1<<race`. That is the
+0x43ae4, not a floor), and sets a permanent bit in the "attacked" mark array
+`byte[0x48304 + star_idx] |= 1<<race` (t205: PER-STAR array — the index is the
+engagement star's own row id via the arg-2 STAR record's +2 self-handle; not
+one global byte). That is the
 closest thing in the engine to a reputation system, and it is a *consequence*
 of shooting, never an input to the decision to shoot.
 
@@ -318,7 +320,7 @@ engine never evaluates the enemy's order of battle.
 | 8 | Single per-race target slot, research-row semantics, no geographic BFS (§3b) | **DIVERGENT BY DESIGN** — rewrite expansionPhase colonises via nearest-first BFS within drive range | expansionPhase :948 |
 | 9 | Colonised star := pop 2 + Colony Base grant (t41, measured) | MODELLED | seedColonyBaseColony :395 |
 | 10 | Ability cadence = cad[ability] days from image 0x6780, fire-on-exact-equality, reset (§6.4) | MODELLED (t100 kCad + abilityPhase) | abilityPhase :1077, species.cpp:30 |
-| 11 | 16 SA_ bodies incl. Repel/Sap/Block-lanes/Force-Peace/Hatred attitude arithmetic (§6.3) | PARTIAL — Sap/Heal/DoubleHull/SuperMarines wired; Repel, BlockStarLanes, ForcePeace, Hatred are FILED NO-OPs (no lane-block/attitude-cell model) | abilities.md §2, abilityPhase :1077 |
+| 11 | 16 SA_ bodies incl. Repel/Sap/Block-lanes/Force-Peace/Hatred attitude arithmetic (§6.3) | PARTIAL (row text t205 housekeeping) — Sap/Heal/DoubleHull/SuperMarines WIRED; ForcePeace WIRED (campaign.cpp SA_ForcePeace case ~:1636, ends all of the user's wars via the symmetric war_ bits); CauseWar WIRED-PARTIAL (~:1720: at-war-with-you races get player-facing attitude -250, third-party redirect no-op — no AI-vs-AI cell exists, gap row 12); still FILED NO-OPs: RepelAlienShips, BlockStarLanes; "Hatred" is NOT a roster token (21-token enum species.h — the §6.3 name maps to SA_CauseWar) | abilities.md §2, abilityPhase |
 | 12 | Diplomacy: attitude word + relation-STATE ladder 0..3 + proposal emitter + attacked-bitmap (§2) | PARTIAL — two-party war/peace/alliance from DIPVALUES thresholds (decideDipAction); no inter-race state ladder, no attacked marks | diplomacyPhase :1046, diplomacy.h:67 |
 | 13 | Diplomacy-on-attack attitude cost (0x43a4c) | MODELLED t204 (law re-verified verbatim + first caller census — exactly 3 callers, combat damage-apply 0x4b875 fires BEFORE the shield/hull subtraction; subtrahend key is the BYTE at [0x13bc4] (t87 said word), live ==1 20/20 saves => -20/-40; state-3 CEILING guarantees alliance death (diplomacy.md §17); attacked-bitmap [0x48304] mirrored by Campaign::attacked_ PERMANENT; pins test_diponattack_t204.cpp x4 incl. e2e cascade + ceiling; residues: zero in-corpus attack-event witnesses [0x48304]==0 20/20, AI-AI engagements have no attitude cell (row-12 projection), planet-event callers 0x39fba/0x3a255 unwired, per-shot stacking vs per-engagement aggregate) | combatPhase (0x4b875-position call) + applyAttackDipCost (diplomacy.cpp) |
 | 14 | Combat: deterministic damage, ordered cat-0 volley, shield-then-hull two-layer absorb, death at <1 (S2g/S2h, OQ-010 CLOSED t89) | MODELLED at empire-aggregate level (volley = Σ researched weapon Levels; shield absorb as clamped split) | attackScore :1249, defenseScore :1282, shieldChargesFor :1295 |

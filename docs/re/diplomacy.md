@@ -541,18 +541,25 @@ the first caller census of the handler; full working detail docs/re/_wip_t204.md
 
 17.1 LAW (verbatim, corrected against the t87 S2f-b summary):
 args EAX=obj=victim's diplo row (0x12e16+0x1ee*r), EDX=attacker race idx,
-EBX=species record 0x13bc5+0x60*r (holds the per-run handle at +2 used for
-the bitmap base). state=byte[obj+dx+0x1c0]: state==2 (WAR) -> return 0, NO
-write. Else d = 10*(MOVSX(byte[0x13bc4])+1) — a BYTE read (t87 said word;
-0x43a99 is movsx dx,BYTE) — doubled (add edx,edx) iff state==3; word
+EBX=STAR RECORD of the engagement location, 0x13bc5+0x60*star_idx (t205
+CORRECTION: t204 wrote "species record ... +0x60*r (r=race)" — the table is
+per-STAR; dword[record+2]>>16 == the row's OWN star index (measured k<50,
+20/20 saves) and the combat caller builds EBX from the ship's +0x59 star
+pointer 0x4b81a->0x4b82c->0x4b868; docs/re/_wip_t205.md W1..W4). state=byte[obj+dx+0x1c0]:
+state==2 (WAR) -> return 0, NO write. Else d = 10*(MOVSX(byte[0x13bc4])+1) — a
+BYTE read (t87 said word; 0x43a99 is movsx dx,BYTE) — doubled (add edx,edx)
+iff state==3; word
 [obj+2*dx+0x1b2] -= d. CEILING iff state==3 (0x43acc..0x43ae7): cmp new,
 word[obj+0x1cf] (=BREAK_ALLIANCE, §8); JLE skips -> iff new is STILL
 strictly above the victim's own break line, slam new := line-10. Net effect:
 firing at an ALLY always leaves the victim below its break line (either the
 -40 already got there, or the ceiling forces it) — an alliance violation is
 a guaranteed alliance death, not a probabilistic cooling.
-Then BYTE[[dword[edi+2]>>16]+0x48304] |= 1<<byte[obj+0] (victim's bit in the
-global attacked byte) and return -1.
+Then BYTE[[dword[edi+2]>>16]+0x48304] |= 1<<byte[obj+0] — the index identity
+is the arg-2 record's OWN star index (W4), so [0x48304] is a PER-STAR byte
+array (value = mask of victim races fired at at that star), not one global
+race-bitmap byte (t205; t206 owns the consumer law: readers 0x4162f/0x42bd2/
+0x45e8d/0x4610b/0x46213 + the bit-0 set/clear pair 0x24e84/0x24e39). Return -1.
 
 17.2 CALLERS (E8 byte-pass 0x14bb0..0x8cc83: EXACTLY three, zero packed-u32):
 0x4b875 combat damage-apply (fires BEFORE the shield/hull subtraction at
@@ -567,8 +574,14 @@ byte[0x13bc4]==1 in 20/20 (=> shipped-scenario subtrahend 20 / doubled 40;
 the STATE-assignment's "==2 => 30" claim did NOT reproduce), race count
 word[0x13b98]==4 20/20, global [0x48304]==0 20/20 — HONEST NEGATIVE: zero
 attacked-bit witnesses in the ring (nobody fired at a non-at-war power in
-captured play). [0x13bc4] row-identity (species table base vs standalone
-word) stays open residue; the law consumes the byte as measured.
+captured play; t205 re-measured the FULL window 0x48304..+0x3f — all-zero
+20/20, so the negative holds under the per-star-array reading too).
+[0x13bc4] row-identity RESOLVED t205 (docs/re/_wip_t205.md): it is an ABSOLUTE
+SCALAR global (all 8 image-wide references are non-strided scalar byte reads;
+zero strided sites on 0x13bc4/0x13bc5-as-base), NOT a table row — the stride-
+0x60 table at 0x13bc5 is the per-STAR table (t200 wins; race rows do not live
+there). Its scenario semantics (why ==1 gates the "==2" arms) stay open:
+needs a save from a scenario where the comparators fire.
 
 17.4 REWRITE: applyAttackDipCost (diplomacy.h/.cpp) verbatim + kAttackDipGovByte=1;
 combatPhase wires it at the 0x4b875 position (per engagement resolution,

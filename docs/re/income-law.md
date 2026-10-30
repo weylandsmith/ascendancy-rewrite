@@ -78,10 +78,14 @@ cap-cells reservation; u16[+0x1c]==cells on 115/153). It does NOT reproduce
 acc=(0,0) vs stored=(1,1) on facility-free owned planets (79 records), plus
 one non-monotone point (INDpre 3 -> stored 2). That pattern is NOT producible
 by any monotone post-transform of the accumulators, so at least one term is
-missing from the loop model — candidates in priority order: (a) species-record
+missing from the loop model — candidates in priority order: (a) ~~species-record
 per-planet-type IND/PROS modifiers (species table DAT_00013bc4 stride 0x60
 holds nonzero small bytes at +0x15..+0x17 that no code site in the recalc
-reads — readers not yet censused), (b) captured slots are load-time stale
+reads — readers not yet censused)~~ [t205 REFUTED as a species table: the
++0x15..+0x17 bytes are fields of the per-STAR table 0x13bc5 stride 0x60
+(docs/re/_wip_t205.md W1..W3), and 0x13bc4 is a scalar global with zero
+strided references image-wide; as a CANDIDATE (star-type per-planet modifier)
+the shape survives, as "species table" it is dead], (b) captured slots are load-time stale
 values (recalc does not run on load, so early-game values bake a pre-pow
 base), (c) an accumulator initialised outside 0x38ba4 (all eight accumulators
 are zeroed at entry @0x38bb5..0x38bd0, which argues against (c)).
