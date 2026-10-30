@@ -50,13 +50,21 @@ Phase order inside the turn (call sites verbatim):
   P7 SCORE/OWNERSHIP 0x250aa..0x2523e (gated DAT_00010ba0 == -1): walks
      the 0x60-stride star-owner table at 0x13bc5 (count
      DAT_00016145 hi-word... loop uses ds:0x16145), tests star owner bit
-     [star+0x15] bit<<race, and incs DAT_00048300 per owned star at
-     0x251a2 — SCORED-STAR PRODUCER FOUND [verified]: DAT_00048300
+     [star+0x15] bit<<race, and incs DAT_00048300 per owned star at 0x251a2 —
+     SCORED-STAR PRODUCER FOUND [verified]: DAT_00048300
      (owner-scan form) and per score.md S3 the printed DAT_000482fb is
      the same dword's byte/adjacent read (0x482fb vs 0x48300: 0x48300 is
      the INC target; OQ-021 row already keys on DAT_482fb — the producer
      walk here is the first cited writer path) [verified as producer of
      0x48300; the 0x482fb alias relation NOT re-measured this pass].
+     >>> t212 CORRECTION [score.md S9]: the alias claim is FALSE — this block
+     writes ONLY word[0x48300], OUTSIDE the displayed dword [0x482fb..0x482fe];
+     gate [0x10ba0]==-1 never fires in banked play and the body calls
+     0x77ece+0x7865a per iteration = a debug dump with a line counter. The
+     displayed count's writer has ZERO statically-encodable forms image-wide
+     (raw scan + disp32/imm census + RAM pointer census, all controlled) —
+     runtime-watchpoint class. Also the "+0x15 = star owner bit" label is
+     [unverified]: at every V==1 slot all 50 [star+0x15] bytes are 0.
   P8 (tail 0x2524a..) FUN_00024274 / 0x24a34 events; 0x2532a 0x40ec0;
      per-race command exec loop 0x2542d..0x2546f calling FUN_0002547c;
      0x2554f FUN_00041260 (race.cpp giant, size 0x2010) = the AI command

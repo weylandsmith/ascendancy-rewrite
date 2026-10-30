@@ -294,8 +294,33 @@ numbers). t187's falsification of systems_full as comparator re-confirmed at
 a second operating point. RESIDUE REFINED: not just the threshold — the
 DISPLAYED count itself needs its producing write-site pinned (comparator
 sweep within the new window against per-star control fields per
-scripts/r1_slot.py, if in watcher schema). | open (threshold residue +
-displayed-count write-site residue; RE unknown, passive capture live) |
+scripts/r1_slot.py, if in watcher schema).
+STATUS t212 (2026-10-30, static exhaustion of the write-site): (a) the
+aicode.md P7 "producer" writes WORD [0x48300] (0x2519b/0x25217/0x25225), a
+DIFFERENT slot from the displayed dword [0x482fb..0x482fe] — no alias
+(the doc's own caveat confirmed); that block is moreover gated [0x10ba0]==-1
+(never fires in banked play) and is a debug-dump-with-counter (calls 0x77ece
++ printf-family 0x7865a per iteration). (b) WRITER CENSUS = ZERO writes to
+0x482fb..0x482fe across THREE independent instruments with positive controls:
+capstone disp32+imm pass obj0 (scripts/r212_ref_census.py, controls 0x28074/
+0x280be/0x2519b/0x25008 found); DECODER-FREE raw image scan (pattern fb 82
+04 00 = EXACTLY 4 hits: 2 relocation-table + the 2 presenter disp fields
+0x28075/0x280c0 — rules out decode desync); live-RAM pointer scan 60.sav
+(every dword pointing into 0x482f0..0x48310 is a relocated operand field of a
+KNOWN instruction, byte-exact per scripts/r212_code_identity.py) + forward
+trace of all 145 immediate-loaded data-segment bases in [0x47f00,0x48b00)
+(scripts/r212_base_disp.py, 140,156 insns, zero [reg+disp] stores into the
+window). (c) CONCLUSION: the 12..22 oscillation is produced by a RUNTIME-
+COMPUTED store address (scaled-index / memory-loaded base / rep-span /
+register-transient class) — not statically enumerable; the decisive
+instrument is a dosbox-x-class write watchpoint, i.e. the SAME interactive
+session the comparator-firing test already needs. Also banked: at V==1 saves,
+byte[star+0x15]==0 on all rows (r212_predicate_corr.py, 90 trusted saves) —
+aicode P7's owner-bit label for +0x15 stays [unverified] and join-FAILS
+against V; current ring is the new-game ring (V=0, 4 nonzero +0x15).
+Full detail docs/re/_wip_t212.md S1..S7 + score.md S9. | open (threshold
+residue = play witness; displayed-count write-site = RESIDUE NOW NARROWED TO
+RUNTIME-WATCHPOINT CLASS, static route exhausted this iteration) |
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719

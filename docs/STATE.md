@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-30T21:05
+updated: 2026-10-30T23:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -166,7 +166,13 @@ ledger:
       comparator writes = ZERO direct encodings -> evaluator hunt via
       dark-zone enumeration (t73b); capture fallback. Default >1/2 stands.
       t189b STATUS: 14->21 drift real, NOT systems count; displayed-count
-      write-site is now the residue"
+      write-site is now the residue. t212 STATUS: write-site static route
+      EXHAUSTED — aicode P7 producer claim REFUTED (writes word[0x48300],
+      not the displayed dword); zero writer across disp32+imm census,
+      decoder-free raw scan (fb 82 04 00 = 4 hits, all accounted), RAM
+      pointer scan (all relocated operand fields), 145-base [reg+disp]
+      trace. Writer = runtime-computed-address class -> dosbox-x write
+      watchpoint, same session as the comparator-firing ask. score.md S9."
 
 ## WHAT IS IN HAND (tools + laws — a fresh session starts here, not from scratch)
 - R1 save-state capture LIVE: scripts/r1_savestate.sh (boot -> autosave ZIP,
@@ -253,51 +259,100 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t212: FIRST CHECK FOR A REAL SITTING (it outranks everything):
+NEXT t213: FIRST CHECK FOR A REAL SITTING (it outranks everything):
 TRIGGER-A baselines for work/r1/playcap/live-timeline.jsonl — full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail-64KiB md5 9054cc6c66802e6f80431d4ffa1416ee.
 If ANY differs, run scripts/r1_t85g_sitting.py adjudication BEFORE any static
-work (standing rule); a save where the player fights a multi-volley battle vs
-a non-at-war owner would witness the OQ-016 clamp residue at once (report
-measured, never fabricate).
-If no sitting armed, work t212 — OQ-021 DISPLAYED-COUNT WRITE SITE (the one
-open ledger row with a corpus-free static route; queue item authored t193-era,
-re-queued by t189b's finding):
-(1) The score law is TRUNC(100*DAT_482fb/T) (t73, presenter cluster
-    0x2c03a eventwnd.cpp); live witness: DAT_482fb oscillates 12..22 across
-    the t188b frames while systems_any=36/systems_full=34 stay FLAT same
-    frames (ships.md/score.md cites) — so the numerator is NOT a plain
-    systems count.
-(2) Find WHO writes it: operand census over obj0 for writes to the data-slot
-    static 0x482fb region (scalar byte/word/dword disp32 forms AND
-    reg+disp; capstone resume-on-gap; the t201 pitfall applies) — and per
-    the t191 law, if static writers come up ZERO, do the runtime-slot member
-    search in the 20-sav corpus (dword == value pattern at the KNOWN member
-    address first to confirm addressing, then writer chain disasm).
-    Candidates from t189b: per-star percent-controlled aggregate,
-    production-weighted count, recompute-only-on-screen-open.
-(3) Tie the oscillation to a named loop OR bank the narrowed writer chain as
-    honest residue; update OQ-021 STATUS + score.md. Bounded ~15 probes.
-RATIONALE: after t211 closed the commit-chain tail, EVERY residue of the
-attack-price/invasion family is play-gated (clamp witnesses) or BLOCKED-USER
-(OQ-019 per-ship model). OQ-021 is the last open row whose static residue
-(displayed-count write-site) was explicitly named; OQ-005's residues need a
-player ruling or live capture; OQ-019's static side is exhausted pending
-design decisions. Fallback if the write-site census dies clean: al-form
-[ship+0x62] value-source trace (t211 S4, low priority) then declare the
-static corpus exhausted and idle-wait honestly.
-Do NOT re-open: t211's dispatch law (three arms @0x49f28; 0x4a350 unbound —
-do NOT claim it dead, and do NOT re-scan for bindings without a new save),
-t210's stacking law (mode==1-only @0x4b7f1, volley 0x4a5c1 mode-0, commit
-loop 0x2550c one arm per matched gizmo, cat-5 loops 0x4d0a5/0x4d2ab, sole
-0x4cd90 caller 0x4a3c4) and tool pitfalls (capstone CS_OP_IMM==2; SCC not
-back-edge test), t209's out-param law + ATTEMPT-TIME clamp position, the
-t207 scale-2 algebra S7a, the caller census EXACTLY-{0x39fba,0x3a255,0x4b875}
-of 0x43a4c, t208's e2e pin semantics (setIndustryForTest has NO production
-call site — keep it that way), t206's two-channel consumer law, t205's
-per-STAR identity (0x13bc5 = star table — a fresh t212 hand may be tempted
-to re-read it as species table; it is NOT), t204, t203, t202/t202b, t201,
-t200, t195, t199, t189b.
+work (standing rule). A NEW sitting is now doubly valuable: (a) a save where
+the player fights a multi-volley battle vs a non-at-war owner witnesses the
+OQ-016 clamp residue; (b) a MID-CAMPAIGN slot (V=dword[0x482fb] > 1 AND some
+byte[star+0x15] nonzero) settles the OQ-021 S6 semantic non-join AND is the
+required witness for aicode P7's [star+0x15] label question (t212 S6).
+If no sitting armed, work t213 — DECLARE STATIC CORPUS EXHAUSTION and do the
+ONE remaining cheap static item, the t211-fallback al-form value trace:
+(a) FIRST verify exhaustion honestly (report, don't re-litigate): t212 closed
+    the OQ-021 write-site static route (score.md S9 — three controlled
+    instruments, zero writer; aicode P7 claim refuted). Every other open-row
+    residue is play-gated (OQ-021 comparator firing, OQ-016 clamp witnesses,
+    OQ-005 player index.txt ruling) or BLOCKED-USER (OQ-019 per-ship model).
+    Do NOT re-run t212's censuses; do NOT invent new static routes for
+    watchpoint-class problems.
+(b) THEN the al-form [ship+0x62] value-source trace (t211 S4: the cl==1
+    population is constant writers; al-forms 0x15c6d/0x15d98 = UI/setup
+    family, value residue explicitly banked low-priority): disassemble around
+    0x15c6d/0x15d98 (r205d_windows), identify WHAT writes byte[ship+0x62]
+    there and whether any path sets it to 1 outside the 9 known ==1 sites
+    (t211 S4 list). Expect a UI/setup answer; bank it either way. Bounded
+    ~8 probes.
+(c) If (b) lands, STATE's NEXT becomes an honest idle-wait list (watch-only
+    asks + the OQ-019 design decisions), because the static corpus is then
+    formally exhausted; say so plainly rather than queuing speculative work.
+RATIONALE: t212 spent its budget proving the OQ-021 writer is NOT statically
+findable; the al-form trace is the LAST residue explicitly named by a prior
+STATE block (t211's fallback). Nothing else open has a corpus-free static
+route. Chasing watchpoint-class questions statically is how iterations burn.
+Do NOT re-open: t212's writer-negative (a ZERO census with controls is the
+result — do NOT re-scan [0x482f0,0x48310] looking for it; the next
+instrument there is a runtime watchpoint, not another pass) and t212's P7
+correction (word[0x48300] != dword[0x482fb]; [star+0x15] label [unverified]
+— do not re-assert it as measured), t211's dispatch law (three arms @0x49f28;
+0x4a350 unbound — do NOT claim it dead, and do NOT re-scan for bindings
+without a new save), t210's stacking law (mode==1-only @0x4b7f1, volley
+0x4a5c1 mode-0, commit loop 0x2550c one arm per matched gizmo, cat-5 loops
+0x4d0a5/0x4d2ab, sole 0x4cd90 caller 0x4a3c4) and tool pitfalls (capstone
+CS_OP_IMM==2 AND .imm not .immediate (t212 hit); resume-on-gap MUST restart
+the generator and CHECK the decoded count ~140,156 (t212 re-hit — a silent
+8,961-insn pass nearly passed as clean); SCC not back-edge test), t209's
+out-param law + ATTEMPT-TIME clamp position, the t207 scale-2 algebra S7a,
+the caller census EXACTLY-{0x39fba,0x3a255,0x4b875} of 0x43a4c, t208's e2e
+pin semantics (setIndustryForTest has NO production call site — keep it that
+way), t206's two-channel consumer law, t205's per-STAR identity (0x13bc5 =
+star table — a fresh hand may be tempted to re-read it as species table; it
+is NOT), t204, t203, t202/t202b, t201, t200, t195, t199, t189b.
+
+LANDED t212 (2026-10-30): OQ-021 DISPLAYED-COUNT WRITE SITE — STATIC ROUTE
+EXHAUSTED, P7 PRODUCER CLAIM REFUTED (docs/re/_wip_t212.md S1..S7 +
+score.md S9 NEW; tools r212_ref_census / r212_raw_and_ptr / r212_code_identity
+/ r212_base_disp / r212_predicate_corr NEW, all RC=0). Trigger triage:
+timeline mtime 1793294532 / size 5,721,578,066 / tail md5 9054cc6c... ==
+frozen baselines, dosbox down, tree clean at 6bca4ce -> no sitting; STATE
+t212 stood. THE ANSWERS:
+(1) AICODE P7 "SCORED-STAR PRODUCER" IS THE WRONG SLOT: block 0x250aa..
+    0x2523e writes ONLY inc word[0x48300] (0x2519b) + RMW 0x25217/0x25225 —
+    OUTSIDE the displayed dword [0x482fb..0x482fe]; gated [0x10ba0]==-1
+    (never fires in banked play); calls 0x77ece(0x838bf,0xd12)+printf 0x7865a
+    per iteration = debug dump with line counter. aicode.md corrected in place.
+(2) ZERO WRITERS image-wide, three controlled instruments: (i) capstone
+    disp32+imm census region [0x48200,0x48400): only the presenter reads
+    0x28074/0x280be + word[0x48300] triple + 0x48304 mark family; (ii)
+    DECODER-FREE raw scan: LE fb 82 04 00 EXACTLY 4x = 2 relocation-table
+    entries (0x2783/0x27ae — that window is the fixup table, shape 05 02
+    <addr> 07) + the 2 presenter disp fields; (iii) 60.sav RAM pointer scan
+    both reloc forms: all 17 dwords into the region are relocated operand
+    fields of KNOWN instructions (byte-exact prefix+dword match; unrelocated
+    forms absent). (iv) base+disp sweep: 145 mov/lea reg,imm bases in
+    [0x47f00,0x48b00), forward-traced to register death = ZERO stores into
+    the window (140,156 insns decoded, t211-count check caught my own
+    silent-gap death at 8,961 — t201 pitfall RE-HIT and banked with the
+    count-guard fix).
+(3) CONCLUSION (honest negative, row OPEN strict-close): the 12..22
+    oscillation needs a RUNTIME-COMPUTED store address (scaled-index /
+    memory-loaded base / rep-span / register-transient); decisive instrument
+    = dosbox-x write watchpoint on the slot — bundle that ask with OQ-021's
+    existing comparator-firing interactive session.
+(4) SEMANTIC NON-JOIN banked: V in {0,1} across ALL 90 trusted banked slots
+    (mid-campaign slots no longer on disk); every V==1 slot has ALL 50
+    byte[star+0x15]==0; current new-game ring: V=0 with 4 nonzero +0x15 —
+    P7's owner-bit label joins FAIL against V; [unverified] flagged in
+    aicode.md, do not re-assert as measured.
+(5) REWRITE: NO change (OQ-021 default >1/2 campaign.cpp:738 stands;
+    semantic surface untouched). Docs: _wip_t212 NEW, score.md S9 NEW,
+    aicode.md P7 correction block, OQ-021 STATUS t212 appended, STATE ledger
+    index mirrored.
+Gate 0 + LEDGER AUDIT OK + LEDGER INDEX OK; NEXT=t213 (sitting check first —
+mid-campaign slot now settles TWO residues; else al-form [ship+0x62] value
+trace at 0x15c6d/0x15d98, then formal static-exhaustion declaration + honest
+idle-wait list).
 
 LANDED t211 (2026-10-30): COMMIT-CHAIN TAIL CLOSED — SECOND-DOOR NEGATIVE +
 SPLASH BOUND NAMED (docs/re/_wip_t211.md S1..S6; tools r211_probe_a..f NEW,

@@ -217,3 +217,70 @@ victory screen appears or sel arms, THAT is the closing measurement;
 until then row OQ-021 STAYS OPEN (strict-close; consistent-with >1/2
 only). Watch.out grep for sel=[1-9] and DAT_482fb>=25 is the cheap
 next-iteration check.
+
+## S9 — t212: the displayed count has NO statically-encodable writer [measured]
+
+S2's "[inferred] DAT_000482fb = player-controlled star count (producer
+untraced)" and aicode.md P7's claim that the 0x250aa star-owner walk produces
+this value are BOTH now measured against:
+
+1. WRONG SLOT [verified, work/t212_w1.txt = disasm 0x250aa..0x2523e]: that
+   block writes ONLY `inc word [0x48300]` (0x2519b) and the RMW pair
+   0x25217/0x25225. 0x48300 lies OUTSIDE the displayed dword
+   [0x482fb..0x482fe] — the "0x48300 is the INC target, alias of 0x482fb"
+   note in aicode.md P7 is FALSE (its own caveat, now discharged). The block
+   is also gated `cmp dword [0x10ba0],-1` @0x250aa (banked play holds 0 →
+   never runs) and calls 0x77ece(file 0x838bf, line 0xd12) + printf-family
+   0x7865a (fmt 0x838cf) per iteration: a vendor DEBUG dump with a line
+   counter, not the score producer.
+
+2. ZERO WRITERS, three independent instruments (positive controls on each —
+   a zero from a linear decoder is worthless without them, t211 law):
+   * scripts/r212_ref_census.py (capstone, detail=True, resume-past-gaps),
+     region widened to [0x48200,0x48400): 16 memory-operand refs total = the
+     two presenter READS `mov eax/edx, ds:0x482fb` (0x28074, 0x280be), the
+     word[0x48300] triple above, and the 0x48304 per-star attacked-mark
+     family (t205/t206). Address-taking immediates: only 0x25008
+     `mov eax,0x48304` (scenario-init memset) + jump-target false positives.
+     Controls 0x28074/0x280be/0x2519b/0x25008 all found → RC=0.
+   * DECODER-FREE raw byte scan of the whole restored image (0..0x8cc83):
+     LE pattern `fb 82 04 00` occurs EXACTLY 4× — 0x2783, 0x27ae (inside the
+     relocation-fixup table; the 0x2740..0x2870 window is fixup records: the
+     recurring `05 02 <data-seg addr> 07` shape also carries 0x16143 @0x2777,
+     0x7458e @0x27c7, 0x13b98 @0x27d0) plus 0x28075 and 0x280c0 = the disp
+     fields of the two presenter moffs reads. So no undisplaced/desynced
+     disp32 store to the slot exists anywhere in the image.
+   * scripts/r212_raw_and_ptr.py + r212_code_identity.py (60.sav, B=0x1bf4d8,
+     P0=B+0x82bb0=0x242088): all 17 dwords in guest RAM pointing into
+     0x482f0..0x48310 (both candidate relocated forms) are the operand fields
+     of the KNOWN instructions above — each found byte-exact as
+     instruction-prefix + relocated disp32 (phys form P0+X-0x88; the lin form
+     and the unrelocated image form are absent → single patched load). No
+     pointer VARIABLE references the score block.
+   * scripts/r212_base_disp.py (140,156 decoded insns — matches t211's census
+     count exactly; a first draft died at the first gap with 8,961, the t201
+     pitfall caught by the count check): enumerated 145 `mov/lea reg,imm32`
+     loads with imm in the data-segment neighbourhood [0x47f00,0x48b00) and
+     traced each forward until the base register dies, reporting any
+     [reg+disp] store (any width) landing in the window, plus any rep-while-
+     EDI-at-base. ZERO hits.
+
+3. WHAT THAT LEAVES: the S6/S8 oscillation (DAT_482fb walking 14,15,12,16,21,
+   19,22 while systems_any/full stay flat) must come from a store whose
+   address is COMPUTED at runtime, which no static census can enumerate:
+   scaled-index with a runtime index, a base loaded from memory, a rep
+   movsb/stosd span crossing the slot, or a pointer that only ever lives in
+   registers. The decisive instrument is a runtime WRITE WATCHPOINT
+   (dosbox-x-class) on guest-phys = B+0x82bb0+0x482fb-0x88 — the same
+   interactive session OQ-021's comparator-firing test already needs, so the
+   two asks should be served together. Row STAYS OPEN (strict-close).
+
+4. SEMANTIC NON-JOIN [measured, scripts/r212_predicate_corr.py, 90 trusted
+   saves over work/r1/r1sav-* + r1deep-* + playcap]: V=dword[0x482fb] ∈ {0,1}
+   in every slot still on disk (the t85b 12..23 trajectory survives only in
+   watch logs), and in EVERY V==1 save byte[star+0x15] is 0 across all 50
+   star rows — while the current (new-game) ring holds 4 nonzero +0x15 bytes
+   with V==0. So aicode.md P7's "star owner bit [star+0x15]" label is
+   [unverified] and does not join to V; t206's cited +0x15 use is a VISION
+   byte. A mid-campaign slot with both fields non-degenerate is the witness
+   needed to settle it; the corpus holds none.
