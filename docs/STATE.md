@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T22:20
+updated: 2026-10-30T00:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,40 +253,87 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t202: AI GAP ROW 4 — DEMOLISH CHANNEL IN buildPhase (queue item
-"t198 AI GAP ROWS 3+4" second half; t201 CLOSED its half outright, so
-this is the direct continuation). LAWS ALREADY BANKED (do not re-derive;
-income-law.md S9 + work/ai_selector_disasm.txt lines 60-230):
-(1) OVER-CAP EMERGENCY 0x3f178: used(+0x4c)>=cap(+0x4a) -> among occupied
-cells <+0x18 skip empty & item 5, pick item with LARGEST MPOP (byte+3,
-gate >0), DEMOLISH FUN_00038840 cmd1 @0x3f1e9; if still used>=pop after
-demolish -> RETURN; free-pop recheck @0x3f1fb.
-(2) ELSE used>=pop -> return @0x3f220 (the "no free pop, no build" law).
-(3) MIN-REQUIRES DEMOLISH SWEEP 0x3f354 (free pop exists): occupied cells
-<+0x18 with MPOP < cap-pop AND smallest byte+5 REQUIRES (ecx sentinel
-0x1869f never binds) -> DEMOLISH cmd1 @0x3f403; free-pop recheck @0x3f414
-else return.
-(4) TRANSPORT-TUBES PRIORITY 0x3f2c8 (research-mask bit set & no item 21:
-demolish/buy path @0x3f344) — include if context allows, else queue t203.
-Rewrite: Campaign::buildPhase models none of this (gap map row 4 "no
-demolish channel"); add demolish on the ps.items/itemCells analog + pins
-(edge classes: used>=cap fires; used==cap-1 no; largest-MPOP tie -> first
-cell; empty/CB skipped; post-demolish recheck return). NOTE the t201
-chain runs AFTER the sweeps at 0x3f4d5 (ordering already wired correctly:
-emergency block precedes scoring, and t201's block sits where the sweeps
-WILL go — insert the sweeps BEFORE the emergency block, keeping the
-0x3f178 early-return semantics). Sizing ~25 probes (pure code + tests;
-disasm already banked).
-Do NOT re-open: threat/emergency laws (t201 landed, ai-dossier.md S10 +
-pin campaign_emergency_chain_law_t201), cos_star selector (t200), slot-
-library identity (live-capture class), visibility (t195), gauge/pop laws
-(t199), relation enum (t189b). WATCH-ONLY unchanged (STATE tail).
-RATIONALE: gap map S8 names #3+#4 as the pair that would make AI economic
-behaviour visibly match stock; #3 landed t201, #4 is its exact twin sweep;
-everything else open needs play, the player, or is t203-scoped minutiae.
+NEXT t202b: DEMOLISH CHANNEL — PURE CODE + PINS (t202 measured every
+law; nothing left to probe). Scope, all inputs already on disk in
+docs/re/_wip_t202.md (S1..S14 — READ IT FIRST; gate polarity was
+mid-session flipped twice there, the FINAL law is S2/S13):
+ (1) usedPopFor UPGRADE (campaign.h): pending-UPOP -> UPOP sum over
+     ps.items (excl item 23, excl item flags&0x40) + gov-35 term kept
+     (S11: 2760/2900 M4 + 140 M3 Automation-shape). CHECK blast radius:
+     campaign_pop_band_law_t199 histograms + needClassFor popMinusPend
+     (t199 pin expectations shift from pending-only to full sum — update
+     the test, keep the band FORMULA untouched) + t45 governor pin stays.
+ (2) buildPhase AI branch (campaign.cpp :1032ff), insert BEFORE the t201
+     emergency block, verbatim order S13: over-cap gate usedPop>=
+     storedCap -> victim = cell-order scan (skip empty, skip item 5, skip
+     mpop!=0, LARGEST upop strict>, upop>0 floor) -> erase items[k]+
+     itemCells[k] -> post recheck used'>=pop -> skip selector; else
+     used>=pop -> skip; TRIAGE gate runs iff emptyNR<2 OR (emptyNR==
+     emptyB && abilityOf(o)==BuildOnBlack==false) -> sweep = min-requires
+     (skip mpop >= cap-pop; strict-< requires incl 255; first-cell ties)
+     -> demolish; shared gate 0x3f41e (emptyNR==0 -> skip; emptyB==emptyNR
+     && !BB -> skip) then t201 chain + scorer UNCHANGED (S12 proves the
+     t201 caller wiring faithful — do NOT touch its -1 semantics).
+ (3) PINS: two pure static pickers (overCapDemolishPick /
+     minRequiresDemolishPick, edge classes per S1/S4/S13: tie-first-cell,
+     CB-skipped-in-overcap but NOT in sweep, mpop-0 UPOP-0 never wins,
+     255-requires participates) + end-to-end: synthetic planet pinned at
+     used==cap demollishes within one advance() and queues next turn.
+ (4) DOCS: ai-dossier gap row 4 GAP -> MODELLED (tubes sub-item = cited
+     dead path); income-law.md S9 OVER-CAP paragraph corrected (largest-
+     MPOP -> largest-UPOP-among-MPOP-0, cite _wip_t202 S1; file is NOT
+     gate-regenerated — verified t202); OQ-016 STATUS t202b appended.
+RATIONALE: t202 banked the full law set + corpus fire-rates (220/2900
+over-cap LIVE); the code is mechanical transcription + pins, ~25 probes,
+zero new measurement. Do NOT re-open: threat/emergency (t201+t202 S12),
+triage-gate re-derivation (S2 FINAL), +0x4c model (S11), cos_star (t200),
+visibility (t195), pop/gauge laws (t199), relation enum (t189b). Then
+t203 candidate banked: gap row 7 free-tech grant FUN_00046e84 on build
+completion (ai-dossier S3c; static).
 If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
 adjudication via scripts/r1_t85g_sitting.py STILL outranks everything.
+
+LANDED t202 (2026-10-30, this session): AI GAP ROW 4 DEMOLISH CHANNEL —
+LAWS FULLY MEASURED; CODE DEFERRED to t202b (budget stop; measurements
+were the risk, they are banked). Trigger triage: timeline size == frozen
+baseline exactly, dosbox down, tree clean at 85afdf7 -> no sitting.
+KEY MEASUREMENTS [all cited, _wip_t202.md S1..S13; tools NEW
+r202_triage_census.py RC=0 (dump work/r1/t202_triage_dump.txt),
+r202b_layout_verify.py, r202c_usedpop_adjudicate.py,
+r202d_usedpop_models.py RC=0]:
+(1) +0x4c USED-POP = UPOP sum over ALL slotted items (excl item23 /
+item flags&0x40 / slot flags&2) — 2760/2900 exact; residual 140 =
+act+1 Automation shape; pending-term INERT 2900/2900. t28 "inactive/
+pending-only" READING SUPERSEDED.
+(2) OVER-CAP 0x3f178 IS LIVE TRAFFIC: 220/2900 fire (always used==pop
+==cap); VICTIM LAW CORRECTED (t28 had bytes inverted): skip item 5,
+skip MPOP!=0 (0x3f1bb), pick LARGEST UPOP (byte+4, 0x3f1c1, strict>,
+first cell ties, UPOP>0 floor). No candidate -> vendor assert + RETURN.
+(3) PRE-TRIAGE GATE 0x3f252 (never banked by t28): triage RUNS iff
+emptyNonRock<2 OR (emptyNonRock==emptyBarren AND ability != 2); ability
+byte = diplo row +0x19d (measured 60.sav {0:19,1:2,2:11,3:0,4:8}; ==2 ==
+SA_BuildOnBlack). Healthy planets NEVER triage.
+(4) SWEEP 0x3f354 verbatim: margin cap-pop, MPOP<margin, min-REQUIRES
+strict-<, 0xFF PARTICIPATES (sentinel 0x1869f never prunes — t28's
+"never binds" stands with corrected reason); NO item-5 skip. Post-
+demolish recheck path provably unreachable from the pre-guard (banked).
+(5) t201 CALLER WIRING RE-VERIFIED FAITHFUL: FUN_0003fc4c returns
+0xffffffff ON EVERY SUCCESSFUL BUY and 0 on no-force (t201_fc4c lines
+19/62/116/158/193 vs 3feb9) — je-0x3f74c means forced->no-scoring; the
+rewrite's item-id/-1 mapping matches. A mid-session "inversion bug"
+claim was WRONG (S12 documents both states so nobody re-fixes it).
+(6) ZERO in-ring demolition EVENT witnesses (adjacent-save multiset diff
+0/20 pairs — same-turn ring cluster); branch PRECONDITIONS measured
+instead (honest negative, strict-close: no row moved).
+TOOLS PITFALLS BANKED: member base B = H + 0x1BF450 (H=find_base vote
+- 0x1BF450; wrong SIGN wraps indices to zeros SILENTLY — item-table
+name self-check mandatory); slot walk bound must cover cap<=83 (a
+capw<40 bound silently skipped every big planet); planitem.txt item rows
+start after the '39 22 9' line. rewrite/ UNCHANGED this session (one
+drafted usedPopFor edit REVERTED — land it with its pins in t202b).
+Gate + ledger checks below.
+
 
 LANDED t201 (2026-10-29, this session): AI THREAT-BYTE INPUT + EMERGENCY
 CHAIN CLOSED WITH MEASUREMENT; REWIRED + PINNED (gap map row 3 ->
