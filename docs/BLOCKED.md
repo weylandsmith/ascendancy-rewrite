@@ -134,6 +134,14 @@ by gate 3n):
   views SWALLOW clicks, see 06f/06j). Schedule by TIME and verify by TURN
   number in checkpoints, never by counting slots: at 10 s autosaves a turn
   may straddle 1-3 slot copies and slots rotate 41..60 cyclically.
+- TIMELINE-MINING LAW (t214, docs/re/_wip_t214.md S6..S7): event COUNTS from
+  live-timeline.jsonl come ONLY through r1_stream.observations(trust=True) —
+  the shared capture dir accumulates watcher instances (4 live at t214, up to
+  12 writers historically), so raw row counts are inflated 4.26x overall and up
+  to ~12x locally with no global correction constant. Duplicate (file,mtime_ns)
+  rows carry zero content conflicts, so the trusted path stays lossless. Run
+  scripts/r214_triage.py as the pre-mining gate (watcher census + tail collapse)
+  before mining any fresh sitting.
 - exit codes: 0 = base derived / upgrade formulas; 1 = normal negative,
   record ONE line in STATE.md, no in-turn retry; 2 = harness bug, fix it
 

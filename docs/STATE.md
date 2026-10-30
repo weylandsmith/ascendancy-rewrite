@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-30T23:40
+updated: 2026-10-31T00:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -259,48 +259,90 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t214: SITTING ADJUDICATION, AND ONLY THAT (static corpus formally
-EXHAUSTED at t213 S7 — there is NO static work left to fall back to; do not
-invent any).
+NEXT t215: SITTING ADJUDICATION, AND ONLY THAT (static corpus formally
+EXHAUSTED at t213 S7; t214 added no new static route, only instrument health —
+do not invent any).
 TRIGGER-A baselines for work/r1/playcap/live-timeline.jsonl — full-ns mtime
-1793294532100000000 / size 5,721,578,066 / tail-64KiB md5 9054cc6c66802e6f80431d4ffa1416ee (re-verified unchanged t213).
-If ANY differs: run scripts/r1_t85g_sitting.py adjudication, then mine the
-sitting for the two named witnesses — (a) a multi-volley battle vs a
-non-at-war owner (OQ-016 clamp witnesses; the ONLY thing that closes the
-zero-witness residue), (b) a MID-CAMPAIGN slot (V=dword[0x482fb] > 1 AND some
-byte[star+0x15] nonzero) which settles the OQ-021 S6 semantic non-join AND
-witnesses aicode P7's [star+0x15] label question.
-If NO sitting: the ledger's open rows are ALL (i) play-gated (OQ-021
-comparator firing, OQ-016 clamp witnesses), (ii) BLOCKED-USER (OQ-019
-per-ship/commit conversion, OQ-005 index.txt ruling), or (iii) watchpoint-
-class (OQ-021 writer -> needs a dosbox-x write-watchpoint session, which is
-a USER-APPROVED harness ask, not static work). In that case write the honest
-idle-wait line into STATE and STOP — a committed no-op note beats invented
-censuses (t212 law: re-running a censused instrument without new inputs is
-net-negative).
-USER ASKS (standing, both cheap, both gate closers): (1) play a few turns
-attacking a non-at-war power mid-campaign + save (kills OQ-016 witness +
-OQ-021 firing asks at once); (2) an OQ-019 ruling on whether the rewrite may
-model per-commit attack pricing.
-RATIONALE: t213 closed the last residue named by any prior STATE block (the
-t211 al-form fallback) with a dominance-checked measured negative: both
-al-forms are batcon order-commit sites in 0x156d4 producing phase in {0,1}
-only — cl>=2 is defensive dead code; NO rewrite delta. Nothing open has a
+1793294532100000000 / size 5,721,578,066 / tail-64KiB md5 9054cc6c66802e6f80431d4ffa1416ee (re-verified byte-identical t214 via scripts/r214_triage.py).
+Prefer running scripts/r214_triage.py as the single triage call: it checks all
+three baselines, censuses watcher instances, and reports the tail collapse
+factor in one RC=0 pass (cheaper than hand-rolled stat+md5+pgrep).
+If ANY baseline differs: (1) run scripts/r214_triage.py FIRST (watcher census +
+collapse), (2) run scripts/r1_t85g_sitting.py adjudication on the named dir,
+(3) mine the two named witnesses — (a) a multi-volley battle vs a non-at-war
+owner (OQ-016 clamp witnesses; the ONLY thing that closes the zero-witness
+residue), (b) a MID-CAMPAIGN slot (V=dword[0x482fb] > 1 AND some byte[star+0x15]
+nonzero) settling the OQ-021 S6 semantic non-join + P7 label question. Mine
+COUNTS ONLY through r1_stream.observations(trust=True) — raw row arithmetic is
+writer-multiplicity garbage (t214: 4.26x overall, up to ~12x locally, no global
+constant; docs/BLOCKED.md R1-runbook TIMELINE-MINING LAW).
+If NO sitting: write the honest idle-wait line into STATE and STOP (t212 law:
+re-running a censused instrument without new inputs is net-negative). The open
+rows are ALL play-gated (OQ-021 comparator firing, OQ-016 clamp witnesses),
+BLOCKED-USER (OQ-019 per-ship/commit conversion, OQ-005 index.txt ruling +
+dims residue), or watchpoint-class (OQ-021 writer; dosbox-x IS installed at
+/usr/bin/dosbox-x — the blocker is the supervised session, not tooling).
+USER ASKS (standing): (1) play a few turns attacking a non-at-war power
+mid-campaign + save (kills OQ-016 witness + OQ-021 firing asks at once); (2) an
+OQ-019 ruling on whether the rewrite may model per-commit attack pricing;
+(3) NEW t214, cheap hygiene: the shared capture dir has 4 live
+r1_playcap_watch.py instances (27774 + orphans 260988/290953/292085) and the
+next sitting will inherit them — retire the orphans before the next capture
+(a supervised-session decision; research iterations must NOT kill them).
+RATIONALE: t214 confirmed no sitting on three independent signals and produced
+the capture-health audit (four-writer multiplicity measured, inflation profile
+over the whole file, and the claim-safety check proving every banked count came
+through the deduped trusted path — no restatements owed). Nothing open has a
 corpus-free static route; only new play or user decisions move the ledger.
-Do NOT re-open: t213's al-form verdict (site 1 ==1 / site 2 ==0 are
-dominance-PROVED — do not re-trace [esp+0x50]/[esp] defs; the 0x156d4
-entry-table question at file 0x88408 is banked as irrelevant to the verdict),
-t212's writer-negative (a ZERO census with controls IS the result; next
-instrument = runtime watchpoint), t212's P7 correction (word[0x48300] !=
-dword[0x482fb]; [star+0x15] label [unverified]), t211's dispatch law (three
-arms @0x49f28; 0x4a350 unbound — not dead, re-scan only with a new save),
-t210's stacking law + tool pitfalls (capstone CS_OP_IMM==2 AND .imm; resume-
-on-gap MUST check decoded count ~140,156; SCC not back-edge), t209's
-out-param law + ATTEMPT-TIME clamp, t207 scale-2 algebra S7a + caller census
-EXACTLY-{0x39fba,0x3a255,0x4b875}, t208 e2e pin semantics
-(setIndustryForTest has NO production call site), t206 two-channel consumer
-law, t205 per-STAR identity (0x13bc5 = star table), t204, t203, t202/t202b,
-t201, t200, t195, t199, t189b.
+Do NOT re-open: t214's no-sitting adjudication and mining law (the collapse
+factor is MEASURED with content-conflict controls; do not "verify" it again
+without a new sitting; do not kill watchers as research side effects),
+t213's al-form verdict (site 1 ==1 / site 2 ==0 are dominance-PROVED — do not
+re-trace [esp+0x50]/[esp] defs), t212's writer-negative (a ZERO census with
+controls IS the result; next instrument = runtime watchpoint), t212's P7
+correction ([star+0x15] label [unverified]), t211's dispatch law (0x4a350
+re-scan only with a new save), t210's stacking law + tool pitfalls, t209's
+out-param law + ATTEMPT-TIME clamp, t207 scale-2 algebra S7a + caller census,
+t208 e2e pin semantics, t206 two-channel consumer law, t205 per-STAR identity,
+t204, t203, t202/t202b, t201, t200, t199, t195, t189b.
+
+LANDED t214 (2026-10-31): NO SITTING + CAPTURE-HEALTH AUDIT (four-writer
+multiplicity measured; NO ledger row moved — strict-close honored; docs/re/
+_wip_t214.md S1..S8 NEW; tools r214_triage.py / r214_inflation_profile.py NEW,
+RC=0). Trigger triage: all three TRIGGER-A baselines byte-identical, zero
+dosbox/ascend.exe processes (comm-class matching — a pgrep -f "hit" was the
+probe's own cmdline), zero new saves anywhere under /home/hrethric, caps/ empty,
+no game mount, 240,249 rows unchanged -> sitting script correctly NOT run (t152
+trap). THE ANSWERS:
+(1) FOUR watcher instances share the capture dir: wrapper+child pair
+    (27772/27774, the t115-sanctioned shape) PLUS three orphaned instances
+    (260988 up since 10-28, 290953/292085 since 10-29) — NOT explained by the
+    t115 pair law; live with --no-exit, appending to the same jsonl.
+(2) RAW-ROW INFLATION MEASURED (r214_inflation_profile.py, whole-file streaming
+    regex pass): 240,249 rows / 56,377 distinct (file,file_mtime_ns) keys =
+    4.26x overall; per-key reps up to 12; per-4k-row append-order chunks drift
+    1.96x -> ~10x -> reset 1.45x at the sitting boundary ~line 192k -> 3.66x at
+    the tail. NO single correction constant exists.
+(3) CLAIM-SAFETY AUDIT (the part that protects the ledger): every count banked
+    from this file (t187 x1115 flight census via r1_t187_delta.py:30, t189
+    68-sustained via r1_t188_state3_arbiter.py:20, the 28k trusted obs in
+    diplomacy.md S11 / score.md S6) uses r1_stream.observations(trust=True);
+    build_index dedupes on exactly (file,mtime_ns) and duplicate groups carry
+    ZERO content conflicts (tail-1200 audit: rows differ only in wall) — first-
+    wins is lossless, NO banked number needs restatement.
+(4) TIMELINE-MINING LAW banked in docs/BLOCKED.md R1 runbook + OQ-021/OQ-016
+    STATUS t214 lines: counts only via the trusted path; r214_triage.py as the
+    pre-mining gate for any fresh sitting.
+PITFALLS BANKED: (i) process-presence claims need comm-class matching — pgrep -f
+matches the probing shell's own command line; (ii) the wall field is time-of-day
+with NO date — binning w[-5:] silently bins MM:SS (my first-draft "hours");
+binning code needs a unit check, and append-order is the safe time axis;
+(iii) multi-instance watchers on a shared dir is a SILENT capture-health failure:
+counts look fine, per-event facts are duplicated — audit the writer population
+before trusting any new capture.
+Gate 0 + LEDGER AUDIT OK + LEDGER INDEX OK; NEXT=t215 sitting adjudication ONLY
+(r214_triage.py as the one triage call), else honest idle-wait + standing asks
+(incl new watcher-retirement hygiene ask).
 
 LANDED t213 (2026-10-30): AL-FORM [ship+0x62] VALUE-SOURCE CLOSED — MEASURED
 NEGATIVE, NO >=2 PHASE EXISTS (docs/re/_wip_t213.md S1..S7 NEW; tools
