@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-30T17:40
+updated: 2026-10-30T21:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,51 +253,97 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t211: FIRST CHECK FOR A REAL SITTING (it outranks everything):
+NEXT t212: FIRST CHECK FOR A REAL SITTING (it outranks everything):
 TRIGGER-A baselines for work/r1/playcap/live-timeline.jsonl — full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail-64KiB md5 9054cc6c66802e6f80431d4ffa1416ee.
 If ANY differs, run scripts/r1_t85g_sitting.py adjudication BEFORE any static
-work (standing rule), and note that a save where the player fights a
-multi-volley battle vs a non-at-war owner would witness BOTH the OQ-016
-clamp residue AND the t210 stacking magnitude at once (report measured,
-never fabricate).
-If no sitting armed, work t211 (the last bounded static thread the t210
-finding opened): COMMIT-CHAIN TAIL — the 0x49f28 ELSE-BRANCH 0x49f54 (taken
-when [ship+0x62] != 1; the [ship+0x62]==1 leg is fully read via 0x4a360,
-t88/t210) and the cat-5 loop-bound array identity:
-(1) Disassemble 0x49f54..(ret) end-to-end (r205d_windows; capstone
-    seed-restart pitfall) and read what [ship+0x62] values route where (the
-    0x49f31 test cl/test cl,1 chain shows values 0 and 1 handled; who sets
-    [ship+0x62] — E8 census writers, operand pass) — this closes whether a
-    committed order can reach the handler-bearing path by a SECOND door the
-    t210 law missed.
-(2) Identify the arrays [esp+0x730]/[esp+0x734] in 0x4cd90 (the splash loop
-    bounds): trace their writers within 0x4cd90 (prologue 0x4cd90..0x4ce2b
-    region fills them — cite which count they mirror: entity list? star
-    garrison?) so the stacking UPPER BOUND becomes a named quantity instead
-    of 'runtime'.
-(3) BANK as docs/re/_wip_t211.md; only a law with addresses is a result; no
-    combatPhase semantic change without a cited per-commit loop in the
-    rewrite (OQ-019 boundary rule, t209/t210 pattern).
-RATIONALE: after t210 quantified stacking, the ONLY corpus-free static
-questions left are (a) whether the commit chain has a second
-handler-bearing door (0x49f54 else-branch) and (b) naming the splash
-multiplier bound; every other open residue in the ledger is play-gated
-(OQ-016 clamp witnesses, OQ-021 end-ctrl boundary, [0x13bc4] gate-firing
-save) or BLOCKED-USER design projection (OQ-019 per-ship model, gap rows
-12/15/16). Bounded ~10-15 probes.
-Do NOT re-open: t210's stacking law (mode==1-only @0x4b7f1, volley 0x4a5c1
-mode-0, commit loop 0x2550c one arm per matched gizmo, ah==1 traps, cat-5
-loops 0x4d0a5/0x4d2ab, sole 0x4cd90 caller 0x4a3c4) and its tool pitfalls
-(capstone CS_OP_IMM==2 not 3; back-edge != target<=site — use SCC),
-t209's out-param law (sole writer 0x3a35e; caller 0x42c8e discards out-param
-AND return; 0x3d951 = UI message family) and ATTEMPT-TIME clamp position
-(rewrite capture-branch = documented under-model, diplomacy.md S19 t209),
-the t207 scale-2 algebra S7a, the caller census EXACTLY-{0x39fba,0x3a255,
-0x4b875} of 0x43a4c, t208's e2e pin semantics (setIndustryForTest has NO
-production call site — keep it that way), t206's two-channel consumer law,
-t205's per-STAR identity, t204's handler law (byte-key, CEILING shape),
-t203, t202/t202b, t201, t200, t195, t199, t189b.
+work (standing rule); a save where the player fights a multi-volley battle vs
+a non-at-war owner would witness the OQ-016 clamp residue at once (report
+measured, never fabricate).
+If no sitting armed, work t212 — OQ-021 DISPLAYED-COUNT WRITE SITE (the one
+open ledger row with a corpus-free static route; queue item authored t193-era,
+re-queued by t189b's finding):
+(1) The score law is TRUNC(100*DAT_482fb/T) (t73, presenter cluster
+    0x2c03a eventwnd.cpp); live witness: DAT_482fb oscillates 12..22 across
+    the t188b frames while systems_any=36/systems_full=34 stay FLAT same
+    frames (ships.md/score.md cites) — so the numerator is NOT a plain
+    systems count.
+(2) Find WHO writes it: operand census over obj0 for writes to the data-slot
+    static 0x482fb region (scalar byte/word/dword disp32 forms AND
+    reg+disp; capstone resume-on-gap; the t201 pitfall applies) — and per
+    the t191 law, if static writers come up ZERO, do the runtime-slot member
+    search in the 20-sav corpus (dword == value pattern at the KNOWN member
+    address first to confirm addressing, then writer chain disasm).
+    Candidates from t189b: per-star percent-controlled aggregate,
+    production-weighted count, recompute-only-on-screen-open.
+(3) Tie the oscillation to a named loop OR bank the narrowed writer chain as
+    honest residue; update OQ-021 STATUS + score.md. Bounded ~15 probes.
+RATIONALE: after t211 closed the commit-chain tail, EVERY residue of the
+attack-price/invasion family is play-gated (clamp witnesses) or BLOCKED-USER
+(OQ-019 per-ship model). OQ-021 is the last open row whose static residue
+(displayed-count write-site) was explicitly named; OQ-005's residues need a
+player ruling or live capture; OQ-019's static side is exhausted pending
+design decisions. Fallback if the write-site census dies clean: al-form
+[ship+0x62] value-source trace (t211 S4, low priority) then declare the
+static corpus exhausted and idle-wait honestly.
+Do NOT re-open: t211's dispatch law (three arms @0x49f28; 0x4a350 unbound —
+do NOT claim it dead, and do NOT re-scan for bindings without a new save),
+t210's stacking law (mode==1-only @0x4b7f1, volley 0x4a5c1 mode-0, commit
+loop 0x2550c one arm per matched gizmo, cat-5 loops 0x4d0a5/0x4d2ab, sole
+0x4cd90 caller 0x4a3c4) and tool pitfalls (capstone CS_OP_IMM==2; SCC not
+back-edge test), t209's out-param law + ATTEMPT-TIME clamp position, the
+t207 scale-2 algebra S7a, the caller census EXACTLY-{0x39fba,0x3a255,0x4b875}
+of 0x43a4c, t208's e2e pin semantics (setIndustryForTest has NO production
+call site — keep it that way), t206's two-channel consumer law, t205's
+per-STAR identity (0x13bc5 = star table — a fresh t212 hand may be tempted
+to re-read it as species table; it is NOT), t204, t203, t202/t202b, t201,
+t200, t195, t199, t189b.
+
+LANDED t211 (2026-10-30): COMMIT-CHAIN TAIL CLOSED — SECOND-DOOR NEGATIVE +
+SPLASH BOUND NAMED (docs/re/_wip_t211.md S1..S6; tools r211_probe_a..f NEW,
+RC=0). Trigger triage: timeline mtime 1793294532 / size 5,721,578,066 /
+tail-64KiB md5 9054cc6c... == frozen baselines, dosbox down, tree clean at
+0620fc9 -> no sitting; STATE t211 stood. THE ANSWERS:
+(1) 0x49f28 IS THREE-ARMS (the assignment's "!= 1" imprecise): mov cl,
+    [ship+0x62]; cl==0 -> 0x49f54 travel resolver (t83's walk law — same
+    function); cl==1 -> 0x4a360 attack leg; cl>=2 -> NO call, result 0
+    (xor eax,eax @0x49f2f precedes every arm). [ship+0x84] := result.
+(2) SECOND DOOR: NO. 0x49f54 entry edges EXACTLY {0x49f37}; callee closure
+    depth-3 (24 functions) ZERO hits into {0x4b740,0x43a4c,0x4cd90,0x4b8e4,
+    0x4a360}; zero indirect jmp/call in the body (E8-only closure sound
+    here). 0x4a360 entry EXACTLY {0x49f45}. Scanner VALIDATED first: E8 pass
+    reproduces t210's six 0x4b740 callers exactly. => t210 commit law stands:
+    committed orders pay 0x43a4c ONLY via the six censused callers.
+(3) PHASE-FLIP BLOCK 0x4a350 (mov byte[eax+0x62],1 @ first insn + 0x67
+    day-stamp clear) is UNBOUND corpus-wide: zero branch edges over 140,156
+    decoded insns, zero image dwords, zero RAM aligned dwords == P0+0x4a350
+    (3 saves, B=0x1bf4d8; t191 binding class checked). Honest negative —
+    NOT claimed dead. cl==1 population = constant writers: ==1 sites
+    0x415b4/0x423e2/0x4245f/0x43392/0x4340f/0x43843/0x43900/0x4a350/0x4a591;
+    0x4a591 = the cat-0 volley PREAMBLE arms phase=1 (lea ecx,[eax+0xab] gizmo
+    ring + order-kind switch DX->0x67 byte, assert 0x4a5b0 else), then the
+    0x4a5c9 ring-slot scan (0xFF skip, cat byte [giz+0x7653e]==0 gate)
+    dry-runs 0x49f28 edx=0 — exactly t210's dry-run loop, phase set in the
+    preamble never by travel. al-form writers 0x15c6d/0x15d98 = UI/setup
+    family (value residue, low priority); 0x42211/0x43188 alignment-suspect
+    (t108 law: preceding byte undecodable).
+(4) SPLASH BOUND NAMED: [esp+0x730]/[esp+0x734] (sole writers 0x4d09e/
+    0x4d2a4) == 4 * FUN_00022304([engaging_ship+0x59]) — CO-LOCATED SHIP
+    COUNT (ship table 0x3a095+0x162*i, i<108 movsx-bound, owner!=-1;
+    location key = star record 0x13bc5+96*([[ship+0x59]+0xa]>>16) for kinds
+    1/2/3, RAW lane handle for kind 4 — 0x22304 verbatim 0x22304..0x223a1).
+    Multiplier <= N-1 (self-skip 0x4d0ac; loop-2 gates owner!=@0x4d2be +
+    byte[0x12fd6+0x1ee*owner]==2@0x4d2ca). First-draft "lane-segment group"
+    SELF-CORRECTED same session (star-garrison case).
+(5) REWRITE: NO semantic change (OQ-019 boundary, t209/t210 pattern). Docs:
+    OQ-016 STATUS t211 appended (residues re-listed); ai-dossier row 13
+    residue line extended with the tail closure. PITFALLS: an E8/edge census
+    must carry a positive control before a zero is trusted; t108 boundary law
+    flags alignment-suspect store sites (preceding byte undecodable).
+Gate 0 + LEDGER AUDIT OK + LEDGER INDEX OK; NEXT=t212 (sitting check first;
+else OQ-021 displayed-count write-site via obj0 writer census + t191
+runtime-slot method; fallback = al-form value trace then static-exhaustion
+declaration).
 
 LANDED t210 (2026-10-30): LAST STATIC RESIDUE OF THE 0x4b875 ATTACK-PRICE
 LEG CLOSED — STACKING LAW MEASURED (docs/re/_wip_t210.md S1..S6; tool
