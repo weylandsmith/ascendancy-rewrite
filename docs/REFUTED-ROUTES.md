@@ -225,3 +225,19 @@ this engine family — cheats are RAW AT SCANCODE keyed (debugflags.md t191:
 0x1f S / 0x26 L / 0x2e C / 0x13 R, handler 0x26b34 DX==3). Full census banked:
 'l'/'L' compare immediates exist ONLY as printf length modifiers
 (0x79694/0x796b4/0x7a4b1/0x7a4bf). Do not re-hunt `cmp al,'l'`.
+
+## t213 — RE-TRACING THE al-form [ship+0x62] VALUE SOURCE IS CLOSED WORK
+The al-form writers 0x15c6d/0x15d98 (batcon order-commit dispatcher
+0x156d4..0x17c25) were the last named static residue. t213 measured them
+DOMINANCE-PROOF: site 1 writes phase==1 on every execution ([esp+0x50] has
+exactly one byte-def 0x15c34/bl=1; cutting init block 0x15c14 makes the store
+unreachable — 641->564 blocks), site 2 writes phase==0 on every execution
+(reaching def 0x16385 `mov [esp],dh` under gate 0x16376 `test dh,dh`
+zero-side; the dl=2 def 0x16361 is straight-line-overwritten; the 0x15e23
+def-1 jumps to the tail and never reaches the store). Combined with t211's
+constant-writer census, the static writer population of [ship+0x62] is COMPLETE
+and BINARY {0,1}. Do NOT re-trace [esp+0x50]/[esp] defs, do NOT hunt another
+">=2 phase producer", and do NOT treat 0x49f28's cl>=2 arm as a live route
+(defensive dead code in the original — docs/re/_wip_t213.md S5/S6). Note the
+order-arg codes {5,1,0,2} land in the DAY byte [ship+0x67], NOT +0x62 (t211
+mis-locate, corrected) — do not re-read the switch as a phase-value ladder.

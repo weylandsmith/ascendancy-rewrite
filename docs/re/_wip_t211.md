@@ -170,6 +170,15 @@ base+0x62 writers are the 0x15c6d/0x15d98 family (AL from local [esp+0x50],
 preceded by a value-range switch cmp al,4 / cmp al,2 @0x15c55..0x15c5d —
 inside a UI/setup function at 0x15bd0-family, NOT the order path; value
 source tracing banked as residue, low priority).
+T213 AMENDMENT (supersedes the family label and closes the residue):
+0x15c6d/0x15d98 are batcon ORDER-COMMIT sites in dispatcher 0x156d4..0x17c25
+(indirect entry, sole dword@file 0x88408); site 1 phase==1 ALWAYS (single
+byte-def 0x15c34 bl=1; cutting 0x15c14 makes the store unreachable), site 2
+phase==0 ALWAYS (reaching def 0x16385 dh under test dh,dh zero-side; dl=2
+0x16361 overwritten; 0x15e23's 1 jumps to tail). The switch codes {5,1,0,2}
+write the DAY byte [ship+0x67], not +0x62. Static [ship+0x62] writers are
+hence COMPLETE and BINARY {0,1}: cl>=2 at 0x49f28 = defensive dead code.
+docs/re/_wip_t213.md S1..S7, tools r213_probe_a..e.
 
 ## VERDICTS (the two t211 questions, answered)
 1. SECOND DOOR: NO. 0x49f28's cl==0 leg (travel resolver 0x49f54) has
