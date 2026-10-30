@@ -313,7 +313,14 @@ item-completion branch of the build engine. FUN_00046e84 (EAX=0x74744,
 DX=race) builds the candidate array (same skip-owned + FUN_00046d3c
 legality), then if count>0: rng%count -> **marks that row OWNED directly**
 (mask bytes +0x4a/0x4b |= 1<<race) and if race == player posts event
-0x55a60(code 0x16). It NEVER writes the target word. So research can be
+0x55a60(code 0x16). It NEVER writes the target word.
+t203 VERBATIM PASS CORRECTS TWO POINTS of the paragraph above
+(docs/re/_wip_t203.md S1): (i) there is NO FUN_00046d3c call anywhere in
+0x46e84 (sole calls: assert 0x46ec2 [research.cpp:301 idiom], rng 0x46f23,
+event 0x46f8c) — the free-tech candidate set is unowned rows minus the
+target word ONLY, so grants bypass the prereq chain; (ii) the event arg and
+the trigger: caller 0x3913b gates on the completing slot's ROCK BIT
+(byte0&8), not on item identity — see _wip_t203 S3. So research can be
 granted by build completion (AI free-tech grant) while the PICK stays in
 FUN_00040018.
 

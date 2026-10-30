@@ -122,9 +122,13 @@ objective" (§2f, gate row+0x19b), so it modulates congregation, not direction.
 Progress = Σ over owned planets of (planet RES word + 1-per-planet gated), ×1.2,
 accumulated and compared against the row's runtime cost; completion sets two
 owned-mask dwords. Also relevant: build completion can **grant a free tech**
-(`FUN_00046e84`, sole caller 0x39173 in the item-completion branch) — it picks
-uniformly among legal rows and marks them OWNED directly, never touching the
-target slot.
+(`FUN_00046e84`, sole caller 0x39173 in the item-completion branch). t203
+CORRECTION (docs/re/_wip_t203.md S1/S3): the trigger is the COMPLETING CELL'S
+ROCK BIT (caller gate 0x3913b is item-blind; placement rule D 0x38533 makes
+item 38 Xeno Dig the only item that can ever sit on rock), and the grant has
+NO prereq legality check at all — candidates = unowned rows minus the race's
+research-target word, uniform rng%count, marks OWNED (+0x4a/+0x4b), NEVER
+touching the target slot. A granted tech can land deep with prereqs unmet.
 
 ## 4. Special-ability cadence engine `FUN_00043b50` (aicode.md §6) [verified]
 16 case bodies, dispatch key = the race's special-ability number
@@ -307,7 +311,7 @@ engine never evaluates the enemy's order of battle.
 | 4 | Over-pop emergency demolish; min-REQUIRES demolish; tubes priority (§3a) | MODELLED t202b (over-cap 0x3f178 + pre-triage 0x3f252 + sweep 0x3f354 + shared gate 0x3f41e wired in original order before the t201 chain; usedPopFor = measured M4 item-UPOP sum 2760/2900; pins campaign_demolish_pickers_t202b + 2 end-to-end e2e witnesses; TUBES sub-item 0x3f2c8 = DEAD PATH, research mask all-zero measured t28 26x13 — banked comment not modelled; laws docs/re/_wip_t202.md S1..S13 + income-law.md S9 corrected) | buildPhase :726 + overCapDemolishPick/minRequiresDemolishPick (campaign.h) |
 | 5 | Research PICK = FUN_00040018 tier chain, 66-main-row law (§3b/§3d, OQ-013) | MODELLED (t93, pin test campaign_research_picker_law_oq016) | researchPhase :885 |
 | 6 | Research PROGRESS = Σ(RES+1-gated) ×1.2 vs runtime cost (§3) | MODELLED (income channel law, OQ-016 closed sub-law) | researchPhase :885 / incomeAndGrow :655 |
-| 7 | Free-tech grant on build completion (0x46e84) | **GAP** | buildPhase completion path :757 |
+| 7 | Free-tech grant on build completion (0x46e84) | MODELLED t203 (law verbatim _wip_t203 S1/S4: rock-bit gate 0x3913b, dig consumes itself 0x39156/0x39164, grant = uniform over unowned-minus-target, NO prereq check, target never written; pins test_freetech_t203.cpp x5; residues: zero in-corpus grant-event witnesses, 0x55a60 event text + rng-order unmodelled) | buildPhase dig-completion branch + freeTechGrantFor (campaign.cpp) |
 | 8 | Single per-race target slot, research-row semantics, no geographic BFS (§3b) | **DIVERGENT BY DESIGN** — rewrite expansionPhase colonises via nearest-first BFS within drive range | expansionPhase :948 |
 | 9 | Colonised star := pop 2 + Colony Base grant (t41, measured) | MODELLED | seedColonyBaseColony :395 |
 | 10 | Ability cadence = cad[ability] days from image 0x6780, fire-on-exact-equality, reset (§6.4) | MODELLED (t100 kCad + abilityPhase) | abilityPhase :1077, species.cpp:30 |

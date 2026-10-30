@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-30T00:40
+updated: 2026-10-30T02:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,37 +253,81 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t203: FREE-TECH GRANT ON BUILD COMPLETION — gap map row 7
-(ai-dossier.md §8 row 7 = the last pure-GAP row reachable statically).
-The original grants a free tech when a build completes: FUN_00046e84,
-sole caller 0x39173 (inside the completion path), ai-dossier.md S3c:
-picks uniformly among legal rows, marks OWNED, NEVER touches the target
-slot. The rewrite completion path (buildPhase :995ff cell-assignment
-block) grants NOTHING. SCOPE: (1) re-derive 0x46e84 verbatim from the
-Ghidra/headless disasm (uniform-over-what census: legal = unowned rows?
-research-mask gate? rng call site + stride interaction with the t202b
-demolish block — check the per-turn rng stream order in buildPhase);
-(2) wire into the rewrite completion path at the ORIGINAL call position
-(0x39173 is inside FUN_00038818's completion tail — decide whether the
-rewrite grants on player completions too or AI-only, cite whichever the
-caller guard says); (3) pin: determinism pin (seeded grant distribution
-over N completions) + "target slot untouched" pin; (4) docs: ai-dossier
-row 7 GAP -> MODELLED/GAP-honest, OQ-016 STATUS t203.
-RATIONALE: t202b closed the demolish channel CODE + PINS (119 tests 0
-failed, gate 0); row 7 is the only remaining pure-GAP row and the
-dossier already banks its shape (S3c), so it is the cheapest measured
-win left. Do NOT re-open: demolish (t202+t202b _wip files, S1..S13 +
-T4), threat/emergency (t201; S12 CORRECTION — caller wiring faithful,
-do not "fix"), triage gate (S2 FINAL), +0x4c model (S11: item-UPOP sum
-2760/2900 — the pacing-window widening in t202b is DONE, do not
-re-fudge it), cos_star (t200), visibility (t195), pop/gauge laws (t199),
-relation enum (t189b). Rows OQ-005/OQ-019/OQ-021 are the harder residue
-families (cited-bound / sugar-cube scale BLOCKED-USER-LEVEL / diplomacy
-live-cell) — not single-iteration targets.
+NEXT t204: DIPLOMACY-ON-ATTACK CODED + PINNED — gap map row 13
+(ai-dossier.md §8 row 13, the LAST pure-GAP row reachable statically now
+that row 7 is MODELLED t203). LAW IS ALREADY BANKED (ai-dossier.md §2,
+identity corrected t87 combat.md S2f-b, cited 0x43a4c): firing at a
+non-at-war power subtracts 10*(word[0x13bc4]+1) from their attitude
+toward you, DOUBLED if the relation state was 3 (ALLIANCE — t189b
+identity), clamps under word[obj+0x1cf]-10, and sets a PERMANENT bit in
+the global attacked-bitmap [..+0x48304] |= 1<<race. The rewrite attacks
+never touch relations (combatPhase). SCOPE (t202b pattern: transcribe +
+wire + pin, ZERO new measurement unless a probe is free):
+(1) re-verify 0x43a4c VERBATIM from work/ascend_restored.bin (capstone
+via ~/tools/revenv/bin/python — .venv has NO capstone, t203 pitfall)
+before transcribing: confirm the subtrahend, the state-3 doubling guard,
+the clamp WORD semantics (under-clamp = floor), the bitmap base, and
+find its CALL SITE(s) (combat path — cite addresses);
+(2) map onto the rewrite diplomacy model: attitude storage is
+DipPolicyState/dipState_ (diplomacy.h:67 — two-party, no inter-race
+ladder per gap row 12, so the state-3 doubling needs the t189b
+alliance() relation as the state proxy — DOCUMENT the mapping, do not
+invent a ladder); the attacked-bitmap has NO rewrite analogue yet — add
+one (per-race bitmask, permanent) + a public readback for the pin;
+(3) wire into combatPhase at the FIRST attack resolution per
+victim-race per battle (cite the original call-site ordering you found
+in (1); if the original fires per-shot vs per-battle, follow the
+disasm, note stream effects);
+(4) pins test_diponattack_t204.cpp: subtrahend law incl. the
+word[0x13bc4] scenario word (live-measured ==2 t202 census => 30 / 60
+doubled), alliance-double, floor clamp, bitmap permanence (survives
+peace), non-at-war-only gate (attacking an existing war costs 0);
+(5) docs: ai-dossier row 13 GAP -> MODELLED/GAP-honest, OQ-016 STATUS
+t204, diplomacy.md new section with the cited law.
+RATIONALE: rows 7/4/3 (the other static GAPs) are all MODELLED now
+(t203/t202b/t201); row 13's law is fully cited in the dossier and its
+blast radius is attitude arithmetic ONLY — the cheapest measured win
+left, and the same transcribe-and-pin shape t202b executed cleanly.
+Do NOT re-open: free-tech grant (t203 _wip_t203 S1..S4 — gate is the
+ROCK bit and there is NO prereq check, do not "restore" legality),
+demolish (t202+t202b), threat/emergency (t201; S12 — caller wiring
+faithful), triage gate (S2 FINAL), +0x4c model (S11 — pacing windows
+DONE, do not re-fudge), cos_star (t200), visibility (t195), pop/gauge
+(t199), relation enum (t189b). Rows OQ-005/OQ-019/OQ-021 = harder
+residue families, not single-iteration targets.
 If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
 adjudication via scripts/r1_t85g_sitting.py STILL outranks everything.
 
+LANDED t203 (2026-10-30, this session): FREE-TECH GRANT MEASURED + CODED +
+PINNED (gap map row 7 GAP -> MODELLED). Trigger triage: timeline size
+5,721,578,066 == frozen baseline exactly (md5 3d6c9cce), dosbox down, tree
+clean at 7dc461c -> no sitting; STATE NEXT stood. LAWS [all cited,
+docs/re/_wip_t203.md S1..S4]: FUN_00046e84 0x46e84..0x46f9d verbatim
+(capstone revenv). GATE CORRECTED vs dossier S3c: caller 0x3913b is
+ITEM-BLIND — key = completing slot byte0 bit3 (ROCK marker, mapgen 0x37f7b);
+placement rule D 0x38533..0x38552 legal iff (byte0&8)==(itemIdx==0x26) makes
+the Xeno Dig the only item ever on rock => dig-on-rock completion IS the
+grant trigger; rock branch clears rock (0x39156) + frees slot (0x39164, dig
+consumes itself — explains banked T38 "zero |8 item bytes ever") THEN calls
+0x46e84; non-rock = normal activation 0x3917a, no grant. GRANT = uniform rng
+over unowned rows MINUS the research-target word (0x46ee6 ==DAT_00076492),
+NO prereq legality call at all (dossier "legal rows" CORRECTED — grants land
+deep, prereqs unmet); rng 0x7824f 15-bit LCG always >=0 (idiv uniform);
+empty-guard 0x46f1c precedes the draw; mark +0x4a/+0x4b; target word NEVER
+written. Rewrite: freeTechGrantFor (campaign.cpp/h, rng_ stream documented
+default), drawItemCell dig exemption (dig draws draw ONLY from rock cells),
+buildPhase dig-completion branch. Pins test_freetech_t203.cpp x5 (+1 owned
+per grant + exhaustion -1, target-exclusion, e2e dig-on-rock grants exactly
+1, dig-on-nonrock 0 + item stands, seeded determinism) — 124 tests 0 failed.
+BLAST RADIUS: seed 2024 Control t1255 FINITE (unchanged vs t202b), seed 42
+Extinct t979 FINITE (CLI this session). ai-dossier row7 MODELLED + S3c
+correction; aicode.md S3b correction paragraph. HONEST RESIDUES (row OPEN,
+strict-close): zero in-corpus grant-event witnesses (0x55a60 code-0x16 never
+observed in ring — grant is rare: dig-armed AI + dig completes + legal rock);
+event string + EDI quirk unmodelled (cosmetic); completion-tail rng ORDER in
+the original single stream unrecoverable. TOOL PITFALL banked: capstone
+lives ONLY in ~/tools/revenv (project .venv lacks it).
 LANDED t202b (2026-10-30, this session): DEMOLISH CHANNEL CODED + PINNED
 (gap map row 4 GAP -> MODELLED; t202's measured law set transcribed with
 zero new measurement). Trigger triage: timeline size 5,721,578,066 ==

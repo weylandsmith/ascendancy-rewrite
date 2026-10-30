@@ -346,6 +346,12 @@ public:
     int shieldChargesFor(int owner) const;
     // Set every research row for one owner (law-pinning + scenario hook).
     void setAllTechs(int owner, bool owned);
+    // t203 pin surface: total table rows, queued-target readback, single-row
+    // owned readback (mirror of ownedTech / queuedTech; docs/re/_wip_t203.md).
+    int techCountTotal() const { return static_cast<int>(tree_->all().size()); }
+    bool isTechQueuedFor(int owner, int row) const { return queuedTech[owner] == row; }
+    bool techRowOwnedFor(int owner, int row) const { return ownedTech[owner][row]; }
+    void setQueuedTechFor(int owner, int row) { queuedTech[owner] = row; }
     // TWO-LAYER CLAMPED ABSORB SPLIT [verified 0x4b7c4..0x4b7d1 + apply
     // 0x4b87a..0x4b890, S2h-audited]: the shield layer absorbs
     // min(volley, charges) and ONLY the remainder spills to the hull layer.
@@ -444,8 +450,15 @@ public:
     static int sizeClassFor(int surfaceCells);
     // t43 built-item cell draw (income-law.md S13): ONE worldNext() over
     // EMPTY non-rock surface cells with an ACTIVE neighbour; -1 if none.
-    // PUBLIC for the t43 pin; mutates worldLcg_.
+    // t203: when ps.pendingItem == 38 (Xeno dig) the set is EMPTY ROCK cells
+    // instead (checker rule D 0x38533 ==-law). PUBLIC for the t43 pin;
+    // mutates worldLcg_.
     int drawItemCell(const PlanetState& ps);
+    // t203 FREE-TECH GRANT (FUN_00046e84 verbatim, docs/re/_wip_t203.md S1/
+    // S4): uniform rng over rows not owned and != the owner's queued TARGET,
+    // NO prereq gate; marks owned, never touches the target. -1 + no draw
+    // when zero candidates. Mutates campaign rng_. PUBLIC for the t203 pin.
+    int freeTechGrantFor(int owner);
 
 private:
     void pickHomeStars();

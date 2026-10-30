@@ -683,15 +683,60 @@ int Campaign::drawItemCell(const PlanetState& ps) {
             if (itemIsSurface(ps.items[k])) active[c] = 1;
         }
     }
+    // t203 RULE-D EXEMPTION (checker FUN_0003830c 0x38533..0x38552 verbatim:
+    // legal iff (slot byte0 & 8) == (itemIdx == 0x26), rule-D block UNbounded
+    // by the itemIdx<=30 XOR guard at 0x384e0): rock cells are legal EXACTLY
+    // for item 38 Xeno Archeological Dig — dig requires rock, every other
+    // item requires non-rock. Rule G adjacency applies to the dig too (the
+    // exemptions at 0x385f6/0x385ff are items 5 and 35 only). The
+    // completion-tail free-tech grant (FUN_00046e84 @0x39173) reads that rock
+    // bit, so the dig draw must reach rock cells or the grant channel is dead.
+    const bool digDraw = (ps.pendingItem == 38);
     std::vector<int> legal;
     for (int c = 0; c < ps.surfaceCells; ++c) {
-        if (used[c] || (ps.cellClasses[c] & 8)) continue;
+        if (used[c]) continue;
+        if (digDraw ? !(ps.cellClasses[c] & 8) : (ps.cellClasses[c] & 8))
+            continue;
         if (szc >= 0 && !cellActiveNeighbour(active, szc, ps.surfaceCells, c))
             continue;
         legal.push_back(c);
     }
     if (legal.empty()) return -1;
     return legal[worldNext() % legal.size()];
+}
+
+int Campaign::freeTechGrantFor(int owner) {
+    // FREE-TECH GRANT LAW, FUN_00046e84 verbatim 0x46e84..0x46f9d (t203,
+    // docs/re/_wip_t203.md S1/S3). Candidate loop 0x46ec7..0x46f1a over rows
+    // 0..word[base] (the 66-row live count, OQ-013) skipping (a) the owner's
+    // research TARGET row (0x46ee6 [base+race*2+0x1d4e] == DAT_00076492, t91
+    // field identity) and (b) rows already owned ([row+0x47]>>0x18 &
+    // (1<<race) @0x46eff..0x46f0e). NO prereq legality call exists in the
+    // function (calls are 0x46ec2 assert, 0x46f23 rng, 0x46f8c event) —
+    // CORRECTS aicode.md §3b "legality = FUN_00046d3c" for this grant path:
+    // a granted tech can land DEEP in the tree, prereqs unmet. Empty-guard
+    // 0x46f1c precedes the rng draw (no draw when count==0). Uniform pick
+    // rng % count @0x46f23..0x46f34 (rng 0x7824f = 15-bit LCG, always >= 0,
+    // idiv at 0x46f2b never negative). Mark 0x46f4f..0x46f64: owned bits
+    // +0x4a/+0x4b |= 1<<race (rewrite ownedTech bool). The TARGET SLOT IS
+    // NEVER TOUCHED: the sole +0x1d4e reference is the candidate-loop read.
+    // RNG stream: campaign rng_ (mid-turn consumer; worldLcg_ is reserved to
+    // the worldgen law set per REFUTED-ROUTES RNG discipline; the original's
+    // single-stream draw ORDER inside the completion tail is unrecoverable
+    // [documented default]).
+    std::vector<int> cand;
+    for (int r : tree_->mainIndices()) {
+        if (ownedTech[owner][r]) continue;
+        if (queuedTech[owner] == r) continue;  // 0x46ee6 target exclusion
+        cand.push_back(r);
+    }
+    if (cand.empty()) return -1;  // 0x46f1c
+    const int pick = cand[static_cast<size_t>(rng_() % cand.size())];  // 0x46f23
+    ownedTech[owner][pick] = true;  // 0x46f4f..0x46f64 (+0x4a AND +0x4b)
+    if (owner == kPlayer)  // 0x46f77 cmp DAT_0007458e; UI event quirk modelled
+                           // as a campaign event (vendor event text unrecovered)
+        events_.push_back({turn_, "granted free tech " + tree_->all()[pick].name});
+    return pick;
 }
 
 int Campaign::storedIndFor(int star) const {
@@ -994,7 +1039,27 @@ void Campaign::buildPhase() {
                 // queue into one): lowest free non-rock — keeps
                 // itemCells/channelAccFor in sync [documented default,
                 // degenerate case only].
-                if (itemIsSurface(ps.pendingItem)) {
+                if (ps.pendingItem == 38) {
+                    // t203 DIG COMPLETION (completion tail 0x3913b..0x3917a
+                    // verbatim + checker rule D 0x38533): the dig PLACES on a
+                    // rock cell ((byte0&8) == (idx==0x26)). Completion on a
+                    // rock slot: clear the rock bit (0x39156 and 0xF7), free
+                    // the slot (0x39164 byte1 := 0xFF — the dig CONSUMES
+                    // itself; banked T38 "zero |8 item bytes ever" is exactly
+                    // this store), then call FUN_00046e84 = FREE-TECH GRANT
+                    // (0x39173). Picker yields no legal rock (drawItemCell
+                    // -1, or the drawn slot already lost its bit): the
+                    // activator reads non-rock -> normal activation tail
+                    // 0x3917a, item STANDS, no grant [faithful: slot view].
+                    const int cell = drawItemCell(ps);  // rock-only set
+                    if (cell >= 0 && (ps.cellClasses[cell] & 8)) {
+                        ps.cellClasses[cell] &= ~8;      // 0x39156
+                        ps.items.pop_back();             // 0x39164 slot freed
+                        freeTechGrantFor(o);             // 0x39173
+                    } else {
+                        ps.itemCells.push_back(cell);    // 0xffff = unplaced
+                    }                        // view keeps items/itemCells 1:1
+                } else if (itemIsSurface(ps.pendingItem)) {
                     int cell = drawItemCell(ps);
                     if (cell < 0) {
                         std::vector<char> used(ps.surfaceCells, 0);
