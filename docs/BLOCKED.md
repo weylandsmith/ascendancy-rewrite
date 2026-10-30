@@ -149,11 +149,15 @@ by gate 3n):
   (27774 + orphans 260988/290953/292085) append to the file simultaneously.
   Retiring orphans is a supervised-session decision; research iterations must
   never kill watchers.
-- NO-SITTING CORROBORATION AXIS (t215): timeline mtime can go stale if the
-  watcher dies, so also check the save axis — find /home/hrethric -xdev
-  \( -name '*.sav' -o -name '*.gam' \) newest-first; a player who advanced the
-  game leaves a newer autosave slot regardless of watcher health. At t215 the
-  newest save anywhere == the last sitting's 60.sav (2026-10-29 13:22).
+- NO-SITTING CORROBORATION AXIS (t215, precision-fixed t216): timeline mtime
+  can go stale if the watcher dies, so also check the save axis — find
+  /home/hrethric -xdev \( -name '*.sav' -o -name '*.gam' \) printed with %T@
+  and sorted numerically newest-first; a player who advanced the game leaves a
+  newer autosave slot regardless of watcher health. At t216 the newest save
+  anywhere == the last sitting's 41.sav at ns 1793294530.108 (t215 named
+  60.sav from wall-minute resolution — 60.sav is 1793294520.040, 10 s OLDER;
+  name the newest save by full ns, never wall-minute). Idle corroborated
+  t215/t216: zero saves modified since 2026-10-29 18:00.
 - exit codes: 0 = base derived / upgrade formulas; 1 = normal negative,
   record ONE line in STATE.md, no in-turn retry; 2 = harness bug, fix it
 
