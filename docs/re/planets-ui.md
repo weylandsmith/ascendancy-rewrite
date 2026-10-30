@@ -172,3 +172,85 @@ pinned too.
    ~/ghidra_scripts (T66Callsites/SeedFns/Diag compile errors make the whole
    build skip every script); switch tables are relocated (image bytes at the
    jump-table symbol are code — read the table from a save member).
+
+## 6. COSMOSWnd STAR-PIP SELECTOR LAW (t200) [verified static + measured census]
+
+Scope: the STAR_SHAPES library (DATA\COS_STAR.SHP, windows.txt:208; file
+extracted/ascend01/data/cos_star.shp, 55 records k0..k54, t196/t197 dims-zero
+residue = k40..k51). Listings: work/t200_cos_star.asm (0x2925c..0x29731),
+work/t200_coswnd2.asm (0x2976c..0x2a493).
+
+1. THE PAINT LOOP IS FUN_00029788 (coswnd.cpp; enclosing function of the
+   t198 census site listed as 0x2925c — t198's "one blit site" was actually
+   the FUNCTION START; the real site is 0x298dc, second cosmos site 0x2a223)
+   [verified: functions_full.tsv hex-size span 2925c+0x1237=0x2a493 + E8
+   byte-pass]. Iterates a dword cursor of DISPLAY NODES (starts at the
+   handler's eax object, step +4, count [wnd+0x400]); each node: +0 POINTER
+   to the stride-0x60 RUNTIME STAR RECORD (static base 0x13bc5; list built
+   by FUN_00028fc0 at 0x2903a: stores 0x13bc5+0x60*i into [w+0xb3] storage,
+   count word [w+0xb7]), +4 dispatch tag (zeroed for stars at 0x2904f),
+   +3/+5 x/y 16.16, +0xd float. The star record matches ships.md S11
+   (coords +0x08/+0x0c/+0x10, stride 0x60, +0x59 owner ptr).
+
+2. STAR DISPATCH on BYTE [entry+4] (zeroed for stars at 0x2904f):
+   0 -> star-pip blit (below); 1 -> lane line FUN_0005bf71 with its own
+   7-class ladder (0x29bd5 chain: >=0xdc->7 else cmps 0x93/0x49/... with
+   bases 0x10/0x30/0x68/0x70; SEPARATE LAW, banked not closed); 2 -> label
+   FUN_00053e58; >=3 -> nothing drawn.
+
+3. STAR-PIP SELECTION LAW [verified 0x2986d..0x298dc; arg map checked with a
+   per-instruction esp walk]:
+       SEL = 4*K + cls
+       K   = u32 [star_record + 0x00]  (star type index)
+       cls = 4-band ladder on v = frndint(f32[star+0xd] + f32@ds:0x105e):
+             v >= 0xdc -> 0 ; 1..0xdb -> 1 ; -0xdc..0 -> 2 ; v < -0xdc -> 3
+       payload base arg = [wnd + 0xab]  (the preloaded cos_star buffer; t198
+       right on this arg) ; x = s16 hi([child+3]), y = s16 hi([child+5]).
+       CORROBORATION [measured 60.sav]: guest RAM holds exactly TWO '1.10'
+       lib buffers; the one at member 0xfd2934 matches cos_star.shp
+       byte-for-byte over its header+directory first 24 B (0x4078e8 is a
+       different lib — directory differs at +0x10).
+   K MEANING [measured]: census over 20 saves x 50 stars
+   (scripts/r200_kcensus.py RC=0): K in {0,1,2,4,5,6,7,8,9,11,12}, a subset
+   of {0..12} — matches starstat.txt's 13 types (mapgen.md S1); types 3/10
+   absent from these 20 new-game saves (10 is the 1.48%-weight type).
+
+4. RESIDUE ADJUDICATION [cited measurement, strict-close grade]:
+   SEL reach = 4*max(K)+3 = 4*12+3 = 51 -> k40..k51 ARE ADDRESSABLE by the
+   vendor selector law (need K in 10..12); k52..k54 are NOT reachable by any
+   K <= 12 (would need K >= 13, outside the 13-type domain — a STARMAP
+   selector can never address them). The dims-zero k40..k51 slots are the
+   TYPE 10/11/12 x cls 0..3 cells of the 13x4 = 52-selector grid (k52..k54 =
+   3 spares). FILE MEASURED t200: k40..k51 = the complete dims-zero set of
+   cos_star.shp (dims u32 pair (0,0) at the law slot; span 0x1b each,
+   file_offs 0x8f2..0xa1b contiguous). MECHANISM [inferred]: a dims-zero
+   record walks zero rows, so the pip draw paints nothing; the blit's -1
+   @0x5cb2b dims check is against the WINDOW shape-struct ([arg1]+4/+8,
+   verified 0x5cabd..0x5cad4), NOT the record — no error code fires.
+   => OQ-005 SHRINKS for cos_star: 12 residue records are now provably
+   addressable-and-empty (rare star types' pips), 3 (k52..k54) are provably
+   UNADDRESSABLE. What REMAINS OPEN is WHY the slots are empty (vendor data
+   defect vs a dims-location unknown) — still player/vision territory, row
+   stays OPEN. NOTE the payload arg [wnd+0xab] must be the TRANSFORMED
+   runtime table (S12 decisive negative: verbatim file bytes would make
+   payload+8+8*sel read the u64 directory and desync at sel=2; t64 already
+   proved raw payloads are never drawn against) — which table holds the
+   cos_star runtime entries keeps the slot-identity residue alive.
+   HONEST NEGATIVE [measured 20/20 saves]: zero dwords anywhere in guest RAM
+   equal member 0xfd2934 — no COSMOSWnd object existed in the corpus (ring
+   = title/new-game states), so [wnd+0xab] itself is a live-capture-class
+   residue like the t198 cache globals; the SEL LAW (the selector ARG) is
+   fully static-verified regardless.
+5. SITE 0x2a223 IS NOT STAR ART [verified]: cache 0x9f10c slot u16 [0x6fd96],
+   SEL in {9 ALLIANCE state, 8 WAR state, -1 skip} from the t189 relation-
+   state byte (table 0x12fd6 + 0x1ee stride), fixed x=0xe y=3, gate skips
+   own-race. A relation-badge blit in the cosmos window, not STAR_SHAPES
+   (STAR_SHAPES is drawn ONLY via [wnd+0xab] at 0x298dc). Slot library
+   identity stays in the t198 honest-negative family (zero direct writers).
+6. PITFALLS (t200 session): functions_full.tsv sizes are HEX (int(x,16)) —
+   a decimal read silently yields wrong spans; heredoc-with-unquoted-
+   delimiter eats $var inside python (write scripts to files instead);
+   in the installed capstone o.mem.base==41 does NOT mean ESP (resolve via
+   ins.reg_name) and cdecl CALL preserves ESP — scripts/r200_espmap.py is
+   fixed for both; invoke it with LO AFTER the prologue's `sub esp,N` (base
+   P = esp right after that instruction).

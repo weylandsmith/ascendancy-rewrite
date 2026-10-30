@@ -643,6 +643,25 @@ state). Arithmetic correction: planets-ui.md S3's "pow(53,0.75)=20.2" is
 19.64 (conclusion unchanged). Id fold into shp.md S22. Rendering stays
 blocked on OQ-005 per ui-runtime.md §2 (no vendor sprites, lookalikes
 banned) — documented in ui-runtime.md §2a.
+STATUS t200 (2026-10-29): COS_STAR SELECTOR SEMANTICS MEASURED — RESIDUE
+SHRINKS WITH CITED BOUND (planets-ui.md §6). The STAR_SHAPES paint is
+FUN_00029788's star path (blit site 0x298dc — t198's "0x2925c" was the
+enclosing function start): LAW SEL = 4*[star_record+0x00] + cls(4-band
+ladder on f32[star+0xd]), payload = [wnd+0xab] (corroborated: guest RAM
+buffer 0xfd2934 in 60.sav matches cos_star.shp header+dir byte-for-byte).
+K = star type index — census scripts/r200_kcensus.py RC=0 over 20 saves x 50
+stars: measured set {0,1,2,4,5,6,7,8,9,11,12} subset {0..12}
+(hist {0:220,1:60,2:40,4:40,5:160,6:120,7:100,8:20,9:60,11:100,12:80};
+types 3/10 absent in these new-game saves; starstat.txt has exactly 13
+types). => SEL reach 0..51: the 12 dims-zero residue records k40..k51 ARE
+ADDRESSABLE (types 10/11/12 x cls 0..3 — rare star types' pips; a dims-zero
+slot blits error -1 @0x5cb2b = draws nothing), while k52..k54 are provably
+UNADDRESSABLE by any legal K (need K>=13 > type domain). Honest negative
+kept: WHY those slots are empty (vendor defect vs dims-location unknown)
+stays unmeasured — row stays OPEN, residue restated as "12 addressable-empty
++ 3 unreachable spares" instead of "44 dims-unknowns incl. cos_star 12".
+Also adjudicated: cosmos site 0x2a223 is a relation BADGE blit (SEL 9 =
+ALLIANCE, 8 = WAR, -1 = skip; t189 relation-state byte), NOT star art.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge

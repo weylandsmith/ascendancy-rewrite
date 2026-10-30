@@ -1040,7 +1040,9 @@ never exceeds 16]; 1starmap: windows.txt SHAPEITEM selects k3,k4,k5,k7
 race-config art, SHAPEITEM selects k0 only; population slot icons come from
 the [0x6fd9c] library — library IDENTITY STILL OPEN (zero direct writers,
 t198 honest negative; gwshare.txt:35-37 lists planets.shp + planitem.shp as
-the adjacent candidates); cos_star k40..k51 selection not adjudicated
-(selector site 0x2925c). The rewrite's selection math landed t199
+the adjacent candidates); cos_star k40..k51 ADJUDICATED t200 (selector law
+SEL = 4*star_type + cls at 0x298dc, star_type census 0..12 => k40..k51 =
+types 10/11/12 addressable-but-dims-zero, k52..k54 unreachable —
+planets-ui.md S6). The rewrite's selection math landed t199
 (ui::gaugeSelector/prosSelector, Campaign::popBands — planets-ui.md
 S3/S4 landing blocks); drawing vendor records stays blocked on OQ-005.

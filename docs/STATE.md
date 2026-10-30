@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-29T21:05
+updated: 2026-10-29T22:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,32 +253,65 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t200: cos_star SELECTOR SEMANTICS (0x2925c) — the last un-adjudicated
-selection class of the OQ-005 census (explicitly queued by t198 as "next
-static candidate AFTER this", and t199 consumed that "after this"). Work:
-disassemble the COSMOSWnd star-paint caller cluster around 0x2925c (listing
-route per t198 method: objdump span of the enclosing function from
-work/functions_full.tsv + scripts/r1_t198_site_context.py for pool-string
-annots; E8 byte-pass if callers needed, NOT Ghidra get_function_callers —
-t198 pitfall), derive how the STAR_SHAPES (windows.txt:208 DATA\COS_STAR.SHP)
-record index is computed from ship/star state, and adjudicate whether the
-t196 dims-non-walkable residue k40..k51 is addressable by that selector at
-all (if the selector's range provably excludes 40..51, that is a CITED
-shrink of the OQ-005 residue toward the "broken/unused vendor records"
-reading; if it includes them, the dims-location question stays fully live).
-Bank to planets-ui.md S5 / shp.md; do NOT close OQ-005 either way
-(strict-close: player ruling on the 44 dims-unknowns still outstanding).
-Do NOT re-open: slot-library identity [0x6fd90/2/4/9c] (zero direct writers,
-live-capture class), span-bounded-walk (t197), planalNN poses (t196),
-visibility (t195 closed), gauge/pop laws (t199 landed — do not re-derive).
-RATIONALE: every other static candidate is spent or capture-gated; the AI
-gap rows (queue t198a/b) remain as fallback if 0x2925c decodes trivially
-early. After t200 the offline-static route to OQ-005 is exhausted and the
-loop should surface the decision trigger (player eyeball of
-work/r1/shp_png/index.txt).
-If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
-1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c), adjudication
-via scripts/r1_t85g_sitting.py STILL outranks everything.
+NEXT t201: AI GAP ROWS — THREAT-BYTE INPUT + EMERGENCY CHAIN (queue item
+"t198 AI GAP ROWS 3+4" STATE.md:580-583, first half). t200 CLOSED its
+assignment outright (cos_star selector law measured; OQ-005 residue shrunk
+to a cited bound), so the offline-static route to OQ-005 is EXHAUSTED as
+predicted — the remaining OQ-005 movement is player-ruling class (WATCH-
+ONLY, do not burn iterations). Work: derive from the binary (static-only;
+Ghidra headless up via scripts/ghidra_headless_up.sh, objdump spans from
+work/functions_full.tsv HEX sizes, E8 byte-pass for callers) (1) the AI
+threat-byte INPUT: who writes the per-target threat value the AI reads
+(ai-dossier.md gap map row 3; anchor aicode.md S3a — bank its citations
+FIRST), and (2) the EMERGENCY CHAIN period tiers 200/225/300/400: find the
+tier table + the consumer loop, cite addresses, and upgrade the rewrite's
+AI threat/emergency defaults wherever they differ (rewrite/src/game/ai*.
+cpp). Sizing per PROBE COUNT ~35. If the threat-byte writer census is dead
+(zero static writers = live-capture class), bank the honest negative and
+stop at the chain half — do NOT spiral.
+Do NOT re-open: cos_star selector law (t200 landed, planets-ui.md S6 — the
+SEL=4K+cls law + K census are MEASURED, do not re-derive), slot-library
+identity [0x6fd90/2/4/9c] (live-capture class), span-bounded-walk (t197),
+visibility (t195 closed), gauge/pop laws (t199), relation-state enum
+(t189b closed).
+RATIONALE: it is the last authored offline-static queue item with real
+rewrite value; the second half (min-REQUIRES/over-pop demolish channel in
+buildPhase) queues as t202. If a REAL sitting arms first (TRIGGER-A
+baselines: full-ns mtime 1793294532100000000 / size 5,721,578,066 / tail
+md5 9054cc6c), adjudication via scripts/r1_t85g_sitting.py STILL outranks
+everything.
+
+LANDED t200 (2026-10-29, this session): COS_STAR SELECTOR SEMANTICS — THE
+LAST UN-ADJUDICATED SELECTION CLASS MEASURED; OQ-005 RESIDUE SHRUNKS TO A
+CITED BOUND. Trigger triage: timeline size 5,721,578,066 == frozen baseline
+(mtime 13:22:12.10), dosbox down -> no sitting; tree clean at d88371f.
+KEY LAWS [all cited, planets-ui.md S6]: (1) t198's "site 0x2925c" was the
+FUNCTION START — the real STAR_SHAPES blit is at 0x298dc inside
+FUN_00029788 (coswnd.cpp, span 0x2925c..0x2a493); (2) STAR SELECTION LAW
+SEL = 4*[star_record+0x00] + cls where K = star TYPE index (starstat.txt's
+13 types mapgen.md S1) and cls = 4-band ladder on v=frndint(f32[star+0xd]+
+f32@0x105e): v>=0xdc->0, 1..0xdb->1, -0xdc..0->2, <-0xdc->3; payload =
+[wnd+0xab]; x/y = unaligned s16 hi-words at node+3/+5; (3) K CENSUS MEASURED
+(scripts/r200_kcensus.py RC=0, 20 saves x 50 stars, pointer law): set
+{0,1,2,4,5,6,7,8,9,11,12} subset {0..12} -> SEL reach 0..51 -> the dims-zero
+residue k40..k51 (= types 10/11/12 x 4 classes, file-verified the COMPLETE
+dims-zero set, offs 0x8f2..0xa1b span 0x1b each) is ADDRESSABLE (draws
+nothing: zero-row walk; the blit's -1 @0x5cb2b checks the window shape-
+struct, not the record), and k52..k54 are provably UNADDRESSABLE (need
+K>=13 > type domain); (4) cosmos site 0x2a223 adjudicated NOT star art:
+relation BADGE blit SEL in {9 ALLIANCE, 8 WAR, -1 skip} off the t189
+relation-state byte, fixed x=0xe y=3. CORROBORATION: 60.sav guest RAM holds
+exactly two '1.10' lib buffers; member 0xfd2934 matches cos_star.shp
+header+dir byte-for-byte. HONEST NEGATIVES (row OQ-005 stays OPEN): WHY the
+12 slots are empty (vendor defect vs dims-location) stays unmeasured;
+[wnd+0xab] itself unmeasurable in-corpus (no COSMOSWnd object in the 20-sav
+ring). Docs: planets-ui.md S6 NEW, shp.md S22 fold, OPEN-QUESTIONS OQ-005
+STATUS t200. TOOLS: scripts/r200_kcensus.py NEW; scripts/r200_espmap.py NEW
++ fixed (capstone reg-constant 41 != ESP -> use reg_name; cdecl call
+preserves ESP; run LO after prologue sub). PITFALLS: functions_full.tsv
+sizes are HEX; unquoted heredoc eats $vars in python. Gate 0 + LEDGER AUDIT
+OK + LEDGER INDEX OK; open = 005/016/019/021.
+
 
 LANDED t199 (2026-10-29, this session): REWRITE WIRING OF THE t198
 PLANET-UI VIS LAWS + POP-BAND PIN (pure code + docs; the cheapest landing
