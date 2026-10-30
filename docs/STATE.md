@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-30T04:05
+updated: 2026-10-30T11:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -253,57 +253,103 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t206: CONSUMER LAW OF THE PER-STAR ATTACKED-MARK ARRAY [0x48304] —
-t205 resolved WHAT WRITES IT (byte[0x48304 + star_idx] |= 1<<victim-race,
-0x43afa, engagement star; docs/re/_wip_t205.md S6..S8); nobody has ever
-censused what READS it, and the rewrite currently treats the marks as pure
-bookkeeping (attackedMarks() has no game-logic consumer) — if the original
-feeds them into a decision (diplo emitter, AI target pick, event text), the
-rewrite is silently missing a channel. The reader census t205 ran
-(scripts/r205b_operand_census.py + imm pass; full site list banked _wip_t205
-L3) found EXACTLY: readers 0x4162f (inside guard ebx == [0x7458e] current
-player, dword[ebx+2]>>16 index form — same shape as the writer), 0x42bd2
-(inside a cmp byte[ebx+0x1c0],2 diplo-state guard block, index from
-dword[esp+0x394+2]>>16), 0x45e8d, the read/write pair 0x4610b/0x4611c
-(cl = [ebx+0x48304] then [ebx+0x48304] = cl — an OR/COPY with a neighbour
-byte?), 0x46213; plus the BIT-0 set/clear pair 0x24e84 (or 1) / 0x24e39
-(and 0xfe) inside star-record init 0x24f24 (its 0x25008 mov eax,0x48304 /
-call 0x76e30 = a fill — figure out what bit 0 means and who clears it).
-PROBE PLAN (~corpus-static; the r205d_windows.py disasm-window tool +
-functions_full.tsv attribution did all of t205's context work):
-(1) disasm 0x41600..0x416a0, 0x42bb0..0x42c60, 0x45e40..0x45ee0,
-    0x460f0..0x46260, 0x24e10..0x24ea0 + 0x24fb0..0x25020 CONTEXT and name
-    the enclosing functions (functions_full.tsv spans); decide for each
-    reader whether the value reaches a branch (decision), an event-text arg,
-    or another record's byte (propagation);
-(2) the 0x4610b/0x4611c pair is the highest-value site: a READ-MODIFY-WRITE
-    means marks TRANSFER or CARRY between stars/races (candidate: captured-
-    star mark inheritance, or a per-turn decay/clear — decay would FALSIFY
-    t204's PERMANENT claim; check it head-on);
-(3) land: per-consumer law into diplomacy.md (new S18) + ai-dossier row 12/
-    13 text; IF a decision-consumer exists, wire-or-file in campaign.cpp
-    with pins (mirror t204's discipline: pins cover both consumer states);
-    if all readers are display/text-only, bank the honest negative and keep
-    attackedMarks() bookkeeping (row 12 residue shrinks by the display part).
-RATIONALE: it is the direct open end of the thread t205 just finished (the
-mark array was DISCOVERED mid-task, its consumers were explicitly deferred,
-and t204's PERMANENT mirror claim is only safe once the 0x4611c write-pair
-is read); it is decision-bearing for the rewrite (a missing channel or a
-falsified permanence both change code); and it is the last corpus-static
-step of this family. Alternatives stay worse: gap row 12's inter-race state
-ladder is a design-shaped rewire (needs a BLOCKED-USER decision on
-projection), OQ-005/019/021 need play or the player (WATCH-ONLY), and the
-0x13bc4 scalar semantics need saves from other scenario families.
-Do NOT re-open: the 0x13bc5 = per-STAR identity (t205 W1..W4: 36 base sites
-vs zero strided on 0x13bc4, 20/20 save census, boundary == 50 stars,
-self-handle dword[+2]>>16 == k) — including "species table" re-reads of
-0x13bc4/0x13bc5; t205 CLOSED that argument in _wip_t205.md; also do not
-re-open t204's handler law itself (BYTE key, CEILING not floor, exactly 3
-callers — only the EBX/index identity and the [0x48304] shape changed),
-t203, t202/t202b, t201, t200, t195, t199, t189b.
+NEXT t207: THE PLANET-EVENT CALLERS OF THE DIPLOMACY-ON-ATTACK HANDLER —
+0x39fba and 0x3a255 (planet-event module; the two of 0x43a4c's three callers
+that t204 left explicitly UNWIRED as "no planet-attack-event model",
+OPEN-QUESTIONS OQ-016 STATUS t204 residue list). The combat caller 0x4b875
+is fully modelled (t204 S17 + t205 EBX=star correction); what fires these
+two, and what the -1 return drives at 0x3a255 (t204 banked "0x3a255
+branches on the -1 return"), has never been read. PROBE PLAN
+(~corpus-static; r205d_windows.py + functions_full.tsv attribution + the
+E8 caller-edge census pattern all proven in t205/t206):
+(1) disasm 0x39f00..0x3a000 and 0x3a1e0..0x3a2a0 verbatim; name the
+    enclosing functions (0x38ba4-family? t45 governor recalc is in that
+    span) and find their callers — is this the planet INVASION/OCCUPATION
+    event dispatch (cf. t206 W6 occupant loop's [occ+0x54] owner reads)
+    or the ground-combat resolver;
+(2) pin the victim law (esi+0x57 byte, 0xff sentinel skips) against the
+    planet-record +0x57 field identity (t85 hot-block note: name-based
+    +0x57..0x61 — CHECK it is not the same family's turn-churn bytes),
+    and what EDX (attacker idx) is sourced from;
+(3) decide: if the planet-event is ground combat on a planet, the rewrite
+    has no ground-combat model -> bank the law + honest no-delta (like t206
+    bit-0), shrinking the OQ-016 residue line; if it is an occupation/
+    bombing-event the rewrite CAN see, wire-or-file with pins (t204
+    discipline: both return states pinned).
+RATIONALE: it is the last unaccounted caller of the t204 handler (the
+family's caller census is EXACTLY 3 — after this pass, nothing in the
+0x48304/0x43a4c thread stays unread); it directly attacks an OQ-016
+documented residue; and it is corpus-static. Alternatives stay worse:
+gap row 12's inter-race ladder is design-shaped (BLOCKED-USER projection
+decision), OQ-005/019/021 need play (WATCH-ONLY), the 0x13bc4 scalar needs
+other-family saves, and t206's bit-0 event-code semantics are ring codes
+with ZERO corpus witnesses (nothing left to cite there).
+Do NOT re-open: t206's consumer law itself (victim bits = order/display
+only, bit-0 = call-scoped notice latch — _wip_t206 S7/diplomacy S18, and
+do NOT re-read 0x46144's relation-0->1 as a t189 contradiction: it is
+first-contact PEACE init, distinct from the proposal path), the 0x13bc5 =
+per-STAR identity (t205 W1..W4), t204's handler law (BYTE key, CEILING,
+3 callers), t203, t202/t202b, t201, t200, t195, t199, t189b.
 If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
 adjudication via scripts/r1_t85g_sitting.py STILL outranks everything.
+
+LANDED t206 (2026-10-30, this session): ATTACKED-MARK CONSUMER LAW
+MEASURED — THE 0x48304 BYTE IS TWO INDEPENDENT CHANNELS, AND NEITHER FEEDS
+DIPLOMACY VALUES OR AI. Trigger triage: timeline size 5,721,578,066 ==
+frozen baseline, dosbox down, tree clean at d9db21a -> no sitting; STATE
+t206 stood. LAWS [all cited, docs/re/_wip_t206.md S1..S7 + diplomacy.md
+§18 NEW; windows work/t206_w1..w7.txt via r205d_windows; function spans
+from functions_full.tsv (OVERLAPPING entries — pick tightest); E8 edge
+census over the FULL image for callers]:
+(1) VICTIM BITS 1..7 (writer 0x43afa, t204): sole mid-play consumers are
+    INSIDE THE ORDER RESOLVER 0x41260..0x43270, both gated owner==current
+    player [0x7458e]: 0x41610..0x41661 unit-at-star -> status byte |=0x20
+    ("under attack" alert); 0x42b7d..0x42be8 slot scan -> result nonzero
+    (action-availability eligibility; WAR-relation skip guard 0x42bb1 sits
+    inside the same loop). NO diplo-value feed, NO AI target pick, NO
+    emitter. => the rewrite's unconsumed attackedMarks()/attackedAt()
+    mirror is FAITHFUL (no code delta); gap row 12 residue SHRINKS.
+(2) t204's PERMANENT claim SURVIVED HEAD-ON (the task's key question):
+    0x4610b/0x4611c = cl=[star]; or cl,1; [star]=cl — an OR-set of BIT 0,
+    no decay, no transfer. Sole victim-bit clear anywhere = the scenario-
+    init fill 0x25008 (mov eax,0x48304/call 0x76e30) in star-init 0x24f24
+    (single caller 0x55f06).
+(3) BIT 0 = contact/announcement channel, never touched by the attack
+    handler: 0x45e48 (march-body caller 0x4a90a, ship-owner==player gate;
+    bit0 GATE 0x45e93 BEFORE fire-then-latch 0x4611c; undiscovered-races
+    test byte[row+0x1c0]==0; codes 3/0x14 by star-vision; 0x55a60's EAX
+    0x7a35c = the event-RING game object, aicode :979/:1042 — NOT a string,
+    bytes there are code re-measured); 0x46144 first-contact ESTABLISH
+    (0x4a932 vision-already branch; relation byte 0->1 PEACE init 0x461a8
+    + contact bookkeeping; gate 0x46213; latch AFTER fire 0x4623e; codes
+    8/9); 0x24dd0 turn-advance notice producer (callers 0x55ed0/0x55f98
+    pass EAX=0x12e10; CLEARS bit0 on ALL stars first — bound u16@0x16145
+    MEASURED 50 == star count 20/20 by NEW script
+    r206_mark_context_census.py RC=0, C1 dword[0x12e10+2]>>16==0 20/20 —
+    then latches and announces AT MOST ONE star/call (event 0x13) iff
+    vision byte +0x15 & occupant owner!=player & relation
+    [owner*0x1ee+0x12fd6]==2 & u32[occ+0x88]>0). Call-scoped duplicate-
+    notice suppression, NOT a permanent star state (S5 self-correction).
+(4) HONEST NEGATIVE (strict-close; OQ-016 STAYS OPEN): C3 re-measured
+    window [0x48304,+0x40) ALL-ZERO 20/20 — zero witnesses for EVERY
+    branch of the bit-0 machinery (corpus is post-first-contact, nobody
+    fires at a non-at-war power); event codes 3/8/9/0x13/0x14 are ring
+    codes decoded only as "queued announcement"; [0x13bc4] semantics still
+    open (other-family saves needed).
+(5) CODE/PINS: campaign.h comment rewritten to the two-channel law; NEW
+    pin mark_channels_separate_t206 (attack mirror never carries bit 0;
+    victim bits only on engagement cells) — 130 tests 0 failed. BLAST
+    RADIUS: SEMANTIC CODE UNCHANGED (comment + test only) — no CLI re-run
+    owed; t205's Control t1255 / Extinct t979 stand. Docs: ai-dossier gap
+    row 12 residue line amended. PITFALLS BANKED: functions_full.tsv spans
+    OVERLAP (Ghidra nested entries — attribute to the tightest containing
+    span, else 0x45e8d "belongs" to six functions); .SAV member is the
+    ZIP entry NAMED "Memory" (a size->0x200000 heuristic silently found
+    zero saves; use r205's read("Memory") pattern); mid-window capstone
+    seeds drift a couple bytes — anchor on an instruction whose jcc target
+    lands on a decode boundary and re-verify (R108). Gate + LEDGER AUDIT +
+    LEDGER INDEX below. NEXT = t207 planet-event callers 0x39fba/0x3a255.
 
 LANDED t205 (2026-10-30, this session): TABLE IDENTITY ADJUDICATED — 0x13bc5
 stride 0x60 is the per-STAR runtime STAR RECORD TABLE (t200 wins; the per-

@@ -590,3 +590,58 @@ Campaign::attacked_ byte + attackedMarks() mirror [0x48304] PERMANENTLY (no
 clear incl. peace). Pins test_diponattack_t204.cpp x4 (battery/e2e cascade/
 alliance violation/ceiling e2e); 128 tests 0 failed; blast radius unchanged
 (seed 2024 Control t1255, seed 42 Extinct t979). Gap map row 13 -> MODELLED.
+
+## §18 — ATTACKED-MARK CONSUMER LAW: TWO CHANNELS, NO DIPLO-VALUE FEED
+(t206, 2026-10-30; full working detail docs/re/_wip_t206.md S1..S7)
+
+The per-star mark byte [0x48304 + star_idx] carries TWO INDEPENDENT channels
+with disjoint producers:
+
+18.1 VICTIM BITS 1..7 — the t204 attack marks. Sole mid-play writer 0x43afa
+(S17); sole clear = the scenario-init fill 0x25008 (mov eax,0x48304 / call
+0x76e30 inside star-record init 0x24f24, itself called only from 0x55f06).
+Consumers (both inside the order resolver 0x41260..0x43270, both gated by
+owner == current player [0x7458e]):
+  - 0x41610..0x41661: owner's unit at the marked star (unit handle ->
+    [h+2]>>16 == star idx) gets status byte |= 0x20 (the "under attack"
+    alert marker in the resolver's per-unit stack status table);
+  - 0x42b7d..0x42be8 slot-scan: same test (bl = byte[star+0x48304] &
+    1<<self-race) makes the scan result nonzero -> unit action-availability
+    eligibility (relation==2 WAR rows skip right next to it, 0x42bb1).
+VERDICT: consumers are UNIT-ORDER/DISPLAY ONLY — no diplomacy-value feed,
+no AI target pick, no emitter reads victim bits. t204's PERMANENT mirror
+claim SURVIVES head-on: the 0x4610b/0x4611c pair flagged as a possible
+decay/transfer is `cl=[star]; or cl,1; [star]=cl` — an OR-set of BIT 0 only.
+
+18.2 BIT 0 — contact/announcement latch, NEVER written by the attack
+handler. Producers/gates (functions 0x45e48..0x465aa and 0x24dd0..0x25108,
+both fed from the march body / advance dispatch with the CURRENT STAR
+record):
+  - 0x45e48 (caller 0x4a90a, ship-owner==player): GATE at 0x45e93 (bit0 set
+    -> return, no re-fire); finds undiscovered races (byte[row+0x1c0]==0),
+    event code 3/0x14 by star-vision (byte[edi+0x15]|byte[edi+0x14] bit
+    player), then fire-then-latch: [star]|=1 at 0x4611c, call 0x55a60
+    (EAX 0x7a35c = the event-RING game object, aicode :979/:1042 — not a
+    string).
+  - 0x46144 first-contact establish (caller 0x4a932, vision-already branch):
+    relation byte 0 -> 1 (PEACE init, t187 identity) at 0x461a8 + contact
+    bookkeeping (word [rec+0x1d5] -> [row+0x1b2], byte [emp*0x1ee+0x12fd6]
+    =1); bit0 gate 0x46213, event codes 8/9, latch AFTER fire at 0x4623e.
+  - 0x24dd0 (callers 0x55ed0/0x55f98, eax=0x12e10): CLEARS bit0 on ALL 50
+    stars first (0x24e39 AND 0xfe loop, bound u16[dword@0x12e10+0x3335]
+    MEASURED 50 == star count 20/20 — address 0x16145 doubles as the live
+    star-count word, r206_mark_context_census C1/C2), then walks stars:
+    latch 0x24e84, require vision byte +0x15, occupant with owner != player,
+    relation [owner*0x1ee+0x12fd6]==2 WAR, u32[occ+0x88]>0 -> [ebp+4]++ and
+    nonzero return -> event 0x13. Call-scoped one-notice suppression, NOT a
+    permanent star state.
+
+18.3 REWRITE: NO DELTA — attackedMarks()/attackedAt() bookkeeping is
+faithful for the channels the rewrite models (no per-unit alert layer, no
+contact-notice event queue). Gap row 12's residue SHRINKS: the attacked
+bitmap is now measured as display/order-only, so the missing inter-race
+ladder no longer owes it an explanation. HONEST NEGATIVE (strict-close,
+row stays open): the whole bit-0 machinery has ZERO witnesses in the 20-save
+corpus (post-first-contact, nobody-fires scenarios — C3 re-measured
+[0x48304..+0x3f] all-zero 20/20); event codes 3/8/9/0x13/0x14 are ring codes
+decoded only as "queued announcement".

@@ -291,3 +291,27 @@ TEST(diponattack_alliance_ceiling_t204) {
     CHECK(c.dipStateAt(0).attitude == 476);
     CHECK((c.attackedMarks() & (1 << 1)) != 0);
 }
+
+// ---- T6 (t206): CHANNEL SEPARATION — the mirror never carries bit 0 ------
+// t206 consumer law (docs/re/diplomacy.md §18): [0x48304]'s bit 0 is a
+// SEPARATE contact-notice latch (producers 0x4611c/0x4623e, per-call
+// clear-all + re-latch-one in 0x24dd0), NEVER written by the attack handler
+// 0x43afa for a non-zero victim. The rewrite models player-attacker
+// engagements only (victims are AI races 1+), so its mirror must stay a
+// pure victim-bit field: after every fired turn, bit 0 of every cell and of
+// the reduced view is 0, and victim bits land exactly on engagement stars.
+TEST(mark_channels_separate_t206) {
+    std::string err;
+    ag::DipFile df;
+    if (!df.loadFromFile((kRepo / "extracted/ascend00/race00.dip").string(), &err))
+        std::abort();
+    auto c = buildFixture({df}, {ag::SpeciesAbility::HealShips});
+    CHECK(c.attackedMarks() == 0);
+    c.setWarForTest(ag::kPlayer, 1, true);
+    for (int t = 0; t < 3 && !c.over(); ++t) c.advance();
+    CHECK((c.attackedMarks() & (1 << 1)) != 0);
+    CHECK((c.attackedMarks() & 1) == 0);          // latch channel absent
+    CHECK((c.attackedAt(1) & 1) == 0);            // per-cell bit 0 never set
+    for (int s = 0; s < 5; ++s)
+        CHECK((c.attackedAt(s) & static_cast<unsigned char>(~(1 << 1))) == 0);
+}

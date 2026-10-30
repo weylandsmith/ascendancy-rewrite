@@ -441,9 +441,14 @@ public:
     // the EDX arg is a STAR record, cf. 0x4b806/0x4b82c building it from the
     // ship's +0x59 star pointer). Byte value = mask of VICTIM races fired at
     // at that star while NOT at war (the -1 return path). PERMANENT for the
-    // attack channel (no clear site for bits 1<<r exists; bit 0 has its own
-    // set/clear pair 0x24e84/0x24e39). attackedMarks() OR-reduces the array
-    // (the t204 pin surface); attackedAt(star) reads one cell.
+    // attack channel (no clear site for bits 1<<r exists; bit 0 is a SEPARATE
+    // channel — a call-scoped contact-notice latch whose only clear is the
+    // 0x24dd0 all-stars sweep, t206). CONSUMER LAW (t206, diplomacy.md S18):
+    // victim bits feed ONLY unit-order/display (status |=0x20 at 0x41659,
+    // eligibility scan result at 0x42be8) — no diplo-value or AI feed — so
+    // this mirror staying unconsumed in the rewrite is FAITHFUL.
+    // attackedMarks() OR-reduces the array (the t204 pin surface);
+    // attackedAt(star) reads one cell.
     unsigned char attackedMarks() const {
         unsigned char m = 0;
         for (size_t i = 0; i < attacked_.size(); ++i) m |= attacked_[i];
