@@ -253,56 +253,96 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t210: ADJUDICATE THE LAST STATIC RESIDUE ON THE OQ-016 ATTACK-PRICE
-THREAD — PER-SHOT STACKING vs PER-ENGAGEMENT AGGREGATE at the 0x4b875
-handler call (the residue t204..t209 all carried as 'unverified'). The
-rewrite charges applyAttackDipCost ONCE per aggregate engagement; the
-original's 0x43a4c cost = 10*(MOVSX([0x13bc4])+1) PER CALL, so if the
-call site sits inside a per-shot / per-gizmo / per-attacker-ship loop,
-the original stacks -20 (or -40 vs ally) multiple times per battle and
-the rewrite's per-engagement charge is quantifiably under-firing. Task
-legs, in order:
-(1) Disassemble 0x4b740..0x4b8e3 END-TO-END (r205d_windows seed-restart;
-    t207 pitfall: capstone stops at first undecodable byte) and map the
-    control-flow nesting of the 0x4b875 call: is it inside a loop whose
-    induction variable iterates shots/gizmos/ships? Cite loop head, bound,
-    and the back-edge that re-reaches 0x4b875 (or its absence).
-(2) Census the SIX callers of 0x4b740 (E8 byte-pass idiom — spans
-    OVERLAP, tightest wins): which fire the handler-bearing path, once
-    per order-resolution or once per volley-round? Correlate with the
-    t89 commit law (mode==1 only 0x25560/0x25570) so the counting is per
-    REAL engagement, not per dead-path.
-(3) BANK the answer as a LAW with addresses either way. If stacking is
-    REAL, quantify (shots-per-engagement upper bound if computable from
-    the loop bound) and state the rewrite's under-count as a DOCUMENTED
-    divergence — do NOT change combatPhase semantics: converting the
-    aggregate model to per-shot charges is a projection across the
-    OQ-019 per-ship boundary (BLOCKED-USER, docs/BLOCKED.md t70 class),
-    same rule t209 applied to the clamp position. If the call is once
-    per engagement, the residue line closes outright (rewrite faithful).
-(4) Update in the same commit: docs/re/_wip_t210.md (new), _wip_t204.md
-    residue line, ai-dossier gap row 13 residue, OPEN-QUESTIONS OQ-016
-    STATUS t210, STATE.md.
-RATIONALE: after t209 closed both 0x3a174 residues, this is the ONLY
-corpus-free static question left anywhere in the open ledger — every
-other residue is play-gated (OQ-016 clamp witness, OQ-021 end-ctrl
-boundary, [0x13bc4] gate-firing save) or BLOCKED-USER design projection
-(OQ-019 per-ship model, gap rows 12/15/16). Bounded ~10-15 probes.
-Do NOT re-open: t209's out-param law (sole writer 0x3a35e; caller 0x42c8e
-discards out-param AND return; 0x3d951 = UI message family) and
-ATTEMPT-TIME clamp position (repelled invasions pay the clamp too;
-rewrite capture-branch = documented under-model, diplomacy.md §19 t209),
+NEXT t211: FIRST CHECK FOR A REAL SITTING (it outranks everything):
+TRIGGER-A baselines for work/r1/playcap/live-timeline.jsonl — full-ns mtime
+1793294532100000000 / size 5,721,578,066 / tail-64KiB md5 9054cc6c66802e6f80431d4ffa1416ee.
+If ANY differs, run scripts/r1_t85g_sitting.py adjudication BEFORE any static
+work (standing rule), and note that a save where the player fights a
+multi-volley battle vs a non-at-war owner would witness BOTH the OQ-016
+clamp residue AND the t210 stacking magnitude at once (report measured,
+never fabricate).
+If no sitting armed, work t211 (the last bounded static thread the t210
+finding opened): COMMIT-CHAIN TAIL — the 0x49f28 ELSE-BRANCH 0x49f54 (taken
+when [ship+0x62] != 1; the [ship+0x62]==1 leg is fully read via 0x4a360,
+t88/t210) and the cat-5 loop-bound array identity:
+(1) Disassemble 0x49f54..(ret) end-to-end (r205d_windows; capstone
+    seed-restart pitfall) and read what [ship+0x62] values route where (the
+    0x49f31 test cl/test cl,1 chain shows values 0 and 1 handled; who sets
+    [ship+0x62] — E8 census writers, operand pass) — this closes whether a
+    committed order can reach the handler-bearing path by a SECOND door the
+    t210 law missed.
+(2) Identify the arrays [esp+0x730]/[esp+0x734] in 0x4cd90 (the splash loop
+    bounds): trace their writers within 0x4cd90 (prologue 0x4cd90..0x4ce2b
+    region fills them — cite which count they mirror: entity list? star
+    garrison?) so the stacking UPPER BOUND becomes a named quantity instead
+    of 'runtime'.
+(3) BANK as docs/re/_wip_t211.md; only a law with addresses is a result; no
+    combatPhase semantic change without a cited per-commit loop in the
+    rewrite (OQ-019 boundary rule, t209/t210 pattern).
+RATIONALE: after t210 quantified stacking, the ONLY corpus-free static
+questions left are (a) whether the commit chain has a second
+handler-bearing door (0x49f54 else-branch) and (b) naming the splash
+multiplier bound; every other open residue in the ledger is play-gated
+(OQ-016 clamp witnesses, OQ-021 end-ctrl boundary, [0x13bc4] gate-firing
+save) or BLOCKED-USER design projection (OQ-019 per-ship model, gap rows
+12/15/16). Bounded ~10-15 probes.
+Do NOT re-open: t210's stacking law (mode==1-only @0x4b7f1, volley 0x4a5c1
+mode-0, commit loop 0x2550c one arm per matched gizmo, ah==1 traps, cat-5
+loops 0x4d0a5/0x4d2ab, sole 0x4cd90 caller 0x4a3c4) and its tool pitfalls
+(capstone CS_OP_IMM==2 not 3; back-edge != target<=site — use SCC),
+t209's out-param law (sole writer 0x3a35e; caller 0x42c8e discards out-param
+AND return; 0x3d951 = UI message family) and ATTEMPT-TIME clamp position
+(rewrite capture-branch = documented under-model, diplomacy.md S19 t209),
 the t207 scale-2 algebra S7a, the caller census EXACTLY-{0x39fba,0x3a255,
 0x4b875} of 0x43a4c, t208's e2e pin semantics (setIndustryForTest has NO
-production call site — keep it that way), t206's two-channel consumer
-law, t205's per-STAR identity, t204's handler law (byte-key, CEILING
-shape), t203, t202/t202b, t201, t200, t195, t199, t189b.
-If a REAL sitting arms first (TRIGGER-A baselines: full-ns mtime
-1793294532100000000 / size 5,721,578,066 / tail md5 9054cc6c),
-adjudication via scripts/r1_t85g_sitting.py STILL outranks everything —
-and a save where the player fights a multi-volley battle vs a non-at-war
-owner would witness BOTH the clamp AND the stacking question at once
-(report it, do not fabricate it).
+production call site — keep it that way), t206's two-channel consumer law,
+t205's per-STAR identity, t204's handler law (byte-key, CEILING shape),
+t203, t202/t202b, t201, t200, t195, t199, t189b.
+
+LANDED t210 (2026-10-30): LAST STATIC RESIDUE OF THE 0x4b875 ATTACK-PRICE
+LEG CLOSED — STACKING LAW MEASURED (docs/re/_wip_t210.md S1..S6; tool
+scripts/r210_loop_nesting.py NEW, Tarjan-SCC loop detector, positive control
+= finds the known 0x3a2c9 defense loop). Trigger triage: timeline mtime
+1793294532100000000 / size 5,721,578,066 / tail-64KiB md5 9054cc6c... ==
+frozen baselines, dosbox down, tree clean at 59755c4 -> no sitting; STATE
+t210 stood. THE ANSWER: STACKING IS REAL, but per COMMITTED WEAPON / per
+VICTIM, NOT per shot.
+(1) 0x4b740 END-TO-END loop-free: every branch forward, single 0x43a4c call
+    0x4b875, gated `cmp [esp+8],1; jne 0x4b8d8` @0x4b7f1 — mode==1-only
+    RE-CONFIRMED at the gate itself; attacker-row select 0x13bc5+96*row
+    @0x4b82c; tail (shield/hull subtract, death 0x49d2c) outcome-independent.
+(2) SIX-caller census (E8 EXACTLY {0x1a146,0x39d9f,0x3a0b3,0x4bb56,0x4d191,
+    0x4d2dd}, zero thunk sites): 0x1a146 mode-0 DEAD; 0x3a0b3 acyclic mode-1
+    (item-0x17 t204 family); 0x4bb56 inside cat0 handler 0x4b8e4 (its ONLY
+    0x4b740 edge), and the volley loop 0x4a5c1 calls 0x49f28 with edx=0
+    (@0x4a5ec) = DRY-RUN, so t88a's commit law holds — volley never charges;
+    0x4d191/0x4d2dd INSIDE the splash loops 0x4d0a5..0x4d1a4 / 0x4d2ab..
+    0x4d2fd of cat-5 dispatcher 0x4cd90 (sole caller 0x4a3c4 = dispatcher
+    cat5 arm; mode invariant [esp+0x73c] sole writer 0x4cd9d; gates owner!=
+    victim @0x4d2be + race-alive byte[0x12fd6+494*owner]==2 @0x4d2ca).
+(3) COMMIT LAW QUANTIFIED: command-exec 0x2547c loop 0x2550c..0x25527,
+    bound = matched-gizmo count; ONE mode-1 arm per matched gizmo (ah==3 gun
+    -> 0x25560 -> 0x49f28 -> 0x4a360 -> 0x4b8e4 -> 0x4bb56; ah==2 ability ->
+    0x25570 -> 0x39c10 -> dispatcher); ah==1 ALSO hits assert trap 0x2a438
+    (t88a correction: 'ah>=4' -> 'ah==1 or ah>=4').
+(4) REWRITE: NO semantic change (OQ-019 boundary rule, t209 pattern) —
+    campaign.cpp:1935 comment rewritten to cite the t210 law; the per-
+    engagement charge is the DOCUMENTED UNDER-MODEL (under-fires per extra
+    committed weapon at the same victim + per splash victim beyond first).
+(5) docs: NEW _wip_t210.md S1..S6, _wip_t204.md AMENDMENT (S2/D4 'per shot'
+    mechanism corrected), ai-dossier row 13 residue amended (stacking
+    RESOLVED), OQ-016 STATUS t210 appended. SELF-CAUGHT x3: capstone
+    operand-type constant (CS_OP_IMM==2, not 3 — first CFG pass silently
+    zero edges); back-edge != target<=site (loop heads can sit mid-range —
+    use SCC); '0x4cd90 reached only indirectly' claimed from a literal-only
+    search before running the E8 pass (0x4a3c4 exists).
+OQ-016 STAYS OPEN (strict-close): zero in-corpus clamp witnesses (play-
+gated); invasion defense law + per-ship channel unmodelled (OQ-019);
+runtime entity-loop bounds play-gated; [0x13bc4] semantics other-family.
+Gate 0 (comment-only rebuild) + LEDGER AUDIT OK (rows=19 open=
+OQ-005/016/019/021). NEXT=t211 (sitting check first; else 0x49f54 else-
+branch second-door census + splash loop-bound array identity; no
+combatPhase semantic change without a cited per-commit loop).
 
 LANDED t209 (2026-10-30): LAST TWO STATIC-LAW RESIDUES OF THE 0x3a174
 INVASION LEG CLOSED — OUT-PARAM CALLER LAW + CLAMP-VS-REPEL POSITION.

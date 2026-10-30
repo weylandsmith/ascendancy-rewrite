@@ -1923,7 +1923,13 @@ void Campaign::combatPhase() {
             // 0x4b875: the hostility cost lands BEFORE the shield/hull
             // subtraction (0x4b87a/0x4b888) — the price of FIRING, not of
             // capturing; a repelled attack still pays. Fires per engagement
-            // resolution (original: per shot; aggregate S2i mapping). Two-
+            // resolution. t210 STACKING LAW (docs/re/_wip_t210.md S6): the
+            // original charges once per COMMITTED weapon/victim (mode==1
+            // gate 0x4b7f1; volley loop 0x4a5c1 is mode-0 cost-free; commit
+            // loop 0x2550c one arm per matched gizmo; cat-5 splash loops
+            // 0x4d0a5/0x4d2ab per victim) — this per-engagement charge is
+            // the DOCUMENTED UNDER-MODEL (per-commit conversion crosses the
+            // OQ-019 per-ship boundary; NO semantic change). Two-
             // party projection (gap row 12): dipState_ rows are AI->PLAYER,
             // the original's cell is victim->attacker, so the cell exists
             // exactly when the attacker is the player; AI-AI engagements

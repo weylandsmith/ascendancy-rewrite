@@ -155,3 +155,18 @@ diplomacy.cpp:243), so player attacks DO pay -20/engagement in FFA runs —
 attitude just never crossed a threshold that altered an outcome on the two
 checked seeds (falling attitude makes ProposePeace strictly rarer; the
 already-at-war DeclareWar branch is a no-op).
+
+## AMENDMENT t210 (stacking residue line, S2:44 + D4:117 "per shot -> stacking")
+RESOLVED by cited measurement (docs/re/_wip_t210.md S1..S6): the original
+stacks the -20 per COMMITTED WEAPON / per VICTIM — NOT per shot. The 0x43a4c
+leg inside 0x4b740 is mode==1-gated (@0x4b7f1 `cmp [esp+8],1`), and the
+generic volley loop 0x4a5c1 calls 0x49f28 with edx=0 (@0x4a5ec) -> volley is
+cost-free (t88a dry-run law holds). Multipliers: commit loop 0x2550c..0x25527
+(one mode-1 arm-activation per matched gizmo — 0x25560 gun / 0x25570 ability)
+and cat-5 splash loops 0x4d0a5..0x4d1a4 (per other entity) / 0x4d2ab..0x4d2fd
+(per hostile alive-power victim, owner!=victim @0x4d2be, race-alive
+byte[0x12fd6+494*owner]==2 @0x4d2ca). The D4 aggregate divergence stands
+(DOCUMENTED, OQ-019 per-ship boundary — no semantic change), but its stated
+mechanism is corrected: per-engagement charge under-fires once per EXTRA
+committed weapon of the same order at the same victim, and once per splash
+victim beyond the first.
