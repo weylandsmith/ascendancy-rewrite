@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-31T01:14
+updated: 2026-10-31T01:24
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,15 +260,15 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t235: DO NOT RUN ON CADENCE — TRIGGER-ARMED IDLE (run ONLY if a trigger
+NEXT t236: DO NOT RUN ON CADENCE — TRIGGER-ARMED IDLE (run ONLY if a trigger
 fired; otherwise run the two axes below, expect the idle result, write the
 one-line idle line, and STOP).
 
-Twenty-one consecutive byte-identical adjudications now stand (t214..t234). An
+Twenty-two consecutive byte-identical adjudications now stand (t214..t235). An
 idle iteration cannot move the ledger — that premise is MEASURED from the
 primary source, not asserted (t219: ledger_audit rows=19
 open=['OQ-005','OQ-016','OQ-019','OQ-021'] closed=15, plus an independent grep
-finding exactly six '| open |' markers, all inside those four rows). t221..t234
+finding exactly six '| open |' markers, all inside those four rows). t221..t235
 each confirmed the idle result WITHOUT re-running the audit, because with no
 sitting the open set cannot have changed. So if this session was armed by
 cadence rather than by a moved baseline, cap the work at ~4 calls and add no
@@ -279,8 +279,8 @@ Axis 1 — python3 scripts/r214_triage.py (one call; RC=0; three baselines +
 game process + watcher census + tail collapse).
 TRIGGER-A baselines for work/r1/playcap/live-timeline.jsonl: full-ns mtime
 1793294532100000000 / size 5,721,578,066 / tail-64KiB md5
-9054cc6c66802e6f80431d4ffa1416ee. As of t234 (2026-10-31T01:12:08Z) all three
-are equal, the baseline is 31.85 h old, and the tail is healthy (400 rows,
+9054cc6c66802e6f80431d4ffa1416ee. As of t235 (2026-10-31T01:21:33Z) all three
+are equal, the baseline is 31.99 h old, and the tail is healthy (400 rows,
 0 bad json, turn 1086, 275 distinct, one key shape).
 
 Axis 2 — ONE save-axis find (t215 law + t216 ns-precision fix,
@@ -300,7 +300,7 @@ byte[star+0x15] nonzero) settling the OQ-021 S6 semantic non-join + P7 label
 question. Mine COUNTS ONLY through r1_stream.observations(trust=True) — raw row
 arithmetic is writer-multiplicity garbage (t214: 4.26x overall, up to ~12x
 locally, no global constant; writer population stable at exactly 4 open fds
-t215..t234; docs/BLOCKED.md R1-runbook TIMELINE-MINING LAW).
+t215..t235; docs/BLOCKED.md R1-runbook TIMELINE-MINING LAW).
 If NO sitting: one line into STATE, nothing appended to the ledger, STOP.
 
 STEERING OVERRIDE (any of these outranks the two axes): (i) a steering note
@@ -314,62 +314,76 @@ USER ASKS (standing, unchanged since t216): (1) play a few turns mid-campaign
 attacking a NON-AT-WAR power + save — kills the OQ-016 witness ask and the
 OQ-021 comparator-firing ask at once; (2) the OQ-019 ruling above; (3) retire
 the three orphaned watchers (260988/290953/292085, all --no-exit) before the
-next capture — fd-level fact stable t215..t234: exactly FOUR processes hold
+next capture — fd-level fact stable t215..t235: exactly FOUR processes hold
 live-timeline.jsonl open for append (27774 + those three; wrapper 27772 holds
 none; no new orphans since t215). A supervised-session decision; research
 iterations must NOT kill them.
 
-RATIONALE: t234 reproduced the t233 adjudication exactly a twenty-first time
+RATIONALE: t235 reproduced the t234 adjudication exactly a twenty-second time
 (three baselines byte-identical; zero comm-class dosbox/ascend.exe; save axis
 bit-identical with the 1409-file population, newest 41.sav ns 1793294530.108,
-gap 1.992 s re-measured a sixteenth consecutive time; watcher population
+gap 1.992 s re-measured a seventeenth consecutive time; watcher population
 unchanged — wrapper 27772 + child 27774 + orphans 260988/290953/292085, no new
-orphans, no retirements). t234 held the ~4-call cap (3 calls before the finish
-sequence: the 2 assigned axes plus one baseline-age recomputation) and added
-nothing beyond the reproduction plus an independently recomputed baseline age
-(31.8455 h at 2026-10-31T01:12:56Z, monotone against t233's 31.6800 h at
-2026-10-31T01:03:00Z — Δ 596.0 s == the 9 m 56 s wall gap exactly); ledger_audit
+orphans, no retirements). t235 held the ~4-call cap (2 assigned axis calls
+plus one baseline-age recomputation) and added nothing beyond the reproduction
+plus an independently recomputed baseline age (31.9892 h at
+2026-10-31T01:21:33Z, monotone against t234's 31.8455 h at 2026-10-31T01:12:56Z
+— Δ 517.3 s == the 8 m 37 s wall gap exactly); ledger_audit
 ran ONLY as a gate stage. Consequence unchanged:
 the next move is new play or a user decision, not another research iteration.
 Re-arm the harness on the r214_triage trigger against the three baselines above.
-Do NOT re-open: t234's twenty-first-identical idle reproduction
-(docs/re/_wip_t234.md S1..S3, same rule as below: nothing there is new content),
-t233's twentieth-identical idle reproduction
-(docs/re/_wip_t233.md S1..S3, same rule as below: nothing there is new content),
-t232's nineteenth-identical idle reproduction
-(docs/re/_wip_t232.md S1..S3, same rule as below: nothing there is new content),
-t231's eighteenth-identical idle reproduction
-(docs/re/_wip_t231.md S1..S3, same rule as below: nothing there is new
-content), t230's seventeenth-identical idle reproduction
-(docs/re/_wip_t230.md S1..S3, same rule as below: nothing there is new
-content), t229's sixteenth-identical idle reproduction
-(docs/re/_wip_t229.md S1..S3, same rule as below: nothing there is new
-content), t228's fifteenth-identical idle reproduction
-(docs/re/_wip_t228.md S1..S3, same rule as below: nothing there is new
-content), t227's fourteenth-identical idle reproduction
-(docs/re/_wip_t227.md S1..S3, same rule as below: nothing there is new
-content), t226's thirteenth-identical idle reproduction (docs/re/_wip_t226.md
-S1..S3, same rule as below: nothing there is new content), t225's
-twelfth-identical idle reproduction (docs/re/_wip_t225.md
-S1..S3 — nothing there is new content; do not add a "new" axis, a third code
-path, a fresh fd census, or a repeat ledger audit as a finding without a moved
-baseline), and the same-content reproductions t224 (eleventh, _wip_t224 S1..S3),
+Do NOT re-open: t235's twenty-second-identical idle reproduction
+(docs/re/_wip_t235.md S1..S3, nothing there is new content), t234's
+twenty-first-identical idle reproduction (docs/re/_wip_t234.md S1..S3), and
+the same-content reproductions t233..t225 (_wip_t233..t225 S1..S3 — do not add
+a "new" axis, a third code path, a fresh fd census, or a repeat ledger audit as
+a finding without a moved baseline), t224 (eleventh, _wip_t224 S1..S3),
 t223 (tenth, _wip_t223 S1..S3), t222 (ninth, _wip_t222 S1..S3), t221 (eighth,
 _wip_t221 S1..S3), t220 (seventh, _wip_t220 S1..S4), t219 (sixth-identical
 adjudication + the 1.992 s gap fix + the ledger-premise re-measurement,
 _wip_t219 S1..S4), t218 (fifth, + the S5 scheduling conclusion), t217 (fourth),
-t216 (idle + the 41.sav precision fix: name the newest save by ns, never
-wall-minute), t215 (no-sitting adjudication + fd-census method: writerhood =
-open fd, not process presence; do not kill watchers), t214 (mining law: the
-collapse factor is MEASURED with content-conflict controls — do not "verify" it
-again without a new sitting), t213's al-form verdict (site 1 ==1 / site 2 ==0
-are dominance-PROVED — do not re-trace [esp+0x50]/[esp] defs), t212's
-writer-negative (a ZERO census with controls IS the result; next instrument =
-runtime watchpoint), t212's P7 correction ([star+0x15] label [unverified]),
+t216 (third: NS-precision lesson — mtime-seconds ties are an artifact of
+sorting at second resolution, not a real inversion), t215 (no-sitting
+adjudication + fd-census method: writerhood = open fd, not process presence;
+do not kill watchers), t214 (mining law: the collapse factor is MEASURED with
+content-conflict controls — do not "verify" it again without a new sitting),
+t213's al-form verdict (site 1 ==1 / site 2 ==0 are dominance-PROVED — do not
+re-trace [esp+0x50]/[esp] defs), t212's writer-negative (a ZERO census with
+controls IS the result; next instrument = runtime watchpoint), t212's P7
+correction ([star+0x15] label [unverified]),
 t211's dispatch law (0x4a350 re-scan only with a new save), t210's stacking law +
 tool pitfalls, t209's out-param law + ATTEMPT-TIME clamp, t207 scale-2 algebra
 S7a + caller census, t208 e2e pin semantics, t206 two-channel consumer law,
 t205 per-STAR identity, t204, t203, t202/t202b, t201, t200, t199, t195, t189b.
+
+LANDED t235 (2026-10-31): NO SITTING — TWENTY-SECOND CONSECUTIVE BYTE-IDENTICAL
+ADJUDICATION, ~4-CALL CAP HELD, DELIBERATELY CONTENT-FREE (NO ledger row moved —
+strict-close honored; docs/re/_wip_t235.md S1..S3 hand-authored; no new tools —
+r214_triage.py RC=0 at 01:21Z: ns 1793294532100000000 / size 5721578066 /
+tail-md5 9054cc6c... all == TRIGGER-A baselines, script prints its own 'sitting
+delta: False', zero comm-class dosbox/ascend.exe, tail intact 400 rows/0 bad
+json/turn 1086/275 distinct; baseline age INDEPENDENTLY RECOMPUTED -- baseline
+ns == 2026-10-29T17:22:12.100Z, session epoch 1793409693 == 2026-10-31T01:21:33Z
+=> 115161.2 s = 31.9892h, monotone vs t234's 31.8455h at 01:12:56Z, delta
+517.3s == the 8m37s wall gap exactly; sitting script correctly NOT run -- t152
+trap) AND: save axis bit-identical to t216..t234 (1409 files, newest
+playcap/save/41.sav ns 1793294530.108, #2..#10 60/59/58/57/56/55/54/53/52.sav
+on the 10s end-series cadence, still OLDER than the timeline baseline --
+watcher-death gap stays closed; gap re-measured 1.992s seventeenth consecutive
+time) AND: NO new content manufactured -- t235 held the cap, 3 calls before the
+finish sequence, no new code path / no fd census / no static hunt, and did NOT
+re-run ledger_audit out-of-band (no sitting => the open set cannot have moved;
+gate stages ran both checks) -- watcher population unchanged (wrapper 27772
+bash/no-writer-fd + child 27774 + orphans 260988/290953/292085, no new orphans,
+no retirements; nothing killed, supervised-session decision) -- NO row closed
+(strict-close: no sitting => witness classes unobservable; OQ-005/016/019/021
+stay OPEN; OPEN-QUESTIONS untouched; honest negative in _wip_t235 S3; nothing
+beyond the two adjudication axes censused per t212 law; no static route re-trod
+per t213 S7) -- docs: NEW _wip_t235 S1..S3 hand-authored (t226 generator-safety
+rule holds), STATE NEXT=t236 TRIGGER-ARMED IDLE ('do not run on cadence') +
+LANDED -- NEXT=t236 axes only (r214_triage.py + one save-axis find by ns) or
+steering override, else one-line idle + stop -- harness owns the next move, not
+a research iteration
 
 LANDED t234 (2026-10-31): NO SITTING — TWENTY-FIRST CONSECUTIVE BYTE-IDENTICAL
 ADJUDICATION, ~4-CALL CAP HELD, DELIBERATELY CONTENT-FREE (NO ledger row moved —
