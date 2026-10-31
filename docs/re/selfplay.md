@@ -86,6 +86,32 @@ confusion, NOT a discrepancy):
 - Residue [unverified]: which producer feeds which %d (linear-disasm
   argument pairing is desync-limited, t91); the writer of u16@0x131b4.
 
+### t247 CORRECTION + t1254 re-measure (softlock #2 recovered; ring banked
+to work/r1/bank-t1254/ BEFORE restart; t1092 RAM frames rotated away):
+- SYSTEMS side VERIFIED AT SECOND TIMESTAMP: t=1254 owner-byte hist
+  {1:35, 2:5, 4:5, 6:2, 132:1, 129:1, 130:1}; sole-owner=35; player-bit-set
+  =36 == header "36 Systems Controlled" == banked systems_any EXACT.
+- u16@0x131b4 read 60 at BOTH t1092 and t1254 while the header planets went
+  60->102: it is NOT the planets counter (t246 attribution WRONG, corrected
+  here; commit 867d3e2 message carries the error).
+- NEW LEAD (strong): star-record BYTE +0x5a = per-star colonised-planet
+  count (record diff sole-owner-5-planet star idx0 vs co-owned-4-planet
+  star idx25 shows +0x5a 5 vs 4, matching visible planet counts; values
+  1..5 across the 36 bit-set stars). SUM(+0x5a over bit-set stars) = 104
+  vs header 102 — delta exactly 2, and idx25 is the ONE player-co-owned
+  star (owner 129 = bits 0|7, 4 planets): hypothesis [unverified] the
+  header counts player-OWNED planets and star 25 has 2 of its 4 owned by
+  race 7 (per-planet ownership stored elsewhere — candidate region
+  +0x56..0x58 zeroed on the co-owned star). Hunt next: locate per-planet
+  owner table; then sum-owner-filtered should hit 102 EXACT.
+- Softlock #2 law refinement: signature recurred WITHOUT any popup (user's
+  t1254 planet-list session) -> engine-state bug >> mouse-grab hypothesis.
+  ALWAYS bank ring slots (cp save/*.sav bank-dir) BEFORE restarting: the
+  ring rotates and unsaved turns are otherwise lost forever.
+  dosbox-x SIGTERM -> pops its own "Quit DOSBox-X warning" xmessage +
+  in-game "Are you sure to quit" dialog with (Yes) DEFAULT: never press
+  Enter near it; SIGKILL is the clean exit for a softlocked session.
+
 ## 4. PLANET-SCREEN INTERACTION LAWS (agent-observed, t244)
 - NAVIGATION STACK: galaxy -> SYSTEM VIEW (orbital grid: blue wireframe plane,
   bodies on yellow stalks, right panel = planet name + art, orbital structure

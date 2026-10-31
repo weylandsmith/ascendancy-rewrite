@@ -45,8 +45,9 @@ def analyze(path, mem, B, label):
         if (b >> race) & 1:
             bitset += 1
     turn = struct.unpack_from("<I", mem, B + OFF + 0x12e10)[0]
+    u131b4 = struct.unpack_from("<H", mem, B + OFF + 0x131b4)[0]
     print(f"[{label}] {os.path.basename(path)} turn={turn} race={race} T={T} "
-          f"excl_ptr={hex(excl)}")
+          f"excl_ptr={hex(excl)} u16@0x131b4={u131b4}")
     print(f"   owner-byte hist: {sorted(hist.items(), key=lambda kv:-kv[1])[:8]}")
     print(f"   sole-owner(==1<<race): {sole}   after exclusion: {sole_excl}   "
           f"bit-set(>= co-own): {bitset}")
