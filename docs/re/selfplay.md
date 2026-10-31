@@ -61,12 +61,30 @@ Planet LIST view (first click on sidebar Planets) is a SEPARATE mode: header
 (star art, system name, planet art, type, construction text, 3 mini-gauges).
 Header "26 Systems Controlled" vs ring systems_any=36 (t=1335): RESOLVED by
 turn alignment — the resume game is at t=1086, and banked score fields at
-t=1086 give planets=26 / systems_any=26 (r1_stream over the ring). Header
-"26 Systems Controlled" == systems_any@1086 EXACT (label says Systems,
-matches ANY, not full). NEW DISCREPANCY BANKED: header "60 Planets Occupied"
-vs banked planets=26 same turn — 60 may be the map's total colonizable
-planets, or a different ownership definition; hunt = find the header-format
-sprintf in the binary (candidate: same cluster as t212's TRUNC(100*score/T)).
+t=1086 give systems_any=26. Header == systems_any@1086 EXACT.
+
+### t246 RESOLUTION of the "60 Planets Occupied vs 26" question (was a unit
+confusion, NOT a discrepancy):
+- Static: header = getter(151) "%s (%d Planet%s Occupied, %d System%s
+  Controlled)" (quoted-record #151 of static.txt; call-site region
+  0x51685..0x517c0, mov eax,0x97 at 0x51798; sibling getter(152) ship-count
+  header at 0x33905). Star table: 0x60-stride at DAT img 0x13bc5, bound WORD
+  ds:0x16145, owner BYTE at +0x14 IS A BITMASK (loop tests ==1<<race at
+  0x516c5; sole-owner test).
+- Measured at t=1092 (scripts/r1_t246_header_law.py, freshest slot):
+  owner-byte hist {1:25, 0:8, 4:7, 2:5, 6:2, ...}; sole-owner(1<<race)=25;
+  player-bit-set=26; maintained u16 at data 0x131b4 = 60 (ONLY occurrence of
+  60 in the race block; race-0 block, likely an incrementally-maintained
+  PLANET counter — [unverified] maintenance writer).
+- The triple that closes it: loop-count 25 == banked systems_full EXACT;
+  bit-set 26 == banked systems_any == header "26 Systems Controlled";
+  u16@0x131b4 60 == header "60 Planets Occupied". The header counts
+  COLONIZED PLANETS (60, ~2.3/system across the scrollable list) and
+  SYSTEMS-any (26). The watcher field named planets_mine actually counts
+  player-owned STARS (its law is sum(stars whose owner-set has player)) —
+  the t244 note conflated the units.
+- Residue [unverified]: which producer feeds which %d (linear-disasm
+  argument pairing is desync-limited, t91); the writer of u16@0x131b4.
 
 ## 4. PLANET-SCREEN INTERACTION LAWS (agent-observed, t244)
 - NAVIGATION STACK: galaxy -> SYSTEM VIEW (orbital grid: blue wireframe plane,
