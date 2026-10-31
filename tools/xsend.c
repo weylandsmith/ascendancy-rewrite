@@ -41,17 +41,28 @@ static Window find_named(Display* d, Window w, const char* title, int depth) {
 }
 
 int main(int argc, char** argv) {
-    if (argc < 4) { fprintf(stderr, "usage: xsend title (click x y | key KEYSYM [ch])\n"); return 2; }
     const char* title = argv[1];
-    int is_key = strcmp(argv[2], "key") == 0;
-    int x = 0, y = 0; KeySym ks = 0;KeyCode kc = 0;
+    const char* mode = argv[2];
+    /* t244 modes: key KEYSYM [ch] (press+release), keyup KEYSYM [ch] (press
+     * ONLY, for hold semantics), click x y / click3 x y (Button1/Button3 —
+     * Ascendancy ship move/attack orders are RIGHT-click), legacy x y. */
+    int is_key = strcmp(mode, "key") == 0 || strcmp(mode, "keyup") == 0;
+    int press_only = strcmp(mode, "keyup") == 0;
+    int button = strcmp(mode, "click3") == 0 ? Button3 : Button1;
+    if (argc < (is_key || strcmp(mode,"click")==0 || strcmp(mode,"click3")==0 ? 4 : 3)) {
+        fprintf(stderr, "usage: xsend title (key|keyup KEYSYM [ch] | click|click3 x y | x y)\n");
+        return 2;
+    }
+    int x = 0, y = 0; KeySym ks = 0; KeyCode kc = 0;
     Display* d = XOpenDisplay(NULL);
     if (!d) { fprintf(stderr, "no display\n"); return 1; }
     if (is_key) {
         ks = XStringToKeysym(argv[3]);
         if (ks == 0L) { fprintf(stderr, "bad keysym '%s'\n", argv[3]); return 2; }
         kc = XKeysymToKeycode(d, ks);
-    } else {
+    } else if (strcmp(mode, "click") == 0 || strcmp(mode, "click3") == 0) {
+        x = atoi(argv[3]); y = atoi(argv[4]);
+    } else {   /* legacy positional: xsend title x y */
         x = atoi(argv[2]); y = atoi(argv[3]);
     }
     XSetErrorHandler(ignore_badwindow);
@@ -67,11 +78,11 @@ int main(int argc, char** argv) {
         usleep(20000);
         e.xbutton.window = w;
         e.xbutton.x = x; e.xbutton.y = y;
-        e.xbutton.button = Button1;
+        e.xbutton.button = button;
         e.xbutton.same_screen = True;
         e.xbutton.subwindow = None;  /* target IS the event window */
     }
-    for (press = 1; press >= 0; press--) {
+    for (press = 1; press >= (press_only ? 1 : 0); press--) {
         if (is_key) {
             e.type = press ? KeyPress : KeyRelease;
             e.xkey.window = w;
@@ -95,9 +106,10 @@ int main(int argc, char** argv) {
         XFlush(d);
         usleep(50000);
     }
-    fprintf(stderr, "sent %s to 0x%lx at %d,%d (press%s)\n",
-            is_key ? argv[3] : "button1", w, x, y,
-            press == -1 ? "+release" : " only (window died)");
+    fprintf(stderr, "sent %s%s to 0x%lx at %d,%d (%s)\n",
+            is_key ? argv[3] : (button == Button3 ? "button3" : "button1"),
+            is_key && press_only ? " (press only)" : "", w, x, y,
+            press == -1 ? "window died before release" : "press+release");
     XCloseDisplay(d);
     return 0;
 }
