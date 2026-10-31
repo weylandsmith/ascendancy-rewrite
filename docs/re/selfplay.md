@@ -59,13 +59,45 @@ planet), construction panel (PLBUILD: "Automation / 2 days until completion"
 Planet LIST view (first click on sidebar Planets) is a SEPARATE mode: header
 "Chamachies (60 Planets Occupied, 26 Systems Controlled)" + per-planet rows
 (star art, system name, planet art, type, construction text, 3 mini-gauges).
-Header "26 Systems Controlled" vs ring systems_any=36: the header counts
-FULLY-owned systems? (26 == full-1 class; t85 law: any=36 full=34 at t=1335;
-at t=1086 any=26/full=25 per banked row — header matches the banked t=1086
-value EXACTLY: "26 Systems Controlled" == systems_any at resume turn. NOTE
-the header label says Systems and matches ANY, not full.)
+Header "26 Systems Controlled" vs ring systems_any=36 (t=1335): RESOLVED by
+turn alignment — the resume game is at t=1086, and banked score fields at
+t=1086 give planets=26 / systems_any=26 (r1_stream over the ring). Header
+"26 Systems Controlled" == systems_any@1086 EXACT (label says Systems,
+matches ANY, not full). NEW DISCREPANCY BANKED: header "60 Planets Occupied"
+vs banked planets=26 same turn — 60 may be the map's total colonizable
+planets, or a different ownership definition; hunt = find the header-format
+sprintf in the binary (candidate: same cluster as t212's TRUNC(100*score/T)).
 
-## 4. SELF-PLAY FEASIBILITY: demonstrated at input+observation level.
+## 4. PLANET-SCREEN INTERACTION LAWS (agent-observed, t244)
+- NAVIGATION STACK: galaxy -> SYSTEM VIEW (orbital grid: blue wireframe plane,
+  bodies on yellow stalks, right panel = planet name + art, orbital structure
+  + art, icon console; planet-icons row selects planet) -> PLANET DETAIL
+  (five-panel strip) -> popups. Planet LIST is a separate sidebar mode, not
+  in this stack.
+- PLANET DETAIL IS MODAL: sidebar sidebar clicks (Planets at 553,145 etc.)
+  are SWALLOWED while it is open.
+- POPUPS CLOSE WITH ESCAPE (research popup + building dialog both closed by
+  key Escape; in-game OK-button clicking was unreliable for synthetic
+  Button1 — vision-estimated coords kept missing; Escape is the robust path).
+- GAUGE CLICK = ECONOMY READOUT POPUP (VERBATIM): clicking the PLRES gauge
+  popped "Vega IV Research: 52 per day / Megagraph Theory will be discovered
+  in 37 days. / OK". => the original DISPLAYS current per-day research rate
+  and ETA for the in-flight tech: a direct verification target for the
+  rewrite's research model (rate + ETA two numbers per planet per tech).
+  Same pattern presumed for PLIND/PLPRO (untested).
+- RIGHT-CLICK (Button3) on the orbital grid = ORDER MODE: green target
+  marker appears on the grid. A red-slash cancel icon sits in the console
+  cluster. CAUTION: red pixel-scanning finds the MISSILE-BASE art's red
+  parts too — a misaimed console click opened "Are you sure you want to
+  abandon Vega II?" (answered NO; planet intact, md5 still 5b382afb). Blast
+  radius lesson: in the system/planet views, click only icon centers
+  confirmed by zoomed crop, never red-pixel guesses.
+- Order mode cleared by dialog-No; no turn advanced during all popup work.
+
+## 5. SELF-PLAY FEASIBILITY: demonstrated at input+observation level.
 Open questions for any future supervised run: click precision on small
 widgets (50px buttons, worked first try on Planets + NEXTTURN band),
 scrollbar/list navigation untested, combat UI never entered yet.
+Campaign safety record this session: RESUME.GAM md5 unchanged (5b382afb)
+throughout; zero turns advanced (NEXTTURN clicks landed on the modal planet
+screen); zero in-game Saves; user save backed up to RESUME.GAM.user-oct29.
