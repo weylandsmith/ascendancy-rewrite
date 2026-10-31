@@ -31,7 +31,9 @@ XOFF, YOFF = 80, 100   # dosbox window origin on root
 NEXTTURN = (511, 67)   # windows.txt rect center, window-relative
 
 def sh(cmd):
-    return subprocess.run(cmd, shell=True, capture_output=True, timeout=40)
+    import os
+    env = dict(os.environ, DISPLAY=":9")   # t245: background shells have no DISPLAY; silent xsend failure looked like a dead game
+    return subprocess.run(cmd, shell=True, capture_output=True, timeout=40, env=env)
 
 def ring_turn():
     out = sh(f"tail -c 400000 {JSONL}").stdout.decode(errors="replace")
@@ -74,7 +76,9 @@ def popup_ok_center(im):
     return (sum(ok)//len(ok), ytop - 3)
 
 def send(args):
-    subprocess.run(["./tools/xsend", "DOSBox-X"] + args, capture_output=True, timeout=20)
+    import os
+    env = dict(os.environ, DISPLAY=":9")
+    subprocess.run(["./tools/xsend", "DOSBox-X"] + args, capture_output=True, timeout=20, env=env)
 
 def drain_popups(maxn=25):
     closed = 0
