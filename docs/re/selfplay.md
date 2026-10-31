@@ -101,3 +101,35 @@ scrollbar/list navigation untested, combat UI never entered yet.
 Campaign safety record this session: RESUME.GAM md5 unchanged (5b382afb)
 throughout; zero turns advanced (NEXTTURN clicks landed on the modal planet
 screen); zero in-game Saves; user save backed up to RESUME.GAM.user-oct29.
+
+## 6. T245 TURN-DRIVE LAWS (scripts/r1_t245_turndrive.py)
+- windows.txt rects are EXACT and in game coords == window coords: NEXTTURN
+  474,52-548,82 (center 511,67 window-rel FIRES turn advance, ring-verified);
+  NEXTTURNCONT 557,52-632,82 (double-arrow = fast-forward, untested); the
+  clock-arrow buttons BELOW the counter are turn-history scrubbers.
+- Turn-end popups SERIALIZE; while ANY popup is open, NEXTTURN and EVERY
+  other input is swallowed (6 presses, zero ring movement).
+- Construction popups: Escape does NOT close them; OK click does. MEASURED
+  hit-rect law: drawn button spans y 429-472, working clicks land at y~440-
+  443 (label-row TOP minus ~3); label baseline (y 455+) MISSES. Detector
+  aims label-top-3.
+- Popup detection: white-text pixel count in the popup band (box is dark
+  with cyan trim — grey-run detectors are blind).
+- After a firing press, AI processing takes ~10-20 s before the ring banks
+  the new turn; drain popups again after.
+- journal tail-scan ONLY (multi-GB): tail -c 400000.
+
+## 7. SOFTLOCK INCIDENT (13:14Z, evidence work/r1/softlock_evidence.png)
+At t=1089 with a construction popup on screen the game became input-dead
+(sidebar, keys, both popup buttons — verified by pixel-diff after each) with
+RAM frozen (25 s apart, journal changed field: 'wall' only) while dosbox-x
+pinned 90-100% CPU (caveat: idle Ascendancy also runs hot, so CPU alone is
+NOT hang evidence). Recovery: kill dosbox, relaunch, Return to Current Game
+-> back at RESUME.GAM turn 1086; the unsaved turns 1087-1089 lost from the
+GAME but banked FOREVER in the ring. Two candidate causes, unresolved
+[unverified]: (a) engine popup-state bug; (b) the user's real mouse hovering
+the window (SDL grabs real motion; synthetic events may be ignored while
+grabbed). The user DID run their mouse across the window mid-session, though
+that message arrived BEFORE the input-dead phase began. LESSON: for long
+unattended drives, warn the user not to touch the VNC window, and treat
+"popup open + input-dead + RAM-frozen" as the softlock signature -> restart.

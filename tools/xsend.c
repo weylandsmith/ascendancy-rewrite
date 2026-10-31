@@ -22,18 +22,26 @@ static int ignore_badwindow(Display* d, XErrorEvent* e) {
     exit(3);
 }
 
-static Window find_named(Display* d, Window w, const char* title, int depth) {
+/* t245: dosbox-x's X window name is CONSTANT ("DOSBox-X ...: ASCEND - 100%")
+ * across boots, and an occluding "Quit DOSBox-X warning" xmessage window
+ * matches the same substring. The wrong hit silently swallowed 20 minutes of
+ * input (screenshot = root window only, so the blocker is INVISIBLE; events
+ * went to the blocker). Refuse titles whose name contains "warning". */
+static Window find_game(Display* d, Window w, const char* title, int depth) {
     char* nm = NULL;
     if (XFetchName(d, w, &nm) && nm) {
         int hit = strstr(nm, title) != NULL;
+        int blocker = strstr(nm, "warning") != NULL;
+        if (hit && blocker)
+            fprintf(stderr, "xsend: REFUSING blocker window '%s'\n", nm);
         XFree(nm);
-        if (hit) return w;
+        if (hit && !blocker) return w;
     }
     Window root, parent, *kids = NULL;
     unsigned n = 0;
     if (depth > 6 || !XQueryTree(d, w, &root, &parent, &kids, &n)) return 0;
     for (unsigned i = 0; i < n; i++) {
-        Window r = find_named(d, kids[i], title, depth + 1);
+        Window r = find_game(d, kids[i], title, depth + 1);
         if (r) { XFree(kids); return r; }
     }
     if (kids) XFree(kids);
@@ -67,7 +75,7 @@ int main(int argc, char** argv) {
     }
     XSetErrorHandler(ignore_badwindow);
     Window root = DefaultRootWindow(d);
-    Window w = find_named(d, root, title, 0);
+    Window w = find_game(d, root, title, 0);
     if (!w) { fprintf(stderr, "window '%s' not found\n", title); return 1; }
     XEvent e;
     memset(&e, 0, sizeof e);
