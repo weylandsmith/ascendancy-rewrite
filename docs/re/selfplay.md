@@ -1,0 +1,71 @@
+# selfplay.md — the agent drives the ORIGINAL game headless (t244, 2026-10-31)
+
+Capability, method, and the findings a 20-minute self-session produced. Input:
+tools/xsend (click + KEYSYM injection, both VERIFIED working on dosbox-x).
+Eyes: `DISPLAY=:9 import -window root` screenshots + vision_analyze (the
+routing change the user made today; read_file refuses PNGs, so vision_analyze
+is the viewing path). Session stack: scripts/r1_playcap_vnc.sh start (title
+menu -> "Return to Current Game" click at window-rel 318,333).
+
+## 1. SAFETY LAW (measured, this session)
+RESUME.GAM (work/r1/game, the game's own title-menu resume file) is written
+ONLY at in-game Save/quit points — NOT continuously. Measured: the ring holds
+t=1335 (the user's final unsaved turns) while RESUME.GAM sat at t=1086 for 2
+days; md5 5b382afb... stable across my entire session because I never pressed
+in-game Save. Consequences: (a) the user's "I forgot to save" testimony is
+CORROBORATED by the file itself; (b) an agent session can advance turns
+FREELY — the watcher banks live RAM every 10 s regardless — and killing
+dosbox without Save leaves the user's resume point byte-identical; (c) the
+game a resume loads can be FAR behind the ring (1086 vs 1335 here): always
+read the in-game turn counter from a screenshot before trusting stream tails.
+Backup taken anyway: work/r1/game/RESUME.GAM.user-oct29 (md5-verified).
+
+## 2. THE 'c' OVERLAY IS THE GAME'S OWN RELATION DUMP — and it corroborates
+the state ENUM a third time (OQ-023 law; OQ-021 readout law)
+Verbatim at t=1086 (galaxy screen, nougat armed, my own keypress):
+    O Biorythm (Neutral)
+    R0 Unknown 0
+    R1 Peace 600
+    R2 Peace 318
+    R3 War 318
+    STARS CONTROLLED 0
+Cross-checks against watcher-banked RAM at the same turn (41.sav, t=1086:
+DAT_482fb=0/50; player row att0/states0 law from sitting dumps):
+- R-index = race index (names [Chamachies, Orfa, Ungooma, Minions]):
+  R1 Peace 600 == Orfa att 600 (sitting value at t=1250, drift-plausible at
+  1086); R3 War 318 == Minions att 318 EXACT + states0[3]=2.
+- STATE WORDS match the enum law independently: cell 2 -> "War", cell 1 ->
+  "Peace", cell 0 -> "Unknown" (never-contacted, Chamachies at t=1086).
+  Third independent corroboration of 0=none/1=PEACE/2=WAR after t85b
+  (declaration) and t188b (alliance flip to 3).
+- STARS CONTROLLED 0 == DAT_482fb==0 banked at t=1086 EXACT. Combined with
+  the player's 14->21 testimony == score_stars 14..21 trajectory t1255..1301,
+  the overlay is a DIRECT READOUT of DAT_482fb, not a recomputed formula.
+  OQ-021 residue sharpens further: pin what WRITES DAT_482fb (oscillates
+  while systems_any=36/full=34 dead flat), the display side is now settled.
+- 'c' is TOGGLE-LIKE: second press on the PLANET screen did nothing (planet
+  screen is modal; overlay is galaxy-screen-only — consistent with t191's
+  cosmos msg handler 0x26b34).
+- Title screen verbatim (new keymap datum): buttons carry Alt-L Load /
+  Alt-S Save / Alt-X Exit hotkey labels (title-menu hotkeys, distinct from
+  galaxy-screen 'l' lane reveal).
+
+## 3. PLANET SCREEN FIVE-PANEL LAW VERIFIED LIVE (windows.txt law + player
+testimony, now agent-observed): top strip L->R = crystal lattice (PLRES/
+research), factory (PLIND), green plant (PLPRO), rows of person figures
+(PLPOP — all RED, all SIDEWAYS = all busy, zero yellow idle on a maxed
+planet), construction panel (PLBUILD: "Automation / 2 days until completion"
++ item art, confirming planitem.shp = current-project item art hypothesis).
+Planet LIST view (first click on sidebar Planets) is a SEPARATE mode: header
+"Chamachies (60 Planets Occupied, 26 Systems Controlled)" + per-planet rows
+(star art, system name, planet art, type, construction text, 3 mini-gauges).
+Header "26 Systems Controlled" vs ring systems_any=36: the header counts
+FULLY-owned systems? (26 == full-1 class; t85 law: any=36 full=34 at t=1335;
+at t=1086 any=26/full=25 per banked row — header matches the banked t=1086
+value EXACTLY: "26 Systems Controlled" == systems_any at resume turn. NOTE
+the header label says Systems and matches ANY, not full.)
+
+## 4. SELF-PLAY FEASIBILITY: demonstrated at input+observation level.
+Open questions for any future supervised run: click precision on small
+widgets (50px buttons, worked first try on Planets + NEXTTURN band),
+scrollbar/list navigation untested, combat UI never entered yet.
