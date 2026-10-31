@@ -260,7 +260,16 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t243: DO NOT RUN ON CADENCE — TRIGGER-ARMED IDLE (run ONLY if a trigger
+PAIRING-SESSION NOTE t243h (2026-10-31): the twenty-nine idle relaunches were
+THE HARNESS'S BUG, not cadence — my trigger C (t199) self-armed because each
+idle iteration renumbered NEXT to the next LETTER, so the tag kept differing.
+Fixed + pinned: QUEUE_CHAIN_MAX=8 consecutive queue-only wakes (substantive =
+commit diff outside STATE.md/_wip_*/BLOCKED.md — measured 5/5 idle vs 6/6 real
+classify correctly); chain resets on external (probe-armed) or steered wake;
+replay t214..t242 -> 8 launches, honest 5-task queue drains clean. Law banked:
+sitting-probing is SHELL-GATE work, never a numbered NEXT task. NEXT tag below
+set to WAIT-TRIGGER so the sentinel guard holds.
+NEXT WAIT-TRIGGER: DO NOT RUN ON CADENCE — TRIGGER-ARMED IDLE (run ONLY if a trigger
 fired; otherwise run the two axes below, expect the idle result, write the
 one-line idle line, and STOP). t242 is the twenty-ninth session launched under
 this instruction with the baselines unmoved: the DO-NOT-RUN-ON-CADENCE clause is

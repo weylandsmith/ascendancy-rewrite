@@ -47,6 +47,10 @@ CONTRACT="docs/TASK_CONTRACT.txt"
 IDLE_PROBE="scripts/r1_idle_probe.py"
 IDLE_GATE="${IDLE_GATE:-1}"
 IDLE_SLEEP="${IDLE_SLEEP:-900}"      # 15 min between idle polls
+# (t243) max consecutive queue-only (trigger-C) wakes before the idle gate
+# re-closes even on a tag change. 8 drains any honestly-queued batch (the
+# t194 queue held 5) while capping the t214..t242 ping-pong at 8, not 29.
+QUEUE_CHAIN_MAX="${QUEUE_CHAIN_MAX:-8}"
 
 log() { echo "[$(date '+%F %T')] $*"; }
 
@@ -85,6 +89,8 @@ while :; do
   steer_wake=""
   [ -s "$LOOPDIR/LOOPSTEER.txt" ] && steer_wake=1
   [ -f "$LOOPDIR/FORCE_RUN" ] && { steer_wake=1; rm -f "$LOOPDIR/FORCE_RUN"; }
+  # (t243) human steering is likewise an external wake — chain restarts.
+  [ -n "$steer_wake" ] && echo 0 > "$LOOPDIR/chain_count"
 
   # TRIGGER C (t199): OFFLINE-QUEUE DRAIN. Triggers A (capture) and B (human
   # edit) cannot see a queue the LOOP itself staged into NEXT ACTION, so the
@@ -103,6 +109,23 @@ while :; do
     WAIT*|IDLE*|PARK*|steer) : ;;
     *) if [ -n "$last_ok_tag" ] && [ "$task" != "$last_ok_tag" ]; then queue_wake=1; fi ;;
   esac
+
+  # CHAIN CAP (t243): trigger C self-armed TWENTY-NINE times (t214..t242)
+  # because an iteration that finds nothing still rewrites NEXT to the next
+  # LETTER, so the tag keeps differing — the same self-arm class t186 killed
+  # for prose, reborn as tags. LAW: idle/sitting-probing is SHELL-GATE work
+  # (t178 IDLE IS HARNESS'S PROBLEM), never a numbered NEXT task; the loop
+  # must park NEXT on a WAIT*/IDLE* sentinel when it has no research left. The
+  # cap is the backstop: QUEUE_CHAIN_MAX consecutive queue-only wakes with no
+  # external trigger (A/B) or steering is enough to drain any real queue; past
+  # that the gate closes even on a tag change. Counter resets on any external
+  # wake and on any probe pass through the gate.
+  chain=$(cat "$LOOPDIR/chain_count" 2>/dev/null || echo 0)
+  if [ -n "$queue_wake" ] && [ "$chain" -ge "$QUEUE_CHAIN_MAX" ] \
+     && [ -z "$steer_wake" ] && [ -z "$dirty" ]; then
+    log "queue chain cap: $chain consecutive queue-only wakes >= QUEUE_CHAIN_MAX=$QUEUE_CHAIN_MAX — holding at the idle gate (park NEXT on a WAIT*/IDLE* sentinel to stop the ping-pong)"
+    queue_wake=""
+  fi
 
   # IDLE GATE (t178): poll triggers in SHELL before spending any model budget.
   # dirty tree => adopt interrupted work (launch regardless of probe);
@@ -127,6 +150,9 @@ while :; do
     elif [ "$prc" = "1" ]; then
       log "IDLE-GATE: TRIGGER ARMED — launching with probe context"
       armed_report=1
+      # external (capture/human) wake: the chain is no longer queue-only, so
+      # the cap counter restarts (t243 law stated in the CHAIN CAP block).
+      echo 0 > "$LOOPDIR/chain_count"
     else
       echo "r1_idle_probe.py exited $prc (probe broken, not idle): see $LOOPDIR/probe-last.log. Fix the probe; triggers cannot be judged without it." > "$LOOPDIR/NEEDS_HUMAN.txt"
       log "idle probe RC=$prc — parking"
@@ -213,6 +239,19 @@ while :; do
   # different work and MUST NOT mark it. NO_COMMIT/KILLED/GATE_RED never mark.
   if [ "$verdict" = OK ] && [ -z "$steer_used" ]; then
     echo "$task" > "$LOOPDIR/last_task"
+  fi
+  # CHAIN COUNTER (t243): "substantive" is measured from the COMMIT DIFF, not
+  # the commit subject — MEASURED t243: 5/5 idle commits touch exactly
+  # docs/STATE.md + docs/re/_wip_tNNN.md; real research touches research docs,
+  # the ledger, rewrite/, or scripts/. Only a substantive delta resets the
+  # chain; an idle adjudication that renumbers NEXT to the next letter does
+  # not, which is precisely the ping-pong the cap must stop.
+  if [ "$verdict" = OK ] && [ "$post_head" != "$pre_head" ]; then
+    if git diff --name-only "$pre_head" "$post_head" | grep -qvE '^(docs/STATE\.md|docs/re/_wip_.*\.md|docs/BLOCKED\.md)$'; then
+      echo 0 > "$LOOPDIR/chain_count"
+    else
+      echo $(( $(cat "$LOOPDIR/chain_count" 2>/dev/null || echo 0) + 1 )) > "$LOOPDIR/chain_count"
+    fi
   fi
   if [ "$post_head" != "$pre_head" ]; then
     log "iter $n: $verdict rc=$rc task=$task | HEAD $pre_head -> $post_head (ADVANCED)"
