@@ -73,10 +73,10 @@ const char* abilityEffectNote(SpeciesAbility a) {
         "colony pop caps +25 [help.txt L2248]",
         "see all star lanes: owner bit OR into every lane mask at scenario init; the cosmos filter always admits them (OQ-026 layer, ships.md S23 L6/L9; passive cadence word 0) [help.txt L2295]",
         "lanes into own stars closed to others this turn [help.txt L2314]",
-        "enemies' player-attitude reduced 250 [help.txt L2361]",
+        "third parties' regard of the user ceilinged to each enemy's own DECLARE_WAR line (SA_Hatred body law 0x440b5, aicode.md S6.3; t256) [help.txt L2361]",
         "+1 launch hop (clamped 3) [help.txt L2409]",
         "queued discovery completes at once [help.txt L2429]",
-        "+20 IND this turn [help.txt L2476]",
+        "every colony with a pending project gains 100 build-accumulator (per-planet +0x50 += 100 law 0x4418e, aicode.md S6.3; t256) [help.txt L2476]",
     };
     const int i = static_cast<int>(a);
     return (i >= 0 && i < static_cast<int>(SpeciesAbility::kCount)) ? kNotes[i] : "";

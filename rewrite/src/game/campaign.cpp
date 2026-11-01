@@ -1681,14 +1681,29 @@ void Campaign::abilityPhase() {
                 break;
             }
             case SpeciesAbility::StealResearch: {  // L2154-2155 "steal any technology known by at least two other races"
+                // CITED BODY LAW SA_StealTech 0x43eec (aicode.md §6.3 t99):
+                // for each research row, the per-race OWNERSHIP bitmask is
+                // ORed in iff popcount(mask) >= 2 (the "known by at least two
+                // other races" rule the vendor text states), AND — the leg the
+                // rewrite was missing until t256 — if the stolen row IS this
+                // race's own research target (0x76492[2*self] == i) the target
+                // is set to 0xffff so it re-picks next turn. queuedTech -1 is
+                // that sentinel here.
                 int n = 0;
+                const int target = queuedTech[o];
+                bool targetStolen = false;
                 for (size_t t = 0; t < tree_->all().size(); ++t) {
                     if (ownedTech[o][t]) continue;
                     int holders = 0;
                     for (int e = 0; e < Nowner_; ++e)
                         if (e != o && ownedTech[e][t]) ++holders;
-                    if (holders >= 2) { ownedTech[o][t] = true; ++n; }
+                    if (holders >= 2) {
+                        ownedTech[o][t] = true;
+                        ++n;
+                        if (static_cast<int>(t) == target) targetStolen = true;
+                    }
                 }
+                if (targetStolen) { queuedTech[o] = -1; techProgress[o] = 0; }
                 events_.push_back({turn_, who + "stole " + std::to_string(n) +
                                       " shared technologies"});
                 break;
@@ -1719,46 +1734,90 @@ void Campaign::abilityPhase() {
                 break;
             }
             case SpeciesAbility::CauseWar: {  // L2361-2362 "alien species to strongly dislike any species at war with you"
-                // PARTIAL [documented, abilities.md §2]: the dip model carries
-                // one attitude vector (AI -> player); AI-vs-AI relationships
-                // do not exist (R1-blocked). Wired here: races at war with the
-                // Marmosians have their player-facing attitude reduced by 250
-                // (strong dislike scale vs START_ATTITUDE 310..620) and the
-                // effect is announced; third-party redirect is a no-op.
+                // UPGRADED t256 to the CITED body law SA_Hatred 0x440b5
+                // (aicode.md §6.3, t99): for every OTHER row r in state 2
+                // (AT WAR with self), for every THIRD party x (x != self,
+                // x != r): if attitude[x -> self] > r's DECLARE_WAR word
+                // (+0x1c9) then attitude[x -> self] := r's DECLARE_WAR. So
+                // the victim is never the belligerent r — it is the neutral
+                // onlooker who LIKES you, and the operation is a CEILING at
+                // the enemy's own war threshold, not a flat subtraction.
+                // Consequence (measured from the shipped DIPVALUES, t256):
+                // the clamp lands on r's line while the chooser tests x's
+                // OWN line (diplomacy.md §7 strict `att < DECLARE_WAR(x)`),
+                // so a low-threshold enemy drags high-threshold onlookers
+                // under their own trigger — "hostility diverters".
+                // PROJECTION [documented]: the rewrite carries ONE attitude
+                // vector (AI -> player, DipPolicyState per AI owner), so the
+                // cells attitude[x -> self] exist only when self == player.
+                // An AI-owned SA_CauseWar therefore has no state to change
+                // (AI-vs-AI attitudes are R1-blocked) and announces itself.
                 int n = 0;
-                for (int e = 1; e < Nowner_; ++e)
-                    if (e != o && war_[o * Nowner_ + e] && dipState_[e - 1].attitude > -1000) {
-                        dipState_[e - 1].attitude -= 250;
-                        ++n;
+                if (o == kPlayer) {
+                    // Build the law's operands (owner index space) and run the
+                    // PINNED pure form Campaign::hatredClamp.
+                    std::vector<int> warWithSelf(Nowner_, 0), line(Nowner_, 0),
+                        att(Nowner_, 0);
+                    for (int r = 1; r < Nowner_; ++r) {
+                        warWithSelf[r] = war_[kPlayer * Nowner_ + r];
+                        line[r] = aiDip_[r - 1].values.declareWar;  // +0x1c9
+                        att[r] = dipState_[r - 1].attitude;
                     }
+                    hatredClamp(warWithSelf, line, &att);
+                    for (int r = 1; r < Nowner_; ++r) {
+                        if (att[r] != dipState_[r - 1].attitude) {
+                            dipState_[r - 1].attitude = att[r];
+                            ++n;
+                        }
+                    }
+                }
                 events_.push_back({turn_, who + std::to_string(n) +
-                                      " belligerents marked for dislike"});
+                                      " onlookers' regard clamped to the war line"});
                 break;
             }
             case SpeciesAbility::FastLaneTravel:
                 break;  // passive: +1 launch hop in driveHopsFor
             case SpeciesAbility::FreeResearch: {  // L2429-2430 "immediately achieve any discovery you are pursuing"
-                int t = queuedTech[o];
-                if (t < 0) {
-                    auto avail = tree_->available(ownedTech[o], /*includeVariants=*/false);
-                    t = -1;
-                    for (int c : avail)
-                        if (t < 0 || tree_->all()[c].runtimeCost() < tree_->all()[t].runtimeCost()) t = c;
-                }
+                // CITED BODY LAW SA_FreeResearch 0x4414e (aicode.md §6.3 t99
+                // + t105 stride-75 correction): `if own target t != 0xffff:
+                // progress := WORD cost(75*t)` — i.e. it completes the row
+                // YOU ARE ALREADY PURSUING and does NOTHING when no row is
+                // queued. The rewrite's earlier "pick the cheapest available
+                // row if none queued" leg was an UNCITED bonus (t256 removal)
+                // that made the Dubtak-free-research race jump tiers.
+                const int t = queuedTech[o];
                 if (t >= 0 && !ownedTech[o][t]) {
                     ownedTech[o][t] = true;
                     events_.push_back({turn_, who + "completed " + tree_->all()[t].name});
                 } else {
                     events_.push_back({turn_, who + "nothing pending to complete"});
                 }
-                queuedTech[o] = -1;
+                queuedTech[o] = -1;   // the original's re-pick-next-turn slot
                 techProgress[o] = 0;
                 break;
             }
-            case SpeciesAbility::IndustryBoost:  // L2476-2477 "boost the progress on all your colonies' projects"
-                ind_[o] += 20;  // = 2 Factory-costs [planitem Factory cost; documented default]
-                events_.push_back({turn_, who + "boosted construction (+20 IND)"});
+            case SpeciesAbility::IndustryBoost: {  // L2476-2477 "boost the progress on all your colonies' projects"
+                // CITED BODY LAW SA_IndustryBoost 0x4418e (aicode.md §6.3
+                // t99): for every own planet with a pending project
+                // ([p+0x54] != 0xff), `WORD [p+0x50] += 100` — the PER-PLANET
+                // build accumulator, NOT an empire stockpile, and gated to
+                // planets that actually have a project (income-law.md S8:
+                // +0x54 == 0xFF means the queue is empty). The earlier
+                // rewrite cut added 20 to ind_[owner], which is the
+                // ship-launch budget (buildPhase never pays ind_ into a
+                // planet queue) — wrong operand AND wrong magnitude (t256).
+                int n = 0;
+                for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
+                    if (owner_[s] != o) continue;
+                    PlanetState& ps = planets_[s];
+                    if (ps.pendingItem < 0) continue;  // [p+0x54]==0xff gate
+                    ps.buildAcc += 100;
+                    ++n;
+                }
+                events_.push_back({turn_, who + "boosted " + std::to_string(n) +
+                                      " colony projects (+100 IND each)"});
                 break;
+            }
             case SpeciesAbility::kCount:
             case SpeciesAbility::Unknown:
                 break;

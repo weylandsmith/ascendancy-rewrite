@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T12:24
+updated: 2026-11-01T13:25
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,16 +260,24 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t256 AI GAP ROWS 11/12/16 CODE PASS (ordering rationale: t255 landed
-and the remaining queue is t256 pure code + t257 which needs a t249b pin
-check; t256 moves ledger-adjacent ai-dossier rows and needs no new capture
-data, so it goes first). docs/re/ai-dossier.md gap map rows 11
-  (16 SA_ bodies — PARTIAL), 12 (relation-STATE ladder 0..3 + proposal emitter
-  + attacked-bitmap — PARTIAL), 16 (per-ship order kinds {0..5} — NOT
-  REPRESENTABLE note applies; decide and bank the disposition). One row per
-  session is fine — if you finish one row, rewrite NEXT to the next row verbatim
-  and commit. Rewrite code in rewrite/src/game/, cite laws from aicode.md +
-  ai-dossier.md, gate + rewrite tests must pass.
+NEXT t256b AI GAP ROW 12 DISPOSITION (ordering rationale: the t256 queue row
+said one row per session and to continue to the next row verbatim; row 11
+landed t256, row 12 is next in the row order, row 16 after it, t257 stays
+queued last). docs/re/ai-dossier.md gap map row 12: relation-STATE ladder
+0..3 + proposal emitter + attacked-bitmap — PARTIAL. The bitmap half is
+already shrunk by t206 (unit-order/display-only, diplomacy.md §18) and the
+two-party chooser is threshold-exact (decideDipAction, §7/§8). The open
+substance is the INTER-RACE state ladder: the rewrite carries ONE attitude
+vector (AI->player), so AI-vs-AI relations have no state — decide and BANK
+the disposition (accept the two-party projection permanently with a written
+rationale, or scope an N x N matrix citing what t99/t92 give you: per-race
+rows +0x1b2/+0x1c0/+0x1c9 exist in the original, but live AI-AI VALUES are
+uncaptured — check the ring saves first: bank-t251-live1255 holds 4-race
+mid-game rows, the diplo-row region 0x12e16+494*r may give the full live
+attitude matrix + state bytes == a MEASUREMENT opportunity, not a guess).
+If the measurement closes the ladder, wire it; else bank the honest negative
+and the disposition. Rewrite code in rewrite/src/game/, cite laws from
+aicode.md + ai-dossier.md + diplomacy.md, gate + rewrite tests must pass.
 
 NOTE t256 MECHANICS (t255 learning): OQ-021 residue is now END-TURN RECOMPUTE
 PATH (screen-open REFUTED; V not save-persisted; deterministic first-turn
@@ -306,17 +314,19 @@ MEASUREMENT: that md5 lives at work/r1/game/RESUME.GAM.user-oct29; the LIVE
 C:\RESUME.GAM (work/r1/game/RESUME.GAM) is md5 f5ffb840 (81647 B, the seed-
 commit pristine template) — verify the BACKUP md5, not the live one.]
 
-QUEUE (2 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
-to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
-rows; keep this QUEUE block intact except deleting the row you completed):
+QUEUE (2 tasks + the after-drain note, one session each; when you finish task
+tN, rewrite NEXT ACTION to the text of task tN+1 VERBATIM — do not renumber,
+do not compress the other rows; keep this QUEUE block intact except deleting
+the row you completed):
 
-t256 AI GAP ROWS 11/12/16 CODE PASS. docs/re/ai-dossier.md gap map rows 11
-  (16 SA_ bodies — PARTIAL), 12 (relation-STATE ladder 0..3 + proposal emitter
-  + attacked-bitmap — PARTIAL), 16 (per-ship order kinds {0..5} — NOT
-  REPRESENTABLE note applies; decide and bank the disposition). One row per
-  session is fine — if you finish one row, rewrite NEXT to the next row verbatim
-  and commit. Rewrite code in rewrite/src/game/, cite laws from aicode.md +
-  ai-dossier.md, gate + rewrite tests must pass.
+t256c AI GAP ROW 16 DISPOSITION. docs/re/ai-dossier.md gap map row 16
+  (per-ship order kinds {0..5}, stickiness, congregation, retreat-downgrade,
+  invasion-module carrier — §5, t179 P1/P3). The "NOT REPRESENTABLE" note
+  applies (rewrite has no ship positions/system objects); DECIDE AND BANK the
+  disposition: either accept the aggregate model permanently with the cited
+  reasons (and correct row 16's "GAP (largest)" label to a documented
+  boundary), or scope the minimal per-ship state the cited laws need. No
+  silent stub either way. Gate + rewrite tests must pass.
 
 t257 WATCHER SCHEMA + DAY FIELD (needs t249b). If t249b pinned the day dword:
   add the field to scripts/r1_playcap_watch.py (append-path open at line ~146;
@@ -325,6 +335,11 @@ t257 WATCHER SCHEMA + DAY FIELD (needs t249b). If t249b pinned the day dword:
   duplicate; there are already orphans 260988/290953/292085 + others — the
   user's call to retire them), and verify new rows carry the field within
   30 s. If t249b did not pin it, fold its candidate list forward instead.
+
+AFTER t257 DRAINS: author a new queue (candidates: OQ-021 end-turn-recompute
+discriminator = per-owner ship census vs V-change turns per the t256
+mechanics note below — NOT another screen experiment; OQ-016/OQ-019 residues
+are play-gated/BLOCKED-USER per the ledger).
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - OOM LAW (t251 incident, MEASURED): the t251 session died because it read
@@ -365,6 +380,31 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t256 (2026-11-01): AI GAP ROW 11 (16 SA_ bodies) AUDITED + UPGRADED —
+NO LEDGER ROW CLOSED (strict-close honored; gap map is a work item, OQ set
+unchanged 4 open). ROW TEXT WAS STALE (claimed Repel/BlockStarLanes filed
+no-ops — both wired long before t205); restated with per-body citations.
+FOUR BODIES UPGRADED TO CITED LAW (aicode.md §6.3 t99): SA_FreeResearch
+0x4414e queued-target-ONLY (uncited "cheapest if none" leg REMOVED);
+SA_StealResearch 0x43eec target-reset leg ADDED (stolen==own target ->
+re-pick); SA_IndustryBoost 0x4418e per-planet buildAcc+=100 behind the
+pending gate (old ind_+=20 = WRONG OPERAND, ind_ is the ship budget);
+SA_CauseWar 0x440b5 CEILING law via new pure static Campaign::hatredClamp
+(third-party x!=r clamped to the belligerent's DECLARE_WAR word; player-
+projection documented; the same-turn declare-war cascade of a clamped
+onlooker = the vendor effect, measured in probe). Remaining bodies labelled
+honestly in row 11: model-level abstractions (OQ-019 boundary) vs mechanism
+divergence (ForcePeace, row-12 family). Pins x3 (137 tests 0 fail); kNotes
+CauseWar/IndustryBoost lines updated; blast radius MEASURED nil on gate
+seeds (specnums 17/19/20 never in default AI slots 0..5): seed 2024 Control
+t1255 + seed 42 Extinct t979 verbatim. Pin pitfalls banked (_wip_t256 S4):
+mood+chooser cascade kills tight attitude bands; completion-reset bounds
+buildAcc below any +N delta — pin via control differential. Debug pattern:
+standalone g++ vs libascend_core.a, -DASCENDANCY_SOURCE_DIR=<repo root>.
+Docs: ai-dossier row 11 rewritten, abilities.md 5 rows updated,
+docs/re/_wip_t256.md S0..S6. gate 0, ledger audit OK, index OK;
+NEXT=t256b (gap row 12) verbatim.
 
 LANDED t255 (2026-11-01): OQ-021 WRITER RE-PROBE LANDED — NO ROW CLOSED
 (strict-close honored; OQ-021 ANNOTATED + residue NARROWED, stays open).

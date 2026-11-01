@@ -375,6 +375,31 @@ public:
         absorb = std::min(volley, charges);
         spill = volley - absorb;
     }
+    // t256 SA_CauseWar / SA_Hatred CEILING LAW (FUN_000440b5, aicode.md §6.3
+    // t99), pure form for pinning (same pattern as absorbSplit). Index space =
+    // owners. warWithSelf[r] != 0: r is at war with self (the ability owner);
+    // declareWarLine[x] = x's OWN DECLARE_WAR word (race row +0x1c9,
+    // diplomacy.md §8 positional map); att[x] = attitude of x toward self.
+    // Law (0x440b5..0x4414c read-through): for EVERY belligerent r, for every
+    // THIRD PARTY x (x != r — the belligerent's own cell is never touched),
+    // if att[x] > declareWarLine[r]... NOTE the original compares against
+    // r's war threshold and stores r's threshold; the rewrite mirrors that
+    // (line = r's), so a low-threshold enemy drags high-regard onlookers
+    // under the ONLOOKER's own chooser trigger only when line also sits below
+    // it — see _wip_t256 S2. Strict >, store = line (ceiling, not floor, and
+    // not a delta).
+    static void hatredClamp(const std::vector<int>& warWithSelf,
+                            const std::vector<int>& rLine,
+                            std::vector<int>* att) {
+        for (size_t r = 0; r < warWithSelf.size(); ++r) {
+            if (!warWithSelf[r]) continue;
+            for (size_t x = 0; x < att->size(); ++x) {
+                if (x == r) continue;
+                int& a = (*att)[x];
+                if (a > rLine[r]) a = rLine[r];
+            }
+        }
+    }
     // t93 (OQ-016): AI RESEARCH PICK tier decision — pure form of the
     // sentinel + preferred tiers of FUN_00040018 (0x400b3..0x40134, body
     // 0x40018..0x40175, disassembly re-verified t93; docs/re/aicode.md
@@ -465,6 +490,10 @@ public:
         return star >= 0 && star < static_cast<int>(attacked_.size()) ? attacked_[star] : 0;
     }
     const DipPolicyState& dipStateAt(int ai) const { return dipState_[ai]; }
+    // t256 pin surface (species_cause_war_hatred_ceiling_t256): set one AI's
+    // attitude baseline so the SA_Hatred ceiling law is testable without
+    // waiting for the oscillation model to move it.
+    void setAttitudeForTest(int ai, int v) { dipState_[ai].attitude = v; }
     std::string traceLine() const;  // one-line status for playthrough logs
     // Pick a Colony-Base cell the way the original's picker does: ONE
     // worldNext() draw over the planet's NON-ROCK surface cells, barren
