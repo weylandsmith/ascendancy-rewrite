@@ -223,6 +223,37 @@ planets_header_t1086_after_open.png.
   warning" blocker window briefly re-appeared and self-cleared (xsend
   refused one click during it — its blocker guard works).
 
+### t249b DAY-COUNTER PINNED: DAY == TURN (DAT_00012e10), MEASURED
+Tools: scripts/r1_t249b_dayscan.py; working log docs/re/_wip_t249b.md S1..S6.
+- THE LAW: the big green 7-segment readout at the top of the UI panel (what
+  the user read as "day 1254") is the TURN COUNTER rendered zero-padded to 5
+  digits. At live turn 1086 it reads "01086" (vision on
+  work/screens/t3/resumed_t247.png — external-display reading, R13-clean);
+  it is the ONLY number-bearing string on the planet/galaxy screen.
+- CENSUS PROOF no separate day scalar exists: dword==turn in bank-t1254
+  (20 slots, all t=1254) intersects to exactly THREE sites — member 0x254e98
+  == turn X=0x12e10 plus two heap addresses (0xfd7268 in a per-entity block;
+  0x100141c inside a sequential-id dword array 1238,1239,...,1254,1255,).
+  ZERO data-seg sites besides the turn. Re-run cross-session on the live ring
+  at t=1086: same shape (u32 intersection {0x254e98,0x270248,0x100117c}, last
+  two heap; u16==turn: ZERO data-seg hits in BOTH sessions at both values).
+  A maintained day dword would sit at a fixed data offset in both sessions
+  like turn/T/score — there is none.
+- SEMANTIC LEG: the vendor itself equates day==turn: t244 verbatim gauge
+  popup "Research: 52 per day / ... will be discovered in 37 days" while
+  research accrues per turn.
+- "Day %d" forensics: string is NOT in the exe payload; it is static.txt
+  (ascend00.cob blob 20 @0x269d0, entry "// 17", loadwin.cpp block) loaded
+  VERBATIM into the RAM pool at member 0x253032. ALL-RAM u32 referrer census
+  (calibrated on restree.txt -> known site 0x468d3): ZERO genuine referrers;
+  the one nominal hit (member 0x252c74) is ASCII "\xaa/%\0" of locale
+  date-format fragments — false positive. Formatter reaches the pool via
+  runtime-computed pointers (OQ-021-writer class instrument).
+- WATCHER (t257 input): no new field needed — timeline "turn" IS the day;
+  any literal "day" key is a pure alias of turn, no second RAM read.
+- No ledger row moved (not an OQ). Session side effects: none on :9 (zero
+  clicks, zero turns; screenshot analysis used EXISTING banked pngs).
+
 ## 4. PLANET-SCREEN INTERACTION LAWS (agent-observed, t244)
 - NAVIGATION STACK: galaxy -> SYSTEM VIEW (orbital grid: blue wireframe plane,
   bodies on yellow stalks, right panel = planet name + art, orbital structure

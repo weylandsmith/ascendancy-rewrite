@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-31T23:30
+updated: 2026-11-01T01:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,7 +260,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t249b DAY-COUNTER DWORD HUNT (verbatim queue row, t249 done — read docs/re/selfplay.md "t249 HEADER-PLANETS COUNTER FOUND" FIRST for the heap-list law and the sig-scan instrument). The planet screen shows a day counter (user testimony: "day 1254" at turn 1254 — day may equal turn in this campaign, which makes a same-value dword a candidate). Census dwords == 1254 in work/r1/bank-t1254/*.sav excluding heap noise; correlate against the known turn dword at data offset 0x12e10 (a day field should sit near game-state core, not the race block). If pinned, note the watcher-schema addition for t257. If not pinned, bank the negative + candidate list. STRICT-CLOSE applies. Do NOT touch the STATE ledger index block (gate machine-checks it).
+NEXT t250 TURN-DRIVER ROBUSTNESS PASS (verbatim queue row, t249b done — for the day==turn pin see docs/re/selfplay.md "t249b"; it also settles t257's dependency: the watcher's turn field IS the day, a literal day key would be a pure alias). scripts/r1_t245_turndrive.py (v3) advances turns and drains popups, but is softlock-blind. Add: (a) SOFTLOCK DETECT — sample the ring tail twice ~20 s apart; if only wall/file fields move AND a popup is on screen AND an input probe (c-key toggle) changes zero pixels, declare softlock, SIGKILL the dosbox pids, relaunch via scripts/r1_playcap_vnc.sh start, click Return-to-game at window-rel (318,333), resume the drive from the ring turn; write work/r1/SELFPLAY.marker (1 byte) so a future probe can tell self-play growth from user play. (b) verify --target against the ring (already v3) and log every press + drain count to a run log under work/r1/. Then run ONE bounded validation: --target +10 turns on the live :9 session. Laws to honor: background shells need DISPLAY=:9 injected explicitly; popup OK button at root (405,443); popups serialize at turn end and swallow NEXTTURN clicks (NEXTTURN at window-rel (511,67)). Do NOT touch the STATE ledger index block (gate machine-checks it).
 
 PAIRING-SESSION NOTE (t247 handoff, 2026-10-31): sentinel-slot law stands — the
 task line above is the FIRST non-blank line under this heading; notes go below
@@ -279,17 +279,9 @@ softlocked dosbox; SIGTERM pops its own quit-confirm with (Yes) DEFAULT.
 (4) User save RESUME.GAM md5 5b382afbb7891... (Oct 29) — never overwrite; the
 game writes it only at in-game Save, so self-play cannot corrupt it.
 
-QUEUE (10 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
+QUEUE (9 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
 to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
 rows; keep this QUEUE block intact except deleting the row you completed):
-
-t249b DAY-COUNTER DWORD HUNT. The planet screen shows a day counter (user
-  testimony: "day 1254" at turn 1254 — day may equal turn in this campaign,
-  which makes a same-value dword a candidate). Census dwords == 1254 in
-  work/r1/bank-t1254/*.sav excluding heap noise; correlate against the known
-  turn dword at data offset 0x12e10 (a day field should sit near game-state
-  core, not the race block). If pinned, note the watcher-schema addition for
-  t256. If not pinned, bank the negative + candidate list.
 
 t250 TURN-DRIVER ROBUSTNESS PASS. scripts/r1_t245_turndrive.py (v3) advances
   turns and drains popups, but is softlock-blind. Add: (a) SOFTLOCK DETECT —
@@ -397,6 +389,31 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t249b (2026-11-01): DAY-COUNTER PINNED — DAY == TURN, MEASURED THREE
+WAYS (no ledger row moved: the day readout is not an OQ row; strict-close
+honored; docs/re/selfplay.md "t249b" section is the record; docs/re/_wip_t249b.md
+S1..S6 working log; 1 tool scripts/r1_t249b_dayscan.py). PROVED: (1) SCREENSHOT
+(vision on existing banked work/screens/t3/resumed_t247.png, live :9 at turn
+1086): the only number-bearing string on screen is the big green 7-segment
+readout reading "01086" — the turn zero-padded to 5 digits; the user's "day
+1254" was this readout at turn 1254. (2) CENSUS: dword==turn in bank-t1254
+intersects (20/20 slots) to EXACTLY 3 sites — member 0x254e98 == data X=0x12e10
+(the turn dword itself) + two heap addresses (0xfd7268 per-entity block field;
+0x100141c inside a sequential-id dword array 1238..1257 — NOT a counter);
+u16==turn: ZERO data-seg hits; cross-session re-run on the live ring at t=1086
+reproduces the shape (u32 intersection {0x254e98, 0x270248, 0x100117c}, last
+two heap). No maintained day scalar exists at ANY stable data-seg offset in
+both sessions. (3) SEMANTIC: vendor equates day==turn (t244 verbatim "52 per
+day" research gauge, research accrues per turn). "Day %d" forensics: string is
+from static.txt (ascend00.cob blob 20 @0x269d0 entry "// 17", loadwin.cpp
+block), loaded verbatim into the RAM pool (member 0x253032); ALL-RAM u32
+referrer census (calibrated on restree.txt->0x468d3) = ZERO genuine referrers,
+the single nominal hit 0x252c74 is locale date-format ASCII "\xaa/%\0" —
+false positive banked as a census trap. t257 DEPENDENCY SETTLED: watcher
+timeline "turn" IS the day; a literal day key = pure alias, no second read.
+Side effects on :9: NONE (zero clicks, zero turns; only pre-banked artifacts
+read). Gate 0, ledger OK.
 
 LANDED t249 (2026-10-31, next day 11-01 local): HEADER-PLANETS COUNTER FOUND —
 SCREEN-OPEN SNAPSHOT LAW, MEASURED WITH A CONTROLLED LIVE EXPERIMENT (no
