@@ -112,6 +112,62 @@ to work/r1/bank-t1254/ BEFORE restart; t1092 RAM frames rotated away):
   in-game "Are you sure to quit" dialog with (Yes) DEFAULT: never press
   Enter near it; SIGKILL is the clean exit for a softlocked session.
 
+### t248 PER-PLANET OWNER TABLE FOUND + t247's +0x5a LEAD REFUTED
+Tools: scripts/r1_t248_planet_owner.py (census), r1_t248_verify.py /
+r1_t248_final.py (structural proof), r1_t248_pred.py + r1_t248_pred2.py +
+r1_t248_pop.py (header-filter sweeps, all negative), r1_t248_counter.py
+(maintained-counter intersection), r1_t248_orphan.py (table extent).
+- THE LAW: the 123-byte (0x7b) stride PLANET TABLE record holds the owner at
+  NAME+0x33 (byte) == race index; 0xFF == unowned. Table anchored by name
+  run (r1-savestate.md name law; name field 19 B): bank-t1254/48.sav rec0
+  "Vega I" member idx 0x26d103 = phys 0x26d07b (pointer law H=0x88, same base
+  in the live-ring t1086 slots). NAME+0x65 == planet index within system.
+- PROOF 1 (structural, decisive): at BOTH t1086 (live ring 46.sav) and t1254
+  (bank 48), every one of the 50 star records keys by name to its planets,
+  and star-record owner byte +0x14 satisfies (star & 0x7f) == OR(1<<planet
+  owner) with ZERO violations — 104 colonised planets @t1086, 124 @t1254. A
+  field that reproduces the star bitmask bit-for-bit across 50 systems x 2
+  timestamps is the owner (scripts/r1_t248_final.py).
+- PROOF 2 (the 102): count(NAMED && NAME+0x33 == race0) = 102 at t1254 ==
+  header "102 Planets Occupied" EXACT (owner hist {0:102,1:11,2:11,255:21};
+  the 6 blank-named slots k=145..150 hold a stale 0 — law is NAMED-filtered).
+  At t1086 the same count = 80 while the t1092 screenshot (work/screens/t2/
+  planets_header_t1092.png, re-read this session) says 60: the header's
+  planets number is a MAINTAINED counter, not the table count (PROOF 3).
+- PROOF 3 (Ghidra, this session): FUN_00051684 (planet-list header producer,
+  region 0x51685..0x517c0) loops the 0x60-stride star table (0x5168d MOV
+  EAX,0x13bc5; bound WORD [0x16145] @0x51692; sole-owner CMP ESI,EDI,
+  EDI=1<<[0x7458e] @0x516c5; home-star exclusion CMP EAX,[ECX*0x1ee+0x12e1d]
+  @0x516d7) — that loop-count feeds the SYSTEMS number (35 sole + home = 36
+  @t1254 EXACT). The PLANETS number is a stored u16 read through
+  *(u16*)(*(int*)(obj+0xab) + 0x8c7) — a HEAP-WINDOW slot, not a data-seg
+  counter. Format fetch MOV EAX,0x97 (static.txt record 151) at 0x51798.
+- PROOF 4 (static init signature): game/resume.gam (vendor 2008, 151 recs,
+  name@0x9b1a, stride 123) at NAME+0x33: hist {0:1,1:1,2:1,3:1,4:1,5:1,6:1,
+  255:144} — exactly seven records hold 0..6 (each race's HOME planet), all
+  else 0xFF. Owner-field initialisation.
+- REFUTED (t247 lead): star byte +0x5a is NOT the colonised-planet count — it
+  is the TOTAL planet SLOTS in the system (sum(+0x5a) over all 50 stars ==
+  145 == named record count @t1254; per-system len(planets)==+0x5a for every
+  keyed system at both timestamps; the colonised reading matches 3/5). So the
+  "104 vs 102" delta was never a co-ownership split: the only non-player
+  planet inside a player-bit-set star @t1254 is Fomalhaut II (0xFF unowned,
+  star byte 0x1); co-owned stars (Sarsaparilla 132, Arcturus 6, Oslo 129,
+  Philadelphia 130, Amoroso 6) each have every planet owned by a party whose
+  bit is in the star byte (player owns 4/4 Oslo).
+- HONEST NEGATIVE (header filter @t1086): no record predicate explains
+  60 @t1086 AND 102 @t1254. Sweeps over all 123 offsets x 256 values, bit-k,
+  u16/u32 !=0/==0xFF, and owner-AND forms: only 5 single-bit hits at 60
+  (@+5 bit4 -> 60@1254 but that is a coincidence class, @+48 bit4 -> 65,
+  @+51 bit1 -> 32, @+89 bit3 -> 80, @+101 bit0 -> 57) — none hits 102.
+  CAVEAT on r1_t248_counter.py: its u16-intersection (60 in the t1086 ring
+  slot AND 102 in t1254 -> 0 offsets) compared a turn-1086 slot against a
+  turn-1254 slot, but the "60" header belongs to t1092 (t246's slot rotated
+  away) — the zero is NOT a refutation of a plain-u16 counter; redo with a
+  same-turn pair. The "occupied == populated" hypothesis (owner flag set but
+  pop==0 at t1086) is the best [unverified] default and is testable once the
+  population-slot library (t254) lands.
+
 ## 4. PLANET-SCREEN INTERACTION LAWS (agent-observed, t244)
 - NAVIGATION STACK: galaxy -> SYSTEM VIEW (orbital grid: blue wireframe plane,
   bodies on yellow stalks, right panel = planet name + art, orbital structure

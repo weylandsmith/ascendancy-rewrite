@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-10-31T04:05
+updated: 2026-10-31T23:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,7 +260,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t248 PER-PLANET OWNER TABLE HUNT (banks the 102-planet law; feeds t249/t249b/t252). Read docs/re/selfplay.md (PLANETALLOC header law + t247 CORRECTION) FIRST. The header "N Planets Occupied" (getter(151), region 0x51685..0x517c0) counts PLANETS: sole-owner sum 100 + player-share 2 of co-owned star idx25 = 102 EXACT at t1254 [hypothesis; the table is the missing citation]. FIND the per-planet ownership table in the banked slot work/r1/bank-t1254/*.sav (base via scripts/r1_sav_scan build_anchors + find_base; data-seg offset law addr = B + 0x82bb0 + X; star table is 0x60-stride at img 0x13bc5, bound WORD ds:0x16145, owner byte +0x14 is a BITMASK). Legs: (a) census u8/u16 arrays whose player-owned count equals 102 (scripts/r1_t247_find102.py is the starting tool; NOTE 15 u16==102 existed, NONE inside the race-0 block -> look race-indexed or global-star-indexed); (b) a candidate must also explain t1092=60: use the ring journal fields, not RAM (the t1092 RAM frames ROTATED away); (c) cross-check the +0x5a per-star colonised-count law (values 1..5, hist {1:35,2:5,4:5,6:2,132:1,129:1,130:1} over bit-set stars at t1254). Bank law + offsets in docs/re/selfplay.md (and economy.md if a census table lands). STRICT-CLOSE applies (OQ-021 stays open unless a cited measurement closes it). Do NOT touch the STATE ledger index block (gate machine-checks it).
+NEXT t249 HEADER-PLANETS COUNTER + WRITER HUNT (retargeted by t248 — read docs/re/selfplay.md "t248 PER-PLANET OWNER TABLE FOUND" FIRST). The per-planet owner table LANDED t248 (planet-record NAME+0x33 == owner race, 0xFF unowned; star-bitmask OR proof 0 violations x 50 systems x 2 timestamps). What did NOT land: the header "N Planets Occupied" NUMBER. At t1254 it equals count(NAMED && owner==race0)=102, but at t1086 count=80 vs header 60 (screenshot planets_header_t1092.png) — the header reads a MAINTAINED value, and Ghidra FUN_00051684 shows HOW: the planets %d comes from a stored u16 at *(u16*)(*(int*)(obj+0xab)+0x8c7) (heap-window slot; obj = the home-planet/game object pointer at data 0x12e1d+0x1ee*race — note [home+0xab] read 0 in both captured slots, so the obj in the decompile is a DIFFERENT object than the raw pointer at 0x12e1d; trace the real call path: FUN_00051684's EAX-in arg, callers via E8 census). Legs: (a) resolve the runtime address of that u16 in work/r1/bank-t1254/48.sav (must read 102) and in a t1086 ring slot (must read 60 at t1092 — CAVEAT: no t1092 RAM survives; use the closest slots and the ring journal turn fields); (b) once pinned, windowed-disasm the writer sites (objdump -b binary -D -m i386 -M intel over work/ascend_restored.bin; t91 desync caveat) — colonize/lose-planet events must update it; (c) SECONDARY: writer + semantics of u16@data 0x131b4 (60 at BOTH t1092 and t1254 — maintained, purpose unknown; t247 proved it is NOT the header counter). Also open from t248: WHY 20 of 80 owned planets @t1086 were not counted 60 — best [unverified] default "occupied==populated"; test when t254's population-slot library lands. Bank in docs/re/selfplay.md. STRICT-CLOSE applies. Do NOT touch the STATE ledger index block (gate machine-checks it).
 
 PAIRING-SESSION NOTE (t247 handoff, 2026-10-31): sentinel-slot law stands — the
 task line above is the FIRST non-blank line under this heading; notes go below
@@ -283,14 +283,16 @@ QUEUE (11 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
 to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
 rows; keep this QUEUE block intact except deleting the row you completed):
 
-t249 PIN WRITER u16@0x131b4 (data-seg offset). The maintained "Planets
-  Occupied" counter read 60 at t1092 AND t1254 while the header went 60->102 —
-  it is maintained, not recomputed by the t246 getter loop. Method: the
-  windowed-disasm recipe used at t106/t107 (objdump -b binary -D -m i386 -M
-  intel over work/ascend_restored.bin; remember the t91 desync caveat —
-  immediate-operand pairing is desync-limited). Find mov/add/inc sites through
-  the image-base equivalent of 0x131b4, plus the colonize/lose-planet event
-  paths. Cite writer sites or bank a measured negative with controls.
+t249 HEADER-PLANETS COUNTER + WRITER HUNT (RETARGETED t248; the verbatim
+  original row "PIN WRITER u16@0x131b4" survives in git history and is folded
+  in as leg (c)). The header planets %d is a stored u16 read through
+  *(u16*)(*(int*)(obj+0xab)+0x8c7) per Ghidra FUN_00051684 (t248); pin its
+  runtime address (must read 102 @t1254; 60 @t1092 — no t1092 RAM survives,
+  nearest slots + ring journal only) then windowed-disasm the writers
+  (objdump -b binary -D -m i386 -M intel over work/ascend_restored.bin;
+  t91 desync caveat). u16@0x131b4 (60 at BOTH timestamps, maintained, NOT
+  the header counter per t247) writer + semantics = leg (c). Cite writer
+  sites or bank a measured negative with controls.
 
 t249b DAY-COUNTER DWORD HUNT. The planet screen shows a day counter (user
   testimony: "day 1254" at turn 1254 — day may equal turn in this campaign,
@@ -406,6 +408,34 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t248 (2026-10-31): PER-PLANET OWNER TABLE FOUND — THE 102-PLANET LAW
+HAS ITS CITATION (no ledger row moved: OQ-005/016/019/021 untouched, strict-
+close honored; docs/re/selfplay.md "t248" section is the record; 8 new tools
+scripts/r1_t248_*.py). PROVED: (1) planet table (stride 0x7b, name-anchored,
+rec0 "Vega I" phys 0x26d07b) holds OWNER at NAME+0x33 (byte, 0xFF=unowned) —
+structural proof: star+0x14 & 0x7f == OR(1<<owner over its planets), 50/50
+systems keyed, ZERO violations at BOTH t1086 (live ring) and t1254 (bank);
+static init signature in vendor resume.gam: exactly 7 records hold 0..6
+(home planets), 144 hold 0xFF. (2) count(NAMED && owner==race0)=102 == header
+EXACT at t1254 (hist {0:102,1:11,2:11,255:21}). (3) Ghidra FUN_00051684:
+the header's SYSTEMS number is the star-table sole-owner loop (35+home=36
+EXACT); the PLANETS number is a stored u16 via *(u16*)(*(obj+0xab)+0x8c7) —
+a maintained heap-window value, NOT a table count. REFUTED: t247's star+0x5a
+"colonised count" — it is TOTAL planet slots per system (sum=145=record count;
+the 104-vs-102 delta was one unowned Fomalhaut II + one blank slot, not a
+co-ownership split; co-owned stars each have all planets owned by bit-set
+parties). HONEST NEGATIVE: the header's 60 @t1086 is NOT count(owner==race)
+(=80): exhaustive predicate sweeps (123 offsets x 256 values, bit-k, u16/u32,
+owner-AND) produced ZERO predicates hitting 60@t1086 AND 102@t1254; the
+t248u16-intersection tool compared a t1086 slot vs t1254 (the header-60
+belongs to t1092, RAM rotated) — caveat banked, NOT a refutation of a plain
+counter. NEXT=t249 retargeted (header-counter address + writers; u16@0x131b4
+folded as leg c) — deviation from the verbatim-queue rule is deliberate and
+recorded in the queue row itself. Live session untouched (watcher banking,
+:9 game at t1086+, user save md5 5b382afb verified absent from writes —
+nothing this iteration touched game/ or the live session at all).
+
 
 LANDED t243 (2026-10-31): ADOPTED THE t243h SENTINEL-FIX DELETION + THIRTIETH
 CONSECUTIVE BYTE-IDENTICAL ADJUDICATION (NO ledger row moved — strict-close
