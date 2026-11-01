@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T10:30
+updated: 2026-11-01T12:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,33 +260,22 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t254 POPULATION-SLOT LIBRARY + PLANITEM RULING (ordering rationale: this
-is a RENDER+EYEBALL task that needs no live game and no drive data, so it is
-immune to the :9 session's state and to the OOM law — do it before t255, which
-wants a fresh mining pass, and before t256, which is pure code; it also closes
-out the shp identification arc while the t252/t253 screen dossiers are warm).
-Render candidates — planets.shp
-  (55 recs), planal00..10 (11x5), planitem.shp (40 recs) — with the corrected
-  6-bit palette (v*255//63; scripts/r1_t182_pngdump.py machinery), contact
-  sheets with labels, then compare against the LIVE planet screen population
-  panel (law: slot array sized to CAPACITY; uncolonized = empty circles; free
-  pop = yellowish figure facing FORWARD; busy pop = reddish figure facing
-  SIDEWAYS — player testimony, shp.md S19) and against the current-project
-  panel (t244 hypothesis: planitem = current-project item art — CONFIRM or kill
-  it). Bank per-record ids to shp.md S20 + work/r1/shp_png/ids.tsv. R13: you
-  may identify against the in-game display; do NOT grade your own renders.
-  MECHANICS t254: work from the galaxy screen with xsend clicks (DISPLAY=:9,
-  window-rel coords; Escape unwinds ONE level — t252/t253 law; t253 addition:
-  LEFT-click a fleet row jumps to that ship's location, RIGHT-click opens the
-  ship contents display). Planet screen = STATUS button (553,145; rect
-  474,130-632,160) -> STATUSWND/STATPLANLST, then a colony row. PRE-SWEEP
-  HAZARD CHECK (t253 law, non-negotiable):
-  `DISPLAY=:9 xwininfo -root -tree | grep -i warning` must print NOTHING before
-  any click — an orphaned xmessage quit-confirm (Yes DEFAULT) was found mapped
-  on :9 at t253; kill the xmessage PID only, never pkill, never touch dosbox-x.
-  NEVER click anything that starts a war, ends a turn, abandons a system, or
-  sells/dismisses a ship (t244 abandoned an Abandon-Vega-II dialog by accident
-  — decline everything); negotiation PLAYERDIP rows 2/3 are war/alliance.
+NEXT t255 OQ-021 WRITER RE-PROBE (needs t251 data; ordering rationale: it is
+the only ledger-row-moving task left that uses the fresh drive corpus while
+the banks are warm; t256 is pure code and t257 depends on t249b, so both
+out-rank lower). t212 exhausted the STATIC route
+(runtime-slot member search over the 20-sav corpus; DAT_482fb oscillates
+while systems_any/full are flat). Redo with the drive corpus: more turns,
+more states. If the oscillation range widened, the recompute-trigger
+hypothesis (screen-open vs per-turn) becomes testable against ring turn
+boundaries. Bank the narrowed chain or a second honest negative.
+NOTE t255 MECHANICS (t254 learning): the live :9 session is at turn 1255 on
+the PLANET screen (Vega IV) — Escape does NOT unwind PLANETALLOC (measured
+t254: key sent, screen unchanged); leave it parked there or click a sidebar
+button (all rects in ui-runtime.md S6) — the ring keeps banking regardless.
+Ring savs are at
+work/r1/playcap/save/ (20 files, 10 s cadence); banks bank-t251-live1255 /
+bank-t251-predrive are intact. NEVER json.loads the whole timeline (OOM law).
 
 PAIRING-SESSION NOTE (t247 handoff, 2026-10-31; turn fact updated t251
 2026-11-01): sentinel-slot law stands — the
@@ -312,20 +301,9 @@ MEASUREMENT: that md5 lives at work/r1/game/RESUME.GAM.user-oct29; the LIVE
 C:\RESUME.GAM (work/r1/game/RESUME.GAM) is md5 f5ffb840 (81647 B, the seed-
 commit pristine template) — verify the BACKUP md5, not the live one.]
 
-QUEUE (6 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
+QUEUE (5 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
 to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
 rows; keep this QUEUE block intact except deleting the row you completed):
-
-t254 POPULATION-SLOT LIBRARY + PLANITEM RULING. Render candidates — planets.shp
-  (55 recs), planal00..10 (11x5), planitem.shp (40 recs) — with the corrected
-  6-bit palette (v*255//63; scripts/r1_t182_pngdump.py machinery), contact
-  sheets with labels, then compare against the LIVE planet screen population
-  panel (law: slot array sized to CAPACITY; uncolonized = empty circles; free
-  pop = yellowish figure facing FORWARD; busy pop = reddish figure facing
-  SIDEWAYS — player testimony, shp.md S19) and against the current-project
-  panel (t244 hypothesis: planitem = current-project item art — CONFIRM or kill
-  it). Bank per-record ids to shp.md S20 + work/r1/shp_png/ids.tsv. R13: you
-  may identify against the in-game display; do NOT grade your own renders.
 
 t255 OQ-021 WRITER RE-PROBE (needs t251 data). t212 exhausted the STATIC route
   (runtime-slot member search over the 20-sav corpus; DAT_482fb oscillates
@@ -389,6 +367,38 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t254 (2026-11-01): POPULATION-SLOT LIBRARY IDENTIFIED + PLANITEM RULING
+(no ledger row closed — strict-close honored; OQ-005 ANNOTATED with the
+pop-slot closure chain, STAYS OPEN; shp.md S23 NEW + planets-ui.md S4
+corrected in place + ids.tsv +11 rows; tools scripts/r1_t254_sheets.py +
+r1_t254_pi_match.py). (1) THE CATCH: pop-slot icon library = 17np.shp, cited
+live-RAM — u16[DAT 0x6fd9c]=44 (bank-t251-live1255/41.sav) -> cache slot 44
+PAY=0x435400, verbatim 1.10 copy at +0x88 content-matches 17np.shp (control
+slot 41=14intel.shp; slot == gwshare.txt line - 1, 45 entries); runtime
+selector table sel 0..8 -> recs 0..8 9/9. IDs: k1 9x9 sideways red humanoid
+=BUSY, k2 7x9 front-facing yellow =FREE, k3 8x8 hollow green ring =EMPTY —
+player S19 testimony corroborated record-for-record. (2) GEOMETRY EXCLUSION
+measured: dims census (u32 pairs at canonical V/A slots — my FIRST pass read
+u16s and printed garbage; law restated shp.md S23.3) — planets.shp 11 groups
+x 5-size ladder min 11x11, planitem min 24x23, planalNN min 47x47: ALL
+excluded from the 0x0a PLPOP pitch; the t254 candidate list was structurally
+wrong and the RAM chain beat it. (3) PLANITEM CONFIRMED (t244 hypothesis):
+live PLBUILD icon 'Scientist Takeover' (item idx 34) == planitem.shp k34 1:1
+sliding-window MAD 1.5, next best 42.1 — vision-first said k33 and was WRONG
+(t254 pitfall banked: for icon identity use 1:1 pixel match, not vision, when
+a live crop exists; vision misjudged because the crop included panel padding).
+(4) LIVE leg: hazard check clean; STATUS button (553,145) -> planet list ->
+row 2 click (200,105) -> Vega IV detail; pixel census 37 busy + 2 free + 1
+unpainted cell (cap-sized array law holds); zero turn drift at 1255 (ring
+tail-scan); game left PARKED ON THE PLANET SCREEN — Escape was sent
+(xsend DOSBox-X key Escape) and did NOT unwind it (planet screen survives
+Escape; t252 'Escape unwinds ONE level' applies to research/diplomacy
+overlays, NOT PLANETALLOC — t255 note above updated accordingly). DAT_43508
+pointer read returned zeros at
+PL+0x42/4a/4c (0x26f3e5) — honest negative, field offsets NOT re-verified
+(t198 law stands, read may need a different base/segment class). NEXT=t255
+verbatim.
 
 LANDED t253 (2026-11-01): LIVE SCREEN SWEEP 2 — FLEET + SHIP DESIGN (no row
 closed — strict-close honored; OQ-005 ANNOTATED with the frame->role anchor set,

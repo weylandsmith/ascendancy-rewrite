@@ -126,12 +126,15 @@ used <= pop <= cap, so exactly three band shapes occur:
   slots pop..cap-1           -> SEL 3  (beyond population: EMPTY slot icon)
 This is the player's testimony (capacity-sized array; empty circles; two
 pose classes) arriving as a CITED law; the assignment SEL1=busy / SEL2=free
-follows the used<=pop ordering law but the icon identity per SEL value needs
-the [0x6fd9c] library's art — the slot-index globals' WRITERS were NOT found
-by direct-encoding census (A3/89 05/C7 05 forms over the whole image, zero
-hits), so WHICH library feeds 0x6fd9c (planets.shp? planalNN? planitem?
-unlisted) stays OPEN [honest negative; gwshare.txt:35-37 lists planets.shp +
-planitem.shp as the planet-screen-adjacent libraries].
+follows the used<=pop ordering law but the icon identity per SEL value needed
+the [0x6fd9c] library's art — RESOLVED t254 [verified live-RAM]:
+u16[0x6fd9c] = 44 (bank-t251-live1255/41.sav) -> cache slot 44 verbatim
+content-match = 17np.shp (gwshare.txt:45; slot == gwshare line - 1, control
+slot 41 = 14intel.shp). Records: SEL1 k1 = sideways red humanoid (busy),
+SEL2 k2 = front-facing yellow figure (free), SEL3 k3 = hollow green ring
+(empty); dims 9x9/7x9/8x8 fit the 0x0a pitch (planets/planitem/planalNN are
+EXCLUDED by min-dims 11/24/47). Full chain + live pixel census:
+docs/re/shp.md S23.
 The 0x3b9df trio (header strip: 3 blits incl. an overlay gated by
 byte[widget+0x18b]&4 at fixed (0x198,0x128)) and the 0x3be7d quad (4 x
 FUN_0005bf71 rect fills gated by byte[widget+0xab]==0xff) are the panel

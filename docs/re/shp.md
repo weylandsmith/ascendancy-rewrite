@@ -1046,3 +1046,51 @@ types 10/11/12 addressable-but-dims-zero, k52..k54 unreachable —
 planets-ui.md S6). The rewrite's selection math landed t199
 (ui::gaugeSelector/prosSelector, Campaign::popBands — planets-ui.md
 S3/S4 landing blocks); drawing vendor records stays blocked on OQ-005.
+
+## 23. t254: POPULATION-SLOT LIBRARY IDENTIFIED = 17np.shp [MEASURED live-RAM]
+## + PLANITEM CURRENT-PROJECT RULING CONFIRMED (1:1 pixel match) + dims census
+
+1. POP-SLOT LIBRARY [verified]: the PLPOP grid (planets-ui.md S4) draws from
+   `u16[DAT 0x6fd9c]` -> cache 0x9f10c. Live RAM bank-t251-live1255/41.sav
+   (turn 1255, B=0x1bf4d8): u16[0x6fd9c]=44; cache slot 44 PAY=0x435400,
+   verbatim 1.10 copy at PAY+0x88 (t68 anatomy) content-matches
+   extracted/ascend01/data/17np.shp (count=9, size+head EXACT). Control:
+   slot 41 -> 14intel.shp, and gwshare.txt line 42 = 14intel.shp / line 45 =
+   17np.shp => slot index == gwshare line - 1 (45 entries). The runtime
+   selector table at copy+8+8*sel maps sel 0..8 -> record stream starts
+   0..8 exactly (blit cursor law entry+0x18, 9/9). Adjacent globals
+   u16[0x6fd90..0x6fd9a] = 38,39,40,41,42,43 (planet-window lib set, gwshare
+   order). "library IDENTITY STILL OPEN" (S22/planets-ui.md S4) is SUPERSEDED.
+2. RECORD IDs (vision-oracle 16x zoom, t193 law; scripts/r1_t254_sheets.py):
+   17np k0 639x479 panel frame (t196 probe stands); k1 9x9 SIDEWAYS humanoid,
+   red/pink body + blue tool = BUSY pop; k2 7x9 FRONT-facing yellow/gold
+   figure = FREE pop; k3 8x8 hollow GREEN ring = EMPTY slot; k4 625x357,
+   k5 416x316 panels; k6/k7/k8 2x2 red/yellow/green dots (legend markers).
+   SEL(i) bands 1/2/3 -> k1/k2/k3 (record index == selector). The player's
+   S19 testimony (yellow-front free, reddish-sideways busy, empty circles)
+   is corroborated record-for-record. LIVE cross-check (Vega IV at t1255,
+   work/r1/screens/t254/02_planet_detail.png, pixel census not vision-count):
+   37 busy-class cells + 2 yellow-heavy cells (row 3 cols 7-8) + cell (9,3)
+   unpainted background = 39 slots painted region; matches the capacity-sized
+   array law (planets-ui.md S4) with used=37, pop=39, cap=39 reading. NOTE
+   the t244 vision read called row-3 figures "yellow sideways" — pixel
+   classes show them yellow-dominant (k2 free icons); icon-counting stays
+   pixel/player-wins (S20 pitfall law).
+3. GEOMETRY EXCLUSION [verified]: corpus-wide dims census (u32 pairs at the
+   canonical V/A slots) — planets.shp 55 recs = 11 groups x 5-size ladder
+   (11,18,25,35,47) x biome, min 11x11; planitem.shp 40 recs min class
+   24x23/33x33 dominant; planal00..10 all 5 recs = 47/75/103/140/189 size
+   ladder (pose-set theory stays dead). The 0x0a (10 px) PLPOP pitch EXCLUDES
+   all three t254-assigned candidates; the pop library had to be one of the
+   <=10px libs (bullet04/shipicon/14intel/listbox/17np/mouse/cos_*/sg-*bull).
+4. PLANITEM RULING [verified]: t244 hypothesis "planitem.shp = current-project
+   item art" CONFIRMED by 1:1 sliding-window pixel match — live PLBUILD icon
+   (Vega IV, project "Scientist Takeover" = item index 34 per income-law.md
+   S6h) matches planitem.shp rec k34 at MAD 1.5 (next best k38 = 42.1; all
+   other 38 recs >= 42). Palette game.pal 6-bit scaled. Record-index ==
+   itemIdx reading now cited for at least one item; per-item ids for the
+   other 39 stay a contact-sheet fold (work/r1/shp_png/sheets/
+   t254_B_planitem.png), NOT self-graded.
+5. SHEETS shipped: work/r1/shp_png/sheets/t254_{A_planets,B_planitem,
+   C_iconcands,D_planal00}.png (labelled, rewrite-decoder renders, corrected
+   palette); harness scripts/r1_t254_sheets.py + scripts/r1_t254_pi_match.py.
