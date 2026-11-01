@@ -393,7 +393,15 @@ dosbox-x write watchpoint on the End-Turn path + drive past V>=25 (USER ASK in
 docs/BLOCKED.md; zero V>=25 rows and zero selector arms in the whole corpus —
 the threshold itself remains unobserved). rewrite default >1/2
 (campaign.cpp:2093) UNCHANGED, consistent with every banked frame. Row STAYS
-OPEN (strict-close). | open (threshold
+OPEN (strict-close). STATUS t259 (2026-11-01): the parked :9 game PROCESS DIED
+~15:45:08 unattributed (docs/re/_wip_t259.md S3, docs/BLOCKED.md t259 ADDENDUM)
+— passive threshold witness is IMPOSSIBLE until relaunch decision; ask (A) as
+literally authored is dead. OFFLINE HANDLE TESTED AND CLOSED t259: banked
+savs are full guest RAM (ZIP member "Memory"), but the same-turn-different-V
+pair census over ALL 122 banked/ring savs returned NONE (turn set {1086:V0,
+1096:V23, 1254:V23, 1255:V14}; scripts/r259_savpair_census.py,
+work/r1/t259_savpair.out) — cross-bank diffs are confounded by world movement.
+OQ-021 has NO offline residue left: both residues are play/watchpoint-gated. | open (threshold
 residue = play witness; displayed-count write-site = RESIDUE NOW NARROWED TO
 END-TURN RECOMPUTE PATH, runtime-watchpoint class; screen-open hypothesis
 REFUTED t255; banked-world-feature explanations MEASURED-EXHAUSTED t258) |

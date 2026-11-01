@@ -260,26 +260,31 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT = WAIT-TRIGGER SENTINEL (t258 drained the last offline queue task; per
-the AFTER-DRAINS instruction the remaining candidates are play-gated USER ASKS,
-authored into docs/BLOCKED.md "t258 USER ASK" — NOT loop tasks). DO NOTHING
-THIS SESSION beyond adopting this sentinel if you were launched on a dirty
-tree. Work re-arms ONLY on: (1) a witness — any trusted row with V>=25 or a
-selector arm (grep the tail per the tail-scan pattern; zero exist as of
-t258), or a new playcap-* dir (a real user sitting); (2) a user answer to ask
-(A) keep ending turns on the parked :9 session past V>=25, or (B) approval to
-run a watchpoint-instrumented dosbox-x against the scratch copy (producer
-write-site of DAT_482fb, t212 class); (3) a STEERING note. If re-armed by (2B)
-or a sitting: the decisive recipe is watchpoint [0x482fb..0x482fe] during ONE
-End-Turn + drive past 25 — everything offline is done (score.md S11 candidicide:
-NO banked world-field combination explains V; SURVIVORS NONE on 38 change vs
-795 stable boundaries). HARNESS: relaunch should now use IDLE_GATE=1 (queue
-empty; the t248 QUEUE-DRIVEN-MODE exit closes the batch on no-wake+no-steer+
-clean tree) or simply not relaunch — see docs/BLOCKED.md t186 CONSEQUENCE.
-Do NOT re-run r258_vdisc.py (it is the closed negative; KEEPER for a future
-schema with new fields). Do NOT re-mine the old candidates (t213/t214/t243
-do-not-re-trod list still stands, plus t255 S10 and t258 S11 supersede the
-V-candidate space).
+NEXT = WAIT-TRIGGER SENTINEL v2 (t259). RUN EXACTLY: `bash
+scripts/r1_t259_sentinel.sh` (~1 call, read-only), read docs/BLOCKED.md
+"t259 ADDENDUM", then END THE SESSION. WHY v2 REPLACES THE t258 SENTINEL:
+the t259 session MEASURED that the parked :9 game PROCESS DIED ~15:45:08
+unattributed — timeline/ring/dosbox.log all froze at 60.sav t=1255 V=14,
+`pgrep -x dosbox-x` empty, Xvfb/x11vnc survive (docs/re/_wip_t259.md S3).
+The old premise "trigger A structurally ALWAYS armed while the watcher lives"
+is FALSE: with no game, no V row can ever appear again, so a passive witness
+(V>=25 / selector arm) is IMPOSSIBLE, not merely absent. Re-arm triggers, in
+order: (1) a new playcap-* dir (real user sitting — the ONLY passive signal
+left); (2) a user answer to BLOCKED.md (t258 ASK A/B as amended by t259:
+A-now-requires-relaunch-decision — CAUTION: live RESUME.GAM md5 == the Oct-29
+backup, so "Return to Current Game" resumes Oct-29 NOT t1255; t1255 survives
+only as dosbox-x savestate ZIPs, loadstate path unexercised by this loop;
+B = watchpoint-dosbox approval; plus t259 ask: nod to retire the seven orphan
+watchers); (3) a STEERING note. NOTHING offline remains for OQ-021: t259 ran
+the last offline handle (same-turn-different-V sav-pair RAM diff) over ALL
+122 banked/ring savs — PAIRS NONE (r259_savpair_census.py KEEPER;
+work/r1/t259_savpair.out; cross-bank diffs confounded). DO NOT relaunch the
+loop batch (MAX_ITERS/IDLE_GATE): a gated relaunch re-burns fresh sessions
+re-adjudicating a dead pipeline — the t214..t243 pattern. If this session was
+launched on a dirty tree, adopt this sentinel and do nothing else.
+Do NOT re-run r258_vdisc.py (closed negative; KEEPER) or
+r259_savpair_census.py (closed negative; KEEPER). Do NOT re-mine banked world
+fields (t258 S11) or re-attempt static write-site hunts (t212 zero).
 
 NOTE t256 MECHANICS (t255 learning): OQ-021 residue is now END-TURN RECOMPUTE
 PATH (screen-open REFUTED; V not save-persisted; deterministic first-turn
@@ -287,7 +292,10 @@ recompute) — if you fold an OQ-021 discriminator in, it is the per-owner ship
 census vs V-change turns (ship_raw banked every row; score.md S10), NOT another
 screen experiment. Live :9 session sits at t1255 V=14 on the PLANET screen
 (Escape does NOT unwind PLANETALLOC — t254); leave it parked, the ring keeps
-banking. Ring savs at work/r1/playcap/save/ (10 s cadence); banks
+banking. [t259 CORRECTION: the game PROCESS is DEAD since ~15:45:08 — nothing
+banks anymore; see sentinel v2 + BLOCKED.md t259 ADDENDUM; the ring's last
+copy (60.sav t1255 V=14) is md5 324d2d75..., bank-t251-live1255 copy 0024340d...]
+Ring savs at work/r1/playcap/save/ (10 s cadence); banks
 bank-t251-live1255 / bank-t251-predrive intact. NEVER json.loads the whole
 timeline (OOM law); per-session trust is REQUIRED for V analysis (t255: the
 global watermark drops re-loaded lower-turn campaigns — see r255d).
@@ -363,6 +371,36 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t259 (2026-11-01): SENTINEL ADJUDICATION FOUND THE ENVIRONMENT DEAD —
+WITNESS PIPELINE DARK; LAST OFFLINE OQ-021 HANDLE MEASURED-CLOSED (_wip_t259
+S1..S7; docs/BLOCKED.md t259 ADDENDUM; OQ-021 annotated, STAYS OPEN — strict
+close: nothing closed, honest negatives recorded). MEASURED: parked :9 dosbox-x
+process DEAD (pgrep -x empty) with timeline/ring/dosbox.log frozen at the SAME
+second 15:45:08 (60.sav t=1255 V=14); Xvfb+x11vnc alive; cause UNVERIFIED
+(journalctl zero 'killed process' lines today, dmesg unreadable; [inferred]
+memory-spike class per t251, r258_vdisc window 15:34-16:20 — not proven).
+Consequence banked: passive trigger A is IMPOSSIBLE while dark (not merely
+unobserved); ask (A) "keep ending turns" is dead as authored; a relaunch
+resumes from RESUME.GAM which MEASURED == Oct-29 backup md5 5b382afb (the game
+never wrote a newer resume slot) — t1255 exists ONLY as savestate ZIPs;
+loadstate path unexercised. TRIGGERS RE-CENSUSED: zero witness rows in tail
+400KB, zero playcap-* dirs, no steering, no ask answers. OFFLINE: same-turn-
+different-V sav-pair RAM-diff route (complement of t212 write-site zero) run
+over ALL 122 banked/ring savs via scripts/r259_savpair_census.py (KEEPER;
+bounded RSS one-Memory-at-a-time; work/r1/t259_savpair.out): PAIRS = NONE
+(turn set {1086:V0,1096:V23,1254:V23,1255:V14}); cross-bank diffs confounded —
+route CLOSED negative. HARNESS findings banked: (a) EIGHT r1_playcap_watch.py
+procs hold O_APPEND fds on the timeline (fdinfo census; all append at EOF;
+tail-400KB = 14 rows/9 UNIQUE) — t258 corpus safe via (file,mtime_ns) dedup
+(misread caught and corrected mid-session, honestly), but ~7x write cost +
+~700MB RSS; orphan retirement = user ask; (b) scripts/r1_t259_sentinel.sh is
+the new ~1-call read-only sentinel census (game-alive FIRST, timeline heartbeat,
+witness, playcap dirs, watcher count, RESUME md5, ring newest); (c) probe law:
+timeline tails must be byte-capped AND cut to fields BEFORE printing (a raw
+uniq -c piped ~150 KB of ship_raw). NEXT = SENTINEL v2 verbatim; DO NOT
+relaunch the batch. Live :9 untouched (already dead); no capture run; gate 0,
+ledger audit OK (open = OQ-005/016/019/021), index OK.
 
 LANDED t258 (2026-11-01): OQ-021 END-TURN-RECOMPUTE DISCRIMINATOR EXECUTED —
 CANDIDICIDE COMPLETE, SURVIVORS NONE (score.md S11 + _wip_t258; queue drained

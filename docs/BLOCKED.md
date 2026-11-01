@@ -479,3 +479,42 @@ new capture or a user decision (see the decision surface in docs/STATE.md).
 ## Best default while unanswered: rewrite keeps >1/2 on V (campaign.cpp:2093),
 ## consistent with every banked frame (V never crossed 25, no screen ever seen);
 ## row stays open; no other open row depends on either residue.
+
+## t259 ADDENDUM (2026-11-01, MEASURED) — ASK (A) AS WRITTEN IS DEAD: THE
+## PARKED :9 GAME PROCESS DIED at ~15:45:08 unattributed (pgrep -x dosbox-x
+## empty; timeline + dosbox.log + ring all freeze at the same second 60.sav
+## t=1255 V=14; Xvfb/x11vnc survive; no OOM record findable in journalctl,
+## dmesg unreadable — cause UNVERIFIED, prime suspect [inferred] a memory
+## spike in the r258_vdisc window 15:34-16:20 per the t251 incident class).
+## Consequences: (1) ask (A) "just keep ending turns" is impossible — the
+## session is gone; its substance survives ONLY via a RELAUNCH from a banked
+## sav (bank-t251-live1255/60.sav md5 0024340d..., ring 60.sav 324d2d75... —
+## the ring copy is NEWER/newer-mtime; both are t1255 V=14 per the watcher).
+## Relaunching is a USER decision (it re-arms trigger A permanently and costs
+## a dosbox + watcher bring-up; resume path = title-menu "Return to Current
+## Game" via RESUME.GAM — CAUTION MEASURED t259: live work/r1/game/RESUME.GAM
+## currently md5 5b382afbb789 == the user-oct29 backup, i.e. the game NEVER
+## wrote a resume slot after that backup; a relaunch would resume from the
+## OCT 29 save, NOT t1255 — the t1255 state exists only as dosbox-x savestate
+## ZIPs (ring/banks), loadable via dosbox-x loadstate, a path NOT yet exercised
+## by this loop. Say so honestly in any relaunch answer.). (2) Passive trigger
+## A (grep for V>=25 rows) can NEVER fire while the game is dark — the sentinel
+## is rewritten (STATE t259) to run scripts/r1_t259_sentinel.sh and exit.
+## (3) HARNESS: DO NOT relaunch the loop batch (MAX_ITERS=14) — an idle-gated
+## relaunch would burn fresh sessions re-adjudicating a dead pipeline.
+## (4) OFFLINE RESIDUE — MEASURED CLOSED t259 (same session, after this row was
+## authored): banked savs ARE full guest RAM (ZIP member "Memory",
+## r1_playcap_watch.py:178) and a same-turn-different-V sav pair WOULD support
+## a RAM byte-diff for the producer's READ inputs (complement of t212's
+## write-site zero). scripts/r259_savpair_census.py ran over ALL 122 savs
+## (banks t1096/t1254/t251-live1255/t251-predrive + ring): PAIRS = NONE
+## (turn set {1086:V0, 1096:V23, 1254:V23, 1255:V14}; the t1169-71 replay
+## exists only as timeline rows, its savs were ring-overwritten). Cross-bank
+## diffs are confounded (world moves between turns — the candidicide class).
+## Route CLOSED as measured-negative; NOTHING offline remains for OQ-021. (5) WATCHER ORPHANS: eight r1_playcap_watch.py processes hold
+## O_APPEND fds on the timeline (fdinfo census _wip_t259 S5); t258's corpus
+## numbers are safe (dedup by (file,mtime_ns)), but retiring the seven pre-t257
+## orphans by /proc-validated kill needs the user's nod per STATE pairing note.
+## Best default while unanswered: no relaunch, banks untouched, loop re-arms
+## ONLY on a user answer, a new playcap-* sitting, or the t259 RAM-pair task
+## (authored as STATE NEXT ACTION since it is offline work, not an ask).
