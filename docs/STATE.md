@@ -260,69 +260,133 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-TRIGGER: DO NOT RUN ON CADENCE — TRIGGER-ARMED IDLE (run ONLY if a
-trigger fired; otherwise run the two axes below, expect the idle result, write
-the one-line idle line, and STOP). t243 is the thirtieth session under this
-instruction with the baselines unmoved. The idle answer is MEASURED, not
-asserted (t219: rows=19 open=OQ-005/016/019/021 closed=15), and every open row
-is play-gated, BLOCKED-USER, or watchpoint-class (t213 S7: static corpus
-FORMALLY EXHAUSTED). Cap an idle run at ~4 calls: two axes, STATE line, finish.
+NEXT t248 PER-PLANET OWNER TABLE HUNT (banks the 102-planet law; feeds t249/t249b/t252). Read docs/re/selfplay.md (PLANETALLOC header law + t247 CORRECTION) FIRST. The header "N Planets Occupied" (getter(151), region 0x51685..0x517c0) counts PLANETS: sole-owner sum 100 + player-share 2 of co-owned star idx25 = 102 EXACT at t1254 [hypothesis; the table is the missing citation]. FIND the per-planet ownership table in the banked slot work/r1/bank-t1254/*.sav (base via scripts/r1_sav_scan build_anchors + find_base; data-seg offset law addr = B + 0x82bb0 + X; star table is 0x60-stride at img 0x13bc5, bound WORD ds:0x16145, owner byte +0x14 is a BITMASK). Legs: (a) census u8/u16 arrays whose player-owned count equals 102 (scripts/r1_t247_find102.py is the starting tool; NOTE 15 u16==102 existed, NONE inside the race-0 block -> look race-indexed or global-star-indexed); (b) a candidate must also explain t1092=60: use the ring journal fields, not RAM (the t1092 RAM frames ROTATED away); (c) cross-check the +0x5a per-star colonised-count law (values 1..5, hist {1:35,2:5,4:5,6:2,132:1,129:1,130:1} over bit-set stars at t1254). Bank law + offsets in docs/re/selfplay.md (and economy.md if a census table lands). STRICT-CLOSE applies (OQ-021 stays open unless a cited measurement closes it). Do NOT touch the STATE ledger index block (gate machine-checks it).
 
-HARNESS LAW (t243 — the real defect class behind the 29-session ping-pong):
-wake selection reads field 2 of the FIRST NON-BLANK LINE under
-"## NEXT ACTION (exactly one)". Prose placed there consumes the sentinel slot:
-at dc008fb the PAIRING-SESSION NOTE sat first, its extracted tag was "NOTE",
-and trigger C re-armed on NOTE != last_task until t243 deleted the paragraph.
-KEEP the line above (WAIT-TRIGGER = sentinel; trigger C can never arm it);
-any note goes BELOW the axes or outside this section.
+PAIRING-SESSION NOTE (t247 handoff, 2026-10-31): sentinel-slot law stands — the
+task line above is the FIRST non-blank line under this heading; notes go below
+(t243 law). THE LIVE SESSION: a self-play game runs on display :9 (dosbox-x,
+resumed from the user's RESUME.GAM at turn 1086); the watcher is banking to
+work/r1/playcap/live-timeline.jsonl every 10 s. Consequences: (1) trigger A is
+structurally ALWAYS armed while that watcher lives (the timeline grows every
+10 s and a running dosbox is present) — it is NOT user play and must NOT be
+adjudicated as a sitting; adjudicate a sitting ONLY if a new playcap-* dir
+appears. This launch runs MAX_ITERS=14 IDLE_GATE=0 (fixed batch, no probe:
+with the always-growing timeline, IDLE_GATE=1 would ping-pong adjudication
+sessions forever once the queue drains — the exact t214..t243 pattern). (2) The ring holds the ONLY copy of
+turn states the game did not save — bank work/r1/playcap/save/*.sav before ANY
+dosbox restart (the t1092 RAM frames were lost this way). (3) SIGKILL a
+softlocked dosbox; SIGTERM pops its own quit-confirm with (Yes) DEFAULT.
+(4) User save RESUME.GAM md5 5b382afbb7891... (Oct 29) — never overwrite; the
+game writes it only at in-game Save, so self-play cannot corrupt it.
 
-Axis 1 — python3 scripts/r214_triage.py (one call; RC=0). TRIGGER-A baselines:
-ns mtime 1793294532100000000 / size 5721578066 / tail-64KiB md5
-9054cc6c66802e6f80431d4ffa1416ee. As of t243 (2026-10-31T03:21:36Z; baseline
-age 34.5388 h) all three equal; tail healthy (400 rows / 0 bad json / turn 1086
-/ 275 distinct / one 16-field key shape).
+QUEUE (11 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
+to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
+rows; keep this QUEUE block intact except deleting the row you completed):
 
-Axis 2 — ONE save-axis find (t215 law + t216 ns-precision fix):
-  find /home/hrethric -xdev \( -name '*.sav' -o -name '*.gam' \) -printf '%T@ %p\n' | sort -rn | head
-Expected: 1409 files; newest playcap/save/41.sav ns 1793294530.108; gap to the
-baseline 1.992 s. A save NEWER than the baseline with an unchanged timeline =
-WATCHERS DIED — that is itself actionable.
+t249 PIN WRITER u16@0x131b4 (data-seg offset). The maintained "Planets
+  Occupied" counter read 60 at t1092 AND t1254 while the header went 60->102 —
+  it is maintained, not recomputed by the t246 getter loop. Method: the
+  windowed-disasm recipe used at t106/t107 (objdump -b binary -D -m i386 -M
+  intel over work/ascend_restored.bin; remember the t91 desync caveat —
+  immediate-operand pairing is desync-limited). Find mov/add/inc sites through
+  the image-base equivalent of 0x131b4, plus the colonize/lose-planet event
+  paths. Cite writer sites or bank a measured negative with controls.
 
-If ANY baseline differs: (1) re-read the triage output (watcher census, tail
-collapse), (2) run scripts/r1_t85g_sitting.py on the named dir, (3) mine the two
-witness classes — (a) a multi-volley battle vs a NON-at-war owner (OQ-016 clamp
-witnesses; the ONLY thing closing the zero-witness residue), (b) a MID-CAMPAIGN
-slot with V=dword[0x482fb]>1 AND some byte[star+0x15] nonzero (OQ-021 S6
-semantic non-join + P7 label). Mine COUNTS ONLY via
-r1_stream.observations(trust=True) — raw row arithmetic is writer-multiplicity
-garbage (t214: 4.26x overall, up to ~12x locally; docs/BLOCKED.md R1-runbook
-TIMELINE-MINING LAW). If NO sitting: one line into STATE, nothing appended to
-the ledger, STOP.
+t249b DAY-COUNTER DWORD HUNT. The planet screen shows a day counter (user
+  testimony: "day 1254" at turn 1254 — day may equal turn in this campaign,
+  which makes a same-value dword a candidate). Census dwords == 1254 in
+  work/r1/bank-t1254/*.sav excluding heap noise; correlate against the known
+  turn dword at data offset 0x12e10 (a day field should sit near game-state
+  core, not the race block). If pinned, note the watcher-schema addition for
+  t256. If not pinned, bank the negative + candidate list.
 
-STEERING OVERRIDE (outranks the axes): (i) a steering note prepended to this
-session's prompt; (ii) a user ruling on OQ-019 (per-commit attack pricing) or
-OQ-005 (index.txt + dims residue) in docs/BLOCKED.md — then implement per the
-ruling and close with cited code-site; (iii) a supervised-session grant for the
-OQ-021 writer watchpoint (dosbox-x IS installed at /usr/bin/dosbox-x; the
-blocker is supervision, not tooling).
+t250 TURN-DRIVER ROBUSTNESS PASS. scripts/r1_t245_turndrive.py (v3) advances
+  turns and drains popups, but is softlock-blind. Add: (a) SOFTLOCK DETECT —
+  sample the ring tail twice ~20 s apart; if only wall/file fields move AND a
+  popup is on screen AND an input probe (c-key toggle) changes zero pixels,
+  declare softlock, SIGKILL the dosbox pids, relaunch via
+  scripts/r1_playcap_vnc.sh start, click Return-to-game at window-rel (318,333),
+  resume the drive from the ring turn; write work/r1/SELFPLAY.marker (1 byte)
+  so a future probe can tell self-play growth from user play. (b) verify
+  --target against the ring (already v3) and log every press + drain count to
+  a run log under work/r1/. Then run ONE bounded validation: --target +10
+  turns on the live :9 session. Laws to honor: background shells need
+  DISPLAY=:9 injected explicitly; popup OK button at root (405,443); popups
+  serialize at turn end and swallow NEXTTURN clicks (NEXTTURN at window-rel
+  (511,67)).
 
-USER ASKS (standing, unchanged since t216): (1) play a few turns mid-campaign
-attacking a NON-AT-WAR power + save — kills the OQ-016 witness ask and the
-OQ-021 comparator-firing ask at once; (2) the OQ-019 ruling above; (3) retire
-the three orphaned watchers (260988/290953/292085, all --no-exit) before the
-next capture — supervised-session decision; research iterations must NOT kill
-them.
+t251 LONG UNATTENDED DRIVE + WITNESS MINING (needs t250). Drive the live
+  session toward turn 1150 (or until two softlocks in a row). Bank the ring
+  BEFORE any restart. MINE witness classes via
+  scripts/r1_stream.observations(trust=True) ONLY (raw row arithmetic is
+  writer-multiplicity garbage — t214 law): (a) multi-volley battle against a
+  NON-at-war owner (OQ-016 clamp witnesses); (b) a mid-campaign slot with
+  V=dword[0x482fb]>1 AND some byte[star+0x15] nonzero (OQ-021 S6 semantic
+  non-join + P7 label). Honest negatives are acceptable outcomes; strict-close
+  only on a real witness. Do NOT issue player attack orders (no self-made
+  wars) — mine what the AI produces.
 
-RATIONALE: t243 reproduced the t242 adjudication exactly (three baselines
-byte-identical; zero comm-class dosbox/ascend.exe; watcher population unchanged
-— wrapper 27772 + child 27774 + orphans 260988/290953/292085; save axis
-bit-identical, gap 1.992 s re-measured a twenty-fifth time) AND closed the
-control-plane story: this launch was trigger-armed by the loop's OWN note
-tagging into the sentinel slot (verified by running the loop's awk extraction
-against both git states — see _wip_t243 S4), which t243h's fix then deleted.
-Adopting that deletion ends the self-arm; the NEXT tag now reads WAIT-TRIGGER
-and trigger C can never fire on it. The next research move is new play or a
-user decision, not another iteration.
+t252 LIVE SCREEN SWEEP 1: RESEARCH + DIPLOMACY (needs a live session; NOT
+  t251's turn — run between drives or on the current one). Navigate from the
+  galaxy screen with xsend clicks (DISPLAY=:9; window-rel coords; the game is
+  modal — Escape backs out). Capture each screen to work/screens/, bank a
+  per-screen dossier in docs/re/ui.md (or ui-runtime.md): widgets seen vs the
+  windows.txt manifest (RESWIN; NEGSCREEN + ALIENDIP/PLAYERDIP), geometry,
+  states. Vision on the in-game projector is legitimate (external display);
+  R13 only bans grading OUR renders. NEVER click anything that starts a war,
+  ends a turn, or abandons a system (t244 abandoned an Abandon-Vega-II dialog
+  by accident — decline everything).
+
+t253 LIVE SCREEN SWEEP 2: SHIP DESIGN + FLEET + INTEL. Same laws as t252
+  (SHIPDESSCREEN + 8 category tabs + GIZLIST; FLEETWND; the intel screen).
+  Cross-check SHIPDESSCREEN tab contents against docs/re/ships.md and the
+  gizmo table law (ai-dossier/combat.md S2f dispatcher 0x4cd90). Bank dossiers
+  same as t252.
+
+t254 POPULATION-SLOT LIBRARY + PLANITEM RULING. Render candidates — planets.shp
+  (55 recs), planal00..10 (11x5), planitem.shp (40 recs) — with the corrected
+  6-bit palette (v*255//63; scripts/r1_t182_pngdump.py machinery), contact
+  sheets with labels, then compare against the LIVE planet screen population
+  panel (law: slot array sized to CAPACITY; uncolonized = empty circles; free
+  pop = yellowish figure facing FORWARD; busy pop = reddish figure facing
+  SIDEWAYS — player testimony, shp.md S19) and against the current-project
+  panel (t244 hypothesis: planitem = current-project item art — CONFIRM or kill
+  it). Bank per-record ids to shp.md S20 + work/r1/shp_png/ids.tsv. R13: you
+  may identify against the in-game display; do NOT grade your own renders.
+
+t255 OQ-021 WRITER RE-PROBE (needs t251 data). t212 exhausted the STATIC route
+  (runtime-slot member search over the 20-sav corpus; DAT_482fb oscillates
+  while systems_any/full are flat). Redo with the drive corpus: more turns,
+  more states. If the oscillation range widened, the recompute-trigger
+  hypothesis (screen-open vs per-turn) becomes testable against ring turn
+  boundaries. Bank the narrowed chain or a second honest negative.
+
+t256 AI GAP ROWS 11/12/16 CODE PASS. docs/re/ai-dossier.md gap map rows 11
+  (16 SA_ bodies — PARTIAL), 12 (relation-STATE ladder 0..3 + proposal emitter
+  + attacked-bitmap — PARTIAL), 16 (per-ship order kinds {0..5} — NOT
+  REPRESENTABLE note applies; decide and bank the disposition). One row per
+  session is fine — if you finish one row, rewrite NEXT to the next row verbatim
+  and commit. Rewrite code in rewrite/src/game/, cite laws from aicode.md +
+  ai-dossier.md, gate + rewrite tests must pass.
+
+t257 WATCHER SCHEMA + DAY FIELD (needs t249b). If t249b pinned the day dword:
+  add the field to scripts/r1_playcap_watch.py (append-path open at line ~146;
+  keep the 16-field key shape backward-compatible — r214_triage asserts ONE
+  key shape, so update it too), relaunch the watcher cleanly (do NOT stack a
+  duplicate; there are already orphans 260988/290953/292085 + others — the
+  user's call to retire them), and verify new rows carry the field within
+  30 s. If t249b did not pin it, fold its candidate list forward instead.
+
+STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
+- Ledger: 14 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
+  ledger_audit + ledger_index_check green; never hand-edit the index block.
+- Do NOT re-trod: t213 static-exhaustion verdict; t214 mining-collapse law;
+  t243 sentinel-slot law; the t194..t212 closed arc; t246/t247 header-law work
+  (build on it, don't re-measure it).
+- Gate ~2-3 min; milestone: 6 must stay. work/ is gitignored — findings go in
+  docs/re/, never work/.
+- After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line
+  FIRST), relaunch with IDLE_GATE=1, or author a new queue.
 
 Do NOT re-open (consolidated to keep STATE scannable): t214..t243 are
 idle/adoption iterations — t243's only new content is the sentinel-slot

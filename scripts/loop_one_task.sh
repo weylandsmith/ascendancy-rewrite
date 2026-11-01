@@ -127,6 +127,17 @@ while :; do
     queue_wake=""
   fi
 
+  # (t248) QUEUE-DRIVEN MODE: IDLE_GATE=0 skips the probe, so without this the
+  # loop would launch a steer-less session every COOLDOWN forever once the
+  # queue drains (the t214..t243 churn arriving through a different door).
+  # Exit when NOTHING is runnable: no queue wake (drained WAIT sentinel OR
+  # chain cap), no human steering, no dirty tree to adopt. Retries still work:
+  # last_task is written only on an OK verdict, so a failed task keeps waking.
+  if [ "$IDLE_GATE" = "0" ] && [ -z "$queue_wake" ] && [ -z "$steer_wake" ] && [ -z "$dirty" ]; then
+    log "nothing runnable (NEXT tag '$task', no wake, IDLE_GATE=0) — batch complete, exiting"
+    break
+  fi
+
   # IDLE GATE (t178): poll triggers in SHELL before spending any model budget.
   # dirty tree => adopt interrupted work (launch regardless of probe);
   # probe RC=0 clean => IDLE: sleep, check STOP, no session, no journal row;
