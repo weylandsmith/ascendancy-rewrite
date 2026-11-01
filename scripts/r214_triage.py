@@ -14,6 +14,13 @@ Two questions, both answered from the tail window only (never the whole file):
      Measure it honestly: distinct-line fraction in the tail window plus the
      key-shape census, so a future witness mining run knows what it is reading.
 
+t257: the census CENSUSES key shapes, it never asserted one (the STATE queue
+text's "asserts ONE key shape" was imprecise). The watcher may now emit 17-key
+rows (with the t249b "day" alias) while orphaned pre-t257 watchers keep
+emitting 16-key rows on the same file — canonical_shape() folds day back into
+the pre-t257 shape so multiplicity math is not polluted by the alias, and the
+raw shapes + day/turn agreement are printed separately.
+
 Prints only small summaries. RC=0 always (triage, not an assertion).
 """
 import hashlib
@@ -89,12 +96,22 @@ def watchers():
     return len(rows), len(orphans)
 
 
+def canonical_shape(keys):
+    """t257: the 'day' key is a pure alias of 'turn' (t249b law). Fold it out
+    so a 16-key pre-t257 row and a 17-key post-t257 row of the same slot count
+    as the SAME schema for multiplicity math."""
+    return tuple(k for k in sorted(keys) if k != "day")
+
+
 def tail_shape(n=400):
     out = subprocess.run(["tail", "-n", str(n), JSONL],
                          capture_output=True, text=True, errors="replace").stdout
     keysets = collections.Counter()
+    raw_shapes = collections.Counter()
     per_turn = collections.Counter()
     distinct = collections.defaultdict(set)
+    day_agree = 0
+    day_disagree = 0
     bad = 0
     kept = 0
     for line in out.splitlines():
@@ -107,7 +124,13 @@ def tail_shape(n=400):
         except Exception:
             bad += 1
             continue
-        keysets[tuple(sorted(j.keys()))] += 1
+        keysets[canonical_shape(j.keys())] += 1
+        raw_shapes[tuple(sorted(j.keys()))] += 1
+        if "day" in j:
+            if j["day"] == j.get("turn"):
+                day_agree += 1
+            else:
+                day_disagree += 1
         t = j.get("turn")
         per_turn[t] += 1
         distinct[t].add(hashlib.md5(line.encode()).hexdigest())
@@ -115,8 +138,13 @@ def tail_shape(n=400):
     print(f"  bad json lines: {bad}")
     for t in sorted(k for k in per_turn if k is not None):
         print(f"  turn {t}: rows={per_turn[t]} distinct={len(distinct[t])}")
-    print("  key shapes (top 4):")
+    print(f"  day/turn agreement: agree={day_agree} disagree={day_disagree} "
+          f"(rows without 'day': {kept - day_agree - day_disagree})")
+    print("  canonical key shapes, day folded out (top 4):")
     for ks, c in keysets.most_common(4):
+        print(f"    n={c}: {','.join(ks)}")
+    print("  raw key shapes (top 4):")
+    for ks, c in raw_shapes.most_common(4):
         print(f"    n={c}: {','.join(ks)}")
     return keysets
 

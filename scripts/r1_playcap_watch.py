@@ -12,7 +12,14 @@ source and this file as the durable record.
 
 Writes (all under OUT_DIR, all bounded):
   live-timeline.jsonl  one line per (slot-file, mtime) — scalars + ships
-                       + validated relation matrix
+                       + validated relation matrix. SCHEMA t257: 17 keys.
+                       "day" is a PURE ALIAS of "turn" (t249b: the green
+                       7-segment readout IS the zero-padded turn counter;
+                       dword==turn intersects only the turn site 0x254e98
+                       plus two heap addresses — no maintained day scalar at
+                       any stable data offset, both sessions). Rows written
+                       before t257 have 16 keys and no "day"; consumers must
+                       treat day as optional (j.get("day", j["turn"])).
   watch.log            human-readable mirror
 
 Usage: r1_playcap_watch.py OUT_DIR [--once]   (--once = single pass, for
@@ -81,6 +88,9 @@ def relation(mem, M):
 def process(sp, mem, B):
     M = B + S.OFF
     d = S.read_slot(sp, mem, B)
+    # t257: "day" is a pure alias of "turn" (t249b law, docs/re/selfplay.md
+    # "t249b DAY-COUNTER PINNED"). No second RAM read — none exists.
+    d["day"] = d["turn"]
     d["ships"] = [
         dict(slot=k, owner=v["owner"], state=v["state"], design=v["design"],
              xyz=[round(c, 4) for c in v["xyz"]])

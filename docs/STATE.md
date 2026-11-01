@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T15:20
+updated: 2026-11-01T15:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,22 +260,35 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t257 WATCHER SCHEMA + DAY FIELD (needs t249b). t249b PINNED the day
-(dword): DAY == TURN, measured three ways (selfplay.md "t249b"; the only
-counter-like intersection is the turn dword itself, member 0x254e98 == data
-X=0x12e10; no maintained day scalar exists at any stable data-seg offset).
-So per the queue text's first branch: add the field to
-scripts/r1_playcap_watch.py (append-path open at line ~146; keep the
-16-field key shape backward-compatible — r214_triage asserts ONE key shape,
-so update it too), relaunch the watcher cleanly (do NOT stack a duplicate;
-there are already orphans 260988/290953/292085 + others — the user's call to
-retire them), and verify new rows carry the field within 30 s. NOTE (t249b):
-a literal day key is a PURE ALIAS of turn — implement it as `"day": turn`
-(no second read, no new scan). If mid-work you find the alias would break
-the one-key-shape assertion, prefer folding the candidate list forward per
-the queue's second branch and say so explicitly.
-(ordering rationale: t256c landed gap row 16; t257 is the last queued task —
-after it drains, author a new queue per the AFTER-DRAINS note.)
+NEXT t258 OQ-021 END-TURN-RECOMPUTE DISCRIMINATOR (no deps; every input is
+already banked — this is the ledger-moving task the t255/t256 mechanics notes
+prepared). HYPOTHESIS SPACE (score.md S10, t255): V=DAT_482fb changes ONLY at
+turn boundaries (39 changes / 0 same-turn, screen-open REFUTED), is NOT
+save-persisted, and is lineage-dependent (same t1254 world read V=14 vs V=23)
+— so V is an end-turn RECOMPUTE of something, and t85g already refuted pure
+territory (V oscillates 8->14->12->15 while systems_full is monotone). THE
+TEST: stream the full corpus ONCE with scripts/r1_stream.py observations
+(trust=True, PER-SESSION watermark per t255 law — never a global one, never
+json.loads the file), and per row compute the candidate feature vector:
+score_stars (V), turn, systems_any/full, planets_mine, owner-0 alive ship
+count, total alive ship count, and per-ship order-kind multiset from ship_raw
+(ship_raw is banked EVERY row since t85b; order-kind law r256c / ships.md —
+kind set {1..5}). Then for each of the 39 V-change boundaries diff the vector
+against the previous banked turn, and against V-stable boundaries as control.
+STRICT BAR: a candidate must explain ALL 39 changes AND zero non-changes
+across all 25 sessions t37..1335, plus V==0 on every session load-turn (the
+recompute fires on the end-turn clock, so load-turn rows are V=0 regardless —
+exclude them from the fit but require the formula to be consistent with the
+first-post-load value, cf. the reproduced V=23@t1087 pair). If a formula
+reproduces everything: upgrade rewrite victory check (campaign.cpp:738
+default >1/2 on V) + pin, and OQ-021 CLOSES with that census as evidence. If
+not: bank the honest negative (which candidates die on which boundaries), keep
+the row open, and note whether the residual now requires a NEW capture (new
+captures are the user's call — record the ask, do not run one).
+(ordering rationale: t257 landed and drained the old queue; per the
+AFTER-DRAINS instruction this is the newly authored queue's head — OQ-021 is
+the only open row with a fully banked offline discriminator; OQ-016/OQ-019
+residues are play-gated/BLOCKED-USER per the ledger, OQ-005 is documentation.)
 
 NOTE t256 MECHANICS (t255 learning): OQ-021 residue is now END-TURN RECOMPUTE
 PATH (screen-open REFUTED; V not save-persisted; deterministic first-turn
@@ -312,25 +325,23 @@ MEASUREMENT: that md5 lives at work/r1/game/RESUME.GAM.user-oct29; the LIVE
 C:\RESUME.GAM (work/r1/game/RESUME.GAM) is md5 f5ffb840 (81647 B, the seed-
 commit pristine template) — verify the BACKUP md5, not the live one.]
 
-QUEUE (1 task + the after-drain note, one session each; when you finish task
-tN, rewrite NEXT ACTION to the text of task tN+1 VERBATIM — do not renumber,
-do not compress the other rows; keep this QUEUE block intact except deleting
-the row you completed. t256c NOTE: the NEXT ACTION above carries the t257
-text PLUS the t249b day==turn resolution; that deviation is deliberate —
-without it the next session re-derives what t249b already measured):
+QUEUE (t257 AUTHORED NEW QUEUE per the AFTER-DRAINS instruction — 1 task;
+when you finish task tN, rewrite NEXT ACTION to the text of task tN+1
+VERBATIM — do not renumber, do not compress the other rows; keep this QUEUE
+block intact except deleting the row you completed. If the queue drains again
+with no new witness, re-run this authoring step):
 
-t257 WATCHER SCHEMA + DAY FIELD (needs t249b). If t249b pinned the day dword:
-  add the field to scripts/r1_playcap_watch.py (append-path open at line ~146;
-  keep the 16-field key shape backward-compatible — r214_triage asserts ONE
-  key shape, so update it too), relaunch the watcher cleanly (do NOT stack a
-  duplicate; there are already orphans 260988/290953/292085 + others — the
-  user's call to retire them), and verify new rows carry the field within
-  30 s. If t249b did not pin it, fold its candidate list forward instead.
+t258 OQ-021 END-TURN-RECOMPUTE DISCRIMINATOR — full text is the current
+NEXT ACTION block above (t257 landed same-day; the head IS the queue).
+Honest expectation banked up front: t255's lineage-dependence result (same
+world, two V values across lineages) means a pure world-state formula may NOT
+fit all 39 boundaries; the deliverable is then the boundary-by-boundary
+candidicide table + the recorded capture-ask, not a forced close.
 
-AFTER t257 DRAINS: author a new queue (candidates: OQ-021 end-turn-recompute
-discriminator = per-owner ship census vs V-change turns per the t256
-mechanics note below — NOT another screen experiment; OQ-016/OQ-019 residues
-are play-gated/BLOCKED-USER per the ledger).
+AFTER t258 DRAINS: candidates remaining are play-gated only (OQ-019 real
+flights, OQ-016 terrain wiring, OQ-021 boundary-crossing observation) — those
+need a USER ASKS entry (new sitting authorization), not a loop task; author
+the ask into docs/BLOCKED.md and let the loop idle-gate per t178.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - OOM LAW (t251 incident, MEASURED): the t251 session died because it read
@@ -371,6 +382,30 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t257 (2026-11-01): WATCHER SCHEMA + DAY FIELD — "day" PURE ALIAS LIVE
+(selfplay.md "t257" block + _wip_t257.md S1..S5; queue drained -> NEW QUEUE
+authored per AFTER-DRAINS). scripts/r1_playcap_watch.py process() emits
+d["day"]=d["turn"] (t249b law: no second RAM read — none exists); schema
+16->17 keys, docstring records pre-t257 rows lack the key (consumers:
+j.get("day", j["turn"])). r214_triage: canonical_shape() folds day out so the
+16/17-key MIXED-SHAPE WINDOW (expected while orphan pre-t257 watchers live —
+retirement stays the user's call, STATE pairing note) counts as ONE schema for
+multiplicity math; raw shapes + day/turn agreement printed separately.
+VERIFIED: scratch --once on banked t251 savs (17 keys, day==turn==1255); live
+relaunch — sitting pair 479981/479983 /proc-validated + reaped, replacement
+detached ppid-1 (work/r1/playcap/watch-t257.pid), first live day-rows
+{53,54,55}.sav 15:14, 7/7 agree, 0 disagree. Harness laws banked: watcher
+relaunch streams the whole timeline to rebuild `seen` (~2-3 min at 7.4 GB,
+bounded RSS) before its first emit — "watch: start" in watch.out is the
+liveness signal, not row presence within 30 s; terminal background=true
+processes die with the session — detach via Popen(start_new_session=True).
+Queue-text correction banked honestly: r214_triage never ASSERTED one key
+shape (it censuses), so the queue's branch-2 trigger did not fire. NO rewrite
+change, no pin (schema not law, t256c precedent); NO OQ closed (strict-close:
+harness plumbing closes nothing; 005/016/019/021 stay open, ledger untouched);
+live :9 untouched (zero clicks/turns, still t1255 parked). Gate 0, ledger
+audit OK, index OK; NEXT=t258 verbatim.
 
 LANDED t256c (2026-11-01): AI GAP ROW 16 DISPOSITION — AGGREGATE MODEL
 ACCEPTED PERMANENTLY, BACKED BY THE FIRST FULL PER-SHIP ORDER-STATE CENSUS

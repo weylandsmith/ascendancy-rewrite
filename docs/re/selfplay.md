@@ -254,6 +254,30 @@ Tools: scripts/r1_t249b_dayscan.py; working log docs/re/_wip_t249b.md S1..S6.
 - No ledger row moved (not an OQ). Session side effects: none on :9 (zero
   clicks, zero turns; screenshot analysis used EXISTING banked pngs).
 
+### t257 WATCHER SCHEMA: "day" ALIAS IMPLEMENTED (harness plumbing, not a law)
+Working log docs/re/_wip_t257.md S1..S5.
+- scripts/r1_playcap_watch.py process() now emits d["day"] = d["turn"] (pure
+  alias per the t249b law above — no second RAM read). Schema 16->17 keys;
+  module docstring records that pre-t257 rows lack the key, so consumers read
+  j.get("day", j["turn"]). Scratch-validated (--once on banked
+  bank-t251-live1255 savs): day==turn==1255 on every row.
+- r214_triage tail_shape: canonical_shape() folds "day" out so 16-key orphan
+  rows and 17-key new rows count as ONE schema for multiplicity math; the
+  raw-shape census + day/turn agreement counters are printed separately.
+  (Honest correction banked in the triage docstring: it never ASSERTED one key
+  shape, it censuses them — the STATE queue text was imprecise.)
+- LIVE MIXED-SHAPE WINDOW IS EXPECTED until the user retires orphan watchers
+  (STATE.md pairing note: retirement is the user's call): post-relaunch tail
+  census showed 7 rows with day (all agree) + 393 without, from the seven
+  still-alive pre-t257 processes. The current-sitting pair 479981/479983 was
+  /proc-validated and reaped; replacement runs detached (ppid 1, own session,
+  pid in work/r1/playcap/watch-t257.pid).
+- STARTUP-COST LAW (t257, measured): a watcher relaunch streams the whole
+  live-timeline.jsonl line-by-line to rebuild the dedup `seen` set (~2-3 min
+  at 7.4 GB, RSS stays ~100 MB) BEFORE its first emit — absence of new rows
+  in the first 30 s is normal; the "watch: start" line in watch.out is the
+  liveness signal.
+
 ## 4. PLANET-SCREEN INTERACTION LAWS (agent-observed, t244)
 - NAVIGATION STACK: galaxy -> SYSTEM VIEW (orbital grid: blue wireframe plane,
   bodies on yellow stalks, right panel = planet name + art, orbital structure
