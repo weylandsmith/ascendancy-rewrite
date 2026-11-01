@@ -290,3 +290,53 @@ this value are BOTH now measured against:
  OBSERVED; non-join holds on real slots (V != ownP 23vs9/14vs9, != occ);
  row 2 +0x15==0x3 co-ownership kills the single-owner-bit reading. See
  docs/re/selfplay.md t251 §3.]
+
+## S10 — t255: V=DAT_482fb behavioural law from the FULL corpus (per-session trust) [measured]
+
+Tools: scripts/r255d_persession.py (classification), r255f_traj.py
+(trajectories), r255e_semantics.py (title-class + ship census); outputs
+work/r1/t255d_persession.out, t255f_traj.out, t255e_sem.out; working log
+docs/re/_wip_t255.md. Corpus: all 7.1 GB live-timeline.jsonl, 65,380 deduped
+in-game rows, 25 sessions (mtime-gap split >600 s), Oct-15..Nov-1, turns
+37..1335.
+
+1. ZERO MID-TURN CHANGES: across every session, V changed ONLY between turn
+   boundaries (39 turn-boundary changes, 0 same-turn changes). The t189b
+   candidate "recomputed when a screen opens" is REFUTED — t249's controlled
+   Planets-screen open at t1086 did not move V, and no session shows a
+   same-turn V move. The player's 14->21 testimony = per-turn evolution
+   observed at different turns.
+
+2. V IS NOT SAVE-PERSISTED; FIRST-END-TURN RECOMPUTE IS DETERMINISTIC:
+   every session's load turn reads V==0 (9,863 trusted V==0 rows; they carry
+   FULL active worlds — 21-41 ships, 9+ systems — so they are NOT title
+   snapshots: S00/S02-style post-load slots). The first End-Turn after load
+   produces the value: Oct-31 19:51 restart sat at t1086 V=0 for 5.8 h, the
+   first End-Turn (01:41) gave V=23; the Nov-1 08:11 restart from the same
+   loaded state reproduced V=23 at t1087 EXACTLY. Same world state -> same
+   recompute; the save never restores V. Consistent with t212's ZERO static
+   writers: the writer is runtime-computed, and it fires on the turn clock,
+   not the loader.
+
+3. V != ANY TERRITORY SNAPSHOT (re-confirmed at new operating points): V=23
+   held turns 1087..1096 while systems went 26->26.., ships 30->30+; the
+   SAME turn t1254 read V=14 in the Oct-26 lineage and V=23 in the Oct-31
+   lineage (both any=36) — V depends on lineage history, not the snapshot.
+   Lag search over all 39 changes: only 7 hit any/full/planets at any past
+   in-session turn (early-game coincidences). No V>=25 row and no selector
+   arm anywhere in the corpus — the Control-victory boundary remains
+   UNOBSERVED (row stays open, strict-close).
+
+4. DECAY UNDER COMBAT [inferred from measured]: the 23->14 fall happened
+   inside the unobserved self-play sprint t1096->t1255 (Nov-1 08:14:19
+   V=23 -> 08:17:39 t1255 V=14; scripted End-Turn drive, AI combat running).
+   V's recompute inputs include something combat destroys (t85g's t1157
+   drop window had ship deaths). Next discriminator: per-owner ship census
+   per turn vs V-change turns (ship_raw is banked in every row).
+
+PARSING PITFALLS (t255): watcher APPENDS systems_*/T_known/file_mtime_ns/wall
+at line END (head-600 parse sees None); '"file": "' is 9 chars — the
+r1_stream.py header scan `i += 8` yields fn='' (dedup survives on mtime, but
+file attribution there is silently empty); the GLOBAL stale-echo watermark
+WRONGLY drops a campaign deliberately re-loaded at a lower turn — this
+corpus needs PER-SESSION trust (r255d).

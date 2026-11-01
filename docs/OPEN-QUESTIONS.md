@@ -352,9 +352,29 @@ bitset count. P7 label SETTLED: star row 2 holds +0x15==0x3 (TWO races set) at
 both turns — +0x15 is not a single-owner bit (t206's vision-byte reading stands).
 The 9 intra-turn V->0 dips in the trusted run all coincide with session-boundary
 slots (wall-clock gaps; the 07:43:50 dip precedes the 07:44 relaunch) = LOAD
-artifacts, narrowing the t85b oscillation class (feeds t255). Row STAYS OPEN: play-gated threshold/comparator residue + watchpoint-class writer. | open (threshold
+artifacts, narrowing the t85b oscillation class (feeds t255). Row STAYS OPEN: play-gated threshold/comparator residue + watchpoint-class writer. STATUS t255
+(2026-11-01, drive-corpus behavioural re-probe, scripts/r255d_persession.py +
+r255f_traj.py + r255e_semantics.py over the FULL 7.1 GB timeline = 65,380 deduped
+rows / 25 sessions / turns 37..1335, PER-SESSION trust; docs/re/score.md S10):
+(a) ZERO MID-TURN V CHANGES — V moves only between turn boundaries (39 changes,
+0 same-turn); the t189b "recompute when a screen opens" candidate is REFUTED
+(t249's controlled screen-open never moved V). (b) V IS NOT SAVE-PERSISTED:
+every session's load turn reads V==0 while the slot carries a full active world
+(21-41 ships) — NOT title class; the FIRST End-Turn after load recomputes it,
+and deterministically: the same loaded state reloaded twice (Oct-31 01:41 and
+Nov-1 08:11 restarts of t1086) produced V=23 at t1087 both times. Writer fires
+on the turn clock, not the loader — narrows t212's runtime-computed-store class
+to the End-Turn recompute path. (c) V != territory at new operating points:
+V=23 held t1087..1096 while territory moved; SAME turn t1254 read V=14 (Oct-26
+lineage) vs V=23 (Oct-31 lineage), both any=36 — V depends on lineage history.
+(d) NO V>=25 row and NO selector arm anywhere in the corpus: the Control-victory
+boundary test remains unobserved passively (live rides V=14/t1255). NEXT
+discriminator banked: per-owner ship census vs V-change turns (ship_raw banked
+in every row); decisive instrument still a write watchpoint on the End-Turn
+path. Row STAYS OPEN (strict-close). | open (threshold
 residue = play witness; displayed-count write-site = RESIDUE NOW NARROWED TO
-RUNTIME-WATCHPOINT CLASS, static route exhausted this iteration) |
+END-TURN RECOMPUTE PATH, runtime-watchpoint class; screen-open hypothesis
+REFUTED t255) |
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719

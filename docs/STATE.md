@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T12:10
+updated: 2026-11-01T12:24
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,22 +260,27 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t255 OQ-021 WRITER RE-PROBE (needs t251 data; ordering rationale: it is
-the only ledger-row-moving task left that uses the fresh drive corpus while
-the banks are warm; t256 is pure code and t257 depends on t249b, so both
-out-rank lower). t212 exhausted the STATIC route
-(runtime-slot member search over the 20-sav corpus; DAT_482fb oscillates
-while systems_any/full are flat). Redo with the drive corpus: more turns,
-more states. If the oscillation range widened, the recompute-trigger
-hypothesis (screen-open vs per-turn) becomes testable against ring turn
-boundaries. Bank the narrowed chain or a second honest negative.
-NOTE t255 MECHANICS (t254 learning): the live :9 session is at turn 1255 on
-the PLANET screen (Vega IV) — Escape does NOT unwind PLANETALLOC (measured
-t254: key sent, screen unchanged); leave it parked there or click a sidebar
-button (all rects in ui-runtime.md S6) — the ring keeps banking regardless.
-Ring savs are at
-work/r1/playcap/save/ (20 files, 10 s cadence); banks bank-t251-live1255 /
-bank-t251-predrive are intact. NEVER json.loads the whole timeline (OOM law).
+NEXT t256 AI GAP ROWS 11/12/16 CODE PASS (ordering rationale: t255 landed
+and the remaining queue is t256 pure code + t257 which needs a t249b pin
+check; t256 moves ledger-adjacent ai-dossier rows and needs no new capture
+data, so it goes first). docs/re/ai-dossier.md gap map rows 11
+  (16 SA_ bodies — PARTIAL), 12 (relation-STATE ladder 0..3 + proposal emitter
+  + attacked-bitmap — PARTIAL), 16 (per-ship order kinds {0..5} — NOT
+  REPRESENTABLE note applies; decide and bank the disposition). One row per
+  session is fine — if you finish one row, rewrite NEXT to the next row verbatim
+  and commit. Rewrite code in rewrite/src/game/, cite laws from aicode.md +
+  ai-dossier.md, gate + rewrite tests must pass.
+
+NOTE t256 MECHANICS (t255 learning): OQ-021 residue is now END-TURN RECOMPUTE
+PATH (screen-open REFUTED; V not save-persisted; deterministic first-turn
+recompute) — if you fold an OQ-021 discriminator in, it is the per-owner ship
+census vs V-change turns (ship_raw banked every row; score.md S10), NOT another
+screen experiment. Live :9 session sits at t1255 V=14 on the PLANET screen
+(Escape does NOT unwind PLANETALLOC — t254); leave it parked, the ring keeps
+banking. Ring savs at work/r1/playcap/save/ (10 s cadence); banks
+bank-t251-live1255 / bank-t251-predrive intact. NEVER json.loads the whole
+timeline (OOM law); per-session trust is REQUIRED for V analysis (t255: the
+global watermark drops re-loaded lower-turn campaigns — see r255d).
 
 PAIRING-SESSION NOTE (t247 handoff, 2026-10-31; turn fact updated t251
 2026-11-01): sentinel-slot law stands — the
@@ -301,16 +306,9 @@ MEASUREMENT: that md5 lives at work/r1/game/RESUME.GAM.user-oct29; the LIVE
 C:\RESUME.GAM (work/r1/game/RESUME.GAM) is md5 f5ffb840 (81647 B, the seed-
 commit pristine template) — verify the BACKUP md5, not the live one.]
 
-QUEUE (5 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
+QUEUE (2 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
 to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
 rows; keep this QUEUE block intact except deleting the row you completed):
-
-t255 OQ-021 WRITER RE-PROBE (needs t251 data). t212 exhausted the STATIC route
-  (runtime-slot member search over the 20-sav corpus; DAT_482fb oscillates
-  while systems_any/full are flat). Redo with the drive corpus: more turns,
-  more states. If the oscillation range widened, the recompute-trigger
-  hypothesis (screen-open vs per-turn) becomes testable against ring turn
-  boundaries. Bank the narrowed chain or a second honest negative.
 
 t256 AI GAP ROWS 11/12/16 CODE PASS. docs/re/ai-dossier.md gap map rows 11
   (16 SA_ bodies — PARTIAL), 12 (relation-STATE ladder 0..3 + proposal emitter
@@ -367,6 +365,26 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t255 (2026-11-01): OQ-021 WRITER RE-PROBE LANDED — NO ROW CLOSED
+(strict-close honored; OQ-021 ANNOTATED + residue NARROWED, stays open).
+Full-corpus behavioural law (scripts/r255d_persession.py, 65,380 deduped rows
+/ 25 sessions / turns 37..1335, PER-SESSION trust): ZERO mid-turn V changes
+(39 boundary changes, 0 same-turn) -> screen-open recompute REFUTED; V==0 at
+every session's load turn on FULL active worlds (not title class) + same
+loaded state reproduced V=23@t1087 twice -> V is NOT save-persisted and the
+End-TURN recompute is deterministic in the world state; same turn t1254 read
+V=14 vs V=23 across lineages (any=36 both) -> V != snapshot, lineage-history
+dependent; NO V>=25 and NO selector arm anywhere -> Control boundary still
+unobserved passively. Banked docs/re/score.md S10 (+ _wip_t255.md incl. a
+self-caught WITHDRAWN claim: ring sampling hid turns 1097..1254 during the
+6-min drive — "flat 167 turns" was an artifact). Harness laws banked: watcher
+appends systems_*/mtime/wall at line END (head-parse blind there);
+'"file": "' is 9 chars — r1_stream.py header fn is silently '' (dedup OK on
+mtime); global stale-echo watermark drops deliberately-re-loaded lower-turn
+campaigns -> per-session trust required (r255d). Tools scripts/r255{,b,c,d,e,f}*
+.py (d/f are the keepers; b dead, c superseded by d). gate 0, ledger audit OK,
+index OK; NEXT=t256 verbatim.
 
 LANDED t254 (2026-11-01): POPULATION-SLOT LIBRARY IDENTIFIED + PLANITEM RULING
 (no ledger row closed — strict-close honored; OQ-005 ANNOTATED with the
