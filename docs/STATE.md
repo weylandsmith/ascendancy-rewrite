@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T09:05
+updated: 2026-11-01T10:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,31 +260,33 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t253 LIVE SCREEN SWEEP 2: SHIP DESIGN + FLEET + INTEL (ordering
-rationale: reuses the t252 sweep laws verbatim — scripts/r1_t252_screen.py is
-proven on :9 at t1255 with zero turn drift — and t255 needs more drive data,
-so finish the screen sweeps while the game is up and untouched; the game is
-currently PARKED ON THE GALAXY SCREEN, verified final2-vs-baseline 3452 px).
-Navigate from the galaxy screen with xsend clicks (DISPLAY=:9; window-rel
-coords; the game is modal — Escape backs out ONE level per press, t252 law).
-Capture each screen to work/screens/t253/, bank a per-screen dossier in
-docs/re/ui-runtime.md (§6c): FLEET sidebar button (553,184; rect 474,169-632,199)
--> FLEETWND; SHIPDESSCREEN (7,114-476,472) with its 8 category tabs VERBATIM
-from windows.txt (WEAPONS 485,7-515,37 / HULL 524,7-593,37 / DEFENSES
-602,7-632,37 / ENGINES 485,46-515,76 / SENSORS 524,46-554,76 / ENERGY
-563,46-593,76 / SPECIAL 602,46-632,76, all PARENT SHIPDESSCREEN, art
-8SHIPDES.SHP) + GIZLIST (485,86-632,471); the intel screen was already swept
-t252 (INTELSCREEN/INTELLIST dossier ui-runtime.md §6b) — cross-check its
-symbol counts against ring RAM if cheap, else skip. Cross-check SHIPDESSCREEN
-tab contents against docs/re/ships.md and the gizmo table law
-(ai-dossier/combat.md S2f dispatcher 0x4cd90). Vision on the in-game projector
-is legitimate (external display); R13 only bans grading OUR renders. NEVER
-click anything that starts a war, ends a turn, or abandons a system (t244
-abandoned an Abandon-Vega-II dialog by accident — decline everything); t252
-addition: negotiation PLAYERDIP option rows 2/3 are declare-war/alliance,
-never click. CAUTION t253: the ship design screen may offer DISMISS/SELL
-buttons for live ships — read before clicking, click only category tabs and
-list rows.
+NEXT t254 POPULATION-SLOT LIBRARY + PLANITEM RULING (ordering rationale: this
+is a RENDER+EYEBALL task that needs no live game and no drive data, so it is
+immune to the :9 session's state and to the OOM law — do it before t255, which
+wants a fresh mining pass, and before t256, which is pure code; it also closes
+out the shp identification arc while the t252/t253 screen dossiers are warm).
+Render candidates — planets.shp
+  (55 recs), planal00..10 (11x5), planitem.shp (40 recs) — with the corrected
+  6-bit palette (v*255//63; scripts/r1_t182_pngdump.py machinery), contact
+  sheets with labels, then compare against the LIVE planet screen population
+  panel (law: slot array sized to CAPACITY; uncolonized = empty circles; free
+  pop = yellowish figure facing FORWARD; busy pop = reddish figure facing
+  SIDEWAYS — player testimony, shp.md S19) and against the current-project
+  panel (t244 hypothesis: planitem = current-project item art — CONFIRM or kill
+  it). Bank per-record ids to shp.md S20 + work/r1/shp_png/ids.tsv. R13: you
+  may identify against the in-game display; do NOT grade your own renders.
+  MECHANICS t254: work from the galaxy screen with xsend clicks (DISPLAY=:9,
+  window-rel coords; Escape unwinds ONE level — t252/t253 law; t253 addition:
+  LEFT-click a fleet row jumps to that ship's location, RIGHT-click opens the
+  ship contents display). Planet screen = STATUS button (553,145; rect
+  474,130-632,160) -> STATUSWND/STATPLANLST, then a colony row. PRE-SWEEP
+  HAZARD CHECK (t253 law, non-negotiable):
+  `DISPLAY=:9 xwininfo -root -tree | grep -i warning` must print NOTHING before
+  any click — an orphaned xmessage quit-confirm (Yes DEFAULT) was found mapped
+  on :9 at t253; kill the xmessage PID only, never pkill, never touch dosbox-x.
+  NEVER click anything that starts a war, ends a turn, abandons a system, or
+  sells/dismisses a ship (t244 abandoned an Abandon-Vega-II dialog by accident
+  — decline everything); negotiation PLAYERDIP rows 2/3 are war/alliance.
 
 PAIRING-SESSION NOTE (t247 handoff, 2026-10-31; turn fact updated t251
 2026-11-01): sentinel-slot law stands — the
@@ -310,15 +312,9 @@ MEASUREMENT: that md5 lives at work/r1/game/RESUME.GAM.user-oct29; the LIVE
 C:\RESUME.GAM (work/r1/game/RESUME.GAM) is md5 f5ffb840 (81647 B, the seed-
 commit pristine template) — verify the BACKUP md5, not the live one.]
 
-QUEUE (7 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
+QUEUE (6 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
 to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
 rows; keep this QUEUE block intact except deleting the row you completed):
-
-t253 LIVE SCREEN SWEEP 2: SHIP DESIGN + FLEET + INTEL. Same laws as t252
-  (SHIPDESSCREEN + 8 category tabs + GIZLIST; FLEETWND; the intel screen).
-  Cross-check SHIPDESSCREEN tab contents against docs/re/ships.md and the
-  gizmo table law (ai-dossier/combat.md S2f dispatcher 0x4cd90). Bank dossiers
-  same as t252.
 
 t254 POPULATION-SLOT LIBRARY + PLANITEM RULING. Render candidates — planets.shp
   (55 recs), planal00..10 (11x5), planitem.shp (40 recs) — with the corrected
@@ -362,7 +358,10 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (b) tail-scan of the last <=400 KB (r1_t245_turndrive.ring_turn pattern),
   (c) r214_triage.py. A heredoc containing json.loads(open(timeline)) is
   PROHIBITED regardless of how simple it looks.
-- Ledger: 14 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
+- Ledger: 4 open (OQ-005, OQ-016, OQ-019, OQ-021); closed count differs
+  between tools (ledger_audit rows=19 closed=15 vs index-block 22 entries —
+  different row units, t253 observation), so never hand-assert a closed count.
+  Keep
   ledger_audit + ledger_index_check green; never hand-edit the index block.
 - Do NOT re-trod: t213 static-exhaustion verdict; t214 mining-collapse law;
   t243 sentinel-slot law; the t194..t212 closed arc; t246/t247 header-law work
@@ -390,6 +389,36 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t253 (2026-11-01): LIVE SCREEN SWEEP 2 — FLEET + SHIP DESIGN (no row
+closed — strict-close honored; OQ-005 ANNOTATED with the frame->role anchor set,
+STAYS OPEN; dossier docs/re/ui-runtime.md §6c NEW + ships.md §7 corollary +
+selfplay.md t253 laws; 1 tool scripts/r1_t253_screen.py = the t252 primitive
+with OUT->work/screens/t253/; screens + _state.json there). PROVED: (1) the
+SHIPDESSCREEN tab->gizmo-CATEGORY map measured 6/6 EXACT against gizmos.txt
+category field and file order (WEAPONS=cat0 DEFENSES=cat1 ENGINES=cat2
+SENSORS=cat3 ENERGY=cat4 SPECIAL=cat5) — and the map is NOT the SENDMESSAGE
+order (SENSORS msg 53=cat3 vs ENGINES msg 54=cat2; msg 56 has no tab), so any
+rewrite must carry a TABLE, not arithmetic; independent live corroboration of
+ships.md §6's Ghidra category dispatch. (2) HULL (msg 50) is NOT a gizmo
+category: press changed 1973 px confined to bbox x524-632 y7-76 (tab rows only;
+GIZLIST 0 px) — hull-SIZE selector per help hull; where size choices render is
+UNPROVEN (noted). windows.txt has SEVEN tabs, not eight — the "8" in
+8SHIPDES.SHP is the name-table index. (3) FLEET row click laws confirmed
+end-to-end vs help fleetwin: LEFT-click = jump to location (Escape returns to
+the LIST), RIGHT-click (xsend click3) = ship contents display, whose measured
+panel edges match SHIPDESSCREEN+GIZLIST rects (tab grid x478-639 y0-81 vs
+windows.txt 485,7-632,76). (4) Header law "<race> (<N> Ships, <M> more
+allowed)" = ship-maintenance allowance shown as HEADROOM; scroll arrows
+measured at (620,63)/(620,453). (5) HAZARD DEFUSED: orphaned
+`xmessage -buttons Yes:1,No:0 -default Yes` quit-confirm (PID 461872, PPID 1,
+14 h older than the live dosbox) sat MAPPED on :9 — killed by PID only; NEW
+PRE-SWEEP LAW: xwininfo -root -tree | grep -i warning must print nothing before
+clicks; xsend's "REFUSING blocker window" line is a warning about ANOTHER
+window and it still sends. SAFETY: 20 steps, ring turn HELD 1255 throughout,
+NEXTTURN never clicked, no war/proposal/sell/dismiss; game PARKED back on the
+galaxy screen (3471 px vs baseline == t252's 3452 blink noise floor). NEXT=t254
+verbatim.
 
 LANDED t252 (2026-11-01): LIVE SCREEN SWEEP 1 — RESEARCH + DIPLOMACY (no row
 closed — strict-close honored; dossier docs/re/ui-runtime.md §6a/§6b NEW +

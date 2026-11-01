@@ -110,6 +110,15 @@ Orbital Docks effects, the vendor cost hack (R1), fleet stacking.
   SHIPDESSCREEN@0x83aae (ref 0x27bba), shipdesx@0x83ac7 (ref 0x27c05),
   owner coswnd.cpp. ship.bin (386)/ship.tsv (393) in table.
 ## 7. NEXT residues (open, do not re-derive §6)
+LIVE CORROBORATION t253 (do not re-measure): the six SHIPDESSCREEN gizmo tabs
+map onto §6's categories EXACTLY (measured 6/6, docs/re/ui-runtime.md §6c), and
+the tab->category map is NOT the tab order nor the SENDMESSAGE order
+(ENGINES msg 54 = cat 2 while SENSORS msg 53 = cat 3; msg 56 has no tab; HULL
+msg 50 selects hull SIZE, not a category — pressing it repaints only the tab
+grid, 1973 px bbox x524-632 y7-76, GIZLIST unchanged). gizmos.txt record census
+76 = cat0 10 / 1 6 / 2 5 / 3 6 / 4 5 / 5 44 matches combat.md S2's runtime
+table. Consequence for any future design-screen code: carry an explicit
+tab->category TABLE; deriving the category from message or index is wrong.
 cost-hack location; per-ship inventory record (ship.bin table law?);
 sugar-cube numeric scale (drive Level in hop math at move code);
 Orbital Docks effect readers.

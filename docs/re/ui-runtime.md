@@ -189,6 +189,94 @@ PATH MAP (measured, ring turn 1255 held through every step, zero drift):
   specific records against these live screens is the sanctioned W3 eyeball
   route once the codec exists; the codec itself stays blocked (R2).
 
+## 6c. LIVE SCREEN SWEEP 2 dossier: FLEETWND + ship design (t253, 2026-11-01, :9 turn 1255)
+
+Harness scripts/r1_t253_screen.py (t252 primitive, OUT -> work/screens/t253/;
+run with ~/.hermes/hermes-agent/venv/bin/python — PIL lives only there). Ring
+turn HELD 1255 through all 20 steps; NEXTTURN never clicked; no war, no
+proposal, nothing sold or dismissed. Working notes docs/re/_wip_t253.md.
+
+FLEETWND (TYPE 17, STATE "1 18", rect 7,7-632,472, help fleetwin) opened by
+sidebar FLEET "Ships" 474,169-632,199 (SENDMESSAGE 1 / SENDPARAM1 18 — the
+param IS the target window's STATE number, same shape as RESEARCH p1 20 ==
+RESWIN STATE 1 20; measured click at rect centre, 116404 px diff).
+- Header renders `<owner> (<N> Ships, <M> more allowed)` — vision read
+  "Chamachies (25 Ships, 12 more allowed)". The allowance is shown as
+  HEADROOM, the live form of help shipdes' "number of ships you can maintain
+  is proportional to the number of star systems you control".
+- STATSHIPLST (child, rect 7,46-632,472) pages 4 rows for 25 ships via the
+  right-rail scroll pair, MEASURED by blue-pixel detection at centres
+  (620,63) and (620,453) (bands y 59-68 / 450-457, x 606-635).
+- Row columns: ship render | NAME (green) | gizmo/cargo icons | chevron chain |
+  column of blue spheres | LOCATION (cyan). Location forms observed:
+  "Orbiting <Planet>" and "In Starlane to <System> System ETA - <N> Days" —
+  ETA in DAYS, the third screen with that unit law (RESWIN t252, t244 gauges).
+- BEHAVIOUR LAWS CONFIRMED end-to-end (help fleetwin verbatim): LEFT-CLICK a
+  row (200,93) JUMPED to that ship's location (orbital view, red shield sphere,
+  109479 px, ring unmoved) and Escape returned to the LIST; RIGHT-CLICK a row
+  (tools/xsend `click3`) opened the ship contents display.
+- Escape unwinds ONE level (fleet list <- design screen; galaxy <- fleet list).
+  Parked back on the galaxy screen: 3471 px vs baseline == t252's 3452 blink
+  noise floor.
+
+THE SHIP CONTENTS DISPLAY IS THE SHIPDESSCREEN WINDOW CLASS (geometric
+identification): measured panel edges x 6/7, 307-330, 477-484, 633-634 and y
+2/4, 96-111, 283, 337-342, 473-477; the tab grid occupies x 478-639 y 0-81,
+i.e. windows.txt's tab rects 485,7-632,76 + GIZLIST from y 86. Panels: ship
+identity `Chamachies "Sparrowhawk"` + 3 spheres + 3 bars | selected-item detail
+(name + large render) | tab grid (3 tiles row 1, 4 tiles row 2) | equipped-slot
+column | cargo band | GIZLIST (name + icon rows, scroll arrows for 44-item cat).
+
+TAB -> GIZMO-CATEGORY MAP, MEASURED 6/6 EXACT against gizmos.txt (cr-stripped)
+category field and FILE ORDER (one tab per step; each category-tab press
+redrew 17.8k-185k px incl. the GIZLIST):
+  WEAPONS(msg 51)=cat0 weapons (Mass Barrage Gun, Fourier Missiles, Quantum
+  Singularity Launcher, Molecular Disassociator, Electromagnetic Pulser,
+  Plasmatron...); DEFENSES(52)=cat1 shields (Ion Wrap, Concussion Shield, Wave
+  Scatterer, Deactotron, Hyperwave Nullifier, Nanoshell); ENGINES(54)=cat2
+  drives (Tonklin Motor, Ion Banger, Graviton Projector, Inertia Negator,
+  Nanowave Space Bender); SENSORS(53)=cat3 scanners (Tonklin Frequency
+  Analyzer, Subspace Phase Array, Aural Cloud Constructor, Hyperwave Tympanum,
+  Murgatroyd's Knower, Nanowave Decoupling Net); ENERGY(55)=cat4 generators
+  (Proton Shaver, Subatomic Scoop, Quark Express, Van Crees Hypersplicer,
+  Nanotwirler); SPECIAL(57)=cat5 specials (Lane Blocker, Molecular Tie Down,
+  Intellect Scrambler, Brunswik Dissipator, Recaller, Disarmer, +scroll).
+- THE MAP IS NOT THE MESSAGE ORDER: ENGINES(msg 54)=cat2 while
+  SENSORS(msg 53)=cat3 — the middle pair is swapped, msg 56 belongs to no tab.
+  A rewrite that derives category from message number or tab index is WRONG;
+  it must carry this table. Independently corroborates ships.md §6's category
+  dispatch (cat4 generator -> +0x66 = POWER) without Ghidra.
+- HULL (msg 50, SHAPEFRAME 3) is NOT a gizmo category: pressing it changed
+  1973 px confined to bbox x 524-632 y 7-76 (tab rows only; GIZLIST starts
+  y 86, changed 0 px, selected name stayed "Lane Blocker"). Every tab press
+  repaints the grid so the pressed tile draws darker. Consistent with help
+  hull ("select a different hull size... larger hulls provide more space,
+  are more durable, take longer to build"); STATE "1 8" has no other child
+  window, so where the size choices render is UNPROVEN (noted, not claimed).
+  windows.txt has SEVEN tabs, not eight — the "8" in 8SHIPDES.SHP is the
+  library's name-table index prefix.
+- gizmos.txt IS the vendor gizmo table: my parse = 76 records (cat 0:10, 1:6,
+  2:5, 3:6, 4:5, 5:44), matching combat.md S2's runtime census (76 rows at
+  0x7650c stride 0x6a, names Mass Barrage Gun..Hyperfuel).
+- OQ-005 ANCHOR (annotation, row STAYS OPEN): SHAPEFRAME pins the tab tiles to
+  8SHIPDES.SHP frames 2=WEAPONS 3=HULL 4=DEFENSES 5=ENGINES 6=SENSORS 7=ENERGY
+  8=SPECIAL (GIZLIST frame 7, SHIPDESSCREEN frame 0), and the live art in grid
+  order is explosion / ship silhouette / blue orb | green crystal / magenta
+  vortex / gold cylinder / pink beam-with-green-tip — seven frames with pinned
+  semantic roles for the W3 eyeball route. Codec itself stays R2-blocked.
+- SPELLING DISCIPLINE: live renders read "Van Crees"/"Brunswick" where
+  gizmos.txt says "Van^Creeg"/"Brunswik" (vision is the noisiest instrument —
+  R13). The FILE is the data authority; do not edit files toward a projector
+  read.
+
+HAZARD (control-plane, banked in _wip_t253.md): an ORPHANED
+`xmessage -buttons Yes:1,No:0 -default Yes` "Quit DOSBox-X warning" (PID
+461872, PPID 1, started Oct 31 19:40 — 14 h before the current dosbox PID
+479968) sat MAPPED on :9 with Yes as default. `xwininfo -root -tree | grep -i
+warning` is the pre-sweep check; xsend's "REFUSING blocker window" line warns
+about a DIFFERENT window and still sends to the game window. Killed the orphan
+by PID only.
+
 ## 6. Explicitly NOT in P5a (no fakery)
 
 pan/zoom/layer toggles (children exist in windows.txt but their exe

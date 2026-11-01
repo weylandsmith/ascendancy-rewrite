@@ -435,3 +435,28 @@ CORPUS LAW BANKED (watermark): after any mid-campaign LOAD to a LOWER
 turn, trust=True is blind to the new session (watermark = historic max).
 Mining a post-rewind window needs trust=False + wall-clock pairing
 (r1_stream's own caveat) — used correctly in the --window pass design.
+
+## t253 (2026-11-01) — LIVE SWEEP 2: FLEET + SHIP DESIGN INTERACTION LAWS
+
+All at turn 1255 on :9, ring turn HELD every step (20 steps, NEXTTURN never
+clicked; parked parked back on the galaxy screen, 3471 px vs baseline == blink
+noise). Full dossier docs/re/ui-runtime.md §6c; harness scripts/r1_t253_screen.py.
+- FLEET sidebar button (553,184) opens the ship list; header shows
+  "<race> (<N> Ships, <M> more allowed)" (headroom form). 4 rows page 25 ships.
+- FLEET ROW CLICK LAWS (help fleetwin confirmed live end-to-end): LEFT-click a
+  row = camera jump to the ship's location (planet/orbital view opens; Escape
+  returns to the LIST, not the galaxy); RIGHT-CLICK (tools/xsend `click3`) =
+  ship contents display (the SHIPDESSCREEN window class).
+- DESIGN-SCREEN TAB LAW: every tab press repaints the tab grid (pressed tile
+  darker); the GIZLIST changes ONLY for the six gizmo-category tabs (HULL
+  changed 1973 px, all inside bbox x524-632 y7-76 = tab rows only). Tab->gizmo
+  category measured 6/6 exact vs gizmos.txt; NOT message order (SENSORS msg 53
+  = cat3, ENGINES msg 54 = cat2).
+- HAZARD LAW (new, control-plane): before EVERY sweep run
+  `DISPLAY=:9 xwininfo -root -tree | grep -i warning`. An orphaned
+  `xmessage -buttons Yes:1,No:0 -default Yes` quit-confirm (from a DEAD dosbox,
+  PPID 1) was sitting mapped on :9 for 14 h with Yes default — one stray
+  root-coord click and the game dies. xsend prints "REFUSING blocker window"
+  but STILL SENDS to the game window (the message names a different window);
+  it is a warning, not a refusal. Remediation: kill the xmessage PID only
+  (never pkill, never touch dosbox-x). Retired: PID 461872.
