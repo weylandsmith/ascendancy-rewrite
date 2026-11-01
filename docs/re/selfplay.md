@@ -168,6 +168,61 @@ r1_t248_pop.py (header-filter sweeps, all negative), r1_t248_counter.py
   pop==0 at t1086) is the best [unverified] default and is testable once the
   population-slot library (t254) lands.
 
+### t249 HEADER-PLANETS COUNTER FOUND — SCREEN-OPEN SNAPSHOT LAW (MEASURED)
+Tools: scripts/r1_t249_listwalk.py / _inspect.py / _raw.py / _content.py /
+_sigscan.py / _validate.py / _items.py / _entry131b4.py / _freeze.py; full
+working log docs/re/_wip_t249.md (S1..S11). Evidence bank:
+work/r1/bank-t249-live-open/{59,60}.sav + work/screens/t3/
+planets_header_t1086_after_open.png.
+- THE LAW (static + 3 measured timestamps): the planet-list header's PLANETS
+  number is u16[list+0x8c7], the ITEM COUNT of a generic scrollable-list
+  object; the list is RESET (count zeroed, +0x8c9 stamped 0x8d) and REFILLED
+  with exactly the planets whose NAME+0x33 == player race on EVERY open of
+  the Planets screen (FUN_00051834 case 1: alloc iff widget+0xab==0; bound
+  u16@dsx0x3a093; filter DAT_0002b0ae = rec0+0x33). Between opens the number
+  is FROZEN — the only +0x8c7 writers program-wide are the list add (0x32eb6
+  in FUN_00032d1c) and reset (0x325b5, 0x33015) routines; FUN_00051834 has
+  no turn-driven case.
+- OBJECT SHAPE: entries inline at obj+0xc7 stride 8 (companion dword +4 is
+  mutated post-add — selection/bookkeeping, 101/102 nonzero); entries are
+  LIST-ITEM HANDLES in their own 0x7b-stride run (base = rec base - 0xac),
+  and SET EQUALITY {entry+0xac} == {records with NAME+0x33==race} verified
+  EXACT at t1254 (102/102) and t1086-live (80/80). Signature for memory
+  hunts: [o+0xab]==0 && byte[o+0xc5]==0 && [o+0xbb]==0xffffffff &&
+  u16[o+0x8c9]==0x8d.
+- MEASUREMENTS: bank-t1254 (user softlocked session): ONE sig-obj 0xfda074
+  count=102 == header 102 EXACT, stable across all 20 bank slots. Live :9
+  session BEFORE click: ZERO sig-objs in 20 slots (screen never opened);
+  after window-rel click (553,145) on the sidebar "Planets" button
+  (windows.txt rect 474,130-632,160): sig-obj 0xfda074 count=80 in every
+  sampled slot AND the screen header renders "80 Planets Occupied,
+  26 Systems Controlled" — count == count(NAMED && owner==race0) == 80.
+- t248's 60-vs-80 ANOMALY: it was a STALE SCREEN-OPEN SNAPSHOT (the t1092
+  header read a list populated at an earlier open). "occupied==populated"
+  hypothesis REFUTED by the live experiment (all 80 owner-flag planets
+  counted, no population filter). WHY the earlier open saw 60 while t1086
+  owner-count is 80: UNRESOLVED (t1092 RAM rotated away; candidates mid-turn
+  population, [unverified]).
+- REFUTED/CLOSED SIDE-QUESTS: u16@data 0x131b4 = 60 at THREE timestamps
+  (t1092, t1254, live t1086-after-open) and ZERO instructions reference
+  absolute 0x131b4 (disp32 census over code [0x14bb0,0x82bb0)) — a
+  race-block-relative field (blk stride 0x1ee, intra 0x1ac), NOT a header
+  counter (t247's refutation now triple-confirmed). FUN_00051684/0x51b68
+  have zero E8 callers and zero u32 refs (pure indirect dispatch);
+  FUN_00051834 referenced once, data-seg handler table file 0x88b78. The
+  widget that held OBJ was torn down (24 sites zero [reg+0xab]; zero pointer
+  sites of OBJ in RAM) — heap object survives as last-open snapshot.
+- HARNESS LESSON: t248's fixed-member-offset u16 intersection across two
+  sessions could NEVER hit (heap layout is session-specific; the counter
+  lives in a heap list object). Correct instrument = content/signature scan
+  per slot, plus (decisive) a controlled live experiment.
+- LIVE-SESSION SIDE EFFECT (disclosed): this iteration opened the Planets
+  screen on :9 (read-only navigation; zero turns advanced, ring turn still
+  1086; user save untouched — no in-game Save). xsend REQUIRES
+  DISPLAY=:9 in env ("no display" otherwise); a stale "Quit DOSBox-X
+  warning" blocker window briefly re-appeared and self-cleared (xsend
+  refused one click during it — its blocker guard works).
+
 ## 4. PLANET-SCREEN INTERACTION LAWS (agent-observed, t244)
 - NAVIGATION STACK: galaxy -> SYSTEM VIEW (orbital grid: blue wireframe plane,
   bodies on yellow stalks, right panel = planet name + art, orbital structure

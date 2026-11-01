@@ -260,7 +260,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t249 HEADER-PLANETS COUNTER + WRITER HUNT (retargeted by t248 — read docs/re/selfplay.md "t248 PER-PLANET OWNER TABLE FOUND" FIRST). The per-planet owner table LANDED t248 (planet-record NAME+0x33 == owner race, 0xFF unowned; star-bitmask OR proof 0 violations x 50 systems x 2 timestamps). What did NOT land: the header "N Planets Occupied" NUMBER. At t1254 it equals count(NAMED && owner==race0)=102, but at t1086 count=80 vs header 60 (screenshot planets_header_t1092.png) — the header reads a MAINTAINED value, and Ghidra FUN_00051684 shows HOW: the planets %d comes from a stored u16 at *(u16*)(*(int*)(obj+0xab)+0x8c7) (heap-window slot; obj = the home-planet/game object pointer at data 0x12e1d+0x1ee*race — note [home+0xab] read 0 in both captured slots, so the obj in the decompile is a DIFFERENT object than the raw pointer at 0x12e1d; trace the real call path: FUN_00051684's EAX-in arg, callers via E8 census). Legs: (a) resolve the runtime address of that u16 in work/r1/bank-t1254/48.sav (must read 102) and in a t1086 ring slot (must read 60 at t1092 — CAVEAT: no t1092 RAM survives; use the closest slots and the ring journal turn fields); (b) once pinned, windowed-disasm the writer sites (objdump -b binary -D -m i386 -M intel over work/ascend_restored.bin; t91 desync caveat) — colonize/lose-planet events must update it; (c) SECONDARY: writer + semantics of u16@data 0x131b4 (60 at BOTH t1092 and t1254 — maintained, purpose unknown; t247 proved it is NOT the header counter). Also open from t248: WHY 20 of 80 owned planets @t1086 were not counted 60 — best [unverified] default "occupied==populated"; test when t254's population-slot library lands. Bank in docs/re/selfplay.md. STRICT-CLOSE applies. Do NOT touch the STATE ledger index block (gate machine-checks it).
+NEXT t249b DAY-COUNTER DWORD HUNT (verbatim queue row, t249 done — read docs/re/selfplay.md "t249 HEADER-PLANETS COUNTER FOUND" FIRST for the heap-list law and the sig-scan instrument). The planet screen shows a day counter (user testimony: "day 1254" at turn 1254 — day may equal turn in this campaign, which makes a same-value dword a candidate). Census dwords == 1254 in work/r1/bank-t1254/*.sav excluding heap noise; correlate against the known turn dword at data offset 0x12e10 (a day field should sit near game-state core, not the race block). If pinned, note the watcher-schema addition for t257. If not pinned, bank the negative + candidate list. STRICT-CLOSE applies. Do NOT touch the STATE ledger index block (gate machine-checks it).
 
 PAIRING-SESSION NOTE (t247 handoff, 2026-10-31): sentinel-slot law stands — the
 task line above is the FIRST non-blank line under this heading; notes go below
@@ -279,20 +279,9 @@ softlocked dosbox; SIGTERM pops its own quit-confirm with (Yes) DEFAULT.
 (4) User save RESUME.GAM md5 5b382afbb7891... (Oct 29) — never overwrite; the
 game writes it only at in-game Save, so self-play cannot corrupt it.
 
-QUEUE (11 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
+QUEUE (10 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
 to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
 rows; keep this QUEUE block intact except deleting the row you completed):
-
-t249 HEADER-PLANETS COUNTER + WRITER HUNT (RETARGETED t248; the verbatim
-  original row "PIN WRITER u16@0x131b4" survives in git history and is folded
-  in as leg (c)). The header planets %d is a stored u16 read through
-  *(u16*)(*(int*)(obj+0xab)+0x8c7) per Ghidra FUN_00051684 (t248); pin its
-  runtime address (must read 102 @t1254; 60 @t1092 — no t1092 RAM survives,
-  nearest slots + ring journal only) then windowed-disasm the writers
-  (objdump -b binary -D -m i386 -M intel over work/ascend_restored.bin;
-  t91 desync caveat). u16@0x131b4 (60 at BOTH timestamps, maintained, NOT
-  the header counter per t247) writer + semantics = leg (c). Cite writer
-  sites or bank a measured negative with controls.
 
 t249b DAY-COUNTER DWORD HUNT. The planet screen shows a day counter (user
   testimony: "day 1254" at turn 1254 — day may equal turn in this campaign,
@@ -408,6 +397,33 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t249 (2026-10-31, next day 11-01 local): HEADER-PLANETS COUNTER FOUND —
+SCREEN-OPEN SNAPSHOT LAW, MEASURED WITH A CONTROLLED LIVE EXPERIMENT (no
+ledger row moved: OQ-005/016/019/021 untouched, strict-close honored;
+docs/re/selfplay.md "t249" section is the record; docs/re/_wip_t249.md S1..S11
+is the working log; 9 tools scripts/r1_t249_*.py). PROVED: (1) the header's
+PLANETS number == u16[list+0x8c7], item count of a generic scrollable-list
+heap object, reset+refilled with exactly {planets NAME+0x33==race} on EVERY
+Planets-screen open (FUN_00051834 case 1; filter const DAT_0002b0ae ==
+rec0+0x33; bound u16@dsx0x3a093=145), FROZEN between opens (program-wide
++0x8c7 writers: add 0x32eb6, resets 0x325b5/0x33015 only). (2) bank-t1254:
+ONE sig-obj 0xfda074 count 102 == header EXACT (all 20 bank slots; set
+{entry+0xac}==owner-recs 102/102). (3) LIVE: zero sig-objs in 20 pre-click
+ring slots -> click sidebar Planets (553,145 window-rel) -> sig-obj count 80
+in every post slot AND header renders "80 Planets Occupied, 26 Systems
+Controlled" (work/screens/t3/planets_header_t1086_after_open.png). t248's
+60-vs-80 anomaly = stale snapshot; "occupied==populated" REFUTED (80/80
+owner-flag planets counted, no pop filter); why the older open saw 60 stays
+UNRESOLVED (t1092 RAM rotated). (4) leg (c) closed: u16@0x131b4 = 60 at THREE
+timestamps + ZERO absolute references in code — race-block-relative field,
+not a counter. Honest negatives banked: entry-pointer-shape scans (0xcb and
+0xc7 record-target hypotheses) were wrong instruments (entries are item
+handles); widget anchor not found (torn down). SIDE EFFECT (disclosed): the
+live :9 session now has the Planets screen OPEN with the stamped list (count
+80) — zero turns advanced (ring still 1086), no in-game Save, user save
+untouched. NEXT = t249b verbatim (day-counter dword hunt; sig-scan
+instrument + live-experiment method now in house style). Gate 0, ledger OK.
 
 LANDED t248 (2026-10-31): PER-PLANET OWNER TABLE FOUND — THE 102-PLANET LAW
 HAS ITS CITATION (no ledger row moved: OQ-005/016/019/021 untouched, strict-
