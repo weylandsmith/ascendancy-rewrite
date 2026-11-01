@@ -364,6 +364,13 @@ t257 WATCHER SCHEMA + DAY FIELD (needs t249b). If t249b pinned the day dword:
   30 s. If t249b did not pin it, fold its candidate list forward instead.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
+- OOM LAW (t251 incident, MEASURED): the t251 session died because it read
+  live-timeline.jsonl with json.loads over the whole 6.4 GB file — 13.4 GB RSS
+  peak, OOM killer killed the ENTIRE tmux scope (loop + game + session tree).
+  NEVER read the timeline except: (a) scripts/r1_stream.py streaming API,
+  (b) tail-scan of the last <=400 KB (r1_t245_turndrive.ring_turn pattern),
+  (c) r214_triage.py. A heredoc containing json.loads(open(timeline)) is
+  PROHIBITED regardless of how simple it looks.
 - Ledger: 14 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
   ledger_audit + ledger_index_check green; never hand-edit the index block.
 - Do NOT re-trod: t213 static-exhaustion verdict; t214 mining-collapse law;
