@@ -319,3 +319,32 @@ grabbed). The user DID run their mouse across the window mid-session, though
 that message arrived BEFORE the input-dead phase began. LESSON: for long
 unattended drives, warn the user not to touch the VNC window, and treat
 "popup open + input-dead + RAM-frozen" as the softlock signature -> restart.
+
+## 10. t250 TURN-DRIVER v4 (scripts/r1_t250_turndrive.py) + PROBE LAW
+Tools: r1_t250_turndrive.py (v4 = v3 laws + softlock detect + auto-recovery +
+run log work/r1/t250_drive_<ts>.log); working log docs/re/_wip_t250.md.
+- INPUT-PROBE LAW (measured, kills the task text's literal design): the 'c'
+  relation overlay is GALAXY-SCREEN-ONLY, so a c-only pixel probe reads
+  ZERO-CHANGE ON A HEALTHY GAME parked on a modal sub-screen (planet list:
+  c -> 0 px, Escape -> 153,672 px; then galaxy screen: c -> 1,152 px). v4
+  probes Escape FIRST (backs out of modals, no-op on galaxy), then c.
+- SOFTLOCK = input-dead (both probes) AND ring ring-tail frozen except
+  {wall,file,file_mtime_ns} over a 20 s gap. Popup presence is LOGGED but NOT
+  required (t247: signature recurred with no popup); the safety the popup-check
+  stood in for comes from sequencing: the interrogate only runs after TWO
+  consecutive NEXTTURN presses with zero advancement and drain_popups()==0.
+- RECOVERY PATH: bank save/*.sav -> work/r1/bank-t250-recovery-<ts>/, SIGKILL
+  pidfile pid then leftovers by exact comm (never SIGTERM), relaunch
+  r1_playcap_vnc.sh start, click Return-to-game (318,333) polling in_game,
+  resume toward the SAME absolute target. work/r1/SELFPLAY.marker (1 byte)
+  written at drive start, removed on clean exit 0 — presence brackets
+  self-play timeline growth for future sitting probes.
+  HONEST STATUS: the recovery branch has NEVER fired (no softlock occurred);
+  only its primitives are individually verified (SIGKILL+relaunch+resume =
+  t245/t247 manual recoveries; bank = this session's cp -p x20).
+- VALIDATION (live :9, 01:41-01:45): --target 1096 from ring 1086 = 10/10
+  presses advanced, drains 4,7,7,4,3,3,3,5,2,2 (34 popups total), TARGET
+  REACHED, exit 0, marker removed, run log written. Drive rate ~17-25 s/turn.
+  Screenshot law reconfirmed: pre-drive screen was the t249 planet-list view
+  ("60 Planets Occupied" stale snapshot header — t249 snapshot law visible
+  again in the wild).

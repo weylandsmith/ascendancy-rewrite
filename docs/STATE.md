@@ -260,7 +260,25 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t250 TURN-DRIVER ROBUSTNESS PASS (verbatim queue row, t249b done — for the day==turn pin see docs/re/selfplay.md "t249b"; it also settles t257's dependency: the watcher's turn field IS the day, a literal day key would be a pure alias). scripts/r1_t245_turndrive.py (v3) advances turns and drains popups, but is softlock-blind. Add: (a) SOFTLOCK DETECT — sample the ring tail twice ~20 s apart; if only wall/file fields move AND a popup is on screen AND an input probe (c-key toggle) changes zero pixels, declare softlock, SIGKILL the dosbox pids, relaunch via scripts/r1_playcap_vnc.sh start, click Return-to-game at window-rel (318,333), resume the drive from the ring turn; write work/r1/SELFPLAY.marker (1 byte) so a future probe can tell self-play growth from user play. (b) verify --target against the ring (already v3) and log every press + drain count to a run log under work/r1/. Then run ONE bounded validation: --target +10 turns on the live :9 session. Laws to honor: background shells need DISPLAY=:9 injected explicitly; popup OK button at root (405,443); popups serialize at turn end and swallow NEXTTURN clicks (NEXTTURN at window-rel (511,67)). Do NOT touch the STATE ledger index block (gate machine-checks it).
+NEXT t251 LONG UNATTENDED DRIVE + WITNESS MINING (verbatim queue row, t250
+done — driver v4 scripts/r1_t250_turndrive.py validated 10/10 presses to ring
+1096 with softlock detect + auto-recovery + run log; see docs/re/selfplay.md
+S10. Run it with the HERMES venv python — PIL exists nowhere else. Live ring
+is at turn 1096, game healthy on :9). Drive the live session toward turn 1150
+(or until two softlocks in a row -> exit 3). Bank the ring BEFORE any restart
+(v4 does this automatically on recovery; do it manually for any other kill).
+MINE witness classes via scripts/r1_stream.observations(trust=True) ONLY (raw
+row arithmetic is writer-multiplicity garbage — t214 law): (a) multi-volley
+battle against a NON-at-war owner (OQ-016 clamp witnesses); (b) a
+mid-campaign slot with V=dword[0x482fb]>1 AND some byte[star+0x15] nonzero
+(OQ-021 S6 semantic non-join + P7 label). Honest negatives are acceptable
+outcomes; strict-close only on a real witness. Do NOT issue player attack
+orders (no self-made wars) — mine what the AI produces. Laws to honor:
+background shells need DISPLAY=:9 injected explicitly; popup OK button at
+root (405,443); popups serialize at turn end and swallow NEXTTURN clicks
+(NEXTTURN at window-rel (511,67)); the 'c' probe is galaxy-screen-only — v4
+probes Escape first. Do NOT touch the STATE ledger index block (gate
+machine-checks it).
 
 PAIRING-SESSION NOTE (t247 handoff, 2026-10-31): sentinel-slot law stands — the
 task line above is the FIRST non-blank line under this heading; notes go below
@@ -282,21 +300,6 @@ game writes it only at in-game Save, so self-play cannot corrupt it.
 QUEUE (9 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
 to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
 rows; keep this QUEUE block intact except deleting the row you completed):
-
-t250 TURN-DRIVER ROBUSTNESS PASS. scripts/r1_t245_turndrive.py (v3) advances
-  turns and drains popups, but is softlock-blind. Add: (a) SOFTLOCK DETECT —
-  sample the ring tail twice ~20 s apart; if only wall/file fields move AND a
-  popup is on screen AND an input probe (c-key toggle) changes zero pixels,
-  declare softlock, SIGKILL the dosbox pids, relaunch via
-  scripts/r1_playcap_vnc.sh start, click Return-to-game at window-rel (318,333),
-  resume the drive from the ring turn; write work/r1/SELFPLAY.marker (1 byte)
-  so a future probe can tell self-play growth from user play. (b) verify
-  --target against the ring (already v3) and log every press + drain count to
-  a run log under work/r1/. Then run ONE bounded validation: --target +10
-  turns on the live :9 session. Laws to honor: background shells need
-  DISPLAY=:9 injected explicitly; popup OK button at root (405,443); popups
-  serialize at turn end and swallow NEXTTURN clicks (NEXTTURN at window-rel
-  (511,67)).
 
 t251 LONG UNATTENDED DRIVE + WITNESS MINING (needs t250). Drive the live
   session toward turn 1150 (or until two softlocks in a row). Bank the ring
@@ -389,6 +392,29 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t250 (2026-11-01): TURN-DRIVER v4 WITH SOFTLOCK DETECT + AUTO-RECOVERY,
+VALIDATED LIVE (no ledger row moved: harness robustness is not an OQ row;
+record docs/re/selfplay.md S10; working log docs/re/_wip_t250.md; 1 tool
+scripts/r1_t250_turndrive.py). BUILT: v3 laws inherited verbatim; softlock =
+input-dead AND ring-tail frozen except {wall,file,file_mtime_ns} over 20 s,
+interrogated only after 2 zero-advance presses with drain==0 (popup-presence
+logged, NOT required — t247 signature recurred without popup; sequencing
+provides the safety the task text's popup-check stood in for: documented
+deviation). Recovery = bank save/*.sav -> bank-t250-recovery-<ts>/, SIGKILL
+pidfile-then-comm (never SIGTERM), relaunch r1_playcap_vnc.sh start,
+Return-to-game (318,333) polling in_game, resume toward same absolute target;
+SELFPLAY.marker written at start, removed on clean exit. PROBE LAW (measured,
+kills the literal c-key-probe design): 'c' overlay is galaxy-screen-only —
+healthy game on planet-list read c=0 px / Escape=153,672 px; on galaxy c=1,152
+px. v4 probes Escape first. VALIDATION (live :9): --target 1096 from ring 1086
+=> 10/10 presses advanced, 34 popups drained, TARGET REACHED exit 0, run log
+work/r1/t250_drive_20261101-014141.log, ring now 1096, pre-drive ring banked
+(bank-t250-predrive, 20 slots). HONEST NEGATIVE: the recovery branch never
+fired this session (no softlock occurred) — only its primitives are individually
+verified. Interpreter law: PIL lives ONLY in the hermes venv python. Gate 0,
+ledger audit OK; side effect: live session advanced 1086->1096 (self-play,
+RESUME.GAM untouched, marker law in force).
 
 LANDED t249b (2026-11-01): DAY-COUNTER PINNED — DAY == TURN, MEASURED THREE
 WAYS (no ledger row moved: the day readout is not an OQ row; strict-close
