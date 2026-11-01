@@ -340,3 +340,76 @@ r1_stream.py header scan `i += 8` yields fn='' (dedup survives on mtime, but
 file attribution there is silently empty); the GLOBAL stale-echo watermark
 WRONGLY drops a campaign deliberately re-loaded at a lower turn — this
 corpus needs PER-SESSION trust (r255d).
+
+## S11 — t258: end-turn-recompute discriminator run over the FULL corpus [measured, negative]
+
+Instrument scripts/r258_vdisc.py (KEEPER; single streaming pass, per-session
+trust per the t255 law, boundary dump + candidicide + per-session V
+trajectories in ONE pass; work/r1/t258_vdisc4.out). Corpus 303,625 lines /
+7.43 GB, 53,412 trusted V!=0 rows, 9,997 V==0 rows, 25 sessions, dedup 237,718,
+stale 3,437.
+
+1. MID-TURN V CHANGES = 0 (53,412 trusted rows; real measurement with the
+   fixed predicate — pass-1's identical 0 was an artifact of a tuple-index bug,
+   see _wip_t258 S2). t255 §1 (V moves only at turn boundaries) re-corroborated.
+   V-change TURN boundaries = 38; V-stable turn-boundary control population =
+   795 (t255's 39 counted one extra boundary on a smaller corpus; the delta is
+   corpus/trust-window, not a contradiction — every t255 boundary reproduces).
+
+2. CANDIDICIDE (strict bar: changes at ALL 38 AND zero of the 795 stable
+   boundaries): SURVIVORS = NONE.
+   - T, rank(65535), selector_byte(0): constant corpus-wide -> dead on leg 1.
+   - systems_any / systems_full / planets_mine: change at exactly 1 of 38 V
+     boundaries (the S25 t1096->1255 sprint) yet also change at 1-2 V-STABLE
+     boundaries -> dead BOTH legs. t85g's "not a territory count" re-proved at
+     full-corpus scope.
+   - alive_total/player/ai and ALL 12 per-owner order-kind counts: change at
+     2-33 of 38 boundaries AND at 3-289 stable boundaries -> dead BOTH legs.
+     The best-correlated features (A_k4/A_k5, 33/38) drown in 277-278 stable
+     false-positives: order churn is ubiquitous, V moves are rare.
+   - Closed-form aggregate fit over all 53,412 rows (same pass, second probe):
+     alive_player 4,013/53,412; P_k4+P_k5+A_k4+A_k5 5,688 (10.6%); sum P_k3..5
+     985; 2*(P_k4+P_k5) 154; alive_ai 3; sum_all_k 1 — all first-miss at t37
+     (V=1 with zero ships: the fleet hadn't launched yet). No formula of the
+     banked-feature space reproduces V; matches are coincidence at V's plateau
+     values.
+
+3. DETERMINISM, 3rd independent witness: the t1169->t1170->t1171 replay in two
+   separate sessions (S14, S15) walks V 14->12->14 EXACTLY (t255 had only the
+   V=23@t1087 pair). The recompute is a function of loaded world + turn clock,
+   not of wall time or session identity.
+
+4. V==0 IS A LOAD-CLASS, NOT turn==0: 33 distinct (session,turn) pairs carry
+   V==0 at turns 692..1254 (e.g. S22/23/25 t1086, S19 t1254). First-post-load
+   V table (22 load points) shows V NOT determined by the snapshot: t1087 reads
+   V=23 with systems_full=25 (S22,S23) and V=23 with full=24 (S25); t1167 reads
+   14 with full=27 (S14) vs full=29 (S15). V co-varies weakly with systems_full
+   but is neither equal nor a function of it (lineage dependence, t255 §3).
+
+5. SHAPE CLUES for the eventual formula (banked, [inferred] labels): steps are
+   small (+-1/2) during growth but include DOUBLING (S07 t911->912 V 11->22)
+   and HALVING (S13 t1140->1141 V 22->11) — a count of *items* changing by
+   factor 2 in one turn suggests V counts a derived per-star quantity whose
+   per-star values cross an integer threshold en masse (e.g. TRUNC/floor of a
+   per-star score), OR the S2 disproducer reads a value recomputed from a
+   structure that is itself rebuilt (halving = rebuild with a different unit).
+   Non-monotone +-1/2 oscillations at plateaus (S17 t1246..1253: 14,15,13,15,14)
+   mean at least one input oscillates per turn while territory is dead-flat.
+
+6. CLOSURE BAR UNMET, row stays OPEN: zero rows with V>=25 in the entire corpus
+   (max 23/50 = 46%), selector_byte never armed — the Control boundary remains
+   UNOBSERVED, and the producer's write-site needs the runtime watchpoint
+   (t212 conclusion unchanged; this iteration adds no static handle). The
+   residual now REQUIRES a NEW interactive capture (watchpoint + drive past
+   V>=25): recorded as a USER ASK in docs/BLOCKED.md. No rewrite change, no
+   pin (campaign.cpp:2093 default >1/2 stays — CONSISTENT with every banked
+   frame: V never crossed 25 and no victory screen ever appeared).
+
+INSTRUMENT PITFALLS (t258, full detail _wip_t258 S2/S4): (a) prev-tuple index
+drift silently merged mid-turn pairs into the turn-boundary population; (b) a
+fast JSON slice that starts AFTER the opening '{' must re-add it —
+json.loads('"0": [...]}') dies "Extra data: line 1 column 4"; (c) an
+except-swallow + isinstance-guard turns a parse bug into a SILENT None — the
+none_census print added mid-task is what caught it; (d) verifier agreement
+against a reference parser is VACUOUS when both return None — assert non-degenerate
+value content, not fast==reference equality.

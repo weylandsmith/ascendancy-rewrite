@@ -457,3 +457,25 @@ new capture or a user decision (see the decision surface in docs/STATE.md).
 ## unanswered: treat the discontinuities as UNVERIFIED frame reframes
 ## (a 5->4->5 round trip one turn apart argues against magnetron) and
 ## keep all rows open.
+
+## t258 USER ASK (2026-11-01) — OQ-021 is now play-GATED at BOTH residues; the
+## loop has no offline work left for it. Not a work block for other rows; the
+## loop idles per t178 until a human answers or authorizes.
+## What the loop PROVED offline (docs/re/score.md S11): no combination of the
+## banked per-row world fields (territory counts, alive ships, all 12 per-owner
+## order-kind counts, closed-form aggregates over 53,412 trusted rows) explains
+## DAT_482fb at any boundary — the producer is invisible to the current watcher
+## schema. Two residues remain, each with a minimal human action:
+## (A) THRESHOLD WITNESS (cheap, passive): in the parked :9 session (t1255,
+##     V=14/50), just keep ending turns (scripted End-Turn drive is enough —
+##     r1_t245_turndrive pattern) until V >= 25 or a Control-victory screen
+##     appears. Either observation closes the threshold residue under
+##     strict-close. The ring keeps banking; no new instrument needed.
+## (B) PRODUCER WRITE-SITE (needs an instrument decision): a dosbox-x build
+##     with a write watchpoint on guest-physical [0x482fb..0x482fe] during ONE
+##     End-Turn. This is the FIRST instrument that can see the runtime-computed
+##     store address t212 proved exists. Requires the user's OK to run a
+##     modified dosbox-x against the scratch copy (game/ untouched as always).
+## Best default while unanswered: rewrite keeps >1/2 on V (campaign.cpp:2093),
+## consistent with every banked frame (V never crossed 25, no screen ever seen);
+## row stays open; no other open row depends on either residue.

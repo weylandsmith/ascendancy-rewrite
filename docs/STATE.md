@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T15:35
+updated: 2026-11-01T17:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,35 +260,26 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t258 OQ-021 END-TURN-RECOMPUTE DISCRIMINATOR (no deps; every input is
-already banked — this is the ledger-moving task the t255/t256 mechanics notes
-prepared). HYPOTHESIS SPACE (score.md S10, t255): V=DAT_482fb changes ONLY at
-turn boundaries (39 changes / 0 same-turn, screen-open REFUTED), is NOT
-save-persisted, and is lineage-dependent (same t1254 world read V=14 vs V=23)
-— so V is an end-turn RECOMPUTE of something, and t85g already refuted pure
-territory (V oscillates 8->14->12->15 while systems_full is monotone). THE
-TEST: stream the full corpus ONCE with scripts/r1_stream.py observations
-(trust=True, PER-SESSION watermark per t255 law — never a global one, never
-json.loads the file), and per row compute the candidate feature vector:
-score_stars (V), turn, systems_any/full, planets_mine, owner-0 alive ship
-count, total alive ship count, and per-ship order-kind multiset from ship_raw
-(ship_raw is banked EVERY row since t85b; order-kind law r256c / ships.md —
-kind set {1..5}). Then for each of the 39 V-change boundaries diff the vector
-against the previous banked turn, and against V-stable boundaries as control.
-STRICT BAR: a candidate must explain ALL 39 changes AND zero non-changes
-across all 25 sessions t37..1335, plus V==0 on every session load-turn (the
-recompute fires on the end-turn clock, so load-turn rows are V=0 regardless —
-exclude them from the fit but require the formula to be consistent with the
-first-post-load value, cf. the reproduced V=23@t1087 pair). If a formula
-reproduces everything: upgrade rewrite victory check (campaign.cpp:738
-default >1/2 on V) + pin, and OQ-021 CLOSES with that census as evidence. If
-not: bank the honest negative (which candidates die on which boundaries), keep
-the row open, and note whether the residual now requires a NEW capture (new
-captures are the user's call — record the ask, do not run one).
-(ordering rationale: t257 landed and drained the old queue; per the
-AFTER-DRAINS instruction this is the newly authored queue's head — OQ-021 is
-the only open row with a fully banked offline discriminator; OQ-016/OQ-019
-residues are play-gated/BLOCKED-USER per the ledger, OQ-005 is documentation.)
+NEXT = WAIT-TRIGGER SENTINEL (t258 drained the last offline queue task; per
+the AFTER-DRAINS instruction the remaining candidates are play-gated USER ASKS,
+authored into docs/BLOCKED.md "t258 USER ASK" — NOT loop tasks). DO NOTHING
+THIS SESSION beyond adopting this sentinel if you were launched on a dirty
+tree. Work re-arms ONLY on: (1) a witness — any trusted row with V>=25 or a
+selector arm (grep the tail per the tail-scan pattern; zero exist as of
+t258), or a new playcap-* dir (a real user sitting); (2) a user answer to ask
+(A) keep ending turns on the parked :9 session past V>=25, or (B) approval to
+run a watchpoint-instrumented dosbox-x against the scratch copy (producer
+write-site of DAT_482fb, t212 class); (3) a STEERING note. If re-armed by (2B)
+or a sitting: the decisive recipe is watchpoint [0x482fb..0x482fe] during ONE
+End-Turn + drive past 25 — everything offline is done (score.md S11 candidicide:
+NO banked world-field combination explains V; SURVIVORS NONE on 38 change vs
+795 stable boundaries). HARNESS: relaunch should now use IDLE_GATE=1 (queue
+empty; the t248 QUEUE-DRIVEN-MODE exit closes the batch on no-wake+no-steer+
+clean tree) or simply not relaunch — see docs/BLOCKED.md t186 CONSEQUENCE.
+Do NOT re-run r258_vdisc.py (it is the closed negative; KEEPER for a future
+schema with new fields). Do NOT re-mine the old candidates (t213/t214/t243
+do-not-re-trod list still stands, plus t255 S10 and t258 S11 supersede the
+V-candidate space).
 
 NOTE t256 MECHANICS (t255 learning): OQ-021 residue is now END-TURN RECOMPUTE
 PATH (screen-open REFUTED; V not save-persisted; deterministic first-turn
@@ -325,23 +316,13 @@ MEASUREMENT: that md5 lives at work/r1/game/RESUME.GAM.user-oct29; the LIVE
 C:\RESUME.GAM (work/r1/game/RESUME.GAM) is md5 f5ffb840 (81647 B, the seed-
 commit pristine template) — verify the BACKUP md5, not the live one.]
 
-QUEUE (t257 AUTHORED NEW QUEUE per the AFTER-DRAINS instruction — 1 task;
-when you finish task tN, rewrite NEXT ACTION to the text of task tN+1
-VERBATIM — do not renumber, do not compress the other rows; keep this QUEUE
-block intact except deleting the row you completed. If the queue drains again
-with no new witness, re-run this authoring step):
-
-t258 OQ-021 END-TURN-RECOMPUTE DISCRIMINATOR — full text is the current
-NEXT ACTION block above (t257 landed same-day; the head IS the queue).
-Honest expectation banked up front: t255's lineage-dependence result (same
-world, two V values across lineages) means a pure world-state formula may NOT
-fit all 39 boundaries; the deliverable is then the boundary-by-boundary
-candidicide table + the recorded capture-ask, not a forced close.
-
-AFTER t258 DRAINS: candidates remaining are play-gated only (OQ-019 real
-flights, OQ-016 terrain wiring, OQ-021 boundary-crossing observation) — those
-need a USER ASKS entry (new sitting authorization), not a loop task; author
-the ask into docs/BLOCKED.md and let the loop idle-gate per t178.
+QUEUE (t258 DRAINED the last authored task — the t258 row WAS the queue head and
+is now complete; no t259 exists. Per the AFTER-DRAINS instruction the remaining
+candidates are play-gated USER ASKS (authored to docs/BLOCKED.md "t258 USER
+ASK"), NOT loop tasks, so no new queue was authored and NEXT is the
+WAIT-TRIGGER sentinel. If a USER ASK is answered or a witness lands, the
+re-armed session authors its own task from the BLOCKED.md recipe. Sentinel-slot
+law: task line stays FIRST under the heading.):
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - OOM LAW (t251 incident, MEASURED): the t251 session died because it read
@@ -382,6 +363,31 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t258 (2026-11-01): OQ-021 END-TURN-RECOMPUTE DISCRIMINATOR EXECUTED —
+CANDIDICIDE COMPLETE, SURVIVORS NONE (score.md S11 + _wip_t258; queue drained
+-> WAIT-TRIGGER sentinel + t258 USER ASK banked BLOCKED.md; no OQ closed —
+strict-close: an exhaustive negative is an honest keep-open, not a close).
+Instrument scripts/r258_vdisc.py (KEEPER; one streaming pass = boundary dump +
+candidicide + per-session trajectories; work/r1/t258_vdisc4.out). MEASURED
+303,625 lines / 53,412 trusted V!=0 rows / 25 sessions: 0 mid-turn V changes
+(t255 §1 re-corroborated with the fixed predicate); 38 V-change turn boundaries
+vs 795 V-stable control — territory counts die BOTH legs (1/38 + 1-2 stable),
+all 12 per-owner order-kind features + alive counts die BOTH legs (best A_k4/
+A_k5 33/38 vs 277-278 false positives), closed-form aggregates fit at most
+10.6% of rows (coincidence; first-miss t37 V=1 zero-ships). NEW FACTS: 3rd
+independent determinism witness (S14/S15 replay 14->12->14 at t1169-71);
+V==0 = LOAD-CLASS not turn==0 (33 session-turn pairs, turns 692..1254); shape
+clues 11->22 doubling + 22->11 halving banked (per-star floor/threshold over a
+rebuilt quantity, [inferred]). CORPUS STILL HAS ZERO V>=25 rows and zero
+selector arms — threshold unobserved; rewrite >1/2 (campaign.cpp:2093) stands,
+consistent with every frame. Instrument-hygiene laws banked (_wip_t258 S2/S4):
+brace-deficient fast JSON slices die "Extra data: line 1 column 4";
+except-swallow + isinstance guard SILENCES a parse bug (none_census caught it);
+verifier agreement is VACUOUS when both sides return None — assert non-degenerate
+content. Live :9 untouched (t1255 parked); no capture run. Gate 0, ledger audit
+OK (open = OQ-005/016/019/021), index OK; NEXT = WAIT-TRIGGER sentinel verbatim
+(IDLE_GATE=1 or no relaunch; re-arm recipe in the sentinel + BLOCKED.md ask).
 
 LANDED t257 (2026-11-01): WATCHER SCHEMA + DAY FIELD — "day" PURE ALIAS LIVE
 (selfplay.md "t257" block + _wip_t257.md S1..S5; queue drained -> NEW QUEUE

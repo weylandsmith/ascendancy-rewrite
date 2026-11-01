@@ -371,10 +371,32 @@ lineage) vs V=23 (Oct-31 lineage), both any=36 — V depends on lineage history.
 boundary test remains unobserved passively (live rides V=14/t1255). NEXT
 discriminator banked: per-owner ship census vs V-change turns (ship_raw banked
 in every row); decisive instrument still a write watchpoint on the End-Turn
-path. Row STAYS OPEN (strict-close). | open (threshold
+path. STATUS t258 (2026-11-01, THE BANKED DISCRIMINATOR EXECUTED,
+scripts/r258_vdisc.py single pass over 303,625 lines / 53,412 trusted V!=0 rows
+/ 25 sessions; docs/re/score.md S11): CANDIDICIDE COMPLETE, SURVIVORS NONE —
+of the 38 V-change turn-boundaries vs the 795 V-stable turn-boundary control:
+T/rank/selector are corpus-constants; systems_any/full/planets_mine move at
+exactly 1/38 change boundaries AND 1-2 stable boundaries (dead both legs —
+t85g's non-territory verdict re-proved at full scope); alive ship counts and
+ALL 12 per-owner order-kind features move at 2-33/38 AND 3-289 stable (best
+correlate A_k4/A_k5 33/38 drowned by 278 false positives — order churn is
+ubiquitous, V moves rare). Closed-form aggregate fit on all 53,412 rows dies
+too (best P_k4+P_k5+A_k4+A_k5 5,688/53,412 = 10.6% coincidence; first-miss at
+t37 V=1 zero-ships). NEW POSITIVE FACTS: 3rd independent determinism witness
+(S14/S15 replay t1169->1171 V 14->12->14 exactly); V==0 is a LOAD-CLASS not
+turn==0 (33 session-turn pairs at turns 692..1254); shape clues banked —
+DOUBLING 11->22 (S07 t911->912) and HALVING 22->11 (S13 t1140->1141) suggest a
+floor/threshold over a per-star derived quantity rebuilt per end-turn. The
+world-feature space is now MEASURED-CLOSED as an explanation of V: the producer
+cannot be identified from banked watcher fields at all. NEXT instrument =
+dosbox-x write watchpoint on the End-Turn path + drive past V>=25 (USER ASK in
+docs/BLOCKED.md; zero V>=25 rows and zero selector arms in the whole corpus —
+the threshold itself remains unobserved). rewrite default >1/2
+(campaign.cpp:2093) UNCHANGED, consistent with every banked frame. Row STAYS
+OPEN (strict-close). | open (threshold
 residue = play witness; displayed-count write-site = RESIDUE NOW NARROWED TO
 END-TURN RECOMPUTE PATH, runtime-watchpoint class; screen-open hypothesis
-REFUTED t255) |
+REFUTED t255; banked-world-feature explanations MEASURED-EXHAUSTED t258) |
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719
