@@ -698,3 +698,76 @@ writer 0x3a35e `mov [ecx],eax` (value = defense result, FORCED 1 iff the
 attacker's ability byte row+0x19d == 0); neither caller pre-inits; the
 engine path never reads it, the UI caller 0x3d951 reads ==1 to pick
 message 0x1c vs 0x1d (0x21a20 @0x3d9bb).
+
+## §20 — t256b: FULL LIVE n x n MATRIX CENSUS; AI-AI LADDER MEASURED DORMANT;
+### ROW-12 DISPOSITION BANKED (2026-11-01)
+
+The gap-row-12 open substance ("no inter-race state ladder") got its first
+MEASUREMENT instead of a guess. Instrument: scripts/r256b_relmatrix.py over
+work/r1/playcap/live-timeline.jsonl — the watcher's "relation" field already
+carries the FULL matrix per slot (r1_playcap_watch.py relation(): states at
+row*0x1ee+col+0x1c0, atts i16 at +0x1b2+2col, per-race th, third-party matrix
+at 0x12fd6 — no bank dig needed). 65,751 unique relation rows / 24 sessions
+(mtime-gap split) / PER-SESSION stale-echo watermark per the t255 law.
+Tool pitfalls banked: (1) the relation object sits at line offset ~28800
+(AFTER the ~28 KB ship_raw window) — r255d's head[:600]/tail[-260] slices
+would MISS it; probe '"states": [[' from offset 600 instead; (2) nested
+values are INDENTED JSON ('"n": 4,\n') — int() the comma-delimited slice with
+.strip(); (3) "n" precedes "states" in the object, so a rel-slice parse must
+derive n = len(states).
+
+MEASURED (n=4 campaign [Chamachies, Orfa, Ungooma, Minions], names validated
+§12):
+1. STATE VALUE CENSUS over all trusted off-diagonal cells:
+   {0: 118,268; 1: 539,740; 2: 90,992; 3: 136}. 52 transitions total.
+2. PLAYER-PARTY pairs ever held {0,1,2} (vs Minions/Ungooma war, vs Orfa war)
+   and {0,1,3} (the t1335 alliance, §16). AI-AI pairs ever held {0,1} ONLY —
+   all six directed AI-AI cells, every session entry, every trusted row.
+3. The 0-values are PRE-CONTACT cells (attitude 0); every 0->1 transition
+   fires RECIPROCAL with attitude := START_ATTITUDE of the ISSUER observed on
+   the issuer cell (e.g. t541 Orfa->Ungooma 0->1 att 0->423 == Orfa
+   START_ATTITUDE 420 +/-; t567 Chamachies->Minions 0->1 att 0->320 ==
+   Chamachies START 320) — matches the §13.4b scenario/contact seeding writer
+   (case bl=0 copies [+0x1d5]=START_ATTITUDE while setting 1). 34 such
+   transitions, all 0->1, no 1->0 anywhere.
+4. POST-CONTACT AI-AI ATTITUDE BANDS vs the issuer's OWN thresholds (the
+   ladder-firing lines): Orfa->Ungooma 409..466, Orfa->Minions 412..440,
+   Ungooma->Orfa 256..470, Ungooma->Minions 316..431, Minions->Orfa 307..364,
+   Minions->Ungooma 326..383 (348,936 cell-observations). Thresholds are
+   STATIC in RAM (min==max across the corpus): DW {Orfa 210, Ungooma 200,
+   Minions 290}; ACCEPT_ALLIANCE {570, 600, 600}. ZERO observations below the
+   issuer's DECLARE_WAR line and ZERO above its ACCEPT_ALLIANCE line.
+   => The inter-race ladder is REAL in state space but DORMANT in this
+   campaign lineage: AI-AI attitudes never crossed any rung line, so no AI-AI
+   war/alliance transition could fire. This is the 2nd independent corpus
+   confirming §11's "AI 0->1 cells never advanced to 2 without the player's
+   declared war" (the playcap sittings and the self-play ring are separate
+   lineages of the same scenario).
+5. Third-party matrix (0x12fd6) mirrors states cell-for-cell per §13.4a —
+   census consistent (no divergence rows in transitions).
+
+DISPOSITION (row 12, BANKED — decision, not a default): the rewrite KEEPS the
+two-party projection permanently. Rationale, each clause cited:
+(a) the ladder's STATE SPACE is already represented where it matters:
+    DipPolicyState.atWar/.allied == the row's +0x1c0 byte (2=WAR t85b,
+    3=ALLIANCE t189b §16), and war_[][] carries the engine-visible relation;
+    what is NOT carried is AI->AI attitude CELLS.
+(b) every consumer of an AI-AI cell that the rewrite has a counterpart for
+    (applyAttackDipCost 0x43a4c, guaranteeWarOnInvasion 0x3a25a, hatredClamp
+    0x440b5 third-party leg) either only exists for player-attacker cells at
+    its cited call site (t204: "exists exactly when the attacker is the
+    player", _wip_t204 D2) or is already wired as pure static clamp (t256);
+    the attacked-bitmap consumer law is display-only (t206 §18).
+(c) the measurement above shows the omitted state adds NO observable
+    behaviour in any captured lineage (AI-AI cells never left {0,1}; bands
+    never crossed a rung line). A rewrite that GUESSED AI-AI attitude
+    dynamics (trade drift, mood sine) would ADD behaviour the corpus has
+    never witnessed — worse than the documented boundary.
+(d) the ladder FIRING law is already cited statically (§13 writer cases +
+    third-party rungs 0x44c1a/0x44c71/0x44ce0), so if a future per-ship/
+    multi-power model (OQ-019 boundary, user decision) needs AI-AI state, the
+    law is in hand — the row's RE residue is nil; what remains is ENGINE
+    BUILD, tracked like OQ-023's A7 residual, not an unknown.
+Row-12 label corrected in ai-dossier.md accordingly. NO OQ ROW CLOSED
+(strict-close: the gap map is a work item; the only live-measured negative
+result here is "dormant in captured lineages", which does not close anything).

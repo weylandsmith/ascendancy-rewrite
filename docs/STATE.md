@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T13:25
+updated: 2026-11-01T14:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,24 +260,16 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t256b AI GAP ROW 12 DISPOSITION (ordering rationale: the t256 queue row
-said one row per session and to continue to the next row verbatim; row 11
-landed t256, row 12 is next in the row order, row 16 after it, t257 stays
-queued last). docs/re/ai-dossier.md gap map row 12: relation-STATE ladder
-0..3 + proposal emitter + attacked-bitmap — PARTIAL. The bitmap half is
-already shrunk by t206 (unit-order/display-only, diplomacy.md §18) and the
-two-party chooser is threshold-exact (decideDipAction, §7/§8). The open
-substance is the INTER-RACE state ladder: the rewrite carries ONE attitude
-vector (AI->player), so AI-vs-AI relations have no state — decide and BANK
-the disposition (accept the two-party projection permanently with a written
-rationale, or scope an N x N matrix citing what t99/t92 give you: per-race
-rows +0x1b2/+0x1c0/+0x1c9 exist in the original, but live AI-AI VALUES are
-uncaptured — check the ring saves first: bank-t251-live1255 holds 4-race
-mid-game rows, the diplo-row region 0x12e16+494*r may give the full live
-attitude matrix + state bytes == a MEASUREMENT opportunity, not a guess).
-If the measurement closes the ladder, wire it; else bank the honest negative
-and the disposition. Rewrite code in rewrite/src/game/, cite laws from
-aicode.md + ai-dossier.md + diplomacy.md, gate + rewrite tests must pass.
+NEXT t256c AI GAP ROW 16 DISPOSITION. docs/re/ai-dossier.md gap map row 16
+(per-ship order kinds {0..5}, stickiness, congregation, retreat-downgrade,
+invasion-module carrier — §5, t179 P1/P3). The "NOT REPRESENTABLE" note
+applies (rewrite has no ship positions/system objects); DECIDE AND BANK the
+disposition: either accept the aggregate model permanently with the cited
+reasons (and correct row 16's "GAP (largest)" label to a documented
+boundary), or scope the minimal per-ship state the cited laws need. No
+silent stub either way. Gate + rewrite tests must pass.
+(ordering rationale: t256b landed row 12; the queue row order says row 16 is
+next and t257 stays queued last.)
 
 NOTE t256 MECHANICS (t255 learning): OQ-021 residue is now END-TURN RECOMPUTE
 PATH (screen-open REFUTED; V not save-persisted; deterministic first-turn
@@ -380,6 +372,34 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t256b (2026-11-01): AI GAP ROW 12 DISPOSITION — TWO-PARTY PROJECTION
+ACCEPTED PERMANENTLY, BACKED BY THE FIRST FULL LIVE n x n MATRIX CENSUS (no
+ledger row closed — strict-close honored; OQ set unchanged 4 open; the census
+is MEASUREMENT that INFORMS the disposition, it closes no OQ). Instrument
+scripts/r256b_relmatrix.py (KEEPER; streams the watcher's "relation" field —
+the full matrix was ALREADY banked per slot, no dig needed): 65,751 unique
+rows / 24 sessions / per-session watermark. MEASURED: state census off-diag
+{0:118268, 1:539740, 2:90992, 3:136}; AI-AI cells ever-held {0,1} ONLY (all
+6 directed cells, every session entry); all 34 0->1 transitions RECIPROCAL
+with att:=issuer START_ATTITUDE (== §13.4b bl=0 seeding writer); post-contact
+AI-AI attitude bands 256..470 over 348,936 obs NEVER crossed the issuer's DW
+(200/210/290) or ACCEPT_ALLIANCE (570/600/600) line — thresholds STATIC in
+RAM (min==max) — the inter-race ladder is real in state space but DORMANT in
+every captured lineage (2nd independent lineage corroborating §11).
+DISPOSITION rationale (a)-(d) banked diplomacy.md §20 NEW: rewrite consumers
+of AI-AI cells exist only at player-attacker call sites (t204) or are static
+clamps (t256); guessed AI-AI dynamics would ADD never-witnessed behaviour;
+firing LAW already cited statically (§13 + rungs 0x44c1a/0x44c71/0x44ce0) for
+any future OQ-019-boundary build — remainder is ENGINE BUILD, not RE unknown.
+Row-12 label rewritten in ai-dossier.md gap map. NO rewrite code change
+(war_[][] already full-matrix; dipState_ deliberately stays AI->PLAYER).
+Tool pitfalls banked (_wip_t256b S4): relation sits at line offset ~28800
+(after 28 KB ship_raw — head/tail slices MISS it); nested values INDENTED
+(int(slice.strip())); "n" precedes "states" (derive n=len(states)). Live :9
+UNTOUCHED (zero clicks; ring kept banking; game still parked at t1255 on the
+planet screen). gate 0 (ran twice, incl. finish-sequence), ledger audit OK
+rows=19 open=OQ-005/016/019/021, index OK; NEXT=t256c verbatim.
 
 LANDED t256 (2026-11-01): AI GAP ROW 11 (16 SA_ bodies) AUDITED + UPGRADED —
 NO LEDGER ROW CLOSED (strict-close honored; gap map is a work item, OQ set
