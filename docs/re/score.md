@@ -281,6 +281,12 @@ this value are BOTH now measured against:
    watch logs), and in EVERY V==1 save byte[star+0x15] is 0 across all 50
    star rows — while the current (new-game) ring holds 4 nonzero +0x15 bytes
    with V==0. So aicode.md P7's "star owner bit [star+0x15]" label is
-   [unverified] and does not join to V; t206's cited +0x15 use is a VISION
-   byte. A mid-campaign slot with both fields non-degenerate is the witness
-   needed to settle it; the corpus holds none.
+ [unverified] and does not join to V; t206's cited +0x15 use is a VISION
+ byte. A mid-campaign slot with both fields non-degenerate is the witness
+ needed to settle it; the corpus holds none.
+ [t251 CORRECTION: "the corpus holds none" was CORPUS-BLIND — the scan
+ roots missed work/r1/bank-*. bank-t1254 (20 slots, t1254) V=23 with NINE
+ +0x15 rows; bank-t251-live1255 (t1255) V=14 with TEN. Witness class
+ OBSERVED; non-join holds on real slots (V != ownP 23vs9/14vs9, != occ);
+ row 2 +0x15==0x3 co-ownership kills the single-owner-bit reading. See
+ docs/re/selfplay.md t251 §3.]

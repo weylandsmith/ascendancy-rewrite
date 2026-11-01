@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T01:30
+updated: 2026-11-01T09:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,57 +260,45 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t251 LONG UNATTENDED DRIVE + WITNESS MINING (verbatim queue row, t250
-done — driver v4 scripts/r1_t250_turndrive.py validated 10/10 presses to ring
-1096 with softlock detect + auto-recovery + run log; see docs/re/selfplay.md
-S10. Run it with the HERMES venv python — PIL exists nowhere else. Live ring
-is at turn 1096, game healthy on :9). Drive the live session toward turn 1150
-(or until two softlocks in a row -> exit 3). Bank the ring BEFORE any restart
-(v4 does this automatically on recovery; do it manually for any other kill).
-MINE witness classes via scripts/r1_stream.observations(trust=True) ONLY (raw
-row arithmetic is writer-multiplicity garbage — t214 law): (a) multi-volley
-battle against a NON-at-war owner (OQ-016 clamp witnesses); (b) a
-mid-campaign slot with V=dword[0x482fb]>1 AND some byte[star+0x15] nonzero
-(OQ-021 S6 semantic non-join + P7 label). Honest negatives are acceptable
-outcomes; strict-close only on a real witness. Do NOT issue player attack
-orders (no self-made wars) — mine what the AI produces. Laws to honor:
-background shells need DISPLAY=:9 injected explicitly; popup OK button at
-root (405,443); popups serialize at turn end and swallow NEXTTURN clicks
-(NEXTTURN at window-rel (511,67)); the 'c' probe is galaxy-screen-only — v4
-probes Escape first. Do NOT touch the STATE ledger index block (gate
-machine-checks it).
+NEXT t252 LIVE SCREEN SWEEP 1: RESEARCH + DIPLOMACY (needs a live session; the
+live :9 game is HEALTHY on the galaxy screen at turn 1255 — verified by
+vision this iteration, work/screens/t2/drive_final_t250.png; sweep it now,
+ordering rationale: t253/t254 reuse the same session laws and t255 needs
+more drive data, so the screen sweeps come first while the game is up and
+untouched). Navigate from the galaxy screen with xsend clicks (DISPLAY=:9;
+window-rel coords; the game is modal — Escape backs out). Capture each
+screen to work/screens/, bank a per-screen dossier in docs/re/ui.md (or
+ui-runtime.md): widgets seen vs the windows.txt manifest (RESWIN;
+NEGSCREEN + ALIENDIP/PLAYERDIP), geometry, states. Vision on the in-game
+projector is legitimate (external display); R13 only bans grading OUR
+renders. NEVER click anything that starts a war, ends a turn, or abandons
+a system (t244 abandoned an Abandon-Vega-II dialog by accident — decline
+everything).
 
-PAIRING-SESSION NOTE (t247 handoff, 2026-10-31): sentinel-slot law stands — the
+PAIRING-SESSION NOTE (t247 handoff, 2026-10-31; turn fact updated t251
+2026-11-01): sentinel-slot law stands — the
 task line above is the FIRST non-blank line under this heading; notes go below
 (t243 law). THE LIVE SESSION: a self-play game runs on display :9 (dosbox-x,
-resumed from the user's RESUME.GAM at turn 1086); the watcher is banking to
-work/r1/playcap/live-timeline.jsonl every 10 s. Consequences: (1) trigger A is
-structurally ALWAYS armed while that watcher lives (the timeline grows every
-10 s and a running dosbox is present) — it is NOT user play and must NOT be
-adjudicated as a sitting; adjudicate a sitting ONLY if a new playcap-* dir
-appears. This launch runs MAX_ITERS=14 IDLE_GATE=0 (fixed batch, no probe:
-with the always-growing timeline, IDLE_GATE=1 would ping-pong adjudication
-sessions forever once the queue drains — the exact t214..t243 pattern). (2) The ring holds the ONLY copy of
-turn states the game did not save — bank work/r1/playcap/save/*.sav before ANY
-dosbox restart (the t1092 RAM frames were lost this way). (3) SIGKILL a
-softlocked dosbox; SIGTERM pops its own quit-confirm with (Yes) DEFAULT.
+post-OOM relaunch 07:44; at turn 1255 since the t251 drive — the ring JUMPED
+1096->1255 via an unattributed load path, healthy galaxy screen verified by
+vision); the watcher is banking to work/r1/playcap/live-timeline.jsonl every
+10 s. Consequences: (1) trigger A is structurally ALWAYS armed while that
+watcher lives (the timeline grows every 10 s and a running dosbox is present)
+— it is NOT user play and must NOT be adjudicated as a sitting; adjudicate a
+sitting ONLY if a new playcap-* dir appears. This launch runs MAX_ITERS=14
+IDLE_GATE=0 (fixed batch, no probe: with the always-growing timeline,
+IDLE_GATE=1 would ping-pong adjudication sessions forever once the queue
+drains — the exact t214..t243 pattern). (2) The ring holds the ONLY copy of
+turn states the game did not save — bank work/r1/playcap/save/*.sav before
+ANY dosbox restart (the t1092 RAM frames were lost this way; t251 banks:
+bank-t251-predrive, bank-t251-live1255). (3) SIGKILL a softlocked dosbox;
+SIGTERM pops its own quit-confirm with (Yes) DEFAULT.
 (4) User save RESUME.GAM md5 5b382afbb7891... (Oct 29) — never overwrite; the
 game writes it only at in-game Save, so self-play cannot corrupt it.
 
-QUEUE (9 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
+QUEUE (8 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
 to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
 rows; keep this QUEUE block intact except deleting the row you completed):
-
-t251 LONG UNATTENDED DRIVE + WITNESS MINING (needs t250). Drive the live
-  session toward turn 1150 (or until two softlocks in a row). Bank the ring
-  BEFORE any restart. MINE witness classes via
-  scripts/r1_stream.observations(trust=True) ONLY (raw row arithmetic is
-  writer-multiplicity garbage — t214 law): (a) multi-volley battle against a
-  NON-at-war owner (OQ-016 clamp witnesses); (b) a mid-campaign slot with
-  V=dword[0x482fb]>1 AND some byte[star+0x15] nonzero (OQ-021 S6 semantic
-  non-join + P7 label). Honest negatives are acceptable outcomes; strict-close
-  only on a real witness. Do NOT issue player attack orders (no self-made
-  wars) — mine what the AI produces.
 
 t252 LIVE SCREEN SWEEP 1: RESEARCH + DIPLOMACY (needs a live session; NOT
   t251's turn — run between drives or on the current one). Navigate from the
@@ -399,6 +387,42 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t251 (2026-11-01): DRIVE 1086->1255 + FIRST POSITIVE ATTACK-CLASS
+CASCADE WITNESS + WITNESS (b) LANDS (no row closed — strict-close honored;
+record docs/re/selfplay.md "t251" section; working log docs/re/_wip_t251.md
+S1..S6; 1 tool scripts/r1_t251_mine.py). DRIVE (hermes-venv python,
+--target 1150 --max-presses 75): presses 1-10 advanced 1086->1096 (34
+popups drained); presses 11-13 zero advance (probe input ALIVE 306,624 px);
+press 14 ring JUMPED 1096->1255 in <=22 s — one click cannot advance 159
+turns, so a LOAD happened inside the modal chain the drains were closing
+(candidate [unverified]: a resume dialog confirmed into the Oct-29 t1254-era
+state); drive exited 0, zero softlocks, recovery never fired. Vision on
+work/screens/t2/drive_final_t250.png: healthy galaxy screen, readout 01255.
+Banks: bank-t251-predrive (20 slots @1086), bank-t251-live1255 (20 @1255);
+live-copy resume.gam md5 5b382afb UNCHANGED. WITNESS MINING (trust=True per
+t214 law; watermark law banked: after a mid-campaign LOAD the new session is
+INVISIBLE to trust=True — mine post-rewind windows trust=False + wall
+pairing, r1_stream's own caveat): (1) FIRST POSITIVE ATTACK-CLASS WITNESS —
+t887 att[Minions][Chamachies] 324->284 EXACTLY -40 with state 1->2 WAR in
+the same window, no other transition (t204 price + t208 chooser cascade
+observed live; -40 == 2 committed weapons per t210). Honest MINUS: direction
+attribution stream-ambiguous; the t205 victim mark is ABSENT everywhere
+(bank-t1254 holds ONLY byte[0x48304+38]=0x1 = contact latch, first nonzero
+byte ever); clamp target 280 NOT hit (284 = price, not clamp) — clamp
+witness still absent, OQ-016 stays OPEN, row ANNOTATED. (2) WITNESS (b)
+LANDS: t212's roots missed work/r1/bank-* — bank-t1254 all 20 slots V=23
+with NINE byte[star+0x15] rows, live1255 V=14 with TEN; SEMANTIC NON-JOIN
+measured (V!=ownP 23vs9/14vs9, !=occ, V==systems_full 0%, ==systems_any 10%
+over 45,227 trusted slots); P7 single-owner-bit label KILLED (row 2 +0x15==
+0x3 co-ownership); the 9 intra-turn V->0 dips all sit at session boundaries
+= LOAD artifacts (feeds t255). OQ-021 ANNOTATED, stays OPEN (writer =
+watchpoint class). Damage channel sharpened to a negative: 0 named-owner
+disappearances; all 10 shield-agg drops = slot remap/garbage-owner class;
+raw-window streak proxies INVALID (day byte +0x67 churn — trap banked).
+Side effects on :9: the drive advanced the self-play campaign to 1255 (via
+the unattributed load path); user save untouched; marker law honored (clean
+exit removed it). Gate 0, LEDGER AUDIT OK rows=19 open=OQ-005/016/019/021.
 
 LANDED t250 (2026-11-01): TURN-DRIVER v4 WITH SOFTLOCK DETECT + AUTO-RECOVERY,
 VALIDATED LIVE (no ledger row moved: harness robustness is not an OQ row;

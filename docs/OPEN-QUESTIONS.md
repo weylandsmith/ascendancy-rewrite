@@ -340,8 +340,19 @@ excluded, not just assumed. WRITER POPULATION MEASURED (docs/re/_wip_t215.md S2,
 /proc/<pid>/fd census): EXACTLY four processes hold live-timeline.jsonl open
 (27774 + orphans 260988/290953/292085, all --no-exit; wrapper 27772 holds no
 writer fd) — t214's process-presence inference is now a direct fd-level fact,
-and the retirement ask (supervised-session decision) stands upgraded. Row
-STAYS OPEN: play-gated threshold/comparator residue + watchpoint-class writer. | open (threshold
+and the retirement ask (supervised-session decision) stands upgraded. STATUS t251
+(2026-11-01, witness mining, scripts/r1_t251_mine.py): WITNESS (b) LANDS —
+t212's roots (r1sav-*/r1deep-*/playcap ring) MISSED work/r1/bank-*: bank-t1254
+ALL 20 slots (turn 1254) hold V=23 with NINE byte[star+0x15] nonzero rows
+[2,6,12,16,21,22,28,33,44]; bank-t251-live1255 (turn 1255) V=14 with TEN
+nonzero rows. SEMANTIC NON-JOIN MEASURED on real mid-campaign slots: V != ownP
+(23 vs 9; 14 vs 9), V != occ (14 vs 10), V==systems_full 238/45,227 trusted
+slots (0%), V==systems_any 4,970 (10%) — the displayed count is NOT any +0x15
+bitset count. P7 label SETTLED: star row 2 holds +0x15==0x3 (TWO races set) at
+both turns — +0x15 is not a single-owner bit (t206's vision-byte reading stands).
+The 9 intra-turn V->0 dips in the trusted run all coincide with session-boundary
+slots (wall-clock gaps; the 07:43:50 dip precedes the 07:44 relaunch) = LOAD
+artifacts, narrowing the t85b oscillation class (feeds t255). Row STAYS OPEN: play-gated threshold/comparator residue + watchpoint-class writer. | open (threshold
 residue = play witness; displayed-count write-site = RESIDUE NOW NARROWED TO
 RUNTIME-WATCHPOINT CLASS, static route exhausted this iteration) |
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
@@ -1234,7 +1245,26 @@ ask stands. docs/re/_wip_t214.md S1. STATUS t215 (2026-10-31, no-sitting
 iteration): trigger-A byte-identical again (r214_triage.py RC=0) + independent
 save-axis (newest .sav anywhere == 60.sav 10-29 13:22, zero modified since
 10-29 18:00) — witness still UNOBSERVABLE, nothing re-censused (t212 law); row
-unchanged, witness ask stands. docs/re/_wip_t215.md S1/S3.
+unchanged, witness ask stands. docs/re/_wip_t215.md S1/S3. STATUS t251
+(2026-11-01, drive + witness mining, scripts/r1_t251_mine.py, docs/re/selfplay.md
+t251 section): FIRST POSITIVE ATTACK-EVENT WITNESS IN THE CORPUS — t887 (wall
+15:12:56->15:18:03, trusted stream): att[Minions][Chamachies] 324->284 EXACTLY
+-40 with relation state 1(PEACE)->2(WAR) in the same autosave window and NO
+other state/attitude transition in the pair — the t204 price + t208 chooser
+cascade observed live (-40 == two committed weapons per t210 stacking). MINUS
+(honest): Minions self-declaring with a -40 slam in their own row is not fully
+excluded from stream data alone; the t205 per-star VICTIM mark (byte 1<<3) is
+ABSENT from every bank (bank-t1254 holds only byte[0x48304+38]==0x1 = the t206
+CONTACT latch, first nonzero byte ever seen in that window), so either the fire
+path used was not 0x43a4c or the mark law has an unmapped clear. CLAMP witness
+(att slamming exactly to DECL-10==280) still ABSENT (284 != 280 — this is the
+price, not the clamp). Multi-volley-vs-non-at-war damage channel NARROWED to a
+sharp negative: named-owner ship disappearance events 0/45,227 trusted points;
+shield-agg(+0x4) decreases 10, all resolvable as slot remap (owner high-u16
+0xffff->N) or garbage owners; streak/multi-volley proxies on raw windows are
+INVALID (day byte +0x67 churns every turn — t213). Row STAYS OPEN (strict-close):
+clamp witness still unobserved; direction attribution needs the watchpoint-class
+instrument. docs/re/selfplay.md t251 + docs/re/_wip_t251.md S1..S6.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

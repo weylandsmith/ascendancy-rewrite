@@ -348,3 +348,83 @@ run log work/r1/t250_drive_<ts>.log); working log docs/re/_wip_t250.md.
   Screenshot law reconfirmed: pre-drive screen was the t249 planet-list view
   ("60 Planets Occupied" stale snapshot header — t249 snapshot law visible
   again in the wild).
+
+---
+
+## t251 (2026-11-01) — DRIVE 1086->1255 + FIRST POSITIVE ATTACK-PRICE CASCADE WITNESS + WITNESS (b) LANDS
+
+Drive (scripts/r1_t250_turndrive.py, hermes venv, --target 1150
+--max-presses 75): presses 1-10 advanced 1086->1096 (34 popups drained);
+presses 11-13 zero advance (probe input ALIVE 306,624 px; drains 0,0,2);
+press 14 ring JUMPED 1096->1255 in <=22 s (08:17:36 -> 08:17:58) and the
+drive exited 0 (target exceeded). Run log
+work/r1/t250_drive_20261101-081121.log. Zero softlocks; recovery never
+fired. Vision on work/screens/t2/drive_final_t250.png: healthy galaxy
+screen, readout 01255, no popup. MECHANISM OF THE JUMP UNATTRIBUTED
+[honest]: one NEXTTURN click cannot advance 159 turns, so a LOAD occurred
+in the modal window the drains were closing; candidate (unconfirmed) = the
+popup chain confirmed a resume-from-save dialog into the Oct-29 t1254-era
+state. Ring banks: bank-t251-predrive (20 slots @1086), bank-t251-live1255
+(20 slots @1255). Live copy work/r1/game/RESUME.GAM md5 5b382afb
+UNCHANGED (mtime Oct 29 13:20) — user save intact.
+
+WITNESS MINING (scripts/r1_t251_mine.py; trust=True per t214 law;
+watermark caveat: the timeline holds turns to 1335 so new-session rows
+below the watermark are dropped by trust — the passes below run over the
+TRUSTED corpus as assigned).
+
+1. FIRST POSITIVE ATTACK-EVENT WITNESS IN THE CORPUS (t887, wall
+   15:12:56 -> 15:18:03): att[Minions][Chamachies] 324->284 EXACTLY -40
+   with relation state 1(PEACE)->2(WAR) in the same autosave window, and
+   NO other state/attitude transition in the pair. This is the t204
+   attack-price + t208 chooser cascade observed end-to-end in live data:
+   the victim's row took the -20-per-committed-weapon price (t210 stacking
+   law: -40 == two committed weapons between two 10 s autosaves), the
+   value crossed the DECLARE_WAR threshold (290, t208 pin), and the
+   chooser flipped the pair to WAR. Direction (victim row = Minions) says
+   the FIRING party was Chamachies (owner 0, the player of the old
+   session) — MINUS: Minions self-declaring war with an attitude slam of
+   exactly -40 in their own row is not fully excluded from stream data
+   alone (no ship-window damage event co-located; see 2). Mark-window
+   cross-check: bank-t1254 (same campaign, t1254) holds
+   byte[0x48304+38]==0x1 — FIRST nonzero mark byte ever seen — bit 0 =
+   the contact latch (t206 law: never written by the attack handler), so
+   the VICTIM-BIT side of the window is still zero across every bank: if
+   the player fired at t887, the t205 per-star victim mark (1<<3 for
+   Minions) is NOT present anywhere — either the fire path used was not
+   0x43a4c, or the mark law has an unmapped clear. BOTH readings banked;
+   clamp witness (att slamming exactly to DECL-10=280) still ABSENT
+   (284 != 280: this is the PRICE, not the clamp). OQ-016 row ANNOTATED,
+   stays OPEN (strict-close).
+
+2. DAMAGE CHANNEL NEGATIVE, NARROWED: over 45,227 trusted points,
+   named-owner ship disappearance events = 0; shield-agg (+0x4) decreases
+   = 10, and the t1253->1254 "3 ships lost shields" pair resolves as SLOT
+   REMAP (owner high-u16 0xffff->2 = slot reassignment, t29b aliasing
+   class), not damage. Offset churn census (coords+state+day skipped):
+   high-frequency offsets {0xa8,0x5a,0x88,0x7a,0x82,0x7e,0x5e,0x84,0x68,
+   0x5c,0x60} = bookkeeping/pathing; multi-volley-vs-non-at-war witness (a)
+   NOT observed. Multi-volley proxy (streak) is INVALID for raw window
+   diffs (every live ship's day byte +0x67 changes every turn — t213);
+   streak counts are bookkeeping churn, banked as a trap trap-down.
+
+3. WITNESS (b) LANDS (score.md S4 was corpus-blind): t212's roots
+   (r1sav-*/r1deep-*/playcap ring) MISSED work/r1/bank-*. Scanning banks:
+   bank-t1254 ALL 20 slots turn 1254 V=23 with NINE byte[star+0x15]
+   nonzero rows [2,6,12,16,21,21..44]; bank-t251-live1255 all slots turn
+   1255 V=14 with TEN nonzero rows. SEMANTIC NON-JOIN MEASURED on real
+   mid-campaign slots: V != ownP (23 vs 9; 14 vs 9), V != occ (14 vs 10),
+   V==systems_full in 238/45,227 trusted slots (0%), V==systems_any in
+   4,970 (10%). P7 label settled: star row 2 holds +0x15==0x3 (two races)
+   at both turns — +0x15 is NOT a single-owner bit; t206's vision-byte
+   reading stands. OQ-021 residue shrinks to the writer law ONLY (row
+   stays OPEN, strict-close). V trajectory over the trusted run:
+   {0,1,2,2..23} — the t85b oscillation class reproduces; the 9 intra-turn
+   V->0 dips all coincide with session-boundary slots (wall gaps; the
+   07:43:50 dip precedes the 07:44 relaunch), i.e. LOAD artifacts, not
+   writer oscillation — feeds t255.
+
+CORPUS LAW BANKED (watermark): after any mid-campaign LOAD to a LOWER
+turn, trust=True is blind to the new session (watermark = historic max).
+Mining a post-rewind window needs trust=False + wall-clock pairing
+(r1_stream's own caveat) — used correctly in the --window pass design.
