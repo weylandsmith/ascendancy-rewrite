@@ -106,6 +106,89 @@ colour alone. Implementation (searched, not hand-picked; min hue spread
   (`ui click map (140,160) -> Burphee`). WM-less Xvfb: SDL_CreateWindow's
   WM_NAME is set and findable via XQueryTree + XFetchName.
 
+## 6a. LIVE SCREEN SWEEP 1 dossier (t252, 2026-11-01, display :9 turn 1255)
+
+Harness: scripts/r1_t252_screen.py (click/key + root screenshot + 640x480 crop
+at root offset (80,100) + pixel-diff vs previous step + ring turn check; run
+with the hermes venv python — PIL is only there). Screens:
+work/screens/t252/. Baseline verified healthy galaxy screen, ring turn 1255,
+zero turn drift across every step of this sweep (NEXTTURN never clicked).
+
+Sidebar geometry CONFIRMED from windows.txt (game coords == window-rel, t245
+law) and matched by live clicks at rect CENTERS:
+- STATUS "Planets" 474,130-632,160; FLEET "Ships" 474,169-632,199;
+  RESEARCH 474,208-632,238; SPECIALAB "Special Ability" 474,247-632,277;
+  Intelligence 474,303-632,333 (STATE '1 7' — hidden until Species menu?);
+  RACES 474,286-632,316 "Species" (help 1races: "access the Species menu,
+  where you can contact other species or access the Intelligence Screen").
+- Each button is WINITEMS 2: TEXTITEM 0 + SHAPEITEM 1 from data\1starmap.shp
+  (icon frames 3=Research, 4=Ships, 5=Planets, 7=Special) — the sidebar icons
+  are 1starmap.shp records, a concrete lead for OQ-005 identification.
+
+RESEARCH SCREEN (RESWIN TYPE 9, rect 7,46-476,472, help reswin; children
+RESROTLEFT 524,442-539,472 msg 50, RESROTRIGHT 540,442-554,472 msg 51,
+RESMOVEUP 563,442-593,457 msg 52, RESMOVEDOWN 563,458-593,472 msg 53):
+- Click RESEARCH center (553,223) opened it, 93688 px diff vs galaxy, ring
+  unmoved. Header renders "Chamachies Knowledge" (race name + " Knowledge").
+- LAYOUT IS A NODE GRAPH, not a list: tech nodes = circles connected by lines
+  on black; discovered node renders blue-outlined, current project gold/brown.
+  Right info panel: "Current Project:" + tech icon + name ("Accel Energy
+  Replenishment") + "(15 days)" + "Allows" + unlock name ("Lush Growth Bomb")
+  + its icon. => the original shows ETA in DAYS and the unlock list per tech
+  — same two-number law as the t244 gauge popup, now on RESWIN.
+- Pan widgets CONFIRMED BY PIXEL-DIFF: click (570,455) (RESMOVEUP/DOWN column
+  center) changed 472 px confined to bbox x 552-593 y 222-469 — i.e. the MINIMAP
+  column, not the main field; second click changed 0 px (viewport already at
+  the map edge / same position). The pan buttons themselves draw as minimap
+  insets with red-white double arrows (vision, z_research_arrows.png).
+- NEGSCREEN (320,0-639,479) + ALIENDIP (336,215-632,316) + PLAYERDIP
+  (336,325-632,472): NOT reachable from the galaxy sidebar directly — help
+  1races routes diplomacy through the Species menu (RACES button). See 6b.
+
+## 6b. Species menu, NEGSCREEN negotiation, INTELLIGENCE (t252 cont.)
+
+PATH MAP (measured, ring turn 1255 held through every step, zero drift):
+- RACES "Species" (553,301) from galaxy -> SPECIES MENU: right sidebar renders
+  "3 of 3 Species Known" + race rows (Orfa/Ungooma/Extinct, race-colored
+  names + flag icons) + home-nebula viewport + "Intelligence" item; the
+  galaxy map stays visible and four large race portraits overlay the map
+  (vision). Escape returns to galaxy (back2 vs baseline diff = 161 px, just
+  cursor/star blink noise).
+- Clicking a race row (Orfa row at y~93) opens NEGSCREEN: right half of the
+  screen replaces the sidebar. Layout VERIFIED against windows.txt rects by
+  pixel-band analysis (bright-text row detection, z_dip_full.png):
+  ALIENDIP 336,215-632,316 = alien portrait band + ONE text line (bright band
+  y 252-262); PLAYERDIP 336,325-632,472 = player option list (three option
+  bands measured at y 329-339, 358-367, 387-396 — ~29 px row pitch); the
+  region ABOVE ALIENDIP (y 40-206) is image content (the Third Party / cosdip
+  miniature-galaxy region per help tinyrace/cosdip).
+- Option set rendered at war-adjacent posture: "Goodbye. I trust we'll speak
+  again." / "We declare war on you. Prepare to die." / "We propose an alliance
+  between our peoples." — the emitter menu is posture-dependent (the Ungooma
+  greeting "How can we little %m help you?" is DR_NoDipResponse in
+  race11.dip:173 verbatim, i.e. dialogue lines come from the raceNN.dip
+  DR_* sections with %m/%y species-name substitution [verified file match]).
+- SAFETY: clicked option #1 (Goodbye) at (480,334) — first row center computed
+  from the measured band. Negotiation CLOSED, returned to the species menu,
+  zero turn drift, no war declared, no proposal sent. NEVER click option rows
+  2/3 (declare-war/alliance) without explicit user sign-off.
+- "Intelligence" item (553,311) opens INTELSCREEN (7,7-632,34 header) +
+  INTELLIST (7,46-632,472): header "Chamachies Intelligence"; rows = every
+  known species incl. SELF; columns Fleet/Colonies/Discoveries rendered as
+  RELATIVE symbol counts (triangles/squares-or-circles/diamonds, race-colored)
+  — help intscr verbatim: "symbols represent relative magnitude rather than
+  specific sizes"; relation flags at row right (help: "species flags ...
+  indicate the diplomatic relations"). Observed: Chamachies 10/12/6, Orfa
+  8/8/4, Ungooma 6/6/5 [vision-read, unverified counts — R13 pitfall: trust
+  generated numbers, and none exist here; treat as posture, not data].
+- OQ-005 LEAD (not a closure): sidebar buttons embed SHAPEITEM records from
+  data\1starmap.shp (frames 3=Research 4=Ships 5=Planets 7=Special), NEGSCREEN
+  window-class art = DATA\13NEGOT.SHP, RESWIN era art = DATA\20RES.SHP, ship
+  design = DATA\8SHIPDES.SHP, opening = DATA\0OPENING.SHP, race select =
+  DATA\7RACESEL.SHP (windows.txt SHAPEFILE keys, 9 total). Identification of
+  specific records against these live screens is the sanctioned W3 eyeball
+  route once the codec exists; the codec itself stays blocked (R2).
+
 ## 6. Explicitly NOT in P5a (no fakery)
 
 pan/zoom/layer toggles (children exist in windows.txt but their exe

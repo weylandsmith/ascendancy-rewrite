@@ -260,20 +260,31 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t252 LIVE SCREEN SWEEP 1: RESEARCH + DIPLOMACY (needs a live session; the
-live :9 game is HEALTHY on the galaxy screen at turn 1255 — verified by
-vision this iteration, work/screens/t2/drive_final_t250.png; sweep it now,
-ordering rationale: t253/t254 reuse the same session laws and t255 needs
-more drive data, so the screen sweeps come first while the game is up and
-untouched). Navigate from the galaxy screen with xsend clicks (DISPLAY=:9;
-window-rel coords; the game is modal — Escape backs out). Capture each
-screen to work/screens/, bank a per-screen dossier in docs/re/ui.md (or
-ui-runtime.md): widgets seen vs the windows.txt manifest (RESWIN;
-NEGSCREEN + ALIENDIP/PLAYERDIP), geometry, states. Vision on the in-game
-projector is legitimate (external display); R13 only bans grading OUR
-renders. NEVER click anything that starts a war, ends a turn, or abandons
-a system (t244 abandoned an Abandon-Vega-II dialog by accident — decline
-everything).
+NEXT t253 LIVE SCREEN SWEEP 2: SHIP DESIGN + FLEET + INTEL (ordering
+rationale: reuses the t252 sweep laws verbatim — scripts/r1_t252_screen.py is
+proven on :9 at t1255 with zero turn drift — and t255 needs more drive data,
+so finish the screen sweeps while the game is up and untouched; the game is
+currently PARKED ON THE GALAXY SCREEN, verified final2-vs-baseline 3452 px).
+Navigate from the galaxy screen with xsend clicks (DISPLAY=:9; window-rel
+coords; the game is modal — Escape backs out ONE level per press, t252 law).
+Capture each screen to work/screens/t253/, bank a per-screen dossier in
+docs/re/ui-runtime.md (§6c): FLEET sidebar button (553,184; rect 474,169-632,199)
+-> FLEETWND; SHIPDESSCREEN (7,114-476,472) with its 8 category tabs VERBATIM
+from windows.txt (WEAPONS 485,7-515,37 / HULL 524,7-593,37 / DEFENSES
+602,7-632,37 / ENGINES 485,46-515,76 / SENSORS 524,46-554,76 / ENERGY
+563,46-593,76 / SPECIAL 602,46-632,76, all PARENT SHIPDESSCREEN, art
+8SHIPDES.SHP) + GIZLIST (485,86-632,471); the intel screen was already swept
+t252 (INTELSCREEN/INTELLIST dossier ui-runtime.md §6b) — cross-check its
+symbol counts against ring RAM if cheap, else skip. Cross-check SHIPDESSCREEN
+tab contents against docs/re/ships.md and the gizmo table law
+(ai-dossier/combat.md S2f dispatcher 0x4cd90). Vision on the in-game projector
+is legitimate (external display); R13 only bans grading OUR renders. NEVER
+click anything that starts a war, ends a turn, or abandons a system (t244
+abandoned an Abandon-Vega-II dialog by accident — decline everything); t252
+addition: negotiation PLAYERDIP option rows 2/3 are declare-war/alliance,
+never click. CAUTION t253: the ship design screen may offer DISMISS/SELL
+buttons for live ships — read before clicking, click only category tabs and
+list rows.
 
 PAIRING-SESSION NOTE (t247 handoff, 2026-10-31; turn fact updated t251
 2026-11-01): sentinel-slot law stands — the
@@ -294,22 +305,14 @@ ANY dosbox restart (the t1092 RAM frames were lost this way; t251 banks:
 bank-t251-predrive, bank-t251-live1255). (3) SIGKILL a softlocked dosbox;
 SIGTERM pops its own quit-confirm with (Yes) DEFAULT.
 (4) User save RESUME.GAM md5 5b382afbb7891... (Oct 29) — never overwrite; the
-game writes it only at in-game Save, so self-play cannot corrupt it.
+game writes it only at in-game Save, so self-play cannot corrupt it. [t252
+MEASUREMENT: that md5 lives at work/r1/game/RESUME.GAM.user-oct29; the LIVE
+C:\RESUME.GAM (work/r1/game/RESUME.GAM) is md5 f5ffb840 (81647 B, the seed-
+commit pristine template) — verify the BACKUP md5, not the live one.]
 
-QUEUE (8 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
+QUEUE (7 tasks, one session each; when you finish task tN, rewrite NEXT ACTION
 to the text of task tN+1 VERBATIM — do not renumber, do not compress the other
 rows; keep this QUEUE block intact except deleting the row you completed):
-
-t252 LIVE SCREEN SWEEP 1: RESEARCH + DIPLOMACY (needs a live session; NOT
-  t251's turn — run between drives or on the current one). Navigate from the
-  galaxy screen with xsend clicks (DISPLAY=:9; window-rel coords; the game is
-  modal — Escape backs out). Capture each screen to work/screens/, bank a
-  per-screen dossier in docs/re/ui.md (or ui-runtime.md): widgets seen vs the
-  windows.txt manifest (RESWIN; NEGSCREEN + ALIENDIP/PLAYERDIP), geometry,
-  states. Vision on the in-game projector is legitimate (external display);
-  R13 only bans grading OUR renders. NEVER click anything that starts a war,
-  ends a turn, or abandons a system (t244 abandoned an Abandon-Vega-II dialog
-  by accident — decline everything).
 
 t253 LIVE SCREEN SWEEP 2: SHIP DESIGN + FLEET + INTEL. Same laws as t252
   (SHIPDESSCREEN + 8 category tabs + GIZLIST; FLEETWND; the intel screen).
@@ -387,6 +390,40 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t252 (2026-11-01): LIVE SCREEN SWEEP 1 — RESEARCH + DIPLOMACY (no row
+closed — strict-close honored; dossier docs/re/ui-runtime.md §6a/§6b NEW +
+selfplay.md §5 bullet; 1 tool scripts/r1_t252_screen.py: click/key + root
+shot + 640x480 crop@(80,100) + pixel-diff + ring-turn guard, run via
+hermes-venv python; screens work/screens/t252/). SAFETY RECORD: 16 steps,
+ring turn HELD 1255 through every step (NEXTTURN never clicked), no war, no
+proposal, no abandon; option-row-1 (Goodbye) clicked from a MEASURED band
+(bands 329-339/358-367/387-396, ~29 px pitch) and closed the negotiation
+cleanly; game left PARKED on the galaxy screen (final2 vs baseline 3452 px);
+game/ untouched (git status clean for game/; pristine user backup
+work/r1/game/RESUME.GAM.user-oct29 md5 5b382afb intact; note: the LIVE
+work/r1/game/RESUME.GAM is md5 f5ffb840 = the seed-commit copy of the
+PRISTINE template, 81647 B — the "5b382afb ... never overwrite" note in the
+PAIRING-SESSION NOTE refers to the user-oct29 backup; the live file is the
+self-play scratch copy and self-play never Saves, so both are consistent).
+MEASURED: (1) sidebar rects exact on live (click centers fired STATUS/RESEARCH/
+RACES/Intelligence as windows.txt predicts); button icons ARE 1starmap.shp
+SHAPEITEM records frames 3=Research 4=Ships 5=Planets 7=Special + 9-key
+SHAPEFILE->screen map banked (OQ-005 W3-eyeball targets, codec still R2-blocked).
+(2) RESWIN = NODE GRAPH (blue ring=discovered, gold=current) + right panel
+"Current Project: Accel Energy Replenishment (15 days) Allows Lush Growth
+Bomb"; pan-click (570,455) moved ONLY the minimap column (472 px, bbox
+552-593 x 222-469; 2nd click 0 px = edge). (3) Species menu = sidebar overlay
+("3 of 3 Species Known": Orfa/Ungooma/Extinct) + map portraits; race-row click
+-> NEGSCREEN: ALIENDIP one dialogue line (band 252-262) verbatim raceNN.dip
+DR_NoDipResponse with %m substitution ("How can we little %m help you?" ==
+race11.dip:173); PLAYERDIP posture-dependent option list; Escape unwinds ONE
+level per press (intel 82k-diff -> menu -> galaxy 3.4k). (4) INTELSCREEN/
+INTELLIST: "Chamachies Intelligence", rows incl. self, Fleet/Colonies/
+Discoveries as RELATIVE symbol counts (vision-read 10/12/6, 8/8/4, 6/6/5 —
+flagged unverified per R13 pitfall), relation flags row-right. Ledger:
+OQ-005 + OQ-023 annotated (both keep status), index untouched.
+NEXT = t253 verbatim (ship design + fleet sweep, same laws).
 
 LANDED t251 (2026-11-01): DRIVE 1086->1255 + FIRST POSITIVE ATTACK-CLASS
 CASCADE WITNESS + WITNESS (b) LANDS (no row closed — strict-close honored;

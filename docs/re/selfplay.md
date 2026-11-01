@@ -284,6 +284,13 @@ Tools: scripts/r1_t249b_dayscan.py; working log docs/re/_wip_t249b.md S1..S6.
 Open questions for any future supervised run: click precision on small
 widgets (50px buttons, worked first try on Planets + NEXTTURN band),
 scrollbar/list navigation untested, combat UI never entered yet.
+- SPECIES-MENU STACK (t252, all zero turn drift): RACES (553,301) opens the
+  species sidebar overlay; race row click opens NEGSCREEN; "Intelligence"
+  (553,311) opens INTELSCREEN. Escape unwinds ONE level per press
+  (intel -> species menu -> galaxy; measured by pixel-diff vs baseline:
+  82k -> 3.4k). Negotiation option rows are ~29px pitch starting y~334 —
+  row 1 (Goodbye) verified safe-closing; rows 2/3 are declare-war/alliance,
+  NEVER click without user sign-off. Full dossier ui-runtime.md §6a/6b.
 Campaign safety record this session: RESUME.GAM md5 unchanged (5b382afb)
 throughout; zero turns advanced (NEXTTURN clicks landed on the modal planet
 screen); zero in-game Saves; user save backed up to RESUME.GAM.user-oct29.

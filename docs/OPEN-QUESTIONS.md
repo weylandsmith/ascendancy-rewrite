@@ -496,6 +496,17 @@ t1335, scripts/r1_t188_state3_arbiter.py RC=0 re-run; law docs/re/
 diplomacy.md §13+§16; rewrite code site unchanged, diplomacy.cpp:227/:244
 cited; engine-build residual — trade/third-party emitter + receiver-rung
 parameter — tracked in docs/PLAN.md A7, NOT an RE unknown) |
+POST-CLOSURE ANNOTATION t252 (2026-11-01, LIVE SWEEP 1, ui-runtime.md §6b):
+player-side negotiation UI MEASURED live at t1255 — NEGSCREEN opens from the
+Species-menu race row (NOT the galaxy sidebar); ALIENDIP renders one dialogue
+line (band y 252-262) whose text is the raceNN.dip DR_* section verbatim with
+%m/%y substitution (Ungooma "How can we little %m help you?" == race11.dip:173
+DR_NoDipResponse); PLAYERDIP renders the option list at ~29 px pitch (bands
+329-339/358-367/387-396) and the rendered set is POSTURE-DEPENDENT (observed:
+Goodbye / declare-war / propose-alliance). Option #1 click closes the
+negotiation back to the species menu, zero turn drift. Row STAYS CLOSED (the
+closure evidence is t189b's; this annotation only feeds the A7 engine-build
+residual with the receiver-side UI shape).
 OQ-024 | loop | planet GOVERNOR assignment law (@0x38df0 branch of
 FUN_00038ba4: '!' -> PROS += IND>>2, '"' -> RES += IND>>2; S6 line 45 read
 +0x54 as a governor byte) | CLOSED t45 | FULL STATIC MEASUREMENT
@@ -721,6 +732,7 @@ stays unmeasured — row stays OPEN, residue restated as "12 addressable-empty
 + 3 unreachable spares" instead of "44 dims-unknowns incl. cos_star 12".
 Also adjudicated: cosmos site 0x2a223 is a relation BADGE blit (SEL 9 =
 ALLIANCE, 8 = WAR, -1 = skip; t189 relation-state byte), NOT star art.
+STATUS t252 (2026-11-01, LIVE SWEEP 1, docs/re/ui-runtime.md §6a/6b): window-class SHAPEFILE map MEASURED from windows.txt and corroborated live — sidebar button icons ARE 1starmap.shp SHAPEITEM records (frames 3=Research 4=Ships 5=Planets 7=Special), NEGSCREEN class art = 13NEGOT.SHP, research screen = 20RES.SHP, ship design = 8SHIPDES.SHP (9 SHAPEFILE keys total). Screens opened live at t1255 with zero turn drift: RESWIN renders a NODE GRAPH (discovered=blue ring, current=gold) + right panel "Current Project: Accel Energy Replenishment (15 days) Allows Lush Growth Bomb"; pan clicks at RESMOVEUP/DOWN center (570,455) moved ONLY the minimap column (bbox x552-593 y222-469, 472px; 2nd click 0px = edge). These are W3-eyeball identification targets for record-level IDs once the codec exists. Row STAYS OPEN (strict-close): codec still blocked (R2); no record-id fold from this sweep yet.
 OQ-006 | audio | sample rate/channel count of 77 headerless .voc + 29 .raw
 (current default 22050 mono) | CLOSED 2026-10-07: DEVICE rate = 22050 MEASURED
 — open chain PUSH 0x5622 @0x4f690/@0x4f90b -> CALL 0x68816 -> unique edge
