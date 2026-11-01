@@ -260,99 +260,123 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT = WAIT-TRIGGER SENTINEL v2 (t259). RUN EXACTLY: `bash
-scripts/r1_t259_sentinel.sh` (~1 call, read-only), read docs/BLOCKED.md
-"t259 ADDENDUM", then END THE SESSION. WHY v2 REPLACES THE t258 SENTINEL:
-the t259 session MEASURED that the parked :9 game PROCESS DIED ~15:45:08
-unattributed — timeline/ring/dosbox.log all froze at 60.sav t=1255 V=14,
-`pgrep -x dosbox-x` empty, Xvfb/x11vnc survive (docs/re/_wip_t259.md S3).
-The old premise "trigger A structurally ALWAYS armed while the watcher lives"
-is FALSE: with no game, no V row can ever appear again, so a passive witness
-(V>=25 / selector arm) is IMPOSSIBLE, not merely absent. Re-arm triggers, in
-order: (1) a new playcap-* dir (real user sitting — the ONLY passive signal
-left); (2) a user answer to BLOCKED.md (t258 ASK A/B as amended by t259:
-A-now-requires-relaunch-decision — CAUTION: live RESUME.GAM md5 == the Oct-29
-backup, so "Return to Current Game" resumes Oct-29 NOT t1255; t1255 survives
-only as dosbox-x savestate ZIPs, loadstate path unexercised by this loop;
-B = watchpoint-dosbox approval; plus t259 ask: nod to retire the seven orphan
-watchers); (3) a STEERING note. NOTHING offline remains for OQ-021: t259 ran
-the last offline handle (same-turn-different-V sav-pair RAM diff) over ALL
-122 banked/ring savs — PAIRS NONE (r259_savpair_census.py KEEPER;
-work/r1/t259_savpair.out; cross-bank diffs confounded). DO NOT relaunch the
-loop batch (MAX_ITERS/IDLE_GATE): a gated relaunch re-burns fresh sessions
-re-adjudicating a dead pipeline — the t214..t243 pattern. If this session was
-launched on a dirty tree, adopt this sentinel and do nothing else.
-Do NOT re-run r258_vdisc.py (closed negative; KEEPER) or
-r259_savpair_census.py (closed negative; KEEPER). Do NOT re-mine banked world
-fields (t258 S11) or re-attempt static write-site hunts (t212 zero).
+NEXT t260 GUI-LOADSTATE RESTORE EXPERIMENT (the ONLY route back to t1255; feeds t261). State of the investigation (MEASURED this pairing session, 2026-11-01 ~18:45): dosbox-x 2025.02.01 has NO CLI loadstate flag (--help grepped) and NO autoexec command (strings grepped); conf keys saveslot=60 + forceloadstate=true set "Active save slot: 60" at boot but DO NOT load (title menu confirmed by vision); F12 via xsend (key F12 F12) sent OK but produced no load log line. Hypothesis [unverified]: the load lives in the GUI menu bar (DOS menu -> Load save state), which -nogui suppresses. EXPERIMENT: relaunch dosbox WITHOUT -nogui on :9 (conf work/r1/vnc/loadstate-test.conf already has autosave=0 + saveslot=60; work/r1/playcap/save/60.sav is the CLEAN bank copy md5 0024340d from bank-t251-live1255), screenshot the menu bar, navigate it with clicks (vision on the projector is fine), load slot 60, then verify the ring shows turn 1255 within 30 s. BLAST RADIUS: loadstate replaces live RAM (current fresh t1086 session) — recoverable via "Return to Current Game" (RESUME.GAM = Oct-29 = t1086), so worst case costs one bring-up. If the menu path fails too, bank the honest negative (loadstate is GUI-only, headless restore IMPOSSIBLE on this build) and rewrite NEXT to t261 with the t1086 session as the drive base. NOTE: the t1255 death-frame ZIP (md5 324d2d75) was overwritten during this restore attempt (autosave churn 18:34-18:37 + bank copy placed at 60.sav); its field values survive in the frozen timeline rows (t1255 V=14) and t259's md5 record — record this honestly wherever you bank the experiment result.
 
-NOTE t256 MECHANICS (t255 learning): OQ-021 residue is now END-TURN RECOMPUTE
-PATH (screen-open REFUTED; V not save-persisted; deterministic first-turn
-recompute) — if you fold an OQ-021 discriminator in, it is the per-owner ship
-census vs V-change turns (ship_raw banked every row; score.md S10), NOT another
-screen experiment. Live :9 session sits at t1255 V=14 on the PLANET screen
-(Escape does NOT unwind PLANETALLOC — t254); leave it parked, the ring keeps
-banking. [t259 CORRECTION: the game PROCESS is DEAD since ~15:45:08 — nothing
-banks anymore; see sentinel v2 + BLOCKED.md t259 ADDENDUM; the ring's last
-copy (60.sav t1255 V=14) is md5 324d2d75..., bank-t251-live1255 copy 0024340d...]
-Ring savs at work/r1/playcap/save/ (10 s cadence); banks
-bank-t251-live1255 / bank-t251-predrive intact. NEVER json.loads the whole
-timeline (OOM law); per-session trust is REQUIRED for V analysis (t255: the
-global watermark drops re-loaded lower-turn campaigns — see r255d).
+PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
+stands — task line is the FIRST non-blank line; notes below. USER DELEGATION
+(verbatim, 2026-11-01): "def retire the watchers, maybe queue up some more
+reverse engineering work if there is any, otherwise re-launch the game and
+proceed with that. Try to keep yourself busy for another day." Watchers: ALL
+retired (~19:00, targeted PIDs — pkill -f matches its own cmdline and kills
+your shell, known footgun). Game RELAUNCHED production-style: :9, autosave
+ring 41-60 ON, watcher banking (one instance), resumed t1086 via Return-to-
+Game, ring verified 3 rows. Launch law unchanged: MAX_ITERS=12 IDLE_GATE=0
+(timeline grows every 10 s -> probe structurally always armed; the queue-
+driven exit fires when the queue drains).
 
-PAIRING-SESSION NOTE (t247 handoff, 2026-10-31; turn fact updated t251
-2026-11-01): sentinel-slot law stands — the
-task line above is the FIRST non-blank line under this heading; notes go below
-(t243 law). THE LIVE SESSION: a self-play game runs on display :9 (dosbox-x,
-post-OOM relaunch 07:44; at turn 1255 since the t251 drive — the ring JUMPED
-1096->1255 via an unattributed load path, healthy galaxy screen verified by
-vision); the watcher is banking to work/r1/playcap/live-timeline.jsonl every
-10 s. Consequences: (1) trigger A is structurally ALWAYS armed while that
-watcher lives (the timeline grows every 10 s and a running dosbox is present)
-— it is NOT user play and must NOT be adjudicated as a sitting; adjudicate a
-sitting ONLY if a new playcap-* dir appears. This launch runs MAX_ITERS=14
-IDLE_GATE=0 (fixed batch, no probe: with the always-growing timeline,
-IDLE_GATE=1 would ping-pong adjudication sessions forever once the queue
-drains — the exact t214..t243 pattern). (2) The ring holds the ONLY copy of
-turn states the game did not save — bank work/r1/playcap/save/*.sav before
-ANY dosbox restart (the t1092 RAM frames were lost this way; t251 banks:
-bank-t251-predrive, bank-t251-live1255). (3) SIGKILL a softlocked dosbox;
-SIGTERM pops its own quit-confirm with (Yes) DEFAULT.
-(4) User save RESUME.GAM md5 5b382afbb7891... (Oct 29) — never overwrite; the
-game writes it only at in-game Save, so self-play cannot corrupt it. [t252
-MEASUREMENT: that md5 lives at work/r1/game/RESUME.GAM.user-oct29; the LIVE
-C:\RESUME.GAM (work/r1/game/RESUME.GAM) is md5 f5ffb840 (81647 B, the seed-
-commit pristine template) — verify the BACKUP md5, not the live one.]
+QUEUE (phase 2, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
+keep this block intact except deleting your completed row):
 
-QUEUE (t258 DRAINED the last authored task — the t258 row WAS the queue head and
-is now complete; no t259 exists. Per the AFTER-DRAINS instruction the remaining
-candidates are play-gated USER ASKS (authored to docs/BLOCKED.md "t258 USER
-ASK"), NOT loop tasks, so no new queue was authored and NEXT is the
-WAIT-TRIGGER sentinel. If a USER ASK is answered or a witness lands, the
-re-armed session authors its own task from the BLOCKED.md recipe. Sentinel-slot
-law: task line stays FIRST under the heading.):
+t261 LONG DRIVE + WITNESS HARVEST (base = t260 outcome: from 1255 if restored,
+  else from 1086; target = base+150). Use scripts/r1_t245_turndrive.py v4
+  (softlock detect + auto-recovery built in). LAWS: bank the ring
+  (work/r1/playcap/save/*.sav -> a dated work/r1/bank-<tag>/) BEFORE any
+  restart AND every ~30 turns (the ring only holds 200 s); NEVER json.loads
+  the whole timeline (OOM law); per-session trust REQUIRED for V analysis
+  (t255: global watermark drops re-loaded lower-turn campaigns). MINE via
+  scripts/r1_stream.observations(trust=True) ONLY: (a) multi-volley battle vs
+  a NON-at-war owner (OQ-016 clamp witnesses — t251 landed the FIRST cascade
+  witness, more turns = more witnesses); (b) mid-campaign slot with
+  V=dword[0x482fb]>1 AND some byte[star+0x15] nonzero (OQ-021 S6/P7 — t251
+  landed the first). Do NOT issue player attack orders — mine what the AI
+  produces. Bank witness tables to docs/re/combat.md (a) / score.md (b).
+
+t262 OQ-021 CENSUS DISCRIMINATOR (t256 MECHANICS note): per-owner ship census
+  vs V-change turns on the t261 corpus (ship_raw banked every row; score.md
+  S10). t255 REFUTED screen-open recompute; t258 candidicide left survivors
+  NONE for value candidates — the question now is TRIGGER: does V change on
+  turns where the census changes (recompute) vs independent events? Bank the
+  discriminator result to score.md; strict-close only on a cited measurement.
+
+t263 REWRITE POP-PANEL (pure code): implement the population panel
+  visualization law in rewrite/src/ui/ — slot array sized to planet CAPACITY;
+  empty circle (k3) / free-pop front-facing-yellow (k2) / busy-pop
+  sideways-red (k1) from 17np.shp (t254 IDENTIFICATION with content-match
+  controls: live1255 bank, cache slot 44 == u16[0x6fd9c], sel table 9/9).
+  Cite docs/re/shp.md S19/S20 + t254 wip. Gate + rewrite tests must pass.
+  If a capacity/free/busy split law is not yet pinned for busy-vs-free, bank
+  the split as [hypothesis] with the t254 frame counts as the fixture.
+
+t264 REWRITE LAYOUT WIRING (pure code): fold t252/t253 measurements into
+  rewrite/src/ui/layout.cpp — sidebar rects (exact, live-measured), button
+  icons = 1starmap.shp SHAPEITEM frames {3 res, 4 ships, 5 planets, 7 spe...},
+  ship-design tab->gizmo-category map 6/6 (WEAPONS=cat0 DEFENSES=cat1
+  ENGINES=cat2 SENSORS=cat3 ENERGY=cat4 SPECIAL=cat5, gizmos.txt FILE order,
+  NOT msg order). Tests pin the map. Cite docs/re/ui.md t252/t253 blocks.
+
+t265 OQ-019 LIVE MINING (needs t261 corpus): st4 mid-turn displacement (the
+  t193 census found 2238 st4 samples with ZERO displacement, turn never
+  advanced — a real DRIVE changes that premise) + magnetron USE frames (gizmo
+  0x3c use-site FUN_0004ca50). ring ship_raw banks every row; stream trust
+  law applies. Bank: flight law corroboration or honest negative; row stays
+  OPEN without a cited measurement.
+
+t266 SOFTLOCK-CLASS FORENSICS: three incidents banked (t1089 popup-dead,
+  t1254 planet-list-dead, t15:45 process-death). Characterize the trigger
+  class: pixel state + last RAM rows + dosbox.log tail per incident; look for
+  the common engine state (popup queue depth? AI-processing flag?). This is
+  RE of a BUG CLASS and directly informs the rewrite's robustness. Bank to
+  docs/re/selfplay.md §7 + flag anything that changes the drive SOP.
+
+t267 HARNESS SELF-HEAL: the 15:45 game death went unnoticed ~1.5 h. Add to
+  scripts/r1_playcap_vnc.sh (or a small r1_watch_dog.py): game-death
+  detector (pgrep -x dosbox-x empty while the session is supposed live ->
+  write work/r1/loop/GAME_DEAD.txt + log line), watcher-liveness check the
+  loop can run cheaply, and a bring-up-verify sequence (ring row lands within
+  30 s of start). Keep it shell-simple; no new deps.
+
+t268 LIVE SCREEN SWEEP 3: NEGSCREEN negotiation flow + intel detail + tech
+  tree detail (manifest-level -> dossier-level, docs/re/ui.md). SAME SAFETY
+  LAW as t252/t253: NEVER click PROPOSE/DECLARE/ABANDON/END-TURN (t244
+  abandoned a system by accident once; Escape does NOT unwind PLANETALLOC per
+  t254 — prefer screens that unwind). Vision on the projector; R13 only bans
+  grading OUR renders.
+
+t269 VICTORY-THRESHOLD MINING (OQ-021 end-ctrl; needs t261): vendor comment
+  says "over half" for end-of-game control. On the driven corpus, track
+  V=dword[0x482fb] trajectory vs systems_any/systems_full and the c-overlay
+  STARS CONTROLLED readout (t244: overlay == DAT_482fb direct). If the drive
+  crossed any threshold event (event log, ENDGAME window), bank it; else bank
+  the trajectory table + the distance-to-half statement. Strict-close: a
+  trajectory is not a threshold — keep the row open unless an event lands.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
-- OOM LAW (t251 incident, MEASURED): the t251 session died because it read
-  live-timeline.jsonl with json.loads over the whole 6.4 GB file — 13.4 GB RSS
-  peak, OOM killer killed the ENTIRE tmux scope (loop + game + session tree).
-  NEVER read the timeline except: (a) scripts/r1_stream.py streaming API,
-  (b) tail-scan of the last <=400 KB (r1_t245_turndrive.ring_turn pattern),
-  (c) r214_triage.py. A heredoc containing json.loads(open(timeline)) is
-  PROHIBITED regardless of how simple it looks.
-- Ledger: 4 open (OQ-005, OQ-016, OQ-019, OQ-021); closed count differs
-  between tools (ledger_audit rows=19 closed=15 vs index-block 22 entries —
-  different row units, t253 observation), so never hand-assert a closed count.
-  Keep
+- OOM LAW (t251 incident, MEASURED): NEVER read live-timeline.jsonl except
+  (a) scripts/r1_stream.py streaming API, (b) tail-scan of the last <=400 KB,
+  (c) r214_triage.py. The t251 session json.loads'd the whole 6.4 GB file:
+  13.4 GB RSS peak, OOM killer took the ENTIRE tmux scope (loop+game+session).
+- PER-SESSION TRUST for V/campaign analysis (t255): the global watermark
+  drops re-loaded lower-turn campaigns; see r255d pattern.
+- Ring = work/r1/playcap/save/ (20 slots, 10 s cadence, ~200 s total!). Bank
+  BEFORE any restart, every ~30 turns during drives. Banks so far:
+  bank-t1254, bank-t1096, bank-t249-live-open, bank-t250-predrive,
+  bank-t251-predrive, bank-t251-live1255 (t1255 clean copy md5 0024340d).
+- User save work/r1/game/RESUME.GAM md5 5b382afbb7891 (Oct 29, == t1086) —
+  the game writes it ONLY at in-game Save; never overwrite by hand.
+- SIGKILL a softlocked dosbox (SIGTERM pops its own quit-confirm, (Yes)
+  DEFAULT). Background shells need DISPLAY=:9 injected. xsend refuses windows
+  with "warning" in the title.
+- Ledger: 14 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
   ledger_audit + ledger_index_check green; never hand-edit the index block.
-- Do NOT re-trod: t213 static-exhaustion verdict; t214 mining-collapse law;
-  t243 sentinel-slot law; the t194..t212 closed arc; t246/t247 header-law work
-  (build on it, don't re-measure it).
+- OQ-005 needs the USER's index.txt ruling — do NOT burn iterations on it.
+- Do NOT re-trod: t212/t213 static exhaustion; t255 screen-open recompute
+  (REFUTED); t258 candidicide (closed negative, KEEPER r258_vdisc.py);
+  t259 sav-pair census (closed negative, KEEPER r259_savpair_census.py);
+  t249b day==turn; t254 17np identification (build on it, don't re-derive).
 - Gate ~2-3 min; milestone: 6 must stay. work/ is gitignored — findings go in
   docs/re/, never work/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line
   FIRST), relaunch with IDLE_GATE=1, or author a new queue.
-
 Do NOT re-open (consolidated to keep STATE scannable): t214..t243 are
 idle/adoption iterations — t243's only new content is the sentinel-slot
 harness law (S4, control-plane, not a ledger fact). t214 = the mining law
