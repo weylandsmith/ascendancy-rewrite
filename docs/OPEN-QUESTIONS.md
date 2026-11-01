@@ -1512,7 +1512,19 @@ OQ-026. OQ-019's OWN residue re-probed and still NOT falsifiable: 2238 st4
 samples in the sitting window, 10 (turn,slot) pairs, ZERO mid-turn
 displacement, and the game never left t=1086 (639 rows 12:55:59..13:22:12,
 turn advance absent) — the live in-system march needs a sitting that PASSES
-turns while a ship is in-system. | open |
+turns while a ship is in-system. STATUS t256c (AI GAP ROW 16 DISPOSITION,
+docs/re/ai-dossier.md S11 + _wip_t256c.md; tool scripts/r256c_shipstate.py
+RC=0 — first full per-ship ORDER-STATE census: 62,762 trusted rows / 25
+sessions / t240..1335): live order-kind set is exactly {1..5} (kind 0 ONLY on
+dead slots, imm0 0x24a00 law); AI holds kind 2 ZERO times; travel/arrival
+pair kind4<->kind5 symmetric 416/416 in self-play (0x220a8/0x21f58); retreat-
+downgrade 0x220f2 fired 143x (both owners); Invasion Module 0x49 carriers in
+480 distinct ships — every §5/t179 law INPUT is observable in the ORIGINAL
+and NONE is representable in the rewrite's transit-only fleet_ vector. Row 16
+relabelled GAP->BOUNDARY (aggregate model accepted permanently); this row
+(OQ-019) is where the per-ship build lives and it STAYS OPEN (strict-close:
+the census informs the boundary, it closes no law; the st4 in-system march
+residue unchanged). | open |
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

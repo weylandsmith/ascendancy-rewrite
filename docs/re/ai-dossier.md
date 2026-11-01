@@ -325,14 +325,14 @@ engine never evaluates the enemy's order of battle.
 | 13 | Diplomacy-on-attack attitude cost (0x43a4c) | MODELLED t204 (law re-verified verbatim + first caller census — exactly 3 callers, combat damage-apply 0x4b875 fires BEFORE the shield/hull subtraction; subtrahend key is the BYTE at [0x13bc4] (t87 said word), live ==1 20/20 saves => -20/-40; state-3 CEILING guarantees alliance death (diplomacy.md §17); attacked-bitmap [0x48304] mirrored by Campaign::attacked_ PERMANENT; pins test_diponattack_t204.cpp x4 incl. e2e cascade + ceiling; residues: zero in-corpus attack-event witnesses [0x48304]==0 20/20, AI-AI engagements have no attitude cell (row-12 projection); planet-event callers BOTH READ t207 — bombard 0x39f00 honest NO-DELTA [fire-and-forget price, no per-ship gunnery channel], invasion 0x3a174 GUARANTEE-WAR clamp WIRED t207 + POSITIVE e2e pinned t208 [invasion_capture_war_e2e_t208: capture -> -20 -> clamp DECL-10 -> chooser DeclareWar], residue = per-ship invasion/bombard channel [OQ-019 family]; per-shot stacking RESOLVED t210: STACKING IS REAL but per COMMITTED WEAPON/PER-VICTIM, not per shot — 0x4b740's 0x43a4c leg is mode==1-gated (@0x4b7f1) and the volley loop 0x4a5c1 is mode-0 (0x4a5ec); mode-1 multipliers = commit loop 0x2550c (one arm-activation per matched gizmo, 0x25560 gun/0x25570 ability) + cat-5 splash loops 0x4d0a5/0x4d2ab in 0x4cd90 (per other-entity / per hostile-alive-power victim, mode-invariant [esp+0x73c]); rewrite per-engagement charge = DOCUMENTED UNDER-MODEL (OQ-019 boundary, no semantic change — docs/re/_wip_t210.md S1..S6); t211 CLOSES the commit-chain tail: 0x49f28 three-arm dispatch (cl==0 travel 0x49f54 / cl==1 attack 0x4a360 / cl>=2 no-op result 0), SECOND-DOOR NEGATIVE (0x49f54 sole entry 0x49f37, depth-3 callee closure zero attack-family hits, zero indirect edges; 0x4a360 sole entry 0x49f45; scanner control = reproduces t210's six callers), phase-flip block 0x4a350 UNBOUND corpus-wide (zero static edges/image dwords/RAM dwords == P0+0x4a350), splash bound NAMED = 4*FUN_00022304([ship+0x59]) co-located ship count (kinds 1/2/3 key by star record 0x13bc5+96*idx, kind 4 raw lane handle) — docs/re/_wip_t211.md S1..S6) | combatPhase (0x4b875-position call) + applyAttackDipCost (diplomacy.cpp) |
 | 14 | Combat: deterministic damage, ordered cat-0 volley, shield-then-hull two-layer absorb, death at <1 (S2g/S2h, OQ-010 CLOSED t89) | MODELLED at empire-aggregate level (volley = Σ researched weapon Levels; shield absorb as clamped split) | attackScore :1249, defenseScore :1282, shieldChargesFor :1295 |
 | 15 | Same-system gate (order kind 4 + identical system object) | NOT REPRESENTABLE — rewrite has no ship positions or system objects | combatPhase :1325 |
-| 16 | Per-ship order kinds {0..5}, stickiness, congregation, retreat-downgrade, invasion-module carrier (§5, t179 P1/P3) | **GAP (largest)** — rewrite has no per-ship model whatsoever; A5 name tie still open | none |
+| 16 | Per-ship order kinds {0..5}, stickiness, congregation, retreat-downgrade, invasion-module carrier (§5, t179 P1/P3) | **BOUNDARY — AGGREGATE MODEL ACCEPTED PERMANENTLY t256c** (was "GAP (largest)"; the label was accurate as a description of the rewrite's state but wrong as a work queue: no iteration short of the OQ-019 per-ship build can close it, and §11 rationale (a)-(d) below says closing it would ADD un-witnessed behaviour). The cited laws are ALL functions of per-ship state the rewrite does not model at all (order kind +0x58, order target +0x59, gizmo ring +0xab, position/system membership) — this is the "does the sim have ships" question, not an AI question. t256c MEASUREMENT (scripts/r256c_shipstate.py, 62,762 trusted rows / 25 sessions / t240..1335): live kind set is exactly {1..5} (kind 0 ONLY on dead slots — the imm0 0x24a00 command-clear law); AI holds kind 2 ZERO times (player-command issuer 0x3ca60); the travel/arrival pair kind4<->kind5 is symmetric 416/416 in self-play (0x220a8/0x21f58); the retreat-downgrade 0x220f2 fired 143 times (both owners); Invasion Module 0x49 carriers exist in RAM (480 distinct ships) — so every input the law needs is observable in the ORIGINAL, and none of it is representable in the rewrite's transit-only fleet_ vector. A5 name tie still open (unchanged). | none (boundary) |
 | 17 | AI acts through the player's own command primitives (§1 P8) | DIVERGENT — rewrite phases are direct state mutation | campaign.cpp advance() |
 
-Priority read for whoever picks up code work: #16 dwarfs everything (it is the
-"does the sim have ships" question, not an AI question), then #3+#4 (a threat
-input and a demolish channel would make the AI's economic behaviour visibly
-match stock), then #13 (attitude cost of attacking — one call site, and it is
-the only thing that makes AI-AI relations reactive to what they see).
+Priority read for whoever picks up code work (UPDATED t256c): #16 is a
+DECIDED BOUNDARY (aggregate accepted; see S11), so it is no longer queueable
+as an AI task — it only re-opens inside an OQ-019 per-ship build. The live
+code queue is now #13's per-commit residual and any OQ-019 work; #3+#4 landed
+t201/t202b.
 
 ## 9. PLAIN (player-facing restatement)
 
@@ -416,3 +416,63 @@ orbitalThreatFor wired into buildPhase AI branch BEFORE scoring
 (0x3f4d5 ordering); digQueuedOrDone armed by the rock event (same
 original branch); pin TEST(campaign_emergency_chain_law_t201) — 115
 tests 0 failed.
+
+## S11 (t256c) — GAP ROW 16 DISPOSITION: AGGREGATE MODEL ACCEPTED PERMANENTLY
+
+DECISION (the task asked: accept-with-reasons or scope the minimal per-ship
+state). ACCEPTED. Rationale, each leg cited:
+
+(a) SCOPE MISMATCH, not a stub. The rewrite's only ship state is
+    `fleet_ : std::vector<ShipInTransit{owner,from,target}>`
+    (campaign.h:614) — a transit list consumed and cleared by
+    expansionPhase (campaign.cpp:1434/1446) plus Repel/Bump erase sites
+    (1650..1678). Every §5/t179 law is a function of per-ship fields
+    (+0x58 kind, +0x59 target, +0xab gizmo ring, system membership via
+    +0x59's star record) that this struct cannot hold. Wiring stickiness or
+    congregation onto it would mean inventing per-ship state — that IS the
+    OQ-019 build, whose observable route is BLOCKED-USER (t58: zero
+    save-observable flight in idle AND scripted corpora; closure needs
+    original-hardware/gameplay capture).
+
+(b) THE CENSUS SHOWS THE AGGREGATE PROJECTION IS NOT DISTORTED IN CAPTURED
+    PLAY. 62,762 trusted rows / 25 sessions / t240..1335
+    (scripts/r256c_shipstate.py): kind changes fire at 0.107% of slot-pair
+    observations, the AI's whole order machinery reduces in-corpus to two
+    observable events — the travel/arrival pair 4<->5 (416/416 symmetric)
+    and the retreat-downgrade 1|2|3->4 (143) — and the rewrite's
+    transit-only model already reproduces the FIRST (a ship leaves a star
+    and arrives next phase). Nothing in the corpus exhibits a law the
+    aggregate model gets observably WRONG, the way row 12's ladder and row
+    4's demolish channel did before they were wired.
+
+(c) ADDING A GUESSED PER-SHIP LAYER WOULD CREATE NEVER-WITNESSED BEHAVIOUR.
+    The AI never holds kind 2 (0/981k+ AI slot-obs); kind 3 is 2 obs; ACT=2
+    (the act-legality leg of the decider) fired 17 times corpus-wide. A
+    minimal state added to "close" row 16 would mostly drive those arms —
+    behaviour the RE corpus never saw. Same discipline as t256b row 12:
+    guessing adds, measurement informs.
+
+(d) THE FIRING LAWS REMAIN CITED FOR THE FUTURE BUILD. §5 (decider
+    FUN_00040178, stickiness return set {1,2,5}, congregation law
+    FUN_0004aa10 over the lane table, 0x220f2 downgrade), t179 P1 (power
+    tie-break on +0x88, re-decision on act==0), t179 P3 (invasion carrier
+    = first kind-4 ship with gizmo slot 0x49). An OQ-019-boundary build can
+    wire them verbatim without new RE — the remainder is ENGINE BUILD,
+    exactly like OQ-023's A7 residual and row 12's ladder.
+
+MEASUREMENT CAVEATS BANKED (honest negatives):
+- sticky_kept=1,160,582 does NOT independently prove stickiness: the live
+  ring parks at t1255 and re-samples the same state every 10 s; only
+  turn-advancing rows can test the law, and the 1,938-change census is
+  merely CONSISTENT with it.
+- Slot identity across rows is assumed (owner-equal filter guards remaps per
+  the t251 slot-remap law, but a same-owner remap would leak).
+- The gizmo ring was decoded from the watcher's u16 window at byte offsets
+  0xab+7i with count dword +0x15a (ships.md:294/632 law); 0x49 carrier counts
+  depend on that law, not on a fresh RAM read.
+
+LEDGER EFFECT: none closed (strict-close). OQ-019 annotated with this
+census (it is the row the boundary belongs to) and STAYS OPEN. NO rewrite
+code change; NO pin added (a pin would freeze a boundary, not a law). Gate +
+137 rewrite tests must stand unchanged.
+

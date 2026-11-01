@@ -101,6 +101,15 @@ struct PlanetState {
 };
 
 struct ShipInTransit {
+    // GAP ROW 16 BOUNDARY (accepted t256c, docs/re/ai-dossier.md S11): this
+    // transit-only struct is the rewrite's ENTIRE ship state. The cited
+    // per-ship order laws (ai-dossier §5: kind +0x58, stickiness {1,2,5},
+    // congregation, 0x220f2 retreat-downgrade; t179 P1 power tie-break,
+    // t179 P3 invasion-module carrier) are NOT wireable here and were
+    // deliberately NOT stubbed — adding guessed per-ship state would create
+    // behaviour the corpus never witnessed (AI kind-2: 0 obs; ACT=2: 17 obs
+    // over 1.8M slot-obs, scripts/r256c_shipstate.py). Implement them only
+    // inside a real per-ship build (OQ-019), verbatim from §5.
     int owner = 0;
     int from = 0;
     int target = 0;

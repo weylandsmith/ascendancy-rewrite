@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T14:35
+updated: 2026-11-01T15:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,16 +260,22 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t256c AI GAP ROW 16 DISPOSITION. docs/re/ai-dossier.md gap map row 16
-(per-ship order kinds {0..5}, stickiness, congregation, retreat-downgrade,
-invasion-module carrier — §5, t179 P1/P3). The "NOT REPRESENTABLE" note
-applies (rewrite has no ship positions/system objects); DECIDE AND BANK the
-disposition: either accept the aggregate model permanently with the cited
-reasons (and correct row 16's "GAP (largest)" label to a documented
-boundary), or scope the minimal per-ship state the cited laws need. No
-silent stub either way. Gate + rewrite tests must pass.
-(ordering rationale: t256b landed row 12; the queue row order says row 16 is
-next and t257 stays queued last.)
+NEXT t257 WATCHER SCHEMA + DAY FIELD (needs t249b). t249b PINNED the day
+(dword): DAY == TURN, measured three ways (selfplay.md "t249b"; the only
+counter-like intersection is the turn dword itself, member 0x254e98 == data
+X=0x12e10; no maintained day scalar exists at any stable data-seg offset).
+So per the queue text's first branch: add the field to
+scripts/r1_playcap_watch.py (append-path open at line ~146; keep the
+16-field key shape backward-compatible — r214_triage asserts ONE key shape,
+so update it too), relaunch the watcher cleanly (do NOT stack a duplicate;
+there are already orphans 260988/290953/292085 + others — the user's call to
+retire them), and verify new rows carry the field within 30 s. NOTE (t249b):
+a literal day key is a PURE ALIAS of turn — implement it as `"day": turn`
+(no second read, no new scan). If mid-work you find the alias would break
+the one-key-shape assertion, prefer folding the candidate list forward per
+the queue's second branch and say so explicitly.
+(ordering rationale: t256c landed gap row 16; t257 is the last queued task —
+after it drains, author a new queue per the AFTER-DRAINS note.)
 
 NOTE t256 MECHANICS (t255 learning): OQ-021 residue is now END-TURN RECOMPUTE
 PATH (screen-open REFUTED; V not save-persisted; deterministic first-turn
@@ -306,19 +312,12 @@ MEASUREMENT: that md5 lives at work/r1/game/RESUME.GAM.user-oct29; the LIVE
 C:\RESUME.GAM (work/r1/game/RESUME.GAM) is md5 f5ffb840 (81647 B, the seed-
 commit pristine template) — verify the BACKUP md5, not the live one.]
 
-QUEUE (2 tasks + the after-drain note, one session each; when you finish task
+QUEUE (1 task + the after-drain note, one session each; when you finish task
 tN, rewrite NEXT ACTION to the text of task tN+1 VERBATIM — do not renumber,
 do not compress the other rows; keep this QUEUE block intact except deleting
-the row you completed):
-
-t256c AI GAP ROW 16 DISPOSITION. docs/re/ai-dossier.md gap map row 16
-  (per-ship order kinds {0..5}, stickiness, congregation, retreat-downgrade,
-  invasion-module carrier — §5, t179 P1/P3). The "NOT REPRESENTABLE" note
-  applies (rewrite has no ship positions/system objects); DECIDE AND BANK the
-  disposition: either accept the aggregate model permanently with the cited
-  reasons (and correct row 16's "GAP (largest)" label to a documented
-  boundary), or scope the minimal per-ship state the cited laws need. No
-  silent stub either way. Gate + rewrite tests must pass.
+the row you completed. t256c NOTE: the NEXT ACTION above carries the t257
+text PLUS the t249b day==turn resolution; that deviation is deliberate —
+without it the next session re-derives what t249b already measured):
 
 t257 WATCHER SCHEMA + DAY FIELD (needs t249b). If t249b pinned the day dword:
   add the field to scripts/r1_playcap_watch.py (append-path open at line ~146;
@@ -372,6 +371,41 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t256c (2026-11-01): AI GAP ROW 16 DISPOSITION — AGGREGATE MODEL
+ACCEPTED PERMANENTLY, BACKED BY THE FIRST FULL PER-SHIP ORDER-STATE CENSUS
+(no ledger row closed — strict-close honored; OQ set unchanged 4 open; OQ-019
+ANNOTATED with the census and stays OPEN). Instrument
+scripts/r256c_shipstate.py (KEEPER; streams the watcher's per-slot ship_raw
+177-u16 window; SINGLE-PASS — buffering decoded rows on the 7.35 GB corpus is
+the t251 OOM class; sessions/watermarks work unbuffered because the timeline
+is append-ordered). MEASURED 62,762 trusted rows / 25 sessions / t240..1335:
+live order-kind set is EXACTLY {1..5} (kind 0 only on dead slots — imm0
+0x24a00 command-clear law corroborated); AI holds kind 2 ZERO times (kind 2 =
+player-command issuer 0x3ca60); AI travel/arrival pair kind4<->kind5
+symmetric 416/416 (0x220a8/0x21f58 observed live in self-play for the first
+time); retreat-downgrade 0x220f2 fired 143x (both owners); Invasion Module
+0x49 ring carriers in 480 distinct ships (ring = bytes at +0xab stride 7,
+count dword +0x15a); POWER/MOVES nonzero for ~all live slots (t179 P1
+tie-break inputs banked). kind changes = 1,938 of ~1.8M slot-pair obs
+(0.107%). HONEST CAVEAT: sticky_kept=1,160,582 does NOT prove stickiness —
+the parked t1255 ring re-samples identical state every 10 s. DISPOSITION
+rationale (a)-(d) banked ai-dossier.md S11 NEW: scope mismatch is the OQ-019
+per-ship build not an AI task; the aggregate projection is NOT observably
+distorted in captured play (unlike pre-wire rows 4/12); a guessed per-ship
+layer would drive never-witnessed arms (kind-2 0 obs, ACT=2 17 obs); the
+firing laws stay cited verbatim in §5 for a future OQ-019 build — remainder
+is ENGINE BUILD. Row 16 label "GAP (largest)" -> BOUNDARY + priority-read
+paragraph updated. NO semantic rewrite change: campaign.h ShipInTransit
+carries the boundary comment (no silent stub); NO pin added (a pin would
+freeze a boundary, not a law). Tool pitfalls banked (_wip_t256c): ship_raw
+sits at line offset ~3200 (find+bracket-depth, head/tail miss it); ring is
+BYTE-odd so rebuild bytes via struct.pack from the u16 window; oc_of must
+treat owner 0xffff/0xffffffff as DEAD before the PLAYER/AI split. Live :9
+UNTOUCHED (zero clicks; ring kept banking; still parked t1255). gate 0, 137
+tests 0 fail, ledger audit OK rows=19 open=OQ-005/016/019/021, index OK;
+NEXT=t257 (day-field, with the t249b day==turn alias resolution folded in —
+deliberate deviation from verbatim, recorded in the QUEUE note).
 
 LANDED t256b (2026-11-01): AI GAP ROW 12 DISPOSITION — TWO-PARTY PROJECTION
 ACCEPTED PERMANENTLY, BACKED BY THE FIRST FULL LIVE n x n MATRIX CENSUS (no
