@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T17:35
+updated: 2026-11-02T18:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,45 +260,24 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t278 OQ-005 RULING PACKAGE (offline, user-time-shortening; ORDERING
-RATIONALE: t277 landed 2026-11-02 — TL-expiry forensics CONFIRMED + SOP shipped
-(LANDED t277 below); the machine-adjacent rows after it (t279 diplomacy
-verification) need a production drive window which stays HELD under the BLOCKED
-t273 release conditions (NO established VNC client AND ring still tutorial-
-lineage; at t277 close the client situation was unchanged), so the queue's next
-offline row runs first. If the release conditions ARE met at a later task
-start, a drive-class re-queue outranks this row and STATE gets rewritten
-accordingly. t280+ follow the queue.)
-TASK VERBATIM (queue row): t278 OQ-005 RULING PACKAGE (offline,
-user-time-shortening): rebuild work/r1/shp_png/index.txt as a DECISION SHEET —
-one row per residue record: thumbnail path, our identification [if any, cited],
-the comparison-screenshot status from the user's Oct-29 message (verbatim quotes
-preserved), and a one-line "keep / junk / re-render" recommendation the user can
-rule on in minutes. DO NOT rule for the user (R13); the deliverable is the sheet
-+ contact sheets already in place. Bank sheet path into BLOCKED.md OQ-005 ask.
-
-PAIRING-SESSION NOTE (phase-3 handoff, 2026-11-02 ~10:15): sentinel-slot law
-stands — task line FIRST, notes below. USER GRANTS this session (verbatim):
-watchpoint "Yes — prep and run it on scratch"; phase 3 "Yes — relaunch + drive
-+ rewrite queue (~another day)". STATE AT HANDOFF: production :9 LIVE at t1086
-single watcher, TL=172800 (48 h guard) — SEE t277: CONFIRMED MEASURED (selfplay.md t277 Law 1)
-— the three "unexplained" game deaths (Nov 1 15:45, Nov 2 07:04, +15:45 pattern)
-were all dosbox-x -time-limit 28800 expiries, NOT an engine crash; the SOP is
-now documented and the defaults pinned by gate 3n3. User save
-work/r1/game/RESUME.GAM md5 5b382afbb7891 (== t1086) untouched. Banks:
-bank-t261-final-1236 (t1236 lineage), bank-t251-live1255 (clean t1255, NEVER
-loadstate — input-dead-on-load law t261), plus the older bank-* dirs.
+NEXT t280 AI GAP ROW 11 REMAINING BODIES (pure code) — ORDERING
+RATIONALE: t278 landed 2026-11-02 (OQ-005 decision sheet shipped; LANDED t278
+below). The drive-class row t279 (diplomacy live verification) STAYS HELD: at
+t278 close `ss -tn | grep 5910` still shows an ESTAB VNC client (release
+condition (a) of BLOCKED t273 unmet), so the queue's next offline row runs.
+If the release conditions ARE met at a later task start, a drive-class
+re-queue outranks this row and STATE gets rewritten accordingly. t281+ after.
+TASK VERBATIM (queue row): t280 AI GAP ROW 11 REMAINING BODIES (pure code):
+t256 upgraded 4 SA_ bodies to cited law; audit the remaining 12 against
+aicode.md §6.3 — wire or file refuted per body, tests where wired. Split
+freely; one commit minimum.
+NOTE t278 FOR THE OQ-005 ASK (user-side, not a task): the ruling package is
+work/r1/shp_png/index.txt (twin decision-sheet.md) — 88 rows, per-row keep/
+junk/re-render recommendation; the user rules by replying per row id. When a
+ruling arrives, adjudicate it against docs/re/shp.md S24 + the OQ-005 row.
 
 QUEUE (phase 3, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t278 OQ-005 RULING PACKAGE (offline, user-time-shortening): rebuild
-  work/r1/shp_png/index.txt as a DECISION SHEET — one row per residue record:
-  thumbnail path, our identification [if any, cited], the comparison-screenshot
-  status from the user's Oct-29 message (verbatim quotes preserved), and a
-  one-line "keep / junk / re-render" recommendation the user can rule on in
-  minutes. DO NOT rule for the user (R13); the deliverable is the sheet +
-  contact sheets already in place. Bank sheet path into BLOCKED.md OQ-005 ask.
 
 t279 DIPLOMACY LIVE VERIFICATION PASS (needs production live): re-verify the
   t244 alliance law reads on the FRESH t1086 campaign WITHOUT initiating any
@@ -369,6 +348,33 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t278 (2026-11-02): OQ-005 RULING PACKAGE SHIPPED — index.txt REBUILT
+AS AN 88-ROW DECISION SHEET (offline; user-time-shortening; nothing closed):
+(1) DELIVERABLE work/r1/shp_png/index.txt (twin decision-sheet.md, generator
+scripts/r1_t278_decision_sheet.py over banked inputs index_t278pristine.txt +
+ids.tsv). Rows A1-15 (already-shown CONTROL/RESTORED-V, Oct-29 verdicts quoted
+VERBATIM — source session 20261022_024226_01e8e7 msg 40813 recovered via
+session_search), B1-29 (SPAN-FREE full frames, bright thumbnails on disk, cited
+library identification per row incl. planind drawn-in-play law), C1-44 (FAIL
+class w/ span bytes + honest status). Every row carries a one-line keep/junk/
+re-render RECOMMENDATION; R13 held — recommendations are proposals, the user
+rules. (2) MEASURED decomposition of the 44 FAILs reconciles EXACTLY: 25
+zero-byte ladder slots (batch-rulable) + 12 cos_star addressable-empty (t200
+selector law) + mouse k6/k7 + 1starmap k1 + sg50expl k9 (invalid dims) +
+mouse k5 + sg64expl k0 (t197 demotions) + 3cfgnew k12 (EOF-broken vendor data;
+the only JUNK candidate — windows.txt selects k0 only). (3) RENDER-STATE
+MEASURED: on-disk PNGs carry the t189b bright palette (lgrace10 mean
+[148,126,102] max 255) so no re-render was owed; sheets/ contact sheets ARE
+dark-era (Oct-1) and are flagged as such in the sheet, regeneration offered not
+performed. (4) KEEPER PITFALL: scripts/r1_t182_pngdump.py OVERWRITES index.txt
+every run — hand content there must be regenerable (generator + pristine census
+copy banked). Banked: shp.md S24, BLOCKED.md t68 amendment (sheet path into the
+OQ-005 ask), OQ-005 STATUS t278. NO OQ MOVED (row stays open strict-close —
+closure = the user's per-row reply or a draw-capture). Machine UNTOUCHED: :9
+pid 576895, ESTAB VNC client still present -> t279 stays HELD, drive HOLD;
+ledger 15/4 audit OK, index OK; gate green; NEXT=t280 VERBATIM.
+
 
 LANDED t277 (2026-11-02): TL-EXPIRY FORENSICS CLOSED THE LOOP'S STANDING
 UNKNOWN ABOUT GAME DEATHS + SOP/DEFAULTS SHIPPED (offline; production :9

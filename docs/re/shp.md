@@ -1094,3 +1094,43 @@ S3/S4 landing blocks); drawing vendor records stays blocked on OQ-005.
 5. SHEETS shipped: work/r1/shp_png/sheets/t254_{A_planets,B_planitem,
    C_iconcands,D_planal00}.png (labelled, rewrite-decoder renders, corrected
    palette); harness scripts/r1_t254_sheets.py + scripts/r1_t254_pi_match.py.
+
+## 24. t278 (2026-11-02): OQ-005 RULING PACKAGE — index.txt REBUILT AS A
+## DECISION SHEET (offline; deliverable-for-the-user, closes nothing itself)
+
+1. DELIVERABLE [shipped]: work/r1/shp_png/index.txt is now the DECISION SHEET
+   (canonical twin decision-sheet.md; generator scripts/r1_t278_decision_sheet.py
+   reproduces it from banked inputs only — index_t278pristine.txt = the pre-
+   rebuild raw dumper census banked verbatim, + ids.tsv). 88 rows: A1..A15
+   (CONTROL + RESTORED-V, user's Oct-29 quotes VERBATIM), B1..B29 (SPAN-FREE
+   full frames with thumbnails on disk, cited identification per library),
+   C1..C44 (FAIL class, span bytes + per-record honest status). Each row:
+   thumbnail path, identification [cited], user status, one-line
+   keep/junk/re-render RECOMMENDATION. R13 honored: recommendations are
+   proposals; the row closes only on the user's ruling or a draw-capture.
+2. MEASURED census reconciliation [verified against index + shp.md S20/S21]:
+   the 44 FAIL rows decompose EXACTLY as 25 zero-byte ladder slots
+   (span 8/24, S3 variant-dims class; batch-rulable) + 12 cos_star k40..k51
+   (dims word 0, t200 selector law makes them addressable-but-blit-refused)
+   + the 4-record invalid-dims set (mouse k6/k7, 1starmap k1, sg50expl k9)
+   + mouse k5 + sg64expl k0 (t197 dims-gate demotions, real bytes)
+   + 3cfgnew k12 (EOF truncation, broken vendor data outright). The honest
+   dims-unknown remainder for closure = shp.md S20.3's 16 records; 3cfgnew
+   k12 is a separate junk ruling; the two demotions need paint evidence.
+3. RENDER-STATE MEASUREMENT [verified]: the on-disk PNGs ARE bright-palette
+   (mean luminance lgrace10 [148,126,102], max 255 — the t189b fix is in them;
+   mtimes Oct-1 predate index.txt Oct-29, so no re-run was owed). The sheets/
+   contact sheets sheet1..5 + partial--*.png are DARK-era (Oct-1 permissive
+   renderer) — flagged as such in the sheet; bright regeneration is offered,
+   not performed (no generator change, no gate surface).
+4. PITFALL (keeper): scripts/r1_t182_pngdump.py WRITES index.txt on every run —
+   any hand-authored content there is destroyed by a future dumper run. The
+   sheet therefore lives in decision-sheet.md (hand-safe) with index.txt a
+   copy + pointer header; the raw census is banked as index_t278pristine.txt.
+5. QUOTE SOURCE (keeper): the user's Oct-29 message lives in session
+   20261022_024226_01e8e7 msg id 40813 (session_search role_filter=user
+   recovers it verbatim); comparison screenshots on disk at
+   work/r1/shp_png/comparison/Comparison/ (3 shots, Oct-28 23:54:59,
+   Oct-29 00:03:17 corrected-curve, 00:03:36 plain). The sheet transcribes
+   every verdict relevant to the residue; planpro/planres non-recognition is
+   shown WITH its t193 revocation so the user rules on current state.

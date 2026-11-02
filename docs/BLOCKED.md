@@ -347,6 +347,13 @@ slots; for these the dims-location question stands exactly as before.]
 Why blocked: closing needs a human-verifiable drawn frame (r1-savestate
 capture exists, but R13 means we cannot confirm the panel drew; blind
 sweeps are FORBIDDEN and the fixup-vary theory is measured dead).
+[t278 RULING PACKAGE SHIPPED 2026-11-02: the ask is now a decision sheet —
+work/r1/shp_png/index.txt (twin: decision-sheet.md, generator
+scripts/r1_t278_decision_sheet.py). 88 rows, per-row cited identification +
+the user's Oct-29 verdict verbatim + a keep/junk/re-render recommendation;
+the 25 zero-byte slots batch-rulable; honest dims-unknown remainder = 16
+records (shp.md S20.3/S24). Banked: docs/re/shp.md S24. The user rules by
+replying per row id; nothing self-closes (R13).]
 Best default to proceed under: decode records per S16 V/A law, dims at
 rec (k0) / rec+0x10 (k>=1); for the 80-record residual class, mark
 skip-and-warn in tooling, never in game-visible paths (rewrite renders
