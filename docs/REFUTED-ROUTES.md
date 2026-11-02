@@ -285,3 +285,18 @@ needs a sub-ring instrument (runtime watchpoint class) or is dropped. Related
 zero-census: magnetron landings leave an OFF-32-GRID st4 row (rng%200 on both
 axes, 0x21f58) — 0 witnesses in 6,184 st4 rows; a player-activated use is the
 only remaining witness route.
+
+## t266 — DO NOT TRUST playcap ROWS 2026-11-01 21:38-23:06 AS PRODUCTION EVENTS: TWO-WRITER RING COLLISION (campaign-fingerprint law)
+The t261 "production :9 softlock at 21:38" narrative is CONTENT-REFUTED: the
+flip slot-pair (bank-t261-t1255 53->54, mtimes 21:38:12/22) changes CAMPAIGN
+(md5 of the star->planet-owner table: f8bf068b76 -> e1d3bdc128), production's
+dosbox.log has ZERO "Loading state from slot" lines, and the post-flip ring
+holds only the restored-t1255 campaign. A stray second dosbox (savedir
+redirected to playcap/save) wrote those slots; production's own autosave went
+silent at 21:38:12 (its own silent guest hang is real, but every "t1255/V=14"
+event attributed to production that evening — incl. the t265 slot-30 tail-
+running feed — belongs to the RESTORED campaign's ring). LAW: fingerprint a
+slot's campaign (star->owner-table md5, see selfplay.md t266) before trusting
+ANY cross-session timeline claim; multi-writer windows look exactly like
+engine anomalies otherwise. Evidence + quantified ~150 s oscillation:
+docs/re/selfplay.md t266 block.

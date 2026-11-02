@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T02:20
+updated: 2026-11-02T04:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,27 +260,31 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t266 SOFTLOCK-CLASS FORENSICS: three incidents banked (t1089
-popup-dead, t1254 planet-list-dead, t15:45 process-death). Characterize the
-trigger class: pixel state + last RAM rows + dosbox.log tail per incident;
-look for the common engine state (popup queue depth? AI-processing flag?).
-This is RE of a BUG CLASS and directly informs the rewrite's robustness.
-Bank to docs/re/selfplay.md §7 + flag anything that changes the drive SOP.
-NEW t265 FEED (ships.md S24 item 5): the softlock window shows
-TURN-FROZEN-BUT-TAIL-RUNNING — slot 30 moved 32/64/160 units while the turn
-readout stayed 1255, and the t1254<->t1255 oscillation repeats identical
-(dx,dy,dz) triples 3x across slots. Start there: the engine kept running the
-turn tail WITHOUT committing the turn counter — the commit site is the suspect.
-ORDERING: t266 first per queue order (t265 landed; t267 self-heal and t268
-screen sweep 3 do not depend on it, but t269 victory-threshold mining is
-strictly easier after t266 tells us whether the drive corpus is trustworthy
-past its softlocks).
+NEXT t267 HARNESS SELF-HEAL: the 15:45 game death went unnoticed ~1.5 h.
+Add to scripts/r1_playcap_vnc.sh (or a small r1_watch_dog.py): game-death
+detector (pgrep -x dosbox-x empty while the session is supposed live ->
+write work/r1/loop/GAME_DEAD.txt + log line), watcher-liveness check the
+loop can run cheaply, and a bring-up-verify sequence (ring row lands within
+30 s of start). Keep it shell-simple; no new deps.
+ORDERING: t267 first per queue order (t266 landed). t266 FEED that CHANGES
+t267's scope (all measured, docs/re/selfplay.md t266 block): (a) I3 root
+cause is -time-limit EXPIRY (07:46 launch + 28800 s = 15:46) — the death
+detector must ALSO compute TL expiry from launch wall and warn BEFORE it, or
+size TL from a fixed wall deadline; (b) THREE r1_playcap_watch.py instances
+are alive on playcap RIGHT NOW (524207, 524532, 535187 — verify via
+/proc/PID/cmdline; only 535187 is the current-session one) — reap the stale
+pair by recorded PID (pkill -f self-matches your shell, known footgun), else
+the two-writer collision class t266 documented keeps compounding; (c) the
+collision class itself: any analysis of the shared timeline across session
+boundaries MUST campaign-fingerprint slots first (star->planet-owner-table
+md5 law, selfplay.md t266).
 PRE-FLIGHT: `git status` clean + game liveness ONLY (pgrep -x dosbox-x;
-production :9 PID 535172 was alive at t265 start, last ring row t1236
-wall 01:27:28 — if dead, bank first, note it, do NOT relaunch without need).
-DO NOT loadstate any bank (REFUTED t261: input-dead on load). Timeline reads
-obey the OOM law (r1_stream.py / bounded tail seek only; NEVER json.load the
-whole file).
+production :9 PID 535172 alive at t266 end, ring current, re-drive banked to
+t1236). DO NOT loadstate any bank (REFUTED t261). Timeline reads obey the
+OOM law (r1_stream.py / bounded tail seek only; NEVER json.load the whole
+file). If the :9 session has since died: that is t267 material — bank the
+ring, note the wall, relaunch per SOP, and the detector you are writing
+should have caught it (report honestly whether it did).
 
 
 PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
@@ -297,13 +301,6 @@ driven exit fires when the queue drains).
 
 QUEUE (phase 2, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t266 SOFTLOCK-CLASS FORENSICS: three incidents banked (t1089 popup-dead,
-  t1254 planet-list-dead, t15:45 process-death). Characterize the trigger
-  class: pixel state + last RAM rows + dosbox.log tail per incident; look for
-  the common engine state (popup queue depth? AI-processing flag?). This is
-  RE of a BUG CLASS and directly informs the rewrite's robustness. Bank to
-  docs/re/selfplay.md §7 + flag anything that changes the drive SOP.
 
 t267 HARNESS SELF-HEAL: the 15:45 game death went unnoticed ~1.5 h. Add to
   scripts/r1_playcap_vnc.sh (or a small r1_watch_dog.py): game-death
@@ -372,6 +369,37 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t266 (2026-11-02): SOFTLOCK-CLASS FORENSICS — THE t261 "PRODUCTION
+:9 SOFTLOCK AT 21:38" IS CONTENT-REFUTED AS A PRODUCTION EVENT: TWO-WRITER
+RING COLLISION (REFUTED-ROUTES t266 block). The flip slot-pair is banked
+(bank-t261-t1255 53->54, mtimes 21:38:12/22): CAMPAIGN changes across it
+(campaign-fingerprint law NEW: md5 of star->planet-owner table; production
+f8bf068b76 vs restored-t1255 lineage e1d3bdc128/47d063a23e) and production's
+dosbox.log has ZERO "Loading state from slot" lines (n=0 over 5.8M lines;
+"Extracting:" n=3.89M are SAVE-path churn — misreading them was a live trap).
+A stray second dosbox with savedir redirected to playcap/save wrote every
+t1255/V=14 row 21:38-23:06; production's own autosave went SILENT at
+21:38:12 (its silent guest hang is real but cause-on-disk unresolvable — last
+driver action press 19 + drain 2, misclick-on-galaxy [unverified]). THE
+OSCILLATION QUANTIFIED (restored campaign, shared-ring witness): 511 rows
+21:41-23:03 = 11 state-runs; single-row t1254 run with CONSTANT ship hash
+ede612 every ~150 s, each followed by a 14-row t1255 run whose ship hash is
+NEW per cycle; frozen single run (hash 3fb209ad, 403 rows) from 21:58:33 =
+the title-menu transition. t265's slot-30 tail-running feed STANDS as a
+bug witness of the restored campaign, not of production. I3 (15:45 death)
+ROOT CAUSE MEASURED: -time-limit expiry (07:46 launch + 28800 s); watch.out
+gap 15:45->18:35 brackets the unnoticed window — t267 scope updated. PROBE
+LAW AMENDMENT: full-frame diff on an animating screen (starfield, 306k px)
+is ALWAYS "ALIVE" — drive-log mid-window ALIVE readings were false
+positives; liveness = c-leg overlay toggle or RAM needle only. CROSS-INCIDENT
+common engine state: NOT identified from disk (honest negative; popup-queue
+hypothesis unsupported — I2 had no popup). Rewrite note: vendor can hang
+with emulator alive; rewrite watchdog per t250 law c-leg version. THREE
+stale playcap watchers alive at session end (524207/524532 stale, 535187
+current — reap in t267). NO OQ CLOSED (bug-class RE; 005/016/019/021 stay
+open). Docs: selfplay.md t266 block, REFUTED-ROUTES t266, _wip_t266.md.
+NEXT = t267 VERBATIM (+ the t266 scope feed above).
 
 LANDED t265 (2026-11-02): OQ-019 DRIVE-CORPUS FLIGHT MINING DONE — the t193
 st4 residue ROUTE is MEASURED-DEAD and a REFUTED route was filed. On the t261

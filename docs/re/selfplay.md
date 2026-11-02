@@ -579,3 +579,68 @@ r1_playcap_vnc.sh start -> Return-to-Game click): resumed t1086 V=0 at
 RAM image is gone (ring-banked slots survive; RESUME.GAM never advanced past
 t1086 all day — the game only writes it at an in-game Save, and the drive must
 NOT click Save unattended since a misclick there could hit adjacent dialogs).
+
+## t266 (2026-11-02) — SOFTLOCK-CLASS FORENSICS: THE t261 "PRODUCTION SOFTLOCK" IS A TWO-WRITER RING COLLISION; I3 IS TL EXPIRY; THE OSCILLATION IS A ~150 s CYCLE
+Campaign fingerprint law (NEW, MEASURED): a slot's campaign identity = md5 of
+the (star -> sorted owner-multiset) table from r1_income_law.find_records.
+Distinct campaigns measured: production-drive-Nov1 f8bf068b76 (t1086-1111,
+V23, 26 systems); restored-t1255 lineage 47d063a23e (:8 soft1255 bank 21:22,
+t251-live1255 08:21) -> e1d3bdc128 (prod-titlesoft 22:47, live-advanced point
+of the SAME campaign); Oct-31 t1254 bank 7391e3f8d6 (V23); re-drive lineage
+9710dec431 (t1101-1236, V23). Memory-md5 differs within a lineage (RAM
+advances); the planet table does not. ALWAYS fingerprint before trusting rows.
+1. I4 (t261 "production :9 soft-locked at 21:38") CONTENT REFUTED. The flip
+   slot-pair is banked: bank-t261-t1255 slot 53 mtime 21:38:12 fp f8bf068b76
+   t1111 V23 -> slot 54 mtime 21:38:22 fp e1d3bdc128 t1255 V14 (36 systems).
+   A different campaign cannot appear in a -nogui process's RAM without a
+   loadstate; production dosbox.log has ZERO "Loading state from slot" lines
+   (n=0, re-verified this session over 5.8M lines; NOTE "Extracting:" lines
+   n=3.89M are the SAVE-path slot-metadata churn, NOT load evidence — do not
+   misread them). The post-flip ring holds ONLY the restored campaign (no
+   interleave), so production's own autosave went SILENT at 21:38:12 while a
+   second writer with savedir=playcap/save and restored-t1255-campaign RAM
+   began writing 10 s slots at 21:38:22. Production's own contribution to the
+   bug class: a SILENT guest hang (input-dead + md5-frozen screen, measured
+   t261 22:05-22:16) — distinct from the restored campaign's noisy oscillating
+   churn. The second writer's process identity is [unverified] — log-gap
+   anchors show launches 20:08 (= t260 experiment, t260-dosbox.pid 20:08) and
+   ~21:01 (t261_session.sh, explicit -savedir t261-drive/save, churned there
+   21:01->21:22:21 then stopped = that process's last rites); no surviving
+   cmdline shows who redirected to playcap/save at 21:38:20. REFUTED ROUTE
+   filed: do not attribute playcap rows 2026-11-01 21:38-23:06 to production.
+2. THE OSCILLATION IS QUANTIFIED (restored campaign, shared-ring witness):
+   21:41-23:03 window = 511 rows -> 11 state-runs. Pattern: single-row
+   t1254 run with CONSTANT ship-state hash ede612 at 21:44:12 / 21:49:02 /
+   21:56:23 (~150 s = 15-slot spacing), each immediately followed by a 14-row
+   t1255 run with a NEW ship hash each cycle (c15523->5480fc->db7cf2->051e29
+   ->cd5885->dcc09f). Reading: the engine completes a turn-TAIL movement pass
+   every ~150 s and toggles the turn counter 1255->1254 once per cycle without
+   a fresh commit — t265's slot-30 d=32/64/160 displacements are these
+   between-cycle movements in RESTORED-campaign RAM (the t265 feed stands as a
+   bug witness, but NOT as a production event). At 21:58:33 the churn STOPS
+   into a single frozen run (403 rows to 23:03, hash 3fb209ad) = the title-
+   menu transition t261 saw via vision.
+3. I3 (15:45 process death) ROOT CAUSE MEASURED: production was launched
+   07:46:21 (watch.out marker) with -time-limit 28800; 07:46 + 8 h = 15:46 —
+   the RUNAWAY GUARD expired mid-drive and killed the game. Watch.out gap
+   15:45 -> 18:35 brackets the unnoticed window. HARNESS LAW for t267: a
+   morning launch makes TL a play cap; compute TL from wall-clock to a fixed
+   deadline (or stop passing it for supervised-daytime sessions).
+4. PROBE LAW AMENDMENT (t250 law stress-failed): the drive log's periodic
+   "input ALIVE (changed_px=306544)" during the whole stuck window is
+   ANIMATION, not input — 306,544 of 307,200 px = full-frame starfield churn
+   between the two grabs. The Escape-leg diff is meaningless on an animating
+   screen. Liveness must be judged by the c-leg (overlay toggle, ~1k px,
+   local) or a RAM needle, never by full-frame diff. t261's mid-window ALIVE
+   readings were false positives; the later arrows-probe (0 px) was correct.
+5. CROSS-INCIDENT TRIGGER CLASS (honest status): I1 popup-present hang,
+   I2 planet-list-modal hang (no popup), I4-silent production guest hang at
+   21:38:12 (cause on disk unresolvable; last driver action was press 19 +
+   drain 2, popup OK-bands overlap the galaxy screen per t244 misclick law —
+   [unverified]), I5 input-dead-on-loadstate (save-carried). NO single common
+   engine state identified from disk evidence (popup queue depth is not
+   ring-visible; I2 had no popup). The restore-lineage sub-class (I4 content,
+   I5) is save-carried and already REFUTED as a drive route (t261). Rewrite
+   robustness note: the vendor engine can hang with the emulator alive; a
+   rewrite watchdog should detect input-dead + RAM-frozen per the t250 law
+   (c-leg version) rather than CPU.
