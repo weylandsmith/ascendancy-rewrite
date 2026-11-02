@@ -257,3 +257,51 @@ work/t200_coswnd2.asm (0x2976c..0x2a493).
    ins.reg_name) and cdecl CALL preserves ESP — scripts/r200_espmap.py is
    fixed for both; invoke it with LO AFTER the prologue's `sub esp,N` (base
    P = esp right after that instruction).
+
+## 7. WINDOW COMPOSITION LANDED AS CODE (t276, 2026-11-02)
+
+The S1-S4 laws are now wired in rewrite/src/ui/planetwin.{h,cpp} (pure, no
+SDL; module template hudlayout.h t264). Working notes docs/re/_wip_t276.md.
+
+1. PANEL TABLE [verified windows.txt lines 1536/1553/1570/1587/1604, joined
+   against the SHIPPED file by the test]: kPlanetPanels[5] carries
+   (rect, SENDMESSAGE, SENDPARAM1, HELPINDEX) verbatim — PLRES 7,7..114,106
+   (50,0,plres), PLIND 123,7..230,106 (50,1,plind), PLPRO 239,7..346,106
+   (50,2,plpro), PLPOP 355,7..454,106 (50,4,plpop), PLBUILD 463,8..632,106
+   (51,1,plbuild). File order == left-to-right (disjoint X-bands, uniform
+   9 px gutter from x=7; PLPOP 100 px INCLUSIVE = the t254 grid anchor;
+   PLBUILD Y0=8 is the only off-grid edge). Parent PLANETALLOC TYPE 7
+   0,0..639,479 msg 3; children PLANLIST (10) and PLSQUARE (14) are NOT
+   panels — planetPanelFor returns nullopt inside them.
+2. DISPATCH [verified S2]: ui::paintKey(msg,param) implements the two
+   remaps (param 4 -> 3; msg 51 -> 4). THE REMAP IS LOAD-BEARING: PLBUILD's
+   SENDPARAM1 is 1, which without the msg-51 override collides with PLIND's
+   key 1 — mutation-proved catcher: deleting `if (sendMessage == 51) key = 4;`
+   fails planetwin_dispatch_key_law_t276 (the five panels must key 0..4
+   exactly once each, and key == enum index == file order).
+3. HEADERS [verified static.txt, joined byte-exact by the test]: #147
+   'Under Construction at %s', #148 'Being Refitted at %s', #149
+   '\\nMoving to Planet', #150 '\\nMoving to Starlane' (FILE bytes carry a
+   literal backslash-n; module constants carry a real newline — loader-
+   interprets law [inferred], both forms pinned), #151 '%s  (%d Planet%s
+   Occupied, %d System%s Controlled)' and #152 '%s  (%d Ship%s, %d more
+   allowed)' (DOUBLE SPACE byte-exact, asserted directly), #153 'Player
+   Species', plural pair #28 ''/#29 's'. PLURALIZATION for #151/#152 is
+   singular-iff-==1 [inferred — the pair's ==1 use is cited only for the
+   ability countdown, aicode.md §8.2]; live witnesses are plural only
+   ("(60 Planets Occupied, 26 Systems Controlled)", "(25 Ships, 12 more
+   allowed)"). The planets count fed to #151 must be the MAINTAINED counter
+   (PROOF 3: heap-window u16, NOT the table count — 80 vs 60 @t1086);
+   formatPlanetHeader takes it as an argument, nothing derives it.
+4. GAUGES + POP + ICON [wiring, laws cited upstream]: planetGaugesFor =
+   {gaugeSelector(res +0x46), gaugeSelector(ind +0x44), prosSelector(pros
+   +0x48)} over Campaign::channelWordsFor (seed-2024 campaign: selectors
+   match per-star and sit on the S3 ladder bounds); popPanelFor composed
+   with origin (355,7) keeps every cell + 9 px sprite inside the PLPOP rect
+   (the t33 cap<=100 clamp is what guarantees it); plbuildIcon =
+   data\\planitem.shp identity, CITED only for 34 -> k34 (shp.md S23.4),
+   domain 0..39 (40 recs, shp.md S23.3), boundary edges tested.
+5. TESTS: tests/test_planetwin_t276.cpp, 8 cases, suite 158/0. No OQ row
+   moved (composition of already-cited laws; the planitem identity extension
+   for 39 items stays an OQ-005 contact-sheet fold, the pluralization stays
+   [inferred] — strict-close unaffected).

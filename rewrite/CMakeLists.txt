@@ -49,6 +49,7 @@ add_library(ascend_ui STATIC
   src/ui/layout.cpp
   src/ui/hudlayout.cpp
   src/ui/poppanel.cpp
+  src/ui/planetwin.cpp
   src/ui/ui.cpp
   src/ui/audio.cpp
 )
@@ -81,6 +82,7 @@ add_executable(run_tests
   tests/test_poppanel_t263.cpp
   tests/test_hudlayout_t264.cpp
   tests/test_econres_t274.cpp
+  tests/test_planetwin_t276.cpp
   tests/test_audio.cpp
   tests/test_ships.cpp
   tests/test_flic.cpp
@@ -89,6 +91,7 @@ add_executable(run_tests
   src/ui/layout.cpp
   src/ui/hudlayout.cpp
   src/ui/poppanel.cpp
+  src/ui/planetwin.cpp
 )
 target_link_libraries(run_tests PRIVATE ascend_core)
 add_test(NAME unit_tests COMMAND run_tests)

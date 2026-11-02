@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T16:15
+updated: 2026-11-02T17:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,21 +260,26 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t276 PLANETALLOC WINDOW WIRING (pure code; machine-free — ORDERING
-RATIONALE: t275's drive-state re-measure 2026-11-02 16:11 shows an x11vnc
-ESTABLISHED client on :5910 STILL attached to production :9 (tutorial t645)
-— drive-class work STAYS HELD until the BLOCKED t273 release conditions are
-met (NO established client AND ring still tutorial-lineage; if met at a
-later task start, a drive-class re-queue outranks this row and STATE gets
-rewritten accordingly). t276 needs no game at all and is the next pure-code
-row whose test surface can lean on the t274 mutation-verified catchers.
-TASK VERBATIM (queue row): t276 PLANETALLOC WINDOW WIRING in rewrite (pure
-code): the five-panel planet screen geometry from windows.txt (PLRES/PLIND/
-PLPRO/PLPOP/PLBUILD, type-29, left-to-right) + header getters (static.txt
-#147/149/151/152/153 law, selfplay.md) + gauge selector (ui::gaugeSelector
-clamp law) + poppanel (t263) + planitem hypothesis -> wire into
-rewrite/src/ui/ as the planet window composition; tests pin panel order +
-header format strings.
+NEXT t277 TL-EXPIRY FORENSICS + SOP FIX (offline forensics; ORDERING
+RATIONALE: t276 landed 2026-11-02 as pure code (planetwin.{h,cpp}, 8 tests,
+suite 158/0). t277 is the highest-value machine-adjacent row that needs NO
+drive of :9 (reads logs/pidfile ctimes only — the x11vnc client was STILL
+attached at t276 close, so drive-class rows t279+ stay HELD under the BLOCKED
+t273 release conditions: NO established client AND ring still tutorial-
+lineage; if met at a later task start, a drive-class re-queue outranks this
+row and STATE gets rewritten accordingly). t278/t280+ follow the queue. The
+TL-expiry hypothesis matters because three production deaths cost ~2 sittings
+of witness harvest; confirming/killing it + the pre-expiry SOP protects every
+future drive row.
+TASK VERBATIM (queue row): t277 TL-EXPIRY FORENSICS + SOP FIX: CONFIRM or
+kill the TL=28800 hypothesis (dosbox.log last lines + launch times from
+loop.log/pidfile ctimes vs the two measured deaths; dosbox-x logs its
+time-limit exit — find the exact farewell line in the log or strings). Then
+fix the harness: r1_game_health.py gains a PRE-EXPIRY warning at TL-600s
+(t267 already warns at 600s — verify it fires and document the
+restart-into-fresh-TL procedure verbatim), and r1_playcap_vnc.sh default TL
+raised to 172800 with a comment citing this row. Bank to docs/re/selfplay.md
+§7 + BLOCKED.md.
 
 PAIRING-SESSION NOTE (phase-3 handoff, 2026-11-02 ~10:15): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS this session (verbatim):
@@ -291,13 +296,6 @@ loadstate — input-dead-on-load law t261), plus the older bank-* dirs.
 
 QUEUE (phase 3, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t276 PLANETALLOC WINDOW WIRING in rewrite (pure code): the five-panel planet
-  screen geometry from windows.txt (PLRES/PLIND/PLPRO/PLPOP/PLBUILD, type-29,
-  left-to-right) + header getters (static.txt #147/149/151/152/153 law,
-  selfplay.md) + gauge selector (ui::gaugeSelector clamp law) + poppanel
-  (t263) + planitem hypothesis -> wire into rewrite/src/ui/ as the planet
-  window composition; tests pin panel order + header format strings.
 
 t277 TL-EXPIRY FORENSICS + SOP FIX: CONFIRM or kill the TL=28800 hypothesis
   (dosbox.log last lines + launch times from loop.log/pidfile ctimes vs the
@@ -380,6 +378,37 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t276 (2026-11-02): PLANETALLOC WINDOW COMPOSITION WIRED AS CODE —
+rewrite/src/ui/planetwin.{h,cpp} (pure, no SDL; hudlayout.h t264 template) +
+tests/test_planetwin_t276.cpp 8 cases, suite 158 tests 0 fail; CMakeLists
+gains both files (ascend_ui + run_tests direct-compile lists). LAWS WIRED
+(all cited upstream, doc section planets-ui.md S7): (1) five TYPE-29 panel
+table kPlanetPanels verbatim windows.txt 1536..1604 (rect+msg+param+help),
+file order == left-to-right, disjoint X-bands 9 px gutter, joined against
+the SHIPPED windows.txt by the test (loader reads TYPE->NAME block order);
+(2) dispatch ui::paintKey = the two remaps verbatim (param 4->3 @0x3cc1c,
+msg 51->4 @0x3cc29) — LOAD-BEARING: PLBUILD param 1 collides with PLIND key
+1 without it; MUTATION-VERIFIED catcher (deleting the override fails the
+pin; reverted, rebuilt green); five panels key 0..4 exactly once, key == file
+order; (3) header strings verbatim static.txt #147/#148/#149/#150/#151/#152/
+#153 + plural pair #28/#29, byte-exact join incl. the DOUBLE SPACE in
+#151/#152 and the literal-backslash-n file bytes vs real-newline module
+constants (loader-interprets law [inferred], both pinned); pluralization
+singular-iff-==1 for #151/#152 marked [inferred] (pair's ==1 use cited only
+for the ability countdown aicode.md §8.2); formatPlanetHeader takes the
+MAINTAINED planets counter as an argument — nothing derives it (t248 PROOF 3
+says the table count is NOT the header source); (4) planetGaugesFor =
+{gaugeSelector RES+0x46, gaugeSelector IND+0x44, prosSelector PROS+0x48}
+over channelWordsFor (seed-2024: per-star match + S3 ladder bounds);
+popPanelFor composed at origin (355,7) inside PLPOP rect; plbuildIcon =
+data\planitem.shp identity domain 0..39, CITED only 34->k34 (shp.md S23.4).
+HONEST BOUNDARIES: NO OQ row moved (composition of already-cited laws; the
+39-item planitem identity extension stays an OQ-005 contact-sheet fold; the
+pluralization stays [inferred]) — strict-close unaffected. Machine untouched
+:9 HEALTHY (TL expiry 2026-11-04 10:07), no new sitting (tail all t645, r214
+tail census decisive: 613 rows last 2 MB all turn 645), VNC client still
+ESTAB :5910 -> drive HOLD holds; game/ untouched. NEXT = t277 VERBATIM.
 
 LANDED t275 (2026-11-02): COMBAT INTEGRATION ADJUDICATED — ENGAGEMENT
 RESOLVER 0x42c60..0x42e6e READ VERBATIM (first time; t179 P3 was a summary).
