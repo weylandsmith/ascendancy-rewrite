@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T06:00
+updated: 2026-11-02T08:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,21 +260,22 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t264 REWRITE LAYOUT WIRING (pure code): fold t252/t253 measurements into
-rewrite/src/ui/layout.cpp — sidebar rects (exact, live-measured), button
-icons = 1starmap.shp SHAPEITEM frames {3 res, 4 ships, 5 planets, 7 spe...},
-ship-design tab->gizmo-category map 6/6 (WEAPONS=cat0 DEFENSES=cat1
-ENGINES=cat2 SENSORS=cat3 ENERGY=cat4 SPECIAL=cat5, gizmos.txt FILE order,
-NOT msg order). Tests pin the map. Cite docs/re/ui.md t252/t253 blocks.
-ORDERING: t264 first per queue order — pure code like t263 (just landed,
-poppanel pattern is the template: pure module + pins, no SDL); no capture
-dependency (the t252/t253 dossiers are banked in ui-runtime.md §6a-§6c);
-t262's census route is closed (score.md S13) so no pending corpus work gates
-anything; the drives are done (t1236 banked) and the OQ-021 watchpoint ask is
-user-gated in BLOCKED.md, not session work.
-PRE-FLIGHT: none beyond `git status` — do NOT touch :9 (game parked t1236,
-PID 535172 alive; ring churn is harmless background). DO NOT loadstate
-bank-t251-live1255 or any bank (REFUTED t261: input-dead on load).
+NEXT t265 OQ-019 LIVE MINING (needs t261 corpus): st4 mid-turn displacement
+(the t193 census found 2238 st4 samples with ZERO displacement, turn never
+advanced — a real DRIVE changes that premise) + magnetron USE frames (gizmo
+0x3c use-site FUN_0004ca50). ring ship_raw banks every row; stream trust
+law applies. Bank: flight law corroboration or honest negative; row stays
+OPEN without a cited measurement.
+ORDERING: t265 first per queue order — the drives are done (t1236 banked,
+bank-t261-final-1236) so the corpus exists; t264 just landed (pure code, no
+capture dependency left in the queue before this); the remaining pure-code
+queue rows do not gate t265 and t266's incident forensics are strictly
+easier with the corpus mined first.
+PRE-FLIGHT: `git status` clean + game liveness ONLY (pgrep -x dosbox-x;
+production :9 was parked t1236 PID 535172 — if dead, that is t266 material,
+note it and mine the BANKED corpus, do not relaunch without need). DO NOT
+loadstate bank-t251-live1255 or any bank (REFUTED t261: input-dead on load).
+Timeline reads obey the OOM law (r1_stream.py / tail <=400 KB only).
 
 
 PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
@@ -291,13 +292,6 @@ driven exit fires when the queue drains).
 
 QUEUE (phase 2, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t264 REWRITE LAYOUT WIRING (pure code): fold t252/t253 measurements into
-  rewrite/src/ui/layout.cpp — sidebar rects (exact, live-measured), button
-  icons = 1starmap.shp SHAPEITEM frames {3 res, 4 ships, 5 planets, 7 spe...},
-  ship-design tab->gizmo-category map 6/6 (WEAPONS=cat0 DEFENSES=cat1
-  ENGINES=cat2 SENSORS=cat3 ENERGY=cat4 SPECIAL=cat5, gizmos.txt FILE order,
-  NOT msg order). Tests pin the map. Cite docs/re/ui.md t252/t253 blocks.
 
 t265 OQ-019 LIVE MINING (needs t261 corpus): st4 mid-turn displacement (the
   t193 census found 2238 st4 samples with ZERO displacement, turn never
@@ -380,6 +374,38 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t264 (2026-11-02): REWRITE HUD LAYOUT WIRING SHIPPED — the t252/t253
+rail + ship-design measurements are CODE + PINS in rewrite/src/ui/
+hudlayout.{h,cpp} (pure, no SDL; 146 tests 0 fail, +5 hud_*_t264; CMake:
+ascend_ui + run_tests; poppanel template followed; ui-runtime.md §2c NEW;
+working log docs/re/_wip_t264.md S1..S3). MEASURED THIS SESSION (primary
+sources re-parsed, not dossier-inherited): (1) windows.txt block-parse
+(132 TYPE blocks) — all six rail rects match §6a verbatim and the
+SENDPARAM1==target-STATE law EXTENDS beyond the dossier's two checked
+pairs: 10 STATUSWND (line 1020) / 18 FLEETWND (1725) / 20 RESWIN (1763) /
+14 INTELSCREEN (1109), RACES 7 = the '1 7' menu class [inferred general
+law]. (2) SHAPEITEM lines exact: 1starmap.shp frames 3=Research 4=Ships
+5=Planets 7=Special; RACES WINITEMS 1 / Intelligence WINITEMS 0 — iconless
+buttons are representable by construction (nullopt, not a fabricated
+frame). (3) gizmos.txt re-parse: 76 records, cat counts {10,6,5,6,5,44},
+categories CONTIGUOUS in file order 0..5 — the GIZLIST order law ==
+gizmosByCategory, and the join test asserts per-tab sizes + live GIZLIST
+head names (Mass Barrage Gun / Ion Wrap / Tonklin Motor / Tonklin
+Frequency Analyzer / Proton Shaver / Lane Blocker). (4) TAB MAP pinned 6/6
++ HULL(50)->-1 + msg56->-1 + inverse total; non-derivability pinned
+combinatorially STRONGER than the dossier: naive cat==msg-51 holds ONLY
+for {51,52,55}, deviations EXACTLY {53,54,57} (the swapped pair AND the
+msg-56 gap at SPECIAL). Mutation probe: flipping 53->2 in the MODULE fails
+11 checks across 3 tests; reverted, green. HONEST: the RACES/Intelligence
+14 px overlap resolution (->Intelligence) is [inferred] z-order pinned as
+law (file has no draw order; no live click ever landed there); task text
+said "cite docs/re/ui.md" — the dossier blocks are actually in
+ui-runtime.md §6a/§6c, cited there; NO sprite drawn (ui.cpp untouched,
+OQ-005 scope unchanged); NO OQ closed strict-close (005/016/019/021 stay
+open, ledger untouched). :9 untouched (zero clicks/turns, no loadstate);
+no sitting (r1_t85g_sitting.py not run). NEXT = t265 VERBATIM (OQ-019 live
+mining on the t261 corpus).
 
 LANDED t263 (2026-11-02): REWRITE POP-PANEL SHIPPED — population panel
 visualization law is CODE + PINS in rewrite/src/ui/poppanel.{h,cpp} (pure,

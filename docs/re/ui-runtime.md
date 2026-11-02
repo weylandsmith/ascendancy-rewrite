@@ -63,6 +63,40 @@ k1/k2 measurably fails the suite). gwshare slot law pinned too: cache slot ==
 0-based index among NON-BLANK lines (entry #44 = 17np, #41 = 14intel control).
 Working log docs/re/_wip_t263.md. Drawing itself stays OQ-005-scoped.
 
+### 2c. HUD rail + ship-design tabs LANDED as code (t264, 2026-11-02)
+
+The t252/t253 measurements (§6a/§6c) plus a fresh primary-source re-parse
+of windows.txt/gizmos.txt (docs/re/_wip_t264.md S1/S2) are now code + pins
+in `src/ui/hudlayout.{h,cpp}` (pure, no SDL; 146 tests 0 fail, +5
+`hud_*_t264`; CMake wires it into ascend_ui AND run_tests):
+
+- `kRail[6]` — the six x-band-474 controls with verbatim rect +
+  (SENDMESSAGE, SENDPARAM1): STATUS 474,130-632,160 (1,10), FLEET
+  474,169-632,199 (1,18), RESEARCH 474,208-632,238 (1,20), SPECIALAB
+  474,247-632,277 (5,0), RACES 474,286-632,316 (1,7), Intelligence
+  474,303-632,333 (1,14). `railButtonFor(Pt)` is the inclusive hit map; the
+  14 px RACES/Intelligence overlap resolves to Intelligence ([inferred]
+  z-order — the file gives no draw order; pinned as law). NEW fact beyond
+  the dossier: SENDPARAM1 == target STATE number holds for all four
+  window-openers (10/18/20/14 = STATUSWND/FLEETWND/RESWIN/INTELSCREEN).
+- `sidebarIcon()` — the SHAPEITEM law: 1starmap.shp frames 3=Research
+  4=Ships 5=Planets 7=Special; RACES (WINITEMS 1) and Intelligence
+  (WINITEMS 0) return nullopt — buttons WITHOUT icons are representable.
+  Drawing the shapes stays OQ-005-scoped (ui-runtime.md §2 unchanged).
+- `gizmoCatForShipTab()` — THE TABLE, 6/6 (51->0 52->1 54->2 53->3 55->4
+  57->5; HULL 50 -> -1; msg 56 -> -1) with `shipTabForGizmoCat()` inverse
+  and `gizmoListForTab()` == `game::gizmosByCategory` (file-order law,
+  gizmos.txt categories contiguous 0..5, counts 10/6/5/6/5/44 of 76).
+  Non-derivability is pinned combinatorially: the naive rule cat==msg-51
+  holds ONLY for 51/52/55 — deviations EXACTLY {53,54,57} (t253's swapped
+  pair plus the msg-56 gap at SPECIAL; a stronger witness than the
+  dossier's prose). Mutation probe this session: flipping 53->2 in the
+  module fails 11 checks across 3 tests, then reverting restores green.
+
+Honest scope: no OQ closed (strict-close — wiring cited law; 005/016/019/
+021 stay open); no sprite is drawn anywhere (ui.cpp untouched); the
+overlap-z-order and the SENDPARAM1-law generalization carry [inferred].
+
 ## 3. Text
 
 Vendor faces are LIVE since 2026-10-05f: the UI renders with the game's own
