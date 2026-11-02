@@ -607,3 +607,106 @@ ZERO destruction events and ZERO strict engagement-scale hits (min dist2
 changes at range), NOT volleys. No multi-volley-vs-non-war witness landed this
 session; OQ-016 STAYS OPEN (t251 cascade witness remains the only one). Raw
 hits banked work/r1/t261_witness_a_hits.json for re-vetting.
+
+## S2k (t275) — ENGAGEMENT RESOLVER 0x42c60..0x42e6e VERBATIM + CALLER-SIDE SHIP-ARRAY LAW (capstone 5.0.7 /home/hrethric/tools/revenv/bin/python, listing work/t275_resolver.txt)
+
+Triage first: the t275 queue row names four sub-laws (deterministic damage,
+ordered cat-0 volley, shield-then-hull absorb, death at <1) — ALL FOUR are
+code-verified LANDED at t89 (S2j): attackScore SUM-volley campaign.cpp:1842,
+absorbSplit campaign.h:383, rng_ draws removed campaign.cpp:1956..1966,
+capture/Extinct death mapping S2i(c), pin campaign_combat_law_oq010. The row's
+actionable remainder is the resolver region itself (t179 P3 banked only a
+summary; this is the first verbatim read) + its caller-side filter.
+
+ENCLOSING FUNCTION: 0x41e34 size 6087 (functions_full.tsv line '41e34 6087');
+sole rel32 caller 0x41910 inside 0x41260 (the movement resolver; callers
+0x16eb0 batmode, 0x2554f player-command-exec 0x2547c — the same function the
+t88a commit law sits in). Entry regs: EAX -> [esp+0x2c4] (context obj;
+[[eax+7]+2]>>16 = race idx), EDX -> ESI = OBJECTIVE OBJECT, EBX -> [esp+0x394]
+(assert 0x840 msg 0x84c84), ECX -> [esp+0x354] = ship COUNT (u16);
+[esp+0x380] = ship POINTER ARRAY; [esp+0x398] = result descriptor out-param.
+
+CALLER-SIDE ARRAY BUILD (0x41260, loop 0x41318..0x413b3 over the 0x22304 list):
+a ship enters the resolver's array iff ALL of:
+  * [[ship+0x54]>>16] == engagement race byte ([edi]) — 0x41340/0x4134c;
+    => THE ARRAY IS OWNER-RACE FILTERED: only the acting side's ships are
+       visible to the resolver. The defender's ships are NOT in it. Return
+       fire is therefore a SEPARATE engagement resolution run (own command-
+       exec pass), corroborating S2g "no interleaving across ships here" and
+       the t85g §1 observation that return fire lands as discrete small
+       steps (player 40>38>36>34), not a simultaneous exchange.
+  * DWORD [ship+0x88] > 0 (POWER — 0x4134e; same gate family as 0x4a55c);
+  * BYTE [ship+0x58] != 1 (order kind 1 excluded — 0x41357).
+Accumulators accumulate: word[esp+0x3a0] += [ship+0x88] (total POWER),
+word[esp+0x3ac] += [ship+0x94] (total MOVES). A ship with BYTE [+0x5d] != 0
+sets [esp+0x38c] := -1 (flag; consumer elsewhere). Second loop 0x413d5..0x41417
+builds the PLANET array ([+0x46] family, count [+0x5a]) filtered on
+[planet+0x57] == engagement race. Both-empty -> exit 0x419c0 (return 0).
+
+REGION 0x42c60..0x42e6e (VERBATIM, confirms t179 P3 and adds legs):
+* 0x42c60 head: race check (assert 0xbc0 msg 0x217c), out-param
+  lea ebx,[esp+0x30c], CALL 0x3a174 (invasion resolution, t207 law) then
+  0x396cc; -1 return path 0x42cd7 returns 0xffffffff (no engagement).
+* LEG-SELECTION GATE 0x42cea..0x42cf3: CALL 0x39a00(ESI) — per-planet ACTIVE
+  -item scan (slot array [+0x10], start word [+0x18], count word [+0x1a],
+  4-byte slots, byte+1 == item id (0xff empty), word+2 bit0 == ACTIVE):
+  returns -1 iff any ACTIVE slot holds item 0x17, 0x1a or 0x1b. Item map
+  [verified income-law.md §6h t25: parsed file order == runtime itemIdx,
+  0 Factory .. 23 Ship, 26 Orbital Shield, 27 Orbital Mega Shield; the four
+  t201 bit8 shield rows {18,19,26,27} cross-validate the same numbering]:
+  0x17=23=Ship, 0x1a=26=Orbital Shield, 0x1b=27=Orbital Mega Shield.
+  => GATE LAW: objective planet with an ACTIVE Ship/Orbital-Shield/
+     Orbital-Mega-Shield item SKIPS the invasion-carrier leg (jne 0x42dce
+     jumps straight to the firepower leg); unshielded objective -> carrier
+     leg runs first. [inferred gloss: the engine shoots at defended planets
+     rather than waste the Invasion Module — the SKIP/SHOOT structure is
+     verified, the intent is not.]
+* LEG A (carrier pick) 0x42d09..0x42d5b: first array ship with BYTE [+0x58]
+  == 4 AND any stride-7 gizmo slot byte == 0x49 (Invasion Module); stops at
+  FIRST match (0x42d54 stores, loop continues only over the no-match tail —
+  the t179 "stops at the FIRST match" holds per scan: [esp+0x2d0] != 0 test
+  at 0x42d16 halts scanning once set). Descriptor: byte 3 + ship ptr
+  (0x42da3/0x42da6); carrier engagement state written [ship+0x62]=0,
+  [+0x63]=0, [+0x67]=1, [+0x68]=objective (0x42d9c..0x42dbd).
+* 0x42d64 (no carrier found): if objective ownership bits [eax+0x15] AND
+  (1<<DAT_0007458e) (local human player, t204 byte) -> RETURN 2; else fall
+  through 0x437ee. Return-code census for this region: 0xffffffff = no
+  engagement / unresolved, 2 = "objective is the player's, nothing picked",
+  descriptor kind 3 = engagement actor chosen.
+* LEG B (firepower pick) 0x42de0..0x42e34: first array ship with [+0x58]==4
+  where CALL 0x4a604 (companion slot scan: first cat-0 slot with power/uses,
+  S2h) != 0 AND CALL 0x4a55c(ship, 1, objective) != 0. First match wins
+  (0x42e2d + [esp+0x2d0] halt test 0x42ded). 0x4a55c SIDE EFFECT fires here
+  (stance setter, S2g): [+0x62]:=1, [+0x67]:=1 (arg 1), [+0x68]:=objective —
+  the resolver COMMITS the chosen shooter's firing order, not merely probes.
+  No strength comparison, no value ranking, no retreat test anywhere in the
+  region (eligibility = order-state + equipment) — t179 verdict re-confirmed.
+
+HONEST NEGATIVES (measured, this pass):
+(1) THE REGION NEVER READS +0x59: instruction census over the window touches
+    +0x58/+0x5d/+0x62..+0x68/+0x88/+0x94/+0xab/+0x15a and gizmo 0x49 only.
+    The queue row's "threat byte +0x59" citation is MISDIRECTED for this
+    region: the planet threat byte is t201-closed and wired in buildPhase;
+    ship +0x59 (t179 §7 stored order target) is NOT read here either — the
+    resolver writes the target to +0x68.
+(2) EVERY selection input in the region is per-ship (array membership, order
+    kind, gizmo slots, power/moves) or per-planet (ACTIVE item scan) state.
+    The rewrite's fleet_ vector {owner, from, target} (campaign.h:90-94)
+    carries NONE of it; the aggregate volley/absorb law landed at t89 is the
+    complete aggregate-mappable content of the four named sub-laws. Per-ship
+    first-eligible wiring = OQ-019/row-16 boundary (accepted permanently
+    t256c, S11) — NOT re-queueable as aggregate code.
+(3) The PLANET-level laws in/around the region that the rewrite COULD in
+    principle see are the leg-selection gate above and the t207-banked
+    invasion defense term (0x3a2c9..0x3a325: shieldscore = #{ACTIVE item 18
+    Surface Shield} + 2*#{ACTIVE item 19 Surface Mega Shield}; result =
+    invmod>shieldscore ? shields+1 : invmod, then up to `result` ACTIVE 19
+    slots stripped). DECISION t275: NOT wired. The gate has no rewrite call
+    site (the rewrite conflates gunnery+invasion into ONE aggregate
+    engagement — t207 S7e documented divergence), and both defense-term
+    operands that make it a LAW (invmod = per-ship Invasion-Module count;
+    per-slot strip) are per-ship state = OQ-019 boundary (row 16/17
+    aggregate accepted permanently t256c). Wiring either would ADD behaviour
+    the corpus never witnessed (zero invasion-vs-shield events in 20/20
+    saves, t207 corpus witness) with no closable ledger row — churn, not
+    progress. The honest delta of this iteration is the verbatim law itself.

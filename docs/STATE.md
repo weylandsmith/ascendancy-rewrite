@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T11:30
+updated: 2026-11-02T16:15
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,22 +260,21 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t275 REWRITE COMBAT INTEGRATION (pure code; machine-free — ORDERING
-RATIONALE: t273's drive leg ended with :9 running the vendor TUTORIAL campaign
-and a remote VNC client STILL established on :5910 (re-measured 2026-11-02
-13:49, t274 start — drive-class work STAYS HELD until the BLOCKED t273 release
-conditions are met: NO established client AND ring still tutorial-lineage; if
-met at a later task start, a drive-class re-queue outranks this row and STATE
-gets rewritten accordingly). t275 needs no game at all; the economy/research
-pin surface it shares (buildPhase) is now regression-guarded by t274's four
-mutation-verified catchers, so a combat rewire that touches the turn loop gets
-caught for free.
-TASK VERBATIM (queue row): gap row 14 — deterministic damage, ordered cat-0
-volley, shield-then-hull two-layer absorb, death at <1 (combat.md S2g/S2h +
-engagement resolution 0x42c60..0x42e6e, first eligible target, threat byte
-+0x59). Implement in rewrite/src/game/ with pins from the t85b 244-turn battle
-law set. If it doesn't fit one session, split (law doc first, code next
-session) and rewrite NEXT accordingly.
+NEXT t276 PLANETALLOC WINDOW WIRING (pure code; machine-free — ORDERING
+RATIONALE: t275's drive-state re-measure 2026-11-02 16:11 shows an x11vnc
+ESTABLISHED client on :5910 STILL attached to production :9 (tutorial t645)
+— drive-class work STAYS HELD until the BLOCKED t273 release conditions are
+met (NO established client AND ring still tutorial-lineage; if met at a
+later task start, a drive-class re-queue outranks this row and STATE gets
+rewritten accordingly). t276 needs no game at all and is the next pure-code
+row whose test surface can lean on the t274 mutation-verified catchers.
+TASK VERBATIM (queue row): t276 PLANETALLOC WINDOW WIRING in rewrite (pure
+code): the five-panel planet screen geometry from windows.txt (PLRES/PLIND/
+PLPRO/PLPOP/PLBUILD, type-29, left-to-right) + header getters (static.txt
+#147/149/151/152/153 law, selfplay.md) + gauge selector (ui::gaugeSelector
+clamp law) + poppanel (t263) + planitem hypothesis -> wire into
+rewrite/src/ui/ as the planet window composition; tests pin panel order +
+header format strings.
 
 PAIRING-SESSION NOTE (phase-3 handoff, 2026-11-02 ~10:15): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS this session (verbatim):
@@ -292,13 +291,6 @@ loadstate — input-dead-on-load law t261), plus the older bank-* dirs.
 
 QUEUE (phase 3, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t275 REWRITE COMBAT INTEGRATION (pure code): gap row 14 — deterministic
-  damage, ordered cat-0 volley, shield-then-hull two-layer absorb, death at
-  <1 (combat.md S2g/S2h + engagement resolution 0x42c60..0x42e6e, first
-  eligible target, threat byte +0x59). Implement in rewrite/src/game/ with
-  pins from the t85b 244-turn battle law set. If it doesn't fit one session,
-  split (law doc first, code next session) and rewrite NEXT accordingly.
 
 t276 PLANETALLOC WINDOW WIRING in rewrite (pure code): the five-panel planet
   screen geometry from windows.txt (PLRES/PLIND/PLPRO/PLPOP/PLBUILD, type-29,
@@ -354,14 +346,18 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   in-game Save; never overwrite by hand.
 - SIGKILL softlocked dosbox (SIGTERM -> quit-confirm (Yes)-default).
   Background shells need DISPLAY=:9. xsend refuses "warning"-titled windows.
-- Ledger: 14 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
+- Ledger: 15 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
   ledger_audit + ledger_index_check green; never hand-edit the index block.
 - Do NOT re-trod: t212/t213 static exhaustion; t255 screen-open (REFUTED);
   t258 candidicide (KEEPER); t259 sav-pair census (KEEPER); t262 fleet-census
   trigger (MEASURED-DEAD); t265 st4-dwell (t193 route DEAD); t269 threshold
   census (zero V>=25); t260/261 loadstate (GUI works, state input-dead);
   t272 debugger census (dosbox-x +dfsg HAS NO debugger — REFUTED-ROUTES t272;
-  no re-census, no -break-start pilot, no DEBUGBOX shell attempts).
+  no re-census, no -break-start pilot, no DEBUGBOX shell attempts);
+  t275 gap-row-14 aggregate RE-IMPLEMENTATION (the four sub-laws landed t89;
+  resolver 0x42c60 read verbatim — aggregate content COMPLETE, first-eligible
+  wiring is OQ-019-engine-build territory, gate/defense-term wiring REFUSED
+  with reasons combat.md S2k).
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in
   docs/re/ only.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line
@@ -384,6 +380,35 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t275 (2026-11-02): COMBAT INTEGRATION ADJUDICATED — ENGAGEMENT
+RESOLVER 0x42c60..0x42e6e READ VERBATIM (first time; t179 P3 was a summary).
+TRIAGE: the queue row's four sub-laws (deterministic damage, ordered cat-0
+volley, shield-then-hull absorb, death at <1) are code-verified LANDED since
+t89 (attackScore SUM campaign.cpp:1842, absorbSplit campaign.h:383, rng_
+draws removed :1956, capture/Extinct mapping, pin campaign_combat_law_oq010)
+— re-implementing them would churn. NEW LAWS (docs/re/combat.md S2k, listing
+work/t275_resolver.txt, capstone via /home/hrethric/tools/revenv/bin/python
+— HOST pythons have NO capstone): (1) enclosing fn 0x41e34 (size 6087), sole
+caller 0x41910 inside movement resolver 0x41260 (callers 0x16eb0/0x2554f);
+(2) caller-side ship array is OWNER-RACE FILTERED ([ship+0x54]>>16 ==
+engagement race, POWER>0, kind!=1) — the resolver NEVER sees the defender ->
+return fire is a SEPARATE resolution pass (corroborates t85g discrete steps
+40>38>36>34); (3) leg-selection gate 0x39a00: objective planet with ACTIVE
+item 23 Ship / 26 Orbital Shield / 27 Orbital Mega Shield SKIPS the
+invasion-carrier leg straight to firepower (item map verified income-law.md
+§6h); (4) 0x4a55c inside leg B WRITES stance/target (+0x62/67/68) — resolver
+commits the firing order. HONEST NEGATIVES: region never reads +0x59 (queue
+citation misdirected); every selection input is per-ship/per-planet state ->
+aggregate-mappable content is COMPLETE; DECISION: gate + t207 defense term
+NOT wired (no call site in the conflated aggregate engagement; operands are
+OQ-019 per-ship state; zero invasion-vs-shield witnesses 20/20 saves —
+wiring would add un-witnessed behaviour). OQ-019 row annotated STAYS OPEN;
+ai-dossier row 14 annotated; rewrite code UNCHANGED (correct strict-close
+outcome: no default changed on this evidence). Machine untouched: :9
+HEALTHY (TL expiry 2026-11-04 10:07), no new sitting (tail all t645), VNC
+client still ESTAB :5910 -> drive HOLD holds; RESUME.GAM untouched; no game/
+changes. NEXT = t276 VERBATIM.
 
 LANDED t274 (2026-11-02): ECONOMY/RESEARCH E2E TEST PIN — rewrite/tests/
 test_econres_t274.cpp (4 tests, CMakeLists registered; suite 150/0 green, gate

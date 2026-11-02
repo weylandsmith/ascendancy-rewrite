@@ -1620,7 +1620,7 @@ still open (flag). STATIC: t191's 'paint loop 0x25aa2..0x25b6d -> painter
 FUN_00025604 is a state-SNAPSHOT serialiser; NO rec+0x20 UI consumer found
 (census: 4 TEST + 18 CMP imm hits, none lane-pool-scoped; Ghidra
 search_instructions 98,819 instrs) — visibility-asked consumption moved to
-OQ-026. OQ-019's OWN residue re-probed and still NOT falsifiable: 2238 st4
+OQ-019's OWN residue re-probed and still NOT falsifiable: 2238 st4
 samples in the sitting window, 10 (turn,slot) pairs, ZERO mid-turn
 displacement, and the game never left t=1086 (639 rows 12:55:59..13:22:12,
 turn advance absent) — the live in-system march needs a sitting that PASSES
@@ -1662,7 +1662,7 @@ feed: the only st4 mid-turn moves in the corpus are INSIDE the softlock window
 new bug-class tell turn-frozen-but-tail-running. Row STAYS OPEN (strict-close):
 remaining runtime residues all need sub-ring instrumentation or a
 player-driven magnetron use; no documented-default in the rewrite changes on
-this evidence. | open | STATUS t273 (2026-11-02): magnetron USE-frame harvest re-run over the full corpus (r273_harvest leg C, r265 W2 signature verbatim): ZERO candidates (st5 control-class 160,747 rows, other 0). Honest negative; row STAYS OPEN.
+this evidence. | open | STATUS t273 (2026-11-02): magnetron USE-frame harvest re-run over the full corpus (r273_harvest leg C, r265 W2 signature verbatim): ZERO candidates (st5 control-class 160,747 rows, other 0). Honest negative; row STAYS OPEN. STATUS t275 (2026-11-02, ENGAGEMENT RESOLVER VERBATIM — docs/re/combat.md S2k, listing work/t275_resolver.txt, capstone 5.0.7): 0x42c60..0x42e6e read instruction-by-instruction for the first time (t179 P3 was a summary). CONFIRMS first-eligible selection both legs (no strength/value ranking anywhere). NEW LEGS: (1) caller-side ship array (0x41260 loop 0x41318) is OWNER-RACE FILTERED ([ship+0x54]>>16 == engagement race) + POWER>0 + kind!=1 — the resolver NEVER sees the defender's ships, so return fire is a separate resolution pass (t85g discrete-step observation corroborated); (2) leg-selection GATE 0x39a00 objective planet with ACTIVE item 23 Ship / 26 Orbital Shield / 27 Orbital Mega Shield SKIPS the invasion-carrier leg straight to firepower; (3) 0x4a55c inside leg B WRITES the shooter's stance/target (+0x62/67/68) — the resolver commits the firing order. HONEST NEGATIVES: region never reads +0x59 (queue-row citation misdirected — threat byte is t201/buildPhase); every selection input is per-ship/per-planet state the rewrite's fleet_ vector cannot represent -> aggregate-mappable content of the four t89 sub-laws is COMPLETE; first-eligible wiring stays inside THIS row (OQ-019 boundary, row 16/17 accepted t256c). No rewrite default changes on this evidence; row STAYS OPEN.
 
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
