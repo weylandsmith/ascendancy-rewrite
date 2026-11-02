@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T04:30
+updated: 2026-11-02T05:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,31 +260,25 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t267 HARNESS SELF-HEAL: the 15:45 game death went unnoticed ~1.5 h.
-Add to scripts/r1_playcap_vnc.sh (or a small r1_watch_dog.py): game-death
-detector (pgrep -x dosbox-x empty while the session is supposed live ->
-write work/r1/loop/GAME_DEAD.txt + log line), watcher-liveness check the
-loop can run cheaply, and a bring-up-verify sequence (ring row lands within
-30 s of start). Keep it shell-simple; no new deps.
-ORDERING: t267 first per queue order (t266 landed). t266 FEED that CHANGES
-t267's scope (all measured, docs/re/selfplay.md t266 block): (a) I3 root
-cause is -time-limit EXPIRY (07:46 launch + 28800 s = 15:46) — the death
-detector must ALSO compute TL expiry from launch wall and warn BEFORE it, or
-size TL from a fixed wall deadline; (b) THREE r1_playcap_watch.py instances
-are alive on playcap RIGHT NOW (524207, 524532, 535187 — verify via
-/proc/PID/cmdline; only 535187 is the current-session one) — reap the stale
-pair by recorded PID (pkill -f self-matches your shell, known footgun), else
-the two-writer collision class t266 documented keeps compounding; (c) the
-collision class itself: any analysis of the shared timeline across session
-boundaries MUST campaign-fingerprint slots first (star->planet-owner-table
-md5 law, selfplay.md t266).
-PRE-FLIGHT: `git status` clean + game liveness ONLY (pgrep -x dosbox-x;
-production :9 PID 535172 alive at t266 end, ring current, re-drive banked to
-t1236). DO NOT loadstate any bank (REFUTED t261). Timeline reads obey the
-OOM law (r1_stream.py / bounded tail seek only; NEVER json.load the whole
-file). If the :9 session has since died: that is t267 material — bank the
-ring, note the wall, relaunch per SOP, and the detector you are writing
-should have caught it (report honestly whether it did).
+NEXT t268 LIVE SCREEN SWEEP 3: NEGSCREEN negotiation flow + intel detail +
+tech tree detail (manifest-level -> dossier-level, docs/re/ui.md). SAME
+SAFETY LAW as t252/t253: NEVER click PROPOSE/DECLARE/ABANDON/END-TURN (t244
+abandoned a system by accident once; Escape does NOT unwind PLANETALLOC per
+t254 — prefer screens that unwind). Vision on the projector; R13 only bans
+grading OUR renders.
+ORDERING: t268 first per queue order (t267 landed; research resumes after
+two harness iterations t266/t267). PRE-FLIGHT CHANGED BY t267: run
+`python3 scripts/r1_game_health.py` FIRST (exit 0 = game/watcher/ring OK;
+reasons name what is broken). PRODUCTION TL EXPIRES 2026-11-02 07:03:58 —
+if the sweep starts after that wall, the :9 game is DEAD (G:DEATH,
+work/r1/loop/GAME_DEAD.txt): bank the ring (cp save/ bank-tNNN-*), relaunch
+via `bash scripts/r1_playcap_vnc.sh start` (t267 guard + reaper + BRINGUP
+verify run automatically), resume via Return-to-Game, THEN sweep. NEVER
+loadstate any bank (REFUTED t261). Timeline reads obey the OOM law
+(r1_stream.py / bounded tail seek only; NEVER json.load the whole file).
+Multi-writer class is closed at the source (one watcher law: reaper), but
+any cross-session timeline analysis still campaign-fingerprints slots first
+(star->planet-owner-table md5, selfplay.md t266).
 
 
 PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
@@ -301,13 +295,6 @@ driven exit fires when the queue drains).
 
 QUEUE (phase 2, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t267 HARNESS SELF-HEAL: the 15:45 game death went unnoticed ~1.5 h. Add to
-  scripts/r1_playcap_vnc.sh (or a small r1_watch_dog.py): game-death
-  detector (pgrep -x dosbox-x empty while the session is supposed live ->
-  write work/r1/loop/GAME_DEAD.txt + log line), watcher-liveness check the
-  loop can run cheaply, and a bring-up-verify sequence (ring row lands within
-  30 s of start). Keep it shell-simple; no new deps.
 
 t268 LIVE SCREEN SWEEP 3: NEGSCREEN negotiation flow + intel detail + tech
   tree detail (manifest-level -> dossier-level, docs/re/ui.md). SAME SAFETY
@@ -369,6 +356,39 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t267 (2026-11-02): HARNESS SELF-HEAL — DEATH/TL/WATCHER DETECTION
+SHIPPED, AND THE 3-WRITER COLLISION WAS CAUGHT LIVE AND KILLED. Pre-flight
+MEASURED three r1_playcap_watch.py writers on playcap (524207/524532/535187,
+all holding timeline fds per the t215 writerhood law) with dup amplification
+MEASURED in the tail (16 rows / 6 slot-keys, reps {3x5,1x1} — per-process
+`seen` dedup cannot see sibling writers). SHIPPED: scripts/r1_game_health.py
+(RC 0/1/2; G recorded-pid + adoption rule [pidfile lost + exactly one
+harness dosbox-x in /proc => record, not death; MULTI checked even with a
+valid pidfile = the t261 class] + GAME_DEAD.txt on DEATH; T TL expiry from
+/proc ctime + own cmdline arg, WARN 600 s BEFORE expiry — the t266 ask; W
+watcher census naming the reaper when >1; F ring-mtime freshness 60 s, NEVER
+reads the timeline jsonl — OOM law; B bring-up 30 s). scripts/
+r1_watch_reaper.py (per-PID /proc-verified SIGTERM, keep-newest, no pattern
+kills): LIVE REAP of 524532+524207 keeping current 535187; POST-REAP
+MEASURED reps all 1 — duplication gone. Wiring: vnc 'status' runs the health
+pass; 'start' reaps --keep 0 then BRINGUP-verifies, and a t267 ADOPTION
+GUARD closes the t261 ROOT (lost pidfile + live harness game used to launch
+a SECOND game on the same ring; now adopts+records). loop_one_task.sh runs
+the health check every iteration pre-gate (advisory stamp even under
+IDLE_GATE=0 — takes effect at next loop relaunch; MEASURED bash 5.2.37 law:
+tmp+rename leaves a running survivor on the old inode, in-place
+rewrite corrupts it at its parse offset). VERIFIED: production HEALTHY
+04:31/04:59 (TL line == hand computation 23:03:57+28800=07:03:58); fixture
+battery DEATH/adopt/MULTI/WARN/PIDSTALE/foreign/zombie/RC2 all behave; full
+lifecycle E2E in isolated sandbox (:10, copied scratch — game/ never
+mounted — TL=120): BRINGUP OK -> T:WARN pre-expiry -> TL kill -> G:DEATH +
+GAME_DEAD.txt; adoption proven (rm pidfile + live game => ADOPTED, one
+dosbox). Limits banked in selfplay.md t267 (detects, does not relaunch —
+evidence law; TL read from cmdline only). NO OQ closed strict-close (005/
+016/019/021 open; control-plane iteration by design); gate 0, ledger audit
+OK, index OK; production :9 untouched (its TL dies 07:03:58 — t268 pre-flight
+handles it); NEXT = t268 VERBATIM
 
 LANDED t266 (2026-11-02): SOFTLOCK-CLASS FORENSICS — THE t261 "PRODUCTION
 :9 SOFTLOCK AT 21:38" IS CONTENT-REFUTED AS A PRODUCTION EVENT: TWO-WRITER

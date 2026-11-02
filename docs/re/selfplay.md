@@ -644,3 +644,93 @@ advances); the planet table does not. ALWAYS fingerprint before trusting rows.
    robustness note: the vendor engine can hang with the emulator alive; a
    rewrite watchdog should detect input-dead + RAM-frozen per the t250 law
    (c-leg version) rather than CPU.
+
+## t267 (2026-11-02) — HARNESS SELF-HEAL: DEATH/TL/WATCHER DETECTION SHIPPED; THE 3-WRITER COLLISION WAS CAUGHT LIVE AND KILLED
+
+CONTEXT (queue verbatim): the t266-measured 15:45 death (dosbox-x
+-time-limit expiry) went unnoticed ~1.5 h because production runs
+loop_one_task.sh with IDLE_GATE=0 — r1_idle_probe.py never fires between
+iterations and nothing polls work/r1/vnc/dosbox.pid.
+
+MEASURED THIS SESSION (pre-flight, 04:24-04:26):
+- THREE r1_playcap_watch.py writers alive on playcap (524207 since 18:40,
+  524532 since 18:49, 535187 since 23:03 = current), each holding an open fd
+  on live-timeline.jsonl (t215 writerhood law re-applied). Duplication
+  MEASURED in the last-400 KB tail: 16 rows = 6 distinct (file, mtime_ns)
+  keys, reps {3x5, 1x1} — every ring write landed THREE times because each
+  watcher's `seen` dedup is per-process (jsonl-derived at start only). The
+  t266 oscillation forensics read data with this 3x amplification live.
+- Ring current (slots at exact 10 s spacing), game 535172 alive, TL expiry
+  hand-computed 23:03:57+28800 = 07:03:58.
+
+SHIPPED (all stdlib/shell, no new deps):
+1. scripts/r1_game_health.py — exit 0 HEALTHY / 1 UNHEALTHY / 2 broken;
+   checks G (recorded pidfile + comm == dosbox-x; ADOPTION rule: pidfile
+   lost but exactly one harness-launched dosbox-x in /proc (cmdline carries
+   $RUNDIR) => record it, do NOT call it death; zero => G:DEATH + write
+   work/r1/loop/GAME_DEAD.txt; >1 => G:MULTI-DOSBOX, checked EVEN with a
+   valid pidfile — t261's class is production+stray both harness-launched),
+   T (TL expiry from /proc/PID ctime + its own -time-limit arg; T:WARN at
+   WARN_AHEAD default 600 s BEFORE expiry — the t266 ask; T:EXPIRED after),
+   W (watcher census on OUT; 0 => NOWATCHER, >1 => MULTI-WRITER naming the
+   reaper), F (newest save/*.sav mtime age > FEED_MAX_AGE 60 s => FEED-STALE;
+   NEVER opens live-timeline.jsonl — OOM law), B (BRINGUP=1 env: ring row
+   within VERIFY_WINDOW 30 s). Artifacts: loop/GAME_HEALTH_LIVE.txt (atomic
+   tmp+rename), loop/game_health.tsv (append-only history).
+   VERIFIED: production run HEALTHY at 04:31 and 04:59 (TL line matches hand
+   computation); fixture battery (dirs via R1_VNC_DIR/R1_PLAYCAP_DIR/
+   R1_LOOP_DIR env, fake dosbox-x compiled in /tmp): DEATH+GAME_DEAD.txt,
+   adopt-sole (pidfile written), MULTI with valid pidfile, stale-pidfile +
+   expired-new game, T:WARN, PIDSTALE, foreign-dosbox note, zombie exclusion
+   (a defunct child still reads comm=dosbox-x — MEASURED trap), instrument-
+   broken RC=2. E2E sandbox (/tmp/t267sb: copied scratch game — game/ never
+   mounted — display :10, TL=120): start -> BRINGUP OK; T:WARN 100 s BEFORE
+   expiry while alive; TL KILL at 04:57:44 -> next health run G:DEATH +
+   GAME_DEAD.txt naming the pid; production :9 untouched throughout (foreign
+   census noted it correctly).
+2. scripts/r1_watch_reaper.py OUT [--keep N] [--dry-run] — /proc-enumerated,
+   per-PID verified (comm python* AND cmdline has script name AND OUT dir),
+   keeps newest-started N, SIGTERM only, never pattern-kills (pkill -f
+   self-match footgun honored). LIVE RUN on production: REAPED 524532 +
+   524207, KEPT 535187 (dry-run first; victim set matched t266's recorded
+   stale pair exactly). POST-REAP MEASURED: timeline tail 10 rows / 10
+   distinct keys, reps all 1 — duplication gone.
+3. scripts/r1_playcap_vnc.sh: 'status' runs the health pass; 'start' runs
+   the /proc reaper with --keep 0 (dosbox is dead in that branch, so every
+   surviving watcher is stale — keep>=1 would spare the newest stale one and
+   recreate the class), then BRING-UP-VERIFY (poll ring for a row newer than
+   30 s; prints BRINGUP OK/FAIL); and a t267 ADOPTION GUARD closes the ROOT
+   of the t261 collision: if dosbox.pid is lost while a harness dosbox
+   (cmdline carries $RUNDIR/session.conf) still lives, old 'start' judged
+   "no sitting" and launched a SECOND game on the same ring — the guard
+   adopts+records instead, reaps to one watcher, relaunches the watcher if
+   missing. VERIFIED in sandbox: rm dosbox.pid + live game -> 'ADOPTED live
+   dosbox pid ... nothing launched', census shows exactly one sandbox
+   dosbox; rm pidfile + dead game -> clean relaunch + BRINGUP OK.
+4. scripts/loop_one_task.sh: runs r1_game_health.py EVERY iteration before
+   the pre-flight gate and logs one GAME-HEALTH line (advisory, non-fatal —
+   relaunching the game is research-schedule policy, not scheduler work), so
+   a death is wall-stamped in loop.log even under IDLE_GATE=0. NOTE: bash
+   reload semantics MEASURED this session (two /tmp probes, bash 5.2.37):
+   in-place truncate+rewrite of a RUNNING script corrupts the survivor at
+   its parse offset (syntax error mid-loop); tmp+rename (what patch/
+   write_file tools use — _atomic_write, file_operations.py) leaves the
+   survivor reading the old inode. loop edits therefore take effect at the
+   NEXT loop relaunch, never mid-flight — safe by construction.
+
+BANKED LIMITS / honest negatives:
+- The detector DETECTS and STAMPS; it does not relaunch. An unattended
+  relaunch would overwrite the softlock evidence state (t261 law: bank
+  before restart), so GAME_DEAD.txt + the loop.log stamp + the next
+  iteration's own pre-flight are the designed response chain.
+- T:WARN fires UNHEALTHY (rc=1) while the game is alive — deliberate: the
+  whole t266 failure was silence-before-expiry. Consumers that grade
+  "process up" only should read the G: reason codes, not rc alone.
+- FEED-STALE cannot distinguish "game at title with autosave off" from
+  "watcher wedged" if autosave ever stops while the process lives; under
+  the current autosave=10 41-60 conf the ring churns even at the title, so
+  staleness means trouble. A future conf change must re-check this row.
+- TL is read from the process cmdline only; a game launched WITHOUT
+  -time-limit reports no TL line (invariant says always pass it).
+- No OQ row touched: this is control-plane work (harness), ledger stays
+  14 closed / 4 open.

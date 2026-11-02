@@ -88,6 +88,9 @@ case "$CMDS" in
       if alive "$p"; then echo "$p: RUNNING (pid $(cat "$RUNDIR/$p.pid"))"
       else echo "$p: not running"; fi
     done
+    # t267: full health pass (game pid + TL expiry + watcher census + ring
+    # freshness). Exit code intentionally not propagated to status.
+    python3 "$ROOT/scripts/r1_game_health.py" || true
     [ -f "$OUT/live-timeline.jsonl" ] && echo "timeline: $(wc -l < "$OUT/live-timeline.jsonl") observations banked"
     echo "--- last banked state (10 s cadence law) ---"
     grep -vE 'PROCESS ERROR' "$OUT/watch.out" 2>/dev/null | tail -n 4 || true
@@ -138,6 +141,28 @@ ss -tln 2>/dev/null | grep -q ":$PORT " || { echo "harness: nothing listening on
 if alive dosbox; then
   echo "harness: dosbox sitting ALREADY RUNNING (pid $(cat "$RUNDIR/dosbox.pid")) — tunnel verified, nothing new launched."
 else
+  # t267 ADOPTION GUARD (t261 collision class ROOT): if dosbox.pid was lost
+  # while a harness dosbox still runs, 'alive dosbox' says false and the old
+  # code launched a SECOND game on the same ring — which is how the t261
+  # stray wrote production's slots. Never launch when a harness-launched
+  # dosbox-x (cmdline carries $RUNDIR/session.conf) is in /proc; record it.
+  _adopt=""
+  for _c in $(pgrep -x dosbox-x 2>/dev/null || true); do
+    if tr '\0' ' ' < "/proc/$_c/cmdline" 2>/dev/null | grep -q "$RUNDIR/session.conf"; then
+      _adopt="$_c"; break
+    fi
+  done
+  if [ -n "$_adopt" ]; then
+    echo "$_adopt" > "$RUNDIR/dosbox.pid"
+    echo "harness: ADOPTED live dosbox pid $_adopt (pid file was lost) — nothing launched"
+    python3 "$ROOT/scripts/r1_watch_reaper.py" "$OUT" --keep 1 || true
+    if ! pgrep -f "r1_playcap_watch.py $OUT" >/dev/null 2>&1; then
+      setsid bash -c "cd '$ROOT' && python3 scripts/r1_playcap_watch.py '$OUT' --no-exit >>'$OUT/watch.out' 2>&1" \
+        < /dev/null > /dev/null 2>&1 &
+      sleep 1; echo $! > "$RUNDIR/watch.pid"
+      echo "harness: watcher launched for adopted session"
+    fi
+  else
   # t85b REAPER: every sitting's 'setsid ... watch &' left its watcher alive
   # (--no-exit + the dosbox-alive check kept old ones looping for days; the
   # single watch.pid file only tracked the NEWEST). Twelve concurrent
@@ -155,6 +180,13 @@ else
     fi
     rm -f "$pf"
   done
+  # t267: pid files miss watchers whose starting session never recorded (or
+  # whose file was overwritten by the next start) — MEASURED 3 live writers
+  # with dup-row amplification on the timeline. /proc census catches the rest.
+  # --keep 0: dosbox is dead here, so EVERY surviving watcher is stale; the
+  # fresh one launches below. (keep>=1 would spare the newest stale watcher
+  # and immediately recreate the two-writer class.)
+  python3 "$ROOT/scripts/r1_watch_reaper.py" "$OUT" --keep 0 || true
   CONF="$RUNDIR/session.conf"
   cat > "$CONF" <<EOF
 [dosbox]
@@ -185,6 +217,23 @@ EOF
     < /dev/null > /dev/null 2>&1 &
   sleep 1
   echo $! > "$RUNDIR/watch.pid"
+  # t267 BRING-UP-VERIFY (queue spec: ring row must land within 30 s of
+  # start). Poll the ring's newest mtime; the 10 s cadence law means a live
+  # stack lands a NEW row each 10 s — an unchanged mtime for 30 s means the
+  # watcher or the guest autosave is not running. Never reads the timeline.
+  _bu_ok=0
+  _bu_t0=$(date +%s)
+  while [ $(( $(date +%s) - _bu_t0 )) -lt 30 ]; do
+    _bu_newest=$(find "$OUT/save" -name '*.sav' -newermt "-30 seconds" 2>/dev/null | head -1)
+    if [ -n "$_bu_newest" ]; then _bu_ok=1; break; fi
+    sleep 3
+  done
+  if [ "$_bu_ok" = 1 ]; then
+    echo "harness: BRINGUP OK (ring row landed within 30 s: $(basename "$_bu_newest"))"
+  else
+    echo "harness: BRINGUP FAIL — no ring row within 30 s; run: python3 scripts/r1_game_health.py"
+  fi
+  fi
 fi
 
 cat <<EOF

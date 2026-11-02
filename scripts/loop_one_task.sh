@@ -176,6 +176,16 @@ while :; do
   n=$(( $(cat "$LOOPDIR/iter.count" 2>/dev/null || echo 0) + 1 ))
   echo "$n" > "$LOOPDIR/iter.count"
 
+  # t267 SELF-HEAL (advisory, sub-second): stamp game/TL/watcher/ring state
+  # EVERY iteration — including under IDLE_GATE=0, where r1_idle_probe.py
+  # never runs and the t266 15:45 death sat unnoticed 1.5 h. Runs BEFORE the
+  # pre-flight gate so a dead game is timestamped even on a red tree.
+  # Non-fatal by design: relaunching the game is research-schedule policy,
+  # not something the scheduler should do unattended.
+  python3 scripts/r1_game_health.py > "$LOOPDIR/health-last.log" 2>&1
+  log "GAME-HEALTH(rc=$?): $(head -1 "$LOOPDIR/health-last.log")"
+  [ -f "$LOOPDIR/GAME_DEAD.txt" ] && log "GAME-HEALTH: $(cat "$LOOPDIR/GAME_DEAD.txt" | head -1)"
+
   # Pre-flight: never start an iteration from a red tree.
   if ! bash scripts/gate.sh > "$LOOPDIR/preflight_gate.log" 2>&1; then
     log "iter $n: GATE RED before start — not launching. See $LOOPDIR/preflight_gate.log"
