@@ -734,3 +734,32 @@ BANKED LIMITS / honest negatives:
   -time-limit reports no TL line (invariant says always pass it).
 - No OQ row touched: this is control-plane work (harness), ledger stays
   14 closed / 4 open.
+
+### t267 INCIDENT (self-inflicted, caught by the new detector, recovered)
+The sandbox cleanup line in this session included `pkill -x dosbox-x
+-u $USER` — exact-name, but production :9 IS dosbox-x: the pattern matched
+PID 535172 and SIGTERM'd it at 04:58:58 (last ring row 48.sav). dosbox-x
+popped its quit-confirm ("Quit DOSBox-X warning", xmessage window
+0x1000025 @ +197+253, (Yes) default — the banked law exactly); the GUEST
+FROZE MODAL for ~17 min. The game never died.
+DETECTION: r1_game_health.py run 04:59:00 was still HEALTHY (ring row 3 s
+old — SIGTERM had just landed); the 05:04:28 run printed F:FEED-STALE
+(331 s) — the ring-stall signal fired on a REAL incident within minutes of
+the first post-event check. (Not automatic: the live loop runs the pre-edit
+inode until relaunch — the t267 wiring lands next loop start.)
+RECOVERY: xwininfo -root -tree located the blocker (t245 law stays valid:
+its point is xsend TARGET CONFUSION — the blocker title matches 'DOSBox-X',
+and xsend refuses 'warning' titles, which is exactly why tclick-by-ID was
+needed here; import -window root did show this dialog, do not infer
+blockers are invisible in general). xsend REFUSES
+"warning" titles by design (t245), so scripts/tclick.c (new; compile:
+gcc -O1 -o tclick scripts/tclick.c -lX11 -include string.h) clicks a window
+by EXPLICIT ID — clicked the "No" child (0x1000027, 31 px = "No"; Yes is
+the 35 px child 0x100002a) at (15,12). Dialog closed 05:15:51, ring resumed
+(49.sav age 2 s at 05:15:53), campaign readouts byte-identical across the
+freeze (t=1236 mine_any=26 full=25 DAT_482fb=23/50) — no reload happened.
+LAW BANKED: production cleanup NEVER pattern-kills dosbox-x (exact-name is
+NOT sufficient — there is exactly one production process with that name);
+kill ONLY PIDs recorded in work/r1/vnc/dosbox.pid, verified via /proc
+cmdline (sandbox conf path). Sandbox teardown = vnc.sh --stop + reaper on
+the SANDBOX out dir, nothing else.

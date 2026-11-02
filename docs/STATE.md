@@ -326,8 +326,14 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   the game writes it ONLY at in-game Save; never overwrite by hand.
 - SIGKILL a softlocked dosbox (SIGTERM pops its own quit-confirm, (Yes)
   DEFAULT). Background shells need DISPLAY=:9 injected. xsend refuses windows
-  with "warning" in the title.
-- Ledger: 14 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
+  with "warning" in the title. t267 LAW: NEVER pattern-kill dosbox-x at all
+  (even pkill -x — production IS that name; t267 self-inflicted modal-freeze
+  incident, docs/re/selfplay.md t267 block): signal ONLY the recorded
+  work/r1/vnc/dosbox.pid after /proc cmdline verification; rescue a popped
+  quit-confirm via scripts/tclick.c by window ID (xwininfo -root -tree;
+  "No" = the narrow child), NEVER click Yes (default).
+- Ledger: 15 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021 — re-derive via
+  ledger_index_check.py, don't trust counts). Keep
   ledger_audit + ledger_index_check green; never hand-edit the index block.
 - OQ-005 needs the USER's index.txt ruling — do NOT burn iterations on it.
 - Do NOT re-trod: t212/t213 static exhaustion; t255 screen-open recompute
@@ -389,6 +395,13 @@ evidence law; TL read from cmdline only). NO OQ closed strict-close (005/
 016/019/021 open; control-plane iteration by design); gate 0, ledger audit
 OK, index OK; production :9 untouched (its TL dies 07:03:58 — t268 pre-flight
 handles it); NEXT = t268 VERBATIM
+CORRECTION TO "untouched" (same session, later): my sandbox CLEANUP line
+pattern-killed production (pkill -x dosbox-x matched 535172) -> quit-confirm
+modal freeze 04:58:58-05:15:51; r1_game_health.py FEED-STALE caught it
+(331 s), tclick.c-by-window-ID clicked No, ring resumed, campaign readouts
+identical across the freeze, ZERO data loss — full account + the banked
+never-pattern-kill law in selfplay.md t267 incident block + STATE standing
+laws. The detector earned its keep on its first night, on its author.
 
 LANDED t266 (2026-11-02): SOFTLOCK-CLASS FORENSICS — THE t261 "PRODUCTION
 :9 SOFTLOCK AT 21:38" IS CONTENT-REFUTED AS A PRODUCTION EVENT: TWO-WRITER
