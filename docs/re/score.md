@@ -543,3 +543,59 @@ STRICT-CLOSE: OQ-021 STAYS OPEN — a trajectory is not a threshold (task law).
 Closure still requires the ENDGAME-window witness (selector arm + end-ctrl
 screen), i.e. the interactive watchpoint session (USER ASK in BLOCKED.md).
 Rewrite default >1/2 (campaign.cpp) remains CONSISTENT with every banked frame.
+
+## S15 — t272: THE WATCHPOINT INSTRUMENT DOES NOT EXIST ON THIS BOX [measured, honest negative]
+
+The task grant was to run a dosbox-x write-watchpoint session on scratch against
+guest-phys B+0x82bb0+0x482fb-0x88 (S9's decisive instrument). The session ran
+(scripts/r1_t272_wp.sh, scratch work/r1/wp-t272/game, own ring dir per the
+two-writer law, display :94, FIFO-held stdin, tracked-PID kills only, production
+:9 untouched) and the instrument census came back NEGATIVE on every route:
+
+1. THE BINARY HAS NO DEBUGGER COMMAND SET. /usr/bin/dosbox-x
+   2025.02.01+dfsg-3 SDL2 (md5 15c49346539c155e4d0a7815f21e787c, stripped):
+   strings -n 2 census (the length that would catch 3-char verbs) finds ZERO
+   exact lines "bpm"/"bph"/"clrbpm"/"bplist"/"dbgcon"; zero substrings
+   "breakpoint"/"watchpoint"/"Break on write" anywhere; the 6 exact "bp" hits
+   are all .text/.rodata byte-noise (offsets d116a,10d1a6,3ac938,6ef192,b2338b,
+   b27285 — none in the string region). The pairing session's
+   "ZERO breakpoint/bpm strings" is CONFIRMED and now root-caused (below).
+2. LEFTOVER DEBUGGER STRINGS ARE DEAD TABLES, NOT CODE. "Enter Debugger
+   Command" (.rodata 0x8ff819) and "DEBUGBOX" (0x8f8003) sit inside the GUI
+   help/menu-construct literal block ("---- display list ----",
+   "void ConstructMenu()", "MainMenu", "command_") — the .lng file ships
+   :DEBUGCMD, :SHELL_CMD_DEBUGBOX_HELP and MENU:debugger_runwatch entries, but
+   EMPIRICS refute them: (a) `DEBUGBOX ASCEND.EXE` in autoexec -> "Bad command
+   or filename - \"DEBUGBOX\"" (screenshot shot2.png; the DOS shell has no such
+   internal — its SHELL_CMD_DEBUGBOX help table isn't linked in either);
+   (b) the live GUI menu bar is Main/CPU/Video/Sound/DOS/Drive/Capture/Help —
+   NO Debug menu (the .lng DebugMenu strings are unreferenced), and the Capture
+   dropdown offers only screenshot/record/state items (shot_help.png);
+   (c) GOAL.txt's standing "do not pilot -break-start" is VINDICATED: the
+   switch is accepted and IGNORED — game reached the title screen normally
+   (shot1.png), autosave ring ran, debugger never appeared.
+3. NO ALTERNATIVE INSTRUMENT ON THE BOX: /usr/bin/dosbox (0.74-3) strings =
+   zero debugger literals of any kind; no bochs/qemu/pcem/valgrind installed;
+   external ptrace stays REFUTED (R4).
+4. SCRATCH SESSION PREREQUISITE FOUND (keeper, scripts/r272_scratch_resident.py):
+   a title-screen scratch boot has NO ascend.exe image in guest RAM — payload
+   16B-chunk hits 3 (sparse noise) vs 118 in a production in-campaign slot,
+   "STARS CONTROLLED" string 0 vs 1, non-zero 1MB pages 3 vs 17. The strategy
+   image loads only when a campaign starts. ANY future watchpoint-class session
+   MUST click into a campaign (New Game) before the watchpoint target exists —
+   the target [0x482fb] is not even resident at the title screen.
+5. WHAT WOULD MAKE IT EXIST [inferred from 1-3, stated for the user]: a
+   dosbox-x built WITH the debugger (upstream builds ship it; the Debian
+   +dfsg-3 package evidently links it out — the dead .lng/.rodata tables are
+   the fingerprint). That is a build-from-source decision (network fetch +
+   ~long compile) and a USER decision; no offline route exists on this box.
+
+CONSEQUENCE FOR THE LEDGER: OQ-021's producer-write-site residue AND OQ-019's
+sub-ring residue (t265: "needs a sub-ring instrument (runtime watchpoint class)
+or is dropped") both named THIS instrument as their closing route. The route is
+now MEASURED-DEAD on this box. OQ-021 STAYS OPEN (strict-close; threshold
+witness via long drive = t273 remains the live route; rewrite default >1/2
+unchanged and still consistent with every banked frame). The producer question
+transfers to: (a) t273 threshold watch, (b) indirect read-input discrimination
+if a same-turn-different-V sav pair ever lands (t259 census: none in 122), or
+(c) a user-supplied debugger-enabled dosbox-x build.

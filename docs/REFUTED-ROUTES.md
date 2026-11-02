@@ -321,3 +321,18 @@ mutation law gets its first live confirmation + a pin). Related banked facts
 (pending reserves its slot byte1:=id/word2-clear; per-slot shield byte has no
 mapped consumer; AI orbital shipyard-tail template {28,29,30,0,26} @0x89360):
 docs/re/income-law.md T271.
+
+## t272 — DOSBOX-X WRITE WATCHPOINT ON THIS BOX IS DEAD (instrument does not exist)
+The installed dosbox-x 2025.02.01+dfsg-3 SDL2 has NO debugger command set
+(strings -n 2: zero "bpm"/"bph"/"clrbp*"/"bplist"/"dbgcon"/"breakpoint"/
+"watchpoint"; the DEBUGBOX internal errors "Bad command or filename"; the GUI
+has no Debug menu despite en_US.lng carrying dead debugger strings; -break-start
+is accepted and IGNORED — game boots to title, measured, screenshots in
+work/r1/wp-t272/). /usr/bin/dosbox 0.74-3: zero debugger strings. No
+bochs/qemu/valgrind on the box; ptrace stays dead (R4). DO NOT re-census this
+binary and do NOT pilot -break-start again (GOAL.txt standing decision, now
+empirically vindicated). Full trail docs/re/score.md S15. Related keeper: a
+title-screen scratch boot does NOT have the ascend.exe image resident in guest
+RAM (scripts/r272_scratch_resident.py) — any future debugger-class session must
+click into a campaign first. If the user ever supplies a debugger-enabled
+dosbox-x build, this route re-opens (S15.5).

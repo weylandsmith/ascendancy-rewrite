@@ -476,6 +476,16 @@ new capture or a user decision (see the decision surface in docs/STATE.md).
 ##     End-Turn. This is the FIRST instrument that can see the runtime-computed
 ##     store address t212 proved exists. Requires the user's OK to run a
 ##     modified dosbox-x against the scratch copy (game/ untouched as always).
+##     STATUS t272 (2026-11-02, GRANTED and RUN): MEASURED-DEAD on this box —
+##     the installed dosbox-x 2025.02.01+dfsg-3 has NO debugger command set
+##     (score.md S15, REFUTED-ROUTES t272; scratch session r1_t272_wp.sh ran,
+##     instrument absent on every route: strings, DEBUGBOX shell, GUI menus,
+##     -break-start). THE ASK NOW CHANGES SHAPE: closing this residue needs the
+##     user to supply/authorise a DEBUGGER-ENABLED dosbox-x build (upstream
+##     binaries ship it; the Debian package links it out) — a network fetch or
+##     source build, both outside loop standing constraints (no network
+##     fetches). Until then the live route for OQ-021 is the t273 V>=25
+##     threshold witness; the write-site itself stays open honestly.
 ## Best default while unanswered: rewrite keeps >1/2 on V (campaign.cpp:2093),
 ## consistent with every banked frame (V never crossed 25, no screen ever seen);
 ## row stays open; no other open row depends on either residue.

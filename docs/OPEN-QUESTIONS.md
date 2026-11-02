@@ -423,7 +423,19 @@ denominator never variable; distance-to-half = max 46.0% (V=23), strict
 majority 3 stars away, systems_any=36>25 with sel=0 re-confirms the semantic
 non-join at the threshold neighbourhood; 66 V-change boundaries banked. Row
 STAYS OPEN (a trajectory is not a threshold; ENDGAME-window witness still the
-closure class) |
+closure class) STATUS t272 (2026-11-02, watchpoint session GRANTED and RUN on
+scratch — INSTRUMENT MEASURED-DEAD on this box): the installed dosbox-x
+2025.02.01+dfsg-3 has no debugger command set at all (zero bpm/bpmw/clrbp/
+bplist/breakpoint strings even at -n 2; DEBUGBOX shell internal absent
+("Bad command or filename"); GUI has no Debug menu; -break-start accepted and
+IGNORED — boots to title; all measured, docs/re/score.md S15,
+docs/REFUTED-ROUTES.md t272). The runtime-watchpoint class named as the
+write-site closure route DOES NOT EXIST here; alternatives checked same session
+(dosbox 0.74 zero debugger strings, no bochs/qemu/valgrind, ptrace dead R4).
+Keeper for any future debugger-class run: a title-screen boot does NOT have the
+image resident (scripts/r272_scratch_resident.py) — enter a campaign first.
+Row STAYS OPEN; live routes = t273 threshold watch (V>=25 event) and the
+ENDGAME-window witness; rewrite default >1/2 unchanged |
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T08:55
+updated: 2026-11-02T11:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,7 +260,22 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t272 V-PRODUCER WATCHPOINT — GRANTED (user 2026-11-02: "Yes — prep and run it on scratch"). Author the dosbox-x write-watchpoint session for guest-phys B+0x82bb0+0x482fb-0x88 (pointer law, score.md S9/S14) on a SCRATCH game copy (NEVER work/r1/game/), drive turns until ONE V-change lands, capture the writer EIP, map it back via the t106/t107 windowed-disasm recipe. INSTRUMENT FACTS MEASURED by the pairing session (don't re-derive): this dosbox-x 2025.02.025 build HAS -break-start (breaks into debugger at startup) and a debugger run-mode config key ("The run mode when the DOSBox-X Debugger starts"), but strings finds ZERO "breakpoint"/"bpm" literals — the debugger command set is UNKNOWN; discover it empirically on scratch (attach, type help/? , dump the command list, then find the memory-write-breakpoint command; if none exists, the debugger is compiled WITHOUT watchpoints -> bank the honest negative, rewrite NEXT to t273 with the negative cited). If watchpoints DO exist: scratch session gets its OWN ring dir (work/r1/playcap-wp/) — NEVER the production ring (two-writer collision law, t266); drive via r1_t245_turndrive with DISPLAY injected; bank every EIP stop (registers + stack window) to docs/re/score.md S-new. PRE-FLIGHT: python3 scripts/r1_game_health.py; production :9 is LIVE at t1086 (relaunch 2026-11-02 10:06, TL=172800) — do not touch it; scratch copy per docs/BLOCKED.md runbook. Timeline reads obey the OOM law. NEVER loadstate any bank (REFUTED t261).
+NEXT t273 LONG DRIVE WITNESS HARVEST II (base = production t1086 NOW; drive toward
+1250+; t272 landed NO writer EIP — the watchpoint instrument is MEASURED-DEAD on
+this box (score.md S15, REFUTED-ROUTES t272: dosbox-x +dfsg-3 has no debugger
+command set at all; do NOT re-census it, do NOT pilot -break-start), so the
+"(b) verify writer EIP" leg of this task is VOID — skip it). ORDERING RATIONALE:
+t272 consumed its grant to an honest negative; production :9 is live and healthy
+(TL expiry Nov 4 10:07), and the V>=25 threshold witness (OQ-021's only live
+closure route now) plus the multi-volley witness (OQ-016) are drive-corpus
+mines — harvest while the session lives. r1_t245_turndrive v4; bank the ring to
+a dated bank dir BEFORE any restart AND every ~30 turns; OOM law; per-segment
+trust law (t262 r262 pattern). MINE: (a) multi-volley vs NON-at-war owner
+(OQ-016 — t251's cascade was the first; bank counts + slot refs to combat.md);
+(b) V>=25 threshold watch (t269 census says this campaign stays under 14..22 —
+if a drive BREAKS 25, that is the threshold witness, log the exact ring slot +
+V + systems counts; strict-close only on the event); (c) OQ-019 magnetron USE
+frames if any AI fleet holds one. Bank witness tables; honest negatives fine.
 
 PAIRING-SESSION NOTE (phase-3 handoff, 2026-11-02 ~10:15): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS this session (verbatim):
@@ -362,7 +377,9 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Do NOT re-trod: t212/t213 static exhaustion; t255 screen-open (REFUTED);
   t258 candidicide (KEEPER); t259 sav-pair census (KEEPER); t262 fleet-census
   trigger (MEASURED-DEAD); t265 st4-dwell (t193 route DEAD); t269 threshold
-  census (zero V>=25); t260/261 loadstate (GUI works, state input-dead).
+  census (zero V>=25); t260/261 loadstate (GUI works, state input-dead);
+  t272 debugger census (dosbox-x +dfsg HAS NO debugger — REFUTED-ROUTES t272;
+  no re-census, no -break-start pilot, no DEBUGBOX shell attempts).
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in
   docs/re/ only.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line
@@ -385,6 +402,40 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t272 (2026-11-02): V-PRODUCER WATCHPOINT SESSION RUN ON SCRATCH —
+INSTRUMENT MEASURED-DEAD ON THIS BOX (honest negative; no row closed,
+strict-close honored). (1) Session built per every standing law:
+scripts/r1_t272_wp.sh — scratch tree work/r1/wp-t272/game (game/ never
+mounted), OWN ring dir work/r1/wp-t272/save (two-writer law), display :94,
+FIFO-held stdin (no EOF-spam), tracked-PID kills only; production :9 untouched
+and healthy throughout (pre-flight HEALTHY pid 576895, TL expiry Nov 4 10:07;
+post-run ring fresh, RESUME.GAM md5 5b382afbb789 unchanged — no new sitting,
+assignment stood). (2) INSTRUMENT CENSUS -> NEGATIVE (score.md S15 +
+REFUTED-ROUTES t272): dosbox-x 2025.02.01+dfsg-3 SDL2 has NO debugger command
+set — strings -n 2 (the length catching 3-char verbs; the pairing session's
+-n 3/4 census was on the wrong artifact but its conclusion stands): zero
+bpm/bph/clrbp*/bplist/dbgcon/breakpoint/watchpoint literals; the en_US.lng
+DEBUGBOX/:DEBUGCMD/debugger_runwatch strings are DEAD tables — EMPIRICS:
+DEBUGBOX ASCEND.EXE -> "Bad command or filename" (shot2.png); live GUI menu bar
+= Main/CPU/Video/Sound/DOS/Drive/Capture/Help, NO Debug menu (shot_help.png
+Capture list = screenshot/record/state only); -break-start ACCEPTED AND IGNORED
+(shot1.png: title screen, autosave ran) — GOAL.txt's do-not-pilot decision
+empirically VINDICATED. No bochs/qemu/valgrind on the box; /usr/bin/dosbox
+0.74-3: zero debugger strings; ptrace stays R4-dead. (3) KEEPER: a
+title-screen scratch boot has NO ascend.exe image in guest RAM
+(scripts/r272_scratch_resident.py RC=0: payload 16B-chunk hits 3 vs 118
+production, "STARS CONTROLLED" 0 vs 1, non-zero 1MB pages 3 vs 17) — any
+debugger-class session must ENTER A CAMPAIGN first; scratch copy itself works
+(ring lands, base tooling reachable once campaign resident). (4) LEDGER EFFECT:
+the watchpoint class named as closure route by OQ-021 (producer write-site) and
+OQ-019 (t265 sub-ring residue) is measured-dead here; OQ-021 row updated with
+t272 status (STAYS OPEN; live routes = t273 V>=25 witness + ENDGAME-window);
+route re-opens ONLY if the user supplies a debugger-enabled dosbox-x build
+(upstream builds ship the debugger; Debian +dfsg evidently links it out —
+score.md S15.5). Harness gains kept: r1_t272_wp.sh (prep/launch/status/stop,
+GUIFLAG + CONF knobs), r272_scratch_resident.py. t273's writer-EIP verify leg
+VOID. NEXT = t273 VERBATIM.
 
 LANDED t268 (2026-11-02): LIVE SCREEN SWEEP 3 — NEGSCREEN FLOW + INTEL DEPTH
 + RESWIN DOSSIERS (no row closed — strict-close honored; OQ-023 post-closure
