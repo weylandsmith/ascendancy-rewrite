@@ -327,6 +327,80 @@ warning` is the pre-sweep check; xsend's "REFUSING blocker window" line warns
 about a DIFFERENT window and still sends to the game window. Killed the orphan
 by PID only.
 
+## 6d. LIVE SCREEN SWEEP 3 dossier: NEGSCREEN flow, INTELLIGENCE depth, RESWIN dossiers (t268, 2026-11-02, :9 turn 1236)
+
+Harness scripts/r1_t268_screen.py (t253 primitive, OUT -> work/screens/t268/).
+Pre-flight r1_game_health.py RC=0 (game 535172, watcher 535187, ring fresh);
+no warning windows. Ring turn HELD 1236 through all 15 steps; NEXTTURN never
+clicked. NOTE the relaunched production campaign plays at t1236 (lower turn
+than t252/t253's 1255 — different campaign state, so re-measurement of the
+option list was mandatory, not redundant).
+
+NEGSCREEN (Orfa, opened from species-menu race TEXT line (553,73); clicking
+between rows at (553,173) did NOTHING — hit target is the text line, ~10 px
+tall, rows at game y ~73/~140/~207):
+- Option list rendered FIVE rows (t252 rendered THREE — posture/campaign
+  dependent list CONFIRMED across campaigns). PLAYERDIP bright-text bands
+  MEASURED y 329-339 / 361-367 / 390-396 / 416-425 / 446-454 (~29 px pitch);
+  ALIENDIP single text band 252-261.
+- DIALOGUE PROVENANCE EXACT [verified file match]: alien line "Uh oh.  What's
+  wrong now?" == race02.dip:172 DR_NoDipResponse (file header "Diplomacy text
+  for Orfa"); player rows verbatim player.dip ACTIONS strings — DA_NoDipAction
+  (Goodbye, :67), DA_DeclareWar (:31), DA_ProposeAlliance (:34),
+  DA_TradeStarlanes (:37), DA_TradeStars (:40). Rendered order == file order
+  MINUS filtered rows, EXCEPT Goodbye is HOISTED to row 1 (file-last).
+  Not rendered at this posture: DA_TradeResearch, DA_OfferPeace,
+  DA_BreakAlliance, every %t third-party action.
+- player.dip base DIPVALUES captured verbatim: DECLARE_WAR 70 ACCEPT_PEACE 100
+  PROPOSE_PEACE 150 BREAK_ALLIANCE 170 ACCEPT_ALLIANCE 200 PROPOSE_ALLIANCE
+  250 START_ATTITUDE 100 SHIP_PATIENCE 100 — base table; race files override
+  (Orfa ACCEPT_ALLIANCE 570 live, diplomacy.md), so the rewrite must load
+  per-race values, never this table alone.
+- Third-party region (y 40-206 above ALIENDIP) renders race art (Orfa
+  creature/volcanic scene) — 13NEGOT.SHP lead stands; no readout there.
+- Goodbye row click (480,334, band-measured) CLOSED the negotiation directly
+  to the species menu (202 px blink), no alien-reply screen. DA_NoDipAction
+  terminates the flow.
+
+INTELLIGENCE (from species menu (553,311)):
+- Header "Chamachies Intelligence"; columns Fleet/Colonies/Discoveries as
+  RELATIVE symbols (help intscr); self row included; relation-flag icons at
+  row right. This campaign vision-read Chamachies 10/12/4, Ungooma 10/6/4,
+  Orfa 8/6/4 [UNVERIFIED counts, R13 pitfall — posture not data].
+- NEGATIVE (measured): race-row click (230,370) changed 204 px == blink floor
+  -> rows are NOT clickable; NO intel detail view exists. Manifest-level IS
+  the terminal intel depth; no buttons/tabs on the screen (vision). Escape
+  unwinds intel -> species menu.
+
+RESWIN dossier-level (open state: panel EMPTY, no gold ring — this campaign
+had NO current project at t1236; t252 opened with one, so the panel is
+state-driven, not layout-driven):
+- CLICK LAWS = help reswin verbatim, confirmed end-to-end: clicking an EMPTY
+  disk (72,327) SETS it as current topic — panel became "Repulsion Beam Tech
+  / (33 days) / Allows: Fleet Disperser", 900 px change CONFINED to the
+  clicked disk bbox (41-100 x 299-358; other nodes 0 px), NO confirm popup.
+  STATE CHANGE MADE (honest): the :9 game's study topic is now Repulsion Beam
+  Tech (was none); no in-game cancel control exists to revert — autoplay
+  campaign only, ring banks unaffected.
+- DISCOVERED/filled disk = dossier read, no state change: (213,88) -> "Energy
+  Focusing / Allows Myrmidonic Carbonizer, Accutron"; red-ringed node
+  (362,462) -> "Megagraph Theory / Allows / Internet". The "(N days)" line
+  renders ONLY for the in-progress topic.
+- ALLOWS LAW PROVEN 3/3 [verified]: restree.txt row N -> tech idx N-3; Allows
+  list = REVERSE JOIN {gizmo + planitem records whose tech field == idx}.
+  Energy^Focusing row 42 = idx 39 -> gizmos.txt:230 Myrmidonic^Carbonizer
+  field 39 + :260 Accutron field 39 (exactly the two rows rendered);
+  Repulsion^Beam^Tech row 45 = idx 42 -> gizmos.txt:209 Fleet^Disperser field
+  42; Megagraph row 62 = idx 59 -> planitem.txt:100 Internet field 59.
+  restree's own trailing numbers are PREREQS (research.md), not Allows.
+- DAYS DATA POINT (not a law): cost 110 -> "(33 days)" here vs cost 120 ->
+  "(15 days)" (t252) — days not a function of cost alone (rate-dependent);
+  n=2, do not derive.
+
+SAFETY: 15 steps, zero turn drift, no PROPOSE/DECLARE/ABANDON/END-TURN click;
+the Goodbye row was clicked only from a per-sweep MEASURED band. Game parked
+on the galaxy screen: final vs baseline 242 px (blink noise floor).
+
 ## 6. Explicitly NOT in P5a (no fakery)
 
 pan/zoom/layer toggles (children exist in windows.txt but their exe

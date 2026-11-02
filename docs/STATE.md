@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T05:05
+updated: 2026-11-02T05:45
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,25 +260,30 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t268 LIVE SCREEN SWEEP 3: NEGSCREEN negotiation flow + intel detail +
-tech tree detail (manifest-level -> dossier-level, docs/re/ui.md). SAME
-SAFETY LAW as t252/t253: NEVER click PROPOSE/DECLARE/ABANDON/END-TURN (t244
-abandoned a system by accident once; Escape does NOT unwind PLANETALLOC per
-t254 — prefer screens that unwind). Vision on the projector; R13 only bans
-grading OUR renders.
-ORDERING: t268 first per queue order (t267 landed; research resumes after
-two harness iterations t266/t267). PRE-FLIGHT CHANGED BY t267: run
+NEXT t269 VICTORY-THRESHOLD MINING (OQ-021 end-ctrl; needs t261 — landed):
+vendor comment says "over half" for end-of-game control. On the driven
+corpus, track V=dword[0x482fb] trajectory vs systems_any/systems_full and
+the c-overlay STARS CONTROLLED readout (t244: overlay == DAT_482fb direct).
+If the drive crossed any threshold event (event log, ENDGAME window), bank
+it; else bank the trajectory table + the distance-to-half statement.
+Strict-close: a trajectory is not a threshold — keep the row open unless an
+event lands.
+ORDERING: t269 first per queue order (t268 landed; research resumes after
+the t252/t253/t268 sweep run). PRE-FLIGHT (t267 law): run
 `python3 scripts/r1_game_health.py` FIRST (exit 0 = game/watcher/ring OK;
 reasons name what is broken). PRODUCTION TL EXPIRES 2026-11-02 07:03:58 —
-if the sweep starts after that wall, the :9 game is DEAD (G:DEATH,
+if t269 needs the live game after that wall and it is DEAD (G:DEATH,
 work/r1/loop/GAME_DEAD.txt): bank the ring (cp save/ bank-tNNN-*), relaunch
 via `bash scripts/r1_playcap_vnc.sh start` (t267 guard + reaper + BRINGUP
-verify run automatically), resume via Return-to-Game, THEN sweep. NEVER
-loadstate any bank (REFUTED t261). Timeline reads obey the OOM law
-(r1_stream.py / bounded tail seek only; NEVER json.load the whole file).
-Multi-writer class is closed at the source (one watcher law: reaper), but
-any cross-session timeline analysis still campaign-fingerprints slots first
-(star->planet-owner-table md5, selfplay.md t266).
+verify run automatically), resume via Return-to-Game. NEVER loadstate any
+bank (REFUTED t261). t269 is mostly OFFLINE corpus work — the driven-corpus
+banks (bank-t249-live-open, bank-t250-predrive, bank-t251-predrive,
+bank-t251-live1255) plus ring banks exist; the live game is only needed for
+an ENDGAME-window witness. Timeline reads obey the OOM law (r1_stream.py /
+bounded tail seek only; NEVER json.load the whole file). Campaign-
+fingerprint slots before any cross-session analysis (star->planet-owner-
+table md5, selfplay.md t266). V watermark caveat: per-session trust (t255),
+the global watermark drops re-loaded lower-turn campaigns.
 
 
 PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
@@ -295,13 +300,6 @@ driven exit fires when the queue drains).
 
 QUEUE (phase 2, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t268 LIVE SCREEN SWEEP 3: NEGSCREEN negotiation flow + intel detail + tech
-  tree detail (manifest-level -> dossier-level, docs/re/ui.md). SAME SAFETY
-  LAW as t252/t253: NEVER click PROPOSE/DECLARE/ABANDON/END-TURN (t244
-  abandoned a system by accident once; Escape does NOT unwind PLANETALLOC per
-  t254 — prefer screens that unwind). Vision on the projector; R13 only bans
-  grading OUR renders.
 
 t269 VICTORY-THRESHOLD MINING (OQ-021 end-ctrl; needs t261): vendor comment
   says "over half" for end-of-game control. On the driven corpus, track
@@ -362,6 +360,32 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t268 (2026-11-02): LIVE SCREEN SWEEP 3 — NEGSCREEN FLOW + INTEL DEPTH
++ RESWIN DOSSIERS (no row closed — strict-close honored; OQ-023 post-closure
+ANNOTATED with the FIVE-row option-list measurement, STAYS CLOSED; dossier
+docs/re/ui-runtime.md §6d NEW + selfplay.md t268 laws; 1 tool
+scripts/r1_t268_screen.py = t253 primitive, OUT->work/screens/t268/).
+PROVED: (1) NEGSCREEN option list is posture-AND-campaign-dependent — FIVE
+rows at t1236 (Goodbye/DA_DeclareWar/DA_ProposeAlliance/DA_TradeStarlanes/
+DA_TradeStars, player.dip :67/:31/:34/:37/:40 verbatim) vs THREE at t252/
+t1255; Goodbye is file-LAST but render-FIRST (hoist law); alien line "Uh oh.
+What's wrong now?" == race02.dip:172 DR_NoDipResponse exact; player.dip holds
+the BASE DIPVALUES (ACCEPT_ALLIANCE 200) — race files override (Orfa 570
+live), engine must read per-race. (2) INTELSCREEN race rows NOT clickable
+(204 px blink floor) — manifest-level IS terminal intel depth (honest
+negative; no detail screen exists). (3) RESWIN Allows list = REVERSE JOIN
+proven 3/3 vs files: restree row N -> idx N-3; rendered Allows == exactly the
+gizmo/planitem records whose tech field == idx (Energy Focusing 39 ->
+Myrmidonic Carbonizer+Accutron; Repulsion Beam 42 -> Fleet Disperser;
+Megagraph 59 -> planitem Internet); "(N days)" renders ONLY on the current
+topic; empty-disk click SETS the topic with NO popup (900 px confined to the
+disk) — STATE-CHANGING sweep law banked; t268 set Repulsion Beam Tech once,
+recorded honestly (autoplay campaign, no revert control). (4) Species-menu
+race-row hit target = the text line only (~10 px), between-row click is a
+no-op. SAFETY: 15 steps, ring turn HELD 1236, NEXTTURN never clicked, only
+the band-measured Goodbye row clicked; parked on galaxy (242 px = blink
+floor); game/ untouched. NEXT=t269 verbatim.
 
 LANDED t267 (2026-11-02): HARNESS SELF-HEAL — DEATH/TL/WATCHER DETECTION
 SHIPPED, AND THE 3-WRITER COLLISION WAS CAUGHT LIVE AND KILLED. Pre-flight

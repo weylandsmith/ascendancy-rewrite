@@ -567,6 +567,18 @@ Goodbye / declare-war / propose-alliance). Option #1 click closes the
 negotiation back to the species menu, zero turn drift. Row STAYS CLOSED (the
 closure evidence is t189b's; this annotation only feeds the A7 engine-build
 residual with the receiver-side UI shape).
+POST-CLOSURE ANNOTATION t268 (2026-11-02, LIVE SWEEP 3, ui-runtime.md §6d):
+option list re-measured on a DIFFERENT campaign state (t1236): FIVE rows
+rendered (Goodbye / declare-war / propose-alliance / DA_TradeStarlanes /
+DA_TradeStars — player.dip :67/:31/:34/:37/:40 verbatim), bands 329-339/
+361-367/390-396/416-425/446-454; Goodbye (file-LAST in ACTIONS) is HOISTED to
+render row 1; DA_TradeResearch/OfferPeace/BreakAlliance and all %t third-party
+actions filtered out at this posture. Alien line "Uh oh.  What's wrong now?"
+== race02.dip:172 DR_NoDipResponse (Orfa) exact. A7-relevant: the trade rows
+DA 4/5 the rewrite AI is supposed to emit ARE UI-renderable player-initiated
+actions too, and player.dip holds the BASE DIPVALUES table (ACCEPT_ALLIANCE
+200) which race files override (Orfa 570 live) — engine must read per-race.
+Row STAYS CLOSED (annotation only; no state-enum or law change).
 OQ-024 | loop | planet GOVERNOR assignment law (@0x38df0 branch of
 FUN_00038ba4: '!' -> PROS += IND>>2, '"' -> RES += IND>>2; S6 line 45 read
 +0x54 as a governor byte) | CLOSED t45 | FULL STATIC MEASUREMENT

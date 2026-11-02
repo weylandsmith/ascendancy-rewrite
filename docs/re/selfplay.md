@@ -763,3 +763,25 @@ NOT sufficient — there is exactly one production process with that name);
 kill ONLY PIDs recorded in work/r1/vnc/dosbox.pid, verified via /proc
 cmdline (sandbox conf path). Sandbox teardown = vnc.sh --stop + reaper on
 the SANDBOX out dir, nothing else.
+
+## t268 (2026-11-02) — LIVE SWEEP 3: NEGSCREEN FLOW, INTEL DEPTH, RESWIN DOSSIERS
+Full dossier docs/re/ui-runtime.md §6d; screens + _state.json
+work/screens/t268/; harness scripts/r1_t268_screen.py (t253 primitive). 15
+steps, ring turn HELD 1236, zero drift, NEXTTURN never clicked, parked on
+galaxy (242 px vs baseline = blink floor). Pre-flight r1_game_health.py RC=0.
+SWEEP LAWS BANKED (interaction-class, this file's remit):
+- Species-menu race rows: hit target is the TEXT LINE (~10 px; game y ~73/
+  ~140/~207), NOT the divider-bounded cell — a click between rows is a no-op
+  (164 px blink). Re-measure bands per campaign state; do not reuse t252's.
+- NEGSCREEN option list is posture-AND-campaign-dependent (3 rows t252/t1255,
+  5 rows t268/t1236): always re-read rendered bands (bright-pixel detection,
+  x336-632) before clicking any row; only the Goodbye row (band 1, hoisted)
+  is safe by construction, and DA_NoDipAction closes directly to the species
+  menu with no alien-reply step.
+- INTELSCREEN rows are NOT clickable (204 px blink on row click) — the list
+  IS the terminal intel depth; no detail screen exists behind it.
+- RESWIN empty-disk click SETS the study topic with NO confirm popup (900 px
+  confined to the disk). This is a STATE-CHANGING click: a sweep must not
+  click empty disks unless changing the campaign's research is intended
+  (t268 did ONE such click — Repulsion Beam Tech — recorded honestly;
+  no in-game revert exists).
