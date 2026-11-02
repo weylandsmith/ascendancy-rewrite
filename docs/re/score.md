@@ -431,3 +431,67 @@ observed; OQ-021 STAYS OPEN. Tool pitfalls banked: window_rows off-by-one in
 r1_t251_mine (quote char in wall slice — silently ZERO rows since t251, fixed;
 every earlier "newsession" pass was vacuous); wall=HH:MM:SS collides across
 days -> gate on file_mtime_ns epoch, not wall alone.
+
+## S13 — t262: CENSUS/INVENTORY TRIGGER discriminator on the DRIVEN corpus [measured]
+
+Instruments scripts/r262_census_disc.py (KEEPER; segment-aware 2x2 contingency
++ functionality join; whole-file single pass, rows never buffered) and
+scripts/r262_legA.py (KEEPER; leg-A deep field check). Corpus: every turn-
+advancing session Oct-15..Nov-1 (the watcher stream; sessions split at mtime
+gap >600 s, PLUS segment splits at reload class (V==0 at turn <= watermark)
+and foreign-lineage class (turn drops >2 below watermark while V!=0 — the
+t261 softlock oscillation and re-drive land in separate segments; t255
+per-session-trust law generalized to per-SEGMENT). Dedup (file,
+file_mtime_ns). 808 turn boundaries (Oct corpus run) + 207 (Oct-29+ run).
+
+DEFINITIONS. Inventory signature = piecewise-constant fleet facts only:
+live-ship count, per-owner count multiset, design-id multiset, gizmo-ring type
+multiset (t256c decode law: owner u32@0x54>>16, design u32@0x10, ring byte
+@0xab+7i, count u32@0x15a clamp 64). Order fields (kind/act/targets) are NOT
+in the signature — in a drive they churn at ~half of all boundaries (539/808)
+and t258 already killed them.
+
+1. THE CENSUS IS NOT THE TRIGGER — BOTH LEGS DIE:
+   leg A (V changed -> inventory changed): FAILS, 27 of 37 V-change boundaries
+     have BYTE-IDENTICAL inventory (V&inv=10). Includes the t258 shape-clue
+     boundaries the doubling/halving note pointed at: t911->912 V 11->22 and
+     t1140->1141 V 22->11 both fire with inventory static — the fleet did not
+     double or halve; V did. The S11.5 "items changing by factor 2" inference
+     is REFUTED for the ship-inventory hypothesis.
+   leg B (inventory changed -> V changed): FAILS, 121 inventory-change
+     boundaries with V static (ship builds/losses happen and V doesn't move).
+   (The two "V&inv" load-class boundaries t1111->1255 / t1096->1255 are the
+   campaign-exit jump, not end-turns: turn-JUMP >1 flagged in output.)
+
+2. FUNCTIONALITY KILL (strongest result): 18 of 149 inventory signatures
+   carry MULTIPLE V values within one continuous segment. Worst case, driven
+   session Oct-28 23:32->23:47 (turns 1255..1335, one lineage, monotone): ONE
+   signature (n_live=37, owners {0:23,1:7,2:7}) carried V in {12,15,16,19,21,
+   21,22} — trajectory 14,15,12,15,16,21,19,22,21 — while the fleet inventory
+   was byte-identical throughout. V is therefore NOT a function of the ship
+   census at fixed turn within a lineage; whatever feeds DAT_482fb re-evaluates
+   every End-Turn from state the watcher does not capture (S11.5's "input that
+   oscillates per turn" — now localized to NON-fleet state: candidates by
+   elimination are per-star garrison/governor state, economy stockpiles, or
+   research/abilities, none of which is in the row schema).
+
+3. leg-A deep check (r262_legA.py): on all 27 static-inventory V-change
+   boundaries, ship TARGET words changed 27/27 and kind-multiset 24/27 — so
+   ships were moving, but movement is ubiquitous (539/808 boundaries churn
+   with V static), so it is correlation-not-trigger exactly as t258 concluded
+   for order features. ZERO boundaries where nothing banked moved yet V moved
+   — but "targets moved" carries no information (see churn rate), so this is
+   NOT a reprieve for the fleet hypothesis.
+
+4. T261 RE-DRIVE CORPUS (1087->1236, 149 boundaries, V=23 constant, inventory
+   sig static, order-churn 23): a fully STATIC-V stretch — the control
+   population for future watchpoint work. The t262 pre-flight drive completed
+   TARGET REACHED at 1236 (bank-t261-final-1236).
+
+STRICT-CLOSE: OQ-021 STAYS OPEN. This iteration closes a HYPOTHESIS (census
+trigger) by measurement, not the ledger row — the threshold (V>=25 / selector
+arm) remains unobserved corpus-wide (max V=23; the driven Oct-28 late-run got
+to 22 at t1301 then decayed 21 by t1335 — distance-to-half banked: 22/50).
+The residue statement is now sharper: writer = per-End-Turn recompute over
+NON-fleet state (S10.2 + S13.2), next instrument = dosbox-x write watchpoint
+on 0x482fb during a drive that crosses V>=25 (USER ASK stays in BLOCKED.md).

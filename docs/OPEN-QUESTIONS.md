@@ -401,10 +401,20 @@ savs are full guest RAM (ZIP member "Memory"), but the same-turn-different-V
 pair census over ALL 122 banked/ring savs returned NONE (turn set {1086:V0,
 1096:V23, 1254:V23, 1255:V14}; scripts/r259_savpair_census.py,
 work/r1/t259_savpair.out) — cross-bank diffs are confounded by world movement.
-OQ-021 has NO offline residue left: both residues are play/watchpoint-gated. | open (threshold
+OQ-021 has NO offline residue left: both residues are play/watchpoint-gated.
+STATUS t262 (2026-11-02): CENSUS TRIGGER HYPOTHESIS MEASURED-DEAD on the driven
+corpus (808+207 turn boundaries, segment-trust law): V moves at 37 boundaries
+where the fleet inventory was byte-identical at 27 of them (doubling/halving
+included), inventory moves at 121 boundaries with V static, and 18/149
+inventory signatures carry MULTIPLE V values in one continuous lineage (worst:
+one sig, V in {12,15,16,19,21,22}, turns 1255..1335 driven) — V is NOT a
+function of the ship census; producer inputs localized to NON-fleet state
+(score.md S13, scripts/r262_census_disc.py + r262_legA.py). Row STAYS OPEN:
+threshold still unobserved (driven max V=22@t1301, decayed 21@t1335). | open (threshold
 residue = play witness; displayed-count write-site = RESIDUE NOW NARROWED TO
-END-TURN RECOMPUTE PATH, runtime-watchpoint class; screen-open hypothesis
-REFUTED t255; banked-world-feature explanations MEASURED-EXHAUSTED t258) |
+END-TURN RECOMPUTE PATH OVER NON-FLEET STATE (t262 S13), runtime-watchpoint
+class; screen-open hypothesis REFUTED t255; banked-world-feature explanations
+MEASURED-EXHAUSTED t258; fleet-census trigger MEASURED-DEAD t262) |
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719

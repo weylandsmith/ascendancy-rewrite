@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T20:40
+updated: 2026-11-02T00:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,23 +260,21 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t262 OQ-021 CENSUS DISCRIMINATOR (t256 MECHANICS note): per-owner ship
-census vs V-change turns on the t261 corpus (ship_raw banked every row;
-score.md S10 + NEW S12 table). t255 REFUTED screen-open recompute; t258
-candidicide left survivors NONE for value candidates — the question now is
-TRIGGER: does V change on turns where the census changes (recompute) vs
-independent events? Bank the discriminator result to score.md; strict-close
-only on a cited measurement. USE scripts/r261_harvest.drive_rows() for corpus
-selection (mtime-epoch gate; wall-clock windows are cross-day-poisoned — the
-t251 window_rows bug made every prior "newsession" pass vacuous). PRE-FLIGHT
-(first two probes only, then work the census): (1) tail
-work/r1/playcap/drive_t261b.out + ring turn — the t261 re-drive (1086->1236,
-started 23:07) runs in a SESSION-BOUND background process and may have died
-with its session; if the ring is < target and dosbox is input-ALIVE, relaunch
-the same command (T261_DISPLAY=:9 T261_BASE=$PWD/work/r1/playcap
-T261_MENUBAR=0 T261_RECOVER=resume ... --target 1236); the census may run on
-whatever turns landed; (2) DO NOT loadstate bank-t251-live1255 for anything
-(REFUTED t261: input-dead on load).
+NEXT t263 REWRITE POP-PANEL (pure code): implement the population panel
+visualization law in rewrite/src/ui/ — slot array sized to planet CAPACITY;
+empty circle (k3) / free-pop front-facing-yellow (k2) / busy-pop
+sideways-red (k1) from 17np.shp (t254 IDENTIFICATION with content-match
+controls: live1255 bank, cache slot 44 == u16[0x6fd9c], sel table 9/9).
+Cite docs/re/shp.md S19/S20 + t254 wip. Gate + rewrite tests must pass.
+If a capacity/free/busy split law is not yet pinned for busy-vs-free, bank
+the split as [hypothesis] with the t254 frame counts as the fixture.
+ORDERING: t263 first per queue order — pure code, no capture dependency;
+t262's census route is closed (score.md S13) so no pending corpus work gates
+anything; the drives are done (t1236 banked) and the watchpoint ask for
+OQ-021 is user-gated in BLOCKED.md, not session work.
+PRE-FLIGHT: none beyond `git status` — do NOT touch :9 (game parked t1236,
+PID 535172 alive; ring churn is harmless background). DO NOT loadstate
+bank-t251-live1255 or any bank (REFUTED t261: input-dead on load).
 
 
 PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
@@ -293,13 +291,6 @@ driven exit fires when the queue drains).
 
 QUEUE (phase 2, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t262 OQ-021 CENSUS DISCRIMINATOR (t256 MECHANICS note): per-owner ship census
-  vs V-change turns on the t261 corpus (ship_raw banked every row; score.md
-  S10). t255 REFUTED screen-open recompute; t258 candidicide left survivors
-  NONE for value candidates — the question now is TRIGGER: does V change on
-  turns where the census changes (recompute) vs independent events? Bank the
-  discriminator result to score.md; strict-close only on a cited measurement.
 
 t263 REWRITE POP-PANEL (pure code): implement the population panel
   visualization law in rewrite/src/ui/ — slot array sized to planet CAPACITY;
@@ -398,6 +389,38 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t262 (2026-11-02): OQ-021 CENSUS/INVENTORY TRIGGER DISCRIMINATOR —
+FLEET-CENSUS HYPOTHESIS MEASURED-DEAD BOTH LEGS on the driven corpus
+(score.md S13 + _wip_t262.md S1..S4; KEEPER tools scripts/r262_census_disc.py
+= segment-aware 2x2 contingency + functionality join, whole-file single pass;
+scripts/r262_legA.py = leg-A deep field check; outputs
+work/r1/t262_census_{full,early}.out). MEASURED 808 boundaries (Oct run) +
+207 (Oct-29+ run) under the NEW per-SEGMENT trust law (session split >600 s
+PLUS splits at reload class V==0@turn<=wm and foreign-lineage class
+turn-drop>2 — generalizes the t255 pitfall; the t261 softlock oscillation and
+re-drive land in separate segments). RESULTS: leg A fails — 27 of 37 V-change
+boundaries have byte-identical fleet inventory (n_live, per-owner counts,
+design multiset, gizmo-ring multiset), INCLUDING the t258 doubling
+(t911->912 V 11->22) and halving (t1140->1141 V 22->11) shape clues — the
+fleet never doubled/halved, V did. Leg B fails — 121 inventory-change
+boundaries with V static. FUNCTIONALITY KILL: 18/149 inventory sigs carry
+MULTIPLE V values within one continuous lineage; worst case ONE sig
+(n_live=37, {0:23,1:7,2:7}) carried V in {12,15,16,19,21,21,22} across driven
+turns 1255..1335. Conclusion banked: V is NOT a function of the ship census;
+the End-Turn recompute reads NON-FLEET state (economy/garrison/research class
+— none in the watcher schema; watchpoint ask stays user-gated). leg-A detail:
+ship targets moved 27/27 but order-churn is ubiquitous (539/808), so
+correlation-not-cause exactly as t258 for order features. PRE-FLIGHT: t261
+re-drive was alive (t1198) and COMPLETED during the session — TARGET REACHED
+1236 23:37:12, banks bank-t261-t1236 + bank-t261-final-1236; game parked t1236
+(PID 535172), zero clicks by this session, no loadstate (REFUTED honored).
+Pitfalls banked: ns-vs-s epoch units in corpus gates; close_seg must flush the
+pending snapshot; a REJECTED compound terminal call may still have applied its
+sed — grep the file before editing on top. NO OQ CLOSED (strict-close: a
+hypothesis died, the row lives; threshold unobserved, driven max V=22@t1301
+decayed 21@t1335). NEXT = t263 VERBATIM (pop-panel rewrite, pure code).
+
 
 LANDED t261 (2026-11-01): t1255 RESTORED-STATE DRIVE ROUTE REFUTED (input-dead
 ON LOAD — the softlock class lives INSIDE the save; REFUTED-ROUTES t261 block;
