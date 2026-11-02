@@ -518,3 +518,16 @@ new capture or a user decision (see the decision surface in docs/STATE.md).
 ## Best default while unanswered: no relaunch, banks untouched, loop re-arms
 ## ONLY on a user answer, a new playcap-* sitting, or the t259 RAM-pair task
 ## (authored as STATE NEXT ACTION since it is offline work, not an ask).
+
+## t260 ADDENDUM (2026-11-01) — LOADSTATE PATH NOW EXERCISED AND BANKED
+The t259 ADDENDUM above (4) flagged "loadable via dosbox-x loadstate, a path
+NOT yet exercised by this loop." MEASURED CLOSED as WORKING-GUI-ONLY: bank
+work/r1/bank-t251-live1255/60.sav -> fresh GUI-mode dosbox-x (no -nogui, no
+-time-limit) -> Capture menu "Load state" click -> "Loaded. (Slot 60)" ->
+campaign map at turn 1255; re-save round-trip decodes turn=1255 V=14 (frozen
+row agrees). Full recipe + laws (TL-expulsion, savedir, xsend chords-vs-clicks,
+menu-row locate tool) in docs/re/selfplay.md t260 block; negatives in
+docs/REFUTED-ROUTES.md t260 block. No open ask remains from the t259 addendum
+(user delegation already authorized the relaunch, done 19:00). Production :9
+t1086 session untouched throughout (verified: ring fresh, RESUME.GAM 5b382afb,
+single dosbox PID 524517 after experiment teardown).

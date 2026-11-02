@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-01T17:05
+updated: 2026-11-01T20:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,7 +260,7 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t260 GUI-LOADSTATE RESTORE EXPERIMENT (the ONLY route back to t1255; feeds t261). State of the investigation (MEASURED this pairing session, 2026-11-01 ~18:45): dosbox-x 2025.02.01 has NO CLI loadstate flag (--help grepped) and NO autoexec command (strings grepped); conf keys saveslot=60 + forceloadstate=true set "Active save slot: 60" at boot but DO NOT load (title menu confirmed by vision); F12 via xsend (key F12 F12) sent OK but produced no load log line. Hypothesis [unverified]: the load lives in the GUI menu bar (DOS menu -> Load save state), which -nogui suppresses. EXPERIMENT: relaunch dosbox WITHOUT -nogui on :9 (conf work/r1/vnc/loadstate-test.conf already has autosave=0 + saveslot=60; work/r1/playcap/save/60.sav is the CLEAN bank copy md5 0024340d from bank-t251-live1255), screenshot the menu bar, navigate it with clicks (vision on the projector is fine), load slot 60, then verify the ring shows turn 1255 within 30 s. BLAST RADIUS: loadstate replaces live RAM (current fresh t1086 session) — recoverable via "Return to Current Game" (RESUME.GAM = Oct-29 = t1086), so worst case costs one bring-up. If the menu path fails too, bank the honest negative (loadstate is GUI-only, headless restore IMPOSSIBLE on this build) and rewrite NEXT to t261 with the t1086 session as the drive base. NOTE: the t1255 death-frame ZIP (md5 324d2d75) was overwritten during this restore attempt (autosave churn 18:34-18:37 + bank copy placed at 60.sav); its field values survive in the frozen timeline rows (t1255 V=14) and t259's md5 record — record this honestly wherever you bank the experiment result.
+NEXT t261 LONG DRIVE + WITNESS HARVEST (BASE = t1255 RESTORED STATE — t260 PROVED loadstate works: GUI menu bar + xsend click Capture->Load state; feeds the OQ-016/OQ-021 witness mining below). Target = 1255+150 = turn 1405. BRING-UP LAW (t260, docs/re/selfplay.md t260 block): launch dosbox-x WITHOUT -nogui AND WITHOUT -time-limit (a TL deadline in the loading process expels the loaded state within seconds — measured both ways), on a free display (t260 used :8; production :9 t1086 session keeps running until YOU decide — you own that blast-radius call; retiring :9 frees RAM and ends the t1086 corpus), -savedir = a SCRATCH copy dir holding the t1255 ZIP as 60.sav (copy from work/r1/bank-t251-live1255/60.sav md5 0024340d; NEVER point savedir at the production ring), conf = work/r1/vnc/t260-experiment.conf pattern (autosave=0 for the load click, then you may re-arm autosave 10 41-60 via a conf relaunch AFTER the load if you want the ring from the driven session — simpler: leave autosave ON from the start in a scratch savedir, the ring never touches t1086 rows). Then drive with scripts/r1_t245_turndrive.py v4 (softlock detect + auto-recovery). LAWS: bank the ring (scratch savedir *.sav -> a dated work/r1/bank-<tag>/) BEFORE any restart AND every ~30 turns; NEVER json.loads the whole timeline (OOM law); per-session trust REQUIRED for V analysis (t255: global watermark drops re-loaded lower-turn campaigns — the t1086 and restored-t1255 sessions are DIFFERENT sessions even on one display); MINE via scripts/r1_stream.observations(trust=True) ONLY: (a) multi-volley battle vs a NON-at-war owner (OQ-016 clamp witnesses — t251 landed the FIRST cascade witness, more turns = more witnesses); (b) mid-campaign slot with V=dword[0x482fb]>1 AND some byte[star+0x15] nonzero (OQ-021 S6/P7 — t251 landed the first). Do NOT issue player attack orders — mine what the AI produces. Bank witness tables to docs/re/combat.md (a) / score.md (b). t260 VERIFICATION TOOLING you can reuse: scripts/r1_t260_menulocate.py (menu-row locate; window ID by NAME via xwininfo, never hardcoded); decode any slot with the watcher module (r1_playcap_watch.S.read_slot(path, mem, B), B via r1_sav_scan.find_base — pass the PATH string, None crashes it). xsend sends keys with state=0: chords (F12+L) are NOT deliverable; menu clicks ARE.
 
 PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
 stands — task line is the FIRST non-blank line; notes below. USER DELEGATION
@@ -395,6 +395,33 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t260 (2026-11-01): GUI-LOADSTATE RESTORE EXPERIMENT SUCCEEDED — t1255
+IS ALIVE AGAIN IN A RESTORABLE PROCESS; HEADLESS RESTORE CONFIRMED DEAD —
+MEASURED on isolated display :8 (production :9 t1086 session untouched: ring
+kept writing, RESUME.GAM still 5b382afb/Oct-29, timeline current at 20:31):
+Capture-menu "Load state" click (xsend synthetic BUTTON events drive the SDL2
+menu bar; rows located PROGRAMMATICALLY via scripts/r1_t260_menulocate.py
+neutral-dark census — 16-bit txt gotcha documented) -> "Loading state from
+slot: 60" + "[20:19:13]: Loaded. (Slot 60)" -> SCREENSHOT shows the campaign
+map, turn readout 01255. STRUCTURAL PROOF: re-save from the loaded process ->
+watcher decode of the round-trip ZIP (banked work/r1/bank-t260-roundtrip-1255/)
+reads turn=1255 V=14 == the frozen t1255 row. Bank 0024340d verified intact
+before AND after. TL-TIME-BOUNB LAW (measured both ways): a loading process
+carrying -time-limit expels the loaded state within seconds -> NEVER pass TL
+to a loadstate target. Menu census: state items live ONLY under Capture (Save
+state F12+S / Load state F12+L); no CLI flag, no autoexec cmd, no [hotkeys]
+section; conf-only (saveslot+forceloadstate) sets the ACTIVE SLOT only;
+mapper editor refuses mid-program ("Another program is already running.");
+xsend keys carry state=0 so chords are NOT deliverable — clicks only. All
+negatives banked to REFUTED-ROUTES (t260 block); full law + bring-up recipe to
+docs/re/selfplay.md t260 block; _wip_t260_loadstate.md holds the raw sequence.
+HONEST NOTES: t1255 death-frame ZIP loss (324d2d75, pairing-session churn)
+does not block t261 (bank copy is the source); attempt-1 exit MECHANISM is
+[unverified] (no TL value found in the ZIP members) though the operational law
+is clean; NO OQ closed strict-close this iteration (t260 is tooling/route
+work; the ledger is unchanged and audit-clean). NEXT = t261 VERBATIM (base
+t1255 restored, target 1405).
 
 LANDED t259 (2026-11-01): SENTINEL ADJUDICATION FOUND THE ENVIRONMENT DEAD —
 WITNESS PIPELINE DARK; LAST OFFLINE OQ-021 HANDLE MEASURED-CLOSED (_wip_t259

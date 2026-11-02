@@ -241,3 +241,22 @@ and BINARY {0,1}. Do NOT re-trace [esp+0x50]/[esp] defs, do NOT hunt another
 (defensive dead code in the original — docs/re/_wip_t213.md S5/S6). Note the
 order-arg codes {5,1,0,2} land in the DAY byte [ship+0x67], NOT +0x62 (t211
 mis-locate, corrected) — do not re-read the switch as a phase-value ladder.
+
+## t260 — HEADLESS (=-nogui) SAVESTATE RESTORE IS DEAD; THE GUI MENU IS THE ONLY PATH
+dosbox-x 2025.02.01 has no loadstate CLI flag (--help verbatim: only
+-conf/-savedir/-erasemapper/-startmapper/-defaultmapper/-nogui/-nomenu), no
+autoexec command, and no [hotkeys] conf section (reference.full.conf grepped:
+zero hits). CONF-ONLY LOAD IS REFUTED: saveslot=60 + forceloadstate=true sets
+"Active save slot: 60" and never loads — forceloadstate is documented
+(reference.conf L182) as a MISMATCH-BYPASS flag ("load even if it finds there
+is a mismatch in the version, machine type, program name and/or memory size"),
+not a trigger. HOTKEY ROUTES ARE REFUTED FOR tools/xsend: the menu prints the
+chords Save state F12+S / Load state F12+L, but xsend sends keys with state=0
+(no modifier support — xsend.c: "state=0 intentionally: synthetic modifiers
+unverified"), and bare F12 is the hostkey. MAPPER-EDITOR BINDING IS REFUTED
+WHILE THE GAME RUNS: the editor refuses with "Another program is already
+running." (observed dialog). What WORKS (measured, docs/re/selfplay.md t260):
+launch WITHOUT -nogui and click Capture -> Load state via xsend synthetic
+BUTTON events (SDL2 accepts those), with -savedir pointed at a scratch copy of
+the banked ZIP. Do NOT re-attempt: conf-only load, bare-F12, mapper-editor
+binding mid-program, or any -nogui loadstate.

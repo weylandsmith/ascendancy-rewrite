@@ -484,3 +484,74 @@ noise). Full dossier docs/re/ui-runtime.md §6c; harness scripts/r1_t253_screen.
   but STILL SENDS to the game window (the message names a different window);
   it is a warning, not a refusal. Remediation: kill the xmessage PID only
   (never pkill, never touch dosbox-x). Retired: PID 461872.
+
+## t260 (2026-11-01) — LOADSTATE RESTORE IS REAL AND GUI-ONLY: t1255 BACK IN A LIVE PROCESS
+THE HEADLINE (MEASURED, isolated display :8, zero production blast radius):
+a banked dosbox-x savestate ZIP loads into a fresh dosbox-x process and the
+GAME RESUMES MID-CAMPAIGN. Sequence verbatim from work/r1/vnc/t260-experiment2.log:
+  LOG: Loading state from slot: 60
+  LOG: [20:19:13]: Loaded. (Slot 60)
+Screenshot: campaign map (lanes + colonies), turn readout reads 01255.
+STRUCTURAL VERIFICATION (the authority, not vision): from the loaded process,
+Capture-menu "Save state" wrote a fresh ZIP (Save_Remark b'' — menu-saves carry
+no remark, vs b'Auto-save' in ring copies), and the watcher decoder on that
+round-trip ZIP (work/r1/bank-t260-roundtrip-1255/60.sav, md5 e23b20c9) reads
+turn=1255 and V=14 — identical to the frozen t1255 timeline row (V=14). The
+bank work/r1/bank-t251-live1255/60.sav is UNTOUCHED (md5 0024340d re-verified
+afterwards; RESUME.GAM still 5b382afb == Oct-29, the game never wrote it).
+
+MENU CENSUS (dosbox-x 2025.02.01 SDL2, no -nogui): menu bar Main CPU Video
+Sound DOS Drive Capture Help; save/load-state lives ONLY under Capture:
+  Take screenshot | Take raw screenshot | Capture format | Record video AVI |
+  Record audio WAV | multi-track AVI | FM (OPL) | MIDI | network traffic |
+  Save state (F12+S) | Load state (F12+L) | Save/load options > | Select save
+  slot > | Auto-save settings... | Browse save file... | Display state info.
+No CLI loadstate flag (--help verbatim), no autoexec command, no [hotkeys]
+section in the reference conf; mapper_loadstate/mapper_savestate exist as
+MAPPER ACTION names (strings on the binary) bindable via the Mapper editor —
+but the editor refuses while a program runs ("Another program is already
+running." dialog observed). => headless (=-nogui) restore remains IMPOSSIBLE;
+with the GUI menu it is fully scriptable via xsend clicks.
+
+WHY THE PAIRING-SESSION F12 ATTEMPT FAILED (two independent reasons, both
+measured): (1) bare F12 is the hostkey and the load chord is F12+L —
+tools/xsend sends keys with state=0 (no modifier support, xsend.c comment
+"synthetic modifiers unverified"), so the chord was never deliverable as-is;
+(2) the earlier conf-only route (saveslot=60 + forceloadstate=true) only sets
+the ACTIVE SLOT — forceloadstate is documented (reference conf L182) as
+"load even if version/machine/program/memory MISMATCH", a bypass flag, not a
+trigger. Synthetic BUTTON events via xsend DO drive the SDL2 menu (dropdowns
+opened and screenshotted repeatedly), so menu clicks are the reliable path.
+
+TL-TIME-BOUNB EXPULSION LAW (measured, mechanism partially unverified):
+attempt 1 ran the loader WITH `-time-limit 1800` and loaded the t1255 state;
+"Loaded." logged, then the process exited within seconds. Attempt 2, identical
+minus `-time-limit`, loaded and STAYED ALIVE (verified >7 min, healthy window,
+re-save round-trip). Raw-u32/u64 scans (28800 and x1000) of Dos/CPU/Dosbox-x/
+IntTimer10 members of the state found NO carried deadline value, so the exact
+carrier is [unverified] — but the OPERATIONAL LAW is clean: NEVER pass
+-time-limit to a process you intend to loadstate INTO; the deadline belongs to
+the loading process only. (The production ring keeps TL on the writer side,
+which is unaffected.)
+
+SAVEDIR LAW: slot files resolve to <savedir>/NN.sav; savedir defaults to
+cwd-relative "save". The experiment used explicit -savedir
+work/r1/t260-loadstate/save holding ONLY the clean t1255 copy, so the
+production ring (work/r1/playcap/save) was never addressable. For t261: load
+the t1255 copy from a scratch savedir copy, NEVER from the ring dir.
+
+TOOLING: scripts/r1_t260_menulocate.py — opens the Capture menu via xsend,
+screenshots the window (ID resolved by name via xwininfo), finds the dropdown
+panel by NEUTRAL-DARK pixel census (ImageMagick txt:- is 16-bit: thresholds
+are against 65535, an 8-bit threshold silently matches nothing), prints text-
+row segment centers (~16 px pitch). Window IDs CHANGE per launch (0x600009 ->
+0x200009); resolve by name, never hardcode. pkill -f matched this session's
+own shell again (known footgun re-triggered, harmless) — targeted PIDs only.
+
+CONSEQUENCE FOR THE QUEUE: t261 base = t1255 (restored state), NOT t1086. The
+restored process must be launched GUI-style (no -nogui, no -time-limit) on a
+free display; the production :9 t1086 session keeps running until t261
+decides otherwise (t261 owns that blast-radius call). The t1255 death-frame
+ZIP loss (324d2d75, overwritten by autosave churn per the pairing note) does
+NOT block t261: the bank copy is the load source and the round-trip above
+reproduces t1255 V=14 from it.
