@@ -47,6 +47,7 @@ add_library(ascend_core STATIC
 # ---- importer + game ------------------------------------------------------
 add_library(ascend_ui STATIC
   src/ui/layout.cpp
+  src/ui/poppanel.cpp
   src/ui/ui.cpp
   src/ui/audio.cpp
 )
@@ -76,12 +77,14 @@ add_executable(run_tests
   tests/test_demolish_t202b.cpp
   tests/test_freetech_t203.cpp
   tests/test_ui_layout.cpp
+  tests/test_poppanel_t263.cpp
   tests/test_audio.cpp
   tests/test_ships.cpp
   tests/test_flic.cpp
   tests/test_fnt.cpp
   tests/test_shp.cpp
   src/ui/layout.cpp
+  src/ui/poppanel.cpp
 )
 target_link_libraries(run_tests PRIVATE ascend_core)
 add_test(NAME unit_tests COMMAND run_tests)

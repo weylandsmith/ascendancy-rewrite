@@ -47,6 +47,22 @@ i<cap, ten per row) — tests `layout_planet_gauge_selector_law_t199` and
 feeds these selectors to ShapeLibrary record indices directly; no law work
 remains on that screen.
 
+### 2b. Pop-panel LANDED as code (t263, 2026-11-02)
+
+The population panel's full visualization law now lives in
+`src/ui/poppanel.{h,cpp}` (no SDL; pinned by 4 tests `poppanel_*_t263`, 141
+total 0 fail): selector->record is IDENTITY on 17np.shp (t254 selector table
+9/9), the pitch grid is (i%10)*10 x (i/10)*10 from a widget-local origin
+(asm 0x3ceed/0x3cef6, PLPOP rect windows.txt:1587 = 100x100 px = exactly 10
+rows x 10 slots x 10 px — and `storedCapFor`'s clamp to 100 equals that
+capacity, so the paint cannot overflow the panel), rows = ceil(cap/10), and
+`popSlotLibraryConforms` gates the library on the t254 census (9 records;
+k1 9x9 busy sideways-red + blue tool, k2 7x9 free front-yellow zero-blue,
+k3 8x8 hollow ring — the icon<->role pixel binding is pinned, and swapping
+k1/k2 measurably fails the suite). gwshare slot law pinned too: cache slot ==
+0-based index among NON-BLANK lines (entry #44 = 17np, #41 = 14intel control).
+Working log docs/re/_wip_t263.md. Drawing itself stays OQ-005-scoped.
+
 ## 3. Text
 
 Vendor faces are LIVE since 2026-10-05f: the UI renders with the game's own

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T00:20
+updated: 2026-11-02T06:00
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,18 +260,18 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t263 REWRITE POP-PANEL (pure code): implement the population panel
-visualization law in rewrite/src/ui/ — slot array sized to planet CAPACITY;
-empty circle (k3) / free-pop front-facing-yellow (k2) / busy-pop
-sideways-red (k1) from 17np.shp (t254 IDENTIFICATION with content-match
-controls: live1255 bank, cache slot 44 == u16[0x6fd9c], sel table 9/9).
-Cite docs/re/shp.md S19/S20 + t254 wip. Gate + rewrite tests must pass.
-If a capacity/free/busy split law is not yet pinned for busy-vs-free, bank
-the split as [hypothesis] with the t254 frame counts as the fixture.
-ORDERING: t263 first per queue order — pure code, no capture dependency;
+NEXT t264 REWRITE LAYOUT WIRING (pure code): fold t252/t253 measurements into
+rewrite/src/ui/layout.cpp — sidebar rects (exact, live-measured), button
+icons = 1starmap.shp SHAPEITEM frames {3 res, 4 ships, 5 planets, 7 spe...},
+ship-design tab->gizmo-category map 6/6 (WEAPONS=cat0 DEFENSES=cat1
+ENGINES=cat2 SENSORS=cat3 ENERGY=cat4 SPECIAL=cat5, gizmos.txt FILE order,
+NOT msg order). Tests pin the map. Cite docs/re/ui.md t252/t253 blocks.
+ORDERING: t264 first per queue order — pure code like t263 (just landed,
+poppanel pattern is the template: pure module + pins, no SDL); no capture
+dependency (the t252/t253 dossiers are banked in ui-runtime.md §6a-§6c);
 t262's census route is closed (score.md S13) so no pending corpus work gates
-anything; the drives are done (t1236 banked) and the watchpoint ask for
-OQ-021 is user-gated in BLOCKED.md, not session work.
+anything; the drives are done (t1236 banked) and the OQ-021 watchpoint ask is
+user-gated in BLOCKED.md, not session work.
 PRE-FLIGHT: none beyond `git status` — do NOT touch :9 (game parked t1236,
 PID 535172 alive; ring churn is harmless background). DO NOT loadstate
 bank-t251-live1255 or any bank (REFUTED t261: input-dead on load).
@@ -291,15 +291,6 @@ driven exit fires when the queue drains).
 
 QUEUE (phase 2, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t263 REWRITE POP-PANEL (pure code): implement the population panel
-  visualization law in rewrite/src/ui/ — slot array sized to planet CAPACITY;
-  empty circle (k3) / free-pop front-facing-yellow (k2) / busy-pop
-  sideways-red (k1) from 17np.shp (t254 IDENTIFICATION with content-match
-  controls: live1255 bank, cache slot 44 == u16[0x6fd9c], sel table 9/9).
-  Cite docs/re/shp.md S19/S20 + t254 wip. Gate + rewrite tests must pass.
-  If a capacity/free/busy split law is not yet pinned for busy-vs-free, bank
-  the split as [hypothesis] with the t254 frame counts as the fixture.
 
 t264 REWRITE LAYOUT WIRING (pure code): fold t252/t253 measurements into
   rewrite/src/ui/layout.cpp — sidebar rects (exact, live-measured), button
@@ -389,6 +380,38 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t263 (2026-11-02): REWRITE POP-PANEL SHIPPED — population panel
+visualization law is CODE + PINS in rewrite/src/ui/poppanel.{h,cpp} (pure,
+no SDL; 141 tests 0 fail, +4 poppanel_*_t263; docs/re/_wip_t263.md S0..S8 +
+ui-runtime.md §2b NEW). MEASURED THIS SESSION (not inherited): (1) gwshare
+entry census — 45 .shp entries among non-blank lines (blank-separated + 0x1a
+terminator: the physical line 63 of entry #44 is why "line-1" mis-states the
+slot law); entry #44=17np / control #41=14intel pinned against the t254
+live-RAM chain ([0x6fd9c]=44 -> cache 44 verbatim == 17np). (2) 17np dims
+census (V/A law): 9 records, k1 9x9/k2 7x9/k3 8x8, all walk canonically.
+(3) CONTENT FIXTURE on game.pal (6-bit v*255//63): k1 red-body 25px + BLUE
+tool 9px (idx 80-85/105-107); k2 yellow idx89 x12, ZERO blue of 30 painted;
+k3 interior 16/16 centre bytes NEVER painted = hollow ring byte-confirmed —
+the icon<->role binding is now executable (mutation probes: swap SEL1/SEL2 ->
+103 failures; swap k1/k2 dims -> conformance gate fails on the real file;
+both reverted). (4) RAW ASM re-read (work/t198_planwin.asm) confirms the
+0x3ce39 loop verbatim (cap +0x4a exit jge; incl at ==+0x4c then ==+0x42;
+[0x6fd9c]; +0x0a pitch; idiv-10 cmp 9) and adds an unrecorded per-case setup
+CALL 0x5e940 with 0xf2/0x96 [semantics unverified] — layout is
+origin-parameterised, default widget-local (EDI=EBP=0 at 0x3ce59). (5) PANEL
+ARITHMETIC: windows.txt:1587 PLPOP 355,7..454,106 == 100x100 == exactly 10
+rows x 10 slots x 10 px, and storedCapFor's clamp to 100 (campaign.cpp:811)
+equals that capacity — paint cannot overflow the panel; cap 39 -> 4 rows
+matches the t254 Vega IV live census (cell 39 never painted). Selector->
+record = IDENTITY (t254 sel table 9/9). HONEST: role NAMES stay the cited
+chain (asm band order + t254 vision/player corroboration), the pixel census
+is corroboration made executable not an independent semantic proof; no
+sprite DRAWN anywhere (ui.cpp untouched, OQ-005 scope unchanged); NO OQ
+closed strict-close (wiring cited law; 005/016/019/021 stay open, ledger
+untouched). :9 untouched (zero clicks/turns, no loadstate); watcher timeline
+growth = parked-campaign churn, no sitting (r1_t85g_sitting.py not run).
+NEXT = t264 VERBATIM (layout wiring; poppanel is the module template).
 
 LANDED t262 (2026-11-02): OQ-021 CENSUS/INVENTORY TRIGGER DISCRIMINATOR —
 FLEET-CENSUS HYPOTHESIS MEASURED-DEAD BOTH LEGS on the driven corpus
