@@ -599,3 +599,30 @@ unchanged and still consistent with every banked frame). The producer question
 transfers to: (a) t273 threshold watch, (b) indirect read-input discrimination
 if a same-turn-different-V sav pair ever lands (t259 census: none in 122), or
 (c) a user-supplied debugger-enabled dosbox-x build.
+
+## S16 — t273: FIRST NONZERO SELECTOR BYTE LANDS — AND IT IS NOT THE end-ctrl THRESHOLD [measured]
+
+The tutorial-lineage lineage that hijacked :9 at 11:35:16 EST 2026-11-02
+(selfplay.md t273) is the first corpus segment with selector_byte != 0: 648
+rows all read byte=2 and rank dword=1 (verified directly in guest RAM at the
+relocated DATA base: mem[P+0x43510]==2, mem[P+0x4350c]==1, P=B+0x82bb0), while
+DAT_000482fb=0, player (DAT_0007458e) = race 0 owns 3/50 systems, 3 live
+ships. Consequences: (a) the 71,679-row zero-census of the campaign lineage
+stands (no V>=25 row anywhere, threshold witness still absent); (b) selector=2
+with V=0 CONTRADICTS a naive "selector == arm index into the presenter table"
+reading under the file-order arm order (0 default, 1 end-xtnc, 2 end-dest...) —
+the mapping selector->arm is [unverified]; the presenter arms were re-measured
+by push-immediate scan: payload file 0x2c03a (default/assert), 0x2c04d
+end-xtnc.txt, 0x2c064 end-dest.txt, 0x2c07a end-capt.txt (S3 MISSED this arm),
+0x2c092 end-unit.txt, 0x2c0a9 end-ctrl.txt; dispatcher `mov al,[0x43510];
+cmp al,5; ja; and eax,0xff; jmp dword[0x10173e0+eax*4]` re-verified verbatim at
+0x2c01d..0x2c039 (operand 0x000173e0). The table itself is NOT findable in the
+payload by arm-dword search (dword-aligned dwords in [0x2c030,0x2c0c0]: three
+strays only) — likely stored relocated or built at load; do not re-run that
+scan. The five end-*.txt strings occur at IDENTICAL static addresses
+(0x243394/0x2433a1/0x2433ae/0x2433bb/0x2433c8 image + 0x24c1e4..0x24c2ac block)
+in tutorial AND production AND t1255 slots: image content, not an event trace —
+no end-window evidence either way. rank=1 with V=0 also weakens "rank =
+V/10-1" (FUN_0002bfa8 reading): [inferred] rank semantics need a same-campaign
+V-sweep, still play-gated. OQ-021 STAYS OPEN (strict-close); the tutorial slot
+family (bank-t273-tutorial645) is banked for any future controlled comparison.

@@ -541,3 +541,17 @@ docs/REFUTED-ROUTES.md t260 block. No open ask remains from the t259 addendum
 (user delegation already authorized the relaunch, done 19:00). Production :9
 t1086 session untouched throughout (verified: ring fresh, RESUME.GAM 5b382afb,
 single dosbox PID 524517 after experiment teardown).
+
+## t273 — :9 RUNS THE TUTORIAL CAMPAIGN; PRODUCTION RELAUNCH HELD FOR ONE USER SIGNAL
+The t273 drive leg died when the popup-drain misclicked the title menu
+(selfplay.md t273 law) and the vendor TUTORIAL campaign took the ring at
+11:35:16 EST. A REMOTE VNC client is connected to :5910 (ss shows the socket
+with no local owning process), so a human may be watching or driving the
+display; per the standing hand-stop law the loop does not kill a game a human
+may hold. Production t1086 is SAFE (bank-t273-predrive + RESUME.GAM md5
+5b382afbb789186c3654f3cec085b2e2 unchanged). DEFAULT TO PROCEED UNDER: run
+machine-free tasks (pure-code queue rows) meanwhile; a future DRIVE-class task
+may relaunch production via scripts/r1_playcap_vnc.sh (adoption guard t267)
+only if (a) `ss -tn | grep 5910` shows NO established client AND (b) the ring
+is still tutorial-lineage (turn 645, 3 powers) i.e. nobody restored it
+manually; bank the tutorial ring first (already done: bank-t273-tutorial645).

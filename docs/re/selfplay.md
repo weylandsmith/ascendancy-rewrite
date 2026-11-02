@@ -785,3 +785,68 @@ SWEEP LAWS BANKED (interaction-class, this file's remit):
   click empty disks unless changing the campaign's research is intended
   (t268 did ONE such click — Repulsion Beam Tech — recorded honestly;
   no in-game revert exists).
+
+## t273 (2026-11-02) — DRIVE LEG LOST TO A TITLE-MENU MISCLICK (LAW) + FULL-CORPUS WITNESS HARVEST
+
+DRIVE FAILURE AND ITS LAW. The t250 v4 driver's pre-drive popup drain closed 1
+"popup" at 11:35:14 EST and 2 s later the ring lineage flipped 1086/4-power
+(Chamachies/Orfa/Ungooma/Minions) -> 645/3-power (Nimbuloids/Hanshaks/Chronomyst):
+the vendor TUTORIAL campaign (screen: "Terpsichore / Orange Medium", Explorer I +
+Defender I, modal "Do you wish to exit this tutorial?" —
+work/screens/t273/now_1156.png). CAUSE [inferred, strong]: the popup detector
+(white-text rows in root band y 330..470 == game y 230..370; click = rightmost
+label of the lowest row at ytop-3) fires on the TITLE MENU — refcap.md measured
+title rows 252/293/333 and ui.md PLAYTUTORIAL rect (159,240)-(477,270), so the
+game-y=237 target lands inside Tutorial. dosbox.log corroborates ("Active save
+slot: 1 [Empty]" then tutorial autosaves). LAW: popup drain must never run while
+the game sits at the title menu; recovery/drive clicks must be band-measured per
+screen, never detector-derived. The t251 "popup chain confirmed a resume dialog"
+load is the SAME class. A remote VNC client was connected during part of the
+window (ss [::1]:53822<->x11vnc pid 1207, no local owning process), so a human
+click is not fully excluded; both readings recorded. Driver killed at 11:49, zero
+further input; RESUME.GAM md5 5b382afbb789186c3654f3cec085b2e2 UNCHANGED; the
+1086 campaign is preserved in work/r1/bank-t273-predrive (20 slots) and the
+tutorial ring in bank-t273-tutorial645.
+
+HARNESS BUGS EXPOSED IN THE t251 MINE (both measured this session):
+(1) mine_stream reads owner as the u16 pair at +0x54 = the owner HANDLE
+(196608/131072...), not the race INDEX byte at +0x56 (verified at t1253: byte56
+maps to relation names exactly and equals the watcher's ships[].owner). Its
+`relv != 2` filter therefore never filtered: the "252 non-war candidates" are
+not witnesses. (2) Stale-echo rows (an old session's turn 692 landing between
+live 1037/1038) pass a plain adjacent-row pairing and mint phantom attitude
+deltas (-38/-52 "Ungooma->Orfa"); guarded by requiring prev_turn in
+{turn, turn-1} plus an mtime gap <= 120 s. (3) Nearest-other-owner != attacker:
+scripts/r273_vet.py prints, per damage hit, min distance to a WAR power vs a
+PEACE power.
+
+FULL-CORPUS HARVEST (scripts/r273_harvest.py; 72,327 deduped rows, 72,128
+guarded same-lineage pairs; work/r1/t273_harvest_full4.out + t273_legA.json):
+- LEG A (OQ-016): 50 damage hits (32 hull-decrease, hist -13:5 -12:1 -11:1
+  -10:1 -8:10 -7:1 -4:10 -2:3; 18 shield-only -10/-6/-5:8/-2:5/-1:3); 26 hull
+  hits AT_WAR, the 3 PEACE-labelled and 3 state-0 rows all FAIL the vet (min
+  distance 363..1854 u, no ship of either class within the 60 u reach) =>
+  UNATTRIBUTED. Damage against a NON-at-war owner: STILL ZERO corpus-wide.
+  MULTI-VOLLEY: 12 (turn,slot) pairs with >=2 hits across consecutive rows, all
+  in the t1253 Chamachies-vs-Ungooma AT-WAR battle (slot 14 six hits; slot 23
+  hull steps -4,-4,-8) + one at t908 state-0 — the filter reproduces the known
+  battle, so its zeros elsewhere are meaningful. SECOND price+cascade witness:
+  Ungooma->Chamachies 477->437 EXACTLY -40 with state 1->2 in the adjacent pair
+  at wall 00:35:35 t1253 (plus its bank duplicate 08:22:52); t887 (t251)
+  re-confirmed as an adjacent-pair event. A -28 price (Chamachies->Orfa
+  618->590) fired with NO war flip (state 1->1). Clamp target DECL-10=280 still
+  never hit. OQ-016 annotated, STAYS OPEN.
+- LEG B (OQ-021): ZERO rows V>=25 corpus-wide (V max 23); selector census
+  {0: 71,679} outside the tutorial lineage. THE FIRST NONZERO SELECTOR IN THE
+  CORPUS: the tutorial lineage (648 rows) reads selector_byte=2 and rank=1 at
+  the relocated DATA base (verified in guest RAM: P+0x43510==2, P+0x4350c==1)
+  while the player owns 3/50 systems and V=0 — i.e. the byte is NOT the
+  end-ctrl threshold reading. Presenter arms measured by push-imm scan at
+  payload file 0x2c03a default / 0x2c04d end-xtnc / 0x2c064 end-dest / 0x2c07a
+  end-capt (score.md S3 missed this one) / 0x2c092 end-unit / 0x2c0a9 end-ctrl;
+  dispatch `jmp dword[0x10173e0+eax*4]` @0x2c033, table not locatable by
+  arm-dword search (3 stray dwords in range only) => selector->arm MAPPING
+  [unverified]. The five end-*.txt strings sit at identical static addresses in
+  tutorial AND production slots (image content, not an event trace). STAYS OPEN.
+- LEG C (OQ-019): magnetron USE frames ZERO (st5 control-class 160,747 rows,
+  other 0). STAYS OPEN.

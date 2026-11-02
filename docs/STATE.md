@@ -260,22 +260,21 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t273 LONG DRIVE WITNESS HARVEST II (base = production t1086 NOW; drive toward
-1250+; t272 landed NO writer EIP — the watchpoint instrument is MEASURED-DEAD on
-this box (score.md S15, REFUTED-ROUTES t272: dosbox-x +dfsg-3 has no debugger
-command set at all; do NOT re-census it, do NOT pilot -break-start), so the
-"(b) verify writer EIP" leg of this task is VOID — skip it). ORDERING RATIONALE:
-t272 consumed its grant to an honest negative; production :9 is live and healthy
-(TL expiry Nov 4 10:07), and the V>=25 threshold witness (OQ-021's only live
-closure route now) plus the multi-volley witness (OQ-016) are drive-corpus
-mines — harvest while the session lives. r1_t245_turndrive v4; bank the ring to
-a dated bank dir BEFORE any restart AND every ~30 turns; OOM law; per-segment
-trust law (t262 r262 pattern). MINE: (a) multi-volley vs NON-at-war owner
-(OQ-016 — t251's cascade was the first; bank counts + slot refs to combat.md);
-(b) V>=25 threshold watch (t269 census says this campaign stays under 14..22 —
-if a drive BREAKS 25, that is the threshold witness, log the exact ring slot +
-V + systems counts; strict-close only on the event); (c) OQ-019 magnetron USE
-frames if any AI fleet holds one. Bank witness tables; honest negatives fine.
+NEXT t274 REWRITE ECONOMY/RESEARCH INTEGRATION TESTS (pure code; machine-free —
+ORDERING RATIONALE: t273's drive leg ended with :9 running the vendor TUTORIAL
+campaign and a remote VNC client attached (selfplay.md t273, BLOCKED.md t273 —
+the loop does not kill a game a human may hold), so DRIVE-class work is HELD
+until the BLOCKED t273 release conditions are met (no established client on
+:5910 AND ring still tutorial-lineage — check BOTH at task start; if met, a
+drive-class re-queue outranks this row and STATE gets rewritten accordingly);
+t274 needs no game at all and pins laws the ledger already closed sub-laws of.
+TASK VERBATIM (queue row): pin the income channel law (OQ-016 closed sub-laws:
+income formula, pop growth — economy.md [NOTE: real home is income-law.md —
+economy.md has NO section 4 per t271 citation audit]) and the research tier
+chain (FUN_00040018, gap row 5) as end-to-end campaign tests in rewrite/tests/
+— multi-turn fixtures from banked worlds (use the watcher JSON scalars, NOT raw
+sav parsing). Target: catch a regression if buildPhase/research wiring changes.
+Gate + rewrite tests green.
 
 PAIRING-SESSION NOTE (phase-3 handoff, 2026-11-02 ~10:15): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS this session (verbatim):
@@ -292,17 +291,6 @@ loadstate — input-dead-on-load law t261), plus the older bank-* dirs.
 
 QUEUE (phase 3, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t273 LONG DRIVE WITNESS HARVEST II (base = production t1086 NOW; drive toward
-  1250+; if t272 landed a writer EIP, ALSO verify it against the new corpus).
-  r1_t245_turndrive v4; bank the ring to a dated bank dir BEFORE any restart
-  AND every ~30 turns; OOM law; per-segment trust law (t262 r262 pattern).
-  MINE: (a) multi-volley vs NON-at-war owner (OQ-016 — t251's cascade was the
-  first; bank counts + slot refs to combat.md); (b) V>=25 threshold watch
-  (t269 census says this campaign stays under 14..22 — if a drive BREAKS 25,
-  that is the threshold witness, log the exact ring slot + V + systems counts;
-  strict-close only on the event); (c) OQ-019 magnetron USE frames if any AI
-  fleet holds one. Bank witness tables; honest negatives fine.
 
 t274 REWRITE ECONOMY/RESEARCH INTEGRATION TESTS (pure code): pin the income
   channel law (OQ-016 closed sub-laws: income formula, pop growth — economy.md)
@@ -402,6 +390,34 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t273 (2026-11-02): LONG DRIVE WITNESS HARVEST II — DRIVE LEG LOST TO A
+TITLE-MENU MISCLICK (law banked), HARVEST LEG DELIVERED over the full corpus,
+t251's mine exposed as TWO measurement bugs, FIRST nonzero selector byte lands
+and REFUTES the naive selector=threshold reading. (1) INTAKE CLEAN: production
+:9 healthy 1086/4-power, single watcher, RESUME.GAM md5 5b382afbb789186c...,
+pre-drive bank bank-t273-predrive (20 slots). (2) 4 s after the t250-v4 driver
+opened, its popup drain had clicked game-y 237 = the TITLE MENU Tutorial
+button (refcap rows 252/293/333 + ui.md PLAYTUTORIAL rect cited) and the ring
+flipped to the vendor TUTORIAL campaign (645, 3 powers, Terpsichore screen
+shot). LAW: popup drain must never run at the title menu; clicks band-measured
+per screen. Remote VNC client attached during part of the window => human
+touch not excluded; driver killed 11:49, zero further input, RESUME.GAM
+re-verified UNCHANGED, tutorial ring banked (bank-t273-tutorial645). (3)
+r273_harvest.py over 72,327 rows / 72,128 guarded pairs: LEG A damage-vs-
+non-at-war-owner STILL ZERO (32 hull hits, 26 AT_WAR, 6 fail the new
+r273_vet.py attribution vet); multi-volley 12 pairs ALL inside the known t1253
+AT-WAR battle (filter validated there); SECOND -40 price+WAR-flip witness
+(Ungooma->Chamachies 477->437, wall 00:35:35 t1253) + a -28 price with NO flip;
+clamp 280 never hit. t251's owner HANDLE-vs-INDEX bug (+0x54 vs +0x56) and
+stale-echo pairing void its '252 non-war candidates'. LEG B: zero V>=25 rows;
+selector=2/rank=1 at V=0 in the tutorial lineage = score.md S16 (arm list
+gains end-capt @0x2c07a; selector->arm mapping unverified). LEG C: magnetron
+USE frames zero (160,747 control rows). LEDGER: OQ-016/019/021 ANNOTATED, all
+STAY OPEN (strict-close honored — honest negatives banked). BLOCKED.md t273
+block written with the relaunch release conditions (no :5910 client AND ring
+still tutorial-lineage; bank first). :9 LEFT RUNNING THE TUTORIAL — a human
+signal decides. NEXT = t274 (pure code, machine-free).
 
 LANDED t272 (2026-11-02): V-PRODUCER WATCHPOINT SESSION RUN ON SCRATCH —
 INSTRUMENT MEASURED-DEAD ON THIS BOX (honest negative; no row closed,

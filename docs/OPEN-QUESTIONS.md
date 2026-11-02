@@ -435,7 +435,8 @@ write-site closure route DOES NOT EXIST here; alternatives checked same session
 Keeper for any future debugger-class run: a title-screen boot does NOT have the
 image resident (scripts/r272_scratch_resident.py) — enter a campaign first.
 Row STAYS OPEN; live routes = t273 threshold watch (V>=25 event) and the
-ENDGAME-window witness; rewrite default >1/2 unchanged |
+ENDGAME-window witness; rewrite default >1/2 unchanged | STATUS t273 (2026-11-02, docs/re/score.md S16): FIRST nonzero selector/rank in corpus — the TUTORIAL-lineage segment (648 rows, bank-t273-tutorial645) reads selector=2, rank=1 with V=0 and player owning 3/50 systems: selector=2 is NOT the end-ctrl threshold arm under the file-order reading; selector->arm MAPPING [unverified] (presenter arms re-measured by push-imm scan: 0x2c03a default/0x2c04d xtnc/0x2c064 dest/0x2c07a CAPT (S3 miss)/0x2c092 unit/0x2c0a9 ctrl; jmp-table @0x10173e0 not locatable in payload by arm-dword scan). Campaign lineage: zero V>=25 rows (72,327 rows), selector 0 everywhere; threshold witness STILL absent. Row STAYS OPEN.
+
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719
@@ -1408,7 +1409,8 @@ banked: a pending build reserves its slot (byte1:=item id, word2 bit0 CLEAR)
 — pending IS observable in idle-turn ring captures (refines t202b note; +0x4c
 M4 untouched). Row STAYS OPEN (strict-close): Phase Bomb capture law, human
 build-order minutiae, setup-draw law (t273 seed), shield-byte consumer,
-word[+0x16] template source.
+word[+0x16] template source. STATUS t273 (2026-11-02, full-corpus witness harvest, docs/re/selfplay.md t273, scripts/r273_harvest.py+r273_vet.py, work/r1/t273_harvest_full4.out): t251's mine had TWO measurement bugs (owner HANDLE u16@+0x54 read as race index -> its relv filter never filtered; stale-echo row pairs minted phantom deltas) — its '252 non-war candidates' are VOID. Guarded re-run (72,128 pairs, prev_turn adjacency + 120 s gap): 32 hull-decrease hits, 26 AT_WAR, all 6 non-war-labelled rows FAIL the attribution vet (no ship of ANY class within 60 u; min distances 363..1854) => damage-vs-non-at-war-owner STILL ZERO. MULTI-VOLLEY 12 (turn,slot) pairs, ALL in the t1253 AT-WAR battle (filter validated there: slot 14 six hits). SECOND price+cascade witness: Ungooma->Chamachies 477->437 EXACTLY -40 + state 1->2 adjacent pair wall 00:35:35 t1253; t887 re-confirmed; a -28 price fired with NO flip (state 1->1). Clamp target 280 never hit. Row STAYS OPEN (strict-close).
+
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:
@@ -1660,7 +1662,8 @@ feed: the only st4 mid-turn moves in the corpus are INSIDE the softlock window
 new bug-class tell turn-frozen-but-tail-running. Row STAYS OPEN (strict-close):
 remaining runtime residues all need sub-ring instrumentation or a
 player-driven magnetron use; no documented-default in the rewrite changes on
-this evidence. | open |
+this evidence. | open | STATUS t273 (2026-11-02): magnetron USE-frame harvest re-run over the full corpus (r273_harvest leg C, r265 W2 signature verbatim): ZERO candidates (st5 control-class 160,747 rows, other 0). Honest negative; row STAYS OPEN.
+
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:
