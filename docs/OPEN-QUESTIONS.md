@@ -414,7 +414,16 @@ threshold still unobserved (driven max V=22@t1301, decayed 21@t1335). | open (th
 residue = play witness; displayed-count write-site = RESIDUE NOW NARROWED TO
 END-TURN RECOMPUTE PATH OVER NON-FLEET STATE (t262 S13), runtime-watchpoint
 class; screen-open hypothesis REFUTED t255; banked-world-feature explanations
-MEASURED-EXHAUSTED t258; fleet-census trigger MEASURED-DEAD t262) |
+MEASURED-EXHAUSTED t258; fleet-census trigger MEASURED-DEAD t262) STATUS t269 (2026-11-02, threshold mining, score.md S14,
+scripts/r269_vthreshold.py + r269_anom.py): full corpus 71,038 trusted rows —
+ZERO V>=25, selector census {0: ALL}, rank census {65535: all but 2 turn-0
+title frames} (score evaluator never ran); T census FIRST-BANKED {50: 71023}
+with every anomaly a turn-0 setup frame -> captured play is ALL T=50 galaxies,
+denominator never variable; distance-to-half = max 46.0% (V=23), strict
+majority 3 stars away, systems_any=36>25 with sel=0 re-confirms the semantic
+non-join at the threshold neighbourhood; 66 V-change boundaries banked. Row
+STAYS OPEN (a trajectory is not a threshold; ENDGAME-window witness still the
+closure class) |
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)
 and reads 0x1d4c0-byte blocks (@0x59cef), yet theme00.raw span == 8,191,719

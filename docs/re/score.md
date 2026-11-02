@@ -495,3 +495,51 @@ to 22 at t1301 then decayed 21 by t1335 — distance-to-half banked: 22/50).
 The residue statement is now sharper: writer = per-End-Turn recompute over
 NON-fleet state (S10.2 + S13.2), next instrument = dosbox-x write watchpoint
 on 0x482fb during a drive that crosses V>=25 (USER ASK stays in BLOCKED.md).
+
+## S14 — t269: VICTORY-THRESHOLD MINING over the full corpus [measured, negative + T census]
+
+Instrument scripts/r269_vthreshold.py (KEEPER; single streaming pass, header-
+scalar slices, per-SEGMENT trust law t262; anomaly locator scripts/r269_anom.py).
+Corpus 7.69 GB / 314,173 lines / dedup 243,135 -> 71,038 trusted rows / 14,348
+segments. Outputs work/r1/t269_vthreshold{,_rank}.out.
+
+1. NO THRESHOLD EVENT, sharper than ever: zero rows V>=25; selector_byte
+   census = {0: 71038} (never armed); AND rank census = {65535: 71045, 0: 2}
+   — the rank slot DAT_0004350c left its sentinel in exactly TWO rows, both
+   turn-0 title/new-game frames (see 3). The score evaluator
+   (FUN_0002bfa8 clamp(DAT/10-1) family) NEVER ran during captured play.
+   Three independent end-state variables (V, selector, rank) all sit in
+   never-fired posture across 100% of trusted frames.
+2. T CENSUS (first ever banked): T=u32[0x16143]>>16 = 50 in 71,023 rows;
+   25 in 12; 0 in 2; 100 in 1. r269_anom.py located every anomaly: ALL are
+   turn-0 in_game=False frames (title/new-game-setup, starfield mid-build —
+   T=25 rows carry any=11/pm=11 at turn 0 = partially-populated setup state;
+   T=0 rows are all-zero). CONCLUSION: every IN-GAME frame ever captured ran
+   the T=50 galaxy; no small-galaxy campaign lineage exists in the corpus, so
+   the threshold denominator was never variable. Half-threshold = V>=26 (or
+   >=25 per "over half" reading) for every captured campaign.
+3. DISTANCE-TO-HALF statement (the honest product, per task): corpus max
+   percent-controlled = TRUNC(100*23/50) = 46.0% (V=23), observed at t925 and
+   re-observed t958/t1015/t1016/t1087; strict majority needs 3 more controlled
+   stars. systems_any reached 36 (> half of 50) WHILE V stayed <=23 and sel
+   stayed 0 — the threshold-neighbourhood re-confirmation of the SEMANTIC
+   NON-JOIN (S6/S9): a player owning planets in 36 of 50 systems never armed
+   the end-ctrl selector, so V's producer gates on something narrower than
+   territory ownership.
+4. V-CHANGE BOUNDARY TABLE: 66 boundaries (vs t258's 38 — the per-segment
+   trust law catches reload-class boundaries the global watermark dropped);
+   shape clues 11->22 @t911->912 and 22->11 @t1140->1141 reproduced
+   independently. Full table in the out file (turn-pair, V a->b, any/full/pm).
+5. end-ctrl.txt VERBATIM re-read (extracted/ascend00/end-ctrl.txt): header
+   comment lines 1-2 "Player controls over / half the galaxy."; enddesc
+   "spans over two-thirds of the galaxy"; congrat "more than two-thirds of the
+   stars ... the other species may continue to bicker over the stars that
+   remain". The prose says two-thirds TWICE against the comment's half; the
+   congrat text describes surviving species holding stars, consistent with
+   either comparator. No numeric constant in the file — the contradiction
+   stays code-only, and the code comparator remains unobserved.
+
+STRICT-CLOSE: OQ-021 STAYS OPEN — a trajectory is not a threshold (task law).
+Closure still requires the ENDGAME-window witness (selector arm + end-ctrl
+screen), i.e. the interactive watchpoint session (USER ASK in BLOCKED.md).
+Rewrite default >1/2 (campaign.cpp) remains CONSISTENT with every banked frame.

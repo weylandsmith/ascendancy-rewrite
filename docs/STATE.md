@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T05:45
+updated: 2026-11-02T06:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,30 +260,49 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t269 VICTORY-THRESHOLD MINING (OQ-021 end-ctrl; needs t261 — landed):
-vendor comment says "over half" for end-of-game control. On the driven
-corpus, track V=dword[0x482fb] trajectory vs systems_any/systems_full and
-the c-overlay STARS CONTROLLED readout (t244: overlay == DAT_482fb direct).
-If the drive crossed any threshold event (event log, ENDGAME window), bank
-it; else bank the trajectory table + the distance-to-half statement.
-Strict-close: a trajectory is not a threshold — keep the row open unless an
-event lands.
-ORDERING: t269 first per queue order (t268 landed; research resumes after
-the t252/t253/t268 sweep run). PRE-FLIGHT (t267 law): run
-`python3 scripts/r1_game_health.py` FIRST (exit 0 = game/watcher/ring OK;
-reasons name what is broken). PRODUCTION TL EXPIRES 2026-11-02 07:03:58 —
-if t269 needs the live game after that wall and it is DEAD (G:DEATH,
-work/r1/loop/GAME_DEAD.txt): bank the ring (cp save/ bank-tNNN-*), relaunch
-via `bash scripts/r1_playcap_vnc.sh start` (t267 guard + reaper + BRINGUP
-verify run automatically), resume via Return-to-Game. NEVER loadstate any
-bank (REFUTED t261). t269 is mostly OFFLINE corpus work — the driven-corpus
-banks (bank-t249-live-open, bank-t250-predrive, bank-t251-predrive,
-bank-t251-live1255) plus ring banks exist; the live game is only needed for
-an ENDGAME-window witness. Timeline reads obey the OOM law (r1_stream.py /
-bounded tail seek only; NEVER json.load the whole file). Campaign-
-fingerprint slots before any cross-session analysis (star->planet-owner-
-table md5, selfplay.md t266). V watermark caveat: per-session trust (t255),
-the global watermark drops re-loaded lower-turn campaigns.
+NEXT t270 HOME-PLACEMENT VERIFICATION (OQ-016 residue; offline, no live game
+needed — production TL dies 07:03:58 and this task must survive its expiry):
+verify the vendor's HOME-WORLD placement against the closed mapgen laws.
+Known anchors: vendor resume.gam static-init signature = EXACTLY 7 planet
+records hold owner 0..6 (byte NAME+0x33, t248 law); per-race home systems;
+mapgen shell/position laws CLOSED (OQ-012/OQ-025: shellRadiiFor, halving pop
+law, position law). QUESTIONS: (a) where do the 7 homes sit relative to the
+shell structure of a T=50 galaxy (radii? shell index? min inter-home
+distance?) — measure across the driven banks (bank-t249-live-open,
+bank-t251-predrive, bank-t1254, vendor resume.gam) using the star-table law
+(pos f32[3] @name-0x14) + t248 owner byte; (b) is home placement RUN-LOCAL
+random or template-fixed (compare home star names across independent
+lineages — the t262 segment law separates lineages; the t106 run-local
+finding for +0x55 seeds is the precedent to test against); (c) does the
+rewrite (mapgen/home placement code in rewrite/src/game/) match, and if a
+match lands, UPGRADE + pin per house style. Strict-close: verify != discover;
+close OQ-016's home sub-item only on cited measurement, annotate otherwise.
+ORDERING: research resumes after the t252/t253/t268 screen sweep run per the
+standing note; home-placement is the first named OQ-016 residue that is fully
+OFFLINE (terrain/nuke wiring needs a cell model decision; the armer residual
+is interactive-class). PRE-FLIGHT (t267 law): python3 scripts/r1_game_health.py
+FIRST (advisory; task needs no live game). Timeline reads obey the OOM law
+(r1_stream.py / bounded scans only). Campaign-fingerprint slots before any
+cross-session analysis (star->planet-owner md5, selfplay.md t266). NEVER
+loadstate any bank (REFUTED t261).
+
+
+QUEUE (phase 2b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
+keep this block intact except deleting your completed row; when it drains,
+park NEXT on a WAIT-TRIGGER sentinel — task line FIRST — or author more):
+
+t271 PER-CELL TERRAIN/NUKE WIRING SCOPING (OQ-016 residue): the planitem
+per-cell laws are DOCUMENTED (economy.md §4) but rewrite wiring is PARKED
+(no cell model). DECIDE the cell model shape first (slot-array law +
+locator law are in hand, STATE 'PLANET SYSTEM OBJECT'), then wire or file a
+REFUTED row with the decision rationale. Cite economy.md §4 + STATE.
+
+t272 V-PRODUCER WATCHPOINT PREP (OQ-021, USER-GATED): author the dosbox-x
+write-watchpoint session script for guest-phys B+0x82bb0+0x482fb-0x88
+(pointer-law law, score.md S9/S14) + a drive plan that pushes V toward >=26
+from bank-t261-final-1236 lineage WITHOUT touching production :9 unsanctioned;
+DO NOT run the watchpoint session without the user's explicit go (BLOCKED.md
+USER ASK). Prep + dry-run on scratch only.
 
 
 PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
@@ -298,16 +317,32 @@ Game, ring verified 3 rows. Launch law unchanged: MAX_ITERS=12 IDLE_GATE=0
 (timeline grows every 10 s -> probe structurally always armed; the queue-
 driven exit fires when the queue drains).
 
-QUEUE (phase 2, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row):
-
-t269 VICTORY-THRESHOLD MINING (OQ-021 end-ctrl; needs t261): vendor comment
-  says "over half" for end-of-game control. On the driven corpus, track
-  V=dword[0x482fb] trajectory vs systems_any/systems_full and the c-overlay
-  STARS CONTROLLED readout (t244: overlay == DAT_482fb direct). If the drive
-  crossed any threshold event (event log, ENDGAME window), bank it; else bank
-  the trajectory table + the distance-to-half statement. Strict-close: a
-  trajectory is not a threshold — keep the row open unless an event lands.
+LANDED t269 (2026-11-02): OQ-021 VICTORY-THRESHOLD MINING DONE — NO EVENT,
+FULL DISTANCE-TO-HALF + FIRST-EVER T CENSUS BANKED (no row closed, strict-
+close honored: a trajectory is not a threshold; score.md S14 + _wip_t269.md
+S1..S3; KEEPER scripts/r269_vthreshold.py + scripts/r269_anom.py, both RC=0;
+outputs work/r1/t269_vthreshold{,_rank}.out). MEASURED (7.69 GB / 314,173
+lines / dedup 243,135 -> 71,038 trusted rows / 14,348 segments, t262 per-
+segment trust law): (1) ZERO rows V>=25, selector census {0: ALL 71,038},
+rank census {65535: all but TWO turn-0 title frames} — three independent
+end-state variables (V, sel, rank) never fired in ANY captured frame; the
+score evaluator never ran. (2) T = u32[0x16143]>>16 census {50: 71,023; 25:
+12; 0: 2; 100: 1} and r269_anom.py PROVED every anomaly is a turn-0
+in_game=False setup frame (T=25 rows carry any=11 at turn 0 = starfield mid-
+build) -> captured play is ALL T=50 galaxies; threshold denominator never
+variable; half = V>=26. (3) DISTANCE-TO-HALF: corpus max 46.0% (V=23) at
+t925, re-observed t958/1015/1016/1087; 3 stars from strict majority;
+systems_any reached 36 (>half) with sel=0 — threshold-neighbourhood re-
+confirmation of the SEMANTIC NON-JOIN (V != territory). (4) 66 V-change
+boundaries (vs t258's 38 — segment law catches reload-class boundaries the
+global watermark dropped); doubling 11->22 @t911->912 and halving 22->11
+@t1140->1141 reproduced independently. (5) end-ctrl.txt re-read verbatim:
+comment "over half" vs enddesc AND congrat BOTH "two-thirds" — contradiction
+confirmed in the file itself, no numeric constant; code comparator still the
+only arbiter and still unobserved. PRE-FLIGHT: health HEALTHY 06:02 (game
+535172, TL dies 07:03:58 — task was offline, expiry moot); :9 untouched
+(zero clicks/turns, no loadstate). QUEUE phase 2 DRAINED -> authored phase
+2b above. NEXT = t270 VERBATIM.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - OOM LAW (t251 incident, MEASURED): NEVER read live-timeline.jsonl except
@@ -337,7 +372,10 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Do NOT re-trod: t212/t213 static exhaustion; t255 screen-open recompute
   (REFUTED); t258 candidicide (closed negative, KEEPER r258_vdisc.py);
   t259 sav-pair census (closed negative, KEEPER r259_savpair_census.py);
-  t249b day==turn; t254 17np identification (build on it, don't re-derive).
+  t249b day==turn; t254 17np identification (build on it, don't re-derive);
+  t269 threshold mining (closed negative, KEEPER r269_vthreshold.py — the
+  corpus CAN supply no threshold event; only the interactive watchpoint
+  session can, t272 prep).
 - Gate ~2-3 min; milestone: 6 must stay. work/ is gitignored — findings go in
   docs/re/, never work/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line
