@@ -260,3 +260,15 @@ launch WITHOUT -nogui and click Capture -> Load state via xsend synthetic
 BUTTON events (SDL2 accepts those), with -savedir pointed at a scratch copy of
 the banked ZIP. Do NOT re-attempt: conf-only load, bare-F12, mapper-editor
 binding mid-program, or any -nogui loadstate.
+
+## t261 — THE t1255 BANK STATE IS NOT DRIVABLE: loadstate RESTORES IT INTO AN INPUT-DEAD GAME
+Measured 2026-11-01 21:02-21:20 (docs/re/_wip_t261.md S1): the t260 load
+sequence reproduces exactly (Loaded. (Slot 60), watcher row t=1255 V=14) but
+the loaded game NEVER accepts input — 6 NEXTTURN presses no-advance, Escape
+and 'c' legs 0 px, screen md5-frozen across minutes, ring core-state identical
+across slots — while the SDL menu bar still responds to the same xsend path
+(Capture dropdown opens, pixel-diff 0.043) and autosave churns. The t1254
+softlock class is INSIDE the save. Do NOT plan any drive on a loadstate of
+bank-t251-live1255; a restored state must first pass an INPUT-LIVENESS PROBE
+('c'-toggle delta > 50 px). Structural decode of a round-trip re-save (t260's
+verification) cannot see this.

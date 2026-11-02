@@ -413,3 +413,21 @@ except-swallow + isinstance-guard turns a parse bug into a SILENT None — the
 none_census print added mid-task is what caught it; (d) verifier agreement
 against a reference parser is VACUOUS when both return None — assert non-degenerate
 value content, not fast==reference equality.
+
+## S12 — t261: driven-corpus +0x15 star-set growth table (OQ-021 S6/P7 witness material) [measured]
+
+Drive session 2026-11-01 (production :9, base t1086 resumed from RESUME.GAM).
+Banks bank-t261-final-1096 + bank-t261-t1255 decoded per-slot (scripts/
+r261_harvest.py, KEEPER; star k = B+OFF+0x13BC5 + k*0x30 + 0x15 nonzero):
+  t=1087 stars15=[4,24,36,44]
+  t=1090 stars15=[4,24,32,36,44]     (32 joins; V=23 constant)
+  t=1111 stars15=[4,14,24,32,36,44]  (14 joins)
+  t=1255 stars15=[4,12,24,32,38,42,44] (t1255 campaign snapshot; V=14)
+Same-turn slots are byte-identical in this field across ring churn (no
+intra-turn flicker). V=23 held 1086->1111 while stars15 grew by 2 — the join
+count does NOT track V within a run (S6 non-join re-corroborated on a NEW
+session, first time from a DRIVEN corpus). Strict-close: no threshold event
+observed; OQ-021 STAYS OPEN. Tool pitfalls banked: window_rows off-by-one in
+r1_t251_mine (quote char in wall slice — silently ZERO rows since t251, fixed;
+every earlier "newsession" pass was vacuous); wall=HH:MM:SS collides across
+days -> gate on file_mtime_ns epoch, not wall alone.

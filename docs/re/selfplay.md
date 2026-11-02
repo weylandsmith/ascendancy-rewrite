@@ -555,3 +555,27 @@ decides otherwise (t261 owns that blast-radius call). The t1255 death-frame
 ZIP loss (324d2d75, overwritten by autosave churn per the pairing note) does
 NOT block t261: the bank copy is the load source and the round-trip above
 reproduces t1255 V=14 from it.
+
+## t261 (2026-11-01) — SOFTLOCK-CLASS CENSUS REACHES 4 INCIDENTS; THE SAVE ITSELF CARRIES IT
+(1) :8 restored-t1255 session: input-dead ON LOAD (see REFUTED-ROUTES t261;
+screen md5-frozen, core-state identical across ring slots, SDL menu responsive,
+90% CPU). The engine was already input-dead when the t1254-era autosave was
+written — softlock is a SAVEABLE state, which retro-reads bank-t251-live1255
+as a softlock artifact, not a healthy snapshot.
+(2) production :9 at 21:38: mid-drive the RAM went from a HEALTHY t1111
+(banked, V=23) to a t1255/V=14 profile within ONE 10 s slot (53->54), then to
+the TITLE MENU (vision), then input-dead there too (arrows 0 px). dosbox.log
+has ZERO loadstate lines; no in-game on-disk SAV decodes to t1255; the VNC
+"client" is a zombie from Oct 16 (bytes_acked frozen). MECHANISM [unverified] —
+candidates: drain-popup misclick chain on the bare galaxy screen (t244
+precedent that misclicks act), or an engine-side fault that self-exits to the
+title. NEW TELL for t266: ring rows OSCILLATE t1254<->t1255 while input-dead
+(turn site 0x12e10 toggling with no input) — the game loop is ALIVE (89.7%
+CPU) and mutating the turn counter; only input handling is dead. Evidence:
+work/r1/bank-t261-prod-titlesoft/ (20 slots), prod-softlock-title.png.
+RECOVERY EXECUTED per SOP (bank -> SIGKILL recorded pid 524517 ->
+r1_playcap_vnc.sh start -> Return-to-Game click): resumed t1086 V=0 at
+23:05:11, re-drive running toward 1236 (base+150). HONEST LOSS: the live t1111
+RAM image is gone (ring-banked slots survive; RESUME.GAM never advanced past
+t1086 all day — the game only writes it at an in-game Save, and the drive must
+NOT click Save unattended since a misclick there could hit adjacent dialogs).

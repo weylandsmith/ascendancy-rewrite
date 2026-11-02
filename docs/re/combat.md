@@ -596,3 +596,14 @@ inputs (empire volley/shield sums), documented here and in the code comments.
 Per-ship combat, if ever modelled (OQ-019 territory), must re-use S2d..S2h
 literally. The t85g live sequence 40>38>36>34 remains the behavioural
 cross-check on the split law.
+
+## 5. t261 driven-corpus witness(a) pass (OQ-016 clamp material) [measured, no qualifying event]
+
+Drive t1086->1111 (25 turns, production :9), 88 deduped trusted-order points
+(scripts/r261_harvest.py). mine_stream found 20 non-war change-hits
+(Chamachies vs Orfa/Ungooma rel=1 streaks <=8; '?' owner-unknown rows) but
+ZERO destruction events and ZERO strict engagement-scale hits (min dist2
+39441 >> 3600 bound) — the streaks are AI ship-state churn (state-field
+changes at range), NOT volleys. No multi-volley-vs-non-war witness landed this
+session; OQ-016 STAYS OPEN (t251 cascade witness remains the only one). Raw
+hits banked work/r1/t261_witness_a_hits.json for re-vetting.

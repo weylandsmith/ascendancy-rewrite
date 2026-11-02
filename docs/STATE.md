@@ -260,7 +260,24 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t261 LONG DRIVE + WITNESS HARVEST (BASE = t1255 RESTORED STATE — t260 PROVED loadstate works: GUI menu bar + xsend click Capture->Load state; feeds the OQ-016/OQ-021 witness mining below). Target = 1255+150 = turn 1405. BRING-UP LAW (t260, docs/re/selfplay.md t260 block): launch dosbox-x WITHOUT -nogui AND WITHOUT -time-limit (a TL deadline in the loading process expels the loaded state within seconds — measured both ways), on a free display (t260 used :8; production :9 t1086 session keeps running until YOU decide — you own that blast-radius call; retiring :9 frees RAM and ends the t1086 corpus), -savedir = a SCRATCH copy dir holding the t1255 ZIP as 60.sav (copy from work/r1/bank-t251-live1255/60.sav md5 0024340d; NEVER point savedir at the production ring), conf = work/r1/vnc/t260-experiment.conf pattern (autosave=0 for the load click, then you may re-arm autosave 10 41-60 via a conf relaunch AFTER the load if you want the ring from the driven session — simpler: leave autosave ON from the start in a scratch savedir, the ring never touches t1086 rows). Then drive with scripts/r1_t245_turndrive.py v4 (softlock detect + auto-recovery). LAWS: bank the ring (scratch savedir *.sav -> a dated work/r1/bank-<tag>/) BEFORE any restart AND every ~30 turns; NEVER json.loads the whole timeline (OOM law); per-session trust REQUIRED for V analysis (t255: global watermark drops re-loaded lower-turn campaigns — the t1086 and restored-t1255 sessions are DIFFERENT sessions even on one display); MINE via scripts/r1_stream.observations(trust=True) ONLY: (a) multi-volley battle vs a NON-at-war owner (OQ-016 clamp witnesses — t251 landed the FIRST cascade witness, more turns = more witnesses); (b) mid-campaign slot with V=dword[0x482fb]>1 AND some byte[star+0x15] nonzero (OQ-021 S6/P7 — t251 landed the first). Do NOT issue player attack orders — mine what the AI produces. Bank witness tables to docs/re/combat.md (a) / score.md (b). t260 VERIFICATION TOOLING you can reuse: scripts/r1_t260_menulocate.py (menu-row locate; window ID by NAME via xwininfo, never hardcoded); decode any slot with the watcher module (r1_playcap_watch.S.read_slot(path, mem, B), B via r1_sav_scan.find_base — pass the PATH string, None crashes it). xsend sends keys with state=0: chords (F12+L) are NOT deliverable; menu clicks ARE.
+NEXT t262 OQ-021 CENSUS DISCRIMINATOR (t256 MECHANICS note): per-owner ship
+census vs V-change turns on the t261 corpus (ship_raw banked every row;
+score.md S10 + NEW S12 table). t255 REFUTED screen-open recompute; t258
+candidicide left survivors NONE for value candidates — the question now is
+TRIGGER: does V change on turns where the census changes (recompute) vs
+independent events? Bank the discriminator result to score.md; strict-close
+only on a cited measurement. USE scripts/r261_harvest.drive_rows() for corpus
+selection (mtime-epoch gate; wall-clock windows are cross-day-poisoned — the
+t251 window_rows bug made every prior "newsession" pass vacuous). PRE-FLIGHT
+(first two probes only, then work the census): (1) tail
+work/r1/playcap/drive_t261b.out + ring turn — the t261 re-drive (1086->1236,
+started 23:07) runs in a SESSION-BOUND background process and may have died
+with its session; if the ring is < target and dosbox is input-ALIVE, relaunch
+the same command (T261_DISPLAY=:9 T261_BASE=$PWD/work/r1/playcap
+T261_MENUBAR=0 T261_RECOVER=resume ... --target 1236); the census may run on
+whatever turns landed; (2) DO NOT loadstate bank-t251-live1255 for anything
+(REFUTED t261: input-dead on load).
+
 
 PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
 stands — task line is the FIRST non-blank line; notes below. USER DELEGATION
@@ -276,20 +293,6 @@ driven exit fires when the queue drains).
 
 QUEUE (phase 2, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t261 LONG DRIVE + WITNESS HARVEST (base = t260 outcome: from 1255 if restored,
-  else from 1086; target = base+150). Use scripts/r1_t245_turndrive.py v4
-  (softlock detect + auto-recovery built in). LAWS: bank the ring
-  (work/r1/playcap/save/*.sav -> a dated work/r1/bank-<tag>/) BEFORE any
-  restart AND every ~30 turns (the ring only holds 200 s); NEVER json.loads
-  the whole timeline (OOM law); per-session trust REQUIRED for V analysis
-  (t255: global watermark drops re-loaded lower-turn campaigns). MINE via
-  scripts/r1_stream.observations(trust=True) ONLY: (a) multi-volley battle vs
-  a NON-at-war owner (OQ-016 clamp witnesses — t251 landed the FIRST cascade
-  witness, more turns = more witnesses); (b) mid-campaign slot with
-  V=dword[0x482fb]>1 AND some byte[star+0x15] nonzero (OQ-021 S6/P7 — t251
-  landed the first). Do NOT issue player attack orders — mine what the AI
-  produces. Bank witness tables to docs/re/combat.md (a) / score.md (b).
 
 t262 OQ-021 CENSUS DISCRIMINATOR (t256 MECHANICS note): per-owner ship census
   vs V-change turns on the t261 corpus (ship_raw banked every row; score.md
@@ -395,6 +398,34 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t261 (2026-11-01): t1255 RESTORED-STATE DRIVE ROUTE REFUTED (input-dead
+ON LOAD — the softlock class lives INSIDE the save; REFUTED-ROUTES t261 block;
+t260's structural verification cannot see input liveness — NEW LAW: probe
+'c'-toggle on any restored state before planning a drive); PRODUCTION :9 hit
+the bug class MID-DRIVE at 21:38 (healthy t1111 banked bank-t261-t1255 slots
+53/54 capture the 10-second flip to a t1255/V=14 profile with ZERO loadstate
+log lines, then title menu, then input-dead there; ring oscillates t1254<->1255
+while the loop mutates the turn site at 89.7% CPU — 4th incident, prime t266
+material; mechanism [unverified], human-sitting hypothesis weakened: the VNC
+"client" is an Oct-16 zombie, bytes_acked frozen); RECOVERY SOP EXECUTED
+(bank->SIGKILL->vnc start->Return-to-Game: resumed t1086 23:05, re-drive to
+1236 launched, session-bound — PRE-FLIGHT in NEXT). HARVEST LANDED: score.md
+S12 (+0x15 star-set growth table from the DRIVEN corpus; V=23 constant while
+stars15 grew 1087->1111 — S6 non-join re-corroborated; OQ-021 STAYS OPEN) +
+combat.md §5 (20 non-war change-hits, ZERO volleys/destructions at engagement
+scale — OQ-016 STAYS OPEN, honest negative). TOOLING: KEEPER
+scripts/r261_harvest.py (mtime-epoch corpus gate; wall windows are
+cross-day-poisoned); BUGFIX r1_t251_mine.window_rows off-by-one (quote char in
+the wall slice — the trust=False "newsession" pass returned ZERO rows since
+t251; every earlier such pass was VACUOUS — re-run any that mattered);
+r1_t261_session.sh + r1_t261_load.py (isolated :8 loadstate bring-up, md5-gated,
+keep-save mode for recovery); r1_t261_drive.py env-parameterized one-code-path
+driver. pkill/pgrep -f self-match footgun fired twice more (killed only my own
+shell both times) — use ps|awk|kill. NO OQ CLOSED (strict-close: honest
+negatives only). Bank new: t261-final-1096, t261-t1255, t261-soft1255,
+t261-prod-titlesoft. NEXT = t262 VERBATIM (census discriminator on the driven
+corpus; pre-flight: re-drive liveness).
 
 LANDED t260 (2026-11-01): GUI-LOADSTATE RESTORE EXPERIMENT SUCCEEDED — t1255
 IS ALIVE AGAIN IN A RESTORABLE PROCESS; HEADLESS RESTORE CONFIRMED DEAD —

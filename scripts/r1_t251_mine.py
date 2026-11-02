@@ -54,7 +54,14 @@ def window_rows(path, lo, hi):
     with open(path, "r", errors="replace") as f:
         for line in f:
             i = line.find('"wall": "')
-            if i < 0 or not (lo <= line[i + 8:i + 16] <= hi):
+            if i < 0:
+                continue
+            # t261 BUGFIX: the value starts at i+9 ('"wall": "' is 9 chars);
+            # slicing at i+8 includes the OPENING QUOTE (ASCII 34 < digits), so
+            # the window comparison NEVER matched — the pass silently returned
+            # zero rows since t251.
+            w = line[i + 9:i + 17]
+            if not (lo <= w <= hi):
                 continue
             try:
                 yield json.loads(line)
