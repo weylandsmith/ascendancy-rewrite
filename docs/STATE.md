@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T17:05
+updated: 2026-11-02T17:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,51 +260,37 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t277 TL-EXPIRY FORENSICS + SOP FIX (offline forensics; ORDERING
-RATIONALE: t276 landed 2026-11-02 as pure code (planetwin.{h,cpp}, 8 tests,
-suite 158/0). t277 is the highest-value machine-adjacent row that needs NO
-drive of :9 (reads logs/pidfile ctimes only — the x11vnc client was STILL
-attached at t276 close, so drive-class rows t279+ stay HELD under the BLOCKED
-t273 release conditions: NO established client AND ring still tutorial-
-lineage; if met at a later task start, a drive-class re-queue outranks this
-row and STATE gets rewritten accordingly). t278/t280+ follow the queue. The
-TL-expiry hypothesis matters because three production deaths cost ~2 sittings
-of witness harvest; confirming/killing it + the pre-expiry SOP protects every
-future drive row.
-TASK VERBATIM (queue row): t277 TL-EXPIRY FORENSICS + SOP FIX: CONFIRM or
-kill the TL=28800 hypothesis (dosbox.log last lines + launch times from
-loop.log/pidfile ctimes vs the two measured deaths; dosbox-x logs its
-time-limit exit — find the exact farewell line in the log or strings). Then
-fix the harness: r1_game_health.py gains a PRE-EXPIRY warning at TL-600s
-(t267 already warns at 600s — verify it fires and document the
-restart-into-fresh-TL procedure verbatim), and r1_playcap_vnc.sh default TL
-raised to 172800 with a comment citing this row. Bank to docs/re/selfplay.md
-§7 + BLOCKED.md.
+NEXT t278 OQ-005 RULING PACKAGE (offline, user-time-shortening; ORDERING
+RATIONALE: t277 landed 2026-11-02 — TL-expiry forensics CONFIRMED + SOP shipped
+(LANDED t277 below); the machine-adjacent rows after it (t279 diplomacy
+verification) need a production drive window which stays HELD under the BLOCKED
+t273 release conditions (NO established VNC client AND ring still tutorial-
+lineage; at t277 close the client situation was unchanged), so the queue's next
+offline row runs first. If the release conditions ARE met at a later task
+start, a drive-class re-queue outranks this row and STATE gets rewritten
+accordingly. t280+ follow the queue.)
+TASK VERBATIM (queue row): t278 OQ-005 RULING PACKAGE (offline,
+user-time-shortening): rebuild work/r1/shp_png/index.txt as a DECISION SHEET —
+one row per residue record: thumbnail path, our identification [if any, cited],
+the comparison-screenshot status from the user's Oct-29 message (verbatim quotes
+preserved), and a one-line "keep / junk / re-render" recommendation the user can
+rule on in minutes. DO NOT rule for the user (R13); the deliverable is the sheet
++ contact sheets already in place. Bank sheet path into BLOCKED.md OQ-005 ask.
 
 PAIRING-SESSION NOTE (phase-3 handoff, 2026-11-02 ~10:15): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS this session (verbatim):
 watchpoint "Yes — prep and run it on scratch"; phase 3 "Yes — relaunch + drive
 + rewrite queue (~another day)". STATE AT HANDOFF: production :9 LIVE at t1086
-single watcher, TL=172800 (48 h guard) — SEE t277: the three "unexplained"
-game deaths (Nov 1 15:45, Nov 2 07:04, +15:45 pattern) each sit ~8 h = 28800 s
-after their launch -> prime suspect [inferred] the TL runaway-guard expiring,
-NOT an engine crash; t277 confirms from dosbox.log/journalctl and fixes the
-SOP (health-check restart BEFORE expiry, or TL>=172800 always). User save
+single watcher, TL=172800 (48 h guard) — SEE t277: CONFIRMED MEASURED (selfplay.md t277 Law 1)
+— the three "unexplained" game deaths (Nov 1 15:45, Nov 2 07:04, +15:45 pattern)
+were all dosbox-x -time-limit 28800 expiries, NOT an engine crash; the SOP is
+now documented and the defaults pinned by gate 3n3. User save
 work/r1/game/RESUME.GAM md5 5b382afbb7891 (== t1086) untouched. Banks:
 bank-t261-final-1236 (t1236 lineage), bank-t251-live1255 (clean t1255, NEVER
 loadstate — input-dead-on-load law t261), plus the older bank-* dirs.
 
 QUEUE (phase 3, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t277 TL-EXPIRY FORENSICS + SOP FIX: CONFIRM or kill the TL=28800 hypothesis
-  (dosbox.log last lines + launch times from loop.log/pidfile ctimes vs the
-  two measured deaths; dosbox-x logs its time-limit exit — find the exact
-  farewell line in the log or strings). Then fix the harness: r1_game_health.py
-  gains a PRE-EXPIRY warning at TL-600s (t267 already warns at 600s — verify
-  it fires and document the restart-into-fresh-TL procedure verbatim), and
-  r1_playcap_vnc.sh default TL raised to 172800 with a comment citing this
-  row. Bank to docs/re/selfplay.md §7 + BLOCKED.md.
 
 t278 OQ-005 RULING PACKAGE (offline, user-time-shortening): rebuild
   work/r1/shp_png/index.txt as a DECISION SHEET — one row per residue record:
@@ -338,8 +324,13 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - PER-SEGMENT TRUST for V/campaign analysis (t255/t262).
 - Ring = work/r1/playcap/save/ (20 slots, 10 s cadence, ~200 s!). Bank before
   restarts and every ~30 turns. NEVER loadstate (input-dead-on-load, t261).
-- TL LAW (t277 pending): assume TL expiry kills sessions at the configured
-  limit; production now runs TL=172800. Check r1_game_health.py BEFORE work.
+- TL LAW (t277 CLOSED, was "pending"): TL expiry IS what kills sessions at the
+  configured limit — MEASURED n=18 (selfplay.md t277 Law 1); dosbox-x logs NO
+  farewell line, so it is undetectable by log grep and must be polled from
+  /proc. Production runs TL=172800 and so does the launcher default (gate 3n3
+  pins both). PRE-EXPIRY RESTART SOP verbatim: docs/re/selfplay.md t277; the
+  loop stamps health every iteration (loop_one_task.sh:185) and T:WARN now fires
+  at 14400 s. A ~2880-saves-per-8 h dead session = TL expiry, not a crash.
 - User save game/RESUME.GAM md5 5b382afbb7891 — game writes it only at
   in-game Save; never overwrite by hand.
 - SIGKILL softlocked dosbox (SIGTERM -> quit-confirm (Yes)-default).
@@ -378,6 +369,48 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t277 (2026-11-02): TL-EXPIRY FORENSICS CLOSED THE LOOP'S STANDING
+UNKNOWN ABOUT GAME DEATHS + SOP/DEFAULTS SHIPPED (offline; production :9
+576895 untouched and HEALTHY throughout — TL expiry 2026-11-04 10:07:01):
+(1) LAW 1 MEASURED n=18 — 18 of 33 logged :9 sessions died at 28810..28820 s
+wall; 17 of them banked EXACTLY 2880 = TL/CADENCE autosaves. ALL THREE deaths
+the t273 handoff note called "unexplained" are TL expiries (S21 ends 15:43:56 /
+28816 s = the "+15:45 pattern" leg, S28 ends 15:45:08 / 28811 s = the Nov-1
+incident, S31 ends 07:04:27 / 28819 s = the Nov-2 incident; S31 banked 2780
+saves — row-suppression window, banked as a residue). The ring
+save count IS the -time-limit counter read through the 10 s cadence law => a
+session's death cause is diagnosable from the ring ALONE. Census method:
+banner-line boundaries (33 "DOSBox-X version") + per-session first/last guest
+`LOG: [hh:mm:ss]` + `Saving state to slot` counts via one awk pass over the
+290 MB log (never a full read). Table: docs/re/_wip_t277.md; laws: selfplay.md
+t277 block. [inferred] residual: internal exit vs the timeout -s KILL $((TL+30))
+wrapper is NOT separable from wall clock (lifetime sits between TL and TL+30).
+(2) LAW 2 MEASURED NEGATIVE — the queue's "exact farewell line" DOES NOT
+EXIST: grep 'Shutting down' == 0 and 'kill' == 0 over the whole production log;
+/usr/bin/dosbox-x holds only the help text + conf name; golden witness ON DISK
+work/r1/selftest-t111-playcap/dosbox.out (TL=90: 9 saves, last line
+'Saved. (Slot 49)', EOF at 'Active save slot: 1 [Empty]'). BINDING CONSEQUENCE:
+never hunt a log marker for TL death again; liveness is /proc-polled, which is
+what r1_game_health.py does. (3) LAW 3 MEASURED n=198 (journal.tsv gaps: p50
+1502 s / p90 6206 / p95 8682 / max 15156) — the loop samples health ONCE PER
+ITERATION, so t267's 600 s warn window was ~4-11% likely to ever be observed:
+structurally unobservable (Nov-2 death reported 35 min AFTER the fact, zero
+T:WARN rows in loop.log). SHIPPED: r1_game_health.py WARN_AHEAD 600->14400
+(VERIFIED both directions on a /tmp fixture: fake dosbox-x compiled with gcc,
+own vnc/out/loop dirs, TL=1200 -> T:WARN RC=1 at default, silent at
+WARN_AHEAD=600; production HEALTHY RC=0 with no false warn; fixture killed by
+its RECORDED pid -> G:DEATH + GAME_DEAD.txt; production never signalled);
+r1_playcap_vnc.sh TL default 28800->172800 (48 h runaway guard, measurement
+cited inline — matches what the t273 hand-relaunch already used so a future
+relaunch cannot regress); gate.sh stage 3n3 pins all three invariants,
+MUTATION-VERIFIED (reverting either constant in a copy FAILS the stage;
+positive path OK1-OK3; bash -n clean). SOP documented VERBATIM (selfplay.md
+t277 + BLOCKED.md t277): bank ring -> confirm no human VNC client -> 'stop'
+(TERM to recorded pid) -> 'start' -> health shows the NEW expiry; restart is
+the ONLY lever since no binary string extends -time-limit at runtime. NO OQ ROW
+MOVED (harness/forensics row; ledger 15 closed / 4 open unchanged, audit OK,
+index OK). NEXT=t278 VERBATIM.
 
 LANDED t276 (2026-11-02): PLANETALLOC WINDOW COMPOSITION WIRED AS CODE —
 rewrite/src/ui/planetwin.{h,cpp} (pure, no SDL; hudlayout.h t264 template) +

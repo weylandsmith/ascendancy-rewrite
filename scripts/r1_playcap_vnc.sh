@@ -9,7 +9,8 @@
 #   * Evidence dir work/r1/playcap ACCUMULATES across sittings; the
 #     watcher dedups by (slot,mtime), so restarting mid-session is free.
 #   * NO wall-clock play cap. -time-limit stays (BLOCKED.md runbook) as a
-#     RUNAWAY guard only: TL=28800 default. End a sitting in-game (Save,
+#     RUNAWAY guard only: TL=172800 default (48 h — t277 raised it from
+#     28800; see the TL line). End a sitting in-game (Save,
 #     then quit) or via this script's 'stop'.
 #
 # VNC: loopback only (-localhost == -allow 127.0.0.1); auth boundary is the
@@ -32,7 +33,16 @@ PORT="${PORT:-5910}"
 VN="${VN:-9}"
 GEOM="${RES:-800x600x16}"
 SCRATCH="$ROOT/work/r1/game"
-TL="${TL:-28800}"                    # runaway guard, NOT a play cap
+# t277 MEASURED (docs/re/selfplay.md t277 block F1): 18 of 33 logged :9
+# sessions died at 28810-28820 s wall with exactly TL/CADENCE = 28800/10 =
+# 2880 autosaves banked — the ring save count IS the -time-limit counter.
+# The "unexplained" Nov-1 15:45 and Nov-2 07:04 deaths were 28800 s expiries,
+# and dosbox-x logs NO farewell line on that exit (golden witness:
+# work/r1/selftest-t111-playcap/dosbox.out, TL=90, ends `Active save slot: 1
+# [Empty]` at EOF). A guard that fires mid-sitting is worse than a late one,
+# so the runaway bound is 48 h: longer than any realistic sitting, still a
+# hard stop for a forgotten process. Override with TL=<seconds>.
+TL="${TL:-172800}"                    # runaway guard (48 h, t277), NOT a play cap
 CMDS="${1:-start}"
 
 XV_BIN="$(command -v x11vnc 2>/dev/null || true)"

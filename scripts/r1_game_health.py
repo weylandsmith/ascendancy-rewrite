@@ -16,8 +16,10 @@ Checks (all independent; report every failure, never short-circuit):
      kill model is recorded-PIDs only; report DEATH-AMBIGUOUS instead).
   T  time-limit: parse '-time-limit N' from /proc/PID/cmdline, compute
      expiry = process_start(/proc/PID ctime) + N. Warn at WARN_AHEAD (env,
-     default 600 s) BEFORE expiry; FAIL once expired (the t266 failure mode:
-     the game dies mid-sitting with nobody watching).
+     default 14400 s — t277 raised it from t267's 600 s: 600 s is far smaller
+     than the loop's own ~25 min..4 h health-sampling interval, so it could
+     never fire; see the WARN_AHEAD comment) BEFORE expiry; FAIL once expired
+     (the t266 failure mode: the game dies mid-sitting with nobody watching).
   W  watcher census: count /proc procs comm python* whose cmdline has
      r1_playcap_watch.py AND the OUT dir. 0 => feed dead; >1 => MULTI-WRITER
      (t266/t267 collision class: each watcher keeps its own `seen`, so every
@@ -46,7 +48,14 @@ RUNDIR = os.environ.get("R1_VNC_DIR", os.path.join(ROOT, "work/r1/vnc"))
 OUT = os.environ.get("R1_PLAYCAP_DIR", os.path.join(ROOT, "work/r1/playcap"))
 LOOPDIR = os.environ.get("R1_LOOP_DIR", os.path.join(ROOT, "work/r1/loop"))
 
-WARN_AHEAD = int(os.environ.get("WARN_AHEAD", "600"))
+# t277 MEASURED (F3): the loop samples health ONCE PER ITERATION
+# (loop_one_task.sh:185) and iteration gaps run p50 1502 s / p90 6206 s / p95
+# 8682 s / max 15156 s (journal.tsv, n=198). A 600 s warn window inside a
+# ~25 min-4 h sampling interval is ~7-17% likely to ever be sampled — the
+# t267 warn could NOT fire in practice (Nov-2 death caught 35 min AFTER the
+# fact, loop.log G:DEATH). 14400 s (4 h) covers p95; the SOP (BLOCKED.md
+# t277) is to relaunch before the warn window opens, not inside it.
+WARN_AHEAD = int(os.environ.get("WARN_AHEAD", "14400"))
 FEED_MAX_AGE = int(os.environ.get("FEED_MAX_AGE", "60"))
 VERIFY_WINDOW = int(os.environ.get("VERIFY_WINDOW", "30"))
 BRINGUP = os.environ.get("BRINGUP") == "1"     # 'start' sets this

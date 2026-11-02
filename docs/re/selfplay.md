@@ -850,3 +850,105 @@ guarded same-lineage pairs; work/r1/t273_harvest_full4.out + t273_legA.json):
   tutorial AND production slots (image content, not an event trace). STAYS OPEN.
 - LEG C (OQ-019): magnetron USE frames ZERO (st5 control-class 160,747 rows,
   other 0). STAYS OPEN.
+
+## t277 (2026-11-02) — TL EXPIRY CONFIRMED AS THE PRODUCTION DEATH MODE; DOSBOX-X LOGS NO FAREWELL; SOP FIXED
+Pure-offline forensics over logs already on disk (no drive, no :9 touch —
+production 576895 was left running and HEALTHY throughout). Full per-session
+census table + honest negatives: docs/re/_wip_t277.md. Method: session
+boundaries = the 33 `LOG: DOSBox-X version` banner line numbers in
+work/r1/vnc/dosbox.log (290 MB, awk pass); session lifetime = first..last guest
+timestamp `LOG: [hh:mm:ss]`; autosaves = count of `Saving state to slot`.
+
+LAW 1 (MEASURED, n=18 of 33): a dosbox-x run under `-time-limit N` dies at
+28810-28820 s wall (N=28800). 17 of those 18 banked exactly N/CADENCE =
+2880 ring saves (+1 for the slot landing in the final second); the exception
+S31 banked 2780 (row-suppression window, see RESIDUES). The ring save COUNT is
+the TL counter read out through the autosave cadence law (10 s), so on a
+healthy-cadence session the death cause is diagnosable from the ring alone:
+2880 saves == TL expiry. All THREE deaths the t273 handoff note called
+"unexplained" are TL expiries: S21 ends 15:43:56 (28816 s wall, 2880 saves —
+the "+15:45 pattern" leg), S28 ends 15:45:08 (28811 s, the Nov-1 incident), S31
+ends 07:04:27 (28819 s, the Nov-2 incident). NOT an engine crash. The other 15
+sessions ended short of TL (manual stop / kill / short interactive sittings),
+so the signature is specific, not universal.
+  Caveat kept [inferred]: whether dosbox-x's internal exit or the
+  `timeout -s KILL $((TL+30))` wrapper is the proximate killer is NOT separable
+  from wall clock (measured lifetime sits between TL and TL+30). The help text
+  says the emulator kills itself; either way the session ends at the configured
+  TL, which is all the SOP depends on.
+
+LAW 2 (MEASURED, NEGATIVE — the queue asked for the "exact farewell line"):
+there is NO farewell line. `grep -c 'Shutting down'` over the 290 MB production
+log == 0; `grep -c -i 'kill'` == 0; the only time-limit strings in
+/usr/bin/dosbox-x are the help text ("Kill the emulator after 'n' seconds") and
+the conf variable name. Golden witness ON DISK:
+work/r1/selftest-t111-playcap/dosbox.out (the t111 TL=90 self-test, launched
+21:09:12, first guest stamp 21:09:22, 9 saves == 90 s, last line
+`LOG: [21:10:42]: Saved. (Slot 49)`, EOF after the slot-list refresh
+`LOG: Active save slot: 1 [Empty]`). Same silent tail in
+work/r1/playcap-20261013-001711/dosbox.out and
+work/r1/playcap-20261014-214407/dosbox.out.
+  CONSEQUENCE (binding for every future drive row): TL-death is
+  undetectable-by-log-line. Liveness must be POLLED from /proc (recorded pid +
+  comm), which is exactly what scripts/r1_game_health.py does. Do not author
+  another task that hunts a log marker for this.
+
+LAW 3 (MEASURED, n=198 iteration gaps from work/r1/loop/journal.tsv): the loop
+samples health ONCE PER ITERATION (loop_one_task.sh:185, before the pre-flight
+gate) and iteration gaps run p50 1502 s / p75 3435 s / p90 6206 s / p95 8682 s /
+max 15156 s. t267's pre-expiry warn window (WARN_AHEAD=600 s) is therefore
+~4-11% likely to be sampled at all — the warn existed but was structurally
+unobservable. Confirmed empirically: the Nov-2 07:04 death was reported at
+07:39:24, 35 min AFTER the fact (loop.log `G:DEATH`), and no `T:WARN` row for it
+exists anywhere in loop.log.
+
+SHIPPED (this iteration):
+1. scripts/r1_game_health.py WARN_AHEAD default 600 -> 14400 s (covers p95 of
+   the sampling interval). VERIFIED BOTH DIRECTIONS on a /tmp fixture (fake
+   dosbox-x compiled with gcc, own vnc/out/loop dirs, TL=1200): default
+   -> `T:WARN(expiry ... in 1199 s)` RC=1; WARN_AHEAD=600 -> no warn (old
+   behaviour reproduced); production re-run HEALTHY RC=0 (146798 s left, no
+   false warn); after killing the fixture by its RECORDED pid -> G:DEATH +
+   GAME_DEAD.txt. Production :9 was never signalled (health reports it as a
+   "foreign" pid from the fixture's point of view, and vice versa).
+2. scripts/r1_playcap_vnc.sh TL default 28800 -> 172800 (48 h runaway guard)
+   with the measurement cited inline. A guard that fires mid-sitting costs a
+   sitting; 48 h exceeds any realistic one while still bounding a forgotten
+   process. Production is ALREADY running TL=172800 (launched 10:07, expiry
+   2026-11-04 10:07:01) — this change makes the default match what the t273
+   hand-relaunch used, so a future relaunch cannot regress to 28800.
+3. scripts/gate.sh stage 3n3 (static, side-effect-free): asserts the TL=172800
+   default, the WARN_AHEAD=14400 default, and that loop_one_task.sh still
+   samples health every iteration. MUTATION-VERIFIED: reverting either constant
+   in a copy makes the stage fail (MUT1/MUT2 CAUGHT); positive path OK1-OK3;
+   `bash -n scripts/gate.sh` clean.
+
+SOP — PRE-EXPIRY RESTART INTO A FRESH TL (verbatim, the procedure t277 was
+asked to document; use it whenever r1_game_health.py prints T:WARN, or proactively
+before a long unattended drive):
+  0. Preconditions: bank the ring first — `cp -a work/r1/playcap/save
+     work/r1/bank-tNNN-preTLexpiry`. NEVER loadstate (input-dead-on-load, t261).
+     NEVER overwrite work/r1/game/RESUME.GAM by hand.
+  1. Check nobody human holds the display: `ss -tn | grep 5910` must show no
+     ESTABLISHED client (BLOCKED.md t273 release condition).
+  2. Graceful end of the sitting: `bash scripts/r1_playcap_vnc.sh stop`
+     (SIGTERM to the RECORDED pid only; SIGKILL leaves a quit-confirm modal —
+     BLOCKED.md law). Wait for the watcher to flush (the script sleeps 7 s).
+  3. Relaunch into a fresh clock: `bash scripts/r1_playcap_vnc.sh start`
+     (TL now defaults to 172800; the adoption guard t267 prevents the t261
+     two-dosbox-on-one-ring class). The game resumes from its own title-menu
+     resume file, so the in-game turn may LAG the ring (S1 law) — read the
+     in-game turn counter from a screenshot before trusting stream tails.
+  4. Verify: `python3 scripts/r1_game_health.py` must print HEALTHY with the
+     NEW expiry (start + 172800), and `BRINGUP OK` from the start output.
+  Why restart rather than raise the limit in place: dosbox-x has no runtime
+  command to extend -time-limit (no such string exists in the binary), so the
+  only lever is the launch-time argument.
+RESIDUES (kept open, strict-close):
+  - S31 banked 2780 saves in 28819 s (1019 s of the window produced no ring
+    row). Not re-litigated: the t266 ~150 s oscillation and modal-freeze windows
+    both suppress rows, and the lifetime verdict rests on wall clock, not the
+    save count. [unverified] which suppression applied.
+  - TL-death of a session whose ring is NOT 10 s cadenced (paused, modal,
+    tutorial) will NOT show 2880 saves; Law 1's diagnostic works only on a
+    healthy-cadence session.

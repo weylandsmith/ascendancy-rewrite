@@ -336,3 +336,20 @@ title-screen scratch boot does NOT have the ascend.exe image resident in guest
 RAM (scripts/r272_scratch_resident.py) — any future debugger-class session must
 click into a campaign first. If the user ever supplies a debugger-enabled
 dosbox-x build, this route re-opens (S15.5).
+
+## t277 — DETECTING A DOSBOX-X -time-limit DEATH FROM ITS LOG IS IMPOSSIBLE (KEEPER)
+The t277 queue row asked for "the exact farewell line in the log or strings" for
+the time-limit exit. IT DOES NOT EXIST, measured three ways: over the 290 MB
+production log work/r1/vnc/dosbox.log `grep -c 'Shutting down'` == 0 and
+`grep -c -i 'kill'` == 0; /usr/bin/dosbox-x holds only the help text ("Kill the
+emulator after 'n' seconds") and the conf variable name; and the golden witness
+on disk — work/r1/selftest-t111-playcap/dosbox.out, the t111 TL=90 self-test —
+expired silently (9 saves == 90 s, last line `LOG: [21:10:42]: Saved.
+(Slot 49)`, EOF right after the `Active save slot: 1 [Empty]` slot-list refresh).
+DO NOT author another task that greps for a TL/shutdown marker, and do not treat
+the trailing `Extracting: Program_Name/Time_Stamp/Save_Remark` churn as exit
+evidence (it is the SAVE-path slot-metadata refresh, same misread class as the
+t266 note). Liveness is /proc-polled from the recorded pid:
+scripts/r1_game_health.py (T:WARN at 14400 s, T:EXPIRED after). Death CAUSE is
+still diagnosable offline, but from the RING, not the log: ~2880 autosaves per
+8 h of life == TL 28800 expiry (docs/re/selfplay.md t277 Law 1).

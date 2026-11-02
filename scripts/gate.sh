@@ -272,6 +272,23 @@ for f in $LAUNCH; do
     || err "3n2: $b has no dosbox bound (-time-limit or timeout -s KILL)"
 done
 
+# 3n3 (t277): TL-expiry SOP invariants. MEASURED t277 (docs/re/selfplay.md t277
+# block): 18 of 33 logged :9 sessions died at 28810-28820 s wall with exactly
+# 2880 autosaves = TL 28800 / 10 s cadence — the "unexplained" deaths WERE the
+# runaway guard firing mid-sitting, and dosbox-x prints NO farewell line on that
+# exit (golden witness work/r1/selftest-t111-playcap/dosbox.out, TL=90, ends
+# 'Active save slot: 1 [Empty]' at EOF; grep 'Shutting down' over the 290 MB
+# production log = 0). So: the production launcher's guard must be >= 48 h, and
+# the health checker's pre-expiry warn must exceed the loop's own worst realistic
+# health-sampling interval (iteration gaps p95 8682 s, max 15156 s — journal.tsv
+# n=198), else the warn can never be observed. Static checks only, as above.
+grep -qE 'TL="\$\{TL:-172800\}"' "$ROOT/scripts/r1_playcap_vnc.sh" \
+  || err "3n3: r1_playcap_vnc.sh lost the t277 TL=172800 default (28800 kills sittings; docs/re/selfplay.md t277)"
+grep -qE 'WARN_AHEAD.*os.environ.get\("WARN_AHEAD", *"14400"\)' "$ROOT/scripts/r1_game_health.py" \
+  || err "3n3: r1_game_health.py lost the t277 WARN_AHEAD=14400 default (600 s < the loop's sampling interval, so the warn never fires)"
+grep -q 'r1_game_health.py' "$ROOT/scripts/loop_one_task.sh" \
+  || err "3n3: loop_one_task.sh no longer samples game health every iteration (t267 self-heal)"
+
 # 3q. POINTER LAW confirmation (docs/re/r1-savestate.md, CLOSED 2026-10-05i):
 # run the law battery against any captured slot present. Skips with a note
 # when no captures exist (work/ is not committed) so a fresh clone still gates.

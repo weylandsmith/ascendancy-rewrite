@@ -555,3 +555,31 @@ may relaunch production via scripts/r1_playcap_vnc.sh (adoption guard t267)
 only if (a) `ss -tn | grep 5910` shows NO established client AND (b) the ring
 is still tutorial-lineage (turn 645, 3 powers) i.e. nobody restored it
 manually; bank the tutorial ring first (already done: bank-t273-tutorial645).
+
+## t277 — TL EXPIRY CONFIRMED (was the loop's standing unknown about game deaths); SOP + DEFAULTS FIXED
+The queue's hypothesis is CONFIRMED MEASURED, not assumed: 18 of 33 logged :9
+sessions died at 28810-28820 s wall with exactly 2880 autosaves = TL 28800 /
+10 s cadence, including the two recorded "unexplained" deaths (Nov-1 15:45:08,
+Nov-2 07:04:27). dosbox-x emits NO farewell line on that exit (golden witness
+work/r1/selftest-t111-playcap/dosbox.out, TL=90; `grep -c 'Shutting down'` over
+the 290 MB production log == 0), so the death is undetectable by log-line and
+must be polled from /proc. Full census + laws: docs/re/selfplay.md t277 block;
+raw table docs/re/_wip_t277.md.
+SHIPPED: r1_playcap_vnc.sh TL default 28800 -> 172800 (48 h);
+r1_game_health.py WARN_AHEAD default 600 -> 14400 s (600 s is smaller than the
+loop's own health-sampling interval — p95 8682 s, max 15156 s, n=198 — so the
+t267 warn was structurally unobservable; verified firing on a fixture both
+ways); gate.sh 3n3 pins all three invariants (mutation-verified).
+STANDING RULE for every future drive-class row (this replaces the old
+"assume TL expiry kills sessions" placeholder in STATE):
+  * Launch with TL=172800 (the default now does this; never pass TL=28800).
+  * Before any unattended drive leg longer than ~40 h, run the PRE-EXPIRY
+    RESTART procedure verbatim (docs/re/selfplay.md t277, "SOP" block): bank
+    ring -> confirm no human VNC client -> `stop` (TERM to recorded pid) ->
+    `start` -> health check shows the new expiry.
+  * A dead session showing ~2880 ring saves per 8 h of life died of TL expiry;
+    do not open a crash investigation for it.
+NOT BLOCKED — proceeding under: production :9 (pid 576895) is HEALTHY with TL
+expiry 2026-11-04 10:07:01, i.e. ~44 h past the warn threshold at t277 close,
+so no pre-expiry restart is due; the x11vnc client situation is unchanged from
+t276 (drive-class rows stay HELD per the t273 release conditions above).
