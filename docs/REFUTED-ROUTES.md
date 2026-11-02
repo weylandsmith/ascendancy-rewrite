@@ -272,3 +272,16 @@ softlock class is INSIDE the save. Do NOT plan any drive on a loadstate of
 bank-t251-live1255; a restored state must first pass an INPUT-LIVENESS PROBE
 ('c'-toggle delta > 50 px). Structural decode of a round-trip re-save (t260's
 verification) cannot see this.
+
+## t265 — MINING st4 MID-TURN DISPLACEMENT FROM AUTOSAVE CORPORA IS DEAD
+The OQ-019 "live in-system march" residue (t190/t193 form) is NOT observable
+at 10 s autosave-ring granularity, corpus size notwithstanding: on the t261
+DRIVE corpus (~150 real turn advances, healthy regimes isolated), every st4
+run spanning turn advances has net displacement 0.00 with constant [+0x59],
+every big mover is a 4<->5 frame switch, and same-turn st5 deltas are exactly
+0 (ships.md S24). A ship resolves its in-system move inside one turn boundary.
+Re-running this census on a bigger corpus wastes an iteration. The residue
+needs a sub-ring instrument (runtime watchpoint class) or is dropped. Related
+zero-census: magnetron landings leave an OFF-32-GRID st4 row (rng%200 on both
+axes, 0x21f58) — 0 witnesses in 6,184 st4 rows; a player-activated use is the
+only remaining witness route.

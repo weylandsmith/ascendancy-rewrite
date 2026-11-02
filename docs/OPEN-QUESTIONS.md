@@ -1564,7 +1564,33 @@ and NONE is representable in the rewrite's transit-only fleet_ vector. Row 16
 relabelled GAP->BOUNDARY (aggregate model accepted permanently); this row
 (OQ-019) is where the per-ship build lives and it STAYS OPEN (strict-close:
 the census informs the boundary, it closes no law; the st4 in-system march
-residue unchanged). | open |
+residue unchanged). STATUS t265 (2026-11-02, DRIVE-CORPUS FLIGHT MINING —
+docs/re/ships.md S24, _wip_t265.md; tools r265_st4_magnetron.py /
+r265_pass2.py / r265_pass3.py / KEEPER r265_keeper.py RC=0 on the t261
+production drive 1086->1236, ~150 real turn advances, softlock window
+21:38-23:06 excluded): (1) THE t193 st4 RESIDUE ROUTE IS MEASURED-DEAD — 21
+multi-row st4 runs spanning >=1 turn advance (longest 150 turns/1014 rows)
+have net displacement 0.00 with CONSTANT [+0x59]; every big mover is a 4<->5
+frame switch ((4,5)x60+(5,4)x67), zero healthy (4,4,True); st4 = DWELL state,
+the in-system march resolves inside one turn boundary and is NOT observable at
+10 s ring cadence — finer instrument (watchpoint class) or nothing. (2) t189
+LANE-STEP LAW RE-CONFIRMED SECOND CORPUS, ZERO VIOLATIONS: consecutive-turn
+st5 |dx| == step0 or step0/3 with step0=float(u16[+0x8]+u16[+0xc])
+same-window (2,400+ pairs, 27 handle groups); /3 is lane-scoped not
+handle-value-scoped (6 mixed handle values = route re-points + pool recycling,
+t190-consistent). (3) TURN-ATOMICITY: same-turn st5 x-delta EXACTLY 0.0 in
+17,595 pairs zero exceptions — t187's "4.67 = three sub-steps" reading DEAD
+(4.6667 is the single step); entry-x all multiples of step (S21 x=k*step
+corroborated). (4) MAGNETRON ZERO-CENSUS with the sharp instrument: landing
+rows must be off-32-grid in x AND z (rng%200 both axes, P(false neg) <0.1% per
+landing) — 0 of 6,184 st4 rows off-grid, y mod 32 == 0 all; W2 frame hunt 0;
+use-site law stays static-cited S19 T3 with zero runtime witnesses. (5) t266
+feed: the only st4 mid-turn moves in the corpus are INSIDE the softlock window
+(turn frozen at 1255 while tail movement ran; repeating identical triples) —
+new bug-class tell turn-frozen-but-tail-running. Row STAYS OPEN (strict-close):
+remaining runtime residues all need sub-ring instrumentation or a
+player-driven magnetron use; no documented-default in the rewrite changes on
+this evidence. | open |
 OQ-018 | audio | soundfx.txt header pairs semantics (2/10000, 3/45000,
 1/65000); VOC u16@25=0x0911 + six zero bytes @36; race->theme mapping |
 CLOSED 2026-10-07 (all three sub-questions measured). (1) Header pairs:

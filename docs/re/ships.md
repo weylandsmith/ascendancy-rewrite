@@ -1236,3 +1236,69 @@ L10 t195 REWRITE SURFACE LANDED (OQ-026 CLOSED — implement+pin, the row's own
   both share sites is [unverified]; AI-AI share has NO rewrite producer (the
   dip model has no AI-AI relations), so the t193 mask-6 AI-only class has no
   rewrite analog.
+
+## S24 — t265 DRIVE-CORPUS FLIGHT-MINING RESULTS (st4 dwell law; t189 law re-confirmed; magnetron zero-census)
+
+Corpus: the t261 production drive (:9, 2026-11-01 21:24 -> 2026-11-02 01:27,
+turns 1086->1236, ~150 real turn advances; regimes A 21:24-21:37 and B
+23:07-01:27 healthy, softlock window 21:38-23:06 EXCLUDED from law censuses).
+Selection law: file_mtime_ns inside the epoch + dedup (file, mtime_ns) +
+in_game + turn>0, bounded 420 MB tail (OOM law). Tools: scripts/
+r265_st4_magnetron.py, r265_pass2.py, r265_pass3.py (output
+work/r1/t265_pass3.out), KEEPER scripts/r265_keeper.py RC=0. Harness lesson:
+lexicographic wall-string bucketing silently drops post-midnight ranges
+("23:07:00" <= "01:59:00" is False) — bucket by mtime_ns/datetime.
+
+1. ST4 IS A DWELL STATE AT RING GRANULARITY — the t193 premise is
+   MEASURED-DEAD. 21 multi-row st4 runs that SPANNED >=1 turn advance
+   (longest slot 13: t1086..t1236, 1014 autosave rows, 150 turns) have net
+   displacement 0.00 and a CONSTANT order byte [+0x59] (69/133/197/101/229)
+   end-to-end (pass3 section F). st4 row-level coords: 9360 samples, 100% on
+   the 32-grid in x AND z, y mod 32 == 0 in ALL 6184 keeper-pass samples.
+   Every big mover in the corpus is a 4<->5 frame switch (boundary classes
+   (4,5,True) x60, (5,4,True) x67), NEVER st4->st4 in a healthy regime
+   ((4,4,True) x6, all inside the softlock window). CONCLUSION [inferred
+   from these legs]: the in-system march cannot be observed between autosave
+   rows — a ship that enters st4 with a move order resolves its displacement
+   and leaves st4 (or dwells at rest) within one turn boundary; the missing
+   witness is NOT a matter of corpus size.
+2. THE t189 LANE-STEP LAW RE-CONFIRMED ON A SECOND INDEPENDENT CORPUS, ZERO
+   VIOLATIONS: consecutive-turn st5 pairs (t == pturn+1, same slot) have
+   |dx| == step0 or step0/3 EXACTLY (1e-3 tol), step0 = float(u16[+0x8] +
+   u16[+0xc]) read from the same window (keeper K1: 27 handle groups,
+   2,400+ pairs, violations 0). The /3 branch is LANE-scoped (t190: bridge
+   lanes), NOT handle-value-scoped: pure-slow handle values (0x13b, 0x209,
+   ...), pure-fast (0x285, 0x31a, 0x3a8), and SIX MIXED values
+   (0x301/0x302/0x34c/0x35d/0x3af/0x3fa) coexist — expected, since [+0x52]
+   is the ROUTE handle which re-points per lane leg (t187 slot13: one ship,
+   step 14 on lanes z=+/-1824, step 14/3 on z=544), and lane pool records
+   are recycled (allocator FUN_00024834, t190). t189's "gate2 zero witnesses"
+   residue is UNCHANGED (every pair landed on step0 or step0/3, so no third
+   speed value exists in this corpus to attribute to gate2).
+3. TURN-ATOMICITY AT SAMPLING GRANULARITY: same-turn consecutive-row st5
+   x-deltas EXACTLY 0.0 in 17,595 pairs (keeper K2, zero exceptions). t187's
+   "owner-1 4.67 = 14/3 THREE sub-steps?" reading is DEAD — one step per
+   turn boundary; 4.6667 is the single step value (2554+ boundary pairs).
+   Lane entry-x values {4.6667, 14, 42, 56, 84, 163.3333, 196, 224} are all
+   exact multiples of the run's step — S21's x = k*step law corroborated.
+   The 25-step apparent jump at the 23:05 relaunch is the re-drive REWIND
+   (t1111 -> t1086 reload), not a flight (keeper drops non-adjacent pairs).
+4. MAGNETRON ZERO-CENSUS (honest negative, now instrumented): W2 frame hunt
+   (st->5, d>300u, y in [-200,0), x/z off-grid) = 0 candidates over the whole
+   epoch incl. softlock windows; the stronger landing census K3b (any st4 row
+   off-grid in x or z — P(false negative) < 0.1% per landing since BOTH
+   jitter axes must land on-grid, 0x21f58 rng%200 law S19 T3) = 0 of 6184.
+   AI ships held cidx-60 slots across 150 driven turns and never fired the
+   device; no player was present. The magnetron use-site stays STATIC-CITED
+   (S19 T3) with zero runtime witnesses; gizhelp's player-activation framing
+   is consistent.
+5. t266 FEED (bug class): the ONLY st4 mid-turn displacement in the corpus is
+   slot 30 inside the softlock window (walls 21:41:44..21:54:06, d = 32/64/
+   160/64 while the turn readout was FROZEN at 1255, and the t1254<->t1255
+   oscillation repeats identical (dx,dy,dz) triples x3 across slots) — the
+   engine ran turn-tail movement WITHOUT advancing the turn counter:
+   turn-frozen-but-tail-running is a new bug-class tell.
+OQ-019 STATUS: stays OPEN (strict-close). What this iteration kills is the
+ROUTE ("mine st4 mid-turn displacement from autosave corpora"), not a law.
+Remaining runtime residues all need an instrument finer than the 10 s ring
+(runtime watchpoint class) or a human/player-driven magnetron use.

@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T08:30
+updated: 2026-11-02T02:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,22 +260,27 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t265 OQ-019 LIVE MINING (needs t261 corpus): st4 mid-turn displacement
-(the t193 census found 2238 st4 samples with ZERO displacement, turn never
-advanced — a real DRIVE changes that premise) + magnetron USE frames (gizmo
-0x3c use-site FUN_0004ca50). ring ship_raw banks every row; stream trust
-law applies. Bank: flight law corroboration or honest negative; row stays
-OPEN without a cited measurement.
-ORDERING: t265 first per queue order — the drives are done (t1236 banked,
-bank-t261-final-1236) so the corpus exists; t264 just landed (pure code, no
-capture dependency left in the queue before this); the remaining pure-code
-queue rows do not gate t265 and t266's incident forensics are strictly
-easier with the corpus mined first.
+NEXT t266 SOFTLOCK-CLASS FORENSICS: three incidents banked (t1089
+popup-dead, t1254 planet-list-dead, t15:45 process-death). Characterize the
+trigger class: pixel state + last RAM rows + dosbox.log tail per incident;
+look for the common engine state (popup queue depth? AI-processing flag?).
+This is RE of a BUG CLASS and directly informs the rewrite's robustness.
+Bank to docs/re/selfplay.md §7 + flag anything that changes the drive SOP.
+NEW t265 FEED (ships.md S24 item 5): the softlock window shows
+TURN-FROZEN-BUT-TAIL-RUNNING — slot 30 moved 32/64/160 units while the turn
+readout stayed 1255, and the t1254<->t1255 oscillation repeats identical
+(dx,dy,dz) triples 3x across slots. Start there: the engine kept running the
+turn tail WITHOUT committing the turn counter — the commit site is the suspect.
+ORDERING: t266 first per queue order (t265 landed; t267 self-heal and t268
+screen sweep 3 do not depend on it, but t269 victory-threshold mining is
+strictly easier after t266 tells us whether the drive corpus is trustworthy
+past its softlocks).
 PRE-FLIGHT: `git status` clean + game liveness ONLY (pgrep -x dosbox-x;
-production :9 was parked t1236 PID 535172 — if dead, that is t266 material,
-note it and mine the BANKED corpus, do not relaunch without need). DO NOT
-loadstate bank-t251-live1255 or any bank (REFUTED t261: input-dead on load).
-Timeline reads obey the OOM law (r1_stream.py / tail <=400 KB only).
+production :9 PID 535172 was alive at t265 start, last ring row t1236
+wall 01:27:28 — if dead, bank first, note it, do NOT relaunch without need).
+DO NOT loadstate any bank (REFUTED t261: input-dead on load). Timeline reads
+obey the OOM law (r1_stream.py / bounded tail seek only; NEVER json.load the
+whole file).
 
 
 PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
@@ -292,13 +297,6 @@ driven exit fires when the queue drains).
 
 QUEUE (phase 2, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t265 OQ-019 LIVE MINING (needs t261 corpus): st4 mid-turn displacement (the
-  t193 census found 2238 st4 samples with ZERO displacement, turn never
-  advanced — a real DRIVE changes that premise) + magnetron USE frames (gizmo
-  0x3c use-site FUN_0004ca50). ring ship_raw banks every row; stream trust
-  law applies. Bank: flight law corroboration or honest negative; row stays
-  OPEN without a cited measurement.
 
 t266 SOFTLOCK-CLASS FORENSICS: three incidents banked (t1089 popup-dead,
   t1254 planet-list-dead, t15:45 process-death). Characterize the trigger
@@ -374,6 +372,33 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t265 (2026-11-02): OQ-019 DRIVE-CORPUS FLIGHT MINING DONE — the t193
+st4 residue ROUTE is MEASURED-DEAD and a REFUTED route was filed. On the t261
+production drive (1086->1236, ~150 real turn advances, softlock window
+21:38-23:06 excluded; tools scripts/r265_st4_magnetron.py + r265_pass2.py +
+r265_pass3.py + KEEPER r265_keeper.py all RC=0): (1) 21 multi-row st4 runs
+spanning >=1 turn advance have net displacement 0.00 with CONSTANT [+0x59]
+— st4 is a DWELL state; every big mover is a 4<->5 frame switch; the
+in-system march is unobservable at 10 s ring cadence (sub-ring instrument or
+drop). (2) t189 LANE-STEP LAW RE-CONFIRMED on a second independent corpus,
+ZERO violations: consecutive-turn st5 |dx| == step0 or step0/3,
+step0 = float(u16[+0x8]+u16[+0xc]) same window (2,400+ pairs); /3 branch is
+lane-scoped (6 mixed handle values = route re-points + pool recycling).
+(3) TURN-ATOMICITY: same-turn st5 x-deltas EXACTLY 0.0 in 17,595 pairs —
+t187's "4.67 = three sub-steps" reading is DEAD (4.6667 = single step);
+entry-x all multiples of step (S21 x=k*step corroborated). (4) MAGNETRON
+ZERO-CENSUS with a sharp instrument (landings must be off-32-grid in x AND z,
+P(false neg) <0.1%/landing): 0 of 6,184 st4 rows off-grid, y mod 32 == 0 all;
+use-site law stays static-cited S19 T3. (5) t266 FEED: the only st4 mid-turn
+moves sit INSIDE the softlock window — TURN-FROZEN-BUT-TAIL-RUNNING tell.
+Banked: ships.md S24 (authoritative law text), _wip_t265.md S1..S4,
+REFUTED-ROUTES t265 entry, OQ-019 row STATUS t265 (STAYS OPEN strict-close —
+the route died, no law closed, no rewrite default changes). Harness lesson
+banked in the pass3 header: lexicographic wall-string bucketing drops
+post-midnight ranges — bucket by mtime_ns. NO OQ closed this iteration
+(005/016/019/021 open); gate 0, ledger audit OK, index OK; :9 untouched
+(alive, PID 535172); NEXT = t266 VERBATIM.
 
 LANDED t264 (2026-11-02): REWRITE HUD LAYOUT WIRING SHIPPED — the t252/t253
 rail + ship-design measurements are CODE + PINS in rewrite/src/ui/
