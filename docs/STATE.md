@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T06:40
+updated: 2026-11-02T07:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,31 +260,21 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t270 HOME-PLACEMENT VERIFICATION (OQ-016 residue; offline, no live game
-needed — production TL dies 07:03:58 and this task must survive its expiry):
-verify the vendor's HOME-WORLD placement against the closed mapgen laws.
-Known anchors: vendor resume.gam static-init signature = EXACTLY 7 planet
-records hold owner 0..6 (byte NAME+0x33, t248 law); per-race home systems;
-mapgen shell/position laws CLOSED (OQ-012/OQ-025: shellRadiiFor, halving pop
-law, position law). QUESTIONS: (a) where do the 7 homes sit relative to the
-shell structure of a T=50 galaxy (radii? shell index? min inter-home
-distance?) — measure across the driven banks (bank-t249-live-open,
-bank-t251-predrive, bank-t1254, vendor resume.gam) using the star-table law
-(pos f32[3] @name-0x14) + t248 owner byte; (b) is home placement RUN-LOCAL
-random or template-fixed (compare home star names across independent
-lineages — the t262 segment law separates lineages; the t106 run-local
-finding for +0x55 seeds is the precedent to test against); (c) does the
-rewrite (mapgen/home placement code in rewrite/src/game/) match, and if a
-match lands, UPGRADE + pin per house style. Strict-close: verify != discover;
-close OQ-016's home sub-item only on cited measurement, annotate otherwise.
-ORDERING: research resumes after the t252/t253/t268 screen sweep run per the
-standing note; home-placement is the first named OQ-016 residue that is fully
-OFFLINE (terrain/nuke wiring needs a cell model decision; the armer residual
-is interactive-class). PRE-FLIGHT (t267 law): python3 scripts/r1_game_health.py
-FIRST (advisory; task needs no live game). Timeline reads obey the OOM law
-(r1_stream.py / bounded scans only). Campaign-fingerprint slots before any
-cross-session analysis (star->planet-owner md5, selfplay.md t266). NEVER
-loadstate any bank (REFUTED t261).
+NEXT t271 PER-CELL TERRAIN/NUKE WIRING SCOPING (OQ-016 residue; offline):
+the planitem per-cell laws are DOCUMENTED (economy.md §4) but rewrite wiring
+is PARKED (no cell model). DECIDE the cell model shape first (slot-array law
++ locator law are in hand, STATE 'PLANET SYSTEM OBJECT'), then wire or file a
+REFUTED row with the decision rationale. Cite economy.md §4 + STATE.
+ORDERING: t271 was queued second in phase 2b and is fully offline like t270;
+t272 (watchpoint PREP) stays last because it brushes the production :9 /
+USER ASK boundary. The t270 finding sharpens a FUTURE task (not this one):
+the home setup-draw law is a code-side target (find the setup function that
+writes 0x12e1d+0x1ee*r rows; candidates discoverable via writer census on
+data 0x12e1d) — if t271 lands early and context remains, prefer authoring
+that as t273 over padding. PRE-FLIGHT (t267 law): python3
+scripts/r1_game_health.py FIRST (advisory; task needs no live game). Timeline
+reads obey the OOM law (r1_stream.py / bounded scans only). NEVER loadstate
+any bank (REFUTED t261).
 
 
 QUEUE (phase 2b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
@@ -316,6 +306,34 @@ ring 41-60 ON, watcher banking (one instance), resumed t1086 via Return-to-
 Game, ring verified 3 rows. Launch law unchanged: MAX_ITERS=12 IDLE_GATE=0
 (timeline grows every 10 s -> probe structurally always armed; the queue-
 driven exit fires when the queue drains).
+
+LANDED t270 (2026-11-02): HOME-PLACEMENT VERIFICATION DONE (OQ-016 residue;
+no row closed, strict-close honored — the draw law stays open; mapgen.md t270
+section + _wip_t270.md S1..S4; KEEPER scripts/r270_homeplace.py RC=0, output
+work/r1/t270_homeplace.out). MEASURED (14 lineages: 4 production bank slots =
+1 lineage + 10 fresh r1ad/r1deep sessions, turn>=1 slots only): (1) HOME JOIN
+— DWORD[data 0x12e1d + race*0x1ee] == phys of star-record base(k) (base =
+NAME-0x1C stride 0x60) EXACTLY; at turn>=1 home star owner byte ==
+0x80|(1<<race) AND the race's own planet (t248 law) is in its LIVE list
+(25/25; production: Oslo I@25, Philadelphia II@27, Sarsaparilla I@18).
+TURN-0 TRUST LAW EXTENDED: turn-0 race-row pointers are template residue
+(r5=+11/r6=+6 constant across ALL fresh runs; same class as t269's turn-0
+anomalies). Star owner-byte census re-derived with the prefix-filter fix:
+byte&0x7f == OR(1<<live owners)&0x7f 50/50 (earlier 50/50 readings at wrong
+offsets were inflation bugs caught same session). (2) RUN-LOCAL, NOT
+TEMPLATE: 11 distinct home sets / 11 independent lineages; resume.gam 7-owner
+signature re-confirmed EXACTLY (Xerxes I/Stavern I/Hannibal III/Gasball V/
+Burphee III/Hurble I/Vishnu IV) but matches NO live run — static init only.
+(3) Home slots span table 0..40 (shell/lowest-id hypotheses REFUTED); min
+inter-home 184.3..440.7 (median 358) over 14 lineages — no min-separation law
+ships, yet no game places homes adjacent. (4) Home planet = first colonisable
+orbit (varies I..V; t40/t42 shape-consistent). (5) REWRITE pickHomeStars
+(campaign.cpp:301) = documented MISMATCH (deterministic max-min BFS spread +
+first-home-lowest-id vs vendor run-local random); NOT upgraded (draw law
+unpinned — needs setup-code writer census, banked as future t273 seed in
+NEXT). PRE-FLIGHT: health HEALTHY 06:31 (game 535172); no new sitting (tail
+scan all t1236); :9 untouched, zero clicks, no loadstate. NEXT = t271
+VERBATIM.
 
 LANDED t269 (2026-11-02): OQ-021 VICTORY-THRESHOLD MINING DONE — NO EVENT,
 FULL DISTANCE-TO-HALF + FIRST-EVER T CENSUS BANKED (no row closed, strict-

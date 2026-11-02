@@ -1360,6 +1360,29 @@ shield-agg(+0x4) decreases 10, all resolvable as slot remap (owner high-u16
 INVALID (day byte +0x67 churns every turn — t213). Row STAYS OPEN (strict-close):
 clamp witness still unobserved; direction attribution needs the watchpoint-class
 instrument. docs/re/selfplay.md t251 + docs/re/_wip_t251.md S1..S6.
+STATUS t270 (2026-11-02, HOME-PLACEMENT VERIFICATION — mapgen.md t270 section,
+KEEPER scripts/r270_homeplace.py RC=0, work/r1/t270_homeplace.out,
+docs/re/_wip_t270.md S1..S4): the runtime HOME JOIN is MEASURED and decisive —
+DWORD[data 0x12e1d + race*0x1ee] == phys of star-record base(k) (base =
+NAME-0x1C, stride 0x60) exactly; at turn>=1 that star's owner byte ==
+0x80|(1<<race) AND the race's own planet (t248 NAME+0x33 law) is in its LIVE
+list (25/25 observations; production t1086/t1254: Oslo I@25, Philadelphia
+II@27, Sarsaparilla I@18). TURN-0 frames carry TEMPLATE RESIDUE pointers
+(r5=base+11/r6=base+6 constant across all fresh runs) — trust law extends
+t269's turn-0 anomaly class to the race rows. HOME PLACEMENT IS RUN-LOCAL:
+11 distinct home-star sets over 11 independent lineages (production banks = 1
+lineage); resume.gam's 7-owner signature re-confirmed EXACTLY but matches no
+live run — static init, not a template. Home slots span table 0..40 (no shell
+constraint; "outer shell" and "lowest id" both REFUTED); min inter-home
+184.3..440.7 units (median 358) over 14 lineages. Home PLANET = first
+colonisable orbit (varies I..V; t40/t42-consistent). Row STAYS OPEN
+(strict-close): the remaining home residue is now precisely the SETUP-TIME
+DRAW LAW (which pool the vendor samples and any rejection test — runtime
+tables cannot pin it; needs the setup code path or a setup watchpoint), and
+the rewrite pickHomeStars() (campaign.cpp:301) is a documented MISMATCH
+(deterministic max-min BFS spread, first-home-lowest-id REFUTED) — NOT
+upgraded this iteration for lack of a pinned draw law. Star owner-byte bit7
+semantics remain UNVERIFIED (t248 masks &0x7f).
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

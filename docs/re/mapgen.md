@@ -202,3 +202,55 @@ the generalized immediate sweep — do not re-sweep); option display names
 consistent with R13 no-screenshot law). Launch: scripts/r1_t57_density.sh,
 click (65,427) = GALAXY_MORE center between New Game tour click and start
 re-fire; measurement via banked star-table law on entry checkpoint.
+
+## t270 HOME-PLACEMENT VERIFICATION (OQ-016 residue) — RUN-LOCAL, MEASURED
+
+Tool: scripts/r270_homeplace.py (KEEPER, RC=0); full output
+work/r1/t270_homeplace.out; working log docs/re/_wip_t270.md S1..S4.
+Battery: 4 production bank slots (ONE lineage) + 10 independent fresh-session
+lineages (r1ad-*/r1deep-*), plus vendor game/resume.gam static image.
+
+RUNTIME JOIN (measured, refines t246/t248 quotes). Star-record base =
+NAME - 0x1C, stride 0x60: base+0x4 u32 idx==k, base+0x8 f32[3] pos, base+0x14
+OWNER BYTE, base+0x1C name, base+0x46 u32[5] planet ptrs. The race-row dword
+DWORD[data 0x12e1d + race*0x1ee] == phys of base(k) EXACTLY (the first
+planet-pointer slot); home slot k = (ptr - (NAME(0)-0x1C)) // 0x60, remainder
+0 in EVERY participating observation. Decisive semantics test: at turn>=1 the
+pointed star's owner byte == 0x80|(1<<race) AND the race's own planet (planet
+NAME+0x33 == race, t248) is inside that star's LIVE list — 25/25 observations
+across 6 lineages (Sophia I@29, Stavern III@28, Hurble IV@9, Ignatius I@16,
+Philadelphia I@24, Oslo I@25, Philadelphia II@27, Sarsaparilla I@18, ...).
+Home == k, not k+1. TURN-0 TRUST LAW: at turn 0 these pointers are template
+residue (r5=base+11 / r6=base+6 identical across ALL fresh runs; cf. t269's
+turn-0 anomaly class) — only turn>=1 frames are game state; ptr==0 => race
+not in the game. Star owner-byte bit7: set on every home star (t1 and @t1254)
+and on some non-homes; semantics UNVERIFIED (t248 masks &0x7f).
+
+(a) SHELL STRUCTURE: home slots span the table (observed 0..40 across 62
+homes), NOT outer-shell-only; shell hist {r440: 45, r365: 15, r290: 2}. Min
+inter-home 3D distance over 14 lineages: 184.3 / p25 262.7 / median 358.1 /
+max 440.7 — consistent with NO min-separation law (OQ-012), yet no observed
+game places homes closer than ~184 units.
+(b) RUN-LOCAL RANDOM, NOT TEMPLATE: 11 distinct home-star SETS over 11
+independent lineages (the 4 production slots collapse to 1); no two
+independent games share even one home star identity. Vendor resume.gam re-read
+EXACTLY reproduces the t248 PROOF 4 signature (base 0x9b1a, owner hist
+{0..6: 1 each, 255: 144}; template homes Xerxes I / Stavern I / Hannibal III /
+Gasball V / Burphee III / Hurble I / Vishnu IV, orbit radii 0..1216) — a
+static-init image, NOT a placement template (matches nothing in any live run).
+(c) HOME PLANET ORBIT VARIES (I..V: Stavern III, Hurble IV, Philadelphia II,
+Millitrin II, Gasball V-template...): the home world is the race's FIRST
+COLONISABLE planet, not orbit I — consistent with the t40/t42 picker law
+(uniform among checker-legal empties on non-rock surface incl. barren).
+(d) REWRITE MISMATCH (annotated, NOT upgraded): rewrite
+Campaign::pickHomeStars() (campaign.cpp:301) is a DETERMINISTIC max-min
+BFS-hop spread with first-home = lowest star id. Vendor is run-local random
+(first home at slot 29, 39, 1, 25...), so the rewrite's home distribution is
+structurally wrong in shape (deterministic vs random) while its SPREAD intent
+is directionally supported (observed min inter-home >= ~184 units, 0/14
+violations of "not adjacent"). Closing the vendor draw law needs the setup-
+phase code path (which pool is sampled, any rejection test) — the runtime
+table alone cannot pin it; home slots span 0..40 with no shell or id
+constraint, so "outer shell" and "lowest id" hypotheses are both REFUTED. Home-planet seeding in the
+rewrite already models first-colonisable via drawCbCell (t42) — verified
+shape-consistent here.
