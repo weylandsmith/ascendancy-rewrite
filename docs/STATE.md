@@ -260,21 +260,22 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t274 REWRITE ECONOMY/RESEARCH INTEGRATION TESTS (pure code; machine-free —
-ORDERING RATIONALE: t273's drive leg ended with :9 running the vendor TUTORIAL
-campaign and a remote VNC client attached (selfplay.md t273, BLOCKED.md t273 —
-the loop does not kill a game a human may hold), so DRIVE-class work is HELD
-until the BLOCKED t273 release conditions are met (no established client on
-:5910 AND ring still tutorial-lineage — check BOTH at task start; if met, a
-drive-class re-queue outranks this row and STATE gets rewritten accordingly);
-t274 needs no game at all and pins laws the ledger already closed sub-laws of.
-TASK VERBATIM (queue row): pin the income channel law (OQ-016 closed sub-laws:
-income formula, pop growth — economy.md [NOTE: real home is income-law.md —
-economy.md has NO section 4 per t271 citation audit]) and the research tier
-chain (FUN_00040018, gap row 5) as end-to-end campaign tests in rewrite/tests/
-— multi-turn fixtures from banked worlds (use the watcher JSON scalars, NOT raw
-sav parsing). Target: catch a regression if buildPhase/research wiring changes.
-Gate + rewrite tests green.
+NEXT t275 REWRITE COMBAT INTEGRATION (pure code; machine-free — ORDERING
+RATIONALE: t273's drive leg ended with :9 running the vendor TUTORIAL campaign
+and a remote VNC client STILL established on :5910 (re-measured 2026-11-02
+13:49, t274 start — drive-class work STAYS HELD until the BLOCKED t273 release
+conditions are met: NO established client AND ring still tutorial-lineage; if
+met at a later task start, a drive-class re-queue outranks this row and STATE
+gets rewritten accordingly). t275 needs no game at all; the economy/research
+pin surface it shares (buildPhase) is now regression-guarded by t274's four
+mutation-verified catchers, so a combat rewire that touches the turn loop gets
+caught for free.
+TASK VERBATIM (queue row): gap row 14 — deterministic damage, ordered cat-0
+volley, shield-then-hull two-layer absorb, death at <1 (combat.md S2g/S2h +
+engagement resolution 0x42c60..0x42e6e, first eligible target, threat byte
++0x59). Implement in rewrite/src/game/ with pins from the t85b 244-turn battle
+law set. If it doesn't fit one session, split (law doc first, code next
+session) and rewrite NEXT accordingly.
 
 PAIRING-SESSION NOTE (phase-3 handoff, 2026-11-02 ~10:15): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS this session (verbatim):
@@ -291,13 +292,6 @@ loadstate — input-dead-on-load law t261), plus the older bank-* dirs.
 
 QUEUE (phase 3, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t274 REWRITE ECONOMY/RESEARCH INTEGRATION TESTS (pure code): pin the income
-  channel law (OQ-016 closed sub-laws: income formula, pop growth — economy.md)
-  and the research tier chain (FUN_00040018, gap row 5) as end-to-end campaign
-  tests in rewrite/tests/ — multi-turn fixtures from banked worlds (use the
-  watcher JSON scalars, NOT raw sav parsing). Target: catch a regression if
-  buildPhase/research wiring changes. Gate + rewrite tests green.
 
 t275 REWRITE COMBAT INTEGRATION (pure code): gap row 14 — deterministic
   damage, ordered cat-0 volley, shield-then-hull two-layer absorb, death at
@@ -390,6 +384,37 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t274 (2026-11-02): ECONOMY/RESEARCH E2E TEST PIN — rewrite/tests/
+test_econres_t274.cpp (4 tests, CMakeLists registered; suite 150/0 green, gate
+green). FIXTURE HONEST NEGATIVE: the queue row said "use the watcher JSON
+scalars" — MEASURED the watcher schema (r1_playcap_watch.py): NO per-planet
+economy fields exist (turn/score/selector/rank/ships/ship_raw/relation/
+planets_mine only), so per-planet pins run on the seeded sim with vendor-truth
+constants cited from income-law.md (banked T274). MUTATION-VERIFIED the
+task's target ("catch a regression if buildPhase/research wiring changes")
+with 3 single-token campaign.cpp mutations, each caught, each REVERTED
+(src tree verified clean via git diff): completion gate >= -> > CAUGHT
+(e2e_build_queue_opening exact cadence t16 -> t17); growth +1-boost leg
+deleted CAUGHT (474 fails, e2e_growth_counter); research
+includeVariants=false -> true CAUGHT (1270 fails incl. queued-row q<66
+legality, e2e_research_tier_chain). Pins: (1) channel words are RATES +
+per-turn acc delta == word IND + completion shape (0x39005/0x3907b/0x390a3);
+(2) full growth law per planet per turn incl. cap-reset @0x393f9, +1 iff
+AI&&word<4, threshold 50, Cloning +1, clamp (S6c/S6e/T56); (3) t0 zero-queue
+/ t1 all-AI-homes-queued (T56(3)) + seed-7 EXACT first-completion t16;
+(4) research chain: variants never owned 240 turns, prereq-before-complete,
+one completion/owner/turn, cumulative injected RES >= runtimeCost at
+completion (research.md §7). TWO SIM DIVERGENCES BANKED (income-law.md T274
+D1/D2, ai-dossier rows 2/5 annotated): D1 rewrite auto-queues the PLAYER home
+where T56 [verified] says 0xFFFF (documented default; re-trajectories all
+seeded pins + PLAYTHROUGH — deferred, NOT silently fixed); D2 AI opening item
+Factory 6/6 vs T56 Agriplot 4/4 (witness n=4 one run — adjudication needs
+fresh-run selector witnesses, drive class HELD). OQ-016 row annotated, STAYS
+OPEN (strict-close — pins guard laws already closed as sub-laws; no new
+closure evidence). Machine untouched: :9 HEALTHY (health script run at start;
+VNC client still established -> drive-class HOLD re-confirmed); RESUME.GAM
+untouched; no game/ changes. NEXT = t275 VERBATIM.
 
 LANDED t273 (2026-11-02): LONG DRIVE WITNESS HARVEST II — DRIVE LEG LOST TO A
 TITLE-MENU MISCLICK (law banked), HARVEST LEG DELIVERED over the full corpus,

@@ -80,6 +80,7 @@ add_executable(run_tests
   tests/test_ui_layout.cpp
   tests/test_poppanel_t263.cpp
   tests/test_hudlayout_t264.cpp
+  tests/test_econres_t274.cpp
   tests/test_audio.cpp
   tests/test_ships.cpp
   tests/test_flic.cpp

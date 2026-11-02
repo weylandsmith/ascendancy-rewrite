@@ -2170,3 +2170,56 @@ outputs work/r1/t271_{cellreach,tfdrill,pendctx}.out).
    tail is NOT-modelled (_wip_t202.md :266, no ship model); corpus AI orbital
    items ARE live (22:1621, 26:2743, 28:2281 active), so the AI DOES buy
    them via that tail.
+
+
+## T274 — ECONOMY/RESEARCH E2E TEST PIN (2026-11-02): 4 campaign-level regression catchers + 2 banked sim divergences
+
+Deliverable: rewrite/tests/test_econres_t274.cpp (registered in rewrite/CMakeLists.txt;
+suite 150 tests, 0 failed). Multi-turn fixtures = seeded seeded campaigns via the
+test_campaign loader (the queue row's "watcher JSON scalars" instruction could not be
+followed literally: the watcher schema has NO per-planet economy fields — verified
+scripts/r1_playcap_watch.py keys are turn/score/selector/rank/ships/ship_raw/relation/
+planets_mine only; per-planet law checks therefore run against the sim with vendor-truth
+constants cited from this doc — honest-negative on the fixture route, banked here).
+
+Pins (each cited):
+1. e2e_income_channel_rates_t274 — channel words are RATES (T56 fact 2): unchanged
+   turn-to-turn on every planet with no completion; per-turn buildAcc delta == word IND
+   while pending (FUN_00038f68 0x39005/0x3907b); completion turn: acc reset 0,
+   built +1, and (acc_prev + ind) >= COST (0x390a3 gate shape).
+2. e2e_growth_counter_law_t274 — full counter law per planet per turn (S6c/S6e + T56):
+   pop>=cap -> counter:=0 (@0x393f9); else counter += stored-PROS-word +1 iff AI && word<4
+   (@0x39319); counter>=50 -> pop += 1 (+1 per built Cloning Plant, t27 item-15 law),
+   clamp cap, counter:=0. Conquered planets (owner changed) skip re-seed noise.
+3. e2e_build_queue_opening_t274 — t0 nothing queued anywhere; t1 every AI home queued
+   (T56(3) opening flip, selector gate IND>0 @0x3f146); opening pick uniform across
+   homes; EXACT cadence pin firstTurn==16 for seed 7 (Factory COST 30, home word IND 2:
+   tick 15 lands acc on 30 exactly).
+4. e2e_research_tier_chain_t274 — 106 rows loaded / queued row always main (<66),
+   unowned, prereqs satisfied (FUN_00046d3c legality = tree_->available); variants
+   NEVER owned across 240 turns (OQ-013); completion == queued row, one per owner per
+   turn max; cumulative injected RES >= runtimeCost(row) at completion (research.md §7
+   cost law + RES-stockpile-dump law), stockpile zeroed at completion.
+
+MUTATION-VERIFIED (the task's stated target "catch a regression if buildPhase/research
+wiring changes" — proven by 3 single-token mutations of campaign.cpp, each REVERTED):
+  * completion gate `>=` -> `>`: e2e_build_queue_opening FAILS (t16 -> t17).
+  * growth `+1` boost leg DELETED: e2e_growth_counter FAILS (474 assertion fails).
+  * research available(includeVariants=false) -> true: e2e_research_tier_chain FAILS
+    (queued variant row caught by q<66; 1270 fails).
+  * NOTE (honest negative): the IND-tick mutation class (buildAcc += storedIndFor ->
+    += 1) was NOT tried in isolation; pins 1/3 both read the tick, so coverage is
+    inferred from pin 3's exact-cadence catch, not measured per-mutation.
+
+BANKED SIM DIVERGENCES (rewrite vs vendor witness; NOT fixed this task, NOT refuted):
+  D1 PLAYER QUEUE: T56(3) [verified] the player home stays +0x52=0xFFFF at End Turn
+    (manual control; FUN_0003f130 is the AI selector). The rewrite auto-queues
+    kBuildOrder for owner 0 — a DOCUMENTED DEFAULT in campaign.cpp buildPhase.
+    Rewiring would re-trajectory every seeded pin + PLAYTHROUGH.md; deferred with the
+    test comment pointing here.
+  D2 AI OPENING ITEM: T56(3) fresh-run witness (n=4, ONE run, thin): opening byte
+    +0x54 == 0x01 Agriplot 4/4. The rewrite's need-class scorer (FUN_0003fec4 model)
+    opens Factory on 6/6 homes seed 7. The scorer's OPENING-turn column weights are the
+    likely gap (need-class roll d66/d35 vs a fresh-world planet); adjudicate only with
+    fresh-run selector-session witnesses (drive class — HELD per t273). Test pins
+    uniformity + cadence, NOT the Agriplot name.
