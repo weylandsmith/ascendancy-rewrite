@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T07:05
+updated: 2026-11-02T08:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,32 +260,26 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t271 PER-CELL TERRAIN/NUKE WIRING SCOPING (OQ-016 residue; offline):
-the planitem per-cell laws are DOCUMENTED (economy.md §4) but rewrite wiring
-is PARKED (no cell model). DECIDE the cell model shape first (slot-array law
-+ locator law are in hand, STATE 'PLANET SYSTEM OBJECT'), then wire or file a
-REFUTED row with the decision rationale. Cite economy.md §4 + STATE.
-ORDERING: t271 was queued second in phase 2b and is fully offline like t270;
-t272 (watchpoint PREP) stays last because it brushes the production :9 /
-USER ASK boundary. The t270 finding sharpens a FUTURE task (not this one):
-the home setup-draw law is a code-side target (find the setup function that
-writes 0x12e1d+0x1ee*r rows; candidates discoverable via writer census on
-data 0x12e1d) — if t271 lands early and context remains, prefer authoring
-that as t273 over padding. PRE-FLIGHT (t267 law): python3
-scripts/r1_game_health.py FIRST (advisory; task needs no live game). Timeline
-reads obey the OOM law (r1_stream.py / bounded scans only). NEVER loadstate
-any bank (REFUTED t261).
+NEXT t272 V-PRODUCER WATCHPOINT PREP (OQ-021, USER-GATED): author the
+dosbox-x write-watchpoint session script for guest-phys
+B+0x82bb0+0x482fb-0x88 (pointer-law law, score.md S9/S14) + a drive plan
+that pushes V toward >=26 from bank-t261-final-1236 lineage WITHOUT touching
+production :9 unsanctioned; DO NOT run the watchpoint session without the
+user's explicit go (BLOCKED.md USER ASK). Prep + dry-run on scratch only.
+ORDERING: t272 is the last queued phase-2b item and brushes the production
+:9 / USER ASK boundary, so it runs after the offline tasks (t270/t271
+landed). PRE-FLIGHT (t267 law): python3 scripts/r1_game_health.py FIRST —
+NOTE 2026-11-02 07:39 reading UNHEALTHY (pid 535172 gone, zero harness
+dosbox-x in /proc, ring stale): the production game is DEAD, so the dry-run
+needs a scratch relaunch per the launch law (MAX_ITERS=12 IDLE_GATE=0,
+scratch copy NEVER game/), and any "push V" drive plan must state its
+restart/bank steps explicitly. Timeline reads obey the OOM law (r1_stream.py
+/ bounded scans only). NEVER loadstate any bank (REFUTED t261).
 
 
 QUEUE (phase 2b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row; when it drains,
 park NEXT on a WAIT-TRIGGER sentinel — task line FIRST — or author more):
-
-t271 PER-CELL TERRAIN/NUKE WIRING SCOPING (OQ-016 residue): the planitem
-per-cell laws are DOCUMENTED (economy.md §4) but rewrite wiring is PARKED
-(no cell model). DECIDE the cell model shape first (slot-array law +
-locator law are in hand, STATE 'PLANET SYSTEM OBJECT'), then wire or file a
-REFUTED row with the decision rationale. Cite economy.md §4 + STATE.
 
 t272 V-PRODUCER WATCHPOINT PREP (OQ-021, USER-GATED): author the dosbox-x
 write-watchpoint session script for guest-phys B+0x82bb0+0x482fb-0x88
@@ -306,6 +300,40 @@ ring 41-60 ON, watcher banking (one instance), resumed t1086 via Return-to-
 Game, ring verified 3 rows. Launch law unchanged: MAX_ITERS=12 IDLE_GATE=0
 (timeline grows every 10 s -> probe structurally always armed; the queue-
 driven exit fires when the queue drains).
+
+LANDED t271 (2026-11-02): PER-CELL TERRAIN/NUKE WIRING SCOPING DONE AS
+DECISION (OQ-016 residue; no row closed, strict-close honored — income-law.md
+T271 + _wip_t271.md S0..S5; keepers scripts/r271_cellreach.py +
+r271b_tfdrill.py + r271c_pendctx.py, all RC=0; outputs
+work/r1/t271_{cellreach,tfdrill,pendctx}.out). MEASURED (1074 saves x 66 run
+dirs, STATE locator law): (1) ZERO ACTIVE item-35 (Automation) slot-obs
+anywhere; item 36 (Terraforming) 78 slot-obs ALL pending-shape (owner 0
+production-lineage worlds, +0x54==36, word2 bit0 CLEAR, +0x50 acc 32..48 of
+COST 50, turn frozen idle) — ZERO T39b terrain-mutation witnesses corpus-
+wide. (2) NEW LAW: a pending build RESERVES its slot (byte1:=item, word2
+bit0 clear); pending IS observable in idle-turn ring captures (refines
+t202b's ring note; +0x4c M4 law untouched). Crell II slot62 cls=9 item=38 =
+pending dig on rock — rule D at the pending layer. (3) STATIC: scorer loop
+read verbatim from work/ai_selector_disasm.txt — 0x3f528 cmp bl,5 + 0x3f52f
+mov ax,[0x73e3c] jge skip: rows >= 22 never scored; emergency chain sets
+{38,18,19,11}+{12,13,14,15,37} — 35/36 are human-UI-only, rewrite has no
+build UI. DECISION: cell model shape = slot-indexed KEPT (flat member array
+per STATE 'PLANET SYSTEM OBJECT'; rule G is the only spatial law, pinned
+hex-geometry helpers serve it); T39b 36/35 branches NOT wired -> REFUTED-
+ROUTES t271 filed with re-open conditions (build UI ships OR a real
+completion is witnessed). Per-slot shield byte: writes reachable (18:1519,
+26:2743, 27:231; 19 ZERO) but consumer unmapped (t207) — no dead state
+added, OQ-019 family. Nuke law unchanged BLOCKED (no new capture class).
+CITATION AUDIT: task's "economy.md §4" does not exist (3 sections; file is
+gizmo_probe.py stage-3j REGENERATED — hand-authoring forbidden); real law
+home = income-law.md §12/§13/§13.5/T38/T39. BANKED future-task seed: AI
+orbital shipyard-tail template {28,29,30,0,26} @0x89360 (FUN_0003f758) not
+modelled — corpus AI orbital items ARE live (22:1621, 26:2743, 28:2281).
+PRE-FLIGHT: health 07:39 UNHEALTHY (pid 535172 GONE — production game dead;
+task fully offline, unaffected; relaunch requirement written into t272's
+NEXT). No new sitting (last row t1236 07:04 predates t270 commit). :9
+untouched, zero clicks, no loadstate. QUEUE now holds t272 ONLY. NEXT = t272
+VERBATIM.
 
 LANDED t270 (2026-11-02): HOME-PLACEMENT VERIFICATION DONE (OQ-016 residue;
 no row closed, strict-close honored — the draw law stays open; mapgen.md t270

@@ -300,3 +300,24 @@ slot's campaign (star->owner-table md5, see selfplay.md t266) before trusting
 ANY cross-session timeline claim; multi-writer windows look exactly like
 engine anomalies otherwise. Evidence + quantified ~150 s oscillation:
 docs/re/selfplay.md t266 block.
+
+## t271 — WIRING the T39b Terraforming/Automation completion branches into the rewrite NOW — DEAD (zero-witness class)
+The route "OQ-016 per-cell residue: implement item-36 completion (word2:=0,
+byte1:=0xFF, byte0:=1 terrain mutation) and item-35 completion (word2|=2) in
+buildPhase" is dead until re-open conditions hold. MEASURED (scripts/
+r271_cellreach.py + r271b_tfdrill.py + r271c_pendctx.py, 1074 saves x 66 runs,
+slot array via STATE locator law): item 35 appears in ZERO slots anywhere;
+item 36 appears 78x ALWAYS as a player mid-progress queue (+0x54==36, word2
+bit0 CLEAR, +0x50 acc 32..48 of COST 50, turn frozen on idle production
+captures) — ZERO completions ever witnessed corpus-wide. Static: the original's
+own AI can never buy either (scorer loop 0x3f528..0x3f592 excludes rows >=
+[0x73e3c]==22 verbatim; emergency chain purchase sets {38,18,19,11}+{12,13,14,
+15,37}, ai-dossier.md S10) — they are human-UI-only items and the rewrite has
+no build UI (kBuildOrder documented stand-in). Wiring them adds behaviour the
+captured original never exhibited (t256c principle). RE-OPEN CONDITIONS: (a) a
+human build-order UI ships in the rewrite (then wire the T39b branch table
+verbatim), or (b) a capture witnesses an ACTUAL item-36 completion (then the
+mutation law gets its first live confirmation + a pin). Related banked facts
+(pending reserves its slot byte1:=id/word2-clear; per-slot shield byte has no
+mapped consumer; AI orbital shipyard-tail template {28,29,30,0,26} @0x89360):
+docs/re/income-law.md T271.

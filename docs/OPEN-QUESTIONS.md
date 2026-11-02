@@ -1382,7 +1382,21 @@ tables cannot pin it; needs the setup code path or a setup watchpoint), and
 the rewrite pickHomeStars() (campaign.cpp:301) is a documented MISMATCH
 (deterministic max-min BFS spread, first-home-lowest-id REFUTED) — NOT
 upgraded this iteration for lack of a pinned draw law. Star owner-byte bit7
-semantics remain UNVERIFIED (t248 masks &0x7f).
+semantics remain UNVERIFIED (t248 masks &0x7f). t271 PER-CELL WIRING SCOPED
+AS DECISION (income-law.md T271, keepers r271_cellreach/tfdrill/pendctx RC=0,
+1074 saves): cell model shape = slot-indexed KEPT (world-gen classes, rock
+event, CB/built-item draws, channel gating, dig consume ALL already wired +
+pinned t40..t43/t203); T39b item-36 Terraforming + item-35 Automation
+completion branches NOT wired — MEASURED zero-witness class (35: 0 slot-obs
+ever; 36: 78 pending-only obs, 0 completions; AI-unreachable by the verbatim
+scorer cap rows<22 @0x3f52f + chain sets) -> REFUTED-ROUTES t271 with re-open
+conditions; per-slot shield byte write reachable but consumer unmapped (OQ-019
+family, no dead state added); nuke law unchanged BLOCKED. NEW OBSERVATION
+banked: a pending build reserves its slot (byte1:=item id, word2 bit0 CLEAR)
+— pending IS observable in idle-turn ring captures (refines t202b note; +0x4c
+M4 untouched). Row STAYS OPEN (strict-close): Phase Bomb capture law, human
+build-order minutiae, setup-draw law (t273 seed), shield-byte consumer,
+word[+0x16] template source.
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor Ship::init_global_gizmos cost hack, Orbital Docks effect
 | open | t15 PARTIAL: gizmo record law MEASURED (docs/re/ships.md §6:

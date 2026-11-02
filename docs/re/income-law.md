@@ -2106,3 +2106,67 @@ growth reset, 0x391b4, 0x393b5/f5). Priors banked from the BROKEN tool's
 byte-only output remain valid as far as they go (they claimed byte writers, not
 completeness), but any future "no writer exists" argument MUST re-run the fixed
 tool or r1_t106_writers.py (boundary-checked variant, adds C6 imm8 form).
+
+## T271 — PER-CELL TERRAIN/NUKE WIRING SCOPING CLOSED AS DECISION (OQ-016 residue, 2026-11-02)
+
+Task asked to decide the cell-model shape, then wire the remaining per-cell
+completion branches or file a REFUTED row. DECISION: keep the slot-indexed
+model; DO NOT wire the T39b item-36/35 branches; REFUTED-ROUTES t271 filed.
+Full working notes docs/re/_wip_t271.md S0..S5; keepers
+scripts/r271_cellreach.py / r271b_tfdrill.py / r271c_pendctx.py (all RC=0;
+outputs work/r1/t271_{cellreach,tfdrill,pendctx}.out).
+
+1. MEASURED REACHABILITY (1074 saves x 66 run dirs, STATE locator law):
+   ACTIVE item census has NO 35 and NO 36 — item 35 (Automation) appears in
+   ZERO slots anywhere; item 36 (Terraforming) 78 slot-obs, ACTIVE 0. Drill:
+   every 36-obs is a PLAYER (owner 0) mid-progress queue on the production
+   lineage (t1131 Smorgasbord II/Hope I/Unterwelt I/Crell I; t1255 Sirverei
+   III/Unterwelt I), +0x54 == 36, slot word2 bit0 CLEAR, +0x50 low word
+   32..48 of COST 50, turn frozen (idle game) — the 10 s ring never spanned
+   a completion. ZERO T39b terrain-mutation witnesses corpus-wide.
+   Crell II slot62 cls=9 item=38 = pending dig ON a rock cell — rule-D
+   consistency re-confirmed at the pending layer.
+2. NEW LAW OBSERVED: a pending build RESERVES ITS SLOT — activator-path
+   shape: byte1 := item id, word2 bit0 CLEAR (explicit-cell human queue; the
+   t44 cargo chain's +0xac/+0xae pair is the same reservation idea). This
+   refines the t202b note "the autosave ring never catches pending != 0xFF":
+   pending IS observable in idle-turn production captures (turn held -> the
+   ring rotates within one turn). +0x4c M4 law untouched (counts slotted
+   UPOP; re-attribution of the 140-row M3 residual to pending-UPOP is a
+   plausible follow-up census, NOT done here — no closed row re-opened).
+3. STATIC UNREACHABILITY of 35/36 in the original's own doctrine [verified
+   disasm, work/ai_selector_disasm.txt read verbatim this session]: scorer
+   loop 0x3f528..0x3f592 excludes CB (cmp bl,5) AND every row >=
+   [0x73e3c]==22 (mov ax,[0x73e3c]; cmp ebx,eax; jge skip) while the loop
+   walks 0..0x26; emergency chain FUN_0003fc4c buys only {38,18,19,11} +
+   template {12,13,14,15,37} (ai-dossier.md S10). So 35/36 are human-UI-only
+   items; the rewrite has no build UI (kBuildOrder documented stand-in).
+   [word[0x73e3c] census over saves reads {0: 1074} — the KNOWN t43 static-
+   region dump artifact; live 22 measured 4/4 full captures, OQ-014 CLOSED.]
+4. PER-SLOT SHIELD BYTE (byte3 := 0 then |= 0xf/0x23<<8 at shield
+   completion, T39b generic branch): writes ARE reachable (18 Surface Shield
+   1519, 26 Orbital Shield 2743, 27 Orbital Mega Shield 231 active obs;
+   19 Surface Mega Shield ZERO — chain-C never fired in captures) but the
+   CONSUMER is unmapped — t207
+   proved bombard is a fire-and-forget price with no per-ship gunnery
+   channel, and the emergency chain reads the +0x59 COUNT, not charges.
+   Storing the byte without a consumer = dead state; documented gap,
+   OQ-019 family, NOT wired.
+5. NUKE (Phase Bomb gizmo 70): unchanged — BLOCKED.md capture-gated entry
+   (zero device events in 13 runs; static dead-ends T39e). Re-affirmed: no
+   new capture class exists, so no new route this iteration.
+6. MID-GAME ROCK-CONSUME (T39a) stays unreachable BY CONSTRUCTION: t29b
+   closed the only mid-game terrain mutation routes (item-36 completion +
+   world-gen rock event); with 36 unwired-by-decision there is no rock
+   writer that can hit a pending build's cell.
+7. SHAPE: slot-indexed (cellClasses + itemCells + class-byte rock bit) is
+   KEPT — the original's slot array IS a flat member member-array (STATE
+   'PLANET SYSTEM OBJECT'), and rule G is the only spatial law; the pinned
+   hex-geometry helpers (sizeClassFor/cellActiveNeighbour, t43) serve it
+   fully. A 2-D occupancy grid would add no cited law.
+8. BANKED FOR A FUTURE TASK (doctrine gap, not per-cell): the AI's orbital
+   shipyard-tail template {28,29,30,0,26} (imm 0x89360 inside FUN_0003f758,
+   pool 0x67b0) — rewrite's gate models orbitalThreatFor but the template
+   tail is NOT-modelled (_wip_t202.md :266, no ship model); corpus AI orbital
+   items ARE live (22:1621, 26:2743, 28:2281 active), so the AI DOES buy
+   them via that tail.
