@@ -260,172 +260,113 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t272 V-PRODUCER WATCHPOINT PREP (OQ-021, USER-GATED): author the
-dosbox-x write-watchpoint session script for guest-phys
-B+0x82bb0+0x482fb-0x88 (pointer-law law, score.md S9/S14) + a drive plan
-that pushes V toward >=26 from bank-t261-final-1236 lineage WITHOUT touching
-production :9 unsanctioned; DO NOT run the watchpoint session without the
-user's explicit go (BLOCKED.md USER ASK). Prep + dry-run on scratch only.
-ORDERING: t272 is the last queued phase-2b item and brushes the production
-:9 / USER ASK boundary, so it runs after the offline tasks (t270/t271
-landed). PRE-FLIGHT (t267 law): python3 scripts/r1_game_health.py FIRST —
-NOTE 2026-11-02 07:39 reading UNHEALTHY (pid 535172 gone, zero harness
-dosbox-x in /proc, ring stale): the production game is DEAD, so the dry-run
-needs a scratch relaunch per the launch law (MAX_ITERS=12 IDLE_GATE=0,
-scratch copy NEVER game/), and any "push V" drive plan must state its
-restart/bank steps explicitly. Timeline reads obey the OOM law (r1_stream.py
-/ bounded scans only). NEVER loadstate any bank (REFUTED t261).
+NEXT t272 V-PRODUCER WATCHPOINT — GRANTED (user 2026-11-02: "Yes — prep and run it on scratch"). Author the dosbox-x write-watchpoint session for guest-phys B+0x82bb0+0x482fb-0x88 (pointer law, score.md S9/S14) on a SCRATCH game copy (NEVER work/r1/game/), drive turns until ONE V-change lands, capture the writer EIP, map it back via the t106/t107 windowed-disasm recipe. INSTRUMENT FACTS MEASURED by the pairing session (don't re-derive): this dosbox-x 2025.02.025 build HAS -break-start (breaks into debugger at startup) and a debugger run-mode config key ("The run mode when the DOSBox-X Debugger starts"), but strings finds ZERO "breakpoint"/"bpm" literals — the debugger command set is UNKNOWN; discover it empirically on scratch (attach, type help/? , dump the command list, then find the memory-write-breakpoint command; if none exists, the debugger is compiled WITHOUT watchpoints -> bank the honest negative, rewrite NEXT to t273 with the negative cited). If watchpoints DO exist: scratch session gets its OWN ring dir (work/r1/playcap-wp/) — NEVER the production ring (two-writer collision law, t266); drive via r1_t245_turndrive with DISPLAY injected; bank every EIP stop (registers + stack window) to docs/re/score.md S-new. PRE-FLIGHT: python3 scripts/r1_game_health.py; production :9 is LIVE at t1086 (relaunch 2026-11-02 10:06, TL=172800) — do not touch it; scratch copy per docs/BLOCKED.md runbook. Timeline reads obey the OOM law. NEVER loadstate any bank (REFUTED t261).
 
+PAIRING-SESSION NOTE (phase-3 handoff, 2026-11-02 ~10:15): sentinel-slot law
+stands — task line FIRST, notes below. USER GRANTS this session (verbatim):
+watchpoint "Yes — prep and run it on scratch"; phase 3 "Yes — relaunch + drive
++ rewrite queue (~another day)". STATE AT HANDOFF: production :9 LIVE at t1086
+single watcher, TL=172800 (48 h guard) — SEE t277: the three "unexplained"
+game deaths (Nov 1 15:45, Nov 2 07:04, +15:45 pattern) each sit ~8 h = 28800 s
+after their launch -> prime suspect [inferred] the TL runaway-guard expiring,
+NOT an engine crash; t277 confirms from dosbox.log/journalctl and fixes the
+SOP (health-check restart BEFORE expiry, or TL>=172800 always). User save
+work/r1/game/RESUME.GAM md5 5b382afbb7891 (== t1086) untouched. Banks:
+bank-t261-final-1236 (t1236 lineage), bank-t251-live1255 (clean t1255, NEVER
+loadstate — input-dead-on-load law t261), plus the older bank-* dirs.
 
-QUEUE (phase 2b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; when it drains,
-park NEXT on a WAIT-TRIGGER sentinel — task line FIRST — or author more):
+QUEUE (phase 3, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
+keep this block intact except deleting your completed row):
 
-t272 V-PRODUCER WATCHPOINT PREP (OQ-021, USER-GATED): author the dosbox-x
-write-watchpoint session script for guest-phys B+0x82bb0+0x482fb-0x88
-(pointer-law law, score.md S9/S14) + a drive plan that pushes V toward >=26
-from bank-t261-final-1236 lineage WITHOUT touching production :9 unsanctioned;
-DO NOT run the watchpoint session without the user's explicit go (BLOCKED.md
-USER ASK). Prep + dry-run on scratch only.
+t273 LONG DRIVE WITNESS HARVEST II (base = production t1086 NOW; drive toward
+  1250+; if t272 landed a writer EIP, ALSO verify it against the new corpus).
+  r1_t245_turndrive v4; bank the ring to a dated bank dir BEFORE any restart
+  AND every ~30 turns; OOM law; per-segment trust law (t262 r262 pattern).
+  MINE: (a) multi-volley vs NON-at-war owner (OQ-016 — t251's cascade was the
+  first; bank counts + slot refs to combat.md); (b) V>=25 threshold watch
+  (t269 census says this campaign stays under 14..22 — if a drive BREAKS 25,
+  that is the threshold witness, log the exact ring slot + V + systems counts;
+  strict-close only on the event); (c) OQ-019 magnetron USE frames if any AI
+  fleet holds one. Bank witness tables; honest negatives fine.
 
+t274 REWRITE ECONOMY/RESEARCH INTEGRATION TESTS (pure code): pin the income
+  channel law (OQ-016 closed sub-laws: income formula, pop growth — economy.md)
+  and the research tier chain (FUN_00040018, gap row 5) as end-to-end campaign
+  tests in rewrite/tests/ — multi-turn fixtures from banked worlds (use the
+  watcher JSON scalars, NOT raw sav parsing). Target: catch a regression if
+  buildPhase/research wiring changes. Gate + rewrite tests green.
 
-PAIRING-SESSION NOTE (phase-2 handoff, 2026-11-01 19:00): sentinel-slot law
-stands — task line is the FIRST non-blank line; notes below. USER DELEGATION
-(verbatim, 2026-11-01): "def retire the watchers, maybe queue up some more
-reverse engineering work if there is any, otherwise re-launch the game and
-proceed with that. Try to keep yourself busy for another day." Watchers: ALL
-retired (~19:00, targeted PIDs — pkill -f matches its own cmdline and kills
-your shell, known footgun). Game RELAUNCHED production-style: :9, autosave
-ring 41-60 ON, watcher banking (one instance), resumed t1086 via Return-to-
-Game, ring verified 3 rows. Launch law unchanged: MAX_ITERS=12 IDLE_GATE=0
-(timeline grows every 10 s -> probe structurally always armed; the queue-
-driven exit fires when the queue drains).
+t275 REWRITE COMBAT INTEGRATION (pure code): gap row 14 — deterministic
+  damage, ordered cat-0 volley, shield-then-hull two-layer absorb, death at
+  <1 (combat.md S2g/S2h + engagement resolution 0x42c60..0x42e6e, first
+  eligible target, threat byte +0x59). Implement in rewrite/src/game/ with
+  pins from the t85b 244-turn battle law set. If it doesn't fit one session,
+  split (law doc first, code next session) and rewrite NEXT accordingly.
 
-LANDED t271 (2026-11-02): PER-CELL TERRAIN/NUKE WIRING SCOPING DONE AS
-DECISION (OQ-016 residue; no row closed, strict-close honored — income-law.md
-T271 + _wip_t271.md S0..S5; keepers scripts/r271_cellreach.py +
-r271b_tfdrill.py + r271c_pendctx.py, all RC=0; outputs
-work/r1/t271_{cellreach,tfdrill,pendctx}.out). MEASURED (1074 saves x 66 run
-dirs, STATE locator law): (1) ZERO ACTIVE item-35 (Automation) slot-obs
-anywhere; item 36 (Terraforming) 78 slot-obs ALL pending-shape (owner 0
-production-lineage worlds, +0x54==36, word2 bit0 CLEAR, +0x50 acc 32..48 of
-COST 50, turn frozen idle) — ZERO T39b terrain-mutation witnesses corpus-
-wide. (2) NEW LAW: a pending build RESERVES its slot (byte1:=item, word2
-bit0 clear); pending IS observable in idle-turn ring captures (refines
-t202b's ring note; +0x4c M4 law untouched). Crell II slot62 cls=9 item=38 =
-pending dig on rock — rule D at the pending layer. (3) STATIC: scorer loop
-read verbatim from work/ai_selector_disasm.txt — 0x3f528 cmp bl,5 + 0x3f52f
-mov ax,[0x73e3c] jge skip: rows >= 22 never scored; emergency chain sets
-{38,18,19,11}+{12,13,14,15,37} — 35/36 are human-UI-only, rewrite has no
-build UI. DECISION: cell model shape = slot-indexed KEPT (flat member array
-per STATE 'PLANET SYSTEM OBJECT'; rule G is the only spatial law, pinned
-hex-geometry helpers serve it); T39b 36/35 branches NOT wired -> REFUTED-
-ROUTES t271 filed with re-open conditions (build UI ships OR a real
-completion is witnessed). Per-slot shield byte: writes reachable (18:1519,
-26:2743, 27:231; 19 ZERO) but consumer unmapped (t207) — no dead state
-added, OQ-019 family. Nuke law unchanged BLOCKED (no new capture class).
-CITATION AUDIT: task's "economy.md §4" does not exist (3 sections; file is
-gizmo_probe.py stage-3j REGENERATED — hand-authoring forbidden); real law
-home = income-law.md §12/§13/§13.5/T38/T39. BANKED future-task seed: AI
-orbital shipyard-tail template {28,29,30,0,26} @0x89360 (FUN_0003f758) not
-modelled — corpus AI orbital items ARE live (22:1621, 26:2743, 28:2281).
-PRE-FLIGHT: health 07:39 UNHEALTHY (pid 535172 GONE — production game dead;
-task fully offline, unaffected; relaunch requirement written into t272's
-NEXT). No new sitting (last row t1236 07:04 predates t270 commit). :9
-untouched, zero clicks, no loadstate. QUEUE now holds t272 ONLY. NEXT = t272
-VERBATIM.
+t276 PLANETALLOC WINDOW WIRING in rewrite (pure code): the five-panel planet
+  screen geometry from windows.txt (PLRES/PLIND/PLPRO/PLPOP/PLBUILD, type-29,
+  left-to-right) + header getters (static.txt #147/149/151/152/153 law,
+  selfplay.md) + gauge selector (ui::gaugeSelector clamp law) + poppanel
+  (t263) + planitem hypothesis -> wire into rewrite/src/ui/ as the planet
+  window composition; tests pin panel order + header format strings.
 
-LANDED t270 (2026-11-02): HOME-PLACEMENT VERIFICATION DONE (OQ-016 residue;
-no row closed, strict-close honored — the draw law stays open; mapgen.md t270
-section + _wip_t270.md S1..S4; KEEPER scripts/r270_homeplace.py RC=0, output
-work/r1/t270_homeplace.out). MEASURED (14 lineages: 4 production bank slots =
-1 lineage + 10 fresh r1ad/r1deep sessions, turn>=1 slots only): (1) HOME JOIN
-— DWORD[data 0x12e1d + race*0x1ee] == phys of star-record base(k) (base =
-NAME-0x1C stride 0x60) EXACTLY; at turn>=1 home star owner byte ==
-0x80|(1<<race) AND the race's own planet (t248 law) is in its LIVE list
-(25/25; production: Oslo I@25, Philadelphia II@27, Sarsaparilla I@18).
-TURN-0 TRUST LAW EXTENDED: turn-0 race-row pointers are template residue
-(r5=+11/r6=+6 constant across ALL fresh runs; same class as t269's turn-0
-anomalies). Star owner-byte census re-derived with the prefix-filter fix:
-byte&0x7f == OR(1<<live owners)&0x7f 50/50 (earlier 50/50 readings at wrong
-offsets were inflation bugs caught same session). (2) RUN-LOCAL, NOT
-TEMPLATE: 11 distinct home sets / 11 independent lineages; resume.gam 7-owner
-signature re-confirmed EXACTLY (Xerxes I/Stavern I/Hannibal III/Gasball V/
-Burphee III/Hurble I/Vishnu IV) but matches NO live run — static init only.
-(3) Home slots span table 0..40 (shell/lowest-id hypotheses REFUTED); min
-inter-home 184.3..440.7 (median 358) over 14 lineages — no min-separation law
-ships, yet no game places homes adjacent. (4) Home planet = first colonisable
-orbit (varies I..V; t40/t42 shape-consistent). (5) REWRITE pickHomeStars
-(campaign.cpp:301) = documented MISMATCH (deterministic max-min BFS spread +
-first-home-lowest-id vs vendor run-local random); NOT upgraded (draw law
-unpinned — needs setup-code writer census, banked as future t273 seed in
-NEXT). PRE-FLIGHT: health HEALTHY 06:31 (game 535172); no new sitting (tail
-scan all t1236); :9 untouched, zero clicks, no loadstate. NEXT = t271
-VERBATIM.
+t277 TL-EXPIRY FORENSICS + SOP FIX: CONFIRM or kill the TL=28800 hypothesis
+  (dosbox.log last lines + launch times from loop.log/pidfile ctimes vs the
+  two measured deaths; dosbox-x logs its time-limit exit — find the exact
+  farewell line in the log or strings). Then fix the harness: r1_game_health.py
+  gains a PRE-EXPIRY warning at TL-600s (t267 already warns at 600s — verify
+  it fires and document the restart-into-fresh-TL procedure verbatim), and
+  r1_playcap_vnc.sh default TL raised to 172800 with a comment citing this
+  row. Bank to docs/re/selfplay.md §7 + BLOCKED.md.
 
-LANDED t269 (2026-11-02): OQ-021 VICTORY-THRESHOLD MINING DONE — NO EVENT,
-FULL DISTANCE-TO-HALF + FIRST-EVER T CENSUS BANKED (no row closed, strict-
-close honored: a trajectory is not a threshold; score.md S14 + _wip_t269.md
-S1..S3; KEEPER scripts/r269_vthreshold.py + scripts/r269_anom.py, both RC=0;
-outputs work/r1/t269_vthreshold{,_rank}.out). MEASURED (7.69 GB / 314,173
-lines / dedup 243,135 -> 71,038 trusted rows / 14,348 segments, t262 per-
-segment trust law): (1) ZERO rows V>=25, selector census {0: ALL 71,038},
-rank census {65535: all but TWO turn-0 title frames} — three independent
-end-state variables (V, sel, rank) never fired in ANY captured frame; the
-score evaluator never ran. (2) T = u32[0x16143]>>16 census {50: 71,023; 25:
-12; 0: 2; 100: 1} and r269_anom.py PROVED every anomaly is a turn-0
-in_game=False setup frame (T=25 rows carry any=11 at turn 0 = starfield mid-
-build) -> captured play is ALL T=50 galaxies; threshold denominator never
-variable; half = V>=26. (3) DISTANCE-TO-HALF: corpus max 46.0% (V=23) at
-t925, re-observed t958/1015/1016/1087; 3 stars from strict majority;
-systems_any reached 36 (>half) with sel=0 — threshold-neighbourhood re-
-confirmation of the SEMANTIC NON-JOIN (V != territory). (4) 66 V-change
-boundaries (vs t258's 38 — segment law catches reload-class boundaries the
-global watermark dropped); doubling 11->22 @t911->912 and halving 22->11
-@t1140->1141 reproduced independently. (5) end-ctrl.txt re-read verbatim:
-comment "over half" vs enddesc AND congrat BOTH "two-thirds" — contradiction
-confirmed in the file itself, no numeric constant; code comparator still the
-only arbiter and still unobserved. PRE-FLIGHT: health HEALTHY 06:02 (game
-535172, TL dies 07:03:58 — task was offline, expiry moot); :9 untouched
-(zero clicks/turns, no loadstate). QUEUE phase 2 DRAINED -> authored phase
-2b above. NEXT = t270 VERBATIM.
+t278 OQ-005 RULING PACKAGE (offline, user-time-shortening): rebuild
+  work/r1/shp_png/index.txt as a DECISION SHEET — one row per residue record:
+  thumbnail path, our identification [if any, cited], the comparison-screenshot
+  status from the user's Oct-29 message (verbatim quotes preserved), and a
+  one-line "keep / junk / re-render" recommendation the user can rule on in
+  minutes. DO NOT rule for the user (R13); the deliverable is the sheet +
+  contact sheets already in place. Bank sheet path into BLOCKED.md OQ-005 ask.
+
+t279 DIPLOMACY LIVE VERIFICATION PASS (needs production live): re-verify the
+  t244 alliance law reads on the FRESH t1086 campaign WITHOUT initiating any
+  proposal: open ALIENDIP per race, bank disposition + relation-state cells
+  vs the watcher RAM rows at the same wall-second (c-overlay is the display,
+  RAM is truth — cross-check OQ-021's STARS CONTROLLED line too). Zero-click
+  risk screens only (read-only panels; NEVER PROPOSE/DECLARE). Bank to
+  diplomacy.md as a second-campaign corroboration (the first campaign's data
+  all lives at turns 1086-1335; a fresh campaign tests race-seed invariance).
+
+t280 AI GAP ROW 11 REMAINING BODIES (pure code): t256 upgraded 4 SA_ bodies to
+  cited law; audit the remaining 12 against aicode.md §6.3 — wire or file
+  refuted per body, tests where wired. Split freely; one commit minimum.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
-- OOM LAW (t251 incident, MEASURED): NEVER read live-timeline.jsonl except
-  (a) scripts/r1_stream.py streaming API, (b) tail-scan of the last <=400 KB,
-  (c) r214_triage.py. The t251 session json.loads'd the whole 6.4 GB file:
-  13.4 GB RSS peak, OOM killer took the ENTIRE tmux scope (loop+game+session).
-- PER-SESSION TRUST for V/campaign analysis (t255): the global watermark
-  drops re-loaded lower-turn campaigns; see r255d pattern.
-- Ring = work/r1/playcap/save/ (20 slots, 10 s cadence, ~200 s total!). Bank
-  BEFORE any restart, every ~30 turns during drives. Banks so far:
-  bank-t1254, bank-t1096, bank-t249-live-open, bank-t250-predrive,
-  bank-t251-predrive, bank-t251-live1255 (t1255 clean copy md5 0024340d).
-- User save work/r1/game/RESUME.GAM md5 5b382afbb7891 (Oct 29, == t1086) —
-  the game writes it ONLY at in-game Save; never overwrite by hand.
-- SIGKILL a softlocked dosbox (SIGTERM pops its own quit-confirm, (Yes)
-  DEFAULT). Background shells need DISPLAY=:9 injected. xsend refuses windows
-  with "warning" in the title. t267 LAW: NEVER pattern-kill dosbox-x at all
-  (even pkill -x — production IS that name; t267 self-inflicted modal-freeze
-  incident, docs/re/selfplay.md t267 block): signal ONLY the recorded
-  work/r1/vnc/dosbox.pid after /proc cmdline verification; rescue a popped
-  quit-confirm via scripts/tclick.c by window ID (xwininfo -root -tree;
-  "No" = the narrow child), NEVER click Yes (default).
-- Ledger: 15 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021 — re-derive via
-  ledger_index_check.py, don't trust counts). Keep
+- OOM LAW: NEVER read live-timeline.jsonl except r1_stream.py / <=400 KB
+  tail-scan / r214_triage.py. (6.4 GB file; t251 session OOM-killed the whole
+  tmux scope at 13.4 GB RSS.)
+- TWO-WRITER RING LAW (t266): a second dosbox-x writing the SAME ring dir
+  corrupts evidence AND freezes the game (modal-freeze class). Scratch
+  sessions ALWAYS get their own ring dir. pkill -x dosbox-x matches
+  production too (t267) — kill by recorded PID only.
+- PER-SEGMENT TRUST for V/campaign analysis (t255/t262).
+- Ring = work/r1/playcap/save/ (20 slots, 10 s cadence, ~200 s!). Bank before
+  restarts and every ~30 turns. NEVER loadstate (input-dead-on-load, t261).
+- TL LAW (t277 pending): assume TL expiry kills sessions at the configured
+  limit; production now runs TL=172800. Check r1_game_health.py BEFORE work.
+- User save game/RESUME.GAM md5 5b382afbb7891 — game writes it only at
+  in-game Save; never overwrite by hand.
+- SIGKILL softlocked dosbox (SIGTERM -> quit-confirm (Yes)-default).
+  Background shells need DISPLAY=:9. xsend refuses "warning"-titled windows.
+- Ledger: 14 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
   ledger_audit + ledger_index_check green; never hand-edit the index block.
-- OQ-005 needs the USER's index.txt ruling — do NOT burn iterations on it.
-- Do NOT re-trod: t212/t213 static exhaustion; t255 screen-open recompute
-  (REFUTED); t258 candidicide (closed negative, KEEPER r258_vdisc.py);
-  t259 sav-pair census (closed negative, KEEPER r259_savpair_census.py);
-  t249b day==turn; t254 17np identification (build on it, don't re-derive);
-  t269 threshold mining (closed negative, KEEPER r269_vthreshold.py — the
-  corpus CAN supply no threshold event; only the interactive watchpoint
-  session can, t272 prep).
-- Gate ~2-3 min; milestone: 6 must stay. work/ is gitignored — findings go in
-  docs/re/, never work/.
+- Do NOT re-trod: t212/t213 static exhaustion; t255 screen-open (REFUTED);
+  t258 candidicide (KEEPER); t259 sav-pair census (KEEPER); t262 fleet-census
+  trigger (MEASURED-DEAD); t265 st4-dwell (t193 route DEAD); t269 threshold
+  census (zero V>=25); t260/261 loadstate (GUI works, state input-dead).
+- Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in
+  docs/re/ only.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line
-  FIRST), relaunch with IDLE_GATE=1, or author a new queue.
+  FIRST) or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
 Do NOT re-open (consolidated to keep STATE scannable): t214..t243 are
 idle/adoption iterations — t243's only new content is the sentinel-slot
 harness law (S4, control-plane, not a ledger fact). t214 = the mining law
