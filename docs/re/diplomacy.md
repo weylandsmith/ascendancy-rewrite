@@ -771,3 +771,71 @@ two-party projection permanently. Rationale, each clause cited:
 Row-12 label corrected in ai-dossier.md accordingly. NO OQ ROW CLOSED
 (strict-close: the gap map is a work item; the only live-measured negative
 result here is "dormant in captured lineages", which does not close anything).
+
+## §21 — t287 SECOND-CAMPAIGN CORROBORATION + NEGSCREEN POSTURE LAW
+### + the "Extinct" row adjudicated (2026-11-03)
+
+Production :9 fresh campaign (t1086, n=4 [Chamachies, Orfa, Ungooma,
+Minions]) — a genuinely DIFFERENT lineage from t252/t253 (t1255) and t256b:
+player here holds PEACE with Orfa AND Ungooma, WAR only with row 3 (old
+campaign: war with Minions AND Ungooma). All reads READ-ONLY, zero turn
+drift, zero proposals (Goodbye-only SOP held; 15 RFB clicks, ring t=1086
+constant throughout). Screens: work/r1/t287-dip/.
+
+1. NEGSCREEN OPTION SET IS POSTURE-INVARIANT ACROSS CAMPAIGNS at
+   peace-adjacent posture: FIVE rows both seeds — Goodbye (hoisted),
+   declare-war, propose-alliance, trade-starlanes, trade-stars; PLAYERDIP
+   variance-bands IDENTICAL to t253 to the pixel: 327-341/358-367/387-396/
+   416-425/448-454, ALIENDIP band 252-262. Orfa line "Uh oh.  What's wrong
+   now?" == race02.dip:172 VERBATIM; Ungooma "How can we little Ungooma
+   help you?" == race11.dip:173 DR_NoDipResponse with %m substitution
+   re-confirmed on a new seed. Goodbye (480,334) closes directly to species
+   menu on BOTH campaigns (t252 law replicates).
+2. THE 'c' OVERLAY == WATCHER RAM, EXACT, first cross-seed pair: overlay
+   lines "0 Biorythym (Neutral) / R0 Unknown 0 / R1 Peace 600 / R2 Peace 318
+   / R3 War 318" vs watcher relation row at the same wall-minute: atts row0
+   [_,600,318,318], states row0 [0,1,1,2] (0=pre-contact cell prints
+   Unknown+0 per §20.3), RELNAMES 1=Peace 2=War per debugflags.md vendor
+   table. "STARS CONTROLLED 0" == DAT_482fb=0/50 (t256b S1 reading holds on
+   a new seed). Overlay render law MEASURED: 5 text lines at y 37-47/62-71/
+   75-84/88-97/101-110 + "STARS CONTROLLED" line y 396-402 (x<127); toggles
+   both directions (1329 px per toggle; 'c' and 'C' both arm it).
+3. "EXTINCT" ROW ADJUDICATED — the label means ELIMINATED, not a name-table
+   quirk, and clicking it CANNOT open NEGSCREEN. Evidence: (a) species-menu
+   row 3 prints "Extinct" (4x-zoom verbatim; t252 saw the same string in the
+   old campaign); static.txt:53 is a coswnd.cpp string; (b) help.txt:775
+   verbatim: "You cannot contact species which are Unknown or Extinct.";
+   (c) MEASURED: click (553,139) twice changed ONLY the row highlight
+   (4562 px bbox (474,124,633,349) vs species-menu baseline; right half
+   never becomes the negscreen layout — pixel-diff vs verified negscreen
+   200607 px) — the engine refuses contact exactly as help says; (d) RAM
+   still tracks the eliminated race: states[0][3]=2 (WAR), att 318, th row
+   present — elimination does NOT scrub the relation matrix; (e) t252's
+   INTEL census (ui-runtime.md §6b) listed rows ONLY for Chamachies/
+   Ungooma/Orfa — no Minions row — corroborating zero-presence in the OLD
+   campaign too. [inferred from (a)-(e)] the display-name slot for an
+   eliminated species is replaced by the coswnd "Extinct" string; the
+   per-race .dip name survives only in RAM tables. A vision read of a
+   dialogue line on the "Extinct" screen ("We are the last of our kind.")
+   was REFUTED by 3x zoom (no text anywhere in the strip) — kept here as a
+   hallucination warning for future adjudicators, NOT as data.
+4. Species-menu row geometry DIFFERS from t252 (rows at y≈61/100/139,
+   pitch ~39, vs ~73/140/207): the t252 "(553,73)" hit law does NOT port
+   across campaigns — always re-measure bands per sitting (consistent with
+   the state-driven layout finding §6c).
+5. INPUT LAWS FOR HOVER-ARMED MENUS (root-caused with witnesses, full
+   detail docs/re/_wip_t287.md F2/F3): SDL rejects synthetic MotionNotify,
+   so xsend warped clicks fire the STALE hovered row — witnessed: xsend
+   click (318,333) 'Return to Current Game' at the title menu OPENED THE
+   TUTORIAL SELECT (the row a VNC user had last hovered). The fix is a real
+   XTEST motion channel: scripts/r287_vncinput.py (RFB 3.3 to the local
+   x11vnc :5910; coords == X root; PointerEvent mask is the SECOND byte).
+   Keyboard does NOT drive the title-menu highlight (Down x3 = 0 px).
+   Production was recovered from this state (tutorial menu -> title ->
+   Return to Current Game via verified RFB click) with the RAM campaign
+   intact — RESUME.GAM md5 5b382afbb78918 verified untouched, no tutorial
+   ever started, zero turn drift.
+NO OQ ROW CLOSED (strict-close): every claim above corroborates already-
+closed rows (OQ-009/015/023 families) or is an input-channel law outside the
+ledger; the one genuinely new engine-behaviour measurement (#3) confirms
+help.txt verbatim and reopens nothing.

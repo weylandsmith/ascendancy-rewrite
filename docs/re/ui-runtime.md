@@ -205,7 +205,13 @@ PATH MAP (measured, ring turn 1255 held through every step, zero drift):
   (vision). Escape returns to galaxy (back2 vs baseline diff = 161 px, just
   cursor/star blink noise).
 - Clicking a race row (Orfa row at y~93) opens NEGSCREEN: right half of the
-  screen replaces the sidebar. Layout VERIFIED against windows.txt rects by
+  screen replaces the sidebar. [t287 CORRECTION: row y's are campaign-state
+  dependent — fresh t1086 campaign rows measured y 61/100/139 (pitch ~39);
+  ALWAYS re-measure bands per sitting. The third row prints "Extinct"
+  (= eliminated race, help.txt:775 contact-refused; clicking it only
+  highlights, never opens NEGSCREEN — diplomacy.md §21.3). Menu clicks MUST
+  go through scripts/r287_vncinput.py (XTEST motion; xsend warped clicks
+  fire the stale hovered row — diplomacy.md §21.5).] Layout VERIFIED against windows.txt rects by
   pixel-band analysis (bright-text row detection, z_dip_full.png):
   ALIENDIP 336,215-632,316 = alien portrait band + ONE text line (bright band
   y 252-262); PLAYERDIP 336,325-632,472 = player option list (three option

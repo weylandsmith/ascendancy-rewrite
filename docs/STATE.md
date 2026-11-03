@@ -265,20 +265,30 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t287 DIPLOMACY SECOND-CAMPAIGN CORROBORATION (queue order; t286 LANDED
-— the debugger is now a scripted instrument (scripts/r1_wp_session.py,
-positive control rc=0, laws in docs/re/dosbox-debugger.md t286 block), so
-hand-held-session blockers are gone and the diplomacy corroboration is the
-next queued row; the one open t286 probe — blind planet-list arm fired zero
-while the ring captured the refill, see docs/re/_wip_t286.md S7 — is queued
-as t286b BELOW and needs the BREAK lottery anyway). Production live at t1086
-(shipfp f4e5e715). Open ALIENDIP per race, bank disposition +
-relation-state cells vs watcher RAM rows at the same wall-second; cross-check
-the c-overlay STARS CONTROLLED line vs DAT_482fb again on a NEW campaign
-seed. READ-ONLY panels only — NEVER PROPOSE/DECLARE/ABANDON/END-TURN (t244
-abandoned a system by accident; Escape does NOT unwind PLANETALLOC, t254;
-and t285 law: NEVER Escape at the bare galaxy map). Bank to diplomacy.md as
-second-campaign corroboration (race-seed invariance test).
+NEXT t288 SOFTLOCK-CLASS FOLLOW-UP WITH THE DEBUGGER (queue order; t287
+LANDED — diplomacy corroboration banked in docs/re/diplomacy.md §21 with the
+"Extinct" row adjudicated and a new XTEST input channel scripts/r287_vncinput.
+py in hand; t286b stays queued below — it is a narrow re-probe with no
+dependency, run it any iteration the BREAK lottery is wanted anyway). The
+softlock class is characterized (t266: modal-freeze from a second writer;
+t261: input-dead ON LOAD, i.e. the save captured the frozen state) but the
+ENGINE state that makes input dead is still unnamed. Use
+scripts/r1_wp_session.py (t286 instrument; BREAK lottery = relaunch loop
+until 'armed:') against a SOFTLOCKED SCRATCH session — bring one up per
+docs/re/selfplay.md t260/t261 laws (GUI window, loadstate from a scratch
+copy of bank-t251-live1255 slot 60, own ring dir, NEVER the production ring,
+NEVER production :9) — break in, and dump the input-callback queue / the
+game's own input flag rather than guessing. Bank to selfplay.md §7 + flag
+anything that changes the drive SOP.
+
+SESSION-START SCREEN CHECK (t287 law, do this BEFORE any other probe): a VNC
+user may leave production on ANY screen (this session found the tutorial
+select menu open). Verify the screen with `DISPLAY=:9 import -window root` +
+vision BEFORE trusting ring rows (ring is blind off-campaign, t285). If off-
+campaign: recover via r287_vncinput.py move + highlight-verified click on
+'Return to Current Game' (title menu row 4, center (318,333)); NEVER xsend-
+click menus (stale-hover law, diplomacy.md §21.5). Production parked NOW at
+galaxy map t1086 (shipfp f4e5e715), overlay OFF, pid 660167 alive.
 
 DRIVE-CLASS PRECONDITION (t285 law, docs/re/driver-selfharm-t285.md — applies
 to EVERY future drive row incl. any V>=25 re-drive): the driver must (1) detect
@@ -319,16 +329,6 @@ t286b PLANET-LIST WRITER RE-PROBE (one t286 follow-up; needs nothing new):
   writer EIP (map via EIP-(B-0x88)); repeated zero = BPLM blind-heap arms are
   unreliable on this build -> bank that negative and the t249 widget-chain
   subitem stays watchpoint-open.
-
-t287 DIPLOMACY SECOND-CAMPAIGN CORROBORATION (t279, now released): production
-  live at t1086 fresh campaign; the t273 release conditions (no VNC client +
-  production lineage) are superseded by the user's "don't worry about a VNC
-  grabbing the session". Open ALIENDIP per race, bank disposition +
-  relation-state cells vs watcher RAM rows at the same wall-second; cross-check
-  the c-overlay STARS CONTROLLED line vs DAT_482fb again on a NEW campaign seed.
-  READ-ONLY panels only — NEVER PROPOSE/DECLARE/ABANDON/END-TURN (t244 abandoned
-  a system by accident; Escape does NOT unwind PLANETALLOC, t254). Bank to
-  diplomacy.md as second-campaign corroboration (race-seed invariance test).
 
 t288 SOFTLOCK-CLASS FOLLOW-UP WITH THE DEBUGGER (needs t282/283): the class is
   characterized (t266: modal-freeze from a second writer; t261: input-dead
@@ -397,6 +397,35 @@ negatives (zero referencing instructions / slot-count semantics) — the
 watchpoint-class question in that thread is the t249 widget chain. Gate TBD
 below; production :9 untouched (scratch game-wp + own ring + Xvfb :97 only).
 NEXT=t287.
+
+LANDED t287 (2026-11-03): DIPLOMACY SECOND-CAMPAIGN CORROBORATION BANKED +
+"EXTINCT" ROW ADJUDICATED + XTEST INPUT CHANNEL (docs/re/diplomacy.md §21 +
+_wip_t287.md F1-F8; NO OQ closed — strict-close honoured, ledger 15/4
+unchanged, no ledger row touched). (1) PRODUCTION FOUND OFF-CAMPAIGN (VNC
+user left the tutorial SELECT menu open; ring blind there per t285) and
+RECOVERED to galaxy map t1086 with the RAM campaign intact (RESUME.GAM md5
+5b382afb verified, no tutorial started, zero turn drift). (2) NEW INPUT LAW,
+root-caused: SDL rejects synthetic MotionNotify -> xsend warped clicks fire
+the STALE HOVERED row (witness: click (318,333) 'Return to Current Game'
+opened the TUTORIAL SELECT); fix = scripts/r287_vncinput.py RFB 3.3 client
+to local x11vnc :5910 -> XTEST (3.8+4-byte-selection RESETS this build;
+PointerEvent mask = SECOND byte; coords == X root; keyboard does NOT drive
+title-menu highlight). (3) NEGSCREEN corroborated on the fresh seed: 5-row
+posture set + pixel-IDENTICAL PLAYERDIP bands vs t253 (327-341/358-367/
+387-396/416-425/448-454); race02.dip:172 + race11.dip:173 verbatim (%m);
+Goodbye (480,334) closes to species menu both campaigns. (4) 'c' OVERLAY ==
+WATCHER RAM EXACT cross-seed: R0-R3 lines vs atts/states row0 ([_,600,318,
+318] / [0,1,1,2]); "STARS CONTROLLED 0" == DAT_482fb=0/50; render bands
+measured (5 lines y37-110 + stars line y396-402, toggles both ways 1329 px).
+(5) "Extinct" row = ELIMINATED race: help.txt:775 contact-refusal CONFIRMED
+BY MEASUREMENT (two clicks -> highlight only, 4562 px, right half never
+becomes negscreen) while RAM keeps states[0][3]=2 WAR att 318 — elimination
+does not scrub the matrix; t252 INTEL had no Minions row either. VISION
+HALLUCINATION banked as a warning (invented dialogue line refuted by 3x
+zoom). (6) Species-row y's are campaign-dependent (61/100/139 here vs t252
+73/140/207) — re-measure per sitting (ui-runtime.md §6b corrected). All 15
+clicks READ-ONLY, zero proposals/declares, parked at galaxy t1086 overlay
+OFF. NEXT=t288.
 
 LANDED t285 (2026-11-03): DRIVE SELF-HARM ROOT-CAUSED WITH WITNESSES — ESCAPE
 AT THE GALAXY MAP EXITS TO THE TITLE MENU; RING GUARDS ARE BLIND THERE; THE
