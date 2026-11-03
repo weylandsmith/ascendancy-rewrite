@@ -251,3 +251,39 @@ times at +2.1 s (00 -> 69 in run -232655, 00 -> 94 in the --disp 93 rerun; the
 value is the tick count, so it differs by wall-clock). BREAK survived both.
 Status: ACCEPTED 3/3, FIRED 2/2 with settle, BREAK aborted 1/2 without settle.
 The instrument is real. t283 is unblocked.
+
+## t286 GENERAL INSTRUMENT — scripts/r1_wp_session.py (ACCEPTED, positive control rc=0)
+Scripted hunt harness (targets data:OFF / lin:ADDR / heap-planets /
+heap-planets-blind; phases quiet,c,turn,planets,reopen; --walk N per-fire
+EIP; --expect-base determinism guard; blind target + --break-early).
+Positive control run work/r1/wp-lin-0x46C-20261103-080919: title BREAK ->
+arm BPLM 0000046C -> RUN -> boot fires drained -> campaign ENTER -> quiet
+phase fire +2.0 s -> registers banked, rc=0. LAWS (all measured, 11 runs):
+1. BPLM SURVIVES save-state restore + campaign load: a bp armed at the title
+   screen fires post-load. t283's post-load re-arm was a workaround, not a
+   law. Paging off at fire (cr0=10, cr3=0) => linear==physical.
+2. BREAK survival is a per-attempt LOTTERY at any screen (title died run 9,
+   lived 10/11; post-load lived 1,4 died 3,5,6,7 — all with 45 s settle).
+   SOP = relaunch loop until 'armed:' in the session log. The tell of a
+   lethal BREAK: REQ n BREAK echoed in pty, then stream ends, socket EPIPE.
+3. --no-break is DEAD: EXEC BPLM arms and BPLIST lists it without BREAK, the
+   watched event genuinely happens (ring-captured), ZERO fire lines. The
+   fire path requires the BREAK-enabled debugger (t282 claim confirmed by
+   negative arm).
+4. Early-armed fires print with a '(Running)' prefix on the pty; FIRE_RE
+   still matches. MEMDUMPBIN at title-arm returns hdr OK but NO file =>
+   byte-at-arm unknown in break-early mode (artifact rejection off; drain
+   boot fires instead).
+5. Clicks are verified by ring/screen evidence, never xsend rc (a click 1 s
+   after the ENTER reaction can be swallowed mid-load; retry loop until the
+   target signature appears). Sidebar sidebar buttons DRILL IN (list ->
+   planet detail), they are not open/close toggles; a 'reopen' must click a
+   neutral starmap spot first.
+6. Deterministic heap: planet-list object lands at linear 0xfda074 in EVERY
+   session at base 0x1bf4d8 (4 independent sightings); the loaded campaign
+   carries NO sig object; ring slots 57/59 of run 10 captured the
+   reset(count=0,stamp 0xe) -> refill(count=80,stamp 0x8d) transition live.
+OPEN PUZZLE (honest negative): run 10 armed blind at 0xfda93b, the refill
+happened (ring evidence above), control flow identical to run 11 — yet zero
+fires. Planet-list writer EIP still unwitnessed; see _wip_t286.md S6/S7 for
+the candidate readings and the proposed next probe.

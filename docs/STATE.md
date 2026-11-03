@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-03T05:55
+updated: 2026-11-03T08:25
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -265,22 +265,20 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t286 MCP/PTY DEBUGGER AS A GENERAL INSTRUMENT (queue order; t285 LANDED —
-the drive leg self-harmed on the softlock class and the harvest leg delivered
-honest negatives, so the V>=25 ask returns to the drive queue REQUIRING the
-hardened driver below; ordering vs t287: the debugger is offline-safe while the
-drive class keeps hitting the t285/t261 bug class every ~6-16 presses, and
-characterising that class with the debugger is t288 — build the instrument
-first). Script scripts/r1_wp_session.py so OTHER writer questions can be hunted
-without hand-held sessions: u16@data 0x131b4 (the maintained "Planets Occupied"
-snapshot, t249 residue), star byte +0x5a (colonised-planet count, t247 law —
-writer unmapped), the PLANETALLOC getter chain 147/149/151/152/153
-(selfplay.md) to confirm the header format-string law at runtime. Each hunt =
-one scratch session (work/r1/game-wp scratch tree, OWN ring dir — two-writer
-law), one address, one captured EIP. Use scripts/r1_t283_wp_session.py as the
-template (settle laws banked there: 45 s post-load settle, ONE bp, BPLM fires
-+3.1 s after NEXTTURN). Bank results to the relevant docs/re/*.md; a scratch
-negative is still a result.
+NEXT t287 DIPLOMACY SECOND-CAMPAIGN CORROBORATION (queue order; t286 LANDED
+— the debugger is now a scripted instrument (scripts/r1_wp_session.py,
+positive control rc=0, laws in docs/re/dosbox-debugger.md t286 block), so
+hand-held-session blockers are gone and the diplomacy corroboration is the
+next queued row; the one open t286 probe — blind planet-list arm fired zero
+while the ring captured the refill, see docs/re/_wip_t286.md S7 — is queued
+as t286b BELOW and needs the BREAK lottery anyway). Production live at t1086
+(shipfp f4e5e715). Open ALIENDIP per race, bank disposition +
+relation-state cells vs watcher RAM rows at the same wall-second; cross-check
+the c-overlay STARS CONTROLLED line vs DAT_482fb again on a NEW campaign
+seed. READ-ONLY panels only — NEVER PROPOSE/DECLARE/ABANDON/END-TURN (t244
+abandoned a system by accident; Escape does NOT unwind PLANETALLOC, t254;
+and t285 law: NEVER Escape at the bare galaxy map). Bank to diplomacy.md as
+second-campaign corroboration (race-seed invariance test).
 
 DRIVE-CLASS PRECONDITION (t285 law, docs/re/driver-selfharm-t285.md — applies
 to EVERY future drive row incl. any V>=25 re-drive): the driver must (1) detect
@@ -311,14 +309,16 @@ preserved as RESUME.GAM.tutorial-nov2 for archaeology only).
 QUEUE (phase 4, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
 
-t286 MCP/PTY DEBUGGER AS A GENERAL INSTRUMENT (needs t282): once one watchpoint
-  flow works, script it (scripts/r1_wp_session.py) so OTHER writer questions can
-  be hunted without hand-held sessions: u16@data 0x131b4 (the maintained
-  "Planets Occupied" snapshot, t249 residue), star byte +0x5a (colonised-planet
-  count, t247 law — writer unmapped), the PLANETALLOC getter chain 147/149/151/
-  152/153 (selfplay.md) to confirm the header format-string law at runtime.
-  Each hunt = one scratch session, one address, one captured EIP. Bank results
-  to the relevant docs/re/*.md; a scratch negative is still a result.
+t286b PLANET-LIST WRITER RE-PROBE (one t286 follow-up; needs nothing new):
+  rerun scripts/r1_wp_session.py --target heap-planets-blind --expect-base
+  0x1bf4d8 --break-early --phases quiet,reopen inside the relaunch loop
+  (retry until 'armed:' — BREAK lottery ~50%) 2-3 attempts; grep pty for ANY
+  'Memory breakpoint' beyond the arm/BPLIST echoes. Run 10 saw the refill in
+  the ring with the bp armed and ZERO fires while run 11's tick control fired
+  in the identical flow (_wip_t286 S6/S7 candidate readings). A fire = the
+  writer EIP (map via EIP-(B-0x88)); repeated zero = BPLM blind-heap arms are
+  unreliable on this build -> bank that negative and the t249 widget-chain
+  subitem stays watchpoint-open.
 
 t287 DIPLOMACY SECOND-CAMPAIGN CORROBORATION (t279, now released): production
   live at t1086 fresh campaign; the t273 release conditions (no VNC client +
@@ -368,6 +368,35 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
   or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
+
+LANDED t286 (2026-11-03): THE WATCHPOINT IS NOW A SCRIPTED INSTRUMENT —
+scripts/r1_wp_session.py POSITIVE CONTROL rc=0 (work/r1/wp-lin-0x46C-
+20261103-080919: title BREAK -> BPLM 0000046C -> RUN -> boot fires drained ->
+campaign ENTER -> quiet-phase fire +2.0 s -> registers banked). NO OQ closed
+(strict-close honoured; ledger 15/4 unchanged — no ledger row was touched;
+the open subitem is t249's planet-list widget chain, docs/re/_wip_t286.md +
+laws in docs/re/dosbox-debugger.md t286 block). 11 runs delivered: (1) BPLM
+SURVIVES save-state restore + campaign load — t283's post-load re-arm was a
+workaround, not a law; paging off at fire (cr0=10) confirms linear==physical.
+(2) BREAK survival is a per-attempt LOTTERY at ANY screen (title died run 9,
+lived 10/11; post-load lived 1/4, died 3/5/6/7 — all with 45 s settle); SOP =
+relaunch loop until 'armed:' in the log. (3) --no-break DEAD: arms fine,
+event happens (ring-captured), zero fire lines — the fire path REQUIRES the
+BREAK-enabled debugger (t282 confirmed by negative arm). (4) Deterministic
+heap: planet-list object ALWAYS at linear 0xfda074 at B=0x1bf4d8 (4
+sightings); loaded campaign carries NO sig object; run-10 ring slots 57->59
+captured the reset(count 0,stamp 0xe)->refill(count 80,stamp 0x8d) transition
+LIVE between reopen clicks — the t249 law witnessed at runtime for the first
+time. (5) HONEST NEGATIVE: that refill produced ZERO fires while the identical
+flow's tick control fired — planet-list writer EIP still unwitnessed; blind-
+heap BPLM reliability is the open question -> t286b re-probe queued. (6) UI
+laws: clicks verified by ring/screen evidence never xsend rc; sidebar buttons
+DRILL IN (not toggles) — reopen needs a neutral-map click first. Assignment
+corrections applied BEFORE building: 0x131b4 and star +0x5a are closed
+negatives (zero referencing instructions / slot-count semantics) — the
+watchpoint-class question in that thread is the t249 widget chain. Gate TBD
+below; production :9 untouched (scratch game-wp + own ring + Xvfb :97 only).
+NEXT=t287.
 
 LANDED t285 (2026-11-03): DRIVE SELF-HARM ROOT-CAUSED WITH WITNESSES — ESCAPE
 AT THE GALAXY MAP EXITS TO THE TITLE MENU; RING GUARDS ARE BLIND THERE; THE
