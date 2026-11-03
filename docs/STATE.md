@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-03T11:15
+updated: 2026-11-03T12:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -183,6 +183,9 @@ ledger:
 - R1 save-state capture LIVE: scripts/r1_savestate.sh (boot -> autosave ZIP,
   full guest RAM) + scripts/r1_sav_scan.py (per-run base B, NEVER hard-code;
   member = physical + H, H=136 for dosbox-x 2025.02.01, re-derive per build).
+  OFF-BY-H DISCIPLINE (t286b, cost a full t286 thread): anything found BY A
+  MEMBER SCAN is a member index — convert (-0x88) before feeding BPLM,
+  pointer comparisons, or any linear-address consumer.
 - Deep capture LIVE: scripts/r1_deepcapture.sh (title -> New Game clicks
   318,293 then (511,67) cadence, needle-gated); campaign start proven
   byte-wise (scripts/r1_campaign_probe.py); planet records resume.gam<->RAM
@@ -265,23 +268,30 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t286b PLANET-LIST WRITER RE-PROBE (queue order: zero new prerequisites,
-and it is the one iteration type that exercises the BREAK lottery anyway —
-t288 LANDED below closed the debugger-on-restored-state route, which does NOT
-constrain this target: heap-planets-blind arms at the TITLE screen and enters
-via RESUME.GAM, never loadstate). Rerun scripts/r1_wp_session.py --target
-heap-planets-blind --expect-base 0x1bf4d8 --break-early --phases quiet,reopen
-inside the relaunch loop (retry until 'armed:' in the session log — BREAK
-lottery ~50%, t286 law 2) 2-3 attempts; grep pty for ANY 'Memory breakpoint'
-beyond the arm/BPLIST echoes. Run 10 saw the refill in the ring with the bp
-armed and ZERO fires while run 11's tick control fired in the identical flow
-(_wip_t286 S6/S7 candidate readings). A fire = the writer EIP (map via
-EIP-(B-0x88)); repeated zero = BPLM blind-heap arms are unreliable on this
-build -> bank that negative and the t249 widget-chain subitem stays
-watchpoint-open. THEN (next session) the drive-class V>=25 row: t288 handed it
-the RAM liveness needle (inject 'c', expect data:0x484c6==0x63 next slot —
-selfplay.md t288) which satisfies the t266-§4 requirement the pixel probe
-failed; wire the needle into the driver before resuming the drive from t1086.
+NEXT t289 WIRE THE RAM LIVENESS NEEDLE INTO THE DRIVER, THEN V>=25 RE-DRIVE
+(queue is drained; ordering rationale: this is the ONLY remaining route to the
+OQ-021 threshold residue — t273 leg B and t262 both measured ZERO V>=25 rows
+in the corpus, and the t288 needle (inject 'c', expect data:0x484c6==0x63 in
+the NEXT ring slot; r288_input_census.py proves the globals ride every slot's
+Memory member) is exactly the non-pixel liveness channel t266 §4 demanded,
+which the pixel probe failed; the watchpoint class cannot reach the threshold
+question anyway — the producer is closed, the comparator needs a witnessed
+V>=25 end-turn pass). Steps: (1) PATCH scripts/r1_t261_drive.py: after every
+press AND after every drain, run the needle (xsend key 'c', wait next slot,
+read data:0x484c6 via r1_sav_scan base + member off-by-H law
+mem[B+0x82bb0+0x484c6]; expect 0x63 — a frozen pair (1,0x1b) shape means
+SOFTLOCK-CLASS: bank, screenshot, SIGKILL recorded pid, STOP per t285
+precondition; note the needle's own 'c' toggles the overlay — harmless in
+self-play, record honestly); (2) satisfy the DRIVE-CLASS PRECONDITION block
+below verbatim (screen-based title-menu detection BEFORE any click, 2
+no-advances = STOP-AND-LOOK, never Escape at the map); (3) verify production
+screen + health at session start (t287 law — done this session at 11:24:
+galaxy t1086, pid 660167 HEALTHY, TL expiry Nov-05 05:26, ring fresh; re-verify
+anyway); (4) drive from t1086 toward V>=25 with banks every ~30 turns, harvest
+with r273_harvest + r284_vreplay mine-check; a V>=25 end-turn row feeds the
+OQ-021 comparator question directly. If softlock-class recurs before V>=25,
+bank the bank+needle trace and keep the row open — do NOT retry-spiral (max 1
+relaunch+resume per session).
 
 SESSION-START SCREEN CHECK (t287 law, do this BEFORE any other probe): a VNC
 user may leave production on ANY screen. Verify with `DISPLAY=:9 import
@@ -289,7 +299,8 @@ user may leave production on ANY screen. Verify with `DISPLAY=:9 import
 t285). If off-campaign: recover via r287_vncinput.py move + highlight-verified
 click on 'Return to Current Game' (title menu row 4, center (318,333)); NEVER
 xsend-click menus (stale-hover law, diplomacy.md §21.5). Production verified
-this session at galaxy map t1086 (10:56 vision), pid 660167 alive, overlay OFF.
+this session at galaxy map t1086 (11:24 vision), pid 660167 alive, ring fresh
+(52.sav age 3 s), HEALTHY.
 
 DRIVE-CLASS PRECONDITION (t285 law, docs/re/driver-selfharm-t285.md — applies
 to EVERY future drive row incl. any V>=25 re-drive): the driver must (1) detect
@@ -319,17 +330,7 @@ preserved as RESUME.GAM.tutorial-nov2 for archaeology only).
 
 QUEUE (phase 4, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t286b PLANET-LIST WRITER RE-PROBE (one t286 follow-up; needs nothing new):
-  rerun scripts/r1_wp_session.py --target heap-planets-blind --expect-base
-  0x1bf4d8 --break-early --phases quiet,reopen inside the relaunch loop
-  (retry until 'armed:' — BREAK lottery ~50%) 2-3 attempts; grep pty for ANY
-  'Memory breakpoint' beyond the arm/BPLIST echoes. Run 10 saw the refill in
-  the ring with the bp armed and ZERO fires while run 11's tick control fired
-  in the identical flow (_wip_t286 S6/S7 candidate readings). A fire = the
-  writer EIP (map via EIP-(B-0x88)); repeated zero = BPLM blind-heap arms are
-  unreliable on this build -> bank that negative and the t249 widget-chain
-  subitem stays watchpoint-open.
+(t286b DONE 2026-11-03 — queue drained; NEXT above is the after-drains task)
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - OOM LAW: NEVER read live-timeline.jsonl except r1_stream.py / <=400 KB
@@ -361,6 +362,43 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
   or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
+
+LANDED t286b (2026-11-03): THE PLANET-LIST WRITER IS WITNESSED — t286's
+honest negative was an OFF-BY-H IN OUR OWN TARGET RESOLVER, and the corrected
+blind-heap arm FIRED on attempt 1 (docs/re/_wip_t286b.md S1-S5 +
+dosbox-debugger.md t286b block + _wip_t249.md amendment; NO ledger row moved
+— the widget chain is t249's work-doc subitem, ledger 15/4 strict-close).
+(1) ROOT CAUSE [verified]: sig_hits returns a RING-MEMBER index; the resolver
+fed it to BPLM as a LINEAR — every t286 heap arm sat 0x88 too high. Smoking
+gun in run 10's OWN ring-final: the corrected watch byte reads 0->80 across
+the refill boundary (slots 58/59); the byte the wrong arm watched is 0 in ALL
+20 slots (dead). Self-proof of -0x88: RAM u32 0xfd9fec stored at member
+0xfda067 (pointer law: target byte = P+0x88; 0xfd9fec+0x88 = the sig match —
+the widget's list pointer points AT the object; linear = 0xfd9fec).
+(2) THE FIRE (work/r1/wp-heap-planets-blind-20261103-114454 rc=0, scripts/
+r286b_relaunch.sh wrapper): blind BPLM 00FDA8B3 at the title, campaign ENTER,
+reopen phase 'Memory breakpoint : 0000:FDA8B3 - 00 -> 01' 2 s after the
+Planets click; stopped frame EIP 1f231f = FILE 0x32ecf, pty operand panel
+names the byte ('mov ax,[ebp+000008C7] ss:[00FDA8B3]=0001') and EBP=00FD9FEC
+(law self-confirming); WRITER = the list-ADD increment at file 0x32eb6
+(FUN_00032d1c) — t249's static census prediction verbatim; EBX=1 = the
+incremented count. BPLM blind-heap arms RELIABLE on this build; t286's
+'check misses the write path' / 'fire path dies post-restore' candidates DEAD.
+(3) NEW INSTRUMENT LAW 7: the store does NOT stop the CPU — the fire prints
+at the first LATER ACCESS with the post-store value (witnesses t283
+0x243a8/0x243b3, t286b 0x32eb6/0x32ecf); the reported EIP may be a READER,
+scan BACK for the last storing instruction. Corollary: the ring freezes at
+the last autosave BEFORE a fire, so ring stack dumps around fires are stale.
+(4) CALLER CHAIN honestly graded [inferred]: FUN_00051834 populator ->
+FUN_00055df4 -> FUN_00056e10 -> FUN_00056890 -> FUN_00056ca4 (vtable slot 8
+= the list-ADD virtual) -> FUN_00032d1c — stale-stack + adjacent-call
+evidence, not a live unwind; a --walk EV-esp re-run could complete it but the
+writer-site law doesn't depend on it. Honest residues: 1->80 tail unwitnessed
+(CPU stopped at first add, nothing lost — the count IS the law); quiet phase
+zero fires as designed. Production :9 untouched (pid 660167 HEALTHY, scratch
+game-wp + own ring + Xvfb :97, kill-by-recorded-PID teardown in session.log).
+Gate 0, LEDGER AUDIT OK, LEDGER INDEX OK. NEXT=t289 (needle->driver then
+V>=25 re-drive; authored inline in NEXT ACTION).
 
 LANDED t286 (2026-11-03): THE WATCHPOINT IS NOW A SCRIPTED INSTRUMENT —
 scripts/r1_wp_session.py POSITIVE CONTROL rc=0 (work/r1/wp-lin-0x46C-

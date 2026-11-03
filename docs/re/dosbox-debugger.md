@@ -279,11 +279,46 @@ phase fire +2.0 s -> registers banked, rc=0. LAWS (all measured, 11 runs):
    target signature appears). Sidebar sidebar buttons DRILL IN (list ->
    planet detail), they are not open/close toggles; a 'reopen' must click a
    neutral starmap spot first.
-6. Deterministic heap: planet-list object lands at linear 0xfda074 in EVERY
-   session at base 0x1bf4d8 (4 independent sightings); the loaded campaign
-   carries NO sig object; ring slots 57/59 of run 10 captured the
+6. Deterministic heap: the planet-list object's RING-MEMBER index lands at
+   0xfda074 in EVERY session at base 0x1bf4d8 (4 independent sightings),
+   i.e. guest-LINEAR 0xfd9fec (off-by-H: linear == member - 0x88; t286b
+   correction — t286's "linear 0xfda074" mislabelled a member index and
+   every t286 heap arm sat 0x88 too high); the loaded campaign carries NO
+   sig object; ring slots 57/59 of run 10 captured the
    reset(count=0,stamp 0xe) -> refill(count=80,stamp 0x8d) transition live.
-OPEN PUZZLE (honest negative): run 10 armed blind at 0xfda93b, the refill
-happened (ring evidence above), control flow identical to run 11 — yet zero
-fires. Planet-list writer EIP still unwitnessed; see _wip_t286.md S6/S7 for
-the candidate readings and the proposed next probe.
+7. FIRE-TIMING: the store does NOT stop the CPU; the heavy check fires at the
+   first LATER memory access to the watched byte and prints the post-store
+   value (2 witnesses: t283 store 0x243a8/fire 0x243b3; t286b store
+   0x32eb6/fire 0x32ecf). The reported EIP may be a READER — identify the
+   writer as the last storing instruction BEFORE the reported EIP that
+   touches the watched offset.
+RESOLVED t286b (was the OPEN PUZZLE above): run 10's zero-fires were the
+off-by-H bug of law 6 — it armed linear 0xfda93b = member 0xfda9c3, a byte
+that is 0 in all 20 of run 10's own ring slots (dead). With the corrected
+blind arm 0xfda8b3, attempt 1 of the re-probe FIRED '00 -> 01' 2 s after the
+Planets-button click; writer = the list-add increment at file 0x32eb6
+(FUN_00032d1c), matching t249's static census. BPLM blind-heap arms are
+RELIABLE on this build. Full account: docs/re/_wip_t286b.md.
+
+## t286b BLIND-HEAP WATCHPOINT POSITIVE — THE PLANET-LIST WRITER IS WITNESSED
+work/r1/wp-heap-planets-blind-20261103-114454 rc=0, first armed attempt
+(scripts/r286b_relaunch.sh wraps the BREAK lottery). Arm BPLM 00FDA8B3 at the
+title screen (blind, --expect-base 0x1bf4d8), RUN, enter campaign, reopen
+phase: fire 'Memory breakpoint : 0000:FDA8B3 - 00 -> 01'. Stopped frame:
+EIP 1f231f (= file 0x32ecf, a READ of [ebp+0x8c7] per law 7), ESP 2e8b94,
+EBX 1 (the incremented count), pty operand panel names the watched byte
+('ss:[00FDA8B3]=0001') and EBP 00FD9FEC (the object linear — law 6
+self-confirming). Writer site FILE 0x32eb6:
+`mov bx,[ebp+0x8c7]; inc ebx; mov [ebp+0x8c7],bx` — the generic scrollable-
+list ADD (FUN_00032d1c), the t249 S1 static prediction verbatim.
+CALLER CHAIN [inferred, honestly graded — see _wip_t286b S4]: populator
+FUN_00051834 -> FUN_00055df4 -> FUN_00056e10 -> FUN_00056890 -> FUN_00056ca4
+(vtable-slot-8 call `mov esi,[eax+0xa7]; call [esi+0x8]` = the list-ADD
+virtual) -> FUN_00032d1c. Evidence = stale-stack return-address-shaped words
+(slot 54 predates the fire) + adjacent-call disasm; NOT a live unwind.
+PRACTICAL LAWS: (1) ALWAYS convert member-index findings to linear (-0x88)
+before BPLM — the silent-miss class this whole t286 thread was; (2) the ring
+freezes at the LAST autosave before a fire (CPU stopped; no more saves), so
+ring-based stack dumps around a fire are stale — bank registers via EV over
+the socket instead; (3) a blind free-heap arm (byte 0 at arm) has no
+baseline artifact and its first fire IS the first write.

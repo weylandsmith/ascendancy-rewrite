@@ -1,4 +1,9 @@
 # t286 WIP — MCP/PTY DEBUGGER AS A GENERAL INSTRUMENT (running notes)
+# RESOLVED t286b (2026-11-03): the S6/S7 zero-fire puzzle was an OFF-BY-H in
+# resolve_target (member index fed to BPLM as a linear). Corrected arm FIRED
+# on attempt 1; writer = file 0x32eb6 (FUN_00032d1c list-ADD). See
+# docs/re/_wip_t286b.md + docs/REFUTED-ROUTES.md t286b. The candidate
+# readings in S6/S7 below are SUPERSEDED, kept for provenance.
 
 ## S0 TASK SHAPE (from STATE.md NEXT ACTION)
 Script scripts/r1_wp_session.py so OTHER writer questions can be hunted

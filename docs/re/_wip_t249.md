@@ -69,6 +69,15 @@
   member; ditto widget guess. [inferred] the widget that held it was freed /
   its slot zeroed by screen close; OBJ survives in heap as the last-open
   snapshot. Open subitem: exact widget chain (needs live watchpoint, t250+).
+  CLOSED t286b: the zero-u32 law re-reads correctly once the off-by-H is
+  fixed — pointers are PHYSICAL, so the widget holds 0xfd9fec (= member
+  0xfda074 - 0x88), and a scan for 0xfda074 was searching for a value 0x88
+  off (slot 59 of a fresh session RAM holds u32 0xfd9fec AT member 0xfda067,
+  witnessed). Live blind watchpoint fired on the refill's first add
+  (writer file 0x32eb6, FUN_00032d1c list-ADD); candidate dispatch chain
+  FUN_00051834 -> FUN_00055df4 -> FUN_00056e10 -> FUN_00056890 ->
+  FUN_00056ca4 (vtable slot 8) -> FUN_00032d1c, honestly graded in
+  docs/re/_wip_t286b.md S4 + dosbox-debugger.md t286b block.
 - LEG (c) CLOSED-ISH: disp32 scan of code range [0x14bb0,0x82bb0) of
   work/ascend_restored.bin for 0x131b4: ZERO sites. 0x131b4 sits INSIDE the
   race-block array region (race blk1 intra-offset 0x1ac) — a per-race stat

@@ -420,3 +420,20 @@ work. Route that WORKS for the input-global questions: release /usr/bin/dosbox-x
 globals (scripts/r288_softlock_probe.py, docs/re/selfplay.md t288). Writer-EIP
 ambitions on restored states need a DIFFERENT instrument (e.g. same-version dbg
 build), not this binary.
+
+## t286b — A RING-MEMBER INDEX FED TO BPLM AS A LINEAR IS ALWAYS THE WRONG BYTE
+Measured 2026-11-03: t286's entire zero-fire thread (runs 1/4/10, incl. the
+run-10 "refill happened in the ring, bp armed, zero fires" puzzle) was ONE
+bug: sig_hits/pointer scans over a save-zip Memory member return MEMBER
+indices; guest-linear == member - 0x88 (H). Arming the member index watches a
+byte 0x88 too high — run 10's armed byte is 0 in all 20 of its own slots
+(dead byte, unfireable by construction), while the corrected byte flipped
+0->80 across the observed refill. SILENT by nature (arm succeeds, BPLIST
+lists it, nothing errors). DEAD: (a) any BPLM/linear consumer fed a
+member-scan finding without -0x88; (b) the t286 candidate readings "BPLM
+blind-heap arms unreliable", "the write path escapes the heavy check", "the
+fire path dies post-restore" — all SUPERSEDED by the corrected positive
+(wp-heap-planets-blind-20261103-114454 fired on attempt 1). Related trap: the
+ring FREEZES at the last autosave before a fire (CPU stopped), so stack dumps
+read from the ring around a fire are STALE — bank registers via EV over the
+socket. Full account docs/re/_wip_t286b.md + dosbox-debugger.md t286b.

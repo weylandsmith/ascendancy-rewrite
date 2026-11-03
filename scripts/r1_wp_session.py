@@ -274,22 +274,34 @@ def resolve_target(spec, B, mem, out, log):
             return None, f"expected exactly 1 planet-list object, got {hits}", None
         o = hits[0]
         cnt = struct.unpack_from("<H", mem, o + 0x8c7)[0]
-        return o + 0x8c7, f"planet-list OBJ={o:#x} count={cnt}", cnt & 0xFF
+        # OFF-BY-H FIX LAW (t286b MEASURED): sig_hits returns a RING-MEMBER
+        # index; BPLM wants guest-LINEAR. linear == physical == member - 0x88
+        # (pointer law CLOSED; self-proof: the widget's own +0xab slot holds
+        # u32 0xfd9fec == 0xfda067-0x88 pointing at the object). The old
+        # member-index form armed 0x88 too high and missed silently.
+        return o - H + 0x8c7, f"planet-list OBJ={o:#x} count={cnt}", cnt & 0xFF
     if spec == "heap-planets-blind":
-        # BLIND-ARM LAW (runs 1-6 MEASURED): the planet-list object lands at
-        # linear 0xfda074 EVERY session at this base (3/3 sig hits + t249's
-        # production and t1254's bank — same address everywhere), and the
-        # loaded campaign carries NO sig object (runs 2/3/4/5/6 PRE-ARM 0
-        # hits), so the slot byte is free-heap at arm time: baseline 0, no
+        # BLIND-ARM LAW (runs 1-6 MEASURED, CORRECTED t286b): the planet-list
+        # object's RING-MEMBER index lands at 0xfda074 EVERY session at this
+        # base (3/3 sig hits + t249's production and t1254's bank), i.e.
+        # guest-LINEAR 0xfda074-0x88 = 0xfd9fec (off-by-H law; self-proof:
+        # RAM u32 0xfd9fec stored at member 0xfda067 == 0xfd9fec+0x88, the
+        # widget's list pointer). t286 run 10 armed the MEMBER index
+        # 0xfda93b as a linear — 0x88 too high, silently missing every
+        # refill write; that, not BPLM unreliability, is the run-10 zero.
+        # The loaded campaign carries NO sig object (runs 2/3/4/5/6 PRE-ARM
+        # 0 hits), so the slot byte is free-heap at arm time: baseline 0, no
         # '00 -> xx' artifact possible, and the FIRST fire IS the first
         # write — the open-click's alloc/zero/add path. Arming after the
         # object exists (runs 1/4) watches an orphan the UI never re-reads
-        # (zero fires incl. reads). GUARD: only valid at --expect-base.
-        o = 0xfda074
-        val = mem[o + 0x8c7] if mem is not None else None
+        # (zero fires incl. reads — ALSO suspect the off-by-H now). GUARD:
+        # only valid at --expect-base.
+        o = 0xfda074 - H          # guest-linear base of the object
+        # value read stays MEMBER-indexed (mem is the raw Memory member):
+        val = mem[0xfda074 + 0x8c7] if mem is not None else None
         return (o + 0x8c7,
-                "blind deterministic planet-list slot (valid only at "
-                "expect-base)", val)
+                "blind deterministic planet-list slot, linear = member-0x88 "
+                "(valid only at expect-base)", val)
     return None, f"unknown target spec {spec!r}", None
 
 
