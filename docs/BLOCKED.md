@@ -483,6 +483,19 @@ new capture or a user decision (see the decision surface in docs/STATE.md).
 ##     End-Turn. This is the FIRST instrument that can see the runtime-computed
 ##     store address t212 proved exists. Requires the user's OK to run a
 ##     modified dosbox-x against the scratch copy (game/ untouched as always).
+##     ADDENDUM t281b (2026-11-02, pairing session) — THE ASK IS NOW SPECIFIC:
+##     user supplied README.debugger + VOGONS t=3944; both fetched and banked in
+##     docs/re/dosbox-debugger.md. Memory-change watchpoints EXIST upstream
+##     (BPLM linear / BPPM pmode / BPM), gated on --enable-debug AND
+##     C_HEAVY_DEBUG; master additionally has a TCP debugger control protocol
+##     (mcp_server=<port>, REQ/EXEC line protocol) which fits our no-display
+##     harness far better than ncurses. MEASURED: our dfsg binary has no
+##     mcp_server strings either, so BOTH need a build. STAGED, NOT RUN:
+##     scripts/r1_t_dbx_build.sh (route 1 = apt-get source + rebuild with
+##     --enable-debug=heavy, installs ONLY to work/r1/bin/dosbox-x-dbg). Blocked
+##     on a user yes (network fetch policy) + dpkg-dev build deps. Operating
+##     rules for the session that runs it are in that doc (core=normal, scratch
+##     copy, own ring dir, first BPLM fire is the 0x00-init artifact).
 ##     STATUS t272 (2026-11-02, GRANTED and RUN): MEASURED-DEAD on this box —
 ##     the installed dosbox-x 2025.02.01+dfsg-3 has NO debugger command set
 ##     (score.md S15, REFUTED-ROUTES t272; scratch session r1_t272_wp.sh ran,
