@@ -468,6 +468,11 @@ new capture or a user decision (see the decision surface in docs/STATE.md).
 ## t258 USER ASK (2026-11-01) — OQ-021 is now play-GATED at BOTH residues; the
 ## loop has no offline work left for it. Not a work block for other rows; the
 ## loop idles per t178 until a human answers or authorizes.
+## RESOLVED t292 WITHOUT the user (2026-11-03): the scratch poke session
+## (scripts/r290_poke_session.py --mode poke 40, run work/r1/t290-poke-a40-
+## 20261103-165405) supplied the threshold AND presenter witness by measurement
+## — OQ-021 CLOSED (OPEN-QUESTIONS STATUS t292, score.md S20). This block is
+## closed history; both (A) and (B) below were satisfied by that single run.
 ## What the loop PROVED offline (docs/re/score.md S11): no combination of the
 ## banked per-row world fields (territory counts, alive ships, all 12 per-owner
 ## order-kind counts, closed-form aggregates over 53,412 trusted rows) explains

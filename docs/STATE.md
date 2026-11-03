@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-03T16:10
+updated: 2026-11-03T17:15
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -21,6 +21,16 @@ policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement
 ## this block cannot drift out green anymore.)
 ledger:
   closed:
+    - "OQ-021 end-ctrl threshold CLOSED 2026-11-03 t292 (live presenter
+      witness): comparator V >= floor(2T/3)+1 MEASURED — scratch poke session
+      work/r1/t290-poke-a40-20261103-165405 (scripts/r290_poke_session.py
+      --mode poke 40, freeze-free): sentinel BPLM 0028A2FB mid-pass stop file
+      0x24274, drain 0x243b3/0x243f4/0x24372 V 40->56, evaluator FUN_00024a34
+      fired: ring t1087 20/20 sel 0->5 (DAT_00043510 @0x24d9f) + rank
+      65535->42 (DAT_0004350c @0x24dab) + end-ctrl.txt text verbatim on screen
+      ('Your score is 42%', 'Interstellar Subjugator'); law distilled
+      docs/re/score.md S20; rewrite arm campaign.cpp:2157 upgraded t291 to the
+      cited law (pins test_control_t291.cpp x4 mutation-verified)."
     - "OQ-026 visibility layer CLOSED 2026-10-29 t195 (implement+pin, the
       row's own closure bar set t194): rewrite campaign.{h,cpp} models
       laneVis_ (rec+0x20) + starLaneVis_/starSelVis_ (obj +0x16/+0x17 twins,
@@ -160,19 +170,6 @@ ledger:
       (0.4% samples), scenario-template preset source"
     - "OQ-019 ship design model (hull+gizmo inventory, cost hack, Orbital
       Docks); per-ship combat application = OQ-010 aggregate caveats S2i"
-    - "OQ-021 end-ctrl threshold: comment 'over half' vs prose 'two-thirds' —
-      t73 dark-zone hit: score strings at 0x2807b/0x280e7 (pool-rel), score law
-      TRUNC(100*DAT_482fb/T), presenter eventwnd.cpp 0x2c03a cluster;
-      comparator writes = ZERO direct encodings -> evaluator hunt via
-      dark-zone enumeration (t73b); capture fallback. Default >1/2 stands.
-      t189b STATUS: 14->21 drift real, NOT systems count; displayed-count
-      write-site is now the residue. t212 STATUS: write-site static route
-      EXHAUSTED — aicode P7 producer claim REFUTED (writes word[0x48300],
-      not the displayed dword); zero writer across disp32+imm census,
-      decoder-free raw scan (fb 82 04 00 = 4 hits, all accounted), RAM
-      pointer scan (all relocated operand fields), 145-base [reg+disp]
-      trace. Writer = runtime-computed-address class -> dosbox-x write
-      watchpoint, same session as the comparator-firing ask. score.md S9."
 
 ## WHAT IS IN HAND (tools + laws — a fresh session starts here, not from scratch)
 - CONTROLLED-SYSTEMS LAW (V = DAT_000482fb) CLOSED as a mechanism t284 and
@@ -268,38 +265,50 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t292 THE LIVE end-ctrl PRESENTER WITNESS (OQ-021's LAST RESIDUE) —
-FREEZE-FREE POKE-UPWARD ROUTE, HARD BUDGET (ordering rationale: t291 landed the
-rewrite upgrade + pins + PLAYTHROUGH retrap, so OQ-021 now has exactly ONE thing
-standing between it and CLOSED: witnessing sel==5 written by evaluator 0x24d9f
-fire in a live session (docs/re/score.md S19, _wip_t290 S2/S6). It is the only
-open residue anywhere in the ledger that a SINGLE run can close with cited
-measurement, and the instrument already exists (scripts/r290_poke_session.py +
-scripts/r290_relaunch.sh). If the EPIPE class keeps killing the decisive run,
-the honest negative lands and NEXT moves to the OQ-019 static residue — do NOT
-spiral.)
-Task: in a SCRATCH session with its OWN ring dir (two-writer law), start from a
-save-state, poke the flood-mode/global such that V>=34 STICKS UPWARD (t290
-finding: the flood only increments within a pass, so poke N>=34, e.g.
-`r290_relaunch.sh poke 40` — the freeze variant is NOT needed and caused the
-t290 S6 EPIPE suspicion; keep the run freeze-free). Then let the end-turn pass
-run and WITNESS, in order: (1) selector byte guest 0x43510 0 -> 5 (MEMREAD is
-real-mode-only, debug.cpp:2983 — use the ring/r1_slot.py surface or a debugger
-read path that works), (2) rank dword 0x4350c written, (3) screen shows the
-end-ctrl victory text (VNC :<scratch> import + vision; presenter arm =
-end-ctrl.txt via table entry sel 5 @0x1eb468+0x14). BUDGET: 5 attempts MAX;
-each dead RUN (EPIPE, ring freeze) counts as a negative, not a retry reason
-beyond the budget; xsend arg1 is the WINDOW TITLE not the display (t290
-pitfall). If witnessed: append STATUS t292 to OQ-021 with the bank/run ids and
-CLOSE the row (ledger 16/3 — update nothing by hand; ledger_index_check derives
-the index). If the budget is exhausted: honest negative in the row (EPIPE class
-characterised as far as measured: which ring slot froze, whether the freeze
-precedes or follows the store), row stays open, and NEXT moves to t293 = OQ-019
-cost-hack residue (+0x46 writers, ships.md §6 lead) which is fully static.
-CAVEATS: production :9 (pid 660167, t1150 V=23) is the corpus — scratch sessions
-NEVER mount game/ and NEVER share its ring; the scratch may be wrecked freely
-(user grant). Do NOT wire rewrite arms for the elimination ladder (results 1-4)
-on t290 evidence; [0x10ba4] identity stays open.
+NEXT t293 THE SUGAR-CUBE SCALE — SCRIPTED MOVE-ORDER CAPTURE (OQ-019
+head-named residue; ordering rationale: t292 CLOSED OQ-021 (16/3), so the
+ledger's highest-value unclosed sub-law is the drive Level -> distance scale,
+named in the row's own title line. The one-run closing route was explicitly
+REFINED at ships.md §t48 and has been waiting on capture capability the loop now
+HAS: t289 drive class (screen gates, needle, no-Escape law) + t292 scratch
+session law (own ring dir, Xvfb, Oct-29 resume, kill-by-PID). NOTE THE
+INHERITED POINTER IS STALE: t292's NEXT said "OQ-019 cost-hack residue (+0x46
+writers, ships.md §6 lead) fully static" — that lead CLOSED at t16 (ships.md §9:
+image-wide +0x46 census, sole gizmo-record write is the loader parse store
+0x491b5, JJTTODO = stale comment). Do NOT re-census it. Of the remaining
+OQ-019/OQ-016 residues, per-ship per-commit channels are BLOCKED-USER (t209/
+t210 law), Phase Bomb is capture-gated BLOCKED, magnetron harvest is REFUTED-
+class zero-witness; word[+0x16] template source (OQ-016) is the cheap static
+FALLBACK if this capture dies — queue it as t294.)
+Task: in a SCRATCH session (r290_poke_session.py skeleton MINUS the debugger,
+or scripts/r1_wp_session.py pattern; OWN ring dir, Xvfb :96, Oct-29 t1086
+RESUME.GAM, production :9 untouched), ISSUE A REAL MOVE ORDER on the galaxy map
+and let two End-Turn passes run: select one of the player's (owner 0) ships —
+t1086 has several in orbit (state 5, e.g. slot 16/22/26/27 at the home star per
+the production ring lineage) — click it, click a VISIBLE lane-adjacent
+destination star, End Turn x2 (drive laws: assert_on_map orange-frac gate before
+any click; 2 consecutive no-advance presses = STOP-AND-LOOK; NEVER Escape).
+MEASURE from the ring (r1_slot / r1_sav_scan law): the ship's xyz per autosave
+slot across the two passes -> travelled distance per turn vs its drive stat
+(gizmo Level sum into ship stat dword +0x10 @0x49b67, ships.md §10; budgets
++0x88 POWER / +0x94 fuel drained at 0x4a2d4..0x4a314, §12). The t48 question to
+settle: is per-turn travel the RAW float world distance walked per step-call
+0x533e0 (t48 reading), or a hop/handpoint abstraction — one witnessed flight
+with per-autosave coordinates discriminates (10 s ring cadence gives >=1 sample
+per turn; a multi-hop path shows waypoints). Also bank whether the order
+survives (issued -> in-transit state) for the OQ-016 setup-draw family.
+BUDGET: 3 scratch launches MAX (BREAK-lottery-class losses do not count, t292
+accounting law: only runs that reached the map-and-click phase count). If the
+order never lands or no flight is witnessed: honest negative in OQ-019
+(STATUS t293), row STAYS OPEN, NEXT -> t294 = word[+0x16] template source
+(static mapgen preset-table hunt; t281 cites the ctor draw rng%11 @0x23a97/aa8,
+the residue is the SOURCE of the 11 weight rows — file table vs hardcoded).
+CAVEATS: production :9 (pid 660167, t1150 V=23) is the corpus — scratch NEVER
+mounts game/ and NEVER shares its ring; the scratch may be wrecked freely (user
+grant); the scratch's autosave ring is the ONLY read surface (MEMREAD is
+real-mode-only, debug.cpp:2983); ship record stride 0x7b, coords are floats in
+the watcher's ship_raw (r1_playcap_watch schema) — reuse the watcher for
+coordinate reads rather than hand-parsing.
 SESSION-START SCREEN CHECK (t287 law, do this BEFORE any other probe): a VNC
 user may leave production on ANY screen. Verify with `DISPLAY=:9 import
 -window root` + vision BEFORE trusting ring rows (ring is blind off-campaign,
@@ -360,7 +369,7 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   /usr/bin/dosbox-x.
 - Ring = work/r1/playcap/save/ (20 slots, 10 s cadence, ~200 s). Bank before
   restarts + every ~30 turns.
-- Ledger: 15 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
+- Ledger: 16 closed / 3 open (OQ-005, OQ-016, OQ-019). Keep
   ledger_audit + ledger_index_check green; never hand-edit the index block.
 - OQ-005 needs the USER's ruling on the 88-row decision sheet (t278,
   work/r1/shp_png/index.txt) — do NOT rule for them (R13) and do NOT burn
@@ -374,6 +383,31 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
   or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
+
+LANDED t292 (2026-11-03): OQ-021 CLOSED — THE LIVE PRESENTER WITNESS
+OBSERVED (docs/re/_wip_t292.md S0-S2, distilled to docs/re/score.md S20).
+Freeze-free poke route worked FIRST TRY at the decisive phase: run work/r1/
+t290-poke-a40-20261103-165405 (r290_poke_session.py --mode poke --arm-value 40
+via r290_relaunch.sh poke 40 3; 4 launches = 3 BREAK-lottery losses + 1
+positive; ZERO decisive-RUN deaths — the t290 EPIPE class did NOT reproduce
+without the FM freeze, suspicion stands unproven but poke is now the safe
+instrument class). Witnessed in order: (1) mid-pass stop file 0x24274, SMV 40,
+drain fires 0x243b3/0x243f4/0x24372 drove V 40->56 live (flood increments
+confirmed); ring t1087 20/20 rows sel 0->5 (DAT_00043510, sole writer 0x24d9f)
+(2) rank 65535->42 (DAT_0004350c, 0x24dab; ladder inputs unverified — 42 !=
+TRUNC(100*86/50), banked as non-claim) (3) screen_final.png = end-ctrl.txt
+enddesc+congrat VERBATIM ("Your score is 42%", "Interstellar Subjugator" 4/10)
+— presenter arm sel 5 -> end-ctrl.txt CONFIRMED by content. Comparator law
+V >= floor(2T/3)+1 is now MEASURED; the founding "over half" comment is
+decoration; rewrite arm campaign.cpp:2157 (t291) matches the witnessed vendor
+behaviour. Ledger mechanics: status cell CLOSED + STATUS t292 in
+OPEN-QUESTIONS.md; ledger_audit.py --expect default drops OQ-021 (t195
+precedent); STATE index block moved open->closed; audits OK 16/3. Banked:
+work/r1/bank-t292-witness/{end-ctrl-screen-t1087.png,session.log}. Production
+:9 untouched, HEALTHY (screen-checked 16:48 galaxy map t1150; ring fresh 16:47;
+no new sitting — timeline tail all t1150, r1_t85g correctly NOT run). Gate 0.
+NEXT=t293 (sugar-cube scale scripted move-order capture; the inherited
+cost-hack pointer was STALE — closed t16, ships.md §9).
 
 LANDED t291 (2026-11-03): THE REWRITE CONTROL ARM NOW CITES THE VENDOR —
 `scoreStars_ >= (2*total)/3 + 1` REPLACES `mine*2 > total` at

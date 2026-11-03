@@ -83,8 +83,11 @@ def rows(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", default="docs/OPEN-QUESTIONS.md")
-    ap.add_argument("--expect", default="OQ-021,"
-                                        "OQ-005,OQ-019,OQ-016")
+    ap.add_argument("--expect", default="OQ-005,OQ-019,OQ-016")
+    # t292: OQ-021 CLOSED by the live presenter witness (sel 0->5 by 0x24d9f,
+    # rank 0x24dab, end-ctrl.txt on screen; score.md S20, run
+    # work/r1/t290-poke-a40-20261103-165405) — removed from this default the
+    # same way t195/t189b/t181 removed their closed rows.
     # t195: OQ-026 CLOSED by the rewrite visibility layer + pin
     # (campaign_visibility_law_oq026_t195; ships.md S23 L10) — removed from
     # this default the same way t189b/t181 removed their closed rows.

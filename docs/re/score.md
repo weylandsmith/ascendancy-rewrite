@@ -760,3 +760,50 @@ ways: threshold mutation CAUGHT 3 fails, operand mutation CAUGHT 4 fails).
 BLAST RADIUS measured (--campaign 1600): seed 1 Control t1131->t1337, seed 2
 t1110->t1427, seeds 13/42 Extinct unchanged, seed 2024 FLIPPED Control t1255
 (46%) -> Extinct t1555 (46% was never a vendor win). PLAYTHROUGH regenerated.
+
+## S20 — t292: LIVE PRESENTER WITNESS OBSERVED — sel 5 + rank + end-ctrl text [measured]
+
+THE OQ-021 CLOSURE WITNESS LANDED on the FIRST decisive run (freeze-free poke
+route, docs/re/_wip_t292.md S2). Run dir
+work/r1/t290-poke-a40-20261103-165405 (scripts/r290_poke_session.py --mode poke
+--arm-value 40 via r290_relaunch.sh poke 40 3; scratch game-wp, own ring dir,
+Xvfb :96, Oct-29 t1086 resume; production :9 untouched).
+
+Sequence witnessed (session.log banked at
+work/r1/bank-t292-witness/session.log): sentinel BPLM 0028A2FB armed at title
+(cs=0x160), campaign entry OK, pre-instrument ring t1086 V=0 sel=0 rank=65535,
+END TURN -> MID-PASS STOP eip=0x1e36c4 file=0x24274 [FLOOD], SMV V:=40
+('Memory changed (4 bytes)'), DECISIVE RUN survived (no FM this time — the t290
+EPIPE class did not reproduce WITHOUT the freeze; suspicion stands unproven,
+poke is now the safe instrument class). Drain fires at file 0x243b3/0x243f4/
+0x24372: V 40->42->45->4A->4B->4E->4F->51->55->56 — the flood increments
+confirmed live, writes stick upward exactly as the 0x2439d..0x243a8 re-read law
+predicts; final V=86 (0x56).
+
+THE THREE LEGS, in order (task spec):
+1. SELECTOR BYTE guest DAT_00043510: 0 -> 5 in EVERY post-pass ring slot
+   (t1087, 20/20 rows; only writer = evaluator FUN_00024a34 store 0x24d9f per
+   the t290 census) — the comparator at 0x24bba consumed V>=floor(2*50/3)+1=34
+   (poked 40, drained 86) and armed the CONTROL arm.
+2. RANK DWORD DAT_0004350c: 65535 -> 42 (written by 0x24dab same pass; ladder
+   arithmetic @0x24c35..0x24d92 banked t290 S19, INPUTS UNVERIFIED — note 42
+   != TRUNC(100*V/T) of the final flooded V=86 (172): the printed score is the
+   ladder output, not raw V/T; presenter prints it as "Your score is 42%").
+3. PRESENTER TEXT: screen_final.png (banked
+   work/r1/bank-t292-witness/end-ctrl-screen-t1087.png) shows the end-ctrl.txt
+   strings VERBATIM — green: "Congratulations! Your massive empire spans over
+   two-thirds of the galaxy. Your dominion is assured." + "Your score is 42%" +
+   "This gives you the title of Interstellar Subjugator." (rank 4/10 in the
+   file's ranks list); white congrat paragraph matches the file word-for-word
+   ("...more than two-thirds of the stars... the other species may continue to
+   bicker over the stars that remain..."). Presenter arm = sel 5 -> end-ctrl.txt
+   via jmp table member 0x1eb468 (S18) — arm identity CONFIRMED by content.
+
+CONSEQUENCE: the founding text dispute of this row is DEAD — the vendor's
+end-ctrl arm fires on the two-thirds comparator AND the presenter text is the
+two-thirds prose; the "over half" header comment is confirmed decoration.
+Rewrite arm campaign.cpp:2157 (t291 `scoreStars_ >= (2*total)/3 + 1`) matches
+the witnessed vendor behaviour. sel!=0 latches (S18) as predicted: rows hold
+sel=5 through the whole post-victory ring.
+Budget accounting: 4 launches total (3 BREAK-lottery losses — harness noise,
+never reached a decisive RUN — + 1 positive); zero decisive-RUN deaths.

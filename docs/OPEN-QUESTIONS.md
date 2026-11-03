@@ -229,7 +229,12 @@ mem.find(b'') artifacts WITHDRAWN; title slots DO carry the on-disk world —
 (live-UI-trace class; the disclaim does not depend on it — non-claim banked).
 CODE SITE: rewrite unchanged — fresh-start-only row, nothing loads originals.
 OQ-021 | victory | end-ctrl threshold: vendor comment "over half" vs same
-file's prose "two-thirds" — current default >1/2 | open | t73 dark-zone HIT
+file's prose "two-thirds" — current default >1/2 | CLOSED 2026-11-03 t292:
+comparator V >= floor(2T/3)+1 WITNESSED LIVE (selector 0->5 by evaluator store
+0x24d9f, rank 65535->42 by 0x24dab, end-ctrl.txt text on screen verbatim;
+docs/re/score.md S20, run work/r1/t290-poke-a40-20261103-165405, scripts/
+r290_poke_session.py; rewrite arm campaign.cpp:2157 upgraded t291 to the cited
+law) | t73 dark-zone HIT
 (docs/re/score.md): score strings ARE referenced — pool-relative immediates
 0xf66/0xf7a at 0x2807b/0x280e7 (t72's zero-ref scan used wrong encoding AND
 the site sits in the never-analysed dark zone 0x26b32..0x284bb); score
@@ -555,6 +560,23 @@ strict-close: the ONLY residue left is the live end-ctrl victory-presenter
 witness (sel==5 written by 0x24d9f observed firing in a live session; t290 S6
 EPIPE class, budget 5+ attempts, freeze-free poke-upward route r290_relaunch.sh
 poke 40); every static and code-side element the row named is now cited-closed.
+STATUS t292 (2026-11-03, docs/re/_wip_t292.md S0-S2, distilled to docs/re/
+score.md S20): THE LIVE PRESENTER WITNESS OBSERVED — ROW CLOSED. Scratch poke
+session work/r1/t290-poke-a40-20261103-165405 (r290_poke_session.py --mode poke
+--arm-value 40, NO freeze — the t290 EPIPE class did not reproduce without FM;
+4 launches: 3 BREAK-lottery losses + 1 positive, zero decisive-RUN deaths):
+sentinel BPLM 0028A2FB caught the mid-pass store at file 0x24274, SMV V:=40,
+drain fires 0x243b3/0x243f4/0x24372 drove V 40->56 (flood increments live), and
+the evaluator FUN_00024a34 fired: ring t1087 20/20 rows sel 0->5 (DAT_00043510,
+sole writer 0x24d9f) + rank 65535->42 (DAT_0004350c, 0x24dab); screen_final.png
+(banked work/r1/bank-t292-witness/end-ctrl-screen-t1087.png) shows end-ctrl.txt
+enddesc + congrat VERBATIM incl "Your score is 42%" and rank title
+"Interstellar Subjugator" (4/10) — presenter arm sel 5 -> end-ctrl.txt confirmed
+by content. Comparator law V >= floor(2T/3)+1 (34 at T=50) is now MEASURED, not
+inferred; the "over half" comment is decoration; rewrite arm (campaign.cpp:2157,
+t291) matches the witnessed vendor behaviour. Non-claims banked: rank-ladder
+arithmetic inputs unverified (42 = the poked-drained V, ladder not re-derived);
+[0x10ba4] identity stays open (gate was open this run: evaluation fired).
 STATUS t289 (2026-11-03, docs/re/_wip_t289.md S2-S3): the needle-guarded re-drive
 ran CLEAN t1086->t1150 (69 presses, 64 turns, zero softlocks; drive_20261103-
 125013.log exit 0). Harvest (r273_harvest window 12:40-13:35, 229 trusted rows):
