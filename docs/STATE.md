@@ -260,99 +260,138 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-TRIGGER SENTINEL (t281 drained the offline queue — do NOT re-derive
-work; check ONLY the triggers below, and end the session if none fired).
-ORDERING RATIONALE: t281 landed 2026-11-02 (LANDED block below): SA_Cornucopia
-was the LAST §6.3 ability body whose operands the rewrite state carries; every
-remaining gap label is per-ship (OQ-019 engine-build boundary) or AI->AI
-(row-12 disposition, t256b) and stays refused with reasons on file. The one
-queued live task t279 (diplomacy second-campaign corroboration) is HELD on its
-release conditions (BLOCKED t273: NO :5910 VNC client AND ring still
-production-lineage — at t281 close BOTH fail: client ESTAB present, ring is
-tutorial-645 churn). Offline RE is drained; per the after-drains law NEXT is a
-sentinel, not churn.
-TRIGGER A (user played / new sitting): r214_triage.py prints "sitting delta:
-True" AND the tail shows a NEW lineage (not the 20:0x-start tutorial-645 churn
-already characterized at t280/t281). Then run scripts/r1_t85g_sitting.py and
-t279 becomes the task IF its release conditions also hold; else harvest per
-selfplay.md laws.
-TRIGGER B (user ruling on OQ-005): a per-row reply arrives against
-work/r1/shp_png/index.txt (twin decision-sheet.md) — adjudicate vs
-docs/re/shp.md S24 + the OQ-005 row (t278 package).
-TRIGGER C (user supplies a debugger-enabled dosbox-x build): re-opens the
-watchpoint class for OQ-021/OQ-019 (REFUTED-ROUTES t272 re-open clause).
-TRIGGER D (human names a task): do that task.
-If NO trigger: write a one-paragraph adoption note to docs/re/_wip_<id>.md and
-END. Do not invent new RE work while all four triggers are dark.
+NEXT t282 DEBUGGER-BUILD VERIFICATION (gate for everything after it). A
+debugger-enabled dosbox-x was BUILT this pairing session from upstream master
+(C_DEBUG + C_HEAVY_DEBUG both defined in config.h, verified) at
+work/r1/dbx-build/dosbox-x-master; install prefix work/r1/dbx-install; build log
+work/r1/dbx-build/build.log. IF make failed or the binary is missing: bank the
+honest negative in docs/re/dosbox-debugger.md, rewrite NEXT to t285 (the drive
+queue stands alone), STOP. IF the binary exists: (1) strings-grep it for
+BPLM/BPPM/BPM/HELP and for mcp_server (expect YES on both — the dfsg build had
+neither; that contrast is the point, docs/re/dosbox-debugger.md); (2) copy it to
+work/r1/bin/dosbox-x-dbg (NEVER touch /usr/bin/dosbox-x — production :9 and the
+launch harness assume it); (3) get the LIVE command list: README.debugger says
+"MCP clients should call HELP for the live command list from the running
+DOSBox-X build" — do it through a PTY (terminal tool pty=true + process
+action=write; the debugger is an ncurses UI on the console, Alt+Pause breaks in,
+-break-start breaks at startup). Bank the verbatim command list + which of
+BPLM/BPPM/BPM the build actually accepts to docs/re/dosbox-debugger.md. Do NOT
+run it against production or mount work/r1/game/ — scratch copy only per the run
+book. PRE-FLIGHT: python3 scripts/r1_game_health.py (production :9 LIVE at t1086
+since 22:27, TL=172800 — leave it running).
 
-QUEUE (phase 3, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
+PAIRING-SESSION NOTE (phase-4 handoff, 2026-11-02 ~22:45): sentinel-slot law
+stands — task line FIRST, notes below. USER GRANTS (verbatim, this session):
+"Go ahead with everything. Don't worry about my save games or a VNC grabbing the
+session - I'm done with the game on this box, if I want to play more I'll fire
+up a session on my main PC." Consequences: (1) network fetches are authorized
+(git clone worked without proxy vars; sudo still needs a password so ALL build
+deps were staged sudo-free into work/r1/localprefix — source
+work/r1/localprefix/autotools.env.sh for autoconf/automake/m4/curses); (2) the
+Oct-29 campaign on :9 is the production corpus, RESUME.GAM md5 5b382afbb78918
+(= t1086) — restore from work/r1/game/RESUME.GAM.user-oct29 if clobbered;
+(3) a VNC client may attach at any time and its input is now HARMLESS to assume
+for RE purposes, but keep the drive laws anyway (they're about the engine, not
+the user); (4) the vendor tutorial is DISCARDED (it had clobbered RESUME.GAM;
+preserved as RESUME.GAM.tutorial-nov2 for archaeology only).
+
+QUEUE (phase 4, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
 
-t279 DIPLOMACY LIVE VERIFICATION PASS (needs production live): re-verify the
-t244 alliance law reads on the FRESH t1086 campaign WITHOUT initiating any
-proposal: open ALIENDIP per race, bank disposition + relation-state cells
-vs the watcher RAM rows at the same wall-second (c-overlay is the display,
-RAM is truth — cross-check OQ-021's STARS CONTROLLED line too). Zero-click
-risk screens only (read-only panels; NEVER PROPOSE/DECLARE). Bank to
-diplomacy.md as a second-campaign corroboration (the first campaign's data
-all lives at turns 1086-1335; a fresh campaign tests race-seed invariance).
+t283 OQ-021 WRITE-WATCHPOINT SESSION (the payoff; needs t282). SCRATCH game copy
+  (docs/BLOCKED.md runbook; NEVER work/r1/game/), OWN ring dir
+  (work/r1/playcap-wp/ — two-writer law t266), conf with core=normal (recompiler
+  skips instructions under stepping, VOGONS) + mcp_server=<port> if using the
+  control channel. Target: guest-LINEAR address of DAT_482fb = image base +
+  0x82bb0 + 0x482fb - 0x88 (pointer law, score.md S9/S14) — compute it from the
+  scratch run, don't copy production's. Set BPLM there, resume (RUN or RUNWATCH),
+  drive turns until the FIRST fire, capture CS:IP + full registers + a stack
+  window + the previous value. PITFALLS BANKED: the FIRST fire may be the
+  0x00-initialization artifact (VOGONS BPM note) — confirm the old value is not
+  the init case before believing it; heavy-debug is SLOW (memory-change check on
+  every write) so budget the wall and expect few turns; debugger breakpoints in
+  heavydebug do NOT use INT 3 so the game cannot strip them (VOGONS). Map the
+  captured EIP back through the t106/t107 windowed-disasm recipe and bank the
+  writer site + surrounding law to score.md. Strict-close: one fire + a cited
+  disasm of the writing instruction closes the PRODUCER residue; the THRESHOLD
+  residue is separate (t269 census: this campaign never reaches V>=25).
+
+t284 REWRITE THE V SEMANTIC (needs t283's law): implement whatever the writer
+  computes in rewrite/src/game/score.cpp (DAT_482fb = the "STARS CONTROLLED"
+  overlay value, t244 verified overlay==RAM direct readout) with a pin from the
+  captured witness. If t283 found the writer is a recompute-on-end-turn (the
+  t258 residue shape), mirror that cadence. Gate + rewrite tests green.
+
+t285 LONG DRIVE + WITNESS HARVEST III (INDEPENDENT of the debugger — run it even
+  if t282/283 fail). Production :9 is LIVE at t1086 (22:27 launch, TL=172800).
+  r1_t245_turndrive v4 toward t1250+. BANK the ring to a dated dir BEFORE any
+  restart and every ~30 turns (ring holds ~200 s!). OOM law: r1_stream.py or
+  <=400 KB tail scans only. MINE with per-segment trust (t262 r262 law) and the
+  t273 ATTRIBUTION FIXES (owner INDEX byte+0x56 not handle u16+0x54; stale-echo
+  pairs mint phantom deltas — t273 VOIDED the t251 mine on exactly these bugs):
+  (a) damage dealt to a NON-at-war owner (OQ-016 — two -40/-28 price witnesses
+  exist at t1253, zero damage witnesses); (b) V>=25 (t269 says no, a drive that
+  breaks it closes the threshold residue — log ring slot + V + systems counts);
+  (c) magnetron USE frames (OQ-019, gizmo 0x3c). Honest negatives are valid
+  outcomes; do NOT issue player attack orders.
+
+t286 MCP/PTY DEBUGGER AS A GENERAL INSTRUMENT (needs t282): once one watchpoint
+  flow works, script it (scripts/r1_wp_session.py) so OTHER writer questions can
+  be hunted without hand-held sessions: u16@data 0x131b4 (the maintained
+  "Planets Occupied" snapshot, t249 residue), star byte +0x5a (colonised-planet
+  count, t247 law — writer unmapped), the PLANETALLOC getter chain 147/149/151/
+  152/153 (selfplay.md) to confirm the header format-string law at runtime.
+  Each hunt = one scratch session, one address, one captured EIP. Bank results
+  to the relevant docs/re/*.md; a scratch negative is still a result.
+
+t287 DIPLOMACY SECOND-CAMPAIGN CORROBORATION (t279, now released): production
+  live at t1086 fresh campaign; the t273 release conditions (no VNC client +
+  production lineage) are superseded by the user's "don't worry about a VNC
+  grabbing the session". Open ALIENDIP per race, bank disposition +
+  relation-state cells vs watcher RAM rows at the same wall-second; cross-check
+  the c-overlay STARS CONTROLLED line vs DAT_482fb again on a NEW campaign seed.
+  READ-ONLY panels only — NEVER PROPOSE/DECLARE/ABANDON/END-TURN (t244 abandoned
+  a system by accident; Escape does NOT unwind PLANETALLOC, t254). Bank to
+  diplomacy.md as second-campaign corroboration (race-seed invariance test).
+
+t288 SOFTLOCK-CLASS FOLLOW-UP WITH THE DEBUGGER (needs t282/283): the class is
+  characterized (t266: modal-freeze from a second writer; t261: input-dead
+  ON LOAD, i.e. the save captured the frozen state) but the ENGINE state that
+  makes input dead is still unnamed. If the debugger is usable, break into a
+  softlocked scratch session and dump the input-callback queue / the game's own
+  input flag rather than guessing. Bank to selfplay.md §7 + flag anything that
+  changes the drive SOP.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - OOM LAW: NEVER read live-timeline.jsonl except r1_stream.py / <=400 KB
-  tail-scan / r214_triage.py. (6.4 GB file; t251 session OOM-killed the whole
-  tmux scope at 13.4 GB RSS.)
-- TWO-WRITER RING LAW (t266): a second dosbox-x writing the SAME ring dir
-  corrupts evidence AND freezes the game (modal-freeze class). Scratch
-  sessions ALWAYS get their own ring dir. pkill -x dosbox-x matches
-  production too (t267) — kill by recorded PID only.
-- PER-SEGMENT TRUST for V/campaign analysis (t255/t262).
-- Ring = work/r1/playcap/save/ (20 slots, 10 s cadence, ~200 s!). Bank before
-  restarts and every ~30 turns. NEVER loadstate (input-dead-on-load, t261).
-- TL LAW (t277 CLOSED, was "pending"): TL expiry IS what kills sessions at the
-  configured limit — MEASURED n=18 (selfplay.md t277 Law 1); dosbox-x logs NO
-  farewell line, so it is undetectable by log grep and must be polled from
-  /proc. Production runs TL=172800 and so does the launcher default (gate 3n3
-  pins both). PRE-EXPIRY RESTART SOP verbatim: docs/re/selfplay.md t277; the
-  loop stamps health every iteration (loop_one_task.sh:185) and T:WARN now fires
-  at 14400 s. A ~2880-saves-per-8 h dead session = TL expiry, not a crash.
-- User save game/RESUME.GAM md5 5b382afbb7891 — game writes it only at
-  in-game Save; never overwrite by hand.
-- SIGKILL softlocked dosbox (SIGTERM -> quit-confirm (Yes)-default).
-  Background shells need DISPLAY=:9. xsend refuses "warning"-titled windows.
-- Ledger: 15 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
+  tail-scan / r214_triage.py (6.4 GB; t251 session OOM-killed its whole tmux
+  scope at 13.4 GB RSS).
+- TWO-WRITER RING LAW (t266): a second dosbox-x on the SAME ring dir corrupts
+  evidence AND freezes the game. Scratch sessions ALWAYS get their own ring dir.
+- KILL BY RECORDED PID ONLY. pkill -f / pgrep -f match the searching shell's own
+  command line and have killed this session's shell TWICE (t267 + this pairing
+  session) — use structured argv matching (ps -eo pid=,args= parsed in Python,
+  basename(toks[0]) == 'dosbox-x').
+- SIGKILL a softlocked dosbox (SIGTERM pops its quit-confirm with (Yes) DEFAULT).
+- Background shells need DISPLAY=:9 injected explicitly (silent xsend failure).
+- NEVER loadstate a bank (input-dead-on-load, t261). NEVER replace
+  /usr/bin/dosbox-x.
+- Ring = work/r1/playcap/save/ (20 slots, 10 s cadence, ~200 s). Bank before
+  restarts + every ~30 turns.
+- Ledger: 14 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
   ledger_audit + ledger_index_check green; never hand-edit the index block.
+- OQ-005 needs the USER's ruling on the 88-row decision sheet (t278,
+  work/r1/shp_png/index.txt) — do NOT rule for them (R13) and do NOT burn
+  iterations on it.
 - Do NOT re-trod: t212/t213 static exhaustion; t255 screen-open (REFUTED);
   t258 candidicide (KEEPER); t259 sav-pair census (KEEPER); t262 fleet-census
-  trigger (MEASURED-DEAD); t265 st4-dwell (t193 route DEAD); t269 threshold
-  census (zero V>=25); t260/261 loadstate (GUI works, state input-dead);
-  t272 debugger census (dosbox-x +dfsg HAS NO debugger — REFUTED-ROUTES t272;
-  no re-census, no -break-start pilot, no DEBUGBOX shell attempts);
-  t275 gap-row-14 aggregate RE-IMPLEMENTATION (the four sub-laws landed t89;
-  resolver 0x42c60 read verbatim — aggregate content COMPLETE, first-eligible
-  wiring is OQ-019-engine-build territory, gate/defense-term wiring REFUSED
-  with reasons combat.md S2k).
-- Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in
-  docs/re/ only.
-- After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line
-  FIRST) or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
-Do NOT re-open (consolidated to keep STATE scannable): t214..t243 are
-idle/adoption iterations — t243's only new content is the sentinel-slot
-harness law (S4, control-plane, not a ledger fact). t214 = the mining law
-(collapse factor MEASURED with controls; do not "verify" again without a new
-sitting); t215 = no-sitting adjudication + fd-census method (writerhood = open
-fd, not process presence; do not kill watchers); t216 = the NS-precision lesson
-(mtime-seconds ties are a sort artifact, not an inversion); t217..t243 =
-identical reproductions (docs/re/_wip_t217.md .. docs/re/_wip_t243.md — nothing
-new in them). t218 adds the S5 scheduling conclusion, t219 the 1.992 s gap fix +
-the ledger-premise re-measurement. Do NOT re-trod substantive findings: t213's
-al-form verdict (site 1 ==1 / site 2 ==0 dominance-PROVED); t212's
-writer-negative (a ZERO census with controls IS the result; next instrument =
-runtime watchpoint); t212's P7 correction ([star+0x15] label [unverified]);
-t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
-+ tool pitfalls; t209's out-param law + ATTEMPT-TIME clamp; t208 e2e pin
-semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
-law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
-t189b.
+  trigger (DEAD); t265 st4-dwell (t193 route dead); t269 threshold census
+  (KEEPER); t272 dfsg-no-debugger (SUPERSEDED by this build — verify the NEW
+  binary, don't re-prove the old negative); t273 attribution fixes (build on
+  them, don't re-mine with the old buggy analyzer).
+- Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
+- After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
+  or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
 
 LANDED t281 (2026-11-02): SA_CORNUCOPIA REPAINT WIRED VERBATIM — THE LAST
 STATE-CARRYING §6.3 BODY CLOSED OUT + THE +0x16 SKIP KEY MEASURED (offline,

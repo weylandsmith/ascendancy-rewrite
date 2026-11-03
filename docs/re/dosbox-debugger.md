@@ -90,18 +90,28 @@ bpm/breakpoint strings at -n2, no DEBUGBOX shell, no GUI Debug menu). Installed
 package is `dosbox-x 2025.02.01+dfsg-3` (Debian trixie). So MCP + watchpoints
 require a build; NOTHING we have today can do them.
 
-## TWO BUILD ROUTES (not yet executed — needs the user's nod)
-1. **Debian source, rebuilt with debug** — `apt-get source dosbox-x` (deb-src IS
-   configured for trixie + trixie-security) then configure with debug+heavy.
-   Gives: BPLM/BPPM watchpoints. Does NOT give: the MCP control protocol
-   (master-only; our 2025.02.01 binary has no mcp_server strings).
-   Pros: distro toolchain, known-good deps, smallest failure surface.
-2. **Upstream master clone** — gives watchpoints AND MCP control.
-   Cons: dependency drift vs the distro build, and every debugger command must
-   be re-verified against the live build anyway (README: "call HELP for the
-   live command list from the running DOSBox-X build").
-Recommendation: route 1 first (unblocks OQ-021 with the least risk); route 2
-only if we want the scripted control channel for broader RE automation.
+## BUILD — EXECUTED 2026-11-02 (route 2, upstream master; result: SUCCESS)
+Route 1 (Debian source) was abandoned: sudo needs a password for build deps,
+and 2025.02.01 predates the MCP protocol anyway. Route 2 executed sudo-free:
+- clone: `git clone --depth 1 https://github.com/joncampbell123/dosbox-x.git`
+  -> work/r1/dbx-build/dosbox-x-master (8 s, direct, no proxy vars needed)
+- autotools staged from debs into work/r1/localprefix (autoconf 2.72, automake
+  1.17, m4, libtool, libncurses-dev, libncurses6, libtinfo6). Debian bakes
+  /usr/share paths into the scripts; our copies were repointed (aclocal line 68
+  patched; M4/AUTOMAKE_LIBDIR/AUTOM4TE_CFG/PERL5LIB envs) — ALL captured in
+  work/r1/localprefix/autotools.env.sh, `source` it. Also needed: real
+  config.guess/config.sub copied into the repo root (the staged ones were
+  dangling symlinks to /usr/share/misc).
+- configure: `./configure --enable-debug=heavy --enable-sdl2` + CPPFLAGS/LDFLAGS
+  pointing at the staged curses (system has only libncursesw.so.6 runtime; the
+  probe wants -lcurses/-lncurses). config.h: `C_DEBUG 1` + `C_HEAVY_DEBUG 1`.
+- `make -j3` RC=0 (~16 min, nice'd). Binary:
+  work/r1/dbx-build/dosbox-x-master/src/dosbox-x (130 MB).
+- STRINGS VERIFIED on the new binary: BPLM x3, BPPM x3, BPM x1, RUNWATCH x4,
+  mcp_server x2 (the dfsg build: ZERO of every one). Copy to
+  work/r1/bin/dosbox-x-dbg is queued (STATE t282); /usr/bin/dosbox-x untouched.
+- NOT YET DONE (t282/t283): live HELP capture via PTY (-break-start, ncurses
+  console UI), scratch watchpoint session, live syntax confirmation.
 
 ## OPERATING RULES IF WE BUILD
 - Install as a SEPARATE binary (e.g. work/r1/bin/dosbox-x-dbg). NEVER replace
