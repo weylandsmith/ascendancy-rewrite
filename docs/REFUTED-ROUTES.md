@@ -406,3 +406,17 @@ RING law itself STANDS (ring-content corruption is still a second-writer
 phenomenon). Every future drive row must satisfy the STATE.md DRIVE-CLASS
 PRECONDITION (screen-based title-menu detection, STOP-AND-LOOK on 2
 no-advances, no Escape at the map).
+
+## t288 — THE DEBUGGER BUILD (work/r1/bin/dosbox-x-dbg) CANNOT RESTORE A 2025.02.01 SAVESTATE ZIP
+Measured 2026-11-03 (work/r1/t288-probe-dbg-a0-20261103-104330): GUI-mode dbg
+session (2026.10.01 master), BREAK lottery WON at the title screen, BPLM armed
+('00. BPLM 0028A4C6 (00)'), EXEC RUN, Capture->Load state clicks delivered
+(xsend rc=0): pty shows 'Loading state from slot: 60' then glibc
+'corrupted size vs. prev_size' — process ABORTED mid-restore, 'Loaded. (Slot
+60)' never printed. The abort is in the LOAD path (BREAK had already survived).
+Mechanism [unverified]; do not retry dbg-restoring bank states for watchpoint
+work. Route that WORKS for the input-global questions: release /usr/bin/dosbox-x
+(2025.02.01, same version as the bank) + offline ring census of the game's own
+globals (scripts/r288_softlock_probe.py, docs/re/selfplay.md t288). Writer-EIP
+ambitions on restored states need a DIFFERENT instrument (e.g. same-version dbg
+build), not this binary.

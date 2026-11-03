@@ -952,3 +952,44 @@ RESIDUES (kept open, strict-close):
   - TL-death of a session whose ring is NOT 10 s cadenced (paused, modal,
     tutorial) will NOT show 2880 saves; Law 1's diagnostic works only on a
     healthy-cadence session.
+
+## t288 (2026-11-03) — SOFTLOCK CLASS: THE DEAD HALF IS THE INPUT PUMP (MEASURED, CONTROL-PAIRED)
+THE HEADLINE. A softlocked save was restored into a clean single-writer session
+and given a discriminating instrument: the game's OWN pending-input globals.
+Static lead (t103 P13): WORD ds:0x484c4 (msg code) / ds:0x484c6 (char) are
+written by the input layer and read verbatim by relay 0x54976; the ring-slot
+Memory member carries them offline (pointer law) -> census needs NO debugger.
+MEASURED PAIR (scripts/r288_softlock_probe.py, release binary 2025.02.01 =
+the bank's own version, scratch mount work/r1/game-t288, Xvfb :91, own ring
+dir; load verified by LOG 'Loading state from slot: 60' + ring turn 1255 +
+vision readout '01255'):
+  SOFT (work/r1/t288-probe-rel-a0-20261103-104942): (msg,char) STUCK at
+    (1,0x1b=Escape) across 11 slots 10:50:44->10:52:14 THROUGH a neutral click
+    and TWO injected 'c' keys; screen md5 identical after_load==final
+    (23492a86...). The pump NEVER wrote the globals.
+  HEALTHY CONTROL (same script --no-load, RESUME.GAM t1086, run
+    ...-110123): pair (0,0) at entry -> (0x2e=46,'c'=99) after ONE injected 'c'
+    (slot 48, 11:02:45), overlay visibly toggled (screen md5 changed).
+VERDICT: in the softlock class the game-side input PUMP (the layer copying the
+DOSBox event record into ds:0x484c4/c6; readers 0x2a875/0x2a8fe per t103) stops
+writing. Dispatch downstream is unreachable-by-starvation, not independently
+dead. 'msg=1,char=0x1b' is exactly the shape of an ESCAPE KEY PENDING — the
+t285 self-harm tell (Escape at the bare map exits the campaign) — consistent
+with the pump dying after recording the Escape but before dispatching it
+[inferred; the state itself is the measured one].
+SOP UPGRADE (drive-class): input liveness now has a RAM NEEDLE (t266 §4 asked
+for one): inject 'c' and read data:0x484c6 in the next 1-2 ring slots —
+char==0x63 ALIVE, char unchanged DEAD. Pixel-diff is animation-fooled (t266
+§4); this needle is not. Census tool: scripts/r288_input_census.py (off-by-H
+law documented in-file: mem[B+OBJ1_OFF+off]).
+HONEST NEGATIVES: (1) writer EIP still unwitnessed — the DEBUGGER build cannot
+host a restored state (see REFUTED-ROUTES t288: glibc 'corrupted size vs.
+prev_size' abort mid-restore, attempt banked
+work/r1/t288-probe-dbg-a0-20261103-104330; BREAK lottery was WON that run, so
+the abort is the load path, not BREAK). (2) t261-t1255's bank shows the MOUSE
+pair changing while (msg,char) sat at 1/0x1b — sub-variants exist where the
+mouse path (likely INT 33h-side) lived on; do not generalise 'all pump paths
+dead' from the single clean restore. (3) control post-click turn dword read 0
+(slot 46+) — unexplained side observation, pair behaviour unaffected; flag for
+t249b-law follow-up if it recurs. (4) mx field read 0x6168 in both t288 runs —
+field identity [unverified], ignored.

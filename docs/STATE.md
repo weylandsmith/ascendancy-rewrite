@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-03T08:25
+updated: 2026-11-03T11:15
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -265,30 +265,31 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t288 SOFTLOCK-CLASS FOLLOW-UP WITH THE DEBUGGER (queue order; t287
-LANDED — diplomacy corroboration banked in docs/re/diplomacy.md §21 with the
-"Extinct" row adjudicated and a new XTEST input channel scripts/r287_vncinput.
-py in hand; t286b stays queued below — it is a narrow re-probe with no
-dependency, run it any iteration the BREAK lottery is wanted anyway). The
-softlock class is characterized (t266: modal-freeze from a second writer;
-t261: input-dead ON LOAD, i.e. the save captured the frozen state) but the
-ENGINE state that makes input dead is still unnamed. Use
-scripts/r1_wp_session.py (t286 instrument; BREAK lottery = relaunch loop
-until 'armed:') against a SOFTLOCKED SCRATCH session — bring one up per
-docs/re/selfplay.md t260/t261 laws (GUI window, loadstate from a scratch
-copy of bank-t251-live1255 slot 60, own ring dir, NEVER the production ring,
-NEVER production :9) — break in, and dump the input-callback queue / the
-game's own input flag rather than guessing. Bank to selfplay.md §7 + flag
-anything that changes the drive SOP.
+NEXT t286b PLANET-LIST WRITER RE-PROBE (queue order: zero new prerequisites,
+and it is the one iteration type that exercises the BREAK lottery anyway —
+t288 LANDED below closed the debugger-on-restored-state route, which does NOT
+constrain this target: heap-planets-blind arms at the TITLE screen and enters
+via RESUME.GAM, never loadstate). Rerun scripts/r1_wp_session.py --target
+heap-planets-blind --expect-base 0x1bf4d8 --break-early --phases quiet,reopen
+inside the relaunch loop (retry until 'armed:' in the session log — BREAK
+lottery ~50%, t286 law 2) 2-3 attempts; grep pty for ANY 'Memory breakpoint'
+beyond the arm/BPLIST echoes. Run 10 saw the refill in the ring with the bp
+armed and ZERO fires while run 11's tick control fired in the identical flow
+(_wip_t286 S6/S7 candidate readings). A fire = the writer EIP (map via
+EIP-(B-0x88)); repeated zero = BPLM blind-heap arms are unreliable on this
+build -> bank that negative and the t249 widget-chain subitem stays
+watchpoint-open. THEN (next session) the drive-class V>=25 row: t288 handed it
+the RAM liveness needle (inject 'c', expect data:0x484c6==0x63 next slot —
+selfplay.md t288) which satisfies the t266-§4 requirement the pixel probe
+failed; wire the needle into the driver before resuming the drive from t1086.
 
 SESSION-START SCREEN CHECK (t287 law, do this BEFORE any other probe): a VNC
-user may leave production on ANY screen (this session found the tutorial
-select menu open). Verify the screen with `DISPLAY=:9 import -window root` +
-vision BEFORE trusting ring rows (ring is blind off-campaign, t285). If off-
-campaign: recover via r287_vncinput.py move + highlight-verified click on
-'Return to Current Game' (title menu row 4, center (318,333)); NEVER xsend-
-click menus (stale-hover law, diplomacy.md §21.5). Production parked NOW at
-galaxy map t1086 (shipfp f4e5e715), overlay OFF, pid 660167 alive.
+user may leave production on ANY screen. Verify with `DISPLAY=:9 import
+-window root` + vision BEFORE trusting ring rows (ring is blind off-campaign,
+t285). If off-campaign: recover via r287_vncinput.py move + highlight-verified
+click on 'Return to Current Game' (title menu row 4, center (318,333)); NEVER
+xsend-click menus (stale-hover law, diplomacy.md §21.5). Production verified
+this session at galaxy map t1086 (10:56 vision), pid 660167 alive, overlay OFF.
 
 DRIVE-CLASS PRECONDITION (t285 law, docs/re/driver-selfharm-t285.md — applies
 to EVERY future drive row incl. any V>=25 re-drive): the driver must (1) detect
@@ -329,14 +330,6 @@ t286b PLANET-LIST WRITER RE-PROBE (one t286 follow-up; needs nothing new):
   writer EIP (map via EIP-(B-0x88)); repeated zero = BPLM blind-heap arms are
   unreliable on this build -> bank that negative and the t249 widget-chain
   subitem stays watchpoint-open.
-
-t288 SOFTLOCK-CLASS FOLLOW-UP WITH THE DEBUGGER (needs t282/283): the class is
-  characterized (t266: modal-freeze from a second writer; t261: input-dead
-  ON LOAD, i.e. the save captured the frozen state) but the ENGINE state that
-  makes input dead is still unnamed. If the debugger is usable, break into a
-  softlocked scratch session and dump the input-callback queue / the game's own
-  input flag rather than guessing. Bank to selfplay.md §7 + flag anything that
-  changes the drive SOP.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - OOM LAW: NEVER read live-timeline.jsonl except r1_stream.py / <=400 KB
@@ -426,6 +419,35 @@ zoom). (6) Species-row y's are campaign-dependent (61/100/139 here vs t252
 73/140/207) — re-measure per sitting (ui-runtime.md §6b corrected). All 15
 clicks READ-ONLY, zero proposals/declares, parked at galaxy t1086 overlay
 OFF. NEXT=t288.
+
+LANDED t288 (2026-11-03): SOFTLOCK CLASS — THE DEAD HALF IS THE GAME-SIDE INPUT
+PUMP, MEASURED WITH A CONTROL PAIR (docs/re/selfplay.md t288 + _wip_t288.md;
+NO OQ closed — no ledger row covers the engine-hang class; strict-close).
+(1) THE INSTRUMENT is offline: the game's own pending-input globals WORD
+ds:0x484c4 (msg) / ds:0x484c6 (char) (t103 P13 relay law) ride inside every
+ring-slot Memory member; scripts/r288_input_census.py RC=0 across 15 banks x 20
+slots: healthy idle (0,0), healthy post-'c' (0x2e,0x63), EVERY softlock-class
+bank STUCK at (1,0x1b=Escape) — the shape of an ESCAPE PENDING, matching the
+t285 Escape-exit tell [inferred]. Member-index off-by-H law banked in-file
+(mem[B+OBJ1_OFF+off]). (2) THE LIVE PAIR (scripts/r288_softlock_probe.py,
+release 2025.02.01 host, scratch work/r1/game-t288, Xvfb :91, own ring —
+production :9 untouched, pid 660167 alive): SOFT run 104942 restored t1255
+(LOG 'Loading state from slot: 60' + ring turn 1255 + vision '01255') shows
+(1,0x1b) frozen across 11 slots THROUGH a click + two injected 'c' keys, screen
+md5 identical; CONTROL run 110123 (--no-load, RESUME t1086) pair moves to
+(46,99) after ONE 'c' with the overlay visibly toggling. VERDICT: the pump
+(copying the DOSBox event record into the globals, readers 0x2a875/0x2a8fe)
+stops writing; dispatch is starved, not independently dead. (3) SOP UPGRADE:
+input liveness = RAM NEEDLE (inject 'c', expect data:0x484c6==0x63 next slot),
+answering t266 §4's call for a non-pixel liveness channel — wire into the
+driver before the V>=25 re-drive. (4) NEW REFUTED ROUTE: the dbg binary
+(2026.10.01) ABORTS mid-restore of a 2025.02.01 state ('corrupted size vs.
+prev_size' with BREAK already survived and BPLM armed; bank
+work/r1/t288-probe-dbg-a0-20261103-104330) — writer-EIP on restored states
+needs a same-version dbg build, not this one. Honest negatives banked: writer
+EIP unwitnessed; t261-t1255 mouse-pair sub-variant (mouse path lived while keys
+dead) — do not generalise; control post-click turn-dword read 0 (flagged,
+unexplained). Gate 0, audits OK. NEXT=t286b.
 
 LANDED t285 (2026-11-03): DRIVE SELF-HARM ROOT-CAUSED WITH WITNESSES — ESCAPE
 AT THE GALAXY MAP EXITS TO THE TITLE MENU; RING GUARDS ARE BLIND THERE; THE
