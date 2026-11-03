@@ -268,52 +268,48 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t291 UPGRADE THE REWRITE CONTROL COMPARATOR TO THE CITED TWO-THIRDS LAW
-+ BLAST-RADIUS RETRAP (ordering rationale: t290 READ the vendor comparator
-verbatim — Control victory iff V >= floor(2T/3)+1 with V=DAT_482fb, T=DAT_16143
-(docs/re/_wip_t290.md S1, disasm 0x24b9c..0x24bbe) — so the rewrite's
-`mine*2 > total` at rewrite/src/game/campaign.cpp:2157 is now MEASURED-WRONG,
-and fixing a cited-wrong default is the loop's core outcome; the live
-victory-screen witness that would fully close OQ-021 cannot be cheaply
-manufactured this way (t290 S6: the FM-freeze decisive RUN EPIPE'd the
-emulator) so the code fix is the highest-value move left on this thread.
-Task: (1) change checkVictory's Control arm to `scoreStars_ * 3 >= 2*total + 1`
-(i.e. V > 2T/3 integer-exact; use scoreStars_, NOT starsOwned — the vendor
-operand is the PRODUCED V, t290 S1/t284; the function currently reads
-`mine`, keep every other arm byte-identical and keep the arm ORDER comment);
-(2) BLAST RADIUS MANDATORY: the CLI Control-win seeds (2024 Control t1255,
-Extinct t979/t982 family, PLAYTHROUGH.md ladders) win by Control at 46-66%
-V-share — raising the bar may push wins past the pacing guards (widened to
-1200/1600 at t202b): re-run the seeded CLI checks, and where a win now lands
-past the guard, widen ONLY pacing windows with dated comments (t202b precedent)
-or re-pin the expected turn — NEVER bend the law back; (3) NEW PIN
-test_campaign_control_two_thirds_t291: construct V==floor(2T/3) -> NO victory
-and V==floor(2T/3)+1 -> Control, mutation-verified (flip the comparison ->
-CAUGHT); check test_score_t284.cpp + test_campaign.cpp for any existing
->1/2-shaped expectations and update them to the cited law with a cite comment;
-(4) regenerate PLAYTHROUGH.md if ladders moved; (5) append STATUS t291 to the
-OQ-021 row (STAYS OPEN strict-close — the live presenter witness residue
-survives; the code-default fix does NOT itself close the row); (6) score.md
-gets a permanent S-section distilled from _wip_t290 S1-S3 (comparator law +
-caller/gate + sel/rank writer + jmp table) since _wip files are working logs.
-CAVEATS: rank semantics stay [unverified] beyond the arithmetic ladder
-(_wip_t290 S3); the elimination ladder (result 1-4) is only class-mapped —
-do NOT wire rewrite arms for it on this evidence (Extinct/LastAlive/Captured/
-Unification keep their current documented readings); [0x10ba4] identity open.
-OPTIONAL SIDE-ARM if t291 finishes early (same session budget): the live
-victory-screen witness via the FREEZE-FREE route — poke mode N>=34 sticks
-upward (the flood only increments), scripts/r290_relaunch.sh poke 40; the S6
-EPIPE class means budget 5+ attempts and treat a dead RUN as the negative.
+NEXT t292 THE LIVE end-ctrl PRESENTER WITNESS (OQ-021's LAST RESIDUE) —
+FREEZE-FREE POKE-UPWARD ROUTE, HARD BUDGET (ordering rationale: t291 landed the
+rewrite upgrade + pins + PLAYTHROUGH retrap, so OQ-021 now has exactly ONE thing
+standing between it and CLOSED: witnessing sel==5 written by evaluator 0x24d9f
+fire in a live session (docs/re/score.md S19, _wip_t290 S2/S6). It is the only
+open residue anywhere in the ledger that a SINGLE run can close with cited
+measurement, and the instrument already exists (scripts/r290_poke_session.py +
+scripts/r290_relaunch.sh). If the EPIPE class keeps killing the decisive run,
+the honest negative lands and NEXT moves to the OQ-019 static residue — do NOT
+spiral.)
+Task: in a SCRATCH session with its OWN ring dir (two-writer law), start from a
+save-state, poke the flood-mode/global such that V>=34 STICKS UPWARD (t290
+finding: the flood only increments within a pass, so poke N>=34, e.g.
+`r290_relaunch.sh poke 40` — the freeze variant is NOT needed and caused the
+t290 S6 EPIPE suspicion; keep the run freeze-free). Then let the end-turn pass
+run and WITNESS, in order: (1) selector byte guest 0x43510 0 -> 5 (MEMREAD is
+real-mode-only, debug.cpp:2983 — use the ring/r1_slot.py surface or a debugger
+read path that works), (2) rank dword 0x4350c written, (3) screen shows the
+end-ctrl victory text (VNC :<scratch> import + vision; presenter arm =
+end-ctrl.txt via table entry sel 5 @0x1eb468+0x14). BUDGET: 5 attempts MAX;
+each dead RUN (EPIPE, ring freeze) counts as a negative, not a retry reason
+beyond the budget; xsend arg1 is the WINDOW TITLE not the display (t290
+pitfall). If witnessed: append STATUS t292 to OQ-021 with the bank/run ids and
+CLOSE the row (ledger 16/3 — update nothing by hand; ledger_index_check derives
+the index). If the budget is exhausted: honest negative in the row (EPIPE class
+characterised as far as measured: which ring slot froze, whether the freeze
+precedes or follows the store), row stays open, and NEXT moves to t293 = OQ-019
+cost-hack residue (+0x46 writers, ships.md §6 lead) which is fully static.
+CAVEATS: production :9 (pid 660167, t1150 V=23) is the corpus — scratch sessions
+NEVER mount game/ and NEVER share its ring; the scratch may be wrecked freely
+(user grant). Do NOT wire rewrite arms for the elimination ladder (results 1-4)
+on t290 evidence; [0x10ba4] identity stays open.
 SESSION-START SCREEN CHECK (t287 law, do this BEFORE any other probe): a VNC
 user may leave production on ANY screen. Verify with `DISPLAY=:9 import
 -window root` + vision BEFORE trusting ring rows (ring is blind off-campaign,
 t285). If off-campaign: recover via r287_vncinput.py move + highlight-verified
 click on 'Return to Current Game' (title menu row 4, center (318,333)); NEVER
 xsend-click menus (stale-hover law, diplomacy.md §21.5). Production verified
-this session at galaxy map t1150 (13:13 ring rows; drive ended clean), pid
-660167 alive, ring fresh, HEALTHY (V=23/50, sel 0). RESUME.GAM remains the
-Oct-29 t1086 point: a title resume REGRESSES 64 turns — production's live
-state lives in the RING/RAM, keep driving, never rely on title-resume.
+this session at galaxy map t1150 (ring fresh 16:11; V=23/50, sel 0), pid
+660167 alive, HEALTHY. RESUME.GAM remains the Oct-29 t1086 point: a title
+resume REGRESSES 64 turns — production's live state lives in the RING/RAM,
+never rely on title-resume.
 
 DRIVE-CLASS PRECONDITION (t285 law, docs/re/driver-selfharm-t285.md — applies
 to EVERY future drive row): (1) detect the TITLE MENU FROM THE SCREEN before
@@ -378,6 +374,42 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
   or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
+
+LANDED t291 (2026-11-03): THE REWRITE CONTROL ARM NOW CITES THE VENDOR —
+`scoreStars_ >= (2*total)/3 + 1` REPLACES `mine*2 > total` at
+campaign.cpp:2157 (docs/re/_wip_t291.md S1-S5; law distilled permanently to
+docs/re/score.md S19; turnloop.md §1 Control row rewritten; OQ-021 STATUS t291
+appended, ROW STAYS OPEN strict-close, ledger 15/4). Pins
+rewrite/tests/test_control_t291.cpp x4 all ok, MUTATION-VERIFIED both ways:
+threshold reverted to total/2+1 -> CAUGHT 3 fails; operand flipped to mine ->
+CAUGHT 4 fails; restored 170/170. New pin surface: checkVictoryForTest() +
+setScoreStarsForTest() (campaign.h), factory shim makeCampaignSized(seed,
+aiCount, starCount) exported from test_campaign.cpp (t202b precedent —
+makeCrafted is anon-namespace in test_species.cpp, NOT linkable across TUs).
+BLAST RADIUS MEASURED --campaign 1600: seed 1 Control t1131->t1337 (70%), seed
+2 t1110->t1427 (70%), 13/42 Extinct UNCHANGED t747/t979, seed 2024 FLIPPED
+Control t1255 (46%) -> EXTINCT t1555 (owner 3 wipes the player before V reaches
+34 — 46% was NEVER a vendor win; the 70% figure is the LANES-unit flood metric,
+score.md S7-unit note, not a star share). Law never bent: pacing windows only —
+record_playthrough.sh budgets 1200->1600 with dated t291 comment, run B re-pinned
+42->1 (42 is an Extinct seed; gate greps PLAYTHROUGH for 'VICTORY Control' AND
+'VICTORY Extinct': run A 2024 Extinct t1555 + run C 13 Extinct t747 carry the
+Extinct grep, run B seed 1 Control t1337 carries the Control grep); PLAYTHROUGH
+REGENERATED via the generator (rc=0, 97 lines — never hand-edited, BLOCKED.md
+trap). gate.sh 4b (--campaign 1600 --seed 2024) passes UNCHANGED post-flip
+(exit 0 + '^VICTORY ' line; guard targets stall, not victory type). test_score_
+t284.cpp had NO >1/2-shaped expectations (checked, none to update). test_campaign
+1200-cap tests pass unchanged (makeCampaign defaults ai=6 dynamics still resolve
+inside 1200 for seeds {1,2,2024} — CLI 1600 numbers differ because the CLI
+wires abilities+smoke roster; contract is finite-resolve, type-agnostic).
+PITFALLS: (a) execute_code kernel dict keys come back str after json round-trip
+— int-key lookups KeyError, re-run cheap probes rather than debug; (b) pinning a
+checkVictory-reachable fixture requires t1-or-earlier arms SILENT: clearing all
+AI owners arms LastAlive first (1-AI map + hostile home is the safe shape).
+Production :9 untouched pid 660167 HEALTHY t1150 (ring fresh 16:11, V=23/50,
+sel 0); no new sitting this session (timeline tail max turn 1150 — t85g
+correctly NOT run). Gate 0, audits OK. NEXT=t292 (live end-ctrl presenter
+witness, freeze-free poke-upward, HARD budget 5 -> else OQ-019 static leg).
 
 LANDED t290 (2026-11-03): THE END-CTRL COMPARATOR IS READ VERBATIM —
 TWO-THIRDS, STRICTLY GREATER (docs/re/_wip_t290.md S1-S6; tools

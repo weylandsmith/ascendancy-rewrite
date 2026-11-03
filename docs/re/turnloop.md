@@ -29,9 +29,15 @@ must stop at the next keyword — running past `congrat` miscounts 20),
 `congrat`..`endtext`, `end`. Asserted by `scripts/endtext_probe.py` / gate 3l.
 
 Rewrite implements (campaign.cpp — all five evaluated since 2026-10-04f):
-- `Control`  — player owns > 1/2 of all stars (end-ctrl; the "> half" IS the
-  vendor comment, the per-star unit of "galaxy" is [inferred]; threshold
-  contradiction with "two-thirds" prose filed as OQ-021).
+- `Control`  — t291 UPGRADED to the CITED law: V >= floor(2T/3)+1 where V is
+  the PRODUCED controlled-systems count (scoreStars_, DAT_482fb analog) and T
+  is the total star count (DAT_16143) — strictly more than two-thirds, read
+  verbatim from evaluator FUN_00024a34 file 0x24b9c..0x24bbe
+  (docs/re/_wip_t290.md S1, distilled score.md S19). The vendor comment "over
+  half" is decoration: enddesc/congrat prose ("over two-thirds", "more than
+  two-thirds of the stars") matches the code (OQ-021's named dispute, ANSWERED
+  t290; the pre-t291 `mine*2 > total` default was MEASURED-WRONG on both the
+  operand and the threshold).
 - `Captured` — player owns every AI's setup home star (end-capt). The home
   star is fixed at setup (`homeStar_`, the star pickHomeStars assigned each
   owner) [inferred unit: "home worlds" = those stars]. Evaluated BEFORE

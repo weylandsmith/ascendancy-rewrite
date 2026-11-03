@@ -26,9 +26,19 @@ capture() { # capture <name> <expected-substring> <cmd...>
 # t93 picker law re-measured: 2024 t737 / 42 t688 / 13 t503 / 1 t836 / 2 t657.
 # t100 cadence law re-measured: IDENTICAL (2024 t737 / 42 t688 / 13 t503) —
 # the FFA smoke seeds' AI abilities do not gate these seeds' victories.
-capture A "VICTORY"          "$BIN" --headless --campaign 1200 --seed 2024
-capture B "VICTORY"          "$BIN" --headless --campaign 1200 --seed 42
-capture C "VICTORY"          xvfb-run -a "$BIN" --campaign 1200 --seed 13
+# t291 BLAST-RADIUS RETRAP (cited two-thirds Control law, docs/re/_wip_t290.md
+# S1 -> campaign.cpp end-ctrl arm): the bar moved from >1/2 owned to
+# V >= floor(2T/3)+1 (=34/50) on the FLOOD metric, so Control wins land much
+# later. CLI --campaign 1600 measured this session: seed 1 Control t1337,
+# seed 2 Control t1427, seed 13 Extinct t747, seed 42 Extinct t979, and seed
+# 2024 FLIPS Control t1255 -> EXTINCT t1555 (owner 3 wipes the player before
+# V ever reaches 34 — 46% was never a vendor win). Budgets 1200 -> 1600
+# (t202b precedent: pacing windows widen, the law never bends); run A is now
+# seed 2024 at 1600 (documents the flip honestly) and run B seed 1 (the
+# Control exemplar the gate greps for). All runs FINITE.
+capture A "VICTORY"          "$BIN" --headless --campaign 1600 --seed 2024
+capture B "VICTORY"          "$BIN" --headless --campaign 1600 --seed 1
+capture C "VICTORY"          xvfb-run -a "$BIN" --campaign 1600 --seed 13
 capture D "ui ok: turn 3"    xvfb-run -a "$BIN" --ui --campaign 3 --autoplay --seed 9
 capture E "audio ok: 85 sfx chunks, music 8191719 B" \
         env SDL_AUDIODRIVER=dummy xvfb-run -a "$BIN" --ui --audio --campaign 1 --autoplay --seed 4
@@ -58,9 +68,9 @@ echo "current binary. Victory conditions and their vendor files: docs/re/turnloo
 echo
 for r in A B C; do
   case $r in
-    A) title="Run A — headless, seed 2024"; cmd="$BIN --headless --campaign 1200 --seed 2024";;
-    B) title="Run B — headless, seed 42";   cmd="$BIN --headless --campaign 1200 --seed 42";;
-    C) title="Run C — Xvfb/X11, seed 13";   cmd="xvfb-run -a $BIN --campaign 1200 --seed 13";;
+    A) title="Run A — headless, seed 2024 (t291: flips to Extinct under the cited two-thirds law)"; cmd="$BIN --headless --campaign 1600 --seed 2024";;
+    B) title="Run B — headless, seed 1 (Control exemplar, t1337 under the cited law)";   cmd="$BIN --headless --campaign 1600 --seed 1";;
+    C) title="Run C — Xvfb/X11, seed 13";   cmd="xvfb-run -a $BIN --campaign 1600 --seed 13";;
   esac
   echo "## $title"
   echo

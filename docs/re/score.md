@@ -720,3 +720,43 @@ now get their owner's +0x16/+0x17 bits at settlement (without it the flood
 prunes its own colonies). Pins: tests/test_score_t284.cpp (6 tests: cadence,
 home-loss zero, full flood == 1+lanes + presence prune, player-bit-only
 visibility, contest incl. direction + own-traffic exemption, pct formula).
+
+## S19 — t291: THE END-CTRL COMPARATOR LAW, DISTILLED (permanent copy of _wip_t290 S1-S3)
+
+Working logs (_wip_*) are not durable citations; this section is the permanent
+home for the t290 result. Full detail, disasm listings, and the live-session
+post-mortem stay in docs/re/_wip_t290.md.
+
+COMPARATOR (evaluator FUN_00024a34, file 0x24b9c..0x24bbe, read verbatim):
+  T = dword[state+0x3333]>>16 == DAT_00016143 (the SAME field the S2
+  disproducer reads); V = dword[state+0x354eb] == DAT_000482fb (S17/S18);
+  eax = floor(2T/3) (idiv 3 of 2T) then inc eax; cmp eax, edi; jg skip.
+LAW: Control victory iff V >= floor(2T/3)+1  <=>  V > 2T/3, strictly greater.
+T=50 is the ONLY corpus galaxy size (S14 census) -> the bar is V >= 34. The
+end-ctrl.txt header comment "over half" is decoration; enddesc ("spans over
+two-thirds of the galaxy") and congrat ("more than two-thirds of the stars")
+match the code. OQ-021's named text dispute is ANSWERED BY CITED CODE (t290).
+
+CALLER/GATE (file 0x252aa..0x252ee, end-turn pass after the S18 producer):
+  exactly one caller 0x252e9 (E8 census); runs iff selector byte
+  state+0x30700 == 0 AND dword[0x10ba4] == 0 (both MEASURED open in banked
+  banks -> the evaluator ran every turn of every captured game and never found
+  a winner); sel!=0 is the game-over latch (a finished game is never
+  re-evaluated). Result!=0 writes presenter sel byte state+0x30700 (0x24d9f) +
+  rank u16 state+0x306fc (0x24dab) and fires event 0x56ad4 arg 0x7a35c.
+
+RESULT MAP (semantics graded): 1 @0x24a66 [class xtnc]; 2 @0x24a78 / 3 @0x24ab7
+/ 4 @0x24b05 elimination ladder, field semantics [unverified]; 5 @0x24bbe the
+Control comparator, evaluated ONLY when 1-4 cleared. Presenter jmp table
+resolved at member 0x1eb468 (linear 0x1eb3e0, cs-rel disp32 operand at file
+0x2c035): sel 1..5 -> end-xtnc/dest/capt/unit/ctrl respectively (strings
+byte-verified). RANK arithmetic ladder @0x24c35..0x24d92 banked; name mapping
+[unverified]. [0x10ba4] identity open.
+
+REWRITE UPGRADED t291 (campaign.cpp end-ctrl arm, was `mine*2 > total`):
+`scoreStars_ >= (2*total)/3 + 1` — operand AND threshold both changed to the
+vendor's. Pins tests/test_control_t291.cpp (4 tests, mutation-verified both
+ways: threshold mutation CAUGHT 3 fails, operand mutation CAUGHT 4 fails).
+BLAST RADIUS measured (--campaign 1600): seed 1 Control t1131->t1337, seed 2
+t1110->t1427, seeds 13/42 Extinct unchanged, seed 2024 FLIPPED Control t1255
+(46%) -> Extinct t1555 (46% was never a vendor win). PLAYTHROUGH regenerated.

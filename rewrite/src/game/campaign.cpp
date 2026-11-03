@@ -2154,7 +2154,21 @@ Victory Campaign::checkVictory() const {
         if (starsOwned(o) > 0 && war_[kPlayer * Nowner_ + o]) playerAtWar = true;
     if (aliveAi > 0 && aiAllied == aliveAi && !playerAtWar)
         return Victory::Unification;
-    if (mine * 2 > total) return Victory::Control;  // end-ctrl (OQ-021: "> half" vs prose "two-thirds")
+    // t291 UPGRADE to the CITED vendor comparator (docs/re/_wip_t290.md S1,
+    // evaluator FUN_00024a34 file 0x24b9c..0x24bbe, read verbatim):
+    //     eax = floor(2*T/3) + 1 ; cmp eax, V ; jg skip ; -> Control
+    // i.e. Control iff V >= floor(2T/3)+1  <=>  V > 2T/3 (integer-exact).
+    // Operands: V = DAT_000482fb = scoreStars_ (the PRODUCED controlled-system
+    // count from the pruned flood, score.md S17/S18) and T = DAT_00016143 ==
+    // total stars (score.md S3, the same field the 'c' overlay disproducer
+    // reads). The arm is therefore NOT starsOwned-based: the previous
+    // `mine * 2 > total` default (the end-ctrl.txt header comment "over half")
+    // is MEASURED-WRONG on both the operand and the threshold -- the prose in
+    // enddesc/congrat ("over two-thirds", "more than two-thirds of the stars")
+    // matches the code, and the code wins. (2*total)/3 truncates toward zero ==
+    // floor for total >= 0, so this is the vendor's idiv pair exactly.
+    const int ctrlThreshold = (2 * total) / 3 + 1;
+    if (scoreStars_ >= ctrlThreshold) return Victory::Control;  // end-ctrl (OQ-021, t291 cited law)
     return Victory::None;
 }
 

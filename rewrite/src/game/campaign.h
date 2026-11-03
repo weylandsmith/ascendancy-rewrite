@@ -198,6 +198,16 @@ public:
     }
     void setFleetForTest(std::vector<ShipInTransit> f) { fleet_ = std::move(f); }
     void recomputeScoreStarsForTest() { recomputeScoreStars(); }
+    // t291 PIN SURFACE: the end-ctrl comparator arm of checkVictory, callable
+    // directly after staging scoreStars_/owner_ (the vendor evaluator is a pure
+    // read of DAT_482fb + DAT_16143 at the end-turn pass; a direct call is the
+    // same read without waiting ~1300 turns of dynamics).
+    Victory checkVictoryForTest() const { return checkVictory(); }
+    // t291 PIN SURFACE: stage V (the DAT_482fb analog) to an EXACT value so the
+    // comparator boundary floor(2T/3) / floor(2T/3)+1 is testable without
+    // engineering a flood of that precise size (thin setter, same pattern as
+    // setIndustryForTest).
+    void setScoreStarsForTest(int v) { scoreStars_ = v; }
     // t204 pin surface: scenario peace/war toggle (pins "peace never clears
     // the attacked mark" — permanence is the measured property, so the pin
     // must be able to make peace). Thin wrapper over the private setWar.

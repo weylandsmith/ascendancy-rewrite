@@ -537,6 +537,24 @@ Rewrite default >1/2 (campaign.cpp:2157) is WRONG vs the cited law — UPGRADE
 QUEUED (code site + pin = closure hygiene per GOAL). Row STAYS OPEN: live
 victory-presenter witness + rewrite upgrade pending; everything else the row
 named is now cited-closed.
+STATUS t291 (2026-11-03, docs/re/_wip_t291.md S1-S4, law distilled to
+docs/re/score.md S19): THE REWRITE UPGRADE LANDED — campaign.cpp end-ctrl arm is
+now `scoreStars_ >= (2*total)/3 + 1` (operand AND threshold both moved to the
+vendor's: V=DAT_482fb analog, not starsOwned; floor(2T/3)+1, not >1/2). Pins
+tests/test_control_t291.cpp x4 (T=50 boundary 33/34; two-thirds-vs-half
+discriminated at T=14 where 2T mod 3 != 0; operand-is-V: owned 8+/14 with V=1
+-> None; end-to-end producer->comparator wiring on a real advance()) —
+MUTATION-VERIFIED both directions (threshold->half CAUGHT 3 fails; operand->mine
+CAUGHT 4 fails; restored 170/170 ok). BLAST RADIUS measured --campaign 1600:
+seed 1 Control t1131->t1337, seed 2 t1110->t1427, seeds 13/42 Extinct unchanged,
+seed 2024 FLIPPED Control t1255 (46%) -> Extinct t1555 (the player is wiped by
+owner 3 before V ever reaches 34 — 46% was never a vendor win; the law stands,
+PLAYTHROUGH.md regenerated via record_playthrough.sh with dated t291 notes, run
+B re-pinned to seed 1 as the Control exemplar the gate greps). Row STAYS OPEN
+strict-close: the ONLY residue left is the live end-ctrl victory-presenter
+witness (sel==5 written by 0x24d9f observed firing in a live session; t290 S6
+EPIPE class, budget 5+ attempts, freeze-free poke-upward route r290_relaunch.sh
+poke 40); every static and code-side element the row named is now cited-closed.
 STATUS t289 (2026-11-03, docs/re/_wip_t289.md S2-S3): the needle-guarded re-drive
 ran CLEAN t1086->t1150 (69 presses, 64 turns, zero softlocks; drive_20261103-
 125013.log exit 0). Harvest (r273_harvest window 12:40-13:35, 229 trusted rows):

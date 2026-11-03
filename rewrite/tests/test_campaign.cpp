@@ -74,6 +74,24 @@ ag::Campaign makeCampaign(unsigned seed, int aiCount = 6, bool ffa = true) {
 // the `ag` alias lives inside the anonymous namespace above.
 ascend::game::Campaign makeCampaignForDemolish(unsigned seed) { return makeCampaign(seed); }
 
+// Exported shim (t291): test_control_t291.cpp needs a crafted campaign with a
+// chosen aiCount/starCount (the end-ctrl boundary must be testable on a galaxy
+// size where floor(2T/3)+1 != the >half bar, i.e. 2T mod 3 != 0 — impossible
+// at the default T=50). Same table wiring as makeCampaign, no abilities.
+ascend::game::Campaign makeCampaignSized(unsigned seed, int aiCount, int starCount) {
+    ag::CampaignConfig cfg;
+    cfg.seed = seed;
+    cfg.aiCount = aiCount;
+    cfg.freeForAll = true;
+    ag::MapConfig mc;
+    mc.seed = seed;
+    mc.starCount = starCount;
+    ag::Galaxy g = ag::MapGenerator(mc, tables().stats, tables().names).generate();
+    std::string err;
+    return ag::Campaign(cfg, g, &tables().tree, tables().items, tables().gizmos,
+                        tables().ai, &err);
+}
+
 TEST(campaign_homes_distinct) {
     auto c = makeCampaign(7);
     for (int o = 0; o <= 6; ++o) CHECK(c.starsOwned(o) == 1);
