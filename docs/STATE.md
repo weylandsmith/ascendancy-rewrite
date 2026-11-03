@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T20:05
+updated: 2026-11-02T21:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,35 +260,30 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t281 SA_CORNUCOPIA REPAINT WIRING (pure code) — ORDERING
-RATIONALE: t280 landed 2026-11-02 (LANDED t280 below: gap row 11 remaining
-bodies closed out — MoreMaxPop body 0x4402a found+wired, CauseWar retired
-per erratum E3, ForcePeace divergence re-labelled E2). The drive-class row
-t279 (diplomacy live verification) STAYS HELD: at t280 close `ss -tn |
-grep 5910` still shows an ESTAB VNC client (release condition (a) of BLOCKED
-t273 unmet). Of the bodies t280 audited, SA_Cornucopia (0x43de4) is the ONLY
-remaining one whose operands the rewrite state CARRIES: the cited law picks
-the own planet with MIN WORD pop (skip [rec+0x16]==10) and repaints every
-slot-class byte in {0,1} to a uniform rng pick {2,3,4} (pool 0x6838 u32x3 ==
-{2,3,4} measured t280, rng 0x7824f %3) — the rewrite has cellClasses (T36)
-and pop, yet currently models richPros+=2 instead. All other open body
-labels are per-ship (OQ-019 boundary) or AI->AI attitude (row 12 boundary)
-and stay refused with reasons on file. TASK: wire the repaint verbatim over
-cellClasses (define the +0x16-skip equivalent honestly — likely
-size-class/none; measure first), then retire richPros (t280 census: NO UI
-source reads richPros — rewrite/src/ui/*.cpp|h has zero hits; the only
-readers are campaign.cpp itself + test_species.cpp:236 — but re-verify at
-task time) and re-target that test leg to the repainted grid; pin with a
-control differential + mutation probe, keep gate seeds verbatim.
-If the +0x16 skip or class semantics turn out unrepresentable, FILE the
-refutation with the measurement instead (strict-close). If a drive-class
-re-queue is justified at task start (no :5910 client AND ring still
-production-lineage), it outranks this row and STATE gets rewritten
-accordingly. t282+ after.
-NOTE t278 FOR THE OQ-005 ASK (user-side, not a task): the ruling package is
-work/r1/shp_png/index.txt (twin decision-sheet.md) — 88 rows, per-row keep/
-junk/re-render recommendation; the user rules by replying per row id. When a
-ruling arrives, adjudicate it against docs/re/shp.md S24 + the OQ-005 row.
+NEXT WAIT-TRIGGER SENTINEL (t281 drained the offline queue — do NOT re-derive
+work; check ONLY the triggers below, and end the session if none fired).
+ORDERING RATIONALE: t281 landed 2026-11-02 (LANDED block below): SA_Cornucopia
+was the LAST §6.3 ability body whose operands the rewrite state carries; every
+remaining gap label is per-ship (OQ-019 engine-build boundary) or AI->AI
+(row-12 disposition, t256b) and stays refused with reasons on file. The one
+queued live task t279 (diplomacy second-campaign corroboration) is HELD on its
+release conditions (BLOCKED t273: NO :5910 VNC client AND ring still
+production-lineage — at t281 close BOTH fail: client ESTAB present, ring is
+tutorial-645 churn). Offline RE is drained; per the after-drains law NEXT is a
+sentinel, not churn.
+TRIGGER A (user played / new sitting): r214_triage.py prints "sitting delta:
+True" AND the tail shows a NEW lineage (not the 20:0x-start tutorial-645 churn
+already characterized at t280/t281). Then run scripts/r1_t85g_sitting.py and
+t279 becomes the task IF its release conditions also hold; else harvest per
+selfplay.md laws.
+TRIGGER B (user ruling on OQ-005): a per-row reply arrives against
+work/r1/shp_png/index.txt (twin decision-sheet.md) — adjudicate vs
+docs/re/shp.md S24 + the OQ-005 row (t278 package).
+TRIGGER C (user supplies a debugger-enabled dosbox-x build): re-opens the
+watchpoint class for OQ-021/OQ-019 (REFUTED-ROUTES t272 re-open clause).
+TRIGGER D (human names a task): do that task.
+If NO trigger: write a one-paragraph adoption note to docs/re/_wip_<id>.md and
+END. Do not invent new RE work while all four triggers are dark.
 
 QUEUE (phase 3, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
@@ -358,6 +353,44 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t281 (2026-11-02): SA_CORNUCOPIA REPAINT WIRED VERBATIM — THE LAST
+STATE-CARRYING §6.3 BODY CLOSED OUT + THE +0x16 SKIP KEY MEASURED (offline,
+pure code; NO OQ closed — strict-close honored, OQ-016 ANNOTATED, ledger 15/4):
+(1) RAW RE-READ sharpened the law (work/t280_bodies.txt:152): repaint BOUND is
+WORD[rec+0x18] = SURFACE slots only (orbital ring never touched), no occupied-
+slot gate, tie law strict-< with FIRST pool record winning (cx carries best pop,
+`jbe` prune @0x43e24). (2) MEASUREMENT (keeper scripts/r1_t281_w16_census.py
+RC=0): WORD[rec+0x16] over the static pool in two lineages (bank-t1254 n=145/
+owned 124, bank-t273-tutorial645 n=135) is UNIFORM over 0..10 owned AND unowned
+=> +0x16 is the STORED world-gen weight-row index (ctor rng%11 @0x23a97/aa8),
+NOT a homeworld marker — t105 §3's one-sample [inferred] reading REFUTED; row
+10 == [0,33,34,33] zero-barren preset. t29b histogram non-prediction STANDS
+(persistence != provenance; template source stays an OQ-016 residue).
+(3) REWRITE: PlanetState.terrainRow stores the previously-discarded ctor draw;
+Cornucopia case = verbatim select (owner, skip row 10, strict-min pop, null-
+exit) + repaint cellClasses raw {0,1} -> 2+worldNext()%3 over the surface bound
+(worldLcg_ = terrain-family stream, rng_ trajectories untouched, choice jus-
+tified not defaulted); richPros field + richProsFor + storedProsFor join
+DELETED (income rides the T35 class-cell bonuses in channelAccFor — the channel
+the stand-in approximated; govBonus t45 law KEPT through the surgery).
+(4) PIN species_cornucopia_repaints_min_pop_colony_t281 (split from the
+more_max_pop test): seed-16 control differential (target recomputed in the
+test from owner/pop/terrainRow; all other stars byte-frozen; ring frozen) +
+seed-8 SKIP/NULL-EXIT leg (temp seed-scan MEASURED owner 1's only home sits on
+row 10 for seeds 8/9/14/18/18/26/31 -> no event, no cell change). MUTATION-
+VERIFIED: bound-widened CAUGHT (10 fails), skip-neutered CAUGHT (line 304);
+tie-break flip NOT caught (no pop tie at seed 16's argmin — honest negative,
+law stands on the raw jbe). Suite 159/0. Mid-edit slip banked honestly: first
+storedProsFor patch dropped +govBonus, caught same-minute.
+(5) Docs: aicode.md §6.3 t281 amendment, abilities.md row, ai-dossier row 11
+(Cornucopia leaves the abstraction list), income-law.md +0x16 note, OQ-016
+STATUS t281 STAYS OPEN, _wip_t281 S0..S5. Machine UNTOUCHED: :9 pid 576895,
+ESTAB VNC client present AND ring still tutorial-645 -> t279 release conditions
+BOTH unmet, drive HOLD; no clicks/saves. QUEUE DRAINED -> NEXT = WAIT-TRIGGER
+SENTINEL (triggers A-D named inline; after-drains relaunch law stands:
+MAX_ITERS=12 IDLE_GATE=0 — sentinel sessions are cheap by construction since
+they check four triggers and end).
 
 LANDED t280 (2026-11-02): AI GAP ROW 11 REMAINING BODIES CLOSED OUT — A
 MISSING BODY FOUND, TWO §6.3 CITATIONS REFUTED, CODE UPGRADED (offline, pure

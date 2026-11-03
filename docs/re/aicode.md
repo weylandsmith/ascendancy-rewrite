@@ -1042,6 +1042,30 @@ above]:
    point == 0, so the rewrite's single reset-on-fire is exact for BOTH
    exits.
 
+*** t281 CORNUCUPIA SHARPENING + +0x16 MEASUREMENT [verified raw re-read
+work/t280_bodies.txt:152 + census scripts/r1_t281_w16_census.py RC=0]:
+body 10 line above stands, with two additions. (1) The repaint BOUND is
+WORD[rec+0x18] — SURFACE slots only (loop 0x43e47..0x43e5a walks [rec+0x10]
+stride 4 to word +0x18); the orbital ring is never touched, and there is NO
+occupied-slot gate (a cell under a built item is repainted too). Tie law:
+cx carries the current best pop and the prune is `jbe` @0x43e24 -> strictly-
+less wins, FIRST pool record wins equal pops. (2) THE SKIP KEY MEASURED:
+WORD[rec+0x16] over the whole static pool in two lineages (bank-t1254 n=145/
+owned 124, bank-t273-tutorial645 n=135) is UNIFORM over 0..10 among owned AND
+unowned records — it is the STORED world-gen weight-row index (the ctor draw
+rng%11 @0x23a97/aa8, income-law.md S10), NOT a homeworld marker; the t105 §3
+one-sample "[inferred] homeworld exclusion" is REFUTED (15 tens across 3
+owners). Row 10 == preset [0,33,34,33], the zero-barren template. REWRITE
+UPGRADE t281: PlanetState.terrainRow stores the ctor draw; Cornucopia case
+repaints cellClasses verbatim (raw byte {0,1} incl. rock-bit semantics -> 2 +
+worldNext()%3, surface bound exact); richPros field + richProsFor accessor +
+the storedProsFor join DELETED (income now rides the T35 class-cell bonuses
+in channelAccFor — the channel the stand-in approximated). Pin
+species_cornucopia_repaints_min_pop_colony_t281 (seed-16 control differential
++ seed-8 skip/null-exit leg; MUTATION-VERIFIED: widening the bound to the
+orbital ring CAUGHT, deleting the skip leg CAUGHT; tie-break flip NOT covered
+— no pop tie at seed 16's argmin, honest negative). ***
+
 ### 6.4 CADENCE LAW + TABLE (0x6780 = ABILITY CHARGE DAYS) [verified]
 Counter row+0x19e: +1 per turn in FUN_0003e6e0 tail (0x3e7cf..0x3e805) iff
 [[row+7]+0x14]&0x80 (AI-enable scenario bit); player row excluded; when

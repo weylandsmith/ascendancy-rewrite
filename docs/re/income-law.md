@@ -685,6 +685,11 @@ WORLD-GEN SEED (FUNC at 0x37d80, single caller 0x23b49 scenario init):
     capBase = NONBARRENCOUNT/3 + 5, and +0x4a initialised to the SAME value.
   word[+0x16] = the scenario-template weight-row index, clamped <11 else 2
     (@0x37e2e..0x37e39).
+    *** t281 MEASURED (scripts/r1_t281_w16_census.py): the field PERSISTS in
+    saves uniform over 0..10 (owned and unowned records alike, two lineages) —
+    it is the operand SA_Cornucopia 0x43de4 skips on (==10). t29b's histogram
+    non-prediction STANDS (persistence != generation drove it); rewrite stores
+    it as PlanetState.terrainRow. ***
   MEASURED RUNTIME TABLES (identical in all 13 captures, GVA B+0x82BB0+off):
     0x744a8 per-size surface-cell counts (5 rows x 15): row sums
       size0=7 size1=11 size2=23 size3=45 size4=73; live +0x18 matches

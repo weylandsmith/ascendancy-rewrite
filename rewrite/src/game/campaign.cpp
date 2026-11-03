@@ -152,6 +152,8 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
         for (int s = 0; s < n; ++s) {
             const int size = next() % 5;  // rng%5 @0x23a86/95
             const int row = next() % 11;  // rng%11 @0x23a97/aa8
+            planets_[s].terrainRow = row;  // +0x16 analog (t281: read by the
+                                           // SA_Cornucopia skip; see PlanetState)
             const int cells = kSurfaceBySize[size];  // +0x18 analog
             planets_[s].surfaceCells = cells;
             auto scaled = [](int w) { return (w * 32768 - w) / 100; };
@@ -767,7 +769,7 @@ int Campaign::storedResFor(int star) const {
 
 int Campaign::storedProsFor(int star) const {
     // +0x48 DISPLAY-WORD analog (income-law.md T34, 2720 stored samples):
-    // max(1, PROS accumulator (class bonuses gated per T35) + richPros -
+    // max(1, PROS accumulator (class bonuses gated per T35) -
     // pop>>2-floor). The grant floor-1 and the pop deduction are MEASURED
     // (0-clamp scores 40.99% vs 94.82%; gov switch at +0x54 dead — queue
     // id). T37b: this WORD is also the GROWTH-COUNTER INPUT (corpus
@@ -778,12 +780,14 @@ int Campaign::storedProsFor(int star) const {
     // GOVERNOR BRANCH (S14 t45, FUN_00038ba4 @0x38df0): DL==0x21 (Endless
     // Party) adds IND acc >>2 to the PROS acc — BEFORE the pow block
     // (@0x38e62), so the word is max(1, round((dbl(pros+bonus)+1)^0.85));
-    // the >>2 operand is post-Hyperpower (@0x38d6a). richPros joins inside
-    // the accumulator in the original (loop @0x38cce adds its 2) — added
-    // here for equivalence. Branch inert corpus-wide (governor -1,
-    // r1_governor_census.py); pinned by campaign_governor_law_t45.
+    // the >>2 operand is post-Hyperpower (@0x38d6a). Governor is -1 on
+    // 2810/2810 corpus records (r1_governor_census.py) — inert on all measured
+    // state, wired for law completeness, pinned by campaign_governor_law_t45.
+    // (The old `richPros` join is DELETED t281: SA_Cornucopia's real PROS
+    // contribution arrives via the T35 class-cell bonuses in channelAccFor
+    // once the body repaints cells — docs/re/_wip_t281.md.)
     const int govBonus = planets_[star].governor == 33 ? rawIndAccFor(star) >> 2 : 0;
-    double pros = planets_[star].richPros + channelAccFor(star).pros + govBonus;
+    double pros = channelAccFor(star).pros + govBonus;
     pros -= static_cast<int>(planets_[star].pop) >> 2;
     return pros < 1.0 ? 1 : static_cast<int>(pros);
 }
@@ -1674,15 +1678,48 @@ void Campaign::abilityPhase() {
                 events_.push_back({turn_, who + "sapping alien hulls in occupied systems"});
                 break;
             case SpeciesAbility::Cornucopia: {  // L2059-2060 "turn your least populated colony into a rich world"
+                // CITED BODY LAW SA_Cornucopia 0x43de4 (aicode.md §6.3 t99,
+                // re-read raw t281 work/t280_bodies.txt:152; docs/re/_wip_t281).
+                // SELECT: pool scan, owner byte == self, SKIP WORD[rec+0x16]
+                // ==10 (the zero-barren terrain row — measured r1_t281_w16_-
+                // census.py: +0x16 is the stored weight-row index, NOT a
+                // homeworld marker), MIN WORD[rec+0x42] strictly-less wins,
+                // first record wins ties, none owned = no-op exit.
+                // REPAINT: slot array [rec+0x10], bound WORD[rec+0x18] ==
+                // SURFACE cells ONLY (the orbital ring is never touched),
+                // raw class byte in {0,1} -> uniform pick {2,3,4} (pool
+                // 0x6838, rng 0x7824f idiv 3). No occupied-slot gate: a cell
+                // under a built item is repainted too — its income then rides
+                // the T35 class-cell bonus in channelAccFor (the real channel
+                // the old richPros+=2 stand-in approximated; field deleted).
+                // RNG: worldLcg_ — terrain-mutation family (world-gen draw +
+                // rock event precedent); the rng_ trajectories are untouched
+                // [inferred stream choice, pick MEMBERSHIP {2,3,4} is cited].
                 int best = -1;
-                for (size_t s = 0; s < galaxy_.stars.size(); ++s)
-                    if (owner_[s] == o && planets_[s].pop > 0 &&
-                        (best < 0 || planets_[s].pop < planets_[best].pop))
-                        best = static_cast<int>(s);
-                if (best >= 0) {
-                    planets_[best].richPros += 2;  // Agriplot PROS=2 [verified planitem.txt]
-                    events_.push_back({turn_, who + "enriched " + galaxy_.stars[best].name});
+                int bestPop = 0xffff;  // cx init @0x43de9
+                for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
+                    if (owner_[s] != o) continue;                    // [rec+0x57]
+                    if (planets_[s].terrainRow == 10) continue;      // [rec+0x16]
+                    const int pop = static_cast<int>(planets_[s].pop);  // [rec+0x42]
+                    if (pop >= bestPop) continue;                    // jbe prune @0x43e24
+                    best = static_cast<int>(s);
+                    bestPop = pop;
                 }
+                if (best < 0) break;  // 0x43e3a null-exit (no eligible colony)
+                int painted = 0;
+                auto& cls = planets_[best].cellClasses;
+                const int bound = std::min(planets_[best].surfaceCells,
+                                           static_cast<int>(cls.size()));  // [rec+0x18]
+                for (int c = 0; c < bound; ++c) {
+                    const int v = cls[c];  // RAW byte incl. rock bit: 8/9 fail
+                                           // the {0,1} test exactly as the vendor's
+                    if (v != 0 && v != 1) continue;
+                    cls[c] = 2 + worldNext() % 3;  // pool 0x6838 {2,3,4} idiv 3
+                    ++painted;
+                }
+                events_.push_back({turn_, who + "made " + galaxy_.stars[best].name +
+                                      " a rich world (" + std::to_string(painted) +
+                                      " cells repainted)"});
                 break;
             }
             case SpeciesAbility::BumpShipsInLanes: {  // L2106-2107 "bump all ships in star lanes backward to their stars of origin"

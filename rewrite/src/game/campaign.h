@@ -83,13 +83,21 @@ struct PlanetState {
     // 0x3ea: `cmp byte [edx+0x54],0xff; jne skip`).
     int pendingItem = -1;
     int buildAcc = 0;
-    // Species-ability modifier (docs/re/abilities.md §2): SA_Cornucopia sets
-    // richPros (= one Agriplot's PROS 2 [verified planitem.txt] on a "rich
-    // world", the static.txt #56 planet-type name list).
+    // TERRAIN WEIGHT-ROW INDEX (+0x16 analog, income-law.md S10 world-gen):
+    // the ctor's `rng % 11` draw (0x23a97/aa8), stored t281 because the cited
+    // SA_Cornucopia body 0x43de4 SKIPS planets where WORD[rec+0x16]==10.
+    // MEASURED (scripts/r1_t281_w16_census.py, two lineages): uniform over
+    // 0..10 across owned AND unowned records — NOT a homeworld marker (the
+    // t105 §3 [inferred] reading is REFUTED). Row 10 == preset [0,33,34,33],
+    // the zero-barren template.
+    int terrainRow = 0;
+    // (SA_Cornucopia's old `richPros` field is DELETED t281: the cited body
+    //  mutates SURFACE CELL CLASSES (repaint {0,1} -> {2,3,4}), whose income
+    //  arrives through the T35 per-cell class bonus in channelAccFor — see
+    //  abilityPhase and docs/re/_wip_t281.md.)
     // (SA_MoreMaxPop's old `capBonus` field is DELETED t280: the cited body
     // 0x4402a mutates the PRE-CLAMP seed word capBase (+0x55) by +2, not a
     // post-clamp bonus — see abilityPhase and income-law.md S10.)
-    double richPros = 0;
     // SELECTED-ABILITY byte (+0x54 analogue; income-law.md S14 t45). Full
     // image writer census (scripts/r1_0x54_writer_sweep.py): queue writes
     // the pending item id, completion/demolish clear to 0xFF (-1 here);
@@ -205,7 +213,6 @@ public:
     bool laneBlockedStar(int star) const { return laneBlock_[star] != 0; }
     bool invincibleStar(int star) const { return invincible_[star] != 0; }
     bool sapActiveFor(int owner) const { return sapActive_[owner] != 0; }
-    double richProsFor(int star) const { return planets_[star].richPros; }
     // Full planet state for law pin-tests (cellClasses/capBase, T36).
     const PlanetState& planetAt(int star) const { return planets_[star]; }
     // Completed queue items on a star (active-slot analogue; tests pin the

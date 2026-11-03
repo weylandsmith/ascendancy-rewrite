@@ -229,13 +229,81 @@ TEST(species_more_max_pop_raises_caps_and_cornucopia_adds_pros) {
     for (int s : owned)
         CHECK(c.planetAt(s).capBase == ctrl.planetAt(s).capBase + 2);
     CHECK(hasEvent(c, "colony pop caps (+2 seed each)"));
-    auto d = makeCrafted(16, 1, ag::SpeciesAbility::Cornucopia);
-    for (int t = 0; t < 150; ++t) d.advance();  // cad[10] == 150 (aicode.md §6.4)
-    bool enriched = false;
-    for (size_t s = 0; s < d.galaxy().stars.size(); ++s)
-        if (d.richProsFor((int)s) > 0) enriched = true;
-    CHECK(enriched);
-    CHECK(hasEvent(d, "enriched"));
+}
+
+TEST(species_cornucopia_repaints_min_pop_colony_t281) {
+    // PIN t281 for the CITED body law SA_Cornucopia 0x43de4 (aicode.md §6.3
+    // t99 + t281 raw re-read work/t280_bodies.txt:152; docs/re/_wip_t281.md):
+    // SELECT the owned planet with MIN pop (+0x42; skip terrainRow==10, the
+    // zero-barren weight row — +0x16 measured as the stored row index by
+    // scripts/r1_t281_w16_census.py, NOT a homeworld marker), then repaint
+    // every SURFACE cell (bound +0x18, orbital ring excluded) whose RAW class
+    // byte is 0 or 1 to a pick from {2,3,4}. CONTROL DIFFERENTIAL vs an
+    // Unknown-ability campaign on the same seed (cad[10] == 150): cells change
+    // ONLY on the fire turn and ONLY on the selected star; rock bytes and the
+    // orbital ring NEVER change; no cell remains 0/1 on the target's surface.
+    auto c = makeCrafted(16, 1, ag::SpeciesAbility::Cornucopia);
+    auto ctrl = makeCrafted(16, 1, ag::SpeciesAbility::Unknown);
+    for (int t = 0; t < 149; ++t) { c.advance(); ctrl.advance(); }
+    // Expected target under the cited law, computed INDEPENDENTLY of the
+    // implementation's internals (owner + pop + terrainRow only).
+    int want = -1, wantPop = 0xffff;
+    for (size_t s = 0; s < c.galaxy().stars.size(); ++s) {
+        if (c.starOwner((int)s) != 1) continue;
+        if (c.planetAt((int)s).terrainRow == 10) continue;
+        const int pop = static_cast<int>(c.planetAt((int)s).pop);
+        if (pop < wantPop) { want = (int)s; wantPop = pop; }
+    }
+    CHECK(want >= 0);
+    c.advance();  // turn 150: cad[10] fires
+    ctrl.advance();
+    CHECK(hasEvent(c, "a rich world"));
+    for (size_t s = 0; s < c.galaxy().stars.size(); ++s) {
+        const auto& pc = c.planetAt((int)s);
+        const auto& pp = ctrl.planetAt((int)s);
+        if ((int)s != want) {
+            // no other star's classes may move (terrain is write-frozen
+            // outside this law: income-law.md terrain-mutation census)
+            CHECK(pc.cellClasses == pp.cellClasses);
+            continue;
+        }
+        const int bound = pc.surfaceCells;
+        CHECK((int)pc.cellClasses.size() == bound + 10);
+        int repainted = 0;
+        for (int k = 0; k < bound; ++k) {
+            const int before = pp.cellClasses[k], after = pc.cellClasses[k];
+            if (before == after) {
+                // unpainted surface cells must not have been 0/1
+                CHECK(before != 0 && before != 1);
+            } else {
+                ++repainted;
+                CHECK(before == 0 || before == 1);
+                CHECK(after == 2 || after == 3 || after == 4);
+            }
+        }
+        CHECK(repainted > 0);  // the min-pop colony always had barren/normal ground
+        // the orbital ring is OUTSIDE the vendor bound WORD[rec+0x18]
+        for (size_t k = bound; k < pc.cellClasses.size(); ++k)
+            CHECK(pc.cellClasses[k] == pp.cellClasses[k]);
+    }
+
+    // SKIP-LEG + NULL-EXIT leg (seed 8, MEASURED via the t281 seed scan —
+    // diagnostic since removed): owner 1's ONLY colony at t150 sits on weight
+    // row 10 (terrainRow==10), so the cited skip leaves NO eligible planet and
+    // the body exits at the null test 0x43e3a — NO repaint, NO event. Seed 16
+    // alone cannot catch a deleted skip leg (its argmin isn't a row-10 world);
+    // this leg can: deleting the skip line fires the event here.
+    auto s8 = makeCrafted(8, 1, ag::SpeciesAbility::Cornucopia);
+    auto s8ctrl = makeCrafted(8, 1, ag::SpeciesAbility::Unknown);
+    bool s8Row10Home = false;
+    for (size_t s = 0; s < s8.galaxy().stars.size(); ++s)
+        if (s8.starOwner((int)s) == 1 && s8.planetAt((int)s).terrainRow == 10)
+            s8Row10Home = true;
+    CHECK(s8Row10Home);  // fixture premise (guard against mapgen drift)
+    for (int t = 0; t < 155; ++t) { s8.advance(); s8ctrl.advance(); }
+    CHECK(!hasEvent(s8, "a rich world"));
+    for (size_t s = 0; s < s8.galaxy().stars.size(); ++s)
+        CHECK(s8.planetAt((int)s).cellClasses == s8ctrl.planetAt((int)s).cellClasses);
 }
 
 TEST(species_steal_research_fires_and_is_capped_by_ownership_rule) {
