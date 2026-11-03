@@ -993,3 +993,17 @@ dead' from the single clean restore. (3) control post-click turn dword read 0
 (slot 46+) — unexplained side observation, pair behaviour unaffected; flag for
 t249b-law follow-up if it recurs. (4) mx field read 0x6168 in both t288 runs —
 field identity [unverified], ignored.
+
+## t289 NEEDLE-GUARDED RE-DRIVE t1086->t1150 (2026-11-03)
+The t285 drive class, rebuilt per the t285 preconditions + t288 needle + t287
+keyboard-only title nav, ran 64 clean turns (69 presses, zero softlocks, exit
+0). V held 23 (selector 0, rank 65535) across all 229 trusted rows; replay
+mine-check EXACT 20/20 on bank-t261-final-1150 — no threshold witness, OQ-021
+stays open. Instrument gains: (1) screen-based title gate (orange frac >0.20;
+fixtures separate 0.4685 vs 0.0016) replaces the blind ring guard everywhere
+including drain_popups; (2) Escape last-resort probe branch DELETED (its guard
+was the blind ring); (3) needle char-exhaustion law + fix (see _wip_t288.md
+amendment; science in _wip_t289.md S3); (4) recover(resume) now highlight-
+verified via r287_title_nav (no stale-hover clicks). Production :9 healthy at
+t1150 (pid 660167); RESUME.GAM still the Oct-29 t1086 point — a title resume
+REGRESSES 64 turns, so keep driving from RAM.

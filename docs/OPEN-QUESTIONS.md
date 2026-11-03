@@ -508,6 +508,16 @@ equal). Harvest on the 6 genuine turns: V held 23 (first end-turn pass), ZERO
 V>=25, selector 0, rank 65535 — replay mine-check 20/20 EXACT on the loaded
 campaign (a NEW seed reproduces the S18 law). No threshold witness; row stays
 open; rewrite unchanged.
+STATUS t289 (2026-11-03, docs/re/_wip_t289.md S2-S3): the needle-guarded re-drive
+ran CLEAN t1086->t1150 (69 presses, 64 turns, zero softlocks; drive_20261103-
+125013.log exit 0). Harvest (r273_harvest window 12:40-13:35, 229 trusted rows):
+V census {0:62, 23:167}, V>=25 rows ZERO, selector {0: ALL}, rank {65535: ALL};
+r284_vreplay on bank-t261-final-1150 EXACT 20/20 (stored 23 == flood pred 23).
+V first lands 23 at t1087 and HOLDS 64 turns (flood prunes 2 claims; systems_full
+25). THRESHOLD WITNESS STILL ABSENT after the largest single clean drive the
+drive class has achieved; the needle instrument itself is now validated live
+(ALIVE stamp witnessed; exhaustion law banked — see _wip_t289 S3). Row STAYS
+OPEN; rewrite comparator UNTOUCHED.
 
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)

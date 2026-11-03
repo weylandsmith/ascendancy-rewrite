@@ -138,3 +138,15 @@ scripts/r288_softlock_probe.py (rc=0 both modes), docs/re/selfplay.md t288
 block, docs/REFUTED-ROUTES.md t288 block, banks: work/r1/t288-probe-{dbg-a0,
 rel-a0 x2}-*, work/r1/game-t288 scratch (149M, keep for t289), production :9
 UNTOUCHED (pid 660167 alive, t1086).
+
+== AMENDMENT t289 (2026-11-03): S3b SOP IS INCOMPLETE — NEEDLE-EXHAUSTION LAW
+'inject c, expect 0x484c6==0x63' works ONLY when the pre char != 0x63. The
+globals hold the LAST-WRITTEN event and are re-stamped by the next event of any
+kind (mouse-move = msg 0x2e), so with pre (0x2e,0x63) — which is exactly what
+t288's own probes LEAVE behind on a healthy session — a single 'c' is
+indistinguishable from a pump frozen at (0x2e,0x63). t289 live witnesses both
+halves: 'z' mid-drive stamped (0x2c,0x7a) verbatim (pump alive); one 'c' on
+pre (0x2e,0x63) read (0x2e,0x63) across 3 fresh slots. Corrected SOP: needle
+char = 'c' unless pre char == 0x63, then 'z'; ALIVE iff post char == injected
+char (a dead pump cannot stamp). Implemented + live-validated in
+scripts/r1_t261_drive.py needle_probe() (docs/re/_wip_t289.md S3).

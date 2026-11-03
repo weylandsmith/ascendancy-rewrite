@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-03T12:05
+updated: 2026-11-03T13:45
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -268,30 +268,42 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t289 WIRE THE RAM LIVENESS NEEDLE INTO THE DRIVER, THEN V>=25 RE-DRIVE
-(queue is drained; ordering rationale: this is the ONLY remaining route to the
-OQ-021 threshold residue — t273 leg B and t262 both measured ZERO V>=25 rows
-in the corpus, and the t288 needle (inject 'c', expect data:0x484c6==0x63 in
-the NEXT ring slot; r288_input_census.py proves the globals ride every slot's
-Memory member) is exactly the non-pixel liveness channel t266 §4 demanded,
-which the pixel probe failed; the watchpoint class cannot reach the threshold
-question anyway — the producer is closed, the comparator needs a witnessed
-V>=25 end-turn pass). Steps: (1) PATCH scripts/r1_t261_drive.py: after every
-press AND after every drain, run the needle (xsend key 'c', wait next slot,
-read data:0x484c6 via r1_sav_scan base + member off-by-H law
-mem[B+0x82bb0+0x484c6]; expect 0x63 — a frozen pair (1,0x1b) shape means
-SOFTLOCK-CLASS: bank, screenshot, SIGKILL recorded pid, STOP per t285
-precondition; note the needle's own 'c' toggles the overlay — harmless in
-self-play, record honestly); (2) satisfy the DRIVE-CLASS PRECONDITION block
-below verbatim (screen-based title-menu detection BEFORE any click, 2
-no-advances = STOP-AND-LOOK, never Escape at the map); (3) verify production
-screen + health at session start (t287 law — done this session at 11:24:
-galaxy t1086, pid 660167 HEALTHY, TL expiry Nov-05 05:26, ring fresh; re-verify
-anyway); (4) drive from t1086 toward V>=25 with banks every ~30 turns, harvest
-with r273_harvest + r284_vreplay mine-check; a V>=25 end-turn row feeds the
-OQ-021 comparator question directly. If softlock-class recurs before V>=25,
-bank the bank+needle trace and keep the row open — do NOT retry-spiral (max 1
-relaunch+resume per session).
+NEXT t290 POKE-PAST-THRESHOLD EXPERIMENT — MEASURE THE COMPARATOR'S OPERAND
+(ordering rationale: t289 drove 64 clean turns and V HELD 23 — the empire is
+static so MORE pressing can never raise V (flood prunes 2 claims; systems_full
+25, planets 26, ships 30 constant; _wip_t289 S2), and expansion-driving via
+ship/settle UI automation is a large unproven lift; the poke experiment instead
+FABRICATES the V>=25 end-turn pass the comparator question needs, using the
+RELIABLE t286b tooling. What is being measured: whether the end-turn
+comparator's operand is V (or 100*V/T) — a poked V that flips selector_byte /
+arms a victory presenter answers it; a poked V that changes NOTHING is the
+honest negative that kills the 'comparator reads V' hypothesis class. Steps:
+(1) scratch session ONLY (own ring dir per TWO-WRITER law, e.g.
+work/r1/t290-poke/; game scratch copy, never mount game/): dbg binary hosting
+RESUME.GAM t1086 as a GAME-LOAD via title (the t286b pattern — BPLM armed at
+title, campaign ENTER; NEVER emulator-state restore of a bank, t288 S2 REFUTED:
+glibc abort mid-restore); note the RESUME.GAM point IS t1086 so V=0 until the
+first end-turn pass lands V=23;
+(2) arm BPLM on the V linear address = B - 0x88 + 0x82bb0 + 0x482fb (B by
+anchor vote on the ring Memory member, works at title per t288; scripts/
+r1_wp_session.py heap arms + r286b_relaunch.sh BREAK-lottery wrapper);
+(3) press End Turn (scratch session, xsend :N), let the fire land — LAW 7: the
+reported EIP may be a READER (the producer store is FUN_00024274 tail ~0x24f24
+per t284; scan back for the last store);
+(4) at the stop, pty set-mem V := 25 (then 26 as second arm), EXEC, then read
+next ring slots: selector_byte u8 DAT_00043510, rank u16 DAT_0004350c
+(r1_slot.py:93-94), any victory-screen pixels (score.md presenter arms
+@0x2c03a..0x2c0a9 family);
+(5) if selector arms or a presenter fires, the comparator operand is measured —
+CLOSE-ATTEMPT OQ-021 threshold residue with the pty operand panel as the cited
+witness; if nothing changes across V=25 AND V=26 AND (for the >-vs->= edge) the
+T-relative pokes V := ceil(T/2), V := ceil(T/2)-1, bank the honest negative and
+keep the row open. CAVEATS to state in the bank: a poked V is an ARTIFICIAL
+pass — it measures the comparator, never the vendor's natural victory-screen
+appearance (that residue survives this experiment under any outcome); the
+producer recomputes V every end-turn pass so the poke only lives inside one
+pass window (that is exactly why the stop-then-poke-then-exec shape is
+required); production :9 stays UNTOUCHED at t1150.
 
 SESSION-START SCREEN CHECK (t287 law, do this BEFORE any other probe): a VNC
 user may leave production on ANY screen. Verify with `DISPLAY=:9 import
@@ -299,19 +311,24 @@ user may leave production on ANY screen. Verify with `DISPLAY=:9 import
 t285). If off-campaign: recover via r287_vncinput.py move + highlight-verified
 click on 'Return to Current Game' (title menu row 4, center (318,333)); NEVER
 xsend-click menus (stale-hover law, diplomacy.md §21.5). Production verified
-this session at galaxy map t1086 (11:24 vision), pid 660167 alive, ring fresh
-(52.sav age 3 s), HEALTHY.
+this session at galaxy map t1150 (13:13 ring rows; drive ended clean), pid
+660167 alive, ring fresh, HEALTHY (V=23/50, sel 0). RESUME.GAM remains the
+Oct-29 t1086 point: a title resume REGRESSES 64 turns — production's live
+state lives in the RING/RAM, keep driving, never rely on title-resume.
 
 DRIVE-CLASS PRECONDITION (t285 law, docs/re/driver-selfharm-t285.md — applies
-to EVERY future drive row incl. any V>=25 re-drive): the driver must (1) detect
-the TITLE MENU FROM THE SCREEN before any click (probe_b fixture:
-work/r1/bank-t285-flip1255/probe_b_043813.png; orange title background dominates
-the game area above the white menu box at rows ~330-565), (2) treat 2
-consecutive no-advance presses as STOP-AND-LOOK (bank + screenshot + flag),
-NEVER probe-then-click, (3) never send Escape at the bare galaxy map — it EXITS
-THE CAMPAIGN to the title menu, and the ring keeps autosaving so RAM-side guards
-are blind. The ~30 genuine rows t1087-1092 are banked (bank-t285-predrive);
-the drive resumes from t1086 (production is parked there, shipfp f4e5e715).
+to EVERY future drive row): (1) detect the TITLE MENU FROM THE SCREEN before
+any click (probe_b fixture: work/r1/bank-t285-flip1255/probe_b_043813.png;
+orange title background dominates the game area above the white menu box at
+rows ~330-565), (2) treat 2 consecutive no-advance presses as STOP-AND-LOOK
+(bank + screenshot + flag), NEVER probe-then-click, (3) never send Escape at
+the bare galaxy map — it EXITS THE CAMPAIGN to the title menu, and the ring
+keeps autosaving so RAM-side guards are blind. AS OF t289 ALL THREE ARE
+IMPLEMENTED in scripts/r1_t261_drive.py (assert_on_map orange-fraction gate at
+start/stall2/post-recover incl. drain_popups; Escape last-resort probe branch
+DELETED; stall2 banks before any probe; recover(resume) highlight-verified via
+r287_title_nav). Verified live: 64 clean turns, zero misfires. Drive forward
+from production RAM (t1150), NOT from title-resume.
 
 PAIRING-SESSION NOTE (phase-4 handoff, 2026-11-02 ~22:45): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS (verbatim, this session):
@@ -362,6 +379,35 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
   or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
+
+LANDED t289 (2026-11-03): NEEDLE WIRED + CLEAN 64-TURN DRIVE — docs/re/
+_wip_t289.md (S1 patch inventory, S2 drive result, S3 needle science) +
+_wip_t288.md amendment + selfplay.md t289 block; OQ-021 status appended,
+ROW STAYS OPEN strict-close (ledger 15/4). (1) r1_t261_drive.py REBUILT:
+RAM liveness needle (msg/char globals ds:0x484c4/c6 via anchor-vote member
+law, no debugger), screen-based title gate (orange frac >0.20; fixtures
+0.4685 vs 0.0016) at start/stall2/post-recover AND inside drain_popups,
+Escape last-resort probe branch DELETED (guard was the blind ring),
+recover(resume) highlight-verified via r287_title_nav (stale-hover law),
+V-watch (score_stars>=target or selector!=0 -> bank+stop), --v-target/
+--max-secs. (2) THE DRIVE: t1086->t1150, 69 presses, ZERO softlocks, exit 0
+— longest clean drive the class has achieved; production :9 HEALTHY at t1150
+afterwards (pid 660167). (3) OQ-021 MEASUREMENT: 229 trusted rows V census
+{0:62, 23:167}, V>=25 ZERO, selector {0:ALL}, rank {65535:ALL}; r284_vreplay
+EXACT 20/20 on bank-t261-final-1150. V lands 23 at first end-turn pass and
+HOLDS — the empire is static, so more pressing cannot reach V>=25: the
+threshold route is now the t290 poke experiment, not more driving. (4) NEW
+INSTRUMENT LAW (needle exhaustion): the pending-input globals are RE-STAMPED
+by the next event of any kind (mouse = 0x2e), so a needle whose char equals
+the pre char is unobservable — t288's SOP only works when pre char != 0x63,
+and the parked/idle baseline IS (0x2e,0x63) after t288's own probes; fix =
+alternate char ('z'), ALIVE iff post char == injected char (dead pump cannot
+stamp — no false-ALIVE path). Live-validated both directions of the law
+('z' stamped (0x2c,0x7a) mid-drive; 'c' stamped (46,99) post-drive); DEAD
+verdict validated offline only (soft banks 20/20 (1,0x1b)). Honest negatives:
+no V>=25, no selector arm, no live soft session to needle-inject, 'z' map
+semantics unverified. NEXT=t290 (poke V at the end-turn fire, measure the
+comparator operand).
 
 LANDED t286b (2026-11-03): THE PLANET-LIST WRITER IS WITNESSED — t286's
 honest negative was an OFF-BY-H IN OUR OWN TARGET RESOLVER, and the corrected

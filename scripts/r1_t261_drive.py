@@ -107,6 +107,142 @@ def grab(path):
     return Image.open(path).convert("RGB") if r.returncode == 0 else None
 
 
+# ---- t289 RAM LIVENESS NEEDLE (docs/re/_wip_t288.md S3b) -------------------
+# t288 CLOSED the dead-half question: softlock = the GAME-SIDE INPUT PUMP stops
+# writing the pending-input globals WORD ds:0x484c4 (msg) / ds:0x484c6 (char),
+# which the relay 0x54976 reads verbatim. They ride every ring slot's Memory
+# member (no debugger): member-index law mem[B + 0x82bb0 + off], B by anchor
+# vote (scripts/r288_input_census.py). SOP: inject 'c', expect the PAIR to
+# CHANGE in a later slot. A pair frozen across the whole fresh ring is the
+# t288 death signature.
+# HONEST LIMIT (needle-char exhaustion): the globals hold the LAST-WRITTEN
+# event and are not zeroed on consumption (witnessed: healthy production sat
+# at (0x2e,0x63) after an old 'c'). So a 'c' injection is only DECISIVE when
+# the pre-state char != 0x63; when pre is already (0x2e,0x63) the needle
+# reports AMBIGUOUS and callers must fall back to the t288 conjunction
+# (overlay pixel toggle + ring freeze + distinct-pair census).
+import struct, zipfile
+import r1_sav_scan as SS
+
+PAYLOAD = os.path.join(ROOT, "work/ascend_payload.bin")
+OBJ1_OFF = 0x82bb0
+OFF_MSG, OFF_CHAR = 0x484c4, 0x484c6
+NEEDLE_CHAR = 0x63                              # 'c': proven-safe, self-reverting
+DEATH_SIG = (0x0001, 0x001b)                    # (msg, Escape) t288 census
+_anchor_cache = None
+
+
+def ring_slots():
+    return sorted(glob.glob(os.path.join(SAVEDIR, "*.sav")), key=os.path.getmtime)
+
+
+def input_globals(slot_path):
+    """(msg, char) pending-input globals from one ring .sav, or None."""
+    global _anchor_cache
+    try:
+        mem = zipfile.ZipFile(slot_path).read("Memory")
+    except Exception:
+        return None
+    if _anchor_cache is None:
+        with open(PAYLOAD, "rb") as f:
+            _anchor_cache = SS.build_anchors(f.read())
+    votes, _ = SS.find_base(mem, _anchor_cache)
+    if not votes or votes.most_common(1)[0][1] < 5:
+        return None
+    base = votes.most_common(1)[0][0] + OBJ1_OFF
+    return tuple(struct.unpack_from("<HH", mem, base + OFF_MSG))
+
+
+def needle_census():
+    """Distinct (msg,char) pairs across the current ring, newest last.
+    >1 distinct = the pump wrote recently; 1 distinct over all slots = frozen."""
+    seq = [p for p in ring_slots() if input_globals(p) is not None]
+    pairs = [input_globals(p) for p in seq]
+    return pairs
+
+
+def needle_probe(tag=""):
+    """Full liveness needle. Returns (verdict, detail) with verdict in
+    ALIVE / DEAD / AMBIGUOUS / UNKNOWN.
+
+    t289 LIVE MEASUREMENTS (running drive, pump demonstrably alive):
+    (a) char GLOBAL == the injected key verbatim ('z' mid-drive flipped the
+        pair (0x50,0x0) -> (0x2c,0x7a) in the next slots);
+    (b) a needle whose char EQUALS the pre char is unobservable — pre
+        (0x2e,0x63) + one 'c' + mouse re-stamping reads (0x2e,0x63) again,
+        and a DEAD pump frozen at (0x2e,0x63) reads identically. So the
+        needle char must differ from the pre char: 'c' normally, 'z' when
+        pre char is already 0x63 (the parked/idle baseline t288 left).
+        'z' map behaviour is UNVERIFIED (observed benign once: turns kept
+        advancing, campaign unchanged); it fires ONLY in-campaign (callers
+        run assert_on_map first) and only in the exhausted-pre case.
+    Decisiveness: dead pump => globals frozen => post char != injected char
+    => DEAD (no false-ALIVE path); live pump => char stamped => ALIVE."""
+    slots = ring_slots()
+    if not slots:
+        return "UNKNOWN", "ring empty"
+    pre = input_globals(slots[-1])
+    pre_mt = os.path.getmtime(slots[-1])
+    if pre is None:
+        return "UNKNOWN", "base vote failed on newest slot"
+    needle = NEEDLE_CHAR if pre[1] != NEEDLE_CHAR else 0x7A   # 'c', else 'z'
+    send(["key", chr(needle)])
+    if needle == NEEDLE_CHAR:
+        time.sleep(1.2)
+        send(["key", "c"])          # revert the overlay toggle (self-reverting)
+    post, newer = None, []
+    for _ in range(8):                       # 10 s cadence; 2 fresh slots max 40 s
+        time.sleep(5)
+        s = ring_slots()
+        newer = [p for p in s if os.path.getmtime(p) > pre_mt + 0.5]
+        if len(newer) >= 2:
+            post = input_globals(newer[-1])
+            break
+    if post is None:
+        return "UNKNOWN", f"no fresh slot pair after injection ({len(newer)} new)"
+    if post[1] == needle:
+        return "ALIVE", f"needle char {needle:#x} stamped: {pre} -> {post}"
+    if pre == DEATH_SIG:
+        return "DEAD", f"death signature {pre} survived needle {needle:#x}"
+    pairs = needle_census()
+    distinct = len(set(pairs))
+    if pairs and distinct == 1:
+        return "DEAD", f"pair {pre} constant across {len(pairs)} slots post-needle"
+    return "DEAD", f"needle {needle:#x} absent from post {post}; {distinct} distinct in ring"
+
+
+# ---- t285 DRIVE-CLASS PRECONDITION: title menu detected FROM THE SCREEN ----
+# (fixture work/r1/bank-t285-flip1255/probe_b_043813.png: the orange title
+# background dominates the game area above the white menu box). The ring is
+# BLIND here (it keeps autosaving off-campaign), so no RAM-side guard substitutes.
+def title_menu_on_screen(im):
+    if im is None:
+        return False, None
+    px = im.load()
+    w, h = im.size
+    y0, y1 = 0, max(0, min(h, 330 + MENUBAR))
+    tot = orange = 0
+    for y in range(y0, y1, 3):
+        for x in range(0, w, 4):
+            r, g, b = px[x, y]
+            tot += 1
+            if r > 140 and g > 50 and b < 110 and r - b > 70:
+                orange += 1
+    frac = orange / max(1, tot)
+    return frac > 0.20, round(frac, 4)
+
+
+def assert_on_map(why):
+    """Screen-based gate BEFORE any click (t285 law). Returns True iff safe."""
+    im = grab("/tmp/_t261_precheck.png")
+    title, frac = title_menu_on_screen(im)
+    if title:
+        log(f"TITLE MENU ON SCREEN ({frac} orange) at {why} - STOP, no clicks "
+            f"(t285 precondition); evidence /tmp/_t261_precheck.png")
+        return False
+    return True
+
+
 def popup_ok_center(im):
     """v4 detector with the +MENUBAR root-band shift for the GUI window."""
     px = im.load()
@@ -138,8 +274,14 @@ def send(args):
 def drain_popups(maxn=25):
     # t273 LAW GUARD: never drain at the title menu (the white-band detector
     # misfires on menu text; t273 clicked Tutorial and lost the campaign).
+    # t289 UPGRADE: the guard is the SCREEN, not the ring — t285 law says the
+    # ring keeps autosaving in_game rows even off-campaign (blind).
+    im0 = grab("/tmp/_t261_drain_gate.png")
+    if title_menu_on_screen(im0)[0]:
+        log("popup drain SKIPPED — title menu on screen (t289 screen guard)")
+        return 0
     if not ring_in_game():
-        log("popup drain SKIPPED — ring not in_game (title-menu guard, t273 law)")
+        log("popup drain SKIPPED — ring not in_game (t273 law)")
         return 0
     closed = 0
     for _ in range(maxn):
@@ -156,31 +298,26 @@ def drain_popups(maxn=25):
 
 
 def input_alive():
-    """True if the game reacts to synthetic input.
+    """True if the game reacts to synthetic input (PIXEL channel).
     t285 LAW: NEVER probe with Escape. Witnessed 04:38:11-13 (screenshots
     banked in work/r1/bank-t285-flip1255/): one Escape at the bare galaxy map
     ejected the campaign to the TITLE MENU (probe_a=campaign t1092, probe_b=
     title menu). The title-menu popup-drain misfire that followed swapped the
-    campaign in RAM (t1086/fp3a189896 -> t1255/fp39614c7c). The 'c' overlay
-    toggle is the safe probe: no-op at the title menu, big pixel delta in-game,
-    and self-reverting."""
+    campaign in RAM (t1086/fp3a189896 -> t1255/fp39614c7c). The old Escape
+    last-resort branch is DELETED (t289): its guard was ring_in_game, and the
+    t285 law established the ring is BLIND off-campaign (it keeps autosaving),
+    so the branch could fire exactly where it is fatal. The 'c' overlay toggle
+    is the only pixel probe: no-op at the title menu, big pixel delta in-game,
+    self-reverting."""
     a = grab("/tmp/_t261_probe_a.png")
     send(["key", "c"])
     time.sleep(1.5)
     b = grab("/tmp/_t261_probe_b.png")
     n = V4.diff_pixels(a, b)
     if n > PIXEL_ALIVE:
-        send(["key", "c"])
+        send(["key", "c"])          # revert the overlay
         time.sleep(1.0)
         return True, n
-    send(["key", "Escape"])          # last-resort only, and ONLY when the ring
-    time.sleep(1.5)                   # still says in_game (title-menu guard)
-    if not ring_in_game():
-        return False, n
-    c = grab("/tmp/_t261_probe_c.png")
-    n2 = V4.diff_pixels(b, c)
-    if n2 > PIXEL_ALIVE:
-        return True, n2
     return False, n
 
 
@@ -273,17 +410,32 @@ def recover(prev_turn):
             r.stdout.decode(errors="replace").strip()[-200:]))
         if r.returncode != 0:
             return False
+        # t289 / t287 LAW: the title-menu row highlight is HOVER state and SDL
+        # rejects synthetic MotionNotify — an xsend click fires the STALE
+        # hovered row (witnessed: opened Tutorial Select). Enter ONLY when the
+        # cyan highlight is measured on R4 via scripts/r287_title_nav.py.
+        import r287_title_nav as NAV
         for i in range(12):
             time.sleep(10)
-            send(["click", str(RETURN_TO_GAME[0]), str(RETURN_TO_GAME[1])])
+            row = NAV.status("nav_t289_recover")
+            for _ in range(8):          # walk highlight to R4 (index 3)
+                if row == 3:
+                    break
+                NAV.key("Down"); time.sleep(0.8)
+                row = NAV.status("nav_t289_walk")
+            if row != 3:
+                log(f"recover attempt {i+1}: highlight {NAV.NAMES[row] if row is not None else 'NONE'} "
+                    f"not R4 - no Enter")
+                continue
+            NAV.key("Return")
             time.sleep(8)
             rs = ring_rows()
-            if rs and any(x.get("in_game") for x in rs[-6:]):
+            if rs and any(x.get("in_game") for x in rs[-6:]) and assert_on_map("post-recover-enter"):
                 got = ring_turn()
                 log(f"resumed into game (attempt {i+1}) at turn {got} "
                     f"(pre-crash {prev_turn}) - RESUME.GAM regression logged")
                 return True
-        log("recovery FAILED: still not in_game after 12 resume clicks")
+        log("recovery FAILED: still not in_game after 12 highlight-verified resume attempts")
         return False
     env = dict(os.environ, KEEP_SAVE="1")
     r = subprocess.run(["bash", os.path.join(ROOT, "scripts/r1_t261_session.sh"), "bringup"],
@@ -308,17 +460,37 @@ def recover(prev_turn):
     return True
 
 
+def ring_v():
+    """(score_stars, selector_byte, turn) from the newest trusted ring row.
+    t284 caveat: slots captured mid-recompute (~3 s window) legitimately read
+    low, so this watch only fires on score_stars >= V_TARGET, never on deltas."""
+    rows = ring_rows()
+    inplay = [r for r in rows if r.get("in_game") and r.get("turn")]
+    if not inplay:
+        return None
+    r = inplay[-1]
+    return (r.get("score_stars"), r.get("selector_byte"), r.get("turn"))
+
+
 def main():
     global LOG
     target, presses, max_soft = 1405, 200, 3
+    V_TARGET, max_secs = 25, 3300
     a = sys.argv[1:]
     for i, x in enumerate(a):
         if x == "--target": target = int(a[i + 1])
         if x == "--max-presses": presses = int(a[i + 1])
         if x == "--max-softlocks": max_soft = int(a[i + 1])
+        if x == "--v-target": V_TARGET = int(a[i + 1])
+        if x == "--max-secs": max_secs = int(a[i + 1])
+    deadline = time.time() + max_secs
     LOG = os.path.join(BASE, f"drive_{time.strftime('%Y%m%d-%H%M%S')}.log")
-    log(f"t261 drive start target={target} presses<={presses} softlocks<={max_soft}")
+    log(f"t289 drive start target={target} presses<={presses} softlocks<={max_soft} "
+        f"v_target={V_TARGET} needle=RAM(0x484c4/6)")
     log(f"dosbox pids alive: {sh('pgrep -x dosbox-x || echo none').stdout.decode().split()}")
+    # t285 PRECONDITION 1: screen, not ring, decides whether we may click at all.
+    if not assert_on_map("session start"):
+        return 4
     drain = drain_popups()
     log(f"pre-drive popup drain closed {drain}")
     cur = ring_turn()
@@ -326,9 +498,16 @@ def main():
     if cur is None:
         log("RING UNREADABLE - abort")
         return 1
-    n = stall = softlocks = 0
+    n = stall = softlocks = alive_stalls = 0
     last_bank = cur
-    while n < presses and cur < target:
+    while n < presses and cur < target and time.time() < deadline:
+        v = ring_v()
+        if v and ((v[0] is not None and v[0] >= V_TARGET) or (v[1] not in (0, None))):
+            log(f"*** THRESHOLD WITNESS score_stars={v[0]} selector={v[1]} "
+                f"turn={v[2]} - BANKING AND STOPPING (OQ-021 feed)")
+            grab(os.path.join(BASE, f"witness_v_{v[2]}_{int(time.time())}.png"))
+            bank_ring(f"t289-witness-t{v[2]}")
+            return 0
         n += 1
         send(["click", str(NEXTTURN[0]), str(NEXTTURN[1])])
         moved = False
@@ -343,6 +522,7 @@ def main():
         log(f"press {n}: ring turn {cur}{' (moved)' if moved else ' (no advance)'} drained={drained}")
         if moved:
             stall = 0
+            alive_stalls = 0
             if cur - last_bank >= 30:
                 bank_ring(f"t261-t{cur}")
                 last_bank = cur
@@ -350,27 +530,59 @@ def main():
         stall += 1
         if stall < 2:
             continue
+        # t285 PRECONDITION 2: 2 consecutive no-advances = STOP-AND-LOOK.
+        grab(os.path.join(BASE, f"stall2_{cur}_{int(time.time())}.png"))
+        bank_ring(f"t289-stall2-t{cur}-press{n}")
+        if not assert_on_map(f"stall2 press {n}"):
+            return 4
+        # t289 PRIMARY CHANNEL: RAM liveness needle (t288 S3b SOP) replaces
+        # the pixel-diff as the softlock discriminator.
+        verdict, why = needle_probe()
+        log(f"NEEDLE {verdict}: {why}")
+        if verdict == "DEAD":
+            softlocks += 1
+            frozen, why2 = ram_frozen(gap=12)
+            log(f"softlock {softlocks} (needle DEAD, ring "
+                f"{'FROZEN' if frozen else 'MOVING'}: {why2}) at turn {cur}")
+            if softlocks > max_soft:
+                log(f"softlock {softlocks} > max - STOP, no retry spiral at turn {cur}")
+                return 3
+            if not recover(cur):
+                return 1
+            if not assert_on_map("post-recover"):
+                return 4
+            cur = ring_turn() or cur
+            last_bank = cur
+            stall = 0
+            continue
+        if verdict == "ALIVE":
+            alive_stalls += 1
+            if alive_stalls >= 4:
+                log(f"pump ALIVE but 4 stalled presses - STOP-AND-LOOK for a human "
+                    f"at turn {cur} (engine stuck downstream of the pump)")
+                return 3
+            stall = 0
+            continue
+        # AMBIGUOUS / UNKNOWN -> t288 conjunction fallback:
+        # pixel-toggle dead AND ring frozen -> treat as softlock-class but do
+        # NOT kill blindly: bank already done above; one recovery attempt max.
         alive, npix = input_alive()
-        log(f"probe: input {'ALIVE' if alive else 'DEAD'} (changed_px={npix})")
-        if alive:
-            stall = 0
-            continue
-        frozen, why = ram_frozen()
-        im = grab("/tmp/_t261_softlock_screen.png")
-        log(f"probe: ram {'FROZEN' if frozen else 'MOVING'} ({why}) "
-            f"popup_on_screen={popup_ok_center(im) is not None}")
-        if not frozen:
-            stall = 0
-            continue
-        softlocks += 1
-        if softlocks > max_soft:
-            log(f"softlock {softlocks} > max - giving up at ring turn {cur}")
-            return 3
-        if not recover(cur):
-            return 1
-        cur = ring_turn() or cur
-        last_bank = cur
+        frozen, why2 = ram_frozen(gap=12)
+        log(f"fallback: pixel {'ALIVE' if alive else 'DEAD'}({npix}px) "
+            f"ring {'FROZEN' if frozen else 'MOVING'} ({why2})")
+        if (not alive) and frozen:
+            softlocks += 1
+            if softlocks > max_soft:
+                log(f"softlock {softlocks} > max (conjunction) - STOP at turn {cur}")
+                return 3
+            if not recover(cur):
+                return 1
+            if not assert_on_map("post-recover-conj"):
+                return 4
+            cur = ring_turn() or cur
+            last_bank = cur
         stall = 0
+        alive_stalls += 1
     ok = cur >= target
     grab(os.path.join(BASE, "drive_final.png"))
     log(("TARGET REACHED" if ok else "BUDGET EXHAUSTED") + f" at ring turn {cur}")
