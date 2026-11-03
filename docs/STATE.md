@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T23:40
+updated: 2026-11-03T03:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -175,6 +175,11 @@ ledger:
       watchpoint, same session as the comparator-firing ask. score.md S9."
 
 ## WHAT IS IN HAND (tools + laws — a fresh session starts here, not from scratch)
+- CONTROLLED-SYSTEMS LAW (V = DAT_000482fb) CLOSED as a mechanism t284 and
+  REPLAYABLE: scripts/r284_vreplay.py [dir...] re-runs the decoded producer
+  (FUN_00024274 flood from the home star, three gates per lane) against any banked
+  .sav dir and prints V + the visited-lane set vs the slot's persisted marks.
+  Law + citations: docs/re/score.md S18. Use it as a mine-check on any new V data.
 - R1 save-state capture LIVE: scripts/r1_savestate.sh (boot -> autosave ZIP,
   full guest RAM) + scripts/r1_sav_scan.py (per-run base B, NEVER hard-code;
   member = physical + H, H=136 for dosbox-x 2025.02.01, re-derive per build).
@@ -260,26 +265,29 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t284 REWRITE THE V SEMANTIC (UNBLOCKED BY t283 — producer WITNESSED,
-docs/re/dosbox-wp-t283.md + score.md S17). ORDERING RATIONALE: t283 delivered
-the law the rewrite must mirror (t285 drive III / t286 tooling / diplomacy are
-all independent of it; the semantic upgrade is the goal-bearing item and its
-evidence is fresh on disk). Implement in rewrite/src/game/score.cpp: the
-displayed DAT_482fb value is a DERIVED per-turn ACCUMULATOR — 0 at load/resume
-(NEVER restored from save; measured scratch AND production 51.sav), then +1 per
-qualifying entity during the end-of-turn pass (fire-anchored store
-`mov [ebp+0x354eb],ecx` at payload file 0x243A8, UNIQUE pattern 898deb5403;
-loop context ship stride 0x162 gated by live count ds:0x4348b, race stride
-0x1ee, cmp BYTE [...],3 predicate — aicode.md P8 tail region; witness walk
-0,1,3,6,11,12,15,16,16,18,22,23 terminal 23 == corpus max). Pin every constant
-to docs/re/dosbox-wp-t283.md §2. The predicate's MEANING is not yet decoded:
-mirror the OBSERVABLE semantic (accumulator over the qualifying-entity loop as
-defined by the disasm you cite), and where the qualification is undecidable
-from statics, keep the rewrite's current per-system-count behaviour behind a
-cited comment — do NOT invent a predicate. Gate + rewrite tests green. OQ-021
-stays OPEN regardless (threshold residue, t269: this campaign never reaches
-V>=25 at a sampled row). PRE-FLIGHT: python3 scripts/r1_game_health.py
-(production :9 pid 636955 LIVE, TL expiry Nov-04 22:33 — LEAVE IT RUNNING).
+NEXT t285 LONG DRIVE + WITNESS HARVEST III (queue order; t284 LANDED, and the
+production :9 game is LIVE with TL expiry Nov-04 22:33 — the drive must burn
+before that window closes, which makes it strictly time-critical vs t286/t287).
+r1_t245_turndrive v4 toward t1250+. BANK the ring to a dated dir BEFORE any
+restart and every ~30 turns (ring holds ~200 s!). OOM law: r1_stream.py or
+<=400 KB tail scans only. MINE with per-segment trust (t262 r262 law) and the
+t273 ATTRIBUTION FIXES (owner INDEX byte+0x56 not handle u16+0x54; stale-echo
+pairs mint phantom deltas — t273 VOIDED the t251 mine on exactly these bugs):
+(a) damage dealt to a NON-at-war owner (OQ-016 — two -40/-28 price witnesses
+exist at t1253, zero damage witnesses); (b) V>=25 (t269 says no; a drive that
+breaks it closes the OQ-021 threshold residue — log ring slot + V + systems
+counts AND, new since t284, the admitted-lane count: scripts/r284_vreplay.py
+prints vis/mk per slot; V == admitted lanes + 1, so the gap to 25 is a gap of
+LANES ADMITTED at the end-of-turn pass, production baseline 22 lanes @t1086,
+58 lanes exist — this replaces every older "more systems" framing);
+(c) magnetron USE frames (OQ-019, gizmo 0x3c). Honest negatives are valid
+outcomes; do NOT issue player attack orders. REPLAY IS THE NEW MINE-CHECK:
+any V the drive logs must reproduce under scripts/r284_vreplay.py on the same
+slot (295/409 EXACT / 0 nonzero-mismatch law, score.md S18) — a replay miss on
+a nonzero V is a FINDING about a gate the decode missed, chase it.
+
+PRE-FLIGHT: python3 scripts/r1_game_health.py (production :9 pid 636955 LIVE,
+TL expiry Nov-04 22:33 — LEAVE IT RUNNING).
 
 PAIRING-SESSION NOTE (phase-4 handoff, 2026-11-02 ~22:45): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS (verbatim, this session):
@@ -298,19 +306,6 @@ preserved as RESUME.GAM.tutorial-nov2 for archaeology only).
 
 QUEUE (phase 4, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t285 LONG DRIVE + WITNESS HARVEST III (INDEPENDENT of the debugger — run it even
-  if t282/283 fail). Production :9 is LIVE at t1086 (22:27 launch, TL=172800).
-  r1_t245_turndrive v4 toward t1250+. BANK the ring to a dated dir BEFORE any
-  restart and every ~30 turns (ring holds ~200 s!). OOM law: r1_stream.py or
-  <=400 KB tail scans only. MINE with per-segment trust (t262 r262 law) and the
-  t273 ATTRIBUTION FIXES (owner INDEX byte+0x56 not handle u16+0x54; stale-echo
-  pairs mint phantom deltas — t273 VOIDED the t251 mine on exactly these bugs):
-  (a) damage dealt to a NON-at-war owner (OQ-016 — two -40/-28 price witnesses
-  exist at t1253, zero damage witnesses); (b) V>=25 (t269 says no, a drive that
-  breaks it closes the threshold residue — log ring slot + V + systems counts);
-  (c) magnetron USE frames (OQ-019, gizmo 0x3c). Honest negatives are valid
-  outcomes; do NOT issue player attack orders.
 
 t286 MCP/PTY DEBUGGER AS A GENERAL INSTRUMENT (needs t282): once one watchpoint
   flow works, script it (scripts/r1_wp_session.py) so OTHER writer questions can
@@ -355,7 +350,7 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   /usr/bin/dosbox-x.
 - Ring = work/r1/playcap/save/ (20 slots, 10 s cadence, ~200 s). Bank before
   restarts + every ~30 turns.
-- Ledger: 14 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
+- Ledger: 15 closed / 4 open (OQ-005, OQ-016, OQ-019, OQ-021). Keep
   ledger_audit + ledger_index_check green; never hand-edit the index block.
 - OQ-005 needs the USER's ruling on the 88-row decision sheet (t278,
   work/r1/shp_png/index.txt) — do NOT rule for them (R13) and do NOT burn
@@ -369,6 +364,45 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
   or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
+
+LANDED t284 (2026-11-03): THE V PREDICATE DECODED, CORPUS-REPLAYED, AND THE
+REWRITE UPGRADED — OQ-021 ANNOTATED (stays OPEN, threshold residue; strict-
+close honoured: the producer/predicate closes on replay, the comparator does
+not). Artifacts: docs/re/score.md S18 (permanent), docs/re/_wip_t284.md (law +
+validation), scripts/r284_vreplay.py (THE replay, reusable as a mine-check),
+scripts/r284_contest_census.py + r284_deref.py (pointer-class readers).
+(1) BASE OBJECT RESOLVED: witnessed ebp 0x254e10 = data base + 0x12e10 = THE
+TURN COUNTER's game-state object; V = field +0x354eb == 0x482fb (t283's
+"arithmetic coincidence" was the state-object root all along). Caller
+FUN_00024f24 (turn ++ at its tail) is the end-of-turn pass; its TAIL is the
+producer protocol: clear lane marks (pool 0x16147 stride 0x27 rec+0x21), seed
+V=1 iff the HOME star (HOME POINTER dword[0x12e1d+0x1ee*player], t246/t248 law)
+carries the player's presence bit else V=0, then FUN_00024274 flood. (2) PREDI-
+CATE (the t283 open question) = three gates per candidate lane: far star +0x17
+SELECT mask has the PLAYER bit (allies do NOT satisfy); far presence pair
++0x14|+0x15 — MEASURED == races owning a planet at that star (48/50, the 2
+exceptions multi-owner) — has no bit outside (allied|player); and no live ship
+holds an ORDER INTO the lane (ship+0x59 == lane record pointer; kind-5 orders
+measurably carry lane-pool pointers, kind-4 star records, kind-0 null — first
+misread was the 0x88 trap, now a REFUTED-ROUTES entry). Admit: mark, V+=1,
+RECURSE; a failing lane PRUNES ITS SUBTREE (explains t912 11->22 and 23->14).
+(3) REPLAY vs 409 banked in-game slots, 20+ runs, turns 1..1255: V EXACT 295,
+ALL 114 misses = pre-first-end-turn slots (stored 0), ZERO V>PRED, ZERO
+nonzero mismatches (ladder V=1 x13 runs, 14@t1255, 23@t1087 == the t283 walk
+terminal); visited set == persisted +0x21 marks 409/409. UNIT CORRECTION: V
+counts ADMITTED LANES + home, not stars (cycles double-enter) — S6's V=22 vs
+systems_any=14 finally reads. S10 #3 REFINED: V is a pure snapshot function;
+the lineage-pair history hypothesis is SUPERSEDED (REFUTED-ROUTES t284).
+Vendor off-by-one edge (break on last live slot still accepts): 0/2310 contest
+pairs — not observable, rewrite uses plain any(). (4) REWRITE: campaign.cpp
+recomputeScoreStars()/floodControlled() mirror the pass (0 at construction,
+recompute ONLY at end of advance() after diplomacyPhase); playerScorePct() =
+TRUNC(100*V/T) per S2 (was rounded owned-star share); settlement grants the
+claimant's +0x16/+0x17 bits (without it the flood prunes its own colonies);
+presence via owner_ proxy [documented single-owner limit]. Pins
+tests/test_score_t284.cpp x7; 166 tests 0 fail; Control VICTORY comparator
+deliberately UNTOUCHED (threshold residue). Gate 0, LEDGER AUDIT OK, LEDGER
+INDEX OK. Production :9 untouched, healthy (pid 636955).
 
 LANDED t283 (2026-11-03): OQ-021 PRODUCER RESIDUE CLOSED WITH CITED MEASUREMENT
 — THE DAT_482fb WRITER IS A WITNESSED END-OF-TURN ACCUMULATOR (9 scratch

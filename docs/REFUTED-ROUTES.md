@@ -359,3 +359,28 @@ t266 note). Liveness is /proc-polled from the recorded pid:
 scripts/r1_game_health.py (T:WARN at 14400 s, T:EXPIRED after). Death CAUSE is
 still diagnosable offline, but from the RING, not the log: ~2880 autosaves per
 8 h of life == TL 28800 expiry (docs/re/selfplay.md t277 Law 1).
+
+## t284 — CLASSIFYING A STORED POINTER BY (p - (B+0x82bb0)) MOD STRIDE IS DEAD (the 0x88 trap, third sighting)
+
+While testing whether ship+0x59 can hold lane-pool pointers, decoding stored u32s
+as X = p - (B + 0x82bb0) put every target "in the data segment but congruent to
+NEITHER pool" — a false negative that nearly killed the contest-gate decode.
+The stored-pointer law (OQ-011, and score.md S2's runtime-relocation note) is
+X = p - (B - 0x88 + 0x82bb0): DIRECT data reads use B+0x82bb0+X, POINTERS decode
+with the -0x88. Re-decoded, kind-5 orders land EXACTLY on lane records and
+kind-4 exactly on star records (scripts/r284_deref.py's head classifies both
+conventions side by side — keep it as the canonical reader). Any future
+pointer-class census MUST decode via ptrX()-style -0x88 arithmetic or it will
+manufacture "no such structure" negatives.
+
+## t284 — "V (DAT_482fb) IS A LINEAGE/HISTORY FUNCTION" IS SUPERSEDED (do not mine history again)
+
+S10 #3 read the same-turn V=14-vs-23 pair as requiring history. t284's replay
+(scripts/r284_vreplay.py) reproduces EVERY banked V from the save's OWN snapshot
+(state object + visibility masks + relation cells + ship order pointers):
+295/409 EXACT, the 114 misses exactly the pre-first-end-turn slots whose stored
+value is 0, and the predicted visited-lane set matches the persisted +0x21
+marks 409/409. The lineage lives IN THOSE FIELDS, not in a hidden accumulator
+of the past. Do not author V-tasks that diff turns looking for "carried state";
+the closure route for the remaining residue is the THRESHOLD witness only
+(selector arm + V>=25 + end screen).

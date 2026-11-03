@@ -656,3 +656,67 @@ the end-of-turn pass, never restored. Why t212's census saw zero writers:
 base-register+disp store, no static disp32/imm form exists (S9's predicted
 residue shape, now positively witnessed). WHAT REMAINS: the predicate's
 meaning (what the loop qualifies) and the threshold residue (V>=25 witness).
+
+## S18 — t284: THE PREDICATE DECODED — CONTROLLED = PRUNED FLOOD FROM HOME [measured + replayed]
+
+The t283 "WHAT REMAINS: the predicate's meaning" is CLOSED as a MECHANISM
+(threshold residue stays open, strict-close). Producer = FUN_00024274 (payload
+0x24274..0x243fc) called from the FUN_00024f24 END-OF-TURN tail; Ghidra
+decompile cross-checked instruction-for-instruction vs objdump; full write-up,
+field-identity cross-checks and validation in docs/re/_wip_t284.md +
+scripts/r284_vreplay.py.
+
+LAW (state object rooted at DAT_00012e10 == the TURN COUNTER; V = its field
++0x354eb == 0x482fb; witnessed ebp 0x254e10 = 0x242000+0x12e10):
+  end-of-turn: clear lane marks (lane_pool 0x16147 stride 0x27, rec+0x21);
+  if home star (dword[0x12e1d + 0x1ee*player], the t246/t248 HOME POINTER law)
+  carries the player's presence bit (+0x14): V = 1 and FLOOD(home); else V = 0.
+  FLOOD(star): for each lane in star's OWN incident list (star+0x2c ptr array,
+  count star+0x44; measured 50 distinct per-star sets, sizes 1..4): skip if
+  marked; far = the lane endpoint != star; admit iff
+  (a) far star +0x17 (SELECT mask) has the PLAYER bit (allies do NOT count),
+  (b) (far+0x14 | far+0x15) & ~(allied | 1<<player) & 0x7f == 0 — the mask pair
+      measured == races owning a planet at that star (48/50 production; the 2
+      exceptions are multi-owner presence),
+  (c) NO live ship holds an order INTO the lane (ship+0x59 == lane ptr, owner
+      != player, relation[player][owner] != 3 ALLIANCE). MEASURED: kind-5 lane
+      orders carry lane-pool pointers (kind 4 -> star records, kind 0 -> null) —
+      decoded under the POINTER LAW after an initial 0x88-trap misread.
+  On admit: mark lane, V += 1, RECURSE(far). A failing lane PRUNES ITS SUBTREE.
+
+VALIDATION (409 in-game slots, 20+ banked runs, turns 1..1255):
+  * V: 295/409 EXACT; ALL 114 misses are predicted>0 vs stored 0 = pre-first-
+    end-turn slots (the S10 #2 population). ZERO rows with V>PRED, ZERO rows
+    where both are nonzero and differ. Nonzero ladder: V=1 (13 runs t1..t52),
+    V=14 at t1255, V=23 at t1087 (the t283 watched runs' own terminal value).
+  * LANE MARKS: predicted visited set == persisted +0x21 marks 409/409 (both
+    set differences empty) — the PRUNING decisions independently confirmed.
+  * Gate census at production t1086: 22 PASS / 2 FAIL-presence / 0 FAIL-vis /
+    0 FAIL-contest.
+  * Vendor off-by-one edge (break on the LAST live slot still accepts the
+    lane): 0 hits in 2310 contesting ship-lane pairs — not observable, rewrite
+    uses plain any().
+
+UNIT OF V [corrects the S6/S10 framing]: V counts ADMITTED LANES + home, not
+stars — a star entered by two lanes is counted twice. V=23 == 22 marked lanes
++ home (t283 walk terminal; replay identical). This is why V is NOT bounded by
+owned-system counts and can spike (t912 11->22 with zero systems change: one
+lane opening re-admits a branch, twice-entered stars included).
+
+S10 #3 REFINED [superseding]: V is a pure SNAPSHOT function (visibility masks +
+relation cells + ship order pointers); the t1254 V=14-vs-23 lineage pair needs
+no history hypothesis — those fields carry the lineage, and the replay
+reproduces 14 from the t1255 snapshot alone.
+
+REWRITE UPGRADED (was: starsOwned share + rounded pct, campaign.cpp:2183):
+Campaign::recomputeScoreStars() + floodControlled() mirror the pass verbatim
+(cadence: 0 at construction, recompute at the END of advance() only — after
+diplomacyPhase so a same-turn alliance counts, matching the original's live
+cell reads); playerScorePct() = TRUNC(100*scoreStars()/T) per S2. Presence
+gate uses the owner_ proxy [documented: rewrite has one owner per star; the
+measured mask pair is multi-owner-capable]; contest gate uses transit
+crossing-the-lane (the measured +0x59 lane-pointer semantics). Claimed stars
+now get their owner's +0x16/+0x17 bits at settlement (without it the flood
+prunes its own colonies). Pins: tests/test_score_t284.cpp (6 tests: cadence,
+home-loss zero, full flood == 1+lanes + presence prune, player-bit-only
+visibility, contest incl. direction + own-traffic exemption, pct formula).

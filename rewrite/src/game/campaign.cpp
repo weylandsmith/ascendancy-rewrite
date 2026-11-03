@@ -1438,6 +1438,15 @@ void Campaign::expansionPhase() {
     for (const ShipInTransit& sh : fleet_) {
         if (owner_[sh.target] < 0) {
             owner_[sh.target] = sh.owner;
+            // CLAIM-VISIBILITY PAIR [documented default, t192 law extended]:
+            // a claimed star carries the claimant's bits in BOTH star mask
+            // bytes (+0x16/+0x17 analogs). seedVisibility() states the premise
+            // (the click handler refuses to select a star without the bit);
+            // t284 adds the producer consequence — FUN_00024274 tests the FAR
+            // star's +0x17, so a colony without its owner's bit would prune
+            // its own subtree out of the CONTROLLED count.
+            starLaneVis_[sh.target] |= static_cast<char>(viewerMaskFor(sh.owner));
+            starSelVis_[sh.target] |= static_cast<char>(viewerMaskFor(sh.owner));
             // settlement :=2 MEASURED (income-law.md S6e) + COLONY BASE
             // grant MEASURED t41 (r1_colony_items.py: 2720/2720 owned
             // records carry an active CB; every in-run colonisation
@@ -2160,6 +2169,12 @@ Victory Campaign::advance() {
     expansionPhase();
     visibilityPhase();
     diplomacyPhase();
+    // t284 cadence law: the producer runs in the END-OF-TURN pass only
+    // (FUN_00024f24 tail, after the per-race loop, just before the turn
+    // increment). Placed after diplomacy so an alliance formed THIS turn
+    // already counts in the allied mask, as in the original (the pass reads
+    // live relation cells).
+    recomputeScoreStars();
     victory_ = checkVictory();
     if (victory_ != Victory::None) {
         events_.push_back({turn_, std::string("VICTORY: ") + victoryName(victory_) +
@@ -2181,8 +2196,80 @@ int Campaign::techsOwned(int owner) const {
 double Campaign::resources(int owner) const { return res[owner]; }
 
 int Campaign::playerScorePct() const {
+    // t284 UPGRADE to the cited disproducer law (docs/re/score.md S2, raw bytes
+    // 0x280be..0x280e5): displayed percent = TRUNC(100 * DAT_000482fb / T) with
+    // T = total stars (u32 DAT_00016143 >> 16). The idiv at 0x280e3 TRUNCATES,
+    // so no +0.5 here (the pre-t284 rounding of an owned-star share was a
+    // documented default; the numerator AND the rounding are both replaced).
     const int total = static_cast<int>(galaxy_.stars.size());
-    return total ? static_cast<int>(100.0 * starsOwned(kPlayer) / total + 0.5) : 0;
+    return total ? (100 * scoreStars_) / total : 0;
+}
+
+// t284 — replay of the witnessed producer FUN_00024274 (payload file
+// 0x24274..0x243fc; Ghidra decompile cross-checked instruction-for-instruction
+// against objdump of work/ascend_payload.bin; full law + corpus validation in
+// docs/re/_wip_t284.md). One flood step: walk `star`'s lane list, admit a lane
+// only if its far star passes visibility + presence and the lane is uncontested,
+// then recurse INTO the far star (a failing lane prunes that whole subtree —
+// this is what makes V jump by whole branches, e.g. t912 11->22 with zero
+// systems change, and fall 23->14 in one combat sprint).
+void Campaign::floodControlled(int star, std::vector<char>& laneDone,
+                               unsigned allowedMask, int& count) const {
+    if (star < 0 || star >= static_cast<int>(galaxy_.stars.size())) return;
+    for (size_t li = 0; li < galaxy_.lanes.size(); ++li) {
+        if (laneDone[li]) continue;
+        const Lane& ln = galaxy_.lanes[li];
+        if (ln.a != star && ln.b != star) continue;
+        const int far = (ln.a == star) ? ln.b : ln.b == star ? ln.a : -1;
+        if (far < 0) continue;
+        // (a) visibility: original tests the far star's +0x17 (SELECT mask,
+        // starSelVis_ analog) against 1<<(playerIdx&0x1f) ONLY — allied bits
+        // do NOT satisfy it (the presence test below is where allies are
+        // forgiven). Star reveal law: debugflags.md STAR REVEAL.
+        if (!(starSelVis_[far] & viewerMaskFor(kPlayer))) continue;
+        // (b) presence: original rejects the lane iff
+        //     (far+0x14 | far+0x15) & ~(allied | 1<<player) & 0x7f  != 0.
+        // The mask pair measured == races owning a planet at that star
+        // (48/50 on the production save; the 2 exceptions are partial/multi-
+        // owner presence the rewrite cannot express — owner_ is ONE owner per
+        // star, so a contested star reads as its owner here [documented]).
+        const int fo = owner_[far];
+        if (fo != kPlayer && fo >= 0 && !((allowedMask >> fo) & 1u)) continue;
+        // (c) contest: the original breaks the lane scan on any live ship with
+        //     +0x59 == this lane pointer, owner != player, relation != 3
+        //     (ALLIANCE, OQ-023). MEASURED: kind-5 (lane) orders really do hold
+        //     lane-pool pointers (scripts/r284_contest_census.py re-read under
+        //     the pointer law), so the rewrite's transit crossing this lane is
+        //     the faithful analog.
+        bool contested = false;
+        for (const ShipInTransit& sh : fleet_) {
+            if (sh.owner == kPlayer || sh.owner < 0) continue;
+            if ((allowedMask >> sh.owner) & 1u) continue;   // allied traffic is free
+            if ((sh.from == ln.a && sh.target == ln.b) ||
+                (sh.from == ln.b && sh.target == ln.a)) { contested = true; break; }
+        }
+        if (contested) continue;
+        laneDone[li] = 1;      // the original's lane rec+0x21 mark (per-pass)
+        ++count;               // state->[+0x354eb] += 1
+        floodControlled(far, laneDone, allowedMask, count);
+    }
+}
+
+// t284 — the FUN_00024f24 TAIL: clear marks, seed from home presence, flood.
+// Cadence is the law: this runs ONLY in the end-of-turn pass, which is why
+// every banked post-load slot reads V==0 (score.md S10 #2) and why t283's
+// watchpoint fired +3.1-3.3 s after NEXTTURN and never on idle.
+void Campaign::recomputeScoreStars() {
+    std::vector<char> laneDone(galaxy_.lanes.size(), 0);   // mark clear
+    const int home = (kPlayer < static_cast<int>(homeStar_.size())) ? homeStar_[kPlayer] : -1;
+    // Original gate: home star +0x14 bit for the player. owner_ proxy [as (b)].
+    if (home < 0 || owner_[home] != kPlayer) { scoreStars_ = 0; return; }
+    unsigned allowed = 1u << kPlayer;
+    for (int o = 1; o < Nowner_; ++o)
+        if (dipState_[o - 1].allied) allowed |= 1u << o;    // relation cell == 3
+    int count = 1;             // the home system itself counts as 1
+    floodControlled(home, laneDone, allowed, count);
+    scoreStars_ = count;
 }
 
 std::string Campaign::traceLine() const {

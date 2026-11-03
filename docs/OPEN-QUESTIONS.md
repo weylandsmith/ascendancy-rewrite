@@ -466,7 +466,40 @@ count is DERIVED state repopulated by the end-of-turn pass, never restored.
 THRESHOLD RESIDUE STILL OPEN (no V>=25 sampled row, selector never armed in
 campaign lineage) — ROW OVERALL STAYS OPEN. Non-artifact law derived: the
 spurious first fire needs the byte NONZERO at arm time (debug.cpp:1048 stores
-0; fire test :870), and score=0 at arm time in every run.
+0; fire test :870), and score=0 at arm time in every run. STATUS t284 (2026-11-03,
+docs/re/score.md S18 + docs/re/_wip_t284.md): THE PREDICATE IS DECODED AND
+CORPUS-REPLAYED — producer = FUN_00024274 (payload 0x24274..0x243fc) invoked
+from the FUN_00024f24 END-OF-TURN tail; state object rooted at DAT_00012e10
+(the TURN COUNTER), V = field +0x354eb == 0x482fb (witnessed ebp 0x254e10 ==
+0x242000+0x12e10). LAW: clear lane marks (pool 0x16147 stride 0x27, rec+0x21);
+if home star (HOME POINTER dword[0x12e1d+0x1ee*player]) carries the player's
+presence bit -> V=1 + FLOOD, else V=0; a lane admits its far star iff the far
+star's +0x17 SELECT mask has the PLAYER bit (allies do NOT satisfy it), the far
+star's presence pair (+0x14|+0x15, measured == races owning a planet there,
+48/50) has no bit outside (allied | player), and NO live ship holds an order
+INTO the lane (ship+0x59 == lane pointer — MEASURED under the pointer law:
+kind-5 orders carry lane-pool records, kind-4 star records, kind-0 null); on
+admit: mark, V+=1, recurse; a failing lane PRUNES ITS SUBTREE. REPLAY
+(scripts/r284_vreplay.py, 409 in-game slots, 20+ runs, turns 1..1255): V
+EXACT 295/409 with ALL 114 misses = pre-first-end-turn slots (stored 0, the
+S10 #2 population), ZERO rows V>PRED, ZERO rows both-nonzero-and-different
+(nonzero ladder V=1 x13 runs, V=14@t1255, V=23@t1087 == the t283 walk
+terminal); predicted visited set == persisted +0x21 marks 409/409 (pruning
+independently confirmed). UNIT CORRECTION: V counts ADMITTED LANES + home, not
+stars (cycles double-enter) — the clean reading of S6's V=22 vs systems_any=14.
+S10 #3 REFINED: V IS a pure snapshot function (visibility masks + relation
+cells + order pointers); the t1254 14-vs-23 lineage pair needs no history
+hypothesis. REWRITE UPGRADED (was starsOwned share + rounded pct at
+campaign.cpp:2183): recomputeScoreStars()/floodControlled() mirror the pass
+(cadence: 0 at construction, recompute ONLY at the end of advance(), after
+diplomacyPhase so same-turn alliances count); playerScorePct() =
+TRUNC(100*V/T) per S2; presence via the owner_ proxy [documented single-owner
+limit]; contest via transit-crossing-the-lane; settlement now grants the
+claimant's +0x16/+0x17 bits (else the flood prunes its own colonies). Pins
+tests/test_score_t284.cpp x7 (166 tests 0 fail). THRESHOLD RESIDUE STILL OPEN
+(no V>=25 sampled row; selector never armed in campaign lineage; the rewrite's
+Control comparator is deliberately UNTOUCHED — a decoded accumulator does not
+name the comparator's operand) — ROW OVERALL STAYS OPEN.
 
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)

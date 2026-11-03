@@ -188,6 +188,16 @@ public:
     // freeTechGrantFor PUBLIC): force a star's owner for wiring an attack
     // scenario. Does NOT seed pop/CB (the engagement math only needs owner).
     void setStarOwnerForTest(int starId, int owner) { owner_[starId] = owner; }
+    // t284 pin surfaces for the CONTROLLED-SYSTEMS producer (same pattern as
+    // setWarForTest): grant the viewer's SELECT-mask bit on one star (the
+    // starSelVis_/+0x17 gate), install an explicit transit list (the contest
+    // gate reads from==lane.a&&target==lane.b or the reverse), and run the
+    // producer on demand.
+    void setStarSelVisForTest(int star, int viewer) {
+        starSelVis_[star] |= static_cast<char>(viewerMaskFor(viewer));
+    }
+    void setFleetForTest(std::vector<ShipInTransit> f) { fleet_ = std::move(f); }
+    void recomputeScoreStarsForTest() { recomputeScoreStars(); }
     // t204 pin surface: scenario peace/war toggle (pins "peace never clears
     // the attacked mark" — permanence is the measured property, so the pin
     // must be able to make peace). Thin wrapper over the private setWar.
@@ -466,7 +476,24 @@ public:
     // different distributions]; OR-only. Pairing this twin to both share
     // sites is [unverified] (the twin's callers are not in the banked set).
     void shareStarVision(int a, int b, bool bidirectional, bool allied);
-    int playerScorePct() const;  // stars-owned share, static.txt '%'-template (§1)
+    int playerScorePct() const;  // TRUNC(100*scoreStars()/T), score.md S2 law
+    // t284 CONTROLLED-SYSTEMS LAW (the DAT_000482fb analog; producer witnessed
+    // t283, predicate decoded + corpus-replayed t284 — docs/re/_wip_t284.md):
+    // the vendor's "STARS CONTROLLED %d" is NOT owned-star count. It is a
+    // per-end-turn-pass FLOOD from the player's home star over the lane graph:
+    //   V = 0; if home star still carries player presence: V = 1 and flood.
+    // A lane admits its far star iff (a) far star visible to the player
+    // (star +0x17 analog -> starSelVis_), (b) far star's presence mask holds no
+    // race that is neither the player nor allied (star +0x14|+0x15 analog ->
+    // owner_ proxy, measured 48/50 exact vs the planet-record owner set), and
+    // (c) NO non-allied ship holds an order INTO the lane (ship +0x59 == lane
+    // pointer, measured: kind-5 lane orders carry lane-pool pointers). A
+    // failing lane PRUNES its whole subtree. Cadence: 0 at load, recomputed
+    // ONLY in the end-of-turn pass (FUN_00024f24 tail; fires +3.1-3.3 s after
+    // NEXTTURN, quiet 90 s zero). Corpus replay: 295/409 EXACT, all 114
+    // misses are pre-first-end-turn slots (stored 0), lane-mark footprint
+    // 409/409 (scripts/r284_vreplay.py).
+    int scoreStars() const { return scoreStars_; }
     // t204 DIPLOMACY-ON-ATTACK readbacks (gap map row 13; law in
     // diplomacy.h::applyAttackDipCost), t205-corrected INDEX IDENTITY:
     // [0x48304] is a BYTE ARRAY indexed by STAR INDEX, not one global byte —
@@ -539,6 +566,11 @@ private:
     void expansionPhase();
     void combatPhase();
     void abilityPhase();
+    // t284 CONTROLLED-SYSTEMS producer (see scoreStars() above): the
+    // FUN_00024f24 tail — clear lane marks, seed from home presence, flood.
+    void recomputeScoreStars();
+    void floodControlled(int star, std::vector<char>& laneDone,
+                         unsigned allowedMask, int& count) const;
     // OQ-026: per-turn receive-leg sweep (cited shape 0x55f6e EBX=-1 inside
     // the per-race event loop, party-1 = current player row [0x7458e]; ships
     // .md S23 L6). One-shot per empire pair: fires the first turn a starlane
@@ -664,6 +696,10 @@ private:
     std::vector<char> contacted_;          // owner x owner: receive-leg fired
     int Nowner_ = 0;
     int turn_ = 0;
+    // t284: DAT_000482fb analog ("STARS CONTROLLED"). 0 at construction/load
+    // (the value is DERIVED state, never restored — t283 watchpoint + S10 #2),
+    // recomputed by recomputeScoreStars() at the END of every advance().
+    int scoreStars_ = 0;
     Victory victory_ = Victory::None;
     std::vector<CampaignEvent> events_;
 };
