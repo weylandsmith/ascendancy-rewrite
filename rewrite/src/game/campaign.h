@@ -83,11 +83,12 @@ struct PlanetState {
     // 0x3ea: `cmp byte [edx+0x54],0xff; jne skip`).
     int pendingItem = -1;
     int buildAcc = 0;
-    // Species-ability modifiers (docs/re/abilities.md §2): SA_MoreMaxPop adds
-    // capBonus to the effective pop ceiling; SA_Cornucopia sets richPros
-    // (= one Agriplot's PROS 2 [verified planitem.txt] on a "rich world",
-    // the static.txt #56 planet-type name list).
-    double capBonus = 0;
+    // Species-ability modifier (docs/re/abilities.md §2): SA_Cornucopia sets
+    // richPros (= one Agriplot's PROS 2 [verified planitem.txt] on a "rich
+    // world", the static.txt #56 planet-type name list).
+    // (SA_MoreMaxPop's old `capBonus` field is DELETED t280: the cited body
+    // 0x4402a mutates the PRE-CLAMP seed word capBase (+0x55) by +2, not a
+    // post-clamp bonus — see abilityPhase and income-law.md S10.)
     double richPros = 0;
     // SELECTED-ABILITY byte (+0x54 analogue; income-law.md S14 t45). Full
     // image writer census (scripts/r1_0x54_writer_sweep.py): queue writes
@@ -183,6 +184,10 @@ public:
     // the attacked mark" — permanence is the measured property, so the pin
     // must be able to make peace). Thin wrapper over the private setWar.
     void setWarForTest(int a, int b, bool on) { setWar(a, b, on); }
+    // t280: override one owner's SA_ after construction (CauseWar boundary
+    // pin needs a deterministic AI-side ability without racing the roster
+    // draw; same pattern as setWarForTest/setAttitudeForTest).
+    void setAbilityForTest(int owner, SpeciesAbility a) { ability_[owner] = a; }
     // t208 pin surface: scenario industry stockpile set (mirror of ind_,
     // §3 stockpile semantics). Exists so an e2e pin can clear the
     // SuperMarines invasion gate (ind_[a] >= ship cost, campaign.cpp:1895)
@@ -210,7 +215,6 @@ public:
     }
     int pendingItemFor(int star) const { return planets_[star].pendingItem; }
     int buildAccFor(int star) const { return planets_[star].buildAcc; }
-    double popCapBonusFor(int star) const { return planets_[star].capBonus; }
     // Public +0x4a analog for tests/UI (income-law.md S10 seed law).
     int popCapAt(int star) const { return storedCapFor(star); }
     // Per-planet channel words +0x44/+0x46/+0x48 incl. the t45 governor
@@ -384,31 +388,13 @@ public:
         absorb = std::min(volley, charges);
         spill = volley - absorb;
     }
-    // t256 SA_CauseWar / SA_Hatred CEILING LAW (FUN_000440b5, aicode.md §6.3
-    // t99), pure form for pinning (same pattern as absorbSplit). Index space =
-    // owners. warWithSelf[r] != 0: r is at war with self (the ability owner);
-    // declareWarLine[x] = x's OWN DECLARE_WAR word (race row +0x1c9,
-    // diplomacy.md §8 positional map); att[x] = attitude of x toward self.
-    // Law (0x440b5..0x4414c read-through): for EVERY belligerent r, for every
-    // THIRD PARTY x (x != r — the belligerent's own cell is never touched),
-    // if att[x] > declareWarLine[r]... NOTE the original compares against
-    // r's war threshold and stores r's threshold; the rewrite mirrors that
-    // (line = r's), so a low-threshold enemy drags high-regard onlookers
-    // under the ONLOOKER's own chooser trigger only when line also sits below
-    // it — see _wip_t256 S2. Strict >, store = line (ceiling, not floor, and
-    // not a delta).
-    static void hatredClamp(const std::vector<int>& warWithSelf,
-                            const std::vector<int>& rLine,
-                            std::vector<int>* att) {
-        for (size_t r = 0; r < warWithSelf.size(); ++r) {
-            if (!warWithSelf[r]) continue;
-            for (size_t x = 0; x < att->size(); ++x) {
-                if (x == r) continue;
-                int& a = (*att)[x];
-                if (a > rLine[r]) a = rLine[r];
-            }
-        }
-    }
+    // (t256's static hatredClamp — the SA_Hatred/SA_CauseWar ceiling mirror —
+    // is RETIRED t280: the raw re-read of 0x440b5 (see abilityPhase case
+    // CauseWar + _wip_t280 S2) shows the vendor clamps att[k->x] (enemy k
+    // toward third party x) at x's OWN DECLARE_WAR, not att[x->self] at r's;
+    // every cell of the corrected law is AI->AI = state the rewrite does not
+    // carry, so there is nothing pure-form to pin. campaign.cpp case CauseWar
+    // is announce-only.)
     // t93 (OQ-016): AI RESEARCH PICK tier decision — pure form of the
     // sentinel + preferred tiers of FUN_00040018 (0x400b3..0x40134, body
     // 0x40018..0x40175, disassembly re-verified t93; docs/re/aicode.md
@@ -599,7 +585,7 @@ private:
     };
     ChannelAcc channelAccFor(int star) const;
     // +0x4a analog (income-law.md S10): clamp(0..100, capBase + MPOP sum,
-    // items flags&4 and Colony Base excluded) + ability capBonus.
+    // items flags&4 and Colony Base excluded).
     int storedCapFor(int star) const;
     int needClassFor(int star) const;
 

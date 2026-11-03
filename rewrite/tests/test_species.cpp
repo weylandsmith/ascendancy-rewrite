@@ -209,9 +209,26 @@ TEST(species_block_star_lanes_flag_set_on_activation) {
 }
 
 TEST(species_more_max_pop_raises_caps_and_cornucopia_adds_pros) {
+    // PIN t280 for the CITED body law SA_MoreMaxPop 0x4402a (aicode.md §6.3
+    // t280 erratum: §6.3 never documented this body; jump-table case al=9):
+    // EVERY owned planet's PRE-CLAMP cap seed word += 2 (capBase, the +0x55
+    // analog), then recalc. Pin = CONTROL DIFFERENTIAL at the exact fire
+    // turn (cad[14] == 72): capBase rises EXACTLY +2 on every owned star and
+    // never before the fire; the old post-clamp +25 bonus would overshoot.
     auto c = makeCrafted(15, 1, ag::SpeciesAbility::MoreMaxPop);
-    for (int t = 0; t < 72; ++t) c.advance();  // cad[14] == 72 (aicode.md §6.4)
-    CHECK(c.popCapBonusFor(homeOf(c, 1)) > 0);
+    auto ctrl = makeCrafted(15, 1, ag::SpeciesAbility::Unknown);
+    for (int t = 0; t < 71; ++t) { c.advance(); ctrl.advance(); }
+    std::vector<int> owned;
+    for (size_t s = 0; s < c.galaxy().stars.size(); ++s)
+        if (c.starOwner((int)s) == 1) owned.push_back((int)s);
+    CHECK(!owned.empty());
+    for (int s : owned)
+        CHECK(c.planetAt(s).capBase == ctrl.planetAt(s).capBase);  // not yet
+    c.advance();  // turn 72: cad[14] fires
+    ctrl.advance();
+    for (int s : owned)
+        CHECK(c.planetAt(s).capBase == ctrl.planetAt(s).capBase + 2);
+    CHECK(hasEvent(c, "colony pop caps (+2 seed each)"));
     auto d = makeCrafted(16, 1, ag::SpeciesAbility::Cornucopia);
     for (int t = 0; t < 150; ++t) d.advance();  // cad[10] == 150 (aicode.md §6.4)
     bool enriched = false;
@@ -233,57 +250,34 @@ TEST(species_steal_research_fires_and_is_capped_by_ownership_rule) {
     CHECK(c.techsOwned(1) <= 106);  // 66 main + 40 variant rows (research.md)
 }
 
-TEST(species_cause_war_hatred_ceiling_t256) {
-    // PIN 1 (pure law, exact): Campaign::hatredClamp mirrors FUN_000440b5
-    // (aicode.md §6.3 t99) — for every belligerent r, every third-party
-    // cell > r's DECLARE_WAR word is CEILINGED to exactly that word; the
-    // belligerent's own cell is NEVER touched; cells at/below the line are
-    // untouched (ceiling, not floor, not delta).
-    {
-        std::vector<int> war{0, 1, 0};            // r = owner 1 at war with self
-        std::vector<int> line{0, 290, 0};         // r's DECLARE_WAR (race00.dip 290 [verified])
-        std::vector<int> att{620, 300, 289};      // x=0: 620>290 -> 290; r cell 300 untouched; 289<=290 untouched
-        ag::Campaign::hatredClamp(war, line, &att);
-        CHECK(att[0] == 290);
-        CHECK(att[1] == 300);   // x != r exclusion
-        CHECK(att[2] == 289);
-        std::vector<int> war2{1, 1};              // two belligerents, lines 290 and 210
-        std::vector<int> line2{290, 210};
-        std::vector<int> att2{250, 250};
-        ag::Campaign::hatredClamp(war2, line2, &att2);
-        // x=0: r=1 (x!=r) clamps 250>210 -> 210; x=1: r=0 (x!=r) clamps 250>290? no -> 210 stands from first pass? 
-        // Order: r=0 first clamps x=1 (250>290 false) -> 250; r=1 then clamps x=0 (250>210) -> 210.
-        CHECK(att2[0] == 210);
-        CHECK(att2[1] == 250);
-    }
-    // PIN 2 (integration, live campaign): player-owned CauseWar (specnum 17,
-    // cad[17]==100) against free-for-all-free scenario, owner 1 (race00, line
-    // 290) at war with the player, onlookers 2..6 high. Fire turn: ability
-    // runs FIRST in advance(), diplomacyPhase after — clamped cells land at
-    // 290 + that turn's mood excursion, and any onlooker whose OWN
-    // DECLARE_WAR sits above 290 (race05 line 300 [verified]) then trips the
-    // chooser's declare-war and pays negPlayerTurns/4 — the redirect IS the
-    // vendor effect ("alien species to strongly dislike any species at war
-    // with you"), so the assertion is directional: every onlooker cell must
-    // end at or below the 290 line + mood slack, never near its 620 start.
+TEST(species_cause_war_two_party_boundary_t280) {
+    // PIN t280 for the CORRECTED SA_Hatred law (raw 0x440b5..0x4414c,
+    // work/t280_bodies.txt; aicode.md §6.3 t280 amendment E3). The vendor
+    // ceilings word[row(x)+0x1b2+2k] == att[x->k] (third party x toward
+    // enemy k) at DECLARE_WAR(x). The law EXCLUDES k==self and x==self, so
+    // with the rewrite's AI->PLAYER-only attitude state (dipState_) NO cell
+    // is addressable — firing must NEVER move an attitude. (The retired t256
+    // pin pinned the §6.3 mislabel; this pins the boundary the corrected
+    // law implies.)
     auto c = makeCrafted(32, 1, ag::SpeciesAbility::Unknown,
-                         /*playerSpecies=*/17, 6, 50, /*freeForAll=*/false);
-    CHECK(c.abilityOf(0) == ag::SpeciesAbility::CauseWar);
+                         /*playerSpecies=*/-1, 6, 50, /*freeForAll=*/false);
+    auto ctrl = makeCrafted(32, 1, ag::SpeciesAbility::Unknown,
+                            /*playerSpecies=*/-1, 6, 50, /*freeForAll=*/false);
+    // Give owner 1 the ability (AI fire, cad[17] == 100) and war it with
+    // the player; onlooker attitudes deliberately start high. CONTROL =
+    // byte-identical scenario WITHOUT the ability; the sim is deterministic,
+    // so "the law touches no rewrite cell" means the two campaigns' full
+    // attitude vectors agree AFTER the fire (per-race mood oscillation makes
+    // raw before/after deltas meaningless — controls absorb it).
+    c.setAbilityForTest(1, ag::SpeciesAbility::CauseWar);
     c.setWarForTest(1, 0, true);
-    for (int i = 2; i <= 6; ++i) c.setAttitudeForTest(i - 1, 620);
-    for (int t = 0; t < 99; ++t) c.advance();
-    std::vector<int> before;
-    for (int i = 2; i <= 6; ++i) before.push_back(c.dipStateAt(i - 1).attitude);
-    c.advance();  // turn 100: CauseWar fires, then diplomacyPhase
-    CHECK(hasEvent(c, "5 onlookers' regard clamped"));
-    for (size_t i = 0; i < before.size(); ++i) {
-        const int att = c.dipStateAt(1 + (int)i).attitude;
-        CHECK(att <= 298);                      // clamped to 290 + mood slack, never 620-ish
-        CHECK(att < before[i]);                 // strictly reduced from the high start
-    }
-    // The belligerent's own cell is not a clamp target: it only moved by
-    // mood-scale amounts, never to 290 from its ~500 drift.
-    CHECK(c.dipStateAt(0).attitude > 400);
+    ctrl.setWarForTest(1, 0, true);
+    for (int i = 1; i <= 6; ++i) { c.setAttitudeForTest(i - 1, 620); ctrl.setAttitudeForTest(i - 1, 620); }
+    for (int t = 0; t < 100; ++t) { c.advance(); ctrl.advance(); }  // turn 100 fires
+    CHECK(hasEvent(c, "stoked the aliens' rivalries"));
+    for (int i = 0; i < 6; ++i)
+        CHECK(c.dipStateAt(i).attitude == ctrl.dipStateAt(i).attitude);
+    CHECK(c.atWar(1, 0) == ctrl.atWar(1, 0));  // and no side effects either
 }
 
 TEST(species_industry_boost_is_per_planet_accumulator_t256) {

@@ -799,8 +799,8 @@ int Campaign::storedCapFor(int star) const {
     // mpop=0) is 72066/72066 exact across 466 saves. Orbital-slot items need
     // no special case in the rewrite: planets_[s].items holds ACTIVE items
     // only, so no orbital row can enter the sum here.
-    // capBonus keeps SA_MoreMaxPop [documented default; the original's
-    // ability site is not yet lifted].
+    // (t280: SA_MoreMaxPop feeds THIS equation via capBase (+2 per fire,
+    // body 0x4402a) — the old post-clamp capBonus term is deleted.)
     const PlanetState& ps = planets_[star];
     int mpopSum = 0;
     for (int it : ps.items) {
@@ -809,7 +809,7 @@ int Campaign::storedCapFor(int star) const {
     int cap = ps.capBase + mpopSum;
     if (cap < 0) cap = 0;
     if (cap > 100) cap = 100;
-    return cap + static_cast<int>(ps.capBonus);
+    return cap;
 }
 
 // ---------------------------------------------------------------------------
@@ -966,7 +966,7 @@ void Campaign::incomeAndGrow() {
         for (int it : planets_[s].items)
             if (it == itemId("Cloning Plant")) hasClone = true;
         PlanetState& ps = planets_[s];
-        const int cap = storedCapFor(s);  // storedCapFor already folds capBonus
+        const int cap = storedCapFor(s);  // clamp(capBase + MPOP)
         if (ps.pop < cap) {
             ps.growthCounter += static_cast<int>(pros);
             if (o != kPlayer && pros < 4) ps.growthCounter += 1;
@@ -1635,6 +1635,18 @@ void Campaign::abilityPhase() {
                 events_.push_back({turn_, who + "repaired all ships"});
                 break;
             case SpeciesAbility::ForcePeace: {  // L1870-1871 "force all aliens to make peace"
+                // t280 ERRATUM note (aicode.md amendment E2): the vendor body
+                // 0x43bf0 does NOT end wars — for every other row x it FLOORS
+                // word[row(x)+0x1b2+2*self] == att[x->self] at PP(x)+20 (x's
+                // own PROPOSE_PEACE + 20), arming x's chooser rung `att >
+                // proposePeace` (diplomacy.cpp:239) so x proposes peace to
+                // self on a later turn — peace via the chooser chain, not
+                // instantly. The rewrite keeps its end-the-wars abstraction:
+                // DIVERGENCE banked (arrival-via-chooser vs same-turn clear);
+                // wiring the floor for the player-holder case needs player->
+                // AI attitudes, which the state does not carry (dipState_ is
+                // AI->player). Pinned unchanged by
+                // species_force_peace_ends_the_owner_wars.
                 int n = 0;
                 for (int e = 0; e < Nowner_; ++e)
                     if (e != o && war_[o * Nowner_ + e]) { setWar(o, e, false); ++n; }
@@ -1716,9 +1728,26 @@ void Campaign::abilityPhase() {
                 break;
             }
             case SpeciesAbility::MoreMaxPop: {  // L2248-2249 "increase the maximum population of all your colonies"
+                // CITED BODY LAW SA_MoreMaxPop 0x4402a (t280 — the body
+                // aicode.md §6.3 never documented; jump-table case al=9 at
+                // restored FILE 0x43b10+9*4, raw listing work/t280_bodies.txt):
+                // scan the static planet pool 0x2b057 stride 0x7b (bound
+                // u16@0x3a093), match owner byte [rec+0x57] == self, and for
+                // EVERY match `WORD [rec+0x55] += 2` then per-planet recalc
+                // 0x38ba4. Operand = the PRE-CLAMP cap seed word (capBase,
+                // income-law.md S10), delta +2 — NOT a post-clamp +25 bonus
+                // (the t280-removed capBonus field), and there is NO
+                // pending-item gate (contrast IndustryBoost) and NO
+                // [rec+0x16]==10 skip (contrast Cornucopia). income-law.md
+                // S10 had already measured this exact site from the corpus
+                // side ("+2: scan 0x4402a ... adds 2 to EVERY owned planet's
+                // +0x55 then recalcs; no in-code caller found"); the caller IS
+                // the ability dispatcher 0x441d8.
+                int n = 0;
                 for (size_t s = 0; s < galaxy_.stars.size(); ++s)
-                    if (owner_[s] == o) planets_[s].capBonus += 25;  // [documented default]
-                events_.push_back({turn_, who + "raised colony pop caps"});
+                    if (owner_[s] == o) { planets_[s].capBase += 2; ++n; }
+                events_.push_back({turn_, who + "raised " + std::to_string(n) +
+                                      " colony pop caps (+2 seed each)"});
                 break;
             }
             case SpeciesAbility::KnowStarLanes:
@@ -1734,45 +1763,34 @@ void Campaign::abilityPhase() {
                 break;
             }
             case SpeciesAbility::CauseWar: {  // L2361-2362 "alien species to strongly dislike any species at war with you"
-                // UPGRADED t256 to the CITED body law SA_Hatred 0x440b5
-                // (aicode.md §6.3, t99): for every OTHER row r in state 2
-                // (AT WAR with self), for every THIRD party x (x != self,
-                // x != r): if attitude[x -> self] > r's DECLARE_WAR word
-                // (+0x1c9) then attitude[x -> self] := r's DECLARE_WAR. So
-                // the victim is never the belligerent r — it is the neutral
-                // onlooker who LIKES you, and the operation is a CEILING at
-                // the enemy's own war threshold, not a flat subtraction.
-                // Consequence (measured from the shipped DIPVALUES, t256):
-                // the clamp lands on r's line while the chooser tests x's
-                // OWN line (diplomacy.md §7 strict `att < DECLARE_WAR(x)`),
-                // so a low-threshold enemy drags high-threshold onlookers
-                // under their own trigger — "hostility diverters".
-                // PROJECTION [documented]: the rewrite carries ONE attitude
-                // vector (AI -> player, DipPolicyState per AI owner), so the
-                // cells attitude[x -> self] exist only when self == player.
-                // An AI-owned SA_CauseWar therefore has no state to change
-                // (AI-vs-AI attitudes are R1-blocked) and announces itself.
-                int n = 0;
-                if (o == kPlayer) {
-                    // Build the law's operands (owner index space) and run the
-                    // PINNED pure form Campaign::hatredClamp.
-                    std::vector<int> warWithSelf(Nowner_, 0), line(Nowner_, 0),
-                        att(Nowner_, 0);
-                    for (int r = 1; r < Nowner_; ++r) {
-                        warWithSelf[r] = war_[kPlayer * Nowner_ + r];
-                        line[r] = aiDip_[r - 1].values.declareWar;  // +0x1c9
-                        att[r] = dipState_[r - 1].attitude;
-                    }
-                    hatredClamp(warWithSelf, line, &att);
-                    for (int r = 1; r < Nowner_; ++r) {
-                        if (att[r] != dipState_[r - 1].attitude) {
-                            dipState_[r - 1].attitude = att[r];
-                            ++n;
-                        }
-                    }
-                }
-                events_.push_back({turn_, who + std::to_string(n) +
-                                      " onlookers' regard clamped to the war line"});
+                // *** t280 ERRATUM against aicode.md §6.3 (and therefore
+                // against t256's wiring, which mirrored it). Raw re-read of
+                // 0x440b5..0x4414c (work/t280_bodies.txt; aicode.md t280
+                // amendment E3): OUTER loop k != self over self's state
+                // window byte[row(self)+0x1c0+k] == 2 (at war) — §6.3 right;
+                // INNER loop x != self, x != k operates cell word[row(x) +
+                // 0x1b2 + 2*k]. Cell law (row = HOLDER, col = TARGET; three
+                // witnesses: §13.2, t207 §19, watcher relation() docstring):
+                // that cell is att[x -> k] — the THIRD PARTY's attitude
+                // toward the ENEMY — ceilinged at word[row(x)+0x1c9] ==
+                // DECLARE_WAR(x), the third party's OWN line (help.txt
+                // L2361: onlookers come to dislike your enemies). §6.3's
+                // "[x toward self +0x1b2] > [r+0x1c9]" mislabeled both.
+                // CONSEQUENCE for the rewrite: every cell the vendor law
+                // touches has holder x != self AND target k != self, i.e.
+                // AI->AI attitudes — the row-12 absent state (t256b census:
+                // dipState_ carries AI->PLAYER only). The t256
+                // Campaign::hatredClamp mutation clamped att[x->self] at
+                // DW(r), which the vendor never does, so it is RETIRED
+                // (campaign.h; pin species_cause_war_hatred_ceiling_t256
+                // replaced by species_cause_war_two_party_boundary_t280).
+                // Announce-only under EVERY owner, honestly labelled (blast
+                // radius of the retirement measured nil on gate seeds —
+                // CauseWar = specnum 17 never occupies default AI slots
+                // 0..5, t256).
+                events_.push_back({turn_, who +
+                                      "stoked the aliens' rivalries (AI->AI "
+                                      "attitudes unmodelled: no rewrite state)"});
                 break;
             }
             case SpeciesAbility::FastLaneTravel:

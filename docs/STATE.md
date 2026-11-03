@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T18:30
+updated: 2026-11-02T20:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,17 +260,31 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t280 AI GAP ROW 11 REMAINING BODIES (pure code) — ORDERING
-RATIONALE: t278 landed 2026-11-02 (OQ-005 decision sheet shipped; LANDED t278
-below). The drive-class row t279 (diplomacy live verification) STAYS HELD: at
-t278 close `ss -tn | grep 5910` still shows an ESTAB VNC client (release
-condition (a) of BLOCKED t273 unmet), so the queue's next offline row runs.
-If the release conditions ARE met at a later task start, a drive-class
-re-queue outranks this row and STATE gets rewritten accordingly. t281+ after.
-TASK VERBATIM (queue row): t280 AI GAP ROW 11 REMAINING BODIES (pure code):
-t256 upgraded 4 SA_ bodies to cited law; audit the remaining 12 against
-aicode.md §6.3 — wire or file refuted per body, tests where wired. Split
-freely; one commit minimum.
+NEXT t281 SA_CORNUCOPIA REPAINT WIRING (pure code) — ORDERING
+RATIONALE: t280 landed 2026-11-02 (LANDED t280 below: gap row 11 remaining
+bodies closed out — MoreMaxPop body 0x4402a found+wired, CauseWar retired
+per erratum E3, ForcePeace divergence re-labelled E2). The drive-class row
+t279 (diplomacy live verification) STAYS HELD: at t280 close `ss -tn |
+grep 5910` still shows an ESTAB VNC client (release condition (a) of BLOCKED
+t273 unmet). Of the bodies t280 audited, SA_Cornucopia (0x43de4) is the ONLY
+remaining one whose operands the rewrite state CARRIES: the cited law picks
+the own planet with MIN WORD pop (skip [rec+0x16]==10) and repaints every
+slot-class byte in {0,1} to a uniform rng pick {2,3,4} (pool 0x6838 u32x3 ==
+{2,3,4} measured t280, rng 0x7824f %3) — the rewrite has cellClasses (T36)
+and pop, yet currently models richPros+=2 instead. All other open body
+labels are per-ship (OQ-019 boundary) or AI->AI attitude (row 12 boundary)
+and stay refused with reasons on file. TASK: wire the repaint verbatim over
+cellClasses (define the +0x16-skip equivalent honestly — likely
+size-class/none; measure first), then retire richPros (t280 census: NO UI
+source reads richPros — rewrite/src/ui/*.cpp|h has zero hits; the only
+readers are campaign.cpp itself + test_species.cpp:236 — but re-verify at
+task time) and re-target that test leg to the repainted grid; pin with a
+control differential + mutation probe, keep gate seeds verbatim.
+If the +0x16 skip or class semantics turn out unrepresentable, FILE the
+refutation with the measurement instead (strict-close). If a drive-class
+re-queue is justified at task start (no :5910 client AND ring still
+production-lineage), it outranks this row and STATE gets rewritten
+accordingly. t282+ after.
 NOTE t278 FOR THE OQ-005 ASK (user-side, not a task): the ruling package is
 work/r1/shp_png/index.txt (twin decision-sheet.md) — 88 rows, per-row keep/
 junk/re-render recommendation; the user rules by replying per row id. When a
@@ -280,17 +294,13 @@ QUEUE (phase 3, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
 
 t279 DIPLOMACY LIVE VERIFICATION PASS (needs production live): re-verify the
-  t244 alliance law reads on the FRESH t1086 campaign WITHOUT initiating any
-  proposal: open ALIENDIP per race, bank disposition + relation-state cells
-  vs the watcher RAM rows at the same wall-second (c-overlay is the display,
-  RAM is truth — cross-check OQ-021's STARS CONTROLLED line too). Zero-click
-  risk screens only (read-only panels; NEVER PROPOSE/DECLARE). Bank to
-  diplomacy.md as a second-campaign corroboration (the first campaign's data
-  all lives at turns 1086-1335; a fresh campaign tests race-seed invariance).
-
-t280 AI GAP ROW 11 REMAINING BODIES (pure code): t256 upgraded 4 SA_ bodies to
-  cited law; audit the remaining 12 against aicode.md §6.3 — wire or file
-  refuted per body, tests where wired. Split freely; one commit minimum.
+t244 alliance law reads on the FRESH t1086 campaign WITHOUT initiating any
+proposal: open ALIENDIP per race, bank disposition + relation-state cells
+vs the watcher RAM rows at the same wall-second (c-overlay is the display,
+RAM is truth — cross-check OQ-021's STARS CONTROLLED line too). Zero-click
+risk screens only (read-only panels; NEVER PROPOSE/DECLARE). Bank to
+diplomacy.md as a second-campaign corroboration (the first campaign's data
+all lives at turns 1086-1335; a fresh campaign tests race-seed invariance).
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - OOM LAW: NEVER read live-timeline.jsonl except r1_stream.py / <=400 KB
@@ -348,6 +358,51 @@ t211's dispatch law (0x4a350 re-scan only with a new save); t210's stacking law
 semantics; t207 scale-2 algebra S7a + caller census; t206 two-channel consumer
 law; t205 per-STAR identity; t204; t203; t202/t202b; t201; t200; t199; t195;
 t189b.
+
+LANDED t280 (2026-11-02): AI GAP ROW 11 REMAINING BODIES CLOSED OUT — A
+MISSING BODY FOUND, TWO §6.3 CITATIONS REFUTED, CODE UPGRADED (offline, pure
+code; NO OQ closed — strict-close honored, OQ-016 ANNOTATED, ledger 15/4):
+(1) BODY 14 SA_MoreMaxPop 0x4402a EXISTS but §6.3 NEVER documented it
+(jump-table re-dump restored FILE 0x43b10: case al=9 -> 0x4402a; keeper tool
+scripts/r1_t280_bodies.py reproduces the whole listing, work/t280_bodies.txt).
+CITED LAW: every owned planet (static pool 0x2b057 stride 0x7b, owner byte
++0x57) WORD capBase +0x55 += 2 then recalc 0x38ba4 — PRE-CLAMP seed operand,
+NO pending/[+0x16] gates. Independently corroborated: income-law.md S10 had
+measured the same site from the corpus side with "no in-code caller found" —
+the caller IS the ability dispatcher 0x441d8 (identity CLOSED, S10 note).
+REWRITE UPGRADE: capBase += 2 verbatim (old capBonus += 25 was wrong operand
+POST-clamp AND wrong magnitude; field + popCapBonusFor deleted, source census:
+no UI reader ever). Pin species_more_max_pop... control differential,
+MUTATION-VERIFIED (capBase+=0 CAUGHT).
+(2) ERRATUM E2 (ForcePeace 0x43bf0): threshold = TARGET ROW's PROPOSE_PEACE
++20 (dword row_x+0x1cb >>16 lands on +0x1cd per the loader positional map),
+not self's ACCEPT_PEACE; the vendor FLOORS att[x->self] to arm x's chooser —
+it never ends wars. Rewrite keeps the end-the-wars abstraction, DIVERGENCE
+labelled (floor needs player->AI attitudes, absent state).
+(3) ERRATUM E3 (Hatred 0x440b5 — the body t256 wired): cell word[row(x)+
+0x1b2+2k] is att[x->k] (holder = row, target = col — three witnesses: §13.2
+att[self][other], t207 §19 victim-row clamp, watcher relation() docstring)
+and the line is DECLARE_WAR(x) (x's OWN), not r's. t256's Campaign::
+hatredClamp clamped att[x->self] at DW(r) = wrong cell AND wrong threshold;
+RETIRED (every corrected-law cell is AI->AI = row-12 absent state) ->
+CauseWar announce-only under every owner; pin species_cause_war_hatred_
+ceiling_t256 -> species_cause_war_two_party_boundary_t280 (deterministic
+control differential, MUTATION-VERIFIED: a dipState_ write in the case
+CAUGHT). Mid-session the cell-direction reading was self-corrected once
+(first draft said att[k->x]); the retirement conclusion held under BOTH
+readings, the docs ship the corrected law (=_wip_t280 S4).
+(4) REMAINING BODIES 5/6/7/8/9/10/11/13/16 + NOPs 15/18 re-read raw and
+CONFIRMED as documented (Shield T2 exit stores cad-counter == 0 at the
+equality point -> rewrite's single reset is EXACT both legs). Docs: aicode.md
+§6.3 t280 amendment E1-E3, abilities.md rows MoreMaxPop/ForcePeace/CauseWar,
+ai-dossier row 11 T280 pass, income-law.md S10 closure note,
+docs/re/_wip_t280.md S0..S5. Machine UNTOUCHED: :9 HEALTHY pid 576895 (TL
+exp 11-04 10:07), no new sitting (r214_triage RC=0, tail 400 rows all turn
+645 tutorial-lineage churn), ESTAB VNC client :5910 -> t279 stays HELD,
+drive HOLD; suite 158/0; gate 0; ledger audit OK 15/4, index OK; NEXT=t281
+(Cornucopia repaint — the last body whose operands the rewrite state
+carries; task card authored with the +0x16-skip honesty caveat).
+
 
 LANDED t278 (2026-11-02): OQ-005 RULING PACKAGE SHIPPED — index.txt REBUILT
 AS AN 88-ROW DECISION SHEET (offline; user-time-shortening; nothing closed):

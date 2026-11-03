@@ -981,6 +981,67 @@ parses, 21 blocks) name the ability per index; the UI caller 0x37cb1 opens
 20 SA_IndustryBoost 0x4418e: own planets ([p+0x54]!=0xff): WORD [p+0x50]
    += 100 (build accumulator per income-law live measurement).
 
+*** t280 AMENDMENT [verified, capstone raw re-read of every case body,
+listing work/t280_bodies.txt; jump-table re-dump restored FILE 0x43b10 16
+u32 = 43baf bf0 3c3f 3c79 3d33 3de4 3e98 3eec 3fba 4402a 4400a 4405f 440b5
+4400a 4414e 4418e — case al=9 (ability 14) -> 0x4402a was NEVER documented
+above]:
+ (E1) BODY 14 SA_MoreMaxPop 0x4402a: scan static planet pool 0x2b057 stride
+   0x7b (bound u16@0x3a093), owner byte [rec+0x57]==self: WORD [rec+0x55]
+   += 2; mov eax,rec; call 0x38ba4 (per-planet recalc). PRE-CLAMP seed
+   operand, +2, no pending gate, no [rec+0x16]==10 skip. Independently
+   corroborated by income-law.md S10's corpus-side measurement of the SAME
+   site ("+2: scan 0x4402a ... adds 2 to EVERY owned planet's +0x55 then
+   recalcs"); the missing caller it noted IS this dispatcher. REWRITE
+   UPGRADE t280: abilityPhase MoreMaxPop capBase += 2 (was post-clamp
+   capBonus += 25 [documented default] — wrong operand AND magnitude);
+   capBonus field + popCapBonusFor deleted; pin
+   species_more_max_pop_raises_caps_and_cornucopia_adds_pros (control
+   differential, mutation-verified: capBase+=0 fails it).
+ (E2) BODY 6 SA_ForcePeace 0x43bf0 ERRATUM: threshold is the TARGET ROW's
+   PROPOSE_PEACE word, not self's ACCEPT_PEACE: ebx = dword[row_x + 0x1cb];
+   sar 0x10 lands on word row_x+0x1cd = PP(x) (loader positional map,
+   diplomacy.md L179); +0x14 -> PP+20; cell ecx = row_x + 2*self (0x43c14..
+   0x43c21: cl = byte[self-row+0x19a>>24]... cl = [ebp] self byte, ecx =
+   2*self + row_x) read via dword[ecx+0x1b0]>>16 = word row_x+0x1b2+2*self.
+   CELL LAW (row = HOLDER, col = TARGET — three independent witnesses:
+   §13.2 'att[self][other]' at row(self)+2*other vs self's OWN
+   ACCEPT_ALLIANCE; t207 prose "SLAMS the victim's attitude below its own
+   declare-war line" at row(victim)+2*attacker; watcher relation() docstring
+   "atts[i][j] = attitude of i toward j (+0x1b2+2j)"): the cell is att[x ->
+   self], FLOORED at PP(x)+20 iff below. Effect: each alien x's OWN
+   chooser-propose-peace rung (att > PP) is armed against self — matches
+   help.txt L1870 "force all aliens to make peace" exactly. §6.3 mislabeled
+   the row (eax iterates targets; self-skip 0x43c10 precedes the load) and
+   the field. Rewrite state has no att[x->self] for x != player (dipState_
+   is AI->player), so ForcePeace keeps its documented end-the-wars
+   abstraction — NO code change; erratum banked for any future n x n build.
+ (E3) BODY 17 SA_Hatred 0x440b5 ERRATUM (the body t256 wired as
+   hatredClamp): per the same cell law, the operated cell word[row(x) +
+   0x1b2 + 2*k] is att[x -> k] — the THIRD PARTY x's attitude toward enemy
+   k (k = at war with self per byte[row(self)+0x1c0+k]==2, x != self,
+   x != k) — and the threshold word[row(x) + 0x1c9] is DECLARE_WAR(x),
+   x's OWN line (edx walks 0x12e16 + 0x1ee*x with eax=x; ecx = row_x + 2k).
+   Law: if att[x->k] > DW(x) -> att[x->k] := DW(x) — a CEILING exactly ON
+   the onlooker's own war line (== is not <, so no instant declare; the
+   next mood dip trips x's own chooser against k). Matches help.txt L2361
+   "alien species to strongly dislike any species at war with you". §6.3's
+   "[x toward self +0x1b2] > [r+0x1c9]" mislabeled BOTH operands (its
+   parenthetical prose was right, the addresses were not). EVERY cell the
+   law touches has holder x != self AND target k != self = AI->AI state;
+   the rewrite carries AI->player only -> Campaign::hatredClamp RETIRED
+   t280 (it clamped att[x->self] at DW(r), which the vendor never does);
+   CauseWar case is announce-only under EVERY owner; pin
+   species_cause_war_hatred_ceiling_t256 replaced by
+   species_cause_war_two_party_boundary_t280 (deterministic control
+   differential, mutation-verified: an attitude write in the case fails
+   it). Blast radius of the retirement nil on gate seeds (specnum 17 never
+   in default AI slots 0..5, t256).
+ (OK) Bodies 5/7/8/9/10/11/13/16 + NOPs 15/18 re-read ACCURATE as
+   documented; Shield T2 exit (0x43fe5) stores cad-counter AT the equality
+   point == 0, so the rewrite's single reset-on-fire is exact for BOTH
+   exits.
+
 ### 6.4 CADENCE LAW + TABLE (0x6780 = ABILITY CHARGE DAYS) [verified]
 Counter row+0x19e: +1 per turn in FUN_0003e6e0 tail (0x3e7cf..0x3e805) iff
 [[row+7]+0x14]&0x80 (AI-enable scenario bit); player row excluded; when

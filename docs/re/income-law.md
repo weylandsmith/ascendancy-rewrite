@@ -719,6 +719,11 @@ EVENT MODIFIERS of the seed word (all cite +0x55 writers, full-code census):
   +2: scan 0x4402a (planet base 0x2b057 stride 123 = 0x7b) adds 2 to EVERY
     owned planet's +0x55 then recalcs; no in-code caller found (data/vtable
     driven — event dispatch), effect = same-law shift.
+    *** t280 CALLER IDENTITY CLOSED: the caller IS the special-ability
+    dispatcher — jump-table case al=9 (ability 14 SA_MoreMaxPop) of
+    `jmp cs:[eax*4+0x2ef60]` @0x441d8 (restored FILE 0x43b10 entry 9 =
+    0x4402a; aicode.md §6.3 t280 amendment E1). Not vtable-driven; it was
+    simply undocumented in §6.3. Rewrite wired verbatim (capBase += 2). ***
   event 24 sets pop:=cap; event 48 documented S6d — unchanged.
 CROSS-VALIDATION vs earlier sections: supersedes S6e RESIDUE and S6f
 "inferred world-gen seed" with the measured law above; S6 tail-clamp law
