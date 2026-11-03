@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-03T13:45
+updated: 2026-11-03T16:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -268,43 +268,42 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t290 POKE-PAST-THRESHOLD EXPERIMENT — MEASURE THE COMPARATOR'S OPERAND
-(ordering rationale: t289 drove 64 clean turns and V HELD 23 — the empire is
-static so MORE pressing can never raise V (flood prunes 2 claims; systems_full
-25, planets 26, ships 30 constant; _wip_t289 S2), and expansion-driving via
-ship/settle UI automation is a large unproven lift; the poke experiment instead
-FABRICATES the V>=25 end-turn pass the comparator question needs, using the
-RELIABLE t286b tooling. What is being measured: whether the end-turn
-comparator's operand is V (or 100*V/T) — a poked V that flips selector_byte /
-arms a victory presenter answers it; a poked V that changes NOTHING is the
-honest negative that kills the 'comparator reads V' hypothesis class. Steps:
-(1) scratch session ONLY (own ring dir per TWO-WRITER law, e.g.
-work/r1/t290-poke/; game scratch copy, never mount game/): dbg binary hosting
-RESUME.GAM t1086 as a GAME-LOAD via title (the t286b pattern — BPLM armed at
-title, campaign ENTER; NEVER emulator-state restore of a bank, t288 S2 REFUTED:
-glibc abort mid-restore); note the RESUME.GAM point IS t1086 so V=0 until the
-first end-turn pass lands V=23;
-(2) arm BPLM on the V linear address = B - 0x88 + 0x82bb0 + 0x482fb (B by
-anchor vote on the ring Memory member, works at title per t288; scripts/
-r1_wp_session.py heap arms + r286b_relaunch.sh BREAK-lottery wrapper);
-(3) press End Turn (scratch session, xsend :N), let the fire land — LAW 7: the
-reported EIP may be a READER (the producer store is FUN_00024274 tail ~0x24f24
-per t284; scan back for the last store);
-(4) at the stop, pty set-mem V := 25 (then 26 as second arm), EXEC, then read
-next ring slots: selector_byte u8 DAT_00043510, rank u16 DAT_0004350c
-(r1_slot.py:93-94), any victory-screen pixels (score.md presenter arms
-@0x2c03a..0x2c0a9 family);
-(5) if selector arms or a presenter fires, the comparator operand is measured —
-CLOSE-ATTEMPT OQ-021 threshold residue with the pty operand panel as the cited
-witness; if nothing changes across V=25 AND V=26 AND (for the >-vs->= edge) the
-T-relative pokes V := ceil(T/2), V := ceil(T/2)-1, bank the honest negative and
-keep the row open. CAVEATS to state in the bank: a poked V is an ARTIFICIAL
-pass — it measures the comparator, never the vendor's natural victory-screen
-appearance (that residue survives this experiment under any outcome); the
-producer recomputes V every end-turn pass so the poke only lives inside one
-pass window (that is exactly why the stop-then-poke-then-exec shape is
-required); production :9 stays UNTOUCHED at t1150.
-
+NEXT t291 UPGRADE THE REWRITE CONTROL COMPARATOR TO THE CITED TWO-THIRDS LAW
++ BLAST-RADIUS RETRAP (ordering rationale: t290 READ the vendor comparator
+verbatim — Control victory iff V >= floor(2T/3)+1 with V=DAT_482fb, T=DAT_16143
+(docs/re/_wip_t290.md S1, disasm 0x24b9c..0x24bbe) — so the rewrite's
+`mine*2 > total` at rewrite/src/game/campaign.cpp:2157 is now MEASURED-WRONG,
+and fixing a cited-wrong default is the loop's core outcome; the live
+victory-screen witness that would fully close OQ-021 cannot be cheaply
+manufactured this way (t290 S6: the FM-freeze decisive RUN EPIPE'd the
+emulator) so the code fix is the highest-value move left on this thread.
+Task: (1) change checkVictory's Control arm to `scoreStars_ * 3 >= 2*total + 1`
+(i.e. V > 2T/3 integer-exact; use scoreStars_, NOT starsOwned — the vendor
+operand is the PRODUCED V, t290 S1/t284; the function currently reads
+`mine`, keep every other arm byte-identical and keep the arm ORDER comment);
+(2) BLAST RADIUS MANDATORY: the CLI Control-win seeds (2024 Control t1255,
+Extinct t979/t982 family, PLAYTHROUGH.md ladders) win by Control at 46-66%
+V-share — raising the bar may push wins past the pacing guards (widened to
+1200/1600 at t202b): re-run the seeded CLI checks, and where a win now lands
+past the guard, widen ONLY pacing windows with dated comments (t202b precedent)
+or re-pin the expected turn — NEVER bend the law back; (3) NEW PIN
+test_campaign_control_two_thirds_t291: construct V==floor(2T/3) -> NO victory
+and V==floor(2T/3)+1 -> Control, mutation-verified (flip the comparison ->
+CAUGHT); check test_score_t284.cpp + test_campaign.cpp for any existing
+>1/2-shaped expectations and update them to the cited law with a cite comment;
+(4) regenerate PLAYTHROUGH.md if ladders moved; (5) append STATUS t291 to the
+OQ-021 row (STAYS OPEN strict-close — the live presenter witness residue
+survives; the code-default fix does NOT itself close the row); (6) score.md
+gets a permanent S-section distilled from _wip_t290 S1-S3 (comparator law +
+caller/gate + sel/rank writer + jmp table) since _wip files are working logs.
+CAVEATS: rank semantics stay [unverified] beyond the arithmetic ladder
+(_wip_t290 S3); the elimination ladder (result 1-4) is only class-mapped —
+do NOT wire rewrite arms for it on this evidence (Extinct/LastAlive/Captured/
+Unification keep their current documented readings); [0x10ba4] identity open.
+OPTIONAL SIDE-ARM if t291 finishes early (same session budget): the live
+victory-screen witness via the FREEZE-FREE route — poke mode N>=34 sticks
+upward (the flood only increments), scripts/r290_relaunch.sh poke 40; the S6
+EPIPE class means budget 5+ attempts and treat a dead RUN as the negative.
 SESSION-START SCREEN CHECK (t287 law, do this BEFORE any other probe): a VNC
 user may leave production on ANY screen. Verify with `DISPLAY=:9 import
 -window root` + vision BEFORE trusting ring rows (ring is blind off-campaign,
@@ -379,6 +378,36 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
   or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
+
+LANDED t290 (2026-11-03): THE END-CTRL COMPARATOR IS READ VERBATIM —
+TWO-THIRDS, STRICTLY GREATER (docs/re/_wip_t290.md S1-S6; tools
+scripts/r290_disasm.py KEEPER + scripts/r290_poke_session.py +
+scripts/r290_relaunch.sh; OQ-021 STATUS t290 appended, ROW STAYS OPEN
+strict-close, ledger 15/4). (1) EVALUATOR FUN_00024a34, sole caller 0x252e9
+AFTER the t284 producer, gated sel==0 AND [0x10ba4]==0 (measured open in both
+probe banks); comparator @0x24bba: V >= floor(2T/3)+1 (V=[state+0x354eb]==
+DAT_482fb, T=[state+0x3333]>>16==DAT_16143 — the disproducer's own pair).
+T=50 corpus-wide -> THRESHOLD 34, NOT 25: the founding text dispute resolves
+FOR THE PROSE; "over half" is the file-comment decoration. The corpus V=23
+"4 units from the boundary" framing was WRONG (11 units). (2) PRESENTER MAP:
+t273's unlocatable jmp table FOUND (relocated imm P0+0x173e0, content at
+member 0x1eb468 both banks) = {1:xtnc 2:dest 3:capt 4:unit 5:ctrl}, strings
+byte-verified; sel/rank written ONLY by the evaluator (0x24d9f/0x24dab) then
+event 0x56ad4; result==0 leaves sel untouched; sel!=0 LATCHES re-evaluation
+off (0x252da). t212's zero-census stands — base+disp32 forms were invisible
+to a disp==0x482fb scan; the t284 state-base resolution unlocked it. (3) LIVE
+WITNESS SURVIVES: threshold-freeze session reached the fire window (mid-pass
+stop at the producer store, SMV V:=34 + FM 0168:28A2FB 'Set memory freeze ...
+value: 34' — first live FM on this build) then the DECISIVE RUN EPIPE'd the
+emulator (ring froze t1086/V0, no armed row, cause NOT proven); no arming seen
+either way. (4) PITFALLS: tools/xsend arg1 = WINDOW TITLE not display (silent
+rc=1 no-op clicks, burned loop 1); MEMREAD over MCP is real-mode-only
+(debug.cpp:2983); objdump -b binary --start-address prints nothing (t283 trap
+re-hit, keeper wraps it). (5) REWRITE: campaign.cpp:2157 mine*2>total now
+MEASURED-WRONG — upgrade deliberately NOT rushed this session (blast radius on
+seeded Control-win pacing), it IS t291 verbatim. Production :9 untouched
+(HEALTHY pid 660167 t1150 at session start; scratch game-wp + own ring + Xvfb
+:96 only, kill-by-recorded-PID teardown). Gate TBD below. NEXT=t291.
 
 LANDED t289 (2026-11-03): NEEDLE WIRED + CLEAN 64-TURN DRIVE — docs/re/
 _wip_t289.md (S1 patch inventory, S2 drive result, S3 needle science) +

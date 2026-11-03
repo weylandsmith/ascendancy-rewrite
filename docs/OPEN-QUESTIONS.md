@@ -508,6 +508,35 @@ equal). Harvest on the 6 genuine turns: V held 23 (first end-turn pass), ZERO
 V>=25, selector 0, rank 65535 — replay mine-check 20/20 EXACT on the loaded
 campaign (a NEW seed reproduces the S18 law). No threshold witness; row stays
 open; rewrite unchanged.
+STATUS t290 (2026-11-03, THE COMPARATOR IS READ VERBATIM — docs/re/_wip_t290.md
+S1-S6): end-of-turn evaluator FUN_00024a34 (payload file 0x24a34; sole E8
+caller 0x252e9, positioned AFTER the t284 V producer; gate: selector
+DAT_43510==0 AND dword[0x10ba4]==0 — both MEASURED 0/open in banked banks
+bank-t261-final-1150 + bank-t273-tutorial645). Comparator @0x24bba:
+eax=floor(2*T/3)+1 (idiv ebx=3 of 2*[state+0x3333]>>16 == DAT_00016143, the
+SAME T the disproducer prints), edi=[state+0x354eb]==DAT_482fb=V, skip iff
+eax>edi => CONTROL VICTORY IFF V >= floor(2T/3)+1. T=50 (only T in corpus) ->
+THRESHOLD 34, NOT 25: the corpus max V=23 was 11 units away, and the row's
+founding text dispute resolves FOR THE PROSE ("two-thirds", strictly greater);
+the "over half" header comment is decoration. Writer of the presenter fields is
+the same body: sel byte [state+0x30700]==DAT_43510 @0x24d9f, rank dword
+[state+0x306fc]==DAT_4350c @0x24dab, then event 0x56ad4 arg 0x7a35c; result==0
+returns WITHOUT touching sel (why healthy saves read 0). The t273
+selector->arm mapping residue CLOSED by cited table: presenter 0x2c032 jmp
+[eax*4+tbl], tbl relocated imm P0+0x173e0, CONTENT found in both banks at
+member 0x1eb468 (linear 0x1eb3e0) = arms {0:default-assert, 1:end-xtnc,
+2:end-dest, 3:end-capt, 4:end-unit, 5:end-ctrl} (strings byte-verified at obj1
+pool 0x83ebc..0x83ef0). t212's zero-writer census stands; the comparator simply
+used base+disp32 forms invisible to a disp==0x482fb scan. LIVE WITNESS SURVIVES:
+threshold-freeze session (scripts/r290_poke_session.py + r290_relaunch.sh)
+reached the fire window — mid-pass stop at the producer store, SMV V:=34 + FM
+0168:28A2FB armed ('Set memory freeze ... value: 34') — then the DECISIVE RUN
+EPIPE'd the emulator (ring froze t1086/V0, no armed row; mechanism unproven);
+no arming witnessed either way, so the natural-screen residue is NOT closed.
+Rewrite default >1/2 (campaign.cpp:2157) is WRONG vs the cited law — UPGRADE
+QUEUED (code site + pin = closure hygiene per GOAL). Row STAYS OPEN: live
+victory-presenter witness + rewrite upgrade pending; everything else the row
+named is now cited-closed.
 STATUS t289 (2026-11-03, docs/re/_wip_t289.md S2-S3): the needle-guarded re-drive
 ran CLEAN t1086->t1150 (69 presses, 64 turns, zero softlocks; drive_20261103-
 125013.log exit 0). Harvest (r273_harvest window 12:40-13:35, 229 trusted rows):
