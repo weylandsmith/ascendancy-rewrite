@@ -336,6 +336,12 @@ title-screen scratch boot does NOT have the ascend.exe image resident in guest
 RAM (scripts/r272_scratch_resident.py) — any future debugger-class session must
 click into a campaign first. If the user ever supplies a debugger-enabled
 dosbox-x build, this route re-opens (S15.5).
+SUPERSEDED 2026-11-02 (t282): the user authorised a build; upstream master with
+--enable-debug=heavy (work/r1/bin/dosbox-x-dbg) ACCEPTS BPLM/BPPM/BPM over its TCP
+MCP control channel and a BPLM MEASURED FIRED (docs/re/dosbox-debugger.md LIVE
+VERIFICATION). The negative below holds ONLY for the dfsg /usr/bin/dosbox-x, which
+production :9 still uses. DO NOT re-census either binary — t282 measured both
+sides. Watchpoint work now runs on dosbox-x-dbg on a scratch copy.
 
 ## t277 — DETECTING A DOSBOX-X -time-limit DEATH FROM ITS LOG IS IMPOSSIBLE (KEEPER)
 The t277 queue row asked for "the exact farewell line in the log or strings" for

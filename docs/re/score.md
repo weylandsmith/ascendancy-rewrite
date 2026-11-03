@@ -546,6 +546,15 @@ Rewrite default >1/2 (campaign.cpp) remains CONSISTENT with every banked frame.
 
 ## S15 — t272: THE WATCHPOINT INSTRUMENT DOES NOT EXIST ON THIS BOX [measured, honest negative]
 
+> **SUPERSEDED 2026-11-02 (t282) as to the general claim.** It was correct for the
+> installed dfsg `/usr/bin/dosbox-x 2025.02.01+dfsg-3`, which is what production :9
+> runs and what t272 censused. A purpose-built upstream-master binary
+> (`work/r1/bin/dosbox-x-dbg`, `C_DEBUG`+`C_HEAVY_DEBUG`) accepts BPLM/BPPM/BPM and
+> a BPLM has been MEASURED FIRING over its TCP control channel — see
+> `docs/re/dosbox-debugger.md` LIVE VERIFICATION. Read the rest of this section as
+> "...does not exist in the dfsg build"; the DAT_482fb PRODUCER residue is now
+> reachable and is queued as t283.
+
 The task grant was to run a dosbox-x write-watchpoint session on scratch against
 guest-phys B+0x82bb0+0x482fb-0x88 (S9's decisive instrument). The session ran
 (scripts/r1_t272_wp.sh, scratch work/r1/wp-t272/game, own ring dir per the

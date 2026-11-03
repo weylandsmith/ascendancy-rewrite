@@ -435,7 +435,21 @@ write-site closure route DOES NOT EXIST here; alternatives checked same session
 Keeper for any future debugger-class run: a title-screen boot does NOT have the
 image resident (scripts/r272_scratch_resident.py) — enter a campaign first.
 Row STAYS OPEN; live routes = t273 threshold watch (V>=25 event) and the
-ENDGAME-window witness; rewrite default >1/2 unchanged | STATUS t273 (2026-11-02, docs/re/score.md S16): FIRST nonzero selector/rank in corpus — the TUTORIAL-lineage segment (648 rows, bank-t273-tutorial645) reads selector=2, rank=1 with V=0 and player owning 3/50 systems: selector=2 is NOT the end-ctrl threshold arm under the file-order reading; selector->arm MAPPING [unverified] (presenter arms re-measured by push-imm scan: 0x2c03a default/0x2c04d xtnc/0x2c064 dest/0x2c07a CAPT (S3 miss)/0x2c092 unit/0x2c0a9 ctrl; jmp-table @0x10173e0 not locatable in payload by arm-dword scan). Campaign lineage: zero V>=25 rows (72,327 rows), selector 0 everywhere; threshold witness STILL absent. Row STAYS OPEN.
+ENDGAME-window witness; rewrite default >1/2 unchanged | STATUS t273 (2026-11-02, docs/re/score.md S16): FIRST nonzero selector/rank in corpus — the TUTORIAL-lineage segment (648 rows, bank-t273-tutorial645) reads selector=2, rank=1 with V=0 and player owning 3/50 systems: selector=2 is NOT the end-ctrl threshold arm under the file-order reading; selector->arm MAPPING [unverified] (presenter arms re-measured by push-imm scan: 0x2c03a default/0x2c04d xtnc/0x2c064 dest/0x2c07a CAPT (S3 miss)/0x2c092 unit/0x2c0a9 ctrl; jmp-table @0x10173e0 not locatable in payload by arm-dword scan). Campaign lineage: zero V>=25 rows (72,327 rows), selector 0 everywhere; threshold witness STILL absent. Row STAYS OPEN. STATUS t282 (2026-11-02, docs/re/dosbox-debugger.md LIVE VERIFICATION): THE t272
+INSTRUMENT-DEAD NEGATIVE IS SUPERSEDED — upstream-master dosbox-x built with
+C_DEBUG+C_HEAVY_DEBUG (work/r1/bin/dosbox-x-dbg) ACCEPTS all three memory-CHANGE
+breakpoint forms over its TCP MCP control channel and a BPLM MEASURED FIRED
+(sanity target guest phys 0x46C BIOS tick counter: "Memory breakpoint :
+0000:046C - 00 -> 69", CPU stopped, stopped debugger still answered EXEC BPLIST;
+reproduced 2/2). Harness scripts/r1_t282_dbx_probe.py. Direction law: dosbox-x
+CONNECTS OUT to our listener, so bind first. Known trap banked: BREAK is
+intermittently fatal (glibc "corrupted double-linked list", 1/2 without a settle;
+mechanism NOT proven) and the first fire of any armed address is the 0x00-baseline
+artifact (VOGONS, cause traced to debug.cpp:870 `bp->GetValue() != value`). NO OQ
+CLOSED THIS ITERATION: the PRODUCER residue (who writes DAT_482fb) still has
+witness ZERO — the watchpoint has now been proven to exist, not pointed at our
+address. Next: scratch session, BPLM on the guest-LINEAR DAT_482fb, drive turns,
+capture the writing EIP. Row STAYS OPEN.
 
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)

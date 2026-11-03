@@ -110,8 +110,10 @@ and 2025.02.01 predates the MCP protocol anyway. Route 2 executed sudo-free:
 - STRINGS VERIFIED on the new binary: BPLM x3, BPPM x3, BPM x1, RUNWATCH x4,
   mcp_server x2 (the dfsg build: ZERO of every one). Copy to
   work/r1/bin/dosbox-x-dbg is queued (STATE t282); /usr/bin/dosbox-x untouched.
-- NOT YET DONE (t282/t283): live HELP capture via PTY (-break-start, ncurses
-  console UI), scratch watchpoint session, live syntax confirmation.
+- NOT YET DONE at the time of that commit (t282/t283): live HELP capture via PTY
+  (-break-start, ncurses console UI), scratch watchpoint session, live syntax
+  confirmation. t282 CLOSED the first and third of those — see the two sections
+  below; the scratch watchpoint session on OUR target address is t283.
 
 ## OPERATING RULES IF WE BUILD
 - Install as a SEPARATE binary (e.g. work/r1/bin/dosbox-x-dbg). NEVER replace
@@ -125,3 +127,127 @@ and 2025.02.01 predates the MCP protocol anyway. Route 2 executed sudo-free:
 - First BPLM fire may be the 0x00-initialization artifact, not the writer.
 - Production :9 stays untouched; the user's Oct-29 campaign save is the
   md5-verified backup (RESUME.GAM.user-oct29), never the live RESUME.GAM.
+
+## LIVE VERIFICATION — t282, 2026-11-02 23:21-23:31 (the instrument WORKS)
+Harness: `scripts/r1_t282_dbx_probe.py` (listener + pty + scratch mount, runbook
+invariants in its docstring). Run dirs work/r1/t282-probe-20261102-{232113,
+232519, 232655} with `mcp-transcript.txt` (raw protocol replies) + `pty.log`.
+Scratch: work/r1/game-wp (`cp -a game/.` + extracted ascend00/ascend02 data),
+OWN captures dir, private Xvfb (never :9), `core=normal`, `-time-limit`,
+kill-by-recorded-PID in a `finally`.
+
+### DIRECTION LAW — WE LISTEN, DOSBOX-X CONNECTS OUT
+`mcp_server=<port>` does NOT make dosbox-x listen. debug_mcp.cpp
+`CONTROL_HOST = "127.0.0.1"` + `SDLNet_ResolveHost`/`SDLNet_TCP_Open` = the
+EMULATOR dials US and retries every 1000 ms while we are down. MEASURED: the
+channel connected 0.2 s after spawn, before the game drew a frame (DEBUG_Init
+runs in SDL's init list, sdlmain.cpp:9807; it is NOT gated on a tty, so the
+socket works fully headless). The listener MUST be bound before the child starts.
+Wire (line text, not JSON): `REQ <id> PING|BREAK|EXEC <cmd>` ->
+`BEGIN <id> OK|ERR\n<lines>\nEND <id>`. The OK/ERR flag is ONLY in the BEGIN
+header. `EXEC` output is captured from DEBUG_ShowMsg (debug_gui.cpp:786) and
+paged content is suppressed while capturing (debug_gui.cpp:685/700), which is why
+HELP returns all 79 lines instead of hanging on the pager.
+
+### LIVE COMMAND LIST (captured from the running build, `EXEC HELP`, 79 lines,
+### hdr=BEGIN 3 OK). Verbatim copy in the run's mcp-transcript.txt:
+    BP     [segment]:[offset] - Set breakpoint.
+    BPINT  [intNr] * / [ah] * / [ah] [al]  - Interrupt breakpoints.
+    BPM    [segment]:[offset] - Set memory breakpoint (memory change).
+    BPPM   [selector]:[offset]- Set pmode-memory breakpoint (memory change).
+    BPLM   [linear address]   - Set linear memory breakpoint (memory change).
+    BPLIST                    - List breakpoints.
+    BPDEL  [bpNr] / *         - Delete breakpoint nr / all.
+    C / D  [segment]:[offset] - Set code / data view address.
+    DV [addr]                 - data view at linear (virtual) address
+    DP [addr]                 - data view at physical address
+    DOS MCBS / KERN / XMS / EMS / FNKEY ; BIOS MEM ; CALLBACKS
+    INT [nr] / INTT [nr]      - Execute / trace into interrupt
+    MEMREAD <seg>:<off> <len> - Read 1-256 conventional RAM bytes (external).
+    STEPIN                    - Execute exactly one instruction, then stop.
+    LOG [num] ; LOGS/LOGL/LOGC [num] ; HEAVYLOG ; ZEROPROTECT ; ADDLOG [msg]
+    SR [reg] [value]          - Set register value(s).
+    SM [seg]:[off] [val]..    - Set memory.        SMV [addr] [val].. (linear)
+    FM [seg]:[off]            - Freeze memory value at address.
+    EV [value...]             - Show register value(s).
+    IV [seg]:[off] [name] ; SV/LV [filename]      - named addresses, var lists
+    VRD                       - Redraw video.   VGA cmd ; PC98 cmd
+    EMU MEM/MACHINE           - emulator memory or machine info
+    MEMDUMP seg:off len [file] / MEMDUMPBIN seg:off len [file]
+    MEMFIND [seg]:[off] [.].. ; MEMS [operator] [value]
+    SELINFO [segName] ; INTVEC [filename] ; INTHAND [intNum]
+    MMX / SSE [=t] [reg] [SET [val]]
+    CPU ; FPU ; GDT ; LDT ; IDT ; PAGING [page] ; EXTEND
+    TIMERIRQ ; TIME [time] ; DATE [date]
+    VRT                       - Run, then enter debugger at next vertical retrace.
+    IN[P|W|D] [port] ; OUT[P|W|D] [port] [data]
+    HELP
+KEYS (UI only, not over the wire): F5 run, F8 toggle printable, F9 breakpoint,
+F10/F11 step over/into, ALT+D/E/S/X/B data view from DS:SI/ES:DI/SS:SP/DS:DX/ES:BX.
+NOTE vs README.debugger: this master build's live list has NO separate
+`RUN`/`RUNWATCH` HELP entry (they are accepted by the parser —
+`EXEC RUN` returned `BEGIN 15 OK / OK` — and debug.cpp:5462 synthesises them
+internally), yet `RUNWATCH` is present in the binary's strings. Do not conclude
+either way from strings alone; the parser is the authority.
+
+### MEMORY-BREAKPOINT ACCEPTANCE — ALL THREE FORMS, MEASURED
+    EXEC BPLM 00FA0000 -> "DEBUG: Set linear memory breakpoint at 00FA0000"
+                          BPLIST: "00. BPLM 00FA0000 (00)"
+    EXEC BPPM 0040:0000 -> "Set prot-mode memory breakpoint at 0040:00000000"
+                          BPLIST: "01. BPPM 0040:00000000 (00)"
+    EXEC BPM  0040:0010 -> "Set memory breakpoint at 0040:0010"
+                          BPLIST: "00. BPMEM 0040:0010 (00)"   <- list spells BPMEM
+    EXEC BPDEL *        -> "DEBUG: Breakpoints deleted."  (BPLIST back to empty)
+This SUPERSEDES t272's "no watchpoints on this box" with a live demonstration.
+The `(00)` in BPLIST is the ARMED BASELINE (AddMemBreakpoint stores value 0;
+BPLIST prints bp->GetValue(), debug.cpp:1048). The fire test is
+`bp->GetValue() != current` (:870) -> a nonzero-valued location fires ONCE
+spuriously the instant it is armed. THAT IS THE VOGONS 0x00 ARTIFACT, now traced
+to its cause. t283 must read the `NN -> MM` pair and reject `00 -> xx`.
+
+### FIRE PATH — MEASURED FIRED, 2.1 s (run -232655, --fire)
+Chosen sanity target: guest PHYSICAL 0x46C, the BIOS 32-bit tick counter — the
+cheapest guaranteed-changing address in the machine (~18.2 Hz). BPLM's operand is
+used directly as a physical/linear Bitu (`address = bp->GetOffset()`,
+debug.cpp:864) so no selector arithmetic is needed.
+    EXEC BPLM 0000046C  -> armed "00. BPLM 0000046C (00)"
+    EXEC RUN            -> "BEGIN 15 OK / OK"  (ACK on ACCEPTANCE, no state)
+    +2.1 s, EXEC BPLIST -> "00. BPLM 0000046C (69)"   <- baseline re-armed to 0x69
+    pty.log line: "DEBUG: Memory breakpoint : 0000:046C - 00 -> 69"
+So: the watchpoint fires, the CPU stops, and the stopped debugger still answers
+over TCP (ControlServer_Poll is pumped INSIDE DEBUG_Loop, debug.cpp:5267). That
+is the whole t283 flow: BPLM -> RUN -> fire stops the CPU -> read registers /
+MEMDUMP / disasm context over the SAME socket.
+FIRE-LINE PITFALL: the format is
+`"DEBUG: Memory breakpoint %s: %04X:%04X - %02X -> %02X"` where %s is "(Prot)"
+ONLY for BPPM — a BPLM fire prints an EMPTY type tag and seg `0000` (BPLM stores
+seg=0), so the printed address is USELESS for BPLM. Identify a fire by the value
+pair and by having exactly one breakpoint armed. GRANULARITY: one byte
+(`mem_readb_checked`), checked on every instruction in every core
+(DEBUG_HeavyIsBreakpoint from core_normal.cpp:182, core_dyn_x86.cpp:466, ...) —
+hence core=normal and the wall-clock cost.
+
+### BREAK IS INTERMITTENTLY FATAL — 1 of 2 attempts ABORTED THE EMULATOR
+Run -232519 (same conf, --fire added): PING answered PONG, then `REQ 2 BREAK`
+and the process DIED with glibc **`corrupted double-linked list`** (last line of
+that run's pty.log; the socket then EPIPE'd). Run -232113 sent BREAK at the same
++0.2 s and survived, so this is NOT a timing law. BREAK is the only path that
+allocates the ncurses UI (`DEBUG_EnableDebugger` -> `DEBUG_Enable_Handler` ->
+`DEBUG_SetupConsole` -> `DBGUI_StartUp` -> `initscr()` on our pty,
+debug_gui.cpp:612). Mechanism NOT proven — do not cite one. MITIGATIONS, in
+order tried: (a) `--settle 40` before BREAK (worked, runs -232655 and -232655's
+successor); (b) skip BREAK and drive EXEC only — NOTE this is NOT sufficient for
+t283, because without BREAK the CPU never stops and a fire has nowhere to land;
+(c) keystroke-driven ncurses on the pty. t283 MUST confirm BREAK survived
+(BPLIST answers, and the fire line appears) before trusting anything it reads.
+tty GATE (why the pty exists at all): debug.cpp:5410
+`if (!isatty(0)||!isatty(1)||!isatty(2)) { LOG_MSG("Debugger is not available
+unless you start DOSBox-X from a terminal"); return; }`. A pty satisfies it;
+`-nogui` does not remove it; the MCP EXEC parser is NOT gated by it.
+GOAL.txt's "do not pilot -break-start" was RESPECTED — no -break-start anywhere.
+
+REPRODUCIBILITY: the fire test run twice more with `--settle 40` and fired BOTH
+times at +2.1 s (00 -> 69 in run -232655, 00 -> 94 in the --disp 93 rerun; the
+value is the tick count, so it differs by wall-clock). BREAK survived both.
+Status: ACCEPTED 3/3, FIRED 2/2 with settle, BREAK aborted 1/2 without settle.
+The instrument is real. t283 is unblocked.

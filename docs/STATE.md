@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-02T21:05
+updated: 2026-11-02T23:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -260,25 +260,34 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t282 DEBUGGER-BUILD VERIFICATION (gate for everything after it). A
-debugger-enabled dosbox-x was BUILT this pairing session from upstream master
-(C_DEBUG + C_HEAVY_DEBUG both defined in config.h, verified) at
-work/r1/dbx-build/dosbox-x-master; install prefix work/r1/dbx-install; build log
-work/r1/dbx-build/build.log. IF make failed or the binary is missing: bank the
-honest negative in docs/re/dosbox-debugger.md, rewrite NEXT to t285 (the drive
-queue stands alone), STOP. IF the binary exists: (1) strings-grep it for
-BPLM/BPPM/BPM/HELP and for mcp_server (expect YES on both — the dfsg build had
-neither; that contrast is the point, docs/re/dosbox-debugger.md); (2) copy it to
-work/r1/bin/dosbox-x-dbg (NEVER touch /usr/bin/dosbox-x — production :9 and the
-launch harness assume it); (3) get the LIVE command list: README.debugger says
-"MCP clients should call HELP for the live command list from the running
-DOSBox-X build" — do it through a PTY (terminal tool pty=true + process
-action=write; the debugger is an ncurses UI on the console, Alt+Pause breaks in,
--break-start breaks at startup). Bank the verbatim command list + which of
-BPLM/BPPM/BPM the build actually accepts to docs/re/dosbox-debugger.md. Do NOT
-run it against production or mount work/r1/game/ — scratch copy only per the run
-book. PRE-FLIGHT: python3 scripts/r1_game_health.py (production :9 LIVE at t1086
-since 22:27, TL=172800 — leave it running).
+NEXT t283 OQ-021 WRITE-WATCHPOINT SESSION (the payoff; t282 UNBLOCKED IT — the
+instrument is BUILT and MEASURED-FIRING, docs/re/dosbox-debugger.md LIVE
+VERIFICATION). GOAL: the writing EIP for guest-LINEAR DAT_482fb (image base +
+0x82bb0 + 0x482fb - 0x88 per the pointer law, score.md S9/S14 — COMPUTE it from
+the scratch run's own base, never production's). Flow, all proven pieces:
+launch via scripts/r1_t282_dbx_probe.py patterns (scratch work/r1/game-wp,
+core=normal, own captures dir, private Xvfb, kill-by-recorded-PID) BUT the
+listener must be bound BEFORE spawn (DIRECTION LAW: dosbox-x connects OUT to us,
+retries 1/s). BREAK ONLY AFTER ~40s settle (BREAK at +0.2s aborted the emulator
+1/2 with a glibc heap error — mechanism unproven, mitigation measured). Click
+into a CAMPAIGN first (title-screen boot has no image resident, t272 keeper via
+scripts/r272_scratch_resident.py), recompute B from the ring (r1_sav_scan.py),
+EXEC BPLM <linear>, EXEC RUN, then poll EXEC BPLIST from the SAME socket
+(ControlServer_Poll runs inside DEBUG_Loop). THE FIRST FIRE IS THE 0x00-BASELINE
+ARTIFACT (fire line "00 -> xx"; cause traced to debug.cpp:870) — believe only a
+fire whose old value is the previous real value. BPLM FIRE LINES PRINT NO USABLE
+ADDRESS (seg field is 0000 by construction) — arm EXACTLY ONE breakpoint. Fire
+granularity is ONE BYTE. After the stop: capture CS:IP + registers (EV/CPU
+commands, live list banked) + MEMDUMPBIN window + stack, map EIP back through the
+t106/t107 windowed-disasm recipe, bank writer site + law to score.md. Budget the
+wall: heavy-debug checks every instruction (core=normal is mandatory and SLOW);
+few turns may pass. STRICT-CLOSE: one non-artifact fire + cited disasm of the
+writing instruction closes the PRODUCER residue ONLY (threshold residue
+separate, t269: this campaign never reaches V>=25). Honest negative valid: if no
+fire lands in the budget, bank the wall/budget numbers and keep OQ-021 open.
+PRE-FLIGHT: python3 scripts/r1_game_health.py (production :9 pid 636955 LIVE,
+TL expiry Nov-04 22:33 — LEAVE IT RUNNING; NEVER mount work/r1/game/ or :9's
+ring). Do NOT run dosbox-x-dbg against production.
 
 PAIRING-SESSION NOTE (phase-4 handoff, 2026-11-02 ~22:45): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS (verbatim, this session):
@@ -298,23 +307,10 @@ preserved as RESUME.GAM.tutorial-nov2 for archaeology only).
 QUEUE (phase 4, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
 
-t283 OQ-021 WRITE-WATCHPOINT SESSION (the payoff; needs t282). SCRATCH game copy
-  (docs/BLOCKED.md runbook; NEVER work/r1/game/), OWN ring dir
-  (work/r1/playcap-wp/ — two-writer law t266), conf with core=normal (recompiler
-  skips instructions under stepping, VOGONS) + mcp_server=<port> if using the
-  control channel. Target: guest-LINEAR address of DAT_482fb = image base +
-  0x82bb0 + 0x482fb - 0x88 (pointer law, score.md S9/S14) — compute it from the
-  scratch run, don't copy production's. Set BPLM there, resume (RUN or RUNWATCH),
-  drive turns until the FIRST fire, capture CS:IP + full registers + a stack
-  window + the previous value. PITFALLS BANKED: the FIRST fire may be the
-  0x00-initialization artifact (VOGONS BPM note) — confirm the old value is not
-  the init case before believing it; heavy-debug is SLOW (memory-change check on
-  every write) so budget the wall and expect few turns; debugger breakpoints in
-  heavydebug do NOT use INT 3 so the game cannot strip them (VOGONS). Map the
-  captured EIP back through the t106/t107 windowed-disasm recipe and bank the
-  writer site + surrounding law to score.md. Strict-close: one fire + a cited
-  disasm of the writing instruction closes the PRODUCER residue; the THRESHOLD
-  residue is separate (t269 census: this campaign never reaches V>=25).
+t283 OQ-021 WRITE-WATCHPOINT SESSION — MOVED OUT OF THE QUEUE INTO "NEXT ACTION"
+  (2026-11-02, t282 iteration): t282 is DONE (instrument built + MEASURED
+  FIRING), so t283 is now the assigned task and its row above (the NEXT ACTION
+  block) supersedes this stub. Keep the queue numbering intact: t284 follows.
 
 t284 REWRITE THE V SEMANTIC (needs t283's law): implement whatever the writer
   computes in rewrite/src/game/score.cpp (DAT_482fb = the "STARS CONTROLLED"
@@ -392,6 +388,48 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
   or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
+
+LANDED t282 (2026-11-02): DEBUGGER INSTRUMENT VERIFIED LIVE — WATCHPOINTS FIRE
+ON THIS BOX (offline gate task + 4 scratch emulator runs; NO OQ closed —
+strict-close honored, OQ-021 ANNOTATED, ledger 15/4 unchanged):
+(1) BUILD GATES verified: config.h :43 C_DEBUG 1, :115 C_HEAVY_DEBUG 1, :172
+C_SDL2_NET 1; binary copied to work/r1/bin/dosbox-x-dbg (md5 ebc6a785... vs
+/usr/bin/dosbox-x 15c49346... — production untouched). Exact-word strings BPLM/
+BPPM/RUNWATCH/mcp_server all present (dfsg: zero of each; pairing-note x3/x3/x4/
+x2 were substring counts — both true, restated precisely).
+(2) DIRECTION LAW READ THEN MEASURED: mcp_server makes dosbox-x CONNECT OUT to
+our listener (debug_mcp.cpp CONTROL_HOST + SDLNet_TCP_Open); connect observed at
++0.2 s. The MCP EXEC parser is NOT tty-gated but BREAK is (debug.cpp:5410
+isatty x3) — hence pty-for-the-gate + socket-for-the-words (deliberate deviation
+from the assignment's PTY-suggested mechanism, on cited source grounds;
+-break-start NOT used, GOAL decision respected).
+(3) LIVE HELP CAPTURED (79 lines, unpaged — capture suppresses the pager,
+debug_gui.cpp:685): verbatim list + key map banked to dosbox-debugger.md; live
+list carries NO HELP entry for RUN/RUNWATCH though EXEC RUN works — parser is the
+authority, not strings.
+(4) ACCEPTANCE MEASURED 3/3: BPLM 00FA0000 / BPPM 0040:0000 / BPM 0040:0010 all
+armed (BPLIST shows them; list spells BPM's entry "BPMEM"); BPDEL * clears.
+(5) FIRE MEASURED 2/2 (--settle 40): BPLM on guest phys 0x46C (BIOS tick) fired
+at +2.1 s — "Memory breakpoint : 0000:046C - 00 -> 69" (and -> 94 rerun), CPU
+stopped, stopped debugger STILL ANSWERED EXEC BPLIST over the same socket
+(ControlServer_Poll inside DEBUG_Loop, debug.cpp:5267). The t272 general
+negative is now SUPERSEDED with a live demonstration (REFUTED-ROUTES + score.md
+S15 marked; dfsg-only scope preserved).
+(6) TRAPS BANKED: (a) BREAK at +0.2 s aborted the emulator 1/2 with glibc
+"corrupted double-linked list" (mechanism NOT proven; --settle 40 mitigated 2/2);
+(b) the BPLIST "(00)" is the armed baseline — the fire test is
+bp->GetValue()!=current (debug.cpp:870), which IS the VOGONS 0x00-artifact, so
+the first fire of any nonzero location is spurious-by-design; (c) a BPLM fire
+line prints seg 0000 — no usable address, arm ONE breakpoint; (d) fire
+granularity one byte; (e) probe crash mid-session must still reap child+Xvfb
+(finally-block law in the scripts). New tools: scripts/r1_mcp_dbg.py (listener
+lib), scripts/r1_t282_dbx_probe.py (bring-up + sweep + fire sanity). Scratch
+copy work/r1/game-wp (148 MB, gitignored) persists for t283. Production :9
+HEALTHY after every run (pid 636955), no stray dosbox/Xvfb, timeline unchanged
+(no new sitting; last turn 1335).
+WIP: docs/re/_wip_t282.md S1..S8. Permanent: docs/re/dosbox-debugger.md (LIVE
+VERIFICATION section). NEXT: t283 (the BPLM-on-DAT_482fb session — everything it
+needs is now measured, including which pitfalls are real).
 
 LANDED t281 (2026-11-02): SA_CORNUCOPIA REPAINT WIRED VERBATIM — THE LAST
 STATE-CARRYING §6.3 BODY CLOSED OUT + THE +0x16 SKIP KEY MEASURED (offline,
