@@ -635,3 +635,24 @@ no end-window evidence either way. rank=1 with V=0 also weakens "rank =
 V/10-1" (FUN_0002bfa8 reading): [inferred] rank semantics need a same-campaign
 V-sweep, still play-gated. OQ-021 STAYS OPEN (strict-close); the tutorial slot
 family (bank-t273-tutorial645) is banked for any future controlled comparison.
+
+## S17 — t283: THE DAT_482fb PRODUCER IS A WITNESSED RUNTIME ACCUMULATOR [measured]
+
+The write watchpoint (dosbox-x-dbg BPLM on guest-linear 0x28A2FB = B-0x88+
+0x82bb0+0x482fb, B scanned from the session's own ring) FIRED REPRODUCIBLY
+(runs 6,7,8,9; docs/re/dosbox-wp-t283.md). Attribution: fires ONLY in the
+end-of-turn phase (NEXTTURN press -> fire +3.1-3.3 s); quiet 90 s ZERO fires;
+'c' overlay x6 ZERO fires (t189b overlay-recompute hypothesis REFUTED).
+The walk 0->1->3->6->11->12->15->16->16->18->22->23 is a MONOTONE per-turn
+accumulator landing exactly on the banked corpus max 23 (S6). Fire EIP 1e3803
+(file 0x243B3, one past the store) anchors the UNIQUE store instruction
+`mov DWORD PTR [ebp+0x354eb],ecx` at file 0x243A8 (pattern 898deb5403 occurs
+EXACTLY once image-wide); arithmetic anchor EAX=0x254e10 == 0x28A2FB-0x354EB
+exact. Loop context: ship stride 0x162 + live-count gate ds:0x4348b, race
+stride 0x1ee with cmp BYTE [...],3 predicate, per-hit inc + call 0x24274
+(aicode.md P8 tail region). score_stars reads 0 at load in scratch AND
+production (playcap/save/51.sav) — the count is DERIVED state repopulated by
+the end-of-turn pass, never restored. Why t212's census saw zero writers:
+base-register+disp store, no static disp32/imm form exists (S9's predicted
+residue shape, now positively witnessed). WHAT REMAINS: the predicate's
+meaning (what the loop qualifies) and the threshold residue (V>=25 witness).

@@ -449,7 +449,24 @@ artifact (VOGONS, cause traced to debug.cpp:870 `bp->GetValue() != value`). NO O
 CLOSED THIS ITERATION: the PRODUCER residue (who writes DAT_482fb) still has
 witness ZERO — the watchpoint has now been proven to exist, not pointed at our
 address. Next: scratch session, BPLM on the guest-LINEAR DAT_482fb, drive turns,
-capture the writing EIP. Row STAYS OPEN.
+capture the writing EIP. Row STAYS OPEN. STATUS t283 (2026-11-03, docs/re/
+dosbox-wp-t283.md + score.md S17): PRODUCER RESIDUE CLOSED WITH CITED
+MEASUREMENT — BPLM on guest-linear 0x28A2FB (B=0x1bf4d8 scanned from the
+session's own ring) FIRED REPRODUCIBLY (runs 6,7,8,9): "0000:28A2FB - 00 -> 01"
+at +3.1-3.3 s after a NEXTTURN press; quiet phase 90 s ZERO fires; 'c' overlay
+x6 ZERO fires (t189b overlay hypothesis REFUTED); value WALK 0,1,3,6,11,12,15,
+16,16,18,22,23 = monotone per-turn accumulator landing on the banked corpus max
+23. Fire EIP 1e3803 (file 0x243B3, one past the store — loop-top check law)
+anchors the UNIQUE store `mov DWORD PTR [ebp+0x354eb],ecx` at file 0x243A8
+(898deb5403 occurs exactly once image-wide); arithmetic anchor EAX=0x254e10 ==
+0x28A2FB-0x354EB exact; loop context = ship stride 0x162 + live-count gate
+ds:0x4348b + race-stride 0x1ee cmp-3 predicate (aicode.md P8 tail). score_stars
+reads 0 at load in scratch AND production (playcap/save/51.sav): the displayed
+count is DERIVED state repopulated by the end-of-turn pass, never restored.
+THRESHOLD RESIDUE STILL OPEN (no V>=25 sampled row, selector never armed in
+campaign lineage) — ROW OVERALL STAYS OPEN. Non-artifact law derived: the
+spurious first fire needs the byte NONZERO at arm time (debug.cpp:1048 stores
+0; fire test :870), and score=0 at arm time in every run.
 
 OQ-022 | audio | music span-vs-check contradiction: player FUN_00059c70
 validates opened-file span CMP EAX,0x1d4d0 (@0x59cc5, error 0x1047 if above)

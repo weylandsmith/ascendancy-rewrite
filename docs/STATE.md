@@ -260,34 +260,26 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t283 OQ-021 WRITE-WATCHPOINT SESSION (the payoff; t282 UNBLOCKED IT — the
-instrument is BUILT and MEASURED-FIRING, docs/re/dosbox-debugger.md LIVE
-VERIFICATION). GOAL: the writing EIP for guest-LINEAR DAT_482fb (image base +
-0x82bb0 + 0x482fb - 0x88 per the pointer law, score.md S9/S14 — COMPUTE it from
-the scratch run's own base, never production's). Flow, all proven pieces:
-launch via scripts/r1_t282_dbx_probe.py patterns (scratch work/r1/game-wp,
-core=normal, own captures dir, private Xvfb, kill-by-recorded-PID) BUT the
-listener must be bound BEFORE spawn (DIRECTION LAW: dosbox-x connects OUT to us,
-retries 1/s). BREAK ONLY AFTER ~40s settle (BREAK at +0.2s aborted the emulator
-1/2 with a glibc heap error — mechanism unproven, mitigation measured). Click
-into a CAMPAIGN first (title-screen boot has no image resident, t272 keeper via
-scripts/r272_scratch_resident.py), recompute B from the ring (r1_sav_scan.py),
-EXEC BPLM <linear>, EXEC RUN, then poll EXEC BPLIST from the SAME socket
-(ControlServer_Poll runs inside DEBUG_Loop). THE FIRST FIRE IS THE 0x00-BASELINE
-ARTIFACT (fire line "00 -> xx"; cause traced to debug.cpp:870) — believe only a
-fire whose old value is the previous real value. BPLM FIRE LINES PRINT NO USABLE
-ADDRESS (seg field is 0000 by construction) — arm EXACTLY ONE breakpoint. Fire
-granularity is ONE BYTE. After the stop: capture CS:IP + registers (EV/CPU
-commands, live list banked) + MEMDUMPBIN window + stack, map EIP back through the
-t106/t107 windowed-disasm recipe, bank writer site + law to score.md. Budget the
-wall: heavy-debug checks every instruction (core=normal is mandatory and SLOW);
-few turns may pass. STRICT-CLOSE: one non-artifact fire + cited disasm of the
-writing instruction closes the PRODUCER residue ONLY (threshold residue
-separate, t269: this campaign never reaches V>=25). Honest negative valid: if no
-fire lands in the budget, bank the wall/budget numbers and keep OQ-021 open.
-PRE-FLIGHT: python3 scripts/r1_game_health.py (production :9 pid 636955 LIVE,
-TL expiry Nov-04 22:33 — LEAVE IT RUNNING; NEVER mount work/r1/game/ or :9's
-ring). Do NOT run dosbox-x-dbg against production.
+NEXT t284 REWRITE THE V SEMANTIC (UNBLOCKED BY t283 — producer WITNESSED,
+docs/re/dosbox-wp-t283.md + score.md S17). ORDERING RATIONALE: t283 delivered
+the law the rewrite must mirror (t285 drive III / t286 tooling / diplomacy are
+all independent of it; the semantic upgrade is the goal-bearing item and its
+evidence is fresh on disk). Implement in rewrite/src/game/score.cpp: the
+displayed DAT_482fb value is a DERIVED per-turn ACCUMULATOR — 0 at load/resume
+(NEVER restored from save; measured scratch AND production 51.sav), then +1 per
+qualifying entity during the end-of-turn pass (fire-anchored store
+`mov [ebp+0x354eb],ecx` at payload file 0x243A8, UNIQUE pattern 898deb5403;
+loop context ship stride 0x162 gated by live count ds:0x4348b, race stride
+0x1ee, cmp BYTE [...],3 predicate — aicode.md P8 tail region; witness walk
+0,1,3,6,11,12,15,16,16,18,22,23 terminal 23 == corpus max). Pin every constant
+to docs/re/dosbox-wp-t283.md §2. The predicate's MEANING is not yet decoded:
+mirror the OBSERVABLE semantic (accumulator over the qualifying-entity loop as
+defined by the disasm you cite), and where the qualification is undecidable
+from statics, keep the rewrite's current per-system-count behaviour behind a
+cited comment — do NOT invent a predicate. Gate + rewrite tests green. OQ-021
+stays OPEN regardless (threshold residue, t269: this campaign never reaches
+V>=25 at a sampled row). PRE-FLIGHT: python3 scripts/r1_game_health.py
+(production :9 pid 636955 LIVE, TL expiry Nov-04 22:33 — LEAVE IT RUNNING).
 
 PAIRING-SESSION NOTE (phase-4 handoff, 2026-11-02 ~22:45): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS (verbatim, this session):
@@ -306,17 +298,6 @@ preserved as RESUME.GAM.tutorial-nov2 for archaeology only).
 
 QUEUE (phase 4, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed row):
-
-t283 OQ-021 WRITE-WATCHPOINT SESSION — MOVED OUT OF THE QUEUE INTO "NEXT ACTION"
-  (2026-11-02, t282 iteration): t282 is DONE (instrument built + MEASURED
-  FIRING), so t283 is now the assigned task and its row above (the NEXT ACTION
-  block) supersedes this stub. Keep the queue numbering intact: t284 follows.
-
-t284 REWRITE THE V SEMANTIC (needs t283's law): implement whatever the writer
-  computes in rewrite/src/game/score.cpp (DAT_482fb = the "STARS CONTROLLED"
-  overlay value, t244 verified overlay==RAM direct readout) with a pin from the
-  captured witness. If t283 found the writer is a recompute-on-end-turn (the
-  t258 residue shape), mirror that cadence. Gate + rewrite tests green.
 
 t285 LONG DRIVE + WITNESS HARVEST III (INDEPENDENT of the debugger — run it even
   if t282/283 fail). Production :9 is LIVE at t1086 (22:27 launch, TL=172800).
@@ -388,6 +369,44 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
   or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
+
+LANDED t283 (2026-11-03): OQ-021 PRODUCER RESIDUE CLOSED WITH CITED MEASUREMENT
+— THE DAT_482fb WRITER IS A WITNESSED END-OF-TURN ACCUMULATOR (9 scratch
+emulator runs; docs/re/dosbox-wp-t283.md hand-authored + score.md S17; ledger
+row OQ-021 ANNOTATED, stays OPEN on the threshold residue — strict-close: the
+producer residue closes on a non-artifact fire + cited disasm, both delivered):
+(1) TARGET from this session's own ring (r1_sav_scan 6 votes B=0x1bf4d8) ->
+guest-linear 0x28A2FB == 0x242000+0x482fb law-anchor exact. (2) FIRES x4 runs
+reproducible "0000:28A2FB - 00 -> 01" +3.1-3.3 s after NEXTTURN; phase protocol
+decisive: quiet 90 s ZERO fires, 'c' overlay x6 ZERO fires (t189b
+overlay-recompute hypothesis REFUTED), turn phase fires. Non-artifact PROVEN by
+derived law (artifact needs byte NONZERO at arm; score_stars=0 at arm in every
+run — and production 51.sav reads 0 too: the displayed count is DERIVED state,
+0 at load, repopulated by the end-of-turn pass). (3) WALK 0,1,3,6,11,12,15,16,
+16,18,22,23 monotone, terminal 23 == banked corpus max (S6) — an accumulator,
+not a territory read. (4) WRITER SITE: fire EIP 1e3803 = file 0x243B3 (loop-top
+check law: fire EIP is one PAST the store) -> UNIQUE store `mov DWORD PTR
+[ebp+0x354eb],ecx` at file 0x243A8 (pattern 898deb5403 exactly once image-wide;
+t212's census missed it precisely because base+disp has no static disp32 form —
+S9's predicted residue shape positively witnessed); arithmetic anchor
+EAX=0x254e10 == 0x28A2FB-0x354EB exact; loop context ship stride 0x162 + live-
+count gate ds:0x4348b + race stride 0x1ee cmp-3 (aicode.md P8 tail). (5) NEW
+HARNESS scripts/r1_t283_wp_session.py (phase protocol + walk + per-fire EIP;
+--phases quiet,c,turn --walk N) + scripts/r1_t283_disasm.py (objdump -b binary
+-m i386 -M intel --adjust-vma; --start-address with -b binary prints NOTHING —
+trap) + scripts/r1_t283_tailturn.py. (6) OPERATIONAL LAWS banked (doc §4):
+BREAK after a campaign LOAD needs its OWN ~45 s settle (run 5 silent stall,
+RECEIVED but never answered, no glibc error — distinct from t282's crash);
+-savedir does NOT mkdir and autosave-fail makes the X window vanish;
+DISPLAY needs the colon; system python3 has NO PIL (use compare -metric AE);
+MEMDUMPBIN-with-filename over MCP EXEC is DEAD ("Invalid memory dump arguments"
+x2 — read the ring saves instead, do not re-guess syntax); the BREAK "Dynamic
+core" warning prints UNCONDITIONALLY (debug.cpp:5350). (7) NO-sitting
+adjudication first (tail max turn 1086 == baseline; sitting script NOT run).
+Production :9 HEALTHY untouched (pid 636955, TL Nov-04 22:33); no strays
+(all scratch dosbox/Xvfb by recorded PID; manual diagnostic Xvfb :95 reaped).
+NEXT=t284 rewrite the V semantic in rewrite/src/game/score.cpp.
+
 
 LANDED t282 (2026-11-02): DEBUGGER INSTRUMENT VERIFIED LIVE — WATCHPOINTS FIRE
 ON THIS BOX (offline gate task + 4 scratch emulator runs; NO OQ closed —
