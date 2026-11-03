@@ -563,6 +563,11 @@ t1086 session untouched throughout (verified: ring fresh, RESUME.GAM 5b382afb,
 single dosbox PID 524517 after experiment teardown).
 
 ## t273 — :9 RUNS THE TUTORIAL CAMPAIGN; PRODUCTION RELAUNCH HELD FOR ONE USER SIGNAL
+SUPERSEDED 2026-11-03 (t285): the user grant in STATE.md PAIRING-SESSION NOTE
+("don't worry about my save games or a VNC grabbing the session") RELEASED
+drive-class work; t285 drove, self-harmed (see REFUTED-ROUTES t285), and
+restored production to t1086 (pid 660167, TL 2026-11-05 05:26, shipfp
+f4e5e715). The historical record below stands as evidence.
 The t273 drive leg died when the popup-drain misclicked the title menu
 (selfplay.md t273 law) and the vendor TUTORIAL campaign took the ring at
 11:35:16 EST. A REMOTE VNC client is connected to :5910 (ss shows the socket

@@ -90,6 +90,17 @@ def ring_turn():
     return best
 
 
+def ring_in_game():
+    """True iff the ring's CURRENT state is in-campaign. t273 LAW: the popup
+    drain must NEVER run at the title menu — the white-band detector fires on
+    title-menu text and clicked the Tutorial button (ring lineage flip 1086 ->
+    645). Any row with in_game False in the tail window means title menu."""
+    rows = ring_rows()
+    if not rows:
+        return False
+    return all(r.get("in_game") for r in rows[-4:] if r.get("turn") is not None)
+
+
 def grab(path):
     from PIL import Image
     r = sh(f"DISPLAY={DISPLAY} import -window root {path}")
@@ -125,6 +136,11 @@ def send(args):
 
 
 def drain_popups(maxn=25):
+    # t273 LAW GUARD: never drain at the title menu (the white-band detector
+    # misfires on menu text; t273 clicked Tutorial and lost the campaign).
+    if not ring_in_game():
+        log("popup drain SKIPPED — ring not in_game (title-menu guard, t273 law)")
+        return 0
     closed = 0
     for _ in range(maxn):
         im = grab("/tmp/_t261_popup.png")
@@ -140,20 +156,30 @@ def drain_popups(maxn=25):
 
 
 def input_alive():
+    """True if the game reacts to synthetic input.
+    t285 LAW: NEVER probe with Escape. Witnessed 04:38:11-13 (screenshots
+    banked in work/r1/bank-t285-flip1255/): one Escape at the bare galaxy map
+    ejected the campaign to the TITLE MENU (probe_a=campaign t1092, probe_b=
+    title menu). The title-menu popup-drain misfire that followed swapped the
+    campaign in RAM (t1086/fp3a189896 -> t1255/fp39614c7c). The 'c' overlay
+    toggle is the safe probe: no-op at the title menu, big pixel delta in-game,
+    and self-reverting."""
     a = grab("/tmp/_t261_probe_a.png")
-    send(["key", "Escape"])
+    send(["key", "c"])
     time.sleep(1.5)
     b = grab("/tmp/_t261_probe_b.png")
     n = V4.diff_pixels(a, b)
     if n > PIXEL_ALIVE:
+        send(["key", "c"])
+        time.sleep(1.0)
         return True, n
-    send(["key", "c"])
-    time.sleep(1.5)
+    send(["key", "Escape"])          # last-resort only, and ONLY when the ring
+    time.sleep(1.5)                   # still says in_game (title-menu guard)
+    if not ring_in_game():
+        return False, n
     c = grab("/tmp/_t261_probe_c.png")
     n2 = V4.diff_pixels(b, c)
     if n2 > PIXEL_ALIVE:
-        send(["key", "c"])
-        time.sleep(1.0)
         return True, n2
     return False, n
 

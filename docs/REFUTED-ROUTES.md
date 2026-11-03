@@ -384,3 +384,25 @@ marks 409/409. The lineage lives IN THOSE FIELDS, not in a hidden accumulator
 of the past. Do not author V-tasks that diff turns looking for "carried state";
 the closure route for the remaining residue is the THRESHOLD witness only
 (selector arm + V>=25 + end screen).
+
+## t285 — NAIVE DRIVE PROBES ARE DEADLY: Escape AT THE GALAXY MAP EXITS TO THE TITLE MENU, AND THE RING NEVER NOTICES (full chain + Nov-1 reattribution)
+
+WITNESSED 2026-11-03 04:38 (screenshots banked, work/r1/bank-t285-flip1255/):
+one Escape at the bare campaign map ejects to the TITLE MENU while autosave
+keeps writing the RAM campaign — in_game stays True, so ring/watcher-based
+title-menu guards are STRUCTURALLY BLIND (the ring_in_game() gate added today
+catches death, not this). A subsequent popup-drain click hits the white title
+rows; a Load Game click makes the game replace the RAM campaign (fp
+3a189896 -> 39614c7c measured 20/20 both sides). Pixel-diff "input ALIVE"
+during the ejection is the t266 starfield false positive. DEAD ROUTES: (a) any
+driver that probes with Escape-first (the pre-t285 r1_t261_drive.py input_alive
+— patched 'c'-first); (b) any campaign-identity claim from fp EQUALITY ACROSS a
+load (the name-anchor locator drifts, recs 152->156; use the r1_slot
+ship_records census across loads); (c) treating the t261/t266 RAM campaign swap
+as a stray-second-dosbox event — the Nov-1 flip slots carry the SAME loaded
+campaign fp as today's self-inflicted load, and the Nov-1 drive log shows the
+identical probe/drain tell (docs/re/driver-selfharm-t285.md §3). The two-writer
+RING law itself STANDS (ring-content corruption is still a second-writer
+phenomenon). Every future drive row must satisfy the STATE.md DRIVE-CLASS
+PRECONDITION (screen-based title-menu detection, STOP-AND-LOOK on 2
+no-advances, no Escape at the map).

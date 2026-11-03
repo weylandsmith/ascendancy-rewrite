@@ -6,7 +6,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-03T03:55
+updated: 2026-11-03T05:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md; that file is the record of
@@ -265,29 +265,33 @@ ledger:
 
 ## NEXT ACTION (exactly one)
 
-NEXT t285 LONG DRIVE + WITNESS HARVEST III (queue order; t284 LANDED, and the
-production :9 game is LIVE with TL expiry Nov-04 22:33 — the drive must burn
-before that window closes, which makes it strictly time-critical vs t286/t287).
-r1_t245_turndrive v4 toward t1250+. BANK the ring to a dated dir BEFORE any
-restart and every ~30 turns (ring holds ~200 s!). OOM law: r1_stream.py or
-<=400 KB tail scans only. MINE with per-segment trust (t262 r262 law) and the
-t273 ATTRIBUTION FIXES (owner INDEX byte+0x56 not handle u16+0x54; stale-echo
-pairs mint phantom deltas — t273 VOIDED the t251 mine on exactly these bugs):
-(a) damage dealt to a NON-at-war owner (OQ-016 — two -40/-28 price witnesses
-exist at t1253, zero damage witnesses); (b) V>=25 (t269 says no; a drive that
-breaks it closes the OQ-021 threshold residue — log ring slot + V + systems
-counts AND, new since t284, the admitted-lane count: scripts/r284_vreplay.py
-prints vis/mk per slot; V == admitted lanes + 1, so the gap to 25 is a gap of
-LANES ADMITTED at the end-of-turn pass, production baseline 22 lanes @t1086,
-58 lanes exist — this replaces every older "more systems" framing);
-(c) magnetron USE frames (OQ-019, gizmo 0x3c). Honest negatives are valid
-outcomes; do NOT issue player attack orders. REPLAY IS THE NEW MINE-CHECK:
-any V the drive logs must reproduce under scripts/r284_vreplay.py on the same
-slot (295/409 EXACT / 0 nonzero-mismatch law, score.md S18) — a replay miss on
-a nonzero V is a FINDING about a gate the decode missed, chase it.
+NEXT t286 MCP/PTY DEBUGGER AS A GENERAL INSTRUMENT (queue order; t285 LANDED —
+the drive leg self-harmed on the softlock class and the harvest leg delivered
+honest negatives, so the V>=25 ask returns to the drive queue REQUIRING the
+hardened driver below; ordering vs t287: the debugger is offline-safe while the
+drive class keeps hitting the t285/t261 bug class every ~6-16 presses, and
+characterising that class with the debugger is t288 — build the instrument
+first). Script scripts/r1_wp_session.py so OTHER writer questions can be hunted
+without hand-held sessions: u16@data 0x131b4 (the maintained "Planets Occupied"
+snapshot, t249 residue), star byte +0x5a (colonised-planet count, t247 law —
+writer unmapped), the PLANETALLOC getter chain 147/149/151/152/153
+(selfplay.md) to confirm the header format-string law at runtime. Each hunt =
+one scratch session (work/r1/game-wp scratch tree, OWN ring dir — two-writer
+law), one address, one captured EIP. Use scripts/r1_t283_wp_session.py as the
+template (settle laws banked there: 45 s post-load settle, ONE bp, BPLM fires
++3.1 s after NEXTTURN). Bank results to the relevant docs/re/*.md; a scratch
+negative is still a result.
 
-PRE-FLIGHT: python3 scripts/r1_game_health.py (production :9 pid 636955 LIVE,
-TL expiry Nov-04 22:33 — LEAVE IT RUNNING).
+DRIVE-CLASS PRECONDITION (t285 law, docs/re/driver-selfharm-t285.md — applies
+to EVERY future drive row incl. any V>=25 re-drive): the driver must (1) detect
+the TITLE MENU FROM THE SCREEN before any click (probe_b fixture:
+work/r1/bank-t285-flip1255/probe_b_043813.png; orange title background dominates
+the game area above the white menu box at rows ~330-565), (2) treat 2
+consecutive no-advance presses as STOP-AND-LOOK (bank + screenshot + flag),
+NEVER probe-then-click, (3) never send Escape at the bare galaxy map — it EXITS
+THE CAMPAIGN to the title menu, and the ring keeps autosaving so RAM-side guards
+are blind. The ~30 genuine rows t1087-1092 are banked (bank-t285-predrive);
+the drive resumes from t1086 (production is parked there, shipfp f4e5e715).
 
 PAIRING-SESSION NOTE (phase-4 handoff, 2026-11-02 ~22:45): sentinel-slot law
 stands — task line FIRST, notes below. USER GRANTS (verbatim, this session):
@@ -364,6 +368,43 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone: 6 stays. work/ is gitignored — findings in docs/re/.
 - After the queue drains: park NEXT on a WAIT-TRIGGER sentinel (task line FIRST)
   or author a new queue; relaunch law MAX_ITERS=12 IDLE_GATE=0.
+
+LANDED t285 (2026-11-03): DRIVE SELF-HARM ROOT-CAUSED WITH WITNESSES — ESCAPE
+AT THE GALAXY MAP EXITS TO THE TITLE MENU; RING GUARDS ARE BLIND THERE; THE
+NOV-1 21:38 CAMPAIGN SWAP IS THE SAME MECHANISM (docs/re/driver-selfharm-t285.md
++ _wip_t285.md; NO OQ closed — strict-close honoured, OQ-016/019/021 annotated,
+ledger 15/4). (1) DRIVE 04:33:53 advanced 1086->1092 (6 presses, ~30 genuine
+rows banked), then SOFTLOCK-CLASS struck (NEXTTURN at measured (511,67) dead,
+no popup, drained=0). (2) The old driver's probe sent ONE Escape: screenshots
+witness CAMPAIGN t1092 -> TITLE MENU (rows transcribed verbatim, incl. "Load
+Game Alt-L"); probe "ALIVE changed_px=306624" was the t266 starfield false
+positive; the drain then clicked two white menu rows -> the GAME'S OWN Load Game
+swapped the RAM campaign: fp 3a189896 (t1086 V0 owned104, 20/20 slots) ->
+39614c7c (t1255 V14 owned124, 20/20, no interleave). Press 10 advanced the
+LOADED campaign -> driver printed FALSE "TARGET REACHED". (3) CORROBORATION vs
+the Nov-1 incident log (drive_20261101-213051.log): identical tell sequence
+(no-advance x2, probe ALIVE 306624, drained=2, flip to 1255) AND the Nov-1 flip
+slots carry the SAME fp 39614c7c — t266's two-writer ring analysis stands for
+ring-content corruption, but the RAM campaign swap in BOTH incidents is driver
+self-harm via title-menu Load, mechanism no longer [unverified]. (4) TOOLS:
+scripts/r285_fp.py KEEPER (planet-name+owner md5; equality valid WITHIN a run,
+NOT across a load — recs 152->156 locator drift witnessed; use the r1_slot
+ship_records census instead across loads: pre-drive shipfp f4e5e715 == restored
+f4e5e715, loaded 0272c480); r1_t261_drive.py PATCHED (ring_in_game gate on the
+drain + input_alive rewritten 'c'-first/Escape-last). (5) RECOVERY SOP EXECUTED
+(bank -> SIGKILL recorded pid 636955 -> vnc start -> ONE click (318,333)):
+production RESUMED t1086 V0, shipfp-verified; new pid 660167 TL expiry
+2026-11-05 05:26; RESUME.GAM md5 5b382afb untouched throughout; banks t285-
+predrive/-flip1255 (incl. screenshots)/-loaded1255/-restored-t1086. (6) HARVEST
+on the 6 genuine turns (r273_harvest window 04:33-04:39:41): leg A ZERO damage/
+destructions/flips, 11 att deltas all -1 drift; leg B V held 23 from the first
+end-turn pass, ZERO V>=25, selector 0, rank 65535; leg C ZERO magnetron frames.
+REPLAY MINE-CHECK on the loaded campaign: r284_vreplay 20/20 EXACT (V=14,
+vis=mk=13) — the S18 law reproduces on a foreign seed. (7) TWO harness failures
+banked honestly: system python3 has NO PIL (t283 trap, killed launch 1 silently)
+and a launch without the T261_* env prefix "reached target" on the stale scratch
+ring (zero clicks; spurious bank deleted; production ring verified untouched).
+NEXT=t286 verbatim + the DRIVE-CLASS PRECONDITION block.
 
 LANDED t284 (2026-11-03): THE V PREDICATE DECODED, CORPUS-REPLAYED, AND THE
 REWRITE UPGRADED — OQ-021 ANNOTATED (stays OPEN, threshold residue; strict-
