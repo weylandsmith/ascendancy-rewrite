@@ -53,7 +53,21 @@ if [ -z "$XV_BIN" ] && [ -x "$DEB/root/usr/bin/x11vnc" ]; then
 fi
 mkdir -p "$RUNDIR" "$OUT/save" "$OUT/caps"
 
-alive() { [ -f "$RUNDIR/$1.pid" ] && kill -0 "$(cat "$RUNDIR/$1.pid")" 2>/dev/null; }
+# REBOOT-SAFE (2026-11-04): pidfiles survive reboot but PIDs do not — pid 1207
+# from an old x11vnc.pid was REASSIGNED to an unrelated process, alive() said
+# true, the harness skipped starting x11vnc and died on its own port check.
+# Verify /proc/<pid>/comm names the expected binary before believing a pidfile.
+alive() { [ -f "$RUNDIR/$1.pid" ] || return 1
+  local p comm
+  p="$(cat "$RUNDIR/$1.pid" 2>/dev/null)" || return 1
+  [ -r "/proc/$p/comm" ] || return 1
+  comm="$(cat "/proc/$p/comm" 2>/dev/null)"
+  case "$1" in
+    xvfb)   [ "$comm" = "Xvfb" ] ;;
+    x11vnc) [ "$comm" = "x11vnc" ] ;;
+    dosbox) [ "$comm" = "dosbox-x" ] ;;
+    *)      kill -0 "$p" 2>/dev/null ;;
+  esac; }
 
 analyze() {
   echo "=== progress timeline (accumulated across sittings; $OUT) ==="
