@@ -309,6 +309,12 @@ failing is EXPLAINED: they either hit mode 0 (no clip: wrong pixel) or mode-2
 clear. The remaining unknown is the destination-entry widget, NOT selection.
 
 ## S7. Live-session choreography note (for t297; derived, to be tested)
+*** SUPERSEDED BY S9 + scripts/r296_selection_note.py — DO NOT FOLLOW THIS
+BLOCK. Its click coordinates were guessed from the cosmos centre before the
+verification pass; the mouse route is msg 4 via 0x1b91c (S9/C3), a plain
+mode-2 map click DESELECTS (C4), and the pointer-law note below (B+0x88) was
+wrong in kind: ds:0x43504 is plain RAM at B+0x43504, not a slot-array offset
+(r1_slot.py OFF=0x82bb0 is the ship-record array). Kept for history. ***
 Per t293's budget law this iteration spent ZERO launches, so t297 owns the
 live attempt. Route (all game coords; scratch scratch copy, Xvfb, background
 =true notify=true — the 420 s foreground cap law):
