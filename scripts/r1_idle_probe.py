@@ -121,7 +121,11 @@ X11VNC_BASE_SIZE = 30114
 X11VNC_BASE_ACCEPTS = 1
 # Paths the loop edits every iteration; a delta here is never the user's
 # answer (t117). Shared by the tree leg and the (B3) committed-commit leg.
+# 2026-11-03 slim: docs/DECISIONS.md is where the USER answers asks (D1..D3) —
+# tracked here so a user reply lands on the B5 escalation path (same class as a
+# reply inside BLOCKED.md) instead of the B1 foreign-divergence alarm.
 LOOP_OWNED = ("docs/STATE.md", "docs/OPEN-QUESTIONS.md", "docs/BLOCKED.md",
+              "docs/DECISIONS.md",
               "docs/re/", "scripts/r1_idle_probe.py", "work/")
 
 
