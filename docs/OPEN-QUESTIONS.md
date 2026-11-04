@@ -135,7 +135,22 @@ witnesses. T297-B: batwin INSTANCE unpinned (u32 0x1aef8 zero refs in RAM;
 GATING FACT: at t=1086 owner 0 has NO kind-4 ship (11 ships, kinds {3,5}) —
 nothing is selectable; slot 8 becomes kind-4 MOVES=12 at t=1087 (the t293 5->4
 lander) -> t298 MUST End-Turn ONCE before picking, target slot 8, and find the
-sprite by COLOUR CLASS (ships.md S25). (2) per-ship build/redesign path =
+sprite by COLOUR CLASS (ships.md S25). LIVE SESSION #2 t298
+(work/r1/t298-order-20261104-174236, scripts/r298_order_session.py, 3
+launches, mouse budget SPENT): End-Turn-once worked, full S1-S7 battery ran,
+STILL no kind-2 — but the battery never saw the target (ships.md S26):
+FLEET-LIST ORDER IS NOT ARRAY ORDER (measured rows Sparrowhawk/Erebor/
+Erchamion/Ignatz = slots 18/7/16/22; sort law UNKNOWN) and unbounded colour
+finders return SIDEBAR CHROME (client rect x 7..465 hard bound). New
+measured law: RAM pointer VALUES are guest-PHYSICAL (target = member
+value+0x88; t297-B zero-refs negative refuted — physical pattern of 0x1aef8
+has 1 hit @0x247978); ds:0x43504 = current-system STAR record ptr ("Icarus"
+read from it) = system-identity oracle; ship_array_law count 30 UNDERCOUNTS
+(named owner-0 ships at 31/32/33; header "14 Ships" == 14 named records);
+command ring churns from non-order input (delta-only, not an oracle).
+NEXT WITNESS = DEBUGGER CLASS t299 (BPLM 0x1ba39/0x1ba5e/0x1baa7/0x1bad3/
+0x1b114, r290 poke skeleton, dosbox-debugger.md) — no fourth mouse launch.
+(2) per-ship build/redesign path =
 BUILD DECISION not RE unknown (t256c census 62,762 rows, AI dossier row 16
 GAP->BOUNDARY; docs/DECISIONS.md D3); (3) magnetron witnessed use (scriptable
 via t289 drive class). | open

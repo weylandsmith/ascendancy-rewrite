@@ -1451,3 +1451,56 @@ filter belongs in the PICKER — fixed in r297_order_session.py same session).
 
 NO LEDGER ROW CLOSED t297 (strict-close): OQ-016 residue 1, OQ-019 residues
 1/3 stay open pending a witnessed order.
+
+## S26 t298 (2026-11-04) — LIVE ORDER-WITNESS #2: HARNESS NEGATIVE + four
+binding measurement corrections (full autopsy docs/re/_wip_t298.md).
+Three launches on scratch game-wp / Xvfb :97 (scripts/r298_order_session.py):
+run 1 KeyError (own), run 2 post-turn EVENTWIN swallowed every click (r293
+drain is white-text-only and BLIND to EVENTWIN — LAW: after ANY turn advance
+close_eventwin() before any click that must land), run 3 full clean battery
+(End Turn t1086->1087, system-view route, S1-S7 click battery, End Turn x2
+to t1089) with NO kind-2, NO order-region delta, NO attributable movement.
+The run-3 negative does NOT refute the mouse route — the battery never saw
+the target ship. MEASURED CORRECTIONS:
+1. POINTER-VALUE COORDINATE LAW: values stored in RAM are GUEST-PHYSICAL;
+   read target at member index value+0x88. Cross-checked against relocated
+   code immediates (dumped in-RAM bytes at 0x1ba16/0x1baa7/0x1baae carry
+   0x7458e+0x242000 etc.; data-segment X physical = X+0x242000 = member
+   X+0x242088 = B+OFF+X — t297-A's scalar law CONFIRMED). Proof case:
+   ds:0x43504 = 0x256825, and member 0x256825+0x88+0x1c reads "Icarus" —
+   ds:0x43504 is the CURRENT-SYSTEM STAR record pointer while in a system
+   view (a cheap system-identity oracle). t297-B's "batwin not findable via
+   handler-ptr scan" used member-coordinate patterns: the PHYSICAL pattern
+   (B+0x1aef8-0x88) has exactly ONE RAM hit (member 0x247978) — the zero-
+   refs negative is REFUTED; the batwin instance hunt resumes with the right
+   coordinate system (clip pool stride 0x35 {u8 kind, u32 phys objptr}
+   found NO candidates even with correct pointers in system-view saves —
+   the pool is rebuilt per-frame or lives outside the Memory member;
+   selection state stays debugger territory).
+2. FLEET LIST ORDER IS NOT SHIP-ARRAY ORDER (vision on run-3 23_fleet.png:
+   rows = Sparrowhawk/Erebor/Erchamion/Ignatz = slots 18/7/16/22; header
+   "Chamachies (14 Ships, 13 more allowed)"). The list sort law is UNKNOWN.
+3. ship_array_law count (0x43489>>16 = 30) UNDERCOUNTS: named owner-0
+   records exist at indices 31/32/33 (Eregion B, Ereinion B, Escutcheon B);
+   14 named owner-0 records == the FLEET header count exactly. Pickers must
+   scan past 30 (n>=52) — the count word is NOT the fleet census.
+4. BatModeWnd CLIENT RECT x 7..465 is a HARD bound for screen finders: the
+   sidebar is tan-coloured AND bright; unbounded finders return chrome
+   (run-3 "sprites" (597,140),(612,259) were sidebar). With the bound, the
+   Icarus view has NO ship-sized tan blob (Enterprise B was in another
+   system — wrong row, per correction 2). Validated offline: the tan class
+   DID find the real sprite at (48,151) in t297's 11_orbital.png (vision
+   (48,148)) — the finder works, the navigation to it failed.
+5. COMMAND RING (game obj B+OFF+0x7a35c, widx u16 @+0x44ac, entry stride 10
+   {u16 code, u32 param, u32 extra} — 0x56ad4 writes [esi+slot*5*2+0x422c])
+   churns entry0 from NON-order activity in scratch sessions ([[7,0,0]] ->
+   [[1,18,1]] after an empty right-click); codes 1/3/5 small-int params are
+   NOT the publish-leg 0x11/pointer shape. Ring is delta-only and NOT an
+   order oracle at this granularity.
+DECISION: the blind-guess mouse-launch route is spent (STATE t297/t298
+"do NOT launch a third mouse session" honoured — run 3 WAS the third).
+t299 = debugger witness: BPLM {0x1ba39 SELECT-success, 0x1ba5e dl==1 order
+relay, 0x1baa7 PUBLISH, 0x1bad3 planet-order leg, 0x1b114 mode-2 deselect}
+in the r290 poke skeleton — one launch answers whether a click EVER selects
+and what the hit-test returns per pixel. NO LEDGER ROW CLOSED t298
+(strict-close): OQ-016 residue 1, OQ-019 residues 1/3 stay open.

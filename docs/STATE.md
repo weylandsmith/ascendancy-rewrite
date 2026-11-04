@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-04T10:40
+updated: 2026-11-04T18:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -181,7 +181,10 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   runtime data = B + 0x82BB0 + X; member byte -> physical = member - 0x88.
   H=136 for dfsg 2025.02.01 (re-derive per build). OFF-BY-H DISCIPLINE (t286b):
   anything found BY A MEMBER SCAN is a member index — convert before BPLM or any
-  linear consumer. B via scripts/r1_sav_scan.py, NEVER hard-coded.
+  linear consumer. B via scripts/r1_sav_scan.py, NEVER hard-coded. POINTER-VALUE
+  LAW (t298, ships.md S26 c.1, BINDING): u32 values STORED in RAM are guest-
+  PHYSICAL — read the target at member index value+0x88; scan patterns must be
+  (member-0x88), never the member value (t297-B false zero-refuted by this).
 - V LAW (OQ-021 CLOSED): V = DAT_000482fb controlled-systems count, producer
   FUN_00024274 replayable via scripts/r284_vreplay.py [dir...]; victory
   comparator V >= floor(2T/3)+1 (FUN_00024a34; docs/re/score.md S18-S20).
@@ -206,38 +209,63 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t298 LIVE MOVE-ORDER WITNESS #2 — FIXED PICKER, CORRECT GATES (ordering
-rationale: t297 proved the drive plumbing end-to-end (title->campaign->fleet
-jump->turns 1086->1088->clean cleanup, production :9 untouched) yet issued
-nothing because of ONE own bug — the candidate picker omitted owner==0 — and
-surfaced two MEASURED facts that change the choreography: (a) at t=1086 owner
-0 has NO kind-4 ship (kinds {3,5} only), so G1 makes selection IMPOSSIBLE
-until one lands: slot 8 becomes owner-0 kind-4 MOVES=12 at t=1087 (verified in
-the run ring); (b) the msg-4 router sends EVERY click to batcon 0x1b91c when
-[win+0xaf] is non-null, and the 0x1ba8c leg publishes ds:0x43508 + command-ring
-code 0x11 at mode 0 with NO msg-0x50 widget — so the mouse route is viable
-after all. One launch is in budget (t293 spent its own 3; t297 spent 1 of the
-fresh allotment). Task: run scripts/r297_order_session.py (fixed in place:
-owner==0 filters, DELTA-based check_issue, correct B+0x82bb0+X global reads)
-with these CHANGES first: (1) after enter_campaign + drain, End Turn ONCE
-(verified-advance law) so slot 8 lands kind-4; (2) re-verify candidate list
-from the NEWEST ring rows (owner-0 kind-4 MOVES>0 — expect slot 8); (3) ship
-SPRITE finder by COLOUR CLASS (tan/gold hull R>150 G>110 B<90; exclude icon
-strip y<112), NOT luminance (t297 clusters merged planet+chrome); (4) witness
-= kind-2 census + ds:0x43504/0x43508 DELTAS vs the fresh post-End-Turn
-baseline (globals churn — absolute reads are meaningless, T297-A) + full-RAM
-run diff; (5) click battery per _wip_t297 S1: select sprite -> then
-right-click empty (0x1ba45/0x1ba8c publish leg) BEFORE any left-click on
-objects (a left-click routes through 0x1b91c and the dl==3 planet leg RELAYS
-0x326 + mode:=0, destroying the selection). Scratch copy game-wp, private Xvfb
-(:97 worked; production :9 read-ring-tail only), background=true, venv python
-(PIL law, BLOCKED trap banked). If kind-2 appears and the watched slot moves
-with order evidence across a turn boundary: bank the flight measurement
-(d_vs_walk law, OQ-019 residue 1 closes with the arithmetic) and queue the
-magnetron + nuke witnesses (residues 3/1) on the SAME choreography. If
-selection again shows NO observable delta anywhere: the honest negative goes
-to ships.md S25 followup and t299 = debugger-poke class (t290/t291 precedent:
-docs/re/dosbox-debugger.md) — do NOT launch a third mouse session.
+NEXT t299 DEBUGGER SELECTION/ORDER WITNESS (ordering rationale: the scripted
+mouse route is SPENT — t298 ran the third and final launch and its negative
+was a HARNESS negative: the battery never saw the target ship because the
+FLEET list is not in ship-array order (measured: rows = slots 18/7/16/22;
+sort law UNKNOWN) and the sprite finder needs the client-rect bound x<=465.
+Every remaining unknown is a runtime-state question the ring cannot see —
+what the hit-test returns per pixel, whether a click EVER reaches the SELECT
+leg, what [win+0xaf]/[win+0xb3]/[win+0xb7] hold — and the master-built
+debugger answers them in ONE launch (t290/t292 precedent, docs/re/
+dosbox-debugger.md operating rules + r290_poke_session.py skeleton).
+Task: scratch session (game-wp, private Xvfb, background=true, venv
+python) that ENTERS THE CAMPAIGN, End Turns until an owner-0 kind-4 MOVES>0
+exists (scan PAST index 30 — count word undercounts, ships.md S26 c.3),
+jumps via the FLEET row whose NAME matches the target (read names from the
+screen or right-click a row -> contents display), then BREAKS on the
+batmode legs via the sentinel technique (BPLM is a MEMORY-CHANGE watchpoint:
+watch the LINEAR address of a cell each leg writes — ds:0x43508 physical
+X+0x242000 for the PUBLISH leg 0x1baa7; the batcon legs write [win+0xb3/
++0xb7] — pin win first via the ONE handler-ptr hit at member 0x247978 using
+the PHYSICAL value law, ships.md S26 c.1) and log EIP/registers + [ebp+0xab]
+clip + [[clip+1]] object per hit while driving the S1-S7 click battery
+(r298_order_session.py is the drive skeleton; its client-rect-bounded
+finders are already fixed). Deliverable: banked answer to (i) does a click
+on an in-system owner-0 kind-4 ship reach 0x1ba39 (SELECT) or die at the
+hit-test/0x1b114, (ii) which leg an order takes (0x1ba5e relay ecx=2 vs
+0x1bad3 ecx=4 vs 0x1baa7 publish), (iii) the batwin instance address law.
+If a leg hits and the kind-2/flight witness then fires on the ring: bank
+the d_vs_walk flight arithmetic (OQ-019 residue 1 closes with it). If the
+debugger session cannot break the legs at all: honest negative to ships.md
+S27 and the mouse/driver class goes to REFUTED-ROUTES with the evidence.
+DO NOT launch a fourth scripted mouse session and do NOT re-derive the
+pointer-value law (S26 c.1 is binding).
+
+## LANDED t298 (2026-11-04, session 7) — LIVE ORDER-WITNESS #2: HARNESS
+NEGATIVE + FIVE BINDING MEASUREMENT CORRECTIONS (docs/re/_wip_t298.md +
+ships.md S26; runs t298-order-FAILED-keyerror-172935, t298-run2-swallowed-
+popup, t298-order-20261104-174236; scripts/r298_order_session.py NEW).
+MEASURED: (1) POINTER-VALUE LAW — RAM stores GUEST-PHYSICAL pointer values,
+read target at member value+0x88 (cross-checked vs relocated code immediates
+dumped from in-RAM code at 0x1ba16/0x1baa7: imm = X+0x242000; scalar law
+B+OFF+X CONFIRMED, t297-A stands); t297-B "handler 0x1aef8 zero refs"
+REFUTED (physical pattern -> 1 hit member 0x247978); ds:0x43504 = current-
+system STAR record ptr ("Icarus" read at value+0x88+0x1c) = system-identity
+oracle. (2) FLEET LIST ORDER != ARRAY ORDER (vision: rows = slots 18/7/16/22;
+sort law UNKNOWN; header "14 Ships, 13 more allowed"). (3) ship_array_law
+count 30 UNDERCOUNTS — named owner-0 ships at 31/32/33; 14 named == header.
+(4) BatModeWnd client rect x 7..465 is a HARD bound for screen finders
+(unbounded finders return sidebar chrome; the tan class itself VALIDATED:
+found the real sprite at (48,151) in t297's orbital shot, vision (48,148)).
+(5) command ring entry stride 10, churns entry0 from NON-order input -> not
+an oracle. LAW RE-ENFORCED: post-End-Turn EVENTWIN construction popups
+swallow every click; close_eventwin() before any click that must land (run 2
+died exactly this way — t293's law, re-broken, now guarded in r298 script).
+Drive plumbing end-to-end CLEAN in run 3 (End Turn x2 t1087->1089, escape
+ladder held, production :9 t=1086 verified untouched all session). NO LEDGER
+ROW CLOSED (strict-close — OQ-016 r1, OQ-019 r1/r3 open). NEXT=t299 debugger
+witness (BPLM sentinel technique on the batmode legs; NO fourth mouse launch).
 
 ## LANDED t297 (2026-11-04, session 6) — LIVE ORDER-WITNESS #1 NEGATIVE,
 INSTRUMENTS FIXED, CHOREOGRAPHY RE-READ (docs/re/_wip_t297.md S1..S3 +

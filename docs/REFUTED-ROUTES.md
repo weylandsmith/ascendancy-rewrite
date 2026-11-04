@@ -450,3 +450,17 @@ MAP CLICK DESELECTS — 0x1b0d6 reads WORD [win+0xbc], 0xffff ->
 star/orbital dot pixels to select; (b) any choreography that plain-clicks the
 map after selection expecting destination entry. Ship selection requires the
 SHIP SPRITE clip, which exists only for kind-4 (in-system) ships (0x1d6bb).
+
+## t298 — FLEET-ROW-BY-ARRAY-RANK NAVIGATION IS DEAD; UNBOUNDED SCREEN FINDERS DEAD
+Row->ship mapping law was inferred, never measured; run-3 vision on the open
+FLEET window: rows top->bottom = slots 18/7/16/22 (Sparrowhawk/Erebor/
+Erchamion/Ignatz) — NOT array order, NOT name order, NOT kind order (sort law
+UNKNOWN; the only reliable row identifier is the NAME rendered in the row).
+Any future fleet-row automation must read the row name (vision or the ship
+name field record+0x34 matched against a screen read), never its position.
+Separately: screen finders without the BatModeWnd client-rect bound (x 7..465,
+y>=112) return sidebar chrome as "sprites" (run 3: (597,140),(612,259)) —
+every click aimed at them hits the sidebar. Fixed in r298_order_session.py.
+The scripted MOUSE session class is also budget-spent by standing law
+(t293 three + t297 one + t298 three): the next witness on the selection/order
+legs is the debugger class (t299), not launch #4.
