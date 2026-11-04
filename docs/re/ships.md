@@ -1351,3 +1351,60 @@ no order issued). Scripted-capture route is NOT refuted (the route rode
 flawlessly; the SELECTION step is the unsolved sub-problem), but its 3-launch
 budget is spent; any re-ask needs a NEW selection choreography candidate (e.g.
 FLEET row RIGHT-click contents menu, or ship-window button) banked first.
+
+
+---
+
+## S24 t296 (2026-11-04) — SHIP-SELECTION CHOREOGRAPHY, STATIC (OQ-019 r1 gate)
+Full evidence + verification pass: docs/re/_wip_t296.md (S1..S9). Every block
+below was re-dumped verbatim from work/t91_code_disasm.txt (140,824 lines,
+0x14bb0..0x826a5) in an independent pass.
+
+SELECTION PREDICATE (BatModeWnd handler 0x1aef8, msg 0x53 leg 0x1b6f6..0x1b737
+AND the mouse msg-4 leg 0x1b9f4..0x1ba40 — same four gates twice):
+  G1 CLIP EXISTS: the ship has an entry in the window's clip list
+     [win+0x1d2a] (count [win+0x1d32], stride 0x35) iff BYTE [ship+0x58] == 4
+     (IN-SYSTEM) — builder 0x1d6bb `cmp BYTE PTR [ebp+0x58],0x4; jne skip`,
+     entry kind := 2 @0x1d6e6, ship ptr @0x1d6e3, overflow assert
+     0x2a428(ebx=0x750,edx=0x5dc). Kind 3 = planet clip, 4/6/0xff = other
+     classes (0x1d745 leg, table 0x4348d stride 0xd, count WORD ds:0x43502).
+  G2 KIND: cmp BYTE [clip],0x2 (0x1b6fc / 0x1b9f6) — SHIP ONLY.
+  G3 OWNER: [ship+0x54]>>16 == BYTE ds:0x7458e (viewer index) @0x1b709/0x1ba16.
+  G4 MOBILITY: DWORD [ship+0x88] MOVES > 0 @0x1b716/0x1ba2c.
+  EFFECT: [batwin+0xb7] := 2 (0x1b71f msg-0x53 leg, 0x1ba39 mouse leg);
+  selected clip gets flag BYTE [clip+0x33] |= 1 @0x1d662 iff its record ==
+  ds:0x43504 (cleared for all clips on every rebuild 0x1d39c).
+
+MODE ENUM [batwin+0xb7] (store census, all verbatim): 0 idle (0x1ad41,
+0x1b114, 0x1b138, 0x1b20f, 0x1b9b4, 0x1ba5e, 0x1bafb, 0x1bf74, 0x17639),
+1 ARMED (0x1b7dd, reached by msgs 0x4d/0x4e/0x4f/0x51), 2 SELECTED (0x1b71f,
+0x1ba39), 3 ROUTE-DRAG (0x1b103), 4 transient/animating (0x17243).
+
+MOUSE ROUTE IS MSG 4 (0x1b070): bounds-check ebx,edi in [win+0x8..0x14]; if
+[win+0xaf] != 0 dispatch to 0x1b91c (batcon selected-object handler, in the
+r1-savestate E1 list) which applies G2..G4; else mode 2 + WORD [win+0xbc]
+== 0xffff -> mode := 0 (A PLAIN MAP CLICK CLEARS SELECTION), else mode := 3 +
+call 0x1bd80(win, x-[win+0x8], y-[win+0xc]).
+
+ORDER PUBLICATION: ds:0x43504 = SELECTED OBJECT (image-wide `a3 04 35 04 00`
+store census = EXACTLY {0x28ec2, 0x28ef6 cosmos star-click, 0x36b01 diplomacy
+row, 0x52003 ship order-target, 0x55d35}); ds:0x43508 = ORDER DESTINATION
+(stores EXACTLY {0x1b5e6, 0x1baa7, 0x51a8e, 0x51fc2, 0x55bbd}). msg 0x50 leg
+0x1b5ba: gate ebx >= 1 and [sel+0x58]>>16 >= ebx, then
+ds:0x43508 := [sel + 0x42 + ebx*4] (the SELECTED object's own target table)
++ command-ring post 0x56ad4(0x7a35c, code 0x11) — 0x56ad4 writes 6-byte
+{u16 code,u32 param} at [game+0x422c]+slot*6, slot = [game+0x44aa]>>16.
+0x51a8e publishes only while DWORD ds:0x484ec > 0x96 (turn gate).
+
+WHY t293 FAILED, now explained (not merely observed): the bright orbital dots
+are kind-3 PLANET clips, so G2 always took the skip leg; and even a correct
+ship clip in mode 2 answers a plain click by CLEARING selection. Selection is
+therefore NOT the unsolved sub-problem any more; the remaining unknown is the
+DESTINATION-ENTRY WIDGET that posts msg 0x50 (no widget-side poster of
+immediates 0x50/0x52/0x53 found outside the batmode family: 0x53 imm-load
+census = {0x15f3c batmode relay, 0x1f971, 0x3df34, 0x4b83a asserts};
+0x52 = {0x1724a, 0x1762c batmode, 0x3decc}).
+
+NO LEDGER ROW CLOSED t296 (strict-close): choreography is static-cited, the
+live witnesses for OQ-016 residue 1 (nuke) and OQ-019 residue 1/3 (arrival
+granularity, magnetron) still require a capture.

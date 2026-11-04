@@ -110,9 +110,17 @@ instrument P(false neg)<0.1%, t273, t285) — use-site stays static-cited
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +
-ships.md t293 block; route rides deterministic, SELECTION is the unsolved
-sub-problem — re-ask needs a new selection choreography banked first; drive
-background=true, 420 s foreground cap kills a full session); (2) per-ship build/redesign path =
+ships.md t293 block; drive background=true, 420 s foreground cap kills a full
+session). t296 CLOSED THE SELECTION SUB-PROBLEM STATICALLY (ships.md S24 +
+_wip_t296 S1..S9, every block re-dumped verbatim): four cited gates — clip
+exists iff [ship+0x58]==4 (builder 0x1d6bb), clip kind==2 (0x1b6fc/0x1b9f6),
+owner [ship+0x54]>>16==ds:0x7458e (0x1b709/0x1ba16), MOVES [ship+0x88]>0
+(0x1b716/0x1ba2c) -> [batwin+0xb7]:=2 (0x1b71f/0x1ba39); the dots are kind-3
+PLANET clips so G2 always skipped, and in mode 2 a plain map click CLEARS
+selection (0x1b114). REMAINING UNKNOWN = the destination-entry widget that
+posts msg 0x50 (ds:0x43508 := [sel+0x42+ebx*4] @0x1b5dd/0x1b5e6 + command-ring
+0x56ad4 code 0x11): no widget-side poster outside the batmode family in the
+image-wide imm census; (2) per-ship build/redesign path =
 BUILD DECISION not RE unknown (t256c census 62,762 rows, AI dossier row 16
 GAP->BOUNDARY; docs/DECISIONS.md D3); (3) magnetron witnessed use (scriptable
 via t289 drive class). | open

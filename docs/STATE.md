@@ -206,24 +206,62 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t296 SHIP-SELECTION CHOREOGRAPHY (static-first) — THE GATE BLOCKING TWO
-OPEN RESIDUES (ordering rationale: after t295 closed residue 2, the ONLY open
-non-user-ask residues are OQ-016 r1 (Phase Bomb nuke law) and OQ-019 r3
-(magnetron witness), and BOTH need a device/ability used BY a selected ship;
-t293 PROVED the naive route dead — orbital bright-dot clicks NAVIGATE (diff
-~65k), never select (REFUTED-ROUTES). Residue 5 stays HELD per t273; OQ-005 +
-OQ-019 r2 are USER ASKS. So the highest-leverage single task is the selection
-law itself.). Task: STATIC first (zero-launch, cheap): from work/ascend_payload.
-bin find the click->selection consumer of the green selection ring (t293
-observed: selected = ring kind 2, unselected kinds 3/4/5; green const 32-34
-never appeared on dot-clicks) — trace the mouse-hit tester that distinguishes
-the SHIP SPRITE hit from the STAR DOT hit and the store that arms order mode
-(t293: click3/destinations never armed it). Deliverable: cited selection
-predicate (addresses + values) into docs/re/_wip_t296.md + ships.md, and a
-scripts/r296 note of the exact click coordinates/sequence a live session must
-use; a live capture run is ONLY queued afterwards as t297 by the next session.
-CAVEATS: static only this iteration (no dosbox launch needed); never mount
-game/; production :9 read-ring-tail only.
+NEXT t297 LIVE MOVE-ORDER WITNESS via the t296 CHOREOGRAPHY (ordering
+rationale: OQ-016 r1 nuke law and OQ-019 r1/r3 (arrival granularity, magnetron)
+all gate on ONE witnessed ship order; t296 closed the SELECTION sub-problem
+statically — four cited gates, ships.md S24 — and localised the ONLY remaining
+unknown to the destination-entry widget that posts msg 0x50 (image-wide
+immediate census found no static poster; window msg handlers are registered at
+runtime, so widget discovery is inherently LIVE — a static iteration cannot
+make further progress on this row). t293's re-ask condition ("new selection
+choreography banked first") is now SATISFIED.). Task: scratch-copy session
+(NEVER mount game/; production :9 read-ring-tail only), drive class
+scripts/r293_move_session.py patterns, run
+python3 scripts/r296_selection_note.py FIRST (anchor self-check, must be OK).
+Choreography (docs/re/_wip_t296.md S9 + scripts/r296_selection_note.py doc):
+click the SHIP SPRITE (never a star dot — kind-3 planet clip, gate G2 skips)
+inside BatModeWnd client rect 7,7..465,472 with mode 0; VERIFY selection by
+reading u32 at guest-phys B+0x43504 (pointer law; r1_slot.py OFF=0x82bb0 is
+the ship-record array, NOT this global) — non-null and record owner byte
++0x56 == 0. Then DISCOVER the msg-0x50 widget: candidates BatListWnd
+(474,142..632,394, SHAPEFILE 16BATTLE.SHP) row click / right-click contents
+menu; after each candidate, re-read ds:0x43508 and the command ring
+([game+0x422c]+slot*6, code 0x11) — a change PROVES the widget. Do NOT
+plain-click the map in mode 2 (0x1b114 deselects). Witness instrument: owner-0
+kind census, kind 2 == issued move order (baseline {3,4,5}, clean signal).
+End Turn x2 + Escape popup drain (t245/t293 law). Drive background=true (420 s
+foreground cap kills a full session). If no widget posts 0x50 after a
+cited-dead-end census of BatListWnd interactions, write the honest negative,
+keep rows open, and queue the debugger-poke alternative (t290/t291 class) as
+t298.
+
+## LANDED t296 (2026-11-04, session 5) — SELECTION CHOREOGRAPHY CLOSED
+STATICALLY (ships.md S24 + docs/re/_wip_t296.md S1..S9; every quoted block
+re-dumped VERBATIM from work/t91_code_disasm.txt, 140,824 lines, in an
+independent verification pass; 11 machine-checkable anchors pinned in
+scripts/r296_selection_note.py, ANCHORS OK 11/11 vs payload 576,643 B).
+THE LAW: a click selects a ship iff G1 clip exists (built iff BYTE
+[ship+0x58]==4 in-system, builder 0x1d6bb, clip kind:=2 @0x1d6e6, stride 0x35,
+overflow assert 0x2a428 ebx=0x750 edx=0x5dc), G2 clip kind==2 (0x1b6fc msg-0x53
+leg / 0x1b9f6 mouse leg), G3 owner [ship+0x54]>>16 == BYTE ds:0x7458e
+(0x1b709/0x1ba16), G4 MOVES [ship+0x88]>0 (0x1b716/0x1ba2c) -> [batwin+0xb7]:=2
+(0x1b71f/0x1ba39); MODE ENUM 0 idle/1 armed (0x1b7dd via msgs 0x4d-0x51)/2
+selected/3 route-drag (0x1b103)/4 transient (0x17243). MOUSE IS MSG 4 (0x1b070)
+-> 0x1b91c, NOT the internal relay msg 0x53 (0x15f3c posts it). WHY t293 failed,
+now EXPLAINED not merely observed: dots are kind-3 PLANET clips (G2 skip leg)
+AND a mode-2 plain map click DESELECTS (WORD [win+0xbc]==0xffff -> 0x1b114).
+PUBLICATION: ds:0x43504 selected-object (store census EXACTLY {0x28ec2,0x28ef6,
+0x36b01,0x52003,0x55d35}), ds:0x43508 order-destination ({0x1b5e6,0x1baa7,
+0x51a8e,0x51fc2,0x55bbd}); msg 0x50 leg 0x1b5ba publishes
+ds:0x43508 := [sel+0x42+ebx*4] + command-ring 0x56ad4(0x7a35c, code 0x11) =
+6B {u16,u32} at [game+0x422c]+slot*6. CORRECTIONS banked: viewer global is
+0x7458e not 0x7458c; 0x1aef8 has ZERO immediate references (registered, not
+referenced — BatModeWnd attribution rests on windows.txt + r1-savestate E1
+list); S1's two `89`-form 0x43504 writers unconfirmed, drop them. HONEST
+NEGATIVES: msg-0x50 TRIGGER WIDGET unidentified (statically unreachable);
+screen->world camera unmapped; NO LEDGER ROW CLOSED (strict-close — OQ-016 r1,
+OQ-019 r1/r3 stay open pending live witness). Pure-static iteration; :9
+untouched. NEXT=t297 live move-order witness via the r296 choreography.
 
 ## LANDED t295 (2026-11-04, session 4) — HOME-STAR DRAW LAW CLOSED
 (OQ-016 residue 2, MEASURED). FUN_00022ce4 0x22eb4..0x22f55 = the draw: per

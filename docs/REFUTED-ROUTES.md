@@ -437,3 +437,16 @@ fire path dies post-restore" — all SUPERSEDED by the corrected positive
 ring FREEZES at the last autosave before a fire (CPU stopped), so stack dumps
 read from the ring around a fire are STALE — bank registers via EV over the
 socket. Full account docs/re/_wip_t286b.md + dosbox-debugger.md t286b.
+
+
+## t296 — CLICKING STAR DOTS TO SELECT A SHIP IS DEAD, AND NOW PROVEN SO
+t293's three launches (dot-clicks navigate, never select) were OBSERVATION;
+t296 cites the mechanism (ships.md S24): the orbital bright dots are kind-3
+PLANET clips, and BOTH selection legs test `cmp BYTE [clip],0x2; jne skip`
+(0x1b6fc msg-0x53, 0x1b9f6 mouse msg-4) — a planet clip can NEVER select.
+Second binding negative from the same pass: in mode 2 (ship selected) a PLAIN
+MAP CLICK DESELECTS — 0x1b0d6 reads WORD [win+0xbc], 0xffff ->
+`mov BYTE PTR [win+0xb7],0x0` @0x1b114. DEAD: (a) any route that aims at
+star/orbital dot pixels to select; (b) any choreography that plain-clicks the
+map after selection expecting destination entry. Ship selection requires the
+SHIP SPRITE clip, which exists only for kind-4 (in-system) ships (0x1d6bb).
