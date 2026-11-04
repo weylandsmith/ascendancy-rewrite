@@ -1408,3 +1408,46 @@ census = {0x15f3c batmode relay, 0x1f971, 0x3df34, 0x4b83a asserts};
 NO LEDGER ROW CLOSED t296 (strict-close): choreography is static-cited, the
 live witnesses for OQ-016 residue 1 (nuke) and OQ-019 residue 1/3 (arrival
 granularity, magnetron) still require a capture.
+
+## S25 t297 (2026-11-04) — LIVE ORDER-WITNESS SESSION #1: NEGATIVE, with two
+binding instrument corrections (full autopsy docs/re/_wip_t297.md S3).
+Run work/r1/t297-order-20261104-152048 (scratch game-wp, private Xvfb :97,
+production :9 verified untouched). Drive class scripts/r297_order_session.py
+(subclasses the r293 session; adds full-RAM XOR byte-run diff, cluster
+flood-finder, ship-record pointer scan). Turns advanced 1086->1088; NO kind-2
+ship EVER appeared; no order issued. HONEST NEGATIVE, rows stay open.
+
+CORRECTION T297-A (MEASURED, production ring 52-54.sav + scratch run, both
+agree): ds:0x43504 and ds:0x43508 live at guest-phys B + 0x82bb0 + X — the
+r1_slot.OFF data-segment base, like every other DAT scalar. The t296 pin sheet
+(r296_selection_note.py "plain RAM at B + 0x43504") is OFF BY 0x82bb0 and
+reads garbage (constant 0x1de8c031). Correct readings, production idle t=1086:
+ds:0x43504 = 0x256825 NON-NULL WHILE IDLE (target bytes all zero) and
+ds:0x43508 = 0x26fe77 -> 0x26f00d CHANGING WITHOUT INPUT — both globals are
+written outside the selection/order path (the 0x51a8e/0x51fc2 writers t296
+cited), so NEITHER is a clean standalone selection/order witness; use them
+only as baseline-vs-delta pairs around a click.
+
+CORRECTION T297-B (MEASURED): the batmode/batcon window INSTANCE is not
+findable by handler-pointer scan: u32 0x1aef8 occurs ZERO times in payload and
+RAM; u32 0x1b91c occurs in RAM only at 0x22cac1/0x22eb3b, whose B-relative
+offsets equal their PAYLOAD FILE offsets (0x6d5e9/0x6f663) — that region is a
+verbatim payload-image copy (window-class TEMPLATE table), not the live
+object. [win+0xaf]/[+0xb3]/[+0xb7]/[+0xbc] remain UNPINNED in guest RAM;
+t298 route = walk the template-record neighbourhood for a heap-pointing u32
+(instance pointer), or title-vs-in-system RAM delta.
+
+INSTRUMENT LAW (t293 lesson REINFORCED): the FLEET row-1 row-jump lands on the
+FIRST-LISTED ship, which may fail the owner gate (this run's ring-picked
+"target" was an OWNER-1 ship — the candidate filter tested kind==4 & MOVES>0
+but NOT owner==0, G3 — so selection was impossible BY LAW and the battery was
+dead on arrival). Destination clicks on the planet blob did nothing
+observable (3340 RAM runs identical to the animation baseline band
+0x4f4/0x57a/0xa4xx/0xa6xx — the ONLY idle churn). Ship-sprite targeting must
+use COLOUR CLASSES (tan/gold hull R>150,G>110,B<90), exclude the top icon
+strip y<112, and the target must be RING-VERIFIED owner-0 kind-4 MOVES>0
+(r293.ring_mem_rows recs are keyed by TRUE ship-array index; the owner==0
+filter belongs in the PICKER — fixed in r297_order_session.py same session).
+
+NO LEDGER ROW CLOSED t297 (strict-close): OQ-016 residue 1, OQ-019 residues
+1/3 stay open pending a witnessed order.

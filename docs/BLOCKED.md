@@ -66,14 +66,19 @@ per-ship sim (t256c census, 62,762 trusted rows). AI dossier row 16 relabelled
 GAP->BOUNDARY PERMANENTLY. This is a BUILD decision, not an RE unknown:
 docs/DECISIONS.md D3.
 
-### Scripted-move capture (t48/t49 route) — LIVE, running as task t293
+### Scripted-move capture (t48/t49 route) — LIVE, t298 owns the next launch
 Historical: the corpus CANNOT supply flight (t49: 484 saves, zero state-4, zero
 movement, zero item-23 landings; t58 scripted-fresh null too), and st4 is a
 DWELL state invisible at 10 s ring cadence (t265 law). The route that closes
 OQ-019's sugar-cube residue is ONE scripted session: click own ship, click
 lane-adjacent destination, End-Turn x2, read per-autosave coords from the ring.
-Capability now exists (t289 drive class + t292 scratch-session law). Do NOT
-re-run corpus mining for this — t49/t58/t265 closed that class three times.
+Capability proven end-to-end t297 (drive plumbing clean; session died at its
+own picker bug — owner==0 filter, fixed). The live choreography authority is
+docs/re/_wip_t297.md S1 (msg-4 router re-read) + ships.md S24/S25; the driver
+is scripts/r297_order_session.py (venv python!). GATE: End Turn ONCE before
+picking (owner-0 fleet has no kind-4 ship at t=1086; slot 8 lands at t=1087).
+Do NOT re-run corpus mining for this — t49/t58/t265 closed that class three
+times.
 
 ## R1 runbook (mandatory safety invariants — a run without them is a bug)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base B; NEVER hard-code

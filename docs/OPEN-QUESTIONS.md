@@ -120,7 +120,22 @@ PLANET clips so G2 always skipped, and in mode 2 a plain map click CLEARS
 selection (0x1b114). REMAINING UNKNOWN = the destination-entry widget that
 posts msg 0x50 (ds:0x43508 := [sel+0x42+ebx*4] @0x1b5dd/0x1b5e6 + command-ring
 0x56ad4 code 0x11): no widget-side poster outside the batmode family in the
-image-wide imm census; (2) per-ship build/redesign path =
+image-wide imm census; t297 re-read the msg-4 ROUTER 0x1b070..0x1b0d6
+(verbatim, _wip_t297 S1/S2): a non-null [win+0xaf] routes EVERY click to the
+batcon handler 0x1b91c(ecx=1) BEFORE the mode-2 deselect branch, and the
+0x1ba8c leg publishes ds:0x43508 + ring code 0x11 directly at mode 0 — the
+mouse route MAY reach publication with NO msg-0x50 widget. LIVE SESSION #1
+t297 (work/r1/t297-order-20261104-152048, scripts/r297_order_session.py)
+NEGATIVE: picker bug aimed it at an owner-1 ship (owner==0 filter missing —
+fixed same-session), no kind-2 ever appeared. MEASURED corrections T297-A: ds
+globals live at B+0x82bb0+X NOT B+X, and BOTH have non-order writers (0x43504
+= 0x256825 non-null at idle t1086; 0x43508 churns without input) -> DELTA-only
+witnesses. T297-B: batwin INSTANCE unpinned (u32 0x1aef8 zero refs in RAM;
+0x1b91c only inside a verbatim payload-image copy at 0x22cac1/0x22eb3b).
+GATING FACT: at t=1086 owner 0 has NO kind-4 ship (11 ships, kinds {3,5}) —
+nothing is selectable; slot 8 becomes kind-4 MOVES=12 at t=1087 (the t293 5->4
+lander) -> t298 MUST End-Turn ONCE before picking, target slot 8, and find the
+sprite by COLOUR CLASS (ships.md S25). (2) per-ship build/redesign path =
 BUILD DECISION not RE unknown (t256c census 62,762 rows, AI dossier row 16
 GAP->BOUNDARY; docs/DECISIONS.md D3); (3) magnetron witnessed use (scriptable
 via t289 drive class). | open

@@ -29,12 +29,15 @@ CLICK GEOMETRY (live session):
 
 VERIFICATION AFTER THE CLICK (ring-readable, no debugger):
   ds:0x43504 (SELECTED OBJECT POINTER) is plain RAM at guest-phys
-  B + 0x43504 (pointer law, scripts/r1_pointer_law.py; scripts/r1_slot.py's
-  OFF = 0x82bb0 is the SHIP-RECORD array base, a different table — do not
-  conflate). Read u32 there: non-null AND the record it points at has owner
-  index (byte +0x56, t273 law) == 0 for viewer 0. BYTE [batwin+0xb7] is a
-  window-object field and is NOT reachable by the pointer law from the ring —
-  verify selection through ds:0x43504 only.
+  B + 0x82bb0 + 0x43504 — the r1_slot.OFF data-segment base, like every other
+  DAT scalar. [t297 CORRECTION, measured: the earlier note here said
+  "B + 0x43504", which is off by 0x82bb0 and reads garbage (constant
+  0x1de8c031).] t297 ALSO measured production idle idle t=1086: ds:0x43504 =
+  0x256825 NON-NULL while nothing is selected and ds:0x43508 changes WITHOUT
+  INPUT — both globals have non-order writers (0x51a8e/0x51fc2), so use them
+  ONLY as baseline-vs-delta pairs around a click, never as absolute
+  witnesses. BYTE [batwin+0xb7] is a window-object field; the batwin INSTANCE
+  is not yet pinned in guest RAM (handler-pointer scan dead, t297-B).
 
 ORDER PUBLICATION (the still-open half):
   msg 0x50 leg 0x1b5ba: gate param ebx >= 1 and [sel+0x58]>>16 >= ebx, then

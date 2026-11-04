@@ -206,34 +206,64 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t297 LIVE MOVE-ORDER WITNESS via the t296 CHOREOGRAPHY (ordering
-rationale: OQ-016 r1 nuke law and OQ-019 r1/r3 (arrival granularity, magnetron)
-all gate on ONE witnessed ship order; t296 closed the SELECTION sub-problem
-statically — four cited gates, ships.md S24 — and localised the ONLY remaining
-unknown to the destination-entry widget that posts msg 0x50 (image-wide
-immediate census found no static poster; window msg handlers are registered at
-runtime, so widget discovery is inherently LIVE — a static iteration cannot
-make further progress on this row). t293's re-ask condition ("new selection
-choreography banked first") is now SATISFIED.). Task: scratch-copy session
-(NEVER mount game/; production :9 read-ring-tail only), drive class
-scripts/r293_move_session.py patterns, run
-python3 scripts/r296_selection_note.py FIRST (anchor self-check, must be OK).
-Choreography (docs/re/_wip_t296.md S9 + scripts/r296_selection_note.py doc):
-click the SHIP SPRITE (never a star dot — kind-3 planet clip, gate G2 skips)
-inside BatModeWnd client rect 7,7..465,472 with mode 0; VERIFY selection by
-reading u32 at guest-phys B+0x43504 (pointer law; r1_slot.py OFF=0x82bb0 is
-the ship-record array, NOT this global) — non-null and record owner byte
-+0x56 == 0. Then DISCOVER the msg-0x50 widget: candidates BatListWnd
-(474,142..632,394, SHAPEFILE 16BATTLE.SHP) row click / right-click contents
-menu; after each candidate, re-read ds:0x43508 and the command ring
-([game+0x422c]+slot*6, code 0x11) — a change PROVES the widget. Do NOT
-plain-click the map in mode 2 (0x1b114 deselects). Witness instrument: owner-0
-kind census, kind 2 == issued move order (baseline {3,4,5}, clean signal).
-End Turn x2 + Escape popup drain (t245/t293 law). Drive background=true (420 s
-foreground cap kills a full session). If no widget posts 0x50 after a
-cited-dead-end census of BatListWnd interactions, write the honest negative,
-keep rows open, and queue the debugger-poke alternative (t290/t291 class) as
-t298.
+NEXT t298 LIVE MOVE-ORDER WITNESS #2 — FIXED PICKER, CORRECT GATES (ordering
+rationale: t297 proved the drive plumbing end-to-end (title->campaign->fleet
+jump->turns 1086->1088->clean cleanup, production :9 untouched) yet issued
+nothing because of ONE own bug — the candidate picker omitted owner==0 — and
+surfaced two MEASURED facts that change the choreography: (a) at t=1086 owner
+0 has NO kind-4 ship (kinds {3,5} only), so G1 makes selection IMPOSSIBLE
+until one lands: slot 8 becomes owner-0 kind-4 MOVES=12 at t=1087 (verified in
+the run ring); (b) the msg-4 router sends EVERY click to batcon 0x1b91c when
+[win+0xaf] is non-null, and the 0x1ba8c leg publishes ds:0x43508 + command-ring
+code 0x11 at mode 0 with NO msg-0x50 widget — so the mouse route is viable
+after all. One launch is in budget (t293 spent its own 3; t297 spent 1 of the
+fresh allotment). Task: run scripts/r297_order_session.py (fixed in place:
+owner==0 filters, DELTA-based check_issue, correct B+0x82bb0+X global reads)
+with these CHANGES first: (1) after enter_campaign + drain, End Turn ONCE
+(verified-advance law) so slot 8 lands kind-4; (2) re-verify candidate list
+from the NEWEST ring rows (owner-0 kind-4 MOVES>0 — expect slot 8); (3) ship
+SPRITE finder by COLOUR CLASS (tan/gold hull R>150 G>110 B<90; exclude icon
+strip y<112), NOT luminance (t297 clusters merged planet+chrome); (4) witness
+= kind-2 census + ds:0x43504/0x43508 DELTAS vs the fresh post-End-Turn
+baseline (globals churn — absolute reads are meaningless, T297-A) + full-RAM
+run diff; (5) click battery per _wip_t297 S1: select sprite -> then
+right-click empty (0x1ba45/0x1ba8c publish leg) BEFORE any left-click on
+objects (a left-click routes through 0x1b91c and the dl==3 planet leg RELAYS
+0x326 + mode:=0, destroying the selection). Scratch copy game-wp, private Xvfb
+(:97 worked; production :9 read-ring-tail only), background=true, venv python
+(PIL law, BLOCKED trap banked). If kind-2 appears and the watched slot moves
+with order evidence across a turn boundary: bank the flight measurement
+(d_vs_walk law, OQ-019 residue 1 closes with the arithmetic) and queue the
+magnetron + nuke witnesses (residues 3/1) on the SAME choreography. If
+selection again shows NO observable delta anywhere: the honest negative goes
+to ships.md S25 followup and t299 = debugger-poke class (t290/t291 precedent:
+docs/re/dosbox-debugger.md) — do NOT launch a third mouse session.
+
+## LANDED t297 (2026-11-04, session 6) — LIVE ORDER-WITNESS #1 NEGATIVE,
+INSTRUMENTS FIXED, CHOREOGRAPHY RE-READ (docs/re/_wip_t297.md S1..S3 +
+ships.md S25; run work/r1/t297-order-20261104-152048). MEASURED: msg-4 router
+0x1b070 dispatches on [win+0xaf] NON-NULL -> batcon 0x1b91c(ecx=1) BEFORE the
+mode-2 branch; [win+0xbc] writer census = {0x1ad59 init 0xffff, 0x1c9a0
+kind-6 route-edit leg} so the t296 deselect reading holds only on the
+null-selection path; the 0x1ba8c leg = mouse-reachable ORDER PUBLICATION
+(ds:0x43508 := [[clip+1]] + ring code 0x11 @0x56ad4) without any msg-0x50
+widget. CORRECTIONS (binding): T297-A ds:0x43504/0x43508 at B+0x82bb0+X (the
+r1_slot.OFF data base — the t296 pin sheet was off by 0x82bb0 and read
+constant garbage); BOTH globals have non-order writers (0x43504 = 0x256825
+non-null at idle; 0x43508 changes between autosaves with zero input) ->
+DELTA-only witnesses; T297-B batwin instance NOT findable via handler-ptr
+scan (0x1aef8 zero u32 refs in payload+RAM; 0x1b91c only at 0x22cac1/0x22eb3b
+= verbatim payload-image copy). GATING FACT: t=1086 owner-0 fleet has NO
+kind-4 ship (11 ships kinds {3,5}); slot 8 kind-4 MOVES=12 at t=1087. Own-bug
+autopsy: picker omitted owner==0 (clicked fleet row-1 = owner 1, G3 dead);
+check_issue read the wrong-address global absolute -> false "issued". FIXED
+same-session in scripts/r297_order_session.py + r293_move_session.py (idx
+field); r296_selection_note.py doc corrected. TOOL TRAPS banked: drive scripts
+need venv python (system 3.13 lacks PIL); pgrep -f self-match again. NO LEDGER
+ROW CLOSED (strict-close — OQ-016 r1, OQ-019 r1/r3 stay open pending the
+witness). Production :9 alive and untouched (turn 1086 pinned all session).
+NEXT=t298 fixed-picker witness session (End-Turn once first, target slot 8,
+colour-class sprite, right-click-empty publish leg).
 
 ## LANDED t296 (2026-11-04, session 5) — SELECTION CHOREOGRAPHY CLOSED
 STATICALLY (ships.md S24 + docs/re/_wip_t296.md S1..S9; every quoted block

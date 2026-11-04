@@ -289,6 +289,8 @@ class Session:
                     if r + SL.SHIP["stride"] > len(mem):
                         break
                     recs[k] = dict(
+                        idx=k,   # t297: TRUE ship-array index — dict keys are
+                                 # owner-0-subset positions, NOT array indices
                         owner=struct.unpack_from("<I", mem, r + 0x54)[0] >> 16,
                         kind=mem[r + 0x58],
                         design=struct.unpack_from("<I", mem, r + 0x10)[0],
