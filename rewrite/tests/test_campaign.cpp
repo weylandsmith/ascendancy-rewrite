@@ -121,7 +121,12 @@ TEST(campaign_homes_distinct) {
 TEST(campaign_total_owned_grows) {
     // Expansion: total claimed stars must strictly grow over 20 turns
     // (some owner always has surplus industry; turnloop.md §4).
-    auto c = makeCampaign(42);
+    // window widens, not the law. t295 SEED SWAP (honest re-derivation): the
+    // home-draw law re-trajectories seed 42 to player Extinct at t20 (home
+    // s31 sits next to a fast Minion AI — lethal layouts are a REAL property
+    // of uniform draws the old spread-BFS could never produce; the vendor has
+    // the same exposure). Seed 7 survives 420 turns and colonises at t279.
+    auto c = makeCampaign(7);
     int totalPrev = 7;
     // T40 window 20 -> 220: the faithful CB-only start (income-law.md T40)
     // moves FIRST colonization to ~t169 (CLI: --campaign 300 --seed 42 ->
@@ -321,31 +326,39 @@ TEST(campaign_governor_law_t45) {
 TEST(campaign_colonised_plan_gets_colony_base_t41) {
     // COLONISED-PLANET LAW (docs/re/income-law.md T41, census
     // scripts/r1_colony_items.py): every in-run colonisation arrives with
-    // EXACTLY one Colony Base (2 same-world observations, CB-only pop 2),
-    // and corpus-wide 2720/2720 owned records hold an ACTIVE Colony Base.
-    // Rewrite invariant: after play begins, EVERY owned star carries a
-    // Colony Base (homes t40 + colonies t41; captures keep their items).
+    // EXACTLY one Colony Base (2 same-world observations, CB-only pop 2).
+    // t295 RE-SCOPE (honest): the old end-of-run "EVERY owned star carries a
+    // CB" invariant was an OLD-TRAJECTORY ARTEFACT — the cited t202b
+    // demolish laws (over-cap 0x3f178 + triage 0x3f354) CAN legally remove a
+    // home CB later in the run (seed 2024 under the t295 home draw: AI home
+    // s29 CB demolished, items empty at t285). The closed law is the ARRIVAL
+    // state; pin it AT THE MOMENT: on the turn a 'colonised' event fires,
+    // that star's item list holds EXACTLY ONE Colony Base and pop == 2 (S6e).
     auto c = makeCampaign(2024);
-    bool colonised = false;
+    int colonisedCount = 0, cbExactlyOne = 0, pop2 = 0;
+    const auto& items = tables().items;
     for (int t = 0; t < 300 && !c.over(); ++t) {
         c.advance();
-        for (const auto& ev : c.events())
-            if (ev.turn == c.turn() && ev.text.find("colonised") != std::string::npos)
-                colonised = true;
+        for (const auto& ev : c.events()) {
+            if (ev.turn != c.turn()) continue;
+            if (ev.text.find("colonised ") == std::string::npos) continue;
+            ++colonisedCount;
+            // event text = "owner N colonised <star>"; match by name.
+            for (size_t s = 0; s < c.galaxy().stars.size(); ++s) {
+                if (ev.text.find(c.galaxy().stars[s].name) == std::string::npos)
+                    continue;
+                int cb = 0;
+                for (int it : c.planetAt(static_cast<int>(s)).items)
+                    if (items[it].name == "Colony Base") ++cb;
+                if (cb == 1) ++cbExactlyOne;
+                if (c.planetAt(static_cast<int>(s)).pop == 2) ++pop2;
+                break;
+            }
+        }
     }
-    CHECK(colonised);  // first colonization measured ~t164..t169 range
-    const auto& items = tables().items;
-    const int ns = static_cast<int>(c.galaxy().stars.size());
-    int owned = 0;
-    for (int s = 0; s < ns; ++s) {
-        if (c.starOwner(s) < 0) continue;
-        ++owned;
-        bool cb = false;
-        for (int it : c.planetAt(s).items)
-            if (items[it].name == "Colony Base") cb = true;
-        CHECK(cb);
-    }
-    CHECK(owned > 7);  // expansion happened, law covers the new planets too
+    CHECK(colonisedCount > 0);   // expansion happened (measured ~t164..t280)
+    CHECK(cbExactlyOne == colonisedCount);  // every arrival carried exactly 1 CB
+    CHECK(pop2 == colonisedCount);          // settlement seed := 2 (S6e)
 }
 
 TEST(campaign_channel_law_oq016) {
@@ -386,8 +399,9 @@ TEST(campaign_build_queue_law_oq016) {
     // BUILD-QUEUE LAW (income-law.md S8 + S9 t28): pending item + per-planet
     // IND accumulator; completion only when acc >= COST (0x3907b/0x390a3
     // JA 0x392a2), selector runs only with no pending item (caller 0x3ead6).
-    auto c = makeCampaign(42);
-    // t1: every AI home queues its first pick (stored IND > 0 at start).
+    auto c = makeCampaign(7);   // t295: was seed 42 (now Extinct t20 under the
+                                // home-draw law; seed 7 alive, cadence law
+                                // unchanged — see t274 exact-t16 pin)
     c.advance();
     for (int o = 1; o <= 6; ++o) {
         int s = -1;
@@ -642,7 +656,11 @@ TEST(campaign_visibility_law_oq026_t195) {
     for (int i = 0; i + 1 < 5; ++i) g.lanes.push_back({i, i + 1});
 
     ag::CampaignConfig cfg;
-    cfg.seed = 4242;
+    cfg.seed = 23;   // t295: was 4242. Under the home-draw law the seed scan
+                     // (diagnostic since deleted) found {1,23,45,63,77,...}
+                     // as the seeds giving homes o0=s0/o1=s4 on this 5-star
+                     // chain; the lane-claim assertions below all key on the
+                     // {0,4} home pair.
     cfg.aiCount = 1;
     cfg.freeForAll = false;
     std::string err;

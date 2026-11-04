@@ -136,6 +136,9 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     // discipline). Initial state := cfg.seed [inferred; the original's
     // seed-injection path is unmeasured].
     worldLcg_ = static_cast<uint32_t>(cfg.seed);
+    // t295: isolated home-draw stream (same form, different seed salt so the
+    // streams never alias; pickHomeStars is the SOLE consumer).
+    homeLcg_ = static_cast<uint32_t>(cfg.seed) ^ 0x295u;
     auto next = [this]() { return worldNext(); };
     {
         // t294 (OQ-016 residue 3 CLOSED): the rows below are NO LONGER a
@@ -301,39 +304,37 @@ int Campaign::itemId(const std::string& name) const {
 }
 
 void Campaign::pickHomeStars() {
-    // Deterministic spread: each new home maximises min graph-distance to the
-    // already-assigned homes (BFS hops), tie -> lowest star id. [documented]
+    // HOME-STAR DRAW LAW t295 (OQ-016 residue 2 CLOSED; docs/re/income-law.md
+    // S-T295, disasm FUN_00022ce4): per race r = 0..races-1 IN RACE ORDER,
+    // loop { ONE rng draw; k = draw % T } until star k is unclaimed
+    // (byte[entry+0x14]==0 gate 0x22ee0), then store row_r+0xd = entry(k)
+    // (0x22edd) and mark entry+0x14 := 0x80|(1<<r). UNIFORM rejection
+    // sampling over ALL T stars -> distinct by construction; NO spread
+    // geometry (the deterministic max-min BFS this replaces was a
+    // documented MISMATCH, never measured). Census scripts/r295_home_draw.py:
+    // exact-equal marker 30/30 at turn<=2, distinct 36/36 lineages, index
+    // chi2=31.0 (df=49, crit 74.9) NOT rejecting uniformity.
+    // Draw stream: ONE dedicated LCG (homeLcg_, same FUN_0x7824f form) per
+    // attempt. The vendor's setup draws ride its world-generation stream and
+    // 0x22ce4 runs BEFORE 0x238e8 in the setup chain 0x2142e/0x21438 (homes
+    // first), but the exact interleave/seed-injection is UNMEASURED, so the
+    // rewrite keeps an isolated stream (t195 visLcg_ precedent: it provably
+    // cannot perturb the terrain worldLcg_ or campaign rng_ sequences). The
+    // closed law is the DISTRIBUTION (uniform, race-ordered, distinct), not
+    // the stream position.
     const int n = static_cast<int>(galaxy_.stars.size());
-    std::vector<int> assigned;
     const int owners = cfg_.aiCount + 1;
+    std::vector<char> taken(n, 0);
+    std::vector<int> assigned;
+    assigned.reserve(owners);
     for (int o = 0; o < owners; ++o) {
-        int best = -1;
-        int bestMin = -1;
-        for (int s = 0; s < n; ++s) {
-            if (std::find(assigned.begin(), assigned.end(), s) != assigned.end()) continue;
-            int mind = std::numeric_limits<int>::max();
-            for (int a : assigned) {
-                // BFS hop distance
-                std::vector<int> dist(n, -1);
-                std::vector<int> q{a};
-                dist[a] = 0;
-                for (size_t h = 0; h < q.size(); ++h) {
-                    for (int nb : galaxy_.neighbours(q[h]))
-                        if (dist[nb] < 0) { dist[nb] = dist[q[h]] + 1; q.push_back(nb); }
-                }
-                mind = std::min(mind, dist[s]);
-            }
-            if (assigned.empty()) {
-                if (bestMin < 0) { bestMin = 0; best = s; }  // first home: lowest id
-                continue;
-            }
-            if (mind > bestMin || (mind == bestMin && (best < 0 || s < best))) {
-                bestMin = mind;
-                best = s;
-            }
-        }
-        owner_[best] = o;
-        assigned.push_back(best);
+        int k;
+        do {
+            k = homeNext() % n;    // draw % T @0x22ec7 (idiv remainder)
+        } while (taken[k]);        // rejection gate @0x22ee0 (owner byte != 0)
+        taken[k] = 1;
+        owner_[k] = o;             // entry+0x14 |= (1<<r) analog
+        assigned.push_back(k);
     }
     homeStar_ = assigned;  // fixed at setup; Captured tests these ids (§1)
 }
@@ -549,6 +550,12 @@ int Campaign::worldNext() {
     // value = (state >> 16) & 0x7fff (income-law.md S10 t29b).
     worldLcg_ = worldLcg_ * 0x41C64E6Du + 0x3039u;
     return static_cast<int>((worldLcg_ >> 16) & 0x7fffu);
+}
+
+int Campaign::homeNext() {
+    // t295: same FUN_0007824f form on the isolated homeLcg_ stream.
+    homeLcg_ = homeLcg_ * 0x41C64E6Du + 0x3039u;
+    return static_cast<int>((homeLcg_ >> 16) & 0x7fffu);
 }
 
 void Campaign::seedColonyBaseColony(int star) {

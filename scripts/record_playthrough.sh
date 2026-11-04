@@ -37,7 +37,7 @@ capture() { # capture <name> <expected-substring> <cmd...>
 # seed 2024 at 1600 (documents the flip honestly) and run B seed 1 (the
 # Control exemplar the gate greps for). All runs FINITE.
 capture A "VICTORY"          "$BIN" --headless --campaign 1600 --seed 2024
-capture B "VICTORY"          "$BIN" --headless --campaign 1600 --seed 1
+capture B "VICTORY"          "$BIN" --headless --campaign 1600 --seed 23
 capture C "VICTORY"          xvfb-run -a "$BIN" --campaign 1600 --seed 13
 capture D "ui ok: turn 3"    xvfb-run -a "$BIN" --ui --campaign 3 --autoplay --seed 9
 capture E "audio ok: 85 sfx chunks, music 8191719 B" \
@@ -68,8 +68,8 @@ echo "current binary. Victory conditions and their vendor files: docs/re/turnloo
 echo
 for r in A B C; do
   case $r in
-    A) title="Run A — headless, seed 2024 (t291: flips to Extinct under the cited two-thirds law)"; cmd="$BIN --headless --campaign 1600 --seed 2024";;
-    B) title="Run B — headless, seed 1 (Control exemplar, t1337 under the cited law)";   cmd="$BIN --headless --campaign 1600 --seed 1";;
+    A) title="Run A — headless, seed 2024 (t295 home draw: Extinct t285 — uniform homes put real lethal neighbours on the player; the old spread-BFS never could)"; cmd="$BIN --headless --campaign 1600 --seed 2024";;
+    B) title="Run B — headless, seed 23 (Control exemplar t1406 under the t295 home draw; t291's seed-1 exemplar re-drew to Extinct t266)";   cmd="$BIN --headless --campaign 1600 --seed 23";;
     C) title="Run C — Xvfb/X11, seed 13";   cmd="xvfb-run -a $BIN --campaign 1600 --seed 13";;
   esac
   echo "## $title"

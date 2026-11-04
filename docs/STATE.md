@@ -206,33 +206,46 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t295 OQ-016 RESIDUE 2 — SETUP-TIME HOME-DRAW LAW VIA DEBUGGER SESSION
-(ordering rationale: with t294 closed, the remaining non-user-ask routes split
-two ways — the nuke law (OQ-016 r1) and magnetron witness (OQ-019 r3) BOTH now
-depend on the UNSOLVED ship-selection choreography that killed t293 (each
-needs a device/ability used BY a selected ship), and residue 5 is HELD per
-t273; OQ-005 + OQ-019-r2 are USER ASKS (D1/D3, do not rule). The home-draw
-route is the ONLY open-row route that needs no ship selection: scenario-init
-runs at new-game before any fleet exists, and the debugger toolchain is
-PROVEN — the master-built dosbox-x (docs/re/dosbox-debugger.md) closed OQ-021
-exactly this way.) Task: on a SCRATCH new-game session (own dir, NO
-resume.gam so FUN_00037d80 + the scenario-init loop 0x23a20..0x23d22 run;
-scripts/r290_poke_session.py skeleton; HARNESS LAW: background=true
-notify=true, 420 s foreground cap kills a full session), BPLM-sentinel the
-loop and answer ONE question: WHICH rng draw (stream position + modulus)
-picks each race's home star — i.e. the consumer path from CALL 0x7824f to the
-home-star store (t270 measured the JOIN DWORD[0x12e1d+race*0x1ee] == star
-base NAME-0x1C; the draw law is the gap; t30c proved it is run-local uniform
-over candidate stars, 11 distinct sets/11 lineages). CAVEATS: scratch copies
-only, never mount game/; production :9 is the corpus (read ring tail only);
-NEVER replaces /usr/bin/dosbox-x; kill-by-recorded-PID (BLOCKED runbook); if
-the loop is reached but the draw-to-store chain is ambiguous in Ghidra output,
-bank the raw register trace and stop (one session, no spiral). Closure = cited
-draw law (addresses + live values) -> upgrade rewrite pickHomeStars
-(campaign.cpp:301, currently a documented MISMATCH: deterministic max-min BFS
-instead of the vendor draw) + pin. If the session dies on harness mechanics
-twice, bank the negative and queue the residue back to BLOCKED.
+NEXT t296 SHIP-SELECTION CHOREOGRAPHY (static-first) — THE GATE BLOCKING TWO
+OPEN RESIDUES (ordering rationale: after t295 closed residue 2, the ONLY open
+non-user-ask residues are OQ-016 r1 (Phase Bomb nuke law) and OQ-019 r3
+(magnetron witness), and BOTH need a device/ability used BY a selected ship;
+t293 PROVED the naive route dead — orbital bright-dot clicks NAVIGATE (diff
+~65k), never select (REFUTED-ROUTES). Residue 5 stays HELD per t273; OQ-005 +
+OQ-019 r2 are USER ASKS. So the highest-leverage single task is the selection
+law itself.). Task: STATIC first (zero-launch, cheap): from work/ascend_payload.
+bin find the click->selection consumer of the green selection ring (t293
+observed: selected = ring kind 2, unselected kinds 3/4/5; green const 32-34
+never appeared on dot-clicks) — trace the mouse-hit tester that distinguishes
+the SHIP SPRITE hit from the STAR DOT hit and the store that arms order mode
+(t293: click3/destinations never armed it). Deliverable: cited selection
+predicate (addresses + values) into docs/re/_wip_t296.md + ships.md, and a
+scripts/r296 note of the exact click coordinates/sequence a live session must
+use; a live capture run is ONLY queued afterwards as t297 by the next session.
+CAVEATS: static only this iteration (no dosbox launch needed); never mount
+game/; production :9 read-ring-tail only.
 
+## LANDED t295 (2026-11-04, session 4) — HOME-STAR DRAW LAW CLOSED
+(OQ-016 residue 2, MEASURED). FUN_00022ce4 0x22eb4..0x22f55 = the draw: per
+race r in RACE ORDER loop { one FUN_0007824f LCG draw; k = draw % T (idiv rem
+@0x22ec7) } until entry unclaimed (gate 0x22ee0), store row_r+0xd=entry(k)
+@0x22edd, claim byte 0x80|(1<<r). UNIFORM rejection sampling, distinct by
+construction, NO spread geometry — the old max-min BFS rewrite code was a
+documented MISMATCH, now replaced (pickHomeStars + isolated homeLcg_ stream;
+interleave vs world-gen stays UNMEASURED, closed law = distribution). Census
+scripts/r295_home_draw.py (KEEPER): equal-marker 30/30 turn<=2, distinct
+36/36 lineages, index chi2=31.0 (df=49, crit@.01=74.92). Linear capstone
+sweeps MISSED the +0xd store (desync); function-aligned disasm found it —
+lesson banked. BLAST RADIUS re-derived by measurement, all honest: seed 42
+now Extinct t20 (uniform draws produce lethal homes the BFS never could —
+real vendor exposure), fixtures moved 42->7 / 4242->23 / cornucopia 8->10,
+t274 cadence pin t16->t31 (MUTATION-VERIFIED: >= -> > slips exactly t32),
+t41 CB test made structural (per-colonise CB). run_tests 175/0. PLAYTHROUGH
+REGENERATED: A seed2024 Extinct t285, B seed23 CONTROL t1406 (NEW exemplar —
+seed 1 re-drew Extinct t266; record_playthrough.sh updated, gate greps
+Control). Evidence: docs/re/income-law.md S-T295 + docs/re/_wip_t295.md
+S1-S7. NEXT=t296 ship-selection choreography (static-first) — it gates BOTH
+remaining non-user residues (nuke law, magnetron witness).
 ## LANDED t294 (2026-11-04, session 3) — word[+0x16] TEMPLATE SOURCE CLOSED:
 FILE TABLE, planitem.txt. Pure-static iteration (zero launches; :9 untouched,
 healthy t1086 the whole time). The 11 terrain weight rows at runtime 0x744f4

@@ -53,17 +53,22 @@ rng%11 row, draw chain @0x37eb7..0x37ee0, T36); terrain-mutation via item-36 +
 world-gen |8 rock only (t29b 40k-sample census); HOME JOIN MEASURED t270
 (DWORD[0x12e1d+race*0x1ee] == star base NAME-0x1C; trust turn>=1 only, turn-0 =
 template residue) + home placement RUN-LOCAL (11 distinct sets/11 lineages;
-rewrite pickHomeStars campaign.cpp:301 = documented MISMATCH, deterministic
-max-min BFS — NOT upgraded for lack of a draw law); pending-build reserves its
+rewrite pickHomeStars was a documented MISMATCH (deterministic max-min BFS) —
+SUPERSEDED t295 by the cited HOME-STAR DRAW LAW, see S-T295 below);
+pending-build reserves its
 slot (t271: byte1:=item id, word2 bit0 CLEAR — pending IS ring-observable).
 ATTRIBUTION FIXES t273 (binding for all future mining): owner INDEX byte +0x56
 (NOT handle u16+0x54); stale-echo pairs mint phantom deltas; the t251 mine is
 VOID on both bugs; damage-vs-non-at-war-owner STILL ZERO corpus-wide.
 RESIDUE (each with a route): (1) Phase Bomb nuke law — capture-gated, BLOCKED
-section + one-run recipe; (2) setup-time home DRAW law — debugger route OPEN
-(the master-built dosbox-x closed OQ-021 t292; scenario-init range cited
-0x23a20..0x23d22; no resume.gam in a scratch dir reaches 0x37d80 at boot,
-t31); (3) word[+0x16] template source — CLOSED MEASURED 2026-11-04 t294:
+section + one-run recipe; (2) setup-time home DRAW law — CLOSED MEASURED
+2026-11-04 t295: uniform rejection draw per race in race order, k=draw%T,
+store row_r+0xd @0x22edd, claim gate 0x22ee0 (FUN_00022ce4 0x22eb4..0x22f55
+full disasm + census scripts/r295_home_draw.py: equal-marker 30/30 turn<=2,
+distinct 36/36, index chi2=31.0 df=49 crit 74.92); docs/re/income-law.md
+S-T295 + docs/re/_wip_t295.md; rewrite pickHomeStars upgraded, stream
+interleave vs world-gen stays UNMEASURED (isolated homeLcg_, distribution
+law); (3) word[+0x16] template source — CLOSED MEASURED 2026-11-04 t294:
 FILE TABLE, planitem.txt ASCII block after '#' (scalar->DS:0x66e4 @0x3802c,
 11x4 weights->0x744f4 row-major @0x3801e..0x38067, grid B->0x7445c, grid C
 ->0x744a8); EXE-constant hypothesis dead two ways (0x744f4 past the

@@ -2312,3 +2312,18 @@ mask, a different field).
    constants the three consumption legs fail (96 failed), restored -> 175/0.
    Stock behaviour UNCHANGED (file values == old constants; seeded pins and
    PLAYTHROUGH.md trajectories do not move).
+
+## S-T295 — HOME-STAR DRAW LAW (OQ-016 residue 2 CLOSED, 2026-11-04)
+Per race r = 0..races-1 IN RACE ORDER: loop { ONE rng draw (FUN_0007824f LCG
+form state*0x41C64E6D+0x3039, out (state>>16)&0x7fff); k = draw % T } until
+star k unclaimed (byte[entry+0x14]==0, gate 0x22ee0), then store row_r+0xd =
+entry(k) (0x22edd) and mark entry+0x14 := 0x80|(1<<r). UNIFORM rejection
+sampling over all T stars; distinct by construction; NO spread geometry.
+Evidence: full body disasm FUN_00022ce4 0x22eb4..0x22f55 (work/t295_22ce4.txt;
+linear sweeps desync, function-aligned disasm found the +0xd store) + census
+scripts/r295_home_draw.py (KEEPER): exact-equal marker 30/30 at turn<=2,
+distinct 36/36 lineages, index chi2=31.0 (df=49, crit@.01=74.92). The old
+rewrite max-min BFS spread was a documented MISMATCH, now replaced. Stream
+interleave vs world-gen UNMEASURED -> rewrite uses isolated homeLcg_
+(seed^0x295); closed law = distribution, not stream position. Details:
+docs/re/_wip_t295.md S1-S6.

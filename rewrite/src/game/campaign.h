@@ -615,6 +615,7 @@ private:
     // (REFUTED-ROUTES RNG discipline: the campaign stream must stay put so
     // combat/expansion timelines remain reproducible).
     int worldNext();
+    int homeNext();  // t295 home-draw stream (same FUN_0x7824f form, homeLcg_)
     // Seed a freshly-claimed planet: pop := 2 [verified S6e] + exactly one
     // Colony Base via drawCbCell (t41 law, scripts/r1_colony_items.py:
     // 2720/2720 owned records corpus-wide carry an ACTIVE Colony Base; the
@@ -653,6 +654,9 @@ private:
     std::mt19937 rng_;
     // World-generation LCG state (banked FUN_0007824f law, see worldNext()).
     uint32_t worldLcg_ = 0;
+    // t295 home-draw stream (same FUN_0x7824f form, isolated state; see
+    // pickHomeStars). Seeded from cfg.seed at construction.
+    uint32_t homeLcg_ = 0;
 
     std::vector<int> owner_;                   // per star
     std::vector<PlanetState> planets_;         // per star (only owned stars use it)

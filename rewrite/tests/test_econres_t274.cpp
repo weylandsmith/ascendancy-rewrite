@@ -238,12 +238,16 @@ TEST(e2e_build_queue_opening_t274) {
     }
     std::printf("[first AI completion t%d]\n", firstTurn);
     // EXACT CADENCE PIN (regression catcher for the completion gate
-    // 0x390a3 >= vs >): seed 7 AI homes queue Factory (COST 30) at t1 with
-    // stored IND word 2; the accumulator lands EXACTLY on 30 at tick 15 ->
-    // completion at t16. A `>` gate slips to t17 (measured by mutation
-    // t274: >= -> > moved this line to t17). Changing the sim's opening
-    // order, IND law, or the gate re-trajectories this line ON PURPOSE.
-    CHECK(firstTurn == 16);
+    // 0x390a3 >= vs >): t295 RE-DERIVATION on seed 7 — the AI home's stored
+    // IND word is 1 (terrain-drawn channel per T35), Factory COST 30 queued
+    // at t1, accumulator lands EXACTLY on 30 at tick 30 -> completion t31.
+    // A `>` gate needs 31 and slips EXACTLY one turn to t32 (re-verified by
+    // mutation this session). Original seed-7-old-layout value was t16 with
+    // stored IND word 2 (2/turn); the gate law is unchanged, the IND seed
+    // came off the world-gen draw the t295 home law re-sits. Changing the
+    // sim's opening order, IND law, or the gate re-trajectories this line ON
+    // PURPOSE.
+    CHECK(firstTurn == 31);
 }
 
 // ---------------------------------------------------------------------------

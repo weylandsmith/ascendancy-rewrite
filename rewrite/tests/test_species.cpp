@@ -287,14 +287,17 @@ TEST(species_cornucopia_repaints_min_pop_colony_t281) {
             CHECK(pc.cellClasses[k] == pp.cellClasses[k]);
     }
 
-    // SKIP-LEG + NULL-EXIT leg (seed 8, MEASURED via the t281 seed scan —
-    // diagnostic since removed): owner 1's ONLY colony at t150 sits on weight
-    // row 10 (terrainRow==10), so the cited skip leaves NO eligible planet and
-    // the body exits at the null test 0x43e3a — NO repaint, NO event. Seed 16
-    // alone cannot catch a deleted skip leg (its argmin isn't a row-10 world);
-    // this leg can: deleting the skip line fires the event here.
-    auto s8 = makeCrafted(8, 1, ag::SpeciesAbility::Cornucopia);
-    auto s8ctrl = makeCrafted(8, 1, ag::SpeciesAbility::Unknown);
+    // SKIP-LEG + NULL-EXIT leg (t295 RE-DERIVATION: seed 8's row-10 HOME was
+    // an artefact of the retired spread-BFS; under the cited home-draw law
+    // the seed scan (diagnostic since deleted) listed seeds whose owner-1
+    // HOME sits
+    // on weight row 10 — seed 10, home s8. Owner 1 keeps NO other eligible
+    // colony through t150 on this seed, so the cited skip leaves no eligible
+    // planet and the body exits at the null test 0x43e3a — NO repaint, NO
+    // event. Seed 16 alone cannot catch a deleted skip leg (its argmin isn't
+    // a row-10 world); this leg can: deleting the skip line fires the event.)
+    auto s8 = makeCrafted(10, 1, ag::SpeciesAbility::Cornucopia);
+    auto s8ctrl = makeCrafted(10, 1, ag::SpeciesAbility::Unknown);
     bool s8Row10Home = false;
     for (size_t s = 0; s < s8.galaxy().stars.size(); ++s)
         if (s8.starOwner((int)s) == 1 && s8.planetAt((int)s).terrainRow == 10)
