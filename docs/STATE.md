@@ -205,60 +205,48 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t293 THE SUGAR-CUBE SCALE — SCRIPTED MOVE-ORDER CAPTURE (OQ-019
-head-named residue; ordering rationale: t292 CLOSED OQ-021 (16/3), so the
-ledger's highest-value unclosed sub-law is the drive Level -> distance scale,
-named in the row's own title line. The one-run closing route was explicitly
-REFINED at ships.md §t48 and has been waiting on capture capability the loop now
-HAS: t289 drive class (screen gates, needle, no-Escape law) + t292 scratch
-session law (own ring dir, Xvfb, Oct-29 resume, kill-by-PID). NOTE THE
-INHERITED POINTER IS STALE: t292's NEXT said "OQ-019 cost-hack residue (+0x46
-writers, ships.md §6 lead) fully static" — that lead CLOSED at t16 (ships.md §9:
-image-wide +0x46 census, sole gizmo-record write is the loader parse store
-0x491b5, JJTTODO = stale comment). Do NOT re-census it. Of the remaining
-OQ-019/OQ-016 residues, per-ship per-commit channels are BLOCKED-USER (t209/
-t210 law), Phase Bomb is capture-gated BLOCKED, magnetron harvest is REFUTED-
-class zero-witness; word[+0x16] template source (OQ-016) is the cheap static
-FALLBACK if this capture dies — queue it as t294.)
-Task: in a SCRATCH session (r290_poke_session.py skeleton MINUS the debugger,
-or scripts/r1_wp_session.py pattern; OWN ring dir, Xvfb :96, Oct-29 t1086
-RESUME.GAM, production :9 untouched), ISSUE A REAL MOVE ORDER on the galaxy map
-and let two End-Turn passes run: select one of the player's (owner 0) ships —
-t1086 has several in orbit (state 5, e.g. slot 16/22/26/27 at the home star per
-the production ring lineage) — click it, click a VISIBLE lane-adjacent
-destination star, End Turn x2 (drive laws: assert_on_map orange-frac gate before
-any click; 2 consecutive no-advance presses = STOP-AND-LOOK; NEVER Escape).
-MEASURE from the ring (r1_slot / r1_sav_scan law): the ship's xyz per autosave
-slot across the two passes -> travelled distance per turn vs its drive stat
-(gizmo Level sum into ship stat dword +0x10 @0x49b67, ships.md §10; budgets
-+0x88 POWER / +0x94 fuel drained at 0x4a2d4..0x4a314, §12). The t48 question to
-settle: is per-turn travel the RAW float world distance walked per step-call
-0x533e0 (t48 reading), or a hop/handpoint abstraction — one witnessed flight
-with per-autosave coordinates discriminates (10 s ring cadence gives >=1 sample
-per turn; a multi-hop path shows waypoints). Also bank whether the order
-survives (issued -> in-transit state) for the OQ-016 setup-draw family.
-BUDGET: 3 scratch launches MAX (BREAK-lottery-class losses do not count, t292
-accounting law: only runs that reached the map-and-click phase count). If the
-order never lands or no flight is witnessed: honest negative in OQ-019
-(STATUS t293), row STAYS OPEN, NEXT -> t294 = word[+0x16] template source
-(static mapgen preset-table hunt; t281 cites the ctor draw rng%11 @0x23a97/aa8,
-the residue is the SOURCE of the 11 weight rows — file table vs hardcoded).
-CAVEATS: production :9 (pid 660167, t1150 V=23) is the corpus — scratch NEVER
-mounts game/ and NEVER shares its ring; the scratch may be wrecked freely (user
-grant); the scratch's autosave ring is the ONLY read surface (MEMREAD is
-real-mode-only, debug.cpp:2983); ship record stride 0x7b, coords are floats in
-the watcher's ship_raw (r1_playcap_watch schema) — reuse the watcher for
-coordinate reads rather than hand-parsing.
-SESSION-START SCREEN CHECK (t287 law, do this BEFORE any other probe): a VNC
-user may leave production on ANY screen. Verify with `DISPLAY=:9 import
--window root` + vision BEFORE trusting ring rows (ring is blind off-campaign,
-t285). If off-campaign: recover via r287_vncinput.py move + highlight-verified
-click on 'Return to Current Game' (title menu row 4, center (318,333)); NEVER
-xsend-click menus (stale-hover law, diplomacy.md §21.5). Production verified
-this session at galaxy map t1150 (ring fresh 16:11; V=23/50, sel 0), pid
-660167 alive, HEALTHY. RESUME.GAM remains the Oct-29 t1086 point: a title
-resume REGRESSES 64 turns — production's live state lives in the RING/RAM,
-never rely on title-resume.
+NEXT t294 WORD[+0x16] TEMPLATE SOURCE — STATIC MAPGEN PRESET-TABLE HUNT
+(OQ-016 residue; ordering rationale: the t293 capture budget is SPENT
+NEGATIVE — see LANDED t293 below; the loop pre-authorized this exact fallback
+in t293's own task text ("word[+0x16] template source (OQ-016) is the cheap
+static FALLBACK if this capture dies — queue it as t294"). It is PURE STATIC
+(no launches, no :9 risk, no budget), and it is the only open row with a
+named, non-BLOCKED, non-USER-ASK route left: OQ-005 = USER ASK (D1, do not
+rule), OQ-019 residues 2/2 = BUILD DECISION + magnetron-zero-witness class.)
+Task: the ship-design word word[+0x16] (11 weight rows; ctor draw rng%11 at
+0x23a97/0x23aaa per t281) has an unresolved SOURCE: a file table vs hardcoded
+constants. Route: (a) locate the 11-row table in guest RAM or the data files
+(ascend00 cob / DATA dir; r205_table_identity.py pattern for cob identity);
+(b) cross-check against the t256c build census (62,762 rows) for the 11
+distinct values; (c) if a file offset is found, cite it and close; if the
+image-wide xref census shows ONLY immediate loads feeding 0x23a97's table
+index consumer, bank the measured-negative "hardcoded" and close with that
+wording. CAVEATS: do NOT touch game/; production :9 pid 660167 (t1150) is the
+corpus — read its ring via tail only (7.9 GB, OOM law); static work uses the
+ghidra program already loaded per docs/re/dosbox-debugger.md conventions.
+DO NOT re-open t293's capture without first banking a NEW ship-selection
+choreography candidate (FLEET row right-click contents menu = first guess;
+orbital-grid dot clicking is MEASURED-DEAD, ships.md t293 block 2).
+
+## LANDED t293 (2026-11-04, session 2) — SCRIPTED MOVE-ORDER CAPTURE, BUDGET
+SPENT, NEGATIVE (honest). 4 scratch launches on Oct-29 t1086 RESUME.GAM
+(Xvfb :96, own ring, kill-by-recorded-PID, production :9 untouched+healthy
+t1150 the whole time). PROVEN: title->campaign->FLEET(553,184)->row-1
+(200,93)->system-view route is DETERMINISTIC ~75 s (scripts/
+r293_move_session.py reusable skeleton). KILLED THE RUN: ship SELECTION never
+happened — orbital bright-dot clicks NAVIGATE (~65k px diff), never select;
+click3/click destinations then do nothing (green constant 32-34, ring order
+bytes never move, owner-0 kinds stay {3,4,5}, never 2). EVENTWIN construction
+popup swallowed End-Turn presses 2-3 (OK clicks at windows.txt geometry do
+NOTHING — Escape is the law, script fixed). One L2 spurious POSITIVE retracted
+(lane-step lane traffic is never a flight; verdict now requires the
+order-issued slot itself to move). Observation: slot 8 kind 5->4 + position
+snap at t1087 = travel order consumed into in-system on arrival, live
+corroboration of static 0x220a8->0x21f58. HARNESS LAW: foreground terminal
+caps at 420 s — a full capture session (~9-12 min) MUST run
+background=true notify=true (L4 died to exactly this). Ledger UNCHANGED
+16/3; OQ-019 residue 1 stays open with the negative banked. Autopsy:
+docs/re/_wip_t293.md + ships.md t293 block.
 
 ## DRIVE-CLASS LAWS (t285/t289 — apply to EVERY drive row; full text docs/re/driver-selfharm-t285.md)
 Title menu detected FROM SCREEN before any click (assert_on_map orange-frac);

@@ -1302,3 +1302,52 @@ OQ-019 STATUS: stays OPEN (strict-close). What this iteration kills is the
 ROUTE ("mine st4 mid-turn displacement from autosave corpora"), not a law.
 Remaining runtime residues all need an instrument finer than the 10 s ring
 (runtime watchpoint class) or a human/player-driven magnetron use.
+
+## t293 — scripted move-order capture (OQ-019 residue 1) — BUDGET SPENT, NEGATIVE
+Four scratch launches on Oct-29 t1086 RESUME.GAM, Xvfb :96, own ring dir
+(work/r1/t293-move-2026110{3,4}-*; production :9 pid 660167 untouched, healthy
+t1150 throughout). Scripts/r293_move_session.py (drives the whole session;
+compile-clean, fixes banked in-file). Full autopsy docs/re/_wip_t293.md.
+MEASURED / PROVEN:
+1. SCRATCH NAV ROUTE DETERMINISTIC (2/2 repro): title orange 0.679 -> click
+   (318,333) Return-to-Game -> ring t1086 30 ships -> FLEET sidebar (553,184)
+   diff 122420 rails 188 -> FLEET row-1 left-click (200,93) JUMPS to that
+   ship's system view (diff ~113k) in ~75 s. Reusable skeleton for ANY future
+   capture task.
+2. ORDER MODE NEVER ARMED (3 launches, the negative): in-system orbital view,
+   bright-dot candidates form a 34 px column grid [(442,346),(442,312),
+   (442,278),(442,244),(374,312),(374,278)]; every left-click on them changes
+   the screen ~65k px (NAVIGATES — planet detail/body view, not selection) and
+   Escape unwinds back to orbital; subsequent click3 (and click, batmode
+   order) at offsets: green count CONSTANT 32-34 (= baseline), ring order bytes
+   (+0x58 kind etc.) NEVER move, no kind-2 ever appears (owner-0 census across
+   all samples: kinds {3,4,5} only). READING [inferred]: those dots are planet/
+   body art, not ship clips; ship SELECT never happened, so help.txt:1146
+   "move a selected ship by clicking on a desired destination" never had a
+   referent. DO NOT re-try dot-clicking in the orbital grid.
+3. POPUP LAW RE-CONFIRMED (t245 serialize): EVENTWIN "Construction of
+   Industrial Megacity complete on Cornucob I" (vision-verified bbox
+   [83,118,417,362]; windows.txt VERBATIM EVENTWIN 60,100-395,355,
+   EVENTBUTTON0 70,320-180,345, EVENTBUTTON1 275,320-385,345, both
+   SENDMESSAGE 50) swallowed End-Turn presses 2-3 in L3: OK clicks at the
+   windows.txt button centre did NOTHING (pre/post popup diff 204 then 0).
+   selfplay.md law stands: synthetic Button1 on popups is unreliable — close
+   with key Escape (script now does; verify title guard first, t285).
+4. VERDICT INSTRUMENT (reusable law): a ring mover is a flight witness ONLY if
+   the ORDER-ISSUED slot itself moved (order_bytes delta logged at issue time);
+   constant-kind constant-budget dx == t189 lane step {28,14,4.6667} is
+   background lane traffic ordered long before the session — a t293 L2 spurious
+   POSITIVE on exactly that pattern is retracted. Bonus honest observation:
+   L3 witnessed slot 8 kind 5->4 with position snap t1086->t1087 — a travel
+   order CONSUMED INTO in-system on arrival, live, matching static
+   0x220a8->0x21f58 (corroborates existing law, closes nothing new).
+5. TURNS: press 1 from the (near-clean) map advanced 1086->1087 in 7-14 s
+   both runs. L4 press 2 was in flight when the HARNESS 420 s foreground cap
+   killed the session (no verdict; scratch reaped, kill-by-recorded-PID path
+   confirmed dead). FOREGROUND CAP LAW: a full t293-class session is ~9-12 min
+   > 420 s foreground max — next capture must run background=true notify=true.
+OQ-019 STATUS t293: residue (1) STAYS OPEN (strict-close — no flight witnessed,
+no order issued). Scripted-capture route is NOT refuted (the route rode
+flawlessly; the SELECTION step is the unsolved sub-problem), but its 3-launch
+budget is spent; any re-ask needs a NEW selection choreography candidate (e.g.
+FLEET row RIGHT-click contents menu, or ship-window button) banked first.

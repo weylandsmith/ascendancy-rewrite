@@ -92,9 +92,12 @@ ring cadence (t265, 21 runs d=0.00 — corpus mining class CLOSED t49/t58/t265,
 scripted capture ONLY); MAGNETRON runtime witness ZERO x3 (t265 off-grid
 instrument P(false neg)<0.1%, t273, t285) — use-site stays static-cited
 (gizhelp.txt:1173-1181 verbatim; kind==5 handler 0x21f58).
-RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SCRIPTED
-MOVE-ORDER CAPTURE RUNNING (own ring, real click-order, per-autosave coords;
-budget 3 launches; ships.md §t48 route); (2) per-ship build/redesign path =
+RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
+3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
+dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +
+ships.md t293 block; route rides deterministic, SELECTION is the unsolved
+sub-problem — re-ask needs a new selection choreography banked first; drive
+background=true, 420 s foreground cap kills a full session); (2) per-ship build/redesign path =
 BUILD DECISION not RE unknown (t256c census 62,762 rows, AI dossier row 16
 GAP->BOUNDARY; docs/DECISIONS.md D3); (3) magnetron witnessed use (scriptable
 via t289 drive class). | open
