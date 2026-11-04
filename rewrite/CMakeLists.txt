@@ -85,6 +85,7 @@ add_executable(run_tests
   tests/test_planetwin_t276.cpp
   tests/test_score_t284.cpp
   tests/test_control_t291.cpp
+  tests/test_terrain_t294.cpp
   tests/test_audio.cpp
   tests/test_ships.cpp
   tests/test_flic.cpp

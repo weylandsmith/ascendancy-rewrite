@@ -92,6 +92,25 @@ ascend::game::Campaign makeCampaignSized(unsigned seed, int aiCount, int starCou
                         tables().ai, &err);
 }
 
+// Exported shim (t294): test_terrain_t294.cpp needs a campaign whose
+// world-gen consumes a PATCHED terrain table (the differential leg proving
+// the rewrite reads cfg.terrain rather than a compiled constant). Same table
+// wiring as makeCampaign, default 50 stars.
+ascend::game::Campaign makeCampaignWithTerrain(unsigned seed,
+                                               const ascend::game::TerrainTables& tt) {
+    ag::CampaignConfig cfg;
+    cfg.seed = seed;
+    cfg.aiCount = 6;
+    cfg.freeForAll = true;
+    cfg.terrain = tt;
+    ag::MapConfig mc;
+    mc.seed = seed;
+    ag::Galaxy g = ag::MapGenerator(mc, tables().stats, tables().names).generate();
+    std::string err;
+    return ag::Campaign(cfg, g, &tables().tree, tables().items, tables().gizmos,
+                        tables().ai, &err);
+}
+
 TEST(campaign_homes_distinct) {
     auto c = makeCampaign(7);
     for (int o = 0; o <= 6; ++o) CHECK(c.starsOwned(o) == 1);

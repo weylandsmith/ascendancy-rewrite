@@ -2233,3 +2233,82 @@ BANKED SIM DIVERGENCES (rewrite vs vendor witness; NOT fixed this task, NOT refu
     likely gap (need-class roll d66/d35 vs a fresh-world planet); adjudicate only with
     fresh-run selector-session witnesses (drive class — HELD per t273). Test pins
     uniformity + cadence, NOT the Agriplot name.
+
+
+## t294 — word[+0x16] TEMPLATE SOURCE CLOSED: the 0x744f4 weight rows are FILE-LOADED (planitem.txt), not EXE constants
+
+OQ-016 residue (3) asked whether the 11 terrain weight rows behind
+word[+0x16] are a file table or hardcoded constants. ANSWER: FILE TABLE —
+the values ship as ASCII decimal text in planitem.txt and the EXE carries NO
+initialised copy. Scope note: STATE.md's t294 blurb called word[+0x16] "the
+ship-design word"; wrong domain — +0x16 here is the PLANET terrain-row index
+(planet stride 0x7b; the ship/lane +0x16 in ships.md:1192 is the visibility
+mask, a different field).
+
+1) LOADER LAW [verified raw-asm this session, objdump -D -b binary -m i386
+   -M intel over work/ascend_payload.bin]. FUN_00037fc0 (scenario loader,
+   opens planitem.txt — the name immediate 0x1cd0 lands on the Watcom string
+   pool "planitem.txt" at payload 0x84880, the banked pool-relative law).
+   After the lone '#' line the scanner reads plain "%d" integers in order:
+     scalar            -> DS:0x66e4  @0x3802c  (vendor value 50: the POP
+                          GROWTH counter wrap — S6c's "counter >= 50" constant
+                          now has its value SOURCE, not just its consumer)
+     11 rows x 4 w     -> 0x744f4 row-major  (record id 0x1ce0; loop
+                          0x3801e..0x38067: inner INC-then-store
+                          "MOV BYTE [EDX+0x744f3],AL" @0x3805f with
+                          EDX=4*row+n, n=1..4 INCLUSIVE -> all four w-slots
+                          land verbatim; outer CMP EDI,0xB)
+     grid B 5 x 15     -> 0x7445c+15i (record 0x1ce3, 0x38070..0x380a9,
+                          base 0x7445b; same INC-first law; DS:0x74458 dword
+                          is the T30b "loaded" sentinel — live mid-campaign
+                          reads 255,255,255,255, semantics NOT re-derived)
+     grid C 5 x 15     -> 0x744a8+15i (record 0x1ce6, 0x380ad..0x380ed)
+   This UPGRADES T30b's draft ("[0x744f3 + 1 + 4*row]" — correct, but it read
+   as w0-only; the loop fills all 44 bytes) and supersedes nothing else.
+
+2) EXE-CONSTANT HYPOTHESIS DEAD TWO WAYS [verified]: (a) payload is 0x8cc83
+   bytes and obj1 data maps at payload 0x82bb0 <-> data-addr 0, so the file
+   initialises data addresses only up to ~0xa0d3; 0x744f4 >> that, so the
+   table is uninitialised data (BSS) in the image — reading payload
+   0x82bb0+0x744f4 is past EOF. (b) IMAGE-WIDE SIB-aware store census (all
+   88/C6/89/C7 forms incl. 66-prefix, mod=10 disp32, SIB decoded) with
+   disp32 in [0x744f0,0x74520): EXACTLY ONE hit — the loader store @0x3805f.
+   No memcpy, no second writer. Boundary note so nobody re-refutes the row
+   from T54b: T54b's "preset blocks are EXE constants" verdict covers the
+   OTHER pair (21-dword tables 0x88f90/0x88fe4, image-mapped, zero file
+   hits); those feed the SPECIAL scenario mode @0x23aaa..0x23ac2, not the
+   0x744f4 rows. Why earlier file hunts missed these values: they are ASCII
+   TEXT in the file, so packed-byte signature search is blind BY
+   CONSTRUCTION (t54b method and this session's first sweep alike).
+
+3) VALUE EQUALITY, three corpora [verified]: planitem.txt (scratch copy
+   work/r1/game/planitem.txt, md5 7e77b10c84c563fa91d56a0f9353a03f; the
+   rewrite's extracted/ascend00 copy is byte-identical) block after '#':
+   scalar 50 @file 0x1c7, weight block 0x1d1..0x269. Parsed 11 rows ==
+   the banked runtime census (S10, 13 captures) EXACTLY == LIVE PRODUCTION
+   RAM read this session from playcap 58/59/60.sav (B=0x1bf4d8, member
+   index B+0x82bb0+0x744f4, 44/44 bytes on all three saves, pointer law).
+   Grid C file rows sum 7/11/23/45/73 == live +0x18 census (OQ-014) ==
+   live 0x744a8 read the same pass. The per-byte split campaign.cpp:147
+   called "not observed" is now OBSERVED (file text + live RAM).
+
+4) THE INDEX ITSELF stays an rng DRAW (no contradiction): per planet
+   row = second scenario-init draw rng%11 (0x23a97/IDIV 11, T54b verbatim),
+   clamped >=11 -> 2 @0x37e39, stored @0x37e33. The file supplies row
+   CONTENTS; the draw picks WHICH row (retracted-R11 stands: save-time
+   +0x16 IS the generation row).
+
+5) REWRITE UPGRADE t294: economy.{h,cpp} gain TerrainTables{weights[11][4],
+   surfaceBySize[5], popGrowth} + loadTerrainTables() (strict: u8 store law,
+   grid-C row sums 1..100) + vendorTerrainTables() (the measured values);
+   CampaignConfig.terrain feeds world-gen (campaign.cpp kRows/kSurfaceBySize
+   are now cfg reads, campaign.cpp growth wrap uses cfg_.terrain.popGrowth);
+   main.cpp loads planitem.txt and injects. Pin file tests/test_terrain_t294.cpp (5 cases:
+ terrain_tables_match_measured_runtime_0x744f4;
+ terrain_weights_are_consumed_not_hardcoded incl. all-barren-table
+ differential + capBase==5 seed law; terrain_surface_grid_is_consumed;
+ terrain_pop_growth_scalar_is_consumed; terrain_loader_rejects_out_of_range;
+ via exported shim makeCampaignWithTerrain, t291 pattern). MUTATION-VERIFIED: with world-gen reverted to compiled
+   constants the three consumption legs fail (96 failed), restored -> 175/0.
+   Stock behaviour UNCHANGED (file values == old constants; seeded pins and
+   PLAYTHROUGH.md trajectories do not move).

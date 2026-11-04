@@ -60,12 +60,22 @@ ATTRIBUTION FIXES t273 (binding for all future mining): owner INDEX byte +0x56
 (NOT handle u16+0x54); stale-echo pairs mint phantom deltas; the t251 mine is
 VOID on both bugs; damage-vs-non-at-war-owner STILL ZERO corpus-wide.
 RESIDUE (each with a route): (1) Phase Bomb nuke law — capture-gated, BLOCKED
-section + one-run recipe; (2) setup-time home DRAW law — needs setup code path
-or watchpoint; (3) word[+0x16] template source (the 11 weight rows: file table
-vs hardcoded; ctor draw rng%11 @0x23a97/aa8 cited t281) — cheap static hunt,
-queued t294 fallback; (4) per-slot shield-byte consumer (OQ-019 family); (5)
-human build-order minutiae 0.4% samples; item-35/35 completion branches =
-MEASURED zero-witness + AI-unreachable (REFUTED t271, re-open conditions there).
+section + one-run recipe; (2) setup-time home DRAW law — debugger route OPEN
+(the master-built dosbox-x closed OQ-021 t292; scenario-init range cited
+0x23a20..0x23d22; no resume.gam in a scratch dir reaches 0x37d80 at boot,
+t31); (3) word[+0x16] template source — CLOSED MEASURED 2026-11-04 t294:
+FILE TABLE, planitem.txt ASCII block after '#' (scalar->DS:0x66e4 @0x3802c,
+11x4 weights->0x744f4 row-major @0x3801e..0x38067, grid B->0x7445c, grid C
+->0x744a8); EXE-constant hypothesis dead two ways (0x744f4 past the
+initialised data segment; image-wide SIB-aware store census = ONE writer,
+the loader @0x3805f); file == banked runtime == live RAM 58/59/60.sav; the
+INDEX itself stays the rng%11 draw @0x23a97; rewrite upgraded
+(TerrainTables+loadTerrainTables economy.{h,cpp}, cfg.terrain consumed
+campaign.cpp, main.cpp injects; pins tests/test_terrain_t294.cpp x5,
+mutation-verified; income-law.md t294 block); (4) per-slot shield-byte
+consumer (OQ-019 family); (5) human build-order minutiae 0.4% samples;
+item-35/35 completion branches = MEASURED zero-witness + AI-unreachable
+(REFUTED t271, re-open conditions there).
 | open
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->

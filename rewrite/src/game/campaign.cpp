@@ -138,17 +138,17 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     worldLcg_ = static_cast<uint32_t>(cfg.seed);
     auto next = [this]() { return worldNext(); };
     {
-        struct Row { int w[4]; };
-        static const Row kRows[11] = {
-            {{100,0,0,0}},   {{50,2,2,2}},   {{20,3,5,3}},   {{0,3,20,3}},
-            {{40,10,2,2}},   {{20,20,2,2}},  {{40,2,2,10}},  {{20,3,3,20}},
-            {{40,10,10,10}}, {{20,15,15,15}},{{0,33,34,33}},
-        };  // 0x744f4 rows [verified identical in all captures]
-        // +0x18 surface counts per size class 0..4: the original sums 15
-        // table bytes 0x744a8[15*size+j] (@0x37de3 loop); only the row SUMS
-        // are verified against live +0x18 (7/11/23/45/73, exact on sampled
-        // planets), the per-byte split is not observed — carried as sums.
-        static const int kSurfaceBySize[5] = {7, 11, 23, 45, 73};
+        // t294 (OQ-016 residue 3 CLOSED): the rows below are NO LONGER a
+        // hardcoded vendor constant — cfg_.terrain comes from
+        // loadTerrainTables(planitem.txt) where data is available (the
+        // original's ONLY source: 0x744f4 is past the initialised data
+        // segment and the loader @0x3805f is the image's sole writer). The
+        // CampaignConfig default remains the measured vendor table so
+        // no-data harnesses keep identical behaviour.
+        const int (&kRows)[11][4] = cfg_.terrain.weights;  // 0x744f4 analog
+        // +0x18 surface counts per size class: grid C row SUMS (file values
+        // per-byte MEASURED t294; the original sums 15 bytes @0x37de3).
+        const int (&kSurfaceBySize)[5] = cfg_.terrain.surfaceBySize;
         for (int s = 0; s < n; ++s) {
             const int size = next() % 5;  // rng%5 @0x23a86/95
             const int row = next() % 11;  // rng%11 @0x23a97/aa8
@@ -157,8 +157,8 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
             const int cells = kSurfaceBySize[size];  // +0x18 analog
             planets_[s].surfaceCells = cells;
             auto scaled = [](int w) { return (w * 32768 - w) / 100; };
-            const int lim[4] = {scaled(kRows[row].w[0]), scaled(kRows[row].w[1]),
-                                scaled(kRows[row].w[2]), scaled(kRows[row].w[3])};
+            const int lim[4] = {scaled(kRows[row][0]), scaled(kRows[row][1]),
+                                scaled(kRows[row][2]), scaled(kRows[row][3])};
             const int s1 = lim[0] + lim[1], s2 = s1 + lim[2], s3 = s2 + lim[3];
             auto& cls = planets_[s].cellClasses;
             cls.assign(cells + 10, 1);  // orbital ring is class 1, no draw
@@ -974,7 +974,11 @@ void Campaign::incomeAndGrow() {
         if (ps.pop < cap) {
             ps.growthCounter += static_cast<int>(pros);
             if (o != kPlayer && pros < 4) ps.growthCounter += 1;
-            if (ps.growthCounter >= 50) {  // DAT_000066e4 [verified value]
+            if (ps.growthCounter >= cfg_.terrain.popGrowth) {  // DAT_000066e4
+                // [verified value 50; t294 SOURCE cited: first integer after
+                // planitem.txt '#', stored by the loader @0x3802c — file ==
+                // live scalar, so a modded file drives the wrap like the
+                // original]
                 ps.pop += 1 + (hasClone ? 1 : 0);
                 if (ps.pop > cap) ps.pop = cap;
                 ps.growthCounter = 0;

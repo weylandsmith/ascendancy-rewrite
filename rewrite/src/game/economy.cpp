@@ -231,6 +231,69 @@ std::vector<PlanetItem> loadPlanItems(const std::string& path, std::string& errO
     return out;
 }
 
+// t294 TERRAIN SOURCE-TABLE LOADER (OQ-016 residue 3). Grammar MEASURED from
+// the vendor loader FUN_00037fc0 (income-law.md S10 t294 block): after the
+// lone '#' line, plain integer tokens in scanner order --
+//   1 scalar          -> pop-growth wrap value (DS:0x66e4 @0x3802c, vendor 50)
+//   11 rows x 4       -> terrain weight rows 0x744f4 (record 0x1ce0 loop)
+//   5 rows x 15       -> grid B -> 0x7445c+15i (record 0x1ce3; UNMAPPED here)
+//   5 rows x 15       -> grid C -> 0x744a8+15i (record 0x1ce6); +0x18 = row sum
+// Rows are read INC-then-store (all 4 weights / all 15 cells land verbatim).
+// Weights must fit the u8 store law (0..255); grid C rows must sum 1..100
+// (the original asserts +0x18 <= 100 @0x37dfb region, economy.md).
+bool loadTerrainTables(const std::string& path, TerrainTables& out,
+                       std::string& errOut) {
+    std::vector<std::string> lines;
+    if (!readTextLines(path, lines, errOut)) return false;
+    const int hash = markerIndex(lines, "#");
+    if (hash < 0) { errOut = "terrain: no '#' data marker"; return false; }
+    // Token stream of pure-integer lines after '#', stopping at the first
+    // non-numeric non-blank line (the item table's name/number records).
+    std::vector<int> tok;
+    for (size_t i = static_cast<size_t>(hash) + 1; i < lines.size(); ++i) {
+        std::istringstream is(lines[i]);
+        std::vector<int> row;
+        int v;
+        while (is >> v) row.push_back(v);
+        std::string rest;
+        if (row.empty()) { if (!(is >> rest)) continue; break; }
+        if (is >> rest) break;  // mixed line: not part of the numeric blocks
+        for (int x : row) tok.push_back(x);
+    }
+    const size_t need = 1 + 44 + 75 + 75;
+    if (tok.size() < need) {
+        errOut = "terrain: expected " + std::to_string(need) +
+                 " numeric tokens after '#', got " + std::to_string(tok.size());
+        return false;
+    }
+    if (tok[0] <= 0) { errOut = "terrain: pop-growth scalar must be > 0"; return false; }
+    out.popGrowth = tok[0];
+    for (int i = 0; i < 11; ++i)
+        for (int j = 0; j < 4; ++j) {
+            const int v = tok[1 + i * 4 + j];
+            if (v < 0 || v > 255) {
+                errOut = "terrain: weight row " + std::to_string(i) +
+                         " value " + std::to_string(v) + " outside u8 store law";
+                return false;
+            }
+            out.weights[i][j] = v;
+        }
+    // grid B (tok 45..119) intentionally unread: no rewrite consumer (0x7445c
+    // window semantics unmapped -- t294 WIP).
+    for (int i = 0; i < 5; ++i) {
+        int sum = 0;
+        for (int j = 0; j < 15; ++j) sum += tok[120 + i * 15 + j];
+        if (sum < 1 || sum > 100) {
+            errOut = "terrain: grid C row " + std::to_string(i) + " sums to " +
+                     std::to_string(sum) + ", outside +0x18 cap 1..100";
+            return false;
+        }
+        out.surfaceBySize[i] = sum;
+    }
+    errOut.clear();
+    return true;
+}
+
 std::vector<int> gizmosByCategory(const std::vector<Gizmo>& gz, GizmoCat cat) {
     std::vector<int> out;
     for (size_t i = 0; i < gz.size(); ++i)

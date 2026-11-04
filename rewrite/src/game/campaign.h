@@ -147,6 +147,12 @@ struct CampaignConfig {
     // (player.dip carries no ability token [verified]). >=0 grants that
     // species' ability to owner 0 like any AI race (docs/re/abilities.md).
     int playerSpecies = -1;
+    // t294 (OQ-016 residue 3): terrain weight rows + surface grid + pop-growth
+    // scalar. The ORIGINAL loads these from planitem.txt at scenario init
+    // (FUN_00037fc0; income-law.md S10 t294 block) — main.cpp fills this via
+    // loadTerrainTables(); the default is the measured vendor table (file ==
+    // banked runtime == live RAM), NOT a guess.
+    TerrainTables terrain = vendorTerrainTables();
 };
 
 // Colony income channel stored value (MEASURED law, docs/re/income-law.md

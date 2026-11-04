@@ -172,6 +172,18 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(const Options& o,
     static const std::vector<ag::Gizmo> gizmos =
         ag::loadGizmos((o.dataRoot / "extracted/ascend00/gizmos.txt").string(), *err);
     const fs::path d0 = o.dataRoot / "extracted" / "ascend00";
+    // t294 (OQ-016 residue 3 CLOSED): the original loads the terrain weight
+    // rows / surface grid / pop-growth scalar from planitem.txt at scenario
+    // init (FUN_00037fc0, income-law.md S10 t294). Load them here so a modded
+    // planitem.txt drives world-gen exactly like the vendor exe; on load
+    // failure fall back to the MEASURED vendor table (identical values) and
+    // keep the error visible only if the item table also failed.
+    ag::TerrainTables terrain = ag::vendorTerrainTables();
+    {
+        std::string terrErr;
+        if (!ag::loadTerrainTables((d0 / "planitem.txt").string(), terrain, terrErr))
+            terrain = ag::vendorTerrainTables();
+    }
     auto stats = ag::StarStats::load(d0 / "starstat.txt", err);
     if (!stats) return nullptr;
     auto names = ag::loadStarNames(d0 / "names.txt", err);
@@ -208,6 +220,7 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(const Options& o,
     ag::CampaignConfig cfg;
     cfg.seed = o.seed;
     cfg.playerSpecies = o.playerSpecies;
+    cfg.terrain = terrain;  // t294: planitem.txt-sourced world-gen tables
     ag::MapConfig mc;
     mc.seed = o.seed;
     mc.starCount = o.stars;   // t78 density ladder (mapgen.md OQ-012(a))

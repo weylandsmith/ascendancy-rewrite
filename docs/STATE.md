@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-03T20:30
+updated: 2026-11-04T10:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -164,7 +164,8 @@ ledger:
       growth, cadence, build order, AI SELECTOR LAW (S9) and POP-CAP SEED LAW
       (S10) closed (income-law.md S6..S10). STILL OPEN: per-cell
       terrain/nuke wiring, home-placement verification, +2 residual minutiae
-      (0.4% samples), scenario-template preset source"
+      (0.4% samples). (scenario-template preset source CLOSED t294 — file
+      table planitem.txt, income-law t294 block)"
     - "OQ-019 ship design model (hull+gizmo inventory, cost hack, Orbital
       Docks); per-ship combat application = OQ-010 aggregate caveats S2i"
 
@@ -205,28 +206,56 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t294 WORD[+0x16] TEMPLATE SOURCE — STATIC MAPGEN PRESET-TABLE HUNT
-(OQ-016 residue; ordering rationale: the t293 capture budget is SPENT
-NEGATIVE — see LANDED t293 below; the loop pre-authorized this exact fallback
-in t293's own task text ("word[+0x16] template source (OQ-016) is the cheap
-static FALLBACK if this capture dies — queue it as t294"). It is PURE STATIC
-(no launches, no :9 risk, no budget), and it is the only open row with a
-named, non-BLOCKED, non-USER-ASK route left: OQ-005 = USER ASK (D1, do not
-rule), OQ-019 residues 2/2 = BUILD DECISION + magnetron-zero-witness class.)
-Task: the ship-design word word[+0x16] (11 weight rows; ctor draw rng%11 at
-0x23a97/0x23aaa per t281) has an unresolved SOURCE: a file table vs hardcoded
-constants. Route: (a) locate the 11-row table in guest RAM or the data files
-(ascend00 cob / DATA dir; r205_table_identity.py pattern for cob identity);
-(b) cross-check against the t256c build census (62,762 rows) for the 11
-distinct values; (c) if a file offset is found, cite it and close; if the
-image-wide xref census shows ONLY immediate loads feeding 0x23a97's table
-index consumer, bank the measured-negative "hardcoded" and close with that
-wording. CAVEATS: do NOT touch game/; production :9 pid 660167 (t1150) is the
-corpus — read its ring via tail only (7.9 GB, OOM law); static work uses the
-ghidra program already loaded per docs/re/dosbox-debugger.md conventions.
-DO NOT re-open t293's capture without first banking a NEW ship-selection
-choreography candidate (FLEET row right-click contents menu = first guess;
-orbital-grid dot clicking is MEASURED-DEAD, ships.md t293 block 2).
+NEXT t295 OQ-016 RESIDUE 2 — SETUP-TIME HOME-DRAW LAW VIA DEBUGGER SESSION
+(ordering rationale: with t294 closed, the remaining non-user-ask routes split
+two ways — the nuke law (OQ-016 r1) and magnetron witness (OQ-019 r3) BOTH now
+depend on the UNSOLVED ship-selection choreography that killed t293 (each
+needs a device/ability used BY a selected ship), and residue 5 is HELD per
+t273; OQ-005 + OQ-019-r2 are USER ASKS (D1/D3, do not rule). The home-draw
+route is the ONLY open-row route that needs no ship selection: scenario-init
+runs at new-game before any fleet exists, and the debugger toolchain is
+PROVEN — the master-built dosbox-x (docs/re/dosbox-debugger.md) closed OQ-021
+exactly this way.) Task: on a SCRATCH new-game session (own dir, NO
+resume.gam so FUN_00037d80 + the scenario-init loop 0x23a20..0x23d22 run;
+scripts/r290_poke_session.py skeleton; HARNESS LAW: background=true
+notify=true, 420 s foreground cap kills a full session), BPLM-sentinel the
+loop and answer ONE question: WHICH rng draw (stream position + modulus)
+picks each race's home star — i.e. the consumer path from CALL 0x7824f to the
+home-star store (t270 measured the JOIN DWORD[0x12e1d+race*0x1ee] == star
+base NAME-0x1C; the draw law is the gap; t30c proved it is run-local uniform
+over candidate stars, 11 distinct sets/11 lineages). CAVEATS: scratch copies
+only, never mount game/; production :9 is the corpus (read ring tail only);
+NEVER replaces /usr/bin/dosbox-x; kill-by-recorded-PID (BLOCKED runbook); if
+the loop is reached but the draw-to-store chain is ambiguous in Ghidra output,
+bank the raw register trace and stop (one session, no spiral). Closure = cited
+draw law (addresses + live values) -> upgrade rewrite pickHomeStars
+(campaign.cpp:301, currently a documented MISMATCH: deterministic max-min BFS
+instead of the vendor draw) + pin. If the session dies on harness mechanics
+twice, bank the negative and queue the residue back to BLOCKED.
+
+## LANDED t294 (2026-11-04, session 3) — word[+0x16] TEMPLATE SOURCE CLOSED:
+FILE TABLE, planitem.txt. Pure-static iteration (zero launches; :9 untouched,
+healthy t1086 the whole time). The 11 terrain weight rows at runtime 0x744f4
+are LOADED FROM planitem.txt (ASCII text after the '#' line: scalar 50 ->
+DS:0x66e4 @0x3802c; 11x4 weights -> 0x744f4 row-major, loader loop
+0x3801e..0x38067, sole store @0x3805f; grid B -> 0x7445c; grid C -> 0x744a8)
+— NOT EXE constants: 0x744f4 lies past the initialised data segment (BSS) and
+the image-wide SIB-aware store census finds exactly ONE writer into the
+window. File == banked runtime == live production RAM (58/59/60.sav, 44/44
+bytes). The per-byte grid-C split campaign.cpp called "not observed" is now
+observed (file + RAM). The INDEX word[+0x16] itself stays the rng%11 draw
+@0x23a97 (file supplies contents, draw picks row; retracted-R11 stands).
+T54b boundary noted so nobody re-refutes the row from it (T54b = the OTHER,
+image-mapped 21-dword preset pair for the special scenario mode). WHY earlier
+hunts missed it: values are decimal TEXT — packed-byte signature search is
+blind by construction. REWRITE UPGRADED: TerrainTables + loadTerrainTables()
+(economy.{h,cpp}), CampaignConfig.terrain consumed by world-gen + growth-wrap
+(campaign.cpp), main.cpp injects the loaded file; vendor default = measured
+values so stock behaviour + seeded pins + PLAYTHROUGH.md are UNCHANGED.
+Pins tests/test_terrain_t294.cpp x5, MUTATION-VERIFIED (revert-to-constants
+=> 3 consumption legs fail 96 tests; restore => 175/0). Ledger: OQ-016 stays
+open (residues 1,2,4,5), residue 3 CLOSED with citation; income-law.md t294
+block; docs/re/_wip_t294.md working notes.
 
 ## LANDED t293 (2026-11-04, session 2) — SCRIPTED MOVE-ORDER CAPTURE, BUDGET
 SPENT, NEGATIVE (honest). 4 scratch launches on Oct-29 t1086 RESUME.GAM

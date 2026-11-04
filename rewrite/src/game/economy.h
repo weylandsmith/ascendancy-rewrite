@@ -76,11 +76,55 @@ inline bool itemSlotAllows(int itemIndex, int cell, int surfaceCells) {
 // Surface cell count per planet SIZE class 0..4: SUM of planitem.txt grid C
 // row (the count grid at guest-phys 0x744a8). FUN_00037d80 accumulates the
 // row into +0x18 (assert <=100); live +0x18 == {7,11,23,45,73} on 2650/2650
-// records across 17 captures, exactly the grid-C row sums.
+// planet records across 17 captures, exactly the grid-C row sums.
+// t294: this free function is the NO-DATA FALLBACK (values MEASURED identical
+// to the shipped planitem.txt grid C); the loaded table is TerrainTables
+// below, which is what the original actually consumes.
 inline int planetSurfaceCells(int sizeClass) {
     static const int kCells[5] = {7, 11, 23, 45, 73};
     return (sizeClass >= 0 && sizeClass < 5) ? kCells[sizeClass] : 0;
 }
+
+// TERRAIN SOURCE TABLES (t294, OQ-016 residue 3 CLOSED): the original loads
+// all of these from planitem.txt at scenario init via FUN_00037fc0 — the
+// 0x744f4 weight rows are NOT compiled into the EXE (0x744f4 lies past the
+// initialised data segment, and the image-wide SIB-aware store census finds
+// exactly ONE writer into the window: the loader @0x3805f). File grammar
+// (docs/re/income-law.md S10 t294 block): after the lone '#' line, integer
+// tokens in order: pop-growth scalar -> DS:0x66e4 (0x3802c, value 50);
+// 11 rows x 4 weights -> 0x744f4 row-major (0x3801e..0x38067, record 0x1ce0);
+// grid B 5x15 -> 0x7445c+15i (0x38070..0x380a9, record 0x1ce3, unmapped);
+// grid C 5x15 -> 0x744a8+15i (0x380ad..0x380ed, record 0x1ce6). Live-RAM
+// equality file==runtime verified on production saves 58/59/60.sav.
+struct TerrainTables {
+    int weights[11][4];       // 0x744f4 analog (row = word[+0x16] draw rng%11)
+    int surfaceBySize[5];     // grid C row SUMS (FUN_00037d80 +0x18 law)
+    int popGrowth = 50;       // DS:0x66e4 analog (growth counter wrap value)
+    bool operator==(const TerrainTables& o) const {
+        if (popGrowth != o.popGrowth) return false;
+        for (int i = 0; i < 11; ++i)
+            for (int j = 0; j < 4; ++j)
+                if (weights[i][j] != o.weights[i][j]) return false;
+        for (int i = 0; i < 5; ++i)
+            if (surfaceBySize[i] != o.surfaceBySize[i]) return false;
+        return true;
+    }
+};
+// Measured vendor values (file == banked runtime == live RAM, t294).
+inline const TerrainTables& vendorTerrainTables() {
+    static const TerrainTables t = {
+        {{100,0,0,0}, {50,2,2,2}, {20,3,5,3}, {0,3,20,3}, {40,10,2,2},
+         {20,20,2,2}, {40,2,2,10}, {20,3,3,20}, {40,10,10,10}, {20,15,15,15},
+         {0,33,34,33}},
+        {7, 11, 23, 45, 73},
+        50,
+    };
+    return t;
+}
+// Strict loader (t294 grammar above; rejects on count/range violations:
+// weights must fit the u8 store law, grid C rows 1..100 per the +0x18 cap).
+bool loadTerrainTables(const std::string& path, TerrainTables& out,
+                       std::string& errOut);
 
 // Strict loaders (reject on any invariant violation, errOut set). The 255
 // terminator is SHARED with the flag list — the last value is always 255 and
