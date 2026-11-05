@@ -358,3 +358,18 @@ dominates) — keep the per-window cap SMALL and let the whole-log pty census
 count the rest. RE-FIRE liveness shortcut: a pending fire line proves the
 guest ran, but PEEK (read without advancing pty_off) — consuming it swallows
 the stop (t302 S4 law re-applies).
+
+## t304 CORE-CONF LAW (binding for every debugger session)
+`core=normal` MUST be written under [cpu] (canonical conf L494-497); under
+[dosbox] it is silently inert and core=auto selects the dynamic core. Ground
+truth = pty line 'Warning: Single-stepping may not work correctly with
+"Dynamic core"' (fires at debugger enable iff CPU_IsDynamicCore()). Dynrec
+heavy-BP check runs only at run-loop top (core_dynrec.cpp:268) = indirect
+branch targets: handler-ENTRY legs fire, mid-block call-site legs NEVER do.
+Fixed launch() conf shape (r299_leg_session.py):
+  [dosbox] machine/memsize / [cpu] core=normal / [dosbox] mcp_server,captures,
+  autosave,saveremark / [sdl] / [autoexec]  (re-opening [dosbox] works:
+  autosave + mcp verified alive in run 051904).
+Known open anomaly: normal core + armed cos_hdlr banked ZERO stops (052925)
+while the same leg fired 41x under dyn core — investigate before trusting
+normal-core negatives.

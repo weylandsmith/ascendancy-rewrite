@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-05T01:10
+updated: 2026-11-05T05:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,34 +209,65 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t304 CALLER-WITNESS AT THE cos_hdlr STOP, THEN CENSUS AT THE TRUE
-DISPATCH SITE (ordering rationale: t303 REFUTED the slot-1 router law —
-whole-log pty census {cos_hdlr:15, all five call-[ecx+4] sites:0} while the
-0x3b pump fed cos_hdlr, and t302's own BPLIST log shows btn_hdlr firing with
-router armed+silent (docs/re/_wip_t303.md S4-S5, REFUTED-ROUTES t303
-amendment). The premise "census at cos_hdlr/slot-1" is DEAD; the missing
-datum is WHICH instruction actually calls the class handlers. The pump hands
-it to us for free: at ANY cos_hdlr stop the return address at [esp] names the
-caller EIP verbatim — bank_stop is ALREADY PATCHED (ret_stack.ret0/
-ret0_file_off, scripts/r299_leg_session.py). PROBE: (1) session enters
-campaign, arms cos_hdlr ONLY, first banked stop yields ret0 (no clicks needed
-— the pump fires in ~2 s; a few stops for confidence); (2) STATIC read of the
-bytes just below ret0 in work/ascend_payload.bin to find the call-instruction
-boundary (E8 rel32 -> site=ret0-5; ff /2 modrm -> decode length; candidates
-to check first: the 0x14de8-0x14f14 `mov r32,[r32+0xa7]` cluster found t303);
-(3) add a leg at that site, run the CORRECTED click census (--census, legs =
-site + cos_hdlr + btn_hdlr): close_eventwin BEFORE every click (t298 law —
-t303's planet/empty/NEXTTURN controls were INVALID-AS-RUN, the Sparrowhawk
-modal swallowed them) and NEXTTURN control only counts with btn_hdlr armed.
-Deliverable: {sprite:[msg-ids], planet:[..], empty:[..]} at the true site +
-the dispatch instruction named, -> OQ-019 selection-writer target. Fixed
-harness laws (do NOT re-trip): fire pattern `(?<![0-9A-Fa-f])<6hex> [0-9A-F]`;
-BPDEL fired index BEFORE RUN; liveness = autosave .sav growth, never the ACK;
-arm only around polled clicks (census cycle, docs/re/dosbox-debugger.md t303
-block); pty_peek not pty_new for liveness peeks; one battery per sitting;
-control clicks pixel-verified; dialog strings are NOT payload plaintext — do
-not grep for them again. Runs: work/r1/t299-leg-20261105-{015611,020416};
-relaunch scripts/r303_relaunch.sh (reuse; --census --window 45).
+NEXT t305 NORMAL-CORE STOP ANOMALY — WHY ARMED LEGS FIRE 0x UNDER core=normal
+(ordering rationale: t304 NAMED the dispatch instruction — cos_hdlr is called
+from file 0x56cda `ff 56 08 call [esi+8]`, [esp] ret0=0x21612d witnessed 53x,
+run work/r1/t299-leg-20261105-033648 rc=0 — and FOUND that every prior
+debugger run used the DYNAMIC core (core= was inert under [dosbox]; dynrec
+cannot stop mid-block site BPs at all, core_dynrec.cpp:268). The corrected
+conf (launch() now writes [cpu]core=normal) proves normal core (pty warning
+gone, runs 051904/052925) but banked ZERO stops even for cos_hdlr, the leg
+that fired 41x under dyn core, while the guest stayed alive (autosave growth,
+moving break-EIP). Until a stop banks under normal core, the 22 site legs
+cannot be witnessed and every census attribution stalls — this single
+instrument question gates OQ-019's selection-writer probe. PROBE (<=35 calls,
+runs scripts/r299_leg_session.py --witness via scripts/r304_relaunch.sh
+pattern, venv python, disp :97, own ring): (1) --witness 2 --legs cos_hdlr
+with the fixed conf, and DUMP the raw pty slice around each armed RUN (fire
+pattern may miss normal-core stop rendering — t302 DrawCode-form law; grep
+the slice for the leg 6-hex BEFORE concluding no-fire); (2) single-[dosbox]-
+section conf variant (rule out the re-opened-section hypothesis; autosave+mcp
+worked at 051904, so this is low prior); (3) EXEC eip-read oracle
+(check_stopped_oracle) + longer windows (120 s) to catch a slow pump;
+(4) if ANY stop banks: immediately re-run the t304 census battery with a
+dialog-DRAIN loop before every click (planet/empty hit the same 'Cancel'
+record last time = modal residue) -> per-target msg-ids at 0x56cda/0x56c74 =
+the OQ-019 selection-writer datum. Fixed laws (do NOT re-trip): pty
+'Dynamic core' warning = core ground truth, never the conf line; BPDEL fired
+index BEFORE RUN; liveness = autosave growth; close_eventwin before clicks;
+one battery per sitting; kill scratch dosbox/Xvfb by RECORDED PID; pkill -f
+matches your own shell — never use it here.)
+
+## LANDED t304 (2026-11-05, session 13) — DISPATCH INSTRUCTION NAMED
+### (0x56cda call [esi+8]); SPRITE CLICK WALKS THE CLASS MSG LAYER via
+### btn_hdlr (t302 negative re-scoped); CORE-CONF LAW: all prior runs ran the
+### DYNAMIC core. docs/re/_wip_t304.md S0-S4, dosbox-debugger.md t304 block,
+### REFUTED-ROUTES t304 amendment; runs work/r1/t299-leg-20261105-033648
+### (rc=0, 45 stops), -043543/-051904/-052925 (site probes), r304_loop killed
+### by pid after attempt 1 banked.
+MEASURED: (1) CALLER WITNESS (--witness 3 --census combined, single boot):
+12/12 witness stops + 41/41 census cos_hdlr stops -> [esp] ret0=0x21612d =
+call site file **0x56cda** = ff 56 08 **call [esi+8]** (payload-verified);
+generic pump shape: mov esi,[eax+0xa7] (class table), record array
+[rec+0x4226]>>0x10, msg id stack-dword sar 0x10. t303 slot-1 zero-fires fully
+re-attributed. (2) CENSUS (btn_hdlr armed + close_eventwin pre-arm, 4/4
+targets measured, guest alive, turn 1086 held): sprite(48,151) -> btn_hdlr
+msg 0x1 NAME='Leave Orbit' via 0x56cda = THE WORKING MAP CLICK DOES EXECUTE
+THE CLASS MSG LAYER; planet(439,331)+empty(236,200) -> SAME 'Cancel' record
+msg 0x4 via 0x56c74 = modal residue, controls invalid-as-run; control_nextturn
+-> btn_hdlr msg 0x8 NAME='PLSQUARE', ret0 file 0x3d391 = direct E8 at 0x3d38f
+(btn_hdlr has 51 E8 sites; t303 'ZERO' applied to other legs only).
+(3) STATIC whole-image ff/2 decode: 22 slot-2 sites (13 esi, 2 edi, 1 ebx,
+6 ebp-disp32 — the prior WIP's mod=01 scan missed the 6); ZERO call [ecx+8].
+(4) HARNESS LAWS: `core` is a [cpu] setting; every session conf had it under
+[dosbox] = inert = ALL t299..t304 ran dyn core (pty warning verbatim); dynrec
+heavy-BP check only at run-loop top (core_dynrec.cpp:268) -> mid-block site
+legs cannot fire there; launch() conf FIXED (re-opened [dosbox] keeps
+autosave+mcp alive, 051904). NEW ANOMALY: normal core banked ZERO stops even
+cos_hdlr (052925, guest alive) — unresolved, gates t305. (5) Instrument:
+--witness mode; bank_stop ret_stack guard fix (image END vs size) +
+ret0_call_site; census default = 22 s2_* + cos_hdlr + btn_hdlr. NO LEDGER ROW
+CLOSED (strict-close): OQ-016, OQ-019 stay open.
 
 ## LANDED t303 (2026-11-05, session 12) — MSG-CENSUS: SLOT-1 ROUTER LAW
 ### REFUTED; MAP-CLICK ENTRY NEITHER cos_hdlr NOR SLOT-1 (cited negative);

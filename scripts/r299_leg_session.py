@@ -113,7 +113,29 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
         "disp_30d02": 0x30D02,
         "disp_7a7eb": 0x7A7EB,
         "disp_7aa3e": 0x7AA3E,
-        "disp_7b020": 0x7B020}
+        "disp_7b020": 0x7B020,
+        # t304 SLOT-2 CALL SITES: cos_hdlr/btn_hdlr are class-table SLOT 2
+        # (+0x8). STATIC (docs/re/_wip_t304.md S1): `call [ecx+8]` does NOT
+        # EXIST in the payload (zero sites) — the slot-2 call is always
+        # ff /2 mod=01 disp8=08 through esi (13x), edi (2x), ebx (1x), each
+        # preceded by a class-table load `mov r32,[r32+0xa7]` (or, at 0x809fe,
+        # a global object-table index). t303 armed only slot-1 ff5104 sites,
+        # which is why cos_hdlr fired 15x "unwitnessed". These 16 are the
+        # candidate callers; the whole-log pty census names the one(s) that
+        # actually fire. Lead: 0x15b0f (msg id via `sar ebx,0x18` = generic).
+        # t304 STATIC RE-VERIFY (whole-image ff/2 decode, not a mod=01 grep):
+        # 22 slot-2 sites total. The 6 below are the DISP32 form the WIP scan
+        # missed: `8b a8 a7 00 00 00` mov r32,[r32+0xa7] (disp32) then ff 55 08
+        # call [ebp+8]; 0x26c43/0x27082 sit INSIDE cos_hdlr's span, 0x333ef/
+        # 0x3340c inside the button-handler span -> handler-to-handler chains.
+        "s2_26c43": 0x26C43, "s2_27082": 0x27082, "s2_31550": 0x31550,
+        "s2_333ef": 0x333EF, "s2_3340c": 0x3340C, "s2_56c74": 0x56C74,
+        "s2_15b0f": 0x15B0F, "s2_356a5": 0x356A5, "s2_3afc3": 0x3AFC3,
+        "s2_3b38b": 0x3B38B, "s2_3b3a9": 0x3B3A9, "s2_3b4e9": 0x3B4E9,
+        "s2_3b584": 0x3B584, "s2_3b5be": 0x3B5BE, "s2_3b607": 0x3B607,
+        "s2_553cb": 0x553CB, "s2_553e5": 0x553E5, "s2_55406": 0x55406,
+        "s2_56cda": 0x56CDA, "s2_809fe": 0x809FE, "s2_4e2cb": 0x4E2CB,
+        "s2_54a83": 0x54A83}
 
 EVENTS = []
 hx = lambda v: hex(v) if isinstance(v, int) else None
@@ -197,7 +219,9 @@ class Sess(R298.Sess):
             fh.write(f"""[dosbox]
 machine=svga_s3
 memsize=16
+[cpu]
 core=normal
+[dosbox]
 mcp_server={self.a.port}
 captures={self.out}/caps
 autosave=10 41-60
@@ -430,8 +454,14 @@ ASCEND.EXE
                 r0, r1 = struct.unpack_from("<II", eb, 0)
                 rec["ret_stack"] = {"esp": hx(esp), "ret0": hx(r0),
                                     "ret1": hx(r1),
+                                    # t304 GUARD FIX: bound must be the image
+                                    # END (P0+size), not the size — comparing
+                                    # linear vs 0x8CC83 rejected every real
+                                    # ret0 (logged file=None at 03:38:55).
                                     "ret0_file_off": (hx((r0 & 0xFFFFFF) - P0)
-                                                      if P0 <= (r0 & 0xFFFFFF) < 0x8CC83 else None)}
+                                                      if P0 <= (r0 & 0xFFFFFF) < CODE_END else None),
+                                    "ret0_call_site": (hx((r0 & 0xFFFFFF) - P0 - 3)
+                                                       if P0 <= (r0 & 0xFFFFFF) < CODE_END else None)}
                 self.log(f"STOP {tag} ret0={hx(r0)} "
                          f"file={rec['ret_stack']['ret0_file_off']}")
         self.log(f"STOP {tag} leg={rec['leg']} eip={hx(eip)} "
@@ -753,6 +783,14 @@ ASCEND.EXE
         between clicks runs leg-free — a hot armed leg + an un-polled click =
         the guest frozen mid-sequence (t302 law, the reason t302 could not
         census map clicks). x=None = BASELINE window (no click)."""
+        if x is not None:
+            # t298 LAW re-confirmed (t303 defect 4a): an open modal SWALLOWS
+            # map clicks (225/207 px diffs = screen repaint only). Close first,
+            # BEFORE the arm, so the armed window is not spent on dead clicks.
+            if not self.close_eventwin():
+                self.log(f"CENSUS {tag}: close_eventwin failed — click "
+                         f"skipped (modal law)")
+                return None
         if not self.assert_on_map(f"pre_{tag}"):
             return None
         if not self.arm_census(self.legs):
@@ -810,15 +848,23 @@ def main():
     ap.add_argument("--clicks-per-view", type=int, default=4)
     ap.add_argument("--control-click", type=int, default=0)  # t301: black rect, REFUTED
     ap.add_argument("--census", action="store_true")   # t303 msg-census mode
+    ap.add_argument("--witness", type=int, default=0)  # t304 A: bank N stops, no clicks
     ap.add_argument("--window", type=int, default=30)  # census bank-window s
     args = ap.parse_args()
 
+    if args.witness and args.legs == ap.get_default("legs"):
+        # t304 WITNESS default: cos_hdlr ONLY (hot pump leg -> stops ~2 s;
+        # leg-light = the t302 freeze law respected by construction).
+        args.legs = "cos_hdlr"
     if args.census and args.legs == ap.get_default("legs"):
-        # t303 CENSUS default set: the COSMOS slot-2 handler (only COSMOS leg
-        # that ever fires, t302) + the five `call [ecx+4]` dispatch sites
-        # (covers EVERY window class incl. BatControl/BatMode siblings).
-        args.legs = ("cos_hdlr,disp_26eda,disp_30d02,disp_7a7eb,disp_7aa3e,"
-                     "disp_7b020")
+        # t304 CENSUS default set (t303 slot-1 set DEAD per REFUTED-ROUTES
+        # t303 amendment): every slot-2 call site in the payload (22, static
+        # whole-image ff/2 decode) + both handlers. The pty census attributes
+        # the true dispatch site; btn_hdlr makes the NEXTTURN control
+        # witnessable (t303 defect 4b).
+        args.legs = ",".join([f"s2_{o:05x}" for o in sorted(
+            v for k, v in LEGS.items() if k.startswith("s2_"))]
+            + ["cos_hdlr", "btn_hdlr"])
     legs = [l.strip() for l in args.legs.split(",") if l.strip()]
     for l in legs:
         if l not in LEGS:
@@ -894,6 +940,52 @@ def main():
             s.log("NEGATIVE: base mismatch — the armed leg addresses would be "
                   "wrong for this session; aborting interpretation")
             return 1
+
+        # ---- t304 WITNESS MODE: no clicks, no choreography. Arm cos_hdlr
+        # ONLY; the 0x3b pump fires it ~1/s, and every bank_stop dumps [esp]
+        # -> ret0 = the CALLER EIP verbatim (the datum t303 could not name).
+        if args.witness:
+            s.census = True          # light bank_stop + hot-leg liveness law
+            s.pay = pay
+            allrecs = []
+            for att in range(3):
+                allrecs += (s.census_click(None, None, f"witness{att}",
+                                           args.window) or [])
+                if len([r for r in allrecs
+                        if r.get("ret_stack", {}).get("ret0_file_off")]) >= 3:
+                    break
+            rets = [r["ret_stack"] for r in allrecs
+                    if r.get("ret_stack", {}).get("ret0_file_off")]
+            s.log(f"WITNESS: {len(allrecs)} stops, {len(rets)} with ret0: "
+                  + " | ".join(f"{r['ret0']}->{r['ret0_file_off']}"
+                               for r in rets[:8]))
+            whole = open(s.ptylog, "rb").read().decode("utf-8", "replace")
+            pty_census = {}
+            for name in s.legs:
+                lin = P0 + LEGS[name]
+                pat = re.compile(rf"(?<![0-9A-Fa-f]){lin & 0xFFFFFF:06X} "
+                                 r"[0-9A-F]", re.I)
+                pty_census[name] = len(pat.findall(whole))
+            s.probes.append({"probe": "witness-ret0", "stops": len(allrecs),
+                             "ret0": [r["ret0_file_off"] for r in rets]})
+            s.persist()
+            with open(op.join(s.out, "witness.json"), "w") as fh:
+                json.dump({"stops": allrecs, "pty": pty_census}, fh, indent=1)
+            rc = 0 if rets else 1
+            s.log(f"SESSION END rc={rc} witness-ret0={len(rets)}"
+                  + (" CONTINUING to census (combined mode)"
+                     if args.census else ""))
+            if args.census:
+                # combined single-boot session: re-target legs to the census
+                # set (slot-2 call sites + both handlers) and fall through.
+                args.legs = ",".join([f"s2_{o:05x}" for o in sorted(
+                    v for k, v in LEGS.items() if k.startswith("s2_"))]
+                    + ["cos_hdlr", "btn_hdlr"])
+                legs = args.legs.split(",")
+                s.legs = legs
+                rc = 1   # census result decides the session rc
+            else:
+                return rc
 
         # ---- t303 CENSUS MODE: never arm across choreography. Every
         # measurement is an arm -> click -> bank-window -> disarm cycle;

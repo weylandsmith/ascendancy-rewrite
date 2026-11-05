@@ -557,3 +557,21 @@ PATCHED for this, ret_stack.ret0/ret0_file_off); arm the census there.
 DEAD too as a control design: planet/empty/NEXTTURN clicks taken while an
 unclosed modal dialog is up (t298 law re-broken in t303 — close_eventwin
 BEFORE every control click; and a NEXTTURN control needs btn_hdlr ARMED).
+
+## t304 AMENDMENT (binding): (1) T302/T303 'MAP-CLICK ENTRY IS NOT THE CLASS
+## MSG LAYER' IS RE-SCOPED: btn_hdlr msg 0x1 NAME='Leave Orbit' fired for the
+## pixel-proven working sprite click (48,151), reached via pump call site file
+## 0x56cda (ff 56 08 call [esi+8]; [esp] ret0=0x21612d witnessed 41+12 times,
+## run work/r1/t299-leg-20261105-033648). Slot-1 stays dead (t303 stands);
+## 'not cos_hdlr, not slot-1' stands; 'not the class msg layer' is DEAD.
+## (2) THE PRE-t304 SITE-ZERO-FIRE LOGS ARE A CORE ARTIFACT, NOT GAME
+## EVIDENCE: `core` is a [cpu] setting (canonical dosbox-x-2026.10.01.conf
+## L494-497) but sat under [dosbox] in every session conf (inert) -> all
+## t299..t304 runs ran the DYNAMIC core (pty warning verbatim); dynrec checks
+## heavy BPs only at run-loop top (core_dynrec.cpp:268) = indirect-branch
+## targets, so mid-block call-site BPs CANNOT stop. Do not re-read those logs
+## as dispatch evidence; do not re-arm site legs under a conf whose [cpu]
+## section is missing.
+## (3) UNDER THE FIXED CONF ZERO STOPS BANK EVEN FOR cos_hdlr (runs
+## t299-leg-20261105-051904/-052925, guest alive) — UNRESOLVED instrument
+## anomaly (STATE t305). Do NOT conclude handlers stopped being called.

@@ -192,6 +192,7 @@ stays open.
 BUILD DECISION not RE unknown (t256c census 62,762 rows, AI dossier row 16
 GAP->BOUNDARY; docs/DECISIONS.md D3); (3) magnetron witnessed use (scriptable
 via t289 drive class). | open
+t304 note (run t299-leg-20261105-033648, ret_stack witnesses): the working sprite click DOES walk the class msg layer — btn_hdlr msg 0x1 NAME='Leave Orbit' via pump site file 0x56cda (ff 56 08 call [esi+8]); planet/empty clicks both hit the SAME 'Cancel' record msg 0x4 via 0x56c74 = modal residue, controls INVALID-AS-RUN (re-run with dialog-drain loop needed); NEXTTURN = btn_hdlr msg 0x8 NAME='PLSQUARE' direct E8 call site 0x3d38f. Selection WRITER still unnamed — row stays open (strict-close).
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —
