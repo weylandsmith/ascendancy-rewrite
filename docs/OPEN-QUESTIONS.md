@@ -80,8 +80,10 @@ campaign.cpp, main.cpp injects; pins tests/test_terrain_t294.cpp x5,
 mutation-verified; income-law.md t294 block); (4) per-slot shield-byte
 consumer (OQ-019 family); (5) human build-order minutiae 0.4% samples;
 item-35/35 completion branches = MEASURED zero-witness + AI-unreachable
-(REFUTED t271, re-open conditions there).
-| open
+(REFUTED t271, re-open conditions there). t299 debugger leg witness ran
+(2026-11-04): zero fires, ATTRIBUTED negative — system-view clicks never
+reach the batmode msg layer (see OQ-019 note + ships.md S27); no OQ-016
+constant moved, row stays open.
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor cost hack, Orbital Docks effect
@@ -150,6 +152,17 @@ read from it) = system-identity oracle; ship_array_law count 30 UNDERCOUNTS
 command ring churns from non-order input (delta-only, not an oracle).
 NEXT WITNESS = DEBUGGER CLASS t299 (BPLM 0x1ba39/0x1ba5e/0x1baa7/0x1bad3/
 0x1b114, r290 poke skeleton, dosbox-debugger.md) — no fourth mouse launch.
+t299 RUN (2026-11-04, 6 debugger sessions work/r1/t299-leg-*): instrument
+PROVEN (8 code BPs armed incl. handler 0x1aef8 + router 0x1b070, control
+MEMDUMPBIN byte-exact) and NEGATIVE x3 with attribution: the same sessions'
+FLEET/row/End-Turn clicks changed game state, yet ship/planet/empty clicks
+in the Icarus system view fired ZERO legs — and windows.txt says the clicks
+were inside BatModeWnd 7,7-465,472 with no child covering them. The batmode
+msg layer NEVER EXECUTES on these clicks; '0x1ba8c mouse-reachable
+publication' REFUTED for synthetic clicks. Disambiguation t301: TOGGRID
+control-click (SENDMESSAGE 74, inside BatModeWnd) while handler armed —
+FIRE=dispatch alive but map clicks bypass it; ZERO=handler attribution dead
+(ships.md S27 + _wip_t299 S7/S8).
 (2) per-ship build/redesign path =
 BUILD DECISION not RE unknown (t256c census 62,762 rows, AI dossier row 16
 GAP->BOUNDARY; docs/DECISIONS.md D3); (3) magnetron witnessed use (scriptable

@@ -1504,3 +1504,46 @@ relay, 0x1baa7 PUBLISH, 0x1bad3 planet-order leg, 0x1b114 mode-2 deselect}
 in the r290 poke skeleton — one launch answers whether a click EVER selects
 and what the hit-test returns per pixel. NO LEDGER ROW CLOSED t298
 (strict-close): OQ-016 residue 1, OQ-019 residues 1/3 stay open.
+
+## S27 t299 (2026-11-04) — DEBUGGER LEG WITNESS: PARTIAL (harness-negative)
+Runs work/r1/t299-leg-{201408,201757,202146} (scripts/r299_leg_session.py NEW,
+r299_relaunch.sh; dbg build work/r1/bin/dosbox-x-dbg; production :9 untouched).
+MEASURED, instrument healthy in all 3 attempts: pmode arm window won first try
+(cs=0160, EIP in-image), 6 code legs armed (BPLIST confirmed), End Turn 1
+landed t1086->1087, FLEET opened, row-93 jump -> Icarus system view, tan sprite
+found at the VALIDATED (48,151) class, clicks sprite/planet/empty delivered —
+ZERO fires at batcon/select/dl1relay/publish/planet/deselect, ZERO stops, ring
+kept autosaving (game never froze). UNATTRIBUTABLE as written: every armed leg
+sits BEHIND the msg-4 router 0x1b070, so zero-fires is equally consistent with
+hit-test-null and with msg-4 never reaching BatModeWnd. Run 4 (armed handler
+0x1aef8 + router 0x1b070 ADDED to LEGS, script patched+compiles) separates
+them; NOT RUN this iteration (budget). Deliverable (iii) (batwin instance law)
+also awaits a register-bearing stop. NO LEDGER ROW CLOSED (strict-close):
+OQ-016 r1, OQ-019 r1/r3 stay open. INSTRUMENT LAWS BANKED (docs/re/
+dosbox-debugger.md + _wip_t299.md): code-BP arming is mode-bound (GetAddress
+evaluated at arm time -> arm AFTER campaign load, gate P0<=EIP<image end);
+AddBreakpoint does not Activate (arm while stopped, RUN once); MEMDUMPBIN
+rejects '/' in filenames (expression parser) AND uppercases the filename;
+MEMDUMPBIN 0000: dumps selector-0 junk; EXEC answers WHILE RUNNING on this
+build (t282's stopped-socket law extended: a reply does NOT imply stopped —
+fire detection must watch the pty code-view line CS:%04X:linear:%08X).
+UPDATE t299 RUN 4 (same session, same day) — RUN 4 WAS RUN, 3 attempts
+(work/r1/t299-leg-20261104-205111/205500/205849), handler 0x1aef8 + router
+0x1b070 ARMED with the 6 legs (8 total, BPLIST-confirmed identical x3,
+control MEMDUMPBIN MATCH=True x1). Result: ZERO fires x3 on
+sprite(48,151)/planet(439,331)/empty(236,200) clicks in the Icarus system
+view — WHILE IN THE SAME SESSION the FLEET-button, row-jump and End-Turn
+clicks all PRODUCED game effects (ring diffs 122756 / view change / t+1).
+ATTRIBUTED NEGATIVE: system-view ship/map clicks NEVER EXECUTE the
+batmode msg layer (handler entry, router, or any of the six legs) — the
+t297 claim '0x1ba8c = MOUSE-REACHABLE order publication' is REFUTED for
+synthetic clicks on these pixels. windows.txt law verified verbatim: all
+click points lie INSIDE BatModeWnd 7,7-465,472 and NO child button covers
+them (children all x>=479), so no child stole the clicks. Static: 0x1aef8
+and 0x1b070 have ZERO E8 callsites and ZERO u32 refs in the payload image
+(the only live ref is the heap member+0x88 window-instance slot). Open
+disambiguation (t301): TOGGRID control-click (inside BatModeWnd, SENDMESSAGE
+74) while handler armed — FIRE means msg dispatch alive but map clicks
+bypass it (polled hit-test); ZERO means the 0x1aef8 handler attribution is
+dead and the leg map must be re-derived from the live instance.
+NO LEDGER ROW CLOSED (strict-close); OQ-016 r1, OQ-019 r1/r3 stay open.

@@ -209,38 +209,82 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t299 DEBUGGER SELECTION/ORDER WITNESS (ordering rationale: the scripted
-mouse route is SPENT — t298 ran the third and final launch and its negative
-was a HARNESS negative: the battery never saw the target ship because the
-FLEET list is not in ship-array order (measured: rows = slots 18/7/16/22;
-sort law UNKNOWN) and the sprite finder needs the client-rect bound x<=465.
-Every remaining unknown is a runtime-state question the ring cannot see —
-what the hit-test returns per pixel, whether a click EVER reaches the SELECT
-leg, what [win+0xaf]/[win+0xb3]/[win+0xb7] hold — and the master-built
-debugger answers them in ONE launch (t290/t292 precedent, docs/re/
-dosbox-debugger.md operating rules + r290_poke_session.py skeleton).
-Task: scratch session (game-wp, private Xvfb, background=true, venv
-python) that ENTERS THE CAMPAIGN, End Turns until an owner-0 kind-4 MOVES>0
-exists (scan PAST index 30 — count word undercounts, ships.md S26 c.3),
-jumps via the FLEET row whose NAME matches the target (read names from the
-screen or right-click a row -> contents display), then BREAKS on the
-batmode legs via the sentinel technique (BPLM is a MEMORY-CHANGE watchpoint:
-watch the LINEAR address of a cell each leg writes — ds:0x43508 physical
-X+0x242000 for the PUBLISH leg 0x1baa7; the batcon legs write [win+0xb3/
-+0xb7] — pin win first via the ONE handler-ptr hit at member 0x247978 using
-the PHYSICAL value law, ships.md S26 c.1) and log EIP/registers + [ebp+0xab]
-clip + [[clip+1]] object per hit while driving the S1-S7 click battery
-(r298_order_session.py is the drive skeleton; its client-rect-bounded
-finders are already fixed). Deliverable: banked answer to (i) does a click
-on an in-system owner-0 kind-4 ship reach 0x1ba39 (SELECT) or die at the
-hit-test/0x1b114, (ii) which leg an order takes (0x1ba5e relay ecx=2 vs
-0x1bad3 ecx=4 vs 0x1baa7 publish), (iii) the batwin instance address law.
-If a leg hits and the kind-2/flight witness then fires on the ring: bank
-the d_vs_walk flight arithmetic (OQ-019 residue 1 closes with it). If the
-debugger session cannot break the legs at all: honest negative to ships.md
-S27 and the mouse/driver class goes to REFUTED-ROUTES with the evidence.
-DO NOT launch a fourth scripted mouse session and do NOT re-derive the
-pointer-value law (S26 c.1 is binding).
+NEXT t301 TOGGRID CONTROL-CLICK DISAMBIGUATION (ordering rationale: t300
+delivered the ATTRIBUTED negative — 3 debugger sessions with handler 0x1aef8
++ router 0x1b070 + 6 legs armed (8 total, BPLIST-identical x3, MEMDUMPBIN
+control byte-exact) fired ZERO on sprite/planet/empty clicks in the Icarus
+system view, while the same sessions' FLEET/row/End-Turn clicks changed game
+state; windows.txt VERBATIM puts all click points inside BatModeWnd
+7,7-465,472 with no child covering them (all children x>=479). Two live
+hypotheses remain and ONE click separates them: arm the same 8 legs, reach
+the Icarus view exactly as t300 did, then click TOGGRID (windows.txt rect
+557,403-587,433, SENDMESSAGE 74 -> centre (572,418)) — a known-good click
+inside the same window. FIRES => msg dispatch is alive and system-map ship
+clicks BYPASS it (polled hit-test law; selection/order witness must move to
+the BPLM watchpoint class on the mouse-state block or the t290 poke route).
+ZERO => the 0x1aef8/0x1b070 handler attribution itself is dead (zero E8
+callsites + zero u32 refs in the image already hint this): re-derive the
+leg map from the live window INSTANCE (member+0x88 physical-value law,
+S26 c.1 binding) before any further batmode probing. Run: bash
+scripts/r299_relaunch.sh (the control click is built into
+scripts/r299_leg_session.py view-0 battery, --control-click 1 default;
+TOGGRID result logs as tag TOGGRID_control). Fixed harness traps (do NOT
+re-trip): MEMDUMPBIN filenames bare+relative (parser reads '/' as division)
+and UPPERCASE on disk; MEMDUMPBIN 0000: = selector-0 junk; arm only AFTER
+campaign load (GetAddress is arm-time-evaluated); EXEC answers while RUNNING
+so fire detection is the pty code-view line, never EXEC-reply-absence;
+post-load autosave ring slots 41/42 may hold PREVIOUS-run bytes until the new
+game's first save; FLEET reopen after a click battery FAILS (t300 views 1-3
+diff 132/0) — one battery per sitting, view 0 only.
+DO NOT launch a scripted mouse session on the RELEASE build (class budget
+spent, t298) and do NOT re-derive the pointer-value law (S26 c.1 binding).
+
+## LANDED t300 (2026-11-04, session 9) — HANDLER/ROUTER-ARMED RUN: ATTRIBUTED
+ZERO-FIRE NEGATIVE (docs/re/_wip_t299.md S7-S8, ships.md S27 update,
+REFUTED-ROUTES t299 entry; runs work/r1/t299-leg-20261104-{205111,205500,
+205849}). MEASURED: (1) 8 code BPs armed identical x3 incl. handler ENTRY
+0x1aef8 + router 0x1b070; MEMDUMPBIN control MATCH=True (dump laws from
+session 8 hold). (2) Attempt-1 full good choreography (t 1086->1087, FLEET
+diff 122756, row-93 -> Icarus, sprite (48,151) + planet (439,331) + empty
+(236,200) clicked): ZERO fires, pty 'Memory breakpoint' count 0, game never
+froze. (3) SAME-SESSION CONTRAST = the attribution: FLEET-button/row-jump/
+End-Turn clicks PRODUCED state changes, so synthetic clicks reach the game;
+yet none of the 8 batmode msg-layer addresses executed on map clicks.
+(4) windows.txt VERBATIM cross-check: BatModeWnd 7,7-465,472 contains every
+click point, children all x>=479 (TOGGRID 557,403-587,433 SENDMESSAGE 74) —
+no child interception possible. (5) Static: 0x1aef8 AND 0x1b070 have ZERO E8
+callsites and ZERO u32 refs in the payload image (batcon 0x1b91c has 2, at
+0x1da51c/0x1da62e — enclosing fn NOT found by prologue scan, deferred);
+payload INT census CD33 x5 / CD31 x42. (6) EXEC-while-running probe answered
+rtt 0.05s -> stopped-oracle INVALID, pty scan is the only stop detector.
+(7) FLEET reopen after battery fails — one battery per sitting. NO LEDGER ROW
+CLOSED (strict-close): OQ-016 r1, OQ-019 r1/r3 stay open; t298's 'not
+refuted' is now a CITED negative (REFUTED-ROUTES t299 section). Control-click
+probe built (--control-click default 1) -> t301.
+
+## LANDED t299 (2026-11-04, session 8) — DEBUGGER LEG WITNESS: instrument
+PROVEN, evidence PARTIAL (honest negative x3; docs/re/_wip_t299.md S1-S7 +
+ships.md S27; runs t299-leg-{195933-crash,201408,201757,202146}; scripts/
+r299_leg_session.py + r299_relaunch.sh NEW). MEASURED: (1) code-BREAKPOINT
+flow works on dosbox-x-dbg headless: BREAK lottery at title (settle 45) ->
+RUN -> campaign enter -> post-load BREAK catches pmode window (cs=0160, EIP
+in-image) -> arm N legs -> BPLIST confirms -> RUN -> battery; C_HEAVY_DEBUG
+adds no 0xCC, check runs every instruction. (2) ARMING IS MODE-BOUND:
+GetAddress(seg,off) evaluates AT arm time (seg==CS -> SegPhys(cs)+off) — arm
+at the real-mode title bakes a wrong location; gate = stopped + live CS +
+P0<=EIP<P0+0x8CC83. (3) AddBreakpoint does NOT Activate (only RUN does) —
+`EXEC BP` while running is inert: arm-while-stopped, RUN once, attribute by
+EIP. (4) EXEC answers WHILE RUNNING (rtt 0.05 s) — a reply does NOT imply
+stopped; fire detection = pty code-view line '0160:<lin8>'. (5) MEMDUMPBIN:
+'/' in filename = division -> whole-command reject; ParseCommand UPPERCASES
+the filename; length arg is hex; 0000: selector dumps GDT-slot-0 JUNK (use
+CS:). (6) Offline re-confirmation: handler physical P0+0x1aef8 has EXACTLY
+ONE RAM hit (member 0x247978, static data image — reproducible t297+t298).
+NEGATIVE (unattributable, see NEXT): sprite(48,151)/planet/empty clicks in
+the Icarus view produced ZERO stops at the 6 downstream legs while the ring
+kept autosaving (game running, never frozen). NO LEDGER ROW CLOSED
+(strict-close): OQ-016 r1, OQ-019 r1/r3 open. NEXT=t300 run 4 with
+handler+router armed (script already patched+committed).
 
 ## LANDED t298 (2026-11-04, session 7) — LIVE ORDER-WITNESS #2: HARNESS
 NEGATIVE + FIVE BINDING MEASUREMENT CORRECTIONS (docs/re/_wip_t298.md +

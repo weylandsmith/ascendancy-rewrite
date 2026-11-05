@@ -464,3 +464,24 @@ every click aimed at them hits the sidebar. Fixed in r298_order_session.py.
 The scripted MOUSE session class is also budget-spent by standing law
 (t293 three + t297 one + t298 three): the next witness on the selection/order
 legs is the debugger class (t299), not launch #4.
+
+## t299 — THE STATIC BATMODE MSG LAYER IS NOT EXECUTED BY SYSTEM-VIEW CLICKS
+Claim tested (t297 static reading): system-view ship clicks walk msg-4
+router 0x1b070 -> batcon 0x1b91c -> select/publish legs, so a debugger BP
+on those legs witnesses selection. MEASURED FALSE (3 debugger sessions
+work/r1/t299-leg-20261104-{205111,205500,205849}, 8 code BPs armed incl.
+handler ENTRY 0x1aef8 and router 0x1b070, MEMDUMPBIN control byte-exact,
+pty 'Memory breakpoint' count 0): clicks on the validated ship sprite
+(48,151), planet (439,331) and empty (236,200) in the Icarus system view
+executed NONE of the eight addresses — IN SESSIONS WHERE FLEET-button,
+row-jump and End-Turn clicks demonstrably changed game state (ring diffs
+122756 / view change / t 1086->1087). windows.txt VERBATIM: BatModeWnd rect
+7,7-465,472 contains all three click points; every named child button sits
+x>=479, so no child intercepted them. Static cross-check: 0x1aef8 and
+0x1b070 have ZERO E8 callsites and ZERO u32 refs in the payload image.
+DEAD: any plan that witnesses system-view selection/orders by arming the
+STATIC legs 0x1b91c/0x1ba39/0x1ba5e/0x1baa7/0x1bad3/0x1b114 (or the router)
+and clicking ship/planet/empty pixels. NOT claimed: that selection is not
+msg-dispatched SOMEWHERE (window-manager hit-test vs wrong handler
+attribution is separated by the t301 TOGGRID control-click probe; see
+docs/re/_wip_t299.md S8). t298's 'not refuted' is hereby a CITED negative.
