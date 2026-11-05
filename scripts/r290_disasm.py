@@ -37,8 +37,11 @@ def disasm(data, base):
         tf.write(data)
         path = tf.name
     try:
+        # -D (NOT -d): a raw binary has no symbols, so -d disassembles
+        # NOTHING and every window printed empty (t309 trap: the fallback
+        # silently returned zero instructions whenever capstone was absent).
         r = subprocess.run(["objdump", "-b", "binary", "-m", "i386", "-M",
-                            "intel", "-d", path],
+                            "intel", "-D", path],
                            capture_output=True, text=True)
         out = []
         for line in r.stdout.splitlines():

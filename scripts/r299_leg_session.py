@@ -228,7 +228,31 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
         "w43504_55d35": 0x55D35,   # gate cmp [esp+8],1 at 0x55d25 (78663)
         "w43508_51a8e": 0x51A8E,   # turn-gated ds:0x484ec>0x96, ring 0x11
         "w43508_51fc2": 0x51FC2,   # eax=[edx+0x59], ring 0x11 (73808)
-        "w43508_55bbd": 0x55BBD}   # edi=0x11 leg into 0x55d6f (78564)
+        "w43508_55bbd": 0x55BBD,   # edi=0x11 leg into 0x55d6f (78564)
+        # t309 TWO-RING MAP (docs/re/_wip_t309.md S1.8/S1.11 — the t308
+        # 'star click posts ring 0x10' reading CONFLATED THE TWO RINGS:
+        # 0x28ed8 posts RING-A {code=edx=1, param=ebx=0x10}; the DAT-writing
+        # consumer dispatches on the CODE field of RING-B). Bytes verified
+        # this session vs work/ascend_payload.bin:
+        "cons_entry": 0x55AE8,      # RING-B CONSUMER fn entry (53 51 52 56
+                                    # 57 55 83ec10; sole E8 caller = pump site
+                                    # 0x54b74 in main-loop fn 0x54650; gates
+                                    # ds:0x7a358!=-1, count [core+0x4758]>>16
+                                    # !=0, mode [core+0x4226]>>16==1)
+        "ringB_post": 0x55A60,      # RING-B POST fn entry (56 57 89d6 89df;
+                                    # 19 E8 sites, codes 1..0x19) — any ring-B
+                                    # activity at all is a fire here
+        "ringB_w10_41c17": 0x41C17, # ring-B code-0x10 post #1 (edx=0x10,
+                                    # ebx=esi, ecx=[esi+0x5e]) fn 0x41260
+        "ringB_w10_499e0": 0x499E0, # ring-B code-0x10 post #2, same shape,
+                                    # fn 0x49880 — the ONLY two 0x10 posters
+        "ringA_resolver": 0x55DF4}  # RING-A shadow-copy+resolver fn entry
+                                    # (called from 0x54b4a gated ([core+
+                                    # 0x44aa]>>16)>0; jmp-table 0x55e86 on
+                                    # code<=8) — POSITIVE CONTROL: the star
+                                    # ENTER posts ring-A code 1, so a fire
+                                    # here after the click proves the pump
+                                    # ran while armed
 
 EVENTS = []
 hx = lambda v: hex(v) if isinstance(v, int) else None
@@ -1114,6 +1138,14 @@ def main():
                         return None
                     rd = lambda X: struct.unpack_from("<I", mm, bb + SL.OFF + X)[0]
                     v43504 = rd(0x43504)
+                    # t309 CORE READS (docs/re/_wip_t309.md S1.13): core
+                    # struct base = the 0x7a35c immediate (t307 self-
+                    # relocation law: RAM immem = +0x242000 rebased, member
+                    # index = linear - mem_base, so member bb+SL.OFF+0x7a35c).
+                    # mode/pump-gates decide whether the RING-B consumer CAN
+                    # run; ring counters decide whether it HAS work.
+                    core = bb + SL.OFF + 0x7a35c
+                    rdc = lambda D: struct.unpack_from("<I", mm, core + D)[0]
                     # t308 S1 LAW: the sav Memory member is +0x88 off guest
                     # LINEAR, so bb+SL.OFF+X == linear mem_base(obj1)+X — the
                     # oracle address IS the rebased store target (t307 fire
@@ -1126,7 +1158,21 @@ def main():
                          "DAT_43504_name": s.star_name_at(mm, v43504),
                          "alt_285504": hx(struct.unpack_from(
                              "<I", mm, bb + SL.OFF - 0x88 + 0x43504)[0]),
-                         "DAT_43508": hx(rd(0x43508))}
+                         "DAT_43508": hx(rd(0x43508)),
+                         # t309 gate/ring snapshot (S1.13): mode==1 required
+                         # by BOTH consumer and pump; ringB widx!=0 required
+                         # by the pump; ringA count>0 required by the
+                         # resolver; pump_gate ds:0x660c==-1 required by the
+                         # fn-0x20fd4 path to 0x54650; guard ds:0x7a358.
+                         "mode4226": hex(rdc(0x4226) >> 16),
+                         "ringB_count": hex(rdc(0x4758) >> 16),
+                         "ringB_widx": hex(struct.unpack_from(
+                             "<H", mm, core + 0x475a)[0]),
+                         "ringA_count": hex(rdc(0x44aa) >> 16),
+                         "ringA_idx": hex(struct.unpack_from(
+                             "<H", mm, core + 0x44ac)[0]),
+                         "pump_gate_660c": hx(rd(0x660c)),
+                         "guard_7a358": hx(rdc(-4))}
                     s.log(f"ORACLE {tag} {o}")
                     return o
                 except Exception as e:
@@ -1244,6 +1290,15 @@ def main():
                                   "stopped early (datum banked)")
                             break
                 census.update({k: v["stops"] for k, v in star_results.items()})
+            # t309 HOT HOLD after the star phase (the t308 blind-spot fix,
+            # S1.7/S1.13): census_click(None) RE-ARMS THE FULL LEG SET and
+            # banks 60 s leg-hot with NO click — consumer/resolver fires that
+            # happen after the click's window disarms are INVISIBLE to the
+            # pty whole-log census (a stop requires an armed BP), so this
+            # window is the only instrument that can see them.
+            census["hold_post_star"] = s.census_click(
+                None, None, "hold_post_star", args.window)
+            oracles["hold_post_star"] = sel_oracle("hold_post_star")
             im, d = (None, 0) if args.star_click else s.open_fleet()
             if im is None:
                 s.log(f"CENSUS: FLEET would not open (diff {d}) — clicking "
@@ -1290,9 +1345,17 @@ def main():
             # dispatch is windows.txt VERBATIM msg 7 (t302 btn_hdlr witness) —
             # if msg 7 + name NEXTTURN appears at a disp site, the census
             # attribution law holds. (Advances the turn: allowed on scratch.)
+            # t309: oracle PAIR around it settles the t308 branch-(b) question
+            # (turn delta via rd(0x12e10): did the turn actually advance?),
+            # and the post-turn HOT HOLD catches a consumer that only runs
+            # after the turn-advance pump.
+            oracles["nextturn_before"] = sel_oracle("nextturn_before")
             census["control_nextturn"] = s.census_click(
                 R293.NEXTTURN[0], R293.NEXTTURN[1], "control_nextturn",
                 args.window)
+            census["hold_post_turn"] = s.census_click(
+                None, None, "hold_post_turn", args.window)
+            oracles["nextturn_after"] = sel_oracle("nextturn_after")
             # WHOLE-LOG pty census (catches any stop poll_stop/census_window
             # missed between cycles; same fire-pattern law as arm_all)
             whole = open(s.ptylog, "rb").read().decode("utf-8", "replace")
