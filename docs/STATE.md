@@ -602,7 +602,7 @@ screen-open; t258 candidicide; t259 sav-pair census; t262 fleet-census trigger;
 t265 st4-dwell; t269 threshold census; t272 dfsg-debugger (superseded by the
 build); t273 attribution fixes (owner INDEX +0x56, stale-echo deltas — build on
 them); t49/t58/t265 flight-mining class (scripted capture only).
-LOOP CONTROL: relaunch law MAX_ITERS=12 IDLE_GATE=0 (queue-driven; the
+LOOP CONTROL: relaunch law MAX_ITERS=20 IDLE_GATE=0 (queue-driven; the
 nothing-runnable path exits clean). After a queue drains: author the next queue
 OR park NEXT on a WAIT-TRIGGER sentinel (task line FIRST — wake selection reads
 field 2 of the first non-blank line; notes never go there). Sentinel-slot law:
