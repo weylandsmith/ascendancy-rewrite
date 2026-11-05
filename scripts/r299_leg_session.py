@@ -166,6 +166,12 @@ class Sess(R298.Sess):
         self.probes = []
         self.csseg = 0x160
         self.leg_lines = {}
+        self.legs = list(LEGS)   # armed set (main overwrites); used by
+                                 # resume_and_rearm
+        self.witnessed = set()   # legs banked once: DROP after first witness
+                                 # (t302 law: msg 0x3b pump re-fires cos/router
+                                 # legs on every resume; keeping them armed
+                                 # floods stops and starves the click battery)
 
     # ---------- launch (dbg build, pty stdio, MCP out-dial) ----------
     def launch(self):
@@ -316,8 +322,18 @@ ASCEND.EXE
         for name in legs:
             lin = P0 + LEGS[name]
             self.leg_lines[name] = f"{self.csseg:04X}:{lin:08X}"
+            # t302 FIX: the MEASURED fire line on this build is the DrawCode
+            # render "1E5F84 56 push esi..." — 6-hex EIP (no CS prefix, no
+            # 8-digit padding), opcode-hex glued to the mnemonic, run-on lines
+            # ("push esi1E5F85 57 ..."). The old full-form pattern
+            # 0160:001E5F84 NEVER matched -> attempt t302-1 banked a real stop
+            # (cos_hdlr) as NOFIRE and let the game freeze at the BP. Pattern:
+            # 6-hex leg EIP NOT preceded by a hex char, then space + >=1 hex
+            # (kills "Set breakpoint at 0160:1F0158" and BPLIST lines: they end
+            # at the address; kills REQ-echo full forms 001F0158: the 6-hex run
+            # there is preceded by '0').
             self.leg_pats.append(re.compile(
-                rf"{self.csseg:04X}\s*:\s*{lin:08X}", re.I))
+                rf"(?<![0-9A-Fa-f]){lin & 0xFFFFFF:06X} [0-9A-F]", re.I))
             lines, ok, hdr = self.req(f"EXEC BP {self.csseg:04X}:{lin:08X}",
                                       15.0)
             self.log(f"ARM {name:9s} {self.leg_lines[name]} hdr={hdr} "
@@ -385,26 +401,38 @@ ASCEND.EXE
                  f"edx={hx(regs.get('edx'))} ebp={hx(regs.get('ebp'))}")
         # window block covering the leg fields: +0xa4 clip, +0xac pending-clip-2,
         # +0xb4 mode, +0xbc pending kind (u32 grid aligned down from 0x90).
+        # t302 FIX: dump the head of EVERY candidate reg (magic-check each) —
+        # at cos_hdlr stops esi=CLASS TABLE (no magic), eax=WINDOW RECORD
+        # (magic + NAME@+0x20); the old break-on-first-blob never named the
+        # window. The magic-bearing reg gets the +0x90 field grid.
+        magic_w = None
         for wkey in ("esi", "eax", "ebp"):
             w = regs.get(wkey)
-            if w and P0 < w < 0x10000000:
-                # t301 LAW: live window records start with magic 0x12345678,
-                # rect at +0x08, NAME at +0x20, dispatch-table phys at +0xa7.
-                head = self.dump_mem(w, 48, f"{tag}_{wkey}_head")
-                if head and len(head) >= 48:
-                    magic = struct.unpack_from("<I", head, 0)[0]
-                    nm = head[0x20:0x2c].split(b"\x00")[0].decode("latin1", "replace")
-                    rec[f"wrec_{wkey}"] = {"magic_ok": magic == 0x12345678,
-                                           "name": nm}
-                blob = self.dump_mem(w + 0x90, 64, f"{tag}_{wkey}")
-                if blob and len(blob) >= 0x40:
-                    g = lambda o: struct.unpack_from("<I", blob, o - 0x90)[0]
-                    rec[f"win_from_{wkey}"] = {
-                        "win": hx(w), **{f"+{o:#x}": hx(g(o))
-                                         for o in range(0x90, 0xD0, 4)}}
-                    self.log(f"STOP {tag} win[{wkey}]="
-                             f"{rec[f'win_from_{wkey}']}")
-                    break
+            if not (w and P0 < w < 0x10000000):
+                continue
+            head = self.dump_mem(w, 48, f"{tag}_{wkey}_head")
+            if head and len(head) >= 48:
+                magic = struct.unpack_from("<I", head, 0)[0]
+                nm = head[0x20:0x2c].split(b"\x00")[0].decode("latin1", "replace")
+                rec[f"wrec_{wkey}"] = {"magic_ok": magic == 0x12345678,
+                                       "name": nm}
+                if magic == 0x12345678:
+                    magic_w = (wkey, w)
+            if magic_w and magic_w[0] == wkey:
+                break
+        wsrc = magic_w if magic_w else (("esi", regs.get("esi"))
+                                        if regs.get("esi") else None)
+        if wsrc:
+            wkey, w = wsrc
+            blob = self.dump_mem(w + 0x90, 64, f"{tag}_{wkey}")
+            if blob and len(blob) >= 0x40:
+                g = lambda o: struct.unpack_from("<I", blob, o - 0x90)[0]
+                rec[f"win_from_{wkey}"] = {
+                    "win": hx(w), **{f"+{o:#x}": hx(g(o))
+                                     for o in range(0x90, 0xD0, 4)}}
+                self.log(f"STOP {tag} win[{wkey}] name="
+                         f"{rec.get(f'wrec_{wkey}', {}).get('name')!r} "
+                         f"{rec[f'win_from_{wkey}']}")
         # pending clip from the hit-test: edx at batcon entry, [[clip]]=object
         clip = regs.get("edx")
         if clip and P0 < clip < 0x10000000:
@@ -438,12 +466,93 @@ ASCEND.EXE
         self.hits.append(rec)
         with open(op.join(self.out, "hits.json"), "w") as fh:
             json.dump(self.hits, fh, indent=1)
-        lines, ok, hdr = self.req("EXEC RUN", 20.0)
-        self.log(f"resumed after STOP {tag}: hdr={hdr} lines={lines}")
-        time.sleep(1.0)
-        self.pty_new()   # consume RUN's own DrawCode output (shows the leg's
-        #                      EIP region) so chain detection can't false-hit it
+        self.resume_and_rearm(rec.get("leg"))
         return rec
+
+    def bp_index_of(self, lin):
+        """Index of the armed code-BP whose offset matches lin (BPLIST prints
+        'NN. BP 0160:1DA348' — 6-hex, GetAddress-evaluated)."""
+        lines, ok, hdr = self.req("EXEC BPLIST", 15.0)
+        if hdr is None:
+            return None
+        for l in lines:
+            m = re.match(r"\s*(\d+)\.\s+BP\s+([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4,8})", l)
+            if m and (int(m.group(3), 16) & 0xFFFFFF) == (lin & 0xFFFFFF):
+                return int(m.group(1))
+        return None
+
+    def resume_and_rearm(self, fired):
+        """t302 LAW (source-pinned, docs/re/_wip_t302.md S3): a code BP under
+        C_HEAVY_DEBUG is NOT 0xCC-patched and NOT once-only, and the
+        heavy-check runs at the TOP of the core loop (core_normal.cpp:182) —
+        resuming with the FIRED bp still armed re-stops at the same EIP on the
+        very next dispatch (msg 0x3b is periodic), freezing the guest (measured
+        t302-1/-2: '(Running)' ACK then debugger prompt, autosave cadence dead).
+        Protocol: BPDEL the fired index -> RUN -> PROVE liveness by autosave
+        growth -> BREAK (stopped re-arm window) -> re-arm all legs -> RUN."""
+        t_res = time.time()
+        if fired:
+            idx = self.bp_index_of(P0 + LEGS[fired])
+            if idx is not None:
+                lines, ok, hdr = self.req(f"EXEC BPDEL {idx:X}", 10.0)
+                self.log(f"BPDEL {fired} idx={idx} hdr={hdr} lines={lines}")
+            else:
+                self.log(f"BPDEL {fired}: index not found in BPLIST")
+            self.witnessed.add(fired)
+        lines, ok, hdr = self.req("EXEC RUN", 20.0)
+        self.log(f"resume RUN hdr={hdr} lines={lines}")
+        alive = False
+        while time.time() - t_res < 40:
+            try:
+                mt = max((os.path.getmtime(op.join(self.savedir, f))
+                          for f in os.listdir(self.savedir)
+                          if f.endswith(".sav")), default=0.0)
+            except OSError:
+                mt = 0.0
+            if mt > t_res + 1:
+                alive = True
+                break
+            time.sleep(2.0)
+        self.probes.append({"probe": "resume-liveness", "alive": alive,
+                            "fired": fired})
+        self.log(f"resume liveness={alive} (autosave growth within 40s)")
+        if not alive:
+            return False
+        time.sleep(1.0)
+        if not self.do_break():
+            self.probes.append({"probe": "rearm-break", "ok": False})
+            self.log("REARM: BREAK lost — legs stay DELETED, continuing "
+                     "leg-free (guest alive)")
+            return True
+        # t302 LAW: re-arm only UN-witnessed legs. The msg-0x3b pump re-fires
+        # router/cos_hdlr every ~1-2 s; re-arming a witnessed hot leg just
+        # re-freezes the guest on the next RUN and starves the click battery.
+        legs = [l for l in getattr(self, "legs", list(LEGS))
+                if l not in self.witnessed]
+        if not legs:
+            self.log("rearm: all legs witnessed — staying leg-free, guest "
+                     "runs clean for the battery")
+            lines, ok, hdr = self.req("EXEC RUN", 20.0)
+            self.log(f"leg-free RUN hdr={hdr}")
+            return True
+        okc = self.arm_all(legs)
+        self.log(f"re-armed {len(legs)} legs ok={okc}")
+        lines, ok, hdr = self.req("EXEC RUN", 20.0)
+        self.log(f"rearm RUN hdr={hdr}")
+        # t302 S4 LAW: do NOT pty_new() here — a HOT leg (one that catches the
+        # periodic msg 0x3b pump: router slot1, cos_hdlr slot2) re-stops within
+        # ~1-2 s of the rearm RUN and pty_new SWALLOWS that stop's code view
+        # (attempt 3: guest frozen at 1E5F84 through the whole press loop).
+        # poll_stop banks it (recursion depth-capped).
+        self._rr_depth = getattr(self, "_rr_depth", 0) + 1
+        try:
+            if self._rr_depth <= 3:
+                self.poll_stop("post-rearm", budget=8.0)
+            else:
+                self.log("post-rearm: recursion cap hit, RUN stays clean")
+        finally:
+            self._rr_depth -= 1
+        return True
 
     def poll_stop(self, tag, budget=20.0):
         """Scan the pty for an armed leg's code-view line; bank EVERY stop that
@@ -528,7 +637,7 @@ def main():
                                       "cos_s5,btn_entry,btn_hdlr,batmode_dead")
     ap.add_argument("--views", type=int, default=4)
     ap.add_argument("--clicks-per-view", type=int, default=4)
-    ap.add_argument("--control-click", type=int, default=1)
+    ap.add_argument("--control-click", type=int, default=0)  # t301: black rect, REFUTED
     args = ap.parse_args()
 
     legs = [l.strip() for l in args.legs.split(",") if l.strip()]
@@ -554,6 +663,7 @@ def main():
               f"bytes {pay[off:off+10].hex(' ')}")
 
     s = Sess(args)
+    s.legs = legs   # resume_and_rearm re-arms exactly this set
     s.log(f"t299 leg-witness session start out={s.out} legs={legs}")
     s.launch()
     rc = 1
@@ -665,7 +775,11 @@ def main():
               f"answered={e1 is not None} rtt={s.probes[-1]['rtt_s']}s "
               f"-> stopped-oracle {'INVALID (EXEC answers while running)' if s.exec_free else 'VALID (a reply means STOPPED)'}")
         s.persist()
-        s.pty_new()
+        # t302 FIX: was s.pty_new() — which SWALLOWED the first fire line
+        # (attempt 1: cos_hdlr fired seconds after RUN and its line was
+        # consumed here, never banked). poll_stop scans incrementally and
+        # banks anything already pending.
+        s.poll_stop("post-run-immediate", budget=6.0)
 
         # End Turn ONCE (kind-4 gating fact, t297/t298)
         turn0 = max(d["turn"] for d in rows)

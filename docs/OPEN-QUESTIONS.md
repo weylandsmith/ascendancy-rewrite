@@ -168,7 +168,19 @@ zero-fires = ATTRIBUTION FAILURE, not a bypass law; the WORKING FLEET/End-Turn
 clicks executed type-0 class 0x247cb8 legs nobody armed. Window-record law
 (magic 0x12345678, NAME@+0x20, table@+0xa7) + re-armed r299_leg_session.py
 (router/cos_*/btn_* legs, stop dumps record NAME) are in hand; NEXT = one
-debugger run, witness on the class the stops name (ships.md S28).
+debugger run, witness on the class the stops name (ships.md S28). t302 RAN IT
+(run work/r1/t299-leg-20261105-004605 rc=0, ships.md S29 + _wip_t302): the
+dispatch law is LIVE-CONFIRMED (cos_hdlr stop names COSMOSWnd, msg 0x3b
+periodic; End-Turn fires btn_hdlr on NEXTTURN record with edx=0x7 ==
+windows.txt SENDMESSAGE 7 VERBATIM = positive control; the turn-advancing
+click fires COSMOS slot 3 edx=0x0). The t299-era zero-fires are fully
+re-attributed: wrong legs + a fire-detector pattern that never matched this
+build's DrawCode form. REMAINING RESIDUE: sprite/planet/empty clicks in the
+Icarus view fire NO class-table slot with 5 un-witnessed legs armed (live
+guest, cited negative) — the map-click entry branches INSIDE cos_hdlr without
+re-consulting the table [inferred]; t303 = msg-census probe (BP cos_hdlr entry
++ the five call-[ecx+4] sites, bank edx per click). No per-ship selection
+WRITER witnessed yet; row stays open.
 (2) per-ship build/redesign path =
 BUILD DECISION not RE unknown (t256c census 62,762 rows, AI dossier row 16
 GAP->BOUNDARY; docs/DECISIONS.md D3); (3) magnetron witnessed use (scriptable

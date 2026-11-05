@@ -322,3 +322,26 @@ freezes at the LAST autosave before a fire (CPU stopped; no more saves), so
 ring-based stack dumps around a fire are stale — bank registers via EV over
 the socket instead; (3) a blind free-heap arm (byte 0 at arm) has no
 baseline artifact and its first fire IS the first write.
+
+## t302 CODE-BREAKPOINT MULTI-STOP PROTOCOL (MEASURED, run
+## work/r1/t299-leg-20261105-004605 + failures 225819/230846/232859/002628)
+Under C_HEAVY_DEBUG a code BP (BP cmd) is NON-once and NOT 0xCC-patched
+(debug.cpp CBreakpoint::Activate PHYSICAL path is `#if !C_HEAVY_DEBUG`), and
+the heavy check runs at the TOP of the core loop (core_normal.cpp:182).
+CONSEQUENCE (measured): resuming with the FIRED bp still armed re-stops at the
+same EIP on the very next dispatch — the guest FREEZES (autosave cadence dies;
+pty shows '(Running)' ACK then debugger prompt `I-> _`).
+PROTOCOL (only viable form): on stop -> bank regs/dumps -> `EXEC BPDEL <idx>`
+(BPLIST order != arm order; parse the index from the address line; BPDEL's
+operand is HEX) -> `EXEC RUN` -> PROVE liveness (new .sav mtime within 40 s;
+NEVER trust the RUN ACK — resume cmds answer on ACCEPTANCE, debug_mcp.cpp
+ProcessControlCommand) -> BREAK (stopped re-arm window; lottery risk) ->
+re-arm ONLY legs not yet witnessed -> RUN. Re-arming a HOT leg (one a periodic
+msg hits — e.g. msg 0x3b pumps COSMOS slot 2 every ~1 s) re-freezes the guest.
+FIRE DETECTION: this build's stop line is the DrawCode render `1E5F84 56 push
+esi...` — bare 6-hex EIP (no CS prefix, unpadded), opcode glued to mnemonic,
+run-on lines. Pattern that works: `(?<![0-9A-Fa-f])<6hex> [0-9A-F]` (kills
+'BREAKPOINT AT 0160:1F0158' echo false-hits). The full-form pattern
+`0160:001E5F84` NEVER matches — it hid three iterations of zero-fires.
+NEVER pty-drain right after a RUN that could stop immediately: the drain
+SWALLOWS the first fire line.

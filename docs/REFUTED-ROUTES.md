@@ -501,3 +501,29 @@ is downgraded: they may well reach BatMode/BatControl class legs — none were
 ever armed (tables 0x2478e8/0x247850 slots 0/2/3). Witness route = re-armed
 r299_leg_session.py (router+cos_*+btn_* legs; stops dump the window-record
 NAME via magic 0x12345678 + +0x20).
+
+## t302 AMENDMENT (binding): the t299-entry zero-fires are now FULLY
+## re-attributed and the class-witness question is OPEN AGAIN (route proven,
+## residue moved). Measurements (run work/r1/t299-leg-20261105-004605 rc=0 +
+## pty re-scans of all 12 pre-t302 runs with the CORRECTED fire pattern):
+(1) Pre-t302 zero-fires were REAL non-executions (corrected-pattern re-scan:
+zero code-view renders for the old leg sets in every pty) — but the detector
+itself had been DEAD until t302 (pattern `0160:001E5F84` never matches this
+build's DrawCode form `1E5F84 56 push esi`), so any fire in t299-t301 runs
+would ALSO have frozen the guest unnoticed. The t299/t300 state-advancing
+clicks prove their guests stayed alive => genuinely no fire. Consistent.
+(2) DEAD is now also: "map clicks dispatch through a class-table SLOT" —
+sprite/planet/empty clicks (Icarus view, live guest, 5 un-witnessed legs
+armed: cos_entry/cos_s5/btn_entry/router/batmode_dead) fired NONE (pty census
+0 each). Equally DEAD: "clicks bypass the class msg layer" — End-Turn fired
+btn_hdlr (table 0x247cb8 slot 2) on record NEXTTURN edx=0x7 == windows.txt
+SENDMESSAGE 7 verbatim; the turn-advancing click fired COSMOS slot 3.
+(3) Live law: msg edx=0x3b pumps COSMOS slot 2 (cos_hdlr, file 0x26b34) ~1/s
+with eax=window record magic 0x12345678 NAME='COSMOSWnd' (3 samples) — any
+armed hot leg guarantees re-stops; instrument must drop witnessed legs
+(BPDEL-before-RUN protocol, docs/re/dosbox-debugger.md t302 block).
+(4) Route forward (NOT refuted, t303): census edx at cos_hdlr entry per click
+(census mode: same-leg re-arm every stop) + the five call-[ecx+4] sites
+(img 0x26eda/0x30d02/0x7a7eb/0x7aa3e/0x7b020), then read the cos_hdlr
+msg-switch statically. BatControl legs (0x15630/0x156d4/0x16420) remain
+unarmed-and-untested; add only if the census points there.

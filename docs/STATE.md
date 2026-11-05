@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-04T18:10
+updated: 2026-11-05T01:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,35 +209,63 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t302 DEBUGGER WITNESS RUN WITH THE RE-ARMED CLASS LEGS (ordering
-rationale: t301 proved the t299/t300 zero-fires were an ARMING FAILURE — the
-dispatch law is `mov ecx,[win+0xa7]; call [ecx+4]` into the ACTIVE window's
-class table with slot 1 = universal dispatcher file 0x30d08 (verified slot-1
-identity in tables 0x2478e8/0x247a4c/0x247cb8/0x247ca0/0x247c70, ships.md
-S28); the script scripts/r299_leg_session.py is ALREADY re-armed and
-py_compile-clean: LEGS {router 0x30d08, cos_entry 0x26818, cos_hdlr 0x26b34,
-cos_s3 0x27e80, cos_s5 0x2925c, btn_entry 0x30ad8, btn_hdlr 0x336b4,
-batmode_dead 0x1aef8}, --control-click default 0, bank_stop dumps the
-window-record head (magic 0x12345678, NAME@+0x20) so every stop NAMES the
-dispatching window, MEMDUMPBIN control at router. Run: bash
-scripts/r299_relaunch.sh (3 attempts, OUTDIR work/r1/t299). SUCCESS TELL:
-'STOP ... leg=' lines; the FIRST stop on End-Turn/FLEET is the BUILT-IN
-positive control (btn_entry/btn_hdlr must fire on clicks PROVEN to work — if
-they don't, the instrument is dead: attribute to harness, do NOT re-run the
-same battery a 3rd time). The Icarus-view clicks then adjudicate which class
-(COSMOS vs BatMode vs BatControl — the view shows 'Scientist Takeover' battle
-chrome, so BatControl table 0x247850 is a live candidate NOT yet in LEGS; if
-cos_*/btn_* fire but map clicks don't, ADD batctrl legs 0x15630/0x156d4/0x16420
-and rerun once). Deliverables: which window+slot handles sprite/planet/empty
-clicks + the stop registers (eax=win, edx=msg) -> OQ-019 r1 selection witness.
-Fixed harness traps (carry over, do NOT re-trip): MEMDUMPBIN filenames
-bare+relative and UPPERCASE; 0000: = selector-0 junk; arm only AFTER campaign
-load; EXEC answers while RUNNING (fire detection = pty code-view line);
-post-load autosave slots may hold PREVIOUS-run bytes; FLEET reopen after a
-click battery FAILS — one battery per sitting, view 0 only; NEW t301 law: any
-control click must be pixel-verified non-black FIRST (REFUTED t299 amendment).
-DO NOT relaunch the old batmode-leg battery; DO NOT launch a scripted mouse
-session on the RELEASE build (class budget spent, t298).
+NEXT t303 MSG-CENSUS PROBE AT THE DISPATCH ENTRY (ordering rationale: t302
+LIVE-CONFIRMED the dispatch law and killed the bypass-theories — run
+work/r1/t299-leg-20261105-004605 rc=0: cos_hdlr stop names COSMOSWnd msg 0x3b
+periodic; End-Turn fires btn_hdlr/NEXTTURN edx=0x7==windows.txt verbatim
+positive control; the turn-advancing click fires COSMOS slot 3 edx=0x0; and
+sprite/planet/empty clicks fire NO class-table slot with 5 un-witnessed legs
+armed = CITED negative. So map clicks must branch INSIDE the cos_hdlr
+slot-2 handler (file 0x26b34, the only COSMOS leg that ever fires) or enter
+via one of the five `call [ecx+4]` sites img 0x26eda/0x30d02/0x7a7eb/0x7aa3e/
+0x7b020 (t301 S6.1) — the MSG VALUE per click is the missing datum. PROBE:
+arm cos_hdlr 0x26b34 ONLY (plus optionally the 5 call sites as separate
+legs — add to LEGS dict) in scripts/r299_leg_session.py, run the standard
+battery, bank edx+window-NAME for EVERY hit between click and poll (drop-
+witnessed policy must be DISABLED for census mode — re-arm the SAME leg every
+stop: set self.witnessed logic off via a --census flag, the resume_and_rearm
+protocol already handles BPDEL+RUN+liveness+re-arm per stop). Deliverable:
+msg-id census {sprite-click: [..], planet-click: [..], empty-click: [..]} ->
+then ONE static read of the cos_hdlr msg-switch (Ghidra or payload) names the
+map-click handler -> OQ-019 selection witness target). Fixed harness laws
+(do NOT re-trip): fire-detect pattern is `(?<![0-9A-Fa-f])<6hex> [0-9A-F]`
+(already in arm_all); NEVER pty-drain after a RUN that can stop immediately;
+BPDEL fired index BEFORE RUN or the guest re-freezes (core_normal.cpp:182);
+liveness = autosave .sav growth, NEVER the RUN ACK; hot leg 0x3b pumps ~1/s —
+budget stops accordingly (tl now 3600); one battery per sitting, FLEET reopen
+fails after clicks; control clicks must be pixel-verified non-black. DO NOT
+re-run the t302 battery unchanged; DO NOT launch a scripted mouse session on
+the RELEASE build (t298).
+
+## LANDED t302 (2026-11-05, session 11) — CLASS-DISPATCH LIVE WITNESS: FULL
+### rc=0, DISPATCH LAW CONFIRMED + POSITIVE CONTROL + MAP-CLICK NEGATIVE
+### (docs/re/_wip_t302.md S1-S5, ships.md S29, dosbox-debugger.md t302 block;
+### runs work/r1/t299-leg-{225819,230758,230846,232811,232859,002540,002628,
+### 004605}; pre-fix archives work/r1/t299-pre-{t302fix,rearmfix,dropfix}/).
+MEASURED: (1) THREE INSTRUMENT BUGS KILLED: (a) fire-detect pattern
+`0160:001E5F84` NEVER matches this build's DrawCode stop render `1E5F84 56
+push esi...` (bare 6-hex, run-on) — fixed pattern
+`(?<![0-9A-Fa-f])<6hex> [0-9A-F]` regression-tested vs arm/BPLIST/echo lines;
+(b) resuming with the FIRED code BP still armed re-stops at the same EIP on
+the next dispatch (core_normal.cpp:182 top-of-loop check, C_HEAVY_DEBUG has
+no 0xCC patch, BP is non-once) — guest FREEZES; fix = BPDEL fired-index ->
+RUN -> liveness by autosave .sav growth -> BREAK -> re-arm -> RUN; (c) a
+re-armed HOT leg (periodic msg 0x3b pumps COSMOS slot 2 ~1/s) re-freezes it
+again — fix = witnessed-set DROP policy, battery runs leg-light. (2) THE
+WITNESS RUN 004605 rc=0: cos_hdlr stop eax=COSMOSWnd-record msg edx=0x3b
+(periodic, 3 samples); endturn-p1 btn_hdlr (type-0 table 0x247cb8 slot 2)
+eax=NEXTTURN-record edx=0x7 == windows.txt SENDMESSAGE 7 VERBATIM = POSITIVE
+CONTROL (working clicks DO execute the class msg layer — t299/t300/t301
+zero-fires fully re-attributed, NOT a bypass law); endturn-p2 cos_s3
+(COSMOS slot 3) edx=0x0 on the click that advanced t1086->1087. (3) CITED
+NEGATIVE: sprite(48,151)/planet(439,331)/empty(236,200) Icarus-view clicks
+fire NONE of the 5 un-witnessed legs (cos_entry/cos_s5/btn_entry/router/
+batmode_dead; pty census 0 each, live guest throughout) — map-click entry is
+not a class-table-slot hit; cos_hdlr itself was DROPPED pre-battery so its
+per-click msg is UNMEASURED -> t303 census. (4) relaunch.sh success-tell
+tightened (lone early STOP no longer stops the loop; needs SESSION END rc=0
+or a click-tagged STOP); tl 1800->3600. NO LEDGER ROW CLOSED (strict-close):
+OQ-016 r1, OQ-019 r1/r3 stay open (entry class named, selection WRITER not).
 
 ## LANDED t301 (2026-11-04, session 10) — TOGGRID CONTROL-CLICK RAN: CONTROL
 INVALID (PIXEL-PROVEN) + WINDOW-CLASS DISPATCH LAW CLOSED OFFLINE

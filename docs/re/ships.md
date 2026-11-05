@@ -1587,3 +1587,40 @@ bank_stop dumps 48-byte record head -> stop NAMES the window; --control-click
 default 0; MEMDUMPBIN control at router). NEXT = one debugger run, then the
 selection/order witness on whichever class the stops name. NO LEDGER ROW
 CLOSED (strict-close); OQ-016 r1, OQ-019 r1/r3 stay open.
+
+## S29 t302 (2026-11-05) — CLASS-DISPATCH LIVE WITNESS: DISPATCH LAW
+### CONFIRMED, POSITIVE CONTROL CONFIRMED, MAP-CLICK LEGS REFUTED
+Run work/r1/t299-leg-20261105-004605 (rc=0, 3 stops; full narrative
+docs/re/_wip_t302.md S1-S5). MEASURED (regs verbatim in hits.json):
+1. `mov ecx,[win+0xa7]; call [ecx+4]` DISPATCH LAW IS LIVE: cos_hdlr
+   (COSMOS table phys 0x247a4c slot 2, file 0x26b34) stopped with
+   eax=0xfd2310 window record magic 0x12345678 NAME='COSMOSWnd', esi=class
+   table, edx=0x3b — a PERIODIC msg (3 samples: runs 225819, 230846, 232859
+   all fire it within ~1 s of RUN, no click).
+2. POSITIVE CONTROL CLOSED: End-Turn click -> btn_hdlr (type-0 table 0x247cb8
+   slot 2, file 0x336b4) eax=0xfd6190 NAME='NEXTTURN' edx=0x7 == windows.txt
+   NEXTTURN `SENDMESSAGE 7` VERBATIM. Working synthetic clicks DO execute the
+   class msg layer => t299/t300/t301 zero-fires were wrong-legs + a
+   DETECTOR BUG (fire-line pattern never matched this build's DrawCode form
+   '1E5F84 56 push esi' — bare 6-hex EIP), NOT any bypass law.
+3. The End-Turn click that ADVANCED the turn (t1086->1087) also fired cos_s3
+   (COSMOS slot 3, file 0x27e80) eax=esi=0xfd2310 NAME='COSMOSWnd' edx=0x0.
+4. NEGATIVE (live guest, un-witnessed legs cos_entry/cos_s5/btn_entry/router/
+   batmode_dead armed through the whole battery): sprite (48,151), planet
+   (439,331), empty (236,200) clicks in the Icarus view fire NONE of them
+   (pty fire census 0 each). Map-click entry is NOT a class-table slot hit —
+   [inferred] it branches INSIDE cos_hdlr (slot 2, the only COSMOS leg that
+   fires) without re-consulting the table. t303 probe: BP cos_hdlr entry +
+   the five `call [ecx+4]` sites (img 0x26eda/0x30d02/0x7a7eb/0x7aa3e/0x7b020),
+   census edx per click.
+5. BatModeWnd stays INACTIVE in the system view for dispatch purposes
+   (batmode_dead armed, zero fires; consistent with t301 S4 record-state).
+INSTRUMENT LAW (this build, dosbox-x-dbg + C_HEAVY_DEBUG + MCP EXEC):
+multi-stop code-BP protocol = BPDEL the fired index -> RUN -> prove liveness
+by autosave growth -> BREAK -> re-arm UN-witnessed legs ONLY -> RUN (a
+re-armed hot leg re-freezes the guest on the next 0x3b pump). codified in
+scripts/r299_leg_session.py (witnessed set, resume_and_rearm).
+NO LEDGER ROW CLOSED (strict-close): OQ-016 r1, OQ-019 r1/r3 stay open — the
+map-click selection witness (which handler + what it writes) is still
+uncited; this iteration names the ENTRY CLASS (COSMOSWnd) but not the
+selection WRITER.
