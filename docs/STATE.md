@@ -209,33 +209,65 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t303 MSG-CENSUS PROBE AT THE DISPATCH ENTRY (ordering rationale: t302
-LIVE-CONFIRMED the dispatch law and killed the bypass-theories — run
-work/r1/t299-leg-20261105-004605 rc=0: cos_hdlr stop names COSMOSWnd msg 0x3b
-periodic; End-Turn fires btn_hdlr/NEXTTURN edx=0x7==windows.txt verbatim
-positive control; the turn-advancing click fires COSMOS slot 3 edx=0x0; and
-sprite/planet/empty clicks fire NO class-table slot with 5 un-witnessed legs
-armed = CITED negative. So map clicks must branch INSIDE the cos_hdlr
-slot-2 handler (file 0x26b34, the only COSMOS leg that ever fires) or enter
-via one of the five `call [ecx+4]` sites img 0x26eda/0x30d02/0x7a7eb/0x7aa3e/
-0x7b020 (t301 S6.1) — the MSG VALUE per click is the missing datum. PROBE:
-arm cos_hdlr 0x26b34 ONLY (plus optionally the 5 call sites as separate
-legs — add to LEGS dict) in scripts/r299_leg_session.py, run the standard
-battery, bank edx+window-NAME for EVERY hit between click and poll (drop-
-witnessed policy must be DISABLED for census mode — re-arm the SAME leg every
-stop: set self.witnessed logic off via a --census flag, the resume_and_rearm
-protocol already handles BPDEL+RUN+liveness+re-arm per stop). Deliverable:
-msg-id census {sprite-click: [..], planet-click: [..], empty-click: [..]} ->
-then ONE static read of the cos_hdlr msg-switch (Ghidra or payload) names the
-map-click handler -> OQ-019 selection witness target). Fixed harness laws
-(do NOT re-trip): fire-detect pattern is `(?<![0-9A-Fa-f])<6hex> [0-9A-F]`
-(already in arm_all); NEVER pty-drain after a RUN that can stop immediately;
-BPDEL fired index BEFORE RUN or the guest re-freezes (core_normal.cpp:182);
-liveness = autosave .sav growth, NEVER the RUN ACK; hot leg 0x3b pumps ~1/s —
-budget stops accordingly (tl now 3600); one battery per sitting, FLEET reopen
-fails after clicks; control clicks must be pixel-verified non-black. DO NOT
-re-run the t302 battery unchanged; DO NOT launch a scripted mouse session on
-the RELEASE build (t298).
+NEXT t304 CALLER-WITNESS AT THE cos_hdlr STOP, THEN CENSUS AT THE TRUE
+DISPATCH SITE (ordering rationale: t303 REFUTED the slot-1 router law —
+whole-log pty census {cos_hdlr:15, all five call-[ecx+4] sites:0} while the
+0x3b pump fed cos_hdlr, and t302's own BPLIST log shows btn_hdlr firing with
+router armed+silent (docs/re/_wip_t303.md S4-S5, REFUTED-ROUTES t303
+amendment). The premise "census at cos_hdlr/slot-1" is DEAD; the missing
+datum is WHICH instruction actually calls the class handlers. The pump hands
+it to us for free: at ANY cos_hdlr stop the return address at [esp] names the
+caller EIP verbatim — bank_stop is ALREADY PATCHED (ret_stack.ret0/
+ret0_file_off, scripts/r299_leg_session.py). PROBE: (1) session enters
+campaign, arms cos_hdlr ONLY, first banked stop yields ret0 (no clicks needed
+— the pump fires in ~2 s; a few stops for confidence); (2) STATIC read of the
+bytes just below ret0 in work/ascend_payload.bin to find the call-instruction
+boundary (E8 rel32 -> site=ret0-5; ff /2 modrm -> decode length; candidates
+to check first: the 0x14de8-0x14f14 `mov r32,[r32+0xa7]` cluster found t303);
+(3) add a leg at that site, run the CORRECTED click census (--census, legs =
+site + cos_hdlr + btn_hdlr): close_eventwin BEFORE every click (t298 law —
+t303's planet/empty/NEXTTURN controls were INVALID-AS-RUN, the Sparrowhawk
+modal swallowed them) and NEXTTURN control only counts with btn_hdlr armed.
+Deliverable: {sprite:[msg-ids], planet:[..], empty:[..]} at the true site +
+the dispatch instruction named, -> OQ-019 selection-writer target. Fixed
+harness laws (do NOT re-trip): fire pattern `(?<![0-9A-Fa-f])<6hex> [0-9A-F]`;
+BPDEL fired index BEFORE RUN; liveness = autosave .sav growth, never the ACK;
+arm only around polled clicks (census cycle, docs/re/dosbox-debugger.md t303
+block); pty_peek not pty_new for liveness peeks; one battery per sitting;
+control clicks pixel-verified; dialog strings are NOT payload plaintext — do
+not grep for them again. Runs: work/r1/t299-leg-20261105-{015611,020416};
+relaunch scripts/r303_relaunch.sh (reuse; --census --window 45).
+
+## LANDED t303 (2026-11-05, session 12) — MSG-CENSUS: SLOT-1 ROUTER LAW
+### REFUTED; MAP-CLICK ENTRY NEITHER cos_hdlr NOR SLOT-1 (cited negative);
+### census instrument proven freeze-free.
+### docs/re/_wip_t303.md S0-S6, ships.md S30, REFUTED-ROUTES t303 amendment,
+### dosbox-debugger.md t303 block; runs work/r1/t299-leg-20261105-{015611,
+### 020416} rc=1 x2 identical (attempt 3 killed after reproduction).
+MEASURED: (1) CENSUS MODE WORKS (--census: per-click arm_census -> MCP click
+-> bank-window -> BPDEL * -> autosave liveness; choreography leg-free between
+clicks): 2 full sessions, 10 arm/click/disarm cycles, ZERO freezes — the t302
+resume bug is ENGINEERED AROUND. pty_peek (non-consuming) added; census-arm
+failure path BPDEL*s before RUN. (2) THE HEADLINE: whole-log pty census
+{cos_hdlr:15, disp_26eda:0, disp_30d02:0, disp_7a7eb:0, disp_7aa3e:0,
+disp_7b020:0} — msg 0x3b reaches COSMOS slot 2 WITHOUT any `call [ecx+4]`
+(site set re-verified verbatim vs payload this session, ff5104 count==5);
+t302 run 004605 log independently shows STOP endturn-p1 leg=btn_hdlr at
+00:48:21 with router 0160:1F0158 in the 00:48:10 re-arm BPLIST. => t301 S6.2
+"every msg walks slot1 0x30d08" REFUTED; slot1==0x30d08-in-tables stands,
+universal-dispatcher claim dead. (3) A pixel-PROVEN WORKING sprite click
+(48,151; 66717 px; vision-cited modal "Ship 'Sparrowhawk'" Leave Orbit/
+Abandon/Cancel) fired NONE of the 6 armed legs in its 45 s window = CITED
+negative: map-click entry is not cos_hdlr, not slot-1. (4) INSTRUMENT
+DEFECTS (not game): no close_eventwin between census clicks (planet/empty/
+NEXTTURN controls swallowed by the modal, 225/207 px); btn_hdlr unarmed so
+the NEXTTURN control was unwitnessable by construction; turn stayed 1086
+(zipfile 'Memory' B+0x82bb0+0x12e10, all 20 autosaves x2 runs). (5) Static:
+indexed ff14 modrm calls ZERO in payload; `mov r32,[r32+0xa7]` 21 sites
+(0x14de8..0x14f14 x6 cluster = prime suspect); dialog strings NOT payload
+plaintext; E8-callsites of cos_hdlr/btn_hdlr/cos_s3/router/cos_entry ZERO.
+NO LEDGER ROW CLOSED (strict-close): OQ-016, OQ-019 stay open.
+
 
 ## LANDED t302 (2026-11-05, session 11) — CLASS-DISPATCH LIVE WITNESS: FULL
 ### rc=0, DISPATCH LAW CONFIRMED + POSITIVE CONTROL + MAP-CLICK NEGATIVE

@@ -1624,3 +1624,26 @@ NO LEDGER ROW CLOSED (strict-close): OQ-016 r1, OQ-019 r1/r3 stay open — the
 map-click selection witness (which handler + what it writes) is still
 uncited; this iteration names the ENTRY CLASS (COSMOSWnd) but not the
 selection WRITER.
+
+## S30 t303 (2026-11-05) — MSG-CENSUS AT THE DISPATCH ENTRY: SLOT-1 ROUTER
+## LAW REFUTED; MAP-CLICK ENTRY STILL UNKNOWN (runs t299-leg-20261105-
+## {015611,020416} rc=1 x2 identical, docs/re/_wip_t303.md S0-S6).
+MEASURED: (1) CENSUS INSTRUMENT WORKS and never froze: per-click arm ->
+click -> bank-window -> BPDEL * -> liveness cycle (scripts/r299_leg_session.py
+--census, scripts/r303_relaunch.sh); MEMDUMPBIN control MATCH=True x5; autosave
+cadence unbroken (zipfile 'Memory' B+OFF+0x12e10 = 1086 across 20 saves/run).
+(2) WHOLE-LOG PTY CENSUS {cos_hdlr:15, disp_26eda:0, disp_30d02:0, disp_7a7eb:0,
+disp_7aa3e:0, disp_7b020:0}: the msg-0x3b pump delivers to cos_hdlr (COSMOS
+slot 2) WITHOUT executing ANY `call [ecx+4]` (slot-1 router) site — combined
+with t302's own BPLIST log (btn_hdlr fired while router armed, silent), the
+t301 S6.2 "every msg walks slot1 0x30d08" law is DEAD (REFUTED-ROUTES t303).
+(3) A WORKING sprite click (48,151; 66717 px change; vision: modal "Ship
+'Sparrowhawk'" Leave Orbit/Abandon/Cancel) fired NONE of the 6 armed legs in
+its window: map-click entry is NEITHER cos_hdlr NOR slot-1. (4) Control
+defects (instrument, not game): no close_eventwin between census clicks (t298
+law re-broken — planet/empty/NEXTTURN clicks hit the modal, diffs 225/207 px);
+NEXTTURN control un-witnessable with btn_hdlr unarmed. (5) Static: indexed
+ff14 modrm calls ZERO; mov r32,[r32+0xa7] = 21 sites (0x14de8-0x14f14 x6
+cluster); dialog strings not payload plaintext. t304 = [esp] caller-witness at
+cos_hdlr stops (bank_stop PATCHED: ret_stack.ret0 -> file offset).
+NO LEDGER ROW CLOSED (strict-close): OQ-016, OQ-019 stay open.

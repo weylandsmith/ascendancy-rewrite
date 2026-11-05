@@ -345,3 +345,16 @@ run-on lines. Pattern that works: `(?<![0-9A-Fa-f])<6hex> [0-9A-F]` (kills
 `0160:001E5F84` NEVER matches — it hid three iterations of zero-fires.
 NEVER pty-drain right after a RUN that could stop immediately: the drain
 SWALLOWS the first fire line.
+
+## t303 CENSUS-SAFETY LAW (2026-11-05, runs t299-leg-20261105-{015611,020416})
+A hot leg may stay armed across MANY stops if — and only if — the harness
+never issues a click it isn't polling: arm -> click -> bank-window(bank EVERY
+stop, fixed seconds, small cap) -> BREAK -> BPDEL * -> RUN -> autosave
+liveness. Choreography (FLEET/row/popup) between measured clicks must run
+LEG-FREE. Measured: 2 full sessions, 5 arm/click/disarm cycles each, ZERO
+freezes (vs t302's freeze on the first un-polled click with a hot leg armed).
+Cost law: a banked stop costs ~20-90 s MCP round-trips (the post-BREAK lottery
+dominates) — keep the per-window cap SMALL and let the whole-log pty census
+count the rest. RE-FIRE liveness shortcut: a pending fire line proves the
+guest ran, but PEEK (read without advancing pty_off) — consuming it swallows
+the stop (t302 S4 law re-applies).

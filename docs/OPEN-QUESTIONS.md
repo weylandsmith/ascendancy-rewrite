@@ -175,12 +175,19 @@ periodic; End-Turn fires btn_hdlr on NEXTTURN record with edx=0x7 ==
 windows.txt SENDMESSAGE 7 VERBATIM = positive control; the turn-advancing
 click fires COSMOS slot 3 edx=0x0). The t299-era zero-fires are fully
 re-attributed: wrong legs + a fire-detector pattern that never matched this
-build's DrawCode form. REMAINING RESIDUE: sprite/planet/empty clicks in the
-Icarus view fire NO class-table slot with 5 un-witnessed legs armed (live
-guest, cited negative) — the map-click entry branches INSIDE cos_hdlr without
-re-consulting the table [inferred]; t303 = msg-census probe (BP cos_hdlr entry
-+ the five call-[ecx+4] sites, bank edx per click). No per-ship selection
-WRITER witnessed yet; row stays open.
+build's DrawCode form. t303 RAN THE CENSUS (2 sessions
+work/r1/t299-leg-20261105-{015611,020416} rc=1, _wip_t303 + REFUTED t303
+amendment): whole-log pty census {cos_hdlr:15, all five call-[ecx+4] sites:0}
+— the 0x3b pump reaches cos_hdlr WITHOUT slot 1, and t302's own log shows
+btn_hdlr firing with router armed+silent, so the t301 "universal slot-1
+router" law is REFUTED; a pixel-proven WORKING sprite click (modal "Ship
+'Sparrowhawk'" dialog, vision-cited) fired NONE of cos_hdlr+5 sites. Map-click
+entry is neither cos_hdlr nor slot-1 [verified negative]; the real dispatch
+instruction is UNKNOWN. REMAINING RESIDUE: no per-ship selection WRITER
+witnessed; t304 = [esp] caller-witness at any cos_hdlr stop (bank_stop
+already patched: ret_stack.ret0/ret0_file_off) -> arm census at the named
+caller; controls need close_eventwin between clicks + btn_hdlr armed. Row
+stays open.
 (2) per-ship build/redesign path =
 BUILD DECISION not RE unknown (t256c census 62,762 rows, AI dossier row 16
 GAP->BOUNDARY; docs/DECISIONS.md D3); (3) magnetron witnessed use (scriptable

@@ -102,8 +102,18 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
                                       # phys 0x247cb8 slot 0) — the clicks that
                                       # WORKED never had this armed
         "btn_hdlr": 0x336B4,    # type-0 button handler (slot 2)
-        "batmode_dead": 0x1AEF8}  # BatModeWnd INACTIVE in system view (record
+        "batmode_dead": 0x1AEF8,  # BatModeWnd INACTIVE in system view (record
                                       # 0xfdc924 +0xac state); control only
+        # t303 CENSUS legs: the FIVE `call [ecx+4]` dispatch sites (ff 51 04
+        # occurs EXACTLY 5x in the payload — verified this session vs t301
+        # S6.1). Stopping at the SITE (before the call) keeps the caller's
+        # window-record reg live: 0x26eda/0x30d02 are preceded by
+        # `mov ecx,[eax+0xa7]` (8b 88 a7 00 00 00) so eax = window record.
+        "disp_26eda": 0x26EDA,
+        "disp_30d02": 0x30D02,
+        "disp_7a7eb": 0x7A7EB,
+        "disp_7aa3e": 0x7AA3E,
+        "disp_7b020": 0x7B020}
 
 EVENTS = []
 hx = lambda v: hex(v) if isinstance(v, int) else None
@@ -172,6 +182,9 @@ class Sess(R298.Sess):
                                  # (t302 law: msg 0x3b pump re-fires cos/router
                                  # legs on every resume; keeping them armed
                                  # floods stops and starves the click battery)
+        self.census = False      # t303: main() sets True in census mode —
+                                 # re-arm ALL legs per stop (every msg id is
+                                 # data) and run choreography LEG-FREE
 
     # ---------- launch (dbg build, pty stdio, MCP out-dial) ----------
     def launch(self):
@@ -273,6 +286,17 @@ ASCEND.EXE
                 fh.seek(self.pty_off)
                 data = fh.read()
                 self.pty_off = fh.tell()
+        except OSError:
+            return ""
+        return data.decode("utf-8", "replace")
+
+    def pty_peek(self):
+        """Same as pty_new but does NOT advance pty_off (t303: liveness checks
+        must not swallow a stop's code-view line — t302 S4 law)."""
+        try:
+            with open(self.ptylog, "rb") as fh:
+                fh.seek(self.pty_off)
+                data = fh.read()
         except OSError:
             return ""
         return data.decode("utf-8", "replace")
@@ -395,6 +419,21 @@ ASCEND.EXE
         eip = regs.get("eip")
         rec["leg"] = self.attribute(eip) if eip else None
         rec["eip_file_off"] = hx(eip - P0) if eip and eip > P0 else None
+        # t304 CALLER WITNESS: t303 REFUTED the slot-1 router law (cos_hdlr
+        # fired 15x with all five ff5104 sites armed+silent). The return
+        # address at [esp] at a handler stop names the TRUE dispatch caller
+        # verbatim. Dump 8 bytes at esp; ret0 = [esp] (call pushed it).
+        esp = regs.get("esp")
+        if esp and 0x1000 < esp < 0x10000000:
+            eb = self.dump_mem(esp, 8, f"{tag}_esp")
+            if eb and len(eb) >= 8:
+                r0, r1 = struct.unpack_from("<II", eb, 0)
+                rec["ret_stack"] = {"esp": hx(esp), "ret0": hx(r0),
+                                    "ret1": hx(r1),
+                                    "ret0_file_off": (hx((r0 & 0xFFFFFF) - P0)
+                                                      if P0 <= (r0 & 0xFFFFFF) < 0x8CC83 else None)}
+                self.log(f"STOP {tag} ret0={hx(r0)} "
+                         f"file={rec['ret_stack']['ret0_file_off']}")
         self.log(f"STOP {tag} leg={rec['leg']} eip={hx(eip)} "
                  f"file={rec['eip_file_off']} "
                  f"eax={hx(regs.get('eax'))} ecx={hx(regs.get('ecx'))} "
@@ -442,26 +481,29 @@ ASCEND.EXE
                 obj = struct.unpack_from("<I", blob, 1)[0]
                 rec["clip"] = {"ptr": hx(clip), "kind": kind, "obj": hx(obj),
                                "ship_slot": None}
-                try:
-                    p = self.newest_sav()
-                    mem = self.read_mem(p) if p else None
-                    B = SL.base_of(mem, self.anch) if mem else None
-                    if B:
-                        base, n = SL.ship_array_law(mem, B)
-                        for k in range(n):
-                            r = base + k * SL.SHIP["stride"]
-                            if r == obj + 0x88:
-                                rec["clip"]["ship_slot"] = k
-                                rec["clip_ship"] = dict(
-                                    slot=k,
-                                    owner=struct.unpack_from("<I", mem,
-                                                             r + 0x54)[0] >> 16,
-                                    kind=mem[r + 0x58],
-                                    moves=struct.unpack_from("<H", mem,
-                                                             r + 0x94)[0])
-                                break
-                except Exception as e:
-                    rec["clip_ship_error"] = repr(e)[:120]
+                # t303 CENSUS: the .sav scan per stop is the expensive part;
+                # a census banks dozens of stops — msg-id+name is the data.
+                if not self.census:
+                    try:
+                        p = self.newest_sav()
+                        mem = self.read_mem(p) if p else None
+                        B = SL.base_of(mem, self.anch) if mem else None
+                        if B:
+                            base, n = SL.ship_array_law(mem, B)
+                            for k in range(n):
+                                r = base + k * SL.SHIP["stride"]
+                                if r == obj + 0x88:
+                                    rec["clip"]["ship_slot"] = k
+                                    rec["clip_ship"] = dict(
+                                        slot=k,
+                                        owner=struct.unpack_from("<I", mem,
+                                                                 r + 0x54)[0] >> 16,
+                                        kind=mem[r + 0x58],
+                                        moves=struct.unpack_from("<H", mem,
+                                                                 r + 0x94)[0])
+                                    break
+                    except Exception as e:
+                        rec["clip_ship_error"] = repr(e)[:120]
                 self.log(f"STOP {tag} clip={rec['clip']}")
         self.hits.append(rec)
         with open(op.join(self.out, "hits.json"), "w") as fh:
@@ -498,7 +540,8 @@ ASCEND.EXE
                 self.log(f"BPDEL {fired} idx={idx} hdr={hdr} lines={lines}")
             else:
                 self.log(f"BPDEL {fired}: index not found in BPLIST")
-            self.witnessed.add(fired)
+            if not self.census:   # t303: census mode re-arms EVERY leg every
+                self.witnessed.add(fired)   # stop — every msg id is data
         lines, ok, hdr = self.req("EXEC RUN", 20.0)
         self.log(f"resume RUN hdr={hdr} lines={lines}")
         alive = False
@@ -512,6 +555,18 @@ ASCEND.EXE
             if mt > t_res + 1:
                 alive = True
                 break
+            # t303 CENSUS: on a HOT leg set (0x3b pump ~1/s) the guest RE-FIRES
+            # within ~2 s of RUN — long before the autosave cadence. A pending
+            # fire line PROVES the guest ran (and it must be banked by
+            # poll_stop, not mistaken for a freeze).
+            if self.census:
+                txt = self.pty_peek()
+                if txt and self.leg_pats and any(p.search(txt)
+                                                 for p in self.leg_pats):
+                    self.log("resume liveness via RE-FIRE (hot census leg; "
+                             "line PEEKED not consumed — poll_stop banks it)")
+                    alive = True
+                    break
             time.sleep(2.0)
         self.probes.append({"probe": "resume-liveness", "alive": alive,
                             "fired": fired})
@@ -597,6 +652,122 @@ ASCEND.EXE
             return [self.bank_stop(tag + "_oracle")]
         return None
 
+    # ---------- t303 CENSUS machinery ----------
+    def arm_census(self, legs):
+        """BREAK -> pmode arm-time gate -> arm_all. Up to 3 tries (GetAddress
+        is evaluated AT ARM TIME — arming under the wrong mode bakes a wrong
+        location, t299 law 2). On failure the guest is left RUNNING leg-free
+        (BPDEL * ran inside arm_all only after a stop was won; if BREAK was
+        lost nothing was armed)."""
+        for att in range(3):
+            if att:
+                r = self.req("EXEC RUN", 15.0)
+                self.log(f"census-arm {att}: RUN hdr={r[2]}")
+                time.sleep(4.0)
+            if not self.do_break():
+                self.log(f"census-arm {att}: BREAK lottery lost")
+                continue
+            cs = self.read_reg("cs")
+            eip0 = self.read_reg("eip")
+            self.log(f"census-arm {att}: cs={hx(cs)} eip={hx(eip0)}")
+            if not (cs and eip0 and P0 <= eip0 < CODE_END):
+                continue
+            self.csseg = cs
+            if self.arm_all(legs):
+                # MEMDUMPBIN control vs payload bytes at the FIRST leg (P0 law
+                # + dump path in one shot; honest log either way)
+                if getattr(self, "pay", None):
+                    first = legs[0]
+                    ctl = self.dump_mem(P0 + LEGS[first], 16, "ctl_census")
+                    if ctl:
+                        want = self.pay[LEGS[first]:LEGS[first] + 16]
+                        self.log(f"census control MATCH={ctl == want}")
+                        self.probes.append({"probe": "census-ctl",
+                                            "match": ctl == want})
+                self.probes.append({"probe": "census-arm", "ok": True,
+                                    "att": att})
+                return True
+        self.probes.append({"probe": "census-arm", "ok": False})
+        # FAILURE PATH SAFETY (t302 law): arm_all may have armed SOME legs
+        # before the BPLIST gate failed, with the guest STOPPED — a bare RUN
+        # would re-freeze on the 0x3b pump. BPDEL * (EXEC answers even while
+        # running) then RUN (no-op if already running).
+        self.req("EXEC BPDEL *", 15.0)
+        self.req("EXEC RUN", 15.0)
+        return False
+
+    def disarm_run(self, tag):
+        """End a census window: BREAK (whatever state), BPDEL *, BPLIST-empty
+        confirm, RUN, liveness by autosave growth. The guest MUST end the
+        choreography leg-free and alive (t302 freeze laws)."""
+        self.do_break()
+        lines, ok, hdr = self.req("EXEC BPDEL *", 15.0)
+        lines2, ok2, hdr2 = self.req("EXEC BPLIST", 15.0)
+        listed = [l for l in lines2
+                  if re.search(r"BP\s+[0-9A-Fa-f]{4}:", l)]
+        self.log(f"DISARM {tag}: BPDEL hdr={hdr} BPLIST left={len(listed)}")
+        lines, ok, hdr = self.req("EXEC RUN", 20.0)
+        t_res = time.time()
+        alive = False
+        while time.time() - t_res < 60:
+            try:
+                mt = max((os.path.getmtime(op.join(self.savedir, f))
+                          for f in os.listdir(self.savedir)
+                          if f.endswith(".sav")), default=0.0)
+            except OSError:
+                mt = 0.0
+            if mt > t_res + 1:
+                alive = True
+                break
+            time.sleep(2.0)
+        self.probes.append({"probe": "disarm-liveness", "tag": tag,
+                            "alive": alive, "bplists_left": len(listed)})
+        self.log(f"DISARM {tag} liveness={alive}")
+        return alive
+
+    def census_window(self, tag, seconds):
+        """Bank EVERY leg stop for `seconds` of wall time (NOT until quiet —
+        with the hot 0x3b pump armed, quiet never comes; the msg-id SET is the
+        datum). bank_stop re-arms all legs and RUNs (census mode never drops),
+        and the cascade inside resume_and_rearm banks 1-3 stops per call, so
+        the per-window cap is SMALL (6): each banked stop costs ~20-90 s of
+        MCP round-trips (BREAK lottery dominates). The whole-log pty census
+        counts EVERY fire regardless. Storm cap 6."""
+        t_end = time.time() + seconds
+        recs = []
+        while time.time() < t_end and len(recs) < 6:
+            txt = self.pty_new()
+            if txt and self.leg_pats and any(p.search(txt)
+                                             for p in self.leg_pats):
+                time.sleep(1.5)
+                self.pty_new()          # settle the code view (t302 form)
+                recs.append(self.bank_stop(f"{tag}#{len(recs)}"))
+                continue
+            time.sleep(1.0)
+        self.log(f"CENSUS-WINDOW {tag}: {len(recs)} stops banked "
+                 f"({seconds:.0f}s)")
+        return recs
+
+    def census_click(self, x, y, tag, seconds):
+        """THE t303 unit: arm ONLY around the measured click. Choreography
+        between clicks runs leg-free — a hot armed leg + an un-polled click =
+        the guest frozen mid-sequence (t302 law, the reason t302 could not
+        census map clicks). x=None = BASELINE window (no click)."""
+        if not self.assert_on_map(f"pre_{tag}"):
+            return None
+        if not self.arm_census(self.legs):
+            self.log(f"CENSUS {tag}: ARM FAILED — click not measured")
+            return None
+        lines, ok, hdr = self.req("EXEC RUN", 20.0)
+        self.log(f"CENSUS {tag}: armed RUN hdr={hdr}")
+        time.sleep(0.5)
+        if x is not None:
+            self.send(["click", str(int(x)), str(int(y))])
+        recs = self.census_window(tag, seconds)
+        self.disarm_run(tag)
+        self.persist()
+        return recs
+
     # ---------- drive helpers ----------
     def click(self, x, y, tag, wait=2.5):
         if not self.assert_on_map(f"pre_{tag}"):
@@ -638,8 +809,16 @@ def main():
     ap.add_argument("--views", type=int, default=4)
     ap.add_argument("--clicks-per-view", type=int, default=4)
     ap.add_argument("--control-click", type=int, default=0)  # t301: black rect, REFUTED
+    ap.add_argument("--census", action="store_true")   # t303 msg-census mode
+    ap.add_argument("--window", type=int, default=30)  # census bank-window s
     args = ap.parse_args()
 
+    if args.census and args.legs == ap.get_default("legs"):
+        # t303 CENSUS default set: the COSMOS slot-2 handler (only COSMOS leg
+        # that ever fires, t302) + the five `call [ecx+4]` dispatch sites
+        # (covers EVERY window class incl. BatControl/BatMode siblings).
+        args.legs = ("cos_hdlr,disp_26eda,disp_30d02,disp_7a7eb,disp_7aa3e,"
+                     "disp_7b020")
     legs = [l.strip() for l in args.legs.split(",") if l.strip()]
     for l in legs:
         if l not in LEGS:
@@ -715,6 +894,81 @@ def main():
             s.log("NEGATIVE: base mismatch — the armed leg addresses would be "
                   "wrong for this session; aborting interpretation")
             return 1
+
+        # ---- t303 CENSUS MODE: never arm across choreography. Every
+        # measurement is an arm -> click -> bank-window -> disarm cycle;
+        # between cycles the guest runs leg-free and alive (t302 freeze laws).
+        if args.census:
+            s.census = True
+            s.pay = pay
+            census = {}
+            # SHORT baseline: the 0x3b pump guarantees a fire storm there; the
+            # whole-log pty census counts them all anyway. The banked baseline
+            # just names the pump msg-id for the CURRENT window set.
+            census["baseline"] = s.census_click(
+                None, None, "baseline", 15)
+            im, d = s.open_fleet()
+            if im is None:
+                s.log(f"CENSUS: FLEET would not open (diff {d}) — clicking "
+                      f"current screen targets only")
+            else:
+                if not s.click(200, FLEET_ROWS[0], "rowjump0", wait=3.0):
+                    s.log("CENSUS: rowjump failed")
+            sys_im = s.grab("census_view")
+            star = ""
+            p = s.newest_sav()
+            if p:
+                m2 = s.read_mem(p)
+                B2 = SL.base_of(m2, s.anch) if m2 else None
+                if B2:
+                    star = s.star_name_at(
+                        m2, struct.unpack_from(
+                            "<I", m2, B2 + SL.OFF + 0x43504)[0])
+            sprites = s.ship_sprites(sys_im) if sys_im is not None else []
+            planet = s.planet_point(sys_im) if sys_im is not None else None
+            emp = (s.empty_point(sys_im, [(x, y) for x, y, _ in sprites] +
+                                 ([planet] if planet else []))
+                   if sys_im is not None else None)
+            s.log(f"CENSUS view star={star!r} sprites={sprites[:4]} "
+                  f"planet={planet} empty={emp}")
+            targets = [(x, y, "sprite") for x, y, _ in sprites[:2]]
+            if planet:
+                targets.append((planet[0], planet[1], "planet"))
+            if emp:
+                targets.append((emp[0], emp[1], "empty"))
+            for (cx, cy, kindlbl) in targets[:args.clicks_per_view]:
+                census[kindlbl] = s.census_click(
+                    cx, cy, f"{kindlbl}_{cx}x{cy}", args.window)
+            # POSITIVE CONTROL inside the dispatch-site instrument: NEXTTURN's
+            # dispatch is windows.txt VERBATIM msg 7 (t302 btn_hdlr witness) —
+            # if msg 7 + name NEXTTURN appears at a disp site, the census
+            # attribution law holds. (Advances the turn: allowed on scratch.)
+            census["control_nextturn"] = s.census_click(
+                R293.NEXTTURN[0], R293.NEXTTURN[1], "control_nextturn",
+                args.window)
+            # WHOLE-LOG pty census (catches any stop poll_stop/census_window
+            # missed between cycles; same fire-pattern law as arm_all)
+            whole = open(s.ptylog, "rb").read().decode("utf-8", "replace")
+            pty_census = {}
+            for name in s.legs:
+                lin = P0 + LEGS[name]
+                pat = re.compile(rf"(?<![0-9A-Fa-f]){lin & 0xFFFFFF:06X} "
+                                 r"[0-9A-F]", re.I)
+                pty_census[name] = len(pat.findall(whole))
+            s.log(f"PTY WHOLE-LOG CENSUS {pty_census}")
+            s.probes.append({"probe": "pty-whole-log-census",
+                             "counts": pty_census})
+            s.persist()
+            with open(op.join(s.out, "census.json"), "w") as fh:
+                json.dump({"window_s": args.window, "star": star,
+                           "targets": census, "pty": pty_census},
+                          fh, indent=1)
+            measured = [k for k, v in census.items()
+                        if k not in ("baseline",) and v]
+            rc = 0 if measured else 1
+            s.log(f"SESSION END rc={rc} census-measured={measured} "
+                  f"hits={len(s.hits)}")
+            return rc
 
         # ---- arm in pmode, base verified ----
         # The BREAK may land on a real-mode DOS moment (wrong CS, EIP below the

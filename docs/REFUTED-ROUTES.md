@@ -527,3 +527,33 @@ armed hot leg guarantees re-stops; instrument must drop witnessed legs
 (img 0x26eda/0x30d02/0x7a7eb/0x7aa3e/0x7b020), then read the cos_hdlr
 msg-switch statically. BatControl legs (0x15630/0x156d4/0x16420) remain
 unarmed-and-untested; add only if the census points there.
+
+## t303 AMENDMENT (binding): T301 S6.2 UNIVERSAL-SLOT-1 LAW IS REFUTED. The
+## "every click (working or not) walks slot1 0x30d08" claim died on two
+## independent witnesses (docs/re/_wip_t303.md S4-S5):
+(1) t303 census (2 full sessions, runs work/r1/t299-leg-20261105-{015611,
+020416}, instrument control MATCH=True x5, ZERO freezes — the arm/click/
+disarm census cycle beats the t302 resume bug): whole-log pty census
+{cos_hdlr: 15, disp_26eda: 0, disp_30d02: 0, disp_7a7eb: 0, disp_7aa3e: 0,
+disp_7b020: 0}. The 0x3b pump delivers msg 0x3b to cos_hdlr (slot 2) WITHOUT
+ever executing a single `call [ecx+4]` site. Slot 1 == P0+0x30d08 in every
+class table remains [verified]; it is NOT the universal msg dispatch point.
+(2) t302 run 004605's OWN log: 00:48:10 're-armed 7 legs ok=True' (BPLIST
+contains 0160:1F0158=router) then 00:48:21 STOP endturn-p1 leg=btn_hdlr —
+the positive-control End-Turn click reached slot 2 with router armed+silent.
+(3) A WORKING map click that opens the ship dialog (sprite (48,151), pixel-
+proven landed 66717 px, vision: modal "Ship 'Sparrowhawk'" Leave Orbit/
+Abandon/Cancel) fired NONE of cos_hdlr + 5 slot-1 sites inside its 45 s
+window. Map-click entry is NOT cos_hdlr and NOT slot-1 — the t303 assignment
+premise ("map clicks must branch INSIDE the cos_hdlr slot-2 handler") is
+DEAD as stated.
+(4) Static (payload): indexed indirect calls ff 14 modrm = ZERO everywhere;
+`mov r32,[r32+0xa7]` = 21 sites (cluster 0x14de8-0x14f14 x6 + 0x1d82c,
+0x2cb4a, 0x3c941, 0x49556, 0x495c4, 0x4982f, 0x4eabd + the 2 ff5104
+predecessors); dialog strings 'Leave Orbit'/'Abandon'/'Scientist Takeover'
+NOT in payload plaintext. Route forward (t304, NOT refuted): at ANY cos_hdlr
+stop dump [esp] — ret0 names the real dispatch caller verbatim (bank_stop
+PATCHED for this, ret_stack.ret0/ret0_file_off); arm the census there.
+DEAD too as a control design: planet/empty/NEXTTURN clicks taken while an
+unclosed modal dialog is up (t298 law re-broken in t303 — close_eventwin
+BEFORE every control click; and a NEXTTURN control needs btn_hdlr ARMED).
