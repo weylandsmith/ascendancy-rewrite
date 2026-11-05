@@ -195,6 +195,22 @@ via t289 drive class). | open
 t304 note (run t299-leg-20261105-033648, ret_stack witnesses): the working sprite click DOES walk the class msg layer — btn_hdlr msg 0x1 NAME='Leave Orbit' via pump site file 0x56cda (ff 56 08 call [esi+8]); planet/empty clicks both hit the SAME 'Cancel' record msg 0x4 via 0x56c74 = modal residue, controls INVALID-AS-RUN (re-run with dialog-drain loop needed); NEXTTURN = btn_hdlr msg 0x8 NAME='PLSQUARE' direct E8 call site 0x3d38f. Selection WRITER still unnamed — row stays open (strict-close).
 t305 note (run t299-leg-20261105-061825 rc=0, close_eventwin pre-arm + FIXED fire detector, docs/re/_wip_t305.md S4): per-target msg-ids MEASURED under normal core — baseline pump s2_56cda+cos_hdlr msg 0x3b COSMOSWnd (15/60 s); sprite(48,151) s2_56cda x2 msg 0x8 NAME='PLIND' + btn_hdlr x1; planet(439,331) s2_56cda msg 0x8 NAME='PLANETALLOC' (t304 'Cancel residue' SUPERSEDED for planet once drain applied); empty(236,200) fires ONLY site 0x56c74 (unbanked render, autosave-gap proven); NEXTTURN s2_56cda x2 msg 0x8 NAME='PLSQUARE' + btn_hdlr x1; 20 other slot-2 sites ZERO in every window. Selection WRITER still unnamed (msg 0x8 = repaint/dispatch at window records, not the selection store) — row stays open (strict-close).
 t306 note (run t299-leg-20261105-101054 rc=0, batmode sites armed under corrected core + FirePat, docs/re/_wip_t306.md + ships.md S32): BATMODE STATIC-GATE ROUTE CLOSED AS A NEGATIVE — working sprite click (48,151, PLIND msg 0x8 btn_hdlr witnessed, control alive) fired ZERO at entry 0x1aef8, msg-4 router 0x1b070, and BOTH effect writers 0x1b71f/0x1ba39; selection oracle pairs moved nothing attributable (consistent with gating fact: t=1086 owner-0 has no kind-4 ship, but entry/router zeros are pre-gate). Writer hunt re-scoped to the non-batmode t296 store-census members: DAT_43508 {0x51a8e, 0x51fc2, 0x55bbd} + DAT_43504 {0x28ec2, 0x28ef6, 0x36b01, 0x52003, 0x55d35} (ships.md S24/S32). Selection WRITER still unnamed — row stays open (strict-close).
+t307 note (run t299-leg-20261105-112859 rc=0, the eight non-batmode census
+legs armed from the galaxy map + new --star-click battery, docs/re/_wip_t307.md
++ ships.md S33): FIRST LIVE FIRE AT A CENSUS MEMBER — w43504_28ec2 stopped
+with EAX=0x256825 (Icarus star record) seconds after the (238,282) star click
+that ENTERED the system (REQ-correlated pty render, follow-on bytes match
+disasm 0x28ec7..0x28ed8 incl. ring post code 0x10). The writer is the COSMOS
+FALLBACK star-select publisher (fn 0x28e70, caller 0x27332; gates: empty clip
+list [win+0x582]==0, ds:0x7e582>>16==1), NOT the per-ship selection writer —
+OQ-019 residue (per-ship select + destination widget) UNTOUCHED, row stays
+open. Census instrument now LIVE-VALIDATED (it catches these writers), so the
+seven remaining zeros are context statements. Binding instrument law from the
+fire: data-segment immediates are REBASED +0x242000 in code RAM
+(a3 04 55 28 00 @0x28ec2). NEXT: resolve the DAT-base question (true
+DAT_43504 = B+OFF-0x88+X reads 0xff idle = SELECTED-NONE vs the t297-A
+oracle address 0x28558c star ptr — ds:0x4358c zero disasm refs), then the
+ring-consumer windows (0x55a60 family fires only on a turn advance).
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

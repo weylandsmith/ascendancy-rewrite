@@ -212,7 +212,23 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
         "s2_3b584": 0x3B584, "s2_3b5be": 0x3B5BE, "s2_3b607": 0x3B607,
         "s2_553cb": 0x553CB, "s2_553e5": 0x553E5, "s2_55406": 0x55406,
         "s2_56cda": 0x56CDA, "s2_809fe": 0x809FE, "s2_4e2cb": 0x4E2CB,
-        "s2_54a83": 0x54A83}
+        "s2_54a83": 0x54A83,
+        # t307 SELECTION/ORDER-WRITER LEGS — the non-batmode members of the
+        # t296 store census (ships.md S24/S32; REFUTED-ROUTES t306 amendment
+        # keeps the four batmode sites DEAD). EVERY byte verified this session
+        # vs work/ascend_payload.bin + t91_code_disasm.txt; the signature is
+        # the store itself `a3 04/08 35 04 00 = mov ds:0x435XX,eax`, so eax at
+        # the stop IS the stored value (star_name_at(eax) names a star record
+        # per T298-A when eax is a star pointer). Follow-on ring posts
+        # (0x56ad4, code 0x10/0x11) sit 5-15 bytes downstream at 6 of 8.
+        "w43504_28ec2": 0x28EC2,   # cosmos family (disasm 23094; ebx=0x10)
+        "w43504_28ef6": 0x28ef6,   # cosmos family, eax=[[..]] (23111)
+        "w43504_36b01": 0x36B01,   # diplomacy row, eax=[ebx+0x13000] (40724)
+        "w43504_52003": 0x52003,   # ship order-target, eax=[esi+0x59] (73824)
+        "w43504_55d35": 0x55D35,   # gate cmp [esp+8],1 at 0x55d25 (78663)
+        "w43508_51a8e": 0x51A8E,   # turn-gated ds:0x484ec>0x96, ring 0x11
+        "w43508_51fc2": 0x51FC2,   # eax=[edx+0x59], ring 0x11 (73808)
+        "w43508_55bbd": 0x55BBD}   # edi=0x11 leg into 0x55d6f (78564)
 
 EVENTS = []
 hx = lambda v: hex(v) if isinstance(v, int) else None
@@ -929,6 +945,7 @@ def main():
     ap.add_argument("--witness", type=int, default=0)  # t304 A: bank N stops, no clicks
     ap.add_argument("--window", type=int, default=30)  # census bank-window s
     ap.add_argument("--target-kinds", default="sprite,planet,empty")
+    ap.add_argument("--star-click", type=int, default=0)  # t307 N cosmos pips
     args = ap.parse_args()
 
     if args.witness and args.legs == ap.get_default("legs"):
@@ -1076,12 +1093,97 @@ def main():
             s.census = True
             s.pay = pay
             census = {}
+            oracles = {}
+            # t306 SELECTION ORACLE (delta-pair law, ships.md S25 t297-A: the
+            # DAT scalars at B+OFF+X churn WITHOUT input — only before/after
+            # pairs around a click mean anything; sel43510 = the watch.log
+            # sel= field, DAT_43504 = current-system/star/sel-object ptr).
+            # t307: MOVED above the baseline so the star phase shares it.
+            def sel_oracle(tag):
+                try:
+                    p = s.newest_sav()
+                    if not p:
+                        return None
+                    mm = s.read_mem(p)
+                    if not mm:
+                        s.log(f"ORACLE {tag}: Memory unreadable in {op.basename(p)}")
+                        return None
+                    bb = SL.base_of(mm, s.anch)
+                    if not bb:
+                        s.log(f"ORACLE {tag}: no base vote in {op.basename(p)}")
+                        return None
+                    rd = lambda X: struct.unpack_from("<I", mm, bb + SL.OFF + X)[0]
+                    o = {"tag": tag, "sav": op.basename(p), "turn": rd(0x12e10),
+                         "sel43510": mm[bb + SL.OFF + 0x43510],
+                         "DAT_43504": hx(rd(0x43504)),
+                         "DAT_43508": hx(rd(0x43508))}
+                    s.log(f"ORACLE {tag} {o}")
+                    return o
+                except Exception as e:
+                    s.log(f"ORACLE {tag} error {e!r}")
+                    return None
             # SHORT baseline: the 0x3b pump guarantees a fire storm there; the
             # whole-log pty census counts them all anyway. The banked baseline
             # just names the pump msg-id for the CURRENT window set.
             census["baseline"] = s.census_click(
                 None, None, "baseline", 15)
-            im, d = s.open_fleet()
+            # ---- t307 COSMOS STAR-CLICK PHASE (galaxy map; campaign-load
+            # view IS the map — do NOT open_fleet, t306 lands system view).
+            # Candidate law VERBATIM from r293 enter_system (bright pips,
+            # sum(r+g+b)>380, x 40..455 y 60..440, nearest MAP_CENTER first);
+            # dedupe >=20px apart. A hit = screen diff vs map baseline >15000
+            # = entered system view -> escape ladder BEFORE the next click
+            # (t285: never Escape blind; ladder checks orange each press).
+            star_results = {}
+            if args.star_click:
+                map_im0 = s.grab("map_pre_star")
+                cands = []
+                if map_im0 is not None:
+                    px = map_im0.load()
+                    for yy in range(60, 440, 2):
+                        for xx in range(40, 455, 2):
+                            rr, gg, bb_ = px[xx, yy]
+                            if rr + gg + bb_ > 380:
+                                cands.append((abs(xx - R293.MAP_CENTER[0])
+                                              + abs(yy - R293.MAP_CENTER[1]),
+                                              xx, yy))
+                    cands.sort()
+                s.log(f"STAR-PHASE: {len(cands)} bright candidates, "
+                      f"nearest={cands[:3]}")
+                tried = []
+                for i in range(args.star_click):
+                    pick = None
+                    for cd, xx, yy in cands:
+                        if all(abs(xx - tx) + abs(yy - ty) > 20
+                               for _, tx, ty in tried):
+                            pick = (cd, xx, yy)
+                            break
+                    if pick is None:
+                        s.log(f"STAR-PHASE {i}: no fresh candidate — stop")
+                        break
+                    cd, xx, yy = pick
+                    tried.append(pick)
+                    oracles[f"star{i}_before"] = sel_oracle(f"star{i}_before")
+                    recs = s.census_click(xx, yy, f"star{i}_{xx}x{yy}",
+                                          args.window)
+                    im_a = s.grab(f"star{i}_screen")
+                    dv = (s.diff_px(map_im0, im_a)
+                          if im_a is not None else -1)
+                    entered = dv > 15000
+                    oracles[f"star{i}_after"] = sel_oracle(f"star{i}_after")
+                    star_results[f"star{i}"] = {
+                        "click": [xx, yy], "cand_dist": cd,
+                        "screen_diff_vs_map": dv, "entered_system": entered,
+                        "stops": recs}
+                    s.log(f"STAR-PHASE {i}: click ({xx},{yy}) diff={dv} "
+                          f"entered={entered} stops={0 if recs is None else len(recs)}")
+                    if entered:
+                        if not s.escape_to_map(map_im0):
+                            s.log("STAR-PHASE: escape_to_map FAILED — "
+                                  "remaining star windows skipped")
+                            break
+                census.update({k: v["stops"] for k, v in star_results.items()})
+            im, d = (None, 0) if args.star_click else s.open_fleet()
             if im is None:
                 s.log(f"CENSUS: FLEET would not open (diff {d}) — clicking "
                       f"current screen targets only")
@@ -1114,34 +1216,9 @@ def main():
             # scope: sprite + control_nextturn only; planet/empty datum done
             # t305, don't re-measure).
             want = {k.strip() for k in args.target_kinds.split(",")}
-            # t306 SELECTION ORACLE (delta-pair law, ships.md S25 t297-A: the
-            # DAT scalars at B+OFF+X churn WITHOUT input — only before/after
-            # pairs around a click mean anything; sel43510 = the watch.log
-            # sel= field, DAT_43504 = current-system/star/sel-object ptr).
-            def sel_oracle(tag):
-                try:
-                    p = s.newest_sav()
-                    if not p:
-                        return None
-                    mm = s.read_mem(p)
-                    if not mm:
-                        s.log(f"ORACLE {tag}: Memory unreadable in {op.basename(p)}")
-                        return None
-                    bb = SL.base_of(mm, s.anch)
-                    if not bb:
-                        s.log(f"ORACLE {tag}: no base vote in {op.basename(p)}")
-                        return None
-                    rd = lambda X: struct.unpack_from("<I", mm, bb + SL.OFF + X)[0]
-                    o = {"tag": tag, "sav": op.basename(p), "turn": rd(0x12e10),
-                         "sel43510": mm[bb + SL.OFF + 0x43510],
-                         "DAT_43504": hx(rd(0x43504)),
-                         "DAT_43508": hx(rd(0x43508))}
-                    s.log(f"ORACLE {tag} {o}")
-                    return o
-                except Exception as e:
-                    s.log(f"ORACLE {tag} error {e!r}")
-                    return None
-            oracles = {}
+            # t307: sel_oracle MOVED above the baseline (shared with the star
+            # phase); the t306 duplicate definition + `oracles = {}` reset
+            # deleted here (it would have wiped the star oracle pairs).
             for (cx, cy, kindlbl) in [t for t in targets
                                       if t[2] in want][:args.clicks_per_view]:
                 oracles[f"{kindlbl}_before"] = sel_oracle(f"{kindlbl}_before")
@@ -1173,8 +1250,14 @@ def main():
                            "targets": census, "pty": pty_census,
                            "oracles": oracles},
                           fh, indent=1)
+            # t307: in --star-click mode a completed bank-window with ZERO
+            # stops IS the datum (task close-condition: "zero fires at ALL 8
+            # sites is ALSO a datum"), so measured = windows that RAN
+            # (recs is not None), not windows that banked. Non-star mode
+            # keeps the t303 semantics (back-compat with runs 033648/061825).
             measured = [k for k, v in census.items()
-                        if k not in ("baseline",) and v]
+                        if k not in ("baseline",)
+                        and (v if not args.star_click else v is not None)]
             rc = 0 if measured else 1
             s.log(f"SESSION END rc={rc} census-measured={measured} "
                   f"hits={len(s.hits)}")

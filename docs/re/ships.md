@@ -1692,3 +1692,32 @@ the 'Cancel' record msg 0x4 via pump 0x56c74 (modal residue class, t304
 pattern) — turn-advance witness stands from t305's PLSQUARE stop, no delta.
 NO LEDGER ROW CLOSED (strict-close): OQ-019 selection WRITER unnamed; t306
 note appended to the row.
+
+## S33 t307 (2026-11-05) — FIRST LIVE FIRE AT A STORE-CENSUS MEMBER:
+## w43504_28ec2, EAX=0x256825. Run work/r1/t299-leg-20261105-112859 (rc=0,
+### attempt 1; scripts/r307_relaunch.sh; full autopsy docs/re/_wip_t307.md).
+Armed the eight non-batmode t296 census legs + btn_hdlr from the GALAXY MAP
+(new --star-click N: r293 enter_system pip law, screen-diff>15000 = entered,
+escape ladder between clicks). PTY census: {w43504_28ec2:1, others 0,
+btn_hdlr:5}. THE FIRE: HL render mcp-pty.log byte 34151, IP=E8312=P0+0x28ec2,
+EAX=0256825 (Icarus star record, T298-A), between REQ 111 RUN (resume after
+the star1 (238,282) click's btn_hdlr msg-4 stop; click ENTERED the system —
+14_star1_screen.png vision-verified 'Icarus / Red Dwarf') and REQ 112 BREAK.
+Follow-on render bytes match disasm 0x28ec7..0x28ed8 verbatim (ring post code
+0x10 via 0x56ad4). Function 0x28e70 (sole caller 0x27332, COSMOS msg chain):
+gates [[win+0xbb]+4]==0, [win+0x582]==0 (EMPTY clip list = fallback branch),
+(ds:0x7e582>>16)==1, test [obj+0x17],ds:0x6774 -> STORE ds:0x43504=eax.
+t306 REFINED: map clicks never reach BatModeWnd (stands) but DO reach the
+COSMOS fallback selection writer. SELF-RELOCATION LAW (MEASURED, binding):
+RAM code bytes at P0+0x28ec2 = a3 04 55 28 00 — data-segment immediates are
+REBASED +0x242000 IN CODE at load (0x7a35c->0x2bc35c in the same render);
+census-ctl byte-compare vs payload reads False at such legs (arms still
+valid; BPLIST proves). DAT-BASE CORRECTION CANDIDATE (bytes verified,
+resolution OPEN): true DAT_43504 physical = 0x285504 (B+SL.OFF-0x88+X, since
+B=P0+0x88), where the scratch sav reads 0xff at idle = SELECTED-NONE fits
+the semantics; the t297-A oracle address B+SL.OFF+X = 0x28558c holds the
+stable Icarus star ptr (grep: ds:0x4358c has ZERO disasm refs — a DIFFERENT
+variable). If confirmed, the oracle has been reading the wrong u32 and the
+43504 delta test was never real. NO LEDGER ROW CLOSED (strict-close): the
+fire is the STAR fallback writer, not the per-ship selection writer;
+OQ-019 residue untouched; t307 note on the row.

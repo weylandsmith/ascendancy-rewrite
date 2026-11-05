@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-05T10:45
+updated: 2026-11-05T12:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,43 +209,66 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t307 SELECTION-WRITER WITNESS AT THE SURVIVING STORE FAMILY — ARM
-DAT_43504/43508 WRITER SITES (non-batmode members of the t296 store census)
-AND WATCH A LIVE COSMOS STAR-CLICK (ordering rationale: t306 CLOSED the
-batmode static-gate route as a cited negative — entry 0x1aef8, router 0x1b070,
-effects 0x1b71f/0x1ba39 all ZERO for a working sprite click with the btn_hdlr
-control alive, run work/r1/t299-leg-20261105-101054 rc=0, ships.md S32 +
-REFUTED t306 amendment; the t296 census is the cited map of who stores
-ds:0x43504/ds:0x43508 AT ALL, and OQ-019's residue is precisely 'no per-ship
-selection WRITER witnessed', so arming the census members is the only route
-left that strict-close can accept). LEGS TO ADD (from ships.md S24/S32, do NOT
-re-derive): w43508_51a8e = 0x51A8E (turn-gated ds:0x484ec>0x96, ring code
-0x11), w43508_51fc2 = 0x51FC2 (stores [edx+0x59], ring 0x11), w43508_55bbd =
-0x55BBD, w43504_28ec2 = 0x28EC2, w43504_28ef6 = 0x28EF6 (cosmos star-click
-pair — the likeliest live fires: a COSMOS map star-click is the known
-0x28e**-family trigger), w43504_36b01 = 0x36B01 (diplomacy row), w43504_52003
-= 0x52003 (ship order-target, ring code 0x10), w43504_55d35 = 0x55D35. VERIFY
-each leg's bytes against work/ascend_payload.bin + t91_code_disasm.txt before
-arming (the a3/a1/a3 store form `mov ds:0x43504,eax` is the signature; if a
-cited site is not a store of 0x43504/43508, log and skip it — do not fix the
-map mid-run). TARGETS: cosmos star click (map view, click a star dot — the
-t293 law: dot-clicks NAVIGATE, which is exactly the 0x28ef6 hypothesis under
-test) + baseline window (the resolver may fire family members during idle
-turn processing) + control_nextturn (positive control ONLY if a prior run
-showed the Cancel-record defect absent; t306 hit 'Cancel' msg 0x4 — if it
-repeats, close_eventwin HARDER or accept baseline+star as the two measured
-windows). Oracle pairs are BUILT IN (r299_leg_session.py t306 patch,
-census.json['oracles']). CLOSE CONDITION: a banked stop at one of these sites
-with win/reg evidence naming what was stored (bank_stop already dumps eax +
-window grid) AND an oracle delta = the selection-writer witness OQ-019 needs
-(strict-close: zero fires at ALL 8 sites is ALSO a datum — it would mean the
-census sites are all context-gated (order/diplomacy/star-selection contexts
-that a system-view battery never enters) and the residue re-scopes to
-entering THOSE contexts, not to new statics). Fixed laws (do NOT re-trip):
-FirePat regression before trusting any census (5/5 vs runs 033648/052925/
-061825); close_eventwin before clicks; BPDEL fired index BEFORE RUN; liveness
-= autosave growth or hot re-fire; kill by RECORDED PID; one battery per
-sitting; do NOT re-arm the four REFUTED batmode legs; production :9 untouched.
+NEXT t308 RESOLVE THE DAT_43504 ADDRESS QUESTION, THEN WITNESS A TRUE
+SELECTED-NONE->STAR TRANSITION (ordering rationale: t307 caught the FIRST
+live fire at a store-census member — w43504_28ec2, EAX=0x256825 Icarus-star
+pointer, REQ-correlated to the entered star click, run
+work/r1/t299-leg-20261105-112859 rc=0, ships.md S33 — and in doing so
+produced the SELF-RELOCATION LAW (code-RAM data immediates rebased +0x242000:
+a3 04 55 28 00 at file 0x28ec2 = store to physical 0x242000+0x43504 =
+0x285504). That makes the t297-A oracle address SUSPECT: the oracle reads
+B+SL.OFF+0x43504 = 0x28558c (stable Icarus star ptr; grep ds:0x4358c = ZERO
+disasm refs = a different variable) while the rebased store target 0x285504
+reads 0xff at idle = SELECTED-NONE fits the t296 semantics. If the oracle is
+confirmed off-target, (a) t297-A's 'both globals have non-order writers,
+delta-only' law must be RE-STATED (the 0x256825-idle datum was read from
+0x28558c, not the selection scalar), and (b) the delta test t307 needed
+becomes REAL for the first time: watch 0x285504 (not B+OFF+X) around a star
+click from a fresh entry where DAT says none-selected. STEP 1 (offline,
+cheap): grep the whole disasm for stores/loads of ds:0x43504 vs ds:0x4358c
+vs ds:0x43508/0x43590, and recheck what r1_slot/SL.OFF anchoring gives for
+the DS base (B+SL.OFF vs B+SL.OFF-0x88; B=P0+0x88); pin the answer into
+docs/re/r1-savestate.md or ships.md. STEP 2 (one capture, reuse the t307
+instrument verbatim): --star-click battery with sel_oracle RE-POINTED to the
+confirmed true DAT addresses (fix scripts/r299_leg_session.py sel_oracle to
+read BOTH candidates so no further ambiguity survives the run), legs = the
+same 8 writers + btn_hdlr. CLOSE CONDITION: a banked w43504_* stop whose
+oracle pair shows the TRUE DAT_43504 scalar CHANGE (0xff->0x256825 or
+starA->starB) = the selection-writer witness strict-close demands; a stable
+0xff before/after WITH a banked fire = the rebased target is not what t296
+thought either, and the census map itself gets re-derived (also a datum).
+Fixed laws (do NOT re-trip): FirePat regression 5/5 before arming (runs
+033648/052925/061825); fire_pats takes P0+LEGS[leg]; census-ctl False at
+rebased legs is NOT an arming failure; do NOT re-arm the four REFUTED
+batmode sites; close_eventwin before clicks; escape ladder never blind
+(t285); BPDEL fired index before RUN; kill by RECORDED PID; one battery per
+sitting; production :9 untouched; scratch copies only, never mount game/.
+
+## LANDED t307 (2026-11-05, session 16) — FIRST LIVE FIRE AT A STORE-CENSUS
+### MEMBER: w43504_28ec2 EAX=0x256825 (Icarus star) ON AN ENTERED STAR CLICK;
+### SELF-RELOCATION LAW (+0x242000 code-RAM data imm rebases); ORACLE-BASE
+### QUESTION OPENED. docs/re/_wip_t307.md S0-S6, ships.md S33; run
+### work/r1/t299-leg-20261105-112854->-112859 (rc=0 attempt 1), scripts/
+### r307_relaunch.sh + r299_leg_session.py t307 patch (8 w4350*/w43508_* legs,
+### --star-click N galaxy-pip battery, sel_oracle hoisted, star-mode rc law =
+### ran-windows count).
+MEASURED: (1) pty whole-log census {w43504_28ec2:1, w43504_28ef6/36b01/52003/
+55d35:0, w43508_51a8e/51fc2/55bbd:0, btn_hdlr:5} — the leg instrument CAN
+catch the writers, zeros are context; (2) THE FIRE: HL render byte 34151
+IP=E8312=P0+0x28ec2 EAX=0256825, between REQ 111 RUN (resume after star1
+(238,282) click's btn_hdlr msg-4 stop; click ENTERED Icarus system — screen
+diff 94504, vision-verified) and REQ 112 BREAK; follow-on bytes match disasm
+0x28ec7..0x28ed8 verbatim (ring post 0x10); writer = fn 0x28e70 COSMOS
+fallback star-select (sole caller 0x27332; gates empty [win+0x582],
+ds:0x7e582>>16==1); (3) SELF-RELOCATION LAW (MEMDUMPBIN ctl vs payload): RAM
+@P0+0x28ec2 = a3 04 55 28 00, 0x7a35c->0x2bc35c — data immediates rebased
++0x242000 in code; (4) star0 (226,238) diff=488 no-enter, star2 (218,308)
+diff=488 no-enter (pip law: nearest bright dot may MISS the hit target; only
+star1 entered); NEXTTURN control CLEAN msg 0x7 (no Cancel residue this run).
+NO LEDGER ROW CLOSED (strict-close): fire = star-fallback writer, NOT the
+per-ship selection writer; oracle delta absent (0x256825 before AND after —
+and the oracle address itself now suspect, see NEXT); t307 note on OQ-019.
+Gate 0, audits OK.
 
 ## LANDED t306 (2026-11-05, session 15) — BATMODE SELECTION SITES NEVER
 ### REACHED BY MAP CLICKS (cited negative; route REFUTED); writer hunt
