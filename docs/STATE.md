@@ -209,46 +209,64 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t309 RING-0x10/0x11 CONSUMER WINDOWS: WITNESS THE 0x55a60 FAMILY RUN
-(ordering rationale: t308 fully witnessed the DAT_43504 star-case writer —
-green-annulus pip law click (182,284) ENTERED Vega, w43504_28ec2 stopped
-EAX=0x255BC5 (star-record base k=0), oracle pair 0x256825 'Icarus' ->
-0x255bc5 'Vega', fire reproduced 3/3, runs t299-leg-20261105-{140250,143815}
-rc=0, ships.md S34 — and the DAT-base question CLOSED (oracle always correct;
-sav member = linear+0x88; the t307 0xff datum void, REFUTED t308 amendment).
-The chain now has exactly one unnamed link on the star side: ring code 0x10 is
-MEASURED POSTED 3x by 0x28ec2 via 0x56ad4 (ring = {u16 code,u32 param,u32
-extra} at [esi+slot*10+0x422c], ships.md S24/S33) but the CONSUMER family
-(0x55a60 incl. legs w43508_55bbd 0x55bbd / w43504_55d35 0x55d35) has fired
-ZERO inside every armed window across 3 runs — INCLUDING the 60 s
-control_nextturn window where btn_hdlr witnessed the NEXTTURN msg (run
-140250). Either (a) resolution runs only after the control window's disarm
-(turn-advance pump), or (b) the NEXTTURN click at (511,67) opens a confirm
-modal and the turn never advanced (t306 saw 'Cancel' via 0x56c74 — the modal
-pattern). STEP 1 (offline, cheap): disasm the 0x55a60 consumer entry + its
-callers (who pumps the ring? turn-loop FUN_00024f24? msg pump?), verify the
-leg bytes 0x55bbd/0x55d35 are mid-block reachable under normal core (t305
-fire law), and pick 1-3 consumer legs incl. the entry if block-top; bank the
-caller map in ships.md S35. STEP 2 (capture, reuse the t308 battery shape):
-arm consumer legs + btn_hdlr; star-click ONE green-annulus pip (posts ring
-0x10 — witnessed 3/3, deterministic); after the escape ladder, click NEXTTURN
-INSIDE a fresh armed window and if a 'Cancel'/'OK' modal appears (bank_stop
-win name names it), click through it (scratch instance, turn advance allowed)
-while armed; ALSO keep a post-disarm 60 s baseline window (no legs hot) as
-the (a)-vs-(b) discriminator: if the consumer fires only after disarm, the
-pty whole-log census still counts it. CLOSE CONDITION: a pty-census count>=1
-at any 0x55a60-family leg correlated (REQ order) to the post-click turn
-advance = the ring consumer witness; a whole-log ZERO incl. post-disarm =
-code 0x10 has no consumer in the normal turn loop (selection is render-time
-state only) = ALSO a datum, and the t296 'ring drives order execution'
-reading gets re-scoped. Fixed laws (do NOT re-trip): green-annulus pip law
-ONLY (bright-dot law REFUTED t308); oracle at B+SL.OFF+X correct, DAT-base
-question CLOSED; FirePat regression 5/5 before arming (runs 033648/052925/
-061825); fire_pats takes P0+LEGS[leg]; census-ctl False at rebased legs is
-NOT an arming failure; do NOT re-arm the four REFUTED batmode sites;
-close_eventwin before clicks; escape ladder never blind (t285); BPDEL fired
-index before RUN; kill by RECORDED PID; production :9 untouched; scratch
-copies only, never mount game/.
+NEXT t310 DESTINATION-WIDGET WRITER WINDOWS: FIRE THE DAT_43508 FAMILY VIA A
+LIVE ORDER FLOW AND NAME THE CALLERS FROM ret_stack (ordering rationale: t309
+measured the ring channel DORMANT at map idle — post-fn entry legs zero
+whole-log incl. two hot holds, ringB count/widx 0 in every snapshot, star-click
+RING-A post body never ran; selection is RENDER-DIRECT (ships.md S35/S35b,
+REFUTED-ROUTES t309 amendment binding: do NOT re-arm the 0x55ae8/0x55a60/
+0x56ad4 family as idle witnesses). The whole-image writer inventory is now
+COMPLETE: DAT_43508 six writers {0x1b5e6, 0x1baa7 (batmode-adjacent, REFUTED
+route), 0x51a8e fn 0x51834 turn-gated ds:0x484ec>0x96, 0x51fc2 fn 0x51b68
+eax=[edx+0x59], 0x55bbd+0x55bcc fn 0x55ae8 dead-at-idle} — the ONLY live-
+reachable non-batmode candidates for the msg-0x50 destination-widget hole are
+fn 0x51b68 (owns THREE of twelve total stores incl. DAT_43504 0x51ac9
+edx=0x13bc5+32*k star-record addr) and fn 0x51834; BOTH have zero E8 callers
+and zero u32 refs in the image = class/vtable members, so the caller map CANNOT
+come from offline static — it comes from ret_stack at a live stop (bank_stop
+already dumps ret0/ret0_file_off, t304 law). STEP 1 (offline, ~6 probes):
+disasm fn 0x51b68 + fn 0x51834 entry gates (what msg/what arg selects them —
+the [edx+0x59]/[esi+0x59] reads look like ORDER TARGET fields per t296 S24);
+check fn 0x51b68's slot-table membership the way t306 named fn 0x3cb00 (scan
+the phys-address family near known vtables; a u32 scan of the FILE image is
+REFUTED-blind for relocated tables, use the ret_stack route as primary).
+STEP 2 (capture, one run): reuse the t309 relaunch shape with LEGSET =
+w43508_51a8e, w43508_51fc2, w51ac9 (NEW leg 0x51AC9 bytes 89 15 04 35 04 00 —
+payload-verified t309), w43504_52003, btn_hdlr; battery = the r298_order_session
+order-placement choreography (fleet view -> select ship -> order -> destination
+click) INSIDE armed windows, star-click omitted (star-case closed t308); bank
+stops with full reg+ret_stack; oracle keeps the t309 gate snapshot incl.
+rd(0x7e5aa)/rd(0x7e89e) (ADD them to sel_oracle this iteration). CLOSE: a
+banked stop at any DAT_43508 writer with a named ret0 caller on an ENTERED
+destination click = destination-widget writer witnessed (OQ-019 residue
+narrows to per-ship select); whole-log zero WITH btn_hdlr alive = fn 0x51b68/
+0x51834 need a different trigger (bank the msg ids seen, keep row open).
+Fixed laws (do NOT re-trip): green-annulus pip law ONLY; fire_pats(P0+LEGS[n])
+form; census_click(None) re-arms all legs (hot holds work); post-disarm is
+invisible to the pty census; sav ring 10 s granularity (turn-delta pairs can
+predate the click — claim neither way); mode4226 map=1/system=0x10; oracle
+B+SL.OFF+X correct (DAT-base CLOSED); FirePat regression 5/5 before arming;
+close_eventwin before clicks; escape ladder never blind; kill by RECORDED PID;
+production :9 untouched; scratch copies only, never mount game/.
+
+## LANDED t309 (2026-11-05, session 18) — TWO-RING MAP + RING DORMANCY
+### MEASURED (selection is RENDER-DIRECT; 'consumer timing' was the wrong
+### question); DAT WRITER INVENTORY COMPLETED (a3 + 89/15 sweeps: 6+6, the
+### t296 census missed 0x51ac9/0x55bcc); objdump -D fallback + jump-resolver
+### laws fixed. docs/re/_wip_t309.md S0-S3, ships.md S35/S35b, REFUTED-ROUTES
+### t309 amendment; run t299-leg-20261105-161711 rc=0 attempt 2 (attempt 1 =
+### BREAK-lottery loss); scripts/r290_disasm.py -D fix, r299_leg_session.py t309
+### patch (cons_entry/ringB_post/ringB_w10_{41c17,499e0}/ringA_resolver legs,
+### oracle gate snapshot mode4226/ring counters/pump660c/guard, HOT HOLD
+### windows), r309_ring_writer_census.py, r309_relaunch.sh. Star witness delta
+### reproduced 4th time (Icarus->Vega at (182,284), diff 94712). NO LEDGER ROW
+### CLOSED (strict-close): OQ-019 residue = per-ship selection writer +
+### msg-0x50 destination widget (now re-scoped to fn 0x51b68/0x51834 live
+### windows -> t310). Honest negatives: consumer/post legs all zero (structural
+### dormancy, PROVEN for ring-B; ring-A post body proven-not-run via idx
+### snapshots); turn advance UNRESOLVED (10 s sav granularity); ringA_resolver
+### control vacuous-by-construction at idle (own gate needs [core+0x44aa]>>16>0,
+### unincrementable at idle). Gate 0, audits OK.
 
 ## LANDED t308 (2026-11-05, session 17) — DAT_43504 STAR WRITER FULLY
 ### WITNESSED WITH A REAL DELTA (Icarus->Vega, EAX=0x255BC5, fire 3/3);

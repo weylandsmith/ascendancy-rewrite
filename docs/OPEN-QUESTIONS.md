@@ -227,6 +227,27 @@ instrument live-validated); NEW SHARPENED HOLE: ring code 0x10 POSTED 3x but
 the 0x55a60 consumer family never ran inside any armed window incl. a
 NEXTTURN-msg window — consumer timing unresolved. NEXT: t309 ring-consumer
 windows (arm the 0x55a60 family + advance the turn INSIDE the armed window).
+t309 note (run t299-leg-20261105-161711 rc=0, consumer/post family legs armed
+in every window incl. two HOT HOLDS, docs/re/_wip_t309.md + ships.md S35):
+THE RING SELECTION CHANNEL IS DORMANT AT MAP IDLE — measured, not inferred:
+leg ringB_post (RING-B POST FN ENTRY 0x55a60, gate-free prefix) fired ZERO
+whole-log across baseline+star+hold+nextturn+hold, snapshots ringB_count=0/
+widx=0 in EVERY window, consumer 0x55ae8 zero, and the star-click RING-A post
+BODY never ran (its sole side effect inc [core+0x44ac] left idx 0 through
+every snapshot; post-fn entry leg zero too). RING-B is structurally shut at
+idle (pump gate [core+0x475a]==0 blocks unconditionally), so 'consumer timing'
+was the wrong question — SELECTION IS RENDER-DIRECT (direct DAT stores). NEW
+WRITER INVENTORY (whole-image a3+89/15 sweep): DAT_43504 has SIX writers (the
+t296 census missed 0x51ac9 in fn 0x51b68, edx=0x13bc5+32*k star record addr);
+DAT_43508 has SIX (missed 0x55bcc); fn 0x51b68 owns three of twelve. mode4226
+IS A VIEW ID (map=1, system=0x10) — the consumer's mode==1 gate confines it to
+the galaxy map. Star witness delta reproduced 4th time (Icarus->Vega). Turn
+advance across NEXTTURN UNRESOLVED (1086->1086 but 10 s sav granularity,
+t260 law — claim neither way). OQ-019 row STAYS OPEN (strict-close): per-ship
+selection writer + msg-0x50 destination widget still unnamed; NEXT t310 = arm
+fn 0x51b68 trio + ringA post entry/body legs {0x56ad4,0x56b4e} + snapshot
+rd(0x7e5aa)/rd(0x7e89e), star-click + hold; EAX dump at 0x56ad4 settles the
+core-base identity live.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

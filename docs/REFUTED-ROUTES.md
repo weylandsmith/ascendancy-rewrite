@@ -617,3 +617,18 @@ BEFORE every control click; and a NEXTTURN control needs btn_hdlr ARMED).
 ## member is +0x88 off guest linear — any "DAT address" quoted WITHOUT that
 ## conversion is void (t307 S1); the oracle at B+SL.OFF+X is CORRECT and the
 ## DAT-base question is CLOSED, do not re-open it.
+
+## t309 AMENDMENT (binding): THE RING SELECTION CHANNEL IS DEAD AS AN
+## EXPLANATION AT MAP IDLE — do NOT arm the 0x55ae8 consumer family (or the
+## 0x55a60/0x56ad4 post fns) hoping map/star/turn clicks light them up.
+## Measured run t299-leg-20261105-161711: post-fn ENTRY legs (gate-free
+## prefixes) fired ZERO whole-log incl. two hot holds; ringB count/widx
+## snapshots 0 in every window; the star-click RING-A post body never ran
+## (idx stayed 0). Selection is RENDER-DIRECT (direct DAT_43504/08 stores).
+## Also dead: (1) the t296 'selection posts ring code 0x10' reading — the
+## star click posts RING-A {code=edx=1, param=ebx=0x10}, and RING-B's two
+## 0x10 posters {0x41c17, 0x499e0} are never called at idle; (2) ringA_resolver
+## 0x55df4 AS AN IDLE POSITIVE CONTROL (caller gate ([core+0x44aa]>>16)>0 is
+## itself unincrementable at idle — a zero there proves nothing); (3) any
+## whole-log count computed as fire_pats(LEGS[name]) — the harness form is
+## fire_pats(P0+LEGS[name]), bare offsets count ZERO.

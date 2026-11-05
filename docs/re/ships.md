@@ -1761,3 +1761,51 @@ Still open (strict-close, OQ-019 residue): per-SHIP selection writer (no
 kind-4 owner-0 ship at t=1086) and the msg-0x50 destination widget; ring-0x10
 CONSUMER family (0x55a60 incl. 0x55bbd/0x55d35) has never run inside an armed
 window even across a witnessed NEXTTURN msg — consumer timing unresolved.
+
+## S35 t309 (2026-11-05) — TWO-RING MAP: 0x55a60 IS THE RING-B POST, THE
+### CONSUMER IS 0x55ae8 (SOLE PUMP SITE 0x54b74), AND THE STAR CLICK POSTS
+### RING-A CODE 1 — THE t308 CLOSE-CONDITION TESTED THE WRONG RING.
+Static (work/ascend_payload.bin, objdump -D windows, jump targets hand-
+resolved per S1.12 law; full detail docs/re/_wip_t309.md S1):
+- RING-B: post fn 0x55a60 (19 E8 sites; record {u16 edx code, u32 ebx, u32
+  ecx} at [core+0x475e+code*10]; write-index WORD [core+0x475a] inc; reject
+  when ([core+0x4758]>>16)==0x20). Consumer fn 0x55ae8 (gates ds:0x7a358!=-1,
+  count!=0, ([core+0x4226]>>16)==1) dispatches code>>16 through a compare
+  tree; code 0x10 -> cmp [esp+8],1 -> mov ds:0x43504,eax (leg w43504_55d35);
+  codes 0xe-0xf arms -> mov ds:0x43508 (legs w43508_55bbd/0x55bcc). Sole E8
+  caller = 0x54b74 inside fn 0x54650, gated write-index!=0 / mode==1 /
+  [core+0x489e]==0; post-call 0x54b79 posts msg 0x7 when the ring drains.
+- fn 0x54650 = core-state pump (called as `mov eax,0x7a35c; call` from
+  exactly TWO sites: 0x217b3 in fn 0x20fd4 = MAIN GAME LOOP (its sole caller
+  0x7b817 sits in program-entry trampoline 0x7b7d7), and 0x555f9 in fn 0x5558c
+  = secondary loop over the same core). Pump path requires ds:0x660c==-1;
+  resolver 0x55df4 case 0x55ebe CLEARS it to 0.
+- RING-A: post fn 0x56ad4 (45 E8 sites; FIFO slot ([core+0x44aa]>>16) at
+  +0x422c stride 10, index WORD +0x44ac inc); consumed by SHADOW-COPY+resolver
+  fn 0x55df4 (called from 0x54b4a gated ([core+0x44aa]>>16)>0; memcpy 0x140B
+  +0x422c->+0x436c, zero index, jmp-table 0x55e86 on code<=8 — table data is
+  RAM-relocated, do not decode the file image). code>8 (incl. 0x10) -> ja
+  0x56336 default = error-report path, NO DAT write.
+- CORRECTION (binding): the t307/t308 star-select site 0x28ec2 posts RING-A at
+  0x28ed8 with edx=ecx=1 (CODE 1) and ebx=0x10 (the u32 PARAM) — NOT ring-B
+  code 0x10. RING-B code-0x10 has exactly TWO posters in the image: 0x41c17
+  (fn 0x41260) and 0x499e0 (fn 0x49880), both `edx=0x10, ebx=esi,
+  ecx=[esi+0x5e]`. Instrument lesson: a whole-log zero at consumer-arm legs
+  0x55d35/0x55bbd cannot distinguish 'consumer never ran' from 'consumer ran,
+  arm not taken' — arm the fn ENTRY (0x55ae8) too; and post-disarm execution
+  is invisible to the pty census (a stop needs an armed BP) — hold windows
+  must stay leg-hot (census_click(None) re-arms all legs).
+### S35b t309 RUN (run t299-leg-20261105-161711 rc=0, docs/re/_wip_t309.md S3):
+### RING DORMANCY MEASURED — post-fn ENTRY legs zero whole-log (ringB_post
+### 0x55a60 gate-free prefix, consumer cons_entry 0x55ae8, ringA_resolver
+### 0x55df4, both 0x10 posters 0x41c17/0x499e0); ringB_count/widx snapshots 0
+### in EVERY window; star-click RING-A post body never ran (idx 0 throughout).
+### mode4226 = VIEW ID (map 1, system 0x10 — star0_after snapshot). Witness
+### delta reproduced 4th time (182,284 ENTER Vega, Icarus->Vega). btn_hdlr
+### control fired msg 7 NEXTTURN (ret0 0x56cdd via pump 0x56cda) with NO ring
+### involvement. WRITER INVENTORY FINAL (a3 + 89/15 whole-image): DAT_43504
+### six {0x28ec2,0x28ef6,0x36b01,0x52003,0x51ac9,0x55d35}, DAT_43508 six
+### {0x1b5e6,0x1baa7,0x51a8e,0x51fc2,0x55bcc,0x55bbd}; fn 0x51b68 owns three
+### (densest); fns 0x51b68/0x51834 have ZERO E8 callers and ZERO u32 refs =
+### table-member family — name their callers from ret_stack at a stop, not
+### offline. REFUTED-ROUTES t309 amendment is binding.

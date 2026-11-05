@@ -175,3 +175,79 @@ S1.13 EXPERIMENT RE-SPEC (STEP 2, replaces the t308-shaped battery):
   the datum is 'consumer never runs, ring-B dormant' (mode-gate hypothesis
   S1.10 is then NOT separable — say so); (P3) turn delta>0 after NEXTTURN iff
   no modal swallowed it.
+
+## S3. RUN t299-leg-20261105-161711 (rc=0, attempt 2; attempt 1 = BREAK-lottery
+### loss at 16:17:10, retry loop as designed). 7 legs BPLIST-verified armed in
+### EVERY window (session.log 16:19:00 'BPLIST 7 entries').
+S3.1 POSITIVES: star click (182,284) ENTERED again (diff 94712) and the WITNESS
+  DELTA REPRODUCED: DAT_43504 0x256825 'Icarus' -> 0x255bc5 'Vega' (4th
+  reproduction of the t308 datum). btn_hdlr fired 1x at control_nextturn
+  (eip file 0x336b4, ret0_file_off 0x56cdd via pump site 0x56cda, wrec_eax
+  name NEXTTURN, EDX=EDI=7, EAX=0xfd6190).
+S3.2 THE MEASUREMENT (pty whole-log census, ALL windows incl. both HOT HOLDS):
+  cons_entry 0, ringB_post 0, ringB_w10_41c17 0, ringB_w10_499e0 0,
+  ringA_resolver 0, w43504_28ec2 0, btn_hdlr 1. A whole-table sweep of the
+  pty log over EVERY LEGS entry returned ONLY btn_hdlr — the writer legs
+  (unarmed this run) counted 0 correctly (no stop without armed BP; instrument
+  law self-consistent).
+S3.3 ORACLE GATE SNAPSHOT (identical at star0_before, hold_post_star,
+  nextturn_before, nextturn_after; star0_after is the SYSTEM-VIEW moment):
+  mode4226=0x1, ringB_count=0x0, ringB_widx=0x0, ringA_count=0x0,
+  ringA_idx=0x0, pump_gate_660c=0xffffffff, guard_7a358=0x0, turn=1086.
+  star0_after: mode4226=0x10 (SYSTEM VIEW IS MODE 0x10 — NEW datum: mode
+  values are view/phase ids). nextturn pair: turn 1086->1086 UNRESOLVED —
+  the sav ring is 10 s granular (REFUTED-ROUTES t260 law), so the after-sav
+  may predate the click; do not claim either way.
+S3.4 GATE + WRITER INVENTORY (re-verified 2nd pass after catching two reading
+  errors — jne-target direction and an ignored store form; everything below is
+  byte-level re-checked):
+  (i) RING-A post fn 0x56ad4 gate 0x56ae0: `mov eax,[eax+0x44aa]; sar 0x10;
+      cmp 0x20; jne 0x56b02 (NORMAL)` — equal 0x20 = ERROR path (report code
+      0x9aa line 0x2eea at 0x56aff, then fall-through writes the slot ANYWAY).
+      So the post is NOT gated shut at idle (count!=0x20 passes).
+  (ii) RING-B post fn 0x55a60 gate 0x55a76 is the mirror (`cmp edx,0x20;
+      jne 0x55a92 normal; equal -> ret 0`): full-32 rejects. Also gate
+      0x55a66 ds:0x10ba4==-1 -> ret 0.
+  (iii) WHOLE-IMAGE WRITER CENSUS (scripts/r309_ring_writer_census.py,
+      mod=10 disp32 + SIB base=disp32 sweeps, sanity-matched against known
+      sites): [core+0x475a] written ONLY by post fn 0x55ad9 + consumer-arm
+      zero 0x55d93; [core+0x44ac] written ONLY by post fn 0x56b4e + resolver
+      zero 0x55e3b; count dwords [core+0x4758]/[core+0x44aa] ZERO direct
+      writers (loader-initialized or written via a base register I can't
+      enumerate statically — [inferred]).
+  (iv) DAT DIRECT-STORE INVENTORY FINAL (a3 + 89 /15 both swept whole-image,
+      4-byte LE compare): DAT_43504 = 6 writers: a3 {0x28ec2, 0x28ef6 (fn
+      0x284bc), 0x36b01 (fn 0x36a90), 0x52003 (fn 0x51b68), 0x55d35 (fn
+      0x55ae8)} + 89-15 {0x51ac9 (fn 0x51b68) `mov ds:0x43504,edx`, edx =
+      0x13bc5+32*k star-record address (shl 5) — the 6th writer the t296
+      census missed}. DAT_43508 = 6 writers: a3 {0x1b5e6, 0x1baa7 (fn
+      0x1acd0), 0x51a8e (fn 0x51834), 0x51fc2 (fn 0x51b68), 0x55bbd (fn
+      0x55ae8)} + 89-15 {0x55bcc (fn 0x55ae8, the extra-field variant)}.
+      fn 0x51b68 owns 3 of 12 (0x52003, 0x51ac9 DAT_43504; 0x51fc2 DAT_43508)
+      — the densest selection writer; t310 arms it.
+S3.5 CHAIN STATE AT t=1086 MAP IDLE (what the run PROVES vs LEAVES OPEN):
+  PROVEN: RING-B is dormant — leg ringB_post (post-fn ENTRY, gate-free
+    prefix) fired ZERO whole-log across baseline+star+hold+nextturn+hold
+    windows => the 19 RING-B post sites are never CALLED at idle (a zero at
+    an entry leg cannot be gate-blind); snapshots ringB_count=0/widx=0 in
+    every window agree; consumer 0x55ae8 zero consistent (pump gate1
+    widx==0 blocks unconditionally).
+  PROVEN: star-click witness delta reproduces a 4th time (Icarus->Vega) and
+    mode4226 IS A VIEW/MODE ID: 1 at map, 0x10 inside the system view — the
+    consumer's mode==1 gate means it can only run on the GALAXY MAP.
+  NOT PROVEN (S3.4-i kills the old argument): whether the RING-A post BODY
+    runs at the star click. The idx-0 snapshots are BLIND: the post body
+    itself zeroes nothing but the resolver (0x55e3b) zeroes idx right after
+    copying, and the first snapshot (hold_post_star) postdates a full pump
+    iteration. t310 discriminator: arm ringA_post_entry 0x56ad4 + a leg at
+    0x56b4e (post-body inc) — called-but-not-run vs run is then a census
+    count>=1 question; arm dump of EAX at 0x56ad4 = the core pointer value
+    (settles the core-base identity live: member 0x7a35c vs linear).
+  UNRESOLVED: turn advance across NEXTTURN (turn 1086->1086 but the 10 s
+    sav ring can predate the click — REFUTED-ROUTES t260 granularity law;
+    claim neither way). t308 branch-(b) stays open.
+  CONTROL DEFECT (honest): ringA_resolver 0x55df4 as designed is VACUOUS at
+    map idle — its caller gate 0x54b44 requires ([core+0x44aa]>>16)>0 while
+    nothing at idle ever increments it; a zero there is not evidence the
+    pump skipped work. t310: snapshot rd(0x7e5aa) ([core+0x44aa]) +
+    rd(0x7e89e) ([core+0x489e]) directly.
