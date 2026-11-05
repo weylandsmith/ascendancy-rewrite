@@ -246,13 +246,30 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
                                     # ebx=esi, ecx=[esi+0x5e]) fn 0x41260
         "ringB_w10_499e0": 0x499E0, # ring-B code-0x10 post #2, same shape,
                                     # fn 0x49880 — the ONLY two 0x10 posters
-        "ringA_resolver": 0x55DF4}  # RING-A shadow-copy+resolver fn entry
+        "ringA_resolver": 0x55DF4,  # RING-A shadow-copy+resolver fn entry
                                     # (called from 0x54b4a gated ([core+
                                     # 0x44aa]>>16)>0; jmp-table 0x55e86 on
                                     # code<=8) — POSITIVE CONTROL: the star
                                     # ENTER posts ring-A code 1, so a fire
                                     # here after the click proves the pump
                                     # ran while armed
+        # t310 (docs/re/_wip_t310.md S1b): fn 0x51834 is a msg PRE-DISPATCHER
+        # (dx=msg id): <2 -> 0x51AF3, ==2 -> 0x51A2A, ==0x1c01 -> 0x51A67
+        # (the DESTINATION path: gate ds:0x484ec>0x96 -> DAT_43508=eax + ring-A
+        # 0x11 at 0x51A8E; else star-addr k=0x13bc5+k*96 -> DAT_43504 + ring-A
+        # 0x10 at 0x51AC9), default -> TAIL-CALL btn_hdlr 0x336b4. The ONLY
+        # senders of msg 0x1c01 in the image (cmp-family + mov edx,0x1c01
+        # census, both 0 other forms):
+        "w51ac9": 0x51AC9,          # DAT_43504=edx star-record addr store,
+                                    # bytes 89 15 04 35 04 00 (payload-verified
+                                    # t310); gate ds:0x484ec<=0x96 branch
+        "s2_1616f": 0x1616F}        # RELAY site: mov edx,0x1c01 at 0x16168,
+                                    # call [ebx+0xc] at 0x1616f (bytes verified
+                                    # ff 53 0c); eax=ebp=window rec — a stop
+                                    # HERE = msg-0x1c01 WAS sent (fn 0x160xx).
+                                    # (Relay site #2 = s2_356a5, already in the
+                                    # t304 set at its line above — digit-key
+                                    # gated 0x30..0x39, NOT in this legset.)
 
 EVENTS = []
 hx = lambda v: hex(v) if isinstance(v, int) else None
@@ -970,6 +987,13 @@ def main():
     ap.add_argument("--window", type=int, default=30)  # census bank-window s
     ap.add_argument("--target-kinds", default="sprite,planet,empty")
     ap.add_argument("--star-click", type=int, default=0)  # t307 N cosmos pips
+    ap.add_argument("--pre-turn", type=int, default=0)    # t310 End Turn ONCE
+                                                          # before the fleet
+                                                          # battery (t298 gate)
+    ap.add_argument("--digit-keys", type=int, default=0)  # t310 N digit keys
+                                                          # '1'.. in ONE armed
+                                                          # window (msg-0x1c01
+                                                          # sender 0x35696)
     args = ap.parse_args()
 
     if args.witness and args.legs == ap.get_default("legs"):
@@ -1172,6 +1196,15 @@ def main():
                          "ringA_idx": hex(struct.unpack_from(
                              "<H", mm, core + 0x44ac)[0]),
                          "pump_gate_660c": hx(rd(0x660c)),
+                         # t310 (task-mandated + the fn-0x51834 gate):
+                         # 0x7e5aa = core member +0x44aa (ringA count, the
+                         # t309 lesson: read it DIRECT, not via rdc offsets),
+                         # 0x7e89e = core member +0x489e, 0x484ec = the
+                         # turn-gate scalar of the msg-0x1c01 destination
+                         # path (publishes iff > 0x96).
+                         "gate_7e5aa": hx(rd(0x7e5aa)),
+                         "gate_7e89e": hx(rd(0x7e89e)),
+                         "gate_484ec": hx(rd(0x484ec)),
                          "guard_7a358": hx(rdc(-4))}
                     s.log(f"ORACLE {tag} {o}")
                     return o
@@ -1299,6 +1332,17 @@ def main():
             census["hold_post_star"] = s.census_click(
                 None, None, "hold_post_star", args.window)
             oracles["hold_post_star"] = sel_oracle("hold_post_star")
+            # t310 --pre-turn (t298 GATE LAW: at t=1086 the owner-0 fleet has
+            # NO kind-4 (moves>0) ship; the sprite picker needs one, so End
+            # Turn ONCE before the fleet battery. Clicked on the bare map with
+            # the orange title guard inside click(); NOT inside an armed window.
+            if args.pre_turn:
+                oracles["preturn_before"] = sel_oracle("preturn_before")
+                s.click(R293.NEXTTURN[0], R293.NEXTTURN[1], "preturn",
+                        wait=6.0)
+                oracles["preturn_after"] = sel_oracle("preturn_after")
+                s.log(f"PRE-TURN turn {oracles['preturn_before'].get('turn') if oracles['preturn_before'] else '?'}"
+                      f" -> {oracles['preturn_after'].get('turn') if oracles['preturn_after'] else '?'}")
             im, d = (None, 0) if args.star_click else s.open_fleet()
             if im is None:
                 s.log(f"CENSUS: FLEET would not open (diff {d}) — clicking "
@@ -1341,6 +1385,29 @@ def main():
                 census[kindlbl] = s.census_click(
                     cx, cy, f"{kindlbl}_{cx}x{cy}", args.window)
                 oracles[f"{kindlbl}_after"] = sel_oracle(f"{kindlbl}_after")
+            # t310 --digit-keys PHASE: the ONLY in-image senders of msg 0x1c01
+            # are fn-0x160xx (0x16168) and the DIGIT-KEY handler (0x35696,
+            # gate cmp ebx,0x31/0x39 = ASCII '1'..'9'). If fn 0x51834's slot
+            # receives 0x1c01, the destination writer legs (w43508_51a8e /
+            # w51ac9) fire inside THIS window with ret0 = fn 0x51834's caller.
+            if args.digit_keys:
+                keys = [str(k) for k in range(1, min(9, args.digit_keys) + 1)]
+                if not s.close_eventwin():
+                    s.log("DIGIT-PHASE: close_eventwin failed — skipped")
+                elif s.arm_census(s.legs):
+                    lines, ok, hdr = s.req("EXEC RUN", 20.0)
+                    s.log(f"DIGIT-PHASE: armed RUN hdr={hdr} keys={keys}")
+                    time.sleep(0.5)
+                    for k in keys:
+                        s.send(["key", k])
+                        time.sleep(1.2)
+                    census["digit_keys"] = s.census_window(
+                        "digit_keys", args.window)
+                    s.disarm_run("digit_keys")
+                    s.persist()
+                else:
+                    s.log("DIGIT-PHASE: ARM FAILED — keys not measured")
+                oracles["digit_after"] = sel_oracle("digit_after")
             # POSITIVE CONTROL inside the dispatch-site instrument: NEXTTURN's
             # dispatch is windows.txt VERBATIM msg 7 (t302 btn_hdlr witness) —
             # if msg 7 + name NEXTTURN appears at a disp site, the census

@@ -209,45 +209,61 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t310 DESTINATION-WIDGET WRITER WINDOWS: FIRE THE DAT_43508 FAMILY VIA A
-LIVE ORDER FLOW AND NAME THE CALLERS FROM ret_stack (ordering rationale: t309
-measured the ring channel DORMANT at map idle — post-fn entry legs zero
-whole-log incl. two hot holds, ringB count/widx 0 in every snapshot, star-click
-RING-A post body never ran; selection is RENDER-DIRECT (ships.md S35/S35b,
-REFUTED-ROUTES t309 amendment binding: do NOT re-arm the 0x55ae8/0x55a60/
-0x56ad4 family as idle witnesses). The whole-image writer inventory is now
-COMPLETE: DAT_43508 six writers {0x1b5e6, 0x1baa7 (batmode-adjacent, REFUTED
-route), 0x51a8e fn 0x51834 turn-gated ds:0x484ec>0x96, 0x51fc2 fn 0x51b68
-eax=[edx+0x59], 0x55bbd+0x55bcc fn 0x55ae8 dead-at-idle} — the ONLY live-
-reachable non-batmode candidates for the msg-0x50 destination-widget hole are
-fn 0x51b68 (owns THREE of twelve total stores incl. DAT_43504 0x51ac9
-edx=0x13bc5+32*k star-record addr) and fn 0x51834; BOTH have zero E8 callers
-and zero u32 refs in the image = class/vtable members, so the caller map CANNOT
-come from offline static — it comes from ret_stack at a live stop (bank_stop
-already dumps ret0/ret0_file_off, t304 law). STEP 1 (offline, ~6 probes):
-disasm fn 0x51b68 + fn 0x51834 entry gates (what msg/what arg selects them —
-the [edx+0x59]/[esi+0x59] reads look like ORDER TARGET fields per t296 S24);
-check fn 0x51b68's slot-table membership the way t306 named fn 0x3cb00 (scan
-the phys-address family near known vtables; a u32 scan of the FILE image is
-REFUTED-blind for relocated tables, use the ret_stack route as primary).
-STEP 2 (capture, one run): reuse the t309 relaunch shape with LEGSET =
-w43508_51a8e, w43508_51fc2, w51ac9 (NEW leg 0x51AC9 bytes 89 15 04 35 04 00 —
-payload-verified t309), w43504_52003, btn_hdlr; battery = the r298_order_session
-order-placement choreography (fleet view -> select ship -> order -> destination
-click) INSIDE armed windows, star-click omitted (star-case closed t308); bank
-stops with full reg+ret_stack; oracle keeps the t309 gate snapshot incl.
-rd(0x7e5aa)/rd(0x7e89e) (ADD them to sel_oracle this iteration). CLOSE: a
-banked stop at any DAT_43508 writer with a named ret0 caller on an ENTERED
-destination click = destination-widget writer witnessed (OQ-019 residue
-narrows to per-ship select); whole-log zero WITH btn_hdlr alive = fn 0x51b68/
-0x51834 need a different trigger (bank the msg ids seen, keep row open).
-Fixed laws (do NOT re-trip): green-annulus pip law ONLY; fire_pats(P0+LEGS[n])
-form; census_click(None) re-arms all legs (hot holds work); post-disarm is
-invisible to the pty census; sav ring 10 s granularity (turn-delta pairs can
-predate the click — claim neither way); mode4226 map=1/system=0x10; oracle
-B+SL.OFF+X correct (DAT-base CLOSED); FirePat regression 5/5 before arming;
-close_eventwin before clicks; escape ladder never blind; kill by RECORDED PID;
-production :9 untouched; scratch copies only, never mount game/.
+NEXT t311 STATUSWND-FOCUSED DIGIT KEYS + fn 0x51834 ENTRY LEG: witness or
+refute msg-0x1c01 -> STATUSWND -> destination-writer in ONE run (ordering
+rationale: t310 named the writer's class — fn 0x51834 is the STATUSWND msg
+handler (RAM class-grid scan, ships.md S36) — and named its only two in-image
+senders {0x16168 relay, 0x35696 DIGIT-KEY handler gated ASCII '1'..'9'}; the
+t310 battery pressed keys while a 'Cancel' popup held focus (btn_hdlr stop,
+ret1='1'), so the composition STATUSWND-focus + keys is the one untested
+legitimate trigger, and the store legs alone cannot separate 'class never
+messaged' from '0x1c01 never sent' — the ENTRY leg fixes that). STEP 1
+(offline, ~4 probes): add LEGS entry fn51834_entry = 0x51834 (entry bytes 56
+57 55 83 ec 0c verified t310; fires for EVERY msg to the class with dx = msg
+id, ret0 = the dispatch site via bank_stop ret_stack); in the census digit
+phase, run close_eventwin + assert_on_map IMMEDIATELY before arm (bare map =
+STATUSWND-focus candidate; the map itself has no key handler, so a key press
+on the bare map routes to whatever window holds keyboard focus — the stop's
+win-name at the entry leg names it verbatim). STEP 2 (capture, one run):
+LEGSET = fn51834_entry, w43508_51a8e, w51ac9, s2_1616f, btn_hdlr; battery =
+baseline 15 s -> preturn --pre-turn 1 -> close_eventwin -> digit keys 1..9 in
+ONE armed window (window 60) -> sprite/planet pair (keep, secondary) ->
+control_nextturn -> hold_post_turn; oracle keeps the t310 fields (gate_484ec
+= mouse X now NAMED, mode4226, DAT pair + names). CLOSE: any stop at
+fn51834_entry with dx=0x1c01 (bank edx) and a following/parallel store-leg
+stop with ret0 = 0x51A67-block caller -> destination writer WITNESSED, OQ-019
+residue narrows to per-ship select; stops at fn51834_entry with OTHER dx
+values -> bank the msg-id SET (first-ever STATUSWND msg census — still
+valuable, row stays open); entry leg ZERO whole-log with btn_hdlr alive ->
+STATUSWND receives no key traffic at all on this rig -> bank as datum,
+0x1c01-into-STATUSWND joins REFUTED-ROUTES, and the destination widget must
+be sought behind an ORDER-PLACEMENT UI path (r298 choreography S4 planet
+relay 0x326, msg ids at fn 0x1b91c family) in t312.
+Fixed laws (do NOT re-trip): ds:0x484ec = LAST MOUSE X (REFUTED-ROUTES t310
+amendment binding); class tables ONLY via sav-RAM scan for entry+P0 (file
+scan blind — do not re-run); fn 0x51834 = STATUSWND handler, fn 0x51b68 =
+star label builder, 0x51ac9 lives in fn 0x51834; ring channel dead at map
+idle (t309 amendment); green-annulus pip law ONLY; fire_pats(P0+LEGS[n])
+form; census_click(None) re-arms all legs; post-disarm invisible to the pty
+census; sav ring 10 s granularity (claim neither way on turn deltas);
+mode4226 map=1/system=0x10/0x11-ish view id; oracle B+SL.OFF+X correct;
+FirePat regression via census-ctl MATCH before battery; close_eventwin before
+clicks; escape ladder never blind; kill by RECORDED PID; production :9
+untouched; scratch copies only, never mount game/.
+
+## LANDED t310 (2026-11-05, session 19) — DESTINATION WRITER'S CLASS NAMED
+## (STATUSWND), MSG-0x1c01 PATH FULLY MAPPED, 0x484ec GATE MEASURED = MOUSE X;
+## writer legs zero (honest negative, control alive); class-table RAM-scan
+## route executed FIRST TIME (file scan blindness confirmed). docs/re/
+## _wip_t310.md S0-S5, ships.md S36, REFUTED-ROUTES t310 amendment; run
+## t299-leg-20261105-173627 rc=0 attempt 2 (attempt 1 BREAK-lottery loss);
+## scripts/r310_relaunch.sh + r299_leg_session.py t310 patch (w51ac9,
+## s2_1616f legs; --pre-turn, --digit-keys phases; oracle gate_7e5aa/7e89e/
+## 484ec). NO LEDGER ROW CLOSED (strict-close): OQ-019 residue = destination-
+## widget fire (STATUSWND-focus composition untested) + per-ship select.
+## Honest negatives: 5 writer/relay legs 0 whole-log x battery with btn_hdlr
+## x4 alive; digit keys routed to the 'Cancel' popup (focus defect banked);
+## fn 0x51834 received NOTHING on the order battery. Gate 0, audits OK.
 
 ## LANDED t309 (2026-11-05, session 18) — TWO-RING MAP + RING DORMANCY
 ### MEASURED (selection is RENDER-DIRECT; 'consumer timing' was the wrong

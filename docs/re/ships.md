@@ -1394,7 +1394,7 @@ row, 0x52003 ship order-target, 0x55d35}); ds:0x43508 = ORDER DESTINATION
 ds:0x43508 := [sel + 0x42 + ebx*4] (the SELECTED object's own target table)
 + command-ring post 0x56ad4(0x7a35c, code 0x11) — 0x56ad4 writes 6-byte
 {u16 code,u32 param} at [game+0x422c]+slot*6, slot = [game+0x44aa]>>16.
-0x51a8e publishes only while DWORD ds:0x484ec > 0x96 (turn gate).
+0x51a8e publishes only while DWORD ds:0x484ec > 0x96 (turn gate — READING DEAD per S36: 0x484ec = last mouse X).
 
 WHY t293 FAILED, now explained (not merely observed): the bright orbital dots
 are kind-3 PLANET clips, so G2 always took the skip leg; and even a correct
@@ -1684,7 +1684,7 @@ G1/G2 unpassable) but the ENTRY+ROUTER zeros are pre-gate: the map click's msg
 0x8 does not walk the BatModeWnd handler layer at all. READ: batmode
 static-gate route for the live selection witness is CLOSED AS A NEGATIVE; the
 writer hunt re-scopes to the non-batmode members of the t296 store census
-(DAT_43508 {0x51a8e stores eax turn-gated ds:0x484ec>0x96 ring 0x11, 0x51fc2
+(DAT_43508 {0x51a8e stores eax gated ds:0x484ec>0x96 [mouse-X per S36] ring 0x11, 0x51fc2
 stores [edx+0x59] ring 0x11, 0x55bbd} and DAT_43504 {0x28ec2, 0x28ef6 cosmos
 star-click, 0x36b01 diplomacy row, 0x52003 ship order-target stores [esi+0x59]
 ring 0x10, 0x55d35}) (disasm verbatim this session + S24). NEXTTURN control this run hit
@@ -1809,3 +1809,49 @@ resolved per S1.12 law; full detail docs/re/_wip_t309.md S1):
 ### (densest); fns 0x51b68/0x51834 have ZERO E8 callers and ZERO u32 refs =
 ### table-member family — name their callers from ret_stack at a stop, not
 ### offline. REFUTED-ROUTES t309 amendment is binding.
+
+## S36 t310 (2026-11-05) — THE DESTINATION WRITER'S CLASS IS STATUSWND;
+## fn 0x51834 IS ITS MSG HANDLER; THE 0x1c01 GATE IS MOUSE X, NOT THE TURN.
+Full evidence docs/re/_wip_t310.md S1-S5; run t299-leg-20261105-173627 rc=0.
+- fn 0x51834 block map (file offsets, objdump window-relative targets
+  resolved): cmp dx,2 -> jb 0x51AF3 / jbe 0x51A2A; cmp dx,0x1c01 je 0x51A67;
+  default 0x51863 TAIL-CALLS btn_hdlr 0x336b4 (verified rel 0x51878-0x1e1c4).
+  0x51A67 (msg 0x1c01): eax=[[win+0xab] system rec]; gate cmp ds:0x484ec,0x96:
+  >0x96 -> DAT_43508=eax + RING-A post 0x11 (0x51A8E); <=0x96 -> edx =
+  0x13bc5 + ([sysrec+0xa]>>16)*96 (star-record addr; +0x242000 = 0x255bc5 =
+  the t308 witness value) -> DAT_43504=edx + RING-A post 0x10 (0x51AC9).
+  SPAN FIX vs t309 STATE: BOTH stores are inside fn 0x51834; fn 0x51b68 is a
+  star LABEL builder (string ids 0x2b13/0x2b14, format call 0x250bb) and the
+  orphan blocks 0x51FB5/0x51FF6 (DAT stores of [edx+0x59]/[esi+0x59]) live
+  past fn 0x51b68's ret in a further fn (add esp,0x1bc epilogue).
+- GATE MEASURED 2/2: ds:0x484ec = LAST MOUSE X (0x30 after the x=48 sprite
+  click, 0x1b7 after the x=439 planet click). The t296 'turn gate' reading is
+  DEAD: 0x1c01's branch select is screen-X>150.
+- SENDER CENSUS (whole image): mov edx,0x1c01 exactly 2x — 0x16168 (fn
+  0x160xx, class-relay call [ebx+0xc]) and 0x35696 (DIGIT-KEY handler, gate
+  ASCII '1'..'9', call [esi+8] on the KEY-FOCUSED window). cmp dx,0x1c01 8x
+  (consumers incl. 0x51858). No push/mov-ecx/mov-eax/cmp-eax/cmp-ecx form.
+- CLASS TABLE VIA RAM SCAN (the t309 route, first EXECUTION): sav Memory
+  member scanned for REBASED entry ptrs — fn 0x51834+P0 exactly 1 hit (RAM
+  0x248050), cos_hdlr+P0 1 hit (0x247adc), btn_hdlr+P0 4 hits; the same
+  values in the FILE image: ZERO hits (relocation blindness CONFIRMED — RAM
+  scan is the route, do not re-run file u32 scans for class tables). Grid at
+  0x248040 {0x311b8,0x316f0,0x51630,0x30d08,0x51834,0x51680}; the constructor
+  fn 0x51630 stores instance [win+0xa7]=0x5fc0 (rebased -> RAM 0x247FC0);
+  refs to 0x247FC0: exactly ONE window-magic record, NAME 'STATUSWND'
+  (rec 0xfd9fbc in that sav). => fn 0x51834 = STATUSWND msg handler.
+- RUN RESULT (honest negative, control alive): order battery (pre-turn
+  1086->1087, fleet rowjump, sprite 48x151, planet 439x331, digit keys 1..9,
+  NEXTTURN) — whole-log {w43508_51a8e:0, w43508_51fc2:0, w51ac9:0,
+  w43504_52003:0, s2_1616f:0, btn_hdlr:4}. Digit keys DID enter the msg
+  dispatcher (stop ret0 file 0x56c77, ret1=0x31='1') but the FOCUSED window
+  was the 'Cancel' popup (class slot-2 = btn_hdlr), not STATUSWND — the
+  battery has no close-popup-immediately-before-keys step (defect, fixed
+  route banked). fn 0x51834 never received anything on this battery.
+- NEXT (t311): digit keys with STATUSWND focused — close_eventwin to bare map
+  immediately before the key window (map focus is the STATUSWND candidate;
+  verify by a stop at fn 0x51834 ENTRY 0x51834 with ret0 = the dispatch site
+  and dx = the msg id), then the 0x1c01 path is witnessed or refuted in ONE
+  run. Entry-leg 0x51834 IS the right instrument; the store legs alone cannot
+  distinguish 'class never messaged' from 'msg 0x1c01 never sent'.
+

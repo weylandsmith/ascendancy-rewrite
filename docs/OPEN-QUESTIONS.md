@@ -248,6 +248,25 @@ selection writer + msg-0x50 destination widget still unnamed; NEXT t310 = arm
 fn 0x51b68 trio + ringA post entry/body legs {0x56ad4,0x56b4e} + snapshot
 rd(0x7e5aa)/rd(0x7e89e), star-click + hold; EAX dump at 0x56ad4 settles the
 core-base identity live.
+t310 note (run t299-leg-20261105-173627 rc=0 attempt 2, order battery pre-turn
+1086->1087 + sprite + planet + digit keys 1..9 + NEXTTURN, legs {w43508_51a8e,
+w43508_51fc2, w51ac9 NEW, w43504_52003, s2_1616f NEW, btn_hdlr}, docs/re/
+_wip_t310.md + ships.md S36): THE WRITER'S CLASS IS NAMED — fn 0x51834 is the
+STATUSWND msg handler (RAM class-grid scan: fn entry+P0 exactly 1 hit RAM
+0x248050; sole window-magic referrer of the instance class ptr 0x247FC0 named
+'STATUSWND'; FILE-image scan 0 hits = relocation blindness CONFIRMED). The
+msg-0x1c01 destination path (0x51A67: mouse-X gate -> DAT_43508=system ptr +
+ring-A 0x11 / DAT_43504=star addr 0x13bc5+k*96 + ring-A 0x10) was NOT reached:
+whole-log zeros on all five writer/relay legs with btn_hdlr x4 alive; digit
+keys entered the dispatcher (ret0 0x56c77, ret1='1') but a 'Cancel' popup held
+focus, not STATUSWND. ds:0x484ec MEASURED = last mouse X (0x30/0x1b7 after
+x=48/x=439 clicks) — 'turn gate' reading REFUTED (REFUTED-ROUTES t310
+amendment binding). Span fix: 0x51ac9 lives in fn 0x51834, NOT fn 0x51b68
+(label builder). OQ-019 row STAYS OPEN (strict-close): destination-widget
+fire still unwitnessed; per-ship select untouched. NEXT t311 = STATUSWND-
+focused digit keys: close_eventwin to the bare map immediately before the key
+window + ENTRY leg at fn 0x51834 0x51834 (dx=msg id, ret0=dispatch site) —
+witnesses or refutes 0x1c01->STATUSWND in one run.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

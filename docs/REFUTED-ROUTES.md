@@ -632,3 +632,19 @@ BEFORE every control click; and a NEXTTURN control needs btn_hdlr ARMED).
 ## itself unincrementable at idle — a zero there proves nothing); (3) any
 ## whole-log count computed as fire_pats(LEGS[name]) — the harness form is
 ## fire_pats(P0+LEGS[name]), bare offsets count ZERO.
+
+## t310 AMENDMENT (binding): (1) ds:0x484ec IS LAST-MOUSE-X, NOT A TURN
+## COUNTER (measured 2/2: 0x30 after an x=48 click, 0x1b7 after x=439) — the
+## t296/ships-S24-era 'turn-gated ds:0x484ec>0x96' label on the 0x51a8e store
+## is DEAD; the fn-0x51834 msg-0x1c01 branch selects on screen-X>150. Do not
+## schedule or gate anything on 0x484ec as a turn proxy. (2) FILE-IMAGE u32
+## scans for class-table membership are STRUCTURALLY BLIND (relocated entries:
+## fn 0x51834, cos_hdlr, btn_hdlr all 0 hits in the file, 1/1/4 hits in the
+## sav Memory member at rebased value entry+P0) — the RAM scan of a run's own
+## .sav is the ONLY class-table route; do not re-run file scans to 'confirm'
+## zero membership. (3) fn 0x51834 IS THE STATUSWND MSG HANDLER (class grid RAM
+## 0x248040, instance [win+0xa7]=0x5fc0 rebased->0x247FC0, sole magic-bearing
+## referrer named 'STATUSWND') — a destination-widget hypothesis must go
+## through STATUSWND focus + msg 0x1c01 (senders: 0x16168 relay, 0x35696 digit
+## keys), not through generic map clicks: whole-log zeros at all five writer/
+## relay legs with btn_hdlr x4 alive (run t299-leg-20261105-173627).
