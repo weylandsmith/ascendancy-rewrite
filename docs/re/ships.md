@@ -1664,3 +1664,31 @@ selection-store WRITER (DAT_000482fb) remains unnamed: msg 0x8 is repaint/
 dispatch, not the selection write. NO LEDGER ROW CLOSED (strict-close): OQ-019
 stays open. Instrument law: FirePat regression suite = runs 033648/052925/
 061825 known-fire counts (41/3/60+20+1).
+
+## S32 t306 (2026-11-05) — BATMODE SELECTION SITES NEVER REACHED BY MAP CLICKS
+Run work/r1/t299-leg-20261105-101054 (rc=0 attempt 1; --census --legs
+batmode_dead,bat_router,bat_s53,bat_mouse,btn_hdlr --target-kinds sprite;
+scripts/r306_relaunch.sh; full autopsy docs/re/_wip_t306.md S2-S3). FirePat
+regression re-passed pre-arm (5/5 exact). MEASURED (whole-log pty census +
+banked stops): working sprite click (48,151) -> btn_hdlr msg 0x8 win[esi]
+NAME='PLIND', ret0 file 0x3cb8d = DIRECT E8 call 0x336b4 at file 0x3cb88 (one
+of 51; enclosing fn 0x3cb00 is a window-family dispatcher with a sibling
+`call [ecx+0xc]` at 0x3cb6e, u32-refs-to-entry ZERO = table-member); the four
+t296 batmode sites {entry 0x1aef8, msg-4 router 0x1b070, effect 0x1b71f,
+effect 0x1ba39} fired ZERO with the positive control ALIVE (btn_hdlr 2 fires
+same session, census-ctl MATCH x3, liveness x2). Selection oracle pairs
+(sel43510/DAT_43504/DAT_43508 before/after, census.json["oracles"]): NOTHING
+attributable moved (43504 stable = Icarus star; 43508 churns without input per
+t297-A). CONSISTENT with the gating fact (t=1086 owner-0 has no kind-4 ship ->
+G1/G2 unpassable) but the ENTRY+ROUTER zeros are pre-gate: the map click's msg
+0x8 does not walk the BatModeWnd handler layer at all. READ: batmode
+static-gate route for the live selection witness is CLOSED AS A NEGATIVE; the
+writer hunt re-scopes to the non-batmode members of the t296 store census
+(DAT_43508 {0x51a8e stores eax turn-gated ds:0x484ec>0x96 ring 0x11, 0x51fc2
+stores [edx+0x59] ring 0x11, 0x55bbd} and DAT_43504 {0x28ec2, 0x28ef6 cosmos
+star-click, 0x36b01 diplomacy row, 0x52003 ship order-target stores [esi+0x59]
+ring 0x10, 0x55d35}) (disasm verbatim this session + S24). NEXTTURN control this run hit
+the 'Cancel' record msg 0x4 via pump 0x56c74 (modal residue class, t304
+pattern) — turn-advance witness stands from t305's PLSQUARE stop, no delta.
+NO LEDGER ROW CLOSED (strict-close): OQ-019 selection WRITER unnamed; t306
+note appended to the row.

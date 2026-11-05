@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-05T07:05
+updated: 2026-11-05T10:45
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,35 +209,67 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t306 SELECTION-WRITER WITNESS — ARM THE t296 STATIC GATE SITES AND WATCH
-A LIVE SPRITE SELECT (ordering rationale: t305 fixed the fire detector and
-MEASURED the click->dispatch map (msg 0x8 to the clicked window record via
-pump 0x56cda; empty -> 0x56c74; docs/re/_wip_t305.md S4, run
-work/r1/t299-leg-20261105-061825 rc=0) — but the census leg set NEVER included
-the sites t296 statically named as the selection EFFECT writers: BatModeWnd
-handler 0x1aef8 entry + msg-0x53 leg 0x1b6f6..0x1b737 (effect [batwin+0xb7]:=2
-at 0x1b71f) + mouse leg mouse handler (0x1ba39). docs/re/ships.md S24. If a
-working sprite click hits these, OQ-019's residue "selection WRITER unnamed"
-closes with a live witness; if it hits NONE (msg 0x53 never dispatched to
-batwin for map clicks), that is a cited negative closing the static-gate route
-and re-scoping selection to the 0x51a8e/0x51fc2 writers (ships.md S24 caveat).
-PROBE (<=35 calls, one battery per sitting, scripts/r299_leg_session.py via a
-r306_relaunch.sh copy of the r305 one): LEGS ALREADY HAS THE ENTRY —
-batmode_dead = 0x1AEF8 (verify its comment: t301 named it BatModeWnd INACTIVE
-in system view; t306 re-arms it AS bat_hdlr, the inactive-verdict came from
-dyn-core zero-fires = re-attributable per t304-(2)). ADD two legs from ships.md
-S24 (do NOT re-derive): bat_s53 = 0x1B71F (msg-0x53 selection effect
-[batwin+0xb7]:=2), bat_mouse = 0x1BA39 (mouse leg effect). Census mode,
-window 60, targets sprite+control_nextturn ONLY
-(planet/empty datum done t305, don't re-measure); bank every stop (msg edx +
-wrec NAME + [batwin+0xb7] dump if batwin findable via the t298/t300 instance
-law — grep ships.md for 'batwin instance' before inventing a finder); AFTER
-the sprite click, read the selection oracle from the newest .sav (watch.log
-sel= field law, scripts/r1_playcap_watch.py) and record sel-before/after per
-target. Fixed laws (do NOT re-trip): FirePat regression before trusting any
-census (docs/re/dosbox-debugger.md t305 block); close_eventwin before clicks;
-BPDEL fired index BEFORE RUN; liveness = autosave growth; kill by RECORDED
-PID; pkill -f matches your own shell — never here; one battery per sitting.
+NEXT t307 SELECTION-WRITER WITNESS AT THE SURVIVING STORE FAMILY — ARM
+DAT_43504/43508 WRITER SITES (non-batmode members of the t296 store census)
+AND WATCH A LIVE COSMOS STAR-CLICK (ordering rationale: t306 CLOSED the
+batmode static-gate route as a cited negative — entry 0x1aef8, router 0x1b070,
+effects 0x1b71f/0x1ba39 all ZERO for a working sprite click with the btn_hdlr
+control alive, run work/r1/t299-leg-20261105-101054 rc=0, ships.md S32 +
+REFUTED t306 amendment; the t296 census is the cited map of who stores
+ds:0x43504/ds:0x43508 AT ALL, and OQ-019's residue is precisely 'no per-ship
+selection WRITER witnessed', so arming the census members is the only route
+left that strict-close can accept). LEGS TO ADD (from ships.md S24/S32, do NOT
+re-derive): w43508_51a8e = 0x51A8E (turn-gated ds:0x484ec>0x96, ring code
+0x11), w43508_51fc2 = 0x51FC2 (stores [edx+0x59], ring 0x11), w43508_55bbd =
+0x55BBD, w43504_28ec2 = 0x28EC2, w43504_28ef6 = 0x28EF6 (cosmos star-click
+pair — the likeliest live fires: a COSMOS map star-click is the known
+0x28e**-family trigger), w43504_36b01 = 0x36B01 (diplomacy row), w43504_52003
+= 0x52003 (ship order-target, ring code 0x10), w43504_55d35 = 0x55D35. VERIFY
+each leg's bytes against work/ascend_payload.bin + t91_code_disasm.txt before
+arming (the a3/a1/a3 store form `mov ds:0x43504,eax` is the signature; if a
+cited site is not a store of 0x43504/43508, log and skip it — do not fix the
+map mid-run). TARGETS: cosmos star click (map view, click a star dot — the
+t293 law: dot-clicks NAVIGATE, which is exactly the 0x28ef6 hypothesis under
+test) + baseline window (the resolver may fire family members during idle
+turn processing) + control_nextturn (positive control ONLY if a prior run
+showed the Cancel-record defect absent; t306 hit 'Cancel' msg 0x4 — if it
+repeats, close_eventwin HARDER or accept baseline+star as the two measured
+windows). Oracle pairs are BUILT IN (r299_leg_session.py t306 patch,
+census.json['oracles']). CLOSE CONDITION: a banked stop at one of these sites
+with win/reg evidence naming what was stored (bank_stop already dumps eax +
+window grid) AND an oracle delta = the selection-writer witness OQ-019 needs
+(strict-close: zero fires at ALL 8 sites is ALSO a datum — it would mean the
+census sites are all context-gated (order/diplomacy/star-selection contexts
+that a system-view battery never enters) and the residue re-scopes to
+entering THOSE contexts, not to new statics). Fixed laws (do NOT re-trip):
+FirePat regression before trusting any census (5/5 vs runs 033648/052925/
+061825); close_eventwin before clicks; BPDEL fired index BEFORE RUN; liveness
+= autosave growth or hot re-fire; kill by RECORDED PID; one battery per
+sitting; do NOT re-arm the four REFUTED batmode legs; production :9 untouched.
+
+## LANDED t306 (2026-11-05, session 15) — BATMODE SELECTION SITES NEVER
+### REACHED BY MAP CLICKS (cited negative; route REFUTED); writer hunt
+### re-scoped to the t296 store census. docs/re/_wip_t306.md S0-S3,
+### ships.md S32, REFUTED-ROUTES t306 amendment; run
+### work/r1/t299-leg-20261105-101054 (rc=0 attempt 1), scripts/
+### r306_relaunch.sh + r299_leg_session.py t306 patch (legs bat_s53/
+### bat_mouse/bat_router, --target-kinds, selection oracle pairs).
+MEASURED: (1) working sprite click (48,151) -> btn_hdlr msg 0x8 win[esi]
+NAME='PLIND', ret0 file 0x3cb8d = DIRECT E8 call 0x336b4 at 0x3cb88 (fn
+0x3cb00, a window-family dispatcher with call [ecx+0xc] sibling at 0x3cb6e;
+u32 refs to entry ZERO = class-table member); (2) the four t296 batmode sites
+{0x1aef8 entry, 0x1b070 router, 0x1b71f + 0x1ba39 effects} fired ZERO whole-log
+with positive control ALIVE (btn_hdlr x2, census-ctl MATCH x3, liveness x2) —
+entry+router zeros are PRE-GATE, so map clicks never dispatch into the
+BatModeWnd handler layer (gating fact t=1086 no kind-4 owner-0 ship is
+consistent but not load-bearing); (3) selection oracle pairs
+(sel43510/DAT_43504/DAT_43508) moved NOTHING attributable (43504 stable =
+Icarus star oracle; 43508 churns without input per t297-A); (4) NEXTTURN
+control hit the 'Cancel' record msg 0x4 via pump 0x56c74 this run (t304 modal
+pattern; turn-advance witness stands from t305). NO LEDGER ROW CLOSED
+(strict-close): OQ-019 selection WRITER unnamed; t306 note on the row; writer
+hunt = DAT_43508 {0x51a8e, 0x51fc2, 0x55bbd} + DAT_43504 {0x28ec2, 0x28ef6,
+0x36b01, 0x52003, 0x55d35}. Gate 0, audits OK.
 
 ## LANDED t305 (2026-11-05, session 14) — NORMAL-CORE ANOMALY RESOLVED =
 ### INSTRUMENT DEFECT; FirePat LAW (source-pinned); CLICK->DISPATCH MAP

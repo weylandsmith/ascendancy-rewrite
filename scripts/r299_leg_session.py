@@ -160,8 +160,27 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
                                       # phys 0x247cb8 slot 0) — the clicks that
                                       # WORKED never had this armed
         "btn_hdlr": 0x336B4,    # type-0 button handler (slot 2)
-        "batmode_dead": 0x1AEF8,  # BatModeWnd INACTIVE in system view (record
-                                      # 0xfdc924 +0xac state); control only
+        "batmode_dead": 0x1AEF8,  # BatModeWnd msg-handler ENTRY (t299 zero-fires
+                                      # were DYN-core: entry is block-top but the
+                                      # t302 fire-pattern was dyn-blind; t306
+                                      # RE-ARMS under normal core + FirePat)
+        # t306 SELECTION-EFFECT LEGS (ships.md S24 static law, do NOT re-derive;
+        # mid-block instructions — CAN fire under normal core, could NOT under
+        # dynrec: core_dynrec.cpp:268 heavy-BP only at run-loop top):
+        #   0x1b71f = c6 85 b7 00 00 00 02  mov BYTE [ebp+0xb7],2  (msg-0x53
+        #     leg: G2 kind==2 / G3 owner / G4 moves>0 all passed; at stop
+        #     ebp=BatModeWnd record (magic+NAME), eax=ship record phys)
+        #   0x1ba39 = c6 86 b7 00 00 00 02  mov BYTE [esi+0xb7],2  (mouse msg-4
+        #     leg via router 0x1b070 -> 0x1b91c; at stop esi=BatModeWnd record,
+        #     eax=ship record, ebp=0xffffffff (bank_stop magic-guards it))
+        "bat_s53": 0x1B71F,
+        "bat_mouse": 0x1BA39,
+        # msg-4 router INSIDE the BatModeWnd family (ships.md S24: "MOUSE
+        # ROUTE IS MSG 4 (0x1b070)"). t299 run-4 armed it but under DYN core
+        # (unreliable per t305 REFUTED amendment) — t306 re-arms under normal.
+        # entry-fires-without-effects = gate rejected; nothing-fires = msg
+        # layer never reached by map clicks.
+        "bat_router": 0x1B070,
         # t303 CENSUS legs: the FIVE `call [ecx+4]` dispatch sites (ff 51 04
         # occurs EXACTLY 5x in the payload — verified this session vs t301
         # S6.1). Stopping at the SITE (before the call) keeps the caller's
@@ -909,6 +928,7 @@ def main():
     ap.add_argument("--census", action="store_true")   # t303 msg-census mode
     ap.add_argument("--witness", type=int, default=0)  # t304 A: bank N stops, no clicks
     ap.add_argument("--window", type=int, default=30)  # census bank-window s
+    ap.add_argument("--target-kinds", default="sprite,planet,empty")
     args = ap.parse_args()
 
     if args.witness and args.legs == ap.get_default("legs"):
@@ -1090,9 +1110,44 @@ def main():
                 targets.append((planet[0], planet[1], "planet"))
             if emp:
                 targets.append((emp[0], emp[1], "empty"))
-            for (cx, cy, kindlbl) in targets[:args.clicks_per_view]:
+            # t306: --target-kinds filters WHICH targets get a window (task
+            # scope: sprite + control_nextturn only; planet/empty datum done
+            # t305, don't re-measure).
+            want = {k.strip() for k in args.target_kinds.split(",")}
+            # t306 SELECTION ORACLE (delta-pair law, ships.md S25 t297-A: the
+            # DAT scalars at B+OFF+X churn WITHOUT input — only before/after
+            # pairs around a click mean anything; sel43510 = the watch.log
+            # sel= field, DAT_43504 = current-system/star/sel-object ptr).
+            def sel_oracle(tag):
+                try:
+                    p = s.newest_sav()
+                    if not p:
+                        return None
+                    mm = s.read_mem(p)
+                    if not mm:
+                        s.log(f"ORACLE {tag}: Memory unreadable in {op.basename(p)}")
+                        return None
+                    bb = SL.base_of(mm, s.anch)
+                    if not bb:
+                        s.log(f"ORACLE {tag}: no base vote in {op.basename(p)}")
+                        return None
+                    rd = lambda X: struct.unpack_from("<I", mm, bb + SL.OFF + X)[0]
+                    o = {"tag": tag, "sav": op.basename(p), "turn": rd(0x12e10),
+                         "sel43510": mm[bb + SL.OFF + 0x43510],
+                         "DAT_43504": hx(rd(0x43504)),
+                         "DAT_43508": hx(rd(0x43508))}
+                    s.log(f"ORACLE {tag} {o}")
+                    return o
+                except Exception as e:
+                    s.log(f"ORACLE {tag} error {e!r}")
+                    return None
+            oracles = {}
+            for (cx, cy, kindlbl) in [t for t in targets
+                                      if t[2] in want][:args.clicks_per_view]:
+                oracles[f"{kindlbl}_before"] = sel_oracle(f"{kindlbl}_before")
                 census[kindlbl] = s.census_click(
                     cx, cy, f"{kindlbl}_{cx}x{cy}", args.window)
+                oracles[f"{kindlbl}_after"] = sel_oracle(f"{kindlbl}_after")
             # POSITIVE CONTROL inside the dispatch-site instrument: NEXTTURN's
             # dispatch is windows.txt VERBATIM msg 7 (t302 btn_hdlr witness) —
             # if msg 7 + name NEXTTURN appears at a disp site, the census
@@ -1115,7 +1170,8 @@ def main():
             s.persist()
             with open(op.join(s.out, "census.json"), "w") as fh:
                 json.dump({"window_s": args.window, "star": star,
-                           "targets": census, "pty": pty_census},
+                           "targets": census, "pty": pty_census,
+                           "oracles": oracles},
                           fh, indent=1)
             measured = [k for k, v in census.items()
                         if k not in ("baseline",) and v]

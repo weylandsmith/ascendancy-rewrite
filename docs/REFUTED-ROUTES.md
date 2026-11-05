@@ -591,3 +591,18 @@ BEFORE every control click; and a NEXTTURN control needs btn_hdlr ARMED).
 ## the SELECTION STORE (DAT_000482fb) is the remaining datum (OQ-019 open).
 ## Any debugger-log reading pre-t305: apply FirePat regression first
 ## (docs/re/dosbox-debugger.md t305 block).
+
+## t306 AMENDMENT (binding): THE BATMODE STATIC-GATE ROUTE TO THE LIVE
+## SELECTION WITNESS IS DEAD. Run t299-leg-20261105-101054 (rc=0, corrected
+## core + FirePat, positive control btn_hdlr alive): the working sprite click
+## fired ZERO at BatModeWnd entry 0x1aef8, msg-4 router 0x1b070, and effect
+## writers 0x1b71f/0x1ba39 (ships.md S32). Do NOT re-arm these four legs for
+## map clicks and do NOT re-derive the t296 gate map (it stands statically —
+## the click layer simply never dispatches into BatModeWnd from the system
+## view). The selection-writer hunt continues ONLY at the non-batmode members of
+## the t296 cited store census (ships.md S24/S32): DAT_43508 {0x51a8e, 0x51fc2,
+## 0x55bbd} and DAT_43504 {0x28ec2, 0x28ef6 cosmos star-click, 0x36b01
+## diplomacy row, 0x52003 ship order-target, 0x55d35} — or by naming a
+## DIFFERENT live-witnessed trigger for msg 0x53/0x50 (t296's widget imm
+## census found none outside the batmode family; re-derive only from a
+## witnessed poster, not another click battery).
