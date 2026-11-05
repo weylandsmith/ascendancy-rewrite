@@ -485,3 +485,19 @@ and clicking ship/planet/empty pixels. NOT claimed: that selection is not
 msg-dispatched SOMEWHERE (window-manager hit-test vs wrong handler
 attribution is separated by the t301 TOGGRID control-click probe; see
 docs/re/_wip_t299.md S8). t298's 'not refuted' is hereby a CITED negative.
+T301 AMENDMENT (binding): the t301 control-click probe ran (2 full sessions,
+t299-leg-{213540,214042}) and ZERO-FIRED, but the control was INVALID — rect
+557,403-587,433 is pixel-BLACK in the Icarus view (uniq=2, mean~0) and
+windows.txt assigns the same rect to TOGSHIPS/COSMOSWnd as to
+TOGGRID/BatModeWnd (sibling windows, identical 7,7-465,472 rects). The probe
+therefore separates NOTHING, and DEAD is now also: any control-click test at
+a rect not pixel-verified non-black in the current view screenshot. The
+underlying question was resolved OFFLINE instead (ships.md S28): dispatch =
+`mov ecx,[win+0xa7]; call [ecx+4]` into the active window's class table, slot
+1 = universal dispatcher file 0x30d08; the t299 zero-fires are an
+ARMING-FAILURE (wrong class table), not evidence of a click bypass. The
+stronger t300 claim 'system-view clicks never reach the batmode msg layer'
+is downgraded: they may well reach BatMode/BatControl class legs — none were
+ever armed (tables 0x2478e8/0x247850 slots 0/2/3). Witness route = re-armed
+r299_leg_session.py (router+cos_*+btn_* legs; stops dump the window-record
+NAME via magic 0x12345678 + +0x20).

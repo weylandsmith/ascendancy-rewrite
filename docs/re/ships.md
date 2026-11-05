@@ -1547,3 +1547,43 @@ disambiguation (t301): TOGGRID control-click (inside BatModeWnd, SENDMESSAGE
 bypass it (polled hit-test); ZERO means the 0x1aef8 handler attribution is
 dead and the leg map must be re-derived from the live instance.
 NO LEDGER ROW CLOSED (strict-close); OQ-016 r1, OQ-019 r1/r3 stay open.
+
+## S28 t301 (2026-11-04) — TOGGRID CONTROL-CLICK: INVALID-CONTROL NEGATIVE +
+## WINDOW-CLASS DISPATCH LAW (full detail docs/re/_wip_t301.md)
+Runs work/r1/t299-leg-20261104-{213540,214042} (2 full choreographies + 1
+lottery loss). The t301 control click at (572,418) ZERO-FIRED in both sessions
+— but pixel census PROVES THE CONTROL INVALID: rect 557,403-587,433 is black
+in the Icarus view (uniq colors=2, mean RGB~0; BatModeWnd content rect
+7,7-465,472 has uniq=222), and windows.txt shows the rect is claimed by TWO
+sibling windows (TOGGRID/BatModeWnd sm=74 AND TOGSHIPS/COSMOSWnd sm=58) — the
+t300 "children all x>=479" note inherited that ambiguity. The disjunction was
+VOID AS RUN; the t300 map-click negative stands.
+DISPATCH LAW (offline, run 59.sav B=0x1bf4d8 P0=0x1bf450, + code byte-pattern
+census of work payload image):
+ 1. Live window records enumerate via magic u32 0x12345678 (126 hits, 2 noise):
+    +0x08 rect (== windows.txt VERBATIM), +0x20 NAME, +0xa7 CLASS-TABLE phys.
+    COSMOSWnd 0xfd2398 table 0x247a4c; BatModeWnd 0xfdc924 table 0x2478e8;
+    BatControlWnd 0xfdbebc table 0x247850; type-0 buttons (FLEET/NEXTTURN)
+    0x247cb8; type-25 toggles 0x247ca0.
+ 2. msg dispatch = `mov ecx,[win+0xa7]; call [ecx+4]` (ff 51 04 x5;
+    mov-rm-a7 x20). TABLE SLOT 1 is the universal dispatcher thunk file
+    0x30d08 (phys 0x1f0158) — verified identical slot-1 in ALL sampled tables;
+    zero E8 callsites to 0x30d08 (reached ONLY via the tables).
+ 3. Class tables (slots 0,2,3,3-shape verified as code prologues):
+    COSMOS [0x26818,0x30d08,0x26b34,0x27e80,0x311b8,0x2925c];
+    BATMODE [0x1abfc,0x30d08,0x1aef8,0x1d858,0x311b8,0x1e9dc];
+    BTN0    [0x30ad8,0x30d08,0x336b4,0x30fb4,0x311b8,0x316f0];
+    BATCTRL [0x15630,0x30d08,0x156d4,0x16420,0x311b8,0x316f0].
+    Installers write the table phys as imm32 into +0xa7 (batmode img+0x1abe6/
+    0x1ac21 static placeholder 0x58 -> RAM +P0; cosmos img+0x2683f).
+ 4. CONSEQUENCE: t299/t300/t301 armed NEITHER slot-1 NOR the active class's
+    slots — zero-fires were an ATTRIBUTION FAILURE, not a bypass law. The
+    clicks that WORKED (FLEET/NEXTTURN, type-0 class 0x247cb8) ran legs nobody
+    armed. Icarus-view dispatching window is one of {COSMOSWnd, BatModeWnd,
+    BatControlWnd} (vision: 'Scientist Takeover' panel = battle chrome) — the
+    router stop + record-NAME adjudicates.
+SCRIPT: r299_leg_session.py RE-ARMED (LEGS router/cos_*/btn_*/batmode_dead;
+bank_stop dumps 48-byte record head -> stop NAMES the window; --control-click
+default 0; MEMDUMPBIN control at router). NEXT = one debugger run, then the
+selection/order witness on whichever class the stops name. NO LEDGER ROW
+CLOSED (strict-close); OQ-016 r1, OQ-019 r1/r3 stay open.

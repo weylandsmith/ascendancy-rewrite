@@ -81,8 +81,8 @@ mutation-verified; income-law.md t294 block); (4) per-slot shield-byte
 consumer (OQ-019 family); (5) human build-order minutiae 0.4% samples;
 item-35/35 completion branches = MEASURED zero-witness + AI-unreachable
 (REFUTED t271, re-open conditions there). t299 debugger leg witness ran
-(2026-11-04): zero fires, ATTRIBUTED negative — system-view clicks never
-reach the batmode msg layer (see OQ-019 note + ships.md S27); no OQ-016
+(2026-11-04): zero fires; t301 re-attributed as ARMING-FAILURE not a bypass
+law (see OQ-019 note + ships.md S28); no OQ-016
 constant moved, row stays open.
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
@@ -156,13 +156,19 @@ t299 RUN (2026-11-04, 6 debugger sessions work/r1/t299-leg-*): instrument
 PROVEN (8 code BPs armed incl. handler 0x1aef8 + router 0x1b070, control
 MEMDUMPBIN byte-exact) and NEGATIVE x3 with attribution: the same sessions'
 FLEET/row/End-Turn clicks changed game state, yet ship/planet/empty clicks
-in the Icarus system view fired ZERO legs — and windows.txt says the clicks
-were inside BatModeWnd 7,7-465,472 with no child covering them. The batmode
-msg layer NEVER EXECUTES on these clicks; '0x1ba8c mouse-reachable
-publication' REFUTED for synthetic clicks. Disambiguation t301: TOGGRID
-control-click (SENDMESSAGE 74, inside BatModeWnd) while handler armed —
-FIRE=dispatch alive but map clicks bypass it; ZERO=handler attribution dead
-(ships.md S27 + _wip_t299 S7/S8).
+in the Icarus system view fired ZERO legs. t301 RE-ATTRIBUTES the negative
+(runs t299-leg-{213540,214042} + offline law, ships.md S28 + _wip_t301): the
+TOGGRID control-click ZEROED but was INVALID (rect 557,403-587,433 pixel-black
+in the Icarus view; windows.txt gives the SAME rect to TOGSHIPS/COSMOSWnd and
+TOGGRID/BatModeWnd — sibling ambiguity), and the offline dispatch law shows
+every msg goes `mov ecx,[win+0xa7]; call [ecx+4]` into the ACTIVE window's
+class table (slot 1 = universal dispatcher file 0x30d08, verified in all
+sampled tables). t299/t300 armed NEITHER slot-1 NOR the active class slots —
+zero-fires = ATTRIBUTION FAILURE, not a bypass law; the WORKING FLEET/End-Turn
+clicks executed type-0 class 0x247cb8 legs nobody armed. Window-record law
+(magic 0x12345678, NAME@+0x20, table@+0xa7) + re-armed r299_leg_session.py
+(router/cos_*/btn_* legs, stop dumps record NAME) are in hand; NEXT = one
+debugger run, witness on the class the stops name (ships.md S28).
 (2) per-ship build/redesign path =
 BUILD DECISION not RE unknown (t256c census 62,762 rows, AI dossier row 16
 GAP->BOUNDARY; docs/DECISIONS.md D3); (3) magnetron witnessed use (scriptable

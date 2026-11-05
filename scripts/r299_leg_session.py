@@ -25,14 +25,26 @@ see docs/re/_wip_t299.md S1/S4 — all [verified in-tree]):
     by its EIP. (The "one bp at a time" rule is a BPLM-fire-line rule; code
     bps report CS:EIP correctly.)
 
-LEGS (file offsets from the t296/t297 verbatim disasm; bytes printed at startup
-and human-checkable against work/ascend_payload.bin):
-  batcon   0x1b91c  entry (eax=win, ecx=modifier, edx=clip from hit-test 0x4fb30)
-  select   0x1ba39  mov byte [esi+0xb7],2          SELECT success
-  dl1relay 0x1ba5e  mov byte [esi+0xb7],0 + relay 0x326 ecx=2
-  publish  0x1baa7  mov ds:0x43508,eax + ring code 0x11
-  planet   0x1bad3  cmp dl,3 -> relay 0x326 ecx=4   (planet order leg)
-  deselect 0x1b114  mov byte [ebp+0xb7],0           (mode-2 deselect)
+LEGS (t301 SUPERSEDED SET — window-class dispatch law, docs/re/_wip_t301.md
+S4/S6; the old batmode legs below are DEAD for system-view clicks — BatModeWnd
+is INACTIVE there and its class table 0x2478e8 is never consulted):
+  cosmos_router 0x30d08  THE generic dispatcher: prologue 51 56 57 55; callers
+                         do `mov ecx,[win+0xa7]; call [ecx+4]` (verified sites
+                         img+0x26eda, img+0x30d02; zero E8 callsites — reached
+                         ONLY through the per-class table slot 1)
+  cosmos_entry  0x26818  COSMOSWnd class-entry (table slot 0) 53 51 56 57 89 c3
+                         89 d1 f6 c1 04; its own installer `mov [eax+0xa7],
+                         0x247a4c` at img+0x2683f (static imm 0x5a4c -> +P0 in
+                         RAM)
+  cosmos_hdlr   0x26b34  COSMOSWnd msg handler (table slot 2, mirrors the dead
+                         batmode slot-2 shape 56 57 55 83 ec 3c)
+  cosmos_27e80  0x27e80  table slot 3 (53 51 56 57 55 81 ec e4 00)
+  cosmos_2925c  0x2925c  table slot 5 (51 56 57 55 81 ec 94 01)
+  batcon        0x1b91c  [DEAD-IN-VIEW, keep armed as controls] entry eax=win
+  deselect      0x1b114  [DEAD-IN-VIEW]
+Shared slots 1/4 of every class table are 0x30d08/0x1f0608 — arming
+0x30d08 witnesses EVERY class dispatch including the FLEET/NEXTTURN type-0
+button clicks (those executed and were never armed in t299-t301).
 
 DRIVE (r298.Sess inherited, client-rect-bounded finders): enter campaign ->
 End Turn ONCE -> FLEET -> row y in (93,200,305,410). Row->ship mapping is NOT
@@ -79,12 +91,19 @@ CODE_END = P0 + 0x8CC83     # obj1 image end (pointer law, OQ-011)
 FLEET_BTN = (553, 184)
 FLEET_ROWS = (93, 200, 305, 410)
 
-LEGS = {"handler": 0x1AEF8,    # BatModeWnd msg handler ENTRY (windows.txt
-                                      # dispatch; eax/win -> deliverable (iii))
-        "router": 0x1B070,      # msg-4 router head (hit-test result [ebp+0xaf]
-                                      # gates the batcon call — t297 verbatim)
-        "batcon": 0x1B91C, "select": 0x1BA39, "dl1relay": 0x1BA5E,
-        "publish": 0x1BAA7, "planet": 0x1BAD3, "deselect": 0x1B114}
+LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
+                                      # EVERY class incl. type-0 FLEET/NEXTTURN);
+                                      # reached via mov ecx,[win+0xa7]; call [ecx+4]
+        "cos_entry": 0x26818,   # COSMOSWnd class-entry (table phys 0x247a4c slot 0)
+        "cos_hdlr": 0x26B34,    # COSMOSWnd msg handler (slot 2)
+        "cos_s3": 0x27E80,      # COSMOS table slot 3
+        "cos_s5": 0x2925C,      # COSMOS table slot 5
+        "btn_entry": 0x30AD8,   # type-0 button class-entry (FLEET/NEXTTURN table
+                                      # phys 0x247cb8 slot 0) — the clicks that
+                                      # WORKED never had this armed
+        "btn_hdlr": 0x336B4,    # type-0 button handler (slot 2)
+        "batmode_dead": 0x1AEF8}  # BatModeWnd INACTIVE in system view (record
+                                      # 0xfdc924 +0xac state); control only
 
 EVENTS = []
 hx = lambda v: hex(v) if isinstance(v, int) else None
@@ -369,6 +388,14 @@ ASCEND.EXE
         for wkey in ("esi", "eax", "ebp"):
             w = regs.get(wkey)
             if w and P0 < w < 0x10000000:
+                # t301 LAW: live window records start with magic 0x12345678,
+                # rect at +0x08, NAME at +0x20, dispatch-table phys at +0xa7.
+                head = self.dump_mem(w, 48, f"{tag}_{wkey}_head")
+                if head and len(head) >= 48:
+                    magic = struct.unpack_from("<I", head, 0)[0]
+                    nm = head[0x20:0x2c].split(b"\x00")[0].decode("latin1", "replace")
+                    rec[f"wrec_{wkey}"] = {"magic_ok": magic == 0x12345678,
+                                           "name": nm}
                 blob = self.dump_mem(w + 0x90, 64, f"{tag}_{wkey}")
                 if blob and len(blob) >= 0x40:
                     g = lambda o: struct.unpack_from("<I", blob, o - 0x90)[0]
@@ -497,8 +524,8 @@ def main():
     ap.add_argument("--tl", type=int, default=1800)
     ap.add_argument("--settle", type=int, default=45)
     ap.add_argument("--boot", type=int, default=170)
-    ap.add_argument("--legs", default="handler,router,batcon,select,dl1relay,"
-                                      "publish,planet,deselect")
+    ap.add_argument("--legs", default="router,cos_entry,cos_hdlr,cos_s3,"
+                                      "cos_s5,btn_entry,btn_hdlr,batmode_dead")
     ap.add_argument("--views", type=int, default=4)
     ap.add_argument("--clicks-per-view", type=int, default=4)
     ap.add_argument("--control-click", type=int, default=1)
@@ -616,9 +643,9 @@ def main():
         # equal payload file bytes at 0x1b91c (proves the dump path AND the P0
         # law in one shot; honest log either way — dump failures are known at
         # title-arm, untested mid-game).
-        ctl = s.dump_mem(P0 + LEGS["batcon"], 16, "control")
+        ctl = s.dump_mem(P0 + LEGS["router"], 16, "control")
         if ctl:
-            want = pay[LEGS["batcon"]:LEGS["batcon"] + len(ctl)]
+            want = pay[LEGS["router"]:LEGS["router"] + len(ctl)]
             s.log(f"MEMDUMPBIN control MATCH={ctl == want} "
                   f"got={ctl.hex(' ')} want={want.hex(' ')}")
             s.probes.append({"probe": "memdumpbin-control",
@@ -722,13 +749,16 @@ def main():
                 if st is None:
                     s.log(f"NOFIRE {tag}")
                     s.probes.append({"tag": tag, "nofire": True})
-            # t301 CONTROL CLICK (once per session, view 0, map still up):
-            # TOGGRID child of BatModeWnd, windows.txt VERBATIM rect
-            # 557,403-587,433, SENDMESSAGE 74 -> centre (572,418). Known-good
-            # click INSIDE the same window. handler/router FIRE here + zero on
-            # map => msg dispatch alive, system-map clicks BYPASS it. Zero
-            # here too => 0x1aef8 handler attribution is dead (re-derive the
-            # leg map from the live instance member+0x88).
+            # t301 AUDIT: the old TOGGRID "control click" at (572,418) was
+            # INVALID — pixel census of 23_view0_r93.png shows rect
+            # 557,403-587,433 is BLACK (uniq=2, mean~0) in the Icarus view;
+            # windows.txt child rects belong to BOTH sibling windows
+            # (COSMOSWnd TOGSHIPS and BatModeWnd TOGGRID share the rect) and
+            # neither is painted there. DEFAULT IS NOW 0. The session carries
+            # a BUILT-IN positive control instead: the End-Turn and FLEET
+            # clicks happen while btn_entry/btn_hdlr (type-0 class 0x247cb8)
+            # + router 0x30d08 are armed, and those clicks are PROVEN to work
+            # (t300) — if they don't fire, the instrument is dead, full stop.
             if vi == 0 and args.control_click:
                 s.pty_new()
                 if s.click(572, 418, "TOGGRID_control"):

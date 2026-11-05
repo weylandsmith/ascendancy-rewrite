@@ -209,35 +209,61 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t301 TOGGRID CONTROL-CLICK DISAMBIGUATION (ordering rationale: t300
-delivered the ATTRIBUTED negative — 3 debugger sessions with handler 0x1aef8
-+ router 0x1b070 + 6 legs armed (8 total, BPLIST-identical x3, MEMDUMPBIN
-control byte-exact) fired ZERO on sprite/planet/empty clicks in the Icarus
-system view, while the same sessions' FLEET/row/End-Turn clicks changed game
-state; windows.txt VERBATIM puts all click points inside BatModeWnd
-7,7-465,472 with no child covering them (all children x>=479). Two live
-hypotheses remain and ONE click separates them: arm the same 8 legs, reach
-the Icarus view exactly as t300 did, then click TOGGRID (windows.txt rect
-557,403-587,433, SENDMESSAGE 74 -> centre (572,418)) — a known-good click
-inside the same window. FIRES => msg dispatch is alive and system-map ship
-clicks BYPASS it (polled hit-test law; selection/order witness must move to
-the BPLM watchpoint class on the mouse-state block or the t290 poke route).
-ZERO => the 0x1aef8/0x1b070 handler attribution itself is dead (zero E8
-callsites + zero u32 refs in the image already hint this): re-derive the
-leg map from the live window INSTANCE (member+0x88 physical-value law,
-S26 c.1 binding) before any further batmode probing. Run: bash
-scripts/r299_relaunch.sh (the control click is built into
-scripts/r299_leg_session.py view-0 battery, --control-click 1 default;
-TOGGRID result logs as tag TOGGRID_control). Fixed harness traps (do NOT
-re-trip): MEMDUMPBIN filenames bare+relative (parser reads '/' as division)
-and UPPERCASE on disk; MEMDUMPBIN 0000: = selector-0 junk; arm only AFTER
-campaign load (GetAddress is arm-time-evaluated); EXEC answers while RUNNING
-so fire detection is the pty code-view line, never EXEC-reply-absence;
-post-load autosave ring slots 41/42 may hold PREVIOUS-run bytes until the new
-game's first save; FLEET reopen after a click battery FAILS (t300 views 1-3
-diff 132/0) — one battery per sitting, view 0 only.
-DO NOT launch a scripted mouse session on the RELEASE build (class budget
-spent, t298) and do NOT re-derive the pointer-value law (S26 c.1 binding).
+NEXT t302 DEBUGGER WITNESS RUN WITH THE RE-ARMED CLASS LEGS (ordering
+rationale: t301 proved the t299/t300 zero-fires were an ARMING FAILURE — the
+dispatch law is `mov ecx,[win+0xa7]; call [ecx+4]` into the ACTIVE window's
+class table with slot 1 = universal dispatcher file 0x30d08 (verified slot-1
+identity in tables 0x2478e8/0x247a4c/0x247cb8/0x247ca0/0x247c70, ships.md
+S28); the script scripts/r299_leg_session.py is ALREADY re-armed and
+py_compile-clean: LEGS {router 0x30d08, cos_entry 0x26818, cos_hdlr 0x26b34,
+cos_s3 0x27e80, cos_s5 0x2925c, btn_entry 0x30ad8, btn_hdlr 0x336b4,
+batmode_dead 0x1aef8}, --control-click default 0, bank_stop dumps the
+window-record head (magic 0x12345678, NAME@+0x20) so every stop NAMES the
+dispatching window, MEMDUMPBIN control at router. Run: bash
+scripts/r299_relaunch.sh (3 attempts, OUTDIR work/r1/t299). SUCCESS TELL:
+'STOP ... leg=' lines; the FIRST stop on End-Turn/FLEET is the BUILT-IN
+positive control (btn_entry/btn_hdlr must fire on clicks PROVEN to work — if
+they don't, the instrument is dead: attribute to harness, do NOT re-run the
+same battery a 3rd time). The Icarus-view clicks then adjudicate which class
+(COSMOS vs BatMode vs BatControl — the view shows 'Scientist Takeover' battle
+chrome, so BatControl table 0x247850 is a live candidate NOT yet in LEGS; if
+cos_*/btn_* fire but map clicks don't, ADD batctrl legs 0x15630/0x156d4/0x16420
+and rerun once). Deliverables: which window+slot handles sprite/planet/empty
+clicks + the stop registers (eax=win, edx=msg) -> OQ-019 r1 selection witness.
+Fixed harness traps (carry over, do NOT re-trip): MEMDUMPBIN filenames
+bare+relative and UPPERCASE; 0000: = selector-0 junk; arm only AFTER campaign
+load; EXEC answers while RUNNING (fire detection = pty code-view line);
+post-load autosave slots may hold PREVIOUS-run bytes; FLEET reopen after a
+click battery FAILS — one battery per sitting, view 0 only; NEW t301 law: any
+control click must be pixel-verified non-black FIRST (REFUTED t299 amendment).
+DO NOT relaunch the old batmode-leg battery; DO NOT launch a scripted mouse
+session on the RELEASE build (class budget spent, t298).
+
+## LANDED t301 (2026-11-04, session 10) — TOGGRID CONTROL-CLICK RAN: CONTROL
+INVALID (PIXEL-PROVEN) + WINDOW-CLASS DISPATCH LAW CLOSED OFFLINE
+(docs/re/_wip_t301.md, ships.md S28, REFUTED-ROUTES t299 t301-amendment; runs
+work/r1/t299-leg-20261104-{213540,214042} + 1 lottery loss). MEASURED:
+(1) Battery as assigned: 2 full sessions, 8 legs armed, Icarus view reached,
+sprite/planet/empty + TOGGRID(572,418) clicks ALL NOFIRE (session.log rc=0
+clicks). (2) CONTROL AUDIT: rect 557,403-587,433 uniq colors=2 mean~0 =
+BLACK in the Icarus view (BatModeWnd content rect uniq=222); windows.txt
+assigns that SAME rect to TOGSHIPS/COSMOSWnd (sm=58) as to TOGGRID/BatModeWnd
+(sm=74) — sibling windows both 7,7-465,472, so the t301 disjunction was VOID
+AS RUN (new standing law: pixel-verify any control click). (3) OFFLINE LAW
+(run 59.sav, B=0x1bf4d8, P0=0x1bf450): live window records = magic u32
+0x12345678 (126 hits; rect@+0x08 == windows.txt VERBATIM; NAME@+0x20; class
+table phys @+0xa7); dispatch = `mov ecx,[win+0xa7]; call [ecx+4]` (ff5104 x5,
+mov-rm+0xa7 x20); TABLE SLOT 1 == file 0x30d08 in EVERY sampled class table
+(batmode/cosmos/btn0/toggle/list); tables: COSMOS [0x26818,_,0x26b34,0x27e80,
+_,0x2925c], BTN0 [0x30ad8,_,0x336b4,...], BATCTRL [0x15630,_,0x156d4,0x16420];
+installers write table-phys imm32 into +0xa7 (batmode img+0x1abe6/0x1ac21,
+cosmos img+0x2683f; static placeholder 0x58 -> RAM +P0). (4) => t299/t300
+zero-fires = ARMING FAILURE (wrong class table; the WORKING FLEET/End-Turn
+clicks ran btn0 legs nobody armed), NOT a bypass law; the t300 'never reach
+the batmode msg layer' claim is DOWNGRADED. (5) r299_leg_session.py RE-ARMED
+(cos_*/btn_*/router legs, stop dumps record NAME, --control-click 0, control
+dump at router; py_compile OK) — run deferred to t302 (3 sittings budget
+spent). NO LEDGER ROW CLOSED (strict-close): OQ-016 r1, OQ-019 r1/r3 open.
 
 ## LANDED t300 (2026-11-04, session 9) — HANDLER/ROUTER-ARMED RUN: ATTRIBUTED
 ZERO-FIRE NEGATIVE (docs/re/_wip_t299.md S7-S8, ships.md S27 update,
