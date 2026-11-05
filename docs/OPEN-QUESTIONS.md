@@ -211,6 +211,22 @@ fire: data-segment immediates are REBASED +0x242000 in code RAM
 DAT_43504 = B+OFF-0x88+X reads 0xff idle = SELECTED-NONE vs the t297-A
 oracle address 0x28558c star ptr — ds:0x4358c zero disasm refs), then the
 ring-consumer windows (0x55a60 family fires only on a turn advance).
+t308 note (runs t299-leg-20261105-{140250,143815} both rc=0, docs/re/_wip_t308.md
++ ships.md S34): DAT-BASE QUESTION CLOSED — the oracle was NEVER off-target
+(sav Memory member = linear+0x88; member B+SL.OFF+0x43504 IS linear 0x285504 =
+the rebased store target; the t307 0xff datum read the member as if linear = a
+different variable, REFUTED t308 amendment). DAT_43504 STAR-CASE WRITER FULLY
+WITNESSED WITH A REAL DELTA: green-annulus pip law click (182,284) ENTERED
+Vega; w43504_28ec2 stopped EAX=0x255BC5 (= star-record base k=0, name law
+0x255be1-0x1c 'Vega'; screenshot vision 'Vega / White Dwarf'); oracle pair
+0x256825 'Icarus' -> 0x255bc5 'Vega'; fire reproduced 3/3; DAT_43508 unchanged
+(order-destination semantics consistent). STILL OPEN (strict-close): OQ-019
+residue = per-SHIP selection writer (kind-2 clip; no kind-4 owner-0 ship at
+t=1086) + the msg-0x50 destination widget (DAT_43508 legs zero x3 runs,
+instrument live-validated); NEW SHARPENED HOLE: ring code 0x10 POSTED 3x but
+the 0x55a60 consumer family never ran inside any armed window incl. a
+NEXTTURN-msg window — consumer timing unresolved. NEXT: t309 ring-consumer
+windows (arm the 0x55a60 family + advance the turn INSIDE the armed window).
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

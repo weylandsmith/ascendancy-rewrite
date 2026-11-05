@@ -1721,3 +1721,43 @@ variable). If confirmed, the oracle has been reading the wrong u32 and the
 43504 delta test was never real. NO LEDGER ROW CLOSED (strict-close): the
 fire is the STAR fallback writer, not the per-ship selection writer;
 OQ-019 residue untouched; t307 note on the row.
+
+## S34 t308 (2026-11-05) — DAT_43504 STAR WRITER FULLY WITNESSED (Icarus->Vega
+### delta); DAT-BASE QUESTION CLOSED (oracle always correct: member+0x88 =
+### linear); GREEN-ANNULUS pip law replaces the dead bright-dot law.
+STEP 1 (offline, docs/re/_wip_t308.md S1): the sav Memory member is +0x88 off
+guest LINEAR (dosbox-debugger.md t286b law re-proved directly: debugger dump
+of linear 0x1e8312 == member bytes at 0x1e839a in run 112859). Oracle reads
+member B+SL.OFF+X = linear mem_base(obj1)+X = EXACTLY the rebased store target
+("mov [00285504],eax" == member 0x28558c). The t307 "true DAT_43504 = 0x285504
+reads 0xff idle" datum is VOID (member read as if linear; linear 0x28547c is a
+different variable, 0xff constant across 18 oracle reads in two runs). t297-A
+needs NO restatement. Disasm: ds:0x43504 38 refs, ds:0x43508 109, ds:0x43510 3,
+ds:0x4358c/0x43590 ZERO.
+PIP LAW DEFECT (run t299-leg-20261105-140250, rc=0): sum(r+g,b)>380 nearest-
+first picks purple UI-text fragments (all 12 "compact" clusters were
+(158,81,174) at y 79-149); 5/6 clicks repaints, the 6th ENTER was Icarus
+AGAIN (same-value store invisible). System pips are GREEN ANNULI of {(0,85,40),
+(0,113,56),(0,142,69)} (offline census of the run's own map shot; Icarus's
+annulus centroid (237,288) is 6px from its pip (238,282)). NEW LAW (patched,
+run-validated): BFS 8px-link green-family clusters >=10px, centroid, drop
+<50px from the known Icarus pip, nearest-first -> 23 candidates ALL distinct
+systems by construction.
+STEP 2 WITNESS (run t299-leg-20261105-143815 rc=0, attempt 1, same 9 legs):
+click #1 (182,284) ENTERED (diff 94712); w43504_28ec2 FIRED (pty census
+{28ec2:1, btn_hdlr:3, others 0}) render "E8312 A304552800 mov [00285504],eax"
+register panel EAX=0x255BC5, REQ 59 RUN..REQ 60 BREAK correlated; follow-on
+bytes = disasm 0x28ec7..0x28ed8 (ring post code 0x10). ORACLE PAIR:
+DAT_43504 0x256825 'Icarus' -> 0x255bc5 'Vega' (name-bearing oracle, first
+real delta ever). CROSS-CHECKS: 0x255bc5 = 0x255be1-0x1c = star-record base
+k=0 (r1_star_table 'Vega'); 0x256825 = k=33 name-0x1c; screenshot
+11_star0_screen.png vision 'Vega / White Dwarf', planets Vega I/II/III ==
+star table. DAT_43508 UNCHANGED (0x26fe77) — order-destination semantics
+consistent. Fire REPRODUCED 3/3 (t307 x1 same-value, t308 b1 x1 same-value,
+b2 x1 delta).
+READINGS: fn 0x28e70 (caller 0x27332) is THE witnessed DAT_43504 star-select
+writer: entered galaxy-map click -> store clicked star-record base + ring 0x10.
+Still open (strict-close, OQ-019 residue): per-SHIP selection writer (no
+kind-4 owner-0 ship at t=1086) and the msg-0x50 destination widget; ring-0x10
+CONSUMER family (0x55a60 incl. 0x55bbd/0x55d35) has never run inside an armed
+window even across a witnessed NEXTTURN msg — consumer timing unresolved.

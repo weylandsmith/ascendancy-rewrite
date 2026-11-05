@@ -606,3 +606,14 @@ BEFORE every control click; and a NEXTTURN control needs btn_hdlr ARMED).
 ## DIFFERENT live-witnessed trigger for msg 0x53/0x50 (t296's widget imm
 ## census found none outside the batmode family; re-derive only from a
 ## witnessed poster, not another click battery).
+
+## t308 AMENDMENT (binding): THE BRIGHT-DOT GALAXY-MAP PIP LAW IS DEAD. The
+## sum(r+g,b)>380 nearest-first rule (r293 enter_system legacy) selects purple
+## UI-text fragments and field dots at the campaign map, and its one hit was
+## Icarus's own pip twice (same-value store = invisible datum). Do NOT reuse
+## it for star selection. Use the GREEN-ANNULUS law (ships.md S34: green
+## family {(0,85,40),(0,113,56),(0,142,69)} BFS clusters >=10px, centroid,
+## >=50px from the known Icarus pip (238,282)). Also binding: the sav Memory
+## member is +0x88 off guest linear — any "DAT address" quoted WITHOUT that
+## conversion is void (t307 S1); the oracle at B+SL.OFF+X is CORRECT and the
+## DAT-base question is CLOSED, do not re-open it.

@@ -1113,9 +1113,19 @@ def main():
                         s.log(f"ORACLE {tag}: no base vote in {op.basename(p)}")
                         return None
                     rd = lambda X: struct.unpack_from("<I", mm, bb + SL.OFF + X)[0]
+                    v43504 = rd(0x43504)
+                    # t308 S1 LAW: the sav Memory member is +0x88 off guest
+                    # LINEAR, so bb+SL.OFF+X == linear mem_base(obj1)+X — the
+                    # oracle address IS the rebased store target (t307 fire
+                    # decoded [00285504] == member 0x28558c). alt_285504 =
+                    # member B+OFF-0x88+0x43504 (linear 0x28547c, a DIFFERENT
+                    # variable — the void t307 datum, kept for disambiguation).
                     o = {"tag": tag, "sav": op.basename(p), "turn": rd(0x12e10),
                          "sel43510": mm[bb + SL.OFF + 0x43510],
-                         "DAT_43504": hx(rd(0x43504)),
+                         "DAT_43504": hx(v43504),
+                         "DAT_43504_name": s.star_name_at(mm, v43504),
+                         "alt_285504": hx(struct.unpack_from(
+                             "<I", mm, bb + SL.OFF - 0x88 + 0x43504)[0]),
                          "DAT_43508": hx(rd(0x43508))}
                     s.log(f"ORACLE {tag} {o}")
                     return o
@@ -1139,14 +1149,46 @@ def main():
                 map_im0 = s.grab("map_pre_star")
                 cands = []
                 if map_im0 is not None:
+                    # t308b GREEN-ANNULUS PIP LAW (offline census of run
+                    # 140250's own map shot, MEASURED): system pips are rings
+                    # of the green family {(0,85,40),(0,113,56),(0,142,69)}
+                    # (20-70 px each); the old sum>380 rule picked purple UI
+                    # text fragments and field dots (5 of 6 clicks were
+                    # repaints, the one ENTER was Icarus again). Cluster the
+                    # green family (8px link), centroid each >=10-px cluster;
+                    # EXCLUDE centroids within 40px of the KNOWN Icarus pip
+                    # (238,282, measured twice: t307+t308 ENTER at that px)
+                    # so every click targets a DIFFERENT system by
+                    # construction (idle DAT_43504 = Icarus ptr -> same-value
+                    # stores are invisible; only starA->starB is a datum).
                     px = map_im0.load()
-                    for yy in range(60, 440, 2):
-                        for xx in range(40, 455, 2):
-                            rr, gg, bb_ = px[xx, yy]
-                            if rr + gg + bb_ > 380:
-                                cands.append((abs(xx - R293.MAP_CENTER[0])
-                                              + abs(yy - R293.MAP_CENTER[1]),
-                                              xx, yy))
+                    GREENS = {(0, 85, 40), (0, 113, 56), (0, 142, 69)}
+                    gp = [(x, y) for y in range(60, 440)
+                          for x in range(40, 456) if px[x, y] in GREENS]
+                    gpset = set(gp)
+                    seen = set()
+                    from collections import deque as _dq
+                    for p in gp:
+                        if p in seen:
+                            continue
+                        q = _dq([p]); seen.add(p); pts = []
+                        while q:
+                            cx0, cy0 = q.popleft(); pts.append((cx0, cy0))
+                            for nx in range(cx0 - 8, cx0 + 9):
+                                for ny in range(cy0 - 8, cy0 + 9):
+                                    if (nx, ny) in gpset and (nx, ny) not in seen:
+                                        seen.add((nx, ny)); q.append((nx, ny))
+                        if len(pts) < 10:
+                            continue
+                        mx = sum(a for a, _ in pts) // len(pts)
+                        my = sum(b for _, b in pts) // len(pts)
+                        d_ic = ((mx - 238) ** 2 + (my - 282) ** 2) ** 0.5
+                        # 50px not 40: Icarus's OWN annulus centroid lands
+                        # ~6px off the pip centre (measured (237,288)); a
+                        # click there = a third same-value store.
+                        if d_ic < 50:
+                            continue
+                        cands.append((d_ic, mx, my))
                     cands.sort()
                 s.log(f"STAR-PHASE: {len(cands)} bright candidates, "
                       f"nearest={cands[:3]}")
@@ -1171,9 +1213,20 @@ def main():
                           if im_a is not None else -1)
                     entered = dv > 15000
                     oracles[f"star{i}_after"] = sel_oracle(f"star{i}_after")
+                    # t308 WITNESS BREAK: the close-condition datum is a REAL
+                    # DAT_43504 delta (t307 proved same-value stores are
+                    # invisible to pairs). Idle scalar = current star ptr, so
+                    # an ENTERED click on a DIFFERENT star must flip it
+                    # (starA->starB). On a flip, bank and stop the pip loop.
+                    delta = False
+                    ob4 = oracles.get(f"star{i}_before")
+                    oa4 = oracles.get(f"star{i}_after")
+                    if entered and ob4 and oa4:
+                        delta = ob4.get("DAT_43504") != oa4.get("DAT_43504")
                     star_results[f"star{i}"] = {
                         "click": [xx, yy], "cand_dist": cd,
                         "screen_diff_vs_map": dv, "entered_system": entered,
+                        "dat43504_delta": delta,
                         "stops": recs}
                     s.log(f"STAR-PHASE {i}: click ({xx},{yy}) diff={dv} "
                           f"entered={entered} stops={0 if recs is None else len(recs)}")
@@ -1181,6 +1234,14 @@ def main():
                         if not s.escape_to_map(map_im0):
                             s.log("STAR-PHASE: escape_to_map FAILED — "
                                   "remaining star windows skipped")
+                            break
+                        if delta and ob4 and oa4:
+                            s.log(f"WITNESS DELTA at star{i}: DAT_43504 "
+                                  f"{ob4.get('DAT_43504')}"
+                                  f"({ob4.get('DAT_43504_name')}) -> "
+                                  f"{oa4.get('DAT_43504')}"
+                                  f"({oa4.get('DAT_43504_name')}) — pip loop "
+                                  "stopped early (datum banked)")
                             break
                 census.update({k: v["stops"] for k, v in star_results.items()})
             im, d = (None, 0) if args.star_click else s.open_fleet()

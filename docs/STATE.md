@@ -209,40 +209,61 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t308 RESOLVE THE DAT_43504 ADDRESS QUESTION, THEN WITNESS A TRUE
-SELECTED-NONE->STAR TRANSITION (ordering rationale: t307 caught the FIRST
-live fire at a store-census member — w43504_28ec2, EAX=0x256825 Icarus-star
-pointer, REQ-correlated to the entered star click, run
-work/r1/t299-leg-20261105-112859 rc=0, ships.md S33 — and in doing so
-produced the SELF-RELOCATION LAW (code-RAM data immediates rebased +0x242000:
-a3 04 55 28 00 at file 0x28ec2 = store to physical 0x242000+0x43504 =
-0x285504). That makes the t297-A oracle address SUSPECT: the oracle reads
-B+SL.OFF+0x43504 = 0x28558c (stable Icarus star ptr; grep ds:0x4358c = ZERO
-disasm refs = a different variable) while the rebased store target 0x285504
-reads 0xff at idle = SELECTED-NONE fits the t296 semantics. If the oracle is
-confirmed off-target, (a) t297-A's 'both globals have non-order writers,
-delta-only' law must be RE-STATED (the 0x256825-idle datum was read from
-0x28558c, not the selection scalar), and (b) the delta test t307 needed
-becomes REAL for the first time: watch 0x285504 (not B+OFF+X) around a star
-click from a fresh entry where DAT says none-selected. STEP 1 (offline,
-cheap): grep the whole disasm for stores/loads of ds:0x43504 vs ds:0x4358c
-vs ds:0x43508/0x43590, and recheck what r1_slot/SL.OFF anchoring gives for
-the DS base (B+SL.OFF vs B+SL.OFF-0x88; B=P0+0x88); pin the answer into
-docs/re/r1-savestate.md or ships.md. STEP 2 (one capture, reuse the t307
-instrument verbatim): --star-click battery with sel_oracle RE-POINTED to the
-confirmed true DAT addresses (fix scripts/r299_leg_session.py sel_oracle to
-read BOTH candidates so no further ambiguity survives the run), legs = the
-same 8 writers + btn_hdlr. CLOSE CONDITION: a banked w43504_* stop whose
-oracle pair shows the TRUE DAT_43504 scalar CHANGE (0xff->0x256825 or
-starA->starB) = the selection-writer witness strict-close demands; a stable
-0xff before/after WITH a banked fire = the rebased target is not what t296
-thought either, and the census map itself gets re-derived (also a datum).
-Fixed laws (do NOT re-trip): FirePat regression 5/5 before arming (runs
-033648/052925/061825); fire_pats takes P0+LEGS[leg]; census-ctl False at
-rebased legs is NOT an arming failure; do NOT re-arm the four REFUTED
-batmode sites; close_eventwin before clicks; escape ladder never blind
-(t285); BPDEL fired index before RUN; kill by RECORDED PID; one battery per
-sitting; production :9 untouched; scratch copies only, never mount game/.
+NEXT t309 RING-0x10/0x11 CONSUMER WINDOWS: WITNESS THE 0x55a60 FAMILY RUN
+(ordering rationale: t308 fully witnessed the DAT_43504 star-case writer —
+green-annulus pip law click (182,284) ENTERED Vega, w43504_28ec2 stopped
+EAX=0x255BC5 (star-record base k=0), oracle pair 0x256825 'Icarus' ->
+0x255bc5 'Vega', fire reproduced 3/3, runs t299-leg-20261105-{140250,143815}
+rc=0, ships.md S34 — and the DAT-base question CLOSED (oracle always correct;
+sav member = linear+0x88; the t307 0xff datum void, REFUTED t308 amendment).
+The chain now has exactly one unnamed link on the star side: ring code 0x10 is
+MEASURED POSTED 3x by 0x28ec2 via 0x56ad4 (ring = {u16 code,u32 param,u32
+extra} at [esi+slot*10+0x422c], ships.md S24/S33) but the CONSUMER family
+(0x55a60 incl. legs w43508_55bbd 0x55bbd / w43504_55d35 0x55d35) has fired
+ZERO inside every armed window across 3 runs — INCLUDING the 60 s
+control_nextturn window where btn_hdlr witnessed the NEXTTURN msg (run
+140250). Either (a) resolution runs only after the control window's disarm
+(turn-advance pump), or (b) the NEXTTURN click at (511,67) opens a confirm
+modal and the turn never advanced (t306 saw 'Cancel' via 0x56c74 — the modal
+pattern). STEP 1 (offline, cheap): disasm the 0x55a60 consumer entry + its
+callers (who pumps the ring? turn-loop FUN_00024f24? msg pump?), verify the
+leg bytes 0x55bbd/0x55d35 are mid-block reachable under normal core (t305
+fire law), and pick 1-3 consumer legs incl. the entry if block-top; bank the
+caller map in ships.md S35. STEP 2 (capture, reuse the t308 battery shape):
+arm consumer legs + btn_hdlr; star-click ONE green-annulus pip (posts ring
+0x10 — witnessed 3/3, deterministic); after the escape ladder, click NEXTTURN
+INSIDE a fresh armed window and if a 'Cancel'/'OK' modal appears (bank_stop
+win name names it), click through it (scratch instance, turn advance allowed)
+while armed; ALSO keep a post-disarm 60 s baseline window (no legs hot) as
+the (a)-vs-(b) discriminator: if the consumer fires only after disarm, the
+pty whole-log census still counts it. CLOSE CONDITION: a pty-census count>=1
+at any 0x55a60-family leg correlated (REQ order) to the post-click turn
+advance = the ring consumer witness; a whole-log ZERO incl. post-disarm =
+code 0x10 has no consumer in the normal turn loop (selection is render-time
+state only) = ALSO a datum, and the t296 'ring drives order execution'
+reading gets re-scoped. Fixed laws (do NOT re-trip): green-annulus pip law
+ONLY (bright-dot law REFUTED t308); oracle at B+SL.OFF+X correct, DAT-base
+question CLOSED; FirePat regression 5/5 before arming (runs 033648/052925/
+061825); fire_pats takes P0+LEGS[leg]; census-ctl False at rebased legs is
+NOT an arming failure; do NOT re-arm the four REFUTED batmode sites;
+close_eventwin before clicks; escape ladder never blind (t285); BPDEL fired
+index before RUN; kill by RECORDED PID; production :9 untouched; scratch
+copies only, never mount game/.
+
+## LANDED t308 (2026-11-05, session 17) — DAT_43504 STAR WRITER FULLY
+### WITNESSED WITH A REAL DELTA (Icarus->Vega, EAX=0x255BC5, fire 3/3);
+### DAT-BASE QUESTION CLOSED (sav member = linear+0x88; oracle always right;
+### t307 0xff datum VOID); GREEN-ANNULUS pip law (bright-dot law REFUTED).
+### docs/re/_wip_t308.md S0-S8, ships.md S34; runs t299-leg-20261105-{140250,
+### 143815} both rc=0 attempt 1; scripts/r308_relaunch.sh + r299_leg_session.py
+### t308 patches (name-bearing sel_oracle + alt_285504, witness-delta early
+### break, green-annulus candidate law). NO LEDGER ROW CLOSED (strict-close):
+### OQ-019 residue = per-ship selection writer (no kind-4 owner-0 ship at
+### t=1086) + msg-0x50 destination widget + NEW sharpened hole: ring-0x10
+### consumer family never observed running -> t309. Honest negatives: battery 1
+### produced NO delta (pip law defect, fixed same session); DAT_43508 legs
+### zero x3 runs; alt_285504 constant 0xff (void variable, identity unnamed).
+### Gate 0, audits OK.
 
 ## LANDED t307 (2026-11-05, session 16) — FIRST LIVE FIRE AT A STORE-CENSUS
 ### MEMBER: w43504_28ec2 EAX=0x256825 (Icarus star) ON AN ENTERED STAR CLICK;
