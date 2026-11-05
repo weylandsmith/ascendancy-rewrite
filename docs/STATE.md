@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-05T05:55
+updated: 2026-11-05T07:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,34 +209,62 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t305 NORMAL-CORE STOP ANOMALY — WHY ARMED LEGS FIRE 0x UNDER core=normal
-(ordering rationale: t304 NAMED the dispatch instruction — cos_hdlr is called
-from file 0x56cda `ff 56 08 call [esi+8]`, [esp] ret0=0x21612d witnessed 53x,
-run work/r1/t299-leg-20261105-033648 rc=0 — and FOUND that every prior
-debugger run used the DYNAMIC core (core= was inert under [dosbox]; dynrec
-cannot stop mid-block site BPs at all, core_dynrec.cpp:268). The corrected
-conf (launch() now writes [cpu]core=normal) proves normal core (pty warning
-gone, runs 051904/052925) but banked ZERO stops even for cos_hdlr, the leg
-that fired 41x under dyn core, while the guest stayed alive (autosave growth,
-moving break-EIP). Until a stop banks under normal core, the 22 site legs
-cannot be witnessed and every census attribution stalls — this single
-instrument question gates OQ-019's selection-writer probe. PROBE (<=35 calls,
-runs scripts/r299_leg_session.py --witness via scripts/r304_relaunch.sh
-pattern, venv python, disp :97, own ring): (1) --witness 2 --legs cos_hdlr
-with the fixed conf, and DUMP the raw pty slice around each armed RUN (fire
-pattern may miss normal-core stop rendering — t302 DrawCode-form law; grep
-the slice for the leg 6-hex BEFORE concluding no-fire); (2) single-[dosbox]-
-section conf variant (rule out the re-opened-section hypothesis; autosave+mcp
-worked at 051904, so this is low prior); (3) EXEC eip-read oracle
-(check_stopped_oracle) + longer windows (120 s) to catch a slow pump;
-(4) if ANY stop banks: immediately re-run the t304 census battery with a
-dialog-DRAIN loop before every click (planet/empty hit the same 'Cancel'
-record last time = modal residue) -> per-target msg-ids at 0x56cda/0x56c74 =
-the OQ-019 selection-writer datum. Fixed laws (do NOT re-trip): pty
-'Dynamic core' warning = core ground truth, never the conf line; BPDEL fired
-index BEFORE RUN; liveness = autosave growth; close_eventwin before clicks;
-one battery per sitting; kill scratch dosbox/Xvfb by RECORDED PID; pkill -f
-matches your own shell — never use it here.)
+NEXT t306 SELECTION-WRITER WITNESS — ARM THE t296 STATIC GATE SITES AND WATCH
+A LIVE SPRITE SELECT (ordering rationale: t305 fixed the fire detector and
+MEASURED the click->dispatch map (msg 0x8 to the clicked window record via
+pump 0x56cda; empty -> 0x56c74; docs/re/_wip_t305.md S4, run
+work/r1/t299-leg-20261105-061825 rc=0) — but the census leg set NEVER included
+the sites t296 statically named as the selection EFFECT writers: BatModeWnd
+handler 0x1aef8 entry + msg-0x53 leg 0x1b6f6..0x1b737 (effect [batwin+0xb7]:=2
+at 0x1b71f) + mouse leg mouse handler (0x1ba39). docs/re/ships.md S24. If a
+working sprite click hits these, OQ-019's residue "selection WRITER unnamed"
+closes with a live witness; if it hits NONE (msg 0x53 never dispatched to
+batwin for map clicks), that is a cited negative closing the static-gate route
+and re-scoping selection to the 0x51a8e/0x51fc2 writers (ships.md S24 caveat).
+PROBE (<=35 calls, one battery per sitting, scripts/r299_leg_session.py via a
+r306_relaunch.sh copy of the r305 one): LEGS ALREADY HAS THE ENTRY —
+batmode_dead = 0x1AEF8 (verify its comment: t301 named it BatModeWnd INACTIVE
+in system view; t306 re-arms it AS bat_hdlr, the inactive-verdict came from
+dyn-core zero-fires = re-attributable per t304-(2)). ADD two legs from ships.md
+S24 (do NOT re-derive): bat_s53 = 0x1B71F (msg-0x53 selection effect
+[batwin+0xb7]:=2), bat_mouse = 0x1BA39 (mouse leg effect). Census mode,
+window 60, targets sprite+control_nextturn ONLY
+(planet/empty datum done t305, don't re-measure); bank every stop (msg edx +
+wrec NAME + [batwin+0xb7] dump if batwin findable via the t298/t300 instance
+law — grep ships.md for 'batwin instance' before inventing a finder); AFTER
+the sprite click, read the selection oracle from the newest .sav (watch.log
+sel= field law, scripts/r1_playcap_watch.py) and record sel-before/after per
+target. Fixed laws (do NOT re-trip): FirePat regression before trusting any
+census (docs/re/dosbox-debugger.md t305 block); close_eventwin before clicks;
+BPDEL fired index BEFORE RUN; liveness = autosave growth; kill by RECORDED
+PID; pkill -f matches your own shell — never here; one battery per sitting.
+
+## LANDED t305 (2026-11-05, session 14) — NORMAL-CORE ANOMALY RESOLVED =
+### INSTRUMENT DEFECT; FirePat LAW (source-pinned); CLICK->DISPATCH MAP
+### MEASURED. docs/re/_wip_t305.md S0-S5, dosbox-debugger.md t305 block,
+### ships.md S31, REFUTED-ROUTES t305 amendment; runs
+### work/r1/t299-leg-20261105-{061737(BREAK-lottery-loss),061825(rc=0)},
+### work/r1/t305/ loop, scripts/r305_relaunch.sh.
+MEASURED: (1) t304 "normal core banks ZERO stops" was FALSE — stops happened
+unbanked (highlighted DrawCode render + prompt-back + autosave gap spanning
+armed windows in 051904/052925 re-reads). SOURCE LAW: stop line = unique
+PAIR_BLACK_GREEN (ESC[30m ESC[42m, debug.cpp:1586-87) prefix; address token =
+full 0160:0021612A form OR leading-zero-stripped SUFFIX of VARIABLE length
+('1612A','60C4') — fixed-width regex impossible (first-pass 5-hex fix missed
+the 0x56c74 empty-click fire; caught same session). FirePat class (r299_leg_
+session.py) = HL-token capture + sig6.endswith(token), len>=4 (last-4 unique
+across 35 legs audited), bare t302 fallback with HL-proximity exclusion.
+REGRESSION EXACT: 033648 cos_hdlr 41, 052925 s2_56cda 3, 061825 60/20/1.
+(2) RUN 061825 rc=0 (attempt 1 lost the BREAK lottery — known flaky, loop
+absorbed it): witness 3/3 ret0=0x21612d -> site 0x56cda under CORRECT core.
+(3) CLICK->DISPATCH MAP (per-window per-leg, drain applied): baseline pump
+0x56cda+cos_hdlr msg 0x3b COSMOSWnd x15/60s; sprite(48,151) 0x56cda x2 msg 0x8
+'PLIND' + btn_hdlr; planet(439,331) 0x56cda msg 0x8 'PLANETALLOC' (t304
+'Cancel residue' SUPERSEDED for planet); empty(236,200) ONLY site 0x56c74;
+NEXTTURN 0x56cda x2 msg 0x8 'PLSQUARE' + btn_hdlr; 20 other slot-2 sites ZERO
+everywhere. (4) NO LEDGER ROW CLOSED (strict-close): OQ-019 selection WRITER
+still unnamed (msg 0x8 = repaint/dispatch at window records, not the selection
+store); t305 note appended to the row. Gate 0, audits OK.
 
 ## LANDED t304 (2026-11-05, session 13) — DISPATCH INSTRUCTION NAMED
 ### (0x56cda call [esi+8]); SPRITE CLICK WALKS THE CLASS MSG LAYER via

@@ -91,6 +91,64 @@ CODE_END = P0 + 0x8CC83     # obj1 image end (pointer law, OQ-011)
 FLEET_BTN = (553, 184)
 FLEET_ROWS = (93, 200, 305, 410)
 
+
+HL_STOP = "\x1b[30m\x1b[42m"   # PAIR_BLACK_GREEN = DrawCode stop-line highlight
+                               # (debug.cpp:1586-87, source-read t305)
+
+
+class FirePat:
+    """t305 FIRE-PATTERN LAW (docs/re/_wip_t305.md S1, source + 3-run verified).
+    A stop fires DrawCode; ncurses emits ONLY the CHANGED CELLS of the cursor
+    line, prefixed by the PAIR_BLACK_GREEN highlight HL_STOP (its use in
+    debug.cpp is exclusive to that line). The address token right after HL is
+    EITHER the full '0160:0021612A' OR a SUFFIX of the 6-hex linear address
+    whose length depends on what the previous screen render had at those cells:
+    0x21612A -> '1612A', 0x2160C4 -> '60C4', 0x1E5F84 -> '1E5F84'. A regex per
+    fixed form cannot cover this (leading zeros are STRIPPED, not present for
+    0* to consume), so: regex captures the token and CODE checks
+    sig6.endswith(token) with len(token) >= 4 (last-4 is unique across the
+    whole leg set incl. the 24-leg census set — audited t305; tokens shorter
+    than 4 are ambiguous and are NOT counted, a documented undercount risk).
+    Bare (no-color) fallback = the t302 6-hex law, with a lookbehind that
+    excludes renders already counted via HL. Attribution is ALWAYS EV-eip-exact
+    (bank_stop); this is only a 'something stopped' trigger + census counter.
+    VERIFIED vs real logs: 033648 cos_hdlr 41; 052925 s2_56cda 3; 061825
+    cos_hdlr 60, s2_56cda 20, s2_56c74 1 (the '60C4' render a fixed-5 pattern
+    misses)."""
+    _RE = re.compile(re.escape(HL_STOP)
+                     + r"((?:[0-9A-Fa-f]{4}:)?[0-9A-F]{4,8}) [0-9A-F]")
+    _RE_BARE_T = r"(?<![0-9A-Fa-f]){} [0-9A-F]"
+
+    def __init__(self, lin):
+        self.sig6 = f"{lin & 0xFFFFFF:06X}"
+        self.re_bare = re.compile(self._RE_BARE_T.format(self.sig6))
+
+    def findall(self, text):
+        hits = []
+        hl_spans = [m.span() for m in
+                    re.finditer(re.escape(HL_STOP), text)]
+        for m in self._RE.finditer(text):
+            tok = m.group(1).split(":")[-1].lstrip("0") or "0"
+            if len(tok) >= 4 and self.sig6.endswith(tok):
+                hits.append(m.group(1))
+        # Bare (no-color) fallback = the t302 law. A token is EXCLUDED if an HL
+        # marker START sits 1..16 bytes before it (HL is 9 bytes; full-form
+        # render adds 'CS:' = 5 more -> token at start+14; a genuine bare token
+        # is preceded by non-ANSI junk). Two counters mutually exclusive.
+        bare = [m.group(0) for m in self.re_bare.finditer(text)
+                if not any(1 <= m.start() - s <= 16
+                           for s, _e in hl_spans)]
+        return hits + bare
+
+    def search(self, text):
+        return bool(self.findall(text))
+
+
+def fire_pats(lin):
+    """Compatibility shim: one FirePat per leg (search/findall API)."""
+    return [FirePat(lin)]
+
+
 LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
                                       # EVERY class incl. type-0 FLEET/NEXTTURN);
                                       # reached via mov ecx,[win+0xa7]; call [ecx+4]
@@ -380,8 +438,9 @@ ASCEND.EXE
             # (kills "Set breakpoint at 0160:1F0158" and BPLIST lines: they end
             # at the address; kills REQ-echo full forms 001F0158: the 6-hex run
             # there is preceded by '0').
-            self.leg_pats.append(re.compile(
-                rf"(?<![0-9A-Fa-f]){lin & 0xFFFFFF:06X} [0-9A-F]", re.I))
+            # t302 pattern kept + t305 NORMAL-CORE 5-hex pattern (fire_pats:
+            # normal core renders '1612A FF5608', the 6-hex form never appears).
+            self.leg_pats.extend(fire_pats(lin))
             lines, ok, hdr = self.req(f"EXEC BP {self.csseg:04X}:{lin:08X}",
                                       15.0)
             self.log(f"ARM {name:9s} {self.leg_lines[name]} hdr={hdr} "
@@ -963,9 +1022,12 @@ def main():
             pty_census = {}
             for name in s.legs:
                 lin = P0 + LEGS[name]
-                pat = re.compile(rf"(?<![0-9A-Fa-f]){lin & 0xFFFFFF:06X} "
-                                 r"[0-9A-F]", re.I)
-                pty_census[name] = len(pat.findall(whole))
+                # t305: dual-core patterns (fire_pats). The two forms are
+                # MUTUALLY EXCLUSIVE per render (5-hex lookbehind kills the
+                # 6-hex run and vice versa), so summing findalls never
+                # double-counts one fire.
+                pty_census[name] = len([m for pt in fire_pats(lin)
+                                        for m in pt.findall(whole)])
             s.probes.append({"probe": "witness-ret0", "stops": len(allrecs),
                              "ret0": [r["ret0_file_off"] for r in rets]})
             s.persist()
@@ -1044,9 +1106,9 @@ def main():
             pty_census = {}
             for name in s.legs:
                 lin = P0 + LEGS[name]
-                pat = re.compile(rf"(?<![0-9A-Fa-f]){lin & 0xFFFFFF:06X} "
-                                 r"[0-9A-F]", re.I)
-                pty_census[name] = len(pat.findall(whole))
+                # t305 dual-core fire law (see witness block above).
+                pty_census[name] = len([m for pt in fire_pats(lin)
+                                        for m in pt.findall(whole)])
             s.log(f"PTY WHOLE-LOG CENSUS {pty_census}")
             s.probes.append({"probe": "pty-whole-log-census",
                              "counts": pty_census})

@@ -1647,3 +1647,20 @@ ff14 modrm calls ZERO; mov r32,[r32+0xa7] = 21 sites (0x14de8-0x14f14 x6
 cluster); dialog strings not payload plaintext. t304 = [esp] caller-witness at
 cos_hdlr stops (bank_stop PATCHED: ret_stack.ret0 -> file offset).
 NO LEDGER ROW CLOSED (strict-close): OQ-016, OQ-019 stay open.
+
+## S31 t305 (2026-11-05) — CLICK->DISPATCH MAP MEASURED UNDER THE CORRECT CORE
+Run work/r1/t299-leg-20261105-061825 (rc=0; --witness 3 --census; close_eventwin
+pre-arm; FIXED fire detector FirePat, docs/re/dosbox-debugger.md t305 block;
+full detail docs/re/_wip_t305.md S4-S5). Witness phase 3/3 ret0=0x21612d -> call
+site file 0x56cda re-confirmed under [cpu]core=normal. Per-window per-leg fires
+(whole-log census): baseline {0x56cda:15, cos_hdlr:15} msg 0x3b COSMOSWnd;
+sprite(48,151) {0x56cda:2, btn_hdlr:1} banked msg 0x8 NAME='PLIND';
+planet(439,331) {0x56cda:1} msg 0x8 'PLANETALLOC'; empty(236,200) {0x56c74:1}
+(render-only, autosave-gap proven); NEXTTURN {0x56cda:2, btn_hdlr:1} msg 0x8
+'PLSQUARE'. 20 other slot-2 sites ZERO in every window. READS: clicks dispatch
+msg 0x8 to the clicked/repainted WINDOW RECORD via the same generic pump site
+0x56cda; empty-map clicks route through the sibling site 0x56c74 only. The
+selection-store WRITER (DAT_000482fb) remains unnamed: msg 0x8 is repaint/
+dispatch, not the selection write. NO LEDGER ROW CLOSED (strict-close): OQ-019
+stays open. Instrument law: FirePat regression suite = runs 033648/052925/
+061825 known-fire counts (41/3/60+20+1).

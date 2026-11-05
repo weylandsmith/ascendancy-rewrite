@@ -372,4 +372,32 @@ Fixed launch() conf shape (r299_leg_session.py):
   autosave + mcp verified alive in run 051904).
 Known open anomaly: normal core + armed cos_hdlr banked ZERO stops (052925)
 while the same leg fired 41x under dyn core — investigate before trusting
-normal-core negatives.
+normal-core negatives. [t305 RESOLVED: the stops WERE happening; see the t305
+block below. Normal-core negatives are trustworthy ONLY with the fixed
+fire_pats detector.]
+
+## t305 NORMAL-CORE RENDER LAW (2026-11-05, runs t299-leg-20261105-{051904,052925,061825})
+The t304 "zero stops" anomaly was an INSTRUMENT DEFECT: the t302 fire pattern
+was written for the dyn-core DrawCode render and normal core renders
+differently. SOURCE LAW (debug.cpp DrawCode 1560+, read t305): a stop fires
+DrawCode; ncurses emits ONLY CHANGED CELLS; the stop line is the ONE line
+prefixed by PAIR_BLACK_GREEN = ESC[30m ESC[42m (its only uses, debug.cpp:1586,
+1587). The address token after that prefix is the FULL '0160:0021612A' form OR
+a SUFFIX of the 6-hex linear address whose LENGTH VARIES with what the previous
+render left in those cells: 0x21612A -> '1612A', 0x2160C4 -> '60C4',
+0x1E5F84 -> '1E5F84' — then space + opcode hex. A fixed-width pattern CANNOT
+work (leading zeros stripped). FIXED INSTRUMENT: FirePat class in
+r299_leg_session.py — capture the HL token, code-check sig6.endswith(token),
+len(token)>=4 (last-4 unique across all 35 legs incl. the 24-leg census set,
+audited t305); bare t302 form kept as no-color fallback with HL-proximity
+exclusion (mutually exclusive per render). REGRESSION EXACT vs known truth:
+033648 cos_hdlr 41; 052925 s2_56cda 3; 061825 cos_hdlr 60, s2_56cda 20,
+s2_56c74 1. Proof stops were real all along: highlighted render between
+'EXEC RUN' and next BREAK + prompt back + autosave gap spanning the armed
+window (50.sav 05:31:07 -> 51.sav 05:32:15 vs arm 05:31:14/disarm 05:32:14).
+Attribution is ALWAYS EV-eip-exact (bank_stop); the grep only triggers
+"something stopped" and feeds the whole-log census.
+NOTE the trap this iteration caught: a first-pass fixed-5-hex fix MISSED the
+0x2160C4 fire ('60C4' is 4 chars) — census said 0 where truth was 1. Any
+future render-format change: re-run the FirePat regression against the three
+runs above before trusting a census.

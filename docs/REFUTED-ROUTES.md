@@ -575,3 +575,19 @@ BEFORE every control click; and a NEXTTURN control needs btn_hdlr ARMED).
 ## (3) UNDER THE FIXED CONF ZERO STOPS BANK EVEN FOR cos_hdlr (runs
 ## t299-leg-20261105-051904/-052925, guest alive) — UNRESOLVED instrument
 ## anomaly (STATE t305). Do NOT conclude handlers stopped being called.
+
+## t305 AMENDMENT (binding): THE t304-(3) "NORMAL CORE BANKS ZERO STOPS"
+## NON-ANOMALY IS RESOLVED AS AN INSTRUMENT DEFECT — the stops were happening
+## unbanked (fire-pattern blindness). SOURCE LAW (debug.cpp DrawCode): the stop
+## line is the unique PAIR_BLACK_GREEN (ESC[30m ESC[42m) prefixed render, and
+## its address token is the full 0160:0021612A form OR a LEADING-ZERO-STRIPPED
+## SUFFIX of variable length ('1612A', '60C4') — no fixed-width regex works.
+## Run t299-leg-20261105-061825 (rc=0, fixed FirePat detector) MEASURED the
+## click->dispatch map under the correct core: baseline pump 0x56cda msg 0x3b
+## COSMOSWnd; sprite msg 0x8 PLIND (+btn_hdlr); planet msg 0x8 PLANETALLOC
+## (t304's planet 'Cancel residue' SUPERSEDED — drain was applied); empty ONLY
+## site 0x56c74; NEXTTURN msg 0x8 PLSQUARE (+btn_hdlr); 20 other slot-2 sites
+## cited ZERO. Do NOT re-run the census to re-confirm this map; the writer of
+## the SELECTION STORE (DAT_000482fb) is the remaining datum (OQ-019 open).
+## Any debugger-log reading pre-t305: apply FirePat regression first
+## (docs/re/dosbox-debugger.md t305 block).
