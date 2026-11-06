@@ -523,6 +523,36 @@ what shows BatModeWnd (fn 0x1d7dc / fn 0x1be10 exit-side candidates, registry
 instance via t313/t316 tools, handler member 0x247978); a capture is justified
 ONLY after the decode names a concrete activator widget/keypress. NO third
 mouse battery.
+t323 note (OFFLINE activation decode, zero capture; docs/re/_wip_t323.md
+S0-S6 + ships.md S49 + REFUTED-ROUTES t323 amendment binding): THE ACTIVATOR
+DOES NOT EXIST — honest negative, census-complete. STATE 1 16 is NOT a
+visibility flag: the STATE line builds the per-window state-RECORD table at
+windows.txt load (14B records; loader fn 0x31d58, sizing fn 0x32000); runtime
+state = WORD [win+0xb1]. COMPLETE [win+0xb1] writer census (14 sites, all
+classified): constructors fn 0x31c54/0x3377c/0x33d08/0x33c34; char-input
+cycler fn 0x339a4 (unreachable for BatModeWnd — no char handler in its msg
+tree, t296 S5+t321); fn 0x364d2 (writes the TABLE not a window field); the
+ONLY runtime switcher fn 0x31f30 <- EXCLUSIVELY fn 0x32100 (generic
+state-rect-click msgs 0..8, jump table cs:[0x1d524]) which is NOT in the
+cited BATMODE class table (t296). Every runtime "BatModeWnd" naming is inert
+or foreign: fn 0x2351c name arg = dead assert-string (overwritten @0x23558;
+body = layout bookkeeping ds:0x48c44); fn 0x528ec@0x52a76 result unused;
+fn 0x156d4 (BATCTRL) stores the lookup unread and resets BatListWnd instead.
+fn 0x1d7dc = repaint/teardown, fn 0x1be10 = cursor chooser — neither writes
+state. Msg 0x53/0x50 re-probe inside the candidate set: no poster exists
+(fn 0x32100 covers msgs 0..8 only). DISPOSITION per task spec: OQ-019
+select/destination residues (destination widget msg 0x50, live stores via
+fn 0x1b5e6/0x1baa7) = UNREACHABLE-BY-CAPTURE; law stands static-cited (t296
+S5 four gates + t321 S1-S4); t322 armed-zero EXPLAINED as design, not an
+untried activator. Row STAYS OPEN (strict-close: no live store witnessed;
+the narrowed negative is the datum). Re-open condition: RAM census showing a
+[rec+0xb1] writer (e.g. fn 0x32100) installed in BatModeWnd's RAM class
+table at [rec+0xa7]. NEXT: OQ-019 remaining live-open scope = the sharpened
+t308 ring-consumer hole is CLOSED (t309/t310); with the mouse+activation
+roads both dead, the per-ship select leg has NO remaining capture route at
+t=1086 — remaining candidates must come from a DIFFERENT sitting/save state
+(kind-4 owner-0 ship exists) or the row's residue is dispositioned
+permanently per the t323 amendment.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

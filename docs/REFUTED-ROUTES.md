@@ -903,3 +903,37 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ## click-window capture): census_click closes popups BEFORE arming, so a
 ## popup that opens/persists after the reguard spends the armed window
 ## (t322 planet stop banked 'Cancel' instead of the map click).
+
+## t323 AMENDMENT (binding): BATMODEWnd ACTIVATION HAS NO IN-SESSION TRIGGER
+## — THE t322(2) ACTIVATION-DECODE ROUTE IS NOW ITSELF CLOSED (negative), AND
+## WITH IT EVERY IN-CAMPAIGN ROUTE TO THE OQ-019 SELECT/DESTINATION RESIDUES.
+## Census-complete static evidence: docs/re/_wip_t323.md S0-S6 + ships.md S49.
+## (1) DEAD: any future attempt to "activate/show/switch BatModeWnd" from
+## inside a captured campaign session (click, key, msg, or menu). The STATE
+## line is the state-RECORD table (loader fn 0x31d58 / sizing fn 0x32000),
+## runtime state = WORD [win+0xb1]; the image-wide [win+0xb1] writer census
+## (14 sites) yields ONLY constructors (fn 0x31c54/0x3377c/0x33d08/0x33c34),
+## the char-input cycler fn 0x339a4 (no char handler exists in BatModeWnd's
+## cited msg tree), a table-not-window store (fn 0x364d2), and fn 0x31f30
+## reachable EXCLUSIVELY through fn 0x32100 (generic state-rect-click msgs
+## 0..8), which is NOT in the cited BATMODE class table (t296). The window's
+## state is PINNED at construction.
+## (2) DEAD as a search target: "the BatModeWnd name in code" as evidence of
+## a control path. All three fn 0x2351c call sites (0x21530 boot-gated by
+## fn 0x78283("resume.gam"), 0x24f96, 0x52a76) pass the name immediate as a
+## DEAD assert-string arg (overwritten @0x23558 before use; body = layout
+## bookkeeping at ds:0x48c44 + [wmgr+0x32dda]); fn 0x156d4 (BATCTRL) stores
+## the fn 0x56d1c(0x5e="BatModeWnd") result UNREAD and resets BatListWnd
+## instead. Do not re-open these as activator candidates.
+## (3) DISPOSITION: OQ-019 select/destination residues (msg-0x50 destination
+## publication, live DAT_43508/0x43504 stores via fn 0x1b5e6/0x1baa7, the
+## kind-2 kind-clip per-ship select) = UNREACHABLE-BY-CAPTURE from the
+## t=1086 sitting corpus; law stands static-cited (t296 S5 four gates, t321
+## S1-S4). RE-OPEN CONDITION (narrow, explicit): a RAM class-table census
+## showing any [rec+0xb1] writer (e.g. fn 0x32100) installed at
+## BatModeWnd's [rec+0xa7] table, OR a DIFFERENT save/sitting where a
+## kind-4 owner-0 ship exists AND BatModeWnd is witnessed live (entry leg
+## fires) — absent either, no capture spends on this residue are justified.
+## (4) fn 0x1d7dc (repaint/teardown) and fn 0x1be10 (cursor chooser, keyed
+## on ds:0x7d35e==[win+0x41]) are NOT activators — t322 S6 candidate list
+## retired.

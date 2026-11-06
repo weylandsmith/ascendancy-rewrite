@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-06T06:20
+updated: 2026-11-06T07:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,36 +209,70 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t323 OFFLINE ACTIVATION DECODE — WHO SHOWS/ARMS BatModeWnd (zero
-capture). t322 measured decision-tree branch (b) (REFUTED-ROUTES t322
-amendment binding: the mouse road is DEAD IN-CAPTURE, no third mouse battery),
-so the only live OQ-019 select/destination route left runs THROUGH window
-activation. Decode steps (all against work/t91_code_disasm.txt +
-work/ascend_payload.bin, cite verbatim): (1) locate the window-record STATE
-field semantics — windows.txt BatModeWnd STATE 1 16 (line 1178 block); find
-the loader that parses the STATE line (search for the windows.txt field
-literal or the parse chain near the class-table builders) and which record
-offset it lands on (candidates near +0xb1/+0xbc region seen in banked grids,
-t322 stops show +0xac=0xb1 patterns — verify, don't assume); (2) census
-writers of that offset across the image (the activation predicate); (3) read
-fn 0x1d7dc and fn 0x1be10 (unconditional exits of fn 0x1aef8, disasm lines
-7508/7510) — they run after every BatModeWnd msg and are activation-adjacent;
-(4) msg 0x53/0x50 sender re-probe ONLY inside the activation-candidate set
-found in (2). DELIVERABLE: docs/re/_wip_t323.md naming the activation writer
-+ the in-game action that triggers it (menu button / key), or an honest
-negative that BatModeWnd activation has no in-session trigger at all — in
-which case OQ-019's select/destination residues get a documented
-UNREACHABLE-BY-CAPTURE disposition (law stays t296/t321 static, cited) and
-the row's remaining OPEN scope narrows to the non-batmode residues. Ordering
-rationale: every capture-bearing alternative is refuted (t319/t320/t321 pump
-road, t322 mouse road); the decode is cheap (~35 probes), needs no guest, and
-its output decides whether ANY future capture can close the select leg.
-Fixed laws carried (do NOT re-trip): t322 amendment (1)-(3); t321 amendment
-(1)-(4); t320 (1)-(4); t319 (1)-(4); msg-0x50 has no external sender (do not
-re-hunt); fn 0x1b91c decode VERBATIM stands (t296 S5 + t321 S4); t298 picker/
-rect laws; production :9 (pid 1957) untouched; scratch copies only, never
-mount game/; sitting check FIRST (playcap newest turn > 1086 => re-run
-scripts/r1_t85g_sitting.py before anything).
+NEXT t324 RAM CLASS-TABLE CENSUS — test the t323 re-open condition, the one
+caveat separating the activation negative from absolute (zero-battery,
+scratch copy). t323 closed the activation route census-complete STATICALLY
+(REFUTED-ROUTES t323 amendment binding), but static class tables are
+RAM-relocated (t303(5); t296: installer img+0x1abe6/0x1ac21 writes imm
+0x58e8 -> RAM +P0), so fn 0x32100's absence from the cited BATMODE table
+[0x1abfc,0x30d08,0x1aef8,0x1d858,0x311b8,0x1e9dc] is cited-but-indirect.
+Steps: (0) FIRST grep existing RAM-dump artifacts in work/r1/ (t313/t316
+tooling produced RAM reads; a dump covering the registry record region may
+already exist — if so, zero guest boot needed); (1) else scratch-copy boot
+resume.gam via the proven relaunch shape (scripts/r322_relaunch.sh as base,
+NO battery, NO legs — this is a READ census, not a capture); (2) locate the
+BatModeWnd registry record (fn 0x2351c law: registry at wmgr 0x12e10+0x3337
+stride 0x27, or via the handler-member 0x247978 neighbourhood t322 named)
+and dump [rec+0xa7] -> 6 RAM slots at data+0x58e8 (rebase +P0 per OQ-011);
+(3) compare slots vs cited law verbatim; flag ANY slot that is a [win+0xb1]
+writer (fn 0x32100/0x31f30/0x339a4/0x15xxx family). DELIVERABLE:
+docs/re/_wip_t324.md — slots MATCH cited law => negative ABSOLUTE, OQ-019
+select/destination residue disposition is final (row stays open per
+strict-close but every capture route is now cited-dead: t319/t320 pump,
+t322 mouse, t323 activation, t324 table); slots MISMATCH => t323 reopens,
+name the writer and re-design. Ordering rationale: this is the last
+falsification test for the t323 law; every other OQ-019 direction is
+refuted, and landing the loop on an absolute negative (or a cited reopen)
+is the only productive spend left before the row's disposition.
+Fixed laws carried (do NOT re-trip): t323 amendment (1)-(4); t322 (1)-(3);
+t321 (1)-(4); t320 (1)-(4); t319 (1)-(4); msg-0x50 no external sender;
+fn 0x1b91c decode verbatim (t296 S5 + t321 S4); fn 0x2351c name arg DEAD
+(do not re-open as activator); production :9 (pid 1957) untouched; scratch
+copies only, never mount game/; sitting check FIRST (playcap newest turn >
+1086 => re-run scripts/r1_t85g_sitting.py before anything).
+
+## LANDED t323 (2026-11-06, session 32) — OFFLINE ACTIVATION DECODE: NO
+## IN-SESSION TRIGGER EXISTS; OQ-019 SELECT/DESTINATION RESIDUES =
+## UNREACHABLE-BY-CAPTURE (t323 amendment binding).
+Zero-capture offline decode (work/t91_code_disasm.txt + work/ascend_payload.bin
+verbatim; full evidence docs/re/_wip_t323.md S0-S6 + ships.md S49 +
+REFUTED-ROUTES t323 amendment). Key measurements: (1) STATE line = state-
+RECORD table at load (14B records rect/flags@+0xa/size@+0xc; loader fn
+0x31d58, sizing fn 0x32000 value*5+0x14); runtime state WORD [win+0xb1],
+count [win+0xaf]. (2) COMPLETE [win+0xb1] writer census 14 sites, all
+classified: constructors fn 0x31c54(=0xffff)/0x3377c/0x33d08/0x33c34
+(=strlen(name)-1); char-cycler fn 0x339a4 (unreachable for BatModeWnd, no
+char handler t296 S5+t321); fn 0x364d2 writes the TABLE not a window; the
+ONLY runtime switcher fn 0x31f30 (store @0x31faf) <- EXCLUSIVELY {0x321ad,
+0x3221b} inside fn 0x32100 (state-rect-click msgs 0..8, table cs:[0x1d524])
+which is NOT in the cited BATMODE table (t296) — sole static reference
+0x603ea proven a MISALIGNED jump-table byte false positive. (3) All three
+fn 0x2351c callers (0x21530 boot-gated fn 0x78283("resume.gam"), 0x24f96,
+0x52a76) pass the "BatModeWnd" pool imm (0x2bf7 VERIFIED) as a DEAD assert
+arg (overwritten @0x23558; body = layout bookkeeping ds:0x48c44 +
+[wmgr+0x32dda]); fn 0x528ec@0x52a76 result unused; fn 0x156d4 (BATCTRL,
+imm 0x5e="BatModeWnd" VERIFIED) stores result UNREAD, resets BatListWnd
+(imm 0x77) state table instead (fn 0x32c5c = viewport realloc, not
+deactivation). (4) fn 0x1d7dc = repaint/teardown, fn 0x1be10 = cursor
+chooser (ds:0x7d35e key) — t322 candidates retired. (5) msg 0x53/0x50
+re-probe inside candidate set: none (fn 0x32100 covers 0..8). DISPOSITION:
+OQ-019 select/destination = UNREACHABLE-BY-CAPTURE (law stands static-cited
+t296 S5 + t321 S1-S4); t322 armed-zero explained as design. NO LEDGER ROW
+CLOSED (strict-close: no live store witnessed; the narrowed negative is the
+datum; row scope now = t324 RAM-table re-open check + different-sitting
+witness only). Sitting check: 200MB tail max turn 1086 == t319..t322's (no
+new play; r1_t85g_sitting.py not run). Production :9 (pid 1957) untouched;
+gate 0, audits OK.
 
 ## LANDED t322 (2026-11-06, session 31) — BATCON CLICK-ROAD LEGS ARMED LIVE
 ## FIRST TIME: BatModeWnd RECEIVES ZERO MSGS IN-VIEW (branch (b)); THE MOUSE

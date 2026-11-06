@@ -2241,3 +2241,56 @@ rails=188 + rowjump + sprite 48x151 + planet 439x331 + NEXTTURN):
   OQ-019 select/destination residues: mouse route CLOSED as a live route;
   next move = offline activation decode (_wip_t322 S6), capture ONLY after it
   names an activator.
+
+## S49 t323 (2026-11-06) — OFFLINE ACTIVATION DECODE: BatModeWnd ACTIVATION
+HAS NO IN-SESSION TRIGGER. The t322 "blocker = activation" resolves to an
+HONEST NEGATIVE: OQ-019 select/destination residues are UNREACHABLE-BY-
+CAPTURE (zero-capture iteration; full evidence docs/re/_wip_t323.md S0-S6).
+- STATE 1 16 is NOT a show/activate flag: the STATE line builds the
+  per-window state-RECORD table at windows.txt load (14B records: rect
+  u16s, flags u16@+0xa bit0 present/bit1 current, size WORD@+0xc =
+  frame*5+0x14 via fn 0x32000; loader helper fn 0x31d58). Runtime state =
+  WORD [win+0xb1] current-record id, [win+0xaf] = count.
+- COMPLETE [win+0xb1] writer census (image-wide grep, 14 sites, all
+  classified): constructors fn 0x31c54 (=0xffff)/fn 0x3377c/fn 0x33d08/
+  fn 0x33c34 (=strlen(name)-1, construction-time); char-input state-cycler
+  fn 0x339a4 (gated on ASCII ranges; BatModeWnd msg tree has NO char
+  handler per t296 S5 + t321 -> unreachable); fn 0x364d2 (store target is
+  [tbl+0xb1] of the state TABLE, not a window field — excluded); and the
+  ONLY runtime switcher fn 0x31f30 (store @0x31faf; callers EXHAUSTIVE =
+  0x321ad + 0x3221b, both inside fn 0x32100).
+- fn 0x32100 = generic state-rect-click msg handler (msgs 0..8, jump table
+  cs:[0x1d524], default -> fn 0x336b4): fn 0x31e74 hit-test -> fn 0x31f30
+  -> repaint. NOT in the cited BATMODE class table (t296: BATMODE =
+  [0x1abfc,0x30d08,0x1aef8,0x1d858,0x311b8,0x1e9dc]); its static-image
+  reference is a misaligned jump-table byte FALSE POSITIVE (0x603ea).
+- Every runtime naming of "BatModeWnd" is inert or foreign (pool-relative
+  OQ-004 immediates decoded verbatim): fn 0x2351c (image-wide name->layout
+  bookkeeping @ds:0x48c44 + [wmgr+0x32dda]; the name arg is a DEAD
+  assert-string overwritten @0x23558; callers 0x21530 boot-gated by
+  fn 0x78283("resume.gam"), 0x24f96, 0x52a76); fn 0x528ec right-panel
+  deselect block 0x52a44 (result unused, registry clears only); fn 0x156d4
+  BATCTRL msg handler stores the fn 0x56d1c(imm 0x5e="BatModeWnd") result
+  UNREAD and resets BatListWnd (imm 0x77) state table instead
+  ([BatListWnd+0xab]=0, fn 0x32c5c viewport realloc, BYTE+0xc5=0).
+- fn 0x1d7dc + fn 0x1be10 (t322's activation-adjacent candidates) are NOT
+  activators: fn 0x1d7dc = repaint/teardown (fn 0x1a338/0x1a8dc/0x1bfa4/
+  0x1a39c + esi==0 virtual [ecx+0xc] hide-call); fn 0x1be10 = cursor code
+  chooser keyed on ds:0x7d35e == [win+0x41] -> fn 0x5a1e4.
+- MSG 0x53/0x50 RE-PROBE inside the activation-candidate set: fn 0x32100's
+  jump table covers msgs 0..8 only; no 0x50/0x53 poster exists in any
+  candidate (fn 0x31c54/0x3377c/0x33c34/0x33d08/0x31f30/0x32048/0x314e8/
+  0x32c5c) — consistent with t296 (sole msg-0x50 consumer = fn 0x1aef8's
+  own publish block) and t321 S6 (image-wide sender hunt closed).
+- LAW (binding candidate for REFUTED-ROUTES): NO mouse click, key, or
+  message reachable from the campaign/system-map session can switch or
+  activate BatModeWnd's state; its state is PINNED at construction. This
+  EXPLAINS t322 branch (b) (armed-zero with MATCH=True instrument) as
+  design, not as an untried activator. Corollary: the OQ-019
+  select/destination residues (destination widget posting msg 0x50, live
+  DAT_43508/0x43504 stores through fn 0x1b5e6/0x1baa7) can NEVER be closed
+  by capture; law stands static-cited (t296 S5 gates, t321 S1-S4).
+  Re-open condition: a RAM census showing fn 0x32100 (or any fn writing
+  [rec+0xb1]) installed in BatModeWnd's RAM class table at [rec+0xa7] —
+  static tables are RAM-relocated (t303(5)), so static absence alone is
+  cited-but-indirect; t322's armed-zero is the live corroboration.
