@@ -209,40 +209,62 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t320 LIVE CAPTURE — THE MOUSE-ACTIVE POSTER-PASS RUN (ONE scratch run;
-mechanism named by t319, docs/re/_wip_t319.md S5/S5.1 — the save corpus is
-save-blind to the transient flags, so only a leg stop can witness msg 0xc).
-Ordering rationale: t319 resolved the three-way pump question with a banked
-EV stop — the poster call site 0x54ac5 fired LIVE with msg 4 (caller-never
-and pump-entry-never REFUTED; REFUTED-ROUTES t319 amendment binding) — and
-the writer census names the ONE discriminator: [core+0x24da4] is fn 0x54650's
-mouse-active flag (set -1 @0x546a5 iff ds:0x484ac!=0; reset 0 @0x546d0 iff
-484ac==0). msg 0xc fires iff the mouse is ACTIVE in the SAME main-loop pass
-the poster block runs. Every t317-shape click went quiet before the poster
-pass -> msg 4. t320's job: hold mouse activity alive through the poster pass.
-Shape: legs {pump_entry_56b5c} ONLY (the sole leg naming the road; hot-leg
-budget trivial — it fired 1x in 28 min) + the proven --shipclick gutter
-choreography MODIFIED per phase: after each xsend click, IMMEDIATELY xsend a
-small mouse MOVE (or a second click 1 px away) inside the same armed window
-so ds:0x484ac!=0 is re-set seconds before the next fn 0x54650 pass; oracle
-pair per window via scripts/r319_gate_read.py fields (save-blind — banked
-stop is the datum). If NO msg-0xc entry stop after 4 modified clicks: honest
-negative, row stays open, and the msg-0x1c01 residue pivots to the fn 0x51cc4
-msg-4 branch decode (offline, t319 S6 note: does msg 4 touch the destination
-widget at all) as t321. Leg bytes already in LEGS (pump_entry_56b5c=0x56B5C,
-payload-verified t319). Reuse scripts/r319_relaunch.sh pattern (attempt-1
-short-circuit law; rc=2 never retry); a --shipclick-move flag pair added to
-r299_leg_session.py is the ONLY harness change needed — s.send() passes args
-straight to xdotool (r293_move_session.py:177-184), so the activity pulse is
-s.send(["mousemove", str(x+2), str(y)]) then s.send(["click", ...]) VERBS
-(verify xdotool's mousemove lands in-window via a grab diff BEFORE betting
-the run; if it doesn't, a second s.send click 1 px away is the sanctioned
-substitute — any input that re-sets ds:0x484ac). Fixed laws carried (do NOT re-trip):
-t319 amendment (1)-(4); t318 (1)-(3); t317 (1)-(4); t316 (1)-(4); magic recs
-RAW guest addrs; close_eventwin before clicks; kill by RECORDED PID;
-production :9 (pid 1957) untouched; scratch copies only, never mount game/;
-ONE capture per iteration; sitting check FIRST (playcap newest turn > 1086 =>
-re-run scripts/r1_t85g_sitting.py before anything).
+NEXT t321 OFFLINE DECODE — fn 0x51cc4 (FLEETWND msg entry): WHAT DO msg 4 AND
+msg 0xc ACTUALLY DO, AND IS msg 0x1c01 REACHABLE FROM WITHIN fn 0x51cc4 AT
+ALL? Ordering rationale: t320 ran the mouse-active poster-pass shape to a
+clean negative (run work/r1/t299-leg-20261106-041522 rc=0 attempt-1: 27/27
+poster fires ALL msg 4, zero 0xc — REFUTED-ROUTES t320 amendment (1)-(4)
+binding), and the t320 assignment's own contingency names this pivot: the
+msg-0x1c01 residue goes to the destination-window entry decode BEFORE any
+further capture is spent. The decode decides the t322 fork cheaply: if
+fn 0x51cc4's msg-4/0xc branches NEVER reach the DAT_43508 store road
+(0x1b5dd/0x1b5e6 publish + ring 0x56ad4 code 0x11) and 0x1c01 has no intake
+in this window's handler, the whole broadcast-pump family is CLOSED as a
+non-route for OQ-019 residue and t322 becomes the batmode-family / mouse
+route (t297 S1/S2: [win+0xaf] != 0 routes EVERY click to batcon 0x1b91c)
+capture design; if a branch DOES reach it, t322 = the press-only Button1
+HOLD capture (xsend.c clickhold/clickrelease verbs, release ALWAYS before
+the run tail; premise: DOSBox int 16h AH=2 reports a parked synthetic
+ButtonPress as held — verify with a 2-minute probe leg on ds:0x484ac BEFORE
+betting a session). Work verbatim from work/t91_code_disasm.txt (fn 0x51cc4
+region; t317 decoded its msg-8 bookkeeping sibling — reuse docs/re/_wip_t317.md
+S4 notes), bank to docs/re/_wip_t321.md as you go, cite every address.
+Fixed laws carried (do NOT re-trip): t320 amendment (1)-(4); t319 (1)-(4);
+t318 (1)-(3); t317 (1)-(4); ds:0x484ac is the BIOS BUTTON-HELD word (int 16h
+AH=2 poll fn 0x2a5f0 — -1 @0x2a629 iff AL&1|AL&2, else 0 @0x2a635); xdotool
+absent, SDL rejects synthetic MotionNotify; poster block is click-traffic-
+driven (27/18 min) not rare; saves are blind to 484ac/24da4; magic recs RAW
+guest addrs; production :9 (pid 1957) untouched; scratch copies only, never
+mount game/; sitting check FIRST (playcap newest turn > 1086 => re-run
+scripts/r1_t85g_sitting.py before anything).
+
+## LANDED t320 (2026-11-06, session 29) — THE MOUSE-ACTIVE POSTER-PASS RUN:
+## 27/27 POSTER FIRES, ALL MSG 4. THE CLICK-PULSE LEVER IS DEAD; ds:0x484ac
+## IS THE BIOS BUTTON-HELD WORD, NOT A GENERIC MOUSE-ACTIVE FLAG.
+LIVE capture run work/r1/t299-leg-20261106-041522 rc=0 attempt-1 (loop
+short-circuited; legs {pump_entry_56b5c} ONLY + proven --shipclick 4 + NEW
+--pulse-clicks 30 + standard tail; scripts/r320_relaunch.sh NEW;
+r299_leg_session.py +--pulse-clicks, pulse sent only in quiet census
+iterations, never mid bank cascade). Measurements (full: docs/re/_wip_t320.md
+S8-S11 + ships.md S46 + REFUTED-ROUTES t320 amendment binding):
+pty-whole-log-census pump=27; EVERY banked stop edx=0x4 (msg 4),
+esi=eax=0x2bc35c, edi=0xffffffff, ret0 file 0x54aca = POSTER 0x54ac5,
+esp_p8=0; caller histogram 27/27 POSTER; 0x1c01/0x1c02 absent all stops; DAT
+oracles unmoved. Baseline windows banked 0 (idle conjunction law holds) —
+but under click traffic the poster block ran 27x in 18 min vs 1x in 28 min
+(t319): the t319 "rare" reading is CORRECTED to click-traffic-driven, and
+484dc=-1 PERSISTS after traffic (control_nextturn windows fired 3x pulse-
+free). Save census: 19/20 gate-zero, 1/20 froze the entry conjunction
+(484d0=1, 484dc=-1) — save axis corroborates; saves stay blind to
+484ac/24da4. STATIC (t91_code_disasm 24853-24866 verbatim): fn 0x2a5f0 =
+BIOS int 16h AH=2 poll; 484ac=-1 iff left/right button HELD at poll, else 0
+next pass — so msg 0xc needs a HELD button across the poster pass; 50-ms
+pulses (cadence eaten to ~20 s by bank cascades) cannot cover it. Host laws
+re-confirmed: xdotool ABSENT; SDL2 rejects synthetic MotionNotify (xsend.c
+header) — motion-shaped levers dead here. NO LEDGER ROW CLOSED strict-close
+(no msg-0xc stop, no live store witnessed) — t321 offline fn 0x51cc4 msg-4/
+0xc branch decode designed above. Sitting check negative (no play past
+t1086); production :9 (pid 1957) untouched; gate 0, audits OK.
 
 ## LANDED t319 (2026-11-06, session 28) — THE POSTER ROAD FIRED LIVE: CALL
 ## SITE 0x54ac5, MSG 4. THE THREE-WAY QUESTION RESOLVED (GATE-NEVER-EQUAL)

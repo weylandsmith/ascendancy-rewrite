@@ -465,6 +465,24 @@ offline ds:0x484ac census over the run's own save dir (r319_gate_read now
 prints it) + fn 0x51cc4 msg-4 branch decode; only if the census shows input
 traffic CAN hold 484ac!=0 at poster time does the mouse-active-poster-pass
 capture shape earn its keep.
+t320 note (LIVE run work/r1/t299-leg-20261106-041522 rc=0 attempt-1;
+docs/re/_wip_t320.md S0-S11 + ships.md S46 + REFUTED-ROUTES t320 amendment
+binding; scripts/r320_relaunch.sh NEW; r299_leg_session.py +--pulse-clicks):
+THE MOUSE-ACTIVE POSTER-PASS RUN FIRED THE POSTER 27x — ALL MSG 4, ZERO MSG
+0xc. pty-whole-log-census pump=27 (caller histogram 27/27 POSTER 0x54ac5,
+every stop edx=0x4 edi=0xffffffff esp_p8=0); baseline windows 0 (idle law);
+28 pulse clicks logged inside armed windows; 1/20 run saves froze the entry
+conjunction (484d0=1, 484dc=-1) — save axis corroborates the traffic law,
+saves remain BLIND to 484ac/24da4 (19/20 all-zero). ds:0x484ac RECLASSIFIED
+(static, t91_code_disasm 24853-24866 verbatim): BIOS int 16h AH=2 BUTTON-HELD
+word — -1 iff left/right held AT POLL, cleared by the next ms-scale poll; a
+50-ms pulse press cannot cover the ~20 s poster period. xdotool absent + SDL
+rejects synthetic motion: motion levers dead here. Row STAYS OPEN (strict-
+close: no msg-0xc stop, no live 0x1c01/DAT_43508 store). NEXT t321 = the
+press-only Button1 HOLD shape (xsend.c clickhold/clickrelease, release
+ALWAYS before tail) IF the loop still wants the 0xc road; else the fn 0x51cc4
+msg-4 branch decode (offline, t319 S6) — the msg-4 poster has now been shown
+twice to move no oracle.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

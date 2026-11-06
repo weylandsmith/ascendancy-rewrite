@@ -378,6 +378,8 @@ class Sess(R298.Sess):
                                  # legs on every resume; keeping them armed
                                  # floods stops and starves the click battery)
         self.census = False      # t303: main() sets True in census mode —
+        self.pulse_clicks = 0    # t320: extra Button1 pulses per armed window
+        self.pulse_xy = None     # t320: set per-window by census_click
                                  # re-arm ALL legs per stop (every msg id is
                                  # data) and run choreography LEG-FREE
 
@@ -946,6 +948,14 @@ ASCEND.EXE
         counts EVERY fire regardless. Storm cap 6."""
         t_end = time.time() + seconds
         recs = []
+        # t320 pulse train: keep ds:0x484ac (mouse-active word) re-set through
+        # the poster pass. Sent ONLY in quiet iterations (never mid bank_stop
+        # cascade), and NOT in baseline windows (x is None there). xsend has
+        # NO motion verb and SDL rejects synthetic MotionNotify (xsend.c
+        # header law) — a real Button click is the sanctioned activator.
+        px = getattr(self, "pulse_xy", None)
+        n_left = getattr(self, "pulse_clicks", 0) if px is not None else 0
+        t_pulse = time.time() + 1.5
         while time.time() < t_end and len(recs) < 6:
             txt = self.pty_new()
             if txt and self.leg_pats and any(p.search(txt)
@@ -953,6 +963,13 @@ ASCEND.EXE
                 time.sleep(1.5)
                 self.pty_new()          # settle the code view (t302 form)
                 recs.append(self.bank_stop(f"{tag}#{len(recs)}"))
+                continue
+            if px is not None and n_left and time.time() >= t_pulse:
+                self.pulse_count = getattr(self, "pulse_count", 0) + 1
+                self.log(f"PULSE {tag}#{self.pulse_count} at {px}")
+                self.send(["click", str(int(px[0])), str(int(px[1]))])
+                n_left -= 1
+                t_pulse = time.time() + 1.5
                 continue
             time.sleep(1.0)
         self.log(f"CENSUS-WINDOW {tag}: {len(recs)} stops banked "
@@ -972,6 +989,10 @@ ASCEND.EXE
                 self.log(f"CENSUS {tag}: close_eventwin failed — click "
                          f"skipped (modal law)")
                 return None
+        # t320: pulse train is per-window — armed ONLY around a real click
+        # window (baseline windows must measure the unperturbed fire rate).
+        self.pulse_xy = ((x, y) if x is not None
+                         and getattr(self, "pulse_clicks", 0) else None)
         if not self.assert_on_map(f"pre_{tag}"):
             return None
         if not self.arm_census(self.legs):
@@ -1043,6 +1064,10 @@ def main():
                                                           # window (msg-0x1c01
                                                           # sender 0x35696)
     ap.add_argument("--shipclick", type=int, default=0)   # t317 N gutter clicks
+    ap.add_argument("--pulse-clicks", type=int, default=0)  # t320: N extra
+    # Button1 pulses at the click coord INSIDE each armed window (keeps
+    # ds:0x484ac mouse-active through the poster pass; xsend has no motion
+    # verb and SDL rejects synthetic motion — click is the activator)
                                                           #    at x=620 inside
                                                           #    STATSHIPLST rect
                                                           #    (emit road, fn
@@ -1086,6 +1111,7 @@ def main():
 
     s = Sess(args)
     s.legs = legs   # resume_and_rearm re-arms exactly this set
+    s.pulse_clicks = args.pulse_clicks   # t320 (consumed in census_window)
     s.log(f"t299 leg-witness session start out={s.out} legs={legs}")
     s.launch()
     rc = 1

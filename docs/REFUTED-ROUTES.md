@@ -834,3 +834,24 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ## runs iff ds:0x484dc==-1 AND ds:0x484d0!=0 AND [core+0x24da8]==-1; the -1
 ## is set by mouse-state recorder fn 0x2a7a4 (0x2a7a8-0x2a7bb: arg2 !=
 ## ds:0x484d0 -> store arg2, set 484dc=-1). Fired ONCE in 28 min.
+
+## t320 AMENDMENT (binding): (1) "A CLICK PULSE TRAIN MAKES THE POSTER PASS
+## FIRE MSG 0xc" IS DEAD: run work/r1/t299-leg-20261106-041522 (rc=0
+## attempt-1, legs {pump_entry_56b5c}, --shipclick 4 + --pulse-clicks 30) —
+## 27/27 banked poster stops edx=0x4 (msg 4), zero msg 0xc, despite pulses
+## logged inside the armed windows seconds before stops. DO NOT re-run any
+## short-press click-train shape betting on the 24da4 gate. (2) ds:0x484ac IS
+## THE BIOS BUTTON-HELD WORD (fn 0x2a5f0 = int 16h AH=2 poll; -1 @0x2a629 iff
+## AL&1 or AL&2, else store 0 @0x2a635 — t91_code_disasm 24853-24866
+## verbatim): the word is set ONLY while a button is physically held at poll
+## time, and ms-scale polls clear it seconds after a 50-ms press. t319's
+## "mouse-active flag" reading survives only as HELD-button. (3) THE POSTER
+## BLOCK IS CLICK-TRAFFIC-DRIVEN, NOT RARE (corrects t319 S4.2 scope): 27
+## fires in 18 min under traffic vs 1 in 28 min idle-ish; baseline windows
+## still bank 0 (idle conjunction law holds); control_nextturn windows fired
+## 3x with no pulses (484dc=-1 persists after traffic). (4) THE NEXT (t321)
+## SHAPE IF PURSUED: press-only Button1 HOLD across the armed window (xsend.c
+## press_only machinery; add clickhold/clickrelease, ALWAYS release before
+## the run tail) — premise: DOSBox int16 AH=2 reports a parked synthetic
+## ButtonPress as held. xdotool absent + SDL rejects synthetic MotionNotify:
+## motion-shaped levers are dead on this host, full stop.

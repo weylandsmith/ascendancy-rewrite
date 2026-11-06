@@ -2146,3 +2146,25 @@ scripts/r317_gate_probe.py; full detail docs/re/_wip_t317.md S0-S8).
 ## NO 0x1c01 anywhere: the msg-4 poster is NOT the destination road; OQ-019
 ## residue stays open (strict-close). NEXT t320 (offline): writer census of
 ## core+0x24da4 + ds:0x484a4; what msg 4 does in FLEETWND fn 0x51cc4.
+
+## S46 t320 (2026-11-06) — THE MOUSE-ACTIVE POSTER-PASS RUN: 27/27 POSTER
+## FIRES, ALL MSG 4 — THE CLICK-PULSE LEVER IS DEAD; ds:0x484ac RECLASSIFIED
+## AS THE BIOS BUTTON-HELD WORD (run work/r1/t299-leg-20261106-041522 rc=0
+## attempt-1, legs {pump_entry_56b5c} + --shipclick 4 + NEW --pulse-clicks 30
+## + standard tail). pty-whole-log-census pump=27 (t319: 1 in 28 min — click
+## traffic DRIVES the poster block; baseline windows 0, idle law holds; 1/20
+## run saves froze the entry conjunction d0=1/dc=-1 verbatim). EVERY banked
+## stop edx=0x4, esi=eax=0x2bc35c, edi=0xffffffff, ret0 file 0x54aca = POSTER
+## 0x54ac5, esp_p8=0; 0x1c01/0x1c02 absent all stops; DAT oracles unmoved.
+## STATIC RE-READ (t91_code_disasm 24853-24866): fn 0x2a5f0 = BIOS int 16h
+## AH=2 mouse poll — 484ac=-1 @0x2a629 iff (AL&1)||(AL&2) (LEFT/RIGHT HELD at
+## poll), else store (AL&1)=0 @0x2a635; so 484ac is the raw BUTTON-HELD state,
+## cleared by the next ms-scale poll. A 50-ms pulse press every ~20 s (bank
+## cascades eat the 1.5 s cadence) CANNOT cover the poster pass: DEAD SHAPE.
+## xdotool absent + SDL rejects synthetic MotionNotify (xsend.c header law):
+## the mousemove lever is dead on this host. t321 LEVER (deterministic if the
+## premise holds): press-only Button1 verb in xsend.c (press_only machinery
+## exists for keys) — HOLD the button across the armed window so every int16
+## poll sees AL&1, 24da4=-1 persists, poster cmp 0x54a88 EQUAL -> msg 0xc;
+## MUST pair a release before the run tail. NO LEDGER ROW CLOSED (strict-
+## close: no live 0x1c01/DAT_43508 store, no msg-0xc stop).
