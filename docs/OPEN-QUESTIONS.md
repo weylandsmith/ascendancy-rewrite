@@ -483,6 +483,26 @@ press-only Button1 HOLD shape (xsend.c clickhold/clickrelease, release
 ALWAYS before tail) IF the loop still wants the 0xc road; else the fn 0x51cc4
 msg-4 branch decode (offline, t319 S6) — the msg-4 poster has now been shown
 twice to move no oracle.
+t321 note (OFFLINE decode, zero capture; docs/re/_wip_t321.md S0-S7 +
+ships.md S47 + REFUTED-ROUTES t321 amendment binding): fn 0x51cc4 FULLY
+DECODED — msg 4 AND msg 0xc have NO dedicated branch (fall through 0x51d00
+-> tail-call fn 0x336b4), and fn 0x336b4's complete tree stores NOTHING to
+ds:0x43508/0x43504 (msg 4 -> rect-gated ring-post or registry forward fn
+0x56ca4; msg 0xc -> rect-gated ring post code 5 only). The 0x1c01 handler
+0x51f3b -> 0x52059 state table (RAM instance {0x51fb5 x3, 0x51ff6, 0x52037},
+t313) is the window's ONLY store road. msg-0x50 sender census re-closed
+image-wide (3 mov edx,0x50 sites all non-msg). DECISIVE HARNESS FACT: the
+batcon-family stores 0x1b5e6/0x1baa7 (fn 0x1aef8/fn 0x1b91c, t296 chain)
+were NEVER ARMED as legs in any capture t307..t320 — every writer-zero
+negative covered the OTHER eight sites only. Row STAYS OPEN (strict-close:
+offline decode + re-verification, no live store witnessed this iteration).
+NEXT t322 = batcon two-click capture, legs {batmode_dead 0x1aef8,
+fn1b91c_entry 0x1b91c, w43508_1b5e6 NEW, w43508_1baa7 NEW} + btn_hdlr
+control + Icarus-view battery, recorder-first reads of [win+0xaf]/[+0xb3]/
+[+0xb7]; decision tree _wip_t321 S7 (a: 1aef8 fires -> script choreography
+from live state; b: 1aef8 silent with btn_hdlr alive -> blocker = BatModeWnd
+window composition/activation, offline STATE-bytes probe). Button1 HOLD for
+the pump is DEAD per REFUTED t321(1).
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

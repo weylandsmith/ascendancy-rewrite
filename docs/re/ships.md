@@ -2168,3 +2168,53 @@ scripts/r317_gate_probe.py; full detail docs/re/_wip_t317.md S0-S8).
 ## poll sees AL&1, 24da4=-1 persists, poster cmp 0x54a88 EQUAL -> msg 0xc;
 ## MUST pair a release before the run tail. NO LEDGER ROW CLOSED (strict-
 ## close: no live 0x1c01/DAT_43508 store, no msg-0xc stop).
+
+## S47 t321 (2026-11-06) — fn 0x51cc4 FULLY DECODED: msg 4 AND msg 0xc ARE
+## DEFAULT-HANDLED (fn 0x336b4), THE DAT STORE ROAD IS MSG-0x1c01-ONLY IN
+## THIS WINDOW; fn 0x1b91c RE-VERIFIED VERBATIM; THE BATCON WRITER LEGS WERE
+## NEVER ARMED. Offline decode (work/t91_code_disasm.txt; full detail
+## docs/re/_wip_t321.md S0-S7). Key measurements (all verbatim addresses):
+- DISPATCH (0x51cc4 prologue 56 57 55 81 ec bc 01): cmp dx,2 @0x51ce5 (jb
+  0x5206f -> msg1 gate 0x51d29; jbe 0x51f0c -> msg2 sets [win+0xaf]=
+  [[rec]+0x8cd]); cmp dx,0x1c01 @0x51cf5 je 0x51f3b; EVERYTHING ELSE
+  (incl. 4, 0xc) falls through 0x51d00 -> call fn 0x336b4 tail. No msg-4/0xc
+  dedicated branch EXISTS.
+- fn 0x336b4 TREE (0x30f55/0x30de2/0x30f46/0x30dbb/0x30dd2/0x30fa9/0x30f26):
+  msg 4|5 -> 0x30e0e rect hit-test -> ring post OR registry dispatch fn
+  0x56ca4(edx=[win+0x63]); msg 0xc -> 0x30edc rect hit-test -> ring post
+  fn 0x56ad4(code 5, ebx=&[win+0x4f]); ZERO DAT_43508/43504 stores in fn
+  0x336b4. Scope law: the registry forward CAN hand msg 4 to another window
+  (t316 slot-id law) — "no store" is proven for this window + fn 0x336b4,
+  [inferred] beyond; t318 census (msg 4 never reached FLEETWND live) keeps
+  it theoretical.
+- 0x1c01 HANDLER 0x51f3b: fn 0x32fa4 accessor; ecx==5 -> popup leg (fn
+  0x56d1c 0x2b6b + ring 8); ecx!=5 -> 0x52059 u8 [rec+0x58]-1 jump table
+  cs:[0x3d100] (FILE BYTES UNRELOCATED — verified garbage {0x80,
+  0x6650d231,...}; RAM instance {0x51fb5 x3, 0x51ff6, 0x52037} t313 S8
+  stands); state 1-3 -> 0x51fb5 *** mov ds:0x43508,[rec+0x59] @0x51fc2 ***
+  + ring 0x11; state 4 -> 0x51ff6 *** mov ds:0x43504 @0x52003 *** + ring
+  0x11; state 5 -> 0x52037 ring code 3, no store.
+- WRITER CENSUS RE-CONFIRMED (literal a3): DAT_43508 {0x1b5e6, 0x1baa7,
+  0x51a8e, 0x51fc2, 0x55bbd} + 89 15 variant 0x55bcc; DAT_43504 {0x28ec2,
+  0x28ef6, 0x36b01, 0x52003, 0x55d35}. fn 0x1b91c (batcon click, callers
+  0x1b0cc/0x1b1de BOTH inside fn 0x1aef8 = BatModeWnd slot 2, class table
+  0x88498) re-verified byte-for-byte against t296 S5: kind-2 arm gate
+  ([ship+0x54]sar16==ds:0x7458e current viewer, [ship+0x88]>0) -> [win+
+  0xb7]=2; kind-1 + stored-equal + mode ch==0 -> 0x1baa7 publish + ring 0x11.
+- msg-0x50 SENDER HUNT (fresh, closes a loose end): whole-image `mov edx,
+  0x50` census = 3 sites, ALL false positives (0x1519d `sub edx,eax`
+  immediately after; 0x3a9e7, 0x71af3 not msg-call sites; none precedes a
+  call [reg+8]/ring post). The ONLY msg-0x50 consumer is fn 0x1aef8's own
+  cmp @0x1b7cd; sole branch into the publish block [0x1b5ba,0x1b600) is
+  jbe 0x1b7d7. t296's "no widget-side poster outside the batmode family"
+  RE-CONFIRMED image-wide.
+- HARNESS BLIND-SPOT (decisive for t322): scripts/r299_leg_session.py arms
+  w43504_{28ec2,28ef6,36b01,52003,55d35}+w43508_{51a8e,51fc2,55bbd} — the
+  batcon-family stores 0x1b5e6/0x1baa7 were NEVER ARMED in ANY capture
+  t307..t320 (grep: zero hits in scripts/, logs only discuss them offline).
+  t307 live-validated the instrument catches census stores. t322 = batcon
+  two-click capture, legs {batmode_dead 0x1aef8, fn1b91c_entry,
+  w43508_1b5e6, w43508_1baa7} + btn_hdlr control + Icarus-view battery,
+  recorder-first state-byte reads; decision tree in _wip_t321 S7. The
+  Button1-HOLD-for-pump branch is DEAD (S1/S2: pump msgs cannot reach the
+  store road from FLEETWND at all).

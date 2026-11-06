@@ -855,3 +855,32 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ## the run tail) — premise: DOSBox int16 AH=2 reports a parked synthetic
 ## ButtonPress as held. xdotool absent + SDL rejects synthetic MotionNotify:
 ## motion-shaped levers are dead on this host, full stop.
+
+## t321 AMENDMENT (binding): (1) THE MSG-4/0xc -> DAT-STORE ROAD FROM
+## FLEETWND DOES NOT EXIST — CLOSED STATICALLY, VERBATIM: fn 0x51cc4 has NO
+## dedicated msg-4 or msg-0xc branch (dispatch cmp dx,2 @0x51ce5 / cmp
+## dx,0x1c01 @0x51cf5; everything else falls through 0x51d00 -> tail-call fn
+## 0x336b4), and fn 0x336b4's full tree (0x30f55/0x30de2/0x30f46/0x30dbb/
+## 0x30dd2/0x30fa9/0x30f26) contains ZERO stores to ds:0x43508/0x43504 — msg
+## 4 goes rect-gated ring-post-or-registry-forward, msg 0xc goes rect-gated
+## ring post code 5 ONLY. DO NOT bet any further capture (incl. the t320(4)
+## Button1-HOLD shape) on poster msg 4/0xc reaching the destination store:
+## HOLD is now dead for OQ-019 regardless of whether it flips the poster
+## gate. (2) MSG-0x50 HAS NO SENDER OUTSIDE fn 0x1aef8 (BatModeWnd): whole-
+## image `mov edx,0x50` census = 3 sites (0x1519d nullified by `sub edx,eax`
+## @0x151a2; 0x3a9e7 -> call fn 0x2fb38 103-caller generic; 0x71af3 -> fn
+## 0x782be), none a msg dispatch; sole publish-block entry jbe 0x1b7d7 (cmp
+## dx,0x50 @0x1b7cd). The t296 "destination-entry widget" framing is DEAD as
+## a search target — publication is reachable ONLY via batcon msg-0x1c01
+## legs (0x51fc2/0x52003 window-side) or the batcon click state machine fn
+## 0x1b91c @0x1baa7 / fn 0x1aef8 @0x1b5e6. (3) HARNESS BLIND-SPOT (fix
+## before any writer capture): r299_leg_session.py NEVER armed 0x1b5e6/
+## 0x1baa7 (the LEGS dict lines 224-231 lists ONLY w43504_{28ec2,28ef6,
+## 36b01,52003,55d35} + w43508_{51a8e,51fc2,55bbd}; 0x1b5e6 appears in
+## scripts/ solely as r296_selection_note.py offline documentation, never
+## as a leg). All "DAT writer zero whole-log" negatives t307..t312 are statements
+## about the OTHER eight sites, NOT the batcon click road. (4) t297's "msg-4
+## router 0x1b070 routes EVERY click to batcon 0x1b91c" is INTERNAL to fn
+## 0x1aef8 (callers 0x1b0cc/0x1b1de inside it) — it is NOT a global router;
+## do not cite it as a way for a galaxy click to reach fn 0x1b91c without
+## BatModeWnd first receiving the msg.

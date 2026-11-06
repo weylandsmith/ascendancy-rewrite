@@ -209,34 +209,69 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t321 OFFLINE DECODE — fn 0x51cc4 (FLEETWND msg entry): WHAT DO msg 4 AND
-msg 0xc ACTUALLY DO, AND IS msg 0x1c01 REACHABLE FROM WITHIN fn 0x51cc4 AT
-ALL? Ordering rationale: t320 ran the mouse-active poster-pass shape to a
-clean negative (run work/r1/t299-leg-20261106-041522 rc=0 attempt-1: 27/27
-poster fires ALL msg 4, zero 0xc — REFUTED-ROUTES t320 amendment (1)-(4)
-binding), and the t320 assignment's own contingency names this pivot: the
-msg-0x1c01 residue goes to the destination-window entry decode BEFORE any
-further capture is spent. The decode decides the t322 fork cheaply: if
-fn 0x51cc4's msg-4/0xc branches NEVER reach the DAT_43508 store road
-(0x1b5dd/0x1b5e6 publish + ring 0x56ad4 code 0x11) and 0x1c01 has no intake
-in this window's handler, the whole broadcast-pump family is CLOSED as a
-non-route for OQ-019 residue and t322 becomes the batmode-family / mouse
-route (t297 S1/S2: [win+0xaf] != 0 routes EVERY click to batcon 0x1b91c)
-capture design; if a branch DOES reach it, t322 = the press-only Button1
-HOLD capture (xsend.c clickhold/clickrelease verbs, release ALWAYS before
-the run tail; premise: DOSBox int 16h AH=2 reports a parked synthetic
-ButtonPress as held — verify with a 2-minute probe leg on ds:0x484ac BEFORE
-betting a session). Work verbatim from work/t91_code_disasm.txt (fn 0x51cc4
-region; t317 decoded its msg-8 bookkeeping sibling — reuse docs/re/_wip_t317.md
-S4 notes), bank to docs/re/_wip_t321.md as you go, cite every address.
-Fixed laws carried (do NOT re-trip): t320 amendment (1)-(4); t319 (1)-(4);
-t318 (1)-(3); t317 (1)-(4); ds:0x484ac is the BIOS BUTTON-HELD word (int 16h
-AH=2 poll fn 0x2a5f0 — -1 @0x2a629 iff AL&1|AL&2, else 0 @0x2a635); xdotool
-absent, SDL rejects synthetic MotionNotify; poster block is click-traffic-
-driven (27/18 min) not rare; saves are blind to 484ac/24da4; magic recs RAW
-guest addrs; production :9 (pid 1957) untouched; scratch copies only, never
+NEXT t322 LIVE CAPTURE — BATCON TWO-CLICK ORDER-WITNESS: arm legs
+{batmode_dead 0x1AEF8, fn1b91c_entry 0x1B91C (NEW), w43508_1b5e6 (NEW),
+w43508_1baa7 (NEW)} + btn_hdlr control; battery = Icarus-view clicks
+(sprite 48,151 / planet 439,331 / empty 236,200 — t312 census values) plus
+the t298 corrected picker path (End-Turn ONCE first -> kind-4 slot 8 ->
+colour-class sprite inside client rect x 7..465; close_eventwin between
+clicks). Recorder-first law t318: at EVERY fn 0x1aef8/fn 0x1b91c stop dump
+[win+0xaf]/[win+0xb3]/[win+0xb7] (offsets cited t296 S5) BEFORE scripting
+the next click. Ordering rationale: t321 closed the msg-4/0xc store road
+statically (REFUTED-ROUTES t321 amendment (1)-(4) binding — the poster/
+pump family, incl. the t320(4) Button1-HOLD shape, can NEVER reach
+DAT_43508/43504 from FLEETWND), and proved the decisive blind-spot: the
+batcon-family stores 0x1b5e6/0x1baa7 were never armed in ANY capture
+t307..t320, so the whole "writer zero" negative series never tested the
+mouse road t296 closed statically. Decision tree (_wip_t321 S7): (a)
+fn 0x1aef8 stops>0 -> learn the two-click choreography from live state
+bytes, script it, close the OQ-019 select leg on a witnessed 1baa7/1b5e6
+store (delta-only oracle law t297-A: globals at B+0x82bb0+X); (b) fn
+0x1aef8 stops=0 with btn_hdlr alive -> BatModeWnd is composition-shielded
+at the campaign map: named blocker moves to window activation (offline
+probe: who writes STATE 1 16 / shows BatModeWnd), NO third mouse battery
+before that decode. Fixed laws carried (do NOT re-trip): t321 amendment
+(1)-(4); t320 (1)-(4); t319 (1)-(4); msg-0x50 has no external sender
+(re-closed t321, do not re-hunt); fn 0x1b91c decode VERBATIM stands
+(t296 S5 + t321 S4 double-verified — do not re-derive); t298 picker/rect
+laws; production :9 (pid 1957) untouched; scratch copies only, never
 mount game/; sitting check FIRST (playcap newest turn > 1086 => re-run
 scripts/r1_t85g_sitting.py before anything).
+
+## LANDED t321 (2026-11-06, session 30) — fn 0x51cc4 FULLY DECODED: msg 4
+## AND msg 0xc ARE DEFAULT-HANDLED (fn 0x336b4, ZERO DAT STORES); THE
+## BATCON WRITER LEGS 0x1b5e6/0x1baa7 WERE NEVER ARMED IN ANY CAPTURE.
+Offline decode iteration (zero capture; work/t91_code_disasm.txt verbatim,
+every address cited in docs/re/_wip_t321.md S0-S7 + ships.md S47 +
+REFUTED-ROUTES t321 amendment binding). Key measurements: (1) fn 0x51cc4
+dispatch — cmp dx,2 @0x51ce5 (jb 0x5206f -> msg-1 gate 0x51d29; jbe 0x51f0c
+-> msg-2 sets [win+0xaf]=[[rec]+0x8cd]), cmp dx,0x1c01 @0x51cf5 je 0x51f3b,
+EVERYTHING ELSE (4, 0xc, ...) falls through 0x51d00 -> tail-call fn 0x336b4:
+NO msg-4/0xc branch EXISTS. (2) fn 0x336b4 full tree (0x30f55/0x30de2/
+0x30f46/0x30dbb/0x30dd2/0x30fa9/0x30f26): msg 4|5 -> 0x30e0e rect hit-test
+-> ring post OR registry dispatch fn 0x56ca4(edx=[win+0x63]); msg 0xc ->
+0x30edc rect hit-test -> ring post fn 0x56ad4(code 5, ebx=&[win+0x4f]) ONLY;
+ZERO stores to ds:0x43508/0x43504 anywhere in fn 0x336b4. (3) 0x1c01
+handler 0x51f3b: fn 0x32fa4 accessor; ecx==5 popup leg; ecx!=5 -> 0x52059
+u8 [rec+0x58]-1 jump table cs:[0x3d100] (FILE bytes verified unrelocated
+garbage; RAM instance {0x51fb5 x3, 0x51ff6, 0x52037} t313 S8 stands) ->
+0x51fc2 DAT_43508 / 0x52003 DAT_43504 / 0x52037 code-3 post. (4) WRITER
+CENSUS re-confirmed literal-a3 (5+5) + 0x55bcc 89 15 variant; fn 0x1b91c
+re-verified byte-for-byte vs t296 S5 (kind-2 arm gate [ship+0x54]sar16==
+ds:0x7458e + [ship+0x88]>0; 0x1baa7 publish iff stored-equal + mode ch==0).
+(5) msg-0x50 SENDER HUNT CLOSED image-wide: 3 `mov edx,0x50` sites, all
+non-msg (0x1519d nullified by sub edx,eax @0x151a2; 0x3a9e7 -> fn 0x2fb38
+103-caller generic; 0x71af3 -> fn 0x782be); sole publish-block entry jbe
+0x1b7d7 (cmp dx,0x50 @0x1b7cd) — t296 re-confirmed. (6) HARNESS BLIND-SPOT:
+r299_leg_session.py LEGS dict (lines 224-231) = w43504_{28ec2,28ef6,36b01,
+52003,55d35} + w43508_{51a8e,51fc2,55bbd}; 0x1b5e6/0x1baa7 never armed
+t307..t320 (t306 armed 0x1b71f/0x1ba39 effect-stores, not the DAT sites) —
+the mouse road was NEVER live-tested. (7) t297 law re-read: 0x1b070 router
+is INTERNAL to fn 0x1aef8, not a global router. NO LEDGER ROW CLOSED
+(strict-close: offline decode + re-verification only, no live store
+witnessed). t322 designed in NEXT ACTION above. Sitting check: 200MB tail
+max turn 1086 == t319/t320's (no new play; r1_t85g_sitting.py not run).
+Production :9 (pid 1957) untouched; gate 0, audits OK.
 
 ## LANDED t320 (2026-11-06, session 29) — THE MOUSE-ACTIVE POSTER-PASS RUN:
 ## 27/27 POSTER FIRES, ALL MSG 4. THE CLICK-PULSE LEVER IS DEAD; ds:0x484ac
