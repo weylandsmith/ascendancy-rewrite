@@ -503,6 +503,26 @@ control + Icarus-view battery, recorder-first reads of [win+0xaf]/[+0xb3]/
 from live state; b: 1aef8 silent with btn_hdlr alive -> blocker = BatModeWnd
 window composition/activation, offline STATE-bytes probe). Button1 HOLD for
 the pump is DEAD per REFUTED t321(1).
+t322 note (LIVE capture work/r1/t299-leg-20261106-055549 rc=0 attempt-1;
+docs/re/_wip_t322.md S0-S6 + ships.md S48 + REFUTED-ROUTES t322 amendment
+binding): the batcon click-road legs {batmode_dead 0x1AEF8, fn1b91c_entry
+0x1B91C, w43508_1b5e6, w43508_1baa7} were armed LIVE FOR THE FIRST TIME over
+the full t298-shape battery (pre-turn 1086->1087, fleet open, rowjump, sprite
+48x151, planet 439x331, NEXTTURN). MEASURED decision-tree branch (b): pty
+whole-log {batmode_dead:0, fn1b91c_entry:0, w43508_1b5e6:0, w43508_1baa7:0,
+btn_hdlr:3} — BatModeWnd received ZERO msgs all session while the control
+lived and the instrument verified (census-ctl MATCH=True); sel43510=0 9/9;
+DAT_43508 churn 0x26fe77->0x26f00d writer-less (writer-less law re-observed).
+THE t321(3) BLIND SPOT IS NOW CLOSED AS A BLIND SPOT: the mouse road was
+tested and is dead IN-CAPTURE — BatModeWnd is composition-shielded at the
+campaign/system map (windows.txt line 1178 STATE 1 16 never active in captured
+sessions). Row STAYS OPEN (strict-close: no live store witnessed; the negative
+is the datum). NEXT t323 = OFFLINE activation decode ONLY (zero capture,
+per _wip_t321 S7 decision tree): who writes the window-record STATE field /
+what shows BatModeWnd (fn 0x1d7dc / fn 0x1be10 exit-side candidates, registry
+instance via t313/t316 tools, handler member 0x247978); a capture is justified
+ONLY after the decode names a concrete activator widget/keypress. NO third
+mouse battery.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

@@ -299,6 +299,24 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
         "pump_entry_56b5c": 0x56B5C,
         "p54a47": 0x54A47,
         "p54a88": 0x54A88,
+        # t322 BATCON CLICK-ROAD LEGS — the two DAT_43508 stores that were
+        # NEVER ARMED in ANY capture t307..t321 (REFUTED-ROUTES t321 amendment
+        # (3): the whole "writer zero" negative series never tested the mouse
+        # road). Bytes verified this session vs work/ascend_payload.bin:
+        #   w43508_1b5e6 = a3 08 35 04 00 (mov ds:0x43508,eax) inside fn 0x1aef8
+        #     (BatModeWnd msg handler), the msg-0x50 publish leg (t296 S4).
+        #   w43508_1baa7 = a3 08 35 04 00, same store inside fn 0x1b91c @0x1baa7
+        #     = THE per-ship destination/selection store (t296 S5 / t321 S4:
+        #     kind-1 clip, ch==[win+0xb7]==0, clicked-obj == [win+0xb3] stored).
+        #   fn1b91c_entry = 56 57 55 89 c6 83 b8 af 00 00 00 00 (push esi/edi/
+        #     ebp; mov esi,eax; cmp DWORD [eax+0xaf],0). At the stop eax=esi=
+        #     BatModeWnd record (bank_stop magic-dumps its +0x90..+0xcf grid =
+        #     the recorder-first [win+0xaf]/[+0xb3]/[+0xb7] reads); ecx=1 from
+        #     router 0x1b0cc / 0 from 0x1b1de; edx=clip ptr (bank_stop clip
+        #     block reads kind=u8[[edx]] + obj=u32[[edx]+1]).
+        "w43508_1b5e6": 0x1B5E6,
+        "w43508_1baa7": 0x1BAA7,
+        "fn1b91c_entry": 0x1B91C,
         # t314 FLEETWND MSG-HANDLER ENTRY LEG (docs/re/_wip_t314.md S1; class
         # named FLEETWND t313 S5 via magic rec 0xfe7a90, cp 0x247fa8). Entry of
         # fn 0x51cc4 (vtable slot 2 of FLEETWND) fires for EVERY msg delivered

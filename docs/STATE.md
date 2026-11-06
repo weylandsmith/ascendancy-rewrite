@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-06T02:20
+updated: 2026-11-06T06:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,34 +209,61 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t322 LIVE CAPTURE — BATCON TWO-CLICK ORDER-WITNESS: arm legs
-{batmode_dead 0x1AEF8, fn1b91c_entry 0x1B91C (NEW), w43508_1b5e6 (NEW),
-w43508_1baa7 (NEW)} + btn_hdlr control; battery = Icarus-view clicks
-(sprite 48,151 / planet 439,331 / empty 236,200 — t312 census values) plus
-the t298 corrected picker path (End-Turn ONCE first -> kind-4 slot 8 ->
-colour-class sprite inside client rect x 7..465; close_eventwin between
-clicks). Recorder-first law t318: at EVERY fn 0x1aef8/fn 0x1b91c stop dump
-[win+0xaf]/[win+0xb3]/[win+0xb7] (offsets cited t296 S5) BEFORE scripting
-the next click. Ordering rationale: t321 closed the msg-4/0xc store road
-statically (REFUTED-ROUTES t321 amendment (1)-(4) binding — the poster/
-pump family, incl. the t320(4) Button1-HOLD shape, can NEVER reach
-DAT_43508/43504 from FLEETWND), and proved the decisive blind-spot: the
-batcon-family stores 0x1b5e6/0x1baa7 were never armed in ANY capture
-t307..t320, so the whole "writer zero" negative series never tested the
-mouse road t296 closed statically. Decision tree (_wip_t321 S7): (a)
-fn 0x1aef8 stops>0 -> learn the two-click choreography from live state
-bytes, script it, close the OQ-019 select leg on a witnessed 1baa7/1b5e6
-store (delta-only oracle law t297-A: globals at B+0x82bb0+X); (b) fn
-0x1aef8 stops=0 with btn_hdlr alive -> BatModeWnd is composition-shielded
-at the campaign map: named blocker moves to window activation (offline
-probe: who writes STATE 1 16 / shows BatModeWnd), NO third mouse battery
-before that decode. Fixed laws carried (do NOT re-trip): t321 amendment
-(1)-(4); t320 (1)-(4); t319 (1)-(4); msg-0x50 has no external sender
-(re-closed t321, do not re-hunt); fn 0x1b91c decode VERBATIM stands
-(t296 S5 + t321 S4 double-verified — do not re-derive); t298 picker/rect
-laws; production :9 (pid 1957) untouched; scratch copies only, never
+NEXT t323 OFFLINE ACTIVATION DECODE — WHO SHOWS/ARMS BatModeWnd (zero
+capture). t322 measured decision-tree branch (b) (REFUTED-ROUTES t322
+amendment binding: the mouse road is DEAD IN-CAPTURE, no third mouse battery),
+so the only live OQ-019 select/destination route left runs THROUGH window
+activation. Decode steps (all against work/t91_code_disasm.txt +
+work/ascend_payload.bin, cite verbatim): (1) locate the window-record STATE
+field semantics — windows.txt BatModeWnd STATE 1 16 (line 1178 block); find
+the loader that parses the STATE line (search for the windows.txt field
+literal or the parse chain near the class-table builders) and which record
+offset it lands on (candidates near +0xb1/+0xbc region seen in banked grids,
+t322 stops show +0xac=0xb1 patterns — verify, don't assume); (2) census
+writers of that offset across the image (the activation predicate); (3) read
+fn 0x1d7dc and fn 0x1be10 (unconditional exits of fn 0x1aef8, disasm lines
+7508/7510) — they run after every BatModeWnd msg and are activation-adjacent;
+(4) msg 0x53/0x50 sender re-probe ONLY inside the activation-candidate set
+found in (2). DELIVERABLE: docs/re/_wip_t323.md naming the activation writer
++ the in-game action that triggers it (menu button / key), or an honest
+negative that BatModeWnd activation has no in-session trigger at all — in
+which case OQ-019's select/destination residues get a documented
+UNREACHABLE-BY-CAPTURE disposition (law stays t296/t321 static, cited) and
+the row's remaining OPEN scope narrows to the non-batmode residues. Ordering
+rationale: every capture-bearing alternative is refuted (t319/t320/t321 pump
+road, t322 mouse road); the decode is cheap (~35 probes), needs no guest, and
+its output decides whether ANY future capture can close the select leg.
+Fixed laws carried (do NOT re-trip): t322 amendment (1)-(3); t321 amendment
+(1)-(4); t320 (1)-(4); t319 (1)-(4); msg-0x50 has no external sender (do not
+re-hunt); fn 0x1b91c decode VERBATIM stands (t296 S5 + t321 S4); t298 picker/
+rect laws; production :9 (pid 1957) untouched; scratch copies only, never
 mount game/; sitting check FIRST (playcap newest turn > 1086 => re-run
 scripts/r1_t85g_sitting.py before anything).
+
+## LANDED t322 (2026-11-06, session 31) — BATCON CLICK-ROAD LEGS ARMED LIVE
+## FIRST TIME: BatModeWnd RECEIVES ZERO MSGS IN-VIEW (branch (b)); THE MOUSE
+## ROAD IS DEAD IN-CAPTURE, BLOCKER = WINDOW ACTIVATION.
+LIVE capture run work/r1/t299-leg-20261106-055549 rc=0 attempt-1 (loop
+short-circuited; legs {batmode_dead, fn1b91c_entry NEW, w43508_1b5e6 NEW,
+w43508_1baa7 NEW} + btn_hdlr; scripts/r322_relaunch.sh + scripts/r322_analyze.py
+NEW; r299_leg_session.py LEGS +3, bytes payload-verified; battery = t298-shape:
+pre-turn 1086->1087, fleet open rails=188, rowjump, sprite 48x151, planet
+439x331, NEXTTURN, holds). Measurements (full: docs/re/_wip_t322.md S0-S6 +
+ships.md S48 + REFUTED-ROUTES t322 amendment binding): pty-whole-log-census
+{batmode_dead:0, fn1b91c_entry:0, w43508_1b5e6:0, w43508_1baa7:0, btn_hdlr:3};
+census-ctl MATCH=True; banked btn stops sprite->'PLIND' msg8 / planet->'Cancel'
+msg4 (EVENTWIN popup ate it — harness defect banked S5) / nextturn->'PLSQUARE'
+msg8; sel43510=0 9/9; DAT_43504 'Icarus' constant; DAT_43508 churn
+0x26fe77->0x26f00d writer-less (t298-C law re-observed). DECISION TREE: branch
+(b) — BatModeWnd composition-shielded at campaign/system map (windows.txt line
+1178 STATE 1 16 never active in captured sessions; t306 entry-zero = second
+independent witness). The t321(3) harness blind spot is CLOSED as a blind spot:
+the mouse road was finally tested and is dead. NO LEDGER ROW CLOSED
+(strict-close: no live store witnessed — the negative is the datum). t323
+offline activation decode designed in NEXT ACTION above (zero capture; capture
+ONLY after it names an activator). Sitting check: 200MB tail max turn 1086 ==
+t319/t320/t321's (no new play; r1_t85g_sitting.py not run). Production :9
+(pid 1957) untouched; gate 0, audits OK.
 
 ## LANDED t321 (2026-11-06, session 30) — fn 0x51cc4 FULLY DECODED: msg 4
 ## AND msg 0xc ARE DEFAULT-HANDLED (fn 0x336b4, ZERO DAT STORES); THE

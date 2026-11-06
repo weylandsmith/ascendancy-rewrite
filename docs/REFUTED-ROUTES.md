@@ -884,3 +884,22 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ## 0x1aef8 (callers 0x1b0cc/0x1b1de inside it) — it is NOT a global router;
 ## do not cite it as a way for a galaxy click to reach fn 0x1b91c without
 ## BatModeWnd first receiving the msg.
+
+## t322 AMENDMENT (binding): THE BATCON MOUSE ROAD IS DEAD IN-CAPTURE — DO
+## NOT RUN A THIRD MOUSE BATTERY. The t321(3) blind spot was closed by the
+## first-ever live arming of legs {batmode_dead 0x1AEF8, fn1b91c_entry 0x1B91C,
+## w43508_1b5e6, w43508_1baa7} over the full t298-shape battery (run
+## work/r1/t299-leg-20261106-055549 rc=0, census-ctl MATCH=True, btn_hdlr 3):
+## pty whole-log ZERO at all four batcon legs; BatModeWnd received no msg at
+## all, session-wide (t306 = second independent entry-zero). (1) DEAD: any
+## further capture whose theory is "click the right pixel / in the right order
+## and fn 0x1aef8 wakes" — the window is composition-shielded (windows.txt
+## 1178 STATE 1 16 never active in captured sessions); no click can hit-test
+## into it. (2) The ONLY remaining OQ-019 select/destination route is the
+## OFFLINE activation decode (_wip_t322 S6: who writes the window-record STATE
+## field / fn 0x1d7dc / fn 0x1be10 / registry instance 0x247978 neighbourhood);
+## a capture is justified ONLY after that decode names a concrete activator
+## widget or keypress. (3) Harness defect banked (fix before any future
+## click-window capture): census_click closes popups BEFORE arming, so a
+## popup that opens/persists after the reguard spends the armed window
+## (t322 planet stop banked 'Cancel' instead of the map click).

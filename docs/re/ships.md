@@ -2218,3 +2218,26 @@ scripts/r317_gate_probe.py; full detail docs/re/_wip_t317.md S0-S8).
   recorder-first state-byte reads; decision tree in _wip_t321 S7. The
   Button1-HOLD-for-pump branch is DEAD (S1/S2: pump msgs cannot reach the
   store road from FLEETWND at all).
+
+## S48 t322 (2026-11-06) — BATCON CLICK-ROAD LEGS ARMED LIVE FOR THE FIRST
+TIME: BatModeWnd receives ZERO msgs in-view (branch (b), composition-shielded).
+Run work/r1/t299-leg-20261106-055549 rc=0 attempt-1 (scripts/r322_relaunch.sh,
+analyzer scripts/r322_analyze.py; legs batmode_dead/fn1b91c_entry/
+w43508_1b5e6/w43508_1baa7/btn_hdlr; battery pre-turn 1086->1087 + fleet open
+rails=188 + rowjump + sprite 48x151 + planet 439x331 + NEXTTURN):
+- PTY WHOLE-LOG {batmode_dead:0, fn1b91c_entry:0, w43508_1b5e6:0,
+  w43508_1baa7:0, btn_hdlr:3}; census-ctl MATCH=True. Banked btn stops: sprite
+  -> 'PLIND' msg 8 (t312 law re-observed), planet -> 'Cancel' msg 4 (EVENTWIN
+  popup ate the click — harness defect banked _wip_t322 S5), nextturn ->
+  'PLSQUARE' msg 8.
+- sel43510=0 in 9/9 oracle snapshots; DAT_43504 'Icarus' constant; DAT_43508
+  0x26fe77->0x26f00d across the turn with zero armed-writer fires (writer-less
+  law, t298-C/t311, re-observed — never read as a store).
+- LAW: with the entry leg armed and alive-instrument verified, NO msg reached
+  fn 0x1aef8 the whole session (t306 = second independent zero). The batcon
+  selection/publish stores 0x1b5e6/0x1baa7 are UNREACHABLE from any captured
+  in-view composition — the blocker is window ACTIVATION (windows.txt line
+  1178 BatModeWnd TYPE 4 STATE 1 16), not the click layer and not the code.
+  OQ-019 select/destination residues: mouse route CLOSED as a live route;
+  next move = offline activation decode (_wip_t322 S6), capture ONLY after it
+  names an activator.
