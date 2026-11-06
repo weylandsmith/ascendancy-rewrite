@@ -763,3 +763,26 @@ STATSHIPLST rect (7,46,632,472 per 60.sav; fn 0x33320 guard [w+0xbf]=28 means
 the msg arg must exceed 28 — verify arg semantics in fn 0x33058 before
 picking coordinates), legs {fn 0x56ca4 entry, fn51cc4_entry, w43508_51fc2,
 w43504_52003}. Key-driven shapes stay dead (t314/t315).
+
+## t317 AMENDMENT (binding): (1) "A STATSHIPLST GUTTER/ROW CLICK POSTS MSG
+0xc (or 4/5) INTO fn 0x32664" IS DEAD BY LIVE MEASUREMENT: 4/4 clicks at
+x=620 y{250,120,453,300} (run work/r1/t299-leg-20261106-012002, strip law
+604<X<=632 verified from saves [w+0xb3]=-1 [w+0xbf]=28) arrived at fn 0x56ca4
+AS MSG 8 DISPATCHED ON STATSHIPLST'S OWN REGISTRY ENTRY (edi=edx=0x8,
+eax=0xfe7ac0 NAME='STATSHIPLST', ebx=620/ecx=ebp=Y verbatim; baseline window
+0 stops). fn 0x32664's msg-8 arm -> fn 0x33058 (row bookkeeping; gutter
+sub-branch self-sends 0x193 + clearers fn 0x56730/fn 0x56434). Do NOT design
+another click-shape run expecting the t316 emit chain to fire from fn 0x56ca4.
+(2) THE 0x1c01 DELIVERY NEVER HAPPENED: fn51cc4_entry ZERO whole-log,
+w43508/w43504 ZERO, gate guest 0x600058=0 datum 0 after every window.
+(3) THE msg-0xc/4 INTAKE ROAD IS THE BROADCAST PUMP fn 0x56b5c (slot-2
+dispatch call *[tgt+0xa7+8] @file 0x56c74; posters 0x54aa9/0x54ab2 from the
+click record ds:0x484ec/0x484f0; suppression ds:0xa2024). A run that arms
+s2_56cda but NOT s2_56c74 CANNOT see msg-0xc/4 deliveries — t317's zero is
+an ARMING SCOPE fact for msg 0xc/4, not a measurement of them.
+(4) [w+0x4f] HAS NO BYTE-ADDRESSED WRITER (payload-wide census, disp8+disp32,
+movb/movw/movl imm+reg: sole store movb $0,[r+0x4f] @0x30bdb); the measured
+0x66 is template/record-copy written — do not hunt a setter instruction.
+(5) NEXT LIVE SHAPE (t318): legs {s2_56c74, s2_56cda, fn51cc4_entry,
+w43508_51fc2, w43504_52003} + the proven --shipclick choreography
+(_wip_t317 S8).

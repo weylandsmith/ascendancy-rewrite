@@ -398,6 +398,28 @@ CAPTURE per REFUTED-ROUTES t316 amendment (4): legs {fn 0x56ca4 entry,
 fn51cc4_entry, w43508_51fc2, w43504_52003}; FLEET open + click inside
 STATSHIPLST rect (7,46,632,472; verify fn 0x33058 msg-arg semantics vs the
 [w+0xbf]=28 guard BEFORE picking coordinates); NO rowjump.
+t317 note (LIVE run work/r1/t299-leg-20261106-012002 rc=0 + offline;
+docs/re/_wip_t317.md S0-S8 + ships.md S43 + REFUTED-ROUTES t317 amendment
+binding): THE t316 CHAIN INTAKE IS LIVE-REFUTED. Vendor gutter clicks
+(x=620, strip law 632-[w+0xbf]28 verified, [w+0xb3]=-1) arrive at registry
+dispatcher fn 0x56ca4 AS MSG 8 ON STATSHIPLST'S OWN ENTRY (4/4 clicks,
+edi=edx=0x8, eax=0xfe7ac0 NAME='STATSHIPLST', coords verbatim ebx=620;
+baseline 0) -> fn 0x33058 row bookkeeping (gutter sub-branch 0x33158 =
+self-send 0x193 + row-table clearers fn 0x56730/fn 0x56434, decoded NOT
+dispatchers). WHOLE-LOG fn51cc4_entry ZERO, w43508/w43504 ZERO,
+gate 0x600058=0 datum 0 after every window, oracles unmoved: NO 0x1c01
+delivery happened; the emit road's msg-0xc premise never occurs and
+[w+0x4f]=0x30 is additionally required (0x66; direct-store census CLOSED —
+sole store movb $0,[r+0x4f] @0x30bdb, so 0x66 is copy-written). Row STAYS
+OPEN (strict-close: no live store witnessed). NEW SEED: the msg-0xc/4
+delivery road into fn 0x32664 is the BROADCAST PUMP fn 0x56b5c (per-entry
+slot-2 dispatch call *[tgt+0xa7+8] @file 0x56c74; posters 0x54aa9/0x54ab2
+driven by click record ds:0x484ec/0x484f0; suppression ds:0xa2024) — t317
+armed s2_56cda only, so msg-0xc/4 deliveries were structurally invisible.
+NEXT t318 = ONE live run legs {s2_56c74, s2_56cda, fn51cc4_entry,
+w43508_51fc2, w43504_52003} + the proven --shipclick choreography
+(_wip_t317 S8); a msg-4/0xc stop at s2_56c74 on the STATSHIPLST rec plus
+s2_56cda edi=0x1c01 closes the destination-fire residue.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

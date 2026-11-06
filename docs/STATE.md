@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-06T00:55
+updated: 2026-11-06T02:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,46 +209,70 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t317 LIVE CAPTURE — SHIP-LIST-CLICK -> FLEETWND 0x1c01 WITNESS (ONE
-scratch run, per REFUTED-ROUTES t316 amendment (4), which is the binding
-shape spec). Ordering rationale: t316 made the chain continuous STATICALLY
-(ship-list in-rect msg-0xc click -> fn 0x33320 -> fn 0x56ca4(0x7a35c,
-edx=[w+0x63]=95, msg 0x1c01) -> registry slot95 win = FLEETWND rec ->
-[rec+0xa7+8] = fn 0x51cc4 -> gate 0x600058 -> writer pair DAT_43508/43504),
-and simultaneously PROVED save scans can never witness delivery (registry
-zero 685/685 — runtime-rebuilt). The only remaining evidence is a LIVE leg
-hit; every offline census on these targets is now spent. Design-time reads
-BEFORE arming (offline, cheap): (1) fn 0x33058 body — what msg/arg does the
-click road deliver into fn 0x32664's dispatch (the emit road needs arg >
-[w+0xbf]=28 per guard 0x33342); (2) r299_leg_session.py leg registry — add
-leg fn56ca4_entry=0x56CA4 (entry bytes 56 57 89 c6 89 df — verify against
-payload before shipping) and a click phase 'shipclick' that runs AFTER
-open_fleet reguard (rails=188 + popup-closed, t314 law) and NEVER rowjumps
-(closes FLEET). Legs: fn56ca4_entry (census leg[0]), fn51cc4_entry,
-w43508_51fc2, w43504_52003, btn_hdlr control. Oracle: whole-log census +
-DAT_43504/43508 + sel43510 + mode4226 + the 0x600058 datum read at exit.
-Click coordinates: inside STATSHIPLST rect (7,46,632,472 per 60.sav) —
-pick a point on a visible ship-row arrow/decoration area, NOT the row body
-if fn 0x33058 shows row-body clicks take a different arg road; if the first
-run's census shows btn_hdlr stops only, bank the arg values witnessed and
-iterate coordinates ONCE (run-2 relaunch via r314_relaunch.sh pattern).
-BRANCHES: fn56ca4 fires + fn51cc4_entry fires + writer leg fires -> OQ-019
-destination-fire residue CLOSES with the live witness (update row, law into
-ships.md). fn56ca4 fires but ret0 (registry empty live too) -> registry is
-view-session-gated: t318 = mode4226 population hunt (who registers the view;
-fn 0x57194/0x57130 callers offline). fn56ca4 never fires -> the click road
-arg never passes 0x33342: bank witnessed btn_hdlr args, t318 pivots to the
-WATCHPOINT route on guest 0x600058 (t315-designed, still valid). Fixed laws
-carried (do NOT re-trip): registry save-blind (t316) — no save-scan witness;
-emit owner fn 0x33320 named — no re-hunt; rec+0x41 = slot-id (ctor fn
-0x3264c); LOADSCREEN digit route dead (t315); rowjump CLOSES FLEET (t314);
-FLEETWND gets no keyboard msg (t314); magic recs at RAW guest addrs, P0 only
-for code pointers, data absolutes from patched code bytes (t315/t316);
-class grids stride-6 cp=base-0x88 (t313); close_eventwin before clicks;
-escape ladder never blind; kill by RECORDED PID; production :9 (pid 1957)
-untouched; scratch copies only, never mount game/; ONE capture this
-iteration.
+NEXT t318 LIVE CAPTURE — THE BROADCAST-PUMP LEG s2_56c74 (ONE scratch run,
+per REFUTED-ROUTES t317 amendment (5), the binding shape spec). Ordering
+rationale: t317 PROVED the vendor click reaches fn 0x56ca4 as msg 8 on
+STATSHIPLST's own entry (4/4, edi=0x8, NAME='STATSHIPLST' — ships.md S43),
+live-refuting the t316 emit-chain intake, AND simultaneously discovered that
+the msg-0xc/4 deliveries into fn 0x32664 ride the BROADCAST PUMP fn 0x56b5c
+whose dispatch site is file 0x56c74 (call *[tgt+0xa7+8]) — a leg t317 never
+armed, so msg-0xc/4 traffic this run is UNMEASURED (arming-scope fact, not a
+negative). t318 arms it. Legset: s2_56c74 (FIRST priority — at the stop:
+tgt rec ptr from table entry [e+0x4], msg = [esp+8]; bank the record NAME +
+msg id), s2_56cda (the fn 0x56ca4 call site — edi==0x1c01 would still name
+the whole chain), fn51cc4_entry (FLEETWND msg entry, edx=msg id),
+w43508_51fc2 + w43504_52003 (writer pair), keep btn_hdlr ONLY if the leg
+registry budget is free (positive control). Choreography: reuse the PROVEN
+--shipclick 4 phase VERBATIM (scripts/r299_leg_session.py, run
+t299-leg-20261106-012002 rc=0: FLEET rails=188 reguard, NO rowjump, one
+armed window per click at x=620 y 250/120/453/300, popup reguard, RAW gate
+0x600058 read per window) — msg 8 fired 4/4 attributable; ALSO let the
+standard tail run (rowjump/sprite/planet/NEXTTURN) since the pump posters
+0x54aa9/0x54ab2 fire off the click record ds:0x484ec/0x484f0 — ANY pump msg
+into any window is banked with its target NAME. relaunch loop per
+scripts/r317_relaunch.sh pattern (attempt-1 short-circuit law: rc=0 +
+pty-whole-log-census probe => NO attempt 2). BRANCHES: (a) s2_56c74 stop
+msg 4/0xc on STATSHIPLST rec AND s2_56cda edi=0x1c01 AND fn51cc4_entry
+edx=0x1c01 -> destination-fire residue CLOSES with the live witness (update
+OQ-019 row, law into ships.md S44). (b) s2_56c74 fires on STATSHIPLST but
+no 0x1c01 anywhere -> bank the msg id + args; the in-rect gate 0x32730 or
+the 0x4f road is then the named blocker (S2 road table) — t319 = decode the
+pump-arg X law from banked regs (msg 4 skips the 0x4f test per S2; if msg 4
+still no emit, the X it carries is NOT a click coord — bank and pivot).
+(c) s2_56c74 never fires on any target whole-log -> the pump is turn-gated
+(msgs post only at turn boundary via ds:0x484ec path): t319 arms the SAME
+legs across a NEXTTURN window (control_nextturn pattern). Fixed laws carried
+(do NOT re-trip): t317 amendment (1)-(4) — gutter clicks = msg 8, no
+byte-addressed [w+0x4f] writer, s2_56cda-only runs cannot see msg 0xc/4;
+t316 amendment (registry save-blind; emit owner fn 0x33320 named;
+rec+0x41=slot-id); t315 (LOADSCREEN dead; P0 law); t314 (rowjump CLOSES
+FLEET; FLEETWND gets no keyboard msg); magic recs RAW guest addrs; class
+grids stride-6 cp=base-0x88; close_eventwin before clicks; kill by RECORDED
+PID; production :9 (pid 1957) untouched; scratch copies only, never mount
+game/; ONE capture per iteration.
 
+## LANDED t317 (2026-11-06, session 26) — GUTTER-CLICK LIVE WITNESS:
+## VENDOR CLICKS ARRIVE AS MSG 8 ON STATSHIPLST'S OWN ENTRY; NO 0x1c01 EVER
+## FIRED; THE msg-0xc/4 INTAKE IS THE BROADCAST PUMP fn 0x56b5c (s2_56c74).
+## Adopted the killed session's in-flight capture (run
+## work/r1/t299-leg-20261106-012002 rc=0, SESSION END 01:46:57, 96 stops, 9
+## census windows; --shipclick phase + r317_relaunch.sh + r317_gate_probe.py
+## were its uncommitted work, committed here). docs/re/_wip_t317.md S0-S8 +
+## ships.md S43 + REFUTED-ROUTES t317 amendment binding. Key measurements:
+## 4/4 clicks x=620 (strip 632-28=604 verified saves [w+0xb3]=-1) -> EXACTLY
+## one s2_56cda stop each, edi=edx=0x8, eax=0xfe7ac0 NAME='STATSHIPLST',
+## ebx=620/ecx=ebp=Y verbatim, baseline 0; WHOLE-LOG fn51cc4_entry=0,
+## w43508/w43504=0, btn_hdlr=0; gate 0x600058=0 datum 0 x4; oracles unmoved.
+## t316 chain intake LIVE-REFUTED (msg 8 -> fn 0x33058 bookkeeping; gutter
+## sub-branch = self-send 0x193 + clearers fn 0x56730/fn 0x56434, decoded).
+## fn 0x56b5c pump decoded (mask table obj+0x3068 stride 0x8e, dispatch
+## 0x56c74, suppression ds:0xa2024, posters 0x54aa9/0x54ab2 off click record
+## ds:0x484ec). [w+0x4f] direct-store census CLOSED (sole movb $0 @0x30bdb).
+## NO LEDGER ROW CLOSED strict-close (no live store witnessed). t318 designed
+## in NEXT ACTION above. Sitting check: newest playcap line turn=1086 == t316's
+## newest (50MB tail: 2109 turn-lines all turn 1086; writer alive, no play
+## past t1255 per t316's 1.5GB check) — r1_t85g_sitting.py not run. Production :9
+## (pid 1957) untouched; gate 0, audits OK.
 
 ## LANDED t316 (2026-11-06, session 25) — THE DYNAMIC 0x1c01 EMIT TARGETS
 ## FLEETWND BY SLOT ID: CHAIN CONTINUOUS STATICALLY; REGISTRY PROVEN

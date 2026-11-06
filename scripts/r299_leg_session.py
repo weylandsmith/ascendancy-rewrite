@@ -1014,6 +1014,11 @@ def main():
                                                           # '1'.. in ONE armed
                                                           # window (msg-0x1c01
                                                           # sender 0x35696)
+    ap.add_argument("--shipclick", type=int, default=0)   # t317 N gutter clicks
+                                                          #    at x=620 inside
+                                                          #    STATSHIPLST rect
+                                                          #    (emit road, fn
+                                                          #    0x33320 strip law)
     args = ap.parse_args()
 
     if args.witness and args.legs == ap.get_default("legs"):
@@ -1457,6 +1462,50 @@ def main():
                         s.log("FLEET-KEYS: ARM FAILED — keys not measured")
                     oracles["fleetkeys_after"] = sel_oracle(
                         "fleetkeys_after")
+            # t317 --shipclick PHASE (docs/re/_wip_t317.md S3): fn 0x33320's
+            # strip law (VERBATIM 0x33331..0x33342: emit iff click-X >
+            # [w+0x10]-[w+0xbf] = 632-28) says the 0x1c01 EMIT ROAD fires for a
+            # click in the RIGHT 28-px GUTTER of STATSHIPLST (x in (604,632],
+            # y in [46,472]), msg 4/5 family (msg 0xc needs [w+0x4f]==0x30;
+            # MEASURED 0x66 — scripts/r317_gate_probe.py). Target = [w+0x63]=95
+            # = FLEETWND slot (t316). Witness leg s2_56cda = the dispatch call
+            # site inside fn 0x56ca4: at the stop eax=registry win rec,
+            # esi=cp, edi=MSG — edi==0x1c01 names the whole chain in one reg
+            # set. NO rowjump before this phase (closes FLEET, t314 law).
+            if args.shipclick:
+                if im is None or not s.fleet_open(im):
+                    s.log("SHIPCLICK: FLEET window not open — skipped")
+                else:
+                    # baseline armed window (no click): the s2_56cda background
+                    # fire rate makes the click-window counts attributable.
+                    oracles["shipclick_baseline"] = sel_oracle(
+                        "shipclick_baseline")
+                    census["shipclick_baseline"] = s.census_click(
+                        None, None, "shipclick_baseline", args.window)
+                    ys = [250, 120, 453, 300][:args.shipclick]
+                    for cy in ys:
+                        oracles[f"shipclick{cy}_before"] = sel_oracle(
+                            f"shipclick{cy}_before")
+                        census[f"shipclick{cy}"] = s.census_click(
+                            620, cy, f"shipclick_620x{cy}", args.window)
+                        oracles[f"shipclick{cy}_after"] = sel_oracle(
+                            f"shipclick{cy}_after")
+                        # RAW gate datum (guest 0x600058 indexes the sav Memory
+                        # member DIRECTLY — t316 S2 base law, probe-verified).
+                        gp = s.newest_sav()
+                        gm = s.read_mem(gp) if gp else None
+                        if gm and len(gm) > 0x60005d:
+                            s.probes.append({
+                                "probe": "gate600058", "after": cy,
+                                "gate": gm[0x600058],
+                                "datum59c": gm[0x600059:0x60005d].hex()})
+                        popup_sc = s.grab(f"shipclick{cy}_post")
+                        if popup_sc is not None and s.eventwin_open(popup_sc):
+                            s.close_eventwin()
+                        if popup_sc is not None and not s.fleet_open(popup_sc):
+                            s.log(f"SHIPCLICK: FLEET closed after click y={cy}"
+                                  " — phase stopping (rails reguard)")
+                            break
             if im is not None:
                 if not s.click(200, FLEET_ROWS[0], "rowjump0", wait=3.0):
                     s.log("CENSUS: rowjump failed")

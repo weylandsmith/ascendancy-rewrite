@@ -2071,3 +2071,29 @@ t299-leg-*/save + playcap/save).
 - CORRECTION: t315 S6's `[[obj+0x4226]] = 0x23c7969f` was a mis-parse of the
   cmpl disp32 at 0x33356 (bytes +3..+6); re-measured 0x0. Other t315 S6
   numbers stand.
+
+## S43 t317 (2026-11-06) — THE GUTTER-CLICK LIVE WITNESS: VENDOR CLICKS
+## ARRIVE AS MSG 8 ON STATSHIPLST'S OWN ENTRY; NO 0x1c01 EVER FIRED; THE
+## REAL msg-0xc/4 INTAKE IS THE BROADCAST PUMP fn 0x56b5c (s2_56c74).
+LIVE run work/r1/t299-leg-20261106-012002 (rc=0, 9 census windows, 96 stops;
+scripts/r299_leg_session.py --shipclick 4 phase NEW, scripts/r317_relaunch.sh,
+scripts/r317_gate_probe.py; full detail docs/re/_wip_t317.md S0-S8).
+- MEASURED: 4 clicks at x=620 (gutter; strip law 632-28=604 corroborated by
+  saves: [w+0xb3]=-1, [w+0xbf]=28) each fired EXACTLY ONE s2_56cda stop with
+  edi=edx=0x8, eax=0xfe7ac0 wrec NAME='STATSHIPLST', ebx=0x26c, ecx=ebp=Y
+  verbatim; baseline window 0 stops; fn51cc4_entry/w43508/w43504/btn_hdlr
+  ZERO WHOLE-LOG (pty census). gate 0x600058=0 datum=0 after every window;
+  oracles unmoved. THE t316 CHAIN INTAKE ("in-rect msg-0xc click") IS
+  LIVE-REFUTED: no click posts msg 0xc to STATSHIPLST.
+- STATIC (verbatim): fn 0x32664 msg switch 0x3266f.. (8 -> 0x32720 fn 0x33058
+  row bookkeeping; msg-8 gutter sub-branch 0x33158 self-sends 0x193 then
+  calls row-table CLEARERS fn 0x56730/fn 0x56434 — decoded, NOT dispatchers);
+  fn 0x33058 full road incl. row-half self-sends 0x191/0x192 (0x332ad..).
+- NEW LAW (t318 seed): fn 0x56b5c = BROADCAST msg pump (mode-masked table
+  family obj+0x3068 stride 0x8e; per-entry slot-2 dispatch call *[tgt+0xa7+8]
+  @0x56c74; suppression flags ds:0xa2024; sole msg-0xc/4 posters 0x54aa9/
+  0x54ab2 driven by click record ds:0x484ec/0x484f0). t317 armed s2_56cda
+  only — msg-0xc/4 deliveries were structurally invisible; NEXT = s2_56c74
+  leg run (_wip_t317 S8 shape). [w+0x4f] census CLOSED: single direct store
+  movb $0,[r+0x4f] @0x30bdb (disp8+disp32, all widths) — 0x66 is copy-written;
+  msg 4 never tests it, so t318 is independent of it.
