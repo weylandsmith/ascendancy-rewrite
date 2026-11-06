@@ -1888,3 +1888,43 @@ Full evidence docs/re/_wip_t310.md S1-S5; run t299-leg-20261105-173627 rc=0.
   DAT_43508 churns 0x26fe77<->0x26f00d across autosaves with NO armed writer
   firing (writer-less churn = the t298-C datum re-observed; do not read a
   DAT_43508 delta as a witnessed store).
+
+## S38 t312 (2026-11-05) — ORDER-PLACEMENT WRITER RUN: fn 0x51b68's
+## DESTINATION-WRITER PAIR UNREACHED WHOLE-LOG (branch (b), second honest
+## negative); sprite-pixel click DOES NOT SELECT (sel43510=0 x4 runs); both
+## msg-0x1c01 senders proven never-firing. Full autopsy docs/re/_wip_t312.md.
+- RUN t299-leg-20261105-192246 (rc=0, attempt 1, BREAK lottery won first try;
+  scripts/r312_relaunch.sh NEW, zero script delta otherwise — all five legs
+  already in LEGS). Battery = t298-B order shape the existing census path
+  drives: baseline -> hold -> pre-turn 1086->1087 -> bare-map digit keys 1..9
+  -> fleet rowjump -> sprite 48x151 -> planet 439x331 (separate armed windows)
+  -> NEXTTURN -> hold. WHOLE-LOG {fn51834_entry:0, w43504_52003:0,
+  w43508_51fc2:0, s2_356a5:0, btn_hdlr:4}; census-ctl MATCH=True x7 (entry
+  leg[0] law).
+- THE DECISIVE DATUM: sel43510 = 0 in EVERY oracle snapshot (pre/post turn,
+  digit, sprite before AND after, planet before and after, nextturn) and
+  mode4226 moves 0x1->0x11 only as the map->system VIEW id (t309 law). The
+  t298-B choreography's first step — select ship, mode 0->2 — NEVER HAPPENS:
+  the sprite click at validated (48,151) dispatches msg 0x8 to 'PLIND'
+  (repaint, t305 law) and selects nothing. Measured identically in t305,
+  t306, t311, t312: the sprite-pixel IS NOT A SELECTION TRIGGER in this
+  game's system view (REFUTED-ROUTES t312 amendment).
+- CONSEQUENCE: the two open OQ-019 residues (destination-widget fire +
+  per-ship select) are ONE hole — without selection no order exists, so
+  fn 0x51b68's writers {0x52003 DAT_43504, 0x51fc2 DAT_43508} stay dark and
+  re-arming them against this battery shape is spent. Next route is the
+  CALLER hunt, not another battery: sav class-grid RAM scan for 0x51b68+P0
+  (t310 route — scan the grid slot index FIRST, then infer which table the
+  game consults), or a FLEET-window selection path (keyboard/UI inside the
+  fleet list, not the map pixel).
+- SENDER-SCOPE FREEBIE CLOSED (negative): s2_356a5 (digit-key sender's own
+  call site, 0x35696 gate ASCII 1..9) fired ZERO even though digit keys
+  demonstrably reached a window (btn_hdlr 'NEXTTURNCONT' edx=0x3 stop —
+  reproduced t311 datum). With s2_1616f zero (t311), NEITHER in-image sender
+  of msg 0x1c01 ever fires in ANY session shape tried (t310 battery, t311
+  bare-map keys, t312 order battery).
+- Control/stops verbatim: digit 'NEXTTURNCONT' ret0 0x3177d ecx=0x2 edx=0x3;
+  sprite 'PLIND' ret0 0x3cb8d ecx=0x97 edx=0x8; planet 'Cancel' ret0 0x56c77
+  ecx=0x14b edx=0x4; nextturn 'PLSQUARE' ret0 0x3d391 ecx=0x43 edx=0x8.
+  DAT_43504 'Icarus' constant; DAT_43508 churns 0x26fe77<->0x26f00d with zero
+  armed writers (t298-C re-observed, 3rd time).

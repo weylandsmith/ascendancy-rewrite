@@ -664,3 +664,22 @@ BEFORE every control click; and a NEXTTURN control needs btn_hdlr ARMED).
 ## 0x51fc2} armed (t309 S3.4 inventory). Also banked: DAT_43508 churns
 ## 0x26fe77<->0x26f00d across autosaves with ZERO armed writers firing — a
 ## DAT delta is never a witnessed store (t298-C law re-observed).
+
+## t312 AMENDMENT (binding): (1) "SPRITE-PIXEL CLICK SELECTS THE SHIP" IS DEAD.
+## Run t299-leg-20261105-192246 (rc=0 attempt 1, fn 0x51b68's writer pair
+## {w43504_52003, w43508_51fc2} armed whole-battery, control btn_hdlr x4
+## alive): sel43510 = 0 in EVERY oracle snapshot including sprite_before AND
+## sprite_after at the validated sprite (48,151), and mode4226 0x1->0x11 is
+## the map->system VIEW id (t309 law), not a selection mode. The click
+## dispatches msg 0x8 to 'PLIND' (repaint, t305 law) and selects nothing —
+## identical in t305/t306/t311/t312. The t311 amendment's "writer hunt
+## continues ONLY via the order-placement choreography" is therefore ITSELF
+## now spent: without selection there is no order, so do NOT re-run this
+## battery shape with fn 0x51b68 legs armed again. (2) BOTH in-image msg-
+## 0x1c01 SENDERS ARE MEASURED DEAD: s2_1616f zero (t311) AND s2_356a5 zero
+## (t312) even though digit keys demonstrably reach a window (btn_hdlr
+## 'NEXTTURNCONT'). Do not arm either sender hoping another battery shape
+## fires it. The OQ-019 residue is ONE hole (per-ship select); the next
+## route is the fn 0x51b68 CALLER hunt via the t310 class-grid RAM scan
+## (grid containing 0x51b68+P0: slot index FIRST, then which table the game
+## consults) or a FLEET-window selection path — not another map battery.

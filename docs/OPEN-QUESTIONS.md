@@ -290,6 +290,28 @@ first; all four legs already exist in LEGS, no script delta. fn 0x51b68 is
 table-member-called (t309), the run names its caller from ret_stack. Pre-turn
 gate must yield a kind-4 owner-0 ship (t298 law) or the sprite select is a
 no-op.
+t312 note (run t299-leg-20261105-192246 rc=0 attempt 1, BREAK lottery won
+first try, scripts/r312_relaunch.sh, zero script delta; legset fn51834_entry,
+w43504_52003, w43508_51fc2, s2_356a5, btn_hdlr; battery = t298-B order shape
+pre-turn 1086->1087 -> bare-map keys -> rowjump -> sprite 48x151 -> planet
+439x331 -> NEXTTURN, docs/re/_wip_t312.md + ships.md S38): BRANCH (b)
+MEASURED — SECOND HONEST NEGATIVE. Whole-log {fn51834_entry:0,
+w43504_52003:0, w43508_51fc2:0, s2_356a5:0, btn_hdlr:4}, census MATCH=True
+7/7. DECISIVE: sel43510=0 in EVERY oracle snapshot (sprite_before AND
+sprite_after included) and mode4226 0x1->0x11 is the map->system VIEW id —
+the sprite-pixel click NEVER selects, so the t298-B order never exists and
+fn 0x51b68's writer pair stays structurally dark (REFUTED-ROUTES t312
+amendment binding: sprite-pixel select DEAD; both msg-0x1c01 senders
+s2_1616f+s2_356a5 measured dead — do not re-run any map/key battery shape
+for this row). SENDER QUESTION CLOSED (negative): digit keys reach a window
+(btn_hdlr 'NEXTTURNCONT') yet s2_356a5 zero => the taken keysym path is not
+the 0x1c01 sender. OQ-019 row STAYS OPEN (strict-close): the two residues
+(destination fire + per-ship select) are ONE hole. NEXT t313 = fn 0x51b68
+CALLER hunt OFFLINE on this run's own save/ dir — class-grid RAM scan for
+0x51b68+P0 (t310 route: grid slot index FIRST, then infer which table the
+game consults; file scan is blind, RAM only), and inventory what dispatches
+slot hits for that class; only if the caller names a FLEET-window path does
+a new capture shape earn its keep.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —
