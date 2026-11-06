@@ -1855,3 +1855,36 @@ Full evidence docs/re/_wip_t310.md S1-S5; run t299-leg-20261105-173627 rc=0.
   run. Entry-leg 0x51834 IS the right instrument; the store legs alone cannot
   distinguish 'class never messaged' from 'msg 0x1c01 never sent'.
 
+
+## S37 t311 (2026-11-05) — STATUSWND RECEIVES NO MSG TRAFFIC AT ALL ON THE
+## MAP/KEY BATTERY (entry-leg measured, branch (c)); bare-map key focus =
+## 'NEXTTURNCONT' button class, NOT STATUSWND.
+- INSTRUMENT (new, reusable): LEGS["fn51834_entry"]=0x51834 — ENTRY of the
+  STATUSWND msg handler. A BP at a fn entry fires regardless of caller
+  (class-table slot, direct E8, tail-call), so entry-zero whole-log = the fn
+  was NEVER entered. Put it FIRST in a legset: the census-ctl probe compares
+  RAM vs FILE bytes at leg[0], and a code-entry leg matches (MATCH=True 7/7
+  this run) where a store-imm leg cannot (t310 lesson).
+- RUN t299-leg-20261105-182822 (rc=0, attempt 1): battery = baseline -> hold
+  -> pre-turn 1086->1087 -> close_eventwin + assert_on_map on the BARE MAP ->
+  digit keys 1..9 in one armed 60 s window (post-arm popup reguard) -> fleet
+  rowjump -> sprite 48x151 -> planet 439x331 -> NEXTTURN -> hold. WHOLE-LOG
+  {fn51834_entry:0, w43508_51a8e:0, w51ac9:0, s2_1616f:0, btn_hdlr:4}.
+- THE t310 FOCUS DEFECT IS FIXED AND MEASURED FIXED: bare-map keys now hit
+  btn_hdlr on window name='NEXTTURNCONT' (eax=0xfd6240, edx=0x3, ret0 file
+  0x3177d) instead of the 'Cancel' popup. Datum: the key-focused window on
+  the bare campaign map is a BUTTON-family class — STATUSWND never holds
+  keyboard focus at the map, so the digit-key sender's call [esi+8] can
+  never reach fn 0x51834 from this composition.
+- CONSEQUENCE (REFUTED-ROUTES t311 amendment): "STATUSWND-focus + digit keys
+  sends 0x1c01 to the destination writer" is DEAD as a live trigger. The
+  destination-widget hunt moves to the ORDER-PLACEMENT choreography (t298-B:
+  select ship mode 0->2, click planet clip dl==3 @0x1bad3 relay 0x326 ecx=4)
+  with fn 0x51b68's TWO writer legs armed (0x52003 DAT_43504, 0x51fc2
+  DAT_43508; 0x51ac9 belongs to fn 0x51834 per the t310 span fix — fn 0x51b68
+  is table-member-called, name the caller from ret_stack). t306 refuted the
+  BATMODE legs, not these.
+- Oracle pair law re-confirmed: DAT_43504 'Icarus' constant all run,
+  DAT_43508 churns 0x26fe77<->0x26f00d across autosaves with NO armed writer
+  firing (writer-less churn = the t298-C datum re-observed; do not read a
+  DAT_43508 delta as a witnessed store).

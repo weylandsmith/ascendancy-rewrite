@@ -267,6 +267,29 @@ fire still unwitnessed; per-ship select untouched. NEXT t311 = STATUSWND-
 focused digit keys: close_eventwin to the bare map immediately before the key
 window + ENTRY leg at fn 0x51834 0x51834 (dx=msg id, ret0=dispatch site) —
 witnesses or refutes 0x1c01->STATUSWND in one run.
+t311 note (run t299-leg-20261105-182822 rc=0 attempt 1, ENTRY leg
+fn51834_entry FIRST (census MATCH=True 7/7) + {w43508_51a8e, w51ac9,
+s2_1616f, btn_hdlr}, battery pre-turn 1086->1087 -> close_eventwin +
+assert_on_map BARE MAP -> digit keys 1..9 one armed window (post-arm popup
+reguard) -> sprite -> planet -> NEXTTURN -> hold, docs/re/_wip_t311.md +
+ships.md S37): BRANCH (c) MEASURED — STATUSWND RECEIVES NO MSG TRAFFIC AT ALL
+(entry leg gate-free, fires for any caller; whole-log fn51834_entry:0 with
+btn_hdlr x4 alive). Focus defect FIXED: bare-map keys hit btn_hdlr window
+'NEXTTURNCONT' (edx=0x3, ret0 file 0x3177d), NOT the 'Cancel' popup — the
+key-focused window on the bare map is a button-family class, so the digit-key
+sender's call [esi+8] structurally cannot reach fn 0x51834 from map focus.
+0x1c01-into-STATUSWND REFUTED as a live trigger (REFUTED-ROUTES t311
+amendment binding). OQ-019 row STAYS OPEN (strict-close, honest negative):
+destination-widget fire still unwitnessed; per-ship select untouched. NEXT
+t312 = ORDER-PLACEMENT choreography (t298-B: select ship mode 0->2 -> click
+planet clip dl==3 @0x1bad3 relay 0x326 ecx=4) with the TWO NEVER-ARMED
+destination writers armed — w43508_51fc2 + w43504_52003 (the fn 0x51b68 pair;
+0x51ac9 belongs to fn 0x51834 per t310 span fix) — plus s2_356a5 (the digit
+sender's own call site, closes the t311 sender question) + fn51834_entry
+first; all four legs already exist in LEGS, no script delta. fn 0x51b68 is
+table-member-called (t309), the run names its caller from ret_stack. Pre-turn
+gate must yield a kind-4 owner-0 ship (t298 law) or the sprite select is a
+no-op.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

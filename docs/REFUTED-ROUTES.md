@@ -648,3 +648,19 @@ BEFORE every control click; and a NEXTTURN control needs btn_hdlr ARMED).
 ## through STATUSWND focus + msg 0x1c01 (senders: 0x16168 relay, 0x35696 digit
 ## keys), not through generic map clicks: whole-log zeros at all five writer/
 ## relay legs with btn_hdlr x4 alive (run t299-leg-20261105-173627).
+
+## t311 AMENDMENT (binding): "STATUSWND-FOCUSED DIGIT KEYS SEND 0x1c01 TO THE
+## DESTINATION WRITER" IS DEAD AS A LIVE TRIGGER. Run
+## t299-leg-20261105-182822 (rc=0, ENTRY leg fn51834_entry armed FIRST,
+## control btn_hdlr x4 alive): the fn 0x51834 entry fired ZERO whole-log —
+## the entry BP fires for ANY caller, so STATUSWND received NO msg of ANY id
+## on the bare-map/key/fleet/planet/NEXTTURN battery. Measured focus datum:
+## digit keys on the bare map hit btn_hdlr window 'NEXTTURNCONT' (button-
+## family class, edx=0x3, ret0 file 0x3177d) — the map's key-focused window
+## is NOT STATUSWND, so the digit sender's call [esi+8] structurally cannot
+## reach fn 0x51834 from map focus. Do NOT re-arm fn51834_entry hoping a map
+## battery messages it; the writer hunt continues ONLY via the order-
+## placement choreography with fn 0x51b68's writer legs {0x52003, 0x51ac9,
+## 0x51fc2} armed (t309 S3.4 inventory). Also banked: DAT_43508 churns
+## 0x26fe77<->0x26f00d across autosaves with ZERO armed writers firing — a
+## DAT delta is never a witnessed store (t298-C law re-observed).

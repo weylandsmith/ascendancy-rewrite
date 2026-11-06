@@ -263,13 +263,21 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
         "w51ac9": 0x51AC9,          # DAT_43504=edx star-record addr store,
                                     # bytes 89 15 04 35 04 00 (payload-verified
                                     # t310); gate ds:0x484ec<=0x96 branch
-        "s2_1616f": 0x1616F}        # RELAY site: mov edx,0x1c01 at 0x16168,
+        "s2_1616f": 0x1616F,        # RELAY site: mov edx,0x1c01 at 0x16168,
                                     # call [ebx+0xc] at 0x1616f (bytes verified
                                     # ff 53 0c); eax=ebp=window rec — a stop
                                     # HERE = msg-0x1c01 WAS sent (fn 0x160xx).
                                     # (Relay site #2 = s2_356a5, already in the
                                     # t304 set at its line above — digit-key
                                     # gated 0x30..0x39, NOT in this legset.)
+        # t311 STATUSWND MSG-ENTRY LEG (docs/re/_wip_t311.md S1; class grid
+        # RAM 0x248040 slot 4 named 'STATUSWND' per t310 S5). ENTRY of fn
+        # 0x51834 fires for EVERY msg delivered to the class; dx = msg id,
+        # ret0 = the dispatch site, magic window rec names the window. This
+        # leg separates 'class never messaged' from '0x1c01 never sent' — the
+        # t310 store legs alone could not. Entry bytes verified this session
+        # vs work/ascend_payload.bin: 56 57 55 83 ec 0c 89 c5 66 89 54 24.
+        "fn51834_entry": 0x51834}
 
 EVENTS = []
 hx = lambda v: hex(v) if isinstance(v, int) else None
@@ -1343,6 +1351,45 @@ def main():
                 oracles["preturn_after"] = sel_oracle("preturn_after")
                 s.log(f"PRE-TURN turn {oracles['preturn_before'].get('turn') if oracles['preturn_before'] else '?'}"
                       f" -> {oracles['preturn_after'].get('turn') if oracles['preturn_after'] else '?'}")
+            # t311 --digit-keys PHASE MOVED ABOVE THE FLEET OPEN (the t310
+            # focus defect: t310 pressed keys after the planet window with a
+            # 'Cancel' popup holding focus, so 0x1c01 (if sent) went to a
+            # BUTTON class, not STATUSWND). Bare map = STATUSWND-focus
+            # candidate; the entry leg's win-name names the focused window
+            # verbatim either way. The ONLY in-image senders of msg 0x1c01
+            # are fn-0x160xx (0x16168) and the DIGIT-KEY handler (0x35696,
+            # gate cmp ebx,0x31/0x39 = ASCII '1'..'9').
+            if args.digit_keys:
+                keys = [str(k) for k in range(1, min(9, args.digit_keys) + 1)]
+                if not s.close_eventwin():
+                    s.log("DIGIT-PHASE: close_eventwin failed — skipped")
+                elif not s.assert_on_map("digit_prearm"):
+                    s.log("DIGIT-PHASE: not on bare map — skipped "
+                          "(title guard)")
+                elif s.arm_census(s.legs):
+                    # POST-ARM POPUP REGUARD (t311): a popup that opens
+                    # between close_eventwin and the arm would steal focus
+                    # again mid-window — re-check and bail rather than press
+                    # into the wrong window.
+                    im_pg = s.grab("digit_reguard")
+                    if im_pg is not None and s.eventwin_open(im_pg):
+                        s.log("DIGIT-PHASE: POPUP REGUARD — popup open at "
+                              "arm; RUN resumed, keys NOT pressed")
+                        s.req("EXEC RUN", 20.0)
+                    else:
+                        lines, ok, hdr = s.req("EXEC RUN", 20.0)
+                        s.log(f"DIGIT-PHASE: armed RUN hdr={hdr} keys={keys}")
+                        time.sleep(0.5)
+                        for k in keys:
+                            s.send(["key", k])
+                            time.sleep(1.2)
+                        census["digit_keys"] = s.census_window(
+                            "digit_keys", args.window)
+                        s.disarm_run("digit_keys")
+                        s.persist()
+                else:
+                    s.log("DIGIT-PHASE: ARM FAILED — keys not measured")
+                oracles["digit_after"] = sel_oracle("digit_after")
             im, d = (None, 0) if args.star_click else s.open_fleet()
             if im is None:
                 s.log(f"CENSUS: FLEET would not open (diff {d}) — clicking "
@@ -1385,29 +1432,10 @@ def main():
                 census[kindlbl] = s.census_click(
                     cx, cy, f"{kindlbl}_{cx}x{cy}", args.window)
                 oracles[f"{kindlbl}_after"] = sel_oracle(f"{kindlbl}_after")
-            # t310 --digit-keys PHASE: the ONLY in-image senders of msg 0x1c01
-            # are fn-0x160xx (0x16168) and the DIGIT-KEY handler (0x35696,
-            # gate cmp ebx,0x31/0x39 = ASCII '1'..'9'). If fn 0x51834's slot
-            # receives 0x1c01, the destination writer legs (w43508_51a8e /
-            # w51ac9) fire inside THIS window with ret0 = fn 0x51834's caller.
-            if args.digit_keys:
-                keys = [str(k) for k in range(1, min(9, args.digit_keys) + 1)]
-                if not s.close_eventwin():
-                    s.log("DIGIT-PHASE: close_eventwin failed — skipped")
-                elif s.arm_census(s.legs):
-                    lines, ok, hdr = s.req("EXEC RUN", 20.0)
-                    s.log(f"DIGIT-PHASE: armed RUN hdr={hdr} keys={keys}")
-                    time.sleep(0.5)
-                    for k in keys:
-                        s.send(["key", k])
-                        time.sleep(1.2)
-                    census["digit_keys"] = s.census_window(
-                        "digit_keys", args.window)
-                    s.disarm_run("digit_keys")
-                    s.persist()
-                else:
-                    s.log("DIGIT-PHASE: ARM FAILED — keys not measured")
-                oracles["digit_after"] = sel_oracle("digit_after")
+            # (t311: the t310 digit-keys block that used to sit HERE — after
+            # the fleet/planet windows — MOVED above open_fleet to the bare
+            # map; a second press-block here would overwrite census["digit_keys"]
+            # and re-press into whatever popup the planet click opened.)
             # POSITIVE CONTROL inside the dispatch-site instrument: NEXTTURN's
             # dispatch is windows.txt VERBATIM msg 7 (t302 btn_hdlr witness) —
             # if msg 7 + name NEXTTURN appears at a disp site, the census
