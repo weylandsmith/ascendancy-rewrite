@@ -2005,3 +2005,36 @@ r313_writer_callers.py, r313_handler_chain.py.
   the gate was never evaluated live (msg never arrived). Payload-wide store
   census [r+0x58] (c6/88/89/c7 disp32) = ZERO sites: writers use computed
   offsets, file scan blind (t313 law re-confirmed on a new target).
+
+## S41 t315 (2026-11-05) — THE DIGIT-HANDLER WINDOW IS LOADSCREEN: THE KEY
+## ROUTE TO msg-0x1c01 IS A MENU MECHANISM, DEAD BY CONSTRUCTION FOR IN-GAME
+## SELECT (offline, zero capture; docs/re/_wip_t315.md S0-S6 +
+## scripts/r315_handler_scan.py; run dirs 212402 + 192246 saves).
+- fn containing the digit sender 0x35696 = fn 0x354f8 (prologue `56 57 55 81
+  ec 44 01` unique 2-site shape; sibling 0x1cf23 has ZERO RAM hits). ZERO E8
+  callers (table-dispatched like every window handler).
+- RAM grid scan: fn 0x354f8+P0 EXACTLY 1 hit @0x247db0, grid base 0x247da8
+  stride-6 slot 2, cp = 0x247d20, magic rec 0xfd705c NAME='LOADSCREEN'
+  (3/3 saves both runs; controls fn 0x51834 1-hit @0x248050 5th reproduction,
+  fn 0x51cc4 1-hit @0x248038). Payload pool corroborates: 'loadscr',
+  'LOADLIST', '%02d.sav', '..\\loadwin.cpp'. The dx==0x1c01 receiver INSIDE
+  fn 0x354f8 formats + displays a save-slot pick. Digit keys talk to the
+  load/save screen family — FLEETWND can NEVER receive 0x1c01 from keys
+  (t314's zero EXPLAINED).
+- WHOLE-PAYLOAD 0x1c01 literal census = exactly 5 sites: 0x16169 relay
+  (t311-dead shape), 0x1642c receiver inside fn 0x16420 = 'BatControlWnd'
+  grid slot 3 (named this session), 0x33375 msg-emit builder via fn 0x56ca4,
+  0x35697 LOADSCREEN sender, 0x1756b FALSE POSITIVE (E8 rel32 operand). No
+  in-game-window sender exists.
+- GATE RECORD MEASURED (chain law exact): caller 0x51f3b: eax=[win+0xab] ->
+  fn 0x32fa4 returns [win+0xc7+idx*8] DIRECTLY; gate 0x52059 reads rec[+0x58]
+  (1..5 else ret0); writer arms copy rec[+0x59..5c] to DAT_43508/43504.
+  FLEETWND rec 0xfe7a90 -> win 0xfe7ac0 -> slot0 0x600000: gate byte GUEST
+  0x600058 == 0 and datum 0x600059..c == 0 in 212/212 valid-chain saves
+  (221 more hold [win+0xab]==0 -> accessor error path). WATCHPOINT TARGET =
+  0x600058. CAUTION banked: 0xfe7ac0 is the INSTANCE (name 'fleetwin'), the
+  magic rec is 0xfe7a90 — base mix-ups land on name-string bytes.
+- P0 RE-DERIVATION LAW (new): payload BYTES map to B+off (B=0x1bf4d8 both
+  runs); u32 CODE POINTERS carry P0=B-0x88; runtime data absolutes must be
+  read from patched CODE bytes (DAT_7e582 -> 0x2c0582 verified at B+0x35561),
+  never guessed as P0+off.

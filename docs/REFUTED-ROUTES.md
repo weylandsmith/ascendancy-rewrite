@@ -723,3 +723,22 @@ r313_class_scan.py / r313_name_b.py, not hand walks.
 ## tested battery). (3) DRIVE LAW: the fleet rowjump click (200,93) CLOSES the
 ## FLEET window (rails 188->0 measured) — any FLEET-focus phase runs BEFORE
 ## rowjump and re-asserts fleet_open at arm.
+
+## t315 AMENDMENT (binding): (1) "A DIGIT KEY CAN REACH AN IN-GAME WINDOW'S
+0x1c01 PATH" IS DEAD BY CONSTRUCTION. The handler fn containing the sender
+0x35696 is fn 0x354f8 = class 'LOADSCREEN' (grid base RAM 0x247da8 slot 2, cp
+0x247d20, magic rec 0xfd705c, 3/3 saves, controls 1-hit exact; loadwin.cpp
+strings 'loadscr'/'LOADLIST'/'%02d.sav'). Digit->0x1c01 is the save-slot-pick
+mechanism of the load screen. Do NOT design any further key-driven capture
+shape expecting in-game 0x1c01 traffic. (2) THE 0x1c01 SENDER INVENTORY IS
+CLOSED (whole-payload literal census = 5 sites, one an E8-operand false
+positive): LOADSCREEN sender 0x35697, BatControlWnd receiver-site 0x1642c
+(fn 0x16420 grid slot 3, cp 0x247850), relay 0x16169 (t311-dead), msg-emit
+builder 0x33375 (via fn 0x56ca4). NO in-game-window sender exists — re-sweep
+for senders is spent. (3) WINDOW-BASE LAW: the magic rec (0xfe7a90 FLEETWND)
+is the accessor window; rec+0xab = instance block (0xfe7ac0, 'fleetwin');
+gate chain = [rec+0xab] then [inst+0xc7+idx*8] -> record; FLEETWND gate byte
+= GUEST 0x600058 (const 0, 212/212 valid-chain saves; datum 0x600059..c
+const 0). A stale probe using 0xfe7ac0 as the window reads name-string bytes —
+wrong base. (4) P0 LAW: bytes at B+off, POINTER VALUES at P0=B-0x88; data
+absolutes read from patched code bytes (DAT_7e582=0x2c0582 at B+0x35561).

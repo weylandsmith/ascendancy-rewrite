@@ -354,6 +354,29 @@ blind). Row STAYS OPEN (strict-close — no live store witnessed). NEXT t315
 route, NEW target so not spent) and magic-rec naming; that window is who the
 digit key talks to, and its class decides whether FLEETWND can EVER receive
 0x1c01 from keys.
+t315 note (OFFLINE, zero capture; scripts/r315_handler_scan.py; docs/re/
+_wip_t315.md S0-S6 + ships.md S41 + REFUTED-ROUTES t315 amendment): DIGIT-
+HANDLER WINDOW NAMED — IT IS 'LOADSCREEN' (loadwin.cpp save/load screen). fn
+0x35696 lives in fn 0x354f8 (unique prologue 56 57 55 81 ec 44 01; ZERO E8
+callers); RAM hit exactly 1 @0x247db0, grid 0x247da8 slot 2, cp 0x247d20,
+magic rec 0xfd705c NAME='LOADSCREEN' 3/3 saves both runs (controls 1-hit
+exact, 5th reproduction). The digit->0x1c01 route is a MENU MECHANISM:
+FLEETWND can NEVER receive 0x1c01 from keys (t314 zero explained, not just
+measured). Whole-payload 0x1c01 census CLOSED at 5 sites (LOADSCREEN sender,
+BatControlWnd receiver fn 0x16420 grid slot 3 cp 0x247850, relay 0x16169
+t311-dead, msg-emit builder 0x33375 via fn 0x56ca4, E8-operand false
+positive 0x1756b) — no in-game-window sender exists. GATE CHAIN MEASURED
+EXACT: caller 0x51f3b eax=[rec+0xab] -> fn 0x32fa4 [win+0xc7+idx*8] ->
+record; gate 0x52059 rec[+0x58] in 1..5; writer arms copy rec[+0x59..c] to
+DAT_43508/43504. FLEETWND chain 0xfe7a90 -> inst 0xfe7ac0 -> slot0 rec
+0x600000: GATE BYTE GUEST 0x600058 == 0, datum 0x600059..c == 0, 212/212
+valid-chain saves (221 have [win+0xab]==0 -> accessor error path). Row
+STAYS OPEN (strict-close — no live store witnessed; the gate byte was again
+never evaluated live). NEXT t316 = the state-byte WATCHPOINT route on guest
+0x600058 designed against the msg-emit path fn 0x56ca4 (NEW target), the
+only route left that can witness a writer (key shapes are dead-by-mechanism
+per t315 amendment; FLEET-rect interior click still untried as the intake
+shape, t314 residue (a)).
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —
