@@ -742,3 +742,24 @@ gate chain = [rec+0xab] then [inst+0xc7+idx*8] -> record; FLEETWND gate byte
 const 0). A stale probe using 0xfe7ac0 as the window reads name-string bytes —
 wrong base. (4) P0 LAW: bytes at B+off, POINTER VALUES at P0=B-0x88; data
 absolutes read from patched code bytes (DAT_7e582=0x2c0582 at B+0x35561).
+
+## t316 AMENDMENT (binding): (1) "THE WINDOW REGISTRY CAN BE WITNESSED FROM A
+SAVE" IS DEAD BY MEASUREMENT: [obj(0x7a35c)+0x4226]==0 AND [obj+0x3000]==0 in
+685/685 saves (u32+u16 reads; corpus = all work/r1/t299-leg-*/save/*.sav +
+playcap/save/*.sav), whole-RAM u32 census finds no pointer to the FLEETWND
+magic rec, yet 126 magic recs persist and registration fn 0x5712c (sole
+0x12345678 writer, file 0x57173) is ctor-wired. The registry is rebuilt
+in-session and NOT persisted — do NOT design any further save-scan witness
+against the registry, mode4226, or slot tables; only LIVE legs count.
+(2) THE EMIT OWNER IS NAMED, DO NOT RE-HUNT: fn 0x33320 (0x1c01/0x1c02 pair
+builder, sole E8 caller 0x32778 in STATSHIPLST slot-2 fn 0x32664 in-rect
+msg-0xc branch); target edx=[w+0x63]=95=FLEETWND slot-id (rec+0x41 law, ctor
+fn 0x3264c writes fn 0x5712c's return to rec+0x41). The t315 branch question
+("map/HUD pump vs table excludes FLEETWND") is RESOLVED: STATSHIPLST emits AT
+FLEETWND. (3) t315 S6's mode4226 RAM value 0x23c7969f was a cmpl-disp32
+mis-parse — the true value is 0; do not cite it. (4) NEXT LIVE shape for
+OQ-019 (t317): FLEET open (rails=188 reguard, NO rowjump) + click INSIDE
+STATSHIPLST rect (7,46,632,472 per 60.sav; fn 0x33320 guard [w+0xbf]=28 means
+the msg arg must exceed 28 — verify arg semantics in fn 0x33058 before
+picking coordinates), legs {fn 0x56ca4 entry, fn51cc4_entry, w43508_51fc2,
+w43504_52003}. Key-driven shapes stay dead (t314/t315).

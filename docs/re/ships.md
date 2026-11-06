@@ -2038,3 +2038,36 @@ r313_writer_callers.py, r313_handler_chain.py.
   runs); u32 CODE POINTERS carry P0=B-0x88; runtime data absolutes must be
   read from patched CODE bytes (DAT_7e582 -> 0x2c0582 verified at B+0x35561),
   never guessed as P0+off.
+
+## S42 t316 (2026-11-06) — THE DYNAMIC 0x1c01 EMIT TARGETS FLEETWND BY SLOT
+## ID: CHAIN CONTINUOUS STATICALLY (ship-list click -> registry -> fn 0x51cc4)
+Full evidence docs/re/_wip_t316.md S1-S5; scripts/r316_registry_dump.py +
+r316_registry_probe.py (offline, zero capture; 685-save corpus = all
+t299-leg-*/save + playcap/save).
+- OWNER NAMED: emit-builder fn 0x33320 (span [0x33320,0x33456), prologue
+  56 57 55 83 ec 08; the sole `bb 01 1c 00 00` at 0x33374) has EXACTLY ONE
+  E8 caller: 0x32778 inside STATSHIPLST's slot-2 fn 0x32664 (in-rect msg-0xc
+  branch; t314 run-2 witnessed msg stops in this same fn). Not a map/HUD
+  pump. 0x1c01/0x1c02 are a PAIRED emit (road chosen by global 0x9f100,
+  runtime 0x2e1100, measured 0 -> 0x1c01 road).
+- TARGET LAW (static-cited + corpus 685/685): fn 0x33320 passes edx=
+  [w+0x63]; STATSHIPLST rec 0xfe7b48 [+0x63] == 95 in 685/685 saves;
+  FLEETWND rec 0xfe7a90 [+0x41] == 95 (60.sav). rec+0x41 = registry slot-id
+  PROVEN: ctor fn 0x3264c `mov $0x7a35c,%eax; call fn 0x5712c; mov %eax,
+  0x41(%ebx)` (all four fn 0x5712c callers pass obj 0x7a35c). fn 0x56ca4 win
+  = [obj+edx*12+4] -> FLEETWND magic rec -> call [rec+0xa7+8] = FLEETWND
+  dispatch slot-2 = fn 0x51cc4 -> 0x1c01 path 0x51f3b -> gate 0x600058 ->
+  writer pair DAT_43508/43504. FIRST measurement-based in-game link from a
+  0x1c01 producer to FLEETWND.
+- REGISTRY SAVE-TIME BLINDNESS (honest negative): [obj+0x4226]==0 AND
+  [obj+0x3000]==0 in 685/685 saves (u32 and u16 reads) while 126 magic recs
+  persist; whole-RAM pointer census finds NO u32 pointing at the FLEETWND rec
+  (3 rec-ptr hits total: TOGGRID, 'I'). Registration fn 0x5712c (sole
+  0x12345678 writer 0x57173) runs in-session => registry table is rebuilt
+  post-load / not persisted: SAVE SCANS CAN NEVER WITNESS DELIVERY — third
+  mechanism class after t313 runtime jump table and t314 computed offsets.
+  t317 = LIVE shape (arm fn 0x56ca4 entry + fn51cc4_entry + writer legs,
+  click STATSHIPLST rect 7,46..632,472 with FLEET open, NO rowjump).
+- CORRECTION: t315 S6's `[[obj+0x4226]] = 0x23c7969f` was a mis-parse of the
+  cmpl disp32 at 0x33356 (bytes +3..+6); re-measured 0x0. Other t315 S6
+  numbers stand.

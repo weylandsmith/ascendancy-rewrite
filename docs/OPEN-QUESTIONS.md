@@ -377,6 +377,27 @@ never evaluated live). NEXT t316 = the state-byte WATCHPOINT route on guest
 only route left that can witness a writer (key shapes are dead-by-mechanism
 per t315 amendment; FLEET-rect interior click still untried as the intake
 shape, t314 residue (a)).
+t316 note (OFFLINE, zero capture; scripts/r316_registry_dump.py +
+r316_registry_probe.py; docs/re/_wip_t316.md S1-S5 + ships.md S42 +
+REFUTED-ROUTES t316 amendment binding): THE DYNAMIC 0x1c01 EMIT TARGETS
+FLEETWND BY SLOT ID. Emit-builder = fn 0x33320 (sole `bb 01 1c 00 00`
+0x33374; span [0x33320,0x33456); EXACTLY ONE E8 caller 0x32778 inside
+STATSHIPLST slot-2 fn 0x32664 in-rect msg-0xc branch — NOT a map/HUD pump).
+Road selector global 0x9f100 (runtime 0x2e1100) == 0 measured -> 0x1c01 road
+(else 0x1c02); target edx = [w+0x63] == 95 in 685/685 saves; rec+0x41 =
+registry slot-id PROVEN STATICALLY (ctor fn 0x3264c stores fn 0x5712c's
+return there; FLEETWND rec [+0x41] == 95). Chain continuous end-to-end
+offline: ship-list in-rect click -> fn 0x33320 -> fn 0x56ca4(0x7a35c, edx=95,
+msg) -> [slot95].win = FLEETWND rec -> call [rec+0xa7+8] = fn 0x51cc4 ->
+gate 0x600058 -> writer pair DAT_43508/43504. HONEST NEGATIVE: registry table
+[mode 0x4226]==0 AND [count 0x3000]==0 in 685/685 saves, zero RAM pointers
+to the FLEETWND rec — REGISTRY IS RUNTIME-REBUILT, save scans can never
+witness delivery (third blindness class). Row STAYS OPEN (strict-close: no
+live store witnessed; chain is static-cited only). NEXT t317 = THE LIVE
+CAPTURE per REFUTED-ROUTES t316 amendment (4): legs {fn 0x56ca4 entry,
+fn51cc4_entry, w43508_51fc2, w43504_52003}; FLEET open + click inside
+STATSHIPLST rect (7,46,632,472; verify fn 0x33058 msg-arg semantics vs the
+[w+0xbf]=28 guard BEFORE picking coordinates); NO rowjump.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —
