@@ -2124,3 +2124,25 @@ scripts/r317_gate_probe.py; full detail docs/re/_wip_t317.md S0-S8).
 - HARNESS: bank_stop esp dump widened 8->16 B (esp_p8/esp_p12 banked — the
   pump dispatch carries msg=[esp+8] BEFORE the return push; unexercised this
   run, harmless). scripts/r318_analyze.py NEW (offline hits.json census).
+
+## S45 t319 (2026-11-06) — THE POSTER ROAD FIRED LIVE: CALL SITE 0x54ac5,
+## MSG 4 (NOT 0xc). THE BLOCKER IS THE NAMED EQUALITY [core+0x24da4]==-1.
+## Full detail docs/re/_wip_t319.md S0-S5 (run work/r1/t299-leg-20261106-030727
+## rc=0 attempt-1, legs {pump_entry_56b5c, p54a47, p54a88, s2_56c74, s2_56cda},
+## proven --shipclick 4 + standard tail). pty-whole-log-census: pump_entry 1 |
+## p54a47 0 | p54a88 1 | s2_56c74 1 | s2_56cda 106 (102x msg 0x3b COSMOSWnd,
+## 4x msg 8 STATSHIPLST gutter VERBATIM, 1x msg 0x193 self-send). The banked
+## EV stop (03:19:09, 6 s after gutter click y=453, armed window): edx=0x4
+## MSG-4, esi=eax=0x2bc35c core obj, edi=0xffffffff (=[obj+0x24da8], set at
+## 0x549de), ret0 file 0x54aca = E8 site 0x54ac5 THE POSTER, esp_p8=0 (4th
+## push @0x54aa6). p54a88/s2_56c74 fires were re-arm-gap pty renders (t305
+## census law; render contexts verified verbatim). VERDICT: caller-never and
+## pump-entry-never REFUTED; gate-never-equal CONFIRMED — msg 0xc requires
+## [obj+0x24da4]==-1, measured 0 (scripts/r319_gate_read.py NEW, oracle-law
+## addressing, cross-checks t318 gate_484ec=0x1ff exact); [obj+0x489e]==0
+## already true; ds:0x484a4=0 so the equal road needs -1 too. Block-entry key
+## ds:0x484dc==-1 AND ds:0x484d0!=0 set by mouse-state recorder fn 0x2a7a4
+## (0x2a7a8-0x2a7bb) — happened ONCE in 28 min, right after a gutter click.
+## NO 0x1c01 anywhere: the msg-4 poster is NOT the destination road; OQ-019
+## residue stays open (strict-close). NEXT t320 (offline): writer census of
+## core+0x24da4 + ds:0x484a4; what msg 4 does in FLEETWND fn 0x51cc4.

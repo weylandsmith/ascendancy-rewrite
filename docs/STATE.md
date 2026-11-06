@@ -209,50 +209,72 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t319 LIVE CAPTURE — THE PUMP CALLER/GATE SEPARATION RUN (ONE scratch
-run, per REFUTED-ROUTES t318 amendment (3), the binding shape spec).
-Ordering rationale: t318 measured the pump DISPATCH s2_56c74 COLD whole-log
-(9 armed windows, 540 s) while s2_56cda fired 26x incl. the 4 verbatim
-t317 msg-8 STATSHIPLST gutter-click stops, and fn51cc4_entry was zero a
-2nd time — so the destination-fire residue can no longer be closed by any
-delivery leg; the question is now WHY fn 0x56b5c's poster road never
-delivers: caller-never vs poster-gate-never-equal vs mask-empty. t319's leg
-set separates all three in ONE run because a stop at the fn 0x56b5c ENTRY
-banks ret0 (which of the NINE E8 callers fired — 0x53fa3 d / 0x54976 3 /
-0x54ac5 4-0xc / 0x54b36 5 / 0x5531e f / 0x5548c e / 0x55f82 d / 0x56f0f 2 /
-0x57003 1) plus edx (the msg id) and ebx/ecx (the click record ds:0x484ec/
-0x484f0 when the caller is the poster). Legset (bytes payload-verified
-2026-11-06): pump_entry_56b5c=0x56B5C (56 57 55 83 ec 10 89 c7 66 89 54 24
-08 — ADD to the LEGS registry in scripts/r299_leg_session.py), p54a47=
-0x54A47 (8b 1d f0 84 04 00 — first instruction of the ds:0x484a4-EQUAL
-road), p54a88=0x54A88 (3b be a4 4d 02 00 — the [esi+0x24da4] cmp),
-s2_56c74, s2_56cda. fn51cc4_entry + the writer pair DROP (zero twice,
-strictly downstream of any witnessed site). Choreography: the PROVEN
---shipclick 4 phase VERBATIM + standard tail (same as run
-t299-leg-20261106-021602 rc=0; relaunch loop = scripts/r318_relaunch.sh
-pattern, attempt-1 short-circuit law: rc=0 + pty-whole-log-census probe =>
-NO attempt 2; rc=2 never retry). BRANCHES: (a) pump_entry fires with
-ret0=0x54ac5-family call-site AND p54a88/p54a47 bank edi — decode the gate
-equalities OFFLINE from saves (ds:0x484a4, magic-obj+0x24da4, +0x489e; obj
-= 0x7a35c runtime) and name which equality fails; if BOTH can be made true
-by a click shape, t320 = that shape. (b) pump_entry fires ONLY from
-non-poster callers (0x56f0f msg 2 / 0x57003 msg 1 etc.) and p54a47/p54a88
-never fire — the POSTER BLOCK ITSELF (the fn containing 0x54a3f) is not
-reached on click traffic: decode its entry gates statically (bank first —
-it is one disasm window, no capture). (c) pump_entry NEVER fires whole-log
-despite the periodic msg-0x3b — then s2_56cda's COSMOSWnd 0x3b traffic
-arrives via fn 0x56ca4 ONLY and the pump is dead weight in this build:
-record that law and pivot the OQ-019 residue to the batmode-family mouse
-route (OQ-016-adjacent, OPEN-QUESTIONS t297/t298 lineage: [win+0xaf]
-routes EVERY click to batcon handler 0x1b91c). Fixed laws carried (do NOT
-re-trip): t318 amendment (1)-(3) — pump dispatch cold-for-observed-road,
-poster gate = named blocker, scope law (leg gaps ≠ never); t317 (1)-(4);
-t316 (1)-(4); t315 (LOADSCREEN dead, P0 law); t314 (rowjump CLOSES FLEET);
-magic recs RAW guest addrs; class grids stride-6 cp=base-0x88;
-close_eventwin before clicks; kill by RECORDED PID; production :9 (pid
-1957) untouched; scratch copies only, never mount game/; ONE capture per
-iteration; sitting check FIRST (playcap turn > 1086 => re-run
-scripts/r1_t85g_sitting.py before anything).
+NEXT t320 LIVE CAPTURE — THE MOUSE-ACTIVE POSTER-PASS RUN (ONE scratch run;
+mechanism named by t319, docs/re/_wip_t319.md S5/S5.1 — the save corpus is
+save-blind to the transient flags, so only a leg stop can witness msg 0xc).
+Ordering rationale: t319 resolved the three-way pump question with a banked
+EV stop — the poster call site 0x54ac5 fired LIVE with msg 4 (caller-never
+and pump-entry-never REFUTED; REFUTED-ROUTES t319 amendment binding) — and
+the writer census names the ONE discriminator: [core+0x24da4] is fn 0x54650's
+mouse-active flag (set -1 @0x546a5 iff ds:0x484ac!=0; reset 0 @0x546d0 iff
+484ac==0). msg 0xc fires iff the mouse is ACTIVE in the SAME main-loop pass
+the poster block runs. Every t317-shape click went quiet before the poster
+pass -> msg 4. t320's job: hold mouse activity alive through the poster pass.
+Shape: legs {pump_entry_56b5c} ONLY (the sole leg naming the road; hot-leg
+budget trivial — it fired 1x in 28 min) + the proven --shipclick gutter
+choreography MODIFIED per phase: after each xsend click, IMMEDIATELY xsend a
+small mouse MOVE (or a second click 1 px away) inside the same armed window
+so ds:0x484ac!=0 is re-set seconds before the next fn 0x54650 pass; oracle
+pair per window via scripts/r319_gate_read.py fields (save-blind — banked
+stop is the datum). If NO msg-0xc entry stop after 4 modified clicks: honest
+negative, row stays open, and the msg-0x1c01 residue pivots to the fn 0x51cc4
+msg-4 branch decode (offline, t319 S6 note: does msg 4 touch the destination
+widget at all) as t321. Leg bytes already in LEGS (pump_entry_56b5c=0x56B5C,
+payload-verified t319). Reuse scripts/r319_relaunch.sh pattern (attempt-1
+short-circuit law; rc=2 never retry); a --shipclick-move flag pair added to
+r299_leg_session.py is the ONLY harness change needed — s.send() passes args
+straight to xdotool (r293_move_session.py:177-184), so the activity pulse is
+s.send(["mousemove", str(x+2), str(y)]) then s.send(["click", ...]) VERBS
+(verify xdotool's mousemove lands in-window via a grab diff BEFORE betting
+the run; if it doesn't, a second s.send click 1 px away is the sanctioned
+substitute — any input that re-sets ds:0x484ac). Fixed laws carried (do NOT re-trip):
+t319 amendment (1)-(4); t318 (1)-(3); t317 (1)-(4); t316 (1)-(4); magic recs
+RAW guest addrs; close_eventwin before clicks; kill by RECORDED PID;
+production :9 (pid 1957) untouched; scratch copies only, never mount game/;
+ONE capture per iteration; sitting check FIRST (playcap newest turn > 1086 =>
+re-run scripts/r1_t85g_sitting.py before anything).
+
+## LANDED t319 (2026-11-06, session 28) — THE POSTER ROAD FIRED LIVE: CALL
+## SITE 0x54ac5, MSG 4. THE THREE-WAY QUESTION RESOLVED (GATE-NEVER-EQUAL)
+## AND THE DISCRIMINATOR NAMED: [core+0x24da4] = fn 0x54650's MOUSE-ACTIVE FLAG.
+Run work/r1/t299-leg-20261106-030727 (attempt-1 WON the BREAK lottery,
+SESSION END 03:35:15 rc=0, 108 hits; loop short-circuited per law).
+docs/re/_wip_t319.md S0-S6 + ships.md S45 + REFUTED-ROUTES t319 amendment
+binding; scripts/r319_{relaunch,analyze,gate_read}.py NEW;
+r299_leg_session.py LEGS +3 (pump_entry_56b5c/p54a47/p54a88, bytes
+payload-verified). Key measurements: pty-whole-log-census {pump_entry:1,
+p54a47:0, p54a88:1, s2_56c74:1, s2_56cda:106}; banked EV stop 03:19:09
+tag=post-rearm (6 s after gutter click y=453, inside its armed window):
+edx=0x4 MSG-4, esi=eax=0x2bc35c core obj, edi=0xffffffff (=[core+0x24da8]
+set at 0x549de), ret0 file 0x54aca = E8 site 0x54ac5 THE POSTER, esp_p8=0
+(the msg-4 poster form 0x54ab0 verbatim); p54a88/s2_56c74 counts are
+re-arm-gap pty renders (t305 law, contexts verified verbatim this session).
+s2_56cda: 102x msg 0x3b COSMOSWnd + 4x msg 8 STATSHIPLST gutter (t317
+VERBATIM 3rd reproduction) + 1x msg 0x193 self-send. 0x1c01/0x1c02 literal
+absent every banked stop; DAT_43508/43504 oracles unmoved all phases — the
+msg-4 poster is NOT the destination road. Static: block-entry conjunction
+ds:0x484dc==-1 AND ds:0x484d0!=0 AND [core+0x24da8]==-1 (recorder fn 0x2a7a4
+sets -1 on position change); writer census of [core+0x24da4] = 0x546a5 (set
+-1 iff ds:0x484ac!=0) / 0x546d0 (reset) / 0x54532 / 0x54b10 — msg 0xc needs
+mouse-active SAME pass; ds:0x484a4=0 idle (equal road needs -1 too).
+r319_gate_read.py cross-checks t318 oracle gate_484ec=0x1ff EXACT; save
+census (20 saves) shows all four flags 0 — saves are save-BLIND to transient
+per-pass flags (t260 cadence law), NOT evidence against the mechanism. NO
+LEDGER ROW CLOSED strict-close (no live store witnessed) — t320 mouse-active
+poster-pass run designed in NEXT ACTION above. Sitting check: playcap newest
+turn=1086 unchanged (8GB tail re-checked this session; writer idle) —
+r1_t85g_sitting.py not run. Production :9 (pid 1957) untouched; gate 0,
+audits OK.
 
 ## LANDED t318 (2026-11-06, session 27) — THE BROADCAST-PUMP DISPATCH
 ## 0x56c74 IS COLD LIVE: NO MSG ID OF ANY KIND REACHED FLEETWND (2ND TIME);

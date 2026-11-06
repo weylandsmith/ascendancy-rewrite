@@ -439,6 +439,32 @@ poster gate is the NAMED BLOCKER. Row STAYS OPEN (strict-close: no live
 store witnessed). NEXT t319 = ONE run legs {pump_entry_56b5c 0x56B5C,
 p54a47, p54a88, s2_56c74, s2_56cda} same choreography — separates
 caller-never / gate-never-equal / mask-empty in one shot (_wip_t318 S6).
+t319 note (LIVE run work/r1/t299-leg-20261106-030727 rc=0 attempt-1 +
+offline; docs/re/_wip_t319.md S0-S5 + ships.md S45 + REFUTED-ROUTES t319
+amendment binding; scripts/r319_{relaunch,analyze,gate_read}.py NEW;
+r299_leg_session.py LEGS +3): THE POSTER ROAD FIRED LIVE — THE THREE-WAY
+QUESTION RESOLVED AS GATE-NEVER-EQUAL. Banked EV stop 6 s after gutter click
+y=453: fn 0x56b5c entry, edx=0x4 MSG-4 (NOT 0xc), esi=eax=0x2bc35c core obj,
+edi=0xffffffff (=[core+0x24da8]), ret0 file 0x54aca = E8 call site 0x54ac5
+THE POSTER, esp_p8=0. pty-whole-log-census {pump_entry:1, p54a47:0,
+p54a88:1, s2_56c74:1, s2_56cda:106 (102x msg 0x3b COSMOSWnd, 4x msg 8
+STATSHIPLST gutter VERBATIM 3rd time, 1x msg 0x193 self-send)}; the
+p54a88/s2_56c74 counts are re-arm-gap renders (t305 law; contexts verified
+verbatim). msg 0xc REQUIRES [core+0x24da4]==-1 — measured 0 (r319_gate_read,
+oracle-law addressing, cross-checks t318 gate_484ec=0x1ff exact); equal road
+requires ds:0x484a4==-1 — measured 0. Block-entry key ds:0x484dc==-1 AND
+ds:0x484d0!=0 set by mouse-state recorder fn 0x2a7a4 — ONCE in 28 min. NO
+0x1c01/0x1c02 literal in any of 108 banked stops; DAT oracles unmoved: the
+msg-4 poster is NOT the destination road. Row STAYS OPEN (strict-close: no
+live store witnessed). WRITER CENSUS LANDED SAME ITERATION (static,
+_wip_t319 S5): [core+0x24da4] is fn 0x54650's OWN mouse-active flag — set -1
+@0x546a5 iff ds:0x484ac!=0 (writer fn 0x2a629), reset 0 @0x546d0 iff
+ds:0x484ac==0; so msg 0xc fires iff the mouse is ACTIVE in the SAME main-loop
+pass the poster block runs; the witnessed msg-4 = the quiet pass. NEXT t320 =
+offline ds:0x484ac census over the run's own save dir (r319_gate_read now
+prints it) + fn 0x51cc4 msg-4 branch decode; only if the census shows input
+traffic CAN hold 484ac!=0 at poster time does the mouse-active-poster-pass
+capture shape earn its keep.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

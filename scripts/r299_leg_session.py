@@ -278,6 +278,27 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
         # t310 store legs alone could not. Entry bytes verified this session
         # vs work/ascend_payload.bin: 56 57 55 83 ec 0c 89 c5 66 89 54 24.
         "fn51834_entry": 0x51834,
+        # t319 PUMP CALLER/GATE SEPARATION LEGS (docs/re/_wip_t319.md S1;
+        # REFUTED-ROUTES t318 amendment (3) shape spec). Bytes verified this
+        # session vs work/ascend_payload.bin:
+        #   pump_entry_56b5c = fn 0x56b5c ENTRY (56 57 55 83 ec 10 89 c7 66 89
+        #     54 24 08). At the stop: edx=msg id, esi=core obj (eax=esi only
+        #     past 0x56b63), ret0 = which of the NINE E8 callers fired
+        #     (0x53fa3 d / 0x54976 3 / 0x54ac5 4|0xc / 0x54b36 5 / 0x5531e f /
+        #     0x5548c e / 0x55f82 d / 0x56f0f 2 / 0x57003 1; call site =
+        #     ret0_file_off-5 for E8).
+        #   p54a47 = 8b 1d f0 84 04 00, first insn of the ds:0x484a4-EQUAL road
+        #     (only reached past cmp edi,ds:0x484a4 @0x54a3f jne 0x54a88).
+        #   p54a88 = 3b be a4 4d 02 00, the cmp edi,[esi+0x24da4]. At the stop
+        #     edi=msg id candidate, esi=core obj; equal AND [esi+0x489e]==0 ->
+        #     msg 0xc poster, else msg 4 — both fall into call 0x56b5c @0x54ac5.
+        #     Static NOTE (t91_code_disasm 77184-77215): the only in-function
+        #     entry to 0x54a3f is je@0x549e7 ([esi+0x24da8]==-1) arriving with
+        #     [esi+0x489e]==0, so on THAT path the discriminating datum is
+        #     edi vs [core+0x24da4], not +0x489e.
+        "pump_entry_56b5c": 0x56B5C,
+        "p54a47": 0x54A47,
+        "p54a88": 0x54A88,
         # t314 FLEETWND MSG-HANDLER ENTRY LEG (docs/re/_wip_t314.md S1; class
         # named FLEETWND t313 S5 via magic rec 0xfe7a90, cp 0x247fa8). Entry of
         # fn 0x51cc4 (vtable slot 2 of FLEETWND) fires for EVERY msg delivered

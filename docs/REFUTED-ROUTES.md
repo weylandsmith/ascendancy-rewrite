@@ -814,3 +814,23 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ## while p54a88 fires, the poster-gate equalities are decodable OFFLINE from
 ## saves (ds:0x484a4, [obj+0x24da4], [obj+0x489e] reads) — do not spend a
 ## second capture on the same legs.
+
+## t319 AMENDMENT (binding): (1) THE THREE-WAY PUMP QUESTION IS RESOLVED —
+## DO NOT RE-ARM {pump_entry_56b5c, p54a47, p54a88} TO ASK IT AGAIN: run
+## work/r1/t299-leg-20261106-030727 (rc=0 attempt-1) banked the POSTER CALL
+## SITE LIVE — pump_entry stop edx=0x4 (msg 4), esi=eax=0x2bc35c,
+## edi=0xffffffff, ret0 file 0x54aca = E8 0x54ac5, 6 s after gutter click
+## y=453. caller-never and pump-entry-never are DEAD readings; gate-never-
+## equal CONFIRMED. (2) THE NAMED BLOCKER IS NOW THE EXACT EQUALITY: msg 0xc
+## requires [core+0x24da4]==-1 (measured 0 in every save read via
+## scripts/r319_gate_read.py; edi at the fire = [core+0x24da8] = -1 so the
+## 0x54a88 cmp is unequal -> msg 4 @0x54ab0); the equal road requires
+## ds:0x484a4==-1 (measured 0). [core+0x489e]==0 already true — do NOT spend
+## a capture on +0x489e. (3) THE MSG-4 POSTER HAS NO OBSERVABLE EFFECT:
+## whole-run DAT_43508/43504 oracles unmoved, 0x1c01/0x1c02 literal absent
+## all 108 banked stops — betting another capture on "msg 4 eventually does
+## the destination store" is dead until a writer census says otherwise.
+## (4) BLOCK-ENTRY CONJUNCTION (law, do not re-derive): the poster region
+## runs iff ds:0x484dc==-1 AND ds:0x484d0!=0 AND [core+0x24da8]==-1; the -1
+## is set by mouse-state recorder fn 0x2a7a4 (0x2a7a8-0x2a7bb: arg2 !=
+## ds:0x484d0 -> store arg2, set 484dc=-1). Fired ONCE in 28 min.
