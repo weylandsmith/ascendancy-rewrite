@@ -209,47 +209,77 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t318 LIVE CAPTURE — THE BROADCAST-PUMP LEG s2_56c74 (ONE scratch run,
-per REFUTED-ROUTES t317 amendment (5), the binding shape spec). Ordering
-rationale: t317 PROVED the vendor click reaches fn 0x56ca4 as msg 8 on
-STATSHIPLST's own entry (4/4, edi=0x8, NAME='STATSHIPLST' — ships.md S43),
-live-refuting the t316 emit-chain intake, AND simultaneously discovered that
-the msg-0xc/4 deliveries into fn 0x32664 ride the BROADCAST PUMP fn 0x56b5c
-whose dispatch site is file 0x56c74 (call *[tgt+0xa7+8]) — a leg t317 never
-armed, so msg-0xc/4 traffic this run is UNMEASURED (arming-scope fact, not a
-negative). t318 arms it. Legset: s2_56c74 (FIRST priority — at the stop:
-tgt rec ptr from table entry [e+0x4], msg = [esp+8]; bank the record NAME +
-msg id), s2_56cda (the fn 0x56ca4 call site — edi==0x1c01 would still name
-the whole chain), fn51cc4_entry (FLEETWND msg entry, edx=msg id),
-w43508_51fc2 + w43504_52003 (writer pair), keep btn_hdlr ONLY if the leg
-registry budget is free (positive control). Choreography: reuse the PROVEN
---shipclick 4 phase VERBATIM (scripts/r299_leg_session.py, run
-t299-leg-20261106-012002 rc=0: FLEET rails=188 reguard, NO rowjump, one
-armed window per click at x=620 y 250/120/453/300, popup reguard, RAW gate
-0x600058 read per window) — msg 8 fired 4/4 attributable; ALSO let the
-standard tail run (rowjump/sprite/planet/NEXTTURN) since the pump posters
-0x54aa9/0x54ab2 fire off the click record ds:0x484ec/0x484f0 — ANY pump msg
-into any window is banked with its target NAME. relaunch loop per
-scripts/r317_relaunch.sh pattern (attempt-1 short-circuit law: rc=0 +
-pty-whole-log-census probe => NO attempt 2). BRANCHES: (a) s2_56c74 stop
-msg 4/0xc on STATSHIPLST rec AND s2_56cda edi=0x1c01 AND fn51cc4_entry
-edx=0x1c01 -> destination-fire residue CLOSES with the live witness (update
-OQ-019 row, law into ships.md S44). (b) s2_56c74 fires on STATSHIPLST but
-no 0x1c01 anywhere -> bank the msg id + args; the in-rect gate 0x32730 or
-the 0x4f road is then the named blocker (S2 road table) — t319 = decode the
-pump-arg X law from banked regs (msg 4 skips the 0x4f test per S2; if msg 4
-still no emit, the X it carries is NOT a click coord — bank and pivot).
-(c) s2_56c74 never fires on any target whole-log -> the pump is turn-gated
-(msgs post only at turn boundary via ds:0x484ec path): t319 arms the SAME
-legs across a NEXTTURN window (control_nextturn pattern). Fixed laws carried
-(do NOT re-trip): t317 amendment (1)-(4) — gutter clicks = msg 8, no
-byte-addressed [w+0x4f] writer, s2_56cda-only runs cannot see msg 0xc/4;
-t316 amendment (registry save-blind; emit owner fn 0x33320 named;
-rec+0x41=slot-id); t315 (LOADSCREEN dead; P0 law); t314 (rowjump CLOSES
-FLEET; FLEETWND gets no keyboard msg); magic recs RAW guest addrs; class
-grids stride-6 cp=base-0x88; close_eventwin before clicks; kill by RECORDED
-PID; production :9 (pid 1957) untouched; scratch copies only, never mount
-game/; ONE capture per iteration.
+NEXT t319 LIVE CAPTURE — THE PUMP CALLER/GATE SEPARATION RUN (ONE scratch
+run, per REFUTED-ROUTES t318 amendment (3), the binding shape spec).
+Ordering rationale: t318 measured the pump DISPATCH s2_56c74 COLD whole-log
+(9 armed windows, 540 s) while s2_56cda fired 26x incl. the 4 verbatim
+t317 msg-8 STATSHIPLST gutter-click stops, and fn51cc4_entry was zero a
+2nd time — so the destination-fire residue can no longer be closed by any
+delivery leg; the question is now WHY fn 0x56b5c's poster road never
+delivers: caller-never vs poster-gate-never-equal vs mask-empty. t319's leg
+set separates all three in ONE run because a stop at the fn 0x56b5c ENTRY
+banks ret0 (which of the NINE E8 callers fired — 0x53fa3 d / 0x54976 3 /
+0x54ac5 4-0xc / 0x54b36 5 / 0x5531e f / 0x5548c e / 0x55f82 d / 0x56f0f 2 /
+0x57003 1) plus edx (the msg id) and ebx/ecx (the click record ds:0x484ec/
+0x484f0 when the caller is the poster). Legset (bytes payload-verified
+2026-11-06): pump_entry_56b5c=0x56B5C (56 57 55 83 ec 10 89 c7 66 89 54 24
+08 — ADD to the LEGS registry in scripts/r299_leg_session.py), p54a47=
+0x54A47 (8b 1d f0 84 04 00 — first instruction of the ds:0x484a4-EQUAL
+road), p54a88=0x54A88 (3b be a4 4d 02 00 — the [esi+0x24da4] cmp),
+s2_56c74, s2_56cda. fn51cc4_entry + the writer pair DROP (zero twice,
+strictly downstream of any witnessed site). Choreography: the PROVEN
+--shipclick 4 phase VERBATIM + standard tail (same as run
+t299-leg-20261106-021602 rc=0; relaunch loop = scripts/r318_relaunch.sh
+pattern, attempt-1 short-circuit law: rc=0 + pty-whole-log-census probe =>
+NO attempt 2; rc=2 never retry). BRANCHES: (a) pump_entry fires with
+ret0=0x54ac5-family call-site AND p54a88/p54a47 bank edi — decode the gate
+equalities OFFLINE from saves (ds:0x484a4, magic-obj+0x24da4, +0x489e; obj
+= 0x7a35c runtime) and name which equality fails; if BOTH can be made true
+by a click shape, t320 = that shape. (b) pump_entry fires ONLY from
+non-poster callers (0x56f0f msg 2 / 0x57003 msg 1 etc.) and p54a47/p54a88
+never fire — the POSTER BLOCK ITSELF (the fn containing 0x54a3f) is not
+reached on click traffic: decode its entry gates statically (bank first —
+it is one disasm window, no capture). (c) pump_entry NEVER fires whole-log
+despite the periodic msg-0x3b — then s2_56cda's COSMOSWnd 0x3b traffic
+arrives via fn 0x56ca4 ONLY and the pump is dead weight in this build:
+record that law and pivot the OQ-019 residue to the batmode-family mouse
+route (OQ-016-adjacent, OPEN-QUESTIONS t297/t298 lineage: [win+0xaf]
+routes EVERY click to batcon handler 0x1b91c). Fixed laws carried (do NOT
+re-trip): t318 amendment (1)-(3) — pump dispatch cold-for-observed-road,
+poster gate = named blocker, scope law (leg gaps ≠ never); t317 (1)-(4);
+t316 (1)-(4); t315 (LOADSCREEN dead, P0 law); t314 (rowjump CLOSES FLEET);
+magic recs RAW guest addrs; class grids stride-6 cp=base-0x88;
+close_eventwin before clicks; kill by RECORDED PID; production :9 (pid
+1957) untouched; scratch copies only, never mount game/; ONE capture per
+iteration; sitting check FIRST (playcap turn > 1086 => re-run
+scripts/r1_t85g_sitting.py before anything).
+
+## LANDED t318 (2026-11-06, session 27) — THE BROADCAST-PUMP DISPATCH
+## 0x56c74 IS COLD LIVE: NO MSG ID OF ANY KIND REACHED FLEETWND (2ND TIME);
+## THE NAMED BLOCKER IS NOW THE POSTER GATE.
+Run work/r1/t299-leg-20261106-021602 (attempt-1 lost the BREAK lottery;
+attempt-2 rc=0, SESSION END 02:33:42, 9 census windows, 26 stops; relaunch
+short-circuited per law). docs/re/_wip_t318.md S0-S6 + ships.md S44 +
+REFUTED-ROUTES t318 amendment binding; scripts/r318_relaunch.sh +
+r318_analyze.py NEW; r299_leg_session.py bank_stop esp dump widened 8->16 B
+(esp_p8/esp_p12 banked — pump dispatch carries msg=[esp+8] BEFORE the
+return push; unexercised, harmless, 26/26 stops banked). Key measurements:
+pty-whole-log-census s2_56c74=0 | s2_56cda=26 | fn51cc4_entry=0 |
+w43508/w43504=0 | btn_hdlr=1; s2_56cda = 18x msg 0x3b COSMOSWnd + 4x msg 8
+STATSHIPLST at x=620 gutter clicks (t317 VERBATIM: edi=edx=0x8, ebx=620,
+baseline 0) + msg 8/6 PLIND + 2x msg 8 PLANETALLOC; 0x1c01/0x1c02 literal
+absent from every banked reg/stack; gate guest 0x600058=0 datum 0;
+DAT_43508/43504 unmoved across all four click pairs; mode4226 0x12/0x11/0x1
+per phase; gate_484ec=0x1ff. Static: poster block re-read verbatim
+(disasm 77195-77245) — msg-4-vs-0xc gated by cmp edi,ds:0x484a4 @0x54a3f
+then cmp edi,[esi+0x24da4] @0x54a88 + [esi+0x489e]==0; fn 0x56b5c has NINE
+E8 callers; t319 leg bytes payload-verified. SCOPE LAW: legs deleted
+between windows/re-arm gaps -> zero means "nothing observable delivered",
+NOT "fn 0x56b5c never called" (t319 separates). NO LEDGER ROW CLOSED
+strict-close (no live store witnessed) — t319 designed in NEXT ACTION
+above. Sitting check: playcap newest turn=1086 (writer alive pid 1979, no
+play past t1255) — r1_t85g_sitting.py not run. Production :9 (pid 1957)
+untouched; gate 0, audits OK.
 
 ## LANDED t317 (2026-11-06, session 26) — GUTTER-CLICK LIVE WITNESS:
 ## VENDOR CLICKS ARRIVE AS MSG 8 ON STATSHIPLST'S OWN ENTRY; NO 0x1c01 EVER

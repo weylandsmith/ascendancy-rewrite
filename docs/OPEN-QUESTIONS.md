@@ -420,6 +420,25 @@ NEXT t318 = ONE live run legs {s2_56c74, s2_56cda, fn51cc4_entry,
 w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 (_wip_t317 S8); a msg-4/0xc stop at s2_56c74 on the STATSHIPLST rec plus
 s2_56cda edi=0x1c01 closes the destination-fire residue.
+t318 note (LIVE run work/r1/t299-leg-20261106-021602 rc=0 + offline;
+docs/re/_wip_t318.md S0-S6 + ships.md S44 + REFUTED-ROUTES t318 amendment
+binding): THE PUMP DISPATCH IS COLD. 9 armed census windows (540 s, 6 legs,
+full standard tail incl. ONE witnessed turn boundary (pre-turn 1086->1087;
+the NEXTTURN after-oracle still read turn 1087, so a second advance is
+UNWITNESSED): s2_56c74 ZERO whole-log;
+s2_56cda 26 (18x msg 0x3b COSMOSWnd periodic; 4x msg 8 STATSHIPLST at the
+x=620 gutter clicks — t317 reproduced verbatim; msg 8/6 PLIND; 2x msg 8
+PLANETALLOC); fn51cc4_entry ZERO (2nd independent confirmation NO msg of any
+id reaches FLEETWND); writers ZERO; literal 0x1c01/0x1c02 absent from every
+banked reg/stack. Honest scope: legs are deleted between windows and during
+fire-cycle re-arm gaps, so this is "delivered nothing observable", NOT "fn
+0x56b5c never called". Static poster-block re-read (disasm 77195-77245): the
+msg-4-vs-0xc choice at pump-call 0x54ac5 is gated by cmp edi,ds:0x484a4
+(0x54a3f) then cmp edi,[esi+0x24da4] (0x54a88) + [esi+0x489e]==0 — the
+poster gate is the NAMED BLOCKER. Row STAYS OPEN (strict-close: no live
+store witnessed). NEXT t319 = ONE run legs {pump_entry_56b5c 0x56B5C,
+p54a47, p54a88, s2_56c74, s2_56cda} same choreography — separates
+caller-never / gate-never-equal / mask-empty in one shot (_wip_t318 S6).
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

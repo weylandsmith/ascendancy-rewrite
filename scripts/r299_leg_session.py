@@ -602,11 +602,18 @@ ASCEND.EXE
         # verbatim. Dump 8 bytes at esp; ret0 = [esp] (call pushed it).
         esp = regs.get("esp")
         if esp and 0x1000 < esp < 0x10000000:
-            eb = self.dump_mem(esp, 8, f"{tag}_esp")
+            # t318 EXTENSION: dump 16 bytes (was 8). The broadcast-pump
+            # dispatch s2_56c74 carries msg = [esp+8] AT THE CALL INSTRUCTION
+            # (return addr not yet pushed), so an 8-byte window CANNOT see it.
+            # esp_p8/esp_p12 are the raw words at [esp+8]/[esp+12]; ret0/ret1
+            # semantics unchanged.
+            eb = self.dump_mem(esp, 16, f"{tag}_esp")
             if eb and len(eb) >= 8:
                 r0, r1 = struct.unpack_from("<II", eb, 0)
                 rec["ret_stack"] = {"esp": hx(esp), "ret0": hx(r0),
                                     "ret1": hx(r1),
+                                    "esp_p8": hx(struct.unpack_from("<I", eb, 8)[0]) if len(eb) >= 12 else None,
+                                    "esp_p12": hx(struct.unpack_from("<I", eb, 12)[0]) if len(eb) >= 16 else None,
                                     # t304 GUARD FIX: bound must be the image
                                     # END (P0+size), not the size — comparing
                                     # linear vs 0x8CC83 rejected every real

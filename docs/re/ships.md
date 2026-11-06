@@ -2097,3 +2097,30 @@ scripts/r317_gate_probe.py; full detail docs/re/_wip_t317.md S0-S8).
   leg run (_wip_t317 S8 shape). [w+0x4f] census CLOSED: single direct store
   movb $0,[r+0x4f] @0x30bdb (disp8+disp32, all widths) — 0x66 is copy-written;
   msg 4 never tests it, so t318 is independent of it.
+
+## S44 t318 (2026-11-06) — THE BROADCAST PUMP DISPATCH 0x56c74 IS COLD LIVE:
+## NO MSG ID OF ANY KIND REACHED FLEETWND (2nd confirmation); THE POSTER GATE
+## IS THE NAMED BLOCKER. Full detail docs/re/_wip_t318.md S0-S6 (run
+## work/r1/t299-leg-20261106-021602 rc=0, 9 census windows, 540 s armed,
+## legs {s2_56c74, s2_56cda, fn51cc4_entry, w43508_51fc2, w43504_52003,
+## btn_hdlr}). pty-whole-log-census: s2_56c74 0 | s2_56cda 26 | fn51cc4 0 |
+## writers 0 | btn_hdlr 1. s2_56cda 26 = 18x msg 0x3b COSMOSWnd (periodic) +
+## 4x msg 8 STATSHIPLST at x=620 gutter clicks (t317 VERBATIM reproduction)
+## + msg 8/6 PLIND (sprite) + 2x msg 8 PLANETALLOC. Literal 0x1c01/0x1c02
+## appears NOWHERE in any banked reg/stack (0/26). Oracles: gate 0x600058=0
+## datum 0; DAT_43508/43504 unmoved across all four click before/after pairs;
+## mode4226 0x12 shipclick phase / 0x11 sprite-planet / 0x1 post-NEXTTURN.
+- SCOPE LAW (honest boundary): legs are DELETED between census windows and
+  during each fire-cycle's BPDEL->re-arm gap, so this measures "0x56c74
+  delivered nothing observable", NOT "fn 0x56b5c was never called". The
+  caller-vs-mask separation is t319.
+- STATIC POSTER-BLOCK RE-READ (t91_code_disasm 77195-77245 verbatim): the
+  4-vs-0xc choice at the pump call 0x54ac5 is gated by TWO u32 equalities —
+  0x54a3f cmp edi,ds:0x484a4 (equal road = 0x5be9b query + msg-0x3f1
+  dispatch @0x54a83, pump only if [[esi+0x21d92]+0x39]!=0); jne road 0x54a88
+  cmp edi,[esi+0x24da4] (equal + [esi+0x489e]==0 -> msg 0xc, else msg 4).
+  fn 0x56b5c has NINE E8 callers (0x53fa3 d, 0x54976 3, 0x54ac5 4/0xc,
+  0x54b36 5, 0x5531e f, 0x5548c e, 0x55f82 d, 0x56f0f 2, 0x57003 1).
+- HARNESS: bank_stop esp dump widened 8->16 B (esp_p8/esp_p12 banked — the
+  pump dispatch carries msg=[esp+8] BEFORE the return push; unexercised this
+  run, harmless). scripts/r318_analyze.py NEW (offline hits.json census).

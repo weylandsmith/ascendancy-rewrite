@@ -786,3 +786,31 @@ movb/movw/movl imm+reg: sole store movb $0,[r+0x4f] @0x30bdb); the measured
 (5) NEXT LIVE SHAPE (t318): legs {s2_56c74, s2_56cda, fn51cc4_entry,
 w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 (_wip_t317 S8).
+
+## t318 AMENDMENT (binding): (1) "THE BROADCAST PUMP DELIVERS THE VENDOR
+## CLICK (OR ANY MSG) TO FLEETWND VIA 0x56c74" IS DEAD FOR THE OBSERVED
+## ROAD: run work/r1/t299-leg-20261106-021602 (rc=0, 9 armed windows, legs
+## {s2_56c74, s2_56cda, fn51cc4_entry, w43508_51fc2, w43504_52003,
+## btn_hdlr}) — s2_56c74 ZERO whole-log while s2_56cda fired 26x (18 msg
+## 0x3b COSMOSWnd, 4 msg 8 STATSHIPLST at the x=620 gutter clicks, msg 8/6
+## PLIND, 2x msg 8 PLANETALLOC). fn51cc4_entry ZERO a 2nd whole-run time;
+## 0x1c01/0x1c02 literal absent from every banked reg/stack. Do NOT design
+## another run betting the pump dispatch closes the destination-fire
+## residue. SCOPE (do not overclaim): legs are deleted between census
+## windows and during fire-cycle re-arm gaps — the zero is "nothing
+## observable delivered", NOT "fn 0x56b5c never called".
+## (2) THE NAMED BLOCKER MOVED TO THE POSTER GATE: static re-read
+## (t91_code_disasm 77195-77245 verbatim) — pump call 0x54ac5 is reached
+## past cmp edi,ds:0x484a4 @0x54a3f (equal road: fn 0x5be9b query, msg-0x3f1
+## dispatch @0x54a83, pump ONLY if [[esi+0x21d92]+0x39]!=0) and cmp
+## edi,[esi+0x24da4] @0x54a88 (equal AND [esi+0x489e]==0 -> msg 0xc, else
+## msg 4). fn 0x56b5c has NINE E8 callers (0x53fa3 d, 0x54976 3, 0x54ac5
+## 4/0xc, 0x54b36 5, 0x5531e f, 0x5548c e, 0x55f82 d, 0x56f0f 2, 0x57003 1).
+## (3) NEXT LIVE SHAPE (t319, one run): legs {pump_entry_56b5c=0x56B5C
+## (bytes 56 57 55 83 ec 10 89 c7 66 89 54 24 08), p54a47=0x54A47,
+## p54a88=0x54A88, s2_56c74, s2_56cda} + the proven --shipclick 4 + standard
+## tail; bank ret0 (caller) + edx (msg id) at the entry. fn51cc4_entry and
+## the writer pair DROP (zero twice, downstream). If the entry never fires
+## while p54a88 fires, the poster-gate equalities are decodable OFFLINE from
+## saves (ds:0x484a4, [obj+0x24da4], [obj+0x489e] reads) — do not spend a
+## second capture on the same legs.
