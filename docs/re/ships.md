@@ -1969,3 +1969,39 @@ r313_writer_callers.py, r313_handler_chain.py.
   into 0x51fb5..0x52058 = exactly the 5 table entries. Offline is EXHAUSTED at
   the dispatch table; the next witness must be LIVE (fn51cc4 entry leg + the
   two writer legs, FLEET-window focus composition).
+
+## S40 t314 (2026-11-05) — FLEETWND-FOCUS LIVE TEST: FLEETWND RECEIVES NO
+## MSG AT ALL; the digit-key handler is its own window family. Runs
+## t299-leg-20261105-{210255 (invalid), 212402 (valid)} both rc=0;
+## docs/re/_wip_t314.md S0-S7; scripts/r314_relaunch.sh + r299_leg_session.py
+## --fleet-keys phase (NEW leg fn51cc4_entry = 0x51CC4).
+- DRIVE LAW (run 1, measured): the fleet rowjump click (200,93) CLOSES the
+  FLEET window (t253 rails detector 188 -> 0). Any phase needing FLEET-window
+  focus MUST run BEFORE rowjump and MUST re-assert fleet_open at arm — the
+  --fleet-keys reguard now gates on popup-closed AND rails>0 and logs rails.
+- VALID TEST (run 2, rails=188 at arm, keys 1..9, no popup after): whole-log
+  census {fn51cc4_entry:0, w43508_51fc2:0, w43504_52003:0, btn_hdlr:4},
+  ctl MATCH=True, liveness True. FLEETWND's msg handler (armed 10x across all
+  windows) NEVER fired — no msg of any kind reaches FLEETWND via keyboard
+  under the FLEET sidebar shape. The t313 "one digit key away" narrative is
+  REFUTED (REFUTED-ROUTES t314 amendment).
+- The single fleet_keys stop: btn_hdlr win='STATSHIPLST' edx=0x3 ecx=0x2
+  eax=0xfe7ac0 ret0 file 0x32943 (call [esi+8] inside STATSHIPLST's slot-2
+  fn; cp 0x247c70 grid tail {0x324f4,0x30d08,0x32664} read from RAM). Key
+  focus with the FLEET window open belongs to the STATSHIPLST family. CAVEAT:
+  s2_356a5 not armed run 2 — sender-zero under FLEET focus is extrapolated
+  from t312, not measured.
+- SENDER BRANCH (objdump verbatim 0x35675..0x356a5): digit in ebx, bail if
+  <0x30/>0x39; eax=9; if BYTE [ebp+0xaf]==1 eax=10; bail if eax >= ebx-0x30;
+  then edx=0x1c01, esi=[ebp+0xa7], eax=ebp, ecx=0, call [esi+8]. The msg goes
+  to the KEY-HANDLER'S OWN window — which window that is = t315 offline hunt
+  (fn containing 0x35696 -> class grid -> magic rec).
+- ACCESSOR fn 0x32fa4 (0x51f4b, also 0x51a73 STATUSWND path — 9 E8 callers):
+  idx=msg arg (0..0xff bound, else fn 0x2a428), returns
+  [[win]+0xc7 + idx*8]. The writer-block gate byte [eax+0x58] (0x52059: mov
+  al,[eax+0x58]; dec al; cmp 4; ja ret0; jmp cs:0x3d100(,eax,4)) is a field of
+  a TABLE-SELECTED record — t313's "system record" label UNPROVEN, not
+  disproven. STATSHIPLST[+0x58]==0 in 40/40 saves (both runs) = rec datum;
+  the gate was never evaluated live (msg never arrived). Payload-wide store
+  census [r+0x58] (c6/88/89/c7 disp32) = ZERO sites: writers use computed
+  offsets, file scan blind (t313 law re-confirmed on a new target).

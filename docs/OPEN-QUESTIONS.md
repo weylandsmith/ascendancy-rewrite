@@ -330,6 +330,30 @@ mechanism but no live store witnessed). NEXT t314: ONE capture — legs
 fn51cc4_entry (NEW, census leg[0]) + w43508_51fc2 + w43504_52003 + btn_hdlr
 control; establish FLEET-window focus via open_fleet, then digit-key + a
 map-click x>150 variant; oracle DAT_43504/43508 + sel43510 + mode4226.
+t314 note (runs t299-leg-20261105-{210255,212402} both rc=0, docs/re/
+_wip_t314.md S0-S7 + ships.md S40 + REFUTED-ROUTES t314 amendment): FLEETWND-
+FOCUS TEST RUN VALID + NEGATIVE. Run 1 exposed a drive law (rowjump click
+(200,93) CLOSES the FLEET window, rails 188->0) so its keys went to 'PLBUILD'
+— invalid, not counted. Run 2 VERIFIED focus at arm (reguard logs rails=188,
+popup-closed) then pressed 1..9: whole-log census {fn51cc4_entry:0,
+w43508_51fc2:0, w43504_52003:0, btn_hdlr:4} — FLEETWND received NO msg of any
+kind with its window open; the single fleet_keys stop was btn_hdlr win=
+'STATSHIPLST' edx=0x3 ret0 file 0x32943 (inside STATSHIPLST's own slot-2 fn,
+cp 0x247c70 read from RAM). GAP named: s2_356a5 was NOT armed run 2, so
+"sender never fires under FLEET focus" stays t312-extrapolation. Offline this
+session (objdump verbatim): sender branch 0x35675..0x356a5 fully decoded —
+gated on [ebp+0xaf] (max digit 9, 10 if ==1), sends edx=0x1c01 ecx=0 via
+call [esi+8] on ITS OWN window [ebp]; fn 0x32fa4 = 8-stride accessor
+[[win]+0xc7+idx*8] (idx from msg arg, 0..0xff bound) — the writer-block state
+byte [eax+0x58] reads a TABLE-SELECTED record (t313 "system-record" label
+unproven); STATSHIPLST[+0x58]==0 in 40/40 saves across both runs (rec datum
+only); payload store census for [r+0x58] = ZERO sites (computed offsets, file
+blind). Row STAYS OPEN (strict-close — no live store witnessed). NEXT t315
+(offline, zero capture): name the digit-handler window — find the fn containing
+0x35696 (ret-bounded walk + E8 census), then RAM grid scan for fn+P0 (r313
+route, NEW target so not spent) and magic-rec naming; that window is who the
+digit key talks to, and its class decides whether FLEETWND can EVER receive
+0x1c01 from keys.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

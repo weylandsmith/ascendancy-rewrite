@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-05T20:35
+updated: 2026-11-05T22:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,52 +209,77 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t314 FLEETWND-FOCUS 0x1c01 LIVE CAPTURE (ONE run, scripts/r299_leg_session.py
-+ a r314_relaunch.sh cloned from r312_relaunch.sh). Ordering rationale: t313
-CLOSED the offline caller hunt — fn 0x51b68 is mid-body of fn 0x51b64 =
-FLEETWND class-grid slot 3, and FLEETWND's msg handler fn 0x51cc4 owns a msg-
-0x1c01 path (je 0x51f3b exact) whose continuation blocks ARE the t312 writer
-pair: state table (RAM 0x211188, runtime-composed, whole-RAM unique) routes
-states 1/2/3 -> DAT_43508+ring0x11 (0x51fc2) and state 4 -> DAT_43504+ring0x10
-(0x52003). The writers were dark in t312 because digit-key focus was
-'NEXTTURNCONT' (btn class), never FLEETWND (REFUTED-ROUTES t313 amendment
-binding). LEGSET: fn51cc4_entry (NEW leg = ENTRY of 0x51cc4, census leg[0]
-per t311 entry-leg law; fires for ANY msg to FLEETWND and names the msg id in
-edx + dispatch site in ret0) + w43508_51fc2 + w43504_52003 + btn_hdlr control.
-PHASES: assert_on_map -> open_fleet (route exists r299_leg_session.py:960) ->
-click a fleet ROW (selects inside the list per t312's own note: 'a FLEET-window
-selection path (keyboard/UI inside the fleet list, not the map pixel)') ->
-digit keys 1..9 with FLEETWND focused -> close popup if any (reguard law) ->
-map-click x>150 variant -> NEXTTURN -> hold. Oracle: DAT_43504/43508 pair +
-sel43510 + mode4226 + last-mouse-X 0x484ec. SUCCESS BAR: a writer stop with
-named ret0 (expect ret0 inside fn 0x51cc4 span 0x51fb5..0x52036 region or the
-0x211188 stub address — a ret0 in 0x211xxx = RAM-composed dispatch, bank it
-as the first direct witness of that mechanism). HONEST-NEGATIVE BRANCH: if
-fn51cc4_entry fires but no 0x1c01 (edx!=0x1c01 all stops), the digit sender's
-window-selection is the hole — bank msg ids seen; if fn51cc4_entry fires ZERO
-with FLEET open, FLEETWND receives no key msgs at all -> selection-state
-residue re-scopes to the ship-record level (kind-4 clip pool outside sav,
-t298 correction 1). Do NOT re-arm STATUSWND legs or bare-map senders (t311/
-t312/t313 all binding).
-Fixed laws (do NOT re-trip): sprite-pixel select DEAD + both 0x1c01 senders
-DEAD-ON-MAP-FOCUS (t312 amendment; t313 explains: focus was the btn class —
-senders are untested with FLEETWND focus, which is what t314 tests);
-0x1c01-into-STATUSWND REFUTED (t311); ds:0x484ec = LAST MOUSE X (t310); DAT
-delta != witnessed store (t298-C, 3x re-observed); class tables ONLY via
-sav-RAM scan entry+P0 AND the grid law is stride-6 with cp = grid_base-0x88,
-dispatcher 0x30d37 call [cp+0xc] (t313 FIXED; t310's '0x248040 slot 4' was an
-8-byte-shifted read — use scripts/r313_class_scan.py / r313_name_b.py);
-mode4226 = view id (map 1, system 0x11) NOT selection mode (t312); ring
-channel dead at map idle (t309); batmode legs dead for map clicks (t306);
-fn 0x51834 = STATUSWND handler (0x51ac9 in ITS span); fn 0x51cc4 = FLEETWND
-handler, fn 0x51b64 = its slot-3 fn (0x51b68 mid-body, NEVER an entry — t313);
-writer pair {0x52003, 0x51fc2} = msg-0x1c01 continuation blocks of fn 0x51cc4
-via runtime state table RAM 0x211188; offline censuses on these targets are
-SPENT (t313 S8); green-annulus pip law ONLY; fire_pats(P0+LEGS[n]) form;
-census_click(None) re-arms all legs; sav ring 10 s granularity (claim neither
-way on turn deltas); oracle B+SL.OFF+X correct; close_eventwin before clicks;
-escape ladder never blind; kill by RECORDED PID; production :9 untouched;
-scratch copies only, never mount game/.
+NEXT t315 DIGIT-HANDLER WINDOW HUNT (OFFLINE, ZERO capture; extend
+scripts/r313_class_scan.py / r313_name_b.py pattern to a NEW target; save dir
+work/r1/t299-leg-20261105-212402/save — P0 re-derive per run, t313 used
+0x1bf450 for run 192246, do NOT assume identical). Ordering rationale: t314
+ran the valid FLEETWND-focus test and it is DEAD (REFUTED-ROUTES t314
+amendment binding: fn51cc4_entry armed 10x with rails=188 FLEET-open, ZERO
+fires — FLEETWND gets no keyboard msg). The sender fn 0x35696 branch is now
+FULLY DECODED (docs/re/_wip_t314.md S6): it sends edx=0x1c01 ecx=0 via
+call [esi+8] on ITS OWN window [ebp] (gate: digit 0x30..0x39 and ebx-0x30 <
+([ebp+0xaf]==1 ? 10 : 9)). The ONE unmeasured link in the whole 0x1c01 chain
+is WHICH WINDOW the key handler runs on. STEPS: (1) find the fn containing
+0x35696 — walk back from 0x35696 for the prologue boundary (prev ret at
+0x35693 is mid-shape; use frame pattern `81 c4 44 01` epilogue @0x356af =>
+sub esp,0x144 entry; objdump --start-address walk the span); E8 census to its
+entry (expect 0 = table-dispatched; if nonzero, the caller names the pump —
+bank it). (2) RAM scan the 212402 save for entry+P0 (r313 route; NEW target,
+not spent); grid slots -> cp candidates -> magic recs (+0x00 magic
+0x12345678, NAME +0x20, cp +0xa7, cp = grid_base-0x88) name the class.
+(3) Check the STATSHIPLST lead: its slot-2 fn 0x32664 CONTAINS the run-2
+ret0 0x32943 (t314), but the sender frame (sub esp,0x144, window reg ebp) is
+NOT obviously inside 0x32664's span — resolve by span walk, don't assume.
+BRANCHES: if the handler window names a GLOBAL console-like window, the key
+route to 0x1c01 is dead by construction -> next iteration pivots to the
+state-byte watchpoint route (the 0x52059 gate reads a table-selected record
+via fn 0x32fa4 `[[win]+0xc7+idx*8]`; STATSHIPLST[+0x58]==0 40/40 saves;
+payload store census [r+0x58] zero sites -> live watchpoint is the only
+witness). If the handler class slot-2 TAIL-CALLS onward (btn_hdlr pattern,
+t313 S5), name the next hop before concluding. Do NOT run any capture this
+iteration; do NOT re-arm fn51cc4_entry for keys (t314), STATUSWND legs
+(t311), bare-map senders (t312), or fn 0x51b68 offline censuses (t313).
+Fixed laws carried (do NOT re-trip): rowjump (200,93) CLOSES the FLEET
+window (t314); FLEETWND receives no keyboard msg (t314); sender branch fully
+decoded incl. [ebp+0xaf] digit-max gate (t314); fn 0x32fa4 = 8-stride
+accessor, state byte TABLE-SELECTED, t313 'system record' label unproven
+(t314); sprite-pixel select DEAD + both 0x1c01 senders DEAD-ON-MAP-FOCUS
+(t312); 0x1c01-into-STATUSWND REFUTED (t311); ds:0x484ec = LAST MOUSE X
+(t310); DAT delta != witnessed store (t298-C); class tables ONLY via sav-RAM
+scan entry+P0, grid stride-6, cp = grid_base-0x88, dispatcher 0x30d37 call
+[cp+0xc] (t313); mode4226 = view id (t312); ring channel dead at map idle
+(t309); batmode legs dead for map clicks (t306); fn 0x51834 = STATUSWND
+handler, fn 0x51cc4 = FLEETWND handler, fn 0x51b64 = its slot-3 fn (t313);
+writer pair {0x52003,0x51fc2} = msg-0x1c01 continuation blocks of fn 0x51cc4
+via runtime table RAM 0x211188; green-annulus pip law ONLY;
+fire_pats(P0+LEGS[n]) form; census_click(None) re-arms all legs; sav ring
+10 s granularity (claim neither way on turn deltas); oracle B+SL.OFF+X correct;
+close_eventwin before clicks; escape ladder never blind; kill by RECORDED
+PID; production :9 untouched; scratch copies only, never mount game/.
+
+## LANDED t314 (2026-11-05, session 23) — FLEETWND-FOCUS LIVE TEST VALID +
+## NEGATIVE: FLEETWND RECEIVES NO KEYBOARD MSG AT ALL. docs/re/_wip_t314.md
+## S0-S7 + ships.md S40 + REFUTED-ROUTES t314 amendment; runs
+## t299-leg-20261105-{210255 (attempt 2, focus DEFECT), 212402 (attempt 1,
+## VALID)} both rc=0; scripts/r314_relaunch.sh NEW + r299_leg_session.py patch
+## (NEW leg fn51cc4_entry=0x51CC4 entry bytes payload-verified; NEW
+## --fleet-keys phase with rails+popup double reguard). Key measurements:
+## run-1 defect law (rowjump CLOSES FLEET, rails 188->0); run-2 whole-log
+## {fn51cc4_entry:0, w43508_51fc2:0, w43504_52003:0, btn_hdlr:4} ctl MATCH=True
+## with rails=188 verified at arm; single fleet_keys stop btn_hdlr
+## win='STATSHIPLST' edx=0x3 ret0 file 0x32943 (inside STATSHIPLST slot-2 fn,
+## cp 0x247c70 RAM-read); sender branch 0x35675..0x356a5 objdump-verbatim
+## ([ebp+0xaf] digit-max gate, call [esi+8] on own window [ebp]); fn 0x32fa4 =
+## 8-stride accessor [[win]+0xc7+idx*8] (9 E8 callers incl. STATUSWND path
+## 0x51a73); STATSHIPLST[+0x58]==0 in 40/40 saves; [r+0x58] store census ZERO
+## (file blind, computed offsets). GAP banked: s2_356a5 NOT armed run 2 ->
+## sender-zero-under-FLEET-focus = extrapolation. NO LEDGER ROW CLOSED
+## (strict-close: no live store witnessed). OQ-019 residue RE-SCOPES: name the
+## digit-handler window offline (t315, designed above), then state-byte
+## watchpoint route. Sitting check: no new play (400MB window max turn 1150 <
+## 1255; newest lines t=1086); r1_t85g_sitting.py not run. Production :9
+## (pid 1957) untouched; scratch dosbox killed by recorded PID every window.
+## Gate 0, audits OK.
 
 ## LANDED t313 (2026-11-05, session 22) — OFFLINE CALLER HUNT LANDED: THE
 ## t312 WRITERS BELONG TO FLEETWND (msg-0x1c01 continuation via a RUNTIME

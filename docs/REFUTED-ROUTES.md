@@ -704,3 +704,22 @@ re-arming STATUSWND legs or bare-map senders is spent (t311+t312 stand).
 (magic rec: magic at rec+0x00, NAME rec+0x20, cp rec+0xa7); dispatcher =
 0x30d37 call [cp+0xc]. t310's '0x248040 slot 4' = 8-byte-shifted read — use
 r313_class_scan.py / r313_name_b.py, not hand walks.
+
+## t314 AMENDMENT (binding): (1) "A DIGIT KEY UNDER FLEET-WINDOW FOCUS REACHES
+## FLEETWND's 0x1c01 PATH" IS DEAD. Run t299-leg-20261105-212402 (rc=0, focus
+## VERIFIED at arm: rails=188 + popup-closed reguard): fn51cc4_entry (armed
+## 10x, all windows incl. fleet_keys) fired ZERO whole-log — FLEETWND receives
+## NO msg of any kind from the keyboard with its window open. The only
+## fleet_keys stop was btn_hdlr win='STATSHIPLST' msg 3 (ret0 file 0x32943,
+## inside STATSHIPLST's own slot-2 fn, cp 0x247c70). Do NOT re-run the
+## open_fleet->digit-keys shape expecting FLEETWND traffic; the sender (fn
+## 0x35696, gated on [ebp+0xaf], call [esi+8] on ITS OWN window [ebp]) talks
+## to the key-handler window family, and that family is NOT FLEETWND. (2) The
+## live 0x1c01 hunt is NOT dead — it re-scopes: FIRST name the digit-handler
+## window offline (fn containing 0x35696 -> class grid via the r313 RAM route
+## -> magic rec). Re-arming fn51cc4_entry for keys is
+## spent; a future LIVE attempt must trigger whatever UI the handler window
+## actually is, or find a non-key sender (relay 0x1616f stays t311-dead on the
+## tested battery). (3) DRIVE LAW: the fleet rowjump click (200,93) CLOSES the
+## FLEET window (rails 188->0 measured) — any FLEET-focus phase runs BEFORE
+## rowjump and re-asserts fleet_open at arm.

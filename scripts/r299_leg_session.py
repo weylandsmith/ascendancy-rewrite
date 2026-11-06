@@ -277,7 +277,17 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
         # leg separates 'class never messaged' from '0x1c01 never sent' — the
         # t310 store legs alone could not. Entry bytes verified this session
         # vs work/ascend_payload.bin: 56 57 55 83 ec 0c 89 c5 66 89 54 24.
-        "fn51834_entry": 0x51834}
+        "fn51834_entry": 0x51834,
+        # t314 FLEETWND MSG-HANDLER ENTRY LEG (docs/re/_wip_t314.md S1; class
+        # named FLEETWND t313 S5 via magic rec 0xfe7a90, cp 0x247fa8). Entry of
+        # fn 0x51cc4 (vtable slot 2 of FLEETWND) fires for EVERY msg delivered
+        # to the FLEET window; prologue `66 89 94 24 b4 01 00 00` = mov
+        # [esp+0x1b4],dx so edx AT THE STOP is the msg id; ret0 names the
+        # dispatch site. Own 0x1c01 path: je@0x51cfa -> 0x51f3b -> state table
+        # (RAM 0x211188) -> writer blocks {0x51fb5 DAT_43508, 0x51ff6
+        # DAT_43504}. Entry bytes verified this session vs
+        # work/ascend_payload.bin: 56 57 55 81 ec bc 01 00 00 89 c7 66 89 94 24.
+        "fn51cc4_entry": 0x51CC4}
 
 EVENTS = []
 hx = lambda v: hex(v) if isinstance(v, int) else None
@@ -999,6 +1009,8 @@ def main():
                                                           # before the fleet
                                                           # battery (t298 gate)
     ap.add_argument("--digit-keys", type=int, default=0)  # t310 N digit keys
+    ap.add_argument("--fleet-keys", type=int, default=0)  # t314 N digit keys
+                                                          #    with FLEET open
                                                           # '1'.. in ONE armed
                                                           # window (msg-0x1c01
                                                           # sender 0x35696)
@@ -1394,7 +1406,58 @@ def main():
             if im is None:
                 s.log(f"CENSUS: FLEET would not open (diff {d}) — clicking "
                       f"current screen targets only")
-            else:
+            # t314 --fleet-keys PHASE (docs/re/_wip_t314.md): the digit sender
+            # 0x356a5 `call [esi+8]` edx=0x1c01 dispatches on the KEY-FOCUSED
+            # window. t311/t312 measured bare-map focus = btn class (NEXTTURN-
+            # CONT), msg never reached STATUSWND; t313 named FLEETWND (cp
+            # 0x247fa8) with its OWN 0x1c01 path je@0x51cfa->0x51f3b->state
+            # table RAM 0x211188 -> writer blocks. THE UNTESTED CARRIER: keys
+            # pressed with the FLEET window open. FOCUS DEFECT FIX (run
+            # t299-leg-20261105-210255, MEASURED): the rowjump click (200,93)
+            # CLOSES the fleet window (rails 188 -> 0 at the reguard grab), so
+            # those keys went to 'PLBUILD' (btn class) — NOT FLEETWND. The
+            # phase therefore runs BEFORE rowjump0, and the reguard asserts
+            # fleet_open(rails)>0 as well as no-popup: keys are pressed only
+            # with the FLEET window verifiably still open.
+            if args.fleet_keys:
+                if im is None or not s.fleet_open(im):
+                    s.log("FLEET-KEYS: FLEET window not open — skipped")
+                else:
+                    fkeys = [str(k) for k in
+                             range(1, min(9, args.fleet_keys) + 1)]
+                    oracles["fleetkeys_before"] = sel_oracle(
+                        "fleetkeys_before")
+                    if s.arm_census(s.legs):
+                        im_pg = s.grab("fleetkeys_reguard")
+                        if im_pg is None or s.eventwin_open(im_pg) \
+                                or not s.fleet_open(im_pg):
+                            s.log("FLEET-KEYS: REGUARD FAIL — popup open or "
+                                  f"rails={s.fleet_open(im_pg) if im_pg is not None else '?'}"
+                                  " — RUN resumed, keys NOT pressed")
+                            s.req("EXEC RUN", 20.0)
+                        else:
+                            lines, ok, hdr = s.req("EXEC RUN", 20.0)
+                            s.log(f"FLEET-KEYS: armed RUN hdr={hdr} "
+                                  f"keys={fkeys} rails={s.fleet_open(im_pg)}")
+                            time.sleep(0.5)
+                            for k in fkeys:
+                                s.send(["key", k])
+                                time.sleep(1.2)
+                            popup_after = s.grab("fleetkeys_popup")
+                            s.log("FLEET-KEYS: popup open after keys = "
+                                  f"{s.eventwin_open(popup_after) if popup_after is not None else '?'}")
+                            census["fleet_keys"] = s.census_window(
+                                "fleet_keys", args.window)
+                            s.disarm_run("fleet_keys")
+                            s.persist()
+                            if popup_after is not None and \
+                                    s.eventwin_open(popup_after):
+                                s.close_eventwin()
+                    else:
+                        s.log("FLEET-KEYS: ARM FAILED — keys not measured")
+                    oracles["fleetkeys_after"] = sel_oracle(
+                        "fleetkeys_after")
+            if im is not None:
                 if not s.click(200, FLEET_ROWS[0], "rowjump0", wait=3.0):
                     s.log("CENSUS: rowjump failed")
             sys_im = s.grab("census_view")
