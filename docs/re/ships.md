@@ -1928,3 +1928,44 @@ Full evidence docs/re/_wip_t310.md S1-S5; run t299-leg-20261105-173627 rc=0.
   ecx=0x14b edx=0x4; nextturn 'PLSQUARE' ret0 0x3d391 ecx=0x43 edx=0x8.
   DAT_43504 'Icarus' constant; DAT_43508 churns 0x26fe77<->0x26f00d with zero
   armed writers (t298-C re-observed, 3rd time).
+
+## S39 t313 (2026-11-05) — fn 0x51b68's WRITERS BELONG TO FLEETWND: FULL
+## OFFLINE CHAIN msg-0x1c01 -> handler 0x51cc4 -> runtime state table -> DAT
+## stores. Offline caller hunt EXHAUSTED at the runtime dispatch table.
+Full evidence docs/re/_wip_t313.md S0-S8; zero capture, save dir of run
+t299-leg-20261105-192246 (58/41/50.savs), scripts/r313_class_scan.py,
+r313_name_entries.py, r313_name_b.py, r313_fleetwnd_map.py,
+r313_writer_callers.py, r313_handler_chain.py.
+- CLASS STRUCTURE FIXED: t310's 'grid 0x248040 slot 4' was an 8-BYTE-SHIFTED
+  read. True class grids are stride-6 u32 {entry, router-fn 0x30d08, msg
+  handler, slot3-fn, 0x311b8, 0x316f0}; the class ptr (stored at window rec
+  +0xa7, magic 0x12345678 at rec+0x00, NAME at rec+0x20 — all re-calibrated
+  verbatim on STATUSWND rec 0xfd9fbc) points at grid_base-0x88. The dispatcher
+  is 0x30d37 (`mov ebp,[win+0xa7]; call [ebp+0xc]`), NOT 0x30d08 (that's the
+  rect-move slot fn). FULL WINDOW CENSUS banked: 115 magic+name recs, 31 class
+  ptrs incl FLEETWND cp 0x247fa8, NEWGAMEWND 0x247f90, STATUSWND 0x247fc0,
+  button family 0x247cb8 (60 wins).
+- fn 0x51b68 was NEVER a function entry: 0x51b64 is the entry (push
+  ebx/ecx/esi/edi at 0x51b64, push ebp at 0x51b68) and 0x51b64 = FLEETWND
+  grid slot 3. t310's 'orphan blocks live past fn 0x51b68's ret' SUPERSEDED.
+- FLEETWND msg handler fn 0x51cc4 (frame sub esp,0x1bc; raw-verified chain):
+  cmp dx,2 -> jb 0x5206f (msg 1 sub-dispatch) / jbe 0x51f0c; cmp dx,0x1c01 ->
+  je 0x51f3b EXACT. Block 0x51f3b: eax=[win+0xab] (system rec), call 0x32fa4,
+  ecx==5 -> confirm-popup leg 0x51f5d (string 0x2b6b); ecx!=5 -> jne 0x52059:
+  al = [[win+0xab]+0x58]-1; cmp al,4; ja ret-0; jmp cs:0x3d100(,eax,4) — a
+  SYSTEM-STATE jump table. RAM instance found (41/50/58.savs identical, whole-
+  RAM unique): runtime-composed stub 0x211160..0x211185 + 5-entry table
+  0x211188 {0x51fb5 x3, 0x51ff6, 0x52037}: states 1/2/3 -> block 0x51fb5
+  (DAT_43508=esi + ring post 0x11), state 4 -> 0x51ff6 (DAT_43504=[esi+0x59] +
+  post 0x10), state 5 -> 0x52037 (post 0x3, eax=-1). File bytes at 0x3d100 are
+  NOT pointers (file scan blindness PROVEN again; fix-up is runtime).
+- t312's dark writers explained OFFLINE: digit sender 0x356a5 `call [esi+8]`
+  edx=0x1c01 hits the KEY-FOCUSED window; that focus was 'NEXTTURNCONT' (btn
+  class 0x247cb8, slot-2 btn_hdlr) in every run tried, so 0x1c01 NEVER reached
+  FLEETWND. FLEETWND holds its OWN 0x1c01 destination path — the STATUSWND
+  route was the wrong window family all along.
+- REACHABILITY CENSUS (all cited): E8 callers of 0x51cc4/0x51b64/0x51f3b/
+  0x51ff6 = 0; branches into 0x52059 = {0x51f57 only}; whole-RAM u32 decoding
+  into 0x51fb5..0x52058 = exactly the 5 table entries. Offline is EXHAUSTED at
+  the dispatch table; the next witness must be LIVE (fn51cc4 entry leg + the
+  two writer legs, FLEET-window focus composition).

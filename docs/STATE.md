@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-05T19:05
+updated: 2026-11-05T20:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,49 +209,72 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t313 OFFLINE CALLER HUNT: identify who calls fn 0x51b68 (and what
-dispatches its class) via the class-grid RAM scan route, then decide whether
-a FLEET-window selection capture earns its keep. Ordering rationale: t312
-MEASURED branch (b) — fn 0x51b68's writer pair {w43504_52003, w43508_51fc2}
-fired ZERO whole-log on the full t298-B order battery (control btn_hdlr x4
-alive, census MATCH=True 7/7) AND sel43510=0 in EVERY oracle snapshot
-including sprite_before/sprite_after => the sprite-pixel click NEVER selects,
-so no order ever exists to drive those writers (REFUTED-ROUTES t312 amendment
-binding: sprite-pixel select DEAD; both msg-0x1c01 senders s2_1616f +
-s2_356a5 measured dead — do NOT re-run any map/key/order battery shape
-hoping for a writer fire). STEP 1 (offline, zero capture, uses this run's own
-save dir work/r1/t299-leg-20261105-192246/save/*.sav + work/ascend_payload.bin
-+ the t310 scan pattern (_wip_t310.md S5: scan the 17 MB sav Memory member
-for the REBASED value 0x51b68+P0 = 0x210fb8 u32 — P0=0x1bf450, check
-0x51834+P0=0x210c84 as the arithmetic control; file scan is structurally
-blind (t310 law), RAM only; for every hit record member address, then walk
-backwards to
-find the containing grid: assume class-table shape (consecutive u32 slots;
-t310 STATUSWND grid was RAM 0x248040 slot 4 -> magic-bearing referrer named
-the class). Slot index FIRST, then infer which table the game consults
-(slot 0 entry/slot 1 router 0x30d08/slot 2 handler shape, t301/t304 law).
-If 0x51b68 is a slot-2 handler, its class entry+router name the window whose
-messages drive the DAT writes; cross-check the class name against windows.txt
-names banked t305-t312 (PLIND/PLANETALLOC/STATUSWND/PLSQUARE...). STEP 2
-(conditional): ONLY if step 1 names a class tied to a FLEET-window (or any
-window reachable by a keyboard/UI path not yet tried), design ONE capture
-shape that delivers msgs to it; otherwise bank the negative that fn 0x51b68
-is dead-code-reachable-only-via-unimplemented-instrument and re-scope OQ-019
-residue to the ship-record level (kind-4 clip pool is outside the sav
-member, t298 correction 1 — selection state may never be sav-visible).
+NEXT t314 FLEETWND-FOCUS 0x1c01 LIVE CAPTURE (ONE run, scripts/r299_leg_session.py
++ a r314_relaunch.sh cloned from r312_relaunch.sh). Ordering rationale: t313
+CLOSED the offline caller hunt — fn 0x51b68 is mid-body of fn 0x51b64 =
+FLEETWND class-grid slot 3, and FLEETWND's msg handler fn 0x51cc4 owns a msg-
+0x1c01 path (je 0x51f3b exact) whose continuation blocks ARE the t312 writer
+pair: state table (RAM 0x211188, runtime-composed, whole-RAM unique) routes
+states 1/2/3 -> DAT_43508+ring0x11 (0x51fc2) and state 4 -> DAT_43504+ring0x10
+(0x52003). The writers were dark in t312 because digit-key focus was
+'NEXTTURNCONT' (btn class), never FLEETWND (REFUTED-ROUTES t313 amendment
+binding). LEGSET: fn51cc4_entry (NEW leg = ENTRY of 0x51cc4, census leg[0]
+per t311 entry-leg law; fires for ANY msg to FLEETWND and names the msg id in
+edx + dispatch site in ret0) + w43508_51fc2 + w43504_52003 + btn_hdlr control.
+PHASES: assert_on_map -> open_fleet (route exists r299_leg_session.py:960) ->
+click a fleet ROW (selects inside the list per t312's own note: 'a FLEET-window
+selection path (keyboard/UI inside the fleet list, not the map pixel)') ->
+digit keys 1..9 with FLEETWND focused -> close popup if any (reguard law) ->
+map-click x>150 variant -> NEXTTURN -> hold. Oracle: DAT_43504/43508 pair +
+sel43510 + mode4226 + last-mouse-X 0x484ec. SUCCESS BAR: a writer stop with
+named ret0 (expect ret0 inside fn 0x51cc4 span 0x51fb5..0x52036 region or the
+0x211188 stub address — a ret0 in 0x211xxx = RAM-composed dispatch, bank it
+as the first direct witness of that mechanism). HONEST-NEGATIVE BRANCH: if
+fn51cc4_entry fires but no 0x1c01 (edx!=0x1c01 all stops), the digit sender's
+window-selection is the hole — bank msg ids seen; if fn51cc4_entry fires ZERO
+with FLEET open, FLEETWND receives no key msgs at all -> selection-state
+residue re-scopes to the ship-record level (kind-4 clip pool outside sav,
+t298 correction 1). Do NOT re-arm STATUSWND legs or bare-map senders (t311/
+t312/t313 all binding).
 Fixed laws (do NOT re-trip): sprite-pixel select DEAD + both 0x1c01 senders
-DEAD (t312 amendment); 0x1c01-into-STATUSWND REFUTED (t311); ds:0x484ec =
-LAST MOUSE X (t310); DAT delta != witnessed store (t298-C, 3x re-observed);
-class tables ONLY via sav-RAM scan entry+P0; mode4226 = view id (map 1,
-system 0x11) NOT selection mode (t312); ring channel dead at map idle (t309);
-batmode legs dead for map clicks (t306); fn 0x51834 = STATUSWND handler
-(0x51ac9 lives in ITS span per the t310 span fix); fn 0x51b68 = label builder
-owning exactly {w43504_52003, w43508_51fc2};
-green-annulus pip law ONLY; fire_pats(P0+LEGS[n]) form; census_click(None)
-re-arms all legs; sav ring 10 s granularity (claim neither way on turn
-deltas); oracle B+SL.OFF+X correct; close_eventwin before clicks; escape
-ladder never blind; kill by RECORDED PID; production :9 untouched; scratch
-copies only, never mount game/.
+DEAD-ON-MAP-FOCUS (t312 amendment; t313 explains: focus was the btn class —
+senders are untested with FLEETWND focus, which is what t314 tests);
+0x1c01-into-STATUSWND REFUTED (t311); ds:0x484ec = LAST MOUSE X (t310); DAT
+delta != witnessed store (t298-C, 3x re-observed); class tables ONLY via
+sav-RAM scan entry+P0 AND the grid law is stride-6 with cp = grid_base-0x88,
+dispatcher 0x30d37 call [cp+0xc] (t313 FIXED; t310's '0x248040 slot 4' was an
+8-byte-shifted read — use scripts/r313_class_scan.py / r313_name_b.py);
+mode4226 = view id (map 1, system 0x11) NOT selection mode (t312); ring
+channel dead at map idle (t309); batmode legs dead for map clicks (t306);
+fn 0x51834 = STATUSWND handler (0x51ac9 in ITS span); fn 0x51cc4 = FLEETWND
+handler, fn 0x51b64 = its slot-3 fn (0x51b68 mid-body, NEVER an entry — t313);
+writer pair {0x52003, 0x51fc2} = msg-0x1c01 continuation blocks of fn 0x51cc4
+via runtime state table RAM 0x211188; offline censuses on these targets are
+SPENT (t313 S8); green-annulus pip law ONLY; fire_pats(P0+LEGS[n]) form;
+census_click(None) re-arms all legs; sav ring 10 s granularity (claim neither
+way on turn deltas); oracle B+SL.OFF+X correct; close_eventwin before clicks;
+escape ladder never blind; kill by RECORDED PID; production :9 untouched;
+scratch copies only, never mount game/.
+
+## LANDED t313 (2026-11-05, session 22) — OFFLINE CALLER HUNT LANDED: THE
+## t312 WRITERS BELONG TO FLEETWND (msg-0x1c01 continuation via a RUNTIME
+## STATE JUMP TABLE); CLASS-GRID LAW FIXED (stride 6, cp=base-0x88,
+## dispatcher 0x30d37 call [cp+0xc]; t310 slot-4 was an 8-byte-shifted read).
+docs/re/_wip_t313.md S0-S8, ships.md S39, REFUTED-ROUTES t313 amendment; ZERO
+capture (save dir of run t299-leg-20261105-192246: 41/50/58.savs); scripts
+r313_class_scan.py / r313_grid_names.py / r313_name_entries.py /
+r313_name_b.py / r313_fleetwnd_map.py / r313_writer_callers.py /
+r313_handler_chain.py (all offline, re-runnable). Key measurements: control
+0x51834+P0 exactly 1 hit @0x248050 (4th reproduction); 0x51b68+P0 ZERO (mid-
+body datum); FLEETWND cp 0x247fa8 named via magic rec 0xfe7a90; full window
+census 115 recs/31 classes; je@0x51cfa->0x51f3b + jne@0x51f57->0x52059 both
+raw-verified exact; RAM table 0x211188 {0x51fb5 x3, 0x51ff6, 0x52037} whole-
+RAM unique + file 0x3d100 NOT pointers (file blindness proven again). NO
+LEDGER ROW CLOSED (strict-close: mechanism named offline, no live store
+witnessed). OQ-019 residue now = ONE live question: does msg 0x1c01 reach
+FLEETWND under FLEET-window focus (t314). Sitting check: no new play since
+t312 (tail 200MB + 1.5GB windows max turn 1255, newest lines t=1086 restored
+state) — r1_t85g_sitting.py not run. Gate 0, audits OK.
 
 ## LANDED t312 (2026-11-05, session 21) — ORDER-PLACEMENT WRITER RUN: fn
 ## 0x51b68 DESTINATION-WRITER PAIR UNREACHED WHOLE-LOG (branch (b)); SPRITE-

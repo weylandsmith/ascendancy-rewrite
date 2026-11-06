@@ -312,6 +312,24 @@ CALLER hunt OFFLINE on this run's own save/ dir — class-grid RAM scan for
 game consults; file scan is blind, RAM only), and inventory what dispatches
 slot hits for that class; only if the caller names a FLEET-window path does
 a new capture shape earn its keep.
+t313 note (OFFLINE, zero capture; save dir of run t299-leg-20261105-192246;
+scripts/r313_class_scan.py + r313_name_b.py + r313_fleetwnd_map.py +
+r313_writer_callers.py + r313_handler_chain.py; docs/re/_wip_t313.md +
+ships.md S39 + REFUTED-ROUTES t313 amendment): CALLER HUNT LANDED — THE
+WRITERS ARE FLEETWND's. 0x51b68 is mid-body of fn 0x51b64 = FLEETWND class-
+grid slot 3 (cp 0x247fa8, magic rec 0xfe7a90 'FLEETWND'); FLEETWND handler fn
+0x51cc4 has its OWN msg-0x1c01 path (je 0x51f3b exact) -> confirm leg (ecx==5,
+string 0x2b6b) or jne 0x52059 -> system-state table (file 0x3d100 unrelocated;
+RAM instance 0x211188 {0x51fb5 x3, 0x51ff6, 0x52037} runtime-composed, whole-
+RAM unique, identical 3/3 savs) -> state 1/2/3 writes DAT_43508+ring 0x11,
+state 4 writes DAT_43504+ring 0x10. CLASS LAW FIXED (grid stride 6, cp =
+base-0x88, dispatcher 0x30d37 call [cp+0xc]; t310's slot-4 was an 8-byte-
+shifted read). t312 dark writers EXPLAINED: digit 0x1c01 hit 'NEXTTURNCONT'
+focus, never FLEETWND. Row STAYS OPEN (strict-close — offline chain names the
+mechanism but no live store witnessed). NEXT t314: ONE capture — legs
+fn51cc4_entry (NEW, census leg[0]) + w43508_51fc2 + w43504_52003 + btn_hdlr
+control; establish FLEET-window focus via open_fleet, then digit-key + a
+map-click x>150 variant; oracle DAT_43504/43508 + sel43510 + mode4226.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

@@ -683,3 +683,24 @@ BEFORE every control click; and a NEXTTURN control needs btn_hdlr ARMED).
 ## route is the fn 0x51b68 CALLER hunt via the t310 class-grid RAM scan
 ## (grid containing 0x51b68+P0: slot index FIRST, then which table the game
 ## consults) or a FLEET-window selection path — not another map battery.
+
+## t313 AMENDMENT (binding): (1) "fn 0x51b68 IS A FUNCTION / ORPHAN" IS DEAD.
+0x51b68 is mid-body of fn 0x51b64 = FLEETWND class-grid slot 3 (grid base RAM
+0x248030, cp 0x247fa8 named 'FLEETWND' via magic rec 0xfe7a90). The writer
+pair {0x52003 DAT_43504, 0x51fc2 DAT_43508} + the 0x52037 block are the
+msg-0x1c01 continuation of FLEETWND's handler fn 0x51cc4 (je 0x51f3b exact),
+reached via the SYSTEM-STATE jump table (file 0x3d100 unrelocated; RAM
+instance 0x211188 {0x51fb5 x3, 0x51ff6, 0x52037}, runtime-composed, whole-RAM
+unique). Do NOT re-run offline caller censuses on these targets: E8/jcc/u32
+censuses are all measured zero AND the live edge is the runtime table —
+offline is EXHAUSTED (t313 S8). (2) THE DESTINATION-WIDGET HUNT IS FLEETWND,
+NOT STATUSWND: STATUSWND's 0x1c01 path exists (t310) but FLEETWND has its own
+(0x51f3b), and the t312 dark-writer datum is explained by focus: digit-key
+0x1c01 landed on 'NEXTTURNCONT' (btn class), never FLEETWND. Any future
+0x1c01 trigger attempt MUST establish FLEET-window focus first (open_fleet
+route exists in r299_leg_session.py) and arm fn51cc4_entry as census leg[0];
+re-arming STATUSWND legs or bare-map senders is spent (t311+t312 stand).
+(3) CLASS-GRID LAW FIXED: grids are stride-6 at grid_base; cp = grid_base-0x88
+(magic rec: magic at rec+0x00, NAME rec+0x20, cp rec+0xa7); dispatcher =
+0x30d37 call [cp+0xc]. t310's '0x248040 slot 4' = 8-byte-shifted read — use
+r313_class_scan.py / r313_name_b.py, not hand walks.
