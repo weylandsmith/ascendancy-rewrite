@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-08T11:20
+updated: 2026-11-08T13:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,39 +212,94 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t332 BatControlWnd CHAIN LIVE WITNESS (capture; OQ-016 residue-1 last
-uncited edge). RATIONALE: t331 cited the whole arming chain except ONE edge —
-who delivers msg 0x1c01 to registry slot 61 — and re-scoped t322's armed-zero
-(fn 0x156d4 was never armed in any capture). Ordering: this is the only capture
-with a fully-cited upstream; if it fires, residue 1 closes on a live mode-1
-store; if fn156d4_entry fires ZERO whole-log with a valid FLEET/system-view
-battery, the fifth UNREACHABLE leg is finally INSTRUMENTED and the D2-c
-disposition strengthens. TASK: r1_dbg_session/r299_leg_session LEGS +7
-{fn156d4_entry 0x156D4, tbl15ef1 0x15EF1, gate15fed 0x15FED, post1615d 0x1615D,
-post161d1 0x161D1, mode1_1b7dd 0x1B7DD, backch_1b180 0x1B180} (bytes
-payload-verified vs work/ascend_restored.bin; last-4 collision audit); battery
-t298-shape (pre-turn, FLEET open rails>0, rowjump, system view) + NEW phase:
-click My^Items SCREEN (593,218) (window rect 479,103-548,133 + window-origin
-(80,100) t325 law; pixel-verify first per t301 law), then BatListWnd item pick,
-second My^Items click; bank b9 field ([BatControlWnd rec 0xfdbe34+0x88]+0xb9)
-before/after each click. WATCH: t330 heavy-check law (entry-leg stop consumes
-the census window — arm entry ONLY in a dedicated window); SIGKILL teardown by
-recorded PID; scratch only. OUTCOMES: (A) mode1_1b7dd fires -> residue 1 CLOSED
-class candidate (still needs nuke-effect witness before any closure claim);
-(B) entry fires, gate/post legs zero -> cite which leg eats it (b9 reject vs
-gizmo-flag), queue the follow-up; (C) entry zero whole-log with valid battery ->
-fifth leg cited, row stays open, D2-c strengthened. DEAD, do NOT re-trod:
-t331 static routes (done), t326b indexing family, jump-table raw-file reads
-(t331 law C5), t322 mouse battery shapes that never clicked the item rects,
-t324 class-table routes, everything in REFUTED-ROUTES t331 AMENDMENT.
-Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW (teardown SIGKILL);
-t326b objdump range-decode + pad-run law; t331 JUMP-TABLE RAM law (never raw
-file read at cs:[disp32]); t331 window-record law (RAW ASCII NAME @+0x20, magic
-0x12345678 @+0x00, member = runtime+0x88); t324 census anchor / slots=P0+static;
-t330 heavy-check + cache ctx 0x2E1194 ABSOLUTE in .sav; economy.md IS GENERATED.
-Sitting check FIRST (playcap newest turn >1086 => scripts/r1_t85g_sitting.py
-before anything; tail-seek only, OOM law); production :9 untouched; scratch
-copies only, never mount game/; venv python for anything PIL/r1_dbg_session.
+NEXT t333 ACTIVE SCREEN STATE WALK (ZERO CAPTURE; OQ-016 residue-1 last named
+edge). RATIONALE: t332 instrumented and measured the BatControlWnd chain ZERO
+(run work/r1/dbg-t332-20261107-124717: all 8 legs 0, control btn_hdlr 8; save axis
+BatControlWnd[+0xb7]/[+0xb9]=0 and BatModeWnd[+0xb7]=0 in every save), and named
+WHY: the mode-1 road needs windows.txt STATE 1 16 (EXCLUSIVELY the 19-window
+battle-map family) to be the ACTIVE SCREEN STATE, while every captured click lands
+on state 1 (NEXTTURNCONT) or state 17 (PLIND/PLBUILD) windows. t323 closed the
+PER-WINDOW route ([win+0xb1] writers = constructors/cycler/bounds-asserting fn
+0x31f30); the never-decoded edge is the GLOBAL active-state id. No capture can be
+justified on this residue until that decode names an activator (REFUTED-ROUTES
+t332 amendment (3)), and OQ-005 is user-blocked (D1) / OQ-019 already dispositioned
+— so this is the only loop-live edge. TASK (static + offline .sav census only):
+(1) OFFLINE MEASUREMENT FIRST, cheapest and most decisive — for every window
+record in the corpus saves (locate by magic 0x12345678 @+0x00 + RAW ASCII NAME
+@+0x20; member = runtime+0x88), read +0xa (the STATE-match flag fn 0x31d58 writes
+at 0x31dd0), +0xab state-table ptr, +0xad count, +0xb1 state, and dump the 14-byte
+per-state records; report the SET of windows whose +0xa is set per save. That set
+names the active state directly, and answers whether 16 has EVER been active in
+484+ saves. Tool shape: scripts/r333_state_census.py, reuse r1_slot.base_of + the
+r324/r329 census pattern; NEVER json-loads the 8.5 GB timeline (OOM law).
+(2) STATIC: objdump -D -b binary -mi386 -M addr32,intel --start-address 0x31d58
+--stop-address 0x32000 work/ascend_restored.bin (the r331 disasm work/r331_disasm.txt
+already covers it — 139,026 insns, zero badbar); read fn 0x31d58 VERBATIM to pin
+where its `di` (the compared state id) comes from, then census its E8 callers and
+walk that datum to its WRITERS. The composition loop is 0x5898e..0x58b3e (windows.txt
+loader, t323 S1b/S2).
+(3) CROSS-CHECK the battle entry: state-16 chrome (TOGGRID/BATROTLEFT/BATZOOMIN/
+ABANDON) must be composed by the same mechanism — look for the state-id writer in
+combat setup (combat.md fn 0x49xxx family) and in the turn-loop docs/re/turnloop.md.
+OUTCOMES: (A) the active-state writer AND a player-reachable path to 16 are cited
+-> name the activator, then a t334 capture is justified; (B) the writer is cited but
+NO player-reachable path to 16 exists (or 16 never active in any save, measured) ->
+residue (1) gains its FIFTH, now fully-named UNREACHABLE leg: write the honest
+negative, row stays OPEN strict-close, D2-c strengthened, and the OQ-016 residue-(1)
+route text must point at t333's citation rather than at a capture. DEAD, do NOT
+re-trod: ANY mouse/click battery targeting the state-16 family (t332 amendment (1)
+(2)); imm-census hunts for a 0x1c01 poster (the delivery is fn 0x156d4's own
+class-table self-relay 0x16162..0x1616f — amendment (4)); t323 [win+0xb1] writers;
+t324 class-table census; t326b indexing family; raw-file reads at cs:[disp32]
+(jump tables are REBASED; t331 law C5 + the member=linear+0x88 fix in ships.md S51).
+Fixed laws carried (do NOT re-trip): t332 CLICK-SPACE LAW (clicks take windows.txt/
+game coords; (80,100) is a GRAB-TIME crop offset — screen forms like (593,218) must
+be converted -80,-100 before use as click targets); t332 `census control MATCH` is
+FALSE for legs with a relocated immediate (judge arming by BPLIST + fires);
+window-record +0xb0/+0xb7/+0xb9 are BYTES interleaved with DWORD pointers at
++0xb5/+0xbb (byte-granular reads mandatory); t325 SIGNAL LAW (SIGKILL by recorded
+PID); t330 heavy-check + cache ctx 0x2E1194 ABSOLUTE in .sav; t324 census anchor /
+slots=P0+static; economy.md IS GENERATED (ships.md is hand-authored — verified no
+generator touches it). Sitting check FIRST (playcap newest turn >1086 => scripts/
+r1_t85g_sitting.py before anything; tail-seek only, OOM law); production :9
+(pids 136357/136359, Xvfb 1461) untouched; scratch copies only, never mount game/;
+venv python (~/.hermes/hermes-agent/venv/bin/python) for anything PIL/r1_dbg_session.
+
+## LANDED t332 — 2026-11-08 (BATCONTROLWND CHAIN LIVE WITNESS: FIFTH LEG
+## INSTRUMENTED AND MEASURED ZERO; THE OBSTACLE IS THE ACTIVE SCREEN STATE)
+ONE scratch debugger session (work/r1/dbg-t332-20261107-124717, attempt 1 rc=0,
+tool scripts/r332_batctrl_session.py; sitting check NEGATIVE turn 1086 via 40 MB
+tail-seek; production :9 pids 136357/136359 + Xvfb 1461 never signalled, ps-verified
+post-run; teardown SIGKILL recorded PIDs dosbox 174711 / xvfb 174707 only).
+MEASURED: (1) PTY whole-log census ZERO at ALL EIGHT chain legs {fn156d4_entry
+0x156D4, tbl15ef1, gate15fed, post1615d, relay1616f 0x1616F, post161d1,
+mode1_1b7dd 0x1B7DD, backch_1b180} with control btn_hdlr firing 8x and 8/8 banked
+stops attributed — fn 0x156d4 (BatControlWnd, slot 61) received NO message of any
+id; save axis (19 oracle reads) holds BatControlWnd 0xfdbe34 [+0xb7]=0 [+0xb9]=0
+and BatModeWnd 0xfdc89c [+0xb7]=0 in every save before/after every click. Battery
+clicked the item rects t322 named as never clicked — (513,118) My^Items /
+(591,118) Other^Items — on the map AND in the entered view, plus BatListWnd-interior
+(553,200) and the assignment's literal (593,218), plus two leg-armed hold windows.
+(2) THE DELIVERY EDGE IS NOW NAMED MECHANICALLY (fresh objdump 0x16060..0x16200):
+fn 0x156d4's own shared tail 0x16162..0x1616f relays msg 0x1c01 to ITSELF through
+its class table (`mov ebx,[ebp+0xa7]; mov edx,0x1c01; mov eax,ebp; call [ebx+0xc]`),
+reached from the 0x16071 shield jmp, the 0x16145 jmp and the fallthrough of the 0x51
+post — which is exactly why t331's immediate census saw no poster. (3) WHY ZERO,
+MEASURED AT THE PIXEL: banked stops name NEXTTURNCONT (msg 4/8, ret0 0x3177d) as
+the owner of the My^Items/Other^Items pixels on the map and PLIND/PLBUILD (msg 4/8,
+ret0 0x3cb8d) in the rowjump view; the t253 FLEET rowjump enters the PLANET/orbital
+state, NOT a battle screen. (4) STATE-16 CENSUS (fresh windows.txt parse): STATE 1 16
+is EXCLUSIVELY the 19-window battle-map family; states witnessed in captures are
+{1,3,7,13,17,18} — ZERO overlap. (5) JUMP-TABLE SPACE FIX: t331's "member 0x1d4b04"
+is the LINEAR disp32 read from the live instruction; the .sav member is 0x1d4b8c,
+where the table reads [0]=0x15ef9 [1]=0x15fed [2]=0x16181 [3]=0x15ef9 (4/5 =
+0x1624d/0x161e5, unreachable: the b9 dispatch bounds al<=3) — t331's structure
+CONFIRMED as data for the first time. LEDGER: NOTHING closed strict-close (16/3);
+OQ-016 residue-(1) REWRITTEN to point at the active-state edge. Files:
+docs/re/_wip_t332.md S0-S9, docs/re/ships.md S51 (hand-authored, no generator),
+docs/REFUTED-ROUTES.md t332 AMENDMENT (5 binding clauses), scripts/
+r332_batctrl_session.py. NEXT = t333 active-screen-state walk per the block above.
+
 ## LANDED t331 — 2026-11-08 (BATMODEWND ACTIVATION STATIC WALK: ACTIVATION IS
 ## THE WRONG QUESTION — THE BATCONTROLWND MSG ROAD IS ALIVE-IN-IMAGE)
 Purely STATIC iteration (zero launches; production :9 pids 1461/136357/136359
@@ -394,12 +449,14 @@ need RAM). Sitting check NEGATIVE (turn 1086); production :9 untouched; gate 0.
 NEXT = t327 VERBATIM per the block above.
 
 QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; t332 is row 1
-(t331 completed 2026-11-08: activation walk landed OUTCOME A-most — BatControlWnd
-0x1c01->0x51->mode-1 chain cited, t326b consumer leg refuted, t332 capture justified):
+keep this block intact except deleting your completed row; t333 is row 1
+(t332 completed 2026-11-08: chain instrumented and measured ZERO, delivery edge
+named as fn 0x156d4's own class-table self-relay 0x16162..0x1616f, obstacle
+measured = windows.txt STATE 1 16 never active; click batteries on the state-16
+family are now REFUTED, so the residue's only live edge is the static state walk):
 
-t332 BatControlWnd chain live witness (capture; see the NEXT ACTION block for
-  legs, battery, outcomes, and the DEAD list).
+t333 active screen state walk (zero capture; see the NEXT ACTION block for the
+  three probes, outcomes, and the DEAD list).
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 amendments are BINDING): poster pass

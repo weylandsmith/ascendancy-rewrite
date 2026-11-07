@@ -965,3 +965,42 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ##     (fn 0x156d4 slot 2 never armed in ANY capture; no battery ever clicked
 ##     My^Items screen-rect (559..628, 203..233)). A t332 capture MUST arm
 ##     fn 0x156d4_entry before claiming any negative on this road.
+
+## t332 AMENDMENT (binding): THE BatControlWnd CHAIN IS INSTRUMENTED-AND-MEASURED
+## ZERO; NO FURTHER MOUSE BATTERY MAY TARGET IT, AND THE OBSTACLE IS THE ACTIVE
+## SCREEN STATE. Evidence: work/r1/dbg-t332-20261107-124717 (rc=0, tool
+## scripts/r332_batctrl_session.py), docs/re/_wip_t332.md S4-S8, docs/re/ships.md S51.
+## (1) CLOSED-BY-MEASUREMENT (negative): t331 correction C4's blind spot. With the
+##     entry leg fn156d4_entry 0x156D4 armed (dedicated sub-battery) AND the item
+##     rects clicked — (513,118) My^Items and (591,118) Other^Items in text space,
+##     on the strategic map and in the entered view — the pty whole-log census is
+##     ZERO at all eight chain legs {0x156D4, 0x15EF1, 0x15FED, 0x1615D, 0x1616F,
+##     0x161D1, 0x1B7DD, 0x1B180} with the control btn_hdlr firing 8x. BatControlWnd
+##     received NO message of any id; the mode-1 store 0x1B7DD has never fired in
+##     any capture. Do NOT re-run this battery to "catch it this time".
+## (2) DEAD: any click-road route to the state-16 window family. Fresh windows.txt
+##     census: STATE 1 16 is EXCLUSIVELY the 19-window battle-map family
+##     {BatControlWnd, BatListWnd, BatModeWnd, TOGGRID, BATROTLEFT, BATROTRIGHT,
+##     BATZOOMIN, BATZOOMOUT, RECENTER, TOGELEV, ABANDON, My^Items, Other^Items,
+##     Repeat, Pass, Auto, W, S, Z, I}. Measured states in captures:
+##     NEXTTURN/NEXTTURNCONT 1, PLIND/PLBUILD/PLANETALLOC 17, FLEETWND 18,
+##     COSMOSWnd {1,3,7,13} — ZERO overlap with 16. Banked stops name the owning
+##     window at the pixel: (513,118)/(591,118) -> NEXTTURNCONT (map) / PLIND
+##     (rowjump view); (553,200)/(593,218) -> PLBUILD. The t253 FLEET rowjump
+##     enters the PLANET/orbital state, NOT a battle screen — do not treat it as
+##     reaching state 16.
+## (3) THE ONE NAMED EDGE LEFT is ZERO-CAPTURE: the GLOBAL active-screen-state
+##     writer (the id the windows.txt STATE-line composition law consumes: fn
+##     0x31d58, composition loop 0x5898e..0x58b3e). Do not spend further captures
+##     on residue (1) until that decode names an activator.
+## (4) MECHANISM FOUND (not a refutation, the reason an imm census was blind): the
+##     msg-0x1c01 delivery is fn 0x156d4's OWN shared tail 0x16162..0x1616f —
+##     `mov ebx,[ebp+0xa7]; mov edx,0x1c01; mov eax,ebp; call [ebx+0xc]`, a
+##     class-table SELF-RELAY. Immediate censuses cannot see table calls; do not
+##     re-open "who posts 0x1c01 to slot 61" as an imm-census question.
+## (5) LAW: click coordinates are GAME/text space (windows.txt numbers; NEXTTURN
+##     (511,67), FLEET (553,184)). The (80,100) origin is a GRAB-TIME crop offset
+##     (r293_move_session.py:73/:121). Screen-space forms like "My^Items screen
+##     559..628,203..233" or "(593,218)" must be converted back (-80,-100) before
+##     being used as click targets — measured: (513,118) and (593,218) hit
+##     DIFFERENT windows (NEXTTURNCONT vs PLBUILD).

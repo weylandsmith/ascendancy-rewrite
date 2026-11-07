@@ -100,8 +100,26 @@ the entry = msg 0x1c01 delivered to slot 61 -> jump table (RAM-rebased, member
 bits CLEAR by FILE DATA). RESIDUE 1 = ALIVE-IN-IMAGE cited; sole uncited edge =
 who posts 0x1c01 to slot 61 (image-wide imm census: none; road law fn 0x33320).
 t322 armed-zero re-scoped: fn 0x156d4 NEVER armed in any capture. t332 forced
-capture JUSTIFIED (legs named at _wip_t331 S7). Row stays OPEN strict-close
-(no live store witnessed; the mode-1 store has never been observed firing).; (2) setup-time home DRAW law — CLOSED MEASURED
+capture JUSTIFIED (legs named at _wip_t331 S7). t332 CAPTURE EXECUTED 2026-11-08
+(work/r1/dbg-t332-20261107-124717 rc=0, docs/re/ships.md S51 + _wip_t332.md
+S4-S8, tool scripts/r332_batctrl_session.py): ALL EIGHT chain legs {fn156d4_entry
+0x156D4, tbl15ef1, gate15fed, post1615d, relay1616f 0x1616F, post161d1,
+mode1_1b7dd 0x1B7DD, backch_1b180} ZERO whole-log with control btn_hdlr firing 8x;
+save axis holds BatControlWnd[+0xb7]=0/+0xb9=0 and BatModeWnd[+0xb7]=0 in every
+save before/after every click. The delivery edge is now NAMED MECHANICALLY (it was
+never an immediate): fn 0x156d4's own shared tail 0x16162..0x1616f relays msg 0x1c01
+to ITSELF through its class table (`mov ebx,[ebp+0xa7]; mov edx,0x1c01; mov eax,ebp;
+call [ebx+0xc]`) — which is why t331's imm census saw nothing. WHY ZERO, MEASURED:
+STATE 1 16 is EXCLUSIVELY the 19-window battle-map family (fresh windows.txt census)
+while banked stops name the owners of the My^Items/Other^Items pixels as
+NEXTTURNCONT (state 1) on the map and PLIND/PLBUILD (state 17) in the rowjump view —
+the t253 rowjump enters the PLANET/orbital state, NOT a battle screen. The sole
+remaining edge for residue (1) is therefore the GLOBAL active-screen-state writer
+(the id the STATE-line composition law fn 0x31d58 / loop 0x5898e..0x58b3e consumes)
+— a ZERO-CAPTURE question (t333); no further capture is justified on this residue
+until it names an activator (REFUTED-ROUTES t332 amendment). Row stays OPEN
+strict-close (the mode-1 store has STILL never been witnessed firing, and no nuke
+effect has ever been observed).; (2) setup-time home DRAW law — CLOSED MEASURED
 2026-11-04 t295: uniform rejection draw per race in race order, k=draw%T,
 store row_r+0xd @0x22edd, claim gate 0x22ee0 (FUN_00022ce4 0x22eb4..0x22f55
 full disasm + census scripts/r295_home_draw.py: equal-marker 30/30 turn<=2,

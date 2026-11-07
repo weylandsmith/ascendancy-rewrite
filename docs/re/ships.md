@@ -2362,3 +2362,56 @@ segmentation; objdump range-decode law banked there). Cited results:
   road law fn 0x33320 edx=[win+0x63]; STATSHIPLST road 95). t332 capture legs:
   fn156d4_entry/tbl15ef1/gate15fed/post1615d/post161d1/mode1_1b7dd + My^Items
   click screen (593,218).
+
+## S51 t332 (2026-11-08) — BATCONTROLWND CHAIN LIVE WITNESS: THE FIFTH LEG IS
+## MEASURED, AND THE OBSTACLE IS THE ACTIVE SCREEN STATE, NOT A WIDGET
+One scratch debugger session (work/r1/dbg-t332-20261107-124717, rc=0 attempt 1,
+tool scripts/r332_batctrl_session.py; production :9 untouched, ps-verified).
+Legs armed {fn156d4_entry 0x156D4, tbl15ef1 0x15EF1, gate15fed 0x15FED,
+post1615d 0x1615D, relay1616f 0x1616F, post161d1 0x161D1, mode1_1b7dd 0x1B7DD,
+backch_1b180 0x1B180} + btn_hdlr control, in TWO sub-batteries (A downstream-only,
+B entry-alone) because an armed entry leg consumes the census window (t330 law).
+- CENSUS (pty whole-log): ALL EIGHT legs 0; btn_hdlr 8 (instrument alive). 8/8
+  banked stops attributed to btn_hdlr. Save axis (19 oracle reads): BatControlWnd
+  rec 0xfdbe34 and BatModeWnd rec 0xfdc89c (both located by NAME+magic) hold
+  [+0xb7]mode=0 AND [+0xb9]=0
+  in every save before/after every click. OUTCOME C of the assignment.
+- NEW MECHANISM FOUND PRE-RUN (fresh objdump 0x16060..0x16200): the handler's own
+  SHARED TAIL 0x16162..0x1616f is a msg-0x1c01 SELF-RELAY — `mov ebx,[ebp+0xa7]`
+  (BatControlWnd's own class table) / `mov edx,0x1c01` / `mov eax,ebp` /
+  `call [ebx+0xc]` (class-table slot 3). Reached from the 0x16071 shield jmp, the
+  0x16145 jmp AND the fallthrough of the 0x51 post at 0x1615d. This is why t331's
+  immediate census found "no poster": the delivery is a TABLE CALL, not a registry
+  post, and it is internal to fn 0x156d4. Site = r299 leg s2_1616f (zero in
+  t310/t311/t312, whose batteries never clicked these rects). It never fired here
+  either => no 0x1c01 pass ever reached the handler at all.
+- WINDOW OWNERSHIP MEASURED AT THE PIXEL (banked stop names, magic+NAME@+0x20):
+  (513,118)/(591,118) on the strategic map -> NEXTTURNCONT msg 4/8 ret0 0x3177d;
+  (513,118) in the rowjump view -> PLIND msg 8 ret0 0x3cb8d; (553,200) and
+  (593,218) -> PLBUILD msg 4 ret0 0x3cb8d. The t253 FLEET rowjump enters the
+  PLANET/orbital state (PLIND/PLBUILD/PLANETALLOC), NOT a battle screen.
+- STATE-16 CENSUS (fresh windows.txt parse): STATE 1 16 is EXCLUSIVELY the
+  battle-map family — 19 windows {BatControlWnd, BatListWnd, BatModeWnd, TOGGRID,
+  BATROTLEFT, BATROTRIGHT, BATZOOMIN, BATZOOMOUT, RECENTER, TOGELEV, ABANDON,
+  My^Items, Other^Items, Repeat, Pass, Auto, W, S, Z, I}. States witnessed in
+  captures: NEXTTURN/NEXTTURNCONT 1, PLIND/PLBUILD/PLANETALLOC 17, FLEETWND 18,
+  COSMOSWnd {1,3,7,13}. ZERO overlap with 16.
+- DISPOSITION: the arming road is alive in-image (t331) and dead in-capture for a
+  STRUCTURAL reason now measured: the family is composed only while the game-level
+  ACTIVE SCREEN STATE == 16. t323 closed the per-window [win+0xb1] route; the
+  never-decoded edge is the GLOBAL active-state writer (the id consumed by the
+  windows.txt STATE-line composition law fn 0x31d58 / loop 0x5898e..0x58b3e). That
+  is a ZERO-CAPTURE question. OQ-016 residue (1) STAYS OPEN strict-close: the
+  mode-1 store 0x1B7DD has still never been witnessed firing, and no nuke effect
+  has ever been observed.
+- INSTRUMENT LAWS (see _wip_t332.md S8): clicks are windows.txt-space, grabs are
+  root-space (XOFF,YOFF 80,100) — never add the origin to a click target; the
+  `census control MATCH` probe is FALSE for legs containing a relocated immediate
+  (judge arming by BPLIST + fires); window-record fields +0xb0/+0xb7/+0xb9 are
+  BYTES interleaved with DWORD pointers at +0xb5/+0xbb, so byte-granular reads are
+  mandatory; a class-table ebp (btn_hdlr: 0x247ca0) yields table data, not a record.
+- JUMP-TABLE SPACE FIX: t331's "member 0x1d4b04" is the LINEAR disp32 read out of
+  the live instruction; the .sav member is 0x1d4b04+0x88 = 0x1d4b8c, where the
+  table reads [0]=0x15ef9 [1]=0x15fed [2]=0x16181 [3]=0x15ef9 (entries 4/5 =
+  0x1624d/0x161e5, unreachable: the b9 dispatch bounds al<=3). Structure CONFIRMED
+  as data for the first time.
