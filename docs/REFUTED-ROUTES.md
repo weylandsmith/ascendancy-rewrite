@@ -1083,3 +1083,30 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ##     is the scanner's parsed u32 copied verbatim under status [esp+0x3a6]>>16
 ##     == 15 (poison -1 under == 25 when parsed != 0); no imul-14 exists in the
 ##     2,328-insn parse fn.
+
+## t335 AMENDMENT (2026-11-08) — BINDING. THE win+0x6d STRIDE-13 ARRAY IS THE
+## WINDOW-ITEM ARRAY; FOUR ROUTES DIE HERE (evidence: docs/re/_wip_t335.md S1-S5,
+## docs/re/ships.md S54, scripts/r335b_item_array.py exit 0, 196/196 saves).
+## (1) DEAD, SUPERSEDING t334 amendment-(1): ANY further "STATE-line consumer at
+##     win+0x6d" work. MEASURED: [win+0xa1] == TEXTITEM+SHAPEITEM line count
+##     22398/22398 exact (STATE-count test fails 3844/18554); byte0 == item kind
+##     4900/4900; tag0 u32@+1 -> interner ds:0x6fda8 string == file item NAME
+##     verbatim 3528/3528; record-bearing windows == exactly the 15 item-line
+##     windows. The block 0x57ee6..0x58062 (entry fn 0x575e4) is the
+##     WINITEMS/TEXTITEM/SHAPEITEM builder: 0x3101 "%s %d" scans WINITEMS,
+##     0x3107 "%s %d" scans the item kind, 0x310d/0x3119 "%s %d %d %d" the
+##     name+triple. t334's STATE-array reading is RETRACTED (mis-attribution).
+## (2) DEAD: the `STATE 1 16` assert-paradox line of attack (t334 handoff item
+##     B). The branch tests the ITEM KIND (file values {0,1} only, 18+7 lines),
+##     so else-assert 0x5804c (-> 0x2a438 eax=0 -> 0x76c79 -> int3 0x2a424) is
+##     unreachable for shipped data; STATE ids never enter this block. Re-deriving
+##     it further is exhausted.
+## (3) DEAD: hunting resident windows.txt text in .sav Memory members. MEASURED:
+##     `NUMCONTROLS` occurs in 0 of 284 save dirs; `STATE \d+` hits are C-literal
+##     fragments (e.g. "BatModeWnd\0" beside "..\batcon.cpp" at 0x2420e6 in
+##     41.sav). t333's "text IS resident (member 0x39db51)" does NOT reproduce in
+##     the playcap corpus. File-vs-RAM diffs take truth from the ON-DISK
+##     extracted/ascend00/windows.txt joined by window NAME (magic+NAME law).
+## (4) LAW (not a route): fn 0x31690's `cmp ([eax+0x9f]>>16), 4` gate IS the u16
+##     item counter at +0xa1 (same 16 bits) — a max-4-items cap, NOT a
+##     window-type check; do not re-read it as a type assertion.

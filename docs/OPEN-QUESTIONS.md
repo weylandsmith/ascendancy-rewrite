@@ -157,9 +157,29 @@ DISPOSITION: residue (1) keeps its "no runtime screen-selection mechanism in thi
 image" verdict, now cited by mechanism-completeness rather than absence; no
 capture justified (the parse machinery is fully walked; the surviving unknown —
 what consumed the array in the vendor's full build — is outside this image).
-Evidence: docs/re/ships.md S52 + S53 + docs/re/_wip_t333.md S0-S7 +
-docs/re/_wip_t334.md S0-S13 + scripts/r333b_state_layout.py (exit 0, 372 saves)
-+ scripts/r334_state_array.py (exit 0, 196 saves). Row stays OPEN strict-close (the mode-1 store has STILL never
+t335 RE-DERIVED THE BRANCH VERBATIM AND FALSIFIED THE STATE-ARRAY READING
+2026-11-08 (docs/re/ships.md S54 + docs/re/_wip_t335.md S0-S4, tools
+scripts/r335_state_records.py + scripts/r335b_item_array.py both exit 0, 196/196
+needle-verified saves, truth side = on-disk windows.txt): the win+0x6d stride-13
+array is the WINDOW-ITEM array — [win+0xa1] == TEXTITEM+SHAPEITEM line count
+22398/22398 EXACT (vs the STATE count: eq 3844/neq 18554); record byte0 == item
+kind (0 TEXTITEM/1 SHAPEITEM) 4900/4900; tag0 u32@+1 resolves through interner
+ds:0x6fda8 to the file item's literal name verbatim 3528/3528; windows ever
+having records == exactly the 15 item-line windows. The id-branch tests the
+item-kind %d output (ds:0x3107="%s %d", file kinds {0,1}), so the else-assert
+0x5804c is unreachable for shipped data and the `STATE 1 16` paradox DISSOLVES —
+the STATE line has NO consumer in fn 0x575e4; "t334: the STATE line DOES have a
+parse-built runtime home at win+0x6d" is RETRACTED (mis-attribution of the item
+builder; fn 0x31690's 0x9f-gate is the counter<4 item cap, not a type check).
+t333's "windows.txt resident in saves" also fails to reproduce: NUMCONTROLS in 0
+of 284 save dirs. RESIDUE-(1) DISPOSITION after t335: the STATE ids have no
+in-image consumer at all (control table ruled out t333, item array t335, no
+global datum t333); "no runtime screen-selection mechanism in this image" stands,
+now with the STATE-line consumer question closed BY MEASUREMENT rather than
+inference. Evidence: docs/re/ships.md S52 + S53 + S54 + docs/re/_wip_t333.md +
+docs/re/_wip_t334.md + docs/re/_wip_t335.md S0-S4 + scripts/r333b_state_layout.py
+(exit 0, 372 saves) + scripts/r334_state_array.py (exit 0, 196 saves) +
+scripts/r335b_item_array.py (exit 0, 196 saves). Row stays OPEN strict-close (the mode-1 store has STILL never
 been witnessed firing, no nuke effect has ever been observed, and residue (1) now
 has SIX fully-named unreachable legs).; (2) setup-time home DRAW law — CLOSED
 MEASURED

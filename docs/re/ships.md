@@ -2561,3 +2561,39 @@ signalled; game/ read-only.
   the correct ds: read law (a run using B+X rejected 196/196 saves — harness
   error, not law change; the t333 "+0x88 not constant" warning is about
   pointer-value->member conversions, a different transform).
+
+## S54 t335 (2026-11-08) — THE win+0x6d STRIDE-13 ARRAY IS THE WINDOW-ITEM ARRAY:
+## t334'S "STATE-LINE CONSUMER" IS RETRACTED AND THE id-16 ASSERT PARADOX
+## DISSOLVES (ZERO CAPTURE)
+Full working detail: docs/re/_wip_t335.md S0-S4; tools scripts/r335_state_records.py
+(run 1, join failure) and scripts/r335b_item_array.py (decisive, RC=0), fresh
+verbatim reads from work/r331_disasm.txt + 41.sav data segment. Sitting check
+NEGATIVE (max turn 1086 == corpus); production :9 never signalled; game/
+read-only. MEASURED (196/196 needle-verified saves, 22,398 window instances,
+truth side = on-disk extracted/ascend00/windows.txt):
+- [win+0xa1] == count of TEXTITEM+SHAPEITEM lines in the window's file block:
+  22398/22398 EXACT; the same test vs the STATE-line count FAILS (eq 3844 /
+  neq 18554). Slot byte0 == item kind (0=TEXTITEM, 1=SHAPEITEM): 4900/4900
+  positional agreement. tag==0 u32@+1 resolves verbatim through the interner
+  pool ds:0x6fda8 to the file item's literal name: 3528/3528 hits ("Play^
+  Introduction", "Load^Game"+"Alt-L", "Species", ...). Windows ever having
+  records == exactly the 15 file windows with item lines, both directions.
+- CODE IDENTITY: parse block 0x57ee6..0x58062 (entry fn 0x575e4) is the
+  WINITEMS/TEXTITEM/SHAPEITEM builder: 0x3101 "%s %d" scans WINITEMS (loop
+  bound), 0x3107 "%s %d" scans the item kind (file values only {0,1}), 0x310d/
+  0x3119 "%s %d %d %d" scan the name+int triple; fn 0x31690 = item appender
+  (gate "[eax+0x9f]>>16 >= 4" is the u16 counter at +0xa1 — a max-4-items cap,
+  NOT a window-type check); fn 0x31384 = paint-time item renderer.
+- THE PARADOX: assert 0x5804c (-> 0x2a438 with eax=0 -> 0x76c79 -> int3 0x2a424)
+  is reachable only for item kind > 1, which shipped windows.txt never contains;
+  `STATE 1 16` never touches this block. t334's STATE-array reading was a
+  mis-attribution of the item builder; its census families (0,1,0,0)/(1,0,0,0)
+  WERE item records (t334's own S9 flagged them as non-pointers).
+- t333 CORRECTION: "windows.txt text IS resident in saves (member 0x39db51)"
+  does NOT reproduce — NUMCONTROLS occurs in 0 of 284 save dirs' Memory members;
+  only C-literal fragments ("BatModeWnd\0" next to "..\batcon.cpp") are resident.
+  File-vs-RAM diffs must use the on-disk file as truth, joined by window NAME.
+CONSEQUENCE FOR OQ-016 residue-(1): the STATE line has NO parse-time consumer in
+fn 0x575e4 at all (that block builds items); the residue question is now purely
+"who reads the STATE ids", with the control-table ([win+0xab], t333) and item
+array (win+0x6d, t335) both ruled out by measurement.
