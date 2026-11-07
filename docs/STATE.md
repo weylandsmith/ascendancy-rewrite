@@ -209,40 +209,37 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t324 RAM CLASS-TABLE CENSUS — test the t323 re-open condition, the one
-caveat separating the activation negative from absolute (zero-battery,
-scratch copy). t323 closed the activation route census-complete STATICALLY
-(REFUTED-ROUTES t323 amendment binding), but static class tables are
-RAM-relocated (t303(5); t296: installer img+0x1abe6/0x1ac21 writes imm
-0x58e8 -> RAM +P0), so fn 0x32100's absence from the cited BATMODE table
-[0x1abfc,0x30d08,0x1aef8,0x1d858,0x311b8,0x1e9dc] is cited-but-indirect.
-Steps: (0) FIRST grep existing RAM-dump artifacts in work/r1/ (t313/t316
-tooling produced RAM reads; a dump covering the registry record region may
-already exist — if so, zero guest boot needed); (1) else scratch-copy boot
-resume.gam via the proven relaunch shape (scripts/r322_relaunch.sh as base,
-NO battery, NO legs — this is a READ census, not a capture); (2) locate the
-BatModeWnd registry record (fn 0x2351c law: registry at wmgr 0x12e10+0x3337
-stride 0x27, or via the handler-member 0x247978 neighbourhood t322 named)
-and dump [rec+0xa7] -> 6 RAM slots at data+0x58e8 (rebase +P0 per OQ-011);
-(3) compare slots vs cited law verbatim; flag ANY slot that is a [win+0xb1]
-writer (fn 0x32100/0x31f30/0x339a4/0x15xxx family). DELIVERABLE:
-docs/re/_wip_t324.md — slots MATCH cited law => negative ABSOLUTE, OQ-019
-select/destination residue disposition is final (row stays open per
-strict-close but every capture route is now cited-dead: t319/t320 pump,
-t322 mouse, t323 activation, t324 table); slots MISMATCH => t323 reopens,
-name the writer and re-design. Ordering rationale: this is the last
-falsification test for the t323 law; every other OQ-019 direction is
-refuted, and landing the loop on an absolute negative (or a cited reopen)
-is the only productive spend left before the row's disposition.
-Fixed laws carried (do NOT re-trip): t323 amendment (1)-(4); t322 (1)-(3);
-t321 (1)-(4); t320 (1)-(4); t319 (1)-(4); msg-0x50 no external sender;
-fn 0x1b91c decode verbatim (t296 S5 + t321 S4); fn 0x2351c name arg DEAD
-(do not re-open as activator); production :9 (pid 1957) untouched; scratch
-copies only, never mount game/; sitting check FIRST (playcap newest turn >
-1086 => re-run scripts/r1_t85g_sitting.py before anything).
+NEXT t329 OQ-019 DISPOSITION PACKET — t324 landed NEGATIVE-ABSOLUTE (its
+condition is met; see LANDED t324 below), so the conditional row is now
+satisfiable and is the natural consequence of this chain: every capture route
+for the select/destination residues is cited-dead (t319/t320 pump, t322 mouse,
+t323 activation, t324 class-table). DRAFT (do NOT apply) the final OQ-019 row
+text marking residues (1) sugar-cube arrival granularity, (2) per-ship build
+path = build decision (D2), (3) magnetron witness as capture-limited with the
+cited dead-route closure: t319/t320 pump never posts 0xc, t322 BatModeWnd zero
+msgs in-view, t323 activation census-complete, t324 class-table absolute
+(live RAM == cited, fn 0x32100 absent — scripts/r324_census.py, 10/10 saves).
+Magnetron USE shares the same widget path, so its witness class is cited-dead
+too — say so explicitly (it retires the last scripted idea honestly). Update
+docs/DECISIONS.md D3 with actual state: rows closeable by the loop = NONE
+remaining without user input (D1 ruling or D2 commission). NO LEDGER ROW MOVES
+in t329 (strict-close; disposition is the USER's ruling) — t329 produces a
+draft packet only. Ordering rationale: t325-t328 are independent of the
+OQ-019 chain (shield-byte witness, phase bomb, debugger tool v2, OQ-005
+feasibility); landing the OQ-019 disposition now banks the payoff of the whole
+t304-t324 chain while it is fresh and hands the user a single crisp ask,
+before the queue drifts. If t329's draft is ready, NEXT becomes t325.
+Fixed laws carried (do NOT re-trip): t324 note (census anchor = installer
+target data 0x58e8; [wmgr+0x3337] is the LANE POOL, not a name registry; slots
+= P0+static); t323 amendment (1)-(4); t322 (1)-(3); t321 (1)-(4); t320 (1)-(4);
+t319 (1)-(4); msg-0x50 no external sender; fn 0x1b91c decode verbatim (t296 S5
++ t321 S4); fn 0x2351c name arg DEAD (do not re-open as activator); production
+:9 (pid 1957) untouched; scratch copies only, never mount game/; sitting check
+FIRST (playcap newest turn >1086 => re-run scripts/r1_t85g_sitting.py before
+anything).
 
 QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; t324 above is row 1):
+keep this block intact except deleting your completed row; t325 below is row 1):
 
 t325 PER-SLOT SHIELD-BYTE WRITNESS (OQ-016 residue 4; t271 said writer
   reachable, consumer unmapped — the debugger chain makes it cheap now).
@@ -304,22 +301,12 @@ t328 OQ-005 DRAW-WITNESS FEASIBILITY (offline-first; sharpens D1 for the user,
   probe. mouse k5/k6/k7 + 1starmap k1: check static sites for who selects
   those indices (windows.txt law + name-imms); if any is reachable in a
   normal screen, DESIGN (do not run) a one-launch scratch draw-capture with
-  screen-compare vs our decode, and queue it as t329. 3cfgnew k12: vendor
-  truncation — cite as junk-certain. Deliverable: feasibility table + updated
-  DECISIONS.md D1 text (ask shrinks to what is actually adjudicable).
-
-t329 (CONDITIONAL — only if t324 landed NEGATIVE-ABSOLUTE) OQ-019 DISPOSITION
-  PACKET: draft (do NOT apply) the final row text marking residues (1)
-  sugar-cube arrival granularity, (2) per-ship build path = build decision
-  (D2), (3) magnetron witness as capture-limited with the cited dead-route
-  closure: t319/t320 pump never posts 0xc, t322 BatModeWnd zero msgs, t323
-  activation census-complete, t324 class-table absolute; magnetron USE shares
-  the same widget path so its witness class is cited-dead too (say so
-  explicitly — it retires the last scripted idea honestly). Update
-  docs/DECISIONS.md D3 with actual state: rows closeable by loop = none
-  remaining without user input (D1 ruling or D2 commission). NO ledger row
-  moves (strict-close; disposition is the USER's ruling). If t324 REOPENED
-  instead: skip this row, design the redesign.
+  screen-compare vs our decode, and queue it as a follow-on task. 3cfgnew
+  k12: vendor truncation — cite as junk-certain. Deliverable: feasibility
+  table + updated DECISIONS.md D1 text (ask shrinks to what is actually
+  adjudicable). (NOTE: the old "queue it as t329" text predated t324 landing;
+  t329 is now the OQ-019 disposition packet — queue any draw-capture design
+  under a new id after t328.)
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 amendments are BINDING): poster pass
@@ -351,6 +338,35 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone 6 stays; work/ gitignored — findings to docs/re/.
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel
   (task line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
+
+## LANDED t324 (2026-11-06, session 33) — RAM CLASS-TABLE CENSUS: THE t323
+## RE-OPEN CONDITION IS DISCHARGED — NEGATIVE ABSOLUTE. Live-RAM census of
+## the BatModeWnd class table (read surface = production save `Memory` ZIP
+## member per the pointer law; zero guest boot, zero scratch copy, production
+## :9 untouched). 10/10 saves 50..59 (t=1086 corpus) IDENTICAL; model
+## validated per-save via the Icarus star record 0x256825 name read. The
+## table at data payload offset 0x58e8 — the SOLE [rec+0xa7] install target
+## (image census of all 62 [+0xa7] stores: 0x58e8 appears ONLY at fn 0x1ac21)
+## — reproduces the cited BATMODE table BYTE-FOR-BYTE: RAM slots
+## 0x1da04c/0x1f0158/0x1da348/0x1dcca8/0x1f0608/0x1dde2c == P0+0x1abfc/
+## 0x30d08/0x1aef8/0x1d858/0x311b8/0x1e9dc (6/6 in-code); fn 0x32100 ABSENT
+## (also 0x31f30/0x339a4). Rebase model measured: table base = UNREBASED data
+## offset, slots = P0 + static fn offset (the t307 code-rebase law does NOT
+## apply to class tables). docs/re/_wip_t324.md S0-S4 + scripts/r324_census.py
+## (exit 0, self-validating). Task-text correction (banked): [wmgr+0x3337]
+## stride 0x27 is the LANE POOL (data 0x16147 = LANE_X), NOT a window-name
+## registry — the census anchored on the installer target instead. Honest
+## caveat: census is via the unique installer's target offset; no BatModeWnd
+## RECORD is resident in the t=1086 save (no u32 -> "BatModeWnd" name pool),
+## consistent with t322 never-in-view — that state is itself the closed class.
+## OQ-019 note added to the row (strict-close: row STAYS OPEN — no live
+## SELECT store ever witnessed; this is a cited-dead-route closure). Every
+## OQ-019 capture route now cited-dead: t319/t320 pump, t322 mouse, t323
+## activation, t324 class-table. NO LEDGER ROW CLOSED (strict-close).
+## Sitting check negative (tail-seek newest turn 1086 == corpus). Production
+## :9 (pid 1957) untouched. NEXT = t329 OQ-019 DISPOSITION PACKET (its
+## condition "only if t324 landed NEGATIVE-ABSOLUTE" is met; drafts only,
+## row closes on USER ruling).
 
 ## LANDED t323 (2026-11-06, session 32) — OFFLINE ACTIVATION DECODE: NO
 ## IN-SESSION TRIGGER EXISTS; OQ-019 SELECT/DESTINATION RESIDUES =

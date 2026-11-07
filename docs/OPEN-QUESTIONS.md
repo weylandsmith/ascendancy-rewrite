@@ -553,6 +553,27 @@ roads both dead, the per-ship select leg has NO remaining capture route at
 t=1086 — remaining candidates must come from a DIFFERENT sitting/save state
 (kind-4 owner-0 ship exists) or the row's residue is dispositioned
 permanently per the t323 amendment.
+t324 note (OFFLINE, zero capture/zero guest boot; scripts/r324_census.py +
+docs/re/_wip_t324.md S0-S4): THE t323 RE-OPEN CONDITION IS DISCHARGED —
+NEGATIVE ABSOLUTE. Live-RAM census of the BatModeWnd class table (read
+surface = production save `Memory` ZIP member per the pointer law; 10/10
+saves 50..59 t=1086 identical; model validated per-save via the Icarus star
+record 0x256825 name read): the table at data payload offset 0x58e8 — the
+SOLE `[rec+0xa7]` install target (image census, 62 stores: 0x58e8 only at fn
+0x1ac21) — reproduces the cited BATMODE table BYTE-FOR-BYTE: RAM slots
+0x1da04c/0x1f0158/0x1da348/0x1dcca8/0x1f0608/0x1dde2c == P0+0x1abfc/0x30d08/
+0x1aef8/0x1d858/0x311b8/0x1e9dc (6/6 in-code), fn 0x32100 ABSENT (and
+0x31f30/0x339a4 too). Rebase model measured: table base = unrebased data
+offset, slots = P0+static fn offset. Caveat (honest): the census anchored on
+the unique installer's target offset, not on a physically located BatModeWnd
+RECORD — no resident record exists in the t=1086 save (no u32 -> "BatModeWnd"
+name pool found), consistent with t322's never-in-view finding; that state is
+itself the closed class. Task-text correction: [wmgr+0x3337] stride 0x27 is
+the LANE POOL (data 0x16147), not a window-name registry. Every OQ-019
+capture route is now cited-dead: t319/t320 pump, t322 mouse, t323
+activation, t324 class-table. Row STAYS OPEN (strict-close: no live SELECT
+store ever witnessed — this is a cited-dead-route closure). Disposition
+packet = t329 (drafts only; the row closes on USER ruling).
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —
