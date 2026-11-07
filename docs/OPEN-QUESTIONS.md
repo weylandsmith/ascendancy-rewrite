@@ -60,8 +60,18 @@ slot (t271: byte1:=item id, word2 bit0 CLEAR — pending IS ring-observable).
 ATTRIBUTION FIXES t273 (binding for all future mining): owner INDEX byte +0x56
 (NOT handle u16+0x54); stale-echo pairs mint phantom deltas; the t251 mine is
 VOID on both bugs; damage-vs-non-at-war-owner STILL ZERO corpus-wide.
-RESIDUE (each with a route): (1) Phase Bomb nuke law — capture-gated, BLOCKED
-section + one-run recipe; (2) setup-time home DRAW law — CLOSED MEASURED
+RESIDUE (each with a route): (1) Phase Bomb nuke law — t326 PREFLIGHT
+MEASUREMENT 2026-11-07 (docs/re/income-law.md S-T326 + docs/re/_wip_t326.md
+S1-S5, tool scripts/r326_precensus.py exit 0): known-tech mask field LOCATED
+(ds:0x7478e+0x4b*i bit(1<<race), count word ds:0x74744; cheat-body law);
+race 0 AND 2 ALREADY OWN row13 Molecular^Explosives at t=1086 (research leg
+vacuous); cidx-70 carriers ZERO in 30 ship rows; 30 owner-0 ORBITAL Shipyards
+exist (build leg UI-satisfiable); mode-1 arming-msg census: no post-senders
+of 0x4d..0x51 (0x15454 = assert reporter; windows.txt has no SENDMESSAGE in
+77..81) BUT an unwalked value-writing family exists (0x17c63/0x17c72/0x17c81
++ sibling 0x16147, _wip_t326 S5) — launch road NOT closed; the 4-launch
+forced-capture is GATED behind the zero-capture walk of fn(0x17c54)+
+fn(0x16147) (task t326b). Row stays OPEN strict-close.; (2) setup-time home DRAW law — CLOSED MEASURED
 2026-11-04 t295: uniform rejection draw per race in race order, k=draw%T,
 store row_r+0xd @0x22edd, claim gate 0x22ee0 (FUN_00022ce4 0x22eb4..0x22f55
 full disasm + census scripts/r295_home_draw.py: equal-marker 30/30 turn<=2,

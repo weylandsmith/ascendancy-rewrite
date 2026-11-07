@@ -218,7 +218,11 @@ that reading:
   (count u16 = 66 at file offset 180, scaled costs included) and its
   4950-byte research block is **byte-identical (0 diffs)** to a fresh-campaign
   RAM copy. So this table is static definition data, not research progress —
-  who-researched-what lives elsewhere and is still unmapped.
+  who-researched-what lives elsewhere: MAPPED 2026-11-07 t326 (income-law.md
+  S-T326) — per-race owned-mask byte at ds:0x7478e + 0x4b*i, bit (1<<race),
+  count word ds:0x74744 (law from cheat body 0x47828 verbatim; census
+  scripts/r326_precensus.py; semantics corroborated via prereq-closure, not
+  proven — 10 deep-tree edges violate strict-AND, see S-T326.2).
 - Weak corroboration only: no extracted table *names* a variant tech (40 spaced
   variant names searched in gizmos/static/cosmos/names/help -> 0 hits). This
   proves little — the 66 main-tree names score 0 in the same files, so the test

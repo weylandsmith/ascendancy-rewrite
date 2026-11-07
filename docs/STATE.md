@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-06T23:40
+updated: 2026-11-08T00:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -165,7 +165,10 @@ ledger:
       (S10) closed (income-law.md S6..S10). STILL OPEN: per-cell
       terrain/nuke wiring, home-placement verification, +2 residual minutiae
       (0.4% samples). (scenario-template preset source CLOSED t294 — file
-      table planitem.txt, income-law t294 block)"
+      table planitem.txt, income-law t294 block) (t326 preflight census
+      2026-11-07: known-tech mask field LOCATED ds:0x7478e+0x4b*i; Phase
+      Bomb tech ALREADY owned by races 0+2; launch-msg post hunt narrowed to
+      the fn(0x17c54)/fn(0x16147) walk — income-law.md S-T326.)"
     - "OQ-019 ship design model (hull+gizmo inventory, cost hack, Orbital
       Docks); per-ship combat application = OQ-010 aggregate caveats S2i"
 
@@ -209,74 +212,56 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t326 PHASE BOMB FORCED-CAPTURE (OQ-016 residue 1 — the nuke law) — t325
-LANDED 2026-11-07 negative-with-census (see LANDED t325 below +
-docs/re/income-law.md S-T325: production census PROVED slot byte +3 is NOT a
-shield progress value => residue 4 premise contradicted, row stays open
-absence-only), so per the queue law t326 is now row 1 and lands VERBATIM.
-Ordering rationale: t326 is the LARGEST capture-gated item left and the only
-remaining row-moving measurement (D3 t329: OQ-016 sole live-movement row);
-t327's tool v2 should bake t326's forced-capture recipe next; t328 follows.
-REUSABLE FROM t325 (do not re-derive): scripts/r325_shield_session.py holds the
-early-arm-at-title BPLM shape (survives campaign load, ZERO boot fires — t286b
-baseline re-confirmed 3/3), the deterministic scratch-heap member address
-0x25eb7c (identical 3/3 sessions), and the FIXED popup drain (ppm:- P6 parse +
-root->window-rel subtract (80,100); detector verified offline vs a real popup
-(406,442)). BREAK lottery at title is the known ~50% killer (t286 law 2) —
-budget relaunches accordingly.
-Slot law (STATE WHAT-IS-IN-HAND): slot array at stored-ptr+0x88 conversion,
-slot = 4B {class, itemIdx(0xff empty), flags u8, shield u8}. POINTER-VALUE LAW
-t298 binding: RAM holds guest-PHYSICAL; BPLM target = member + 0x88. t326
-RECIPE VERBATIM (its queue row + docs/BLOCKED.md §Nuke one-run recipe):
-Scratch copy, OWN ring, drive class laws (t285: assert_on_map, no Escape,
-STOP-AND-LOOK). Scripted route: research path per restree prereqs (verify
-availability via t294 planitem law), build at a Shipyard, launch at an OWNED
-planet with >=3 surface items. Capture slot states before/launch/after via the
-ring + pointer law; identify the dispatch-table entry by which code first
-writes FF into a mid-record slot byte at launch time. Budget 4 launches MAX
-(t293 accounting: only runs that reached the build/launch phase count). If
-Phase Bomb never completes research in reachable turns, bank the turn-cost
-arithmetic witnessed (restree cost law t295-era pins) and exit-1 negative.
-Default stays NOT modelled either way; closing = witnessed destruction law
-banked to economy.md + row residue updated. t305 FirePat law (stop line =
-unique PATTERN); t307/t308 leg shape (reproducible 3/3 — copy run dirs under
-work/r1/ as templates).
-Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW — NEVER SIGTERM the game
-process: it opens the vendor quit-confirm with (Yes) DEFAULTED (measured live
-this session; recovering the (No) coordinate burned a third of an iteration);
-teardown is SIGKILL (as r325_shield_session.py does). Also t325 context law:
-`convert img rgb:-` is HEADERLESS raw RGB — piping it anywhere risks dumping
-1 MB of bytes into context; use ppm:- (P6 header). And t325 note (slot byte +3 census law — do
-NOT re-witness byte +3 as progress: 44 pending rows read 0, 43 completed read
-15/word2 0xf01; witness the whole dword instead, income-law S-T325); t324 note (census anchor = installer
-target data 0x58e8; [wmgr+0x3337] is the LANE POOL, not a name registry; slots
-= P0+static); t323 amendment (1)-(4); t322 (1)-(3); t321 (1)-(4); t320 (1)-(4);
-t319 (1)-(4); msg-0x50 no external sender; fn 0x1b91c decode verbatim (t296 S5
-+ t321 S4); fn 0x2351c name arg DEAD (do not re-open as activator); t329 note
-(magnetron scripted road cited-dead — do NOT re-derive the 0x15xxx arming
-tail; production sitting has ZERO cidx-60 carriers, scripts/
-r329_magnetron_census.py); production :9 (pid 1957) untouched; scratch copies
-only, never mount game/; sitting check FIRST (playcap newest turn >1086 =>
-re-run scripts/r1_t85g_sitting.py before anything).
+NEXT t326b STATIC WALK: fn(0x17c54) + fn containing 0x16147 — DECIDES the
+Phase Bomb launch road (OQ-016 residue 1). t326 LANDED 2026-11-07 as an
+offline preflight census (docs/re/income-law.md S-T326 + docs/re/_wip_t326.md
+S1-S5): research leg VACUOUS (races 0+2 already own row13 Molecular^Explosives
+at t=1086), cidx-70 carriers ZERO, 30 owner-0 orbital Shipyards exist, mode-1
+arming msgs 0x4d..0x51 have NO post-senders (0x15454 = assert reporter;
+windows.txt has no SENDMESSAGE in 77..81) — BUT a value-writing family was
+FOUND AND LEFT UNWALKED: 0x17c63/0x17c72/0x17c81 set stack-dword
+[esp+0x54] := 0x4c/0x4d/0x4e dispatching on BYTE[[edi]+1] in
+{0x1c,0x1d,0x1e} (after call 0x39b6c), consumed as an INDEX at 0x17cf8 into
+[esi+0x1a92+edi*4] / [esi+0x1bcc+edi*4] before calls 0x1ce1c/0x17694; sibling
+0x16147 `mov ebx,0x51` right after 0x16122 clears [ebp+0xb1] (post-shaped,
+eax=0x7a35c, edx=[ebp+0xbb]).
+TASK (zero capture; work/t91_code_disasm.txt + work/ascend_payload.bin
+verbatim; production untouched): walk BOTH functions entry-to-sites; name
+what BYTE[[edi]+1] is (record kind? gizmo category? the 0x1c/0x1d/0x1e keys
+are NOT gizmo ids 70/71/72 — resolve what they index); determine whether ANY
+reachable path posts msg 0x4d..0x51 to the batmode window (fn 0x1aef8 layer,
+cmp dx,0x50 @0x1b7cd) or whether these are pure table-index values.
+OUTCOME A (poster exists): update residue-1 route to the named trigger, THEN
+run t326c ONE-launch forced-capture per the BLOCKED §Nuke recipe as amended
+by S-T326 (skip research leg; design+build at an orbital Shipyard; launch
+needs GZ_TARGETSURFACE target). OUTCOME B (index values only): residue 1 =
+UNREACHABLE-BY-CAPTURE cited (three independent dead legs: this census + t323
+writerless [ebp+0xb1] + t329 commit edges), row stays OPEN strict-close with
+the cited-dead note, and t327 (tool v2) becomes row 1 unchanged.
+Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW — SIGTERM pops the
+vendor quit-confirm (Yes)-default; teardown is SIGKILL. t325 context law:
+`convert img rgb:-` is HEADERLESS raw RGB — use ppm:- (P6). t325 census law:
+slot byte +3 is NOT a progress value (44 pending rows 0, 43 completed 15/
+word2 0xf01) — watch whole dwords. t329: magnetron scripted road cited-dead
+(do NOT re-derive the 0x15xxx arming tail). t324: census anchor = installer
+target data 0x58e8; [wmgr+0x3337] = LANE POOL; slots = P0+static. t323
+amendment (1)-(4); t322 (1)-(3); t321 (1)-(4) incl. msg-0x50 three non-post
+sites; fn 0x2351c name arg DEAD. economy.md IS GENERATED (gizmo_probe.py) —
+bank nuke findings to income-law.md (S-T326 precedent). Sitting check FIRST
+(playcap newest turn >1086 => scripts/r1_t85g_sitting.py before anything);
+production :9 untouched; scratch copies only, never mount game/.
 
 QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; t326 below is row 1;
-NOTE: t325's queue row was deleted when t329 landed it as NEXT 2026-11-06):
+keep this block intact except deleting your completed row; t326b is row 1 —
+it was inserted by t326 2026-11-07 and OUTRANKS t327 because it decides
+whether residue 1 has any live-capture potential at all):
 
-t326 PHASE BOMB FORCED-CAPTURE (OQ-016 residue 1 — the nuke law, the LARGEST
-  capture-gated item left; one-run recipe verbatim in docs/BLOCKED.md §Nuke).
-  Scratch copy, OWN ring, drive class laws (t285: assert_on_map, no Escape,
-  STOP-AND-LOOK). Scripted route: research path per restree prereqs (its tech
-  chain, verify availability via t294 planitem law), build at a Shipyard,
-  launch at an OWNED planet with >=3 surface items. Capture slot states
-  before/launch/after via the ring + pointer law; identify the dispatch-table
-  entry by which code first writes FF into a mid-record slot byte at launch
-  time. Budget 4 launches MAX (t293 accounting law: only runs that reached the
-  build/launch phase count). If Phase Bomb never completes research in-turns
-  reachable, bank the turn-cost arithmetic you DID witness (restree cost law
-  t295-era pins apply) and exit-1 negative. Default stays NOT modelled either
-  way; closing = the witnessed destruction law banked to economy.md + row
-  residue updated.
+t326b STATIC WALK fn(0x17c54) + fn(0x16147) — the mode-1/msg-0x4d..0x51
+  poster hunt, VERBATIM per the NEXT ACTION block above (Outcome A -> author
+  t326c ONE-launch capture row from S-T326's amended recipe; Outcome B ->
+  bank cited-dead note on residue 1, row stays OPEN strict-close, t327
+  stands). Budget: pure static, ~25 probes; every claim carries disasm line
+  numbers; honest negative is an acceptable landing.
 
 t327 DEBUGGER-SESSION TOOL v2 (compresses every future DAT-writer hunt to 1-2
   sessions; the t306-t323 chain burned ~18 iterations largely on instrument
@@ -343,6 +328,40 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone 6 stays; work/ gitignored — findings to docs/re/.
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel
   (task line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
+
+## LANDED t326 (2026-11-07, session 36) — PHASE BOMB PREFLIGHT CENSUS:
+## RESEARCH LEG VACUOUS, LAUNCH-MSG POST HUNT OPEN->NARROWED (OQ-016 residue
+## 1 stays OPEN strict-close; zero capture, production :9 untouched, sitting
+## check negative — tail-seek newest turn 1086). Tool scripts/
+## r326_precensus.py (exit 0, keeper); working notes docs/re/_wip_t326.md
+## S0-S5; law banked docs/re/income-law.md S-T326 (NOT economy.md — that file
+## IS GENERATED by gizmo_probe.py, BLOCKED trap) + docs/re/research.md S6c
+## stale-"unmapped" corrected. MEASURED: (1) KNOWN-TECH MASK FIELD LOCATED —
+## tech row i per-race mask byte ds:0x7478e+0x4b*i bit(1<<race), count word
+## ds:0x74744 (law from cheat body 0x47828 verbatim); (2) row13
+## Molecular^Explosives (Phase Bomb ResReq) mask 0x05 = RACES 0+2 ALREADY OWN
+## at t=1086 — the queued forced-capture's research leg is vacuous; prereq-
+## closure 110 in-play edges / 10 violations all deep-tree-skip => gate NOT
+## strict-AND on this reading, mask semantics corroborated-not-proven (do not
+## wire on this datum); (3) cidx-70 carriage ZERO in 30 ship rows (owner-0
+## kinds {3:3,5:8}); (4) Shipyard(22) = 30 ACTIVE slots ALL owner-0 ALL
+## class-1 ORBITAL + 2 pending (Cambria II/IV) — build leg UI-satisfiable,
+## recipe's surface framing sloppy. STATIC: mode-1 arming msgs 0x4d..0x51
+## have NO post-senders (mov edx,0x4d sole site 0x15454 = assert reporter
+## 0x2a428 ebx=0x122; 0x4e/0x4f/0x51 zero; windows.txt SENDMESSAGE has no
+## value in 77..81; msg->mode map cmp dx,0x50 @0x1b7cd re-read verbatim) BUT
+## a VALUE-WRITING family was found and deliberately NOT walked (context
+## budget): 0x17c63/0x17c72/0x17c81 set [esp+0x54]:=0x4c/0x4d/0x4e on
+## BYTE[[edi]+1] in {0x1c,0x1d,0x1e} (post call 0x39b6c), consumed as INDEX at
+## 0x17cf8 into [esi+0x1a92+edi*4]/[esi+0x1bcc+edi*4]; sibling 0x16147 mov
+## ebx,0x51 after 0x16122 clears [ebp+0xb1]. DECISION (honest, not a shortcut
+## claim): the 4-launch capture is GATED behind the zero-capture walk of
+## fn(0x17c54)+fn(0x16147) — if that family posts, launching is alive and the
+## capture runs; if it's table indexing, residue 1 joins the cited-dead class
+## and no launch can ever witness it. Spending 4 launches (~1 hr + lottery)
+## before knowing which is the coin-flip error. NEXT = t326b STATIC WALK
+## (queue row 1 inserted; t327/t328 unchanged behind it). NO LEDGER ROW
+## CLOSED (strict-close). Gate 0, audits OK.
 
 ## LANDED t325 (2026-11-07, session 35) — SHIELD-BYTE WITNESS: NEGATIVE +
 ## CENSUS LAW (OQ-016 residue 4 premise contradicted, row STAYS OPEN).
