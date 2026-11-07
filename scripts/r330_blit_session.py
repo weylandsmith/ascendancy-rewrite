@@ -461,6 +461,11 @@ def live_attempt(tag, window, disp, port, tl, settle):
         if ph_res is None:
             return 2
         ds.whole_log_census()
+        # t330 ORDERING FIX: blit_attrib.json was atexit-only, so the
+        # in-process analyze() saw no file and returned 2 on a GOOD run
+        # (both t330 attempts exited 1 despite rc=0 banking). Write the
+        # artifacts before analyze() runs; bank_on_exit stays idempotent.
+        ds.bank_on_exit()
         with open(op.join(s.out, "phases.json"), "w") as fh:
             json.dump({k: (v if isinstance(v, (dict, int, float, bool))
                            else (0 if v is None else len(v)))
