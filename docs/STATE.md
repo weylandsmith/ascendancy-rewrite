@@ -212,22 +212,27 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t327 DEBUGGER-SESSION TOOL v2 (compresses every future DAT-writer hunt
-to 1-2 sessions; the t306-t323 chain burned ~18 iterations largely on
-instrument bugs — this is the payoff task for that chain; t326b CLOSED the
-residue-1 question statically 2026-11-07 so no capture is queued ahead of
-this). Ship scripts/r1_dbg_session.py wrapping the proven pieces
-(r322_relaunch.sh boot shape, leg spec {addr, FirePat pattern,
-expected-callsite}, whole-log msg census, resume-with-fired-BP handling,
-bank-on-exit). LAWS to bake in, all measured: t305 FirePat stop-line = unique
-pattern (debug.cpp debug.cpp:1560+/1586-87); MEMREAD real-mode-only
-(debug.cpp:2983) — ring is the read surface; xsend arg1 = WINDOW TITLE not
-display (t290); resume-with-fired-BP re-freezes (t302 bug 2). VERIFY against
-two known positives: the t308 DAT_43504 leg (must fire 3/3 on an entered-star
-click; run dir under work/r1/) and the t319 poster leg (0x54ac5 msg-4).
-MUTATION TEST: one deliberately bogus pattern must classify zero-fire, not
-crash. Bank usage doc to docs/re/dosbox-debugger.md (append §TOOL v2) + fix
-any doc drift found.
+NEXT t328 OQ-005 DRAW-WITNESS FEASIBILITY (offline-first; sharpens D1 for the
+user, closes nothing itself) — queue row 1 after t327 landed the tool
+2026-11-07; OQ-005 is the oldest open row and the decision sheet waits on
+measurements this task can produce offline. The vendor game IS a measurement
+instrument (external to us; R13 satisfied). Per-record feasibility pass:
+t200 selector law already PROVES the 12 cos_star k40..k51 + 25 zero-byte
+ladder slots draw NOTHING in the vendor too (dims-zero blit = error -1
+@0x5cb2b) => no witness possible, bank as CITED-NO-WITNESS (this alone
+converts "batch ruling junk?" into "vendor-drawn nothing" — update
+decision-sheet rows B/C + shp.md S25). sg50expl k9 / sg64expl k0 = combat
+explosions = UNREACHABLE-BY-CAPTURE class per t323 amendment — cite, no
+probe. mouse k5/k6/k7 + 1starmap k1: check static sites for who selects those
+indices (windows.txt law + name-imms); if any is reachable in a normal screen,
+DESIGN (do not run) a one-launch scratch draw-capture with screen-compare vs
+our decode, and queue it as a follow-on task under a new id (NOT t329 — that
+id is the OQ-019 disposition packet). 3cfgnew k12: vendor truncation — cite as
+junk-certain. Deliverable: feasibility table + updated DECISIONS.md D1 text
+(ask shrinks to what is actually adjudicable). TOOL NOTE: any screen-capture
+or debugger leg work now runs through scripts/r1_dbg_session.py (t327; run
+with ~/.hermes/hermes-agent/venv/bin/python — system python3 has no PIL);
+--offline RUN_DIR replays+censuses any recorded run before spending launches.
 Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW — SIGTERM pops the
 vendor quit-confirm (Yes)-default; teardown is SIGKILL. t325 context law:
 `convert img rgb:-` is HEADERLESS raw RGB — use ppm:- (P6). t325 census law:
@@ -244,6 +249,32 @@ msg-0x50 three non-post sites; fn 0x2351c name arg DEAD. economy.md IS
 GENERATED (gizmo_probe.py). Sitting check FIRST (playcap newest turn >1086 =>
 scripts/r1_t85g_sitting.py before anything); production :9 untouched; scratch
 copies only, never mount game/.
+
+## LANDED t327 — 2026-11-07 (DEBUGGER-SESSION TOOL v2: scripts/r1_dbg_session.py)
+Tool SHIPPED and VERIFIED end-to-end. Composes r299_leg_session machinery
+(imports it; re-derives nothing): declarative LEGSPEC {addr, callsite, hot},
+phase runner (baseline/starN/hold/preturn), expectation grammar
+(LEG==N / LEG>=N / LEG@0xRET0), whole-log FirePat census, verdict.json,
+atexit bank-on-exit, in-process r322 relaunch loop, SIGKILL-recorded-PID
+teardown. Mechanical law gates NEW: last-4 FirePat-collision preflight (the
+t305 manual audit as a unit check), port-busy preflight, Oct-29 md5, game/
+mount refusal. VERIFIED (all measured, zero drift vs recorded census lines):
+offline t308 runs 140250 (9/9: w43504_28ec2 1, btn_hdlr 8) + 143815 (2/2);
+offline t319 run 030727 (5/5 incl. s2_56cda 106; poster ret0@0x54aca = post
+call 0x54ac5+5 msg-4 found); MUTATION battery 7/7 (bogus leg -> 0 fires no
+crash; wrong count/callsite -> FAIL rc=1; unparsable expect/bogus live leg/
+busy port/collision -> rc=2 before any launch). LIVE: run
+work/r1/dbg-t327v-20261107-050546 attempt 1 rc=0 PASS ~4.6 min wall —
+23 green pips (t308b count reproduced), click (182,284) diff=94712 ENTERED,
+WITNESS DELTA 0x256825(Icarus)->0x255bc5(Vega) byte-identical to t308,
+census {w43504_28ec2:1, btn_hdlr:2}, verdict PASS 3/3 incl.
+btn_hdlr@0x3177d, clean teardown, offline replay of the fresh run 0 drift.
+INTERPRETER LAW: run with ~/.hermes/hermes-agent/venv/bin/python (system
+python3 has NO PIL). Docs: docs/re/dosbox-debugger.md §TOOL v2 appended
+(hand-authored file, no generator); docs/re/_wip_t327.md S0-S6. LEDGER:
+tooling task, NOTHING closed (strict-close unaffected; 16 closed / 3 open).
+Sitting check NEGATIVE (turn 1086); production :9 untouched (ps verified
+post-run: 1461/136357/136359). NEXT = t328 VERBATIM per the block above.
 
 
 ## LANDED t326b — 2026-11-07 (STATIC WALK fn(0x17c54)+fn(0x16147): residue-1 verdict OUTCOME B)
@@ -270,24 +301,8 @@ need RAM). Sitting check NEGATIVE (turn 1086); production :9 untouched; gate 0.
 NEXT = t327 VERBATIM per the block above.
 
 QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; t327 is row 1
-(t326b completed 2026-11-07; residue 1 closed-cited, no capture queued):
-
-
-t327 DEBUGGER-SESSION TOOL v2 (compresses every future DAT-writer hunt to 1-2
-  sessions; the t306-t323 chain burned ~18 iterations largely on instrument
-  bugs — this is the payoff task for that chain). Ship
-  scripts/r1_dbg_session.py wrapping the proven pieces (r322_relaunch.sh boot
-  shape, leg spec {addr, FirePat pattern, expected-callsite}, whole-log msg
-  census, resume-with-fired-BP handling, bank-on-exit). LAWS to bake in, all
-  measured: t305 FirePat stop-line = unique pattern (debug.cpp debug.cpp:1560+/
-  1586-87); MEMREAD real-mode-only (debug.cpp:2983) — ring is the read surface;
-  xsend arg1 = WINDOW TITLE not display (t290); resume-with-fired-BP re-freezes
-  (t302 bug 2). VERIFY against two known positives: the t308 DAT_43504 leg
-  (must fire 3/3 on an entered-star click; run dir under work/r1/) and the
-  t319 poster leg (0x54ac5 msg-4). MUTATION TEST: one deliberately bogus
-  pattern must classify zero-fire, not crash. Bank usage doc to
-  docs/re/dosbox-debugger.md (append §TOOL v2) + fix any doc drift found.
+keep this block intact except deleting your completed row; t328 is row 1
+(t327 completed 2026-11-07, tool shipped + verified live):
 
 t328 OQ-005 DRAW-WITNESS FEASIBILITY (offline-first; sharpens D1 for the user,
   closes nothing itself). The decision sheet waits on human ruling because we

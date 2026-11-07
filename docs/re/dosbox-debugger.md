@@ -401,3 +401,56 @@ NOTE the trap this iteration caught: a first-pass fixed-5-hex fix MISSED the
 0x2160C4 fire ('60C4' is 4 chars) — census said 0 where truth was 1. Any
 future render-format change: re-run the FirePat regression against the three
 runs above before trusting a census.
+
+## TOOL v2 — scripts/r1_dbg_session.py (t327, 2026-11-07)
+One-command debugger-session runner: declarative legs + phases + expectations
++ whole-log census + verdict + bank-on-exit. It IMPORTS r299_leg_session and
+re-derives NOTHING — every law below is the doc's own, enforced mechanically.
+
+RUN (interpreter law): `~/.hermes/hermes-agent/venv/bin/python
+scripts/r1_dbg_session.py ...` — system python3 has NO PIL and the r293
+import chain needs it (measured ModuleNotFoundError 2026-11-07).
+
+    live : --tag tNNN --legs A,B --phases baseline,star6,hold, \
+             preturn --expect 'A>=1' --expect 'B==3' \
+             --expect-ret0 'B@0x3177d' [--attempts 2] [--window 60]
+    offln: --offline work/r1/<run-dir> [--expect ...]
+           replays the FirePat whole-log census against the run's recorded
+           mcp-pty.log and diffs vs its own census line (drift check).
+
+LAWS BAKED IN (all measured elsewhere in this doc; the tool is the first
+place they are enforced rather than remembered):
+1. t305 render law -> detection ONLY via FirePat (suffix token, len>=4);
+   attribution ONLY via bank_stop EV-eip. NEW MECHANICAL GATE: preflight
+   rejects any legset whose last-4 address tokens collide (the t305 manual
+   audit, now a unit check — fabricated collision 0x336b4/0x136b4 -> rc=2).
+2. t304 core=normal under [cpu] (launch() conf shape inherited verbatim).
+3. MEMREAD real-mode-only (debug.cpp:2983-84): oracle reads go to the RING
+   (.sav) surface only; memory at stops via MEMDUMPBIN CS: (bare relative
+   filename, HEX length, UPPERCASED output name).
+4. xsend arg1 = WINDOW TITLE ("DOSBox-X"), NOT the display (t290; the title
+   confusion history is selfplay.md:751 — xsend refuses 'warning' titles).
+5. t302 resume-with-fired-BP freeze -> all resumes through
+   resume_and_rearm (BPDEL fired idx, RUN, autosave/refire liveness proof).
+6. t303 census safety -> arm only around polled clicks; bank cap 6/window;
+   whole-log census counts the rest.
+7. BANK-ON-EXIT: persist() + census.json + verdict.json at every
+   census_click, at end, AND atexit; teardown = SIGKILL RECORDED PIDs (t325
+   signal law: SIGTERM pops the vendor quit-confirm — never used).
+8. Relaunch loop = r322 law in-process: rc=0+verdict PASS stops; rc=2 NEVER
+   retries; rc=1 retries up to --attempts (BREAK lottery, t286 law 2).
+
+VERIFIED POSITIVES (measured 2026-11-07, zero drift vs recorded census):
+- offline t308 run t299-leg-20261105-140250: 9/9 counts (w43504_28ec2 1,
+  btn_hdlr 8); ret0 btn_hdlr@0x3177d found (tag star0_226x238#0). rc=0.
+- offline t308 run -143815: w43504_28ec2 1, btn_hdlr 3. rc=0.
+- offline t319 run t299-leg-20261106-030727: 5/5 (pump_entry_56b5c 1,
+  p54a47 0, p54a88 1, s2_56c74 1, s2_56cda 106); poster callsite
+  ret0@0x54aca (= post call 0x54ac5+5, msg 4) found. rc=0.
+- MUTATION battery (7 cases): bogus leg name -> 0 fires, no crash; wrong
+  count -> FAIL rc=1; bogus callsite -> FAIL rc=1; unparsable expect -> rc=2;
+  bogus live leg -> preflight rc=2 before any launch; busy MCP port -> rc=2;
+  last-4 collision -> rc=2.
+- LIVE end-to-end (t308 legset through the tool): see
+  docs/re/_wip_t327.md S5 + work/r1/t327/live-verify.out for the recorded
+  result (run dir work/r1/dbg-t327v-20261107-050546: attempt 1 rc=0 PASS (census w43504_28ec2 1, btn_hdlr 2; witness delta Icarus->Vega reproduced byte-identical; verdict.json pass=true; offline replay 0 drift)).
