@@ -87,15 +87,21 @@ vacuous); cidx-70 carriers ZERO in 30 ship rows; 30 owner-0 ORBITAL Shipyards
 exist (build leg UI-satisfiable). t326b WALK LANDED 2026-11-07
 (docs/re/ships.md S49 + docs/re/_wip_t326b.md S1-S8): the 0x4d/0x4e
 "value-writing family" is TABLE INDEXING (gizmo-index space, fn 0x17b2c, ZERO
-posters cited); the sole msg-0x51 poster (0x16147, class-0x5850 gizmo gate
-WORD[rec+0x33] bit0x20 CLEAR) posts 81 to a game-object child slot, and
-BatModeWnd fn 0x1aef8 provably does NOT consume 81 (dispatch dx set
-{6,d,3b,46,47,4a,50} cited) — mode-1 setter 0x1b7dd has NO citable arming
-trigger image-wide. RESIDUE 1 = UNREACHABLE-BY-CAPTURE cited (4 independent
-legs: t326 census, t323 writerless [ebp+0xb1], t329 commit edges, t326b
-poster/consumer closure); the 4-launch forced capture is VACUOUS — DROP.
-Row stays OPEN strict-close (activation blocker STATE 1 16, t322 armed-zero
-x2, is the sole live-movement obstacle).; (2) setup-time home DRAW law — CLOSED MEASURED
+posters cited — INDEXING half STANDS). t331 STATIC WALK 2026-11-08
+(docs/re/_wip_t331.md S6-S7, fresh whole-code objdump): t326b's CONSUMER leg
+REFUTED — fn 0x1aef8 dispatch tail 0x1b7cd cmp dx,0x50 / jb / jbe means dx==0x51
+FALLS THROUGH onto 0x1b7dd BYTE[+0xb7]=1 (MODE-1 ARMED, bytes cited); both 0x51
+posters (0x1615d, 0x161d1 inside BatControlWnd handler fn 0x156d4, class 0x5850 =
+file-0x88400 table, ctor fn 0x15630) target [[ebp+0xbb]+0x41] = registry slot 63 =
+BatModeWnd MEASURED (record resident 20/20 saves, state 0, class P0+0x88498);
+the entry = msg 0x1c01 delivered to slot 61 -> jump table (RAM-rebased, member
+0x1d4b04) entry[1] -> gizmo-flag gate 0x15fed (bit0x80 abort / 0x20 shield fn
+0x49e78 / CLEAR -> post 0x51; Phase^Bomb gizmos.txt flag_list {3} => all three
+bits CLEAR by FILE DATA). RESIDUE 1 = ALIVE-IN-IMAGE cited; sole uncited edge =
+who posts 0x1c01 to slot 61 (image-wide imm census: none; road law fn 0x33320).
+t322 armed-zero re-scoped: fn 0x156d4 NEVER armed in any capture. t332 forced
+capture JUSTIFIED (legs named at _wip_t331 S7). Row stays OPEN strict-close
+(no live store witnessed; the mode-1 store has never been observed firing).; (2) setup-time home DRAW law — CLOSED MEASURED
 2026-11-04 t295: uniform rejection draw per race in race order, k=draw%T,
 store row_r+0xd @0x22edd, claim gate 0x22ee0 (FUN_00022ce4 0x22eb4..0x22f55
 full disasm + census scripts/r295_home_draw.py: equal-marker 30/30 turn<=2,

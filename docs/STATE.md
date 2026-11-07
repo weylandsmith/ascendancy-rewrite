@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-08T08:40
+updated: 2026-11-08T11:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,32 +212,69 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t331 BatModeWnd ACTIVATION STATIC WALK (OQ-016's sole live obstacle,
-cited t326b: windows.txt:1178 STATE 1 16 + t322 armed-zero x2). If the user
-answered D2 in docs/DECISIONS.md (grep for an answer block first), EXECUTE
-the ruling instead and re-form the queue. TASK: purely STATIC (offline, zero
-launches): enumerate every writer and reader of the BatModeWnd activation
-state (STATE 1 16 word path per t324 RAM class-table law + the gizmo
-WORD[rec+0x33] gate family from t326b: bit0x80 abort / bit0x20 shield-leg)
-and decide whether ANY UI-reachable or msg-reachable trigger sets it; cite
-address+bytes for every edge (work/ascend_restored.bin objdump range-decode
-law t326b; consumer-cmp-set census law). OUTCOMES: (A) trigger cited ->
-queue a t332 forced-capture with exact legs; (B) no trigger exists in-image
--> residue (1) gains a fifth independent UNREACHABLE leg (row stays open
-strict-close; strengthens the D2-c disposition). DEAD, do NOT re-trod: t322
-batcon mouse battery, t323 activation probes, t325/t326 shield-charge
-capture legs, t306 batmode site list (REFUTED amendment), t324 class-table
-routes.
-Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW (SIGTERM pops quit-
-confirm; teardown SIGKILL); t326b objdump range-decode + pad-run law; t324
-census anchor 0x58e8 / [wmgr+0x3337]=LANE POOL / slots=P0+static; t330
-heavy-check law (an armed ENTRY-leg stop consumes the census window — arm
-MID-BLOCK legs only when the entry is unarmed) + cache ctx 0x2E1194
-ABSOLUTE in .sav scans; economy.md IS GENERATED. Sitting check FIRST
-(playcap newest turn >1086 => scripts/r1_t85g_sitting.py before anything;
-tail-seek only, OOM law); production :9 untouched; scratch copies only,
-never mount game/; venv python for anything importing PIL (r1_dbg_session
-machinery).
+NEXT t332 BatControlWnd CHAIN LIVE WITNESS (capture; OQ-016 residue-1 last
+uncited edge). RATIONALE: t331 cited the whole arming chain except ONE edge —
+who delivers msg 0x1c01 to registry slot 61 — and re-scoped t322's armed-zero
+(fn 0x156d4 was never armed in any capture). Ordering: this is the only capture
+with a fully-cited upstream; if it fires, residue 1 closes on a live mode-1
+store; if fn156d4_entry fires ZERO whole-log with a valid FLEET/system-view
+battery, the fifth UNREACHABLE leg is finally INSTRUMENTED and the D2-c
+disposition strengthens. TASK: r1_dbg_session/r299_leg_session LEGS +7
+{fn156d4_entry 0x156D4, tbl15ef1 0x15EF1, gate15fed 0x15FED, post1615d 0x1615D,
+post161d1 0x161D1, mode1_1b7dd 0x1B7DD, backch_1b180 0x1B180} (bytes
+payload-verified vs work/ascend_restored.bin; last-4 collision audit); battery
+t298-shape (pre-turn, FLEET open rails>0, rowjump, system view) + NEW phase:
+click My^Items SCREEN (593,218) (window rect 479,103-548,133 + window-origin
+(80,100) t325 law; pixel-verify first per t301 law), then BatListWnd item pick,
+second My^Items click; bank b9 field ([BatControlWnd rec 0xfdbe34+0x88]+0xb9)
+before/after each click. WATCH: t330 heavy-check law (entry-leg stop consumes
+the census window — arm entry ONLY in a dedicated window); SIGKILL teardown by
+recorded PID; scratch only. OUTCOMES: (A) mode1_1b7dd fires -> residue 1 CLOSED
+class candidate (still needs nuke-effect witness before any closure claim);
+(B) entry fires, gate/post legs zero -> cite which leg eats it (b9 reject vs
+gizmo-flag), queue the follow-up; (C) entry zero whole-log with valid battery ->
+fifth leg cited, row stays open, D2-c strengthened. DEAD, do NOT re-trod:
+t331 static routes (done), t326b indexing family, jump-table raw-file reads
+(t331 law C5), t322 mouse battery shapes that never clicked the item rects,
+t324 class-table routes, everything in REFUTED-ROUTES t331 AMENDMENT.
+Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW (teardown SIGKILL);
+t326b objdump range-decode + pad-run law; t331 JUMP-TABLE RAM law (never raw
+file read at cs:[disp32]); t331 window-record law (RAW ASCII NAME @+0x20, magic
+0x12345678 @+0x00, member = runtime+0x88); t324 census anchor / slots=P0+static;
+t330 heavy-check + cache ctx 0x2E1194 ABSOLUTE in .sav; economy.md IS GENERATED.
+Sitting check FIRST (playcap newest turn >1086 => scripts/r1_t85g_sitting.py
+before anything; tail-seek only, OOM law); production :9 untouched; scratch
+copies only, never mount game/; venv python for anything PIL/r1_dbg_session.
+## LANDED t331 — 2026-11-08 (BATMODEWND ACTIVATION STATIC WALK: ACTIVATION IS
+## THE WRONG QUESTION — THE BATCONTROLWND MSG ROAD IS ALIVE-IN-IMAGE)
+Purely STATIC iteration (zero launches; production :9 pids 1461/136357/136359
+untouched; sitting check NEGATIVE turn 1086 tail-seek; no D2 answer block).
+Instrument: fresh whole-code objdump (work/r331_disasm.txt, 139,026 insns, zero
+badbar) — deliberately NOT the t91/tsv segmentation (proven broken past 0x160cb).
+MEASURED/PROVED: (1) t326b S8(3) REFUTED — fn 0x1aef8 tail cmp dx,0x50/jb/jbe:
+dx==0x51 FALLS THROUGH onto 0x1b7dd BYTE[+0xb7]=1 MODE-1 ARMED (bytes banked);
+(2) both 0x51 posters (0x1615d/0x161d1 in BatControlWnd handler fn 0x156d4)
+target edx=[[ebp+0xbb]+0x41]=registry slot 63 = BatModeWnd (live MEASURED;
+t326b's category-bit-slot reading REFUTED — edx clobbered at 0x1615a); (3) THE
+ENTRY: msg 0x1c01 branch 0x15ebf -> RAM jump table (member 0x1d4b04; file read
+at disp32 is the "...cosmos.cpp" string = FALSE ZERO, law C5) entry[1] -> gate
+0x15fed (gizmo WORD[+0x33]: 0x80 abort / 0x20 shield fn 0x49e78 / CLEAR -> post
+0x51); b9 machine fed by msg 0x320 (0x15b51/0x15b48/0x15b1e) + 0x1c01 legs
+(0x15f1e/0x15f25/0x15f35, which also post 0x53 to slot 63); (4) gizmo flags
+FILE-LOADED sole writer fn 0x49074 (gizmos.txt flag_list; Phase^Bomb {3}=bit8 ->
+0x80/0x20/0x40 CLEAR by file data); (5) BatModeWnd RECORD RESIDENT 20/20 saves
+(runtime 0xfdc89c, magic+RAW-ASCII law; t324 caveat REFUTED), state 0 +
+state-table NULL => setter fn 0x31f30 bounds-asserts any id>=0 (construction-
+pinned; STATE-line activation stays dead — 20-save sweep, setter-bounds law);
+(6) t322 armed-zero RE-SCOPED: fn 0x156d4 never armed in ANY capture; item-rect
+clicks (My^Items screen (559..628,203..233)) never in any battery. OUTCOME per
+assignment: NEITHER pure A nor B — road ALIVE (A-class) but one uncited edge
+(who posts 0x1c01 to slot 61; image imm census = none; road law fn 0x33320
+edx=[win+0x63], STATSHIPLST->95) => t332 capture JUSTIFIED, legs named.
+LEDGER: NOTHING closed strict-close (16/3). Files: docs/re/_wip_t331.md S0-S7,
+ships.md S50 (hand-authored, no generator verified), REFUTED-ROUTES t331
+AMENDMENT (5 clauses binding), OPEN-QUESTIONS residue-(1) REWRITTEN.
+NEXT = t332 BatControlWnd chain live witness per the block above.
 ## LANDED t330 — 2026-11-08 (MOUSE-DIMS DRAW-CAPTURE: draw-time dims slot
 ## MEASURED = rec+0 u16 pair [H-1,W-1]; C27-C29 'invalid dims' REFUTED)
 TWO live debugger sessions on scratch (production :9 pids 136357/136359 +
@@ -357,12 +394,12 @@ need RAM). Sitting check NEGATIVE (turn 1086); production :9 untouched; gate 0.
 NEXT = t327 VERBATIM per the block above.
 
 QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; t331 is row 1
-(t330 completed 2026-11-08: draw-time dims slot MEASURED rec+0 [H-1,W-1],
-mouse lib; shp.md S26; C27-C29 reclassified valid-dims-no-selector):
+keep this block intact except deleting your completed row; t332 is row 1
+(t331 completed 2026-11-08: activation walk landed OUTCOME A-most — BatControlWnd
+0x1c01->0x51->mode-1 chain cited, t326b consumer leg refuted, t332 capture justified):
 
-t331 BatModeWnd ACTIVATION static walk (OQ-016 sole live obstacle; see the
-  NEXT ACTION block for scope, outcomes, and the DEAD-route list).
+t332 BatControlWnd chain live witness (capture; see the NEXT ACTION block for
+  legs, battery, outcomes, and the DEAD list).
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 amendments are BINDING): poster pass

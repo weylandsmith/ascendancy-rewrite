@@ -937,3 +937,31 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ## (4) fn 0x1d7dc (repaint/teardown) and fn 0x1be10 (cursor chooser, keyed
 ## on ds:0x7d35e==[win+0x41]) are NOT activators — t322 S6 candidate list
 ## retired.
+
+## t331 AMENDMENT (binding): t326b's MSG-0x51 CONSUMER CLOSURE IS REFUTED — THE
+## MODE-1 ARMING ROAD IS ALIVE-IN-IMAGE; and three route-framings die with it.
+## Evidence: docs/re/_wip_t331.md S2-S7 (fresh whole-code objdump 139,026 insns,
+## zero badbar; live-record reads via pointer law, 20/20 saves).
+## (1) REFUTED: "BatModeWnd fn 0x1aef8 does not consume msg 0x51" (t326b S8(3)).
+##     Dispatch tail bytes: 1b7cd 66 83 fa 50 (cmp dx,0x50); 1b7d1 jb 0x1af4e;
+##     1b7d7 jbe 0x1b5ba; 1b7dd c6 85 b7 00 00 00 01 (BYTE[+0xb7]=1 MODE-1).
+##     dx==0x51 fails jb AND jbe -> falls through onto the mode-1 store.
+## (2) DEAD: reusing the t329 disposition-packet argument "no arming trigger
+##     exists" for residue (1); replaced by the cited chain (msg 0x1c01 ->
+##     BatControlWnd slot 61 -> RAM jump table member 0x1d4b04 entry[1] -> gate
+##     0x15fed -> poster 0x1615d/0x161d1 -> slot 63 BatModeWnd -> 0x1b7dd).
+##     Do NOT re-walk the 0x4c/0x4d/0x4e indexing family (t326b indexing half
+##     STANDS) and do NOT re-derive the gizmo flag words: sole writer fn 0x49074
+##     (gizmos.txt flag_list loader; Phase^Bomb flags = bit0x8 only).
+## (3) DEAD: raw-reading a cs:[disp32] JUMP TABLE from the file image (t331 hit
+##     the false-zero: file 0x836b4 holds the "...cosmos.cpp" assert string; the
+##     live table is REBASED at member 0x1d4b04). Always RAM-scan by target-range.
+## (4) DEAD: "no BatModeWnd window record is resident in the corpus" (t324
+##     caveat). Records store RAW ASCII NAME at +0x20 (magic 0x12345678 at -0x20):
+##     BatModeWnd rec runtime 0xfdc89c, slot-id[+0x41]=63, registry slot 63 MATCH,
+##     20/20 t=1086 saves; state [+0xb1]=0, state-table [+0xab]=NULL (setter
+##     fn 0x31f30 bounds-asserts any id>=0 with count 0 — construction-pinned).
+## (5) SCOPE: t322's BatModeWnd armed-zero does NOT test the BatControlWnd chain
+##     (fn 0x156d4 slot 2 never armed in ANY capture; no battery ever clicked
+##     My^Items screen-rect (559..628, 203..233)). A t332 capture MUST arm
+##     fn 0x156d4_entry before claiming any negative on this road.

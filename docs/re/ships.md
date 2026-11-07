@@ -2327,3 +2327,38 @@ segmentation; objdump range-decode law banked there). Cited results:
    VACUOUS (no citable arming trigger; research leg vacuous per S-T326) — DROP.
    The batmode activation blocker (STATE 1 16, t322 armed-zero x2) stands as
    the sole live-movement obstacle; row stays OPEN strict-close.
+
+## S50 t331 (2026-11-08) — BATCONTROLWND CHAIN: THE MODE-1 ARMING ROAD IS
+## ALIVE-IN-IMAGE (t326b consumer-leg REFUTED; fresh objdump + live-record law)
+- Window identity law (measured): class tables live at FILE 0x88xxx; installer imm
+  = pool-relative data offset (imm+0x82bb0=file; RAM=P0+file). BATMODE table file
+  0x88498 (imm 0x58e8, sole installer fn 0x1ac21); BATCTRL file 0x88400 (ctor
+  fn 0x15630 `mov [eax+0xa7],0x5850`); live records: BatControlWnd runtime
+  0xfdbe34 slot 61, BatModeWnd 0xfdc89c slot 63, registry [0x2bc35c+4+slot*12]
+  MATCH both; NAME is RAW ASCII at rec+0x20 (magic u32 0x12345678 at rec+0x00).
+- BatModeWnd STATE pinned: state-table ptr [+0xab]=NULL and count [+0xaf]=0 in
+  20/20 t=1086 saves; setter fn 0x31f30 asserts (0x2a428 ebx=0x396) for any
+  id>=0 when count=0; sole caller pair {0x321ad,0x3221b} inside fn 0x32100 which
+  is NOT in the class table (t323 stands). ACTIVATION of the window itself stays
+  dead — but activation was the WRONG question.
+- THE ROAD (every edge cited in _wip_t331 S7): msg 0x1c01 -> BatControlWnd slot-2
+  fn 0x156d4 (tree 0x156ec; 0x1c01 branch 0x15ebf: reject iff [BatModeWnd+0xb7]==4;
+  al=BYTE[+0xb9]-1; jmp cs:[eax*4+0xb04] REBASED, live table member 0x1d4b04:
+  [0]=0x15ef9 [1]=0x15fed [2]=0x16181 [3]=0x15ef9). Gate block 0x15fed: gizmo rec
+  via fn 0x32f34/0x32fa4 accessors on [ebp+0xb5]=BatListWnd; WORD[rec+0x33]
+  bit0x80 abort / bit0x20 set -> fn 0x49e78 shield-charge / CLEAR -> 0x16076 +
+  je 0x16147 POST 0x51; bit0x40 set -> 0x16181 block POSTS 0x51 too (0x161d1).
+  Both posters: eax=ds:0x7a35c, edx=[[ebp+0xbb]+0x41]=63 -> fn 0x56ca4 law ->
+  fn 0x1aef8 -> 0x1b7dd BYTE[+0xb7]=0x1 = MODE-1 ARMED (fallthrough of cmp dx,0x50).
+- b9 state machine: msg 0x320 param al {0->b9=1 @0x15b51, 2->3 @0x15b48, 3->2
+  @0x15b1e}; msg 0x1c01 legs also set b9 2/3 (0x15f1e/0x15f25/0x15f35) AND post
+  msg 0x53 to BatModeWnd (0x15f3c/0x15f75). fn 0x1aef8 back-posts 0x320/0x326 to
+  [[win+0xab=BACKPOINTER-BEFORE-INIT? no: its OWN state-table slot] -> 0x1b164/
+  0x1b202/0x1b127 (mouse legs).
+- Gizmo flags FILE-LOADED: sole WORD[rec+0x33] writer fn 0x49074 (gizmos.txt
+  flag_list sscanf loop, 0x491ec/0x49221); enum gizmos.txt L67-76: 32 TOGGLEABLE,
+  64 NOTARGET, 128 PASSIVE. Phase^Bomb flag_list {3} => 0x80/0x20/0x40 CLEAR.
+- NOT YET CITED: any poster of imm 0x1c01 targeting slot 61 (imm census 5 sites,
+  road law fn 0x33320 edx=[win+0x63]; STATSHIPLST road 95). t332 capture legs:
+  fn156d4_entry/tbl15ef1/gate15fed/post1615d/post161d1/mode1_1b7dd + My^Items
+  click screen (593,218).
