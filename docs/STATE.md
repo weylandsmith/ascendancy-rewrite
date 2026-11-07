@@ -241,6 +241,117 @@ fn 0x1b91c decode verbatim (t296 S5 + t321 S4); fn 0x2351c name arg DEAD
 copies only, never mount game/; sitting check FIRST (playcap newest turn >
 1086 => re-run scripts/r1_t85g_sitting.py before anything).
 
+QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
+keep this block intact except deleting your completed row; t324 above is row 1):
+
+t325 PER-SLOT SHIELD-BYTE WRITNESS (OQ-016 residue 4; t271 said writer
+  reachable, consumer unmapped — the debugger chain makes it cheap now).
+  Slot law (STATE WHAT-IS-IN-HAND): slot array at stored-ptr+0x88 conversion,
+  slot = 4B {class, itemIdx(0xff empty), flags u8, shield u8} -> shield byte =
+  slot base +3. POINTER-VALUE LAW t298 binding: RAM holds guest-PHYSICAL;
+  BPLM target = member + 0x88. Scratch copy, OWN ring dir, r322_relaunch.sh
+  base, t305 FirePat law (stop line = unique PATTERN), t307/t308 leg shape
+  (reproducible 3/3 — copy their run dirs under work/r1/ as templates). Drive
+  ~10 turns with a build completing (pending reserves its slot t271: byte1:=
+  item id, word2 bit0 CLEAR — completions DO fire in normal play; item-36/35
+  branches are the REFUTED zero-witness class, do NOT chase those). On fire:
+  capture CS:IP + previous value + which slot; map EIP through the windowed
+  disasm recipe; census consumers of the same offset offline. Bank writer +
+  consumer law to docs/re/economy.md (or income-law.md if build-phase); update
+  the OQ-016 row residue list. Zero-fire after 3 launches = honest negative,
+  residue becomes instrumentation-class, say so in the row.
+
+t326 PHASE BOMB FORCED-CAPTURE (OQ-016 residue 1 — the nuke law, the LARGEST
+  capture-gated item left; one-run recipe verbatim in docs/BLOCKED.md §Nuke).
+  Scratch copy, OWN ring, drive class laws (t285: assert_on_map, no Escape,
+  STOP-AND-LOOK). Scripted route: research path per restree prereqs (its tech
+  chain, verify availability via t294 planitem law), build at a Shipyard,
+  launch at an OWNED planet with >=3 surface items. Capture slot states
+  before/launch/after via the ring + pointer law; identify the dispatch-table
+  entry by which code first writes FF into a mid-record slot byte at launch
+  time. Budget 4 launches MAX (t293 accounting law: only runs that reached the
+  build/launch phase count). If Phase Bomb never completes research in-turns
+  reachable, bank the turn-cost arithmetic you DID witness (restree cost law
+  t295-era pins apply) and exit-1 negative. Default stays NOT modelled either
+  way; closing = the witnessed destruction law banked to economy.md + row
+  residue updated.
+
+t327 DEBUGGER-SESSION TOOL v2 (compresses every future DAT-writer hunt to 1-2
+  sessions; the t306-t323 chain burned ~18 iterations largely on instrument
+  bugs — this is the payoff task for that chain). Ship
+  scripts/r1_dbg_session.py wrapping the proven pieces (r322_relaunch.sh boot
+  shape, leg spec {addr, FirePat pattern, expected-callsite}, whole-log msg
+  census, resume-with-fired-BP handling, bank-on-exit). LAWS to bake in, all
+  measured: t305 FirePat stop-line = unique pattern (debug.cpp debug.cpp:1560+/
+  1586-87); MEMREAD real-mode-only (debug.cpp:2983) — ring is the read surface;
+  xsend arg1 = WINDOW TITLE not display (t290); resume-with-fired-BP re-freezes
+  (t302 bug 2). VERIFY against two known positives: the t308 DAT_43504 leg
+  (must fire 3/3 on an entered-star click; run dir under work/r1/) and the
+  t319 poster leg (0x54ac5 msg-4). MUTATION TEST: one deliberately bogus
+  pattern must classify zero-fire, not crash. Bank usage doc to
+  docs/re/dosbox-debugger.md (append §TOOL v2) + fix any doc drift found.
+
+t328 OQ-005 DRAW-WITNESS FEASIBILITY (offline-first; sharpens D1 for the user,
+  closes nothing itself). The decision sheet waits on human ruling because we
+  assumed no measurement can see these 80 records — but the vendor game IS a
+  measurement instrument (external to us; R13 satisfied). Per-record
+  feasibility pass: t200 selector law already PROVES the 12 cos_star k40..k51
+  + 25 zero-byte ladder slots draw NOTHING in the vendor too (dims-zero blit
+  = error -1 @0x5cb2b) => no witness possible, bank as CITED-NO-WITNESS (this
+  alone converts "batch ruling junk?" into "vendor-drawn nothing" — update
+  decision-sheet rows B/C + shp.md S25). sg50expl k9 / sg64expl k0 = combat
+  explosions = UNREACHABLE-BY-CAPTURE class per t323 amendment — cite, no
+  probe. mouse k5/k6/k7 + 1starmap k1: check static sites for who selects
+  those indices (windows.txt law + name-imms); if any is reachable in a
+  normal screen, DESIGN (do not run) a one-launch scratch draw-capture with
+  screen-compare vs our decode, and queue it as t329. 3cfgnew k12: vendor
+  truncation — cite as junk-certain. Deliverable: feasibility table + updated
+  DECISIONS.md D1 text (ask shrinks to what is actually adjudicable).
+
+t329 (CONDITIONAL — only if t324 landed NEGATIVE-ABSOLUTE) OQ-019 DISPOSITION
+  PACKET: draft (do NOT apply) the final row text marking residues (1)
+  sugar-cube arrival granularity, (2) per-ship build path = build decision
+  (D2), (3) magnetron witness as capture-limited with the cited dead-route
+  closure: t319/t320 pump never posts 0xc, t322 BatModeWnd zero msgs, t323
+  activation census-complete, t324 class-table absolute; magnetron USE shares
+  the same widget path so its witness class is cited-dead too (say so
+  explicitly — it retires the last scripted idea honestly). Update
+  docs/DECISIONS.md D3 with actual state: rows closeable by loop = none
+  remaining without user input (D1 ruling or D2 commission). NO ledger row
+  moves (strict-close; disposition is the USER's ruling). If t324 REOPENED
+  instead: skip this row, design the redesign.
+
+STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
+- FIXED LAWS, do NOT re-trip (t319-t323 amendments are BINDING): poster pass
+  posts msg 4 only (27/27); ds:0x484ac = BIOS int16h button state not app flag;
+  msg 4/0xc default-handled fn 0x336b4 zero DAT stores; BatModeWnd has NO
+  in-session activator ([win+0xb1] writers 14 sites cited); fn 0x2351c name arg
+  DEAD; msg-0x50 no external sender; broadcast pump dispatch 0x56c74 COLD
+  2x-confirmed.
+- DEBUGGER: binary work/r1/dbx-build/dosbox-x-master/src/dosbox-x (copy to
+  work/r1/bin/dosbox-x-dbg if not yet there); NEVER /usr/bin/dosbox-x;
+  core=normal for stepping legs per docs/re/dosbox-debugger.md; first-BP-fire
+  0x00-init artifact check before believing a witness; OFF-BY-H discipline
+  (member -0x88 -> physical; t298/t286b).
+- OOM LAW (6.4 GB timeline: r1_stream / <=400 KB tail-seek / r214_triage only);
+  TWO-WRITER RING LAW (scratch = own ring); KILL BY RECORDED PID (structured
+  argv; pkill -f self-kills shells); SIGKILL softlocks; DISPLAY=:9 injected;
+  TL=172800; NEVER loadstate to resume; bank ring before restarts.
+- Sitting check FIRST every iteration (tail-seek playcap newest turn; >1086 =>
+  scripts/r1_t85g_sitting.py before anything). Production :9 pid 1957 t1086 is
+  the corpus — untouched unless the task IS a drive task, and then drive laws.
+- Ledger 16 closed / 3 open (OQ-005, OQ-016, OQ-019); keep ledger_audit +
+  ledger_index_check green; NEVER hand-edit the index block (re-derive).
+- OQ-005 ruling = USER's (D1); do not rule for them (R13); draw-witness work
+  (t328) is permitted because the VENDOR is the instrument.
+- Do NOT re-trod: t323 amendment routes; t293 click-selection; t49/t58/t265
+  flight mining; item-35/36 completion witnesses (t271 REFUTED zero-witness,
+  AI-unreachable); t212/t213 static exhaustion; everything in STATE.md
+  DO-NOT-RE-TROD.
+- Gate ~2-3 min; milestone 6 stays; work/ gitignored — findings to docs/re/.
+- After the queue drains: author next queue or park WAIT-TRIGGER sentinel
+  (task line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
+
 ## LANDED t323 (2026-11-06, session 32) — OFFLINE ACTIVATION DECODE: NO
 ## IN-SESSION TRIGGER EXISTS; OQ-019 SELECT/DESTINATION RESIDUES =
 ## UNREACHABLE-BY-CAPTURE (t323 amendment binding).
