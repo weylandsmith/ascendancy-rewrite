@@ -2327,3 +2327,31 @@ rewrite max-min BFS spread was a documented MISMATCH, now replaced. Stream
 interleave vs world-gen UNMEASURED -> rewrite uses isolated homeLcg_
 (seed^0x295); closed law = distribution, not stream position. Details:
 docs/re/_wip_t295.md S1-S6.
+
+## S-T325 — SHIELD-SLOT BYTE +3 CENSUS + WITNESS NEGATIVE (OQ-016 residue 4, 2026-11-07)
+Production ring52.sav (B=0x1bf4d8, turn 1086, untouched — post-run ps verified
+Xvfb :9 pid 1461 + production dosbox-x pid 136359 only), full slot census over
+ALL records x cap slots (scripts inline, reproducible via
+scripts/r325_shield_scan.py shape):
+  item 18  word2=0x1   byte+3=0   : 30 slots
+  item 26  word2=0x0   byte+3=0   :  1 slot  (the Gridsor I PENDING row)
+  item 26  word2=0xf01 byte+3=15  : 43 slots
+LAW [verified census]: slot byte +3 is NEVER a per-turn shield progress value
+in production state — 44 pending-class observations all read 0; completed rows
+read a constant 15 (0xf) alongside word2=0xf01. [inferred] If a per-slot shield
+progress law exists it lives outside slot dword +3; any future witness must
+watch the whole slot dword / the build-queue struct, not byte +3 (the t325
+assignment premise is contradicted for every slot class present).
+WITNESS: 4 launches (t329 handoff budget), ZERO reached the shield-completion
+turn — att1 stale shape (no drain), att2+att4 BREAK-lottery channel death at
+title (t286 law 2 class), att3 killed by two instrument bugs of mine (rgb:- is
+headerless raw RGB so the PPM parse always failed; and root-vs-window-rel click
+coords — window origin (80,100) confirmed HERE too via content bbox
+(80,100)-(716,576)). ABSENCE-ONLY negative: does NOT prove the completion
+writer leaves +3 untouched. Residue 4 stays OPEN, instrumentation-class.
+REUSABLE ASSETS banked in scripts/r325_shield_session.py: early-arm-at-title
+BPLM shape (survived campaign load, ZERO boot fires — t286b blind-free-heap
+baseline re-confirmed 3/3); deterministic scratch-heap member address
+0x25eb7c resolved IDENTICAL 3/3 sessions; fixed popup drain (ppm:- P6 parse +
+root->window-rel (80,100); detector verified offline vs the real attempt-3
+Corncob I popup: (406,442) vs expected (408,442)).

@@ -78,7 +78,12 @@ INDEX itself stays the rng%11 draw @0x23a97; rewrite upgraded
 (TerrainTables+loadTerrainTables economy.{h,cpp}, cfg.terrain consumed
 campaign.cpp, main.cpp injects; pins tests/test_terrain_t294.cpp x5,
 mutation-verified; income-law.md t294 block); (4) per-slot shield-byte
-consumer (OQ-019 family); (5) human build-order minutiae 0.4% samples;
+consumer (OQ-019 family) — t325 MEASUREMENT 2026-11-07 (docs/re/income-law.md
+S-T325): production census 74 shield-item slots, byte+3 = 0 on ALL 44
+pending-class rows and constant 15 on 43 completed rows (word2 0xf01) => byte
++3 is NOT a progress counter; witness 4 launches zero-fire (2 BREAK-lottery,
+2 instrument bugs) = ABSENCE-ONLY, stays open, instrumentation-class — future
+witness must watch the whole slot dword, not byte +3; (5) human build-order minutiae 0.4% samples;
 item-35/35 completion branches = MEASURED zero-witness + AI-unreachable
 (REFUTED t271, re-open conditions there). t299 debugger leg witness ran
 (2026-11-04): zero fires; t301 re-attributed as ARMING-FAILURE not a bypass

@@ -209,29 +209,46 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t325 PER-SLOT SHIELD-BYTE WRITNESS (OQ-016 residue 4) — t329 delivered
-the OQ-019 disposition packet (docs/re/_wip_t329.md S1-S5; row stays open on
-USER ruling; see LANDED t329 below), and per its own text "If t329's draft is
-ready, NEXT becomes t325." Ordering rationale: t329 closed out the OQ-019
-chain; t325 is row 1 of the phase-5b queue and the ONLY remaining loop-side
-work that can MOVE a ledger row toward closure (OQ-016 is the sole row with
-live closure potential per DECISIONS.md D3 t329 update); t326-t328 follow
-verbatim.
+NEXT t326 PHASE BOMB FORCED-CAPTURE (OQ-016 residue 1 — the nuke law) — t325
+LANDED 2026-11-07 negative-with-census (see LANDED t325 below +
+docs/re/income-law.md S-T325: production census PROVED slot byte +3 is NOT a
+shield progress value => residue 4 premise contradicted, row stays open
+absence-only), so per the queue law t326 is now row 1 and lands VERBATIM.
+Ordering rationale: t326 is the LARGEST capture-gated item left and the only
+remaining row-moving measurement (D3 t329: OQ-016 sole live-movement row);
+t327's tool v2 should bake t326's forced-capture recipe next; t328 follows.
+REUSABLE FROM t325 (do not re-derive): scripts/r325_shield_session.py holds the
+early-arm-at-title BPLM shape (survives campaign load, ZERO boot fires — t286b
+baseline re-confirmed 3/3), the deterministic scratch-heap member address
+0x25eb7c (identical 3/3 sessions), and the FIXED popup drain (ppm:- P6 parse +
+root->window-rel subtract (80,100); detector verified offline vs a real popup
+(406,442)). BREAK lottery at title is the known ~50% killer (t286 law 2) —
+budget relaunches accordingly.
 Slot law (STATE WHAT-IS-IN-HAND): slot array at stored-ptr+0x88 conversion,
-slot = 4B {class, itemIdx(0xff empty), flags u8, shield u8} -> shield byte =
-slot base +3. POINTER-VALUE LAW t298 binding: RAM holds guest-PHYSICAL;
-BPLM target = member + 0x88. Scratch copy, OWN ring dir, r322_relaunch.sh
-base, t305 FirePat law (stop line = unique PATTERN), t307/t308 leg shape
-(reproducible 3/3 — copy their run dirs under work/r1/ as templates). Drive
-~10 turns with a build completing (pending reserves its slot t271: byte1:=
-item id, word2 bit0 CLEAR — completions DO fire in normal play; item-36/35
-branches are the REFUTED zero-witness class, do NOT chase those). On fire:
-capture CS:IP + previous value + which slot; map EIP through the windowed
-disasm recipe; census consumers of the same offset offline. Bank writer +
-consumer law to docs/re/economy.md (or income-law.md if build-phase); update
-the OQ-016 row residue list. Zero-fire after 3 launches = honest negative,
-residue becomes instrumentation-class, say so in the row.
-Fixed laws carried (do NOT re-trip): t324 note (census anchor = installer
+slot = 4B {class, itemIdx(0xff empty), flags u8, shield u8}. POINTER-VALUE LAW
+t298 binding: RAM holds guest-PHYSICAL; BPLM target = member + 0x88. t326
+RECIPE VERBATIM (its queue row + docs/BLOCKED.md §Nuke one-run recipe):
+Scratch copy, OWN ring, drive class laws (t285: assert_on_map, no Escape,
+STOP-AND-LOOK). Scripted route: research path per restree prereqs (verify
+availability via t294 planitem law), build at a Shipyard, launch at an OWNED
+planet with >=3 surface items. Capture slot states before/launch/after via the
+ring + pointer law; identify the dispatch-table entry by which code first
+writes FF into a mid-record slot byte at launch time. Budget 4 launches MAX
+(t293 accounting: only runs that reached the build/launch phase count). If
+Phase Bomb never completes research in reachable turns, bank the turn-cost
+arithmetic witnessed (restree cost law t295-era pins) and exit-1 negative.
+Default stays NOT modelled either way; closing = witnessed destruction law
+banked to economy.md + row residue updated. t305 FirePat law (stop line =
+unique PATTERN); t307/t308 leg shape (reproducible 3/3 — copy run dirs under
+work/r1/ as templates).
+Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW — NEVER SIGTERM the game
+process: it opens the vendor quit-confirm with (Yes) DEFAULTED (measured live
+this session; recovering the (No) coordinate burned a third of an iteration);
+teardown is SIGKILL (as r325_shield_session.py does). Also t325 context law:
+`convert img rgb:-` is HEADERLESS raw RGB — piping it anywhere risks dumping
+1 MB of bytes into context; use ppm:- (P6 header). And t325 note (slot byte +3 census law — do
+NOT re-witness byte +3 as progress: 44 pending rows read 0, 43 completed read
+15/word2 0xf01; witness the whole dword instead, income-law S-T325); t324 note (census anchor = installer
 target data 0x58e8; [wmgr+0x3337] is the LANE POOL, not a name registry; slots
 = P0+static); t323 amendment (1)-(4); t322 (1)-(3); t321 (1)-(4); t320 (1)-(4);
 t319 (1)-(4); msg-0x50 no external sender; fn 0x1b91c decode verbatim (t296 S5
@@ -326,6 +343,31 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone 6 stays; work/ gitignored — findings to docs/re/.
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel
   (task line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
+
+## LANDED t325 (2026-11-07, session 35) — SHIELD-BYTE WITNESS: NEGATIVE +
+## CENSUS LAW (OQ-016 residue 4 premise contradicted, row STAYS OPEN).
+## MEASURED (production ring52 B=0x1bf4d8 turn 1086, untouched post-run — ps
+## == Xvfb :9 pid 1461 + dosbox-x pid 136359 only): 74 shield-item slots,
+## slot byte +3 == 0 on ALL 44 pending-class rows (incl. the live Gridsor I
+## pending row item 26 word2 0x0) and constant 15 (word2 0xf01) on 43
+## completed rows => byte +3 is NOT a per-turn shield progress value
+## (docs/re/income-law.md S-T325; binding note in Fixed laws). WITNESS: 4
+## launches budget, ZERO reached the completion turn — att1 stale shape (no
+## drain), att2/att4 BREAK-lottery channel death at title (t286 law 2), att3
+## two instrument bugs of mine (rgb:- headerless parse; root-vs-window-rel
+## click coords — window origin (80,100) confirmed here too, content bbox
+## (80,100)-(716,576)). ABSENCE-ONLY: does NOT prove the writer leaves +3
+## alone; residue 4 becomes instrumentation-class. ASSETS shipped in
+## scripts/r325_shield_session.py: early-arm-at-title BPLM (survives load,
+## ZERO boot fires 3/3), deterministic heap member 0x25eb7c (3/3), FIXED popup
+## drain (ppm:- P6 + root->window-rel (80,100); offline-verified vs a real
+## Corncob I popup (406,442) vs expected (408,442)); scripts/r325_shield_scan.py
+## + r325b_oct29_check.py offline scanners; RESUME.GAM law: vendor save = RAW
+## data not a zip, live state = ring .sav (t259 re-confirmed). SIGNAL LAW
+## banked (Fixed laws): SIGTERM on the game pops quit-confirm (Yes)-default —
+## teardown is SIGKILL. Working notes docs/re/_wip_t325.md S0-S8. LEDGER:
+## OQ-016 residue (4) annotated, NOTHING closed (strict-close). NEXT: t326
+## PHASE BOMB FORCED-CAPTURE verbatim.
 
 ## LANDED t329 (2026-11-06, session 34) — OQ-019 DISPOSITION PACKET
 ## DELIVERED (drafts only; row closes on USER ruling). Zero capture, zero
