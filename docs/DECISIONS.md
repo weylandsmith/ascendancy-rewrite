@@ -46,18 +46,36 @@ is really your call wearing our clothes:
 ## D3 — Definition of done: how long the loop keeps running
 GOAL.txt says: stop when every open row is CLOSED. Strict-close forbids closing
 on a plausible default, so some residues may be legally unclosable on this box
-(player-testimony class). What remains with a documented closing route:
-  OQ-005  -> D1 above
-  OQ-019  -> sugar-cube scale: t293 scripted move-order capture (queued NOW)
-  OQ-016  -> three one-shots: Phase Bomb forced-capture run; setup-time home
-             draw law; word[+0x16] template source (static hunt)
-  magnetron -> needs one witnessed use; scriptable via the t289 drive class
+(player-testimony class). UPDATE t329 (2026-11-06) — routes re-scored against
+cited evidence; the original list below over-promised two entries:
+  OQ-005  -> D1 ruling remains the closure. t328 (queued) converts the
+             records the vendor itself draws NOTHING for (cos_star k40..k51,
+             25 ladder slots — t200 law) to CITED-NO-WITNESS and may design
+             (not run) a draw-capture for mouse/1starmap if reachable.
+  OQ-019  -> CLOSED-ROUTE SUPERSEDED: the t293 scripted move-order capture
+             and every follow-on capture route are now CITED-DEAD (t319/t320
+             pump, t322 mouse, t323 activation, t324 RAM class table).
+             Disposition packet drafted (docs/re/_wip_t329.md S4): closing
+             this row needs YOUR ruling — D2 (a/b/c) plus accepting the
+             cited-dead notes for select/destination + magnetron.
+  OQ-016  -> the ONLY row with live loop-side closure potential left:
+             t325 shield-byte witness + t326 phase-bomb forced-capture are
+             queued and runnable without you; residue (5) build-order
+             minutiae still needs a disposition (diminishing tail).
+  magnetron -> CLOSED-ROUTE SUPERSEDED: scripted route retired (arming runs
+             through the batmode-family pinned state WORD — docs/re/
+             _wip_t329.md S2); carriage census shows zero carriers in your
+             campaign and zero uses in the epochs that did carry
+             (scripts/r329_magnetron_census.py). Static use-site law stands.
 Beyond those, mining the corpus yields diminishing witnesses (three separate
 full-corpus censuses came back empty — that's the shape of the tail).
-RECOMMENDED (D3 = yes): run the remaining queue, then park the loop on a
-sentinel and ship the project as "N/19 closed + honest capture-limited notes"
-where anything resists. Alternatives: keep looping literally until zero open
-(risk: churn against refuted-class routes), or stop now.
+RECOMMENDED (D3 = yes): run the remaining queue (t325-t328), then park the
+loop on a sentinel and ship the project as "N/19 closed + honest
+capture-limited notes" where anything resists. What the loop can close
+without you: NONE end-to-end (OQ-016's tail residue still needs a word from
+you too, though t325/t326 could move it a long way). Alternatives: keep
+looping literally until zero open (risk: churn against refuted-class routes),
+or stop now.
 
 ## D4 — Optional: VM resources (you offered; one thing is worth taking)
 +8 GiB RAM (15 -> 23) is the only high-value add: OOM killed two batches (both

@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-06T07:10
+updated: 2026-11-06T23:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -209,54 +209,42 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t329 OQ-019 DISPOSITION PACKET — t324 landed NEGATIVE-ABSOLUTE (its
-condition is met; see LANDED t324 below), so the conditional row is now
-satisfiable and is the natural consequence of this chain: every capture route
-for the select/destination residues is cited-dead (t319/t320 pump, t322 mouse,
-t323 activation, t324 class-table). DRAFT (do NOT apply) the final OQ-019 row
-text marking residues (1) sugar-cube arrival granularity, (2) per-ship build
-path = build decision (D2), (3) magnetron witness as capture-limited with the
-cited dead-route closure: t319/t320 pump never posts 0xc, t322 BatModeWnd zero
-msgs in-view, t323 activation census-complete, t324 class-table absolute
-(live RAM == cited, fn 0x32100 absent — scripts/r324_census.py, 10/10 saves).
-Magnetron USE shares the same widget path, so its witness class is cited-dead
-too — say so explicitly (it retires the last scripted idea honestly). Update
-docs/DECISIONS.md D3 with actual state: rows closeable by the loop = NONE
-remaining without user input (D1 ruling or D2 commission). NO LEDGER ROW MOVES
-in t329 (strict-close; disposition is the USER's ruling) — t329 produces a
-draft packet only. Ordering rationale: t325-t328 are independent of the
-OQ-019 chain (shield-byte witness, phase bomb, debugger tool v2, OQ-005
-feasibility); landing the OQ-019 disposition now banks the payoff of the whole
-t304-t324 chain while it is fresh and hands the user a single crisp ask,
-before the queue drifts. If t329's draft is ready, NEXT becomes t325.
+NEXT t325 PER-SLOT SHIELD-BYTE WRITNESS (OQ-016 residue 4) — t329 delivered
+the OQ-019 disposition packet (docs/re/_wip_t329.md S1-S5; row stays open on
+USER ruling; see LANDED t329 below), and per its own text "If t329's draft is
+ready, NEXT becomes t325." Ordering rationale: t329 closed out the OQ-019
+chain; t325 is row 1 of the phase-5b queue and the ONLY remaining loop-side
+work that can MOVE a ledger row toward closure (OQ-016 is the sole row with
+live closure potential per DECISIONS.md D3 t329 update); t326-t328 follow
+verbatim.
+Slot law (STATE WHAT-IS-IN-HAND): slot array at stored-ptr+0x88 conversion,
+slot = 4B {class, itemIdx(0xff empty), flags u8, shield u8} -> shield byte =
+slot base +3. POINTER-VALUE LAW t298 binding: RAM holds guest-PHYSICAL;
+BPLM target = member + 0x88. Scratch copy, OWN ring dir, r322_relaunch.sh
+base, t305 FirePat law (stop line = unique PATTERN), t307/t308 leg shape
+(reproducible 3/3 — copy their run dirs under work/r1/ as templates). Drive
+~10 turns with a build completing (pending reserves its slot t271: byte1:=
+item id, word2 bit0 CLEAR — completions DO fire in normal play; item-36/35
+branches are the REFUTED zero-witness class, do NOT chase those). On fire:
+capture CS:IP + previous value + which slot; map EIP through the windowed
+disasm recipe; census consumers of the same offset offline. Bank writer +
+consumer law to docs/re/economy.md (or income-law.md if build-phase); update
+the OQ-016 row residue list. Zero-fire after 3 launches = honest negative,
+residue becomes instrumentation-class, say so in the row.
 Fixed laws carried (do NOT re-trip): t324 note (census anchor = installer
 target data 0x58e8; [wmgr+0x3337] is the LANE POOL, not a name registry; slots
 = P0+static); t323 amendment (1)-(4); t322 (1)-(3); t321 (1)-(4); t320 (1)-(4);
 t319 (1)-(4); msg-0x50 no external sender; fn 0x1b91c decode verbatim (t296 S5
-+ t321 S4); fn 0x2351c name arg DEAD (do not re-open as activator); production
-:9 (pid 1957) untouched; scratch copies only, never mount game/; sitting check
-FIRST (playcap newest turn >1086 => re-run scripts/r1_t85g_sitting.py before
-anything).
++ t321 S4); fn 0x2351c name arg DEAD (do not re-open as activator); t329 note
+(magnetron scripted road cited-dead — do NOT re-derive the 0x15xxx arming
+tail; production sitting has ZERO cidx-60 carriers, scripts/
+r329_magnetron_census.py); production :9 (pid 1957) untouched; scratch copies
+only, never mount game/; sitting check FIRST (playcap newest turn >1086 =>
+re-run scripts/r1_t85g_sitting.py before anything).
 
 QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; t325 below is row 1):
-
-t325 PER-SLOT SHIELD-BYTE WRITNESS (OQ-016 residue 4; t271 said writer
-  reachable, consumer unmapped — the debugger chain makes it cheap now).
-  Slot law (STATE WHAT-IS-IN-HAND): slot array at stored-ptr+0x88 conversion,
-  slot = 4B {class, itemIdx(0xff empty), flags u8, shield u8} -> shield byte =
-  slot base +3. POINTER-VALUE LAW t298 binding: RAM holds guest-PHYSICAL;
-  BPLM target = member + 0x88. Scratch copy, OWN ring dir, r322_relaunch.sh
-  base, t305 FirePat law (stop line = unique PATTERN), t307/t308 leg shape
-  (reproducible 3/3 — copy their run dirs under work/r1/ as templates). Drive
-  ~10 turns with a build completing (pending reserves its slot t271: byte1:=
-  item id, word2 bit0 CLEAR — completions DO fire in normal play; item-36/35
-  branches are the REFUTED zero-witness class, do NOT chase those). On fire:
-  capture CS:IP + previous value + which slot; map EIP through the windowed
-  disasm recipe; census consumers of the same offset offline. Bank writer +
-  consumer law to docs/re/economy.md (or income-law.md if build-phase); update
-  the OQ-016 row residue list. Zero-fire after 3 launches = honest negative,
-  residue becomes instrumentation-class, say so in the row.
+keep this block intact except deleting your completed row; t326 below is row 1;
+NOTE: t325's queue row was deleted when t329 landed it as NEXT 2026-11-06):
 
 t326 PHASE BOMB FORCED-CAPTURE (OQ-016 residue 1 — the nuke law, the LARGEST
   capture-gated item left; one-run recipe verbatim in docs/BLOCKED.md §Nuke).
@@ -338,6 +326,35 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone 6 stays; work/ gitignored — findings to docs/re/.
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel
   (task line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
+
+## LANDED t329 (2026-11-06, session 34) — OQ-019 DISPOSITION PACKET
+## DELIVERED (drafts only; row closes on USER ruling). Zero capture, zero
+## guest boot. Full working notes docs/re/_wip_t329.md S1-S5; NEW
+## scripts/r329_magnetron_census.py (exit 0). Deliverables: (1) DRAFT final
+## OQ-019 row text at _wip_t329 S4 — DO NOT APPLY to OPEN-QUESTIONS.md; the
+## row flips closed ONLY on USER ruling (D2 a/b/c + accept cited-dead notes).
+## (2) NEW MEASUREMENT (magnetron residue): carriage census — production
+## playcap/save (t=1086) 20 saves / 600 ship-rows hold ZERO cidx-60 'Lane
+## Magnetron' slots; scratch epochs t261-drive (360 owner-0 slots) and
+## t288-probe-* (252) DID carry and STILL yielded zero uses across the
+## t265/t273/t285 mines -> residue is WITNESS-CLASS, not absence-only
+## (r1_t185 table-law control re-run green same session). (3) Scripted-drive
+## idea RETIRED cited-indirect (_wip_t329 S2): gizmo-use orders arm ONLY via
+## the batmode-family state-WORD tail 0x15c63/0x15da6 (verified verbatim:
+## `mov eax,[ebp+0xb1]` state gate -> [ship+0x62]/[+0x63]/[+0x67] stores),
+## the field t323 census-proved writerless and t324 RAM-proved unswitchable;
+## commit edges 0x25560/0x25570 (t88a) unreachable without the armed order.
+## CAVEAT (honest, banked): no census t296..t324 NAMES the window record
+## owning the 0x15xxx block — identity inferred from t88 'batmode' labels +
+## gate shape; closure class = cited-but-indirect, same class t323 accepted.
+## (4) DECISIONS.md D3 rewritten to actual state: rows closeable by the loop
+## WITHOUT user input = NONE end-to-end; OQ-016 (t325/t326 queued) is the
+## only row with live loop-side movement potential; OQ-005 waits on D1
+## (t328 shrinks the ask); magnetron static law stands. LEDGER: OQ-019 note
+## appended, row STAYS OPEN strict-close (a disposition is not a measurement;
+## no live store witnessed this iteration). Sitting check negative (tail-seek
+## newest turn 1086 == corpus). Production :9 (pid 1957) untouched. NEXT =
+## t325 PER-SLOT SHIELD-BYTE WRITNESS per the t329 text's own handoff.
 
 ## LANDED t324 (2026-11-06, session 33) — RAM CLASS-TABLE CENSUS: THE t323
 ## RE-OPEN CONDITION IS DISCHARGED — NEGATIVE ABSOLUTE. Live-RAM census of

@@ -574,6 +574,22 @@ capture route is now cited-dead: t319/t320 pump, t322 mouse, t323
 activation, t324 class-table. Row STAYS OPEN (strict-close: no live SELECT
 store ever witnessed — this is a cited-dead-route closure). Disposition
 packet = t329 (drafts only; the row closes on USER ruling).
+t329 note (DISPOSITION PACKET delivered, zero capture; docs/re/_wip_t329.md
+S1-S5 + scripts/r329_magnetron_census.py exit 0): final row text DRAFTED at
+_wip_t329 S4 — DO NOT APPLY; row status flips to closed ONLY on USER ruling
+(D2 commission, or accept boundary + cited-dead notes). New MEASUREMENT this
+iteration (magnetron residue): carriage census — production playcap/save
+(t=1086) 20 saves/600 ship-rows hold ZERO cidx-60 (Lane Magnetron) slots,
+while scratch epochs t261-drive (360 owner-0 slots) and t288-probe-* (252)
+DID carry and STILL produced zero uses across the t265/t273/t285 mines ->
+residue is WITNESS-CLASS, not absence-only. Scripted-drive idea RETIRED
+(cited-indirect, _wip_t329 S2): gizmo-use orders arm only via the batmode
+family state-WORD tail 0x15c63/0x15da6 (`mov eax,[ebp+0xb1]` gate -> [ship
++0x62/0x63/0x67] stores), the field t323 proved has no in-session writer and
+t324 proved unswitchable in live RAM; commit edges 0x25560/0x25570 (t88a) are
+unreachable without the armed order. CAVEAT banked: no census names the
+window record owning the 0x15xxx block — identity inferred from t88 'batmode'
+labels + gate shape, closure class same as t323 accepted. Row STAYS OPEN.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —
