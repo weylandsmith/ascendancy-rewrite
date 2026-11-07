@@ -11,23 +11,31 @@ campaign driven to t1150 as the RE corpus; the original save is intact at
 work/r1/game/RESUME.GAM.user-oct29.
 
 ## D1 — .shp sprite library ruling (closes OQ-005, the oldest open row)
-Our decoder reproduces 1477 of 1557 vendor sprite records byte-lawfully. The
-80 that don't fit cannot be closed by measurement: every reader in the game
-takes dimensions from the record header, so the odd ones can only be adjudicated
-by a human looking at frames, or by capturing the vendor game drawing them.
-Deliverable waiting on you: work/r1/shp_png/decision-sheet.md (88 rows, 5
-contact sheets under work/r1/shp_png/sheets/):
-  A1..A15   your own Oct-29 verdicts transcribed — just confirm still accurate
+UPDATE t328 (2026-11-07): the ask shrank. Our decoder reproduces 1513 of 1557
+vendor sprite records byte-lawfully (t197 corpus). We then asked the vendor
+itself which of the 44 failures it can even DRAW (shp.md S25, cited):
+  - 39 records are CITED-NO-WITNESS: the vendor draws NOTHING for them.
+    12 cos_star k40..k51 have zero dims in every slot -> the blit's own
+    -1 gate (@0x5cb2b) refuses them outright; 25 ladder slots
+    (destroy/expl*/orbex/sg*expl — all named in batfx.txt battle-effects)
+    carry ZERO stream bytes; 1starmap k1 likewise (and no selector selects
+    it). Nothing to keep, nothing to see — batch-ruling them junk is now a
+    formality backed by measurement, not a guess.
+  - 3cfgnew k12 is truncated at the file's EOF by the vendor itself:
+    junk-certain. sg64expl k0 is combat art = unreachable by capture.
+  - ONLY mouse k5/k6/k7 (sheet rows C27-C29) remain genuinely adjudicable:
+    real art bytes (46x77, 2038 stream bytes each) whose dimensions sit at
+    record offset 0 instead of the usual 0x10 — a slot-location dispute,
+    not junk. One designed scratch session (t330) can measure what the
+    vendor does with them; your ruling may then be unnecessary even there.
+So the live ask is now just:
   B1..B29   identified frames with thumbnails — confirm or correct the ID
-  C1..C44   decode failures — rule each keep / junk / re-render
-Batch rulings are explicitly fine: e.g. "all B correct; the 25 zero-byte ladder
-slots = junk; mouse k5/k6/k7 + 3cfgnew = junk; cos_star k40..k51 = leave".
-Effort: ~5 minutes.
-Alternative if you'd rather not eyeball: say "draw-capture" and we run one
-scratch session that makes the VENDOR draw those records and pixel-compares our
-decode against its output — a measurement, no ruling needed.
-If undecided: row stays open, rewrite unaffected (it renders its own vector
-art; the codec is a validation asset).
+            (work/r1/shp_png/decision-sheet.md + sheets/)
+  C27-C29   mouse k5/k6/k7: keep / junk / wait-for-t330 — or say
+            "draw-capture" and we run t330 instead of asking.
+  A rows     restatement only; confirm if you like.
+Effort: ~2 minutes. If undecided: row stays open, rewrite unaffected (it
+renders its own vector art; the codec is a validation asset).
 
 ## D2 — Per-ship fleet simulation: build scope decision (not an RE unknown)
 The vendor tracks per-ship order states, gizmo inventories, and carrier/
@@ -48,10 +56,11 @@ GOAL.txt says: stop when every open row is CLOSED. Strict-close forbids closing
 on a plausible default, so some residues may be legally unclosable on this box
 (player-testimony class). UPDATE t329 (2026-11-06) — routes re-scored against
 cited evidence; the original list below over-promised two entries:
-  OQ-005  -> D1 ruling remains the closure. t328 (queued) converts the
-             records the vendor itself draws NOTHING for (cos_star k40..k51,
-             25 ladder slots — t200 law) to CITED-NO-WITNESS and may design
-             (not run) a draw-capture for mouse/1starmap if reachable.
+  OQ-005  -> D1 ruling remains the closure. T328 LANDED (2026-11-07): 39 of
+             the 44 C-rows are now CITED-NO-WITNESS (vendor draws nothing —
+             shp.md S25), 1 junk-certain, 1 unreachable; the live ask is
+             B-rows + mouse C27-C29 only; t330 (designed) can settle the
+             mouse trio by measurement if you prefer.
   OQ-019  -> CLOSED-ROUTE SUPERSEDED: the t293 scripted move-order capture
              and every follow-on capture route are now CITED-DEAD (t319/t320
              pump, t322 mouse, t323 activation, t324 RAM class table).

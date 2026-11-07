@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-08T00:40
+updated: 2026-11-08T06:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,43 +212,63 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t328 OQ-005 DRAW-WITNESS FEASIBILITY (offline-first; sharpens D1 for the
-user, closes nothing itself) — queue row 1 after t327 landed the tool
-2026-11-07; OQ-005 is the oldest open row and the decision sheet waits on
-measurements this task can produce offline. The vendor game IS a measurement
-instrument (external to us; R13 satisfied). Per-record feasibility pass:
-t200 selector law already PROVES the 12 cos_star k40..k51 + 25 zero-byte
-ladder slots draw NOTHING in the vendor too (dims-zero blit = error -1
-@0x5cb2b) => no witness possible, bank as CITED-NO-WITNESS (this alone
-converts "batch ruling junk?" into "vendor-drawn nothing" — update
-decision-sheet rows B/C + shp.md S25). sg50expl k9 / sg64expl k0 = combat
-explosions = UNREACHABLE-BY-CAPTURE class per t323 amendment — cite, no
-probe. mouse k5/k6/k7 + 1starmap k1: check static sites for who selects those
-indices (windows.txt law + name-imms); if any is reachable in a normal screen,
-DESIGN (do not run) a one-launch scratch draw-capture with screen-compare vs
-our decode, and queue it as a follow-on task under a new id (NOT t329 — that
-id is the OQ-019 disposition packet). 3cfgnew k12: vendor truncation — cite as
-junk-certain. Deliverable: feasibility table + updated DECISIONS.md D1 text
-(ask shrinks to what is actually adjudicable). TOOL NOTE: any screen-capture
-or debugger leg work now runs through scripts/r1_dbg_session.py (t327; run
-with ~/.hermes/hermes-agent/venv/bin/python — system python3 has no PIL);
---offline RUN_DIR replays+censuses any recorded run before spending launches.
-Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW — SIGTERM pops the
-vendor quit-confirm (Yes)-default; teardown is SIGKILL. t325 context law:
-`convert img rgb:-` is HEADERLESS raw RGB — use ppm:- (P6). t325 census law:
-slot byte +3 is NOT a progress value — watch whole dwords. t329: magnetron
-scripted road cited-dead. t326b: objdump range-decode law
-(objdump -D -b binary -mi386 -M addr32,intel --start-address --stop-address
-work/ascend_restored.bin) re-syncs where the t91 tsv desyncs (badbar pads);
-0x56ca4 = msg post law (slot [[obj+edx*3+4]], vtable+0x8, 16-bit id in ebx);
-msg ids are CONSUMER-tree facts — always census the handler's cmp-dx set
-before claiming a msg reaches a window (fn 0x1aef8: {6,d,3b,46,47,4a,50}).
-t324: census anchor = installer target data 0x58e8; [wmgr+0x3337] = LANE POOL;
-slots = P0+static. t323 amendment (1)-(4); t322 (1)-(3); t321 (1)-(4) incl.
-msg-0x50 three non-post sites; fn 0x2351c name arg DEAD. economy.md IS
-GENERATED (gizmo_probe.py). Sitting check FIRST (playcap newest turn >1086 =>
-scripts/r1_t85g_sitting.py before anything); production :9 untouched; scratch
-copies only, never mount game/.
+NEXT t330 MOUSE-DIMS DRAW-CAPTURE (run the t328 design; OQ-005's only
+witnessable residue). Design VERBATIM at docs/re/_wip_t328.md S4 — execute it,
+do not redesign. Rationale: t328 measured 39+1+1 of the 44 C-rows out of the
+human ask (CITED-NO-WITNESS/junk/unreachable, shp.md S25); mouse k5/k6/k7 are
+the sole records where a live witness decides the dims-slot-location question
+(u16@rec+0 46x77 EXACT-H vs canonical u32@+0x10 zero-component). Run via
+scripts/r1_dbg_session.py with ~/.hermes/hermes-agent/venv/bin/python (system
+python3 NO PIL); scratch copy of the Oct-29 save, own ring, SIGKILL teardown
+by recorded PID; legs blit_entry 0x5caac + blit_refuse 0x5cb2b (hot) +
+blit_deref 0x5cb59 (payload base -> cache slot via S17 anchor 0x2e1194 ->
+library attribution); phases per S4; --offline replay before believing any
+run. Budget 1-2 attempts; honest-negative exit is banked in S4 (mouse.shp
+never loaded => join UNREACHABLE class, row note updated). Last-4 FirePat
+collision preflight is enforced by the tool — pick leg-name last-4s that do
+not collide with existing LEGS.
+Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW (SIGTERM pops quit-
+confirm; teardown SIGKILL); t325 ppm:- not raw rgb; t325 census whole dwords;
+t323 amendment (1)-(4); t326b objdump range-decode law + 0x56ca4 post law +
+consumer-cmp-set census law; t324 census anchor 0x58e8 / [wmgr+0x3337]=LANE
+POOL / slots=P0+static; t328 blit -1-gate asm reading (shp.md S25.1) +
+mouse-walk correction (S25.3) + zero-stream-vs-zero-dims distinction (S25.2 —
+do NOT call the 25 ladder slots dims-zero). economy.md IS GENERATED. Sitting
+check FIRST (playcap newest turn >1086 => scripts/r1_t85g_sitting.py before
+anything; watcher pid 136374 alive, file grows continuously — tail-seek only,
+OOM law); production :9 untouched; scratch copies only, never mount game/.
+
+## LANDED t328 — 2026-11-07 (OQ-005 DRAW-WITNESS FEASIBILITY: 41 of 44
+## C-rows leave the human ask; mouse k5/k6/k7 sole witnessable residue)
+OFFLINE-ONLY iteration (zero launches; production :9 pids 136357/136359 +
+watcher 136372/136374 untouched, ps-verified). Sitting check NEGATIVE (newest
+playcap turn 1086 via tail-seek; OOM law honoured — never full-read the 7.9 GB
+timeline). Deliverables all measured, files: docs/re/shp.md S25 (durable law,
+hand-authored — verified no script writes shp.md), docs/re/_wip_t328.md S0-S4
+(working notes + t330 design), work/r1/shp_png/_t328_dims.json (44-row dims/-
+span census), scripts/r328_hdr.py (record-header dumper). MEASURED: (1) blit
+-1 gate re-verified from raw asm at 0x5caac..0x5cb2b (inc-then-jle on
+[ebx+4]/[ebx+8]); (2) cos_star k40..51 all-zero 24-byte headers 12/12 =>
+vendor CANNOT draw them (zero dims every slot) => CITED-NO-WITNESS; (3) the
+25 ladder slots are zero-STREAM (span==header: 8 B k0-variant / 24 B k>=1)
+NOT dims-zero (task-text framing corrected) + every lib named in
+extracted/ascend00/batfx.txt battle-effects list => combat class + zero
+draw-content => CITED-NO-WITNESS; (4) 1starmap k1 zero-stream + SHAPEITEM
+selects k3/k4/k5/k7 only (windows.txt 456/477/498/517) => CITED-NO-WITNESS;
+(5) sg50expl k9 near-empty+EOF + batfx line 58 => cited; sg64expl k0 batfx
+line 63 => UNREACHABLE (t323); (6) 3cfgnew k12 EOF-truncated => JUNK-CERTAIN;
+(7) MOUSE CORRECTION: t196 "k6/k7 not walkable" was canonical-slot-only —
+with u16 dims @rec+0 (46x77) ALL of k5/k6/k7 walk EXACT-H 77/77 from
+rec+0x18 (2038 stream bytes real art); canonical u32@+0x10 has a zero
+component each ((0,46)/(77,0)/(0,0)) => dims-SLOT-LOCATION dispute, not junk;
+windows.txt has no mouse.shp SHAPEITEM and 'DATA\MOUSE.SHP' @0x84314 has zero
+u32 refs in code (honest negative, scan calibrated against planets/LGRACE/
+planal hits) => selector UNKNOWN => t330 capture designed (S4), NOT run.
+LEDGER: NOTHING closed (strict-close; feasibility sharpens, never closes).
+OQ-005 row appended with the S25 verdict + t330 pointer; DECISIONS.md D1
+REWRITTEN (ask = B-rows + C27-C29 only; 'draw-capture' alternative kept) and
+D3 OQ-005 line updated. NEXT = t330 VERBATIM per the block above.
+
 
 ## LANDED t327 — 2026-11-07 (DEBUGGER-SESSION TOOL v2: scripts/r1_dbg_session.py)
 Tool SHIPPED and VERIFIED end-to-end. Composes r299_leg_session machinery
@@ -301,28 +321,20 @@ need RAM). Sitting check NEGATIVE (turn 1086); production :9 untouched; gate 0.
 NEXT = t327 VERBATIM per the block above.
 
 QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; t328 is row 1
-(t327 completed 2026-11-07, tool shipped + verified live):
+keep this block intact except deleting your completed row; t330 is row 1
+(t328 completed 2026-11-07, feasibility table landed shp.md S25):
 
-t328 OQ-005 DRAW-WITNESS FEASIBILITY (offline-first; sharpens D1 for the user,
-  closes nothing itself). The decision sheet waits on human ruling because we
-  assumed no measurement can see these 80 records — but the vendor game IS a
-  measurement instrument (external to us; R13 satisfied). Per-record
-  feasibility pass: t200 selector law already PROVES the 12 cos_star k40..k51
-  + 25 zero-byte ladder slots draw NOTHING in the vendor too (dims-zero blit
-  = error -1 @0x5cb2b) => no witness possible, bank as CITED-NO-WITNESS (this
-  alone converts "batch ruling junk?" into "vendor-drawn nothing" — update
-  decision-sheet rows B/C + shp.md S25). sg50expl k9 / sg64expl k0 = combat
-  explosions = UNREACHABLE-BY-CAPTURE class per t323 amendment — cite, no
-  probe. mouse k5/k6/k7 + 1starmap k1: check static sites for who selects
-  those indices (windows.txt law + name-imms); if any is reachable in a
-  normal screen, DESIGN (do not run) a one-launch scratch draw-capture with
-  screen-compare vs our decode, and queue it as a follow-on task. 3cfgnew
-  k12: vendor truncation — cite as junk-certain. Deliverable: feasibility
-  table + updated DECISIONS.md D1 text (ask shrinks to what is actually
-  adjudicable). (NOTE: the old "queue it as t329" text predated t324 landing;
-  t329 is now the OQ-019 disposition packet — queue any draw-capture design
-  under a new id after t328.)
+t330 MOUSE-DIMS DRAW-CAPTURE (run t328 design VERBATIM, _wip_t328 S4; do not
+  redesign). OQ-005's only witnessable residue: mouse k5/k6/k7 dims-slot
+  dispute (u16@rec+0 46x77 EXACT-H real art vs canonical u32@+0x10
+  zero-component). scripts/r1_dbg_session.py + venv python; legs blit_entry
+  0x5caac / blit_refuse 0x5cb2b (hot) / blit_deref 0x5cb59 (payload base ->
+  cache slot S17 anchor 0x2e1194 -> library attribution); phases S4; budget
+  1-2 attempts; honest-negative exit banked (mouse.shp never loaded =>
+  UNREACHABLE class). After landing: update OQ-005 row + DECISIONS.md D1 per
+  the S4 verdict grammar; queue the next row from the t329 disposition
+  follow-ons (OQ-019 needs the USER's D2 ruling — if unanswered, the queue
+  re-forms around OQ-016 BatModeWnd activation, t326b).
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 amendments are BINDING): poster pass

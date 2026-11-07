@@ -34,7 +34,16 @@ drawn frame (R13 blocks self-grading) OR user ruling on the shipped decision
 sheet work/r1/shp_png/decision-sheet.md (88 rows, docs/DECISIONS.md D1) OR a
 vendor draw-capture session. Blind sweeps FORBIDDEN (R2). Default in force:
 decode per S16 V/A law, residual skip-and-warn in tooling only (rewrite renders
-its own vector art; codec = validation asset). | open
+its own vector art; codec = validation asset). T328 FEASIBILITY PASS (shp.md
+S25, cited): of the 44 C-rows, 39 are CITED-NO-WITNESS (12 cos_star k40..51
+zero dims every slot -> blit -1 gate @0x5cb2b draws nothing; 25 ladder slots
+zero STREAM bytes span==header + batfx.txt battle attribution; 1starmap k1
+zero-stream + no selector), 1 junk-certain (3cfgnew k12 vendor EOF
+truncation), 1 UNREACHABLE (sg64expl k0 combat, t323), and ONLY mouse
+k5/k6/k7 remain witnessable — real art 46x77x2038B with dims u16@rec+0
+(EXACT-H walk; t196 "not walkable" was canonical-slot-only) vs canonical
+u32@+0x10 zero-component: a dims-slot-location dispute. t330 draw-capture
+DESIGNED (_wip_t328 S4); DECISIONS.md D1 ask shrunk to B-rows + C27-29. | open
 
 OQ-016 | loop | campaign per-turn constants: income formula, pop growth
 curve/cap, starting items, build order, expansion cadence, home placement

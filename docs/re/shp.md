@@ -1134,3 +1134,60 @@ S3/S4 landing blocks); drawing vendor records stays blocked on OQ-005.
    Oct-29 00:03:17 corrected-curve, 00:03:36 plain). The sheet transcribes
    every verdict relevant to the residue; planpro/planres non-recognition is
    shown WITH its t193 revocation so the user rules on current state.
+
+## 25. t328 (2026-11-07): OQ-005 DRAW-WITNESS FEASIBILITY — 41 of 44 C-rows
+## leave the human ask; only mouse k5/k6/k7 remain witnessable [measured]
+
+Offline-only iteration (zero launches; production :9 untouched). Full working
+notes docs/re/_wip_t328.md; dims/span census snapshot
+work/r1/shp_png/_t328_dims.json; header dumper scripts/r328_hdr.py.
+
+1. BLIT -1 GATE RE-VERIFIED from raw asm (objdump range-decode law):
+   0x5cabe eax=[ebx+4]; inc; 0x5cac5 jle 0x5cb2b; 0x5cac7 eax=[ebx+8]; inc;
+   0x5cacd jle 0x5cb2b; 0x5cb2b mov eax,-1;ret. A shape struct with W==0 or
+   H==0 CANNOT be drawn, independent of selector. Error set {-1 @0x5cb2b,
+   -2 @0x5cb36}; no stream-overrun error (S20 stands).
+
+2. FEASIBILITY TABLE (44 C-rows of decision-sheet.md):
+   - cos_star k40..k51 (12): MEASURED all-zero 24-byte headers 12/12 (every
+     dims slot zero) + 3 stream bytes. Blit -1 gate (above) => vendor draws
+     NOTHING. CITED-NO-WITNESS. (t200 selector law corroborates.)
+   - 25 zero-STREAM ladder slots (destroy k14, expl00 k9, expl01 k8/9,
+     expl03 k0/9, expl04 k0/9, expl05 k9, expl07 k0, expl08 k0/9, orbex00
+     k8/9, sg37/45/47/49expl k0+9, sg66expl k0/9, sg70expl k9): measured
+     span==header 25/25 (8 B k0-variant, 24 B k>=1) => zero stream bytes at
+     the only law-cited stream slot (S16/S17). CORRECTION to the t328 task
+     framing: these are NOT dims-zero (u16@+0 reads 139x139/199x199); the
+     structural fact is zero-stream. Every lib is named in
+     extracted/ascend00/batfx.txt (battle-effects list; destroy line 10,
+     expl00..08 lines 24-32, sgNNexpl ~50-66, orbex00..02 75-77) => combat
+     class => UNREACHABLE-BY-CAPTURE per t323 amendment. CITED-NO-WITNESS.
+   - 1starmap k1: span 24 = zero stream bytes; SHAPEITEM selects k3/k4/k5/k7
+     only (windows.txt 456/477/498/517); no citable selector for k1; a draw
+     would paint next-record bytes (garbage). CITED-NO-WITNESS.
+   - sg50expl k9: span 27 AT EOF (near-empty + truncated) + batfx line 58
+     combat. UNREACHABLE-BY-CAPTURE (t323) + no-witness corroboration.
+   - sg64expl k0: batfx line 63 combat; header variant 12 00 00 00 fb ff ff
+     ff (S3). UNREACHABLE-BY-CAPTURE (t323).
+   - 3cfgnew k12: span 2391 AT FILE EOF, walk short 55/79 (S20/S21),
+     SHAPEITEM selects k0 only. JUNK-CERTAIN.
+   - mouse k5/k6/k7: THE ONLY WITNESSABLE RECORDS (see 3).
+   Count: 39 no-witness + 1 junk-certain + sg64expl cited + 3 mouse = 44.
+
+3. MOUSE CORRECTION [measured]: t196 S20.1 "mouse k6/k7 not walkable" was
+   canonical-slot-only. With the u16 dims PAIR AT rec+0 (46x77, all three
+   records) the S9 walk from rec+0x18 completes EXACT-H 77/77 for k5, k6,
+   k7 (and passing k4 identically). Canonical A dims u32@+0x10 are
+   (0,46)/(77,0)/(0,0) — zero component => pinned dims-gate rejects. So the
+   mouse records are a DIMS-SLOT-LOCATION dispute with real art bytes
+   (2038 stream bytes each), not junk. windows.txt has NO mouse.shp
+   SHAPEITEM; 'DATA\MOUSE.SHP' @0x84314 has zero u32 refs in code (honest
+   negative, calibration-calibrated); CURSORSHAPE 2 on cosmos + BatModeWnd.
+   WHO SELECTS k5/k6/k7 remains UNKNOWN => t330 one-launch draw-capture
+   DESIGN banked at _wip_t328 S4 (blit 0x5caac entry + refuse-0x5cb2b
+   census + 0x5cb59 deref -> cache-slot library attribution via S17 anchor
+   0x2e1194; screen-compare vs u16@+0 decode).
+
+4. CONSEQUENCE: the D1 human ask shrinks from 44 adjudicable-looking rows to
+   effectively the B-class identifications + the 3 mouse rows (and even
+   those may become no-witness after t330). DECISIONS.md D1 updated t328.
