@@ -2415,3 +2415,77 @@ B entry-alone) because an armed entry leg consumes the census window (t330 law).
   table reads [0]=0x15ef9 [1]=0x15fed [2]=0x16181 [3]=0x15ef9 (entries 4/5 =
   0x1624d/0x161e5, unreachable: the b9 dispatch bounds al<=3). Structure CONFIRMED
   as data for the first time.
+
+## S52 t333 (2026-11-08) — THE "GLOBAL ACTIVE SCREEN STATE" IS A CATEGORY ERROR:
+## [win+0xab] IS THE CONTROL TABLE, fn 0x31d58 IS A CONTROL-FLAG WRITER, AND THE
+## BATTLE-MAP WINDOWS HAVE NO CONTROL TABLE AT ALL
+Zero-capture iteration (static disasm + offline .sav census; production :9 pids
+136357/136359 + Xvfb 1461 never signalled). Instruments: work/r331_disasm.txt
+(139,026 insns) read verbatim; census scripts/r333b_state_layout.py over 372 saves
+(42,780 window records, 5,208 control records). Full working notes:
+docs/re/_wip_t333.md S0-S7.
+- WINDOWS.TXT STATE-LINE GRAMMAR, MEASURED 123/123 LINES, ZERO EXCEPTIONS:
+  `STATE <count> <id> [<id> ...]`. RACECONTROLS:418 `STATE 3 1 7 13` = THREE states
+  {1,7,13}; BatModeWnd:1180 `STATE 1 16` = ONE state, id 16. Distinct ids in the
+  file: 0,1,2,2,3,4,6,7,8,9,10,10,12,13,14,15,16,16,18,20-class (max 20). The
+  state-16 family is 20 windows (t332 said 19 — off by one; list re-derived
+  identically: BatControlWnd, BatListWnd, BatModeWnd, TOGGRID, BATROTLEFT,
+  BATROTRIGHT, BATZOOMIN, BATZOOMOUT, RECENTER, TOGELEV, ABANDON, My^Items,
+  Other^Items, Repeat, Pass, Auto, W, S, Z, I).
+- THE RECORD LAYOUT, FROM FIVE INDEPENDENT VERBATIM READS (not inference):
+  [win+0xab] u32 TABLE PTR (fn 0x31d58 0x31d7e; fn 0x31e74 0x31e94; fn 0x31f30
+  0x31f75/0x31f91; fn 0x32100 0x3224c) · [win+0xaf] u16 COUNT (fn 0x31f30 0x31f44
+  bounds compare; fn 0x31d58 reaches it as the high half of the dword @+0xad via
+  `mov ebx,[esi+0xad]; sar ebx,0x10`) · [win+0xb1] u16 CURRENT INDEX (fn 0x31f30
+  0x31faf writes it; fn 0x31e74 0x31ec3 returns it). The prior t323 wording that
+  called +0xb1 a "CURRENT STATE id" is WRONG IN MEANING: it is the current CONTROL
+  RECORD INDEX, and 0/0xffff when the window has no controls.
+- BYTE-FOR-BYTE CONTROL-RECORD DECODE (the proof the table is CONTROLS, not the
+  STATE list). RACECONTROLS member 0xfd5d84, table -> member 0xfd5e3c, count 7,
+  current 0xffff. rec[0] = `01 00 | df 01 ef 01 | c1 01 d1 01 | 05 00 | 14 00`
+  against windows.txt:429 `RACE1CONTROL 1 479 449 495 465 0 20`:
+  +0x00 id=1 · +0x02=479 · +0x04=495 · +0x06=449 · +0x08=465 · +0x0a flags=5 ·
+  +0x0c size=20. Ids across rec[0..6] are 1,2,4,8,16,32,64 = the RACEnCONTROL
+  bitmasks verbatim. The loader's `shl eax,cl` id construction (0x58b0b) builds
+  THESE, and fn 0x31d58's only store 0x31dd0 `mov WORD PTR [eax+0xa],dx` sets
+  THEIR enable flags.
+- MEASURED FLAGS, 372/372 SAVES: RACECONTROLS control +0xa = 5 (bit0|bit2) for
+  ids 1,2,4,8 and 0 for ids 16,32,64 — exactly the first four race slots enabled.
+  This is the loader loop 0x58aff..0x58b3e writing val=1 per player-race slot.
+- RARITY, THE HEADLINE: RACECONTROLS IS THE ONLY WINDOW IN THE ENTIRE CORPUS WITH
+  A DECODABLE TABLE at [win+0xab]. NEXTTURNCONT, COSMOSWnd, BatControlWnd,
+  BatModeWnd, TOGLANES, TOGEMPIRE, STATUSWND, GIZLIST, RACELIST, LOADLIST,
+  SHIPDESSCREEN, NEGSCREEN, INTELSCREEN ... table u32 = 0 in 372/372 saves.
+  BatModeWnd member 0xfdc924 measured +0xab=0, +0xaf=0, +0xb1=0; BatControlWnd
+  member 0xfdbebc identical.
+- CONSEQUENCE FOR fn 0x31f30 (the sole runtime switcher): it bounds-asserts
+  (`mov ebx,0x396; mov edx,0x183e; call 0x2a428`) whenever idx >= [win+0xaf]. With
+  count=0 measured, it CANNOT be called successfully on either battle window. The
+  control machine is structurally incapable of naming them — independently
+  confirming t323's construction-pinning conclusion by a measurement route.
+- THE t332 AMENDMENT-(3) EDGE IS DISSOLVED, NOT ANSWERED. (a) fn 0x31d58 cannot
+  select a screen (it writes control flags). (b) There is NO global
+  active-screen-state datum: `grep -nE "mov (WORD|BYTE|...) PTR ds:0x13b98"` over
+  the whole image returns NOTHING — the loader's loop bound ds:0x13b98 has no
+  writer in the image. (c) All seven [win+0xb1] writers (0x31c79, 0x31faf,
+  0x33787, 0x339a4, 0x33c73, 0x33d1b, 0x364d2) are constructors / a char-input
+  cycler / a table write / the bounds-asserting switcher — none is a screen
+  selector. So residue (1) does NOT get an activator, and the route text must stop
+  pointing at fn 0x31d58: the STATE line is consumed at windows.txt PARSE TIME and
+  its runtime home is not in the window record.
+- NEGATIVES WORTH BANKING: the windows.txt keyword literals (PARENT, NUMCONTROLS,
+  SHAPEFRAME, HELPINDEX, MOUSEFOCUS, X0, BACKGRNDCOLOR) appear ZERO times in
+  work/ascend_restored.bin, ascend_payload.bin, ascend_raw.bin and t73c_obj1slab.bin;
+  they exist only in the data archive game/ascend00.cob (NUMCONTROLS n=1 @0x2aefb,
+  PARENT n=123, STATE n=139). The sole "STATE"-prefixed string in the image is
+  `STATE%02d` @0x8598b, sitting in the HELPWINDOW/gizhelp string run — a help-topic
+  name formatter, NOT a windows.txt keyword. => the windows.txt parser is
+  keyword-table-driven from data the RE image does not contain; do not hunt the
+  STATE-line consumer inside work/ascend_restored.bin on keyword evidence.
+- FALSE-POSITIVE LAW: "state 16 resident" measured by id==16 in a decodable table
+  is meaningless unless the table is first PROVEN to be a control table — the only
+  such table in the corpus hits 16 because RACE5CONTROL's bitmask is 16.
+- UNINFORMATIVE SHAPE (do not re-run): scanning window records for the byte
+  encodings of OR(1<<id) yields 1-2 spurious hits for every one of 123 windows at
+  ~60 candidate offsets; two-byte patterns match a record of small ints by
+  construction.

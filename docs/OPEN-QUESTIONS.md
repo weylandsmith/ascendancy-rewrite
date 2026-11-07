@@ -113,13 +113,33 @@ call [ebx+0xc]`) — which is why t331's imm census saw nothing. WHY ZERO, MEASU
 STATE 1 16 is EXCLUSIVELY the 19-window battle-map family (fresh windows.txt census)
 while banked stops name the owners of the My^Items/Other^Items pixels as
 NEXTTURNCONT (state 1) on the map and PLIND/PLBUILD (state 17) in the rowjump view —
-the t253 rowjump enters the PLANET/orbital state, NOT a battle screen. The sole
-remaining edge for residue (1) is therefore the GLOBAL active-screen-state writer
-(the id the STATE-line composition law fn 0x31d58 / loop 0x5898e..0x58b3e consumes)
-— a ZERO-CAPTURE question (t333); no further capture is justified on this residue
-until it names an activator (REFUTED-ROUTES t332 amendment). Row stays OPEN
-strict-close (the mode-1 store has STILL never been witnessed firing, and no nuke
-effect has ever been observed).; (2) setup-time home DRAW law — CLOSED MEASURED
+the t253 rowjump enters the PLANET/orbital state, NOT a battle screen. t333 THEN
+TOOK THE LAST NAMED EDGE (the "global active-screen-state writer") AND FOUND IT IS
+A CATEGORY ERROR, so it is no longer an edge: fn 0x31d58's ONLY store 0x31dd0
+`mov WORD PTR [eax+0xa],dx` writes a CONTROL record, byte-decoded against
+windows.txt:429 `RACE1CONTROL 1 479 449 495 465 0 20` (id,x,y,x,y,flags,size —
+ids 1,2,4,8,16,32,64 = the RACEnCONTROL bitmasks), so [win+0xab] is the CONTROL
+table and the loader loop 0x58aff..0x58b3e `shl eax,cl` writes per-race-slot
+ENABLEMENT (measured 372/372 saves: ids 1,2,4,8 flags=5, ids 16,32,64 flags=0);
+there is NO global active-state datum (`mov WORD/BYTE PTR ds:0x13b98` = ZERO hits
+in the whole 139,026-insn image, so the loader's loop bound has no writer); and
+BatControlWnd 0xfdbebc / BatModeWnd 0xfdc924 measure +0xab=+0xaf=+0xb1=0 in
+372/372 saves, which makes the sole runtime switcher fn 0x31f30 bounds-assert on
+them (it cannot be called successfully with count=0). windows.txt STATE-line
+grammar MEASURED 123/123 lines: `STATE <count> <id>...`, so BatModeWnd's
+`STATE 1 16` = one state of id 16, and the state-16 family is 20 windows (t332
+said 19). CONSEQUENCE FOR THE ROUTE: it no longer points at fn 0x31d58 and no
+capture is justified; the STATE line is consumed at windows.txt PARSE TIME and its
+runtime home is NOT in the window record — the keyword literals (PARENT,
+NUMCONTROLS, SHAPEFRAME, HELPINDEX, X0, BACKGRNDCOLOR) occur ZERO times in
+work/ascend_restored.bin / ascend_payload.bin / ascend_raw.bin / t73c_obj1slab.bin
+and only in game/ascend00.cob (NUMCONTROLS n=1 @0x2aefb, PARENT n=123), so any
+further walk needs the archive-side parser, not the RE image. Evidence:
+docs/re/ships.md S52 + docs/re/_wip_t333.md S0-S7 + scripts/r333b_state_layout.py
+(exit 0, 372 saves). Row stays OPEN strict-close (the mode-1 store has STILL never
+been witnessed firing, no nuke effect has ever been observed, and residue (1) now
+has SIX fully-named unreachable legs).; (2) setup-time home DRAW law — CLOSED
+MEASURED
 2026-11-04 t295: uniform rejection draw per race in race order, k=draw%T,
 store row_r+0xd @0x22edd, claim gate 0x22ee0 (FUN_00022ce4 0x22eb4..0x22f55
 full disasm + census scripts/r295_home_draw.py: equal-marker 30/30 turn<=2,

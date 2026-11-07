@@ -212,58 +212,104 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t333 ACTIVE SCREEN STATE WALK (ZERO CAPTURE; OQ-016 residue-1 last named
-edge). RATIONALE: t332 instrumented and measured the BatControlWnd chain ZERO
-(run work/r1/dbg-t332-20261107-124717: all 8 legs 0, control btn_hdlr 8; save axis
-BatControlWnd[+0xb7]/[+0xb9]=0 and BatModeWnd[+0xb7]=0 in every save), and named
-WHY: the mode-1 road needs windows.txt STATE 1 16 (EXCLUSIVELY the 19-window
-battle-map family) to be the ACTIVE SCREEN STATE, while every captured click lands
-on state 1 (NEXTTURNCONT) or state 17 (PLIND/PLBUILD) windows. t323 closed the
-PER-WINDOW route ([win+0xb1] writers = constructors/cycler/bounds-asserting fn
-0x31f30); the never-decoded edge is the GLOBAL active-state id. No capture can be
-justified on this residue until that decode names an activator (REFUTED-ROUTES
-t332 amendment (3)), and OQ-005 is user-blocked (D1) / OQ-019 already dispositioned
-— so this is the only loop-live edge. TASK (static + offline .sav census only):
-(1) OFFLINE MEASUREMENT FIRST, cheapest and most decisive — for every window
-record in the corpus saves (locate by magic 0x12345678 @+0x00 + RAW ASCII NAME
-@+0x20; member = runtime+0x88), read +0xa (the STATE-match flag fn 0x31d58 writes
-at 0x31dd0), +0xab state-table ptr, +0xad count, +0xb1 state, and dump the 14-byte
-per-state records; report the SET of windows whose +0xa is set per save. That set
-names the active state directly, and answers whether 16 has EVER been active in
-484+ saves. Tool shape: scripts/r333_state_census.py, reuse r1_slot.base_of + the
-r324/r329 census pattern; NEVER json-loads the 8.5 GB timeline (OOM law).
-(2) STATIC: objdump -D -b binary -mi386 -M addr32,intel --start-address 0x31d58
---stop-address 0x32000 work/ascend_restored.bin (the r331 disasm work/r331_disasm.txt
-already covers it — 139,026 insns, zero badbar); read fn 0x31d58 VERBATIM to pin
-where its `di` (the compared state id) comes from, then census its E8 callers and
-walk that datum to its WRITERS. The composition loop is 0x5898e..0x58b3e (windows.txt
-loader, t323 S1b/S2).
-(3) CROSS-CHECK the battle entry: state-16 chrome (TOGGRID/BATROTLEFT/BATZOOMIN/
-ABANDON) must be composed by the same mechanism — look for the state-id writer in
-combat setup (combat.md fn 0x49xxx family) and in the turn-loop docs/re/turnloop.md.
-OUTCOMES: (A) the active-state writer AND a player-reachable path to 16 are cited
--> name the activator, then a t334 capture is justified; (B) the writer is cited but
-NO player-reachable path to 16 exists (or 16 never active in any save, measured) ->
-residue (1) gains its FIFTH, now fully-named UNREACHABLE leg: write the honest
-negative, row stays OPEN strict-close, D2-c strengthened, and the OQ-016 residue-(1)
-route text must point at t333's citation rather than at a capture. DEAD, do NOT
-re-trod: ANY mouse/click battery targeting the state-16 family (t332 amendment (1)
-(2)); imm-census hunts for a 0x1c01 poster (the delivery is fn 0x156d4's own
-class-table self-relay 0x16162..0x1616f — amendment (4)); t323 [win+0xb1] writers;
-t324 class-table census; t326b indexing family; raw-file reads at cs:[disp32]
-(jump tables are REBASED; t331 law C5 + the member=linear+0x88 fix in ships.md S51).
-Fixed laws carried (do NOT re-trip): t332 CLICK-SPACE LAW (clicks take windows.txt/
-game coords; (80,100) is a GRAB-TIME crop offset — screen forms like (593,218) must
-be converted -80,-100 before use as click targets); t332 `census control MATCH` is
-FALSE for legs with a relocated immediate (judge arming by BPLIST + fires);
-window-record +0xb0/+0xb7/+0xb9 are BYTES interleaved with DWORD pointers at
-+0xb5/+0xbb (byte-granular reads mandatory); t325 SIGNAL LAW (SIGKILL by recorded
-PID); t330 heavy-check + cache ctx 0x2E1194 ABSOLUTE in .sav; t324 census anchor /
-slots=P0+static; economy.md IS GENERATED (ships.md is hand-authored — verified no
-generator touches it). Sitting check FIRST (playcap newest turn >1086 => scripts/
-r1_t85g_sitting.py before anything; tail-seek only, OOM law); production :9
-(pids 136357/136359, Xvfb 1461) untouched; scratch copies only, never mount game/;
-venv python (~/.hermes/hermes-agent/venv/bin/python) for anything PIL/r1_dbg_session.
+NEXT t334 CONTROL-TABLE ATTACH SITE WALK (ZERO CAPTURE; the last file-to-RAM
+edge t333 exposed). RATIONALE: t333 proved the STATE line has NO runtime home in
+the window record and that the "global active-screen-state writer" t332 named does
+not exist, so residue (1) has no capture-justified edge left; the only live
+file->RAM question in this area is how a windows.txt block becomes a control
+table, because t333 found the allocate/attach pair INSIDE the windows.txt loader
+region — 0x57d56 `mov DWORD PTR [eax+0xab],0xffffffff` and 0x57e48
+`mov DWORD PTR [edx+0xab],eax`, immediately upstream of the composition loop
+0x5898e..0x58b3e — and proved the table shape it produces (14 B records,
+{id,x0,y0,y1x?,...,flags u16@+0xa,size u16@+0xc}). If the STATE list is consumed
+purely at parse time (no runtime structure), that is a MEASURED negative that
+converts residue (1)'s disposition from "unreachable leg" to "no mechanism exists
+in the image", which is the strongest honest outcome available for that row and
+also settles whether ANY further OQ-016 work in this area can ever be justified.
+TASK (static first, then one offline census):
+(1) Disassemble 0x57c00..0x58000 VERBATIM (fresh objdump — the r331 dump starts at
+0x14bb0 so it covers this, but re-dump the region to be safe) and name: who calls
+0x57d56/0x57e48, what allocates the 14-byte stride, and whether any parse path
+reads a STATE-line value into a structure (grep the region for the second-number
+scan pattern used by the NUMCONTROLS/RACEnCONTROL chain).
+(2) OFFLINE CROSS-CHECK with the resident text: windows.txt IS IN THE SAVE FILE
+(t333: member 0x39db51 holds the literal `NAME ABILBUTTON1 / PARENT ABILITYWIN /
+STATE 0 / MOUSEFOCUS 1 / X0 60 ...`). Parse the resident copy and compare it
+per-window against the runtime records — a same-save file-vs-RAM diff is the
+cheapest decisive test of the parse-time-only hypothesis, and it also validates
+the save's address mapping in the same pass.
+(3) Measure the runtime value of the loader loop bound ds:0x13b98 in saves where
+the mapping is VERIFIED (expect 4 if the per-player-slot enablement reading in
+_wip_t333.md S8(b) is right; ids 16/32/64 having flags=0 while 1/2/4/8 have bit0
+is the inference that needs this number).
+DEAD, do NOT re-trod: anything t332 amendment (1)(2)(2-click batteries on the
+state-16 family), (4) imm-census for a 0x1c01 poster; t323 [win+0xb1] writers;
+t324 class-table census; t326b indexing family; the STATE-MASK byte scan (t333 S7,
+empty signal); hunting the windows.txt keyword literals inside
+work/ascend_restored.bin (t333: PARENT/NUMCONTROLS/SHAPEFRAME/HELPINDEX/X0/
+BACKGRNDCOLOR occur ZERO times in ascend_restored.bin / ascend_payload.bin /
+ascend_raw.bin / t73c_obj1slab.bin; they exist only in game/ascend00.cob — read
+it, never modify it). t333 DID NOT close fn 0x31d58 as irrelevant to everything:
+it is the control-record lookup + flag writer, and its two loader callers are
+cited; do not re-open "does fn 0x31d58 select a screen" (answer measured: no).
+Fixed laws carried: SAVE-FILE MAPPING LAW (t333 S8b) — the save-member-to-linear
+delta is NOT a constant 0x88 across save dirs; re-derive per save with
+r1_slot.base_of and validate with a known needle (t332's jump table
+0x15ef9/0x15fed/0x16181 works) before reading ANY ds: global at a computed offset;
+[win+0xab] table ptr / [win+0xaf] count / [win+0xb1] current CONTROL INDEX (never
+a state id — t333 S5d); windows.txt STATE-line grammar `STATE <count> <id>...`
+(123/123 lines); control +0xa bits: bit0 loader enablement, bit1 fn 0x31f30
+CURRENT, bit2 fn 0x32048 toggle; clicks are windows.txt-space, (80,100) is a
+grab-time crop offset; t330 heavy-check + cache ctx 0x2E1194 ABSOLUTE in .sav; t325
+SIGNAL LAW (SIGKILL by recorded PID only); economy.md IS GENERATED, ships.md is
+hand-authored (verified no generator touches it). Sitting check FIRST (playcap
+newest turn >1086 => scripts/r1_t85g_sitting.py before anything; tail-seek only,
+OOM law — never json-load the 8.5 GB timeline). Production :9 (pids 136357/136359,
+Xvfb 1461) untouched; scratch copies only, never mount game/; venv python
+(~/.hermes/hermes-agent/venv/bin/python) for anything PIL/r1_dbg_session.
+
+## LANDED t333 — 2026-11-08 (THE "GLOBAL ACTIVE SCREEN STATE" IS A CATEGORY
+ERROR: [win+0xab] IS THE CONTROL TABLE, fn 0x31d58 WRITES CONTROL FLAGS, AND THE
+BATTLE-MAP WINDOWS HAVE NO TABLE AT ALL)
+Zero-capture iteration (static disasm + offline .sav census; adopted an
+interrupted session's uncommitted docs/re/_wip_t333.md S0-S3 +
+scripts/r333_state_census.py and finished the task in the same commit).
+Production :9 pids 136357/136359 + Xvfb 1461 never signalled; game/ read-only
+(ascend00.cob grepped only). MEASURED/PROVED: (1) STATE-LINE GRAMMAR 123/123
+lines `STATE <count> <id> [<id>...]` (RACECONTROLS:418 = 3 states {1,7,13};
+BatModeWnd:1180 = ONE state id 16) — the state-16 family is 20 windows, t332's
+"19" was off by one; (2) LAYOUT from five independent verbatim reads: [win+0xab]
+u32 table ptr, [win+0xaf] u16 count, [win+0xb1] u16 CURRENT CONTROL INDEX (never a
+state id — t323's wording corrected); (3) BYTE-FOR-BYTE control-record decode:
+RACECONTROLS member 0xfd5d84 table->0xfd5e3c rec[0]=`01 00|df 01 ef 01|c1 01 d1
+01|05 00|14 00` == windows.txt:429 `RACE1CONTROL 1 479 449 495 465 0 20`, ids
+1,2,4,8,16,32,64 = the RACEnCONTROL bitmasks => [win+0xab] is the CONTROL table and
+fn 0x31d58's only store 0x31dd0 `mov WORD PTR [eax+0xa],dx` writes CONTROL
+enablement, so it cannot select a screen (the task's premise, refuted); (4) flags
+372/372 saves: ids 1,2,4,8 = 5, ids 16,32,64 = 0, and since caller D passes val=1
+with a MOV (not OR), bit2 is runtime fn 0x32048 (0x320bf/0x320c5) and bit1 is
+fn 0x31f30 — enablement is COUNT-CAPPED, [inferred] per player slot (runtime
+ds:0x13b98 NOT measured, see the mapping law); (5) RACECONTROLS IS THE ONLY
+WINDOW WITH A DECODABLE TABLE in 372 saves — BatControlWnd 0xfdbebc and
+BatModeWnd 0xfdc924 measure +0xab=+0xaf=+0xb1=0, which makes the sole runtime
+switcher fn 0x31f30 bounds-assert on them (count=0), confirming t323's
+construction-pinning by measurement; (6) NO GLOBAL ACTIVE-STATE DATUM: zero store
+forms to ds:0x13b98 across the WHOLE code image (r331 covers 0x14bb0..0x826a5,
+max inter-line gap 66 B; fresh low-range objdump 0x0..0x14bb0 adds 9 refs, none a
+store); (7) the windows.txt keyword literals occur ZERO times in every RE image
+(ascend_restored/payload/raw/t73c_obj1slab) and only in game/ascend00.cob
+(NUMCONTROLS n=1 @0x2aefb, PARENT n=123) => the STATE-line consumer is
+keyword-table-driven from data the RE image lacks; BUT windows.txt text IS
+resident in the save (member 0x39db51), which is t334's handle; (8) NEW LAW: the
+save-member-to-linear delta is NOT a constant 0x88 across save dirs — the +0x88
+probe returns 0x1d5349/0x1d543d/0x1d55d1 in playcap saves where t332 measured
+0x15ef9/0x15fed/0x16181, so re-derive per save and validate with a needle before
+any ds: read. LEDGER: NOTHING closed strict-close (16/3: OQ-005, OQ-016, OQ-019
+open); OQ-016 residue-(1) REWRITTEN to stop pointing at fn 0x31d58 and to name the
+loader-side control-table site. Files: docs/re/_wip_t333.md S0-S9,
+docs/re/ships.md S52 (hand-authored, no generator), scripts/r333b_state_layout.py
+(exit 0), scripts/r333_state_census.py (superseded field map, kept for history).
+NEXT = t334 control-table attach-site walk per the block above.
 
 ## LANDED t332 — 2026-11-08 (BATCONTROLWND CHAIN LIVE WITNESS: FIFTH LEG
 ## INSTRUMENTED AND MEASURED ZERO; THE OBSTACLE IS THE ACTIVE SCREEN STATE)

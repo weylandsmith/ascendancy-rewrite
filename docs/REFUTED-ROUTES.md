@@ -1004,3 +1004,34 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ##     559..628,203..233" or "(593,218)" must be converted back (-80,-100) before
 ##     being used as click targets — measured: (513,118) and (593,218) hit
 ##     DIFFERENT windows (NEXTTURNCONT vs PLBUILD).
+
+## t333 AMENDMENT (binding): THE ACTIVE-SCREEN-STATE ROUTE IS A CATEGORY ERROR,
+## fn 0x31d58 IS A CONTROL-FLAG WRITER, AND FIXED-0x88 ds: READS ACROSS SAVE DIRS
+## ARE INVALID. Evidence: docs/re/_wip_t333.md S0-S9, docs/re/ships.md S52,
+## scripts/r333b_state_layout.py (exit 0, 372 saves / 42,780 window records).
+## (1) DEAD: "the +0xa set / fn 0x31d58 names or selects the active screen
+##     state". [win+0xab] is the per-window CONTROL table — byte-proved:
+##     RACECONTROLS rec[0] `01 00|df 01 ef 01|c1 01 d1 01|05 00|14 00` ==
+##     windows.txt:429 `RACE1CONTROL 1 479 449 495 465 0 20`; ids across recs are
+##     the RACEnCONTROL bitmasks 1,2,4,8,16,32,64. fn 0x31d58's only store
+##     0x31dd0 writes control flags. Do not re-open this as a screen-selection
+##     question.
+## (2) DEAD: hunting a GLOBAL active-screen-state datum. Zero store forms to
+##     ds:0x13b98 over the entire code image (r331 disasm 0x14bb0..0x826a5 +
+##     fresh 0x0..0x14bb0 objdump). Active screen is a parse-time property; the
+##     windows.txt keyword literals (PARENT/NUMCONTROLS/SHAPEFRAME/HELPINDEX/X0/
+##     BACKGRNDCOLOR) occur ZERO times in ascend_restored.bin, ascend_payload.bin,
+##     ascend_raw.bin, t73c_obj1slab.bin — only in game/ascend00.cob. Do not hunt
+##     the STATE-line consumer inside the RE image on keyword evidence.
+## (3) LAW: [win+0xb1] is the CURRENT CONTROL INDEX (0/0xffff when no controls),
+##     never a state id; [win+0xaf] is the control COUNT; the interleaved-u16
+##     layout means u16@+0xad and u32@+0xad>>16 are DIFFERENT quantities. t333's
+##     own S3 "layout contradiction" was this misread — do not cite it.
+## (4) LAW: the .sav-member = linear + 0x88 delta is NOT constant across save
+##     dirs. The +0x88 probe on playcap saves yields jump-table entries
+##     0x1d5349/0x1d543d/0x1d55d1 where t332 (dbg-t331 run) measured
+##     0x15ef9/0x15fed/0x16181. Re-derive per save (r1_slot.base_of) and validate
+##     with a known needle IN THE SAME SAVE before reading any ds: global.
+## (5) UNINFORMATIVE SHAPE: scanning window records for byte encodings of
+##     OR(1<<state_id) matches 1-2 spurious offsets for EVERY window (~60
+##     candidates each); small-int records defeat 2-byte value search.
