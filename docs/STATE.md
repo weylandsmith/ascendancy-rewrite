@@ -212,61 +212,89 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t334 CONTROL-TABLE ATTACH SITE WALK (ZERO CAPTURE; the last file-to-RAM
-edge t333 exposed). RATIONALE: t333 proved the STATE line has NO runtime home in
-the window record and that the "global active-screen-state writer" t332 named does
-not exist, so residue (1) has no capture-justified edge left; the only live
-file->RAM question in this area is how a windows.txt block becomes a control
-table, because t333 found the allocate/attach pair INSIDE the windows.txt loader
-region — 0x57d56 `mov DWORD PTR [eax+0xab],0xffffffff` and 0x57e48
-`mov DWORD PTR [edx+0xab],eax`, immediately upstream of the composition loop
-0x5898e..0x58b3e — and proved the table shape it produces (14 B records,
-{id,x0,y0,y1x?,...,flags u16@+0xa,size u16@+0xc}). If the STATE list is consumed
-purely at parse time (no runtime structure), that is a MEASURED negative that
-converts residue (1)'s disposition from "unreachable leg" to "no mechanism exists
-in the image", which is the strongest honest outcome available for that row and
-also settles whether ANY further OQ-016 work in this area can ever be justified.
-TASK (static first, then one offline census):
-(1) Disassemble 0x57c00..0x58000 VERBATIM (fresh objdump — the r331 dump starts at
-0x14bb0 so it covers this, but re-dump the region to be safe) and name: who calls
-0x57d56/0x57e48, what allocates the 14-byte stride, and whether any parse path
-reads a STATE-line value into a structure (grep the region for the second-number
-scan pattern used by the NUMCONTROLS/RACEnCONTROL chain).
-(2) OFFLINE CROSS-CHECK with the resident text: windows.txt IS IN THE SAVE FILE
-(t333: member 0x39db51 holds the literal `NAME ABILBUTTON1 / PARENT ABILITYWIN /
-STATE 0 / MOUSEFOCUS 1 / X0 60 ...`). Parse the resident copy and compare it
-per-window against the runtime records — a same-save file-vs-RAM diff is the
-cheapest decisive test of the parse-time-only hypothesis, and it also validates
-the save's address mapping in the same pass.
-(3) Measure the runtime value of the loader loop bound ds:0x13b98 in saves where
-the mapping is VERIFIED (expect 4 if the per-player-slot enablement reading in
-_wip_t333.md S8(b) is right; ids 16/32/64 having flags=0 while 1/2/4/8 have bit0
-is the inference that needs this number).
-DEAD, do NOT re-trod: anything t332 amendment (1)(2)(2-click batteries on the
-state-16 family), (4) imm-census for a 0x1c01 poster; t323 [win+0xb1] writers;
-t324 class-table census; t326b indexing family; the STATE-MASK byte scan (t333 S7,
-empty signal); hunting the windows.txt keyword literals inside
-work/ascend_restored.bin (t333: PARENT/NUMCONTROLS/SHAPEFRAME/HELPINDEX/X0/
-BACKGRNDCOLOR occur ZERO times in ascend_restored.bin / ascend_payload.bin /
-ascend_raw.bin / t73c_obj1slab.bin; they exist only in game/ascend00.cob — read
-it, never modify it). t333 DID NOT close fn 0x31d58 as irrelevant to everything:
-it is the control-record lookup + flag writer, and its two loader callers are
-cited; do not re-open "does fn 0x31d58 select a screen" (answer measured: no).
-Fixed laws carried: SAVE-FILE MAPPING LAW (t333 S8b) — the save-member-to-linear
-delta is NOT a constant 0x88 across save dirs; re-derive per save with
-r1_slot.base_of and validate with a known needle (t332's jump table
-0x15ef9/0x15fed/0x16181 works) before reading ANY ds: global at a computed offset;
-[win+0xab] table ptr / [win+0xaf] count / [win+0xb1] current CONTROL INDEX (never
-a state id — t333 S5d); windows.txt STATE-line grammar `STATE <count> <id>...`
-(123/123 lines); control +0xa bits: bit0 loader enablement, bit1 fn 0x31f30
-CURRENT, bit2 fn 0x32048 toggle; clicks are windows.txt-space, (80,100) is a
-grab-time crop offset; t330 heavy-check + cache ctx 0x2E1194 ABSOLUTE in .sav; t325
-SIGNAL LAW (SIGKILL by recorded PID only); economy.md IS GENERATED, ships.md is
-hand-authored (verified no generator touches it). Sitting check FIRST (playcap
-newest turn >1086 => scripts/r1_t85g_sitting.py before anything; tail-seek only,
-OOM law — never json-load the 8.5 GB timeline). Production :9 (pids 136357/136359,
-Xvfb 1461) untouched; scratch copies only, never mount game/; venv python
-(~/.hermes/hermes-agent/venv/bin/python) for anything PIL/r1_dbg_session.
+NEXT t335 STATE-RECORD FILE-VS-RAM DIFF + id-BRANCH RE-DERIVATION (ZERO CAPTURE;
+OQ-016 residue-(1) closer). RATIONALE: t334 located the STATE line's runtime home
+(win+0x6d, stride 13, counter [win+0xa1], compactor fn 0x31690, paint-time walker
+fn 0x31384) but its save census read the slots as a FLAG quad, not as the
+stride-13 RECORDS fn 0x31690 copies (byte0 tag; id==0 path stores u32 name-handle
+at slot+0x1; id==1 path stores tag + u16 INDEX via fn 0x1fe20 without touching
+the counter). Two consequences: (A) the census families (0,1,0,0) n=784 /
+(1,0,0,0) n=588 may BE parsed STATE records read at the wrong width — the
+file-vs-RAM test t334's own assignment demanded has therefore NOT yet been run
+against the right layout; (B) t334 S5 read the per-entry branch as "id==0 / id==1
+/ else vendor assert winmgr.cpp:0xcd6 (0x5804c)", but windows.txt ships
+`STATE 1 16` for the whole battle family and the game BOOTS — so either the branch
+is not on the STATE id, or 0x2a428-with-eax=0 is soft at this site; the reading
+must be re-derived VERBATIM before any further disposition of residue-(1).
+TASK (static first, then one offline census; ~25 probes):
+(1) Re-read 0x57ee6..0x58062 VERBATIM from work/r331_disasm.txt and re-derive
+    which register/value the 3-way branch actually tests (walk the dataflow of the
+    value compared at the branch — do not assume it is the parsed STATE number);
+    state explicitly what an entry `16` takes and where the u32 written to
+    [ecx+0x1] comes from. If the assert path IS reachable for id 16, check what
+    fn 0x2a428 does with eax=0 (is it fatal or log-only? cite the body).
+(2) OFFLINE CENSUS with RECORD semantics: modify scripts/r334_state_array.py (or
+    write scripts/r335_state_records.py) to read, per window, [win+0xa1] slots at
+    win+0x6d+13i as (byte0 tag, u32 at +1) AND, for id==1-path windows, the u16
+    index; diff against the resident windows.txt STATE lines parsed per window
+    (same-save, needle-verified mapping member = B + 0x82bb0 + X, r1_slot.py law;
+    validate with the turn needle 1086 before reading any ds:). Report per-family
+    agreement: battle family (STATE 1 16), RACECONTROLS (STATE 3 1 7 13), the
+    id==0 name family.
+(3) DISPOSITION: if the records match the text, residue-(1) closes its
+    "parse-time-only" question by MECHANISM (file->record->paint, no selector),
+    which is the strongest honest outcome left in this image; if they do not,
+    name the mismatch precisely (offsets + values) and keep the row open.
+DEAD, do NOT re-trod: everything in REFUTED-ROUTES t322..t334 amendments (binding),
+specifically t334: (1) STATE-line-as-screen-selector and the win+0x6d FLAG-quad
+census unchanged — the RECORD-record census of (2) is the sanctioned successor;
+(2) 0x3000-range parser constants as windows.txt offsets (they are DATA-segment
+format strings); (4) allocator hunting at 0x57d56/0x57e48. Also dead from t332/t333:
+2-click batteries on the state-16 family, imm-census for a 0x1c01 poster,
+[win+0xb1] writers, class-table census, STATE-MASK byte scan, hunting windows.txt
+keyword literals inside ascend_restored.bin (they exist only in game/ascend00.cob).
+Fixed laws carried: SAVE-MEMBER MAPPING member = B + 0x82bb0 + X (r1_slot.py),
+needle-verify per save before ANY ds: read; [win+0xab] control-table ptr /
+[win+0xaf] count / [win+0xb1] current CONTROL INDEX; ds:0x13b98 = WORD 4
+(196/196 saves); STATE home win+0x6d stride 13 counter [win+0xa1]; paint fn
+0x30fb8 reachable only via outside-image table (0 LE ptrs in bin);
+fn 0x315c4/0x31660 ds:0x6fda8 is a 0x400-byte NAME INTERNER (counter ds:0x701a6),
+NOT a state array; venv python for PIL/r1_dbg_session; tail-seek only on the
+8.5 GB timeline; sitting check FIRST (newest turn >1086 => r1_t85g_sitting.py).
+Production :9 (pids 136357/136359, Xvfb 1461) untouched; scratch copies only;
+game/ read-only. economy.md IS GENERATED; ships.md hand-authored (no generator).
+
+## LANDED t334 — 2026-11-08 (CONTROL-TABLE ATTACH SITE WALKED; THE STATE LINE'S
+## RUNTIME HOME IS win+0x6d STRIDE 13 — CONSUMED AT PAINT TIME, NOT AS A SELECTOR;
+## ds:0x13b98 = 4 MEASURED 196/196)
+Zero-capture iteration (static disasm + offline census; tools
+scripts/r334_parse_map.py exit 0, scripts/r334_state_array.py exit 0, fresh
+region objdump work/r334_disasm_57c00.txt; working doc docs/re/_wip_t334.md
+S0-S13; ships.md S53; REFUTED-ROUTES t334 amendment). Sitting check NEGATIVE
+(tail-seek, max turn 1086 == corpus). Production :9 never signalled; game/
+read-only. PROVED: (1) 0x57d56/0x57e48 are fallthrough-only sequential parse
+blocks INSIDE the windows.txt parser fn 0x575e4 (sole entry: tail call 0x575da
+from winmgr init); guards read scanner status [esp+0x3a6] (>>16==25 -> poison -1,
+==15 -> copy parsed u32 verbatim to [win+0xab]); no allocator at the attach site,
+no imul-14 in the 2,328-insn body. (2) FORMAT-STRING DOMAIN LAW: parser-pushed
+constants in the 0x3000 range are DATA-segment scan format strings (ds:0x3008
+reads `%s %d` at B+0x82bb0+0x3008 in 41.sav) — NOT windows.txt offsets; the
+earlier "text offset" coincidences are dead. (3) THE STATE-LINE CONSUMER EXISTS:
+parse loop 0x57ee6..0x57ff5 builds 13-byte records at win+0x6d (compactor fn
+0x31690 verbatim: dst = win + 13*[win+0xa1] + 0x6d, movs 3xDWORD+1xBYTE,
+counter++); walker fn 0x31384 renders slots byte0==0 text (format 0x7d3aa) /
+byte0==1 handle-resolve (fn 0x1fc34 via 0x9f10c) / else assert — its EXACTLY-2
+callers are inside paint fn 0x30fb8, which has NO in-image pointer to it. STATE
+slots feed paint-time text/handles, never a screen selector. (4) CENSUS 196
+needle-verified saves: WORD ds:0x13b98 = 4 in 196/196; battle-family counters
+[win+0xa1]=0 (690-record probe: {0:600,1:30,2:60}, nonzero only for the id==0
+name family). (5) SELF-CORRECTIONS banked in-file: interim S12 "global stride-13
+array ds:0x6fda8" retracted by S13 (fn 0x315c4/0x31660 body = repnz scas NAME
+INTERNER, 0x400 pool, counter ds:0x701a6). LEDGER: nothing closed strict-close
+(16/3); OQ-016 residue-(1) disposition rewritten on mechanism, with the
+id-branch paradox (`STATE 1 16` vs assert 0x5804c) handed to t335. GATE 0,
+ledger audit OK. NEXT=t335 STATE-record file-vs-RAM diff + id-branch
+re-derivation VERBATIM.
 
 ## LANDED t333 — 2026-11-08 (THE "GLOBAL ACTIVE SCREEN STATE" IS A CATEGORY
 ERROR: [win+0xab] IS THE CONTROL TABLE, fn 0x31d58 WRITES CONTROL FLAGS, AND THE

@@ -2489,3 +2489,75 @@ docs/re/_wip_t333.md S0-S7.
   encodings of OR(1<<id) yields 1-2 spurious hits for every one of 123 windows at
   ~60 candidate offsets; two-byte patterns match a record of small ints by
   construction.
+
+## S53 t334 (2026-11-08) — THE CONTROL-TABLE ATTACH SITE IS WALKED: THE STATE
+## LINE DOES HAVE A RUNTIME HOME (win+0x6d, stride 13, counter [win+0xa1]) — ITS
+## ONLY IN-IMAGE CONSUMER IS PAINT fn 0x31384; ds:0x13b98 = 4 MEASURED
+Zero-capture (static disasm + offline census; tools scripts/r334_parse_map.py
+exit 0, scripts/r334_state_array.py exit 0, fresh region objdump
+work/r334_disasm_57c00.txt 0x57c00..0x58000; working doc
+docs/re/_wip_t334.md S0-S13). Production :9 (136357/136359, Xvfb 1461) never
+signalled; game/ read-only.
+- ATTACH-SITE IDENTITY: 0x57d56/0x57e48 are both inside fn 0x575e4 (the winmgr
+  windows.txt PARSER — its string pool at 0x85b82..0x85d3c holds `windows.txt`,
+  `WMGR MAPRACES`, `%s bad parent`, `..\winmgr.cpp` x8). Sole entry: tail call
+  0x575da from the winmgr init fn. Both +0xab blocks are reached ONLY by
+  fallthrough (whole-body branch-target scan: zero jumps land on 0x57d18/0x57e14;
+  only self-skips 0x57d25->0x57d60, 0x57e21->0x57e4e). The guards read the STACK
+  SLOT [esp+0x3a6] high half (==25 -> poison -1 when parsed!=0; ==15 -> copy the
+  parsed u32 verbatim into [win+0xab]); NOTHING in the 2,328-insn body writes
+  [esp+0x3a6] — it is scanner-status left by 0x77fba's machinery. So "who
+  allocates the control table" = the SCANNER's parsed value, copied verbatim;
+  there is no allocator call at the attach site and no imul-14 anywhere in the fn.
+- FORMAT-STRING DOMAIN LAW (self-correction, save-probe cited): the constants the
+  parser pushes to 0x77fe1 are SCAN FORMAT STRINGS in TWO segments — small ones
+  (0x3000-range) live in the loaded DATA segment (ds:0x3008 reads
+  `%s %d\0..\winmgr.cpp\0...` at B+0x82bb0+X in save 41.sav), big ones
+  (0x85000-range) are code-image rodata (`%s %d` verbatim at file 0x85c69).
+  They are NOT windows.txt offsets — S3-era "text offset" coincidences are dead;
+  keyword matching lives in the scanner machinery (0x7a1f7 + handler 0x77f64).
+- THE STATE-LINE CONSUMER IS FOUND (corrects t333 S6/S9 wording): parse loop
+  0x57ee6..0x57ff5 parses `STATE <count>` then per id: id==0 branch parses a NAME,
+  resolves via 0x315c4, stores u32 handle at [ecx+0x1], then calls 0x31690;
+  id==1 branch stores tag byte + u16 INDEX via 0x1fe20 (walks [edi+0x7d0] stride
+  0x32, count [edi+0x2ede]>>16); any other id hits the vendor assert
+  winmgr.cpp:0xcd6 (0x5804c). dst base = win+0x6d, stride 13 (`lea ecx,[edx+0x6d]`,
+  `add ecx,0xd`). fn 0x31690 VERBATIM: asserts window type ([win+0x9f]>>16) >= 4
+  (winmgr.cpp:0x241), n = WORD [win+0xa1], dst = win + 13n + 0x6d, copies EXACTLY
+  13 BYTES (movs 3xDWORD + 1xBYTE), [win+0xa1]++. So [win+0xa1] IS the state-slot
+  counter — the compacting writer, and its ONLY caller is the parse loop.
+- CONSUMER LAW (exhaustive census, two passes): literal `+0x6d` operands in the
+  whole RE image are ONLY 0x57f06 (parse fn) and 0x316de (0x31690); fresh
+  low-range objdump 0x0..0x14bb0 adds NONE. But the array IS read via pointer
+  arithmetic: fn 0x31384 (`mov bx,[win+0xa1]` guard, `ebp=win+0x6d+13i`, 3-way
+  branch on slot byte0: 0 -> text format 0x7d3aa, 1 -> handle-resolve fn 0x1fc34
+  via format 0x9f10c, >1 -> assert winmgr.cpp:0x1df) — its EXACTLY-2 callers
+  0x3117f/0x3135a are inside paint fn 0x30fb8 (reads [win+0x39]/[+0x3d],
+  compares [win+0x41] to ds:0x7d35e active-window ptr, draws via 0x5bf71).
+  NO LE pointer to 0x30fb8 exists in ascend_restored.bin (0 hits; control fns
+  0x1aef8/0x156d4 each have 1) — 0x30fb8 is reachable only through an
+  outside-image table. STATE slots therefore feed PAINT-TIME text/handle
+  rendering, never a screen selector; battle windows measure [win+0xa1]=0 so the
+  loop is a no-op for them. (fn 0x315c4/0x31660 ds:0x6fda8 is a 0x400-byte NAME
+  INTERNER pool with counter ds:0x701a6 — string handles, NOT stride-13 records;
+  an interim S12 reading, retracted, _wip_t334 S13.) [win+0xa1] appears 5x:
+  0x30bf3 (ctor clear), 0x313b9/0x31488 (the 0x31384 walker),
+  0x316be/0x316d7 (the compactor).
+- SAVE CENSUS (r334_state_array.py, 196 needle-verified saves t1086-1087):
+  WORD ds:0x13b98 = 4 in 196/196 (cites t333's [inferred] per-player-slot bound;
+  4 = player count, relation n=4). win+0x6d slot flags: 17,836/18,816 records
+  (0,0,0,0); clean nonzero families (0,1,0,0) n=784 / (1,0,0,0) n=588 carry small
+  ints (0x75, 0x2e) not pointers; text-vs-slots agreement 708/708 but ONLY on
+  count==0 cases (zero positive matches); handle->magic delta scan empty for all
+  K<0x200. [win+0xa1] histogram {0:600, 1:30, 2:60} over 690 records x6 saves;
+  nonzero ONLY for the id==0-branch family (INTRO/PLAYTUTORIAL/FRESHGAME/RESUME/
+  LOAD/SAVE/EXITTODOS/RACES), ROT* (STATE 3 1 7 13) = 0 — the index path does not
+  compact. CONCLUSION: the array exists and the counter matches the branch
+  structure, but in production saves the slots are zero/garbage — the parse-time
+  builder's resolved handles do NOT persist as pointers. The STATE line is
+  therefore STILL not a runtime screen-selection mechanism in this image; residue
+  (1) keeps its disposition with the mechanism now fully named.
+- MAPPING LAW REFINED: r1_slot addr = B + 0x82bb0 + X for obj1 DATA offsets is
+  the correct ds: read law (a run using B+X rejected 196/196 saves — harness
+  error, not law change; the t333 "+0x88 not constant" warning is about
+  pointer-value->member conversions, a different transform).

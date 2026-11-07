@@ -134,9 +134,32 @@ runtime home is NOT in the window record — the keyword literals (PARENT,
 NUMCONTROLS, SHAPEFRAME, HELPINDEX, X0, BACKGRNDCOLOR) occur ZERO times in
 work/ascend_restored.bin / ascend_payload.bin / ascend_raw.bin / t73c_obj1slab.bin
 and only in game/ascend00.cob (NUMCONTROLS n=1 @0x2aefb, PARENT n=123), so any
-further walk needs the archive-side parser, not the RE image. Evidence:
-docs/re/ships.md S52 + docs/re/_wip_t333.md S0-S7 + scripts/r333b_state_layout.py
-(exit 0, 372 saves). Row stays OPEN strict-close (the mode-1 store has STILL never
+further walk needs the archive-side parser, not the RE image. t334 THEN WALKED
+THE ATTACH SITE 2026-11-08 (docs/re/ships.md S53 + docs/re/_wip_t334.md S0-S13,
+tools scripts/r334_parse_map.py + scripts/r334_state_array.py both exit 0): the
+STATE line DOES have a parse-built runtime home — parse loop 0x57ee6..0x57ff5
+writes win+0x6d stride 13 (id==0: NAME->handle via 0x315c4 then compactor
+0x31690 `dst=win+13*[win+0xa1]+0x6d`, 13-byte movs, counter [win+0xa1]++; id==1:
+tag + u16 index via 0x1fe20; else vendor assert winmgr.cpp:0xcd6), CORRECTING
+t333's "runtime home is not in the window record" wording — BUT the array's only
+in-image WALKER is paint fn 0x31384 (literal +0x6d operands: only 0x57f06 and
+0x316de; walker reaches slots via `add ebp,0x6d`+`add ebp,0xd` arithmetic; its
+2 callers 0x3117f/0x3135a are inside paint fn 0x30fb8, reachable in-image only
+through an outside-image table — 0 LE pointers to 0x30fb8 in the bin), rendering
+slots as TEXT/HANDLES (byte0 0 -> format 0x7d3aa, 1 -> resolve fn 0x1fc34, >1 ->
+assert) — never a screen selector; and 196 needle-verified
+saves show the slots zero/garbage (agreement only on count==0 cases; [win+0xa1]
+nonzero exactly for the id==0 family). ds:0x13b98 = WORD 4 MEASURED 196/196
+(cites t333's [inferred] enablement bound; 4 = player count). The attach sites
+0x57d56/0x57e48 are fallthrough-only sequential parse code guarded by scanner
+status [esp+0x3a6] (no writer in-body); no allocator at the attach site.
+DISPOSITION: residue (1) keeps its "no runtime screen-selection mechanism in this
+image" verdict, now cited by mechanism-completeness rather than absence; no
+capture justified (the parse machinery is fully walked; the surviving unknown —
+what consumed the array in the vendor's full build — is outside this image).
+Evidence: docs/re/ships.md S52 + S53 + docs/re/_wip_t333.md S0-S7 +
+docs/re/_wip_t334.md S0-S13 + scripts/r333b_state_layout.py (exit 0, 372 saves)
++ scripts/r334_state_array.py (exit 0, 196 saves). Row stays OPEN strict-close (the mode-1 store has STILL never
 been witnessed firing, no nuke effect has ever been observed, and residue (1) now
 has SIX fully-named unreachable legs).; (2) setup-time home DRAW law — CLOSED
 MEASURED

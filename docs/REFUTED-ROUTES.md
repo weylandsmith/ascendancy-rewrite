@@ -1035,3 +1035,51 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ## (5) UNINFORMATIVE SHAPE: scanning window records for byte encodings of
 ##     OR(1<<state_id) matches 1-2 spurious offsets for EVERY window (~60
 ##     candidates each); small-int records defeat 2-byte value search.
+
+## t334 AMENDMENT (binding): THE STATE LINE'S RUNTIME HOME IS win+0x6d (STRIDE
+## 13, counter [win+0xa1]) AND IT IS WRITE-ONLY IN THE RE IMAGE; THE 0x3000-RANGE
+## PARSER CONSTANTS ARE DATA-SEGMENT FORMAT STRINGS, NOT windows.txt OFFSETS.
+## Evidence: docs/re/_wip_t334.md S0-S13, docs/re/ships.md S53,
+## scripts/r334_parse_map.py (exit 0, 152 call-sites), scripts/r334_state_array.py
+## (exit 0, 196 needle-verified saves).
+## (1) CORRECTION (not refutation) of t333 amendment-(2) wording: "the STATE line
+##     is consumed at parse time and its runtime home is NOT in the window
+##     record" is WRONG as written — parse loop 0x57ee6..0x57ff5 (fn 0x575e4)
+##     writes a per-window inline array at win+0x6d, stride 13, compacted by
+##     fn 0x31690 (asserts [win+0x9f]>>16 >= 4; dst = win + 13*[win+0xa1] + 0x6d;
+##     exactly 13 bytes via movs; [win+0xa1]++), non-zero ids != 1 hit vendor
+##     assert winmgr.cpp:0xcd6 (0x5804c). The VALID part of t333's conclusion
+##     survives on new evidence: the array's ONLY literal +0x6d operands are
+##     0x57f06 and 0x316de (fresh 0x0..0x14bb0 objdump adds none), and the ONLY
+##     in-image WALKER is paint fn 0x31384 (via `add ebp,0x6d`/`add ebp,0xd`
+##     pointer arithmetic, callers EXACTLY 0x3117f/0x3135a inside paint fn
+##     0x30fb8) which renders slots as TEXT/HANDLES (byte0 0/1/>1 -> format
+##     0x7d3aa / fn 0x1fc34 / assert) — never a screen selector; and 196 saves
+##     show battle-window counters [win+0xa1]=0 with agreement only on
+##     count==0 windows. Do NOT re-open "the STATE line selects a screen at
+##     runtime" and do NOT re-run the win+0x6d flag-array census unchanged —
+##     [win+0xa1] is the slot counter, not the flags. (Interim retraction: an
+##     earlier S12 reading "ds:0x6fda8 is a global stride-13 STATE array" is
+##     WRONG — fn 0x315c4/0x31660 body is a `repnz scas` NAME INTERNER over a
+##     0x400-byte string pool, counter ds:0x701a6; _wip_t334 S13.)
+## (2) DEAD: treating the parser's 0x3000-range pushed constants as windows.txt
+##     file offsets. Save-probe cited: ds:0x3008 at B+0x82bb0+0x3008 reads
+##     `%s %d\0..\winmgr.cpp\0...` (scan FORMAT STRINGS in the loaded DATA
+##     segment); the readable-ASCII coincidences in windows.txt at those numbers
+##     are coincidences. Keyword matching lives in the scanner machinery
+##     (0x7a1f7 + handler 0x77f64 + table 0x63402), consistent with t333's
+##     keyword-literal ZERO result.
+## (3) MEASURED: WORD ds:0x13b98 = 4 in 196/196 needle-verified saves (turns
+##     1086-1087). This cites t333's [inferred] per-player-slot enablement bound
+##     (ids 1,2,4,8 set / 16,32,64 clear). The value has NO writer in the code
+##     image (t333 amendment-(2) stands) — it is initialised outside the
+##     disassembled code. ds: READ LAW for obj1 data offsets is
+##     member_addr = B + 0x82bb0 + X (r1_slot.py); using B + X rejects 196/196
+##     saves — that is a harness error, distinct from t333 amendment-(4), which
+##     governs pointer-value -> member conversions.
+## (4) DEAD: hunting an allocator at the control-table attach sites. 0x57d56/
+##     0x57e48 are fallthrough-only sequential parse code (whole-body
+##     branch-target scan: no jump lands on the guard blocks); the stored value
+##     is the scanner's parsed u32 copied verbatim under status [esp+0x3a6]>>16
+##     == 15 (poison -1 under == 25 when parsed != 0); no imul-14 exists in the
+##     2,328-insn parse fn.
