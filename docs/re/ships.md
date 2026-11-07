@@ -2294,3 +2294,36 @@ CAPTURE (zero-capture iteration; full evidence docs/re/_wip_t323.md S0-S6).
   [rec+0xb1]) installed in BatModeWnd's RAM class table at [rec+0xa7] —
   static tables are RAM-relocated (t303(5)), so static absence alone is
   cited-but-indirect; t322's armed-zero is the live corroboration.
+
+## S49 t326b (2026-11-07) — MODE-1/MSG-0x4d..0x51 FAMILY RESOLVED: THE
+"ARMING MSGS" WERE TABLE INDICES; THE REAL POSTER POSTS 81 ELSEWHERE
+Full walk work docs/re/_wip_t326b.md S1-S8 (scripts/r326b_extract.py pad-run
+segmentation; objdump range-decode law banked there). Cited results:
+- fn 0x17b2c (caller 0x1750c in a per-record loop over [[esi]+0x5032]>>16)
+  writes stack [esp+0x54] := 0x4c/0x4d/0x4e keyed on BYTE[design-rec+0x1] in
+  {0x1c,0x1d,0x1e}; consumer 0x17cf8 uses it as INDEX into [[esi]+0x1a92+edi*4]
+  (WORD, bounds fn 0x1ce1c count [eax+0x1a8e]) + [esi+0x1bcc+edi*4]. Call
+  census = NO POSTERS. 76/77/78 = gizmo-index space (0x7650c+0x6a*i law; code
+  corroboration 0x17bca 0x76546+0x6a*idx = rec+0x3a RANGE). NOT messages.
+- fn 0x16147 site = class-0x5850 msg handler (ctor 0x15630 stores [eax+0xa7]=
+  0x5850; msg tree @0x156ec cmps {0x327,0x32b,0x32d,0x1c01,0x1c02}). Path to
+  the post (fresh objdump, straight-line): gizmo gate WORD[rec+0x33]: bit0x80
+  -> abort; bit0x20 set -> call 0x49e78 + return; bit0x20 CLEAR -> je 0x16147:
+  ebx=0x51, call 0x56ca4 (eax=ds:0x7a35c, edx=[[ebp+0xbb]+0x41]) = POST msg 81
+  to [[0x7a35c+edx*3+4]] (game-object child table, 12-byte slots; edx in
+  {0,0x20}). 0x56ca4 LAW (banked S3): gate sar16([obj+0x4226])>=0; slot =
+  [[obj+edx*3+4]]; call [[slot+0xa7]+0x8](obj, msg16, sar16(edx)).
+- BatModeWnd handler fn 0x1aef8 dispatch compares dx ONLY in {0x6,0xd,0x3b,
+  0x46,0x47,0x4a,0x50} (sed 7390-8010 census) => msg 81 falls to default
+  0x1af7c EVEN IF targeted there; mode-1 setter 0x1b7dd entry requires
+  dx in (0x50..] via cmp dx,0x50 @0x1b7cd jbe 0x1b5ba — 0x51 would hit the
+  PUBLISH leg 0x1b5ba NOT mode-1 (publish = DAT_43508 store + ring 0x11,
+  t296 S5 cited). Actual image-wide 0x51 consumers: fn 0x4709c @0x47ac0
+  (je 0x47a53: [esi+0xe3]:=-100.0 float; sibling +1000000.0; gauge/score
+  family, window UNNAMED — class table RAM-relocated t303(5)) and fn 0x6f600
+  @0x6f7f9 (packet-parse family, NOT a window msg).
+=> OQ-016 RESIDUE 1 (Phase Bomb launch/arming road) = UNREACHABLE-BY-CAPTURE
+   cited (4 independent legs, see _wip_t326b S8.4). 4-launch forced capture is
+   VACUOUS (no citable arming trigger; research leg vacuous per S-T326) — DROP.
+   The batmode activation blocker (STATE 1 16, t322 armed-zero x2) stands as
+   the sole live-movement obstacle; row stays OPEN strict-close.

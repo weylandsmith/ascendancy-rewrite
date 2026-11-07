@@ -66,12 +66,18 @@ S1-S5, tool scripts/r326_precensus.py exit 0): known-tech mask field LOCATED
 (ds:0x7478e+0x4b*i bit(1<<race), count word ds:0x74744; cheat-body law);
 race 0 AND 2 ALREADY OWN row13 Molecular^Explosives at t=1086 (research leg
 vacuous); cidx-70 carriers ZERO in 30 ship rows; 30 owner-0 ORBITAL Shipyards
-exist (build leg UI-satisfiable); mode-1 arming-msg census: no post-senders
-of 0x4d..0x51 (0x15454 = assert reporter; windows.txt has no SENDMESSAGE in
-77..81) BUT an unwalked value-writing family exists (0x17c63/0x17c72/0x17c81
-+ sibling 0x16147, _wip_t326 S5) — launch road NOT closed; the 4-launch
-forced-capture is GATED behind the zero-capture walk of fn(0x17c54)+
-fn(0x16147) (task t326b). Row stays OPEN strict-close.; (2) setup-time home DRAW law — CLOSED MEASURED
+exist (build leg UI-satisfiable). t326b WALK LANDED 2026-11-07
+(docs/re/ships.md S49 + docs/re/_wip_t326b.md S1-S8): the 0x4d/0x4e
+"value-writing family" is TABLE INDEXING (gizmo-index space, fn 0x17b2c, ZERO
+posters cited); the sole msg-0x51 poster (0x16147, class-0x5850 gizmo gate
+WORD[rec+0x33] bit0x20 CLEAR) posts 81 to a game-object child slot, and
+BatModeWnd fn 0x1aef8 provably does NOT consume 81 (dispatch dx set
+{6,d,3b,46,47,4a,50} cited) — mode-1 setter 0x1b7dd has NO citable arming
+trigger image-wide. RESIDUE 1 = UNREACHABLE-BY-CAPTURE cited (4 independent
+legs: t326 census, t323 writerless [ebp+0xb1], t329 commit edges, t326b
+poster/consumer closure); the 4-launch forced capture is VACUOUS — DROP.
+Row stays OPEN strict-close (activation blocker STATE 1 16, t322 armed-zero
+x2, is the sole live-movement obstacle).; (2) setup-time home DRAW law — CLOSED MEASURED
 2026-11-04 t295: uniform rejection draw per race in race order, k=draw%T,
 store row_r+0xd @0x22edd, claim gate 0x22ee0 (FUN_00022ce4 0x22eb4..0x22f55
 full disasm + census scripts/r295_home_draw.py: equal-marker 30/30 turn<=2,

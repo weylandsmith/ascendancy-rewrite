@@ -212,56 +212,67 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t326b STATIC WALK: fn(0x17c54) + fn containing 0x16147 — DECIDES the
-Phase Bomb launch road (OQ-016 residue 1). t326 LANDED 2026-11-07 as an
-offline preflight census (docs/re/income-law.md S-T326 + docs/re/_wip_t326.md
-S1-S5): research leg VACUOUS (races 0+2 already own row13 Molecular^Explosives
-at t=1086), cidx-70 carriers ZERO, 30 owner-0 orbital Shipyards exist, mode-1
-arming msgs 0x4d..0x51 have NO post-senders (0x15454 = assert reporter;
-windows.txt has no SENDMESSAGE in 77..81) — BUT a value-writing family was
-FOUND AND LEFT UNWALKED: 0x17c63/0x17c72/0x17c81 set stack-dword
-[esp+0x54] := 0x4c/0x4d/0x4e dispatching on BYTE[[edi]+1] in
-{0x1c,0x1d,0x1e} (after call 0x39b6c), consumed as an INDEX at 0x17cf8 into
-[esi+0x1a92+edi*4] / [esi+0x1bcc+edi*4] before calls 0x1ce1c/0x17694; sibling
-0x16147 `mov ebx,0x51` right after 0x16122 clears [ebp+0xb1] (post-shaped,
-eax=0x7a35c, edx=[ebp+0xbb]).
-TASK (zero capture; work/t91_code_disasm.txt + work/ascend_payload.bin
-verbatim; production untouched): walk BOTH functions entry-to-sites; name
-what BYTE[[edi]+1] is (record kind? gizmo category? the 0x1c/0x1d/0x1e keys
-are NOT gizmo ids 70/71/72 — resolve what they index); determine whether ANY
-reachable path posts msg 0x4d..0x51 to the batmode window (fn 0x1aef8 layer,
-cmp dx,0x50 @0x1b7cd) or whether these are pure table-index values.
-OUTCOME A (poster exists): update residue-1 route to the named trigger, THEN
-run t326c ONE-launch forced-capture per the BLOCKED §Nuke recipe as amended
-by S-T326 (skip research leg; design+build at an orbital Shipyard; launch
-needs GZ_TARGETSURFACE target). OUTCOME B (index values only): residue 1 =
-UNREACHABLE-BY-CAPTURE cited (three independent dead legs: this census + t323
-writerless [ebp+0xb1] + t329 commit edges), row stays OPEN strict-close with
-the cited-dead note, and t327 (tool v2) becomes row 1 unchanged.
+NEXT t327 DEBUGGER-SESSION TOOL v2 (compresses every future DAT-writer hunt
+to 1-2 sessions; the t306-t323 chain burned ~18 iterations largely on
+instrument bugs — this is the payoff task for that chain; t326b CLOSED the
+residue-1 question statically 2026-11-07 so no capture is queued ahead of
+this). Ship scripts/r1_dbg_session.py wrapping the proven pieces
+(r322_relaunch.sh boot shape, leg spec {addr, FirePat pattern,
+expected-callsite}, whole-log msg census, resume-with-fired-BP handling,
+bank-on-exit). LAWS to bake in, all measured: t305 FirePat stop-line = unique
+pattern (debug.cpp debug.cpp:1560+/1586-87); MEMREAD real-mode-only
+(debug.cpp:2983) — ring is the read surface; xsend arg1 = WINDOW TITLE not
+display (t290); resume-with-fired-BP re-freezes (t302 bug 2). VERIFY against
+two known positives: the t308 DAT_43504 leg (must fire 3/3 on an entered-star
+click; run dir under work/r1/) and the t319 poster leg (0x54ac5 msg-4).
+MUTATION TEST: one deliberately bogus pattern must classify zero-fire, not
+crash. Bank usage doc to docs/re/dosbox-debugger.md (append §TOOL v2) + fix
+any doc drift found.
 Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW — SIGTERM pops the
 vendor quit-confirm (Yes)-default; teardown is SIGKILL. t325 context law:
 `convert img rgb:-` is HEADERLESS raw RGB — use ppm:- (P6). t325 census law:
-slot byte +3 is NOT a progress value (44 pending rows 0, 43 completed 15/
-word2 0xf01) — watch whole dwords. t329: magnetron scripted road cited-dead
-(do NOT re-derive the 0x15xxx arming tail). t324: census anchor = installer
-target data 0x58e8; [wmgr+0x3337] = LANE POOL; slots = P0+static. t323
-amendment (1)-(4); t322 (1)-(3); t321 (1)-(4) incl. msg-0x50 three non-post
-sites; fn 0x2351c name arg DEAD. economy.md IS GENERATED (gizmo_probe.py) —
-bank nuke findings to income-law.md (S-T326 precedent). Sitting check FIRST
-(playcap newest turn >1086 => scripts/r1_t85g_sitting.py before anything);
-production :9 untouched; scratch copies only, never mount game/.
+slot byte +3 is NOT a progress value — watch whole dwords. t329: magnetron
+scripted road cited-dead. t326b: objdump range-decode law
+(objdump -D -b binary -mi386 -M addr32,intel --start-address --stop-address
+work/ascend_restored.bin) re-syncs where the t91 tsv desyncs (badbar pads);
+0x56ca4 = msg post law (slot [[obj+edx*3+4]], vtable+0x8, 16-bit id in ebx);
+msg ids are CONSUMER-tree facts — always census the handler's cmp-dx set
+before claiming a msg reaches a window (fn 0x1aef8: {6,d,3b,46,47,4a,50}).
+t324: census anchor = installer target data 0x58e8; [wmgr+0x3337] = LANE POOL;
+slots = P0+static. t323 amendment (1)-(4); t322 (1)-(3); t321 (1)-(4) incl.
+msg-0x50 three non-post sites; fn 0x2351c name arg DEAD. economy.md IS
+GENERATED (gizmo_probe.py). Sitting check FIRST (playcap newest turn >1086 =>
+scripts/r1_t85g_sitting.py before anything); production :9 untouched; scratch
+copies only, never mount game/.
+
+
+## LANDED t326b — 2026-11-07 (STATIC WALK fn(0x17c54)+fn(0x16147): residue-1 verdict OUTCOME B)
+OUTCOME B LANDED: the "mode-1/msg-0x4d..0x51 arming family" DOES NOT EXIST as
+messages. fn 0x17b2c writes 0x4c/0x4d/0x4e as GIZMO-INDEX values (consumer
+0x17cf8 -> [esi+0x1a92+edi*4]/[esi+0x1bcc+edi*4] via bounds-fn 0x1ce1c; call
+census ZERO posters). The sibling 0x16147 IS a real post (engine law fn
+0x56ca4) but of msg 0x51(81) to a ds:0x7a35c child-table slot (gate: gizmo
+WORD[rec+0x33] bit0x20 CLEAR; bit0x80 abort; bit0x20 set -> 0x49e78 shield
+charge), and BatModeWnd fn 0x1aef8 consumes ONLY dx in {6,d,3b,46,47,4a,50}
+=> 81 cannot reach the mode-1 setter 0x1b7dd even if misdirected there.
+Image-wide 0x51 consumers: fn 0x4709c @0x47ac0 (window field +0xe3 := -100.0
+float — gauge/score family, UNNAMED window) + fn 0x6f600 @0x6f7f9 (packet
+parse, not a window msg). OQ-016 RESIDUE 1 = UNREACHABLE-BY-CAPTURE cited
+(4 independent legs); the 4-launch forced capture is VACUOUS — DROPPED from
+the plan (research leg vacuous t326 + no citable arming trigger). Row stays
+OPEN strict-close; sole live-movement obstacle = BatModeWnd ACTIVATION
+(windows.txt:1178 STATE 1 16; t322 armed-zero x2). Docs: docs/re/ships.md S49
+(hand-authored verified — ships.md is NOT generated; scripts only cite it) +
+docs/re/_wip_t326b.md S1-S8; OPEN-QUESTIONS residue-(1) text rewritten.
+Tools: scripts/r326b_extract.py (pad-run segmentation, mnemonic-after-2nd-TAB
+law), scripts/r326b_gizmo_rows.py (0x7650c file bytes UNRELOCATED — values
+need RAM). Sitting check NEGATIVE (turn 1086); production :9 untouched; gate 0.
+NEXT = t327 VERBATIM per the block above.
 
 QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; t326b is row 1 —
-it was inserted by t326 2026-11-07 and OUTRANKS t327 because it decides
-whether residue 1 has any live-capture potential at all):
+keep this block intact except deleting your completed row; t327 is row 1
+(t326b completed 2026-11-07; residue 1 closed-cited, no capture queued):
 
-t326b STATIC WALK fn(0x17c54) + fn(0x16147) — the mode-1/msg-0x4d..0x51
-  poster hunt, VERBATIM per the NEXT ACTION block above (Outcome A -> author
-  t326c ONE-launch capture row from S-T326's amended recipe; Outcome B ->
-  bank cited-dead note on residue 1, row stays OPEN strict-close, t327
-  stands). Budget: pure static, ~25 probes; every claim carries disasm line
-  numbers; honest negative is an acceptable landing.
 
 t327 DEBUGGER-SESSION TOOL v2 (compresses every future DAT-writer hunt to 1-2
   sessions; the t306-t323 chain burned ~18 iterations largely on instrument
