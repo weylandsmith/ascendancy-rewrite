@@ -42,8 +42,17 @@ zero-stream + no selector), 1 junk-certain (3cfgnew k12 vendor EOF
 truncation), 1 UNREACHABLE (sg64expl k0 combat, t323), and ONLY mouse
 k5/k6/k7 remain witnessable — real art 46x77x2038B with dims u16@rec+0
 (EXACT-H walk; t196 "not walkable" was canonical-slot-only) vs canonical
-u32@+0x10 zero-component: a dims-slot-location dispute. t330 draw-capture
-DESIGNED (_wip_t328 S4); DECISIONS.md D1 ask shrunk to B-rows + C27-29. | open
+u32@+0x10 zero-component: a dims-slot-location dispute. T330 DRAW-CAPTURE
+EXECUTED (run work/r1/dbg-t330b-20261107-080216, shp.md S26, cited): 4
+live deref stops inside mouse.shp (records k0/k2) MEASURE draw-time dims =
+u16 pair at rec+0 stored [H-1,W-1], u32@+0x10 REJECTED; blit_refuse 0 fires
+whole-log; mouse.shp is on the blit path (bar-panel glyphs) loaded OUTSIDE
+the 200-slot cache. C27-C29 'invalid dims' premise REFUTED ((46,77) = 78x47
+valid under the +0 law); their drawn-frame witness stays impossible (no
+selector names k5/k6/k7; CURSORSHAPE 2 only) -> they remain in the human
+ask re-classified 'valid dims, no selector'. ROW STAYS OPEN strict-close:
+generalizing the +0 law beyond mouse needs per-library witnesses (corpus
++0x10 uniformity check fails 1526/1567). DECISIONS.md D1 updated. | open
 
 OQ-016 | loop | campaign per-turn constants: income formula, pop growth
 curve/cap, starting items, build order, expansion cadence, home placement

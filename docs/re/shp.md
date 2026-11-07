@@ -1191,3 +1191,32 @@ work/r1/shp_png/_t328_dims.json; header dumper scripts/r328_hdr.py.
 4. CONSEQUENCE: the D1 human ask shrinks from 44 adjudicable-looking rows to
    effectively the B-class identifications + the 3 mouse rows (and even
    those may become no-witness after t330). DECISIONS.md D1 updated t328.
+
+
+## 26. T330 LIVE BLIT WITNESS — DRAW-TIME DIMS SLOT IS rec+0 (mouse lib)
+1. MEASURED [verified, run work/r1/dbg-t330b-20261107-080216, legs
+0x5cb2b/0x5cb36/0x5cb59 armed, normal core, census around windows.txt
+right-bar clicks]: 4 phase-tagged FUN_0005caac deref stops INSIDE mouse.shp
+(record base = PAY 0x2EC03C + dir_rel; 32-B record heads matched
+extracted/ascend01/data/mouse.shp at 0x68=k0, 0x257=k2): runtime shape
+struct hdr (W-1,H-1) == file (u16@rec+2, u16@rec+0); the u32@rec+0x10 pair
+is REJECTED (k0 hdr (11,15) == (+2=11, +0=15); +0x10 = (10,14)). LAW:
+record dims at DRAW TIME come from the u16 pair at rec+0, stored
+[H-1, W-1]. mouse.shp is blitted on EVERY right-bar panel open (k0 glyph
+at the button rect; k2 at 8,8) — the library IS on the blit path, loaded
+OUTSIDE the 200-slot shape cache (PAY not in [0x2e1194, +800); verbatim
+copy at PAY+0x88, t62 law holds).
+2. blit_refuse (-1 dims gate) FIRED ZERO times whole-log across baseline,
+6 panels, system view, edges: the vendor never refused a dims blit in
+reachable UI. btn_hdlr 10 = clicks land.
+3. CONSEQUENCE for the OQ-005 residue: decision-sheet C27-C29 (mouse
+k5/k6/k7) 'invalid dims' premise is REFUTED — under the measured +0 law
+their (46,77) pair = 78x47 VALID dims. Their drawn-frame witness stays
+impossible (windows.txt selects CURSORSHAPE 2 only, L216/L1186; no
+selector names k5/k6/k7 — t328 S2a), so they remain human-ask rows, now
+classified 'valid dims, no selector' rather than 'invalid dims'.
+4. GENERALIZATION SCOPE: +0 law MEASURED for mouse k0/k2 only. Corpus
+check u32@+0x10 == (u16@+2-1, u16@+0-1) fails 1526/1567 records => +0x10
+is a different quantity (per-record values, not a uniform delta); do NOT
+rewrite rewrite/shp.cpp dims reading on the mouse-only measurement
+without per-library witnesses. [law, t330]

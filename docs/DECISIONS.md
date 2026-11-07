@@ -23,11 +23,14 @@ itself which of the 44 failures it can even DRAW (shp.md S25, cited):
     formality backed by measurement, not a guess.
   - 3cfgnew k12 is truncated at the file's EOF by the vendor itself:
     junk-certain. sg64expl k0 is combat art = unreachable by capture.
-  - ONLY mouse k5/k6/k7 (sheet rows C27-C29) remain genuinely adjudicable:
-    real art bytes (46x77, 2038 stream bytes each) whose dimensions sit at
-    record offset 0 instead of the usual 0x10 — a slot-location dispute,
-    not junk. One designed scratch session (t330) can measure what the
-    vendor does with them; your ruling may then be unnecessary even there.
+  - ONLY mouse k5/k6/k7 (sheet rows C27-C29) remained adjudicable, and
+    T330 RAN (2026-11-08, docs/re/shp.md S26): the vendor's draw-time dims
+    slot is MEASURED = the u16 pair at record offset 0 (stored H-1,W-1) —
+    k5/k6/k7 are therefore VALID-dims records (78x47), not invalid. But NO
+    selector anywhere names k5/k6/k7 (windows.txt requests only cursor
+    shape 2), while the library itself draws on every right-bar panel open
+    (records k0/k2 witnessed live). So the question shrank from 'keep or
+    junk' to 'valid-but-unselected art: keep as-is?' — a formality.
 So the live ask is now just:
   B1..B29   identified frames with thumbnails — confirm or correct the ID
             (work/r1/shp_png/decision-sheet.md + sheets/)
@@ -59,8 +62,9 @@ cited evidence; the original list below over-promised two entries:
   OQ-005  -> D1 ruling remains the closure. T328 LANDED (2026-11-07): 39 of
              the 44 C-rows are now CITED-NO-WITNESS (vendor draws nothing —
              shp.md S25), 1 junk-certain, 1 unreachable; the live ask is
-             B-rows + mouse C27-C29 only; t330 (designed) can settle the
-             mouse trio by measurement if you prefer.
+             B-rows + mouse C27-C29 only. T330 LANDED (2026-11-08): draw-time
+             dims slot MEASURED (rec+0 u16 pair, shp.md S26); C27-C29 are
+             valid-dims, unselected records — ruling is now a formality.
   OQ-019  -> CLOSED-ROUTE SUPERSEDED: the t293 scripted move-order capture
              and every follow-on capture route are now CITED-DEAD (t319/t320
              pump, t322 mouse, t323 activation, t324 RAM class table).

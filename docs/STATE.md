@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-08T06:40
+updated: 2026-11-08T08:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,31 +212,67 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t330 MOUSE-DIMS DRAW-CAPTURE (run the t328 design; OQ-005's only
-witnessable residue). Design VERBATIM at docs/re/_wip_t328.md S4 — execute it,
-do not redesign. Rationale: t328 measured 39+1+1 of the 44 C-rows out of the
-human ask (CITED-NO-WITNESS/junk/unreachable, shp.md S25); mouse k5/k6/k7 are
-the sole records where a live witness decides the dims-slot-location question
-(u16@rec+0 46x77 EXACT-H vs canonical u32@+0x10 zero-component). Run via
-scripts/r1_dbg_session.py with ~/.hermes/hermes-agent/venv/bin/python (system
-python3 NO PIL); scratch copy of the Oct-29 save, own ring, SIGKILL teardown
-by recorded PID; legs blit_entry 0x5caac + blit_refuse 0x5cb2b (hot) +
-blit_deref 0x5cb59 (payload base -> cache slot via S17 anchor 0x2e1194 ->
-library attribution); phases per S4; --offline replay before believing any
-run. Budget 1-2 attempts; honest-negative exit is banked in S4 (mouse.shp
-never loaded => join UNREACHABLE class, row note updated). Last-4 FirePat
-collision preflight is enforced by the tool — pick leg-name last-4s that do
-not collide with existing LEGS.
+NEXT t331 BatModeWnd ACTIVATION STATIC WALK (OQ-016's sole live obstacle,
+cited t326b: windows.txt:1178 STATE 1 16 + t322 armed-zero x2). If the user
+answered D2 in docs/DECISIONS.md (grep for an answer block first), EXECUTE
+the ruling instead and re-form the queue. TASK: purely STATIC (offline, zero
+launches): enumerate every writer and reader of the BatModeWnd activation
+state (STATE 1 16 word path per t324 RAM class-table law + the gizmo
+WORD[rec+0x33] gate family from t326b: bit0x80 abort / bit0x20 shield-leg)
+and decide whether ANY UI-reachable or msg-reachable trigger sets it; cite
+address+bytes for every edge (work/ascend_restored.bin objdump range-decode
+law t326b; consumer-cmp-set census law). OUTCOMES: (A) trigger cited ->
+queue a t332 forced-capture with exact legs; (B) no trigger exists in-image
+-> residue (1) gains a fifth independent UNREACHABLE leg (row stays open
+strict-close; strengthens the D2-c disposition). DEAD, do NOT re-trod: t322
+batcon mouse battery, t323 activation probes, t325/t326 shield-charge
+capture legs, t306 batmode site list (REFUTED amendment), t324 class-table
+routes.
 Fixed laws carried (do NOT re-trip): t325 SIGNAL LAW (SIGTERM pops quit-
-confirm; teardown SIGKILL); t325 ppm:- not raw rgb; t325 census whole dwords;
-t323 amendment (1)-(4); t326b objdump range-decode law + 0x56ca4 post law +
-consumer-cmp-set census law; t324 census anchor 0x58e8 / [wmgr+0x3337]=LANE
-POOL / slots=P0+static; t328 blit -1-gate asm reading (shp.md S25.1) +
-mouse-walk correction (S25.3) + zero-stream-vs-zero-dims distinction (S25.2 —
-do NOT call the 25 ladder slots dims-zero). economy.md IS GENERATED. Sitting
-check FIRST (playcap newest turn >1086 => scripts/r1_t85g_sitting.py before
-anything; watcher pid 136374 alive, file grows continuously — tail-seek only,
-OOM law); production :9 untouched; scratch copies only, never mount game/.
+confirm; teardown SIGKILL); t326b objdump range-decode + pad-run law; t324
+census anchor 0x58e8 / [wmgr+0x3337]=LANE POOL / slots=P0+static; t330
+heavy-check law (an armed ENTRY-leg stop consumes the census window — arm
+MID-BLOCK legs only when the entry is unarmed) + cache ctx 0x2E1194
+ABSOLUTE in .sav scans; economy.md IS GENERATED. Sitting check FIRST
+(playcap newest turn >1086 => scripts/r1_t85g_sitting.py before anything;
+tail-seek only, OOM law); production :9 untouched; scratch copies only,
+never mount game/; venv python for anything importing PIL (r1_dbg_session
+machinery).
+## LANDED t330 — 2026-11-08 (MOUSE-DIMS DRAW-CAPTURE: draw-time dims slot
+## MEASURED = rec+0 u16 pair [H-1,W-1]; C27-C29 'invalid dims' REFUTED)
+TWO live debugger sessions on scratch (production :9 pids 136357/136359 +
+watcher UNTOUCHED, ps-verified post-run; sitting check NEGATIVE turn 1086 via
+tail-seek). RUN 1 dbg-t330-20261107-073530 (blit_entry-armed): banked the
+TOOL LAW that an entry-leg stop CONSUMES the census window (6 stops, one per
+bar panel, ret0=0x64aa6 = the generic 5-arg blit call 0x64aa1 ADD ESP,0x14;
+deref/refuse NEVER fired behind an armed entry — heavy-check does not
+re-enter mid-block post-RUN) + DECISIVE: MOUSE.SHP verbatim 10435-B copy at
+sav-linear 0x2EC0C4 = PAY 0x2EC03C + 0x88, OUTSIDE the 200-slot cache (attri-
+bution by rec_head bytes, not slot name; cache ctx = 0x2E1194 ABSOLUTE in
+the .sav — P0+0x9F10C reading REFUTED for .sav scans; registry 0xFFFFFFFF).
+RUN 2 dbg-t330b-20261107-080216 (refuse+minus2+deref+btn_hdlr armed,
+instance-patched bank_stop — DbgSession COMPOSES Sess, wrapper overrides are
+dead code): census {blit_deref:15, blit_refuse:0, blit_minus2:0,
+btn_hdlr:10}; 8 attribution rows; the 4 phase-tagged mouse stops (status k2,
+fleet/research/specialab k0) show runtime shape hdr (W-1,H-1) == file
+(u16@rec+2, u16@rec+0) and NEVER the u32@+0x10 pair (k0: hdr (11,15) vs
++0x10 (10,14)) => DRAW-TIME DIMS SLOT = rec+0 u16 PAIR stored [H-1,W-1]
+[verified, mouse k0/k2]; mouse.shp draws on EVERY right-bar panel open.
+blit_refuse 0 fires whole-log. post-rearm rows (639x479 full-screen shape,
+pixptr 0x2f2af8) = cascade artifact, excluded. CONSEQUENCES: C27-C29
+(46,77)@+0 = 78x47 VALID dims — 'invalid dims' classification REFUTED; the
+records stay drawn-frame-unwitnessed (no selector names k5/k6/k7; CURSORSHAPE
+2 only L216/L1186) but the slot-LOCATION dispute is closed by measurement for
+the mouse lib. Generalization bounded: corpus u32@+0x10 == (u16@+2-1,
+u16@+0-1) fails 1526/1567 — do NOT rewrite shp.cpp dims reading on mouse-only
+data (per-library witnesses needed; queued behind OQ-016 by the t330
+instruction). LEDGER: NOTHING closed strict-close (16/3). Files: docs/re/
+shp.md S26 (hand-authored, no generator verified), docs/re/_wip_t330.md
+S0-S3, scripts/r330_blit_session.py (legs 0x5cb2b BF7B / 0x5cb36 BF86 /
+0x5cb59 BFA9 unique-audited vs 61 LEGS; --offline replay 0 drift),
+OPEN-QUESTIONS OQ-005 note, DECISIONS.md D1/D3 updated (C27-C29 = formality).
+NEXT = t331 BatModeWnd activation static walk per the block above.
+
 
 ## LANDED t328 — 2026-11-07 (OQ-005 DRAW-WITNESS FEASIBILITY: 41 of 44
 ## C-rows leave the human ask; mouse k5/k6/k7 sole witnessable residue)
@@ -321,20 +357,12 @@ need RAM). Sitting check NEGATIVE (turn 1086); production :9 untouched; gate 0.
 NEXT = t327 VERBATIM per the block above.
 
 QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; t330 is row 1
-(t328 completed 2026-11-07, feasibility table landed shp.md S25):
+keep this block intact except deleting your completed row; t331 is row 1
+(t330 completed 2026-11-08: draw-time dims slot MEASURED rec+0 [H-1,W-1],
+mouse lib; shp.md S26; C27-C29 reclassified valid-dims-no-selector):
 
-t330 MOUSE-DIMS DRAW-CAPTURE (run t328 design VERBATIM, _wip_t328 S4; do not
-  redesign). OQ-005's only witnessable residue: mouse k5/k6/k7 dims-slot
-  dispute (u16@rec+0 46x77 EXACT-H real art vs canonical u32@+0x10
-  zero-component). scripts/r1_dbg_session.py + venv python; legs blit_entry
-  0x5caac / blit_refuse 0x5cb2b (hot) / blit_deref 0x5cb59 (payload base ->
-  cache slot S17 anchor 0x2e1194 -> library attribution); phases S4; budget
-  1-2 attempts; honest-negative exit banked (mouse.shp never loaded =>
-  UNREACHABLE class). After landing: update OQ-005 row + DECISIONS.md D1 per
-  the S4 verdict grammar; queue the next row from the t329 disposition
-  follow-ons (OQ-019 needs the USER's D2 ruling — if unanswered, the queue
-  re-forms around OQ-016 BatModeWnd activation, t326b).
+t331 BatModeWnd ACTIVATION static walk (OQ-016 sole live obstacle; see the
+  NEXT ACTION block for scope, outcomes, and the DEAD-route list).
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 amendments are BINDING): poster pass
