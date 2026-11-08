@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-08T13:30
+updated: 2026-11-08T23:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,30 +212,66 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t338 STATE-16 LIVE DRIVE — WITNESS THE MODE-1 ARMING CHAIN ON A SAVE
-WHERE THE GAME IS ACTUALLY IN THE BATTLE STATE (capture task; scratch copy,
-drive laws, ONE capture).
-RATIONALE: t337 closed the STATE-table reader side and MEASURED that recorded
-play enters battle state 16 (core+0x4228==16 in 5 saves:
-work/r1/t299-leg-20261105-112859/save/{43,44,45,46,47}.sav, base 0x2bc3e4,
-scripts/r337_state_word.py exit 0). In state 16 the hit-test fn 0x56890 routes
-clicks THROUGH the group-16 slot array to BatControlWnd/BatModeWnd — while
-every t332 chain-leg capture sat in states {0,1,17}, which is now the measured
-candidate explanation for t332's all-zero log (state-16 hit-testing never ran,
-so the fn 0x156d4 posters 0x1615d/0x161d1 never fired). Method: scratch ring
-from t299-leg-20261105-112859 (NEVER mount pristine game/, NEVER loadstate to
-resume — bank ring before restarts), Xvfb :9 second instance per BLOCKED.md,
-debugger BPs on the eight t332 legs {fn156d4_entry 0x156D4, tbl15ef1,
-gate15fed, post1615d, relay1616f 0x1616F, post161d1, mode1_1b7dd 0x1B7DD,
-backch_1b180} PLUS new BPs on the state-16 routing edge (0x56890 entry,
-0x56aa4 focus-set arm, 0x56e10 entry) and on the RING-A state-switch arm
-0x55ea3; click the BatControlWnd gizmo rows (file windows.txt BatControlWnd
-rects; My^Items/Other^Items pixel law t332). Deliverable docs/re/_wip_t338.md:
-did ANY leg fire with current-state==16; witness = CLOSES residue-(1) arming
-edge; zero-with-control-fires (btn_hdlr) = second independent zero -> the
-arming question moves to fn 0x156d4's internal gates (msg 0x51 path), write
-the honest negative and keep the row open. FIRST ACTION of the iteration is
-still the sitting check (tail-seek newest turn; >1086 => r1_t85g_sitting.py).
+NEXT t339 — BatControlWnd INTAKE DECODE (ZERO CAPTURE): WHO POSTS 0x1c01 (OR
+ANY MSG) TO REGISTRY SLOT 61, AND WHAT DOES THE state-16-FAMILY SENDMESSAGE
+VALUES DO? RATIONALE: t338 killed the last capture lever for OQ-016 residue-(1)
+— driven INTO state 16 with hit-routing proven executing (hit_test x2,
+btn_hdlr x17 on the family rows), all eight chain legs stayed ZERO
+(docs/re/ships.md S57, REFUTED-ROUTES t338 amendment binding). BatControlWnd
+is a TYPE-19 parent with rect 0,0-0,0: clicks can only land on CHILD records
+(My^Items sm=804, Other^Items sm=805, Pass 807, Auto 808, Repeat 809, W/S/Z/I
+810-813), so the sole remaining live edge is whether those child SENDMESSAGE
+values ever PRODUCE a post to the parent (fn 0x56ca4 dispatch law:
+edx=[win+0x63]; t316: rec+0x41 = registry slot-id; slot 61 = BatControlWnd).
+Method (offline, save axis + work/r331_disasm.txt verbatim): (1) census
+[w+0x63] for every state-16-family child record in the state-16 five
+(work/r1/t299-leg-20261105-112859/save/43..47.sav, magic-rec law) + the t338
+run's saves — if any child's [w+0x63]==61, the road EXISTS and t340 = arm
+fn156d4_entry + click My^Items in state 16 (r338_state16_session.py already
+does both; --window tuned). (2) Walk the SENDMESSAGE consumer: t302 banked msg
+0xc -> 0x30edc rect hit-test -> ring post fn 0x56ad4 / registry dispatch
+fn 0x56ca4; find where the FILE SENDMESSAGE value (windows.txt) is loaded into
+a record field and who posts it (t302 positive control: NEXTTURN SENDMESSAGE 7
+== btn_hdlr msg 0x7 — the values ARE posted as msg ids somewhere; find the
+poster site for the 804..813 band: grep the disasm for imm 0x324..0x335
+(804..821) near call fn 0x56ca4/0x56ad4 sites). (3) If the 804..813 posts land
+on the CHILD's own slot (not 61), enumerate which msg ids fn 0x156d4 would
+then see and whether ANY reaches the 0x15ebf 0x1c01 branch. OUTCOMES: poster
+found -> residue stays open with a named t340 capture; no poster -> residue-(1)
+joins the cited-dead class entirely (eighth leg) and the row's only movement
+is user ruling D2-c — write the honest negative, keep open strict-close. FIRST
+ACTION of the iteration is still the sitting check (tail-seek newest turn;
+>1086 => r1_t85g_sitting.py).
+
+## LANDED t338 — 2026-11-08 (STATE-16 LIVE DRIVE EXECUTED: THE MODE-1 CHAIN IS
+## ZERO IN BATTLE STATE TOO — SECOND INDEPENDENT ZERO; THE STATE-16 TRIGGER IS
+## THE GALAXY-MAP ICARUS-PIP CLICK; SET-STATE edx=0x10 + hit-routing WITNESSED
+## LIVE; t332's "obstacle is the active screen state" SUPERSEDED)
+ONE scratch debugger session work/r1/dbg-t338-20261107-224027 (rc=0 attempt 1;
+tool scripts/r338_state16_session.py composing r332_batctrl_session.BatSess +
+r337_state_word state oracle; private Xvfb :97, own ring, core=normal, tl 7200;
+teardown SIGKILL RECORDED pids dosbox 200239/xvfb 200235; production :9
+136357/136359 + Xvfb 1461 ps-verified UNTOUCHED post-run; sitting check
+NEGATIVE turn 1086; game/ read-only). PROVED: (1) TRIGGER from existing data:
+the five state-16 saves of t299-leg-20261105-112859 sit exactly inside the
+star1 census window — pip click (238,282) ENTERS the system view = state 16,
+Escape exits; reproduced (diff=94504, oracle sav=56.sav state=16 groups=18).
+(2) STATE-SWITCH WITNESS: setstate_56e10 STOP eax=ebp=0x2bc35c edx=0x10 (t337
+law live); ringa_55ea3 census x1. (3) ROUTING WITNESS: hit_test_56890 x2
+(edx=click Y 0x76/0xc8), btn_hdlr x17 on the state-16 family rows — banked
+window names My^Items/Other^Items/Auto/Pass/TOGGRID/BATZOOMIN (SAME pixels
+t332 measured NEXTTURNCONT-owned in state 1); focus_56aa4 zero (xsend
+press+release law banked). (4) HEADLINE: pty whole-log census ZERO at all
+eight chain legs {0x156D4, 0x15EF1, 0x15FED, 0x1615D, 0x1616F, 0x161D1,
+0x1B7DD, 0x1B180}; BatModeWnd +0xb7==1 in 0 oracle reads. OUTCOME C: t337's
+wrong-state candidate for t332 REFUTED as cause; BatControlWnd is a TYPE-19
+parent rect 0,0-0,0 — never a mouse hit target; entry needs a POSTER to
+registry slot 61. LEDGER nothing closed strict-close (16/3); residue-(1)
+REWRITTEN (SEVEN named unreachable legs; live edge = t339 intake decode or
+user ruling D2-c). Files: docs/re/_wip_t338.md S0-S4, ships.md S57
+(hand-authored), REFUTED-ROUTES t338 amendment (4 binding clauses),
+scripts/r338_state16_session.py (rc=0). GATE 0, ledger + index audits OK.
+NEXT=t339 BatControlWnd intake decode VERBATIM
 
 ## LANDED t337 — 2026-11-08 (THE STATE TABLE'S READERS ARE THE SCREEN ROUTING
 ## MACHINERY: CURRENT-STATE WORD core+0x4228 FOUND + MEASURED {0,1,16,17};
@@ -567,14 +603,11 @@ need RAM). Sitting check NEGATIVE (turn 1086); production :9 untouched; gate 0.
 NEXT = t327 VERBATIM per the block above.
 
 QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; t333 is row 1
-(t332 completed 2026-11-08: chain instrumented and measured ZERO, delivery edge
-named as fn 0x156d4's own class-table self-relay 0x16162..0x1616f, obstacle
-measured = windows.txt STATE 1 16 never active; click batteries on the state-16
-family are now REFUTED, so the residue's only live edge is the static state walk):
-
-t333 active screen state walk (zero capture; see the NEXT ACTION block for the
-  three probes, outcomes, and the DEAD list).
+keep this block intact except deleting your completed row; the t326b..t338 rows
+are all completed and retired (see LANDED blocks); t339 is the live queue head
+per the NEXT ACTION block above — the residue-(1) capture levers are exhausted
+(REFUTED-ROUTES t338 amendment), so after t339 author the next queue or park
+the WAIT-TRIGGER sentinel):
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 amendments are BINDING): poster pass

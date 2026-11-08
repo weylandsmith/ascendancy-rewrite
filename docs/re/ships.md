@@ -2668,3 +2668,56 @@ working doc docs/re/_wip_t337.md S0-S7). Sitting check NEGATIVE (newest turn
 NOTE BatControlWnd magic-rec bytes in state-16 saves: +0xb7=253/+0xb9=1
 (identical in all saves; accessor-rec vs magic-rec base distinction from t316
 law (3); the STATE word itself is base-unambiguous).
+
+## S57 t338 (2026-11-08) — STATE-16 LIVE DRIVE: THE MODE-1 CHAIN IS ZERO IN
+## BATTLE STATE TOO (SECOND INDEPENDENT ZERO); THE STATE-16 TRIGGER IS THE
+## GALAXY-MAP ICARUS PIP CLICK; SET-STATE edx=0x10 WITNESSED LIVE
+ONE scratch debugger session work/r1/dbg-t338-20261107-224027 (rc=0 attempt 1,
+tool scripts/r338_state16_session.py composing r332_batctrl_session.BatSess;
+private Xvfb :97, own ring, core=normal, tl 7200; teardown SIGKILL recorded
+pids dosbox 200239 / xvfb 200235; production :9 136357/136359 + Xvfb 1461
+ps-verified untouched; sitting check NEGATIVE turn 1086).
+(1) TRIGGER FOUND FROM EXISTING DATA (zero-capture, _wip_t338 S1): the five
+    state-16 saves of t299-leg-20261105-112859 (43..47.sav) sit EXACTLY inside
+    the star1 census window — click (238,282) ENTERS the Icarus system view =
+    state 16 (save mtimes 11:32:59..11:33:39; Escape exits, 48.sav state 1).
+    Reproduced THIS run: enter diff=94504 (t307 verbatim), STATE-ORACLE
+    sav=56.sav state=16 groups=18; 13 consecutive oracle reads held 16 through
+    the whole A battery + B_pre.
+(2) STATE-SWITCH EDGE WITNESSED (t337 law corroborated live): leg
+    setstate_56e10 fired once, STOP eip=0x216260 eax=ebp=0x2bc35c (core)
+    edx=0x10 ecx=0x10 — SET-STATE fn 0x56e10 entered with new-state 16 seconds
+    after the enter click. ringa_55ea3 census x1 (pty whole-log; banked stop
+    attributed to setstate — the call-site stop and the entry stop collapsed
+    into one banked event; both legs fired per whole-log census).
+(3) STATE-16 HIT ROUTING WITNESSED: hit_test_56890 fired x2 (eax=0x2bc35c,
+    edx = click Y 0x76/0xc8); btn_hdlr fired 17x on the state-16 family rows
+    with window names My^Items/Other^Items/Auto/Pass/TOGGRID/BATZOOMIN — the
+    SAME pixels t332 measured as NEXTTURNCONT-owned in state 1. focus_56aa4
+    zero (xsend sends ButtonPress+Release at the same coordinate; the
+    [esp+4]==-1 clear-focus arm never took the clicked path — unattributed
+    beyond that).
+(4) THE HEADLINE (OUTCOME C): with the game MEASURED in state 16, the pty
+    whole-log census at all eight t332 chain legs {fn156d4_entry 0x156D4,
+    tbl15ef1, gate15fed, post1615d, relay1616f, post161d1, mode1_1b7dd,
+    backch_1b180} is ZERO; control btn_hdlr x17; BatModeWnd magic-rec
+    +0xb7==1 in 0 oracle reads (batrec.json, before/after every click). t337's
+    candidate explanation for t332's zero (wrong screen state) is REFUTED as
+    the cause: state-16 hit-testing DID run and fn 0x156d4 (BatControlWnd,
+    registry slot 61) STILL received no message of any id. SECOND independent
+    zero-witness. The arming question now moves INSIDE fn 0x156d4: the
+    msg-0x1c01 branch 0x15ebf was never entered because no 0x1c01 was ever
+    delivered — and t332's self-relay tail 0x16162..0x1616f is downstream of
+    that branch, so the sole live edge is who posts 0x1c01 to slot 61 given a
+    click that DOES reach the window family (rows route to child button
+    records, never to the BatControlWnd parent record itself).
+(5) BATTERY NOTE (banked law): every state-16 row click hit a CHILD record
+    (My^Items/Other^Items/W..I/Pass/Auto/Repeat interior) — the parent
+    BatControlWnd (0,0-0,0, TYPE 19) has no own rectangle to receive a hit;
+    a mouse-road click can therefore NEVER stop at fn156d4_entry via these
+    rows. Entry would require the self-relay or another window posting 0x1c01
+    to slot 61 — consistent with zero x two runs.
+LEDGER: nothing closed strict-close (16/3); OQ-016 residue-(1) REWRITTEN: the
+state-16 hypothesis is spent, closure-class = fn 0x156d4 internal-gate decode
+(zero-capture) or user ruling D2-c. Tools: scripts/r338_state16_session.py
+(exit 0; --offline replay supported). Working notes docs/re/_wip_t338.md S0-S4.

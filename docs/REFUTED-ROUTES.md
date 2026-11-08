@@ -1129,3 +1129,33 @@ t332's zero-witness capture is now KNOWN to have run entirely in states
 {0,1,17} — any future arming witness MUST run with core+0x4228==16 (resident
 state-16 saves: work/r1/t299-leg-20261105-112859/save/43..47.sav); a zero log
 from a non-16 state is NOT evidence of unreachability.
+
+## t338 AMENDMENT (binding): THE STATE-16 LIVE DRIVE IS EXECUTED AND MEASURED
+## ZERO; "THE OBSTACLE IS THE ACTIVE SCREEN STATE" IS SUPERSEDED; BatControlWnd
+## CAN NEVER BE A MOUSE HIT TARGET. Evidence: work/r1/dbg-t338-20261107-224027
+## (rc=0, tool scripts/r338_state16_session.py), docs/re/ships.md S57,
+## docs/re/_wip_t338.md S0-S4.
+## (1) CLOSED-BY-MEASUREMENT (negative): with the game DRIVEN INTO state 16
+##     (SET-STATE fn 0x56e10 witnessed live with edx=0x10; 13 save-oracle reads
+##     state==16; hit_test fn 0x56890 x2; btn_hdlr x17 on the state-16 family
+##     rows), the pty whole-log census at all eight chain legs {0x156D4, 0x15EF1,
+##     0x15FED, 0x1615D, 0x1616F, 0x161D1, 0x1B7DD, 0x1B180} is ZERO and
+##     BatModeWnd +0xb7==1 appears in ZERO oracle reads. t332 clause (3)'s
+##     obstacle-claim (captures sat in the wrong state) is SUPERSEDED — state 16
+##     was reached, state-16 hit-testing ran, the chain stayed zero. Do NOT run
+##     another mouse battery at this chain in ANY state; the closure-class is now
+##     the fn 0x156d4 intake decode (who posts 0x1c01 to registry slot 61) or a
+##     user ruling (D2-c).
+## (2) LAW (trigger, measured + reproducible): state 16 is entered by the
+##     galaxy-map Icarus-pip click (238,282) (enter diff 94504; the five
+##     state-16 saves of t299-leg-20261105-112859 sit exactly inside that click's
+##     census window; Escape exits). The FLEET rowjump enters state 17 (t332
+##     stands). Do not re-hunt "how does play reach state 16".
+## (3) LAW (geometry): BatControlWnd is TYPE 19 PARENT with rect 0,0-0,0 — it has
+##     NO own hit rectangle; every state-16 row click lands on a CHILD button
+##     record (banked names My^Items/Other^Items/Auto/Pass/TOGGRID/BATZOOMIN).
+##     Any claim that a click reaches fn 0x156d4 must cite a POSTER to registry
+##     slot 61, not a pixel.
+## (4) INSTRUMENT NOTE: xsend click = ButtonPress+ButtonRelease at one
+##     coordinate; focus_56aa4 (the [esp+4]==-1 arm) fired ZERO while hit_test
+##     fired x2 — do not treat the focus leg as a generic mouse-traffic witness.
