@@ -38,7 +38,23 @@ IMM32_PREV = {0x8D, 0x68, 0xA1, 0xA3} | set(range(0xB8, 0xC0))
 
 def main():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    pay = open(os.path.join(root, "work/ascend_payload.bin"), "rb").read()
+    pay_path = os.path.join(root, "work/ascend_payload.bin")
+    if not os.path.isfile(pay_path):
+        # t343 PORTABILITY: the payload is a byte-exact slice of the tracked
+        # original game/ascend.exe at file offset 0x2a50 (measured 2026-11-08:
+        # exe[0x2a50:0x2a50+0x8cc83] == work/ascend_payload.bin exactly,
+        # 576,643 B). Derive instead of harness-error so a fresh clone with
+        # the game dir runs this gate.
+        exe_path = os.path.join(root, "game/ascend.exe")
+        if not os.path.isfile(exe_path):
+            print("harness-error: no payload and no game/ascend.exe to derive from"); return 2
+        exe = open(exe_path, "rb").read()
+        pay = exe[0x2a50:0x2a50 + 0x8cc83]
+        if len(pay) != 0x8cc83:
+            print("harness-error: derived payload size wrong"); return 2
+        print("payload derived from game/ascend.exe@0x2a50 (work copy absent)")
+    else:
+        pay = open(pay_path, "rb").read()
     if len(pay) != 0x8cc83:
         print("harness-error: payload size"); return 2
 
@@ -54,10 +70,13 @@ def main():
     # may land anywhere inside the ..\x.cpp bytes (string interior), so the
     # value map covers every byte position of every occurrence.
     try:
-        res = open(os.path.join(root, "work/ascend_restored.bin"), "rb").read()
+        res_path = os.path.join(root, "artifacts/ascend_restored.bin")
+        if not os.path.isfile(res_path):
+            res_path = os.path.join(root, "work/ascend_restored.bin")
+        res = open(res_path, "rb").read()
     except OSError:
-        print("harness-error: work/ascend_restored.bin missing "
-              "(run scripts/r1_restore_sites.py)"); return 2
+        print("harness-error: ascend_restored.bin missing "
+              "(tracked copy at artifacts/, rebuild via scripts/r1_restore_sites.py)"); return 2
     off2mod = {}
     for n, occ in strs.items():
         for p, ln in occ:
@@ -103,7 +122,9 @@ def main():
         i = bisect.bisect_right(pros, site) - 1
         return pros[i] if i >= 0 else CODE_LO
 
-    out = open(os.path.join(root, "work/attribution.tsv"), "w")
+    tsv_path = os.path.join(root, "work/attribution.tsv")
+    os.makedirs(os.path.dirname(tsv_path), exist_ok=True)  # t343: fresh clones have no work/
+    out = open(tsv_path, "w")
     out.write("module\tsite\tenc\test_func\n")
     summary = []
     for nm in sorted(set(list(hits) + list(e2)),

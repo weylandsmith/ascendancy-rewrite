@@ -47,6 +47,53 @@ for f in docs/PLAN.md docs/STATE.md docs/FINDINGS.md; do
   [ -s "$ROOT/$f" ] || err "$f missing or empty"
 done
 
+# 3-pre. BUILD FIRST (t343 fix). The build used to live at the bottom of this
+# script, AFTER the build-dependent stages (3m ability smoke, 3l campaign,
+# 4e pixel, 4c UI, 4d audio). Every one of those guards on
+# `[ -x rewrite/build/ascendancy ]`, so on a FRESH CLONE they all silently
+# self-skipped on the first gate run while the build then happened at the very
+# end — a green first-run gate that had tested none of them (measured:
+# t343 clone run1, work/r343/clone-run1-gate.out). The build is a hard
+# prerequisite of the milestone>=3 contract, so the whole build/test/boot block
+# moved here; every later stage now sees a real binary. (Side-effect-free gate
+# rule: the build dir is gitignored scratch; the gate still never touches game/
+# or work/ captures.)
+MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
+MS=${MS:-0}
+if [ "$MS" -ge 3 ] && [ -d "$ROOT/rewrite" ]; then
+  if [ ! -d "$ROOT/rewrite/build" ]; then
+    cmake -S "$ROOT/rewrite" -B "$ROOT/rewrite/build" -DCMAKE_BUILD_TYPE=Debug >/tmp/gate_cmake.log 2>&1 \
+      || { tail -30 /tmp/gate_cmake.log; err "cmake configure failed"; }
+  fi
+  if [ -d "$ROOT/rewrite/build" ]; then
+    cmake --build "$ROOT/rewrite/build" -j2 >/tmp/gate_build.log 2>&1 \
+      || { tail -40 /tmp/gate_build.log; err "build failed"; }
+    if [ -x "$ROOT/rewrite/build/run_tests" ]; then
+      "$ROOT/rewrite/build/run_tests" >/tmp/gate_tests.log 2>&1 \
+        || { tail -40 /tmp/gate_tests.log; err "unit tests failed"; }
+    fi
+    # 4b. Boot smoke test. Runs the REAL binary twice: once with the dummy
+    # video driver and once under Xvfb with x11, because the completion
+    # contract requires an Xvfb boot. Bounds are mandatory — see the DOSBOX
+    # RULE in STATE.md about unbounded log growth.
+    if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
+      timeout 60 "$ROOT/rewrite/build/ascendancy" --headless --turns 3 >/tmp/gate_boot.log 2>&1 \
+        || { tail -20 /tmp/gate_boot.log; err "headless boot failed"; }
+      grep -q '(.bin tables parsed: 7)' /tmp/gate_boot.log \
+        || { tail -20 /tmp/gate_boot.log; err "boot did not parse all 7 .bin tables"; }
+      grep -q '^ok$' /tmp/gate_boot.log || err "headless boot did not complete the turn loop"
+      if command -v xvfb-run >/dev/null 2>&1; then
+        timeout 60 xvfb-run -a "$ROOT/rewrite/build/ascendancy" --turns 2 >/tmp/gate_xvfb.log 2>&1 \
+          || { tail -20 /tmp/gate_xvfb.log; err "xvfb boot failed"; }
+        grep -q 'video driver: x11' /tmp/gate_xvfb.log \
+          || { tail -20 /tmp/gate_xvfb.log; err "xvfb boot did not use the x11 driver"; }
+      else
+        note "xvfb-run unavailable: skipped x11 boot"
+      fi
+    fi
+  fi
+fi
+
 # 3b. P1b invariant: .bin tables parse at stride 24, and the .cob extractor must
 # emit ALL directory entries (it silently dropped the last file of every archive
 # until 2026-10-03, so count is asserted, not trusted).
@@ -325,9 +372,11 @@ fi
 
 # 3r. MODULE ATTRIBUTION invariant (docs/re/r1-savestate.md 2026-10-05j):
 # the restored image must keep yielding debug-string attributions for the
-# core modules (flic/winmgr/gsystem/race, >=5 exact sites each). Needs the
-# restored artifact; skips with a note when no captures exist.
-if [ -s "$ROOT/work/ascend_restored.bin" ]; then
+# core modules (flic/winmgr/gsystem/race, >=5 exact sites each). t343: the
+# restored image is TRACKED at artifacts/ascend_restored.bin (payload derives
+# from game/ascend.exe@0x2a50 inside attribution_scan.py), so this stage now
+# runs on a fresh clone; work/ copy still honoured when present.
+if [ -s "$ROOT/work/ascend_restored.bin" ] || [ -s "$ROOT/artifacts/ascend_restored.bin" ]; then
   if ! "$HOME/tools/revenv/bin/python" "$ROOT/scripts/attribution_scan.py" \
         >/tmp/gate_attr.log 2>&1; then
     tail -12 /tmp/gate_attr.log
@@ -362,13 +411,12 @@ fi
 # under Xvfb, capture the screen, demand an EXACT 640x480 match against the
 # Python-decoded frame (scripts/intro_pixelcheck.sh; verified 2026-10-04i:
 # frame 19 at (192,144)).
-if [ -x "$ROOT/rewrite/build/ascendancy" ] && command -v Xvfb >/dev/null 2>&1 \
-   && command -v import >/dev/null 2>&1 && [ -x "$HOME/tools/revenv/bin/python" ]; then
-  if ! bash "$ROOT/scripts/intro_pixelcheck.sh" 40 1.5 91 >/tmp/gate_intro.log 2>&1; then
-    tail -20 /tmp/gate_intro.log; err "intro pixel check failed (window != decoded frame)"
-  fi
-else
-  note "Xvfb/ImageMagick/revenv unavailable: skipped intro pixel check"
+if [ ! -x "$ROOT/rewrite/build/ascendancy" ]; then
+  note "rewrite binary absent (build stage failed/skipped): skipped intro pixel check"
+elif ! command -v Xvfb >/dev/null 2>&1 || ! command -v import >/dev/null 2>&1 || [ ! -x "$HOME/tools/revenv/bin/python" ]; then
+  note "Xvfb/ImageMagick(revenv) unavailable: skipped intro pixel check"
+elif ! bash "$ROOT/scripts/intro_pixelcheck.sh" 40 1.5 91 >/tmp/gate_intro.log 2>&1; then
+  tail -20 /tmp/gate_intro.log; err "intro pixel check failed (window != decoded frame)"
 fi
 
 # 3l. Victory-condition grammar + CONTRACT smoke: end-*.txt blocks assert
@@ -402,7 +450,13 @@ fi
 
 # 4c. UI smoke: the P5a window must boot under Xvfb, play N turns driven by
 # the autoplay path, and exit 0 printing 'ui ok:' (docs/re/ui-runtime.md §5).
-if [ -x "$ROOT/rewrite/build/ascendancy" ] && command -v xvfb-run >/dev/null 2>&1; then
+# t343: notes split by cause (binary absent vs toolchain absent) — the old
+# single note blamed xvfb-run for a missing binary on fresh clones.
+if [ ! -x "$ROOT/rewrite/build/ascendancy" ]; then
+  note "rewrite binary absent (build stage failed/skipped): skipped UI smoke"
+elif ! command -v xvfb-run >/dev/null 2>&1; then
+  note "xvfb-run unavailable: skipped UI smoke"
+else
   if ! timeout 120 xvfb-run -a "$ROOT/rewrite/build/ascendancy" --ui \
        --campaign 3 --autoplay --seed 9 >/tmp/gate_ui.log 2>&1; then
     tail -20 /tmp/gate_ui.log; err "ui boot failed under xvfb"
@@ -436,8 +490,6 @@ if [ -x "$ROOT/rewrite/build/ascendancy" ] && command -v xvfb-run >/dev/null 2>&
   else
     note "tools/xsend not built: skipped real-input UI check"
   fi
-else
-  note "xvfb-run unavailable: skipped UI smoke"
 fi
 
 # 4f. Reference-capture comparison: screenshots of the ORIGINAL game running
@@ -468,7 +520,12 @@ fi
 # manifest lists 'shield' twice) + theme00 from the REAL vendor files, with
 # a dummy audio device (docs/re/audio.md §5). Any load failure aborts init
 # with exit 1, so grepping the ok line IS the load test.
-if [ -x "$ROOT/rewrite/build/ascendancy" ] && command -v xvfb-run >/dev/null 2>&1; then
+# t343: notes split by cause (see 4c).
+if [ ! -x "$ROOT/rewrite/build/ascendancy" ]; then
+  note "rewrite binary absent (build stage failed/skipped): skipped audio smoke"
+elif ! command -v xvfb-run >/dev/null 2>&1; then
+  note "xvfb-run unavailable: skipped audio smoke"
+else
   if ! timeout 180 env SDL_AUDIODRIVER=dummy xvfb-run -a \
        "$ROOT/rewrite/build/ascendancy" --ui --audio --campaign 1 \
        --autoplay --seed 4 >/tmp/gate_audio.log 2>&1; then
@@ -478,8 +535,6 @@ if [ -x "$ROOT/rewrite/build/ascendancy" ] && command -v xvfb-run >/dev/null 2>&
     || { cat /tmp/gate_audio.log; err "audio load line wrong (expect 85 chunks, theme00)"; }
   grep -q 'ui ok: turn 1' /tmp/gate_audio.log \
     || { cat /tmp/gate_audio.log; err "audio run did not complete a turn"; }
-else
-  note "xvfb-run unavailable: skipped audio smoke"
 fi
 
 # 3t. LEDGER CONSISTENCY (t158) — the two ledger checks run HERE, not in prose.
@@ -516,42 +571,9 @@ if ! /usr/bin/python3 "$ROOT/scripts/r1_t186_b2_regression.py" >/tmp/gate_b2_reg
   err "idle-gate B2 regression failed: the probe could arm on loop echo again (see docs/STATE.md t186 LANDED block)"
 fi
 
-# 4-5. Build & tests of rewrite/ once the project exists (milestone >= 3)
-MS=$(sed -n 's/^milestone:[ ]*\([0-9]*\).*/\1/p' "$ROOT/docs/STATE.md" | head -1)
-MS=${MS:-0}
-if [ "$MS" -ge 3 ] && [ -d "$ROOT/rewrite" ]; then
-  if [ ! -d "$ROOT/rewrite/build" ]; then
-    cmake -S "$ROOT/rewrite" -B "$ROOT/rewrite/build" -DCMAKE_BUILD_TYPE=Debug >/tmp/gate_cmake.log 2>&1 \
-      || { tail -30 /tmp/gate_cmake.log; err "cmake configure failed"; }
-  fi
-  if [ -d "$ROOT/rewrite/build" ]; then
-    cmake --build "$ROOT/rewrite/build" -j2 >/tmp/gate_build.log 2>&1 \
-      || { tail -40 /tmp/gate_build.log; err "build failed"; }
-    if [ -x "$ROOT/rewrite/build/run_tests" ]; then
-      "$ROOT/rewrite/build/run_tests" >/tmp/gate_tests.log 2>&1 \
-        || { tail -40 /tmp/gate_tests.log; err "unit tests failed"; }
-    fi
-    # 4b. Boot smoke test. Runs the REAL binary twice: once with the dummy
-    # video driver and once under Xvfb with x11, because the completion
-    # contract requires an Xvfb boot. Bounds are mandatory — see the DOSBOX
-    # RULE in STATE.md about unbounded log growth.
-    if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
-      timeout 60 "$ROOT/rewrite/build/ascendancy" --headless --turns 3 >/tmp/gate_boot.log 2>&1 \
-        || { tail -20 /tmp/gate_boot.log; err "headless boot failed"; }
-      grep -q '(.bin tables parsed: 7)' /tmp/gate_boot.log \
-        || { tail -20 /tmp/gate_boot.log; err "boot did not parse all 7 .bin tables"; }
-      grep -q '^ok$' /tmp/gate_boot.log || err "headless boot did not complete the turn loop"
-      if command -v xvfb-run >/dev/null 2>&1; then
-        timeout 60 xvfb-run -a "$ROOT/rewrite/build/ascendancy" --turns 2 >/tmp/gate_xvfb.log 2>&1 \
-          || { tail -20 /tmp/gate_xvfb.log; err "xvfb boot failed"; }
-        grep -q 'video driver: x11' /tmp/gate_xvfb.log \
-          || { tail -20 /tmp/gate_xvfb.log; err "xvfb boot did not use the x11 driver"; }
-      else
-        note "xvfb-run unavailable: skipped x11 boot"
-      fi
-    fi
-  fi
-fi
+# (t343) The build/test/boot block that used to sit here now runs at "3-pre"
+# near the top, so the build-dependent smokes below see a real binary on a
+# fresh clone's FIRST gate run. MS is computed there.
 
 if [ "$fail" = 0 ]; then echo "[gate] ALL CHECKS PASS (milestone=$MS)"; fi
 exit $fail
