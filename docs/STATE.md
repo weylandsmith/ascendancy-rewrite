@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-08T23:40
+updated: 2026-11-08T02:25
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,32 +212,82 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t340 — OQ-016 RESIDUE-(4) FINAL SHIELD-COMPLETION WITNESS (ONE LAUNCH,
-t325's OWN STATED BUDGET: "ONE more launch with the fully-fixed chain, then
-stop"). Question: at the shield build-completion turn (~t1092 for the live
-Gridsor I pending row item 26 word2 0x0 acc 30 @ turn 1086, +6/turn), does
-ANY observable dword move per turn in the item slot / build-queue struct —
-watch the WHOLE slot dword and the build-queue acc, NOT byte +3 (t325 census
-law: byte +3 is 0 on all 44 pending rows, constant 15 on completed rows).
-Method: scripts/r325_shield_session.py fixed chain verbatim (early-arm-at-
-title BPLM survives load, deterministic heap member 0x25eb7c, fixed popup
-drain ppm:- P6 + root->window-rel (80,100)); budget to t>=1093; ring-diff the
-slot before/after each turn; production :9 NEVER signalled, own Xvfb, scratch
-copy only, teardown SIGKILL recorded. OUTCOMES: dword-per-turn mover found ->
-residue-(4) closes with cited law + rewrite note; zero movers at completion
--> ABSENCE-ONLY third time, residue stays instrumentation-class-open and the
-capture queue is EMPTY — t341 then = residue-(5) build-order-minutiae corpus
-census (zero-capture) or park-on-sentinel per DECISIONS.md D3. Do NOT spend a
-second launch on this question. FIRST ACTION of the iteration is still the
-sitting check (tail-seek newest turn in work/r1/playcap/live-timeline.jsonl;
->1086 => r1_t85g_sitting.py BEFORE starting).
-CONTEXT BANKED: t339 landed the BatControlWnd intake decode (ships.md S58,
-REFUTED-ROUTES t339 amendment 3 binding clauses) — the OQ-016 residue-(1)
-arming question is now fully cited-dead (EIGHT legs); do not re-open it; its
-closure is user ruling D2-c only. The msg-routing layer (router fn 0x30c9c,
-pump fn 0x56b5c parent-priority 0x56c34, [child+0x63]=parent-slot parser law)
-is banked — do not re-derive. Window records are NOT in saves (t339 S7) —
-window-field questions are live-legs-only.
+NEXT t341 — CANDIDATE-RESIDUE-(6) DECODE: FACTORY AUTO-RESERVE AT BUILD
+COMPLETION (ZERO CAPTURE). t340 S4(5) MEASURED at the completion boundary:
+Gridsor I (HUMAN, owner index 0) slot43 byte1 0xff->0x00 + queue words
++0x52=43/+0x54=0 (item 0 FACTORY, t271 reservation pattern) with NO UI click
+— the original auto-queues a build on a player planet the instant the queue
+empties, while rewrite buildPhase (campaign.cpp:1032 comment) claims "Player
+planets: the original is UI-driven (no auto selector)". If the vendor really
+auto-reserves for humans, that is a rewrite delta (buildPhase gains the
+player-planet queue-when-empty path) AND it re-opens part of OQ-016 residue
+(5) (human build order is machine-chosen after all, at least the first pick).
+Method (static only, tools exist): walk FUN_00038f68's completion tail from
+0x392f4 (the jmp after the reset) + every in-image caller of the selector
+family FUN_0003f130 (banked caller law 0x3ead6 queue-empty-only) for a
+per-planet loop that covers race-slot 0; check the selector candidate scan
+0x3f672..0x3f733 pick law against the OBSERVED choice (item 0 Factory on a
+planet with 26 items already); ring-final of
+work/r1/t340-shieldc-20261108-014705 is the ground-truth save (turn 1093,
+Factory pending, acc=12) — reuse scripts/r340_shield_complete_session.py's
+sample_ring() offline. OUTCOMES: auto-queue path found + owner-0 reachable
+-> rewrite upgrade + pin; path found but owner-gated away from 0 -> the
+reserve came from elsewhere (UI replay? the t271 pattern writer census);
+no path -> honest negative, residue-(6) stays open, t342 = residue-(5)
+corpus census or park-on-sentinel per DECISIONS.md D3. FIRST ACTION of the
+iteration is still the sitting check (tail-seek newest turn in
+work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py BEFORE
+starting).
+CONTEXT BANKED: t340 landed the shield-completion law (income-law.md S-T340,
+REFUTED-ROUTES t340 amendment 3 binding clauses incl. the t325 instrument
+verdict + MEMDUMPBIN trap) — residue-(4) CLOSED, do not re-census byte+3, do
+not spend another launch on it. The OQ-016 residue-(1) arming question stays
+cited-dead (EIGHT legs), closure = user ruling D2-c only. msg-routing layer
+(router 0x30c9c, pump 0x56b5c, [child+0x63] law) banked at t339. Window
+records are NOT in saves (t339 S7) — window-field questions are
+live-legs-only. The scratch campaign copy (RESUME.GAM.user-oct29 md5-pinned)
+is reusable for future witnesses; launch-1 harness bug fixed in
+r340_shield_complete_session.py (T325.W_ANCH assignment).
+
+## LANDED t340 — 2026-11-08 (OQ-016 RESIDUE-(4) CLOSED WITH CITED MEASUREMENT:
+## THE SHIELD COMPLETION HANDLER IS THE SOLE SLOT WRITER — word2 |= 0x0f01
+## ONCE AT THE COMPLETION TURN (0x3928b); WHILE PENDING THE SOLE MOVER IS THE
+## ACC WORD; BPLM FIRED EXACTLY ONCE AT file 0x39290 INSIDE FUN_00038f68;
+## t325's STALLS WERE THE PRE-FIX POPUP DETECTOR, NOT THE GAME; NEW LEAD:
+## FACTORY AUTO-RESERVE ON THE HUMAN PLANET AT COMPLETION)
+ONE scratch debugger session work/r1/t340-shieldc-20261108-014705 (rc=0,
+413 s; tool scripts/r340_shield_complete_session.py = r325 FIXED chain
+verbatim + 15 s whole-array ring sampling to turns.jsonl; private Xvfb :97,
+own ring dir, core=normal, TL 3600; teardown SIGKILL RECORDED dosbox 208042/
+Xvfb 208038; production :9 136357/136359 + Xvfb 1461 ps-verified UNTOUCHED;
+sitting check NEGATIVE turn 1086; launch-1 …013812 renamed .harnessbug1 =
+exit-2 class NameError, not a scientific negative). PROVED: (1) PER-TURN LAW
+t1086..1093: pending acc 30/36/42/48/54 (+6=stored IND verbatim), ALL 83
+slot dwords frozen; completion at t1091 (54+6 >= COST 60). (2) COMPLETION
+STORE witnessed live: 0x3928b `or WORD PTR [ebx+eax*4+0x2],dx` dx=0x0f00 ->
+slot76 0x00001a01->0x0f011a01 (byte2 01 active, byte3 15 ONE-TIME marker —
+t325 census EXPLAINED), gate flag-word bit8 SET (item 26 @DS:0x74256=0x8
+measured; DS base B+0x82bb0) + slot>=cells; reset tail 0x39290..0x3929a
++0x52=0xffff/+0x54=0xff/acc=0 observed same turn; acc resumes +6/turn.
+(3) WRITER IDENTITY: BPLM 0x25EAF4 fired EXACTLY ONCE whole-log (00->0F) at
+EIP-linear 0x1f86e0 = file 0x39290, inside FUN_00038f68 (0x38f68..0x394d8);
+fire regs esi=0x270c66 = Gridsor I linear VERIFIED, eax=76, edx=0xf00.
+Static census scripts/r340_slot_writers.py: 4 slot *4-stores in the fn
+(0x39164/0x391ce dig, 0x3920d |=2, 0x3928b completion). (4) t325 INSTRUMENT
+VERDICT: drain closed 7 popups of the exact class that stalled t325
+(offline: committed detector returns (406,442) on t325's drain_0.png) —
+t325's four zero-fire launches were NEVER the game. (5) NEW named observation
+(candidate residue 6, NOT part of the closure): slot43 byte1 ff->00 same
+boundary = item 0 FACTORY auto-reserved on the HUMAN planet, queuer
+undecoded -> t341. LEDGER: residue-(4) CLOSED strict-close with cited
+measurement (OQ-016 ROW STAYS OPEN — residues 1, 5 + candidate 6); count
+unchanged 16/3. Files: docs/re/_wip_t340.md S0-S5, income-law.md S-T340
+(hand-authored, no regenerator — verified), REFUTED-ROUTES t340 amendment
+(3 clauses), OPEN-QUESTIONS residue-(4) rewrite, campaign.cpp buildPhase
+comment (no code delta). Tools r340_shield_complete_session.py (rc=0),
+r340_writer_site.py + r340_slot_writers.py (exit 0). GATE 0, ledger + index
+audits OK. NEXT=t341 factory-auto-reserve decode VERBATIM
+
 
 ## LANDED t339 — 2026-11-07 (BatControlWnd INTAKE DECODED, ZERO CAPTURE: NO
 ## POSTER OF 0x1c01 TO SLOT 61 EXISTS ANYWHERE; THE MODE-1 CHAIN IS

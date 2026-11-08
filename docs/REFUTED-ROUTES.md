@@ -1187,3 +1187,21 @@ from a non-16 state is NOT evidence of unreachability.
 ##     is LIVE-LEGS-ONLY (t316 clause (1) extended from the registry table to
 ##     the records themselves); scripts/r339_rec_census.py exit 1 is the
 ##     reproduction, do not re-run save scans for records.
+
+## t340 AMENDMENT (2026-11-08) — binding clauses, OQ-016 residue-(4) class
+## (1) SHIELD COMPLETION LAW CLOSED (docs/re/income-law.md S-T340, live
+##     witness + static cross-check): slot byte+3 (=15) is a ONE-TIME
+##     completion marker written by FUN_00038f68 0x3928b word2 |= 0x0f00 at
+##     the completion turn ONLY; while pending no slot byte moves at all
+##     (sole mover = acc word += stored IND). Do NOT re-census byte+3 as a
+##     progress value and do NOT spend another launch on residue-(4).
+## (2) INSTRUMENT VERDICT on the t325 zero-fire launches (t325-shield-
+##     20261107-005947/-013553): their stalls at turn 1087 were the
+##     pre-fix headerless (rgb:-) popup detector, NOT the game — the
+##     committed detector clears the exact stall popup (t340 drained 7).
+##     Any future claim "t325 showed the game blocks turn advance" is VOID.
+## (3) MEMDUMPBIN SYNTAX TRAP: `MEMDUMPBIN 0000:<8hex-linear> len file` ->
+##     "Invalid memory dump arguments" on this dosbox-x-dbg build (t325's
+##     byte-at-arm and t340's code/stack dumps all no-op'd). Use EXEC EV for
+##     registers; do not trust a MEMDUMPBIN hdr=OK BEGIN as a file landing
+##     without checking the file exists.

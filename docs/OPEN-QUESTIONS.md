@@ -206,12 +206,21 @@ INDEX itself stays the rng%11 draw @0x23a97; rewrite upgraded
 (TerrainTables+loadTerrainTables economy.{h,cpp}, cfg.terrain consumed
 campaign.cpp, main.cpp injects; pins tests/test_terrain_t294.cpp x5,
 mutation-verified; income-law.md t294 block); (4) per-slot shield-byte
-consumer (OQ-019 family) — t325 MEASUREMENT 2026-11-07 (docs/re/income-law.md
-S-T325): production census 74 shield-item slots, byte+3 = 0 on ALL 44
-pending-class rows and constant 15 on 43 completed rows (word2 0xf01) => byte
-+3 is NOT a progress counter; witness 4 launches zero-fire (2 BREAK-lottery,
-2 instrument bugs) = ABSENCE-ONLY, stays open, instrumentation-class — future
-witness must watch the whole slot dword, not byte +3; (5) human build-order minutiae 0.4% samples;
+consumer (OQ-019 family) — CLOSED MEASURED 2026-11-08 t340 (ONE launch,
+work/r1/t340-shieldc-20261108-014705 rc=0, docs/re/income-law.md S-T340,
+tools scripts/r340_shield_complete_session.py + r340_writer_site.py +
+r340_slot_writers.py exit 0): whole-83-slot per-turn ring diff — while
+pending the SOLE mover is the acc word += stored IND; at the completion turn
+(54+6=60>=COST 60, t1091) FUN_00038f68 0x3928b `or WORD [ebx+eax*4+2],dx`
+(dx=0x0f00; gate flag-word bit8 SET @DS:0x74256 measured + slot>=cells) sets
+word2 0x0000->0x0f01 (byte3=15 = ONE-TIME marker, t325 census fully
+explained), then 0x39290..0x3929a resets +0x52=0xffff/+0x54=0xff/acc=0;
+BPLM fired EXACTLY ONCE at EIP-linear 0x1f86e0=file 0x39290, esi=Gridsor I
+record linear verified. NEW named observation (candidate residue 6, NOT
+part of the closure): slot43 byte1 ff->00 at the same boundary = item 0
+FACTORY auto-reserved on the HUMAN planet at completion, queuer undecoded —
+the buildPhase "no auto selector on player planets" comment claim needs a
+witness. Rewrite buildPhase confirmed, comment cites 0x3928b/0x39290; (5) human build-order minutiae 0.4% samples;
 item-35/35 completion branches = MEASURED zero-witness + AI-unreachable
 (REFUTED t271, re-open conditions there). t299 debugger leg witness ran
 (2026-11-04): zero fires; t301 re-attributed as ARMING-FAILURE not a bypass

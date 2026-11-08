@@ -2392,3 +2392,62 @@ nuke findings bank HERE, not there.
    preflight, and the S5 sender family is an unresolved hole). The 4-launch
    forced-capture is GATED behind the zero-capture walk of fn(0x17c54) +
    fn(0x16147) — run it first; only a revive hypothesis justifies launches.
+
+## S-T340 — SHIELD-COMPLETION WRITERS CLOSED (OQ-016 residue 4 CLOSED, 2026-11-08)
+ONE-launch witness work/r1/t340-shieldc-20261108-014705 (rc=0, 413 s, tool
+scripts/r340_shield_complete_session.py = r325 FIXED chain verbatim + 15 s
+whole-array ring sampling). Gridsor I pending item 26 Orbital^Shield acc=30 @
+turn 1086, stored IND=6, COST 60. MEASURED LAW (turns.jsonl per-turn diff of
+ALL 83 slot dwords + queue words):
+1. WHILE PENDING the sole per-turn mover in the whole slot array is the acc
+   word (+0x50) += stored IND (+0x44): 30/36/42/48/54 at t1086..1090; every
+   slot dword frozen. (Existing acc law 0x39005/0x3907b re-confirmed live.)
+2. AT THE COMPLETION BOUNDARY (turn 1091: acc 54+6=60 >= COST 60) exactly the
+   completion handler moves the slot: FUN_00038f68 0x3928b
+   `or WORD PTR [ebx+eax*4+0x2],dx` with edx=0x0f00 (0x3925b mov edx,0xf;
+   0x39260 cmp ch,0x1b -> item 27 gets 0x2300 instead; 0x39288 shl edx,0x8)
+   => word2 0x0000 -> 0x0f01 OBSERVED verbatim (slot76 raw 0x00001a01 ->
+   0x0f011a01): byte2 01 = built/active (t271 word2-bit0 law), byte3 0x0f=15
+   = ONE-TIME completion marker. Preceded by 0x3927a byte3:=0 (silent, writes
+   0 over 0); gate into the marker block: slot-record FLAG word bit 0x8
+   0x3924c SKIPS the marker block when bit 8 of the gate word is CLEAR
+   (je target = 0x39290, the queue-reset tail) => marker requires bit 8 SET;
+   gate word layout idx*40 + DS:0x73e46 (code computes 5*idx then *8). AND
+   slot >= cells (0x39256 cmp ax,[esi+0x18], jb 0x39290 skips marker —
+   surface slots take the reset WITHOUT the 0x0f00 marker [static]).
+   RUNTIME VERIFIED: item 26 gate word @DS:0x74256 = 0x8 (bit8 SET; DS base
+   linear B+0x82bb0=0x242088, turn-law self-check DS+0x12e10=1093) in
+   ring-final — marker path exactly as observed; item 27 word also 0x8;
+   item 43 = 0x305 (bit8 clear); item 0 = 0x0.
+3. QUEUE RESET tail (fire EIP 0x39290 = first insn after the store):
+   +0x52:=0xffff, +0x54 byte:=0xff, +0x50 acc:=0 — observed at t1091
+   (acc=0, item word=0). acc then resumes +6/turn t1092 6, t1093 12.
+4. WRITER IDENTITY: BPLM 0x25EAF4 fired EXACTLY ONCE whole-session
+   (00->0F) at EIP-linear 0x1f86e0 -> file 0x39290 = eip-(B-H) with
+   B=0x1bf4d8, H=0x88;
+   inside FUN_00038f68 (0x38f68..0x394d8, functions_full.tsv); fire regs
+   esi=0x270c66 = Gridsor I record linear VERIFIED vs ring-final
+   (physical 0x270cee-0x88), eax=0x4c=76=slot, edx=0xf00. Static store census
+   scripts/r340_slot_writers.py: FOUR slot-array *4 stores in the fn —
+   0x39164 (dig free, byte1:=ff), 0x391ce (dig word2:=0), 0x3920d (word2 |=2),
+   0x3928b (completion |= dx) — the shield completion used 0x3928b.
+5. NEW OBSERVATION (named, NOT decoded — candidate residue (6)): at the SAME
+   boundary slot43 byte1 0xff->0x00 and ring-final shows queue +0x52=43,
+   +0x54=0: item 0 FACTORY auto-RESERVED (t271 reservation pattern) on the
+   HUMAN planet at completion with no UI click. Selector-caller law 0x3ead6
+   says the AI selector runs queue-empty-only; whether it (or a
+   completion-tail auto-queue) reserves Factory on player planets is
+   UNMEASURED — the buildPhase comment's "no auto selector on player
+   planets" claim needs a witness before it can stand against this.
+6. t325 CENSUS EXPLAINED: byte+3==0 on all 44 pending rows (marker written
+   only at completion) and constant 15 on 43 completed rows (one-time 0x0f
+   marker) — byte+3 was NEVER a progress counter; residue-(4) premise dead,
+   row CLOSED. t325's four zero-fire launches were an INSTRUMENT bug
+   (pre-fix headerless popup detector), not the game: this session's drain
+   closed 7 popups of the exact class that stalled t325 (S1/_wip_t340).
+MEMDUMPBIN pitfall banked: `MEMDUMPBIN 0000:<8hex-linear> len file` ->
+"Invalid memory dump arguments" on this build (seg:off form wants different
+syntax); EXEC EV reads work fine. Rewrite: buildPhase (campaign.cpp:1012)
+models acc+=IND/completion/reset correctly (t340 CONFIRMS); comment now
+cites 0x3928b/0x39290 + this witness; no code delta (rewrite keeps no
+word2 slot-state model; none required by the channel law).

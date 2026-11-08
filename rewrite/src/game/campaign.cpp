@@ -1016,7 +1016,12 @@ void Campaign::buildPhase() {
     //    tick pays stored IND into the accumulator ONLY while pending
     //    (FUN_00038f68 0x39005: +0x54==0xFF jumps the accumulator block);
     //    completion at acc >= COST(item) (0x390a3 call 0x394d8 / JA 0x392a2),
-    //    then +0x50 resets (0x3929a).
+    //    then +0x50 resets (0x3929a). LIVE WITNESS t340 (income-law.md
+    //    S-T340): sole per-turn mover while pending is the acc word; at the
+    //    completion turn the handler sets slot word2 |= 0x0f01 (0x3928b,
+    //    gate: item flag word bit 8 + slot >= cells) then resets
+    //    +0x52=0xffff/+0x54=0xff/+0x50=0 (0x39290..0x3929a) — acc law and
+    //    reset confirmed verbatim.
     //  * The AI selector (FUN_0003f130) runs ONLY on planets with no pending
     //    item (caller law 0x3ead6) and requires stored IND > 0 (0x3f146).
     //  * Candidates: surface rows 0..21, Colony Base row 5 excluded,
