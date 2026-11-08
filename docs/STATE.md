@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-08T04:05
+updated: 2026-11-08T15:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,103 +212,63 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t343 PORTABILITY AUDIT + ARTIFACT CLOSURE (decision-free; high value;
-the "could this be re-implemented in Go/Rust from the docs alone?" test).
-ORDERING RATIONALE: t342 dispositioned residue-(5) as PLAYER-INPUT CLASS
-with cited measurement (income-law.md S-T342) — the OQ-016 residue list is
-now EXHAUSTED and every remaining ledger movement (OQ-005 D1 ruling,
-OQ-016 D2/D3 adjudication, OQ-019 disposition packet) is a USER decision,
-so the next productive loop task is the decision-free audit the queue
-lists as row 1. t344 (mouse-cursor draw-witness) follows; it needs 1-2
-launches and is unaffected by ordering.
-  (1) COMMIT the disk-only RE artifacts under a tracked path (artifacts/):
-      work/ascend_restored.bin (564 KB) + work/functions_full.tsv (12 KB) —
-      re-run scripts/r1_restore_sites.py validation first (pointer-run Watcom
-      start density) and record the command + output in artifacts/README.md.
-      NOTE work/ is gitignored wholesale: use `git add -f` and state why.
-      Do NOT commit game/ beyond what's already tracked, no saves, no banks.
-  (2) CLEAN-CLONE GATE TEST: clone this repo to /tmp (file:// is fine, zero
-      network), run `bash scripts/gate.sh` there, and report VERBATIM which
-      stages fail and why (expected suspects: docs/BASELINE.sha256 handling,
-      anything reaching work/ or the extracted/ tree, milestone parsing). Fix
-      only what is genuinely box-dependent drift; if a stage legitimately
-      requires the game dir or a live capture, document that in gate.sh's
-      header comment + docs/re/portability.md rather than weakening the stage.
-      MEASURED PAIRING SESSION 2026-11-08 (clone to /tmp/ascend-clone-test):
-      exit 0 both runs; binary built FROM SCRATCH in the clone (fresh
-      CMakeCache); second run also passes UI smoke + real-input xsend check +
-      audio; 4 residual skips are the capture/venv-dependent stages (R1 saves,
-      ascend_restored.bin, venv payload probes). STAGE-ORDER FIX: the build
-      (stage '4-5', gate.sh ~line 519) runs AFTER smokes 4c/4d, so a fresh
-      clone self-skips them on its FIRST gate run — move the build earlier (or
-      have the smokes trigger it) so first-run gates are honest; verify with a
-      third clean clone that a SINGLE run passes everything.
-  (3) LAW-RETRACTION INDEX: 340 iterations retracted some of their own earlier
-      readings (known family: t31/t32 pop-cap numbers, t47 §12/13 field labels,
-      t187 "4.67 = three sub-steps", t212 dark-zone zero-xref claim, t334
-      state-array retracted by t335, t326b S8(3) refuted by t331, t246
-      u16@0x131b4 attribution, t251 witness mine voided by t273, t196 mouse
-      k6/k7 corrected by t328). Build docs/re/retractions.md: one line per
-      retracted claim — WHAT WAS SAID / WHO SAID IT / SUPERSEDED BY / CURRENT
-      LAW — so a newcomer cannot pick up a dead reading as fact. Mine it from
-      the archived LANDED blocks (archive/state-v2-full/2026-11-03/STATE.md +
-      wip/) and the live docs; grep for RETRACT/REFUT/SUPERSED/CORRECT first,
-      verify each pair against the citing docs before listing. NEW PAIR FOR
-      t342: t45 "trigger values 33/34/35 NEVER occur (0/2810)" was CORPUS-
-      LIMITED (true of the Oct-5/6 early-turn captures; production t1086 has
-      320 owner-0 values {34:180,35:140}) — list it as a coverage correction,
-      closure route unchanged (income-law.md S14 correction block).
-  (4) docs/re/portability.md: the re-implementation reading order (formats ->
-      tables -> economy -> mapgen -> research -> combat -> victory -> AI), each
-      step naming the law file + its gate/pin, plus what is NOT portably known
-      (the open residues + the capture-limited class). Deliverable is the
-      reading order, not a re-narration of the laws.
-  Gate + both ledger audits green. No ledger row closes (audit task).
+NEXT t344 MOUSE-CURSOR DRAW-WITNESS (OQ-005, R13-clean: the VENDOR is the
+instrument). t328 (docs/re/shp.md S25, _wip_t328) measured mouse k5/k6/k7 as
+REAL frames: u16 dims @rec+0 walk EXACT-H 77/77 over 2038 stream bytes, while
+the canonical u32@+0x10 slot is zero-component (0,46)/(77,0)/(0,0) => the
+dispute is the dims SLOT LOCATION for this library, not junk. Selector
+UNKNOWN (no mouse SHAPEITEM in windows.txt; MOUSE.SHP@0x84314 has zero u32
+refs — pool-relative-immediate law means the referrer may be an imm, so hunt
+imm == str_off-0x82BB0 per datafiles.md, not u32). The cursor is drawn
+continuously in-game: (a) static hunt for the cursor-shape selector first
+(zero capture; the Windows driver layer / int33h hook is the candidate);
+(b) if found, ONE scratch launch (r1_dbg_session.py, own ring) to capture the
+vendor-drawn cursor region at multiple positions/shapes and pixel-compare vs
+ShapeLibrary.decode with dims@rec+0. MATCH => cited witness, bank to shp.md
+S26 + update the OQ-005 residue class list (this is the last non-user route
+for the dims-location question). NO MATCH / selector unidentified => honest
+negative, class becomes capture-limited, say so in the row. Budget 2 launches.
+ORDERING RATIONALE: t343 closed the portability audit decision-free; the
+queue's row 1 (t344) is next VERBATIM per queue discipline. t344 is the last
+non-user route for OQ-005; everything else open (OQ-016 D2/D3, OQ-019
+disposition packet, OQ-005 D1 ruling) waits on user decisions.
+  MEASURED CONTEXT t343 supplies: the static hunt in (a) reads
+  artifacts/ascend_restored.bin (TRACKED now, identical to the work/ copy —
+  either path; functions_full.tsv likewise tracked, hex sizes, overlapping
+  spans: pick tightest). docs/re/retractions.md entry #16 is the t196->t328
+  mouse pair — do not re-claim "no art"; entry #18 fixes k7 span at 189.
+Gate + both ledger audits green. No ledger row closes unless (b) lands a
+MATCH witness (strict-close: cited measurement + shp.md S26 + row update).
 FIRST ACTION of the iteration is still the sitting check (tail-seek newest
 turn in work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py
 BEFORE starting).
 
-CONTEXT BANKED: t342 landed the residue-(5) disposition (income-law.md
-S-T342 + correction block at S14; tool scripts/r342_queue_census.py exit 0;
-work/r342_census_pinned.out + work/r342_census_all.out; docs/re/_wip_t342.md
-S0-S2.8; REFUTED-ROUTES t342 amendments 1-2; buildPhase comment upgraded, no
-code delta). KEY LAWS t342 added: item COST word is DS+0x73E40+8+0x28*idx
-(NOT +2 — gate FLAGS word is +6; the old STATE text's "cost word +2" was
-WRONG); flag-bit1 items {31,32,33,34,37} keep queue cell 0xffff; orbit
-queue cells are >= cells (cap=cells+10); governor values 33/34/35 accrue
-+IND/turn indefinitely (not a cost-1 build). BINDING carried forward:
-Gridsor I is OWNER-1 — never call it a human planet (REFUTED-ROUTES t341
-amendment); the queue-pair writer census is CLOSED (sole writer fn 0x38840
-0x38af5..0x38b26 via the 0x38818->0x3875c->0x38718 chain) — do not
-re-census; event-15 is EVENTWIN-refresh-only (aicode.md S7.1) — do not hunt
-an effect arm. Turn tail order law: fn 0x24f24 loop A (FUN_00038f68 per
-planet, 0x2503c) runs BEFORE loop B (FUN_0003e6e0 per race row,
-0x25060/0x25083) + local row after at 0x250a5. The STATIC star-table base
-0x13bc5 read is GARBAGE on heap-moved saves — star corroboration only from
-verified anchors. t340 shield-completion law stands (income-law.md S-T340).
-The scratch campaign copy (RESUME.GAM.user-oct29 md5-pinned) is reusable
-for future witnesses; launch-1 harness bug stays fixed (T325.W_ANCH
-assignment).
+CONTEXT BANKED: t343 landed the portability audit (artifacts/ tracked +
+validated exit 0 by scripts/r343_artifact_validate.py; gate stage-order fix
+build->3-pre; skip notes split by cause; docs/re/retractions.md 24 verified
+pairs; docs/re/portability.md reading order; work/r343/clone-run{1,2,3}-gate.out
+verbatim). MEASURED LAW BANKED t343: the payload is a byte-exact slice of the
+tracked original — game/ascend.exe[0x2a50:0x2a50+0x8cc83] ==
+work/ascend_payload.bin EXACT (576,643 B); attribution_scan.py derives it and
+gate 3r now RUNS on fresh clones (run3: single clone run, exit 0, everything
+runnable executed; only capture/venv stages skip, notes naming the true
+cause). V2 PITFALL: start-density must be measured on the RESTORED-SITES
+population (55.3%/15.6%); the naive self-pointer population (21.6%) cannot
+pass the 2x bar — population definition is part of the law. Prior context:
+t342 residue-(5) disposition (income-law.md S-T342 + S14 correction;
+scripts/r342_queue_census.py exit 0; REFUTED-ROUTES t342 amendments 1-2).
+KEY LAWS carried: item COST word DS+0x73E40+8+0x28*idx (NOT +2); flag-bit1
+items {31,32,33,34,37} keep queue cell 0xffff; orbit cells >= cells
+(cap=cells+10); governor 33/34/35 accrue +IND/turn. BINDING: Gridsor I is
+OWNER-1 (REFUTED-ROUTES t341); queue-pair writer census CLOSED (sole writer
+fn 0x38840 0x38af5..0x38b26) — do not re-census; event-15 EVENTWIN-refresh
+only (aicode.md S7.1); turn tail fn 0x24f24 loop A before loop B; static star
+base 0x13bc5 GARBAGE on heap-moved saves. Scratch campaign copy
+(RESUME.GAM.user-oct29 md5-pinned) reusable; launch-1 harness bug fixed.
 QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed rows; t343 above is row 1;
-phase-5b rows t324-t342 all completed and retired — see LANDED blocks):
-
-t344 MOUSE-CURSOR DRAW-WITNESS (OQ-005, R13-clean: the VENDOR is the
-  instrument). t328 (docs/re/shp.md S25, _wip_t328) measured mouse k5/k6/k7 as
-  REAL frames: u16 dims @rec+0 walk EXACT-H 77/77 over 2038 stream bytes, while
-  the canonical u32@+0x10 slot is zero-component (0,46)/(77,0)/(0,0) => the
-  dispute is the dims SLOT LOCATION for this library, not junk. Selector
-  UNKNOWN (no mouse SHAPEITEM in windows.txt; MOUSE.SHP@0x84314 has zero u32
-  refs — pool-relative-immediate law means the referrer may be an imm, so hunt
-  imm == str_off-0x82BB0 per datafiles.md, not u32). The cursor is drawn
-  continuously in-game: (a) static hunt for the cursor-shape selector first
-  (zero capture; the Windows driver layer / int33h hook is the candidate);
-  (b) if found, ONE scratch launch (r1_dbg_session.py, own ring) to capture the
-  vendor-drawn cursor region at multiple positions/shapes and pixel-compare vs
-  ShapeLibrary.decode with dims@rec+0. MATCH => cited witness, bank to shp.md
-  S26 + update the OQ-005 residue class list (this is the last non-user route
-  for the dims-location question). NO MATCH / selector unidentified => honest
-  negative, class becomes capture-limited, say so in the row. Budget 2 launches.
+keep this block intact except deleting your completed rows; phase-5b rows
+t324-t342 + phase-6 row t343 completed and retired; t344 is the live NEXT
+above — see LANDED blocks):
 
 t345 SHIELD-BYTE LAW -> REWRITE CODE SITE (OQ-016 residue-(4) follow-through).
   t325 measured the census law (pending rows slot+3 == 0, 44/44; completed rows
@@ -392,6 +352,65 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t343 — 2026-11-08 (PORTABILITY AUDIT + ARTIFACT CLOSURE, DECISION-FREE,
+## THREE CLEAN CLONES MEASURED; NO LEDGER ROW CLOSES BY DESIGN)
+Sitting check FIRST: newest tail-seek turn 1086 == corpus (no new sitting; the
+file grew only from the production session's own writes). No launch taken this
+iteration; game/ read-only; production :9 never signalled.
+(1) ARTIFACTS TRACKED: artifacts/{ascend_restored.bin,functions_full.tsv,
+README.md} committed as a COPY out of gitignored work/ (cleaner than the
+assignment's `git add -f` route; supersession stated in the README). Validation
+scripts/r343_artifact_validate.py exit 0, command+output in the README:
+V1 rebuild from work/r1/r1sav-20261011-213606 slot 46.sav (H=0x88 B=0x1bf4d8
+P0=0x1bf450) is CODE-WINDOW BYTE-IDENTICAL to the committed image; 9 differing
+bytes in 3 u32-groups, all data-region (0x8bed0/0x8bedc/0x8bee4) = capture-
+dependent fixup-class drift, documented as expected, NOT papered over.
+V2 Watcom start density on the RESTORED-SITES population 575/1039 = 55.3% vs
+15.6% control (3.55x; banked pairing figure 60%/15% re-confirmed on the
+committed bytes). PITFALL BANKED: the naive aligned-self-pointer population
+measures 21.6% and CANNOT pass the 2x bar — population definition is part of
+the law (first V2 attempt failed on exactly this).
+V3 tsv: header exact, 1,144 rows hex-parse, spans in range, 904 overlaps known.
+(2) CLEAN-CLONE GATE TEST, tool scripts/r343_clone_gate.sh (file:// clone, zero
+network, verbatim output to work/r343/clone-runN-gate.out):
+RUN1 (pre-fix): exit 0 BUT three stages self-skipped on the first run — the
+build lived at the bottom (stage '4-5'), so 4e/4c/4d saw no binary, and their
+single else-note blamed xvfb-run for a missing binary (MISATTRIBUTED SKIP,
+confirms the pairing measurement).
+FIX LANDED (gate.sh): build/test/boot block hoisted to "3-pre" right after
+docs integrity; skip notes split by cause (binary absent vs toolchain absent)
+in 4e/4c/4d. No stage weakened: every check that runs still asserts the same
+grammar. RUN2 (working-tree gate on clone): exit 0, binary built early, the
+run1-vs-run2 skip-note diff is EXACTLY the three lines disappearing (xsend
+click line present = real-input check ran). RUN3 (committed tree, SINGLE run,
+14:53:36->14:54:20 = 44 s wall INCLUDING the from-scratch cmake+build the gate
+itself performed): exit 0; everything runnable executed; remaining skips are
+the capture stages (3q pointer-law, 3s star-table) + venv loader-model probes,
+notes naming the true cause.
+(3) PORTABILITY UPGRADE MEASURED: game/ascend.exe[0x2a50:0x2a50+0x8cc83] ==
+work/ascend_payload.bin EXACT (576,643 B) — the payload is a byte-exact slice
+of the TRACKED original. attribution_scan.py now derives it when the work copy
+is absent, prefers artifacts/ascend_restored.bin, and mkdir -p's work/ for its
+tsv; gate 3r guard widened to the tracked path. Net effect: a fresh clone with
+the game dir RUNS the attribution stage (was: skip) — run3 confirms.
+(4) docs/re/retractions.md: 24 entries (WHAT SAID / BY WHOM / SUPERSEDED BY /
+CURRENT LAW), every pair verified against the citing doc this session; covers
+the assignment's known family (t31/t32 pop-cap, t47 labels, t187 4.67, t212
+alias, t334->t335, t326b->t331, t246 0x131b4, t196->t328 mouse) plus pairs
+mined live (t247 +0x5a, t249 occupied, t251 bank-blind, t266 ring collision,
+t267 kill SOP, t283 debugger revival, t342 COST +8 + 33/34/35 coverage,
+t162 manifest, 05j rv-B mislabel). combat.md ~L467 still prints the narrow
+ah>=4 form — flagged in entry #15 rather than silently edited.
+(5) docs/re/portability.md: reading order formats -> tables -> worldgen ->
+economy -> combat -> dip -> victory -> AI, each step law-file + gate stage /
+pin TEST name (verified against gate.sh stage list + rewrite/tests), plus the
+NOT-portably-known section (open rows, capture-limited class, box-limited
+gates, and the rule a skip note must name the ACTUAL missing prerequisite).
+LEDGER: 16 closed / 3 open UNCHANGED (audit task; no row touched, no strict-
+close attempted — nothing in this iteration was a law measurement on a row).
+Working notes docs/re/_wip_t343.md. Gate green incl both ledger audits.
+NEXT = t344 MOUSE-CURSOR DRAW-WITNESS VERBATIM (queue row 1).
 
 ## LANDED t342 — 2026-11-08 (OQ-016 RESIDUE-(5) "HUMAN BUILD-ORDER
 ## MINUTIAE" DISPOSITIONED PLAYER-INPUT CLASS WITH CITED MEASUREMENT, ZERO
