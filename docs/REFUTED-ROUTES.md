@@ -1198,7 +1198,8 @@ from a non-16 state is NOT evidence of unreachability.
 ## (2) INSTRUMENT VERDICT on the t325 zero-fire launches (t325-shield-
 ##     20261107-005947/-013553): their stalls at turn 1087 were the
 ##     pre-fix headerless (rgb:-) popup detector, NOT the game — the
-##     committed detector clears the exact stall popup (t340 drained 7).
+##     committed detector clears the exact stall popup (t340 drained 23 OK
+##     clicks across 7 drain calls; t325's detector closed 0 on the same class).
 ##     Any future claim "t325 showed the game blocks turn advance" is VOID.
 ## (3) MEMDUMPBIN SYNTAX TRAP: `MEMDUMPBIN 0000:<8hex-linear> len file` ->
 ##     "Invalid memory dump arguments" on this dosbox-x-dbg build (t325's

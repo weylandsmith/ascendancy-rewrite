@@ -2444,7 +2444,8 @@ ALL 83 slot dwords + queue words):
    marker) — byte+3 was NEVER a progress counter; residue-(4) premise dead,
    row CLOSED. t325's four zero-fire launches were an INSTRUMENT bug
    (pre-fix headerless popup detector), not the game: this session's drain
-   closed 7 popups of the exact class that stalled t325 (S1/_wip_t340).
+   closed 23 popups (7 drain calls) of the exact class that stalled t325
+   (S1/_wip_t340).
 MEMDUMPBIN pitfall banked: `MEMDUMPBIN 0000:<8hex-linear> len file` ->
 "Invalid memory dump arguments" on this build (seg:off form wants different
 syntax); EXEC EV reads work fine. Rewrite: buildPhase (campaign.cpp:1012)

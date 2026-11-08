@@ -258,8 +258,10 @@ r340_shield_complete_session.py (T325.W_ANCH assignment).
 ONE scratch debugger session work/r1/t340-shieldc-20261108-014705 (rc=0,
 413 s; tool scripts/r340_shield_complete_session.py = r325 FIXED chain
 verbatim + 15 s whole-array ring sampling to turns.jsonl; private Xvfb :97,
-own ring dir, core=normal, TL 3600; teardown SIGKILL RECORDED dosbox 208042/
-Xvfb 208038; production :9 136357/136359 + Xvfb 1461 ps-verified UNTOUCHED;
+own ring dir, core=normal, TL 3600; teardown SIGKILL RECORDED dosbox 208428/
+Xvfb 208424 (kill_rec prints to STDOUT only, not session.log — read the bg
+transcript for teardown lines); production :9 136357/136359 + Xvfb 1461
+ps-verified UNTOUCHED;
 sitting check NEGATIVE turn 1086; launch-1 …013812 renamed .harnessbug1 =
 exit-2 class NameError, not a scientific negative). PROVED: (1) PER-TURN LAW
 t1086..1093: pending acc 30/36/42/48/54 (+6=stored IND verbatim), ALL 83
@@ -274,7 +276,7 @@ EIP-linear 0x1f86e0 = file 0x39290, inside FUN_00038f68 (0x38f68..0x394d8);
 fire regs esi=0x270c66 = Gridsor I linear VERIFIED, eax=76, edx=0xf00.
 Static census scripts/r340_slot_writers.py: 4 slot *4-stores in the fn
 (0x39164/0x391ce dig, 0x3920d |=2, 0x3928b completion). (4) t325 INSTRUMENT
-VERDICT: drain closed 7 popups of the exact class that stalled t325
+VERDICT: drain closed 23 popups (7 drain calls) of the exact class that stalled t325
 (offline: committed detector returns (406,442) on t325's drain_0.png) —
 t325's four zero-fire launches were NEVER the game. (5) NEW named observation
 (candidate residue 6, NOT part of the closure): slot43 byte1 ff->00 same

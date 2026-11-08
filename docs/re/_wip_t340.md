@@ -104,9 +104,12 @@ work/r1/t340-shieldc-20261108-014705/turns.jsonl, first-sample-per-turn):
     witness.)
 (3) slot43 byte1 0xff->0x00 at the same boundary (empty cell -> byte1=0) —
     secondary mover, decode pending vs planitem.txt + fn at 0x39290.
-(4) Popups: 6+1 drain closes where t325 closed 0 — the S1 instrument verdict
+(4) Popups: 23 OK-clicks across 7 drain calls (4/6/1/4/4/3/1) where t325
+    closed 0 — the S1 instrument verdict
     confirmed live; t325's four zero-fire launches were NEVER the game.
-Teardown SIGKILL recorded (dosbox 208042, Xvfb 208038). Exit rc=0.
+Teardown SIGKILL recorded (dosbox 208428, Xvfb 208424 — from the bg stdout
+transcript; kill_rec does not write session.log. 208042/208038 were
+launch-1's pids). Exit rc=0.
 
 ## S4 — WRITER SITE + STATIC CROSS-CHECK (scripts/r340_writer_site.py exit 0)
 - Fire EIP linear 0x1f86e0 -> file 0x39290; containing function span
