@@ -220,7 +220,19 @@ record linear verified. NEW named observation (candidate residue 6, NOT
 part of the closure): slot43 byte1 ff->00 at the same boundary = item 0
 FACTORY auto-reserved on the HUMAN planet at completion, queuer undecoded —
 the buildPhase "no auto selector on player planets" comment claim needs a
-witness. Rewrite buildPhase confirmed, comment cites 0x3928b/0x39290; (5) human build-order minutiae 0.4% samples;
+witness. t341 CLOSED CANDIDATE RESIDUE-(6) 2026-11-08 WITH CITED MEASUREMENT
+(zero capture; docs/re/income-law.md S-T341 + docs/re/_wip_t341.md S0-S5,
+tools scripts/r341_dis.py + r341_queue_writers.py + r341_writer_paths.py exit
+0): the t340 "HUMAN planet" reading was an OWNER MISATTRIBUTION — Gridsor I
+owner byte (NAME+0x33 == +0x57, t248 law) = 1 (AI) in all 20 ring saves; the
+re-queue is the banked AI selector (fn 0x24f24 turn tail runs FUN_00038f68
+per planet BEFORE FUN_0003e6e0/FUN_0003ea54 per race; queue-empty caller
+0x3ead6; sole writer fn 0x38840 0x38af5..0x38b26; item 0 absent + COST/IND=5
+< 70 -> deterministic first pick per t28 law). MEASURED LAW BANKED: the
+vendor NEVER auto-queues for the human (local-race gate 0x3eabf..0x3eacd on
+[p+0x5a]!=0, all owned planets read 0; 13/13 empty owner-0 queues persisted
+over 7 turns). buildPhase comment upgraded to cite the witness; no code
+delta. Rewrite buildPhase confirmed, comment cites 0x3928b/0x39290; (5) human build-order minutiae 0.4% samples;
 item-35/35 completion branches = MEASURED zero-witness + AI-unreachable
 (REFUTED t271, re-open conditions there). t299 debugger leg witness ran
 (2026-11-04): zero fires; t301 re-attributed as ARMING-FAILURE not a bypass

@@ -1034,9 +1034,13 @@ void Campaign::buildPhase() {
     //    FUN_0003fec4, 65% full-sum / 35% primary roll @0x3f6fb).
     // Planet builds never touch the empire IND stockpile (payment is the
     // per-planet accumulator, S8); ind_ remains the ship-launch budget only.
-    // Player planets: the original is UI-driven (no auto selector); the
-    // rewrite keeps kBuildOrder as the pick policy under the SAME queue law
-    // [documented default].
+    // Player planets: the original is UI-driven (no auto selector) — MEASURED
+    // t341 (income-law.md S-T341): selector caller FUN_0003ea54 gates the
+    // LOCAL race's planets on [p+0x5a]!=0 (all owned planets read 0) and 13
+    // empty human queues stayed empty across 7 turns while AI empires
+    // re-queued; the "human auto-reserve" t340 lead was an owner-1 planet
+    // (misattribution). The rewrite keeps kBuildOrder as the pick policy
+    // under the SAME queue law [documented default, now witness-backed].
     for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
         int o = owner_[s];
         if (o < 0) continue;

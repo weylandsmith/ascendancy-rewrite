@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-08T02:25
+updated: 2026-11-08T04:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,42 +212,98 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t341 — CANDIDATE-RESIDUE-(6) DECODE: FACTORY AUTO-RESERVE AT BUILD
-COMPLETION (ZERO CAPTURE). t340 S4(5) MEASURED at the completion boundary:
-Gridsor I (HUMAN, owner index 0) slot43 byte1 0xff->0x00 + queue words
-+0x52=43/+0x54=0 (item 0 FACTORY, t271 reservation pattern) with NO UI click
-— the original auto-queues a build on a player planet the instant the queue
-empties, while rewrite buildPhase (campaign.cpp:1032 comment) claims "Player
-planets: the original is UI-driven (no auto selector)". If the vendor really
-auto-reserves for humans, that is a rewrite delta (buildPhase gains the
-player-planet queue-when-empty path) AND it re-opens part of OQ-016 residue
-(5) (human build order is machine-chosen after all, at least the first pick).
-Method (static only, tools exist): walk FUN_00038f68's completion tail from
-0x392f4 (the jmp after the reset) + every in-image caller of the selector
-family FUN_0003f130 (banked caller law 0x3ead6 queue-empty-only) for a
-per-planet loop that covers race-slot 0; check the selector candidate scan
-0x3f672..0x3f733 pick law against the OBSERVED choice (item 0 Factory on a
-planet with 26 items already); ring-final of
-work/r1/t340-shieldc-20261108-014705 is the ground-truth save (turn 1093,
-Factory pending, acc=12) — reuse scripts/r340_shield_complete_session.py's
-sample_ring() offline. OUTCOMES: auto-queue path found + owner-0 reachable
--> rewrite upgrade + pin; path found but owner-gated away from 0 -> the
-reserve came from elsewhere (UI replay? the t271 pattern writer census);
-no path -> honest negative, residue-(6) stays open, t342 = residue-(5)
-corpus census or park-on-sentinel per DECISIONS.md D3. FIRST ACTION of the
-iteration is still the sitting check (tail-seek newest turn in
-work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py BEFORE
-starting).
-CONTEXT BANKED: t340 landed the shield-completion law (income-law.md S-T340,
-REFUTED-ROUTES t340 amendment 3 binding clauses incl. the t325 instrument
-verdict + MEMDUMPBIN trap) — residue-(4) CLOSED, do not re-census byte+3, do
-not spend another launch on it. The OQ-016 residue-(1) arming question stays
-cited-dead (EIGHT legs), closure = user ruling D2-c only. msg-routing layer
-(router 0x30c9c, pump 0x56b5c, [child+0x63] law) banked at t339. Window
-records are NOT in saves (t339 S7) — window-field questions are
-live-legs-only. The scratch campaign copy (RESUME.GAM.user-oct29 md5-pinned)
-is reusable for future witnesses; launch-1 harness bug fixed in
-r340_shield_complete_session.py (T325.W_ANCH assignment).
+NEXT t342 — RESIDUE-(5) CORPUS CENSUS OF THE HUMAN BUILD QUEUE + THE
+UI-COMMAND LEG (ZERO CAPTURE; offline over existing saves).
+ORDERING RATIONALE: t341 closed candidate residue-(6) as an owner
+misattribution (Gridsor I is owner-1; income-law.md S-T341) and banked the
+law "the vendor never auto-queues for the human" on a 7-turn window + the
+static local-race gate. Residue-(5) ("human build-order minutiae") is the
+ONLY OQ-016 residue with an in-image route left (residue-(1) = user ruling
+D2-c only, EIGHT cited-dead legs; OQ-019 residues = unreachable-by-capture,
+dispositioned t323/t332; OQ-005 = D1 ruling + user B-rows ask). The t341
+window is thin: widen it to the whole corpus and adjudicate whether human
+(owner-0) pending queue rows are ALWAYS explainable as UI-command-path
+writes (fn 0x3aa0a planet-window cmd leg 0x3ae99/0x3b0d1/0x3d887 ->
+0x38818/0x38840 chain, t341 S5.2) — if pending owner-0 rows across the
+needle-verified save set carry acc>0/COST patterns consistent with
+player-clicked queue entries (and never a same-turn completion-then-queue
+signature on owner-0 planets), the "minutiae" residue is dispositioned
+player-input-class (no vendor law missing) and the OQ-016 residue list is
+EXHAUSTED -> per DECISIONS.md D3 recommend park-on-sentinel; if any save
+shows a pending owner-0 queue the UI could not have written, name it
+residue-(7) with exact save/turn/planet + capture design.
+Method: scripts/r341_dis.py disasm context; census via IL.find_records
+heap-record law (name base+0x24, owner +0x57, queue +0x52/+0x54, acc +0x50)
+over production playcap/save (t1086 corpus), work/r1/playcap/caps, bank
+t1254, and the t340 ring-final; per-save owner-0 pending rows + acc/COST
+(item gate words DS:0x73e46+idx*40, cost word +2). NO launch, no debugger.
+FIRST ACTION of the iteration is still the sitting check (tail-seek newest
+turn in work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py
+BEFORE starting).
+
+CONTEXT BANKED: t341 landed the auto-reserve resolution (income-law.md
+S-T341; tools scripts/r341_dis.py, r341_queue_writers.py,
+r341_writer_paths.py exit 0; work/r341_queue_writers.out; docs/re/
+_wip_t341.md S0-S5.5). BINDING: Gridsor I is OWNER-1 — never call it a
+human planet (REFUTED-ROUTES t341 amendment); the queue-pair writer census
+is CLOSED (sole writer fn 0x38840 0x38af5..0x38b26 via the
+0x38818->0x3875c->0x38718 chain) — do not re-census; event-15 is
+EVENTWIN-refresh-only (aicode.md S7.1) — do not hunt an effect arm. Turn
+tail order law: fn 0x24f24 loop A (FUN_00038f68 per planet, 0x2503c) runs
+BEFORE loop B (FUN_0003e6e0 per race row, 0x25060/0x25083) + local row
+after at 0x250a5. The STATIC star-table base 0x13bc5 read is GARBAGE on
+heap-moved saves — star corroboration only from verified anchors. t340
+shield-completion law stands (income-law.md S-T340). The scratch campaign
+copy (RESUME.GAM.user-oct29 md5-pinned) is reusable for future witnesses;
+launch-1 harness bug stays fixed (T325.W_ANCH assignment).
+
+## LANDED t341 — 2026-11-08 (CANDIDATE OQ-016 RESIDUE-(6) RESOLVED WITH
+## CITED MEASUREMENT, ZERO CAPTURE: THE "FACTORY AUTO-RESERVE ON THE HUMAN
+## PLANET" WAS AN OWNER MISATTRIBUTION — GRIDSOR I IS OWNER-1 (AI); THE
+## RE-QUEUE IS THE BANKED AI SELECTOR; LAW BANKED: THE VENDOR NEVER
+## AUTO-QUEUES FOR THE HUMAN PLAYER)
+Offline iteration over the t340 ground-truth ring-final + restored-image
+disasm (work/r331_disasm.txt). Sitting check NEGATIVE (tail-seek, newest
+live-timeline turn 1086 == corpus); production :9 never signalled; game/
+read-only. PROVED: (1) OWNER CORRECTION — Gridsor I planet-record owner byte
+([base+0x57]==NAME+0x33, t248 law) = 1 in ALL 20 ring saves; named-pool
+census {0:80,1:11,2:13,255:41} (owner-0 80 == t248 PROOF 2 t1086 EXACT);
+ds:0x7458e=0, ds:0x10ba4=0. t340 LANDED clause (5) VOID as stated.
+(2) TURN-TAIL ORDER verbatim (fn 0x24f24): loop A 0x2503c calls
+FUN_00038f68 per planet BEFORE loop B 0x25060/0x25083 calls FUN_0003e6e0
+per race row; local row after loop at 0x250a5 — completion-reset then AI
+re-queue inside one boundary, exactly t340's observation. (3) LOCAL-RACE
+GATE verbatim 0x3eabf..0x3eacd: selector FUN_0003f130 (sole caller 0x3eade,
+queue-empty-only 0x3ead6) runs on LOCAL-race planets iff [p+0x5a]!=0; ALL
+104 owned planets read [p+0x5a]=0 MEASURED. MEASURED LAW: 13 owner-0
+empty-queue planets at t1086 stayed empty at t1093 (13/13, 7 turns) while
+AI empires re-queued — player build order is UI-driven; rewrite buildPhase
+comment upgraded to cite the witness (campaign.cpp, no code delta).
+(4) WRITER CENSUS CLOSED (scripts/r341_queue_writers.py exit 0,
+work/r341_queue_writers.out; scripts/r341_writer_paths.py exit 0): sole
+in-image queue-pair writer fn 0x38840 0x38af5..0x38b26 reached via
+0x38818->0x3875c->0x38718->0x38753 (17 direct callers; UI leg fn 0x3aa0a
+0x3ae99/0x3b0d1/0x3d887; selector legs 0x3f1f6/0x3f2ff/0x3f403/0x3f4c7);
+resets 0x37f8d/0x3a153/0x39290; 0x3a596 block = record copy ctor. Slot43
+byte1 ff->0x00 == writer byte1:=item(0) verbatim. (5) PICK CONSISTENCY:
+item 0 gate flag 0x0 COST 30, Gridsor I IND=6 (ratio 5 < 70), item 0 ABSENT
+from the 76-slot array -> absent-first-pass table order (t28 0x3f6a7 law)
+picks Factory DETERMINISTICALLY; cell 43 = rng legal-cell picker. AI
+empty-queue non-fires (4 planets, all pop==cap IND 6-7) consistent with the
+t28 over-cap path — honest control, closure does not rest on it.
+(6) EVENT-15 (completion-tail producer 0x3939b) consumer arm {0,1,2,15} =
+EVENTWIN refresh ONLY (banked aicode.md S7.1) — cannot queue builds.
+HONEST NEGATIVES: star-bitmask corroboration ATTEMPTED via static base
+0x13bc5 = garbage on heap-moved saves (not claimed); per-planet AI pick
+adjudication stays residue-(5) minutiae. LEDGER: candidate residue-(6)
+CLOSED as non-phenomenon with cited measurement; OQ-016 ROW STAYS OPEN
+(residues 1, 5); count 16/3 unchanged. Files: docs/re/_wip_t341.md S0-S5.5,
+income-law.md S-T341 (hand-authored, no regenerator — verified),
+OPEN-QUESTIONS residue-(6) rewrite, campaign.cpp buildPhase comment,
+REFUTED-ROUTES t341 amendment (3 clauses). Tools scripts/r341_dis.py +
+r341_queue_writers.py + r341_writer_paths.py exit 0. GATE 0, ledger + index
+audits OK. NEXT=t342 residue-(5) corpus census VERBATIM
+
 
 ## LANDED t340 — 2026-11-08 (OQ-016 RESIDUE-(4) CLOSED WITH CITED MEASUREMENT:
 ## THE SHIELD COMPLETION HANDLER IS THE SOLE SLOT WRITER — word2 |= 0x0f01

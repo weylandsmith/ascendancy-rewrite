@@ -1206,3 +1206,26 @@ from a non-16 state is NOT evidence of unreachability.
 ##     byte-at-arm and t340's code/stack dumps all no-op'd). Use EXEC EV for
 ##     registers; do not trust a MEMDUMPBIN hdr=OK BEGIN as a file landing
 ##     without checking the file exists.
+
+## t341 AMENDMENT (2026-11-08) — binding clauses, OQ-016 residue-(6) class
+## (1) GRIDSOR I IS OWNER-1 (AI) — MEASURED in all 20 ring saves of
+##     work/r1/t340-shieldc-20261108-014705 (owner byte [rec+0x57]==NAME+0x33
+##     per the t248 law; named-pool census {0:80,1:11,2:13,255:41}). The t340
+##     "item 0 FACTORY auto-reserved on the HUMAN planet" lead is a
+##     MISATTRIBUTION, resolved in docs/re/income-law.md S-T341. Do NOT treat
+##     Gridsor I as a human planet in any future witness, and do NOT re-open
+##     residue-(6): the vendor NEVER auto-queues for the human (local-race
+##     gate 0x3eabf..0x3eacd on [p+0x5a]!=0, all 104 owned planets read 0;
+##     13/13 empty owner-0 queues persisted 7 turns while AI empires queued).
+## (2) QUEUE-WRITER CENSUS CLOSED: the ONLY in-image stores of the planet
+##     queue pair (+0x52 WORD cell / +0x54 BYTE item) are fn 0x38840
+##     0x38af5..0x38b26 (chain 0x38818->0x3875c->0x38718->0x38753; 17 direct
+##     callers incl. UI leg fn 0x3aa0a; selector legs in fn 0x3f130). Resets
+##     live at 0x37f8d/0x3a153/0x39290; the 0x3a596..0x3a6b9 block is the
+##     record COPY ctor, not a queue op. Reproduction:
+##     scripts/r341_queue_writers.py + scripts/r341_writer_paths.py (exit 0).
+##     Do not re-census.
+## (3) STATIC STAR-TABLE READ TRAP: the data-seg star base 0x13bc5 does NOT
+##     resolve in heap-moved scratch saves (owner-mask corroboration returned
+##     garbage). Star-record claims need an anchor verified per-save (name
+##     law), not the static base.

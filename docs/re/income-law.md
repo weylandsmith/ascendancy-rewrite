@@ -2452,3 +2452,44 @@ syntax); EXEC EV reads work fine. Rewrite: buildPhase (campaign.cpp:1012)
 models acc+=IND/completion/reset correctly (t340 CONFIRMS); comment now
 cites 0x3928b/0x39290 + this witness; no code delta (rewrite keeps no
 word2 slot-state model; none required by the channel law).
+
+## S-T341 — FACTORY AUTO-RESOLVE RESIDUE CLOSED AS A MISATTRIBUTION
+## (candidate OQ-016 residue-(6); zero capture; 2026-11-08)
+Ground truth = t340 run ring-final (work/r1/t340-shieldc-20261108-014705),
+re-read offline via IL.find_records + scripts/r341_dis.py /
+r341_queue_writers.py / r341_writer_paths.py (all exit 0;
+work/r341_queue_writers.out). FINDINGS:
+1. OWNER CORRECTION (decisive): Gridsor I owner byte [base+0x57]==NAME+0x33
+   (t248 owner law, selfplay.md) = 1 (AI race) in ALL 20 ring saves — NOT
+   the human (ds:0x7458e=0, ds:0x10ba4=0). Named-pool owner census
+   {0:80,1:11,2:13,255:41}; owner-0 count 80 == t248 PROOF 2 t1086 EXACT.
+   The t340 S-T340 clause-5 "auto-reserved on the HUMAN planet" is VOID;
+   the observed re-queue is the AI selector doing its banked job.
+2. TURN-TAIL ORDER (fn 0x24f24 verbatim 0x2503c..0x250a5): loop A calls
+   FUN_00038f68 per planet BEFORE loop B calls FUN_0003e6e0 per race row
+   (local row skipped in-loop, called after at 0x250a5) — completion-reset
+   then AI re-queue in one boundary, exactly as t340 measured.
+3. LOCAL-RACE GATE (0x3eabf..0x3eacd verbatim): the selector FUN_0003f130
+   runs on a LOCAL-race planet iff [p+0x5a]!=0; all 104 owned planets read
+   [p+0x5a]=0 MEASURED -> human planets are NEVER selector-fed in this
+   capture class. 13 owner-0 empty-queue planets at t1086 stayed empty at
+   t1093 (13/13 over 7 turns). *** LAW: the vendor never auto-queues a
+   build for the human player; player build order is UI-driven. *** The rewrite comment at
+   rewrite/src/game/campaign.cpp buildPhase now cites this witness (no code
+   delta — the documented default stands MEASURED, upgrade class).
+4. WRITER CENSUS CLOSED: the ONLY in-image store of the planet queue pair
+   (+0x52 WORD cell / +0x54 BYTE item) is fn 0x38840 0x38af5..0x38b26
+   (cmd1/cmd2 arm), reached by the 0x38818->0x3875c->0x38718->0x38753 chain
+   (17 direct callers + UI fn 0x3aa0a at 0x3ae99) and the selector legs
+   0x3f1f6/0x3f2ff/0x3f403/0x3f4c7; resets at 0x37f8d/0x3a153/0x39290; the
+   0x3a596.. block is the record COPY ctor, not a queue op. Slot43 byte1
+   ff->0x00 == writer store byte1:=item(0) verbatim (0x38b1b, item!=0x23).
+5. PICK CONSISTENCY: item 0 flag 0x0 COST 30 (gate word DS:0x73e46),
+   Gridsor I IND=6 (ratio 5 < 70 no abort), item 0 ABSENT from its 76-slot
+   array -> absent-item-first-pass in table order (t28 pick law 0x3f6a7)
+   picks Factory DETERMINISTICALLY; cell 43 = random-legal-cell picker
+   (rng). AI empty-queue non-fires (Shlupp II/III, Sarsaparilla I, Feculon
+   I, all pop==cap, IND 6-7) are t28 over-cap-path consistent, not counter-
+   examples.
+6. EVENT-15 (completion tail producer 0x3939b): consumer arm {0,1,2,15} =
+   EVENTWIN refresh ONLY (aicode.md S7.1 banked t102) — cannot queue builds.
