@@ -232,7 +232,28 @@ per planet BEFORE FUN_0003e6e0/FUN_0003ea54 per race; queue-empty caller
 vendor NEVER auto-queues for the human (local-race gate 0x3eabf..0x3eacd on
 [p+0x5a]!=0, all owned planets read 0; 13/13 empty owner-0 queues persisted
 over 7 turns). buildPhase comment upgraded to cite the witness; no code
-delta. Rewrite buildPhase confirmed, comment cites 0x3928b/0x39290; (5) human build-order minutiae 0.4% samples;
+delta. Rewrite buildPhase confirmed, comment cites 0x3928b/0x39290;
+(5) human build-order minutiae — DISPOSITIONED PLAYER-INPUT CLASS 2026-11-08
+t342 (ZERO capture; docs/re/income-law.md S-T342 + docs/re/_wip_t342.md, tool
+scripts/r342_queue_census.py exit 0): corpus census of 4891 pending owner-0
+queue rows (60 saves: playcap t1086 + bank-t1254 + t340 ring; caps EMPTY),
+FULL-CORPUS PASS 3324 saves / 144,302 owner-0 pending rows, 0
+complete-then-requeue vs AI control 180 —
+[p+0x5a]==0 4891/4891, netplay==0 60/60 (selector gate 0x3eabf..0x3eacd
+statically excludes FUN_0003f130 from every row); turn-sorted transitions
+owner-0 PROGRESS 247 / DRAIN 8 / complete-then-requeue 0 while the SAME
+instrument fires the AI signature 3/3 (Gridsor I, Arcturus I, Sarsaparilla
+III); all 8 human DRAINs = completion + slot word2 bit0 SET + queue empty
+next save; every anomaly class collapses to a banked law (flag-bit1 0xffff
+cell t341; orbit slots cap=cells+10 t340; governor 33/34/35 acc-growth +
+mode-3 select t45; ship COST=design value t27 with frozen bank rows). UI
+writer legs named verbatim (fn 0x3aa0a 0x3b0d1/0x3d887/0x3b349/0x3b411/
+0x3b482/0x3c9fc/0x3ca44/0x3daa9; fn 0x3a174 0x3a3f0/0x3a455; 0x3ae99 nougat-
+gated). NO residue-(7): no pending owner-0 row requires a non-UI writer.
+buildPhase comment upgraded to cite the corpus witness (no code delta). The
+OQ-016 residue list is now EXHAUSTED ((1) cited-dead x8 legs = user ruling,
+(2)(3)(4) CLOSED, (6) CLOSED as misattribution) — row movement per D3 is
+USER ADJUDICATION; row stays open strict-close.
 item-35/35 completion branches = MEASURED zero-witness + AI-unreachable
 (REFUTED t271, re-open conditions there). t299 debugger leg witness ran
 (2026-11-04): zero fires; t301 re-attributed as ARMING-FAILURE not a bypass

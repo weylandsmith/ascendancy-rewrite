@@ -1039,8 +1039,12 @@ void Campaign::buildPhase() {
     // LOCAL race's planets on [p+0x5a]!=0 (all owned planets read 0) and 13
     // empty human queues stayed empty across 7 turns while AI empires
     // re-queued; the "human auto-reserve" t340 lead was an owner-1 planet
-    // (misattribution). The rewrite keeps kBuildOrder as the pick policy
-    // under the SAME queue law [documented default, now witness-backed].
+    // (misattribution). WITNESSED CORPUS-WIDE t342 (income-law.md S-T342):
+    // 144,302 pending owner-0 rows over 3,324 saves, 0 complete-then-
+    // requeue transitions (AI positive control fires 180), every row a
+    // UI-order / governor / frozen-ship class. The rewrite keeps
+    // kBuildOrder as the pick policy under the SAME queue law [documented
+    // default, now witness-backed at corpus scale].
     for (size_t s = 0; s < galaxy_.stars.size(); ++s) {
         int o = owner_[s];
         if (o < 0) continue;

@@ -212,56 +212,15 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t342 — RESIDUE-(5) CORPUS CENSUS OF THE HUMAN BUILD QUEUE + THE
-UI-COMMAND LEG (ZERO CAPTURE; offline over existing saves).
-ORDERING RATIONALE: t341 closed candidate residue-(6) as an owner
-misattribution (Gridsor I is owner-1; income-law.md S-T341) and banked the
-law "the vendor never auto-queues for the human" on a 7-turn window + the
-static local-race gate. Residue-(5) ("human build-order minutiae") is the
-ONLY OQ-016 residue with an in-image route left (residue-(1) = user ruling
-D2-c only, EIGHT cited-dead legs; OQ-019 residues = unreachable-by-capture,
-dispositioned t323/t332; OQ-005 = D1 ruling + user B-rows ask). The t341
-window is thin: widen it to the whole corpus and adjudicate whether human
-(owner-0) pending queue rows are ALWAYS explainable as UI-command-path
-writes (fn 0x3aa0a planet-window cmd leg 0x3ae99/0x3b0d1/0x3d887 ->
-0x38818/0x38840 chain, t341 S5.2) — if pending owner-0 rows across the
-needle-verified save set carry acc>0/COST patterns consistent with
-player-clicked queue entries (and never a same-turn completion-then-queue
-signature on owner-0 planets), the "minutiae" residue is dispositioned
-player-input-class (no vendor law missing) and the OQ-016 residue list is
-EXHAUSTED -> per DECISIONS.md D3 recommend park-on-sentinel; if any save
-shows a pending owner-0 queue the UI could not have written, name it
-residue-(7) with exact save/turn/planet + capture design.
-Method: scripts/r341_dis.py disasm context; census via IL.find_records
-heap-record law (name base+0x24, owner +0x57, queue +0x52/+0x54, acc +0x50)
-over production playcap/save (t1086 corpus), work/r1/playcap/caps, bank
-t1254, and the t340 ring-final; per-save owner-0 pending rows + acc/COST
-(item gate words DS:0x73e46+idx*40, cost word +2). NO launch, no debugger.
-FIRST ACTION of the iteration is still the sitting check (tail-seek newest
-turn in work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py
-BEFORE starting).
-
-CONTEXT BANKED: t341 landed the auto-reserve resolution (income-law.md
-S-T341; tools scripts/r341_dis.py, r341_queue_writers.py,
-r341_writer_paths.py exit 0; work/r341_queue_writers.out; docs/re/
-_wip_t341.md S0-S5.5). BINDING: Gridsor I is OWNER-1 — never call it a
-human planet (REFUTED-ROUTES t341 amendment); the queue-pair writer census
-is CLOSED (sole writer fn 0x38840 0x38af5..0x38b26 via the
-0x38818->0x3875c->0x38718 chain) — do not re-census; event-15 is
-EVENTWIN-refresh-only (aicode.md S7.1) — do not hunt an effect arm. Turn
-tail order law: fn 0x24f24 loop A (FUN_00038f68 per planet, 0x2503c) runs
-BEFORE loop B (FUN_0003e6e0 per race row, 0x25060/0x25083) + local row
-after at 0x250a5. The STATIC star-table base 0x13bc5 read is GARBAGE on
-heap-moved saves — star corroboration only from verified anchors. t340
-shield-completion law stands (income-law.md S-T340). The scratch campaign
-copy (RESUME.GAM.user-oct29 md5-pinned) is reusable for future witnesses;
-launch-1 harness bug stays fixed (T325.W_ANCH assignment).
-QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed rows; t342 above is row 1;
-phase-5b rows t324-t341 all completed and retired — see LANDED blocks):
-
-t343 PORTABILITY AUDIT + ARTIFACT CLOSURE (decision-free; high value; the
-  "could this be re-implemented in Go/Rust from the docs alone?" test).
+NEXT t343 PORTABILITY AUDIT + ARTIFACT CLOSURE (decision-free; high value;
+the "could this be re-implemented in Go/Rust from the docs alone?" test).
+ORDERING RATIONALE: t342 dispositioned residue-(5) as PLAYER-INPUT CLASS
+with cited measurement (income-law.md S-T342) — the OQ-016 residue list is
+now EXHAUSTED and every remaining ledger movement (OQ-005 D1 ruling,
+OQ-016 D2/D3 adjudication, OQ-019 disposition packet) is a USER decision,
+so the next productive loop task is the decision-free audit the queue
+lists as row 1. t344 (mouse-cursor draw-witness) follows; it needs 1-2
+launches and is unaffected by ordering.
   (1) COMMIT the disk-only RE artifacts under a tracked path (artifacts/):
       work/ascend_restored.bin (564 KB) + work/functions_full.tsv (12 KB) —
       re-run scripts/r1_restore_sites.py validation first (pointer-run Watcom
@@ -294,13 +253,45 @@ t343 PORTABILITY AUDIT + ARTIFACT CLOSURE (decision-free; high value; the
       LAW — so a newcomer cannot pick up a dead reading as fact. Mine it from
       the archived LANDED blocks (archive/state-v2-full/2026-11-03/STATE.md +
       wip/) and the live docs; grep for RETRACT/REFUT/SUPERSED/CORRECT first,
-      verify each pair against the citing docs before listing.
+      verify each pair against the citing docs before listing. NEW PAIR FOR
+      t342: t45 "trigger values 33/34/35 NEVER occur (0/2810)" was CORPUS-
+      LIMITED (true of the Oct-5/6 early-turn captures; production t1086 has
+      320 owner-0 values {34:180,35:140}) — list it as a coverage correction,
+      closure route unchanged (income-law.md S14 correction block).
   (4) docs/re/portability.md: the re-implementation reading order (formats ->
       tables -> economy -> mapgen -> research -> combat -> victory -> AI), each
       step naming the law file + its gate/pin, plus what is NOT portably known
       (the open residues + the capture-limited class). Deliverable is the
       reading order, not a re-narration of the laws.
   Gate + both ledger audits green. No ledger row closes (audit task).
+FIRST ACTION of the iteration is still the sitting check (tail-seek newest
+turn in work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py
+BEFORE starting).
+
+CONTEXT BANKED: t342 landed the residue-(5) disposition (income-law.md
+S-T342 + correction block at S14; tool scripts/r342_queue_census.py exit 0;
+work/r342_census_pinned.out + work/r342_census_all.out; docs/re/_wip_t342.md
+S0-S2.8; REFUTED-ROUTES t342 amendments 1-2; buildPhase comment upgraded, no
+code delta). KEY LAWS t342 added: item COST word is DS+0x73E40+8+0x28*idx
+(NOT +2 — gate FLAGS word is +6; the old STATE text's "cost word +2" was
+WRONG); flag-bit1 items {31,32,33,34,37} keep queue cell 0xffff; orbit
+queue cells are >= cells (cap=cells+10); governor values 33/34/35 accrue
++IND/turn indefinitely (not a cost-1 build). BINDING carried forward:
+Gridsor I is OWNER-1 — never call it a human planet (REFUTED-ROUTES t341
+amendment); the queue-pair writer census is CLOSED (sole writer fn 0x38840
+0x38af5..0x38b26 via the 0x38818->0x3875c->0x38718 chain) — do not
+re-census; event-15 is EVENTWIN-refresh-only (aicode.md S7.1) — do not hunt
+an effect arm. Turn tail order law: fn 0x24f24 loop A (FUN_00038f68 per
+planet, 0x2503c) runs BEFORE loop B (FUN_0003e6e0 per race row,
+0x25060/0x25083) + local row after at 0x250a5. The STATIC star-table base
+0x13bc5 read is GARBAGE on heap-moved saves — star corroboration only from
+verified anchors. t340 shield-completion law stands (income-law.md S-T340).
+The scratch campaign copy (RESUME.GAM.user-oct29 md5-pinned) is reusable
+for future witnesses; launch-1 harness bug stays fixed (T325.W_ANCH
+assignment).
+QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
+keep this block intact except deleting your completed rows; t343 above is row 1;
+phase-5b rows t324-t342 all completed and retired — see LANDED blocks):
 
 t344 MOUSE-CURSOR DRAW-WITNESS (OQ-005, R13-clean: the VENDOR is the
   instrument). t328 (docs/re/shp.md S25, _wip_t328) measured mouse k5/k6/k7 as
@@ -401,6 +392,59 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t342 — 2026-11-08 (OQ-016 RESIDUE-(5) "HUMAN BUILD-ORDER
+## MINUTIAE" DISPOSITIONED PLAYER-INPUT CLASS WITH CITED MEASUREMENT, ZERO
+## CAPTURE: 4891 PENDING OWNER-0 QUEUE ROWS CENSUSED, VENDOR SIGNATURE 0
+## HITS vs AI POSITIVE CONTROL 3/3; THE OQ-016 RESIDUE LIST IS EXHAUSTED)
+Offline iteration over existing saves (production work/r1/playcap t1086 +
+bank-t1254 t1254 + t340 ring-final t1086..1093; playcap/caps EMPTY — honest
+negative). Sitting check NEGATIVE (tail-seek, newest live-timeline turn
+1086 == corpus); production :9 never signalled; game/ read-only.
+Instrument scripts/r342_queue_census.py (exit 0; turn-sorted adjacent-save
+pairing + AI positive control; pinned output
+work/r342_census_pinned.out; FULL-CORPUS --all pass
+work/r342_census_all.out: 3324 saves, 144,302 owner-0 pending rows,
+[p+0x5a]==0 144302/144302, netplay==0 3324/3324, owner-0
+complete-then-requeue 0 vs AI control 180 re-queues, 0 counterexamples).
+PROVED (income-law.md S-T342):
+1. EXCLUSION: netplay ds:0x10ba4==0 and local ds:0x7458e==0 in 60/60 saves;
+   [p+0x5a]==0 in 4891/4891 pending owner-0 rows (and 5240/5240 owner-0 rows
+   overall) — the t341 verbatim gate 0x3eabf..0x3eacd statically excludes
+   the vendor selector FUN_0003f130 from every observed human row.
+2. SIGNATURE ABSENT/PRESENT: owner-0 transitions PROGRESS 247, DRAIN 8,
+   complete-then-requeue 0; AI control on the SAME instrument fires the
+   boundary re-queue 3/3 (Gridsor I item26->item0 t1090->1091, Arcturus I
+   item8->item20, Sarsaparilla III item20->item8). All 8 human DRAINs are
+   completions (slot word2 bit0 SET next save; item 35 -> word2 0x3 =
+   Automation |=2 verbatim) that drain to EMPTY and stay empty — t341's
+   13/13 law holds corpus-wide, 0 counterexamples. NO residue-(7).
+3. EVERY anomaly class collapses to a banked law: cell 0xffff == flag-bit1
+   items {31,32,33,34,37} (t341 writer law); cell>=cells == ORBIT slots
+   (cap=cells+10, t340); acc>COST == governor 33/34/35 accrual (t45;
+   Mukwonago I 45->60->75 at IND 15) or the bank-t1254 frozen ship rows
+   (item 23 COST = ship-design value, t27 S8; all 20 saves turn t1254).
+   CORRECTION LANDED: the COST word is DS+0x73E40+8+0x28*idx (flags +6,
+   cost +8) — the t342 STATE assignment's "cost word +2" was WRONG (t340's
+   own income-law text had it right at S8/L448).
+4. UI WRITER LEGS NAMED VERBATIM: fn 0x3aa0a (window ds:0x43508) -> 0x38840
+   at 0x3b0d1 (colonize), 0x3d887 (ship design), 0x3b349/0x3b411/0x3b482/
+   0x3c9fc/0x3ca44/0x3daa9 (queue-edit arms); fn 0x3a174 -> 0x3a3f0/0x3a455
+   (demolish/rebuild); 0x3ae99 (via 0x38818) is nougat-gated (ds:0x10ba0).
+   Governor values = mode-3 cell-SELECT writes (+0x54 only; t45).
+5. CORPUS CORRECTION to t45: "trigger values 33/34/35 NEVER occur (0/2810)"
+   was corpus-limited (Oct-5/6 early-turn captures 0/1838) — production
+   t1086 has 320 owner-0 values {34:180, 35:140}. Branch closure stands on
+   the static pin, not on corpus vacuity (income-law.md S14 correction).
+LEDGER: OQ-016 row STAYS OPEN (strict-close): residue-(5) dispositioned
+player-input class = no missing vendor law, nothing to change in code; the
+residue list is EXHAUSTED ((1) cited-dead x8 = user ruling, (2)(3)(4)
+CLOSED, (6) CLOSED) — remaining movement is USER adjudication (D2/D3).
+Ledger count 16/3 unchanged. buildPhase comment upgraded to cite the corpus
+witness (rewrite/src/game/campaign.cpp, comment-only, no code delta).
+REFUTED-ROUTES t342 amendments 1-2 appended (do not re-census the human
+queue; governor accrual is not a cost-1 build). GATE 0, both audits OK.
+NEXT = t343 PORTABILITY AUDIT + ARTIFACT CLOSURE VERBATIM.
 
 ## LANDED t341 — 2026-11-08 (CANDIDATE OQ-016 RESIDUE-(6) RESOLVED WITH
 ## CITED MEASUREMENT, ZERO CAPTURE: THE "FACTORY AUTO-RESERVE ON THE HUMAN

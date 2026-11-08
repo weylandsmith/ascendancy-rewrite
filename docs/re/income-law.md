@@ -1601,7 +1601,17 @@ CORPUS (scripts/r1_governor_census.py, 484 saves, 2810 owned records via
 the t33-corrected walk): values 0xFF x2418, 0x01 x282, 0x00 x107, 0x15 x3
 — trigger values 33/34/35 NEVER occur (0/2810). The branch is inert on ALL
 measured state (consistent with T34's 2720-sample battery), which is why
-earlier captures could not close it from the POSITIVE side. Closure route:
+earlier captures could not close it from the POSITIVE side.
+CORPUS CORRECTION t342 (2026-11-08, scripts/r342_queue_census.py + inline
+re-run of the t45 walk): "NEVER occur" held for the OCT-5/6 capture corpus
+(0/1838 owned records — early-turn states, governor never set) but the
+PRODUCTION campaign (work/r1/playcap t1086, bank-t1254) is RIFE with them:
+320 owner-0 values {34:180, 35:140} at t1086 alone (histogram printed in
+S-T342). The branch is NOT inert on production state; its closure stands on
+the static pin + operand resolution, not on corpus vacuity. The production
+rows match the mode-3 UI law: item 34 rows carry acc==0, cell==0xffff,
+never in a slot; item 35 rows accumulate +IND/turn (Mukwonago I 45->60->75,
+IND 15) and complete to slot word2 |= 2 (Pulveran I word2 0x3 verbatim). Closure route:
 the static branch is now pinned verbatim AND its every operand resolved —
 that is the measurement (code + corpus + runtime config).
 
@@ -2493,3 +2503,65 @@ work/r341_queue_writers.out). FINDINGS:
    examples.
 6. EVENT-15 (completion tail producer 0x3939b): consumer arm {0,1,2,15} =
    EVENTWIN refresh ONLY (aicode.md S7.1 banked t102) — cannot queue builds.
+
+## S-T342 — RESIDUE-(5) "HUMAN BUILD-ORDER MINUTIAE" DISPOSITIONED
+## PLAYER-INPUT CLASS (corpus census, zero capture, 2026-11-08)
+
+Instrument scripts/r342_queue_census.py (exit 0; work/r342_census_pinned.out
+= the assignment corpus: production work/r1/playcap t1086 + bank-t1254 t1254
++ t340 ring-final t1086..1093; playcap/caps EMPTY — honest negative).
+Heap-record law t33 + owner byte +0x57 (t248) + queue pair +0x52/+0x54 +
+acc +0x50 + gate flags DS+0x73e40+0x28*idx (+6 flags, +8 COST, S8 verbatim).
+
+1. MEASURED: 4891 owner-0 PENDING queue rows across 60 saves. Item
+   histogram {0:299, 1:100, 6:1679, 7:180, 8:448, 21:20, 23:40, 26:60,
+   27:240, 28:59, 30:180, 33:40, 34:880, 35:266, 36:360, 38:40} — every id
+   a real item-table entry; [p+0x5a]==0 in 4891/4891; netplay ds:0x10ba4==0
+   and local ds:0x7458e==0 in 60/60. => the t341 selector gate
+   (0x3eabf..0x3eacd) statically excludes FUN_0003f130 from EVERY observed
+   pending human row.
+2. TRANSITIONS (turn-sorted adjacent saves, per-planet): owner-0 PROGRESS
+   247, DRAIN 8, FRESH-QUEUE/SAME-ITEM-REQUEUE/NEW-ITEM 0,
+   complete-then-requeue 0. POSITIVE CONTROL on the same instrument (AI
+   rows): 3 boundary re-queues fire — Gridsor I t1090->1091 (item 26 acc
+   54+IND6 >= COST 60 -> item 0 queued), Arcturus I (item 8 154+11>=160 ->
+   item 20), Sarsaparilla III (item 20 114+6>=120 -> item 8). The vendor
+   signature EXISTS in the data and NEVER appears on owner-0 planets.
+   All 8 owner-0 DRAINs are completions with slot word2 bit0 SET next save
+   (item 35 -> word2 0x3 = Automation |=2 verbatim) and queue 0xffff/0xff
+   next save: human completion drains to EMPTY and waits for a click.
+3. EVERY apparent anomaly collapses to a banked law (no residue-(7)):
+   (a) cell==0xffff rows are flag-bit1 items {31,32,33,34,37} (t341 S1
+   writer law: bit1 SET keeps 0xffff); (b) cell>=cells rows are ORBIT slots
+   (cap=cells+10; t340 marker-skip law) — items 23/26/27/28/30 only;
+   (c) acc>COST rows are ONLY governor values 33/34/35 (COST word==1;
+   acc keeps +IND/turn while the governor sits in +0x54 — Mukwonago I
+   45->60->75 at IND 15; t45 branch law 0x38e00/0x38e0b/0x38e16 fires each
+   recalc, income-law S14) plus the bank-t1254 frozen ship rows (item 23
+   COST = ship-design value per S8, slot word2 bit0 CLEAR, all 20 saves the
+   SAME turn t1254).
+4. UI-COMMAND LEG (writer identification for every class): fn 0x3aa0a
+   (planet-window command fn; window record ds:0x43508) calls the sole
+   queue writer 0x38840 at 0x3b0d1 (colonize: owner:=, pop:=2 — t248 law),
+   0x3d887 (ship-design via 0x396cc), 0x3b349/0x3b411/0x3b482/0x3c9fc/
+   0x3ca44/0x3daa9 (queue-edit arms); fn 0x3a174 at 0x3a3f0/0x3a455
+   (demolish/rebuild, slot byte 0x12/0x13 + active-bit gates); 0x3ae99
+   (via 0x38818) is gated on ds:0x10ba0 (nougat debug flag) — debug-only.
+   Governor values 33/34/35 are written by the mode-3 cell-SELECT path
+   (S14: "§413 mode 3 writes +0x54 := item idx"). No non-UI writer of a
+   pending human row exists in-image (t341 writer census).
+
+DISPOSITION: residue-(5) is PLAYER-INPUT CLASS — every pending owner-0 row
+in the corpus is explainable as (a) an ordinary UI construction order,
+(b) a governor selection, or (c) a frozen ship build; the vendor-selector
+signature is measurably absent (0/247+8 transitions, positive control 3/3).
+FULL-CORPUS PASS (--all, same tool, exit 0, work/r342_census_all.out):
+3324 saves, 144,302 owner-0 pending rows, [p+0x5a]==0 144302/144302,
+netplay==0 3324/3324, owner-0 PROGRESS 3955 / DRAIN 138 /
+complete-then-requeue 0 vs AI control 180 re-queues; the only flagged rows
+beyond the three law-classes are the t27 ship-design-cost class (364 rows,
+all item 23). NO counterexample anywhere.
+No missing vendor law for human build order; nothing for the rewrite to
+change (buildPhase comment upgraded to cite this corpus witness). Row
+movement per D3 = user adjudication (the row's residue list is exhausted:
+(1) cited-dead x8 legs, (2)(3)(4) CLOSED, (6) CLOSED as misattribution).

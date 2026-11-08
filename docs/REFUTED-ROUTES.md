@@ -1229,3 +1229,20 @@ from a non-16 state is NOT evidence of unreachability.
 ##     resolve in heap-moved scratch saves (owner-mask corroboration returned
 ##     garbage). Star-record claims need an anchor verified per-save (name
 ##     law), not the static base.
+
+# t342 AMENDMENTS (binding, 2026-11-08; evidence docs/re/income-law.md
+# S-T342 + work/r342_census_pinned.out, tool scripts/r342_queue_census.py):
+## (1) RESIDUE-(5) "HUMAN BUILD-ORDER MINUTIAE" IS DISPOSITIONED
+##     PLAYER-INPUT CLASS — do NOT re-census the human build queue looking
+##     for a missing vendor law. 4891 pending owner-0 rows over the pinned
+##     corpus: selector statically excluded ([p+0x5a]==0 4891/4891,
+##     netplay==0 60/60, gate 0x3eabf..0x3eacd), complete-then-requeue
+##     signature 0/247+8 while the AI control fires 3/3, and every row
+##     class = UI order / governor 33-35 / frozen ship (t27 design-cost).
+##     A future "anomaly" in these fields MUST first be tested against:
+##     flag-bit1->0xffff cell law (t341), orbit-slot cap=cells+10 (t340),
+##     governor acc-growth (t45), ship COST=design value (t27).
+## (2) COST WORD == 1 IS NOT A COMPLETION BOUNDARY for governor values:
+##     acc keeps accruing +IND/turn while +0x54 holds 33/34/35 (measured
+##     45->60->75 at IND 15). Do not model a governor queue as a
+##     cost-1 build.
