@@ -1220,3 +1220,48 @@ check u32@+0x10 == (u16@+2-1, u16@+0-1) fails 1526/1567 records => +0x10
 is a different quantity (per-record values, not a uniform delta); do NOT
 rewrite rewrite/shp.cpp dims reading on the mouse-only measurement
 without per-library witnesses. [law, t330]
+
+## 27. T344 CURSOR SELECTOR LAW + GEOMETRY QUERY + LIVE CORNER WITNESS
+1. THE MOUSE.SHP REFERRER [verified, static]: 'DATA\MOUSE.SHP' is payload
+offset 0x84314; per the pool-relative-immediate law (OQ-004) the code imm
+is 0x1764 = str_off - 0x82BB0, and the image holds EXACTLY ONE u32 0x1764
+— fn 0x309d4 at 0x309f9 (opener: lazy-open iff [obj+0x733]==0 &&
+ds:0x484cc!=0; handle stored [obj+0x733]; assert tail '..\gsystem.cpp').
+t328's 'zero u32 refs' scanned 0x84314 — wrong value under this law; its
+negative is fully explained, NOT re-litigated (scripts/r344_mouse_refs.py).
+2. GEOMETRY QUERY LAW [verified, static]: the cursor chain
+fn 0x1be10/fn 0x54650 -> fn 0x5a1e4 -> fn 0x30a60 -> fn 0x64ea9(lib,id)
+computes via fn 0x61058 (0x61072..0x61083):
+   W = u32[rec+0x10] - u32[rec+0x8] + 1 ; H = u32[rec+0x14] - u32[rec+0xc] + 1
+and fn 0x6108c returns (int32[rec+8]<<16)|u16[rec+0xc] (the hotspot).
+fn 0x64ea9 memoises on (ds:0xa208c=lib, ds:0xa2074=id); caches
+ds:0xa2090=W, ds:0xa20cc=H, ds:0xa20a0=W*H, ds:0xa20b0/b4=hotspot.
+FILE MEASUREMENT (mouse.shp, all 12 records): bbox-difference (W,H) ==
+(u16@+2+1, u16@+0+1) 12/12 — the two slots AGREE on size; the bbox pair's
+SIGNS carry the anchor. So t328's k5/k6/k7 'zero-component canonical slot'
+was reading one half of a signed bbox pair: k5=(-77,0,0,46), k6=(0,-46,77,0),
+k7=(-77,-46,0,0); all four of k4..k7 are 78x47 — ONE glyph, four anchors.
+3. SELECTOR LAW [verified, static + LIVE]: fn 0x54650 per-pass mouse pass:
+button-HELD arm (ds:0x484ac!=0 && [core+0x24da4]==0 && [core+0x489e]==0)
+requests id 1 then sets the mouse-active flag; RELEASE arm requests id 0
+and clears it. Mode chain 0x5473b..0x547a6 keyed on cursor position
+(ds:0x484f0=Y, ds:0x484ec=X): (0,0)->mode 0, (0,639)->1, (479,0)->2,
+(479,639)->3; on CHANGE requests id = mode+4. fn 0x5a1e4 gates the request
+on ([core+0x24da4]==0 || ecx==-1). => ids 4/5/6/7 = mouse.shp k4..k7 are
+the screen-CORNER cursors, TL/TR/BL/BR anchors matching the bbox signs.
+LIVE WITNESS [run work/r1/dbg-t344d-20261108-161132, leg cur_req = file
+0x30AA7 (the call 0x64ea9 site inside fn 0x30a60)]: root click (0,0) ->
+request id 4 lib 0x2EC03C rec 0x48b (= k4 TOC offset, byte-exact); root
+click (799,0) -> id 5 rec 0xc99 (= k5); releases -> id 0 rec 0x68 (k0).
+Guest must be at the EXACT edge (root 788 -> guest ~630 fired nothing;
+DOSBox maps guest 640x480 -> root 800x600, scale 1.25). Bottom corners
+(6/7) unwitnessed (t285 title-eject stopped the sweep; mechanism identical).
+4. DRAW-CONTENT SCOPE [honest negative]: blit_deref during the corner
+windows banked only k0/k2 (t330 law reproduced: hdr == file u16 pair);
+ZERO deref at k5/k6/k7 offsets => the corner glyph is NOT drawn through
+FUN_0005caac in captured play — pixel-level draw-content for k5/k6/k7 is
+CAPTURE-LIMITED (the request itself is now witnessed; the pixels are not).
+OQ-005 C27-C29 class updates to: valid dims (78x47), selector KNOWN
+(screen-corner cursor modes, live-witnessed for TL/TR), drawn-frame pixels
+capture-limited. No rewrite code change (t330 generalization bound stands;
+shp.cpp is a decode lib for extracted files, not the cursor runtime).

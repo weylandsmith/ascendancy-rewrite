@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-08T15:05
+updated: 2026-11-08T16:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,65 +212,8 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t344 MOUSE-CURSOR DRAW-WITNESS (OQ-005, R13-clean: the VENDOR is the
-instrument). t328 (docs/re/shp.md S25, _wip_t328) measured mouse k5/k6/k7 as
-REAL frames: u16 dims @rec+0 walk EXACT-H 77/77 over 2038 stream bytes, while
-the canonical u32@+0x10 slot is zero-component (0,46)/(77,0)/(0,0) => the
-dispute is the dims SLOT LOCATION for this library, not junk. Selector
-UNKNOWN (no mouse SHAPEITEM in windows.txt; MOUSE.SHP@0x84314 has zero u32
-refs — pool-relative-immediate law means the referrer may be an imm, so hunt
-imm == str_off-0x82BB0 per datafiles.md, not u32). The cursor is drawn
-continuously in-game: (a) static hunt for the cursor-shape selector first
-(zero capture; the Windows driver layer / int33h hook is the candidate);
-(b) if found, ONE scratch launch (r1_dbg_session.py, own ring) to capture the
-vendor-drawn cursor region at multiple positions/shapes and pixel-compare vs
-ShapeLibrary.decode with dims@rec+0. MATCH => cited witness, bank to shp.md
-S26 + update the OQ-005 residue class list (this is the last non-user route
-for the dims-location question). NO MATCH / selector unidentified => honest
-negative, class becomes capture-limited, say so in the row. Budget 2 launches.
-ORDERING RATIONALE: t343 closed the portability audit decision-free; the
-queue's row 1 (t344) is next VERBATIM per queue discipline. t344 is the last
-non-user route for OQ-005; everything else open (OQ-016 D2/D3, OQ-019
-disposition packet, OQ-005 D1 ruling) waits on user decisions.
-  MEASURED CONTEXT t343 supplies: the static hunt in (a) reads
-  artifacts/ascend_restored.bin (TRACKED now, identical to the work/ copy —
-  either path; functions_full.tsv likewise tracked, hex sizes, overlapping
-  spans: pick tightest). docs/re/retractions.md entry #16 is the t196->t328
-  mouse pair — do not re-claim "no art"; entry #18 fixes k7 span at 189.
-Gate + both ledger audits green. No ledger row closes unless (b) lands a
-MATCH witness (strict-close: cited measurement + shp.md S26 + row update).
-FIRST ACTION of the iteration is still the sitting check (tail-seek newest
-turn in work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py
-BEFORE starting).
-
-CONTEXT BANKED: t343 landed the portability audit (artifacts/ tracked +
-validated exit 0 by scripts/r343_artifact_validate.py; gate stage-order fix
-build->3-pre; skip notes split by cause; docs/re/retractions.md 24 verified
-pairs; docs/re/portability.md reading order; work/r343/clone-run{1,2,3}-gate.out
-verbatim). MEASURED LAW BANKED t343: the payload is a byte-exact slice of the
-tracked original — game/ascend.exe[0x2a50:0x2a50+0x8cc83] ==
-work/ascend_payload.bin EXACT (576,643 B); attribution_scan.py derives it and
-gate 3r now RUNS on fresh clones (run3: single clone run, exit 0, everything
-runnable executed; only capture/venv stages skip, notes naming the true
-cause). V2 PITFALL: start-density must be measured on the RESTORED-SITES
-population (55.3%/15.6%); the naive self-pointer population (21.6%) cannot
-pass the 2x bar — population definition is part of the law. Prior context:
-t342 residue-(5) disposition (income-law.md S-T342 + S14 correction;
-scripts/r342_queue_census.py exit 0; REFUTED-ROUTES t342 amendments 1-2).
-KEY LAWS carried: item COST word DS+0x73E40+8+0x28*idx (NOT +2); flag-bit1
-items {31,32,33,34,37} keep queue cell 0xffff; orbit cells >= cells
-(cap=cells+10); governor 33/34/35 accrue +IND/turn. BINDING: Gridsor I is
-OWNER-1 (REFUTED-ROUTES t341); queue-pair writer census CLOSED (sole writer
-fn 0x38840 0x38af5..0x38b26) — do not re-census; event-15 EVENTWIN-refresh
-only (aicode.md S7.1); turn tail fn 0x24f24 loop A before loop B; static star
-base 0x13bc5 GARBAGE on heap-moved saves. Scratch campaign copy
-(RESUME.GAM.user-oct29 md5-pinned) reusable; launch-1 harness bug fixed.
-QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed rows; phase-5b rows
-t324-t342 + phase-6 row t343 completed and retired; t344 is the live NEXT
-above — see LANDED blocks):
-
-t345 SHIELD-BYTE LAW -> REWRITE CODE SITE (OQ-016 residue-(4) follow-through).
+NEXT t345 SHIELD-BYTE LAW -> REWRITE CODE SITE (OQ-016 residue-(4)
+follow-through). [queue row VERBATIM:]
   t325 measured the census law (pending rows slot+3 == 0, 44/44; completed rows
   constant 15 with word2 0xf01, 43/43 — docs/re/economy.md or income-law.md
   S-T325) and t340 named the completion handler (commit 53138e0, read its LANDED
@@ -282,6 +225,47 @@ t345 SHIELD-BYTE LAW -> REWRITE CODE SITE (OQ-016 residue-(4) follow-through).
   which seeds moved). If not sufficient: bank the precise gap (what measurement
   would close it) and change no code. strict-close the residue ONLY on cited
   measurement + code site; otherwise row STAYS OPEN.
+
+ORDERING RATIONALE: t344 spent the LAST non-user route on OQ-005 (selector law
+found + TL/TR corner witness landed, shp.md S27; k5/k6/k7 pixels
+capture-limited). What remains open everywhere (OQ-005 D1 ruling, OQ-016 D2/D3,
+OQ-019 disposition packet) waits on user decisions, so the queue's row 1 (t345,
+zero-capture static + code-site task) is next VERBATIM per queue discipline.
+No launch budget needed for t345; if it proves to need one, re-scope honestly.
+  MEASURED CONTEXT t344 supplies: (i) debug-harness teardown now REMOVES the
+  Xvfb lock it owns (scripts/r1_dbg_session.py fix) — future capture tasks need
+  no manual /tmp/.X<d>-lock surgery; (ii) DOSBox maps guest 640x480 -> root
+  800x600 (scale 1.25): edge-exact clicks are root {0,799}x{0,599} (root 788 =
+  guest ~630 fires NOTHING — false zero, REFUTED-ROUTES t344(3));
+  (iii) pool-relative-immediate law CONFIRMED again — scan str_off-0x82BB0,
+  never str_off (REFUTED-ROUTES t344(1)); (iv) artifacts/ascend_restored.bin +
+  functions_full.tsv tracked (t343), tightest-span rule still applies.
+Gate + both ledger audits green at t344 landing. No ledger row closes unless
+t345 lands cited measurement + code site (strict-close).
+FIRST ACTION of the iteration is still the sitting check (tail-seek newest
+turn in work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py
+BEFORE starting; NEVER full-read — OOM law).
+
+CONTEXT BANKED: t344 landed the mouse-cursor selector law (docs/re/shp.md S27;
+working detail docs/re/_wip_t344.md S0-S5; scripts/r344_strings.py,
+r344_mouse_refs.py, r344_dimslaw.py, r344_cursor_session.py — all exit 0).
+MEASURED LAWS BANKED t344: MOUSE.SHP referrer = pool-relative imm 0x1764,
+sole code site fn 0x309d4 @0x309f9; geometry W=u32[rec+0x10]-u32[rec+0x8]+1,
+H=u32[rec+0x14]-u32[rec+0xc]+1 (fn 0x61058), hotspot int32[rec+8]/u16[rec+0xc]
+(fn 0x6108c), memo quad ds:0xa208c/74/90/cc (fn 0x64ea9); 12/12 mouse records
+bbox-diff == u16-pair+1 (slots agree; SIGNS carry the anchor; k4..k7 = ONE
+78x47 glyph, four corner anchors); ids 4..7 = screen-corner cursors via mode
+chain 0x5473b..0x547a6 (id = mode+4, EXACT-edge cmp on ds:0x484ec/0x484f0);
+held->id1 / release->id0 (fn 0x54650). LIVE run
+work/r1/dbg-t344d-20261108-161132: click (0,0)->k4@rec 0x48b, (799,0)->
+k5@rec 0xc99, releases->k0@0x68, lib 0x2EC03C byte-exact vs t330 base.
+REFUTED-ROUTES t344 amendments 1-3 binding. OQ-005 row updated, STAYS OPEN
+(pixel MATCH never landed).
+
+QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
+keep this block intact except deleting your completed rows; phase-5b rows
+t324-t342 + phase-6 rows t343-t344 completed and retired; t345 is the live
+NEXT above (its queue row moved there VERBATIM) — see LANDED blocks)
 
 t346 NEXT UNMAPPED-WRITER HUNT with tool v2 (the t327 instrument's first real
   assignment). CANDIDATE ORDER: (a) star-record byte +0x5a colonized-planet
@@ -352,6 +336,50 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t344 — 2026-11-08 (MOUSE-CURSOR DRAW-WITNESS, OQ-005: SELECTOR LAW
+## FOUND STATICALLY + LIVE CORNER WITNESS TL/TR BYTE-EXACT; t328 DIMS DISPUTE
+## DISSOLVES (SIGNED-BBOX PAIR, 12/12 FILE-MEASURED); k5/k6/k7 PIXELS
+## CAPTURE-LIMITED; ROW STAYS OPEN STRICT-CLOSE)
+- SELECTOR FOUND (zero capture): 'DATA\MOUSE.SHP' = payload 0x84314; under
+  the pool-relative-immediate law the imm is 0x1764 and the image holds
+  EXACTLY ONE code site: fn 0x309d4 @0x309f9 (lazy-open iff [obj+0x733]==0 &&
+  ds:0x484cc!=0; gsystem.cpp assert tail). t328's zero-u32-ref negative
+  scanned 0x84314 — scan-value artifact, not a fact (REFUTED-ROUTES t344(1);
+  scripts/r344_mouse_refs.py).
+- GEOMETRY LAW (static): cursor chain fn 0x1be10/fn 0x54650 -> fn 0x5a1e4 ->
+  fn 0x30a60 -> fn 0x64ea9(lib,id); W/H = signed-bbox differences
+  (fn 0x61058 0x61072..0x61083), hotspot = (+8,+c) (fn 0x6108c), memo quad
+  ds:0xa208c/74/90/cc. FILE MEASURED: all 12 mouse.shp records agree
+  bbox-diff == (u16@+2+1, u16@+0+1) — the two slots serve DIFFERENT consumers
+  (gate reads pair, geometry reads bbox) and neither is "the" dims slot.
+  k5=(-77,0,0,46) k6=(0,-46,77,0) k7=(-77,-46,0,0): k4..k7 = ONE 78x47 glyph
+  at four corner anchors; t328's "zero-component" was one half of a signed
+  pair (REFUTED-ROUTES t344(2)).
+- LIVE WITNESS (run work/r1/dbg-t344d-20261108-161132, attempt 1 rc=0, leg
+  cur_req = file 0x30AA7 = call 0x64ea9 inside fn 0x30a60): root click (0,0)
+  -> request id 4 lib 0x2EC03C rec 0x48b (= k4 TOC offset byte-exact); root
+  (799,0) -> id 5 rec 0xc99 (= k5); releases -> id 0 rec 0x68 (k0). TL/TR
+  corner law CONFIRMED LIVE. Exact edge required (launch-1 root 788 = guest
+  ~630 fired nothing; DOSBox 1.25 scale). ids 6/7 unwitnessed (t285
+  title-eject stopped the sweep; mechanism identical). Zero blit_deref at
+  k5/k6/k7 offsets => corner glyph NOT drawn through FUN_0005caac in
+  captured play: pixel draw-content = CAPTURE-LIMITED (honest negative in
+  the row; t344 assignment (b) pixel-compare could not run — no drawn
+  corner frames exist in the witness window).
+- TOOL LANDS: scripts/r1_dbg_session.py teardown removes the Xvfb
+  /tmp/.X<d>-lock+socket iff owner==killed pid (stale lock cost run t344c
+  both attempts); scripts/r344_cursor_session.py composes r330 BlitSess with
+  cur_req/mode_upd banking + whole-log PTY census (bank-on-exit before
+  analyze, t330 ordering law honored). mode_upd attribution anomaly noted
+  honestly: 2 fires in pty log, leg=None at bank time (re-arm-gap class).
+- Ledger: OQ-005 C27-C29 re-classified 'valid dims (78x47), SELECTOR KNOWN
+  (corner modes, TL/TR live-witnessed), drawn-frame pixels capture-limited';
+  STAYS OPEN strict-close (pixel MATCH bar never landed; generalization
+  beyond mouse still needs per-library witnesses; D1 ask unchanged in
+  substance). 16 closed / 3 open unchanged. GATE_EXIT=0, LEDGER AUDIT OK,
+  LEDGER INDEX OK. game/ read-only.
+- NEXT = t345 SHIELD-BYTE LAW -> REWRITE CODE SITE VERBATIM (queue row 1).
 
 ## LANDED t343 — 2026-11-08 (PORTABILITY AUDIT + ARTIFACT CLOSURE, DECISION-FREE,
 ## THREE CLEAN CLONES MEASURED; NO LEDGER ROW CLOSES BY DESIGN)

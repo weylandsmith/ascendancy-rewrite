@@ -373,6 +373,27 @@ class DbgSession:
                 self.s.log(f"[teardown] SIGKILL {who} pid={p.pid}")
             except Exception:
                 pass
+            # t344 FIX: a SIGKILLed Xvfb leaves /tmp/.X<disp>-lock + socket
+            # behind, and every later attempt on the same display dies with
+            # "Server is already active for display" (t344c att2). Remove
+            # ONLY when the lock contents == the pid we just killed.
+            if who == "xvfb":
+                disp = getattr(self.s, "disp", None)
+                if disp is not None:
+                    disp = str(disp).lstrip(":")
+                    lock = f"/tmp/.X{disp}-lock"
+                    try:
+                        with open(lock) as fh:
+                            owner = int(fh.read().strip())
+                        if owner == p.pid:
+                            os.remove(lock)
+                            sock = f"/tmp/.X11-unix/X{disp}"
+                            if op.exists(sock):
+                                os.remove(sock)
+                            self.s.log(f"[teardown] removed stale X{disp} "
+                                       f"lock+socket (owner==killed pid)")
+                    except Exception:
+                        pass
         try:
             self.s.ls.close()
         except Exception:

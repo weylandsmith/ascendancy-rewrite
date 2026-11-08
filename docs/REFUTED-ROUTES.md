@@ -1246,3 +1246,22 @@ from a non-16 state is NOT evidence of unreachability.
 ##     acc keeps accruing +IND/turn while +0x54 holds 33/34/35 (measured
 ##     45->60->75 at IND 15). Do not model a governor queue as a
 ##     cost-1 build.
+
+# t344 AMENDMENTS (binding, 2026-11-08; evidence docs/re/shp.md S27 +
+# docs/re/_wip_t344.md + run work/r1/dbg-t344d-20261108-161132):
+## (1) MOUSE.SHP REFERRER IS NOT "ZERO-REF": do NOT scan for u32 == 0x84314.
+##     Under the pool-relative-immediate law the imm is 0x1764 and the sole
+##     code site is fn 0x309d4 0x309f9. Any future .shp "no referrer" claim
+##     MUST scan (str_off - 0x82BB0) first — the t328 negative was a scan
+##     artifact, not a fact about the image.
+## (2) MOUSE k5/k6/k7 "ZERO-COMPONENT DIMS" IS REFUTED: the canonical slot
+##     is a SIGNED bbox pair (int32 +8/+c/+10/+14); W=+10 - +8 +1,
+##     H=+14 - +c +1 (fn 0x61058 verbatim), hotspot = (+8,+c). All 12 mouse
+##     records agree bbox == u16-pair+1. Do NOT re-file them as invalid-dims
+##     or re-open the "which slot is THE dims slot" dispute for this lib:
+##     both slots are law'd (gate reads the pair, geometry reads the bbox).
+## (3) CORNER-CURSOR FALSE ZEROS: the mode chain compares cursor coords to
+##     EXACT values {0,639}x{0,479}; DOSBox maps guest 640x480 -> root
+##     800x600 (scale 1.25), so root clicks must be at {0,799}x{0,599}.
+##     A root click at 788 measures guest ~630 and fires NOTHING — that is
+##     a calibration miss, not evidence the selector is dead.
