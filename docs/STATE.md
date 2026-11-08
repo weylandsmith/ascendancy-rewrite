@@ -212,24 +212,71 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t337 STATE-TABLE READER WALK (ZERO CAPTURE; OQ-016 residue-(1) final edge).
-RATIONALE: t336 closed the WRITE side of the STATE line by measurement — parse
-block 0x59021 (PARENT-block fallthrough, fmts '%s %d' 0x85fdb + '%d' 0x85fe1)
-calls fn 0x57194 per id, filling winmgr + 0x3068 (u16 count) / + 0x306a (32 u32
-window-handles) at stride 0x8e per state id, global distinct-id counter
-winmgr+0x4226; census 196/196 saves at W=0x2bc3e4, sum(counts)=135=file STATE
-tokens, +0x4226=18=distinct file ids (scripts/r336d_state_census.py, exit 0).
-The t335 wording "no in-image consumer at all" is superseded: 0x57194 IS the
-in-image consumer. Nothing has yet enumerated who READS that table. Method:
-whole-image scan of work/r331_disasm.txt for read forms of displacements
-+0x3066/+0x3068/+0x306a/+0x4226 (data-base-register relative, same scanner
-class as t331's store-form sweep, use the fixed disasm regex
-^\s*([0-9a-f]+):\t([0-9a-f][0-9a-f ]*?)\t+(.*)$ — r331's own line set is
-incomplete for 1-byte encodings), then attribute each reader function by its
-call chain, answering specifically whether ANY reader is battle-mode-1-reachable
-(the residue-(1) arming question). Deliverable: docs/re/_wip_t337.md reader
-inventory + verdict; honest-negative (row stays open) if the only readers are
-the remover 0x57284-mirrors and paint-time group iteration.
+NEXT t338 STATE-16 LIVE DRIVE — WITNESS THE MODE-1 ARMING CHAIN ON A SAVE
+WHERE THE GAME IS ACTUALLY IN THE BATTLE STATE (capture task; scratch copy,
+drive laws, ONE capture).
+RATIONALE: t337 closed the STATE-table reader side and MEASURED that recorded
+play enters battle state 16 (core+0x4228==16 in 5 saves:
+work/r1/t299-leg-20261105-112859/save/{43,44,45,46,47}.sav, base 0x2bc3e4,
+scripts/r337_state_word.py exit 0). In state 16 the hit-test fn 0x56890 routes
+clicks THROUGH the group-16 slot array to BatControlWnd/BatModeWnd — while
+every t332 chain-leg capture sat in states {0,1,17}, which is now the measured
+candidate explanation for t332's all-zero log (state-16 hit-testing never ran,
+so the fn 0x156d4 posters 0x1615d/0x161d1 never fired). Method: scratch ring
+from t299-leg-20261105-112859 (NEVER mount pristine game/, NEVER loadstate to
+resume — bank ring before restarts), Xvfb :9 second instance per BLOCKED.md,
+debugger BPs on the eight t332 legs {fn156d4_entry 0x156D4, tbl15ef1,
+gate15fed, post1615d, relay1616f 0x1616F, post161d1, mode1_1b7dd 0x1B7DD,
+backch_1b180} PLUS new BPs on the state-16 routing edge (0x56890 entry,
+0x56aa4 focus-set arm, 0x56e10 entry) and on the RING-A state-switch arm
+0x55ea3; click the BatControlWnd gizmo rows (file windows.txt BatControlWnd
+rects; My^Items/Other^Items pixel law t332). Deliverable docs/re/_wip_t338.md:
+did ANY leg fire with current-state==16; witness = CLOSES residue-(1) arming
+edge; zero-with-control-fires (btn_hdlr) = second independent zero -> the
+arming question moves to fn 0x156d4's internal gates (msg 0x51 path), write
+the honest negative and keep the row open. FIRST ACTION of the iteration is
+still the sitting check (tail-seek newest turn; >1086 => r1_t85g_sitting.py).
+
+## LANDED t337 — 2026-11-08 (THE STATE TABLE'S READERS ARE THE SCREEN ROUTING
+## MACHINERY: CURRENT-STATE WORD core+0x4228 FOUND + MEASURED {0,1,16,17};
+## STATE SWITCH = CLICK-POSTED RING-A CODE-1 RECORD; NO BROADCAST TARGETS
+## GROUP 16; t333 "NO GLOBAL ACTIVE-STATE DATUM" SUPERSEDED)
+Zero-capture iteration (static whole-image walk + offline census; tools
+scripts/r337_state_readers.py exit 0, scripts/r337_state_word.py exit 0;
+working doc docs/re/_wip_t337.md S0-S7; ships.md S56). Sitting check NEGATIVE
+(tail-seek newest turn 1086 == corpus). Production :9 never signalled; game/
+read-only. PROVED: (1) dword winmgr+0x4226 = TWO u16s: LOW distinct-group count
+(inc 0x57207/dec 0x5711e only), HIGH = winmgr+0x4228 CURRENT STATE ID, image-
+wide exactly THREE touchers, sole runtime writer 0x56f66 in SET-STATE fn
+0x56e10(core,edx=newstate); all 17 legacy `sar 0x10` sites read the current
+state, not a count. (2) READER INVENTORY 16 fns: SET-STATE 0x56e10 (msg 2/1
+group broadcasts, per-group LEAVE cb +0x30f0 / ENTER cb +0x30ec, 16-deep
+history ring core+0x4736), POP-STATE 0x57020, clear-group 0x57094, BROADCAST-
+TO-GROUP 0x56b5c (32 slots, vtable [win+0xa7]+8, re-entrancy byte 0xa2024+g),
+POST-TO-HANDLE 0x56ca4 (the t331 msg path), HIT-TEST 0x56890 (mouse globals,
+focus core+0x3002, current-state fallthrough 0x569d9), FIND-BY-NAME-IN-STATE
+0x56d8c (10 callers incl. the 0x27401-family), record-free 0x574a4 (dec
+[core+0x3000], the t316 law home). (3) SET-STATE callers arg-traced: boot
+0x21733 edx=0 (trampoline-wired fn 0x20fd4, which also installs ENTER cbs for
+16 groups via 0x57464 — NO group-16 cb), hotkeys 0x54d92 edx=2 / 0x54dba edx=4
+(fn 0x54d18, WORD ds:0x484c4, guard current!=8), RING-A arm 0x55ea3 edx=record
+PARAM. (4) RING-A LAW: poster 0x56ad4(core,edx=code,ebx=param) 44 sites; code-1
+resolver arm's new-state = the u32 param verbatim; static param-0x10 posters
+0x28ed8/0x51ad1/0x5200f/0x36b0b (all prime ds:0x43504). (5) MEASURED 537 saves
+(t336 fingerprint, base 0x2bc3e4 537/537, groups=18 everywhere): current-state
+{0:122, 1:236, 16:5, 17:174}, group[state] residency 537/537. State-16 saves =
+t299-leg-20261105-112859/save/43..47.sav. (6) All 9 broadcast sites name fixed
+groups {1,2,3,4,5,d,e,f} — group 16 NEVER broadcast; BatModeWnd magic-rec
++0xb7=0/+0xb9=0 in EVERY save incl. the state-16 five (BatControlWnd rec
++0xb7=253/+0xb9=1 constant — accessor-vs-magic base note recorded). LEDGER
+nothing closed strict-close (16/3); OQ-016 residue-(1) reader side CLOSED by
+measurement, row open on the mode-1 arming witness alone, with t332's zero now
+having a measured candidate cause (capture states {0,1,17}). Files
+_wip_t337.md S0-S7, ships.md S56 (hand-authored), scripts/r337_state_readers.py
++ r337_state_word.py (exit 0). Sitting NEGATIVE t1086; production :9 (136357/
+136359, Xvfb 1461) never signalled; game/ read-only. GATE 0, ledger + index
+audits OK. NEXT=t338 state-16 live drive VERBATIM
+
 
 ## LANDED t335 — 2026-11-08 (THE win+0x6d STRIDE-13 ARRAY IS THE WINDOW-ITEM
 ## ARRAY: t334'S "STATE-LINE CONSUMER" RETRACTED, THE id-16 ASSERT PARADOX

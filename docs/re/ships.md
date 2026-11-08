@@ -2616,3 +2616,55 @@ distinct file ids. The table is LIVE runtime state, not a file mirror.
 CONSEQUENCE OQ-016 residue-(1): STATE-line value disposition CLOSED by
 measurement (global per-id table, located and count-reproducing); the row's
 remaining edge is the mode-1 arming witness AND the table's READERS (t337).
+
+## S56 t337 (2026-11-08) — THE STATE TABLE'S READERS ARE THE SCREEN ROUTING
+## MACHINERY: CURRENT-STATE WORD core+0x4228 FOUND AND MEASURED {0,1,16,17},
+## STATE SWITCHING = RING-A CODE-1 PARAM=STATE, NO BROADCAST EVER TARGETS
+## GROUP 16, t333'S "NO GLOBAL ACTIVE-STATE DATUM" SUPERSEDED
+Zero-capture iteration (static whole-image walk + offline census; tools
+scripts/r337_state_readers.py exit 0, scripts/r337_state_word.py exit 0;
+working doc docs/re/_wip_t337.md S0-S7). Sitting check NEGATIVE (newest turn
+1086 == corpus). PROVED:
+1. GEOMETRY: dword core+0x4226 is TWO u16s — LOW = distinct-group count
+   (`inc WORD` 0x57207 / `dec WORD` 0x5711e only), HIGH = core+0x4228 = CURRENT
+   STATE ID. +0x4228 has exactly THREE touchers image-wide: writers 0x56f66
+   (`mov WORD PTR [esi+0x4228],di`, fn 0x56e10 SET-STATE) and 0x570c2 (=0xffff,
+   fn 0x57094 clear-group), plus reads 0x56e20/0x56f39/0x570b9. t336 read the
+   dword as one word; the sar-0x10 idiom at all 17 other +0x4226 sites reads
+   the CURRENT STATE, not the count.
+2. READER INVENTORY (16 functions touch +0x3066/0x3068/0x306a/0x4226/stride-0x8e;
+   bodies verbatim work/r337_fnbodies.txt): fn 0x56e10 SET-STATE(core,edx=new
+   state) — leave/enter broadcasts msg 2/1 via 0x56b5c, per-group LEAVE cb
+   +0x30f0 / ENTER cb +0x30ec calls, 16-deep history ring core+0x4736, focused-
+   handle msg 6; fn 0x57020 POP-STATE; fn 0x56b5c BROADCAST-TO-GROUP (walks 32
+   slots of group edx, window vtable [win+0xa7]+8, re-entrancy byte 0xa2024+g);
+   fn 0x56ca4 POST-TO-HANDLE (the t331 msg path); fn 0x56890 HIT-TEST (mouse
+   ds:0x484ec/0x484f0, item rects [win+0x67]/count+0x69, focus core+0x3002,
+   current-state fallthrough walk at 0x569d9); fn 0x56d8c FIND-BY-NAME-IN-STATE
+   (callers 0x24fdc 0x2670b 0x27565 0x276f3 0x27ebb 0x28f00 0x363bd 0x3643e
+   0x36476 0x52742); fn 0x574a4 window-record free (`dec WORD [core+0x3000]` —
+   the t316 +0x3000 law home).
+3. SET-STATE CALLERS (arg-traced verbatim): boot 0x21733 edx=0 (fn 0x20fd4,
+   program-entry trampoline 0x7b7d7; same fn wires ENTER cbs for groups
+   {0,1,2,3,4,7,8,9,a,c,d,e,f,10,12,14} via 0x57464 — NO group-16 cb);
+   hotkey 0x54d92 edx=2 / 0x54dba edx=4 (fn 0x54d18 keyed WORD ds:0x484c4,
+   guarded current!=8); RING-A resolver arm 0x55ea3 edx=record param.
+4. RING-A LAW: poster fn 0x56ad4(core, edx=CODE, ebx=PARAM) 44 sites; the
+   resolver's code-1 arm's edx IS the record's u32 param — STATE SWITCHING IS
+   A CLICK-POSTED RING RECORD. Static param-0x10 (=state 16) posters: 0x28ed8
+   (star-select fn 0x28e70), 0x51ad1 (fn 0x51674), 0x5200f (fn 0x51b04),
+   0x36b0b (fn 0x36a90); all prime ds:0x43504 first.
+5. MEASURED (scripts/r337_state_word.py, 537 saves, base fingerprint = t336's,
+   B=0x2bc3e4 537/537, group count 18 everywhere): CURRENT STATE histogram
+   {0:122, 1:236, 16:5, 17:174}; group[state] residency 537/537. The 5
+   state-16 saves: work/r1/t299-leg-20261105-112859/save/43..47.sav. THE GAME
+   DOES ENTER THE BATTLE SCREEN STATE IN RECORDED PLAY.
+6. ALL 9 fn 0x56b5c broadcast sites name FIXED groups {1,2,3,4,5,d,e,f,e}: NO
+   IN-IMAGE BROADCAST EVER TARGETS GROUP 16. The mode-1 arming chain (t331) is
+   not state-table-gated; t332's zero-witness now has a measured candidate
+   explanation — every t332-leg save sat in states {0,1,17}, so state-16
+   hit-testing of BatControlWnd never ran in that capture. NEXT = live drive
+   on the resident state-16 save, not another static walk.
+NOTE BatControlWnd magic-rec bytes in state-16 saves: +0xb7=253/+0xb9=1
+(identical in all saves; accessor-rec vs magic-rec base distinction from t316
+law (3); the STATE word itself is base-unambiguous).

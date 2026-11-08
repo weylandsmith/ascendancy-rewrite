@@ -1110,3 +1110,22 @@ w43508_51fc2, w43504_52003} + the proven --shipclick choreography
 ## (4) LAW (not a route): fn 0x31690's `cmp ([eax+0x9f]>>16), 4` gate IS the u16
 ##     item counter at +0xa1 (same 16 bits) — a max-4-items cap, NOT a
 ##     window-type check; do not re-read it as a type assertion.
+
+## t337 AMENDMENT (binding): (1) THE STATE-TABLE READER WALK IS DONE — the
+complete reader inventory is docs/re/_wip_t337.md S1/S2 + ships.md S56 (16
+functions over displacements +0x3066/+0x3068/+0x306a/+0x4226 and every
+`imul *,0x8e` in the 139,026-insn image). Do NOT re-sweep for readers.
+(2) DO NOT RE-ASSERT t333's "there is NO global active-screen-state datum":
+the datum is u16 core+0x4228 (CURRENT STATE ID), sole runtime writer 0x56f66
+inside SET-STATE fn 0x56e10, MEASURED 537 saves {0:122,1:236,16:5,17:174}.
+Every `mov r32,[X+0x4226]; sar r32,0x10` site reads the CURRENT STATE, not the
+group count (LOW u16 = count; inc 0x57207 / dec 0x5711e only).
+(3) NO IN-IMAGE BROADCAST EVER TARGETS STATE GROUP 16: all nine fn 0x56b5c
+call sites pass fixed immediates {1,2,3,4,5,0xd,0xe,0xf} (verbatim-cited
+_wip_t337 S4). Hunting "a group-16 broadcast" is spent; state-16 traffic is
+hit-test/post-to-handle routed (fn 0x56890 / 0x56ca4).
+(4) t326/t331's "research leg vacuous"/"mode-1 armed-zero" re-reads stand, but
+t332's zero-witness capture is now KNOWN to have run entirely in states
+{0,1,17} — any future arming witness MUST run with core+0x4228==16 (resident
+state-16 saves: work/r1/t299-leg-20261105-112859/save/43..47.sav); a zero log
+from a non-16 state is NOT evidence of unreachability.
