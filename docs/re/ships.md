@@ -2597,3 +2597,22 @@ CONSEQUENCE FOR OQ-016 residue-(1): the STATE line has NO parse-time consumer in
 fn 0x575e4 at all (that block builds items); the residue question is now purely
 "who reads the STATE ids", with the control-table ([win+0xab], t333) and item
 array (win+0x6d, t335) both ruled out by measurement.
+
+## S55 t336 (2026-11-08) — THE STATE IDS LIVE IN THE GLOBAL WINMGR PER-ID
+## HANDLE TABLE (winmgr+0x3068/+0x306a + 0x8e*id), WRITTEN BY fn 0x57194 FROM
+## PARSE BLOCK 0x59021; CENSUS 196/196 SAVES AT W=0x2bc3e4
+Zero capture (static disasm + offline census). STATE line = count + N ids
+(fmts '%s %d' 0x85fdb then '%d' 0x85fe1), parsed in the PARENT block's
+fallthrough 0x58f67->0x59021; per id call 0x57194(winmgr, id, handle=[ebp+0x41]).
+Geometry verbatim: stride id*0x8e, u16 count @+0x3068, 32 u32 handle slots
+@+0x306a, global distinct-id counter winmgr+0x4226; asserts :0xb37 id<0x20,
+:0xb38 handle<0x400, :0xb5a slot overflow; remover 0x57284 mirrors.
+MEASURED 196/196 saves (scripts/r336d_state_census.py, exit 0): table at
+W=0x2bc3e4 in every save dir; 16/18 ids EXACT file-order (incl. id 16 battle
+family verbatim); id 1 prefix+appended by runtime windows (EVENTWIN, Go^to^
+Planet, OK) in 16 saves; id 17 slot-substituted (Leave Orbit/Abandon/Cancel
+over PLSQBUT0..2) in 22 saves; sum(counts)=135=file tokens; +0x4226=18=
+distinct file ids. The table is LIVE runtime state, not a file mirror.
+CONSEQUENCE OQ-016 residue-(1): STATE-line value disposition CLOSED by
+measurement (global per-id table, located and count-reproducing); the row's
+remaining edge is the mode-1 arming witness AND the table's READERS (t337).

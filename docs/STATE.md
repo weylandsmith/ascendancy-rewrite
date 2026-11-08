@@ -212,53 +212,24 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t336 windows.txt KEYWORD->STORE MAP + STATE VALUE DISPOSITION (ZERO CAPTURE;
-OQ-016 residue-(1) last STATE edge). RATIONALE: t335 falsified t334's STATE-array
-reading by measurement (win+0x6d stride-13 = the TEXTITEM/SHAPEITEM item array:
-count 22398/22398, kind tags 4900/4900, interner-name hits 3528/3528 over 196
-saves; scripts/r335b_item_array.py) and dissolved the id-16 assert paradox (the
-branch tests the ITEM KIND, file values {0,1} only). What t333/t334/t335 have
-NOT yet done is identify what fn 0x575e4 does with the STATE keyword's parsed
-VALUES: the control-table attach sites 0x57d56/0x57e48 copy a parsed u32 to
-[win+0xab] under scanner status (t334 S2; per t335's reinterpretation that is the
-NUMCONTROLS family, not STATE), and the item builder 0x57ee6..0x58062 consumes
-WINITEMS/TEXTITEM/SHAPEITEM (t335). If the STATE ids are stored NOWHERE in the
-window record, residue-(1)'s STATE-line sub-question closes parse-discarded-by-
-mechanism and the row's residue reduces to the mode-1 witness alone (a battle-
-screen capture problem, gated by t323/t332 amendments). TASK (~30 probes):
-(1) Enumerate EVERY store instruction in fn 0x575e4 (0x575e4..~0x597ff; reuse
-    work/r331_disasm.txt line windows, NEVER an awk range to EOF — t335 burned a
-    3 MB dump that way) with its target displacement; group by displacement.
-(2) Attribute each block to a windows.txt keyword: block order + format-string
-    shape (read ds:0x30xx strings verbatim from 41.sav per the r335 S2 law) +
-    VALUE-MATCH census: for all 123 file windows vs 196 needle-verified saves,
-    the field's file value must equal the RAM u16/u32 at win+disp (report per
-    keyword n_agree/n_total; use the on-disk extracted/ascend00/windows.txt as
-    truth — resident-text is DEAD, t335 amendment-(3)).
-(3) DISPOSITION: name the STATE keyword's block and its store, or prove no block
-    carries STATE values (every store target already attributed to another
-    keyword with >=95% value agreement); state the residue-(1) consequence
-    explicitly and update the OQ-016 row.
-DEAD, do NOT re-trod: everything in REFUTED-ROUTES t322..t335 amendments (binding),
-specifically t335: (1) any "STATE-line consumer at win+0x6d" work (item array,
-measured); (2) the id-16 assert-paradox attack (kind>1 never ships); (3) hunting
-resident windows.txt in .sav members (NUMCONTROLS 0/284 dirs); law (4): fn
-0x31690's 0x9f-gate IS the counter<4 item cap. Also dead: t334 STATE-array +
-format-strings-as-file-offsets + allocator hunting; t333 [win+0xb1] writers,
-class-table census, STATE-MASK scans, keyword literals in ascend_restored.bin;
-t332 2-click batteries on state-16, imm census for a 0x1c01 poster.
-Fixed laws carried: SAVE-MEMBER MAPPING member = B + 0x82bb0 + X (r1_slot.py),
-needle-verify (turn u32 at +0x12e10 in 1..4000 AND >=100 magic+NAME windows)
-before ANY ds: read; window record magic u32 0x12345678 + NAME @+0x20;
-[win+0xab] control-table ptr / [win+0xaf] count / [win+0xb1] control index;
-[win+0xa1] item counter (same u16 high half of [win+0x9f]); interner pool
-ds:0x6fda8 (u32 handles = pool offsets; '^' = accelerator marker); ds:0x13b98 =
-WORD 4 (196/196, no in-image writer); paint fn 0x30fb8 outside-image only;
-venv python for PIL/r1_dbg_session; tail-seek only on the 8.5 GB timeline
-(scripts/r1_t283_tailturn.py, 4 MB window suffices); sitting check FIRST (newest
-turn >1086 => r1_t85g_sitting.py). Production :9 (pids 136357/136359, Xvfb 1461)
-untouched; scratch copies only; game/ read-only. economy.md IS GENERATED;
-ships.md hand-authored (no generator).
+NEXT t337 STATE-TABLE READER WALK (ZERO CAPTURE; OQ-016 residue-(1) final edge).
+RATIONALE: t336 closed the WRITE side of the STATE line by measurement — parse
+block 0x59021 (PARENT-block fallthrough, fmts '%s %d' 0x85fdb + '%d' 0x85fe1)
+calls fn 0x57194 per id, filling winmgr + 0x3068 (u16 count) / + 0x306a (32 u32
+window-handles) at stride 0x8e per state id, global distinct-id counter
+winmgr+0x4226; census 196/196 saves at W=0x2bc3e4, sum(counts)=135=file STATE
+tokens, +0x4226=18=distinct file ids (scripts/r336d_state_census.py, exit 0).
+The t335 wording "no in-image consumer at all" is superseded: 0x57194 IS the
+in-image consumer. Nothing has yet enumerated who READS that table. Method:
+whole-image scan of work/r331_disasm.txt for read forms of displacements
++0x3066/+0x3068/+0x306a/+0x4226 (data-base-register relative, same scanner
+class as t331's store-form sweep, use the fixed disasm regex
+^\s*([0-9a-f]+):\t([0-9a-f][0-9a-f ]*?)\t+(.*)$ — r331's own line set is
+incomplete for 1-byte encodings), then attribute each reader function by its
+call chain, answering specifically whether ANY reader is battle-mode-1-reachable
+(the residue-(1) arming question). Deliverable: docs/re/_wip_t337.md reader
+inventory + verdict; honest-negative (row stays open) if the only readers are
+the remover 0x57284-mirrors and paint-time group iteration.
 
 ## LANDED t335 — 2026-11-08 (THE win+0x6d STRIDE-13 ARRAY IS THE WINDOW-ITEM
 ## ARRAY: t334'S "STATE-LINE CONSUMER" RETRACTED, THE id-16 ASSERT PARADOX
@@ -1502,3 +1473,34 @@ task line FIRST under NEXT ACTION. work/ is gitignored — findings in docs/re/.
 ## HISTORY
 Per-iteration LANDED blocks t1..t292: archive/state-v2-full/2026-11-03/STATE.md
 (+ wip/ notes). v1: archive/ralph-v1/. Slim commit: see git log 2026-11-03.
+## LANDED t336 — 2026-11-08 (windows.txt KEYWORD->STORE MAP + STATE VALUE
+## DISPOSITION: THE STATE IDS ARE THE GLOBAL WINMGR PER-ID HANDLE TABLE,
+## CENSUSED 196/196; KEYWORD DISPATCH IS ON THE TYPE INTEGER, NOT STRINGS)
+- VERBATIM: STATE line parsed in PARENT-block fallthrough 0x58f67->0x59021
+  ('%s %d' count then '%d' ids); per id fn 0x57194(winmgr=edi, id, handle=
+  [ebp+0x41]): stride id*0x8e, u16 count @+0x3068, 32 u32 slots @+0x306a,
+  global counter winmgr+0x4226; asserts id<0x20 (:0xb37), handle<0x400
+  (:0xb38), slot<0x20 (:0xb5a); remover 0x57284 mirrors. S3's interim stride
+  arithmetic (0x11c/0x238) retracted — the lea/add/shl chain computes 0x8e.
+- MEASURED (scripts/r336d_state_census.py exit 0, 196 needle-verified saves):
+  table located at W=0x2bc3e4 in 196/196; 16/18 ids EXACT windows.txt order
+  (id 16 battle family verbatim incl. 1-char windows 'W','S','Z','I' — an
+  earlier 0/196 for id 16 was a name-length-filter bug, fixed in-script);
+  id 1 prefix+appended by runtime windows (EVENTWIN/Go^to^Planet/OK, 16
+  saves); id 17 slot-substituted Leave Orbit/Abandon/Cancel over PLSQBUT0..2
+  (22 saves); sum(counts id 0..31)=135=file STATE token count; +0x4226=18=
+  distinct file ids. The table is a LIVE runtime registry, not a file mirror.
+- KEYWORD DISPATCH LAW: outer loop 0x57687 scans '%s %d' (0x85bcc); the
+  INTEGER token (TYPE code) drives the cmp-chain 0x576c4/0x593b7; keyword
+  strings are scanned to scratch [esp+0x334]/0x338 and never string-compared
+  in-image (keyword literals absent from the RE image, t333 reproduced).
+  TYPE n -> class creation 0x78b4c(class literal from pool, size, 2) + alloc
+  0x2a4ec + init 0x30c08; full keyword->store map banked docs/re/_wip_t336.md S4.
+- LEDGER: nothing closed strict-close (16/3); OQ-016 residue-(1) STATE-line
+  disposition rewritten (stored in global per-id table, located, counts
+  reproduce), row open on mode-1 witness + table READERS. Files
+  _wip_t336 S0-S4, ships.md S55 (hand-authored), OPEN-QUESTIONS residue-(1)
+  update, scripts/r336_store_map.py + r336d_state_census.py (exit 0).
+  Sitting NEGATIVE t1086; production :9 (136357/136359, Xvfb 1461) never
+  signalled; game/ read-only. NEXT=t337 STATE-table reader walk VERBATIM
+

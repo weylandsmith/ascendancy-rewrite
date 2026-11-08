@@ -176,7 +176,7 @@ of 284 save dirs. RESIDUE-(1) DISPOSITION after t335: the STATE ids have no
 in-image consumer at all (control table ruled out t333, item array t335, no
 global datum t333); "no runtime screen-selection mechanism in this image" stands,
 now with the STATE-line consumer question closed BY MEASUREMENT rather than
-inference. Evidence: docs/re/ships.md S52 + S53 + S54 + docs/re/_wip_t333.md +
+inference. t336 RE-OPENED-THEN-CLOSED THE STORE SIDE 2026-11-08: the STATE ids DO have a store — the GLOBAL winmgr per-id window-handle table winmgr+0x3068 (u16 count) / +0x306a (32 u32 handles) at stride 0x8e per id, written by fn 0x57194 from parse block 0x59021 (PARENT-block fallthrough, fmts '%s %d' 0x85fdb + '%d' 0x85fe1); MEASURED 196/196 needle-verified saves at W=0x2bc3e4, 16/18 ids EXACT windows.txt order (id 1 runtime-appended EVENTWIN/Go^to^Planet/OK in 16 saves, id 17 slot-substituted in 22), sum(counts)=135=file STATE tokens, winmgr+0x4226=18=distinct ids (scripts/r336d_state_census.py exit 0; docs/re/ships.md S55 + docs/re/_wip_t336.md S4). STATE-line DISPOSITION now: stored in a live runtime registry, not a window-record field; residue (1) survives on the mode-1 arming witness + the table's READERS (t337). Evidence: docs/re/ships.md S52 + S53 + S54 + docs/re/_wip_t333.md +
 docs/re/_wip_t334.md + docs/re/_wip_t335.md S0-S4 + scripts/r333b_state_layout.py
 (exit 0, 372 saves) + scripts/r334_state_array.py (exit 0, 196 saves) +
 scripts/r335b_item_array.py (exit 0, 196 saves). Row stays OPEN strict-close (the mode-1 store has STILL never
