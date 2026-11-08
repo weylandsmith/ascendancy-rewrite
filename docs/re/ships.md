@@ -2721,3 +2721,68 @@ LEDGER: nothing closed strict-close (16/3); OQ-016 residue-(1) REWRITTEN: the
 state-16 hypothesis is spent, closure-class = fn 0x156d4 internal-gate decode
 (zero-capture) or user ruling D2-c. Tools: scripts/r338_state16_session.py
 (exit 0; --offline replay supported). Working notes docs/re/_wip_t338.md S0-S4.
+
+## S58 t339 (2026-11-07) — BatControlWnd INTAKE DECODED (ZERO CAPTURE): NO
+## POSTER OF 0x1c01 TO SLOT 61 EXISTS; THE MODE-1 CHAIN IS UNREACHABLE BY
+## CONSTRUCTION; THE 804..813 SENDMESSAGE VALUES ARE DORMANT DATA
+Static iteration over work/r331_disasm.txt (140,824 insns) + windows.txt +
+saves. Tools: scripts/r339_intake_census.py (exit 0, work/r339_intake.out),
+scripts/r339_cfg156d4.py, scripts/r339_xreach.py (work/r339_xreach.out),
+scripts/r339_dump.py, scripts/r339_rec_census.py (exit 1 = instrument
+negative, S7). Working notes docs/re/_wip_t339.md S0-S7.
+(1) THE PARENT-SLOT LAW (verbatim x3 parser sites 0x59012-0x59017 /
+    0x59618-0x5961d / 0x59726-0x5972b): after PARENT-name lookup fn 0x56d1c,
+    `mov eax,[parent+0x41]; mov [child+0x63],eax` + fn 0x30c20 links the child
+    into [parent+0x67] (20-slot pointer array). So My^Items w+0x63 == 61 =
+    BatControlWnd's slot BY CONSTRUCTION (t316 measured the same field for
+    STATSHIPLST==95 live; t316 amendment clause (1) forbids any save-axis
+    registry witness — confirmed directly in S7 below).
+(2) THE GENERIC ROUTER (fn 0x30c9c span, reached via the 0x336b4 dx-chain;
+    sole caller 0x30b57 inside ctor-path fn 0x30ad8): msg 4/5 arm 0x30e0e and
+    msg 0xc arm 0x30f46->0x30edc rect-test then POST [w+0x63] the child's
+    SENDMESSAGE WORD ([w+0x45]) + SENDPARAM1 ([w+0x47]) verbatim (0x30ecb);
+    msg 7/8 arms (0x30de2/0x30dbb) NEVER parent-post (self msg 3 only when
+    [0x39]&&[0x35]&&[0x3d]). t302's "msg 0xc -> 0x30edc" law fully explained.
+(3) THE ROAD IS STRUCTURALLY BLOCKED FOR THE BATTLE FAMILY: (a) pump
+    parent-priority fn 0x56b5c 0x56c34 verbatim — `[w+0x63]!=0 && msg>2` ->
+    child SKIPPED (msg bubbles to parentless windows; the only 4/0xc posters
+    0x54aa9/0x54ab2 feed through the pump, t318); (b) the parent BatControlWnd
+    rect is 0,0-0,0 so fn 0x336b4's rect-test fails every real click; (c) the
+    children (TYPE 0/32) have no custom code (class slot 2 = fn 0x336b4).
+    => 804/805/807..813 can never reach fn 0x156d4 from observable traffic.
+(4) THE 0x1c01 ANSWER (assignment headline): whole-image literal census
+    0x1c01/0x1c02 = 18 sites = 14 receiver cmps + 4 senders {0x16168 self-post
+    inside fn 0x156d4's OWN gate tail, 0x33374/0x3338e STATSHIPLST emit ->
+    slot 95 (t316), 0x35696 LOADSCREEN (t315)} — t315's inventory reproduced
+    exactly, NO new poster. windows.txt SENDMESSAGE full census: 39 distinct
+    values, MAX 1006 — no file value >= 0x1c01. The only posts of 0x1c01 into
+    slot 61 are the gate tail's own re-posts (self-bootstrap).
+(5) CFG PROOF OF UNREACHABILITY (scripts/r339_cfg156d4.py + whole-image
+    j-edge index): in-edges to the gate block {0x15fed, 0x16147, 0x16181} are
+    ONLY 0x1608e je + 0x16071/0x16145 jmp (all INSIDE the block); entry to the
+    block is ONLY the rebased 0x15ef1 jump table from the 0x1c01 branch
+    (members [0]=0x15ef9 [1]=0x15fed [2]=0x16181 [3]=0x15ef9, t331 live).
+    External first arrival: ctor fn 0x15630 zeroes b9 (0x15a0 store), so
+    al=b9-1=0xffffffff >3 -> default exit 0x15b39. The b9 2/3 writers
+    0x15f1e/0x15f25/0x15f35 are INSIDE the gate block (bootstrap-only). The
+    msg 0x320 posters (which CAN set b9 2/3 via arms 0x15b48/0x15b1e) are all
+    BatModeWnd back-posts {0x1b164, 0x1b202, 0x1bb5e, 0x1bf80} targeting
+    [[BatModeWnd+0xab]+0x41] = the STATE-TABLE slot — and BatModeWnd's state
+    table is NULL at t=1086 (t331: 20/20 saves), so those posts never executed
+    (they sit on b7-clearing paths — consistent with b7==1 ZERO in t332+t338).
+    t331's open question ("which branch flows into the gate block; 0x16181 has
+    NO direct j-edge") is CLOSED: 0x1c01 branch via table member; 0x16181 is
+    table-only.
+(6) WHAT 0x324/0x325 DO (data-matched receiver legs): 0x324 My^Items ->
+    0x158c0 {if b9!=1: b9=1, fn 0x16cf0 child shape-redraw (string-id 0x13e),
+    self-post msg 0}; 0x325 Other^Items -> 0x158f3 {same, b9=4}. 807..813 have
+    NO branch (sub-tree 0x162ac arms only 0x322/0x323/0x324/0x325 then
+    0x163f4/0x16410 arms 1/0xd/0x320; default 0x1573b -> fn 0x336b4 generic).
+(7) SAVE-AXIS NEGATIVE (S7): 41..49.sav contain ZERO occurrences of
+    My^Items/BatControlWnd/STATSHIPLST/FLEETWND/COSMOSWnd/magic 0x12345678 —
+    window records are NOT persisted at all (t316 clause (1) corroborated for
+    the whole family); assignment step (1) (save census of [w+0x63]) is dead-
+    by-law, not instrument bug.
+LEDGER: nothing closed strict-close (16/3); OQ-016 residue-(1) REWRITTEN —
+EIGHTH cited-dead leg (no-poster + unreachable-by-construction); closure-class
+= user ruling D2-c alone. REFUTED-ROUTES t339 amendment (3 binding clauses).

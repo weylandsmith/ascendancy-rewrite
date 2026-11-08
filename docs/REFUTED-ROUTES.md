@@ -1159,3 +1159,31 @@ from a non-16 state is NOT evidence of unreachability.
 ## (4) INSTRUMENT NOTE: xsend click = ButtonPress+ButtonRelease at one
 ##     coordinate; focus_56aa4 (the [esp+4]==-1 arm) fired ZERO while hit_test
 ##     fired x2 — do not treat the focus leg as a generic mouse-traffic witness.
+
+## t339 AMENDMENT (binding): THE BatControlWnd INTAKE IS DECODED; "SOMETHING
+## POSTS 0x1c01 TO SLOT 61" IS DEAD BY CONSTRUCTION; THE 804..813 PARENT-POST
+## ROAD IS STRUCTURALLY BLOCKED. Evidence: docs/re/ships.md S58,
+## docs/re/_wip_t339.md S0-S7, scripts/r339_intake_census.py +
+## r339_cfg156d4.py + r339_xreach.py (exit 0).
+## (1) DO NOT DESIGN ANY FURTHER INTAKE/POSTER HUNT FOR SLOT 61 IN ANY FORM.
+##     The whole-image 0x1c01/0x1c02 literal census (18 sites) + windows.txt
+##     SENDMESSAGE census (39 values, max 1006) + CFG (gate block
+##     {0x15fed,0x16147,0x16181} reachable ONLY via the rebased 0x15ef1 table
+##     from the 0x1c01 branch; b9==0 external arrival exits at 0x15b39; b9 2/3
+##     writers are inside the gate; 0x320 posters target BatModeWnd's NULL
+##     state table) leave NO feed. Residue-(1) leg count = EIGHT, all named.
+## (2) LAW (router): generic msg router fn 0x30c9c arms 4/5 (0x30e0e) and 0xc
+##     (0x30f46->0x30edc) parent-post the child's SENDMESSAGE WORD ([w+0x45])
+##     + SENDPARAM1 to [w+0x63]; arms 7/8 NEVER parent-post. LAW (parser):
+##     [child+0x63] := parent slot-id at parse time (0x59012/0x5961d/0x5972b).
+##     LAW (pump): fn 0x56b5c 0x56c34 skips delivery to any window with
+##     [w+0x63]!=0 when msg>2 — parented children never receive 4/0xc; with
+##     BatControlWnd rect 0,0-0,0 the bubbled msg dies in fn 0x336b4's
+##     rect-test. Do not re-derive these.
+## (3) SAVE-CLASS LAW (directly re-confirmed): the t299-leg-20261105-112859
+##     saves 41..49 contain ZERO window-record name strings and ZERO magic
+##     0x12345678 — window records are NOT in the save image AT ALL. Any
+##     future question about window fields ([w+0x63], slot-ids, class ptrs)
+##     is LIVE-LEGS-ONLY (t316 clause (1) extended from the registry table to
+##     the records themselves); scripts/r339_rec_census.py exit 1 is the
+##     reproduction, do not re-run save scans for records.

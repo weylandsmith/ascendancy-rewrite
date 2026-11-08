@@ -71,17 +71,15 @@ cited evidence; the original list below over-promised two entries:
              Disposition packet drafted (docs/re/_wip_t329.md S4): closing
              this row needs YOUR ruling — D2 (a/b/c) plus accepting the
              cited-dead notes for select/destination + magnetron.
-  OQ-016  -> UPDATE t338 (2026-11-08): the CAPTURE levers are exhausted. The
-             mode-1 arming chain (Phase Bomb) measured ZERO twice: once on the
-             map/orbital states (t332) and once DRIVEN INTO the battle state 16
-             itself with the routing machinery witnessed executing (t338,
-             ships.md S57) — BatControlWnd turns out to have no hit rectangle
-             at all, so no mouse road can ever reach it. ONE zero-capture
-             decode remains (t339: does anything post msg 0x1c01 to its
-             registry slot); if it comes up empty the residue joins the
-             cited-dead class and closing it becomes YOUR call (accept as
-             unreachable, like the magnetron). Residue (5) build-order
-             minutiae still needs a disposition (diminishing tail).
+  OQ-016  -> UPDATE t339 (2026-11-07): the last zero-capture decode LANDED and
+             came up EMPTY — no poster of msg 0x1c01 to BatControlWnd's slot 61
+             exists anywhere in the image, the child SENDMESSAGE road (804/805)
+             is structurally blocked, and the arming gate is reachable only via
+             a self-bootstrap with no external entry (ships.md S58). The
+             residue is now fully in the cited-dead class (EIGHT named legs):
+             closing it is YOUR call (accept as unreachable, like the
+             magnetron). Residue (5) build-order minutiae still needs a
+             disposition (diminishing tail).
   magnetron -> CLOSED-ROUTE SUPERSEDED: scripted route retired (arming runs
              through the batmode-family pinned state WORD — docs/re/
              _wip_t329.md S2); carriage census shows zero carriers in your

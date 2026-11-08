@@ -180,11 +180,15 @@ inference. t336 RE-OPENED-THEN-CLOSED THE STORE SIDE 2026-11-08: the STATE ids D
 docs/re/_wip_t334.md + docs/re/_wip_t335.md S0-S4 + scripts/r333b_state_layout.py
 (exit 0, 372 saves) + scripts/r334_state_array.py (exit 0, 196 saves) +
 scripts/r335b_item_array.py (exit 0, 196 saves) + scripts/r338_state16_session.py
-(run rc=0). Row stays OPEN strict-close (the mode-1 store has STILL never
-been witnessed firing, no nuke effect has ever been observed, and residue (1) now
-has SEVEN fully-named unreachable legs — the mouse road is dead TWICE over;
-remaining live edge = zero-capture decode of who posts 0x1c01 to slot 61, or
-user ruling D2-c).; (2) setup-time home DRAW law — CLOSED
+(run rc=0) + scripts/r339_intake_census.py + r339_cfg156d4.py + r339_xreach.py
+(exit 0; docs/re/ships.md S58 + docs/re/_wip_t339.md S0-S7). t339 LANDED THE
+INTAKE DECODE 2026-11-07: NO poster of 0x1c01 to slot 61 exists — the eighth
+leg is cited-dead BY CONSTRUCTION (whole-image literal census, windows.txt
+max SENDMESSAGE 1006, CFG gate-block reachability, ctor b9=0 default exit,
+0x320 posters aimed at BatModeWnd's NULL state table), and the 804..813
+parent-post road is structurally blocked (pump parent-priority 0x56c34 +
+parent rect 0,0-0,0). Row stays OPEN strict-close: the ONLY movement left is
+user ruling D2-c (accept cited-dead, DECISIONS.md D3/OQ-016 note).; (2) setup-time home DRAW law — CLOSED
 MEASURED
 2026-11-04 t295: uniform rejection draw per race in race order, k=draw%T,
 store row_r+0xd @0x22edd, claim gate 0x22ee0 (FUN_00022ce4 0x22eb4..0x22f55

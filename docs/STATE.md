@@ -212,36 +212,73 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t339 — BatControlWnd INTAKE DECODE (ZERO CAPTURE): WHO POSTS 0x1c01 (OR
-ANY MSG) TO REGISTRY SLOT 61, AND WHAT DOES THE state-16-FAMILY SENDMESSAGE
-VALUES DO? RATIONALE: t338 killed the last capture lever for OQ-016 residue-(1)
-— driven INTO state 16 with hit-routing proven executing (hit_test x2,
-btn_hdlr x17 on the family rows), all eight chain legs stayed ZERO
-(docs/re/ships.md S57, REFUTED-ROUTES t338 amendment binding). BatControlWnd
-is a TYPE-19 parent with rect 0,0-0,0: clicks can only land on CHILD records
-(My^Items sm=804, Other^Items sm=805, Pass 807, Auto 808, Repeat 809, W/S/Z/I
-810-813), so the sole remaining live edge is whether those child SENDMESSAGE
-values ever PRODUCE a post to the parent (fn 0x56ca4 dispatch law:
-edx=[win+0x63]; t316: rec+0x41 = registry slot-id; slot 61 = BatControlWnd).
-Method (offline, save axis + work/r331_disasm.txt verbatim): (1) census
-[w+0x63] for every state-16-family child record in the state-16 five
-(work/r1/t299-leg-20261105-112859/save/43..47.sav, magic-rec law) + the t338
-run's saves — if any child's [w+0x63]==61, the road EXISTS and t340 = arm
-fn156d4_entry + click My^Items in state 16 (r338_state16_session.py already
-does both; --window tuned). (2) Walk the SENDMESSAGE consumer: t302 banked msg
-0xc -> 0x30edc rect hit-test -> ring post fn 0x56ad4 / registry dispatch
-fn 0x56ca4; find where the FILE SENDMESSAGE value (windows.txt) is loaded into
-a record field and who posts it (t302 positive control: NEXTTURN SENDMESSAGE 7
-== btn_hdlr msg 0x7 — the values ARE posted as msg ids somewhere; find the
-poster site for the 804..813 band: grep the disasm for imm 0x324..0x335
-(804..821) near call fn 0x56ca4/0x56ad4 sites). (3) If the 804..813 posts land
-on the CHILD's own slot (not 61), enumerate which msg ids fn 0x156d4 would
-then see and whether ANY reaches the 0x15ebf 0x1c01 branch. OUTCOMES: poster
-found -> residue stays open with a named t340 capture; no poster -> residue-(1)
-joins the cited-dead class entirely (eighth leg) and the row's only movement
-is user ruling D2-c — write the honest negative, keep open strict-close. FIRST
-ACTION of the iteration is still the sitting check (tail-seek newest turn;
->1086 => r1_t85g_sitting.py).
+NEXT t340 — OQ-016 RESIDUE-(4) FINAL SHIELD-COMPLETION WITNESS (ONE LAUNCH,
+t325's OWN STATED BUDGET: "ONE more launch with the fully-fixed chain, then
+stop"). Question: at the shield build-completion turn (~t1092 for the live
+Gridsor I pending row item 26 word2 0x0 acc 30 @ turn 1086, +6/turn), does
+ANY observable dword move per turn in the item slot / build-queue struct —
+watch the WHOLE slot dword and the build-queue acc, NOT byte +3 (t325 census
+law: byte +3 is 0 on all 44 pending rows, constant 15 on completed rows).
+Method: scripts/r325_shield_session.py fixed chain verbatim (early-arm-at-
+title BPLM survives load, deterministic heap member 0x25eb7c, fixed popup
+drain ppm:- P6 + root->window-rel (80,100)); budget to t>=1093; ring-diff the
+slot before/after each turn; production :9 NEVER signalled, own Xvfb, scratch
+copy only, teardown SIGKILL recorded. OUTCOMES: dword-per-turn mover found ->
+residue-(4) closes with cited law + rewrite note; zero movers at completion
+-> ABSENCE-ONLY third time, residue stays instrumentation-class-open and the
+capture queue is EMPTY — t341 then = residue-(5) build-order-minutiae corpus
+census (zero-capture) or park-on-sentinel per DECISIONS.md D3. Do NOT spend a
+second launch on this question. FIRST ACTION of the iteration is still the
+sitting check (tail-seek newest turn in work/r1/playcap/live-timeline.jsonl;
+>1086 => r1_t85g_sitting.py BEFORE starting).
+CONTEXT BANKED: t339 landed the BatControlWnd intake decode (ships.md S58,
+REFUTED-ROUTES t339 amendment 3 binding clauses) — the OQ-016 residue-(1)
+arming question is now fully cited-dead (EIGHT legs); do not re-open it; its
+closure is user ruling D2-c only. The msg-routing layer (router fn 0x30c9c,
+pump fn 0x56b5c parent-priority 0x56c34, [child+0x63]=parent-slot parser law)
+is banked — do not re-derive. Window records are NOT in saves (t339 S7) —
+window-field questions are live-legs-only.
+
+## LANDED t339 — 2026-11-07 (BatControlWnd INTAKE DECODED, ZERO CAPTURE: NO
+## POSTER OF 0x1c01 TO SLOT 61 EXISTS ANYWHERE; THE MODE-1 CHAIN IS
+## UNREACHABLE BY CONSTRUCTION (EIGHTH CITED-DEAD LEG); THE 804..813
+## SENDMESSAGE VALUES ARE DORMANT DATA; t331's GATE-BRANCH QUESTION CLOSED)
+Zero-capture iteration (static whole-image walk over work/r331_disasm.txt
+140,824 insns + windows.txt + offline save scan; tools
+scripts/r339_intake_census.py exit 0 (work/r339_intake.out),
+scripts/r339_cfg156d4.py, scripts/r339_xreach.py (work/r339_xreach.out),
+scripts/r339_dump.py; scripts/r339_rec_census.py exit 1 = instrument negative
+S7; working doc docs/re/_wip_t339.md S0-S7; ships.md S58). Sitting check
+NEGATIVE turn 1086; production :9 never signalled; game/ read-only. PROVED:
+(1) PARENT-SLOT LAW verbatim x3 parser sites (0x59012/0x59618/0x59726 blocks):
+[child+0x63] := parent slot-id at parse time + fn 0x30c20 child-list link —
+My^Items [w+0x63]==61 BY CONSTRUCTION. (2) ROUTER LAW (fn 0x30c9c, reached via
+0x336b4 dx-chain): arms 4/5 (0x30e0e) + 0xc (0x30f46->0x30edc) parent-post the
+child's SENDMESSAGE WORD [w+0x45]+SENDPARAM1 to [w+0x63] (0x30ecb); arms 7/8
+NEVER parent-post — t302's msg-0xc law fully explained; t338's all-7/8 battery
+could not propagate by law. (3) ROAD BLOCKED: pump parent-priority fn 0x56b5c
+0x56c34 (`[w+0x63]!=0 && msg>2` -> skip) + parent rect 0,0-0-0-0 rect-test
+fail + children have no custom code => 804/805/807..813 can NEVER reach
+fn 0x156d4 from observable traffic; whole-image imm census 0x324..0x335 = the
+receiver's own cmps only, no poster. (4) THE 0x1c01 ANSWER: literal census 18
+sites = 14 receiver cmps + 4 senders (self-post 0x16168 INSIDE the gate tail,
+STATSHIPLST 0x33374/0x3338e -> slot 95, LOADSCREEN 0x35696) — t315 inventory
+reproduced exactly; windows.txt SENDMESSAGE max value 1006. (5) CFG: gate
+block {0x15fed,0x16147,0x16181} has NO in-edge outside itself except the
+rebased 0x15ef1 jump table from the 0x1c01 branch; ctor zeroes b9 so external
+arrival exits 0x15b39; b9 2/3 writers are inside the gate; the 0x320 posters
+{0x1b164,0x1b202,0x1bb5e,0x1bf80} target BatModeWnd's NULL state table (t331
+20/20 saves) — never executed. t331 open question CLOSED (0x1c01 branch via
+table member; 0x16181 table-only). (6) 0x324->0x158c0 {b9=1, fn 0x16cf0
+redraw, self-post msg 0}, 0x325->0x158f3 {b9=4}; 807..813 have no branch.
+(7) saves 41..49 contain ZERO window-record strings/magic — records not
+persisted at all (t316 clause extended to records; REFUTED-ROUTES t339 (3)).
+LEDGER nothing closed strict-close (16/3); residue-(1) REWRITTEN — EIGHTH
+cited-dead leg, closure = user ruling D2-c alone (DECISIONS.md OQ-016 note
+updated). Files: _wip_t339.md S0-S7, ships.md S58 (hand-authored),
+REFUTED-ROUTES t339 amendment (3 binding clauses), DECISIONS.md OQ-016 note,
+OPEN-QUESTIONS residue-(1) rewrite. GATE 0, ledger + index audits OK.
+NEXT=t340 shield-completion final witness VERBATIM
 
 ## LANDED t338 — 2026-11-08 (STATE-16 LIVE DRIVE EXECUTED: THE MODE-1 CHAIN IS
 ## ZERO IN BATTLE STATE TOO — SECOND INDEPENDENT ZERO; THE STATE-16 TRIGGER IS
