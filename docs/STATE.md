@@ -256,6 +256,151 @@ heap-moved saves — star corroboration only from verified anchors. t340
 shield-completion law stands (income-law.md S-T340). The scratch campaign
 copy (RESUME.GAM.user-oct29 md5-pinned) is reusable for future witnesses;
 launch-1 harness bug stays fixed (T325.W_ANCH assignment).
+QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
+keep this block intact except deleting your completed rows; t342 above is row 1;
+phase-5b rows t324-t341 all completed and retired — see LANDED blocks):
+
+t343 PORTABILITY AUDIT + ARTIFACT CLOSURE (decision-free; high value; the
+  "could this be re-implemented in Go/Rust from the docs alone?" test).
+  (1) COMMIT the disk-only RE artifacts under a tracked path (artifacts/):
+      work/ascend_restored.bin (564 KB) + work/functions_full.tsv (12 KB) —
+      re-run scripts/r1_restore_sites.py validation first (pointer-run Watcom
+      start density) and record the command + output in artifacts/README.md.
+      NOTE work/ is gitignored wholesale: use `git add -f` and state why.
+      Do NOT commit game/ beyond what's already tracked, no saves, no banks.
+  (2) CLEAN-CLONE GATE TEST: clone this repo to /tmp (file:// is fine, zero
+      network), run `bash scripts/gate.sh` there, and report VERBATIM which
+      stages fail and why (expected suspects: docs/BASELINE.sha256 handling,
+      anything reaching work/ or the extracted/ tree, milestone parsing). Fix
+      only what is genuinely box-dependent drift; if a stage legitimately
+      requires the game dir or a live capture, document that in gate.sh's
+      header comment + docs/re/portability.md rather than weakening the stage.
+      MEASURED PAIRING SESSION 2026-11-08 (clone to /tmp/ascend-clone-test):
+      exit 0 both runs; binary built FROM SCRATCH in the clone (fresh
+      CMakeCache); second run also passes UI smoke + real-input xsend check +
+      audio; 4 residual skips are the capture/venv-dependent stages (R1 saves,
+      ascend_restored.bin, venv payload probes). STAGE-ORDER FIX: the build
+      (stage '4-5', gate.sh ~line 519) runs AFTER smokes 4c/4d, so a fresh
+      clone self-skips them on its FIRST gate run — move the build earlier (or
+      have the smokes trigger it) so first-run gates are honest; verify with a
+      third clean clone that a SINGLE run passes everything.
+  (3) LAW-RETRACTION INDEX: 340 iterations retracted some of their own earlier
+      readings (known family: t31/t32 pop-cap numbers, t47 §12/13 field labels,
+      t187 "4.67 = three sub-steps", t212 dark-zone zero-xref claim, t334
+      state-array retracted by t335, t326b S8(3) refuted by t331, t246
+      u16@0x131b4 attribution, t251 witness mine voided by t273, t196 mouse
+      k6/k7 corrected by t328). Build docs/re/retractions.md: one line per
+      retracted claim — WHAT WAS SAID / WHO SAID IT / SUPERSEDED BY / CURRENT
+      LAW — so a newcomer cannot pick up a dead reading as fact. Mine it from
+      the archived LANDED blocks (archive/state-v2-full/2026-11-03/STATE.md +
+      wip/) and the live docs; grep for RETRACT/REFUT/SUPERSED/CORRECT first,
+      verify each pair against the citing docs before listing.
+  (4) docs/re/portability.md: the re-implementation reading order (formats ->
+      tables -> economy -> mapgen -> research -> combat -> victory -> AI), each
+      step naming the law file + its gate/pin, plus what is NOT portably known
+      (the open residues + the capture-limited class). Deliverable is the
+      reading order, not a re-narration of the laws.
+  Gate + both ledger audits green. No ledger row closes (audit task).
+
+t344 MOUSE-CURSOR DRAW-WITNESS (OQ-005, R13-clean: the VENDOR is the
+  instrument). t328 (docs/re/shp.md S25, _wip_t328) measured mouse k5/k6/k7 as
+  REAL frames: u16 dims @rec+0 walk EXACT-H 77/77 over 2038 stream bytes, while
+  the canonical u32@+0x10 slot is zero-component (0,46)/(77,0)/(0,0) => the
+  dispute is the dims SLOT LOCATION for this library, not junk. Selector
+  UNKNOWN (no mouse SHAPEITEM in windows.txt; MOUSE.SHP@0x84314 has zero u32
+  refs — pool-relative-immediate law means the referrer may be an imm, so hunt
+  imm == str_off-0x82BB0 per datafiles.md, not u32). The cursor is drawn
+  continuously in-game: (a) static hunt for the cursor-shape selector first
+  (zero capture; the Windows driver layer / int33h hook is the candidate);
+  (b) if found, ONE scratch launch (r1_dbg_session.py, own ring) to capture the
+  vendor-drawn cursor region at multiple positions/shapes and pixel-compare vs
+  ShapeLibrary.decode with dims@rec+0. MATCH => cited witness, bank to shp.md
+  S26 + update the OQ-005 residue class list (this is the last non-user route
+  for the dims-location question). NO MATCH / selector unidentified => honest
+  negative, class becomes capture-limited, say so in the row. Budget 2 launches.
+
+t345 SHIELD-BYTE LAW -> REWRITE CODE SITE (OQ-016 residue-(4) follow-through).
+  t325 measured the census law (pending rows slot+3 == 0, 44/44; completed rows
+  constant 15 with word2 0xf01, 43/43 — docs/re/economy.md or income-law.md
+  S-T325) and t340 named the completion handler (commit 53138e0, read its LANDED
+  block FIRST — it may already state the disposition). If the cited law is now
+  sufficient to model: upgrade the rewrite (planetwin/poppanel/economy as
+  appropriate) + a mutation-verified pin, cite the addresses, run run_tests +
+  record_playthrough regeneration if timelines move (PLAYTHROUGH.md is
+  generated output; a flip is expected regeneration, not regression — but say
+  which seeds moved). If not sufficient: bank the precise gap (what measurement
+  would close it) and change no code. strict-close the residue ONLY on cited
+  measurement + code site; otherwise row STAYS OPEN.
+
+t346 NEXT UNMAPPED-WRITER HUNT with tool v2 (the t327 instrument's first real
+  assignment). CANDIDATE ORDER: (a) star-record byte +0x5a colonized-planet
+  count (t247 102-planet arithmetic; the writer was never witnessed — VERIFY
+  first by grepping docs/re/r1-savestate.md + score.md for a +0x5a writer
+  claim; if already closed, fall to (b)); (b) any DAT/star/ship writer that the
+  live docs explicitly label "writer unmapped"/"consumer unmapped" — build the
+  list by grepping docs/re/*.md + docs/OPEN-QUESTIONS.md, pick the one whose
+  address is pointer-law-convertible and whose trigger is reachable in normal
+  play (t338's Icarus-pip click at (238,282) and the star-enter click are
+  proven triggers); (c) if (a) and (b) both fail, exit-1 honest: list what was
+  checked so the next session doesn't re-check it. Use scripts/r1_dbg_session.py
+  (LEGSPEC + expectation grammar + verdict.json + bank-on-exit), scratch copy,
+  own ring dir, budget 3 launches. Bank writer + surrounding law to the right
+  docs/re/ file; strict-close only if the row's own bar is met.
+
+t347 DECISION-SHEET REGENERATION AFTER THE SLIM (cheap, protects D1). The
+  docs/re/_wip_*.md files were archived 2026-11-03; scripts/r1_t278_decision_sheet.py
+  reproduces the sheet "from banked inputs only" (index_t278pristine.txt +
+  ids.tsv) — VERIFY those inputs still exist at their expected paths and that
+  the generator RUNS post-slim (if it read any _wip file, repoint it to
+  archive/state-v2-full/2026-11-03/wip/ or bank the input it needed). Then
+  regenerate decision-sheet.md + index.txt to the SHRUNK ask from t328 (41 of 44
+  C-rows now cited-no-witness/junk-certain/unreachable; the human ask is the
+  residue that is actually adjudicable) and update docs/DECISIONS.md D1 text to
+  match. PITFALL (banked t278): r1_t182_pngdump.py rewrites index.txt on every
+  run — keep index.txt a copy + pointer header, hand-author only in
+  decision-sheet.md. Do NOT rule on any row yourself (R13).
+
+STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
+- FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
+  pass posts msg 4 only; ds:0x484ac = BIOS int16h button state; msg 4/0xc
+  default-handled fn 0x336b4 zero DAT stores; BatModeWnd has no in-session
+  activator; no poster of 0x1c01 to slot 61 exists anywhere (8th cited-dead
+  leg); broadcast pump dispatch 0x56c74 cold 2x; win+0x6d stride-13 = window-
+  ITEM array (t335 retracts t334's state-array reading); state ids = global
+  winmgr per-id handle table (winmgr+0x3068/+0x306a); current-state word
+  core+0x4228.
+- OQ-019 residues = UNREACHABLE-BY-CAPTURE, dispositioned t323/t329/t332: the
+  disposition packet is DRAFTED DO-NOT-APPLY (_wip_t329 S4) — rows close on USER
+  ruling only. Magnetron scripted-drive idea RETIRED cited-indirect (t329).
+- DEBUGGER via scripts/r1_dbg_session.py ONLY (t327): LEGSPEC/expectation
+  grammar, preflight gates (FirePat collision, port-busy, Oct-29 md5, game/
+  refusal), bank-on-exit BEFORE in-process analyze (t330 ordering fix), run
+  under VENV python (system 3.13 has no PIL — t327 INTERPRETER LAW). Never
+  /usr/bin/dosbox-x. OFF-BY-H: physical = member - 0x88; RAM values are guest-
+  PHYSICAL (t298). First-fire 0x00-init artifact check before believing.
+- OOM LAW (timeline ~7 GB now: r1_stream / <=400 KB tail-SEEK / r214_triage;
+  never iterate the whole file); TWO-WRITER RING (scratch = own ring; wrapper
+  bash holds 0 fds, its python child holds 1 — t215/t340 shape); KILL BY
+  RECORDED PID (structured argv; pkill -f self-kills shells); SIGKILL softlocks;
+  DISPLAY=:9 injected; TL=172800; NEVER loadstate to resume; bank before restart.
+- Sitting check FIRST (tail-seek newest turn; >1086 => r1_t85g_sitting.py before
+  anything). Production :9 is the corpus — untouched unless the task IS a drive.
+- Ledger 16 closed / 3 open (OQ-005, OQ-016, OQ-019); ledger_audit +
+  ledger_index_check green every gate; never hand-edit the index block.
+- USER DECISIONS PENDING (docs/DECISIONS.md): D1 .shp ruling (t347 shrinks the
+  ask; do NOT rule for them), D2 per-ship sim scope (this is now the ONLY route
+  to the nuke law + per-ship residues — EIGHT cited-dead capture legs), D3
+  definition of done (t329 rewrote it: loop-closeable-without-user = NONE
+  end-to-end). Do not burn iterations re-asking or working around them.
+- Do NOT re-trod: t323/t332 route set; t293 click-selection; t49/t58/t265
+  flight mining; item-35/36 completion witnesses (t271 zero-witness,
+  AI-unreachable); t212/t213 static exhaustion; t326 research leg (races 0+2
+  ALREADY own Phase Bomb tech at t1086 — mask 0x05, vacuous).
+- Gate ~2-3 min; milestone 6 stays; work/ gitignored (git add -f is the ONLY
+  exception, artifacts/ task t343).
+- After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
+  line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
+
 
 ## LANDED t341 — 2026-11-08 (CANDIDATE OQ-016 RESIDUE-(6) RESOLVED WITH
 ## CITED MEASUREMENT, ZERO CAPTURE: THE "FACTORY AUTO-RESERVE ON THE HUMAN
@@ -747,43 +892,6 @@ law), scripts/r326b_gizmo_rows.py (0x7650c file bytes UNRELOCATED — values
 need RAM). Sitting check NEGATIVE (turn 1086); production :9 untouched; gate 0.
 NEXT = t327 VERBATIM per the block above.
 
-QUEUE (phase 5b, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed row; the t326b..t338 rows
-are all completed and retired (see LANDED blocks); t339 is the live queue head
-per the NEXT ACTION block above — the residue-(1) capture levers are exhausted
-(REFUTED-ROUTES t338 amendment), so after t339 author the next queue or park
-the WAIT-TRIGGER sentinel):
-
-STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
-- FIXED LAWS, do NOT re-trip (t319-t323 amendments are BINDING): poster pass
-  posts msg 4 only (27/27); ds:0x484ac = BIOS int16h button state not app flag;
-  msg 4/0xc default-handled fn 0x336b4 zero DAT stores; BatModeWnd has NO
-  in-session activator ([win+0xb1] writers 14 sites cited); fn 0x2351c name arg
-  DEAD; msg-0x50 no external sender; broadcast pump dispatch 0x56c74 COLD
-  2x-confirmed.
-- DEBUGGER: binary work/r1/dbx-build/dosbox-x-master/src/dosbox-x (copy to
-  work/r1/bin/dosbox-x-dbg if not yet there); NEVER /usr/bin/dosbox-x;
-  core=normal for stepping legs per docs/re/dosbox-debugger.md; first-BP-fire
-  0x00-init artifact check before believing a witness; OFF-BY-H discipline
-  (member -0x88 -> physical; t298/t286b).
-- OOM LAW (6.4 GB timeline: r1_stream / <=400 KB tail-seek / r214_triage only);
-  TWO-WRITER RING LAW (scratch = own ring); KILL BY RECORDED PID (structured
-  argv; pkill -f self-kills shells); SIGKILL softlocks; DISPLAY=:9 injected;
-  TL=172800; NEVER loadstate to resume; bank ring before restarts.
-- Sitting check FIRST every iteration (tail-seek playcap newest turn; >1086 =>
-  scripts/r1_t85g_sitting.py before anything). Production :9 pid 1957 t1086 is
-  the corpus — untouched unless the task IS a drive task, and then drive laws.
-- Ledger 16 closed / 3 open (OQ-005, OQ-016, OQ-019); keep ledger_audit +
-  ledger_index_check green; NEVER hand-edit the index block (re-derive).
-- OQ-005 ruling = USER's (D1); do not rule for them (R13); draw-witness work
-  (t328) is permitted because the VENDOR is the instrument.
-- Do NOT re-trod: t323 amendment routes; t293 click-selection; t49/t58/t265
-  flight mining; item-35/36 completion witnesses (t271 REFUTED zero-witness,
-  AI-unreachable); t212/t213 static exhaustion; everything in STATE.md
-  DO-NOT-RE-TROD.
-- Gate ~2-3 min; milestone 6 stays; work/ gitignored — findings to docs/re/.
-- After the queue drains: author next queue or park WAIT-TRIGGER sentinel
-  (task line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
 ## LANDED t326 (2026-11-07, session 36) — PHASE BOMB PREFLIGHT CENSUS:
 ## RESEARCH LEG VACUOUS, LAUNCH-MSG POST HUNT OPEN->NARROWED (OQ-016 residue
