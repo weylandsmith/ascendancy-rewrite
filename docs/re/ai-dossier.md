@@ -190,7 +190,13 @@ sites). The surrounding law: ships with `+0x5d == 0` get re-decided (0x41970
 `ds:0x10ba4 == -1` gates at 0x41976..0x41987), and the loop tracks the
 candidate with MAX `[+0x88]` POWER among ships whose act is set (0x4199f
 `cmp eax,[edx+0x88]` / 0x419af `mov cx,[edx+0x88]`) — **the powered ship is the
-one whose act is processed**. After movement, kind must be 3 or 4 or the engine
+one whose act is processed**. [t361 CORRECTION: the direction is MIN, not MAX.
+Intel `cmp 0x88(%edx),%eax` computes (cand - threshold) and the `jge` skips on
+NOT-LESS — the scan REPLACES the candidate only while it is strictly SMALLER,
+matching ships.md S17 T4 decompile verbatim ("MINIMUM fuel [+0x88], strict <,
+first-in-list on ties"). The 0x41949 block zeroing the threshold on one path
+makes that block the post-commit re-scan, not the sweep entry; full raw trail
+docs/re/_wip_t361.md S1.] After movement, kind must be 3 or 4 or the engine
 asserts (`0x419cf` `cmp BYTE [esi+0x58],3` → `0x39894`; `0x419e3` `je` else
 assert id 0x93e at 0x2a428). If a ship's act target `[+0x5e]` no longer equals
 the current object, the act is cleared (`0x41a30` `mov BYTE [esi+0x5d],0`) and

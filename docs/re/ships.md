@@ -2818,3 +2818,42 @@ anchor vote; full detail docs/re/_wip_t360.md S2):
      md5 54bea6e3e9cd66236dd3ff0d6ba34738 / FNV-1a64 0x3acb4b625a289f54 over
      0x6b*0x162 B. Test: rewrite/tests/test_shipsave_t360.cpp (x3 cases,
      run_tests 179/0). Census tool: scripts/r360_save_shipcensus.py.
+
+## S60 t361 (2026-11-09) — PER-SHIP ENGINE SKELETON LANDED (rewrite/src/game/shipsim.{h,cpp})
+
+The t361 skeleton consumes the t360 parser (Ship::fromRecord) and encodes the
+pership-spec (2) turn frame. Laws encoded (all cited at the declaration
+sites): FUN_0007824f LCG on an ISOLATED stream (campaign RNG discipline);
+turn tail FUN_0004a74c prologue (+0x9c zero, POWER refill trunc([+0x18]*
+(1+clamp((T-[+0x52])//100,0,10)/10)) t101 leg3) + L1 lane march (step0=[+8]+
+[+c], third-speed gate x1/3 pool word, NEITHER MOVES nor POWER spent — S21
+item 1); T-3 arrival placement (star + (0,-200,0) + %200 x2, kind 5->4 at
+0x2202f); T-4 issuer validation {1,2} + orderType 5; T-5 retreat {3,1,2}->4;
+T-6 completion via the cited no-free-slot branch (kind 4 + %1000-500 x3, act
+consumed); T-8 dwell stasis (zero displacement/rng between boundaries);
+T-9 walk law (guard +0x58==4 verbatim; power-clamp operand is STEPS;
++0x94 := round(remaining walk); x87 fistp round-half-to-EVEN — C round()
+diverges on .5 ties); T-10 suppress-and-decrement (field home DISPUTED G-a —
+sim-level word, never a record offset); executor pick MIN POWER strict <
+first-ties (S17 T4; ai-dossier §5 MAX wording CORRECTED in place); assert
+law 0x419cf counted-not-fatal (kind 3 tolerated per dossier reading); sort
+comparator 0x40eb4 verbatim on +0x52 (the "design power" label vs the +0x52
+operand stays DISPUTED — verbatim wins).
+TESTS: rewrite/tests/test_shipsim_t361.cpp x11 (golden LCG vectors seeds
+1/7/2024 + state pin 0x264e4f5d; x86round; powerRefill; walk vectors incl
+the 2.5-tie and off-grid snap; table-driven T-4/T-5; march+placement golden
+jitter 164/6; dwell expiry 2->1->0 then fire; MIN-pick flip + tie-first +
+POWER==0 refuse + stale-act clear; assert counter; 12-boundary determinism
+digest A==B, seed-divergence; fromRecord mapping). run_tests 190/0.
+MUTATION TESTS (t290 arms precedent): max-pick mutant 3 fail; no-decrement
+mutant 7 fail; tie-away mutant 5 fail — CAUGHT. Power-clamp-operand mutant
+and march-spends-MOVES mutant NOT caught (clamp only diverges when
+power<steps AND power!=walk; the march mutant only touches moves which no
+t361 assertion reads post-march before re-grant) — honest gap: t362 parity
+tests must pin both (mixed-fleet fuel interleaving exercises exactly those
+two code paths).
+SEAMS (named, not silent): gizmo upkeep G9 + slot refresh (t363); FUN_00049a34
+body not banked (kind-2 arrival reuses the T-6 no-slot branch under flag);
+decider FUN_00040178 target scoring not banked (setAct is the order-apply
+API; stale-act clears, never re-decides); kind-5 dangling lane holds state
+(no cited law); T-3 etaDay import stamp INFERRED (parser has no +0x52).

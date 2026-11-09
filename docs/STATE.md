@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-09T15:10
+updated: 2026-11-09T16:41
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,18 +222,18 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t361 per queue row t361 below (PER-SHIP ENGINE SKELETON), VERBATIM.
-Ordering rationale: t360 LANDED 2026-11-09 — the read-side parse API
-(rewrite/src/formats/shipsave.{h,cpp}, ships.md S59 laws L1-L5) is exactly the
-input surface shipsim.{h,cpp} consumes, so the skeleton goes next; t361 is
-independent of all shp/D1 work (OQ-005 CLOSED t367, no residue). Spec contract
-stays docs/re/pership-spec.md: section (2) is the transition table the unit
-tests table-drive; determinism pins FIRST (seeded RNG must match the
-campaign.cpp law before any behavior is encoded). Consume S59 L2 (full-window
-scan, count word is not the census) and L4 (probe(idx==cap) is inventory only
-when cap<25). If the production ring has moved past turn 1086 by then, the
-frozen-ring test self-skips — that is expected, not a blocker; the durable law
-test is shipsave_corpus_law_pins_t360.
+NEXT t362 per queue row t362 below (MIXED-FLEET DEPARTURE LAW PARITY),
+VERBATIM. Ordering rationale: t361 LANDED 2026-11-09 (shipsim.{h,cpp} + 11
+pins, run_tests 190/0) and its mutation campaign named EXACTLY the t362 test
+mandate (ships.md S60): the power-clamp-operand path (clamp fires only when
+power<steps AND power!=walk) and the march-spends-NEITHER law are the two
+mutants t361 could not catch — mixed-fleet fuel interleaving exercises both,
+so t362 must pin them before t363 stacks gizmos on top. Spec contract stays
+docs/re/pership-spec.md; the st4 DWELL law is ships.md S24 item 1 + S17 T4
+(round-robin cursor = remaining FUEL). Banked witnesses for parity are the
+production ring saves (turn 1086 census in S59; shipsave_t360 tests show the
+self-skip pattern when the ring moves). shipsim seams t362 may NOT silently
+close: FUN_00049a34 body unbanked; decider re-decide stays caller-side.
 
 QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
 to the original; NO permanent toggle — per-ship becomes THE engine once the
@@ -252,10 +252,9 @@ t367 D1-RULING APPLICATION — LANDED 2026-11-09 (see LANDED t367 block;
 t360 PER-SHIP SAVE PARSER (read-side) — LANDED 2026-11-09 (see LANDED t360
       block; shipsave.{h,cpp} + test_shipsave_t360.cpp x3, run_tests 179/0).
 
-t361 PER-SHIP ENGINE SKELETON: rewrite/src/game/shipsim.{h,cpp} — ship list,
-      per-ship dwell countdown, order apply at turn boundary per spec (2).
-      Determinism pins first: seeded RNG use matches campaign.cpp law. Unit
-      tests for dwell expiry + order transitions (table-driven from spec).
+t361 PER-SHIP ENGINE SKELETON — LANDED 2026-11-09 (see LANDED t361 block;
+      shipsim.{h,cpp} + test_shipsim_t361.cpp x11, run_tests 190/0; ai-dossier
+      §5 MAX->MIN wording corrected in place; ships.md S60).
 
 t362 MIXED-FLEET DEPARTURE LAW PARITY: reproduce the vendor piecemeal-
       departure behavior (dwell expiry per ship) from the st4 DWELL law;
@@ -330,6 +329,62 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t361 — 2026-11-09 (PER-SHIP ENGINE SKELETON SHIPPED:
+## rewrite/src/game/shipsim.{h,cpp} + 11 PIN TESTS, run_tests 190/0; EXECUTOR
+## PICK ADJUDICATED MIN (ai-dossier §5 MAX wording corrected in place);
+## MUTATION CAMPAIGN 3 CAUGHT / 2 NAMED GAPS BANKED FOR t362; LEDGER 17/2
+## UNCHANGED — honest negative on closes, strict-close held)
+
+Sitting check FIRST: NEGATIVE — timeline 8,897,010,542 B (15:05 mtime), 400 KB
+tail-seek, 16/16 records turn 1086; r1_t85g_sitting.py not run; production :9
+untouched; game/ read-only.
+
+DISPUTED-INPUT ADJUDICATION (_wip_t361 S1, resolved BEFORE encoding): the
+executor POWER pick — pership-spec §2 says MIN (strict <, first ties), ai-
+dossier §5 t179 P1 says MAX. Raw objdump of work/ascend_payload.bin: Intel
+`cmp 0x88(%edx),%eax` + `jge`-skip = replace-on-STRICTLY-SMALLER, matching
+the t183 decompile (ships.md S17 T4 verbatim MIN). The 0x41949 threshold-zero
+path is a post-commit re-scan, not the sweep entry (stated honestly; sweep
+init not re-derived, budget-bounded). ai-dossier §5 annotated CORRECTION in
+place. Also raw-confirmed: eligibility gates 0x4134e (POWER>0) / 0x41357
+(kind!=1) / 0x419a7 (act set), assert law 0x419cf..0x419f1 (id 0x93e at
+0x2a428), stale-act clear 0x41a30 + re-decide 0x41a45, sort comparator 0x40eb4
+operand = +0x52 (the "design power" label vs +0x52 stays DISPUTED — sim
+encodes the verbatim comparator, ascending stable), list builder 0x40ec0
+(stride 0x162, cap 0x6b, live gate ds:0x43489>>16 — A1/A3 code-level echo).
+0x3ac1c read: word store +0xac on the pending-slot object (0x3ac880 converter,
++0xab==0x05 guards) — spec G-a CONFIRMED: queued-order field home on the ship
+record is NOT cited; sim models the T-10 suppress-and-decrement behaviour at
+sim level, never invents a record offset.
+
+CODE: shipsim.{h,cpp} — OrderKind {0..5}, Lcg (FUN_0007824f verbatim, own
+ISOLATED stream per campaign-RNG discipline), turn frame per spec (2): tail
+(+0x9c zero, t101 refill, kind-5 march T-7 with third-speed gate, NEITHER
+MOVES nor POWER spent), sort, per-race executor (MOVES re-grant, stale-act
+clear, MIN-pick, T-10 suppression pre-decrement read + post-pick decrement,
+assert COUNTED not fatal), walk law T-9 (guard kind==4 verbatim; clamp operand
+STEPS; +0x94 := round(remaining); x87 fistp round-half-to-EVEN — C round()
+diverges on .5 ties, pinned), T-3 placement (star + (0,-200,0) + %200 x2,
+sequential draws — call-order-in-one-statement hazard fixed), T-6 no-slot
+branch + act consumed (S24 stasis-forced), T-4/T-5 transitions, digest()
+FNV-1a64 determinism pin surface. SEAMS named in ships.md S60 (upkeep t363,
+FUN_00049a34 body unbanked, decider scoring unbanked, dangling-lane hold).
+
+TESTS: test_shipsim_t361.cpp x11 — golden LCG vectors seeds 1/7/2024 + state
+pin 0x264e4f5d; x86round 10 cases; powerRefill 9 cases; walk vectors (arrival/
+moves-limited/power-clamp/2.5-tie off-grid-snap/zero-dist); table-driven
+T-4/T-5 admit+refuse; march+placement golden jitter (164,6) + third-speed +
+no-rng/no-fuel; dwell stasis 5 boundaries + expiry 2->1->0->fire + act
+consumed; MIN-pick flip/tie-first/POWER==0/stale-act; assert counter;
+12-boundary two-run digest equality + seed divergence; fromRecord mapping.
+run_tests 190/0 (179 baseline + 11). MUTATION (ships.md S60): max-pick 3 fail,
+no-decrement 7 fail, tie-away 5 fail CAUGHT; power-clamp-operand and march-
+burns-MOVES NOT caught -> named t362 parity mandate.
+
+LEDGER: no row touched (skeleton per D2=(b); OQ-016/OQ-019 user-gated). 17/2
+unchanged; both audits green. Production :9 untouched; game/ read-only.
+GATE_EXIT=0. NEXT = t362 VERBATIM.
 
 ## LANDED t360 — 2026-11-09 (PER-SHIP SAVE PARSER READ-SIDE SHIPPED:
 ## rewrite/src/formats/shipsave.{h,cpp} + 3 PIN TESTS, run_tests 179/0;

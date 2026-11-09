@@ -45,6 +45,7 @@ add_library(ascend_core STATIC
   src/game/diplomacy.cpp
   src/game/species.cpp
   src/game/campaign.cpp
+  src/game/shipsim.cpp
 )
 # shipsave.cpp inflates savestate ZIPs; PUBLIC so consumers (run_tests) link it.
 target_link_libraries(ascend_core PUBLIC ZLIB::ZLIB)
@@ -97,6 +98,7 @@ add_executable(run_tests
   tests/test_fnt.cpp
   tests/test_shp.cpp
   tests/test_shipsave_t360.cpp
+  tests/test_shipsim_t361.cpp
   src/ui/layout.cpp
   src/ui/hudlayout.cpp
   src/ui/poppanel.cpp

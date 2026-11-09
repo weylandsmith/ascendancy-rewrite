@@ -1,0 +1,239 @@
+#pragma once
+#include <cstdint>
+#include <vector>
+#include "formats/shipsave.h"
+
+namespace ascend::game {
+// PER-SHIP SIM SKELETON (queue row t361, user ruling D2=(b)). Build contract:
+// docs/re/pership-spec.md (2); durable laws: docs/re/ships.md S17/S21/S22/S22
+// S24/S59, docs/re/combat.md §1, docs/re/ai-dossier.md §5. Every constant
+// below cites docs/ (rewrite evidence rule, docs/PLAN.md rule 1); INFERRED
+// modelling choices are flagged as such. Scope t361: ship list, per-ship
+// dwell countdown, order apply at the turn boundary. Gizmo upkeep (G9),
+// carrier/cargo (spec 4) and the combat round (spec 5) are t363/t364 — the
+// skeleton applies ORDERS, not gizmo effects, and says so at each seam.
+
+// Order kind verbatim, +0x58 (pership-spec §2 kind enum, end-to-end values
+// {0..5} with the imm store census 0x24a00/0x3fb3e/0x3ca60/0x39859/0x2202f/
+// 0x22243 in ai-dossier §5). Functional descriptions only — SO_ labels are a
+// NON-GOAL (spec N5).
+enum class OrderKind : uint8_t {
+    NoOrder = 0,     // command clear (live kind 0 only on dead slots, spec A4)
+    Move = 1,        // coord payload; completion FUN_00049880 (T-6)
+    StarTarget = 2,  // colonize/land path; completion FUN_00049a34
+    Engage = 3,      // act state (targetability gate FUN_00039894)
+    InSystem = 4,    // arrived/positioned; DWELL state (T-8)
+    Placement = 5,   // transit-to-star (lane march T-7 / placement T-3)
+};
+
+// Single-image LCG FUN_0007824f verbatim (income-law.md S10 t29b):
+// state = state*0x41C64E6D + 0x3039; value = (state >> 16) & 0x7fff.
+// Same form as campaign.cpp worldNext()/homeNext()/visNext() — the campaign
+// RNG discipline (REFUTED-ROUTES) means ShipSim keeps its OWN isolated stream
+// (t195 visLcg_ precedent) that provably cannot perturb campaign streams.
+struct Lcg {
+    uint32_t state = 0;
+    int next() {
+        state = state * 0x41C64E6Du + 0x3039u;
+        return static_cast<int>((state >> 16) & 0x7fffu);
+    }
+};
+
+// One star for the placement law (T-3): position := star coords + (0,-200,0)
+// + rng%200 on the other two axes (ships.md §19 T3, jitter const LIVE -200.0
+// at B+0x82bb0+0xaee).
+struct SimStar {
+    int id = 0;
+    float pos[3] = {0, 0, 0};
+};
+
+// One lane for the march law (T-7). gate1 = byte[lane+0x23] bit0 (third-speed
+// lane, pool word 0.333333 MEASURED, ships.md S22 L1/L3); the species gate2
+// (double) is NEVER-SEEN zero-witness (S22 L5) — kept as a flag, never fired
+// by any shipped scenario (spec N4: model the cited FORMS only).
+struct SimLane {
+    int id = 0;
+    int a = -1, b = -1;        // SimStar ids (lane endpoints)
+    float len = 0;             // lane_len = |A-B| (S22 L1)
+    bool thirdSpeed = false;   // gate 1
+};
+
+// Ship record fields the skeleton consumes. Offsets are into the 0x162 record
+// (pership-spec §1 field table); fields the t360 parser does not read
+// (+0x52 ETA) are flagged at the seam. Guest-physical pointer fields
+// (+0x59/0x63/0x68) are represented by SIM-LEVEL ids (star/lane ids) — the
+// sim is driven headlessly from record state, never from live pointers
+// (spec N8).
+struct Ship {
+    int id = -1;             // array slot (record index; identity law A2 uses
+                             // the record address — slot is the save-side
+                             // surrogate, parse-verified t360)
+    int owner = -1;          // +0x56 race index == (+0x54 handle)>>16 (t273)
+    OrderKind kind = OrderKind::NoOrder;         // +0x58
+    uint32_t orderTarget = 0;                    // +0x59 (raw value kept)
+    int targetStar = -1;     // sim-level target for StarTarget/Engage
+    int laneId = -1;         // sim-level target while Placement (kind 5)
+    uint8_t act = 0;                             // +0x5d (0 none, 1 congregate, 2 engage)
+    uint32_t actTarget = 0;                      // +0x5e
+    uint8_t orderType = 0;                       // +0x67 (issuer sets 5 for delayed moves)
+    float targetPos[3] = {0, 0, 0};              // walk target triple (+0x6c
+                             // abs-triple semantics for orderType 3, S17 T1;
+                             // ptr-deref triple for type 1 — the sim holds
+                             // the triple explicitly, INFERRED surrogate)
+    float pos[3] = {0, 0, 0};                    // +0x9e triple
+    int32_t power = 0;                           // +0x88 multi-turn fuel budget
+    int32_t powerMax = 0;                        // +0x18 recharge cap
+    int32_t moves = 0;                           // +0x94 per-call budget (sugar units)
+    int32_t driveStat = 0;                       // +0x10 drive total (refill source)
+    int32_t integrity = 0;                       // +0x8c
+    int32_t maxIntegrity = 0;                    // +0x98
+    uint16_t status = 0;                         // +0x9c
+    int32_t laneStepX = 0;                       // +0x8  (step0 = X+Z, S22 L2)
+    int32_t laneStepZ = 0;                       // +0xc
+    int32_t etaDay = 0;                          // +0x52 dual-use field; NOT read
+                             // by the t360 parser — fromRecord() defaults it
+                             // to the current turn (INFERRED: full refill),
+                             // explicit values via direct assignment.
+    // Dwell countdown (QUEUE-TURN LAW, ships.md §10 item 1 + §11): a queued
+    // order with turn word != 0 SUPPRESSES the move and decrements per turn.
+    // FIELD HOME DISPUTED (spec G-a): the 0x3ac1c write site is on the
+    // pending-slot/command object (word +0xac), NOT a cited ship-record
+    // offset — behaviour modelled, home unresolved, do not invent an offset.
+    int32_t dwellTurns = 0;
+    // Lane-local progress while kind==5 (lane-local frame, S21 item 4; the
+    // galactic-frame transform at lane end is NOT cited — spec G-d — so the
+    // sim re-places via the cited T-3 placement law on arrival).
+    float laneX = 0;
+    bool arrivedFlag = false;  // walk flag 8 (S17 T1: arrived := walk == d)
+
+    // Map a parsed save record (formats::ShipSave::Record, t360) onto a sim
+    // ship. Census laws (S59 L2 full-window scan, L4 probe-home rule) are the
+    // PARSER's job and already applied: dead rows must be filtered by the
+    // caller BEFORE this call. targetStar/laneId stay -1 — pointer fields are
+    // not dereferenced here (guest-physical values kept raw in orderTarget).
+    static Ship fromRecord(const formats::ShipSave::Record& r,
+                           int currentTurn);
+};
+
+// Turn-boundary report (what one advanceBoundary() did).
+struct BoundaryReport {
+    int asserts = 0;            // assert-law violations counted (never crashes)
+    int rngDraws = 0;           // LCG draws consumed this boundary
+    std::vector<int> placed;    // ship ids: kind 5 -> 4 arrival placement (T-3)
+    std::vector<int> landed;    // ship ids: kind 1 arrival landing (T-6)
+    std::vector<int> acted;     // ship ids: the executor pick(s) this boundary
+    bool executorStalled = false;  // safety cap hit (must never fire)
+};
+
+// The per-ship engine skeleton. Turn frame per pership-spec §2 (ai-dossier §1
+// turn frame + ships.md S22 IDENTITY TIE):
+//   (1) per-ship turn tail: status +0x9c := 0, POWER refill [+0x88] :=
+//       trunc([+0x18]*(1+clamp((T-[+0x52])//100,0,10)/10)) [t101 leg3,
+//       combat.md §1; the clamp caps the multiplier at 2.0];
+//   (2) ship list order: stable-stable ascending on the verbatim comparator
+//       0x40eb4 — [ship+0x52] - [ship+0x52] (raw read, _wip_t361 S1; the
+//       ai-dossier "descending design power" label vs the +0x52 operand is
+//       DISPUTED — the VERBATIM comparator wins);
+//   (3) queue suppressor: dwellTurns > 0 suppresses the executor and
+//       decrements (T-10 behaviour, home DISPUTED G-a);
+//   (4) executor, one resolver call per owner per boundary: refill MOVES
+//       from drive (+0x94 := +0x10, FUN_0004a658 re-grant, combat.md §1),
+//       collect ships with POWER > 0 && kind != Move && ownership
+//       (raw 0x41340..0x41357), pick the ONE with MINIMUM POWER (strict <,
+//       first-in-list ties — ships.md S17 T4 t183 decompile; ai-dossier
+//       "MAX" wording is a misread, _wip_t361 S1), commit its move, and
+//       after movement assert kind in {3,4} else count violation 0x93e
+//       (0x419cf..0x419f1 verbatim). "One sub-turn per day" maps to ONE
+//       resolver call per owner per boundary (S16 item 1 + S17 T4 mapping,
+//       INFERRED coupling); multi-boundary travel spans days naturally.
+// Decider policy (FUN_00040178 target scoring FUN_00039b28) is NOT banked —
+// hooks below, default no-op; the sim never invents AI target choice (C5/N2).
+class ShipSim {
+  public:
+    explicit ShipSim(unsigned seed, int turn = 0);
+
+    void addStar(const SimStar& s);
+    void addLane(const SimLane& l);
+    void addShip(const Ship& s);
+
+    // List order is engine state (the sorted array drives tie-breaks).
+    const std::vector<Ship>& ships() const { return ships_; }
+    Ship* findShip(int id);
+    int turn() const { return turn_; }
+    uint32_t lcgState() const { return lcg_.state; }
+    int totalRngDraws() const { return rngDraws_; }
+
+    // Order issue API (the "order apply" surface at the turn boundary).
+    // setAct mirrors the decider's store (0x40224 act-legality decider,
+    // t96 correction in ai-dossier §5): act + actTarget in one step.
+    void setAct(int shipId, uint8_t act, uint32_t actTarget);
+    // issueTravel mirrors travel issuer FUN_000220a8 (T-4): validates order
+    // kind in {Move, StarTarget}, sets kind Placement + orderType 5, resets
+    // lane-local progress. False (state unchanged) if the kind is not issuable.
+    bool issueTravel(int shipId, int laneId);
+    // retreatToSystem mirrors 0x220f2 (T-5): kind in {Engage, Move,
+    // StarTarget} -> InSystem when the target stops being targetable. The
+    // targetability test itself (FUN_00039894) is engagement scope (t364);
+    // the caller invokes this when IT knows the target is gone.
+    bool retreatToSystem(int shipId);
+    // Per-race focus object (0x41a1c compares [+0x5e] against the current
+    // object): when set for a race, ships whose actTarget differs get their
+    // act CLEARED at the boundary (0x41a30) — re-decide is the caller's hook.
+    void setFocus(int race, uint32_t focus);
+
+    // One day at the turn boundary: steps (1)-(4) of the frame above, races
+    // in ascending owner order. Assert violations are COUNTED, never fatal
+    // (headless harness; the vendor calls assert fn 0x2a428).
+    BoundaryReport advanceBoundary();
+
+    // Determinism digest: FNV-1a64 over every ship's cited state + the LCG
+    // state + the turn counter. Two runs, same seed + same inputs => same
+    // digest (pin test t361).
+    uint64_t digest() const;
+
+    // Cited helpers, exposed for the pin tests.
+    // powerRefill: trunc(powerMax * (1 + clamp((T-eta)//100, 0, 10)/10))
+    // (combat.md §1 t101 leg3; integer //100 = truncating division).
+    static int32_t powerRefill(int32_t powerMax, int32_t deltaDays);
+    // walkLaw (S17 T1/T2, FUN_00049f54): d = |delta| * 0.00625 (1/160 world->
+    // sugar); walk = min(d, moves); steps = max(1, x86round(walk)); if
+    // power < steps: walk *= power/steps, steps = power; arrived = walk == d;
+    // commit: pos += normalize(delta) * walk * 160 (the per-step
+    // normalize*(walk/steps)*32.0*5.0 collapsed — quantizer NOT applied mid-
+    // walk, INFERRED; snapped to the 32-grid on ARRIVAL only, S17 T3).
+    // Returns steps burned; mutates pos/power/moves/arrived per the commit
+    // law (param_2==1 equivalent: the sim always commits — mode-0 dry runs
+    // are the engagement resolver's concern, t364/K6).
+    static int32_t walkLaw(float pos[3], int32_t* power, int32_t* moves,
+                           const float delta[3], bool* arrived);
+    // x86 default-mode rounding (fistp round-half-to-even); C roundf is
+    // half-AWAY and would differ on .5 ties.
+    static int32_t x86Round(float v);
+
+  private:
+    struct RaceFocus { int race; uint32_t focus; };
+    void sortShipList();                 // step (2), stable on +0x52
+    void commitMove(Ship& s, BoundaryReport& rep);   // per-kind dispatch
+    void laneMarch(Ship& s, BoundaryReport& rep);    // T-7 march + T-3 arrival
+    void landingAttempt(Ship& s, BoundaryReport& rep);  // T-6 (slot model is
+                                                        // planet-side, t363:
+                                                        // default = no free
+                                                        // slot -> dwell+scatter)
+    const SimLane* lane(int id) const;
+    const SimStar* star(int id) const;
+    // Owners present in the list, ascending (per-race loop order, ai-dossier
+    // §1 "per-race AI loop" over the control table).
+    std::vector<int> ownersOf() const;
+
+    std::vector<Ship> ships_;
+    std::vector<SimStar> stars_;
+    std::vector<SimLane> lanes_;
+    std::vector<RaceFocus> focus_;
+    Lcg lcg_;
+    int turn_ = 0;
+    int rngDraws_ = 0;
+
+    int draw() { ++rngDraws_; return lcg_.next(); }
+};
+
+}  // namespace ascend::game
