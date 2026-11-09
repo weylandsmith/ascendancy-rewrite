@@ -146,3 +146,12 @@ archive/state-v2-full/2026-11-03/
 Older history: archive/ralph-v1/ (v1), archive/state-v2-full/STATE-full-2026-10-28.md.
 Anything a slimmed doc used to say is findable there; the slimmed docs carry
 archive paths where the detail lives.
+
+## USER RULING 2026-11-09 (chat, assistant as scribe) — D2
+USER: D2 = (b) commission the per-ship fleet simulation — fidelity to the
+USER:   original is the goal. Per the assistant's note accepted: NO permanent
+USER:   config toggle; per-ship becomes THE engine once it passes the
+USER:   pinned-seed suite; aggregate demotes to a test oracle during the
+USER:   transition, removed after seeds agree.
+USER: D1 = ruling page live (work/r1/d1page); D1 answer to follow via page submit.
+USER: D3 = DEFERRED by user until D1/D2 work has landed.

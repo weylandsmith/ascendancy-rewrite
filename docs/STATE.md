@@ -215,151 +215,87 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t357 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
-t348's exit ramp made this the parked state — task line FIRST, per ramp; t349
--t356 parked on it, checks below are the proven shape. SHAPE: launch
-work/r1/sentinel_t357.sh (pre-staged this iteration, copy of the proven t354/-
-t355/t356 script, BASE_EPOCH 2026-11-09 03:40:49) via terminal(background=true,
-notify=true) — nohup/& wrappers are REJECTED by the tool harness (t355). Wait
-with process_manage(action='wait', timeout=180) repeatedly (clamped to 180 s;
-~15 calls cover 45 min; a completion notification fires, so waiting is safe —
-t356 note: a foreground tail --pid chunk is NOT worth it, the tool itself
-timeouts at 420 s and the wait still returns fine). Baselines as of t356
-commit: sheet mtime 2026-11-09 03:40:49.800, DECISIONS.md mtime 03:31:41,
-timeline 8,827,874,725 B turn 1086. The sentinel covers branch (2) only — run
-branch (1) sitting check FIRST, before launching).
-  DO IN ORDER, THEN STOP: (1) tail-seek sitting check on
-  work/r1/playcap/live-timeline.jsonl (OOM law: r1_stream or <=400 KB tail
-  seek; NEVER full-read). If newest turn > 1086, a NEW SITTING arrived: run
-  scripts/r1_t85g_sitting.py FIRST (standing law), then THAT result is the
-  new NEXT ACTION — rewrite STATE.md accordingly and stop. (2) If turn is
-  still 1086: check docs/DECISIONS.md + any user note for a ruling on the
-  three live asks (OQ-005 shp keep/junk incl. the t347 shrunk 3+10-row sheet
-  work/r1/shp_png/decision-sheet.md; OQ-016 and OQ-019 dispositions per
-  _wip_t329 S4 DO-NOT-APPLY packet). A ruling = work: apply it, close per
-  strict-close, rewrite NEXT. (3) Otherwise: append one dated 'parked, no
-  trigger' line to the '## Sentinel park log' section of BLOCKED.md (t349
-  created it — append, don't re-create; t356 line ends just before '## R1
-  runbook' at ~line 191), keep NEXT as this sentinel, gate green, commit,
-  stop. Do NOT re-open the +0x0a hunt (t348 closed its offline framings;
-  REFUTED-ROUTES t348(1)-(3) binding — a future live attempt REQUIRES a
-  turn-advancing watch session, which REQUIRES fixing the xsend click path
-  first: every click in run wp-lin-0x26D061-20261109-042523 logged
-  'window died before release' and the turn never moved). Do NOT invent new
-  research tasks at the sentinel; idle is the harness's problem (t178), not
-  yours. Do NOT treat a fresh decision-sheet.md mtime as an annotation (the
-  t347 generator rewrites it; check content for USER marks). Nor a fresh
-  docs/re/*.md or work/attribution.tsv mtime (t350: gate stages gizmo_probe.py,
-  fnt_probe.py, attribution_scan.py rewrite them post-commit; only a DIRTY
-  tree is an edit — and t355/t356 add: identify WHICH file is dirty before
-  treating porcelain output as a trigger; in t355 AND t356 the lone dirty
-  entry was the session's own docs/re/_wip file). PATH FACT (t353): the health
-  readout lives at work/r1/loop/GAME_HEALTH_LIVE.txt —
-  work/r1/GAME_HEALTH_LIVE.txt does NOT exist.
+NEXT t358 per queue row t358 below (D1-RULING APPLICATION,
+CONDITIONAL). The loop had been parked on the WAIT-TRIGGER sentinel;
+user ruling D2=(b) per-ship sim recorded in docs/DECISIONS.md
+(USER RULING 2026-11-09 block) — phase 7 below is the build
+program. D1 answer may arrive via the work/r1/d1page ruling page
+(submit appends a USER block to DECISIONS.md); D3 deferred by user.
 
-ORDERING RATIONALE: t356 LANDED (~18 tool calls incl. the 45-min poll, zero
-new measurement by design — EIGHTH consecutive park on the SAME sentinel): all
-three branches re-checked with cited results — sitting check NEGATIVE (400 KB
-tail-seek, 16 records, turn 1086 on 16/16, newest tail files 44/45/46.sav,
-timeline 8,827,874,725 B; +7.8 MB growth vs t355 baseline = ring rotation), no
-user ruling (DECISIONS.md 03:31:41.300 and sheet 03:40:49.800 unchanged from
-baselines; porcelain empty pre-launch; no *ruling*/*reply*; grep USER: = 0 on
-both docs), poller run TIMEOUT:no ruling after 45min (session
-proc_9913cfae18a0) with post-exit re-confirm (both mtimes unchanged; porcelain
-lone dirty entry = own _wip_t356.md). Production :9 HEALTHY (pid 1555 up
-06:54:39, TL expiry 2026-11-11 01:07:10, watcher 1575, ring 56.sav age 4s).
-Ledger stays 16/3 (nine iterations).
-Before t356: t355 LANDED (~20 tool calls, zero new measurement by
-design — SEVENTH consecutive park on the SAME sentinel): all three branches
-re-checked with cited results — sitting check NEGATIVE (400 KB tail-seek, 16
-records, turn 1086 on 16/16, newest tail file=50.sav, timeline 8,820,053,395 B;
-growth vs t354 baseline = ring rotation), no user ruling (DECISIONS.md
-03:31:41.300 and sheet 03:40:49.800 unchanged from baselines, pre-dating the
-t354 commit 964517c 06:15:57; porcelain empty pre-launch; no *ruling*/*reply*;
-grep USER: = 0), poller run TIMEOUT:no ruling after 45min with post-exit
-re-confirm (mtime unchanged, pid 1555 alive; lone dirty entry mid-poll was the
-session's own _wip file — guardrail extended into NEXT). Production :9 HEALTHY
-(pid 1555 up 05:12:27, TL expiry 2026-11-11 01:07:10, watcher 1575, ring age
-7s). Harness facts banked: nohup/& rejected by terminal() (use
-background=true+notify=true); process_manage wait clamps to 180 s. Ledger
-stays 16/3 (eight iterations).
-Before t355: t353 LANDED (~8 tool calls, zero new measurement by
-design — FIFTH consecutive park on the SAME sentinel): all three branches
-re-checked with cited results — sitting check NEGATIVE (400 KB tail-seek, 16
-records, turn 1086 on 16/16, timeline 8,811,378,829 B newest tail record
-file=58.sav; on-disk ring 58/59/60.sav 05:20:21/:31/:41 = rotation), no user
-ruling (DECISIONS.md 03:31:41 and decision-sheet.md 03:40:49 both pre-date the
-t352 commit 5af066b 05:17:00; ruling grep = author's own ask-text only; git
-status --porcelain EMPTY per the t350 guardrail; post-commit sweep = the five
-gate-regenerated docs/re/*.md), park line appended to BLOCKED.md. Production :9
-HEALTHY (pid 1555 up 04:13:36, TL expiry 2026-11-11 01:07, watcher 1575). NEW
-PATH FACT banked into the sentinel body: the health readout is
-work/r1/loop/GAME_HEALTH_LIVE.txt, not work/r1/GAME_HEALTH_LIVE.txt. Ledger
-stays 16/3 (seven iterations).
-Before t353: t352 LANDED (~10 tool calls, zero new measurement by design
-— FOURTH consecutive park on the SAME sentinel): all three branches re-checked
-with cited results — sitting check NEGATIVE (400 KB tail-seek, 17 records, turn
-1086 on 17/17, timeline 8,810,407,088 B newest tail record file=60.sav; growth
-is ring rotation, 60.sav mtime 05:14:00), no user ruling (DECISIONS.md 03:31:41
-and decision-sheet.md 03:40:49 both pre-date the t351 commit 05:10:33; ruling
-grep hits only the author's own ask-text; git status CLEAN per the t350
-guardrail), park line appended to BLOCKED.md. Production :9 HEALTHY (pid 1555,
-TL expiry 2026-11-11 01:07:10, watcher 1575). Ledger stays 16/3 (six iterations).
-Before t352: t351 LANDED (~9 tool calls, zero new measurement by design
-— THIRD consecutive park on the SAME sentinel): all three branches re-checked
-with cited results — sitting check NEGATIVE (400 KB tail-seek, 16 records, turn
-1086 on 16/16, newest ring saves 59.sav 05:07:10; growth is ring rotation), no
-user ruling (DECISIONS.md 03:31:41 and decision-sheet.md 03:40:49 both pre-date
-the t350 commit 05:03:50; grep USER: = 0 hits; git status CLEAN, so the fresh
-mtimes in the post-commit sweep prove nothing per the t350 guardrail), park
-line appended to BLOCKED.md. Production :9 HEALTHY (pid 1555, TL expiry
-2026-11-11 01:07:10, watcher 1575). Ledger stays 16/3 (five iterations).
-Before t351: t350 LANDED (~10 tool calls, zero new measurement by
-design — second consecutive park on the SAME sentinel): all three branches
-re-checked with cited results — sitting check NEGATIVE (400 KB tail-seek, 16
-records, turn 1086 on every one, newest 54.sav; growth is ring rotation), no
-user ruling (DECISIONS.md 03:31 and decision-sheet.md 03:40 both pre-date the
-t349 commit 04:56:55; grep USER: = 0 hits; the post-commit find -newermt sweep
-returned 22 files but ALL are gate-regenerated docs/re/* + work/r1/loop logs —
-git status CLEAN, so no hand edit exists), park line appended to BLOCKED.md.
-NEW GUARDRAIL from this pass: fresh mtimes on docs/re/*.md + work/attribution.tsv
-mean nothing (gate regeneration, content-identical). Ledger stays 16/3 (four
-iterations). Before t349: t349 LANDED (~12 tool calls, zero new measurement by
-design): the sentinel's three branches were each checked with cited results —
-sitting check NEGATIVE (tail-seek newest turn 1086; timeline growth is ring
-rotation only, 51.sav 04:52:29), no user ruling anywhere (DECISIONS.md mtime
-03:31 pre-dates the t348 commit; post-commit find sweep clean), park line
-appended to the new BLOCKED.md '## Sentinel park log'.
-Before t348: t348 LANDED (1 of 2 launches spent, ~28 tool calls): the
-offline census REFUTED every arithmetic/pointer framing of planet-record
-+0x0a, and the watchpoint run wp-lin-0x26D061-20261109-042523 WITNESSED the
-load-time stamp — fire '00 -> 06' at boot, value == owner-race's run-random
-per-race constant (rec0 V=17414 constant across all 20 IDLE saves; churn is
-TURN-driven, not idle). Fire EIP 0x22d85c decoded to file 0x6e40c = a READER
-(law 7), so the writer site stays unnamed — the honest negative is banked and
-the row (not an open OQ row; OQ-003 closed t181) stays open. Every remaining
-open question (OQ-005/OQ-016/OQ-019) needs USER adjudication; the only
-machine-detectable event that outranks the park is a new sitting. Hence the
-sentinel, verbatim per t348's exit ramp.
-INTERPRETER LAW: venv python ~/.hermes/hermes-agent/venv/bin/python for
-anything importing PIL (t327) AND for every debugger/watch session (t348 ran
-r1_wp_session.py under it fine). NOTE t348: r1_wp_session.py's wp.conf writes
-core=normal under [dosbox] — INERT per t304 CORE-CONF LAW (must be under
-[cpu]); the run still fired correctly but ran the DYNAMIC core. Fix the conf
-shape (copy r299_leg_session.py's launch()) BEFORE any future watch session.
-CONTEXT BANKED t348: census scripts/r348_planet0a_census.py (exit 0; corpus
-output /tmp/t348_census.txt — ephemeral, rerun if needed); watch run
-work/r1/wp-lin-0x26D061-20261109-042523 (boot-fires.txt, session.log, 20
-saves + ring-final); findings docs/re/_wip_t348.md S0-S5; doc updates
-income-law.md T348 UPDATE + r1-savestate.md field line + REFUTED t348(1)-(3).
-t346 input-pump law still binding (docs/re/selfplay.md t346 block). Ledger
-16/3 unchanged four iterations running (OQ-005/OQ-016/OQ-019 — all user-gated).
+QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
+to the original; NO permanent toggle — per-ship becomes THE engine once the
+pinned-seed suite passes, aggregate demotes to oracle, removed after. One
+session each; finish tN -> rewrite NEXT to tN+1 VERBATIM; keep this block
+intact except deleting completed rows. Evidence base: docs/re/ships.md,
+docs/re/ai-dossier.md (treat as spec), STATE DRIVE-CLASS laws,
+docs/re/_wip_d1page.md (signed-bbox dims fix, D1-gated).
 
-QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed rows; phase-5b rows
-t324-t342 + phase-6 rows t343-t348 completed and retired; the authored queue
-ran out at t347, t348 was derived from the t346 (b)-list; t349 = the live
-NEXT above (WAIT-TRIGGER sentinel, per t348's exit ramp) — see LANDED blocks.)
+t358 D1-RULING APPLICATION (CONDITIONAL — run FIRST; if
+      'grep -c "^USER: D1 mouse" docs/DECISIONS.md' is 0, bank an honest
+      negative and rewrite NEXT to t359; do NOT park). If the block exists:
+      apply exactly what it says — (a) mouse k5/k6/k7 verdict + batch-41
+      accept -> update work/r1/shp_png/index.txt dispositions +
+      decision-sheet.md footer + docs/OPEN-QUESTIONS.md OQ-005 row to CLOSED
+      citing the USER block (verbatim quote) + shp.md S25-S27 pointers
+      (strict-close: the user ruling IS the closer; R13 satisfied); (b) if
+      keep: implement the signed-bbox-aware dims read in
+      rewrite/src/formats/shp.cpp per _wip_d1page.md MEASURED section (k4..k7
+      decode at 78x47, plane md5 b2d049bbf5b5 as the pin), add the 4-plane pin
+      test, keep the -1 blit gate untouched; (c) A6-A8 + B-row corrections per
+      the block; (d) ledger_audit + index_check + gate green.
+
+t359 PER-SHIP RECORD SPEC DOSSIER (zero code). From the CITED laws only —
+      ships.md order/dwell/gizmo/carrier sections, ai-dossier.md, t292 combat
+      fields (+0x8c INTEGRITY / +0x90 shield, subtract 0x4d1ea, death 0x49d2c),
+      t273 attribution law, st4 DWELL law, 0x220a8->0x21f58 arrival chain —
+      write docs/re/pership-spec.md: (1) ship-record field table (guest-phys
+      offsets, width, law pointer per field, UNKNOWN marked); (2) order-state
+      enum + transition table with cited trigger sites; (3) gizmo inventory
+      law; (4) carrier/cargo law; (5) per-ship combat round law; (6) save/
+      load: which RESUME.GAM regions carry ship records (pointers to t-banks);
+      (7) explicit NON-GOALS. Every line carries a docs/re pointer or is
+      marked INFERRED. This dossier is the build contract for t360-t365.
+
+t360 PER-SHIP SAVE PARSER (read-side). rewrite/src/formats/: ShipRecord
+      structs + parser mapping RESUME.GAM ship regions per spec section (6);
+      round-trip test: parse banked production frames (work/r1/bank-t1086* /
+      ring .sav files — READ ONLY via streaming, OOM law) and assert census
+      invariants already measured (62,762-row census, owner/race attribution
+      law t273). No behavior change yet; tests only + parse API.
+
+t361 PER-SHIP ENGINE SKELETON: rewrite/src/game/shipsim.{h,cpp} — ship list,
+      per-ship dwell countdown, order apply at turn boundary per spec (2).
+      Determinism pins first: seeded RNG use matches campaign.cpp law. Unit
+      tests for dwell expiry + order transitions (table-driven from spec).
+
+t362 MIXED-FLEET DEPARTURE LAW PARITY: reproduce the vendor piecemeal-
+      departure behavior (dwell expiry per ship) from the st4 DWELL law;
+      parity test vs banked witnesses; aggregate oracle still passes.
+
+t363 GIZMO INVENTORY + CARRIER/CARGO into shipsim per spec (3)(4); magnetron/
+      Phase-Bomb residues get a HOME here (which ship carries what) — do not
+      close OQ rows (user-gated), just give the model the fields.
+
+t364 PER-SHIP COMBAT ROUND into shipsim per spec (5) + t292 comparator
+      unchanged (aggregate victory law stays; per-ship only redistributes
+      losses). Mutation-tested pins like the t290-t292 arms.
+
+t365 ENGINE FLIP: campaign turn loop calls shipsim; aggregate code demoted to
+      rewrite/src/game/aggregate_oracle.{h,cpp} used ONLY by tests; full
+      pinned-seed suite green; gate green; DECISIONS.md D2 annotated APPLIED;
+      OQ-019 residue status updated in OPEN-QUESTIONS (row itself closes only
+      on user ruling per t329 packet — annotate 'model exists, awaiting
+      user acceptance').
+
+t366 (CONDITIONAL, only if t365 green) SAVE-WRITE SIDE: emit ship records back
+      into RESUME.GAM layout; byte-compare vs vendor-written save if one can
+      be produced headlessly, else round-trip-through-rewrite tests + honest
+      note.
+
+After t366 (or on any hard block): rewrite NEXT to the WAIT-TRIGGER sentinel
+shape (see t356 LANDED for the proven script pattern) — do NOT invent new
+capture routes against cited-dead laws.
+
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
