@@ -258,7 +258,16 @@ item-35/35 completion branches = MEASURED zero-witness + AI-unreachable
 (REFUTED t271, re-open conditions there). t299 debugger leg witness ran
 (2026-11-04): zero fires; t301 re-attributed as ARMING-FAILURE not a bypass
 law (see OQ-019 note + ships.md S28); no OQ-016
-constant moved, row stays open.
+constant moved, row stays open. T345 (residue-(4) follow-through, income-law.md
+S-T345): marker-byte law closed MEASUREMENT-WISE — gate-bit8 population =
+{18,19,26,27} runtime 48/48 (scripts/r345_gate_word_census.py exit 0), writer
+census exhaustive (completion 0x3928b constants 15/35 vs setter fn 0x39760
+ship-index; getter 0x396cc 25/25 sites item-23-gated -> shield constants inert),
+corpus circle 360/360 ACTIVE ship rows resolve owner+0x59+0x58==3 (scripts/
+r345_marker_census.py exit 0). Rewrite code site NOT landed: no per-ship
+build-slot state exists to carry it (OQ-019 boundary); shieldThreatFor/
+orbitalThreatFor sets runtime-verified unchanged. No code delta; row stays
+open per D3.
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor cost hack, Orbital Docks effect

@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-08T16:40
+updated: 2026-11-09T02:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,63 +212,9 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t345 SHIELD-BYTE LAW -> REWRITE CODE SITE (OQ-016 residue-(4)
-follow-through). [queue row VERBATIM:]
-  t325 measured the census law (pending rows slot+3 == 0, 44/44; completed rows
-  constant 15 with word2 0xf01, 43/43 — docs/re/economy.md or income-law.md
-  S-T325) and t340 named the completion handler (commit 53138e0, read its LANDED
-  block FIRST — it may already state the disposition). If the cited law is now
-  sufficient to model: upgrade the rewrite (planetwin/poppanel/economy as
-  appropriate) + a mutation-verified pin, cite the addresses, run run_tests +
-  record_playthrough regeneration if timelines move (PLAYTHROUGH.md is
-  generated output; a flip is expected regeneration, not regression — but say
-  which seeds moved). If not sufficient: bank the precise gap (what measurement
-  would close it) and change no code. strict-close the residue ONLY on cited
-  measurement + code site; otherwise row STAYS OPEN.
-
-ORDERING RATIONALE: t344 spent the LAST non-user route on OQ-005 (selector law
-found + TL/TR corner witness landed, shp.md S27; k5/k6/k7 pixels
-capture-limited). What remains open everywhere (OQ-005 D1 ruling, OQ-016 D2/D3,
-OQ-019 disposition packet) waits on user decisions, so the queue's row 1 (t345,
-zero-capture static + code-site task) is next VERBATIM per queue discipline.
-No launch budget needed for t345; if it proves to need one, re-scope honestly.
-  MEASURED CONTEXT t344 supplies: (i) debug-harness teardown now REMOVES the
-  Xvfb lock it owns (scripts/r1_dbg_session.py fix) — future capture tasks need
-  no manual /tmp/.X<d>-lock surgery; (ii) DOSBox maps guest 640x480 -> root
-  800x600 (scale 1.25): edge-exact clicks are root {0,799}x{0,599} (root 788 =
-  guest ~630 fires NOTHING — false zero, REFUTED-ROUTES t344(3));
-  (iii) pool-relative-immediate law CONFIRMED again — scan str_off-0x82BB0,
-  never str_off (REFUTED-ROUTES t344(1)); (iv) artifacts/ascend_restored.bin +
-  functions_full.tsv tracked (t343), tightest-span rule still applies.
-Gate + both ledger audits green at t344 landing. No ledger row closes unless
-t345 lands cited measurement + code site (strict-close).
-FIRST ACTION of the iteration is still the sitting check (tail-seek newest
-turn in work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py
-BEFORE starting; NEVER full-read — OOM law).
-
-CONTEXT BANKED: t344 landed the mouse-cursor selector law (docs/re/shp.md S27;
-working detail docs/re/_wip_t344.md S0-S5; scripts/r344_strings.py,
-r344_mouse_refs.py, r344_dimslaw.py, r344_cursor_session.py — all exit 0).
-MEASURED LAWS BANKED t344: MOUSE.SHP referrer = pool-relative imm 0x1764,
-sole code site fn 0x309d4 @0x309f9; geometry W=u32[rec+0x10]-u32[rec+0x8]+1,
-H=u32[rec+0x14]-u32[rec+0xc]+1 (fn 0x61058), hotspot int32[rec+8]/u16[rec+0xc]
-(fn 0x6108c), memo quad ds:0xa208c/74/90/cc (fn 0x64ea9); 12/12 mouse records
-bbox-diff == u16-pair+1 (slots agree; SIGNS carry the anchor; k4..k7 = ONE
-78x47 glyph, four corner anchors); ids 4..7 = screen-corner cursors via mode
-chain 0x5473b..0x547a6 (id = mode+4, EXACT-edge cmp on ds:0x484ec/0x484f0);
-held->id1 / release->id0 (fn 0x54650). LIVE run
-work/r1/dbg-t344d-20261108-161132: click (0,0)->k4@rec 0x48b, (799,0)->
-k5@rec 0xc99, releases->k0@0x68, lib 0x2EC03C byte-exact vs t330 base.
-REFUTED-ROUTES t344 amendments 1-3 binding. OQ-005 row updated, STAYS OPEN
-(pixel MATCH never landed).
-
-QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed rows; phase-5b rows
-t324-t342 + phase-6 rows t343-t344 completed and retired; t345 is the live
-NEXT above (its queue row moved there VERBATIM) — see LANDED blocks)
-
-t346 NEXT UNMAPPED-WRITER HUNT with tool v2 (the t327 instrument's first real
-  assignment). CANDIDATE ORDER: (a) star-record byte +0x5a colonized-planet
+NEXT t346 UNMAPPED-WRITER HUNT with tool v2 (the t327 instrument's first real
+assignment). [queue row VERBATIM:]
+  CANDIDATE ORDER: (a) star-record byte +0x5a colonized-planet
   count (t247 102-planet arithmetic; the writer was never witnessed — VERIFY
   first by grepping docs/re/r1-savestate.md + score.md for a +0x5a writer
   claim; if already closed, fall to (b)); (b) any DAT/star/ship writer that the
@@ -281,6 +227,51 @@ t346 NEXT UNMAPPED-WRITER HUNT with tool v2 (the t327 instrument's first real
   (LEGSPEC + expectation grammar + verdict.json + bank-on-exit), scratch copy,
   own ring dir, budget 3 launches. Bank writer + surrounding law to the right
   docs/re/ file; strict-close only if the row's own bar is met.
+
+ORDERING RATIONALE: t345 closed the marker-byte question MEASUREMENT-WISE
+(income-law.md S-T345) with NO code delta — the rewrite has no per-ship
+build-slot state to carry it (OQ-019 boundary, pre-authorised "insufficient ->
+bank, change no code" branch did not even trigger: measurement landed fully).
+What remains open everywhere (OQ-005 D1 ruling, OQ-016 D3, OQ-019 disposition
+packet) waits on user decisions, so the queue's next row (t346, the only
+non-user route left) runs VERBATIM per queue discipline. t346 needs a launch
+budget (3); the sitting check may PRE-EMPT it if the user played (new sitting >
+turn 1086 => r1_t85g_sitting.py FIRST, and if the sitting opens a fresher
+question, that outranks this assignment).
+  MEASURED CONTEXT t345 supplies (binding for t346): (i) static bytes at
+  Ghidra 0x73e40 (item table) are CODE-SHAPED GARBAGE — the t74 heap-copy law
+  bit firsthand this session; ANY table census MUST go through live saves
+  (pointer law B+0x82BB0+off) or the r1_income_law IL.load_slots/find_records
+  helpers (they carry the +0x88 member-header correction; a raw walk WITHOUT
+  +0x88 finds ZERO planet records — measured, don't re-derive); (ii) keeper
+  scripts r345_gate_word_census.py / r345_marker_census.py run the
+  save-corpus census pattern green — copy their structure;
+  (iii) Xvfb-lock teardown fix stands (t344); root-edge clicks {0,799}x{0,599}
+  (t344(3)); pool-relative immediates (t344(1)).
+Gate + both ledger audits green at t345 landing. No ledger row closes unless
+t346 lands cited measurement + the row's own bar (strict-close).
+FIRST ACTION of the iteration is still the sitting check (tail-seek newest
+turn in work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py
+BEFORE starting; NEVER full-read — OOM law).
+
+CONTEXT BANKED: t345 landed the slot-marker UNION law (docs/re/income-law.md
+S-T345; working detail docs/re/_wip_t345.md S0-S10; scripts/r345_gate_word_census.py
+exit 0 work/r345_gate_census.out; scripts/r345_marker_census.py exit 0
+work/r345_marker_census.out). MEASURED LAWS: runtime item FLAGS word bit8 set
+EXACTLY {18,19,26,27} / bit4 EXACTLY {17,28,29,30} (48/48 saves stable); slot
+word2 = (MARKER<<8)|ACTIVE-bit with exhaustive writers (completion 0x3928b
+constants 15/35 gated bit8+cell>=+0x18; SETTER fn 0x39760 = ship-record index,
+orbital-only, callers 0x3987c/0x3b860/0x3f87b; clears 0x391ce/0x21f37/0x3ca2c);
+getter 0x396cc (25 sites, ALL item-23-gated) resolves marker -> ship record
+0x3a095+marker*0x162; corpus circle 360/360 ACTIVE ship rows: rec owner ==
+planet owner, +0x59 == planet record, +0x58 == 3. Shield constants 15/35 are
+INERT (getter never runs on shields) — t340 reading HOLDS. Rewrite:
+shieldThreatFor/orbitalThreatFor sets now runtime-verified; NO code delta.
+
+QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
+keep this block intact except deleting your completed rows; phase-5b rows
+t324-t342 + phase-6 rows t343-t345 completed and retired; t346 is the live
+NEXT above (its queue row moved there VERBATIM) — see LANDED blocks)
 
 t347 DECISION-SHEET REGENERATION AFTER THE SLIM (cheap, protects D1). The
   docs/re/_wip_*.md files were archived 2026-11-03; scripts/r1_t278_decision_sheet.py
@@ -336,6 +327,32 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t345 — 2026-11-09 (SLOT MARKER BYTE UNION LAW, OQ-016 residue-(4)
+follow-through; ZERO captures, offline corpus + disasm; sitting check negative
+t1086. PROVED: (1) runtime item-table FLAGS word bit8 set EXACTLY {18,19,26,27}
+/ bit4 EXACTLY {17,28,29,30} — 48/48 saves stable (scripts/r345_gate_word_census
+.py exit 0); static 0x73e40 bytes code-shaped garbage, t74 law firsthand.
+(2) Writer census EXHAUSTIVE over both addressing forms (*1+0x3 = 1 site,
+*4+0x2 = 27 sites, all classified): word2 = (MARKER<<8)|ACTIVE-bit; completion
+0x3928b writes constants 15/35 (item 27) gated gate-bit8 AND cell >= +0x18 —
+first time shown the cell term is what explains the t325 item-18-vs-26 census;
+SETTER fn 0x39760 (pair of getter 0x396cc) writes the SHIP-RECORD INDEX
+(orbital-only assert 0x40f; callers 0x3987c ship-assign, 0x3b860, 0x3f87b) —
+the S4 "contradiction" (constants can't feed a 25-site resolver) dissolves:
+two writer populations by slot class, a UNION FIELD. (3) Getter 0x396cc's 25
+call sites are ALL item-23-gated -> shield constants 15/35 functionally INERT;
+t340's one-time-marker reading HOLDS for shields. (4) CORPUS CIRCLE
+(scripts/r345_marker_census.py exit 0 + inline pass): 17 distinct byte3 values
+on item-23 rows; 360/360 ACTIVE ship rows resolve rec owner == planet owner,
++0x59 == planet record (guest-phys +0x88 law), +0x58 == 3; shield contrast
+item18 1800 rows byte3 always 0, item26 2932x15+108x0, item27 180x35+240x0,
+zero dangling (4-run-lineage correlation honestly noted). DISPOSITION: law
+closed measurement-wise (income-law.md S-T345); NO rewrite code delta — the
+rewrite carries no per-ship build-slot state to hold the marker (OQ-019
+boundary); shieldThreatFor/orbitalThreatFor item sets upgraded from file-file
+citation to RUNTIME-verified (code unchanged). OQ-016 row STAYS OPEN per D3
+strict-close. NEXT=t346 VERBATIM. game/ untouched.
 
 ## LANDED t344 — 2026-11-08 (MOUSE-CURSOR DRAW-WITNESS, OQ-005: SELECTOR LAW
 ## FOUND STATICALLY + LIVE CORNER WITNESS TL/TR BYTE-EXACT; t328 DIMS DISPUTE

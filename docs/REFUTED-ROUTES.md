@@ -1265,3 +1265,22 @@ from a non-16 state is NOT evidence of unreachability.
 ##     800x600 (scale 1.25), so root clicks must be at {0,799}x{0,599}.
 ##     A root click at 788 measures guest ~630 and fires NOTHING — that is
 ##     a calibration miss, not evidence the selector is dead.
+
+
+# t345 AMENDMENTS (binding, 2026-11-09; evidence docs/re/income-law.md S-T345 +
+# docs/re/_wip_t345.md):
+## (1) STATIC BYTE CENSUS OF A HEAP-COPY TABLE IS A FALSE INSTRUMENT. The
+##     Ghidra bytes at 0x73e40 (item table) returned a 40-item "bit8 set" list
+##     that is pure code-shape noise; the live census is {18,19,26,27} 48/48.
+##     Any FLAGS/class/count census of 0x73e40, 0x3a095, or 0x12e16-family
+##     tables MUST read saves via the pointer law (r345_gate_word_census.py is
+##     the template). A static result on these tables is never evidence.
+## (2) "byte3 IS NOT A SHIP INDEX" IS REFUTED FOR ITEM-23 SLOTS: word2 high
+##     byte is a UNION by slot class - ship-record index on item-23 rows
+##     (setter fn 0x39760, corpus circle 360/360), constants 15/35 only on
+##     completed gate-bit8 items. Do NOT re-litigate t340's shield-marker
+##     reading (it holds) and do NOT model byte3 as a single-meaning field.
+## (3) PLANET-RECORD WALKS WITHOUT THE +0x88 MEMBER HEADER find ZERO records
+##     (measured this session: 0 stats over 60 saves). Slot-array pointer
+##     [rec+0x10] is guest-physical; the ZIP Memory member starts at +0x88
+##     (t33 law). Use IL.load_slots/find_records which carry the correction.

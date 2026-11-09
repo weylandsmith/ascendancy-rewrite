@@ -2565,3 +2565,41 @@ No missing vendor law for human build order; nothing for the rewrite to
 change (buildPhase comment upgraded to cite this corpus witness). Row
 movement per D3 = user adjudication (the row's residue list is exhausted:
 (1) cited-dead x8 legs, (2)(3)(4) CLOSED, (6) CLOSED as misattribution).
+
+
+## S-T345 — SLOT MARKER BYTE: UNION LAW CLOSED MEASUREMENT-WISE (OQ-016 residue-4 follow-through, 2026-11-09)
+Working detail docs/re/_wip_t345.md S0-S10; keeper tools scripts/r345_gate_word_census.py
+(exit 0, work/r345_gate_census.out) + scripts/r345_marker_census.py (exit 0,
+work/r345_marker_census.out). Zero captures — offline corpus + disasm only.
+THE LAW (slot word2 = (MARKER << 8) | ACTIVE-bit; every writer/consumer cited):
+1. GATE POPULATION MEASURED: runtime item-table FLAGS word (+6, pointer law
+   B+0x82BB0+0x73E40+idx*0x28) has bit 0x8 SET EXACTLY on items {18,19,26,27}
+   and bit 0x4 exactly on {17,28,29,30} — 48/48 saves, every row single-valued.
+   Static bytes at Ghidra 0x73e40 are code-shaped garbage (t74 law firsthand).
+   Item 23 (Ship) flags=0x0000 -> ship completions NEVER take the completion
+   marker. The rewrite's shieldThreatFor flags&8 / orbitalThreatFor flags&4
+   item sets are now RUNTIME-verified (were file-file cited).
+2. WRITER CENSUS EXHAUSTIVE: `*1+0x3` form = 1 site (0x3927a, completion);
+   `*4+0x2` form = 27 sites, all classified. Completion marker writer 0x3928b
+   (15 / 35 for item 27) gated gate-bit8 AND cell >= +0x18; SETTER fn 0x39760
+   (pair of getter 0x396cc) writes word2 = (word2&0xff) | (ship_idx << 8),
+   orbital-only (assert 0x40f cell >= +0x18), callers 0x3987c (ship-assign:
+   finds free orbital cell, byte1:=0x17, word2:=1, then stamps), 0x3b860,
+   0x3f87b. Clears: 0x391ce/0x21f37 word2:=0; 0x3ca2c bit0-only (marker kept).
+3. CONSUMER: getter 0x396cc resolves marker -> ship record 0x3a095+marker*0x162
+   (asserts marker < 0x6b, rec+0x54 hi16 != -1). ALL 25 call sites gate slot
+   byte1 == 0x17 -> THE GETTER NEVER RUNS ON SHIELD SLOTS; the constants 15/35
+   are functionally INERT one-time completion markers (t340 reading HOLDS).
+4. CORPUS CIRCLE: item-23 slot rows carry 17 DISTINCT byte3 values (per-ship
+   index, NOT constant); 360/360 ACTIVE ship rows resolve to a ship record with
+   owner == planet owner, +0x59 == planet record ptr (guest-phys, +0x88 law),
+   +0x58 == 3. Shield contrast 60 saves: item 18 1800 rows byte3 ALWAYS 0
+   (surface skip); item 26 2932 marker15 + 108 marker0-uncompleted; item 27 180
+   marker35 + 240 marker0; zero dangling. (Count-correlation honest note:
+   4 run lineages — "rec15/35 always valid" is 4 independent data points.)
+5. REWRITE DISPOSITION (the t345 question): measurement is SUFFICIENT, code
+   site is NOT — the rewrite carries no per-ship build-slot state (fleet_
+   launch abstraction), so the marker union has nowhere to live until the
+   OQ-019 per-ship model lands. NO code delta this iteration (pre-authorised:
+   insufficient -> bank, change no code). residue-(4) stays CLOSED as a law
+   question; OQ-016 row movement remains D3 user adjudication.
