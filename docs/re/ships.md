@@ -2786,3 +2786,35 @@ negative, S7). Working notes docs/re/_wip_t339.md S0-S7.
 LEDGER: nothing closed strict-close (16/3); OQ-016 residue-(1) REWRITTEN —
 EIGHTH cited-dead leg (no-poster + unreachable-by-construction); closure-class
 = user ruling D2-c alone. REFUTED-ROUTES t339 amendment (3 binding clauses).
+
+## S59 t360 (2026-11-09) — SAVE-SIDE SHIP-ARRAY LAW (t360, MEASURED 2026-11-09, production ring
+work/r1/playcap/save/41..60.sav, turn 1086, 20/20 base-verified via the
+anchor vote; full detail docs/re/_wip_t360.md S2):
+  L1 The reader stack is live in the rewrite: rewrite/src/formats/shipsave.
+     {h,cpp} (ZIP Memory-member inflate, findImageBase anchor-vote port,
+     parseShipRecords full-window). Cited fields only; UNKNOWN gaps unmodelled.
+  L2 The count word (ds:0x43489>>16 == 30 here) is NOT the fleet census:
+     4 live records sit at indices >= 30 (slot indices 1..33 live). Full-window
+     scan + dead-marker filter is the parse law (confirms fleet-list item 3
+     save-side: named Eregion/Ereinion/Escutcheon B rows were the witness).
+  L3 Dead/free marker: u32@+0x54 == 0xffff0000 (NOT 0xffffffff; the low u16
+     is 0), race byte 0xff, uniform (kind,cap,filled) == (0,5,0) on 1540/1540.
+     Live attribution (handle>>16 == byte@+0x56): 600/600 (t273 re-confirmed).
+  L4 FILLED-LAW ARTIFACT RESOLVED (supersedes the DISPUTED flag in
+     pership-spec §1 +0x15e): filled == count(cidx!=0xFF over 0..cap-1) on
+     600/600 rows here, while §18 measured INCLUSIVE 1234/1234 on the t184
+     campaign. Both are consistent: the 25-slot ring ends exactly at +0x15a
+     where the CAP dword begins, so a stride-7 probe at slot index == cap on a
+     cap==25 row reads the cap word's low byte (==25, never 0xFF) — a self-read
+     that inflates every cap==25 row by 1. On cap<25 rows index==cap is a real
+     ring slot (the genuine 100 phantom rows live there). Consumers must treat
+     probe(idx==cap) as inventory ONLY when cap < 25.
+  L5 PORT TRAP (binding for any future Python->C++ port of r1_sav_scan):
+     build_anchors' zero law is w.strip(b"\x00")==w — strip trims END bytes
+     only; middle zeros pass. An anywhere-zero port gets 0 anchors.
+  Corpus pin (frozen turn-1086 ring, self-skips when the game advances):
+     B==0x1bf4d8; per-save live 30 / dead 77 / 4 beyond count; kinds
+     {3:4,4:3,5:23}, owners {0:14,1:7,2:9}, caps {10:25,15:1,25:4}; window
+     md5 54bea6e3e9cd66236dd3ff0d6ba34738 / FNV-1a64 0x3acb4b625a289f54 over
+     0x6b*0x162 B. Test: rewrite/tests/test_shipsave_t360.cpp (x3 cases,
+     run_tests 179/0). Census tool: scripts/r360_save_shipcensus.py.

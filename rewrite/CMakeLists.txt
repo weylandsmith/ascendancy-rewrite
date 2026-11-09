@@ -16,6 +16,8 @@ endif()
 add_compile_options(-Wall -Wextra -Wno-unused-parameter)
 
 find_package(PkgConfig REQUIRED)
+# zlib: savestate ZIP reader (formats/shipsave.cpp, t360). System lib, no vendoring.
+find_package(ZLIB REQUIRED)
 pkg_check_modules(SDL2 REQUIRED sdl2)
 pkg_check_modules(SDL2_MIXER REQUIRED SDL2_mixer)
 # NOTE: SDL2_ttf was dropped 2026-10-05f — UI text now renders from the
@@ -35,6 +37,7 @@ add_library(ascend_core STATIC
   src/formats/flic.cpp
   src/formats/fnt.cpp
   src/formats/shp.cpp
+  src/formats/shipsave.cpp
   src/game/starstat.cpp
   src/game/mapgen.cpp
   src/game/research.cpp
@@ -43,6 +46,8 @@ add_library(ascend_core STATIC
   src/game/species.cpp
   src/game/campaign.cpp
 )
+# shipsave.cpp inflates savestate ZIPs; PUBLIC so consumers (run_tests) link it.
+target_link_libraries(ascend_core PUBLIC ZLIB::ZLIB)
 
 # ---- importer + game ------------------------------------------------------
 add_library(ascend_ui STATIC
@@ -91,6 +96,7 @@ add_executable(run_tests
   tests/test_flic.cpp
   tests/test_fnt.cpp
   tests/test_shp.cpp
+  tests/test_shipsave_t360.cpp
   src/ui/layout.cpp
   src/ui/hudlayout.cpp
   src/ui/poppanel.cpp

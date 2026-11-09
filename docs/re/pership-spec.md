@@ -179,7 +179,11 @@ All offsets below are record-relative. Recalc fn FUN_00049acc
                                    INCLUSIVE (phantom-slot off-by-one,
                                    MEASURED 100/1234 rows; gizmo at idx==cap
                                    is inert for stats/upkeep yet counted);
-                                   ships.md §18 PHANTOM-SLOT
+                                   ships.md §18 PHANTOM-SLOT. RESOLVED t360:
+                                   the probe at idx==cap on a cap==25 row is a
+                                   SELF-READ of the cap word's low byte (ring
+                                   span 0xab..0x15a); exclusive law holds
+                                   600/600 save-side — ships.md S59 L4.
  stride 0x162 record size          A1 above
 UNKNOWN fields (do not model, do not invent): +0x0e? gap between +0x0c and
  +0x10; +0x1e..+0x1f; +0x32..+0x33; +0x55; +0x57 (planet-record field, NOT

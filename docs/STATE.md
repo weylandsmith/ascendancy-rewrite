@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-09T15:05
+updated: 2026-11-09T15:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,14 +222,18 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t360 per queue row t360 below (PER-SHIP SAVE PARSER, read-side), VERBATIM.
-Ordering rationale: t367 (D1 application) LANDED 2026-11-09 — OQ-005 CLOSED,
-ledger 17/2 — so the queue resumes where it was before the ruling diverted one
-row; t360 is independent of all shp work and is the first artifact t361's
-skeleton depends on. The spec contract is docs/re/pership-spec.md (t359);
-section (6) carries the member-index law, count gate, and ring-corpus
-streaming constraints to test against. No D1 residue remains open: the B5-B29
-render testimony is banked shp.md S28 (not a ledger row, do not open one).
+NEXT t361 per queue row t361 below (PER-SHIP ENGINE SKELETON), VERBATIM.
+Ordering rationale: t360 LANDED 2026-11-09 — the read-side parse API
+(rewrite/src/formats/shipsave.{h,cpp}, ships.md S59 laws L1-L5) is exactly the
+input surface shipsim.{h,cpp} consumes, so the skeleton goes next; t361 is
+independent of all shp/D1 work (OQ-005 CLOSED t367, no residue). Spec contract
+stays docs/re/pership-spec.md: section (2) is the transition table the unit
+tests table-drive; determinism pins FIRST (seeded RNG must match the
+campaign.cpp law before any behavior is encoded). Consume S59 L2 (full-window
+scan, count word is not the census) and L4 (probe(idx==cap) is inventory only
+when cap<25). If the production ring has moved past turn 1086 by then, the
+frozen-ring test self-skips — that is expected, not a blocker; the durable law
+test is shipsave_corpus_law_pins_t360.
 
 QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
 to the original; NO permanent toggle — per-ship becomes THE engine once the
@@ -245,12 +249,8 @@ t359 PER-SHIP RECORD SPEC DOSSIER — LANDED 2026-11-09 (see LANDED
 t367 D1-RULING APPLICATION — LANDED 2026-11-09 (see LANDED t367 block;
       OQ-005 CLOSED, shp.cpp fallback + pin, sheet dispositions final).
 
-t360 PER-SHIP SAVE PARSER (read-side). rewrite/src/formats/: ShipRecord
-      structs + parser mapping RESUME.GAM ship regions per spec section (6);
-      round-trip test: parse banked production frames (work/r1/bank-t1086* /
-      ring .sav files — READ ONLY via streaming, OOM law) and assert census
-      invariants already measured (62,762-row census, owner/race attribution
-      law t273). No behavior change yet; tests only + parse API.
+t360 PER-SHIP SAVE PARSER (read-side) — LANDED 2026-11-09 (see LANDED t360
+      block; shipsave.{h,cpp} + test_shipsave_t360.cpp x3, run_tests 179/0).
 
 t361 PER-SHIP ENGINE SKELETON: rewrite/src/game/shipsim.{h,cpp} — ship list,
       per-ship dwell countdown, order apply at turn boundary per spec (2).
@@ -330,6 +330,46 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t360 — 2026-11-09 (PER-SHIP SAVE PARSER READ-SIDE SHIPPED:
+## rewrite/src/formats/shipsave.{h,cpp} + 3 PIN TESTS, run_tests 179/0;
+## SAVE-SIDE LAWS MEASURED ships.md S59; FILLED-LAW DISPUTE RESOLVED; LEDGER
+## 17/2 UNCHANGED — honest negative on closes)
+
+Sitting check FIRST: NEGATIVE — timeline 8,890,184,654 B, 400 KB tail-seek,
+16/16 records turn 1086; r1_t85g_sitting.py not run; production :9 untouched;
+game/ read-only. Corpus: production ring work/r1/playcap/save/41..60.sav
+(turn 1086, 20/20 base-verified; the queue's "bank-t1086*" glob matches
+nothing on disk — the ring IS the banked frame set; noted, not a blocker).
+
+MEASURED (scripts/r360_save_shipcensus.py + probes, all cited in
+docs/re/_wip_t360.md S2 + ships.md S59): B==0x1bf4d8 20/20 (anchor-vote
+re-derivation, agrees t333 needle); whole 0x6b-slot window byte-identical
+across the ring (md5 54bea6e3e9cd66236dd3ff0d6ba34738, FNV-1a64
+0x3acb4b625a289f54); count word 30 is NOT the census — 4 live records at
+indices >=30 (ships.md fleet-list item 3 confirmed save-side); dead marker
+u32@+0x54==0xffff0000 (NOT 0xffffffff) with uniform (kind,cap,filled)==(0,5,0)
+1540/1540; attr law (handle>>16==race) 600/600 live (t273 re-confirmed);
+live kinds {3:80,4:60,5:460} subset A4; caps {10:500,15:20,25:80}. FILLED-LAW
+RESOLUTION: exclusive law holds 600/600 here vs §18 inclusive 1234/1234 on
+t184 — consistent because the ring span ends AT the cap dword (+0xab+7*25 ==
+0x15a): probe(idx==cap) on a cap==25 row self-reads the cap low byte. No
+contradiction remains; pership-spec +0x15e row annotated RESOLVED.
+
+CODE: formats/shipsave.{h,cpp} — ZIP EOCD->central-dir->Memory raw-inflate
+(zlib; ascend_core PUBLIC ZLIB::ZLIB, find_package(ZLIB REQUIRED) added),
+anchor-vote findImageBase port, parseShipRecords full-window (cited fields
+only, dead rows flagged not skipped, ring cidx x25, UNKNOWN gaps unmodelled).
+PORT TRAP BANKED (S59 L5): build_anchors' zero law is strip() END-semantics —
+anywhere-zero port gets 0 anchors (cost 3 debug rounds).
+TESTS test_shipsave_t360.cpp x3: reader determinism + negative controls
+(zero-filled member no vote; 4 KiB stub window-refused-not-clamped); durable
+corpus-law pins; frozen-ring EXACT pin self-skipping past turn 1086.
+run_tests 179/0 (176->+3). Engine behavior UNCHANGED (read-side only).
+
+LEDGER: nothing closed strict-close (17/2 — parser artifacts + law
+re-confirmations are not a row's named closer; OQ-019 stays user-gated per
+t329, read-side model existing is noted in _wip_t360 S5, not the row).
 
 ## LANDED t367 — 2026-11-09 (D1-RULING APPLICATION: OQ-005 CLOSED STRICT-CLOSE,
 ## CORNER-ANCHOR GATE FALLBACK SHIPPED + PINNED, SHEET DISPOSITIONS FINAL;
