@@ -127,6 +127,22 @@ times.
   NEXT stays the WAIT-TRIGGER sentinel verbatim; +0x0a hunt not re-opened
   (t348(1)-(3) binding); no research task invented (t178).
 
+- 2026-11-09 t353: parked, no trigger. Sitting check NEGATIVE (400 KB tail-SEEK,
+  16 records parsed with json, turn==day==1086 on 16/16 == corpus floor; timeline
+  8,811,378,829 B, newest tail record field file=58.sav; on-disk ring 58/59/60.sav
+  05:20:21/:31/:41 = 10 s rotation, not play). Production :9 HEALTHY: dosbox-x pid
+  1555 up 04:13:36 (-time-limit 172800, TL expiry 2026-11-11 01:07), watcher pid
+  1575 r1_playcap_watch.py --no-exit, health 'ring 45.sav age 0s'. PATH NOTE: the
+  health file is work/r1/loop/GAME_HEALTH_LIVE.txt, NOT work/r1/GAME_HEALTH_LIVE.txt
+  (t351/t352 LANDED blocks cite the latter path; the file there does not exist).
+  No ruling: DECISIONS.md mtime 03:31:41 and decision-sheet.md mtime 03:40:49 both
+  pre-date the t352 commit 5af066b 05:17:00; grep -i -E 'USER:|ANSWER:|RULING|RULED|
+  user replied' DECISIONS.md = 4 hits, all the author's own ask-text (D1 header L13,
+  'if undecided' L58, status lines L80/85/94); the 59 sheet hits are the t347
+  generator's own disposition column. git status --porcelain EMPTY (t350 guardrail);
+  post-commit find -newermt sweep = gate-regenerated docs/re/{gizmos,economy,modules,
+  fnt,text}.md only. NEXT stays the WAIT-TRIGGER sentinel verbatim; no research task
+  invented (t178); +0x0a hunt not re-opened (REFUTED t348(1)-(3)); game/ untouched.
 ## R1 runbook (mandatory safety invariants — a run without them is a bug)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base B; NEVER hard-code
 B; member = physical + H, H=136 for dfsg 2025.02.01, re-derive per build — the
