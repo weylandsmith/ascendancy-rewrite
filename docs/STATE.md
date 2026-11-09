@@ -215,87 +215,56 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t348 PLANET-RECORD +0x0a: WRITER WITNESS THEN SEMANTICS, HARD BUDGET
-(LAST non-user candidate; bank an honest negative and t349 parks the loop).
-[derived from the t346 (b)-list residue #3, docs/re/_wip_t346.md S0:]
-  THE DATA: planet-record field +0x0a is the only still-UNMAPPED field with a
-  named address and a live writer. Facts on disk: planet records phys 0x26d07b
-  stride 123, NAME AT +0x00, chain start 0xAAE2 (r1-savestate.md:990); +0x0a
-  "23 distinct, 0..50328 packed look", unnamed alongside +0x20/+0x4a/+0x55
-  (r1-savestate.md:934); "file-side two value bands ~17.5k/~50.2k, live value
-  churns on UNOWNED records too — pointer-like seed field repaired at load; not
-  read by income recalc" (income-law.md:2050).
-  METHOD, STATIC FIRST (zero capture, t346 shape): (1) test the POINTER-LIKE
-  claim cheaply OFFLINE under the POINTER-VALUE LAW (t298: stored u32 = guest
-  PHYSICAL; read the target at member index value+0x88) across the 48-save
-  corpus — if the two file-side bands decode to in-image targets, that alone
-  is a semantics lead with cited numbers; if they do not, the pointer framing
-  dies pre-launch (write the negative). (2) static store census over
-  work/r331_disasm.txt for the field's rebased immediate form; NOTE the base is
-  heap/record-relative, so [reg+0xa] grep is HIGH-NOISE — do not burn the
-  iteration on it, one bounded pass max. (3) ONLY IF (1) or (2) names
-  something: ONE live launch via scripts/r1_wp_session.py --target data:OFF
-  (pre-add the offset yourself — the tool rejects compound specs,
-  r1_wp_session.py:22-24), converting through scripts/r1_sav_scan.py, NEVER
-  hard-coding B (OFF-BY-H: physical = member - 0x88). First-fire 0x00-init
-  artifact check before believing any EIP.
-  BUDGET + EXIT RAMP (this is what makes the row honest): <=2 launches, <=35
-  tool calls. If a writer EIP lands but the SEMANTICS do not follow from it in
-  the same session, BANK THE PARTIAL + the honest negative ("writer named,
-  meaning unnamed") and make t349 the WAIT-TRIGGER sentinel (task line FIRST).
-  Do NOT open a second hunt from a lead you discover mid-flight.
-  LEDGER: this is an OQ-003-class field (r1-savestate.md names it in the
-  OQ-003 residue paragraph) but the loop's OPEN rows are OQ-005/OQ-016/OQ-019;
-  if +0x0a turns out to feed income/pop growth it touches OQ-016 — re-check
-  which row it belongs to BEFORE writing status, and never move a row closed on
-  a plausible default (strict-close).
+NEXT t349 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
+t348's exit ramp made this the parked state — task line FIRST, per ramp).
+  DO IN ORDER, THEN STOP: (1) tail-seek sitting check on
+  work/r1/playcap/live-timeline.jsonl (OOM law: r1_stream or <=400 KB tail
+  seek; NEVER full-read). If newest turn > 1086, a NEW SITTING arrived: run
+  scripts/r1_t85g_sitting.py FIRST (standing law), then THAT result is the
+  new NEXT ACTION — rewrite STATE.md accordingly and stop. (2) If turn is
+  still 1086: check docs/DECISIONS.md + any user note for a ruling on the
+  three live asks (OQ-005 shp keep/junk incl. the t347 shrunk 3+10-row sheet
+  work/r1/shp_png/decision-sheet.md; OQ-016 and OQ-019 dispositions per
+  _wip_t329 S4 DO-NOT-APPLY packet). A ruling = work: apply it, close per
+  strict-close, rewrite NEXT. (3) Otherwise: append one dated 'parked, no
+  trigger' line to BLOCKED.md, keep NEXT as this sentinel, gate green, commit,
+  stop. Do NOT re-open the +0x0a hunt (t348 closed its offline framings;
+  REFUTED-ROUTES t348(1)-(3) binding — a future live attempt REQUIRES a
+  turn-advancing watch session, which REQUIRES fixing the xsend click path
+  first: every click in run wp-lin-0x26D061-20261109-042523 logged 'window
+  died before release' and the turn never moved). Do NOT invent new research
+  tasks at the sentinel; idle is the harness's problem (t178), not yours.
 
-ORDERING RATIONALE: t347 LANDED (zero capture, ~20 tool calls): the generator
-runs post-slim and reproduced decision-sheet.md BYTE-IDENTICAL, then was
-rebuilt to print a cited disposition per C-row with the 40/1/3 split ASSERTED,
-and to write index.txt itself — the t182-clobber pitfall is now structurally
-repaired, not policed. docs/DECISIONS.md D1 is rewritten to the shrunk ask and
-the A6-A8 triad is promoted to a live keep/junk call. NO row moved (strict-close
-+ R13; the blocker for OQ-005 is user time, not our measurement — banked
-honestly). t348 is ordered because it is the LAST residue on the t346 (b)-list
-with a named address and a live writer; every other open question requires the
-user. It is deliberately given an EXIT RAMP rather than an open mandate: the
-honest end-state of this loop is "3 rows await USER ADJUDICATION + WAIT-TRIGGER
-sentinel", and t348 must not be allowed to spawn a fourth hunt on the way there.
-INTERPRETER LAW: venv python ~/.hermes/hermes-agent/venv/bin/python for anything
-importing PIL (t327); scripts/r1_t278_decision_sheet.py is stdlib-only, so it
-runs under either.
-  MEASURED CONTEXT t346 supplies (binding): (i) ds:0x484c4/c6 writer = INT16h
-drain fn 0x2a5f0 0x2a70e/0x2a72a (banked regs EAX=scan EDX=char, run
-work/r1/dbg-t346-20261109-024828); fn 0x2a838 type-3 arm DEAD for keys
-(REFUTED t346(1)); (ii) ctl_census MATCH=False on legs with data-seg
-immediates is BY CONSTRUCTION, not arming failure (REFUTED t346(2));
-(iii) r1_dbg_session.py now has a "keys" phase + --keys (t311 shape, no
-Escape); (iv) NEVER pkill -f a pattern matching your own shell (t346
-self-match). Xvfb-lock teardown fix stands (t344); production :9 healthy
-(pid 1555 timeline growing at t1086 — sitting check still negative at t346
-landing; FIRST ACTION of every iteration remains the tail-seek sitting check:
-newest turn >1086 => r1_t85g_sitting.py BEFORE starting, NEVER full-read).
-
-CONTEXT BANKED: t347 artifact pair work/r1/shp_png/decision-sheet.md (176 L) +
-index.txt (pointer header + same bytes), generator
-scripts/r1_t278_decision_sheet.py, working detail docs/re/_wip_t347.md S0-S2.
-Pre-t347 sheet copy: /tmp/ds_pre_t347.md (md5 54f07195806cd8cfe6b30c0d2db37ce9,
-the byte-identity proof of the VERIFY step; post-rebuild sheet md5
-10989b4d52e30a4939928a52e4de8da4). INPUTS NOW DURABLE: committed
-artifacts/shp_png_inputs/{index_t278pristine.txt,ids.tsv,README.md} (t343
-copy route; generator inp() resolves work/ first, artifacts/ fallback —
-fallback TESTED with PK=/nonexistent). t346 context still binding: input-pump writer law
-(docs/re/selfplay.md t346 block; run work/r1/dbg-t346-20261109-024828 census.json
-{w484c4_2a91d:0, w484c4_2a72a:2, c484c4_54928:0, btn_hdlr:2}). Ledger 16/3
-unchanged two iterations running.
+ORDERING RATIONALE: t348 LANDED (1 of 2 launches spent, ~28 tool calls): the
+offline census REFUTED every arithmetic/pointer framing of planet-record
++0x0a, and the watchpoint run wp-lin-0x26D061-20261109-042523 WITNESSED the
+load-time stamp — fire '00 -> 06' at boot, value == owner-race's run-random
+per-race constant (rec0 V=17414 constant across all 20 IDLE saves; churn is
+TURN-driven, not idle). Fire EIP 0x22d85c decoded to file 0x6e40c = a READER
+(law 7), so the writer site stays unnamed — the honest negative is banked and
+the row (not an open OQ row; OQ-003 closed t181) stays open. Every remaining
+open question (OQ-005/OQ-016/OQ-019) needs USER adjudication; the only
+machine-detectable event that outranks the park is a new sitting. Hence the
+sentinel, verbatim per t348's exit ramp.
+INTERPRETER LAW: venv python ~/.hermes/hermes-agent/venv/bin/python for
+anything importing PIL (t327) AND for every debugger/watch session (t348 ran
+r1_wp_session.py under it fine). NOTE t348: r1_wp_session.py's wp.conf writes
+core=normal under [dosbox] — INERT per t304 CORE-CONF LAW (must be under
+[cpu]); the run still fired correctly but ran the DYNAMIC core. Fix the conf
+shape (copy r299_leg_session.py's launch()) BEFORE any future watch session.
+CONTEXT BANKED t348: census scripts/r348_planet0a_census.py (exit 0; corpus
+output /tmp/t348_census.txt — ephemeral, rerun if needed); watch run
+work/r1/wp-lin-0x26D061-20261109-042523 (boot-fires.txt, session.log, 20
+saves + ring-final); findings docs/re/_wip_t348.md S0-S5; doc updates
+income-law.md T348 UPDATE + r1-savestate.md field line + REFUTED t348(1)-(3).
+t346 input-pump law still binding (docs/re/selfplay.md t346 block). Ledger
+16/3 unchanged three iterations running (OQ-005/OQ-016/OQ-019 — all user-gated).
 
 QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed rows; phase-5b rows
-t324-t342 + phase-6 rows t343-t347 completed and retired; t348 is the live
-NEXT above (derived by t347 from the t346 (b)-list, since the authored queue
-ran out at t347) — see LANDED blocks. t349 = WAIT-TRIGGER sentinel or the
-user-adjudication park, per t348's exit ramp.)
+t324-t342 + phase-6 rows t343-t348 completed and retired; the authored queue
+ran out at t347, t348 was derived from the t346 (b)-list; t349 = the live
+NEXT above (WAIT-TRIGGER sentinel, per t348's exit ramp) — see LANDED blocks.)
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
@@ -338,6 +307,48 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t348 — 2026-11-09 (PLANET-RECORD +0x0a: OFFLINE FRAMINGS REFUTED,
+## LOAD-TIME STAMP WITNESSED, WRITER SITE STAYS UNNAMED — HONEST NEGATIVE,
+## EXIT RAMP TAKEN, LOOP PARKS AT THE WAIT-TRIGGER SENTINEL)
+- SITTING CHECK first (tail-seek): newest turn 1086 (56/58.sav 03:46),
+  negative — same as t346/t347 landings. Production :9 healthy.
+- OFFLINE CENSUS (scripts/r348_planet0a_census.py, 48 saves / 7401 rec-samples,
+  exit 0): 207 distinct values; V=0 n=2385; bands ~17.07k-17.7k / ~49.9k-50.44k
+  differ run-to-run in COUNT (39-91 hi), not just value. HYPOTHESIS BATTERY ALL
+  DEAD: low16(+0x10 phys), low16(arr member), (arr-base)&0xffff, data-seg
+  offset(p10/rec), star*40 (36/7401 coincidence), bit15 — REFUTED-ROUTES
+  t348(2). TARGET-SHAPE: DS+V hits the 'data\\smraceNN.shp' BSS pool ONLY for
+  owner 0 (owner1 = string MINUS 7; low band lands MID-AIL_*-string) — the
+  shp-name-pointer story is REFUTED, t348(1).
+- STATIC bounded pass (one, as budgeted): the only +0xa traffic near planet-
+  offset anchors (0x32099/0x320af) is a STRIDE-27 array (t249 planet-object),
+  not our stride-123 record. No static writer named (predicted: heap base).
+- LIVE LAUNCH 1/2 (r1_wp_session.py lin:0x26D061 = rec0 linear 0x26d057+0xa,
+  --expect-base 1bf4d8 --break-early; run work/r1/wp-lin-0x26D061-20261109-
+  042523 rc=1): FIRED at boot 'Memory breakpoint : 0000:26D061 - 00 -> 06',
+  eip=22d85c. DECODED via the pty code panel ('0160:0022D82E 8B502C mov
+  edx,[eax+002C]'; linear=file+P0): fire site FILE 0x6e40c = 'mov edx,
+  [eax+0x2c]' inside the generic iterator-reset fn 0x6e3d0 — a READER (law 7),
+  NOT the writer. Phase clicks all logged 'window died before release', turn
+  stuck 1086 => phase negatives are UNATTRIBUTABLE, launch 2 correctly NOT
+  spent against a broken click path.
+- THE MEASUREMENT THAT LANDED (post-run save census, all 20 saves + ring-final
+  of the wp run): rec0 +0x0a = 17414 CONSTANT while IDLE (its low byte 0x06 ==
+  the fired value; 17414 == owner 0's per-race constant in the SAME session).
+  Cross-run table (17 runs): per-race constants are run-RANDOM (rec0 V in {0,
+  49917, 49996, 50213, 17169, 17414}). Reconciles the self-play within-run
+  monotone churn: churn is TURN PROCESSING, not idle repaint (REFUTED t348(3)).
+  LAW BANKED: +0x0a = load-stamped once per record with the owner-race's
+  run-random runtime constant; turn-rewritten; no income/pop consumer; file
+  blob carries previous-session leftovers verbatim (t53). income-law.md +
+  r1-savestate.md field lines updated; _wip_t348.md S0-S5 full account.
+- LEDGER: NO ROW MOVED (strict-close; writer unnamed, meaning unnamed). The
+  field is OQ-003-CLASS but OQ-003 CLOSED t181 on its own question; checked
+  OQ-016 — no income link found, row untouched. 16/3 unchanged (OQ-005/016/019
+  all USER-gated). Harness note banked: r1_wp_session.py writes core=normal
+  under [dosbox] = INERT (t304 law); fix conf shape before any future watch.
+- GATE_EXIT=0, ledger_audit + ledger_index_check OK, game/ untouched.
 
 ## LANDED t347 — 2026-11-09 (DECISION-SHEET REBUILD POST-SLIM: GENERATOR
 ## VERIFIED BYTE-IDENTICAL, SHRUNK ASK NOW ASSERTED 40/1/3, index.txt CLOBBER

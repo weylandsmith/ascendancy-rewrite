@@ -2050,6 +2050,13 @@ FIELD NAMING (OQ-003 residue; disasm + live):
   +0x0a = still UNMAPPED (file-side two value bands ~17.5k/~50.2k,
     live value churns on UNOWNED records too — pointer-like seed field
     repaired at load; not read by income recalc).
+    T348 UPDATE [verified]: the load repair is ONE stamp per record of the
+    owner's PER-RACE RUNTIME CONSTANT (watchpoint run wp-lin-0x26D061-
+    20261109-042523 fired '00 -> 06' mid-boot == low byte of owner0's
+    constant 17414; rec0 V constant across all 20 idle saves). Constant is
+    run-random, rewritten during TURN processing (idle = no churn), not read
+    by income/pop code; DS+V string-pointer reading REFUTED (owner-
+    inconsistent). Writer EIP unnamed (fire was a reader, file 0x6e40c).
 
 No rewrite behaviour change: campaign.cpp growth block already implements
 exactly this law (threshold 50, alien +1 at PROS<4, cap clamp, upkeep-

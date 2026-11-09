@@ -1300,3 +1300,20 @@ from a non-16 state is NOT evidence of unreachability.
 ##     c4 84 04 00). MATCH=False there is NOT an arming failure — trust the
 ##     BPLIST count + the fire census. Do not "fix" the control by rebasing
 ##     payload bytes globally (it is the correct check for code-only legs).
+
+## t348 — (1) PLANET-RECORD +0x0a IS NOT A POINTER TO THE RACE SHP FILENAME.
+##     The high-band DS+V landing on 'data\smraceNN.shp' strings is a numeric
+##     coincidence that holds ONLY for owner 0 (owner1 V=50151 = smrace05
+##     string MINUS 7; low-band V land MID-string in the AIL_* debug pool,
+##     never at starts). The value's correct characterization: per-race
+##     runtime constant, run-random allocator shape (48-save census
+##     scripts/r348_planet0a_census.py; run wp-lin-0x26D061-20261109-042523).
+## (2) Self-offset battery for +0x0a is DEAD: low16(+0x10 phys), low16(arr
+##     member), (arr-base)&0xffff, data-seg offsets of p10/rec, star*40,
+##     bit15-complement — ALL measured, max hit 36/7401 (coincidence). Do not
+##     re-run arithmetic framings; only a witnessed writer site can name it.
+## (3) The corpus 'churn' of +0x0a is TURN-PROCESSING work, NOT idle repaint:
+##     the idle wp session held rec0 V=17414 constant across 20 saves while
+##     the self-play run churned 50/50 star-slots. A future watch session MUST
+##     advance turns (and must fix the click path first — every xsend in run
+##     042523 logged 'window died before release', turn never moved off 1086).

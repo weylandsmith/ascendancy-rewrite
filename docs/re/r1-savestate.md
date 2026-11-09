@@ -933,7 +933,9 @@ s=all<=12, n=distinct count):
   '26 CB records' probe of t50 was this artifact, discarded).
 - +0x20 u16 0..73 (35 distinct), +0x0a (23 distinct, 0..50328 packed
   look), +0x4a u16 5..29, +0x55 u16 5..29 (SAME range as +0x4a):
-  unnamed; +0x52..+0x54 bytes all-0xFF (governor +0x54 in F region =
+  unnamed [t348 partially mapped: +0x0a = load-stamped per-race runtime
+  constant, run-random, turn-rewritten; see income-law.md T348 UPDATE +
+  _wip_t348.md]; +0x52..+0x54 bytes all-0xFF (governor +0x54 in F region =
   the banked unowned/governor-FF state).
 - +0x32..+0x43 s-region (small ints incl. banked tech/pop-req bytes);
   +0x44..+0x4f channel words all zero in the FRESH-START snapshot —
