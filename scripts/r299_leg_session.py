@@ -278,6 +278,21 @@ LEGS = {"router": 0x30D08,     # GENERIC msg dispatcher (shared table slot 1 of
         # t310 store legs alone could not. Entry bytes verified this session
         # vs work/ascend_payload.bin: 56 57 55 83 ec 0c 89 c5 66 89 54 24.
         "fn51834_entry": 0x51834,
+        # t346 INPUT-PUMP WRITER LEGS (docs/re/_wip_t346.md S1 static census;
+        # closes the t288 honest negative "writer EIP still unwitnessed" for
+        # WORD ds:0x484c4. Store bytes verified this session vs
+        # work/ascend_payload.bin verbatim):
+        "w484c4_2a91d": 0x2A91D,      # 66 89 15 c4 84 04 00: fn 0x2a838
+                                      # DOSBox event-record demux type-3 arm,
+                                      # dx=WORD[rec+0xc] (char store 0x2a911
+                                      # precedes at 66 a3 c6 84 04 00)
+        "w484c4_2a72a": 0x2A72A,      # 66 a3 c4 84 04 00: fn 0x2a5f0 INT16h
+                                      # AH=0 drain arm, ax=scan code (sar 8
+                                      # @0x2a721); fires only on a non-empty
+                                      # DOS key buffer
+        "c484c4_54928": 0x54928,      # 66 89 0d c4 84 04 00: fn 0x54650
+                                      # pump CLEAR-to-0 after consumption
+                                      # (gated msg==0x19 + [esi+0x48aa]==-1)
         # t319 PUMP CALLER/GATE SEPARATION LEGS (docs/re/_wip_t319.md S1;
         # REFUTED-ROUTES t318 amendment (3) shape spec). Bytes verified this
         # session vs work/ascend_payload.bin:

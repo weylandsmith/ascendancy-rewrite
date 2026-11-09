@@ -11,7 +11,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-09T02:30
+updated: 2026-11-09T03:15
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,69 +212,9 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t346 UNMAPPED-WRITER HUNT with tool v2 (the t327 instrument's first real
-assignment). [queue row VERBATIM:]
-  CANDIDATE ORDER: (a) star-record byte +0x5a colonized-planet
-  count (t247 102-planet arithmetic; the writer was never witnessed — VERIFY
-  first by grepping docs/re/r1-savestate.md + score.md for a +0x5a writer
-  claim; if already closed, fall to (b)); (b) any DAT/star/ship writer that the
-  live docs explicitly label "writer unmapped"/"consumer unmapped" — build the
-  list by grepping docs/re/*.md + docs/OPEN-QUESTIONS.md, pick the one whose
-  address is pointer-law-convertible and whose trigger is reachable in normal
-  play (t338's Icarus-pip click at (238,282) and the star-enter click are
-  proven triggers); (c) if (a) and (b) both fail, exit-1 honest: list what was
-  checked so the next session doesn't re-check it. Use scripts/r1_dbg_session.py
-  (LEGSPEC + expectation grammar + verdict.json + bank-on-exit), scratch copy,
-  own ring dir, budget 3 launches. Bank writer + surrounding law to the right
-  docs/re/ file; strict-close only if the row's own bar is met.
-
-ORDERING RATIONALE: t345 closed the marker-byte question MEASUREMENT-WISE
-(income-law.md S-T345) with NO code delta — the rewrite has no per-ship
-build-slot state to carry it (OQ-019 boundary, pre-authorised "insufficient ->
-bank, change no code" branch did not even trigger: measurement landed fully).
-What remains open everywhere (OQ-005 D1 ruling, OQ-016 D3, OQ-019 disposition
-packet) waits on user decisions, so the queue's next row (t346, the only
-non-user route left) runs VERBATIM per queue discipline. t346 needs a launch
-budget (3); the sitting check may PRE-EMPT it if the user played (new sitting >
-turn 1086 => r1_t85g_sitting.py FIRST, and if the sitting opens a fresher
-question, that outranks this assignment).
-  MEASURED CONTEXT t345 supplies (binding for t346): (i) static bytes at
-  Ghidra 0x73e40 (item table) are CODE-SHAPED GARBAGE — the t74 heap-copy law
-  bit firsthand this session; ANY table census MUST go through live saves
-  (pointer law B+0x82BB0+off) or the r1_income_law IL.load_slots/find_records
-  helpers (they carry the +0x88 member-header correction; a raw walk WITHOUT
-  +0x88 finds ZERO planet records — measured, don't re-derive); (ii) keeper
-  scripts r345_gate_word_census.py / r345_marker_census.py run the
-  save-corpus census pattern green — copy their structure;
-  (iii) Xvfb-lock teardown fix stands (t344); root-edge clicks {0,799}x{0,599}
-  (t344(3)); pool-relative immediates (t344(1)).
-Gate + both ledger audits green at t345 landing. No ledger row closes unless
-t346 lands cited measurement + the row's own bar (strict-close).
-FIRST ACTION of the iteration is still the sitting check (tail-seek newest
-turn in work/r1/playcap/live-timeline.jsonl; >1086 => r1_t85g_sitting.py
-BEFORE starting; NEVER full-read — OOM law).
-
-CONTEXT BANKED: t345 landed the slot-marker UNION law (docs/re/income-law.md
-S-T345; working detail docs/re/_wip_t345.md S0-S10; scripts/r345_gate_word_census.py
-exit 0 work/r345_gate_census.out; scripts/r345_marker_census.py exit 0
-work/r345_marker_census.out). MEASURED LAWS: runtime item FLAGS word bit8 set
-EXACTLY {18,19,26,27} / bit4 EXACTLY {17,28,29,30} (48/48 saves stable); slot
-word2 = (MARKER<<8)|ACTIVE-bit with exhaustive writers (completion 0x3928b
-constants 15/35 gated bit8+cell>=+0x18; SETTER fn 0x39760 = ship-record index,
-orbital-only, callers 0x3987c/0x3b860/0x3f87b; clears 0x391ce/0x21f37/0x3ca2c);
-getter 0x396cc (25 sites, ALL item-23-gated) resolves marker -> ship record
-0x3a095+marker*0x162; corpus circle 360/360 ACTIVE ship rows: rec owner ==
-planet owner, +0x59 == planet record, +0x58 == 3. Shield constants 15/35 are
-INERT (getter never runs on shields) — t340 reading HOLDS. Rewrite:
-shieldThreatFor/orbitalThreatFor sets now runtime-verified; NO code delta.
-
-QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
-keep this block intact except deleting your completed rows; phase-5b rows
-t324-t342 + phase-6 rows t343-t345 completed and retired; t346 is the live
-NEXT above (its queue row moved there VERBATIM) — see LANDED blocks)
-
-t347 DECISION-SHEET REGENERATION AFTER THE SLIM (cheap, protects D1). The
-  docs/re/_wip_*.md files were archived 2026-11-03; scripts/r1_t278_decision_sheet.py
+NEXT t347 DECISION-SHEET REGENERATION AFTER THE SLIM (cheap, protects D1).
+[queue row VERBATIM:]
+  The docs/re/_wip_*.md files were archived 2026-11-03; scripts/r1_t278_decision_sheet.py
   reproduces the sheet "from banked inputs only" (index_t278pristine.txt +
   ids.tsv) — VERIFY those inputs still exist at their expected paths and that
   the generator RUNS post-slim (if it read any _wip file, repoint it to
@@ -285,6 +225,48 @@ t347 DECISION-SHEET REGENERATION AFTER THE SLIM (cheap, protects D1). The
   match. PITFALL (banked t278): r1_t182_pngdump.py rewrites index.txt on every
   run — keep index.txt a copy + pointer header, hand-author only in
   decision-sheet.md. Do NOT rule on any row yourself (R13).
+
+ORDERING RATIONALE: t346 landed the input-pump WRITING law (selfplay.md t346
+block; t288 honest-negative (1) SUPERSEDED) with 2/3 launches spent, and the
+queue's only remaining non-user row is t347. Its inputs VERIFIED PRESENT at
+session start 2026-11-09: scripts/r1_t278_decision_sheet.py,
+work/r1/shp_png/index_t278pristine.txt, work/r1/shp_png/ids.tsv,
+work/r1/shp_png/decision-sheet.md + index.txt all exist — the row's VERIFY
+step is half done, spend the session on the generator RUN + shrunk-ask
+regeneration. ZERO-capture task: interpreter
+~/.hermes/hermes-agent/venv/bin/python if the generator chain imports PIL
+(system python3 and .venv both LACK PIL — t346 firsthand). After t347 the
+loop's non-user queue is EMPTY: the next session re-derives candidates from
+the t346 (b)-list residue banked in docs/re/_wip_t346.md S0 — the strongest
+left is planet-record +0x0a "pointer-like seed field repaired at load"
+(income-law.md:2050; pointer-convertible, load-time trigger; the write
+witness is cheap via r1_wp_session --target, but SEMANTICS need more than a
+writer EIP — size it accordingly) — else the honest state is: every open row
+(OQ-005 D1, OQ-016 D3, OQ-019 D2/D3) awaits USER ADJUDICATION, and the loop
+should say so rather than churn.
+  MEASURED CONTEXT t346 supplies (binding): (i) ds:0x484c4/c6 writer = INT16h
+drain fn 0x2a5f0 0x2a70e/0x2a72a (banked regs EAX=scan EDX=char, run
+work/r1/dbg-t346-20261109-024828); fn 0x2a838 type-3 arm DEAD for keys
+(REFUTED t346(1)); (ii) ctl_census MATCH=False on legs with data-seg
+immediates is BY CONSTRUCTION, not arming failure (REFUTED t346(2));
+(iii) r1_dbg_session.py now has a "keys" phase + --keys (t311 shape, no
+Escape); (iv) NEVER pkill -f a pattern matching your own shell (t346
+self-match). Xvfb-lock teardown fix stands (t344); production :9 healthy
+(pid 1555 timeline growing at t1086 — sitting check still negative at t346
+landing; FIRST ACTION of every iteration remains the tail-seek sitting check:
+newest turn >1086 => r1_t85g_sitting.py BEFORE starting, NEVER full-read).
+
+CONTEXT BANKED: t346 proved the input-pump writer law (docs/re/selfplay.md
+t346 block; working detail docs/re/_wip_t346.md S0-S3; run
+work/r1/dbg-t346-20261109-024828 census.json {w484c4_2a91d:0,
+w484c4_2a72a:2, c484c4_54928:0, btn_hdlr:2}). No OQ ledger row was touched
+(the closed gap was t288's selfplay.md honest negative). NO ledger movement;
+16/3 unchanged.
+
+QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
+keep this block intact except deleting your completed rows; phase-5b rows
+t324-t342 + phase-6 rows t343-t346 completed and retired; t347 is the live
+NEXT above (its queue row moved there VERBATIM) — see LANDED blocks)
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
@@ -327,6 +309,34 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t346 — 2026-11-09 (INPUT-PUMP WRITER WITNESSED — fn 0x2a5f0 IS THE
+## LIVE WRITER OF WORD ds:0x484c4/0x484c6; t288 honest-negative (1) CLOSED;
+## sitting check negative t1086; candidate (a) verified-refuted t248).
+PROVED: (1) STATIC census (work/r331_disasm.txt literal-immediate scan)
+names every writer of the pending-input pair: fn 0x2a5f0 INT16h drain
+(char 0x2a70e, msg 0x2a72a — msg published LAST, so consumers never see a
+half pair), fn 0x2a838 DOSBox-record demux type-3 arm (0x2a911/0x2a91d),
+fn 0x54650 pump clear (0x54928, gated msg==0x19). (2) LIVE witness, ONE
+launch (run work/r1/dbg-t346-20261109-024828 rc=0 attempt 1, NEW "keys"
+phase in scripts/r1_dbg_session.py — t311 shape, keys 'c','1'): census
+{w484c4_2a91d:0, w484c4_2a72a:2, c484c4_54928:0, btn_hdlr:2}, banked stop
+keys#0 EIP file 0x2a72a EAX=0x2e EDX=0x63 = THE WRITER MID-STORE with the
+injected pair in registers; fn 0x2a838 arm DEAD for injected keys
+(REFUTED-ROUTES t346(1)). post-rearm btn_hdlr ebx=0x63 ecx=0x2e win
+NEXTTURN (ret0 0x56c77/0x3177d) — t311 bare-map focus law reproduced free.
+(3) t288's stuck pair (msg=1,char=0x1b) is EXACTLY fn 0x2a5f0's ESC-drain
+output shape (scan 1); msg==1 routes to fn 0x54d18 hotkey dispatcher
+(0x5494a/0x54951) before any button dispatch — the softlock HALT CAUSE
+stays UNNAMED (honest negative; writer-EIP gap closed only). INSTRUMENT:
+ctl_census MATCH=False on data-seg-immediate legs is by construction
+(REFUTED t346(2)); whole-log census authoritative. Tool delta:
+r299_leg_session.py LEGS +3 (payload-verified store bytes),
+r1_dbg_session.py LEGSPEC + "keys" phase + --keys CLI (preflight rc=0).
+Ledger: NO OQ row touched (t288 negative lives in selfplay.md, not the
+ledger) — 16 closed/3 open unchanged, strict-close intact. Launches spent
+2/3 (attempt 2 killed at campaign entry — attempt 1 already decisive).
+GATE_EXIT=0, both audits OK, game/ read-only. NEXT=t347 VERBATIM.
 
 ## LANDED t345 — 2026-11-09 (SLOT MARKER BYTE UNION LAW, OQ-016 residue-(4)
 follow-through; ZERO captures, offline corpus + disasm; sitting check negative

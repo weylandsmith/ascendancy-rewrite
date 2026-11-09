@@ -118,6 +118,17 @@ LEGSPEC = {
     "s2_56cda":      {"hot": True,  "why": "HOT pump leg (~1/s msg 0x3b "
                      "family; storm-capped at 6 banked stops)"},
     "cos_hdlr":      {"hot": True,  "why": "COSMOSWnd msg handler, hot"},
+    # t346 INPUT-PUMP WRITER legs (docs/re/_wip_t346.md S1 static census;
+    # closes the t288 honest negative "writer EIP still unwitnessed"):
+    "w484c4_2a91d":  {"hot": False, "why": "DOSBox event-record demux "
+                      "keyboard arm fn 0x2a838: mov WORD ds:0x484c4,dx "
+                      "(dx=WORD[rec+0xc]); char store 0x2a911 precedes"},
+    "w484c4_2a72a":  {"hot": False, "why": "INT16h AH=0 drain arm fn "
+                      "0x2a5f0: mov ds:0x484c4,ax (ax=scan code, sar 8); "
+                      "fires only when the DOS key buffer is non-empty"},
+    "c484c4_54928":  {"hot": False, "why": "pump CLEAR fn 0x54650: mov "
+                      "ds:0x484c4,0 gated msg==0x19 + [esi+0x48aa]==-1 "
+                      "(consumption witness)"},
 }
 
 
@@ -185,6 +196,7 @@ class DbgSession:
         self.census = {}
         self.oracle = {}
         self.verdict = None
+        self.keys = ["c", "1"]          # t346 keys-phase key list
         atexit.register(self.bank_on_exit)
 
     def bank_on_exit(self):
@@ -310,6 +322,40 @@ class DbgSession:
                 self.sel_oracle("preturn_after")
                 results["preturn"] = {"turn_before":
                                       (ob or {}).get("turn")}
+            elif ph == "keys":
+                # t346 INPUT-PUMP WITNESS (t311 digit-phase shape verbatim:
+                # close_eventwin -> bare-map assert -> arm -> RUN -> popup
+                # re-guard -> send keys -> census window -> disarm). NO
+                # Escape (t285 self-harm law: Escape at the bare map exits
+                # the campaign).
+                keys = getattr(self, "keys", ["c", "1"])
+                if not s.close_eventwin():
+                    s.log("KEYS: close_eventwin failed — skipped")
+                    results["keys"] = {"skipped": "close_eventwin"}
+                    continue
+                if not s.assert_on_map("keys_prearm"):
+                    s.log("KEYS: not on bare map — skipped (title guard)")
+                    results["keys"] = {"skipped": "not_on_map"}
+                    continue
+                if not s.arm_census(self.legs):
+                    s.log("KEYS: ARM FAILED — keys not measured")
+                    results["keys"] = {"skipped": "arm"}
+                    continue
+                lines, ok, hdr = s.req("EXEC RUN", 20.0)
+                s.log(f"KEYS: armed RUN hdr={hdr} keys={keys}")
+                im_rg = s.grab("keys_reguard")
+                if im_rg is not None and s.eventwin_open(im_rg):
+                    s.log("KEYS: POPUP REGUARD — popup open at arm; RUN "
+                          "resumed, keys NOT pressed")
+                    s.req("EXEC RUN", 20.0)
+                    results["keys"] = {"skipped": "reguard"}
+                else:
+                    for k in keys:
+                        s.send(["key", k])
+                        time.sleep(0.4)
+                    results["keys"] = s.census_window("keys", self.window)
+                s.disarm_run("keys")
+                s.persist()
             elif re.match(r"^star\d+$", ph):
                 results[ph] = self.phase_star(int(ph[4:]))
             else:
@@ -447,9 +493,12 @@ def preflight(legs):
     return 0
 
 
-def live_attempt(tag, legs, phases, window, disp, port, tl, settle, star_max):
+def live_attempt(tag, legs, phases, window, disp, port, tl, settle, star_max,
+                 keys=None):
     ds = DbgSession(tag, legs, phases, window, disp, port, tl, settle,
                     star_max)
+    if keys:
+        ds.keys = keys
     s = ds.s
     rc = 1
     try:
@@ -582,6 +631,7 @@ def main():
     ap.add_argument("--tl", type=int, default=7200)
     ap.add_argument("--settle", type=int, default=45)
     ap.add_argument("--star-max", type=int, default=6)
+    ap.add_argument("--keys", default="c,1")  # t346 keys-phase key list
     ap.add_argument("--offline", default=None, metavar="RUN_DIR")
     args = ap.parse_args()
 
@@ -614,7 +664,9 @@ def main():
     for i in range(1, args.attempts + 1):
         print(f"=== ATTEMPT {i} {time.strftime('%H:%M:%S')} ===", flush=True)
         rc = live_attempt(args.tag, legs, phases, args.window, args.disp,
-                          args.port, args.tl, args.settle, args.star_max)
+                          args.port, args.tl, args.settle, args.star_max,
+                          keys=[k.strip() for k in args.keys.split(",")
+                                if k.strip()])
         run = None
         # find the newest dbg-<tag>- dir for this attempt
         cands = sorted((d for d in os.listdir(op.join(ROOT, "work/r1"))

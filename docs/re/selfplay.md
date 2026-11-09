@@ -986,7 +986,9 @@ HONEST NEGATIVES: (1) writer EIP still unwitnessed — the DEBUGGER build cannot
 host a restored state (see REFUTED-ROUTES t288: glibc 'corrupted size vs.
 prev_size' abort mid-restore, attempt banked
 work/r1/t288-probe-dbg-a0-20261103-104330; BREAK lottery was WON that run, so
-the abort is the load path, not BREAK). (2) t261-t1255's bank shows the MOUSE
+the abort is the load path, not BREAK). SUPERSEDED for the writer-EIP half by
+the t346 live witness block at the end of this file (campaign-via-RESUME.GAM
+route, no savestate restore needed). (2) t261-t1255's bank shows the MOUSE
 pair changing while (msg,char) sat at 1/0x1b — sub-variants exist where the
 mouse path (likely INT 33h-side) lived on; do not generalise 'all pump paths
 dead' from the single clean restore. (3) control post-click turn dword read 0
@@ -1007,3 +1009,44 @@ amendment; science in _wip_t289.md S3); (4) recover(resume) now highlight-
 verified via r287_title_nav (no stale-hover clicks). Production :9 healthy at
 t1150 (pid 660167); RESUME.GAM still the Oct-29 t1086 point — a title resume
 REGRESSES 64 turns, so keep driving from RAM.
+
+## t346 INPUT-PUMP WRITER WITNESSED — fn 0x2a5f0 IS THE LIVE WRITER OF
+## WORD ds:0x484c4/0x484c6 (closes the t288 honest negative (1))
+Run work/r1/dbg-t346-20261109-024828 (rc=0 attempt 1, BREAK lottery won;
+scripts/r1_dbg_session.py NEW phase "keys" — t311 digit-phase shape:
+close_eventwin -> assert_on_map bare map -> arm_census -> RUN -> popup
+re-guard -> xsend key 'c','1' -> 60 s census window -> disarm; legs
+{w484c4_2a91d, w484c4_2a72a, c484c4_54928, btn_hdlr}; interpreter
+~/.hermes/hermes-agent/venv/bin/python — the only python with PIL).
+WHOLE-LOG PTY CENSUS {w484c4_2a91d:0, w484c4_2a72a:2, c484c4_54928:0,
+btn_hdlr:2}; baseline 15 s window 0 stops (cold legs genuinely cold).
+BANKED STOP keys#0 (hits.json): EIP file 0x2a72a, EAX=0x2e (BIOS scan 46 =
+'c'), EDX=0x63 (char 'c') — THE WRITER, mid-store at `mov ds:0x484c4,ax`
+(fn 0x2a5f0 INT16h drain arm; char store 0x2a70e executed one breath
+earlier). post-rearm btn_hdlr stops carry ebx=0x63 ecx=0x2e, window
+NAME='NEXTTURN' (ret0 file 0x56c77 + 0x3177d) — the pair reached the
+button layer and bare-map focus is the button class (t311 reproduced).
+LAW (live + static census docs/re/_wip_t346.md S1): DOS keys are consumed
+by the INT 16h DRAIN fn 0x2a5f0 (called fn 0x2a7fc <- fn 0x54650 pump
+itself, site 0x555ef), NOT by the DOSBox event-record demux fn 0x2a838
+type-3 arm (0x2a911/0x2a91d ZERO — see REFUTED-ROUTES t346). msg is
+published LAST (char 0x2a70e -> msg 0x2a72a), so a consumer never sees a
+half pair. t288's stuck pair (msg=1, char=0x1b) is EXACTLY fn 0x2a5f0's
+ESC-drain output shape (scan 1, char 0x1B): the t288 SOFT probe's "pump
+stops writing" is consistent with the writer fn 0x2a5f0 draining ESC and
+the pump loop halting before the NEXT drain pass; consumer-side, msg==1
+routes to fn 0x54d18 (hotkey dispatcher keyed on ds:0x484c4, t337 S104;
+call site 0x54951 gated msg==1 or ds:0x484a4==-1) and only a -1 return
+lets the generic pump 0x54976/0x56b5c run — the stuck ESC is handled (or
+swallowed) by the hotkey layer before any button dispatch. THE HALT CAUSE
+of the softlock class is STILL UNNAMED (this closes the writer-EIP gap
+only). INSTRUMENT LAWS banked: (a) arm_census MEMDUMPBIN control compares
+FILE-offset payload bytes against REBASED RAM — for legs whose instruction
+contains a data-seg immediate the control FAILS BY CONSTRUCTION (dump at
+0x1e9d6d read `66 89 15 c4 a4 28 00` = the t307-rebased 0x28a4c4); a
+failed ctl_census MATCH on such a leg is NOT an arming failure (arms fired
+this run); (b) whole-log census is authoritative over banked-stop caps.
+Attempt 2 (work/r1/dbg-t346-20261109-025150) was killed by the driver at
+campaign-entry after attempt 1 produced the decisive banked witness
+(recursive pkill self-match caveat banked in STATE.md) — no keys-phase
+data in that dir.

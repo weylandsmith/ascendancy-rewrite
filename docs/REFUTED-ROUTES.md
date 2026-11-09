@@ -1284,3 +1284,19 @@ from a non-16 state is NOT evidence of unreachability.
 ##     (measured this session: 0 stats over 60 saves). Slot-array pointer
 ##     [rec+0x10] is guest-physical; the ZIP Memory member starts at +0x88
 ##     (t33 law). Use IL.load_slots/find_records which carry the correction.
+
+## t346 — (1) fn 0x2a838 TYPE-3 ARM (0x2a911/0x2a91d, "DOSBox event record"
+##     reader) IS NOT THE LIVE WRITER of WORD ds:0x484c4/0x484c6 for injected
+##     keys: legs armed, guest alive, keys 'c'/'1' delivered (xsend rc=0) —
+##     whole-log census ZERO while the sibling INT16h drain leg 0x2a72a fired
+##     twice with the injected pair in EAX/EDX (run
+##     work/r1/dbg-t346-20261109-024828, docs/re/selfplay.md t346 block). The
+##     aicode.md §8.4 "record+0xc/+0x10 readers 0x2a875/0x2a8fe" lead
+##     describes the MOUSE arms' shape (0x2a875 is the type<2 arm); do not
+##     re-arm 0x2a91d for key-witness work.
+## (2) arm_census MEMDUMPBIN ctl MATCH FAILS BY CONSTRUCTION on any leg whose
+##     instruction encodes a data-seg immediate (payload FILE bytes vs
+##     REBASED RAM: dump at 0x1e9d6d = 66 89 15 c4 a4 28 00 vs file 66 89 15
+##     c4 84 04 00). MATCH=False there is NOT an arming failure — trust the
+##     BPLIST count + the fire census. Do not "fix" the control by rebasing
+##     payload bytes globally (it is the correct check for code-only legs).
