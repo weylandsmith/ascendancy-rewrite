@@ -188,6 +188,18 @@ times.
   :9 HEALTHY (pid 1555 up 05:12+, TL expiry 2026-11-11 01:07:10, watcher 1575).
   No row moved strict-close; ledger stays 16/3. NEXT stays the WAIT-TRIGGER
   sentinel verbatim.
+- 2026-11-09 t356: parked, no trigger (EIGHTH consecutive park). Sitting check
+  NEGATIVE (400 KB tail-SEEK, 16 records, turn 1086 on 16/16, newest tail
+  files 44/45/46.sav; timeline 8,827,874,725 B — +7.8 MB vs t355 baseline is
+  ring rotation only). Ruling check NEGATIVE pre-launch (DECISIONS.md
+  03:31:41.300 + sheet 03:40:49.800 unchanged, porcelain empty, no
+  *ruling*/*reply*, grep USER: = 0 on both docs). Ran the t356 poller
+  (sentinel_t356.sh, 60 s poll, 45 min cap, terminal(background=true,
+  notify=true), session proc_9913cfae18a0): TIMEOUT:no ruling after 45min;
+  post-exit re-confirm both mtimes unchanged, porcelain showed only the
+  session's own _wip_t356.md. Production :9 HEALTHY (pid 1555 up 06:54:39,
+  watcher 1575, TL expiry 2026-11-11 01:07:10, ring 56.sav age 4s). No row
+  moved strict-close; ledger stays 16/3. NEXT stays the WAIT-TRIGGER sentinel.
 ## R1 runbook (mandatory safety invariants — a run without them is a bug)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base B; NEVER hard-code
 B; member = physical + H, H=136 for dfsg 2025.02.01, re-derive per build — the

@@ -215,18 +215,19 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t356 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
+NEXT t357 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
 t348's exit ramp made this the parked state — task line FIRST, per ramp; t349
--t355 parked on it, checks below are the proven shape. SHAPE: launch
-work/r1/sentinel_t356.sh (pre-staged this iteration, copy of the proven t354/
-t355 script, BASE_EPOCH 2026-11-09 03:40:49) via terminal(background=true,
+-t356 parked on it, checks below are the proven shape. SHAPE: launch
+work/r1/sentinel_t357.sh (pre-staged this iteration, copy of the proven t354/-
+t355/t356 script, BASE_EPOCH 2026-11-09 03:40:49) via terminal(background=true,
 notify=true) — nohup/& wrappers are REJECTED by the tool harness (t355). Wait
 with process_manage(action='wait', timeout=180) repeatedly (clamped to 180 s;
-~15 calls cover 45 min; a completion notification fires, so a tail --pid
-foreground chunk is also fine, hard cap ~420 s regardless of timeout=).
-Baselines as of t355 commit: sheet mtime 2026-11-09 03:40:49.800, DECISIONS.md
-mtime 03:31:41, timeline 8,820,053,395 B turn 1086. The sentinel covers branch
-(2) only — run branch (1) sitting check FIRST, before launching).
+~15 calls cover 45 min; a completion notification fires, so waiting is safe —
+t356 note: a foreground tail --pid chunk is NOT worth it, the tool itself
+timeouts at 420 s and the wait still returns fine). Baselines as of t356
+commit: sheet mtime 2026-11-09 03:40:49.800, DECISIONS.md mtime 03:31:41,
+timeline 8,827,874,725 B turn 1086. The sentinel covers branch (2) only — run
+branch (1) sitting check FIRST, before launching).
   DO IN ORDER, THEN STOP: (1) tail-seek sitting check on
   work/r1/playcap/live-timeline.jsonl (OOM law: r1_stream or <=400 KB tail
   seek; NEVER full-read). If newest turn > 1086, a NEW SITTING arrived: run
@@ -238,24 +239,37 @@ mtime 03:31:41, timeline 8,820,053,395 B turn 1086. The sentinel covers branch
   _wip_t329 S4 DO-NOT-APPLY packet). A ruling = work: apply it, close per
   strict-close, rewrite NEXT. (3) Otherwise: append one dated 'parked, no
   trigger' line to the '## Sentinel park log' section of BLOCKED.md (t349
-  created it — append, don't re-create), keep NEXT as this sentinel, gate
-  green, commit, stop. Do NOT re-open the +0x0a hunt (t348 closed its offline
-  framings; REFUTED-ROUTES t348(1)-(3) binding — a future live attempt
-  REQUIRES a turn-advancing watch session, which REQUIRES fixing the xsend
-  click path first: every click in run wp-lin-0x26D061-20261109-042523 logged
+  created it — append, don't re-create; t356 line ends just before '## R1
+  runbook' at ~line 191), keep NEXT as this sentinel, gate green, commit,
+  stop. Do NOT re-open the +0x0a hunt (t348 closed its offline framings;
+  REFUTED-ROUTES t348(1)-(3) binding — a future live attempt REQUIRES a
+  turn-advancing watch session, which REQUIRES fixing the xsend click path
+  first: every click in run wp-lin-0x26D061-20261109-042523 logged
   'window died before release' and the turn never moved). Do NOT invent new
   research tasks at the sentinel; idle is the harness's problem (t178), not
   yours. Do NOT treat a fresh decision-sheet.md mtime as an annotation (the
   t347 generator rewrites it; check content for USER marks). Nor a fresh
   docs/re/*.md or work/attribution.tsv mtime (t350: gate stages gizmo_probe.py,
   fnt_probe.py, attribution_scan.py rewrite them post-commit; only a DIRTY
-  tree is an edit — and t355 adds: identify WHICH file is dirty before
-  treating porcelain output as a trigger; in t355 the lone dirty entry was
-  the session's own docs/re/_wip file). PATH FACT (t353): the health readout
-  lives at work/r1/loop/GAME_HEALTH_LIVE.txt — work/r1/GAME_HEALTH_LIVE.txt
-  does NOT exist.
+  tree is an edit — and t355/t356 add: identify WHICH file is dirty before
+  treating porcelain output as a trigger; in t355 AND t356 the lone dirty
+  entry was the session's own docs/re/_wip file). PATH FACT (t353): the health
+  readout lives at work/r1/loop/GAME_HEALTH_LIVE.txt —
+  work/r1/GAME_HEALTH_LIVE.txt does NOT exist.
 
-ORDERING RATIONALE: t355 LANDED (~20 tool calls, zero new measurement by
+ORDERING RATIONALE: t356 LANDED (~18 tool calls incl. the 45-min poll, zero
+new measurement by design — EIGHTH consecutive park on the SAME sentinel): all
+three branches re-checked with cited results — sitting check NEGATIVE (400 KB
+tail-seek, 16 records, turn 1086 on 16/16, newest tail files 44/45/46.sav,
+timeline 8,827,874,725 B; +7.8 MB growth vs t355 baseline = ring rotation), no
+user ruling (DECISIONS.md 03:31:41.300 and sheet 03:40:49.800 unchanged from
+baselines; porcelain empty pre-launch; no *ruling*/*reply*; grep USER: = 0 on
+both docs), poller run TIMEOUT:no ruling after 45min (session
+proc_9913cfae18a0) with post-exit re-confirm (both mtimes unchanged; porcelain
+lone dirty entry = own _wip_t356.md). Production :9 HEALTHY (pid 1555 up
+06:54:39, TL expiry 2026-11-11 01:07:10, watcher 1575, ring 56.sav age 4s).
+Ledger stays 16/3 (nine iterations).
+Before t356: t355 LANDED (~20 tool calls, zero new measurement by
 design — SEVENTH consecutive park on the SAME sentinel): all three branches
 re-checked with cited results — sitting check NEGATIVE (400 KB tail-seek, 16
 records, turn 1086 on 16/16, newest tail file=50.sav, timeline 8,820,053,395 B;
@@ -388,6 +402,33 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t356 — 2026-11-09 (WAIT-TRIGGER SENTINEL, EIGHTH PARK: NO TRIGGER,
+## HONEST NEGATIVE, ZERO NEW MEASUREMENT)
+
+- Branch (1) sitting check NEGATIVE: 400 KB tail-seek of
+  work/r1/playcap/live-timeline.jsonl (8,827,874,725 B, +7,821,330 B vs t355
+  baseline = ring rotation), 16 records parsed, turn 1086 on 16/16, newest
+  tail records 44.sav/45.sav/46.sav (turn 1086, T=50). r1_t85g_sitting.py NOT
+  run (standing law: only on turn > 1086).
+- Branch (2) ruling check NEGATIVE pre-launch AND post-poller: DECISIONS.md
+  mtime 2026-11-09 03:31:41.300 and work/r1/shp_png/decision-sheet.md mtime
+  03:40:49.800 both unchanged from t355 baselines; git status --porcelain
+  EMPTY pre-launch; no *ruling*/*reply* files (work/r1/ + repo depth 3);
+  grep -c "USER:" = 0 on both the sheet and DECISIONS.md.
+- Branch (3) taken: park line appended to BLOCKED.md '## Sentinel park log'.
+  Poller sentinel_t356.sh run via terminal(background=true, notify=true)
+  (session proc_9913cfae18a0, pid 37541): exit 0 "TIMEOUT:no ruling after
+  45min". Waited via process_manage(action='wait', timeout=180) x11; one
+  foreground tail --pid 420 s chunk errored with the TOOL's own timeout
+  (harmless; the background poller was unaffected) — lesson banked into NEXT:
+  skip foreground wait chunks entirely.
+- Production :9 HEALTHY: game pid 1555 up 06:54:39, watcher 1575, TL expiry
+  2026-11-11 01:07:10, ring 56.sav age 4s (GAME_HEALTH_LIVE.txt).
+- Ledger UNCHANGED 16/3 (nine iterations): OQ-005/OQ-016/OQ-019 remain open,
+  user-gated; no measurement this iteration by design, so nothing closable
+  under strict-close. sentinel_t357.sh pre-staged (copy, same baselines).
+- GATE_EXIT=0; ledger audit OK; game/ untouched.
 
 ## LANDED t355 — 2026-11-09 (WAIT-TRIGGER SENTINEL, SEVENTH PARK: NO TRIGGER,
 ## HONEST NEGATIVE, ZERO NEW MEASUREMENT — PLUS TWO HARNESS LAWS BANKED)
