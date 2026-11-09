@@ -143,6 +143,40 @@ times.
   post-commit find -newermt sweep = gate-regenerated docs/re/{gizmos,economy,modules,
   fnt,text}.md only. NEXT stays the WAIT-TRIGGER sentinel verbatim; no research task
   invented (t178); +0x0a hunt not re-opened (REFUTED t348(1)-(3)); game/ untouched.
+- 2026-11-09 t354: PATH FACT banked (the only deliverable this iteration — see
+  the t354 LANDED block in STATE.md for the full account). Short form: the
+  decision sheet lives at work/r1/shp_png/decision-sheet.md and has NEVER
+  existed at docs/decision-sheet.md (t354 stat: no such file; git ls-files =
+  zero hits under docs/). Prior sentinel scripts t348-t353 are untracked and
+  gone, so what they actually watched is unrecoverable — their park lines
+  report sheet mtime 03:40:49 which matches the REAL file, but trigger
+  fidelity is UNVERIFIABLE. (STATE.md NEXT has always named the real path
+  work/r1/shp_png/decision-sheet.md — do NOT assume the old sentinels
+  watched docs/; t354 briefly did and was wrong.) t354 sentinel (work/r1/sentinel_t354.sh,
+  untracked — logic restated here so it survives): watches the REAL path,
+  trigger = mtime > 03:40:49 baseline OR git-diff-vs-HEAD OR any
+  *ruling*/*reply* file in git status --porcelain; 60 s poll, 45 min cap.
+  LESSON: stat a watched path at authoring time — a sentinel on a missing
+  file reads 'no change' forever, silently. CORRECTION after the run: the
+  STATE.md NEXT text always named the RIGHT path (work/r1/shp_png/...); the
+  phantom docs/ path was t354's own misreading of the park lines, which cite
+  the sheet by bare filename. The t354 sentinel therefore watched the real
+  file and its negative IS valid ruling evidence.
+- 2026-11-09 t354: parked, no trigger. Sitting check NEGATIVE (400 KB
+  tail-SEEK, 16 records parsed with json, turn field 1086 on 16/16 == corpus
+  floor; timeline 8,819,223,860 B, growth = ring rotation only — tail field
+  files 53/54/55.sav are ring slots, not play). Production :9 HEALTHY:
+  dosbox-x pid 1555 up 04:22+ (-time-limit 172800, TL expiry 2026-11-11
+  01:07:10), watcher 1575, health 'ring 47.sav age 4s' (health readout path
+  confirmed: work/r1/loop/GAME_HEALTH_LIVE.txt). Ruling check via the t354
+  sentinel (45 min, 60 s poll, watched the REAL sheet path
+  work/r1/shp_png/decision-sheet.md + *ruling*/*reply* files + git diff vs
+  HEAD): TIMEOUT, no trigger; re-confirmed after exit — sheet mtime still
+  03:40:49.800 (t347 generator output), git status = own docs/BLOCKED.md
+  edit only. No row moved strict-close; ledger stays 16/3 (OQ-005/016/019
+  all user-gated). NEXT stays the WAIT-TRIGGER sentinel verbatim; +0x0a hunt
+  not re-opened (t348(1)-(3) binding); no research task invented (t178);
+  game/ untouched.
 ## R1 runbook (mandatory safety invariants — a run without them is a bug)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base B; NEVER hard-code
 B; member = physical + H, H=136 for dfsg 2025.02.01, re-derive per build — the

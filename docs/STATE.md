@@ -215,9 +215,19 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t354 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
+NEXT t355 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
 t348's exit ramp made this the parked state — task line FIRST, per ramp; t349,
-t350, t351, t352 and t353 parked on it, checks below are the proven shape).
+t350, t351, t352, t353 and t354 parked on it, checks below are the proven
+shape. t354 PROVED a faster shape: launch work/r1/sentinel_t354.sh (copy to
+sentinel_t355.sh, update the baseline epoch) as a background poller — 60 s
+poll, 45 min cap, watches the REAL sheet path work/r1/shp_png/decision-sheet.md
+for mtime > baseline OR git-diff-vs-HEAD OR a *ruling*/*reply* file; wait on
+it in foreground chunks (tail --pid=$P -f /dev/null, <=410 s each — the tool
+caps ~420 s; a nohup-launch notification fires when the WRAPPER exits, not the
+sentinel — ignore it, poll the pid). Baselines as of t354 commit: sheet mtime
+2026-11-09 03:40:49.800, DECISIONS.md mtime 03:31:41, timeline 8,819,223,860 B
+turn 1086. The sentinel covers branch (2) only — run branch (1) sitting check
+FIRST, before launching).
   DO IN ORDER, THEN STOP: (1) tail-seek sitting check on
   work/r1/playcap/live-timeline.jsonl (OOM law: r1_stream or <=400 KB tail
   seek; NEVER full-read). If newest turn > 1086, a NEW SITTING arrived: run
@@ -366,6 +376,33 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t354 — 2026-11-09 (WAIT-TRIGGER SENTINEL, SIXTH PARK: NO TRIGGER,
+## HONEST NEGATIVE — FIRST PARK RUN AS A REAL 45-MIN POLLER + PATH AUDIT)
+- BRANCH 1 SITTING CHECK NEGATIVE (400 KB tail-SEEK per OOM law, 16 records
+  parsed with json, turn field 1086 on 16/16 == corpus floor; timeline
+  8,819,223,860 B; tail field files 53/54/55.sav = ring slots, growth =
+  rotation only). Production :9 HEALTHY (dosbox-x pid 1555 up 04:22+, TL
+  expiry 2026-11-11 01:07:10, watcher 1575, health 'ring 47.sav age 4s' at
+  work/r1/loop/GAME_HEALTH_LIVE.txt).
+- BRANCH 2 RULING CHECK — first time actually WAITED (45 min live poll via
+  work/r1/sentinel_t354.sh, 60 s cycle: sheet mtime vs 03:40:49 baseline,
+  git diff vs HEAD, *ruling*/*reply* in git status): TIMEOUT, no trigger;
+  post-exit re-confirm: sheet mtime still 03:40:49.800 (t347 generator
+  output), git status = own BLOCKED.md edit only. No ruling exists.
+- PATH AUDIT (the one new fact): t354 briefly suspected prior sentinels
+  watched a phantom docs/decision-sheet.md — REFUTED by re-reading NEXT:
+  the assignment has ALWAYS named work/r1/shp_png/decision-sheet.md, which
+  is the real file (34,475 B, t347 rebuild). Park lines cite it by bare
+  filename, which is what misled t354. Prior scripts t348-t353 untracked and
+  gone; trigger fidelity unrecoverable but immaterial — the ask was never
+  answered on any path. Full account + lesson (stat watched paths at
+  authoring time) in BLOCKED.md park log t354 entry.
+- BRANCH 3: park line appended to BLOCKED.md '## Sentinel park log'. No row
+  moved strict-close (nothing measured); ledger 16/3 (OQ-005/016/019 all
+  user-gated). NEXT=t355 same sentinel, upgraded with the poller shape +
+  baselines; work/r1/sentinel_t355.sh pre-staged (copy of t354, same
+  baselines — sheet unchanged). GATE_EXIT=0, ledger audit OK, game/ clean.
 
 ## LANDED t353 — 2026-11-09 (WAIT-TRIGGER SENTINEL, FIFTH PARK: NO TRIGGER,
 ## HONEST NEGATIVE, ZERO NEW MEASUREMENT — PLUS THE HEALTH-FILE PATH CORRECTION)
