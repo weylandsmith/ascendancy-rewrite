@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-09T04:20
+updated: 2026-11-09T05:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -215,9 +215,9 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t350 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
+NEXT t351 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
 t348's exit ramp made this the parked state — task line FIRST, per ramp; t349
-parked on it once, checks below are the proven shape).
+and t350 parked on it, checks below are the proven shape).
   DO IN ORDER, THEN STOP: (1) tail-seek sitting check on
   work/r1/playcap/live-timeline.jsonl (OOM law: r1_stream or <=400 KB tail
   seek; NEVER full-read). If newest turn > 1086, a NEW SITTING arrived: run
@@ -237,14 +237,29 @@ parked on it once, checks below are the proven shape).
   'window died before release' and the turn never moved). Do NOT invent new
   research tasks at the sentinel; idle is the harness's problem (t178), not
   yours. Do NOT treat a fresh decision-sheet.md mtime as an annotation (the
-  t347 generator rewrites it; check content for USER marks).
+  t347 generator rewrites it; check content for USER marks). Nor a fresh
+  docs/re/*.md or work/attribution.tsv mtime (t350: gizmos/economy/modules/fnt/
+  text/attribution.tsv were all rewritten at 04:58:11-04:58:26, i.e. by the
+  post-commit gate run — the writers are gate stages gizmo_probe.py, fnt_probe.py
+  and attribution_scan.py — and `git status` was CLEAN, so content-identical;
+  only a DIRTY tree is an edit).
 
-ORDERING RATIONALE: t349 LANDED (~12 tool calls, zero new measurement by
+ORDERING RATIONALE: t350 LANDED (~10 tool calls, zero new measurement by
+design — second consecutive park on the SAME sentinel): all three branches
+re-checked with cited results — sitting check NEGATIVE (400 KB tail-seek, 16
+records, turn 1086 on every one, newest 54.sav; growth is ring rotation), no
+user ruling (DECISIONS.md 03:31 and decision-sheet.md 03:40 both pre-date the
+t349 commit 04:56:55; grep USER: = 0 hits; the post-commit find -newermt sweep
+returned 22 files but ALL are gate-regenerated docs/re/* + work/r1/loop logs —
+git status CLEAN, so no hand edit exists), park line appended to BLOCKED.md.
+NEW GUARDRAIL from this pass: fresh mtimes on docs/re/*.md + work/attribution.tsv
+mean nothing (gate regeneration, content-identical). Ledger stays 16/3 (four
+iterations). Before t349: t349 LANDED (~12 tool calls, zero new measurement by
 design): the sentinel's three branches were each checked with cited results —
 sitting check NEGATIVE (tail-seek newest turn 1086; timeline growth is ring
 rotation only, 51.sav 04:52:29), no user ruling anywhere (DECISIONS.md mtime
 03:31 pre-dates the t348 commit; post-commit find sweep clean), park line
-appended to the new BLOCKED.md '## Sentinel park log'. Ledger stays 16/3.
+appended to the new BLOCKED.md '## Sentinel park log'.
 Before t348: t348 LANDED (1 of 2 launches spent, ~28 tool calls): the
 offline census REFUTED every arithmetic/pointer framing of planet-record
 +0x0a, and the watchpoint run wp-lin-0x26D061-20261109-042523 WITNESSED the
@@ -316,6 +331,36 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   exception, artifacts/ task t343).
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
+
+
+## LANDED t350 — 2026-11-09 (WAIT-TRIGGER SENTINEL, SECOND PARK: NO TRIGGER,
+## HONEST NEGATIVE, ZERO NEW MEASUREMENT — PLUS ONE NEW HARNESS GUARDRAIL)
+- BRANCH 1 SITTING CHECK NEGATIVE (400 KB tail-SEEK, 16 lines parsed with json,
+  never a full-read): timeline 8,808,297,699 B; every one of the 16 tail records
+  carries turn=1086 / day=1086 == the corpus floor; newest record 54.sav (ring
+  saves 57-59.sav on disk stamped 05:00:10/20/30). Growth since t349 = rotation.
+  Production :9 HEALTHY: pid 1555 dosbox-x up 03:53:29, TL expiry 2026-11-11
+  01:07:10, watcher pid 1575 (r1_playcap_watch.py --no-exit). r1_t85g_sitting.py
+  correctly NOT run.
+- BRANCH 2 NO USER RULING: docs/DECISIONS.md mtime 03:31:41 and
+  work/r1/shp_png/decision-sheet.md mtime 03:40:49 BOTH pre-date the t349 commit
+  (04:56:55); grep -i 'USER:' DECISIONS.md = 0 hits; grep -i -E
+  'ruling received|ANSWER:|user replied' across docs/ = only the author's own
+  in-document Q/A prose (STATE.md:761, REFUTED-ROUTES.md:221, ai-dossier.md:340,
+  income-law.md:2258) — no verdict on D1/D2/D3.
+- BRANCH 3 TAKEN: t350 park line appended to BLOCKED.md '## Sentinel park log'
+  (append, per t349's rule — the section already existed).
+- NEW GUARDRAIL (why the find sweep looked alarming and isn't): a post-commit
+  find -newermt '2026-11-09 04:56:55' sweep returned 22 files INCLUDING
+  docs/re/gizmos.md, economy.md, modules.md, fnt.md, text.md and
+  work/attribution.tsv — but `git status --porcelain` is EMPTY, i.e. the gate
+  rewrote those files content-identically. So a fresh mtime on docs/re/*.md or
+  attribution.tsv proves NOTHING (same class as the t347 decision-sheet pitfall);
+  only a dirty tree is an edit. Sentinel body now carries this rule.
+- LEDGER UNCHANGED 16 closed / 3 open (OQ-005 shp keep/junk, OQ-016, OQ-019) —
+  all three are USER-GATED; strict-close forbids closing them on a default, and
+  no new measurement was available without a turn-advancing session (click path
+  still broken: 'window died before release'). Gate + both audits green.
 
 
 ## LANDED t349 — 2026-11-09 (WAIT-TRIGGER SENTINEL: ALL THREE BRANCHES CHECKED,

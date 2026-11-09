@@ -92,6 +92,16 @@ times.
   markers, post-commit find -newermt shows only capture/loop artifacts.
   decision-sheet.md 03:40 = t347 generator output, not an annotation. NEXT stays
   the WAIT-TRIGGER sentinel verbatim; no research task invented (t178).
+- 2026-11-09 t350: parked, no trigger. Sitting check NEGATIVE (400 KB tail-SEEK,
+  16 lines, newest 54.sav, turn field 1086 on 16/16 records == corpus floor;
+  timeline 8,808,297,699 B, growth = ring rotation only). Production :9 HEALTHY
+  (pid 1555 up 03:53, TL expiry 2026-11-11 01:07, watcher 1575, saves at
+  05:00:30). No ruling: DECISIONS.md 03:31 / decision-sheet.md 03:40 both pre-date
+  the t349 commit 04:56:55, `grep -i USER:` in DECISIONS.md = zero hits, and the
+  post-commit find -newermt sweep (22 files) is only docs/re/* regeneration
+  timestamps + work/r1/loop + dosbox.log — no hand-edited file anywhere. NEXT
+  stays the WAIT-TRIGGER sentinel verbatim; +0x0a hunt not re-opened (t348(1)-(3)
+  binding); no research task invented (t178).
 
 ## R1 runbook (mandatory safety invariants — a run without them is a bug)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base B; NEVER hard-code
