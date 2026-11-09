@@ -1,6 +1,9 @@
 # STATE — machine-readable working memory for the closeout loop (v2)
 # A fresh session must be able to resume from THIS file alone.
-# Patch discipline: ONE patch per region, read_file verify after.
+# Patch discipline: ONE patch per region, read_file verify after. t347
+# specifics: the patch tool DROPS the trailing newline of old_string when
+# old_string ends with one — never end old_string at a bare newline; for
+# multi-line insertions use execute_code's patch() with explicit \n.
 # HISTORY (this file was SLIMMED 2026-11-03): every LANDED block t1..t292, the
 # full per-iteration narrative, and the pre-slim copy of this file live in
 # archive/state-v2-full/2026-11-03/STATE.md (md5 a2faccfb648418045b2647be66364f10);
@@ -11,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-09T03:15
+updated: 2026-11-09T04:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -212,38 +215,56 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t347 DECISION-SHEET REGENERATION AFTER THE SLIM (cheap, protects D1).
-[queue row VERBATIM:]
-  The docs/re/_wip_*.md files were archived 2026-11-03; scripts/r1_t278_decision_sheet.py
-  reproduces the sheet "from banked inputs only" (index_t278pristine.txt +
-  ids.tsv) — VERIFY those inputs still exist at their expected paths and that
-  the generator RUNS post-slim (if it read any _wip file, repoint it to
-  archive/state-v2-full/2026-11-03/wip/ or bank the input it needed). Then
-  regenerate decision-sheet.md + index.txt to the SHRUNK ask from t328 (41 of 44
-  C-rows now cited-no-witness/junk-certain/unreachable; the human ask is the
-  residue that is actually adjudicable) and update docs/DECISIONS.md D1 text to
-  match. PITFALL (banked t278): r1_t182_pngdump.py rewrites index.txt on every
-  run — keep index.txt a copy + pointer header, hand-author only in
-  decision-sheet.md. Do NOT rule on any row yourself (R13).
+NEXT t348 PLANET-RECORD +0x0a: WRITER WITNESS THEN SEMANTICS, HARD BUDGET
+(LAST non-user candidate; bank an honest negative and t349 parks the loop).
+[derived from the t346 (b)-list residue #3, docs/re/_wip_t346.md S0:]
+  THE DATA: planet-record field +0x0a is the only still-UNMAPPED field with a
+  named address and a live writer. Facts on disk: planet records phys 0x26d07b
+  stride 123, NAME AT +0x00, chain start 0xAAE2 (r1-savestate.md:990); +0x0a
+  "23 distinct, 0..50328 packed look", unnamed alongside +0x20/+0x4a/+0x55
+  (r1-savestate.md:934); "file-side two value bands ~17.5k/~50.2k, live value
+  churns on UNOWNED records too — pointer-like seed field repaired at load; not
+  read by income recalc" (income-law.md:2050).
+  METHOD, STATIC FIRST (zero capture, t346 shape): (1) test the POINTER-LIKE
+  claim cheaply OFFLINE under the POINTER-VALUE LAW (t298: stored u32 = guest
+  PHYSICAL; read the target at member index value+0x88) across the 48-save
+  corpus — if the two file-side bands decode to in-image targets, that alone
+  is a semantics lead with cited numbers; if they do not, the pointer framing
+  dies pre-launch (write the negative). (2) static store census over
+  work/r331_disasm.txt for the field's rebased immediate form; NOTE the base is
+  heap/record-relative, so [reg+0xa] grep is HIGH-NOISE — do not burn the
+  iteration on it, one bounded pass max. (3) ONLY IF (1) or (2) names
+  something: ONE live launch via scripts/r1_wp_session.py --target data:OFF
+  (pre-add the offset yourself — the tool rejects compound specs,
+  r1_wp_session.py:22-24), converting through scripts/r1_sav_scan.py, NEVER
+  hard-coding B (OFF-BY-H: physical = member - 0x88). First-fire 0x00-init
+  artifact check before believing any EIP.
+  BUDGET + EXIT RAMP (this is what makes the row honest): <=2 launches, <=35
+  tool calls. If a writer EIP lands but the SEMANTICS do not follow from it in
+  the same session, BANK THE PARTIAL + the honest negative ("writer named,
+  meaning unnamed") and make t349 the WAIT-TRIGGER sentinel (task line FIRST).
+  Do NOT open a second hunt from a lead you discover mid-flight.
+  LEDGER: this is an OQ-003-class field (r1-savestate.md names it in the
+  OQ-003 residue paragraph) but the loop's OPEN rows are OQ-005/OQ-016/OQ-019;
+  if +0x0a turns out to feed income/pop growth it touches OQ-016 — re-check
+  which row it belongs to BEFORE writing status, and never move a row closed on
+  a plausible default (strict-close).
 
-ORDERING RATIONALE: t346 landed the input-pump WRITING law (selfplay.md t346
-block; t288 honest-negative (1) SUPERSEDED) with 2/3 launches spent, and the
-queue's only remaining non-user row is t347. Its inputs VERIFIED PRESENT at
-session start 2026-11-09: scripts/r1_t278_decision_sheet.py,
-work/r1/shp_png/index_t278pristine.txt, work/r1/shp_png/ids.tsv,
-work/r1/shp_png/decision-sheet.md + index.txt all exist — the row's VERIFY
-step is half done, spend the session on the generator RUN + shrunk-ask
-regeneration. ZERO-capture task: interpreter
-~/.hermes/hermes-agent/venv/bin/python if the generator chain imports PIL
-(system python3 and .venv both LACK PIL — t346 firsthand). After t347 the
-loop's non-user queue is EMPTY: the next session re-derives candidates from
-the t346 (b)-list residue banked in docs/re/_wip_t346.md S0 — the strongest
-left is planet-record +0x0a "pointer-like seed field repaired at load"
-(income-law.md:2050; pointer-convertible, load-time trigger; the write
-witness is cheap via r1_wp_session --target, but SEMANTICS need more than a
-writer EIP — size it accordingly) — else the honest state is: every open row
-(OQ-005 D1, OQ-016 D3, OQ-019 D2/D3) awaits USER ADJUDICATION, and the loop
-should say so rather than churn.
+ORDERING RATIONALE: t347 LANDED (zero capture, ~20 tool calls): the generator
+runs post-slim and reproduced decision-sheet.md BYTE-IDENTICAL, then was
+rebuilt to print a cited disposition per C-row with the 40/1/3 split ASSERTED,
+and to write index.txt itself — the t182-clobber pitfall is now structurally
+repaired, not policed. docs/DECISIONS.md D1 is rewritten to the shrunk ask and
+the A6-A8 triad is promoted to a live keep/junk call. NO row moved (strict-close
++ R13; the blocker for OQ-005 is user time, not our measurement — banked
+honestly). t348 is ordered because it is the LAST residue on the t346 (b)-list
+with a named address and a live writer; every other open question requires the
+user. It is deliberately given an EXIT RAMP rather than an open mandate: the
+honest end-state of this loop is "3 rows await USER ADJUDICATION + WAIT-TRIGGER
+sentinel", and t348 must not be allowed to spawn a fourth hunt on the way there.
+INTERPRETER LAW: venv python ~/.hermes/hermes-agent/venv/bin/python for anything
+importing PIL (t327); scripts/r1_t278_decision_sheet.py is stdlib-only, so it
+runs under either.
   MEASURED CONTEXT t346 supplies (binding): (i) ds:0x484c4/c6 writer = INT16h
 drain fn 0x2a5f0 0x2a70e/0x2a72a (banked regs EAX=scan EDX=char, run
 work/r1/dbg-t346-20261109-024828); fn 0x2a838 type-3 arm DEAD for keys
@@ -256,17 +277,25 @@ self-match). Xvfb-lock teardown fix stands (t344); production :9 healthy
 landing; FIRST ACTION of every iteration remains the tail-seek sitting check:
 newest turn >1086 => r1_t85g_sitting.py BEFORE starting, NEVER full-read).
 
-CONTEXT BANKED: t346 proved the input-pump writer law (docs/re/selfplay.md
-t346 block; working detail docs/re/_wip_t346.md S0-S3; run
-work/r1/dbg-t346-20261109-024828 census.json {w484c4_2a91d:0,
-w484c4_2a72a:2, c484c4_54928:0, btn_hdlr:2}). No OQ ledger row was touched
-(the closed gap was t288's selfplay.md honest negative). NO ledger movement;
-16/3 unchanged.
+CONTEXT BANKED: t347 artifact pair work/r1/shp_png/decision-sheet.md (176 L) +
+index.txt (pointer header + same bytes), generator
+scripts/r1_t278_decision_sheet.py, working detail docs/re/_wip_t347.md S0-S2.
+Pre-t347 sheet copy: /tmp/ds_pre_t347.md (md5 54f07195806cd8cfe6b30c0d2db37ce9,
+the byte-identity proof of the VERIFY step; post-rebuild sheet md5
+10989b4d52e30a4939928a52e4de8da4). INPUTS NOW DURABLE: committed
+artifacts/shp_png_inputs/{index_t278pristine.txt,ids.tsv,README.md} (t343
+copy route; generator inp() resolves work/ first, artifacts/ fallback —
+fallback TESTED with PK=/nonexistent). t346 context still binding: input-pump writer law
+(docs/re/selfplay.md t346 block; run work/r1/dbg-t346-20261109-024828 census.json
+{w484c4_2a91d:0, w484c4_2a72a:2, c484c4_54928:0, btn_hdlr:2}). Ledger 16/3
+unchanged two iterations running.
 
 QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed rows; phase-5b rows
-t324-t342 + phase-6 rows t343-t346 completed and retired; t347 is the live
-NEXT above (its queue row moved there VERBATIM) — see LANDED blocks)
+t324-t342 + phase-6 rows t343-t347 completed and retired; t348 is the live
+NEXT above (derived by t347 from the t346 (b)-list, since the authored queue
+ran out at t347) — see LANDED blocks. t349 = WAIT-TRIGGER sentinel or the
+user-adjudication park, per t348's exit ramp.)
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
@@ -309,6 +338,50 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t347 — 2026-11-09 (DECISION-SHEET REBUILD POST-SLIM: GENERATOR
+## VERIFIED BYTE-IDENTICAL, SHRUNK ASK NOW ASSERTED 40/1/3, index.txt CLOBBER
+## STRUCTURALLY REPAIRED; D1 REWRITTEN; NO LEDGER MOVEMENT, HONEST NEGATIVE)
+- VERIFY HALF OF THE ROW: all three inputs present
+  (scripts/r1_t278_decision_sheet.py 340 L, index_t278pristine.txt 97 L / 44
+  RESIDUE rows, ids.tsv 88 L). Generator ran under venv python EXIT=0 and
+  reproduced decision-sheet.md BYTE-IDENTICAL (md5
+  54f07195806cd8cfe6b30c0d2db37ce9 == pre-run copy /tmp/ds_pre_t347.md) — so
+  the sheet never depended on an archived _wip file; NOTHING needed
+  repointing. Its only file reads are the two banked inputs (open() grep); all
+  user quotes + citations are IN the script.
+- SHRUNK ASK IS NOW MACHINE-ASSERTED, not prose-asserted: new disposition()
+  law table gives every C-row a cited CLASS+reason (sources shp.md S25 t328
+  feasibility census, S26 t330 live blit witness run
+  dbg-t330b-20261107-080216, S27 t344 selector law run
+  dbg-t344d-20261108-161132, + the t323 combat-unreachable amendment);
+  unmapped census rows raise SystemExit. MEASURED SPLIT 40 NO-ASK + 1
+  JUNK-CERTAIN (3cfgnew k12 vendor EOF truncation) + 3 ADJUDICABLE (mouse
+  k5/k6/k7) = 44, i.e. 41 rows leave the ask. THE ASSERTION EARNED ITS KEEP:
+  the author's hand-count of 38 failed the first run (sg50expl k9 + sg64expl k0
+  are NO-ASK/unreachable, not a separate class) — headline numbers can no
+  longer drift silently.
+- STALE PREMISES PURGED from the sheet (superseded by cited measurement, not
+  re-litigated): mouse lib "dims words invalid ... only paint-capture could
+  resolve"; k5 note "W=0 H=46" (that was ONE HALF of a signed bbox pair, S27);
+  "THE HONEST DIMS-UNKNOWN REMAINDER is 16 records".
+- TOOL LAND: the generator now writes index.txt ITSELF (pointer header + the
+  identical sheet bytes), so r1_t182_pngdump.py clobbering it is recoverable by
+  re-running the generator instead of by discipline. Sheet is 176 L.
+- DECISIONS.md D1 REWRITTEN to the t347 shape (3 rows + one batch word +
+  optional B-ID confirm), D3's OQ-005 line got the t344/t347 addendum, and the
+  10status/2savegam/4loadgam triad (A6-A8, user: "possibly junk data") was
+  promoted from "restatement only" to a LIVE keep/junk call — a real ask we had
+  been not-asking. Hand-authored docs confirmed safe: no script opens
+  DECISIONS.md or shp.md for writing (grep).
+- LEDGER: NO row moved, honest negative banked in the OQ-005 row — t347
+  produced NO new measurement (it re-expressed already-cited measurement and
+  repaired tooling), R13 bars self-grading, and the blocker is USER TIME not
+  our coverage. The k5/k6/k7 pixel-capture route stays OPEN and is NOT refuted.
+  16 closed / 3 open unchanged. GATE_EXIT=0, LEDGER AUDIT OK, LEDGER INDEX OK.
+  game/ read-only.
+- NEXT = t348 PLANET-RECORD +0x0a WRITER WITNESS, HARD BUDGET + EXIT RAMP
+  (last non-user candidate; t349 = sentinel/park).
 
 ## LANDED t346 — 2026-11-09 (INPUT-PUMP WRITER WITNESSED — fn 0x2a5f0 IS THE
 ## LIVE WRITER OF WORD ds:0x484c4/0x484c6; t288 honest-negative (1) CLOSED;

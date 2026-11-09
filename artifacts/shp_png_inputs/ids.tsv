@@ -1,0 +1,88 @@
+# t196 per-record residue identifications (vision-oracle identification-by-context; NO codec grading, R13).
+# class: EMPTY=no stream bytes / TINY=<=8B / ART=walked. unbounded: X (validator tag t197) = canonical slots + EXACT-H walk, NO span bound (rewrite decode() + r1_shp_unifiedlaw.py agree: V196+A1288+X29+FAIL44, libs clean 187/208).
+# lib	rec	class	unbounded	identification	source
+14intel.shp	8	ART	X (validator tag t197, span-free)	intel-panel sprite set (PASSED neighbours = mood faces; this rec = red spark partial)	vision t196 / census
+1starmap.shp	1	EMPTY	n/a	star-map sprite/button (PASSED neighbours carry NEXT TURN <ENTER>); k3 green ship, k4 blue ship, k6 golden canisters (vision)	vision t196 / census
+1starmap.shp	3	ART	X (validator tag t197, span-free)	star-map sprite/button (PASSED neighbours carry NEXT TURN <ENTER>); k3 green ship, k4 blue ship, k6 golden canisters (vision)	vision t196 / census
+1starmap.shp	4	ART	X (validator tag t197, span-free)	star-map sprite/button (PASSED neighbours carry NEXT TURN <ENTER>); k3 green ship, k4 blue ship, k6 golden canisters (vision)	vision t196 / census
+1starmap.shp	6	ART	X (validator tag t197, span-free)	star-map sprite/button (PASSED neighbours carry NEXT TURN <ENTER>); k3 green ship, k4 blue ship, k6 golden canisters (vision)	vision t196 / census
+3cfgnew.shp	0	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	1	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	2	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	3	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	4	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	5	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	6	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	7	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	8	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	9	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	10	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	11	ART	X (validator tag t197, span-free)	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+3cfgnew.shp	12	ART	short@EOF	new-game/race-configuration art (dot-wheel menus k0-4,k7-9; heraldic shields k5-6; glowing orbs k10-12, vision)	vision t196 / census
+cos_star.shp	40	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	41	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	42	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	43	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	44	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	45	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	46	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	47	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	48	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	49	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	50	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+cos_star.shp	51	TINY	n/a	star-map pip library (rec0 2x2); k40-51 dims word 0 = placeholder slots [inferred never selected; blit error -1 path]	vision t196 / census
+destroy.shp	14	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl00.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl01.shp	8	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl01.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl03.shp	0	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl03.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl04.shp	0	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl04.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl05.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl07.shp	0	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl08.shp	0	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+expl08.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+mouse.shp	5	DEGENERATE t197	FAIL	cursor/button set; W=0 H=46 at canonical slots — old validator walked swapped anyway (t197 dims-gate demotion)	census t197
+mouse.shp	6	ART	no-dims-word	cursor/button set; k6 = Exit <ESC>-style panel partial; dims word invalid (H=0)	vision t196 / census
+mouse.shp	7	ART	no-dims-word	cursor/button set; k6 = Exit <ESC>-style panel partial; dims word invalid (H=0)	vision t196 / census
+orbex00.shp	8	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+orbex00.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+planind.shp	0	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	1	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	2	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	3	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	4	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	5	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	6	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	7	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	8	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	9	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	10	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	11	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+planind.shp	12	ART	X (validator tag t197, span-free)	manufacturing gauge ladder (factory on red soil; +1 grey tank per level k8->k12, vision)	vision t196 / census
+sg37expl.shp	0	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg37expl.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg45expl.shp	0	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg45expl.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg47expl.shp	0	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg47expl.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg49expl.shp	0	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg49expl.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg50expl.shp	9	TINY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg64expl.shp	0	DEGENERATE t197	FAIL	explosion ladder; W=18 H=0xfffffffb at V slot — old validator walked swapped H=18 rows (t197 dims-gate demotion)	census t197
+sg66expl.shp	0	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg66expl.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+sg70expl.shp	9	EMPTY	n/a	(empty/TINY placeholder)	vision t196 / census
+# t254 additions (pop-slot library = 17np.shp, MEASURED via u16[0x6fd9c]=44 -> cache slot 44 verbatim content-match; docs/re/shp.md S23)
+17np.shp	0	ART		planet-screen/panel frame 639x479 (t196 probe stands)	vision t196/t254 + RAM
+17np.shp	1	ART		BUSY population icon: sideways humanoid, red/pink body, blue tool (9x9)	vision t254 16x zoom + live PLPOP
+17np.shp	2	ART		FREE population icon: front-facing yellow/gold figure (7x9)	vision t254 16x zoom + live PLPOP
+17np.shp	3	ART		EMPTY-slot circle: hollow green ring (8x8)	vision t254 16x zoom + live PLPOP
+17np.shp	4	ART		large panel 625x357 (no slot role)	vision t254
+17np.shp	5	ART		panel 416x316 (no slot role)	vision t254
+17np.shp	6	ART		2x2 red dot (legend marker)	vision t254
+17np.shp	7	ART		2x2 yellow dot (legend marker)	vision t254
+17np.shp	8	ART		2x2 green dot (legend marker)	vision t254
+# t254 planitem ruling: live PLBUILD icon "Scientist Takeover" (item idx 34) == planitem.shp k34 1:1 MAD 1.5 (next 42.1) — scripts/r1_t254_pi_match.py
+# t254 dims exclusion: planets min 11x11 / planitem min 24x23 / planalNN min 47x47 vs PLPOP 10px pitch — candidates EXCLUDED (shp.md S23.3)

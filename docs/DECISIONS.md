@@ -11,32 +11,50 @@ campaign driven to t1150 as the RE corpus; the original save is intact at
 work/r1/game/RESUME.GAM.user-oct29.
 
 ## D1 — .shp sprite library ruling (closes OQ-005, the oldest open row)
-UPDATE t328 (2026-11-07): the ask shrank. Our decoder reproduces 1513 of 1557
-vendor sprite records byte-lawfully (t197 corpus). We then asked the vendor
-itself which of the 44 failures it can even DRAW (shp.md S25, cited):
-  - 39 records are CITED-NO-WITNESS: the vendor draws NOTHING for them.
-    12 cos_star k40..k51 have zero dims in every slot -> the blit's own
-    -1 gate (@0x5cb2b) refuses them outright; 25 ladder slots
-    (destroy/expl*/orbex/sg*expl — all named in batfx.txt battle-effects)
-    carry ZERO stream bytes; 1starmap k1 likewise (and no selector selects
-    it). Nothing to keep, nothing to see — batch-ruling them junk is now a
-    formality backed by measurement, not a guess.
-  - 3cfgnew k12 is truncated at the file's EOF by the vendor itself:
-    junk-certain. sg64expl k0 is combat art = unreachable by capture.
-  - ONLY mouse k5/k6/k7 (sheet rows C27-C29) remained adjudicable, and
-    T330 RAN (2026-11-08, docs/re/shp.md S26): the vendor's draw-time dims
-    slot is MEASURED = the u16 pair at record offset 0 (stored H-1,W-1) —
-    k5/k6/k7 are therefore VALID-dims records (78x47), not invalid. But NO
-    selector anywhere names k5/k6/k7 (windows.txt requests only cursor
-    shape 2), while the library itself draws on every right-bar panel open
-    (records k0/k2 witnessed live). So the question shrank from 'keep or
-    junk' to 'valid-but-unselected art: keep as-is?' — a formality.
-So the live ask is now just:
-  B1..B29   identified frames with thumbnails — confirm or correct the ID
-            (work/r1/shp_png/decision-sheet.md + sheets/)
-  C27-C29   mouse k5/k6/k7: keep / junk / wait-for-t330 — or say
-            "draw-capture" and we run t330 instead of asking.
-  A rows     restatement only; confirm if you like.
+REBUILD t347 (2026-11-09): the decision sheet was regenerated from banked
+inputs only (zero capture) and now prints a CITED DISPOSITION on every one of
+its 44 C-rows, so the ask you have to read is 3 rows plus a batch word. Sources
+per row: shp.md S25 (t328 feasibility census), S26 (t330 live blit witness, run
+dbg-t330b-20261107-080216), S27 (t344 selector law + corner witness, run
+dbg-t344d-20261108-161132), and the t323 combat-unreachable amendment.
+
+  41 of 44 rows LEAVE the ask (asserted by the generator, so the number can't
+  drift silently):
+    - 12 cos_star k40..k51 — all-zero headers, dims zero in EVERY slot, so the
+      blit's own -1 gate (@0x5cb2b) draws nothing (S25.2/S12).
+    - 25 ladder slots (destroy k14, expl00/01/03/03/04/04/05/07/08/08,
+      orbex00 k8/k9, sg37/45/47/49expl k0+k9, sg66expl k0/k9, sg70expl k9) —
+      measured span==header, i.e. ZERO stream bytes, in libraries named in
+      extracted/ascend00/batfx.txt battle-effects (S25.2, t323).
+    - 1starmap k1 — zero stream bytes and no selector names it (SHAPEITEM is
+      k3/k4/k5/k7; windows.txt 456/477/498/517).
+    - sg50expl k9 + sg64expl k0 — combat art, UNREACHABLE-BY-CAPTURE (t323).
+    - 3cfgnew k12 — JUNK-CERTAIN: the vendor truncated it at file EOF.
+  Nothing here is a guess about your files; it is what the vendor's own code
+  does with those records. Batch-accepting them is one word.
+
+  THE 3 ADJUDICABLE ROWS — C27-C29, mouse.shp k5/k6/k7. T330 MEASURED the
+  draw-time dims slot (u16 pair at record offset 0, stored H-1,W-1), and T344
+  found the selector: fn 0x54650's mode chain requests id mode+4 from the
+  cursor position, so k4/k5/k6/k7 are the four screen-CORNER cursors
+  (TL/TR/BL/BR) — TL and TR witnessed live byte-exact. The earlier
+  "invalid dims / no selector anywhere" reading was wrong on both counts: the
+  zero component was one half of a SIGNED bbox pair, and all four records are
+  ONE 78x47 glyph at four anchors (12/12 file-measured, S27). What is still
+  capture-limited is the PIXELS — no blit deref at k5/k6/k7 offsets occurred in
+  the witness window. So the question is not keep-or-junk on broken data, it is:
+  keep valid-but-seldom-drawn corner-cursor art as-is?
+
+So the live ask:
+  C27-C29   mouse k5/k6/k7 — keep as-is / junk. (Recommended: keep — the bytes
+            are valid and the selector is known; junking them buys nothing.)
+  BATCH     the 41 dispositions above — accept / contest specific row ids.
+  B1..B29   identified frames with thumbnails — confirm or correct the IDs
+            (work/r1/shp_png/decision-sheet.md + sheets/). Optional but it is
+            the only part that could still surprise us.
+  A6-A8     the 10status/2savegam/4loadgam triad you called "possibly junk
+            data" — now a live keep/junk call from the thumbnails (they decode
+            cleanly as 639x479 menu panels; we have never seen them drawn).
 Effort: ~2 minutes. If undecided: row stays open, rewrite unaffected (it
 renders its own vector art; the codec is a validation asset).
 
@@ -65,6 +83,10 @@ cited evidence; the original list below over-promised two entries:
              B-rows + mouse C27-C29 only. T330 LANDED (2026-11-08): draw-time
              dims slot MEASURED (rec+0 u16 pair, shp.md S26); C27-C29 are
              valid-dims, unselected records — ruling is now a formality.
+             T344/T347 (2026-11-08/09): C27-C29's selector FOUND (screen-corner
+             cursor modes, TL/TR live-witnessed, shp.md S27) and the sheet was
+             regenerated with per-row cited dispositions — the ask is now 3 rows
+             + a batch word (see D1 above).
   OQ-019  -> CLOSED-ROUTE SUPERSEDED: the t293 scripted move-order capture
              and every follow-on capture route are now CITED-DEAD (t319/t320
              pump, t322 mouse, t323 activation, t324 RAM class table).

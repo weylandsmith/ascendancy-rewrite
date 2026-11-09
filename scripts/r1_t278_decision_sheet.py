@@ -14,6 +14,17 @@ Output:
       user's Oct-29 verdict verbatim where it applies, and a one-line
       keep / junk / re-render recommendation. R13: the recommendation is a
       RECOMMENDATION — the user rules; nothing here closes a row by itself.
+  work/r1/shp_png/index.txt  the same bytes behind a pointer header (t278
+      convention; scripts/r1_t182_pngdump.py OVERWRITES index.txt with the raw
+      dumper census on every run, so decision-sheet.md is canonical).
+
+T347 REGENERATION (2026-11-09, post-slim): the generator was verified to run
+and reproduce decision-sheet.md byte-identical from banked inputs only, then
+updated to the SHRUNK ASK — every C-row now carries a cited DISPOSITION
+(shp.md S25 t328 feasibility table, S26 t330 live draw-capture, S27 t344
+selector law), and the script ASSERTS the 41-out-of-ask / 3-adjudicable
+split (40 NO-ASK + 1 JUNK-CERTAIN + 3 ADJUDICABLE = 44) on every rebuild. Row ids C1..C44 stay pinned to the
+index_t278pristine.txt census order so DECISIONS.md references (C27-C29) hold.
 
 The user-quote and citation tables below are transcribed from:
   - the user's Oct-29 message (session 20261022_024226_01e8e7 msg 40813),
@@ -25,6 +36,17 @@ import os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PK = os.path.join(ROOT, "work", "r1", "shp_png")
+# t347: the two banked inputs are ALSO committed under artifacts/ (gitignored
+# work/ can be wiped; the sheet the user rules on must stay regenerable).
+ART = os.path.join(ROOT, "artifacts", "shp_png_inputs")
+
+def inp(name):
+    """Resolve a generator input: work/r1/shp_png first, artifacts/ fallback."""
+    for d in (PK, ART):
+        cand = os.path.join(d, name)
+        if os.path.exists(cand):
+            return cand
+    raise SystemExit("missing generator input %r (looked in %s and %s)" % (name, PK, ART))
 
 # ---------------------------------------------------------------- user quotes
 Q = {
@@ -138,11 +160,14 @@ LAW = {
              "no render possible (dims word 0); never shown.",
              "KEEP as never-drawn placeholder slots - do NOT junk the records; "
              "rule only whether 'never drawn' is acceptable to close the class."),
-"mouse":    ("cursor/button set (vision: arrows on PASSED k0/k1; k6 shows an "
-             "'Exit <ESC>'-style button panel).",
+"mouse":    ("cursor/button set. k0 drawn on EVERY right-bar panel open "
+             "(t330 live witness, shp.md S26); k4..k7 = screen-corner cursors "
+             "TL/TR/BL/BR (selector law fn 0x54650 mode chain; TL/TR "
+             "live-witnessed byte-exact t344, shp.md S27).",
              "k6 partial in sheets/sheet2_stragglers.png (DARK palette).",
-             "RE-RENDER candidate - dims words invalid (W=0/H=0 at canonical "
-             "slots, shp.md S20); only paint-capture could resolve."),
+             "KEEP - valid 78x47 art with a KNOWN selector; the t196/t278 "
+             "'invalid dims' premise is REFUTED (t330/t344). Your rule needed: "
+             "keep valid-but-rarely-drawn corner art as-is?"),
 "destroy":  ("ship-destruction animation family (name; shp.md S3 variant dims "
              "word 0x7FFFFFBB-class).",
              "no render possible (0 stream bytes); never shown.",
@@ -175,9 +200,62 @@ RECG = {  # record-level overrides: (lib_key, quote_or_None, rec_note, rec_overr
     "dims-gate unification (shp.md S21.2); bytes exist, dims-location unknown.",
     None),
 "mouse|5": ("mouse", None,
-    "dims W=0 H=46 at canonical slots; old validator walked swapped anyway "
-    "(t197 dims-gate demotion, shp.md S21.2).", None),
+   "t344: k4..k7 = ONE 78x47 glyph at four corner anchors (signed bbox pair; "
+   "the old 'W=0' read one half of the pair, shp.md S27).", None),
 }
+
+
+# ---------------------------------------------------- t347 C-ROW DISPOSITION LAW
+# Why each of the 44 C-rows needs NO shape ruling (or does). Cited sources:
+#   S25  = docs/re/shp.md section 25 (t328 feasibility table, measured)
+#   S26  = docs/re/shp.md section 26 (t330 live blit witness, run
+#          work/r1/dbg-t330b-20261107-080216)
+#   S27  = docs/re/shp.md section 27 (t344 selector law + corner witness, run
+#          work/r1/dbg-t344d-20261108-161132)
+#   t323 = the UNREACHABLE-BY-CAPTURE disposition amendment (combat-art class;
+#          every battle lib is named in extracted/ascend00/batfx.txt)
+ZERO_STREAM = {  # the 25 slots t328 measured span==header => zero stream bytes
+ "destroy|14", "expl00|9", "expl01|8", "expl01|9", "expl03|0", "expl03|9",
+ "expl04|0", "expl04|9", "expl05|9", "expl07|0", "expl08|0", "expl08|9",
+ "orbex00|8", "orbex00|9", "sg37expl|0", "sg37expl|9", "sg45expl|0",
+ "sg45expl|9", "sg47expl|0", "sg47expl|9", "sg49expl|0", "sg49expl|9",
+ "sg66expl|0", "sg66expl|9", "sg70expl|9",
+}
+
+def disposition(lib, k, span):
+    """Return (CLASS, reason) for one C-row. Raises if a census row is unmapped,
+    so a changed corpus cannot silently slip into the sheet."""
+    key = "%s|%s" % (lib, k)
+    if lib == "mouse":
+        return ("ADJUDICABLE",
+                "valid 78x47 corner-cursor art, selector KNOWN (S26/S27); drawn "
+                "pixels capture-limited — your rule is keep/junk, not decode")
+    if lib == "3cfgnew" and k == "12":
+        return ("JUNK-CERTAIN",
+                "vendor truncated it at FILE EOF (walk short 55/79, S20/S21); "
+                "windows.txt SHAPEITEM selects k0 only")
+    if lib == "cos_star":
+        return ("NO-ASK",
+                "all-zero 24-byte header, dims zero in EVERY slot -> the blit's "
+                "own -1 gate @0x5cb2b draws nothing (S25.2, S12)")
+    if key in ZERO_STREAM:
+        return ("NO-ASK",
+                "zero stream bytes (span==header, 25/25 measured) + battle-effects "
+                "lib named in batfx.txt => UNREACHABLE-BY-CAPTURE (S25.2, t323)")
+    if lib == "1starmap":
+        return ("NO-ASK",
+                "zero stream bytes (span 24) AND no selector names k1 "
+                "(SHAPEITEM k3/k4/k5/k7, windows.txt 456/477/498/517) (S25.2)")
+    if lib == "sg50expl":
+        return ("NO-ASK",
+                "combat art => UNREACHABLE-BY-CAPTURE (batfx line 58, t323); "
+                "span 27 sits AT EOF (near-empty + truncated, S25.2)")
+    if lib == "sg64expl":
+        return ("NO-ASK",
+                "combat art => UNREACHABLE-BY-CAPTURE (batfx line 63, t323); "
+                "variant dims word class (S3)")
+    raise SystemExit("unmapped C-row in census: %r (span %s) — classify it "
+                     "before regenerating the sheet" % (key, span))
 
 def libkey(cls, lib):
     if cls == "CONTROL": return "CONTROL"
@@ -196,7 +274,7 @@ def png_for(cls, name):
     return name if os.path.exists(p) else None
 
 def main():
-    src = os.path.join(PK, "index_t278pristine.txt")
+    src = inp("index_t278pristine.txt")
     rows = []
     for line in open(src):
         line = line.rstrip("\n")
@@ -208,14 +286,14 @@ def main():
 
     # ids.tsv ids
     ids = {}
-    for line in open(os.path.join(PK, "ids.tsv")):
+    for line in open(inp("ids.tsv")):
         if line.startswith("#") or not line.strip(): continue
         p = line.rstrip("\n").split("\t")
         if len(p) >= 5: ids[(p[0], p[1])] = p[4]
 
     out = []
     w = out.append
-    w("# OQ-005 RESIDUE DECISION SHEET (t278, 2026-11-02)")
+    w("# OQ-005 RESIDUE DECISION SHEET (t278; t347 REBUILD 2026-11-09 - SHRUNK ASK)")
     w("")
     w("How to use: read the RECOMMEND column; overrule anything you disagree with")
     w("(reply per row id, e.g. 'C1 junk, B13 keep'). Your Oct-29 verdicts are")
@@ -223,14 +301,28 @@ def main():
     w("never reached you as an image. R13: nothing here rules for you - the ledger")
     w("row closes only on your ruling or a drawn-frame capture.")
     w("")
+    w("THE LIVE ASK (t347): 41 of the 44 C-rows now carry a CITED DISPOSITION -")
+    w("the vendor itself draws NOTHING for them, or the bytes are junk-certain -")
+    w("so they need no ruling; batch-accept them with one word if you like.")
+    w("Actually adjudicable: B1..B29 (confirm/correct the identifications),")
+    w("C27-C29 (mouse k5/k6/k7 - valid 78x47 corner-cursor art, selector known;")
+    w("keep as-is?), and the A6-A8 triad you called 'possibly junk data' (rule")
+    w("from the thumbnails: keep as unused menu art, or junk). ~2 minutes.")
+    w("")
     w("Scope (measured from index_t278pristine.txt, the t197-era census): 88 records =")
     w("5 CONTROL + 10 RESTORED-V (t182 validator false-FAILs, already rendered")
     w("bright - brightness complaint fixed per shp.md S19) + 29 SPAN-FREE (t197:")
     w("full frames at canonical dims, our old span bound was the bug) + 44 FAIL")
-    w("(no render possible). The honest dims-unknown remainder after t197 is 16")
-    w("records: cos_star k40..k51, mouse k5/k6/k7, sg50expl k9, 3cfgnew k12")
-    w("(shp.md S20.3). 26 of the 44 FAIL rows are ZERO-byte ladder slots - they")
-    w("render nothing on any law, so they need no shape ruling (batch row below).")
+    w("(t278 rows C1..C44). The t278 'dims-location' framing is SUPERSEDED: t330")
+    w("MEASURED the vendor's draw-time dims slot (u16 pair at rec+0, stored")
+    w("[H-1,W-1]; shp.md S26) and t344 dissolved the mouse zero-component dispute")
+    w("(the pair is a SIGNED bbox; S27). Every C-row now carries its own cited")
+    w("disposition (feasibility table shp.md S25 + S26/S27): 12 cos_star k40..k51")
+    w("zero-dims (blit -1 gate), 25 zero-stream ladder slots, 1starmap k1")
+    w("zero-stream + no selector, sg50expl k9 + sg64expl k0 combat-unreachable,")
+    w("3cfgnew k12 vendor-truncated = 41 rows out of the ask (40 no-ask + 1")
+    w("junk-certain); mouse k5/k6/k7 = the 3 adjudicable rows. The script")
+    w("ASSERTS the 41/3 split on every rebuild.")
     w("")
     w("Standing law for every row (shp.md S19): 'Do NOT delete rows on")
     w("non-recognition alone.' The Oct-29 blanket verdict: " + Q["all_real"])
@@ -280,11 +372,20 @@ def main():
         w("| B%d | %s | %s | %s | %s | %s |" % (n, name, name, law, ustat, rec))
     w("")
 
-    # Section C: FAIL rows, grouped; zero-byte batched
-    w("## C. FAIL CLASS (44 records, no render possible)")
+    # Section C: FAIL rows with t347 cited dispositions (shrunk ask)
+    w("## C. FAIL CLASS (44 records) - t347 DISPOSITIONS; only 3 rows need you")
     w("")
-    w("| # | record | span | identification [cited] | user status | RECOMMEND |")
-    w("|---|--------|------|----------------------|-------------|-----------|")
+    w("Every row carries a cited disposition (law table in")
+    w("scripts/r1_t278_decision_sheet.py; sources shp.md S25/S26/S27 + the t323")
+    w("combat-unreachable amendment). NO-ASK = the vendor's own code draws")
+    w("nothing for it (zero dims -> blit -1 gate @0x5cb2b, or zero stream bytes)")
+    w("or the class is unreachable by any capture we can stage; batch-accepting")
+    w("them costs one word. JUNK-CERTAIN = vendor-truncated bytes. ADJUDICABLE =")
+    w("real art you can rule keep/junk on.")
+    w("")
+    w("| # | record | span | DISPOSITION | why [cited] | RECOMMEND |")
+    w("|---|--------|------|-------------|-------------|-----------|")
+    counts = {"NO-ASK": 0, "JUNK-CERTAIN": 0, "ADJUDICABLE": 0}
     n = 0
     for cls, name, status in rows:
         if not cls.startswith("RESIDUE"): continue
@@ -292,49 +393,65 @@ def main():
         libfile = name.split("--")[0]
         lib = libfile[:-4] if libfile.endswith(".shp") else libfile
         k = name.split("--")[1]
-        lk = libkey(cls, lib)
-        law, ustat, rec = LAW[lk]
-        ov = RECG.get("%s|%s" % (lib, k))
-        note = ov[2] if ov else ""
-        reco = ov[3] if (ov and ov[3]) else rec
         m = re.search(r"span=(\d+)", status)
         span = int(m.group(1)) if m else -1
-        if not note and span > 100:
-            note = ("real stream bytes present but dims WORD invalid "
-                    "(t197 dims-gate demotion, shp.md S21.2) — dims-location "
-                    "question still open for this slot.")
-        w("| C%d | %s | %s B | %s%s | %s | %s |" % (n, name, span, law, (" NOTE: "+note) if note else "", ustat, reco))
+        dclass, dwhy = disposition(lib, k, span)
+        counts[dclass] += 1
+        ov = RECG.get("%s|%s" % (lib, k))
+        note = ov[2] if ov else ""
+        if ov and ov[3]:
+            reco = ov[3]
+        elif dclass == "ADJUDICABLE":
+            reco = LAW[libkey(cls, lib)][2]
+        else:
+            reco = "no ruling needed (batch: accept disposition)"
+        w("| C%d | %s | %s B | %s | %s%s | %s |"
+          % (n, name, span, dclass, dwhy, (" NOTE: "+note) if note else "", reco))
+    # SHRUNK-ASK ASSERTION: the sheet's headline numbers are measured facts; a
+    # corpus change that shifts them must fail loudly, not silently re-framing.
+    assert n == 44, "C-class census changed: %d rows (expected 44)" % n
+    assert counts == {"NO-ASK": 40, "JUNK-CERTAIN": 1, "ADJUDICABLE": 3}, \
+        "disposition split changed: %r (expected 40/1/3 = 41 rows out of the ask)" % (counts,)
     w("")
-    w("Batch framing for the span-8/span-24 rows (expl*/sg*expl/destroy/orbex00):")
-    w("25 of them are the t196 EMPTY class with ZERO stream bytes and the S3")
-    w("variant dims word (0x7FFFFFBB-class, shp.md S20.1). They are not junk and")
-    w("not recoverable art: the file simply holds an empty slot. If you accept")
-    w("that framing they close as a batch with one word. (1starmap k1 also shows")
-    w("span 24 but its dims word is invalid, so it sits in the remainder below,")
-    w("not this batch.) THE HONEST DIMS-UNKNOWN REMAINDER is 16 records (shp.md")
-    w("S20.3): mouse k6/k7, 1starmap k1, sg50expl k9 (invalid dims, not walkable")
-    w("at any tested slot) + cos_star k40..k51 (dims word 0; the t200 selector law")
-    w("makes them addressable-but-blit-refused placeholders). Separately:")
-    w("3cfgnew k12 is broken vendor data outright (EOF truncation) and mouse k5 +")
-    w("sg64expl k0 are t197 dims-gate demotions (shp.md S21.2) — real bytes,")
-    w("invalid dims component. Those three plus the 16 are what your ruling (or a")
-    w("draw-capture) has to land for the dims-location question to close.")
+    w("Count (asserted on every rebuild): 40 NO-ASK + 1 JUNK-CERTAIN = the 41")
+    w("rows that leave the ask, plus 3 ADJUDICABLE (C27-C29 mouse k5/k6/k7) = 44.")
     w("")
     w("## D. WHAT EACH ANSWER BUYS (ledger mechanics, for your planning)")
     w("")
-    w("- A ruling on B rows + the 16-record dims-unknown set (cos_star/mouse/")
-    w("  sg50expl/3cfgnew-k12) is the OQ-005 closer the BLOCKED t68 ask names")
-    w("  ('human-verifiable drawn frame'). Answer per row, or blanket.")
-    w("- A answers are restatement only; they cost you nothing and change no row.")
+    w("- A ruling on B1..B29 + C27..C29 (batch or per-row) is the OQ-005 closer")
+    w("  the BLOCKED t68 ask names ('human-verifiable drawn frame' - for")
+    w("  k5/k6/k7 that bar is now measured CAPTURE-LIMITED, so your word is the")
+    w("  practical closer). If you accept the 41 dispositions in one word, the")
+    w("  only residues needing per-row text are the B identifications.")
+    w("- A answers are restatement only; they cost you nothing and change no row")
+    w("  EXCEPT A6-A8 (the 10status/2savegam/4loadgam triad you called 'possibly")
+    w("  junk data') - that is a live keep/junk call from the thumbnails.")
     w("- The population-slot icon library IDENTITY (17np.shp content-match")
     w("  planets-ui.md S4) is NOT part of this sheet - it is tracked separately.")
     w("")
     w("Generated by scripts/r1_t278_decision_sheet.py from index_t278pristine.txt +")
-    w("ids.tsv; quote/citation tables live in the script. Rebuild any time.")
+    w("ids.tsv; quote/citation/disposition tables live in the script. Rebuild any")
+    w("time: venv python, zero capture. t347 rebuild 2026-11-09.")
 
+    # If work/ was wiped the inputs still resolve (artifacts/), but the OUTPUT
+    # needs a directory — create it rather than die confusingly.
+    os.makedirs(PK, exist_ok=True)
     dst = os.path.join(PK, "decision-sheet.md")
-    open(dst, "w").write("\n".join(out) + "\n")
-    print("wrote", dst, len(out), "lines")
+    body = "\n".join(out) + "\n"
+    open(dst, "w").write(body)
+    # index.txt = pointer header + the same bytes (t278 convention). The dumper
+    # scripts/r1_t182_pngdump.py clobbers it with the raw census on every run;
+    # re-running THIS script restores the sheet view (t347: made part of the
+    # generator so the pair can never drift apart silently).
+    hdr = ("# ===========================================================================\n"
+           "# index.txt IS THE DECISION SHEET (canonical copy: decision-sheet.md,\n"
+           "# same bytes). scripts/r1_t182_pngdump.py OVERWRITES this file with the raw\n"
+           "# dumper census on every run; the pre-rebuild raw census is banked verbatim\n"
+           "# as index_t278pristine.txt. Restore the sheet view any time:\n"
+           "#   python3 scripts/r1_t278_decision_sheet.py\n"
+           "# ===========================================================================\n")
+    open(os.path.join(PK, "index.txt"), "w").write(hdr + body)
+    print("wrote", dst, len(out), "lines (+ index.txt pointer copy)")
 
 if __name__ == "__main__":
     main()

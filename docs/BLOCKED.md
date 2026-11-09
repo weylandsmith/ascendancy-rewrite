@@ -26,10 +26,14 @@ k40..k51 (addressable-but-blit-refused per t200 selector law) + 4 invalid-dims
 + 2 t197 dims-gate demotions (mouse k5, sg64expl k0) + 3cfgnew k12 (vendor EOF
 truncation). Closure class = human-verifiable drawn frame (R13 forbids self-
 grading) OR user ruling on the shipped DECISION SHEET:
-work/r1/shp_png/decision-sheet.md (88 rows, per-row cited identification +
-the user's Oct-29 verdicts verbatim + recommendations). PITFALL:
-scripts/r1_t182_pngdump.py REWRITES index.txt on every run — hand-author only
-in decision-sheet.md. Blind sweeps FORBIDDEN (R2). Default in force: decode per
+work/r1/shp_png/decision-sheet.md (88 rows; t347 REBUILD adds a cited
+DISPOSITION per C-row — 40 no-ask + 1 junk-certain + 3 adjudicable — asserted by
+the generator). PITFALL (t347 amendment): scripts/r1_t182_pngdump.py still
+REWRITES index.txt on every run, but scripts/r1_t278_decision_sheet.py now
+writes index.txt too (pointer header + the identical sheet bytes), so recovery
+is "re-run the generator", not hand-editing. Hand-author only in
+decision-sheet.md (and even there, prefer editing the generator's tables so the
+next rebuild keeps the text). Blind sweeps FORBIDDEN (R2). Default in force: decode per
 S16 V/A law (dims at rec / rec+0x10); residual class skip-and-warn in tooling,
 never game-visible (rewrite renders its own vector art; codec = validation
 asset). Details: docs/DECISIONS.md D1.
