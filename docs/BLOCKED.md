@@ -114,6 +114,18 @@ times.
   interpreted ONLY via `git status --porcelain` = EMPTY, so no hand edit exists.
   NEXT stays the WAIT-TRIGGER sentinel verbatim; +0x0a hunt not re-opened
   (t348(1)-(3) binding); no research task invented (t178).
+- 2026-11-09 t352: parked, no trigger. Sitting check NEGATIVE (400 KB tail-SEEK,
+  17 records parsed with json, turn field 1086 on 17/17 == corpus floor; timeline
+  8,810,407,088 B, newest tail record file=60.sav; ring saves rotating at the
+  10 s cadence — 60.sav mtime 05:14:00). Production :9 HEALTHY (game pid 1555,
+  TL expiry 2026-11-11 01:07:10, watcher 1575, ring age 5s). No ruling:
+  DECISIONS.md mtime 03:31:41 and decision-sheet.md 03:40:49 both pre-date the
+  t351 commit 05:10:33; grep USER:/ANSWER:/RULING/RULED over DECISIONS.md hits
+  only the author's own ask-text (lines 13/80/85/94), decision-sheet hits are the
+  generator's disposition column; post-commit sweep = gate-regenerated docs/re/*
+  only and `git status --porcelain` EMPTY per the t350 guardrail — no hand edit.
+  NEXT stays the WAIT-TRIGGER sentinel verbatim; +0x0a hunt not re-opened
+  (t348(1)-(3) binding); no research task invented (t178).
 
 ## R1 runbook (mandatory safety invariants — a run without them is a bug)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base B; NEVER hard-code

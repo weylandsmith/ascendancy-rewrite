@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-09T05:05
+updated: 2026-11-09T05:15
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -215,9 +215,9 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t352 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
+NEXT t353 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
 t348's exit ramp made this the parked state — task line FIRST, per ramp; t349,
-t350 and t351 parked on it, checks below are the proven shape).
+t350, t351 and t352 parked on it, checks below are the proven shape).
   DO IN ORDER, THEN STOP: (1) tail-seek sitting check on
   work/r1/playcap/live-timeline.jsonl (OOM law: r1_stream or <=400 KB tail
   seek; NEVER full-read). If newest turn > 1086, a NEW SITTING arrived: run
@@ -244,7 +244,16 @@ t350 and t351 parked on it, checks below are the proven shape).
   and attribution_scan.py — and `git status` was CLEAN, so content-identical;
   only a DIRTY tree is an edit).
 
-ORDERING RATIONALE: t351 LANDED (~9 tool calls, zero new measurement by design
+ORDERING RATIONALE: t352 LANDED (~10 tool calls, zero new measurement by design
+— FOURTH consecutive park on the SAME sentinel): all three branches re-checked
+with cited results — sitting check NEGATIVE (400 KB tail-seek, 17 records, turn
+1086 on 17/17, timeline 8,810,407,088 B newest tail record file=60.sav; growth
+is ring rotation, 60.sav mtime 05:14:00), no user ruling (DECISIONS.md 03:31:41
+and decision-sheet.md 03:40:49 both pre-date the t351 commit 05:10:33; ruling
+grep hits only the author's own ask-text; git status CLEAN per the t350
+guardrail), park line appended to BLOCKED.md. Production :9 HEALTHY (pid 1555,
+TL expiry 2026-11-11 01:07:10, watcher 1575). Ledger stays 16/3 (six iterations).
+Before t352: t351 LANDED (~9 tool calls, zero new measurement by design
 — THIRD consecutive park on the SAME sentinel): all three branches re-checked
 with cited results — sitting check NEGATIVE (400 KB tail-seek, 16 records, turn
 1086 on 16/16, newest ring saves 59.sav 05:07:10; growth is ring rotation), no
@@ -340,6 +349,37 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   exception, artifacts/ task t343).
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
+
+
+## LANDED t352 — 2026-11-09 (WAIT-TRIGGER SENTINEL, FOURTH PARK: NO TRIGGER,
+## HONEST NEGATIVE, ZERO NEW MEASUREMENT — ALL THREE BRANCHES CITED)
+- BRANCH 1 SITTING CHECK NEGATIVE (400 KB tail-SEEK per OOM law, 17 records
+  parsed with json, never a full-read): timeline 8,810,407,088 B; turn==day==
+  1086 on 17/17 tail records == the corpus floor; newest tail record field
+  file=60.sav. Ring saves rotating at the 10 s cadence (53..60.sav mtimes
+  05:12:50->05:14:00) — rotation, not play. Production :9 HEALTHY:
+  GAME_HEALTH_LIVE 'HEALTHY | game pid 1555; TL expiry 2026-11-11 01:07:10
+  (158125 s left); watcher 1575; ring 46.sav age 5s'; ps confirms dosbox-x 1555
+  up 04:06:58 and r1_playcap_watch.py 1575 --no-exit. r1_t85g_sitting.py
+  correctly NOT run.
+- BRANCH 2 NO USER RULING: docs/DECISIONS.md mtime 03:31:41 and
+  work/r1/shp_png/decision-sheet.md mtime 03:40:49 BOTH pre-date the t351 commit
+  (3d25540, 05:10:33); grep -i -E 'USER:|ANSWER:|RULING|RULED|user replied'
+  DECISIONS.md hits only the author's own ask-text (D1 header line 13, status
+  lines 80/85/94); decision-sheet.md hits are the t347 generator's own
+  disposition/needs-ruling column, not annotations. Post-commit find sweep =
+  gate-regenerated docs/re/{gizmos,economy,modules,fnt,text}.md only; per the
+  t350 GUARDRAIL read via `git status --porcelain` = EMPTY — no hand edit exists.
+- BRANCH 3 TAKEN: t352 park line appended to BLOCKED.md '## Sentinel park log'
+  (append, per t349's rule).
+- LEDGER UNCHANGED 16 closed / 3 open (OQ-005 shp keep/junk, OQ-016, OQ-019) —
+  all USER-GATED; strict-close forbids closing on a default and no new
+  measurement exists without a turn-advancing session (click path still broken:
+  'window died before release'). No row touched, so no OQ status edits.
+- DISCIPLINE HELD: +0x0a hunt not re-opened (REFUTED t348(1)-(3)), no click-path
+  repair attempted, no invented research task at the sentinel (t178), no second
+  capture, game/ untouched, ~10 tool calls.
+- GATE_EXIT=0; ledger_audit LEDGER AUDIT OK; ledger_index_check OK.
 
 
 ## LANDED t351 — 2026-11-09 (WAIT-TRIGGER SENTINEL, THIRD PARK: NO TRIGGER,
