@@ -215,8 +215,9 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t349 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
-t348's exit ramp made this the parked state — task line FIRST, per ramp).
+NEXT t350 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
+t348's exit ramp made this the parked state — task line FIRST, per ramp; t349
+parked on it once, checks below are the proven shape).
   DO IN ORDER, THEN STOP: (1) tail-seek sitting check on
   work/r1/playcap/live-timeline.jsonl (OOM law: r1_stream or <=400 KB tail
   seek; NEVER full-read). If newest turn > 1086, a NEW SITTING arrived: run
@@ -227,15 +228,24 @@ t348's exit ramp made this the parked state — task line FIRST, per ramp).
   work/r1/shp_png/decision-sheet.md; OQ-016 and OQ-019 dispositions per
   _wip_t329 S4 DO-NOT-APPLY packet). A ruling = work: apply it, close per
   strict-close, rewrite NEXT. (3) Otherwise: append one dated 'parked, no
-  trigger' line to BLOCKED.md, keep NEXT as this sentinel, gate green, commit,
-  stop. Do NOT re-open the +0x0a hunt (t348 closed its offline framings;
-  REFUTED-ROUTES t348(1)-(3) binding — a future live attempt REQUIRES a
-  turn-advancing watch session, which REQUIRES fixing the xsend click path
-  first: every click in run wp-lin-0x26D061-20261109-042523 logged 'window
-  died before release' and the turn never moved). Do NOT invent new research
-  tasks at the sentinel; idle is the harness's problem (t178), not yours.
+  trigger' line to the '## Sentinel park log' section of BLOCKED.md (t349
+  created it — append, don't re-create), keep NEXT as this sentinel, gate
+  green, commit, stop. Do NOT re-open the +0x0a hunt (t348 closed its offline
+  framings; REFUTED-ROUTES t348(1)-(3) binding — a future live attempt
+  REQUIRES a turn-advancing watch session, which REQUIRES fixing the xsend
+  click path first: every click in run wp-lin-0x26D061-20261109-042523 logged
+  'window died before release' and the turn never moved). Do NOT invent new
+  research tasks at the sentinel; idle is the harness's problem (t178), not
+  yours. Do NOT treat a fresh decision-sheet.md mtime as an annotation (the
+  t347 generator rewrites it; check content for USER marks).
 
-ORDERING RATIONALE: t348 LANDED (1 of 2 launches spent, ~28 tool calls): the
+ORDERING RATIONALE: t349 LANDED (~12 tool calls, zero new measurement by
+design): the sentinel's three branches were each checked with cited results —
+sitting check NEGATIVE (tail-seek newest turn 1086; timeline growth is ring
+rotation only, 51.sav 04:52:29), no user ruling anywhere (DECISIONS.md mtime
+03:31 pre-dates the t348 commit; post-commit find sweep clean), park line
+appended to the new BLOCKED.md '## Sentinel park log'. Ledger stays 16/3.
+Before t348: t348 LANDED (1 of 2 launches spent, ~28 tool calls): the
 offline census REFUTED every arithmetic/pointer framing of planet-record
 +0x0a, and the watchpoint run wp-lin-0x26D061-20261109-042523 WITNESSED the
 load-time stamp — fire '00 -> 06' at boot, value == owner-race's run-random
@@ -258,7 +268,7 @@ work/r1/wp-lin-0x26D061-20261109-042523 (boot-fires.txt, session.log, 20
 saves + ring-final); findings docs/re/_wip_t348.md S0-S5; doc updates
 income-law.md T348 UPDATE + r1-savestate.md field line + REFUTED t348(1)-(3).
 t346 input-pump law still binding (docs/re/selfplay.md t346 block). Ledger
-16/3 unchanged three iterations running (OQ-005/OQ-016/OQ-019 — all user-gated).
+16/3 unchanged four iterations running (OQ-005/OQ-016/OQ-019 — all user-gated).
 
 QUEUE (phase 6, one session each; finish tN -> rewrite NEXT to tN+1 VERBATIM;
 keep this block intact except deleting your completed rows; phase-5b rows
@@ -306,6 +316,39 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   exception, artifacts/ task t343).
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
+
+
+## LANDED t349 — 2026-11-09 (WAIT-TRIGGER SENTINEL: ALL THREE BRANCHES CHECKED,
+## PARKED, NO TRIGGER — HONEST NEGATIVE, ZERO NEW MEASUREMENT, LOOP STILL PARKS
+## AT THE SAME SENTINEL)
+- BRANCH 1 SITTING CHECK NEGATIVE (400 KB tail-SEEK per OOM law, 16 lines read,
+  never a full-read): newest turn 1086 across the whole tail == corpus floor
+  (same as t346/t347/t348). The 8.8 GB timeline GREW since t348's commit but
+  only by ring rotation: newest save 51.sav ns-stamp 2026-11-09T04:52:29.856,
+  one save/10 s cadence, turn field constant 1086. Production :9 HEALTHY
+  (GAME_HEALTH_LIVE.txt: game pid 1555, watcher 1575, TL expiry 2026-11-11
+  01:07:10). r1_t85g_sitting.py correctly NOT run (no new sitting to analyse).
+- BRANCH 2 NO USER RULING: docs/DECISIONS.md mtime 03:31 (predates the t348
+  commit 04:47:07); grep USER:/RULING/RULED/'D1 =' = only the author's own
+  example reply-shape at line 4 and the D3 recommendation at 112. A
+  post-commit find -newermt sweep of the tree (excluding .git/game/work)
+  returned NOTHING — no user note dropped anywhere.
+  work/r1/shp_png/decision-sheet.md mtime 03:40 is the t347 generator's own
+  rebuild output, not a user annotation (t347 PITFALL: the generator rewrites
+  the sheet + index.txt, so a fresh mtime proves nothing).
+- BRANCH 3 TAKEN: one dated 'parked, no trigger' line appended to BLOCKED.md
+  under a new '## Sentinel park log' section (future parked iterations append
+  there, one line each, naming the three checked branches). NEXT rewritten to
+  the SAME sentinel verbatim per t348's exit ramp.
+- NO LEDGER MOVEMENT — honest negative banked: zero new measurement this
+  iteration, so strict-close closes nothing. Ledger 16 closed / 3 open
+  (OQ-005, OQ-016, OQ-019 — all three user-gated, none re-opened here).
+- DISCIPLINE HELD: no +0x0a re-hunt (REFUTED t348(1)-(3) binding), no click-
+  path repair attempted (the t348 xsend break stays a prerequisite, not a task),
+  no invented research task at the sentinel (idle is the harness's problem,
+  t178), no second capture, game/ untouched, ~12 tool calls.
+- GATE_EXIT=0; ledger_audit LEDGER AUDIT OK; ledger_index_check OK; game/
+  checksums intact.
 
 
 ## LANDED t348 — 2026-11-09 (PLANET-RECORD +0x0a: OFFLINE FRAMINGS REFUTED,

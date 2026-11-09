@@ -84,6 +84,15 @@ picking (owner-0 fleet has no kind-4 ship at t=1086; slot 8 lands at t=1087).
 Do NOT re-run corpus mining for this — t49/t58/t265 closed that class three
 times.
 
+## Sentinel park log (t349+; one line per parked iteration — checks per STATE.md NEXT)
+- 2026-11-09 t349: parked, no trigger. Sitting check NEGATIVE (400 KB tail-seek,
+  16 lines, newest turn 1086; ring rotation only — newest save 51.sav
+  2026-11-09T04:52:29.856 ns, game pid 1555 HEALTHY, TL expiry 2026-11-11 01:07).
+  No D1/D2/D3 ruling: DECISIONS.md mtime 03:31 (pre-t348-commit), no USER:/RULING
+  markers, post-commit find -newermt shows only capture/loop artifacts.
+  decision-sheet.md 03:40 = t347 generator output, not an annotation. NEXT stays
+  the WAIT-TRIGGER sentinel verbatim; no research task invented (t178).
+
 ## R1 runbook (mandatory safety invariants — a run without them is a bug)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base B; NEVER hard-code
 B; member = physical + H, H=136 for dfsg 2025.02.01, re-derive per build — the
