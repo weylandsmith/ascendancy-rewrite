@@ -177,6 +177,17 @@ times.
   all user-gated). NEXT stays the WAIT-TRIGGER sentinel verbatim; +0x0a hunt
   not re-opened (t348(1)-(3) binding); no research task invented (t178);
   game/ untouched.
+- 2026-11-09 t355: parked, no trigger. Sitting check NEGATIVE (400 KB
+  tail-SEEK, 16 records, turn 1086 on 16/16, newest tail file=50.sav; timeline
+  8,820,053,395 B — growth vs t354 baseline is ring rotation only). Ruling
+  check NEGATIVE pre-launch (DECISIONS.md 03:31:41.300 + sheet 03:40:49.800
+  unchanged, porcelain empty, no *ruling*/*reply*, grep USER: = 0). Ran the
+  t355 poller (sentinel_t355.sh, 60 s poll, 45 min cap, launched via
+  terminal(background=true) — nohup is rejected by the tool harness): TIMEOUT,
+  no trigger; post-exit re-confirm mtime unchanged, pid 1555 alive. Production
+  :9 HEALTHY (pid 1555 up 05:12+, TL expiry 2026-11-11 01:07:10, watcher 1575).
+  No row moved strict-close; ledger stays 16/3. NEXT stays the WAIT-TRIGGER
+  sentinel verbatim.
 ## R1 runbook (mandatory safety invariants — a run without them is a bug)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base B; NEVER hard-code
 B; member = physical + H, H=136 for dfsg 2025.02.01, re-derive per build — the

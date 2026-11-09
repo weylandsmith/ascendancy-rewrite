@@ -215,19 +215,18 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t355 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
-t348's exit ramp made this the parked state — task line FIRST, per ramp; t349,
-t350, t351, t352, t353 and t354 parked on it, checks below are the proven
-shape. t354 PROVED a faster shape: launch work/r1/sentinel_t354.sh (copy to
-sentinel_t355.sh, update the baseline epoch) as a background poller — 60 s
-poll, 45 min cap, watches the REAL sheet path work/r1/shp_png/decision-sheet.md
-for mtime > baseline OR git-diff-vs-HEAD OR a *ruling*/*reply* file; wait on
-it in foreground chunks (tail --pid=$P -f /dev/null, <=410 s each — the tool
-caps ~420 s; a nohup-launch notification fires when the WRAPPER exits, not the
-sentinel — ignore it, poll the pid). Baselines as of t354 commit: sheet mtime
-2026-11-09 03:40:49.800, DECISIONS.md mtime 03:31:41, timeline 8,819,223,860 B
-turn 1086. The sentinel covers branch (2) only — run branch (1) sitting check
-FIRST, before launching).
+NEXT t356 WAIT-TRIGGER SENTINEL (the loop has NO auto-runnable work left;
+t348's exit ramp made this the parked state — task line FIRST, per ramp; t349
+-t355 parked on it, checks below are the proven shape. SHAPE: launch
+work/r1/sentinel_t356.sh (pre-staged this iteration, copy of the proven t354/
+t355 script, BASE_EPOCH 2026-11-09 03:40:49) via terminal(background=true,
+notify=true) — nohup/& wrappers are REJECTED by the tool harness (t355). Wait
+with process_manage(action='wait', timeout=180) repeatedly (clamped to 180 s;
+~15 calls cover 45 min; a completion notification fires, so a tail --pid
+foreground chunk is also fine, hard cap ~420 s regardless of timeout=).
+Baselines as of t355 commit: sheet mtime 2026-11-09 03:40:49.800, DECISIONS.md
+mtime 03:31:41, timeline 8,820,053,395 B turn 1086. The sentinel covers branch
+(2) only — run branch (1) sitting check FIRST, before launching).
   DO IN ORDER, THEN STOP: (1) tail-seek sitting check on
   work/r1/playcap/live-timeline.jsonl (OOM law: r1_stream or <=400 KB tail
   seek; NEVER full-read). If newest turn > 1086, a NEW SITTING arrived: run
@@ -248,16 +247,29 @@ FIRST, before launching).
   research tasks at the sentinel; idle is the harness's problem (t178), not
   yours. Do NOT treat a fresh decision-sheet.md mtime as an annotation (the
   t347 generator rewrites it; check content for USER marks). Nor a fresh
-  docs/re/*.md or work/attribution.tsv mtime (t350: gizmos/economy/modules/fnt/
-  text/attribution.tsv were all rewritten at 04:58:11-04:58:26, i.e. by the
-  post-commit gate run — the writers are gate stages gizmo_probe.py, fnt_probe.py
-  and attribution_scan.py — and `git status` was CLEAN, so content-identical;
-  only a DIRTY tree is an edit). PATH FACT (t353): the health readout lives at
-  work/r1/loop/GAME_HEALTH_LIVE.txt — work/r1/GAME_HEALTH_LIVE.txt does NOT exist
-  (t351/t352 LANDED blocks cite the wrong path; the check itself was always valid,
-  ps confirms).
+  docs/re/*.md or work/attribution.tsv mtime (t350: gate stages gizmo_probe.py,
+  fnt_probe.py, attribution_scan.py rewrite them post-commit; only a DIRTY
+  tree is an edit — and t355 adds: identify WHICH file is dirty before
+  treating porcelain output as a trigger; in t355 the lone dirty entry was
+  the session's own docs/re/_wip file). PATH FACT (t353): the health readout
+  lives at work/r1/loop/GAME_HEALTH_LIVE.txt — work/r1/GAME_HEALTH_LIVE.txt
+  does NOT exist.
 
-ORDERING RATIONALE: t353 LANDED (~8 tool calls, zero new measurement by
+ORDERING RATIONALE: t355 LANDED (~20 tool calls, zero new measurement by
+design — SEVENTH consecutive park on the SAME sentinel): all three branches
+re-checked with cited results — sitting check NEGATIVE (400 KB tail-seek, 16
+records, turn 1086 on 16/16, newest tail file=50.sav, timeline 8,820,053,395 B;
+growth vs t354 baseline = ring rotation), no user ruling (DECISIONS.md
+03:31:41.300 and sheet 03:40:49.800 unchanged from baselines, pre-dating the
+t354 commit 964517c 06:15:57; porcelain empty pre-launch; no *ruling*/*reply*;
+grep USER: = 0), poller run TIMEOUT:no ruling after 45min with post-exit
+re-confirm (mtime unchanged, pid 1555 alive; lone dirty entry mid-poll was the
+session's own _wip file — guardrail extended into NEXT). Production :9 HEALTHY
+(pid 1555 up 05:12:27, TL expiry 2026-11-11 01:07:10, watcher 1575, ring age
+7s). Harness facts banked: nohup/& rejected by terminal() (use
+background=true+notify=true); process_manage wait clamps to 180 s. Ledger
+stays 16/3 (eight iterations).
+Before t355: t353 LANDED (~8 tool calls, zero new measurement by
 design — FIFTH consecutive park on the SAME sentinel): all three branches
 re-checked with cited results — sitting check NEGATIVE (400 KB tail-seek, 16
 records, turn 1086 on 16/16, timeline 8,811,378,829 B newest tail record
@@ -376,6 +388,41 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t355 — 2026-11-09 (WAIT-TRIGGER SENTINEL, SEVENTH PARK: NO TRIGGER,
+## HONEST NEGATIVE, ZERO NEW MEASUREMENT — PLUS TWO HARNESS LAWS BANKED)
+
+Branches, cited: (1) sitting check NEGATIVE — 400 KB tail-seek of
+work/r1/playcap/live-timeline.jsonl: 16 records parsed, turn 1086 on 16/16,
+newest tail record file=50.sav; size 8,820,053,395 B (mtime 06:19:07) vs the
+t354 baseline 8,819,223,860 B — growth is ring rotation, not play.
+(2) Ruling check NEGATIVE pre-launch and re-confirmed post-poller:
+docs/DECISIONS.md mtime 03:31:41.300 and work/r1/shp_png/decision-sheet.md
+mtime 03:40:49.800 both UNCHANGED from the t354 baselines (pre-date commit
+964517c 06:15:57); git status --porcelain empty at session start; no
+*ruling*/*reply* files (ls grep = 0); grep 'USER:' in DECISIONS.md + sheet =
+0 hits. Poller work/r1/sentinel_t355.sh (60 s poll, 45 min cap) ran
+06:2x->~07:02 and printed 'TIMEOUT:no ruling after 45min'; post-exit re-check:
+sheet mtime still 03:40:49.800, DECISIONS still 03:31:41, pid 1555 alive.
+(3) Park line appended to BLOCKED.md '## Sentinel park log'.
+
+HARNESS LAWS BANKED THIS PASS (both now in NEXT): (a) `nohup cmd &` inside
+terminal() is REJECTED ("shell-level background wrappers") — launch watchers
+with terminal(background=true, notify=true) and track the returned pid;
+(b) process_manage(action='wait') clamps timeout to 180 s per call (foreground
+tail --pid=$P -f /dev/null chunks cap ~420 s regardless of timeout=). Also:
+identify WHICH path a dirty git-status entry names before calling it a user
+edit — the lone mid-poll dirty entry was this session's docs/re/_wip_t355.md.
+
+Production :9 HEALTHY: dosbox-x pid 1555 etime 05:12:27 (-time-limit 172800,
+TL expiry 2026-11-11 01:07:10), watcher 1575, health readout
+work/r1/loop/GAME_HEALTH_LIVE.txt mtime 06:17:40 ('ring 41.sav age 7s').
+
+No row moved strict-close; ledger stays 16/3 (eight iterations; OQ-005/016/
+019 all user-gated). +0x0a hunt NOT re-opened (t348(1)-(3) binding); no
+research task invented (t178); game/ untouched. NEXT = t356 sentinel verbatim;
+work/r1/sentinel_t356.sh pre-staged (BASE_EPOCH unchanged 2026-11-09
+03:40:49 — correct while the sheet mtime never moves).
 
 ## LANDED t354 — 2026-11-09 (WAIT-TRIGGER SENTINEL, SIXTH PARK: NO TRIGGER,
 ## HONEST NEGATIVE — FIRST PARK RUN AS A REAL 45-MIN POLLER + PATH AUDIT)
