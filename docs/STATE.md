@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-09T05:25
+updated: 2026-11-09T12:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -215,12 +215,16 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t358 per queue row t358 below (D1-RULING APPLICATION,
-CONDITIONAL). The loop had been parked on the WAIT-TRIGGER sentinel;
-user ruling D2=(b) per-ship sim recorded in docs/DECISIONS.md
-(USER RULING 2026-11-09 block) — phase 7 below is the build
-program. D1 answer may arrive via the work/r1/d1page ruling page
-(submit appends a USER block to DECISIONS.md); D3 deferred by user.
+NEXT t367 per queue row t367 below (D1-RULING APPLICATION — the ruling
+ARRIVED 2026-11-09 12:45 via the ruling page; two content-identical
+USER blocks at the tail of docs/DECISIONS.md; apply ONCE). Ordering
+rationale: it is the only user-unblocked strict-CLOSE available (closes
+OQ-005, the oldest open row) and a one-session job; t360 (save parser)
+is independent of it and resumes verbatim right after. The full
+application checklist is pre-written in docs/re/_wip_t367.md S2
+(ledger re-derive, sheet-generator route for index.txt, shp.cpp
+signed-bbox dims pin md5 b2d049bbf5b5, the NEW B5-B29 top-part user
+testimony handling, DECISIONS status annotate-not-rewrite).
 
 QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
 to the original; NO permanent toggle — per-ship becomes THE engine once the
@@ -230,31 +234,19 @@ intact except deleting completed rows. Evidence base: docs/re/ships.md,
 docs/re/ai-dossier.md (treat as spec), STATE DRIVE-CLASS laws,
 docs/re/_wip_d1page.md (signed-bbox dims fix, D1-gated).
 
-t358 D1-RULING APPLICATION (CONDITIONAL — run FIRST; if
-      'grep -c "^USER: D1 mouse" docs/DECISIONS.md' is 0, bank an honest
-      negative and rewrite NEXT to t359; do NOT park). If the block exists:
-      apply exactly what it says — (a) mouse k5/k6/k7 verdict + batch-41
-      accept -> update work/r1/shp_png/index.txt dispositions +
-      decision-sheet.md footer + docs/OPEN-QUESTIONS.md OQ-005 row to CLOSED
-      citing the USER block (verbatim quote) + shp.md S25-S27 pointers
-      (strict-close: the user ruling IS the closer; R13 satisfied); (b) if
-      keep: implement the signed-bbox-aware dims read in
-      rewrite/src/formats/shp.cpp per _wip_d1page.md MEASURED section (k4..k7
-      decode at 78x47, plane md5 b2d049bbf5b5 as the pin), add the 4-plane pin
-      test, keep the -1 blit gate untouched; (c) A6-A8 + B-row corrections per
-      the block; (d) ledger_audit + index_check + gate green.
+t359 PER-SHIP RECORD SPEC DOSSIER — LANDED 2026-11-09 (see LANDED
+      t358/t359 block; docs/re/pership-spec.md written, zero code).
 
-t359 PER-SHIP RECORD SPEC DOSSIER (zero code). From the CITED laws only —
-      ships.md order/dwell/gizmo/carrier sections, ai-dossier.md, t292 combat
-      fields (+0x8c INTEGRITY / +0x90 shield, subtract 0x4d1ea, death 0x49d2c),
-      t273 attribution law, st4 DWELL law, 0x220a8->0x21f58 arrival chain —
-      write docs/re/pership-spec.md: (1) ship-record field table (guest-phys
-      offsets, width, law pointer per field, UNKNOWN marked); (2) order-state
-      enum + transition table with cited trigger sites; (3) gizmo inventory
-      law; (4) carrier/cargo law; (5) per-ship combat round law; (6) save/
-      load: which RESUME.GAM regions carry ship records (pointers to t-banks);
-      (7) explicit NON-GOALS. Every line carries a docs/re pointer or is
-      marked INFERRED. This dossier is the build contract for t360-t365.
+t367 D1-RULING APPLICATION (ruling banked 2026-11-09 12:45, DECISIONS.md
+      tail; apply ONCE of two identical blocks). Execute the checklist in
+      docs/re/_wip_t367.md S2 verbatim: (1) OQ-005 CLOSE strict-close citing
+      the USER block VERBATIM + shp.md S25-S27, ledger index RE-DERIVED
+      (17/2); (2) index.txt/decision-sheet dispositions via the t347
+      generator route (no hand-edit of the sheet body); (3) shp.cpp
+      signed-bbox dims read + 4-plane pin (md5 b2d049bbf5b5), -1 blit gate
+      untouched; (4) B5-B29 top-part testimony recorded in shp.md (render
+      fidelity is NOT a ledger row); (5) audits + gate green, DECISIONS D1
+      status annotated APPLIED. NEXT after t367 = t360 VERBATIM.
 
 t360 PER-SHIP SAVE PARSER (read-side). rewrite/src/formats/: ShipRecord
       structs + parser mapping RESUME.GAM ship regions per spec section (6);
@@ -338,6 +330,68 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t358+t359 — 2026-11-09 (t358 CONDITION NOT MET = honest negative;
+## t359 PER-SHIP RECORD SPEC DOSSIER SHIPPED: docs/re/pership-spec.md, the
+## build contract for t360-t365, zero new measurement, zero code)
+
+t358 (D1-RULING APPLICATION, CONDITIONAL): condition NEGATIVE —
+`grep -c "^USER: D1 mouse" docs/DECISIONS.md` = 0 (exit 1); the only USER:
+lines are the 2026-11-09 chat-scribe block (L151-157: D2=(b), "D1 answer to
+follow via page submit", D3 deferred); no *ruling*/*reply* files; git porcelain
+EMPTY; decision-sheet mtime unchanged 03:40:49.800. Sitting check NEGATIVE
+(timeline 8,868,782,651 B, 400 KB tail-seek, 16/16 records turn 1086, newest
+42/43/44.sav = ring rotation). Exit ramp taken per the row's own text: honest
+negative banked docs/re/_wip_t358.md, queue advanced, no park. NEW HARNESS
+FACT (the iteration's only measurement): the d1page ruling server IS live
+(pid 43067, 0.0.0.0:8613) but runs the OLD /tmp/d1page/server.py — unpatched
+path handler `os.path.join(ROOT, self.path)`; submit leg identical (both
+copies REPO=/home/hrethric/projects/ascendancy append the USER block to
+docs/DECISIONS.md), so the trigger channel works; relaunch-from-work/r1/d1page
+noted for the user, not acted on unilaterally (user's channel).
+
+t359 (PER-SHIP RECORD SPEC DOSSIER, zero code): docs/re/pership-spec.md
+written from CITED laws only (ships.md §6/§10/§11/§12/§17/§18/§19 +
+S20-S24, combat.md §1/§2/§2b + gizmo tree + resolver-array law, ai-dossier.md
+§5/§6/row-16, income-law.md §13.5 cargo chain, selfplay.md t273 attribution/
+stale-echo laws, STATE pointer laws OQ-011/t298/t333). Contents: (1) field
+table ~45 offsets with per-field law pointer + explicit UNKNOWN gap list;
+(2) kind enum {0..5} with the verbatim imm store-site census + 11-row
+transition table (T-1 auto-order .. T-11 death; walk law with the 160-units-
+per-sugar-cube constants; st5 march body FUN_0004a74c gates; st4 DWELL;
+retreat-downgrade 0x220f2; placement 0x21f58 star+(0,-200,0)+rng%200); turn
+frame FUN_0003e6e0->FUN_0004a74c + FUN_0004a658 upkeep + FUN_00041260
+min-fuel round-robin + descending-power sort; determinism = single LCG
+FUN_0007824f, commit mode==1 only; (3) gizmo inventory law (ring 0xab stride
+7 x25, cap table 0x6842 1234/1234, phantom-slot off-by-one, mutators,
+redesign, design-apply shuffle, upkeep/propulsion nesting); (4) carrier/cargo
+(Invasion Module cidx 0x49 first-eligible law, landed-ship-is-planet-slot-0x17,
+EVENT-4/8 chain, AI coord picker stays OPEN per BLOCKED OQ-CARGO); (5) combat
+round (same-system gate, stored-order volley, no hit roll, clamped
+shield->hull layers, death 0x49d2c, owner-race-filtered array + return-fire-
+as-separate-run); (6) save/load (array member index B+0x82bb0+0x3a095, count
+gate ds:0x43489>>16 cap 0x6b, guest-physical pointer values +0x88 rebase,
+ring-corpus streaming constraints, no-window-records law, t366 write-side
+shape); (7) ten explicit NON-GOALS (nuke law, AI coord chooser, magnetron
+re-hunt, lane-step mapping, SO_ labels, +0x42 semantics, OQ-016 residues,
+UI choreography, re-deriving closed rows, early aggregate removal); (8) four
+named build gaps (G-a queued-order field home DISPUTED — resolve at t360
+against the 0x3ac1c site; G-b +0x90/+0x52 dual-use; G-c phantom origin; G-d
+lane-frame transform NOT cited — model lane-local progress only).
+Epistemic key in-file: every line carries a docs/re pointer or is marked
+INFERRED/DISPUTED; strict-close unaffected — the dossier closes NOTHING.
+
+LEDGER UNCHANGED 16 closed / 3 open (OQ-005/016/019, all user-gated). OQ-019
+row got a pointer NOTE only (pership-spec = build contract; closure still per
+t329 packet / user acceptance at t365). Hand-authored-file check: no script
+references pership-spec (gate regeneration safe). Production :9 HEALTHY
+throughout (pid 1555 up 11:54+, watcher 1575, ring 58.sav age 2s, TL expiry
+2026-11-11 01:07:10). game/ untouched. ARRIVAL MID-SESSION: the D1 ruling
+landed in DECISIONS.md at 12:45:01/12:45:31 (two identical submits from the
+ruling page — channel live-validated) AFTER this session's t358 check ran at
+~11:52. Per this session's own NEXT note t358 was consumed and the session did
+NOT divert; application is queued as row t367 with the checklist pre-written
+(docs/re/_wip_t367.md). NEXT = t367 D1-RULING APPLICATION.
 
 ## LANDED t356 — 2026-11-09 (WAIT-TRIGGER SENTINEL, EIGHTH PARK: NO TRIGGER,
 ## HONEST NEGATIVE, ZERO NEW MEASUREMENT)

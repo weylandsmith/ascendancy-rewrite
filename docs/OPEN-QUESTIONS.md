@@ -293,6 +293,10 @@ ring cadence (t265, 21 runs d=0.00 — corpus mining class CLOSED t49/t58/t265,
 scripted capture ONLY); MAGNETRON runtime witness ZERO x3 (t265 off-grid
 instrument P(false neg)<0.1%, t273, t285) — use-site stays static-cited
 (gizhelp.txt:1173-1181 verbatim; kind==5 handler 0x21f58).
+t359 NOTE (2026-11-09): user ruling D2=(b) commissioned the per-ship sim; its
+BUILD CONTRACT is docs/re/pership-spec.md (t359, zero new measurement — a
+dossier of already-cited laws + explicit non-goals; row closure still per the
+t329 disposition packet / user acceptance at t365, NOT on this file).
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +

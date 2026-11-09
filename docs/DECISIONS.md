@@ -155,3 +155,17 @@ USER:   pinned-seed suite; aggregate demotes to a test oracle during the
 USER:   transition, removed after seeds agree.
 USER: D1 = ruling page live (work/r1/d1page); D1 answer to follow via page submit.
 USER: D3 = DEFERRED by user until D1/D2 work has landed.
+
+## USER RULING 2026-11-09 12:45:01 (from ruling page)
+USER: D1 mouse k5/k6/k7 = keep as-is
+USER: D1 batch 41 dispositions = accept all 41
+USER: D1 A6 keep=True, A7 keep=True, A8 keep=True
+USER: D1 B-rows misidentified = none
+USER: D1 notes: I don't think the A series are used anywhere, but it doesn't hurt to keep them. If nothing else, they're a historical curiosity, and maybe someday someone will pipe up with a story behind them. The B series is generally correct. B3 is the star-map research menu button icon, and B4 is an icon I don't immediately recognize or remember seeing anywhere in the game. B5-B16 are from the new game menu, B17-B29 are a subset of the planet screen manufactoring indicators, and B5-B29 are drawn wrong here. B5 contains the top part of the image for B6, B6 contains the top part of the image for B7, ... B17 contains the top part of the image for B18, B18 contains the top part of the image for B19, and so on.
+
+## USER RULING 2026-11-09 12:45:31 (from ruling page)
+USER: D1 mouse k5/k6/k7 = keep as-is
+USER: D1 batch 41 dispositions = accept all 41
+USER: D1 A6 keep=True, A7 keep=True, A8 keep=True
+USER: D1 B-rows misidentified = none
+USER: D1 notes: I don't think the A series are used anywhere, but it doesn't hurt to keep them. If nothing else, they're a historical curiosity, and maybe someday someone will pipe up with a story behind them. The B series is generally correct. B3 is the star-map research menu button icon, and B4 is an icon I don't immediately recognize or remember seeing anywhere in the game. B5-B16 are from the new game menu, B17-B29 are a subset of the planet screen manufacturing indicators, and B5-B29 are drawn wrong here. B5 contains the top part of the image for B6, B6 contains the top part of the image for B7, ... B17 contains the top part of the image for B18, B18 contains the top part of the image for B19, and so on.
