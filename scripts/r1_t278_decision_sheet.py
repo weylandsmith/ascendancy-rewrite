@@ -23,7 +23,7 @@ and reproduce decision-sheet.md byte-identical from banked inputs only, then
 updated to the SHRUNK ASK — every C-row now carries a cited DISPOSITION
 (shp.md S25 t328 feasibility table, S26 t330 live draw-capture, S27 t344
 selector law), and the script ASSERTS the 41-out-of-ask / 3-adjudicable
-split (40 NO-ASK + 1 JUNK-CERTAIN + 3 ADJUDICABLE = 44) on every rebuild. Row ids C1..C44 stay pinned to the
+split (40 NO-ASK + 1 JUNK-CERTAIN + 3 KEEP-RULED = 44) on every rebuild. Row ids C1..C44 stay pinned to the
 index_t278pristine.txt census order so DECISIONS.md references (C27-C29) hold.
 
 The user-quote and citation tables below are transcribed from:
@@ -227,9 +227,14 @@ def disposition(lib, k, span):
     so a changed corpus cannot silently slip into the sheet."""
     key = "%s|%s" % (lib, k)
     if lib == "mouse":
-        return ("ADJUDICABLE",
-                "valid 78x47 corner-cursor art, selector KNOWN (S26/S27); drawn "
-                "pixels capture-limited — your rule is keep/junk, not decode")
+        # t367: D1 RULING RECEIVED 2026-11-09 12:45 via the ruling page
+        # ("D1 mouse k5/k6/k7 = keep as-is", docs/DECISIONS.md USER block).
+        # The rewrite decodes these via the corner-anchor gate fallback
+        # (shp.md S28); class renamed ADJUDICABLE -> KEEP-RULED.
+        return ("KEEP-RULED",
+                "user RULED keep 2026-11-09; valid 78x47 corner-cursor art "
+                "(S26/S27), k4..k7 planes byte-identical md5 b2d049bbf5b5, "
+                "decoded by the t367 fallback")
     if lib == "3cfgnew" and k == "12":
         return ("JUNK-CERTAIN",
                 "vendor truncated it at FILE EOF (walk short 55/79, S20/S21); "
@@ -293,21 +298,18 @@ def main():
 
     out = []
     w = out.append
-    w("# OQ-005 RESIDUE DECISION SHEET (t278; t347 REBUILD 2026-11-09 - SHRUNK ASK)")
+    w("# OQ-005 RESIDUE DECISION SHEET (t278; t367 REBUILD 2026-11-09 - RULING APPLIED)")
     w("")
-    w("How to use: read the RECOMMEND column; overrule anything you disagree with")
-    w("(reply per row id, e.g. 'C1 junk, B13 keep'). Your Oct-29 verdicts are")
-    w("quoted verbatim where they apply; where a row says 'not shown', the item")
-    w("never reached you as an image. R13: nothing here rules for you - the ledger")
-    w("row closes only on your ruling or a drawn-frame capture.")
+    w("ASK CLOSED (t367). The D1 ruling arrived 2026-11-09 12:45 via the ruling")
+    w("page (docs/DECISIONS.md USER block, quoted verbatim there): mouse")
+    w("k5/k6/k7 = KEEP; all 41 C-row dispositions ACCEPTED; A6/A7/A8 keep; no")
+    w("B-row misidentifications. OQ-005 is CLOSED strict-close on that ruling.")
+    w("This sheet is the historical record of how the 88 residue rows were")
+    w("classified; the RECOMMEND column now reads RULED where you ruled.")
     w("")
-    w("THE LIVE ASK (t347): 41 of the 44 C-rows now carry a CITED DISPOSITION -")
-    w("the vendor itself draws NOTHING for them, or the bytes are junk-certain -")
-    w("so they need no ruling; batch-accept them with one word if you like.")
-    w("Actually adjudicable: B1..B29 (confirm/correct the identifications),")
-    w("C27-C29 (mouse k5/k6/k7 - valid 78x47 corner-cursor art, selector known;")
-    w("keep as-is?), and the A6-A8 triad you called 'possibly junk data' (rule")
-    w("from the thumbnails: keep as unused menu art, or junk). ~2 minutes.")
+    w("(Historical, t347:) the ask had shrunk to B1..B29 confirmations,")
+    w("C27-C29, and the A6-A8 triad; the ruling answered all three in one page")
+    w("submission.")
     w("")
     w("Scope (measured from index_t278pristine.txt, the t197-era census): 88 records =")
     w("5 CONTROL + 10 RESTORED-V (t182 validator false-FAILs, already rendered")
@@ -373,19 +375,19 @@ def main():
     w("")
 
     # Section C: FAIL rows with t347 cited dispositions (shrunk ask)
-    w("## C. FAIL CLASS (44 records) - t347 DISPOSITIONS; only 3 rows need you")
+    w("## C. FAIL CLASS (44 records) - DISPOSITIONS FINAL (D1 ruled 2026-11-09)")
     w("")
     w("Every row carries a cited disposition (law table in")
     w("scripts/r1_t278_decision_sheet.py; sources shp.md S25/S26/S27 + the t323")
     w("combat-unreachable amendment). NO-ASK = the vendor's own code draws")
     w("nothing for it (zero dims -> blit -1 gate @0x5cb2b, or zero stream bytes)")
     w("or the class is unreachable by any capture we can stage; batch-accepting")
-    w("them costs one word. JUNK-CERTAIN = vendor-truncated bytes. ADJUDICABLE =")
-    w("real art you can rule keep/junk on.")
+    w("them costs one word. JUNK-CERTAIN = vendor-truncated bytes. KEEP-RULED =")
+    w("you ruled it (D1 ruling page, 2026-11-09 12:45).")
     w("")
     w("| # | record | span | DISPOSITION | why [cited] | RECOMMEND |")
     w("|---|--------|------|-------------|-------------|-----------|")
-    counts = {"NO-ASK": 0, "JUNK-CERTAIN": 0, "ADJUDICABLE": 0}
+    counts = {"NO-ASK": 0, "JUNK-CERTAIN": 0, "KEEP-RULED": 0}
     n = 0
     for cls, name, status in rows:
         if not cls.startswith("RESIDUE"): continue
@@ -401,8 +403,8 @@ def main():
         note = ov[2] if ov else ""
         if ov and ov[3]:
             reco = ov[3]
-        elif dclass == "ADJUDICABLE":
-            reco = LAW[libkey(cls, lib)][2]
+        elif dclass == "KEEP-RULED":
+            reco = "RULED keep (D1, 2026-11-09 12:45 — no further action)"
         else:
             reco = "no ruling needed (batch: accept disposition)"
         w("| C%d | %s | %s B | %s | %s%s | %s |"
@@ -410,11 +412,12 @@ def main():
     # SHRUNK-ASK ASSERTION: the sheet's headline numbers are measured facts; a
     # corpus change that shifts them must fail loudly, not silently re-framing.
     assert n == 44, "C-class census changed: %d rows (expected 44)" % n
-    assert counts == {"NO-ASK": 40, "JUNK-CERTAIN": 1, "ADJUDICABLE": 3}, \
-        "disposition split changed: %r (expected 40/1/3 = 41 rows out of the ask)" % (counts,)
+    assert counts == {"NO-ASK": 40, "JUNK-CERTAIN": 1, "KEEP-RULED": 3}, \
+        "disposition split changed: %r (expected 40/1/3)" % (counts,)
     w("")
-    w("Count (asserted on every rebuild): 40 NO-ASK + 1 JUNK-CERTAIN = the 41")
-    w("rows that leave the ask, plus 3 ADJUDICABLE (C27-C29 mouse k5/k6/k7) = 44.")
+    w("Count (asserted on every rebuild): 40 NO-ASK + 1 JUNK-CERTAIN + 3")
+    w("KEEP-RULED (C27-C29 mouse k5/k6/k7, RULED keep 2026-11-09 via the D1")
+    w("ruling page) = 44. THE ASK IS CLOSED; this sheet is now a record.")
     w("")
     w("## D. WHAT EACH ANSWER BUYS (ledger mechanics, for your planning)")
     w("")
@@ -431,7 +434,8 @@ def main():
     w("")
     w("Generated by scripts/r1_t278_decision_sheet.py from index_t278pristine.txt +")
     w("ids.tsv; quote/citation/disposition tables live in the script. Rebuild any")
-    w("time: venv python, zero capture. t347 rebuild 2026-11-09.")
+    w("time: venv python, zero capture. t347 rebuild 2026-11-09; t367 rebuild")
+    w("2026-11-09 (D1 RULING APPLIED — dispositions final).")
 
     # If work/ was wiped the inputs still resolve (artifacts/), but the OUTPUT
     # needs a directory — create it rather than die confusingly.

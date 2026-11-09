@@ -105,8 +105,13 @@ TEST(shp_corpus_parity_with_python_validator) {
     // now unified on the blit-faithful both-components rule.
     CHECK(libs >= 200);
     CHECK(recs >= 1500);
-    CHECK(passed >= 1513);
-    CHECK(clean_libs >= 187);
+    // t367: the corner-anchor gate fallback (shp.md S28) adds EXACTLY mouse
+    // k5/k6/k7 over the t197 Python validator tally (1513/187): floors move
+    // to 1516/188. The Python validator itself stays on the t197 law (gate
+    // 3c-2 pins 1513-side strings) — the divergence is intentional and
+    // asserted exactly by TEST(shp_corner_anchor_fallback_t367) below.
+    CHECK(passed >= 1516);
+    CHECK(clean_libs >= 188);
 }
 
 TEST(shp_span_free_t197) {
@@ -163,10 +168,11 @@ TEST(shp_span_free_t197) {
     { std::vector<uint8_t> px; CHECK(!cfg.decode(12, px)); }
 
     // (3) Garbage dims still rejected despite the unbounded walk:
-    // 1starmap k1 dims word 0x7ffffdbb-class; mouse k6/k7 dims 0-class.
+    // 1starmap k1 dims word 0x7ffffdbb-class (no negative bbox anchor).
+    // t367 AMENDMENT: mouse k6/k7 formerly asserted REJECT here; under the
+    // D1 keep ruling + the corner-anchor gate fallback (shp.md S28) they
+    // decode at 78x47 — see TEST(shp_corner_anchor_fallback_t367).
     { std::vector<uint8_t> px; CHECK(!star.decode(1, px)); }
-    { std::vector<uint8_t> px; CHECK(!mous.decode(6, px)); }
-    { std::vector<uint8_t> px; CHECK(!mous.decode(7, px)); }
 
     // (4) 14intel k8 + 1starmap k3/k4/k6 (the other X members) decode.
     ShapeLibrary intel;
@@ -175,4 +181,86 @@ TEST(shp_span_free_t197) {
     { std::vector<uint8_t> px; CHECK(star.decode(3, px)); }
     { std::vector<uint8_t> px; CHECK(star.decode(4, px)); }
     { std::vector<uint8_t> px; CHECK(star.decode(6, px)); }
+}
+
+// FNV-1a 64 — pin helper (md5 not in the codebase; identity + census are
+// what the law asserts, the digest is just a compact witness).
+static uint64_t fnv64(const std::vector<uint8_t>& v) {
+    uint64_t h = 1469598103934665603ull;
+    for (uint8_t b : v) { h ^= b; h *= 1099511628211ull; }
+    return h;
+}
+
+TEST(shp_corner_anchor_fallback_t367) {
+    // D1 RULING (docs/DECISIONS.md USER block 2026-11-09 12:45: "D1 mouse
+    // k5/k6/k7 = keep as-is") + t344 S27 geometry law + t367 file
+    // measurement (shp.md S28). k4..k7 = ONE 78x47 glyph at four corner
+    // anchors. The d1page pin md5 b2d049bbf5b5 IS the k5/k6/k7 plane at
+    // 78x47 (full md5 b2d049bbf5b571bfc4ea3b97db7a4fa7, re-derived t367;
+    // an early scratch-reference walk that failed to reproduce it had a
+    // pixel-position bug — the C++ walkRows was correct).
+    ShapeLibrary mous;
+    std::string err;
+    CHECK(mous.load(kA01 + "mouse.shp", &err));
+    CHECK(mous.count() == 12);
+
+    // (1) k5/k6/k7 decode via the fallback at bbox dims 78x47.
+    std::vector<uint8_t> p5, p6, p7;
+    CHECK(mous.decode(5, p5));
+    CHECK(mous.decode(6, p6));
+    CHECK(mous.decode(7, p7));
+    CHECK(p5.size() == 78u * 47u);
+    CHECK(p6.size() == p5.size());
+    CHECK(p7.size() == p5.size());
+
+    // (2) BYTE-IDENTITY LAW: one glyph, four anchors (t367 measured: raw
+    // stream, painted plane, and the ruling-page PNGs all agree 4/4).
+    CHECK(p5 == p6);
+    CHECK(p6 == p7);
+
+    // (3) Value pins (measured t367): the k5 plane at 78x47 (zero underlay)
+    // md5s b2d049bbf5b571bfc4ea3b97db7a4fa7 — EXACTLY the d1page pin
+    // b2d049bbf5b5 (verified t367 against a corrected reference walk; the
+    // C++ walkRows was always right). No md5 helper exists in the codebase,
+    // so the test pins census + non-zero count + FNV-1a 64 of the same
+    // bytes: a desynced walk cannot reproduce all three.
+    uint64_t census = 0;
+    int nonzero = 0;
+    for (uint8_t v : p5) { census += v; if (v) ++nonzero; }
+    CHECK(census == 543287ull);
+    CHECK(nonzero == 3666);
+    const uint64_t plane_fnv = fnv64(p5);
+    CHECK(plane_fnv == 0x3ba44ef8c0c54974ull);  // == md5 b2d049bbf5b5 bytes
+    std::printf("    t367 mouse k5 plane: 78x47 census %llu nonzero %d "
+                "fnv64 %016llx (md5 b2d049bbf5b5...)\n",
+                (unsigned long long)census, nonzero,
+                (unsigned long long)plane_fnv);
+    // Determinism: second decode bit-identical.
+    std::vector<uint8_t> again;
+    CHECK(mous.decode(5, again));
+    CHECK(again == p5);
+
+    // (4) NEGATIVE CONTROL (the blast-radius law, shp.md S28): records the
+    // vendor -1 blit gate provably refuses must STAY rejected even though a
+    // naive bbox read would rescue them. cos_star k40..k51 zero headers,
+    // sg50expl k9 1x1 bbox, 1starmap k1 no negative anchor.
+    ShapeLibrary cos, sg50;
+    CHECK(cos.load(kA01 + "cos_star.shp", &err));
+    for (int k = 40; k <= 51; ++k) {
+        std::vector<uint8_t> px;
+        CHECK(!cos.decode(k, px));
+    }
+    CHECK(sg50.load(kA01 + "sg50expl.shp", &err));
+    { std::vector<uint8_t> px; CHECK(!sg50.decode(9, px)); }
+    ShapeLibrary star;
+    CHECK(star.load(kA01 + "1starmap.shp", &err));
+    { std::vector<uint8_t> px; CHECK(!star.decode(1, px)); }
+
+    // (5) k4 stays on the CANONICAL gate (dims 77x46 valid): the fallback
+    // never runs for it. Its canonical plane differs from the 78x47 plane
+    // (77 vs 78 stride) — assert the canonical size.
+    std::vector<uint8_t> p4;
+    CHECK(mous.decode(4, p4));
+    CHECK(p4.size() == size_t(mous.record(4).width) * mous.record(4).height);
+    CHECK(mous.record(4).width == 77u && mous.record(4).height == 46u);
 }

@@ -4,13 +4,22 @@ Three decisions + one optional resource question. A reply can be one line
 ("D1 batch: sheet looks right except C7; D2 a; D3 yes; RAM yes") — annotate
 rows by id, or just say "as recommended" per item.
 
-Status snapshot: ledger 16 closed / 3 open (OQ-005, OQ-016, OQ-019). OQ-021 —
+Status snapshot (t367 update 2026-11-09): ledger 17 closed / 2 open (OQ-016,
+OQ-019). D1 ANSWERED + APPLIED t367 (see the APPLIED note under D1 and the
+USER RULING blocks at the tail). D2 answered (b), build queued t360+. D3
+DEFERRED by you. OQ-021 —
 the one that needed a debugger — CLOSED 2026-11-03 by live watchpoint witness;
 the two pages you sent made it possible. Production game (:9) is your Oct-29
 campaign driven to t1150 as the RE corpus; the original save is intact at
 work/r1/game/RESUME.GAM.user-oct29.
 
 ## D1 — .shp sprite library ruling (closes OQ-005, the oldest open row)
+>>> APPLIED t367 2026-11-09: OQ-005 CLOSED strict-close on your ruling page
+>>> submit (12:45); mouse k4..k7 decode in the rewrite at 78x47 (shp.md S28);
+>>> sheet dispositions final (3 rows KEEP-RULED). Your B5-B29 "drawn wrong /
+>>> top-part chain" testimony is banked in shp.md S28 as user testimony — the
+>>> prime suspect is our own dumper's X-class span-crossing paint, NOT the
+>>> game's bytes; no ledger row opens on it. Nothing further needed from you.
 REBUILD t347 (2026-11-09): the decision sheet was regenerated from banked
 inputs only (zero capture) and now prints a CITED DISPOSITION on every one of
 its 44 C-rows, so the ask you have to read is 3 rows plus a batch word. Sources

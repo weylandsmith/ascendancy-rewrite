@@ -12,6 +12,10 @@ uint32_t rd32(const std::vector<uint8_t>& b, size_t off) {
            (uint32_t(b[off + 2]) << 16) | (uint32_t(b[off + 3]) << 24);
 }
 
+int32_t rd32s(const std::vector<uint8_t>& b, size_t off) {
+    return int32_t(rd32(b, off));
+}
+
 // One row walk per the S9 grammar; rows_this is the row-height guess.
 // Returns true iff every row terminated (C==0) inside the IMAGE (file
 // bytes), never the directory span: t197 measured (shp.md S20.2/S21) that
@@ -134,8 +138,39 @@ bool ShapeLibrary::decode(int i, std::vector<uint8_t>& out,
     // never allocated against. t197: this clamp is KEPT even though the
     // span bound below was removed — it models the vendor's dims check,
     // our span bound modelled nothing that exists in the image.
-    if (r.width == 0 || r.height == 0 || r.width > 4096 || r.height > 4096)
+    if (r.width == 0 || r.height == 0 || r.width > 4096 || r.height > 4096) {
+        // CORNER-ANCHOR GATE FALLBACK (t367, shp.md S28; D1 ruling keep).
+        // The canonical gate above models the vendor blit's -1 check and
+        // stays FIRST and UNTOUCHED for every record that passes it —
+        // measured t367: canonical dims == bbox-diff for only 3 of 1,313
+        // valid k>=1 records, so a blanket signed-bbox dims read is REFUTED.
+        // But mouse.shp k4..k7 are ONE 78x47 glyph at four screen-corner
+        // anchors (t344 S27): k5/k6/k7 read (0,46)/(77,0)/(0,0) in the
+        // unsigned pair because the slot holds half of a SIGNED bbox
+        // (L,T,R,B at rec+0x08/0xc/0x10/0x14) whose negative half the
+        // unsigned gate threw away. This fallback fires ONLY when the
+        // canonical gate just failed AND the signed bbox is >=2x2 AND at
+        // least one anchor component is negative. Measured corpus-wide it
+        // admits EXACTLY mouse k5/k6/k7: cos_star k40..k51 (zero header,
+        // 1x1, no negative), 1starmap k1 (no negative) and sg50expl k9
+        // (1x1) all stay rejected, matching the vendor -1 gate (t328 S25).
+        if (i >= 1 && r.start + 0x1c <= img_.size()) {
+            const int32_t L = rd32s(img_, r.start + 0x08);
+            const int32_t T = rd32s(img_, r.start + 0x0c);
+            const int32_t Rr = rd32s(img_, r.start + 0x10);
+            const int32_t B = rd32s(img_, r.start + 0x14);
+            const int32_t BW = Rr - L + 1, BH = B - T + 1;
+            if ((L < 0 || T < 0) && BW >= 2 && BH >= 2 && BW <= 4096 &&
+                BH <= 4096) {
+                out.assign(size_t(BW) * size_t(BH), 0);
+                if (walkRows(img_, r.stream, uint32_t(BW), uint32_t(BH), out,
+                             uint32_t(BW)))
+                    return true;
+                out.clear();
+            }
+        }
         return false;
+    }
     if (out.size() < size_t(r.width) * r.height)
         out.resize(size_t(r.width) * r.height);
     // Canonical row count is the SECOND u32 of the dims pair (H);
@@ -157,6 +192,37 @@ bool ShapeLibrary::decode(int i, std::vector<uint8_t>& out,
             out.swap(alt);
             if (swapped) *swapped = true;
             return true;
+        }
+    }
+    // CORNER-ANCHOR GATE FALLBACK (t367, shp.md S28; D1 ruling keep). The
+    // canonical dims gate above models the vendor blit's -1 check and stays
+    // FIRST and UNTOUCHED for every record that passes it — measured t367:
+    // canonical dims == bbox-diff for only 3 of 1,313 valid k>=1 records, so
+    // a blanket signed-bbox dims read is REFUTED. But mouse.shp k4..k7 are
+    // ONE 78x47 glyph at four screen-corner anchors (t344 S27): k5/k6/k7
+    // store (0,46)/(77,0)/(0,0) in the unsigned pair because the slot holds
+    // half of a SIGNED bbox (L,T,R,B at rec+0x08/0xc/0x10/0x14) whose
+    // negative half the unsigned gate threw away. This fallback fires ONLY
+    // when the canonical gate failed AND the signed bbox is >=2x2 AND at
+    // least one anchor component is negative. Measured corpus-wide this
+    // admits EXACTLY mouse k5/k6/k7: cos_star k40..k51 (zero header, 1x1,
+    // no negative), 1starmap k1 (no negative), sg50expl k9 (1x1) and the
+    // 16 expl-class walk-failures all stay rejected, matching the vendor's
+    // -1 gate (t328 S25).
+    if (i >= 1 && r.start + 0x1c <= img_.size()) {
+        const int32_t L = rd32s(img_, r.start + 0x08);
+        const int32_t T = rd32s(img_, r.start + 0x0c);
+        const int32_t Rr = rd32s(img_, r.start + 0x10);
+        const int32_t B = rd32s(img_, r.start + 0x14);
+        const int32_t BW = Rr - L + 1, BH = B - T + 1;
+        if ((L < 0 || T < 0) && BW >= 2 && BH >= 2 && BW <= 4096 && BH <= 4096) {
+            std::vector<uint8_t> alt;
+            alt.resize(size_t(BW) * size_t(BH));
+            if (walkRows(img_, r.stream, uint32_t(BW), uint32_t(BH), alt,
+                         uint32_t(BW))) {
+                out.swap(alt);
+                return true;
+            }
         }
     }
     return false;

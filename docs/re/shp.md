@@ -1265,3 +1265,59 @@ OQ-005 C27-C29 class updates to: valid dims (78x47), selector KNOWN
 (screen-corner cursor modes, live-witnessed for TL/TR), drawn-frame pixels
 capture-limited. No rewrite code change (t330 generalization bound stands;
 shp.cpp is a decode lib for extracted files, not the cursor runtime).
+
+## 28. T367 D1 RULING APPLIED — OQ-005 CLOSED; CORNER-ANCHOR GATE FALLBACK [measured + user ruling]
+
+USER RULING (verbatim, docs/DECISIONS.md "## USER RULING 2026-11-09 12:45:01
+(from ruling page)", duplicate submit 12:45:31, applied ONCE):
+> USER: D1 mouse k5/k6/k7 = keep as-is
+> USER: D1 batch 41 dispositions = accept all 41
+> USER: D1 A6 keep=True, A7 keep=True, A8 keep=True
+> USER: D1 B-rows misidentified = none
+Notes: A series "historical curiosity" keep; B3 = star-map research menu
+button icon; B4 unrecognized; B5-B16 new-game-menu, B17-B29 planet-screen
+manufacturing indicators. THIS IS THE CLOSER (R13: user ruling, self-graded
+drawn frame not required).
+
+FILE MEASUREMENTS (extracted/ascend01/data/mouse.shp, 12 recs, 10,435 B):
+k4 canon dims (77,46); k5 (0,46); k6 (77,0); k7 (0,0). Signed bbox
+(L,T,R,B) at rec+0x08/0xc/0x10/0x14: k5 (-77,0,0,46), k6 (0,-46,77,0),
+k7 (-77,-46,0,0) — W=R-L+1=78, H=B-T+1=47 for all four. Row walk completes
+47/47 rows, stream ends at span end 2062. PLANE PINS: k5/k6/k7 painted at
+78x47 (zero underlay) are BYTE-IDENTICAL, md5 b2d049bbf5b571bfc4ea3b97db7a4fa7
+(= the d1page figure b2d049bbf5b5, CONFIRMED reproducible; census 543287,
+nonzero 3666, fnv64 3ba44ef8c0c54974 — pinned in C++
+TEST(shp_corner_anchor_fallback_t367)). k4 canonical 77x46 plane md5
+a67550d3e270b9b02c0b3892c8aeee95. One glyph, four corner anchors — the
+t344 S27 geometry law now holds at the pixel-plane level.
+
+GENERALISATION CENSUS (208 libs, 1,349 k>=1 records): canonical dims ==
+bbox-diff in 3 records ONLY; 1,313 valid records DISAGREE. A blanket
+signed-bbox dims read is REFUTED. The t344 "12/12 agree" is mouse-libral.
+
+FALLBACK LAW (rewrite/src/formats/shp.cpp decode()): fires ONLY when the
+canonical dims gate FAILED, k>=1, signed bbox W,H in [2,4096], and (L<0 ||
+T<0). Measured corpus-wide it admits EXACTLY mouse k5/k6/k7; cos_star
+k40..k51 (zero header, 1x1, no negative), 1starmap k1 (no negative anchor),
+sg50expl k9 (1x1) and the 16 expl-class walk-failures STAY rejected — the
+vendor blit -1 gate (S25.2) remains modelled faithfully. Canonical pass path
+bit-identical to pre-t367. C++ decode-pass 1513->1516, clean libs 187->188
+(= Python FAIL-44 minus exactly mouse x3).
+
+TWO-CONSUMER NOTE (why the Python validator stays on t197 law):
+r1_shp_unifiedlaw.py models the FUN_0005caac blit consumer (which really
+does refuse dims<=0 words); the C++ fallback models the cursor-GEOMETRY
+consumer fn 0x61058 (which reads the signed bbox, S27). The 3-record
+divergence is intentional; gate 3c-2 still pins the Python side.
+
+USER TESTIMONY — B5-B29 RENDER CHAIN (NEW info, not a ledger row): the
+ruling page renders of B5..B29 are a TOP-PART-OFFSET chain ("B5 contains the
+top part of the image for B6, ... B17 contains the top part of the image for
+B18, ..."). User: "B5-B29 are drawn wrong here." Whether r1_t182_pngdump.py's
+record walk or the X-class span-crossing paint behaviour (S20.2/S21: past-
+span rows desync into the NEXT record's bytes — which for a gauge LADDER of
+fixed-size frames would exactly produce a neighbour-contamination chain)
+causes it is UNDETERMINED and NOT re-opened: the ruling accepted the art
+keep/junk-wise; render fidelity of accepted art is not a ledger row. The
+X-class mechanism is the prime suspect if anyone ever revisits the dumper.
+

@@ -1317,3 +1317,19 @@ from a non-16 state is NOT evidence of unreachability.
 ##     the self-play run churned 50/50 star-slots. A future watch session MUST
 ##     advance turns (and must fix the click path first — every xsend in run
 ##     042523 logged 'window died before release', turn never moved off 1086).
+
+## t367 — (1) A BLANKET SIGNED-BBOX DIMS READ IN shp.cpp IS REFUTED BY
+##     CENSUS: canonical dims == bbox-diff (R-L+1,B-T+1) in only 3 of 1,349
+##     k>=1 records (208 libs measured); the t344 '12/12 mouse records agree'
+##     law is MOUSE-LIBRAL ONLY. Do not replace the canonical read; the only
+##     admissible shape is the shipped corner-anchor GATE FALLBACK (canonical
+##     gate failed AND bbox >=2x2 AND (L<0||T<0) AND walk completes -> admits
+##     EXACTLY mouse k5/k6/k7). (2) A naive 'gate-fail -> bbox walk' fallback
+##     is REFUTED on blast radius: it rescues 17 records, 14 of which the
+##     vendor provably cannot draw (cos_star k40..k51 zero headers, 1starmap
+##     k1 zero stream, sg50expl k9 1x1) — resurrecting them contradicts the
+##     blit -1 gate law (shp.md S25.2). (3) r1_shp_unifiedlaw.py must STAY on
+##     the t197 both-components law (it models blit FUN_0005caac); the C++
+##     1516/188 vs Python 1513/187 divergence is intentional (two-consumer
+##     law, shp.md S28) — do not 're-unify' the validator onto the fallback.
+

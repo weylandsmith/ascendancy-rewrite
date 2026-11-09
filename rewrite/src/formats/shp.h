@@ -40,9 +40,19 @@
 // span (X class: planind k0..k12, 3cfgnew k0..k11, 14intel k8, 1starmap
 // k3/k4/k6) decode; past-span rows desync into the next record's bytes and
 // paint whatever the vendor would paint. Records that still fail: garbage
-// dims words (cos_star k40..k51, mouse k6/k7, 1starmap k1-class) and
-// genuine EOF truncation (3cfgnew k12) — reported, never silently stubbed
-// (docs/BLOCKED.md t68 residue, now 44 after the t197 dims-gate unification).
+// dims words (cos_star k40..k51, 1starmap k1) and genuine EOF truncation
+// (3cfgnew k12) — reported, never silently stubbed
+// (docs/BLOCKED.md t68 residue).
+//
+// CORNER-ANCHOR GATE FALLBACK (t367, docs/re/shp.md S28, D1 ruling KEEP):
+// when the canonical dims gate FAILS for k>=1, a SIGNED bbox read
+// (L,T,R,B u32 as int32 at rec+0x08/0x0c/0x10/0x14, W=R-L+1, H=B-T+1) is
+// attempted ONLY if (L<0 || T<0) and W,H in [2,4096] and the walk completes.
+// This decodes mouse.shp k5/k6/k7 (78x47 — one glyph at four corner
+// anchors, t344 S27) and NOTHING else corpus-wide (measured t367: the
+// zero-header cos_star k40..k51, 1starmap k1 and sg50expl k9 have no
+// negative anchor component or degenerate 1x1 bbox and stay rejected).
+// The canonical gate is unchanged for every record that passes it.
 
 #include <cstdint>
 #include <string>

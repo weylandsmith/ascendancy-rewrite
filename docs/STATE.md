@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-09T12:10
+updated: 2026-11-09T15:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -160,9 +160,16 @@ ledger:
       session memory, not a format field set; scratch identity stays
       UNNAMED non-claim. docs/re/savegame.md §t181; rewrite unchanged
       (fresh-start-only)"
+    - "OQ-005 .shp pixel codec CLOSED 2026-11-09 t367 (D1 USER RULING, the
+      row's own named closer; docs/DECISIONS.md USER block 2026-11-09 12:45
+      verbatim: mouse k5/k6/k7 keep, batch-41 accepted, A6-A8 keep, no B-row
+      misID). t367 code+pin: corner-anchor gate fallback in
+      rewrite/src/formats/shp.cpp decode() decodes k5/k6/k7 at signed-bbox
+      78x47 (planes byte-identical md5 b2d049bbf5b5..., census 543287,
+      TEST shp_corner_anchor_fallback_t367 admits EXACTLY these 3 corpus-
+      wide; cos_star/1starmap/sg50expl stay vendor-gate-rejected); Python
+      validator unchanged by design (two-consumer law); docs/re/shp.md S28."
   open:
-    - "OQ-005 .shp pixel codec — static route exhausted (6 angles,
-      docs/REFUTED-ROUTES.md); needs exe shape loader via live image"
     - "OQ-016 campaign per-turn constants — scope NARROWED t29: income,
       growth, cadence, build order, AI SELECTOR LAW (S9) and POP-CAP SEED LAW
       (S10) closed (income-law.md S6..S10). STILL OPEN: per-cell
@@ -215,16 +222,14 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t367 per queue row t367 below (D1-RULING APPLICATION — the ruling
-ARRIVED 2026-11-09 12:45 via the ruling page; two content-identical
-USER blocks at the tail of docs/DECISIONS.md; apply ONCE). Ordering
-rationale: it is the only user-unblocked strict-CLOSE available (closes
-OQ-005, the oldest open row) and a one-session job; t360 (save parser)
-is independent of it and resumes verbatim right after. The full
-application checklist is pre-written in docs/re/_wip_t367.md S2
-(ledger re-derive, sheet-generator route for index.txt, shp.cpp
-signed-bbox dims pin md5 b2d049bbf5b5, the NEW B5-B29 top-part user
-testimony handling, DECISIONS status annotate-not-rewrite).
+NEXT t360 per queue row t360 below (PER-SHIP SAVE PARSER, read-side), VERBATIM.
+Ordering rationale: t367 (D1 application) LANDED 2026-11-09 — OQ-005 CLOSED,
+ledger 17/2 — so the queue resumes where it was before the ruling diverted one
+row; t360 is independent of all shp work and is the first artifact t361's
+skeleton depends on. The spec contract is docs/re/pership-spec.md (t359);
+section (6) carries the member-index law, count gate, and ring-corpus
+streaming constraints to test against. No D1 residue remains open: the B5-B29
+render testimony is banked shp.md S28 (not a ledger row, do not open one).
 
 QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
 to the original; NO permanent toggle — per-ship becomes THE engine once the
@@ -237,16 +242,8 @@ docs/re/_wip_d1page.md (signed-bbox dims fix, D1-gated).
 t359 PER-SHIP RECORD SPEC DOSSIER — LANDED 2026-11-09 (see LANDED
       t358/t359 block; docs/re/pership-spec.md written, zero code).
 
-t367 D1-RULING APPLICATION (ruling banked 2026-11-09 12:45, DECISIONS.md
-      tail; apply ONCE of two identical blocks). Execute the checklist in
-      docs/re/_wip_t367.md S2 verbatim: (1) OQ-005 CLOSE strict-close citing
-      the USER block VERBATIM + shp.md S25-S27, ledger index RE-DERIVED
-      (17/2); (2) index.txt/decision-sheet dispositions via the t347
-      generator route (no hand-edit of the sheet body); (3) shp.cpp
-      signed-bbox dims read + 4-plane pin (md5 b2d049bbf5b5), -1 blit gate
-      untouched; (4) B5-B29 top-part testimony recorded in shp.md (render
-      fidelity is NOT a ledger row); (5) audits + gate green, DECISIONS D1
-      status annotated APPLIED. NEXT after t367 = t360 VERBATIM.
+t367 D1-RULING APPLICATION — LANDED 2026-11-09 (see LANDED t367 block;
+      OQ-005 CLOSED, shp.cpp fallback + pin, sheet dispositions final).
 
 t360 PER-SHIP SAVE PARSER (read-side). rewrite/src/formats/: ShipRecord
       structs + parser mapping RESUME.GAM ship regions per spec section (6);
@@ -314,13 +311,16 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   DISPLAY=:9 injected; TL=172800; NEVER loadstate to resume; bank before restart.
 - Sitting check FIRST (tail-seek newest turn; >1086 => r1_t85g_sitting.py before
   anything). Production :9 is the corpus — untouched unless the task IS a drive.
-- Ledger 16 closed / 3 open (OQ-005, OQ-016, OQ-019); ledger_audit +
+- Ledger 17 closed / 2 open (OQ-016, OQ-019; OQ-005 CLOSED t367 by the D1
+  user ruling); ledger_audit +
   ledger_index_check green every gate; never hand-edit the index block.
-- USER DECISIONS PENDING (docs/DECISIONS.md): D1 .shp ruling (t347 shrinks the
-  ask; do NOT rule for them), D2 per-ship sim scope (this is now the ONLY route
+- USER DECISIONS (docs/DECISIONS.md): D1 ANSWERED + APPLIED t367 (nothing
+  owed); D2 ANSWERED (b) — the per-ship queue t360+ IS its application (this is
+  the ONLY route
   to the nuke law + per-ship residues — EIGHT cited-dead capture legs), D3
   definition of done (t329 rewrote it: loop-closeable-without-user = NONE
-  end-to-end). Do not burn iterations re-asking or working around them.
+  end-to-end; still DEFERRED by user). Do not burn iterations re-asking or
+  working around them.
 - Do NOT re-trod: t323/t332 route set; t293 click-selection; t49/t58/t265
   flight mining; item-35/36 completion witnesses (t271 zero-witness,
   AI-unreachable); t212/t213 static exhaustion; t326 research leg (races 0+2
@@ -330,6 +330,64 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t367 — 2026-11-09 (D1-RULING APPLICATION: OQ-005 CLOSED STRICT-CLOSE,
+## CORNER-ANCHOR GATE FALLBACK SHIPPED + PINNED, SHEET DISPOSITIONS FINAL;
+## b2d049bbf5b5 PIN CONFIRMED; LEDGER 17/2 — FIRST CLOSE SINCE t292)
+
+Sitting check FIRST: NEGATIVE — timeline 8,884,069,796 B, 400 KB tail-seek,
+16/16 records turn 1086, newest 56/57/58.sav (ring rotation); r1_t85g_sitting
+correctly not run; production :9 never signalled; game/ read-only throughout.
+
+THE CLOSE (the row's OWN named closer, R13 satisfied): USER RULING 2026-11-09
+12:45:01 via the ruling page (identical resubmit 12:45:31; applied ONCE),
+cited VERBATIM in docs/OPEN-QUESTIONS.md: "D1 mouse k5/k6/k7 = keep as-is /
+D1 batch 41 dispositions = accept all 41 / D1 A6 keep=True, A7 keep=True, A8
+keep=True / D1 B-rows misidentified = none" + notes. OQ-005 status cell ->
+CLOSED; ledger_audit --expect default retargeted to OQ-019,OQ-016 (the t292
+precedent); STATE index RE-DERIVED (ledger_index_check OK, 17 closed/2 open —
+first ledger movement since t292).
+
+MEASURED (all file-level, zero capture; full detail docs/re/shp.md S28 +
+docs/re/_wip_t367.md S4): (1) mouse.shp k5/k6/k7 signed bbox -> 78x47, row
+walk 47/47 rows to span end 2062; planes BYTE-IDENTICAL md5
+b2d049bbf5b571bfc4ea3b97db7a4fa7 — THE d1page pin b2d049bbf5b5 CONFIRMED
+reproducible (an early scratch reference walk that failed to reproduce it had
+a pixel-position bug; retracted in _wip S4.7, C++ walkRows was always right).
+(2) GENERALISATION REFUTED: canonical dims == bbox-diff in 3 of 1,349 k>=1
+records — a blanket signed-bbox dims read would corrupt 1,313 good records.
+(3) BLAST RADIUS: naive bbox fallback rescues 17 records (14 of them vendor-
+-provably-undrawable: cos_star k40..k51 zero headers, 1starmap k1, sg50expl
+k9); the SHIPPED rule (canonical gate failed AND bbox >=2x2 AND (L<0||T<0)
+AND walk completes) admits EXACTLY mouse k5/k6/k7 corpus-wide, measured.
+
+CODE + PINS (rewrite): shp.cpp decode() corner-anchor gate fallback (the
+canonical -1-gate path bit-identical for every record passing it; the Python
+validator r1_shp_unifiedlaw.py DELIBERATELY unchanged — two-consumer law: it
+models blit FUN_0005caac, the fallback models cursor geometry fn 0x61058);
+NEW TEST(shp_corner_anchor_fallback_t367) = decode x3 + plane identity +
+census 543287/nonzero 3666/fnv64 3ba44ef8c0c54974 pins + determinism +
+NEGATIVE CONTROL (cos_star x12, sg50expl k9, 1starmap k1 stay rejected) + k4
+canonical-size assert; shp_span_free_t197 clause (3) amended; parity floors
+1513/187 -> 1516/188 (MEASURED: "208 libs, 1557 records, 1516 decode-pass,
+188 clean libs"). run_tests 176 tests 0 failed.
+
+SHEET ROUTE (per checklist, generator owns the files):
+r1_t278_decision_sheet.py disposition() ADJUDICABLE -> KEEP-RULED, header/
+footer rewritten to "ASK CLOSED", assertion re-keyed {40,1,3} KEEP-RULED,
+re-run -> decision-sheet.md + index.txt regenerated (C27-C29 = RULED keep).
+DECISIONS.md: D1 annotated APPLIED + status snapshot 17/2 (USER blocks
+untouched, appended-not-rewritten).
+
+USER TESTIMONY BANKED (new info, NOT a ledger row): B5-B29 ruling-page
+renders are a top-part-offset chain ("Bn contains the top of Bn+1", "drawn
+wrong here"); prime suspect = our dumper's X-class span-crossing paint
+(shp.md S20.2/S21), NOT vendor bytes; no sub-investigation opened (the k4..k7
+pin work does not touch r1_t182_pngdump.py's walk); revisit only if the
+dumper is ever the task.
+
+GATE_EXIT=0 (full gate incl 3c/3c-2 shp stages + run_tests + both audits);
+game/ checksums intact. NEXT = t360 PER-SHIP SAVE PARSER VERBATIM.
 
 ## LANDED t358+t359 — 2026-11-09 (t358 CONDITION NOT MET = honest negative;
 ## t359 PER-SHIP RECORD SPEC DOSSIER SHIPPED: docs/re/pership-spec.md, the

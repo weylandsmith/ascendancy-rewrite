@@ -83,7 +83,11 @@ def rows(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", default="docs/OPEN-QUESTIONS.md")
-    ap.add_argument("--expect", default="OQ-005,OQ-019,OQ-016")
+    ap.add_argument("--expect", default="OQ-019,OQ-016")
+    # t367: OQ-005 CLOSED by the D1 USER RULING (ruling page 2026-11-09 12:45,
+    # DECISIONS.md verbatim block; shp.md S28; corner-anchor fallback + pin
+    # TEST(shp_corner_anchor_fallback_t367)) — removed from this default the
+    # same way t292/t195/t181 removed their closed rows.
     # t292: OQ-021 CLOSED by the live presenter witness (sel 0->5 by 0x24d9f,
     # rank 0x24dab, end-ctrl.txt on screen; score.md S20, run
     # work/r1/t290-poke-a40-20261103-165405) — removed from this default the
