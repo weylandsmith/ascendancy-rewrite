@@ -337,8 +337,11 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   bash holds 0 fds, its python child holds 1 — t215/t340 shape); KILL BY
   RECORDED PID (structured argv; pkill -f self-kills shells); SIGKILL softlocks;
   DISPLAY=:9 injected; TL=172800; NEVER loadstate to resume; bank before restart.
-- Sitting check FIRST (tail-seek newest turn; >1086 => r1_t85g_sitting.py before
-  anything). Production :9 is the corpus — untouched unless the task IS a drive.
+- Sitting check FIRST — RING-FIRST since t368 (the timeline watcher died
+  2026-11-09 17:26; a stale feed's tail proves only that nothing was BANKED).
+  `python3 work/r1/t368_ring_turn.py` -> max_turn > 1086 => run
+  r1_t85g_sitting.py before anything. Production :9 is the corpus — untouched
+  unless the task IS a drive.
 - Ledger 17 closed / 2 open (OQ-016, OQ-019; OQ-005 CLOSED t367 by the D1
   user ruling); ledger_audit +
   ledger_index_check green every gate; never hand-edit the index block.
