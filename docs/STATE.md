@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-10T08:20
+updated: 2026-11-10T14:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -231,6 +231,16 @@ decided GPL-3.0+creator-grant (D5), vendor data excluded, OQ-016/
 OQ-019 acceptance + D3 DEFERRED pending playtest. Production pid
 107664 TL-expiry 2026-11-17 11:24 (week-long for the night session);
 ring pre-play banked work/r1/bank-t1086-preplay/.
+T369 STATUS (this iteration): the three census tools are BUILT and
+control-verified (zero-hit on the pre-play bank + positive fixture;
+docs/re/_wip_t369.md RESULTS). Playwindow ran honest-negative: NO
+WINDOW YET (no SAV/RESUME mtime move, timeline tail all t1086 with
+the mandatory 2026-11-10 11:18 mtime floor — stale Nov-3 drive rows
+would otherwise false-fire it). Per the queue row the rerun stays
+t369: run scripts/r369_playwindow.py; exit 1 => not played, land the
+negative, NEXT stays t369; exit 0 => BANK the ring immediately
+(rotation law ~200 s), then run the two censuses --window and --dir
+per the RUNBOOK at the bottom of docs/re/_wip_t369.md.
 
 QUEUE (phase 8 — PLAYTEST HARVEST + PACKAGING; user decisions 2026-11-10:
 ship WITHOUT vendor data; license = GPL-3.0 + written grant to original
@@ -356,6 +366,55 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   tNNN in field 3 for the human reader). Human steering is tag-independent
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
+
+
+## LANDED t369 — 2026-11-10 (CENSUS TOOLS PRE-BUILT + CONTROL-VERIFIED;
+## PLAYTEST WINDOW NOT YET OPEN — HONEST NEGATIVE; NEXT STAYS t369)
+
+- Sitting check RING-FIRST: t368_ring_turn.py parsed=20/20 max_turn=1086 —
+  no play yet at session start (watcher pid 107679 alive this time; game pid
+  107664). Tree clean at launch.
+- BUILT (queue row t369, zero corpus assumptions):
+  scripts/r369_playwindow.py (window locator: disk mtime signal on
+  work/r1/game/{RESUME.GAM,0*.SAV} vs banked baselines + bounded-tail
+  turn!=1086 timeline scan with a MANDATORY mtime floor),
+  scripts/r369_magnetron_hit.py (C1 carriage cidx60 / C2 off-grid st4 K3b /
+  C3 W2 frame; --dir .sav mode + --window timeline mode),
+  scripts/r369_order_diff.py (order/inventory ring diff; dest-vector classes
+  XY / Z / BOTH; two-click witness = adjacent XY->Z events same slot;
+  gizmo use-counter decrements; --selftest).
+- CONTROLS (all real runs): zero-hit on work/r1/bank-t1086-preplay for both
+  censuses (C1=C2=C3=0, 0 witnesses); POSITIVE fixture
+  work/r1/t369-fixture (synthetic edited copies of a bank slot) fires every
+  counter: C1=2, C2=2, C3=1, decrements=1, XY/Z classes fire, --selftest
+  two_click=1 PASS. Timeline mode exercised on the real 8.9 GB file (814
+  deduped idle samples, all counters 0 — correct pre-play shape).
+- TRAP CAUGHT + FIXED (banked _wip_t369): the Nov-3 DRIVE EPOCH (turns
+  1086->1236) lives in the same live-timeline.jsonl; an unfloored turn!=1086
+  scan false-fires on it (observed: turn 1150 wall 14:09:29 mtime 2026-11-03).
+  Playwindow floors at 2026-11-10 11:18 (pre-play bank time). t251 rewind
+  caveat re-confirmed; wall clock collides across days — mtime is the only
+  selector.
+- INSTRUMENT LAW (fixture-derived): shared payload triples (bank ships 3+25
+  both p=0x26d339) fan one edit into two slot-events and break XY->Z
+  adjacency by design; issued orders allocate per-ship ptrs so live adjacency
+  is meaningful. tl mode cannot deref +0x68 — full derefed two-click
+  measurement requires --dir on a BANKED play dir; ring rotation ~200 s means
+  t370 banks immediately post-session (RUNBOOK in _wip_t369).
+- GATE RACE (the run went RED once, then green): shipsave_writeback_idempotent
+  _t366 raced the LIVE 10 s ring writer — a torn ZIP mid-rewrite was counted
+  in the denominator (zero divergences printed => not a law break; 3x direct
+  reruns passed). Fixed TESTS ONLY (game/ untouched): torn-slot tolerance in
+  test_shipsave_t360.cpp (reader loop + frozen-ring: was re-listing
+  ringSaves().front() per record, i.e. the slot being rewritten NOW) and
+  test_shipsave_t366.cpp (idempotence over parsed slots, parsed>=10 floor).
+  LAW banked: any test reading playcap/save while production runs must be
+  torn-tolerant. Full gate G_EXIT=0 after fix.
+- LEDGER: NOTHING closed (strict-close; no witness exists yet — the tools
+  are instruments, not evidence). OQ-016/OQ-019 rows untouched (user-gated,
+  DEFERRED pending playtest). Ledger 17 closed / 2 open unchanged.
+- NEXT: t369 rerun (queue law: 'Exit honest-negative if the window doesn't
+  exist yet — then NEXT stays t369'). Runbook in docs/re/_wip_t369.md.
 
 
 ## LANDED t368 — 2026-11-10 (EIGHTH PARK: NO TRIGGER — PLUS THE DISCOVERY THAT
