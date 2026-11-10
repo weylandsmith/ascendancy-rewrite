@@ -309,6 +309,12 @@ engine (campaign_fleet_bridge.{h,cpp} driving ShipSim; aggregate demoted to
 game/aggregate_oracle.{h,cpp}, test-only), pinned-seed suite green (223/0) and
 seeds 1/2024/23 byte-identical pre/post (docs/re/engine-flip-t365.md). Closure
 remains the user's call per the t329 packet.
+t366 NOTE (2026-11-10): I/O SURFACE COMPLETE — write side shipped
+(shipsave.{h,cpp} serializeRecord/writeShipRecords/rebaseRecord; write-back
+byte-identical on 20/20 ring saves; pins test_shipsave_t366 x3, suite 226/0,
+mutation 6/6; ships.md S63 + docs/re/_wip_t366.md). No game-emitted vendor
+save is headlessly producable (cited-broken click path); honest note banked.
+Closure remains the user's call.
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +

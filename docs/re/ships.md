@@ -2946,3 +2946,36 @@ VERBATIM (work/r331_disasm.txt, full evidence docs/re/_wip_t362.md S4/S6/S7):
   6/6 CAUGHT (M1 bare-regrant, M2 skip-ring-bit0, M3 charges-unnested,
   M4 refresh-operand, M5 window-inclusive, M6 phantom-rejected).
   LEDGER 17/2 UNCHANGED (honest negative; no OQ row's named closer touched).
+
+## S63 t366 (2026-11-10) — SAVE WRITE-SIDE: WRITE-BACK IDEMPOTENCE BYTE-VERIFIED; VENDOR-EMITTED SAVE HEADLESS-UNREACHABLE (honest negative)
+- CODE (rewrite/src/formats/shipsave.{h,cpp}): serializeRecord() (cited-only
+  PATCH LAW: stores EXACTLY the parser's field set, never touches unmodelled
+  stride gaps or ring use-word/payload bytes), writeShipRecords() (full-window
+  0x6b contract + geometry refusal), rebaseRecord() (t298 POINTER-VALUE LAW:
+  shifts ONLY +0x59/+0x63/+0x68 by newB-oldB; every other field is a value).
+  PINS test_shipsave_t366.cpp x3, suite 226/0. MUTATION 6/6 CAUGHT
+  (scripts/r366_mutate.py, checkpoint e7ca7a2 BEFORE first mutant): M1 gap
+  write, M2 no-ring, M3 rebase-hits-value-field, M4 rebase-skips-slotptr,
+  M5 geometry off-by-one (MISSED first — buffer had 16 B slack hiding the
+  exact-equality edge; re-scoped to zero-slack buffer, CAUGHT), M6 count-check
+  dropped (abort class).
+- BYTE-COMPARE LEG (the queue's conditional): a GAME-EMITTED vendor save with
+  ship records cannot be produced headlessly here — the game's save is
+  UI-driven, the click path is cited-broken (REFUTED-ROUTES t261 input-dead;
+  N8/t293 budget), a second long capture is contract-forbidden, and
+  bank-t260-roundtrip-1255 is an emulator re-save of the input-dead class
+  (REFUTED-ROUTES L273). Shipped substitute: parse->write-back on the 20/20
+  production ring saves -> the whole 17,055,880-B Memory member is
+  BYTE-IDENTICAL (fnv1a64 equality, stable across a second pass). That is a
+  real byte-compare against vendor-saved (emulator-snapshotted) bytes.
+- CHURN CENSUS (scripts/r366_churn_census.py RC=0, work/r366_churn.out):
+  same-turn ring pairs (19): EVERY field churns 0 (whole window frozen idle);
+  t340 drive ring-final pairs (19, turns 1089-1093): churn ONLY at +0x58 kind,
+  +0x59 orderTarget, +0x5d actEnum, +0x5e actTarget, +0x9e..+0xa9 pos
+  (pos-z 86/19 pairs). All identity/design/inventory fields byte-durable
+  across advancing boundaries. HONEST SCOPE: zero-churn at +0x62/+0x63 is
+  observation, not vendor promise — no captured save holds an in-combat-at-
+  boundary ship, so the t365 stance/gate/activeSlot transience claim remains a
+  LAW reading; the writer round-trips those bytes verbatim like any other.
+- NON-CLOSURE (strict-close): OQ-019 stays open (user-gated per t329); the
+  write side completes the model's I/O surface, it is not the row's closer.

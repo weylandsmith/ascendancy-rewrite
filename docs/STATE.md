@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-10T01:55
+updated: 2026-11-10T07:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,38 +222,31 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t366 — SAVE-WRITE SIDE (queue row VERBATIM): emit ship records back
-into RESUME.GAM layout; byte-compare vs vendor-written save if one can be
-produced headlessly, else round-trip-through-rewrite tests + honest note.
-Ordering rationale: the queue names t366 CONDITIONAL "only if t365 green" —
-t365 LANDED 2026-11-10 GREEN (suite 223/0, gate 0, seeds 1/2024/23
-byte-identical pre/post flip; docs/re/engine-flip-t365.md), so the condition
-is met and t366 is next VERBATIM. Evidence base: the t360 read-side parser
-(shipsim record fields + test_shipsim_t360 golden vectors) is the mirror to
-write against; the t365 bridge's reset-per-engagement
-(campaign_fleet_bridge.cpp, docs/re/_wip_t365b.md fix 5) means engagement-
-transient fields (stance/gate/activeSlot) are NOT durable save state — the
-writer persists identity/owner/kind/position/integrity/inventory, and the
-honest note must say which fields round-trip and which the vendor leaves
-undefined for in-combat ships. If no vendor-written save with ship records
-exists headlessly, say so plainly in the note (no fabricated byte-compare).
-Ordering rationale: t364 landed 2026-11-10 the LAST per-ship capability the
-queue named (combat round, pins 218/0, MUTATION 6/6 CAUGHT — combat.md S3l +
-docs/re/_wip_t364.md); the sim now covers records, orders, gizmos, upkeep,
-carrier law AND engagement, so the flip has no remaining capability gap.
-t365 is integration, not derivation: campaign.cpp's turn frame must call
-ShipSim::advanceBoundary() + engageRound() where combatPhase runs today, keep
-the aggregate engine callable from tests as the seed-comparison oracle
-(N10: removal only after seeds agree — do NOT delete in t365), and carry the
-t364 seams FORWARD: the chase leg (walk toward +0x68 targetPos) is NOT
-modelled in shipsim (t364 named it t365 scope — decide there: model via
-targetPos = victim pos at stance time, or leave the caller to re-issue);
-activeSlot defaults -1 (fixtures must set it or run setStance first).
-Evidence base: _wip_t364.md S3 (model decisions), ships.md S60-S62/S3l seam
-history, campaign.cpp combatPhase/turn loop sites, DECISIONS.md D2 ruling
-wording. Mutation-tested pins like the t290-t292 arms if new decision
-branches land in the flip itself. Seams t365 may NOT silently close: OQ rows
-user-gated (annotate only); aggregate REMOVAL is post-agreement, not t365.
+NEXT t368 — WAIT-TRIGGER SENTINEL (task line FIRST; proven t349-t356 script
+pattern). All queue rows t359-t366 are LANDED; the per-ship model's I/O
+surface is complete (t366); the ONLY remaining ledger movement is USER
+adjudication (OQ-016 residues, OQ-019 closure per the t329 packet, D3
+deferred). Branches, in order:
+  (1) SITTING CHECK: 400 KB tail-SEEK of work/r1/playcap/live-timeline.jsonl
+      (OOM law, never a full read); newest turn > 1086 => run
+      scripts/r1_t85g_sitting.py BEFORE anything (new sitting outranks this
+      assignment). Baseline 2026-11-10: 8,917,535,608 B, turn 1086 on all
+      tail records (ring rotation only).
+  (2) RULING CHECK: DECISIONS.md mtime baseline 2026-11-10 06:23:41 (t365's
+      own D2-annotation write; commit 5758465 06:30:26 post-dates it);
+      trigger = mtime newer than baseline OR `git diff -- docs/DECISIONS.md`
+      non-empty OR any *ruling*/*reply* file in git status. The old sheet
+      baseline (work/r1/shp_png/decision-sheet.md, OQ-005) is CLOSED t367 —
+      do NOT watch it. Poller: work/r1/sentinel_t368.sh (pre-staged, 60 s
+      poll, 45 min cap; launch via terminal(background=true, notify=true),
+      wait via process_manage(action='wait', timeout<=180) — NO foreground
+      tail chunks (t356 lesson), no nohup (t355 law).
+  (3) Neither => park line appended to BLOCKED.md '## Sentinel park log'
+      (one dated line naming the three branches), rewrite NEXT to the SAME
+      sentinel verbatim, GATE 0, commit, stop.
+Do NOT invent new capture routes (t178; the click path is cited-broken, the
+per-ship residues are EIGHT cited-dead legs — D2=(b) was the route and it is
+now fully built). Production :9 is the corpus, untouched.
 
 QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
 to the original; NO permanent toggle — per-ship becomes THE engine once the
@@ -297,10 +290,11 @@ t365 ENGINE FLIP — LANDED 2026-11-10 (see LANDED t365 block;
       docs/re/engine-flip-t365.md; aggregate demotion DONE, removal
       post-user-acceptance per D2/N10).
 
-t366 (CONDITIONAL, only if t365 green) SAVE-WRITE SIDE: emit ship records back
-      into RESUME.GAM layout; byte-compare vs vendor-written save if one can
-      be produced headlessly, else round-trip-through-rewrite tests + honest
-      note.
+t366 SAVE-WRITE SIDE — LANDED 2026-11-10 (t365-green condition was met;
+      shipsave.{h,cpp} write side + test_shipsave_t366.cpp x3, suite 226/0,
+      MUTATION 6/6 CAUGHT; write-back byte-identical 20/20 ring saves;
+      vendor-emitted save headless-unreachable = honest negative;
+      docs/re/_wip_t366.md + ships.md S63). Keep row.
 
 After t366 (or on any hard block): rewrite NEXT to the WAIT-TRIGGER sentinel
 shape (see t356 LANDED for the proven script pattern) — do NOT invent new
@@ -351,6 +345,52 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t366 — 2026-11-10 (SAVE WRITE-SIDE SHIPPED: WRITE-BACK BYTE-IDENTICAL
+ON 20/20 RING SAVES; VENDOR-EMITTED SAVE HEADLESS-UNREACHABLE = HONEST
+NEGATIVE; SUITE 226/0; MUTATION 6/6 CAUGHT; LEDGER 17/2 UNCHANGED)
+
+- Sitting check NEGATIVE (timeline 8,917,535,608 B unchanged; 400 KB tail-seek,
+  turn 1086 on all records; r1_t85g_sitting.py NOT run per the >1086 rule).
+  Tree clean at launch.
+- CODE (rewrite/src/formats/shipsave.{h,cpp}, pership-spec §6 S7):
+  serializeRecord() under a CITED-ONLY PATCH LAW — stores EXACTLY the parser's
+  field set (the +0x00..+0x15e cited fields, ring cidx bytes at +0xab+7*i),
+  NEVER touches unmodelled stride gaps or ring use-word/payload bytes (whole-
+  record emit into fresh memory is therefore NOT yet faithful in the gaps —
+  named limitation, pinned). writeShipRecords() = full-window 0x6b contract,
+  geometry refusal (refuse-not-clamp), count refusal. rebaseRecord() per the
+  t298 POINTER-VALUE LAW: shifts ONLY +0x59/+0x63/+0x68 by (newB - oldB);
+  delta 0 = same-run no-op; self-inverse pinned.
+- THE BYTE-COMPARE LEG (honest negative + real substitute): a GAME-EMITTED
+  vendor save with ship records is NOT headlessly producable — game save is
+  UI-driven, click path cited-broken (REFUTED-ROUTES t261/N8), second capture
+  contract-forbidden, bank-t260-roundtrip-1255 is an emulator re-save of the
+  input-dead class (REFUTED-ROUTES L273). Shipped substitute IS a byte-compare
+  against vendor-saved bytes: parse->write-back->whole 17,055,880-B Memory
+  member fnv1a64-IDENTICAL, 20/20 ring saves, stable across a second pass.
+- CHURN CENSUS grounding the durable/transient note
+  (scripts/r366_churn_census.py RC=0, work/r366_churn.out): same-turn ring
+  pairs 19 — every field churns 0; t340 drive ring-final pairs 19 (turns
+  1089-1093) — churn ONLY at +0x58/+0x59/+0x5d/+0x5e (order/act) and
+  +0x9e..+0xa9 (pos). HONEST SCOPE: zero-churn at +0x62/+0x63 is observation,
+  not vendor promise (no captured save holds an in-combat-at-boundary ship);
+  t365's stance/gate/activeSlot transience stays a law reading; the writer
+  round-trips those bytes verbatim.
+- PINS test_shipsave_t366.cpp x3 (writeback idempotence / synthetic round-trip
+  + patch law / rebase + refusals). SUITE 226/0 (223 + 3). MUTATION 6/6
+  CAUGHT (scripts/r366_mutate.py; checkpoint e7ca7a2 BEFORE first mutant per
+  the skill law): M1 gap write, M2 no-ring, M3 rebase-hits-value,
+  M4 rebase-skips-slotptr, M5 geometry off-by-one (MISSED first — 16 B buffer
+  slack hid the exact-equality edge; re-scoped to zero-slack, CAUGHT),
+  M6 count-check dropped (abort class).
+- LEDGER 17/2 UNCHANGED — honest negative: OQ-019 stays user-gated (t329);
+  the write side completes the model's I/O surface (note added to the row),
+  it is not the row's named closer. Files: docs/re/_wip_t366.md S0-S3,
+  ships.md S63, OPEN-QUESTIONS t366 note.
+- QUEUE EXHAUSTED (t359-t366 all landed). NEXT = t368 WAIT-TRIGGER SENTINEL
+  (DECISIONS.md baseline 2026-11-10 06:23:41 = t365's own annotation write;
+  the OQ-005 sheet baseline is CLOSED — do not watch it).
 
 ## LANDED t365 — 2026-11-10 (ENGINE FLIP: THE PER-SHIP ENGINE IS THE COMBAT
 ENGINE; aggregate demoted to oracle; SEEDS AGREE — D2=(b) acceptance condition

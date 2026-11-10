@@ -210,13 +210,20 @@ TEST(shipsave_rebase_and_refusals_t366) {
     std::string err;
     CHECK(!ShipSave::writeShipRecords(&stub, 0, {}, &err));
     std::vector<ShipSave::Record> recs(ShipSave::kArraySlots);
-    // Geometry-valid base in a big-enough buffer: window write must succeed.
+    // Geometry-valid base in a buffer sized EXACTLY to the window (zero
+    // slack): the boundary write must succeed (a >= mutant is caught here —
+    // t366 M5 re-scope: with slack the exact-equality edge is unobservable).
     std::vector<uint8_t> big(ShipSave::kDataSeg + ShipSave::kShipArrayX +
                                  size_t(ShipSave::kArraySlots) *
-                                     ShipSave::kRecordStride + 16,
+                                     ShipSave::kRecordStride,
                              0);
     CHECK(ShipSave::writeShipRecords(&big, 0, recs, &err));
     // One byte past the boundary -> refused, not clamped (window would read
     // off the end by exactly 1).
-    CHECK(!ShipSave::writeShipRecords(&big, 17, recs, &err));
+    CHECK(!ShipSave::writeShipRecords(&big, 1, recs, &err));
+    // Wrong record count at VALID geometry -> refused (full-window contract;
+    // a partial emit would silently leave stale rows unaccounted).
+    std::vector<ShipSave::Record> half(recs.begin(),
+                                       recs.begin() + ShipSave::kArraySlots - 1);
+    CHECK(!ShipSave::writeShipRecords(&big, 0, half, &err));
 }
