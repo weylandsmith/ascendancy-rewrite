@@ -222,18 +222,17 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t362 per queue row t362 below (MIXED-FLEET DEPARTURE LAW PARITY),
-VERBATIM. Ordering rationale: t361 LANDED 2026-11-09 (shipsim.{h,cpp} + 11
-pins, run_tests 190/0) and its mutation campaign named EXACTLY the t362 test
-mandate (ships.md S60): the power-clamp-operand path (clamp fires only when
-power<steps AND power!=walk) and the march-spends-NEITHER law are the two
-mutants t361 could not catch — mixed-fleet fuel interleaving exercises both,
-so t362 must pin them before t363 stacks gizmos on top. Spec contract stays
-docs/re/pership-spec.md; the st4 DWELL law is ships.md S24 item 1 + S17 T4
-(round-robin cursor = remaining FUEL). Banked witnesses for parity are the
-production ring saves (turn 1086 census in S59; shipsave_t360 tests show the
-self-skip pattern when the ring moves). shipsim seams t362 may NOT silently
-close: FUN_00049a34 body unbanked; decider re-decide stays caller-side.
+NEXT t363 per queue row t363 below (GIZMO INVENTORY + CARRIER/CARGO),
+VERBATIM. Ordering rationale: t362 LANDED 2026-11-09 (driver repeat law
+verbatim + 7 pins, run_tests 197/0; see LANDED t362 block) and left named
+gaps t363 owns: FUN_0004a658's upkeep burn +0x88 -= design[+0x36] (the
+t361/t362 refill-without-burn seam), the turn-tail slot-refresh loop
+0x4a77c..0x4a7a4 (WORD[slot+1] := design[+0x4e]), and FUN_00049a34's
+colonise leg (kind-2 completion body now PARTLY banked — S61 item 4). Gizmo
+scope is where those three legs live, so t363 must land before t364 stacks
+combat on top. Spec contract stays docs/re/pership-spec.md. shipsim seams
+t363 may NOT silently close: decider re-decide stays caller-side; OQ rows
+user-gated (give the model fields, do not close rows).
 
 QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
 to the original; NO permanent toggle — per-ship becomes THE engine once the
@@ -256,9 +255,9 @@ t361 PER-SHIP ENGINE SKELETON — LANDED 2026-11-09 (see LANDED t361 block;
       shipsim.{h,cpp} + test_shipsim_t361.cpp x11, run_tests 190/0; ai-dossier
       §5 MAX->MIN wording corrected in place; ships.md S60).
 
-t362 MIXED-FLEET DEPARTURE LAW PARITY: reproduce the vendor piecemeal-
-      departure behavior (dwell expiry per ship) from the st4 DWELL law;
-      parity test vs banked witnesses; aggregate oracle still passes.
+t362 MIXED-FLEET DEPARTURE LAW PARITY — LANDED 2026-11-09 (see LANDED t362
+      block; driver repeat law verbatim, shipsim.cpp sweep loop +
+      test_shipsim_t362.cpp x7, run_tests 197/0; ships.md S61).
 
 t363 GIZMO INVENTORY + CARRIER/CARGO into shipsim per spec (3)(4); magnetron/
       Phase-Bomb residues get a HOME here (which ship carries what) — do not
@@ -329,6 +328,52 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t362 — 2026-11-09 (MIXED-FLEET DEPARTURE LAW: THE EXECUTOR DRIVER
+REPEATS — PIECEMEAL DEPARTURE IS VERBATIM LAW, t361's ONE-PICK READING
+SUPERSEDED; 7 PINS, run_tests 197/0, LEDGER 17/2 UNCHANGED)
+- Sitting check NEGATIVE (16/16 records turn 1086, ring rotation only; ring
+  FILES rotate even when the turn does not — shipsave_t360 flaked once
+  mid-run from a 19:04-19:05 ring touch, clean on re-run — environmental).
+- WITNESS CENSUS scripts/r362_departure_witness.py (exit 0, output
+  work/r362_witness.out; t265 corpus law verbatim: file_mtime_ns windows,
+  regimes A+B healthy, softlock gap excluded; 163,432 lines, 602 rows):
+  MID-TURN kind flips ZERO (10267 st5 same-turn deltas all 0.0); PER-BOUNDARY
+  3-same-owner flips EXIST — owner 1 slots 17/20/29 t1104->1105, owner 2
+  12/21/23 t1111->1112 (both directions twice). st4 off-grid {} re-confirmed.
+- STATIC (work/r331_disasm.txt verbatim, _wip_t362.md S4/S6/S7, ships.md S61):
+  DRIVER FUN_0002547c 0x2550c..0x25527 `or edi,eax` + `test edi,edi; jne`
+  = re-run the whole per-race pass while any race reports work; ah arms
+  1/2/3 -> commit hooks 0x49f28/0x39c10, other -> assert 0x8f5. COMMIT EXIT
+  FUN_00041260 0x41b8f..0x41ba6: work iff REMAINING WALK > 0 (sar 0x10; jle
+  -> return 0). kind-5 stores are FOUR sites (0x22243/0x2228f/0x49a74/
+  0x4cd16 — the 0x49a74 leg inside the kind-2 completion body now banked in
+  part). MOVES re-grant 0x412cf is INSIDE the re-invoked prologue => per
+  sweep. Termination: 0x4134e POWER gate drains the race.
+- CODE (shipsim.cpp advanceBoundary): sweep loop, repeat driven by commitMove
+  status (status = post-walk remaining > 0 — the most literal mapping; the
+  raw-vs-rounded micro-edge 0<remaining<0.5 NAMED in _wip_t362 S7, no witness
+  either way); T-10 decrement hoisted ONCE per boundary AFTER all sweeps read
+  the words; stale-act clear once per boundary (named simplification);
+  BoundaryReport.sweeps + executorStalled safety cap (never fires, pinned);
+  laneMarch made a PUBLIC seam (march law invisible at boundary observation).
+- PINS test_shipsim_t362.cpp x7: piecemeal order (ascending POWER 30/20/10
+  departs 3 ships in ONE boundary, sweeps==4 incl. the silent drain sweep),
+  exhausted-budget stop (remaining 0 -> no repeat; continues next boundary),
+  POWER-gate no-op sweep (clamp->0 power: acted 1, sweeps 2, re-grant makes
+  moves 10 NOT 9 — remaining is STATUS not durable state), dwell suppression
+  across sweeps, march-spends-NEITHER (seam pin), power-clamp-operand
+  (d=2.6 sugar/power 2: pos 277.333 separates scale-operand mutants), stall-
+  cap negative control (6-ship 2-day drain, 12 acts, cap never fires).
+  MEASUREMENT FACTS: landing always fires the T-6 scatter — pin flags not
+  coordinates (t361's r3.landed pins already respected this).
+- MUTATION 4/4 CAUGHT: clamp-scale power/walk (condition swap is VACUOUS —
+  integer power makes both conditions equal; S60 wording corrected by this
+  measurement), march-burns-MOVES, no-repeat (t361 behavior, x20 collateral),
+  per-sweep decrement (breaks t361 expiry pins too). All restored; 197/0.
+- LEDGER 17/2 UNCHANGED — honest negative: no OQ row's named closer touched
+  (sweep-count coupling was a queue-row mandate, not an OQ row).
+GATE_EXIT=0. NEXT = t363 VERBATIM.
 
 ## LANDED t361 — 2026-11-09 (PER-SHIP ENGINE SKELETON SHIPPED:
 ## rewrite/src/game/shipsim.{h,cpp} + 11 PIN TESTS, run_tests 190/0; EXECUTOR

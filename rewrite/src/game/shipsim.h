@@ -119,9 +119,14 @@ struct Ship {
 struct BoundaryReport {
     int asserts = 0;            // assert-law violations counted (never crashes)
     int rngDraws = 0;           // LCG draws consumed this boundary
+    int sweeps = 0;             // executor sweep passes run this boundary
+                                // (driver FUN_0002547c 0x2550c..0x25527 repeat
+                                // law, t362; >=2 means piecemeal departure fired)
     std::vector<int> placed;    // ship ids: kind 5 -> 4 arrival placement (T-3)
     std::vector<int> landed;    // ship ids: kind 1 arrival landing (T-6)
-    std::vector<int> acted;     // ship ids: the executor pick(s) this boundary
+    std::vector<int> acted;     // ship ids: the executor pick(s) this boundary,
+                                // in pick order (a ship may repeat: interleaving
+                                // is by REMAINING POWER, S17 T4)
     bool executorStalled = false;  // safety cap hit (must never fire)
 };
 
@@ -135,17 +140,22 @@ struct BoundaryReport {
 //       ai-dossier "descending design power" label vs the +0x52 operand is
 //       DISPUTED — the VERBATIM comparator wins);
 //   (3) queue suppressor: dwellTurns > 0 suppresses the executor and
-//       decrements (T-10 behaviour, home DISPUTED G-a);
-//   (4) executor, one resolver call per owner per boundary: refill MOVES
-//       from drive (+0x94 := +0x10, FUN_0004a658 re-grant, combat.md §1),
-//       collect ships with POWER > 0 && kind != Move && ownership
-//       (raw 0x41340..0x41357), pick the ONE with MINIMUM POWER (strict <,
-//       first-in-list ties — ships.md S17 T4 t183 decompile; ai-dossier
-//       "MAX" wording is a misread, _wip_t361 S1), commit its move, and
-//       after movement assert kind in {3,4} else count violation 0x93e
-//       (0x419cf..0x419f1 verbatim). "One sub-turn per day" maps to ONE
-//       resolver call per owner per boundary (S16 item 1 + S17 T4 mapping,
-//       INFERRED coupling); multi-boundary travel spans days naturally.
+//       decrements ONCE per boundary AFTER all sweeps read the words (T-10
+//       behaviour, home DISPUTED G-a);
+//   (4) executor DRIVER (FUN_0002547c, t362): REPEATS the whole per-race pass
+//       while any race reports work (0x25525 test edi,edi jne). Each pass, per
+//       race: refill MOVES from drive (+0x94 := +0x10, FUN_0004a658 re-grant
+//       at 0x412cf — INSIDE the re-invoked prologue, so PER SWEEP), then pick
+//       the ONE eligible ship with MINIMUM POWER (strict <, first-in-list
+//       ties — ships.md S17 T4 t183 decompile; ai-dossier "MAX" wording is a
+//       misread, _wip_t361 S1), commit its move, assert kind in {3,4} else
+//       count violation 0x93e (0x419cf..0x419f1 verbatim). Work is reported by
+//       the COMMIT EXIT (0x41b8f: remaining walk > 0 -> -1, else 0): a ship
+//       with walk left re-arms the repeat => PIECEMEAL DEPARTURE — ships
+//       depart one-per-sweep in ascending-POWER order until each arrives or
+//       drains (witness: 3 same-owner kind flips in one boundary,
+//       work/r362_witness.out B2). The t361 one-pick-per-boundary reading is
+//       superseded (_wip_t362 S4/S6/S7).
 // Decider policy (FUN_00040178 target scoring FUN_00039b28) is NOT banked —
 // hooks below, default no-op; the sim never invents AI target choice (C5/N2).
 class ShipSim {
@@ -210,11 +220,21 @@ class ShipSim {
     // half-AWAY and would differ on .5 ties.
     static int32_t x86Round(float v);
 
+    // T-7 march + T-3 arrival. PUBLIC (t362): the march-spends-NEITHER law is
+    // invisible at boundary observation — the per-sweep MOVES re-grant (0x412cf)
+    // overwrites moves before any observation, exactly as in the vendor — so
+    // the law is pinned at the seam itself (mutant: march decrementing
+    // moves/power must fail here, not at advanceBoundary).
+    void laneMarch(Ship& s, BoundaryReport& rep);
+
   private:
     struct RaceFocus { int race; uint32_t focus; };
     void sortShipList();                 // step (2), stable on +0x52
-    void commitMove(Ship& s, BoundaryReport& rep);   // per-kind dispatch
-    void laneMarch(Ship& s, BoundaryReport& rep);    // T-7 march + T-3 arrival
+    // Per-kind dispatch. RETURNS the executor work status: 0 when no walk
+    // committed (kind not walkable / no target triple — the vendor arms that
+    // report status 0 and keep the driver's edi clear), nonzero (steps spent)
+    // when a walk committed (driver `or edi,eax` -> repeat, t362 S6).
+    int commitMove(Ship& s, BoundaryReport& rep);
     void landingAttempt(Ship& s, BoundaryReport& rep);  // T-6 (slot model is
                                                         // planet-side, t363:
                                                         // default = no free

@@ -2857,3 +2857,43 @@ body not banked (kind-2 arrival reuses the T-6 no-slot branch under flag);
 decider FUN_00040178 target scoring not banked (setAct is the order-apply
 API; stale-act clears, never re-decides); kind-5 dangling lane holds state
 (no cited law); T-3 etaDay import stamp INFERRED (parser has no +0x52).
+
+## S61 t362 (2026-11-09) — MIXED-FLEET DEPARTURE LAW: THE EXECUTOR DRIVER REPEATS
+
+VERBATIM (work/r331_disasm.txt, full evidence docs/re/_wip_t362.md S4/S6/S7):
+1. DRIVER FUN_0002547c 0x2550c..0x25527: reload race count, walk every race
+   (executor call 0x2554f, `or edi,eax` 0x25554), then `test edi,edi; jne
+   0x2550c` — RE-RUN THE WHOLE PASS while any race reports work. Return-status
+   byte ah=[esp+0x10]: 0 nothing; 1->0x49f28(ship,1); 2->0x39c10(ship,1);
+   3->0x49f28(ship,1); other -> assert 0x8f5 (0x25560/0x25570/0x25587).
+2. COMMIT EXIT FUN_00041260 0x41b8f..0x41ba6: `mov eax,[esp+0x39e]; sar
+   eax,0x10; test eax,eax; jle 0x419c0` -> REMAINING WALK > 0 reports -1
+   (work), remaining <= 0 reports 0. All commit arms converge on 0x41b8f.
+   No-pick / ownership-gate-fail path 0x419c0 returns 0.
+3. => PIECEMEAL DEPARTURE: one MIN-POWER pick per sweep, MOVES re-granted
+   PER SWEEP (0x412cf sits inside the re-invoked prologue), ships drain
+   ascending-POWER until arrival or POWER==0 (0x4134e gate terminates).
+   WITNESS (work/r362_witness.out B2, t265 drive corpus regimes A+B):
+   3 same-owner kind flips in ONE boundary TWICE each direction — owner 1
+   slots 17/20/29 t1104->1105 (5->4 then 4->5), owner 2 slots 12/21/23
+   t1111->1112. Mid-turn flips ZERO (10267 st5 same-turn deltas all 0.0):
+   one step per boundary per ship holds on the flip class (S24 item 3).
+4. kind-5 STORE sites are FOUR (grep `c6 .*58 05`): 0x22243 (per-ship issuer
+   loop, LOCAL race only ds:0x7458e), 0x2228f (single-ship variant), 0x49a74
+   (INSIDE FUN_00049a34 = kind-2 completion body: derive star from
+   [[+0x59]+0xa]>>16 via 0x13bc5, call FUN_000220a8, +0x9e:=0, +0xa2:=
+   lane-end flag), 0x4cd16 (gizmo dispatcher). The corpus 5->4/4->5 chains
+   are executor+completion interplay, not the local issuer loop.
+5. MODEL (shipsim.cpp advanceBoundary, pins test_shipsim_t362.cpp x7,
+   run_tests 197/0): sweep loop with commit-status-driven repeat; T-10 dwell
+   decrement ONCE per boundary AFTER all sweeps read the words (per-sweep
+   decrement is a CAUGHT mutant); stale-act clear once per boundary (focus
+   cannot change mid-boundary — named simplification). MUTATION CAMPAIGN:
+   clamp-scale power/walk CAUGHT (note: swapping the clamp CONDITION is
+   vacuous — integer power makes power<walk == power<steps pre-clamp scale;
+   t361 S60 wording corrected by this measurement), march-burns-MOVES
+   CAUGHT at the public laneMarch seam, no-repeat CAUGHT x20, per-sweep
+   decrement CAUGHT. Test-measurement facts: silent sweeps re-grant MOVES
+   (remaining is status not state); landing always scatters (T-6 no-slot
+   default) — pin flags, not coordinates. LEDGER 17/2 UNCHANGED (honest
+   negative; no OQ row's named closer touched).

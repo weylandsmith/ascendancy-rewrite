@@ -99,6 +99,7 @@ add_executable(run_tests
   tests/test_shp.cpp
   tests/test_shipsave_t360.cpp
   tests/test_shipsim_t361.cpp
+  tests/test_shipsim_t362.cpp
   src/ui/layout.cpp
   src/ui/hudlayout.cpp
   src/ui/poppanel.cpp

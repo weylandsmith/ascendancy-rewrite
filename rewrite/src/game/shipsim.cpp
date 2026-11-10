@@ -284,7 +284,7 @@ void ShipSim::landingAttempt(Ship& s, BoundaryReport& rep) {
     rep.landed.push_back(s.id);
 }
 
-void ShipSim::commitMove(Ship& s, BoundaryReport& rep) {
+int ShipSim::commitMove(Ship& s, BoundaryReport& rep) {
     // Walk guard verbatim: FUN_00049f54 requires byte[ship+0x58]==4 (ships.md
     // S17 T1; spec T-9 quotes the same guard). The pership-spec T-9 heading
     // "kind 1/2/3 in the executor" is the t359 summary — the CITED guard is
@@ -296,7 +296,7 @@ void ShipSim::commitMove(Ship& s, BoundaryReport& rep) {
     // travel cross-system via the T-4 issuer (kind -> 5) and are sticky in
     // the decider (ai-dossier §5) — nothing to commit until they arrive as
     // kind 4 or their act goes stale (T-5).
-    if (s.kind != OrderKind::InSystem) return;
+    if (s.kind != OrderKind::InSystem) return 0;   // vendor arm reporting 0
 
     // Target triple by order TYPE +0x67 (S17 T1 verbatim: 3=abs triple
     // +0x6c, 1=ptr f[0..2], 2=star-handle f0/1/2, other incl 5 -> no walk).
@@ -321,11 +321,23 @@ void ShipSim::commitMove(Ship& s, BoundaryReport& rep) {
             retreatToSystem(s.id);  // dangling target ~ T-5 not-targetable
         }
     }
-    if (!have) return;
+    if (!have) return 0;   // orderType 5/0 or dangling star: no walk, 0 status
 
     bool arrived = false;
     walkLaw(s.pos, &s.power, &s.moves, delta, &arrived);
-    if (!arrived) return;
+    // VERBATIM commit-exit law (0x41b8f..0x41ba6: `sar eax,0x10; test eax,eax;
+    // jle -> return 0; else return -1`): work is reported iff REMAINING WALK
+    // > 0 after the commit. The sim's own commit law sets +0x94 :=
+    // round(remaining) (S17 T1), so post-walk moves IS the remaining — the
+    // most literal mapping available. [unverified micro-edge: the vendor
+    // reads the RAW accumulator, the sim the rounded word; they differ only
+    // when 0 < remaining < 0.5 — named in _wip_t362 S7, no witness either
+    // way.] An ARRIVED ship with moves left reports work -> one extra no-op
+    // sweep (act consumed at landing / stale-clear makes the re-pick empty),
+    // STATE-EQUIVALENT to the vendor stopping; sweep accounting pinned in
+    // test_piecemeal_t362.
+    const int status = s.moves > 0 ? 1 : 0;
+    if (!arrived) return status;   // walk committed, no completion hook
     s.arrivedFlag = true;
 
     // Completion hooks on arrival (S17 T1: type1 -> FUN_00049880, type2 ->
@@ -343,6 +355,7 @@ void ShipSim::commitMove(Ship& s, BoundaryReport& rep) {
     }
     // orderType 3 (abs-triple ENGAGE anchor): arrival is the engagement
     // hand-off — t364 seam, no state change.
+    return status;
 }
 
 BoundaryReport ShipSim::advanceBoundary() {
@@ -366,75 +379,114 @@ BoundaryReport ShipSim::advanceBoundary() {
     // (2) list order (sorted array = engine state; +0x52 stamps move).
     sortShipList();
 
-    // (3)+(4) Command executor, one resolver call per race per boundary
-    // (FUN_00041260, ai-dossier §1/t179 P2; "one sub-turn per day" S16 item 1
-    // maps to one call per boundary, S17 T4 day-coupling [INFERRED]).
+    // (3)+(4) Command executor driver = FUN_0002547c verbatim (t362). The
+    // driver REPEATS the whole per-race pass while any race's executor call
+    // reported work: 0x2550c reloads the race count, 0x2551b..0x25531 walks
+    // every race entry (executor call 0x2554f, `or edi,eax` accumulate), then
+    // 0x25525 `test edi,edi; jne 0x2550c`. A race reports work when its call
+    // picked and committed a ship (return status != 0 — the ah arms at
+    // 0x25560/0x25570/0x25587 are the mode==1 commit hooks; the no-pick path
+    // 0x419c0 returns ebx==0). => PIECEMEAL DEPARTURE: one MIN-POWER pick per
+    // sweep, sweeps run until the race's POWER drains. Witness: 3 same-owner
+    // kind flips in ONE boundary, twice (work/r362_witness.out B2; owner 1
+    // slots 17/20/29 t1104->1105, owner 2 slots 12/21/23 t1111->1112). The
+    // t361 one-pick-per-boundary encoding is superseded by this leg.
+    // Termination: every walked pick spends POWER (steps >= 1 while eligible,
+    // POWER==0 fails the 0x4134e gate), so the loop drains. Safety cap below
+    // sets executorStalled; it must never fire.
     std::vector<int> owners = ownersOf();
-    for (int race : owners) {
-        // Resolver step 1 verbatim (T4: FUN_0003ea08 @0x412d4 -> FUN_0004a658):
-        // MOVES re-grant +0x94 := drive stat +0x10 for the owner's ships.
-        // (FUN_0004a658's upkeep burn +0x88 -= design[+0x36] is t363 gizmo
-        // scope — honest seam; the boundary-state refill-without-burn matches
-        // the t101 "POW frozen at autosave" observation, S22 IDENTITY TIE.)
-        for (auto& s : ships_)
-            if (s.owner == race) s.moves = s.driveStat;
-
-        // Stale-act law (0x41a1c..0x41a45): act target != the race's current
-        // focus object -> act CLEARED (0x41a30 movb $0x0,[+0x5d]); the
-        // vendor's re-decide call 0x40178 is decider policy (target scoring
-        // FUN_00039b28 NOT banked) — the sim leaves the ship act-cleared and
-        // the caller re-sets via setAct(). Documented seam, no invented AI.
-        uint32_t focus = 0;
-        bool hasFocus = false;
-        for (const auto& f : focus_)
-            if (f.race == race) { focus = f.focus; hasFocus = true; }
-        if (hasFocus) {
+    bool drained = false;
+    for (int sweep = 0; !drained && sweep < 100000; ++sweep) {
+        bool anyWork = false;
+        for (int race : owners) {
+            // Resolver step 1 verbatim (T4: FUN_0003ea08 @0x412cf ->
+            // FUN_0004a658): MOVES re-grant +0x94 := drive stat +0x10 — PER
+            // SWEEP (the call sits inside the executor prologue, which the
+            // driver re-invokes every sweep). (FUN_0004a658's upkeep burn
+            // +0x88 -= design[+0x36] is t363 gizmo scope — honest seam; the
+            // boundary-state refill-without-burn matches the t101 "POW frozen
+            // at autosave" observation, S22 IDENTITY TIE.)
             for (auto& s : ships_)
-                if (s.owner == race && s.act != 0 && s.actTarget != focus)
-                    s.act = 0;
-        }
+                if (s.owner == race) s.moves = s.driveStat;
 
-        // Pick: act set, POWER > 0 (cmpl $0x0,+0x88; jle — raw 0x4134e),
-        // kind != 1 (cmpb $0x1,+0x58; je — raw 0x41357, MOVE excluded from
-        // the sweep verbatim), kind != 5 (the march spends NEITHER MOVES nor
-        // POWER — MEASURED-negative S21 item 1 — and was already advanced by
-        // the tail in step (1); the executor's case-1 gradient hop is an
-        // issuer seam for t362), dwell word == 0 (pre-decrement read: T-10
-        // suppresses and decrements in the SAME boundary). MIN POWER,
-        // strict <, first-in-list ties (ships.md S17 T4 t183 decompile;
-        // _wip_t361 S1 for the raw scan + ai-dossier MAX-wording fix).
-        Ship* pick = nullptr;
-        for (auto& s : ships_) {
-            if (s.owner != race) continue;
-            if (s.act == 0) continue;
-            if (s.power <= 0) continue;
-            if (s.kind == OrderKind::Move || s.kind == OrderKind::Placement)
-                continue;
-            if (s.dwellTurns > 0) continue;        // suppressed (T-10)
-            if (!pick || s.power < pick->power) pick = &s;  // strict <
-        }
+            // Stale-act law (0x41a1c..0x41a45): act target != the race's
+            // current focus object -> act CLEARED (0x41a30 movb $0x0,[+0x5d]).
+            // Focus cannot change mid-boundary (no caller between sweeps), so
+            // clearing once on the first sweep is state-equivalent to the
+            // vendor's per-sweep clear; the vendor's re-decide call 0x40178 is
+            // decider policy (target scoring FUN_00039b28 NOT banked) — the
+            // sim leaves the ship act-cleared and the caller re-sets via
+            // setAct(). Documented seam, no invented AI.
+            if (sweep == 0) {
+                uint32_t focus = 0;
+                bool hasFocus = false;
+                for (const auto& f : focus_)
+                    if (f.race == race) { focus = f.focus; hasFocus = true; }
+                if (hasFocus) {
+                    for (auto& s : ships_)
+                        if (s.owner == race && s.act != 0 && s.actTarget != focus)
+                            s.act = 0;
+                }
+            }
 
-        // T-10 decrement pass (word-decrement-only writer 0x3ac1c): after the
-        // pick read the words; runs even when nothing was picked. Field home
-        // DISPUTED G-a — modelled at sim level, never on a record offset.
+            // T-10 (word-decrement-only writer 0x3ac1c): the pick below reads
+            // the word PRE-decrement (suppress-then-decrement, t361-pinned:
+            // dwell 2 suppresses boundaries 1-2, fires on 3), and the
+            // decrement runs ONCE per boundary — hoisted BELOW the sweep loop
+            // so no sweep can act on a decremented value and a multi-sweep
+            // boundary cannot re-decrement. Field home DISPUTED G-a — modelled
+            // at sim level, never on a record offset.
+
+            // Pick: act set, POWER > 0 (cmpl $0x0,+0x88; jle — raw 0x4134e),
+            // kind != 1 (cmpb $0x1,+0x58; je — raw 0x41357, MOVE excluded from
+            // the sweep verbatim), kind != 5 (the march spends NEITHER MOVES
+            // nor POWER — MEASURED-negative S21 item 1 — and was already
+            // advanced by the tail in step (1); the executor's case-1 gradient
+            // hop is an issuer seam), dwell word == 0. MIN POWER, strict <
+            // (jge skip => first ties), first-in-list order (0x4195d walk).
+            Ship* pick = nullptr;
+            for (auto& s : ships_) {
+                if (s.owner != race) continue;
+                if (s.act == 0) continue;
+                if (s.power <= 0) continue;
+                if (s.kind == OrderKind::Move || s.kind == OrderKind::Placement)
+                    continue;
+                if (s.dwellTurns > 0) continue;        // suppressed (T-10)
+                if (!pick || s.power < pick->power) pick = &s;  // strict <
+            }
+
+            if (!pick) continue;      // this race silent this sweep
+
+            // Commit the pick's move, then the ASSERT law (0x419cf..0x419f1).
+            // Raw sequence: kind==3 -> call 0x39894, THEN cmpb $0x4 — a ship
+            // still at kind 3 after the gate falls into assert id 0x93e at
+            // 0x2a428 UNLESS the gate changed kind; ai-dossier §5 reads kind
+            // 3/4 as both tolerated. The sim follows the dossier reading (kind
+            // 3 tolerated — the gate body is engagement scope t364), and
+            // COUNTS violations rather than crashing (headless). The sim's own
+            // commits only ever leave kind 3-or-4, so asserts == 0 is the
+            // expected pin.
+            const int commitStatus = commitMove(*pick, rep);
+            rep.acted.push_back(pick->id);
+            if (pick->kind != OrderKind::Engage &&
+                pick->kind != OrderKind::InSystem)
+                ++rep.asserts;
+            // Driver `or edi,eax` (0x25554): the repeat fires on the COMMIT
+            // status, not the pick — a pick whose commit arm reports 0 (kind
+            // not walkable, no target triple) leaves edi clear (_wip_t362 S6).
+            if (commitStatus != 0) anyWork = true;
+        }
+        ++rep.sweeps;
+        if (!anyWork) drained = true;
+    }
+    if (!drained) rep.executorStalled = true;
+
+    // T-10 decrement pass ONCE per boundary, AFTER all sweeps read the words
+    // (suppress-then-decrement order is t361-pinned; runs even when nothing
+    // was picked). Races ascending per the per-race frame.
+    for (int race : owners)
         for (auto& s : ships_)
             if (s.owner == race && s.dwellTurns > 0) --s.dwellTurns;
-
-        if (!pick) continue;
-
-        // Commit the pick's move, then the ASSERT law (0x419cf..0x419f1).
-        // Raw sequence: kind==3 -> call 0x39894, THEN cmpb $0x4 — a ship
-        // still at kind 3 after the gate falls into assert id 0x93e at
-        // 0x2a428 UNLESS the gate changed kind; ai-dossier §5 reads kind 3/4
-        // as both tolerated. The sim follows the dossier reading (kind 3
-        // tolerated — the gate body is engagement scope t364), and COUNTS
-        // violations rather than crashing (headless). The sim's own commits
-        // only ever leave kind 3-or-4, so asserts == 0 is the expected pin.
-        commitMove(*pick, rep);
-        rep.acted.push_back(pick->id);
-        if (pick->kind != OrderKind::Engage && pick->kind != OrderKind::InSystem)
-            ++rep.asserts;
-    }
 
     ++turn_;
     return rep;
