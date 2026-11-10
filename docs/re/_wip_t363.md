@@ -294,3 +294,34 @@ session, ~30 probes):
    corroborates laws already credited to t47/t86/t89/t101/t184; no OQ row's
    named closer was touched: OQ-019's sugar-cube-flight-delta residue is
    unchanged, magnetron/Phase-Bomb remain zero-carried in the corpus).
+
+---
+
+## S6 t363R RE-LAND SESSION (2026-11-09 ~23:15 EST) — PRE-CODE VERBATIM RE-READS
+
+Sitting check NEGATIVE: live-timeline.jsonl 8,917,535,608 B (unchanged since
+t363 baseline), 400 KB tail-seek 16/16 rows turn 1086. r1_t85g_sitting.py NOT
+run (standing law). Tree clean at launch (shipsim.{h,cpp} == HEAD confirmed).
+
+t363R re-read the mutator/completion bodies RAW (work/r331_disasm.txt) to
+close the contract's "rewrite from S5, do not hunt for the draft" gap:
+- FUN_00049698 set-slot: 0x4969b `cmp ebx,[eax+0x15a]; jg 0x496df` => REJECT
+  iff idx > cap (idx==cap ADMITTED, phantom); 0x496b4 `cmp cl,ch; je` REJECT
+  same-cidx-same-slot ONLY; 0x496bd inc [+0x15e] iff old byte 0xFF; store;
+  call 0x49acc; return -1 (0 on reject). VERBATIM == contract item 2.
+- FUN_000496e4 clear-slot: NO index bound (0x496ee direct deref); byte==0xFF
+  -> return 0; dec [+0x15e]; byte:=0xFF; recalc; -1.
+- FUN_00049624 fill-first-empty: scan i=0..cap-1 (`cmp eax,[+0x15a] jl` at
+  0x4964a) — window is CAP, NOT all-25 as spec G3's shorthand words it;
+  found: filled+1 stored 0x49672, byte set, recalc; none/cap<=0 -> 0.
+- FUN_000499f8 admission: ( [+8]+[+c] > 0 ) OR species col 0x12 (race*0x1ee
+  stride, 0x49a17); THEN 0x49a21 `test BYTE[ebx+0x23],0x2; jne -> 0` — bit
+  SET == CLOSED/DENIED (S4 item 3 polarity CONFIRMED raw).
+- FUN_00049a34 stores 0x49a74..0x49a97 verbatim: kind:=5; DWORD[+0x9e]:=0
+  (lane-local x); [+0x59]:=lane; [+0xa2] := (esi_target == [lane]) ? 1.0f :
+  0.0f. The kind==3 leg at 0x49a44 is UNREACHABLE from the sole caller (walk
+  guard is kind 4) — dead in-vivo, sim models the kind!=3 leg (target :=
+  existing [+0x59]).
+- Completion switch 0x4a31a..0x4a33d CONFIRMED: flag 0x8 -> type1 calls
+  0x49880, type2 calls 0x49a34 INSIDE the walk body, so the executor assert
+  leg sees kind 5 after a type-2 arrival (S4 item 4). Sim: COUNTED (t361 law).

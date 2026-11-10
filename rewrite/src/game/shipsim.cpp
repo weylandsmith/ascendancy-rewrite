@@ -67,6 +67,26 @@ Ship Ship::fromRecord(const formats::ShipSave::Record& r, int currentTurn) {
     s.status = r.statusFlags;
     s.laneStepX = static_cast<int32_t>(r.laneStepX);
     s.laneStepZ = static_cast<int32_t>(r.laneStepZ);
+    // t363 imports (contract item 5): recalc-owned fields VERBATIM from the
+    // record, ring cidx bytes verbatim, cap + filled verbatim (phantom +1
+    // preserved — shipsave.h:34 law). NO recalcShip() on import: the recalc
+    // zeroes [+0x18] powerMax (generator-sum only), so re-deriving here would
+    // destroy the stored budget (named asymmetry, _wip_t363 S3a/contract).
+    s.weaponLevel = r.weaponLevel;
+    s.shieldLevel = r.shieldLevel;
+    s.cat2PowerCarry = r.cat2PowerCarry;
+    s.scannerTotal = r.scannerTotal;
+    s.specialCount = r.specialCount;
+    s.targetSlot = static_cast<int32_t>(r.targetSlot);
+    s.hullBaseDrive = static_cast<int32_t>(r.hullBaseDrive);
+    s.shields = r.shields;
+    s.invCap = r.invCap;
+    s.invFilled = r.filled;
+    for (size_t i = 0; i < kRingSlots && i < r.ringCidx.size(); ++i)
+        s.inv[i].cidx = r.ringCidx[i];
+    // Slot use-words and payloads are NOT in the t360 parser's field set;
+    // they default (0 / 0) — the refresh law restores use-words at the first
+    // tail anyway (MEASURED 5940/5940, _wip_t363 S4 item 5).
     // +0x52 ETA is NOT in the t360 parser's field set (shipsave.h — cited
     // fields only). Import at turn `currentTurn` stamps eta := currentTurn
     // (INFERRED: delta 0 -> full refill on the first boundary; callers who
@@ -181,6 +201,201 @@ int32_t ShipSim::powerRefill(int32_t powerMax, int32_t deltaDays) {
                                 (1.0 + static_cast<double>(q) / 10.0));
 }
 
+// ---- t363 GIZMO INVENTORY --------------------------------------------------
+
+void ShipSim::setDesigns(const std::vector<SimDesign>& designs) {
+    designs_ = designs;
+}
+
+namespace {
+const SimDesign& designRow(const std::vector<SimDesign>& designs, uint8_t cidx) {
+    // Vendor law: edx = cidx*0x6a + 0x7650c — the row is addressed DIRECTLY,
+    // so an out-of-range cidx would read garbage. The sim substitutes the
+    // honest all-zero cat-5 row (no gate, no contributions) for rows the
+    // caller never installed; static, so pins can rely on it.
+    static const SimDesign kZeroRow;
+    if (cidx >= designs.size()) return kZeroRow;
+    return designs[cidx];
+}
+}  // namespace
+
+void ShipSim::recalcShip(Ship& s) const {
+    // FUN_00049acc verbatim (_wip_t363 S3a; raw re-read 0x49ad5..0x49c04).
+    // Zero the accumulators, then driveTotal := hullBaseDrive read BEFORE the
+    // other zeroes (0x49ae4 load, 0x49b29 store — the same field, so order is
+    // immaterial here; kept for the law's sake).
+    s.weaponLevel = 0; s.shieldLevel = 0; s.scannerTotal = 0;
+    s.specialCount = 0; s.cat2PowerCarry = 0; s.targetSlot = 0;
+    s.powerMax = 0;                                    // [+0x18] := 0 (0x49af5)
+    s.driveStat = s.hullBaseDrive;
+    int32_t cntA = 0, cntB = 0;
+    // Window i < invCap EXCLUSIVE (0x49bae `cmp esi,ebp; jge exit`): slots at
+    // or beyond cap are the phantom zone — read NOTHING from them.
+    for (uint32_t i = 0; i < s.invCap && i < kRingSlots; ++i) {
+        const InvSlot& slot = s.inv[i];
+        if (slot.cidx == 0xff) continue;               // 0x49b36
+        const SimDesign& d = designRow(designs_, slot.cidx);
+        s.weaponLevel += d.rowWeapon;                  // +0x00 (0x49b52)
+        s.shieldLevel += d.rowShield;                  // +0x04 (0x49b5c)
+        s.driveStat   += d.rowDrive;                   // +0x10 (0x49b67)
+        s.scannerTotal += d.rowScanner;                // +0x20 (0x49b72)
+        s.powerMax    += d.rowGenPower;                // +0x18 (0x49b7d)
+        if (d.cat == 2) s.cat2PowerCarry += d.power;   // +0x1c (0x49b85)
+        // Special-cidx legs are keyed on the cidx BYTE, not the category
+        // (0x49b91..0x49bcc). NB each cidx value is distinct: a slot matches
+        // at most one leg.
+        if (slot.cidx == kCidxColonizer) s.targetSlot = -1;        // 0x49b9b
+        else if (slot.cidx == kCidxLaneDrive) ++cntA;              // 0x49bb6
+        else if (slot.cidx == kCidxHyperdrive) ++cntB;             // 0x49bc0
+        else if (slot.cidx == kCidxCloaker) ++s.specialCount;      // 0x49bc9
+    }
+    // fistp(cntA * ds:0x2583) / fistp(cntB * ds:0x258b) via the DERIVED pool
+    // values (kLaneStepXPool/kLaneStepZPool — see shipsim.h; counts are small
+    // ints, the x87-round-vs-C edge is unreachable).
+    s.laneStepX = x86Round(static_cast<float>(cntA) * kLaneStepXPool);
+    s.laneStepZ = x86Round(static_cast<float>(cntB) * kLaneStepZPool);
+}
+
+int32_t ShipSim::upkeep(Ship& s) {
+    // FUN_0004a658 verbatim (_wip_t363 S1a + S4 item 1 correction; raw re-read
+    // 0x4a65e..0x4a74a). Returns the burn applied to power.
+    // MOVES branch: bit0 SET -> [+0x94] := 0 and SKIP THE RE-GRANT ONLY — the
+    // shields zeroing and the ring scan STILL RUN (0x4a67b `jmp 0x4a6a6`, NOT
+    // 0x4a727; S4 item 1 retracts the earlier "skip ring scan" wording).
+    // Else re-grant: bit1 SET adds the ds:0x77f6c global (0x4a690 — polarity
+    // S3c: GLOBAL ADDED WHEN BIT SET; identity UNMEASURED, sim-level
+    // driveAddend_ stand-in); bit1 CLR plain [+0x10].
+    if (s.status & 0x1) {
+        s.moves = 0;
+    } else {
+        s.moves = s.driveStat + ((s.status & 0x2) ? driveAddend_ : 0);
+    }
+    s.shields = 0;                                     // [+0x90] := 0 ALWAYS
+    const int32_t powerBefore = s.power;
+    // Ring scan i < cap (0x4a6b0..0x4a6d4; window EXCLUSIVE, phantom slots
+    // contribute nothing — same law as the recalc).
+    for (uint32_t i = 0; i < s.invCap && i < kRingSlots; ++i) {
+        InvSlot& slot = s.inv[i];
+        if (slot.cidx == 0xff) continue;               // 0x4a6d8
+        const SimDesign& d = designRow(designs_, slot.cidx);
+        if (!d.upkeepGate) continue;                   // w16+0x33 bit 0x20 (0x4a6e9)
+        if (slot.payload != 0xffffffffu) continue;     // 0x4a6f9
+        // PAYABLE gate (0x4a70a `jl next`): cost > power skips the slot
+        // ENTIRELY — no partial burn, no clamp, no charges (S1a NEW READ).
+        if (s.power < d.power) continue;
+        s.power -= d.power;                            // [+0x88] -= cost (0x4a710)
+        if (d.cat == 1)                                // 0x4a716
+            s.shields += static_cast<uint32_t>(d.rowShield);  // charges (0x4a71c)
+    }
+    // bit3 of status -> [+0x90] := 0 (0x4a73a) AFTER the scan.
+    if (s.status & 0x8) s.shields = 0;
+    return powerBefore - s.power;
+}
+
+void ShipSim::refreshUseCounts(Ship& s) {
+    // Turn-tail loop 0x4a772..0x4a7a4 (_wip_t363 S1c + CORRECTION): every
+    // non-empty slot's u16 use word := design[+0x42] (numUses). The operand
+    // is RAW +0x42 (0x7654e - 0x7650c), NOT +0x4e — measured save-side
+    // 5940/5940 (S4 item 5). Window i < cap; runs for EVERY ship (S1c NB).
+    for (uint32_t i = 0; i < s.invCap && i < kRingSlots; ++i) {
+        if (s.inv[i].cidx == 0xff) continue;           // 0x4a78c
+        s.inv[i].use = static_cast<uint16_t>(
+            designRow(designs_, s.inv[i].cidx).numUses);
+    }
+}
+
+bool ShipSim::setSlot(Ship& s, uint32_t idx, uint8_t cidx) {
+    // FUN_00049698 verbatim (_wip_t363 S6 raw re-read 0x4969b..0x496de).
+    if (idx > s.invCap) return false;                  // 0x4969b jg: idx==cap ADMITTED
+    if (idx >= kRingSlots) return false;               // sim array bound (cap<=25
+                                       // in the vendor: cap := hull table
+                                       // dword, MEASURED 1234/1234 rows — the
+                                       // guard is defensive, never hit)
+    if (s.inv[idx].cidx == cidx) return false;         // 0x496b4: same-cidx-
+                                       // in-TARGET-slot only; duplicates
+                                       // across slots are LEGAL (600 live
+                                       // rows carry repeats, S4 item 5)
+    if (s.inv[idx].cidx == 0xff) ++s.invFilled;        // 0x496bd inc [+0x15e]
+    s.inv[idx].cidx = cidx;                            // 0x496cc store
+    recalcShip(s);                                     // 0x496d3
+    return true;
+}
+
+bool ShipSim::clearSlot(Ship& s, uint32_t idx) {
+    // FUN_000496e4 verbatim (S6 raw 0x496ee..0x49713): NO index bound in the
+    // vendor (direct deref) — a phantom slot is clearable; the sim clamps to
+    // the array defensively (idx>=25: the vendor would corrupt memory, the
+    // sim refuses — named divergence, no cited law covers it).
+    if (idx >= kRingSlots) return false;
+    if (s.inv[idx].cidx == 0xff) return false;         // 0x496f5 je -> return 0
+    --s.invFilled;                                     // 0x496f7 dec [+0x15e]
+    s.inv[idx].cidx = 0xff;                            // 0x496fd
+    recalcShip(s);                                     // 0x49704
+    return true;
+}
+
+bool ShipSim::fillFirstEmpty(Ship& s, uint8_t cidx) {
+    // FUN_00049624 verbatim (S6 raw 0x49632..0x4968d): scan i=0..cap-1
+    // (0x4964a `cmp eax,[+0x15a]; jl` — window is CAP, NOT all-25 as spec
+    // G3's shorthand words it; cap<=0 -> 0x4963e exit, no slot).
+    if (s.invCap == 0) return false;
+    for (uint32_t i = 0; i < s.invCap && i < kRingSlots; ++i) {
+        if (s.inv[i].cidx != 0xff) continue;
+        ++s.invFilled;                                 // 0x4966f/0x49672
+        s.inv[i].cidx = cidx;                          // 0x49678
+        recalcShip(s);                                 // 0x49681
+        return true;
+    }
+    return false;                                      // 0x4968d
+}
+
+bool ShipSim::carriesCode(const Ship& s, uint8_t code) const {
+    // Window = cap (the C2 loop 0x42d3f `cmp edx,[ebx+0x15a]; jge next` walks
+    // slots i<cap; phantom slots are NOT equipment).
+    for (uint32_t i = 0; i < s.invCap && i < kRingSlots; ++i)
+        if (s.inv[i].cidx == code) return true;
+    return false;
+}
+
+const Ship* ShipSim::firstCarrier(uint8_t code) const {
+    // C2 shape verbatim (engagement resolver loop 0x42d09..0x42d5b, raw
+    // re-read): FIRST ship in LIST order with BYTE[+0x58]==4 (InSystem) AND
+    // a slot == code. No strength comparison — eligibility is order-state +
+    // equipment. Returns nullptr when no carrier qualifies.
+    for (const auto& s : ships_)
+        if (s.kind == OrderKind::InSystem && carriesCode(s, code)) return &s;
+    return nullptr;
+}
+
+bool ShipSim::starArrivalComplete(Ship& s) {
+    // FUN_00049a34 + admission FUN_000499f8 verbatim (_wip_t363 S3d + S4
+    // item 3 polarity; raw re-read 0x499f8..0x49aa4 — see shipsim.h for the
+    // full contract). The order payload names the lane RECORD (edx arg); the
+    // OLD order target [+0x59] names the system object entered against.
+    const SimLane* l = lane(s.orderPayloadLane);
+    // Admission (0x499fb..0x49a25): (laneStepX + laneStepZ > 0) skips the
+    // species test; else the species col-0x12 gate must hold (NEVER-SEEN
+    // form, spec N4 — per-ship flag, default false = never admits). THEN the
+    // lane must exist and bit 0x2 must be CLEAR (SET == CLOSED/DENIED).
+    const bool hasLaneGear = static_cast<int32_t>(s.laneStepX + s.laneStepZ) > 0;
+    if (!hasLaneGear && !s.speciesLaneTravel) return false;
+    if (!l || l->closed) return false;                 // 0x49a21 jne -> 0
+    // Admitted (0x49a44..0x49a97). The kind==3 leg (target := system-object
+    // table entry) is UNREACHABLE from the sole caller 0x4a33d — the walk
+    // guard is kind 4 — so the sim takes the else leg verbatim: esi := the
+    // EXISTING [+0x59] target. The sim's target home is targetStar; the lane
+    // id home is laneId (+0x59's surrogate after the store).
+    const int target = s.targetStar;
+    s.kind = OrderKind::Placement;                     // 0x49a74 [+0x58] := 5
+    s.laneX = 0;                                       // 0x49a78 [+0x9e] := 0
+    s.laneId = s.orderPayloadLane;                     // 0x49a82 [+0x59] := lane
+    // 0x49a85 `cmp esi,[ecx]`: 1.0f iff the old target == lane[0] (A-end
+    // object, S22 L1). The sim compares sim-level ids: target == l->a.
+    s.laneToB = (target == l->a);
+    return true;
+}
+
+
 int32_t ShipSim::walkLaw(float pos[3], int32_t* power, int32_t* moves,
                          const float delta[3], bool* arrived) {
     // S17 T1 verbatim (FUN_00049f54 0x4a034..0x4a23d).
@@ -239,8 +454,11 @@ void ShipSim::laneMarch(Ship& s, BoundaryReport& rep) {
         // Lane end -> arrival placement via the cited T-3 law (S21 item 5's
         // flip/turn-around lives in the frame switch, spec G-d: keep
         // lane-local progress, re-place via star coords — the transform
-        // itself is NOT cited and is never invented here).
-        const SimStar* dest = star(l->b);
+        // itself is NOT cited and is never invented here). t363 (contract
+        // item 3): the endpoint honours the +0xa2 direction surrogate —
+        // laneToB ? star(l->b) : star(l->a). Default laneToB=true keeps the
+        // t361 golden pins green (their mkLane has A==B anyway).
+        const SimStar* dest = star(s.laneToB ? l->b : l->a);
         s.kind = OrderKind::InSystem;  // byte[+0x58] := 4 at 0x2202f (T-3)
         if (dest) {
             // position := star + (0,-200,0); rng%200 on the OTHER two axes
@@ -345,13 +563,14 @@ int ShipSim::commitMove(Ship& s, BoundaryReport& rep) {
     if (s.orderType == 1) {
         landingAttempt(s, rep);      // T-6 (planet-slot model is t363)
     } else if (s.orderType == 2) {
-        // FUN_00049a34 body is NOT banked (colonizer/land path). The only
-        // cited arrival behaviour for a system arrival without a committed
-        // slot model is the T-6 no-free-slot branch (kind stays 4 + three
-        // %1000-500 scatter draws, "vanishes at sea" [state semantics
-        // INFERRED]). Applied under that flag; t363's planet-slot model owns
-        // the colonise leg. NO new law is invented here.
-        landingAttempt(s, rep);
+        // FUN_00049a34 is BANKED (t363, _wip_t363 S3d/S6). Admitted: kind 2
+        // -> 5 INSIDE the commit (0x49a74), lane-local x reset, laneId set,
+        // direction flag stored. Denied: state untouched (0x49aa1 exit) —
+        // the ship stays kind 4 with its act intact (no cited law clears it;
+        // the t361-era scatter fallback is SUPERSEDED here, it stood in for
+        // this body). The executor's assert leg then sees kind 5 -> counted
+        // violation 0x93e per the raw sequence (S4 item 4), never fatal.
+        if (starArrivalComplete(s)) rep.laned.push_back(s.id);
     }
     // orderType 3 (abs-triple ENGAGE anchor): arrival is the engagement
     // hand-off — t364 seam, no state change.
@@ -364,15 +583,23 @@ BoundaryReport ShipSim::advanceBoundary() {
     // (1) Per-ship turn tail = FUN_0004a74c verbatim (IDENTITY TIE, ships.md
     // S22: the march L1 and the prologue live in ONE function; caller
     // FUN_0003e6e0 per-race turn tail, ai-dossier §1 phase order "per-race AI
-    // loop ... then command exec"). Prologue: zero +0x9c; POWER refill; slot
-    // refresh loop is gizmo scope (t363 seam). Body L1: kind-5 lane march
-    // (T-7). Races ascending; ships in sorted-list order.
+    // loop ... then command exec"). Prologue ORDER (t363, _wip_t363 S1c + S4
+    // item 2): status +0x9c := 0 (0x4a756) -> POWER refill (0x4a76c, the
+    // clamp call 0x4a75f in between) -> slot use-count REFRESH loop
+    // (0x4a772..0x4a7a4, every ship, no kind gate) -> kind-5 march body
+    // (0x4a7a6 guard) -> upkeep FUN_0004a658 (0x4a95b, BOTH the march path
+    // and the skip path converge on it). Status is zeroed BEFORE the upkeep
+    // call, so within the tail the upkeep bit tests always see 0 (S4 item 2)
+    // — the tail re-grants plain drive and the burn lands AFTER the refill:
+    // the t361/t362 refill-without-burn seam CLOSED verbatim.
     for (int race : ownersOf()) {
         for (auto& s : ships_) {
             if (s.owner != race) continue;
             s.status = 0;                                   // [ship+0x9c] := 0
             s.power = powerRefill(s.powerMax, turn_ - s.etaDay);
+            refreshUseCounts(s);                            // 0x4a772 loop
             if (s.kind == OrderKind::Placement) laneMarch(s, rep);
+            upkeep(s);                                      // 0x4a95b
         }
     }
 
@@ -400,14 +627,16 @@ BoundaryReport ShipSim::advanceBoundary() {
         bool anyWork = false;
         for (int race : owners) {
             // Resolver step 1 verbatim (T4: FUN_0003ea08 @0x412cf ->
-            // FUN_0004a658): MOVES re-grant +0x94 := drive stat +0x10 — PER
-            // SWEEP (the call sits inside the executor prologue, which the
-            // driver re-invokes every sweep). (FUN_0004a658's upkeep burn
-            // +0x88 -= design[+0x36] is t363 gizmo scope — honest seam; the
-            // boundary-state refill-without-burn matches the t101 "POW frozen
-            // at autosave" observation, S22 IDENTITY TIE.)
+            // FUN_0004a658): the FULL upkeep body — MOVES re-grant (+0x94 :=
+            // drive stat +0x10, status-bit gated) PLUS the shield-maintenance
+            // burn (+0x88 -= cost) — PER SWEEP (the call sits inside the
+            // executor prologue, which the driver re-invokes every sweep;
+            // _wip_t363 S1b). t363 closes the bare-re-grant seam: the burn
+            // lands BEFORE this sweep's MIN-POWER pick, so it changes both
+            // the pick ORDER and the drain rate (a burn-to-zero ship fails
+            // the 0x4134e POWER>0 gate for the rest of the boundary).
             for (auto& s : ships_)
-                if (s.owner == race) s.moves = s.driveStat;
+                if (s.owner == race) upkeep(s);
 
             // Stale-act law (0x41a1c..0x41a45): act target != the race's
             // current focus object -> act CLEARED (0x41a30 movb $0x0,[+0x5d]).
@@ -519,6 +748,20 @@ uint64_t ShipSim::digest() const {
         mix(static_cast<uint64_t>(s.dwellTurns));
         mixf(s.laneX);
         mix(static_cast<uint64_t>(s.laneId));
+        // t363 state (contract item 4): shield charges, recalc-owned levels,
+        // the inventory ring (cidx / use low-16 / payload per slot), cap and
+        // the direction flag. The determinism pins stay green — the digest is
+        // a pure function of state either way.
+        mix(static_cast<uint64_t>(s.shields));
+        mix(static_cast<uint64_t>(s.weaponLevel));
+        mix(static_cast<uint64_t>(s.shieldLevel));
+        for (int i = 0; i < kRingSlots; ++i) {
+            mix(s.inv[i].cidx);
+            mix(s.inv[i].use);
+            mix(s.inv[i].payload);
+        }
+        mix(static_cast<uint64_t>(s.invCap));
+        mix(s.laneToB ? 1ull : 0ull);
     }
     mix(lcg_.state);
     mix(static_cast<uint64_t>(turn_));
