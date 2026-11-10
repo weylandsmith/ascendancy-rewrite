@@ -222,17 +222,21 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t363 per queue row t363 below (GIZMO INVENTORY + CARRIER/CARGO),
-VERBATIM. Ordering rationale: t362 LANDED 2026-11-09 (driver repeat law
-verbatim + 7 pins, run_tests 197/0; see LANDED t362 block) and left named
-gaps t363 owns: FUN_0004a658's upkeep burn +0x88 -= design[+0x36] (the
-t361/t362 refill-without-burn seam), the turn-tail slot-refresh loop
-0x4a77c..0x4a7a4 (WORD[slot+1] := design[+0x4e]), and FUN_00049a34's
-colonise leg (kind-2 completion body now PARTLY banked — S61 item 4). Gizmo
-scope is where those three legs live, so t363 must land before t364 stacks
-combat on top. Spec contract stays docs/re/pership-spec.md. shipsim seams
-t363 may NOT silently close: decider re-decide stays caller-side; OQ rows
-user-gated (give the model fields, do not close rows).
+NEXT t363R — RE-LAND THE GIZMO INVENTORY + CARRIER/CARGO CODE per the
+complete implementation contract docs/re/_wip_t363.md S5 (one session,
+~30 probes). VERBATIM contract, do not re-derive: every law this task needs
+is already banked in _wip_t363 S1-S4 (upkeep 0x4a658 byte-level, recalc
+0x49acc byte-level, tail refresh +0x42 CORRECTION, kind-2 completion
+FUN_00049a34/FUN_000499f8 with lane-gate POLARITY fix, file-vs-RAM gizmo
+census, save-side census work/r363_gizmo_census.out). t363's session
+(2026-11-09) banked all evidence and drafted the code, but the run budget
+expired before wiring/pins/build — the draft was REVERTED clean (shipsim.
+{h,cpp} == HEAD; do NOT hunt for a stash, rewrite from S5). Ordering
+rationale unchanged from the t363 row: gizmo scope owns the upkeep burn, the
+tail slot-refresh, and the colonise leg, so t363R lands before t364 stacks
+combat. Spec contract stays docs/re/pership-spec.md. Seams t363R may NOT
+silently close: decider re-decide stays caller-side; OQ rows user-gated
+(give the model fields, do not close rows). Sitting check first as always.
 
 QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
 to the original; NO permanent toggle — per-ship becomes THE engine once the
@@ -262,6 +266,10 @@ t362 MIXED-FLEET DEPARTURE LAW PARITY — LANDED 2026-11-09 (see LANDED t362
 t363 GIZMO INVENTORY + CARRIER/CARGO into shipsim per spec (3)(4); magnetron/
       Phase-Bomb residues get a HOME here (which ship carries what) — do not
       close OQ rows (user-gated), just give the model the fields.
+      — EVIDENCE LANDED 2026-11-09, CODE NOT LANDED (run budget expired;
+      draft reverted clean). All laws + census + the full re-land contract:
+      docs/re/_wip_t363.md S1..S5. See LANDED t363 block. Successor: t363R
+      (the NEXT ACTION above) — keep this row for the audit trail.
 
 t364 PER-SHIP COMBAT ROUND into shipsim per spec (5) + t292 comparator
       unchanged (aggregate victory law stays; per-ship only redistributes
@@ -328,6 +336,47 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t363 — 2026-11-09 (GIZMO INVENTORY EVIDENCE COMPLETE: UPKEEP/
+RECALC/REFRESH/KIND-2-COMPLETION ALL BANKED BYTE-LEVEL + SAVE CENSUS
+5940/5940; CODE RE-LAND DEFERRED TO t363R BY RUN BUDGET — DRAFT REVERTED
+CLEAN; LEDGER 17/2 UNCHANGED, HONEST NEGATIVE)
+- Sitting check NEGATIVE (live-timeline mtime 17:26:31 == t362 baseline; turn
+  1086 standing law; r1_t85g_sitting.py NOT run per the >1086 rule).
+- VERBATIM (docs/re/_wip_t363.md S1/S3/S4, work/r331_disasm.txt line refs
+  in-file): FUN_0004a658 upkeep body (MOVES re-grant IS part of it — bit0
+  zeroes MOVES but the RING SCAN STILL RUNS, S4 item 1 corrects the first-
+  pass reading; payable gate `cmp/jl` skips the slot ENTIRELY — no partial
+  burn, no charges; shield recharge NESTED under affordability);
+  FUN_00049acc recalc byte-level (the lane-step pool constants DERIVE to
+  14.0/28.0 from the MEASURED live pairs (14,0)/(0,28) — closes the S22
+  step-constant residue as a CARRIER law: 1 Star Lane Drive -> +0x08 14,
+  1 Hyperdrive -> +0x0c 28); turn-tail refresh operand IS RAW design[+0x42]
+  (0x7654e-0x7650c; STATE's t362-era "+0x4e" wording was off-by-convention —
+  S1c CORRECTION); FUN_00049a34 kind-2 completion FULLY banked incl.
+  FUN_000499f8 admission (lane byte+0x23 bit 0x2 SET == CLOSED, polarity
+  adjudicated from the raw jne — S4 item 3) and the +0xa2 direction flag.
+- MEASUREMENT (scripts/r363_gizmo_census.py RC=0, work/r363_gizmo_census.out;
+  20 saves / 2140 live rows / 5940 real ring slots): REFRESH LAW 5940/5940
+  (design0 slots all carry word 0; NumUses-1 slots all carry 1; below/above
+  buckets EMPTY); RESIDUE HOME census — Invasion Module 0x49 on 500 slots/
+  260 ships, Colonizer 960/140, Lane Drive 980/500, Hyperdrive 200/100,
+  Magnetron 0x3c and Phase Bomb 0x46 ZERO slots (consistent t326b/t329);
+  slot payload dword 5860==0x0 / 80==0xFFFFFFFF and ALL 80 sit on upkeep-
+  gate rows — the `-1` gate is SELECTIVE in real data; duplicate cidx legal
+  re-confirmed (600 rows).
+- FILE-vs-RAM cross-validation: gizmos.txt parse (work/r363_gizmo_rows.json)
+  reproduces the RAM-measured upkeep-gate census EXACTLY (rows 10..15 only,
+  all cat-1, costs {1,2,0,2,4,3}, levels 1/2/1/3/4/5) — loadGizmos IS the
+  design table for every column the cited laws read. pership-spec G9 bit-
+  polarity correction banked (addend applies when bit 0x2 SET, not clear).
+- CODE: full draft landed mid-session then REVERTED (git checkout, tree
+  clean) when the run budget expired pre-build/pins. The complete rewrite
+  contract (structs, gates, advanceBoundary ordering, digest, fromRecord,
+  8 pins, 6 mutants) is _wip_t363.md S5 — t363R executes it verbatim.
+- LEDGER 17/2 UNCHANGED (honest negative: every census fact corroborates
+  laws already credited t47/t86/t89/t101/t184; no OQ row's named closer was
+  touched; magnetron/Phase-Bomb rows stay user-gated).
 
 ## LANDED t362 — 2026-11-09 (MIXED-FLEET DEPARTURE LAW: THE EXECUTOR DRIVER
 REPEATS — PIECEMEAL DEPARTURE IS VERBATIM LAW, t361's ONE-PICK READING
