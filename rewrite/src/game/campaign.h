@@ -5,6 +5,7 @@
 // (docs/re/combat.md S2d..S2i: deterministic volley, two-layer clamped
 // absorb); aggregate-model caveats in S2i.
 #include <algorithm>
+#include <memory>
 #include <random>
 #include <string>
 #include <vector>
@@ -16,6 +17,11 @@
 #include "game/species.h"
 
 namespace ascend::game {
+
+// t365 ENGINE FLIP: the per-ship fleet engine bridge (combatPhase drives it;
+// docs/re/_wip_t365.md, ruling D2=(b)). Incomplete here on purpose — the
+// shipsim/shipsave headers stay out of the campaign's public surface.
+class CampaignFleetBridge;
 
 // Owner ids: 0 = human player (player.dip), 1..kAiCount = AI races
 // (raceNN.dip in roster order; windows.txt NUMCONTROLS 7 upper bound —
@@ -188,6 +194,13 @@ public:
     int turn() const { return turn_; }
     bool over() const { return victory_ != Victory::None; }
     Victory victory() const { return victory_; }
+    // t365: unique_ptr member (fleetSim_) — out-of-line dtor so the
+    // incomplete CampaignFleetBridge type is only destroyed in campaign.cpp;
+    // the move ctor is DEFAULTED out-of-line (a user-declared dtor deletes
+    // the implicit one, and the test harness returns campaigns by value —
+    // makeCampaign; copy stays deleted, which is correct for campaign state).
+    ~Campaign();
+    Campaign(Campaign&&);
     int starsOwned(int owner) const;
     int starOwner(int starId) const { return owner_[starId]; }
     // t204 pin surface (established harness idiom — planetAt const_cast,
@@ -232,6 +245,11 @@ public:
     int driveHopsFor(int owner) const;  // docs/re/ships.md §3 (launch range)
     int techsOwned(int owner) const;
     double resources(int owner) const;
+
+    // t365 PIN SURFACES (engine flip): the per-ship engine the combat phase
+    // drives, and its engagement census (seed-comparison evidence, ruling
+    // D2 "removed after seeds agree" — test_campaign_fleet_t365).
+    const class CampaignFleetBridge* fleetSim() const;
     // --- read-only inspection (tests + UI; docs/re/abilities.md §5) ---
     SpeciesAbility abilityOf(int owner) const { return ability_[owner]; }
     int chargeFor(int owner) const { return charge_[owner]; }
@@ -402,6 +420,8 @@ public:
     }
     int attackScoreFor(int owner) const { return attackScore(owner); }
     int defenseScoreFor(int owner, int star) const { return defenseScore(owner, star); }
+    // t365: owned-pop operand helper (aggregate oracle input).
+    double ownedPopFor(int owner) const;
     // t89 (OQ-010): aggregate shield-charge analogue, shield absorb of
     // hit-path 0x4b740 (docs/re/combat.md S2d/S2h).
     int shieldChargesFor(int owner) const;
@@ -666,6 +686,10 @@ private:
     std::vector<int> queuedTech;               // per owner, Tech id or -1
     std::vector<double> techProgress;          // per owner
     std::vector<ShipInTransit> fleet_;
+    // t365 ENGINE FLIP: the per-ship engine (combatPhase owns its boundary
+    // steps; docs/re/campaign_fleet_bridge doc header). Lazily constructed;
+    // destructor out-of-line (incomplete type in this header).
+    std::unique_ptr<CampaignFleetBridge> fleetSim_;
     std::vector<DipPolicyState> dipState_;     // per AI owner
     // War table (symmetric bits, owner x owner) + capture fortify counter
     // per star. Model + constants: docs/re/turnloop.md §5 [inferred].

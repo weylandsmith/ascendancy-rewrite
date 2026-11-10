@@ -222,12 +222,21 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t365 — ENGINE FLIP (queue row VERBATIM): campaign turn loop calls
-shipsim; aggregate code demoted to rewrite/src/game/aggregate_oracle.{h,cpp}
-used ONLY by tests; full pinned-seed suite green; gate green; DECISIONS.md D2
-annotated APPLIED; OQ-019 residue status updated in OPEN-QUESTIONS (row
-itself closes only on user ruling per t329 packet — annotate 'model exists,
-awaiting user acceptance').
+NEXT t366 — SAVE-WRITE SIDE (queue row VERBATIM): emit ship records back
+into RESUME.GAM layout; byte-compare vs vendor-written save if one can be
+produced headlessly, else round-trip-through-rewrite tests + honest note.
+Ordering rationale: the queue names t366 CONDITIONAL "only if t365 green" —
+t365 LANDED 2026-11-10 GREEN (suite 223/0, gate 0, seeds 1/2024/23
+byte-identical pre/post flip; docs/re/engine-flip-t365.md), so the condition
+is met and t366 is next VERBATIM. Evidence base: the t360 read-side parser
+(shipsim record fields + test_shipsim_t360 golden vectors) is the mirror to
+write against; the t365 bridge's reset-per-engagement
+(campaign_fleet_bridge.cpp, docs/re/_wip_t365b.md fix 5) means engagement-
+transient fields (stance/gate/activeSlot) are NOT durable save state — the
+writer persists identity/owner/kind/position/integrity/inventory, and the
+honest note must say which fields round-trip and which the vendor leaves
+undefined for in-combat ships. If no vendor-written save with ship records
+exists headlessly, say so plainly in the note (no fabricated byte-compare).
 Ordering rationale: t364 landed 2026-11-10 the LAST per-ship capability the
 queue named (combat round, pins 218/0, MUTATION 6/6 CAUGHT — combat.md S3l +
 docs/re/_wip_t364.md); the sim now covers records, orders, gizmos, upkeep,
@@ -284,12 +293,9 @@ t364 PER-SHIP COMBAT ROUND — LANDED 2026-11-10 (see LANDED t364 block;
       mutation 6/6 CAUGHT; _wip_t364.md C1..C9; combat.md S3l + two in-place
       corrections (S2g dispatch key/stance map, S2k C7 polarity)). Keep row.
 
-t365 ENGINE FLIP: campaign turn loop calls shipsim; aggregate code demoted to
-      rewrite/src/game/aggregate_oracle.{h,cpp} used ONLY by tests; full
-      pinned-seed suite green; gate green; DECISIONS.md D2 annotated APPLIED;
-      OQ-019 residue status updated in OPEN-QUESTIONS (row itself closes only
-      on user ruling per t329 packet — annotate 'model exists, awaiting
-      user acceptance').
+t365 ENGINE FLIP — LANDED 2026-11-10 (see LANDED t365 block;
+      docs/re/engine-flip-t365.md; aggregate demotion DONE, removal
+      post-user-acceptance per D2/N10).
 
 t366 (CONDITIONAL, only if t365 green) SAVE-WRITE SIDE: emit ship records back
       into RESUME.GAM layout; byte-compare vs vendor-written save if one can
@@ -345,6 +351,35 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t365 — 2026-11-10 (ENGINE FLIP: THE PER-SHIP ENGINE IS THE COMBAT
+ENGINE; aggregate demoted to oracle; SEEDS AGREE — D2=(b) acceptance condition
+MET). campaign_fleet_bridge.{h,cpp} (new): CampaignFleetBridge owns a ShipSim;
+combatPhase() calls advanceBoundary() once/turn + resolveEngagement() per
+border engagement; capture verdict = garrison death (cited C4). Surrogate
+ledger S1..S12 in the bridge header (garrison-as-ship, synthetic pop-reserve
+row at design idx 76+owner, power-gate-only sapping, chase-leg decision (a)
+targetPos:=victim pos, isolated LCG = zero campaign rng draws).
+aggregate_oracle.{h,cpp} (new): old volley/defense/absorb math moved VERBATIM;
+Campaign::attackScore/defenseScore kept as delegating PIN SURFACES (production
+combatPhase no longer calls them — grep-verified). test_campaign_fleet_t365
+x5: P1 flip-live+determinism, P2 exact per-engagement oracle equivalence +
+the named S3 sapping divergence both directions, P3 chase targetPos/stance,
+P4 seed determinism, P5 80/80 census agreement. SUITE 223/0; GATE_EXIT=0;
+seeds 1/2024/23 headless-1600 logs byte-IDENTICAL pre/post flip (Extinct
+t266 / Extinct t285 / Control t1406 unchanged). DECISIONS.md D2 annotated
+APPLIED; OQ-019 annotated "model exists, awaiting user acceptance" (row stays
+open, user-gated per t329). FIVE first-run bugs fixed + banked
+(docs/re/engine-flip-t365.md + _wip_t365b.md): dangling Ship* across
+addShip-realloc; unaffordable shield upkeep (+1 top-up); missing first-pass
+refreshUseCounts; invCap window must grow with fill (setSlot admits idx==cap);
+STALE STATE ACROSS RECORD REBIRTH (cap=0/filled=1 -> shots=0 -> zero
+captures -> seed-1 Extinct vanished) fixed by RESET-PER-ENGAGEMENT, matching
+the aggregate's statelessness. LAW NOTES: loadGizmos never sets Gizmo::shield
+(charge law = SUM cat-1 Level gated); InvSlot payload default 0 fails the
+upkeep -1 test (0x4a6f9) -> synced slots get 0xffffffff (ledger S12);
+run_tests' failure count counts CHECKs not tests. NEXT=t366 (its
+"only if t365 green" condition is met).
 
 ## LANDED t364 — 2026-11-10 (PER-SHIP COMBAT ROUND INTO SHIPSIM: verbatim
 windows 0x4a55c/0x4a360/0x4b8e4/0x4b740/0x42c60-region re-read FRESH with cap-

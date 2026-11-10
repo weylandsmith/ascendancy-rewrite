@@ -162,6 +162,12 @@ USER:   original is the goal. Per the assistant's note accepted: NO permanent
 USER:   config toggle; per-ship becomes THE engine once it passes the
 USER:   pinned-seed suite; aggregate demotes to a test oracle during the
 USER:   transition, removed after seeds agree.
+D2 STATUS t365 (2026-11-10): APPLIED. The flip landed — combatPhase resolves
+per-ship via campaign_fleet_bridge (ShipSim), the aggregate lives only in
+game/aggregate_oracle.{h,cpp} behind pin surfaces, suite 223/0, seeds
+1/2024/23 byte-identical pre/post flip (docs/re/engine-flip-t365.md). The
+"removed after seeds agree" clause is now UNBLOCKED but deferred (t366+ /
+user acceptance of the OQ-019 model, t329 packet).
 USER: D1 = ruling page live (work/r1/d1page); D1 answer to follow via page submit.
 USER: D3 = DEFERRED by user until D1/D2 work has landed.
 

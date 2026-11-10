@@ -5,7 +5,15 @@
 #include <cstdio>
 #include <limits>
 
+#include "game/aggregate_oracle.h"
+#include "game/campaign_fleet_bridge.h"
+
 namespace ascend::game {
+
+// t365 PIN SURFACE (engine flip).
+const class CampaignFleetBridge* Campaign::fleetSim() const {
+    return fleetSim_.get();
+}
 namespace {
 
 // Build order policy [documented default, turnloop.md §4]: factories (IND),
@@ -1913,50 +1921,37 @@ void Campaign::abilityPhase() {
     }
 }
 
+// Incomplete-type plumbing (t365): defined where CampaignFleetBridge is.
+Campaign::~Campaign() = default;
+Campaign::Campaign(Campaign&&) = default;
+
 int Campaign::attackScore(int owner) const {
-    // UPGRADED t89 (OQ-010) to the cited original law. The original's volley
-    // loop (0x4a5c1..0x4a5fc, docs/re/combat.md S2g, S2h-audited) fires
-    // EVERY cat-0 weapon in the ship's gizmo slots in STORED order per
-    // engagement, and each in-range hit applies design[+0x52] (= the file
-    // Level column, column map CLOSED 76/76 t87, scripts/r1_t87_gizmo_table.py)
-    // with NO hit roll (measured-negative, S2g "HIT PROBABILITY"). So the
-    // aggregate volley damage of an empire's researched weapon set is the
-    // SUM of researched weapon Levels, replacing v1's MAX (turnloop.md §5
-    // [inferred]). Empires field whatever they can build, so the per-empire
-    // scale still rides total owned pop /10 (reserves model, unchanged).
+    // t365 DEMOTION (ruling D2=(b)): the body moved VERBATIM to
+    // game/aggregate_oracle.cpp (aggregateVolley + weaponLevelSum); this is
+    // the pinned-test surface (test_campaign campaign_combat_law_oq010 reads
+    // the volley delta / sum pins through attackScoreFor). PRODUCTION no
+    // longer calls it — combatPhase resolves per-ship since t365.
+    return aggregateVolley(ownedPopFor(owner),
+                           weaponLevelSum(*gizmos_,
+                                          static_cast<int>(tree_->all().size()),
+                                          ownedTech[owner]),
+                           fleetDamage_[owner]);
+}
+
+double Campaign::ownedPopFor(int owner) const {
     double pop = 0;
     for (size_t s = 0; s < galaxy_.stars.size(); ++s)
         if (owner_[s] == owner) pop += planets_[s].pop;
-    int volley = 0;
-    if (gizmos_) {
-        for (const Gizmo& g : *gizmos_) {
-            if (g.cat != GizmoCat::Weapon) continue;
-            bool ok = requiresAvailable(g.resReq, static_cast<int>(tree_->all().size()),
-                                        ownedTech[owner]);
-            // NumUses gate [verified gizmos.txt header + dispatcher 0x4a373..
-            // 0x4a390 S2g]: a 0-use row engages nothing (every shipped cat-0
-            // row has NumUses >= 1 — {1,1,1,1,5,1,2,2,2,3} — so this arm
-            // never fires on shipped data, it refuses a 0-use row).
-            if (ok && g.numUses != 0) volley += g.level;
-        }
-    }
-    // SA_SapAlienPower / SA_HealShips semantics: fleetDamage_ IS the sapped
-    // "power" (abilities.md §2) — subtracted from fleet strength until
-    // repaired. Floor at 0 keeps a sapped empire able to defend its homes.
-    return std::max(0, static_cast<int>(pop / 10.0) + volley - fleetDamage_[owner]);
+    return pop;
 }
 
 int Campaign::defenseScore(int owner, int star) const {
-    // UPGRADED t89 (OQ-010) to the cited TWO-LAYER model. The original's hit
-    // path 0x4b740 (whole body disassembled, S2h-audited) never folds shields
-    // into a single defense total: shield absorb = MIN(damage, [t+0x90]) with
-    // the overflow SPILLING to hull [t+0x8c], both clamped, death at hull < 1
-    // (0x4b7c4..0x4b8a6). So defenseScore is the HULL layer only — local-pop
-    // reserves model — and the shield absorb is applied as a clamped split at
-    // the engagement site (combatPhase). Fortify +2 is the rewrite's own
-    // capture-protection term [documented default, unchanged].
-    double pop = planets_[star].pop;
-    return static_cast<int>(pop / 10.0) + 2;
+    // t365 DEMOTION: body moved VERBATIM to game/aggregate_oracle.cpp
+    // (aggregateHullDefense); pinned-test surface only — since t365 the
+    // per-ship garrison hull (bridge S1) IS seeded from this formula and the
+    // capture verdict is the sim's death check.
+    (void)owner;  // the hull layer never folded owner state in (t89)
+    return aggregateHullDefense(planets_[star].pop);
 }
 
 int Campaign::shieldChargesFor(int owner) const {
@@ -1990,6 +1985,18 @@ void Campaign::setWar(int a, int b, bool on) {
 }
 
 void Campaign::combatPhase() {
+    // t365 ENGINE FLIP (ruling D2=(b), docs/re/_wip_t365.md): the per-ship
+    // engine IS the combat engine. One boundary step of the cited turn frame
+    // (status zero, t101 refill, slot refresh, march, upkeep — shipsim.cpp
+    // advanceBoundary verbatim), then every border engagement below runs as
+    // a per-ship resolution (CampaignFleetBridge::resolveEngagement). The
+    // aggregate score code lives in game/aggregate_oracle.{h,cpp} and is
+    // consumed by the pinned tests only; the bridge's census is the seed-
+    // comparison evidence (P2/P5, rewrite/tests/test_campaign_fleet_t365).
+    if (!fleetSim_) fleetSim_ = std::make_unique<CampaignFleetBridge>(cfg_.seed);
+    fleetSim_->setTurn(turn_);
+    fleetSim_->advanceBoundary();
+    const int techCount = static_cast<int>(tree_->all().size());
     // Fortify protects CAPTURED stars (a captured star cannot be attacked for
     // 2 turns — prevents instant ping-pong; a first cut checked the ATTACKER
     // star instead and produced 5k oscillating captures with a frozen front,
@@ -2041,31 +2048,39 @@ void Campaign::combatPhase() {
             if (fortify_[nb] > 0) continue;
             if (invadesAlwaysSucceeds(a) && (superUsed[a] || ind_[a] < shipCostC))
                 continue;
-            // DETERMINISTIC COMBAT LAW (t89, OQ-010): the original has NO hit
-            // roll — full-body reads of the gun handler 0x4b8e4 + hit path
-            // 0x4b740 contain no rng call and no random-compare, and zero
-            // rel32 rng edges exist in the whole combat module family
-            // [0x4a360,0x4f097) (docs/re/combat.md S2g "HIT PROBABILITY:
-            // MEASURED NEGATIVE", S2h-audited). v1's uniform(0,10) draws here
-            // were an UNCITED abstraction; removing them re-diverts campaign
-            // rng_ ON PURPOSE (the combat-phase draws were never cited — the
-            // remaining rng_ consumers incomeAndGrow/buildPhase keep their
-            // sequences). RNG discipline still holds downstream: no feature
-            // may ADD or SKIP draws around the remaining streams.
-            //
-            // TWO-LAYER CLAMPED ABSORB (0x4b7c4..0x4b8a6, S2h): the defender's
-            // shield charges absorb the volley FIRST, clamped at the volley
-            // (min law at 0x4b7c4), and only the SPILL reaches the hull layer.
-            // Aggregate mapping (S2i: no per-ship inventory exists):
-            //   volley  = attackScore(a)          (every researched cat-0 gun)
-            //   absorb  = MIN(volley, shield charges of b)
-            //   hullHit = volley - absorb  vs  defenseScore(b, nb) (hull/pop)
-            // (SA_ShieldPlanets is the guard above — it skips the engagement,
-            // the aggregate stand-in for the +0x9c 0x10 null-shield bit.)
-            int volley = attackScore(a);
-            if (doublePower_[a]) volley *= 2;          // SA_DoublePower (L1917)
-            int absorb = 0, hullHit = 0;
-            absorbSplit(volley, shieldChargesFor(b), absorb, hullHit);
+            // t365 ENGINE FLIP: the engagement resolves in the PER-SHIP
+            // engine (bridge doc header carries the surrogate ledger; cited
+            // law executes inside ShipSim). DETERMINISTIC COMBAT LAW is
+            // preserved: the original has NO hit roll (combat.md S2g
+            // measured-negative) and the sim draws from its OWN isolated LCG
+            // (S9) — zero campaign rng_ draws added or skipped here.
+            // Pop operands are recomputed PER ENGAGEMENT exactly as the
+            // pre-t362 attackScore/defenseScore calls did (owner_ mutates
+            // mid-loop on captures — snapshotting would be a delta).
+            double popA = 0;
+            for (size_t q = 0; q < galaxy_.stars.size(); ++q)
+                if (owner_[q] == a) popA += planets_[q].pop;
+            auto out = fleetSim_->resolveEngagement(
+                a, b, static_cast<int>(nb), popA, planets_[nb].pop,
+                fleetDamage_[a], doublePower_[a] != 0, *gizmos_, techCount,
+                ownedTech[a], ownedTech[b]);
+            // DETERMINISTIC COMBAT LAW (t89, OQ-010) — preserved through the
+            // flip: the original has NO hit roll (combat.md S2g measured-
+            // negative; zero rng edges in [0x4a360,0x4f097)), and the sim's
+            // absorb is the cited TWO-LAYER CLAMPED SPLIT run PER SHOT
+            // (0x4b7c4..0x4b8a6 sequential, telescoping to the aggregate
+            // min/split for one garrison target — bridge P2 pin). The CAPTURE
+            // VERDICT is the sim's: garrison hull < 1 (death finalizer C4).
+            // S1 seeds that hull at defenseScore+1, so for fleetDamage == 0
+            // the verdict EQUALS the pre-t362 comparison hullHit >
+            // defenseScore engagement-for-engagement (P5 census census-
+            // measured over seed 2024); the ONLY divergence class is a
+            // partially-sapped attacker firing FULL row damage (bridge S3,
+            // census-flagged, help.txt L2012 semantics). SA_ShieldPlanets is
+            // the guard above — it skips the engagement (aggregate stand-in
+            // for the +0x9c 0x10 null-shield bit; the sim's garrison carries
+            // the cited per-ship shield layer, bridge S8).
+            fleetSim_->recordDecider(out.captured, invadesAlwaysSucceeds(a));
             // t204 DIPLOMACY-ON-ATTACK — FUN_00043a4c AT ITS CITED CALL SITE
             // 0x4b875: the hostility cost lands BEFORE the shield/hull
             // subtraction (0x4b87a/0x4b888) — the price of FIRING, not of
@@ -2099,7 +2114,7 @@ void Campaign::combatPhase() {
             if (invadesAlwaysSucceeds(a)) {            // SA_SuperMarines (L1723 always succeed)
                 ind_[a] -= shipCostC;                  // the invasion ships
                 superUsed[a] = 1;
-            } else if (hullHit <= defenseScore(b, nb)) {
+            } else if (!out.captured) {                // t365: per-ship verdict (C4)
                 continue;
             }
             // t207 GUARANTEE-WAR CLAMP (FUN_0003a174 post-handler site

@@ -303,6 +303,12 @@ S62) — the magnetron/Phase-Bomb residue HOME is the ring field + carriesCode
 accessor (zero-carried in the corpus; C5 chooser NOT modelled, per spec N4/N2).
 Row STAYS OPEN (strict-close, user-gated): no named residue closer was touched;
 the sugar-cube-clamp and destination-widget residues are unchanged.
+t365 NOTE (2026-11-10): MODEL EXISTS, AWAITING USER ACCEPTANCE — the engine
+flip landed: Campaign::combatPhase() resolves every engagement in the per-ship
+engine (campaign_fleet_bridge.{h,cpp} driving ShipSim; aggregate demoted to
+game/aggregate_oracle.{h,cpp}, test-only), pinned-seed suite green (223/0) and
+seeds 1/2024/23 byte-identical pre/post (docs/re/engine-flip-t365.md). Closure
+remains the user's call per the t329 packet.
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +

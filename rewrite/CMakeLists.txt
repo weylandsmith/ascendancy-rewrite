@@ -46,6 +46,8 @@ add_library(ascend_core STATIC
   src/game/species.cpp
   src/game/campaign.cpp
   src/game/shipsim.cpp
+  src/game/campaign_fleet_bridge.cpp
+  src/game/aggregate_oracle.cpp
 )
 # shipsave.cpp inflates savestate ZIPs; PUBLIC so consumers (run_tests) link it.
 target_link_libraries(ascend_core PUBLIC ZLIB::ZLIB)
@@ -79,6 +81,7 @@ add_executable(run_tests
   tests/test_diplomacy.cpp
   tests/test_species.cpp
   tests/test_campaign.cpp
+  tests/test_campaign_fleet_t365.cpp
   tests/test_diponattack_t204.cpp
   tests/test_invasion_war_t207.cpp
   tests/test_emergency_t201.cpp
