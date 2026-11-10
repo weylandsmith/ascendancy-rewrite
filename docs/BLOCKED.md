@@ -217,8 +217,14 @@ times.
   ALIVE (pid 1555 etime 1-06:50, TL expiry 2026-11-11 01:07:10) but WATCHER
   STAYS DOWN — relaunch deliberately NOT done (F6: not the task; two-writer
   law; harness/user call). Ledger 17/2 unchanged, strict-close honest negative.
-  NEXT = t369 same sentinel with the RING-FIRST sitting law;
-  work/r1/sentinel_t369.sh pre-staged (baselines unchanged).
+  NEXT = same sentinel (RING-FIRST), TAG FIXED: 'NEXT WAIT-USER-RULING t369 —'
+  (field 2 must match WAIT* — see WIP F8: written 'NEXT t368 —', the scheduler's
+  field-2 tag read as a QUEUE TASK and TRIGGER C armed this very session,
+  loop.log:289885 'queue drain (t366 -> t368)' — the t243 self-arm class reborn
+  via 'rewrite verbatim' keeping words but incrementing the number; validated
+  with the scheduler's exact awk => never arms; wake routes dirty/LOOPSTEER/
+  FORCE_RUN/IDLE_GATE=1 are tag-independent, none lost). work/r1/
+  sentinel_t369.sh pre-staged (copy, baselines unchanged).
 ## R1 runbook (mandatory safety invariants — a run without them is a bug)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base B; NEVER hard-code
 B; member = physical + H, H=136 for dfsg 2025.02.01, re-derive per build — the

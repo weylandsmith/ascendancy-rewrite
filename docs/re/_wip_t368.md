@@ -109,6 +109,49 @@ iteration, so **no row moves**. OQ-016 and OQ-019 stay OPEN (both close on USER
 ruling only — t323/t329/t332 disposition). Honest negative recorded rather than
 a plausible-default close. Ledger stays 17/2.
 
+## F8 — THE LOOP WAS ARMING ITS OWN SENTINEL (harness bug, found and fixed)
+
+`work/r1/loop/loop.log:289885`:
+`[2026-11-10 07:10:00] WAKE: TRIGGER C queue drain (t366 -> t368) — bypassing
+idle gate` — i.e. **this session (iteration 302) was launched by trigger C**,
+the offline-queue-drain wake, because the parked sentinel was written
+`NEXT t368 — WAIT-TRIGGER SENTINEL` and `loop_one_task.sh:103-111` extracts
+FIELD 2 of the task line as the task tag:
+
+    task=$(echo "$next" | awk 'NF{print $2; exit}' | tr -d ':')
+    case "$task" in WAIT*|IDLE*|PARK*|steer) : ;;
+      *) [ -n "$last_ok_tag" ] && [ "$task" != "$last_ok_tag" ] && queue_wake=1 ;;
+
+`t368` is not WAIT*/IDLE*/PARK*, so a sentinel reads as a QUEUE TASK, and since
+each park renumbers it, the tag always differs from `last_task` => self-arm,
+forever. This is exactly the class the harness itself documents (t243: trigger C
+self-armed TWENTY-NINE times, t214..t242) — it came back through the prose
+"rewrite NEXT to the SAME sentinel verbatim", which preserves the WORDS but
+increments the NUMBER. Under the running config (`IDLE_GATE=0`,
+`QUEUE_CHAIN_MAX=8`) each relaunch burns up to 8 full model sessions polling a
+sentinel that can never fire; the chain cap is the only thing stopping it, and
+it counts only per-launch (chain_count was 0 at session start, so this session
+was wake #1 of a fresh chain).
+
+FIX (this commit): the task line's field 2 is now `WAIT-USER-RULING` (the tNNN
+moves to field 3 for the human reader), and the STANDING LAWS carry the rule so
+later sessions don't reintroduce it. Validated with the scheduler's EXACT
+extraction, not by reading:
+
+    task=[WAIT-USER-RULING] -> VERDICT: sentinel — trigger C will NEVER arm
+
+Wake routes audited before changing it (all tag-independent, so nothing is
+lost): dirty tree => adoption launch (`:88,149`); `LOOPSTEER.txt` / `FORCE_RUN`
+=> steer_wake (`:90-91`, `:147`); `IDLE_GATE=1` => the probe polls without
+launching (`:149-160`). Only consequence under the CURRENT `IDLE_GATE=0` run:
+the next gate pass logs `nothing runnable (NEXT tag 'WAIT-USER-RULING' ...) —
+batch complete, exiting` and the scheduler EXITS. That is the t248 design
+behaviour and the correct outcome — idling is the harness's problem (t178), not
+a reason to spend model budget. Restarting the loop is the user's call:
+`bash scripts/loop_one_task.sh` (it re-reads the on-disk control plane; nothing
+needs reconstructing). Only `loop_one_task.sh` parses field 2
+(`r1_idle_probe.py` does not), so the change is confined to the scheduler.
+
 ## F6 — Watcher relaunch: deliberately NOT done
 
 Restarting `r1_playcap_watch.py` on the production capture dir would restore

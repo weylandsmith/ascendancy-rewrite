@@ -222,9 +222,10 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t369 — WAIT-TRIGGER SENTINEL (task line FIRST; proven t349-t356 script
-pattern; t368 AMENDMENT: the sitting branch is now RING-FIRST — the timeline
-feed is DEAD). All queue rows t359-t366 are LANDED; the per-ship model's I/O
+NEXT WAIT-USER-RULING t369 — SENTINEL, NOT A QUEUE TASK, DO NOT RENUMBER THE
+TAG (task line FIRST; proven t349-t356 script pattern; t368 AMENDMENTS: (i) the
+sitting branch is now RING-FIRST — the timeline feed is DEAD; (ii) field 2 MUST
+keep matching WAIT*/IDLE*/PARK* — see the sentinel-tag law in STANDING LAWS). All queue rows t359-t366 are LANDED; the per-ship model's I/O
 surface is complete (t366); the ONLY remaining ledger movement is USER
 adjudication (OQ-016 residues, OQ-019 closure per the t329 packet, D3
 deferred). Branches, in order:
@@ -359,7 +360,17 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - Gate ~2-3 min; milestone 6 stays; work/ gitignored (git add -f is the ONLY
   exception, artifacts/ task t343).
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
-  line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
+  line FIRST; relaunch law MAX_ITERS=20 IDLE_GATE=0).
+- SENTINEL-TAG LAW (t368, measured): loop_one_task.sh trigger C extracts field 2
+  of the task line and arms whenever it is NOT WAIT*/IDLE*/PARK*/steer and differs
+  from work/r1/loop/last_task. A sentinel written as 'NEXT t369 —' therefore
+  reads as a QUEUE TASK: every park renumbers it and self-arms (loop.log 289885
+  'WAKE: TRIGGER C queue drain (t366 -> t368)' armed the t368 session itself;
+  the same class burned t214..t242 = 29 sessions). Law: parked sentinel task
+  lines begin 'NEXT WAIT-<...> tNNN —' and the tag is NEVER renumbered (keep the
+  tNNN in field 3 for the human reader). Human steering is tag-independent
+  (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
+  launching, so a WAIT tag costs nothing and loses no wake route.
 
 
 ## LANDED t368 — 2026-11-10 (EIGHTH PARK: NO TRIGGER — PLUS THE DISCOVERY THAT
@@ -409,8 +420,20 @@ Branches, cited (full working detail docs/re/_wip_t368.md F1..F7):
 - Ledger UNCHANGED 17/2 (OQ-016, OQ-019 — user-gated): zero measurement of any
   open-row constant this iteration, so nothing closable under strict-close;
   honest negative recorded. GATE_EXIT=0; ledger audit OK; game/ untouched.
-- NEXT = t369 same sentinel with the RING-FIRST sitting law; work/r1/
-  sentinel_t369.sh pre-staged (copy, baselines unchanged).
+- SECOND FIX (F8, harness): the sentinel itself was the wake. Written
+  `NEXT t368 —`, its field-2 tag `t368` is not WAIT*/IDLE*/PARK*, so trigger C
+  (`loop_one_task.sh:103-111`) read it as a queue task and armed THIS session
+  (`loop.log:289885`, `queue drain (t366 -> t368)`) — the documented t243
+  self-arm class returning through the instruction 'rewrite NEXT to the SAME
+  sentinel verbatim' (words kept, number incremented). Field 2 is now
+  `WAIT-USER-RULING` with tNNN in field 3; STANDING LAWS carry the rule.
+  Validated by the scheduler's exact extraction (=> never arms), and the wake
+  routes were audited first (dirty tree / LOOPSTEER.txt / FORCE_RUN / IDLE_GATE=1
+  are all tag-independent, so no wake is lost). Under the live IDLE_GATE=0 run
+  the scheduler will now log 'batch complete' and EXIT — correct t248 behaviour;
+  relaunch (`bash scripts/loop_one_task.sh`) is the user's call.
+- NEXT = same sentinel, RING-FIRST sitting law, tag WAIT-USER-RULING;
+  work/r1/sentinel_t369.sh pre-staged (copy, baselines unchanged).
 
 ## LANDED t366 — 2026-11-10 (SAVE WRITE-SIDE SHIPPED: WRITE-BACK BYTE-IDENTICAL
 ON 20/20 RING SAVES; VENDOR-EMITTED SAVE HEADLESS-UNREACHABLE = HONEST
