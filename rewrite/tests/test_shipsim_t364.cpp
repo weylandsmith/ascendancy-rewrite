@@ -68,10 +68,13 @@ TEST(shipsim_stance_map_t364) {
     as::Ship* pa = sim.findShip(1);
     // Handler-1/2 returns are NOT banked (C8) — the sim only claims the GUN
     // handler's bit0; non-gun stances are checked on STATE, not the return.
-    sim.setStance(1, 0, 2); CHECK(pa->orderType == 2);
+    // ORDER MATTERS: each step starts from a DIFFERENT handler value than
+    // the arg-under-test writes, so a wrong-map mutant cannot hide behind
+    // the previous stance (t364 M1 triage).
     sim.setStance(1, 1, 2); CHECK(pa->orderType == 1);
-    sim.setStance(1, 2, 2); CHECK(pa->orderType == 1);
-    CHECK(sim.setStance(1, 3, 2)); CHECK(pa->orderType == 0);  // gun: engage bit0
+    sim.setStance(1, 0, 2); CHECK(pa->orderType == 2);   // arg0 -> 2
+    sim.setStance(1, 2, 2); CHECK(pa->orderType == 1);   // arg2 -> 1 (NOT 0)
+    CHECK(sim.setStance(1, 3, 2)); CHECK(pa->orderType == 0);  // arg3 -> 0
     CHECK(!sim.setStance(1, 9, 2));               // vendor asserts; sim refuses
     CHECK(pa->dispatcherGate == 1);               // [+0x62] set by every accept
     CHECK(pa->fireTarget == 2);
@@ -111,7 +114,11 @@ TEST(shipsim_mode0_probe_no_state_t364) {
     auto a = mkCombatShip(1, 0, 7, 0);
     auto b = mkCombatShip(2, 1, 7, 32 * 20);
     b.shields = 4;
-    a.inv[0].cidx = 10; a.inv[0].use = 1;         // numUses 1: DEC would show
+    std::vector<as::SimDesign> t = mkCombatDesigns();
+    t[10].numUses = 1;                            // FINITE ammo: a mode-0 DEC
+                                                  // becomes observable (M5)
+    sim.setDesigns(t);
+    a.inv[0].cidx = 10; a.inv[0].use = 1;
     sim.addShip(a); sim.addShip(b);
     as::Ship* pa = sim.findShip(1);
     pa->orderType = 0; pa->dispatcherGate = 1; pa->fireTarget = 2; pa->activeSlot = 0;
