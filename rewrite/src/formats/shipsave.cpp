@@ -184,6 +184,92 @@ bool ShipSave::findImageBase(const std::vector<uint8_t>& mem,
     return false;
 }
 
+namespace {
+
+void wr16(uint8_t* p, uint16_t v) { p[0] = uint8_t(v); p[1] = uint8_t(v >> 8); }
+void wr32(uint8_t* p, uint32_t v) {
+    p[0] = uint8_t(v); p[1] = uint8_t(v >> 8); p[2] = uint8_t(v >> 16);
+    p[3] = uint8_t(v >> 24);
+}
+void wrf(uint8_t* p, float f) {
+    uint32_t u;
+    std::memcpy(&u, &f, 4);
+    wr32(p, u);
+}
+
+}  // namespace
+
+void ShipSave::serializeRecord(const Record& rec, uint8_t* r) {
+    // CITED-ONLY PATCH LAW (_wip_t366 S3, header): store EXACTLY the parser's
+    // field set; unmodelled stride gaps keep their existing bytes. The dead
+    // marker is NOT special-cased — a dead Record carries the vendor
+    // (kind,cap,filled)==(0,5,0) shape verbatim (S59 L2) and round-trips like
+    // any row.
+    wr32(r + 0x00, rec.weaponLevel);
+    wr32(r + 0x04, rec.shieldLevel);
+    wr32(r + 0x08, rec.laneStepX);
+    wr32(r + 0x0c, rec.laneStepZ);
+    wr32(r + 0x10, rec.driveTotal);
+    wr32(r + 0x14, rec.hullBaseDrive);
+    wr32(r + 0x18, rec.powerMax);
+    wr32(r + 0x1c, rec.cat2PowerCarry);
+    wr32(r + 0x20, rec.scannerTotal);
+    wr32(r + 0x24, rec.specialCount);
+    wr32(r + 0x28, rec.targetSlot);
+    r[0x31] = rec.playerDesign;
+    wr32(r + 0x54, rec.ownerHandle);
+    r[0x56] = rec.ownerRace;
+    r[0x58] = rec.orderKind;
+    wr32(r + 0x59, rec.orderTarget);
+    r[0x5d] = rec.actEnum;
+    wr32(r + 0x5e, rec.actTarget);
+    r[0x62] = rec.resolverFlag;
+    wr32(r + 0x63, rec.gizmoSlotPtr);
+    r[0x67] = rec.orderType;
+    wr32(r + 0x68, rec.orderPayload);
+    for (int i = 0; i < 3; ++i) wrf(r + 0x6c + 4 * i, rec.absTriple[i]);
+    wr32(r + 0x88, rec.power);
+    wr32(r + 0x8c, rec.integrity);
+    wr32(r + 0x90, rec.shields);
+    wr32(r + 0x94, rec.moves);
+    wr32(r + 0x98, rec.maxIntegrity);
+    wr16(r + 0x9c, rec.statusFlags);
+    for (int i = 0; i < 3; ++i) wrf(r + 0x9e + 4 * i, rec.pos[i]);
+    r[0xaa] = rec.hullKind;
+    for (uint32_t i = 0; i < kRingSlots && i < rec.ringCidx.size(); ++i)
+        r[0xab + 7 * i] = rec.ringCidx[i];
+    wr32(r + 0x15a, rec.invCap);
+    wr32(r + 0x15e, rec.filled);
+}
+
+bool ShipSave::writeShipRecords(std::vector<uint8_t>* mem, size_t base,
+                                const std::vector<Record>& recs,
+                                std::string* err) {
+    size_t arr = base + kDataSeg + kShipArrayX;
+    if (arr + size_t(kArraySlots) * kRecordStride > mem->size()) {
+        if (err) *err = "ship window past end of Memory member";
+        return false;
+    }
+    if (recs.size() != kArraySlots) {
+        if (err) *err = "expected exactly kArraySlots records, got " +
+                        std::to_string(recs.size());
+        return false;
+    }
+    for (uint32_t k = 0; k < kArraySlots; ++k)
+        serializeRecord(recs[k], mem->data() + arr + size_t(k) * kRecordStride);
+    return true;
+}
+
+void ShipSave::rebaseRecord(Record* rec, uint32_t delta) {
+    if (delta == 0) return;  // same-run write-back is a no-op
+    // t298 POINTER-VALUE LAW: these three stored u32s are guest-PHYSICAL
+    // addresses; a run whose image base moved by `delta` shifts them by the
+    // SAME delta. Every other field is a value, not an address.
+    rec->orderTarget += delta;
+    rec->gizmoSlotPtr += delta;
+    rec->orderPayload += delta;
+}
+
 uint32_t ShipSave::countWord(const std::vector<uint8_t>& mem, size_t base) {
     return rd32(&mem[base + kDataSeg + kCountX]) >> 16;
 }

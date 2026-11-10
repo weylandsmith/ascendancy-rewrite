@@ -101,6 +101,7 @@ add_executable(run_tests
   tests/test_fnt.cpp
   tests/test_shp.cpp
   tests/test_shipsave_t360.cpp
+  tests/test_shipsave_t366.cpp
   tests/test_shipsim_t361.cpp
   tests/test_shipsim_t362.cpp
   tests/test_shipsim_t363.cpp

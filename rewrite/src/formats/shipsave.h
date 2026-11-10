@@ -108,6 +108,31 @@ class ShipSave {
     // if the window would read past the member.
     static bool parseShipRecords(const std::vector<uint8_t>& mem, size_t base,
                                  std::vector<Record>* out, std::string* err);
+
+    // ---- WRITE SIDE (t366, pership-spec §6 S7) ----
+    // Serialize ONE record back into the RESUME.GAM member layout.
+    // CITED-ONLY PATCH LAW (binding, _wip_t366 S3): the writer stores EXACTLY
+    // the field offsets parseShipRecords() reads, and touches NOTHING else in
+    // the stride — the unmodelled gap bytes (+0x0a.., +0x32.., the ring-slot
+    // use-word/payload, ...) are neither read nor zeroed. A whole-record emit
+    // into fresh memory therefore cannot yet be faithful in the gaps; the
+    // supported operation is write-back into an existing member (idempotence
+    // is the pinned property: parse -> write -> byte-identical).
+    // Ring note: slot stride 7 {cidx u8, use u16, payload u32}; only the cidx
+    // byte at +0xab+7*i is written (use/payload are not in the parser's set).
+    static void serializeRecord(const Record& rec, uint8_t* r);
+
+    // Full-window write-back at base (same geometry checks as the parser).
+    static bool writeShipRecords(std::vector<uint8_t>* mem, size_t base,
+                                 const std::vector<Record>& recs,
+                                 std::string* err);
+
+    // Pointer-valued fields (+0x59 orderTarget, +0x63 gizmoSlotPtr,
+    // +0x68 orderPayload) hold guest-PHYSICAL addresses (t298 POINTER-VALUE
+    // LAW; spec §6 S2). Moving records between runs of DIFFERENT base B means
+    // shifting these three values by (newB - oldB) — nothing else. Delta 0 is
+    // a no-op (same-run write-back).
+    static void rebaseRecord(Record* rec, uint32_t delta);
 };
 
 }  // namespace ascend::formats
