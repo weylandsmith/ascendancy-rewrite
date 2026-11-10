@@ -222,97 +222,82 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-USER-RULING t369 — SENTINEL, NOT A QUEUE TASK, DO NOT RENUMBER THE
-TAG (task line FIRST; proven t349-t356 script pattern; t368 AMENDMENTS: (i) the
-sitting branch is now RING-FIRST — the timeline feed is DEAD; (ii) field 2 MUST
-keep matching WAIT*/IDLE*/PARK* — see the sentinel-tag law in STANDING LAWS). All queue rows t359-t366 are LANDED; the per-ship model's I/O
-surface is complete (t366); the ONLY remaining ledger movement is USER
-adjudication (OQ-016 residues, OQ-019 closure per the t329 packet, D3
-deferred). Branches, in order:
-  (1) SITTING CHECK (RING-FIRST — t368 law: watcher pid 1575 died 2026-11-09
-      ~17:26, so tail-seekling live-timeline.jsonl proves only that nothing was
-      BANKED, not that nothing was PLAYED): run
-      `timeout 300 python3 work/r1/t368_ring_turn.py` (read-only; unzips each
-      work/r1/playcap/save/*.sav, cached-anchor base, r1_slot turn scalar,
-      prints per-slot turn + max; ~30-60 s for 20 slots). max_turn > 1086 =>
-      run scripts/r1_t85g_sitting.py BEFORE anything (new sitting outranks this
-      assignment). Baseline 2026-11-10 08:07: 20/20 slots turn 1086, ring
-      mtimes live through 07:57:46. Cross-check `tail -c 200
-      work/r1/loop/GAME_HEALTH_LIVE.txt`: 'W:NOWATCHER' is EXPECTED (watcher
-      down by choice — t368 F6); 'game pid' ABSENT means the corpus dosbox
-      exited, name it in the park line.
-  (2) RULING CHECK: DECISIONS.md mtime baseline 2026-11-10 06:23:41 (t365's
-      own D2-annotation write; commit 5758465 06:30:26 post-dates it);
-      trigger = mtime newer than baseline OR `git diff -- docs/DECISIONS.md`
-      non-empty OR any *ruling*/*reply* file in git status. The old sheet
-      baseline (work/r1/shp_png/decision-sheet.md, OQ-005) is CLOSED t367 —
-      do NOT watch it. Poller: work/r1/sentinel_t369.sh (pre-staged copy, same
-      baselines, 60 s poll, 45 min cap; launch via terminal(background=true,
-      notify=true), wait ONLY via process_manage(action='wait', timeout<=180)
-      — foreground tail --pid chunks hit the TOOL's own cap at 420 s and a
-      timeout=590 request is REFUSED not clamped (t356 law, re-tripped twice
-      at t368), no nohup (t355 law). A dirty porcelain entry naming THIS
-      session's own docs/re/_wip_*.md is not a user edit (t355 path-audit).
-  (3) Neither => park line appended to BLOCKED.md '## Sentinel park log'
-      (one dated line naming the three branches), rewrite NEXT to the SAME
-      sentinel verbatim, GATE 0, commit, stop.
-Do NOT invent new capture routes (t178; the click path is cited-broken, the
-per-ship residues are EIGHT cited-dead legs — D2=(b) was the route and it is
-now fully built). Production :9 is the corpus, untouched. Relaunching the
-capture watcher is NOT a sentinel task (t368 F6: two-writer law; harness/user
-call — if ever relaunched, first `pgrep -f r1_playcap_watch` to be sure).
+NEXT t369 per queue row t369 below (phase 8: PLAYTEST HARVEST +
+PACKAGING). The WAIT-USER-RULING sentinel is RETIRED — user spoke
+2026-11-10: movement testimony banked (docs/re/_wip_playtest_t369.md;
+two-click x/y-then-z destination = the msg-0x50 class, testimony
+re-opens it measurement-wise ONLY via tonight's witnesses), license
+decided GPL-3.0+creator-grant (D5), vendor data excluded, OQ-016/
+OQ-019 acceptance + D3 DEFERRED pending playtest. Production pid
+107664 TL-expiry 2026-11-17 11:24 (week-long for the night session);
+ring pre-play banked work/r1/bank-t1086-preplay/.
 
-QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
-to the original; NO permanent toggle — per-ship becomes THE engine once the
-pinned-seed suite passes, aggregate demotes to oracle, removed after. One
-session each; finish tN -> rewrite NEXT to tN+1 VERBATIM; keep this block
-intact except deleting completed rows. Evidence base: docs/re/ships.md,
-docs/re/ai-dossier.md (treat as spec), STATE DRIVE-CLASS laws,
-docs/re/_wip_d1page.md (signed-bbox dims fix, D1-gated).
+QUEUE (phase 8 — PLAYTEST HARVEST + PACKAGING; user decisions 2026-11-10:
+ship WITHOUT vendor data; license = GPL-3.0 + written grant to original
+creators (D5 drafted t372); OQ-016/OQ-019 acceptance + D3 DEFERRED pending
+tonight's playtest witnesses. One session each; finish tN -> rewrite NEXT to
+tN+1 VERBATIM; keep this block intact except deleting completed rows.
+Context: docs/re/_wip_playtest_t369.md (testimony + signatures + baselines).
 
-t359 PER-SHIP RECORD SPEC DOSSIER — LANDED 2026-11-09 (see LANDED
-      t358/t359 block; docs/re/pership-spec.md written, zero code).
+t369 CENSUS TOOLS PRE-BUILT (zero corpus assumptions, runnable the morning
+      after the playtest). scripts/r369_playwindow.py: locate the play window
+      from baselines in _wip_playtest_t369.md (first RESUME.GAM/*.SAV mtime
+      change, first timeline turn != 1086) and emit window bounds.
+      scripts/r369_magnetron_hit.py: K3b off-grid landing census OVER THE
+      WINDOW ONLY (streaming, OOM law; law pointers in _wip S 'EXPECTED
+      SIGNATURES' 1). scripts/r369_order_diff.py: consecutive-slot ring diff
+      of ship order/inventory fields per docs/re/pership-spec.md (t273 owner
+      attribution; testimony predicts two-step x/y then z destination set —
+      look for order kinds with arbitrary z). Tools must run on the PREPLAY
+      bank first as a no-hit control (expect 0 hits; a nonzero control =
+      instrument bug, fix before use). Exit honest-negative if the window
+      doesn't exist yet (user may not have played yet at session time — then
+      NEXT stays t369, run again; do NOT park).
 
-t367 D1-RULING APPLICATION — LANDED 2026-11-09 (see LANDED t367 block;
-      OQ-005 CLOSED, shp.cpp fallback + pin, sheet dispositions final).
+t370 PLAYTEST WITNESS CENSUS (run t369 tools over the real window). Report
+      per signature: magnetron landing hit(s) with ship index + system +
+      jitter values vs the rng%200 law; destination-order witnesses (does the
+      two-click x/y-then-z law show in ship-record fields? which order id?);
+      gizmo-on-target decrements. Land as MEASURED blocks in ships.md (new S
+      section) with scripts + run ids. IMPLICATIONS, applied per evidence:
+      a destination witness RE-OPENS OQ-019 residue-(1) measurement-wise
+      (annotate the row — cited-dead chain note amended, NOT deleted; do NOT
+      close anything, user-gated); a magnetron hit upgrades the use-site from
+      static-cited to WITNESSED (annotate). Zero-hits land as honest
+      negatives with the window stats.
 
-t360 PER-SHIP SAVE PARSER (read-side) — LANDED 2026-11-09 (see LANDED t360
-      block; shipsave.{h,cpp} + test_shipsave_t360.cpp x3, run_tests 179/0).
+t371 DISTRIBUTION SPLIT (docs only, no git surgery yet): docs/re/packaging.md
+      — the publishable-tree inventory (rewrite/ docs/ artifacts/ scripts/
+      archive/ LICENSE README), the excluded set (game/, extracted/, work/,
+      live-timeline — vendor data + capture corpus; regenerability notes:
+      scripts/cob.py importer for user-supplied installs), the case-
+      sensitivity audit checklist for Windows, and the CI matrix draft
+      (linux gcc / windows msvc+vcpkg / macos clang+brew; build + run_tests
+      226). README.md draft for the public repo (what this is, evidence
+      rule, build instructions, supply-your-own-data section, abandonware
+      status note w/ archive.org citation, Todd Templeman / Logic Factory
+      credit + license-grant offer text).
 
-t361 PER-SHIP ENGINE SKELETON — LANDED 2026-11-09 (see LANDED t361 block;
-      shipsim.{h,cpp} + test_shipsim_t361.cpp x11, run_tests 190/0; ai-dossier
-      §5 MAX->MIN wording corrected in place; ships.md S60).
+t372 LICENSE DRAFT: LICENSE = GPL-3.0-or-later (full text verbatim); NOTICE
+      file: dual-grant offer to the original creators (Todd Templeman per
+      motesandbeams.com about page — co-founder The Logic Factory; contact
+      offer, grant scope = unrestricted incl. commercial use, at their
+      option; explicit that it changes nothing for everyone else) + vendor-
+      data exclusion statement. Add SPDX headers sweep plan (list files,
+      don't bulk-edit blind: headers land with t373). DECISIONS.md: add D5
+      'APPLIED 2026-11-10 user decision: GPL-3.0-or-later + creator grant'.
 
-t362 MIXED-FLEET DEPARTURE LAW PARITY — LANDED 2026-11-09 (see LANDED t362
-      block; driver repeat law verbatim, shipsim.cpp sweep loop +
-      test_shipsim_t362.cpp x7, run_tests 197/0; ships.md S61).
+t373 (only if t371/t372 green) REPO HYGIENE EXECUTION: .gitignore additions
+      if any; SPDX headers on rewrite/src + tools + scripts entry files;
+      scripts/gate.sh gains --portable mode (skips stages needing the live
+      capture stack, runs on a fresh clone w/ user data dir env ASCENDANCY_
+      DATA); verify: fresh clone + --portable gate exit 0 on THIS box.
+      GitHub push itself stays USER-gated (remote, org, name = your call).
 
-t363 GIZMO INVENTORY + CARRIER/CARGO into shipsim per spec (3)(4); magnetron/
-      Phase-Bomb residues get a HOME here (which ship carries what) — do not
-      close OQ rows (user-gated), just give the model the fields.
-      — EVIDENCE LANDED 2026-11-09 (t363); CODE LANDED 2026-11-09 via t363R
-      (see LANDED t363R block; shipsim.{h,cpp} + test_shipsim_t363.cpp x9,
-      run_tests 206/0, mutation 6/6 CAUGHT; ships.md S62). Laws + census:
-      docs/re/_wip_t363.md S1..S6. Keep this row for the audit trail.
-
-t364 PER-SHIP COMBAT ROUND — LANDED 2026-11-10 (see LANDED t364 block;
-      shipsim t364 block + test_shipsim_t364.cpp x12, run_tests 218/0,
-      mutation 6/6 CAUGHT; _wip_t364.md C1..C9; combat.md S3l + two in-place
-      corrections (S2g dispatch key/stance map, S2k C7 polarity)). Keep row.
-
-t365 ENGINE FLIP — LANDED 2026-11-10 (see LANDED t365 block;
-      docs/re/engine-flip-t365.md; aggregate demotion DONE, removal
-      post-user-acceptance per D2/N10).
-
-t366 SAVE-WRITE SIDE — LANDED 2026-11-10 (t365-green condition was met;
-      shipsave.{h,cpp} write side + test_shipsave_t366.cpp x3, suite 226/0,
-      MUTATION 6/6 CAUGHT; write-back byte-identical 20/20 ring saves;
-      vendor-emitted save headless-unreachable = honest negative;
-      docs/re/_wip_t366.md + ships.md S63). Keep row.
-
-After t366 (or on any hard block): rewrite NEXT to the WAIT-TRIGGER sentinel
-shape (see t356 LANDED for the proven script pattern) — do NOT invent new
-capture routes against cited-dead laws.
+After t373: rewrite NEXT to WAIT-USER-RULING sentinel shape (proven t368
+pattern: 'NEXT WAIT-USER-RULING tNNN —' so field 2 is not a queue tag).
+Standing laws unchanged; the OQ rows close ONLY on user ruling (t329 packet
+S4 stays DO-NOT-APPLY until the user says accept, possibly amended by t370).
 
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
