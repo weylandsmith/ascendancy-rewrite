@@ -200,6 +200,25 @@ times.
   session's own _wip_t356.md. Production :9 HEALTHY (pid 1555 up 06:54:39,
   watcher 1575, TL expiry 2026-11-11 01:07:10, ring 56.sav age 4s). No row
   moved strict-close; ledger stays 16/3. NEXT stays the WAIT-TRIGGER sentinel.
+- 2026-11-10 t368: parked, no trigger. BRANCH 1 (sitting) NEGATIVE on the LIVE
+  RING, not the feed: the timeline watcher (pid 1575) DIED ~2026-11-09 17:26
+  (GAME_HEALTH_LIVE.txt 'UNHEALTHY | W:NOWATCHER(feed not banking)', feed mtime
+  17:26 with ZERO bytes growth vs baseline) while the game kept autosaving — so
+  the tail-seek law was BLIND for ~14 h. New primitive work/r1/t368_ring_turn.py
+  (read-only; unzips each ring .sav, cached-anchor base, r1_slot turn scalar):
+  20/20 slots turn=1086 at 07:2x AND again at 08:0x (turn monotonic => no play
+  crossed a turn boundary in the dead window). BRANCH 2 (ruling) NEGATIVE
+  pre-launch, mid-poll, post-exit: DECISIONS.md mtime 2026-11-10 06:23:41.040 ==
+  baseline exactly, git diff empty, porcelain = only this session's own files,
+  no *ruling*/*reply* (three vendored dosbox-x clock_reply.h hits are tracked
+  macOS headers, cannot fire the porcelain-based grep). Poller
+  sentinel_t368.sh (proc_6d442daa5692, pid 102048) exit 0
+  'TIMEOUT:no ruling after 45min'. BRANCH 3 taken: this line. Production :9
+  ALIVE (pid 1555 etime 1-06:50, TL expiry 2026-11-11 01:07:10) but WATCHER
+  STAYS DOWN — relaunch deliberately NOT done (F6: not the task; two-writer
+  law; harness/user call). Ledger 17/2 unchanged, strict-close honest negative.
+  NEXT = t369 same sentinel with the RING-FIRST sitting law;
+  work/r1/sentinel_t369.sh pre-staged (baselines unchanged).
 ## R1 runbook (mandatory safety invariants — a run without them is a bug)
 Route: scripts/r1_savestate.sh (+ r1_sav_scan.py per-run base B; NEVER hard-code
 B; member = physical + H, H=136 for dfsg 2025.02.01, re-derive per build — the

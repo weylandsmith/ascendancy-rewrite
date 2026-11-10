@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-10T07:30
+updated: 2026-11-10T08:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,31 +222,44 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t368 — WAIT-TRIGGER SENTINEL (task line FIRST; proven t349-t356 script
-pattern). All queue rows t359-t366 are LANDED; the per-ship model's I/O
+NEXT t369 — WAIT-TRIGGER SENTINEL (task line FIRST; proven t349-t356 script
+pattern; t368 AMENDMENT: the sitting branch is now RING-FIRST — the timeline
+feed is DEAD). All queue rows t359-t366 are LANDED; the per-ship model's I/O
 surface is complete (t366); the ONLY remaining ledger movement is USER
 adjudication (OQ-016 residues, OQ-019 closure per the t329 packet, D3
 deferred). Branches, in order:
-  (1) SITTING CHECK: 400 KB tail-SEEK of work/r1/playcap/live-timeline.jsonl
-      (OOM law, never a full read); newest turn > 1086 => run
-      scripts/r1_t85g_sitting.py BEFORE anything (new sitting outranks this
-      assignment). Baseline 2026-11-10: 8,917,535,608 B, turn 1086 on all
-      tail records (ring rotation only).
+  (1) SITTING CHECK (RING-FIRST — t368 law: watcher pid 1575 died 2026-11-09
+      ~17:26, so tail-seekling live-timeline.jsonl proves only that nothing was
+      BANKED, not that nothing was PLAYED): run
+      `timeout 300 python3 work/r1/t368_ring_turn.py` (read-only; unzips each
+      work/r1/playcap/save/*.sav, cached-anchor base, r1_slot turn scalar,
+      prints per-slot turn + max; ~30-60 s for 20 slots). max_turn > 1086 =>
+      run scripts/r1_t85g_sitting.py BEFORE anything (new sitting outranks this
+      assignment). Baseline 2026-11-10 08:07: 20/20 slots turn 1086, ring
+      mtimes live through 07:57:46. Cross-check `tail -c 200
+      work/r1/loop/GAME_HEALTH_LIVE.txt`: 'W:NOWATCHER' is EXPECTED (watcher
+      down by choice — t368 F6); 'game pid' ABSENT means the corpus dosbox
+      exited, name it in the park line.
   (2) RULING CHECK: DECISIONS.md mtime baseline 2026-11-10 06:23:41 (t365's
       own D2-annotation write; commit 5758465 06:30:26 post-dates it);
       trigger = mtime newer than baseline OR `git diff -- docs/DECISIONS.md`
       non-empty OR any *ruling*/*reply* file in git status. The old sheet
       baseline (work/r1/shp_png/decision-sheet.md, OQ-005) is CLOSED t367 —
-      do NOT watch it. Poller: work/r1/sentinel_t368.sh (pre-staged, 60 s
-      poll, 45 min cap; launch via terminal(background=true, notify=true),
-      wait via process_manage(action='wait', timeout<=180) — NO foreground
-      tail chunks (t356 lesson), no nohup (t355 law).
+      do NOT watch it. Poller: work/r1/sentinel_t369.sh (pre-staged copy, same
+      baselines, 60 s poll, 45 min cap; launch via terminal(background=true,
+      notify=true), wait ONLY via process_manage(action='wait', timeout<=180)
+      — foreground tail --pid chunks hit the TOOL's own cap at 420 s and a
+      timeout=590 request is REFUSED not clamped (t356 law, re-tripped twice
+      at t368), no nohup (t355 law). A dirty porcelain entry naming THIS
+      session's own docs/re/_wip_*.md is not a user edit (t355 path-audit).
   (3) Neither => park line appended to BLOCKED.md '## Sentinel park log'
       (one dated line naming the three branches), rewrite NEXT to the SAME
       sentinel verbatim, GATE 0, commit, stop.
 Do NOT invent new capture routes (t178; the click path is cited-broken, the
 per-ship residues are EIGHT cited-dead legs — D2=(b) was the route and it is
-now fully built). Production :9 is the corpus, untouched.
+now fully built). Production :9 is the corpus, untouched. Relaunching the
+capture watcher is NOT a sentinel task (t368 F6: two-writer law; harness/user
+call — if ever relaunched, first `pgrep -f r1_playcap_watch` to be sure).
 
 QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
 to the original; NO permanent toggle — per-ship becomes THE engine once the
@@ -345,6 +358,56 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t368 — 2026-11-10 (EIGHTH PARK: NO TRIGGER — PLUS THE DISCOVERY THAT
+## THE STANDING SITTING CHECK HAD BEEN BLIND FOR ~14 HOURS, AND ITS FIX)
+
+Branches, cited (full working detail docs/re/_wip_t368.md F1..F7):
+- F1 THE FEED IS DEAD (the iteration's real finding). Branch-(1) as written
+  tail-seeks work/r1/playcap/live-timeline.jsonl. That file is 8,917,535,608 B
+  with mtime **2026-11-09 17:26** — zero growth vs the recorded baseline, ~14 h
+  stale at session start — because the collector (`r1_playcap_watch.py`, pid
+  1575) is GONE (`ps -p 1575` empty, no matching process) while the game (pid
+  1555) kept autosaving every 10 s. GAME_HEALTH_LIVE.txt says exactly this:
+  `UNHEALTHY | W:NOWATCHER(feed not banking)` + `ring 50.sav age 6s`. A dead
+  feed means the tail law reports "no new sitting" even for REAL play (the
+  20-slot ring rotates in ~200 s and leaves no trace). The law was satisfied
+  literally while being blind.
+- F2/F7 NEW PRIMITIVE (read-only, reusable):
+  **work/r1/t368_ring_turn.py** — for each work/r1/playcap/save/*.sav: unzip
+  `Memory`, resolve the base via the CITED cached-anchor law
+  (`r1_slot.anchors_cached` + `base_of`), read the turn scalar
+  (`r1_slot.read_slot`, OFF 0x82bb0 + 0x12e10). Two real runs: 07:2x and 08:0x,
+  both **parsed 20/20, max_turn 1086, min_turn 1086**, ring mtimes live through
+  07:57:46. Turn is monotonic in a running save, so a CURRENT ring reading of
+  1086 retroactively covers the feed-dead window (mid-turn-only actions remain
+  invisible to this probe AND to the standing law — stated, not hidden).
+  => Branch (1) NEGATIVE before and after the poll; r1_t85g_sitting.py NOT run.
+- Branch (2) ruling check NEGATIVE pre-launch, mid-poll, and post-exit:
+  DECISIONS.md mtime **2026-11-10 06:23:41.040** == baseline exactly, `git diff`
+  empty, porcelain = only this session's own docs/re/_wip_t368.md (t355
+  path-audit applied), no *ruling*/*reply* files (the three
+  dosbox-x `clock_reply.h`/`host_notify_reply.defs` hits are tracked vendored
+  macOS headers — the poller greps `git status --porcelain`, so they cannot
+  fire it). The OQ-005 sheet baseline stays unwatched (CLOSED t367).
+- Branch (3) taken: park line appended to BLOCKED.md '## Sentinel park log'.
+  Poller work/r1/sentinel_t368.sh via terminal(background=true, notify=true)
+  (proc_6d442daa5692, pid 102048): exit 0 `TIMEOUT:no ruling after 45min`.
+  Waited via process_manage(timeout=180) x7; TWO foreground tail --pid chunks
+  hit the tool's 420 s cap (a timeout=590 request is REFUSED, not clamped) —
+  harmless; NEXT now forbids them in favor of process_manage only.
+- Watcher relaunch DELIBERATELY NOT DONE (F6): not the assigned task; launching
+  a long-running writer from a sentinel session risks two writers on
+  live-timeline.jsonl (the t85b dedup handles restarts, not concurrency).
+  Harness/user call; safe procedure recorded in NEXT.
+- Production :9 ALIVE: pid 1555 etime 1-06:50:34, -time-limit 172800, TL expiry
+  **2026-11-11 01:07:10** (~17 h after this iteration — the corpus clock is the
+  real deadline for any further live capture; note it).
+- Ledger UNCHANGED 17/2 (OQ-016, OQ-019 — user-gated): zero measurement of any
+  open-row constant this iteration, so nothing closable under strict-close;
+  honest negative recorded. GATE_EXIT=0; ledger audit OK; game/ untouched.
+- NEXT = t369 same sentinel with the RING-FIRST sitting law; work/r1/
+  sentinel_t369.sh pre-staged (copy, baselines unchanged).
 
 ## LANDED t366 — 2026-11-10 (SAVE WRITE-SIDE SHIPPED: WRITE-BACK BYTE-IDENTICAL
 ON 20/20 RING SAVES; VENDOR-EMITTED SAVE HEADLESS-UNREACHABLE = HONEST
