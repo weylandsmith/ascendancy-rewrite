@@ -222,21 +222,20 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t363R — RE-LAND THE GIZMO INVENTORY + CARRIER/CARGO CODE per the
-complete implementation contract docs/re/_wip_t363.md S5 (one session,
-~30 probes). VERBATIM contract, do not re-derive: every law this task needs
-is already banked in _wip_t363 S1-S4 (upkeep 0x4a658 byte-level, recalc
-0x49acc byte-level, tail refresh +0x42 CORRECTION, kind-2 completion
-FUN_00049a34/FUN_000499f8 with lane-gate POLARITY fix, file-vs-RAM gizmo
-census, save-side census work/r363_gizmo_census.out). t363's session
-(2026-11-09) banked all evidence and drafted the code, but the run budget
-expired before wiring/pins/build — the draft was REVERTED clean (shipsim.
-{h,cpp} == HEAD; do NOT hunt for a stash, rewrite from S5). Ordering
-rationale unchanged from the t363 row: gizmo scope owns the upkeep burn, the
-tail slot-refresh, and the colonise leg, so t363R lands before t364 stacks
-combat. Spec contract stays docs/re/pership-spec.md. Seams t363R may NOT
-silently close: decider re-decide stays caller-side; OQ rows user-gated
-(give the model fields, do not close rows). Sitting check first as always.
+NEXT t364 — PER-SHIP COMBAT ROUND into shipsim per spec (5) (K1..K-series,
+docs/re/pership-spec.md §5) + the t292 aggregate comparator UNCHANGED
+(per-ship only REDISTRIBUTES losses; the aggregate victory law stays).
+Ordering rationale: t363R landed 2026-11-09 the inventory/upkeep layer the
+combat round consumes — shield charges +0x90 are now engine state refreshed
+per tail (ships.md S62), and the charge law sites (0x49f15, 0x4a71f) share
+ONE body with upkeep (S3c), so K-round charge/damage code lands verbatim
+without re-deriving. Evidence base: docs/re/combat.md §1-§2, ai-dossier §6
+Leg A/B (invasion eligibility ALREADY modelled as firstCarrier — reuse, do
+not duplicate), ships.md S60/S61/S62 seams. Mutation-tested pins like the
+t290-t292 arms. Seams t364 may NOT silently close: OQ rows user-gated;
+targetability FUN_00039894 is cited-form-only (spec N4). Watch the
+commitMove kind-5 assert accounting (t363: laned ships COUNT one assert —
+combat completion must not silently change that pin).
 
 QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
 to the original; NO permanent toggle — per-ship becomes THE engine once the
@@ -266,10 +265,10 @@ t362 MIXED-FLEET DEPARTURE LAW PARITY — LANDED 2026-11-09 (see LANDED t362
 t363 GIZMO INVENTORY + CARRIER/CARGO into shipsim per spec (3)(4); magnetron/
       Phase-Bomb residues get a HOME here (which ship carries what) — do not
       close OQ rows (user-gated), just give the model the fields.
-      — EVIDENCE LANDED 2026-11-09, CODE NOT LANDED (run budget expired;
-      draft reverted clean). All laws + census + the full re-land contract:
-      docs/re/_wip_t363.md S1..S5. See LANDED t363 block. Successor: t363R
-      (the NEXT ACTION above) — keep this row for the audit trail.
+      — EVIDENCE LANDED 2026-11-09 (t363); CODE LANDED 2026-11-09 via t363R
+      (see LANDED t363R block; shipsim.{h,cpp} + test_shipsim_t363.cpp x9,
+      run_tests 206/0, mutation 6/6 CAUGHT; ships.md S62). Laws + census:
+      docs/re/_wip_t363.md S1..S6. Keep this row for the audit trail.
 
 t364 PER-SHIP COMBAT ROUND into shipsim per spec (5) + t292 comparator
       unchanged (aggregate victory law stays; per-ship only redistributes
@@ -336,6 +335,50 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t363R — 2026-11-09 (GIZMO INVENTORY + UPKEEP BURN + CARRIER LAW
+CODE LANDED VERBATIM: shipsim.{h,cpp} + test_shipsim_t363.cpp x9, run_tests
+206/0, MUTATION 6/6 CAUGHT; LEDGER 17/2 UNCHANGED, HONEST NEGATIVE)
+
+- Sitting check NEGATIVE (live-timeline 8,917,535,608 B unchanged from the
+  t363 baseline; 400 KB tail 16/16 rows turn 1086; r1_t85g_sitting.py NOT
+  run per the >1086 rule). Tree clean at launch (shipsim.{h,cpp} == HEAD,
+  the t363 revert claim CONFIRMED before coding).
+- Contract docs/re/_wip_t363.md S5 executed ITEMS 1-8 IN ORDER; raw re-reads
+  banked as _wip_t363 S6. NEW from the re-reads: fillFirstEmpty window is
+  CAP (0x4964a `cmp eax,[+0x15a] jl`) — spec G3 "scans all 25" superseded;
+  the recalc also zeroes +0x18 (0x49af5); completion zeroes DWORD[+0x9e]
+  (lane-local x) at store 0x49a78.
+- WIRED (the three named seams CLOSED): (i) upkeep FUN_0004a658 at BOTH
+  call sites — sweep prologue (burn BEFORE the MIN pick) and tail (after
+  refill+refresh+march); bit0 zeroes MOVES, ring scan STILL RUNS; payable
+  gate = whole-slot skip (no partial burn, charges NESTED); bit3 zeroes
+  charges. (ii) tail refresh loop use := design[+0x42] (+0x42 operand
+  measured 5940/5940 save-side; the "+0x4e" queue wording SUPERSEDED).
+  (iii) kind-2 completion FUN_00049a34 inside commitMove orderType-2
+  arrival (admission FUN_000499f8: lane gear OR species flag AND lane NOT
+  closed, bit 0x2 SET == DENIED; admitted -> kind 5, laneId, laneToB; the
+  assert leg COUNTS kind 5). t361-era scatter-on-type-2 fallback superseded.
+- CARRIER/CARGO FIELDS per spec C1-C4 (no C5 chooser): ring InvSlot[25],
+  invCap/invFilled verbatim import (NO recalc on import — powerMax law);
+  recalcShip carrier law (LaneDrive->stepX 14, Hyperdrive->stepZ 28 pools
+  DERIVED from measured live pairs; Colonizer->targetSlot -1; Cloaker->
+  specialCount); carriesCode / firstCarrier (C2 loop 0x42d09 verbatim shape:
+  InSystem + slot==code, list order, no strength test).
+- MUTATION CAMPAIGN 6/6 CAUGHT (scripts/r363r_mutate.py, reusable): M1 bare
+  re-grant (first pin was NOT sweep-visible — re-scoped powers 28/22 so only
+  the SWEEP burn flips the pick; MISSED then CAUGHT after the pin fix), M2
+  skip-ring-on-bit0, M3 charges-unnested, M4 refresh operand +0x3e, M5
+  recalc window inclusive, M6 phantom rejected at idx==cap.
+- INCIDENT (self-inflicted, fully recovered): the first mutation run's
+  `git checkout --` revert fired while the code was still UNCOMMITTED and
+  wiped the cpp work; re-applied all six patches verbatim from transcript,
+  re-verified build+suite, THEN checkpoint e9c8bae before the real campaign.
+- Banking: ships.md S62; pership-spec G9 polarity correction IN PLACE
+  (global added when bit SET, raw 0x4a68e); OPEN-QUESTIONS t363R note on
+  OQ-019 (row STAYS OPEN — user-gated, honest negative: no named closer
+  touched, magnetron/Phase-Bomb remain zero-carried, HOME = ring field).
+  LEDGER 17/2 UNCHANGED; gate + both audits green. NEXT = t364 VERBATIM.
 
 ## LANDED t363 — 2026-11-09 (GIZMO INVENTORY EVIDENCE COMPLETE: UPKEEP/
 RECALC/REFRESH/KIND-2-COMPLETION ALL BANKED BYTE-LEVEL + SAVE CENSUS

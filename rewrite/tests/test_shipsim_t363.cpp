@@ -61,11 +61,11 @@ as::Ship mkBase(int id, int owner) {
 TEST(shipsim_upkeep_burn_orders_pick_t363) {
     // (a) The burn lands BEFORE the MIN-POWER pick of its sweep (_wip S1b:
     // 0x4a658 sits inside the re-invoked executor prologue). Ship A: power
-    // 28 + affordable shield (cost 4); ship B: power 25, no shield. TAIL
-    // (refill -> upkeep, 0x4a95b) already burns A to 24 before the executor;
-    // sweep 1 burns A to 20 before the pick => A (20) is MIN and departs
-    // FIRST. Without the burn the pick would be B (25 < 28) — the ORDER is
-    // the pin (the t361/t362 refill-without-burn seam, closed verbatim).
+    // 28 + affordable shield (cost 4); ship B: power 22, no shield. The TAIL
+    // burn (0x4a95b) takes A to 24 — still ABOVE B. Only the SWEEP burn (the
+    // 0x412cf call) takes A to 20 < 22 => A departs FIRST. A bare re-grant
+    // (the t361/t362 seam, mutation M1) leaves A at 24 > 22 and picks B —
+    // the ORDER at acted[0] is the pin.
     as::ShipSim sim(1);
     sim.setDesigns(mkDesigns(shieldRow(4, 2)));
     sim.addStar({0, {0, 0, 0}});
@@ -79,7 +79,7 @@ TEST(shipsim_upkeep_burn_orders_pick_t363) {
     b.kind = as::OrderKind::InSystem;
     b.act = 2; b.orderType = 1;
     b.targetPos[0] = 160;
-    b.driveStat = 10; b.powerMax = 25;
+    b.driveStat = 10; b.powerMax = 22;          // 28-8 < 22 < 28-4: sweep-visible
     sim.addShip(a); sim.addShip(b);
     auto rep = sim.advanceBoundary();
     CHECK(rep.acted.size() >= 2);

@@ -343,7 +343,10 @@ G8 COST side: per-hull cost table live 0x687c (4 dwords) via FUN_0004a41c ->
    §9 CLOSED-BY-CENSUS; no design-cost total is ever materialised).
 G9 Upkeep/propulsion (per turn, FUN_0004a658 verbatim): status +0x9c bit0 ->
    +0x94 := 0 else +0x94 := [ship+0x10] (or PTR_DAT_00077f6c + [ship+0x10]
-   when bit2 clear); speed accumulator +0x90 := 0 ALWAYS; then per ring slot:
+   when bit2 SET — t363R CORRECTION in place of "when bit2 clear": raw
+   0x4a68e `je 0x4a69d` takes the PLAIN value when the bit is clear, the
+   GLOBAL when set; _wip_t363 S3c); speed accumulator +0x90 := 0 ALWAYS;
+   then per ring slot:
    type != 0xFF AND w16[gizmo row+3] & 0x20 AND dword[row+3]==-1 -> if
    dword[row+6] <= [+0x88]: [+0x88] -= row[+6] (maintenance burn); IF ALSO
    byte[row+2]==1: +0x90 += dword[row+0x26] (propulsion bonus, NESTED under

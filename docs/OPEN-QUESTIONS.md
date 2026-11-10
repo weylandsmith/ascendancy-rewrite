@@ -297,6 +297,12 @@ t359 NOTE (2026-11-09): user ruling D2=(b) commissioned the per-ship sim; its
 BUILD CONTRACT is docs/re/pership-spec.md (t359, zero new measurement — a
 dossier of already-cited laws + explicit non-goals; row closure still per the
 t329 disposition packet / user acceptance at t365, NOT on this file).
+t363R NOTE (2026-11-09): the sim MODEL now carries the gizmo inventory
+(ring + recalc + upkeep burn + carrier/cargo fields, shipsim.{h,cpp}, ships.md
+S62) — the magnetron/Phase-Bomb residue HOME is the ring field + carriesCode
+accessor (zero-carried in the corpus; C5 chooser NOT modelled, per spec N4/N2).
+Row STAYS OPEN (strict-close, user-gated): no named residue closer was touched;
+the sugar-cube-clamp and destination-widget residues are unchanged.
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +

@@ -2897,3 +2897,52 @@ VERBATIM (work/r331_disasm.txt, full evidence docs/re/_wip_t362.md S4/S6/S7):
    (remaining is status not state); landing always scatters (T-6 no-slot
    default) — pin flags, not coordinates. LEDGER 17/2 UNCHANGED (honest
    negative; no OQ row's named closer touched).
+
+## S62 t363R (2026-11-09) — GIZMO INVENTORY + UPKEEP BURN + CARRIER LAW LANDED
+(rewrite/src/game/shipsim.{h,cpp}; laws banked docs/re/_wip_t363.md S1..S6)
+
+- UPKEEP FUN_0004a658 is now a wired sim step at BOTH cited call sites: the
+  executor prologue (per sweep, before the MIN-POWER pick, 0x412cf) and the
+  turn tail (0x4a95b, after refill + refresh + march). The t361/t362
+  refill-without-burn seam is CLOSED verbatim. Corroboration: the sweep burn
+  changes the pick ORDER — pinned shipsim_upkeep_burn_orders_pick_t363 (two
+  ships straddling the burn delta; a bare re-grant picks the wrong ship).
+- Status bit0 zeroes MOVES but the RING SCAN STILL RUNS (0x4a67b jmp 0x4a6a6,
+  NOT the loop exit 0x4a727 — S4 item 1; pinned shipsim_upkeep_bit0_ring_runs
+  _t363: burn == 4 with bit0 set). The payable gate is a whole-slot skip:
+  cost > power burns NOTHING and grants NO charges (charges NESTED, 0x4a716
+  below the burn; pinned shipsim_upkeep_unaffordable_t363).
+- REFRESH OPERAND CONFIRMED +0x42 (numUses), save-side MEASURED 5940/5940
+  (work/r363_gizmo_census.out) + disasm 0x4a799; the "+0x4e" wording in
+  STATE.md:230 / _wip_t362 S56 is superseded (off-by-convention artifact).
+  Mutation M4 (operand := Level +0x3e) CAUGHT at shipsim_slot_refresh_t363.
+- CARRIER LAW (recalc FUN_00049acc): one Star Lane Drive => lane-step X 14,
+  one Hyperdrive => lane-step Z 28 — the pool words ds:0x2583/ds:0x258b are
+  NOT in the image dump (data pool, t43 law); the values are DERIVED from the
+  MEASURED live pairs (14,0)/(0,28) (S3a synthesis). This is where the S22
+  "step CONSTANT 14 base units" residue comes from: the CARRIER law produces
+  it; the march consumes float([+8]+[+c]). Colonizer => targetSlot -1;
+  Cloaker => specialCount; driveTotal := hullBaseDrive + cat-2 levels;
+  cat2PowerCarry += row[+0x36] for cat==2. Pinned shipsim_recalc_carrier_law
+  _t363; window i<cap EXCLUSIVE (mutation M5 inclusive CAUGHT).
+- MUTATORS verbatim: set-slot REJECTS idx>cap but ADMITS idx==cap (phantom:
+  filled+1, stats INERT — window excludes it; mutation M6 reject-at-eq CAUGHT);
+  same-cidx-same-slot REJECT, duplicates across slots LEGAL; clear-slot has
+  NO index bound; fill-first-empty scans the CAP window (0x4964a), not all 25
+  — spec G3's "scans all 25" is superseded by the raw bound.
+- KIND-2 COMPLETION FUN_00049a34 wired into commitMove (orderType-2 arrival):
+  admission = (laneStepX+laneStepZ > 0) OR species col-0x12 (flag, never
+  fired, spec N4) AND lane byte+0x23 bit 0x2 CLEAR (SET == CLOSED, S4 item 3);
+  admitted => kind 5, lane-local x 0, laneId set, direction (target == A end).
+  The executor assert leg then COUNTS kind 5 (0x93e), never fatal. The t361-
+  era scatter-on-type-2 fallback is SUPERSEDED. Pinned shipsim_lane_arrival_t363.
+- CENSUS CORROBORATION (no new OQ credit — laws already t47/t86/t89/t101/t184):
+  gizmos.txt flag bit 5 == the upkeep gate reproduces rows {10..15} all cat 1
+  exactly; costs {0,1,2,2,3,4}; payload == -1 on exactly 80 shield slots in
+  20 saves (the eligibility gate is SELECTIVE in real data); Invasion Module
+  500 slots/260 ships, Colonizer 960/140, Lane Drive 980/500, Hyperdrive
+  200/100; magnetron + Phase Bomb ZERO-carried (residue HOME = the ring field
+  + carriesCode accessor; chooser stays open, user-gated). MUTATION CAMPAIGN
+  6/6 CAUGHT (M1 bare-regrant, M2 skip-ring-bit0, M3 charges-unnested,
+  M4 refresh-operand, M5 window-inclusive, M6 phantom-rejected).
+  LEDGER 17/2 UNCHANGED (honest negative; no OQ row's named closer touched).
