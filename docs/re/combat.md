@@ -326,7 +326,12 @@ MOVES==0 return 0 (t101: [+0x88] is POWER — firing REQUIRES nonzero power,
 guns draw the per-shot power the S2h/S2j accounting charges at handler
 tail); sets [ship+0x62]:=1 and stance map (verified 0x4a570..
 0x4a586): arg 0 -> +0x67=2, arg 1 -> +0x67=1, arg 2 -> +0x67=0 (default
-assert 0x2623); [ship+0x68] := target. VOLLEY LOOP 0x4a5c1..0x4a5fc: for i in
+assert 0x2623); [ship+0x68] := target. [t364 CORRECTION, _wip_t364.md C1/C2,
+both disassemblers agree: the KEY at the 0x4a399 dispatch is BYTE [ship+0x67]
+(handler id), NOT design[+0x32] — the category gate lives in the volley loop
+(0x4a5e1); and the arg map is 0->2, 1->1, 2->1, 3->0 (the jbe at 0x4a5a1
+captures BOTH 1 and 2). Dispatcher chain: 0->0x4b8e4 gun, 1->0x4c794,
+2->0x4ca50, 5->0x4cd90; the 0x4c794/0x4ca50 bodies call NO hit path.] VOLLEY LOOP 0x4a5c1..0x4a5fc: for i in
 0..[ship+0x15a) stride 7 over ship+0xab gizmo slots IN STORED ORDER, skip
 0xff, gate design[gizmo][+0x32]==0 (CAT==0 weapons ONLY), set [ship+0x63] :=
 slot ptr, call 0x49f28 (-> 0x4a360 -> cat0 -> 0x4b8e4); remember slot on
@@ -670,9 +675,12 @@ REGION 0x42c60..0x42e6e (VERBATIM, confirms t179 P3 and adds legs):
   [+0x63]=0, [+0x67]=1, [+0x68]=objective (0x42d9c..0x42dbd).
 * 0x42d64 (no carrier found): if objective ownership bits [eax+0x15] AND
   (1<<DAT_0007458e) (local human player, t204 byte) -> RETURN 2; else fall
-  through 0x437ee. Return-code census for this region: 0xffffffff = no
-  engagement / unresolved, 2 = "objective is the player's, nothing picked",
-  descriptor kind 3 = engagement actor chosen.
+  through 0x437ee. [t364 POLARITY CORRECTION, _wip_t364.md C7: the verified
+  order 0x42d7f..0x42d99 is TEST bits & (1<<local); JNE (IS local) -> 0x437ee
+  (outside the banked region); the FALL-THROUGH (NOT local) returns 2 — the
+  draft has the branches swapped.] Return-code census for this region:
+  0xffffffff = no engagement / unresolved, 2 = "nothing picked" (not-local
+  objective per the correction), descriptor kind 3 = engagement actor chosen.
 * LEG B (firepower pick) 0x42de0..0x42e34: first array ship with [+0x58]==4
   where CALL 0x4a604 (companion slot scan: first cat-0 slot with power/uses,
   S2h) != 0 AND CALL 0x4a55c(ship, 1, objective) != 0. First match wins
@@ -710,3 +718,17 @@ HONEST NEGATIVES (measured, this pass):
     the corpus never witnessed (zero invasion-vs-shield events in 20/20
     saves, t207 corpus witness) with no closable ledger row — churn, not
     progress. The honest delta of this iteration is the verbatim law itself.
+
+
+## S3l (t364, 2026-11-10) — PER-SHIP COMBAT ROUND LANDED into shipsim
+Laws C1..C9 (verbatim windows, both disassemblers) banked at
+docs/re/_wip_t364.md; code rewrite/src/game/shipsim.cpp t364 block
+(setStance/volleyTail/companionScan/gunEngageFlag/commitShot/engageRound);
+pins tests/test_shipsim_t364.cpp x12, run_tests 218/0; MUTATION 6/6 CAUGHT
+(M1 stance map — needed a pin re-scope: stance-order sensitivity made the
+first version vacuous; M2 volley store-on-hit; M3 mode-gated apply; M4
+charge-even-zero-damage; M5 mode-0 DEC; M6 Leg A exclusivity). Zero-witness
+legs modelled verbatim and flagged: range-0 unlimited (C9), handler-1/2
+returns (C8 named substitution arg3), 0x437ee unmodelled (C7). No OQ row
+closes (user-gated per t364 contract); the aggregate engine (campaign.cpp
+combatPhase, OQ-010 CLOSED law) stays the oracle until the t365 flip.

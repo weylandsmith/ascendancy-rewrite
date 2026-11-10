@@ -12,8 +12,9 @@ namespace ascend::game {
 // dwell countdown, order apply at the turn boundary. Scope t363
 // (docs/re/_wip_t363.md S1..S6): gizmo inventory + upkeep (spec 3 G1..G9)
 // and carrier/cargo FIELDS (spec 4 C1..C4 — the C5 chooser stays a named
-// non-goal). The combat round (spec 5) is t364 — the sim applies ORDERS and
-// cited upkeep laws, never invented gizmo effects.
+// non-goal). t364 (docs/re/_wip_t364.md C1..C9): the per-ship combat round
+// (spec 5, setStance/volleyTail/commitShot/engageRound) — cited gates and
+// absorb law only; handler-1/2/special effects remain K9 reference scope.
 
 // Order kind verbatim, +0x58 (pership-spec §2 kind enum, end-to-end values
 // {0..5} with the imm store census 0x24a00/0x3fb3e/0x3ca60/0x39859/0x2202f/

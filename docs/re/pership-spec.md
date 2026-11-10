@@ -395,10 +395,11 @@ K1 Same-system gate: ship+0x58==4 && target+0x58==4 && ship+0x59 ==
    target+0x59 — combat is strictly per-system-object; ai-dossier §6 [S2g/
    S2h cited].
 K2 Firing order: fn 0x4a55c — refuses if POWER==0; stance map arg->+0x67
-   (0->2,1->1,2->0); [+0x68] := target; volley loop 0x4a5c1..0x4a5fc walks the
-   gizmo ring IN STORED ORDER stride 7 and fires EVERY cat-0 weapon (slot
-   eligibility via companion scan 0x4a604: first cat-0 slot with power/uses);
-   ai-dossier §6, combat.md S2g.
+   (0->2,1->1,2->1,3->0 — VERBATIM re-read t364 _wip_t364 C2 SUPERSEDES the
+   t88 "2->0" reading: cmp dx,2/jbe captures {1,2}); [+0x68] := target; volley
+   loop 0x4a5c1..0x4a5fc walks the gizmo ring IN STORED ORDER stride 7 and
+   fires EVERY cat-0 weapon (slot eligibility via companion scan 0x4a604:
+   first cat-0 slot with power/uses); ai-dossier §6, combat.md S2g.
 K3 Range gate: design[+0x3a]<<5 vs distance (0x4d15f/0x4d162 shl 5 against
    squared distance at the 0x4d075 loop; combat.md §2; and the star-target
    path Range*32 < lane-d at 0x4ca50, ships.md §19 T3 GATE 1). Units: world

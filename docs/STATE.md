@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-09T16:41
+updated: 2026-11-10T01:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,20 +222,29 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t364 — PER-SHIP COMBAT ROUND into shipsim per spec (5) (K1..K-series,
-docs/re/pership-spec.md §5) + the t292 aggregate comparator UNCHANGED
-(per-ship only REDISTRIBUTES losses; the aggregate victory law stays).
-Ordering rationale: t363R landed 2026-11-09 the inventory/upkeep layer the
-combat round consumes — shield charges +0x90 are now engine state refreshed
-per tail (ships.md S62), and the charge law sites (0x49f15, 0x4a71f) share
-ONE body with upkeep (S3c), so K-round charge/damage code lands verbatim
-without re-deriving. Evidence base: docs/re/combat.md §1-§2, ai-dossier §6
-Leg A/B (invasion eligibility ALREADY modelled as firstCarrier — reuse, do
-not duplicate), ships.md S60/S61/S62 seams. Mutation-tested pins like the
-t290-t292 arms. Seams t364 may NOT silently close: OQ rows user-gated;
-targetability FUN_00039894 is cited-form-only (spec N4). Watch the
-commitMove kind-5 assert accounting (t363: laned ships COUNT one assert —
-combat completion must not silently change that pin).
+NEXT t365 — ENGINE FLIP (queue row VERBATIM): campaign turn loop calls
+shipsim; aggregate code demoted to rewrite/src/game/aggregate_oracle.{h,cpp}
+used ONLY by tests; full pinned-seed suite green; gate green; DECISIONS.md D2
+annotated APPLIED; OQ-019 residue status updated in OPEN-QUESTIONS (row
+itself closes only on user ruling per t329 packet — annotate 'model exists,
+awaiting user acceptance').
+Ordering rationale: t364 landed 2026-11-10 the LAST per-ship capability the
+queue named (combat round, pins 218/0, MUTATION 6/6 CAUGHT — combat.md S3l +
+docs/re/_wip_t364.md); the sim now covers records, orders, gizmos, upkeep,
+carrier law AND engagement, so the flip has no remaining capability gap.
+t365 is integration, not derivation: campaign.cpp's turn frame must call
+ShipSim::advanceBoundary() + engageRound() where combatPhase runs today, keep
+the aggregate engine callable from tests as the seed-comparison oracle
+(N10: removal only after seeds agree — do NOT delete in t365), and carry the
+t364 seams FORWARD: the chase leg (walk toward +0x68 targetPos) is NOT
+modelled in shipsim (t364 named it t365 scope — decide there: model via
+targetPos = victim pos at stance time, or leave the caller to re-issue);
+activeSlot defaults -1 (fixtures must set it or run setStance first).
+Evidence base: _wip_t364.md S3 (model decisions), ships.md S60-S62/S3l seam
+history, campaign.cpp combatPhase/turn loop sites, DECISIONS.md D2 ruling
+wording. Mutation-tested pins like the t290-t292 arms if new decision
+branches land in the flip itself. Seams t365 may NOT silently close: OQ rows
+user-gated (annotate only); aggregate REMOVAL is post-agreement, not t365.
 
 QUEUE (phase 7 — PER-SHIP SIM BUILD, user ruling D2=(b) 2026-11-09: fidelity
 to the original; NO permanent toggle — per-ship becomes THE engine once the
@@ -270,9 +279,10 @@ t363 GIZMO INVENTORY + CARRIER/CARGO into shipsim per spec (3)(4); magnetron/
       run_tests 206/0, mutation 6/6 CAUGHT; ships.md S62). Laws + census:
       docs/re/_wip_t363.md S1..S6. Keep this row for the audit trail.
 
-t364 PER-SHIP COMBAT ROUND into shipsim per spec (5) + t292 comparator
-      unchanged (aggregate victory law stays; per-ship only redistributes
-      losses). Mutation-tested pins like the t290-t292 arms.
+t364 PER-SHIP COMBAT ROUND — LANDED 2026-11-10 (see LANDED t364 block;
+      shipsim t364 block + test_shipsim_t364.cpp x12, run_tests 218/0,
+      mutation 6/6 CAUGHT; _wip_t364.md C1..C9; combat.md S3l + two in-place
+      corrections (S2g dispatch key/stance map, S2k C7 polarity)). Keep row.
 
 t365 ENGINE FLIP: campaign turn loop calls shipsim; aggregate code demoted to
       rewrite/src/game/aggregate_oracle.{h,cpp} used ONLY by tests; full
@@ -335,6 +345,51 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - After the queue drains: author next queue or park WAIT-TRIGGER sentinel (task
   line FIRST); relaunch law MAX_ITERS=20 IDLE_GATE=0.
 
+
+## LANDED t364 — 2026-11-10 (PER-SHIP COMBAT ROUND INTO SHIPSIM: verbatim
+windows 0x4a55c/0x4a360/0x4b8e4/0x4b740/0x42c60-region re-read FRESH with cap-
+stone AND objdump (both agree); THREE banked claims corrected in place; code +
+test_shipsim_t364.cpp x12, run_tests 218/0, MUTATION 6/6 CAUGHT; LEDGER 17/2
+UNCHANGED — honest, both open rows user-gated)
+
+- Sitting check NEGATIVE (live-timeline 8,917,535,608 B, tail 400 rows all
+  turn 1086; r1_t85g_sitting.py NOT run per the >1086 rule). Tree clean at
+  launch. One stray dosbox-x (pid 1555, vnc session) noted, untouched.
+- CORRECTIONS (docs/re/_wip_t364.md C1..C9; in-place notes in combat.md
+  S2g/S2k; pership-spec K2 updated): (C1) the 0x4a399 dispatcher KEY is
+  BYTE [ship+0x67] (handler id 0 gun/1/2 drive/5 special), NOT design[+0x32]
+  — the category gate is the volley loop's (0x4a5e1); (C2) stance map is
+  0->2, 1->1, 2->1, 3->0 (t88's "2->0" read the jbe at 0x4a5a1 wrong);
+  (C7) the resolver's no-carrier ownership branch has its polarity swapped
+  in S2k (JNE=IS-local -> 0x437ee; fall-through NOT-local -> 2).
+- LAW QUIRKS banked verbatim: (C3) APPLY + death are BOTH behind the
+  0x4b7f1 mode==1 cmp — mode-0 probes set flags only; the dispatcher DEC
+  precedes the handler and is mode-1-only; (C4) death finalizer 0x249b4:
+  owner:=0xffff, kind:=0, live-count DEC (corroborates A3/A4); (C5) the
+  volley writes [+0x63] for EVERY cat-0 slot before the call — the commit
+  fires the LAST scanned gun, not the last hit one; charge fires EVEN ON
+  ZERO DAMAGE (0x4bb64 falls through to 0x4bb6c); (C6) Leg A commits and
+  RETURNS — no gunfire in the same resolution; (C9) Range 0 = UNLIMITED
+  (0x4b9a3 je keeps the -1 in-range sentinel; zero-witness, flagged).
+- CODE (rewrite/src/game/shipsim.{h,cpp}): Ship gains dispatcherGate
+  (+0x62)/activeSlot (+0x63 index surrogate)/fireTarget (+0x68 ship-id)/
+  systemId (K1 stand-in); SimDesign gains targetShip (+0x33 bit0; all 10
+  cat-0 file rows carry it — re-measured) and special1 (+0x4a, the 0x2f
+  Carbonizer override); API setStance/volleyTail/companionScan/commitShot/
+  engageRound; digest extended with the engagement quadruple. Named
+  non-inventions: handler-1/2 returns undecoded (sim returns false, state
+  changes per stores; engageRound substitutes the GUN stance arg 3 — C8
+  note); 0x437ee unmodelled; chase leg (walk toward +0x68) deferred t365.
+- MUTATION 6/6 CAUGHT (scripts/r364_mutate.sh, driver r363r_mutate.py,
+  checkpoint 08a6693 BEFORE the first mutant per the skill law): M1 stance
+  map (MISSED first — pin re-scope: each stance step must START from a
+  different handler value than the arg-under-test writes; re-run CAUGHT),
+  M2 store-on-hit, M3 mode-agnostic apply, M4 charge-after-damage, M5
+  mode-0 DEC (MISSED first — fixture used an unlimited-ammo row; finite
+  numUses makes it observable; re-run CAUGHT), M6 Leg-A fall-through.
+- HONEST NEGATIVE: no OQ row closes (t364 contract: user-gated); the
+  aggregate engine stays THE engine until t365 flips it; per-ship-vs-
+  aggregate seed parity is NOT claimed anywhere — it is t365's test.
 
 ## LANDED t363R — 2026-11-09 (GIZMO INVENTORY + UPKEEP BURN + CARRIER LAW
 CODE LANDED VERBATIM: shipsim.{h,cpp} + test_shipsim_t363.cpp x9, run_tests
