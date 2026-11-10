@@ -119,9 +119,19 @@ struct SimDesign {
     int32_t industry = 0;        // +0x46 (spec G1 col order); never read by a
                                  // cited law (G8: no design-cost total is ever
                                  // materialised) — carried for the model only
+    int32_t special1 = 0;        // +0x4a (file Special1; combat.md S2f(c)) —
+                                 // the ONLY t364 consumer is the gizmo-0x2f
+                                 // damage override 0x4bb40 (Myrmidonic
+                                 // Carbonizer damage 20, gizmos.txt row 47)
     bool upkeepGate = false;     // w16 +0x33 bit 0x20 (TOGGLEABLE per the
                                  // vendor flag table, gizmos.md §1) — MEASURED
                                  // true on EXACTLY rows 10..15, all cat 1
+    bool targetShip = false;     // w16 +0x33 bit 0x0 (GZ_TARGETSHIP, gizmos.md
+                                 // §1 flag table) — the gun handler's engage-
+                                 // flag leg ANDs it in at 0x4bae6..0x4baf3;
+                                 // ALL 10 cat-0 file rows carry bitpos 0
+                                 // (gizmos.txt re-measured t364), so the
+                                 // default for a gun row is true
     // Derived-slot contributions (recalc 0x49b52..0x49b8e), pre-switched so
     // the recalc body stays verbatim without a category branch per slot:
     int32_t rowWeapon = 0;       // cat==0 ? level : 0   (+0x00)
@@ -212,6 +222,27 @@ struct Ship {
     // by shipped scenarios). Per-ship surrogate for BYTE[0x12fb3+race*0x1ee]
     // == 0x12; default false == gate never admits on species alone.
     bool speciesLaneTravel = false;
+
+    // ---- t364 COMBAT-ROUND fields (docs/re/_wip_t364.md S1/C1, S3) --------
+    // +0x62 dispatcher gate: 0 -> 0x49f28 routes to movement bookkeeping,
+    // 1 -> routes to the gizmo-use dispatcher 0x4a360 (stance setter store
+    // 0x4a591; resolver Leg A CLEAR store 0x42d9c). Distinct from act (+0x5d,
+    // the decider's act) — the vendor keeps two bytes, so does the sim.
+    uint8_t dispatcherGate = 0;
+    // +0x63 ACTIVE slot (vendor stores the slot POINTER; the sim keeps the
+    // index, -1 == none, the Leg A clear value). The volley writes it for
+    // EVERY cat-0 slot it scans (0x4a5ee stores before the slot call, result
+    // ignored) — after a volley it holds the LAST cat-0 slot scanned, and
+    // the mode-1 commit edges fire THAT gun (_wip_t364 C5 quirk, verbatim).
+    int activeSlot = -1;
+    // +0x68 engagement target (vendor: guest-physical objective/ship pointer
+    // written by the stance setter 0x4a574/0x4a57d/0x4a586 and Leg A
+    // 0x42dbd). Sim-level ship id; -1 none. NOT the walk target — the chase
+    // seam (type-1 ptr-deref walk toward +0x68) is not modelled (t365).
+    int fireTarget = -1;
+    // Sim-level stand-in for the [+0x59] system-object identity the K1 gate
+    // compares (0x4b997). 0 == no system; two ships engage iff nonzero-equal.
+    uint32_t systemId = 0;
 
     // Dwell countdown (QUEUE-TURN LAW, ships.md §10 item 1 + §11): a queued
     // order with turn word != 0 SUPPRESSES the move and decrements per turn.
@@ -363,6 +394,87 @@ class ShipSim {
     // FIRST ship in list order with kind==InSystem AND a slot == code. No
     // strength comparison: eligibility is order-state + equipment.
     const Ship* firstCarrier(uint8_t code) const;
+
+    // ---- t364 PER-SHIP COMBAT ROUND (spec §5 K1..K10; verbatim windows +
+    // this session's CORRECTIONS C1..C5: docs/re/_wip_t364.md; resolver
+    // region combat.md S2k; laws K1..K8 cited there). Naming law: the vendor
+    // resolves an engagement in TWO modes — mode-0 PROBES (volley loop, AI
+    // paths: compute flags, charge and apply NOTHING — C3) and mode-1
+    // COMMITS (the only two edges 0x25560/0x25570, player-command-exec). The
+    // sim exposes the same split; engageRound composes the resolver legs.
+    struct EngagementReport {
+        int shooter = -1;          // Leg B winner (first-eligible, list order)
+        int carrier = -1;          // Leg A winner (first kind-4 + gizmo 0x49)
+        int handler = -1;          // +0x67 value the commit ran (0 gun /
+                                   // 1 shield-family / 2 drive / 5 special;
+                                   // -1 no commit ran). C1: the HANDLER is
+                                   // selected by +0x67, not the gizmo cat.
+        int shots = 0;             // mode-1 hit calls that reached 0x4b740
+                                   // (gates passed; damage may still be 0)
+        int shieldAbsorb = 0;      // sum applied to [+0x90] this round
+        int hullAbsorb = 0;        // sum applied to [+0x8c] this round
+        int destroyed = -1;        // victim slot on death (C4 finalizer ran)
+        int flags = 0;             // last hit-path return (bit2 shield
+                                   // overflow, bit4 lethal-clamp, bit0x10
+                                   // zero-damage skip) — C3: probes set these
+                                   // WITHOUT touching record state
+        bool legACommitted = false;   // carrier engagement state written
+    };
+    // Stance setter FUN_0004a55c VERBATIM (0x4a55c..0x4a601 — the volley loop
+    // lives INSIDE it): refuses POWER==0 (no state change at all — the ret at
+    // 0x4a56f precedes every store); else [+0x62]:=1 (0x4a591) and the
+    // arg->+0x67 HANDLER map 0->2, 1->1, 2->1, 3->0 (banked "arg2->0"
+    // SUPERSEDED, _wip_t364 C2), [+0x68]:=target, then runs the volley tail.
+    // Returns the vendor's truthiness: true iff the tail's dispatch loop
+    // remembered a slot (edi != 0 — Leg B's test eax,eax).
+    bool setStance(int shipId, int arg, int targetShipId);
+    // Companion slot scan FUN_0004a604 VERBATIM: -1 (the vendor's ELIGIBLE
+    // sentinel) iff some slot i < invCap has design cat==0 AND (design
+    // numUses==0 OR slot use != 0); 0 when none (Leg B's test eax,eax reads
+    // -1 as pass, 0 as fail — it is a boolean, NOT a slot index).
+    int companionScan(const Ship& s) const;
+    // Volley loop 0x4a5c1..0x4a5fc VERBATIM (always mode 0 — 0x4a5ec
+    // xor edx,edx): walk slots i < invCap in STORED ORDER, skip 0xff, gate
+    // design cat==0, write [+0x63] := slot (per slot, BEFORE the call,
+    // whatever it returns), run the dispatcher on it (ammo law
+    // 0x4a373..0x4a397; the gun handler's engage flag is the only banked
+    // bit0 reporter). Returns the last slot whose dispatch returned bit0
+    // (vendor edi), -1 none. PUBLIC (t364): the "volley leaves activeSlot on
+    // the LAST cat-0 scanned, not the last HIT one" quirk (C5) is invisible
+    // through setStance — the pins need the seam.
+    int volleyTail(Ship& s);
+    // Dispatcher FUN_0004a360 + gun handler 0x4b8e4 + hit path 0x4b740 on
+    // the ship's ACTIVE slot (+0x63). mode must be 0 or 1 (K6: the vendor's
+    // only mode-1 edges are the player-command-exec calls; AI passes 0).
+    // mode-0: gates + flags + hypothetical absorb ONLY — APPLY (0x4b87a) and
+    // the death call are BOTH behind the mode==1 cmp (C3), so nothing lands.
+    // mode==1: DEC slot use (NumUses != 0), run the +0x67 handler, charge
+    // power -= MIN(design[+0x36], power) (0x4c614), apply shield-then-hull
+    // clamped absorb, hull < 1 -> destroy (C4: owner := -1, kind := 0, act
+    // := 0 — the 0x249b4 finalizer; the corpse's travel re-issue legs are
+    // moot after the finalizer, planet-slot release is planet-side).
+    // Returns the hit-path flags (or the handler result for non-gun +0x67).
+    EngagementReport commitShot(int shipId, int mode);
+    // One engagement resolution (S2k shape, this side's view — K10: the
+    // caller-side array is OWNER-RACE FILTERED, return fire is a SEPARATE
+    // run; call it once per side). Leg A (carrier) runs unless
+    // objectivePlanetShielded (the ACTIVE Ship/Orbital-Shield skip gate,
+    // operands are planet state — caller supplies); Leg B picks the shooter
+    // FIRST-ELIGIBLE in list order (kind 4, companionScan != -1... the
+    // vendor's != 0 test on eax: -1 fails, index >= 0 passes — see impl note)
+    // and setStance(ship,1,target) on the WINNER ONLY (the halt test
+    // [esp+0x2d0] != 0 at 0x42ded stops scanning once a winner is stored),
+    // then commitShot(shooter, mode). K1 same-system gate is enforced inside
+    // the gun handler, verbatim (kind 4 both sides + same systemId).
+    EngagementReport engageRound(int race, int targetShipId,
+                                 bool objectivePlanetShielded, int mode);
+    // System-object id for the K1 gate (vendor [+0x59] star-block index law,
+    // 0x49dbd `edx*39*32 + 0x13bc5` re-confirmed in the death path this
+    // session). Ships in the sim share a system iff systemId matches; the
+    // caller maps star ids onto it. 0 == no system (gates deny).
+    void setSystemId(int shipId, uint32_t id) {
+        if (Ship* s = findShip(shipId)) s->systemId = id;
+    }
     // ds:0x77f6c stand-in (UNMEASURED, ships.md:365 — sim-level constant,
     // never a record offset; default 0 == the bit1-clear branch always).
     void setDriveAddend(int32_t addend) { driveAddend_ = addend; }
@@ -428,6 +540,12 @@ class ShipSim {
     // endpoint mapping is the flagged contract choice, not a cited law.
     // False (state untouched) when denied.
     bool starArrivalComplete(Ship& s);
+
+    // Gun handler engage-flag block 0x4bad4..0x4bafc (in-range incl. the
+    // range==0 unlimited-leg, self-exclusion, GZ_TARGETSHIP) — shared by the
+    // volley tail (bit0 of the dispatch result) and commitShot (the gate
+    // before charge/damage). Cites its own addresses; see _wip_t364 C9.
+    bool gunEngageFlag(const Ship& s, const SimDesign& d) const;
 
     // Owners present in the list, ascending (per-race loop order, ai-dossier
     // §1 "per-race AI loop" over the control table).

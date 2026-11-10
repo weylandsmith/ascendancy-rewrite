@@ -362,10 +362,289 @@ const Ship* ShipSim::firstCarrier(uint8_t code) const {
     // re-read): FIRST ship in LIST order with BYTE[+0x58]==4 (InSystem) AND
     // a slot == code. No strength comparison — eligibility is order-state +
     // equipment. Returns nullptr when no carrier qualifies.
+    // t364 NOTE: the vendor's array is built BEFORE the death finalizer can
+    // run mid-resolution, so corpses (owner 0xffff, kind 0 — C4) are absent
+    // from it; the sim filters them explicitly (owner < 0 == the -1 mirror).
     for (const auto& s : ships_)
-        if (s.kind == OrderKind::InSystem && carriesCode(s, code)) return &s;
+        if (s.owner >= 0 && s.kind == OrderKind::InSystem &&
+            carriesCode(s, code))
+            return &s;
     return nullptr;
 }
+
+// ---------------------------------------------------------------------------
+// t364 PER-SHIP COMBAT ROUND (spec §5 K1..K10). Verbatim windows and this
+// session's corrections C1..C8: docs/re/_wip_t364.md; resolver region
+// combat.md S2k. EVIDENCE RULE: every branch below cites an address.
+// ---------------------------------------------------------------------------
+
+bool ShipSim::setStance(int shipId, int arg, int targetShipId) {
+    Ship* s = findShip(shipId);
+    if (!s) return false;
+    // FUN_0004a55c VERBATIM (0x4a55c..0x4a601) = refusal + stance stores +
+    // the volley tail (the loop at 0x4a5c1 is INSIDE this function). The
+    // power refusal (cmp [ship+0x88],0 / ret, 0x4a561..0x4a56f) PRECEDES
+    // every store — zero state change.
+    if (s->power == 0) return false;
+    s->dispatcherGate = 1;                 // [+0x62] := 1 (0x4a591)
+    // Arg->handler map C2 (raw 0x4a597..0x4a5ae; the banked "arg2->0" is
+    // SUPERSEDED): cmp dx,1/jb -> arg0 => 2; cmp dx,2/jbe captures {1,2} => 1;
+    // cmp dx,3/je => 0. The vendor's default arm asserts (0x3e5, msg 0x2623)
+    // and STILL runs the tail with +0x67 unchanged; the sim refuses instead
+    // (named deviation — no shipped caller passes arg > 3).
+    if (arg == 0)      s->orderType = 2;
+    else if (arg <= 2) s->orderType = 1;
+    else if (arg == 3) s->orderType = 0;
+    else return false;
+    s->fireTarget = targetShipId;          // [+0x68] := ebx (0x4a574/7d/86)
+    // Tail: the VOLLEY LOOP (0x4a5c1..0x4a5fc). The vendor returns edi = the
+    // LAST slot whose dispatch result had bit0; the sim surfaces the same
+    // value through volleyTail's return.
+    return volleyTail(*s) >= 0;
+}
+
+int ShipSim::companionScan(const Ship& s) const {
+    // FUN_0004a604 verbatim: first i < [ship+0x15a] with design cat==0 AND
+    // (design[+0x42] NumUses == 0  OR  slot use WORD != 0) -> -1 (edx :=
+    // 0xffffffff, the ELIGIBLE sentinel Leg B tests != 0); none -> 0. The
+    // vendor's dword-overlap slot reads (ship+0xa8/+0xaa sar shifts) are
+    // byte-equivalent to the direct InvSlot reads used here.
+    for (uint32_t i = 0; i < s.invCap && i < kRingSlots; ++i) {
+        if (s.inv[i].cidx == 0xff) continue;
+        const SimDesign& d = designRow(designs_, s.inv[i].cidx);
+        if (d.cat != 0) continue;
+        if (d.numUses != 0 && s.inv[i].use == 0) continue;
+        return -1;
+    }
+    return 0;
+}
+
+int ShipSim::volleyTail(Ship& s) {
+    // 0x4a5c1..0x4a5fc verbatim, ALWAYS mode 0 (0x4a5ec xor edx,edx — the
+    // volley can never charge or apply; C3/C5). The [+0x63] store fires for
+    // EVERY cat-0 slot BEFORE its dispatcher call (0x4a5ee precedes 0x4a5f1)
+    // and the per-slot result is ignored for the store — after the loop
+    // activeSlot == the LAST cat-0 slot scanned, even an out-of-ammo one
+    // (the C5 quirk the mode-1 commit edges then fire).
+    // 0x49f28 gate (BYTE [+0x62]): 0 routes to movement bookkeeping 0x49f54
+    // (NOT combat — unmodelled), so the volley only reaches the dispatcher
+    // after a stance set. The stance setter always sets +0x62 := 1.
+    if (s.dispatcherGate == 0) return -1;
+    int last = -1;
+    for (uint32_t i = 0; i < s.invCap && i < kRingSlots; ++i) {
+        const InvSlot& slot = s.inv[i];
+        if (slot.cidx == 0xff) continue;                       // 0x4a5d6
+        const SimDesign& d = designRow(designs_, slot.cidx);
+        if (d.cat != 0) continue;                              // 0x4a5e1
+        s.activeSlot = static_cast<int>(i);                    // 0x4a5ee
+        // Dispatcher FUN_0004a360, mode-0 legs: NumUses law 0x4a373..0x4a397
+        // (design word == 0 -> unlimited; else slot use == 0 -> OUT OF AMMO,
+        // handler SKIPPED, result 0; mode != 1 -> no DEC). Result bit0
+        // (0x4a5f6 test al,1) is banked ONLY for the gun handler (engage
+        // flag 0x4bad4..0x4bafc); handlers 1/2 returns are NOT banked (C8) —
+        // honest 0, never claim an undecoded value.
+        const bool ammo = (d.numUses == 0) || (slot.use != 0);
+        if (ammo && s.orderType == 0 && gunEngageFlag(s, d))
+            last = static_cast<int>(i);                        // 0x4a5fa
+    }
+    return last;                                               // eax = edi
+}
+
+bool ShipSim::gunEngageFlag(const Ship& s, const SimDesign& d) const {
+    // Engage-flag block 0x4bad4..0x4bafc: eax := 1 iff [esp+0x4cc] != 0
+    // (entry -1, always true), ecx (in-range) != 0, target != shooter
+    // (0x4bae2), design[+0x33] bit 0 GZ_TARGETSHIP (0x4baec; ALL 10 cat-0
+    // file rows carry bitpos 0). IN-RANGE (C9, fresh read): the range==0
+    // branch 0x4b9a3 `je 0x4bad4` SKIPS the distance math with ecx still the
+    // init sentinel -1 => RANGE 0 = UNLIMITED RANGE, not never-fire. No
+    // shipped cat-0 row has Range 0 (gizmos.txt 76-row census), so the leg
+    // is zero-witness — modelled verbatim, flagged as such.
+    const Ship* t = nullptr;
+    for (const auto& c : ships_)
+        if (c.id == s.fireTarget) { t = &c; break; }
+    if (!t) return false;                        // [+0x68] null (assert 0xad)
+    if (t == &s) return false;                   // 0x4bae2 self excluded
+    if (!d.targetShip) return false;             // GZ_TARGETSHIP AND-term
+    if (d.range != 0) {
+        double limit = static_cast<double>(d.range) * 32.0;  // design[+0x3a]<<5
+        if (s.status & 0x4) limit *= 2.0;   // [ship+0x9c]&4 fmul ds:0x2743 —
+                                            // header const UNRESTORED, 2x
+                                            // [inferred] (cat-1 twin
+                                            // ds:0x85312 == 2.0 verified)
+        const double dx = static_cast<double>(t->pos[0]) - s.pos[0];
+        const double dy = static_cast<double>(t->pos[1]) - s.pos[1];
+        const double dz = static_cast<double>(t->pos[2]) - s.pos[2];
+        const double dist = std::sqrt(dx * dx + dy * dy + dz * dz);  // 0x76da0
+        if (dist > limit) return false;          // 0x4baae jbe -> fail leg
+    }
+    return true;
+}
+
+ShipSim::EngagementReport ShipSim::commitShot(int shipId, int mode) {
+    EngagementReport rep;
+    Ship* s = findShip(shipId);
+    if (!s) return rep;
+    if (s->dispatcherGate == 0) return rep;   // 0x49f28 gate -> bookkeeping
+    // Dispatcher FUN_0004a360 entry: ACTIVE slot (+0x63) required (the gun
+    // handler asserts 0xff slot at 0x4b922; the dispatcher derefs [ecx] at
+    // 0x4a36b — the sim's -1/0xff stand in for the null deref).
+    if (s->activeSlot < 0 || s->activeSlot >= kRingSlots) return rep;
+    InvSlot& slot = s->inv[s->activeSlot];
+    if (slot.cidx == 0xff) return rep;
+    const SimDesign& d = designRow(designs_, slot.cidx);
+    // NumUses law + DEC, verbatim order (0x4a37b..0x4a397): the ammo skip
+    // tests the use word BEFORE any DEC (esi := 0 set only at 0x4a387 when
+    // use == 0 pre-DEC); the DEC (0x4a390) runs ONLY mode==1 AND use != 0 —
+    // and runs BEFORE the handler, ungated by any handler-side gate.
+    if (d.numUses != 0) {
+        if (slot.use == 0) return rep;         // out of ammo: handler skipped
+        if (mode == 1) --slot.use;             // THE use-consumption site
+    }
+    rep.handler = s->orderType;                // C1: +0x67 selects the handler
+
+    if (s->orderType != 0) {
+        // Handlers 1 (0x4c794), 2 (0x4ca50), 5 (0x4cd90): the shield/drive
+        // bodies run NO hit call (C1 rel32 census of [0x4c794,0x4ca50):
+        // {0x2a428,0x38840,0x39f00,0x496e4,0x76da0}) and their returns are
+        // not banked; the special tree is K9 reference scope. Named no-op
+        // legs — and NO charge: the MIN-charge tail 0x4c614 lives inside the
+        // GUN handler; the other handlers' accounting (if any) is unbanked,
+        // so the sim charges nothing for them (never invent).
+        return rep;
+    }
+
+    // ---- GUN HANDLER 0x4b8e4 (fresh full read 0x4b8e4..0x4bb7a) ----------
+    const int32_t cost = std::min(d.power, s->power);   // MIN entry-computed
+                                                        // (0x4b951..0x4b961)
+    Ship* t = findShip(s->fireTarget);
+    if (!t) return rep;                       // [+0x68] null assert (0xad)
+    if (s->kind != OrderKind::InSystem || t->kind != OrderKind::InSystem)
+        return rep;                            // K1 gate 0x4b982..0x4b991
+    if (s->systemId == 0 || s->systemId != t->systemId)
+        return rep;                            // K1 system identity 0x4b997
+    // Engage flag (range + self + TARGETSHIP) — gate fail exits at 0x4c780
+    // WITHOUT charge and without damage.
+    if (!gunEngageFlag(*s, d)) return rep;
+    // Gate passed: mode==1 charges at the tail (0x4bb6c cmp mode,1 /
+    // je 0x4c614) EVEN WHEN damage is 0 (the 0x4bb64 or-0x10 leg falls
+    // THROUGH to 0x4bb6c, verified) — so the charge precedes the damage
+    // branch below. DEC already applied (dispatcher, above).
+    if (mode == 1) s->power -= cost;           // 0x4c614..0x4c62a
+    // Damage 0x4bb2a..0x4bb43: ebx = cat0 ? design[+0x52] : 0; cidx 0x2f ->
+    // design[+0x4a]. The sim's rowWeapon IS the derived +0x52 for cat-0 rows
+    // (recalc law) and 0 for every other category — a non-gun active slot
+    // under a gun stance lands here as damage 0, verbatim.
+    int32_t dmg = d.rowWeapon;
+    if (slot.cidx == 0x2f) dmg = d.special1;   // Myrmidonic Carbonizer 20
+    if (dmg == 0) { rep.flags |= 0x10; return rep; }   // 0x4bb64 skip, no hit
+
+    // ---- HIT PATH 0x4b740 (call site 0x4bb56; absorb chain 0x4b7a7..) -----
+    int32_t flags = 0;
+    int32_t absorb = dmg;
+    if (t->status & 0x10) absorb = 0;          // invulnerable: edi := 0 (0x4b7bc)
+    int32_t spill = 0;
+    if (absorb > static_cast<int32_t>(t->shields)) {   // 0x4b7c4 jle
+        spill = absorb - static_cast<int32_t>(t->shields);
+        absorb = static_cast<int32_t>(t->shields);
+        flags |= 2;                            // shield overflow (0x4b7d1)
+    }
+    int32_t hullAbs = spill;
+    if (hullAbs >= static_cast<int32_t>(t->integrity)) {  // 0x4b7e0 jl: no
+        hullAbs = static_cast<int32_t>(t->integrity);     // flag ONLY when
+        flags |= 4;                            // spill < hull (0x4b7e8)
+    }
+    rep.flags = flags;
+    rep.shots = 1;                             // the hit call happened
+
+    // C3: mode != 1 exits at 0x4b7f6 BEFORE the star-record leg, the APPLY,
+    // and the death call — flags only, NOTHING lands. (The dispatcher DEC
+    // already ran above — verbatim: the DEC precedes the handler, so a
+    // mode-0 probe is the ONLY thing that cannot spend ammo; C5: the volley
+    // itself is mode-0, so volley probes never DEC either.)
+    if (mode != 1) return rep;
+
+    // APPLY 0x4b87a..0x4b890 (sub then store, shield layer first).
+    t->shields = static_cast<uint32_t>(static_cast<int32_t>(t->shields) - absorb);
+    t->integrity -= hullAbs;
+    rep.shieldAbsorb = absorb;
+    rep.hullAbsorb = hullAbs;
+    if (t->integrity < 1) {
+        // DEATH 0x49d2c -> finalizer 0x249b4 (C4): owner := 0xffff (sim -1),
+        // kind := 0, +0x34 := 0 (no sim field), live-count DEC (sim: the
+        // dead filter drops the row). Corpse travel-reissue legs are moot
+        // after the finalizer; planet-slot release is planet-side (non-goal).
+        rep.destroyed = t->id;
+        t->owner = -1;
+        t->kind = OrderKind::NoOrder;
+        t->act = 0;
+        t->dispatcherGate = 0;
+        t->activeSlot = -1;
+        t->fireTarget = -1;
+    }
+    return rep;
+}
+
+ShipSim::EngagementReport ShipSim::engageRound(int race, int targetShipId,
+                                               bool objectivePlanetShielded,
+                                               int mode) {
+    EngagementReport rep;
+    // Leg A (carrier) 0x42d09..0x42d5b — runs ONLY when the objective planet
+    // has NO ACTIVE Ship/Orbital-Shield item (gate 0x42cea..0x42cf3, S2k;
+    // operands are planet state -> caller supplies, M-e). The vendor's array
+    // is owner-race filtered (K10) — the sim filters by race here too.
+    if (!objectivePlanetShielded) {
+        for (const auto& c : ships_) {
+            if (c.owner != race || c.kind != OrderKind::InSystem) continue;
+            if (!carriesCode(c, kCidxInvasionModule)) continue;
+            Ship* carrier = findShip(c.id);
+            rep.carrier = c.id;
+            rep.legACommitted = true;
+            // C6 VERBATIM stores (0x42d9c..0x42dbd) then RETURN — no gunfire
+            // in the same resolution ([+0x63] := 0 null slot: the carrier's
+            // commit edges would skip the dispatcher anyway).
+            carrier->dispatcherGate = 0;       // [+0x62] := 0
+            carrier->activeSlot = -1;          // [+0x63] := 0 (null slot)
+            carrier->orderType = 1;            // [+0x67] := 1
+            carrier->fireTarget = targetShipId;// [+0x68] := objective
+            return rep;
+        }
+        // C7: no carrier. The objective-IS-local-player branch (jne 0x437ee,
+        // outside the banked region) is UNMODELLED; the not-local fall-
+        // through returns 2 ("nothing picked") — the sim mirrors it as an
+        // empty report.
+        return rep;
+    }
+    // Leg B 0x42de0..0x42e34 verbatim tests IN ORDER: kind==4, companionScan
+    // != 0 (eax: -1 eligible), stance setter != 0. The stance setter RUNS
+    // the volley tail, so its result is the volley's engage-bit0 — a ship
+    // that cannot hit THIS target is NOT picked and the scan CONTINUES
+    // (vendor loop structure). First match stores [esp+0x2d0] and the
+    // loop-head halt test (0x42ded) ends the scan.
+    Ship* shooter = nullptr;
+    for (auto& c : ships_) {
+        if (c.owner != race) continue;
+        if (c.kind != OrderKind::InSystem) continue;      // 0x42e08
+        if (companionScan(c) == 0) continue;              // 0x42e10/0x42e15
+        // Named substitution (C8): the vendor passes arg 1 (+0x67 := 1, the
+        // handler-1 body whose return is UNDECODED); the firepower this leg
+        // resolves IS the cat-0 gun path, so the sim sets the GUN stance
+        // (arg 3 -> +0x67 := 0) and evaluates the cited gun engage flag.
+        if (!setStance(c.id, 3, targetShipId)) continue;  // 0x42e24/0x42e29
+        shooter = &c;
+        break;
+    }
+    if (!shooter) return rep;
+    rep.shooter = shooter->id;
+    // Damage step: the cited commit law at the caller's mode (K6: player
+    // edges pass 1, AI paths 0). FIRES [+0x63] = the LAST cat-0 slot the
+    // stance volley scanned — the C5 quirk, verbatim (may be out-of-ammo ->
+    // dispatcher skip -> no shot; that is the vendor's behaviour).
+    EngagementReport shot = commitShot(shooter->id, mode);
+    shot.shooter = shooter->id;
+    return shot;
+}
+
+
 
 bool ShipSim::starArrivalComplete(Ship& s) {
     // FUN_00049a34 + admission FUN_000499f8 verbatim (_wip_t363 S3d + S4
@@ -762,6 +1041,14 @@ uint64_t ShipSim::digest() const {
         }
         mix(static_cast<uint64_t>(s.invCap));
         mix(s.laneToB ? 1ull : 0ull);
+        // t364 state: the engagement quadruple (+0x62/+0x63/+0x67/+0x68) and
+        // the system identity. The determinism pins stay green (digest is a
+        // pure function of state either way).
+        mix(s.dispatcherGate);
+        mix(static_cast<uint64_t>(s.activeSlot));
+        mix(s.orderType);
+        mix(static_cast<uint64_t>(s.fireTarget));
+        mix(s.systemId);
     }
     mix(lcg_.state);
     mix(static_cast<uint64_t>(turn_));
