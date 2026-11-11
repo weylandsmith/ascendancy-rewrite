@@ -232,3 +232,31 @@ STAR TRIPLE vs SHIP POS SCALE: Vega table triple (359.5,246.4,-60.2); no
 scale 1/5/160 puts the magnetron landing (1280,-1760,1344) within 200 units.
 type=2 pay ptr deref (0x2589f6) = (-654.8,2055.2,-556.8) = some object triple,
 NOT the landing. => landing source UNIDENTIFIED this session; honest negative.
+
+
+## S-T376 save-slot map + protection (2026-11-11, user directive)
+
+User directive: existing saved games (day 887, 1086, 1253) must NOT be
+overwritten; other save-state mutation is granted.
+
+MEASURED LAW (new, cheap): a raw `.SAV`/`RESUME.GAM` byte 0..3 is a u32
+LE = the game-day (turn) at save time. Verified 6/6 files in the mounted
+game dir (work/r1/game): 01.SAV=1086, 02.SAV=1253, 03.SAV=887, 04.SAV=1254,
+RESUME.GAM=1086, RESUME.GAM.user-oct29=1086. (The in-game menu shows these
+as day numbers; slot order is NOT chronological.) mtimes are USELESS here —
+the whole game dir was copied at VM setup (Oct 26 08:59) and the in-game
+save writes preserve them.
+
+PROTECTION EXECUTED 2026-11-11: all six files copied read-only (chmod 444)
+into ~/ascendancy-saves-protected/ (dir 0500), md5-verified identical:
+01 a5816431d5afc9940cbfa75e790ef943 / 02 35b29d9c8fa8aff7b903796eb37cd349 /
+03 e3e9e220cb4e0804f44854ea03305453 / 04 5b8662d9bb5567cd4efdb65122e450ab /
+RESUME(+user-oct29) 5b382afbb789186c3654f3cec085b2e2.
+NOTE: in-game SAVE writes to slot NN replace work/r1/game/NN.SAV wholesale
+(dosbox C: mount) — the protected copies are the restore point, not a lock.
+Ring saves (NNN.sav in playcap/save/) are a different container (raw, ~2 MB,
+watcher-made) and never collide with the user's 4 slots.
+
+Consequence for the tutorial plan: running the tutorial mutates RESUME.GAM
+(=day 1086 slot content) and may clobber slot files if saved; RESTORE
+POINT = cp ~/ascendancy-saves-protected/RESUME.GAM work/r1/game/RESUME.GAM.
