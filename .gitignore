@@ -14,3 +14,6 @@ xsend/build/rewrite
 tools/xsend
 tools/shp_pngdump
 tools/shp_partialdump
+
+# user save copies — never publish (t376)
+archive/user-saves/

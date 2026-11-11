@@ -23,13 +23,13 @@ SRC="$(cd "$(dirname "$0")/.." && pwd)"
 git clone -q "$SRC" "$OUT"
 cd "$OUT"
 
-git rm -r -q --cached --ignore-unmatch \
-    game extracted work \
-    artifacts/ascend_restored.bin artifacts/functions_full.tsv
+# NOTE: do NOT pre-stage removals with `git rm --cached` — a dirty index makes
+# filter-branch refuse ("Your index contains uncommitted changes"). The
+# --index-filter below performs the removal per commit. (Verified 2026-11-11.)
 
 FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --prune-empty \
     --index-filter 'git rm -r -q --cached --ignore-unmatch \
-      game extracted work \
+      game extracted work archive/user-saves \
       artifacts/ascend_restored.bin artifacts/functions_full.tsv' \
     --env-filter 'export GIT_AUTHOR_NAME="Weyland Smith" GIT_COMMITTER_NAME="Weyland Smith";
       if [ -n "${GITHUB_USER:-}" ]; then
