@@ -30,7 +30,11 @@ git rm -r -q --cached --ignore-unmatch \
 FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --prune-empty \
     --index-filter 'git rm -r -q --cached --ignore-unmatch \
       game extracted work \
-      artifacts/ascend_restored.bin artifacts/functions_full.tsv' -- --all >/dev/null
+      artifacts/ascend_restored.bin artifacts/functions_full.tsv' \
+    --env-filter 'export GIT_AUTHOR_NAME="Weyland Smith" GIT_COMMITTER_NAME="Weyland Smith";
+      if [ -n "${GITHUB_USER:-}" ]; then
+        export GIT_AUTHOR_EMAIL="$GITHUB_USER@users.noreply.github.com" GIT_COMMITTER_EMAIL="$GITHUB_USER@users.noreply.github.com";
+      fi' -- --all >/dev/null
 
 # filter-branch keeps refs/original backups; without this the vendor blobs
 # survive gc and the strip is cosmetic (VERIFIED 2026-11-11: 100M->9.7M).
