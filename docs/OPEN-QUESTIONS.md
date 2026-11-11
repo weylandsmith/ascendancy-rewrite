@@ -315,6 +315,18 @@ byte-identical on 20/20 ring saves; pins test_shipsave_t366 x3, suite 226/0,
 mutation 6/6; ships.md S63 + docs/re/_wip_t366.md). No game-emitted vendor
 save is headlessly producable (cited-broken click path); honest note banked.
 Closure remains the user's call.
+t370 NOTE (2026-11-11, playtest witnesses, ships.md S64): residue-(1)
+destination-widget annotated MEASUREMENT-WISE (amended, NOT deleted, NOT
+closed — user-gated). First runtime witnesses from the user's own session
+(turn 1253->1254, banks work/r1/bank-play-20261111{,-late}/): magnetron use
+WITNESSED (power burn = gizmos.txt Power field exact, ring slot consumed);
+gizmo use-counter decrements WITNESSED (cidx==gizmos.txt entry index for
+9/60/73); empty-space destination orders write [+0x6c] triple ATOMICALLY per
+issued order (type->3, one frame) — the two-click x/y-then-z testimony is
+UNRESOLVED at field level because the 10 s watcher cadence cannot resolve
+clicks inside one gap (adjacent XY->Z census = 0, cadence-blind, not
+refuted); placement source vs star triples UNIDENTIFIED (honest negative S64
+neg-(a)). Row closure remains the user's call per the t329 packet.
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +

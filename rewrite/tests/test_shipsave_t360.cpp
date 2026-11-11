@@ -158,7 +158,7 @@ TEST(shipsave_corpus_law_pins_t360) {
         std::printf("(skip: work/ corpus absent) ");
         return;
     }
-    uint64_t liveRows = 0, attrOk = 0;
+    uint64_t liveRows = 0, attrOk = 0, deadWithInv = 0;
     for (const auto& s : ringSaves()) {
         Parsed p = parseOne(s);
         if (!p.ok) continue;
@@ -168,8 +168,15 @@ TEST(shipsave_corpus_law_pins_t360) {
             if (r.dead) {
                 CHECK(r.ownerHandle == 0xffff0000u);
                 CHECK(r.orderKind == 0);
-                CHECK(r.invCap == 5u);
-                CHECK(r.filled == 0u);
+                // t360 dead-row SHAPE UNIFORMITY (invCap==5, filled==0) IS
+                // RETRACTED — falsified by the 2026-11-11 user playtest: a
+                // slot killed IN PLAY keeps its inventory (work/r1/
+                // bank-play-20261111-late slot 12: handle 0xffff0000, kind 0,
+                // invCap 10, filled 10). The old corpus only ever held
+                // never-used slots. Death does NOT clear +0x15a/+0x15e.
+                // What still holds: the ring span law.
+                CHECK(r.invCap <= ShipSave::kRingSlots);
+                if (r.invCap > 5u || r.filled > 0u) ++deadWithInv;
                 continue;
             }
             ++liveRows;
@@ -180,6 +187,9 @@ TEST(shipsave_corpus_law_pins_t360) {
     }
     CHECK(liveRows > 0);
     CHECK(attrOk == liveRows);  // t273 attribution law, corpus-wide
+    if (deadWithInv)
+        std::printf("(dead rows retaining inventory: %llu) ",
+                    (unsigned long long)deadWithInv);
 }
 
 TEST(shipsave_frozen_ring_t1086_exact_t360) {

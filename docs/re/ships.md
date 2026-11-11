@@ -2979,3 +2979,79 @@ VERBATIM (work/r331_disasm.txt, full evidence docs/re/_wip_t362.md S4/S6/S7):
   LAW reading; the writer round-trips those bytes verbatim like any other.
 - NON-CLOSURE (strict-close): OQ-019 stays open (user-gated per t329); the
   write side completes the model's I/O surface, it is not the row's closer.
+
+## S64 t370 (2026-11-11) — FIRST RUNTIME WITNESSES: MAGNETRON USE, GIZMO-USE DECREMENTS, QUANTIZER-AT-ARRIVAL (user playtest turn 1253->1254)
+Window 2026-11-11 00:02:06 -> (open), lo_ns 1794373326560000000
+(scripts/r369_playwindow.py exit 0). Two ring banks:
+work/r1/bank-play-20261111/ (20 slots, ALL t1253 = orders placed, turn
+UNENDED) and work/r1/bank-play-20261111-late/ (taken 02:19, t1254 = turn
+ENDED between 01:26 and 02:19). Tools: scripts/r370_slot_events.py (raw
+177-word ship-record word-event stream from live-timeline.jsonl ship_raw;
+full output work/r1/t370_slot_events_all.txt) + scripts/r370_bank_deref.py
+(Memory-image deref + star grid census).
+MEASURED M1 MAGNETRON USE (slot 28 GUANDAGNINI, wall 00:13:50): single-frame
+pos (-1184,1344,-1184)->(1280,-1760,1344) (d=+2464,-3104,+2528); kind byte
+stays 4, high byte 0x45->0x85; +0x59 tgt 0x256045->0x255c85; order type
+1->2; POWER [+0x88] 90->80 = Lane Magnetron gizmos.txt entry 60 'Power 10'
+EXACT; gizmo ring slot 14 (cidx 60, use 1) REMOVED in the same event =
+single-use inventory consumption (NumUses column 1). +0x8c 40->39 landed
+LATER (00:24:08, separate frame) = 1 hull point, NOT a charge decrement —
+spec +0x8c = INTEGRITY stands; the t369 manual-pass note calling +0x8c
+'charges' is RETRACTED. Landing is ON the 32-grid; compatible with T3
+(rng%200) because the walk/commit quantizer FUN_000533e0 g=32 applies at
+ARRIVAL — strengthened this session by runtime mid-transit off-grid rows:
+s9/s15/s15/s19/s21 post-end-turn kind 4->5 at (14.0,1.0,-224.0), Ilmarinen
+s38 kind-5 mid-transit (28.0,0.0,-2144.0), s13 (28->42,0,1824), s17/s20/s29
+(144.7->149.3,0,32) = glide frames off-grid, rest frames on-grid. CENSUS
+LAW: K3b off-grid-at-rest test is BLIND BY CONSTRUCTION (quantizer at
+arrival); mid-transit off-grid rows are the correct magnetron-adjacent
+signal. use-site upgraded static-cited -> WITNESSED (M1).
+MEASURED M2 GIZMO-USE DECREMENTS (use u16 @ring-slot+1): Stainer s14 slot13
+cidx 9 use 3->2 @00:24:08 with POWER 90->84 = Nanomanipulator (gizmos.txt
+entry 9, 'Power 6') EXACT; Gofriller s34 slot13 cidx 9 3->2 @00:26:59 then
+2->1 @00:27:51, POWER -6 each = two uses. cidx == gizmos.txt ENTRY INDEX
+confirmed independently for 9, 60 (M1), 73: Ignatz s22 LOST two slots
+(73,0,0) @00:28:48 = Invasion Module x2 consumed at invasion launch (user:
+invade Vernunft I).
+MEASURED M3 EMPTY-SPACE DESTINATION ORDERS: every user empty-space move
+writes order TYPE ->3 + [+0x6c] f32 triple := destination IN ONE FRAME
+(Erchamion s16 00:15:29 trip:=(-1664,-1568,64); Ipshitz s25 00:22:29
+trip:=(-192,1504,-1280); Sparrowhawk s18 00:24:49/59, 00:25:10; Ilmarinen
+s38 00:20:19 trip:=(-672,32,-2112) then 00:21:21 kind 4->5 lane-entry at
+(0,0,-2144)). Object-target moves instead set type 1/2 + pointer (Ignatz
+kind 4->3 orbit Vernunft at (-480,0,-736) y=0). r369_order_diff tl census:
+dest-change classes {'BOTH':2}, adjacent XY->Z two_click = 0 — the 10 s
+watcher cadence CANNOT resolve two clicks inside one gap, so the two-click
+testimony is neither confirmed nor refuted at field level; the record-level
+fact is ATOMIC triple write per issued order. OQ-019 residue-(1) annotated
+measurement-wise (user-gated; NOT closed).
+MEASURED M4 SPARROWHAWK 10-s CADENCE RESOLVED: frames 00:24:39/49/49/59/
+00:25:10 show trip==pos EXACTLY each sample + power 19->16->11->8 = watcher
+samples the real-time GLIDE, not order commits (answers t369 manual-pass
+CHECK item; march steps consumed real-time within the unended turn).
+MEASURED M5 END-TURN BOOKKEEPING (bank t1253 -> bank t1254): player-ship
+POWER refills to design max (s14 84->90, s28 80->90, s34 78->90; corroborates
+S13-D refuel law at runtime); five ships kind 4->5 lane-entry (tgt
+0x258195); s10 kind 5->4 arrival (-1280,-1952,384); s12 name cleared +
+kind 4->0 and s40 Intil-Za GONE from the array (n 41->40) = loss
+bookkeeping at end turn; AI ships (owners 1/2) moved same boundary.
+HONEST NEGATIVES (all banked, rows stay open): (a) landing-vs-star
+placement source UNIDENTIFIED — no scale 1/5/160 of any star-table triple
+(name-0x14) puts (1280,-1760,1344) within 200 units; +0x59 value 0x255c85
+sits at a star-record name-slot +0x1c whose [+8]/[+0x14] read zeros — the
+FUN_00021f58 target-object rebase law for +0x59 is NOT the naive linear
+read; needs the 0x220a8 target-store disasm leg, not more RAM pokes.
+(b) star-table triples are 50/50 OFF the ship 32-grid (Vega (359.5,246.4,
+-60.2)) — unit mapping star-space vs ship-space open. (c) invasion EFFECT on
+Vernunft I owner byte unchanged 0->0 across the end turn (capture may predate
+resolution or the effect lands elsewhere); (d) two-click two-step unresolved
+by cadence (M3).
+S64 ADDENDUM (t370, same iteration): MEASURED M6 DEATH KEEPS INVENTORY —
+the t360 dead-row shape uniformity (dead => invCap==5 && filled==0, cited
+_wip_t360 S2) is FALSIFIED by the playtest: late bank slot 12 (the ship the
+user lost at this turn boundary: name cleared, was 'Medium' own0) is dead
+(handle 0xffff0000, kind 0) with invCap 10, filled 10 INTACT. The old
+49-save corpus only ever held never-used dead slots. LAW: death clears the
+name + order fields but NOT +0x15a/+0x15e (ring cap/filled). Test amended
+(test_shipsave_t360 dead-branch: span law kept, uniformity retracted,
+deadWithInv counter printed); suite 226/0.

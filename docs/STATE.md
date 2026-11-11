@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-10T14:05
+updated: 2026-11-11T02:45
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,25 +222,26 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t369 per queue row t369 below (phase 8: PLAYTEST HARVEST +
-PACKAGING). The WAIT-USER-RULING sentinel is RETIRED — user spoke
-2026-11-10: movement testimony banked (docs/re/_wip_playtest_t369.md;
-two-click x/y-then-z destination = the msg-0x50 class, testimony
-re-opens it measurement-wise ONLY via tonight's witnesses), license
-decided GPL-3.0+creator-grant (D5), vendor data excluded, OQ-016/
-OQ-019 acceptance + D3 DEFERRED pending playtest. Production pid
-107664 TL-expiry 2026-11-17 11:24 (week-long for the night session);
-ring pre-play banked work/r1/bank-t1086-preplay/.
-T369 STATUS (this iteration): the three census tools are BUILT and
-control-verified (zero-hit on the pre-play bank + positive fixture;
-docs/re/_wip_t369.md RESULTS). Playwindow ran honest-negative: NO
-WINDOW YET (no SAV/RESUME mtime move, timeline tail all t1086 with
-the mandatory 2026-11-10 11:18 mtime floor — stale Nov-3 drive rows
-would otherwise false-fire it). Per the queue row the rerun stays
-t369: run scripts/r369_playwindow.py; exit 1 => not played, land the
-negative, NEXT stays t369; exit 0 => BANK the ring immediately
-(rotation law ~200 s), then run the two censuses --window and --dir
-per the RUNBOOK at the bottom of docs/re/_wip_t369.md.
+NEXT t371 DISTRIBUTION SPLIT (queue row t371 below; ordering rationale:
+the playtest harvest t369+t370 LANDED 2026-11-11 — witnesses banked
+ships.md S64, OQ-019 residue-(1) annotated measurement-wise — so the
+phase-8 queue advances to packaging; t371 is docs-only and needs NO
+capture stack). Write docs/re/packaging.md per the queue row:
+publishable-tree inventory, excluded set (game/, extracted/, work/,
+live-timeline), case-sensitivity audit checklist for Windows, CI matrix
+draft, README.md draft for the public repo. NOTE for the README/
+evidence prose: the t369 manual-pass claim '+0x8c charges -1' is
+RETRACTED (t370 M1: +0x8c = INTEGRITY hull; single-use gizmos vanish
+from the +0xab ring slot instead — ships.md S64).
+OPTIONAL FOLLOW-UP (only if the user plays again; run BEFORE t371 if a
+new window exists): python3 scripts/r369_playwindow.py — exit 0 => BANK
+the ring IMMEDIATELY (rotation law ~200 s: cp -p work/r1/playcap/save/*.sav
+work/r1/bank-play-<date>/), then scripts/r370_slot_events.py LO -1 and
+the r369 censuses; session 2026-11-11 was still LIVE at t370 end (turn
+1254, production pid 107664 up to TL 2026-11-17 11:24). Open lead worth
+one probe if witnesses recur: the FUN_00021f58 target rebase law for
++0x59 (S64 honest-negative (a)) — needs the 0x220a8 target-store disasm
+leg, NOT more RAM pokes.
 
 QUEUE (phase 8 — PLAYTEST HARVEST + PACKAGING; user decisions 2026-11-10:
 ship WITHOUT vendor data; license = GPL-3.0 + written grant to original
@@ -248,33 +249,6 @@ creators (D5 drafted t372); OQ-016/OQ-019 acceptance + D3 DEFERRED pending
 tonight's playtest witnesses. One session each; finish tN -> rewrite NEXT to
 tN+1 VERBATIM; keep this block intact except deleting completed rows.
 Context: docs/re/_wip_playtest_t369.md (testimony + signatures + baselines).
-
-t369 CENSUS TOOLS PRE-BUILT (zero corpus assumptions, runnable the morning
-      after the playtest). scripts/r369_playwindow.py: locate the play window
-      from baselines in _wip_playtest_t369.md (first RESUME.GAM/*.SAV mtime
-      change, first timeline turn != 1086) and emit window bounds.
-      scripts/r369_magnetron_hit.py: K3b off-grid landing census OVER THE
-      WINDOW ONLY (streaming, OOM law; law pointers in _wip S 'EXPECTED
-      SIGNATURES' 1). scripts/r369_order_diff.py: consecutive-slot ring diff
-      of ship order/inventory fields per docs/re/pership-spec.md (t273 owner
-      attribution; testimony predicts two-step x/y then z destination set —
-      look for order kinds with arbitrary z). Tools must run on the PREPLAY
-      bank first as a no-hit control (expect 0 hits; a nonzero control =
-      instrument bug, fix before use). Exit honest-negative if the window
-      doesn't exist yet (user may not have played yet at session time — then
-      NEXT stays t369, run again; do NOT park).
-
-t370 PLAYTEST WITNESS CENSUS (run t369 tools over the real window). Report
-      per signature: magnetron landing hit(s) with ship index + system +
-      jitter values vs the rng%200 law; destination-order witnesses (does the
-      two-click x/y-then-z law show in ship-record fields? which order id?);
-      gizmo-on-target decrements. Land as MEASURED blocks in ships.md (new S
-      section) with scripts + run ids. IMPLICATIONS, applied per evidence:
-      a destination witness RE-OPENS OQ-019 residue-(1) measurement-wise
-      (annotate the row — cited-dead chain note amended, NOT deleted; do NOT
-      close anything, user-gated); a magnetron hit upgrades the use-site from
-      static-cited to WITNESSED (annotate). Zero-hits land as honest
-      negatives with the window stats.
 
 t371 DISTRIBUTION SPLIT (docs only, no git surgery yet): docs/re/packaging.md
       — the publishable-tree inventory (rewrite/ docs/ artifacts/ scripts/
@@ -367,6 +341,50 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t370 — 2026-11-11 (PLAYTEST WITNESS CENSUS: FIRST RUNTIME
+WITNESSES LANDED — MAGNETRON USE, GIZMO-USE DECREMENTS, ATOMIC TYPE-3
+DESTINATION WRITES; ships.md S64)
+Window FOUND (r369_playwindow exit 0, lo_ns 1794373326560000000, first
+turn!=1086 row = t1253 wall 00:02:09). Ring banked TWICE per rotation law:
+work/r1/bank-play-20261111/ (all 20 slots t1253, orders placed, turn
+UNENDED) + work/r1/bank-play-20261111-late/ (02:19, t1254 — user ended the
+turn in between). New tools (both exercised on real data):
+scripts/r370_slot_events.py (raw ship-record word-event stream over the
+timeline window; full dump work/r1/t370_slot_events_all.txt) and
+scripts/r370_bank_deref.py (Memory deref + star-grid census).
+WITNESSED M1: magnetron use s28 00:13:50 — instant jump d=(+2464,-3104,
++2528), POWER 90->80 = gizmos.txt Lane Magnetron 'Power 10' EXACT, ring
+slot 14 (cidx 60 use 1) REMOVED same event = single-use consumption.
++0x8c 40->39 lands LATER = hull, NOT charges: the t369 manual-pass
+'charges' note is RETRACTED (spec +0x8c = INTEGRITY stands).
+WITNESSED M2: gizmo use-counter decrements (Stainer cidx9 3->2 power -6 =
+Nanomanipulator 'Power 6' EXACT; Gofriller 3->2->1; Ignatz LOST 2x cidx73
+Invasion Module at invasion launch). cidx == gizmos.txt entry index (9/60/
+73 independent hits).
+WITNESSED M3 (record level): every empty-space move writes order type->3 +
+[+0x6c] destination triple ATOMICALLY in one frame (5 ships); object moves
+write type 1/2 + ptr. Two-click x/y-then-z testimony UNRESOLVED at field
+level — 10 s watcher cadence is blind to sub-gap clicks (adjacent XY->Z
+census = 0; cadence-blind != refuted). OQ-019 residue-(1) ANNOTATED
+measurement-wise per queue law (amended, NOT closed; user-gated).
+M4: SPARROWHAWK 10-s-cadence anomaly RESOLVED = watcher samples the
+real-time glide (trip==pos each frame, power burn per step), not commits.
+M5 end-turn bookkeeping: player POWER refills (84->90 etc), 5 lane-entries,
+s12 cleared + s40 GONE n 41->40 = losses; corroborates S13-D at runtime.
+QUANTIZER LAW CONFIRMED RUNTIME: mid-transit rows are OFF the 32-grid
+((14,1,-224)x5, (28,0,-2144), 144.7->149.3), rest rows ON — K3b
+off-grid-at-rest test is BLIND BY CONSTRUCTION (amend instrument, use
+mid-transit signal). HONEST NEGATIVES (rows stay open): magnetron landing
+vs star-table triple UNIDENTIFIED at scales 1/5/160 (S64 neg-a; +0x59
+rebase law for the placement target needs the 0x220a8 disasm leg, NOT RAM
+pokes); star-space vs ship-space unit mapping open; Vernunft I owner byte
+unchanged across the end turn; two-click sub-gap unresolved.
+CENSUS RUNS: r369_magnetron_hit --window C1=carriage-present 3850, C2=0
+(by-construction, see above), C3=0; r369_order_diff --window kinds {4:8986,
+3:2440, 5:3784, 1:780}, BOTH=2, two_click=0, decrements=4; --dir on the
+first bank = 1 dedup sample (turn never ended inside it — honest negative,
+instrument correct). game/ untouched; gate + both ledger audits green.
 
 ## LANDED t369 — 2026-11-10 (CENSUS TOOLS PRE-BUILT + CONTROL-VERIFIED;
 ## PLAYTEST WINDOW NOT YET OPEN — HONEST NEGATIVE; NEXT STAYS t369)
