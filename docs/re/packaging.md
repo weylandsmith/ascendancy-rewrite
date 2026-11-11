@@ -46,9 +46,15 @@ rewrite+docs+artifacts+scripts+archive+tools+root).
 **Tracked-file landmine (measured):** despite `work/` being in .gitignore,
 4 files ARE tracked (added with -f historically): work/r1/sentinel_t369.sh,
 work/r1/t368_ring_turn.py, work/r363_gizmo_census.out,
-work/r363_gizmo_rows.json. t373 must decide: move the two .py to scripts/
-(they are tools) and `git rm --cached` the .out/.json (or move under docs/
-as evidence). A publish filter that only drops `work/` would MISS these.
+work/r363_gizmo_rows.json. A publish filter that only drops `work/` would
+MISS these.
+**DISPOSITIONED t373 (2026-11-11):** `git mv` -> scripts/t368_ring_turn.py
+(path math patched, re-run verified parsed=20/20) and
+scripts/sentinel_t369.sh (absolute REPO path, no edit needed);
+`git rm --cached` the .out/.json (evidence stays on disk + regenerable by
+scripts/r363_gizmo_census.py). `git ls-files work/` now prints NOTHING, and
+gate.sh carries a recurrence check (fails the gate if any work/ file is ever
+tracked again).
 
 ## 4. Evidence-rule file: docs/BASELINE.sha256
 
@@ -128,18 +134,25 @@ land atomically).
 
 ## 9. Honest negatives / open items this audit could not close
 
-(a) The vendor-text files under extracted/ascend00/*.txt (gizmos.txt,
-    help.txt…) are the files docs/re/*.md quote from. Publishing docs/re with
-    short quotes is fine (fair-use-ish, and quotes are our measurement
-    records); publishing extracted/ is not. A quote-audit of docs/re (longest
-    verbatim vendor block per file) was NOT run this iteration — add to t373
-    checklist: `longest quoted vendor span per docs/re/*.md`.
-(b) cob.py extract covers ascend00 (54 entries, table=ok). ascend01/02
-    extraction path (compressed entries? per cob.py docstring "entries may be
-    compressed") and the ascend02 .bin/.tsv side are NOT verified end-to-end
-    as a user-runnable importer. The public "supply your own data" flow is
-    therefore INCOMPLETE until t373 lands scripts/r_extract_all.py or README
-    states the limitation honestly.
+(a) QUOTE AUDIT RUN t373 — CLOSED as measured. Tool
+    scripts/r373_quote_audit.py (corpus: every .txt/.dip/.gam under
+    extracted/, cp437, distinct stripped lines >= 12 chars = 5297; longest
+    run of consecutive verbatim lines per docs/re/*.md). RESULT: 1 doc with
+    any span at all — ui.md, 4 lines (vendor table rows like
+    "SMALLSEED      1"); everything else 0. Positive control: pasting 6 consecutive
+    gizmos.txt lines into a probe md reports 6, so the audit is not blind.
+    No wholesale paste exists in docs/re; the NOTICE fair-use-length claim
+    holds.
+(b) CLOSED t373 by measurement: cob.py extract IS the complete importer.
+    ascend01 -> 328 files, ascend02 -> 89 files (incl. the compressed
+    entries); `diff -r` vs the loop's reference extracted/ trees = 0
+    differing lines for BOTH archives (ascend00 54 files, gate-checked).
+    README now states the three-command flow as fact, and gate --portable
+    with ASCENDANCY_DATA=<vendor install dir> runs the extraction
+    automatically (verified on a vendor-stripped clone: exit 0, full
+    vendor stages). The ascend02 .bin/.tsv side was already covered by
+    this: those live in extracted/ascend02/data/ (flc/voc/fnt/raw), which
+    the same command produces.
 (c) SDL2_mixer on vcpkg: availability/versions as of 2026-11 NOT checked
     (no vcpkg here); the CI row is a DRAFT, not a verified matrix.
 
@@ -163,3 +176,47 @@ Honest negatives: no byte-diff vs gnu.org (URL budget spent on S8 fetch;
 md5/sha256 anchored instead); author identity, artifacts/, remote stay
 user-gated. No OQ row touched (license is not a measurement; strict-close
 trivially satisfied — nothing closable and nothing closed).
+
+
+## 11. t373 LANDING (2026-11-11) — root swap executed, hygiene verified
+
+- LICENSE: `install -m644 /usr/share/common-licenses/GPL-3 LICENSE`;
+  post-install ASSERT PASS on both anchors (md5 1ebbd3e34237af26da5dc08a4e440464,
+  sha256 3972dc97...36986). Byte-diff vs gnu.org still NOT run (URL budget;
+  hashes are the anchor of record — S1 honest negative unchanged).
+- NOTICE: from _notice_draft_t372.md minus its 4-line draft header
+  (`tail -n +5`): 2417 B, sha256
+  2e5f4153f90632b448bab4761f064867a18be6cb35645c1794ee9ee98a5dd3bf.
+  Copyright holder line intentionally still `<TBD-t373: repo author name>` —
+  author identity is USER-gated (license draft S7). Landing the file with the
+  placeholder is safe: the grant text needs no holder to be an offer.
+- README.md replaced by the t371 draft + t373 edits: ascend01/02 importer now
+  stated as a VERIFIED three-command flow (S9b); Windows vcpkg downgraded to
+  honest "expected-to-work, not tested" (negative (c) unchanged — no vcpkg on
+  this box); gate section documents --portable + ASCENDANCY_DATA; the
+  authentic-vs-defaults section from the old README kept (it is the public
+  honesty statement) with OQ-003/OQ-005 residues as-is.
+- SPDX sweep EXECUTED: scripts/r373_spdx_sweep.py, 505 files inserted
+  (rewrite 82, scripts 420 incl. the 2 moved survivors, tools 3; archive/
+  SKIPPED per S4; idempotent --check mode exits 0 = 0 missing). Placement
+  law: after shebang; after shebang+coding-cookie (4 files carry PEP-263
+  cookies on L2 — pushing them to L3 would void them). No copyright lines
+  inserted (S7). Post-sweep: all 365 .py py_compile-clean EXCEPT
+  scripts/r1_shp_streamlaw_variants.py, which is broken at HEAD since t67
+  (literal `...[truncated]` paste artifact — verified identical failure on
+  the pre-sweep HEAD blob; NOT a t373 regression; gate never runs it).
+- gate.sh: `--portable` flag + `ASCENDANCY_DATA=<dir>` env (symlink game/ +
+  auto-extract extracted/ once); 25 stages wrapped in `[ "$VENDOR" = 1 ]`
+  skip-with-note guards (VENDOR = ascend.exe present AND ascend00 >= 54
+  files); default no-flag behaviour unchanged (missing game/ = FAIL);
+  recurrence invariant wired: gate FAILS if `git ls-files work/` is ever
+  non-empty again; 3r gained the missing revenv guard (t343 fresh-clone
+  gap); 4f vendor-gated (pub-clone test caught it reading
+  extracted/ascend02/data/intro65a.flc).
+- CLONE VERIFICATION (the queue's "verify" bar), all exit 0 on this box:
+  (A) raw clone --portable; (B) PUBLISHED SHAPE (clone minus game/ and
+  extracted/ = the actual distribution) --portable, 28 skip-notes;
+  (C) published shape + ASCENDANCY_DATA=<real vendor install dir>
+  --portable: auto-extraction ran (ascend00 54 confirmed) and the FULL
+  vendor stage set executed — only work/-capture stages noted-skipped.
+- GitHub push: NOT done — USER-gated (remote/org/name = user's call).

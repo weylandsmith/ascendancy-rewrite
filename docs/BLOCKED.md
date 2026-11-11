@@ -204,7 +204,7 @@ times.
   RING, not the feed: the timeline watcher (pid 1575) DIED ~2026-11-09 17:26
   (GAME_HEALTH_LIVE.txt 'UNHEALTHY | W:NOWATCHER(feed not banking)', feed mtime
   17:26 with ZERO bytes growth vs baseline) while the game kept autosaving — so
-  the tail-seek law was BLIND for ~14 h. New primitive work/r1/t368_ring_turn.py
+  the tail-seek law was BLIND for ~14 h. New primitive scripts/t368_ring_turn.py (moved from work/r1/ at t373)
   (read-only; unzips each ring .sav, cached-anchor base, r1_slot turn scalar):
   20/20 slots turn=1086 at 07:2x AND again at 08:0x (turn monotonic => no play
   crossed a turn boundary in the dead window). BRANCH 2 (ruling) NEGATIVE

@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-11T04:15
+updated: 2026-11-11T05:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,47 +222,33 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t373 REPO HYGIENE EXECUTION (queue row t373 below; ordering rationale:
-t372 LICENSE DRAFT LANDED 2026-11-11 (docs/re/_license_draft_t372.md +
-_notice_draft_t372.md; packaging.md S10; D5 in DECISIONS.md), so the queue
-advances verbatim and t373's "only if t371/t372 green" condition is MET
-(both landed, gate green each). t373 is docs+files work, no capture stack.
-EXECUTE the atomic root swap per _license_draft S3: install GPL-3 text ->
-LICENSE (assert md5 1ebbd3e34237af26da5dc08a4e440464 + sha256 3972dc97...
-36986), NOTICE from _notice_draft_t372.md (strip draft-comment header),
-README from _readme_draft_t371.md (contact placeholder already resolved),
-.gitignore per packaging.md S3 + `git rm --cached` the 4 tracked work/
-survivors (t371 landmine), SPDX headers per _license_draft S4 sweep rules
-(504-506 file census measured t372; archive/ SKIPPED), gate + run_tests
-green after. t373 checklist ALSO carries the t371 quote-audit item
-(packaging.md S9a: longest verbatim vendor span per docs/re/*.md). GitHub
-push stays USER-gated. BEFORE t373 work: OPTIONAL play-window check —
-python3 scripts/r369_playwindow.py; if exit 0 AND lo_ns CHANGED from
-1794373326560000000 (t370/t371/t372 all saw the SAME window = idle since
-~02:22; t372 banked bank-play-20261111-t372/ covering 03:32-03:54,
-r370 events=0 = still idle), THEN bank the ring + r370_slot_events +
-r369 censuses on NEW frames first. Session still LIVE (turn 1254, pid
-107664, TL to 2026-11-17).
-
-QUEUE (phase 8 — PLAYTEST HARVEST + PACKAGING; user decisions 2026-11-10:
-ship WITHOUT vendor data; license = GPL-3.0 + written grant to original
-creators (D5 drafted t372); OQ-016/OQ-019 acceptance + D3 DEFERRED pending
-tonight's playtest witnesses. One session each; finish tN -> rewrite NEXT to
-tN+1 VERBATIM; keep this block intact except deleting completed rows.
-Context: docs/re/_wip_playtest_t369.md (testimony + signatures + baselines).
-
-t373 (only if t371/t372 green) REPO HYGIENE EXECUTION: .gitignore additions
-      if any; SPDX headers on rewrite/src + tools + scripts entry files;
-      scripts/gate.sh gains --portable mode (skips stages needing the live
-      capture stack, runs on a fresh clone w/ user data dir env ASCENDANCY_
-      DATA); verify: fresh clone + --portable gate exit 0 on THIS box.
-      GitHub push itself stays USER-gated (remote, org, name = your call).
-
-After t373: rewrite NEXT to WAIT-USER-RULING sentinel shape (proven t368
-pattern: 'NEXT WAIT-USER-RULING tNNN —' so field 2 is not a queue tag).
-Standing laws unchanged; the OQ rows close ONLY on user ruling (t329 packet
-S4 stays DO-NOT-APPLY until the user says accept, possibly amended by t370).
-
+NEXT WAIT-USER-RULING t374 — phase-8 queue DRAINED (t371 packaging, t372
+license draft, t373 repo-hygiene execution all LANDED 2026-11-11; the queue
+itself said: after t373 rewrite NEXT to this sentinel shape). Nothing is
+loop-closeable: the two open ledger rows (OQ-016 AI build/expansion, OQ-019
+magnetron/per-ship residues) close ONLY on a user ruling — the disposition
+packet docs/re/_wip_t329.md S4 is drafted DO-NOT-APPLY, and t370's playtest
+witnesses (docs/re/ships.md S64+M6) stand as the measurement record that
+amends it. D3 (definition of done) remains DEFERRED by the user.
+A session woken by a DECISIONS.md edit or a *ruling*/*reply* file: read
+docs/DECISIONS.md, apply what the ruling says, close rows per strict-close,
+then author the next queue or re-park this sentinel.
+USER-GATED items parked with everything pre-staged: (1) GitHub push —
+remote/org/name is the user's call; the publishable tree IS the working
+tree minus game/ + extracted/ (verified t373: that shape gates green via
+`bash scripts/gate.sh --portable`, and with ASCENDANCY_DATA=<vendor dir>
+runs the FULL stage set); NOTICE copyright line intentionally still
+<TBD-t373: repo author name> until the user names what to publish.
+(2) artifacts/ exe-derivative ships-or-not (packaging.md S2).
+(3) gnu.org one-fetch byte-diff vs LICENSE (md5/sha256 anchors in
+_license_draft S1 are the interim record).
+If instead a NEW playtest sitting exists at wake (ring max_turn > 1254 —
+t368_ring_turn moved to scripts/ at t373): run r1_t85g_sitting.py +
+r370_slot_events on the new window FIRST, bank the ring, then decide
+whether witnesses move OQ-019 residue-(1) (t370 annotated it measurement-
+wise; the two-click two-step order-entry question was left UNRESOLVED at
+field level, needs sub-10s sampling or a poke session, NOT more passive
+watching).
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
@@ -289,7 +275,7 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   DISPLAY=:9 injected; TL=172800; NEVER loadstate to resume; bank before restart.
 - Sitting check FIRST — RING-FIRST since t368 (the timeline watcher died
   2026-11-09 17:26; a stale feed's tail proves only that nothing was BANKED).
-  `python3 work/r1/t368_ring_turn.py` -> max_turn > 1086 => run
+  `python3 scripts/t368_ring_turn.py` -> max_turn > 1086 => run
   r1_t85g_sitting.py before anything. Production :9 is the corpus — untouched
   unless the task IS a drive.
 - Ledger 17 closed / 2 open (OQ-016, OQ-019; OQ-005 CLOSED t367 by the D1
@@ -321,6 +307,47 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t373 — 2026-11-11 (REPO HYGIENE EXECUTED: LICENSE/NOTICE/README
+ROOT SWAP LIVE, work/ TRACKED-FILE LANDMINE DEFUSED + GATE-PROOFED, SPDX 505,
+gate --portable + ASCENDANCY_DATA VERIFIED ON THREE CLONE SHAPES, QUOTE
+AUDIT CLEAN — packaging.md S11 is the full landing record)
+Steering: r369_playwindow lo_ns UNCHANGED (1794373326560000000); post-t372-
+bank span frames=94 events=0 (idle since ~02:22); ring already banked at
+t372 — nothing new to witness, assignment stood.
+EXECUTED per _license_draft S3 + queue row: (1) LICENSE installed from
+/usr/share/common-licenses/GPL-3, post-install ASSERT PASS md5 1ebbd3e3 +
+sha256 3972dc97...36986; (2) NOTICE = _notice_draft minus 4-line header
+(2417 B, sha256 2e5f4153...dd3bf; copyright line stays <TBD-t373> — author
+identity USER-gated S7); (3) README replaced by t371 draft + t373 edits —
+ascend01/02 importer stated as fact BY MEASUREMENT (cob.py extract: 328/89
+files, diff -r clean vs reference trees; packaging S9b CLOSED), Windows
+vcpkg honestly "not tested", authentic/defaults/open sections corrected
+AGAINST THE LEDGER RECORD (old README still called OQ-003/005/006/010 open
+— all closed t181/t367/t8/OQ-006; public statement now says 2 open of 26:
+OQ-016, OQ-019); (4) landmine: git mv t368_ring_turn.py + sentinel_t369.sh
+-> scripts/ (ring-turn re-verified parsed=20/20 from new path), git
+rm --cached the 2 evidence files (on-disk + regenerable); git ls-files work/
+= EMPTY, and gate.sh now FAILS if it ever isn't (recurrence invariant);
+(5) SPDX sweep via scripts/r373_spdx_sweep.py: 505 inserted (rewrite 82 /
+scripts 420 / tools 3, archive skipped), cookie-safe placement (4 files
+have PEP-263 on L2), idempotent check exits 0; all py_compile-clean EXCEPT
+scripts/r1_shp_streamlaw_variants.py which is broken AT HEAD since t67
+(literal "...[truncated]" paste — verified identical pre-sweep; not a t373
+regression; gate never runs it); (6) gate.sh --portable: 25 stages wrapped
+in VENDOR guards + 4f predicate-fixed (pub-clone test CAUGHT it opening
+extracted intro65a.flc) + 3r revenv guard (t343 fresh-clone gap);
+ASCENDANCY_DATA=<vendor dir> symlinks game/ + auto-extracts extracted/.
+VERIFY (queue bar: fresh clone + --portable exit 0 on THIS box): three
+shapes all exit 0 — raw clone; PUBLISHED shape (minus game/+extracted/, 28
+notes); published+ASCENDANCY_DATA (auto-extract ran, FULL vendor stages
+executed). (7) quote audit scripts/r373_quote_audit.py: worst span in all
+of docs/re = 4 consecutive lines (ui.md table rows), positive control
+reports 6/6 — NOTICE fair-use-length claim holds (S9a CLOSED).
+HONEST NEGATIVES: gnu.org byte-diff still not run (URL budget; hashes are
+the anchor); GitHub push NOT done (USER-gated); vcpkg matrix unchecked.
+No OQ row closed (hygiene is not measurement; strict-close: nothing closable
+was closed). NEXT = WAIT-USER-RULING t374 sentinel (queue drained).
 
 ## LANDED t372 — 2026-11-11 (LICENSE DRAFT: GPL-3.0-OR-LATER + CREATOR
 GRANT OFFER DRAFTED, CONTACT ROUTE CITED BY THE ONE APPROVED FETCH —

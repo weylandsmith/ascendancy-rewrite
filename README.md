@@ -93,23 +93,27 @@ map-grid and lane rules, victory-condition files (end-*.txt), the 21 species
 special-ability effects and their charged/passive split (help.txt
 L1713-2511, docs/re/abilities.md), sound manifests and the vendor .voc
 sample container, the vendor FLC intro videos (both decode frame-exact to
-hashes + a visually checked PNG; docs/re/flc.md), CP437 text handling.
+hashes + a visually checked PNG; docs/re/flc.md), CP437 text handling, and
+the combat/relation/end-game laws measured from live captures
+(`docs/re/combat.md`, `docs/re/diplomacy.md`, `docs/re/score.md`).
 
-DOCUMENTED DEFAULTS (the original's exact rule is not recoverable from
-static data; each is listed in `docs/OPEN-QUESTIONS.md` and cited from code
-back to docs): campaign combat arithmetic (OQ-010); AI build/expansion
-orderings (OQ-015/016); ability charge time — 30 turns for all 14 charged
-species abilities (OQ-020); sample rate of headerless audio files — 22050 Hz
-mono (OQ-006); window colours — BACKGRNDCOLOR indices have no documented
-palette mapping, so a deuteranopia/protanopia-verified palette is used.
-The UI font is NOT a default: the vendor smfont/bigfont .fnt faces are
-decoded and rendered per docs/re/fnt.md (OQ-017 closed).
+DOCUMENTED DEFAULTS (kept where the original's rule could not be recovered
+or was dispositioned by the project's standing decisions; each row and its
+disposition is in `docs/OPEN-QUESTIONS.md`): window colours —
+BACKGRNDCOLOR indices have no documented palette mapping, so a
+deuteranopia/protanopia-verified palette is used; mono playback of
+headerless vendor audio (the 22050 Hz device rate is measured, the channel
+count is not stated by any vendor field). The UI font is NOT a default: the
+vendor smfont/bigfont .fnt faces are decoded and rendered per
+docs/re/fnt.md.
 
-OPEN, NOT FAKE-IMPLEMENTED (stated, not silently stubbed): original sprite
-pixel codec (OQ-005 — the map draws documented circles instead of invented
-art), save/load (OQ-003). All five vendor end-*.txt victory conditions ARE
-now evaluated (end-capt and end-unit under documented readings —
-turnloop.md §1; their exact vendor thresholds/priority remain open).
+OPEN AS OF 2026-11-11 (stated, not silently stubbed — 2 of 26 ledger rows):
+OQ-016 (AI build/expansion orderings: eight capture routes cited dead,
+residues dispositioned, row awaiting the project owner's final ruling) and
+OQ-019 (per-ship design model and order-entry micro-law: partially closed by
+live-witness measurement, residues annotated and open). The map draws
+documented circles instead of invented art — the sprite pixel codec's
+remaining record class was closed by owner ruling; nothing here is faked.
 
 ## Status of the original game, and credit
 

@@ -40,7 +40,33 @@ packaging; root LICENSE/NOTICE did not exist at session start).
      docs/re/packaging.md S3, docs/re/ships.md:2916 (census.out path stays
      valid as a path-on-disk; annotate only if cheap).
 
-## PENDING (rest of checklist)
+## VERIFICATION (measured, this iteration)
+- Main tree, default gate (no flag): GATE_EXIT=0 pre-4f-fix; re-run at finish.
+- CLONE TEST A (raw clone, --portable): exit 0.
+- CLONE TEST B (PUBLISHED SHAPE: clone minus game/ + extracted/, 494 files
+  removed, --portable): exit 0; 28 skip-notes; first run CAUGHT the ungated
+  4f refcap stage (refcap_match.py opens extracted/ascend02/data/intro65a.flc)
+  -> fixed by [ "$VENDOR" = 1 ] predicate (WIP2 commit).
+- CLONE TEST C (published shape + ASCENDANCY_DATA=<vendor install dir>,
+  --portable): exit 0, auto-ran cob.py extract for all three archives
+  (ascend00 54 files confirmed), full vendor stages executed (only
+  work/-capture stages skipped with notes: pointer-law, star-table,
+  loader-model probes).
+- Quote audit (scripts/r373_quote_audit.py): corpus 5297 distinct vendor
+  lines >=12 chars; docs/re worst = ui.md 4 consecutive lines
+  ("SMALLSEED 1"-style table rows); positive control pasted 6 gizmos.txt
+  lines into a probe md -> audit reported 6. VERDICT: no wholesale vendor
+  paste anywhere in docs/re; NOTICE fair-use claim holds.
+- 3r revenv guard added (t343 gap: ungated $HOME/tools/revenv/bin/python
+  hard-failed clones lacking it).
+- Pre-existing (NOT introduced by t373, noted not fixed):
+  scripts/r1_shp_streamlaw_variants.py line 7 is a literal
+  "from r1_shp_stre...[truncated]" paste artifact committed at t67 (b1b20b8)
+  -- py_compile fails on HEAD version identically; gate never runs it.
+
+## STATUS: COMPLETE (all items done; landing record = docs/re/packaging.md S11 + STATE.md LANDED t373)
+
+## (was) PENDING (rest of checklist)
 5. SPDX sweep 504 files (rewrite 82, scripts 418+2 moved=420, tools 3;
    archive SKIPPED; work leaves set via untrack). Scripted insert: after
    shebang if line1 starts '#!', else line 1; '//' for c/cpp/h(pp), '#' for
