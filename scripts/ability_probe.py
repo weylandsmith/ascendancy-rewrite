@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Species special-ability probe (docs/re/abilities.md, gate 3m).
 
 Asserts the three-source roster invariant and the charge/passive split:

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t339 — magic-rec census of the state-16 family in the five state-16 saves
 (work/r1/t299-leg-20261105-112859/save/43..47.sav) + two state-1 neighbours.
 Law (banked): magic u32 0x12345678 at rec+0x00 (t316 fn 0x5712c file 0x57173);

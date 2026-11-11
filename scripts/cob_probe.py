@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """cob_probe.py — assert the .cob container grammar (OQ-004, docs/re/datafiles.md §3).
 
     +0x000 u32 N; +0x004 N x 50-byte NUL-padded names; then N x u32 absolute

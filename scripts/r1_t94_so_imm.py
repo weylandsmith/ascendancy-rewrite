@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t94 helper 2: find code that references the SO order-name table via the
 POOL-RELATIVE immediate law (imm = str_off - 0x82BB0; block base 0x88e60 ->
 0x62b0). Individual names sit at base+20*k, so also flag sites whose window

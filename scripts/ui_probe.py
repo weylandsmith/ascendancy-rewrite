@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Probe windows.txt + subtitle.txt -> docs/re/ui.md, and history.txt
 specnum blocks -> docs/re/species.md.
 

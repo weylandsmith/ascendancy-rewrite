@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t106_drift.py — is the +0x55 deviation POST-GENERATION terrain drift?
 
 P1 [measured] established the deviation set is RUN-LOCAL and NAME-INDEPENDENT

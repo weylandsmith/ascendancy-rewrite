@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t320: THE MOUSE-ACTIVE POSTER-PASS RUN (docs/re/_wip_t320.md; STATE.md NEXT
 # ACTION t320; REFUTED-ROUTES t319 amendment (1)-(4) binding). t319 banked the
 # poster call site 0x54ac5 LIVE with msg 4; msg 0xc requires [core+0x24da4]==-1

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Re-measure surface-item slot contiguity on the corrected +0x88 array
 (tension check: FUN_0003875c picks uniformly among legal empty slots, but
 T37 banked 17980/18620 contiguous prefix runs). Reports per-record:

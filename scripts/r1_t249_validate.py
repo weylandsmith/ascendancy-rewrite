@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t249 S7: (a) validate OBJ=0xfda074 set-equality at t1254: entries must be
 rec+0x33 EXACTLY for every rec with owner==race (and nothing else);
 (b) widget anchor: pointer sites of OBJ-0xab and OBJ in data seg;

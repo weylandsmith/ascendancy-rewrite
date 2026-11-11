@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_mutation_inject.py — t53 capture STEP 1 injection side (OQ-003).
 
 SCRATCH ONLY (game/ untouched). Target layout MEASURED this turn on the

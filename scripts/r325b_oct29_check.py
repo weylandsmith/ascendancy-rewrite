@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r325b — t325 Phase A2: (1) newest production ring slot turn (sitting
 corroboration on the SAVE axis, t215 law); (2) oct29 raw vendor save walk —
 does the scratch-boot campaign (RESUME.GAM.user-oct29) have a pending shield

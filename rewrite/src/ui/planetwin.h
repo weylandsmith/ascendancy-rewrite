@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // PLANET SCREEN (PLANETALLOC) window composition law — t276.
 //

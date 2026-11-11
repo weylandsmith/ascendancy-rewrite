@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t262 — OQ-021 CENSUS/INVENTORY DISCRIMINATOR on the DRIVEN corpus.
 
 Question (t256 MECHANICS note / t258 residue): V=DAT_000482fb moves only at

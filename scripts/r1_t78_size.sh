@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_t78_size.sh — OQ-012(a) new-game size options: screenshot the SETUP
 # screen, cycle the density/size control with timed clicks, ENTER the
 # campaign, measure star count from the final autosave offline.

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t188: FRAME + TARGET adjudication for the flight corpus (OQ-019).
 
 For the busy lane-mover slots in the banked sitting (t1255..1335), per turn

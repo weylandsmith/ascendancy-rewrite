@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Scan dosbox-x autosave slots for the live ascend.exe image (R1 via savestate).
 
 Save files are ZIPs (measured 2026-10-05); the 'Memory' member is 17,055,880 B

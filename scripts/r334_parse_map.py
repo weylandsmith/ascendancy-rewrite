@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r334_parse_map.py — t334 windows.txt PARSE-FIELD MAP (zero capture).
 
 Builds the file->field map of the winmgr windows.txt parser fn 0x575e4

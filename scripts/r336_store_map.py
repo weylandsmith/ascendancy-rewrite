@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t336 S1: enumerate EVERY store instruction in fn 0x575e4 (windows.txt parser)
 with its target displacement, grouped by displacement.
 

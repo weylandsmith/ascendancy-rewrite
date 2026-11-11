@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t248 FINAL: owner-field structural proof at BOTH timestamps with the
 verify.py keying (star tokens from raw star-record bytes, no printable filter).
 (a) subset: every colonised planet's (1<<owner) bit is in its star's +0x14.

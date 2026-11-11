@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t99 W6-A6: FUN_00043b50 race-maintenance dispatch + field-writer census.
 
 Verifies (exit 0 only if every pinned expectation holds):

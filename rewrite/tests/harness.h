@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Minimal assertion harness: no external deps (the box is offline).
 #pragma once
 #include <cstdio>

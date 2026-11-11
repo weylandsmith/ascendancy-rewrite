@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t269 — OQ-021 VICTORY-THRESHOLD MINING on the driven corpus.
 
 Question: the vendor's end-ctrl.txt header says "Player controls over half the

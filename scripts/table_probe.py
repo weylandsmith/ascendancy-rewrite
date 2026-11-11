@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Ascendancy P1b probe: the ascend02 table pair (name.bin / name.tsv).
 
 Regenerates docs/re/tables.md.  Run:

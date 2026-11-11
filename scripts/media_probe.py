@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """media_probe.py — P1e: FLIC video, audio, font, hazard, .tmp inventory.
 
 Every number printed here is MEASURED from files under extracted/ and game/.

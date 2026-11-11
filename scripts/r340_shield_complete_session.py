@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r340_shield_complete_session.py — t340 OQ-016 residue-(4) FINAL witness.
 
 ONE launch (t325's own stated budget). Question: at the shield build-

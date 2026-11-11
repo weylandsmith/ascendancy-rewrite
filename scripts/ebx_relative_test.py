@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """ebx_relative_test.py — test the Watcom position-independent (-FPi) data
 model, in which data addresses are [EBX+disp32] rather than absolute.
 

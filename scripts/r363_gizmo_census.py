@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r363_gizmo_census.py — t363 SAVE-SIDE gizmo-ring census (residue HOME + law corroboration).
 
 Laws reused verbatim (see scripts/r360_save_shipcensus.py header): slot ZIP

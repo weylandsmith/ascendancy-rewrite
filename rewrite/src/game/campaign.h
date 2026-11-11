@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // Seeded campaign state + turn loop. Behaviour model and the verified/inferred
 // split: docs/re/turnloop.md (cites end-*.txt vendor comments, planitem.txt

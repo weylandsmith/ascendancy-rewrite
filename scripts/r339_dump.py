@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t339 — dump a verbatim disasm range from work/r331_disasm.txt.
 Usage: r339_dump.py START [END]  (hex, inclusive)."""
 import re, sys

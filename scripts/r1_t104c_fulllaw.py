@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t104c: CONTINUITY-GATED order-completion drain census.
 
 t104b lesson: raw P>0->0 transitions count death/recycle artifacts. This

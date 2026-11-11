@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """attribution_scan.py — attribute code to source modules via debug strings.
 
 THE SIGNAL (Watcom 11 i386, measured 2026-10-05j): data storage holds

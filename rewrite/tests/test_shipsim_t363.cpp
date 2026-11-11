@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t363R GIZMO INVENTORY + CARRIER/CARGO pins — the upkeep burn (FUN_0004a658),
 // the turn-tail slot refresh (0x4a772..0x4a7a4), the recalc carrier law
 // (FUN_00049acc), the ring mutators (FUN_00049698/0x496e4/0x49624), the

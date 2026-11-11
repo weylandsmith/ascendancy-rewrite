@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # R1 via SAVESTATE, not ptrace (2026-10-05): external attach is dead on this
 # box (dosbox-x blocks PTRACE_ATTACH/SEIZE — docs/BLOCKED.md), but dosbox-x's
 # own autosave writes ZIP save-states whose 'Memory' member is the FULL guest

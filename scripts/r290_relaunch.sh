@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t290: relaunch loop for the threshold-freeze session (BREAK lottery, t286
 # law 2: retry until 'armed:' in session.log). Each attempt is a FULL
 # r290_poke_session.py run (owns its ring dir, Xvfb :96, scratch game-wp,

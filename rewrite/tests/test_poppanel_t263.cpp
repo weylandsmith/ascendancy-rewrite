@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Population panel law pins (t263). Law sources: docs/re/planets-ui.md S4
 // (paint loop 0x3ce39..0x3cef8), docs/re/shp.md S23 + docs/re/_wip_t254.md
 // (17np.shp identification), docs/re/_wip_t263.md S1..S5 (this task's

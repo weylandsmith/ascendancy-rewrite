@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """flc_probe.py — P1e follow-up: full DECODE test of the vendor FLIC files.
 
 Background. media_probe.py (earlier) concluded the frame payloads were

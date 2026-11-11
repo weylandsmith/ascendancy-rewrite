@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t315 STEP 2: offline class-grid RAM scan for the digit-handler fn 0x354f8.
 
 Target fn (docs/re/_wip_t315.md S1): payload 0x354f8, prologue 56 57 55 81 ec

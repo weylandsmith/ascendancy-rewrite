@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t365 ENGINE FLIP BRIDGE — implementation. Cited law executes INSIDE
 // ShipSim (shipsim.cpp); this file is pure integration + the flagged
 // surrogate ledger S1..S11 documented in campaign_fleet_bridge.h. No new law

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t55 OUTER driver for r1_adcapture.sh — step-2 scripted sequence with
 # banked-verification only (refuted route: scheduled UNVERIFIED in-game
 # clicks, 2026-10-06c; every click here is verified by the turn counter).

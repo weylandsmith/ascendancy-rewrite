@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r255e_semantics.py — what does V=DAT_482fb count? Correlate per trusted
 row (per-session trust) with cheap fields: ships count, relation matrix
 alive-race census (matrix = 4x4 relation states; states matrix rows per race

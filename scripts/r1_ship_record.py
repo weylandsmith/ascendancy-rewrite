@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_ship_record.py — verify the LIVE ship-record model in guest RAM (OQ-019).
 
 Static law (docs/re/ships.md S6 + S9, FUN_00037d80 / FUN_00038ba4 /

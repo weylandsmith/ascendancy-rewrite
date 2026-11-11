@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t370 — per-slot ORDER-EVENT stream over the playtest window.
 
 Why this exists: r369_order_diff tl mode can only build a destination vector

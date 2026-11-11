@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t265 pass 3 — CLEAN-drive-only span analysis (drop softlock windows).
 
 Pass-2 lesson: the corpus contains THREE regimes: (i) the healthy drive

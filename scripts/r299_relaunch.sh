@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t299: relaunch loop for the debugger leg-witness session (BREAK lottery is a
 # per-attempt coin flip, t286 law 2). Each attempt is a FULL
 # r299_leg_session.py run (own ring dir, Xvfb :97, scratch game-wp,

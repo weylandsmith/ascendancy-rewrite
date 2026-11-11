@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # R1 ADAPTIVE CAPTURE (STATE.md NEXT ACTION 2026-10-06c): same invariants and
 # boot law as r1_deepcapture.sh, BUT the game keeps running while an outer
 # driver (the loop session) reads screenshots, clicks live, and checkpoints.

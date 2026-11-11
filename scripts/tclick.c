@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /* tclick.c — t267: synthetic click at an EXPLICIT window id (xsend targets by
  * title and must keep refusing "warning" titles; a quit-confirm xmessage is
  * the one case where the blocker IS the target, and it must be hit by id,

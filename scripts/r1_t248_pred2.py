@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t248 S4b: owner-AND predicates with u16 + bit forms, scored 60@t1086 AND
 102@t1254. Also probe the SECOND stride-0x7b array the star records point to
 (star+0x46..+0x55 hold 3-byte pointers ~0x26f3xx, stride 0x7b apart)."""

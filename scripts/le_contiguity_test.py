@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """le_contiguity_test.py — decide whether ascend.exe's Watcom LE payload is
 stored in the file in the same order it occupies in memory.
 

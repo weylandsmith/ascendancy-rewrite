@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """shp_tokenize.py — OQ-005 tokenisation-grammar search (analysis, not
 assertion; exit 0 unless it crashes; report -> docs/re/shp-tokenize.md).
 

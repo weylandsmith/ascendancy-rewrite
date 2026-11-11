@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t339 — static intake decode helper over work/r331_disasm.txt.
 
 Parses the whole-image objdump once, then answers:

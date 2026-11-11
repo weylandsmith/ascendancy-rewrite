@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_pointer_measure.py — MEASURE the pointer law (no assumed LE field map).
 
 Model under measurement (from r1_pointer_law.py run 2026-10-05 on slot 46):

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r333_state_census.py — ACTIVE SCREEN STATE census (t333, zero capture).
 
 Question (OQ-016 residue-(1) last named edge): is windows.txt `STATE 1 16`

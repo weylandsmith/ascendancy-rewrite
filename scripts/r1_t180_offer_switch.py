@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t180: resolve FUN_00044fc0's offer-kind switch table (cs:0x303dc).
 
     44fd3  mov al,bl ; sub al,2 ; cmp al,0xc / ja 0x45448   ; bl in 2..14

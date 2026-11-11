@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r255f_traj.py — per-session per-turn trajectory: turn, V, systems_any,
 systems_full, planets, nships. Tests whether V equals a TERRITORY SNAPSHOT
 taken at some earlier turn (the "recompute-at-event" family) by checking, for

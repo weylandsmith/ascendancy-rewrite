@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Map-dot finder: bright celestial dots in the strategic-map region.
 
 Strategic-map law: map area is root coords x in [40, 470], y in [40, 460]

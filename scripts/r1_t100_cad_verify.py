@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t100 self-verification: kCad in rewrite/src/game/species.cpp against the
 cited cadence words, two ways:
   (A) FILE leg: u16 words at restored-image FILE offset 0x89330

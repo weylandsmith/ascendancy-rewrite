@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t85_relation.py RUN_DIR [--no-trust] — OQ-023 relation-state ENUM
 adjudication (t85; streaming rewrite t85b).
 

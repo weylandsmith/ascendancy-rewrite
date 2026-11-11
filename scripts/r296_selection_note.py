@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r296 — SHIP-SELECTION CHOREOGRAPHY NOTE (t296 deliverable, static-cited).
 
 NOT a capture driver. This is the machine-readable pin sheet a t297 live

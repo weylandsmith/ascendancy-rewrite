@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t211 probe E: full-obj0 branch-edge scan for target 0x4a350 (and control
 targets 0x4a360/0x49f54 which HAVE E8 edges), plus dword-equality scan of the
 whole image for 0x4a350 (jumptable candidate — NOTE t191: handler bindings may

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t98: WATCOM WLINK debug-info verdict for game/ascend.exe (spec-first).
 
 PURPOSE (docs/STATE.md t98): try once, properly, to tie the SO name block

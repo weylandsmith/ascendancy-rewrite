@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r324_census.py — BatModeWnd RAM class-table census (t324).
 
 Reads the BatModeWnd class table from LIVE RAM via a production save's

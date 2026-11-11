@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t211 probe B: (1) transitive callee closure of 0x49f54 (depth-limited E8)
 against the attack-family set {0x4b740, 0x43a4c, 0x4cd90, 0x4b8e4}; (2) E8
 byte-pass census of all direct callers of each member of that family (done

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t105 STATIC PAIR probe (OQ-016-adjacent residuals named by t99 S6.4).
 
 (b) STRIDE-45 TABLE 0x74782: hypothesis = parallel per-research-row array

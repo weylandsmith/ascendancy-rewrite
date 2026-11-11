@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_deep_diff.py — measure whether a deeper capture went DEEP.
 
 Compares the EARLIEST and LATEST autosave slot of one r1deep run (guest RAM

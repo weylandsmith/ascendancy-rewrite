@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_shp_blit_law.py — OQ-005 t64: blit-faithful validator + RAM base solve.
 
 Grammar (re-verified 2026-10-12 from FUN_0005caac raw asm SHR-flag

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t85_victory.py RUN_DIR — OQ-021 end-ctrl threshold readout (t85).
 
 Question: does the original fire Control victory at >1/2 of stars or at

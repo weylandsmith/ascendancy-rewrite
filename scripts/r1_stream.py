@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_stream.py — shared STREAMING observation layer over live-timeline.jsonl.
 
 WHY THIS EXISTS (t85b): a multi-sitting capture's jsonl grows to gigabytes

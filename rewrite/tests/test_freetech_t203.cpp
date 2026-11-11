@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t203 FREE-TECH GRANT PIN — FUN_00046e84 (0x46e84..0x46f9d) + its sole
 // caller gate inside the build-completion tail (0x3913b..0x3917a) + checker
 // rule-D dig placement (FUN_0003830c 0x38533..0x38552).

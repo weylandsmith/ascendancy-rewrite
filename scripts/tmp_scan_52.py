@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Scan restored code for stores/loads of planet-record offsets +0x52
 (queue slot index) and +0x54 (pending item id), decoding 32-bit modrm
 displacements properly. Operand-base guesses aside, the disp value is the

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Per-ship engine skeleton (t361). Laws + citations are at the declaration
 // sites in shipsim.h; build contract docs/re/pership-spec.md (2); session
 // adjudications docs/re/_wip_t361.md S1. Evidence rule: no constant without a

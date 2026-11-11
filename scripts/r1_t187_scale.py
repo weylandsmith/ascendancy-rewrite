@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t187: OQ-019 sugar-cube SCALE from the live flying sitting.
 
 Turn-boundary law hunt: for each ship slot, snapshot position at the FIRST

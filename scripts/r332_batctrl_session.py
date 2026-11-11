@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t332 — BatControlWnd CHAIN LIVE WITNESS (OQ-016 residue-1 last uncited edge).
 
 Question (docs/re/_wip_t331.md S7 verdict + STATE.md t332): does msg 0x1c01 ever

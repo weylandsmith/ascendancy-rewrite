@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t248 S5: header counts 60 @t1086 while count(owner==race)=80; at t1254 both
 are 102. Hypothesis: the header counts OCCUPIED (=populated) planets. Sweep
 u32-width predicates and per-record nonzero-byte-count forms, scored 60@t1086

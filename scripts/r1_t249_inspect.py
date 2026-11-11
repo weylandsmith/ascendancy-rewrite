@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t249 S3: inspect raw candidate list-objects. For each u32-aligned P with
 u16[P+0x8c7]==want, dump entry pointers at P+0xcb (stride 8) and classify:
 -> planet record? -> other? Also try stride 4 and offset variants, and check

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r345_gate_word_census.py — RUNTIME item-table gate-word census (t345).
 
 Question: FUN_00038f68's completion marker block is gated on the item-record

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """r333b_state_layout.py — t333 STATE-DECODING measurement (zero capture).
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 
 Why this script exists (supersedes r333_state_census.py's field map):
   Verbatim disassembly of the state machinery (work/r331_disasm.txt) pins the

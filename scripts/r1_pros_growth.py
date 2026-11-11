@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_pros_growth.py — T37 SPLIT: does the POP-GROWTH counter (+0x4e)
 accumulate (a) the RAW item PROS sum (t24 law), (b) the GATED battery
 accumulator (field + class-3 bonus when field != 0; T35), or (c) the

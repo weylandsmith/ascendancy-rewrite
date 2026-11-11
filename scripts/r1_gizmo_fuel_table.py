@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_gizmo_fuel_table.py — t47 fuel/propulsion law measurement.
 
 Static law (decompile FUN_0004a658 @0x4a658, per ship per turn):

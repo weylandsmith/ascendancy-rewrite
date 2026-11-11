@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // shp_pngdump.cpp — t182 OQ-005 evidence driver (docs/BLOCKED.md t68,
 // docs/re/shp.md S16/S17, docs/STATE.md t182).
 //

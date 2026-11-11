@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t287 title-menu keyboard navigator: arrow-key highlight tracker.
 
 Why keyboard: the title-menu row highlight is HOVER state updated by motion

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t288: SOFTLOCK-CLASS LIVE PROBE — restore the soft save, watch the game's
 own pending-input globals, inject a key, name the dead half.
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t97d: enumerate ALL computed-jump tables (ff 24 9d disp32 = jmp [ebx*4+d])
 in obj0 with a decode-boundary-aware filter (disassemble window, keep sites
 whose insn actually decodes at that offset), then for the tables whose

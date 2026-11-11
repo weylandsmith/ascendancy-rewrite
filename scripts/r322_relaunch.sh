@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t322: BATCON TWO-CLICK ORDER-WITNESS (docs/re/_wip_t322.md; STATE.md NEXT
 # ACTION t322). FIRST-EVER arming of the batcon DAT_43508 stores 0x1b5e6 /
 # 0x1baa7 (REFUTED-ROUTES t321 amendment (3): the writer-zero series t307..t320

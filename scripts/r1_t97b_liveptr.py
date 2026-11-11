@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t97b: relocated-imm census for the SO block in LIVE RAM.
 Static-image census (pool-rel form 0x62b0..0x63a0, alignment-checked
 against objdump decode boundaries) found ONLY 0x1dae6. This tool repeats

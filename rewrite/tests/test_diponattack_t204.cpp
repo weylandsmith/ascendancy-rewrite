@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t204 DIPLOMACY-ON-ATTACK PIN — FUN_00043a4c (0x43a4c..0x43b0e) + its
 // combat call site 0x4b875 (fire precedes the shield/hull subtraction at
 // 0x4b87a/0x4b888) + the [0x48304] attacked-bitmap permanence.

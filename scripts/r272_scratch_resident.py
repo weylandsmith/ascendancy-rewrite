@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t272 probe: is the ascend.exe image resident in the SCRATCH session's RAM?
 
 The scratch session (title screen, New Game never clicked) produced savestate

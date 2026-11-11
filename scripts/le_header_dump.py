@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """le_header_dump.py — dump the OS/2 LE header, object table and page table of
 game/ascend.exe using ONLY fields this repo can cross-validate from the file.
 

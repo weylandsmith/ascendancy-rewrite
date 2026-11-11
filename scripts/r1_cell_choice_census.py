@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_cell_choice_census.py — t42 evidence census for the CB/built-item cell
 law (picker FUN_0003875c uniform-among-legal-empty).
 

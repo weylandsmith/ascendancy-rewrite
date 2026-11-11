@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """r1_t107_writers_full.py — FULL memory-write encoding census [reg+DISP].
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 
 t107 audit tool. r1_t86/r1_t106 covered only mov/sub/add(+imm) store forms.
 This variant adds every other memory-WRITING opcode family for the same

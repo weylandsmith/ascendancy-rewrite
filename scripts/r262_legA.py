@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t262b — leg-A deep check: on turn boundaries where V changed but the ship
 INVENTORY signature was identical, did ANY other banked field move
 (systems_any, systems_full, planets_mine, ship target-word multiset)?

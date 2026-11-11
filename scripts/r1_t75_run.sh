@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_t75_run.sh — OQ-021 threshold-discriminating capture (t75, rev2).
 # Inject 29/50 star ownership (58% band: fires >1/2; >=2/3 survives) into the
 # SCRATCH RESUME.GAM via scripts/r1_t75_inject.py, boot, click MENU ROW

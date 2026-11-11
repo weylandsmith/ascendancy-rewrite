@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r335b_item_array.py — t335 DECISIVE CENSUS: what the win+0x6d stride-13 array IS.
 
 Hypotheses (from _wip_t335.md S1-S3):

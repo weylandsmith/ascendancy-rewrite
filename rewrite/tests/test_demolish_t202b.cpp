@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t202b DEMOLISH CHANNEL PIN — the two victim scans + the +0x4c used-pop
 // law inside the AI build evaluator FUN_0003f130.
 // Law source: docs/re/_wip_t202.md S1/S3/S5/S11/S13 FINAL (verbatim disasm

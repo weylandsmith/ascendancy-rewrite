@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t249b S2: day-counter dword census.
 
 Leg A: in work/r1/bank-t1254/*.sav (all 20 slots, all turn 1254), find every

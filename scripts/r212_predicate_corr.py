@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t212 — predicate correlation for dword[0x482fb] over banked campaign saves.
 
 Static leg is CLOSED (see _wip_t212 S3/S4/S5): zero encodings of the slot

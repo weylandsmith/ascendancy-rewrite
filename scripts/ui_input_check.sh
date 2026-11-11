@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # dev check (bounded): does synthetic input reach the app? autoplay keeps
 # the app exit-able even if no clicks land. Prints app log tail.
 set -u

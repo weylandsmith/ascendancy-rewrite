@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_datafile_strings.py — which data files does the exe actually reference?
 
 OQ-004's first measurable half: the payload contains literal data-file names.

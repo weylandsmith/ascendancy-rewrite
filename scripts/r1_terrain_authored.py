@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_terrain_authored.py — OQ-016 residue: scenario-AUTHORED vs rng-GENERATED
 terrain (income-law.md S10 t29b, t30).
 

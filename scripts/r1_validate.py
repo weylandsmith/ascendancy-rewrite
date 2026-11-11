@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Validate a candidate runtime load base B by pointer density (R1).
 
 The refuted static schemes (OQ-011) voted on code-immediates WITHOUT a memory

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // Star-type statistics + name pools for galaxy generation.
 // Citations: docs/re/mapgen.md sections 1-2.

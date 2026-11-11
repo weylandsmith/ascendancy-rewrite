@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t88: caller census + RNG-constant uniqueness over the restored image.
 
 Static verification for the W6-A3 generic-gun-fire findings (combat.md S2g).

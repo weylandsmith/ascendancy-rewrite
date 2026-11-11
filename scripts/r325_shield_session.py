@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r325_shield_session.py — t325 PER-SLOT SHIELD-BYTE WRITNESS (OQ-016 res 4).
 
 The scratch campaign (RESUME.GAM.user-oct29, md5-pinned) carries a PENDING

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t106_deviation.py — census the +0x55 SEED-LAW deviation set (OQ-016).
 
 Seed law [CLOSED law, income-law.md S10/T33]:

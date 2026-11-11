@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Probe gizmos.txt + planitem.txt -> docs/re/gizmos.md, docs/re/economy.md.
 
 Both files carry the vendor's own format documentation above a '#' marker —

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t322: analyse the batcon two-click order-witness capture (offline).
 
 Reads <run>/hits.json + census.json + probes.json + session.log, prints a

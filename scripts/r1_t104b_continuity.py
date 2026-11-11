@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t104b: per-slot CONTINUITY probe around the four boundary drains.
 
 Slots/days: (4,11,15) days 1245..1255 and (24) days 775..785. Prints, per

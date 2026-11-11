@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t362 MIXED-FLEET DEPARTURE LAW — witness census on the banked t265 drive
 corpus (docs/re/ships.md S24: regimes A 2026-11-01 21:24-21:37 and B
 23:07-01:27 healthy, softlock window 21:38-23:06 EXCLUDED).

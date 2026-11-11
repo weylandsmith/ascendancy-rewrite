@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r325_shield_scan.py — t325 PHASE A: find shield-item slots + pending shield
 builds in (a) the Oct-29 resume state (work/r1/game/RESUME.GAM.user-oct29, the
 state every scratch leg session boots) and (b) the newest production ring slot.

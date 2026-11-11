@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t214: inflation-vs-time profile of the shared capture timeline.
 
 Why: four watcher instances write the same dir (docs/re/_wip_t214.md S2). A

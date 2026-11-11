@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t274 ECONOMY/RESEARCH INTEGRATION TESTS — end-to-end campaign pins for the
 // income-channel law, the pop-growth counter law, the build-queue completion
 // cadence, and the research tier chain (FUN_00040018 model).

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t294 TERRAIN SOURCE-TABLE PINS (OQ-016 residue 3 CLOSED).
 // Law (docs/re/income-law.md S10 t294 block, raw-asm this session): the
 // vendor loader FUN_00037fc0 fills the terrain weight rows at DS:0x744f4, the

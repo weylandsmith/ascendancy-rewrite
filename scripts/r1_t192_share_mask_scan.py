@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t192 (rev2): MEASURE lane/star visibility share residues in real saves.
 
 Addressing conventions (empirically re-verified this session on 60.sav,

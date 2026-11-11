@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t291 END-CTRL COMPARATOR PINS (OQ-021).
 // Law: the vendor evaluator FUN_00024a34 (payload file 0x24b9c..0x24bbe, read
 // verbatim — docs/re/_wip_t290.md S1, distilled to docs/re/score.md S19):

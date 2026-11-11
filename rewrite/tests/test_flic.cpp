@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // FLC codec tests — C++ decoder vs the Python reference golden hashes
 // (docs/re/flc.md §3). The TSV ships in-tree; game/ is the same corpus the
 // gate checksums. Hash: FNV-1a-64 over frame pixels then 256 RGB triples —

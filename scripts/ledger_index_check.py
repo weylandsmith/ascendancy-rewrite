@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 r"""ledger_index_check.py — t157: diff STATE.md's fast ledger index against the
 authoritative record (docs/OPEN-QUESTIONS.md), using ledger_audit's OWN status
 classifier so the two checks can never disagree by parser.

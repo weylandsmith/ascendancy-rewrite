@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t309: whole-image byte census of RING counter writers.
 
 Question (docs/re/_wip_t309.md S3): both ring counters read 0 in EVERY oracle

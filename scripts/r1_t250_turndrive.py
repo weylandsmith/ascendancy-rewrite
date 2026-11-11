@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t250 turn-driver v4: v3 (ring-verified press + popup drain) PLUS softlock
 detect and auto-recovery, plus a persistent run log.
 

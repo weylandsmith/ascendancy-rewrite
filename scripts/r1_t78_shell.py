@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t78_shell.py RUN... — OQ-012(a) extension: measure star position
 law at NON-default density (T=15/25/100 measured by r1_t78_read).
 

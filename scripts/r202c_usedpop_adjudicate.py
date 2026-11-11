@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t202c — adjudicate what +0x4c USED-POP actually equals on live records.
 Candidates per recalc S6 law (INACTIVE UPOP sum) vs ACTIVE UPOP sum vs
 pop - ACTIVE UPOP. Skips item 23 (Ship) and item flags&0x40 and slot

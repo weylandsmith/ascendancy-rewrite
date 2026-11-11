@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r284_deref.py — classify what ship+0x59 points AT (t284 contest-test law).
 
 The producer compares ship(+0x59) against a LANE-POOL record pointer, so the

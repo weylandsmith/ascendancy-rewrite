@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 r"""r1_t181_banddiff.py — OQ-003 packed-entropy residue: three-class diff (t181).
 
 Question (docs/OPEN-QUESTIONS.md OQ-003 residue): are the "packed-entropy"

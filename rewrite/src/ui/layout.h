@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // Pure UI layout math (no SDL) so it is unit-testable in ascend_core.
 // Geometry anchors: docs/re/ui-runtime.md §1 (windows.txt line numbers cited

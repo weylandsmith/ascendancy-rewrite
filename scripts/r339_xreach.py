@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t339 — cross-function reachability + poster-site report.
 (1) callers of fn 0x30c9c (child-list msg router entry) and of 0x30e0e/0x30edc arms.
 (2) BFS from fn 0x156d4 entry over CALL edges (bounded by function extents

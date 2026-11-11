@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_slot.py — shared slot-reading layer for the playcap analyzers (t85).
 
 Laws this depends on (all cited, none invented here):

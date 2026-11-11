@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # R1 DEEPER CAPTURE (STATE.md NEXT ACTION 2026-10-05k): drive the ORIGINAL
 # game past its title screen under dosbox-x using the coordinates
 # scripts/ref_capture.sh / docs/re/refcap.md prove clickable, so the

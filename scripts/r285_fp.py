@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r285_fp.py — campaign fingerprint for slots (t285 flip forensics).
 
 Identity law adapted from selfplay.md t266 (md5 over the ownership table). The

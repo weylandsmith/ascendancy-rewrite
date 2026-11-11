@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_home_placement.py — OQ-016 home-placement sub-law (T40).
 METHOD: earliest-mtime save per DISTINCT world (world identity = tuple of
 planet name+row+cap from find_records; t31 law that a game's slot ring

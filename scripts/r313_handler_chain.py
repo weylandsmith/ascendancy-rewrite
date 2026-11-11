@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t313 STEP 1h: msg-id dispatch chain inside fn 0x51cc4 (FLEETWND handler)
 + true indirect-dispatch census with SMALL displacements (the real law is
 `ff 55 0c` call [ebp+0xc] / `ff 71 08` — 8-bit disp forms; the 1f3 probe used

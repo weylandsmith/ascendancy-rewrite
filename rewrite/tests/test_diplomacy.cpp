@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Diplomacy module tests — expectations cite docs/re/diplomacy.md or the
 // verbatim .dip files under extracted/ascend00.
 #include "game/diplomacy.h"

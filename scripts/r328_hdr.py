@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import struct, glob, sys
 p=sys.argv[1]; ks=[int(x) for x in sys.argv[2:]]
 d=open(p,'rb').read(); count=struct.unpack_from('<I',d,4)[0]; tsz=struct.unpack_from('<I',d,8)[0]

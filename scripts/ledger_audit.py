@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 r"""ledger_audit.py — t84 contract-compliance check on docs/OPEN-QUESTIONS.md.
 
 Contract leg test per CLOSED row (whitespace-joined body):

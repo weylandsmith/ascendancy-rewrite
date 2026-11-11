@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_rock_convention.py — T38 tie-breaker: does capBase (+0x55 seed word)
 count the rock-marked cell NON-barren (pre-mark count: '|=' preserves the
 base class) or BARREN (post-mark count: bit-3 masks the class)? Only raw-8

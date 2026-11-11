@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t108_disp32_audit.py — adjudicate disp32 + FPU store-census claims.
 
 t108 audit tool (first revision generated mod=10 [base+disp32] forms only and

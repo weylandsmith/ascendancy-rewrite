@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t361 per-ship engine skeleton pins — build contract docs/re/pership-spec.md
 // (2); law sources docs/re/ships.md S17/S21/S22/S24/S59, docs/re/combat.md §1,
 // docs/re/ai-dossier.md §5; session adjudications docs/re/_wip_t361.md S1.

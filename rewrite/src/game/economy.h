@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // Ship devices ("gizmos") and planetary items.
 // Grammar + measured invariants: docs/re/gizmos.md, docs/re/economy.md.

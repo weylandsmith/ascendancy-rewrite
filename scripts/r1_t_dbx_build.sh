@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_t_dbx_build.sh — build a debugger-enabled dosbox-x (OQ-021 watchpoint
 # instrument; see docs/re/dosbox-debugger.md for WHY and the operating rules).
 #

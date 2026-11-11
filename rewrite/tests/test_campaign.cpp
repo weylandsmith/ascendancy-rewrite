@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Campaign turn-loop tests. Constants: docs/re/turnloop.md (end-*.txt vendor
 // comments, planitem rows, gizmo levels) — never memory (STATE rule).
 #include "game/campaign.h"

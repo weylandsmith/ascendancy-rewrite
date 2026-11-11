@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t202 — corpus census of the AI demolish-triage PRECONDITION fields.
 
 Fields (system-object base = planet-NAME - 0x24; window j = P0+k*123+H so

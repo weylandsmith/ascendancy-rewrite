@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t106_srcscan.py v2 — counts-only: is a deviating planet's GRID BLOCK
 copied from a template (memory / restored image / extracted corpus)?
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_ckdiff.py — per-record churn diff across ADAPTIVE checkpoints.
 
 For runs/ck dirs produced by scripts/r1_adcapture.sh: decode planet names

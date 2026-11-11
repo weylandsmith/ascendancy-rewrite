@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t310: WITNESS THE DESTINATION-WIDGET WRITER FAMILY (DAT_43508 / DAT_43504
 # stores of fn 0x51834's msg-0x1c01 path, docs/re/_wip_t310.md S1b) VIA A LIVE
 # ORDER FLOW, and name the callers from ret_stack (bank_stop dumps [esp]).

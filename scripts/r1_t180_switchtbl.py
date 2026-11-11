@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t180: resolve the FUN_000454a4 switch table (OQ-023 state-3 writers).
 
 Dispatch evidence (objdump, work/ascend_restored.bin, VA == file offset):

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # R1 attempt (option C cadence, docs/BLOCKED.md): ONE bounded attempt to dump
 # the live data base from the original game under dosbox-x. Safe by
 # construction (STATE.md DOSBOX RULE, 12 GB incident):

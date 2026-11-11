@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t303: relaunch loop for the MSG-CENSUS session (--census mode of
 # r299_leg_session.py). Census mode arms legs ONLY around each measured click
 # (arm -> click -> bank-window -> disarm -> liveness), so choreography between

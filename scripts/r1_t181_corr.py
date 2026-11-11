@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t181 correction probe: the earlier probe had an empty-slice bug
 (mem.find(b'') == 0). RESUME-014 is 75,603 B (EOF 0x12753), so every
 "verbatim chunk" hit past that offset was an artifact. Re-run with

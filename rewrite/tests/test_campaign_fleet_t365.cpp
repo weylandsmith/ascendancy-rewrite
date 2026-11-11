@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t365 ENGINE FLIP pins — the per-ship engine is THE combat engine and the
 // aggregate code is the oracle (user ruling D2=(b); bridge surrogate ledger
 // rewrite/src/game/campaign_fleet_bridge.h S1..S11; design docs/re/_wip_t365).

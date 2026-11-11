@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t213 probe A — al-form [ship+0x62] value source (0x15c6d / 0x15d98).
 
 Three questions, in the order the t210/t211 pitfalls demand:

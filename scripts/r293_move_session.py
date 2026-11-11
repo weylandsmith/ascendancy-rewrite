@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t293 SCRIPTED MOVE-ORDER CAPTURE — witness the sugar-cube scale live (OQ-019).
 
 QUESTION (docs/re/ships.md §17 T1/T2 + §t48 route, docs/BLOCKED.md

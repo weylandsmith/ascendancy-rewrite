@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r255d_persession.py — OQ-021: V=DAT_482fb change classification with
 PER-SESSION trust (the global watermark law of r1_stream wrongly drops every
 row of a campaign re-loaded at a LOWER turn — which is exactly what happened

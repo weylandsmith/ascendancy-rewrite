@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t360 per-ship SAVE PARSER (read-side) pins — docs/re/_wip_t360.md S2
 // (MEASURED 2026-11-09 on the production ring work/r1/playcap/save/41..60.sav)
 // + build contract docs/re/pership-spec.md §0/§1/§6. Read-side only: this

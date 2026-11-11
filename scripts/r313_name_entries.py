@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t313 STEP 1d: calibrate the window-rec law on t310's KNOWN STATUSWND rec
 (0xfd9fbc, name 'STATUSWND'), then name the owner of class entry 0x247FBC
 (grid B = {51b20,30d08,51cc4,51b64,311b8,316f0} — the fn holding the t312

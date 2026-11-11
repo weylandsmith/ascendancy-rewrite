@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_governor_census.py — t45 OQ-024 corpus evidence.
 
 Census of the planet-record byte +0x54 (the field the recalc governor

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t307: SELECTION-WRITER WITNESS at the SURVIVING STORE FAMILY. Arm the eight
 # non-batmode members of the t296 store census (w43504_{28ec2,28ef6,36b01,
 # 52003,55d35} + w43508_{51a8e,51fc2,55bbd}; every byte verified vs payload

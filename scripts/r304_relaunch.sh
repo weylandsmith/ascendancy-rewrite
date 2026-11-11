@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t304: relaunch loop for the COMBINED caller-witness + corrected census run
 # (--witness 3 --census of r299_leg_session.py). Phase A arms cos_hdlr ONLY
 # (hot 0x3b pump -> stops ~2 s; bank_stop dumps [esp] -> ret0 = caller EIP

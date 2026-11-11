@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t248 predicate search: find f such that count(f(planet)) == header at BOTH
 t1086 (60) and t1254 (102). Owned-by-race0 counts: 80 @1086, 108 @1254.
 Sweeps per byte offset d and per value v: ==v, !=v, >v, bit k set; also u16."""

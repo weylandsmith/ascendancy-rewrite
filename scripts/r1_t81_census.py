@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t81_census.py — OQ-003 planet-record field census (t81).
 
 Cohort: 20-slot r1deep timeline (real turns, idle+boundary phases).

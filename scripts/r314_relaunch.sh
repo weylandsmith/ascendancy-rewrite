@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t314: FLEETWND-FOCUS msg-0x1c01 LIVE CAPTURE (docs/re/_wip_t314.md). t313
 # closed the offline caller hunt: fn 0x51b68 is mid-body of fn 0x51b64 =
 # FLEETWND class-grid slot 3, and FLEETWND's msg handler fn 0x51cc4 owns its

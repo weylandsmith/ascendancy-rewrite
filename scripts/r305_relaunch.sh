@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t305: relaunch loop for the COMBINED witness+census run under the FIXED
 # [cpu]core=normal conf, with the t305 FIRE-PATTERN FIX (fire_pats dual
 # 6-hex/5-hex; normal core renders stop addresses TRUNCATED TO 5 HEX — run

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t261 witness harvest on the DRIVE corpus (production session 2026-11-01
 21:24-21:38, turns 1086->1111), with the two bugs that poisoned earlier passes
 fixed:

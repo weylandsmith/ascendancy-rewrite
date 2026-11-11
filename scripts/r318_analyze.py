@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t318: analyse the broadcast-pump capture (offline).
 
 Reads <run>/hits.json + <run>/session.log and prints a SMALL census:

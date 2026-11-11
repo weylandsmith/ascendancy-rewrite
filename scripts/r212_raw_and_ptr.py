@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t212 — decoder-independent checks on the DAT_000482fb writer census.
 
 scripts/r212_ref_census.py (capstone, resume-past-gaps, controls OK) found

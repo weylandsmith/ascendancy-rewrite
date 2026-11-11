@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """graph_quality.py — acceptance test for the raw-load approach.
 
 Because scripts/le_contiguity_test.py showed rel32 call targets resolve in

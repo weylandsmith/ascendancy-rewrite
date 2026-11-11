@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r256b_relmatrix.py — AI-AI relation-state census over the live timeline.
 
 t256b (gap row 12): the rewrite carries ONE attitude vector (AI->player); the

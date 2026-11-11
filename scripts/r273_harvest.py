@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t273 — offline witness harvest over the EXISTING drive corpus (three legs).
 
 Why offline: the t273 drive leg died at 11:35 EST when the :9 ring lineage

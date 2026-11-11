@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_game_health.py — production :9 liveness + TL-expiry + watcher census (t267).
 
 WHY (t266 measured): the 15:45 game death was dosbox-x -time-limit EXPIRY

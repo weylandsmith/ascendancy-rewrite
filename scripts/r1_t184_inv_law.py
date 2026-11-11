@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t184: OQ-019 build-inventory law RUNTIME CORROBORATION.
 
 Static law (docs/re/_wip_t184.md, full asm decode):

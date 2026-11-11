@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t316: dump the window registry at obj 0x7a35c (payload off) from a save.
 
 Laws (binding, docs/re/_wip_t316.md S1 + t313/t315):

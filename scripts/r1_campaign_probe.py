@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_campaign_probe.py — when did a NEW CAMPAIGN start inside a capture?
 
 LAW (verified 2026-10-05k, runs 204919 + 215445): the planet record table

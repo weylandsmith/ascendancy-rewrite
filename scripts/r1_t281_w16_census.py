@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t281 — MEASURE word[planet_rec + 0x16] (+0x16 = the [p+0x16]==10 skip key of
 SA_Cornucopia 0x43de4) over the static planet pool in TWO campaign lineages.
 

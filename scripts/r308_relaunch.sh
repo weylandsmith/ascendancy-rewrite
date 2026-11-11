@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t308: WITNESS A TRUE DAT_43504 DELTA. Same 9-leg set as t307 (8 store-census
 # writers + btn_hdlr control; bytes payload-verified t307), same fixed normal-
 # core conf + FirePat detector (regression 5/5 re-run this session). Changes:

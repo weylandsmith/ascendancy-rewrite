@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "game/research.h"
 #include "game/starstat.h"  // cp437ToUtf8
 

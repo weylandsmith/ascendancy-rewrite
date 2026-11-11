@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t259 sav-pair census: which banked/ring savstates exist, and do any two
 share a TURN but differ in V (DAT_482fb)? Bounded RSS: one Memory member at a
 time. Prints one line per sav + a PAIRS summary. NEVER loads the timeline."""

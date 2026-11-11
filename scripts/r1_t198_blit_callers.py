@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t198 — BLIT-CALLER CENSUS with per-function module attribution.
 
 Purpose (OQ-005 / planet-screen paint routine hunt): enumerate EVERY E8

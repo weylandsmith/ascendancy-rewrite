@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // ascendancy — reimplementation entry point.
 //
 // Current scope (docs/PLAN.md P3): boot SDL2 headless-able, locate and load

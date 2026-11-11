@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t364 PER-SHIP COMBAT ROUND pins — the stance setter + volley tail
 // (FUN_0004a55c 0x4a55c..0x4a601), the companion scan (FUN_0004a604), the
 // dispatcher ammo law (0x4a360 0x4a373..0x4a397), the gun handler gates

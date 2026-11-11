@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t326 PRE-RUN OFFLINE CENSUS (zero capture).
 
 Two questions that decide the t326 shape BEFORE spending any launch:

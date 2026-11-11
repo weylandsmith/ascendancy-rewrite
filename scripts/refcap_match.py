@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """refcap_match.py — compare screenshots of the ORIGINAL game (captured by
 scripts/ref_capture.sh) against the reference FLIC decode the C++ port is
 pinned to (flic.cpp == golden tsv == flc_probe.py; gate 4e == on-screen).

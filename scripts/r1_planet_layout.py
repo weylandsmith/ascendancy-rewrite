@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_planet_layout.py — planet/star record law from resume.gam + live RAM.
 
 Measured 2026-10-05k:

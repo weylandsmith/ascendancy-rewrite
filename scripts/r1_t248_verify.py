@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t248 VERIFY: planet-record +0x33 == owner race index (0xFF = unowned)?
 
 Chain to close (docs/re/selfplay.md t247 lead):

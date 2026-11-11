@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_t259_sentinel.sh — one-call census for the WAIT-TRIGGER sentinel (t259).
 # WHY: t259 measured that the parked :9 game DIED unattributed at 15:45:08
 # (docs/re/_wip_t259.md). The old sentinel premises ("the ring keeps banking",

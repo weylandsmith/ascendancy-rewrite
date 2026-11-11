@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // Galaxy generator. Model + citations: docs/re/mapgen.md section 4.
 // Deterministic: the same Config/seed produces a byte-identical galaxy.

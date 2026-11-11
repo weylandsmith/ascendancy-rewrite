@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 /* gate helper: synthetic X11 input for the P5a UI window.
  * Rationale: no xdotool/libXtst-dev/python-xlib on this host; XSendEvent
  * needs only libX11, and SDL2 accepts synthetic Button/Key events (only

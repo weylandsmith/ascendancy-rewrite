@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t91 (W6-A4): research-picker field-identity + write-census self-check.
 
 Pins the law banked in docs/re/aicode.md §3b:

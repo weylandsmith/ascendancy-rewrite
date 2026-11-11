@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t104: F8b ORDER-COMPLETION POWER-BOUNDARY CENSUS over the banked playcap.
 
 Closure target (docs/re/aicode.md S7.4): the static completion leg

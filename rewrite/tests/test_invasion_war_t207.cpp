@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t207 GUARANTEE-WAR CLAMP PIN — FUN_0003a174's post-handler site
 // 0x3a25a..0x3a291 (invasion resolution) + the caller-thread closure
 // (E8 census EXACTLY {0x39fba, 0x3a255, 0x4b875} edges into 0x43a4c).

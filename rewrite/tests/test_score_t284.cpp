@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t284 CONTROLLED-SYSTEMS producer pins (DAT_000482fb analog).
 // Law: Ghidra FUN_00024274 (payload file 0x24274..0x243fc) + the FUN_00024f24
 // tail, cross-checked instruction-for-instruction against objdump of

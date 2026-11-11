@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t313 STEP 1b: direct-call census for fn 0x51b68 (imagebase-0 payload).
 
 If fn 0x51b68 is NOT a class slot (t313 scan: zero rebased hits), its callers

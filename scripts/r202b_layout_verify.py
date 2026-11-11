@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t202b — layout self-verify for r202_triage_census item/diplo addressing.
 Item table member = B+0x82bb0+0x73e40 stride 0x28, name30@+10 (OQ-014).
 Print names for rows 0..38; compare against extracted planitem.txt order.

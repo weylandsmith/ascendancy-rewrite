@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """text_probe.py — P1f: text encodings + rule-table grammar + exe module map.
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 
 Three measurements, all whole-family:
 

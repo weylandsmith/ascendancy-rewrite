@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_cb_rank_models.py — t42 model fit for the home/CB cell-rank paradox.
 
 OBSERVED (r1_cell_choice_census, first-save homes): CB barren-cell rate

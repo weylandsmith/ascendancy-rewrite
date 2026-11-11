@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r340_slot_writers.py — census: every instruction in FUN_00038f68
 (0x38f68..0x394d8) that WRITES a slot-array dword/word (reg base + idx*4).
 Supports the t340 residue-(4) closure: the completion handler is expected to

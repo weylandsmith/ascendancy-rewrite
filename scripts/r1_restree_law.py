@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_restree_law.py — decode the LIVE research table in guest RAM (OQ-013).
 
 Measured law (2026-10-06r): restree.txt rows appear in guest RAM as

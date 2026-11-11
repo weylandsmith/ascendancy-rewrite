@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """t86 (W6-A1): [reg+DISP] write-encoding census over work/ascend_restored.bin.
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 
 Finds every MEMORY-WRITE encoding that touches a fixed byte offset from a
 base register, then verifies every candidate is an instruction boundary with

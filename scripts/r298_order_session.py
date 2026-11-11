@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t298 — LIVE MOVE-ORDER WITNESS #2 (fixed picker, correct gates, OQ-019 r1/r3).
 
 r297 base class + four fixes (docs/re/_wip_t298.md T298-A..D):

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t201 — VERIFY THREAT-BYTE LAWS (corrected control-flow reading).
 
 From FUN_00038ba4 recalc disasm (work/t201_recalc_scan.txt, verbatim):

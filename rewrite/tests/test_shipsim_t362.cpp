@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t362 MIXED-FLEET DEPARTURE LAW pins — the executor DRIVER repeat
 // (FUN_0002547c 0x2550c..0x25527: re-run the whole per-race pass while any
 // race reports work) and the commit-exit return law (FUN_00041260 tail

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_cb_placement_paths.py — t42 decisive census: which path placed each CB,
 and does the race table byte (rule-A blanket legality) explain barren CBs.
 

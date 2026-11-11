@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_record_census.py — per-record, per-offset census of planet-table churn.
 
 Purpose (docs/STATE.md NEXT ACTION 2026-10-06, W1(b) analysis half): the

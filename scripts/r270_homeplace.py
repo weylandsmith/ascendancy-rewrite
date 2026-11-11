@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t270: HOME-PLACEMENT VERIFICATION (OQ-016 residue; offline). KEEPER.
 
 Questions (STATE.md t270 assignment):

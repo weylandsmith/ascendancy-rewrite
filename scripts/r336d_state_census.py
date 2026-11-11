@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t336 census: winmgr STATE-ID table in .sav Memory (fn 0x57194 law).
 
 Layout (fn 0x57194 verbatim; stride geometry self-consistent 0x3066..0x30f4):

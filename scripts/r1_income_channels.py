@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_income_channels.py — per-channel income-law battery (OQ-016 income
 half; docs landing docs/re/economy.md S6 t20). Exit 0 iff IND and PROS
 each fit >=95% under the banked model.

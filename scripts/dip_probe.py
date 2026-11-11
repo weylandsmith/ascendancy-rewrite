@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """dip_probe.py — characterise extracted/ascend00/raceNN.dip and planitem.txt.
 
 Findings this script exists to prove (all [verified] by measurement over the

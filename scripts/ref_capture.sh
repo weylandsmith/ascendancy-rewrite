@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Reference-capture harness for the ORIGINAL game under dosbox-x + Xvfb.
 # Closes the "dosbox screenshot comparison (needs a reference capture
 # harness)" subitem in STATE.md P5. Produces ground-truth PNGs only; the

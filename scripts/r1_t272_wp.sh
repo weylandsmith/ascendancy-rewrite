@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_t272_wp.sh — t272 V-PRODUCER WATCHPOINT session launcher (scratch-only).
 #
 # WHY A SEPARATE LAUNCHER: scripts/r1_savestate.sh and r1_playcap_vnc.sh both

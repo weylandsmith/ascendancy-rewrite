@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # coswnd_run.sh (t73) — decompile the 36 coswnd.cpp functions never covered by
 # any prior batch (banked t72; work/attribution.tsv module==coswnd.cpp, est_func
 # column). OQ-021 static route: the t72 scan placed the end-ctrl string pool

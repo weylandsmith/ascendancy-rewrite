@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_live_probe.py — decide WHICH guest-physical copy of the image is LIVE.
 
 Measured context (2026-10-05, slot 46 of r1sav-20261005-160721):

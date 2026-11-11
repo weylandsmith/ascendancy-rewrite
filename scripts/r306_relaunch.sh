@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t306: SELECTION-WRITER WITNESS — arm the t296 static gate/effect sites
 # (BatModeWnd entry 0x1aef8, msg-4 router 0x1b070, msg-0x53 effect 0x1b71f,
 # mouse effect 0x1ba39) + btn_hdlr positive control, under the FIXED

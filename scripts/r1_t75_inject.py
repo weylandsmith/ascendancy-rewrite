@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t75_inject.py — OQ-021 discriminating injection (t75).
 
 Laws in force (all measured): .gam planet chain at 0xaae2, stride 123, name at

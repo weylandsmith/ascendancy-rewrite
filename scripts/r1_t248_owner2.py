@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t248 second-timestamp + structural closure for the per-planet owner law.
 
 planet-record BYTE +0x33 (stride 0x7b table, phys 0x26d07b in the banked

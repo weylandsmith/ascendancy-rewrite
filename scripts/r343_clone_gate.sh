@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t343 portability probe: clone the repo from local disk (file://, zero network)
 # and run the quality gate in the clone, capturing VERBATIM per-stage output.
 # Usage: r343_clone_gate.sh <dest-dir> [run-label]

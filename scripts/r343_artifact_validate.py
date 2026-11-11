@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r343_artifact_validate.py — validate the committed RE artifacts (t343).
 
 Artifacts (tracked under artifacts/):

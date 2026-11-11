@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r335_state_records.py — t335 STATE-RECORD FILE-VS-RAM CENSUS (zero capture).
 
 Semantics implemented (all VERBATIM from work/r331_disasm.txt this iteration):

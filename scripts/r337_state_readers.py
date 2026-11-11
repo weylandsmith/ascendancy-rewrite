@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t337: STATE-TABLE (winmgr+0x3066/0x3068/0x306a+0x8e*id, winmgr+0x4226)
 READER INVENTORY.
 

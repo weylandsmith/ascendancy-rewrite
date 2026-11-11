@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t369 — PLAY-WINDOW LOCATOR (phase 8, playtest 2026-11-10 evening).
 
 Finds the bounds of the USER'S play session over the production capture:

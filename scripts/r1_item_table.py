@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_item_table.py — runtime planitem-table census (AI build-selector input).
 
 Purpose: the AI evaluator (FUN_0003f130 region, restored-image disasm) gates

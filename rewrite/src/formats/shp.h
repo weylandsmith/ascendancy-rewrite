@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // .shp shape-library reader + row-RLE pixel decoder (OQ-005).
 //

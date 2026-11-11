@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_slot_delta.py — what changes BETWEEN ADJACENT slots of a live campaign?
 
 Purpose (docs/STATE.md NEXT ACTION 2026-10-05l): in a long capture of a

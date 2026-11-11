@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Vendor .fnt font tests — invariants from docs/re/fnt.md (OQ-017 CLOSED),
 // checked against the REAL files in extracted/ (read-only, gate-safe). The
 // same law is asserted by scripts/fnt_probe.py (gate 3p); this file pins

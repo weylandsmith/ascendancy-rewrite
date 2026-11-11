@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // Species special abilities (SA_<Token>) wired into the campaign.
 // Roster + effect prose: docs/re/species.md and extracted/ascend00/help.txt

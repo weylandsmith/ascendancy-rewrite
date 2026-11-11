@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t249 S6: locate the planet-list OBJECT by its OPEN-TIME signature.
 FUN_00051834 case 1 (screen open) does on the freshly alloc'd list obj:
    [obj+0xab]=0 ; [obj+0x8c9]=0x8d ; [obj+0xc5]=0 ; [obj+0xbb]=0xffffffff

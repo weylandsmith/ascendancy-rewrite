@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t188: speed-word hunt — why does slot 13 march 14/day while owner-1
 slots 17/20/29 march 14/3/day at IDENTICAL MOVES=4 POW~10-12 des=4?
 

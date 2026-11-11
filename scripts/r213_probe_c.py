@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t213 probe C — (C1) tail chain after 0x15e7c (back-edges?),
 (C2) exhaustive byte-defs of the two phase locals + linear block 0x1632f..0x16364,
 (C3) batmode-order vocabulary corroboration (command ids 0x326/0x327/0x328,

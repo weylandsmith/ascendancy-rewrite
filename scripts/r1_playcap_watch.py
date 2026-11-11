@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_playcap_watch.py OUT_DIR — LIVE collector for a played session (t85).
 
 WHY THIS EXISTS: the ring is autosave=10 41-60 (10 s cadence law, docs/

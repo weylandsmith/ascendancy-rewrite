@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t85_combat.py RUN_DIR [--no-trust] — OQ-010 combat application evidence
 extractor (t85; streaming rewrite t85b).
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t290: THRESHOLD-FREEZE / POKE at the end-turn pass — measure the comparator.
 
 STATIC LAW THIS INSTRUMENT TESTS (docs/re/_wip_t290.md S1-S2, read verbatim

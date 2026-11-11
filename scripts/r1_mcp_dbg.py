@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t282/t286: DOSBox-X debugger MCP control channel — LISTENER side.
 
 DIRECTION LAW (read the source before trusting the README's phrasing):

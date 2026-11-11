@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Quality gate for the Ascendancy RE goal loop. Deterministic, no network.
 # Exit 0 = healthy. Output is fed verbatim to the agent on failure.
 set -u
@@ -8,6 +10,53 @@ fail=0
 note() { echo "[gate] $*"; }
 err()  { echo "[gate FAIL] $*"; fail=1; }
 
+# t373: --portable mode (public-tree / fresh-clone entry point). The published
+# repo ships NO vendor data (docs/re/packaging.md S3) and a cloning machine may
+# lack the RE toolchain (~/tools/revenv). Portable mode SKIPS vendor-dependent
+# stages with a note instead of failing. Default (no flag) behaviour is
+# UNCHANGED: on the loop tree a missing game/ is an error. ASCENDANCY_DATA=<dir>
+# (optional) points at the user's own vendor install: if set and ROOT/game is
+# absent, game/ becomes a symlink to it so the ROOT-relative probes all work.
+# The gate never writes into game/ — P0 checksums it bidirectionally anyway.
+PORTABLE=0
+for _a in "$@"; do [ "$_a" = "--portable" ] && PORTABLE=1; done
+if [ -n "${ASCENDANCY_DATA:-}" ]; then
+  # User-supplied vendor install dir (ascend.exe + ascendNN.cob), READ-ONLY.
+  # Probes hardcode ROOT-relative game/ paths, so the symlink is the only
+  # uniform mechanism; the gate never writes into it (P0 checksums it
+  # bidirectionally anyway). extracted/ is regenerated from the archives
+  # (importer measured t373: ascend00 54 / ascend01 328 / ascend02 89 files,
+  # diff -r clean vs the loop tree) — packaging.md S9(b) CLOSED by this.
+  [ -e "$ROOT/game" ] || ln -s "${ASCENDANCY_DATA%/}" "$ROOT/game" \
+    || err "--portable: cannot symlink $ROOT/game -> $ASCENDANCY_DATA"
+  if [ ! -d "$ROOT/extracted/ascend00" ] && [ -f "$ROOT/game/ascend00.cob" ]; then
+    for _a in ascend00 ascend01 ascend02; do
+      /usr/bin/python3 "$ROOT/scripts/cob.py" extract "$ROOT/game/$_a.cob" \
+        "$ROOT/extracted/$_a" >/dev/null 2>&1 \
+        || err "--portable: cob.py extract $_a failed (ASCENDANCY_DATA incomplete?)"
+    done
+  fi
+fi
+VENDOR=0
+if [ -f "$ROOT/game/ascend.exe" ] \
+   && [ "$(ls "$ROOT/extracted/ascend00" 2>/dev/null | wc -l)" -ge 54 ]; then
+  VENDOR=1
+fi
+if [ "$VENDOR" = 0 ]; then
+  if [ "$PORTABLE" = 1 ]; then
+    note "vendor corpus absent (game/ + extracted/ascend00): vendor stages SKIPPED; supply ASCENDANCY_DATA=<vendor install dir> for the full gate"
+  else
+    err "game/ vendor data absent (run with --portable on a clone that legitimately lacks it)"
+  fi
+fi
+
+# 3v-invariant (t373, publish-filter): work/ must hold ZERO tracked files —
+# the historical `git add -f` survivors (packaging.md S3 landmine) made a
+# work/-dropping publish filter leak capture-corpus paths. Recurrence-proof.
+if [ -n "$(git ls-files work/)" ]; then
+  err "t373 invariant: tracked files under work/ exist again (publish filter would leak): $(git ls-files work/ | head -3)"
+fi
+
 # 1. Originals untouched (P0 invariant) — checksum manifest, BIDIRECTIONAL (t162).
 # t162 audit (docs/re/stop-report.md SS55): the pre-t162 leg enumerated
 # manifest->disk only. Measured on a scratch copy: DELETE of a listed file armed
@@ -16,6 +65,7 @@ err()  { echo "[gate FAIL] $*"; fail=1; }
 # itself from whatever was on disk, blessing a tampered tree forever.
 # Manifest set == disk == 23 files verified on the real tree before landing.
 MAN="$ROOT/docs/BASELINE.sha256"
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: P0
 if [ ! -f "$MAN" ]; then
   # docs/BASELINE.sha256 has been git-tracked since seed 3792dc5, so a healthy
   # tree can never legitimately lack it; absence = restore from git, NEVER
@@ -32,8 +82,10 @@ else
               <(cd "$ROOT/game" && find . -maxdepth 1 -type f -printf '%f\n' | LC_ALL=C sort) \
     | grep . && err "P0: game/ file SET != manifest (file added/removed outside the baseline)"
 fi
+else note "P0 game/ checksums skipped (no vendor data)"; fi
 
 # 2. Extractor round-trip works
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: extract
 TMP=$(mktemp -d)
 if /usr/bin/python3 "$ROOT/scripts/cob.py" extract "$ROOT/game/ascend00.cob" "$TMP/a0" >/dev/null 2>&1; then
   n=$(ls "$TMP/a0" | wc -l); [ "$n" -ge 50 ] || err "extractor regression: only $n files from ascend00 (expect >=50)"
@@ -41,6 +93,7 @@ else
   err "cob.py extract failed on ascend00.cob"
 fi
 rm -rf "$TMP"
+else note "ascend00 extractor round-trip skipped (no vendor data)"; fi
 
 # 3. Docs integrity
 for f in docs/PLAN.md docs/STATE.md docs/FINDINGS.md; do
@@ -68,14 +121,17 @@ if [ "$MS" -ge 3 ] && [ -d "$ROOT/rewrite" ]; then
   if [ -d "$ROOT/rewrite/build" ]; then
     cmake --build "$ROOT/rewrite/build" -j2 >/tmp/gate_build.log 2>&1 \
       || { tail -40 /tmp/gate_build.log; err "build failed"; }
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: run_tests
     if [ -x "$ROOT/rewrite/build/run_tests" ]; then
       "$ROOT/rewrite/build/run_tests" >/tmp/gate_tests.log 2>&1 \
         || { tail -40 /tmp/gate_tests.log; err "unit tests failed"; }
     fi
+else note "run_tests skipped (unit tests read extracted/ vendor tables)"; fi
     # 4b. Boot smoke test. Runs the REAL binary twice: once with the dummy
     # video driver and once under Xvfb with x11, because the completion
     # contract requires an Xvfb boot. Bounds are mandatory — see the DOSBOX
     # RULE in STATE.md about unbounded log growth.
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: boot
     if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
       timeout 60 "$ROOT/rewrite/build/ascendancy" --headless --turns 3 >/tmp/gate_boot.log 2>&1 \
         || { tail -20 /tmp/gate_boot.log; err "headless boot failed"; }
@@ -91,12 +147,14 @@ if [ "$MS" -ge 3 ] && [ -d "$ROOT/rewrite" ]; then
         note "xvfb-run unavailable: skipped x11 boot"
       fi
     fi
+else note "boot smokes skipped (binary needs user-supplied game data)"; fi
   fi
 fi
 
 # 3b. P1b invariant: .bin tables parse at stride 24, and the .cob extractor must
 # emit ALL directory entries (it silently dropped the last file of every archive
 # until 2026-10-03, so count is asserted, not trusted).
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3b
 if /usr/bin/python3 "$ROOT/scripts/table_probe.py" --out /tmp/gate_tables.md >/tmp/gate_probe.log 2>&1; then
   [ "$(ls "$ROOT/extracted/ascend00" | wc -l)" -ge 54 ] || err "ascend00 extracted <54 files"
   [ "$(find "$ROOT/extracted/ascend02" -type f | wc -l)" -ge 89 ] || err "ascend02 extracted <89 files"
@@ -104,11 +162,13 @@ if /usr/bin/python3 "$ROOT/scripts/table_probe.py" --out /tmp/gate_tables.md >/t
 else
   tail -20 /tmp/gate_probe.log; err "table_probe.py failed (.bin stride invariant broken?)"
 fi
+else note "table_probe skipped (no extracted/)"; fi
 
 # 3c. P1c invariant: every .shp container parses (magic 1.10, table size
 # 8*(N+1), monotonic pointer slots, spans covering the data area). The probe
 # aborts on any violation; here we additionally pin the corpus size so a
 # silently-shrunk extracted/ tree cannot pass.
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3c
 NSH=$(find "$ROOT/extracted" -name '*.shp' -type f | wc -l)
 [ "$NSH" -ge 208 ] || err "only $NSH .shp files in extracted/ (expect >=208)"
 if /usr/bin/python3 "$ROOT/scripts/shp_probe.py" --out /tmp/gate_shp.md >/tmp/gate_shp.log 2>&1; then
@@ -117,11 +177,13 @@ if /usr/bin/python3 "$ROOT/scripts/shp_probe.py" --out /tmp/gate_shp.md >/tmp/ga
 else
   tail -20 /tmp/gate_shp.log; err "shp_probe.py failed (.shp container invariant broken?)"
 fi
+else note "shp corpus skipped (no extracted/)"; fi
 
 # 3c-2. t197: unified record law pinned on the REWRITE-EXACT validator
 # (span-free walk + both-components dims gate; shp.md S21). The X class
 # (29 span-crossing full frames) must stay decodable and the dims-gate
 # demotions (mouse k5, sg64expl k0) must not silently drift. ~0.2 s.
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3c2
 if /usr/bin/python3 "$ROOT/scripts/r1_shp_unifiedlaw.py" >/tmp/gate_shplaw.log 2>&1; then
   for TV in "record V: 196" "record A: 1288" "record X: 29" "record FAIL: 44" \
             "libraries passing EVERY record: 187/208"; do
@@ -131,43 +193,52 @@ if /usr/bin/python3 "$ROOT/scripts/r1_shp_unifiedlaw.py" >/tmp/gate_shplaw.log 2
 else
   tail -20 /tmp/gate_shplaw.log; err "r1_shp_unifiedlaw.py crashed"
 fi
+else note "shp unified-law battery skipped (no extracted/)"; fi
 
 # 3d. P2-input invariant: all 21 race*.dip parse with the SAME DIPVALUES key
 # set (that identity is what makes per-race AI data-driven rather than 21
 # bespoke scripts). Also pins the corpus size.
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3d
 if /usr/bin/python3 "$ROOT/scripts/dip_probe.py" --out /tmp/gate_dip.md >/tmp/gate_dip.log 2>&1; then
   grep -q 'OK: 21/21 dips parsed' /tmp/gate_dip.log \
     || { tail -20 /tmp/gate_dip.log; err "dip_probe did not parse all 21 dips"; }
 else
   tail -20 /tmp/gate_dip.log; err "dip_probe.py failed (.dip grammar broken?)"
 fi
+else note "dip_probe skipped (no extracted/)"; fi
 
 # 3e. P1e invariant: FLIC chunk chains tile their files exactly; audio/font/
 # hazard/tmp inventory regenerates.
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3e
 if /usr/bin/python3 "$ROOT/scripts/media_probe.py" --out /tmp/gate_media.md >/tmp/gate_media.log 2>&1; then
   grep -q 'OK: 2 flic exact-tiled' /tmp/gate_media.log \
     || { tail -20 /tmp/gate_media.log; err "media_probe did not verify both FLICs"; }
 else
   tail -20 /tmp/gate_media.log; err "media_probe.py failed (FLIC/audio inventory)"
 fi
+else note "media_probe skipped (no extracted/)"; fi
 
 # 3f. P1d invariant: the golden save is byte-pinned by size and the measured
 # stride-75 tech chain still resolves.
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3f
 if /usr/bin/python3 "$ROOT/scripts/gam_probe.py" --out /tmp/gate_gam.md >/tmp/gate_gam.log 2>&1; then
   grep -q 'stride=75' /tmp/gate_gam.log \
     || { tail -20 /tmp/gate_gam.log; err "gam_probe stride changed (was 75)"; }
 else
   tail -20 /tmp/gate_gam.log; err "gam_probe.py failed (resume.gam correlation)"
 fi
+else note "gam_probe skipped (no vendor data)"; fi
 
 # 3g. P1f invariant: ascend00 stays CP437-safe (few high bytes) and the exe
 # still exposes its 34 module names (the P2 subsystem spine).
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3g
 if /usr/bin/python3 "$ROOT/scripts/text_probe.py" --quiet >/dev/null 2>/tmp/gate_text.log; then
   grep -q 'modules=34' /tmp/gate_text.log \
     || { cat /tmp/gate_text.log; err "text_probe module count changed (was 34)"; }
 else
   cat /tmp/gate_text.log; err "text_probe.py failed"
 fi
+else note "text_probe skipped (no vendor data)"; fi
 
 # 3h. P2 loader-model invariant: docs/re/loader.md exists (it is the P2
 # foundation every subsystem spec cites), the Ghidra bootstrap sources are
@@ -193,6 +264,7 @@ fi
 # reproduces its headline measurements on the shipped restree.txt (66 main
 # rows + 40 ALL-CAPS variants, acyclic prereq graph). Pure stdlib.
 [ -s "$ROOT/docs/re/research.md" ] || err "docs/re/research.md missing"
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3i
 if /usr/bin/python3 "$ROOT/scripts/restree_probe.py" --out /tmp/gate_research.md --quiet; then
   grep -q 'data rows = \*\*106\*\* = \*\*66\*\*' /tmp/gate_research.md \
     || err "restree_probe: row counts drifted from 106=66+40"
@@ -201,6 +273,7 @@ if /usr/bin/python3 "$ROOT/scripts/restree_probe.py" --out /tmp/gate_research.md
 else
   err "restree_probe.py crashed"
 fi
+else note "restree_probe skipped (no extracted/)"; fi
 
 # 3i2. OQ-004 invariant: .cob container grammar (docs/re/datafiles.md S3) —
 # TOC parse + strictly-increasing blob offsets + ascend00 full 54/54 md5
@@ -222,9 +295,11 @@ fi
 # must exist and keep the sentinel fact visible.
 [ -s "$ROOT/docs/re/gizmos.md" ] || err "docs/re/gizmos.md missing"
 [ -s "$ROOT/docs/re/economy.md" ] || err "docs/re/economy.md missing"
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3j
 if ! /usr/bin/python3 "$ROOT/scripts/gizmo_probe.py" --quiet; then
   err "gizmo_probe.py failed its own invariants"
 fi
+else note "gizmo_probe skipped (no extracted/)"; fi
 grep -q 'Interstellar Trucking' "$ROOT/docs/re/economy.md" \
   || err "economy.md lost the 254-sentinel record"
 
@@ -234,9 +309,11 @@ grep -q 'Interstellar Trucking' "$ROOT/docs/re/economy.md" \
 [ -s "$ROOT/docs/re/ui.md" ] || err "docs/re/ui.md missing"
 [ -s "$ROOT/docs/re/species.md" ] || err "docs/re/species.md missing"
 [ -s "$ROOT/docs/re/diplomacy.md" ] || err "docs/re/diplomacy.md missing"
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3k
 if ! /usr/bin/python3 "$ROOT/scripts/ui_probe.py" --quiet; then
   err "ui_probe.py failed its own invariants"
 fi
+else note "ui_probe skipped (no extracted/)"; fi
 grep -q 'PARSE TRAP' "$ROOT/docs/re/diplomacy.md" \
   || err "diplomacy.md lost the negative-value parse-trap record"
 grep -q 'SA_SuperMarines' "$ROOT/docs/re/species.md" \
@@ -247,9 +324,12 @@ grep -q 'SA_SuperMarines' "$ROOT/docs/re/species.md" \
 # tokenless -> title match) and the 14/7 charge split, via
 # scripts/ability_probe.py; plus the binary firing at least one SA_ event.
 [ -s "$ROOT/docs/re/abilities.md" ] || err "docs/re/abilities.md missing"
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3m-probe
 if ! /usr/bin/python3 "$ROOT/scripts/ability_probe.py"; then
   err "ability_probe.py failed (roster/charge invariant broken?)"
 fi
+else note "ability_probe skipped (no extracted/)"; fi
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3m-bin
 if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
   timeout 120 "$ROOT/rewrite/build/ascendancy" --headless --campaign 65 \
     --seed 11 >/tmp/gate_ability.log 2>&1
@@ -259,6 +339,7 @@ if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
   grep -q 'SA_HealShips' /tmp/gate_ability.log \
     || { tail -10 /tmp/gate_ability.log; err "charged ability never fired by turn 65 (cad[HealShips]==60, aicode.md §6.4)"; }
 fi
+else note "ability smoke skipped (no data)"; fi
 
 # 3n. Option-C R1 harness invariants (docs/BLOCKED.md runbook): the attempt
 # harness must exist, must be executable, must NEVER reference a mount of the
@@ -376,8 +457,11 @@ fi
 # restored image is TRACKED at artifacts/ascend_restored.bin (payload derives
 # from game/ascend.exe@0x2a50 inside attribution_scan.py), so this stage now
 # runs on a fresh clone; work/ copy still honoured when present.
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3r
 if [ -s "$ROOT/work/ascend_restored.bin" ] || [ -s "$ROOT/artifacts/ascend_restored.bin" ]; then
-  if ! "$HOME/tools/revenv/bin/python" "$ROOT/scripts/attribution_scan.py" \
+  if [ ! -x "$HOME/tools/revenv/bin/python" ]; then
+    echo "note: revenv python absent: attribution scan skipped (t373: ungated invocation used to hard-fail clones lacking ~/tools/revenv)"
+  elif ! "$HOME/tools/revenv/bin/python" "$ROOT/scripts/attribution_scan.py" \
         >/tmp/gate_attr.log 2>&1; then
     tail -12 /tmp/gate_attr.log
     err "attribution_scan regressed (modules lost their >=5-site signal)"
@@ -385,32 +469,38 @@ if [ -s "$ROOT/work/ascend_restored.bin" ] || [ -s "$ROOT/artifacts/ascend_resto
 else
   echo "note: work/ascend_restored.bin absent (run scripts/r1_restore_sites.py); attribution skipped"
 fi
+else note "attribution scan skipped (no vendor data / revenv)"; fi
 
 # 3o. OQ-002 closure invariant: BOTH vendor FLC files must fully decode
 # (stock Autodesk chunks; zero-residue + OOB asserted per chunk). Fast path:
 # --decode-only skips the 50s golden hashing; the golden cross-check against
 # the C++ port lives in run_tests (flc_logic_golden / flc_intro_golden).
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3o
 if /usr/bin/python3 "$ROOT/scripts/flc_probe.py" --decode-only --quiet; then
   :
 else
   err "flc_probe.py decode failed (OQ-002 regressed?)"
 fi
+else note "FLIC decode skipped (no vendor data)"; fi
 [ -s "$ROOT/docs/re/flc.md" ] || err "docs/re/flc.md missing"
 [ -s "$ROOT/rewrite/tests/data/flc_golden.tsv" ] || err "flc_golden.tsv missing (C++ cross-check data)"
 
 # 3p. OQ-017 closure invariant: the .fnt law (1B/px, slot==4+w*h, EOF tiling,
 # per-font ink alphabet) must hold on all 384 vendor glyphs (docs/re/fnt.md).
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3p
 if /usr/bin/python3 "$ROOT/scripts/fnt_probe.py" --quiet; then
   :
 else
   err "fnt_probe.py failed (OQ-017 regressed?)"
 fi
+else note ".fnt law skipped (no extracted/)"; fi
 [ -s "$ROOT/docs/re/fnt.md" ] || err "docs/re/fnt.md missing"
 
 # 4e. Pixel proof the C++ path renders what the decoder says: play the intro
 # under Xvfb, capture the screen, demand an EXACT 640x480 match against the
 # Python-decoded frame (scripts/intro_pixelcheck.sh; verified 2026-10-04i:
 # frame 19 at (192,144)).
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 4e
 if [ ! -x "$ROOT/rewrite/build/ascendancy" ]; then
   note "rewrite binary absent (build stage failed/skipped): skipped intro pixel check"
 elif ! command -v Xvfb >/dev/null 2>&1 || ! command -v import >/dev/null 2>&1 || [ ! -x "$HOME/tools/revenv/bin/python" ]; then
@@ -418,18 +508,22 @@ elif ! command -v Xvfb >/dev/null 2>&1 || ! command -v import >/dev/null 2>&1 ||
 elif ! bash "$ROOT/scripts/intro_pixelcheck.sh" 40 1.5 91 >/tmp/gate_intro.log 2>&1; then
   tail -20 /tmp/gate_intro.log; err "intro pixel check failed (window != decoded frame)"
 fi
+else note "intro pixel check skipped (no data)"; fi
 
 # 3l. Victory-condition grammar + CONTRACT smoke: end-*.txt blocks assert
 # (scripts/endtext_probe.py), and the rewrite binary must actually reach a
 # victory condition on a seeded headless campaign run (docs/PLAYTHROUGH.md).
 [ -s "$ROOT/docs/re/turnloop.md" ] || err "docs/re/turnloop.md missing"
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3l-endtext
 if ! /usr/bin/python3 "$ROOT/scripts/endtext_probe.py"; then
   err "endtext_probe.py failed (end-*.txt grammar changed?)"
 fi
+else note "endtext_probe skipped (no extracted/)"; fi
 grep -q 'VICTORY Control' "$ROOT/docs/PLAYTHROUGH.md" \
   || err "PLAYTHROUGH.md lost the control-victory run"
 grep -q 'VICTORY Extinct' "$ROOT/docs/PLAYTHROUGH.md" \
   || err "PLAYTHROUGH.md lost the extinction run"
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 3l-campaign
 if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
   # T37: budget 600 -> 900 (class-cell channel law). T40: 900 -> 1200 — the
   # faithful CB-only start (docs/re/income-law.md T40) moved the seed-2024
@@ -447,11 +541,13 @@ if [ -x "$ROOT/rewrite/build/ascendancy" ]; then
   grep -q '^VICTORY ' /tmp/gate_campaign.log \
     || { tail -20 /tmp/gate_campaign.log; err "campaign log has no VICTORY line"; }
 fi
+else note "victory campaign skipped (no data)"; fi
 
 # 4c. UI smoke: the P5a window must boot under Xvfb, play N turns driven by
 # the autoplay path, and exit 0 printing 'ui ok:' (docs/re/ui-runtime.md §5).
 # t343: notes split by cause (binary absent vs toolchain absent) — the old
 # single note blamed xvfb-run for a missing binary on fresh clones.
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 4c
 if [ ! -x "$ROOT/rewrite/build/ascendancy" ]; then
   note "rewrite binary absent (build stage failed/skipped): skipped UI smoke"
 elif ! command -v xvfb-run >/dev/null 2>&1; then
@@ -491,6 +587,7 @@ else
     note "tools/xsend not built: skipped real-input UI check"
   fi
 fi
+else note "UI smoke skipped (no data)"; fi
 
 # 4f. Reference-capture comparison: screenshots of the ORIGINAL game running
 # under dosbox-x (produced by scripts/ref_capture.sh, pinned in
@@ -521,6 +618,7 @@ fi
 # a dummy audio device (docs/re/audio.md §5). Any load failure aborts init
 # with exit 1, so grepping the ok line IS the load test.
 # t343: notes split by cause (see 4c).
+if [ "$VENDOR" = 1 ]; then   # t373 portable-wrap: 4d
 if [ ! -x "$ROOT/rewrite/build/ascendancy" ]; then
   note "rewrite binary absent (build stage failed/skipped): skipped audio smoke"
 elif ! command -v xvfb-run >/dev/null 2>&1; then
@@ -536,6 +634,7 @@ else
   grep -q 'ui ok: turn 1' /tmp/gate_audio.log \
     || { cat /tmp/gate_audio.log; err "audio run did not complete a turn"; }
 fi
+else note "audio smoke skipped (no data)"; fi
 
 # 3t. LEDGER CONSISTENCY (t158) — the two ledger checks run HERE, not in prose.
 # Why: t157 found STATE.md's fast index had drifted 6 rows from the record while

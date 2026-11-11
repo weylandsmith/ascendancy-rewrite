@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t85g: adjudicate the t1253/1254 sitting (OQ-010/021/023 evidence).
 
 Events this sitting must explain: alliance proposal #2 to Orfa, war

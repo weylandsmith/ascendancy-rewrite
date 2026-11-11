@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_colony_items.py — COLONISED-PLANET INITIAL ITEMS (STATE next action
 after t40). QUESTION: when an UNOWNED planet becomes owned, does the
 original put a Colony Base on it in the SAME turn, or nothing (ownership

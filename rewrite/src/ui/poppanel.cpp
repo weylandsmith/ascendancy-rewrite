@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Population panel law — see poppanel.h for the citations. Pure math + a
 // library-conformance gate; no SDL (ascend_ui links it; run_tests compiles
 // this file directly, layout.cpp precedent).

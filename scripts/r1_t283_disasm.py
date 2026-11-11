@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t283 helper: map a stopped-debugger EIP back to a payload file offset and
 disassemble the writing instruction locally.
 

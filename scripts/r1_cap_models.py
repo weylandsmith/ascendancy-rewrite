@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_cap_models.py — POP-CAP model matrix on the byte-verified item table
 (OQ-016 residual, S10 T33).
 

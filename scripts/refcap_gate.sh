@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # refcap_gate.sh — end-to-end reference-capture comparison in one run:
 #   1. scripts/ref_capture.sh boots the ORIGINAL (dosbox-x + Xvfb), screenshots
 #      the title menu, clicks Play Introduction, screenshots the movie.

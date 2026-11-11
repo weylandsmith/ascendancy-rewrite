@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t265 pass 2 — aggregated st4 motion + magnetron hunt on the drive corpus.
 
 Same corpus law as pass 1 (r265_st4_magnetron.py): mtime inside the drive

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t311: STATUSWND-FOCUSED DIGIT KEYS + fn 0x51834 ENTRY LEG (docs/re/
 # _wip_t311.md). The entry leg (0x51834, entry bytes 56 57 55 83 ec 0c
 # payload-verified t311) fires for EVERY msg to the STATUSWND class with

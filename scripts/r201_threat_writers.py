@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t201 — writer/reader census for planet threat bytes +0x58/+0x59.
 
 Scans obj0 code [0x14bb0,0x82bb0) in work/ascend_restored.bin (base-0

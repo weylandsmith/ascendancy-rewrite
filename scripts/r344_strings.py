@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t344: name the immediate string operands of the cursor-shape dispatcher
 fn 0x5a292..0x5a3ed (work/r331_disasm.txt). Per the pool-relative-immediate
 law (docs/re/datafiles.md), an imm in the code may be a pool-relative offset

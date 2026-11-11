@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t313 STEP 1g: callers of the FLEETWND writer fns + slot-3 dispatch route.
 
 Block map (r313_fleetwnd_map.py) shows fn boundaries: writer store 0x51fc2 is

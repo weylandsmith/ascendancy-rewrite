@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Probe extracted/ascend00/restree.txt -> docs/re/research.md.
 
 Grammar established by evidence (see section 2 for the discriminating tests):

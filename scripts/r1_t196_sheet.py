@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t196_sheet.py — OQ-005 residue triage: partial renders + contact sheets.
 
 Continues r1_t182_pngdump.py (which renders only fully-valid records). The 71

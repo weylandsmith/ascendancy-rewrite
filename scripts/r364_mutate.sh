@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t364 mutation campaign: 6 mutants, serial, driver = scripts/r363r_mutate.py
 set -u
 cd /home/hrethric/projects/ascendancy

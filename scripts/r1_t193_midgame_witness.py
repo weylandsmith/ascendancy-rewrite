@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t193: mid-game witness probe for the lane/star visibility share law.
 
 The t192 corpus (new-game saves) produced the honest negative "share path

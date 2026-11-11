@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_income_law.py — live-verify the colony income law (OQ-016 income half)
 against guest RAM. Docs landing: docs/re/economy.md, docs/re/ships.md.
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // Research tree loader + availability queries.
 // Grammar and field roles: docs/re/research.md §1-§2 (from

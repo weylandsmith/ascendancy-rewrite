@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t197_pastrows2.py — are the past-span rows the NEXT record's top rows?
 
 Follow-up to r1_t197_pastrows.py: planind/3cfgnew past-span rows paint many

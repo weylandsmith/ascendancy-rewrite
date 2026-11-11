@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # One task per session, forever. Each iteration spawns a FRESH hermes process
 # (new context, no compaction), which must complete exactly one task, write its
 # findings to disk, and exit. The loop then verifies and starts the next task.

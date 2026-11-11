@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t313 STEP 1f: block map of the FLEETWND vtable region 0x51b64..0x52060.
 
 capstone is NOT installed (t313 trap: r290_disasm imports it but falls back to

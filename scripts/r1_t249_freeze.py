@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t249 S10: (a) E8 direct-caller census for 0x51684 / 0x51834 / 0x51b68;
 (b) every site writing dword 0 to [reg+0xab] (freeze-vs-refresh question:
     does anything clear the widget's list handle?);

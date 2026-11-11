@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_trajectory_regression.py — t49 BLOCKED-route ONE RUN.
 
 Ship array law [verified verbatim, FUN_00022304]: base DAT_0003a095

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t213 — linear-sweep CFG for the 0x15b00..0x15e60 region + predecessor query.
 
 Purpose: the t211 S4 Amendment banked the al-form [ship+0x62] writers

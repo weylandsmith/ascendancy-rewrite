@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t247: locate the "Planets Occupied" producer (header showed 102 at
 t=1254 while u16@0x131b4 sat at 60 -> t246 attribution was wrong)."""
 import zipfile, struct, sys

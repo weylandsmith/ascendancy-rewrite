@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Assert the end-*.txt victory-condition grammar (docs/re/turnloop.md §1).
 Grammar per file: vendor comment, enddesc..endtext, ranks + EXACTLY 10 names
 (stop the walker at the next keyword!), congrat..endtext, end. Exit 0 = all

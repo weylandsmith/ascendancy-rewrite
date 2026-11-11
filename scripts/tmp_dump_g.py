@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # tmp dump: worlds whose last save has an active Factory with zero active
 # neighbours per r1_built_cell_law geometry; print full row map + actives.
 import sys, os, glob, struct as st, zipfile

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_playcap.sh — USER-FACED original-game capture session (t82).
 #
 # PURPOSE: the three remaining user-level blocks (OQ-021 victory selector,

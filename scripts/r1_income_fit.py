@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_income_fit.py — candidate-model scoring for the colony income law
 (OQ-016 income half) against guest RAM. Companion to r1_income_law.py.
 

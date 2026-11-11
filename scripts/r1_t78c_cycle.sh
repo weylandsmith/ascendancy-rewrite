@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_t78c_cycle.sh — OQ-012(a) decisive leg: click GALAXY_MORE N times on
 # the setup screen (rect center (64,426), windows.txt NEWGAMEWND law),
 # ENTER campaign ((600,440) r1deep law), measure T=hi-u16 DAT_00016143

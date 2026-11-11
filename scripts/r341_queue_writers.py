@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t341: static census for the factory auto-reserve question.
 
 Restored image work/ascend_restored.bin disassembled at work/r331_disasm.txt

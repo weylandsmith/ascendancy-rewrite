@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t338 — STATE-16 LIVE DRIVE: witness the BatControlWnd mode-1 arming chain
 while the game is ACTUALLY in battle state 16 (core+0x4228 == 16).
 

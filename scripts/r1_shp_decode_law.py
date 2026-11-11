@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_shp_decode_law.py — OQ-005 codec validation (t61).
 
 Grammar recovered VERBATIM from FUN_0005caac instruction stream

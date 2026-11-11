@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // PLANETALLOC window composition law — see planetwin.h for the citations.
 // Pure data + lookup; no SDL (compiled into run_tests directly, hudlayout.cpp
 // / poppanel.cpp precedent). Working notes: docs/re/_wip_t276.md.

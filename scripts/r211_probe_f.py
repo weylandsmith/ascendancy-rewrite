@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t211 probe F: does guest RAM hold any dword == P0 + 0x4a350 (pointer law)?
 If yes, the phase-flip block 0x4a350 has a runtime binding (handler table,
 t191 pattern); if no dword anywhere in the member references it, the block is

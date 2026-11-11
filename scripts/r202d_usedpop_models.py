@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t202d — final +0x4c model comparison over the 20-save corpus.
 Per record compute candidate models and histogram EXACT-EXACT agreement:
   M1 inactU           (S6 verbatim: UPOP over INACTIVE non-23 non-0x40 non-slotflag2)

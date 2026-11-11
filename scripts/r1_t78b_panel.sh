@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_t78b_panel.sh — step B of OQ-012(a): click GALAXY_MORE button
 # (windows.txt NEWGAMEWND child, rect 7,381..122,472 -> center (64,426)),
 # screenshot the resulting density panel for coordinate adjudication.

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t369 — MAGNETRON LANDING CENSUS over the play window (or any .sav dir).
 
 Three counters, all from CITED laws (docs/re/ships.md S19 T3, S24 K3b,

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t212 — verify the pointer hits are relocated disp32 bytes, not hidden code.
 
 r212_raw_and_ptr.py C2 found relocated-value dwords in RAM at members

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t103: FUN_00037b6c DX-SWITCH (human ability activation) verify. RC=0 iff all legs pass.
 
 LEG 1 (dispatch bytes, restored image 0x37b90..0x37c9c): the class-record

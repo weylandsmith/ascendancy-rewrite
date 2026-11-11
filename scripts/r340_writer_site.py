@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r340_writer_site.py — locate the t340 BPLM-fire writer (file offset 0x39290)
 in the restored image + Ghidra function table, and disassemble the window.
 

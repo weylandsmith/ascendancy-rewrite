@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t207 C-W2 — is byte[race-row + 2] a per-race CONTACT flag (dynamic) or a
 static species attribute?
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // HUD RAIL + SHIP-DESIGN TAB layout law — t264.
 //

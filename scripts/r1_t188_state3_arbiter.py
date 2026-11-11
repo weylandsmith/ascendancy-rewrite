@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t188 arbiter: state-3 cells + proposal frames, RAW per-row (not first-per-turn).
 
 t187_delta said zero state-3 in t1255..1335; r1_t187_session (deduped dump over

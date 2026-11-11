@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_playcap_vnc.sh — RESUMABLE played-session harness (t85 redesign).
 #
 # WHY REDESIGNED: the t85 incident — TL=1500 killed the user's game

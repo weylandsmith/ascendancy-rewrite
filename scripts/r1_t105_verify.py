@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t105 self-verification — STATIC PAIR (OQ-016 residuals from t99 S6.4):
   (b) "stride-45 table 0x74782" REFUTED: 0x74782 is the ROW-0 RUNTIME COST
       WORD of the research-state table (base 0x74744, stride 75 == the

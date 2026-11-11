@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t295: HOME-DRAW LAW CENSUS (OQ-016 residue 2 closure evidence). KEEPER.
 
 Static law (docs/re/_wip_t295.md S3-S4, disasm FUN_00022ce4 + FUN_000238e8):

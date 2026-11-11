@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_turn_delta.py — OQ-016 income-APPLICATION law from turn bracket.
 
 Reads the ck/ timeline of an r1ad run whose driver advanced turns (turns.log

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t252 live screen-sweep primitive: click (optional) + screenshot + pixel-diff
 + ring turn check, one atomic step per screen.
 

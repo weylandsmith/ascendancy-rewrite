@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t81_mpop.py — verify the banked +0x4a recalc equation's SEED term is
 the word +0x55 (income-law.md L609-620 claims `MOV AX,[EBX+0x55]` @0x38bd4
 and +0x4a == clamp(0,100, +0x55 + sum MPOP(active items, skip flags bit2)).

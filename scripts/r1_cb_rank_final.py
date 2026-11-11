@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_cb_rank_final.py — t42 definitive home-CB rank diagnostic.
 
 Per turn<=1 home (picker-path placement, all other slots empty): print the

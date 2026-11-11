@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r271b_tfdrill.py — t271: drill the 78 item-36 (Terraforming) slot observations.
 #
 # r271_cellreach.py found: item 36 in slots 78x, ACTIVE 0x; item 35 (Automation)

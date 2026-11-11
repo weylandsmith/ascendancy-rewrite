@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t197_pastrows.py — what do past-span rows actually WRITE? (t197)
 
 The X-class walk (scripts/r1_shp_unifiedlaw.py) completes H rows for 29

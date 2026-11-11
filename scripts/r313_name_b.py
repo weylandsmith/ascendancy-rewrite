@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t313 STEP 1e: name the class of grid B {51b20,30d08,51cc4,51b64,311b8,316f0}.
 
 Calibrated laws (this session, on run 192246 58.sav):

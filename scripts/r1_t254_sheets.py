@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t254_sheets.py — t254 population-slot library + planitem ruling sheets.
 
 Renders candidate libraries with the rewrite's OWN decoder (tools/shp_pngdump,

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "formats/bin_table.h"
 #include "formats/cob.h"
 #include "harness.h"

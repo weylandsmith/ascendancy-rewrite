@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t249 S9: (1) entries-as-OLD-records test: owner at entry+0x33, set-equality
 of {entry+0xac} vs race-owned NEW records; (2) writer census for u16@dsx
 0x131b4: scan code range of ascend_restored.bin for writes to absolute

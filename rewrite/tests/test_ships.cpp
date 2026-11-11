@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Ship-system data invariants: docs/re/ships.md (rows verified against
 // extracted/ascend00/{planitem,gizmos}.txt).
 #include "game/campaign.h"

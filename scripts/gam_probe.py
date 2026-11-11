@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """gam_probe.py — P1d: correlate game/resume.gam with the plaintext tables.
 
 resume.gam (81,647 B, entropy ~2.65, ~60% NUL) is a sparse u32-LE savegame.

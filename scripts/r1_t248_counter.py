@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t248 S4: locate the MAINTAINED header counter — u16==60 at t1086 AND
 u16==102 at t1254 (B=0x1bf4d8 identical across both corpora; member offsets
 directly comparable). Feeds t249 (writer hunt)."""

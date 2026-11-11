@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r360_save_shipcensus.py — t360 SAVE-SIDE ship-array census (parser ground truth).
 
 Mirrors scripts/r1_slot.py laws (READ ONLY, no behavior change):

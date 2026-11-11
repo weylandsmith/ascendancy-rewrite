@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """vtable_base_test.py — test whether the payload's pointer tables admit a
 single absolute load base C (VA = payload_file_offset + C).
 

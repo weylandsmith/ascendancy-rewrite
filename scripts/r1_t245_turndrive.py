@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t245 turn-driver v3: advance turns on the live headless game, verified
 against the watcher ring (authoritative).
 

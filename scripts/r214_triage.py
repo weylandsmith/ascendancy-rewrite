@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t214: capture-health triage on the SHARED playcap dir.
 
 Two questions, both answered from the tail window only (never the whole file):

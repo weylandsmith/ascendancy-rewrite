@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t366 mutation campaign driver (r363r_mutate.py shape): apply one mutant to
 shipsave.cpp, rebuild, run the suite, revert. CAUGHT = suite fails (good).
 Usage: r366_mutate.py <name> <old-str> <new-str>

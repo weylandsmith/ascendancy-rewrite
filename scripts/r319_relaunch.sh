@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t319: PUMP CALLER/GATE SEPARATION RUN (docs/re/_wip_t319.md; REFUTED-ROUTES
 # t318 amendment (3) is the binding shape spec). t318 measured pump DISPATCH
 # s2_56c74 COLD whole-log while s2_56cda fired 26x — the question is WHY fn

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t278 OQ-005 RULING PACKAGE — build the DECISION SHEET.
 
 Inputs (all on disk, nothing regenerated from binaries):

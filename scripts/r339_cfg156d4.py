@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t339 — CFG reachability inside fn 0x156d4 (BatControlWnd msg tree,
 file_off 0x156d4 size 0x9f7 per work/functions_full.tsv).
 Edges: fallthrough, jmp, jcc (both arms), call (into target). call-indirect

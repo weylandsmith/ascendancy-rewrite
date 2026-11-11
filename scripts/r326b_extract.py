@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t326b: extract fn(0x17c54) and fn(0x16147) from work/t91_code_disasm.txt.
 
 Function segmentation law (t91 disasm): functions are separated by int3-pad

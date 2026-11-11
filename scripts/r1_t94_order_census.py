@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t94 (W6-A5): ship order-kind +0x58 imm-store and cmp-reader census.
 
 Complements scripts/r1_t86_write_census.py (whose op set lacks mov r/m8,imm8).

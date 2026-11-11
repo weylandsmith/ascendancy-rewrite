@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t330: MOUSE-DIMS DRAW-CAPTURE — executes the t328 S4 design (docs/re/
 _wip_t328.md S4; docs/re/shp.md S25). ATTEMPT-2 SHAPE (post attempt 1
 dbg-t330-20261107-073530, findings in _wip_t330 S2):

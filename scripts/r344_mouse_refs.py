@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t344: exhaustive immediate-reference hunt for DATA\\MOUSE.SHP.
 
 Law context (docs/re/datafiles.md pool-relative-immediate law, OQ-004 CLOSED):

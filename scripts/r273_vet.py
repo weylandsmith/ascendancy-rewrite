@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t273 — attribution vet for the leg-A hull-decrease hits.
 
 The harvest's `near_own` is the NEAREST other-owner ship, which is not the

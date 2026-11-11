@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Launch the Ascendancy CLOSEOUT (v2) Ralph loop in tmux.
 # Usage:  bash scripts/launch_ralph.sh     (detached; watch: tmux attach -t ascend)
 # Stop:   /goal clear inside the session, or: tmux kill-session -t ascend

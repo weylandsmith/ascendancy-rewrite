@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t182_pngdump.py — OQ-005 shape-PNG evidence dumper (t182).
 
 Ships EVIDENCE for the player's closure ruling on the 80-record dims-location

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t288: offline census of the game's pending-input globals across banks.
 
 Static lead (t103 P13): WORD ds:0x484c4 = msg code, ds:0x484c6 = char/ebx,

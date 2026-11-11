@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t180_state3_writers.py — relation-state cell writer census (t180).
 
 Question (ledger OQ-023 residual): which values can the ORIGINAL engine store

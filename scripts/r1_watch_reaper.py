@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_watch_reaper.py OUT_DIR [--keep N] [--dry-run] — targeted watcher reaper (t267).
 
 WHY: three r1_playcap_watch.py instances were MEASURED alive on playcap at

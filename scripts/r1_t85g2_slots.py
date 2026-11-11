@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t85g2: per-slot offset trace through the t1253/1254 engagement.
 Tracks every u16 that changes per ship slot t>=1244, with turn and
 (owner,state) context, plus the FULL 1253->1254 relation diff."""

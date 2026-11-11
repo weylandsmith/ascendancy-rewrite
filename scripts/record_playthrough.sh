@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Regenerate docs/PLAYTHROUGH.md from REAL runs of the CURRENT binary.
 # Every recorded block is actual captured output (head/tail-summarised
 # turn lines are marked "(N more turns)"). Run after any change that

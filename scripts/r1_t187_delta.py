@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t187: adjudicate the LIVE sitting delta (turns >= T0) for the three
 capture-gated rows, in one streaming pass with small output.
 

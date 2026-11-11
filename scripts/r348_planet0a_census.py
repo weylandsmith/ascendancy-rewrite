@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r348_planet0a_census.py — planet-record +0x0a OFFLINE census (t348 probe 1).
 
 Premises banked (income-law.md:2050, r1-savestate.md ~:934): file-side two

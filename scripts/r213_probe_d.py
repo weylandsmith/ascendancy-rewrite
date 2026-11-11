@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t213 probe D — the two soundness checks S5 rests on:
  (D1) EVERY in-edge of 0x15c14 (the bl=1 init block) and 0x15c34, across the
       WHOLE function -> confirms site-1 phase==1 is unconditional once entered.

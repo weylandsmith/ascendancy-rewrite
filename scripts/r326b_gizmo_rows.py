@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t326b: name gizmo rows around the 0x1c/0x1d/0x1e dispatch keys.
 # Law: gizmo rec = idx*0x6a + 0x7650c (cited combat.md); dispatch reads
 # BYTE[[edi]+1] where edi walks the table (0x17c37: mov al,[eax+0x1]).

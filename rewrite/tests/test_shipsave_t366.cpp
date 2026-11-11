@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t366 per-ship SAVE WRITE-SIDE pins — pership-spec §6 S7 + _wip_t366.md.
 //
 // HONEST NOTE (the row's byte-compare leg): NO game-emitted vendor save with

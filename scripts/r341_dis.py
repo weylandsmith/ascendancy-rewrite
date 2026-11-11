@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t341 helper: stream a disassembly range from work/r331_disasm.txt (restored
 image, file offsets == guest offsets for obj0 code [0x14bb0,0x82bb0)).
 

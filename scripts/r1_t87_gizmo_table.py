@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t87 (W6-A2c): gizmos.txt column -> design-record map, settled RIGHT.
 
 Legs:

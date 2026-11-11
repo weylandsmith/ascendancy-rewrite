@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_shp_unifiedlaw.py — OQ-005 t67c: unified per-record stream-start law.
 
 Candidates tested per record at `rec` (span [rec,nxt)):

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t345: SLOT word2 HIGH BYTE (byte3) CENSUS — is it a constant marker or a live
 ship-table index? (OQ-016 residue-(4) follow-through; ZERO CAPTURE, offline.)
 

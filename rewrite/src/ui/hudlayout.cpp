@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // HUD rail + ship-design tab law — see hudlayout.h for the citations. Pure
 // data + lookup; no SDL (compiled into run_tests directly, layout.cpp /
 // poppanel.cpp precedent).

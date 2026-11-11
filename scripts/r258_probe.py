@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r258_probe.py — format/format-only probe for the t258 OQ-021 discriminator.
 
 Answers, cheaply and BEFORE the main single-pass pass:

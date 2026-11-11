@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t297 — LIVE MOVE-ORDER WITNESS via the t296/t297 choreography (OQ-019 r1/r3).
 
 GOAL: issue ONE player ship move order in a scratch session and witness it in

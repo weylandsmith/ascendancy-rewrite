@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t287 diplomacy-corroboration step primitive (production :9, READ-ONLY).
 
 Inherits the t268 primitive (click/key + screenshot + pixel-diff + ring turn

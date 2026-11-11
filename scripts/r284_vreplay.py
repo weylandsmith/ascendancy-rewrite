@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r284_vreplay.py — REPLAY the decoded producer FUN_00024274 against real saves.
 
 The law being replayed (Ghidra FUN_00024274 + FUN_00024f24 tail, cross-checked

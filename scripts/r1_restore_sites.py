@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_restore_sites.py — build the fixup-site-restored Ghidra image.
 
 POINTER LAW (docs/re/r1-savestate.md, CLOSED 2026-10-05i; frame re-derived

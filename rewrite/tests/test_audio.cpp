@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Vendor sample format tests — invariants from docs/re/audio.md §1-§4,
 // checked against the REAL files in extracted/ (read-only, gate-safe).
 #include "formats/voc.h"

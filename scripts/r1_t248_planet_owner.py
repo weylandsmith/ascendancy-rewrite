@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t248: hunt the per-planet owner table in the banked t1254 slot.
 
 Hypothesis chain (docs/re/selfplay.md t247): header "102 Planets Occupied"

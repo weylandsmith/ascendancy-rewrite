@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t192: adjudicate the TRIGGER-A growth window exactly, not by replay.
 
 The idle probe froze BASE_SIZE at 5691796463 (Oct 26 15:44). The timeline is

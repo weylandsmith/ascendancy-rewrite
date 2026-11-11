@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t345 PROOF STEP: are the item-23 slot byte3 values LIVE INDEXES into the
 354-byte ship array, or dead completion constants?
 

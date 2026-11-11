@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t319: analyse the pump caller/gate separation capture (offline).
 
 Reads <run>/hits.json + <run>/probes.json, prints a SMALL census answering

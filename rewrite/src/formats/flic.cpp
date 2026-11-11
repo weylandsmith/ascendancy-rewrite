@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // FLC decoder — 1:1 port of scripts/flc_probe.py (the probe is the reference
 // implementation, validated against both vendor files zero-residue and
 // visually: docs/re/flc.md §1,§3). Rules cite docs/re/flc.md §2.

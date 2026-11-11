@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t95 / W6-A5: decode the ship-order-kind JUMP TABLE via the dispatch site.
 
 WARNING (t96): the table read below IS valid (live entries == restored FILE

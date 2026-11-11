@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_t261_session.sh — bring up the RESTORED-t1255 session isolated on :8 and
 # (optionally) tear it down. Phase-2 t261 (docs/re/selfplay.md t260 block laws).
 #

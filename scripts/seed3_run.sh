@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # seed3_run.sh — headless Ghidra bootstrap + data-xref export on the
 # POINTER-LAW-restored image (docs/re/r1-savestate.md 2026-10-05i).
 #   input  : work/ascend_restored.bin  (regenerate: scripts/r1_restore_sites.py)

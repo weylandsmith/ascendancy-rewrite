@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "game/mapgen.h"
 #include "game/starstat.h"
 #include "harness.h"

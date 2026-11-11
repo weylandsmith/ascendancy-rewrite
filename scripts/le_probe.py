@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """le_probe.py — locate and verify the OS/2-LE (Watcom) tables inside
 game/ascend.exe without assuming a header field map.
 

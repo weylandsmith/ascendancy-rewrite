@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // UI layout math tests. Rect constants are the windows.txt values cited in
 // docs/re/ui-runtime.md §1 (COSMOSWnd 7,7..465,472; NEXTTURN 474,52..548,82).
 #include "ui/layout.h"

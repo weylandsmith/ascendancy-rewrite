@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t287 RFB input channel — REAL pointer motion into display :9 via x11vnc.
 
 WHY: the title-menu/game menus are hover-driven, and the game updates hover

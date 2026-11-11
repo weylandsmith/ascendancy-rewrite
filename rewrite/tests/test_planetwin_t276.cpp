@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t276 PLANETALLOC composition pins: the five-panel table joined against the
 // SHIPPED windows.txt (t264 precedent), the dispatch-key remap law, the
 // header format strings joined byte-exact against shipped static.txt, the

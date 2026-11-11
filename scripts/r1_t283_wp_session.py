@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t283: OQ-021 WRITE-WATCHPOINT session — find the EIP that writes DAT_482fb.
 
 Everything here is composed from MEASURED pieces (docs/re/dosbox-debugger.md

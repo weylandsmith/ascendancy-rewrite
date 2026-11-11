@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // Diplomacy: .dip parameter files + attitude model + dialogue templates.
 // Spec: docs/re/diplomacy.md — chooser law §7 (t12), DIPVALUES field map §8

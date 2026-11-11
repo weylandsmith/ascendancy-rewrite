@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t65 OUTER driver — OQ-005 draw-path capture. Opens the Intelligence
 # panel [verified geometry extracted/ascend00/windows.txt "Intelligence"
 # button X0 474 Y0 303 X1 632 Y1 333 -> center (553,318), SENDMESSAGE 1

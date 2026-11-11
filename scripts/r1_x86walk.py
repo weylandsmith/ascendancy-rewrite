@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_x86walk.py — minimal recursive x86 decoder for the restored image
 (stdlib-only: capstone unavailable t42). Walks functions from an entry:
 falls through, follows rel32/jcc targets, records call targets, stops at

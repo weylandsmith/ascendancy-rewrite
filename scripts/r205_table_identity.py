@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t205 — adjudicate the identity of the stride-0x60 table at static 0x13bc5
 (and the byte at 0x13bc4, one byte earlier).
 

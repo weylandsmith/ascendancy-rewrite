@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r271_cellreach.py — t271: REACHABILITY CENSUS for per-cell completion laws.
 #
 # QUESTION (docs/re/_wip_t271.md S3): are the rewrite-unwired T39b completion

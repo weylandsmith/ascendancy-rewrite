@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t202b helper: dump the 39-row planitem table (name, IND/RES/PROS/MPOP/
 UPOP/COST/REQ/FLAGS) exactly as loadPlanItems indexes it, so the demolish
 picker pins can name real items. Rows start after the '39 22 9' count triple

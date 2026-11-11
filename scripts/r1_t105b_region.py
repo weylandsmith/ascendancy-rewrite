@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t105b — characterise the 0x74782 region + locate restree runtime rows.
 
 Legs:

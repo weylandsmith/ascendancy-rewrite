@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t207 C-W2b — the capture-path CEILING operands, measured on 20 saves.
 
 CORRECTED ALGEBRA (the compiler splits 494 = (32x - x)*8 - x = 247x, read

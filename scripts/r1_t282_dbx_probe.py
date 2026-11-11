@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t282: bring up the debugger build on a SCRATCH copy and capture the LIVE
 debugger command list + prove BPLM/BPPM/BPM are accepted.
 

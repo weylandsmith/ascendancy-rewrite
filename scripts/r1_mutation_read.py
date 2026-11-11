@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_mutation_read.py — t53 STEP 1 offline reader (OQ-003).
 
 Records are NAME-RELATIVE (layout law measured t53 on the scratch file:

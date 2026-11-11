@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t211 probe A: call graph inside the [ship+0x62]==0 leg 0x49f54, plus
 whole-image E8 caller census of 0x49f54, plus writers of [reg+0x62]."""
 import sys

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t201 — corpus census of planet threat bytes sys+0x58 / sys+0x59.
 
 CONVENTION (validated in-script): PLANET_P0 name-anchored stride-123 walk

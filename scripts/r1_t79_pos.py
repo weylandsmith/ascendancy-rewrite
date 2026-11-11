@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t79_pos.py RUN... — OQ-025: the shell law at NON-default density.
 
 Laws used (all r1_star_table.py / docs/re/r1-savestate.md, pointer law):

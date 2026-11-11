@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t192: adjudicate the TRIGGER-A timeline growth WITHOUT streaming the whole
 5.7 GB file. Compares head/tail md5 baselines, then walks only the TAIL WINDOW
 (new bytes since the trigger baseline size) and prints a compact census:

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t187: adjudicate the 2026-10-28/29 play session (t1253..end) from the ring.
 
 Answers, with cited frame numbers:

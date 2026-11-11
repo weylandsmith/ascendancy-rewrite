@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t78_read.py RUN_DIR... — print total-stars T (DAT_00016143 hi-u16)
 per save slot via the pointer law (base-of-memory anchor vote >= 5;
 member = B + 0x82bb0 + X). Exit 0 if any slot yields a T."""

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t286: GENERAL write-watchpoint session (the t283 instrument, scripted).
 
 Everything runtime-behavioural here is MEASURED, not assumed — see

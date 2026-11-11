@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Derive the runtime load base of ascend.exe from dosbox-x save states.
 
 Method (multi-chunk anchoring, robust to runtime fixups):

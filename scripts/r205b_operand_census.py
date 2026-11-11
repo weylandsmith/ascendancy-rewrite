@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t205b — static operand census for the disputed static addresses
 0x13b98 (race count word), 0x13bc4 (disputed byte), 0x13bc5 (disputed table).
 

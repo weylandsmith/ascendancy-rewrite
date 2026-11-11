@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t97: live-RAM read of the pool region the restored image truncates
 (image ends FILE 0x8cc83; pool-rel 0xa0e0 -> F 0x8cc90 is PAST the end).
 Law: pool string at payload-file offset F -> save member index B + F

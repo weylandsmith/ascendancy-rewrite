@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t265 KEEPER — st5 lane-march law check on the t261 DRIVE corpus.
 
 Checks in ONE bounded-tail pass (corpus law: mtime_ns inside

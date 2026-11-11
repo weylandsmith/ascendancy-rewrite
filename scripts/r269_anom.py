@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t269b — locate ANOMALY rows in the timeline: T != 50 or rank == 0
 (the t269 pass found T in {50:71023, 25:12, 0:2, 100:1} and rank=0 x2).
 Streams (OOM law), prints header fields only (ship_raw/relation never read).

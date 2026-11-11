@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t246: verify the PLANETALLOC header law decoded from the binary at
 0x51685..0x517c0 (getter(151) call site 0x51798).
 

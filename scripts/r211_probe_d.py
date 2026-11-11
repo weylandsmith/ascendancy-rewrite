@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t211: who reaches block 0x4a350? Decode obj0 and list ALL branch edges
 (jcc rel8/rel32, jmp rel, call rel) whose TARGET == 0x4a350, plus fallthrough
 check (does any decoded insn END exactly at 0x4a350)."""

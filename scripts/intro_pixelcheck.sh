@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # One-shot: render N intro frames under Xvfb, capture the screen mid-play,
 # and pixel-verify the window equals a Python-decoded frame (independent
 # cross-check of the C++ blit path). Bounded; no dosbox; kills only its own

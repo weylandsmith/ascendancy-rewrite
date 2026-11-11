@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t205c — find the STRIDED consumers of the 0x13bc4/0x13bc5 block.
 
 The t205b disp-only census found only ABSOLUTE scalar reads of 0x13bc4 and no

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t212 — runtime census of the displayed-score slot block + binding hunt.
 
 Static leg (scripts/r212_ref_census.py, controls OK) found over obj0 code

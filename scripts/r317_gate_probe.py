@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t317: FLEETWND gate datum + widget-field probe (offline, offline saves).
 
 Reads per save (all via zipfile 'Memory' member):

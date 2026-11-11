@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t106_writers.py — boundary-correct [reg+DISP] write census (offset, img).
 
 Same encoding families as r1_t86_write_census.py, but fixes its

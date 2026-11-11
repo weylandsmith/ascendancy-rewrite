@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_ability_charge.py — OQ-020 census: slot word+2 upper byte values.
 
 Law context (income-law.md S10 + T57): completion walk FUN_00038f68 calls

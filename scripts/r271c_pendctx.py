@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r271c_pendctx.py — t271: pending/accumulator context for the item-36/38 tracks.
 # For each (run, planet) that held item 35/36/38 in a slot, dump per save:
 # turn, owner, +0x54 (pending byte), +0x50 (build acc u32), +0x44 (stored IND),

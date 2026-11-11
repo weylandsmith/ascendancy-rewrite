@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_idle_probe.py — one-shot adjudication of the two IDLE re-arm triggers
 (docs/STATE.md NEXT ACTION / docs/re/stop-report.md §6). Read-only: touches
 no game state, launches nothing. Exit 0 = both triggers NEGATIVE (loop stays

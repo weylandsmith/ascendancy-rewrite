@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t213 probe B — (i) intra-function edge map into the site-2 cluster,
 (ii) entry mechanism of 0x156d4 (zero E8 callers), (iii) dl/dh value defs.
 

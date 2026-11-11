@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """le_tables_anchored.py — parse the LE object/page/fixup tables using ONLY
 offsets measured by scripts/le_header_dump.py on this exact file, and
 cross-validate against runtime measurements (slot 46, 2026-10-05).

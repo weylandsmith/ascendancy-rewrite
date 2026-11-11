@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t106_alias.py — is the +0x55 seed residual the SLOT-ARRAY ALIASING set?
 
 Hypothesis (from P2/P3): the seed word r55 and the weight row +0x16 are

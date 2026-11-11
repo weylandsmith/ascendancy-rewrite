@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_destruction_census.py — NUKE-EVENT hunt (OQ: Phase Bomb gizmo 70
 destroys surface structures per gizhelp.txt). METHOD: whole-record diff
 across turn-adjacent saves (u16 clock 0x254e10 H-mapped, dt==1): surface

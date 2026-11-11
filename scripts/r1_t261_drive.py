@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t261 turn-driver for the RESTORED-t1255 session on :8.
 
 Inherits every t245/t250 law (ring-verified press, popup drain, OK hit-target

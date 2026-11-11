@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t261 load-click: click Capture->Load state on the :8 restored session and
 VERIFY structurally (watcher row turn==1255), not by vision.
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t319: offline poster-gate operand read from a save.
 
 The poster block (fn containing 0x54a3f, in main-loop fn 0x54650) decides the

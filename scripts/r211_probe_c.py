@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t211 probe C: (1) writer census of byte [reg+0x62] (the 0x49f28 dispatch
 discriminator) across obj0 code — capstone operand pass, resume-on-gap (t201
 pitfall: sequential capstone STOPS at data gaps; blind pass found 36/325).

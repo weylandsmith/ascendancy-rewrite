@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t190: LANE POOL STRUCT + byte+0x23 census in saves (OQ-019 residue).
 
 Static law banked this session (disasm citations in docs/re/_wip_t190.md):

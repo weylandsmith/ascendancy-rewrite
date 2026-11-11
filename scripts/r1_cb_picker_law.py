@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_cb_picker_law.py — verify the PINNED uniform-among-legal-empty CB picker
 (FUN_0003875c, disasm-verified t42) on first-save worlds.
 

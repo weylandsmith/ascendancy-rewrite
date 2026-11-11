@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t106_dump.py — raw header+grid dump for named planets, dev vs siblings.
 
 P2 [measured]: the +0x55 deviation is frozen for the whole run and clusters by

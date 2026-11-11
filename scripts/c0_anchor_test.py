@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """c0_anchor_test.py — the direct C=0 test for OQ-011.
 
 Hypothesis: the payload loads at VA == its own file offset (base C = 0), so

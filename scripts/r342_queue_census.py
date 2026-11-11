@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t342: corpus census of the HUMAN (owner-0) build queue — residue-(5).
 
 ZERO CAPTURE: offline over existing .sav files (Memory member of the

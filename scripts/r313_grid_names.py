@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t313 STEP 1c: name the three class grids at RAM 0x248018/30/48.
 
 t313 scan result: fn 0x51834+P0 hits 0x248050, and the code-decoding walk

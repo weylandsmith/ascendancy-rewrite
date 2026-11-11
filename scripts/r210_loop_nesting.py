@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t210 — CFG loop-nesting census for the callers of 0x4b740.
 
 PITFALL THIS SCRIPT EXISTS FOR (t210): a back-edge is NOT 'target <= site'.

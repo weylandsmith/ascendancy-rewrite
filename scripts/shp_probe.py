@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """Ascendancy P1c probe: .shp shape/sprite libraries.
 
 Generates docs/re/shp.md.  Run:

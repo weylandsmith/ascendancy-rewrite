@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """R1 tracer probe + capture (option C cadence; docs/BLOCKED.md Resolution).
 
 Attempts to seize/attach a running dosbox-x to dump guest RAM and locate the

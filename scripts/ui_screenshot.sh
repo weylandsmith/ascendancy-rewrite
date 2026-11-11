@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # dev helper: screenshot the P5a UI mid-run (not part of the gate).
 set -u
 which import >/dev/null || { echo "ImageMagick import missing"; exit 2; }

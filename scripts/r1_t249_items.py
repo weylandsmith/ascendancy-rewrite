@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t249 S8: item-run semantics + widget anchor.
 Findings so far: bank-t1254 has ONE sig-hit obj at 0xfda074 with count 102,
 entries forming a 0x7b-stride item run (base ~0x26d057 = recbase-0xac).

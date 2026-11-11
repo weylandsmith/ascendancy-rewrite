@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t265 — OQ-019 live mining on the t261 DRIVE corpus (one pass).
 
 Corpus law (measured at t265 intake): production :9 drove turns 1086->1236 on

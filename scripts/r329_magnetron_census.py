@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t329: Lane Magnetron (design idx 60) carriage census for the OQ-019
 disposition packet.
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // .shp reader/decoder tests (OQ-005). Law source: docs/re/shp.md
 // S1/S8/S9/S14/S16/S17; parity target: scripts/r1_shp_unifiedlaw.py
 // corpus run (measured 2026-10-11: 1477/1557 records walk, 176/208

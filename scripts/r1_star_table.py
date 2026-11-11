@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_star_table.py — star-system table law from live RAM (pointer law decoded).
 
 MEASURED 2026-10-06 (runs r1deep-20261005-{230146,221429,233706}; guest

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_t57_density.sh — OQ-012(a) ONE-OBSERVATION probe driver (outer).
 # One click of the new-game "Star^Density" control during the SETUP screen,
 # timed between the inner's New Game tour click (t=75, opens setup) and the

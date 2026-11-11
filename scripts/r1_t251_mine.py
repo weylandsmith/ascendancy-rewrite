@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t251 — witness miner for the two play-gated OQ residues.
 
 WITNESS (a) [OQ-016 / diplomacy row 13 clamp witnesses]: a multi-volley

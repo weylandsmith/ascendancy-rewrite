@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t248: is the t1086 count(80) inflated by table slots whose names don't key
 any star record? Count owner==race only among planets in star-named systems,
 at both timestamps. Also print the tail names past k=140.

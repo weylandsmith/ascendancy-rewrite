@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t316: registry probe — can fn 0x56ca4's window table EVER name FLEETWND?
 
 Laws (docs/re/_wip_t316.md S1, objdump-verbatim):

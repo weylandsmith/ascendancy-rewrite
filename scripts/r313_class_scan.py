@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t313 STEP 1: offline class-grid RAM scan for fn 0x51b68's rebased value.
 
 Route (t310 S5 law, binding): class tables exist ONLY in guest RAM (file-image

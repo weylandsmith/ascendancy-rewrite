@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // shp_partialdump.cpp — t196 OQ-005 residue TRIAGE dumper (docs/re/_wip_t196.md).
 //
 // Why this exists: at t196 ShapeLibrary::decode() FAILed the 71 residue

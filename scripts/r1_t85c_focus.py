@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t85c focused pass: testimony-vs-ring adjudication. Output -> stdout (small)."""
 import sys
 sys.path.insert(0, "/home/hrethric/projects/ascendancy/scripts")

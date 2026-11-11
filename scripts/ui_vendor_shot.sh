@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # One-shot dev check (NOT a gate stage): boot the campaign UI with the vendor
 # .fnt faces under Xvfb, autoplay some turns, capture the screen for a vision
 # read. Kills only its own Xvfb pid. Bounded by timeout on the app.

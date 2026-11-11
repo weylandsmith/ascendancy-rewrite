@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # Start the GhidraMCP headless server (HTTP on 127.0.0.1:8089) unless already up.
 # The Hermes 'ghidra' MCP bridge (stdio) multiplexes onto this server.
 # Idempotent; safe to call at the start of any turn that needs Ghidra.

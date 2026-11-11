@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t90: AI turn-loop call-graph census over the restored image (W6-A3).
 
 Rebuilds rel32 (E8) call edges over obj0 code [0x14bb0,0x82BB0)

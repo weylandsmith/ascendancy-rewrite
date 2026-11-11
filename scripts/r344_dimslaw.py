@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t344 DECISIVE OFFLINE TEST of the vendor dims law.
 
 Static law just derived (work/r331_disasm.txt verbatim):

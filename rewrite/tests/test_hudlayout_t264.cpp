@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t264 HUD layout wiring pins: rail rects/messages vs windows.txt, the
 // 1starmap.shp icon law, and the SHIPDESSCREEN tab->gizmo-category table
 // (t253 measured 6/6). Citations: docs/re/ui-runtime.md §6a/§6c and

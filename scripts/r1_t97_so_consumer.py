@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t97: hunt the CONSUMER of the SO order-name block (F 0x88e60, pool-rel
 0x62b0, 10 records stride 20). Hammers:
   (H) disasm adjust-helper 0x2fb38, census its rel32 callers;

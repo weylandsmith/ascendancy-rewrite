@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t53 capture STEP 1 (OQ-003 controlled mutation): boot scratch copy with
 # sentinel-injected RESUME.GAM, click "Return to Current Game" (title
 # button 4: window (318,333) — golden-save law, docs/re/refcap.md S4),

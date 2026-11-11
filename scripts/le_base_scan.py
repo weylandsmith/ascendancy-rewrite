@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """le_base_scan.py — find the constant C with VA = file_offset + C for
 ascend.exe's Watcom flat image, using vtable structure rather than strings.
 

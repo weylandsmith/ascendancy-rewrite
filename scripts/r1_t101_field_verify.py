@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t101: SHIP-FIELD RE-ATTRIBUTION verify (+0x88=POWER, +0x94=MOVES,
 +0x8c=INTEGRITY, +0x98=MAX-INTEGRITY, [+0x18]=POWER capacity). RC=0 iff all legs pass.
 

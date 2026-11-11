@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t280 keeper: re-derive the SA_ ability case-body disassembly listing from
 work/ascend_restored.bin and print it (the listing banked at
 work/t280_bodies.txt, quoted by docs/re/aicode.md t280 amendment E1-E3).

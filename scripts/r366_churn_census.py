@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r366_churn_census.py - t366 WRITE-SIDE grounding: which ship-record bytes
 churn across adjacent autosaves at the SAME turn (idle ring rotation), and
 which across a TURN BOUNDARY (bank-t261 drive corpus)? Grounds the

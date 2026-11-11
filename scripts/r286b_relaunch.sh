@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t286b: relaunch loop for the blind planet-list watchpoint hunt (BREAK
 # lottery ~50% per attempt, t286 law 2: retry until 'armed:' in session.log).
 # Each attempt is a FULL r1_wp_session.py session (script owns its ring dir,

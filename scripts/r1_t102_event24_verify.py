@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t102: EVENT-24 (SA_) CONSUMER DECODE verify. RC=0 iff all legs pass.
 
 LEG 1 (pump type-switch law, restored image 0x55cbc..0x55db1): the record

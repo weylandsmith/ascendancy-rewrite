@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_pointer_law.py — POINTER LAW CONFIRMATION (law CLOSED 2026-10-05i).
 
 THE LAW (see docs/re/r1-savestate.md for the full evidence trail):

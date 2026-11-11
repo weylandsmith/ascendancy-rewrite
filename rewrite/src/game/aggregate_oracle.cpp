@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "game/aggregate_oracle.h"
 #include "game/economy.h"  // Gizmo, GizmoCat, requiresAvailable (income-law.md S4)
 

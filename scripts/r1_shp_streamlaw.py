@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_shp_streamlaw.py — OQ-005 t67: per-record stream-start discriminator.
 
 Context (docs/re/shp.md S12/S14): blit FUN_0005caac reads DIMS from the

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t318: BROADCAST-PUMP LEG WITNESS (docs/re/_wip_t318.md; REFUTED-ROUTES
 # t317 amendment (5) is the binding shape spec). t317 proved vendor gutter
 # clicks arrive at fn 0x56ca4 as msg 8 on STATSHIPLST's OWN entry and that

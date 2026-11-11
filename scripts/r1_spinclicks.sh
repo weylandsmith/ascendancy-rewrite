@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_spinclicks.sh — fixed-cadence End-Turn clicker for the tail of an r1ad run.
 # Motivation (t58): r1_step2_drive.sh phase 3 waits <=80 s per advance and
 # stalls when turn resolution is slower; the inner capture keeps

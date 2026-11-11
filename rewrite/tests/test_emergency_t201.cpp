@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // t201 EMERGENCY CHAIN + THREAT-COUNTER PIN (FUN_0003fc4c / FUN_00038ba4).
 // Law source: docs/re/_wip_t201.md S1d/S1e/S1f (cited disasm
 // work/t201_fc4c.txt; corpus tools scripts/r201_threat_writers.py,

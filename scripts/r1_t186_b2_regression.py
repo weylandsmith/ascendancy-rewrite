@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t186 regression for the B2 leg of r1_idle_probe.py.
 
 Replays every adjacent (numeric-order) prompt pair in work/r1/loop/ and prints

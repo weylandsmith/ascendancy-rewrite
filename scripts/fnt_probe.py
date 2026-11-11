@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """fnt_probe.py — OQ-017 CLOSED: vendor .fnt glyph codec validator.
 
 Codec (measured + vision-verified 2026-10-04, all 384 glyphs of the 3 vendor

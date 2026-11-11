@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 // t365 ENGINE FLIP BRIDGE (user ruling D2=(b), docs/DECISIONS.md USER RULING
 // 2026-11-09: "per-ship becomes THE engine ... aggregate demotes to a test

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t104 verify: F8b ORDER-COMPLETION POWER DRAIN — observation + refutation.
 
 Leg 1 (OBSERVATION): stream pass (r1_stream trusted order) — the

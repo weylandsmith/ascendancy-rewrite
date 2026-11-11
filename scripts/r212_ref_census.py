@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t212 — every reference to the displayed-score slot region in obj0.
 
 OQ-021 residue: the presenter 0x28074/0x280be reads dword [0x482fb]; the

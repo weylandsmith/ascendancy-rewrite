@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r258_vdisc.py — t258 OQ-021: end-turn-recompute discriminator for
 V = DAT_000482fb (the "STARS CONTROLLED" count, score.md S2).
 

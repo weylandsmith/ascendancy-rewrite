@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t200 — K census: the COSMOSWnd star-pip type field (star_record+0x00).
 
 Law under test (docs/re/planets-ui.md S6, derived from FUN_00029788's star

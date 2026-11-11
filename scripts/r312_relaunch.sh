@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t312: ORDER-PLACEMENT WRITER RUN (docs/re/_wip_t312.md). The t311 amendment
 # refuted 0x1c01-into-STATUSWND; the remaining never-armed destination writers
 # are fn 0x51b68's pair {w43504_52003 DAT_43504 eax=[esi+0x59], w43508_51fc2

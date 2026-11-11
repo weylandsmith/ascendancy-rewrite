@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # r1_built_cell_law.py — t43: non-CB built-item cell law.
 #
 # STATIC (Ghidra, this session):

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t299 — DEBUGGER LEG WITNESS: does a mouse click reach the batmode SELECT /
 ORDER legs, and with what operands (OQ-016 r1, OQ-019 r1/r3).
 

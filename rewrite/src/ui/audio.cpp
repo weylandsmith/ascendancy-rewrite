@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "ui/audio.h"
 
 #include <SDL_mixer.h>

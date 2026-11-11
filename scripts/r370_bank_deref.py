@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t370 — deref pass over a banked playtest ring (Memory image).
 
 Measurements (the tl-mode census cannot do these — no Memory image):

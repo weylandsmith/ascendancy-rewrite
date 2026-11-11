@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t198 — context dump around each blit (FUN_0005caac) call site.
 
 Prints a linear capstone disassembly of [site-SPAN, site+8] for every E8 call

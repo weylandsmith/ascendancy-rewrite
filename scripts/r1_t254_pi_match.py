@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t254: MAD-match the live PLBUILD current-project icon vs planitem.shp recs."""
 import os
 import subprocess

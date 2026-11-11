@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t317: SHIP-LIST-GUTTER-CLICK -> FLEETWND msg-0x1c01 LIVE WITNESS
 # (docs/re/_wip_t317.md). t316 made the chain continuous statically (click in
 # STATSHIPLST -> fn 0x33320 -> fn 0x56ca4(0x7a35c, edx=[w+0x63]=95, msg 0x1c01)

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t363R mutation campaign driver: apply one mutant to shipsim.cpp, rebuild,
 run the suite, revert. Prints CAUGHT (suite fails) / MISSED (suite green —
 bad: the pins do not cover the law). Usage: mutate.py <name> <old-file> <new-file>

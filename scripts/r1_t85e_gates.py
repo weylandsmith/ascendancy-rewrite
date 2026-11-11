@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t85e: per-gate forward decode. Gate addrs come from byte-pattern scans so
 they are instruction-aligned; decoding FORWARD from a gate self-syncs even
 where linear sweeps misalign (dark zone). Compact report mode."""

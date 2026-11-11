@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t205d — verbatim disasm of the windows that decide EBX's addressing mode.
 
 The t205b/t205c censuses showed the image uses `[reg + ABS]` forms

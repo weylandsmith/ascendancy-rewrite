@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t212 — close the base+disp WRITER blind spot for [0x482f0,0x48300).
 
 Established (r212_ref_census + r212_raw_and_ptr + r212_code_identity):

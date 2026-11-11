@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t189: verify the lane-step law found statically in FUN_0004a74c.
 
 Static law (disasm 0x4a824..0x4a8af): st5 march does

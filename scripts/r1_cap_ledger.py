@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_cap_ledger.py — POP-CAP (+0x4a) exact-law ledger (OQ-016, S10).
 
 Three candidate recalc models for every planet record in every save slot:

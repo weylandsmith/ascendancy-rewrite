@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t213 probe E — the decisive site-1 soundness check:
 is EVERY predecessor-chain into 0x15c63 downstream of the bl=1 init block
 0x15c14..0x15c34?  Prints in-edges (whole function, branches+fallthrough) of

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t185: OQ-019 magnetron identity — LOADED gizmo table + ship slot census.
 
 Question (STATE.md t185): immediate 0x24 at image 0x4159a feeds

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r334_state_array.py — t334 STATE-ARRAY + ds:0x13b98 OFFLINE CENSUS (zero capture).
 
 Measures the two claims _wip_t334.md S5/S8 rest on:

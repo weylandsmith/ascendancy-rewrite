@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t106_hdrdiff.py — find header fields that discriminate the +0x55
 deviation set from the law-holding set INSIDE ONE SAVE.
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t290: tiny file-offset disassembler over work/ascend_payload.bin.
 
 Why it exists: `objdump -b binary --start-address` prints NOTHING (t283 trap),

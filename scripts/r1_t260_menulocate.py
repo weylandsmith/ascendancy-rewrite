@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t260 helper: locate the dropdown panel rows in the experiment window shot.
 Opens the Capture menu via xsend, screenshots window 0x600009, finds the dark
 dropdown panel bbox, and prints candidate item-row centers (~16 px pitch)."""

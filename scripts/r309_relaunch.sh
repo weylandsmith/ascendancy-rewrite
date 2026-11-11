@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # t309: WITNESS THE RING CONSUMER FAMILY (0x55ae8 RING-B consumer, 0x55df4
 # RING-A resolver) INSIDE ARMED WINDOWS, incl. the two HOT HOLD windows that
 # fix the t308 blind spot (post-disarm execution is invisible to the pty

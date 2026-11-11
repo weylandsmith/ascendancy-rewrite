@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t249 S4: raw dump of list-object candidates. Print P, count, and the first
 few u32 at P+0xcb (stride 8) with range classification, plus a hex window at
 P+0x8b0..P+0x910 for shape. No recs assumption."""

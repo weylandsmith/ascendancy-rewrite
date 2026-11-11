@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t67b: failing-record autopsy (shp.md S15.3 hypothesis).
 
 For every record failing BOTH stream-start candidates under its own

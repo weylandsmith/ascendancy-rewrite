@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t249 S5: find planet-LIST OBJECTS by content, not by count.
 Law (static, this session): the list class stores entries inline at
 obj+0xc7 stride 8 (add-routine FUN_00032d1c 0x32e9f/0x32eb6: ptr at

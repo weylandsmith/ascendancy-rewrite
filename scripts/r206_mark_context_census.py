@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t206 — verify the operand identities the mark-consumer law rests on.
 
 Checks over the 20 playcap saves (pointer law: member = B + 0x82bb0 + X):

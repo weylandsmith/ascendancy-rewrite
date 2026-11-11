@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_dbg_session.py — t327 DEBUGGER-SESSION TOOL v2.
 
 One command = one leg-witness capture session with declarative legs, phase

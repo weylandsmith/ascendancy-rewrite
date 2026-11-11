@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r1_t75_read.py — offline analysis of an r1_t75_run.sh capture.
 
 Per slot: base B (payload anchor vote >=5), then via score.md S2 / pointer-law

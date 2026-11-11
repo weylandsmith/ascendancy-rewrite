@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t94 helper: census imm references to the SO order-name block and its
 runtime copy destination, plus every u32 in the restored image pointing into
 the block. R12 file law: work/ascend_restored.bin."""

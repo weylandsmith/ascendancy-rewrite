@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r256c_shipstate.py — per-ship ORDER-STATE census over the live timeline.
 
 t256c (AI gap row 16): the dossier's cited ship-order laws (§5 stickiness,

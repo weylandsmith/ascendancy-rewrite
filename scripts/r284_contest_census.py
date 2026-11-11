@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """r284_contest_census.py — t284: what pointer CLASS does ship+0x59 hold?
 
 Why this matters: the Ghidra-decoded producer FUN_00024274 (docs/re/_wip_t284.md)

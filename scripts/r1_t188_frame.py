@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t188: FRAME + SCALE adjudication for the flight corpus (OQ-019).
 
 Q1 (frame): are ship xyz [+0x9e] and star-table f32 [name-0x14] the SAME

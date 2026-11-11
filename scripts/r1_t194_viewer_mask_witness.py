@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t194: viewer-mask witness for the OQ-026 lane/star visibility consumer.
 
 Static law (ships.md S23 L9, decompiled verbatim):

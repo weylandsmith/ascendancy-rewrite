@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Species special abilities: roster cross-check + per-ability behaviour.
 // Effect citations: extracted/ascend00/help.txt L1713-2511 through
 // docs/re/abilities.md; roster docs/re/species.md. Numeric effects are

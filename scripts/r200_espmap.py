@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t200 — mechanical esp-offset tracker over a code span.
 
 Prints, for every instruction, the frame-relative offset of each [esp+k]

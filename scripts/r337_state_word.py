@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 """t337 census: the CURRENT-STATE word u16 @ core+0x4228 in .sav Memory.
 
 Law (all cited this iteration, docs/re/_wip_t337.md S2-S4):

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """r1_0x54_writer_sweep.py — t45 exhaustive census of every encoding that
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 touches planet-record byte +0x54 (selected-ability/queue byte; the recalc
 governor branch switch operand, income-law.md S14).
 
