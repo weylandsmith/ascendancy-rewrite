@@ -37,6 +37,7 @@ ag::DipFile loadOrDie(const char* name) {
 }  // namespace
 
 TEST(dip_player_has_exactly_8_keys) {
+    REQUIRE_DATA();
     auto df = loadOrDie("player.dip");
     // player.dip carries the 8-key subset (docs/re/diplomacy.md §1)
     CHECK(df.values.hasOscillation == false);
@@ -51,6 +52,7 @@ TEST(dip_player_has_exactly_8_keys) {
 }
 
 TEST(dip_race00_oscillation_values) {
+    REQUIRE_DATA();
     auto df = loadOrDie("race00.dip");
     CHECK(df.values.hasOscillation == true);
     CHECK(df.values.bioPeriod == 400);      // verbatim race00.dip
@@ -61,6 +63,7 @@ TEST(dip_race00_oscillation_values) {
 }
 
 TEST(dip_negative_values_parse) {
+    REQUIRE_DATA();
     // parse-trap regression (docs/re/diplomacy.md §1): an isdigit-style
     // filter silently drops negative-valued keys.
     const char* text = "DIPVALUES\nSTART_ATTITUDE 500\nBIO_MAXNEGATIVE -5\n"
@@ -76,6 +79,7 @@ TEST(dip_negative_values_parse) {
 }
 
 TEST(dip_rejects_unknown_key_and_missing_block) {
+    REQUIRE_DATA();
     ag::DipValues v;
     std::string err;
     const char* badKey = "DIPVALUES\nSTART_ATTITUDE 1\nNOT_A_KEY 2\nACTIONS\n";
@@ -86,6 +90,7 @@ TEST(dip_rejects_unknown_key_and_missing_block) {
 }
 
 TEST(dip_dialogue_blocks) {
+    REQUIRE_DATA();
     auto df = loadOrDie("race00.dip");
     CHECK(df.dialogue.size() == 15);  // docs/re/diplomacy.md §2 count
     auto it = df.dialogue.find("DA_DeclareWar");
@@ -94,6 +99,7 @@ TEST(dip_dialogue_blocks) {
 }
 
 TEST(dip_render_tokens) {
+    REQUIRE_DATA();
     std::string s = ag::renderDialogue("We, %m, greet %y at %s re %t.",
                                        "HUMANS", "ORFA", "Sol", "MIB");
     CHECK(s == "We, HUMANS, greet ORFA at Sol re MIB.");
@@ -102,6 +108,7 @@ TEST(dip_render_tokens) {
 }
 
 TEST(dip_header_ability) {
+    REQUIRE_DATA();
     auto df = loadOrDie("race00.dip");
     CHECK(df.abilityToken == "SA_SuperMarines");  // docs/re/species.md roster
     auto d11 = loadOrDie("race11.dip");
@@ -109,6 +116,7 @@ TEST(dip_header_ability) {
 }
 
 TEST(dip_mood_oscillates_within_envelope) {
+    REQUIRE_DATA();
     auto df = loadOrDie("race00.dip");
     ag::AttitudeModel m(df.values);
     double lo = 1e9, hi = -1e9;
@@ -124,12 +132,14 @@ TEST(dip_mood_oscillates_within_envelope) {
 }
 
 TEST(dip_mood_zero_without_oscillation) {
+    REQUIRE_DATA();
     auto df = loadOrDie("player.dip");
     ag::AttitudeModel m(df.values);
     for (int t = 0; t < 50; ++t) CHECK(m.mood(t) == 0.0);
 }
 
 TEST(dip_policy_war_on_low_attitude) {
+    REQUIRE_DATA();
     auto df = loadOrDie("race00.dip");
     ag::AttitudeModel m(df.values);
     ag::DipPolicyState st;
@@ -142,6 +152,7 @@ TEST(dip_policy_war_on_low_attitude) {
 }
 
 TEST(dip_action_chooser_law_oq015_t12) {
+    REQUIRE_DATA();
     // MEASURED (docs/re/diplomacy.md §7): FUN_00044a44 return value == DA_
     // ACTIONS pool index (file order). Pin the ACTIONS file order and the
     // two decoded state-threshold branches' byte-level shape in the image.
@@ -190,6 +201,7 @@ TEST(dip_action_chooser_law_oq015_t12) {
 }
 
 TEST(dip_strict_threshold_oq015_t13) {
+    REQUIRE_DATA();
     // MEASURED (docs/re/diplomacy.md §7/§8): original comparisons STRICT —
     // propose-alliance fires only when PROPOSE_ALLIANCE < att (not >=).
     ag::DipValues v;
@@ -209,6 +221,7 @@ TEST(dip_strict_threshold_oq015_t13) {
 }
 
 TEST(dip_trade_predicate_bytes_oq015_t14) {
+    REQUIRE_DATA();
     // MEASURED §9 pins from the restored image: each trade gate ends in
     // FCOMP qword pool-const; min-count cmp bytes; state==3 skip.
     namespace fs = std::filesystem;

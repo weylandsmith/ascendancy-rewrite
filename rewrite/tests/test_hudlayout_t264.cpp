@@ -24,6 +24,7 @@ const std::string kRepo = ASCENDANCY_SOURCE_DIR;
 }  // namespace
 
 TEST(hud_rail_constants_match_windows_txt_t264) {
+    REQUIRE_DATA();
     using RB = au::RailButton;
     // Rect + (SENDMESSAGE, SENDPARAM1) verbatim per _wip_t264.md S1.
     struct Want { int x0, y0, x1, y1, msg, p1; };
@@ -52,6 +53,7 @@ TEST(hud_rail_constants_match_windows_txt_t264) {
 }
 
 TEST(hud_rail_hit_map_t264) {
+    REQUIRE_DATA();
     using RB = au::RailButton;
     // Click centers t252 actually used (rect centers) hit their button.
     CHECK(au::railButtonFor({553, 145}).value_or(RB::Intelligence) == RB::Status);
@@ -77,6 +79,7 @@ TEST(hud_rail_hit_map_t264) {
 }
 
 TEST(hud_sidebar_icon_law_t264) {
+    REQUIRE_DATA();
     using RB = au::RailButton;
     // SHAPEITEM lines verbatim (windows.txt 439/460/481/500 blocks).
     auto ic = au::sidebarIcon(RB::Research);
@@ -101,6 +104,7 @@ TEST(hud_sidebar_icon_law_t264) {
 }
 
 TEST(hud_ship_tab_category_map_t264) {
+    REQUIRE_DATA();
     // THE MEASURED TABLE (t253, 6/6 live vs gizmos.txt category field).
     CHECK(au::gizmoCatForShipTab(51) == 0);  // WEAPONS
     CHECK(au::gizmoCatForShipTab(52) == 1);  // DEFENSES
@@ -140,6 +144,7 @@ TEST(hud_ship_tab_category_map_t264) {
 }
 
 TEST(hud_gizlist_join_live_file_t264) {
+    REQUIRE_DATA();
     // Join the table against the shipped gizmos.txt: per-tab list sizes are
     // the file's category census {0:10 1:6 2:5 3:6 4:5 5:44} (t253 + the
     // loadGizmos 76-record invariant), and the head of each list is the

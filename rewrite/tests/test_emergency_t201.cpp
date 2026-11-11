@@ -10,6 +10,7 @@
 namespace ag = ascend::game;
 
 TEST(campaign_emergency_chain_law_t201) {
+    REQUIRE_DATA();
     using G = ag::Campaign::EmergencyGate;
     auto plain = [](G& g) {  // all gates closed baseline
         g = G{};

@@ -46,6 +46,7 @@ ag::Campaign stagedT1(unsigned seed, int aiCount, int stars) {
 // V=34 (68%) must. This is the value the whole OQ-021 chase chased: the corpus
 // max V=23 was 11 steps away from arming, not 4.
 TEST(control_threshold_t50_t291) {
+    REQUIRE_DATA();
     auto c = stagedT1(2024, 6, 50);
     const int total = static_cast<int>(c.galaxy().stars.size());
     CHECK(total == 50);
@@ -62,6 +63,7 @@ TEST(control_threshold_t50_t291) {
 // the galaxy, comfortably over half) must NOT win; V=10 must. Any galaxy where
 // 2T mod 3 != 0 separates the two readings; T=14 is one.
 TEST(control_bar_is_two_thirds_not_half_t291) {
+    REQUIRE_DATA();
     auto c = stagedT1(7, 2, 14);
     const int total = static_cast<int>(c.galaxy().stars.size());
     CHECK(total == 14);
@@ -83,6 +85,7 @@ TEST(control_bar_is_two_thirds_not_half_t291) {
 // contested map keeps far below the owned count (score.md S10: V=23 with the
 // player owning more stars; S6 branch-jumps 11<->22).
 TEST(control_operand_is_v_not_owned_t291) {
+    REQUIRE_DATA();
     auto c = stagedT1(7, 2, 14);
     const int total = static_cast<int>(c.galaxy().stars.size());
     int home = -1;
@@ -112,6 +115,7 @@ TEST(control_operand_is_v_not_owned_t291) {
 // producer's business (test_score_t284 pins it); this pin locks the WIRING:
 // a real advance() whose recomputed V >= floor(2T/3)+1 reports Control.
 TEST(control_end_to_end_flood_wins_t291) {
+    REQUIRE_DATA();
     auto c = makeCampaignSized(2026, 1, 50);
     const int total = static_cast<int>(c.galaxy().stars.size());
     const int thr = (2 * total) / 3 + 1;

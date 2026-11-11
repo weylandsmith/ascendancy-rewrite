@@ -14,12 +14,17 @@ int main(int argc, char** argv) {
     for (const auto& c : ascend::test::registry()) {
         if (filt && !std::strstr(c.name, filt)) continue;
         const int before = ascend::test::failures();
+        const int sbefore = ascend::test::skipped();
         std::printf("  %-52s", c.name);
         c.fn();
         ++ran;
-        std::printf("%s\n", ascend::test::failures() == before ? "ok" : "FAILED");
+        if (ascend::test::skipped() != sbefore)
+            std::printf("skipped (no vendor data)\n");
+        else
+            std::printf("%s\n", ascend::test::failures() == before ? "ok" : "FAILED");
     }
     const int bad = ascend::test::failures();
-    std::printf("\n%d tests, %d failed\n", ran, bad);
+    std::printf("\n%d tests, %d skipped, %d failed\n", ran,
+                ascend::test::skipped(), bad);
     return bad == 0 ? 0 : 1;
 }

@@ -62,6 +62,7 @@ std::vector<uint8_t> buildArchive(const std::vector<std::pair<std::string, std::
 }  // namespace
 
 TEST(cob_parses_synthetic_and_round_trips_blobs) {
+    REQUIRE_DATA();
     auto img = buildArchive({{"alpha.txt", "hello"}, {"data\\sub\\b.bin", "\x01\x02\x03\x03"}});
     std::string err;
     auto a = CobArchive::parse(img, &err);
@@ -85,6 +86,7 @@ TEST(cob_parses_synthetic_and_round_trips_blobs) {
 // and data bytes are not validated, so the archive legitimately parsed and
 // the test failed for the wrong reason.
 TEST(cob_rejects_non_monotonic_table) {
+    REQUIRE_DATA();
     size_t de = 0;
     auto img = buildArchive({{"a.txt", "aaaa"}, {"b.txt", "bbbb"}}, &de);
     // Swap the two offsets so the table decreases.
@@ -100,6 +102,7 @@ TEST(cob_rejects_non_monotonic_table) {
 }
 
 TEST(cob_rejects_bad_first_offset) {
+    REQUIRE_DATA();
     size_t de = 0;
     auto img = buildArchive({{"a.txt", "aaaa"}, {"b.txt", "bbbb"}, {"c.txt", "cccc"}}, &de);
     // off[0] must equal dir_end + 4N exactly (docs/FINDINGS.md P1a).
@@ -111,6 +114,7 @@ TEST(cob_rejects_bad_first_offset) {
 }
 
 TEST(cob_reads_all_shipped_archives_and_matches_extracted_dir) {
+    REQUIRE_DATA();
     // Strongest available check: the C++ reader must reproduce, byte for byte,
     // the tree the verified Python extractor produced (gate stages 2 and 3b).
     struct Item {

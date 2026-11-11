@@ -16,6 +16,7 @@ static const std::string kRepo = ASCENDANCY_SOURCE_DIR;
 static const std::string kData = kRepo + "/extracted/ascend01/data/";
 
 TEST(audio_manifest_soundfx) {
+    REQUIRE_DATA();
     std::string err;
     auto names = af::loadSoundfxManifest(kRepo + "/extracted/ascend00/soundfx.txt", &err);
     CHECK(names.size() == 86);
@@ -25,6 +26,7 @@ TEST(audio_manifest_soundfx) {
 }
 
 TEST(audio_manifest_music) {
+    REQUIRE_DATA();
     std::string err;
     auto m = af::loadMusicManifest(kRepo + "/extracted/ascend00/music.txt", &err);
     CHECK(m.size() == 29);
@@ -33,6 +35,7 @@ TEST(audio_manifest_music) {
 }
 
 TEST(audio_headered_voc) {
+    REQUIRE_DATA();
     // bang01.voc: rate 22050, mono, PCM 41389 bytes (audio.md §2 table).
     af::Sample s;
     std::string err;
@@ -51,6 +54,7 @@ TEST(audio_headered_voc) {
 }
 
 TEST(audio_headerless_defaults) {
+    REQUIRE_DATA();
     af::Sample s;
     std::string err;
     CHECK(af::loadSample(kData + "destroy.voc", "destroy", &s, &err));
@@ -66,6 +70,7 @@ TEST(audio_headerless_defaults) {
 }
 
 TEST(audio_open_rate_measured_oq006) {
+    REQUIRE_DATA();
     // MEASURED law (OQ-006 CLOSED 2026-10-07, audio.md §3.1): the original's
     // audio-open chain pushes 22050 (0x5622) and forwards it to the rate
     // setter. Pin the exact bytes at the three cited sites of the restored
@@ -116,6 +121,7 @@ TEST(audio_open_rate_measured_oq006) {
 }
 
 TEST(audio_tune_selector_oq018) {
+    REQUIRE_DATA();
     // MEASURED (docs/re/audio.md §3.3): global tune selector DAT_00010ba0
     // has EXACTLY ONE writer in the image — MOV [0x10ba0],-1 @0x21309,
     // guarded by an option-key check (CALL 0x77ece) inside the music.txt
@@ -157,6 +163,7 @@ TEST(audio_tune_selector_oq018) {
 }
 
 TEST(audio_voice_band_law_oq018) {
+    REQUIRE_DATA();
     // MEASURED (docs/re/audio.md §3.2 HEADER-PAIR LAW, FINAL): the vendor
     // bands sounds by FILE SIZE vs soundfx.txt col2 (2 10000 / 3 45000 /
     // 1 65000): band = count(threshold <= size), size >= 65000 = vendor
@@ -198,6 +205,7 @@ TEST(audio_voice_band_law_oq018) {
 }
 
 TEST(audio_rejects_garbage_magic) {
+    REQUIRE_DATA();
     // A file that lies about being a VOC (magic but wrong block fields)
     // must fail, not silently play garbage.
     const std::string p = "/tmp/ascend_fake.voc";

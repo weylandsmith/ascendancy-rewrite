@@ -13,6 +13,7 @@ namespace ag = ascend::game;
 ag::Campaign makeCampaignForDemolish(unsigned seed);  // test_campaign.cpp
 
 TEST(campaign_free_tech_grant_law_t203) {
+    REQUIRE_DATA();
     // (G1) candidates = NOT-owned rows minus the QUEUED TARGET; uniform.
     // Run N grants on one empire: every pick is previously-unowned at pick
     // time (owned-mask skip 0x46eff), the target row is NEVER granted while
@@ -39,6 +40,7 @@ TEST(campaign_free_tech_grant_law_t203) {
 }
 
 TEST(campaign_free_tech_grant_skips_queued_target_t203) {
+    REQUIRE_DATA();
     // The candidate loop reads ONLY [base+race*2+0x1d4e] == DAT_00076492
     // (t91 field identity) — the research TARGET word — so the row a race
     // is currently researching is excluded from the uniform pool while
@@ -58,6 +60,7 @@ TEST(campaign_free_tech_grant_skips_queued_target_t203) {
 }
 
 TEST(campaign_dig_completion_grants_tech_t203) {
+    REQUIRE_DATA();
     // END-TO-END through buildPhase: a queued dig (item 38) on an AI planet
     // completes into a ROCK cell: rock bit cleared, dig CONSUMED (item list
     // unchanged minus the dig), exactly ONE free tech granted. Seed a tech
@@ -91,6 +94,7 @@ TEST(campaign_dig_completion_grants_tech_t203) {
 }
 
 TEST(campaign_dig_on_nonrock_no_grant_t203) {
+    REQUIRE_DATA();
     // S3: the gate is the ROCK bit, not the item id. A dig completing where
     // NO rock exists (degenerate rewrite case; the original's buy could not
     // queue without legal rock) takes the normal activation tail 0x3917a:
@@ -119,6 +123,7 @@ TEST(campaign_dig_on_nonrock_no_grant_t203) {
 }
 
 TEST(campaign_free_tech_grant_determinism_t203) {
+    REQUIRE_DATA();
     // Seeded determinism: two campaigns with identical seed produce the
     // identical grant sequence (rng_ stream, law-faithful uniform pick).
     auto a = makeCampaignForDemolish(99);

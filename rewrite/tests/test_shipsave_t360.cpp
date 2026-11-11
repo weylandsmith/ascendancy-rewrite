@@ -107,6 +107,7 @@ Census censusOf(const Parsed& p) {
 }  // namespace
 
 TEST(shipsave_reader_and_base_vote_t360) {
+    REQUIRE_DATA();
     if (!fs::exists(kRepo + "/work/ascend_payload.bin") ||
         !fs::is_directory(kRepo + "/work/r1/playcap/save")) {
         std::printf("(skip: work/ corpus absent) ");
@@ -152,6 +153,7 @@ TEST(shipsave_reader_and_base_vote_t360) {
 }
 
 TEST(shipsave_corpus_law_pins_t360) {
+    REQUIRE_DATA();
     // Laws that hold in ANY in-game campaign state (banked derivations:
     // attr t273, dead marker r256c oc_of, kind subset spec A4, dead-row shape
     // uniformity _wip_t360 S2). Run unconditionally on every readable save.
@@ -195,6 +197,7 @@ TEST(shipsave_corpus_law_pins_t360) {
 }
 
 TEST(shipsave_frozen_ring_t1086_exact_t360) {
+    REQUIRE_DATA();
     // EXACT match against the banked census (_wip_t360 S2) — valid ONLY while
     // the production ring still holds turn 1086 (the state the census measured;
     // the whole 0x6b-slot window was byte-identical across 41..60.sav). If the

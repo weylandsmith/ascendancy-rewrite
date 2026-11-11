@@ -26,6 +26,7 @@ static const fs::path kRepo = ASCENDANCY_SOURCE_DIR;
 
 // ---- T1: pure-law battery, verbatim 0x43a4c ------------------------------
 TEST(diponattack_law_battery_t204) {
+    REQUIRE_DATA();
     ag::DipValues v;  // breakAlliance set per case (word[obj+0x1cf] analog)
 
     // (A1) AT-WAR GUARD 0x43a90: state==2 -> xor eax,eax;ret — NO attitude
@@ -156,6 +157,7 @@ static ag::Campaign buildFixture(std::vector<ag::DipFile> dips,
 
 // ---- T2: end-to-end at the cited call site 0x4b875 ------------------------
 TEST(diponattack_combat_phase_t204) {
+    REQUIRE_DATA();
     std::string err;
     ag::DipFile df;
     if (!df.loadFromFile((kRepo / "extracted/ascend00/race00.dip").string(), &err))
@@ -208,6 +210,7 @@ TEST(diponattack_combat_phase_t204) {
 
 // ---- T3: alliance violation (state-3 doubling + ceiling, end-to-end) -----
 TEST(diponattack_alliance_violation_t204) {
+    REQUIRE_DATA();
     std::string err;
     ag::DipFile df;
     if (!df.loadFromFile((kRepo / "extracted/ascend00/race00.dip").string(), &err))
@@ -247,6 +250,7 @@ TEST(diponattack_alliance_violation_t204) {
 // fired at here) — after the s0->s1 shot, attackedAt(1) carries bit 1<<1 and
 // every other cell is zero.
 TEST(diponattack_mark_is_per_star_t205) {
+    REQUIRE_DATA();
     std::string err;
     ag::DipFile df;
     if (!df.loadFromFile((kRepo / "extracted/ascend00/race00.dip").string(), &err))
@@ -264,6 +268,7 @@ TEST(diponattack_mark_is_per_star_t205) {
 }
 
 TEST(diponattack_alliance_ceiling_t204) {
+    REQUIRE_DATA();
     // The 0x43acc CEILING end-to-end: attitude high enough that even the
     // doubled hit leaves it ABOVE the victim's break-alliance line.
     std::string err;
@@ -303,6 +308,7 @@ TEST(diponattack_alliance_ceiling_t204) {
 // pure victim-bit field: after every fired turn, bit 0 of every cell and of
 // the reduced view is 0, and victim bits land exactly on engagement stars.
 TEST(mark_channels_separate_t206) {
+    REQUIRE_DATA();
     std::string err;
     ag::DipFile df;
     if (!df.loadFromFile((kRepo / "extracted/ascend00/race00.dip").string(), &err))

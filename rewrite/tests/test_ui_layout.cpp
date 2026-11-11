@@ -19,6 +19,7 @@ using ascend::game::StarStats;
 }  // namespace
 
 TEST(layout_constants_match_windows_txt) {
+    REQUIRE_DATA();
     CHECK(au::kCosmosWnd.x0 == 7);
     CHECK(au::kCosmosWnd.y0 == 7);
     CHECK(au::kCosmosWnd.x1 == 465);
@@ -32,6 +33,7 @@ TEST(layout_constants_match_windows_txt) {
 }
 
 TEST(layout_nextturn_outside_cosmos) {
+    REQUIRE_DATA();
     // The verified rects prove the HUD rail sits beside the map: no corner
     // of NEXTTURN is inside COSMOSWnd.
     CHECK(!au::inRect(au::kCosmosWnd, {au::kNextTurnBtn.x0, au::kNextTurnBtn.y0}));
@@ -41,6 +43,7 @@ TEST(layout_nextturn_outside_cosmos) {
 }
 
 TEST(layout_star_projection_within_bounds) {
+    REQUIRE_DATA();
     au::CosmosView v;  // mapSize 1024 default (MapConfig default)
     ascend::game::Star s;
     s.x = 0; s.y = 0;
@@ -56,6 +59,7 @@ TEST(layout_star_projection_within_bounds) {
 }
 
 TEST(layout_palette_cvd_separable) {
+    REQUIRE_DATA();
     // Rule (docs/re/ui-runtime.md §4), evaluated under BOTH the
     // deuteranopia and protanopia transforms, with gaps measured on the
     // SIMULATED colours: owner pair OK iff luminance gap >= 32 OR chroma
@@ -86,6 +90,7 @@ TEST(layout_palette_cvd_separable) {
 }
 
 TEST(layout_hit_test_finds_nearest) {
+    REQUIRE_DATA();
     // Synthetic 3-star galaxy directly (no generator needed).
     Galaxy g;
     for (int i = 0; i < 3; ++i) {
@@ -103,6 +108,7 @@ TEST(layout_hit_test_finds_nearest) {
 }
 
 TEST(layout_planet_gauge_selector_law_t199) {
+    REQUIRE_DATA();
     // GAUGE COMPRESSION LAW (docs/re/planets-ui.md S3 [verified planwin
     // 0x3b96c switch cases; t198]): sel = clamp0..20(round(level^0.75)).
     // Round-to-nearest ties are IMPOSSIBLE (16*L^3 == odd^4 has no integer

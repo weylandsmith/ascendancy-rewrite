@@ -113,6 +113,7 @@ std::vector<std::string> loadStaticRecords(const std::string& path) {
 }  // namespace
 
 TEST(planetwin_panel_table_matches_windows_txt_t276) {
+    REQUIRE_DATA();
     auto w = loadWindows(kRepo + "/extracted/ascend00/windows.txt");
     const char* names[5] = {"PLRES", "PLIND", "PLPRO", "PLPOP", "PLBUILD"};
     for (int i = 0; i < 5; ++i) {
@@ -154,6 +155,7 @@ TEST(planetwin_panel_table_matches_windows_txt_t276) {
 }
 
 TEST(planetwin_panel_order_and_disjointness_t276) {
+    REQUIRE_DATA();
     // File order == left-to-right: X0 strictly increasing...
     for (int i = 1; i < au::kPlanetPanelCount; ++i)
         CHECK(au::kPlanetPanels[i].rect.x0 > au::kPlanetPanels[i - 1].rect.x1);
@@ -182,6 +184,7 @@ TEST(planetwin_panel_order_and_disjointness_t276) {
 }
 
 TEST(planetwin_dispatch_key_law_t276) {
+    REQUIRE_DATA();
     // Remap table verbatim (planets-ui.md S2): gauge params pass through,
     // param 4 -> 3, SENDMESSAGE 51 -> 4, out-of-range -> default (-1).
     CHECK(au::paintKey(50, 0) == 0);  // PLRES
@@ -211,6 +214,7 @@ TEST(planetwin_dispatch_key_law_t276) {
 }
 
 TEST(planetwin_header_strings_match_static_txt_t276) {
+    REQUIRE_DATA();
     auto recs = loadStaticRecords(kRepo + "/extracted/ascend00/static.txt");
     if (recs.size() != 191) { CHECK(recs.size() == 191); return; }  // live 0xbf law
     // 0-INDEXED getter convention (selfplay.md t246 pins #151).
@@ -234,6 +238,7 @@ TEST(planetwin_header_strings_match_static_txt_t276) {
 }
 
 TEST(planetwin_header_format_output_t276) {
+    REQUIRE_DATA();
     // Output shapes pinned to the two live vision reads:
     // "Chamachies (60 Planets Occupied, 26 Systems Controlled)" (t246/t248
     // era header screenshot) and "Chamachies (25 Ships, 12 more allowed)"
@@ -254,6 +259,7 @@ TEST(planetwin_header_format_output_t276) {
 }
 
 TEST(planetwin_gauge_wiring_t276) {
+    REQUIRE_DATA();
     // Wire check, not a re-pin of t199: for a SEEDED campaign the
     // composition's three selectors must equal gaugeSelector(res),
     // gaugeSelector(ind), prosSelector(pros) of the SAME channelWordsFor
@@ -316,6 +322,7 @@ TEST(planetwin_gauge_wiring_t276) {
 }
 
 TEST(planetwin_poppanel_containment_t276) {
+    REQUIRE_DATA();
     // Composition leg: feeding popPanelFor the PLPOP panel origin must keep
     // every painted cell (plus the 9x9 max sprite, shp.md S23.3) inside the
     // windows.txt panel rect — the t33 cap clamp (<=100 slots == 10x10 grid)
@@ -363,6 +370,7 @@ TEST(planetwin_poppanel_containment_t276) {
 }
 
 TEST(planetwin_plbuild_icon_t276) {
+    REQUIRE_DATA();
     // CITED point: item 34 ("Scientist Takeover", income-law.md S6h) -> k34
     // (shp.md S23.4 live MAD 1.5). Domain edges: planitem.shp has 40 records.
     auto icon = au::plbuildIcon(34);

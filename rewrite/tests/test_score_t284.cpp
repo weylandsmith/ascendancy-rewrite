@@ -43,6 +43,7 @@ void openGalaxy(ag::Campaign& c) {
 // pass), and >=1 after the first advance while the home star is the player's
 // (the FUN_00024f24 seed V=1 branch).
 TEST(score_cadence_zero_then_one_t284) {
+    REQUIRE_DATA();
     auto c = makeCampaignForDemolish(7);
     CHECK(c.scoreStars() == 0);
     c.advance();
@@ -53,6 +54,7 @@ TEST(score_cadence_zero_then_one_t284) {
 // player's presence bit -> V := 0, flood never runs. The pass always REWRITES
 // the dword; no partial value survives.
 TEST(score_home_loss_zeroes_t284) {
+    REQUIRE_DATA();
     auto c = makeCampaignForDemolish(7);
     c.advance();
     CHECK(c.scoreStars() >= 1);
@@ -71,6 +73,7 @@ TEST(score_home_loss_zeroes_t284) {
 // star strictly lowers V, pruning whatever hangs behind it — the S6 t912
 // 11->22 / S10 23->14 branch-jump mechanism.
 TEST(score_flood_and_presence_prune_t284) {
+    REQUIRE_DATA();
     auto c = makeCampaignForDemolish(2026);
     const int n = static_cast<int>(c.galaxy().stars.size());
     const int lanes = static_cast<int>(c.galaxy().lanes.size());
@@ -96,6 +99,7 @@ TEST(score_flood_and_presence_prune_t284) {
 // 4. VISIBILITY GATE IS PLAYER-BIT-ONLY: with the map unclaimed but every
 // star INVISIBLE to the player, the flood cannot cross a single lane -> V==1.
 TEST(score_visibility_gate_is_player_bit_t284) {
+    REQUIRE_DATA();
     auto c = makeCampaignForDemolish(2026);
     const int n = static_cast<int>(c.galaxy().stars.size());
     for (int s = 0; s < n; ++s)
@@ -113,6 +117,7 @@ TEST(score_visibility_gate_is_player_bit_t284) {
 // POINTER at ship+0x59; kind-5 lane orders measurably hold lane-pool
 // pointers). Direction-free: either orientation contests.
 TEST(score_contest_gate_t284) {
+    REQUIRE_DATA();
     auto c = makeCampaignForDemolish(2026);
     const int n = static_cast<int>(c.galaxy().stars.size());
     openGalaxy(c);
@@ -141,6 +146,7 @@ TEST(score_contest_gate_t284) {
 // integral, so truncation-vs-rounding is NOT observable in any captured frame
 // — this pin locks the FORMULA and the exact factor, not the rounding mode.
 TEST(score_pct_formula_t284) {
+    REQUIRE_DATA();
     auto d = makeCampaignForDemolish(2026);
     const int n = static_cast<int>(d.galaxy().stars.size());
     openGalaxy(d);
@@ -160,6 +166,7 @@ TEST(score_pct_formula_t284) {
 // (V=22 while systems_any=14: the lane graph has cycles). Upper bound is
 // therefore 1 + laneCount, NOT the star count.
 TEST(score_unit_is_lanes_not_stars_t284) {
+    REQUIRE_DATA();
     auto c = makeCampaignForDemolish(2026);
     const int n = static_cast<int>(c.galaxy().stars.size());
     const int lanes = static_cast<int>(c.galaxy().lanes.size());

@@ -33,6 +33,7 @@ std::vector<uint8_t> mkBin(const std::vector<std::array<uint32_t, 6>>& recs, boo
 }  // namespace
 
 TEST(bin_parses_header_and_records) {
+    REQUIRE_DATA();
     auto img = mkBin({{1, 2, 3, 3, 1000, 0}, {7, 8, 9, 1, 2000, 5}});
     std::string err;
     auto t = BinTable::parse(img.data(), img.size(), &err);
@@ -44,12 +45,14 @@ TEST(bin_parses_header_and_records) {
 }
 
 TEST(bin_rejects_wrong_magic) {
+    REQUIRE_DATA();
     auto img = mkBin({{1, 1, 1, 1, 1, 1}}, false);
     std::string err;
     CHECK(!BinTable::parse(img.data(), img.size(), &err).has_value());
 }
 
 TEST(bin_rejects_body_not_multiple_of_24) {
+    REQUIRE_DATA();
     auto img = mkBin({{1, 1, 1, 1, 1, 1}});
     img.pop_back();  // 23-byte body
     std::string err;
@@ -57,6 +60,7 @@ TEST(bin_rejects_body_not_multiple_of_24) {
 }
 
 TEST(bin_all_shipped_tables_parse_at_stride_24) {
+    REQUIRE_DATA();
     // Mirrors gate stage 3b: every .bin in the corpus must satisfy the
     // 16-byte-header + N x 24 invariant (docs/re/tables.md).
     std::string err;

@@ -28,6 +28,7 @@ static const fs::path kRepo = ASCENDANCY_SOURCE_DIR;
 
 // ---- T1: pure-law battery, verbatim 0x3a25a..0x3a291 ---------------------
 TEST(invasion_guarantee_war_battery_t207) {
+    REQUIRE_DATA();
     ag::DipValues v;
     v.declareWar = 200;
 
@@ -74,6 +75,7 @@ TEST(invasion_guarantee_war_battery_t207) {
 
 // ---- T2: chooser consequence — the clamp makes DA_DeclareWar fire --------
 TEST(invasion_declare_war_cascade_t207) {
+    REQUIRE_DATA();
     ag::DipValues v;
     v.declareWar = 290;             // race00's live DECLARE_WAR (t204 pins)
     v.proposeAlliance = 1000000;    // keep the propose arm out of the way
@@ -163,6 +165,7 @@ ag::Campaign buildFixture207(std::vector<ag::DipFile> dips,
 }  // namespace
 
 TEST(invasion_combat_phase_clamp_t207) {
+    REQUIRE_DATA();
     std::string err;
     ag::DipFile df;
     if (!df.loadFromFile((kRepo / "extracted/ascend00/race00.dip").string(), &err))
@@ -197,6 +200,7 @@ TEST(invasion_combat_phase_clamp_t207) {
 // accrual). Law: 340 -> handler -20 = 320 (still > DECL 290) -> clamp
 // 0x3a291 -> 280 (strictly below the line) -> t180 chooser DeclareWar.
 TEST(invasion_capture_war_e2e_t208) {
+    REQUIRE_DATA();
     std::string err;
     ag::DipFile df;
     if (!df.loadFromFile((kRepo / "extracted/ascend00/race00.dip").string(), &err))

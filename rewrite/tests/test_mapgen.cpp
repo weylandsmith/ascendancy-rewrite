@@ -32,6 +32,7 @@ std::optional<StarStats> shippedStats() {
 }  // namespace
 
 TEST(starstat_parses_shipped_file_with_invariants) {
+    REQUIRE_DATA();
     auto st = shippedStats();
     CHECK(st.has_value());
     if (!st) return;
@@ -47,6 +48,7 @@ TEST(starstat_parses_shipped_file_with_invariants) {
 }
 
 TEST(starstat_rejects_bad_inputs) {
+    REQUIRE_DATA();
     std::string err;
     CHECK(!StarStats::parse("TYPE_0\t 1.0 Percent\t 2.0 Lanes\n", &err).has_value());  // 1 row
     // 13 rows but percent sums to 90: rejected, never renormalised silently
@@ -60,6 +62,7 @@ TEST(starstat_rejects_bad_inputs) {
 }
 
 TEST(star_names_load_100_bases_and_roman_shape) {
+    REQUIRE_DATA();
     std::string err;
     auto names = ascend::game::loadStarNames(kRepo / "extracted" / "ascend00" / "names.txt", &err);
     CHECK(names.size() == 100);  // docs/re/mapgen.md §2
@@ -72,6 +75,7 @@ TEST(star_names_load_100_bases_and_roman_shape) {
 }
 
 TEST(galaxy_is_deterministic_per_seed) {
+    REQUIRE_DATA();
     auto st = shippedStats();
     CHECK(st.has_value());
     if (!st) return;
@@ -101,6 +105,7 @@ TEST(galaxy_is_deterministic_per_seed) {
 }
 
 TEST(galaxy_invariants_over_many_seeds) {
+    REQUIRE_DATA();
     auto st = shippedStats();
     CHECK(st.has_value());
     if (!st) return;
@@ -139,6 +144,7 @@ TEST(galaxy_invariants_over_many_seeds) {
 }
 
 TEST(galaxy_positions_follow_measured_shell_law) {
+    REQUIRE_DATA();
     // docs/re/r1-savestate.md 2026-10-06p: radius-by-slot shells 440(k<26)
     // 365(26..37) 290(38..43) 215(44..46) 140(47) 65(48) 50(49), identity
     // across 5 campaigns; default mapSize keeps scale 1.0 so radii are exact.
@@ -169,6 +175,7 @@ TEST(galaxy_positions_follow_measured_shell_law) {
 }
 
 TEST(galaxy_density_ladder_matches_measured_sizes) {
+    REQUIRE_DATA();
     // docs/re/mapgen.md OQ-012(a) (t78, 2026-10-12): the original's
     // GALAXY_MORE cycle measures T = 50/75/100/15/25 (Average/Dense/Very
     // Dense/Vacuous/Sparse, wraps at 5). Pin: our generator produces the
@@ -228,6 +235,7 @@ TEST(galaxy_density_ladder_matches_measured_sizes) {
 }
 
 TEST(galaxy_lanes_are_simple_and_bounds_checked) {
+    REQUIRE_DATA();
     auto st = shippedStats();
     if (!st) return;
     std::string err;

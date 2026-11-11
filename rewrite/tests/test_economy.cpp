@@ -21,6 +21,7 @@ std::filesystem::path d0(const std::string& f) {
 }  // namespace
 
 TEST(gizmos_loads_76_with_measured_category_counts) {
+    REQUIRE_DATA();
     std::string err;
     auto gz = ag::loadGizmos(d0("gizmos.txt").string(), err);
     CHECK(err.empty());
@@ -42,6 +43,7 @@ TEST(gizmos_loads_76_with_measured_category_counts) {
 }
 
 TEST(gizmo_flag_packing_uses_bit_positions) {
+    REQUIRE_DATA();
     std::string err;
     auto gz = ag::loadGizmos(d0("gizmos.txt").string(), err);
     CHECK(!gz.empty());
@@ -64,6 +66,7 @@ TEST(gizmo_flag_packing_uses_bit_positions) {
 }
 
 TEST(gizmo_resreq_cross_validates_restree_rows) {
+    REQUIRE_DATA();
     std::string err;
     auto gz = ag::loadGizmos(d0("gizmos.txt").string(), err);
     auto tree = ag::ResearchTree::loadFromFile(d0("restree.txt").string(), err);
@@ -87,6 +90,7 @@ TEST(gizmo_resreq_cross_validates_restree_rows) {
 }
 
 TEST(planitems_loads_39_with_requotes) {
+    REQUIRE_DATA();
     std::string err;
     auto items = ag::loadPlanItems(d0("planitem.txt").string(), err);
     CHECK(err.empty());
@@ -117,6 +121,7 @@ TEST(planitems_loads_39_with_requotes) {
 // §4; loader FUN_00037fc0, availability checker FUN_0003830c, init
 // FUN_00037d80; cross-checked against 17 banked captures).
 TEST(oq014_requires_law_254_is_dead_not_ungated) {
+    REQUIRE_DATA();
     std::vector<bool> all(66, true), none(66, false);
     CHECK(ag::requiresAvailable(255, 66, none));      // sentinel: ungated
     CHECK(ag::requiresAvailable(26, 66, all));        // owned tech: available
@@ -128,6 +133,7 @@ TEST(oq014_requires_law_254_is_dead_not_ungated) {
 }
 
 TEST(oq014_count_triple_and_placement_classes) {
+    REQUIRE_DATA();
     std::string err;
     auto items = ag::loadPlanItems(d0("planitem.txt").string(), err);
     CHECK(err.empty());
@@ -147,6 +153,7 @@ TEST(oq014_count_triple_and_placement_classes) {
 }
 
 TEST(oq014_slot_law_surface_xor_and_size_cells) {
+    REQUIRE_DATA();
     // FUN_00037d80: orbital pool is exactly 10 slots above the surface cells;
     // live planet records 2650/2650 carry cap == cells + 10.
     // Grid-C row sums = size-class surface cells (RAM +0x18, 5 classes).
@@ -170,6 +177,7 @@ TEST(oq014_slot_law_surface_xor_and_size_cells) {
 }
 
 TEST(best_drive_range_respects_research_gate) {
+    REQUIRE_DATA();
     std::string err;
     auto gz = ag::loadGizmos(d0("gizmos.txt").string(), err);
     CHECK(!gz.empty());
@@ -182,6 +190,7 @@ TEST(best_drive_range_respects_research_gate) {
 }
 
 TEST(economy_loaders_reject_corrupt_input) {
+    REQUIRE_DATA();
     auto tmp = std::filesystem::temp_directory_path() / "ascendancy_econ_bad.txt";
     struct Bad {
         const char* text;

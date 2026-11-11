@@ -114,6 +114,7 @@ ascend::game::Campaign makeCampaignWithTerrain(unsigned seed,
 }
 
 TEST(campaign_homes_distinct) {
+    REQUIRE_DATA();
     auto c = makeCampaign(7);
     for (int o = 0; o <= 6; ++o) CHECK(c.starsOwned(o) == 1);
     CHECK(c.turn() == 0);
@@ -121,6 +122,7 @@ TEST(campaign_homes_distinct) {
 }
 
 TEST(campaign_total_owned_grows) {
+    REQUIRE_DATA();
     // Expansion: total claimed stars must strictly grow over 20 turns
     // (some owner always has surplus industry; turnloop.md §4).
     // window widens, not the law. t295 SEED SWAP (honest re-derivation): the
@@ -153,6 +155,7 @@ TEST(campaign_total_owned_grows) {
 }
 
 TEST(campaign_home_placement_law_t40) {
+    REQUIRE_DATA();
     // HOME-PLACEMENT LAW (docs/re/income-law.md T40 + T42 upgrade, census
     // scripts/r1_cell_choice_census.py): exactly one home per empire;
     // opening position = Colony Base ONLY (no Factory/Lab/Shipyard ever on
@@ -184,6 +187,7 @@ TEST(campaign_home_placement_law_t40) {
 }
 
 TEST(campaign_cb_cell_uniform_t42) {
+    REQUIRE_DATA();
     // PICKER UNIFORMITY (income-law.md T42): drawCbCell must spread CBs
     // across ALL non-rock cells (barren included) and never land on rock.
     // 4000 draws on a mid-size planet: every non-rock cell hit at least
@@ -217,6 +221,7 @@ TEST(campaign_cb_cell_uniform_t42) {
 }
 
 TEST(campaign_built_cell_rule_g_t43) {
+    REQUIRE_DATA();
     // BUILT-ITEM CELL LAW (income-law.md S13, CLOSED t43): rule-G
     // adjacency over the runtime hex-continuous-x grid (tables banked from
     // guest RAM; checker FUN_0003830c @0x385b7 + FUN_000395c4), and the
@@ -281,6 +286,7 @@ TEST(campaign_built_cell_rule_g_t43) {
 }
 
 TEST(campaign_governor_law_t45) {
+    REQUIRE_DATA();
     // SELECTED-ABILITY / "GOVERNOR" LAW (docs/re/income-law.md S14 t45,
     // recalc FUN_00038ba4 @0x38df0..0x38e29 raw disasm): byte +0x54 == 33
     // Endless Party adds IND acc >>2 to the PROS accumulator (before its
@@ -326,6 +332,7 @@ TEST(campaign_governor_law_t45) {
 }
 
 TEST(campaign_colonised_plan_gets_colony_base_t41) {
+    REQUIRE_DATA();
     // COLONISED-PLANET LAW (docs/re/income-law.md T41, census
     // scripts/r1_colony_items.py): every in-run colonisation arrives with
     // EXACTLY one Colony Base (2 same-world observations, CB-only pop 2).
@@ -364,6 +371,7 @@ TEST(campaign_colonised_plan_gets_colony_base_t41) {
 }
 
 TEST(campaign_channel_law_oq016) {
+    REQUIRE_DATA();
     // MEASURED stored-channel law (docs/re/income-law.md S6/t18b compression
     // + t19 grant; battery scripts/r1_income_channels.py post-t35:
     // IND/PROS/RES 173/173/173 on the corrected +0x88 array with the
@@ -398,6 +406,7 @@ TEST(campaign_channel_law_oq016) {
 }
 
 TEST(campaign_build_queue_law_oq016) {
+    REQUIRE_DATA();
     // BUILD-QUEUE LAW (income-law.md S8 + S9 t28): pending item + per-planet
     // IND accumulator; completion only when acc >= COST (0x3907b/0x390a3
     // JA 0x392a2), selector runs only with no pending item (caller 0x3ead6).
@@ -429,6 +438,7 @@ TEST(campaign_build_queue_law_oq016) {
 }
 
 TEST(campaign_pop_cap_seed_law_oq016) {
+    REQUIRE_DATA();
     // POP-CAP SEED LAW (income-law.md S10 t29/t36): seed = nonbarren/3 + 5
     // with nonbarren from the per-cell class draw (T36: size rng%5 @0x23a86,
     // row rng%11 @0x23a97, chain @0x37eb7..0x37f24); bounds per surface
@@ -475,12 +485,14 @@ TEST(campaign_pop_cap_seed_law_oq016) {
 }
 
 TEST(campaign_research_progresses) {
+    REQUIRE_DATA();
     auto c = makeCampaign(3);
     for (int t = 0; t < 40 && !c.over(); ++t) c.advance();
     CHECK(c.techsOwned(ag::kPlayer) > 0);  // home lab researches within 40 turns
 }
 
 TEST(campaign_deterministic_same_seed) {
+    REQUIRE_DATA();
     auto a = makeCampaign(1234);
     auto b = makeCampaign(1234);
     for (int t = 0; t < 30 && !a.over(); ++t) {
@@ -492,6 +504,7 @@ TEST(campaign_deterministic_same_seed) {
 }
 
 TEST(campaign_reaches_a_victory) {
+    REQUIRE_DATA();
     // CONTRACT: a seeded run reaches a victory condition (docs/PLAYTHROUGH.md
     // is generated from such a run). Combat (combat.md S2g/S2j) makes Control
     // or LastAlive reachable; 1200-turn cap bounds the search.
@@ -508,6 +521,7 @@ TEST(campaign_reaches_a_victory) {
 }
 
 TEST(campaign_combat_law_oq010) {
+    REQUIRE_DATA();
     // t89 UPGRADE pin (docs/re/combat.md S2d/S2f/S2g/S2h/S2i). Laws lifted:
     //  (1) VOLLEY = SUM of researched cat-0 weapon Levels — every weapon
     //      engages per engagement (volley loop 0x4a5c1..0x4a5fc); damage per
@@ -570,6 +584,7 @@ TEST(campaign_combat_law_oq010) {
 }
 
 TEST(campaign_victory_files_named) {
+    REQUIRE_DATA();
     CHECK(std::string(ag::victoryConditionFile(ag::Victory::Control)) == "end-ctrl");
     CHECK(std::string(ag::victoryConditionFile(ag::Victory::Extinct)) == "end-xtnc");
     CHECK(std::string(ag::victoryConditionFile(ag::Victory::LastAlive)) == "end-dest");
@@ -577,6 +592,7 @@ TEST(campaign_victory_files_named) {
 }
 
 TEST(campaign_advance_after_victory_is_noop) {
+    REQUIRE_DATA();
     auto c = makeCampaign(1);
     ag::Victory v = ag::Victory::None;
     // t89 re-pin: seed 1 finite resolve Control t842 (deterministic combat;
@@ -594,6 +610,7 @@ TEST(campaign_advance_after_victory_is_noop) {
 }
 
 TEST(campaign_research_picker_law_oq016) {
+    REQUIRE_DATA();
     // t93 AI RESEARCH PICK LAW (FUN_00040018 0x40018..0x40175 re-verified
     // from the disassembly; docs/re/aicode.md §3c/§3d). Tiers: sentinel
     // (rng%100<45) skips ONLY the preferred scan (guard 0x400fb); the
@@ -640,6 +657,7 @@ TEST(campaign_research_picker_law_oq016) {
 // fogged for both (t193 census: value-0/foreign-only lanes exist).
 // ---------------------------------------------------------------------------
 TEST(campaign_visibility_law_oq026_t195) {
+    REQUIRE_DATA();
     using C = ag::Campaign;
     // (0) VIEWER MASK LAW verbatim (FUN_00021a84 + 0x21a94 spectator leg).
     CHECK(C::viewerMaskFor(0) == 0x01);
@@ -780,6 +798,7 @@ TEST(campaign_visibility_law_oq026_t195) {
 }
 
 TEST(campaign_pop_band_law_t199) {
+    REQUIRE_DATA();
     // POPULATION BAND LAW pin (docs/re/planets-ui.md S4 [verified
     // 0x3ce39..0x3cef8], t198; wiring t199). SEL(i) = 1 + [i>=used] +
     // [i>=pop] over i < cap.

@@ -16,6 +16,7 @@ static const std::string kRepo = ASCENDANCY_SOURCE_DIR;
 static const std::string kA01 = kRepo + "/extracted/ascend01/data/";
 
 TEST(fnt_load_all_vendor_fonts) {
+    REQUIRE_DATA();
     af::Font sm, big, intro;
     std::string err;
     CHECK(sm.load(kA01 + "smfont.fnt", &err));
@@ -28,6 +29,7 @@ TEST(fnt_load_all_vendor_fonts) {
 }
 
 TEST(fnt_glyph_widths_measured) {
+    REQUIRE_DATA();
     // Widths from fnt.md (space=4/5/16, A=6/8/22 sm/big/intro).
     af::Font sm, big, intro;
     std::string err;
@@ -44,6 +46,7 @@ TEST(fnt_glyph_widths_measured) {
 }
 
 TEST(fnt_ink_census_pinned) {
+    REQUIRE_DATA();
     // Measured 2026-10-04 over all 128 glyphs: the unimplemented block
     // (0..31 and @^{|}~ in sm/big) carries no ink.
     af::Font sm, big, intro;
@@ -57,6 +60,7 @@ TEST(fnt_ink_census_pinned) {
 }
 
 TEST(fnt_letterform_shape_solid) {
+    REQUIRE_DATA();
     // smfont 'I' (w=4, h=8) is .### / ..#. / ..#. / ..#. / ..#. / ..#. /
     // .### / .... in the vision-confirmed sheet — assert the exact bitmap,
     // and that 0xF3 is the ONLY ink byte smfont ever uses (fnt.md alphabet).
@@ -85,6 +89,7 @@ TEST(fnt_letterform_shape_solid) {
 }
 
 TEST(fnt_render_argb) {
+    REQUIRE_DATA();
     af::Font sm;
     std::string err;
     CHECK(sm.load(kA01 + "smfont.fnt", &err));
@@ -96,6 +101,7 @@ TEST(fnt_render_argb) {
 }
 
 TEST(fnt_rejects_garbage) {
+    REQUIRE_DATA();
     // (a) header N != 128 must reject; (b) a hand-built WELL-FORMED font
     // (128 zero-width glyphs, offsets spaced 4, so every slot is exactly
     // 4+0*h and the last ends at EOF) must LOAD; (c) appending one junk byte

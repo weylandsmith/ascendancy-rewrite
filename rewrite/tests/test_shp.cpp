@@ -23,6 +23,7 @@ const std::string kA01 = kRepo + "/extracted/ascend01/data/";
 }  // namespace
 
 TEST(shp_loads_raceflag_with_va_stream_law) {
+    REQUIRE_DATA();
     ShapeLibrary lib;
     std::string err;
     CHECK(lib.load(kA01 + "raceflag.shp", &err));
@@ -35,6 +36,7 @@ TEST(shp_loads_raceflag_with_va_stream_law) {
 }
 
 TEST(shp_decodes_raceflag_every_record) {
+    REQUIRE_DATA();
     ShapeLibrary lib;
     std::string err;
     CHECK(lib.load(kA01 + "raceflag.shp", &err));
@@ -50,6 +52,7 @@ TEST(shp_decodes_raceflag_every_record) {
 }
 
 TEST(shp_rejects_broken_container) {
+    REQUIRE_DATA();
     // tsz must equal 8*(N+1): law rejection testable in memory.
     std::vector<uint8_t> img = {0x31, 0x2e, 0x31, 0x30};
     auto put = [&](uint32_t v) {
@@ -71,6 +74,7 @@ TEST(shp_rejects_broken_container) {
 }
 
 TEST(shp_corpus_parity_with_python_validator) {
+    REQUIRE_DATA();
     int libs = 0, clean_libs = 0, recs = 0, passed = 0;
     std::vector<std::string> fails;
     for (const auto& e : fs::recursive_directory_iterator(kRepo + "/extracted")) {
@@ -117,6 +121,7 @@ TEST(shp_corpus_parity_with_python_validator) {
 }
 
 TEST(shp_span_free_t197) {
+    REQUIRE_DATA();
     // The span bound was our validator's invention (shp.md S20.2: blit
     // FUN_0005caac has no length arg, no overrun error; cache = verbatim
     // whole-library copy). Pins BOTH sides of the t197 correction.
@@ -194,6 +199,7 @@ static uint64_t fnv64(const std::vector<uint8_t>& v) {
 }
 
 TEST(shp_corner_anchor_fallback_t367) {
+    REQUIRE_DATA();
     // D1 RULING (docs/DECISIONS.md USER block 2026-11-09 12:45: "D1 mouse
     // k5/k6/k7 = keep as-is") + t344 S27 geometry law + t367 file
     // measurement (shp.md S28). k4..k7 = ONE 78x47 glyph at four corner

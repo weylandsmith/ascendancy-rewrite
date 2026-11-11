@@ -26,6 +26,7 @@ ascend::game::ResearchTree loadOrDie(std::string& err) {
 }  // namespace
 
 TEST(research_loads_66_main_plus_40_variants) {
+    REQUIRE_DATA();
     std::string err;
     auto t = loadOrDie(err);
     CHECK(err.empty());
@@ -48,6 +49,7 @@ TEST(research_loads_66_main_plus_40_variants) {
 }
 
 TEST(research_costs_match_measured_histogram) {
+    REQUIRE_DATA();
     std::string err;
     auto t = loadOrDie(err);
     // docs/re/research.md §3: main costs 50..400; §4: variants uniformly 20.
@@ -77,6 +79,7 @@ TEST(research_costs_match_measured_histogram) {
 }
 
 TEST(research_graph_is_acyclic_with_forward_refs) {
+    REQUIRE_DATA();
     std::string err;
     auto t = loadOrDie(err);
     CHECK(t.wellFormed(err));
@@ -93,6 +96,7 @@ TEST(research_graph_is_acyclic_with_forward_refs) {
 }
 
 TEST(research_runtime_cost_law_measured) {
+    REQUIRE_DATA();
     // OQ-013 / docs/re/research.md §7. The original's loader FUN_00046870
     // (work/ascend_restored.bin:00046870) multiplies the file cost by
     // iVar4 = -20 + 2*row once row > 10 and clamps to 65000, storing the
@@ -120,6 +124,7 @@ TEST(research_runtime_cost_law_measured) {
 }
 
 TEST(research_variants_are_not_in_play) {
+    REQUIRE_DATA();
     // OQ-013 CLOSED: available()'s default excludes variant rows because the
     // original never loads them (count-line = 66 bounds the load loop).
     std::string err;
@@ -136,6 +141,7 @@ TEST(research_variants_are_not_in_play) {
 }
 
 TEST(research_availability_gating) {
+    REQUIRE_DATA();
     std::string err;
     auto t = loadOrDie(err);
     const int n = static_cast<int>(t.all().size());
@@ -159,6 +165,7 @@ TEST(research_availability_gating) {
 }
 
 TEST(research_parser_rejects_corrupt_input) {
+    REQUIRE_DATA();
     struct Bad {
         const char* what;
         const char* text;

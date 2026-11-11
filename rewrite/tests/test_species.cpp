@@ -103,6 +103,7 @@ int homeOf(const ag::Campaign& c, int owner) {
 }  // namespace
 
 TEST(species_roster_three_source) {
+    REQUIRE_DATA();
     std::vector<ag::SpeciesInfo> r;
     std::string err;
     CHECK(ag::loadAbilities(kDir.string(), &r, &err));
@@ -118,6 +119,7 @@ TEST(species_roster_three_source) {
 }
 
 TEST(species_roster_rejects_bad_dir) {
+    REQUIRE_DATA();
     std::vector<ag::SpeciesInfo> r;
     std::string err;
     CHECK(!ag::loadAbilities("/nonexistent-ascendancy-dir", &r, &err));
@@ -125,6 +127,7 @@ TEST(species_roster_rejects_bad_dir) {
 }
 
 TEST(species_charge_split_verified) {
+    REQUIRE_DATA();
     // Split: 7 passive blocks (no amass line) [verified help.txt; gate 3m
     // re-checks against the file]. PERIODS: the MEASURED cadence table
     // WORD[0x6780+2*ability] (aicode.md §6.4, live 60.sav == FILE 0x89330,
@@ -151,6 +154,7 @@ TEST(species_charge_split_verified) {
 }
 
 TEST(species_every_token_has_effect_or_filed_noop) {
+    REQUIRE_DATA();
     // C++ mirror of gate 3m: no token is silently unhandled, and every note
     // cites a help.txt line block.
     int filedNoops = 0;
@@ -166,6 +170,7 @@ TEST(species_every_token_has_effect_or_filed_noop) {
 }
 
 TEST(species_charged_ability_fires_on_schedule) {
+    REQUIRE_DATA();
     // MEASURED CADENCE LAW (t100, aicode.md §6.4): counter counts UP from 0,
     // fires EXACTLY at the cadence word, resets to 0. SA_HealShips cad=60:
     // first activation turn 60, then every 60 turns (period == cad).
@@ -187,6 +192,7 @@ TEST(species_charged_ability_fires_on_schedule) {
 }
 
 TEST(species_force_peace_ends_the_owner_wars) {
+    REQUIRE_DATA();
     auto c = makeCrafted(12, 1, ag::SpeciesAbility::ForcePeace);
     CHECK(c.atWar(1, 0));  // free-for-all start
     for (int t = 0; t < 100; ++t) c.advance();  // cad[6] == 100 (aicode.md §6.4)
@@ -195,6 +201,7 @@ TEST(species_force_peace_ends_the_owner_wars) {
 }
 
 TEST(species_shield_planets_blocks_captures_that_turn) {
+    REQUIRE_DATA();
     auto c = makeCrafted(13, 1, ag::SpeciesAbility::ShieldPlanets);
     for (int t = 0; t < 66; ++t) c.advance();  // cad[13] == 66 (aicode.md §6.4)
     CHECK(c.invincibleStar(homeOf(c, 1)));
@@ -204,6 +211,7 @@ TEST(species_shield_planets_blocks_captures_that_turn) {
 }
 
 TEST(species_block_star_lanes_flag_set_on_activation) {
+    REQUIRE_DATA();
     auto c = makeCrafted(14, 1, ag::SpeciesAbility::BlockStarLanes);
     for (int t = 0; t < 92; ++t) c.advance();  // cad[16] == 92 (aicode.md §6.4)
     CHECK(c.laneBlockedStar(homeOf(c, 1)));
@@ -211,6 +219,7 @@ TEST(species_block_star_lanes_flag_set_on_activation) {
 }
 
 TEST(species_more_max_pop_raises_caps_and_cornucopia_adds_pros) {
+    REQUIRE_DATA();
     // PIN t280 for the CITED body law SA_MoreMaxPop 0x4402a (aicode.md §6.3
     // t280 erratum: §6.3 never documented this body; jump-table case al=9):
     // EVERY owned planet's PRE-CLAMP cap seed word += 2 (capBase, the +0x55
@@ -234,6 +243,7 @@ TEST(species_more_max_pop_raises_caps_and_cornucopia_adds_pros) {
 }
 
 TEST(species_cornucopia_repaints_min_pop_colony_t281) {
+    REQUIRE_DATA();
     // PIN t281 for the CITED body law SA_Cornucopia 0x43de4 (aicode.md §6.3
     // t99 + t281 raw re-read work/t280_bodies.txt:152; docs/re/_wip_t281.md):
     // SELECT the owned planet with MIN pop (+0x42; skip terrainRow==10, the
@@ -312,6 +322,7 @@ TEST(species_cornucopia_repaints_min_pop_colony_t281) {
 }
 
 TEST(species_steal_research_fires_and_is_capped_by_ownership_rule) {
+    REQUIRE_DATA();
     auto c = makeCrafted(17, 1, ag::SpeciesAbility::StealResearch);
     const int before = c.techsOwned(1);
     for (int t = 0; t < 63; ++t) c.advance();  // cad[12] == 63 (aicode.md §6.4)
@@ -324,6 +335,7 @@ TEST(species_steal_research_fires_and_is_capped_by_ownership_rule) {
 }
 
 TEST(species_cause_war_two_party_boundary_t280) {
+    REQUIRE_DATA();
     // PIN t280 for the CORRECTED SA_Hatred law (raw 0x440b5..0x4414c,
     // work/t280_bodies.txt; aicode.md §6.3 t280 amendment E3). The vendor
     // ceilings word[row(x)+0x1b2+2k] == att[x->k] (third party x toward
@@ -354,6 +366,7 @@ TEST(species_cause_war_two_party_boundary_t280) {
 }
 
 TEST(species_industry_boost_is_per_planet_accumulator_t256) {
+    REQUIRE_DATA();
     // PIN for the t256 upgrade of SA_IndustryBoost to the CITED body law
     // 0x4418e (aicode.md §6.3 t99): every own planet WITH a pending
     // project gets WORD [p+0x50] += 100 (buildAcc analog); the empire
@@ -386,6 +399,7 @@ TEST(species_industry_boost_is_per_planet_accumulator_t256) {
 }
 
 TEST(species_free_research_completes_only_the_queued_row_t256) {
+    REQUIRE_DATA();
     // PIN for the t256 upgrade of SA_FreeResearch to the CITED body law
     // 0x4414e (aicode.md §6.3 t99 + t105): completes the row ALREADY
     // being pursued (target != 0xffff -> progress := cost); with nothing
@@ -411,6 +425,7 @@ TEST(species_free_research_completes_only_the_queued_row_t256) {
 }
 
 TEST(species_player_species_selection) {
+    REQUIRE_DATA();
     // Chronomyst (specnum 18, passive FastLaneTravel): the player gets it and
     // no AI keeps a duplicate of the player's own species set-up.
     auto c = makeCrafted(31, 1, ag::SpeciesAbility::Unknown, /*playerSpecies=*/18);
@@ -425,12 +440,14 @@ TEST(species_player_species_selection) {
 }
 
 TEST(species_unknown_ability_campaign_is_silent) {
+    REQUIRE_DATA();
     auto c = makeCrafted(7, 1, ag::SpeciesAbility::Unknown);
     for (int t = 0; t < 95; ++t) c.advance();  // past two full charge cycles
     for (const auto& e : c.events()) CHECK(e.text.find("SA_") == std::string::npos);
 }
 
 TEST(species_campaign_with_abilities_reaches_victory) {
+    REQUIRE_DATA();
     // The abilities must not deadlock the loop (no-victory-in-N is the
     // bar earlier turn-loop bugs died on). T37 note: the class-cell
     // channel law (income-law.md T35/T36b) shifts this seed's timeline —
@@ -449,6 +466,7 @@ TEST(species_campaign_with_abilities_reaches_victory) {
 }
 
 TEST(species_determinism_with_abilities) {
+    REQUIRE_DATA();
     auto a = makeCrafted(555, 2, ag::SpeciesAbility::SapAlienPower);
     auto b = makeCrafted(555, 2, ag::SpeciesAbility::SapAlienPower);
     for (int t = 0; t < 120 && !a.over(); ++t) {
@@ -463,6 +481,7 @@ TEST(species_determinism_with_abilities) {
 // --- end-capt / end-unit evaluation (docs/re/turnloop.md §1) -------------
 
 TEST(victory_condition_files_all_mapped) {
+    REQUIRE_DATA();
     // All five vendor end-*.txt files are now evaluated in checkVictory;
     // the enum->file mapping must cover every one (this is what changed:
     // Captured/Unification were previously "not evaluated" rows).
@@ -476,6 +495,7 @@ TEST(victory_condition_files_all_mapped) {
 }
 
 TEST(victory_end_capt_reachable_small_ffa) {
+    REQUIRE_DATA();
     // Captured = player owns every AI's setup home star. Player Minions
     // (guaranteed invasions) vs 2 AI on a small FFA map. Whether a bot game
     // reaches it is dynamics, not the evaluation contract; but the check IS
@@ -495,6 +515,7 @@ TEST(victory_end_capt_reachable_small_ffa) {
 }
 
 TEST(victory_peace_acceptance_ends_player_war) {
+    REQUIRE_DATA();
     // diplomacyPhase now acts on ProposePeace (accept-threshold argument in
     // campaign.cpp): a race at war whose attitude recovers past its
     // PROPOSE_PEACE ends that war. 1-AI non-FFA game; watch for the pair.

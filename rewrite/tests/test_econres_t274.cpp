@@ -76,6 +76,7 @@ bool hasItem(ag::Campaign& c, int star, const char* name) {
 // on planets whose item set is unchanged.
 // ---------------------------------------------------------------------------
 TEST(e2e_income_channel_rates_t274) {
+    REQUIRE_DATA();
     auto c = makeCampaignForDemolish(77);
     c.advance();  // t1: AI homes queue, selector state established
     // Snapshot words + built/pending state; over 8 idle-bracket turns the
@@ -134,6 +135,7 @@ TEST(e2e_income_channel_rates_t274) {
 // buildPhase in advance()).
 // ---------------------------------------------------------------------------
 TEST(e2e_growth_counter_law_t274) {
+    REQUIRE_DATA();
     auto c = makeCampaignForDemolish(99);
     int wraps = 0, ticks = 0;
     for (int t = 0; t < 80; ++t) {
@@ -190,6 +192,7 @@ TEST(e2e_growth_counter_law_t274) {
 // cited law, re-measurable by un-commenting the printf.
 // ---------------------------------------------------------------------------
 TEST(e2e_build_queue_opening_t274) {
+    REQUIRE_DATA();
     auto c = makeCampaignForDemolish(7);
     const int nstars = static_cast<int>(c.galaxy().stars.size());
     // t0: nothing queued anywhere (fresh world; selector first runs in t1's
@@ -267,6 +270,7 @@ TEST(e2e_build_queue_opening_t274) {
 //       sum of raw RES channel words, the same quantity researchPhase moves).
 // ---------------------------------------------------------------------------
 TEST(e2e_research_tier_chain_t274) {
+    REQUIRE_DATA();
     auto c = makeCampaignForDemolish(2024);
     const int nrow = c.techCountTotal();
     CHECK(nrow == 106);  // 66 main + 40 variants on the shipped file

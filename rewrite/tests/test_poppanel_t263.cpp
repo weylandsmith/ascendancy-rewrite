@@ -28,6 +28,7 @@ const std::string kA01 = kRepo + "/extracted/ascend01/data/";
 }  // namespace
 
 TEST(poppanel_gwshare_entry44_t263) {
+    REQUIRE_DATA();
     // LIBRARY-CHAIN pin (file half; live-RAM half cited t254: [0x6fd9c]=44 ->
     // cache slot 44 verbatim == 17np.shp). gwshare.txt is CRLF + blank-line
     // separated with a 0x1a terminator: the CACHE SLOT INDEX is the 0-based
@@ -58,6 +59,7 @@ TEST(poppanel_gwshare_entry44_t263) {
 }
 
 TEST(poppanel_17np_library_census_t263) {
+    REQUIRE_DATA();
     // Record census + the byte-level ICON<->ROLE binding (fixture:
     // _wip_t263.md S2/S3, measured this session on game.pal 6-bit v*255//63).
     ShapeLibrary lib;
@@ -139,6 +141,7 @@ TEST(poppanel_17np_library_census_t263) {
 }
 
 TEST(poppanel_grid_geometry_t263) {
+    REQUIRE_DATA();
     // Panel rect + pitch arithmetic (_wip_t263.md S5).
     CHECK(au::kPlPopRect.x0 == 355);  // windows.txt:1591
     CHECK(au::kPlPopRect.y0 == 7);    // windows.txt:1592
@@ -180,6 +183,7 @@ TEST(poppanel_grid_geometry_t263) {
 }
 
 TEST(poppanel_campaign_integration_t263) {
+    REQUIRE_DATA();
     // End-to-end: campaign band law -> layout law. Table wiring mirrors
     // test_campaign.cpp's tables() verbatim (loaders, paths, race00..05).
     static ag::StarStats stats;

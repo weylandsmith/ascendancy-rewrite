@@ -67,6 +67,7 @@ std::vector<bool> techs(bool owned) { return std::vector<bool>(techCount(), owne
 }  // namespace
 
 TEST(campaign_fleet_engagement_t365_p1) {
+    REQUIRE_DATA();
     // Drive a real FFA campaign until combat happens; the per-ship engine
     // must have records, engagement state, and a death when stars fall.
     ag::Campaign c = makeCampaignForDemolish(2024);
@@ -98,6 +99,7 @@ TEST(campaign_fleet_engagement_t365_p1) {
 }
 
 TEST(campaign_fleet_oracle_equivalence_t365_p2) {
+    REQUIRE_DATA();
     // THE seed-comparison evidence, exact per-engagement form. Aggregate
     // expectation from the oracle (attackScore demoted body + the cited
     // absorb split) vs the bridge's per-ship run, fleetDamage == 0.
@@ -164,6 +166,7 @@ TEST(campaign_fleet_oracle_equivalence_t365_p2) {
 }
 
 TEST(campaign_fleet_chase_targetpos_t365_p3) {
+    REQUIRE_DATA();
     // S6 decision (a): the bridge sets shooter targetPos := victim pos at
     // stance time (the walk-toward-+0x68 leg is uncited — not modelled).
     ag::CampaignFleetBridge b(7);
@@ -179,6 +182,7 @@ TEST(campaign_fleet_chase_targetpos_t365_p3) {
 }
 
 TEST(campaign_fleet_determinism_t365_p4) {
+    REQUIRE_DATA();
     // Equal seeds trace identically THROUGH the flip (determinism pin, not
     // pre-t365 preservation — see bridge S11 trajectory note), and the
     // per-ship engine digest is part of the reproducible state.
@@ -195,6 +199,7 @@ TEST(campaign_fleet_determinism_t365_p4) {
 }
 
 TEST(campaign_fleet_census_agreement_t365_p5) {
+    REQUIRE_DATA();
     // Over a real 40-turn FFA run: EVERY non-guaranteed, non-sapped
     // engagement's per-ship verdict equals the oracle recomputation from the
     // recorded inputs. Sapped facts are counted, never thresholded.

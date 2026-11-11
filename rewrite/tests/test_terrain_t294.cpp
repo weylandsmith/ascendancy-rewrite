@@ -52,6 +52,7 @@ int barrenPct(const ag::Campaign& c, int n) {
 }  // namespace
 
 TEST(terrain_tables_match_measured_runtime_0x744f4) {
+    REQUIRE_DATA();
     ag::TerrainTables tt;
     std::string err;
     CHECK(ag::loadTerrainTables(kPlanitem.string(), tt, err));
@@ -73,6 +74,7 @@ TEST(terrain_tables_match_measured_runtime_0x744f4) {
 }
 
 TEST(terrain_weights_are_consumed_not_hardcoded) {
+    REQUIRE_DATA();
     // All rows [100,0,0,0]: scaled w0 = 32767, so rng(0..32767) < w0 on every
     // draw -> BARREN everywhere (r==32767 exactly takes the chain's class-1
     // remainder; >=99.9% barren is the law's own prediction). Control: the
@@ -90,6 +92,7 @@ TEST(terrain_weights_are_consumed_not_hardcoded) {
 }
 
 TEST(terrain_surface_grid_is_consumed) {
+    REQUIRE_DATA();
     // Grid C patched to 1 cell per size class: every planet carries exactly
     // one surface cell (+10 orbital), whatever the size draw.
     ag::TerrainTables one = ag::vendorTerrainTables();
@@ -104,6 +107,7 @@ TEST(terrain_surface_grid_is_consumed) {
 }
 
 TEST(terrain_pop_growth_scalar_is_consumed) {
+    REQUIRE_DATA();
     // popGrowth 1: every turn with stored PROS >= 1 wraps immediately, so pop
     // climbs to cap fast; stock 50 is the ~25-turn cadence (income-law S6c).
     ag::TerrainTables fast = ag::vendorTerrainTables();
@@ -120,6 +124,7 @@ TEST(terrain_pop_growth_scalar_is_consumed) {
 }
 
 TEST(terrain_loader_rejects_out_of_range) {
+    REQUIRE_DATA();
     namespace fs = std::filesystem;
     const fs::path tmp = fs::temp_directory_path() / "t294_bad_planitem.txt";
     std::string err;

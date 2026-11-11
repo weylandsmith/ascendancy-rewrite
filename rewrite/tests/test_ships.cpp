@@ -70,6 +70,7 @@ ag::Campaign makeShipCampaign(unsigned seed, int aiCount = 6) {
 }  // namespace
 
 TEST(ship_hull_rows_verified) {
+    REQUIRE_DATA();
     std::string err;
     auto items = tables().items;
     int ship = -1, yard = -1;
@@ -83,6 +84,7 @@ TEST(ship_hull_rows_verified) {
 }
 
 TEST(ship_drive_levels_verified) {
+    REQUIRE_DATA();
     int drives = 0;
     for (const auto& g : tables().gizmos) {
         if (g.cat != ag::GizmoCat::Drive) continue;
@@ -106,6 +108,7 @@ TEST(ship_drive_levels_verified) {
 }
 
 TEST(ship_drive_hops_gate_launches) {
+    REQUIRE_DATA();
     // Early turns: drives gated (resReq row 7) -> grounded owners must have
     // driveHopsFor 0 or a researched ladder value; after enough turns owner
     // 0 must clear the gate and reach hops>=1.
@@ -116,6 +119,7 @@ TEST(ship_drive_hops_gate_launches) {
 }
 
 TEST(ship_expansion_survives_gates) {
+    REQUIRE_DATA();
     // The gate-critical invariant: Shipyard launch precondition + drive-range
     // BFS must not stall expansion to the point of no-victory (mirrors the
     // frozen-front bug the fortify fix addressed). T37: the class-cell

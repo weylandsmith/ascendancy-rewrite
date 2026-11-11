@@ -85,15 +85,18 @@ void checkAgainstGolden(const std::string& path, const std::string& base) {
 }  // namespace
 
 TEST(flc_logic_golden) {
+    REQUIRE_DATA();
     checkAgainstGolden(kRepo + "/game/logic.flc", "logic.flc");
 }
 
 TEST(flc_intro_golden) {
+    REQUIRE_DATA();
     checkAgainstGolden(kRepo + "/extracted/ascend02/data/intro65a.flc",
                        "intro65a.flc");
 }
 
 TEST(flc_header_facts) {
+    REQUIRE_DATA();
     // Both vendor files: 640x480x8, speed 71 ms; the header's frame count
     // excludes the ring frame (docs/re/flc.md §1 measurements).
     af::Flic f;
@@ -111,6 +114,7 @@ TEST(flc_header_facts) {
 }
 
 TEST(flc_ring_copy_decodes) {
+    REQUIRE_DATA();
     // The ring frame of logic.flc is the vendor's wrong-sized FLI_COPY
     // (declared 307204, true 6+640*480; compuphase "Frequent errors",
     // docs/re/flc.md §1). With the repair in force, replay() must SUCCEED

@@ -92,6 +92,7 @@ ShipSave::Record synthetic() {
 }  // namespace
 
 TEST(shipsave_writeback_idempotent_t366) {
+    REQUIRE_DATA();
     if (!fs::exists(kRepo + "/work/ascend_payload.bin") ||
         !fs::is_directory(kRepo + "/work/r1/playcap/save")) {
         std::printf("(skip: work/ corpus absent) ");
@@ -138,6 +139,7 @@ TEST(shipsave_writeback_idempotent_t366) {
 }
 
 TEST(shipsave_synthetic_roundtrip_and_patch_law_t366) {
+    REQUIRE_DATA();
     // Field-level round-trip through the rewrite (spec S7 fallback): serialize
     // a synthetic record into a patterned buffer, re-read it by hand at the
     // cited offsets, and assert the unmodelled gaps kept the pattern.
@@ -193,6 +195,7 @@ TEST(shipsave_synthetic_roundtrip_and_patch_law_t366) {
 }
 
 TEST(shipsave_rebase_and_refusals_t366) {
+    REQUIRE_DATA();
     // rebaseRecord shifts ONLY the three pointer-valued fields (t298 law;
     // delta = B_new - B_old per the CLOSED pointer law runtime = P0 + off).
     ShipSave::Record r = synthetic();

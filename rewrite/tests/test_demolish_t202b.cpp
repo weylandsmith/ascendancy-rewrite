@@ -17,6 +17,7 @@ namespace ag = ascend::game;
 ag::Campaign makeCampaignForDemolish(unsigned seed);  // test_campaign.cpp
 
 TEST(campaign_demolish_pickers_t202b) {
+    REQUIRE_DATA();
     // ---- OVER-CAP VICTIM 0x3f1bb..0x3f1c7 (pure statics) ----------------
     // (O1) empty slots / empty planet -> no candidate (the original takes
     //      the 0x3f20b assert/recalc RETURN path).
@@ -61,6 +62,7 @@ TEST(campaign_demolish_pickers_t202b) {
 }
 
 TEST(campaign_used_pop_item_sum_t202b) {
+    REQUIRE_DATA();
     // +0x4c = UPOP SUM over slotted items (r202d model M4, 2760/2900 exact;
     // 140-row residual = Automation shape M3): item 23 (Ship) and
     // flags&0x40 rows (20 Outpost, 21 Transport Tubes) excluded; the
@@ -96,6 +98,7 @@ TEST(campaign_used_pop_item_sum_t202b) {
 }
 
 TEST(campaign_over_cap_demolish_e2e_t202b) {
+    REQUIRE_DATA();
     // END-TO-END over-cap channel: an AI planet at used == pop == cap (the
     // 220/2900 corpus shape, r202_triage_census) demollishes ONE Factory
     // within a single advance(), the 0x3f1fb recheck passes (used' < pop —
@@ -123,6 +126,7 @@ TEST(campaign_over_cap_demolish_e2e_t202b) {
 }
 
 TEST(campaign_barren_sweep_demolishes_cb_e2e_t202b) {
+    REQUIRE_DATA();
     // SWEEP CHANNEL END-TO-END through the 0x3f252 pre-triage gate: a planet
     // with BOTH surface cells occupied (eNR == 0 < 2 -> triage RUNS; the
     // healthy-planet skip needs eNR>=2) is swept even though it is NOT
