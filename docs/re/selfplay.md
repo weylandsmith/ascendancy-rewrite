@@ -1050,3 +1050,16 @@ Attempt 2 (work/r1/dbg-t346-20261109-025150) was killed by the driver at
 campaign-entry after attempt 1 produced the decisive banked witness
 (recursive pkill self-match caveat banked in STATE.md) — no keys-phase
 data in that dir.
+
+## RIGHT-CLICK DESELECT LAW (user testimony 2026-11-11 + LIVE WITNESS same day)
+Testimony (verbatim): "when you've selected a ship, if you want to un-select
+it and select something else, you first right-click (perhaps in empty space,
+that's what I'm in the habit of doing) to clear the ship selection."
+WITNESS (Atropos system view, root (180,250) empty-space Button3 via xsend
+click3): BEFORE right panel = ship Stainer header (portrait + status bars),
+white selection box on map; AFTER = box GONE, panel header = star context
+"Atropos / Blue Medium" + planet list, no status bars. Header-zone md5
+b8f62f5325 -> 1efc92201c. Screens work/screens/t5/rightclick-probe-{0,1}.png.
+Implication for scripted driving: every ship-select sequence must begin with
+Button3 deselect, or stale selection hijacks the next click (candidate cause
+for t293-class selection failures — CHECK before re-running captures).
