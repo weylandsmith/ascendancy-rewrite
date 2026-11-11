@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-11T03:55
+updated: 2026-11-11T04:15
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,22 +222,27 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t372 LICENSE DRAFT (queue row t372 below; ordering rationale:
-t371 DISTRIBUTION SPLIT LANDED 2026-11-11 (docs/re/packaging.md —
-inventory, excluded set, case audit 0/0/0/0, CI draft, README draft
-docs/re/_readme_draft_t371.md), so the queue advances verbatim to t372.
-t372 is docs-only, no capture stack. BEFORE t372 work: the same OPTIONAL
-play-window check as always — python3 scripts/r369_playwindow.py exit 0
-=> BANK the ring IMMEDIATELY (cp -p work/r1/playcap/save/*.sav
-work/r1/bank-play-<date>-tNNN/; t371 banked bank-play-20261111-t371/
-covering 02:22-03:37, r370 events=0 in that span = idle/no orders), then
-r370_slot_events + r369 censuses on the NEW frames. Session was still
-LIVE at t371 end (turn 1254, production pid 107664, TL to 2026-11-17).
-LICENSE-specific lead: motesandbeams.com about page (Todd Templeman
-contact route) is cited in the queue but NOT yet fetched — fetch ONCE
-under the URL policy during t372 and bank the quote in packaging.md S8.
-Publisher-rights caveat from t371 (Wikipedia: Virgin/Broderbund/Softgold):
-NOTICE prose must not assert the dev grant covers publisher rights.
+NEXT t373 REPO HYGIENE EXECUTION (queue row t373 below; ordering rationale:
+t372 LICENSE DRAFT LANDED 2026-11-11 (docs/re/_license_draft_t372.md +
+_notice_draft_t372.md; packaging.md S10; D5 in DECISIONS.md), so the queue
+advances verbatim and t373's "only if t371/t372 green" condition is MET
+(both landed, gate green each). t373 is docs+files work, no capture stack.
+EXECUTE the atomic root swap per _license_draft S3: install GPL-3 text ->
+LICENSE (assert md5 1ebbd3e34237af26da5dc08a4e440464 + sha256 3972dc97...
+36986), NOTICE from _notice_draft_t372.md (strip draft-comment header),
+README from _readme_draft_t371.md (contact placeholder already resolved),
+.gitignore per packaging.md S3 + `git rm --cached` the 4 tracked work/
+survivors (t371 landmine), SPDX headers per _license_draft S4 sweep rules
+(504-506 file census measured t372; archive/ SKIPPED), gate + run_tests
+green after. t373 checklist ALSO carries the t371 quote-audit item
+(packaging.md S9a: longest verbatim vendor span per docs/re/*.md). GitHub
+push stays USER-gated. BEFORE t373 work: OPTIONAL play-window check —
+python3 scripts/r369_playwindow.py; if exit 0 AND lo_ns CHANGED from
+1794373326560000000 (t370/t371/t372 all saw the SAME window = idle since
+~02:22; t372 banked bank-play-20261111-t372/ covering 03:32-03:54,
+r370 events=0 = still idle), THEN bank the ring + r370_slot_events +
+r369 censuses on NEW frames first. Session still LIVE (turn 1254, pid
+107664, TL to 2026-11-17).
 
 QUEUE (phase 8 — PLAYTEST HARVEST + PACKAGING; user decisions 2026-11-10:
 ship WITHOUT vendor data; license = GPL-3.0 + written grant to original
@@ -245,15 +250,6 @@ creators (D5 drafted t372); OQ-016/OQ-019 acceptance + D3 DEFERRED pending
 tonight's playtest witnesses. One session each; finish tN -> rewrite NEXT to
 tN+1 VERBATIM; keep this block intact except deleting completed rows.
 Context: docs/re/_wip_playtest_t369.md (testimony + signatures + baselines).
-
-t372 LICENSE DRAFT: LICENSE = GPL-3.0-or-later (full text verbatim); NOTICE
-      file: dual-grant offer to the original creators (Todd Templeman per
-      motesandbeams.com about page — co-founder The Logic Factory; contact
-      offer, grant scope = unrestricted incl. commercial use, at their
-      option; explicit that it changes nothing for everyone else) + vendor-
-      data exclusion statement. Add SPDX headers sweep plan (list files,
-      don't bulk-edit blind: headers land with t373). DECISIONS.md: add D5
-      'APPLIED 2026-11-10 user decision: GPL-3.0-or-later + creator grant'.
 
 t373 (only if t371/t372 green) REPO HYGIENE EXECUTION: .gitignore additions
       if any; SPDX headers on rewrite/src + tools + scripts entry files;
@@ -325,6 +321,54 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t372 — 2026-11-11 (LICENSE DRAFT: GPL-3.0-OR-LATER + CREATOR
+GRANT OFFER DRAFTED, CONTACT ROUTE CITED BY THE ONE APPROVED FETCH —
+docs/re/_license_draft_t372.md + _notice_draft_t372.md)
+Steering check per NEXT: ring parsed 20/20 turn 1254; r369_playwindow exit
+0 but lo_ns UNCHANGED (1794373326560000000 = same t370 window); timeline
+live (03:52:50); r370_slot_events over post-t371-bank span (lo = bank mtime
+ns 1794385936844000000): frames=141 wall 03:32:18->03:54:29, events=0 —
+user idle since ~02:22, nothing new to witness, t372 assignment stands.
+Ring banked anyway per rotation law -> work/r1/bank-play-20261111-t372/
+(20 slots, 43 MB).
+LICENSE TEXT: source = /usr/share/common-licenses/GPL-3 (Debian
+common-licenses) MEASURED verbatim-ready: 35,149 B / 674 L, md5
+1ebbd3e34237af26da5dc08a4e440464, sha256 3972dc97...36986; structure greps
+all pass (header L1-2, FSF verbatim-copy notice L4-6, TERMS L71, sections
+0..17 L73..L612, END OF TERMS L621, apply-appendix L623). HONEST NEGATIVE:
+byte-diff vs gnu.org NOT run (URL budget = 1 fetch, spent below); hashes are
+the anchor of record. "or later" shape: LICENSE = v3 text alone; the + lives
+in per-file SPDX ids + notice blocks (S2).
+THE APPROVED FETCH: motesandbeams.com/about.html — VERBATIM "created by
+Todd Templeman ... co-Founder of The Logic Factory, developer of the
+original Space Strategy game, Ascendancy"; contact routes mailto
+contact@motesandbeams.com + X @motesandbeams; site live/maintained (Mobe
+public testing). SCOPE STATED HONESTLY: page carries NO rights statement —
+the NOTICE grant is an OFFER, nothing closes on it. Quote + caveat banked
+packaging.md S8; README draft <TBD-t372> placeholder resolved with the cited
+route.
+NOTICE DRAFT (_notice_draft_t372.md): GPL header block; dual-grant offer
+(unrestricted incl. commercial, at their option, changes nothing for anyone
+else, explicit "no license has been granted to us, we claim none");
+publisher caveat honored per t371 (offer covers OUR code only; Virgin/
+Broderbund/Softgold rights may sit elsewhere — text says so); vendor-
+exclusion + abandonware-is-not-a-license statements.
+SPDX SWEEP CENSUS (measured, git ls-files x ext filter x first-400B scan):
+506 code-ish tracked files, HAS=0 (rewrite 82, scripts 418, tools 3,
+archive 1, work 2). Sweep rules banked S4 (comment-first-line per language,
+archive/ skipped, work survivors leave the set if untracked -> 504,
+post-sweep grep -rL must be empty + gate green).
+DECISIONS.md: D5 ADDED 'APPLIED 2026-11-10 user decision: GPL-3.0-or-later
++ creator grant'; still-user-gated items named (author identity for
+published copyright lines, artifacts/, remote). Landing procedure atomic at
+t373 per S3 (root LICENSE/NOTICE confirmed ABSENT this session — drafts
+unclobberable). HAND-AUTHORED CONTROL re-run: no script opens packaging.md/
+README draft/license drafts for writing.
+LEDGER: NO OQ ROW TOUCHED (license adoption is a decision application, not a
+measurement; strict-close trivially holds — nothing closable, nothing
+closed). 17 closed / 2 open (OQ-016, OQ-019) unchanged. GATE_EXIT=0,
+ledger_audit OK, ledger_index_check OK, game/ untouched. NEXT = t373 VERBATIM.
 
 ## LANDED t371 — 2026-11-11 (DISTRIBUTION SPLIT: PUBLISHABLE INVENTORY,
 EXCLUDED SET, CASE AUDIT CLEAN, CI DRAFT, README DRAFT — docs/re/packaging.md)

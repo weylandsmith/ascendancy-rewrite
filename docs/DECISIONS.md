@@ -133,6 +133,16 @@ sessions are RAM-hungry. A 4th core only speeds compiles — model inference doe
 not run on this box, so neither change changes loop pace. Take it if free,
 otherwise fine as-is.
 
+## D5 — License for the public engine repo
+>>> APPLIED 2026-11-10 user decision: GPL-3.0-or-later + creator grant
+>>> (drafted t372: docs/re/_license_draft_t372.md landing procedure + SPDX
+>>> census 506 files/0 headers; docs/re/_notice_draft_t372.md dual-grant +
+>>> vendor-exclusion text; motesandbeams.com fetched once per pre-approval —
+>>> Todd Templeman identity + contact route CITED, no rights statement on
+>>> the page, so the grant stays an OFFER, nothing closes). Root
+>>> LICENSE/NOTICE land atomically with README+.gitignore at t373.
+>>> Still yours: published author identity, artifacts/ inclusion, remote.
+
 ## Resolved without you since the last check-in (no action needed)
 - OQ-021 CLOSED by the debugger you green-lit: master-built dosbox-x, BPLM
   watchpoint, live presenter witness ("Your score is 42%", threshold V >=

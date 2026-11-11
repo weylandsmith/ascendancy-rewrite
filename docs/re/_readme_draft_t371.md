@@ -95,4 +95,7 @@ successor or rights-holder of The Logic Factory: we additionally offer, at
 your option and in writing on request, an unrestricted license to this
 codebase including commercial use, so that an official re-release would
 never be encumbered by our copyleft. This offer changes nothing for anyone
-else: everyone else's terms remain GPL-3.0-or-later. Contact: <TBD-t372>.
+else: everyone else's terms remain GPL-3.0-or-later. Contact:
+contact@motesandbeams.com (Todd Templeman — per his company about page,
+co-founder of The Logic Factory; fetched 2026-11-11, quoted in
+docs/re/packaging.md S8) or via this repository's issue tracker.

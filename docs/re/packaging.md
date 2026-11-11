@@ -108,9 +108,20 @@ land atomically).
   Virgin Interactive / Broderbund / Softgold — publisher-side rights may sit
   elsewhere than the developer; NOTICE prose must not assert the dev grant
   covers publisher rights.
-- motesandbeams.com (Todd Templeman about page) is cited in the STATE queue
-  as the contact route; NOT re-fetched this iteration (URL-fetch policy: 1
-  per approval) — [unverified] here; t372 should fetch once with approval.
+- motesandbeams.com about page FETCHED 2026-11-11 (t372 — the queue row
+  pre-approved exactly this one fetch). Verbatim quote: "Mobe, short for
+  Motes and Beams, was created by Todd Templeman, author of Space Pilot
+  Connor Grant and co-Founder of The Logic Factory, developer of the
+  original Space Strategy game, Ascendancy." Page contact routes: mailto
+  contact@motesandbeams.com, X @motesandbeams (the page says the company is
+  in public testing of "Mobe", hiring C++/3D/open-source people — i.e. the
+  site is live and maintained). [verified
+  https://www.motesandbeams.com/about.html 2026-11-11]
+  HONEST SCOPE: the page establishes Todd Templeman's TLF co-founder
+  identity and a live contact channel ONLY. It contains NO licensing or
+  rights statement. The creator grant in the NOTICE draft is therefore an
+  OFFER addressed to him (and the other creators/rights holders), not a
+  grant received — nothing here closes anything.
 - Legal caveat for the README: "abandonware" is a distribution norm, not a
   license. Our tree ships NO vendor data (§3), so our copyright exposure is
   code + prose only; the artifacts/ conditional (§2) is the one gray item.
@@ -131,3 +142,24 @@ land atomically).
     states the limitation honestly.
 (c) SDL2_mixer on vcpkg: availability/versions as of 2026-11 NOT checked
     (no vcpkg here); the CI row is a DRAFT, not a verified matrix.
+
+## 10. t372 LICENSE DRAFT (appended 2026-11-11; S1-S9 above unchanged)
+
+Deliverables (all drafts; root swap stays atomic at t373 per S7):
+- docs/re/_license_draft_t372.md — GPL-3.0-or-later adoption record: text
+  source /usr/share/common-licenses/GPL-3 (md5 1ebbd3e3..., sha256
+  3972dc97...36986, 674 L, structure greps pass); landing procedure;
+  SPDX sweep census MEASURED 506 code-ish tracked files, 0 with headers
+  (rewrite 82, scripts 418, tools 3, archive 1, work 2 — work survivors
+  leave the set if t373 untracks them: 504).
+- docs/re/_notice_draft_t372.md — NOTICE body: GPL header block, dual-grant
+  offer to the creators (OFFER, not grant; publisher-rights caveat honored —
+  says explicitly the offer covers OUR code only), vendor-exclusion
+  statement, abandonware-is-not-a-license note.
+- docs/re/_readme_draft_t371.md: <TBD-t372> contact placeholder RESOLVED
+  with the cited motesandbeams.com route (S8).
+- docs/DECISIONS.md: D5 added, APPLIED 2026-11-10 user decision.
+Honest negatives: no byte-diff vs gnu.org (URL budget spent on S8 fetch;
+md5/sha256 anchored instead); author identity, artifacts/, remote stay
+user-gated. No OQ row touched (license is not a measurement; strict-close
+trivially satisfied — nothing closable and nothing closed).
