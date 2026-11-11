@@ -104,3 +104,131 @@ Slot attribution via ship_raw words[26:] (record +0x34 name law, spec S1):
 4. IF the user ends the turn tonight: re-scan post-end-turn frames for
    combat resolution (Stainer vs Ungooma ship; Gofriller vs planet),
    invasion effect, and the per-ship loss bookkeeping t364 predicts.
+
+## t370 TOOL PASS (scripts/r369_*, run 2026-11-11 ~01:15) — WINDOW FOUND
+r369_playwindow.py exit 0: first turn!=1086 row = turn 1253 wall 00:02:09,
+lo_ns=1794373326560000000. Ring banked to work/r1/bank-play-20261111/ (20
+slots, ALL turn 1253 => the user's turn was still unended at bank time; the
+bank covers only the last ~200 s of the session, so the 00:02-00:39 events
+exist ONLY in live-timeline.jsonl).
+r369_magnetron_hit.py --window lo -1: 385 deduped slot-samples; C1 carriage
+cidx60 present on 10 slots (use-counter 1); C2 OFF-GRID st4 = 0 hits,
+on-grid st4 = 8871; C3 W2 frames = 0; y-mod-32 histogram {0.0: 8871} (y is
+ALWAYS a multiple of 32 in st4 rows).
+r369_order_diff.py --window lo -1: 390 samples; kind histogram {4:8986,
+3:2440, 5:3784, 1:780}; dest-change classes {'BOTH':2} (both slot 18);
+TWO-CLICK (adjacent XY->Z) = 0; gizmo use-counter decrements = 4 (slot2 own2
+cidx0 1->0; slot14 own0 cidx9 3->2; slot34 own0 cidx9 3->2 then 2->1);
+off-32-grid z landings = 0.
+r369_order_diff.py --dir bank-play-20261111: 1 deduped sample (all 20 slots
+identical turn 1253 + identical diffed fields => turn never ended inside the
+bank). Honest negative, instrument not at fault.
+
+## t370 TOOL PASS 2 (scripts/r370_slot_events.py + r370_bank_deref.py, ~01:30-02:20)
+WINDOW EXTENDS: session still live at probe time (timeline mtime 02:19, rows
+to wall 02:18). Full event stream banked work/r1/t370_slot_events_all.txt
+(window lo..EOF at ~01:26 run; 29 lines, events=10). SECOND BANK
+work/r1/bank-play-20261111-late/ taken 02:19: TURN=1254 => the user ENDED THE
+TURN between 01:26 and 02:19. Late bank n=40 ships (was 41).
+STAR COORD SCALE: star-table triples (name-0x14) are 50/50 OFF the 32-grid
+(Vega (359.5,246.4,-60.2)) while SHIP pos records are 32-multiples in st4 —
+different unit scales confirmed (open mapping question; ship-grid law T3
+DAT_000895dc=32 stands for ship space).
+GUANDAGNINI 00:13:50 EVENT (full decode): pos (-1184,1344,-1184)->(1280,-1760,
+1344); kind 4/0x45->4/0x85; tgt 0x256045->0x255c85; type 1->2; pay swap;
+POWER +0x88 90->80 (= Lane Magnetron gizmos.txt idx 60 'Power 10' EXACT);
+RING SLOT REMOVED: slot14 (cidx 60, use 1) GONE post-jump = single-use gizmo
+consumed (NumUses=1 column); +0x8c 40->39 happened LATER (00:24:08, separate
+10-s frame) = 1 dmg point, NOT a charge decrement (spec: +0x8c = INTEGRITY
+hull, combat `sub [esi+0x8c],eax`) — the manual-pass note calling +0x8c
+'charges' is CORRECTED.
++0x59 DECODE (this session, r370_bank_deref): value 0x255c85 = star-record
+NAME SLOT address (Vega chain base 0x255c69 + 0x1c; chain0 Vega @H+0x255be1
+pattern, k=7 name 0x255f09... NOTE: 0x255c85-0x255c69=0x1c = name-0x1c? the
+hit is INSIDE Vega record 0's name field region (name 60B? star name field).
+Deref of FUN_00021f58's target[+8]/[+0x14] at that addr reads zeros/garbage =>
+target object is NOT at the guest-linear addr read naively OR the ptr points
+at an embedded sub-record; the handler's 'target' is the star OBJECT ptr and
+[+0x14] = its triple — at 0x255c85 the bytes AFTER +0x1c ARE the triple slot?
+UNRESOLVED: landing (1280,-1760,1344) is >200 units from EVERY star triple at
+scale 1/5/160 => placement source is NOT star-table xyz at those scales.
+=> magnetron landing-vs-star-xyz mapping UNRESOLVED; on-grid landing is
+CONSISTENT with T3 quantizer applied at commit (FUN_00049aa8 path + walk
+quantizer FUN_000533e0 g=32) — jitter survives only mid-transit (t101: 12/12
+off-grid ships were kind-2 mid-transit). C2 census off-grid test is
+BLIND AT REST by construction; instrument law, not a game law.
+ILMARINEN: 00:20:19 type 0->3 trip:=(-672,32,-2112) (OFF-32? no: all x32) +
+act:=7 + power -2; 00:21:21 kind 4->5 pos:=(0,0,-2144) = lane-entry. LATE
+BANK (post end-turn): pos (28,0,-2144) — x=28 OFF the 32-grid, still kind 5
+= MID-TRANSIT off-grid corroborates T3 'arrival-time-only' quantization.
+SPARROWHAWK s18: 00:24:39 kind 3->4 pos jump d=2240; then 00:24:49/59,
+00:25:10 type=3 trip==pos EXACTLY each frame + pay ptr churns 0x1030000/
+0x14f0000/0x1aa0000 (garbage-looking, NOT deref'd in tl mode) + power
+19->16->11->8 = real-time march steps consumed at 10-s cadence (watcher
+samples the GLIDE, not order commits — answers the manual-pass CHECK item).
+AI ships s2/s11/s12/s23 own2 at 00:24:08: power burns + ring slot u16 arg
+0xFFFFFFFF churn = AI order issue at the same wall frame as player's Stainer
+power burn — end-of-sub-turn batch.
+RING DECREMENT STORY (census r369 4 decrements + slot_events): s14 Stainer
+cidx9 slot13 use 3->2 @00:24:08 (power 90->84 = gizmos.txt idx 9
+Nanomanipulator 'Power 6' EXACT); s34 Gofriller cidx9 slot13 3->2 @00:26:59
+(power -6) then 2->1 @00:27:51 (power -6) = 2 uses. cidx==gizmos.txt ENTRY
+INDEX confirmed for 9 (Nanomanipulator), 60 (Lane Magnetron), 73 (Invasion
+Module — s22 Ignatz LOST 2 slots (73,0,0) @00:28:48 = invasion launched,
+user: 'invade Vernunft I'; effect pending end-turn, check post-1254 bank).
+
+
+## END-TURN RESOLUTION CAPTURED (assistant, 2026-11-11 02:07-02:12; user asleep,
+## blanket grant "do whatever you want / mess with the running game" 23:5x)
+Route notes: NEXTTURN clicks STUCK twice while screen sat in SYSTEM VIEW
+(button exists only on star map; NEW LAW candidate: system-view must Escape
+first — Escape unwinds one level, corroborated). First Escape attempt hit the
+ORPHANED t1555 quit-blocker (xmessage pid 107540, spawned 11:23:30 by the
+SIGTERM'd old dosbox; killed process, window unmapped, game unharmed —
+xsend blocker-refusal worked exactly as designed). Then driver t245 pressed
+turn: 1253 -> 1254, drained 5 popups. ON-DISK USER SAVE UNTOUCHED (no game
+save performed; RAM state 1254, disk stays 1253).
+RESOLUTION WITNESSES (pre=bank-t1253-preresolve/60.sav frame 02:07:27 vs
+post=playcap 60.sav 02:11:36; ship slots via watcher):
+- SLOT 40 DESTROYED: owner 0, design 12, xyz (0,0,0) state 1 pre -> slot gone
+  post (41->40 ships). WHO + WHY UNKNOWN: at star-plane origin in st1; check
+  raw record + AI-attack plausibility; Ungooma att 190->189 same boundary.
+- SLOT 12 (owner 2) state 4->0 owner byte 2->0xFFFF = DEATH-CLEANING law
+  (death handler 0x49d2c class): position FROZEN at last xyz, owner becomes
+  sentinel. AI ship died too (combat or dwell? design 4).
+- POWER RECOVERY at turn boundary: Stainer +0x88 84->90, Gofriller 78->90 =
+  CAP (recharge law trunc([+0x18]*(1+...)) cap hit; both fired orders
+  resolved with charges word +0x8c UNCHANGED 40 -> their shots were NOT
+  gizmo charges; charges law untouched).
+- USER-ORDERED MOVES RESOLVED: Erchamion (-416,-2048,+864), Ipshitz
+  (-416,+896,-1312), Sparrowhawk (0,+256,+384) [user: several Pulveran moves,
+  confirmed], Guandagnini arrived st5->st4 d=(-1504,-1952,+736) continues
+  post-jump travel; 7 AI ships st4->st5 (lane entries) + 5 st5 st5 +14/+28
+  px = transit crawl steps.
+- INVASION: Vernunft I owner byte 255->255 NO CHANGE (planet table 151 recs,
+  base-normalized diff: ZERO owner changes turn 1253->1254). Hypotheses:
+  ground-control is a different field/law, or effect next turn, or invade-
+  own-planet no-op (Vernunft I owner=0 ALREADY player-owned in planet table —
+  CHECK what the user saw on screen; possible the planet is UNOWNED in table
+  sense vs player sense... 255 at +0x24+0x33 vs owner-count dict says
+  Vernunft I owner 0. RE-VERIFY offsets before banking any law).
+- relation.atts Ungooma 190->189 (-1); matrix states unchanged (no war).
+PLANETS: planets_mine 35->35; score_stars 0->14 (watcher field, meaning TBD
+- first non-zero ever? check field law).
+
+## t370 TARGET-DEREF RESOLUTION (execute_code probes on bank-play-20261111-late)
++0x59 VALUE ANATOMY: runtime u32 whose LOW 16 bits are a guest offset into the
+star-name table region (0x255c85 = Vega-rec0 name 0x255c69 + 0x1c; chain base
+H+0x255be1 law). The +0x1c site is ZEROS (star record: name@-0x1c..-0x01,
+triple@-0x14, idx@-0x18; at name+0x1c sits the NEXT record's spare/zero word)
+— reading FUN_00021f58's target[+8]/[+0x14] there gives zeros/garbage. So the
+naive 'target = star object at that linear addr' read FAILS; the handler's
+EDI-based branch (target[0]/target[4] id match) never matches garbage => the
+placement triple must come from a record whose base = +0x59 value MINUS the
+high-byte-tagged stride, or the low16+H rebase law for this field differs.
+UNRESOLVED, banked as instrument question (needs the disasm of 0x220a8's
+target-store leg, not more RAM pokes).
+STAR TRIPLE vs SHIP POS SCALE: Vega table triple (359.5,246.4,-60.2); no
+scale 1/5/160 puts the magnetron landing (1280,-1760,1344) within 200 units.
+type=2 pay ptr deref (0x2589f6) = (-654.8,2055.2,-556.8) = some object triple,
+NOT the landing. => landing source UNIDENTIFIED this session; honest negative.
