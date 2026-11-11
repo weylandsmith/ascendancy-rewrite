@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-11T02:45
+updated: 2026-11-11T03:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,26 +222,22 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t371 DISTRIBUTION SPLIT (queue row t371 below; ordering rationale:
-the playtest harvest t369+t370 LANDED 2026-11-11 — witnesses banked
-ships.md S64, OQ-019 residue-(1) annotated measurement-wise — so the
-phase-8 queue advances to packaging; t371 is docs-only and needs NO
-capture stack). Write docs/re/packaging.md per the queue row:
-publishable-tree inventory, excluded set (game/, extracted/, work/,
-live-timeline), case-sensitivity audit checklist for Windows, CI matrix
-draft, README.md draft for the public repo. NOTE for the README/
-evidence prose: the t369 manual-pass claim '+0x8c charges -1' is
-RETRACTED (t370 M1: +0x8c = INTEGRITY hull; single-use gizmos vanish
-from the +0xab ring slot instead — ships.md S64).
-OPTIONAL FOLLOW-UP (only if the user plays again; run BEFORE t371 if a
-new window exists): python3 scripts/r369_playwindow.py — exit 0 => BANK
-the ring IMMEDIATELY (rotation law ~200 s: cp -p work/r1/playcap/save/*.sav
-work/r1/bank-play-<date>/), then scripts/r370_slot_events.py LO -1 and
-the r369 censuses; session 2026-11-11 was still LIVE at t370 end (turn
-1254, production pid 107664 up to TL 2026-11-17 11:24). Open lead worth
-one probe if witnesses recur: the FUN_00021f58 target rebase law for
-+0x59 (S64 honest-negative (a)) — needs the 0x220a8 target-store disasm
-leg, NOT more RAM pokes.
+NEXT t372 LICENSE DRAFT (queue row t372 below; ordering rationale:
+t371 DISTRIBUTION SPLIT LANDED 2026-11-11 (docs/re/packaging.md —
+inventory, excluded set, case audit 0/0/0/0, CI draft, README draft
+docs/re/_readme_draft_t371.md), so the queue advances verbatim to t372.
+t372 is docs-only, no capture stack. BEFORE t372 work: the same OPTIONAL
+play-window check as always — python3 scripts/r369_playwindow.py exit 0
+=> BANK the ring IMMEDIATELY (cp -p work/r1/playcap/save/*.sav
+work/r1/bank-play-<date>-tNNN/; t371 banked bank-play-20261111-t371/
+covering 02:22-03:37, r370 events=0 in that span = idle/no orders), then
+r370_slot_events + r369 censuses on the NEW frames. Session was still
+LIVE at t371 end (turn 1254, production pid 107664, TL to 2026-11-17).
+LICENSE-specific lead: motesandbeams.com about page (Todd Templeman
+contact route) is cited in the queue but NOT yet fetched — fetch ONCE
+under the URL policy during t372 and bank the quote in packaging.md S8.
+Publisher-rights caveat from t371 (Wikipedia: Virgin/Broderbund/Softgold):
+NOTICE prose must not assert the dev grant covers publisher rights.
 
 QUEUE (phase 8 — PLAYTEST HARVEST + PACKAGING; user decisions 2026-11-10:
 ship WITHOUT vendor data; license = GPL-3.0 + written grant to original
@@ -249,18 +245,6 @@ creators (D5 drafted t372); OQ-016/OQ-019 acceptance + D3 DEFERRED pending
 tonight's playtest witnesses. One session each; finish tN -> rewrite NEXT to
 tN+1 VERBATIM; keep this block intact except deleting completed rows.
 Context: docs/re/_wip_playtest_t369.md (testimony + signatures + baselines).
-
-t371 DISTRIBUTION SPLIT (docs only, no git surgery yet): docs/re/packaging.md
-      — the publishable-tree inventory (rewrite/ docs/ artifacts/ scripts/
-      archive/ LICENSE README), the excluded set (game/, extracted/, work/,
-      live-timeline — vendor data + capture corpus; regenerability notes:
-      scripts/cob.py importer for user-supplied installs), the case-
-      sensitivity audit checklist for Windows, and the CI matrix draft
-      (linux gcc / windows msvc+vcpkg / macos clang+brew; build + run_tests
-      226). README.md draft for the public repo (what this is, evidence
-      rule, build instructions, supply-your-own-data section, abandonware
-      status note w/ archive.org citation, Todd Templeman / Logic Factory
-      credit + license-grant offer text).
 
 t372 LICENSE DRAFT: LICENSE = GPL-3.0-or-later (full text verbatim); NOTICE
       file: dual-grant offer to the original creators (Todd Templeman per
@@ -341,6 +325,56 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t371 — 2026-11-11 (DISTRIBUTION SPLIT: PUBLISHABLE INVENTORY,
+EXCLUDED SET, CASE AUDIT CLEAN, CI DRAFT, README DRAFT — docs/re/packaging.md)
+Steering check FIRST per contract: r369_playwindow exit 0 but SAME window as
+t370 (lo unchanged, first turn!=1086 row t1253 wall 00:02:09); session still
+LIVE (dosbox pid 107664, watcher 107679, turn 1254 frames to 03:37). Banked
+ring cp -p -> work/r1/bank-play-20261111-t371/ (20 slots, all 20 differ from
+bank-play-20261111-late = ring rotated, saves live). r370_slot_events over
+the post-late span (lo_ns 1794400000000000000..EOF): frames=466 wall
+02:22:05->03:37:09, events=0 — NO ship-record field changes: user idle since
+~02:22, nothing new to witness, t371 assignment stands.
+INVENTORY (git ls-files measured): 1362 tracked files, 182.0 MB. Publishable
+set 864 files / ~14.3 MB: rewrite 84/1.03, docs 178/8.11 (docs/re 115),
+scripts 425/2.55, archive 166/2.03 (state-v2-full 159 + ralph-v1 7; vendor-
+extension grep inside archive = 0 hits), artifacts 6/0.62, tools 3, root 2.
+Excluded: game 23/94.2 MB + extracted 471/73.5 MB (167.7 MB vendor bytes —
+user decision 2026-11-10: ship WITHOUT vendor data), work/ 17 GB incl
+live-timeline.jsonl 9.1 GB (largest single file, live-appended).
+LANDMINE FOUND (measured, not theorised): work/ is gitignored BUT 4 files
+are tracked anyway (historical add -f): work/r1/sentinel_t369.sh,
+work/r1/t368_ring_turn.py, work/r363_gizmo_census.out,
+work/r363_gizmo_rows.json — a naive publish filter dropping work/ MISSES
+them; t373 disposition listed in packaging.md S3.
+CASE AUDIT (Windows, mechanical over 1362 paths): case-collisions 0,
+file/dir case collisions 0, non-ASCII 0, spaces 0 — tree is Windows-clone
+safe at path level; runtime-include/case checklist for t373 banked S5.
+CI DRAFT S6: ubuntu/gcc13/apt-SDL2 vs windows/msvc/vcpkg vs macos/clang/
+brew, scope = cmake build + run_tests (226 tests 0 failed MEASURED this
+iteration ./rewrite/build/run_tests); capture-stack gate stages out of CI;
+vcpkg sdl2-mixer availability NOT verified (no vcpkg on box) — draft status
+stated honestly.
+IMPORTER CONTROL: scripts/cob.py list game/ascend00.cob -> '54 entries,
+table=ok' (extract subcommand exists, cmd_extract cob.py:82); ascend01/02
+compressed-side importer NOT verified end-to-end -> supply-your-own-data
+flow is INCOMPLETE, README draft says so instead of pretending (S9b).
+README DRAFT landed docs/re/_readme_draft_t371.md (evidence rule, build/run,
+supply-your-own-data, abandonware note w/ CITED sources: archive.org item
+msdos_ascendancy 'is currently abandonware' + Wikipedia The Logic Factory
+(Templeman brothers, site ceased June 2014) — both fetched 2026-11-11;
+publisher caveat Virgin/Broderbund/Softgold -> NOTICE must not claim dev
+grant covers publisher rights). Root README.md deliberately UNTOUCHED —
+t373 swaps README+LICENSE+NOTICE+.gitignore atomically.
+HAND-AUTHORED CHECK: grep 'packaging' scripts/* = 0 hits; no generator can
+touch packaging.md or _readme_draft_t371.md (gate regenerants list unchanged).
+HONEST NEGATIVES: docs/re quote-length audit not run (t373 checklist);
+motesandbeams.com not fetched (URL policy; t372 fetches once); vcpkg matrix
+unverified. NO OQ ROW TOUCHED (packaging is a distribution task; OQ-016/
+OQ-019 stay open on user ruling — strict-close respected, nothing closable
+here). GATE_EXIT=0, ledger_audit OK (rows=19 open=OQ-016,OQ-019 closed=17),
+ledger_index_check OK, game/ untouched.
 
 ## LANDED t370 — 2026-11-11 (PLAYTEST WITNESS CENSUS: FIRST RUNTIME
 WITNESSES LANDED — MAGNETRON USE, GIZMO-USE DECREMENTS, ATOMIC TYPE-3
