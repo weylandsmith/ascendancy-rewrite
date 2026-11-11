@@ -595,7 +595,8 @@ else note "UI smoke skipped (no data)"; fi
 # shots and its negation on the title-menu control (scripts/refcap_match.py;
 # law + measurements + refuted alternatives in docs/re/refcap.md). Fast path:
 # scored from pinned PNGs, no emulator. Refresh pins via refcap_gate.sh.
-if command -v "$HOME/tools/revenv/bin/python" >/dev/null 2>&1 \
+if [ "$VENDOR" = 1 ] \
+   && command -v "$HOME/tools/revenv/bin/python" >/dev/null 2>&1 \
    && [ -f "$ROOT/docs/assets/refcap/original-title-menu.png" ]; then
   RC_PY="$HOME/tools/revenv/bin/python"
   "$RC_PY" "$ROOT/scripts/refcap_match.py" \
