@@ -327,6 +327,17 @@ UNRESOLVED at field level because the 10 s watcher cadence cannot resolve
 clicks inside one gap (adjacent XY->Z census = 0, cadence-blind, not
 refuted); placement source vs star triples UNIDENTIFIED (honest negative S64
 neg-(a)). Row closure remains the user's call per the t329 packet.
+t377 NOTE (2026-11-11, static re-read + RAM corroboration, ships.md S19
+corrections C1/C2 in place, full audit docs/re/_wip_t377.md): the magnetron
+USE-SITE law was corrected against raw bytes — the range gate rejects a TOO-
+CLOSE target (fail iff dist < Range*32; t185's wording inverted), the
+TARGETLANE flag is a return-word bit not a commit gate (0x4cbd4 tests bit0
+only), and the dispatcher prologue DECs the slot use word BEFORE the handler
+ungated (a failed use still consumes). RAM design-row readout
+(scripts/r377_design_rows.py, bank 3/3): row 60 cat=5 flags=0x2 power=10
+range=50 numUses=1 == file row exactly. Code landing NOT done this session
+(budget); sim seam design banked _wip S3. Row STAYS OPEN (user-gated;
+strict-close — corrections refine cited law, they are not the named closer).
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +

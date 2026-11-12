@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-11T05:55
+updated: 2026-11-11T22:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,7 +222,7 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t377 per queue row t377 below (phase 9: FINDINGS->CODE). The
+NEXT t377R per queue row t377 below (phase 9: FINDINGS->CODE). The
 WAIT-USER-RULING t374 sentinel is RETIRED — user spoke 2026-11-11 (verbatim
 quotes in DECISIONS.md USER block): OQ-016/OQ-019 acceptance DEFERRED (rows
 stay OPEN; do NOT re-ask, do NOT apply the t329 S4 draft); playtest witnesses
@@ -235,6 +235,24 @@ Weyland Smith <weylandsmith@users.noreply.github.com> (NOTICE + publish
 is USER-GO after this queue drains (credentials still absent on box: SSH key
 printed to user 2026-11-11, or token file route).
 
+t377R = t377 CODE LANDING ONLY (evidence is DONE — do NOT re-read the static
+windows, the fresh raw re-reads + corrections are banked): execute
+docs/re/_wip_t377.md S3 verbatim — useMagnetron seam in shipsim.{h,cpp}
+(C1 corrected range polarity: FAIL iff dist < Range*32, Range==0 skips;
+C2 activation = bit0 affordable+rangeOK, TARGETLANE is a return FLAG;
+C3 charge min(power,cost) at entry; C7 dispatcher-prologue DEC BEFORE the
+handler, mode-1-only, ungated by handler-side gates; C4 single-use via
+clearSlot(activeSlot); placement = star triple + (0,-200,0) + two %200
+draws snapped by snapGrid — tie-class divergence named C6, pin never
+vendor coordinates). Pins per queue row: burn-exact, slot consumed-once,
+no second use (use-word 0 -> handler never runs), zero-carried never
+fires, gate-fail-DECs-still (C7 — the mutant-visible seam), mode-0 probe
+lands nothing. MUTATION campaign per the skill (checkpoint FIRST).
+Rationale for t377R-before-t378: t378's atomicity pins touch the same
+issue/order path in shipsim.cpp; landing t377's use-event first keeps the
+diffs reviewable and the corrected law is already in hand — waiting would
+only let it go stale.
+
 QUEUE (phase 9 — FINDINGS->CODE; every row wires an ALREADY-WITNESSED law
 (docs/re/ships.md S64 M1-M5, docs/re/_wip_playtest_t369.md, selfplay.md
 right-click law) into rewrite code with witness-valued pins. NO OQ row closes
@@ -244,16 +262,15 @@ completed rows. All rows: sitting check RING-FIRST, OOM law, game/ read-only,
 gate + both audits green before commit, mutation campaign per the mutation-
 campaign skill law where code lands.)
 
-t377 MAGNETRON USE-SITE INTO SHIPSIM. Witness M1 (ships.md S64): s28
+t377 MAGNETRON USE-SITE INTO SHIPSIM. (EVIDENCE LANDED t377 incl. THREE
+static corrections C1/C2/C7 + RAM row readout — see LANDED t377 block and
+docs/re/_wip_t377.md; CODE = t377R above.) Witness M1 (ships.md S64): s28
 Guandagnini Vernunft->Atropos INSTANT jump d=(+2464,-3104,+2528), POWER
 90->80 = gizmos.txt Lane Magnetron 'Power 10' EXACT, ring slot (cidx 60)
 REMOVED same event = single-use consumption. cidx == gizmos.txt entry index
-(M2 corroboration 9/60/73). Carriage side EXISTS (t363R carriesCode/
-firstCarrier, shipsim.cpp); the USE event is not modelled. Land useMagnetron
-(or executor seam) firing on the cited carrier law; pins: burn-exact, slot
-consumed-once, no second use, zero-carried never fires. Landing-on-grid
-reconciliation stays an honest negative (S64 neg-(a) — star triple UNKNOWN);
-pin FLAGS/DELTA CLASS, never invented coordinates.
+(M2 corroboration 9/60/73). Landing-on-grid reconciliation stays an honest
+negative (S64 neg-(a) — star triple UNKNOWN); pin FLAGS/DELTA CLASS, never
+invented coordinates.
 
 t378 DESTINATION-TRIPLE ATOMICITY INTO SHIPSIM. Witness M3 (S64): every
 empty-space order writes order type->3 + [+0x6c] destination triple
@@ -363,6 +380,51 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t377 — 2026-11-11 (MAGNETRON USE-SITE EVIDENCE COMPLETE + THREE
+STATIC CORRECTIONS C1/C2/C7; RAM DESIGN-ROW READOUT NEW TOOL; CODE DEFERRED
+TO t377R BY RUN BUDGET; LEDGER 17/2 UNCHANGED — HONEST, USER-GATED)
+
+- Sitting check RING-FIRST: parsed=20/20 max_turn=1254 > 1086 => ran
+  r1_t85g_sitting.py per the standing rule (exit 0, work/r1/t377_sitting.out).
+  NEW SPAN FOUND (r369_playwindow exit 0, lo_ns 1794429182264000000, first
+  turn!=1086 row wall 15:33:07) — but scripts/r377_feedcheck.py (new, reuses
+  r370_slot_events.stream): 2236 frames 15:33->21:35 ALL turn 1254,
+  first-vs-last ship_raw diff 0/40 slots. The user resumed the session but
+  issued ZERO ship-record events. No new witness; t377 assignment stood.
+  INSTRUMENT LAW banked (_wip S0b): the r1_stream trust law filters BELOW the
+  watermark only — the accumulating timeline carries the OLD Oct-28 game
+  (turn 1335 rows at line 239178, mtime_ns 1793245...), so an unfloored
+  sitting census false-fires on turns ABOVE today's watermark; floor at the
+  playwindow mtime_ns. Ring banked work/r1/bank-play-20261111-t377/ (20).
+- STATIC RE-READS (work/r331_disasm.txt, verbatim, audit trail
+  docs/re/_wip_t377.md C1..C8): windows FUN_0004a360 prologue, FUN_0004ca50
+  whole body + case tree 0x4cd51.., magnetron leg 0x4cd0d..0x4cd43,
+  FUN_000220a8 entry, FUN_00021f58 whole body, FUN_00049aa8, FUN_000533e0,
+  FUN_000496e4. THREE CORRECTIONS to t185's S19 (in-place in ships.md):
+  (C1) RANGE-GATE POLARITY INVERTED — raw 0x4cb76..95 fail leg fires when
+  dist < Range*32 (TOO-CLOSE rejected; Range==0 skips via je 0x4cb99); M1
+  (dist ~4700 vs bound 1600, COMMITTED) corroborates the bytes; the inverted
+  reading would have REFUSED M1. (C2) "GATE 2" TARGETLANE is a RETURN-WORD
+  bit, not a commit gate — 0x4cbd4 tests bit0 only (affordable AND rangeOK).
+  (C7) dispatcher prologue DECs the slot use word BEFORE the handler,
+  mode-1-only, UNGATED by handler-side gates: a gate-failed use still
+  consumes a charge (zero-witness, flagged).
+- MEASUREMENT (scripts/r377_design_rows.py, new tool; bank-play-20261111 3/3
+  saves, B=0x1bf4d8 anchor-vote): loaded RAM design rows at B+0x82bb0+0x7650c
+  stride 0x6a — row 60 cat=5 flags=0x0002(TARGETLANE) power=10 range=50
+  level=0 numUses=1; row 9 cat=0 flags=0x000f power=6 range=50 numUses=3;
+  row 73 cat=5 flags=0x0080(PASSIVE) power=10 range=0 numUses=0. LOADED==FILE
+  re-confirmed for all three witness keys (t185 T1 law holds on the playtest
+  saves).
+- CODE: NOT landed (run budget expired after evidence; the complete landing
+  contract — seam shape, gate order, pins, mutation targets — is _wip S3;
+  STATE NEXT carries it as t377R, evidence re-read FORBIDDEN by the NEXT text
+  to protect the next session's budget). Tree stayed clean of rewrite/ edits.
+- LEDGER 17/2 UNCHANGED — honest negative: no OQ row's named closer touched
+  (OQ-019 user-gated per t329; t377 NOTE added to the row: corrections are
+  law refinements, not the closer). GATE_EXIT=0; ledger_audit OK;
+  ledger_index_check OK; game/ untouched; production :9 untouched.
 
 ## LANDED t373 — 2026-11-11 (REPO HYGIENE EXECUTED: LICENSE/NOTICE/README
 ROOT SWAP LIVE, work/ TRACKED-FILE LANDMINE DEFUSED + GATE-PROOFED, SPDX 505,

@@ -742,12 +742,21 @@ FUN_0004a360 (combat.md §286) routes order-kind [+0x67]==2 (star-target)
 to FUN_0004ca50 (0x4a3ac). Inside 0x4ca50:
   lane-d = sqrt(|target_star.pos - ship[+0x9e]|^2)   (pos = star rec f32
       at +8/+0xc/+0x10, alternate triple +0/+4 used when ptr[0]==ship+0x59)
-  GATE 1 (range): if design[+0x3a]Range != 0 and Range*32 < lane-d:
-      power spend 0 -> activation fails (decompile 0x4ca50:
-      `(FUN_00076544+iVar4+2 != 0) && (<<5 as float < local_38)` -> local_28=0)
-  GATE 2 (flag): bit1 of WORD design[+0x33] must be set
-      (decompile: `(*(ushort *)(iVar4 + 0x7653f) & 2)`; 0x7653f = raw
-      +0x33 flag word per t101 convention)
+  GATE 1 (range) POLARITY CORRECTED t377 (raw re-read 0x4cb76..0x4cb95:
+      fild(Range<<5); fcomp dist; jae pass -> the FAIL leg fires when
+      dist < Range*32: a target TOO CLOSE is rejected, a FAR target passes;
+      Range==0 skips the check (je 0x4cb99). The original t185 wording
+      ("Range*32 < lane-d -> fails") had it INVERTED; witness M1 (world-dist
+      ~4700 vs bound 1600, use COMMITTED) corroborates the raw bytes, and
+      the RAM row 60 readout (range=50, scripts/r377_design_rows.py,
+      bank-play-20261111 3/3, B=0x1bf4d8) matches the file column. Full
+      audit + the bit0-vs-bit1 activation law: docs/re/_wip_t377.md C1/C2.
+  "GATE 2" (flag) CORRECTED t377: TARGETLANE (bit1 of WORD design[+0x33],
+      0x4cba7 `and al,0x2`) is OR-ed into the return word (bit1) but the
+      COMMIT test at 0x4cbd4 is `test BYTE [esp+0x5c],0x1` — bit0 ONLY
+      (= affordable AND rangeOK). It is a RETURN FLAG on this path, not a
+      gate; its consumers live elsewhere. (0x7653f = raw +0x33 flag word per
+      t101 convention)
   on commit (mode==1): [+0x88] -= min(Power, fuel)
   CASE TREE on slot cidx (0x4cd51..0x4cd66; each `jc/jbe` pair captures a
   single value): 0x20 -> OR target[+0x23],2 ; 0x33 -> loop ships,
