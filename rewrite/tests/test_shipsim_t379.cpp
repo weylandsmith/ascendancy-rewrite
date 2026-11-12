@@ -106,62 +106,77 @@ as::Ship mkS40() {
 }  // namespace
 
 TEST(shipsim_death_is_in_place_no_compaction_t379) {
-    // The C4 shape: the corpse KEEPS ITS INDEX (no erase, no shift) and the
-    // census mirror decrements. Fixture = the MEASURED boundary minus 38
-    // untouched rows: s12 dies, s40 survives.
+    // Kill through the REAL finalizer path (commitShot hull<1, same rig as
+    // t364's lethal pin), then pin the MEASURED corpse shape: the C4 store
+    // set lands (owner -1 / kind 0 / act 0) and NOTHING else changes —
+    // order type +0x67, the fireTarget(+0x68) stand-in, dispatcherGate
+    // (+0x62), activeSlot (+0x63), pos, power, eta, ring cidx AND use-words,
+    // cap/filled are all RETAINED (5-word diff witness, _wip_t379 S5; the
+    // pre-t379 finalizer cleared +0x62/+0x63/+0x68 — unwitnessed, removed,
+    // re-adding them is a CAUGHT mutant). No compaction: the corpse keeps
+    // its id and stays findable.
     as::ShipSim sim(1);
-    sim.addShip(mkS40());
-    sim.addShip(mkS12());
-    CHECK(sim.liveCount() == 2);
-    // Kill s12 the only modelled way (hull < 1 commit): reproduce the C4
-    // stores via the resolver would need the full combat rig; the finalizer
-    // shape itself is pinned by t364. Here the LAW under test is the SHAPE
-    // after death, so drive the same stores the finalizer makes — via a real
-    // commit: give s12 hull 0 through the sim's own lethal path is t364
-    // scope; instead assert the window law on the DEATH-MARKED row directly:
-    // owner -1 is exactly what the finalizer writes (t364-pinned store set).
-    as::Ship* v = sim.findShip(12);
-    v->owner = -1; v->kind = as::OrderKind::NoOrder; v->act = 0;  // the 3 sim-side C4 stores
-    CHECK(sim.liveCount() == 1);            // census mirror 2 -> 1 (count DEC)
-    // NO compaction: both records remain addressable by id.
-    CHECK(sim.findShip(12) != nullptr);     // corpse retained in place
-    CHECK(sim.findShip(40) != nullptr);
-    // The corpse keeps its fields (M6 + S5 retention law): hull, power, eta,
-    // ring cidx AND use-words, cap/filled, order type/payload halves.
-    const as::Ship* c = sim.findShip(12);
-    CHECK(c->id == 12);
-    CHECK(c->integrity == 20 && c->maxIntegrity == 20);   // NOT zeroed (S5)
-    CHECK(c->power == 1 && c->powerMax == 8);             // NOT refilled/zeroed
-    CHECK(c->etaDay == 1018);
-    CHECK(c->invCap == 10 && c->invFilled == 10);         // M6 at record level
-    CHECK(c->inv[0].cidx == 28 && c->inv[9].cidx == 13);
-    CHECK(c->inv[4].use == 1);                            // use-words retained
-    CHECK(c->orderType == 2);                             // +0x67 retained
-    CHECK(c->fireTarget == 7);                            // +0x68 RETAINED (t379)
-    CHECK(c->dispatcherGate == 1 && c->activeSlot == 4);  // disasm scope keeps them
+    std::vector<as::SimDesign> t(0x4a);
+    t[10] = as::SimDesign{}; t[10].cat = 0; t[10].power = 2; t[10].range = 25;
+    t[10].rowWeapon = 6; t[10].targetShip = true;
+    sim.setDesigns(t);
+    as::Ship v = mkS12();
+    v.systemId = 7; v.integrity = 3;           // dmg 6 -> hull < 1 (t364 clamp law)
+    as::Ship a = mkS12();
+    a.id = 0; a.owner = 1; a.systemId = 7; a.integrity = 10; a.maxIntegrity = 10;
+    a.power = 10; a.powerMax = 10; a.invCap = 1;
+    a.inv[0].cidx = 10;
+    sim.addShip(v); sim.addShip(a);
+    as::Ship* pa = sim.findShip(0);
+    pa->orderType = 0; pa->dispatcherGate = 1; pa->fireTarget = 12; pa->activeSlot = 0;
+    auto r = sim.commitShot(0, 1);
+    CHECK(r.destroyed == 12);
+    const as::Ship* c = sim.findShip(12);      // NO compaction: corpse at its id
+    CHECK(c != nullptr);
+    CHECK(c->owner == -1);                     // +0x56 := 0xffff (law A3)
+    CHECK(c->kind == as::OrderKind::NoOrder);  // +0x58 := 0
+    CHECK(c->act == 0);                        // +0x5d := 0 (witness leg)
+    // RETENTION (the S5 word-diff minus the three stores above):
+    CHECK(c->orderType == 2);                  // +0x67 2->2
+    CHECK(c->fireTarget == 7);                 // +0x68 0x002589f6->same
+    CHECK(c->dispatcherGate == 1);             // +0x62 outside store set
+    CHECK(c->activeSlot == 4);                 // +0x63 outside store set
     CHECK(c->pos[0] == 1280.f && c->pos[1] == -1760.f && c->pos[2] == 1344.f);
+    CHECK(c->power == 1 && c->powerMax == 8);  // NOT refilled, NOT zeroed
+    CHECK(c->etaDay == 1018);
+    CHECK(c->invCap == 10 && c->invFilled == 10);   // M6 at record level
+    CHECK(c->inv[0].cidx == 28 && c->inv[9].cidx == 13);
+    CHECK(c->inv[4].use == 1);                 // ring USE-WORDS retained
+    CHECK(sim.liveCount() == 1);               // census mirror 2 -> 1 (count DEC)
 }
 
 TEST(shipsim_count_window_contains_corpse_and_orphans_top_t379) {
-    // The MEASURED t1254 shape at small scale: window size == live census (1),
+    // The MEASURED t1254 shape at small scale: window size == live census,
     // the window contains the CORPSE (in-place death at a lower index), and
-    // the live record at the top index falls OUTSIDE the window — the orphan.
+    // live records at ids >= the census fall OUTSIDE the window — orphans.
+    // BOUNDARY witness: the corpus orphan s40 has id == count EXACTLY
+    // (40 == 40), so the window law is id >= census, not id > census: ship
+    // id2 here is the id==census row (census is 2 with the s12 corpse).
     // This is the seam a compacting refactor would silently erase.
     as::ShipSim sim(1);
-    sim.addShip(mkS40());
-    sim.addShip(mkS12());
+    as::Ship b = mkS40(); b.id = 2;            // id == census boundary row
+    sim.addShip(b);
+    sim.addShip(mkS40());                      // s40 orphan
+    sim.addShip(mkS12());                      // dies in place
     as::Ship* v = sim.findShip(12);
     v->owner = -1; v->kind = as::OrderKind::NoOrder; v->act = 0;
 
     auto win = sim.countWindow();
-    CHECK(win.size() == 1u);                       // window == count == live census
-    CHECK(win[0]->id == 12);                       // CORPSE inside the window
+    CHECK(win.size() == 2u);                   // window == count == live census
+    CHECK(win.size() == 2u && win[1]->id == 12);   // CORPSE inside the window
     auto orph = sim.orphanedShips();
-    CHECK(orph.size() == 1u);
-    CHECK(orph[0]->id == 40);                      // s40 live, outside range(count)
+    CHECK(orph.size() == 2u);                  // boundary row id2 AND s40
+    // GUARDED indexing: CHECK does not abort; an unguarded orph[1] under a
+    // size-breaking mutant segfaults the WHOLE suite (t379 M1/M5 lesson).
+    CHECK(orph.size() == 2u && orph[0]->id == 2 && orph[1]->id == 40);
     // The orphan is fully intact (byte-identity witness): fields readable.
-    CHECK(orph[0]->power == 40 && orph[0]->integrity == 40);
-    CHECK(orph[0]->kind == as::OrderKind::Move);
+    CHECK(orph.size() == 2u && orph[1]->power == 40 && orph[1]->integrity == 40);
+    CHECK(orph.size() == 2u && orph[1]->kind == as::OrderKind::Move);
     // ships() (the SORTED executor list) still sees the orphan — fleet-list
     // item 3: pickers must scan past the count word (ships.md / _wip_t360 S2).
     bool inShips = false;
@@ -174,6 +189,7 @@ TEST(shipsim_count_window_contains_corpse_and_orphans_top_t379) {
     for (const auto& s : sim.ships())
         if (s.id == 12) corpseInList = true;
     CHECK(corpseInList);
+    CHECK(sim.liveCount() == 2);               // corpses excluded from census
 }
 
 TEST(shipsim_clean_boundary_no_orphans_t379) {

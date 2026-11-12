@@ -3163,3 +3163,52 @@ NON-GOALS HONOURED: the two-click x/y-then-z testimony stays CADENCE-BLIND
 (adjacent XY->Z census = 0) — no two-step internal model exists in the seam;
 UI choreography remains non-goal (pership-spec N8). NO OQ row closes (user
 deferred OQ-016/OQ-019; this is law implementation, not the named closer).
+
+## S67 t379 (2026-11-12) — DEATH-vs-RECLAIM SHAPES RECONCILED + COUNT-WINDOW SEAM LANDED
+Code landing of the S64 M5 witness reconciliation (queue row t379; full
+working notes docs/re/_wip_t379.md S1..S6; tools scripts/r379_shape_census.py
++ r379_shape_verify.py, banks on disk, ZERO new capture).
+MEASURED (banks bank-play-20261111 t1253 vs -late t1254, 20/20 base-verified
+per side; production ring 20 saves; law test holds 60/60): the TWO queue-side
+"shapes" are ONE law read at two indices. (1) The death at s12 is the C4
+in-place corpse — word-level diff of the whole 0x162 record: EXACTLY 5 of 177
+words differ: +0x34 name NUL-stamp (byte store, 'edium' survives in RAM),
++0x56 owner word :=0xffff (handle 0x00020000->0xffff0000: the dead marker IS
+this store seen as a dword), +0x58 kind byte :=0 (high byte 0x85 preserved,
++0x59 pointer untouched), +0x5c act(+0x5d) :=0 (NEW LEG the RAM witness adds
+to the disasm window), +0x90 shields :=0 (UNATTRIBUTABLE — upkeep zeroes it
+always; not wired). RETAINED across death: +0x67 order type 2->2, +0x68
+payload 0x002589f6->same, pos, power 1, integrity 20 (death does NOT zero
+hull), +0x52 eta, ring cidx x10 AND use-words, cap 10/filled 10 (M6 at record
+level). (2) s40 'Intil-Za' was NEVER WRITTEN (whole record sha256-identical
+across the boundary; changed-slot census excludes it): its disappearance from
+the count-window rows is purely the count DEC (41->40) at index 12 applied to
+the enumeration range(0,count) — the highest live record falls outside the
+window as the ORPHAN. LAW (60/60): count word == full-array live census;
+corpses-in-window == live-beyond-window; no compaction ever observed. The
+writer of the DEC remains UNATTRIBUTED ([ds:0x3067b] is 0 in both banks — NOT
+the array count word; do not attribute it to 0x249b4).
+CODE: ShipSim::liveCount() (census mirror), countWindow() (array-order window
+size==liveCount, contains corpses BY CONSTRUCTION, misses id>=liveCount rows —
+the orphan law is >=, corpus witness s40 id 40 == count 40), orphanedShips().
+ships() (sorted executor list) keeps seeing orphans (fleet-list item 3:
+pickers scan past the count word). C4 finalizer CORRECTED: the pre-t379
+clears of dispatcherGate/activeSlot/fireTarget were UNWITNESSED hygiene —
+removed (fireTarget +0x68 is affirmatively RETAINED in the witness).
+PINS test_shipsim_t379.cpp x5: in-place death through the REAL commitShot
+finalizer + full retention law; corpse-in-window + orphan boundary row
+(id==census); clean-boundary NEGATIVE CONTROL (dense ids — a sparse fixture
+is vacuously orphaned); corpus dead-row shape both sides (5 saves/side,
+self-skips without work/); s40 record BYTE-IDENTITY via std::equal over the
+ZIP Memory members. MUTATION 9/9 CAUGHT (r363r_mutate.py, checkpoint 0a55a05
+first): M1 liveCount counts corpses CAUGHT (8 fails); M2 window filters
+corpses CAUGHT; M3 window no-trim CAUGHT; M4 window sorts eta-not-id CAUGHT;
+M5 orphan strict > CAUGHT (boundary row isolates >= vs >); M6 orphan no-owner-
+filter CAUGHT; M7 death clears gate CAUGHT (retention isolator); M8 death
+clears fireTarget CAUGHT; M9 death keeps act CAUGHT (t364 pin too). SUITE
+247/0. LESSON banked: CHECK does not abort — index a container only behind a
+guarded size CHECK or a size-breaking mutant segfaults the whole suite
+(first M1/M5 runs returned rc=139 with no FAIL lines).
+CORPUS NOTE: work/r1/playcap/save/41..60.sav rolled over to turn 1254 (same
+state as the -late bank; test_shipsave_t360 frozen-exact case self-skips by
+design — the durable law case stays green).

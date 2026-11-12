@@ -222,14 +222,14 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t379 per queue row t379 below (phase 9: FINDINGS->CODE). t378 LANDED
-(LANDED block below this one): issueDestination/clearDestination seam + 4
-pins + MUTATION 9/9 CAUGHT — the queue's t378 row is DONE and deleted from
-the queue.
-Rationale for t379 next: it is the next witnessed-law row in queue order and
-touches the same shipsim death/bookkeeping family the t378 executor pin just
-exercised (the type-0 commit arm, the C4 finalizer fields); zero capture
-needed — the 1253->1254 boundary witnesses are already banked. The
+NEXT t380 per queue row t380 below (phase 9: FINDINGS->CODE). t379 LANDED
+(LANDED block below this one): count-window seam (liveCount/countWindow/
+orphanedShips) + finalizer store-set correction + 5 pins + MUTATION 9/9
+CAUGHT — the queue's t379 row is DONE and deleted from the queue.
+Rationale for t380 next: it is the next witnessed-law row in queue order and
+reuses the same sitting's banked evidence (S64 quantizer rows; zero capture
+needed — the mid-transit signal instrument was corrected t370, do NOT re-hunt
+magnetron landing). The
 WAIT-USER-RULING t374 sentinel stays RETIRED — user spoke 2026-11-11
 (verbatim quotes in DECISIONS.md USER block): OQ-016/OQ-019 acceptance
 DEFERRED (rows stay OPEN; do NOT re-ask, do NOT apply the t329 S4 draft);
@@ -243,14 +243,13 @@ LANDED t376/t376b); user saves 887/1086/1253 PROTECTED
 is USER-GO after this queue drains (credentials still absent on box: SSH key
 printed to user 2026-11-11, or token file route).
 
-t379 = DEATH vs RECLAIM SHAPES INTO SHIPSIM (queue row verbatim): witness M5
-(S64): at the 1253->1254 boundary s12 cleared + s40 (Intil-Za) GONE entirely
-(count 41->40) while the AI death kept position with owner->0xffff
-(death-cleaned). shipsim has the C4 finalizer (owner 0xffff, kind 0, count
-dec — 0x249b4). Task: reconcile the TWO observed shapes (corpse-retained-flag
-vs slot-vanished) against the cited fleet-list law; if the corpus cannot
-discriminate, bank the boundary honestly and pin BOTH shapes as legal. No
-new capture.
+t380 = QUANTIZER REST-ON-GRID INTO SHIPSIM PINS (queue row verbatim): t370
+RUNTIME CONFIRMED: mid-transit rows OFF the 32-grid ((14,1,-224)x5,
+(28,0,-2144), 144.7->149.3), REST rows ON (grid quantizer DAT_000895dc=32,
+t183). Pin shipsim walk output: rest positions land 32-aligned, in-flight
+positions may not; K3b off-grid-at-rest test is BLIND BY CONSTRUCTION
+(instrument corrected t370 — use mid-transit signal, do NOT re-hunt magnetron
+landing). No new capture.
 
 QUEUE (phase 9 — FINDINGS->CODE; every row wires an ALREADY-WITNESSED law
 (docs/re/ships.md S64 M1-M5, docs/re/_wip_playtest_t369.md, selfplay.md
@@ -260,13 +259,6 @@ tN -> rewrite NEXT to tN+1 VERBATIM; keep this block intact except deleting
 completed rows. All rows: sitting check RING-FIRST, OOM law, game/ read-only,
 gate + both audits green before commit, mutation campaign per the mutation-
 campaign skill law where code lands.)
-
-t380 QUANTIZER REST-ON-GRID INTO SHIPSIM PINS. t370 RUNTIME CONFIRMED:
-mid-transit rows OFF the 32-grid ((14,1,-224)x5, (28,0,-2144), 144.7->149.3),
-REST rows ON (grid quantizer DAT_000895dc=32, t183). Pin shipsim walk output:
-rest positions land 32-aligned, in-flight positions may not; K3b
-off-grid-at-rest test is BLIND BY CONSTRUCTION (instrument corrected t370 —
-use mid-transit signal, do NOT re-hunt magnetron landing).
 
 t381 GIZMO-USE DECREMENT + INVASION CONSUMPTION. Witness M2 (S64): Stainer
 cidx9 3->2 with power -6 = Nanomanipulator 'Power 6' EXACT; Gofriller
@@ -353,6 +345,53 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t379 — 2026-11-12 (DEATH-vs-RECLAIM SHAPES RECONCILED + COUNT-WINDOW
+SEAM + FINALIZER STORE-SET CORRECTION + 5 PINS + MUTATION 9/9 CAUGHT; SUITE
+247/0; LEDGER 17/2 UNCHANGED — HONEST, USER-GATED)
+
+- Sitting check RING-FIRST: scripts/t368_ring_turn.py max_turn=1254 (20/20)
+  + 300 KB tail-SEEK of live-timeline.jsonl (rows still turn 1254, wall to
+  02:01:31) => no new turn boundary; assignment stands (zero-capture row).
+- MEASURED (banks on disk, scripts/r379_shape_census.py + r379_shape_verify.py,
+  zero capture): the queue's TWO shapes are ONE law. s12 death = C4 in-place
+  corpse (word diff: EXACTLY 5/177 words — name NUL-stamp +0x34, owner word
+  +0x56:=0xffff, kind byte +0x58:=0 (high byte kept), act +0x5d:=0 (new leg
+  the RAM adds to the disasm), +0x90:=0 UNATTRIBUTABLE-not-wired); s40
+  'Intil-Za' NEVER WRITTEN (whole 0x162 record sha256-identical across the
+  boundary) — its vanishing is the count DEC 41->40 at index 12 applied to
+  the range(0,count) walk: the top live record orphans OUTSIDE the window.
+  LAW 60/60 saves (both banks + production ring): count == live census;
+  corpses-in-window == live-beyond-window; NO compaction ever seen.
+- CORRECTIONS banked (not silent): ships.md S64 addendum's s12 'own0' is
+  wrong (handle 0x00020000 => race 2, t273 law); the pre-t379 finalizer's
+  +0x62/+0x63/+0x68 clears were unwitnessed hygiene — +0x68 is affirmatively
+  RETAINED (0x002589f6 survived death) — removed from shipsim.cpp;
+  [ds:0x3067b] (the C4 disasm's DEC word) is 0 in BOTH banks => it is NOT
+  the array count word; the DEC writer stays UNATTRIBUTED (do not attribute
+  it to 0x249b4). s12 integrity 20->20: this corpse was NOT produced by the
+  hull<1 path — death producer unattributed; do NOT add integrity:=0.
+- CODE: ShipSim::liveCount() (census mirror), countWindow() (array-order
+  window, size==liveCount, corpse-in-window BY CONSTRUCTION, orphan law
+  id >= census per the corpus boundary witness s40 id 40 == count 40),
+  orphanedShips(); ships() keeps seeing orphans (fleet-list item 3).
+- PINS test_shipsim_t379.cpp x5: real-commitShot death + full retention law
+  (orderType/fireTarget/dispatcherGate/activeSlot/pos/power/eta/ring
+  cidx+use-words/cap/filled); corpse-in-window + orphan boundary row;
+  clean-boundary NEGATIVE CONTROL (DENSE ids — a sparse fixture is vacuously
+  orphaned, learned this session); corpus dead-row shape both sides
+  (self-skips without work/); s40 record byte-identity std::equal.
+- MUTATION 9/9 CAUGHT (r363r_mutate.py, checkpoint 0a55a05 FIRST per skill
+  rule 1): M1 liveCount-counts-corpses / M2 window-filters-corpses / M3
+  window-no-trim / M4 window-sorts-eta / M5 orphan-strict-> (boundary row
+  isolates >= vs >) / M6 orphan-no-owner-filter / M7 death-clears-gate /
+  M8 death-clears-fireTarget / M9 death-keeps-act (t364 pin fires too).
+  LESSON banked in ships.md S67: CHECK does not abort — index containers
+  only behind guarded size CHECKs (unguarded orph[1] segfaulted the suite,
+  rc=139, no FAIL lines, first M1/M5 run).
+- CORPUS NOTE: production ring work/r1/playcap/save rolled over to turn 1254
+  (same state as bank-play-20261111-late); test_shipsave_t360 frozen-exact
+  case self-skips by design; durable law case green.
 
 ## LANDED t378 — 2026-11-12 (DESTINATION-TRIPLE ATOMICITY CODE LANDED:
 issueDestination/clearDestination + 4 PINS + MUTATION 9/9 CAUGHT; SUITE

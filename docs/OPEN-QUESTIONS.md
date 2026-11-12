@@ -357,6 +357,19 @@ honest negative _wip_t378 S2); order-end clears both atomically; object
 orders refuse. 4 pins test_shipsim_t378.cpp, MUTATION 9/9 CAUGHT, suite
 242/0. ships.md S66. Row STILL OPEN (user deferred; two-click sub-gap stays
 cadence-blind, N8).
+t379 NOTE (2026-11-12, CODE LANDED): the M5 death-vs-reclaim shapes are
+RECONCILED to ONE measured law and are IN THE REWRITE — the C4 corpse is
+in-place (word-level witness: exactly 5/177 words change; +0x62/+0x63/+0x68
+RETAINED, the pre-t379 clears removed) and the "slot vanished" reading is the
+count DEC at a lower index orphaning the top live record (s40 byte-identical,
+never written). New seam ShipSim::liveCount/countWindow/orphanedShips mirrors
+the count-word walk law (count == live census, 60/60 saves; corpse in-window;
+orphan id >= census). 5 pins test_shipsim_t379.cpp (incl. corpus dead-row
+shape both banks + s40 byte-identity), MUTATION 9/9 CAUGHT, suite 247/0.
+ships.md S67. HONEST NEGATIVES banked (_wip_t379 S2/S4/S5): DEC writer
+unattributed ([ds:0x3067b]==0 both banks), corpse refill-skip cause
+unmeasured, s12 death producer unattributed (integrity survived — NOT the
+hull<1 path in this witness). Row STILL OPEN (user deferred).
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +
