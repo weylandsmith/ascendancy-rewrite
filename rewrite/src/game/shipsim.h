@@ -351,6 +351,25 @@ class ShipSim {
     // targetability test itself (FUN_00039894) is engagement scope (t364);
     // the caller invokes this when IT knows the target is gone.
     bool retreatToSystem(int shipId);
+    // ---- t378 DESTINATION-TRIPLE ATOMICITY (witness M3, ships.md S64 +
+    // work/r1/t370_slot_events_all.txt). The sim-level stand-in for the
+    // player issuer of an EMPTY-SPACE destination order: every witnessed
+    // issue (4 in-window ships + s14's pre-window order) writes order TYPE
+    // (+0x67) := 3 AND the destination triple (+0x6c) IN ONE FRAME — kind
+    // (+0x58) is NOT part of this pair (stays 4 at every issue). The vendor
+    // issuer's store leg was never disassembled (S64 honest negative
+    // neg-(a)); the ATOMIC PAIR is the measured field-level fact, so the
+    // seam admits no torn state: accept writes both fields, refuse writes
+    // NOTHING (returns false — the sim-level no-target sentinel; the cited
+    // 0xffff sentinel lives on the owner half at the 0x24a00 clear, not on
+    // the order fields). Two-click x/y-then-z stays CADENCE-BLIND
+    // (adjacent XY->Z census = 0): NO two-step internal model (N8).
+    bool issueDestination(int shipId, float x, float y, float z);
+    // The witnessed ORDER-END leg (s14 Stainer 00:24:02: type 3->0 with
+    // trip := (0,0,0) same frame): iff orderType == 3, clear BOTH the type
+    // and the triple atomically. Object orders (type 1/2) never own +0x6c —
+    // refuse (state untouched).
+    bool clearDestination(int shipId);
     // Per-race focus object (0x41a1c compares [+0x5e] against the current
     // object): when set for a race, ships whose actTarget differs get their
     // act CLEARED at the boundary (0x41a30) — re-decide is the caller's hook.

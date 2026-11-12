@@ -185,6 +185,39 @@ bool ShipSim::retreatToSystem(int shipId) {
     return true;
 }
 
+// t378 — EMPTY-SPACE destination issue, ATOMIC PAIR (see shipsim.h note).
+// Witness shape (all 4 in-window issues, t370_slot_events_all.txt): kind 4
+// UNCHANGED, type (+0x67) -> 3, triple (+0x6c) := destination, same frame.
+// The prior type at issue was 2 (s16), 0 (s38), 1 (s25, s18) — no gate on
+// the previous order type is cited, so none is imposed; the kind gate is the
+// cited walk-guard family (FUN_00049f54 requires kind 4; kinds 1/2/5 are
+// sticky in the decider, ai-dossier §5). Refusal writes NOTHING: the
+// type-3-with-stale-triple state is unreachable through this seam.
+bool ShipSim::issueDestination(int shipId, float x, float y, float z) {
+    Ship* s = findShip(shipId);
+    if (!s) return false;                       // no-target sentinel (sim)
+    if (s->kind != OrderKind::InSystem) return false;   // state untouched
+    s->orderType = 3;                           // +0x67 := 3
+    s->targetPos[0] = x;                        // +0x6c triple := destination
+    s->targetPos[1] = y;
+    s->targetPos[2] = z;                        // ... all in ONE step
+    return true;
+}
+
+// t378 — ORDER-END leg (s14 00:24:02: type 3->0 + trip := (0,0,0) same
+// frame). Iff the ship holds an empty-space order, BOTH fields clear in one
+// call; object orders (type 1/2) never own +0x6c — refuse, state untouched.
+bool ShipSim::clearDestination(int shipId) {
+    Ship* s = findShip(shipId);
+    if (!s) return false;
+    if (s->orderType != 3) return false;        // state untouched
+    s->orderType = 0;
+    s->targetPos[0] = 0;
+    s->targetPos[1] = 0;
+    s->targetPos[2] = 0;
+    return true;
+}
+
 void ShipSim::setFocus(int race, uint32_t focus) {
     for (auto& f : focus_)
         if (f.race == race) { f.focus = focus; return; }
