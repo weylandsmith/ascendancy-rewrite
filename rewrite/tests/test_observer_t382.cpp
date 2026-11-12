@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <vector>
@@ -161,6 +162,55 @@ TEST(observer_buildsim_and_refusal_t382) {
     CHECK(!Observer::parseRawShipBlock(junk, &none, &err));
     CHECK(none.empty());
     CHECK(!Observer::parseRawStarBlock(junk, &noneStars, &err));
+}
+
+TEST(observer_synthetic_terminator_laws_t382) {
+    // SYNTHETIC pins (labelled: they pin the OBSERVER's stated discovery
+    // laws, not vendor-measured data — no corpus save contains a
+    // duplicate-marker adjacency or a K>12 star run, so only constructed
+    // inputs separate these branches; mutation campaign t382 M2/M4).
+    // (a) Terminator: a marker chain stops at a REPEATED marker.
+    auto saneShipAt = [](std::vector<uint8_t>& f, size_t h, uint8_t kind) {
+        f[h + 0x56] = 0;                       // owner race 0
+        f[h + 0x58] = kind;                    // live kind
+        f[h + 0x15a] = 5;                      // invCap
+        for (int i = 0; i < 3; ++i) f[h + 0x9e + 4 * i] = 0x00;  // pos 0.0f
+    };
+    std::vector<uint8_t> f(size_t(40) * 0x166, 0);
+    for (uint32_t n = 0; n < 12; ++n) {
+        uint32_t mk = n;  // markers 0..11
+        std::memcpy(&f[size_t(n) * 0x166], &mk, 4);
+        saneShipAt(f, size_t(n) * 0x166 + 4, 4);
+    }
+    // then a DUPLICATE marker 11 followed by sane records — the walk must
+    // stop at the duplicate: exactly 12 rows, never 13+.
+    for (uint32_t n = 12; n < 16; ++n) {
+        uint32_t mk = (n == 12) ? 11u : n;
+        std::memcpy(&f[size_t(n) * 0x166], &mk, 4);
+        saneShipAt(f, size_t(n) * 0x166 + 4, 4);
+    }
+    std::vector<Observer::ShipRow> rows;
+    std::string err;
+    CHECK(Observer::parseRawShipBlock(f, &rows, &err));
+    CHECK(rows.size() == 12);
+
+    // (b) Star sanity: type index domain is the 13 starstat types (K <= 12,
+    // planets-ui.md §1 census); a run of K==13 records is REFUSED. Name is
+    // exactly 3 chars: any byte-SHIFTED discovery window then reads a name
+    // of < 3 printable chars (the surrounding zero pad terminates it), so
+    // K==13 is the ONLY discriminator separating this fixture.
+    std::vector<uint8_t> s(size_t(20) * 0x60, 0);
+    for (int i = 0; i < 14; ++i) {
+        size_t h = size_t(i) * 0x60;
+        uint32_t K = 13;  // out of the 0..12 domain
+        std::memcpy(&s[h], &K, 4);
+        float x = 10.f * (i + 1), y = 1.f;
+        std::memcpy(&s[h + 0x08], &x, 4);
+        std::memcpy(&s[h + 0x0c], &y, 4);
+        std::memcpy(&s[h + 0x1c], "Fak", 3);
+    }
+    std::vector<Observer::StarRow> stars;
+    CHECK(!Observer::parseRawStarBlock(s, &stars, &err));
 }
 
 TEST(observer_render_map_t382) {

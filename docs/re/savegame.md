@@ -222,3 +222,32 @@ BLOCK11200) are 87-100% stable across a 123-turn session and stay mapped.
 Residual honesty: WHAT the scratch was (star-draw cache vs heap) is
 UNNAMED — naming needs a live-UI trace; the disclaim does not depend on it.
 OQ-005's .tmp-HEAD half is untouched by this and stays in OQ-005's own row.
+
+## t382 (2026-11-12) — NATIVE .SAV SHIP + STAR BLOCKS FOUND (MEASURED)
+
+The raw vendor .SAV (work/r1/game/01..04.SAV) DOES serialize the ship array
+and the star-slot table verbatim — the old "no verbatim ship records in .SAV"
+reading (this session's first probe) was a NEEDLE ARTIFACT: a 64-B window at
+record +0x52 straddles the save-writer's pointer-rewrite region (t298 class)
+and misses, while the name window at +0x34 hits. Full laws + witness values:
+docs/re/_wip_t382.md; code + pins rewrite/src/game/observer.{h,cpp},
+rewrite/tests/test_observer_t382.cpp (MUTATION 6/6 CAUGHT).
+
+Headline laws (all MEASURED, same-world .SAV vs ring-RAM comparisons):
+- day = u32@0 (4/4).
+- SHIP BLOCK at a save-DEPENDENT home (content discovery: marker chain, never
+  a fixed offset): stride 0x166 = u32 marker + 0x162 record; marker = RAM slot
+  id, strictly ascending; terminator = first marker >= 0x6b or <= previous.
+  The block is the PACKED LIVE LIST at save instant — 01.SAV markers == the
+  bank-t1086 live-slot set EXACTLY (30/30).
+- STAR BLOCK stride 0x60 (the K8 star-slot table shape, planets-ui.md §1):
+  name CP437 +0x1c, coords f32 triple +0x08, owner bitmask byte +0x14;
+  47/50 byte-verbatim vs same-world ring RAM (3 diffs = single owner bytes,
+  state drift class). Type-index domain 0..12 (13 starstat types).
+- FRAME RESIDUE (honest negative): ship pos triples are 32-aligned world
+  frame (~±2300); star-record triples ~±430; NO scale unifies them (scan
+  3.5..8.0, no snap) — the two coordinate frames coexist; the bridge is
+  the kind-4 +0x59 star-object POINTER (ZIP path: member = phys + 0x88,
+  19/19 attribution; raw path: pointer region rewritten, no deref possible).
+- kind-1 records sit at (0,0,0) with +0x59 pointing OUTSIDE the star table
+  (planet-object class, s39/s40 ring 60) — orbiting-planet garrison ships.

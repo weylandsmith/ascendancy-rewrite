@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-12T04:35
+updated: 2026-11-12T09:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,15 +222,15 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t382 per queue row t382 below (phase 9: FINDINGS->CODE). t381 LANDED
-(LANDED block below this one): gizmo-use decrement + invasion consumption
-(handler-1 CHARGE law — the t364 "non-gun handlers charge nothing" reading
-SUPERSEDED — + ShipSim::resolveInvasion count-limited consumption
-FUN_0003a174 0x3a2a2..0x3a38b) + 10 pins + MUTATION 10/10 CAUGHT — the
-queue's t381 row is DONE and deleted from the queue.
-Rationale for t382 next: it is the next row in queue order and the user's
-playtest of the rewrite depends on it (t382 lands --save boot as a read-only
-OBSERVER; zero capture, formats/shipsave + fromRecord already exist). The
+NEXT t383 per queue row t383 below (phase 9: FINDINGS->CODE). t382 LANDED
+(LANDED block below this one): --save READ-ONLY OBSERVER boot for BOTH save
+shapes — native raw .SAV (NEW save-format laws: marker-prefixed stride-0x166
+ship block + stride-0x60 star-slot table, docs/re/savegame.md t382 section)
+and dosbox-x savestate ZIP (existing t360 reader) — + 7 pins + MUTATION 6/6
+CAUGHT, suite 270/0 — the queue's t382 row is DONE and deleted from the
+queue.
+Rationale for t383 next: it is the LAST row of the queue; on landing it
+rewrites NEXT to the WAIT-PUSH-USER sentinel per its own text. The
 WAIT-USER-RULING t374 sentinel stays RETIRED — user spoke 2026-11-11
 (verbatim quotes in DECISIONS.md USER block): OQ-016/OQ-019 acceptance
 DEFERRED (rows stay OPEN; do NOT re-ask, do NOT apply the t329 S4 draft);
@@ -253,20 +253,11 @@ completed rows. All rows: sitting check RING-FIRST, OOM law, game/ read-only,
 gate + both audits green before commit, mutation campaign per the mutation-
 campaign skill law where code lands.)
 
-t382 PLAYTEST BOOT (READ-ONLY OBSERVER). Current binary boots mapgen
-campaigns only; NO save-boot path exists (grep-verified 2026-11-11). Land
-`--save <file>` mode: formats/shipsave parse -> fromRecord import (t361)
-into ShipSim -> star-map render with per-ship dots + day number (u32@0 law).
-Supply-your-own copy ONLY (NEVER open game/); zero write-back; refusal not
-clamp on parse failure. Honest scope in --help: this is an OBSERVER, not
-gameplay (no order UI until commissioned; right-click deselect law banked
-selfplay.md awaits a selection widget). User playtest of the rewrite depends
-on this row landing.
-
 t383 RE-EXPORT + VERIFY + PARK FOR PUSH. Re-run scripts/publish_public.sh
 into a FRESH dir (tree moved since /tmp/pubpush), verify on clone shapes:
-vendor-free history (script gate), build + run_tests (expect 226 tests,
-187+ skipped, 0 failed WITHOUT data), author identity single
+vendor-free history (script gate), build + run_tests (expect 270 tests,
+187+ skipped, 0 failed WITHOUT data — recount from a fresh run_tests output
+line, t382 added observer_* x7), author identity single
 (weylandsmith@users.noreply.github.com, zero [ISP-DOMAIN] emails), GITHUB_USER=
 weylandsmith set. Then rewrite NEXT to the sentinel shape (TAG LAW: field 2
 WAIT*, NEVER renumber): NEXT WAIT-PUSH-USER t383 — on wake (GO note in
@@ -330,6 +321,47 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t382 — 2026-11-12 (--save READ-ONLY OBSERVER + NATIVE .SAV SAVE LAWS)
+Delivered queue row t382 verbatim: `ascendancy --save FILE` boots a save as a
+READ-ONLY OBSERVER (day + fleet roster + star map + ship field; zero writes,
+zero SDL, runs before archive load; --help states OBSERVER-not-gameplay scope;
+refusal-not-clamp on parse failure — junk input exits 1 with the reason).
+THE ITERATION'S REAL FINDING (not in the row's scope, found by probing the
+row's input question): the NATIVE raw .SAV carries the ship array and star
+table VERBATIM — laws MEASURED + banked docs/re/savegame.md "t382" section +
+docs/re/_wip_t382.md (probes 1-14):
+- day = u32@0 (4/4 saves: 1086/1253/887/1254).
+- SHIP BLOCK: save-DEPENDENT home (content discovery by marker-chain scan;
+  fixed offsets REFUTED — 01.SAV chain starts at marker 1), stride 0x166 =
+  u32 slot-id marker + 0x162 record, markers strictly ascending, terminator =
+  first violation; block == live list at save instant (01.SAV markers ==
+  bank-t1086 live set EXACTLY 30/30; 04.SAV 38 slots vs ring-60 40 = same-day
+  drift both directions, slot 12 died / {19,21,23} born after the save).
+- STAR BLOCK: stride 0x60 K8 star-slot table (planets-ui.md §1 shape): name
+  CP437 +0x1c, coords f32 +0x08, owner byte +0x14; 47/50 verbatim vs same-
+  world ring RAM (3 owner-byte drifts); type domain 0..12 pinned.
+- NEEDLE-ARTIFACT CORRECTION (method law): a probe window straddling record
+  +0x52 (pointer fields) MISSES in save space (writer rewrites pointers,
+  t298 class) — name-window needles at +0x34 hit. The first probe's "ship
+  array absent from .SAV" reading was WITHDRAWN mid-session and superseded.
+- FRAME RESIDUE (honest negative, kept OPEN as a named residue, no OQ row):
+  ship pos = 32-aligned world frame (~±2300), star-record triples ~±430;
+  NO scale unifies them (scan 3.5..8.0 no snap; placement-anchor f32
+  -1560.0 = ZERO hits in the whole ring-60 member). Bridge = the kind-4
+  +0x59 star-object pointer (ZIP path member = phys+0x88, 19/19 attribution
+  incl. s23->Atropos; raw path pointer region rewritten -> no deref).
+  Observer renders the two frames as SEPARATE maps, claims no projection.
+Code: rewrite/src/game/observer.{h,cpp} (ascend_core, no SDL), main.cpp
+--save branch, CMakeLists wired. Pins test_observer_t382.cpp x7 (day law,
+ship-block law + witness pos, star-block law, savestate import + deref,
+buildSim/findShip + junk refusal, SYNTHETIC terminator/K-domain pins, render
+projection). MUTATION 6/6 CAUGHT (M1 stride 0x166->0x162, M2 dup-marker
+terminator, M3 pos offset, M4 K-bound 12->50, M5 member-law sign flip, M6
+dead-filter drop; M2/M4 first MISSED on corpus data — synthetic pin added per
+mutation-campaign skill rule 4, then both CAUGHT with named FAILs). Suite
+270/0; gate green; ledger audits green (17 closed / 2 open — NO OQ row
+touched, queue mandate). NEXT -> t383 verbatim (last queue row).
 
 ## LANDED t381 — 2026-11-12 (GIZMO-USE DECREMENT + INVASION CONSUMPTION
 LANDED: HANDLER-1 CHARGE LAW SUPERSEDES THE t364 NO-CHARGE READING;
