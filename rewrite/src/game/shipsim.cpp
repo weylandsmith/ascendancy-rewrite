@@ -447,6 +447,38 @@ const Ship* ShipSim::firstCarrier(uint8_t code) const {
     return nullptr;
 }
 
+int ShipSim::resolveInvasion(int transportShipId, int activeShieldUnits) {
+    // t381 — FUN_0003a174 0x3a2a2..0x3a38b verbatim (contract in shipsim.h;
+    // evidence docs/re/_wip_t381 S1 + witness ships.md S64 M2 Ignatz).
+    Ship* s = findShip(transportShipId);
+    if (!s) return 0;
+    // LOOP1 0x3a2a2..0x3a2c5: count ALL cidx-0x49 slots in i<cap.
+    int count = 0;
+    for (uint32_t i = 0; i < s->invCap && i < kRingSlots; ++i)
+        if (s->inv[i].cidx == kCidxInvasionModule) ++count;
+    // CAP 0x3a327..0x3a33e: need := count; if (count > deficit) need :=
+    // deficit + 1, deficit := activeShieldUnits (item-18 +1 / item-19 +2 —
+    // caller operand). The owner-7 override leg 0x3a342 is NOT modelled
+    // (named divergence; file table zero only for owner 7, zero witnesses).
+    int need = count;
+    if (need > activeShieldUnits) need = activeShieldUnits + 1;
+    if (need > count) need = count;            // defensive: shieldUnits<0
+                                               // input clamps to the count
+                                               // (vendor cannot reach it: the
+                                               // deficit walk sums >= 0)
+    // LOOP3 0x3a360..0x3a38b: walk-ORDER first-match clearSlot, stop at need
+    // (consumed counter edi increments per clear; the loop head tests
+    // consumed < need AND i < cap). clearSlot = the vendor's 0x496e4 (filled
+    // --, recalc re-materialises).
+    int consumed = 0;
+    for (uint32_t i = 0; i < s->invCap && i < kRingSlots && consumed < need; ++i)
+        if (s->inv[i].cidx == kCidxInvasionModule) {
+            clearSlot(*s, i);
+            ++consumed;
+        }
+    return consumed;
+}
+
 // ---------------------------------------------------------------------------
 // t364 PER-SHIP COMBAT ROUND (spec §5 K1..K10). Verbatim windows and this
 // session's corrections C1..C8: docs/re/_wip_t364.md; resolver region
@@ -577,14 +609,66 @@ ShipSim::EngagementReport ShipSim::commitShot(int shipId, int mode) {
     }
     rep.handler = s->orderType;                // C1: +0x67 selects the handler
 
+    if (s->orderType == 1) {
+        // ---- HANDLER-1 FUN_0004c794 (t381 fresh full read 0x4c794..0x4c990;
+        // docs/re/_wip_t381 S1b/S1c). The t364-era "no charge for non-gun
+        // handlers" reading is SUPERSEDED for handler 1: the M2 witnesses
+        // (Stainer 00:24:08, Gofriller 00:26:59 + 00:27:51, ships.md S64)
+        // show slot-use DEC AND power -6 IN THE SAME FRAME with +0x67 == 1 —
+        // Nanomanipulator gizmos.txt row 9 `0 6 50 13 3 ...` Power 6 EXACT.
+        // AFFORDABLE + cost (0x4c7c9..0x4c7e2): affordable := design[+0x36]
+        // <= power; cost [esp+0x34] := affordable ? design[+0x36] : 0 (the
+        // unaffordable branch ZEROES the cost, it is not a truncating MIN —
+        // the gun shape). Since the charge runs iff affordable, the landed
+        // charge is always design[+0x36] verbatim.
+        const bool affordable = d.power <= s->power;
+        // [+0x68] null -> assert call 0x2a428 (0x4c7ea..0x4c7ef); the sim
+        // refuses with zero state change (DEC already paid dispatcher-side —
+        // the C7 order holds: DEC precedes every handler gate).
+        if (s->fireTarget < 0) return rep;
+        // RANGE GATE 0x4c831..0x4c901: design[+0x3a]==0 SKIPS the distance
+        // math with edi still the -1 sentinel -> UNLIMITED (je 0x4c91d, the
+        // gun C9 shape). Else limit := range<<5, DOUBLED when status bit0x4
+        // (ds:0x85312 == f32 2.0, file bytes MEASURED t381); dist > limit
+        // clears edi (too-far fails, too-CLOSE is fine). Target triple :=
+        // the sim's explicit targetPos (the banked [+0x68]-deref surrogate,
+        // shipsim.h Ship::targetPos note). The cidx-0x2f leg 0x4c903..0x4c919
+        // is a DEAD leg (compares dist*0.75 against dist — jbe always taken),
+        // not modelled.
+        bool inRange = true;
+        if (d.range != 0) {
+            double limit = static_cast<double>(d.range) * 32.0;
+            if (s->status & 0x4) limit *= 2.0;
+            const double dx = static_cast<double>(s->targetPos[0]) - s->pos[0];
+            const double dy = static_cast<double>(s->targetPos[1]) - s->pos[1];
+            const double dz = static_cast<double>(s->targetPos[2]) - s->pos[2];
+            if (std::sqrt(dx * dx + dy * dy + dz * dz) > limit) inRange = false;
+        }
+        // COMMIT GATE 0x4c91d..0x4c942: gate := affordable AND inRange AND
+        // (design[+0x33] & 0xc) — GZ_TARGETORBIT|GZ_TARGETSURFACE, the FIRST
+        // cited consumer of that mask as a gate (t377 proved TARGETLANE bit1
+        // is a magnetron return-flag; different leg). The gate word IS the
+        // handler's return (0x4c984 := [esp+0x40]).
+        const int gate = (affordable && inRange && d.targetOrbitSurface) ? 1 : 0;
+        rep.flags = gate;
+        if (gate == 0) return rep;             // 0x4c942 je 0x4ca43: DEC paid,
+                                               // NO charge (witness-shaped:
+                                               // gate-fail decrements are the
+                                               // C7 law, charge is not)
+        if (mode != 1) return rep;             // 0x4c947 cmp 0x1: probes charge
+                                               // nothing (K6 edge law)
+        s->power -= d.power;                   // 0x4c958..0x4c960 (affordable
+                                               // here, so cost == design power)
+        // 0x4c966 cat switch: cat==0 -> call 0x39f00 (bombard-shaped effect,
+        // honest NO-DELTA per ai-dossier row 13); cat!=0 returns straight
+        // away. Named no-op either way — the CHARGE is not cat-gated.
+        return rep;
+    }
     if (s->orderType != 0) {
-        // Handlers 1 (0x4c794), 2 (0x4ca50), 5 (0x4cd90): the shield/drive
-        // bodies run NO hit call (C1 rel32 census of [0x4c794,0x4ca50):
-        // {0x2a428,0x38840,0x39f00,0x496e4,0x76da0}) and their returns are
-        // not banked; the special tree is K9 reference scope. Named no-op
-        // legs — and NO charge: the MIN-charge tail 0x4c614 lives inside the
-        // GUN handler; the other handlers' accounting (if any) is unbanked,
-        // so the sim charges nothing for them (never invent).
+        // Handlers 2 (0x4ca50) and 5 (0x4cd90): handler 2's magnetron leg
+        // charges at 0x4cbe3 INSIDE its own composition (t377, modelled by
+        // useMagnetron — not reachable through this seam); the special tree
+        // is K9 reference scope. Named no-op legs here (never invent).
         return rep;
     }
 

@@ -144,6 +144,13 @@ struct SimDesign {
                                  // flag is OR-ed into the return word as a
                                  // FLAG, not a gate; its consumers are
                                  // elsewhere (unbanked, do not invent).
+    bool targetOrbitSurface = false;  // w16 +0x33 mask 0xc (GZ_TARGETORBIT
+                                 // bit2 | GZ_TARGETSURFACE bit3, gizmos.txt
+                                 // vendor flag table lines 74-75). FIRST
+                                 // cited consumer as a COMMIT GATE (t381):
+                                 // handler-1 0x4c928 `and al,0xc` — the
+                                 // handler-1 commit tail runs iff the bitset
+                                 // ANDs 0xc nonzero (docs/re/_wip_t381 S1c).
     // Derived-slot contributions (recalc 0x49b52..0x49b8e), pre-switched so
     // the recalc body stays verbatim without a category branch per slot:
     int32_t rowWeapon = 0;       // cat==0 ? level : 0   (+0x00)
@@ -452,6 +459,23 @@ class ShipSim {
     // FIRST ship in list order with kind==InSystem AND a slot == code. No
     // strength comparison: eligibility is order-state + equipment.
     const Ship* firstCarrier(uint8_t code) const;
+    // ---- t381 INVASION-LAUNCH MODULE CONSUMPTION (FUN_0003a174
+    // 0x3a2a2..0x3a38b verbatim; docs/re/_wip_t381 S1; witness ships.md
+    // S64 M2 Ignatz: SIX cidx-73 slots, EXACTLY the first TWO cleared at
+    // launch, four survive — consumption is COUNT-LIMITED, not all-or-
+    // nothing). Law: count := slots i<invCap with cidx==0x49; need :=
+    // min(count, activeShieldUnits + 1) (the cap at 0x3a327: deficit walk
+    // counts active item-18 Surface Shield +1 / item-19 Mega Shield +2,
+    // ids per income-law.md:565); then walk walk-ORDER again clearing the
+    // FIRST need matches via clearSlot (recalc lands per mutator; the
+    // vendor calls it once post-loop — same zero-then-sum totals).
+    // activeShieldUnits is a CALLER operand (planet state, e-shape like
+    // engageRound's objectivePlanetShielded). NOT modelled, named: the
+    // owner-7/neutral need:=1 override 0x3a342 (table [0x12fb3+494*owner]
+    // file bytes {6,157,226,1,39,24,7,0} measured t381 — zero only for
+    // owner 7; no witness), and the capture EFFECT itself (S64 neg-(c),
+    // user-gated residue family). Returns the number consumed.
+    int resolveInvasion(int transportShipId, int activeShieldUnits);
 
     // ---- t364 PER-SHIP COMBAT ROUND (spec §5 K1..K10; verbatim windows +
     // this session's CORRECTIONS C1..C5: docs/re/_wip_t364.md; resolver

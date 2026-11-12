@@ -43,6 +43,10 @@ void CampaignFleetBridge::ensureDesigns(const std::vector<Gizmo>& gizmos) {
         d.targetLane = (g.flags & 2) != 0;    // GZ_TARGETLANE bitpos 1
                                               // (row 60 Lane Magnetron
                                               // MEASURED flags=0x2, t377)
+        d.targetOrbitSurface = (g.flags & 0xc) != 0;  // TARGETORBIT|
+                                              // TARGETSURFACE bits 2|3 —
+                                              // the handler-1 commit gate
+                                              // 0x4c928 (t381)
         switch (d.cat) {
             case 0: d.rowWeapon = g.level; break;
             case 1: d.rowShield = g.level; break;
