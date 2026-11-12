@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-12T09:40
+updated: 2026-11-12T10:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,47 +222,32 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t383 per queue row t383 below (phase 9: FINDINGS->CODE). t382 LANDED
-(LANDED block below this one): --save READ-ONLY OBSERVER boot for BOTH save
-shapes — native raw .SAV (NEW save-format laws: marker-prefixed stride-0x166
-ship block + stride-0x60 star-slot table, docs/re/savegame.md t382 section)
-and dosbox-x savestate ZIP (existing t360 reader) — + 7 pins + MUTATION 6/6
-CAUGHT, suite 270/0 — the queue's t382 row is DONE and deleted from the
-queue.
-Rationale for t383 next: it is the LAST row of the queue; on landing it
-rewrites NEXT to the WAIT-PUSH-USER sentinel per its own text. The
-WAIT-USER-RULING t374 sentinel stays RETIRED — user spoke 2026-11-11
-(verbatim quotes in DECISIONS.md USER block): OQ-016/OQ-019 acceptance
-DEFERRED (rows stay OPEN; do NOT re-ask, do NOT apply the t329 S4 draft);
-playtest witnesses stand as the evidence base; "incorporate all findings in
-the rewrite before pushing to github" (D7); repo =
-https://github.com/weylandsmith/ascendancy-rewrite.git (exists, empty,
-verified by ls-remote 2026-11-11); author identity Weyland Smith
-<weylandsmith@users.noreply.github.com> (NOTICE + publish --env-filter
-LANDED t376/t376b); user saves 887/1086/1253 PROTECTED
-(~/ascendancy-saves-protected/, law: raw .SAV u32@0 = game-day). GitHub PUSH
-is USER-GO after this queue drains (credentials still absent on box: SSH key
-printed to user 2026-11-11, or token file route).
-
-QUEUE (phase 9 — FINDINGS->CODE; every row wires an ALREADY-WITNESSED law
-(docs/re/ships.md S64 M1-M5, docs/re/_wip_playtest_t369.md, selfplay.md
-right-click law) into rewrite code with witness-valued pins. NO OQ row closes
-(user deferred); strict-close otherwise unchanged. One session each; finish
-tN -> rewrite NEXT to tN+1 VERBATIM; keep this block intact except deleting
-completed rows. All rows: sitting check RING-FIRST, OOM law, game/ read-only,
-gate + both audits green before commit, mutation campaign per the mutation-
-campaign skill law where code lands.)
-
-t383 RE-EXPORT + VERIFY + PARK FOR PUSH. Re-run scripts/publish_public.sh
-into a FRESH dir (tree moved since /tmp/pubpush), verify on clone shapes:
-vendor-free history (script gate), build + run_tests (expect 270 tests,
-187+ skipped, 0 failed WITHOUT data — recount from a fresh run_tests output
-line, t382 added observer_* x7), author identity single
-(weylandsmith@users.noreply.github.com, zero [ISP-DOMAIN] emails), GITHUB_USER=
-weylandsmith set. Then rewrite NEXT to the sentinel shape (TAG LAW: field 2
-WAIT*, NEVER renumber): NEXT WAIT-PUSH-USER t383 — on wake (GO note in
-DECISIONS.md USER block or a *ruling* file): push -u origin main from the
-verified tree ONLY, then park WAIT-USER-RULING t374 verbatim.
+NEXT WAIT-PUSH-USER t383 — on wake (a GO note in docs/DECISIONS.md USER
+block, or a *ruling* file): push -u origin main FROM THE VERIFIED TREE
+/tmp/pubpush-t383b ONLY (do NOT re-export and push blind — if that dir is
+gone, re-run `GITHUB_USER=weylandsmith bash scripts/publish_public.sh
+<fresh-dir>` and re-verify per docs/re/packaging.md §12 BEFORE pushing),
+then park WAIT-USER-RULING t374 verbatim (TAG LAW: field 2 WAIT*, NEVER
+renumber).
+Wake-checklist (all measured green 2026-11-12, t383 session): tree = 568
+commits uniform "Weyland Smith <weylandsmith@users.noreply.github.com>",
+zero vendor-path objects, ZERO blobs holding the personal [ISP-DOMAIN] address
+(scrub + batch gate in publish_public.sh 1b), cmake+build exit 0, run_tests
+"270 tests, 192 skipped, 0 failed" WITHOUT vendor data, origin already set to
+https://github.com/weylandsmith/ascendancy-rewrite.git (exists, empty per
+ls-remote 2026-11-11). Credentials: still absent on box — SSH key printed to
+user 2026-11-11, or token-file route; a push attempt without them fails at
+auth, which is safe (nothing partial lands).
+User context (spoke 2026-11-11, verbatim quotes in DECISIONS.md USER block):
+OQ-016/OQ-019 acceptance DEFERRED (rows stay OPEN; do NOT re-ask, do NOT
+apply the t329 S4 draft); playtest witnesses stand as the evidence base;
+"incorporate all findings in the rewrite before pushing to github" (D7 —
+phase 9 queue DONE: t380/t381/t382 landed the last laws, suite 270/0); user
+saves 887/1086/1253 PROTECTED (~/ascendancy-saves-protected/, law: raw .SAV
+u32@0 = game-day).
+QUEUE: EMPTY — phase 9 fully drained (t383 was the last row, LANDED below).
+After the push (or if the user redirects), author the next queue or park the
+WAIT-TRIGGER sentinel per the standing law below.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
@@ -321,6 +306,37 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t383 — 2026-11-12 (VERIFIED PUSHABLE TREE + HISTORY PRIVACY SCRUB;
+## QUEUE DRAINED — NEXT IS THE WAIT-PUSH-USER SENTINEL)
+Delivered queue row t383 verbatim + one finding the row's own privacy bar
+exposed. Full account docs/re/packaging.md §12 + docs/re/_wip_t383.md.
+- Sitting check RING-FIRST: t368_ring_turn parsed=20/20 max_turn=1254 (same
+  sitting as t380..t382); zero new play; assignment stood.
+- EXPORT: GITHUB_USER=weylandsmith bash scripts/publish_public.sh
+  /tmp/pubpush-t383b exit 0 — "vendor-free history, 6149 objects, 11M .git,
+  tree intact." THE VERIFIED TREE = /tmp/pubpush-t383b (stale /tmp/pubpush +
+  /tmp/pubpush-t383 deleted; script refuses existing dirs by design).
+- HISTORY PRIVACY LEAK FOUND + FIXED (the iteration's real work): the
+  personal [ISP-DOMAIN]-domain git-identity address survived the tip redaction in
+  25 HISTORICAL blobs of docs/re/_license_draft_t372.md (git grep over
+  rev-list; the full sweep timed out at 300 s — bounded count banked).
+  publish_public.sh 1b now rewrites every blob (--tree-filter sed scoped to
+  that path; --blob-filter does NOT exist on this box's git — banked pitfall)
+  and a NEW fail-closed gate (exit 5) batch-scans ALL blobs via
+  cat-file --batch. Post-scrub independent scan: 0 hits "[ISP-DOMAIN]", 0
+  hits "hrethric@".
+- VERIFIED ON THE CLONE, no vendor data: build exit 0; run_tests exit 0
+  "270 tests, 192 skipped, 0 failed" (observer_* pins x7: 5 SKIP no-vendor +
+  synthetic-terminator + render-map ok); identities 568x uniform "Weyland
+  Smith <weylandsmith@users.noreply.github.com>", zero [ISP-DOMAIN], refs/original
+  0; keep-checks pass; NOTICE copyright line intact. origin set on the tree
+  to the user's repo URL (set-url ONLY — push is USER-gated, NOT run).
+- OPEN DISPOSITION (user's call): 160 tracked files carry the plain username
+  "hrethric" in /home/hrethric paths; username not credential; NOT scrubbed.
+- Ledger 17 closed / 2 open UNCHANGED (queue mandate; nothing closable and
+  nothing closed — strict-close held). NEXT = WAIT-PUSH-USER t383 sentinel
+  (queue drained; tag NOT renumbered per SENTINEL-TAG LAW).
 
 ## LANDED t382 — 2026-11-12 (--save READ-ONLY OBSERVER + NATIVE .SAV SAVE LAWS)
 Delivered queue row t382 verbatim: `ascendancy --save FILE` boots a save as a

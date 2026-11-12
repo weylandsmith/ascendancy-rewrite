@@ -208,3 +208,13 @@ push). Push is USER-GO only after t383 verifies. Status at decision time
 (honest): sim laws from the playtest were banked in DOCS ONLY, not yet code;
 binary boots mapgen campaigns, no save-load path — playtest of the rewrite
 needs t382.
+
+D7 STATUS t383 (2026-11-12): QUEUE DONE + TREE VERIFIED. Phase-9 queue
+t377-t383 fully landed (suite 270/0; last code rows: t380 quantizer store,
+t381 gizmo/invasion, t382 --save OBSERVER boot — playtest of the rewrite now
+has its save-load path). t383 export verified at /tmp/pubpush-t383b:
+vendor-free history, single published identity, build+tests green WITHOUT
+vendor data, and a new history scrub (personal email was living in 25 old
+blobs; docs/re/packaging.md S12). PUSH = USER-GO: from /tmp/pubpush-t383b
+run `git push -u origin main` (needs your SSH key or token — neither is on
+the box yet). The loop waits for that GO and will not push itself.

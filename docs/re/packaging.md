@@ -220,3 +220,39 @@ trivially satisfied — nothing closable and nothing closed).
   --portable: auto-extraction ran (ascend00 54 confirmed) and the FULL
   vendor stage set executed — only work/-capture stages noted-skipped.
 - GitHub push: NOT done — USER-gated (remote/org/name = user's call).
+
+
+## 12. t383 RE-EXPORT (2026-11-12) — verified pushable tree + history scrub
+
+- Fresh export `GITHUB_USER=weylandsmith bash scripts/publish_public.sh
+  /tmp/pubpush-t383b` exit 0: "vendor-free history, 6149 objects, 11M .git,
+  tree intact." (first export of the session, /tmp/pubpush-t383, predated the
+  scrub: 6143 objects; superseded and deleted.)
+- HISTORY: 568 commits, author+committer UNIFORM "Weyland Smith
+  <weylandsmith@users.noreply.github.com>"; refs/original 0.
+- PRIVACY FINDING (the iteration's real one): a tip-only redaction is NOT
+  enough — docs/re/_license_draft_t372.md held the personal git-identity
+  address ([ISP-DOMAIN] domain, withheld) in 25 historical blobs; pushing without a
+  history scrub would have leaked it. publish_public.sh 1b now rewrites every
+  blob via --tree-filter sed scoped to that path, and a fail-closed gate
+  batch-scans ALL blobs (rev-list --objects | cat-file --batch | grep -a) for
+  SCRUB_PATTERN=[ISP-DOMAIN] — exit 5 on any hit. Post-scrub scan: 0 hits
+  for "[ISP-DOMAIN]" AND 0 for "hrethric@" across every blob.
+- TOOL PITFALLS banked: (1) this box's git filter-branch has NO --blob-filter
+  (git-filter-repo only; not installed) — first attempt exit 1; (2) a
+  [^[:space:][:punct:]] email class stops at '@' and leaks the local part —
+  use [A-Za-z0-9._%+-]*domain[A-Za-z0-9.-]*; (3) per-commit `git grep
+  $(git rev-list --all)` over 568 commits timed out at 300 s — the batch
+  cat-file scan is the shape that works; (4) no generator writes
+  packaging.md/_license_draft_t372.md (scripts/ grep = comment citations
+  only) — both safe to hand-edit.
+- VERIFIED ON THE CLONE (no vendor data): cmake Debug + build -j4 exit 0;
+  run_tests exit 0 "270 tests, 192 skipped, 0 failed" (observer pins: 5 SKIP
+  no-vendor, 2 ok incl. synthetic terminator + render map). Keep-checks pass;
+  NOTICE "Copyright (C) Weyland Smith". origin set to
+  https://github.com/weylandsmith/ascendancy-rewrite.git on the verified tree
+  (set-url only — push is USER-gated, NOT run).
+- OPEN DISPOSITION (user's call, not a blocker): 160 tracked files carry the
+  plain username "hrethric" inside /home/hrethric paths (scripts, docs). It
+  is a username, not an email/credential; scrubbing it would rewrite hundreds
+  of path strings across history. Left as-is for the push.
