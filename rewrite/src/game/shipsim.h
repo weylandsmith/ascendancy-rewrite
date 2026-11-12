@@ -135,6 +135,15 @@ struct SimDesign {
                                  // ALL 10 cat-0 file rows carry bitpos 0
                                  // (gizmos.txt re-measured t364), so the
                                  // default for a gun row is true
+    bool targetLane = false;     // w16 +0x33 bit 0x2 (GZ_TARGETLANE, gizmos.md
+                                 // §1 flag table; MEASURED set on RAM row 60
+                                 // flags=0x0002 = Lane Magnetron, t377
+                                 // design-row readout scripts/r377_design_rows
+                                 // .py). C2 CORRECTION (t377): the magnetron
+                                 // commit test 0x4cbd4 tests bit0 ONLY — this
+                                 // flag is OR-ed into the return word as a
+                                 // FLAG, not a gate; its consumers are
+                                 // elsewhere (unbanked, do not invent).
     // Derived-slot contributions (recalc 0x49b52..0x49b8e), pre-switched so
     // the recalc body stays verbatim without a category branch per slot:
     int32_t rowWeapon = 0;       // cat==0 ? level : 0   (+0x00)
@@ -471,6 +480,54 @@ class ShipSim {
     // the gun handler, verbatim (kind 4 both sides + same systemId).
     EngagementReport engageRound(int race, int targetShipId,
                                  bool objectivePlanetShielded, int mode);
+    // ---- t377R MAGNETRON USE-SITE (t377 evidence S2 C1..C8 + S3 landing
+    // contract docs/re/_wip_t377.md; witnesses ships.md S64 M1) -------------
+    // Dispatcher-entry composition for the orderType-2 (handler 0x4ca50)
+    // path on the ship's ACTIVE slot (+0x63), magnetron leg (cidx 0x3c) of
+    // the kind-2 tail case tree. The entry 0x4a360 does NOT test [+0x62]
+    // (that gate lives in the caller FUN_00049f28) and derefs [+0x63]
+    // directly: the sim's activeSlot < 0 stands in for the null deref —
+    // named divergence, refuse with zero state change.
+    // Gate ORDER is the law (verbatim, _wip_t377 S3):
+    //   C7 prologue 0x4a373..0x4a397: design numUses==0 -> unlimited, no
+    //     DEC; slot use==0 -> BLOCK, handler never runs; else DEC mode-1-
+    //     ONLY, BEFORE the handler, UNGATED by any handler-side gate — a
+    //     gate-failed use STILL consumes a charge (zero-witness, flagged).
+    //   C1 range gate 0x4cb76..0x4cb95: FAIL iff dist < Range*32 (TOO-CLOSE
+    //     rejected — t185's inverted reading refused witness M1; the
+    //     correction is witness-verified); Range==0 skips the check (je).
+    //   C2 0x4cbd4: bit0 = affordable(design cost <= power, 0x4ca90) AND
+    //     rangeOK — the ONLY commit gate; bit1 = design TARGETLANE is a
+    //     RETURN FLAG, not a gate (consumers elsewhere, unbanked).
+    //   C3 charge 0x4cbe3: power -= min(design power, power) (entry-
+    //     computed 0x4ca89; M1 90->80 = gizmos.txt row 60 'Power 10' EXACT).
+    //   tail case tree cidx==0x3c leg 0x4cd0d..0x4cd43: FUN_000220a8 target
+    //     gate (sim surrogate: kind==InSystem AND targetStar resolves —
+    //     M1's kind byte stayed 4; other kinds = named non-goal), then
+    //     placement FUN_00021f58: star triple + (0,-200,0) + TWO LCG draws
+    //     %200 on x/z, stored via FUN_00049aa8 = quantizer snapGrid on all
+    //     THREE axes (M1 landing ON-grid), kind transient 5 then 4 (0x2202f;
+    //     the 5 is invisible from outside — no boundary between the stores).
+    //     Slot rebuild 0x4cd24..0x4cd39 maps the vendor slot POINTER to the
+    //     stored index — identity in the sim's index space — then clearSlot
+    //     (M1: ring slot REMOVED same event = SINGLE-USE consumption).
+    // mode-0 (AI/probe): exits at 0x4cbcd BEFORE any store — no DEC, no
+    // charge, no placement; flags + cost are reported WITHOUT landing.
+    // HONEST NEGATIVES carried: which star M1 used is UNRECONCILED (S64
+    // neg-(a)) — the sim takes the caller's targetStar; pins assert the
+    // placement FORM (star+jitter snapped) and the delta class (instant, no
+    // walk), NEVER vendor coordinates. A committed use whose target does not
+    // resolve has ALREADY paid DEC+charge (byte order: both precede the
+    // case tree) — unwitnessed composition consequence, flagged.
+    struct MagnetronReport {
+        bool ranHandler = false;   // ammo law passed (prologue did not block)
+        int32_t cost = 0;          // min(design power, power) at entry (C3)
+        int flags = 0;             // return word: bit0 affordable&&rangeOK,
+                                   // bit1 TARGETLANE (C2 — flag, not gate)
+        bool committed = false;    // mode-1 AND bit0 (0x4cbd4)
+        bool placed = false;       // magnetron leg ran placement + clearSlot
+    };
+    MagnetronReport useMagnetron(int shipId, int mode);
     // System-object id for the K1 gate (vendor [+0x59] star-block index law,
     // 0x49dbd `edx*39*32 + 0x13bc5` re-confirmed in the death path this
     // session). Ships in the sim share a system iff systemId matches; the

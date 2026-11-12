@@ -40,6 +40,9 @@ void CampaignFleetBridge::ensureDesigns(const std::vector<Gizmo>& gizmos) {
         d.special1 = g.special1;
         d.upkeepGate = (g.flags & 32) != 0;   // TOGGLEABLE (gizmos.md §1)
         d.targetShip = (g.flags & 1) != 0;    // GZ_TARGETSHIP bitpos 0
+        d.targetLane = (g.flags & 2) != 0;    // GZ_TARGETLANE bitpos 1
+                                              // (row 60 Lane Magnetron
+                                              // MEASURED flags=0x2, t377)
         switch (d.cat) {
             case 0: d.rowWeapon = g.level; break;
             case 1: d.rowShield = g.level; break;

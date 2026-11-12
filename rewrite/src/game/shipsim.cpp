@@ -646,6 +646,106 @@ ShipSim::EngagementReport ShipSim::engageRound(int race, int targetShipId,
     return shot;
 }
 
+ShipSim::MagnetronReport ShipSim::useMagnetron(int shipId, int mode) {
+    // t377R — see shipsim.h for the full contract (evidence _wip_t377 S2/S3,
+    // witness M1 ships.md S64). Gate ORDER is the deliverable.
+    MagnetronReport rep;
+    Ship* s = findShip(shipId);
+    if (!s) return rep;
+    // Entry 0x4a360 derefs [+0x63] directly (NO [+0x62] test at this entry —
+    // that gate is the caller FUN_00049f28's). activeSlot < 0 stands in for
+    // the null deref: named divergence, refuse with zero state change.
+    if (s->activeSlot < 0 || s->activeSlot >= kRingSlots) return rep;
+    InvSlot& slot = s->inv[s->activeSlot];
+    // 0xff active slot: the vendor would read design row 255 (past the
+    // 76-row table — garbage; the UI can never select it). Same named
+    // refusal as the gun path (commitShot 0xff check). This is what makes
+    // "no second use" total: after the first commit the slot is 0xff, so a
+    // repeat call changes NOTHING (no DEC, no charge, no placement).
+    if (slot.cidx == 0xff) return rep;
+    const SimDesign& d = designRow(designs_, slot.cidx);
+    // C3 entry-computed cost 0x4ca89 (BEFORE any gate/placement): the value
+    // the charge tail 0x4cbe3 will subtract.
+    const int32_t cost = std::min(d.power, s->power);
+    rep.cost = cost;
+    // C7 prologue 0x4a373..0x4a397 — BEFORE the handler, ungated by any
+    // handler-side gate: numUses==0 -> unlimited (no DEC); slot use==0 ->
+    // BLOCK (handler never runs); else DEC mode-1-ONLY. A gate-failed use
+    // STILL consumes a charge (zero-witness composition consequence,
+    // flagged at the declaration).
+    rep.ranHandler = true;
+    if (d.numUses != 0) {
+        if (slot.use == 0) return rep;         // out of ammo: esi=0, ret 0
+        if (mode == 1) --slot.use;             // THE consumption site
+    }
+    // Handler 0x4ca50 gates (generic orderType-2 handler; the magnetron leg
+    // is the tail case tree below):
+    // C1 range gate 0x4cb76..0x4cb95 — CORRECTED POLARITY: FAIL iff
+    // dist < Range*32 (TOO-CLOSE rejected; Range==0 skips via je 0x4cb99).
+    // dist measured from the ACTIVE target triple (sim holds targetPos).
+    bool rangeOK = true;
+    if (d.range != 0) {
+        const double dx = static_cast<double>(s->targetPos[0]) - s->pos[0];
+        const double dy = static_cast<double>(s->targetPos[1]) - s->pos[1];
+        const double dz = static_cast<double>(s->targetPos[2]) - s->pos[2];
+        const double dist = std::sqrt(dx * dx + dy * dy + dz * dz);  // 0x76da0
+        rangeOK = !(dist < static_cast<double>(d.range) * 32.0);
+    }
+    // C2 return word 0x4cbd4: bit0 = affordable (design cost <= power,
+    // 0x4ca90) AND rangeOK — the ONLY commit test. bit1 = TARGETLANE flag,
+    // OR-ed into the word, NOT tested here (its consumers are elsewhere,
+    // unbanked — do not invent them).
+    const bool affordable = d.power <= s->power;
+    if (affordable && rangeOK) rep.flags |= 1;
+    if (d.targetLane) rep.flags |= 2;
+    // mode != 1 exits at 0x4cbcd BEFORE any store: probe reports flags/cost,
+    // lands nothing (the DEC above was mode-1-only, so probes cannot spend
+    // ammo either).
+    if (mode != 1) return rep;
+    if (!(rep.flags & 1)) return rep;          // 0x4cbd4 test bit0 -> fail leg
+    rep.committed = true;
+    // C3 charge tail 0x4cbe3: power -= min(Power, power) at entry value.
+    s->power -= cost;
+    // Kind-2 tail case tree 0x4cd51 (switch on the slot cidx): the 0x20 /
+    // 0x34..0x3b / 0x3e legs are planet/star visibility bookkeeping OUTSIDE
+    // the ship model (named non-goals, S3) — the sim returns for them;
+    // cidx 0x3c is the magnetron leg 0x4cd0d..0x4cd43.
+    if (slot.cidx != kCidxMagnetron) return rep;
+    // FUN_000220a8 target gate (sim surrogate, S3): M1's kind byte stayed 4
+    // (InSystem) across the use; kinds outside the cited set are a named
+    // non-goal -> refuse placement (DEC+charge ALREADY PAID, flagged).
+    if (s->kind != OrderKind::InSystem) return rep;
+    const SimStar* st = star(s->targetStar);
+    if (!st) return rep;                       // target does not resolve
+    // Placement FUN_00021f58 (C5 verbatim): triple := star triple; y +=
+    // -200.0 (LIVE ds:0xaee); TWO LCG draws 0x7824f, x += draw%200, z +=
+    // draw%200 (idiv ebx==200 both axes — the 0x4cd12 xor ebx,ebx feeds only
+    // the assert-skip test 0x21f62, NOT the divisor; _wip_t377 C5 audit).
+    // Separate statements: draw ORDER is the determinism law.
+    const int jx = draw();
+    const int jz = draw();
+    float p[3];
+    p[0] = st->pos[0] + static_cast<float>(jx % 200);
+    p[1] = st->pos[1] + kPlaceYOffset;
+    p[2] = st->pos[2] + static_cast<float>(jz % 200);
+    // Store via FUN_00049aa8 = store +0x9e then CALL quantizer FUN_000533e0
+    // (g=32) on ALL THREE axes — M1 landing ON the 32-grid. kind transient:
+    // BYTE[+0x58] := 5 at 0x4cd26, := 4 at 0x2202f — no observation boundary
+    // between the stores, net kind = InSystem (M1: kind byte stays 4).
+    for (int i = 0; i < 3; ++i) s->pos[i] = snapGrid(p[i]);
+    s->kind = OrderKind::InSystem;
+    rep.placed = true;
+    // Slot rebuild 0x4cd24..0x4cd39: idx = ([+0x63] - ring base)/7 — the
+    // vendor's pointer-to-index map is IDENTITY in the sim's index space —
+    // then FUN_000496e4 clear-slot (C8: filled dec, recalc). M1: ring slot
+    // REMOVED in the same event = SINGLE-USE consumption is explicit law.
+    // [+0x63] itself is NOT cleared (no cited law touches it; the sim keeps
+    // the index — the next call meets the 0xff refusal above).
+    clearSlot(*s, static_cast<uint32_t>(s->activeSlot));
+    return rep;
+}
+
+
 
 
 bool ShipSim::starArrivalComplete(Ship& s) {
