@@ -3064,3 +3064,57 @@ user lost at this turn boundary: name cleared, was 'Medium' own0) is dead
 name + order fields but NOT +0x15a/+0x15e (ring cap/filled). Test amended
 (test_shipsave_t360 dead-branch: span law kept, uniformity retracted,
 deadWithInv counter printed); suite 226/0.
+
+## S65 t377R (2026-11-12) — MAGNETRON USE-SITE LANDED INTO SHIPSIM (useMagnetron)
+Code landing of the S64 M1 witness + the t377 static corrections C1..C8
+(contract docs/re/_wip_t377.md S3; execution notes docs/re/_wip_t377R.md).
+Seam: `ShipSim::MagnetronReport useMagnetron(int shipId, int mode)`
+(rewrite/src/game/shipsim.{h,cpp}) = dispatcher-entry composition (0x4a360
+derefs [+0x63] directly, NO [+0x62] test at this entry — activeSlot<0 named
+refusal) of the orderType-2 handler (0x4ca50) gates + the cidx 0x3c leg of
+the kind-2 tail case tree (0x4cd0d..0x4cd43):
+  C7 prologue DEC (mode-1-only) BEFORE the handler, ungated by handler-side
+  gates -> C1 range gate FAIL iff dist < Range*32, Range==0 skips (CORRECTED
+  polarity) -> C2 bit0 = affordable AND rangeOK is the ONLY commit test;
+  TARGETLANE bit1 is a return FLAG (SimDesign.targetLane, bridge-wired from
+  gizmos.txt flags bitpos 1; RAM row 60 flags=0x2 MEASURED) -> C3 charge
+  power -= min(design power, power) entry value -> target-gate surrogate
+  (kind==InSystem + targetStar resolves) -> placement FUN_00021f58 verbatim
+  (star triple + (0,-200,0) + TWO LCG draws %200 on x/z; ebx=200 divisor for
+  BOTH idivs — the 0x4cd12 xor ebx,ebx feeds only the assert-skip test) ->
+  snapGrid all three axes (FUN_00049aa8 quantizer) -> kind net InSystem
+  (transient 5 invisible: no observation boundary between the stores) ->
+  clearSlot(activeSlot) [C4 single-use; [+0x63] itself NOT cleared — no
+  cited law touches it; the repeat call meets the 0xff refusal].
+COMPOSITION CONSEQUENCES (flagged, zero-witness): (i) a gate-failed mode-1
+use pays the DEC but no charge (bytes: DEC precedes the gates, charge tail
+follows the bit0 test); (ii) a committed use whose TARGET does not resolve
+pays DEC + charge and lands nothing (both precede the case tree); mode-0
+lands NOTHING (0x4cbcd early exit; DEC is mode-1-only so probes cannot
+spend ammo). Non-magnetron cidx under this seam: generic gates + charge
+land, no leg (0x20/0x34../0x3e bookkeeping legs = named non-goals outside
+the ship model).
+PINS rewrite/tests/test_shipsim_t377.cpp x12 (M1-valued fixture: power 90,
+row 60 shape cat5/power10/range50/uses1/TARGETLANE; expected placement
+computed from the sim's own LCG, NEVER vendor coordinates — S64 neg-(a)
+stands): burn-exact 90->80; slot-consumed-once (cidx->0xff, filled dec);
+placement-form + 32-grid + exactly-2-draws; no-second-use (digest
+identical); zero-carried never fires (activeSlot -1 and 0xff, zero state
+change); gate-fail-DECs-still (TOO-CLOSE dist 800<1600: use 3->2, no
+charge, no placement); unaffordable-DECs-still (power 5: DEC paid, no
+charge); mode-0 probe lands nothing (flags+cost reported, digest
+identical, 0 draws); non-magnetron cidx no leg; TARGETLANE-not-a-gate
+(unflagged row commits identically); target-gate shape (kind!=4: DEC+charge
+paid, nothing placed). SUITE 238/0.
+MUTATION 9/9 CAUGHT (driver scripts/r363r_mutate.py, checkpoint commits
+b09cefb/799c9c4 first): M1 charge->1 CAUGHT (burn pins); M2 clearSlot
+removed CAUGHT (consumed-once); M3 0xff-refusal removed CAUGHT
+(no-second-use); M4 polarity INVERTED to the t185 reading CAUGHT (27 tests
+— the corrected law is the suite-visible one); M5a DEC removed CAUGHT
+(gate-fail pins); M5b DEC affordability-gated CAUGHT (unaffordable pin
+isolates it); M6 mode!=1 exit removed CAUGHT (mode-0 pin); M7 TARGETLANE
+as commit gate CAUGHT (non-magnetron + flags pins); M8 snapGrid removed
+CAUGHT (placement-form pin).
+HONEST NEGATIVE unchanged: which star M1 used stays UNRECONCILED (S64
+neg-(a)); the seam takes the caller's targetStar. NO OQ row closes (user
+deferred OQ-016/OQ-019; this is law implementation, not the named closer).

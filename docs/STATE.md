@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-11T22:55
+updated: 2026-11-12T00:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,15 +222,21 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t377R per queue row t377 below (phase 9: FINDINGS->CODE). The
-WAIT-USER-RULING t374 sentinel is RETIRED — user spoke 2026-11-11 (verbatim
-quotes in DECISIONS.md USER block): OQ-016/OQ-019 acceptance DEFERRED (rows
-stay OPEN; do NOT re-ask, do NOT apply the t329 S4 draft); playtest witnesses
-stand as the evidence base; "incorporate all findings in the rewrite before
-pushing to github" (D7); repo = https://github.com/weylandsmith/ascendancy-
-rewrite.git (exists, empty, verified by ls-remote 2026-11-11); author identity
-Weyland Smith <weylandsmith@users.noreply.github.com> (NOTICE + publish
---env-filter LANDED t376/t376b); user saves 887/1086/1253 PROTECTED
+NEXT t378 per queue row t378 below (phase 9: FINDINGS->CODE). t377R LANDED
+(LANDED block below this one): useMagnetron seam + 12 pins + MUTATION 9/9
+CAUGHT — the queue's t377 row is DONE and deleted from the queue.
+Rationale for t378 next: its atomicity pins touch the same issue/order path
+in shipsim.cpp that t377R just landed on (targetPos/orderType fields); doing
+it while that code is fresh keeps the diff reviewable. The
+WAIT-USER-RULING t374 sentinel stays RETIRED — user spoke 2026-11-11
+(verbatim quotes in DECISIONS.md USER block): OQ-016/OQ-019 acceptance
+DEFERRED (rows stay OPEN; do NOT re-ask, do NOT apply the t329 S4 draft);
+playtest witnesses stand as the evidence base; "incorporate all findings in
+the rewrite before pushing to github" (D7); repo =
+https://github.com/weylandsmith/ascendancy-rewrite.git (exists, empty,
+verified by ls-remote 2026-11-11); author identity Weyland Smith
+<weylandsmith@users.noreply.github.com> (NOTICE + publish --env-filter
+LANDED t376/t376b); user saves 887/1086/1253 PROTECTED
 (~/ascendancy-saves-protected/, law: raw .SAV u32@0 = game-day). GitHub PUSH
 is USER-GO after this queue drains (credentials still absent on box: SSH key
 printed to user 2026-11-11, or token file route).
@@ -261,16 +267,6 @@ tN -> rewrite NEXT to tN+1 VERBATIM; keep this block intact except deleting
 completed rows. All rows: sitting check RING-FIRST, OOM law, game/ read-only,
 gate + both audits green before commit, mutation campaign per the mutation-
 campaign skill law where code lands.)
-
-t377 MAGNETRON USE-SITE INTO SHIPSIM. (EVIDENCE LANDED t377 incl. THREE
-static corrections C1/C2/C7 + RAM row readout — see LANDED t377 block and
-docs/re/_wip_t377.md; CODE = t377R above.) Witness M1 (ships.md S64): s28
-Guandagnini Vernunft->Atropos INSTANT jump d=(+2464,-3104,+2528), POWER
-90->80 = gizmos.txt Lane Magnetron 'Power 10' EXACT, ring slot (cidx 60)
-REMOVED same event = single-use consumption. cidx == gizmos.txt entry index
-(M2 corroboration 9/60/73). Landing-on-grid reconciliation stays an honest
-negative (S64 neg-(a) — star triple UNKNOWN); pin FLAGS/DELTA CLASS, never
-invented coordinates.
 
 t378 DESTINATION-TRIPLE ATOMICITY INTO SHIPSIM. Witness M3 (S64): every
 empty-space order writes order type->3 + [+0x6c] destination triple
@@ -380,6 +376,51 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t377R — 2026-11-12 (MAGNETRON USE-SITE CODE LANDED: useMagnetron
++ 12 PINS + MUTATION 9/9 CAUGHT; SUITE 238/0; LEDGER 17/2 UNCHANGED —
+HONEST, USER-GATED)
+
+- Sitting check RING-FIRST: t368_ring_turn parsed=20/20 max_turn=1254 (ring
+  kept rotating WITHIN turn 1254 after t377's 21:16 bank — 41/60.sav cksums
+  differ, turn identical). 1254 > 1086 => r1_t85g_sitting.py re-run per the
+  standing rule (background, work/r1/t377R_sitting.out): presence events
+  t>=1240 are EXACTLY the already-witnessed M5 boundary + history rows +
+  the Oct-28 t1335 echo (t377 FEED LAW); mid-turn offset census shows no NEW
+  class. NO new witness; M1-M6 stand; t377R assignment confirmed.
+- CODE (799c9c4): ShipSim::MagnetronReport useMagnetron(shipId, mode) in
+  rewrite/src/game/shipsim.{h,cpp}, composed VERBATIM per _wip_t377 S3:
+  entry derefs activeSlot (no [+0x62] test at 0x4a360; -1/0xff named
+  refusals) -> C7 prologue DEC mode-1-only BEFORE handler, ungated ->
+  C1 CORRECTED range gate (FAIL iff dist < Range*32, Range==0 skips) ->
+  C2 bit0-only commit test, TARGETLANE = return flag (SimDesign.targetLane,
+  bridge-wired gizmos flags bitpos 1; row 60 MEASURED flags=0x2) -> C3
+  charge min(design,power) entry value -> 220a8 target-gate surrogate
+  (kind==InSystem + targetStar resolves) -> FUN_00021f58 placement (star
+  triple + (0,-200,0) + TWO LCG draws %200 x/z, ebx=200 both idivs) ->
+  snapGrid 3 axes -> kind net 4 -> clearSlot(activeSlot) [C4]. Flagged
+  composition consequences (zero-witness): gate-fail pays DEC no charge;
+  committed-use-with-unresolved-target pays DEC+charge lands nothing;
+  mode-0 lands NOTHING incl. no DEC, no draws.
+- PINS test_shipsim_t377.cpp x12 (M1-valued fixture; expected placement
+  computed from the sim's own LCG, NEVER vendor coordinates — S64 neg-(a)
+  stands): burn-exact 90->80 / slot-consumed-once / placement-form+grid+
+  2-draws / no-second-use (digest-identical) / zero-carried / gate-fail-
+  DECs-still / unaffordable-DECs-still / mode-0-lands-nothing / non-
+  magnetron-cidx-no-leg / TARGETLANE-not-a-gate / target-gate-shape /
+  determinism. SUITE 238/0 (session start 226; +10 then +2 pins).
+- MUTATION 9/9 CAUGHT (r363r_mutate.py; checkpoints b09cefb+799c9c4 FIRST
+  per skill rule 1): M1 charge-amount, M2 clearSlot, M3 0xff-refusal,
+  M4 POLARITY-INVERTED-to-t185-reading (27 fails — the corrected law is the
+  suite-visible law), M5a DEC-removed, M5b DEC-affordability-gated (the
+  unaffordable pin ISOLATES it, 1 fail), M6 mode!=1-exit, M7 TARGETLANE-as-
+  gate, M8 snapGrid. Full per-mutant verdicts _wip_t377R S3; laws distilled
+  ships.md S65.
+- LEDGER 17/2 UNCHANGED — honest negative: no OQ row's named closer touched
+  (OQ-019 user-gated; t377R NOTE added to the row: implementation of the
+  corrected law, not the closer). GATE_EXIT=0; ledger_audit OK;
+  ledger_index_check OK; game/ untouched; production :9 untouched; no new
+  capture run.
 
 ## LANDED t377 — 2026-11-11 (MAGNETRON USE-SITE EVIDENCE COMPLETE + THREE
 STATIC CORRECTIONS C1/C2/C7; RAM DESIGN-ROW READOUT NEW TOOL; CODE DEFERRED

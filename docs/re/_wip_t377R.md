@@ -53,4 +53,42 @@ placement FORM + delta class, never vendor coordinates; TARGETLANE bit1
 consumer elsewhere (C2).
 
 ## S2 adjudications made during landing
-(TBD as code lands)
+1. TARGETLANE wiring home: SimDesign gained `targetLane` (bitpos 1);
+   campaign_fleet_bridge.cpp (the production gizmos.txt->SimDesign path)
+   sets it from g.flags & 2 alongside targetShip. Row 60 MEASURED flags=0x2.
+2. activeSlot after the commit: NOT cleared (no cited law touches [+0x63]
+   in the magnetron leg; only clearSlot touches the SLOT byte). The vendor
+   keeps a dangling pointer to a now-0xff cell; the sim keeps the index and
+   the 0xff refusal reproduces "no second use" TOTAL (M3 mutant CAUGHT
+   proves the refusal is the load-bearing site).
+3. kind transient 5 (0x4cd26) then 4 (0x2202f): the sim stores only the net
+   4 — there is no observation boundary between the stores inside one
+   handler call, and M1's kind byte stayed 4 (ships.md S64). Pin asserts net.
+4. snapGrid applied to ALL THREE axes (store via FUN_00049aa8 = store + CALL
+   0x533e0 quantizer; the y axis star-200 lands 32-aligned iff star.y is;
+   the pin star uses y=-1560 so y is aligned, matching M1's on-grid landing).
+5. Non-magnetron cidx under this seam: charge lands, no leg. The seam is
+   named useMagnetron but composes the GENERIC handler-2 gates first (that
+   is what the bytes are); the case-tree legs 0x20/0x34../0x3e stay named
+   non-goals. Pin shipsim_magnetron_nonmagnetron_cidx_no_leg uses the M2
+   cost-6 shape (Invasion Module row) and asserts DEC-is-cidx-independent.
+6. Gate-fail DEC fixture: numUses 3 (M2-shape) so the slot SURVIVES the
+   gate-fail use and use==2 is observable; a numUses-1 fixture would let
+   the mutant "DEC removed" hide behind slot removal (vacuity rule 5).
+7. mode-0 probe: rngDraws must stay 0 (draws live only in the store leg) —
+   pinned; digest-identity pinned too (stronger than field-by-field for
+   "lands nothing").
+
+## S3 mutation campaign result (checkpoint b09cefb + 799c9c4 FIRST, rule 1)
+Driver scripts/r363r_mutate.py (anchor count==1 asserted per mutant).
+9/9 CAUGHT, each by its named pin(s):
+  M1 charge->1: burn-exact + nonmagnetron-cost pins (4 fail)
+  M2 clearSlot removed: slot-consumed-once (4 fail)
+  M3 0xff-refusal removed: no-second-use (3 fail)
+  M4 polarity INVERTED (t185 reading): 27 fail — corrected law is suite-visible
+  M5a DEC removed: gate-fail-decs + unaffordable-decs (4 fail)
+  M5b DEC affordability-gated: unaffordable-decs isolates it (1 fail)
+  M6 mode!=1 exit removed: mode0-probe-lands-nothing (6 fail)
+  M7 TARGETLANE as commit gate: nonmagnetron + flags pins (6 fail)
+  M8 snapGrid removed: placement-form (4 fail)
+Post-campaign: git clean, rebuild, suite 238/0.
