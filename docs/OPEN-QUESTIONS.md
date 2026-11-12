@@ -370,6 +370,21 @@ ships.md S67. HONEST NEGATIVES banked (_wip_t379 S2/S4/S5): DEC writer
 unattributed ([ds:0x3067b]==0 both banks), corpse refill-skip cause
 unmeasured, s12 death producer unattributed (integrity survived — NOT the
 hull<1 path in this witness). Row STILL OPEN (user deferred).
+t380 NOTE (2026-11-12, CODE LANDED + CORRECTION): the QUANTIZER STORE LAW is
+now in the rewrite and the S64 mid-transit signal is REFRAMED — every
+committed galactic position store (walk incl. PARTIAL walks, placement,
+scatter) passes the triple through FUN_000533e0 g=32 (walk quantizer call
+0x4a2cf unconditional, copy-back gated by mode==1 only; placement 0x2202a and
+scatter 0x399df store via the quantizing helper 0x49aa8); the t361-era
+"arrival-time-only snap" reading is SUPERSEDED. Runtime census
+(scripts/r380_grid_census.py): kinds 1/3/4 rest rows 100% on the 32-grid
+(4020+800 rows, zero exceptions); ALL off-grid rows are kind-5 LANE-LOCAL
+frames (S22 L4), so the (14,1,-224)/(28,0,-2144)/144.7 rows never contradicted
+the law. 6 pins test_shipsim_t380.cpp (mid-transit snap, tie-away-from-zero,
+lane-END grid rest, lane-local frame boundary, scatter invariant, corpus
+census), 2 goldens corrected in place, MUTATION 7/7 CAUGHT incl. M7 = the
+superseded arrival-gated reading. ships.md S68; _wip_t380 S1..S5. Row STILL
+OPEN (user deferred).
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +

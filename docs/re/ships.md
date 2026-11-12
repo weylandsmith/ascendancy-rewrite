@@ -3212,3 +3212,43 @@ guarded size CHECK or a size-breaking mutant segfaults the whole suite
 CORPUS NOTE: work/r1/playcap/save/41..60.sav rolled over to turn 1254 (same
 state as the -late bank; test_shipsave_t360 frozen-exact case self-skips by
 design — the durable law case stays green).
+
+## S68 t380 (2026-11-12) — QUANTIZER STORE LAW: EVERY COMMITTED GALACTIC POSITION IS 32-ALIGNED
+Static, instruction-level (work/r331_disasm.txt; full audit docs/re/_wip_t380.md
+S1): FUN_00049aa8 (0x49aa8..0x49ac8) is a QUANTIZING STORE — stores the f32
+triple to [ship+0x9e..+0xa6] then CALLs FUN_000533e0 (g = ds:0x895dc = 32) on
+ALL THREE axes (0x53436/0x53481 leg bodies verified). Callers: placement
+0x2202a (FUN_00021f58 tail, before BYTE[+0x58]:=4) and scatter 0x399df
+(landing-attempt region) — both quantized. The WALK body FUN_00049f54 calls
+the quantizer UNCONDITIONALLY at 0x4a2cf (straight line, scratch triple at
+[ship+0x78]); the copy-back of the quantized scratch 0x4a2d9..0x4a2ed is gated
+ONLY by cmp edi,0x1 (edi = arg2, set 0x49f63, no writes verified between).
+CALLER CENSUS of the wrapper FUN_00049f28: executor commit 0x25560 passes
+edx=1; dry-run callers 0x15cc5/0x15df0 pass edx=0 (scratch quantize, no
+store, no power/moves math). => THE t361-era "arrival-time-only snap"
+[INFERRED] reading is SUPERSEDED: arrival drives BOOKKEEPING (0x4a2f0 fild
+[+0x94], power) never the snap; a PARTIAL walk commits a 32-aligned position.
+TIE SEMANTICS NOW BANKED (0x533e0 full read): q = trunc(round(v + 16*sign(v))
+/ 32) * 32 — ties (v = 16 mod 32) go AWAY FROM ZERO; the sim's snapGrid
+(std::round(a/g)*g) is the identical shape.
+RUNTIME (scripts/r380_grid_census.py, zero capture): banks 100 saves -> 4020
+LIVE rest rows, off-grid 1140; kinds {1:200, 3:600, 4:1980, 5:1240};
+OFF-BY-KIND {5:1140} — kinds 1/3/4 ZERO exceptions; production ring 20 saves
+same shape (540 rows kinds 1/3/4, all on grid). Every off-grid row carries
+the S22-L4 LANE-LOCAL signature (y EXACTLY 0 or 1, z exact x32); off-grid
+rows NOT lane-local: 0 on both sides. REFRAME: the t370 "mid-transit
+off-grid" rows ((14,1,-224)x5, (28,0,-2144), 144.7->149.3) are kind-5
+lane-local march progress — the march never writes galactic +0x9e (laneX is
+a separate field). Consistent with the law, not evidence against it.
+CODE: shipsim.cpp walkLaw snap unconditional; laneMarch lane-END placement +
+landingAttempt scatter snap (both are 0x49aa8-shaped stores in the vendor).
+GOLDENS CORRECTED: t361 lane placement (1164,300,1006)->(1152,288,992);
+t362 clamp-operand 277.333->288 (mutant separation preserved). Runtime
+corroboration of the corrected lane-END value: S64 M5 s10 arrival
+(-1280,-1952,384) all exact x32.
+MUTATION 7/7 CAUGHT (checkpoint 7962fb8 first): M1 walk-snap-removed /
+M2 grid-16 / M3 toward-zero ties / M4 lane-end-snap-removed / M5
+scatter-snap-removed (isolated by the t380 scatter pin alone) / M6
+snap-identity / M7 ARRIVAL-GATED (the superseded reading restored — 4 fails;
+the partial-walk pins are the isolator). Pins test_shipsim_t380.cpp x6 incl.
+the corpus census pin (off-grid => kind-5 lane-local, floors 400/150).

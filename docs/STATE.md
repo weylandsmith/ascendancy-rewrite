@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-12T02:40
+updated: 2026-11-12T04:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,14 +222,14 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t380 per queue row t380 below (phase 9: FINDINGS->CODE). t379 LANDED
-(LANDED block below this one): count-window seam (liveCount/countWindow/
-orphanedShips) + finalizer store-set correction + 5 pins + MUTATION 9/9
-CAUGHT — the queue's t379 row is DONE and deleted from the queue.
-Rationale for t380 next: it is the next witnessed-law row in queue order and
-reuses the same sitting's banked evidence (S64 quantizer rows; zero capture
-needed — the mid-transit signal instrument was corrected t370, do NOT re-hunt
-magnetron landing). The
+NEXT t381 per queue row t381 below (phase 9: FINDINGS->CODE). t380 LANDED
+(LANDED block below this one): quantizer store law (walk/placement/scatter
+stores quantize UNCONDITIONALLY — the arrival-only reading SUPERSEDED) + 6
+pins + 2 goldens corrected + MUTATION 7/7 CAUGHT — the queue's t380 row is
+DONE and deleted from the queue.
+Rationale for t381 next: it is the next witnessed-law row in queue order and
+reuses the same sitting's banked evidence (S64 M2 decrement rows; zero capture
+needed). The
 WAIT-USER-RULING t374 sentinel stays RETIRED — user spoke 2026-11-11
 (verbatim quotes in DECISIONS.md USER block): OQ-016/OQ-019 acceptance
 DEFERRED (rows stay OPEN; do NOT re-ask, do NOT apply the t329 S4 draft);
@@ -243,13 +243,13 @@ LANDED t376/t376b); user saves 887/1086/1253 PROTECTED
 is USER-GO after this queue drains (credentials still absent on box: SSH key
 printed to user 2026-11-11, or token file route).
 
-t380 = QUANTIZER REST-ON-GRID INTO SHIPSIM PINS (queue row verbatim): t370
-RUNTIME CONFIRMED: mid-transit rows OFF the 32-grid ((14,1,-224)x5,
-(28,0,-2144), 144.7->149.3), REST rows ON (grid quantizer DAT_000895dc=32,
-t183). Pin shipsim walk output: rest positions land 32-aligned, in-flight
-positions may not; K3b off-grid-at-rest test is BLIND BY CONSTRUCTION
-(instrument corrected t370 — use mid-transit signal, do NOT re-hunt magnetron
-landing). No new capture.
+t381 = GIZMO-USE DECREMENT + INVASION CONSUMPTION. Witness M2 (S64): Stainer
+cidx9 3->2 with power -6 = Nanomanipulator 'Power 6' EXACT; Gofriller
+3->2->1; Ignatz LOST 2x cidx73 Invasion Module AT INVASION LAUNCH. Verify
+commitShot/upkeep charge laws reproduce the decrements (t364 C5: charge
+fires even on zero damage) and the turn-tail refresh (t363R design[+0x42]);
+wire invasion-LAUNCH inventory consumption if absent (pership-spec §4
+EVENT-4/8 chain). Pins from the exact witnessed values.
 
 QUEUE (phase 9 — FINDINGS->CODE; every row wires an ALREADY-WITNESSED law
 (docs/re/ships.md S64 M1-M5, docs/re/_wip_playtest_t369.md, selfplay.md
@@ -259,14 +259,6 @@ tN -> rewrite NEXT to tN+1 VERBATIM; keep this block intact except deleting
 completed rows. All rows: sitting check RING-FIRST, OOM law, game/ read-only,
 gate + both audits green before commit, mutation campaign per the mutation-
 campaign skill law where code lands.)
-
-t381 GIZMO-USE DECREMENT + INVASION CONSUMPTION. Witness M2 (S64): Stainer
-cidx9 3->2 with power -6 = Nanomanipulator 'Power 6' EXACT; Gofriller
-3->2->1; Ignatz LOST 2x cidx73 Invasion Module AT INVASION LAUNCH. Verify
-commitShot/upkeep charge laws reproduce the decrements (t364 C5: charge
-fires even on zero damage) and the turn-tail refresh (t363R design[+0x42]);
-wire invasion-LAUNCH inventory consumption if absent (pership-spec §4
-EVENT-4/8 chain). Pins from the exact witnessed values.
 
 t382 PLAYTEST BOOT (READ-ONLY OBSERVER). Current binary boots mapgen
 campaigns only; NO save-boot path exists (grep-verified 2026-11-11). Land
@@ -345,6 +337,52 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t380 — 2026-11-12 (QUANTIZER STORE LAW LANDED: EVERY COMMITTED
+GALACTIC POSITION IS 32-ALIGNED — ARRIVAL-ONLY READING SUPERSEDED; 6 PINS +
+2 GOLDENS CORRECTED + MUTATION 7/7 CAUGHT; SUITE 253/0; LEDGER 17/2
+UNCHANGED — HONEST, USER-GATED)
+
+- Sitting check RING-FIRST: t368_ring_turn parsed=20/20 max_turn=1254;
+  timeline 9,349,893,839 B 400 KB tail-SEEK 12 rows ALL turn 1254 (wall
+  03:42:07) = ring rotation only; r1_t85g_sitting.py NOT run; assignment
+  stood (zero-capture row).
+- STATIC (work/r331_disasm.txt verbatim, _wip_t380 S1a..S1d): FUN_00049aa8 IS
+  a quantizing store (store +0x9e triple then call 0x533e0, all 3 axes
+  verified through 0x534c9); callers 0x2202a placement / 0x399df scatter.
+  The WALK quantizer call 0x4a2cf is UNCONDITIONAL; copy-back 0x4a2d9 gated
+  ONLY by cmp edi,0x1 (edi=arg2 at 0x49f63, no intervening writes verified).
+  Caller census of wrapper 0x49f28: executor commit 0x25560 edx=1; dry-runs
+  0x15cc5/0x15df0 edx=0. => PARTIAL walks commit ON-GRID; arrival is
+  bookkeeping only. Ties banked: trunc(round(v+16*sign(v))/32)*32 =
+  AWAY-FROM-ZERO — identical to the sim's snapGrid shape.
+- RUNTIME (scripts/r380_grid_census.py, new tool, zero capture): banks 100
+  saves 4020 live rest rows / 1140 off-grid, off-by-kind {5:1140} — kinds
+  1/3/4 ZERO exceptions; ring 20 saves same shape. Off-grid rows NOT
+  lane-local (S22 L4 y in {0,1}, z x32): ZERO both sides. REFRAME: the t370
+  mid-transit rows were kind-5 lane-local all along — consistent with the
+  law, never evidence against it.
+- CODE (shipsim.{h,cpp}): walkLaw snap unconditional after the walk math
+  (moves := round(remaining RAW) order preserved); laneMarch lane-END +
+  landingAttempt scatter snap (both 0x49aa8-shaped vendor stores); shipsim.h
+  walkLaw doc rewritten. GOLDENS CORRECTED IN PLACE: t361 lane placement
+  (1164,300,1006)->(1152,288,992); t362 clamp-operand 277.333->288 (clamp
+  mutant separation preserved — walk-operand mutant lands 320).
+- PINS test_shipsim_t380.cpp x6: mid-transit snap; negative-coord ties
+  (-48->-64, -80->-96, -81->-96, -47->-32); lane-END arrival grid rest;
+  lane march stays lane-local (pos frozen, laneX off-grid OK); scatter
+  on-grid invariant + |d|<=516; corpus census (off-grid => kind5 lane-local,
+  floors 400/150, self-skips on public clone).
+- MUTATION 7/7 CAUGHT (r363r_mutate.py, checkpoint 7962fb8 FIRST per skill
+  rule 1): M1 walk-snap-removed (10 fail) / M2 grid-16 (16) / M3 ties-toward-
+  zero (7) / M4 lane-end-snap-removed (6) / M5 scatter-snap-removed (1,
+  isolated by the t380 scatter pin alone) / M6 snap-identity (21) / M7
+  ARRIVAL-GATED = the SUPERSEDED t361 reading restored (4 fails — the
+  partial-walk pins are the isolator; the pre-t380 suite was blind to this
+  law). Clean revert verified 253/0; campaign spot-check --seed 2024 exit 0.
+- LEDGER 17/2 UNCHANGED — honest negative: no OQ row's named closer touched
+  (OQ-019 user-gated; t380 NOTE added: law refinement + S64 reframe). GATE
+  green; both audits OK; game/ untouched; production :9 untouched.
 
 ## LANDED t379 — 2026-11-12 (DEATH-vs-RECLAIM SHAPES RECONCILED + COUNT-WINDOW
 SEAM + FINALIZER STORE-SET CORRECTION + 5 PINS + MUTATION 9/9 CAUGHT; SUITE

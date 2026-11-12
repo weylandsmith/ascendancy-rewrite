@@ -75,3 +75,50 @@
 - walkLaw mid-walk (non-arrival) no snap — t361-era [INFERRED]; t362 pin
   'pos 277.333' encodes it. Resolution needs the CALLER census of 0x49f54
   (what arg2 does the executor pass) — IN PROGRESS.
+
+## S3 RUNTIME CENSUS (scripts/r380_grid_census.py, zero capture) — LAW CONFIRMED
+Banks (5 dirs x 20 saves = 100): live rest rows 4020, off-grid 1140 (28.36%);
+kinds census {1:200, 3:600, 4:1980, 5:1240}; OFF-BY-KIND {5: 1140} — kinds
+1/3/4 ZERO off-grid rows. Production ring (20 saves): 800 rows, off 260,
+off-by-kind {5:260} again zero exceptions.
+EVERY off-grid row carries the S22-L4 LANE-LOCAL frame signature (y EXACTLY
+0 or 1, z exact multiple of 32): "off-grid rows that are NOT the lane-local
+frame: 0" on both sides. The mid-transit rows t370 read as quantizer evidence
+((14,1,-224)x5, (28,0,-2144), 144.7->149.3) are kind-5 lane-local march
+progress — the march never writes galactic +0x9e (laneX is a different field).
+Timeline tail (200 MB, deduped): kind4 off-grid 0/19; kind5 off-grid 13/13
+(8 with the pure lane-local signature; the other 5 have y=0 z=32/1824 shapes).
+ADJUDICATION: rest-on-grid holds at EVERY committed GALACTIC store (kinds
+1/3/4 + kind-5 lane-END arrival); kind-5 mid-lane rows are a different frame,
+not law-breaks. t370's "mid-transit off-grid" signal is REFRAMED (it was kind
+5 all along — consistent, not contradictory).
+
+## S4 CODE + PINS + MUTATION (landed this iteration)
+CODE (shipsim.{h,cpp}): walkLaw snap UNCONDITIONAL after the walk math
+(bookkeeping order: moves := round(remaining RAW) unchanged — the snap feeds
+no accumulator); laneMarch lane-END placement + landingAttempt scatter each
+snap via snapGrid; shipsim.h walkLaw doc rewritten (INFERRED text removed).
+PINS test_shipsim_t380.cpp x6: mid-transit snap (288 not 277.333, fmod
+families); negative-coord tie AWAY-FROM-ZERO (-48->-64, -80->-96, -81->-96,
+-47->-32); lane-END arrival on-grid (1152/288/992 = S64-M5 shape shape-law);
+lane march stays lane-local (pos frozen, laneX off-grid OK — the frame
+boundary pin); scatter on-grid invariant + |d|<=516 bound; corpus census
+(20 saves, off-grid => kind5 && y in {0,1} && z on grid, floors 400/150).
+TWO EXISTING GOLDENS CORRECTED IN PLACE (encoded the superseded reading):
+t361 lane placement (1164,300,1006)->(1152,288,992); t362 clamp-operand
+(277.333->288; mutant separation preserved — walk-operand mutant lands 320).
+MUTATION 7/7 CAUGHT (r363r_mutate.py, checkpoint 7962fb8 FIRST per skill
+rule 1): M1 walk-snap-removed (10 fail) / M2 grid-16 (16) / M3 snap floor =
+toward-zero at negatives (7) / M4 lane-end-snap-removed (6) / M5
+scatter-snap-removed (1, isolated by the t380 scatter pin) / M6
+snap-identity (21) / M7 SNAP-ARRIVAL-GATED = the superseded t361 reading
+restored (4 fails — the partial-walk pins ARE the isolator; the old suite
+could not see this law, which is why the correction was invisible).
+Clean revert verified: suite 253/0 post-campaign; git rewrite/ clean.
+Campaign spot-check post-correction: --seed 2024 --campaign 1600 EXIT 0.
+
+## S5 LEDGER DISPOSITION
+No OQ row closes (strict-close): the correction refines an OQ-019-adjacent
+model law; OQ-019 closure stays USER-GATED (t329 packet). NOTE appended to
+the OQ-019 row: quantizer store law landed + the S64 "mid-transit off-grid"
+signal reframed as kind-5 lane-local.
