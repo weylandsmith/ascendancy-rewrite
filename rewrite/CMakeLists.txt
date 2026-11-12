@@ -46,6 +46,7 @@ add_library(ascend_core STATIC
   src/game/species.cpp
   src/game/campaign.cpp
   src/game/shipsim.cpp
+  src/game/observer.cpp
   src/game/campaign_fleet_bridge.cpp
   src/game/aggregate_oracle.cpp
 )
@@ -102,6 +103,7 @@ add_executable(run_tests
   tests/test_shp.cpp
   tests/test_shipsave_t360.cpp
   tests/test_shipsave_t366.cpp
+  tests/test_observer_t382.cpp
   tests/test_shipsim_t361.cpp
   tests/test_shipsim_t362.cpp
   tests/test_shipsim_t363.cpp

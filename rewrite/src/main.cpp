@@ -11,6 +11,7 @@
 
 #include <cstdio>
 #include <filesystem>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -23,6 +24,7 @@
 #include "game/diplomacy.h"
 #include "game/economy.h"
 #include "game/mapgen.h"
+#include "game/observer.h"
 #include "game/research.h"
 #include "game/species.h"
 #include "game/starstat.h"
@@ -55,6 +57,7 @@ struct Options {
     bool flic = false;                          // decode both vendor FLCs (docs/re/flc.md)
     bool fonts = false;                         // load all vendor .fnt faces (docs/re/fnt.md)
     int introFrames = -1;                       // -1 off; >=0: play intro, cap N frames (0=all)
+    std::string saveFile;                       // t382: --save OBSERVER boot
 };
 
 bool parseArgs(int argc, char** argv, Options* o) {
@@ -88,6 +91,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->fonts = true;
         else if (a == "--intro" && i + 1 < argc)
             o->introFrames = std::atoi(argv[++i]);
+        else if (a == "--save" && i + 1 < argc)
+            o->saveFile = argv[++i];
         else if (a == "--help")
             return false;
         else {
@@ -116,7 +121,13 @@ void usage() {
         "                15/25/50/75/100 stars (mapgen.md OQ-012(a); default 50)\n"
         "  --flic        decode both vendor FLC videos end-to-end (docs/re/flc.md)\n"
         "  --fonts       load all vendor .fnt faces + ink census (docs/re/fnt.md)\n"
-        "  --intro N     play the vendor intro (intro65a.flc), N frames cap (0=all)\n");
+        "  --intro N     play the vendor intro (intro65a.flc), N frames cap (0=all)\n"
+        "  --save FILE   READ-ONLY OBSERVER boot: print the day, star map and\n"
+        "                ship field of a save file, then exit. Accepts a\n"
+        "                dosbox-x savestate ZIP (ring .sav) or a native raw\n"
+        "                .SAV. This is NOT gameplay: no orders, no writes,\n"
+        "                no simulation advance (order UI awaits a selection\n"
+        "                widget; right-click deselect law banked, selfplay.md)\n");
 }
 
 // Loads the three archives from the ORIGINAL game/ directory, because the
@@ -256,12 +267,102 @@ int runCampaign(const Options& o) {
     return 1;
 }
 
+// t382 OBSERVER boot (--save FILE): read-only report of day + star map +
+// ship field. Returns exit code (0 on a successful read; 1 with the honest
+// refusal reason otherwise — never a clamp). NO writes, NO SDL, NO archives:
+// runs before loadGameData like the other media smokes.
+int runObserver(const Options& o) {
+    namespace ag = ascend::game;
+    std::error_code ec;
+    const fs::path p = o.saveFile;
+    if (!fs::exists(p, ec)) {
+        std::printf("observer: no such file: %s\n", p.string().c_str());
+        return 1;
+    }
+    std::vector<uint8_t> file;
+    {
+        std::ifstream f(p, std::ios::binary);
+        file.assign(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>());
+    }
+    if (file.empty()) { std::printf("observer: empty file\n"); return 1; }
+
+    std::vector<ag::Observer::StarRow> stars;
+    std::vector<ag::Observer::ShipRow> ships;
+    uint32_t day = 0;
+    std::string err;
+    const bool isZip = file.size() > 4 && file[0] == 'P' && file[1] == 'K';
+    if (isZip) {
+        // Anchor-vote payload (same corpus file the t360 parser pins use).
+        std::vector<uint8_t> payload;
+        {
+            std::ifstream g(fs::path(ASCENDANCY_SOURCE_DIR) / "work/ascend_payload.bin",
+                            std::ios::binary);
+            payload.assign(std::istreambuf_iterator<char>(g), std::istreambuf_iterator<char>());
+        }
+        if (!ag::Observer::importSavestate(p.string(), payload, &day, &stars, &ships, &err)) {
+            std::printf("observer: REFUSED (%s)\n", err.c_str());
+            return 1;
+        }
+        std::printf("observer: savestate %s  day %u (u32@0 law via turn counter)\n",
+                    p.filename().string().c_str(), day);
+    } else {
+        day = ag::Observer::rawDay(file);
+        std::printf("observer: native save %s  day %u (u32@0 law)\n",
+                    p.filename().string().c_str(), day);
+        const bool okStars = ag::Observer::parseRawStarBlock(file, &stars, &err);
+        if (!okStars) std::printf("observer: star table REFUSED (%s)\n", err.c_str());
+        const bool okShips = ag::Observer::parseRawShipBlock(file, &ships, &err);
+        if (!okShips) std::printf("observer: ship block REFUSED (%s)\n", err.c_str());
+        if (!okStars && !okShips) return 1;  // not a save file at all
+    }
+
+    // Fleet roster (imported into a ShipSim via the t361 fromRecord law; the
+    // sim is BUILT, never advanced — observer scope).
+    auto sim = ag::Observer::buildSim(day, stars, ships);
+    std::printf("fleet: %zu live records, sim census %d\n", ships.size(), sim.liveCount());
+    for (const auto& row : ships) {
+        std::printf("  s%-3d own=%u kind=%d pos=(%.0f,%.0f,%.0f)", row.rec.slot,
+                    row.rec.ownerRace, row.rec.orderKind, row.rec.pos[0],
+                    row.rec.pos[1], row.rec.pos[2]);
+        if (row.targetStar >= 0 && row.targetStar < int(stars.size()))
+            std::printf(" -> %s", stars[size_t(row.targetStar)].name.c_str());
+        if (!row.name.empty()) std::printf("  %s", row.name.c_str());
+        std::printf("\n");
+    }
+
+    // TWO separate frames, no claimed projection (frame residue named in
+    // docs/re/_wip_t382.md S3): star table span ~±430, ship field on the
+    // 32-aligned world grid span ~±2300.
+    if (!stars.empty()) {
+        std::vector<float> xs, zs;
+        std::vector<char> gl;
+        for (const auto& s : stars) {
+            xs.push_back(s.pos[0]); zs.push_back(s.pos[2]);
+            gl.push_back(s.owner ? 'O' : 'o');  // shape, not colour
+        }
+        std::printf("\nSTAR TABLE (star-record frame; 'o' unowned, 'O' owned):\n");
+        std::printf("%s", ag::Observer::renderMap(xs, zs, gl, 72, 24).c_str());
+    }
+    if (!ships.empty()) {
+        std::vector<float> xs, zs;
+        std::vector<char> gl;
+        for (const auto& r : ships) {
+            xs.push_back(r.rec.pos[0]); zs.push_back(r.rec.pos[2]);
+            gl.push_back(char('0' + (r.rec.orderKind > 5 ? 0 : r.rec.orderKind)));
+        }
+        std::printf("\nSHIP FIELD (32-aligned world frame; digit = order kind):\n");
+        std::printf("%s", ag::Observer::renderMap(xs, zs, gl, 72, 24).c_str());
+    }
+    return 0;
+}
+
 int main(int argc, char** argv) {
     Options o;
     if (!parseArgs(argc, argv, &o)) {
         usage();
         return 2;
     }
+    if (!o.saveFile.empty()) return runObserver(o);
     if (o.headless) SDL_SetHint(SDL_HINT_VIDEODRIVER, "dummy");
 
     // FLC decode report (docs/re/flc.md): replay both vendor videos through
