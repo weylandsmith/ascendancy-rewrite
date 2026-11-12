@@ -106,8 +106,10 @@ NOTICE sha256: <fill at S3 step 2, after the draft-comment strip>.
 
 ## S7. Open items deliberately NOT decided here (user-gated, not blockers)
 
-- Repo author identity to publish in README/NOTICE copyright lines (git
-  identity exists: hrethric <[REDACTED-EMAIL]> — whether
+- Repo author identity to publish in README/NOTICE copyright lines (a local
+  git identity existed [email REDACTED t383 — personal address removed before
+  the public push; published identity is Weyland Smith
+  <weylandsmith@users.noreply.github.com> per t376/t376b + NOTICE] — whether
   that is what goes on a public repo is the user's decision, not ours).
 - Whether artifacts/ (packaging.md S2 gray item) ships. Unchanged from t371.
 - GitHub remote/org/name: stays USER-gated per queue.
