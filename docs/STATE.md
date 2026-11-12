@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-12T00:55
+updated: 2026-11-12T02:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,12 +222,14 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t378 per queue row t378 below (phase 9: FINDINGS->CODE). t377R LANDED
-(LANDED block below this one): useMagnetron seam + 12 pins + MUTATION 9/9
-CAUGHT — the queue's t377 row is DONE and deleted from the queue.
-Rationale for t378 next: its atomicity pins touch the same issue/order path
-in shipsim.cpp that t377R just landed on (targetPos/orderType fields); doing
-it while that code is fresh keeps the diff reviewable. The
+NEXT t379 per queue row t379 below (phase 9: FINDINGS->CODE). t378 LANDED
+(LANDED block below this one): issueDestination/clearDestination seam + 4
+pins + MUTATION 9/9 CAUGHT — the queue's t378 row is DONE and deleted from
+the queue.
+Rationale for t379 next: it is the next witnessed-law row in queue order and
+touches the same shipsim death/bookkeeping family the t378 executor pin just
+exercised (the type-0 commit arm, the C4 finalizer fields); zero capture
+needed — the 1253->1254 boundary witnesses are already banked. The
 WAIT-USER-RULING t374 sentinel stays RETIRED — user spoke 2026-11-11
 (verbatim quotes in DECISIONS.md USER block): OQ-016/OQ-019 acceptance
 DEFERRED (rows stay OPEN; do NOT re-ask, do NOT apply the t329 S4 draft);
@@ -241,23 +243,14 @@ LANDED t376/t376b); user saves 887/1086/1253 PROTECTED
 is USER-GO after this queue drains (credentials still absent on box: SSH key
 printed to user 2026-11-11, or token file route).
 
-t377R = t377 CODE LANDING ONLY (evidence is DONE — do NOT re-read the static
-windows, the fresh raw re-reads + corrections are banked): execute
-docs/re/_wip_t377.md S3 verbatim — useMagnetron seam in shipsim.{h,cpp}
-(C1 corrected range polarity: FAIL iff dist < Range*32, Range==0 skips;
-C2 activation = bit0 affordable+rangeOK, TARGETLANE is a return FLAG;
-C3 charge min(power,cost) at entry; C7 dispatcher-prologue DEC BEFORE the
-handler, mode-1-only, ungated by handler-side gates; C4 single-use via
-clearSlot(activeSlot); placement = star triple + (0,-200,0) + two %200
-draws snapped by snapGrid — tie-class divergence named C6, pin never
-vendor coordinates). Pins per queue row: burn-exact, slot consumed-once,
-no second use (use-word 0 -> handler never runs), zero-carried never
-fires, gate-fail-DECs-still (C7 — the mutant-visible seam), mode-0 probe
-lands nothing. MUTATION campaign per the skill (checkpoint FIRST).
-Rationale for t377R-before-t378: t378's atomicity pins touch the same
-issue/order path in shipsim.cpp; landing t377's use-event first keeps the
-diffs reviewable and the corrected law is already in hand — waiting would
-only let it go stale.
+t379 = DEATH vs RECLAIM SHAPES INTO SHIPSIM (queue row verbatim): witness M5
+(S64): at the 1253->1254 boundary s12 cleared + s40 (Intil-Za) GONE entirely
+(count 41->40) while the AI death kept position with owner->0xffff
+(death-cleaned). shipsim has the C4 finalizer (owner 0xffff, kind 0, count
+dec — 0x249b4). Task: reconcile the TWO observed shapes (corpse-retained-flag
+vs slot-vanished) against the cited fleet-list law; if the corpus cannot
+discriminate, bank the boundary honestly and pin BOTH shapes as legal. No
+new capture.
 
 QUEUE (phase 9 — FINDINGS->CODE; every row wires an ALREADY-WITNESSED law
 (docs/re/ships.md S64 M1-M5, docs/re/_wip_playtest_t369.md, selfplay.md
@@ -267,22 +260,6 @@ tN -> rewrite NEXT to tN+1 VERBATIM; keep this block intact except deleting
 completed rows. All rows: sitting check RING-FIRST, OOM law, game/ read-only,
 gate + both audits green before commit, mutation campaign per the mutation-
 campaign skill law where code lands.)
-
-t378 DESTINATION-TRIPLE ATOMICITY INTO SHIPSIM. Witness M3 (S64): every
-empty-space order writes order type->3 + [+0x6c] destination triple
-ATOMICALLY in one frame (5 ships); object moves write type 1/2 + ptr.
-Verify the issue seam in shipsim writes kind AND destination in one step;
-pin the atomic pair + the 0xFFFF no-target sentinel. The two-click x/y-then-z
-sub-gap is CADENCE-BLIND (adjacent XY->Z census = 0) — do NOT invent a
-two-step internal model; UI choreography stays non-goal (pership-spec N8).
-
-t379 DEATH vs RECLAIM SHAPES INTO SHIPSIM. Witness M5: at the 1253->1254
-boundary s12 cleared + s40 (Intil-Za) GONE entirely (count 41->40) while the
-AI death kept position with owner->0xffff (death-cleaned). shipsim has the
-C4 finalizer (owner 0xffff, kind 0, count dec — 0x249b4). Task: reconcile
-the TWO observed shapes (corpse-retained-flag vs slot-vanished) against the
-cited fleet-list law; if the corpus cannot discriminate, bank the boundary
-honestly and pin BOTH shapes as legal. No new capture.
 
 t380 QUANTIZER REST-ON-GRID INTO SHIPSIM PINS. t370 RUNTIME CONFIRMED:
 mid-transit rows OFF the 32-grid ((14,1,-224)x5, (28,0,-2144), 144.7->149.3),
@@ -376,6 +353,44 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t378 — 2026-11-12 (DESTINATION-TRIPLE ATOMICITY CODE LANDED:
+issueDestination/clearDestination + 4 PINS + MUTATION 9/9 CAUGHT; SUITE
+242/0; LEDGER 17/2 UNCHANGED — HONEST, USER-GATED)
+
+- Sitting check RING-FIRST: live-timeline tail-SEEK (OOM law) — all parsed
+  rows turn 1254 (wall to 01:22:48); the production capture is still live but
+  no NEW turn boundary occurred since t377R => assignment stands (t378 is a
+  zero-capture code row anyway; witnesses already banked).
+- EVIDENCE RE-READ (_wip_t378 S1/S2, zero new capture): the S64 M3 witness
+  resolves to FOUR in-window issue frames (s16/s38/s25/s18; s14's issue
+  pre-dates the window, its END leg 00:24:02 is in-window): type (+0x67) ->3
+  + triple (+0x6c) written SAME FRAME, kind stays 4 (NOT part of the pair),
+  act 0->7 at every issue (7 outside the cited enum — banked observation, not
+  wired). The queue's "0xFFFF no-target sentinel" does NOT exist on the order
+  fields (honest negative): the cited 0xffff law is the OWNER half at the
+  0x24a00 clear / 0x249b4 death (pinned t364/t360, not duplicated).
+- CODE: ShipSim::issueDestination(shipId,x,y,z) — kind-4 gate (walk-guard
+  family FUN_00049f54; no prior-type gate is cited so none imposed), accept
+  writes type 3 + triple in ONE step, refusal writes NOTHING (no torn
+  type-3/stale-triple state reachable). ShipSim::clearDestination — iff type
+  3, clears BOTH fields atomically (Stainer order-end shape); type 1/2 never
+  own +0x6c -> refuse, state untouched. shipsim.h note carries the full
+  citation trail incl. the cadence-blind two-click non-model (N8 honoured).
+- PINS test_shipsim_t378.cpp x4: atomic-pair (4 MEASURED triples exact
+  round-trip, kind untouched); refusal-writes-nothing (kinds 1/2/3/5 + id
+  999); order-end leg (+ object-order refusal); executor-consumes-the-pair
+  (walk toward the EXACT issued triple; post-clear: act-driven pick still
+  fires, type-0 arm walks NOTHING, pos frozen, power refill-only).
+- MUTATION 9/9 CAUGHT (scripts/r363r_mutate.py, checkpoint 203f503 FIRST per
+  skill rule 1): M1 kind-gate removed / M2 type-store removed / M3 triple-
+  stores removed / M4 y,z-stores dropped / M5 type-store-before-guard (the
+  refusal-totality isolator) / M6 clear-no-type-zero / M7 clear-no-triple-
+  zero / M8 clear-guard removed / M9 clear-returns-false — all CAUGHT, clean
+  revert verified (suite 242/0 post-campaign).
+- BANKED: docs/re/ships.md S66 (full law + sentinel adjudication); OQ-019
+  t378 NOTE appended (row stays OPEN, user-gated). Gate + both audits green
+  (see commit). NEXT -> t379 verbatim.
 
 ## LANDED t377R — 2026-11-12 (MAGNETRON USE-SITE CODE LANDED: useMagnetron
 + 12 PINS + MUTATION 9/9 CAUGHT; SUITE 238/0; LEDGER 17/2 UNCHANGED —

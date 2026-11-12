@@ -347,6 +347,16 @@ test_shipsim_t377.cpp (M1 burn-exact/slot-gone/placement-form; C7
 gate-fail-DECs x2; mode-0 lands nothing; zero-carried; no-second-use),
 MUTATION 9/9 CAUGHT, suite 238/0. ships.md S65. Row STILL OPEN — the named
 closer (sugar-cube residue, user ruling) is untouched; strict-close holds.
+t378 NOTE (2026-11-12, CODE LANDED): the M3 destination-atomicity law is now
+IN THE REWRITE — ShipSim::issueDestination/clearDestination
+(rewrite/src/game/shipsim.{h,cpp}): the empty-space order writes type 3 + the
++0x6c triple in ONE step (4 witnessed issue frames), refusal writes nothing
+(sim-level no-target sentinel — the cited 0xffff sentinel is the OWNER-half
+law at 0x24a00/death, already pinned t364/t360, NOT an order-field value
+honest negative _wip_t378 S2); order-end clears both atomically; object
+orders refuse. 4 pins test_shipsim_t378.cpp, MUTATION 9/9 CAUGHT, suite
+242/0. ships.md S66. Row STILL OPEN (user deferred; two-click sub-gap stays
+cadence-blind, N8).
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +

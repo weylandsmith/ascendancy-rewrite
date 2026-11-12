@@ -3118,3 +3118,48 @@ CAUGHT (placement-form pin).
 HONEST NEGATIVE unchanged: which star M1 used stays UNRECONCILED (S64
 neg-(a)); the seam takes the caller's targetStar. NO OQ row closes (user
 deferred OQ-016/OQ-019; this is law implementation, not the named closer).
+
+## S66 t378 (2026-11-12) — DESTINATION-TRIPLE ATOMICITY LANDED INTO SHIPSIM (issueDestination/clearDestination)
+Code landing of the S64 M3 witness (queue row t378). Evidence re-read
+work/r1/t370_slot_events_all.txt (frames=546, wall 00:02:09..01:31:32) via
+docs/re/_wip_t378.md S1: FOUR in-window empty-space destination issues
+(s16 00:15:29 trip:=(-1664,-1568,64) prior type 2; s38 00:20:19
+(-672,32,-2112) prior 0; s25 00:22:29 (-192,1504,-1280) prior 1; s18
+00:24:49 (608,32,-416) prior 1) + s14's pre-window order, whose END leg is
+witnessed at 00:24:02 (type 3->0, trip := (0,0,0) SAME FRAME). MEASURED
+PAIR: order TYPE (+0x67) := 3 AND destination triple (+0x6c) written in ONE
+frame at every issue; KIND (+0x58) is NOT part of the pair (stays 4 at all
+four); act 0->7 at all four issues (7 is OUTSIDE the cited act enum {0,1,2}
+— MEASURED value, uncited meaning; banked observation, NOT wired). Prior
+type spans {0,1,2} => no cited gate on prior type; kind gate = the cited
+walk-guard family FUN_00049f54 (kind 4; kinds 1/2/5 sticky, ai-dossier §5).
+SEAM LANDED: ShipSim::issueDestination(shipId,x,y,z) — accept writes type 3
++ triple in one step; REFUSAL (unknown id, kind != 4) writes NOTHING (no
+torn type-3-with-stale-triple state reachable). ShipSim::clearDestination —
+iff type == 3 clears BOTH fields atomically (the Stainer order-end shape);
+object orders (type 1/2) never own +0x6c (every object swap frame in the
+census writes type+pay only) -> refuse, state untouched.
+SENTINEL ADJUDICATION (queue asked "pin the 0xFFFF no-target sentinel"):
+the corpus has NO 0xffff value on the ORDER fields — +0x59 kind_hi bytes are
+star-ptr bytes at every witnessed issue; the CITED 0xffff sentinel lives on
+the OWNER half (imm-0 clear 0x24a00 writes kind:=0 + WORD [+0x56]:=0xffff,
+aicode.md:505; death finalizer u32@+0x54==0xffff0000, ships.md L3) — pinned
+by the t364/t360 death law, NOT duplicated here. The seam's no-target
+sentinel is the sim-level false return. _wip_t378 S2.
+PINS test_shipsim_t378.cpp x4: atomic-pair (the four MEASURED triples
+round-trip exactly + kind untouched); refusal-writes-nothing (kinds 1/2/3/5
++ unknown id, state byte-identical after false); order-end leg (type 3 clear
+pair; type 1/2 refusal); executor-consumes-the-pair (type-3 arm walks toward
+the EXACT issued triple 3200/0/0 -> pos 1600 power 90; after clearDestination
+the act-driven pick still fires but the type-0 commit arm walks NOTHING —
+pos frozen, power refill-only 100). MUTATION 9/9 CAUGHT (driver
+scripts/r363r_mutate.py, checkpoint 203f503 first): M1 kind-gate removed
+CAUGHT (refusal pins); M2 type-store removed CAUGHT; M3 triple-stores removed
+CAUGHT; M4 y/z-stores dropped CAUGHT; M5 type-store-before-guard CAUGHT
+(refusal totality isolates it); M6 clear-without-type-zero CAUGHT (executor
+pin too); M7 clear-without-triple-zero CAUGHT; M8 clear-guard removed CAUGHT
+(object-order refusal); M9 clear-returns-false CAUGHT. SUITE 242/0.
+NON-GOALS HONOURED: the two-click x/y-then-z testimony stays CADENCE-BLIND
+(adjacent XY->Z census = 0) — no two-step internal model exists in the seam;
+UI choreography remains non-goal (pership-spec N8). NO OQ row closes (user
+deferred OQ-016/OQ-019; this is law implementation, not the named closer).
