@@ -137,6 +137,46 @@ std::vector<int> ShipSim::ownersOf() const {
     return owners;
 }
 
+// ---- t379 COUNT WINDOW (docs/re/_wip_t379.md S1/S4/S6, MEASURED 60/60) ----
+// liveCount is the count-word census mirror: count == full-array live census
+// on BOTH banks (41/41 at t1253, 40/40 at t1254) and on the production ring.
+// It is a CENSUS, not a size: corpses stay in ships_ exactly as they stay in
+// RAM (the finalizer marks, never relocates — no compaction was ever seen).
+int ShipSim::liveCount() const {
+    int n = 0;
+    for (const auto& s : ships_)
+        if (s.owner >= 0) ++n;
+    return n;
+}
+
+// The count-word walk range(0, count) in ARRAY order (r1_slot.ship_array_law
+// enumerates `for k in range(min(n, 0x6b))` over record indices; the sim's
+// id IS the record index — law A2, fromRecord: s.id = r.slot). Sorting by id
+// reproduces index order; taking the first liveCount entries reproduces the
+// window: it contains corpses BY CONSTRUCTION (measured: s12 inside range(40)
+// at t1254) and it MISSES the orphan (measured: s40, live, at index 40).
+// Walkers of this seam apply the owner filter themselves — the window is a
+// MEMORY SHAPE, not an eligibility list (fleet-list item 3: the count word is
+// not the census; pickers scan past it via ships()).
+std::vector<const Ship*> ShipSim::countWindow() const {
+    std::vector<const Ship*> byId;
+    byId.reserve(ships_.size());
+    for (const auto& s : ships_) byId.push_back(&s);
+    std::sort(byId.begin(), byId.end(),
+              [](const Ship* a, const Ship* b) { return a->id < b->id; });
+    const int n = liveCount();
+    if (static_cast<int>(byId.size()) > n) byId.resize(static_cast<size_t>(n));
+    return byId;
+}
+
+std::vector<const Ship*> ShipSim::orphanedShips() const {
+    std::vector<const Ship*> out;
+    const int n = liveCount();
+    for (const auto& s : ships_)
+        if (s.owner >= 0 && s.id >= n) out.push_back(&s);
+    return out;
+}
+
 // Step (2): the ship-list order. Verbatim comparator 0x40eb4:
 //   mov (%eax),%eax / mov (%edx),%edx / mov 0x52(%eax),%eax / sub 0x52(%edx),%eax
 // (raw read _wip_t361 S1: the deref loads the record pointer, the operand is
@@ -604,17 +644,23 @@ ShipSim::EngagementReport ShipSim::commitShot(int shipId, int mode) {
     rep.shieldAbsorb = absorb;
     rep.hullAbsorb = hullAbs;
     if (t->integrity < 1) {
-        // DEATH 0x49d2c -> finalizer 0x249b4 (C4): owner := 0xffff (sim -1),
-        // kind := 0, +0x34 := 0 (no sim field), live-count DEC (sim: the
-        // dead filter drops the row). Corpse travel-reissue legs are moot
-        // after the finalizer; planet-slot release is planet-side (non-goal).
+        // DEATH 0x49d2c -> finalizer 0x249b4 (C4). t379 CORRECTION (word-level
+        // corpse witness, docs/re/_wip_t379.md S5: slot 12 across the t1253->
+        // t1254 boundary, exactly 5 of 177 words differ): the finalizer store
+        // set is owner(+0x56):=0xffff, kind(+0x58):=0, name(+0x34):=0 (byte-
+        // level NUL stamp), + the count DEC (sim: the census mirror, t379
+        // liveCount) — plus act(+0x5d):=0 which the RAM witness adds to the
+        // disasm window. +0x62/+0x63/+0x68 are in NEITHER the verified disasm
+        // (t364 C4) NOR the witness (+0x68 0x002589f6 survived death): the
+        // previous clears here were unwitnessed hygiene and are REMOVED.
+        // +0x90 shields:=0 appears in the witness but is UNATTRIBUTABLE
+        // (upkeep zeroes it always) — not wired. Corpse travel-reissue legs
+        // are moot after the finalizer; planet-slot release is planet-side
+        // (non-goal). The corpse stays IN PLACE at its array index (t379).
         rep.destroyed = t->id;
         t->owner = -1;
         t->kind = OrderKind::NoOrder;
         t->act = 0;
-        t->dispatcherGate = 0;
-        t->activeSlot = -1;
-        t->fireTarget = -1;
     }
     return rep;
 }

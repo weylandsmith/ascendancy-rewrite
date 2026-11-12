@@ -334,6 +334,33 @@ class ShipSim {
     // List order is engine state (the sorted array drives tie-breaks).
     const std::vector<Ship>& ships() const { return ships_; }
     Ship* findShip(int id);
+    // ---- t379 COUNT WINDOW (memory-array law; witness + measurement
+    // docs/re/_wip_t379.md S1/S4/S6: banks bank-play-20261111(-late) 40 saves
+    // + production ring 20 saves, law holds 60/60). The vendor's ship array
+    // is NOT compacted on death: the C4 finalizer marks the corpse IN PLACE
+    // (owner 0xffff, kind 0, name NUL-stamped, act 0) and the count word
+    // DECREMENTS by one. MEASURED LAW: count == full-array live census (both
+    // banks: 41/41 then 40/40), so the count-based walk range(0,count) —
+    // r1_slot.ship_array_law / FUN_00022304 — must skip the corpse and still
+    // reach every live record; the observable consequence is the ORPHAN:
+    // after an in-window death the highest-index live record falls OUTSIDE
+    // the window byte-identical (s40 'Intil-Za', sha256-verified untouched).
+    // The sim mirrors the law with TWO orderings, never conflated:
+    //   ships()      = the SORTED list (+0x52 comparator 0x40eb4) — the
+    //                  executor/carrier walks; a corpse is skipped there by
+    //                  the owner>=0 filters, not by the window;
+    //   countWindow()= the ARRAY-order window (id == record index law A2,
+    //                  fromRecord: s.id = r.slot) — memory enumeration;
+    //                  contains corpses by construction, may MISS live
+    //                  ships whose id >= liveCount (the orphan).
+    // liveCount() is the CENSUS MIRROR (count word == live census, measured
+    // 60/60 — a derived count, never the vector size: corpses stay in the
+    // vector exactly as they stay in RAM).
+    int liveCount() const;
+    std::vector<const Ship*> countWindow() const;
+    // Live records outside the count window (measured: s40 at t1254; exactly
+    // one per in-window death since count stays the live census).
+    std::vector<const Ship*> orphanedShips() const;
     int turn() const { return turn_; }
     uint32_t lcgState() const { return lcg_.state; }
     int totalRngDraws() const { return rngDraws_; }
