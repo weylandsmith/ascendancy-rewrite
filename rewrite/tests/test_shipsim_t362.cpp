@@ -205,7 +205,12 @@ TEST(shipsim_power_clamp_operand_t362) {
     const int32_t steps = as::ShipSim::walkLaw(pos, &power, &moves, delta, &arrived);
     CHECK(steps == 2);
     CHECK(!arrived);
-    CHECK(nearf(pos[0], 277.33333f));        // 1.73333 sugar * 160
+    // t380: the commit quantizes UNCONDITIONALLY (quantizer call 0x4a2cf on
+    // the straight line; copy-back gated only by mode==1 — _wip_t380 S1c).
+    // Raw walk 1.73333 sugar = 277.333 world -> snap 288 (8.667 -> 9 x 32).
+    // The clamp-operand mutant still separates: walk 2.0 -> 320 -> snap 320.
+    CHECK(nearf(pos[0], 288.f));              // snap(1.73333 sugar * 160)
+    CHECK(std::fmod(pos[0], 32.f) == 0.f);    // rest-on-grid at a PARTIAL walk
     CHECK(power == 0);                       // steps := power, burned
     CHECK(moves == 8);                       // round(10 - 1.73333) = round(8.26667)
     // Guard side: power >= steps -> NO scale (d=320 world = 2 sugar, steps 2).

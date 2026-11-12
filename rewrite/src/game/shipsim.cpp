@@ -873,19 +873,29 @@ int32_t ShipSim::walkLaw(float pos[3], int32_t* power, int32_t* moves,
     if (steps > 0 && walk > 0) {
         // per-step normalize(delta)*(walk/steps)*32.0*5.0 summed over steps
         // == normalize(delta)*walk*160 (the two FMUL moffs are REAL per S17
-        // T1 — product 160 inverts the /160). Mid-walk quantizer NOT applied
-        // [INFERRED]: S17 T3 verified for stationary positions, arrival-time-
-        // only is the inferred reading; on arrival the commit snaps to grid.
+        // T1 — product 160 inverts the /160).
         const double inv = dWorld > 0 ? walk * (kSugarStepA * kSugarStepB) / dWorld : 0.0;
         for (int i = 0; i < 3; ++i)
             pos[i] = pos[i] + static_cast<float>(static_cast<double>(delta[i]) * inv);
     }
-    if (*arrived) {
-        // Arrival grid snap (S17 T3 [verified] stationary law; the 12
-        // off-grid ships are all mid-transit kind-2 — corroborates arrival-
-        // time snapping [inferred]).
-        for (int i = 0; i < 3; ++i) pos[i] = snapGrid(pos[i]);
-    }
+    // GRID SNAP IS UNCONDITIONAL IN THE COMMIT — t380 STATIC CORRECTION
+    // (docs/re/_wip_t380.md S1c/S1d, instruction-level): the quantizer call
+    // 0x4a2cf sits on the walk body's straight line (no arrival branch), and
+    // the copy-back of the quantized scratch triple 0x4a2d9..0x4a2ed is
+    // gated ONLY by cmp edi,0x1 (arg2 = mode). The executor commit passes
+    // edx=1 (0x25560 -> call 0x49f28, the t364-banked commit site); the two
+    // dry-run callers 0x15cc5/0x15df0 pass edx=0 (scratch quantize, no
+    // store). Arrival (0x4a2f0 fild [+0x94]) drives BOOKKEEPING only, never
+    // the snap. The t361-era "arrival-time-only" [INFERRED] reading is
+    // SUPERSEDED: every committed walk position is 32-aligned mid-transit
+    // too. Runtime corroboration: playtest s10 lane-END arrival
+    // (-1280,-1952,384) = 40/61/12 x 32 EXACT; ALL off-grid rows ever seen
+    // are kind-5 LANE-LOCAL x (march 14/28/14-over-3, never stored through
+    // the quantizing helper) or kind-2 cross-system frames.
+    // Tie semantics BANKED t380 (0x533e0 full read): q = trunc(round(v +
+    // 16*sign(v))/32)*32 -> ties (v = 16 mod 32) go AWAY FROM ZERO —
+    // identical to snapGrid's std::round(a/g)*g.
+    for (int i = 0; i < 3; ++i) pos[i] = snapGrid(pos[i]);
     const double remaining = static_cast<double>(*moves) - walk;
     *power -= steps;                       // [+0x88] -= steps (commit)
     // [+0x94] := round(remaining walk) — walk LEFT after this commit
@@ -930,6 +940,12 @@ void ShipSim::laneMarch(Ship& s, BoundaryReport& rep) {
             s.pos[0] = dest->pos[0] + static_cast<float>(jx % 200);
             s.pos[1] = dest->pos[1] + kPlaceYOffset;
             s.pos[2] = dest->pos[2] + static_cast<float>(jz % 200);
+            // t380: this is the FUN_00021f58 placement — its store leg IS
+            // call 0x49aa8 (quantizing helper, _wip_t380 S1a/S1c): the raw
+            // triple lands 32-ALIGNED (rng jitter quantized away). Runtime
+            // corroboration: playtest s10 lane-END arrival (-1280,-1952,384)
+            // = 40/61/12 x 32 EXACT (S64 M5).
+            for (int i = 0; i < 3; ++i) s.pos[i] = snapGrid(s.pos[i]);
         }
         s.laneId = -1;
         rep.placed.push_back(s.id);
@@ -959,6 +975,10 @@ void ShipSim::landingAttempt(Ship& s, BoundaryReport& rep) {
     s.pos[0] += static_cast<float>(j0 % 1000 - 500);
     s.pos[1] += static_cast<float>(j1 % 1000 - 500);
     s.pos[2] += static_cast<float>(j2 % 1000 - 500);
+    // t380: the scatter store at 0x399df IS call 0x49aa8 (quantizing helper,
+    // _wip_t380 S1a): the scattered triple lands 32-ALIGNED — the rest-on-
+    // grid law holds at EVERY committed galactic store, scatter included.
+    for (int i = 0; i < 3; ++i) s.pos[i] = snapGrid(s.pos[i]);
     rep.landed.push_back(s.id);
 }
 

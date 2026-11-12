@@ -598,11 +598,14 @@ class ShipSim {
     // sugar); walk = min(d, moves); steps = max(1, x86round(walk)); if
     // power < steps: walk *= power/steps, steps = power; arrived = walk == d;
     // commit: pos += normalize(delta) * walk * 160 (the per-step
-    // normalize*(walk/steps)*32.0*5.0 collapsed — quantizer NOT applied mid-
-    // walk, INFERRED; snapped to the 32-grid on ARRIVAL only, S17 T3).
-    // Returns steps burned; mutates pos/power/moves/arrived per the commit
-    // law (param_2==1 equivalent: the sim always commits — mode-0 dry runs
-    // are the engagement resolver's concern, t364/K6).
+    // normalize*(walk/steps)*32.0*5.0 collapsed), THEN the quantizer g=32 on
+    // all three axes UNCONDITIONALLY — t380 STATIC CORRECTION (_wip_t380
+    // S1c/S1d): the quantizer call 0x4a2cf is on the straight line and the
+    // quantized copy-back 0x4a2d9 is gated only by mode==1, never by
+    // arrival. Returns steps burned; mutates pos/power/moves/arrived per the
+    // commit law (param_2==1 equivalent: the sim always commits — mode-0 dry
+    // runs are the engagement resolver's concern, t364/K6; the vendor's own
+    // dry-run callers 0x15cc5/0x15df0 pass edx=0 and store nothing).
     static int32_t walkLaw(float pos[3], int32_t* power, int32_t* moves,
                            const float delta[3], bool* arrived);
     // x86 default-mode rounding (fistp round-half-to-even); C roundf is

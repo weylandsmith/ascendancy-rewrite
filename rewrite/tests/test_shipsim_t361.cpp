@@ -204,9 +204,16 @@ TEST(shipsim_lane_march_and_placement_t361) {
     CHECK(sim.totalRngDraws() == 2);       // exactly the two %200 draws
     as::Ship* p = sim.findShip(1);
     CHECK(p->kind == as::OrderKind::InSystem);          // byte[+0x58] := 4 (0x2202f)
-    CHECK(nearf(p->pos[0], 1164.f));       // star.x + 164 (golden draw 1 %200)
-    CHECK(nearf(p->pos[1], 300.f));        // star.y - 200 (LIVE jitter const)
-    CHECK(nearf(p->pos[2], 1006.f));       // star.z + 6   (golden draw 2 %200)
+    // t380 CORRECTION: the placement store leg IS call 0x49aa8 — the
+    // quantizing helper (_wip_t380 S1a/S1c) — so the raw star+jitter triple
+    // lands 32-ALIGNED. Golden draws unchanged (164/6 seed 7); the pinned
+    // values are the quantizer output: 1164->1152, 300->288, 1006->992.
+    // Runtime corroboration: playtest s10 lane-END arrival
+    // (-1280,-1952,384) all exact multiples of 32 (S64 M5).
+    CHECK(nearf(p->pos[0], 1152.f));       // snap(1000 + 164) = 36*32
+    CHECK(nearf(p->pos[1], 288.f));        // snap(500 - 200) = 9*32
+    CHECK(nearf(p->pos[2], 992.f));        // snap(1000 + 6) = 31*32
+    CHECK(std::fmod(p->pos[0], 32.f) == 0.f && std::fmod(p->pos[2], 32.f) == 0.f);
     CHECK(p->laneId == -1);
 
     // Third-speed gate (S22 L1: byte[H+0x23] bit0 -> step *= 1/3, pool word
