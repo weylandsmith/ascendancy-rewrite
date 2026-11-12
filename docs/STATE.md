@@ -222,14 +222,15 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t381 per queue row t381 below (phase 9: FINDINGS->CODE). t380 LANDED
-(LANDED block below this one): quantizer store law (walk/placement/scatter
-stores quantize UNCONDITIONALLY — the arrival-only reading SUPERSEDED) + 6
-pins + 2 goldens corrected + MUTATION 7/7 CAUGHT — the queue's t380 row is
-DONE and deleted from the queue.
-Rationale for t381 next: it is the next witnessed-law row in queue order and
-reuses the same sitting's banked evidence (S64 M2 decrement rows; zero capture
-needed). The
+NEXT t382 per queue row t382 below (phase 9: FINDINGS->CODE). t381 LANDED
+(LANDED block below this one): gizmo-use decrement + invasion consumption
+(handler-1 CHARGE law — the t364 "non-gun handlers charge nothing" reading
+SUPERSEDED — + ShipSim::resolveInvasion count-limited consumption
+FUN_0003a174 0x3a2a2..0x3a38b) + 10 pins + MUTATION 10/10 CAUGHT — the
+queue's t381 row is DONE and deleted from the queue.
+Rationale for t382 next: it is the next row in queue order and the user's
+playtest of the rewrite depends on it (t382 lands --save boot as a read-only
+OBSERVER; zero capture, formats/shipsave + fromRecord already exist). The
 WAIT-USER-RULING t374 sentinel stays RETIRED — user spoke 2026-11-11
 (verbatim quotes in DECISIONS.md USER block): OQ-016/OQ-019 acceptance
 DEFERRED (rows stay OPEN; do NOT re-ask, do NOT apply the t329 S4 draft);
@@ -242,14 +243,6 @@ LANDED t376/t376b); user saves 887/1086/1253 PROTECTED
 (~/ascendancy-saves-protected/, law: raw .SAV u32@0 = game-day). GitHub PUSH
 is USER-GO after this queue drains (credentials still absent on box: SSH key
 printed to user 2026-11-11, or token file route).
-
-t381 = GIZMO-USE DECREMENT + INVASION CONSUMPTION. Witness M2 (S64): Stainer
-cidx9 3->2 with power -6 = Nanomanipulator 'Power 6' EXACT; Gofriller
-3->2->1; Ignatz LOST 2x cidx73 Invasion Module AT INVASION LAUNCH. Verify
-commitShot/upkeep charge laws reproduce the decrements (t364 C5: charge
-fires even on zero damage) and the turn-tail refresh (t363R design[+0x42]);
-wire invasion-LAUNCH inventory consumption if absent (pership-spec §4
-EVENT-4/8 chain). Pins from the exact witnessed values.
 
 QUEUE (phase 9 — FINDINGS->CODE; every row wires an ALREADY-WITNESSED law
 (docs/re/ships.md S64 M1-M5, docs/re/_wip_playtest_t369.md, selfplay.md
@@ -336,6 +329,51 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   tNNN in field 3 for the human reader). Human steering is tag-independent
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
+
+
+## LANDED t381 — 2026-11-12 (GIZMO-USE DECREMENT + INVASION CONSUMPTION
+LANDED: HANDLER-1 CHARGE LAW SUPERSEDES THE t364 NO-CHARGE READING;
+resolveInvasion COUNT-LIMITED NEED = MIN(COUNT, SHIELDS+1); 10 PINS +
+MUTATION 10/10 CAUGHT; SUITE 263/0; LEDGER 17/2 UNCHANGED — HONEST,
+USER-GATED)
+
+- Sitting check RING-FIRST: t368_ring_turn parsed=20/20 max_turn=1254 (same
+  sitting as t380); assignment stood (zero-capture row).
+- WITNESS RE-READ (work/r1/t370_slot_events_all.txt IN FULL, 29 lines —
+  _wip_t381 S0): the S64 M2 "LOST 2x Invasion Module" summary HID slot
+  multiplicity — Ignatz's ring held SIX cidx-73 slots (2..7) and EXACTLY the
+  first TWO were cleared at launch (00:28:48 frame), four survive =>
+  consumption is COUNT-LIMITED, not single-use, not all-or-nothing.
+- STATIC (work/r331_disasm.txt; _wip_t381 S1/S1b/S1c): FUN_0003a174
+  (callers EXACTLY {0x3d951, 0x42c8e}) — count loop 0x3a2a2 counts ALL
+  cidx-0x49 slots i<cap; deficit loop 0x3a2f1 counts ACTIVE planet item 18
+  +1 / item 19 +2 (income-law.md:565); cap 0x3a327 need := min(count,
+  deficit+1); consume loop 0x3a360 clearSlot first-match walk-order stop at
+  need. Owner-7 override 0x3a342 (table [0x12fb3+494*o] bytes {6,157,226,1,
+  39,24,7,0} file-measured; zero only o7) NOT modelled, named. Handler-1
+  FUN_0004c794: affordable+cost 0x4c7cf, null-target assert 0x4c7ea, range
+  gate 0x4c831 (range0 = unlimited; status bit0x4 doubles via ds:0x85312 ==
+  f32 2.0 FILE-MEASURED; cidx-0x2f leg is DEAD — dist*0.75 vs dist), commit
+  gate 0x4c91d = affordable AND inRange AND (flags AND 0xc) (TARGETORBIT|
+  TARGETSURFACE — first cited consumer as a GATE; t377's TARGETLANE finding
+  is a different leg), mode==1 charge design[+0x36] at 0x4c958; DEC is
+  dispatcher-side mode-1-gated (0x4a38b) — mode-0 probe lands NOTHING.
+  Nanomanipulator gizmos.txt:116 `0 6 50 13 3 100 0 0 56` — DEC 3->2 AND
+  -6 SAME FRAME twice (Stainer, Gofriller) reproduced EXACTLY.
+- CODE: shipsim.cpp commitShot orderType==1 leg + ShipSim::resolveInvasion
+  (contracts shipsim.h; SimDesign.targetOrbitSurface NEW); bridge wires the
+  0xc mask. resolveInvasion is NOT wired into campaign.cpp's capture branch
+  (aggregate volley has no per-ship transport ring — OQ-019 boundary, same
+  shape as t209; named in _wip_t381 S3).
+- PINS test_shipsim_t381.cpp x10; MUTATION 10/10 CAUGHT (checkpoint c41bc3d
+  first; driver scripts/r381_mutate.sh): M1 dec-removed / M2 charge-mode-
+  gate-removed / M3 gate-mask-dropped / M3b gate-range-dropped / M3c gate-
+  affordable-dropped / M4 status-doubler-removed / M5 invasion-cap-removed /
+  M6 off-by-one / M8 consume-stop-removed / M9 charge-from-power. M7 window-
+  widening DROPPED vacuous (rule 6: need <= real count always).
+- SUITE 263/0. Ledger 17 closed / 2 open UNCHANGED — no OQ row closes
+  (user-gated). ships.md S69; OPEN-QUESTIONS t381 NOTE.
+- NEXT: t382 VERBATIM (playtest boot OBSERVER --save mode).
 
 
 ## LANDED t380 — 2026-11-12 (QUANTIZER STORE LAW LANDED: EVERY COMMITTED

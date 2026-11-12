@@ -3252,3 +3252,47 @@ scatter-snap-removed (isolated by the t380 scatter pin alone) / M6
 snap-identity / M7 ARRIVAL-GATED (the superseded reading restored — 4 fails;
 the partial-walk pins are the isolator). Pins test_shipsim_t380.cpp x6 incl.
 the corpus census pin (off-grid => kind-5 lane-local, floors 400/150).
+
+## S69 t381 (2026-11-12) — GIZMO-USE DECREMENT + INVASION CONSUMPTION LANDED (handler-1 charge + resolveInvasion)
+Code landing of the S64 M2 witness (queue row t381; full evidence
+docs/re/_wip_t381.md S0..S3). Zero capture; static over
+work/r331_disasm.txt + the raw word-event stream
+work/r370_slot_events_all.txt re-read IN FULL.
+MEASURED/CORRECTED FACTS: (a) the M2 "x2 Invasion Module" summary HID
+multiplicity — Ignatz held SIX cidx-73 slots (ring slots 2..7) and EXACTLY
+the first TWO were cleared at launch, FOUR survive: consumption is COUNT-
+LIMITED. (b) FUN_0003a174 0x3a2a2..0x3a38b (callers EXACTLY {0x3d951,
+0x42c8e}) is the site: count all cidx-0x49 slots i<cap; need := min(count,
+activeShieldUnits + 1) (cap 0x3a327; the deficit walk counts ACTIVE planet
+item 18 Surface Shield +1 / item 19 Mega Shield +2 — ids per income-law.md
+:565); clearSlot the FIRST need matches in walk order. Ignatz: need=2 ->
+one active shield at the objective. (c) the owner-7 override leg 0x3a342
+(table [0x12fb3+494*owner] file bytes {6,157,226,1,39,24,7,0} measured from
+ascend_restored.bin — zero ONLY for owner 7) is NOT modelled (zero
+witnesses, named divergence). (d) HANDLER-1 FUN_0004c794 CHARGES: the t364
+"non-gun handlers charge nothing" reading is SUPERSEDED — commit gate
+0x4c91d..0x4c942 = affordable AND inRange AND (design[+0x33] AND 0xc)
+(TARGETORBIT|TARGETSURFACE — first cited consumer of that mask as a gate),
+then mode==1 charges design[+0x36] at 0x4c958..0x4c960; gate-fail or probe
+pays the dispatcher DEC but no charge. M2 Stainer/Gofriller -6 EXACT =
+Nanomanipulator row 9 Power 6. (e) ds:0x85312 == f32 2.0 FILE-MEASURED (the
+status-bit0x4 range doubler twin of the gun's); the cidx-0x2f leg
+0x4c903..0x4c919 is a DEAD leg (dist*0.75 compared against dist — jbe
+always taken), not modelled. (f) DEC is mode-1-gated at the dispatcher
+(0x4a38b) — a mode-0 probe lands NOTHING (t377 twin law, re-confirmed by
+pin). HONEST NEGATIVES: the invasion EFFECT on the planet (S64 neg-(c)) and
+the AI coord chooser (OQ-CARGO) stay out of the seam; the 00:24:08 AI-ship
+payload -1 stampings (S0 item 5) are banked unexplained (upkeep-gate rows
+are cat-1 per t363; those rows read cat 3/5 — carry).
+Code: shipsim.cpp commitShot handler-1 leg + ShipSim::resolveInvasion
+(contract shipsim.h); campaign_fleet_bridge.cpp wires the 0xc flag. Pins
+test_shipsim_t381.cpp x10 (Stainer frame EXACT, Gofriller twice + copies
+untouched, mode-0 lands nothing, range/status doubler, unaffordable, orbit
+mask gate, Ignatz need=2 EXACT, cap-by-count, zero-shield need=1, no-
+modules). MUTATION 10/10 CAUGHT (checkpoint c41bc3d first): M1 dec-removed /
+M2 charge-mode-gate-removed / M3 gate-mask-dropped / M3b gate-range-dropped
+/ M3c gate-affordable-dropped / M4 status-doubler-removed / M5 invasion-cap-
+removed / M6 off-by-one (need=shieldUnits) / M8 consume-stop-removed /
+M9 charge-from-power-not-design. M7 window-widening mutants DROPPED vacuous
+(rule 6): need <= real module count always, phantom slots unreachable.
+Suite 263/0. NO OQ row closes (user-gated).

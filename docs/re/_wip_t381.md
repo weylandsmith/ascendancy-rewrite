@@ -164,8 +164,20 @@ SUPERSEDED for handler 1 by this window: handler-1 DOES charge (witnessed
 -6 twice). Handler 2 charge: the magnetron leg charges at 0x4cbe3 (t377
 banked, modelled in useMagnetron); handlers 5: unbanked, stays no-charge.
 
-## S2 STATIC: INVASION-LAUNCH SLOT CONSUMPTION SITE
-(PENDING)
+## S2 INVASION-LAUNCH CONSUMPTION SITE
+Superseded by S1 (the site IS FUN_0003a174; see S1 for the verbatim walk).
 
-## S3 CODE CONTRACT
-(PENDING)
+## S3 CODE CONTRACT (LANDED)
+- shipsim.h: SimDesign.targetOrbitSurface (w16 +0x33 mask 0xc);
+  ShipSim::resolveInvasion(transportShipId, activeShieldUnits) -> consumed.
+- shipsim.cpp: commitShot orderType==1 leg (affordable/null-target/range/
+  status-doubler/gate/mode/charge, verbatim order); resolveInvasion
+  (count -> cap -> walk-order clearSlot x need).
+- campaign_fleet_bridge.cpp: d.targetOrbitSurface = (g.flags & 0xc) != 0.
+- Pins rewrite/tests/test_shipsim_t381.cpp x10; MUTATION 10/10 CAUGHT
+  (driver scripts/r381_mutate.sh; verdicts in ships.md S69).
+- Bridge wiring of resolveInvasion into the campaign invasion branch is
+  DELIBERATELY NOT DONE: the campaign has no per-ship transport ring at the
+  capture site (aggregate volley; OQ-019 boundary, same shape as t209's
+  documented under-model). The seam + pins stand for the per-ship model
+  (D2 queue); wiring rides a future per-ship invasion path.

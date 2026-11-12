@@ -385,6 +385,19 @@ lane-END grid rest, lane-local frame boundary, scatter invariant, corpus
 census), 2 goldens corrected in place, MUTATION 7/7 CAUGHT incl. M7 = the
 superseded arrival-gated reading. ships.md S68; _wip_t380 S1..S5. Row STILL
 OPEN (user deferred).
+t381 NOTE (2026-11-12, CODE LANDED + CORRECTION): the S64 M2 row is RE-READ
+from the raw stream — the "LOST 2x Invasion Module" summary HID multiplicity
+(Ignatz held SIX cidx-73 slots; EXACTLY the first TWO cleared at launch, four
+survive). The consumption site is FUN_0003a174 0x3a2a2..0x3a38b: need :=
+min(count, activeShieldUnits+1), walk-order first-match clearSlot — landed as
+ShipSim::resolveInvasion. Handler-1 FUN_0004c794 CHARGES design[+0x36] under
+gate affordable AND inRange AND (flags AND 0xc) (0xc = TARGETORBIT|
+TARGETSURFACE, first cited consumer as a gate): the t364 "non-gun handlers
+charge nothing" reading is SUPERSEDED; M2 -6 EXACT pinned twice. ds:0x85312
+== f32 2.0 file-measured; cidx-0x2f handler-1 range leg is DEAD (dist*0.75
+vs dist). 10 pins test_shipsim_t381.cpp, MUTATION 10/10 CAUGHT
+(scripts/r381_mutate.sh). ships.md S69; _wip_t381 S0..S3. Row STILL OPEN
+(user deferred).
 RESIDUE: (1) sugar-cube per-turn clamp/arrival granularity — t293 SPENT the
 3-launch scripted-capture budget, NEGATIVE (order never issued: orbital-grid
 dot-clicks navigate, never select; full autopsy docs/re/_wip_t293.md +
