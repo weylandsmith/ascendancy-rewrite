@@ -222,33 +222,89 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-USER-RULING t374 — phase-8 queue DRAINED (t371 packaging, t372
-license draft, t373 repo-hygiene execution all LANDED 2026-11-11; the queue
-itself said: after t373 rewrite NEXT to this sentinel shape). Nothing is
-loop-closeable: the two open ledger rows (OQ-016 AI build/expansion, OQ-019
-magnetron/per-ship residues) close ONLY on a user ruling — the disposition
-packet docs/re/_wip_t329.md S4 is drafted DO-NOT-APPLY, and t370's playtest
-witnesses (docs/re/ships.md S64+M6) stand as the measurement record that
-amends it. D3 (definition of done) remains DEFERRED by the user.
-A session woken by a DECISIONS.md edit or a *ruling*/*reply* file: read
-docs/DECISIONS.md, apply what the ruling says, close rows per strict-close,
-then author the next queue or re-park this sentinel.
-USER-GATED items parked with everything pre-staged: (1) GitHub push —
-remote/org/name is the user's call; the publishable tree IS the working
-tree minus game/ + extracted/ (verified t373: that shape gates green via
-`bash scripts/gate.sh --portable`, and with ASCENDANCY_DATA=<vendor dir>
-runs the FULL stage set); NOTICE copyright line intentionally still
-<TBD-t373: repo author name> until the user names what to publish.
-(2) artifacts/ exe-derivative ships-or-not (packaging.md S2).
-(3) gnu.org one-fetch byte-diff vs LICENSE (md5/sha256 anchors in
-_license_draft S1 are the interim record).
-If instead a NEW playtest sitting exists at wake (ring max_turn > 1254 —
-t368_ring_turn moved to scripts/ at t373): run r1_t85g_sitting.py +
-r370_slot_events on the new window FIRST, bank the ring, then decide
-whether witnesses move OQ-019 residue-(1) (t370 annotated it measurement-
-wise; the two-click two-step order-entry question was left UNRESOLVED at
-field level, needs sub-10s sampling or a poke session, NOT more passive
-watching).
+NEXT t377 per queue row t377 below (phase 9: FINDINGS->CODE). The
+WAIT-USER-RULING t374 sentinel is RETIRED — user spoke 2026-11-11 (verbatim
+quotes in DECISIONS.md USER block): OQ-016/OQ-019 acceptance DEFERRED (rows
+stay OPEN; do NOT re-ask, do NOT apply the t329 S4 draft); playtest witnesses
+stand as the evidence base; "incorporate all findings in the rewrite before
+pushing to github" (D7); repo = https://github.com/weylandsmith/ascendancy-
+rewrite.git (exists, empty, verified by ls-remote 2026-11-11); author identity
+Weyland Smith <weylandsmith@users.noreply.github.com> (NOTICE + publish
+--env-filter LANDED t376/t376b); user saves 887/1086/1253 PROTECTED
+(~/ascendancy-saves-protected/, law: raw .SAV u32@0 = game-day). GitHub PUSH
+is USER-GO after this queue drains (credentials still absent on box: SSH key
+printed to user 2026-11-11, or token file route).
+
+QUEUE (phase 9 — FINDINGS->CODE; every row wires an ALREADY-WITNESSED law
+(docs/re/ships.md S64 M1-M5, docs/re/_wip_playtest_t369.md, selfplay.md
+right-click law) into rewrite code with witness-valued pins. NO OQ row closes
+(user deferred); strict-close otherwise unchanged. One session each; finish
+tN -> rewrite NEXT to tN+1 VERBATIM; keep this block intact except deleting
+completed rows. All rows: sitting check RING-FIRST, OOM law, game/ read-only,
+gate + both audits green before commit, mutation campaign per the mutation-
+campaign skill law where code lands.)
+
+t377 MAGNETRON USE-SITE INTO SHIPSIM. Witness M1 (ships.md S64): s28
+Guandagnini Vernunft->Atropos INSTANT jump d=(+2464,-3104,+2528), POWER
+90->80 = gizmos.txt Lane Magnetron 'Power 10' EXACT, ring slot (cidx 60)
+REMOVED same event = single-use consumption. cidx == gizmos.txt entry index
+(M2 corroboration 9/60/73). Carriage side EXISTS (t363R carriesCode/
+firstCarrier, shipsim.cpp); the USE event is not modelled. Land useMagnetron
+(or executor seam) firing on the cited carrier law; pins: burn-exact, slot
+consumed-once, no second use, zero-carried never fires. Landing-on-grid
+reconciliation stays an honest negative (S64 neg-(a) — star triple UNKNOWN);
+pin FLAGS/DELTA CLASS, never invented coordinates.
+
+t378 DESTINATION-TRIPLE ATOMICITY INTO SHIPSIM. Witness M3 (S64): every
+empty-space order writes order type->3 + [+0x6c] destination triple
+ATOMICALLY in one frame (5 ships); object moves write type 1/2 + ptr.
+Verify the issue seam in shipsim writes kind AND destination in one step;
+pin the atomic pair + the 0xFFFF no-target sentinel. The two-click x/y-then-z
+sub-gap is CADENCE-BLIND (adjacent XY->Z census = 0) — do NOT invent a
+two-step internal model; UI choreography stays non-goal (pership-spec N8).
+
+t379 DEATH vs RECLAIM SHAPES INTO SHIPSIM. Witness M5: at the 1253->1254
+boundary s12 cleared + s40 (Intil-Za) GONE entirely (count 41->40) while the
+AI death kept position with owner->0xffff (death-cleaned). shipsim has the
+C4 finalizer (owner 0xffff, kind 0, count dec — 0x249b4). Task: reconcile
+the TWO observed shapes (corpse-retained-flag vs slot-vanished) against the
+cited fleet-list law; if the corpus cannot discriminate, bank the boundary
+honestly and pin BOTH shapes as legal. No new capture.
+
+t380 QUANTIZER REST-ON-GRID INTO SHIPSIM PINS. t370 RUNTIME CONFIRMED:
+mid-transit rows OFF the 32-grid ((14,1,-224)x5, (28,0,-2144), 144.7->149.3),
+REST rows ON (grid quantizer DAT_000895dc=32, t183). Pin shipsim walk output:
+rest positions land 32-aligned, in-flight positions may not; K3b
+off-grid-at-rest test is BLIND BY CONSTRUCTION (instrument corrected t370 —
+use mid-transit signal, do NOT re-hunt magnetron landing).
+
+t381 GIZMO-USE DECREMENT + INVASION CONSUMPTION. Witness M2 (S64): Stainer
+cidx9 3->2 with power -6 = Nanomanipulator 'Power 6' EXACT; Gofriller
+3->2->1; Ignatz LOST 2x cidx73 Invasion Module AT INVASION LAUNCH. Verify
+commitShot/upkeep charge laws reproduce the decrements (t364 C5: charge
+fires even on zero damage) and the turn-tail refresh (t363R design[+0x42]);
+wire invasion-LAUNCH inventory consumption if absent (pership-spec §4
+EVENT-4/8 chain). Pins from the exact witnessed values.
+
+t382 PLAYTEST BOOT (READ-ONLY OBSERVER). Current binary boots mapgen
+campaigns only; NO save-boot path exists (grep-verified 2026-11-11). Land
+`--save <file>` mode: formats/shipsave parse -> fromRecord import (t361)
+into ShipSim -> star-map render with per-ship dots + day number (u32@0 law).
+Supply-your-own copy ONLY (NEVER open game/); zero write-back; refusal not
+clamp on parse failure. Honest scope in --help: this is an OBSERVER, not
+gameplay (no order UI until commissioned; right-click deselect law banked
+selfplay.md awaits a selection widget). User playtest of the rewrite depends
+on this row landing.
+
+t383 RE-EXPORT + VERIFY + PARK FOR PUSH. Re-run scripts/publish_public.sh
+into a FRESH dir (tree moved since /tmp/pubpush), verify on clone shapes:
+vendor-free history (script gate), build + run_tests (expect 226 tests,
+187+ skipped, 0 failed WITHOUT data), author identity single
+(weylandsmith@users.noreply.github.com, zero [ISP-DOMAIN] emails), GITHUB_USER=
+weylandsmith set. Then rewrite NEXT to the sentinel shape (TAG LAW: field 2
+WAIT*, NEVER renumber): NEXT WAIT-PUSH-USER t383 — on wake (GO note in
+DECISIONS.md USER block or a *ruling* file): push -u origin main from the
+verified tree ONLY, then park WAIT-USER-RULING t374 verbatim.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster

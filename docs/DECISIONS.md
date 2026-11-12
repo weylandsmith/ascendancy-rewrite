@@ -194,3 +194,17 @@ USER: D1 batch 41 dispositions = accept all 41
 USER: D1 A6 keep=True, A7 keep=True, A8 keep=True
 USER: D1 B-rows misidentified = none
 USER: D1 notes: I don't think the A series are used anywhere, but it doesn't hurt to keep them. If nothing else, they're a historical curiosity, and maybe someday someone will pipe up with a story behind them. The B series is generally correct. B3 is the star-map research menu button icon, and B4 is an icon I don't immediately recognize or remember seeing anywhere in the game. B5-B16 are from the new game menu, B17-B29 are a subset of the planet screen manufacturing indicators, and B5-B29 are drawn wrong here. B5 contains the top part of the image for B6, B6 contains the top part of the image for B7, ... B17 contains the top part of the image for B18, B18 contains the top part of the image for B19, and so on.
+
+## D7 — FINDINGS->CODE BEFORE PUSH (USER, 2026-11-11, verbatim)
+
+> please set up the loop to incorporate all findings in the rewrite before pushing to github.
+
+> I'm going to defer the remaining Open Questions, I'd like to do some play-testing on the rewrite, if it's ready to go. All the recent findings have been incorporated in the rewrite?
+
+Applied: OQ-016/OQ-019 DEFERRED (rows stay open, t329 S4 draft stays
+DO-NOT-APPLY). Phase-9 queue t377-t383 authored (witnesses M1-M5 + quantizer
+law -> shipsim pins; t382 playtest-boot observer; t383 re-export + park for
+push). Push is USER-GO only after t383 verifies. Status at decision time
+(honest): sim laws from the playtest were banked in DOCS ONLY, not yet code;
+binary boots mapgen campaigns, no save-load path — playtest of the rewrite
+needs t382.
