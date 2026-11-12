@@ -277,6 +277,56 @@ TEST(shipsim_magnetron_nonmagnetron_cidx_no_leg_t377) {
     CHECK(s->inv[14].use == 2);               // DEC law is cidx-independent
 }
 
+TEST(shipsim_magnetron_targetlane_not_a_gate_t377) {
+    // C2: the commit test 0x4cbd4 tests bit0 ONLY. A magnetron row WITHOUT
+    // the TARGETLANE flag commits exactly like the flagged row (flags carry
+    // bit0, no bit1; burn exact; slot consumed). Pin exists so the
+    // "gate also tests bit1" mutant cannot survive (flag consumers are
+    // elsewhere, unbanked).
+    as::ShipSim sim(1, 1253);
+    std::vector<as::SimDesign> t = mkMagDesigns();
+    t[0x3c].targetLane = false;
+    sim.setDesigns(t);
+    sim.addStar(farStar(0));
+    sim.addShip(mkMagShip(28));
+    as::Ship* s = sim.findShip(28);
+    s->targetStar = 0;
+    s->targetPos[0] = 1280; s->targetPos[1] = -1560; s->targetPos[2] = 1344;
+    auto rep = sim.useMagnetron(28, 1);
+    CHECK(rep.committed);
+    CHECK((rep.flags & 1) != 0);
+    CHECK((rep.flags & 2) == 0);              // flag word, not a gate
+    CHECK(s->power == 80);
+    CHECK(rep.placed);
+    CHECK(s->inv[14].cidx == 0xff);
+}
+
+TEST(shipsim_magnetron_target_gate_shape_t377) {
+    // FUN_000220a8 target-gate surrogate shape (S3): a ship OUTSIDE the
+    // cited InSystem kind pays DEC + charge (both precede the case tree in
+    // the bytes) and lands NOTHING (placement refused). Zero-witness
+    // composition consequence, flagged at the declaration.
+    as::ShipSim sim(1, 1253);
+    sim.setDesigns(mkMagDesigns(3));
+    sim.addStar(farStar(0));
+    as::Ship s0 = mkMagShip(28, 3);
+    s0.kind = as::OrderKind::Move;
+    sim.addShip(s0);
+    as::Ship* s = sim.findShip(28);
+    s->targetStar = 0;
+    s->targetPos[0] = 1280; s->targetPos[1] = -1560; s->targetPos[2] = 1344;
+    auto rep = sim.useMagnetron(28, 1);
+    CHECK(rep.ranHandler);
+    CHECK(rep.committed);                     // gates passed (kind is not a
+                                              // handler gate, only a leg gate)
+    CHECK(!rep.placed);
+    CHECK(s->power == 80);                    // charge PAID
+    CHECK(s->inv[14].use == 2);               // DEC PAID
+    CHECK(s->inv[14].cidx == 0x3c);           // slot NOT consumed
+    CHECK(s->pos[0] == -1184.0f);             // no placement
+    CHECK(s->kind == as::OrderKind::Move);
+}
+
 TEST(shipsim_magnetron_determinism_t377) {
     // Same seed + same inputs -> same digest AND same landing point; seed 2
     // lands elsewhere (the draws feed the placement).
