@@ -8,10 +8,11 @@ can be layered. This is the engine only, you'll need to seperately obtain a
 copy of the original game in order to play it.
 
 As far as I'm aware the original game is no longer offered for sale anywhere,
-but you should try to buy the game legitimately if you can, or support the
-creators in other ways. Todd Templeman has a new project at motesandbeams.com,
-and he also has a few published books out for sale. I'll add links for the 
-other original creators as I find them.
+but you should try to buy the game legitimately if you can (I bought a retail
+boxed copy in the 1990s, and still have it), or support the creators in other 
+ways. Todd Templeman has a new project at motesandbeams.com, and he also has 
+a few published books out for sale. I'll add links for the other original 
+creators as I find them.
 
 Begin AI-generated content:
 
