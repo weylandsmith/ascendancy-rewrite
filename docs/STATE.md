@@ -222,16 +222,19 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-USER-RULING t374 — PUSH DONE 2026-11-12 (this session, user GO
-after token landed): https://github.com/weylandsmith/ascendancy-rewrite.git
-main = 12afb0ad2afb872490cc1b70dbf8521180e29f1d, verified remote ls-remote
-== local tip of /tmp/pubpush-t383b (568 commits, single identity, vendor-
-free, 270 tests 192 skipped 0 failed WITHOUT vendor data). Transport note:
-SSH is DEAD on this network (github.com:22 AND ssh.github.com:443 both
-firewalled — measured); route = HTTPS through the Squid proxy + fine-grained
-PAT in ~/.config/gh-pub-token via a GIT_ASKPASS helper (token never
-echoed; helper deleted after use — recreate per docs/re/packaging.md if a
-future push is needed; NEVER push from the working repo).
+NEXT WAIT-USER-RULING t374 — PUSH DONE 2026-11-12, RE-PUSHED CLEAN 2026-11-12
+(user order): https://github.com/weylandsmith/ascendancy-rewrite.git
+main = 370f361e0dd8 (verified ls-remote). MANUAL REMOVAL: docs/assets/
+manual-jpg (23 pages of the copyrighted vendor manual, entered history at
+eb79da3) filtered from ALL commits + .gitignore'd; local copies kept on disk
+untracked. Two user web-UI commits (43c91d0, 294ba8d README prose) were
+cherry-picked onto the rewritten history, NOT clobbered — LAW BANKED: always
+`git fetch` before any force-push; --force-with-lease caught them cold.
+OPEN: GitHub backend GC may still serve old commit SHAs (manual pages via
+eb79da3) until support sweeps orphaned objects — user may want to email
+support.github.com citing the repo + commit. Transport law: SSH firewalled
+both routes; HTTPS + ~/.config/gh-pub-token PAT via GIT_ASKPASS helper
+(delete after use); NEVER push from the working repo.
 A session woken by a DECISIONS.md edit or a *ruling*/*reply* file: read
 docs/DECISIONS.md, apply what the ruling says, close rows per strict-close,
 then author the next queue or re-park this sentinel.
