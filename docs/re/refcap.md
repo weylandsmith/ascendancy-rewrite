@@ -28,7 +28,9 @@ dosbox-x 2025.02.01 under Xvfb and is driven by synthetic input.
   = all directions as expected. Last real run: title 9.2% / movie shots
   97.3–100.0% -> PASS.
 - The gate (stage 4f) scores FOUR PINNED shots in `docs/assets/refcap/`
-  (no emulator at gate time): title-menu control + three movie shots
+  (no emulator at gate time; the dir is UNTRACKED vendor-copyright media —
+  self-captured from your own copy via `scripts/refcap_gate.sh`, so the
+  stage self-skips when absent). Title-menu control + three movie shots
   (starfield, caption+starfield, galaxy+caption). Pinned sha256:
   title c0eb3958…, movie 1660fb89…, caption 5713330b…, galaxy e73587e6…
 

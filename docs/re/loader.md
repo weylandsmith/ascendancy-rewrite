@@ -110,7 +110,9 @@ data side cannot be statically addressed. Two viable extraction routes remain:
   viable.
 - **R2 data-first rules** : implement systems from the extracted plaintext
   tables (`race*.dip` DIPVALUES, `restree.txt`, `items.txt`, ship tables),
-  the manual (23-page rules prose, rasterised to `docs/assets/manual-jpg/`),
+  the manual (23-page rules prose, rasterised locally to
+  `docs/assets/manual-jpg/` — UNTRACKED, vendor copyright, never published;
+  regenerate from your own copy if needed),
   and targeted dosbox observation; every constant cites an extracted-file
   offset per the goal contract. Formulas that remain ambiguous go to
   OPEN-QUESTIONS with the range of admissible behaviour.
