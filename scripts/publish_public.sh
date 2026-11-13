@@ -12,6 +12,10 @@
 #                           PUBLISH-CONDITIONAL); regenerable:
 #                           python3 scripts/r1_restore_sites.py + Ghidra
 #                           headless (see docs/re/loader.md)
+#   docs/assets/manual-jpg/ 23 rasterised pages of the copyrighted vendor
+#                           manual (USER REMOVAL ORDER 2026-11-12; entered
+#                           history at eb79da3 — filter must cover ALL
+#                           commits, a tip delete is not enough)
 #
 # Usage: bash scripts/publish_public.sh <output-dir>
 set -euo pipefail
@@ -29,7 +33,7 @@ cd "$OUT"
 
 FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --prune-empty \
     --index-filter 'git rm -r -q --cached --ignore-unmatch \
-      game extracted work archive/user-saves \
+      game extracted work archive/user-saves docs/assets/manual-jpg \
       artifacts/ascend_restored.bin artifacts/functions_full.tsv' \
     --env-filter 'export GIT_AUTHOR_NAME="Weyland Smith" GIT_COMMITTER_NAME="Weyland Smith";
       if [ -n "${GITHUB_USER:-}" ]; then
@@ -61,7 +65,7 @@ git reflog expire --expire=now --all
 git gc --prune=now -q
 
 # ---- verification gates (fail closed) -------------------------------------
-V=$(git rev-list --objects --all | grep -cE '^.* (game/|extracted/|work/|artifacts/ascend_restored\.bin)' || true)
+V=$(git rev-list --objects --all | grep -cE '^.* (game/|extracted/|work/|archive/user-saves/|docs/assets/manual-jpg/|artifacts/ascend_restored\.bin)' || true)
 [ "$V" = "0" ] || { echo "FAIL: $V vendor-path objects remain in history" >&2; exit 3; }
 # t383 gate: NO blob in the rewritten history may contain the scrub pattern
 # (batch cat-file; per-commit git grep over rev-list timed out at 300 s).
