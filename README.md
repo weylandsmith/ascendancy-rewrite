@@ -1,5 +1,20 @@
 # Ascendancy — a native rewrite
 
+This is an AI-facilitated re-implementation of Ascendancy, a 1995 space 4x 
+game by The Logic Factory. It's a wonderful game that was, sadly, hampered
+by poor AI in the computer opponents, and tedious micro-management in the
+midgame. This rewrite aims to create a faithful base upon which improvements
+can be layered. This is the engine only, you'll need to seperately obtain a 
+copy of the original game in order to play it.
+
+As far as I'm aware the original game is no longer offered for sale anywhere,
+but you should try to buy the game legitimately if you can, or support the
+creators in other ways. Todd Templeman has a new project at motesandbeams.com,
+and he also has a few published books out for sale. I'll add links for the 
+other original creators as I find them.
+
+Begin AI-generated content:
+
 A C++17 + SDL2/SDL2_mixer re-implementation of the single-player game of
 **Ascendancy** (The Logic Factory, 1995), written from scratch by
 reverse-engineering the original distribution's **data formats and game
