@@ -222,32 +222,28 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-PUSH-USER t383 — on wake (a GO note in docs/DECISIONS.md USER
-block, or a *ruling* file): push -u origin main FROM THE VERIFIED TREE
-/tmp/pubpush-t383b ONLY (do NOT re-export and push blind — if that dir is
-gone, re-run `GITHUB_USER=weylandsmith bash scripts/publish_public.sh
-<fresh-dir>` and re-verify per docs/re/packaging.md §12 BEFORE pushing),
-then park WAIT-USER-RULING t374 verbatim (TAG LAW: field 2 WAIT*, NEVER
-renumber).
-Wake-checklist (all measured green 2026-11-12, t383 session): tree = 568
-commits uniform "Weyland Smith <weylandsmith@users.noreply.github.com>",
-zero vendor-path objects, ZERO blobs holding the personal [ISP-DOMAIN] address
-(scrub + batch gate in publish_public.sh 1b), cmake+build exit 0, run_tests
-"270 tests, 192 skipped, 0 failed" WITHOUT vendor data, origin already set to
-https://github.com/weylandsmith/ascendancy-rewrite.git (exists, empty per
-ls-remote 2026-11-11). Credentials: still absent on box — SSH key printed to
-user 2026-11-11, or token-file route; a push attempt without them fails at
-auth, which is safe (nothing partial lands).
+NEXT WAIT-USER-RULING t374 — PUSH DONE 2026-11-12 (this session, user GO
+after token landed): https://github.com/weylandsmith/ascendancy-rewrite.git
+main = 12afb0ad2afb872490cc1b70dbf8521180e29f1d, verified remote ls-remote
+== local tip of /tmp/pubpush-t383b (568 commits, single identity, vendor-
+free, 270 tests 192 skipped 0 failed WITHOUT vendor data). Transport note:
+SSH is DEAD on this network (github.com:22 AND ssh.github.com:443 both
+firewalled — measured); route = HTTPS through the Squid proxy + fine-grained
+PAT in ~/.config/gh-pub-token via a GIT_ASKPASS helper (token never
+echoed; helper deleted after use — recreate per docs/re/packaging.md if a
+future push is needed; NEVER push from the working repo).
+A session woken by a DECISIONS.md edit or a *ruling*/*reply* file: read
+docs/DECISIONS.md, apply what the ruling says, close rows per strict-close,
+then author the next queue or re-park this sentinel.
 User context (spoke 2026-11-11, verbatim quotes in DECISIONS.md USER block):
 OQ-016/OQ-019 acceptance DEFERRED (rows stay OPEN; do NOT re-ask, do NOT
 apply the t329 S4 draft); playtest witnesses stand as the evidence base;
 "incorporate all findings in the rewrite before pushing to github" (D7 —
-phase 9 queue DONE: t380/t381/t382 landed the last laws, suite 270/0); user
-saves 887/1086/1253 PROTECTED (~/ascendancy-saves-protected/, law: raw .SAV
-u32@0 = game-day).
+DONE, pushed); user saves 887/1086/1253 PROTECTED
+(~/ascendancy-saves-protected/, law: raw .SAV u32@0 = game-day).
 QUEUE: EMPTY — phase 9 fully drained (t383 was the last row, LANDED below).
-After the push (or if the user redirects), author the next queue or park the
-WAIT-TRIGGER sentinel per the standing law below.
+After the user's next word, author the next queue or park the WAIT-TRIGGER
+sentinel per the standing law below.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
