@@ -1,0 +1,252 @@
+hrethric@athens:~/Games/ascendancy/ascendancy-rewrite$ cmake -S rewrite -B build
+-- Checking for module 'sdl2'
+--   Found sdl2, version 2.30.0
+-- Checking for module 'SDL2_mixer'
+--   Found SDL2_mixer, version 2.8.0
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/hrethric/Games/ascendancy/ascendancy-rewrite/build
+hrethric@athens:~/Games/ascendancy/ascendancy-rewrite$ cmake --build build -j4
+[  1%] Building CXX object CMakeFiles/ascend_core.dir/src/formats/cob.cpp.o
+[  4%] Building CXX object CMakeFiles/ascend_core.dir/src/formats/bin_table.cpp.o
+[  4%] Building CXX object CMakeFiles/ascend_core.dir/src/formats/flic.cpp.o
+[  5%] Building CXX object CMakeFiles/ascend_core.dir/src/formats/voc.cpp.o
+[  6%] Building CXX object CMakeFiles/ascend_core.dir/src/formats/fnt.cpp.o
+[  8%] Building CXX object CMakeFiles/ascend_core.dir/src/formats/shp.cpp.o
+[  9%] Building CXX object CMakeFiles/ascend_core.dir/src/formats/shipsave.cpp.o
+[ 10%] Building CXX object CMakeFiles/ascend_core.dir/src/game/starstat.cpp.o
+[ 12%] Building CXX object CMakeFiles/ascend_core.dir/src/game/mapgen.cpp.o
+[ 13%] Building CXX object CMakeFiles/ascend_core.dir/src/game/research.cpp.o
+[ 15%] Building CXX object CMakeFiles/ascend_core.dir/src/game/economy.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.cpp:3:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 16%] Building CXX object CMakeFiles/ascend_core.dir/src/game/diplomacy.cpp.o
+[ 17%] Building CXX object CMakeFiles/ascend_core.dir/src/game/species.cpp.o
+[ 19%] Building CXX object CMakeFiles/ascend_core.dir/src/game/campaign.cpp.o
+[ 20%] Building CXX object CMakeFiles/ascend_core.dir/src/game/shipsim.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.cpp:3:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 21%] Building CXX object CMakeFiles/ascend_core.dir/src/game/observer.cpp.o
+[ 23%] Building CXX object CMakeFiles/ascend_core.dir/src/game/campaign_fleet_bridge.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign_fleet_bridge.cpp:9:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 24%] Building CXX object CMakeFiles/ascend_core.dir/src/game/aggregate_oracle.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/aggregate_oracle.cpp:4:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 26%] Linking CXX static library libascend_core.a
+[ 26%] Built target ascend_core
+[ 30%] Building CXX object CMakeFiles/ascend_ui.dir/src/ui/layout.cpp.o
+[ 30%] Building CXX object CMakeFiles/ascend_ui.dir/src/ui/poppanel.cpp.o
+[ 30%] Building CXX object CMakeFiles/ascend_ui.dir/src/ui/hudlayout.cpp.o
+[ 31%] Building CXX object CMakeFiles/run_tests.dir/tests/main.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/hudlayout.h:47,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/hudlayout.cpp:6:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/poppanel.cpp:9:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 32%] Building CXX object CMakeFiles/run_tests.dir/tests/test_cob.cpp.o
+[ 34%] Building CXX object CMakeFiles/ascend_ui.dir/src/ui/planetwin.cpp.o
+[ 35%] Building CXX object CMakeFiles/ascend_ui.dir/src/ui/ui.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/planetwin.h:75,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/planetwin.cpp:6:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/ui.cpp:12:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 36%] Building CXX object CMakeFiles/ascend_ui.dir/src/ui/audio.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/audio.cpp:5:
+/usr/include/SDL2/SDL_mixer.h:268:27: error: conflicting declaration ‘typedef struct _Mix_Music Mix_Music’
+  268 | typedef struct _Mix_Music Mix_Music;
+      |                           ^~~~~~~~~
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/audio.cpp:3:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/audio.h:12:8: note: previous declaration as ‘struct Mix_Music’
+   12 | struct Mix_Music;  // SDL_mixer.h:269
+      |        ^~~~~~~~~
+gmake[2]: *** [CMakeFiles/ascend_ui.dir/build.make:146: CMakeFiles/ascend_ui.dir/src/ui/audio.cpp.o] Error 1
+gmake[2]: *** Waiting for unfinished jobs....
+[ 39%] Building CXX object CMakeFiles/run_tests.dir/tests/test_mapgen.cpp.o
+[ 39%] Building CXX object CMakeFiles/run_tests.dir/tests/test_bin_table.cpp.o
+[ 41%] Building CXX object CMakeFiles/run_tests.dir/tests/test_research.cpp.o
+[ 42%] Building CXX object CMakeFiles/run_tests.dir/tests/test_economy.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_economy.cpp:3:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+gmake[1]: *** [CMakeFiles/Makefile2:115: CMakeFiles/ascend_ui.dir/all] Error 2
+gmake[1]: *** Waiting for unfinished jobs....
+[ 43%] Building CXX object CMakeFiles/run_tests.dir/tests/test_diplomacy.cpp.o
+[ 45%] Building CXX object CMakeFiles/run_tests.dir/tests/test_species.cpp.o
+[ 46%] Building CXX object CMakeFiles/run_tests.dir/tests/test_campaign.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_species.cpp:8:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_campaign.cpp:5:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 47%] Building CXX object CMakeFiles/run_tests.dir/tests/test_campaign_fleet_t365.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_campaign_fleet_t365.cpp:20:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 49%] Building CXX object CMakeFiles/run_tests.dir/tests/test_diponattack_t204.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_diponattack_t204.cpp:10:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_campaign.cpp:6:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_campaign.cpp: In function ‘void campaign_visibility_law_oq026_t195()’:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_campaign.cpp:767:39: warning: comparison of integer expressions of different signedness: ‘std::vector<int>::size_type’ {aka ‘long unsigned int’} and ‘const int’ [-Wsign-compare]
+  767 |     CHECK(c2.cosmosStarsFor(0).size() == starsAlways);  // stars ALWAYS listed
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/harness.h:59:44: note: in definition of macro ‘CHECK’
+   59 | #define CHECK(cond) ::ascend::test::check((cond), #cond, __FILE__, __LINE__)
+      |                                            ^~~~
+[ 50%] Building CXX object CMakeFiles/run_tests.dir/tests/test_invasion_war_t207.cpp.o
+[ 52%] Building CXX object CMakeFiles/run_tests.dir/tests/test_emergency_t201.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_invasion_war_t207.cpp:12:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_emergency_t201.cpp:8:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 53%] Building CXX object CMakeFiles/run_tests.dir/tests/test_demolish_t202b.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_demolish_t202b.cpp:11:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 54%] Building CXX object CMakeFiles/run_tests.dir/tests/test_freetech_t203.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_freetech_t203.cpp:9:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 56%] Building CXX object CMakeFiles/run_tests.dir/tests/test_ui_layout.cpp.o
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_freetech_t203.cpp: In function ‘void campaign_free_tech_grant_law_t203()’:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_freetech_t203.cpp:23:15: warning: unused variable ‘target’ [-Wunused-variable]
+   23 |     const int target = 7;
+      |               ^~~~~~
+[ 57%] Building CXX object CMakeFiles/run_tests.dir/tests/test_poppanel_t263.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_poppanel_t263.cpp:15:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 58%] Building CXX object CMakeFiles/run_tests.dir/tests/test_hudlayout_t264.cpp.o
+[ 60%] Building CXX object CMakeFiles/run_tests.dir/tests/test_econres_t274.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/hudlayout.h:47,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_hudlayout_t264.cpp:8:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_econres_t274.cpp:20:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 61%] Building CXX object CMakeFiles/run_tests.dir/tests/test_planetwin_t276.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/planetwin.h:75,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_planetwin_t276.cpp:10:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 63%] Building CXX object CMakeFiles/run_tests.dir/tests/test_score_t284.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_score_t284.cpp:13:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 64%] Building CXX object CMakeFiles/run_tests.dir/tests/test_control_t291.cpp.o
+[ 65%] Building CXX object CMakeFiles/run_tests.dir/tests/test_terrain_t294.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_control_t291.cpp:19:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_terrain_t294.cpp:19:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_score_t284.cpp: In function ‘void score_contest_gate_t284()’:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_score_t284.cpp:122:15: warning: unused variable ‘n’ [-Wunused-variable]
+  122 |     const int n = static_cast<int>(c.galaxy().stars.size());
+      |               ^
+[ 67%] Building CXX object CMakeFiles/run_tests.dir/tests/test_audio.cpp.o
+[ 68%] Building CXX object CMakeFiles/run_tests.dir/tests/test_ships.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_ships.cpp:5:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 69%] Building CXX object CMakeFiles/run_tests.dir/tests/test_flic.cpp.o
+[ 71%] Building CXX object CMakeFiles/run_tests.dir/tests/test_fnt.cpp.o
+[ 72%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shp.cpp.o
+[ 73%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsave_t360.cpp.o
+[ 75%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsave_t366.cpp.o
+[ 78%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsim_t361.cpp.o
+[ 78%] Building CXX object CMakeFiles/run_tests.dir/tests/test_observer_t382.cpp.o
+[ 79%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsim_t362.cpp.o
+[ 80%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsim_t363.cpp.o
+[ 82%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsim_t364.cpp.o
+[ 83%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsim_t377.cpp.o
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_shipsim_t364.cpp:32:15: warning: ‘ascend::game::SimDesign {anonymous}::shieldRow(int32_t, int32_t)’ defined but not used [-Wunused-function]
+   32 | as::SimDesign shieldRow(int32_t cost, int32_t level) {
+      |               ^~~~~~~~~
+[ 84%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsim_t378.cpp.o
+[ 86%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsim_t379.cpp.o
+[ 87%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsim_t380.cpp.o
+[ 89%] Building CXX object CMakeFiles/run_tests.dir/tests/test_shipsim_t381.cpp.o
+[ 90%] Building CXX object CMakeFiles/run_tests.dir/src/ui/layout.cpp.o
+[ 91%] Building CXX object CMakeFiles/run_tests.dir/src/ui/hudlayout.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/hudlayout.h:47,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/hudlayout.cpp:6:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 93%] Building CXX object CMakeFiles/run_tests.dir/src/ui/poppanel.cpp.o
+[ 94%] Building CXX object CMakeFiles/run_tests.dir/src/ui/planetwin.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/poppanel.cpp:9:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/campaign.h:16,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/planetwin.h:75,
+                 from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/ui/planetwin.cpp:6:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/src/game/economy.h:37:9: warning: identifier ‘requires’ is a keyword in C++20 [-Wc++20-compat]
+   37 |     int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+      |         ^~~~~~~~
+[ 95%] Linking CXX executable run_tests
+[ 95%] Built target run_tests
+gmake: *** [Makefile:101: all] Error 2

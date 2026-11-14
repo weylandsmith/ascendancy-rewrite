@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-14T12:30
+updated: 2026-11-14T14:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,14 +222,23 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t386 per queue row t386 below (phase 10: TITLE-SCREEN + MENU UI).
-ORDERING: t385+t385b LANDED 2026-11-14 (boot state machine + title shell +
-D9 gap closed — see LANDED t385 below and docs/re/boot.md); the title ART
-identity is the only thing standing between the shell and t387's window
-wiring, and t386's Chamachies lead (D9) is fresh user testimony — work it
-before the chrome rows age. t385b's measured SDL law (first synthetic click
-on a NEW window is dropped; reuse the window — docs/re/boot.md §4) BINDS
-every future state-transition row.
+NEXT t387 per queue row t387 below (phase 10: TITLE-SCREEN + MENU UI;
+"finish tN -> NEXT tN+1 VERBATIM").
+ORDERING: t386 LANDED 2026-11-14 — TITLE ART IDENTITY CLOSED
+(docs/re/title-art.md): the vendor title screen IS 0opening.gif blitted 1:1
+at (0,0) through an index-preserving palette swap (derived table
+rewrite/tests/data/title_palette_t386.tsv), with GIF index 255 a colour-key
+hole whose bbox is EXACTLY the windows.txt seven-button union (159,200)-
+(477,470) — the 0opening.shp strips + VendorText labels composite there.
+t387's NewGame/Load windows now have the full title render to wire INTO;
+the Chamachies lead is CLOSED as not-supported (race19 art = one 296-px
+record + one 49-px sprite; the figure is the GIF's own prerender). t385b's
+measured SDL law (first synthetic click on a NEW window is dropped; reuse
+the window — docs/re/boot.md §4) BINDS every future state-transition row.
+t386's REGISTRATION law binds t387+ verification: palette MEMBERSHIP is
+blind at the title screen (all candidates d0=9.2%); the working instrument
+is single-valued index-map CONFLICT COUNTS at the capture-chrome shift
+(shift +40 = 0 conflicts / +-1 = >10^5) — docs/re/title-art.md §4.
 The WAIT-USER-RULING t374 sentinel is RETIRED — user spoke 2026-11-14
 (verbatim in DECISIONS.md D8): recreate the ORIGINAL interface — boot goes
 to the title screen ("the dinosaur-looking guy at the top"), all menu
@@ -286,7 +295,10 @@ seven items, exact rects, Alt-L/Alt-S hotkeys, Exit-to-DOS = clean exit,
 missing pins; if t385 already satisfies the law, bank the honest negative
 (zero diffs) and say so. Read docs/re/ui.md §3 correction marker first.
 
-t386 TITLE ART IDENTITY (the dinosaur-looking guy). D9 LEAD (user
+t386 TITLE ART IDENTITY (the dinosaur-looking guy). [CLOSED 2026-11-14
+— title = 0opening.gif 1:1 + palette swap + key-255 menu hole; law,
+conflict-count witness, derived palette TSV in docs/re/title-art.md; see
+LANDED t386. Original row text kept below.] D9 LEAD (user
 testimony 2026-11-14): the figure may be the HEAD OF THE CHAMACHIES, a
 playable race ("brilliant scientists", help.txt L2424) that reads
 dinosaur-like — race art lives in race00..raceNN.dip + the .haz hazard
@@ -424,6 +436,48 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t386 — 2026-11-14 (TITLE ART IDENTITY CLOSED: title = 0opening.gif)
+
+Full law + every measurement: docs/re/title-art.md (hand-authored; grep
+verified no generator or gate stage writes it). Instruments:
+scripts/t386_title_art.py, t386_colour_witness.py, t386_remap_test.py,
+t386_registration.py; derived pin data
+rewrite/tests/data/title_palette_t386.tsv. NO rewrite code changed (this is
+an identity row; the blit lands with t387's wiring). Ledger untouched
+(OQ-016/OQ-019 stay open; phase-10 queue work moves no OQ row).
+- IDENTITY LAW [verified]: the vendor title screen IS extracted/ascend01/
+  data/0opening.gif (GIF87a, ONE frame 640x480, 53 used indices) blitted
+  1:1 at (0,0) through an index-preserving palette swap. Decisive: the
+  gif_index -> shot_colour map over the pinned vendor screenshot has ZERO
+  conflicts across all 52 art indices at capture shift +40 (the banked
+  window-chrome offset, refcap.md §1), vs 213,415 at +39 and 117,327 at
+  +41. Label bands land on windows.txt centres +40; seventh button below
+  the crop exactly as D9 predicts.
+- KEY-SOLID LAW [verified]: GIF index 255 (GCT [0,0,255]) covers EXACTLY
+  (159,200)-(477,470) = the windows.txt seven-button union; it is the only
+  non-singleton map index (11,039 conflicts = the game's own menu chrome
+  composited there). Port: blit GIF skipping 255, then 0opening.shp state-0
+  strips + VendorText at (159,200..440 step 40, h30).
+- REFUTED ARMS banked: 0opening.shp is strips-only (318x30 + 6x(30x318),
+  zero records >=150x150 — it CANNOT be the figure); the GIF is NOT a movie
+  frame (0/1144 intro65a + 0/226 logic exact-plane matches); palette
+  membership laws are BLIND at the title (every candidate d0=9.2%); the
+  .haz index-remap hypothesis 0/45; the GIF's own GCT is not the title
+  palette (1/39). Chamachies lead NOT supported: lgrace19.shp = single
+  record, smrace19.shp = 49-px sprite; figure = GIF prerender.
+- MEASUREMENT LAW for t387+: identify/verify chrome by single-valued
+  index-map CONFLICT COUNTS at the registration shift, not by palette
+  membership, not by self-graded vision.
+- RESIDUES (named, none blocking): blit-chain edge = referrers only as the
+  0x2183x cluster (neither imm 0xa06 nor raw 0x835b6 occurs as u32 in
+  work/ascend_restored.bin — a Ghidra xref walk is the named instrument,
+  unexercised); the vendor title palette TABLE's origin unresolved (the TSV
+  substitutes); GIF rows 440..479 clipped by the +40 capture, witnessed
+  from the GIF only.
+- ADOPTED from the dirty tree: notes/cmake-error.txt + cmake-warnings.txt
+  (user's build-log dumps corroborating the t384 reqByte rename — 15x
+  -Wc++20-compat before, clean after) committed so the tree is clean.
 
 ## LANDED t385 + t385b — 2026-11-14 (BOOT STATE MACHINE + TITLE SCREEN + D9 GAP CLOSED)
 Queue rows t385 and t385b, one session. Full law + measurements:

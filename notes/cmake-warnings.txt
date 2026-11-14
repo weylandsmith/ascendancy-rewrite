@@ -1,0 +1,73 @@
+hrethric@athens:~/Games/ascendancy/ascendancy-rewrite$ git pull --rebase
+remote: Enumerating objects: 29, done.
+remote: Counting objects: 100% (29/29), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 16 (delta 13), reused 16 (delta 13), pack-reused 0 (from 0)
+Unpacking objects: 100% (16/16), 2.27 KiB | 290.00 KiB/s, done.
+From https://github.com/weylandsmith/ascendancy-rewrite
+   e113a39..c02e3ad  main       -> origin/main
+Updating e113a39..c02e3ad
+Fast-forward
+ docs/STATE.md                  | 11 ++++++++---
+ rewrite/src/game/campaign.cpp  |  8 ++++----
+ rewrite/src/game/campaign.h    |  6 +++---
+ rewrite/src/game/economy.cpp   |  2 +-
+ rewrite/src/game/economy.h     |  3 ++-
+ rewrite/tests/test_economy.cpp |  8 ++++----
+ rewrite/tests/test_ships.cpp   |  4 ++--
+ 7 files changed, 24 insertions(+), 18 deletions(-)
+hrethric@athens:~/Games/ascendancy/ascendancy-rewrite$ cmake --build build -j4
+[  1%] Building CXX object CMakeFiles/ascend_core.dir/src/game/economy.cpp.o
+[  2%] Building CXX object CMakeFiles/ascend_core.dir/src/game/campaign.cpp.o
+[  4%] Building CXX object CMakeFiles/ascend_core.dir/src/game/campaign_fleet_bridge.cpp.o
+[  5%] Building CXX object CMakeFiles/ascend_core.dir/src/game/aggregate_oracle.cpp.o
+[  6%] Linking CXX static library libascend_core.a
+[ 26%] Built target ascend_core
+[ 28%] Building CXX object CMakeFiles/ascend_ui.dir/src/ui/hudlayout.cpp.o
+[ 28%] Building CXX object CMakeFiles/ascend_ui.dir/src/ui/poppanel.cpp.o
+[ 30%] Building CXX object CMakeFiles/ascend_ui.dir/src/ui/planetwin.cpp.o
+[ 31%] Building CXX object CMakeFiles/run_tests.dir/tests/test_economy.cpp.o
+[ 32%] Building CXX object CMakeFiles/ascend_ui.dir/src/ui/ui.cpp.o
+[ 34%] Building CXX object CMakeFiles/run_tests.dir/tests/test_species.cpp.o
+[ 35%] Building CXX object CMakeFiles/run_tests.dir/tests/test_campaign.cpp.o
+[ 36%] Building CXX object CMakeFiles/run_tests.dir/tests/test_campaign_fleet_t365.cpp.o
+In file included from /home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_campaign.cpp:6:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_campaign.cpp: In function ‘void campaign_visibility_law_oq026_t195()’:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_campaign.cpp:767:39: warning: comparison of integer expressions of different signedness: ‘std::vector<int>::size_type’ {aka ‘long unsigned int’} and ‘const int’ [-Wsign-compare]
+  767 |     CHECK(c2.cosmosStarsFor(0).size() == starsAlways);  // stars ALWAYS listed
+      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/harness.h:59:44: note: in definition of macro ‘CHECK’
+   59 | #define CHECK(cond) ::ascend::test::check((cond), #cond, __FILE__, __LINE__)
+      |                                            ^~~~
+[ 38%] Building CXX object CMakeFiles/run_tests.dir/tests/test_diponattack_t204.cpp.o
+[ 39%] Linking CXX static library libascend_ui.a
+[ 42%] Built target ascend_ui
+[ 43%] Building CXX object CMakeFiles/run_tests.dir/tests/test_invasion_war_t207.cpp.o
+[ 45%] Building CXX object CMakeFiles/run_tests.dir/tests/test_emergency_t201.cpp.o
+[ 46%] Building CXX object CMakeFiles/run_tests.dir/tests/test_demolish_t202b.cpp.o
+[ 47%] Building CXX object CMakeFiles/run_tests.dir/tests/test_freetech_t203.cpp.o
+[ 49%] Building CXX object CMakeFiles/run_tests.dir/tests/test_poppanel_t263.cpp.o
+[ 50%] Building CXX object CMakeFiles/run_tests.dir/tests/test_hudlayout_t264.cpp.o
+[ 52%] Building CXX object CMakeFiles/run_tests.dir/tests/test_econres_t274.cpp.o
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_freetech_t203.cpp: In function ‘void campaign_free_tech_grant_law_t203()’:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_freetech_t203.cpp:23:15: warning: unused variable ‘target’ [-Wunused-variable]
+   23 |     const int target = 7;
+      |               ^~~~~~
+[ 53%] Building CXX object CMakeFiles/ascendancy.dir/src/main.cpp.o
+[ 54%] Building CXX object CMakeFiles/run_tests.dir/tests/test_planetwin_t276.cpp.o
+[ 56%] Building CXX object CMakeFiles/run_tests.dir/tests/test_score_t284.cpp.o
+[ 57%] Building CXX object CMakeFiles/run_tests.dir/tests/test_control_t291.cpp.o
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_score_t284.cpp: In function ‘void score_contest_gate_t284()’:
+/home/hrethric/Games/ascendancy/ascendancy-rewrite/rewrite/tests/test_score_t284.cpp:122:15: warning: unused variable ‘n’ [-Wunused-variable]
+  122 |     const int n = static_cast<int>(c.galaxy().stars.size());
+      |               ^
+[ 58%] Building CXX object CMakeFiles/run_tests.dir/tests/test_terrain_t294.cpp.o
+[ 60%] Building CXX object CMakeFiles/run_tests.dir/tests/test_ships.cpp.o
+[ 61%] Building CXX object CMakeFiles/run_tests.dir/src/ui/hudlayout.cpp.o
+[ 63%] Building CXX object CMakeFiles/run_tests.dir/src/ui/poppanel.cpp.o
+[ 64%] Linking CXX executable ascendancy
+[ 65%] Building CXX object CMakeFiles/run_tests.dir/src/ui/planetwin.cpp.o
+[ 65%] Built target ascendancy
+[ 67%] Linking CXX executable run_tests
+[100%] Built target run_tests
+hrethric@athens:~/Games/ascendancy/ascendancy-rewrite$
