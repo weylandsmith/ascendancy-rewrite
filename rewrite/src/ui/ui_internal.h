@@ -9,7 +9,9 @@
 #include <vector>
 
 #include "formats/fnt.h"
+#include "formats/shp.h"
 #include "ui/layout.h"
+#include "ui/menulaw.h"
 
 namespace ascend::ui {
 
@@ -41,5 +43,19 @@ struct VendorText {
     void release();
     ~VendorText() { release(); }
 };
+
+// t388: chrome blit shared by the title loop (title.cpp) and the campaign
+// loop (ui.cpp). Definition in vendortext.cpp; semantics documented there.
+bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
+               int rec, int x, int y);
+
+// t388: the load screen moved out of title.cpp's anonymous namespace so the
+// campaign loop can reuse it (t388 task: Save/Load reuse the t387 windows).
+// Return >=0 accepted slot index; kLoadCancel (Esc); kLoadQuit (SDL_QUIT).
+constexpr int kLoadCancel = -1;
+constexpr int kLoadQuit = -2;
+int runLoadScreen(SDL_Renderer* ren, VendorText& txt,
+                  const std::string& dataRoot,
+                  const std::vector<SaveSlot>& slots);
 
 }  // namespace ascend::ui

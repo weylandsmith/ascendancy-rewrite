@@ -174,6 +174,11 @@ law) and matched by live clicks at rect CENTERS:
 - Each button is WINITEMS 2: TEXTITEM 0 + SHAPEITEM 1 from data\1starmap.shp
   (icon frames 3=Research, 4=Ships, 5=Planets, 7=Special) — the sidebar icons
   are 1starmap.shp records, a concrete lead for OQ-005 identification.
+- [t388 CORRECTION] the RACES/Intelligence 14-px overlap does NOT need a
+  z-order rule: the STATE field is an id-LIST ("<count> <id>..." — the count
+  equals the number of ids in 123/123 records) and Intelligence's list is
+  "1 7" — active in the species menu ONLY, never on the map. t264's
+  [inferred] last-hit z-order reading is superseded by ui/statuslaw.h.
 
 RESEARCH SCREEN (RESWIN TYPE 9, rect 7,46-476,472, help reswin; children
 RESROTLEFT 524,442-539,472 msg 50, RESROTRIGHT 540,442-554,472 msg 51,
@@ -414,3 +419,35 @@ behaviour is unverified), the 132-window chrome (SHAPEFRAME frames need
 OQ-005), audio mixing of headerless rates (OQ-006), save/load (OQ-003).
 Vendor fonts were on this list until OQ-017 closed (§3). Each remaining item
 is a listed open question, not a silent omission.
+
+## 7. t388 CAMPAIGN SCREEN LAW LANDED (2026-11-14)
+
+The campaign loop (ui.cpp) is now a set of vendor SCREENS keyed by the
+windows.txt STATE ids, with the rail as the switch. Pure law module:
+`rewrite/src/ui/statuslaw.{h,cpp}` (no SDL; 8 pins
+`statuslaw_*_t388`, 289 tests 0 fail). Full working log + the 10status.shp
+census: docs/re/_wip_t388.md. Distilled facts:
+
+- STATE IS AN ID-LIST [verified 123/123]: "STATE 1 10" = active in state 10
+  only. Rail "1 1" = map only; Intelligence "1 7" = species menu only;
+  COSMOSWnd "4 1 3 7 13" = the map stays visible under the species menu
+  (t252 vision corroborates); STATUSWND "1 10" only — an independent
+  full-screen screen, NOT a bottom bar (the t388 task prose "bottom bar" is
+  refuted by the rect 7,7-632,472 + the STATE lists).
+- SWITCH LAW: msg 1 + param1 (a known screen id) switches; msg 5/7/8 and
+  unknown ids (13 NEGSCREEN, 17 PLANETALLOC) are NO-OPS — never a clamp.
+- ESCAPE: inside a screen -> map (t252 live); on the map -> quit (standing).
+- 10status.shp [measured t388, scripts/r388_status_census.py]: 2 records,
+  k0 639x479 V FULLY OPAQUE (306081 painted px = W*H, zero skip rows) —
+  the full-backdrop class (same as 4loadgam/2savegam k0); k1 32x31. The
+  backdrop is blitted full-frame via the two-buffer prefill-diff mask;
+  palette stays the named luminance-ramp seam (title-art.md §4).
+- Screens landed with chrome: map(1), species(7, race-row frames over the
+  map), Planets(10), Intelligence(14), Ships(18), Research(20) — the last
+  five FRAME + TITLE only; content is a named seam per screen.
+- HONEST NEGATIVES [verified over all 132 windows.txt records]: no button
+  named Galaxy/Production/Design exists anywhere; SAVE/LOAD exist ONLY in
+  state 0 (title). Campaign Alt-L (opens the t387 load window) / Alt-S
+  (prints the no-writer seam) are LABELLED PORT ADDITIONS.
+- LIVE WITNESS (Xvfb :81, xsend): map->Planets->map->Species->Intelligence
+  ->map->NEXTTURN turn 1, every step logged; wired as gate 4c-d.

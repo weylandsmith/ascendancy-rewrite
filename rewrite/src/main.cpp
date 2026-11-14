@@ -530,7 +530,7 @@ int main(int argc, char** argv) {
         }
         const int rc = ascend::ui::runCampaignUi(*camp, o.campaign, o.autoplay,
                                                  o.dataRoot.string(), audio.get(),
-                                                 handedWindow);
+                                                 handedWindow, savesDir);
         SDL_Quit();  // also tears down the handed-over window
         return rc;
     }

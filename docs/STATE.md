@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-14T15:30
+updated: 2026-11-14T19:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,18 +222,23 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t388 per queue row t388 below (phase 10: TITLE-SCREEN + MENU UI;
+NEXT t388b per queue row t388b below (phase 10: TITLE-SCREEN + MENU UI;
 "finish tN -> NEXT tN+1 VERBATIM").
-ORDERING: t387 LANDED 2026-11-14 — NEWGAMEWND + LOAD MENU WINDOWS (law
-distilled docs/re/boot.md §6; full census docs/re/_wip_t387.md). Key laws
-t388 MUST reuse: (1) COORDINATE SPACE — windows.txt rects are ABSOLUTE;
-PARENT is containment, not an offset (geometry-decisive witness boot.md §6);
-(2) the pure-law pattern rewrite/src/ui/menulaw.{h,cpp} (no SDL in the
-routing/listing law; SDL only in title.cpp); (3) blitShape two-buffer
-prefill-diff MASK (skipped px -> alpha 0, shp.h untouched-destination law);
-(4) STATUSWND chrome census: 10status.shp NOT yet censused — census it
-first (dims per V/A law); (5) t385b window-reuse law (boot.md §4) — the
-gate 4c chain drives Title->Campaign through ONE window, keep it.
+ORDERING: t388 LANDED 2026-11-14 — campaign SCREEN LAW (STATE id-lists) +
+rail routing + STATUSWND/Species/Intel screens (law docs/re/ui-runtime.md
+§7; full census docs/re/_wip_t388.md). Key laws t388b MUST reuse: (1) the
+STATE field is an ID-LIST "<count> <id>..." [123/123] — controls/windows
+draw iff the list holds the current screen id (ui/statuslaw.h); (2) sound
+wiring points ALREADY EXIST: ui.cpp plays click08 on NEXTTURN and laser01/
+bang01 via the same branch style — extend inside railButtonForScreen
+routing, soundfx.txt "2 10000 button" is the cited SFX id; (3) the t384b
+include law (never re-forward-declare SDL2_mixer opaque types — audio.{h,
+cpp} owns them); (4) headless CI has NO sound card: audio init failure
+degrades to silent, NEVER aborts (audio.md §5 already ships this shape —
+check before adding any Mix_* call site). Gate 4c-d (t388) drives the
+screen round trip via xsend; extend it for SFX only if a headless-safe
+instrument exists (a print line per played sound is mechanical; hearing
+is the USER's grade — t389 names it).
 Palette seam (boot.md §6): menu .shp index sets are disjoint from the t386
 title TSV; luminance ramp substitutes; closing it needs a vendor screenshot
 of load/newgame screens (user-grader artifact, none pinned). Do NOT fake
@@ -328,7 +333,14 @@ listing from REAL files in a temp dir (torn-tolerance law), refusal-not-
 clamp on junk saves. NEW GAME may stub the actual campaign-start seed
 with a named seam if mapgen wiring exceeds budget — say so in the row.
 
-t388 IN-GAME MENU BAR + STATUS WINDOW CHROME. The campaign UI currently
+t388 IN-GAME MENU BAR + STATUS WINDOW CHROME. [CLOSED 2026-11-14 —
+campaign STATE id-list screen law (123/123 records; t264 z-order inference
+superseded), rail routing msg1/p1 + Escape law, 10status.shp k0 639x479
+fully-opaque backdrop census, gate 4c-d live round trip; law
+docs/re/ui-runtime.md §7, full log docs/re/_wip_t388.md. HONEST NEGATIVES:
+no Galaxy/Production/Design button exists in windows.txt; SAVE/LOAD are
+title-state-only — Alt-L/Alt-S campaign chords are labelled port additions.
+Original row text kept below.] The campaign UI currently
 draws bare star dots + NEXTTURN rect. Land STATUSWND (windows.txt L1018 +
 PARENT controls L1036+; art 10status.shp) as the bottom bar, buttons per
 ui-runtime.md §6 (Galaxy/Species/Intelligence/Research/Production/Design/
@@ -435,6 +447,42 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   tNNN in field 3 for the human reader). Human steering is tag-independent
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
+
+
+## LANDED t388 — 2026-11-14 (CAMPAIGN SCREEN LAW + RAIL ROUTING + STATUS CHROME)
+
+What landed: pure screen-law module rewrite/src/ui/statuslaw.{h,cpp} + 8
+pins test_statuslaw_t388.cpp (289 tests 0 fail): screenAfterRailPress (msg
+1 + param1 known-id switches; msg 5/7/8 + unknown ids NO-OP, never clamp),
+railActive/railButtonForScreen (STATE id-lists), escapeToMap, verbatim
+chrome rects (STATUSWND 7,7-632,472 + STATPLANLST 7,46-632,472, INTELSCREEN
+7,7-632,34 + INTELLIST, FLEETWND, RESWIN 7,46-476,472, RACE_1..7 rows),
+screenTitle/railLabel (TEXTITEM verbatim), screenShapeLib naming law. THE
+DECISIVE TABLE FACT [verified 123/123 records]: STATE = "<count> <id>..."
+id-LIST — Intelligence "1 7" is species-menu-ONLY, dissolving t264's
+[inferred] z-order rule for the RACES/Intelligence 14-px overlap; rail "1
+1" map-only; COSMOSWnd "4 1 3 7 13" keeps the map visible under the species
+menu (t252 corroborates); STATUSWND is an independent FULL screen — the task
+prose "bottom bar" is REFUTED by rect + STATE lists. SDL side ui.cpp:
+screen variable + per-screen chrome backdrop blit (mechanical full-backdrop
+test: record k0 >= 600x400 — measured 10status k0 639x479 FULLY OPAQUE
+306081 px zero skip rows, scripts/r388_status_census.py imports the V/A law
+from r1_shp_unifiedlaw, no re-implementation); rail draw per sidebarIcon
+law (icons 1starmap k3/k4/k5/k7 censused; text-only buttons get none);
+opened screens = frame + title + named content seams (species = race-row
+frames over the map; NEGSCREEN state 13 inert); Escape inside->map/on-map->
+quit; runLoadScreen + blitShape MOVED title.cpp -> vendortext.cpp (shared
+via ui_internal.h; title.cpp behaviour unchanged, gate 4c-c still green).
+HONEST NEGATIVES (all 132 records searched): NO button named Galaxy /
+Production / Design exists anywhere in windows.txt (the task's button list
+was prose, the table wins); SAVE/LOAD exist ONLY in STATE "1 0" — campaign
+Alt-L (opens the t387 load window) / Alt-S (prints the no-campaign-writer
+seam, t382) are LABELLED PORT ADDITIONS. Live witness Xvfb :81: map->
+Planets->map->Species->Intelligence->map->NEXTTURN turn 1; wired as gate
+4c-d (:82, greps every transition). NO LEDGER ROW CLOSED (strict-close:
+this row wires cited table law; no OQ asks it). Right-click deselect
+(selfplay.md): lands in the ui.cpp map-selection branch once selection
+widgets exist — noted per task, not implemented.
 
 
 ## LANDED t387 — 2026-11-14 (MAIN MENU WIRING: NEWGAMEWND + LOAD SCREEN)

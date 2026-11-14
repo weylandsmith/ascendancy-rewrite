@@ -40,9 +40,12 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
 // matching interactions. `dataRoot` is the repo root holding extracted/;
 // text is rendered with the VENDOR .fnt faces (smfont/bigfont, docs/re/fnt.md
 // + ui-runtime.md §3 — OQ-017 CLOSED, substitute removed 2026-10-05f).
+// `savesDir` (t388): the supply-your-own dir the Alt-L load screen lists
+// (empty = no dir; the screen still opens and says so — honest zero).
 int runCampaignUi(ascend::game::Campaign& camp, int turns, bool autoplay,
                   const std::string& dataRoot, AudioEngine* audio = nullptr,
-                  void* window = nullptr);
+                  void* window = nullptr,
+                  const std::string& savesDir = std::string());
 
 // Plays an FLC video 1:1 into a 640x480 window (docs/re/flc.md): palette +
 // indices converted on the CPU to ARGB, uploaded per frame via a streaming

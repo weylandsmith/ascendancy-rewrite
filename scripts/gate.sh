@@ -632,6 +632,39 @@ else
       grep -q 'ui ok: turn 1' /tmp/gate_ui_load.log \
         || { cat /tmp/gate_ui_load.log; err "campaign unreachable after load cancel"; }
     fi
+
+    # 4c-d (t388): the campaign SCREEN LAW. Rail clicks route through
+    # screenAfterRailPress (STATE id-lists, windows.txt); Escape returns to
+    # the map (t252 live law); the RACES/Intelligence overlap resolves by
+    # SCREEN (map click -> Species, species-menu click -> Intelligence),
+    # and NEXTTURN still advances after the round trip.
+    rm -f /tmp/.X82-lock /tmp/.X11-unix/X82
+    Xvfb :82 -screen 0 640x480x24 >/dev/null 2>&1 &
+    GATE_XV3=$!
+    sleep 1
+    DISPLAY=:82 timeout 60 "$ROOT/rewrite/build/ascendancy" --ui --resume \
+      --campaign 1 --seed 5 >/tmp/gate_ui_screens.log 2>&1 &
+    GATE_APP3=$!
+    sleep 2
+    GS() { DISPLAY=:82 "$ROOT/tools/xsend" "Ascendancy rewrite (P5a)" "$@"; sleep 1; }
+    GS 553 145    # STATUS centre (474,130-632,160)
+    grep -q 'ui screen map -> Planets (STATUS)' /tmp/gate_ui_screens.log \
+      || { cat /tmp/gate_ui_screens.log; err "STATUS rail click never opened the Planets screen"; }
+    GS key Escape
+    grep -q 'ui screen Planets -> map (esc)' /tmp/gate_ui_screens.log \
+      || { cat /tmp/gate_ui_screens.log; err "Escape never returned to the map"; }
+    GS 553 310    # overlap-zone click ON THE MAP -> RACES (Intelligence inactive)
+    grep -q 'ui screen map -> Species (RACES)' /tmp/gate_ui_screens.log \
+      || { cat /tmp/gate_ui_screens.log; err "overlap-zone click did not route to RACES on the map"; }
+    GS 553 310    # same point INSIDE the species menu -> Intelligence (STATE "1 7")
+    grep -q 'ui screen Species -> Intelligence (Intelligence)' /tmp/gate_ui_screens.log \
+      || { cat /tmp/gate_ui_screens.log; err "Intelligence never opened from the species menu"; }
+    GS key Escape
+    GS 510 66     # NEXTTURN
+    wait $GATE_APP3 || err "ui app exited non-zero after screen round trip"
+    kill $GATE_XV3 2>/dev/null
+    grep -q 'ui ok: turn 1' /tmp/gate_ui_screens.log \
+      || { cat /tmp/gate_ui_screens.log; err "turn did not advance after the screen round trip"; }
   else
     note "tools/xsend not built: skipped real-input UI check"
   fi

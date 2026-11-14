@@ -61,6 +61,7 @@ add_library(ascend_ui STATIC
   src/ui/vendortext.cpp
   src/ui/title.cpp
   src/ui/hudlayout.cpp
+  src/ui/statuslaw.cpp
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp
   src/ui/ui.cpp
@@ -97,6 +98,7 @@ add_executable(run_tests
   tests/test_menulaw_t387.cpp
   tests/test_poppanel_t263.cpp
   tests/test_hudlayout_t264.cpp
+  tests/test_statuslaw_t388.cpp
   tests/test_econres_t274.cpp
   tests/test_planetwin_t276.cpp
   tests/test_score_t284.cpp
@@ -123,6 +125,7 @@ add_executable(run_tests
   src/ui/boot.cpp
   src/ui/menulaw.cpp
   src/ui/hudlayout.cpp
+  src/ui/statuslaw.cpp
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp
 )
