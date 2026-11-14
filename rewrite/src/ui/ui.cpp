@@ -10,7 +10,9 @@
 #include "formats/flic.h"
 #include "formats/fnt.h"
 #include "game/campaign.h"
+#include "ui/boot.h"
 #include "ui/layout.h"
+#include "ui/ui_internal.h"
 
 namespace ascend::ui {
 namespace ag = ascend::game;
@@ -25,93 +27,6 @@ const SDL_Color kLane{120, 120, 120, 255};
 const SDL_Color kText{235, 235, 235, 255};
 const SDL_Color kDim{150, 130, 110, 255};
 
-// Vendor text faces (docs/re/fnt.md, OQ-017 CLOSED): SMALLFONT/BIGFONT as
-// windows.txt:30-32 maps them (ui-runtime.md §3). Each face is blitted from a
-// white-with-alpha atlas (one row, glyphs packed left-to-right with a 1px
-// gutter) tinted per draw call via SDL_SetTextureColorMod. sm/big ink is the
-// SINGLE value 0xF3 [verified corpus-wide, fnt_probe]: binary ink/background,
-// so atlas alpha is 255/0 — no intensity ramp is invented. advance == width,
-// no bearings [verified]; codes 0..31 and @^{|}~ carry no ink (blank, still
-// advance) exactly as in the vendor font.
-struct VendorText {
-    ascend::formats::Font sm, big;
-    struct Face {
-        SDL_Texture* tex = nullptr;
-        int gx[ascend::formats::Font::kGlyphCount] = {};
-        int gw[ascend::formats::Font::kGlyphCount] = {};
-        int h = 0;
-    };
-    Face smFace, bigFace;
-
-    bool buildFace(SDL_Renderer* r, const ascend::formats::Font& f, Face* out,
-                   std::string* err) {
-        out->h = f.height();
-        int total = 1;
-        for (int i = 0; i < ascend::formats::Font::kGlyphCount; i++) {
-            out->gx[i] = total;
-            out->gw[i] = int(f.glyph(i).width);
-            total += out->gw[i] + 1;  // 1px gutter, NEAREST sampling anyway
-        }
-        std::vector<uint32_t> px(size_t(total) * out->h, 0x00000000u);
-        for (int i = 0; i < ascend::formats::Font::kGlyphCount; i++) {
-            const auto& g = f.glyph(i);
-            for (int y = 0; y < out->h; y++)
-                for (uint32_t x = 0; x < g.width; x++)
-                    if (g.px[size_t(y) * g.width + x] != 0xFF)  // 0xFF = bg [fnt.md]
-                        px[size_t(y) * total + out->gx[i] + x] = 0xFFFFFFFFu;
-        }
-        out->tex = SDL_CreateTexture(r, SDL_PIXELFORMAT_ARGB8888,
-                                     SDL_TEXTUREACCESS_STATIC, total, out->h);
-        if (!out->tex) {
-            *err = std::string("atlas: ") + SDL_GetError();
-            return false;
-        }
-        SDL_SetTextureBlendMode(out->tex, SDL_BLENDMODE_BLEND);
-        SDL_UpdateTexture(out->tex, nullptr, px.data(), total * int(sizeof(uint32_t)));
-        return true;
-    }
-
-    bool load(SDL_Renderer* r, const std::string& root, std::string* err) {
-        const std::string smPath = root + "/extracted/ascend01/data/smfont.fnt";
-        const std::string bigPath = root + "/extracted/ascend01/data/bigfont.fnt";
-        if (!sm.load(smPath, err)) return false;
-        if (!big.load(bigPath, err)) return false;
-        if (!buildFace(r, sm, &smFace, err)) return false;
-        if (!buildFace(r, big, &bigFace, err)) return false;
-        return true;
-    }
-
-    void draw(SDL_Renderer* r, int x, int y, const std::string& s, bool large,
-              SDL_Color c) {
-        if (s.empty()) return;
-        Face& fa = large ? bigFace : smFace;
-        SDL_SetTextureColorMod(fa.tex, c.r, c.g, c.b);
-        for (unsigned char ch : s) {
-            // Vendor fonts define codes 0..127 only (docs/re/fnt.md). CP437
-            // high bytes in event text render as a space-width gap, not UB.
-            const int gw = ch < ascend::formats::Font::kGlyphCount
-                               ? fa.gw[ch]
-                               : fa.gw[' '];
-            if (gw > 0 && ch < ascend::formats::Font::kGlyphCount) {
-                // Whole-glyph clipping at the display edge: a half-drawn
-                // glyph reads as corruption; a missing one reads as wrap.
-                if (x + gw > kDisplayW) break;
-                SDL_Rect src{fa.gx[ch], 0, gw, fa.h};
-                SDL_Rect dst{x, y, gw, fa.h};
-                SDL_RenderCopy(r, fa.tex, &src, &dst);
-            }
-            x += gw;  // advance == width [verified, fnt.md]
-        }
-    }
-
-    void release() {
-        if (smFace.tex) SDL_DestroyTexture(smFace.tex), smFace.tex = nullptr;
-        if (bigFace.tex) SDL_DestroyTexture(bigFace.tex), bigFace.tex = nullptr;
-    }
-    ~VendorText() { release(); }
-};
-
-
 void filledCircle(SDL_Renderer* r, int cx, int cy, int rad) {
     for (int dy = -rad; dy <= rad; ++dy)
         for (int dx = -rad; dx <= rad; ++dx)
@@ -122,13 +37,24 @@ void filledCircle(SDL_Renderer* r, int cx, int cy, int rad) {
 }  // namespace
 
 int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
-                  const std::string& dataRoot, AudioEngine* audio) {
-    SDL_Window* win = SDL_CreateWindow("Ascendancy rewrite (P5a)",
-                                       SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                       kDisplayW, kDisplayH, SDL_WINDOW_SHOWN);
-    if (!win) {
-        std::printf("CreateWindow: %s\n", SDL_GetError());
-        return 1;
+                  const std::string& dataRoot, AudioEngine* audio,
+                  void* window) {
+    // t385: on a title->campaign transition the title loop hands over its
+    // LIVE window (ui.h law: a fresh Xvfb window drops its first synthetic
+    // click, so per-state window swaps eat injected gate input). Reuse it;
+    // only a bare boot creates one.
+    SDL_Window* win = static_cast<SDL_Window*>(window);
+    const bool owned = win == nullptr;
+    if (owned) {
+        win = SDL_CreateWindow("Ascendancy rewrite (P5a)",
+                               SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                               kDisplayW, kDisplayH, SDL_WINDOW_SHOWN);
+        if (!win) {
+            std::printf("CreateWindow: %s\n", SDL_GetError());
+            return 1;
+        }
+    } else {
+        SDL_SetWindowTitle(win, "Ascendancy rewrite (P5a)");
     }
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     if (!ren) ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE);
@@ -279,7 +205,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     std::printf("ui ok: turn %d\n", camp.turn());
     txt.release();  // atlases before their renderer (destructor is idempotent)
     SDL_DestroyRenderer(ren);
-    SDL_DestroyWindow(win);
+    if (owned) SDL_DestroyWindow(win);  // a handed-over window: caller's duty
     return 0;
 }
 

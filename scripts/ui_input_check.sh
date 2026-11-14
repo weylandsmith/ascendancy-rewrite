@@ -8,7 +8,7 @@ BIN=${1:-./rewrite/build/ascendancy}
 Xvfb :77 -screen 0 640x480x24 >/dev/null 2>&1 &
 XV=$!
 sleep 1
-DISPLAY=:77 "$BIN" --ui --autoplay --campaign 4 >/tmp/ui_in.log 2>&1 &
+DISPLAY=:77 "$BIN" --ui --resume --autoplay --campaign 4 >/tmp/ui_in.log 2>&1 &
 APP=$!
 sleep 3
 echo "-- xsend next-turn (510,66):"

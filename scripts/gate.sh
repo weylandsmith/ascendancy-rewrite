@@ -553,7 +553,9 @@ if [ ! -x "$ROOT/rewrite/build/ascendancy" ]; then
 elif ! command -v xvfb-run >/dev/null 2>&1; then
   note "xvfb-run unavailable: skipped UI smoke"
 else
-  if ! timeout 120 xvfb-run -a "$ROOT/rewrite/build/ascendancy" --ui \
+  # t385: --ui boots to the TITLE SCREEN (D8 ruling); --resume pre-selects
+  # Campaign (the vendor RESUME-button equivalent) so the autoplay law holds.
+  if ! timeout 120 xvfb-run -a "$ROOT/rewrite/build/ascendancy" --ui --resume \
        --campaign 3 --autoplay --seed 9 >/tmp/gate_ui.log 2>&1; then
     tail -20 /tmp/gate_ui.log; err "ui boot failed under xvfb"
   fi
@@ -576,6 +578,13 @@ else
       --seed 5 >/tmp/gate_ui_in.log 2>&1 &
     GATE_APP=$!
     sleep 2
+    # t385: first click the TITLE screen's RESUME button (vendor rect
+    # 159,320-477,350, windows.txt) — the campaign window only exists after
+    # that transition. 'ui title click RESUME -> campaign' proves routing.
+    DISPLAY=:77 "$ROOT/tools/xsend" "Ascendancy" 318 335 || err "xsend title-resume failed"
+    sleep 1
+    grep -q 'ui title click RESUME -> campaign' /tmp/gate_ui_in.log \
+      || { cat /tmp/gate_ui_in.log; err "title RESUME click never routed"; }
     DISPLAY=:77 "$ROOT/tools/xsend" "Ascendancy" 510 66 || err "xsend failed"
     wait $GATE_APP || err "ui app exited non-zero with input"
     kill $GATE_XV 2>/dev/null
@@ -626,7 +635,7 @@ elif ! command -v xvfb-run >/dev/null 2>&1; then
   note "xvfb-run unavailable: skipped audio smoke"
 else
   if ! timeout 180 env SDL_AUDIODRIVER=dummy xvfb-run -a \
-       "$ROOT/rewrite/build/ascendancy" --ui --audio --campaign 1 \
+       "$ROOT/rewrite/build/ascendancy" --ui --resume --audio --campaign 1 \
        --autoplay --seed 4 >/tmp/gate_audio.log 2>&1; then
     tail -20 /tmp/gate_audio.log; err "audio boot failed"
   fi

@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-12T10:05
+updated: 2026-11-14T12:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,7 +222,14 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t385 per queue row t385 below (phase 10: TITLE-SCREEN + MENU UI).
+NEXT t386 per queue row t386 below (phase 10: TITLE-SCREEN + MENU UI).
+ORDERING: t385+t385b LANDED 2026-11-14 (boot state machine + title shell +
+D9 gap closed — see LANDED t385 below and docs/re/boot.md); the title ART
+identity is the only thing standing between the shell and t387's window
+wiring, and t386's Chamachies lead (D9) is fresh user testimony — work it
+before the chrome rows age. t385b's measured SDL law (first synthetic click
+on a NEW window is dropped; reuse the window — docs/re/boot.md §4) BINDS
+every future state-transition row.
 The WAIT-USER-RULING t374 sentinel is RETIRED — user spoke 2026-11-14
 (verbatim in DECISIONS.md D8): recreate the ORIGINAL interface — boot goes
 to the title screen ("the dinosaur-looking guy at the top"), all menu
@@ -417,6 +424,35 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t385 + t385b — 2026-11-14 (BOOT STATE MACHINE + TITLE SCREEN + D9 GAP CLOSED)
+Queue rows t385 and t385b, one session. Full law + measurements:
+docs/re/boot.md (hand-authored; ui_probe.py writes only ui/species/
+diplomacy.md — checked, nothing regenerates it).
+- BOOT LAW LANDED: --ui boots to the TITLE SCREEN (D8/D9). Seven vendor
+  buttons verbatim from windows.txt L34-175 (INTRO/PLAYTUTORIAL/FRESHGAME/
+  RESUME/LOAD/SAVE/EXITTODOS; column x159-477, h30, pitch 40, first y200;
+  msg/param1 1/6,1/15,1/3,1/1,1/4,1/2,2/0). Pure routing law bootClick/
+  bootHotkey (rewrite/src/ui/boot.{h,cpp}) — headless-unit-testable, no SDL.
+  TITLERECT band 0,379-639,419 + BIGFONT name drawn; the campaign is ONE
+  transition (RESUME), not the constructor path (runTitleScreen hands the
+  live window to runCampaignUi).
+- MEASURED t385b (boot.md §4): SDL2/X11 under WM-less Xvfb DROPS the first
+  synthetic Button event on a freshly-created window (click#1 lost, click#2
+  landed; single-window boots never lose). State transitions MUST reuse the
+  window. Gate 4c-b now drives Title->RESUME->NEXTTURN through one window
+  grepping both print lines; --resume added (autoplay gates 4c/4d use it);
+  scripts/title_input_check.sh is the standing instrument.
+- D9 GAP CHECK (boot.md §5): seven buttons/labels/exit ALREADY met;
+  Alt-L/Alt-S hotkeys were the ONE gap — fixed via bootHotkey + pin.
+  Honest negative: zero-diff would have been false.
+- Suite 270 -> 276 (+6: rects/names verbatim, routing table, inclusivity/
+  no-clamp, reachability, vendor labels, D9 hotkeys), 0 failed. Gate ALL
+  PASS (incl. xvfb real-input chain + audio smoke). Ledger untouched (no
+  OQ row moved this task; OQ-016/019 stay open/deferred per standing rule).
+- HONEST SCOPE: title ART not rendered (t386); Tutorial/Load/Save are named
+  seams that print and return to Title; RaceConfig overlay is placeholder
+  text (t387 lands 3cfgnew/7racesel chrome).
 
 ## LANDED t383 — 2026-11-12 (VERIFIED PUSHABLE TREE + HISTORY PRIVACY SCRUB;
 ## QUEUE DRAINED — NEXT IS THE WAIT-PUSH-USER SENTINEL)

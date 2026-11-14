@@ -48,6 +48,7 @@ struct Options {
     unsigned seed = 1;
     bool ui = false;                            // P5a window (docs/re/ui-runtime.md)
     bool autoplay = false;
+    bool resume = false;                        // t385: boot straight to Campaign
     bool audio = false;                         // SDL2_mixer (docs/re/audio.md §5)
     bool mute = false;                          // load everything, volume 0
     int playerSpecies = -1;                     // specnum 0..20 (docs/re/species.md)
@@ -77,6 +78,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->ui = true;
         else if (a == "--autoplay")
             o->autoplay = true;
+        else if (a == "--resume")
+            o->resume = true;  // t385: Resume-equivalent boot (skip title click)
         else if (a == "--audio")
             o->audio = true;
         else if (a == "--mute")
@@ -113,7 +116,10 @@ void usage() {
         "  --mute        load audio but master volume 0\n"
         "  --campaign N  play N turns of a seeded campaign (docs/re/turnloop.md)\n"
         "  --seed S      seed for --campaign (default 1)\n"
-        "  --ui          open the P5a campaign window (docs/re/ui-runtime.md)\n"
+        "  --ui          boot to the TITLE SCREEN (t385, docs/re/boot.md);\n"
+        "                campaign is one transition away (RESUME button)\n"
+        "  --resume      with --ui: pre-select Campaign (Resume-equivalent\n"
+        "                boot — what the autoplay gates use)\n"
         "  --autoplay    with --ui: advance a turn every 250 ms\n"
         "  --species N   play as species specnum N (0..20, docs/re/species.md);\n"
         "                default -1 = human, no special ability\n"
@@ -468,9 +474,12 @@ int main(int argc, char** argv) {
             SDL_Quit();
             return 1;
         }
-        // Vendor .fnt faces are a hard requirement of the UI (docs/re/fnt.md,
-        // OQ-017 CLOSED; ui-runtime.md §3). runCampaignUi loads smfont/bigfont
-        // itself from dataRoot — no substitute TTF path anymore.
+        // t385 (D8 user ruling 2026-11-14): --ui boots to the TITLE SCREEN;
+        // the campaign is reached through ONE transition (vendor RESUME
+        // button, msg 1/1), not the constructor path. --resume pre-selects
+        // Campaign (the Resume-equivalent path the autoplay gates use, so
+        // t382/--autoplay flows do not regress); --intro N caps the title's
+        // intro movie for the gate smoke.
         std::unique_ptr<ascend::ui::AudioEngine> audio;
         if (o.audio) {
             audio = std::make_unique<ascend::ui::AudioEngine>();
@@ -484,9 +493,30 @@ int main(int argc, char** argv) {
                         audio->chunksLoaded(), audio->musicBytes());
             audio->playMusic();
         }
+        using ascend::ui::BootState;
+        const BootState entry =
+            o.resume ? BootState::Campaign : BootState::Title;
+        std::string terr;
+        void* handedWindow = nullptr;  // t385: title loop reuses it for campaign
+        const BootState exit = ascend::ui::runTitleScreen(
+            o.dataRoot.string(), entry,
+            o.introFrames >= 0 ? o.introFrames : 0,  // 0 = all frames
+            &terr, &handedWindow);
+        if (exit == BootState::Quit && entry != BootState::Quit &&
+            !terr.empty()) {
+            std::printf("title: %s\n", terr.c_str());
+            SDL_Quit();
+            return 1;
+        }
+        if (exit != BootState::Campaign) {
+            std::printf("ui title exit: %s\n", bootStateName(exit));
+            SDL_Quit();
+            return 0;
+        }
         const int rc = ascend::ui::runCampaignUi(*camp, o.campaign, o.autoplay,
-                                                 o.dataRoot.string(), audio.get());
-        SDL_Quit();
+                                                 o.dataRoot.string(), audio.get(),
+                                                 handedWindow);
+        SDL_Quit();  // also tears down the handed-over window
         return rc;
     }
 

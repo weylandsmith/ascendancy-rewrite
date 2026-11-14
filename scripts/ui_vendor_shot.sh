@@ -11,7 +11,7 @@ DISPLAY_NUM=${2:-79}
 Xvfb ":$DISPLAY_NUM" -screen 0 640x480x24 >/dev/null 2>&1 &
 XV=$!
 sleep 1
-DISPLAY=":$DISPLAY_NUM" timeout 30 ./rewrite/build/ascendancy --ui \
+DISPLAY=":$DISPLAY_NUM" timeout 30 ./rewrite/build/ascendancy --ui --resume \
   --campaign 40 --autoplay --seed 2024 >/tmp/ui_vendor_run.log 2>&1 &
 APP=$!
 sleep 6

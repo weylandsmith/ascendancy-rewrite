@@ -41,14 +41,18 @@ capture() { # capture <name> <expected-substring> <cmd...>
 capture A "VICTORY"          "$BIN" --headless --campaign 1600 --seed 2024
 capture B "VICTORY"          "$BIN" --headless --campaign 1600 --seed 23
 capture C "VICTORY"          xvfb-run -a "$BIN" --campaign 1600 --seed 13
-capture D "ui ok: turn 3"    xvfb-run -a "$BIN" --ui --campaign 3 --autoplay --seed 9
+capture D "ui ok: turn 3"    xvfb-run -a "$BIN" --ui --resume --campaign 3 --autoplay --seed 9
 capture E "audio ok: 85 sfx chunks, music 8191719 B" \
-        env SDL_AUDIODRIVER=dummy xvfb-run -a "$BIN" --ui --audio --campaign 1 --autoplay --seed 4
+        env SDL_AUDIODRIVER=dummy xvfb-run -a "$BIN" --ui --resume --audio --campaign 1 --autoplay --seed 4
 # F: real injected input (own Xvfb so xsend can find the window)
 Xvfb :77 -screen 0 640x480x24 >/dev/null 2>&1 & XV=$!
 sleep 1
 DISPLAY=:77 "$BIN" --ui --campaign 1 --seed 5 >"$TMP/F.log" 2>&1 & APP=$!
 sleep 2
+# t385: title screen first — RESUME button (vendor 159,320-477,350)
+DISPLAY=:77 ./tools/xsend "Ascendancy" 318 335 2>/dev/null || true
+sleep 1
+grep -q 'ui title click RESUME -> campaign' "$TMP/F.log" || { echo "F: title RESUME never routed"; cat "$TMP/F.log"; exit 1; }
 DISPLAY=:77 ./tools/xsend "Ascendancy" 510 66 2>/dev/null || true
 wait $APP
 kill $XV 2>/dev/null
