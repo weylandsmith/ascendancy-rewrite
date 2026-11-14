@@ -222,10 +222,11 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-USER-RULING t374 — PUSH DONE, RE-PUSHED x3 (latest 2026-11-14):
-https://github.com/weylandsmith/ascendancy-rewrite.git main = e113a39ffd70
-(verified ls-remote; diff vs prior remote = audio.h portability fix +
-sentinel record ONLY; user README commits native in working repo now).
+NEXT WAIT-USER-RULING t374 — PUSH DONE, LATEST 2026-11-14:
+https://github.com/weylandsmith/ascendancy-rewrite.git main = c02e3ad6f88f
+(verified ls-remote; FAST-FORWARD e113a39..c02e3ad — user README commits
+native in working repo, no force needed anymore; t384 requires->reqByte
+rename landed, -std=c++20 syntax-check RC=0 proven).
 PORTABILITY FIX: audio.h forward-declared 'struct Mix_Music' — SDL2_mixer
 2.8.0 tags it _Mix_Music, 2.8.1 tags Mix_Music; typedef conflict silently
 killed ascend_ui on the user's 2.8.0 box (build/ascendancy missing). Law:
