@@ -232,3 +232,22 @@ Resume wiring; STATUSWND in-game menu bar; verify+export+push). Evidence:
 ui.md §3 four-button main-menu law + TITLERECT, windows.txt NEWGAMEWND/
 STATUSWND, chrome shp libs, Flic decoder, VendorText. R13 unchanged:
 mechanical verification + user as external grader for look-and-feel.
+
+## D9 — FULL-ORIGINAL FIDELITY + MAIN-MENU CORRECTION (USER, 2026-11-14, verbatim)
+
+> The art displayed on the main screen might be the head of one of the
+> playable races, the Chamachies, but it kind of looks like a dinosar.
+> The buttons on the main menu are "Play Introduction", "Tutorial",
+> "New Game", "Return to Current Game", "Load Game", "Save Game", and
+> "Exit to DOS". I'd like the rewrite to recreate the original faithfull
+> - it should look, play, and sound like the original.
+
+Applied: (1) ui.md §3 prose corrected — SEVEN buttons, not four (the
+table above that line always listed all seven; windows.txt TEXTITEMs +
+user testimony + vision read of the pinned vendor title shot agree; the
+vendor shot visibly shows six labels — Exit-to-DOS likely below the
+capture crop). (2) t386 gets the Chamachies-head lead for the title art.
+(3) SOUND joins the fidelity scope: new row t388b (soundfx.txt + 29
+theme raws + DIGITALMUSIC/FADEMUSIC law via the SDL2_mixer port). Queue
+rows amended mid-run; running t385 session predates the amendment —
+t385b closes any four-vs-seven gap.
