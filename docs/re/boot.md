@@ -119,4 +119,75 @@ label + Exit-to-DOS = clean exit. Audit vs what t385 landed:
 - Alt-L / Alt-S hotkeys: GAP — t385 wired mouse only. FIXED: pure
   bootHotkey law in boot.{h,cpp} + SDL Alt-chord decode in title.cpp +
   pin boot_d9_hotkeys_t385b. Suite 275 -> 276, 0 failed.
-Zero-diff claim would have been false; one real gap closed.
+
+## 6. Menu windows landed (t387, 2026-11-14): NEWGAMEWND + LOAD
+
+Source: extracted/ascend00/windows.txt L575-717 read verbatim this
+iteration (full block dump in docs/re/_wip_t387.md).
+
+COORDINATE SPACE LAW [inferred, geometry-decisive]: every rect in
+windows.txt is an ABSOLUTE screen coordinate; PARENT names containment,
+NOT a coordinate offset. Witness: the state-3 bottom row
+GALAXY_MORE/PLAYERS_MORE/DIFFICULTYMORE/Player^Color spans x 7-122,
+131-246, 255-370, 379-493 in absolute space — equal 115-px widths, 9-px
+gutters, disjoint; read relative to NEWGAMEWND (334,12) they would land
+mutually overlapping and partly off-screen, and RACELIST would sit at
+x=836. Impossible. This law binds every future windows.txt consumer.
+
+Tables (rewrite/src/ui/menulaw.{h,cpp}, pure/no-SDL; pin
+test_menulaw_t387.cpp x5):
+- NEWGAMEWND TYPE 18 (334,12)-(488,364) STATE "1 3" SHAPEFRAME 0.
+- Children TYPE 0 STATE "1 3", SHAPEITEM 1 data\3cfgnew.shp 0 0 0:
+  GALAXY_MORE (7,381)-(122,472) msg 501 "Star Density"; PLAYERS_MORE
+  (131,381)-(246,472) msg 503 "Species"; DIFFICULTYMORE
+  (255,381)-(370,472) msg 505 "Atmosphere". Player^Color (379,381)-
+  (493,419) is PARENT NONE msg 0 -> NOT a rewrite control.
+- RACELIST TYPE 10 (502,45)-(632,372) SHAPEFRAME 7 (frame only; the
+  state-7 RACE_n rows are the racesel screen, t388 seam).
+- LOADSCREEN TYPE 11 (7,7)-(632,37) + LOADLIST TYPE 10 (7,46)-(632,472),
+  STATE "3 2 4 15". Row law [inferred — no cited LOADLIST row rect
+  exists]: pitch 39 from y0=46, band 30, gutter dead — verbatim the only
+  list census in windows.txt (RACE_1..7, y 7/46/85/124/...).
+
+LOAD slot law (implementation menulaw.cpp, live-verified
+scripts/t387_menu_check.sh): slots = *.sav/*.SAV in a SUPPLY-YOUR-OWN dir
+(--saves DIR; default <data>/saves when present; NEVER game/), sorted by
+name ascending; day = u32@0 (Observer::rawDay, 4/4 corpus); a file
+shorter than 4 B is TORN — listed, marked, and REFUSED on pick
+(refusal-not-clamp; out-of-range index also refuses). Live witness
+(2026-11-14, one-window Xvfb run): 'ui load open slots=4 backdrop=
+4loadgam.shp k0' / 'ui load pick 07.sav day 300' / 'ui load refuse
+43.sav (slot is torn (partial autosave))' / 'ui load cancel' -> Title ->
+RESUME -> campaign still works (gate 4c-c pins the open/cancel/resume
+chain).
+
+Backdrop census (extracted/ascend01/data, V/A dims law): 4loadgam.shp
+N=1 k0 639x479; 2savegam.shp N=1 k0 639x479; 3cfgnew.shp N=13
+(84x79/80; k12 = known EOF truncation); 7racesel.shp N=8 all 158x30.
+4loadgam.shp is referenced by NO TYPE 100 block (STATENUMBER census has
+no 2/4) — the engine opens it by name like 0opening.gif; its backdrop
+role is [inferred] from name + the single full-screen record.
+
+Blit law (title.cpp blitShape): decode TWICE into differently-prefilled
+buffers (0xAA/0x55) and diff — a pixel identical from both prefills was
+WRITTEN; a differing one was skipped -> alpha 0 (vendor
+untouched-destination semantics, formats/shp.h). Mechanical; no guessed
+transparent-index value.
+
+PALETTE [named seam]: no cited palette exists for the menu .shp libs —
+their index sets are disjoint from the t386 title palette TSV (4loadgam
+k0: 19 distinct, all 19 absent; 3cfgnew k0: 44 distinct, 31 absent) and
+game.pal/logo.pal/subfont.pal are refuted for the title
+(title-art.md §4). Chrome renders through a deterministic luminance ramp;
+COLOUR fidelity is a named seam, geometry is not. Instrument to close it:
+the t386 registration conflict-count method needs a vendor SCREENSHOT of
+the load/newgame screens (user-grader artifact) — none is pinned.
+
+Honest negatives / seams:
+- An accepted slot prints its pick but does NOT import into a live
+  Campaign: the rewrite has no campaign-state importer (Observer is
+  read-only by contract, t382). The screen returns to Title.
+- The three state-3 wheel buttons ACKNOWLEDGE (print name+msg); setting
+  wheel values feeds a campaign-seed seam that does not exist yet.
+- RACELIST rows (state-7 RACE_n TYPE 6) are t388 chrome.
+- No OQ ledger row moved (queue work; strict-close ledger untouched).

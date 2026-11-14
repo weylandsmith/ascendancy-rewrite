@@ -11,8 +11,12 @@
 #include <SDL.h>
 
 #include <cstdio>
+#include <algorithm>
+#include <vector>
 
+#include "formats/shp.h"
 #include "ui/boot.h"
+#include "ui/menulaw.h"
 #include "ui/ui_internal.h"
 
 namespace ascend::ui {
@@ -21,11 +25,140 @@ namespace {
 const SDL_Color kTitleBg{10, 12, 26, 255};
 const SDL_Color kInk{235, 235, 235, 255};
 const SDL_Color kBand{150, 130, 110, 255};
+const SDL_Color kSelInk{255, 244, 160, 255};
+
+// t387 chrome blit: decode a .shp record's palette-index plane and upload it
+// as an ARGB texture, honouring the vendor's untouched-destination semantics
+// (formats/shp.h: skipped/clamped pixels keep the destination). Mask law:
+// decode twice into two differently-prefilled buffers and diff — a pixel that
+// decodes identically from both prefills was WRITTEN; one that differs was
+// skipped, so it gets alpha 0 and the backdrop shows through. Mechanical, no
+// guessed transparent index value.
+//
+// PALETTE [named seam]: no cited palette exists for the menu .shp libs — the
+// chrome index sets are disjoint from the t386 title palette TSV and
+// game.pal/logo.pal/subfont.pal are refuted for the title screen
+// (docs/re/title-art.md §4). Until a palette is measured, indices render
+// through a deterministic luminance ramp so GEOMETRY is verifiable while
+// colour is honestly labelled a seam. Phase-10 verification is geometry +
+// hit-maps + routing lines, never self-graded vision (R13).
+bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
+               int rec, int x, int y) {
+    std::vector<uint8_t> a, b;
+    if (!lib.decode(rec, a) || a.empty()) return false;
+    b = a;
+    std::fill(b.begin(), b.end(), uint8_t(0x55));
+    std::fill(a.begin(), a.end(), uint8_t(0xAA));
+    if (!lib.decode(rec, a) || !lib.decode(rec, b)) return false;
+    const auto& r = lib.record(rec);
+    std::vector<uint32_t> argb(a.size());
+    for (size_t k = 0; k < a.size(); k++) {
+        const uint8_t idx = a[k];
+        const uint32_t lum = 40u + (uint32_t(idx) * 185u) / 255u;
+        argb[k] = (a[k] == b[k] ? 0xFF000000u : 0x00000000u) | (lum << 16) |
+                  (lum << 8) | lum;
+    }
+    SDL_Texture* tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                                         SDL_TEXTUREACCESS_STATIC,
+                                         int(r.width), int(r.height));
+    if (!tex) return false;
+    SDL_UpdateTexture(tex, nullptr, argb.data(),
+                      int(r.width) * int(sizeof(uint32_t)));
+    SDL_Rect dst{x, y, int(r.width), int(r.height)};
+    SDL_RenderCopy(ren, tex, nullptr, &dst);
+    SDL_DestroyTexture(tex);
+    return true;
+}
+
+// The load screen (t387). Windows law: LOADSCREEN title strip (7,7)-(632,37)
+// + LOADLIST interior (7,46)-(632,472) over the 4loadgam.shp k0 backdrop
+// (single 639x479 record; [inferred] backdrop role — no TYPE 100 block names
+// it, the engine opens it by name like 0opening.gif). Rows come from
+// listSaveSlots (supply-your-own dir ONLY) via the loadRowAt pitch law.
+// Return codes: >=0 accepted slot index; kLoadCancel (Esc); kLoadQuit
+// (SDL_QUIT — the window died, must propagate, not re-show the title).
+constexpr int kLoadCancel = -1;
+constexpr int kLoadQuit = -2;
+int runLoadScreen(SDL_Renderer* ren, VendorText& txt,
+                  const std::string& dataRoot,
+                  const std::vector<SaveSlot>& slots) {
+    ascend::formats::ShapeLibrary bg;
+    std::string serr;
+    const bool haveBg =
+        bg.load(dataRoot + "/extracted/ascend01/data/4loadgam.shp", &serr);
+    std::printf("ui load open slots=%zu backdrop=%s\n", slots.size(),
+                haveBg ? "4loadgam.shp k0" : serr.c_str());
+    std::fflush(stdout);
+
+    int hover = -1;
+    for (;;) {
+        SDL_SetRenderDrawColor(ren, kTitleBg.r, kTitleBg.g, kTitleBg.b, 255);
+        SDL_RenderClear(ren);
+        if (haveBg) blitShape(ren, bg, 0, 0, 0);
+        // LOADSCREEN strip frame + caption.
+        SDL_Rect strip{kLoadScreen.x0, kLoadScreen.y0,
+                       kLoadScreen.x1 - kLoadScreen.x0 + 1,
+                       kLoadScreen.y1 - kLoadScreen.y0 + 1};
+        SDL_SetRenderDrawColor(ren, kBand.r, kBand.g, kBand.b, 255);
+        SDL_RenderDrawRect(ren, &strip);
+        txt.draw(ren, strip.x + 8, strip.y + 8, "Load Game", true, kInk);
+        if (slots.empty()) {
+            txt.draw(ren, kLoadList.x0 + 8, kLoadList.y0 + 8,
+                     "No save slots: supply a saves dir (--saves DIR)", false,
+                     kInk);
+        }
+        for (size_t i = 0; i < slots.size(); i++) {
+            const int ry = kLoadList.y0 + int(i) * kLoadRowPitch;
+            if (ry + kLoadRowH > kLoadList.y1) break;  // list clipped by frame
+            const SaveSlot& s = slots[i];
+            const std::string line =
+                s.name + (s.torn ? "  (torn)" : "  day " + std::to_string(s.day));
+            if (int(i) == hover) {
+                SDL_Rect hl{kLoadList.x0, ry,
+                            kLoadList.x1 - kLoadList.x0 + 1, kLoadRowH};
+                SDL_SetRenderDrawColor(ren, 40, 44, 66, 255);
+                SDL_RenderFillRect(ren, &hl);
+            }
+            txt.draw(ren, kLoadList.x0 + 8, ry + 4, line, false,
+                     int(i) == hover ? kSelInk : kInk);
+        }
+        SDL_RenderPresent(ren);
+
+        SDL_Event e;
+        if (!SDL_WaitEvent(&e)) continue;
+        if (e.type == SDL_QUIT) return kLoadQuit;
+        if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE) {
+            std::printf("ui load cancel\n");
+            std::fflush(stdout);
+            return kLoadCancel;
+        }
+        if (e.type == SDL_MOUSEMOTION) {
+            hover = loadRowAt(Pt{e.motion.x, e.motion.y}, int(slots.size()));
+            continue;
+        }
+        if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
+            const int idx = loadRowAt(Pt{e.button.x, e.button.y},
+                                       int(slots.size()));
+            if (idx < 0) continue;  // click in a gutter / outside: no-op
+            std::string why;
+            if (!loadPickAccepts(slots, idx, &why)) {
+                std::printf("ui load refuse %s (%s)\n",
+                            slots[size_t(idx)].name.c_str(), why.c_str());
+                std::fflush(stdout);
+                continue;  // refusal is not a cancel and never a clamp
+            }
+            std::printf("ui load pick %s day %u\n", slots[size_t(idx)].name.c_str(),
+                        slots[size_t(idx)].day);
+            std::fflush(stdout);
+            return idx;
+        }
+    }
+}
 }  // namespace
 
 BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          int maxIntroFrames, std::string* err,
-                         void** windowOut) {
+                         void** windowOut, const std::string& savesDir) {
     SDL_Window* win = SDL_CreateWindow("Ascendancy", SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED, kDisplayW,
                                        kDisplayH, SDL_WINDOW_SHOWN);
@@ -45,6 +178,18 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
 
     BootState st = initial;
     std::fflush(stdout);
+
+    // t387: the NEWGAMEWND wheel library loads ONCE (per-frame loading would
+    // re-read 27 KB every 16 ms). count()>0 == available; a refusal prints
+    // the reason once and the frame renders without the wheel face.
+    ascend::formats::ShapeLibrary cfgNew;
+    {
+        std::string cerr;
+        if (!cfgNew.load(dataRoot + "/extracted/ascend01/data/3cfgnew.shp",
+                         &cerr))
+            std::printf("ui raceconfig backdrop refused: %s\n", cerr.c_str());
+        std::fflush(stdout);
+    }
 
     // Overlay states that have no driver yet: draw the seam message, any
     // key/click-outside returns to Title. Never silently do nothing.
@@ -83,15 +228,41 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                      b.rect.y0 + 4, b.label, true, kInk);
         }
         if (st == BootState::RaceConfig) {
-            SDL_Rect ov{120, 120, 400, 60};
-            SDL_SetRenderDrawColor(ren, 30, 30, 46, 255);
-            SDL_RenderFillRect(ren, &ov);
+            // NEWGAMEWND chrome (windows.txt L575-673, law docs/re/boot.md
+            // §6): the TYPE-18 frame + its three state-3 child buttons +
+            // the RACELIST frame. Absolute coords — PARENT is containment,
+            // not an offset (_wip_t387 coordinate-space witness). The k0
+            // wheel face (SHAPEITEM 1 data\3cfgnew.shp 0 0 0) blits inside
+            // each child rect; setting the wheel values is a named seam.
+            const bool haveCfg = cfgNew.count() > 0;
+            SDL_Rect wf{kNewgameWnd.x0, kNewgameWnd.y0,
+                        kNewgameWnd.x1 - kNewgameWnd.x0 + 1,
+                        kNewgameWnd.y1 - kNewgameWnd.y0 + 1};
+            if (haveCfg) {
+                // k0 is 84x79, not a window backdrop: draw it centred in the
+                // frame as the declared wheel face, frame edges on top.
+                blitShape(ren, cfgNew, 0,
+                          wf.x + (wf.w - int(cfgNew.record(0).width)) / 2,
+                          wf.y + 40);
+            }
             SDL_SetRenderDrawColor(ren, kBand.r, kBand.g, kBand.b, 255);
-            SDL_RenderDrawRect(ren, &ov);
-            txt.draw(ren, ov.x + 12, ov.y + 8,
-                     "New game setup lands t387.", false, kInk);
-            txt.draw(ren, ov.x + 12, ov.y + 28,
-                     "Press Return to Current Game.", false, kInk);
+            SDL_RenderDrawRect(ren, &wf);
+            SDL_Rect rl{kRaceList.x0, kRaceList.y0,
+                        kRaceList.x1 - kRaceList.x0 + 1,
+                        kRaceList.y1 - kRaceList.y0 + 1};
+            SDL_RenderDrawRect(ren, &rl);  // RACELIST frame (rows = t388 seam)
+            for (int i = 0; i < kNewgameControlCount; i++) {
+                const NewgameControl& c = kNewgameControls[i];
+                if (haveCfg)
+                    blitShape(ren, cfgNew, 0, c.rect.x0, c.rect.y0);  // k0 face
+                const int w = txt.width(c.label, false);
+                txt.draw(ren, c.rect.x0 +
+                                 ((c.rect.x1 - c.rect.x0 + 1) - w) / 2,
+                         c.rect.y0 + 4, c.label, false, kInk);
+            }
+            txt.draw(ren, wf.x + 12, wf.y + 8,
+                     "New game setup. Press Return to Current Game.", false,
+                     kInk);
         }
         SDL_RenderPresent(ren);
 
@@ -125,6 +296,20 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             }
             if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
                 Pt p{e.button.x, e.button.y};
+                // t387: NEWGAMEWND child buttons first (absolute rects; they
+                // sit OUTSIDE the title column, so bootClick cannot see them).
+                // Routing law: the buttons ACKNOWLEDGE (print) — the wheel
+                // values feed a campaign-seed seam that does not exist yet.
+                if (st == BootState::RaceConfig) {
+                    const int ci = newgameControlAt(p);
+                    if (ci >= 0) {
+                        std::printf("ui raceconfig click %s msg %d\n",
+                                    kNewgameControls[ci].name,
+                                    kNewgameControls[ci].message);
+                        std::fflush(stdout);
+                        continue;
+                    }
+                }
                 const int idx = titleButtonAt(p);
                 const BootState next = bootClick(st, p);
                 if (next == st) continue;  // click outside any live button
@@ -145,7 +330,15 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             seamLoop("tutorial driver absent (seam, docs/re/boot.md §3)");
             st = BootState::Title;
         } else if (st == BootState::Load) {
-            seamLoop("load chrome lands t387 (4loadgam)");
+            // t387: real load screen over 4loadgam chrome. The vendor's
+            // RESUME.GAM is NOT faked (REFUTED-ROUTES: resume.gam lacks the
+            // reference metadata; supply-your-own slots only). An accepted
+            // slot prints its pick; importing it into a live Campaign is the
+            // named seam (Observer is read-only by contract, t382) — so the
+            // screen returns to Title with the pick banked on stdout.
+            const std::vector<SaveSlot> slots = listSaveSlots(savesDir);
+            const int pick = runLoadScreen(ren, txt, dataRoot, slots);
+            if (pick == kLoadQuit) { st = BootState::Quit; break; }
             st = BootState::Title;
         } else if (st == BootState::Save) {
             seamLoop("save chrome lands t388 (STATUSWND)");

@@ -30,7 +30,8 @@ namespace ascend::ui {
 // (scripts/_wip_t385_debug3.sh log); single-window boots never lose it.
 BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          int maxIntroFrames, std::string* err,
-                         void** windowOut = nullptr);
+                         void** windowOut = nullptr,
+                         const std::string& savesDir = std::string());
 
 // Opens the P5a window over a LIVE campaign (docs/re/ui-runtime.md §5).
 // Blocks until quit or `turns` turns elapsed (0 = until quit). Returns 0 on

@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-14T14:05
+updated: 2026-11-14T15:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -222,29 +222,25 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t387 per queue row t387 below (phase 10: TITLE-SCREEN + MENU UI;
+NEXT t388 per queue row t388 below (phase 10: TITLE-SCREEN + MENU UI;
 "finish tN -> NEXT tN+1 VERBATIM").
-ORDERING: t386 LANDED 2026-11-14 — TITLE ART IDENTITY CLOSED
-(docs/re/title-art.md): the vendor title screen IS 0opening.gif blitted 1:1
-at (0,0) through an index-preserving palette swap (derived table
-rewrite/tests/data/title_palette_t386.tsv), with GIF index 255 a colour-key
-hole whose bbox is EXACTLY the windows.txt seven-button union (159,200)-
-(477,470) — the 0opening.shp strips + VendorText labels composite there.
-t387's NewGame/Load windows now have the full title render to wire INTO;
-the Chamachies lead is CLOSED as not-supported (race19 art = one 296-px
-record + one 49-px sprite; the figure is the GIF's own prerender). t385b's
-measured SDL law (first synthetic click on a NEW window is dropped; reuse
-the window — docs/re/boot.md §4) BINDS every future state-transition row.
-t386's REGISTRATION law binds t387+ verification: palette MEMBERSHIP is
-blind at the title screen (all candidates d0=9.2%); the working instrument
-is single-valued index-map CONFLICT COUNTS at the capture-chrome shift
-(shift +40 = 0 conflicts / +-1 = >10^5) — docs/re/title-art.md §4.
-The WAIT-USER-RULING t374 sentinel is RETIRED — user spoke 2026-11-14
-(verbatim in DECISIONS.md D8): recreate the ORIGINAL interface — boot goes
-to the title screen ("the dinosaur-looking guy at the top"), all menu
-options present. PUSH STATE: remote main = c02e3ad6f88f (2026-11-14,
-fast-forward; user README commits native; t384 requires->reqByte rename
-pushed; portability law banked: NEVER hand-forward-declare vendor
+ORDERING: t387 LANDED 2026-11-14 — NEWGAMEWND + LOAD MENU WINDOWS (law
+distilled docs/re/boot.md §6; full census docs/re/_wip_t387.md). Key laws
+t388 MUST reuse: (1) COORDINATE SPACE — windows.txt rects are ABSOLUTE;
+PARENT is containment, not an offset (geometry-decisive witness boot.md §6);
+(2) the pure-law pattern rewrite/src/ui/menulaw.{h,cpp} (no SDL in the
+routing/listing law; SDL only in title.cpp); (3) blitShape two-buffer
+prefill-diff MASK (skipped px -> alpha 0, shp.h untouched-destination law);
+(4) STATUSWND chrome census: 10status.shp NOT yet censused — census it
+first (dims per V/A law); (5) t385b window-reuse law (boot.md §4) — the
+gate 4c chain drives Title->Campaign through ONE window, keep it.
+Palette seam (boot.md §6): menu .shp index sets are disjoint from the t386
+title TSV; luminance ramp substitutes; closing it needs a vendor screenshot
+of load/newgame screens (user-grader artifact, none pinned). Do NOT fake
+colours. t385b's seven-button law + t386's registration conflict-count
+instrument still bind verification. PUSH STATE: remote main = c02e3ad6f88f
+(2026-11-14, fast-forward; user README commits native; t384 requires->reqByte
+rename pushed; portability law banked: NEVER hand-forward-declare vendor
 typedefs — SDL2_mixer 2.8.0 vs 2.8.1 struct-tag drift). Push route:
 HTTPS + ~/.config/gh-pub-token PAT via GIT_ASKPASS helper (delete after
 use); NEVER push from the working repo; re-export + re-verify per row t389.
@@ -315,7 +311,11 @@ whatever source wins. If composition stays ambiguous, bank the candidate
 table + what instrument would resolve it (user screenshot comparison IS
 allowed — user is the external grader).
 
-t387 MAIN MENU WIRING: NEW GAME + LOAD + RESUME. Clicking New Game opens
+t387 MAIN MENU WIRING: NEW GAME + LOAD + RESUME. [CLOSED 2026-11-14 —
+NEWGAMEWND frame + 3 child buttons + RACELIST frame + LOAD screen over
+4loadgam chrome with real slot listing, torn-refusal, Esc-cancel,
+acknowledge-not-clamp clicks; law docs/re/boot.md §6, live witness + pins
+see LANDED t387. Original row text kept below.] Clicking New Game opens
 the race-configuration window (NEWGAMEWND windows.txt L580 + PARENT
 controls; art 3cfgnew.shp k0..k11 dot-wheel menus + 7racesel.shp; the
 validator-tagged span-free records t197); Load opens 4loadgam.shp chrome
@@ -437,7 +437,38 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   launching, so a WAIT tag costs nothing and loses no wake route.
 
 
-## LANDED t386 — 2026-11-14 (TITLE ART IDENTITY CLOSED: title = 0opening.gif)
+## LANDED t387 — 2026-11-14 (MAIN MENU WIRING: NEWGAMEWND + LOAD SCREEN)
+
+What landed: pure menu-law module rewrite/src/ui/menulaw.{h,cpp} (NEWGAMEWND
++ RACELIST + LOADSCREEN/LOADLIST rects verbatim windows.txt L575-717; the
+three state-3 child buttons GALAXY_MORE/PLAYERS_MORE/DIFFICULTYMORE with
+msgs 501/503/505; newgameControlAt hit-map; listSaveSlots + loadRowAt +
+loadPickAccepts). SDL side title.cpp: blitShape (two-buffer prefill-diff
+mask, skipped px -> alpha 0 per shp.h untouched-destination law; luminance-
+ramp palette = NAMED SEAM, no cited chrome palette exists — index sets
+disjoint from the t386 TSV 19/19 and 31/44), the Load seamLoop replaced by
+the real load screen (4loadgam.shp k0 backdrop 639x479 [inferred role],
+LOADSCREEN strip + slot rows pitch-39 law, hover, pick/refuse/cancel), the
+RaceConfig placeholder replaced by NEWGAMEWND frame + k0 wheel face + child
+buttons + RACELIST frame (clicks ACKNOWLEDGE, refuse-not-clamp). main.cpp
+--saves DIR (supply-your-own only, NEVER game/; default <data>/saves).
+Gate: 4c-c added — LOAD click opens the screen with slots=1 + backdrop
+line, Esc cancels, RESUME+NEXT TURN still reach the campaign (timeout-wrapped
+app, stale-X-lock cleanup; DISPLAY=:80 on the app launch is MANDATORY —
+without it SDL silently fell to KMSDRM and every grep failed, measured).
+Suite 276 -> 281, 0 failed (test_menulaw_t387.cpp x5). Live witness
+(scripts/t387_menu_check.sh, Xvfb :79, ONE window): LOAD->open slots=4->pick
+07.sav day 300->LOAD->refuse 43.sav torn->Esc->FRESHGAME->GALAXY_MORE msg
+501->RESUME->next-turn->ok turn 1. Laws distilled docs/re/boot.md §6
+(coordinate-space law binds every future windows.txt consumer).
+Honest negatives: accepted slot does NOT import into a live Campaign (no
+campaign-state importer; Observer read-only by contract — pick prints,
+screen returns to Title); wheel-value setting is a campaign-seed seam;
+RACELIST rows = t388 chrome; chrome COLOUR is a palette seam (needs a
+vendor screenshot, none pinned); NO OQ ledger row moved (queue work;
+open=OQ-016,OQ-019 unchanged). Gate ALL PASS GATE_EXIT=0; ledger_audit OK;
+ledger_index OK. game/ untouched; production :9 untouched. NEXT=t388
+STATUSWND + in-game menu bar VERBATIM.
 
 Full law + every measurement: docs/re/title-art.md (hand-authored; grep
 verified no generator or gate stage writes it). Instruments:

@@ -592,6 +592,46 @@ else
       || { cat /tmp/gate_ui_in.log; err "injected click never reached the app"; }
     grep -q 'ui ok: turn 1' /tmp/gate_ui_in.log \
       || { cat /tmp/gate_ui_in.log; err "click did not advance the campaign"; }
+
+    # 4c-c (t387): the LOAD screen. Title click (159,360)-(477,390) centre
+    # opens it; the log must show the open line with the REAL slot count of
+    # a supply-your-own dir and the 4loadgam.shp backdrop decoded — then an
+    # Esc returns to Title and RESUME still reaches the campaign (the
+    # load screen must not trap the state machine).
+    if [ -x "$ROOT/tools/xsend" ]; then
+      rm -rf /tmp/gate_saves_t387 && mkdir -p /tmp/gate_saves_t387
+      printf '\x2a\x04\x00\x00' > /tmp/gate_saves_t387/01.sav  # day 1066
+      # A SIGKILLed Xvfb leaves /tmp/.X*-lock and the app then silently
+      # falls back to KMSDRM (measured 2026-11-14: 4c-c all-fail with
+      # 'video driver: KMSDRM'). Clear stale locks for OUR scratch display
+      # only, and refuse to run if the server still didn't come up.
+      rm -f /tmp/.X80-lock /tmp/.X11-unix/X80
+      Xvfb :80 -screen 0 640x480x24 >/dev/null 2>&1 &
+      GATE_XV2=$!
+      sleep 1
+      DISPLAY=:80 timeout 60 "$ROOT/rewrite/build/ascendancy" --ui \
+        --campaign 1 --seed 5 --saves /tmp/gate_saves_t387 \
+        >/tmp/gate_ui_load.log 2>&1 &
+      GATE_APP2=$!
+      sleep 2
+      DISPLAY=:80 "$ROOT/tools/xsend" "Ascendancy" 318 375 || err "xsend title-load failed"
+      sleep 1
+      grep -q 'ui title click LOAD -> load' /tmp/gate_ui_load.log \
+        || { cat /tmp/gate_ui_load.log; err "title LOAD click never routed"; }
+      grep -q 'ui load open slots=1 backdrop=4loadgam' /tmp/gate_ui_load.log \
+        || { cat /tmp/gate_ui_load.log; err "load screen did not open with the slot list + backdrop"; }
+      DISPLAY=:80 "$ROOT/tools/xsend" "Ascendancy" key Escape || err "xsend esc failed"
+      sleep 1
+      grep -q 'ui load cancel' /tmp/gate_ui_load.log \
+        || { cat /tmp/gate_ui_load.log; err "load Esc never cancelled"; }
+      DISPLAY=:80 "$ROOT/tools/xsend" "Ascendancy" 318 335 || err "xsend resume failed"
+      sleep 1
+      DISPLAY=:80 "$ROOT/tools/xsend" "Ascendancy" 510 66 || err "xsend next-turn failed"
+      wait $GATE_APP2 || err "ui app exited non-zero after load-cancel"
+      kill $GATE_XV2 2>/dev/null
+      grep -q 'ui ok: turn 1' /tmp/gate_ui_load.log \
+        || { cat /tmp/gate_ui_load.log; err "campaign unreachable after load cancel"; }
+    fi
   else
     note "tools/xsend not built: skipped real-input UI check"
   fi

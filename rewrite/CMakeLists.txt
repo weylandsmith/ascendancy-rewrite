@@ -57,6 +57,7 @@ target_link_libraries(ascend_core PUBLIC ZLIB::ZLIB)
 add_library(ascend_ui STATIC
   src/ui/layout.cpp
   src/ui/boot.cpp
+  src/ui/menulaw.cpp
   src/ui/vendortext.cpp
   src/ui/title.cpp
   src/ui/hudlayout.cpp
@@ -93,6 +94,7 @@ add_executable(run_tests
   tests/test_freetech_t203.cpp
   tests/test_ui_layout.cpp
   tests/test_boot_t385.cpp
+  tests/test_menulaw_t387.cpp
   tests/test_poppanel_t263.cpp
   tests/test_hudlayout_t264.cpp
   tests/test_econres_t274.cpp
@@ -119,6 +121,7 @@ add_executable(run_tests
   tests/test_shipsim_t381.cpp
   src/ui/layout.cpp
   src/ui/boot.cpp
+  src/ui/menulaw.cpp
   src/ui/hudlayout.cpp
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp

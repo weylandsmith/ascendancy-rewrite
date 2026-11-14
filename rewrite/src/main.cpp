@@ -59,6 +59,7 @@ struct Options {
     bool fonts = false;                         // load all vendor .fnt faces (docs/re/fnt.md)
     int introFrames = -1;                       // -1 off; >=0: play intro, cap N frames (0=all)
     std::string saveFile;                       // t382: --save OBSERVER boot
+    std::string savesDir;                       // t387: --saves DIR (load list)
 };
 
 bool parseArgs(int argc, char** argv, Options* o) {
@@ -96,6 +97,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->introFrames = std::atoi(argv[++i]);
         else if (a == "--save" && i + 1 < argc)
             o->saveFile = argv[++i];
+        else if (a == "--saves" && i + 1 < argc)
+            o->savesDir = argv[++i];  // t387: supply-your-own saves dir
         else if (a == "--help")
             return false;
         else {
@@ -133,7 +136,11 @@ void usage() {
         "                dosbox-x savestate ZIP (ring .sav) or a native raw\n"
         "                .SAV. This is NOT gameplay: no orders, no writes,\n"
         "                no simulation advance (order UI awaits a selection\n"
-        "                widget; right-click deselect law banked, selfplay.md)\n");
+        "                widget; right-click deselect law banked, selfplay.md)\n"
+        "  --saves DIR   t387: directory the title LOAD screen lists\n"
+        "                (supply-your-own .SAV slots only — NEVER game/).\n"
+        "                Default: <data>/saves when it exists; an absent\n"
+        "                dir is an honest empty list.\n");
 }
 
 // Loads the three archives from the ORIGINAL game/ directory, because the
@@ -498,10 +505,18 @@ int main(int argc, char** argv) {
             o.resume ? BootState::Campaign : BootState::Title;
         std::string terr;
         void* handedWindow = nullptr;  // t385: title loop reuses it for campaign
+        // t387: the LOAD screen's slot dir — explicit --saves wins; else
+        // <data>/saves when it exists; NEVER game/ (supply-your-own law).
+        fs::path sdir = o.savesDir.empty()
+                            ? o.dataRoot / "saves"
+                            : fs::path(o.savesDir);
+        std::error_code sec;
+        const std::string savesDir =
+            fs::is_directory(sdir, sec) ? sdir.string() : std::string();
         const BootState exit = ascend::ui::runTitleScreen(
             o.dataRoot.string(), entry,
             o.introFrames >= 0 ? o.introFrames : 0,  // 0 = all frames
-            &terr, &handedWindow);
+            &terr, &handedWindow, savesDir);
         if (exit == BootState::Quit && entry != BootState::Quit &&
             !terr.empty()) {
             std::printf("title: %s\n", terr.c_str());
