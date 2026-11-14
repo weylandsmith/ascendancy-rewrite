@@ -405,7 +405,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     return 0;
 }
 
-int playIntro(const std::string& flicPath, int maxFrames) {
+int playIntro(const std::string& flicPath, int maxFrames, AudioEngine* audio) {
     namespace afl = ascend::formats;
     afl::Flic f;
     std::string err;
@@ -413,6 +413,24 @@ int playIntro(const std::string& flicPath, int maxFrames) {
         std::printf("intro: %s\n", err.c_str());
         return 1;
     }
+    // SUBTITLE.TXT cue table (the vendor subtitle script for this movie;
+    // law + addresses docs/re/audio.md §6). DIGITALMUSIC lines carry the
+    // 1-based music.txt TUNEIDs (6, 7); we address our own loaded table
+    // (audio.cpp trackNames: 0 theme00, 1 intro00, 2 intro01).
+    struct Cue {
+        int frame;   // FRAMENUMBER verbatim from subtitle.txt
+        int tune;    // playTune index, or -1 = none
+        int volume;  // vendor 0..127 scale, or -1 = none
+    };
+    static const Cue kCues[] = {
+        {20, 1, -1},    // DIGITALMUSIC TUNEID 6  -> intro00 (bulk of movie)
+        {966, -1, 100}, // FADEMUSIC VOLUME ramp (CHANNEL 0): fade tune 6 out
+        {971, -1, 80},
+        {976, -1, 60},
+        {981, -1, 30},
+        {988, -1, 127}, // VOLUME 127 restore — same frame as...
+        {988, 2, -1},   // DIGITALMUSIC TUNEID 7  -> intro01 (movie tail)
+    };
     SDL_Window* win = SDL_CreateWindow("Ascendancy", SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED, f.width(),
                                        f.height(), SDL_WINDOW_SHOWN);
@@ -451,6 +469,16 @@ int playIntro(const std::string& flicPath, int maxFrames) {
             // gate/dummy runs stay fast because they never reach here with
             // interactive timing expectations.
             SDL_Delay(baseSpeed);
+            // Cue firing uses the frame JUST SHOWN (1-based: replay() hands
+            // 0-based indices, subtitle.txt FRAMENUMBER counts from 1).
+            if (audio) {
+                const int shown1 = i + 1;
+                for (const Cue& c : kCues) {
+                    if (c.frame != shown1) continue;
+                    if (c.tune >= 0) audio->playTune(c.tune);
+                    if (c.volume >= 0) audio->setMusicVolume(c.volume);
+                }
+            }
             SDL_Event ev;
             while (SDL_PollEvent(&ev))
                 if (ev.type == SDL_QUIT || ev.type == SDL_KEYDOWN) ++aborted;

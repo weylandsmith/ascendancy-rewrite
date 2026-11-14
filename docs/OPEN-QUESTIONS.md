@@ -269,6 +269,24 @@ build-slot state exists to carry it (OQ-019 boundary); shieldThreatFor/
 orbitalThreatFor sets runtime-verified unchanged. No code delta; row stays
 open per D3.
 
+OQ-027 | audio | intro TUNEID index base + per-button vendor SFX id
+| open | OPENED t388b 2026-11-14 (docs/re/audio.md §6). Two named residues
+of the sound-fidelity row. (a) TUNEID base: subtitle.txt DIGITALMUSIC
+TUNEID 6@FRAMENUMBER 20 / 7@988 maps into music.txt either 0- or 1-based;
+the tune table is heap-relative (FUN_00074a88 stores [handle+0x8868]; same
+limitation class as audio.md §3.4 +0x48a6 fields — no static base). Port
+law in force: 1-based (6=intro00, 7=intro01; sizes fit that order only:
+intro00 2,000,000 B = 90.7 s covers frames 20..988 unlooped; 0-based would
+loop intro01 ~4x + play race00 over the opening). Closes on: user hearing
+(user = grader) or a capture read of the heap tune table via the pointer
+law. (b) per-button SFX id: FUN_000500e0 UI callers 0x17488/0x1749b read
+indices from control-record +0x1bcc/+0x1bce (runtime window-item tables);
+windows.txt SOUNDCHANNEL census {0 x118, -0 x1} carries NO sound id. Port
+names (click08 NEXTTURN / laser01 map / bang01 captured) stay DOCUMENTED
+port choices (audio.md §5). Closes on: capture diff of +0x1bcc across
+control classes, or user hearing. --audio-trace instrument ships for the
+wiring half (pins audio_tune_switch_law + audio_subtitle_script_cues_oq018).
+
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor cost hack, Orbital Docks effect
 | open | CLOSED PORTION (full evidence: archive 2026-11-03 + docs/re/ships.md):

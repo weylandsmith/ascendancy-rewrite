@@ -291,3 +291,91 @@ this engine (no claim about what serves it; candidates: startup load of all
 "contradiction" evaporates: no captured run feeds theme00 to the 0x1d4d0
 check. Rewrite loads theme00.raw directly == observed vendor state; code
 site rewrite/src/ui/audio.cpp playMusic (comment updated to cite §3.4).
+
+## 6. t388b SOUND FIDELITY law (2026-11-14; payload disasm + subtitle.txt)
+
+### 6.1 The subtitle-script engine (flic.cpp) [verified, payload bytes]
+Loader 0x2d144 refs 'SUBTITLE.TXT' (pool imm 0x1400 = file 0x83fb0) then
+parser 0x2e46c reads each line VERB-NUMBER-first (sscanf pool '%s %d'-family
+at 0x77fe1) and dispatches at 0x2e4fe..0x2e525: case 2 -> 0x2e614, case 11
+-> 0x2ea50, case 16 -> 0x2e947, unknown -> "Bad Subtitle Data" (pool 0x15ef,
+error reporter 0x2a438). The verb WORDS DIGITALMUSIC/FADEMUSIC exist ONLY
+as ascend00.cob data (game/ascend00.cob:0x2811f) — zero copies in the exe
+image: the numbers are the real verb ids; the words label them in the file.
+- case 16 (DIGITALMUSIC arg): stores type word 0x1e (=30) at rec+0x206
+  (0x2e9e8; COMMAND==1 -> 0x1f=31 via setne/add 0x1e @0x2e9c7); TUNEID ->
+  rec+0x208 dword (0x2e9a3); COMMAND -> rec+0x204 (0x2ea24). The literal
+  `16` is NEVER stored — the handler ignores its own argument number.
+- case 11 (FADEMUSIC arg): stores type word 0xb at rec+0x206 (0x2ea81);
+  CHANNEL -> rec+0x208 (0x2eac2); VOLUME -> rec+0x204 (0x2eb36, word).
+- tick/consumer loop 0x2ed37 (stride-0xc records): 0xb -> 0x2ee72 calls
+  FUN_0004feec(obj, movsx VOLUME); 0x1e -> 0x2edf5: TUNEID==-1 ->
+  FUN_00067b85(handle) (stop), else FUN_000678ec(handle, TUNEID) (play);
+  0x1f -> 0x4f9bc (stop/finish); type 1 -> frame bookkeeping.
+- FUN_000678ec -> FUN_00074a88(handle, tuneid): opens slot table entry,
+  stores tuneid at [handle+0x8868]; the tune table is heap-relative, so the
+  BASE (0- vs 1-indexed) is NOT statically decidable — same limitation
+  class as §3.4's +0x48a6 fields.
+
+### 6.2 VOLUME law [verified]
+FUN_0004feec @0x4feec: stores the volume byte at [audioObj+0x6fe] ONLY when
+-1 < v <= 0x7f; out-of-range values are SILENTLY DROPPED (no clamp, no
+error), then the device is poked via CALL 0x6888c(device,[obj+0x358]).
+Sibling 0x4ff1c stores a second 0..127 byte at +0x6ff (same guard). Vendor
+music-volume scale = 0..127. Rewrite mirror: vendorVolumeOk() +
+AudioEngine::setMusicVolume drop-not-clamp (ui/audio.{h,cpp}); pin
+audio_vendor_volume_scale_law.
+
+### 6.3 Intro cue table (subtitle.txt verbatim law) [verified file bytes]
+  DIGITALMUSIC 16 / TUNEID 6 / COMMAND 1 / FRAMENUMBER 20
+  DIGITALMUSIC 16 / TUNEID 7 / COMMAND 1 / FRAMENUMBER 988
+  FADEMUSIC 11 / CHANNEL 0 / VOLUME 100|80|60|30 / FRAMENUMBER 966|971|976|981
+  FADEMUSIC 11 / CHANNEL 0 / VOLUME 127 / FRAMENUMBER 988
+(file order: the VOLUME-127 line precedes the TUNEID-7 block, so the dip
+100->30 recovers to full volume ON the switch frame.) Pin
+audio_subtitle_script_cues_oq018 pins these lines byte-exactly.
+TUNEID->track mapping [inferred, NOT statically decidable — §6.1]: 1-based
+music.txt reading 6=intro00.raw, 7=intro01.raw. Consistency witness:
+intro00 2,000,000 B = 90.7 s @22050 mono covers frames 20..988 (80.6 s)
+without looping; intro01 479,670 B = 21.75 s covers the movie tail (988 ->
+1144 frames = 11.1 s) plus title handoff. The 0-based reading (6=intro01
+looping ~4x over 80.6 s, 7=race00 as intro music) is structurally possible
+but content-incoherent. HONEST STATUS: 1-based banked as the port's law,
+labelled inferred; a USER listening check (intro tune count/character) is
+the closing witness if ever needed.
+Rewrite: AudioEngine::trackNames() = {theme00, intro00, intro01} (cited
+members only; race00..20 stay UNLOADED — the race->theme selector never
+materialised in any capture, §3.3); playIntro(flic, maxFrames, audio) fires
+the cue table at frame index == FRAMENUMBER-1 (the FRAMENUMBER base is
+±1-uncited; one 71 ms frame of named slack); title.cpp restores tune 0
+(theme00, the captured-selector law §3.3) after the movie. playTune switch
+law: different tune replaces, same tune never restarts, -1 stops (vendor
+TUNEID -1 path). Pins audio_tune_switch_law + audio_music_tune_table_law.
+Instrument: --audio-trace prints `sfx <name>` / `music <n> <name>` (fflush)
+per played sound — wiring is machine-verified, hearing stays the USER's
+grade (R13). Live witness 2026-11-14 (scripts/_wip_t388b_intro_witness.sh,
+Xvfb :81 + xsend click 318,215): `music 0 theme00` at boot, `ui title click
+INTRO -> intro`, `music 1 intro00` at frame 20.
+
+### 6.4 Silent-degrade law + dead-code removal [verified behaviour]
+main.cpp: --audio init failure now prints `audio: <err> (degraded: silent)`
+and CONTINUES without the engine (was: exit 1). Witness: --data
+/tmp/fakeroot2 (archives + ascend00/ascend02, ascend01/data emptied) ->
+`audio: cannot open .../button.voc (degraded: silent)` then `ui ok: turn 1`,
+exit 0. The dead P3-era Mix_OpenAudio(22050, S16SYS mono, 1024) block on the
+non-campaign path (and its matching Mix_CloseAudio) is removed — it opened a
+second device, played nothing, and its "rate provisional, OQ-006" comment
+predated the closed law.
+
+### 6.5 Button SFX id: NOT statically cited — named seam
+FUN_000500e0's UI callers 0x17488/0x1749b read the sound index from
+control-record fields +0x1bcc/+0x1bce (runtime window-item table area,
+stride 0x1e); no static literal feeds them, and windows.txt SOUNDCHANNEL is
+0 on 118 + -0 on 1 of 119 records — the shipped table carries NO per-button
+sound id. Which of button/button01/button02/click08 the vendor plays per
+button class is therefore uncited; the port keeps click08 on NEXTTURN /
+laser01 on map click / bang01 on "captured" as DOCUMENTED port choices
+(§5). STATE.md's phase-10 note '"2 10000 button" is the cited SFX id' is
+FALSE — soundfx.txt has no such line (header pairs are 2 10000 / 3 45000 /
+1 65000; name list starts `button` at index 0). Closing witness candidates:
+a capture diff of the +0x1bcc field across control types, or user hearing.

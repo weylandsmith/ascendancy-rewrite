@@ -129,5 +129,5 @@ add_executable(run_tests
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp
 )
-target_link_libraries(run_tests PRIVATE ascend_core)
+target_link_libraries(run_tests PRIVATE ascend_core ascend_ui)
 add_test(NAME unit_tests COMMAND run_tests)

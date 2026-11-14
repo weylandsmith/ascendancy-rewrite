@@ -42,6 +42,24 @@ std::vector<uint8_t> wrapWav(const af::Sample& s) {
 }
 }  // namespace
 
+const std::vector<std::string>& AudioEngine::trackNames() {
+    // LOADED tune table (playTune index order). Members of the music.txt
+    // manifest (29 entries) chosen by CITED law only:
+    //  0 theme00  == music.txt track 0 == the value the captured global
+    //    selector DAT_00010ba0 holds in ALL banked saves (audio.md §3.3,
+    //    §3.4 closed "engine unreachable in captured states").
+    //  1 intro00  2 intro01  -- the intro-movie script law: subtitle.txt
+    //    DIGITALMUSIC/TUNEID 6 at FRAMENUMBER 20 and TUNEID 7 at 988, with
+    //    the FADEMUSIC dip 100->30 at frames 966-981 and VOLUME 127 restore
+    //    at 988 (audio.md §6; the 1-based TUNEID reading banked there —
+    //    0-based would loop intro01 ~4x and play race00 over the opening).
+    // The race00..20 themes stay UNLOADED: the race->theme selector never
+    // materialised in any capture (OQ-018 residue, §3.3) — named seam.
+    static const std::vector<std::string> kNames{"theme00", "intro00",
+                                                 "intro01"};
+    return kNames;
+}
+
 bool AudioEngine::init(const std::string& dataDir, bool mute,
                        std::string* err) {
     // MEASURED rate law (OQ-006 CLOSED 2026-10-07): the original opens
@@ -51,7 +69,7 @@ bool AudioEngine::init(const std::string& dataDir, bool mute,
     // stores the argument at [audioObj+0x3c]. The constructor default at
     // 0x6df3e is 11025 ([EAX+0x3c]=0x2b11), overwritten by both open sites
     // -- so headerless samples play at 22050 (docs/re/audio.md §3).
-    // Channel count has no setter in this chain (0x44/+0x40 hold buffer
+    // Channel count has no setter in this chain (0x44/+0x44 hold buffer
     // size/volume plumbing), so stereo below remains a rewrite choice.
     if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 512) != 0) {
         if (err) *err = std::string("Mix_OpenAudio: ") + Mix_GetError();
@@ -88,42 +106,88 @@ bool AudioEngine::init(const std::string& dataDir, bool mute,
         chunks_.emplace(n, ch);
     }
 
-    const std::string theme = dataDir + "/extracted/ascend02/data/theme00.raw";
-    // Track 0 is MEASURED-correct for every captured game state: the global
-    // tune selector DAT_00010ba0 (image) has exactly one writer (0x21309,
-    // writes -1 under an option check) and reads 0 in all banked saves
-    // (ck005/ck010 x5 runs); 0 == music.txt track 0 == theme00.raw.
-    // OQ-022 CLOSED (docs/re/audio.md §3.4): the 0x1d4d0-checked engine
-    // (FUN_00059c70) is guard-preceded at 0x59984 and its static name
-    // buffer DS:0xa200c is zero in all 10 saves — inactive in captured
-    // states; what serves original menu music stays UNMAPPED (non-claim).
-    af::Sample ms;
-    if (!af::loadSample(theme, "theme00", &ms, &merr)) {
-        if (err) *err = merr;
-        return false;
-    }
-    musicBytes_ = ms.pcm.size();
-    musicWav_ = wrapWav(ms);  // member: music streams from this (see .h)
-    SDL_RWops* rw = SDL_RWFromConstMem(musicWav_.data(), int(musicWav_.size()));
-    music_ = Mix_LoadMUS_RW(rw, 1);
-    if (!music_) {
-        if (err) *err = std::string("Mix_LoadMUS theme00: ") + Mix_GetError();
-        return false;
+    // Music: load the cited tune table (trackNames above). theme00 lives in
+    // ascend02/data; the intro pair lives in ascend01/data (music.txt paths
+    // name both archives' members flattened — audio.md §4).
+    for (size_t t = 0; t < trackNames().size(); t++) {
+        const std::string& tune = trackNames()[t];
+        const std::string a02 = dataDir + "/extracted/ascend02/data/" + tune + ".raw";
+        const std::string a01 = dataDir + "/extracted/ascend01/data/" + tune + ".raw";
+        std::string path;
+        if (FILE* probe = std::fopen(a02.c_str(), "rb")) {
+            std::fclose(probe); path = a02;
+        } else if (FILE* probe = std::fopen(a01.c_str(), "rb")) {
+            std::fclose(probe); path = a01;
+        } else {
+            if (err) *err = "music track missing: " + tune + ".raw";
+            return false;
+        }
+        af::Sample ms;
+        if (!af::loadSample(path, tune, &ms, &merr)) {
+            if (err) *err = merr;
+            return false;
+        }
+        if (t == 0) musicBytes_ = ms.pcm.size();  // gate line reports track 0
+        musicWavs_.push_back(wrapWav(ms));  // member: music streams from here
+        const auto& w = musicWavs_.back();
+        SDL_RWops* rw = SDL_RWFromConstMem(w.data(), int(w.size()));
+        Mix_Music* m = Mix_LoadMUS_RW(rw, 1);
+        if (!m) {
+            if (err) *err = "Mix_LoadMUS " + tune + ": " + Mix_GetError();
+            return false;
+        }
+        music_.push_back(m);
     }
     return true;
 }
 
 void AudioEngine::play(const std::string& sfxName) {
     auto it = chunks_.find(sfxName);
-    if (it != chunks_.end()) Mix_PlayChannel(-1, it->second, 0);
+    if (it != chunks_.end()) {
+        // fflush: the trace is read by automation that may SIGKILL the app
+        // mid-movie (witness scripts); unbuffered lines survive teardown.
+        if (trace_) { std::printf("sfx %s\n", sfxName.c_str()); std::fflush(stdout); }
+        Mix_PlayChannel(-1, it->second, 0);
+    }
 }
 
-void AudioEngine::playMusic() {
-    if (music_ && !Mix_PlayingMusic()) Mix_PlayMusic(music_, -1);
+void AudioEngine::playTune(int t) {
+    // Out-of-range is a no-op against the STATIC law (trackNames), so the
+    // request state machine behaves identically with or without a device —
+    // that is what makes audio_tune_switch_law headless-testable.
+    if (t >= int(trackNames().size())) return;
+    // Stop request (vendor TUNEID -1 -> FUN_00067b85): halt, remember idle.
+    if (t == -1) {
+        if (inited_ && Mix_PlayingMusic()) Mix_HaltMusic();
+        currentTune_ = -1;
+        if (trace_) { std::printf("music stop\n"); std::fflush(stdout); }
+        return;
+    }
+    // SWITCH law (subtitle.txt fires DIGITALMUSIC at frames 20 AND 988): a
+    // different tune replaces the current one; the same tune never restarts.
+    if (t == currentTune_) return;
+    if (currentTune_ >= 0 && inited_ && Mix_PlayingMusic()) Mix_HaltMusic();
+    if (inited_ && t < int(music_.size())) Mix_PlayMusic(music_[size_t(t)], -1);
+    currentTune_ = t;
+    if (trace_) {
+        std::printf("music %d %s\n", t, trackNames()[size_t(t)].c_str());
+        std::fflush(stdout);
+    }
+}
+
+void AudioEngine::setMusicVolume(int vendorScale) {
+    // MEASURED (docs/re/audio.md §6): FUN_0004feec @0x4feec stores the
+    // volume byte ONLY when -1 < v <= 0x7f — out-of-range values are
+    // silently dropped (NO clamp), then the device is poked via 0x6888c.
+    // Mirror the drop, then map the 0..127 scale onto MIX_MAX_VOLUME.
+    if (!vendorVolumeOk(vendorScale)) return;
+    musicVol_ = vendorScale;
+    if (inited_)
+        Mix_VolumeMusic(int((MIX_MAX_VOLUME * musicVol_) / kVendorVolMax));
 }
 
 AudioEngine::~AudioEngine() {
-    if (music_) Mix_FreeMusic(music_);
+    for (auto* m : music_) if (m) Mix_FreeMusic(m);
     for (auto& kv : chunks_) Mix_FreeChunk(kv.second);
     if (inited_) Mix_CloseAudio();
 }

@@ -85,7 +85,10 @@ def rows(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", default="docs/OPEN-QUESTIONS.md")
-    ap.add_argument("--expect", default="OQ-019,OQ-016")
+    # t388b: OQ-027 (intro TUNEID base + per-button SFX id) OPENED with the
+    # sound-fidelity row — added to this default the same way t193 opened
+    # OQ-026.
+    ap.add_argument("--expect", default="OQ-019,OQ-016,OQ-027")
     # t367: OQ-005 CLOSED by the D1 USER RULING (ruling page 2026-11-09 12:45,
     # DECISIONS.md verbatim block; shp.md S28; corner-anchor fallback + pin
     # TEST(shp_corner_anchor_fallback_t367)) — removed from this default the

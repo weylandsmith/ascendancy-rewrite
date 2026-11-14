@@ -32,7 +32,8 @@ const SDL_Color kBand{150, 130, 110, 255};
 
 BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          int maxIntroFrames, std::string* err,
-                         void** windowOut, const std::string& savesDir) {
+                         void** windowOut, const std::string& savesDir,
+                         AudioEngine* audio) {
     SDL_Window* win = SDL_CreateWindow("Ascendancy", SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED, kDisplayW,
                                        kDisplayH, SDL_WINDOW_SHOWN);
@@ -198,8 +199,14 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
         // ---- non-Title states reached this frame ----
         if (st == BootState::Intro) {
             playIntro(dataRoot + "/extracted/ascend02/data/intro65a.flc",
-                      maxIntroFrames);
-            st = BootState::Title;  // vendor law: movie exit -> title
+                      maxIntroFrames, audio);
+            // Vendor law: movie exit -> title. Menu music on the captured
+            // selector is track 0 = theme00 (audio.md §3.3: DAT_00010ba0
+            // == 0 in every banked save), so the title restores it after
+            // the intro tunes; the script's own VOLUME 127 cue (frame 988)
+            // has already reset the fade by this point.
+            if (audio) audio->playTune(0);
+            st = BootState::Title;
         } else if (st == BootState::Tutorial) {
             seamLoop("tutorial driver absent (seam, docs/re/boot.md §3)");
             st = BootState::Title;

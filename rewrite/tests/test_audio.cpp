@@ -3,10 +3,12 @@
 // Vendor sample format tests — invariants from docs/re/audio.md §1-§4,
 // checked against the REAL files in extracted/ (read-only, gate-safe).
 #include "formats/voc.h"
+#include "ui/audio.h"
 #include "harness.h"
 
 #include <array>
 #include <cstdio>
+#include <cstdlib>
 #include <filesystem>
 #include <string>
 
@@ -218,4 +220,98 @@ TEST(audio_rejects_garbage_magic) {
     af::Sample s;
     std::string err;
     CHECK(!af::loadSample(p, "fake", &s, &err));
+}
+
+// ---------------------------------------------------------------------------
+// t388b SOUND FIDELITY pins (docs/re/audio.md §6)
+
+TEST(audio_subtitle_script_cues_oq018) {
+    REQUIRE_DATA();
+    // MEASURED law: the intro-movie cue table IS subtitle.txt (flic.cpp
+    // engine; loader refs 'SUBTITLE.TXT' payload 0x83fb0, parser 0x2e46c,
+    // verb-number dispatch 0x2e4fe..0x2e525 — audio.md §6.1). Pin the file
+    // contents the port's cue table mirrors.
+    std::FILE* f = std::fopen((kRepo + "/extracted/ascend00/subtitle.txt").c_str(), "rb");
+    CHECK(f != nullptr);
+    if (!f) return;
+    std::string all;
+    char buf[4096];
+    size_t n;
+    while ((n = std::fread(buf, 1, sizeof(buf), f)) > 0) all.append(buf, n);
+    std::fclose(f);
+    // DIGITALMUSIC lines: TUNEID 6 at FRAMENUMBER 20, TUNEID 7 at 988
+    // (1-based music.txt reading -> intro00 over the bulk of the movie,
+    // intro01 over the tail — audio.md §6.3; sizes fit that order only).
+    CHECK(all.find("DIGITALMUSIC  16\r\nTUNEID        6\r\nCOMMAND       1\r\nFRAMENUMBER   20 ") != std::string::npos);
+    CHECK(all.find("DIGITALMUSIC  16\r\nTUNEID        7\r\nCOMMAND       1\r\nFRAMENUMBER   988 ") != std::string::npos);
+    // FADEMUSIC ramp: 100/80/60/30 at 966/971/976/981, 127 at 988
+    CHECK(all.find("FADEMUSIC     11\r\nCHANNEL       0\r\nVOLUME        100\r\nFRAMENUMBER   966 ") != std::string::npos);
+    CHECK(all.find("VOLUME        30\r\nFRAMENUMBER   981 ") != std::string::npos);
+    CHECK(all.find("VOLUME        127\r\nFRAMENUMBER   988 ") != std::string::npos);
+}
+
+TEST(audio_music_tune_table_law) {
+    REQUIRE_DATA();
+    // The loaded tune table is cited-law-only (audio.cpp comment; audio.md
+    // §3.3 captured selector + §6 script). Members and ORDER are the pin.
+    const auto& t = ascend::ui::AudioEngine::trackNames();
+    CHECK(t.size() == 3);
+    CHECK(t[0] == "theme00");
+    CHECK(t[1] == "intro00");
+    CHECK(t[2] == "intro01");
+    // Files exist where the loader looks, sizes match the banked census:
+    // theme00 8191719 (ascend02), intro00 2000000 / intro01 479670
+    // (ascend01) — same numbers as audio.md §4 + t388b WIP inventory.
+    std::error_code ec;
+    CHECK(std::filesystem::file_size(kRepo + "/extracted/ascend02/data/theme00.raw", ec) == 8191719u);
+    CHECK(std::filesystem::file_size(kRepo + "/extracted/ascend01/data/intro00.raw", ec) == 2000000u);
+    CHECK(std::filesystem::file_size(kRepo + "/extracted/ascend01/data/intro01.raw", ec) == 479670u);
+    // Headerless shape: first bytes are 0x80-region PCM silence, NOT a
+    // RIFF/VOC magic (the .raw loader must not be handed a headered file
+    // by accident; §3 re-verified for the tune set here).
+    af::Sample s;
+    std::string err;
+    CHECK(af::loadSample(kRepo + "/extracted/ascend01/data/intro00.raw", "intro00", &s, &err));
+    CHECK(s.rate == 22050);
+    CHECK(s.channels == 1);
+    CHECK(std::abs(int(s.pcm.front()) - 0x80) <= 4);
+}
+
+TEST(audio_vendor_volume_scale_law) {
+    // MEASURED (FUN_0004feec @0x4feec, audio.md §6.2): store iff
+    // -1 < v <= 0x7f; out-of-range is DROPPED, never clamped.
+    CHECK(ascend::ui::vendorVolumeOk(0));
+    CHECK(ascend::ui::vendorVolumeOk(100));
+    CHECK(ascend::ui::vendorVolumeOk(127));
+    CHECK(!ascend::ui::vendorVolumeOk(-1));
+    CHECK(!ascend::ui::vendorVolumeOk(128));
+    // State machine (headless, no device): setMusicVolume keeps the last
+    // ACCEPTED value; a dropped request leaves it untouched.
+    ascend::ui::AudioEngine a;
+    CHECK(a.musicVolume() == 127);          // constructor: full scale
+    a.setMusicVolume(100);
+    CHECK(a.musicVolume() == 100);
+    a.setMusicVolume(300);                  // dropped, not clamped
+    CHECK(a.musicVolume() == 100);
+}
+
+TEST(audio_tune_switch_law) {
+    // Headless state machine (no device opened): playTune tracks the
+    // current tune; SWITCH replaces, SAME never restarts, -1 stops, junk
+    // indices are no-ops. Mirrors the subtitle-script behaviour where
+    // DIGITALMUSIC fires at frames 1 AND 20 without restarting tune 7.
+    ascend::ui::AudioEngine a;
+    CHECK(a.currentTune() == -1);
+    a.playTune(0);
+    CHECK(a.currentTune() == 0);
+    a.playTune(0);                          // same tune: state unchanged
+    CHECK(a.currentTune() == 0);
+    a.playTune(1);                          // switch
+    CHECK(a.currentTune() == 1);
+    a.playTune(2);
+    CHECK(a.currentTune() == 2);
+    a.playTune(3);                          // out of range: no-op
+    CHECK(a.currentTune() == 2);
+    a.playTune(-1);                         // stop (vendor TUNEID -1)
+    CHECK(a.currentTune() == -1);
 }

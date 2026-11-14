@@ -181,6 +181,14 @@ ledger:
       the fn(0x17c54)/fn(0x16147) walk — income-law.md S-T326.)"
     - "OQ-019 ship design model (hull+gizmo inventory, cost hack, Orbital
       Docks); per-ship combat application = OQ-010 aggregate caveats S2i"
+    - "OQ-027 audio intro TUNEID index base + per-button vendor SFX id
+      (OPENED t388b 2026-11-14): tune table heap-relative (FUN_00074a88
+      stores [handle+0x8868]) so the 0/1-base of subtitle.txt TUNEID 6/7 is
+      not statically decidable — port law 1-based (6=intro00, 7=intro01,
+      sizes-fit-only witness); closes on user hearing or pointer-law capture
+      of the heap table. Per-button SFX ids come from runtime control fields
+      +0x1bcc/+0x1bce (windows.txt SOUNDCHANNEL census {0 x118, -0 x1} = no
+      id); port click names stay documented choices. law docs/re/audio.md §6"
 
 ## WHAT IS IN HAND (tools + laws — start here, not from scratch)
 Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
@@ -222,33 +230,31 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t388b per queue row t388b below (phase 10: TITLE-SCREEN + MENU UI;
-"finish tN -> NEXT tN+1 VERBATIM").
-ORDERING: t388 LANDED 2026-11-14 — campaign SCREEN LAW (STATE id-lists) +
-rail routing + STATUSWND/Species/Intel screens (law docs/re/ui-runtime.md
-§7; full census docs/re/_wip_t388.md). Key laws t388b MUST reuse: (1) the
-STATE field is an ID-LIST "<count> <id>..." [123/123] — controls/windows
-draw iff the list holds the current screen id (ui/statuslaw.h); (2) sound
-wiring points ALREADY EXIST: ui.cpp plays click08 on NEXTTURN and laser01/
-bang01 via the same branch style — extend inside railButtonForScreen
-routing, soundfx.txt "2 10000 button" is the cited SFX id; (3) the t384b
-include law (never re-forward-declare SDL2_mixer opaque types — audio.{h,
-cpp} owns them); (4) headless CI has NO sound card: audio init failure
-degrades to silent, NEVER aborts (audio.md §5 already ships this shape —
-check before adding any Mix_* call site). Gate 4c-d (t388) drives the
-screen round trip via xsend; extend it for SFX only if a headless-safe
-instrument exists (a print line per played sound is mechanical; hearing
-is the USER's grade — t389 names it).
-Palette seam (boot.md §6): menu .shp index sets are disjoint from the t386
-title TSV; luminance ramp substitutes; closing it needs a vendor screenshot
-of load/newgame screens (user-grader artifact, none pinned). Do NOT fake
-colours. t385b's seven-button law + t386's registration conflict-count
-instrument still bind verification. PUSH STATE: remote main = c02e3ad6f88f
-(2026-11-14, fast-forward; user README commits native; t384 requires->reqByte
-rename pushed; portability law banked: NEVER hand-forward-declare vendor
-typedefs — SDL2_mixer 2.8.0 vs 2.8.1 struct-tag drift). Push route:
-HTTPS + ~/.config/gh-pub-token PAT via GIT_ASKPASS helper (delete after
-use); NEVER push from the working repo; re-export + re-verify per row t389.
+NEXT t389 PHASE-10 VERIFY + RE-EXPORT + PUSH VERBATIM per queue row t389
+below (phase 10: TITLE-SCREEN + MENU UI; "finish tN -> NEXT tN+1 VERBATIM").
+ORDERING: t388b LANDED 2026-11-14 — sound fidelity law banked docs/re/
+audio.md §6 (subtitle cue engine + addresses §6.1, volume 0..127 drop-not-
+clamp FUN_0004feec §6.2, cue table TUNEID 6@20/7@988 + FADEMUSIC dip
+§6.3, silent-degrade + dead-mixer removal §6.4, button-SFX seam §6.5);
+see LANDED t388b. Key facts t389 MUST carry: (1) run_tests is 293 tests
+(289 prior + 4 audio pins) and now LINKS ascend_ui (CMakeLists change —
+export build must pick it up; SDL2_mixer dev headers required at build
+time, same as before); (2) STATE ledger index is 17 closed / 3 OPEN
+(OQ-016, OQ-019, OQ-027 — t388b OPENED OQ-027; ledger_audit --expect
+updated in scripts/ledger_audit.py; gate 3t re-checks both audits);
+(3) --audio-trace is the headless wiring instrument — the t389 WAIT-USER
+pointer should name the SOUND check concretely: run with --audio (real
+device), listen for theme00 loop at title, intro00 from ~1.4 s (frame 20
+x 71 ms) into Play Introduction, intro01 near the movie end (that grades
+the OQ-027 1-based law); (4) the t385b seven-button law + t386
+registration conflict-count instrument still bind verification; (5)
+headless CI has NO sound card —
+silent-degrade is gate-tested shape, do not re-add any abort-on-audio-fail.
+Palette seam (boot.md §6) unchanged: menu .shp index sets disjoint from the
+t386 title TSV; closing needs a vendor screenshot (user-grader, none
+pinned). Do NOT fake colours. Push route: HTTPS + ~/.config/gh-pub-token
+PAT via GIT_ASKPASS helper (delete after use); NEVER push from the working
+repo; re-export + re-verify per row t389.
 
 QUEUE (phase 10 — TITLE-SCREEN + MENU UI; user D8 2026-11-14. Evidence
 base ALREADY BANKED: windows.txt window inventory (NEWGAMEWND L580,
@@ -353,8 +359,15 @@ Right-click deselect law (selfplay.md) applies once selection widgets
 exist — note where it lands, no selection UI this row.
 
 t388b SOUND FIDELITY (D9: the port must SOUND like the original).
-Evidence: soundfx.txt (id+rate+name table, e.g. "2 10000 button"), 29
-theme*.raw music tracks (music.txt index), DIGITALMUSIC(TUNEID)+
+[CLOSED 2026-11-14 — subtitle-script cue engine law + volume 0..127 drop-
+not-clamp + tune table {theme00,intro00,intro01} + silent-degrade + dead-
+mixer removal + --audio-trace instrument; live cue witness at frame 20;
+law docs/re/audio.md §6, session log docs/re/_wip_t388b.md. HONEST
+NEGATIVES: TUNEID index base NOT statically decidable (heap table) and
+per-button SFX ids are runtime-table-fed — both banked as OPEN row
+OQ-027; the row's '"2 10000 button" cited SFX id' premise was FALSE.
+Original row text kept below.] Evidence: soundfx.txt (id+rate+name table),
+29 theme*.raw music tracks (music.txt index), DIGITALMUSIC(TUNEID)+
 FADEMUSIC law (ui.md §4 intro script). Land in the EXISTING SDL2_mixer
 port (ui/audio.{h,cpp} — keep the t384b include law, never re-forward-
 declare opaque types): (1) .raw loader (rate from the table; verify the
@@ -419,7 +432,7 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   `python3 scripts/t368_ring_turn.py` -> max_turn > 1086 => run
   r1_t85g_sitting.py before anything. Production :9 is the corpus — untouched
   unless the task IS a drive.
-- Ledger 17 closed / 2 open (OQ-016, OQ-019; OQ-005 CLOSED t367 by the D1
+- Ledger 17 closed / 3 open (OQ-016, OQ-019, OQ-027; OQ-005 CLOSED t367 by the D1
   user ruling); ledger_audit +
   ledger_index_check green every gate; never hand-edit the index block.
 - USER DECISIONS (docs/DECISIONS.md): D1 ANSWERED + APPLIED t367 (nothing
@@ -448,6 +461,43 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t388b — 2026-11-14 (SOUND FIDELITY: SUBTITLE CUE ENGINE + VOLUME LAW + SILENT-DEGRADE)
+
+What landed: the intro-movie music law is now CODE, cited. AudioEngine
+grew a cited tune table trackNames()={theme00,intro00,intro01} (race00..20
+stay UNLOADED — selector never captured, §3.3), playTune with switch/same-
+no-restart/stop semantics whose RANGE law is static so the machine is
+device-independent, setMusicVolume mirroring the vendor's drop-not-clamp
+0..127 guard, and --audio-trace (fflush'd `sfx <name>`/`music N <name>`
+lines). playIntro(flic,maxFrames,audio) fires the subtitle.txt cue table
+{20:TUNEID6->intro00, 966/971/976/981:VOLUME 100/80/60/30, 988:VOLUME 127
+then TUNEID7->intro01} at replay index == FRAMENUMBER-1 (base ±1 named);
+title.cpp restores theme00 after the movie (captured-selector law §3.3);
+main.cpp: --audio init failure now DEGRADES TO SILENT (was exit 1) and the
+dead P3-era second Mix_OpenAudio/CloseAudio pair is removed. Law banked
+docs/re/audio.md §6.1-§6.5 (all addresses payload-relative: parser 0x2e46c
+verb-NUMBER dispatch 0x2e4fe, case 16 stores 0x1e/0x1f @0x2e9e8, case 11
+stores 0xb @0x2ea81, consumer 0x2ed37, volume FUN_0004feec guard -1<v<=0x7f,
+play FUN_000678ec->FUN_00074a88 [handle+0x8868]). 4 new pins
+(293 tests, 0 fail): audio_subtitle_script_cues_oq018 (cue lines byte-
+exact incl. trailing-space law), audio_music_tune_table_law (table + real
+file sizes + headerless shape), audio_vendor_volume_scale_law,
+audio_tune_switch_law. LIVE WITNESS (scripts/_wip_t388b_intro_witness.sh,
+Xvfb+xsend click 318,215): `music 0 theme00` boot -> `ui title click INTRO
+-> intro` -> `music 1 intro00` fired mid-movie at frame 20. Silent-degrade
+witness: ascend01/data emptied -> `audio: ... (degraded: silent)` +
+`ui ok: turn 1` exit 0. MEASURED NEGATIVES banked: verb words
+DIGITALMUSIC/FADEMUSIC exist ONLY in ascend00.cob:0x2811f (zero in image —
+the numbers are the verbs); windows.txt SOUNDCHANNEL census {0 x118, -0 x1}
+carries NO per-button sound id; STATE.md's '"2 10000 button" is the cited
+SFX id' was FALSE (no such line). LEDGER: no row closed (strict-close —
+the cue table is cited but the TUNEID BASE and button ids are not); row
+OQ-027 OPENED for those two residues (closing witnesses = user hearing or
+pointer-law capture of the heap tune table). Honest mid-session
+correction: first cue reading transposed the frames (6@1/7@20); cat -A
+proved 6@20/7@988 before any commit. Gate GATE_EXIT=0 + ledger_audit OK +
+ledger_index_check OK (STATE index re-derived: 17 closed / 3 open).
 
 ## LANDED t388 — 2026-11-14 (CAMPAIGN SCREEN LAW + RAIL ROUTING + STATUS CHROME)
 

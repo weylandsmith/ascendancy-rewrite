@@ -51,6 +51,7 @@ struct Options {
     bool resume = false;                        // t385: boot straight to Campaign
     bool audio = false;                         // SDL2_mixer (docs/re/audio.md §5)
     bool mute = false;                          // load everything, volume 0
+    bool audioTrace = false;                    // t388b: print per played sound
     int playerSpecies = -1;                     // specnum 0..20 (docs/re/species.md)
     int stars = 50;                             // galaxy density (t78 ladder
                                                 // 15/25/50/75/100; mapgen.md
@@ -85,6 +86,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->audio = true;
         else if (a == "--mute")
             o->mute = true;
+        else if (a == "--audio-trace")
+            o->audioTrace = true;  // t388b headless SFX wiring instrument
         else if (a == "--species" && i + 1 < argc)
             o->playerSpecies = std::atoi(argv[++i]);
         else if (a == "--stars" && i + 1 < argc)
@@ -115,8 +118,9 @@ void usage() {
         "  --data ROOT   directory containing extracted/ (default: repo root)\n"
         "  --turns N     run N turns of the turn loop then exit\n"
         "  --headless    SDL dummy video driver, no audio device\n"
-        "  --audio       SDL2_mixer: all 86 soundfx + theme00 (docs/re/audio.md)\n"
+        "  --audio       SDL2_mixer: all 86 soundfx + cited tunes (docs/re/audio.md)\n"
         "  --mute        load audio but master volume 0\n"
+        "  --audio-trace print one line per played sound (wiring instrument)\n"
         "  --campaign N  play N turns of a seeded campaign (docs/re/turnloop.md)\n"
         "  --seed S      seed for --campaign (default 1)\n"
         "  --ui          boot to the TITLE SCREEN (t385, docs/re/boot.md);\n"
@@ -490,15 +494,22 @@ int main(int argc, char** argv) {
         std::unique_ptr<ascend::ui::AudioEngine> audio;
         if (o.audio) {
             audio = std::make_unique<ascend::ui::AudioEngine>();
+            audio->setTrace(o.audioTrace);
             std::string aerr;
             if (!audio->init(o.dataRoot.string(), o.mute, &aerr)) {
-                std::printf("audio: %s\n", aerr.c_str());
-                SDL_Quit();
-                return 1;
+                // SILENT-DEGRADE LAW (t388b; CI has no sound card): audio is
+                // presentation, never a boot precondition. Report and run on
+                // without the engine — a missing device must not abort the
+                // app or the gate. (The old code returned 1 here.)
+                std::printf("audio: %s (degraded: silent)\n", aerr.c_str());
+                audio.reset();
+            } else {
+                std::printf("audio ok: %d sfx chunks, music %lu B\n",
+                            audio->chunksLoaded(), audio->musicBytes());
+                // Title-screen music: tune 0 = theme00 == the captured
+                // selector value in every banked save (audio.md §3.3/§3.4).
+                audio->playTune(0);
             }
-            std::printf("audio ok: %d sfx chunks, music %lu B\n",
-                        audio->chunksLoaded(), audio->musicBytes());
-            audio->playMusic();
         }
         using ascend::ui::BootState;
         const BootState entry =
@@ -516,7 +527,7 @@ int main(int argc, char** argv) {
         const BootState exit = ascend::ui::runTitleScreen(
             o.dataRoot.string(), entry,
             o.introFrames >= 0 ? o.introFrames : 0,  // 0 = all frames
-            &terr, &handedWindow, savesDir);
+            &terr, &handedWindow, savesDir, audio.get());
         if (exit == BootState::Quit && entry != BootState::Quit &&
             !terr.empty()) {
             std::printf("title: %s\n", terr.c_str());
@@ -535,11 +546,13 @@ int main(int argc, char** argv) {
         return rc;
     }
 
-    // Audio: the game's music is raw PCM whose sample rate is not yet known
-    // (docs/re/media.md OQ-006), so P3 opens the device but plays nothing.
-    if (!o.headless && Mix_OpenAudio(22050, AUDIO_S16SYS, 1, 1024) == 0) {
-        std::printf("mixer open at 22050 Hz mono (rate is provisional, OQ-006)\n");
-    }
+    // Audio on the non-campaign paths: t388b removed the dead P3-era
+    // Mix_OpenAudio(22050, AUDIO_S16SYS, 1, 1024) block that used to sit
+    // here — the rate law it called "provisional (OQ-006)" has been CLOSED
+    // since 2026-10-07 (audio.md §3.1), the device was opened and never
+    // played anything, and a second mixer device next to AudioEngine's is
+    // exactly the shape that made --audio confusing. Turn playback on the
+    // stub loop stays silent by design (no cited cue exists for it).
 
     // Stub turn loop: real turn resolution is P4 (economy -> research ->
     // production -> movement -> combat -> AI -> diplomacy -> victory).
@@ -555,7 +568,9 @@ int main(int argc, char** argv) {
         if (turns > 1) std::printf("turn %d\n", t);
     }
 
-    if (!o.headless) Mix_CloseAudio();
+    // No Mix_CloseAudio here: since t388b removed the dead P3-era opener
+    // above, this path never opens a mixer device (AudioEngine owns the
+    // device on --audio paths and closes it in its dtor).
     SDL_Quit();
     std::printf("ok\n");
     return 0;
