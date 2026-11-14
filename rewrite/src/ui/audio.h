@@ -8,8 +8,12 @@
 
 #include "formats/voc.h"
 
-struct Mix_Chunk;  // SDL_mixer.h:231 defines it as struct; tag must match
-struct Mix_Music;  // SDL_mixer.h:269
+// Mix_Chunk/Mix_Music come from the vendor header directly. Do NOT
+// forward-declare them: the struct TAGS drifted between SDL2_mixer
+// versions (2.8.0 declares `struct _Mix_Music`, 2.8.1 declares `struct
+// Mix_Music`), so a hand-written tag compiles on one and conflicts on the
+// other — measured on a user build, 2026-11-14.
+#include <SDL_mixer.h>
 
 namespace ascend::ui {
 // SDL2_mixer over the vendor samples (docs/re/audio.md §5). One instance
