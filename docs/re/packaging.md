@@ -256,3 +256,34 @@ trivially satisfied — nothing closable and nothing closed).
   plain username "hrethric" inside /home/hrethric paths (scripts, docs). It
   is a username, not an email/credential; scrubbing it would rewrite hundreds
   of path strings across history. Left as-is for the push.
+
+## t389 RE-EXPORT + VERIFY + PUSH LANDED (2026-11-14)
+
+- Export: `GITHUB_USER=weylandsmith bash scripts/publish_public.sh
+  /tmp/pubpush-t389` exit 0 — "vendor-free history, 6298 objects, 5.6M .git,
+  tree intact." game/ extracted/ work/ archive/user-saves docs/assets all
+  absent from the tree; artifacts/ holds only README+tsv stubs (vendor
+  derivatives filtered); identity uniform across ALL history: single email
+  weylandsmith@users.noreply.github.com (`git log --all --format=%ae | sort -u`).
+- VERIFIED ON THE CLONE (no vendor data): cmake (empty build type) + build -j4
+  exit 0, ZERO warnings, ascend_ui BUILDS on the export (t389 key-fact 1 — the
+  CMakeLists run_tests->ascend_ui link + SDL2_mixer headers survived the
+  filter); run_tests exit 0 "293 tests, 196 skipped, 0 failed";
+  ASCENDANCY_DATA=<working repo> gate.sh --portable exit 0.
+- PUSH: fetch-FIRST law respected. Trap hit + banked: publish_public.sh clones
+  from the local SRC, so the export's `origin` is the WORKING REPO path — a
+  naive fetch/ls-remote grades against the wrong remote. Fix: `git remote
+  set-url origin https://github.com/weylandsmith/ascendancy-rewrite.git`
+  BEFORE fetch. Remote tip was b2539b3; `merge-base --is-ancestor` confirmed
+  FAST_FORWARD_OK; push landed `b2539b3..36bf92d main -> main`;
+  ls-remote origin main == 36bf92dbb4bdf12d2a76bb0ff88fbdc26980621c (the
+  exported t388b tip). 7 commits shipped: D9 records, t385+t385b, t386, t387,
+  t388, t388b (49 files, +4690/-195). No force needed; askpass helper
+  /tmp/t389_askpass.sh deleted after use (verified absent).
+- SEED REGRESSION (engine-untouched proof, pre-push): baseline worktree
+  /tmp/t389-baseline @ c7a3fda (last commit before phase 10); `--headless
+  --campaign 1600` seeds 1/2024/23 byte-IDENTICAL base vs HEAD
+  (md5 7e794a6d.../332a8cf3.../0a6b7876...), victories Extinct t266 / Extinct
+  t285 / Control t1406 == the t365 banked record (docs/re/engine-flip-t365.md
+  L28-30). Match the working repo's EMPTY CMAKE_BUILD_TYPE when byte-comparing
+  builds. Baseline worktree removed after (`git worktree list` clean).

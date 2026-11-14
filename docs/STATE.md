@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-14T19:40
+updated: 2026-11-14T18:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,169 +230,36 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t389 PHASE-10 VERIFY + RE-EXPORT + PUSH VERBATIM per queue row t389
-below (phase 10: TITLE-SCREEN + MENU UI; "finish tN -> NEXT tN+1 VERBATIM").
-ORDERING: t388b LANDED 2026-11-14 — sound fidelity law banked docs/re/
-audio.md §6 (subtitle cue engine + addresses §6.1, volume 0..127 drop-not-
-clamp FUN_0004feec §6.2, cue table TUNEID 6@20/7@988 + FADEMUSIC dip
-§6.3, silent-degrade + dead-mixer removal §6.4, button-SFX seam §6.5);
-see LANDED t388b. Key facts t389 MUST carry: (1) run_tests is 293 tests
-(289 prior + 4 audio pins) and now LINKS ascend_ui (CMakeLists change —
-export build must pick it up; SDL2_mixer dev headers required at build
-time, same as before); (2) STATE ledger index is 17 closed / 3 OPEN
-(OQ-016, OQ-019, OQ-027 — t388b OPENED OQ-027; ledger_audit --expect
-updated in scripts/ledger_audit.py; gate 3t re-checks both audits);
-(3) --audio-trace is the headless wiring instrument — the t389 WAIT-USER
-pointer should name the SOUND check concretely: run with --audio (real
-device), listen for theme00 loop at title, intro00 from ~1.4 s (frame 20
-x 71 ms) into Play Introduction, intro01 near the movie end (that grades
-the OQ-027 1-based law); (4) the t385b seven-button law + t386
-registration conflict-count instrument still bind verification; (5)
-headless CI has NO sound card —
-silent-degrade is gate-tested shape, do not re-add any abort-on-audio-fail.
-Palette seam (boot.md §6) unchanged: menu .shp index sets disjoint from the
-t386 title TSV; closing needs a vendor screenshot (user-grader, none
-pinned). Do NOT fake colours. Push route: HTTPS + ~/.config/gh-pub-token
-PAT via GIT_ASKPASS helper (delete after use); NEVER push from the working
-repo; re-export + re-verify per row t389.
+NEXT WAIT-USER-RULING t374 — PHASE 10 LANDED + PUSHED, LATEST 2026-11-14:
+https://github.com/weylandsmith/ascendancy-rewrite.git main = 36bf92dbb4bd
+(verified ls-remote post-push; FAST-FORWARD b2539b3..36bf92d — 7 commits:
+D9 records, t385+t385b boot state machine, t386 title art, t387 menu wiring,
+t388 campaign screen, t388b sound fidelity; 49 files +4690/-195). Export
+/tmp/pubpush-t389 verified vendor-free (6298 objects, 5.6M .git, uniform
+noreply identity), builds WITHOUT data 0 warnings incl. ascend_ui, run_tests
+293 tests / 196 skipped / 0 failed, gate --portable exit 0. SEED REGRESSION
+PASS: baseline worktree @ c7a3fda (pre-phase-10) vs HEAD, --headless
+--campaign 1600 seeds 1/2024/23 byte-IDENTICAL (Extinct t266 / Extinct t285 /
+Control t1406 == t365 record). Full witness docs/re/packaging.md t389 block
+(incl. the export-origin-points-at-local-SRC trap: set-url BEFORE fetch).
 
-QUEUE (phase 10 — TITLE-SCREEN + MENU UI; user D8 2026-11-14. Evidence
-base ALREADY BANKED: windows.txt window inventory (NEWGAMEWND L580,
-STATUSWND L1018, HELPINDEX newgame/loadgame/savegame), docs/re/ui.md §3
-(4 menu buttons = main menu: Play Introduction / Tutorial / New Game /
-Resume; TITLERECT 0,379-639,419 + SUBFONT slots 240..255), docs/re/
-ui-runtime.md §6/6b (in-game menu bar + Species/Intelligence menus),
-chrome shape libs in extracted/ascend01/data (0opening, 10status,
-2savegam, 4loadgam, 3cfgnew, 7racesel, 1starmap), Flic decoder + --intro
-law (docs/re/flc.md), VendorText .fnt renderer (ui.cpp), refcap palette
-instrument (scripts/refcap_match.py). VERIFICATION RULE for this phase:
-R13 still bans self-graded VISION of our own renders — verify with cited
-GEOMETRY (windows.txt rects), MECHANICAL instruments (palette-law color
-sampling, decode hashes, click->state-wiring unit tests on the state
-machine itself), and honest negatives where only a human eye can judge.
-One session each; finish tN -> NEXT tN+1 VERBATIM; game/ read-only; t382
---save observer must NOT regress; gate + both audits before commit.)
+WHAT THE USER CAN GRADE (the only closers left need a human witness):
+(1) TITLE ART: run --ui, compare the title screen against the vendor game —
+    t386 law says 0opening.gif 1:1 + palette swap (docs/re/title-art.md);
+    a screenshot of either screen settles candidates.
+(2) SOUND (grades OQ-027 1-based law): run --ui --audio (real device);
+    listen for theme00 loop at the TITLE screen; click Play Introduction —
+    intro00 should start ~1.4 s in (frame 20 x 71 ms) and switch to intro01
+    near the movie end; wrong tune/loop order => TUNEID base is 0-based.
+    --audio-trace prints `music N <name>` lines headless for the wiring half.
+(3) MENU SHAPE: seven items per D9 (Play Introduction / Tutorial / New Game /
+    Return to Current Game / Load Game / Save Game / Exit to DOS), Alt-L /
+    Alt-S hotkeys — any vendor-screenshot diff is a ruling.
+LEDGER: 17 closed / 3 OPEN (OQ-016, OQ-019 deferred per user — do NOT re-ask,
+do NOT apply the t329 S4 draft; OQ-027 opened t388b, closes on user hearing or
+pointer-law capture of the heap tune table). t389 closed NO row (strict-close:
+verify+push moves no measurement).
 
-t385 BOOT STATE MACHINE + TITLE SCREEN SHELL. Land the vendor boot
-sequence as an explicit state machine in the UI: TITLE -> (Intro |
-Tutorial | NewGame | Resume), Intro -> TITLE (movie exit), NewGame ->
-RACECONFIG, per ui.md §3 button law + refcap title-menu witness (title
-shot 9.2% palette-match = NOT movie = control screen; docs/re/refcap.md).
-Current --ui boots straight into runCampaignUi (ui.cpp:124) — wrap it:
-campaign entry becomes one transition, not the constructor path. Title
-screen renders the cited chrome: TITLERECT band + SUBFONT text via the
-existing VendorText renderer; menu buttons at the MEASURED rects (census
-them from windows.txt/menu shp records THIS row, bank the table). D9
-LAW (user 2026-11-14 + windows.txt): the menu is SEVEN items — Play
-Introduction / Tutorial / New Game / Return to Current Game / Load Game
-/ Save Game / Exit to DOS — rects (159,Y)-(477,Y+30), Y=200,240,...,440;
-hotkeys Alt-L Load, Alt-S Save (vendor screenshot). Exit to DOS = clean
-process exit (the port's equivalent of quitting to DOS). Pins:
-state transitions deterministic, click routing table test (synthetic
-events, no display — headless-safe), --ui still reaches campaign via
-Resume-equivalent path, --save observer + --campaign unaffected
-(gate-proven). HONEST SCOPE: title ART (the dinosaur figure) may be a
-movie frame or shp composite — NOT guessed this row; t386 decides.
-
-t385b D9 GAP CHECK (title shell vs SEVEN-button law). The t385 session
-launched BEFORE D9 was recorded; its prompt said "4 menu buttons". Audit
-t385's committed title shell against the D9 law in t385's text above:
-seven items, exact rects, Alt-L/Alt-S hotkeys, Exit-to-DOS = clean exit,
-"Return to Current Game" label (NOT "Resume"). Fix any gap + add the
-missing pins; if t385 already satisfies the law, bank the honest negative
-(zero diffs) and say so. Read docs/re/ui.md §3 correction marker first.
-
-t386 TITLE ART IDENTITY (the dinosaur-looking guy). [CLOSED 2026-11-14
-— title = 0opening.gif 1:1 + palette swap + key-255 menu hole; law,
-conflict-count witness, derived palette TSV in docs/re/title-art.md; see
-LANDED t386. Original row text kept below.] D9 LEAD (user
-testimony 2026-11-14): the figure may be the HEAD OF THE CHAMACHIES, a
-playable race ("brilliant scientists", help.txt L2424) that reads
-dinosaur-like — race art lives in race00..raceNN.dip + the .haz hazard
-remaps (media.md §4); census whether a Chamachies-family asset matches
-the title image. Determine MECHANICALLY
-what composes the vendor title image: census 0opening.shp records (record
-count, dims, palette) vs the two FLCs' known frames (logic.flc frame0
-digest 6c8bf570e4ba1ae8 = Logic Factory logo; intro65a frame digests
-banked flc.md §) vs the local pinned refcap/original-title-menu.png
-geometry. Deliverable: docs/re/title-art.md naming the exact source
-(lib+record or movie+frame) + the blit chain if statically walkable
-(class-table law applies: cite or name the edge), + decode/hash pins for
-whatever source wins. If composition stays ambiguous, bank the candidate
-table + what instrument would resolve it (user screenshot comparison IS
-allowed — user is the external grader).
-
-t387 MAIN MENU WIRING: NEW GAME + LOAD + RESUME. [CLOSED 2026-11-14 —
-NEWGAMEWND frame + 3 child buttons + RACELIST frame + LOAD screen over
-4loadgam chrome with real slot listing, torn-refusal, Esc-cancel,
-acknowledge-not-clamp clicks; law docs/re/boot.md §6, live witness + pins
-see LANDED t387. Original row text kept below.] Clicking New Game opens
-the race-configuration window (NEWGAMEWND windows.txt L580 + PARENT
-controls; art 3cfgnew.shp k0..k11 dot-wheel menus + 7racesel.shp; the
-validator-tagged span-free records t197); Load opens 4loadgam.shp chrome
-over the SAVE-slot list (slot law banked: raw .SAV u32@0 = game-day;
-supply-your-own dir ONLY — NEVER game/); Resume loads the last save
-(vendor RESUME.GAM equivalent = user-chosen slot in OUR app; do NOT fake
-a RESUME.GAM in game/). Implement window frame + button hit-map + slot
-list render via shp decode + VendorText. Pins: hit-map geometry, slot
-listing from REAL files in a temp dir (torn-tolerance law), refusal-not-
-clamp on junk saves. NEW GAME may stub the actual campaign-start seed
-with a named seam if mapgen wiring exceeds budget — say so in the row.
-
-t388 IN-GAME MENU BAR + STATUS WINDOW CHROME. [CLOSED 2026-11-14 —
-campaign STATE id-list screen law (123/123 records; t264 z-order inference
-superseded), rail routing msg1/p1 + Escape law, 10status.shp k0 639x479
-fully-opaque backdrop census, gate 4c-d live round trip; law
-docs/re/ui-runtime.md §7, full log docs/re/_wip_t388.md. HONEST NEGATIVES:
-no Galaxy/Production/Design button exists in windows.txt; SAVE/LOAD are
-title-state-only — Alt-L/Alt-S campaign chords are labelled port additions.
-Original row text kept below.] The campaign UI currently
-draws bare star dots + NEXTTURN rect. Land STATUSWND (windows.txt L1018 +
-PARENT controls L1036+; art 10status.shp) as the bottom bar, buttons per
-ui-runtime.md §6 (Galaxy/Species/Intelligence/Research/Production/Design/
-Save/Load — cite each button's rect from the table, do NOT invent).
-Opening each menu: implement the SCREEN SWITCH law for Galaxy (return to
-map) + Save/Load (reuse t387 windows); Species/Intelligence/Research/
-Production/Design render window FRAME + title only, content stubs named
-as seams (their laws live in ui-runtime.md §6b+, species/research docs).
-Right-click deselect law (selfplay.md) applies once selection widgets
-exist — note where it lands, no selection UI this row.
-
-t388b SOUND FIDELITY (D9: the port must SOUND like the original).
-[CLOSED 2026-11-14 — subtitle-script cue engine law + volume 0..127 drop-
-not-clamp + tune table {theme00,intro00,intro01} + silent-degrade + dead-
-mixer removal + --audio-trace instrument; live cue witness at frame 20;
-law docs/re/audio.md §6, session log docs/re/_wip_t388b.md. HONEST
-NEGATIVES: TUNEID index base NOT statically decidable (heap table) and
-per-button SFX ids are runtime-table-fed — both banked as OPEN row
-OQ-027; the row's '"2 10000 button" cited SFX id' premise was FALSE.
-Original row text kept below.] Evidence: soundfx.txt (id+rate+name table),
-29 theme*.raw music tracks (music.txt index), DIGITALMUSIC(TUNEID)+
-FADEMUSIC law (ui.md §4 intro script). Land in the EXISTING SDL2_mixer
-port (ui/audio.{h,cpp} — keep the t384b include law, never re-forward-
-declare opaque types): (1) .raw loader (rate from the table; verify the
-container is headerless PCM by byte-inspection first — if a header is
-found, cite it, don't guess); (2) SFX channel: menu click + button
-sounds wired to the t385/t388 hit-maps; (3) music: title-screen theme +
-campaign theme selection per any cited vendor law, else a named seam;
-(4) master volume law if statically cited, else seam. Headless-safe:
-audio init failure degrades to silent, NEVER aborts (CI has no sound
-card). Pins: loader byte-shape (first-N hash of a REAL theme*.raw),
-rate-table parse, silent-degrade path test. HONEST SCOPE: exact vendor
-channel/voice MIXING (how many simultaneous channels, priorities) is
-cited-or-seamed, not guessed.
-
-t389 PHASE-10 VERIFY + RE-EXPORT + PUSH. Full gate + run_tests (expect
-prior 270 + new pins, 0 failed) + headless --campaign seed regression
-(seeds 1/2024/23 headless logs must stay byte-identical — engine
-untouched rule; UI rows must not move sim rng). Fresh export via
-scripts/publish_public.sh GITHUB_USER=weylandsmith; verify vendor-free +
-build + tests WITHOUT data + identity; push (fast-forward expected;
-fetch FIRST per law; lease-pin if force ever needed). Then rewrite NEXT
-to WAIT-USER-RULING t374 verbatim (TAG LAW: field 2 WAIT*, never
-renumber) with a pointer that phase-10 landed + what user screenshots
-would grade (title art candidates from t386; SOUND check =
-user listens for theme + click SFX per t388b).
 OPEN ITEM: GitHub backend GC may still serve old commit SHAs (manual pages
 eb79da3-lineage) until support sweeps orphaned objects — user may email
 support.github.com. (Removal mechanics landed: docs/assets fully filtered,
@@ -403,6 +270,8 @@ PROTECTED (~/ascendancy-saves-protected/, law: raw .SAV u32@0 = game-day).
 A session woken by a DECISIONS.md edit or a *ruling*/*reply* file: read
 docs/DECISIONS.md, apply what the ruling says, close rows per strict-close,
 then author the next queue or re-park a WAIT sentinel.
+QUEUE: EMPTY — phase 10 fully drained (t385, t385b, t386, t387, t388, t388b,
+t389 all LANDED; per-row text lives in git history + LANDED blocks).
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
@@ -461,6 +330,30 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t389 — 2026-11-14 (PHASE-10 VERIFY + RE-EXPORT + PUSH)
+
+What landed: phase 10 is PUBLIC. Suite 293/0 (rebuild clean). SEED REGRESSION
+proven with a real baseline: worktree @ c7a3fda (last pre-phase-10 commit)
+built with matching EMPTY CMAKE_BUILD_TYPE; `--headless --campaign 1600`
+seeds 1/2024/23 byte-IDENTICAL base vs HEAD (md5 7e794a6d/332a8cf3/0a6b7876),
+victories Extinct t266 / Extinct t285 / Control t1406 == the t365 banked
+record — phase-10 UI/audio rows moved ZERO sim rng. Export
+/tmp/pubpush-t389 via publish_public.sh: vendor-free (6298 objects, 5.6M
+.git), uniform noreply identity, builds WITHOUT data 0 warnings incl.
+ascend_ui (t389 key-fact 1 survived the history filter), run_tests 293/196
+skipped/0 failed, gate --portable 0. PUSH: fetch-first law respected; TRAP
+banked — the export's `origin` is the local SRC clone path, so fetch/ls-remote
+grade the WRONG remote until `git remote set-url origin
+https://github.com/weylandsmith/ascendancy-rewrite.git`; remote tip was
+b2539b3, ancestor check FAST_FORWARD_OK, push b2539b3..36bf92d landed,
+ls-remote verified == 36bf92dbb4bd. Askpass helper deleted (verified absent).
+Ledger: NO row closed (strict-close — verify+push is not a measurement;
+OQ-027 stays open on user-hearing/pointer-law witnesses). NEXT re-parked as
+WAIT-USER-RULING t374 (tag law: never renumber) with the three concrete
+grading checks (title-art screenshot compare; --ui --audio theme00/intro00
+~1.4s/intro01 listen = OQ-027 closer; seven-item menu shape). Gate
+GATE_EXIT=0 + ledger_audit OK + ledger_index_check OK (17 closed / 3 open).
 
 ## LANDED t388b — 2026-11-14 (SOUND FIDELITY: SUBTITLE CUE ENGINE + VOLUME LAW + SILENT-DEGRADE)
 
