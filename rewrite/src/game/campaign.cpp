@@ -1166,7 +1166,7 @@ void Campaign::buildPhase() {
                 slotItems.push_back(ps.items[j]);
                 slotMpop.push_back(pi.mpop);
                 slotUpop.push_back(pi.upop);
-                slotReq.push_back(pi.requires);
+                slotReq.push_back(pi.reqByte);
             }
             auto demolishAt = [&](size_t j) {
                 const size_t k = order[j];
@@ -1263,7 +1263,7 @@ void Campaign::buildPhase() {
                 const PlanetItem& pi = (*items_)[id];
                 if (pi.upop > storedCapFor(s) - usedPop) continue;  // 0x3f574
                 if (pi.upop > ps.pop - usedPop) continue;        // cmd0 gate
-                if (!requiresAvailable(pi.requires, static_cast<int>(tree_->all().size()),
+                if (!requiresAvailable(pi.reqByte, static_cast<int>(tree_->all().size()),
                                        ownedTech[o]))
                     continue;
                 pick = id;
@@ -1282,7 +1282,7 @@ void Campaign::buildPhase() {
                 g.digArmed = ps.digQueuedOrDone != 0;
                 auto legal = [&](int id) {
                     return id >= 0 && id < static_cast<int>(items_->size()) &&
-                           requiresAvailable((*items_)[id].requires,
+                           requiresAvailable((*items_)[id].reqByte,
                                              static_cast<int>(tree_->all().size()),
                                              ownedTech[o]);
                 };
@@ -1356,7 +1356,7 @@ void Campaign::buildPhase() {
             for (int id = 0; id < 22 && id < static_cast<int>(items_->size()); ++id) {
                 if (id == 5) continue;  // Colony Base excluded 0x3f52d
                 const PlanetItem& pi = (*items_)[id];
-                if (!requiresAvailable(pi.requires, static_cast<int>(tree_->all().size()),
+                if (!requiresAvailable(pi.reqByte, static_cast<int>(tree_->all().size()),
                                        ownedTech[o]))
                     continue;  // S4 research law
                 if (pi.upop > storedCapFor(s) - usedPop) continue;  // 0x3f587

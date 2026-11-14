@@ -79,8 +79,8 @@ TEST(ship_hull_rows_verified) {
         if (items[i].name == "Shipyard") yard = int(i);
     }
     CHECK(ship >= 0 && yard >= 0);
-    CHECK(items[ship].cost == 20 && items[ship].requires == 1);
-    CHECK(items[yard].cost == 240 && items[yard].requires == 0);
+    CHECK(items[ship].cost == 20 && items[ship].reqByte == 1);
+    CHECK(items[yard].cost == 240 && items[yard].reqByte == 0);
 }
 
 TEST(ship_drive_levels_verified) {

@@ -322,7 +322,7 @@ public:
     // t202b DEMOLISH CHANNEL pickers — the two victim scans inside the AI
     // build evaluator FUN_0003f130 (docs/re/_wip_t202.md S1/S3/S5/S13;
     // verbatim disasm work/ai_selector_disasm.txt 0x3f178..0x3f209 and
-    // 0x3f354..0x3f418). `items`/`mpop`/`upop`/`requires` are parallel
+    // 0x3f354..0x3f418). `items`/`mpop`/`upop`/`reqCol` are parallel
     // arrays in SLOT order (the original walks the slot pointer +4i); the
     // return value is the SLOT index to demolish, or -1 for "no candidate".
     // OVER-CAP VICTIM 0x3f1bb..0x3f1c7: skip item 5 (Colony Base, 0x3f1a8),
@@ -351,13 +351,13 @@ public:
     // never binds" stands with this corrected reason.
     static int minRequiresDemolishPick(const std::vector<int>& items,
                                        const std::vector<int>& mpop,
-                                       const std::vector<int>& requires,
+                                       const std::vector<int>& reqCol,
                                        int margin) {
         int best = -1, bestR = 99999;  // 0x3f354 mov ecx,0x1869f
         for (size_t i = 0; i < items.size(); ++i) {
             if (items[i] < 0) continue;
             if (mpop[i] >= margin) continue;
-            if (requires[i] < bestR) { bestR = requires[i]; best = static_cast<int>(i); }
+            if (reqCol[i] < bestR) { bestR = reqCol[i]; best = static_cast<int>(i); }
         }
         return best;
     }

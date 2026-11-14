@@ -99,7 +99,7 @@ TEST(planitems_loads_39_with_requotes) {
     const ag::PlanetItem* truck = nullptr;
     int sentinels = 0;
     for (const auto& it : items) {
-        if (it.requires == 254 || it.requires == 255) ++sentinels;
+        if (it.reqByte == 254 || it.reqByte == 255) ++sentinels;
         if (it.name == "Ship") ship = &it;
         if (it.name == "Interstellar Trucking") truck = &it;
     }
@@ -108,12 +108,12 @@ TEST(planitems_loads_39_with_requotes) {
     if (ship) {
         // raw row: Ship 0 0 0 0 1 20 1 255  (cost=20, requires=1)
         CHECK(ship->cost == 20);
-        CHECK(ship->requires == 1);  // Interplanetary Exploration
+        CHECK(ship->reqByte == 1);  // Interplanetary Exploration
     }
     CHECK(truck != nullptr);
     if (truck) {
-        CHECK(truck->requires == 254);  // the undocumented sentinel
-        CHECK(!ag::requiresValidTech(truck->requires, 106));
+        CHECK(truck->reqByte == 254);  // the undocumented sentinel
+        CHECK(!ag::requiresValidTech(truck->reqByte, 106));
     }
 }
 

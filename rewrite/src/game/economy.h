@@ -34,7 +34,8 @@ struct PlanetItem {
     int ind = 0, res = 0, pros = 0;  // IND/RES/PROS columns (economy.md §1)
     int mpop = 0, upop = 0;          // MPOP/UPOP columns (units undocumented)
     int cost = 0;
-    int requires = 255;              // raw REQUIRES byte; see requiresAvailable
+    int reqByte = 255;               // raw REQUIRES byte; see requiresAvailable
+                                     // (t384: was `requires` — keyword in C++20)
     int flags = 0;                   // bitset; bit meanings MEASURED (income-law.md §4)
 };
 

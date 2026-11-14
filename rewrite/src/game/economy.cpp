@@ -222,7 +222,7 @@ std::vector<PlanetItem> loadPlanItems(const std::string& path, std::string& errO
         it.mpop = v[3];
         it.upop = v[4];
         it.cost = v[5];
-        it.requires = v[6];
+        it.reqByte = v[6];
         std::vector<int> pos(v.begin() + 7, v.end() - 1);
         const int bits = packFlags(pos, errOut, "planitem " + it.name);
         if (bits < 0) return {};
