@@ -258,15 +258,33 @@ shot 9.2% palette-match = NOT movie = control screen; docs/re/refcap.md).
 Current --ui boots straight into runCampaignUi (ui.cpp:124) — wrap it:
 campaign entry becomes one transition, not the constructor path. Title
 screen renders the cited chrome: TITLERECT band + SUBFONT text via the
-existing VendorText renderer; 4 menu buttons at the MEASURED rects (census
-them from windows.txt/menu shp records THIS row, bank the table). Pins:
+existing VendorText renderer; menu buttons at the MEASURED rects (census
+them from windows.txt/menu shp records THIS row, bank the table). D9
+LAW (user 2026-11-14 + windows.txt): the menu is SEVEN items — Play
+Introduction / Tutorial / New Game / Return to Current Game / Load Game
+/ Save Game / Exit to DOS — rects (159,Y)-(477,Y+30), Y=200,240,...,440;
+hotkeys Alt-L Load, Alt-S Save (vendor screenshot). Exit to DOS = clean
+process exit (the port's equivalent of quitting to DOS). Pins:
 state transitions deterministic, click routing table test (synthetic
 events, no display — headless-safe), --ui still reaches campaign via
 Resume-equivalent path, --save observer + --campaign unaffected
 (gate-proven). HONEST SCOPE: title ART (the dinosaur figure) may be a
 movie frame or shp composite — NOT guessed this row; t386 decides.
 
-t386 TITLE ART IDENTITY (the dinosaur-looking guy). Determine MECHANICALLY
+t385b D9 GAP CHECK (title shell vs SEVEN-button law). The t385 session
+launched BEFORE D9 was recorded; its prompt said "4 menu buttons". Audit
+t385's committed title shell against the D9 law in t385's text above:
+seven items, exact rects, Alt-L/Alt-S hotkeys, Exit-to-DOS = clean exit,
+"Return to Current Game" label (NOT "Resume"). Fix any gap + add the
+missing pins; if t385 already satisfies the law, bank the honest negative
+(zero diffs) and say so. Read docs/re/ui.md §3 correction marker first.
+
+t386 TITLE ART IDENTITY (the dinosaur-looking guy). D9 LEAD (user
+testimony 2026-11-14): the figure may be the HEAD OF THE CHAMACHIES, a
+playable race ("brilliant scientists", help.txt L2424) that reads
+dinosaur-like — race art lives in race00..raceNN.dip + the .haz hazard
+remaps (media.md §4); census whether a Chamachies-family asset matches
+the title image. Determine MECHANICALLY
 what composes the vendor title image: census 0opening.shp records (record
 count, dims, palette) vs the two FLCs' known frames (logic.flc frame0
 digest 6c8bf570e4ba1ae8 = Logic Factory logo; intro65a frame digests
@@ -303,6 +321,23 @@ as seams (their laws live in ui-runtime.md §6b+, species/research docs).
 Right-click deselect law (selfplay.md) applies once selection widgets
 exist — note where it lands, no selection UI this row.
 
+t388b SOUND FIDELITY (D9: the port must SOUND like the original).
+Evidence: soundfx.txt (id+rate+name table, e.g. "2 10000 button"), 29
+theme*.raw music tracks (music.txt index), DIGITALMUSIC(TUNEID)+
+FADEMUSIC law (ui.md §4 intro script). Land in the EXISTING SDL2_mixer
+port (ui/audio.{h,cpp} — keep the t384b include law, never re-forward-
+declare opaque types): (1) .raw loader (rate from the table; verify the
+container is headerless PCM by byte-inspection first — if a header is
+found, cite it, don't guess); (2) SFX channel: menu click + button
+sounds wired to the t385/t388 hit-maps; (3) music: title-screen theme +
+campaign theme selection per any cited vendor law, else a named seam;
+(4) master volume law if statically cited, else seam. Headless-safe:
+audio init failure degrades to silent, NEVER aborts (CI has no sound
+card). Pins: loader byte-shape (first-N hash of a REAL theme*.raw),
+rate-table parse, silent-degrade path test. HONEST SCOPE: exact vendor
+channel/voice MIXING (how many simultaneous channels, priorities) is
+cited-or-seamed, not guessed.
+
 t389 PHASE-10 VERIFY + RE-EXPORT + PUSH. Full gate + run_tests (expect
 prior 270 + new pins, 0 failed) + headless --campaign seed regression
 (seeds 1/2024/23 headless logs must stay byte-identical — engine
@@ -312,7 +347,8 @@ build + tests WITHOUT data + identity; push (fast-forward expected;
 fetch FIRST per law; lease-pin if force ever needed). Then rewrite NEXT
 to WAIT-USER-RULING t374 verbatim (TAG LAW: field 2 WAIT*, never
 renumber) with a pointer that phase-10 landed + what user screenshots
-would grade (title art candidates from t386).
+would grade (title art candidates from t386; SOUND check =
+user listens for theme + click SFX per t388b).
 OPEN ITEM: GitHub backend GC may still serve old commit SHAs (manual pages
 eb79da3-lineage) until support sweeps orphaned objects — user may email
 support.github.com. (Removal mechanics landed: docs/assets fully filtered,

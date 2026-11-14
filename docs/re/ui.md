@@ -29,7 +29,15 @@ TYPE=5 NAME=RACES            rect=(474,286)-(632,316) msg=1/7,1 help=1races
 TYPE=2 NAME=COSMOSWnd        rect=(7,7)-(465,472) msg=0/0,0 help=coswnd
 TYPE=0 NAME=ROTRIGHT         rect=(495,364)-(509,394) msg=51/999,0 help=1spin
 ```
-- the four menu buttons are exactly the main menu (Play Introduction / Tutorial / New Game / Resume), matching the manual — the UI rewrite can reproduce the opening screen from THIS file alone.
+- the main menu is SEVEN buttons (D9 user correction 2026-11-14, matching
+  the table above verbatim: Play Introduction / Tutorial / New Game /
+  Return to Current Game / Load Game / Save Game / Exit to DOS, rects
+  (159,200..470) step 40). Earlier prose here said "four" — WRONG, kept
+  as a correction marker. Vendor title screenshot (refcap pin, external
+  vision read 2026-11-14) shows six labels; Exit to DOS is presumably
+  just below that capture's crop — the windows.txt table is authoritative
+  for the seventh. Hotkeys visible in the vendor shot: Load=Alt-L,
+  Save=Alt-S.
 
 ## 4. subtitle.txt = intro movie script [verified]
 - **12** FRAMENUMBER-triggered blocks; command keys: {'SUBTITLE': 18, 'TEXT': 18, 'FRAME_START': 18, 'FRAME_END': 18, 'FRAMENUMBER': 12, 'DELAY': 5, 'FRAME_RATE': 5, 'FADEMUSIC': 5, 'CHANNEL': 5, 'VOLUME': 5, 'DIGITALMUSIC': 2, 'TUNEID': 2, 'COMMAND': 2, 'TITLEBOX': 1, 'TITLERECT_X0': 1, 'TITLERECT_Y0': 1, 'TITLERECT_X1': 1, 'TITLERECT_Y1': 1, 'SUBFONT': 1, 'FONTFILE': 1, 'FONTPALETTE': 1, 'FONTPALSTART': 1, 'FONTPALCOUNT': 1, 'FONTBACKCOLOR': 1, 'END': 1}
