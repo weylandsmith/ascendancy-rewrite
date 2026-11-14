@@ -222,9 +222,14 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-USER-RULING t374 — PUSH DONE 2026-11-12, RE-PUSHED CLEAN x2
-(user orders): https://github.com/weylandsmith/ascendancy-rewrite.git
-main = ae460da4e728 (verified ls-remote). REMOVALS: (1) docs/assets/
+NEXT WAIT-USER-RULING t374 — PUSH DONE, RE-PUSHED x3 (latest 2026-11-14):
+https://github.com/weylandsmith/ascendancy-rewrite.git main = e113a39ffd70
+(verified ls-remote; diff vs prior remote = audio.h portability fix +
+sentinel record ONLY; user README commits native in working repo now).
+PORTABILITY FIX: audio.h forward-declared 'struct Mix_Music' — SDL2_mixer
+2.8.0 tags it _Mix_Music, 2.8.1 tags Mix_Music; typedef conflict silently
+killed ascend_ui on the user's 2.8.0 box (build/ascendancy missing). Law:
+NEVER hand-forward-declare vendor typedefs. REMOVALS: (1) docs/assets/
 manual-jpg manual pages; (2) SAME DAY extended to the WHOLE docs/assets/
 tree — intro/logic decoded movie frames, vendor font sheets, original-game
 screenshots (gate 4f pins; stage self-skips when absent), all vendor-
