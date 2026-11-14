@@ -20,7 +20,8 @@ TEST(campaign_free_tech_grant_law_t203) {
     // queued (0x46ee6), and owned count advances exactly +1 per grant.
     auto c = makeCampaignForDemolish(202);
     const int owner = 1;
-    const int target = 7;
+    // (t384b: dropped unused `target` — this pin runs through repeated
+    // grants, not a single-target lookup.)
     // leave queuedTech as-is after a turn: researchPhase owns that field;
     // instead pin through repeated grants + the owned-count bookkeeping.
     int before = c.techsOwned(owner);

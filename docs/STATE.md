@@ -222,40 +222,107 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-USER-RULING t374 — PUSH DONE, LATEST 2026-11-14:
-https://github.com/weylandsmith/ascendancy-rewrite.git main = c02e3ad6f88f
-(verified ls-remote; FAST-FORWARD e113a39..c02e3ad — user README commits
-native in working repo, no force needed anymore; t384 requires->reqByte
-rename landed, -std=c++20 syntax-check RC=0 proven).
-PORTABILITY FIX: audio.h forward-declared 'struct Mix_Music' — SDL2_mixer
-2.8.0 tags it _Mix_Music, 2.8.1 tags Mix_Music; typedef conflict silently
-killed ascend_ui on the user's 2.8.0 box (build/ascendancy missing). Law:
-NEVER hand-forward-declare vendor typedefs. REMOVALS: (1) docs/assets/
-manual-jpg manual pages; (2) SAME DAY extended to the WHOLE docs/assets/
-tree — intro/logic decoded movie frames, vendor font sheets, original-game
-screenshots (gate 4f pins; stage self-skips when absent), all vendor-
-derived. Filter + fail-closed gate + .gitignore cover docs/assets; local
-copies KEPT untracked; loader.md/refcap.md annotated regenerate-locally.
-User web-UI README commits survive every rewrite via cherry-pick (verified
-README diff == 0 vs remote before pushing). LAW REAFFIRMED: git fetch
-BEFORE any force-push.
-OPEN: GitHub backend GC may still serve old commit SHAs until support
-sweeps orphaned objects — user may want to email support.github.com citing
-the repo + commits eb79da3-lineage. Transport law: SSH firewalled both
-routes; HTTPS + ~/.config/gh-pub-token PAT via GIT_ASKPASS helper
-(delete after use); NEVER push from the working repo.
+NEXT t385 per queue row t385 below (phase 10: TITLE-SCREEN + MENU UI).
+The WAIT-USER-RULING t374 sentinel is RETIRED — user spoke 2026-11-14
+(verbatim in DECISIONS.md D8): recreate the ORIGINAL interface — boot goes
+to the title screen ("the dinosaur-looking guy at the top"), all menu
+options present. PUSH STATE: remote main = c02e3ad6f88f (2026-11-14,
+fast-forward; user README commits native; t384 requires->reqByte rename
+pushed; portability law banked: NEVER hand-forward-declare vendor
+typedefs — SDL2_mixer 2.8.0 vs 2.8.1 struct-tag drift). Push route:
+HTTPS + ~/.config/gh-pub-token PAT via GIT_ASKPASS helper (delete after
+use); NEVER push from the working repo; re-export + re-verify per row t389.
+
+QUEUE (phase 10 — TITLE-SCREEN + MENU UI; user D8 2026-11-14. Evidence
+base ALREADY BANKED: windows.txt window inventory (NEWGAMEWND L580,
+STATUSWND L1018, HELPINDEX newgame/loadgame/savegame), docs/re/ui.md §3
+(4 menu buttons = main menu: Play Introduction / Tutorial / New Game /
+Resume; TITLERECT 0,379-639,419 + SUBFONT slots 240..255), docs/re/
+ui-runtime.md §6/6b (in-game menu bar + Species/Intelligence menus),
+chrome shape libs in extracted/ascend01/data (0opening, 10status,
+2savegam, 4loadgam, 3cfgnew, 7racesel, 1starmap), Flic decoder + --intro
+law (docs/re/flc.md), VendorText .fnt renderer (ui.cpp), refcap palette
+instrument (scripts/refcap_match.py). VERIFICATION RULE for this phase:
+R13 still bans self-graded VISION of our own renders — verify with cited
+GEOMETRY (windows.txt rects), MECHANICAL instruments (palette-law color
+sampling, decode hashes, click->state-wiring unit tests on the state
+machine itself), and honest negatives where only a human eye can judge.
+One session each; finish tN -> NEXT tN+1 VERBATIM; game/ read-only; t382
+--save observer must NOT regress; gate + both audits before commit.)
+
+t385 BOOT STATE MACHINE + TITLE SCREEN SHELL. Land the vendor boot
+sequence as an explicit state machine in the UI: TITLE -> (Intro |
+Tutorial | NewGame | Resume), Intro -> TITLE (movie exit), NewGame ->
+RACECONFIG, per ui.md §3 button law + refcap title-menu witness (title
+shot 9.2% palette-match = NOT movie = control screen; docs/re/refcap.md).
+Current --ui boots straight into runCampaignUi (ui.cpp:124) — wrap it:
+campaign entry becomes one transition, not the constructor path. Title
+screen renders the cited chrome: TITLERECT band + SUBFONT text via the
+existing VendorText renderer; 4 menu buttons at the MEASURED rects (census
+them from windows.txt/menu shp records THIS row, bank the table). Pins:
+state transitions deterministic, click routing table test (synthetic
+events, no display — headless-safe), --ui still reaches campaign via
+Resume-equivalent path, --save observer + --campaign unaffected
+(gate-proven). HONEST SCOPE: title ART (the dinosaur figure) may be a
+movie frame or shp composite — NOT guessed this row; t386 decides.
+
+t386 TITLE ART IDENTITY (the dinosaur-looking guy). Determine MECHANICALLY
+what composes the vendor title image: census 0opening.shp records (record
+count, dims, palette) vs the two FLCs' known frames (logic.flc frame0
+digest 6c8bf570e4ba1ae8 = Logic Factory logo; intro65a frame digests
+banked flc.md §) vs the local pinned refcap/original-title-menu.png
+geometry. Deliverable: docs/re/title-art.md naming the exact source
+(lib+record or movie+frame) + the blit chain if statically walkable
+(class-table law applies: cite or name the edge), + decode/hash pins for
+whatever source wins. If composition stays ambiguous, bank the candidate
+table + what instrument would resolve it (user screenshot comparison IS
+allowed — user is the external grader).
+
+t387 MAIN MENU WIRING: NEW GAME + LOAD + RESUME. Clicking New Game opens
+the race-configuration window (NEWGAMEWND windows.txt L580 + PARENT
+controls; art 3cfgnew.shp k0..k11 dot-wheel menus + 7racesel.shp; the
+validator-tagged span-free records t197); Load opens 4loadgam.shp chrome
+over the SAVE-slot list (slot law banked: raw .SAV u32@0 = game-day;
+supply-your-own dir ONLY — NEVER game/); Resume loads the last save
+(vendor RESUME.GAM equivalent = user-chosen slot in OUR app; do NOT fake
+a RESUME.GAM in game/). Implement window frame + button hit-map + slot
+list render via shp decode + VendorText. Pins: hit-map geometry, slot
+listing from REAL files in a temp dir (torn-tolerance law), refusal-not-
+clamp on junk saves. NEW GAME may stub the actual campaign-start seed
+with a named seam if mapgen wiring exceeds budget — say so in the row.
+
+t388 IN-GAME MENU BAR + STATUS WINDOW CHROME. The campaign UI currently
+draws bare star dots + NEXTTURN rect. Land STATUSWND (windows.txt L1018 +
+PARENT controls L1036+; art 10status.shp) as the bottom bar, buttons per
+ui-runtime.md §6 (Galaxy/Species/Intelligence/Research/Production/Design/
+Save/Load — cite each button's rect from the table, do NOT invent).
+Opening each menu: implement the SCREEN SWITCH law for Galaxy (return to
+map) + Save/Load (reuse t387 windows); Species/Intelligence/Research/
+Production/Design render window FRAME + title only, content stubs named
+as seams (their laws live in ui-runtime.md §6b+, species/research docs).
+Right-click deselect law (selfplay.md) applies once selection widgets
+exist — note where it lands, no selection UI this row.
+
+t389 PHASE-10 VERIFY + RE-EXPORT + PUSH. Full gate + run_tests (expect
+prior 270 + new pins, 0 failed) + headless --campaign seed regression
+(seeds 1/2024/23 headless logs must stay byte-identical — engine
+untouched rule; UI rows must not move sim rng). Fresh export via
+scripts/publish_public.sh GITHUB_USER=weylandsmith; verify vendor-free +
+build + tests WITHOUT data + identity; push (fast-forward expected;
+fetch FIRST per law; lease-pin if force ever needed). Then rewrite NEXT
+to WAIT-USER-RULING t374 verbatim (TAG LAW: field 2 WAIT*, never
+renumber) with a pointer that phase-10 landed + what user screenshots
+would grade (title art candidates from t386).
+OPEN ITEM: GitHub backend GC may still serve old commit SHAs (manual pages
+eb79da3-lineage) until support sweeps orphaned objects — user may email
+support.github.com. (Removal mechanics landed: docs/assets fully filtered,
+fail-closed gate + .gitignore, local copies untracked.)
+Standing context: OQ-016/OQ-019 acceptance DEFERRED (rows stay OPEN; do
+NOT re-ask, do NOT apply the t329 S4 draft); user saves 887/1086/1253
+PROTECTED (~/ascendancy-saves-protected/, law: raw .SAV u32@0 = game-day).
 A session woken by a DECISIONS.md edit or a *ruling*/*reply* file: read
 docs/DECISIONS.md, apply what the ruling says, close rows per strict-close,
-then author the next queue or re-park this sentinel.
-User context (spoke 2026-11-11, verbatim quotes in DECISIONS.md USER block):
-OQ-016/OQ-019 acceptance DEFERRED (rows stay OPEN; do NOT re-ask, do NOT
-apply the t329 S4 draft); playtest witnesses stand as the evidence base;
-"incorporate all findings in the rewrite before pushing to github" (D7 —
-DONE, pushed); user saves 887/1086/1253 PROTECTED
-(~/ascendancy-saves-protected/, law: raw .SAV u32@0 = game-day).
-QUEUE: EMPTY — phase 9 fully drained (t383 was the last row, LANDED below).
-After the user's next word, author the next queue or park the WAIT-TRIGGER
-sentinel per the standing law below.
+then author the next queue or re-park a WAIT sentinel.
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster

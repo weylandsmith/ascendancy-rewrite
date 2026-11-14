@@ -764,7 +764,7 @@ TEST(campaign_visibility_law_oq026_t195) {
     for (int t = 0; t < 30 && !c2.over(); ++t) c2.advance();
     CHECK(c2.visibleLaneCountFor(0) >= v0);
     CHECK(c2.visibleLaneCountFor(1) >= v1);
-    CHECK(c2.cosmosStarsFor(0).size() == starsAlways);  // stars ALWAYS listed
+    CHECK(static_cast<int>(c2.cosmosStarsFor(0).size()) == starsAlways);  // stars ALWAYS listed
 
     // (4) SA_KnowStarLanes (L2295 "see all star lanes") on the PLAYER
     // (cfg.playerSpecies is the SA_ index; abilities[i] belongs to owner

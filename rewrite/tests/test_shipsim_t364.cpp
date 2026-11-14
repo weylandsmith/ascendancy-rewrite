@@ -29,7 +29,10 @@ as::SimDesign gunRow(int32_t power, int32_t range, int32_t dmg,
     d.numUses = uses; d.targetShip = true; d.rowWeapon = dmg;
     return d;
 }
-as::SimDesign shieldRow(int32_t cost, int32_t level) {
+[[maybe_unused]] as::SimDesign shieldRow(int32_t cost, int32_t level) {
+    // KEPT: encodes the cited cat-1 shield-row shape (upkeepGate law,
+    // ships.md §6) for future shield pins; t364's shipped pins engage the
+    // gun path only.
     as::SimDesign d;
     d.cat = 1; d.power = cost; d.level = level;
     d.upkeepGate = true; d.rowShield = level;

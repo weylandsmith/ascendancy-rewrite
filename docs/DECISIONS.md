@@ -218,3 +218,17 @@ vendor data, and a new history scrub (personal email was living in 25 old
 blobs; docs/re/packaging.md S12). PUSH = USER-GO: from /tmp/pubpush-t383b
 run `git push -u origin main` (needs your SSH key or token — neither is on
 the box yet). The loop waits for that GO and will not push itself.
+
+## D8 — RECREATE THE ORIGINAL INTERFACE (USER, 2026-11-14, verbatim)
+
+> OK can you set up the loop to recreate the original interface in the
+> rewrite? When the game loads, it should go to the main screen with the
+> dinosaur-looking guy at the top, all the menu options should be present,
+> etc.
+
+Applied: phase-10 queue t385-t389 authored (boot state machine + title
+screen shell; title-art identity for the dinosaur figure; New Game/Load/
+Resume wiring; STATUSWND in-game menu bar; verify+export+push). Evidence:
+ui.md §3 four-button main-menu law + TITLERECT, windows.txt NEWGAMEWND/
+STATUSWND, chrome shp libs, Flic decoder, VendorText. R13 unchanged:
+mechanical verification + user as external grader for look-and-feel.

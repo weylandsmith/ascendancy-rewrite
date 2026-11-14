@@ -119,7 +119,6 @@ TEST(score_visibility_gate_is_player_bit_t284) {
 TEST(score_contest_gate_t284) {
     REQUIRE_DATA();
     auto c = makeCampaignForDemolish(2026);
-    const int n = static_cast<int>(c.galaxy().stars.size());
     openGalaxy(c);
     const int home = playerHome(c);
     int la = -1, lb = -1;
