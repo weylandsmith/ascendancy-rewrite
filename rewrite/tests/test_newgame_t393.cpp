@@ -125,6 +125,10 @@ TEST(newgame_t393_summary_template_static168) {
 }
 
 TEST(newgame_t393_lore_file_real_data) {
+    // t396: REQUIRE_DATA — on a data-less clone the loader fails, lore stays
+    // EMPTY, and lore[0] below is UB (MEASURED: SIGSEGV 139 on the export
+    // tree; harness law — skip counted separately, never a silent pass).
+    REQUIRE_DATA();
     // The REAL extracted/ascend00/newgame.txt: 21 fragments, specnum order,
     // EOF marker 0x1a. Minions (specnum 0) quoted VERBATIM from the file
     // (the same sentence the user-supplied original shows in green).
