@@ -251,3 +251,19 @@ capture crop). (2) t386 gets the Chamachies-head lead for the title art.
 theme raws + DIGITALMUSIC/FADEMUSIC law via the SDL2_mixer port). Queue
 rows amended mid-run; running t385 session predates the amendment —
 t385b closes any four-vs-seven gap.
+
+## D10 — UI FIDELITY ROUND 2 + SOUND (USER GRADE, 2026-11-14, verbatim excerpts)
+
+> the text is just a tad bit too high in the boxes, and the "Alt-L"/
+> "Alt-S"/"Alt-X" second lines are missing on the last three buttons
+> ... The "New Game" screen is garbled and unusable, and the galaxy map
+> screen is still wonky. ... All the buttons off the galaxy map are
+> wonky too. ... I'm not hearing any sound playing the rebuild on Athens.
+> Let's get the UI right in all the screens.
+
+Reference material: scratchpad/{galaxymap,newgame}-{original,rewrite}.png
+(originals from archive.org, "rendering a bit roughly" — user will
+replace with a better source; scratchpad/ is gitignored + publish-
+excluded: vendor-copyright captures). Applied as phase 11 rows
+t392-t396. External-vision reads of the USER-SUPPLIED originals are
+allowed evidence (R13 covers our own renders only).
