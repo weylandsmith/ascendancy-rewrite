@@ -230,11 +230,30 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t390 per queue row t390 below (TITLE ART BLIT). The WAIT-USER-RULING
-t374 sentinel is RETIRED: the user GRADED phase 10 (2026-11-14, verbatim
-"it's still not drawing the UI") and the grade found a real gap — t386
-identified the title art (0opening.gif) but NO row blitted it; PIL scan
-of our own render: art-zone mass 0. t390 + t391 queued. Banked below.
+NEXT t391 PRESENTATION SWEEP (row text below; ordering: the title art the
+user graded missing LANDED t390, so the same class of gap — vector chrome
+where the vendor has art — must now be audited on the OTHER screens before
+any further user grading is offered). t390 LANDED 2026-11-14, banked below
+(t390-artzone-witness.png: art-zone mass 0 -> 124,800).
+
+t390 LANDED 2026-11-14 (title art blit — user grade "still not drawing the
+UI" mechanically closed on our own render): C++ GIF87a index-plane decoder
+rewrite/src/formats/gif.{h,cpp} BIT-EXACT vs the PIL reference plane
+(ndiff 0 / 307,200 B; FNV pins tests/test_gif_t390.cpp; code-width law
+grow-at-next>=2^width MEASURED, early-change desyncs at 11208; interlace
+read from the IMAGE DESCRIPTOR — the logical screen byte 0xd7 is a TRAP);
+titlepalette.{h,cpp} loads title_palette_t386.tsv (52 mapped, GCT fallback
+flagged per-index); title.cpp blits at (0,0) with index-255 alpha-0 key
+hole, then band fill (0,0,8) + VendorText white (215,215,215) per the NEW
+BAND-CLOSURE LAW (measured per band on the pinned vendor shot: rect pixels
+are EXACTLY fill+white). NEW NEGATIVE [verified]: 0opening.shp strips are
+NOT the label glyphs (best shift overlap 74/234; bbox mismatch) — t386 §7
+composition corrected, residue banked title-art.md §6.6. Witness
+work/r1/loop/t390-artzone-witness.png + scripts/t390_artmass.py PASS
+(mass 124,800, all 7 bands other=0, top-5 colours in TSV vendor set).
+297 tests 0 failed; --campaign 400 seed 1 spot-check Extinct t266 ==
+record. NO ledger row moved (strict-close; queue work). Full evidence
+docs/re/title-art.md §8.
 
 PHASE 10 LANDED + PUSHED, LATEST 2026-11-14:
 https://github.com/weylandsmith/ascendancy-rewrite.git main = 36bf92dbb4bd
@@ -251,8 +270,9 @@ Control t1406 == t365 record). Full witness docs/re/packaging.md t389 block
 
 WHAT THE USER CAN GRADE (the only closers left need a human witness):
 (1) TITLE ART: run --ui, compare the title screen against the vendor game —
-    t386 law says 0opening.gif 1:1 + palette swap (docs/re/title-art.md);
-    a screenshot of either screen settles candidates.
+    t390 LANDED the blit (0opening.gif 1:1 + palette swap, docs/re/title-art.md
+    §8); our current render is screenshotted at work/r1/loop/
+    t390-artzone-witness.png — a screenshot of either screen settles it.
 (2) SOUND (grades OQ-027 1-based law): run --ui --audio (real device);
     listen for theme00 loop at the TITLE screen; click Play Introduction —
     intro00 should start ~1.4 s in (frame 20 x 71 ms) and switch to intro01
@@ -266,7 +286,12 @@ do NOT apply the t329 S4 draft; OQ-027 opened t388b, closes on user hearing or
 pointer-law capture of the heap tune table). t389 closed NO row (strict-close:
 verify+push moves no measurement).
 
-t390 TITLE ART BLIT (user 2026-11-14: "it's still not drawing the UI").
+t390 TITLE ART BLIT — LANDED 2026-11-14 (see LANDED block above +
+title-art.md §8). (1) GIF decoder LANDED bit-exact; (2) TSV palette LANDED;
+(3) blit + key-255 skip LANDED; (4) "0opening.shp strips + text" — the
+STRIPS HALF REFUTED by measurement (§8.3): fill + VendorText is what the
+vendor shot shows; strip role residue §6.6. USER GRADING STILL OPEN on the
+LOOK (see item (1) below).
 MECHANICAL WITNESS (PIL scan of our own Xvfb screenshot — our own render,
 self-graded VISION stays banned, geometry/mass counting is mechanical):
 art zone rows 0-195 mass = 0 non-bg pixels; menu zone 195-475 mass 1006.

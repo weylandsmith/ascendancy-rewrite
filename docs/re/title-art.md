@@ -116,6 +116,13 @@ participates.
    can only see 0..439.
 5. No OQ ledger row moved: t386 is phase-10 QUEUE work (STATE.md), the
    strict-close ledger (OQ-016, OQ-019 open) is untouched.
+6. t390 residue (§8.3): HOW the engine uses 0opening.shp at the title
+   screen is unresolved (windows.txt TYPE 100 declares the lib; the strips
+   are measurably NOT the label glyphs). Candidates: hover/selected button
+   state art, or a fill layer under the TEXTITEM render. Instrument that
+   would resolve it: live-RAM diff of the draw-time verbatim library copy
+   (shp.md §10/S12) while hovering a button — NOT tried; the screen closes
+   the band law without it.
 
 ## 7. Port implementation checklist (feeds t387+)
 
@@ -128,3 +135,44 @@ participates.
 - Verification for t387's own pixel work: registration conflict-count at
   shift 0 against OUR captures (self-graded VISION still banned; conflict
   counting on our own index plane vs our own screenshot is mechanical).
+
+## 8. t390 LANDED 2026-11-14 — the blit exists, art-zone mass 0 -> 124,800
+
+Instruments (all re-runnable): `scripts/t390_strip_witness.py`,
+`t390_textmatch.py` (venv python), `t390_gifref.py`, `t390_lzwmirror.py`,
+`t390_slices.py`, `t390_artmass.py`; screenshot harness
+`scripts/r1_t390_titleshot.sh`; witness
+`work/r1/loop/t390-artzone-witness.png`.
+
+Code: `rewrite/src/formats/gif.{h,cpp}` (GIF87a single-frame index-plane
+decoder, refuse-not-clamp), `rewrite/src/ui/titlepalette.{h,cpp}` (TSV
+load + GCT fallback flagged per-index), `title.cpp` blit + band fill;
+pins `rewrite/tests/test_gif_t390.cpp` (297 tests, 0 failed).
+
+New measurements that REFINE §7:
+1. INTERLACE TRAP [verified]: the file's LOGICAL SCREEN packed byte is
+   0xd7 (interlace bit SET) while the IMAGE DESCRIPTOR packed byte (offset
+   790) is 0x00 (not interlaced). The decoder reads interlace from the
+   descriptor (spec law) and refuses if set.
+2. CODE-WIDTH LAW [verified vs PIL]: grow when next >= 2^width. The
+   "early change" variant desyncs at output 11208 of THIS file
+   (t390_lzwmirror.py two-variant test). The C++ decoder now matches the
+   PIL plane BIT-EXACTLY (ndiff 0 over 307,200 B; FNV pins in the test).
+3. THE SHP STRIPS ARE NOT THE LABELS [verified]: state-k strip ink
+   (values 15/145; fills 242) vs the pinned shot's white(44) mask — best
+   shift overlap 74/234 at (dx,dy)=(-23,-2), ink bbox cols 89..227 vs text
+   cols 275..361. §7's "shp strips + text" composition is WRONG for the
+   labels; the white labels come from the TEXTITEM render. The strips'
+   role at the title screen stays an honest residue (§6.6).
+4. BAND-CLOSURE LAW [verified per band]: every pixel inside a button rect
+   of the pinned shot is EXACTLY flat fill (0,0,8) + label white
+   (215,215,215) (k1 carries 40 black AA pixels; k6 is below the capture).
+   The port therefore paints fill + VendorText into the key hole — and our
+   own render now closes the same law (t390_artmass.py: every band
+   other=0, fill 9.3-9.5k, white 106-311).
+5. ART-ZONE VERDICT on our render [verified, mechanical]: rows 0..194
+   non-bg mass 124,800 (was 0 at assignment), top-5 colours all in the
+   TSV vendor set ((215,138,56) first — the t386 §4 example pair).
+   `ui title art ok 640x480 key255-hole` in the run log.
+6. §7 wordmark law respected: no text/band frame drawn when the art is
+   present (fallback keeps the old honest-vector render).

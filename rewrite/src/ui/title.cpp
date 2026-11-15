@@ -14,20 +14,66 @@
 #include <algorithm>
 #include <vector>
 
+#include "formats/gif.h"
 #include "formats/shp.h"
 #include "ui/boot.h"
 #include "ui/menulaw.h"
+#include "ui/titlepalette.h"
 #include "ui/ui_internal.h"
 
 namespace ascend::ui {
 
 namespace {
 const SDL_Color kTitleBg{10, 12, 26, 255};
-const SDL_Color kInk{235, 235, 235, 255};
+// t390 band-closure law (measured per band on the pinned vendor shot,
+// scripts/t390_strip_witness.py C): every pixel inside a button rect is
+// EXACTLY the flat fill (0,0,8) or the label white (215,215,215).
+const SDL_Color kInk{215, 215, 215, 255};
 const SDL_Color kBand{150, 130, 110, 255};
+const SDL_Color kButtonFill{0, 0, 8, 255};
 
-// t387 chrome blit + the load screen: moved to vendortext.cpp (t388) so the
-// campaign loop shares identical chrome semantics; declared in ui_internal.h.
+// t390: build the title texture once — 0opening.gif index plane through the
+// t386 palette, index 255 (the menu key-solid, title-art.md §2) as alpha 0
+// so the button column composites on top. False + reason on any refusal
+// (no fake art substituted; the frame then renders honestly-vector).
+bool buildTitleTexture(SDL_Renderer* ren, const std::string& dataRoot,
+                       SDL_Texture** out, std::string* err) {
+    ascend::formats::GifFrame fr;
+    if (!ascend::formats::gifDecodeFile(
+            dataRoot + "/extracted/ascend01/data/0opening.gif", &fr, err))
+        return false;
+    TitlePalette pal;
+    std::string perr;
+    if (!pal.load(dataRoot, fr.gct.data(), fr.gct.size(), &perr)) {
+        // Palette TSV absent (data-less clone): GCT fallback would be
+        // honest-vector but NOT the vendor colours — refuse instead.
+        *err = perr;
+        return false;
+    }
+    if (fr.width != kDisplayW || fr.height != kDisplayH) {
+        *err = "title gif is not 640x480";
+        return false;
+    }
+    std::vector<uint32_t> argb(fr.indices.size());
+    for (size_t i = 0; i < fr.indices.size(); i++) {
+        const uint8_t idx = fr.indices[i];
+        if (idx == 255) { argb[i] = 0x00000000u; continue; }  // key hole
+        argb[i] = 0xFF000000u | (uint32_t(pal.rgb[idx][0]) << 16) |
+                  (uint32_t(pal.rgb[idx][1]) << 8) | pal.rgb[idx][2];
+    }
+    SDL_Texture* tex =
+        SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                          SDL_TEXTUREACCESS_STATIC, int(fr.width),
+                          int(fr.height));
+    if (!tex) {
+        *err = std::string("title texture: ") + SDL_GetError();
+        return false;
+    }
+    SDL_UpdateTexture(tex, nullptr, argb.data(),
+                      int(fr.width) * int(sizeof(uint32_t)));
+    *out = tex;
+    return true;
+}
 }  // namespace
 
 BootState runTitleScreen(const std::string& dataRoot, BootState initial,
@@ -66,6 +112,21 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
         std::fflush(stdout);
     }
 
+    // t390 TITLE ART (docs/re/title-art.md §7): the GIF decodes ONCE and
+    // lives as a static texture (the cfgNew pattern). A refusal prints the
+    // reason ONCE and the frame renders honestly-vector (no fake art).
+    SDL_Texture* titleArt = nullptr;
+    {
+        std::string aerr;
+        if (!buildTitleTexture(ren, dataRoot, &titleArt, &aerr)) {
+            std::printf("ui title art refused: %s\n", aerr.c_str());
+            std::fflush(stdout);
+        } else {
+            std::printf("ui title art ok 640x480 key255-hole\n");
+            std::fflush(stdout);
+        }
+    }
+
     // Overlay states that have no driver yet: draw the seam message, any
     // key/click-outside returns to Title. Never silently do nothing.
     auto seamLoop = [&](const char* line) {
@@ -80,24 +141,34 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
     };
 
     while (st == BootState::Title || st == BootState::RaceConfig) {
-        // ---- draw: caption band + the seven-button column ----
+        // ---- draw: ART first, then the seven-button column in its hole ----
         SDL_SetRenderDrawColor(ren, kTitleBg.r, kTitleBg.g, kTitleBg.b, 255);
         SDL_RenderClear(ren);
-        // TITLERECT 0,379-639,419 [verified, subtitle.txt / ui.md §4]: the
-        // vendor caption band. Title art identity is t386; the band frame +
-        // game name are what is geometry-verified today.
-        SDL_Rect band{0, 379, 640, 41};
-        SDL_SetRenderDrawColor(ren, kBand.r, kBand.g, kBand.b, 255);
-        SDL_RenderDrawRect(ren, &band);
-        {
+        if (titleArt) {
+            // The wordmark and creature are INSIDE the GIF (t386 §7) — no
+            // text is drawn for them. Index 255 carries alpha 0, so the
+            // button column below shows through the key hole.
+            SDL_RenderCopy(ren, titleArt, nullptr, nullptr);
+        } else {
+            // Honestly-vector fallback (pre-t390 render): caption band
+            // frame + game name (TITLERECT, subtitle.txt / ui.md §4).
+            SDL_Rect band{0, 379, 640, 41};
+            SDL_SetRenderDrawColor(ren, kBand.r, kBand.g, kBand.b, 255);
+            SDL_RenderDrawRect(ren, &band);
             const std::string name = "ASCENDANCY";
             const int w = txt.width(name, true);
             txt.draw(ren, (kDisplayW - w) / 2, 385, name, true, kInk);
         }
         for (int i = 0; i < kTitleButtonCount; i++) {
             const TitleButton& b = kTitleButtons[i];
-            // Label centred in the vendor rect; the rect itself is the hit
-            // law (boot.h), drawn here only as its text baseline frame.
+            // Band-closure law (measured on the pinned vendor shot): the
+            // rect is EXACTLY flat fill + white label; the GIF's key hole
+            // is the same rect, so fill before the label either way.
+            SDL_Rect r{b.rect.x0, b.rect.y0,
+                       b.rect.x1 - b.rect.x0 + 1, b.rect.y1 - b.rect.y0 + 1};
+            SDL_SetRenderDrawColor(ren, kButtonFill.r, kButtonFill.g,
+                                   kButtonFill.b, 255);
+            SDL_RenderFillRect(ren, &r);
             const int w = txt.width(b.label, true);
             txt.draw(ren, b.rect.x0 + (b.rect.x1 - b.rect.x0 - w) / 2,
                      b.rect.y0 + 4, b.label, true, kInk);
@@ -228,6 +299,7 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
     }
 
     txt.release();  // atlases before their renderer
+    if (titleArt) SDL_DestroyTexture(titleArt);
     SDL_DestroyRenderer(ren);
     if (st == BootState::Campaign && windowOut) {
         // Hand the SAME window to the campaign loop (ui.h law: the first

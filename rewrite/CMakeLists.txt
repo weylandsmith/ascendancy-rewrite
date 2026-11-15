@@ -33,6 +33,7 @@ include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS} src)
 add_library(ascend_core STATIC
   src/formats/cob.cpp
   src/formats/bin_table.cpp
+  src/formats/gif.cpp
   src/formats/voc.cpp
   src/formats/flic.cpp
   src/formats/fnt.cpp
@@ -59,6 +60,7 @@ add_library(ascend_ui STATIC
   src/ui/boot.cpp
   src/ui/menulaw.cpp
   src/ui/vendortext.cpp
+  src/ui/titlepalette.cpp
   src/ui/title.cpp
   src/ui/hudlayout.cpp
   src/ui/statuslaw.cpp
@@ -107,6 +109,7 @@ add_executable(run_tests
   tests/test_audio.cpp
   tests/test_ships.cpp
   tests/test_flic.cpp
+  tests/test_gif_t390.cpp
   tests/test_fnt.cpp
   tests/test_shp.cpp
   tests/test_shipsave_t360.cpp
