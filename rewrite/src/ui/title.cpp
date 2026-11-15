@@ -201,7 +201,7 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
         std::fflush(stdout);
     }
 
-    // t401 ART LIBRARIES (docs/re/_wip_t401.md S10): raceflag.shp (21x
+    // t401 ART LIBRARIES (docs/re/t401-newgame-art.md S10): raceflag.shp (21x
     // 14x24 crest class — the description-panel emblem, measured exact-size
     // match) and the smraceNN.shp portrait cache (49x49 class; loaded on
     // demand per specnum, one refusal line each, never re-read per frame).
@@ -586,7 +586,7 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             // 394..404, bevel rows 405..419 — and NO chromatic icon pixels
             // exist anywhere in the capture (navy + greys only; the vision
             // read's "six coloured icons" is compression bleed, refuted
-            // mechanically, docs/re/_wip_t401.md S10). The port draws six
+            // mechanically, docs/re/t401-newgame-art.md S10). The port draws six
             // CVD-safe chips in the measured band; WHICH colours the vendor
             // used stays a named seam (no citation exists).
             {

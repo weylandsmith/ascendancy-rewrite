@@ -195,7 +195,7 @@ bool loadPickAccepts(const std::vector<SaveSlot>& slots, int index,
 
 // ---- t401 NEW GAME ART LAW (header docblock carries the citations) --------
 // Page-texture bands on the New Game screen [measured on the user original;
-// docs/re/_wip_t401.md S8/S10 — same t400 §4 texture class, different band
+// docs/re/t401-newgame-art.md S8/S10 — same t400 §4 texture class, different band
 // extents because the starfield runs to ~x493 here].
 const Rect kNewgameTextureBands[2] = {
     {0, 0, 6, 479},       // left margin (t400 §4 band, same extent)

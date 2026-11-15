@@ -199,3 +199,26 @@ two scales, ring source = measure next.
 - app.log routing: FRESHGAME -> raceconfig; PLAYERS_MORE msg 503 -> Three;
   begin density 50 species 3 atmosphere 2 species-pick 0 (wheel click on
   Species cycled 7->3 via msg 503 — law-consistent).
+
+## S12 — MUTATION CAMPAIGN + CLOSEOUT STATUS
+- scripts/t401_mutate.py, checkpoint-commit a5f1284 first (revert safety).
+  MUTATION 6/6 CAUGHT: M1 density-offladder-accept, M2 density-topshare,
+  M3 species-anchor (2+value->1+), M4 atmosphere-swap (10<->11),
+  M5 portrait-clamp (refuse->clamp), M6 portrait-nopad (%02d->%d) — M1-M4
+  caught by newgame_t401_wheel_frame_law, M5-M6 by
+  newgame_t401_portrait_lib_name. Post-revert suite re-run green
+  (340/0).
+- LEDGER: no OPEN-QUESTIONS row matches t401 (D11 grades are user-ruling
+  items in STATE.md's queue, not OQ rows; the only t401-adjacent OQ fact
+  — 3cfgnew k12 JUNK — is already inside OQ-005's CLOSED residue
+  decomposition). HONEST NEGATIVE: t401 CLOSES NOTHING in OPEN-QUESTIONS.
+  The D11 New Game item's visual ACCEPTANCE is not self-gradeable (R13) —
+  witness shots work/r1/loop/t401-newgame{,-set}.png ride the t403 grading
+  sheet; until the USER grades them the item stays user-pending, though
+  every sub-law (framing bands, wheel frames, portrait class, crest class,
+  Begin art, opacity) is now cited-measurement-backed and pinned.
+- SEAMS kept open (named, deciders listed in S1-S11): racering.shp role
+  (decider: live witness vs original crops); density top-two frame share
+  k3 (weak discriminator banked); atmosphere Peaceful-vs-Neutral both k10
+  (declared choice); RACELIST row-ring scale (port uses scaled portrait,
+  vendor 105-px DESC ring vs 53 racering noted S8).

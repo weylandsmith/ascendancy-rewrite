@@ -230,19 +230,18 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t401 per queue row t401 below (NEW GAME FRAMING + PANELS — D11: UI
-framing missing, bottom-row artwork wrong, Player Species column art not
-rendered, Begin New Game box empty except text, species description box
-transparent). ORDERING RATIONALE: t400 landed the rail/flag/hover/texture
-laws (docs/re/t400-rail-hover.md) — the New Game screen shares the t398
-palette law AND the raceflag sprite class t400 just measured (its species
-column is 7racesel strips + the same 21-race identity question; do it
-after the flag law, not before). t402 (planets list) then t403 (verify +
-push, MANDATORY push-gap law) follow unchanged. t400 shipped witness
-shots work/r1/loop/t400-{map,title-hover}.png for the t403 grading sheet.
-The D11 rulings are APPLIED (user lines 2026-11-15 11:37 in DECISIONS.md);
-D11b privacy = DROP (dispositioned). RULING CHANNEL: page server hardened
-+ live (t397b); health-check per wake procedure below.
+NEXT t402 per queue row t402 below (PLANETS LIST SCREEN — D11: "the
+planets list screen is wrong and unusable"). ORDERING RATIONALE: t401
+landed the New Game art law (docs/re/t401-newgame-art.md S1-S12: wheel-
+frame law, smrace portrait class 49x49 scaled 2x, raceflag crest class
+21x14x24 native, page-texture bands, opaque DESC panel; 6 pins + MUTATION
+6/6 CAUGHT + witness census PASS). The planets list reuses that plumbing
+(blitShapeScaled now exists; windows.txt state-17 17np chrome is already
+banked in planetwin.{h,cpp} + docs/re/planetalloc*.md) — do it while the
+shape-blit seams are fresh. t403 (verify + push, MANDATORY push-gap law)
+follows unchanged and builds the grading sheet from
+work/r1/loop/t401-newgame{,-set}.png + t402 shots + t398/t400 shots.
+D11 New Game item stays USER-PENDING until graded (R13: no self-accept).
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
@@ -253,9 +252,29 @@ lines; regenerate page+crops with the HERMES venv python
 after the newest block; apply answers per strict-close (audio OQ-027 closes
 only on a final HEARING verdict — the 11:37 line "seems OK at first listen"
 is NOT it; chrome grades close nothing by themselves; D11b answered = drop).
-(2) t398 shipped new screenshots work/r1/loop/t398-{title,load,newgame,map}.png
-— a re-grade of the palette fix rides on the NEXT ruling sheet (t403 builds
-it); the t398 census already says the ramp defect is mechanically gone.
+(2) If a USER line grades the t401 New Game shots
+(work/r1/loop/t401-newgame{,-set}.png), record it verbatim in
+docs/re/t401-newgame-art.md S12 and disposition the D11 item.
+
+t401 LANDED 2026-11-15 (NEW GAME FRAMING + PANELS, D11). Proved by
+cited measurement + pins, law doc docs/re/t401-newgame-art.md:
+windows.txt L575-717 state-3 SHAPEFILE 3CFGNEW.SHP binds NEWGAMEWND
+SHAPEFRAME 0 / RACELIST SHAPEFRAME 7; wheel law newgameWheelFrame() —
+density ladder-rank k0..k3 (top-two share seam), species k(2+n) anchored
+k7@Five, atmosphere k10/k11; portrait class smraceNN.shp rec0 49x49
+scaled 2x (NEW blitShapeScaled, vendortext.cpp); DESC panel OPAQUE pure-
+black + green ring (0,142,69) r52@(409,97) + raceflag crest k<specnum>
+NATIVE 14x24 + planet blit; Begin box = dot-noise band + smrace emblem
+native; page texture t400 §4 class bands x0..6 + x494.. (right band x494,
+NOT the map screen's 466). Value words inside bottom panels REMOVED
+(original has none — summary block carries them). Suite 340/0 (+6 pins,
+rewrite/tests/test_newgame_t401.cpp); MUTATION 6/6 CAUGHT
+(scripts/t401_mutate.py, checkpoint a5f1284); witness
+scripts/t401_newgame_witness.sh + t401_witness_census.py census VERDICT
+PASS both shots (solid panel black 42149 / starish 0; racelist chromatic;
+ring 1360; wheels distinct; begin dots 233; texture 3360/3360). LEDGER:
+closes NOTHING (honest negative in S12 — no OQ row matches; D11 item is
+user-pending). 3cfgnew k12 stays JUNK (OQ-005 residue, re-confirmed).
 
 t400 LANDED 2026-11-15 (RAIL + SPECIES FLAGS + TITLE HOVER + FRAME
 TEXTURE — LAW docs/re/t400-rail-hover.md + _wip_t400.md S1-S14):
@@ -747,7 +766,9 @@ MOUSEFOCUS/SHAPEFRAME hover-state law in windows.txt (frame swap on
 focus?) — implement highlight for title + rail buttons; if vendor hover
 state has no data law, bank seam with what would decide it.
 
-t401 NEW GAME FRAMING + PANELS (D11: usable now, but: UI framing
+t401 NEW GAME FRAMING + PANELS — LANDED 2026-11-15 (see LANDED block
+above; law docs/re/t401-newgame-art.md; D11 grade user-pending).
+[original brief kept for the record:] (D11: usable now, but: UI framing
 missing, bottom-row artwork wrong, Player Species column art not
 rendered, Begin New Game box empty except text, species description box
 transparent/galaxy visible behind). (1) framing: bevel chrome — census

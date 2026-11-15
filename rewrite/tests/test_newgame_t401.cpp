@@ -2,7 +2,7 @@
 
 // t401 New Game art-law pins (D11: framing missing / bottom-row artwork
 // wrong / species column art not rendered / Begin box empty / description
-// transparent). Laws + every measurement citation: docs/re/_wip_t401.md
+// transparent). Laws + every measurement citation: docs/re/t401-newgame-art.md
 // S1-S10 (user-supplied originals scratchpad/newgame-original{,-very-dense-}
 // .png are allowed evidence per D10; windows.txt L575-717 cited).
 // Headless-safe: pure law + real shape-library file reads (supply-your-own
@@ -162,7 +162,7 @@ TEST(newgame_t401_wheel_frames_exist_real) {
         CHECK(lib.decode(f, px));
         CHECK(!px.empty());
     }
-    // Monotonic dot census (the law's measured basis, docs/re/_wip_t401.md
+    // Monotonic dot census (the law's measured basis, docs/re/t401-newgame-art.md
     // S10): game.pal-converted bright pixels (r+g+b > 200) k0 < k1 < k2 <
     // k3 — dots increase with frame index. Indices alone would NOT prove
     // this (navy is index 242), hence the palette path.

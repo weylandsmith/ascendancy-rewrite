@@ -85,7 +85,7 @@ int newgameArrowAt(Pt p); // 0 = up, 1 = down, -1 = none
 
 // ---- t401 NEW GAME ART LAW (D11: framing missing, bottom-row artwork
 // wrong, species column art not rendered, Begin box empty, description
-// transparent). Measurement trail docs/re/_wip_t401.md S1-S10 on the
+// transparent). Measurement trail docs/re/t401-newgame-art.md S1-S10 on the
 // USER-SUPPLIED originals (scratchpad/newgame-original.png +
 // -very-dense- variant; capture->screen mapping cited there).
 

@@ -52,7 +52,7 @@ bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
 
 // t401: same decode/palette path as blitShape, drawn at scale (integer,
 // NEAREST filter — the scale FACTOR for RACELIST portraits is a port law;
-// the vendor's own filter is a named seam, docs/re/_wip_t401.md S10).
+// the vendor's own filter is a named seam, docs/re/t401-newgame-art.md S10).
 bool blitShapeScaled(SDL_Renderer* ren,
                      const ascend::formats::ShapeLibrary& lib, int rec,
                      int x, int y, int scale);

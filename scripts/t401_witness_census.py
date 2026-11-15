@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """t401 witness census — MECHANICAL checks of OUR OWN New Game render
 (R13-safe: geometry/mass counting on our render; look-grading stays USER's).
-Checks (laws docs/re/_wip_t401.md S10):
+Checks (laws docs/re/t401-newgame-art.md S10):
  1. DESC panel interior is SOLID (starfield cannot show through): the black
     fill covers the panel; star-preview px (neutral grey dots) inside the
     panel rect == 0 outside drawn art... simplified decisive form: the
