@@ -379,3 +379,42 @@ laser01 on map click / bang01 on "captured" as DOCUMENTED port choices
 FALSE — soundfx.txt has no such line (header pairs are 2 10000 / 3 45000 /
 1 65000; name list starts `button` at index 0). Closing witness candidates:
 a capture diff of the +0x1bcc field across control types, or user hearing.
+
+### 6.6 t395 SOUND AUDIBILITY law (2026-11-15; D10 "not hearing any sound on Athens")
+
+MEASURED this iteration (scripts/t395_soundchannel_census.py): windows.txt
+carries 119 SOUNDCHANNEL records over 124 NAME records, histogram {0 x118,
+-0 x1} (the lone -0 sits in ALIENDIP at file offset 0x51aa). Title-side
+buttons INTRO/RESUME/EXITTODOS all 0. Re-pins §6.5: NO per-button sound id
+exists in the shipped table; channel->sample stays the named seam (OQ-027b,
+still OPEN — a census re-pins a negative, it closes nothing).
+
+Three real defects found and fixed (all pinned, rewrite/tests/test_sound_t395.cpp):
+
+1. AUDIO WAS OPT-IN ON THE UI PATH. main.cpp built the AudioEngine only when
+   `--audio` was passed, so a plain `./ascendancy --ui` boot never opened a
+   device AND never printed even the degrade line — on Athens indistinguishable
+   from a dead sound card. LAW: on the --ui path audio is ON unless
+   --no-audio; --headless/non-UI paths keep opt-in. Witness:
+   scripts/t395_sound_witness.sh (no --audio flag) prints
+   `audio: driver=dummy sfx=86 tunes=3 vol=127`.
+
+2. play("click08") WAS A SILENT NO-OP SINCE t388. MEASURED: click08.voc
+   EXISTS in ascend01/data but soundfx.txt (86 names) does NOT list it —
+   the data dir holds samples the manifest does not name. init() now loads
+   the referenced-but-unlisted click08 explicitly (chunks 85->86; gate 4d
+   expects 86). The title-menu buttons play click08 symmetric with the
+   campaign rail — DOCUMENTED PORT CHOICE per §6.5, never vendor law.
+
+3. FAILURE LINES NAMED NOTHING. AudioEngine::triedPaths() records every
+   path init() opened or probed; the degrade line appends
+   `; last path tried: <p>`, and the missing-music error names BOTH archive
+   layouts (ascend02/data/<t>.raw AND ascend01/data/<t>.raw) so "--data
+   without extracted/" reads differently from a dead device. Silent-degrade
+   unchanged: audio failure NEVER aborts boot.
+
+Also: MENU-MUSIC ENTRY LAW made explicit — bootTune(Title)==0, every other
+state kTuneNoChange(-2) (boot.h, pinned); the title loop requests it every
+frame (idempotent via the playTune same-tune no-op). playTune hardened: any
+t < -1 is a no-op (pre-fix, t=-2 indexed music_ out of bounds — UB).
+

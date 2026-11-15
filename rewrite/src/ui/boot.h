@@ -55,6 +55,17 @@ extern const TitleButton kTitleButtons[kTitleButtonCount];
 // Which button (index 0..6) contains p from the Title screen, -1 if none.
 int titleButtonAt(Pt p);
 
+// t395 MENU-MUSIC ENTRY LAW (docs/re/audio.md §3.3/§6.6): tune 0 (theme00)
+// is requested WHILE the Title screen is up — on entry, not only after the
+// intro movie. The captured selector DAT_00010ba0 == 0 in every banked
+// save. Any other state issues NO request (kTuneNoChange; NOT -1, which is
+// the vendor stop command). playTune's same-tune no-op makes per-frame
+// re-requesting idempotent (audio.h switch law).
+inline constexpr int kTuneNoChange = -2;
+inline int bootTune(BootState s) {
+    return s == BootState::Title ? 0 : kTuneNoChange;
+}
+
 // D9 LAW (user 2026-11-14; windows.txt LOAD/SAVE TEXTITEM hotkey items):
 // from Title, 'l' = Load, 's' = Save (the Alt-chord twins of the on-screen
 // buttons); any other key is a no-op. Takes the LOWERCASED letter so the

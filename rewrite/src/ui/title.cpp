@@ -223,6 +223,14 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
     };
 
     while (st == BootState::Title || st == BootState::RaceConfig) {
+        // t395 MENU-MUSIC ENTRY LAW (audio.md §6.6): tune 0 is requested
+        // while the Title screen is UP, not only after the intro. Re-asking
+        // the same tune is a no-op (audio.h switch law), so this is safe
+        // every frame and also covers Title re-entries from Load/Tutorial.
+        if (audio) {
+            const int want = bootTune(st);
+            if (want != kTuneNoChange) audio->playTune(want);
+        }
         // t393 SCREEN LAW (D10; boot.md §7): RaceConfig is a FULL-SCREEN
         // SWITCH — the title chrome (art + button column) must NOT show
         // through. Draw one frame of exactly one screen per iteration.
@@ -593,6 +601,13 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 const int idx = titleButtonAt(p);
                 const BootState next = bootClick(st, p);
                 if (next == st) continue;  // click outside any live button
+                // t395 BUTTON SFX (D10): click08 on every title-menu button
+                // press. DOCUMENTED PORT CHOICE, not vendor law — the
+                // windows.txt SOUNDCHANNEL census {0 x118, -0 x1} carries no
+                // sound id (audio.md §6.5, t395 re-census), so which sample
+                // the vendor played per button class is uncited. Symmetric
+                // with the campaign map's click08 (ui.cpp).
+                if (audio) audio->play("click08");
                 std::printf("ui title click %s -> %s\n",
                             idx >= 0 ? kTitleButtons[idx].name : "?",
                             bootStateName(next));

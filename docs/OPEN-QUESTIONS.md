@@ -285,7 +285,11 @@ windows.txt SOUNDCHANNEL census {0 x118, -0 x1} carries NO sound id. Port
 names (click08 NEXTTURN / laser01 map / bang01 captured) stay DOCUMENTED
 port choices (audio.md §5). Closes on: capture diff of +0x1bcc across
 control classes, or user hearing. --audio-trace instrument ships for the
-wiring half (pins audio_tune_switch_law + audio_subtitle_script_cues_oq018).
+wiring half (pins audio_tune_switch_law + audio_subtitle_script_cues_oq018;
+t395 adds boot_tune_entry_law_t395, audio_invalid_tune_guard_t395,
+audio_click08_offmanifest_t395 — the last one MEASURED click08.voc is off
+soundfx.txt, so play("click08") had been a no-op; census re-run
+scripts/t395_soundchannel_census.py re-pins {0 x118, -0 x1}, closes nothing).
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor cost hack, Orbital Docks effect

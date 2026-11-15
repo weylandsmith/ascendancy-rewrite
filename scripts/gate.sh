@@ -712,8 +712,8 @@ else
        --autoplay --seed 4 >/tmp/gate_audio.log 2>&1; then
     tail -20 /tmp/gate_audio.log; err "audio boot failed"
   fi
-  grep -q 'audio ok: 85 sfx chunks, music 8191719 B' /tmp/gate_audio.log \
-    || { cat /tmp/gate_audio.log; err "audio load line wrong (expect 85 chunks, theme00)"; }
+  grep -q 'audio ok: 86 sfx chunks, music 8191719 B' /tmp/gate_audio.log \
+    || { cat /tmp/gate_audio.log; err "audio load line wrong (expect 86 chunks incl t395 click08, theme00)"; }
   grep -q 'ui ok: turn 1' /tmp/gate_audio.log \
     || { cat /tmp/gate_audio.log; err "audio run did not complete a turn"; }
 fi

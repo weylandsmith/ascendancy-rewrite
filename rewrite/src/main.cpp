@@ -51,6 +51,7 @@ struct Options {
     bool autoplay = false;
     bool resume = false;                        // t385: boot straight to Campaign
     bool audio = false;                         // SDL2_mixer (docs/re/audio.md §5)
+    bool noAudio = false;                       // t395: explicit opt-out (UI default is ON)
     bool mute = false;                          // load everything, volume 0
     bool audioTrace = false;                    // t388b: print per played sound
     int playerSpecies = -1;                     // specnum 0..20 (docs/re/species.md)
@@ -85,6 +86,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->resume = true;  // t385: Resume-equivalent boot (skip title click)
         else if (a == "--audio")
             o->audio = true;
+        else if (a == "--no-audio")
+            o->noAudio = true;  // t395: UI audio is default-ON; this opts out
         else if (a == "--mute")
             o->mute = true;
         else if (a == "--audio-trace")
@@ -120,6 +123,8 @@ void usage() {
         "  --turns N     run N turns of the turn loop then exit\n"
         "  --headless    SDL dummy video driver, no audio device\n"
         "  --audio       SDL2_mixer: all 86 soundfx + cited tunes (docs/re/audio.md)\n"
+        "  --no-audio    never open an audio device (t395: --ui audio is ON by\n"
+        "                default; a silent-degrade line always prints)\n"
         "  --mute        load audio but master volume 0\n"
         "  --audio-trace print one line per played sound (wiring instrument)\n"
         "  --campaign N  play N turns of a seeded campaign (docs/re/turnloop.md)\n"
@@ -528,7 +533,14 @@ int main(int argc, char** argv) {
         // t382/--autoplay flows do not regress); --intro N caps the title's
         // intro movie for the gate smoke.
         std::unique_ptr<ascend::ui::AudioEngine> audio;
-        if (o.audio) {
+        // t395 AUDIO DEFAULT (D10 "not hearing any sound on Athens"): on the
+        // --ui path audio is ON unless --no-audio. The old opt-in flag meant
+        // a plain `--ui` boot NEVER opened a device and NEVER printed even
+        // the degrade line — indistinguishable from a dead sound card.
+        // Non-UI paths keep the old opt-in semantics (headless sim runs
+        // never touch a device).
+        const bool wantAudio = o.noAudio ? false : (o.audio || o.ui);
+        if (wantAudio) {
             audio = std::make_unique<ascend::ui::AudioEngine>();
             audio->setTrace(o.audioTrace);
             std::string aerr;
@@ -537,9 +549,20 @@ int main(int argc, char** argv) {
                 // presentation, never a boot precondition. Report and run on
                 // without the engine — a missing device must not abort the
                 // app or the gate. (The old code returned 1 here.)
-                std::printf("audio: %s (degraded: silent)\n", aerr.c_str());
+                // t395: name the last path init() probed, so "--data points
+                // at the wrong dir" reads differently from "device dead".
+                const auto& tried = audio->triedPaths();
+                std::printf("audio: %s (degraded: silent%s%s)\n", aerr.c_str(),
+                            tried.empty() ? "" : "; last path tried: ",
+                            tried.empty() ? "" : tried.back().c_str());
                 audio.reset();
             } else {
+                // t395 DIAGNOSTIC LINE (unmissable, printed on EVERY healthy
+                // boot now that audio is default-on): device + counts. The
+                // user pasting this line decides device-failure vs code gap.
+                std::printf("audio: driver=%s sfx=%d tunes=%d vol=%d\n",
+                            SDL_GetCurrentAudioDriver(), audio->chunksLoaded(),
+                            audio->tunesLoaded(), audio->musicVolume());
                 std::printf("audio ok: %d sfx chunks, music %lu B\n",
                             audio->chunksLoaded(), audio->musicBytes());
                 // Title-screen music: tune 0 = theme00 == the captured

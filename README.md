@@ -67,7 +67,10 @@ repo root). The binary reads the ORIGINAL extracted data (manifests,
 star/tech/economy tables, race diplomacy files, audio samples) — never
 generated stand-ins — and plays a seeded, deterministic campaign to a
 victory condition. UI: click NEXT TURN or Enter/Space; click a star to
-select; ESC quits. More flags: `--autoplay`, `--audio`, `--mute`,
+select; ESC quits. On the `--ui` path audio is ON by default (t395 — the
+startup prints an `audio: driver=... sfx=N tunes=N vol=N` line, or a
+`degraded: silent` line naming what it could not open; `--no-audio` opts
+out). More flags: `--autoplay`, `--mute`,
 `--species N`, `--flic`, `--intro N`, `--fonts` — see `--help`.
 
 ## Supply your own data

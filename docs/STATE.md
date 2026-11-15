@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-15T03:30
+updated: 2026-11-15T05:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,22 +230,41 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t395 per queue row t395 below (phase 11: UI ROUND 2 + SOUND, per the
-D10 user grade of 2026-11-14). Ordering: t395 now that t394 LANDED
-(2026-11-15) — the map-screen chrome + the WM-scale scale-law are shipped,
-so sound is the last untried D10 complaint before the mandatory re-export
-(t396 must follow t395 so the Athens user gets chrome+scale+sound in ONE
-push). t395 job (queue row t395 is complete): (1) playTune(0) on ENTERING
-Title state (title.cpp:279 is currently the only Title-side call, reached
-only after Intro — fresh launch is SILENT BY CODE); (2) button click SFX
-via the windows.txt SOUNDCHANNEL field law (census the seven title buttons'
-SOUNDCHANNEL values + the channel->soundfx FUN, cite or seam — NOTE t394
-re-measured the campaign-map records: rail buttons + NEXTTURN + the whole
-cluster all carry SOUNDCHANNEL 0, so "channel 0 = click08?" is exactly the
-claim to check, never assume); (3) the unmissable startup audio diagnostic
-line (device + tunes loaded + sfx loaded on SUCCESS, paths tried on
-failure) — this line decides device failure vs code gap in the next Athens
-report; (4) theme*.raw load path vs --data layout variants. Pins per row.
+NEXT t396 per queue row t396 below (PHASE-11 VERIFY + RE-EXPORT + PUSH).
+Ordering: t395 LANDED 2026-11-15 (sound audibility: --ui audio default-ON,
+click08 off-manifest load fix, tried-paths diagnostic — audio.md §6.6), so
+chrome+scale+sound are ALL shipped and the mandatory single push to Athens
+can happen now. t396 job (queue row t396 is complete): full gate + run_tests
++ headless seed regression (seeds 1/2024/23 byte-identical — engine
+untouched by t393-t395, verify anyway); export
+scripts/publish_public.sh GITHUB_USER=weylandsmith; verify vendor-free
+(scratchpad/ excluded — check the gate line in the script); fetch FIRST,
+push fast-forward; verify post-push ls-remote; THEN rewrite STATE NEXT to
+WAIT-USER-RULING t374 verbatim with the grading handoff: what to look at
+(title text/hotkey lines, New Game screen, map + rail buttons) and the ONE
+audio question — paste the startup `audio: driver=... sfx=... tunes=...`
+(or `degraded: silent ...`) line from Athens; that line now prints on EVERY
+--ui boot (t395), so an answer decides device-failure vs code gap outright.
+
+t395 LANDED 2026-11-15 (SOUND AUDIBILITY, D10 "not hearing any sound on
+Athens"): THREE defects, all pinned + live-witnessed
+(scripts/t395_sound_witness.sh PASS: `audio: driver=dummy sfx=86 tunes=3
+vol=127` / `music 0 theme00` on title entry / `sfx click08` on the INTRO
+button click, NO --audio flag passed): (1) AUDIO WAS OPT-IN on the --ui
+path (plain boot opened NO device and printed NO line — indistinguishable
+from a dead card); now default-ON, --no-audio opts out, non-UI paths keep
+opt-in; (2) ROOT CAUSE MEASURED: click08.voc exists in ascend01/data but
+soundfx.txt does NOT list it -> play("click08") was a SILENT NO-OP since
+t388; init() loads it explicitly (85->86 chunks, gate 4d updated); title
+buttons play click08 symmetric with the rail (port choice per §6.5, never
+vendor law); (3) tried-paths diagnostic: degrade line names last path,
+missing-music error names BOTH archive layouts. MENU-MUSIC ENTRY LAW made
+pure + pinned (bootTune(Title)==0, else kTuneNoChange=-2); playTune
+hardened t<-1 no-op (was UB). SOUNDCHANNEL census RE-RUN
+(scripts/t395_soundchannel_census.py): {0 x118, -0 x1}, -0 in ALIENDIP
+0x51aa — re-pins §6.5, "channel 0 = click08" stays NOT citable. Suite 318/0.
+NO ledger row closed (OQ-027 stays OPEN — census re-pins the negative;
+strict-close). Law banked audio.md §6.6 + _wip_t395.md.
 t394 LANDED 2026-11-15 (galaxy-map sidebar chrome + WM-scale fix, D10
 "galaxy map still wonky... all the buttons off the galaxy map are wonky
 too"): DIAGNOSIS closed mechanically — user's shot IS the map screen where

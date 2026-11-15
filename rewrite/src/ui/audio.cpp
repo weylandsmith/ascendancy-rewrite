@@ -80,6 +80,7 @@ bool AudioEngine::init(const std::string& dataDir, bool mute,
 
     std::string merr;
     const std::string manifest = dataDir + "/extracted/ascend00/soundfx.txt";
+    triedPaths_.push_back(manifest);  // t395 diagnostic
     auto names = af::loadSoundfxManifest(manifest, &merr);
     if (names.empty()) {
         if (err) *err = merr;
@@ -91,6 +92,7 @@ bool AudioEngine::init(const std::string& dataDir, bool mute,
         std::string lower = n;
         for (auto& c : lower) c = char(std::tolower(c));
         const std::string path = dataDir + "/extracted/ascend01/data/" + lower + ".voc";
+        triedPaths_.push_back(path);  // t395 diagnostic
         af::Sample s;
         if (!af::loadSample(path, n, &s, &merr)) {
             if (err) *err = merr;
@@ -105,6 +107,32 @@ bool AudioEngine::init(const std::string& dataDir, bool mute,
         }
         chunks_.emplace(n, ch);
     }
+    // t395 ROOT CAUSE for D10 silence: click08.voc EXISTS in ascend01/data
+    // but is NOT listed in soundfx.txt (manifest = 86 names; the data dir
+    // holds more samples than it names — MEASURED: ls + grep of the
+    // manifest). The campaign map's play("click08") was therefore a silent
+    // no-op on every build since t388. Load the referenced-but-unlisted
+    // vendor sample explicitly; a missing file fails init (named path) like
+    // any other sample.
+    for (const char* extra : {"click08"}) {
+        if (chunks_.count(extra)) continue;
+        const std::string path = dataDir + "/extracted/ascend01/data/";
+        const std::string xpath = path + extra + ".voc";
+        triedPaths_.push_back(xpath);  // t395 diagnostic
+        af::Sample s;
+        if (!af::loadSample(xpath, extra, &s, &merr)) {
+            if (err) *err = merr;
+            return false;
+        }
+        auto wav = wrapWav(s);
+        SDL_RWops* rw = SDL_RWFromConstMem(wav.data(), int(wav.size()));
+        Mix_Chunk* ch = Mix_LoadWAV_RW(rw, 1);
+        if (!ch) {
+            if (err) *err = std::string("Mix_LoadWAV ") + extra + ": " + Mix_GetError();
+            return false;
+        }
+        chunks_.emplace(extra, ch);
+    }
 
     // Music: load the cited tune table (trackNames above). theme00 lives in
     // ascend02/data; the intro pair lives in ascend01/data (music.txt paths
@@ -113,13 +141,17 @@ bool AudioEngine::init(const std::string& dataDir, bool mute,
         const std::string& tune = trackNames()[t];
         const std::string a02 = dataDir + "/extracted/ascend02/data/" + tune + ".raw";
         const std::string a01 = dataDir + "/extracted/ascend01/data/" + tune + ".raw";
+        triedPaths_.push_back(a02); triedPaths_.push_back(a01);  // t395
         std::string path;
         if (FILE* probe = std::fopen(a02.c_str(), "rb")) {
             std::fclose(probe); path = a02;
         } else if (FILE* probe = std::fopen(a01.c_str(), "rb")) {
             std::fclose(probe); path = a01;
         } else {
-            if (err) *err = "music track missing: " + tune + ".raw";
+            // t395: name BOTH probed layouts — the Athens report needs to
+            // distinguish "--data has no extracted/" from a dead device.
+            if (err) *err = "music track missing: " + tune + ".raw (tried " +
+                            a02 + " and " + a01 + ")";
             return false;
         }
         af::Sample ms;
@@ -156,6 +188,10 @@ void AudioEngine::playTune(int t) {
     // request state machine behaves identically with or without a device —
     // that is what makes audio_tune_switch_law headless-testable.
     if (t >= int(trackNames().size())) return;
+    // t395 HARDENING: any negative other than the cited -1 stop command is
+    // an invalid request (kTuneNoChange == -2 lives in boot.h). Without this
+    // guard `t < music_.size()` below is true for negatives and indexes UB.
+    if (t < -1) return;
     // Stop request (vendor TUNEID -1 -> FUN_00067b85): halt, remember idle.
     if (t == -1) {
         if (inited_ && Mix_PlayingMusic()) Mix_HaltMusic();

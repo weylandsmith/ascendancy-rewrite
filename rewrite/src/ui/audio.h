@@ -36,7 +36,11 @@ class AudioEngine {
     // Returns false with *err if the device or ANY referenced sample fails
     // (no fakery, §5). Callers must treat false as silent-degrade, NEVER
     // abort the app (CI has no sound card; main.cpp owns that law).
+    // t395: triedPaths() lists every file path init() opened or probed, so
+    // a failure line can name what was actually looked for (Athens: was
+    // --data missing extracted/, or was the device dead?).
     bool init(const std::string& dataDir, bool mute, std::string* err);
+    const std::vector<std::string>& triedPaths() const { return triedPaths_; }
     void play(const std::string& sfxName);   // unknown name -> no-op
 
     // The loaded tune table in playTune() index order (music.txt basenames,
@@ -81,5 +85,7 @@ class AudioEngine {
     // must outlive its music handle (an init()-local vector caused a
     // use-after-free segfault under the dummy driver; gate 4d caught it).
     std::vector<std::vector<uint8_t>> musicWavs_;
+    // t395 DIAGNOSTIC: every path init() opened or probed, in order.
+    std::vector<std::string> triedPaths_;
 };
 }  // namespace ascend::ui
