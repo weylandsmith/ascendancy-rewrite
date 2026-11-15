@@ -32,11 +32,16 @@ TEST(rail_icon_placement_t400) {
     }
     // Measured icon centres land within +-3 px of the button centres for
     // all four vendor rows (registration tops 130/175/213/248 + h/2 vs
-    // button centres 145/184/223/262). Pin the law's own centring:
-    const IconPos status = railIconPos(RailButton::Status, 27);  // k5 h=27
-    const int cyStatus = (kRail[0].rect.y0 + kRail[0].rect.y1) / 2;
-    CHECK(status.y + 27 / 2 >= cyStatus - 3 &&
-          status.y + 27 / 2 <= cyStatus + 3);
+    // button centres 145/184/223/262). Pin the law's own centring EXACTLY
+    // (tolerance-only pins were MISSED by a top-align mutant at t400 M2):
+    // y == centre - h/2 for every height, and y DIFFERS from rect.y0
+    // whenever the face is shorter than the button.
+    for (int h : {20, 24, 27, 30}) {
+        const int cy = (kRail[0].rect.y0 + kRail[0].rect.y1) / 2;
+        CHECK(railIconPos(RailButton::Status, h).y == cy - h / 2);
+    }
+    CHECK(railIconPos(RailButton::Status, 24).y != kRail[0].rect.y0);
+    CHECK(railIconPos(RailButton::Status, 24).y > kRail[0].rect.y0);
     // The x lands RIGHT of the label zone: the vendor label ink ends well
     // before 583 (Species label content run ends x516, measured).
     CHECK(railIconPos(RailButton::Status, 27).x > 516);
