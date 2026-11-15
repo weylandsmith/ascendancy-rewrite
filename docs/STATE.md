@@ -230,7 +230,13 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-USER-RULING t374 — PHASE 10 LANDED + PUSHED, LATEST 2026-11-14:
+NEXT t390 per queue row t390 below (TITLE ART BLIT). The WAIT-USER-RULING
+t374 sentinel is RETIRED: the user GRADED phase 10 (2026-11-14, verbatim
+"it's still not drawing the UI") and the grade found a real gap — t386
+identified the title art (0opening.gif) but NO row blitted it; PIL scan
+of our own render: art-zone mass 0. t390 + t391 queued. Banked below.
+
+PHASE 10 LANDED + PUSHED, LATEST 2026-11-14:
 https://github.com/weylandsmith/ascendancy-rewrite.git main = 36bf92dbb4bd
 (verified ls-remote post-push; FAST-FORWARD b2539b3..36bf92d — 7 commits:
 D9 records, t385+t385b boot state machine, t386 title art, t387 menu wiring,
@@ -259,6 +265,46 @@ LEDGER: 17 closed / 3 OPEN (OQ-016, OQ-019 deferred per user — do NOT re-ask,
 do NOT apply the t329 S4 draft; OQ-027 opened t388b, closes on user hearing or
 pointer-law capture of the heap tune table). t389 closed NO row (strict-close:
 verify+push moves no measurement).
+
+t390 TITLE ART BLIT (user 2026-11-14: "it's still not drawing the UI").
+MECHANICAL WITNESS (PIL scan of our own Xvfb screenshot — our own render,
+self-graded VISION stays banned, geometry/mass counting is mechanical):
+art zone rows 0-195 mass = 0 non-bg pixels; menu zone 195-475 mass 1006.
+Buttons + caption band draw; the ART does not exist in the code path.
+t386 CLOSED the identity (docs/re/title-art.md §7 checklist is this row's
+spec) but no row implemented the blit. Implement per §7: (1) C++ GIF
+index-plane decoder in rewrite/src/formats/gif.{h,cpp} — GIF87a, ONE
+frame 640x480, GCT 256 (the file's own shape, cite title-art.md §
+table); LZW-min-code decode, interlace NOT expected (verify the
+descriptor, refuse-not-clamp if interlaced); NO new dependencies (no
+SDL2_image, no stb — athens builds without them, deps are a publish
+surface); (2) colour via rewrite/tests/data/title_palette_t386.tsv
+(index-preserving swap, the t386 map f(gif_index)=vendor rgb); (3) blit
+at (0,0), SKIP index 255 (key-hole -> the shp/text on top shows through);
+(4) then 0opening.shp state-0 strips + VendorText labels at the SEVEN
+windows.txt rects (already law in t385). Wordmark + creature come FREE
+from the GIF — do NOT add shp/text art for them (§7). Pins: decoder
+against the REAL 0opening.gif (first-N index-plane hash + full-frame
+row-0 hash vs a Python-decoded reference generated IN the test or
+banked as a data artifact), key-255 skip count, palette-map round-trip,
+headless-safe (no display -> decode still testable, render path skipped).
+Verification beyond pins: registration conflict-count at shift 0 between
+our decoded plane and our own Xvfb screenshot (§7 law) + bank the
+screenshot path for the USER to grade the LOOK (user is the external
+grader).
+
+t391 PRESENTATION SWEEP (user: look/play/sound like the original). With
+the title art landed, audit the OTHER screens for the same class of gap
+— chrome drawn as vector OUTLINES where the vendor has ART: (a) campaign
+STATUSWND (ui.cpp:244 blits 10status k0 — confirm it is the full backdrop
+per the t388 FULL-BACKDROP test comment, not a strip; if k0 is not a
+backdrop, cite the right record/frame, do NOT invent); (b) NEWGAMEWND /
+LOAD screens (t387 draws frames + wheel faces — check windows.txt
+SHAPEITEM/SHAPEFRAME for a backdrop record the vendor paints that we
+skip); (c) any TYPE-18 window frame that should carry art. Deliverable:
+each screen is art-backed-or-honestly-vector (cite the windows.txt record
+that decides it, or bank it as a named seam with the reason). NO engine
+touches. Same screenshot-per-screen + user-grading handoff as t390.
 
 OPEN ITEM: GitHub backend GC may still serve old commit SHAs (manual pages
 eb79da3-lineage) until support sweeps orphaned objects — user may email
