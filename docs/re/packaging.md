@@ -287,3 +287,61 @@ trivially satisfied — nothing closable and nothing closed).
   t285 / Control t1406 == the t365 banked record (docs/re/engine-flip-t365.md
   L28-30). Match the working repo's EMPTY CMAKE_BUILD_TYPE when byte-comparing
   builds. Baseline worktree removed after (`git worktree list` clean).
+
+## t396 RE-EXPORT + VERIFY + PUSH LANDED (2026-11-15) — the privacy gate was VACUOUS; real scan found the t383 leak still live (and ALREADY PUBLIC); fixed + forced
+
+- SITTING CHECK RING-FIRST: t368_ring_turn parsed=20/20 max_turn=1254 (same
+  sitting as t380..t383); timeline mtime 2026-11-12 predates t393-t395; zero
+  new play; assignment stood.
+- VERIFICATION (queue row verbatim): full gate ALL CHECKS PASS exit 0;
+  run_tests 318/0/0; SEED REGRESSION baseline worktree @ c7a3fda (Release,
+  same build type both sides) vs HEAD: `--headless --campaign 1600` seeds
+  1/2024/23 byte-IDENTICAL, md5 7e794a6d.../332a8cf3.../0a6b7876... EXACTLY
+  the t389 record; victories Extinct t266 / Extinct t285 / Control t1406 ==
+  t365 record. Engine untouched by t393-t395 PROVEN. Worktree removed.
+- THE ITERATION'S REAL FINDING — t383's exit-5 privacy gate NEVER RAN
+  (MEASURED): `xargs -r git cat-file --batch` appends the ids as ARGUMENTS;
+  git dies "fatal: batch modes take no arguments"; 2>/dev/null + `|| true`
+  yielded a 0-byte scan file -> the pattern grep could never hit. t383's
+  "post-scrub scan: 0 hits across every blob" was measured on NOTHING.
+- REAL SCAN (ids on STDIN; 3399 blobs / 122 MB; positive control
+  "usage: publish_public.sh" present): 1 blob holds the FULL personal ISP
+  address (docs/re/_wip_t383.md, a pre-redaction historical version — t383's
+  SCRUB_PATHS covered only _license_draft_t372.md) AND the SAME blob exists
+  in the pushed pubt391 tree: the address was ALREADY PUBLIC since 2026-11-14.
+  Bare-domain tokens lived in STATE.md/packaging/publish_public.sh/_wip files
+  (citations), and commit c953fc8's MESSAGE held one — tree-filters never
+  touch messages.
+- publish_public.sh FIXED (t396 + t396b): (1) scan reads STDIN, FAIL-CLOSED
+  exit 6 if scan < 1 MB, positive control must hit; (2) P1 full-address sed +
+  P2 bare-domain sed over ALL paths (grep -rlZ first; domain literals split in
+  code so the script never trips its own gate; FAIL output counts only, never
+  prints leak lines); (3) PITFALL MEASURED in /tmp/tfmini: sed WITHOUT -E is
+  BRE where bare `|` is a LITERAL — the P2 alternation silently no-oped while
+  the ERE gate reported 100 hits; BOTH seds run -E; (4) 1c --msg-filter pass
+  scrubs commit messages with the same ERE seds.
+- DATA-OPTIONAL SUITE REGRESSION FOUND + FIXED: newgame_t393_lore_file_real_
+  data lacked REQUIRE_DATA(); on a data-less tree the loader fails, lore stays
+  empty, lore[0] is UB -> run_tests SIGSEGV 139 on the export (stdbuf -o0
+  pinned the true crasher; block-buffered stdout blamed neighbour
+  invasion_declare_war — harness law banked). Guard census over all 8
+  data-referencing test files: the only true crasher.
+- EXPORT (canonical) /tmp/pubpush-t396c from cbe7b8f: "vendor-free history,
+  6459 objects, 6.0M .git, tree intact"; build Release 0 warnings; run_tests
+  WITHOUT data 318 tests / 205 skipped / 0 failed; identity uniform Weyland
+  Smith noreply; refs/original 0; keep-checks pass.
+- PUSH: fetch-first law respected — remote tip 5373c66 (== pubt391 tip tree
+  2fe57e55 verified: no foreign/web-UI commits to preserve); rewritten history
+  DIVERGED by construction, so fast-forward was IMPOSSIBLE; pushed
+  --force-with-lease=main:5373c66 (lease pinned to the fetched SHA).
+  POST-PUSH ls-remote origin main == 3be7e9af6c242ec90a0d3a83391375f1587a1511
+  (verified, not self-reported). Askpass helper /tmp/t396_askpass.sh deleted
+  (verified absent).
+- OPEN DISPOSITION (user's call, same class as the manual pages): GitHub
+  backend GC may still serve the OLD SHAs (5373c66 lineage, incl. the
+  already-public address blob) until orphaned objects are swept — a
+  support.github.com request citing repo + old tip SHA is the
+  belt-and-suspenders step. Username "hrethric" in paths: unchanged t383
+  disposition (not a credential).
+- Ledger: NO row closed (strict-close — verify+push is not a measurement;
+  OQ-027 stays open on the Athens audio-line witness).

@@ -41,9 +41,23 @@ MEASURED 2026-11-15, discovered while exporting /tmp/pubpush-t396:
    contains the SAME full address in 1 blob — it is ALREADY PUBLIC.
    Server-side removal needs the rewrite + force-push, and GitHub GC may keep
    old objects until a support sweep (same open item as the manual pages).
-4. hrethric@motesandbeams.com appears in 41 pushed blobs / 48 new blobs —
-   disposition below (intentional-public vs leak) checked against README/
-   NOTICE.
+4. motesandbeams.com appears in 41 pushed blobs / 48 new blobs — CORRECTED:
+   those are contact@motesandbeams.com / the vendor-author site references
+   (README:13,155, NOTICE:23-25 — INTENTIONAL public info about Todd
+   Templeman, part of the licensing posture). No blob holds a
+   "hrethric@motesandbeams" form; working-repo "hrethric@" hits are the
+   playcap ssh line (username + command substitution) and shell prompts in
+   notes/ (username@athens). Username disposition stays the t383 open call
+   (not a credential).
+5. CRASHER PINNED (data-optional-suite law regressed by t393):
+   newgame_t393_lore_file_real_data has NO REQUIRE_DATA(); on a data-less
+   tree loadNewgameLore fails, lore stays empty, lore[0] (test line 148) is
+   UB -> run_tests SIGSEGV 139 on the export (stdbuf -o0 pinned the true
+   last test; block-buffered stdout had blamed invasion_declare_war, a
+   NEIGHBOUR — banked pitfall). Fixed with REQUIRE_DATA(); export re-verify
+   318 tests / 205 skipped / 0 failed exit 0. Full-file guard census run:
+   only this one true crasher (other flagged tests are pure constant checks
+   whose ".txt" mentions are comments).
 
 ## Fix shipped in scripts/publish_public.sh (t396)
 - (a) scan reads ids on STDIN; FAIL-CLOSED exit 6 if scan < 1 MB;

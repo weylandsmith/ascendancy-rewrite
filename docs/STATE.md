@@ -230,21 +230,59 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t396 per queue row t396 below (PHASE-11 VERIFY + RE-EXPORT + PUSH).
-Ordering: t395 LANDED 2026-11-15 (sound audibility: --ui audio default-ON,
-click08 off-manifest load fix, tried-paths diagnostic — audio.md §6.6), so
-chrome+scale+sound are ALL shipped and the mandatory single push to Athens
-can happen now. t396 job (queue row t396 is complete): full gate + run_tests
-+ headless seed regression (seeds 1/2024/23 byte-identical — engine
-untouched by t393-t395, verify anyway); export
-scripts/publish_public.sh GITHUB_USER=weylandsmith; verify vendor-free
-(scratchpad/ excluded — check the gate line in the script); fetch FIRST,
-push fast-forward; verify post-push ls-remote; THEN rewrite STATE NEXT to
-WAIT-USER-RULING t374 verbatim with the grading handoff: what to look at
-(title text/hotkey lines, New Game screen, map + rail buttons) and the ONE
-audio question — paste the startup `audio: driver=... sfx=... tunes=...`
-(or `degraded: silent ...`) line from Athens; that line now prints on EVERY
---ui boot (t395), so an answer decides device-failure vs code gap outright.
+WAIT-USER-RULING t374 (tag law: never renumber). t396 LANDED + PUSHED
+2026-11-15: remote main == 3be7e9af6c24 (verified ls-remote; force-with-lease
+over 5373c66 — the privacy rewrite makes FF impossible by construction; no
+foreign commits existed to preserve). chrome+scale+sound (t393/t394/t395) are
+ALL on GitHub now. NOTHING further is closable without a human witness; do NOT
+re-check for new work (IDLE law t178) — a session wakes on a DECISIONS.md edit,
+a ruling/reply file, or a new sitting.
+
+THE GRADING HANDOFF (ask the user exactly these, on the ruling page if
+faster than text — D9 law):
+1. TITLE screen: are the two hotkey hint lines readable (no garble), is the
+   0opening art visible behind the buttons? Compare work/r1/loop/t390-title-
+   after.png (ours, Xvfb) against their Athens screen.
+2. NEW GAME screen (t393): full-screen starfield + race rows readable? Begin
+   New Game bottom-right works? If their window is STILL clipped, the
+   `ui window WxH (logical 640x480)` line now prints at title entry — ask for
+   it (512x384 = their WM is still scaling; letterbox should now absorb it).
+3. GALAXY MAP + rail buttons (t394): turn-counter ovals, NEXT TURN, spin/zoom
+   cluster, species squares — any still wonky? Grade map.png (map-turn1.png =
+   post-quit; --campaign 1 exits after advance).
+4. THE ONE AUDIO QUESTION (OQ-027 closer): paste the startup line
+   `audio: driver=... sfx=86 tunes=3 vol=127` — or the `degraded: silent ...`
+   line naming the last path tried. It prints on EVERY `--ui` boot since t395;
+   its presence/absence + text decides device-failure vs code-gap outright.
+5. NEW t396 disposition ask: GitHub GC may still serve the OLD commit SHAs
+   (5373c66 lineage) which contain the personal ISP address that t396 found
+   ALREADY PUBLIC in the pushed tree. The rewrite is done + verified; the
+   belt-and-suspenders step is a support.github.com request citing
+   weylandsmith/ascendancy-rewrite + old tip 5373c66aa637. User's call whether
+   to send it (also covers the manual-pages eb79da3-lineage open item).
+
+t396 LANDED 2026-11-15 (PHASE-11 VERIFY + RE-EXPORT + PUSH): verification
+PASS first (gate ALL PASS; 318/0/0; seed regression seeds 1/2024/23
+byte-IDENTICAL vs c7a3fda baseline, md5s == t389 record — engine untouched by
+t393-t395 PROVEN). REAL FINDING: the t383 privacy gate was VACUOUS — `xargs
+git cat-file --batch` appends ids as ARGS (git dies "batch modes take no
+arguments"), 2>/dev/null+||true hid it, 0-byte scan made exit-5 unreachable;
+REAL stdin scan (3399 blobs, positive control) found 1 blob with the FULL
+personal ISP address (docs/re/_wip_t383.md historical — t383's SCRUB_PATHS
+covered only one other file) AND proved it was ALREADY PUBLIC (same blob in
+pushed pubt391). Fixes shipped in publish_public.sh: stdin scan + fail-closed
+<1MB + positive control; full-address + bare-domain ERE masks over ALL paths
+(sed BRE pitfall MEASURED: bare | is literal — both seds run -E); --msg-filter
+pass (commit c953fc8's MESSAGE held the domain). Data-optional law restored:
+newgame_t393_lore_file_real_data lacked REQUIRE_DATA() -> lore[0] UB ->
+run_tests SIGSEGV on data-less clones (stdbuf -o0 pinned it; census: only true
+crasher). Canonical export /tmp/pubpush-t396c: vendor-free 6459 obj, build 0
+warnings, tests 318/205skipped/0-failed WITHOUT data, uniform noreply
+identity. PUSH force-with-lease=main:5373c66 (fetched first; remote tip tree ==
+pubt391 tree, zero foreign commits); ls-remote VERIFIED ==
+3be7e9af6c242ec90a0d3a83391375f1587a1511; askpass deleted. NO ledger row
+closed (strict-close). Full account docs/re/packaging.md t396 block +
+docs/re/_wip_t396.md.
 
 t395 LANDED 2026-11-15 (SOUND AUDIBILITY, D10 "not hearing any sound on
 Athens"): THREE defects, all pinned + live-witnessed
@@ -527,17 +565,11 @@ NOTHING while the game still boots: print which paths were tried on
 failure). Pins: tune-on-title-entry state test, SOUNDCHANNEL census
 table, path-tried diagnostic, silent-degrade still never aborts.
 
-t396 PHASE-11 VERIFY + RE-EXPORT + PUSH (push-gap law: this row MANDATORY
-even if earlier rows touched only ui/). Full gate + run_tests + headless
-seed regression (seeds 1/2024/23 byte-identical — engine untouched);
-export scripts/publish_public.sh GITHUB_USER=weylandsmith; verify
-vendor-free (scratchpad/ must be excluded — check the gate line in the
-script) + build WITHOUT data + run_tests + identity; fetch FIRST, push
-(fast-forward expected); verify post-push ls-remote; THEN rewrite NEXT
-to WAIT-USER-RULING t374 verbatim with the grading handoff: what to
-look at (title text/hotkey lines, New Game screen, map + rail buttons)
-and the one audio question (paste the startup "audio:" line from
-Athens).
+t396 PHASE-11 VERIFY + RE-EXPORT + PUSH — LANDED 2026-11-15 (see NEXT ACTION
+block + packaging.md t396; force-with-lease push, remote==3be7e9af6c24; the
+row's "fast-forward expected" premise FAILED because the privacy rewrite
+diverged history by construction — force-with-lease pinned to the FETCHED tip
+is the correct shape, skill publish-sanitized-repo).
 
 OPEN ITEM: GitHub backend GC may still serve old commit SHAs (manual pages
 eb79da3-lineage) until support sweeps orphaned objects — user may email

@@ -267,3 +267,28 @@ replace with a better source; scratchpad/ is gitignored + publish-
 excluded: vendor-copyright captures). Applied as phase 11 rows
 t392-t396. External-vision reads of the USER-SUPPLIED originals are
 allowed evidence (R13 covers our own renders only).
+
+## D11 — GRADE THE PUSHED REBUILD + ONE PRIVACY DISPOSITION (loop -> user, 2026-11-15)
+
+Everything from D10 is fixed and pushed: remote main == 3be7e9af6c24
+(weylandsmith/ascendancy-rewrite). Four eyes-on checks, one line each suffices:
+
+1. TITLE: hotkey hint lines (Alt-L/S/X) readable? Art behind buttons OK?
+   (ours for comparison: work/r1/loop/t390-title-after.png)
+2. NEW GAME: full-screen, race rows readable, Begin works? If anything is
+   clipped, paste the startup line `ui window WxH (logical 640x480)`.
+3. GALAXY MAP + rail buttons: still wonky anywhere?
+4. SOUND (closes OQ-027 outright): paste the startup line
+   `audio: driver=... sfx=86 tunes=3 vol=127` — or the `degraded: silent ...`
+   line. It prints on every `--ui` boot now; its text decides dead-card vs
+   code-gap by itself.
+
+D11b — PRIVACY DISPOSITION (your call, loop cannot act): while verifying the
+push, t396 MEASURED that the previously-pushed history (tip 5373c66aa637)
+contained your personal ISP email address in one doc blob (the t383 scrub's
+verification gate had been silently broken — now fixed, and the rewritten
+history is clean and verified). The address is therefore PUBLIC until GitHub
+garbage-collects the old objects. Optional belt-and-suspenders: email
+support.github.com citing repo `weylandsmith/ascendancy-rewrite` + old tip
+`5373c66aa637` (same request also covers the manual-page lineage from the
+earlier open item). Say "send it" or "drop it"; either way the loop proceeds.
