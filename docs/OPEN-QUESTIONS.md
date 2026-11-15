@@ -267,7 +267,9 @@ corpus circle 360/360 ACTIVE ship rows resolve owner+0x59+0x58==3 (scripts/
 r345_marker_census.py exit 0). Rewrite code site NOT landed: no per-ship
 build-slot state exists to carry it (OQ-019 boundary); shieldThreatFor/
 orbitalThreatFor sets runtime-verified unchanged. No code delta; row stays
-open per D3.
+open per D3. t397: D11 grading page is the answer channel
+(http://<this-host>:8613/, work/r1/d1page + scripts/t397_grading_page.py);
+acceptance close still requires the USER ruling, nothing closed here.
 
 OQ-027 | audio | intro TUNEID index base + per-button vendor SFX id
 | open | OPENED t388b 2026-11-14 (docs/re/audio.md §6). Two named residues
@@ -290,6 +292,8 @@ t395 adds boot_tune_entry_law_t395, audio_invalid_tune_guard_t395,
 audio_click08_offmanifest_t395 — the last one MEASURED click08.voc is off
 soundfx.txt, so play("click08") had been a no-op; census re-run
 scripts/t395_soundchannel_census.py re-pins {0 x118, -0 x1}, closes nothing).
+t397: item (a)+(b) both askable on the D11 grading page (item 4 = paste the
+`audio:`/`degraded:` startup line); row OPEN until the ruling lands.
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor cost hack, Orbital Docks effect
@@ -901,6 +905,9 @@ t324 proved unswitchable in live RAM; commit edges 0x25560/0x25570 (t88a) are
 unreachable without the armed order. CAVEAT banked: no census names the
 window record owning the 0x15xxx block — identity inferred from t88 'batmode'
 labels + gate shape, closure class same as t323 accepted. Row STAYS OPEN.
+t397 NOTE: acceptance stays DEFERRED per standing ruling (do NOT re-ask);
+the D11 grading page does NOT ask D2 and must not be edited to. Nothing
+closed; only a USER ruling on the deferred packet closes the residue.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

@@ -230,36 +230,50 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-WAIT-USER-RULING t374 (tag law: never renumber). t396 LANDED + PUSHED
-2026-11-15: remote main == 3be7e9af6c24 (verified ls-remote; force-with-lease
-over 5373c66 — the privacy rewrite makes FF impossible by construction; no
-foreign commits existed to preserve). chrome+scale+sound (t393/t394/t395) are
-ALL on GitHub now. NOTHING further is closable without a human witness; do NOT
+WAIT-USER-RULING t374 (tag law: never renumber). t397 LANDED 2026-11-15: the
+D11 asks are now ANSWERABLE on the ruling page (see below) — the channel that
+actually gets answers (D1 answered in minutes there; text asks D10/D11 sat
+unanswered). NOTHING further is closable without a human witness; do NOT
 re-check for new work (IDLE law t178) — a session wakes on a DECISIONS.md edit,
 a ruling/reply file, or a new sitting.
 
-THE GRADING HANDOFF (ask the user exactly these, on the ruling page if
-faster than text — D9 law):
-1. TITLE screen: are the two hotkey hint lines readable (no garble), is the
-   0opening art visible behind the buttons? Compare work/r1/loop/t390-title-
-   after.png (ours, Xvfb) against their Athens screen.
-2. NEW GAME screen (t393): full-screen starfield + race rows readable? Begin
-   New Game bottom-right works? If their window is STILL clipped, the
-   `ui window WxH (logical 640x480)` line now prints at title entry — ask for
-   it (512x384 = their WM is still scaling; letterbox should now absorb it).
-3. GALAXY MAP + rail buttons (t394): turn-counter ovals, NEXT TURN, spin/zoom
-   cluster, species squares — any still wonky? Grade map.png (map-turn1.png =
-   post-quit; --campaign 1 exits after advance).
-4. THE ONE AUDIO QUESTION (OQ-027 closer): paste the startup line
-   `audio: driver=... sfx=86 tunes=3 vol=127` — or the `degraded: silent ...`
-   line naming the last path tried. It prints on EVERY `--ui` boot since t395;
-   its presence/absence + text decides device-failure vs code-gap outright.
-5. NEW t396 disposition ask: GitHub GC may still serve the OLD commit SHAs
-   (5373c66 lineage) which contain the personal ISP address that t396 found
-   ALREADY PUBLIC in the pushed tree. The rewrite is done + verified; the
-   belt-and-suspenders step is a support.github.com request citing
-   weylandsmith/ascendancy-rewrite + old tip 5373c66aa637. User's call whether
-   to send it (also covers the manual-pages eb79da3-lineage open item).
+WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
+`ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
+background (it died once already when this session killed the Nov-09 pid; the
+server code is generic now: POST fields:[[label,value]] -> "USER:" lines;
+regenerate page+crops with the HERMES venv python
+`scripts/t397_grading_page.py` — system python3 has NO PIL). (1) read
+docs/DECISIONS.md tail + grep `USER:` after the D11 block; apply answers per
+strict-close (item 4 DIAGONOSES device-failure vs code-gap, but per the row's
+own bar OQ-027(a)/(b) close only on a HEARING verdict — "music/sfx audible and
+correct" — or a heap-table capture; our own `tunes=3` self-report is not
+evidence; items 1-3 grade chrome, they close nothing by themselves unless the
+user says otherwise; D11b "send it"/"drop it" is the privacy disposition).
+(2) THE GRADING HANDOFF itself = the five D11 items on
+the page (full text: docs/DECISIONS.md D11 + t396b LANDED block below).
+
+t397 LANDED 2026-11-15 (D11 GRADING PAGE — channel repair, not a measurement):
+trigger audit NEGATIVE (DECISIONS.md mtime 04:55 predates commit 04:57; no
+USER: after D11; no *ruling*/*reply* files; timeline last grew Nov 12 -> no
+sitting, r1_t85g_sitting.py correctly NOT re-run). FINDING: the live ruling
+server (pid since Nov-09) still SERVED the closed D1 sheet and its POST
+handler was HARDCODED to D1 fields — a D11 answer posted to it would have been
+mangled into D1 lines. Fixes: work/r1/d1page/server.py generalized (fields
+shape + legacy D1 fallback + env overrides D11_PAGE_PORT/D11_PAGE_ROOT/
+D11_DECISIONS_FILE, defaults identical) and RESTARTED on 8613; old sheet
+archived at /index-d1.html; scripts/t397_grading_page.py (tracked generator)
+rebuilds index.html + 2x-nearest crops from loop captures — readability law:
+text bands shown as native-res crops, NEVER browser-scaled 640x480; crops
+VERIFIED by vision read before shipping (hints "Load Game/Alt-L", title art
+"ASCENDANC"+menu, map sidebar ovals+arrows+Planets/Ships/Research, race rows
+Minions/SNOVEMDOMAS/Orfa — SNOVEMDOMAS is real vendor data,
+extracted/ascend00/static.txt:304); map-turn1.png EXCLUDED (black post-quit
+teardown frame would misreport a black screen). Self-test PASS on SCRATCH port
+8699 + scratch DECISIONS (real file never a test target): POST->USER: block,
+GET 200s, traversal 403. Pitfalls banked _wip_t397 (crop-by-measurement not
+guess; pkill -f self-match). NO ledger row closed (strict-close; a shipped
+page is not an answer); OQ-016/027 notes point at the page, OQ-019 note
+re-pins DEFERRED-do-not-re-ask. Full account docs/re/_wip_t397.md.
 
 t396 LANDED 2026-11-15 (PHASE-11 VERIFY + RE-EXPORT + PUSH): verification
 PASS first (gate ALL PASS; 318/0/0; seed regression seeds 1/2024/23
