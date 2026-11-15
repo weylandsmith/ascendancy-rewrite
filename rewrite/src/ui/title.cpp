@@ -10,12 +10,14 @@
 
 #include <SDL.h>
 
+#include <cmath>
 #include <cstdio>
 #include <algorithm>
 #include <vector>
 
 #include "formats/gif.h"
 #include "formats/shp.h"
+#include "game/campaign.h"
 #include "ui/boot.h"
 #include "ui/menulaw.h"
 #include "ui/titlepalette.h"
@@ -31,6 +33,30 @@ const SDL_Color kTitleBg{10, 12, 26, 255};
 const SDL_Color kInk{215, 215, 215, 255};
 const SDL_Color kBand{150, 130, 110, 255};
 const SDL_Color kButtonFill{0, 0, 8, 255};
+// t393 New Game screen colours [measured on the user-supplied original;
+// capture is JPEG-lossy so greys land on the canonical (97,97,97)/(12,32,48)
+// values the census converges to]. CVD rule: meaning is never carried by
+// hue alone here (selection = luminance band, labels carry the words).
+const SDL_Color kPanel{12, 32, 48, 255};      // navy panel interior
+const SDL_Color kBevel{97, 97, 97, 255};      // grey bevel lines
+const SDL_Color kLore{0, 142, 69, 255};       // vendor green ink
+const SDL_Color kSelBg{28, 56, 74, 255};      // selection band (lighter navy)
+const SDL_Color kDisc{128, 128, 128, 255};    // portrait-seam disc + ring
+const SDL_Color kArrowFill{26, 87, 146, 255};   // arrow square fill (measured)
+const SDL_Color kArrowInk{190, 255, 255, 255};  // arrow glyph (measured)
+
+// t393 map-preview primitives: IDENTICAL to ui.cpp's anonymous-namespace
+// pair (internal linkage each; the preview must project stars with the same
+// CosmosView-default law or the backdrop would drift from play). If either
+// changes, change both (pinned: preview uses starScreenPos law test).
+inline SDL_Color toSdl(RGB c) { return {c.r, c.g, c.b, 255}; }
+const SDL_Color kLane{120, 120, 120, 255};
+void filledCircle(SDL_Renderer* r, int cx, int cy, int rad) {
+    for (int dy = -rad; dy <= rad; ++dy)
+        for (int dx = -rad; dx <= rad; ++dx)
+            if (dx * dx + dy * dy <= rad * rad)
+                SDL_RenderDrawPoint(r, cx + dx, cy + dy);
+}
 
 // t390: build the title texture once — 0opening.gif index plane through the
 // t386 palette, index 255 (the menu key-solid, title-art.md §2) as alpha 0
@@ -79,13 +105,27 @@ bool buildTitleTexture(SDL_Renderer* ren, const std::string& dataRoot,
 BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          int maxIntroFrames, std::string* err,
                          void** windowOut, const std::string& savesDir,
-                         AudioEngine* audio) {
+                         AudioEngine* audio,
+                         const ascend::game::Campaign* previewCamp,
+                         const std::vector<ascend::game::SpeciesInfo>* roster,
+                         const std::vector<std::string>* lore) {
     SDL_Window* win = SDL_CreateWindow("Ascendancy", SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED, kDisplayW,
                                        kDisplayH, SDL_WINDOW_SHOWN);
     if (!win) {
         *err = std::string("title CreateWindow: ") + SDL_GetError();
         return BootState::Quit;
+    }
+    // t393 WINDOW DIAGNOSTIC (Athens report: user's window measured 512x384
+    // = 0.8x of the 640x480 logical size; everything "small/wonky" follows).
+    // Print the ACTUAL size so the next report says what the WM gave us.
+    {
+        int ww = 0, wh = 0;
+        SDL_GetWindowSize(win, &ww, &wh);
+        std::printf("ui window %dx%d (logical %dx%d)%s\n", ww, wh, kDisplayW,
+                    kDisplayH,
+                    (ww == kDisplayW && wh == kDisplayH) ? "" : " <- SCALED");
+        std::fflush(stdout);
     }
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     if (!ren) ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE);
@@ -99,6 +139,44 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
 
     BootState st = initial;
     std::fflush(stdout);
+
+    // ---- t393 New Game screen state (SETTINGS; applying them to the live
+    // campaign is the named seed seam — buildCampaign already ran, so Begin
+    // enters play with the built galaxy and prints the wheel values).
+    // Default density word = the ladder rung the built galaxy actually has
+    // (o.stars 50 -> Average); species count word = the number of players
+    // the campaign really has (player + 6 AI = Seven); atmosphere Neutral =
+    // the vendor default AS MEASURED on the user-supplied original (the
+    // capture shows "Neutral Atmosphere" on a fresh New Game screen) — the
+    // wheel click does not model atmosphere (no atmosphere model exists).
+    int densityIdx = 0;
+    if (previewCamp)
+        for (int i = 0; i < kDensityCycleCount; i++)
+            if (int(kDensityStarCounts[i]) ==
+                int(previewCamp->galaxy().stars.size()))
+                densityIdx = i;
+    int speciesSetting = 7;   // player + 6 AI (main.cpp buildCampaign law)
+    int atmosphere = 1;       // Neutral (measured vendor default, see above)
+    int selSlot = 0, scrollOffset = 0;  // RACELIST window (3 of roster)
+    const auto rosterCount = [&]() { return roster ? int(roster->size()) : 0; };
+    const auto speciesNameAt = [&](int specnum) -> std::string {
+        if (roster && specnum >= 0 && specnum < int(roster->size())) {
+            std::string n = roster->at(size_t(specnum)).dipName;
+            if (!n.empty()) {
+                // Header shape varies: race01 "for SNOVEMDOMAS", race00 "for
+                // the Minions" [verified headers]. The vendor screen shows
+                // the bare name ("Minions", green ink on the user-supplied
+                // original), and static.txt //154 supplies the article —
+                // strip a leading "the " so the template cannot render
+                // "The the Minions are ...".
+                if (n.size() > 4 && (n[0] == 't' || n[0] == 'T') &&
+                    n[1] == 'h' && n[2] == 'e' && n[3] == ' ')
+                    n = n.substr(4);
+                return n;
+            }
+        }
+        return "Species " + std::to_string(specnum);  // defensive, not shown
+    };
 
     // t387: the NEWGAMEWND wheel library loads ONCE (per-frame loading would
     // re-read 27 KB every 16 ms). count()>0 == available; a refusal prints
@@ -141,6 +219,10 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
     };
 
     while (st == BootState::Title || st == BootState::RaceConfig) {
+        // t393 SCREEN LAW (D10; boot.md §7): RaceConfig is a FULL-SCREEN
+        // SWITCH — the title chrome (art + button column) must NOT show
+        // through. Draw one frame of exactly one screen per iteration.
+        if (st == BootState::Title) {
         // ---- draw: ART first, then the seven-button column in its hole ----
         SDL_SetRenderDrawColor(ren, kTitleBg.r, kTitleBg.g, kTitleBg.b, 255);
         SDL_RenderClear(ren);
@@ -188,42 +270,222 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          b.label, true, kInk);
             }
         }
-        if (st == BootState::RaceConfig) {
-            // NEWGAMEWND chrome (windows.txt L575-673, law docs/re/boot.md
-            // §6): the TYPE-18 frame + its three state-3 child buttons +
-            // the RACELIST frame. Absolute coords — PARENT is containment,
-            // not an offset (_wip_t387 coordinate-space witness). The k0
-            // wheel face (SHAPEITEM 1 data\3cfgnew.shp 0 0 0) blits inside
-            // each child rect; setting the wheel values is a named seam.
-            const bool haveCfg = cfgNew.count() > 0;
+        } else {
+            // ---- t393 NEW GAME FULL SCREEN (D10: was an overlay -> garbled
+            // title bleeding through). Layout law docs/re/_wip_t393.md S1-S12
+            // (windows.txt L575-684 cited rects + cited measurement off the
+            // user-supplied original); this block only draws that table.
+            SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+            SDL_RenderClear(ren);  // starfield zone measured BLACK (S: census)
+
+            // (1) BACKDROP = live map preview (COSMOSWnd is STATE "4 1 3 7 13"
+            // — registered in state 3; the original shows the generated map
+            // behind the panels). Same projection law as the campaign loop.
+            if (previewCamp) {
+                const ascend::game::Galaxy& g = previewCamp->galaxy();
+                CosmosView view;  // mapSize default == MapConfig default
+                SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
+                for (const auto& ln : g.lanes) {
+                    Pt a = starScreenPos(view, g.stars[ln.a]);
+                    Pt b2 = starScreenPos(view, g.stars[ln.b]);
+                    SDL_RenderDrawLine(ren, a.x, a.y, b2.x, b2.y);
+                }
+                for (const auto& s : g.stars) {
+                    Pt q = starScreenPos(view, s);
+                    SDL_Color n = toSdl(kNeutralRgb);
+                    SDL_SetRenderDrawColor(ren, n.r, n.g, n.b, 255);
+                    filledCircle(ren, q.x, q.y, 2);
+                }
+            }
+
+            // (2) Summary block: static.txt //168 template, white, centred
+            // under the starfield (measured rows 327/340/353, pitch 13).
+            std::vector<std::string> summary;
+            newgameSummary(kDensityStarCounts[densityIdx], speciesSetting,
+                           atmosphere, &summary);
+            for (size_t i = 0; i < summary.size(); i++) {
+                const int w = txt.width(summary[i], false);
+                txt.draw(ren, kSummaryCentreX - w / 2,
+                         kSummaryTop + int(i) * kSummaryPitch, summary[i],
+                         false, kInk);
+            }
+
+            // (3) NEWGAMEWND panel: interior measured BLACK + grey bevel
+            // (97,97,97). The k0 wheel face (84x79) is the config WHEEL art
+            // for the bottom-row controls (SHAPEITEM records), not this
+            // panel's backdrop — t387 drew it here on a wrong reading; the
+            // panel carries name + lore text instead (original S9).
             SDL_Rect wf{kNewgameWnd.x0, kNewgameWnd.y0,
                         kNewgameWnd.x1 - kNewgameWnd.x0 + 1,
                         kNewgameWnd.y1 - kNewgameWnd.y0 + 1};
-            if (haveCfg) {
-                // k0 is 84x79, not a window backdrop: draw it centred in the
-                // frame as the declared wheel face, frame edges on top.
-                blitShape(ren, cfgNew, 0,
-                          wf.x + (wf.w - int(cfgNew.record(0).width)) / 2,
-                          wf.y + 40);
-            }
-            SDL_SetRenderDrawColor(ren, kBand.r, kBand.g, kBand.b, 255);
+            SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
             SDL_RenderDrawRect(ren, &wf);
+
+            // (4) Species name (green, rows 18..27, centred on the panel) +
+            // "Player Species" header (white, rows 16..25, centred RACELIST).
+            const int selIndex = scrollOffset + selSlot;
+            const std::string selName = speciesNameAt(selIndex);
+            {
+                const int w = txt.width(selName, false);
+                txt.draw(ren, (kNewgameWnd.x0 + kNewgameWnd.x1 + 1) / 2 - w / 2,
+                         kNameTop, selName, false, kLore);
+            }
+            {
+                const std::string hdr = "Player Species";  // static.txt //153
+                const int w = txt.width(hdr, false);
+                txt.draw(ren, (kRaceList.x0 + kRaceList.x1 + 1) / 2 - w / 2,
+                         kHeaderTop, hdr, false, kInk);
+            }
+
+            // (5) Lore: "The <Name> <fragment>" (static.txt //154 template +
+            // newgame.txt line N+1), green, word-wrapped into kLoreBox.
+            {
+                const std::string frag =
+                    selIndex >= 0 && lore && selIndex < int(lore->size())
+                        ? (*lore)[size_t(selIndex)]
+                        : std::string();
+                if (!frag.empty()) {
+                    const auto lines = wrapToWidth(
+                        loreSentence(selName, frag),
+                        kLoreBox.x1 - kLoreBox.x0 - 8,
+                        [&](const std::string& s) {
+                            return txt.width(s, false);
+                        });
+                    for (size_t i = 0; i < lines.size(); i++) {
+                        const int w = txt.width(lines[i], false);
+                        txt.draw(ren,
+                                 (kLoreBox.x0 + kLoreBox.x1 + 1) / 2 - w / 2,
+                                 kLoreBox.y0 + int(i) * kLoreLinePitch,
+                                 lines[i], false, kLore);
+                    }
+                }
+            }
+
+            // (6) RACELIST: navy interior + bevel + THREE portrait slots
+            // (measured S: bands 49-153/157-262/266-372, pitch 108) + scroll
+            // arrow squares. PORTRAITS ARE A NAMED SEAM (t391: the 7racesel
+            // strips stay unblitted without a stronger witness) — a grey
+            // disc + the species NAME stands in, and says so in the docs.
             SDL_Rect rl{kRaceList.x0, kRaceList.y0,
                         kRaceList.x1 - kRaceList.x0 + 1,
                         kRaceList.y1 - kRaceList.y0 + 1};
-            SDL_RenderDrawRect(ren, &rl);  // RACELIST frame (rows = t388 seam)
+            SDL_SetRenderDrawColor(ren, kPanel.r, kPanel.g, kPanel.b, 255);
+            SDL_RenderFillRect(ren, &rl);
+            SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
+            SDL_RenderDrawRect(ren, &rl);
+            for (int i = 0; i < kRaceSlotCount; i++) {
+                const int specnum = scrollOffset + i;
+                const int cy = kRaceSlotTop + i * kRaceSlotPitch +
+                               kRaceSlotH / 2;
+                const int cx = (kRaceList.x0 + kRaceList.x1) / 2;
+                if (i == selSlot) {  // selection: luminance change, not hue
+                    SDL_SetRenderDrawColor(ren, kSelBg.r, kSelBg.g, kSelBg.b,
+                                           255);
+                    SDL_Rect band{kRaceList.x0 + 1, cy - kRaceSlotH / 2,
+                                  kRaceList.x1 - kRaceList.x0 - 1, kRaceSlotH};
+                    SDL_RenderFillRect(ren, &band);
+                }
+                if (specnum < rosterCount()) {
+                    SDL_SetRenderDrawColor(ren, kDisc.r, kDisc.g, kDisc.b, 255);
+                    filledCircle(ren, cx, cy, kRaceSlotH / 2 - 2);
+                    SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b,
+                                           255);
+                    for (int a = 0; a < 360; a += 2) {  // ring (seam stand-in)
+                        const double rad = a * 3.14159265 / 180.0;
+                        SDL_RenderDrawPoint(
+                            ren, cx + int((kRaceSlotH / 2 - 1) * cos(rad)),
+                            cy + int((kRaceSlotH / 2 - 1) * sin(rad)));
+                    }
+                    const std::string nm = speciesNameAt(specnum);
+                    const int w = txt.width(nm, false);
+                    txt.draw(ren, cx - w / 2, cy - 4, nm, false, kInk);
+                }
+            }
+            for (int i = 0; i < 2; i++) {  // arrows (measured corner squares)
+                const Rect& ar = i == 0 ? kRaceArrowUp : kRaceArrowDown;
+                SDL_Rect r{ar.x0, ar.y0, ar.x1 - ar.x0 + 1,
+                           ar.y1 - ar.y0 + 1};
+                SDL_SetRenderDrawColor(ren, kArrowFill.r, kArrowFill.g,
+                                       kArrowFill.b, 255);
+                SDL_RenderFillRect(ren, &r);
+                SDL_SetRenderDrawColor(ren, kArrowInk.r, kArrowInk.g,
+                                       kArrowInk.b, 255);
+                const int cx = (ar.x0 + ar.x1) / 2, cy = (ar.y0 + ar.y1) / 2;
+                for (int d = -4; d <= 4; d++) {
+                    const int len = 4 - std::abs(d);
+                    for (int t = 0; t <= len; t++)
+                        SDL_RenderDrawPoint(
+                            ren, cx + d,
+                            i == 0 ? cy - t + 2 : cy + t - 2);
+                }
+            }
+
+            // (7) Bottom config bar: four windows.txt-cited panels + the
+            // measured Begin zone. Panels: navy fill + bevel + white label
+            // (measured rows 393..403) + value word + k0 wheel face inside.
             for (int i = 0; i < kNewgameControlCount; i++) {
                 const NewgameControl& c = kNewgameControls[i];
-                if (haveCfg)
-                    blitShape(ren, cfgNew, 0, c.rect.x0, c.rect.y0);  // k0 face
-                const int w = txt.width(c.label, false);
-                txt.draw(ren, c.rect.x0 +
-                                 ((c.rect.x1 - c.rect.x0 + 1) - w) / 2,
-                         c.rect.y0 + 4, c.label, false, kInk);
+                SDL_Rect r{c.rect.x0, c.rect.y0, c.rect.x1 - c.rect.x0 + 1,
+                           c.rect.y1 - c.rect.y0 + 1};
+                SDL_SetRenderDrawColor(ren, kPanel.r, kPanel.g, kPanel.b, 255);
+                SDL_RenderFillRect(ren, &r);
+                SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
+                SDL_RenderDrawRect(ren, &r);
+                const int cxp = (c.rect.x0 + c.rect.x1) / 2;
+                const int wl = txt.width(c.label, false);
+                txt.draw(ren, cxp - wl / 2, c.rect.y0 + 12, c.label, false,
+                         kInk);
+                if (cfgNew.count() > 0)
+                    blitShape(ren, cfgNew, 0,
+                              cxp - int(cfgNew.record(0).width) / 2,
+                              c.rect.y0 + 26);  // wheel face (SHAPEITEM cited)
+                const char* vw = i == 0
+                                     ? kDensityWords[densityIdx]
+                                     : (i == 1 ? speciesCountWord(speciesSetting)
+                                               : atmosphereWord(atmosphere));
+                if (vw) {
+                    const int wv = txt.width(vw, false);
+                    txt.draw(ren, cxp - wv / 2, c.rect.y0 + 58, vw, false,
+                             kInk);
+                }
             }
-            txt.draw(ren, wf.x + 12, wf.y + 8,
-                     "New game setup. Press Return to Current Game.", false,
-                     kInk);
+            // Player^Color (windows.txt L653, MSG 0 = inert): label + six
+            // owner-colour chips (the original shows six icons; WHICH six is
+            // a named seam — kOwnerRgb is our CVD-safe set, cited as such).
+            {
+                const Rect c = kPlayerColorRect;
+                SDL_Rect r{c.x0, c.y0, c.x1 - c.x0 + 1, c.y1 - c.y0 + 1};
+                SDL_SetRenderDrawColor(ren, kPanel.r, kPanel.g, kPanel.b, 255);
+                SDL_RenderFillRect(ren, &r);
+                SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
+                SDL_RenderDrawRect(ren, &r);
+                const std::string lbl = "Player Color";  // NAME 'Player^Color'
+                const int cxp = (c.x0 + c.x1) / 2;
+                const int wl = txt.width(lbl, false);
+                txt.draw(ren, cxp - wl / 2, c.y0 + 12, lbl, false, kInk);
+                for (int k = 0; k < 6; k++) {
+                    SDL_Color col = toSdl(kOwnerRgb[k]);
+                    SDL_SetRenderDrawColor(ren, col.r, col.g, col.b, 255);
+                    SDL_Rect chip{cxp - 45 + k * 16, c.y0 + 28, 12, 12};
+                    SDL_RenderFillRect(ren, &chip);
+                }
+            }
+            // Begin New Game (measured rect; NOT windows.txt — STARTGAME is
+            // STATE "1 12"). White label rows measured ~456; thumbnail seam.
+            {
+                SDL_Rect r{kBeginNewGameBtn.x0, kBeginNewGameBtn.y0,
+                           kBeginNewGameBtn.x1 - kBeginNewGameBtn.x0 + 1,
+                           kBeginNewGameBtn.y1 - kBeginNewGameBtn.y0 + 1};
+                SDL_SetRenderDrawColor(ren, kPanel.r, kPanel.g, kPanel.b, 255);
+                SDL_RenderFillRect(ren, &r);
+                SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
+                SDL_RenderDrawRect(ren, &r);
+                const std::string lbl = "Begin New Game";  // static.txt //169
+                const int w = txt.width(lbl, false);
+                txt.draw(ren,
+                         (r.x + (r.w - w) / 2), kBeginLabelTop, lbl, false,
+                         kInk);
+            }
         }
         SDL_RenderPresent(ren);
 
@@ -258,19 +520,71 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             }
             if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
                 Pt p{e.button.x, e.button.y};
-                // t387: NEWGAMEWND child buttons first (absolute rects; they
-                // sit OUTSIDE the title column, so bootClick cannot see them).
-                // Routing law: the buttons ACKNOWLEDGE (print) — the wheel
-                // values feed a campaign-seed seam that does not exist yet.
+                // t393 NEW GAME input law (full screen — the title column is
+                // NOT on this screen, so bootClick does not route here):
+                // arrows -> scroll window, rows -> select, wheel -> cycle the
+                // setting (SENDMESSAGE 501/503/505 = the vendor *_MORE
+                // semantics), Begin -> Campaign, PlayerColor inert (MSG 0).
                 if (st == BootState::RaceConfig) {
-                    const int ci = newgameControlAt(p);
-                    if (ci >= 0) {
-                        std::printf("ui raceconfig click %s msg %d\n",
-                                    kNewgameControls[ci].name,
-                                    kNewgameControls[ci].message);
+                    const int ai = newgameArrowAt(p);
+                    if (ai >= 0) {
+                        const int maxOff =
+                            std::max(0, rosterCount() - kRaceSlotCount);
+                        scrollOffset =
+                            std::clamp(scrollOffset + (ai == 0 ? -1 : 1), 0,
+                                       maxOff);
+                        std::printf("ui raceconfig arrow %s offset %d\n",
+                                    ai == 0 ? "up" : "down", scrollOffset);
                         std::fflush(stdout);
                         continue;
                     }
+                    const int row = newgameRowAt(p);
+                    if (row >= 0 && scrollOffset + row < rosterCount()) {
+                        selSlot = row;
+                        std::printf("ui raceconfig select specnum %d %s\n",
+                                    scrollOffset + row,
+                                    speciesNameAt(scrollOffset + row).c_str());
+                        std::fflush(stdout);
+                        continue;
+                    }
+                    const int ci = newgameControlAt(p);
+                    if (ci >= 0) {
+                        // *_MORE = advance one rung (density cycles the t78
+                        // ladder; species 3..Seven; atmosphere 0..2).
+                        if (ci == 0)
+                            densityIdx = (densityIdx + 1) % kDensityCycleCount;
+                        else if (ci == 1)
+                            speciesSetting =
+                                speciesSetting >= 7 ? 3 : speciesSetting + 1;
+                        else
+                            atmosphere = (atmosphere + 1) % 3;
+                        std::printf("ui raceconfig click %s msg %d -> %s\n",
+                                    kNewgameControls[ci].name,
+                                    kNewgameControls[ci].message,
+                                    ci == 0
+                                        ? kDensityWords[densityIdx]
+                                        : (ci == 1
+                                               ? speciesCountWord(speciesSetting)
+                                               : atmosphereWord(atmosphere)));
+                        std::fflush(stdout);
+                        continue;
+                    }
+                    if (inRect(kPlayerColorRect, p)) {
+                        std::printf("ui raceconfig click Player^Color msg 0\n");
+                        std::fflush(stdout);
+                        continue;  // MSG 0 = inert zone (windows.txt L664)
+                    }
+                    if (inRect(kBeginNewGameBtn, p)) {
+                        std::printf(
+                            "ui raceconfig begin density %d species %d "
+                            "atmosphere %d species-pick %d\n",
+                            kDensityStarCounts[densityIdx], speciesSetting,
+                            atmosphere, scrollOffset + selSlot);
+                        std::fflush(stdout);
+                        st = BootState::Campaign;
+                        continue;
+                    }
+                    continue;  // dead zone on the full screen
                 }
                 const int idx = titleButtonAt(p);
                 const BootState next = bootClick(st, p);

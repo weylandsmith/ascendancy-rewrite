@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-14T23:40
+updated: 2026-11-15T02:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,17 +230,50 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t393 per queue row t393 below (phase 11: UI ROUND 2 + SOUND, per the
-D10 user grade of 2026-11-14). Ordering: t393 before t394 because the
-"garbled and unusable" New Game screen is the worst-graded screen and its
-coordinate-space bug hunt (clipped rects) is the same class of error t394
-may share — land the layout-table instrument first. t392 LANDED 2026-11-14
-(title text baseline + Alt-L/S/X second lines — see its LANDED block; the
-vendor-profile row-for-row witness closes the D10 text complaints on our
-own render). Reference material for t393/t394: scratchpad/ user-supplied
-original-vs-rewrite pairs — gitignored and publish-excluded (archive.org
-vendor captures); external vision on USER-SUPPLIED originals is ALLOWED
-evidence (R13 governs OUR OWN renders only).
+NEXT t394 per queue row t394 below (phase 11: UI ROUND 2 + SOUND, per the
+D10 user grade of 2026-11-14). Ordering: t394 now that t393 LANDED
+(2026-11-15) — t393 shipped the layout-table instrument (menulaw t393 block
++ the capture->screen mapping law boot.md S8) and the `ui window WxH
+(logical 640x480)` diagnostic line; t394's FIRST job (diagnose why t391's
+10status/1starmap blits are absent from the user's shot) now starts from
+that diagnostic: ask for the line in the next Athens report, and check the
+512x384-vs-640x480 scale law (the user's rewrite shot measured exactly
+0.8x — our own Xvfb window measured 640x480, so the scale happens on their
+WM side; the fix (hint vs. borderless vs. scale-factor flag) is t394's
+decision, to be taken from SDL docs, not memory).
+Then per-element galaxy map + rail: five ovals / two nav buttons / 3x3
+grid / six squares, EACH cited to windows.txt STATUSWND children +
+1starmap/10status records, or banked as named seam (t393's Begin-rect
+precedent: cited measurement off user-supplied originals IS admissible —
+scratchpad/galaxymap-original.png is already on disk).
+t393 LANDED 2026-11-15 (New Game screen rebuild, D10 "garbled and
+unusable"): ROOT CAUSES closed — (1) RaceConfig was an OVERLAY under the
+live title frame (title.cpp rewired to a full-screen else-branch; screen law
+mechanically witnessed: title fill (0,0,8) count 0 on the New Game shot);
+(2) the user's clipping = their WM scaled the window to 512x384 (0.8x) —
+law rects all FIT 640x480 (pinned) and a `ui window WxH (logical 640x480)`
+diagnostic line now prints at title entry (our own Xvfb: 640x480 exact).
+LAYOUT LAW banked boot.md S8 + menulaw t393 block: state-3 window-table
+re-parse (COSMOSWnd "4 1 3 7 13" => starfield backdrop IS the table's law;
+rail children registered but NOT painted [verified on original]); Begin New
+Game (494,373)-(639,472) CITED-MEASURED off the user-supplied original
+(STARTGAME STATE "1 12" cited negative; capture->screen = minus 1, anchored
+on GALAXY_MORE x0=7 + bevel census); RACELIST = THREE-slot scroll window
+(pitch 108, bands 49-153/157-262/266-372) + 16x16 arrows (616,47)/(616,356)
+[measured]; text law static.txt //153 name green rows 18-27, //154 "The %s
+%s" x newgame.txt line N+1 (21 fragments, EOF 0x1a, loadNewgameLore refuses
+otherwise — REAL file pinned incl. the race00 "for the Minions" leading-the
+strip), //168 summary template words 155-167 on the t78 MEASURED ladder
+(50/75/100/15/25), Neutral default measured on the original. INPUT: arrows
+scroll, rows select, *_MORE cycle one rung, Begin -> Campaign (prints
+settings; APPLYING them = named seam, buildCampaign already ran),
+Player^Color MSG 0 inert. PORTRAITS stay a named seam (t391 witness weak):
+grey disc + dipName. 7 pins (test_newgame_t393.cpp), suite 308/0, gate 0,
+witness scripts t393_newgame_witness.sh + t393_witness.py (13 checks PASS;
+RUN WITH ~/tools/revenv/bin/python — repo .venv has no PIL, banked),
+screenshots work/r1/loop/t393-*.png for USER grading. NO ledger row moved
+(strict-close; queue work).
+
 PHASE-10 HISTORY: PUSH GAP CLOSED 2026-11-14 (user: "nothing has been committed to Github"
 — CORRECT: t390/t391 were local-only; t389's push covered phase-10 proper.
 Export /tmp/pubt391 verified vendor-free 6349 obj, builds WITHOUT data

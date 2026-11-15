@@ -231,3 +231,63 @@ Both closed with measurement; implementation `title.cpp` draw loop +
   t392_title_witness.sh proves the input path (Esc -> "ui title esc" ->
   process exits); the Alt-chords themselves are unit-pinned only —
   tools/xsend sends one keysym with no modifier state (banked pitfall).
+## 8. t393 NEW GAME FULL SCREEN (2026-11-15, D10 "garbled and unusable")
+
+SCREEN LAW: RaceConfig is a full-screen SWITCH, not an overlay (t387 drew it
+over the live title frame -> title art bled through the gaps = "garbled").
+The draw loop is now `if (st == Title) {title frame} else {newgame frame}`;
+mechanical witness: the title button fill (0,0,8) appears 0 times on the
+New Game screenshot (scripts/t393_witness.py, our own Xvfb render).
+
+STATE-3 TABLE (windows.txt, re-parsed mechanically — every record whose
+STATE field contains token "3"): NEWGAMEWND TYPE 18 (334,12)-(488,364);
+GALAXY_MORE/PLAYERS_MORE/DIFFICULTYMORE TYPE 0 msg 501/503/505 (bottom row
+7-122/131-246/255-370, y 381-472); Player^Color (379,381)-(493,419) MSG 0;
+RACELIST TYPE 10 (502,45)-(632,372) SF 7; COSMOSWnd TYPE 2 STATE "4 1 3 7
+13" (the map viewport is REGISTERED in state 3 -> the starfield backdrop is
+the window table's own law, drawn with the campaign's starScreenPos
+projection over the live built galaxy); LOADSCREEN also lives in 3. The
+rail children list 3 too but DO NOT PAINT on this screen (user-supplied
+original shows no rail): STATE-list membership = registration, not paint.
+
+BEGIN NEW GAME: NOT windows.txt (STARTGAME TYPE 30 is STATE "1 12" — cited
+negative). Rect (494,373)-(639,472) is a CITED MEASUREMENT off the
+user-supplied original capture (capture->screen = minus 1; anchors:
+GALAXY_MORE x0=7 lands exactly on the bevel boundary, bevel census row
+y=430 hits screen 123/247/371/493 at every windows.txt child right edge).
+
+RACELIST ROW LAW [measured]: THREE-slot scroll window (silver-ring bands
+screen 49-153/157-262/266-372, pitch 108, full-pitch hit slots) + 16x16
+arrow squares (616,47)-(631,62) / (616,356)-(631,371). PORTRAITS = named
+seam (t391 7racesel witness still weak): grey disc + dipName stands in.
+
+TEXT LAW: species name green (0,142,69) rows 18-27 centred NEWGAMEWND;
+"Player Species" (static.txt //153) white rows 16-25 centred RACELIST;
+lore = static.txt //154 "The %s %s" x newgame.txt line N+1 (specnum order,
+21 fragments, EOF 0x1a; loadNewgameLore refuses otherwise), greedy wrap
+into (334,258)-(488,330); summary = static.txt //168 template words 155-
+167, lines at y 327/340/353 pitch 13 centred x 170. dipName leading "the "
+is stripped ("for the Minions" header + //154's article would render "The
+the Minions are ...").
+
+WORD->VALUE LAW: density words 155-159 ride the t78 MEASURED ladder
+(Average 50 / Dense 75 / Very Dense 100 / Vacuous 15 / Sparse 25, cycle
+order mapgen.md OQ-012(a)); species words Three..Seven (3..7); atmosphere
+Peaceful/Neutral/Hostile (0..2, default Neutral = measured on the original
+capture). Wheel click = advance one rung (*_MORE semantics, SENDMESSAGE).
+APPLYING settings to the live campaign is the named SEAM (buildCampaign
+already ran; Begin prints density/species/atmosphere/species-pick and
+enters play with the built galaxy).
+
+DIAGNOSTIC: runTitleScreen prints `ui window WxH (logical 640x480)` (+
+" <- SCALED") — the Athens report's 512x384 window (0.8x) is what made the
+bottom row clip; the law rects all FIT 640x480 (pinned). Scale LAW = t394.
+
+PINS: tests/test_newgame_t393.cpp x7 (fit-640x480 assert, cited rects,
+slots/arrows, ladder+words, //168 template, REAL newgame.txt read incl.
+refusal paths, wrap law). Witness: scripts/t393_newgame_witness.sh (click
+path Title->New Game->wheels->select->arrow->Begin->campaign, stdout
+routing lines) + scripts/t393_witness.py (13 mechanical checks, RUN WITH
+~/tools/revenv/bin/python — repo .venv has no PIL). Screenshots graded by
+the USER: work/r1/loop/t393-{title,newgame,newgame-set,after-begin}.png.
+

@@ -12,6 +12,7 @@
 // overlaps the bottom-row buttons; absolute puts them disjoint, equal-width,
 // 9-px gutters).
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -41,6 +42,78 @@ extern const NewgameControl kNewgameControls[kNewgameControlCount];
 // Which control (0..2) contains p, -1 if none. Inclusive edges, no clamp
 // (same law as titleButtonAt).
 int newgameControlAt(Pt p);
+
+// ---- New Game full-screen layout (t393; docs/re/_wip_t393.md S6-S12) ------
+// D10 (user 2026-11-14): the vendor New Game screen is a FULL-SCREEN switch
+// (starfield backdrop + panels), not an overlay. The four bottom-row panels
+// above are windows.txt-cited; the fifth zone — the Begin New Game button —
+// is NOT in windows.txt (STARTGAME L1866 carries STATE "1 12", so it is not
+// the state-3 button): its rect is a CITED MEASUREMENT off the user-supplied
+// original capture scratchpad/newgame-original.png (capture = 640x480 + 1px
+// border; screen coord = capture coord - 1; anchor: GALAXY_MORE x0=7 lands
+// exactly on the capture's navy/left-bevel boundary).
+inline constexpr Rect kBeginNewGameBtn{494, 373, 639, 472};
+// Player^Color (windows.txt L653, TYPE 0, PARENT NONE, MSG 0): the fourth
+// bottom-row zone. Label + colour chips; MSG 0 means the vendor sends no
+// message on click (inert zone in the window table).
+inline constexpr Rect kPlayerColorRect{379, 381, 493, 419};
+// Summary block centre x [measured]: the three white lines centre on screen
+// x ~170 (bands x 116..224 / 140..204 / 121..221). Begin label white ink
+// rows measured 456..464 -> label top 455.
+inline constexpr int kSummaryCentreX = 170, kBeginLabelTop = 455;
+
+// Text placements [measured S9, screen coords, ink rows]: species name
+// (green) rows 18..27 centred x 412 ~= NEWGAMEWND centre 411; "Player
+// Species" header (white) rows 16..25 centred x 568 ~= RACELIST centre 567;
+// lore block inside NEWGAMEWND; summary block centred under the starfield.
+inline constexpr int kNameTop = 18, kHeaderTop = 16;
+inline constexpr Rect kLoreBox{334, 258, 488, 330};
+inline constexpr int kLoreLinePitch = 11;  // measured bands pitch 11
+inline constexpr int kSummaryTop = 327, kSummaryPitch = 13;
+
+// RACELIST ROW LAW [MEASURED t393 on the user-supplied original]: the list
+// is a THREE-SLOT scroll window, not a 7-row list. Silver bevel-ring census
+// inside the interior gives row bands screen 49..153 / 157..262 / 266..372
+// (pitch 108), x 506..631. Scroll arrows are 16x16 squares at the interior
+// corners: up (616,47)-(631,62), down (616,356)-(631,371).
+inline constexpr int kRaceSlotTop = 49, kRaceSlotH = 108, kRaceSlotPitch = 108;
+inline constexpr int kRaceSlotCount = 3;
+inline constexpr Rect kRaceArrowUp{616, 47, 631, 62};
+inline constexpr Rect kRaceArrowDown{616, 356, 631, 371};
+int newgameRowAt(Pt p);   // slot 0..2 or -1 (gutters/arrows dead for rows)
+int newgameArrowAt(Pt p); // 0 = up, 1 = down, -1 = none
+
+// The three setting words + summary (static.txt verbatim, L429-457 block):
+// density words 155-159, atmosphere 160-162, species count 163-167, summary
+// template 168 "%s Star Cluster\n%s Species\n%s Atmosphere". The word->star
+// count law is the t78 MEASURED ladder (mapgen.md OQ-012(a)): Average 50 ->
+// Dense 75 -> Very Dense 100 -> Vacuous 15 -> Sparse 25 -> wrap.
+inline constexpr int kDensityCycleCount = 5;
+extern const char* const kDensityWords[kDensityCycleCount];
+extern const int kDensityStarCounts[kDensityCycleCount];  // parallel, cited
+const char* densityWord(int starCount);  // "Average" for 50; nullptr off-ladder
+const char* speciesCountWord(int n);     // "Three".."Seven"; nullptr else
+const char* atmosphereWord(int v);       // 0 Peaceful / 1 Neutral / 2 Hostile
+// Summary lines from a (density, species, atmosphere) triple; unknown values
+// degrade to the bare noun ("Star Cluster") rather than inventing a word.
+void newgameSummary(int starCount, int speciesCount, int atmosphere,
+                    std::vector<std::string>* out);  // 3 lines, template 168
+
+// LORE LAW (t393): extracted/ascend00/newgame.txt line N+1 == specnum N's
+// sentence fragment ("are a mysterious group of robot creatures ..."); the
+// vendor composes it with static.txt 154 "The %s %s" (name + fragment).
+// Refuses (false, err) unless exactly 21 fragments parse (EOF marker 0x1a
+// ends the file). Supply-your-own data rules apply: read, never embed.
+bool loadNewgameLore(const std::string& path, std::vector<std::string>* out,
+                     std::string* err);
+std::string loreSentence(const std::string& name, const std::string& frag);
+
+// Greedy word wrap against a measured-width function (the caller supplies
+// VendorText::width; pure so it unit-tests without SDL). Never splits a
+// word; a single word wider than maxW goes on its own line (honest overflow).
+std::vector<std::string> wrapToWidth(
+    const std::string& text, int maxW,
+    const std::function<int(const std::string&)>& widthOf);
 
 // ---- Load (LOADSCREEN/LOADLIST) -------------------------------------------
 // TYPE 11 LOADSCREEN (7,7)-(632,37): the title strip; TYPE 10 LOADLIST

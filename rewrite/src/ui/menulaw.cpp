@@ -35,6 +35,110 @@ int newgameControlAt(Pt p) {
     return -1;
 }
 
+// ---- t393 New Game full-screen law ----------------------------------------
+int newgameRowAt(Pt p) {
+    if (!inside(kRaceList, p)) return -1;
+    for (int i = 0; i < kRaceSlotCount; i++) {
+        Rect slot{kRaceList.x0, kRaceSlotTop + i * kRaceSlotPitch,
+                  kRaceList.x1, kRaceSlotTop + i * kRaceSlotPitch + kRaceSlotH - 1};
+        if (inside(slot, p)) return i;
+    }
+    return -1;  // gutters dead
+}
+
+int newgameArrowAt(Pt p) {
+    if (inside(kRaceArrowUp, p)) return 0;
+    if (inside(kRaceArrowDown, p)) return 1;
+    return -1;
+}
+
+// static.txt //155-159 verbatim; star counts = the t78 MEASURED cycle
+// (docs/re/mapgen.md OQ-012(a): Average 50 measured 5/5, Dense 75, Very
+// Dense 100, Vacuous 15, Sparse 25; cycle order Average->Dense->Very
+// Dense->Vacuous->Sparse->wrap, live-rung witness r1size-* captures).
+const char* const kDensityWords[kDensityCycleCount] = {
+    "Average", "Dense", "Very Dense", "Vacuous", "Sparse"};
+const int kDensityStarCounts[kDensityCycleCount] = {50, 75, 100, 15, 25};
+
+const char* densityWord(int starCount) {
+    for (int i = 0; i < kDensityCycleCount; i++)
+        if (kDensityStarCounts[i] == starCount) return kDensityWords[i];
+    return nullptr;  // off the measured ladder: no word is cited, say so
+}
+
+const char* speciesCountWord(int n) {  // static.txt //163-167
+    static const char* const kWords[5] = {"Three", "Four", "Five", "Six",
+                                          "Seven"};
+    return n >= 3 && n <= 7 ? kWords[n - 3] : nullptr;
+}
+
+const char* atmosphereWord(int v) {  // static.txt //160-162
+    static const char* const kWords[3] = {"Peaceful", "Neutral", "Hostile"};
+    return v >= 0 && v <= 2 ? kWords[v] : nullptr;
+}
+
+void newgameSummary(int starCount, int speciesCount, int atmosphere,
+                    std::vector<std::string>* out) {
+    // Template static.txt //168 "%s Star Cluster\n%s Species\n%s Atmosphere".
+    // An uncited word degrades to the bare noun — the line still says what
+    // it is about, it just stops claiming a value it cannot cite.
+    const char* d = densityWord(starCount);
+    const char* s = speciesCountWord(speciesCount);
+    const char* a = atmosphereWord(atmosphere);
+    out->clear();
+    out->push_back(std::string(d ? d : "") + (d ? " " : "") + "Star Cluster");
+    out->push_back(std::string(s ? s : "") + (s ? " " : "") + "Species");
+    out->push_back(std::string(a ? a : "") + (a ? " " : "") + "Atmosphere");
+}
+
+bool loadNewgameLore(const std::string& path, std::vector<std::string>* out,
+                     std::string* err) {
+    std::ifstream f(path, std::ios::binary);
+    if (!f) {
+        if (err) *err = "newgame.txt: cannot open " + path;
+        return false;
+    }
+    out->clear();
+    std::string line;
+    while (std::getline(f, line)) {
+        if (!line.empty() && line.back() == '\r') line.pop_back();
+        if (line == "\x1a") break;  // vendor EOF marker after line 22
+        if (line.empty()) continue;  // blank padding lines 22-23
+        out->push_back(line);
+    }
+    if (out->size() != 21) {
+        if (err)
+            *err = "newgame.txt: expected 21 species fragments, got " +
+                   std::to_string(out->size());
+        return false;
+    }
+    return true;
+}
+
+std::string loreSentence(const std::string& name, const std::string& frag) {
+    return "The " + name + " " + frag;  // static.txt //154 "The %s %s"
+}
+
+std::vector<std::string> wrapToWidth(
+    const std::string& text, int maxW,
+    const std::function<int(const std::string&)>& widthOf) {
+    std::vector<std::string> lines;
+    std::string cur;
+    std::istringstream words(text);
+    std::string w;
+    while (words >> w) {
+        const std::string cand = cur.empty() ? w : cur + " " + w;
+        if (cur.empty() || widthOf(cand) <= maxW)
+            cur = cand;
+        else {
+            lines.push_back(cur);
+            cur = w;
+        }
+    }
+    if (!cur.empty()) lines.push_back(cur);
+    return lines;
+}
+
 std::vector<SaveSlot> listSaveSlots(const std::string& dir) {
     std::vector<SaveSlot> out;
     std::error_code ec;

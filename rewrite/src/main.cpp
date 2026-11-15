@@ -28,6 +28,7 @@
 #include "game/research.h"
 #include "game/species.h"
 #include "game/starstat.h"
+#include "ui/menulaw.h"  // t393: loadNewgameLore for the New Game screen
 #include "ui/ui.h"
 
 #ifndef ASCENDANCY_SOURCE_DIR
@@ -257,6 +258,41 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(const Options& o,
     ag::Galaxy g = ag::MapGenerator(mc, *stats, names).generate();
     return std::make_unique<ag::Campaign>(cfg, g, &tree, items, gizmos, ai,
                                           abilities, err);
+}
+
+// t393: New Game screen inputs for runTitleScreen. Both are process-lifetime
+// statics (the title loop keeps the pointers; --ui runs one title session per
+// process). rosterForUi reuses the SAME load law as buildCampaign (21 specnum
+// entries, race02 via help.txt); loreForUi reads newgame.txt supply-your-own
+// style — a refusal yields an empty vector (screen draws without lore, honest
+// degrade, no fake text).
+const std::vector<ascend::game::SpeciesInfo>& rosterForUi(const Options& o) {
+    static std::vector<ascend::game::SpeciesInfo> v;
+    if (v.empty()) {
+        std::string err;
+        const fs::path d0 = o.dataRoot / "extracted" / "ascend00";
+        if (!ascend::game::loadAbilities(d0.string(), &v, &err)) {
+            std::printf("ui roster refused: %s\n", err.c_str());
+            v.clear();
+        }
+    }
+    return v;
+}
+
+const std::vector<std::string>& loreForUi(const Options& o) {
+    static std::vector<std::string> v;
+    static bool tried = false;
+    if (!tried) {
+        tried = true;
+        std::string err;
+        if (!ascend::ui::loadNewgameLore(
+                (o.dataRoot / "extracted" / "ascend00" / "newgame.txt").string(),
+                &v, &err)) {
+            std::printf("ui lore refused: %s\n", err.c_str());
+            v.clear();
+        }
+    }
+    return v;
 }
 
 // Seeded campaign to victory: docs/re/turnloop.md. Returns process exit code
@@ -527,7 +563,12 @@ int main(int argc, char** argv) {
         const BootState exit = ascend::ui::runTitleScreen(
             o.dataRoot.string(), entry,
             o.introFrames >= 0 ? o.introFrames : 0,  // 0 = all frames
-            &terr, &handedWindow, savesDir, audio.get());
+            &terr, &handedWindow, savesDir, audio.get(),
+            // t393 New Game screen inputs: preview backdrop = the SAME
+            // galaxy the campaign plays (buildCampaign already ran), roster
+            // names from raceNN.dip headers, lore from newgame.txt (read,
+            // never embedded; a missing file = no lore, screen still draws).
+            camp.get(), &rosterForUi(o), &loreForUi(o));
         if (exit == BootState::Quit && entry != BootState::Quit &&
             !terr.empty()) {
             std::printf("title: %s\n", terr.c_str());

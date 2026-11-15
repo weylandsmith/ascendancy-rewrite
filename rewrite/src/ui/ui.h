@@ -2,7 +2,9 @@
 
 #pragma once
 #include <string>
+#include <vector>
 
+#include "game/species.h"  // SpeciesInfo (t393 New Game roster param)
 #include "ui/audio.h"
 #include "ui/boot.h"
 
@@ -32,7 +34,11 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          int maxIntroFrames, std::string* err,
                          void** windowOut = nullptr,
                          const std::string& savesDir = std::string(),
-                         AudioEngine* audio = nullptr);
+                         AudioEngine* audio = nullptr,
+                         const ascend::game::Campaign* previewCamp = nullptr,
+                         const std::vector<ascend::game::SpeciesInfo>* roster =
+                             nullptr,
+                         const std::vector<std::string>* lore = nullptr);
 
 // Opens the P5a window over a LIVE campaign (docs/re/ui-runtime.md §5).
 // Blocks until quit or `turns` turns elapsed (0 = until quit). Returns 0 on
