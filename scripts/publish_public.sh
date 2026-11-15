@@ -71,8 +71,18 @@ P2="dig""ital-oasis|ta""nagra"
 # contain a pattern — never rewrites binaries, never churns every file's bytes
 # per commit (t383's single-path loop took 20 s; an unconditional
 # find|xargs sed over ~570 commits would churn the whole tree every commit).
-TREE_SED="grep -rlZ -E '${P1}|${P2}' . --exclude-dir=.git 2>/dev/null | xargs -0 -r sed -i -e 's/${P1}/[REDACTED-EMAIL]/g' -e 's/${P2}/[ISP-DOMAIN]/g'; true;"
+# t396b PITFALL (MEASURED in /tmp/tfmini): sed WITHOUT -E is BRE, where a bare
+# `|` is a LITERAL — the P2 alternation matched nothing and the mask silently
+# no-oped while the ERE gate (grep -aE) reported 100 hits. BOTH seds run -E.
+TREE_SED="grep -rlZ -E '${P1}|${P2}' . --exclude-dir=.git 2>/dev/null | xargs -0 -r sed -i -E -e 's/${P1}/[REDACTED-EMAIL]/g' -e 's/${P2}/[ISP-DOMAIN]/g'; true;"
 FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --tree-filter "$TREE_SED" -- --all >/dev/null
+
+# 1c. COMMIT-MESSAGE SCRUB (t396): the scan covers commit OBJECTS too
+# (rev-list --objects lists them) and MEASURED 1 hit: commit c953fc8 (t383)
+# carries the bare ISP domain IN ITS MESSAGE. A tree-filter never touches
+# messages; --msg-filter does (same ERE sed, same -E law).
+FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --msg-filter \
+  "sed -E -e 's/${P1}/[REDACTED-EMAIL]/g' -e 's/${P2}/[ISP-DOMAIN]/g'" -- --all >/dev/null
 
 # filter-branch keeps refs/original backups; without this the vendor blobs
 # survive gc and the strip is cosmetic (VERIFIED 2026-11-11: 100M->9.7M).
