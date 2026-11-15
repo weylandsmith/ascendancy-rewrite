@@ -230,18 +230,26 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-USER-RULING t374 — (sentinel-tag law: tag never renumbered;
-PUSH GAP CLOSED 2026-11-14 (user: "nothing has been committed to Github"
+NEXT t392 per queue row t392 below (phase 11: UI ROUND 2 + SOUND, per the
+D10 user grade of 2026-11-14). The WAIT-USER-RULING t374 sentinel is
+RETIRED — the user graded and found five real gaps: title text sits too
+high in its boxes; Alt-L/Alt-S/Alt-X second lines missing on the last
+three buttons; New Game screen "garbled and unusable"; galaxy map and all
+its rail buttons "wonky"; NO SOUND on the Athens build (partly a code
+fact — nothing calls playTune on fresh title entry, only after the intro;
+partly undiagnosed on his box, see t395). Reference material: scratchpad/
+user-supplied original-vs-rewrite pairs — gitignored and publish-excluded
+(archive.org vendor captures), and external vision on USER-SUPPLIED
+originals is ALLOWED evidence (R13 governs OUR OWN renders only).
+PHASE-10 HISTORY: PUSH GAP CLOSED 2026-11-14 (user: "nothing has been committed to Github"
 — CORRECT: t390/t391 were local-only; t389's push covered phase-10 proper.
 Export /tmp/pubt391 verified vendor-free 6349 obj, builds WITHOUT data
 0 warnings, run_tests 297/199-skipped/0-failed, EXE present; FAST-FORWARD
 36bf92d..5373c66 verified post-push by ls-remote). t390 ART WITNESS: our
 own Xvfb render art-zone coverage 0% -> 100% (PIL mass, mechanical);
 screenshot work/r1/loop/t390-title-after.png for USER look-grading.
-ordering: the phase-10 queue is FULLY DRAINED — t390 LANDED title art, t391
-LANDED the presentation sweep 2026-11-14 (both banked below) — and every
-remaining closer is a human witness; no machine-checkable work exists, so do
-NOT renumber, do NOT invent a row, run the DECISIONS.md/ruling check and park).
+(phase-10-era note "every remaining closer is a human witness" proved
+premature: the human witness ARRIVED as D10 and generated phase 11.)
 
 t391 LANDED 2026-11-14 (presentation sweep — every screen now art-backed-or-
 honestly-vector, cited): windows.txt TYPE-100 sections head each state's
@@ -353,6 +361,108 @@ skip); (c) any TYPE-18 window frame that should carry art. Deliverable:
 each screen is art-backed-or-honestly-vector (cite the windows.txt record
 that decides it, or bank it as a named seam with the reason). NO engine
 touches. Same screenshot-per-screen + user-grading handoff as t390.
+
+t392 TITLE TEXT FIX (D10 user grade: "text is a tad too high in the
+boxes" + "Alt-L/Alt-S/Alt-X second lines are missing on the last three
+buttons"). (a) Vertical: title.cpp draws labels at rect.y0+4 — measure
+the vendor baseline from scratchpad/newgame-original.png context OR the
+refcap title pin (band-centre law refcap.md §1: buttons centred in 30px
+rects; centre = y0 + (30 - fontH)/2, NOT +4). (b) Second lines: vendor
+shot shows "Load Game Alt-L" / "Save Game Alt-S" (vision read 2026-11-14,
+user testimony adds Alt-X on Exit to DOS — user is authoritative). Draw
+the hotkey hint as a second line (smaller font slot if cited, else same
+VendorText at +fontH+2) on Load/Save/Exit ONLY. TEXTITEM caret law: the
+'^' in "Load^Game" marks the hotkey LETTER (underline if the vendor
+underlines — check the pin, do NOT invent). Pins: baseline geometry
+table, second-line presence test, hotkey map Alt-L/Alt-S/Alt-X.
+
+t393 NEW GAME SCREEN REBUILD (D10: "garbled and unusable"). USER-
+SUPPLIED original (scratchpad/newgame-original.png, external vision read
+2026-11-14 — ALLOWED evidence): full-screen layout, NOT an overlay:
+LEFT/centre = live starfield PREVIEW of the generated map; RIGHT =
+"Player Species" scroll list with portrait thumbnails + up/down arrows;
+CENTRE = selected-species detail (large circular portrait, planet icon,
+species symbol, green lore text verbatim per race e.g. "The Minions are
+a mysterious group..."); TOP = species name in green; BOTTOM = config
+bar: Star Density / Species / Atmosphere / Player Color panels + map
+thumbnail + "Begin New Game"; summary strings "Average Star Cluster",
+"Five Species", "Neutral Atmosphere". OUR rewrite shot: translucent grey
+panels floating top-right, bottom row CLIPPED below screen edge, labels
+cut off left — coordinate-space + backdrop bugs. Fix: (1) NEWGAMEWND is
+a full SCREEN SWITCH (title chrome must NOT show through — t388 screen
+law applies); (2) bank the real rects from windows.txt NEWGAMEWND
+section (L575+, controls L598+) into a layout table, verify each rect
+FITS 640x480 (the clipping says ours don't — find the coordinate-space
+error, do not offset-by-eye); (3) backdrop: t391 said no 18*.shp — the
+original shows the STARFIELD behind, so backdrop = map preview render
+(reuse the map draw), panels opaque; (4) species rows: 7racesel strips
+seam from t391 stays a seam IF witness still weak — draw placeholder
+portraits, say so; lore text from history.txt/help.txt verbatim per race
+(supply-your-own data, NEVER embed); (5) config bar widgets = wheel
+faces (3cfgnew) at cited SHAPEITEM records; setting values can stay a
+named seam but the WIDGETS must sit right; (6) "Begin New Game" wires
+to the existing campaign-start (mapgen seed law already shipped). Pins:
+layout table vs windows.txt (every rect cited), fit-in-640x480 assert,
+screen-law (title chrome absent), opaque-panel test. Screenshots per
+state -> work/r1/loop/t393-*.png for USER grading.
+
+t394 GALAXY MAP + RAIL BUTTONS (D10: "galaxy map still wonky... all the
+buttons off the galaxy map are wonky too"). USER-SUPPLIED original
+(scratchpad/galaxymap-original.png, external vision read 2026-11-14):
+map framed left (bevel chrome, stars as pixel dots, lanes as thin vector
+lines, colony icon with sprite inside); RIGHT column top-to-bottom: FIVE
+green oval resource counters, TWO wide blue nav buttons w/ arrows +
+circular icons, category list (Planets/Ships/Research/Special Ability/
+Species each with sprite art right), 3x3 grid of circular command
+buttons, bottom row SIX small coloured squares (green yellow purple red
+grey blue). OUR rewrite shot: no chrome at all, text string-dump
+("turn 0 player stars 1 score"), flat stacked rectangles. Diagnose FIRST
+why t391's 10status/1starmap blits do NOT appear in the user's shot
+(user ran latest main = 5373c66): plausible causes — blit gated behind a
+state the user's path didn't reach, lib load failure degrading silently
+(print it), or the 512x384 window scale (why is the rewrite window
+512x384 when kDisplayW is 640?? CHECK SDL scale/integer-scaling law —
+vendor is 640x480 logical; a half-scale window explains "everything
+small/wonky"). Then per-element: ovals = resource counters (cite the
+windows.txt STATUSWND children + the shp records), nav buttons, 3x3
+grid, six squares — EACH cited to windows.txt + a 1starmap/10status
+record, or banked as named seam. Status line: vendor has NO string dump
+— stats live in the ovals; remove/replace ours per citation. Pins:
+window-size law assert (640x480 logical), blit-present mass test per
+screen state, every button rect cited. Screenshots -> t394-*.png.
+
+t395 SOUND AUDIBILITY (D10: "not hearing any sound... on Athens").
+LOCAL FACTS (2026-11-14): fresh --ui boot lands on Title and NOTHING
+calls playTune until after Intro (title.cpp:279 is the only Title-side
+call) — a fresh launch is SILENT BY CODE even with working audio; click
+SFX only wired for campaign-map click08 (ui.cpp:213), title buttons
+play nothing. FIX: (1) title-entry plays theme00 (audio.md §3.3 law:
+DAT_00010ba0==0 in every banked save = menu selector tune 0) — call
+playTune(0) on ENTERING Title state, not just intro-exit; (2) button
+click SFX via the windows.txt SOUNDCHANNEL field law (119 instances —
+census the seven title buttons' SOUNDCHANNEL values + the FUN that
+maps channel->soundfx id, cite or seam); (3) ATHENS DIAGNOSTIC: startup
+ALREADY prints "audio: <err> (degraded: silent)" on init failure —
+make it unmissable (print device + tune loaded count + sfx loaded count
+on SUCCESS too, one line); user report of that line decides device
+failure vs code gap. (4) verify theme*.raw load path vs --data layout
+variants (audio looks in dataDir/extracted/... — if the user points
+--data at a dir WITHOUT extracted/ beside the cobs, sfx+music load
+NOTHING while the game still boots: print which paths were tried on
+failure). Pins: tune-on-title-entry state test, SOUNDCHANNEL census
+table, path-tried diagnostic, silent-degrade still never aborts.
+
+t396 PHASE-11 VERIFY + RE-EXPORT + PUSH (push-gap law: this row MANDATORY
+even if earlier rows touched only ui/). Full gate + run_tests + headless
+seed regression (seeds 1/2024/23 byte-identical — engine untouched);
+export scripts/publish_public.sh GITHUB_USER=weylandsmith; verify
+vendor-free (scratchpad/ must be excluded — check the gate line in the
+script) + build WITHOUT data + run_tests + identity; fetch FIRST, push
+(fast-forward expected); verify post-push ls-remote; THEN rewrite NEXT
+to WAIT-USER-RULING t374 verbatim with the grading handoff: what to
+look at (title text/hotkey lines, New Game screen, map + rail buttons)
+and the one audio question (paste the startup "audio:" line from
+Athens).
 
 OPEN ITEM: GitHub backend GC may still serve old commit SHAs (manual pages
 eb79da3-lineage) until support sweeps orphaned objects — user may email
