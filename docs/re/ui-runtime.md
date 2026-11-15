@@ -498,7 +498,7 @@ HEAD of their state's window section (0 title, 1 star map, 3 cfgnew, 7 race
 menu, 8 ship design, 13 negotiation, 16 battle, 20 research). FIVE screen
 sections have NO TYPE-100 header (states 2/4/15 load-save, 10 status, 14
 intel, 17 planet-alloc, 18 fleet): windows.txt CANNOT name their backdrop;
-only the numeric-prefix file + the engine's by-name open can (10status/
+ (10status/
 4loadgam/2savegam/14intel/17np exist on disk; 18 does NOT). The port's
 screenShapeLib naming law is therefore the correct instrument for the four
 headerless screens that have art, and no other screen is missing art.
@@ -509,3 +509,49 @@ HONEST NEGATIVE: no engine change landed (the sweep found ZERO screens where
 the vendor has backdrop art and the port paints vector — nothing to fix);
 the 7racesel strip role stays a named seam; chrome COLOUR stays the
 luminance-ramp palette seam (title-art.md §4) — geometry is what registers.
+
+## t394 GALAXY-MAP SIDEBAR CHROME LANDED (2026-11-15)
+
+D10 "galaxy map still wonky... all the buttons off the galaxy map are wonky
+too". Full working log + pixel measurements: docs/re/_wip_t394.md. Law
+module rewrite/src/ui/mapchrome.{h,cpp} (no SDL; 5 pins
+tests/test_mapchrome_t394.cpp; suite 313/0).
+
+- DIAGNOSIS (task's first job) [verified]: the user's shot IS the map
+  screen, where NO backdrop exists by law (1starmap k0 = 158x75 element;
+  10status blits in state 10 only) — blit "absence" was correct behaviour.
+  The WONKINESS = the WM rescaled the window 640x480 -> 512x384 (0.8x):
+  our shot has 408 colours and nearest-upscaling to 640x480 adds ZERO new
+  colours (clean resample); our code requests 640x480 and our Xvfb witness
+  measures 640x480. Hit-maps use windows.txt LOGICAL rects, so under WM
+  scaling every click lands 1.25x off -> "all the buttons wonky". SDL
+  2.32.4 has no window-scale hint (SDL_hints.h census); THE FIX is
+  SDL_RenderSetLogicalSize(640,480) on every renderer we create — header
+  doc verbatim (SDL_render.h): "mouse and touch events in the window will
+  be filtered and scaled so they seem to arrive within the logical
+  resolution" (letterbox default, SDL_hints.h:1942). Applied in
+  runCampaignUi (ui.cpp applyLogicalSize) + runTitleScreen (title.cpp).
+- CAPTURE MAPPING CORRECTION [verified]: on the t394 galaxy-map original
+  (642x481) the mapping is IDENTITY (bevel lines y=130/169/208/248/286 vs
+  table 130/169/208/247/286); t393's "minus 1" was capture-tool chrome and
+  does NOT generalise. Re-anchor future measurements per-capture.
+- MAP SCREEN REBUILD (ui.cpp state-1 draw block): string dump REMOVED per
+  D10 (vendor has none). Now drawn, every rect verbatim windows.txt:
+  TURNCOUNT panel 474,7-632,43 + FIVE green ovals MEASURED at x
+  482/513/544/575/606 pitch 31 (turn digits inside via port text face —
+  DIGITFRAMES 55 -> k55..k64 digit faces plausible, digit->frame mapping
+  NAMED SEAM); NEXTTURN k65 + NEXTTURNCONT k66 faces (74x30/75x30 EXACT
+  dims match); spin/zoom/toggle cluster SHAPEFRAMEs 8..18 (dims census:
+  every record WxH == rect inclusive-minus-1 — DIMS PARITY LAW, pinned
+  against the real 1starmap.shp); RACECONTROLS k19 strip 158x30 + seven
+  16x16 species squares at 479+22i,449 (MEASURED slot-1 green square
+  exact; CVD-safe kOwnerRgb fills, vendor palette stays the named seam).
+  Click law: cluster/race-strip/continue hits print NAMED SEAM lines
+  (pan/zoom behaviour unmodelled — never a fake scroll); TURNCOUNT
+  MOUSEFOCUS 0 inert by table.
+- WITNESS: scripts/t394_map_witness.sh (Xvfb RESUME->map, seam clicks,
+  NEXT TURN advance) + scripts/t394_map_mass.py CENSUS PASS (green oval
+  mass 350, dump band white px 0, 11 cluster rects non-flat, 7 slot
+  dominants distinct); shots work/r1/loop/t394-map.png (map-turn1.png is
+  post-quit, --campaign 1 exits after the advance — use map.png for
+  grading). NO ledger row moved (strict-close; queue work).

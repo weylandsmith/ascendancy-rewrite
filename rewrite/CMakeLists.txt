@@ -63,6 +63,7 @@ add_library(ascend_ui STATIC
   src/ui/titlepalette.cpp
   src/ui/title.cpp
   src/ui/hudlayout.cpp
+  src/ui/mapchrome.cpp
   src/ui/statuslaw.cpp
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp
@@ -101,6 +102,7 @@ add_executable(run_tests
   tests/test_newgame_t393.cpp
   tests/test_poppanel_t263.cpp
   tests/test_hudlayout_t264.cpp
+  tests/test_mapchrome_t394.cpp
   tests/test_statuslaw_t388.cpp
   tests/test_econres_t274.cpp
   tests/test_planetwin_t276.cpp
@@ -130,6 +132,7 @@ add_executable(run_tests
   src/ui/boot.cpp
   src/ui/menulaw.cpp
   src/ui/hudlayout.cpp
+  src/ui/mapchrome.cpp
   src/ui/statuslaw.cpp
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp

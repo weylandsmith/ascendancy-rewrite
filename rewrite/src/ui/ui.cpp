@@ -4,6 +4,7 @@
 
 #include <SDL.h>
 
+#include <cmath>
 #include <cstdio>
 #include <vector>
 
@@ -15,6 +16,7 @@
 #include "ui/hudlayout.h"
 #include "ui/layout.h"
 #include "ui/menulaw.h"
+#include "ui/mapchrome.h"
 #include "ui/statuslaw.h"
 #include "ui/ui_internal.h"
 
@@ -36,6 +38,21 @@ void filledCircle(SDL_Renderer* r, int cx, int cy, int rad) {
         for (int dx = -rad; dx <= rad; ++dx)
             if (dx * dx + dy * dy <= rad * rad)
                 SDL_RenderDrawPoint(r, cx + dx, cy + dy);
+}
+
+int ipow10(int e) { int v = 1; while (e-- > 0) v *= 10; return v; }
+
+// t394 WM-SCALE FIX (D10 "everything small/wonky"; diagnosis _wip_t394.md
+// S1): the user's WM rescales our 640x480 window to 512x384. SDL's own
+// header law (SDL_render.h:805-810, "Set a device independent resolution
+// for rendering"): with a logical size set, "mouse and touch events in the
+// window will be filtered and scaled so they seem to arrive within the
+// logical resolution" — which is exactly the hit-map fix (every windows.txt
+// rect is logical). Rendering letterboxes/scales to whatever the WM gives
+// us; SDL_HINT_RENDER_LOGICAL_SIZE_MODE is left at its documented default
+// ("letterbox", SDL_hints.h:1942). Applied to EVERY window we create.
+void applyLogicalSize(SDL_Renderer* ren) {
+    SDL_RenderSetLogicalSize(ren, kDisplayW, kDisplayH);
 }
 
 }  // namespace
@@ -67,6 +84,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         SDL_DestroyWindow(win);
         return 1;
     }
+    applyLogicalSize(ren);  // t394 WM-scale fix (see helper for the law)
     // Vendor .fnt faces (OQ-017 CLOSED; ui-runtime.md §3 swap rule). Hard
     // requirement, no silent TTF fallback: if the shipped faces fail to load
     // the data tree is broken and the run must say so.
@@ -212,6 +230,25 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     std::printf("ui click next-turn\n");
                     if (audio) audio->play("click08");
                     advanceOnce();
+                } else if (screen == kScreenMap && inRect(kNextTurnCont, p)) {
+                    // t394 NEXTTURNCONT (msg 8, ln556): the vendor's mid-turn
+                    // combat-continue pump. The port's advance() runs a full
+                    // turn with no pause, so there is nothing to continue —
+                    // NAMED SEAM: inert with a printed line, never a fake.
+                    std::printf("ui click next-turn-cont seam (no mid-turn pause model)\n");
+                } else if (screen == kScreenMap && mapCtlFor(p)) {
+                    // t394 cluster cited art lands; SENDMESSAGE 50..61
+                    // pan/zoom/toggle BEHAVIOUR is the named seam (CosmosView
+                    // has no scroll model). Print, never guess a scroll.
+                    std::printf("ui click map-ctl seam (msg %d)\n",
+                                kMapCtl[static_cast<int>(*mapCtlFor(p))].sendMessage);
+                } else if (screen == kScreenMap && kRaceControlsFrame.x0 <= p.x &&
+                           inRect(kRaceControlsFrame, p)) {
+                    std::printf("ui click race-controls seam (slot %s)\n",
+                                raceSlotFor(p) ? std::to_string(*raceSlotFor(p) + 1).c_str()
+                                               : "frame");
+                } else if (screen == kScreenMap && inRect(kTurnCount, p)) {
+                    // TURNCOUNT MOUSEFOCUS 0 (ln525): inert by the table.
                 } else if (screen == kScreenMap && inRect(kCosmosWnd, p)) {
                     // COSMOSWnd's own STATE list excludes the opened screens,
                     // so map selection is inert inside a screen too.
@@ -310,32 +347,127 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         }
 
         if (screen == kScreenMap) {
-        int hx = kCosmosWnd.x1 + 8;
-        txt.draw(ren, hx, 8, "Ascendancy P5a", true, kText);
-        txt.draw(ren, hx, 30, camp.traceLine(), false, kText);
-        // NEXTTURN button (verified rect)
-        SDL_Rect btn{kNextTurnBtn.x0, kNextTurnBtn.y0,
-                     kNextTurnBtn.x1 - kNextTurnBtn.x0, kNextTurnBtn.y1 - kNextTurnBtn.y0};
-        SDL_SetRenderDrawColor(ren, 40, 40, 56, 255);
-        SDL_RenderFillRect(ren, &btn);
-        SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
-        SDL_RenderDrawRect(ren, &btn);
-        txt.draw(ren, btn.x + 10, btn.y + 8, "NEXT TURN", true, kText);
-        // selected star info
+        // ---- t394 VENDOR SIDEBAR CHROME (mapchrome.h; windows.txt state-1
+        // records verbatim; rects MEASURED on the user-supplied original).
+        // The old string dump ("Ascendancy P5a / turn|stars|score / events")
+        // is REMOVED per D10: the vendor map screen has no stats string —
+        // TURNCOUNT (TYPE 15, ln521) carries the turn as five oval digits.
+        // 1) TURNCOUNT panel 474,7-632,43 + five oval slots MEASURED at x
+        //    482/513/544/575/606 (pitch 31, y10..39). DIGITFRAMES 55 says the
+        //    digit FACES are 1starmap k55..k64; which frame is which digit is
+        //    a NAMED SEAM (uncited), so digits draw via the port text face
+        //    inside cited oval outlines.
+        {
+            SDL_Rect panel{kTurnCount.x0, kTurnCount.y0,
+                           kTurnCount.x1 - kTurnCount.x0 + 1,
+                           kTurnCount.y1 - kTurnCount.y0 + 1};
+            SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+            SDL_RenderFillRect(ren, &panel);
+            SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
+            SDL_RenderDrawRect(ren, &panel);
+            const int turn = camp.turn();
+            for (int i = 0; i < 5; i++) {
+                const OvalSlot& o = kOvalSlots[i];
+                SDL_SetRenderDrawColor(ren, 0, 160, 70, 255);  // vendor green
+                // ellipse outline via mid-point arcs (no SDL ellipse prim):
+                const int cx = (o.x0 + o.x1) / 2, cy = (o.y0 + o.y1) / 2;
+                const int rx = (o.x1 - o.x0) / 2, ry = (o.y1 - o.y0) / 2;
+                for (int a = 0; a < 360; a += 4) {
+                    const double rad = a * 3.14159265358979 / 180.0;
+                    SDL_RenderDrawPoint(ren, cx + int(rx * std::cos(rad)),
+                                        cy + int(ry * std::sin(rad)));
+                }
+                const int d = (turn / ipow10(4 - i)) % 10;  // right-aligned
+                std::string ds(1, char('0' + d));
+                txt.draw(ren, cx - 3, cy - 7, ds, true, kText);
+            }
+        }
+        // 2) NEXTTURN / NEXTTURNCONT faces (SHAPEFRAME 65/66 verbatim;
+        //    1starmap k65 74x30 / k66 75x30 EXACT size match of the rects).
+        {
+            const int iconLib = libFor(kScreenMap);
+            const SDL_Rect a{kNextTurnBtn.x0, kNextTurnBtn.y0,
+                             kNextTurnBtn.x1 - kNextTurnBtn.x0 + 1,
+                             kNextTurnBtn.y1 - kNextTurnBtn.y0 + 1};
+            const SDL_Rect b{kNextTurnCont.x0, kNextTurnCont.y0,
+                             kNextTurnCont.x1 - kNextTurnCont.x0 + 1,
+                             kNextTurnCont.y1 - kNextTurnCont.y0 + 1};
+            if (iconLib >= 0 &&
+                blitShape(ren, kLibs[iconLib], kNextTurnShape, a.x, a.y) &&
+                blitShape(ren, kLibs[iconLib], kNextTurnContShape, b.x, b.y)) {
+                // art-backed: faces carry the vendor label art
+            } else {  // honest degraded chrome, same rects
+                SDL_SetRenderDrawColor(ren, 24, 48, 96, 255);
+                SDL_RenderFillRect(ren, &a);
+                SDL_RenderFillRect(ren, &b);
+                SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
+                SDL_RenderDrawRect(ren, &a);
+                SDL_RenderDrawRect(ren, &b);
+                txt.draw(ren, a.x + 10, a.y + 8, "NEXT TURN", true, kText);
+                txt.draw(ren, b.x + 6, b.y + 8, "END TURN", true, kText);
+            }
+        }
+        // 3) spin/zoom/toggle cluster (COSMOSWnd children ln223-414,
+        //    SHAPEFRAMEs 8..18 -> 1starmap; DRAW cited, pan/zoom BEHAVIOUR is
+        //    the named seam — CosmosView has no scroll model to drive).
+        {
+            const int iconLib = libFor(kScreenMap);
+            for (int i = 0; i < kMapCtlCount; i++) {
+                const MapControl& mc = kMapCtl[i];
+                SDL_Rect r{mc.rect.x0, mc.rect.y0,
+                           mc.rect.x1 - mc.rect.x0 + 1,
+                           mc.rect.y1 - mc.rect.y0 + 1};
+                if (!(iconLib >= 0 && blitShape(ren, kLibs[iconLib],
+                                                mc.shapeFrame, r.x, r.y))) {
+                    SDL_SetRenderDrawColor(ren, 40, 40, 56, 255);
+                    SDL_RenderFillRect(ren, &r);
+                    SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
+                    SDL_RenderDrawRect(ren, &r);
+                }
+            }
+        }
+        // 4) RACECONTROLS strip 474,442-632,472 (SHAPEFRAME 19 = 1starmap
+        //    k19 158x30; MEASURED slot-1 square 479,448-495,465 == table).
+        //    Slot SQUARES carry species colour — vendor palette is the named
+        //    luminance seam, so the port's CVD-safe kOwnerRgb fills them.
+        {
+            const int iconLib = libFor(kScreenMap);
+            if (!(iconLib >= 0 && blitShape(ren, kLibs[iconLib],
+                                            kRaceControlsShape,
+                                            kRaceControlsFrame.x0,
+                                            kRaceControlsFrame.y0))) {
+                SDL_Rect f{kRaceControlsFrame.x0, kRaceControlsFrame.y0,
+                           kRaceControlsFrame.x1 - kRaceControlsFrame.x0 + 1,
+                           kRaceControlsFrame.y1 - kRaceControlsFrame.y0 + 1};
+                SDL_SetRenderDrawColor(ren, 20, 20, 28, 255);
+                SDL_RenderFillRect(ren, &f);
+                SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
+                SDL_RenderDrawRect(ren, &f);
+            }
+            for (int i = 0; i < 7; i++) {
+                const RaceSlot& rs = kRaceSlots[i];
+                SDL_Rect r{rs.rect.x0, rs.rect.y0,
+                           rs.rect.x1 - rs.rect.x0 + 1,
+                           rs.rect.y1 - rs.rect.y0 + 1};
+                const RGB c = kOwnerRgb[i];
+                SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                SDL_RenderFillRect(ren, &r);
+                SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+                SDL_RenderDrawRect(ren, &r);
+            }
+        }
+        // Selection info (PORT SEAM: the vendor shows a colony panel here,
+        // unmapped; a single dim line inside the cosmos interior).
         if (selected >= 0) {
             const auto& s = camp.galaxy().stars[selected];
             std::string info = s.name + "  (" + std::to_string(s.planets.size()) + " planets)";
             int o = camp.starOwner(selected);
             info += o == ag::kPlayer ? "  [yours]" : (o > 0 ? "  [owner " + std::to_string(o) + "]" : "  [neutral]");
-            txt.draw(ren, hx, 100, info, false, kDim);
+            txt.draw(ren, kCosmosWnd.x0 + 6, kCosmosWnd.y1 - 16, info, false, kDim);
         }
-        // event log (last 8)
-        const auto& evs = camp.events();
-        int y = 140;
-        for (size_t i = evs.size() > 8 ? evs.size() - 8 : 0; i < evs.size(); ++i, y += 14)
-            txt.draw(ren, hx, y, evs[i].text, false, kDim);
         if (camp.over()) {
-            txt.draw(ren, hx, 300, std::string("VICTORY: ") + ag::victoryName(camp.victory()),
+            txt.draw(ren, kCosmosWnd.x0 + 6, kCosmosWnd.y1 - 34,
+                     std::string("VICTORY: ") + ag::victoryName(camp.victory()),
                      true, kText);
         }
         } else {

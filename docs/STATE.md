@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-15T02:55
+updated: 2026-11-15T03:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,22 +230,45 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t394 per queue row t394 below (phase 11: UI ROUND 2 + SOUND, per the
-D10 user grade of 2026-11-14). Ordering: t394 now that t393 LANDED
-(2026-11-15) — t393 shipped the layout-table instrument (menulaw t393 block
-+ the capture->screen mapping law boot.md S8) and the `ui window WxH
-(logical 640x480)` diagnostic line; t394's FIRST job (diagnose why t391's
-10status/1starmap blits are absent from the user's shot) now starts from
-that diagnostic: ask for the line in the next Athens report, and check the
-512x384-vs-640x480 scale law (the user's rewrite shot measured exactly
-0.8x — our own Xvfb window measured 640x480, so the scale happens on their
-WM side; the fix (hint vs. borderless vs. scale-factor flag) is t394's
-decision, to be taken from SDL docs, not memory).
-Then per-element galaxy map + rail: five ovals / two nav buttons / 3x3
-grid / six squares, EACH cited to windows.txt STATUSWND children +
-1starmap/10status records, or banked as named seam (t393's Begin-rect
-precedent: cited measurement off user-supplied originals IS admissible —
-scratchpad/galaxymap-original.png is already on disk).
+NEXT t395 per queue row t395 below (phase 11: UI ROUND 2 + SOUND, per the
+D10 user grade of 2026-11-14). Ordering: t395 now that t394 LANDED
+(2026-11-15) — the map-screen chrome + the WM-scale scale-law are shipped,
+so sound is the last untried D10 complaint before the mandatory re-export
+(t396 must follow t395 so the Athens user gets chrome+scale+sound in ONE
+push). t395 job (queue row t395 is complete): (1) playTune(0) on ENTERING
+Title state (title.cpp:279 is currently the only Title-side call, reached
+only after Intro — fresh launch is SILENT BY CODE); (2) button click SFX
+via the windows.txt SOUNDCHANNEL field law (census the seven title buttons'
+SOUNDCHANNEL values + the channel->soundfx FUN, cite or seam — NOTE t394
+re-measured the campaign-map records: rail buttons + NEXTTURN + the whole
+cluster all carry SOUNDCHANNEL 0, so "channel 0 = click08?" is exactly the
+claim to check, never assume); (3) the unmissable startup audio diagnostic
+line (device + tunes loaded + sfx loaded on SUCCESS, paths tried on
+failure) — this line decides device failure vs code gap in the next Athens
+report; (4) theme*.raw load path vs --data layout variants. Pins per row.
+t394 LANDED 2026-11-15 (galaxy-map sidebar chrome + WM-scale fix, D10
+"galaxy map still wonky... all the buttons off the galaxy map are wonky
+too"): DIAGNOSIS closed mechanically — user's shot IS the map screen where
+NO backdrop exists by law (10status blits in state 10 only); wonkiness =
+user's WM rescaled our 640x480 window to 512x384 (clean resample: 408
+colours, nearest-upscale adds ZERO; our Xvfb witness 640x480 exact). FIX:
+SDL_RenderSetLogicalSize(640,480) on every renderer (SDL_render.h doc:
+mouse events rescale into logical space; letterbox default) — ui.cpp
+applyLogicalSize + title.cpp. MAP SCREEN REBUILT to cited chrome
+(mapchrome.{h,cpp}, 5 pins, suite 313/0): string dump REMOVED; TURNCOUNT
+474,7-632,43 + five green ovals MEASURED x482/513/544/575/606 pitch 31
+(digits via port face, frame-mapping NAMED SEAM); NEXTTURN k65/
+NEXTTURNCONT k66 faces (74x30/75x30 exact); spin/zoom/toggle cluster
+SHAPEFRAMEs 8..18 — DIMS PARITY LAW every shape == rect minus-1 (pinned
+vs real 1starmap.shp); RACECONTROLS k19 158x30 strip + 7 species squares
+479+22i,449 (slot-1 green MEASURED exact; CVD palette seam). Click seam
+lines printed for pan/zoom/continue (never fake). CAPTURE LAW CORRECTION:
+t394 original maps IDENTITY (t393 minus-1 does NOT generalise). Witness
+scripts t394_map_witness.sh + t394_map_mass.py CENSUS PASS (oval green
+350, dump band 0 white, clusters non-flat, 7 slot dominants distinct);
+shots work/r1/loop/t394-map.png (map-turn1.png = post-quit, --campaign 1
+exits after advance — grade map.png). Law banked ui-runtime.md t394 block
++ _wip_t394.md. NO ledger row moved (strict-close; queue work).
 t393 LANDED 2026-11-15 (New Game screen rebuild, D10 "garbled and
 unusable"): ROOT CAUSES closed — (1) RaceConfig was an OVERLAY under the
 live title frame (title.cpp rewired to a full-screen else-branch; screen law

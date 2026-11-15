@@ -129,6 +129,10 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
     }
     SDL_Renderer* ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
     if (!ren) ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE);
+    // t394 WM-scale fix (ui.cpp applyLogicalSize comment; SDL_render.h
+    // SDL_RenderSetLogicalSize doc: mouse events are scaled into logical
+    // space). The title screen is where the user's 512x384 WM scale bites.
+    if (ren) SDL_RenderSetLogicalSize(ren, kDisplayW, kDisplayH);
     VendorText txt;
     if (!ren || !txt.load(ren, dataRoot, err)) {
         *err = err->empty() ? std::string("title renderer: ") + SDL_GetError() : *err;
