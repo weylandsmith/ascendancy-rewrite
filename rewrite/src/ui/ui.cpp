@@ -130,6 +130,37 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
             std::printf("ui chrome lib refused %s: %s\n", kLibFiles[i],
                         lerr.c_str());
     }
+    // t400: raceflag.shp (21 x 14x24 species flags for the Species rail
+    // row; law ui/hudlayout.h). Refusal just drops the two flags.
+    ascend::formats::ShapeLibrary raceflagLib;
+    {
+        std::string ferr;
+        if (!raceflagLib.load(dataRoot + "/extracted/ascend01/data/raceflag.shp",
+                              &ferr))
+            std::printf("ui raceflag lib refused: %s\n", ferr.c_str());
+    }
+    // t400 FRAME TEXTURE (mapchrome.h law): one static texture over the
+    // measured bands (alpha 0 elsewhere), built ONCE — 87k draw-points per
+    // frame would be absurd. Deterministic per pixel (no rng_).
+    SDL_Texture* frameTex = nullptr;
+    {
+        frameTex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                                     SDL_TEXTUREACCESS_STATIC, kDisplayW,
+                                     kDisplayH);
+        if (frameTex) {
+            std::vector<uint32_t> px(size_t(kDisplayW) * kDisplayH, 0u);
+            for (int b = 0; b < kTextureBandCount; b++)
+                for (int y = kTextureBands[b].y0; y <= kTextureBands[b].y1; y++)
+                    for (int x = kTextureBands[b].x0; x <= kTextureBands[b].x1; x++) {
+                        const RGB c = textureColourAt(x, y);
+                        px[size_t(y) * kDisplayW + x] =
+                            0xFF000000u | (uint32_t(c.r) << 16) |
+                            (uint32_t(c.g) << 8) | c.b;
+                    }
+            SDL_UpdateTexture(frameTex, nullptr, px.data(),
+                              kDisplayW * int(sizeof(uint32_t)));
+        }
+    }
     std::fflush(stdout);
     // Index into kLibs for a screen, or -1.
     auto libFor = [&](int s) -> int {
@@ -299,6 +330,11 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         // ---- draw ----
         SDL_SetRenderDrawColor(ren, kBg.r, kBg.g, kBg.b, 255);
         SDL_RenderClear(ren);
+        // t400: the map screen's frame texture (mapchrome.h law — measured
+        // on the vendor map shot; opened screens have no texture witness,
+        // so it is drawn on the map ONLY, honestly-degraded elsewhere).
+        if (frameTex && screen == kScreenMap)
+            SDL_RenderCopy(ren, frameTex, nullptr, nullptr);
         // t388: screen chrome backdrop (see backdropFor for the measured
         // full-backdrop test; the luminance-ramp palette seam is documented
         // on blitShape). Map screen intentionally keeps its vector map (no
@@ -395,7 +431,11 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
             const RailControl rc = kRail[i];
             SDL_Rect rr{rc.rect.x0, rc.rect.y0,
                         rc.rect.x1 - rc.rect.x0 + 1, rc.rect.y1 - rc.rect.y0 + 1};
-            SDL_SetRenderDrawColor(ren, 40, 40, 56, 255);
+            // t400: vendor rail fill MEASURED (12,32,48) == game.pal idx 242
+            // (palette.md §4; the t398 witness's single outside colour was
+            // this port's own (40,40,56)). The raceflag faces' dominant
+            // colour is the same value — they blit seamlessly on it.
+            SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
             SDL_RenderFillRect(ren, &rr);
             SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
             SDL_RenderDrawRect(ren, &rr);
@@ -403,12 +443,35 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
             // Icons come from 1starmap.shp (the sidebar icon law) — load it
             // for the icon regardless of the screen's own library.
             const int iconLib = libFor(kScreenMap);
+            // t400 PLACEMENT LAW (hudlayout.h): x = rect.x0 + dx(109) = RIGHT
+            // of the label, native size, vertically centred. The old code
+            // painted at rr.x+4 (LEFT) — the D11 "wrong side" defect.
             if (const auto icon = sidebarIcon(b); icon && iconLib >= 0) {
-                if (blitShape(ren, kLibs[iconLib], icon->frame, rr.x + 4,
-                              rr.y + (rr.h - 24) / 2))
+                const IconPos ip =
+                    railIconPos(b, int(kLibs[iconLib].record(icon->frame).height));
+                if (blitShape(ren, kLibs[iconLib], icon->frame, ip.x, ip.y)) {
+                    // label keeps its left slot; the icon sits right of it
+                } else {
                     tx = rr.x + 4 + int(kLibs[iconLib].record(icon->frame).width) + 6;
+                }
             }
             txt.draw(ren, tx, rr.y + 8, railLabel(b), false, kText);
+            // t400 SPECIES FLAGS (hudlayout.h law): RACES has no SHAPEITEM
+            // yet the vendor shows two 14x24 raceflag faces right of the
+            // label (measured runs x521..552). Left = player species
+            // (-1 human -> no flag exists, slot stays empty honestly);
+            // right = first AI specnum (0, skipping the player's).
+            if (b == RailButton::Races && raceflagLib.count() > 0) {
+                const int ps = camp.playerSpecies();
+                int right = 0;
+                if (right == ps) right = 1;
+                if (ps >= 0 && ps < int(raceflagLib.count()))
+                    blitShape(ren, raceflagLib, ps, kSpeciesFlagSlots[0].rect.x0,
+                              kSpeciesFlagSlots[0].rect.y0);
+                if (right < int(raceflagLib.count()))
+                    blitShape(ren, raceflagLib, right, kSpeciesFlagSlots[1].rect.x0,
+                              kSpeciesFlagSlots[1].rect.y0);
+            }
         }
 
         if (screen == kScreenMap) {

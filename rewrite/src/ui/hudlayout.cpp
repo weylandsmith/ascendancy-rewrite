@@ -37,7 +37,7 @@ RailControl railControl(RailButton b) {
 }
 
 std::optional<ShapeRef> sidebarIcon(RailButton b) {
-    // SHAPEITEM lines verbatim: "SHAPEITEM 1 data\1starmap.shp <f> 109 0".
+    // SHAPEITEM lines verbatim: "SHAPEITEM 1 data\\1starmap.shp <f> 109 0".
     // RACES (WINITEMS 1) and Intelligence (WINITEMS 0) have NO shape item —
     // returning a frame for them would fabricate an icon the file lacks.
     switch (b) {
@@ -48,6 +48,21 @@ std::optional<ShapeRef> sidebarIcon(RailButton b) {
         default:                    return std::nullopt;
     }
 }
+
+IconPos railIconPos(RailButton b, int h) {
+    // Header law (hudlayout.h): x = rect.x0 + dx verbatim; y centres the
+    // native-height face in the 30 px button (measured centres within ±3).
+    const Rect r = kRail[static_cast<int>(b)].rect;
+    const int cy = (r.y0 + r.y1) / 2;
+    return {r.x0 + kRailIconDx, cy - h / 2};
+}
+
+const FlagSlot kSpeciesFlagSlots[2] = {
+    // MEASURED content runs (original x521..552, y288..314; identity
+    // capture->screen mapping, t394 law): box lefts 521/540, native 14x24.
+    {{521, 288, 534, 311}},
+    {{540, 288, 553, 311}},
+};
 
 int gizmoCatForShipTab(int sendMessage) {
     // THE TABLE (t253 measured 6/6 live; header block for why it cannot be

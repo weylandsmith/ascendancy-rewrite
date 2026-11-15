@@ -4,6 +4,8 @@
 // data + hit-testing (no SDL), pin: tests/test_mapchrome_t394.cpp.
 #include "ui/mapchrome.h"
 
+#include <cstdint>
+
 namespace ascend::ui {
 
 // windows.txt verbatim (line cites in mapchrome.h / _wip_t394.md).
@@ -47,6 +49,47 @@ std::optional<int> raceSlotFor(Pt p) {
     for (int i = 0; i < 7; ++i)
         if (inRect(kRaceSlots[i].rect, p)) return i;
     return std::nullopt;
+}
+
+// t400 texture census (mapchrome.h): colour set + percent weights as
+// MEASURED on the pinned shot's margin bands (docs/re/_wip_t400.md S12).
+// The residue (100 - sum = 34%) is spread over the remaining game.pal
+// greys/teals of the same luminance families by the hash tail below.
+const RGB kTextureColours[10] = {
+    {0, 0, 0},        //  4.5% black
+    {77, 113, 117},   // 14.9% mode
+    {85, 125, 125},   //  8.7%
+    {97, 146, 146},   //  8.0%
+    {69, 105, 109},   //  7.4%
+    {97, 97, 97},     //  7.2%
+    {89, 134, 138},   //  6.7%
+    {89, 89, 89},     //  6.6%
+    {60, 93, 97},     //  5.6%
+    {73, 73, 85},     //  4.1%
+};
+const int kTextureWeights[10] = {4, 15, 9, 8, 7, 7, 7, 7, 6, 4};
+
+RGB textureColourAt(int x, int y) {
+    // splitmix64 over (x,y) — deterministic (no engine rng_; a texture
+    // that shimmered per frame would be a bug, and consuming rng_ would
+    // break the seed-reproducibility law).
+    uint64_t z = (uint64_t(uint32_t(x)) << 32) ^ uint64_t(uint32_t(y)) ^
+                 0x9e3779b97f4a7c15ull;
+    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
+    z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
+    z = z ^ (z >> 31);
+    const int r = int(z % 100u);
+    int acc = 0;
+    for (int i = 0; i < 10; i++) {
+        acc += kTextureWeights[i];
+        if (r < acc) return kTextureColours[i];
+    }
+    // Residue tail: neighbours of the mode within the measured families
+    // (all game.pal entries; (48,77,81) and (105,154,144)-family greys
+    // observed in the census).
+    static const RGB kTail[4] = {{48, 77, 81}, {105, 154, 154},
+                                 {81, 81, 81}, {36, 56, 60}};
+    return kTail[z % 4u];
 }
 
 }  // namespace ascend::ui

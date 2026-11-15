@@ -32,7 +32,8 @@ const SDL_Color kTitleBg{10, 12, 26, 255};
 // EXACTLY the flat fill (0,0,8) or the label white (215,215,215).
 const SDL_Color kInk{215, 215, 215, 255};
 const SDL_Color kBand{150, 130, 110, 255};
-const SDL_Color kButtonFill{0, 0, 8, 255};
+// t400: the button fills moved to boot.h titleButtonFill(hovered) — the
+// vendor's hovered fill (0,28,36) vs (0,0,8) is MEASURED law there.
 // t393 New Game screen colours [measured on the user-supplied original;
 // capture is JPEG-lossy so greys land on the canonical (97,97,97)/(12,32,48)
 // values the census converges to]. CVD rule: meaning is never carried by
@@ -263,10 +264,16 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             // Band-closure law (measured on the pinned vendor shot): the
             // rect is EXACTLY flat fill + white label; the GIF's key hole
             // is the same rect, so fill before the label either way.
+            // t400 HOVER LAW (boot.h): the vendor's hovered button fills
+            // (0,28,36) instead of (0,0,8) — MEASURED on the pinned shot
+            // (the cursor sat on PLAYTUTORIAL). SDL tracks the mouse
+            // position; no polling beyond what the loop already pumps.
             SDL_Rect r{b.rect.x0, b.rect.y0,
                        b.rect.x1 - b.rect.x0 + 1, b.rect.y1 - b.rect.y0 + 1};
-            SDL_SetRenderDrawColor(ren, kButtonFill.r, kButtonFill.g,
-                                   kButtonFill.b, 255);
+            int mx = -1, my = -1;
+            SDL_GetMouseState(&mx, &my);  // logical coords (SetLogicalSize law)
+            const RGB fill = titleButtonFill(inRect(b.rect, Pt{mx, my}));
+            SDL_SetRenderDrawColor(ren, fill.r, fill.g, fill.b, 255);
             SDL_RenderFillRect(ren, &r);
             // t392 TEXT BASELINE LAW (boot.h + boot.md §7): single-item
             // buttons draw ONE line at y0+8; the LOAD/SAVE/EXITTODOS pair

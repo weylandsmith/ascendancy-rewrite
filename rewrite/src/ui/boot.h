@@ -52,6 +52,24 @@ inline constexpr int kTitleHintTop        = 18;  // y0 + 18 (font 2, dy 18)
 inline constexpr int kTitleButtonCount = 7;
 extern const TitleButton kTitleButtons[kTitleButtonCount];
 
+// ---- t400 TITLE HOVER LAW (D11: "the original highlights the button when
+// you mouse over it, the rewrite doesn't") ----------------------------------
+// MEASURED on the pinned vendor shot docs/assets/refcap/original-title-menu.png
+// (the mouse sat on PLAYTUTORIAL when it was captured): the six UNHOVERED
+// bands are EXACTLY fill (0,0,8) + ink (215,215,215) (the t390 band-closure
+// law); the HOVERED band's fill is (0,28,36) — 9691 px — with the same ink
+// (docs/re/_wip_t400.md S3/S9). The hovered band additionally carries a
+// black+grey vertical structure mid-button (x319-330 rows 280-294): the
+// vendor CURSOR cannot be separated from a hover bevel with a single
+// hovered sample — NAMED SEAM (decider: a screenshot with the cursor moved
+// off a hovered button). The port draws ONLY the fill change; ink stays
+// (215,215,215). windows.txt has NO hover field (MOUSEFOCUS 1 x119 is a
+// focus flag, not a state; SHAPEFRAME -1 on all seven buttons) — the law
+// is the pixel census, cited as such.
+inline constexpr RGB kTitleFill{0, 0, 8};
+inline constexpr RGB kTitleFillHover{0, 28, 36};
+inline RGB titleButtonFill(bool hovered) { return hovered ? kTitleFillHover : kTitleFill; }
+
 // Which button (index 0..6) contains p from the Title screen, -1 if none.
 int titleButtonAt(Pt p);
 

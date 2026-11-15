@@ -87,6 +87,41 @@ struct ShapeRef {
 // Intelligence). Drawing the referenced shape stays blocked on OQ-005.
 std::optional<ShapeRef> sidebarIcon(RailButton b);
 
+// ---- t400 RAIL ICON PLACEMENT LAW (D11 "wrong side / wrong size") ---------
+// The SHAPEITEM line carries two trailing fields: "SHAPEITEM <en> <lib>
+// <frame> <dx> <dy>" — dx=109, dy=0 verbatim on all four rail icons
+// (windows.txt L456/477/498/517). MEASURED (docs/re/_wip_t400.md S1/S5,
+// t398 registration + chromatic map of scratchpad/galaxymap-original.png):
+// the vendor paints the icon RIGHT of the label at x = rect.x0 + 109
+// (474+109 = 583; registration best-fit 584/585 — capture noise ±2), and
+// VERTICALLY CENTRED in the 30 px button: measured icon centres land
+// within ±3 px of the button centres on all four rows (k5 143.5/145,
+// k4 186.5/184, k3 224/223, k7 263/262). Size law: NATIVE 1:1 — the
+// records (43-45 px wide) fit the shot at that placement with 93-97% of
+// pixels within 12 of game.pal (palette.md §4); the D11 "wrong size"
+// symptom was the pre-t394 vector-rect build, not a vendor scale.
+inline constexpr int kRailIconDx = 109;  // SHAPEITEM dx verbatim
+struct IconPos { int x, y; };
+// Placement for an icon of width `w`/height `h` (native record dims) in
+// button `b`. x ignores `w` (LEFT-anchored at dx, the vendor law).
+IconPos railIconPos(RailButton b, int h);
+
+// ---- t400 SPECIES-ROW FLAGS (D11 "icons on the species button missing") ---
+// RACES is WINITEMS 1 (no SHAPEITEM) and Intelligence WINITEMS 0, yet the
+// vendor original shows TWO small race portraits right of the "Species"
+// label (MEASURED content run x521..552 y288..314 = two 14 px boxes with a
+// 4 px gap; docs/re/_wip_t400.md S6/S11). The art is raceflag.shp: 21
+// records, ALL exactly 14x24 — the only lib in the corpus of that shape
+// class at 21 records (21 races; frame index == specnum [inferred from the
+// 21==21 census + the smraceNN sibling pattern]). Its dominant colour is
+// EXACTLY the button fill (12,32,48), so it blits seamlessly.
+// WHICH two races the vendor shows is uncited (NAMED SEAM — decider: a
+// live witness with a known player species). Port law: LEFT box = the
+// player's species flag (skipped for playerSpecies -1, no human flag
+// exists), RIGHT box = the first AI specnum.
+struct FlagSlot { Rect rect; };  // absolute screen rect, native 14x24
+extern const FlagSlot kSpeciesFlagSlots[2];
+
 // ---- ship-design tabs (windows.txt lines 897..1002, t253 measured) --------
 // The seven tab SENDMESSAGE numbers, in FILE order (tile order: row 1
 // WEAPONS HULL DEFENSES, row 2 ENGINES SENSORS ENERGY SPECIAL).

@@ -194,6 +194,9 @@ public:
     Victory advance();
 
     int turn() const { return turn_; }
+    // t400: the player's species selection (specnum 0..20, -1 = human).
+    // The Species-row flag law reads it (ui/hudlayout.h); no new state.
+    int playerSpecies() const { return cfg_.playerSpecies; }
     bool over() const { return victory_ != Victory::None; }
     Victory victory() const { return victory_; }
     // t365: unique_ptr member (fleetSim_) — out-of-line dtor so the
