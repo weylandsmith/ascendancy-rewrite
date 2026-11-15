@@ -132,3 +132,30 @@ measured weights, painted in the measured bands before chrome; the noise
 PATTERN is a named seam (decider: vendor screen-record of a pan, or the
 identifying record), the GEOMETRY + PALETTE are cited. Witness = census of
 our own render (R13-safe): band px >=90% inside game.pal + non-flat.
+
+S13 CODE LANDED (checkpoint 4aad600 + pin fix): hudlayout.{h,cpp}
+railIconPos (dx 109 anchor + exact vertical centring) + kSpeciesFlagSlots
+(521/540, 14x24); boot.h kTitleFill/kTitleFillHover/titleButtonFill;
+mapchrome.{h,cpp} texture bands + census colour set + splitmix64
+textureColourAt (no rng_); campaign.h playerSpecies() accessor; ui.cpp:
+raceflag lib, one static frame texture painted on the map screen only,
+rail icons RIGHT-placed, flags blitted (player left / first AI right,
+human -1 -> left slot honestly empty), rail fill (40,40,56)->(12,32,48)
+[palette.md §4 cited]; title.cpp hover fill via SDL_GetMouseState.
+S13b WITNESS VERDICT PASS (scripts/t400_rail_witness.sh +
+t400_witness_census.py, our own render, mechanical): left band 14 colours
+100% in game.pal (port frame grey excluded, named); right band 182 colours
+97.9%; rail icon-zone chroma Planets 1128 / Ships 806 / Research 984 (art
+exists RIGHT of label); species flag zone 5 colours incl (0,170,81)
+(raceflag green); title-hover: LOAD band dominant (0,28,36), other bands
+(0,0,8). Screenshots work/r1/loop/t400-{map,title-hover}.png.
+S13c MUTATION 6/6 CAUGHT (scripts/t400_mutate.py, checkpoint 4aad600
+first): M1 dx->4 (2 fails incl label-zone crossing), M2 top-align (first
+run MISSED — tolerance pin; re-scoped to exact cy-h/2 for h in {20,24,27,
+30} + != y0 -> 5 fails), M3 flag box 14x24->16x16 (4), M4 hover fill ==
+plain (2), M5 texture hash x-only (distinctness), M6 band trimmed (band
+law), M7 census colour off-palette (membership vs the REAL game.pal).
+Clean revert 334/0. Suite 330 -> 334 (test_rail_t400.cpp x4).
+S14 HEADLESS SPOT: --headless --campaign 120 --seed 1 md5
+6f8281d078447b0dd036e1d27c7c3578 == the t399 record — engine untouched by
+t400 PROVEN (all changes UI-side; playerSpecies() is a pure accessor).

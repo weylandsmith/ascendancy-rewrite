@@ -230,18 +230,19 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t400 per queue row t400 below (RAIL + CLUSTER + HOVER LAW — D11: rail
-icons greyscale/wrong-side/wrong-size, species-button icons missing
-entirely, bottom-right hide/show cluster bg art + small icons missing,
-TITLE hover highlight missing). ORDERING RATIONALE: t399 shipped the 3D
-field + digit law (docs/re/t399-galaxy-map-3d.md) and its witness shot
-/tmp/t399_shots/map.png (copy to work/r1/loop/t399-map.png) is the base the
-user grades; t400's rail re-verification rides on the SAME palette law
-(t398) and the same screenshot harness, and the t399 field clip changed
-the frame edge — rail geometry must be re-checked against it. t401/t402
-follow unchanged. The D11 rulings are APPLIED (user lines 2026-11-15 11:37
-in DECISIONS.md); D11b privacy = DROP (dispositioned). RULING CHANNEL: page
-server hardened + live (t397b); health-check per wake procedure below.
+NEXT t401 per queue row t401 below (NEW GAME FRAMING + PANELS — D11: UI
+framing missing, bottom-row artwork wrong, Player Species column art not
+rendered, Begin New Game box empty except text, species description box
+transparent). ORDERING RATIONALE: t400 landed the rail/flag/hover/texture
+laws (docs/re/t400-rail-hover.md) — the New Game screen shares the t398
+palette law AND the raceflag sprite class t400 just measured (its species
+column is 7racesel strips + the same 21-race identity question; do it
+after the flag law, not before). t402 (planets list) then t403 (verify +
+push, MANDATORY push-gap law) follow unchanged. t400 shipped witness
+shots work/r1/loop/t400-{map,title-hover}.png for the t403 grading sheet.
+The D11 rulings are APPLIED (user lines 2026-11-15 11:37 in DECISIONS.md);
+D11b privacy = DROP (dispositioned). RULING CHANNEL: page server hardened
++ live (t397b); health-check per wake procedure below.
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
@@ -255,6 +256,44 @@ is NOT it; chrome grades close nothing by themselves; D11b answered = drop).
 (2) t398 shipped new screenshots work/r1/loop/t398-{title,load,newgame,map}.png
 — a re-grade of the palette fix rides on the NEXT ruling sheet (t403 builds
 it); the t398 census already says the ramp defect is mechanically gone.
+
+t400 LANDED 2026-11-15 (RAIL + SPECIES FLAGS + TITLE HOVER + FRAME
+TEXTURE — LAW docs/re/t400-rail-hover.md + _wip_t400.md S1-S14):
+(1) RAIL PLACEMENT [verified]: windows.txt SHAPEITEM = <enabled> <lib>
+<frame> <dx> <dy>; rail rows carry 1starmap k5/k4/k3/k7 dx=109 dy=0 =>
+icon at (rect.x0+109, centre-h/2) = RIGHT of label at NATIVE size
+(583 vs measured 584/585; "wrong size" defect = user graded pre-t394 push
+5373c66). Port was painting rr.x+4 (left) — FIXED. RACES/Intelligence
+have NO SHAPEITEM (grep: SHAPEITEM only x4 rail + x3 3cfgnew).
+(2) SPECIES FLAGS: raceflag.shp = 21x EXACTLY 14x24 (unique census class),
+dominant colour EXACTLY (12,32,48) = rail fill (seamless blit); boxes
+measured x521/x540 y288. Port law DECLARED (left=player, right=first AI,
+human -> left empty): WHICH TWO races vendor shows = NAMED SEAM, decider
+= live witness w/ known species. (3) TITLE HOVER [verified]: hovered band
+fill (0,28,36) EXACTLY 9691px vs (0,0,8) elsewhere (pinned shot, cursor
+on PLAYTUTORIAL); teals are consecutive t386-TSV GIF columns; windows.txt
+has NO hover-state field (grep MOUSEFOCUS|HIGHLIGHT|BUTTONSTATE|... = 0)
+=> code-drawn law. Implemented via titleButtonFill() + SDL_GetMouseState.
+Bevel-vs-cursor residue in the one hovered sample = NAMED SEAM. RAIL
+hover: NO witness, NO law — deliberately NOT implemented (honest).
+(4) FRAME TEXTURE [geometry+palette verified, source record UNKNOWN]:
+mottled grey-teal bands x0..6 + x466..639 full height in BOTH vendor
+shots; field interior black; 10-colour census ALL in game.pal (weights
+sum 74 + tail 4); 1starmap k0 REFUTED at cluster (7172 conflicts, 21%).
+Port = splitmix64 hash-noise over the measured set/bands (pattern = named
+seam). Cluster "missing bg art" resolves to this band; no panel record
+exists. (5) rail fill (40,40,56)->(12,32,48) [palette.md §4].
+VERIFICATION: suite 330->334/0 (test_rail_t400.cpp); mutation 6/6 CAUGHT
+(scripts/t400_mutate.py; M2 top-align MISSED first — tolerance pin ->
+re-scoped exact cy-h/2 -> CAUGHT; skill rule 4 followed); witness census
+PASS on our own render (t400_rail_witness.sh + t400_witness_census.py:
+bands 100%/97.9% in game.pal w/ port frame grey named+excluded, icon-zone
+chroma 1128/806/984, flag zone non-flat w/ raceflag green, hovered LOAD
+band (0,28,36)); shots work/r1/loop/t400-{map,title-hover}.png; headless
+seed-1 md5 6f8281d078447b0dd036e1d27c7c3578 == t399 (engine untouched).
+LEDGER: no OQ row matches (D11 chrome items live in the STATE queue);
+strict-close held — SEAMS banked (two-race law, hover bevel, texture
+source, rail hover), nothing closed on defaults.
 
 t399 LANDED 2026-11-15 (GALAXY MAP 3D FIELD — D11 HEADLINE FIXED WITH
 MEASUREMENT; LAW docs/re/t399-galaxy-map-3d.md + _wip_t399.md):
