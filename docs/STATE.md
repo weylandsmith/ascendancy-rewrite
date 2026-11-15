@@ -231,6 +231,13 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 ## NEXT ACTION (exactly one)
 
 NEXT WAIT-USER-RULING t374 — (sentinel-tag law: tag never renumbered;
+PUSH GAP CLOSED 2026-11-14 (user: "nothing has been committed to Github"
+— CORRECT: t390/t391 were local-only; t389's push covered phase-10 proper.
+Export /tmp/pubt391 verified vendor-free 6349 obj, builds WITHOUT data
+0 warnings, run_tests 297/199-skipped/0-failed, EXE present; FAST-FORWARD
+36bf92d..5373c66 verified post-push by ls-remote). t390 ART WITNESS: our
+own Xvfb render art-zone coverage 0% -> 100% (PIL mass, mechanical);
+screenshot work/r1/loop/t390-title-after.png for USER look-grading.
 ordering: the phase-10 queue is FULLY DRAINED — t390 LANDED title art, t391
 LANDED the presentation sweep 2026-11-14 (both banked below) — and every
 remaining closer is a human witness; no machine-checkable work exists, so do
