@@ -28,10 +28,27 @@ struct TitleButton {
     const char* name;      // vendor NAME (verbatim)
     Rect rect;             // vendor X0,Y0,X1,Y1 (inclusive)
     const char* label;     // TEXTITEM 0 string, '^' joined to spaces
+    // t392: the button's SECOND TEXTITEM display string, verbatim from
+    // windows.txt ("Alt-L"/"Alt-S"/"Alt-X"), or nullptr for the four
+    // single-item buttons (WINITEMS 1). The vendor draws it under the
+    // label; docs/re/boot.md §7 (t392 measurement).
+    const char* hint;
     BootState target;      // state this click selects from Title
     int message;           // SENDMESSAGE
     int param1;            // SENDPARAM1 (the vendor's command id)
 };
+
+// t392 TEXT BASELINE LAW (measured on the pinned vendor shot
+// docs/assets/refcap/original-title-menu.png, capture shift +40):
+// single-line labels (WINITEMS 1) ink rows y0+8..y0+17/18 -> draw TOP
+// y0+8; two-item buttons ink rows y0+4..13 (label) and y0+18..27 (hint),
+// matching their TEXTITEM dy fields 4/18 -> draw TOPs y0+4 and y0+18.
+// Both lines are horizontally CENTRED (vendor ink spans symmetric about
+// rect centre 318). NO underline is rendered for the '^' hotkey letter
+// (row census inside the rect holds EXACTLY fill+ink, no third colour).
+inline constexpr int kTitleLabelTopSingle = 8;   // y0 + 8 (font 3, dy 0)
+inline constexpr int kTitleLabelTopPair   = 4;   // y0 + 4 (font 2, dy 4)
+inline constexpr int kTitleHintTop        = 18;  // y0 + 18 (font 2, dy 18)
 inline constexpr int kTitleButtonCount = 7;
 extern const TitleButton kTitleButtons[kTitleButtonCount];
 

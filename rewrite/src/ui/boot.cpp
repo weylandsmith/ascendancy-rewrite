@@ -9,13 +9,20 @@ namespace ascend::ui {
 // spelling. Sub-grammar after the string ("3 0 0" etc.) is OQ-015 territory
 // and deliberately unused.
 const TitleButton kTitleButtons[kTitleButtonCount] = {
-    {"INTRO", {159, 200, 477, 230}, "Play Introduction", BootState::Intro, 1, 6},
-    {"PLAYTUTORIAL", {159, 240, 477, 270}, "Tutorial", BootState::Tutorial, 1, 15},
-    {"FRESHGAME", {159, 280, 477, 310}, "New Game", BootState::RaceConfig, 1, 3},
-    {"RESUME", {159, 320, 477, 350}, "Return to Current Game", BootState::Campaign, 1, 1},
-    {"LOAD", {159, 360, 477, 390}, "Load Game", BootState::Load, 1, 4},
-    {"SAVE", {159, 400, 477, 430}, "Save Game", BootState::Save, 1, 2},
-    {"EXITTODOS", {159, 440, 477, 470}, "Exit to DOS", BootState::Quit, 2, 0},
+    {"INTRO", {159, 200, 477, 230}, "Play Introduction", nullptr,
+     BootState::Intro, 1, 6},
+    {"PLAYTUTORIAL", {159, 240, 477, 270}, "Tutorial", nullptr,
+     BootState::Tutorial, 1, 15},
+    {"FRESHGAME", {159, 280, 477, 310}, "New Game", nullptr,
+     BootState::RaceConfig, 1, 3},
+    {"RESUME", {159, 320, 477, 350}, "Return to Current Game", nullptr,
+     BootState::Campaign, 1, 1},
+    {"LOAD", {159, 360, 477, 390}, "Load Game", "Alt-L", BootState::Load,
+     1, 4},
+    {"SAVE", {159, 400, 477, 430}, "Save Game", "Alt-S", BootState::Save,
+     1, 2},
+    {"EXITTODOS", {159, 440, 477, 470}, "Exit to DOS", "Alt-X",
+     BootState::Quit, 2, 0},
 };
 
 int titleButtonAt(Pt p) {
@@ -28,6 +35,9 @@ BootState bootHotkey(BootState from, char letter) {
     if (from != BootState::Title) return from;
     if (letter == 'l') return BootState::Load;
     if (letter == 's') return BootState::Save;
+    // t392: windows.txt EXITTODOS carries a second TEXTITEM "Alt-X"
+    // (L170) — the vendor's Exit hotkey twin, same shape as Alt-L/S.
+    if (letter == 'x') return BootState::Quit;
     return from;
 }
 

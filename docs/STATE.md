@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-14T21:15
+updated: 2026-11-14T23:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,17 +230,17 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t392 per queue row t392 below (phase 11: UI ROUND 2 + SOUND, per the
-D10 user grade of 2026-11-14). The WAIT-USER-RULING t374 sentinel is
-RETIRED — the user graded and found five real gaps: title text sits too
-high in its boxes; Alt-L/Alt-S/Alt-X second lines missing on the last
-three buttons; New Game screen "garbled and unusable"; galaxy map and all
-its rail buttons "wonky"; NO SOUND on the Athens build (partly a code
-fact — nothing calls playTune on fresh title entry, only after the intro;
-partly undiagnosed on his box, see t395). Reference material: scratchpad/
-user-supplied original-vs-rewrite pairs — gitignored and publish-excluded
-(archive.org vendor captures), and external vision on USER-SUPPLIED
-originals is ALLOWED evidence (R13 governs OUR OWN renders only).
+NEXT t393 per queue row t393 below (phase 11: UI ROUND 2 + SOUND, per the
+D10 user grade of 2026-11-14). Ordering: t393 before t394 because the
+"garbled and unusable" New Game screen is the worst-graded screen and its
+coordinate-space bug hunt (clipped rects) is the same class of error t394
+may share — land the layout-table instrument first. t392 LANDED 2026-11-14
+(title text baseline + Alt-L/S/X second lines — see its LANDED block; the
+vendor-profile row-for-row witness closes the D10 text complaints on our
+own render). Reference material for t393/t394: scratchpad/ user-supplied
+original-vs-rewrite pairs — gitignored and publish-excluded (archive.org
+vendor captures); external vision on USER-SUPPLIED originals is ALLOWED
+evidence (R13 governs OUR OWN renders only).
 PHASE-10 HISTORY: PUSH GAP CLOSED 2026-11-14 (user: "nothing has been committed to Github"
 — CORRECT: t390/t391 were local-only; t389's push covered phase-10 proper.
 Export /tmp/pubt391 verified vendor-free 6349 obj, builds WITHOUT data
@@ -534,6 +534,49 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t392 — 2026-11-14 (TITLE TEXT BASELINE + Alt-L/S/X SECOND LINES:
+## THE D10 TEXT COMPLAINTS CLOSED WITH MEASUREMENT; VENDOR ROW-FOR-ROW
+## WITNESS; UNDERLINE CLAIM REFUTED; LEDGER 17/3 UNCHANGED)
+
+- Sitting check RING-FIRST: t368_ring_turn parsed=20/20 max_turn=1254 (same
+  sitting as t380..t383/t391); zero new play; assignment stood. Tree clean
+  at launch.
+- TABLE LAW (windows.txt L128-170 cited): LOAD/SAVE/EXITTODOS = WINITEMS 2
+  with second TEXTITEM verbatim "Alt-L"/"Alt-S"/"Alt-X" (dy fields 4/18);
+  first four buttons WINITEMS 1. Alt-X is table-cited — user testimony
+  corroborated, not merely adopted.
+- PIXEL LAW (measured on pinned docs/assets/refcap/original-title-menu.png,
+  capture shift +40 verified by pure-fill rows): single-line ink rows
+  dy8..17/18 -> draw TOP y0+8; pair buttons dy4..13 + dy18..27 -> TOPs
+  y0+4/y0+18 (dy fields land ON the ink tops); both lines centred (spans
+  symmetric about rect centre 318). FACE: hint span 27 == bigfont 28
+  (smfont 22 refuted) — vendor draws BOTH lines big.
+- PORT DELTA: pre-fix our ink was the vendor profile shifted EXACTLY -4
+  (title.cpp drew y0+4) — decisive explanation of "text is a tad too
+  high". CODE: TitleButton gains `hint` (nullptr x4, verbatim Alt-* x3);
+  bootHotkey gains 'x'->Quit; title.cpp draws per the three constants
+  (kTitleLabelTopSingle/Pair/kTitleHintTop in boot.h).
+- WITNESS (mechanical, our own render — R13-safe): scripts/
+  t392_title_witness.sh boots Title in one Xvfb window; screenshot ink-row
+  profile is ROW-FOR-ROW identical to the vendor on all seven buttons
+  (btn0 8:11 9:7 10:7 11:39 ...; btn4/5/6 pairs 4..13 + 18..27); Esc exits
+  live ("ui title esc" -> OK: EXITED_AFTER_ESC). Screenshot banked
+  work/r1/loop/t392-title-after.png for USER look-grading.
+- UNDERLINE NEGATIVE: external vision on the 3x crop claimed the 'L' of
+  Load is underlined — MECHANICALLY REFUTED: inside the rect the census
+  holds EXACTLY {fill (0,0,8), ink (215,215,215)}, dy14 white=0 (no row of
+  underline pixels). '^' = word joiner; the port draws NO underline.
+- HONEST LIMITS: xsend sends one keysym without modifier state, so the
+  Alt-chords are unit-pinned only (test_titletext_t392.cpp x4), not
+  live-synthesised; the hint-face finding is a size census (2/3 font-field
+  semantics stay OQ-015 sub-grammar territory). Suite 301 tests 0 failed
+  (297 -> +4). LEDGER: NO row moved (strict-close — queue work; the D10
+  grade is testimony + our own-render measurement, not a witness for any
+  OQ row's named closer). Law banked docs/re/boot.md §7 + _wip_t392.md.
+  GATE_EXIT=0; ledger_audit OK; ledger_index_check OK; game/ untouched;
+  production :9 untouched. NEXT = t393 NEW GAME SCREEN REBUILD (worst-
+  graded screen first; its coordinate-space hunt precedes t394's).
 
 ## LANDED t391 — 2026-11-14 (PRESENTATION SWEEP: EVERY SCREEN ART-BACKED-OR-
 ## HONESTLY-VECTOR, CITED; ZERO CODE CHANGE; MASS 8/8 + REGISTRATION 0-

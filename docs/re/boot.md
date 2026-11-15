@@ -191,3 +191,43 @@ Honest negatives / seams:
   wheel values feeds a campaign-seed seam that does not exist yet.
 - RACELIST rows (state-7 RACE_n TYPE 6) are t388 chrome.
 - No OQ ledger row moved (queue work; strict-close ledger untouched).
+
+## 7. t392 TITLE TEXT BASELINE + HOTKEY-HINT LAW (2026-11-14, D10 grade)
+
+User grade of the pushed build: "text is a tad too high in the boxes" +
+"Alt-L/Alt-S/Alt-X second lines are missing on the last three buttons".
+Both closed with measurement; implementation `title.cpp` draw loop +
+`TitleButton::hint` (boot.h/cpp); pins `test_titletext_t392.cpp` x4.
+
+- TABLE LAW [verified, windows.txt L128-170]: LOAD/SAVE/EXITTODOS are
+  WINITEMS 2 with a second TEXTITEM whose display string is VERBATIM
+  "Alt-L" / "Alt-S" / "Alt-X" (dy fields 4 and 18); the first four
+  buttons are WINITEMS 1 (`... 3 0 0`). Alt-X is table-cited, not only
+  user testimony.
+- PIXEL LAW [measured on docs/assets/refcap/original-title-menu.png,
+  capture shift shot_row = logical + 40]: single-line labels ink rows
+  dy8..17/18 (draw TOP y0+8); pair buttons ink dy4..13 (label) and
+  dy18..27 (hint) — the TEXTITEM dy fields land exactly on the ink tops
+  (draw TOPs y0+4 / y0+18). Both lines centred on rect centre 318
+  (measured spans: "Load Game" 289..346, "Alt-L" 305..331).
+- FACE [measured decisive]: hint ink span 27 px == bigfont no-gutter 28
+  (smfont 22 — refuted). The vendor draws BOTH lines with the big face;
+  the TEXTITEM font field 2-vs-3 distinction is not a size difference
+  visible at the title.
+- PORT DELTA [measured]: pre-t390 our title ink rows were the vendor
+  profile shifted EXACTLY -4 (we drew y0+4; vendor y0+8) — the user's
+  "tad too high" was this. Post-fix witness /tmp/t392_shots/title.png
+  (= work/r1/loop/t392-title-after.png) is row-for-row identical to the
+  vendor profile on all seven buttons (btn0 8:11 9:7 10:7 11:39 ...,
+  btn4/5/6 pairs at dy4..13 + dy18..27).
+- UNDERLINE NEGATIVE [verified, refutes the external vision read]: the
+  3x-zoom vision readout claimed the 'L' of "Load" is underlined. Inside
+  the button rect the colour census holds EXACTLY {fill (0,0,8), ink
+  (215,215,215)} — no third colour — and dy14 white-count is 0 (no
+  underline row at any x). '^' is the word joiner (S1/boot.md §1), NOT a
+  rendered hotkey underline. The port draws NO underline.
+- HOTKEY LAW: bootHotkey gains 'x' -> Quit (the EXITTODOS twin; same
+  Title-only shape as 'l'/'s'). Live-loop witness scripts/
+  t392_title_witness.sh proves the input path (Esc -> "ui title esc" ->
+  process exits); the Alt-chords themselves are unit-pinned only —
+  tools/xsend sends one keysym with no modifier state (banked pitfall).

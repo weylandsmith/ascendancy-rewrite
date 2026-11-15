@@ -169,9 +169,24 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             SDL_SetRenderDrawColor(ren, kButtonFill.r, kButtonFill.g,
                                    kButtonFill.b, 255);
             SDL_RenderFillRect(ren, &r);
-            const int w = txt.width(b.label, true);
-            txt.draw(ren, b.rect.x0 + (b.rect.x1 - b.rect.x0 - w) / 2,
-                     b.rect.y0 + 4, b.label, true, kInk);
+            // t392 TEXT BASELINE LAW (boot.h + boot.md §7): single-item
+            // buttons draw ONE line at y0+8; the LOAD/SAVE/EXITTODOS pair
+            // draws label at y0+4 and the vendor's Alt-* TEXTITEM verbatim
+            // at y0+18 (the dy fields of the two TEXTITEM records land on
+            // the measured ink rows). Both lines centred on the rect.
+            const int cx = (b.rect.x0 + b.rect.x1 + 1) / 2;
+            if (b.hint) {
+                const int w1 = txt.width(b.label, true);
+                txt.draw(ren, cx - w1 / 2, b.rect.y0 + kTitleLabelTopPair,
+                         b.label, true, kInk);
+                const int w2 = txt.width(b.hint, true);
+                txt.draw(ren, cx - w2 / 2, b.rect.y0 + kTitleHintTop,
+                         b.hint, true, kInk);
+            } else {
+                const int w = txt.width(b.label, true);
+                txt.draw(ren, cx - w / 2, b.rect.y0 + kTitleLabelTopSingle,
+                         b.label, true, kInk);
+            }
         }
         if (st == BootState::RaceConfig) {
             // NEWGAMEWND chrome (windows.txt L575-673, law docs/re/boot.md
@@ -222,10 +237,11 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 st = BootState::Quit;
                 break;
             }
-            // D9 LAW (user 2026-11-14 + vendor screenshot): Alt-L = Load,
-            // Alt-S = Save from the title screen — the on-screen buttons'
-            // hotkey twins (windows.txt LOAD/SAVE blocks carry the 'Alt-L'/
-            // 'Alt-S' TEXTITEM items). Routing lives in bootHotkey (pinned).
+            // D9 LAW (user 2026-11-14) + t392 (windows.txt TEXTITEM items
+            // 'Alt-L'/'Alt-S'/'Alt-X' L129/149/170): Alt-L = Load, Alt-S =
+            // Save, Alt-X = Exit to DOS from the title screen — the on-
+            // screen buttons' hotkey twins. Routing lives in bootHotkey
+            // (pinned).
             if (e.type == SDL_KEYDOWN &&
                 (e.key.keysym.mod & KMOD_ALT)) {
                 const char letter =
