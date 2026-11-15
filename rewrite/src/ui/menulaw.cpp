@@ -5,6 +5,7 @@
 #include "ui/menulaw.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <filesystem>
 #include <fstream>
 
@@ -190,6 +191,49 @@ bool loadPickAccepts(const std::vector<SaveSlot>& slots, int index,
         return false;
     }
     return true;
+}
+
+// ---- t401 NEW GAME ART LAW (header docblock carries the citations) --------
+// Page-texture bands on the New Game screen [measured on the user original;
+// docs/re/_wip_t401.md S8/S10 — same t400 §4 texture class, different band
+// extents because the starfield runs to ~x493 here].
+const Rect kNewgameTextureBands[2] = {
+    {0, 0, 6, 479},       // left margin (t400 §4 band, same extent)
+    {494, 0, 639, 479},   // right side (texture columns measured at y=200)
+};
+
+int newgameWheelFrame(int control, int value) {
+    switch (control) {
+        case 0: {  // Star Density: rank in the sorted ladder -> k0..k3,k3.
+            // Sorted copy of the t78 ladder rungs {50,75,100,15,25}.
+            int ladder[5] = {kDensityStarCounts[0], kDensityStarCounts[1],
+                             kDensityStarCounts[2], kDensityStarCounts[3],
+                             kDensityStarCounts[4]};
+            for (int i = 0; i < 4; i++)
+                for (int j = i + 1; j < 5; j++)
+                    if (ladder[j] < ladder[i]) std::swap(ladder[i], ladder[j]);
+            int rank = -1;
+            for (int i = 0; i < 5; i++)
+                if (ladder[i] == value) rank = i;
+            if (rank < 0) return -1;  // off-ladder: refuse, never clamp
+            return rank >= 3 ? 3 : rank;  // top-two share = named seam
+        }
+        case 1:  // Species: k(2+n), 3..Seven (anchor k7 @ Five, measured).
+            if (value < 3 || value > 7) return -1;
+            return 2 + value;
+        case 2:  // Atmosphere: orbs k10 (Peaceful/Neutral) / k11 (Hostile).
+            if (value < 0 || value > 2) return -1;
+            return value == 2 ? 11 : 10;
+        default:
+            return -1;
+    }
+}
+
+std::string portraitLibName(int specnum) {
+    if (specnum < 0 || specnum > 20) return std::string();  // refuse
+    char buf[32];
+    std::snprintf(buf, sizeof(buf), "smrace%02d.shp", specnum);
+    return std::string(buf);
 }
 
 }  // namespace ascend::ui

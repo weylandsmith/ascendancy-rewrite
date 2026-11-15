@@ -20,6 +20,7 @@
 #include "game/campaign.h"
 #include "ui/boot.h"
 #include "ui/menulaw.h"
+#include "ui/mapchrome.h"  // t401: textureColourAt (the §4 hash-noise law)
 #include "ui/titlepalette.h"
 #include "ui/ui_internal.h"
 
@@ -200,6 +201,39 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
         std::fflush(stdout);
     }
 
+    // t401 ART LIBRARIES (docs/re/_wip_t401.md S10): raceflag.shp (21x
+    // 14x24 crest class — the description-panel emblem, measured exact-size
+    // match) and the smraceNN.shp portrait cache (49x49 class; loaded on
+    // demand per specnum, one refusal line each, never re-read per frame).
+    ascend::formats::ShapeLibrary raceflagLib;
+    {
+        std::string ferr;
+        if (!raceflagLib.load(
+                dataRoot + "/extracted/ascend01/data/raceflag.shp", &ferr))
+            std::printf("ui raceconfig raceflag refused: %s\n", ferr.c_str());
+        std::fflush(stdout);
+    }
+    std::vector<ascend::formats::ShapeLibrary> portraitLibs(21);
+    std::vector<bool> portraitTried(21, false), portraitOk(21, false);
+    const auto portraitFor = [&](int specnum)
+        -> const ascend::formats::ShapeLibrary* {
+        if (specnum < 0 || specnum > 20) return nullptr;
+        if (!portraitTried[size_t(specnum)]) {
+            portraitTried[size_t(specnum)] = true;
+            std::string perr;
+            portraitOk[size_t(specnum)] = portraitLibs[size_t(specnum)].load(
+                dataRoot + "/extracted/ascend01/data/" +
+                    portraitLibName(specnum),
+                &perr);
+            if (!portraitOk[size_t(specnum)])
+                std::printf("ui raceconfig portrait refused: smrace%02d: %s\n",
+                            specnum, perr.c_str());
+            std::fflush(stdout);
+        }
+        return portraitOk[size_t(specnum)] ? &portraitLibs[size_t(specnum)]
+                                           : nullptr;
+    };
+
     // t390 TITLE ART (docs/re/title-art.md §7): the GIF decodes ONCE and
     // lives as a static texture (the cfgNew pattern). A refusal prints the
     // reason ONCE and the frame renders honestly-vector (no fake art).
@@ -302,6 +336,23 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
             SDL_RenderClear(ren);  // starfield zone measured BLACK (S: census)
 
+            // (1a) t401 PAGE TEXTURE (D11 "UI framing is missing"): the New
+            // Game original carries the t400 §4 mottled texture in the LEFT
+            // margin x0..6 and the RIGHT side x>=494 (sparse columns
+            // 494/498/502/614/634/637/639 measured at y=200 — the field
+            // runs to ~493 here, so the map screen's x466 band does NOT
+            // transfer). Same splitmix64 law as the map chrome; painted
+            // BEFORE the field so panels stay clean over it.
+            for (int b = 0; b < 2; b++) {
+                const Rect& band = kNewgameTextureBands[b];
+                for (int y = band.y0; y <= band.y1; y++)
+                    for (int x = band.x0; x <= band.x1; x++) {
+                        RGB c = textureColourAt(x, y);
+                        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                        SDL_RenderDrawPoint(ren, x, y);
+                    }
+            }
+
             // (1) BACKDROP = live map preview (COSMOSWnd is STATE "4 1 3 7 13"
             // — registered in state 3; the original shows the generated map
             // behind the panels). Same projection law as the campaign loop.
@@ -334,16 +385,21 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          false, kInk);
             }
 
-            // (3) NEWGAMEWND panel: interior measured BLACK + grey bevel
-            // (97,97,97). The k0 wheel face (84x79) is the config WHEEL art
-            // for the bottom-row controls (SHAPEITEM records), not this
-            // panel's backdrop — t387 drew it here on a wrong reading; the
-            // panel carries name + lore text instead (original S9).
-            SDL_Rect wf{kNewgameWnd.x0, kNewgameWnd.y0,
-                        kNewgameWnd.x1 - kNewgameWnd.x0 + 1,
-                        kNewgameWnd.y1 - kNewgameWnd.y0 + 1};
-            SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
-            SDL_RenderDrawRect(ren, &wf);
+            // (3) NEWGAMEWND description panel — t401 REBUILD (D11 "the
+            // species description box ... is empty and transparent ... it
+            // should be solid"). MEASURED on the user original: interior
+            // BLACK 71.9% (39363/54715 px) + green ring (0,142,69) x357..461
+            // rows 45..149 (centre (409,97) r 52) + portrait + purple planet
+            // disc x383..419 y198..239 + green crest x441..455 y205..229
+            // (raceflag NATIVE 14x24 exact-size match) + green lore. The
+            // pre-t401 port drew only a 1-px outline = the defect.
+            {
+                SDL_Rect fill{kNewgameWnd.x0, kNewgameWnd.y0,
+                              kNewgameWnd.x1 - kNewgameWnd.x0 + 1,
+                              kNewgameWnd.y1 - kNewgameWnd.y0 + 1};
+                SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+                SDL_RenderFillRect(ren, &fill);
+            }
 
             // (4) Species name (green, rows 18..27, centred on the panel) +
             // "Player Species" header (white, rows 16..25, centred RACELIST).
@@ -359,6 +415,48 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 const int w = txt.width(hdr, false);
                 txt.draw(ren, (kRaceList.x0 + kRaceList.x1 + 1) / 2 - w / 2,
                          kHeaderTop, hdr, false, kInk);
+            }
+
+            // (3b) t401 PANEL ART: portrait ring (green, the vendor ring
+            // colour (0,142,69) == kLore ink — measured ring px), portrait
+            // smraceNN scaled 2x inside (scale = port law, seam), planet
+            // disc (purple bands (40,20,32)/(109,56,93)/(125,121,138)
+            // measured; honest-vector concentric circles), crest raceflag
+            // k<specnum> NATIVE at (441,205). A missing lib degrades to the
+            // ring-only drawing (never a fake stand-in).
+            {
+                SDL_SetRenderDrawColor(ren, kLore.r, kLore.g, kLore.b, 255);
+                for (int a = 0; a < 360; a += 1) {  // dense ring, 1px step
+                    const double rad = a * 3.14159265 / 180.0;
+                    SDL_RenderDrawPoint(
+                        ren, kDescRingCentre.x + int(kDescRingR * cos(rad)),
+                        kDescRingCentre.y + int(kDescRingR * sin(rad)));
+                }
+                if (const auto* pl = portraitFor(selIndex)) {
+                    const int d = int(pl->record(0).width) *
+                                  kRacePortraitScale;  // 49x49 -> 98
+                    blitShapeScaled(ren, *pl, 0,
+                                    kDescRingCentre.x - d / 2,
+                                    kDescRingCentre.y - d / 2,
+                                    kRacePortraitScale);
+                }
+                // Planet disc: three purple bands measured on the original.
+                const RGB kPlanet[3] = {{40, 20, 32}, {109, 56, 93},
+                                        {125, 121, 138}};
+                for (int dy = -kDescPlanetR; dy <= kDescPlanetR; dy++)
+                    for (int dx = -kDescPlanetR; dx <= kDescPlanetR; dx++) {
+                        if (dx * dx + dy * dy > kDescPlanetR * kDescPlanetR)
+                            continue;
+                        const int bandIdx = dy < -6 ? 0 : (dy < 7 ? 1 : 2);
+                        const RGB& c = kPlanet[bandIdx];
+                        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                        SDL_RenderDrawPoint(ren, kDescPlanetCentre.x + dx,
+                                            kDescPlanetCentre.y + dy);
+                    }
+                if (raceflagLib.count() > 0 && selIndex >= 0 &&
+                    selIndex < raceflagLib.count())
+                    blitShape(ren, raceflagLib, selIndex, kDescCrestRect.x0,
+                              kDescCrestRect.y0);
             }
 
             // (5) Lore: "The <Name> <fragment>" (static.txt //154 template +
@@ -387,9 +485,13 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
 
             // (6) RACELIST: navy interior + bevel + THREE portrait slots
             // (measured S: bands 49-153/157-262/266-372, pitch 108) + scroll
-            // arrow squares. PORTRAITS ARE A NAMED SEAM (t391: the 7racesel
-            // strips stay unblitted without a stronger witness) — a grey
-            // disc + the species NAME stands in, and says so in the docs.
+            // arrow squares. t401 (D11 "artwork isn't rendered at all in the
+            // Player Species column"): the vendor rows are smraceNN portraits
+            // scaled 2x (chromatic art run x505..613 measured; ring greys
+            // x506..511/608..612 -> r 53, centre x 559) and carry NO text
+            // (two independent vision reads of the original crop agree) —
+            // the grey-disc + NAME stand-in is REMOVED. A refused lib
+            // degrades to the ring alone (honest, no fake portrait).
             SDL_Rect rl{kRaceList.x0, kRaceList.y0,
                         kRaceList.x1 - kRaceList.x0 + 1,
                         kRaceList.y1 - kRaceList.y0 + 1};
@@ -401,7 +503,6 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 const int specnum = scrollOffset + i;
                 const int cy = kRaceSlotTop + i * kRaceSlotPitch +
                                kRaceSlotH / 2;
-                const int cx = (kRaceList.x0 + kRaceList.x1) / 2;
                 if (i == selSlot) {  // selection: luminance change, not hue
                     SDL_SetRenderDrawColor(ren, kSelBg.r, kSelBg.g, kSelBg.b,
                                            255);
@@ -410,19 +511,21 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     SDL_RenderFillRect(ren, &band);
                 }
                 if (specnum < rosterCount()) {
-                    SDL_SetRenderDrawColor(ren, kDisc.r, kDisc.g, kDisc.b, 255);
-                    filledCircle(ren, cx, cy, kRaceSlotH / 2 - 2);
                     SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b,
                                            255);
-                    for (int a = 0; a < 360; a += 2) {  // ring (seam stand-in)
+                    for (int a = 0; a < 360; a += 2) {  // silver ring r53
                         const double rad = a * 3.14159265 / 180.0;
                         SDL_RenderDrawPoint(
-                            ren, cx + int((kRaceSlotH / 2 - 1) * cos(rad)),
-                            cy + int((kRaceSlotH / 2 - 1) * sin(rad)));
+                            ren, kRacePortraitCx + int(kRaceRingR * cos(rad)),
+                            cy + int(kRaceRingR * sin(rad)));
                     }
-                    const std::string nm = speciesNameAt(specnum);
-                    const int w = txt.width(nm, false);
-                    txt.draw(ren, cx - w / 2, cy - 4, nm, false, kInk);
+                    if (const auto* pl = portraitFor(specnum)) {
+                        const int d = int(pl->record(0).width) *
+                                      kRacePortraitScale;  // 98 inside r53
+                        blitShapeScaled(ren, *pl, 0,
+                                        kRacePortraitCx - d / 2, cy - d / 2,
+                                        kRacePortraitScale);
+                    }
                 }
             }
             for (int i = 0; i < 2; i++) {  // arrows (measured corner squares)
@@ -446,7 +549,14 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
 
             // (7) Bottom config bar: four windows.txt-cited panels + the
             // measured Begin zone. Panels: navy fill + bevel + white label
-            // (measured rows 393..403) + value word + k0 wheel face inside.
+            // (measured rows 393..403). t401 (D11 "the artwork is rendered
+            // incorrectly in the bottom row"): the wheel face comes from
+            // newgameWheelFrame(control, value) — a DIFFERENT 3cfgnew record
+            // per setting (the pre-t401 port blitted k0 into every panel at
+            // (cx-42, y0+26)); blit anchored so the record's content circle
+            // centres on the panel ((cx-28, 408), measured bbox x38..92
+            // y408..462). The in-panel value word is REMOVED: the original
+            // has none (the summary block carries the values).
             for (int i = 0; i < kNewgameControlCount; i++) {
                 const NewgameControl& c = kNewgameControls[i];
                 SDL_Rect r{c.rect.x0, c.rect.y0, c.rect.x1 - c.rect.x0 + 1,
@@ -459,23 +569,26 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 const int wl = txt.width(c.label, false);
                 txt.draw(ren, cxp - wl / 2, c.rect.y0 + 12, c.label, false,
                          kInk);
-                if (cfgNew.count() > 0)
-                    blitShape(ren, cfgNew, 0,
-                              cxp - int(cfgNew.record(0).width) / 2,
-                              c.rect.y0 + 26);  // wheel face (SHAPEITEM cited)
-                const char* vw = i == 0
-                                     ? kDensityWords[densityIdx]
-                                     : (i == 1 ? speciesCountWord(speciesSetting)
-                                               : atmosphereWord(atmosphere));
-                if (vw) {
-                    const int wv = txt.width(vw, false);
-                    txt.draw(ren, cxp - wv / 2, c.rect.y0 + 58, vw, false,
-                             kInk);
-                }
+                const int value = i == 0
+                                      ? kDensityStarCounts[densityIdx]
+                                      : (i == 1 ? speciesSetting : atmosphere);
+                const int frame = newgameWheelFrame(i, value);
+                if (frame >= 0 && frame < cfgNew.count())
+                    blitShape(ren, cfgNew, frame, cxp - kWheelBlitHalfW,
+                              kWheelBlitTop);
+                else if (frame >= 0)
+                    std::printf("ui raceconfig wheel refused: ctrl %d k%d "
+                                "(lib %d recs)\n",
+                                i, frame, cfgNew.count());
             }
-            // Player^Color (windows.txt L653, MSG 0 = inert): label + six
-            // owner-colour chips (the original shows six icons; WHICH six is
-            // a named seam — kOwnerRgb is our CVD-safe set, cited as such).
+            // Player^Color (windows.txt L653, MSG 0 = inert). t401 census
+            // MEASURES the zone: label ink rows 383..393, an icon band rows
+            // 394..404, bevel rows 405..419 — and NO chromatic icon pixels
+            // exist anywhere in the capture (navy + greys only; the vision
+            // read's "six coloured icons" is compression bleed, refuted
+            // mechanically, docs/re/_wip_t401.md S10). The port draws six
+            // CVD-safe chips in the measured band; WHICH colours the vendor
+            // used stays a named seam (no citation exists).
             {
                 const Rect c = kPlayerColorRect;
                 SDL_Rect r{c.x0, c.y0, c.x1 - c.x0 + 1, c.y1 - c.y0 + 1};
@@ -486,16 +599,23 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 const std::string lbl = "Player Color";  // NAME 'Player^Color'
                 const int cxp = (c.x0 + c.x1) / 2;
                 const int wl = txt.width(lbl, false);
-                txt.draw(ren, cxp - wl / 2, c.y0 + 12, lbl, false, kInk);
+                txt.draw(ren, cxp - wl / 2, c.y0 + 2, lbl, false, kInk);
                 for (int k = 0; k < 6; k++) {
                     SDL_Color col = toSdl(kOwnerRgb[k]);
                     SDL_SetRenderDrawColor(ren, col.r, col.g, col.b, 255);
-                    SDL_Rect chip{cxp - 45 + k * 16, c.y0 + 28, 12, 12};
+                    SDL_Rect chip{cxp - 45 + k * 16, c.y0 + 13, 12, 10};
                     SDL_RenderFillRect(ren, &chip);
                 }
             }
             // Begin New Game (measured rect; NOT windows.txt — STARTGAME is
-            // STATE "1 12"). White label rows measured ~456; thumbnail seam.
+            // STATE "1 12"). White label rows measured ~456. t401 (D11 "the
+            // Begin New Game box is empty except for text"): the original
+            // carries (a) a hash-noise dot cluster in the left band
+            // x496..570 (greys (225,227,229)/(255,255,255)/(164,171,177)/
+            // (103,116,126)/(97,97,97) + teals measured; splitmix64 law like
+            // the page texture — the PATTERN is the named seam) and (b) the
+            // species emblem: smrace NATIVE 49x49 at (577,394), inside the
+            // green-ring zone x573..629 y390..446 (centre (601,418)).
             {
                 SDL_Rect r{kBeginNewGameBtn.x0, kBeginNewGameBtn.y0,
                            kBeginNewGameBtn.x1 - kBeginNewGameBtn.x0 + 1,
@@ -504,6 +624,35 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 SDL_RenderFillRect(ren, &r);
                 SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
                 SDL_RenderDrawRect(ren, &r);
+                // (a) dot cluster: ~6% of the band pixels, deterministic.
+                for (int y = kBeginDotsBand.y0; y <= kBeginDotsBand.y1; y++)
+                    for (int x = kBeginDotsBand.x0; x <= kBeginDotsBand.x1;
+                         x++) {
+                        uint64_t z =
+                            (uint64_t(uint32_t(x)) << 32) ^
+                            uint64_t(uint32_t(y)) ^ 0x9e3779b97f4a7c15ull;
+                        z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
+                        z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
+                        z = z ^ (z >> 31);
+                        if (z % 100u >= 6u) continue;
+                        static const RGB kDot[6] = {
+                            {255, 255, 255}, {225, 227, 229}, {164, 171, 177},
+                            {103, 116, 126}, {97, 97, 97},    {69, 105, 109}};
+                        const RGB& c = kDot[z % 6u];
+                        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                        SDL_RenderDrawPoint(ren, x, y);
+                    }
+                // (b) emblem ring + portrait of the SELECTED species.
+                SDL_SetRenderDrawColor(ren, kLore.r, kLore.g, kLore.b, 255);
+                for (int a = 0; a < 360; a += 2) {
+                    const double rad = a * 3.14159265 / 180.0;
+                    SDL_RenderDrawPoint(
+                        ren, kBeginEmblemCentre.x + int(28 * cos(rad)),
+                        kBeginEmblemCentre.y + int(28 * sin(rad)));
+                }
+                if (const auto* pl = portraitFor(scrollOffset + selSlot))
+                    blitShape(ren, *pl, 0, kBeginEmblemRect.x0,
+                              kBeginEmblemRect.y0);
                 const std::string lbl = "Begin New Game";  // static.txt //169
                 const int w = txt.width(lbl, false);
                 txt.draw(ren,

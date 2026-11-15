@@ -83,6 +83,69 @@ inline constexpr Rect kRaceArrowDown{616, 356, 631, 371};
 int newgameRowAt(Pt p);   // slot 0..2 or -1 (gutters/arrows dead for rows)
 int newgameArrowAt(Pt p); // 0 = up, 1 = down, -1 = none
 
+// ---- t401 NEW GAME ART LAW (D11: framing missing, bottom-row artwork
+// wrong, species column art not rendered, Begin box empty, description
+// transparent). Measurement trail docs/re/_wip_t401.md S1-S10 on the
+// USER-SUPPLIED originals (scratchpad/newgame-original.png +
+// -very-dense- variant; capture->screen mapping cited there).
+
+// WHEEL FRAME LAW — which 3cfgnew.shp record a bottom-row control shows for
+// its value; -1 = refuse (draw nothing; never clamp). `control` indexes
+// kNewgameControls (0 Star Density / 1 Species / 2 Atmosphere).
+//   density    : star count RANKED in the sorted t78 ladder {15,25,50,75,
+//                100} -> k0,k1,k2,k3,k3. Dots increase with frame index
+//                (measured bright-cluster census 23/33/45/62 for k0..k3);
+//                the top-two share and the exact 5->4 bijection = SEAM.
+//   species    : n -> k(2+n). ANCHOR measured: the original at "Five
+//                Species" shows FOUR icons and k7 carries four icons;
+//                endpoints 3->k5 / 7->k9 inferred (SEAM).
+//   atmosphere : 0/1 -> k10, 2 -> k11. Both orbs carry the original's
+//                (36,138,190) chroma (k10 x123, k11 x195 px) — WEAK
+//                discriminator; declared port choice, seam named.
+int newgameWheelFrame(int control, int value);
+
+// Wheel blit anchor [measured]: the record's CONTENT circle (55 px wide)
+// centres on the panel — original non-navy bbox x38..92 y408..462 inside
+// the Star Density panel (cx 64). Blit at (panelCx - kWheelBlitHalfW,
+// kWheelBlitTop). The pre-t401 port blitted k0 always at (cx-42, y0+26) =
+// the "wrong artwork / wrong place" defect.
+inline constexpr int kWheelBlitTop = 408, kWheelBlitHalfW = 28;
+
+// Description-panel art [measured]: portrait ring (green px x357..461,
+// rows 45..149 -> centre (409,97) r 52); crest = raceflag frame <specnum>
+// at NATIVE 14x24 (green bbox x441..455 y205..229 = exact size match);
+// planet disc (purple bands x383..419 y198..239) — honest-vector circle.
+inline constexpr Pt kDescRingCentre{409, 97};
+inline constexpr int kDescRingR = 52;
+inline constexpr Rect kDescCrestRect{441, 205, 454, 228};
+inline constexpr Pt kDescPlanetCentre{401, 218};
+inline constexpr int kDescPlanetR = 18;
+
+// RACELIST row art [measured]: portrait centre x 559 (row-2 ring greys at
+// x506..511 / x608..612 -> dia ~107, r 53); smrace 49x49 SCALED 2x (98 px)
+// inside the ring — the scale filter is a NAMED SEAM. The vendor rows
+// carry NO text (two independent vision reads of the original crop).
+inline constexpr int kRacePortraitCx = 559, kRacePortraitScale = 2;
+inline constexpr int kRaceRingR = 53;
+
+// Begin-box art [measured]: emblem zone green px x573..629 y390..446
+// (centre (601,418)); smrace NATIVE 49x49 at (577,394) fits it exactly;
+// hash-noise dot band (splitmix64, the t400 texture pattern) x496..570.
+inline constexpr Rect kBeginEmblemRect{577, 394, 625, 442};
+inline constexpr Pt kBeginEmblemCentre{601, 418};
+inline constexpr Rect kBeginDotsBand{496, 390, 570, 446};
+
+// Page texture on THIS screen [measured]: left margin x0..6 (the t400 §4
+// band) and the RIGHT side from x494 (sparse texture columns 494/498/502/
+// 614/634/637/639 at y=200). t400's map-screen band starts at 466 because
+// the cosmos field ends there; on this screen the starfield runs to ~493.
+extern const Rect kNewgameTextureBands[2];
+
+// Portrait library file name for a specnum: smraceNN.shp — the unique
+// race-named 49x49 portrait class (21 libs, dims census). Frame->species
+// IDENTITY is the same named-seam class as t400's raceflag law.
+std::string portraitLibName(int specnum);
+
 // The three setting words + summary (static.txt verbatim, L429-457 block):
 // density words 155-159, atmosphere 160-162, species count 163-167, summary
 // template 168 "%s Star Cluster\n%s Species\n%s Atmosphere". The word->star

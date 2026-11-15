@@ -123,6 +123,15 @@ bool loadChromePalette(const std::string& dataRoot) {
 
 bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
                int rec, int x, int y) {
+    return blitShapeScaled(ren, lib, rec, x, y, 1);
+}
+
+bool blitShapeScaled(SDL_Renderer* ren,
+                     const ascend::formats::ShapeLibrary& lib, int rec,
+                     int x, int y, int scale) {
+    if (scale < 1) scale = 1;  // refuse-not-clamp applies to the FRAME,
+                               // never to the draw scale (a 0-scale blit
+                               // would be an invisible no-op at best)
     std::vector<uint8_t> a, b;
     if (!lib.decode(rec, a) || a.empty()) return false;
     b = a;
@@ -148,8 +157,9 @@ bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
     if (!tex) return false;
     SDL_UpdateTexture(tex, nullptr, argb.data(),
                       int(r.width) * int(sizeof(uint32_t)));
-    SDL_Rect dst{x, y, int(r.width), int(r.height)};
-    SDL_RenderCopy(ren, tex, nullptr, &dst);
+    SDL_Rect dst{x, y, int(r.width) * scale, int(r.height) * scale};
+    SDL_RenderCopy(ren, tex, nullptr, &dst);  // SDL default scale mode is
+                                              // NEAREST (integer upscale)
     SDL_DestroyTexture(tex);
     return true;
 }
