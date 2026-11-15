@@ -230,12 +230,18 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-WAIT-USER-RULING t374 (tag law: never renumber). t397 LANDED 2026-11-15: the
-D11 asks are now ANSWERABLE on the ruling page (see below) — the channel that
-actually gets answers (D1 answered in minutes there; text asks D10/D11 sat
-unanswered). NOTHING further is closable without a human witness; do NOT
-re-check for new work (IDLE law t178) — a session wakes on a DECISIONS.md edit,
-a ruling/reply file, or a new sitting.
+NEXT t398 per queue row t398 below (phase 12: PALETTE + 3D MAP + RAIL +
+NEW GAME PANELS + PLANETS LIST, per the D11 rulings submitted 2026-11-15
+via the ruling page — USER: lines in DECISIONS.md, six fields, all
+saw-live). The WAIT-USER-RULING t374 sentinel is RETIRED (tag law: tag
+itself never renumbered; history kept below). RULING CHANNEL INCIDENT
+t397b: the page server died right AFTER writing the user's ruling
+(BrokenPipeError through single-threaded serve_forever); fixed + hardened
+(server.py: swallow-on-send, catch-all handle, ThreadingHTTPServer) and
+the user's 6 lines verified intact. D11 headline: title near-pass; New
+Game usable-but-wrong; GALAXY MAP FAILS (3D rotatable point field, lane
+visibility law, day-counter digits, rail art greyscale); audio audible
+on athens (OQ-027 stays open pending final verdict); D11b privacy=DROP.
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
@@ -585,9 +591,89 @@ row's "fast-forward expected" premise FAILED because the privacy rewrite
 diverged history by construction — force-with-lease pinned to the FETCHED tip
 is the correct shape, skill publish-sanitized-repo).
 
-OPEN ITEM: GitHub backend GC may still serve old commit SHAs (manual pages
-eb79da3-lineage) until support sweeps orphaned objects — user may email
-support.github.com. (Removal mechanics landed: docs/assets fully filtered,
+t398 PALETTE FIDELITY (D11 root cause for MOST "greyscale/wrong art"
+reports). t391 banked the seam: chrome COLOUR = luminance-ramp palette.
+User now confirms: rail icons, bottom-right cluster, hide/show box art,
+New Game bottom-row art ALL read greyscale/wrong. Extract the REAL
+palettes: per-shp-file palette law (SHP header? shared .pal? palette
+records inside the lib? — inspect 1starmap/10status/3cfgnew/7racesel
+byte-shape + cross-check against the user-supplied originals in
+scratchpad/ via colour-histogram of matching regions (user-supplied =
+allowed evidence). The t386 title-palette method (measured swap table)
+generalises: build per-lib palette tables, pin first-N colours, replace
+the ramp in blitShape's colour-uplift path. Deliverable: named-colour
+screenshots per screen + t398-palette.md; every lib either tabled or
+honestly-seamed with the missing witness named.
+
+t399 GALAXY MAP 3D FIELD (D11: "should be a 3d field of colored points
+that can be rotated and zoomed by the controls near the lower right...
+number of points is wrong... at the beginning only lanes off your home
+system show... can't find the home star"). Our RE ALREADY HOLDS THE
+PIECES: per-star x/y/z (starstat law — census the z field; ships.md/
+pership-spec.md carry the z-projection law from captures: Ilmarinen
+lane-witness z -2144 etc). Implement: (1) render ALL stars as coloured
+points (count = galaxy star count, pin it); (2) camera = rotation
+(pitch/yaw from the spin cluster SENDPARAMs) + zoom, projected per the
+cited vendor law (cite the FUN that projects, or bank the capture-derived
+affine + its witnesses); (3) LANE VISIBILITY LAW at game start: only
+lanes touching systems the player can see (home system at turn 1 =
+lanes from home); expansion law when sensors widen view — cite SA_KnowStarLanes
+already in test_campaign; (4) home star visually distinct (measured from
+original: brighter/ringed — verify against scratchpad original); (5) day
+counter = LARGE GREEN NUMBERS (vendor LED style; the circles-with-small-
+numbers is wrong — check smfont/bigfont slots for the digit face, else
+named seam). Pins: star count, projection determinism (fixed camera
+fixture), lane visibility set at turn 1 == home-system law, no-engine-RNG
+rule holds.
+
+t400 RAIL + CLUSTER + HOVER LAW (D11: rail art greyscale/wrong-side/
+wrong-size, species-button icons missing entirely, bottom-right cluster
+bg art + small icons missing; TITLE: "original highlights the button
+when you mouse over it, rewrite doesn't"). After t398 palettes: re-verify
+each rail icon lib/frame/position vs windows.txt SHAPEITEM + the original
+screenshot geometry (icons on the RIGHT of labels per original vision
+read; species row = TWO portraits); bottom-right hide/show box: bg art
+record + per-button small icons cited; HOVER: census SOUNDCHANNEL/
+MOUSEFOCUS/SHAPEFRAME hover-state law in windows.txt (frame swap on
+focus?) — implement highlight for title + rail buttons; if vendor hover
+state has no data law, bank seam with what would decide it.
+
+t401 NEW GAME FRAMING + PANELS (D11: usable now, but: UI framing
+missing, bottom-row artwork wrong, Player Species column art not
+rendered, Begin New Game box empty except text, species description box
+transparent/galaxy visible behind). (1) framing: bevel chrome — census
+which shp paints NEWGAMEWND frame (t393 said no 18*.shp; the ORIGINAL
+shows bevels — maybe drawn from a generic frame lib or 3cfgnew frames:
+find the record, cite it, else bank honest-vector-with-citation); (2)
+7racesel species-row strips: t391 seam (8x158x30, SHAPEFRAME -1) — the
+user shot now SHOWS portraits in the list = they DO blit; re-derive the
+frame mapping using the user-supplied original as geometry evidence;
+(3) description panel OPAQUE + populated (lore verbatim from history.txt
+per race — supply-your-own data law holds); (4) Begin box art per cited
+record; (5) bottom-row wheel art via t398 palettes. Screenshots per
+state -> t401-*.png.
+
+t402 PLANETS LIST SCREEN (D11: "the planets list screen is wrong and
+unusable"). First pass at the PLANETALLOC/planet-window law we already
+banked (docs/re/planetalloc*.md, planetwin.{h,cpp}): render the real
+list screen — columns, per-planet name/atmosphere/pop/manufacturing from
+the campaign model, chrome per windows.txt (17np lib, state 17), click
+to select. Content law citations over pixel-perfection; screenshots ->
+t402-*.png for user grading.
+
+t403 PHASE-12 VERIFY + RE-EXPORT + PUSH (push-gap law: MANDATORY). Full
+gate + run_tests + headless seed regression byte-identical; export;
+verify vendor-free/build-without-data/identity; fetch FIRST; push;
+ls-remote verify; rewrite NEXT to WAIT-USER-RULING t374 verbatim with
+D11-item-by-item grading handoff. AUDIO NOTE: user tentative-OK ("music
+plays, heard a click") — OQ-027 stays OPEN until the final "more
+playable" verdict per the row's own bar.
+
+DISPOSITIONED t403-prep (D11b USER: drop, 2026-11-15): no support email
+will be sent; old-object GC exposure (manual pages + the one ISP-email
+blob at old tip 5373c66) is ACCEPTED risk by the user. Current remote
+history verified clean (fail-closed gates in publish_public.sh).
+REMOVED ITEM: GitHub backend GC may still serve old commit SHAs (Removal mechanics landed: docs/assets fully filtered,
 fail-closed gate + .gitignore, local copies untracked.)
 Standing context: OQ-016/OQ-019 acceptance DEFERRED (rows stay OPEN; do
 NOT re-ask, do NOT apply the t329 S4 draft); user saves 887/1086/1253
