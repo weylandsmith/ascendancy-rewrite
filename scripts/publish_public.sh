@@ -46,22 +46,32 @@ FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --prune-empty \
         export GIT_AUTHOR_EMAIL="$GITHUB_USER@users.noreply.github.com" GIT_COMMITTER_EMAIL="$GITHUB_USER@users.noreply.github.com";
       fi' -- --all >/dev/null
 
-# 1b. HISTORY SCRUB (t383): a tip-only redaction of a personal email leaves it
-# inside old blobs (MEASURED 2026-11-12: 25 historical copies of
-# docs/re/_license_draft_t372.md held the pre-t383 address). Rewrite every
-# blob across all history. NOTE: this box's git filter-branch has NO
-# --blob-filter (that flag belongs to git-filter-repo, not installed) — first
-# attempt exit 1 with usage text. --tree-filter works; sed is scoped to the
-# ONE path that ever held the address. The sed eats the LOCAL PART too
-# ([A-Za-z0-9._%+-]* before the domain pattern) — an earlier
-# [[:space:][:punct:]] class stopped at '@' and would have leaked the
-# username.
-SCRUB_PATTERN="${SCRUB_PATTERN:-[ISP-DOMAIN]}"
-SCRUB_PATHS="${SCRUB_PATHS:-docs/re/_license_draft_t372.md}"
-TREE_SED=""
-for p in $SCRUB_PATHS; do
-    TREE_SED="$TREE_SED [ -f \"$p\" ] && sed -i -e 's/[A-Za-z0-9._%+-]*${SCRUB_PATTERN}[A-Za-z0-9.-]*/[REDACTED-EMAIL]/g' \"$p\" || true;"
-done
+# 1b. HISTORY SCRUB (t383; t396 GENERALIZED — see t396 notes below).
+# Two passes over ALL tracked paths (SCRUB_PATHS empty = all files):
+#  (P1) FULL personal-address form [REDACTED-EMAIL]*.[ISP] -> [REDACTED-EMAIL].
+#       t383 scoped this to ONE path (docs/re/_license_draft_t372.md) and the
+#       wip file docs/re/_wip_t383.md kept a historical blob with the full
+#       address — MEASURED t396: 1 blob, present in the ALREADY-PUSHED
+#       pubt391 tree too. Path-scoped privacy scrub is the bug; mask is
+#       idempotent, so scope it wide.
+#  (P2) BARE domain tokens (the ISP domain words, never used as contact info
+#       in this repo — MEASURED t396: only gate-pattern citations in
+#       STATE.md/packaging/publish_public.sh + the wip leak) -> [ISP-DOMAIN],
+#       so the fail-closed gate below can exist at all. NOTE the domain
+#       literals are SPLIT in-code ("ta"+"nagra", "digital"+"-oasis") so this
+#       script's own blob never trips its own grep.
+# PITFALLS (banked): this box's git filter-branch has NO --blob-filter (that
+# belongs to git-filter-repo, not installed) — --tree-filter works; sed is
+# now unscoped-by-default; the email class must eat the LOCAL PART too
+# ([A-Za-z0-9._%+-]* before '@') — an earlier [[:space:][:punct]] class
+# stopped at '@' and would have leaked the username.
+P1="[A-Za-z0-9._%+-]*@ta""nagra[A-Za-z0-9.-]*"
+P2="dig""ital-oasis|ta""nagra"
+# grep -l first (text files only, NUL-safe), sed ONLY the files that actually
+# contain a pattern — never rewrites binaries, never churns every file's bytes
+# per commit (t383's single-path loop took 20 s; an unconditional
+# find|xargs sed over ~570 commits would churn the whole tree every commit).
+TREE_SED="grep -rlZ -E '${P1}|${P2}' . --exclude-dir=.git 2>/dev/null | xargs -0 -r sed -i -e 's/${P1}/[REDACTED-EMAIL]/g' -e 's/${P2}/[ISP-DOMAIN]/g'; true;"
 FILTER_BRANCH_SQUELCH_WARNING=1 git filter-branch -f --tree-filter "$TREE_SED" -- --all >/dev/null
 
 # filter-branch keeps refs/original backups; without this the vendor blobs
@@ -75,13 +85,30 @@ V=$(git rev-list --objects --all | grep -cE '^.* (game/|extracted/|work/|archive
 [ "$V" = "0" ] || { echo "FAIL: $V vendor-path objects remain in history" >&2; exit 3; }
 # t383 gate: NO blob in the rewritten history may contain the scrub pattern
 # (batch cat-file; per-commit git grep over rev-list timed out at 300 s).
+# t396 FIX — THE GATE WAS VACUOUS (MEASURED 2026-11-15): `xargs git cat-file
+# --batch` appends the ids as ARGUMENTS and git dies "fatal: batch modes take
+# no arguments"; with 2>/dev/null and `|| true` that produced a 0-byte scan
+# file, so the pattern grep could never hit and exit 5 was unreachable.
+# Batch mode reads ids from STDIN. Fail CLOSED on an empty/short scan file,
+# plus a positive control proving the scan sees real blob content.
+SCAN=/tmp/pubpush_blobscan.$$
+SCAN_PATTERN="${SCAN_PATTERN:-dig""ital-oasis|ta""nagra}"
 git rev-list --objects --all | cut -d' ' -f1 | sort -u | \
-  xargs -r git cat-file --batch 2>/dev/null > /tmp/pubpush_blobscan.$$ || true
-if grep -a "$SCRUB_PATTERN" /tmp/pubpush_blobscan.$$ > /dev/null; then
-    rm -f /tmp/pubpush_blobscan.$$
-    echo "FAIL: scrub pattern '$SCRUB_PATTERN' still present in some blob" >&2; exit 5
+  git cat-file --batch 2>/dev/null > "$SCAN" || true
+SCAN_BYTES=$(stat -c %s "$SCAN" 2>/dev/null || echo 0)
+[ "$SCAN_BYTES" -gt 1000000 ] || { rm -f "$SCAN"; echo "FAIL(t396): blob scan vacuous — only $SCAN_BYTES bytes scanned (must be >1MB; a short scan means cat-file died)" >&2; exit 6; }
+# Positive control (t396): a string that has been in THIS script's blob since
+# inception MUST appear in the scan file itself — proves the scan holds real
+# blob content, not just cat-file headers.
+grep -aq "usage: publish_public.sh" "$SCAN" || { rm -f "$SCAN"; echo "FAIL(t396): positive control absent from scan — scan cannot see scripts/ blob content" >&2; exit 6; }
+if grep -aE "$SCAN_PATTERN" "$SCAN" > /dev/null; then
+    # NEVER print matching lines: the leak IS an address, and stdout of this
+    # script lands in logs (t396 rule). Count only.
+    HITS=$(grep -acE "$SCAN_PATTERN" "$SCAN")
+    rm -f "$SCAN"
+    echo "FAIL: scrub pattern still present ($HITS scan hits)" >&2; exit 5
 fi
-rm -f /tmp/pubpush_blobscan.$$
+rm -f "$SCAN"
 git checkout -q . 2>/dev/null || true
 for keep in rewrite/src/game/campaign.cpp docs/re LICENSE NOTICE README.md; do
     [ -e "$keep" ] || { echo "FAIL: $keep missing from stripped tree" >&2; exit 4; }
