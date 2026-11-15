@@ -174,14 +174,13 @@ WRITTEN; a differing one was skipped -> alpha 0 (vendor
 untouched-destination semantics, formats/shp.h). Mechanical; no guessed
 transparent-index value.
 
-PALETTE [named seam]: no cited palette exists for the menu .shp libs —
-their index sets are disjoint from the t386 title palette TSV (4loadgam
-k0: 19 distinct, all 19 absent; 3cfgnew k0: 44 distinct, 31 absent) and
-game.pal/logo.pal/subfont.pal are refuted for the title
-(title-art.md §4). Chrome renders through a deterministic luminance ramp;
-COLOUR fidelity is a named seam, geometry is not. Instrument to close it:
-the t386 registration conflict-count method needs a vendor SCREENSHOT of
-the load/newgame screens (user-grader artifact) — none is pinned.
+PALETTE [t398 CLOSED — was the named seam above]: the menu/game chrome
+renders through DATA\game.pal (exe-named, payload 0x83579/0x84207; every
+pixel of the three pinned in-game refcap shots lies inside it under the
+DOSBox 6->8 conversion; 1starmap rail records register through it at the
+cited rects). Full law: docs/re/palette.md. The title screen KEEPS the t386
+TSV (game.pal covers it at 8.79% only — title-art.md §4 stands). The ramp is
+the data-less-clone degradation path, announced on the console.
 
 Honest negatives / seams:
 - An accepted slot prints its pick but does NOT import into a live

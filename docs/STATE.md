@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-15T05:10
+updated: 2026-11-15T13:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,33 +230,61 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t398 per queue row t398 below (phase 12: PALETTE + 3D MAP + RAIL +
-NEW GAME PANELS + PLANETS LIST, per the D11 rulings submitted 2026-11-15
-via the ruling page — USER: lines in DECISIONS.md, six fields, all
-saw-live). The WAIT-USER-RULING t374 sentinel is RETIRED (tag law: tag
-itself never renumbered; history kept below). RULING CHANNEL INCIDENT
-t397b: the page server died right AFTER writing the user's ruling
-(BrokenPipeError through single-threaded serve_forever); fixed + hardened
-(server.py: swallow-on-send, catch-all handle, ThreadingHTTPServer) and
-the user's 6 lines verified intact. D11 headline: title near-pass; New
-Game usable-but-wrong; GALAXY MAP FAILS (3D rotatable point field, lane
-visibility law, day-counter digits, rail art greyscale); audio audible
-on athens (OQ-027 stays open pending final verdict); D11b privacy=DROP.
+NEXT t399 per queue row t399 below (GALAXY MAP 3D FIELD — the D11 headline
+FAIL: "3d field of colored points that can be rotated and zoomed", star count
+= galaxy count, lane visibility = home-system lanes only at game start, home
+star findable, day counter = large green numbers). ORDERING RATIONALE: t398
+landed the palette law (docs/re/palette.md), unblocking BOTH t399 and t400;
+t399 is the user's worst-graded surface and the biggest build, so it goes
+first, and its witnesses feed t400's rail re-verification. The D11 rulings
+are APPLIED (user lines 2026-11-15 11:37 in DECISIONS.md); D11b privacy =
+DROP (dispositioned). RULING CHANNEL: page server hardened + live (t397b);
+health-check per wake procedure below.
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
-background (it died once already when this session killed the Nov-09 pid; the
-server code is generic now: POST fields:[[label,value]] -> "USER:" lines;
-regenerate page+crops with the HERMES venv python
-`scripts/t397_grading_page.py` — system python3 has NO PIL). (1) read
-docs/DECISIONS.md tail + grep `USER:` after the D11 block; apply answers per
-strict-close (item 4 DIAGONOSES device-failure vs code-gap, but per the row's
-own bar OQ-027(a)/(b) close only on a HEARING verdict — "music/sfx audible and
-correct" — or a heap-table capture; our own `tunes=3` self-report is not
-evidence; items 1-3 grade chrome, they close nothing by themselves unless the
-user says otherwise; D11b "send it"/"drop it" is the privacy disposition).
-(2) THE GRADING HANDOFF itself = the five D11 items on
-the page (full text: docs/DECISIONS.md D11 + t396b LANDED block below).
+background (server code is generic: POST fields:[[label,value]] -> "USER:"
+lines; regenerate page+crops with the HERMES venv python
+`scripts/t397_grading_page.py` — system python3 has NO PIL; numpy now IS in
+~/tools/revenv since t398). (1) read docs/DECISIONS.md tail + grep `USER:`
+after the newest block; apply answers per strict-close (audio OQ-027 closes
+only on a final HEARING verdict — the 11:37 line "seems OK at first listen"
+is NOT it; chrome grades close nothing by themselves; D11b answered = drop).
+(2) t398 shipped new screenshots work/r1/loop/t398-{title,load,newgame,map}.png
+— a re-grade of the palette fix rides on the NEXT ruling sheet (t403 builds
+it); the t398 census already says the ramp defect is mechanically gone.
+
+t398 LANDED 2026-11-15 (PALETTE FIDELITY — THE GREYSCALE DEFECT CLOSED WITH
+MEASUREMENT; game.pal IS THE IN-GAME PALETTE; LAW docs/re/palette.md):
+(1) IDENTITY [verified]: the exe names `DATA\game.pal` verbatim at payload
+0x83579 (corn.cpp init cluster) + 0x84207 (flicwin/font cluster); file = 768 B,
+256 triples, all channels <= 0x3f (6-bit DAC). (2) MEMBERSHIP LAW [measured]:
+ALL 307200 px of each pinned in-game refcap shot (strategic-map, species-
+research, planet-view) lie inside game.pal under the DOSBox conv c=(v<<2)|
+(v>>4); title only 8.79% (title keeps the t386 TSV — the old boot.md seam
+prose had conflated the title refutation with the chrome question).
+(3) REGISTRATION [measured]: 1starmap k5/k4/k3 through the table match the
+pinned shot rail at mean |RGB diff| 3/6/6 (93-97% px within 12) at the cited
+kRail rows; icon x=584/585 = RIGHT of label (geometry delta -> t400); k7
+position exact, degraded by the Intelligence-row overlap. Rail fill teal
+(12,32,48) == idx 242 exact. (4) CODE: formats/gamepal.{h,cpp} (refuse-not-
+clamp 768 B, conv table, argb wraps), blitShape paints through it, ramp kept
+ONLY as the announced degradation (`ui palette: ... (degraded: greyscale
+ramp)` — live-witnessed on a scratch data root minus game.pal, never game/);
+loadChromePalette once-per-process in both loops. (5) WITNESS: scripts/
+t398_palette_witness.sh + t398_witness_census.py VERDICT PASS — rail zone 131
+chromatic colours, 130 in game.pal, the ONE outside = (40,40,56) our own port
+fill; the ramp yields EXACTLY 0 chromatic px (mechanical discriminator, R13-
+safe). Screenshots work/r1/loop/t398-{title,load,newgame,map}.png for the
+next ruling sheet. (6) PINS 4 (whole-table FNV + v*4-vs-law discriminator at
+v=16 + alpha + size-refusal + title-refutation half); MUTATION 3/3 CAUGHT,
+clean revert. Suite 318->322/0; gate 0; seed-1 spot Extinct t266 == record
+(UI-only change). Tools banked: t398_band_register.py (conflict-richness
+selection law: flat placements are VACUOUS — flag them), t398_palette_
+register.py; numpy pip-installed into ~/tools/revenv. NO ledger row closed
+(strict-close; queue work). Harness observation banked: the 11:40:35
+"selftest=ok" ruling line was stripped from DECISIONS.md by t397b but
+survives in work/r1/d1page/server.log — no ledger meaning.
 
 t397 LANDED 2026-11-15 (D11 GRADING PAGE — channel repair, not a measurement):
 trigger audit NEGATIVE (DECISIONS.md mtime 04:55 predates commit 04:57; no

@@ -94,13 +94,33 @@ void VendorText::release() {
 // skipped, so it gets alpha 0 and the backdrop shows through. Mechanical, no
 // guessed transparent index value.
 //
-// PALETTE [named seam]: no cited palette exists for the menu .shp libs — the
-// chrome index sets are disjoint from the t386 title palette TSV and
-// game.pal/logo.pal/subfont.pal are refuted for the title screen
-// (docs/re/title-art.md §4). Until a palette is measured, indices render
-// through a deterministic luminance ramp so GEOMETRY is verifiable while
-// colour is honestly labelled a seam. Phase-10 verification is geometry +
-// hit-maps + routing lines, never self-graded vision (R13).
+// PALETTE [t398 CLOSED]: chrome indices render through DATA\game.pal — the
+// exe loads it by name (payload 0x83579/0x84207) and every pixel of the
+// pinned in-game refcap shots lies inside it under the DOSBox 6->8-bit
+// conversion, while the title screen sits at 8.79% (different palette, the
+// t386 TSV). 1starmap k3/k4/k5 register at the cited kRail rects through it
+// (mean |RGB diff| 3..6/765). formats/gamepal.h carries the law. If the file
+// is unavailable the ramp remains, with a one-time printed degradation line
+// (silent-degrade law: never abort the frame loop over a palette).
+static ascend::formats::GamePalette g_chromePal;
+
+bool loadChromePalette(const std::string& dataRoot) {
+    // Once per process: the title loop and the campaign loop both call this;
+    // the data root never changes mid-session, and the diagnostic line prints
+    // exactly once either way.
+    static bool attempted = false;
+    if (attempted) return g_chromePal.ready();
+    attempted = true;
+    std::string err;
+    if (g_chromePal.load(dataRoot + "/extracted/ascend01/data/game.pal",
+                         &err)) {
+        std::printf("ui palette: game.pal (256 entries, 6->8 bit)\n");
+        return true;
+    }
+    std::printf("ui palette: %s (degraded: greyscale ramp)\n", err.c_str());
+    return false;
+}
+
 bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
                int rec, int x, int y) {
     std::vector<uint8_t> a, b;
@@ -113,9 +133,14 @@ bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
     std::vector<uint32_t> argb(a.size());
     for (size_t k = 0; k < a.size(); k++) {
         const uint8_t idx = a[k];
-        const uint32_t lum = 40u + (uint32_t(idx) * 185u) / 255u;
-        argb[k] = (a[k] == b[k] ? 0xFF000000u : 0x00000000u) | (lum << 16) |
-                  (lum << 8) | lum;
+        uint32_t rgb;
+        if (g_chromePal.ready()) {
+            rgb = g_chromePal.argb(idx) & 0x00FFFFFFu;
+        } else {
+            const uint32_t lum = 40u + (uint32_t(idx) * 185u) / 255u;
+            rgb = (lum << 16) | (lum << 8) | lum;
+        }
+        argb[k] = (a[k] == b[k] ? 0xFF000000u : 0x00000000u) | rgb;
     }
     SDL_Texture* tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
                                          SDL_TEXTUREACCESS_STATIC,

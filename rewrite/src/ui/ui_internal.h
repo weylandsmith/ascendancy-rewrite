@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "formats/fnt.h"
+#include "formats/gamepal.h"
 #include "formats/shp.h"
 #include "ui/layout.h"
 #include "ui/menulaw.h"
@@ -48,6 +49,13 @@ struct VendorText {
 // loop (ui.cpp). Definition in vendortext.cpp; semantics documented there.
 bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
                int rec, int x, int y);
+
+// t398: load DATA\game.pal for blitShape's colour path (process-wide; the
+// data root never changes mid-session — only the FIRST call in a process
+// reads the file and prints the diagnostic line; later calls just report
+// readiness). Success: `ui palette: game.pal ...`; failure names the tried
+// path and the greyscale-ramp degradation (never aborts — silent-degrade).
+bool loadChromePalette(const std::string& dataRoot);
 
 // t388: the load screen moved out of title.cpp's anonymous namespace so the
 // campaign loop can reuse it (t388 task: Save/Load reuse the t387 windows).

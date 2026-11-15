@@ -37,6 +37,7 @@ add_library(ascend_core STATIC
   src/formats/voc.cpp
   src/formats/flic.cpp
   src/formats/fnt.cpp
+  src/formats/gamepal.cpp
   src/formats/shp.cpp
   src/formats/shipsave.cpp
   src/game/starstat.cpp
@@ -114,6 +115,7 @@ add_executable(run_tests
   tests/test_ships.cpp
   tests/test_flic.cpp
   tests/test_gif_t390.cpp
+  tests/test_gamepal_t398.cpp
   tests/test_fnt.cpp
   tests/test_shp.cpp
   tests/test_shipsave_t360.cpp

@@ -133,6 +133,11 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
     // SDL_RenderSetLogicalSize doc: mouse events are scaled into logical
     // space). The title screen is where the user's 512x384 WM scale bites.
     if (ren) SDL_RenderSetLogicalSize(ren, kDisplayW, kDisplayH);
+    // t398: chrome palette for blitShape's colour path (the title's OWN art
+    // stays the t386 TSV — game.pal covers the in-game states, refutation
+    // docs/re/title-art.md §4; chrome blits like 4loadgam/3cfgnew belong to
+    // in-game states and take game.pal).
+    loadChromePalette(dataRoot);
     VendorText txt;
     if (!ren || !txt.load(ren, dataRoot, err)) {
         *err = err->empty() ? std::string("title renderer: ") + SDL_GetError() : *err;

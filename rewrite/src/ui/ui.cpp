@@ -85,6 +85,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         return 1;
     }
     applyLogicalSize(ren);  // t394 WM-scale fix (see helper for the law)
+    // t398: chrome palette (game.pal) for every blitShape colour path.
+    loadChromePalette(dataRoot);
     // Vendor .fnt faces (OQ-017 CLOSED; ui-runtime.md §3 swap rule). Hard
     // requirement, no silent TTF fallback: if the shipped faces fail to load
     // the data tree is broken and the run must say so.
