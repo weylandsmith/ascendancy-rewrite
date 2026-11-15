@@ -21,6 +21,13 @@ struct Planet {
 struct Star {
     int id = 0;
     int x = 0, y = 0;    // logical map units (kMapSize grid, OQ-012)
+    // t399: field depth. The ORIGINAL's star position is f32[x,y,z] on a
+    // sphere (r1-savestate.md OQ-012(c): shell radius x random unit vector,
+    // z uniform-marginal). z here is a PURE function of (seed, slot) —
+    // splitmix64, NOT the engine rng_ — so adding it cannot shift any
+    // seeded trajectory (gate 3l byte-identity law); sim consumers (lane
+    // distance, combat) keep using x/y. Scaled to the star's shell radius.
+    int z = 0;
     int type = 0;        // index into StarStats rows, docs/re/mapgen.md §1
     std::string name;    // base name, unnumbered (§2)
     std::vector<Planet> planets;

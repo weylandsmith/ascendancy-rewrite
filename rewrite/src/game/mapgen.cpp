@@ -139,6 +139,16 @@ Galaxy MapGenerator::generate() const {
         const double r = shellR[static_cast<size_t>(i)] * scale;
         s.x = static_cast<int>(std::llround(cx + r * std::cos(a)));
         s.y = static_cast<int>(std::llround(cy + r * std::sin(a)));
+        // t399 field depth (Star.z): splitmix64(seed, slot) — NOT rng_, so
+        // the seeded trajectory stream is untouched (gate 3l byte identity).
+        // Uniform-marginal over [-r, r] like the measured sphere z law
+        // (r1-savestate OQ-012(c)); xy stays the documented 2D hybrid.
+        uint64_t h = static_cast<uint64_t>(cfg_.seed) * 0x9E3779B97F4A7C15ull +
+                     static_cast<uint64_t>(i) * 0xD1B5BA8D4B2B2A1ull + 0x7A5B6C3Dull;
+        h ^= h >> 30; h *= 0xBF58476D1CE4E5B9ull;
+        h ^= h >> 27; h *= 0x94D049BB133111EBull;
+        h ^= h >> 31;
+        s.z = static_cast<int>(std::llround(r * (double(h) / 18446744073709551616.0 * 2.0 - 1.0)));
         g.stars.push_back(std::move(s));
     }
 

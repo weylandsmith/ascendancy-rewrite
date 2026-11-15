@@ -4,6 +4,7 @@
 
 #include <SDL.h>
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <vector>
@@ -13,6 +14,7 @@
 #include "formats/shp.h"
 #include "game/campaign.h"
 #include "ui/boot.h"
+#include "ui/cam3d.h"
 #include "ui/hudlayout.h"
 #include "ui/layout.h"
 #include "ui/menulaw.h"
@@ -101,7 +103,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         }
     }
 
-    CosmosView view;  // mapSize default matches MapConfig default (layout.h)
+    // t399: 3D field camera (cam3d.h; vendor affine+pinhole law cited there)
+    // + the TOGLANES layer state (windows.txt ln342 control; default ON —
+    // lanes are drawn, subject to the t192 visibility law).
+    Camera3d cam;
+    cam.mapSize = 1024;  // MapConfig default (mapgen.h)
+    bool lanesOn = true;
     int selected = -1;
     int played = 0;
     Uint32 nextAuto = autoplay ? SDL_GetTicks() + 250 : 0xFFFFFFFFu;
@@ -239,11 +246,28 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // NAMED SEAM: inert with a printed line, never a fake.
                     std::printf("ui click next-turn-cont seam (no mid-turn pause model)\n");
                 } else if (screen == kScreenMap && mapCtlFor(p)) {
-                    // t394 cluster cited art lands; SENDMESSAGE 50..61
-                    // pan/zoom/toggle BEHAVIOUR is the named seam (CosmosView
-                    // has no scroll model). Print, never guess a scroll.
-                    std::printf("ui click map-ctl seam (msg %d)\n",
-                                kMapCtl[static_cast<int>(*mapCtlFor(p))].sendMessage);
+                    // t399: the cluster DRIVES the camera (msg numbers cited
+                    // in mapchrome.cpp; behaviour law cam3d.h). Per-click
+                    // step is the documented default (vendor continuous
+                    // right-drag, help.txt 1spin, not implemented).
+                    switch (*mapCtlFor(p)) {
+                        case MapCtl::RotRight: cam.rotate(+1); break;
+                        case MapCtl::RotLeft:  cam.rotate(-1); break;
+                        case MapCtl::RotUp:    cam.tilt(+1); break;
+                        case MapCtl::RotDown:  cam.tilt(-1); break;
+                        case MapCtl::ZoomIn:   cam.zoom(+1); break;
+                        case MapCtl::ZoomOut:  cam.zoom(-1); break;
+                        case MapCtl::CenterHolo: cam.reset(); break;
+                        case MapCtl::TogLanes: lanesOn = !lanesOn; break;
+                        default:
+                            // TOGEMPIRE/TOGSHIPS/TOGCOLONIES: the port has
+                            // no ship/colony overlay layers yet — named
+                            // seam, printed, never a fake toggle.
+                            std::printf("ui click map-ctl seam (msg %d)\n",
+                                        kMapCtl[static_cast<int>(*mapCtlFor(p))].sendMessage);
+                    }
+                    std::printf("ui cam yaw %.2f pitch %.2f focal %.0f lanes %d\n",
+                                cam.yaw, cam.pitch, cam.focal, lanesOn ? 1 : 0);
                 } else if (screen == kScreenMap && kRaceControlsFrame.x0 <= p.x &&
                            inRect(kRaceControlsFrame, p)) {
                     std::printf("ui click race-controls seam (slot %s)\n",
@@ -257,7 +281,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // Right-click deselect (selfplay.md) will land HERE once
                     // selection widgets exist — no selection UI this row.
                     if (audio) audio->play("laser01");
-                    selected = hitStar(view, camp.galaxy(), p);
+                    selected = hitStarCam(cam, camp.galaxy(), p);
                     std::printf("ui click map (%d,%d) -> %s\n", p.x, p.y,
                                 selected >= 0 ? camp.galaxy().stars[selected].name.c_str()
                                               : "none");
@@ -286,37 +310,76 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
             screen == kScreenMap || screen == kScreenSpecies;  // COSMOSWnd
                                                                // "4 1 3 7 13"
         if (mapVisible) {
-        // cosmos frame
-        SDL_Rect frame{kCosmosWnd.x0 - 1, kCosmosWnd.y0 - 1,
-                       kCosmosWnd.x1 - kCosmosWnd.x0 + 3, kCosmosWnd.y1 - kCosmosWnd.y0 + 3};
-        SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
-        SDL_RenderDrawRect(ren, &frame);
-        // lanes first (behind stars)
-        for (const auto& ln : camp.galaxy().lanes) {
-            Pt a = starScreenPos(view, camp.galaxy().stars[ln.a]);
-            Pt b2 = starScreenPos(view, camp.galaxy().stars[ln.b]);
+        // ---- t399: THE 3D FIELD (D11 headline). Every galaxy star renders
+        // (count == galaxy count; the vendor builder adds stars
+        // UNCONDITIONALLY, ships.md S23 L9 star side). Lanes follow the
+        // CITED visibility law: an empire sees ONLY lanes incident to stars
+        // it owns (t192 new-game witness; SA_KnowStarLanes widens through
+        // laneVisibleTo) — at game start that is exactly the lanes leading
+        // off the home systems. Projection law = cam3d.h (vendor affine
+        // FUN_00053324 + pinhole FUN_00053374).
+        {
+            // cosmos frame (same anchor as t394: rect +1 outset) + the field
+            // clip: zoomed-in stars beyond the frame must not paint the rail.
+            SDL_Rect frame{kCosmosWnd.x0 - 1, kCosmosWnd.y0 - 1,
+                           kCosmosWnd.x1 - kCosmosWnd.x0 + 3,
+                           kCosmosWnd.y1 - kCosmosWnd.y0 + 3};
             SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
-            SDL_RenderDrawLine(ren, a.x, a.y, b2.x, b2.y);
+            SDL_RenderDrawRect(ren, &frame);
+            SDL_RenderSetClipRect(ren, &frame);
         }
-        // stars
-        for (const auto& s : camp.galaxy().stars) {
-            Pt q = starScreenPos(view, s);
-            int o = camp.starOwner(s.id);
-            if (o < 0) {
-                SDL_Color n = toSdl(kNeutralRgb);
-                SDL_SetRenderDrawColor(ren, n.r, n.g, n.b, 255);
-                filledCircle(ren, q.x, q.y, 2);  // SMALLER: ownership coded by
-            } else {                             // size as well as colour
-                SDL_Color c = toSdl(kOwnerRgb[o]);
-                SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
-                filledCircle(ren, q.x, q.y, 4);
-            }
-            if (s.id == selected) {
-                SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
-                SDL_Rect sel{q.x - 6, q.y - 6, 13, 13};
-                SDL_RenderDrawRect(ren, &sel);
+        if (lanesOn) {
+            for (size_t li = 0; li < camp.galaxy().lanes.size(); ++li) {
+                if (!camp.laneVisibleTo(int(li), ag::kPlayer)) continue;
+                const auto& ln = camp.galaxy().lanes[li];
+                Pt a = projectStar(cam, camp.galaxy().stars[ln.a]);
+                Pt b2 = projectStar(cam, camp.galaxy().stars[ln.b]);
+                SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
+                SDL_RenderDrawLine(ren, a.x, a.y, b2.x, b2.y);
             }
         }
+        {
+            const int home = camp.homeStarFor(ag::kPlayer);
+            // far pips first so nearer ones paint over them (depth order)
+            std::vector<int> order(camp.galaxy().stars.size());
+            for (size_t i = 0; i < order.size(); ++i) order[i] = int(i);
+            std::sort(order.begin(), order.end(), [&](int a, int b) {
+                return viewDepth(cam, camp.galaxy().stars[a]) >
+                       viewDepth(cam, camp.galaxy().stars[b]);
+            });
+            for (int sid : order) {
+                const auto& s = camp.galaxy().stars[sid];
+                Pt q = projectStar(cam, s);
+                const int o = camp.starOwner(s.id);
+                const bool owned = o >= 0;
+                const int r = pipRadius(depthClass(double(s.z)), owned);
+                if (owned) {
+                    SDL_Color c = toSdl(kOwnerRgb[o]);
+                    SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                } else {
+                    SDL_Color c = toSdl(neutralTint(s.type));
+                    SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                }
+                filledCircle(ren, q.x, q.y, r);
+                if (s.id == home) {
+                    // HOME MARKER [named seam shape]: the vendor original
+                    // shows a distinct marker at the player's system
+                    // (external vision read, scratchpad/galaxymap-original
+                    // .png); the record is unmapped, so the port rings it —
+                    // shape + colour redundancy (CVD law).
+                    SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+                    SDL_Rect hm{q.x - r - 3, q.y - r - 3, 2 * (r + 3) + 1,
+                                2 * (r + 3) + 1};
+                    SDL_RenderDrawRect(ren, &hm);
+                }
+                if (s.id == selected) {
+                    SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
+                    SDL_Rect sel{q.x - 6, q.y - 6, 13, 13};
+                    SDL_RenderDrawRect(ren, &sel);
+                }
+            }
+        }
+        SDL_RenderSetClipRect(ren, nullptr);  // end field clip
         }  // cosmos (states 1, 7)
 
         // ---- t388 the rail (x-band 474; STATE id-lists decide activity) --
@@ -353,36 +416,51 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         // records verbatim; rects MEASURED on the user-supplied original).
         // The old string dump ("Ascendancy P5a / turn|stars|score / events")
         // is REMOVED per D10: the vendor map screen has no stats string —
-        // TURNCOUNT (TYPE 15, ln521) carries the turn as five oval digits.
-        // 1) TURNCOUNT panel 474,7-632,43 + five oval slots MEASURED at x
-        //    482/513/544/575/606 (pitch 31, y10..39). DIGITFRAMES 55 says the
-        //    digit FACES are 1starmap k55..k64; which frame is which digit is
-        //    a NAMED SEAM (uncited), so digits draw via the port text face
-        //    inside cited oval outlines.
+        // TURNCOUNT (TYPE 15, ln521) carries the turn as five LARGE DIGITS.
+        // 1) TURNCOUNT panel 474,7-632,43 + five digit slots MEASURED at x
+        //    482/513/544/575/606 (pitch 31, y10..39). t399 CLOSED the t394
+        //    named seam: the DIGITFRAMES 55 faces 1starmap k55..k64 map
+        //    IDENTITY to digits 0..9 — measured decode (scripts/
+        //    t399_digit_faces.py): k56 is uniquely the narrow face (w=18 vs
+        //    >=24) and reads as '1'. Faces render VENDOR ART through
+        //    game.pal (t398), 1:1, clipped to the panel; the oval
+        //    OUTLINES are GONE (D11: "green circles ... with smaller numbers
+        //    inside" was the defect; original = large green numbers, dark
+        //    box, thin border — external vision read of the supplied
+        //    original). No lib: big VendorText face in green, never ovals.
         {
             SDL_Rect panel{kTurnCount.x0, kTurnCount.y0,
                            kTurnCount.x1 - kTurnCount.x0 + 1,
                            kTurnCount.y1 - kTurnCount.y0 + 1};
             SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
             SDL_RenderFillRect(ren, &panel);
-            SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
+            SDL_SetRenderDrawColor(ren, 0, 200, 80, 255);  // LED green frame
             SDL_RenderDrawRect(ren, &panel);
             const int turn = camp.turn();
+            const int faceLib = libFor(kScreenMap);
+            // faces are 33..35 px tall vs the 30 px slot: blit 1:1 centred
+            // on the slot and CLIP to the panel (vendor faces never spill
+            // over the box border; k64's descender is inside the panel).
+            SDL_RenderSetClipRect(ren, &panel);
             for (int i = 0; i < 5; i++) {
                 const OvalSlot& o = kOvalSlots[i];
-                SDL_SetRenderDrawColor(ren, 0, 160, 70, 255);  // vendor green
-                // ellipse outline via mid-point arcs (no SDL ellipse prim):
-                const int cx = (o.x0 + o.x1) / 2, cy = (o.y0 + o.y1) / 2;
-                const int rx = (o.x1 - o.x0) / 2, ry = (o.y1 - o.y0) / 2;
-                for (int a = 0; a < 360; a += 4) {
-                    const double rad = a * 3.14159265358979 / 180.0;
-                    SDL_RenderDrawPoint(ren, cx + int(rx * std::cos(rad)),
-                                        cy + int(ry * std::sin(rad)));
-                }
                 const int d = (turn / ipow10(4 - i)) % 10;  // right-aligned
-                std::string ds(1, char('0' + d));
-                txt.draw(ren, cx - 3, cy - 7, ds, true, kText);
+                const int rec = kDigitFirstFrame + d;
+                bool art = false;
+                if (faceLib >= 0 && kLibs[faceLib].count() > rec) {
+                    const auto& fr = kLibs[faceLib].record(rec);
+                    const int ox = (o.x0 + o.x1 - int(fr.width)) / 2;
+                    const int oy = (o.y0 + o.y1 - int(fr.height)) / 2;
+                    art = blitShape(ren, kLibs[faceLib], rec, ox, oy);
+                }
+                if (!art) {
+                    std::string ds(1, char('0' + d));
+                    const int cx = (o.x0 + o.x1) / 2;
+                    txt.draw(ren, cx - txt.width(ds, true) / 2, o.y0 + 1, ds,
+                             true, SDL_Color{0, 230, 90, 255});
+                }
             }
+            SDL_RenderSetClipRect(ren, nullptr);
         }
         // 2) NEXTTURN / NEXTTURNCONT faces (SHAPEFRAME 65/66 verbatim;
         //    1starmap k65 74x30 / k66 75x30 EXACT size match of the rects).

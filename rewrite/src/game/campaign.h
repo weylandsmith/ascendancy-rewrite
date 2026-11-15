@@ -205,6 +205,13 @@ public:
     Campaign(Campaign&&);
     int starsOwned(int owner) const;
     int starOwner(int starId) const { return owner_[starId]; }
+    // t399: the owner's home star id (pickHomeStars result, fixed for the
+    // campaign), or -1. Consumer: the cosmos map marks it visually distinct
+    // (D11 "not possible to find the player's home star").
+    int homeStarFor(int owner) const {
+        return owner >= 0 && owner < static_cast<int>(homeStar_.size())
+                   ? homeStar_[owner] : -1;
+    }
     // t204 pin surface (established harness idiom — planetAt const_cast,
     // freeTechGrantFor PUBLIC): force a star's owner for wiring an attack
     // scenario. Does NOT seed pop/CB (the engagement math only needs owner).

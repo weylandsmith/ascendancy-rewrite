@@ -230,16 +230,18 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t399 per queue row t399 below (GALAXY MAP 3D FIELD — the D11 headline
-FAIL: "3d field of colored points that can be rotated and zoomed", star count
-= galaxy count, lane visibility = home-system lanes only at game start, home
-star findable, day counter = large green numbers). ORDERING RATIONALE: t398
-landed the palette law (docs/re/palette.md), unblocking BOTH t399 and t400;
-t399 is the user's worst-graded surface and the biggest build, so it goes
-first, and its witnesses feed t400's rail re-verification. The D11 rulings
-are APPLIED (user lines 2026-11-15 11:37 in DECISIONS.md); D11b privacy =
-DROP (dispositioned). RULING CHANNEL: page server hardened + live (t397b);
-health-check per wake procedure below.
+NEXT t400 per queue row t400 below (RAIL + CLUSTER + HOVER LAW — D11: rail
+icons greyscale/wrong-side/wrong-size, species-button icons missing
+entirely, bottom-right hide/show cluster bg art + small icons missing,
+TITLE hover highlight missing). ORDERING RATIONALE: t399 shipped the 3D
+field + digit law (docs/re/t399-galaxy-map-3d.md) and its witness shot
+/tmp/t399_shots/map.png (copy to work/r1/loop/t399-map.png) is the base the
+user grades; t400's rail re-verification rides on the SAME palette law
+(t398) and the same screenshot harness, and the t399 field clip changed
+the frame edge — rail geometry must be re-checked against it. t401/t402
+follow unchanged. The D11 rulings are APPLIED (user lines 2026-11-15 11:37
+in DECISIONS.md); D11b privacy = DROP (dispositioned). RULING CHANNEL: page
+server hardened + live (t397b); health-check per wake procedure below.
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
@@ -253,6 +255,46 @@ is NOT it; chrome grades close nothing by themselves; D11b answered = drop).
 (2) t398 shipped new screenshots work/r1/loop/t398-{title,load,newgame,map}.png
 — a re-grade of the palette fix rides on the NEXT ruling sheet (t403 builds
 it); the t398 census already says the ramp defect is mechanically gone.
+
+t399 LANDED 2026-11-15 (GALAXY MAP 3D FIELD — D11 HEADLINE FIXED WITH
+MEASUREMENT; LAW docs/re/t399-galaxy-map-3d.md + _wip_t399.md):
+(1) VENDOR LAW [verified static]: FUN_00053324 = affine 3x4 float (the
+camera matrix); FUN_00053374 = pinhole sx=frndint(x*zoom/z+K)+originX (fdiv
+[eax+8]; zoom=COSMOSWnd+0x102; origins hi16 @+0x574/+0x576); paint loop
+FUN_000284bc stores the TRANSFORMED z at node+0xd -> the t200 ±0xdc ladder
+bands DEPTH, so SEL=4*type+cls picks depth-class pips (the original's
+"varying size/brightness" EXPLAINED). Stars always listed (builder kind-0
+unconditional) => screen star count == galaxy count IS the vendor law.
+K@0x2c50/offset@0x105e relocation-patched [unverified] -> port centre/0.
+(2) CODE: ui/cam3d.{h,cpp} (Camera3d yaw/pitch/focal + projectStar per the
+law; fit law focal 680 standoff 1760 keeps 50 stars inside COSMOSWnd —
+bounds pin; field CLIP rect so zoom never paints the rail); mapctl clicks
+msg50..56 DRIVE rotate/tilt/zoom/reset, TOGLANES toggles lanes (per-click
+step + continuous-drag = named seams); Star.z = splitmix64(seed,slot) in
+[-r_shell,r_shell] — NO rng_ consumption PROVEN: seed-1 120-turn headless
+log byte-identical before/after (md5 6f8281d0...); lanes drawn iff
+Campaign::laneVisibleTo (t192 law — turn 1 = home-system lanes ONLY; old
+code drew the full mesh = the D11 defect); home star exposed
+(Campaign::homeStarFor) + ringed [shape named seam]; hit-test via
+projection. (3) DAY COUNTER: t394 seam CLOSED by measurement (scripts/
+t399_digit_faces.py decodes 1starmap k55..k64): IDENTITY digit->frame,
+discriminator k56 uniquely narrow (w18 vs >=24, reads '1'); vendor faces
+blit 1:1 through game.pal at the cited slot x's, CLIPPED to the panel,
+ovals GONE (D11: "green circles with smaller numbers inside" removed).
+(4) WITNESS /tmp/t399_shots/map.png (copy work/r1/loop/t399-map.png):
+vision read — ~60-70 coloured points, BOTH lane lines touch the boxed home
+star, five blocky green zeros, no clipping/glitches. (5) PINS 8
+(tests/test_cam3d_t399.cpp: pinhole arithmetic 440->+170px, determinism,
+zoom clamp/wrap, full-field bounds, z law, ladder ±220 edges, tint domain,
+digit identity+k56 on real shp, home+turn-1 lane law); MUTATION 3/3 CAUGHT
+(frame 55->54, focal 680->900, ladder 220->221), clean revert. Suite
+322->330/0; gate 0. NO ledger row closed (strict-close; queue work; OQ-012
+already CLOSED). Tools banked: scripts/t399_disasm.py (capstone base-0
+disassembler — REVENV python has capstone, system python3 does NOT),
+t399_digit_faces.py. Pitfalls banked: run_tests compiles ui/*.cpp sources
+DIRECTLY — a new ui source must be added to BOTH ascend_ui AND the
+run_tests list; a decl inside anonymous namespace never binds an exported
+definition; t398_palette_witness.sh env is OUT= (not SHOTS).
 
 t398 LANDED 2026-11-15 (PALETTE FIDELITY — THE GREYSCALE DEFECT CLOSED WITH
 MEASUREMENT; game.pal IS THE IN-GAME PALETTE; LAW docs/re/palette.md):
