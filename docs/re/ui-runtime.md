@@ -451,3 +451,61 @@ census: docs/re/_wip_t388.md. Distilled facts:
   (prints the no-writer seam) are LABELLED PORT ADDITIONS.
 - LIVE WITNESS (Xvfb :81, xsend): map->Planets->map->Species->Intelligence
   ->map->NEXTTURN turn 1, every step logged; wired as gate 4c-d.
+
+## t391 PRESENTATION SWEEP — every screen art-backed-or-honestly-vector (2026-11-14)
+
+Task: audit the campaign screens for vector chrome where the vendor has ART.
+Verdict table below; instruments scripts/t391_screen_shot.sh (one-window Xvfb
+tour, shot per screen, app-log names the screens) + scripts/t391_screen_mass.py
+(mechanical class census: per-shot dominant colour = bg; mass >50k art,
+<5k vector, between = vector-content) + scripts/t391_registration.py (t386
+conflict-count law re-applied to the .shp backdrops through OUR luminance-ramp
+blit). Witness shots work/r1/loop/t391-{title,load,map,status,fleet,research,
+species,intel}.png; census VERDICT PASS 8/8.
+
+- STATUS state 10 ART-BACKED [measured]: 10status k0 639x479 blits at (0,0);
+  registration shift(+0,+0) 295,063 ramp-matching px / 0 map-conflicts, and
+  mass 53,438 over the dominant grey. The t388 FULL-BACKDROP test stands
+  (k0 IS the backdrop, not a strip — task question (a) answered).
+- LOAD state 4 ART-BACKED [measured]: 4loadgam k0, shift(0,0) 50,296 px /
+  0 conflicts, mass 59,803. (The dominant (163,163,163) is the ramp value of
+  the backdrop's dominant index — expected, not a wash: conflicts 0 proves
+  per-index fidelity.)
+- MAP state 1 honestly-vector [verified]: 1starmap k0 158x75 element art;
+  NO backdrop record; rail icons ARE cited art (SHAPEITEM law below).
+- FLEET state 18 honestly-vector [verified, decisive]: FLEETWND SHAPEFRAME 0
+  (ln1722) but NO 18*.SHP exists among the 165 data .shp files and no
+  SHAPEFILE names one — the vendor has no fleet backdrop art to skip.
+- INTEL state 14 honestly-vector [verified]: 14intel.shp 10 records max
+  28x28 (element art only, unused = named seam).
+- RESEARCH state 20 honestly-vector backdrop [verified]: 20res 6 records
+  15x30-ish = the RESROT/RESMOVE arrow faces (rect 524,442-539,472 = 15x30
+  exact); restree.shp = tech-tree content art (named seam, not chrome).
+- NEWGAME state 3 frame honestly-vector + wheel faces cited art [verified]:
+  TYPE-18 census = EXACTLY ONE record (NEWGAMEWND ln579); 3cfgnew 13 records
+  max 88x80, no backdrop-size record for the 154x352 window.
+- SPECIES state 7 named seam [inferred only]: RACE_1..7 + Intelligence all
+  carry SHAPEFRAME -1 (no table citation), yet 7racesel.shp k0..k7 are EIGHT
+  records of EXACTLY the 158x30 row size — size-match witness, NOT cited;
+  do NOT blit without a stronger witness (palette seam compounds).
+- SAVE state 15 art-in-hand seam [verified]: 2savegam k0 639x479 exists;
+  our port has no save screen (no campaign writer, t382 seam).
+- STATE 17 (PLANETALLOC, not implemented): 17np.shp k0 639x479 + k4 625x357
+  are the backdrop-per-prefix candidates — banked for whoever implements it.
+
+STRUCTURAL LAW [verified ln34..1756]: the eight TYPE-100 blocks sit at the
+HEAD of their state's window section (0 title, 1 star map, 3 cfgnew, 7 race
+menu, 8 ship design, 13 negotiation, 16 battle, 20 research). FIVE screen
+sections have NO TYPE-100 header (states 2/4/15 load-save, 10 status, 14
+intel, 17 planet-alloc, 18 fleet): windows.txt CANNOT name their backdrop;
+only the numeric-prefix file + the engine's by-name open can (10status/
+4loadgam/2savegam/14intel/17np exist on disk; 18 does NOT). The port's
+screenShapeLib naming law is therefore the correct instrument for the four
+headerless screens that have art, and no other screen is missing art.
+SHAPEITEM census [verified 7/7]: rail buttons -> 1starmap k3/k4/k5/k7;
+NEWGAME child buttons -> 3cfgnew k0 — the port implements every cited
+SHAPEITEM; item-level art gaps: NONE.
+HONEST NEGATIVE: no engine change landed (the sweep found ZERO screens where
+the vendor has backdrop art and the port paints vector — nothing to fix);
+the 7racesel strip role stays a named seam; chrome COLOUR stays the
+luminance-ramp palette seam (title-art.md §4) — geometry is what registers.

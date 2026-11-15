@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-14T18:05
+updated: 2026-11-14T21:15
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,11 +230,27 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t391 PRESENTATION SWEEP (row text below; ordering: the title art the
-user graded missing LANDED t390, so the same class of gap — vector chrome
-where the vendor has art — must now be audited on the OTHER screens before
-any further user grading is offered). t390 LANDED 2026-11-14, banked below
-(t390-artzone-witness.png: art-zone mass 0 -> 124,800).
+NEXT WAIT-USER-RULING t374 — (sentinel-tag law: tag never renumbered;
+ordering: the phase-10 queue is FULLY DRAINED — t390 LANDED title art, t391
+LANDED the presentation sweep 2026-11-14 (both banked below) — and every
+remaining closer is a human witness; no machine-checkable work exists, so do
+NOT renumber, do NOT invent a row, run the DECISIONS.md/ruling check and park).
+
+t391 LANDED 2026-11-14 (presentation sweep — every screen now art-backed-or-
+honestly-vector, cited): windows.txt TYPE-100 sections head each state's
+windows; FIVE headerless sections (load/save 2-4-15, status 10, intel 14,
+planet-alloc 17, fleet 18) — on disk 10status/4loadgam/2savegam/14intel/17np
+exist, NO 18*.SHP exists at all => FLEET chrome honestly-vector in ANY
+faithful port. REGISTRATION PASS at shift (0,0) through our own ramp blit:
+10status k0 295,063 px 0 conflicts; 4loadgam k0 50,296 px 0 conflicts (task
+(a) answered: k0 IS the full backdrop). SHAPEITEM census 7/7 all implemented
+(rail -> 1starmap k3/4/5/7; NEWGAME children -> 3cfgnew k0). Mass census
+PASS 8/8 shots (work/r1/loop/t391-<screen>.png). NAMED SEAMS kept open:
+7racesel 8x158x30 species-row strips (size-match only, SHAPEFRAME -1 — do
+NOT blit without a stronger witness), 2savegam art-in-hand (no save screen),
+17np k0 for state 17, chrome COLOUR = luminance-ramp palette seam. HONEST
+NEGATIVE: zero code change — no screen had vendor art the port paints vector.
+Law docs/re/ui-runtime.md t391 block; NO ledger row moved (strict-close).
 
 t390 LANDED 2026-11-14 (title art blit — user grade "still not drawing the
 UI" mechanically closed on our own render): C++ GIF87a index-plane decoder
@@ -342,7 +358,7 @@ A session woken by a DECISIONS.md edit or a *ruling*/*reply* file: read
 docs/DECISIONS.md, apply what the ruling says, close rows per strict-close,
 then author the next queue or re-park a WAIT sentinel.
 QUEUE: EMPTY — phase 10 fully drained (t385, t385b, t386, t387, t388, t388b,
-t389 all LANDED; per-row text lives in git history + LANDED blocks).
+t389, t390, t391 all LANDED; per-row text lives in git history + LANDED blocks).
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
@@ -401,6 +417,54 @@ STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
   (dirty tree / LOOPSTEER.txt / FORCE_RUN), and IDLE_GATE=1 polls without
   launching, so a WAIT tag costs nothing and loses no wake route.
 
+
+## LANDED t391 — 2026-11-14 (PRESENTATION SWEEP: EVERY SCREEN ART-BACKED-OR-
+## HONESTLY-VECTOR, CITED; ZERO CODE CHANGE; MASS 8/8 + REGISTRATION 0-
+## CONFLICT PASS; LEDGER 17/3 UNCHANGED — STRICT-CLOSE, WAIT-USER-RULING
+## RE-PARKED)
+
+- Sitting check RING-FIRST: t368_ring_turn parsed=20/20 max_turn=1254 (same
+  sitting as t380..t383); zero new play; assignment stood. Tree clean at
+  launch.
+- STRUCTURAL AUDIT (windows.txt parsed whole, 132 records): the eight
+  TYPE-100 blocks head their state's window section; FIVE sections are
+  headerless (2/4/15 load+save, 10 status, 14 intel, 17 planet-alloc, 18
+  fleet). Disk census over all 165 .shp: 2savegam/4loadgam/10status/14intel/
+  17np exist; NO 18*.SHP exists => FLEETWND SHAPEFRAME 0 cites nothing
+  resolvable — honestly-vector in ANY faithful port. LOADSCREEN+LOADLIST
+  STATE "2 4 15" serve load AND save; state 15 = [inferred] save-side
+  variant (2savegam k0 art-in-hand; our port has no save screen, t382).
+  TYPE-18 census = EXACTLY ONE record (NEWGAMEWND): 3cfgnew has no
+  backdrop-size record (13 recs max 88x80) — frame honestly-vector, wheel
+  faces cited art. Self-correction mid-session: first-pass grep claimed NO
+  SHAPEITEM keyword; it exists x7 (ui.md §1 had it; banked the correction) —
+  all seven implemented in the port (rail 1starmap k3/4/5/7, NEWGAME children
+  3cfgnew k0): item-level art gaps NONE.
+- NEW TOOLS + REAL RUNS: scripts/t391_screen_shot.sh (Xvfb :96 one-window
+  tour, app-log-verified transitions, 8 shots -> work/r1/loop/t391-*.png);
+  scripts/t391_screen_mass.py VERDICT PASS 8/8 (title 232,554 / load 59,803
+  / status 53,438 art; fleet 4,035 / research 2,447 / intel 4,124 vector;
+  map 32,096 / species 12,768 content-class) — pitfall banked: background =
+  per-shot dominant colour (kBg differs per screen; fixed constant
+  false-fails all 8); scripts/t391_registration.py (t386 conflict law
+  through our ramp blit; S9 walk re-implemented value-emitting incl. the
+  C==1 p-no-advance quirk + 0xAA/0x55 prefill-collision mask): 10status k0
+  shift(0,0) 295,063 ramp-px 0 conflicts PASS, 4loadgam k0 50,296 0 PASS,
+  off-shifts strictly degrade (sharp, not vacuous).
+- NAMED SEAMS (none blocking): 7racesel 8x158x30 species-row strips =
+  size-match witness ONLY (all eight rows SHAPEFRAME -1) — do NOT blit
+  without a stronger witness; 17np k0 639x479 banked for state 17; chrome
+  COLOUR stays the luminance-ramp palette seam (title-art.md §4) — geometry
+  is what registers.
+- LEDGER: NO row touched (strict-close — an audit moves no measurement on
+  OQ-016/019/027). HONEST NEGATIVE: zero code change — the sweep found NO
+  screen where the vendor has backdrop art and the port paints vector.
+  Law banked docs/re/ui-runtime.md t391 block (ui.md is REGENERATED by
+  ui_probe.py:271 — never bank there). NEXT re-parked WAIT-USER-RULING t374
+  (queue fully drained; the three grading checks stand: title screenshot,
+  --ui --audio listen = OQ-027 closer, seven-item menu shape). GATE_EXIT=0;
+  ledger_audit OK; ledger_index_check OK; game/ untouched; production :9
+  untouched.
 
 ## LANDED t389 — 2026-11-14 (PHASE-10 VERIFY + RE-EXPORT + PUSH)
 
