@@ -312,3 +312,28 @@ planets list, audio line). Live playtest after `git pull` grades best; 2x
 native-res crops are the fallback. AUDIO NOTE: your "seems OK at first listen"
 is recorded but per the row's own bar is NOT the OQ-027 closer — the paste of
 the `audio:` startup line plus a match/differ verdict is.
+
+## D13 — AGENT SELF-GRADES VIA NATIVE VISION (USER, 2026-11-15, verbatim excerpts)
+
+> can you step through the new game setup and menus with your own vision,
+> and see for yourself where things still need work? And then come back
+> when you've stepped through all the screens and they look and work
+> right? ... set up the loop to keep working through it until all the
+> screens look right to you. The loop is running the same model you are,
+> that now has vision capabilities, so if the agent software supports it,
+> it should be able to use native vision too, without relying on the
+> external model.
+
+POLICY CHANGE: R13 (no self-graded vision of our own renders) is LIFTED
+BY OWNER ORDER for the rewrite's UI screens. Vision-on-our-own-screens
+is now a first-class verification instrument inside loop rows. User's
+D13 bug list (verbatim in the quote block above + the loop queue):
+new game still off; RACE INTRO screen missing (between new game and
+map); map slightly off; lower-right map controls don't work right;
+planets screen shows non-owned planets + click does nothing; ships
+screen EMPTY; research screen EMPTY; special-ability button DEAD;
+species screen quite off; intelligence screen EMPTY; EVERY map click
+plays laser-fire sound (regression, t400-era); system view + planet
+view unreachable; can't set a project; can't select a technology.
+Loop rows must use vision_analyze on their own Xvfb captures (native,
+same model) and iterate screen-by-screen until look+function pass.
