@@ -555,3 +555,22 @@ tests/test_mapchrome_t394.cpp; suite 313/0).
   dominants distinct); shots work/r1/loop/t394-map.png (map-turn1.png is
   post-quit, --campaign 1 exits after the advance — use map.png for
   grading). NO ledger row moved (strict-close; queue work).
+
+## t405 STATUS HIT-MAP + RAIL-STATEMENT LAW (2026-11-16)
+
+Full working log: docs/re/_wip_t405.md F1-F10. Durable laws:
+- SCREENS SWAP, RAIL IS MAP-ONLY (re-affirmed by measurement, now pinned
+  statusnav_rail_is_map_only_vendor_law_t405): rail buttons STATE "1 1";
+  the state-10 backdrop 10status k0 is full-width and paints standings
+  art + a scrollbar over the rail column (decoded, native-vision-graded;
+  t3 live capture agrees). "Esc: return to galaxy" is a PORT AFFORDANCE,
+  not vendor data (zero hits in every extracted file + exe strings).
+- STATUS HIT-MAP (rewrite/src/ui/statuslist.{h,cpp} statusHitFor):
+  precedence arrow boxes -> scrollbar column (INERT) -> rows. Arrow rects
+  MEASURED on the backdrop pixel plane: up {619,48,638,94}, down
+  {620,425,638,476}; rows own x 7..618 only. The old 566-wide PORT rects
+  + unbounded row test were the D13 "rail clicks scroll the list" defect.
+  Row-frame PAINT also stops at 618 (vendor scrollbar shows through).
+- Pins test_statusnav_t405.cpp x4; witness scripts/t405_statusnav_witness.sh
+  PASS; mutation 5 named CAUGHT + M2c (old-code shape) CAUGHT, M2/M3
+  single-guard mutants banked as VACUOUS (guards mutually redundant).

@@ -282,27 +282,35 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                     kRailName[static_cast<int>(*rb)], rc.sendMessage, rc.sendParam1);
                         std::fflush(stdout);
                     }
-                } else if (screen == kScreenStatus && inRect(kStatusArrowUp, p)) {
-                    // PORT hit-map (the vendor TYPE-10 list arrows sit at the
-                    // interior right edge — witness top/bottom corners; the
-                    // exact arrow rects are uncited).
-                    statusScroll = std::max(0, statusScroll - 1);
-                    std::printf("ui status scroll up %d\n", statusScroll);
                 } else if (screen == kScreenStatus &&
-                           inRect(kStatusArrowDown, p)) {
-                    ++statusScroll;  // statusWindow clamps
-                    std::printf("ui status scroll down %d\n", statusScroll);
-                } else if (screen == kScreenStatus &&
-                           statusRowAt(p, kStatusRowsTop)) {
-                    const auto all = statusPlanets(camp, ag::kPlayer);
-                    const auto win = statusWindow(all, statusScroll);
-                    const int i = *statusRowAt(p, kStatusRowsTop);
-                    if (i < int(win.size())) {
-                        statusSel = statusScroll + i;
-                        const auto& s = camp.galaxy().stars[win[i].star];
-                        std::printf("ui status select %s (planet detail = "
-                                    "state-17 seam)\n", s.name.c_str());
+                           statusHitFor(p, kStatusRowsTop).kind != StatusHit::None) {
+                    // t405 UNIFIED HIT-MAP (statuslist.h): arrows own their
+                    // measured art rects; the scrollbar column is inert
+                    // (None); rows own the table left of x 619. Replaces the
+                    // three-branch chain whose 566-wide arrows + unbounded
+                    // row test swallowed every rail-position click (D13).
+                    const auto h = statusHitFor(p, kStatusRowsTop);
+                    if (h.kind == StatusHit::ArrowUp) {
+                        statusScroll = std::max(0, statusScroll - 1);
+                        std::printf("ui status scroll up %d\n", statusScroll);
+                    } else if (h.kind == StatusHit::ArrowDown) {
+                        ++statusScroll;  // statusWindow clamps
+                        std::printf("ui status scroll down %d\n", statusScroll);
+                    } else {
+                        const auto all = statusPlanets(camp, ag::kPlayer);
+                        const auto win = statusWindow(all, statusScroll);
+                        if (h.row < int(win.size())) {
+                            statusSel = statusScroll + h.row;
+                            const auto& s = camp.galaxy().stars[win[h.row].star];
+                            std::printf("ui status select %s (planet detail = "
+                                        "state-17 seam)\n", s.name.c_str());
+                        }
                     }
+                } else if (screen == kScreenStatus) {
+                    // t405: clicks the unified map rejects (outside the
+                    // table, scroll column) are SILENT and inert — the
+                    // D13 fall-through (rail-position clicks scrolling the
+                    // list) is closed by the hit-map, not by a sound.
                 } else if (screen == kScreenMap && inRect(kNextTurnBtn, p)) {
                     // NEXTTURN's STATE is "1 1" (map-only) — same gate.
                     std::printf("ui click next-turn\n");
@@ -767,8 +775,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         SDL_RenderFillRect(ren, &mk);
                     }
                     // row frame (PORT; the vendor row separator is part of
-                    // the 10status chrome style anomaly, ui-runtime.md)
-                    SDL_Rect rf{32, y, 632 - 32, kStatusRowPitch - 8};
+                    // the 10status chrome style anomaly, ui-runtime.md).
+                    // t405: right edge stops at the table boundary x 618 —
+                    // x>=619 is the SCROLLBAR COLUMN painted in the backdrop
+                    // (arrow boxes + trough), which the old 632-wide fill
+                    // covered up.
+                    SDL_Rect rf{32, y, 618 - 32, kStatusRowPitch - 8};
                     SDL_SetRenderDrawColor(ren, 40, 40, 56, 255);
                     SDL_RenderFillRect(ren, &rf);
                     SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);

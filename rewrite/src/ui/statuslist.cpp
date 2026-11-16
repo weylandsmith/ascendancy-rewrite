@@ -108,6 +108,32 @@ std::vector<StatusRowKey> statusWindow(const std::vector<StatusRowKey>& all,
     return std::vector<StatusRowKey>(all.begin() + s, all.begin() + s + n);
 }
 
+namespace {
+inline bool inR(const ascend::ui::Rect& r, ascend::ui::Pt p) {
+    return p.x >= r.x0 && p.x <= r.x1 && p.y >= r.y0 && p.y <= r.y1;
+}
+}  // namespace
+
+// t405 UNIFIED HIT-MAP. Precedence: arrow boxes (painted over the list in
+// the vendor backdrop) -> scroll column (inert; a trough/thumb click must
+// NOT scroll or select — the old port let the row band swallow x 566..632)
+// -> row bands. Points outside the list interior hit nothing.
+StatusHitResult statusHitFor(Pt p, int topY) {
+    StatusHitResult h;
+    if (inR(kStatusArrowUp, p)) { h.kind = StatusHit::ArrowUp; return h; }
+    if (inR(kStatusArrowDown, p)) { h.kind = StatusHit::ArrowDown; return h; }
+    if (inR(kStatusScrollCol, p)) return h;  // None: trough/thumb seam
+    if (const auto i = statusRowAt(p, topY)) {
+        // Rows live inside the table: left frame x 7, right of the scrollbar
+        // column boundary x 619 (vendor table verticals end at 619/621).
+        if (p.x >= kStatusInterior.x0 && p.x < kStatusScrollCol.x0) {
+            h.kind = StatusHit::Row;
+            h.row = *i;
+        }
+    }
+    return h;
+}
+
 std::optional<int> statusRowAt(Pt p, int topY) {
     if (p.y < topY) return std::nullopt;
     const int i = (p.y - topY) / kStatusRowPitch;

@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-15T23:30
+updated: 2026-11-16T01:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,20 +230,19 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t405 per queue row t405 below (phase 14: SUB-SCREEN NAVIGATION +
-RAIL LIVENESS — the owner's D13 witness "Ships/Research clicks route
-into the status screen's scroll" is STILL TRUE after t404: t404 fixed
-what the clicks SOUND like, not where they GO; ui.cpp:342-348 still
-deliberately makes the rail inert while a screen is open, and the
-vendor law is screens SWAP with the rail live). Ordering rationale:
-t405 is the navigation fix every later screen row (t406 planets-view,
-t407 ships, t408 research, t410 system chain) is walked THROUGH, so it
-must land first; t404 closed the audio-hygiene half of D13 (laser01
-plays nowhere — witness PASS, MUTATION 6/6, audio.md §6.7). Reuse the
-t404 witness harness shape (SDL_AUDIODRIVER=dummy + --audio-trace makes
-rail-press click08 a machine-visible marker for "the rail branch ran").
+NEXT t406 per queue row t406 below (phase 14: PLANETS OWNED-ONLY FILTER +
+PLANET VIEW state 17 + project-set) — with the t405 AFTERCARE note folded
+in (row-frame clips the art "name" header cell; grade rows against the t3
+capture). Ordering rationale: t405 landed the navigation/hit-map law every
+later screen row is walked THROUGH (screens swap, rail map-only, Esc back,
+status hit-map unified at MEASURED art rects); t406 is the owner's
+loudest remaining planets complaint ("displays planets I don't own",
+"can't set a project") and owns the row-assembly seam t405 banked. Do NOT
+re-litigate rail liveness — refuted with three evidence lines in
+docs/re/_wip_t405.md F3; re-trying "rail live in sub-screens" is a dead
+route (add to REFUTED-ROUTES if temptation recurs).
 The WAIT-USER-RULING t374 sentinel is RETIRED (tag itself never
-renumbered; history below). D13 queue rows t406..t413 stand as written.
+renumbered; history below). D13 queue rows t407..t413 stand as written.
 OQ-027 still closes only on the user's final audio verdict.
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
@@ -260,6 +259,40 @@ verbatim in docs/re/_wip_t403.md F7+ and disposition the named screen item;
 if a ruling reopens a screen, author ONE queue row citing the ruling phrase
 (no fix-by-eye). NOTE: the 11:37 D11 ruling PREDATES the t401/t402 landings —
 it grades neither; do not treat it as their disposition.
+
+t405 LANDED 2026-11-16 (SUB-SCREEN NAVIGATION + RAIL STATEMENT; law +
+full working log docs/re/_wip_t405.md F1-F10). PREMISE REFUTED with three
+measured lines: (1) windows.txt re-parsed (136 records) — the five plain
+rail buttons are STATE "1 1", NO sub-screen id appears in any rail list,
+so no list "keeps the rail live"; (2) 10status.shp k0 DECODED via
+tools/shp_pngdump + native-vision-graded (game.pal): full-width backdrop,
+NO button faces at the rail y-bands — the standings panel + scrollbar
+OCCUPY x>=474 in state 10; (3) the t3 live capture of the original agrees
+(no rail visible, arrows far-right). The shipped rail-hiding law was
+CORRECT; the owner's witnessed fall-through was the HIT-MAP: old PORT
+arrow rects {566,...} + unbounded row test swallowed every click at the
+rail's last-known position. FIX: unified pure statusHitFor (statuslist.h)
+— arrows at rects MEASURED on the backdrop plane (up {619,48,638,94},
+down {620,425,638,476}), scrollbar column {619,48,638,476} INERT between
+them, rows only x 7..618; ui.cpp click chain replaced by one dispatch,
+rejected points silent+inert; row-frame paint 632->618 so the vendor
+scrollbar art shows (native-vision after-shot confirms). Esc-hint hunt:
+"Esc: return to galaxy" is NOT vendor data (CP437 sweep of every extracted
+file + exe strings = zero hits; t3 capture bottom-left has no text) — the
+port's existing hint stands as a labelled PORT AFFORDANCE. PINS
+test_statusnav_t405.cpp x4, suite 352->356/0. MUTATION (scripts/
+t405_mutate.py, revert by FILE COPY from /tmp/t405-snap): M1 arrows->566,
+M4 precedence flip, M5 rail-always-active, M6 clamp-unknown, M7 Esc-dead-
+intel all CAUGHT with named FAILs; M2/M3 single-guard drops VERIFIED
+VACUOUS manually (redundant guards, skill rule 6) — the old-code-shape
+mutant M2c CAUGHT with named FAILs (test lines 42/44/56/60). WITNESS
+scripts/t405_statusnav_witness.sh (Xvfb :97, dummy audio + trace): VERDICT
+PASS — (580,60)=row select not scroll, measured boxes scroll, trough inert
+(exactly 4 status lines), rail-position click switches nothing, Esc->map,
+zero laser01. LEDGER: closes NOTHING (strict-close honest negative — no OQ
+row owns chrome geometry; OQ-016/019/027 untouched). AFTERCARE banked on
+queue row t406 (row-0 frame clips the art "name" header cell to "na";
+vendor row content richer than ours). Gate 0; ledger audit OK.
 
 t404 LANDED 2026-11-15 (LASER-SOUND REGRESSION + INPUT HYGIENE; law
 docs/re/audio.md §6.7). Root cause ui.cpp:348 (pre-fix): EVERY left click
@@ -926,6 +959,15 @@ keeps the rail live during sub-screens): rail rects evaluated before
 sub-screen children; Esc returns to map from ANY sub-screen. Pins:
 Ships-from-Planets swaps screens; Esc from every sub-screen -> map;
 scroll still lives inside its own rects.
+LANDED t405 — PREMISE REFUTED, DEFECT FIXED. No STATE list keeps the
+rail live (rail buttons are "1 1" ONLY; the 10status k0 backdrop paints
+OVER the rail column, native-vision-graded): screens swap, rail hidden,
+Esc back — already the shipped law, now pinned (statusnav_*_t405 x4).
+The witnessed fall-through was the hit-map: old 566-wide arrow rects +
+unbounded row test swallowed rail-position clicks. Unified statusHitFor
+(arrows at MEASURED art rects 619..638, trough inert, rows x 7..618),
+row paint stops at 618. Witness t405_statusnav_witness.sh PASS; suite
+356/0; law docs/re/_wip_t405.md F1-F10.
 
 t406 PLANETS: OWNED-ONLY + PLANET VIEW (user: "displays planets I don't
 own, can't click a planet"; I WITNESSED: Empire status lists the 3
@@ -940,6 +982,13 @@ my home planet" — project list law in planetalloc/income docs), terrain/
 keywords, surface art record; row click opens it. Pins: owned-only count
 == campaign model; project-set mutates PLANETALLOC state; row->detail
 routing.
+AFTERCARE (t405 native grade): row 0's PORT frame clips the backdrop's
+"name" header cell to "na" at the left edge (pre-existing t402; the
+header cells are ART at y~48..82 — either anchor rows below y 94 or
+clip row painting to the table interior). The vendor row content
+(system circle + cyan system name + planet icon + gauges RIGHT, t3
+capture F7) is richer than our current row — grade vs
+work/screens/t3/planets_header_t1086_after_open.png.
 
 t407 SHIPS SCREEN (user: "ships screen is empty"; I WITNESSED: click
 dead, no fleet window). Build the fleet list from the per-ship model

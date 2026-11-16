@@ -111,6 +111,7 @@ add_executable(run_tests
   tests/test_newgame_t401.cpp
   tests/test_statuslaw_t388.cpp
   tests/test_statuslist_t402.cpp
+  tests/test_statusnav_t405.cpp
   tests/test_econres_t274.cpp
   tests/test_planetwin_t276.cpp
   tests/test_score_t284.cpp

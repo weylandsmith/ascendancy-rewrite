@@ -134,14 +134,36 @@ inline constexpr Rect kStatusInterior{7, 46, 632, 457};  // frame fill lines
 // sits inside its own interior; the port's header strip is the STATUSWND
 // band above). Documented port layout.
 inline constexpr int kStatusRowsTop = 46;
-// Scroll arrows (PORT hit rects; the witness shows an arrow column at the
-// interior right edge x~573 native — the exact vendor rects are UNCITED,
-// named seam).
-inline constexpr Rect kStatusArrowUp{566, 46, 632, 70};
-inline constexpr Rect kStatusArrowDown{566, 433, 632, 457};
+// Scroll arrows — t405 RECTS MEASURED on the vendor backdrop itself
+// (10status.shp k0, decoded via tools/shp_pngdump this session;
+// docs/re/_wip_t405.md F8): the arrow BOXES are painted in the art at
+// x 619..638, top box y 48..94, bottom box y 425..478. The old PORT rects
+// {566,...} were 50px too wide on the left and swallowed clicks that the
+// vendor gives to the list. Hit order: arrow boxes first, then rows, and
+// the scrollbar column (below) never hits a row.
+inline constexpr Rect kStatusArrowUp{619, 48, 638, 94};
+inline constexpr Rect kStatusArrowDown{620, 425, 638, 476};
+// The scrollbar column of the vendor list (art: trough + thumb between the
+// two arrow boxes; verticals at x 619/621 and the right frame at 638).
+// Clicks here are NOT row clicks (vendor: trough/page area; the port has no
+// thumb-drag model — inert, named seam).
+inline constexpr Rect kStatusScrollCol{619, 48, 638, 476};
+
+// t405 UNIFIED STATUS HIT-MAP (pure; pins test_statusnav_t405.cpp).
+// Vendor precedence evidence: the arrow boxes are painted OVER the list
+// column in the backdrop, so they own their rects; the list interior owns
+// everything left of x 619; the scroll column between the arrows is inert.
+enum class StatusHit { None, ArrowUp, ArrowDown, Row };
+struct StatusHitResult {
+    StatusHit kind = StatusHit::None;
+    int row = -1;  // visible-row index (0..kStatusVisibleRows-1) for Row
+};
+StatusHitResult statusHitFor(Pt p, int topY);
 
 // Hit-map: which visible row owns point p (0..2), nullopt outside rows.
 // `topY` = native y of row 0's top (the port anchors row 0 at interior y0).
+// DEPRECATED for click routing (use statusHitFor, which honours the arrow
+// boxes and the scroll column); kept as the raw row-band math.
 std::optional<int> statusRowAt(Pt p, int topY);
 
 // ---- the header count pair (screen-open snapshot law) --------------------

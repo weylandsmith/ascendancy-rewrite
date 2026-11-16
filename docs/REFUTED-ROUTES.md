@@ -1333,3 +1333,21 @@ from a non-16 state is NOT evidence of unreachability.
 ##     1516/188 vs Python 1513/187 divergence is intentional (two-consumer
 ##     law, shp.md S28) — do not 're-unify' the validator onto the fallback.
 
+
+## t405 — (1) "KEEP THE RAIL LIVE INSIDE SUB-SCREENS" IS DEAD. The t405
+##     queue premise contradicted the tables; three measured lines refute it
+##     (docs/re/_wip_t405.md F1-F3): every plain rail button is STATE "1 1"
+##     (windows.txt re-parse, 136 records — no sub-screen id 10/14/18/20 in
+##     ANY rail list); 10status.shp k0 is a FULL-WIDTH backdrop whose right
+##     column is standings-panel + scrollbar ART (decoded + native-vision,
+##     zero button faces at the rail y-bands); the t3 live capture of the
+##     original shows the same. Screens SWAP; Esc is the cited way back.
+##     Do not re-add rail buttons or a "rail rects evaluated first" path.
+## (2) THE 'Esc: return to galaxy' HINT IS NOT VENDOR DATA — CP437
+##     byte-sweep of every extracted file + ASCII/UTF-16 strings of
+##     ascend.exe: zero occurrences; the t3 capture's bottom-left strip has
+##     no text. Do not hunt for a string table to "restore" it; the port's
+##     own hint is a labelled affordance.
+## (3) STATUS ARROW RECTS ARE NO LONGER UNCITED: MEASURED on the 10status k0
+##     pixel plane (up x619..638 y48..94, down x620..638 y425..476). Do not
+##     revert to the 566-wide PORT rects or widen rows past x618.
