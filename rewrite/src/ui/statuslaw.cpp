@@ -14,9 +14,11 @@ bool screenKnown(int screen) {
         case kScreenFleet:
         case kScreenResearch:
         case kScreenPlanet:   // t406 PLANETALLOC (opener = status row click)
+        case kScreenSystemView:  // t410 the System Display (opener = map star
+                                 // click, t338 measured; STATE "1 16" x20)
             return true;
         default:
-            return false;  // 13 NEGSCREEN, 17 PLANETALLOC, ...: no chrome yet
+            return false;  // 13 NEGSCREEN (t409 seam), 0 title, ...: no chrome
     }
 }
 
@@ -71,6 +73,13 @@ const char* screenTitle(int screen) {
 
 const char* screenName(int screen) {
     if (screen == kScreenMap) return "map";
+    // t410: the System Display has no TEXTITEM (no rail button opens it —
+    // the name is help.txt ln1149 "System Display" verbatim, header of the
+    // batmode help page).
+    if (screen == kScreenSystemView) return "System Display";
+    // t410: state 17's help.txt name verbatim ("Planet Display", ln1501-7)
+    // so the Escape-chain log line names the screen instead of "?".
+    if (screen == kScreenPlanet) return "Planet Display";
     const char* t = screenTitle(screen);
     return *t ? t : "?";
 }
@@ -106,8 +115,14 @@ const char* screenShapeLib(int screen) {
                                    // k0 639x479 decoded, panel borders land
                                    // on the windows.txt panel rects
                                    // (_wip_t406.md F6) [inferred binding]
-        case kScreenIntel:    return "14intel.shp";
-        case kScreenResearch: return "20res.shp";
+        case kScreenIntel:      return "14intel.shp";
+        case kScreenResearch:  return "20res.shp";
+        case kScreenSystemView: return "16battle.shp";  // t410: TYPE-100
+                                   // STATENUMBER 16 ln1140-1142 names it
+                                   // EXPLICITLY (not the prefix law); no
+                                   // full-screen record exists in the lib
+                                   // (dims census _wip_t410 F3) so the
+                                   // backdrop test declines it — faces only
         default:              return nullptr;  // species menu, FLEETWND:
     }                                            // no cited library
 }

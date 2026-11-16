@@ -659,8 +659,12 @@ else
     GS 553 310    # same point INSIDE the species menu -> Intelligence (STATE "1 7")
     grep -q 'ui screen Species -> Intelligence (Intelligence)' /tmp/gate_ui_screens.log \
       || { cat /tmp/gate_ui_screens.log; err "Intelligence never opened from the species menu"; }
-    GS key Escape
-    GS 510 66     # NEXTTURN
+    GS key Escape   # Intelligence -> Species (t252: returns to OPENER)
+    GS key Escape   # Species -> map (t410 stack unwind: one level per press;
+                    # the t388 gate assumed the OLD flat law here — the t252
+                    # pixel-diff measurement supersedes it, pinned
+                    # test_sysview_t410 stack walk)
+    GS 510 66     # NEXTTURN (STATE "1 1" = map-only; needs the map under us)
     wait $GATE_APP3 || err "ui app exited non-zero after screen round trip"
     kill $GATE_XV3 2>/dev/null
     grep -q 'ui ok: turn 1' /tmp/gate_ui_screens.log \

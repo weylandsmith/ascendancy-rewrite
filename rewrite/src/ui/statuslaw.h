@@ -53,6 +53,12 @@ enum Screen : int {
     // targets it (STATE census t405 F1) — the openers are list/system clicks
     // (planet.txt info00/info05): the STATUS LIST row click lands here.
     kScreenPlanet = 17,
+    // t410: the SYSTEM VIEW ("System Display"). windows.txt STATE "1 16" x20
+    // (BatModeWnd 7,7-465,472 + BatControlWnd 0,0-0,0 + BatListWnd +
+    // console); entry measured t338 (SET-STATE fn 0x56e10 edx=0x10 on a map
+    // star-pip click). No rail button targets it either — the opener is the
+    // star click on the map (planet.txt info00 route 1).
+    kScreenSystemView = 16,
 };
 
 // True iff the port renders chrome for `screen` (the known set). Presses

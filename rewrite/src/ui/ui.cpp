@@ -27,6 +27,7 @@
 #include "ui/speciesmenu.h"
 #include "ui/fleetlist.h"
 #include "ui/researchview.h"
+#include "ui/sysview.h"
 #include "ui/ui_internal.h"
 
 namespace ascend::ui {
@@ -152,6 +153,26 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // the ABILBUTTON msg-50 dismiss (both buttons cover 60,100-395,355),
     // clicks outside are inert, Escape also dismisses.
     bool abilityOpen = false;
+    // t410 THE SCREEN STACK (ui/sysview.h): the chain the owner never found.
+    // The map is the bottom level; a star click pushes the System Display
+    // (state 16, t338-measured entry), a colonised-dot click pushes the
+    // planet view (state 17, planet.txt info00 route 1); Escape pops ONE
+    // level (t252 pixel-diff law). `systemCam` is the view's own camera over
+    // kBatModeWnd (same vendor pinhole law as the galaxy field, cam3d.h);
+    // `gridOn` is the TOGGRID state (port default ON — t244 wireframe
+    // witness). Rail presses REPLACE the top level (the rail is only live
+    // on states 1/7 anyway — the STATE lists say so).
+    ScreenStack stack(kScreenMap);
+    // `screen` stays the single read variable (every transition site below
+    // updates BOTH it and the stack; a reference to topRef() would dangle
+    // the first time push() resizes the vector).
+    int screen = stack.top();
+    Camera3d systemCam;
+    systemCam.bounds = kBatModeWnd;
+    // FIT LAW (pinned test_sysview_t410): at the DEFAULT focal (zs=1) the
+    // outer ring of a 5-body system is orbitRadius(4) = 60+34*4 = 196 px,
+    // inside the kBatModeWnd half-height (472-7)/2 = 232. Zoom is user-driven.
+    bool gridOn = true;
     int played = 0;
     Uint32 nextAuto = autoplay ? SDL_GetTicks() + 250 : 0xFFFFFFFFu;
     bool quit = false;
@@ -161,17 +182,22 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // libraries load ONCE (files are 3-40 KB; per-frame reload would be
     // absurd). A screen whose lib refuses to load still draws frame + title
     // (honest degraded chrome, never a blank swap).
-    int screen = kScreenMap;
+    // (t410: `screen` is the ScreenStack top reference, declared above.)
     // t402: planets.shp joins the set for the PLANETS LIST row spheres
     // (55 records = 11 groups x 5-size ladder 11/18/25/35/47, shp.md S23.3
     // — the group/size axes match the status row's type/size words; the
     // group law itself is a NAMED SEAM, see the row painter).
     // t406: 17np.shp joins the set — the PLANETALLOC backdrop candidate
     // (k0 639x479, decoded this session, docs/re/_wip_t406.md F6).
-    const char* kLibFiles[6] = {"1starmap.shp", "10status.shp", "14intel.shp",
-                                "20res.shp", "planets.shp", "17np.shp"};
-    ascend::formats::ShapeLibrary kLibs[6];
-    for (int i = 0; i < 6; i++) {
+    // t410: 16battle.shp joins the set — the SYSTEM VIEW console faces
+    // (TYPE-100 STATENUMBER 16 ln1140-1142; dims census _wip_t410 F3: the
+    // lib has NO backdrop record, so backdropFor() declines it and only the
+    // SHAPEFRAME-identified faces blit).
+    const char* kLibFiles[7] = {"1starmap.shp", "10status.shp", "14intel.shp",
+                                "20res.shp", "planets.shp", "17np.shp",
+                                "16battle.shp"};
+    ascend::formats::ShapeLibrary kLibs[7];
+    for (int i = 0; i < 7; i++) {
         std::string lerr;
         if (!kLibs[i].load(dataRoot + "/extracted/ascend01/data/" + kLibFiles[i],
                            &lerr))
@@ -223,11 +249,24 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         }
     }
     std::fflush(stdout);
+    // t410 HOME-STAR DIAGNOSTIC (display-only, zero rng): the projected
+    // home-star pixel under the DEFAULT camera, printed once so a witness
+    // can click the map->system-view entry without guessing a pip.
+    {
+        const int hs = camp.homeStarFor(ag::kPlayer);
+        if (hs >= 0 && hs < int(camp.galaxy().stars.size())) {
+            const Pt hp = projectStar(cam, camp.galaxy().stars[size_t(hs)]);
+            std::printf("ui home star %s at %d,%d\n",
+                        camp.galaxy().stars[size_t(hs)].name.c_str(), hp.x,
+                        hp.y);
+            std::fflush(stdout);
+        }
+    }
     // Index into kLibs for a screen, or -1.
     auto libFor = [&](int s) -> int {
         const char* want = screenShapeLib(s);
         if (!want) return -1;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 7; i++)
             if (std::string(kLibFiles[i]) == want) return i;
         return -1;
     };
@@ -281,11 +320,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     abilityOpen = false;
                     std::printf("ui ability dialog dismiss (esc)\n");
                     std::fflush(stdout);
-                } else if (escapeToMap(screen)) {
-                    std::printf("ui screen %s -> map (esc)\n",
-                                screenTitle(screen));
+                } else if (stack.escape()) {
+                    // t410 CHAIN LAW: Escape unwinds ONE level (t252 measured
+                    // pixel-diff; t369 corroborated in the system view). The
+                    // stack knows the level we came from: 17->16 when the
+                    // planet view was opened FROM the system view, 17->1 when
+                    // it came from the status list, 16->1 always.
+                    const int from = screen;
+                    screen = stack.top();
+                    std::printf("ui screen %s -> %s (esc)\n",
+                                screenName(from), screenName(screen));
                     std::fflush(stdout);
-                    screen = kScreenMap;
                 } else {
                     quit = true;
                 }
@@ -341,7 +386,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                     screenName(screen), screenName(next),
                                     kRailName[static_cast<int>(*rb)]);
                         std::fflush(stdout);
-                        screen = next;
+                        stack.push(next);  // t410: replaces the top level if
+                        screen = next;     // already present (no duplicates)
                     } else if (rb == RailButton::SpecialAbility &&
                                rc.sendMessage == 5) {
                         // t409 msg 5 IS WIRED in the vendor (never a silent
@@ -420,6 +466,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                              ? s.planets[key.planetIndex].name
                                              : s.name;
                             projectOpen = false;
+                            stack.push(kScreenPlanet);  // t410: chain level
                             screen = kScreenPlanet;
                             std::printf("ui status select %s -> planet view "
                                         "(state 17)\n", planetName.c_str());
@@ -584,6 +631,78 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     std::printf("ui click map (%d,%d) -> %s\n", p.x, p.y,
                                 selected >= 0 ? camp.galaxy().stars[selected].name.c_str()
                                               : "none");
+                    if (selected >= 0) {
+                        // t410 ENTRY LAW: the star click opens the System
+                        // Display (state 16) — t338 MEASURED SET-STATE fn
+                        // 0x56e10 edx=0x10 on exactly this click (the Icarus
+                        // pip at (238,282)); planet.txt info00 names it route
+                        // one to a planet. Silent like every map click (t404).
+                        stack.push(kScreenSystemView);
+                        screen = kScreenSystemView;
+                        std::printf("ui system view %s (state 16)\n",
+                                    camp.galaxy().stars[selected].name.c_str());
+                    }
+                } else if (screen == kScreenSystemView) {
+                    // t410 state-16 CLICK CHAIN (ui/sysview.h): console
+                    // buttons first (windows.txt file order), then the
+                    // orbital dots (planet.txt info00/info05 + help batmode
+                    // "view a selected planet by clicking it again").
+                    // Everything else is inert + silent (MapClick law; t312
+                    // measured vendor empty clicks do nothing here either).
+                    const SysCtl ctl = sysCtlFor(p);
+                    if (ctl != SysCtl::None) {
+                        const SysCtlControl& cc =
+                            kSysCtl[static_cast<int>(ctl)];
+                        switch (ctl) {
+                            case SysCtl::RotateLeft:  systemCam.rotate(-1); break;
+                            case SysCtl::RotateRight: systemCam.rotate(+1); break;
+                            case SysCtl::ZoomIn:      systemCam.zoom(+1); break;
+                            case SysCtl::ZoomOut:     systemCam.zoom(-1); break;
+                            case SysCtl::Recenter:    systemCam.reset(); break;
+                            case SysCtl::TogGrid:     gridOn = !gridOn; break;
+                            case SysCtl::Abandon:
+                                // REFUSED (header): msg 84 DESTROYS the planet
+                                // (t369 live hazard). No sim mutation, ever.
+                                std::printf("ui sysview abandon refused "
+                                            "(no destruction model)\n");
+                                break;
+                            default:
+                                std::printf("ui sysview seam %s (msg %d: no "
+                                            "per-ship order model, t256c)\n",
+                                            cc.name, cc.sendMessage);
+                                break;
+                        }
+                        std::printf("ui sysview cam yaw %.2f pitch %.2f focal %.0f grid %d\n",
+                                    systemCam.yaw, systemCam.pitch,
+                                    systemCam.focal, gridOn ? 1 : 0);
+                        std::fflush(stdout);
+                    } else if (inRect(kBatModeWnd, p)) {
+                        const auto dots = systemOrbits(camp, selected,
+                                                       systemCam);
+                        const int hit = hitOrbitDot(dots, p);
+                        if (hit >= 0 && hit < int(dots.size()) &&
+                            dots[size_t(hit)].colonised) {
+                            const auto& s = camp.galaxy().stars[selected];
+                            planetStar = selected;
+                            planetName = hit < int(s.planets.size())
+                                             ? s.planets[size_t(hit)].name
+                                             : s.name;
+                            projectOpen = false;
+                            stack.push(kScreenPlanet);
+                            screen = kScreenPlanet;
+                            std::printf("ui system planet %s -> planet view "
+                                        "(state 17)\n", planetName.c_str());
+                            std::fflush(stdout);
+                        } else if (hit >= 0) {
+                            // Bare body: the port models ONE PlanetState per
+                            // star (t406) — opening state 17 here would show
+                            // data that does not exist. Honest inert + seam
+                            // line, never a fabricated readout.
+                            std::printf("ui system planet seam (bare body "
+                                        "%d: no per-orbit model)\n", hit);
+                            std::fflush(stdout);
+                        }
+                    }
                 }
                 }  // t409 end: !abilityOpen left-click chain
             } else if (ev.type == SDL_MOUSEBUTTONDOWN &&
@@ -911,6 +1030,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                       interior = kResWin; break;
                 case kScreenPlanet:   hdr = Rect{};  // 17np k0 backdrop IS
                                        interior = kPlanetAllocRect; break;  // the frame
+                case kScreenSystemView:  // t410: no TEXTITEM header (help
+                    hdr = Rect{};          // batmode titles the screen
+                    interior = kBatModeWnd;  // itself); the viewport frame is
+                    break;                 // drawn by the content branch
                 case kScreenSpecies: hdr = Rect{};  // NO cited header: the
                                      interior = Rect{}; break;          // menu
                                                                         // is rows
@@ -930,9 +1053,11 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     txt.draw(ren, hs.x + 8, hs.y + 6, screenTitle(screen), true,
                              kText);
             }
-            if (screen != kScreenSpecies && screen != kScreenPlanet) {
+            if (screen != kScreenSpecies && screen != kScreenPlanet &&
+                screen != kScreenSystemView) {
                 // t406: the planet screen's frame IS the 17np k0 backdrop
                 // (outer frame measured on the decode) — no vector overlay.
+                // t410: the system view draws its own viewport frame.
                 SDL_Rect is{interior.x0, interior.y0,
                             interior.x1 - interior.x0 + 1, interior.y1 - interior.y0 + 1};
                 SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
@@ -1459,6 +1584,114 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         }
                     }
                 }
+            } else if (screen == kScreenSystemView) {
+                // ---- t410 THE SYSTEM DISPLAY (state 16) ------------------
+                // Law ui/sysview.h (STATE census + t338 entry + help batmode
+                // verbatim). Blue wireframe plane + bodies (t244 dossier);
+                // console rects verbatim; faces from 16battle.shp under the
+                // SHAPEFRAME->record identity law (t394 parity 14/16, F3).
+                if (selected < 0 || selected >= int(camp.galaxy().stars.size()))
+                    txt.draw(ren, kBatModeWnd.x0 + 8, kBatModeWnd.y0 + 8,
+                             "no system selected", false, kDim);
+                {
+                    // viewport frame + clip (rail never paints through)
+                    SDL_Rect vf{kBatModeWnd.x0 - 1, kBatModeWnd.y0 - 1,
+                                kBatModeWnd.x1 - kBatModeWnd.x0 + 3,
+                                kBatModeWnd.y1 - kBatModeWnd.y0 + 3};
+                    SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
+                    SDL_RenderDrawRect(ren, &vf);
+                    SDL_RenderSetClipRect(ren, &vf);
+                    const int ccx = (kBatModeWnd.x0 + kBatModeWnd.x1) / 2;
+                    const int ccy = (kBatModeWnd.y0 + kBatModeWnd.y1) / 2;
+                    if (gridOn) {
+                        // Wireframe plane rings + spokes (t244 "blue
+                        // wireframe plane"; colour/pitch = port law).
+                        SDL_SetRenderDrawColor(ren, 40, 40, 160, 255);
+                        for (int i = 0; i < 6; i++) {
+                            const int rr = int(orbitRadius(i) *
+                                               systemCam.focal / Camera3d().focal);
+                            int x = rr, y = 0, err = 1 - rr;
+                            while (x >= y) {
+                                const SDL_Point pts[8] = {
+                                    {ccx + x, ccy + y}, {ccx + y, ccy + x},
+                                    {ccx - y, ccy + x}, {ccx - x, ccy + y},
+                                    {ccx - x, ccy - y}, {ccx - y, ccy - x},
+                                    {ccx + y, ccy - x}, {ccx + x, ccy - y}};
+                                SDL_RenderDrawPoints(ren, pts, 8);
+                                y++;
+                                if (err < 0) err += 2 * y + 1;
+                                else { x--; err += 2 * (y - x) + 1; }
+                            }
+                        }
+                        for (int k = 0; k < 8; k++) {
+                            const double a = k * 6.283185307179586 / 8.0;
+                            const double r = orbitRadius(5) *
+                                             systemCam.focal / Camera3d().focal;
+                            SDL_RenderDrawLine(ren, ccx, ccy,
+                                               ccx + int(r * std::cos(a)),
+                                               ccy + int(r * std::sin(a)));
+                        }
+                    }
+                    const auto dots = systemOrbits(camp, selected, systemCam);
+                    for (const auto& d : dots) {
+                        // stalk star->body (t244 "bodies on yellow stalks")
+                        SDL_SetRenderDrawColor(ren, 150, 140, 60, 255);
+                        SDL_RenderDrawLine(ren, ccx, ccy, d.pos.x, d.pos.y);
+                        SDL_Color c = d.owner >= 0
+                                          ? toSdl(kOwnerRgb[d.owner % 7])
+                                          : toSdl(kNeutralRgb);
+                        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                        filledCircle(ren, d.pos.x, d.pos.y, d.radius);
+                        if (d.colonised) {
+                            // colonised ring (CVD: shape, not colour alone)
+                            SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+                            SDL_Rect cr{d.pos.x - d.radius - 3,
+                                        d.pos.y - d.radius - 3,
+                                        2 * (d.radius + 3) + 1,
+                                        2 * (d.radius + 3) + 1};
+                            SDL_RenderDrawRect(ren, &cr);
+                        }
+                    }
+                    if (selected >= 0) {
+                        const auto& s = camp.galaxy().stars[selected];
+                        const std::string info =
+                            s.name + (camp.starOwner(selected) == ag::kPlayer
+                                          ? "  [yours]"
+                                          : camp.starOwner(selected) > 0
+                                                ? "  [other]"
+                                                : "  [neutral]");
+                        txt.draw(ren, kBatModeWnd.x0 + 6,
+                                 kBatModeWnd.y1 - 34, info, false, kDim);
+                    }
+                    SDL_RenderSetClipRect(ren, nullptr);
+                }
+                // console: faces where cited, vector box + initial elsewhere
+                const int batLib = libFor(kScreenSystemView);
+                for (int i = 0; i < kSysCtlCount; i++) {
+                    const SysCtlControl& cc = kSysCtl[i];
+                    SDL_Rect rr{cc.rect.x0, cc.rect.y0,
+                                cc.rect.x1 - cc.rect.x0 + 1,
+                                cc.rect.y1 - cc.rect.y0 + 1};
+                    const int rec = sysCtlShapeRecord(static_cast<SysCtl>(i));
+                    if (rec >= 0 && batLib >= 0 &&
+                        blitShape(ren, kLibs[batLib], rec, rr.x, rr.y))
+                        continue;
+                    SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
+                    SDL_RenderFillRect(ren, &rr);
+                    SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
+                    SDL_RenderDrawRect(ren, &rr);
+                    const std::string lbl(1, cc.name[0]);
+                    txt.draw(ren, rr.x + 4, rr.y + 8, lbl, false, kText);
+                }
+                // BatListWnd: honest frame + the honest zero (t256c: no
+                // per-ship presence in the model; vendor orbit rows = seam).
+                SDL_Rect bl{kBatListWnd.x0, kBatListWnd.y0,
+                            kBatListWnd.x1 - kBatListWnd.x0 + 1,
+                            kBatListWnd.y1 - kBatListWnd.y0 + 1};
+                SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
+                SDL_RenderDrawRect(ren, &bl);
+                txt.draw(ren, kBatListWnd.x0 + 6, kBatListWnd.y0 + 6,
+                         "ships: seam (t256c)", false, kDim);
             } else {
                 txt.draw(ren, interior.x0 + 8, interior.y0 + 8,
                          "frame + title only: content law seam", false, kDim);

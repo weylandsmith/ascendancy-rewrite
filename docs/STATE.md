@@ -230,21 +230,65 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t410 per queue row t410 below (phase 14: SYSTEM VIEW + MAP->PLANET
-CHAIN). Ordering rationale: t409 closed the rail's last dead button
-(SPECIALAB opens the cited ABILITYWIN modal — the vendor msg-5 path decoded
-end-to-end) and gave the SPECIES menu real content; the owner's remaining
-unreachable-screen complaint ("haven't found any way to pull up the system
-view screen") is the next D13 row, and t406's planet view already exists as
-the chain's far end — t410 wires the near end (star click on the map ->
-system view -> planet dot -> state 17) with the Escape chain depth pinned.
-Reuse the t408/t409 machinery: pure ui/<law> module, Campaign display-only
-zero-rng accessors, witness with the modal-law pattern (t409's
-"ui key next" COUNT probe beat turn-md5 greps for suppression claims),
-mutation script shape scripts/t409_mutate.py. PRE-FLIGHT: none owed (t409
-mutation campaign 9/9 CAUGHT incl the M8 vacuous-fixture re-scope). D13
-queue rows t411..t413 stand as written. OQ-027 still closes only on the
-user's final audio verdict.
+NEXT t411 per queue row t411 below (phase 14: MAP LOOK PASS 2). Ordering
+rationale: t410 landed the system-view chain (map star click -> state-16
+System Display -> colonised dot -> t406 planet view; Escape unwinds one
+level; witness scripts/t410_sysview_witness.sh VERDICT PASS + my own
+native-vision grade of both shots; suite 384->391/0; mutation 9/9 CAUGHT),
+so every rail button and the escape chain now work — the owner's D13 list
+next names the map's LOOK (queue row t411: bevel frame, LED resource
+digits, palette noise, flat starfield, start-lane law, dials), which is
+purely visual and independent of t410's wiring. Reuse t410's machinery:
+pure ui/<law> module + witness + mutation shape scripts/t410_mutate.py —
+AND HEED t410's mutation pitfall (F6): run campaigns of 3+ mutants inside
+execute_code or background with restore-guard; a foreground run killed at
+the tool timeout poisons the /tmp snapshot mid-mutant. PRE-FLIGHT: none
+owed (t410 campaign 9/9 CAUGHT incl. re-run of M7 standalone). D13 queue
+rows t412..t413 stand as written. OQ-027 still closes only on the user's
+final audio verdict.
+
+t410 LANDED 2026-11-16 (SYSTEM VIEW + MAP->PLANET CHAIN; law + working log
+docs/re/_wip_t410.md F1-F6; state-16 census = windows.txt STATE "1 16" x20
+records incl BatModeWnd/BatListWnd + 17 console buttons verbatim rects/
+messages, chrome lib 16battle.shp via TYPE-100 ln1140-1142, NO full-screen
+backdrop — max frame 173x141 so the orbit grid is code-drawn). ENTRY LAW:
+a STAR click on the map opens the System Display (t338 measured state==16;
+help.txt ln1149 names it — state 16 has NO TEXTITEM, so screenName
+special-cases it); a click INSIDE BatModeWnd 7,46-465,437 on a COLONISED
+orbit dot opens the t406 planet view (state 17) — bare bodies stay silent
+(the port models one PlanetState per star, t406; opening 17 on a bare dot
+would fabricate data). ESCAPE CHAIN: one level per press (t252 pixel-diff;
+t369 corroborated), stack bottom = map standing-quit; push() re-entry
+truncates instead of stacking duplicates; screens not in the stack (t252:
+intel-from-species returns to species) stay flat — the stack only governs
+the map/system/planet family. LANDED: ui/sysview.{h,cpp} pure (ScreenStack,
+kSysCtl table 17 entries verbatim windows.txt incl Auto msg 808, shapeFrame
+identity + t394 dim parity, orbitRadius 60+34i / orbitAngle, hitOrbitDot
+radius law, systemOrbits zero-rng display accessor, seam census MyItems/
+Abandon = -1), statuslaw 16 known+named, ui.cpp: map star click enters,
+BatModeWnd click chain, state-16 paint (code grid via Camera3d default
+focal — FIT LAW pinned: outer ring of a 5-body system stays inside the
+viewport), home-star diagnostic (display-only, zero rng) for witness
+targets, 16battle.shp joined the 7-lib chrome set. PINS
+test_sysview_t410.cpp x7 (3 REQUIRE_DATA) incl named closer
+star-click->system->dot->planet->esc->esc->map stack walk. Suite
+384->391/0. MUTATION scripts/t410_mutate.py 9/9 CAUGHT (stack duplicate,
+escape-past-bottom, rect drift, first-match-wins, shape offset, seam-face
+accepted, colonised index shift, orbit pitch, hit radius) — AFTER-RESTORE
+391/0. WITNESS scripts/t410_sysview_witness.sh VERDICT PASS (8 markers:
+home-star diag, ui screen map -> systemview, ui systemview -> planet,
+two esc unwinds, map return) + my native-vision grade: wireframe grid +
+dots + right-column consoles render clean; one defect found and fixed
+(BatListWnd seam text clipped at the list edge -> shortened). Seeds 1/2024/
+23 headless md5 EXACTLY per record (no sim touched). GATE AMENDMENT 4c-d:
+the t388 stage clicked NEXTTURN after ONE Escape from Intelligence, encoding
+the OLD flat escapeToMap law; the pinned t252 opener-return law (now the
+stack) goes Intelligence->Species->map, so the stage presses Escape TWICE
+(cited in-script; gate green after amendment, GATE_EXIT=0). LEDGER: NOTHING
+closed (strict-close honest negative — the D13 screen-chain complaint has
+no OQ row; evidence stays here + _wip_t410.md; state-routing rows inside
+OQ-016's closed block unchanged). PITFALL BANKED (F6): mutation campaign
+foreground-timeout poisons the /tmp snapshot — see rationale above.
 
 t409 LANDED 2026-11-16 (SPECIAL ABILITY DIALOG + SPECIES MENU CONTENT; law
 + full working log docs/re/_wip_t409.md F1-F6; durable law docs/re/
