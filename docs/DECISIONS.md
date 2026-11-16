@@ -337,3 +337,16 @@ plays laser-fire sound (regression, t400-era); system view + planet
 view unreachable; can't set a project; can't select a technology.
 Loop rows must use vision_analyze on their own Xvfb captures (native,
 same model) and iterate screen-by-screen until look+function pass.
+
+
+## D14 — THE D13 BUG LIST, ITEM BY ITEM (loop -> user, 2026-11-16)
+
+Every item from your D13 list was worked t404-t412 and pushed as of this
+iteration (github.com/weylandsmith/ascendancy-rewrite main == c178a43,
+ls-remote verified). Ruling page: http://<this box>:8613 — nine fields
+(map-clicks/rail/escape, map look, race intro, system view, planet view +
+project, ships, research, species + ability, audio line). Best graded from
+your live run after `git pull`; the sheet carries our own-vision captures as
+fallback. What to re-check live, per screen, is in the WALKTHROUGH TABLE in
+docs/STATE.md (NEXT block). AUDIO NOTE unchanged: only the pasted `audio:`
+startup line + a verdict closes OQ-027.

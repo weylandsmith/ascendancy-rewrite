@@ -378,3 +378,29 @@ trivially satisfied — nothing closable and nothing closed).
   Self-test PASS on scratch port 8699 + scratch DECISIONS.
 - LEDGER: 17 closed / 3 open UNCHANGED (strict-close: verify+push moves no
   measurement; the seed-md5 match corroborates but closes no row).
+
+## t413 PHASE-14 VERIFY + RE-EXPORT + PUSH LANDED (2026-11-16) — fast-forward, 9-commit gap closed; data-optional law HOLDS; 0-warning law regressed (test-only, banked)
+
+- VERIFICATION: gate ALL PASS GATE_EXIT=0; run_tests 401/0/0; SEED
+  REGRESSION seeds 1/2024/23 `--headless --campaign 1600` md5 EXACTLY the
+  banked record (7e794a6dfb495800502762def9331e85 /
+  332a8cf3cebc95359924ce6a6b94a830 / 0a6b7876719f38796e8235cb772a43d3;
+  Extinct t266 / Extinct t285 / Control t1406). Phases 13/14 moved ZERO sim
+  rng. Full md5s now in docs/re/_wip_t413.md F2.
+- EXPORT /tmp/pubpush-t413 (from 39a6546): vendor-free 6889 objects, 6.1M
+  .git, uniform noreply identity. Build WITHOUT data exit 0 but TWO
+  -Wsign-compare warnings (tests/test_statuslist_t402.cpp:201,226) — t403
+  law was ZERO warnings; carried as hygiene (tests pass; export not touched
+  mid-verify). run_tests WITHOUT data 401/241-skipped/0-failed; gate
+  --portable exit 0.
+- PUSH: set-url BEFORE fetch (t389 trap avoided); remote tip 06da9b2fa8a4,
+  zero foreign commits, FAST_FORWARD_OK; `--force-with-lease=main:06da9b2`
+  landed 06da9b2..c178a43; POST-PUSH ls-remote == c178a43c1f7186c87d2c542
+  afc6bd17720867a60 (verified). PAT via ~/.config/gh-pub-token + throwaway
+  askpass, deleted (verified absent).
+- D14 SHEET live :8613 (scripts/t413_grading_page.py tracked; 20 crops,
+  3 low-colour ones vision-verified live content; scratch-8699 self-test
+  PASS incl. traversal 404; real DECISIONS never a test target). D14 ask
+  block appended to docs/DECISIONS.md.
+- LEDGER: 17 closed / 3 open UNCHANGED (strict-close: verify+push moves no
+  measurement).

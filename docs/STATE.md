@@ -230,22 +230,70 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t413 PHASE-14 VERIFY + PUSH + HANDOFF (queue row t413, push-gap law
-MANDATORY). Ordering rationale: t412 landed the race intro (history.txt
-parser law + BootState::RaceIntro + Begin -> intro -> map chain witnessed
-end-to-end, mutation 6/6 pin-CAUGHT, suite 394->401/0), which was the last
-feature item on the owner's D13 list before the verify/push/handoff row.
-t413 = full-suite + seeds 1/2024/23 md5 vs record + gate + push + handoff
-doc refresh. Residual t412 seams to carry (none block t413): (1) runtime
-race-colour bytes -- kIntroRaceBytes is the STATIC table census
-(0x12e18+specnum*494); a live game may carry scenario-populated bytes
-(OQ-style close: RAM census during a live intro); (2) vendor intro draw
-immediates unmapped (599>480) -- port layout documented in
-docs/re/_wip_t412.md F4/F5, not claimed vendor-exact; (3) intro has no
-scroll driver (honest truncation printed); (4) New Game bottom-wheel
-clipping/polish (queue t412 tail item) -- deferred, next cosmetic pass if
-the owner re-prioritises. OQ-027 still closes only on the user's final
-audio verdict.
+NEXT WAIT-USER-RULING t374 (sentinel; queue DRAINED after t413). The
+phase-13/14 work is PUSHED (remote main == c178a43c1f71, ls-remote
+verified) and the D14 grading sheet is LIVE on :8613 (9 fields; D14 ask
+block in docs/DECISIONS.md). This session does NOT start new feature work;
+it wakes on a DECISIONS.md USER: block or a ruling. On wake: apply the
+ruling per row, close per strict-close, then author the phase-15 queue from
+whatever the user flags. Carried items the ruling does NOT need (start the
+queue with these if the user grades everything "ok"):
+  (H1) hygiene: rewrite/tests/test_statuslist_t402.cpp:201,226 sign-compare
+      warnings — the export 0-warning law regressed since t403; fix + keep.
+  (H2) t412 tail: New Game bottom-wheel clipping/polish (deferred cosmetic).
+  (H3) t412 seams: runtime race-colour bytes census (live-RAM during intro);
+      vendor intro draw immediates unmapped; intro scroll driver.
+  (H4) OQ-027 closes ONLY on the user's pasted `audio:` line + verdict (D14
+      field q8). OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.
+
+WALKTHROUGH TABLE (own-grade before -> after; what to re-check LIVE after
+`git pull`; all rows self-graded via native vision PASS unless noted):
+  map clicks      | laser01 on every click (D13 regression) -> silent; rail/
+                  | nav sfx only. LIVE: click empty map space, rotate, zoom.
+  galaxy map look | pale sage wash + TV-static sidebar + flat frame + washed
+                  | digits (t411 root cause: blitShapeScaled never set
+                  | SDL_BLENDMODE_BLEND) -> blend fix, 6x6 mottle, bevel
+                  | recess, outline-ring zero digits, depth-dim pips.
+                  | LIVE: whole screen vs memory of vendor; day counter at
+                  | turn 1; spin/zoom cluster still works.
+  race intro      | ABSENT (Begin jumped to map, mapgen delay exposed) ->
+                  | history.txt text screen in race ink between Begin and
+                  | map. LIVE: New Game -> Begin: intro shows, click -> map,
+                  | delay hidden; text right for YOUR species (loop only
+                  | witnessed Minions).
+  system view     | unreachable -> map STAR click opens orbit grid + 17
+                  | consoles. LIVE: click any star; TOGGRID toggles grid.
+  planet view +   | unreachable / could not set project -> colonised dot in
+  project         | system view opens planet view; project list click sets.
+                  | LIVE: set a project, next turn honours it.
+  ships screen    | EMPTY -> fleet rows (name/location/orders, fn 0x50d12
+                  | law). LIVE: rows match your fleet.
+  research screen | EMPTY / could not select tech -> list + set-study law.
+                  | LIVE: pick a tech, current study row updates.
+  species +       | quite off / ability button DEAD -> menu content law +
+  ability         | ABILITYWIN dialog (vendor path 0x55ffb). LIVE: both.
+  escape chain    | flat -> one level per press map<->system<->planet
+                  | (t252 law). LIVE: press Escape repeatedly, expect
+                  | planet->system->map, map quit only at bottom.
+
+t413 LANDED 2026-11-16 (PHASE-14 VERIFY + RE-EXPORT + PUSH + D14 SHEET;
+full account docs/re/packaging.md t413 block + docs/re/_wip_t413.md).
+Verification PASS first: gate 0, run_tests 401/0/0, SEED REGRESSION seeds
+1/2024/23 md5 EXACTLY record (full md5s re-pinned in _wip F2) — phases 13/
+14 moved zero sim rng. Export /tmp/pubpush-t413 vendor-free 6889 obj,
+uniform noreply identity; data-less build exit 0 but 2 sign-compare
+warnings (test_statuslist_t402.cpp:201,226 — H1 above); data-less tests
+401/241/0 (data-optional law HOLDS); gate --portable 0. PUSH: set-url
+BEFORE fetch (t389 trap avoided), remote tip 06da9b2 zero foreign commits,
+FAST-FORWARD --force-with-lease landed 06da9b2..c178a43; POST-PUSH
+ls-remote VERIFIED c178a43c1f71...; 9-commit gap (t404..t412) closed;
+askpass deleted. D14 sheet: scripts/t413_grading_page.py (tracked), 20
+crops (3 low-colour flagged, native-vision verified LIVE content not dead
+frames — FLAT flag is a census heuristic, vision is the arbiter), scratch-
+8699 self-test PASS (POST fields -> USER: lines, traversal 404), :8613
+live without restart (GET 200, D14 x10). D14 ask block appended to DECISIONS.
+LEDGER: 17 closed / 3 open — closes NOTHING (strict-close honest negative:
+verify+push+sheet ships no measurement).
 
 t412 LANDED 2026-11-16 (NEW GAME FIXES + RACE INTRO; measurement log
 docs/re/_wip_t412.md F0-F6). SPECIES-ROW SQUARES premise CLOSED by t411
@@ -1300,8 +1348,9 @@ PROTECTED (~/ascendancy-saves-protected/, law: raw .SAV u32@0 = game-day).
 A session woken by a DECISIONS.md edit or a *ruling*/*reply* file: read
 docs/DECISIONS.md, apply what the ruling says, close rows per strict-close,
 then author the next queue or re-park a WAIT sentinel.
-QUEUE: EMPTY — phase 10 fully drained (t385, t385b, t386, t387, t388, t388b,
-t389, t390, t391 all LANDED; per-row text lives in git history + LANDED blocks).
+QUEUE: EMPTY — phases 10-14 fully drained (t385..t413 all LANDED; per-row
+text lives in git history + LANDED blocks). Phase-15 queue authored ON USER
+RULING (see NEXT carried items H1-H4).
 
 STANDING LAWS FOR EVERY ITERATION HERE (beyond TASK_CONTRACT):
 - FIXED LAWS, do NOT re-trip (t319-t323 + t331/t332 amendments BINDING): poster
