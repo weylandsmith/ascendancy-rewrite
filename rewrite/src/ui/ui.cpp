@@ -24,6 +24,7 @@
 #include "ui/statuslist.h"
 #include "ui/planetview.h"
 #include "ui/fleetlist.h"
+#include "ui/researchview.h"
 #include "ui/ui_internal.h"
 
 namespace ascend::ui {
@@ -136,6 +137,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // 2026-11-11: "right-click ... to clear the ship selection").
     int fleetScroll = 0;
     int fleetSel = -1;
+    // t408 RESEARCH VIEW (state 20) session state: the tree-field pan
+    // offsets (px). The four pan buttons are windows.txt children OUTSIDE
+    // the RESWIN rect (msg 50..53); rotate pair pans X, move pair pans Y
+    // (t252 pixel-diff). No clamp law exists in vendor data -> the offsets
+    // are unbounded [labelled port choice]; nodes derive from them purely.
+    int resPanX = 0, resPanY = 0;
     int played = 0;
     Uint32 nextAuto = autoplay ? SDL_GetTicks() + 250 : 0xFFFFFFFFu;
     bool quit = false;
@@ -369,6 +376,46 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             std::printf("ui fleet select row %d\n", fleetSel);
                         }
                     }
+                    std::fflush(stdout);
+                } else if (screen == kScreenResearch && camp.researchTree() &&
+                           researchHit(*camp.researchTree(),
+                                       researchNodes(camp, *camp.researchTree(),
+                                                     ag::kPlayer),
+                                       p.x, p.y, resPanX, resPanY)
+                                   .kind != ResHit::None) {
+                    // t408 RESEARCH hit-map (researchview.h): the four pan
+                    // buttons (windows.txt msg 50..53, OUTSIDE the RESWIN
+                    // rect) first, then the node grid. Click law = help
+                    // reswin: an Available ("empty disk") node SETS the
+                    // study topic; Owned = dossier read; Blocked = silent.
+                    const auto& tree = *camp.researchTree();
+                    const auto nodes = researchNodes(camp, tree, ag::kPlayer);
+                    const auto h = researchHit(tree, nodes, p.x, p.y,
+                                               resPanX, resPanY);
+                    bool panned = true;
+                    switch (h.kind) {
+                        case ResHit::RotLeft:  resPanX += 96; break;
+                        case ResHit::RotRight: resPanX -= 96; break;
+                        case ResHit::MoveUp:   resPanY += 78; break;
+                        case ResHit::MoveDown: resPanY -= 78; break;
+                        case ResHit::Node: {
+                            panned = false;
+                            const std::string tname = tree.all()[h.row].name;
+                            if (setStudy(camp, tree, ag::kPlayer, h.row))
+                                std::printf("ui research study %s\n",
+                                            tname.c_str());
+                            else if (camp.techRowOwnedFor(ag::kPlayer, h.row))
+                                std::printf("ui research readout %s\n",
+                                            tname.c_str());
+                            // Blocked: SILENT (no capture shows reject
+                            // feedback; MapClick law t404).
+                            break;
+                        }
+                        default: panned = false; break;
+                    }
+                    if (panned)
+                        std::printf("ui research pan %d %d\n", resPanX,
+                                    resPanY);
                     std::fflush(stdout);
                 } else if (screen == kScreenPlanet && projectOpen &&
                            projectRowFor(p, 0)) {
@@ -778,7 +825,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 case kScreenIntel:  hdr = kIntelScreen; interior = kIntelList; break;
                 case kScreenFleet:  hdr = Rect{kFleetWnd.x0, kFleetWnd.y0, kFleetWnd.x1, 34};
                                     interior = Rect{7, 46, 632, 472}; break;
-                case kScreenResearch: hdr = Rect{kResWin.x0, kResWin.y0, kResWin.x1, kResWin.y1};
+                case kScreenResearch: hdr = Rect{kResWin.x0, kResWin.y0, kResWin.x1, 34};
                                       interior = kResWin; break;
                 case kScreenPlanet:   hdr = Rect{};  // 17np k0 backdrop IS
                                        interior = kPlanetAllocRect; break;  // the frame
@@ -797,7 +844,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 // t402: on the status screen the HEADER is the static.txt
                 // #151 string (t246/t249 law), drawn centred below — the
                 // generic rail-label title would collide with it.
-                if (screen != kScreenStatus)
+                if (screen != kScreenStatus && screen != kScreenResearch)
                     txt.draw(ren, hs.x + 8, hs.y + 6, screenTitle(screen), true,
                              kText);
             }
@@ -1126,6 +1173,181 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                    "idle fleets — named seam)"
                                  : "Scrolled past the last ship",
                              false, kDim);
+            } else if (screen == kScreenResearch) {
+                // ---- t408 RESEARCH SCREEN (D13 "research is empty") ------
+                // Law ui/researchview.h: header = static #130 first-%s join
+                // centred (t252/t268 native grade: green "Chamachies
+                // Knowledge" y~17); nodes = rings r30 at the derived layout
+                // (depth x row; vendor positions = named seam); RIGHT PANEL
+                // x484..632 is CODE-DRAWN (the STATE "1 20" census is RESWIN
+                // + the four pan buttons ONLY). Chrome honestly-vector WITH
+                // citation: 20res.shp holds the arrow faces only (t391).
+                const auto* tree = camp.researchTree();
+                if (tree) {
+                    const auto nodes = researchNodes(camp, *tree, ag::kPlayer);
+                    std::string owner = "Player";
+                    if (roster) {
+                        const int ps = camp.playerSpecies();
+                        if (ps >= 0 && ps < int(roster->size()) &&
+                            !roster->at(size_t(ps)).dipName.empty())
+                            owner = roster->at(size_t(ps)).dipName;
+                    }
+                    const std::string htxt = researchHeaderText(owner);
+                    {
+                        const int w = txt.width(htxt, true);
+                        txt.draw(ren, (640 - w) / 2, 14, htxt, true,
+                                 SDL_Color{0, 230, 90, 255});
+                    }
+                    // Tree field: clip to the RESWIN interior so panning
+                    // never paints the header or the right panel.
+                    SDL_Rect clip{7, 46, 470, 427};
+                    SDL_RenderSetClipRect(ren, &clip);
+                    for (const auto& nd : nodes) {
+                        // prereq edges first (thin blue, the capture's lanes)
+                        const auto c = researchNodePos(*tree, nd.row,
+                                                       resPanX, resPanY);
+                        for (int pr : tree->all()[nd.row].prereqs) {
+                            const auto pc = researchNodePos(*tree, pr,
+                                                            resPanX, resPanY);
+                            SDL_SetRenderDrawColor(ren, 40, 40, 160, 255);
+                            SDL_RenderDrawLine(ren, pc.x, pc.y, c.x, c.y);
+                        }
+                    }
+                    for (const auto& nd : nodes) {
+                        const auto c = researchNodePos(*tree, nd.row,
+                                                       resPanX, resPanY);
+                        SDL_Color ring = {120, 130, 190, 255};   // empty disk
+                        bool fill = false;
+                        if (nd.state == TechNodeState::Owned)
+                            ring = {90, 200, 255, 255};          // discovered
+                        if (nd.state == TechNodeState::Study)
+                            ring = {230, 160, 40, 255};          // gold rim
+                        if (nd.state == TechNodeState::Blocked) {
+                            ring = {70, 70, 90, 255};            // dim [port
+                            // choice; the captures never show a blocked node]
+                        }
+                        if (nd.state == TechNodeState::Owned) fill = true;
+                        // ring: two concentric circle outlines (r30/r27)
+                        for (int rr : {kResNodeRadius, kResNodeRadius - 3}) {
+                            SDL_SetRenderDrawColor(ren, ring.r, ring.g,
+                                                   ring.b, 255);
+                            int x = rr, y = 0, err = 1 - rr;
+                            while (x >= y) {
+                                const SDL_Point pts[8] = {
+                                    {c.x + x, c.y + y}, {c.x + y, c.y + x},
+                                    {c.x - y, c.y + x}, {c.x - x, c.y + y},
+                                    {c.x - x, c.y - y}, {c.x - y, c.y - x},
+                                    {c.x + y, c.y - x}, {c.x + x, c.y - y}};
+                                SDL_RenderDrawPoints(ren, pts, 8);
+                                y++;
+                                if (err < 0) err += 2 * y + 1;
+                                else { x--; err += 2 * (y - x) + 1; }
+                            }
+                        }
+                        if (fill) {  // discovered = filled disk (help reswin)
+                            SDL_SetRenderDrawColor(ren, ring.r / 3, ring.g / 3,
+                                                   ring.b / 2, 255);
+                            for (int dy = -kResNodeRadius + 4;
+                                 dy <= kResNodeRadius - 4; ++dy) {
+                                const int dx2 = (kResNodeRadius - 4) *
+                                                    (kResNodeRadius - 4) -
+                                                dy * dy;
+                                int dx = 0;
+                                while ((dx + 1) * (dx + 1) <= dx2) ++dx;
+                                SDL_RenderDrawLine(ren, c.x - dx, c.y + dy,
+                                                   c.x + dx, c.y + dy);
+                            }
+                        }
+                    }
+                    SDL_RenderSetClipRect(ren, nullptr);
+                    // Pan button faces (honest vector; 20res frames 0..3 are
+                    // the cited art, 15x30 each — blit seam named).
+                    auto arrowBox = [&](const Rect& r, bool horiz, bool neg) {
+                        SDL_Rect rr{r.x0, r.y0, r.x1 - r.x0 + 1,
+                                    r.y1 - r.y0 + 1};
+                        SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
+                        SDL_RenderFillRect(ren, &rr);
+                        SDL_SetRenderDrawColor(ren, 200, 60, 40, 255);
+                        const int cx = (r.x0 + r.x1) / 2, cy = (r.y0 + r.y1) / 2;
+                        if (horiz) {
+                            SDL_RenderDrawLine(ren, cx - 8, cy, cx + 8, cy);
+                            const int s = neg ? -1 : 1;
+                            SDL_RenderDrawLine(ren, cx + 8 * s, cy,
+                                               cx + 4 * s, cy - 4);
+                            SDL_RenderDrawLine(ren, cx + 8 * s, cy,
+                                               cx + 4 * s, cy + 4);
+                        } else {
+                            SDL_RenderDrawLine(ren, cx, cy - 8, cx, cy + 8);
+                            const int s = neg ? -1 : 1;
+                            SDL_RenderDrawLine(ren, cx, cy + 8 * s,
+                                               cx - 4, cy + 4 * s);
+                            SDL_RenderDrawLine(ren, cx, cy + 8 * s,
+                                               cx + 4, cy + 4 * s);
+                        }
+                    };
+                    arrowBox(kResRotLeft, true, false);
+                    arrowBox(kResRotRight, true, true);
+                    arrowBox(kResMoveUp, false, true);
+                    arrowBox(kResMoveDown, false, false);
+                    // RIGHT PANEL x 484..632 (code-drawn; t252 verbatim
+                    // order): #122, name (wrapped), #124 days, #125, Allows
+                    // entries. No project -> panel BLANK (t268 witness;
+                    // #123 "(No Progress)" is data, never rendered there).
+                    SDL_Rect pf{484, 46, 632 - 484 + 1, 472 - 46 + 1};
+                    SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);
+                    SDL_RenderDrawRect(ren, &pf);
+                    const int panelCx = (484 + 632) / 2;
+                    int queued = -1;
+                    for (const auto& nd : nodes)
+                        if (nd.state == TechNodeState::Study) queued = nd.row;
+                    if (queued >= 0) {
+                        const std::string tname = tree->all()[queued].name;
+                        const double remain =
+                            tree->all()[queued].runtimeCost() -
+                            camp.techProgressFor(ag::kPlayer);
+                        const std::string days = researchDaysLine(
+                            remain, camp.techRateFor(ag::kPlayer));
+                        auto centred = [&](int y, const std::string& s,
+                                           SDL_Color col) {
+                            const int w = txt.width(s, false);
+                            txt.draw(ren, panelCx - w / 2, y, s, false, col);
+                        };
+                        const SDL_Color grn{0, 230, 90, 255};
+                        centred(56, "Current Project:", grn);   // static #122
+                        // naive wrap at ~18 chars (the capture wrapped
+                        // "Accel Energy / Replenishment"); wrap width =
+                        // labelled port choice
+                        std::string a = tname, b;
+                        size_t sp = a.find(' ');
+                        while (sp != std::string::npos &&
+                               a.substr(0, sp).size() <= 17 &&
+                               a.size() > 18) {
+                            size_t sp2 = a.find(' ', sp + 1);
+                            if (sp2 == std::string::npos ||
+                                sp2 > 18) break;
+                            sp = sp2;
+                        }
+                        if (a.size() > 18 && sp != std::string::npos) {
+                            b = a.substr(sp + 1);
+                            a = a.substr(0, sp);
+                        }
+                        centred(104, a, grn);
+                        int yy = 120;
+                        if (!b.empty()) { centred(yy, b, grn); yy += 16; }
+                        centred(yy, days, grn);
+                        yy += 16;
+                        const auto allows = allowsList(camp, queued);
+                        if (!allows.empty()) {
+                            centred(yy, "Allows", grn);   // static #125
+                            yy += 16;
+                            for (size_t i = 0; i < allows.size() && i < 6;
+                                 ++i) {
+                                centred(yy, allows[i], grn);
+                                yy += 16;
+                            }
+                        }
+                    }
+                }
             } else {
                 txt.draw(ren, interior.x0 + 8, interior.y0 + 8,
                          "frame + title only: content law seam", false, kDim);

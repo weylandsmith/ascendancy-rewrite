@@ -170,10 +170,13 @@ F12 TIMING LAW (probe over real buildCampaign, seed 5): Shipyard queued t198,
   t286 (hops=1 whole game). The witness lands the one-turn window by
   deterministic NEXTTURN count — no injected state. Fleet is ONLY ever
   in-transit in the model (named seam (b) stands).
-F13 MUTATION CAMPAIGN NOT RUN — honest negative. scripts/t407_mutate.sh has a
-  cwd bug (relative paths after `cd rewrite/build`: mutants no-op'd, M5/M6
-  "SURVIVED" are VACUOUS, sources untouched — suite re-verified 368/0 green).
-  t408/9 MUST re-run mutation from repo root with absolute-ish paths before
-  claiming pin strength. Pins are currently UN-MUTATED (green but unproven).
+F13 MUTATION CAMPAIGN RE-RUN + PROVEN t408 (was: honest negative). TWO bugs
+  were real: (a) cwd (relative paths after `cd rewrite/build`); (b) THE
+  ACTUAL VACUITY: run() grepped 'fleetlist.*FAIL' but harness.h:52 prints
+  'FAIL <file>:<line>' — FAIL FIRST, so the grep could never match ANY
+  mutant. Fixed (absolute paths + exit-code verdict with the 'fleetlist'
+  substring filter): M1 CAUGHT with named FAIL lines (fleetlist_t407.cpp
+  :224/225/226), M2-M6 CAUGHT rc=1, restore 368/0, fails=0. THE t407 PINS
+  ARE PROVEN.
 NAMED SEAMS unchanged (a)-(e) above. NO OQ ROW CLOSED (strict-close; ships
 chrome has no OQ owner — same honest negative as t405/t406).

@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-16T01:30
+updated: 2026-11-16T09:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,19 +230,25 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t408 per queue row t408 below (phase 14: RESEARCH SCREEN — user:
-"research is empty"; witnessed dead). Ordering rationale: t407 landed the
-SHIPS LIST law module (ui/fleetlist, state 18) with pins 368/0 and a native-
-vision PASS witness — the rail's next dead button is RESEARCH, and t408
-reuses the SAME machinery (t402 row assembly, t405 hit-map, t407 marker-driven
-static.txt reader — use it, NOT the naive quoted-line counter, F10 of
-docs/re/fleet-screen.md). PRE-FLIGHT for t408 (both are cheap and owed):
-(1) re-run scripts/t407_mutate.sh FIXED (cwd bug: it cd's to rewrite/build
-then uses repo-relative paths — all mutants no-op'd; see fleet-screen.md F13;
-run mutate/restore from repo root) so the t407 pins are proven, not just
-green; fold results into the t408 commit; (2) the WAIT-USER-RULING t374
-sentinel stays retired. D13 queue rows t408..t413 stand as written.
-OQ-027 still closes only on the user's final audio verdict.
+NEXT t409 per queue row t409 below (phase 14: SPECIAL ABILITY + SPECIES
+SCREEN — user: "special ability button doesn't even do anything" + "species
+screen quite off"). Ordering rationale: t408 landed the RESEARCH screen
+(ui/researchview, state 20) — pins 376/0, mutation 9/9 CAUGHT, witness PASS +
+native grade — so the rail's remaining dead buttons are SPECIALAB and the
+SPECIES menu content. t409's FIRST act is the census the row demands:
+windows.txt for a special-ability window; if NONE exists (grep the STATE
+id-lists + TYPE census; SPECIALAB is msg 5 p1 0 — screenAfterRailPress NO-OPs
+it per t388), SAY SO with the table citation and disposition the rail label
+per its SENDPARAM/help index — do NOT invent a screen. Species screen:
+RACE_1..7 rows are NEGSCREEN (state 13) clicks — the t252/t268 dossiers bank
+the negotiation law (PLAYERDIP rows, Goodbye hoist); every species + portrait
+stays a seam until the 7racesel witness strengthens (t391). Reuse the t408
+machinery: pure ui/<screen>law module + hit-map precedence + the marker-driven
+static reader + the t408-style witness script (sleep-before-grep, sleep-1.2-
+before-shot, probe.log NEVER inside app.log). PRE-FLIGHT: none owed (t407
+F13 closed this session; both mutation campaigns proven). D13 queue rows
+t410..t413 stand as written. OQ-027 still closes only on the user's final
+audio verdict.
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
@@ -258,6 +264,47 @@ verbatim in docs/re/_wip_t403.md F7+ and disposition the named screen item;
 if a ruling reopens a screen, author ONE queue row citing the ruling phrase
 (no fix-by-eye). NOTE: the 11:37 D11 ruling PREDATES the t401/t402 landings —
 it grades neither; do not treat it as their disposition.
+
+t408 LANDED 2026-11-16 (RESEARCH SCREEN STATE 20 + SET-STUDY LAW; law + full
+working log docs/re/_wip_t408.md F0-F11; module docs in ui/researchview.h).
+PRE-FLIGHT CLOSED first: t407 mutation re-run — TWO bugs (the named cwd bug
+AND the real vacuity: run() grepped 'fleetlist.*FAIL' but harness.h:52 prints
+'FAIL <file>' FIRST, so it could never match) — fixed to an exit-code verdict
+with the 'fleetlist' filter; M1 CAUGHT with named FAILs :224-226, M2-M6
+CAUGHT rc=1, fails=0: t407 pins PROVEN (fleet-screen.md F13 rewritten).
+t408 CORE: (1) STATE 20 CENSUS [verified windows.txt]: TYPE-100 binds
+20RES.SHP; RESWIN 7,46-476,472 + EXACTLY four pan children (RESROTLEFT
+524,442-539,472 msg50 / RESROTRIGHT 540,442-554,472 msg51 / RESMOVEUP
+563,442-593,457 msg52 / RESMOVEDOWN 563,458-593,472 msg53) => the RIGHT INFO
+PANEL (x484..632, vision-measured) IS CODE-DRAWN, not a window. (2) CLICK LAW
+= help reswin verbatim ln1668-1690 ("empty disks ... click on an empty disk to
+make it your current topic") + the t268 live dossier (empty-disk click SETS,
+confined 900px, no popup; discovered-disk = readout only): setStudy() Available
+-> queue, Owned/Blocked SILENT. (3) PANEL TEXT = static.txt reswin.cpp pool
+marker-driven: #122 "Current Project:" #123 "(No Progress)" #124 "(%d day%s)"
+#125 "Allows" #130 "%s Knowledge %s" (second %s never rendered in ANY capture
+= seam; t268 no-project panel BLANK -> #123 pinned as data only). (4) ALLOWS
+= the banked 3/3 reverse join (gizmos+planitems tech field == row, table
+order; Gizmo.resReq/PlanetItem.reqByte). (5) LAYOUT = derived depth x row
+(restree carries NO coordinates; vendor organic positions = NAMED SEAM S1,
+closer = pointer-law capture of the node table); pan = 4 buttons, rotate
+pair X / move pair Y. (6) Campaign additions ALL display-only zero-rng:
+researchTree()/techProgressFor/techRateFor + techRate_ write beside
+techProgress, gizmoAt/gizmoCount. PINS test_researchview_t408.cpp x8
+(includes the queue row's named closer: setStudy -> resolves at turn end on
+the seeded campaign), suite 368->376/0. MUTATION scripts/t408_mutate.py 9/9
+CAUGHT (M1 owned-accept, M2 blocked-accept, M3 header, M4 plural, M5 floor,
+M6 allows-order, M7 MoveUp extent = the verbatim 554->563 gap, M8 precedence,
+M9 Study-merge). WITNESS scripts/t408_research_witness.sh VERDICT PASS +
+NATIVE VISION GRADE (gold-rim study ring, filled discovered discs, panel
+"Current Project: / Spacetime Surfing / (0 days) / Allows / Star Lane Drive";
+shots work/r1/loop/t408-{research-open,research-study,research-pan}.png).
+WITNESS PITFALLS banked: grep-race sleep 0.4; SHOT-race (md5-identical at
++0.1 s) sleep 1.2; NEVER echo into app.log (the app's stdout offset
+overwrites appended bytes — use probe.log). SEED REGRESSION seeds 1/2024/23
+md5 7e794a6d/332a8cf3/0a6b7876 == record EXACTLY. LEDGER: closes NOTHING
+(strict-close honest negative — no OQ row owns the D13 research chrome;
+OQ-016/019/027 untouched). Gate 0; ledger audit OK.
 
 t406 LANDED 2026-11-16 (PLANETS OWNED-ONLY + PLANET VIEW STATE 17 + PROJECT
 SET; law + full working log docs/re/_wip_t406.md F0-F9). THE OWNER'S TWO
@@ -1038,11 +1085,9 @@ right-click deselect (selfplay.md) lands here; chrome: t391 proved NO
 a named seam; the LIST renders real campaign ships.
 
 t408 RESEARCH SCREEN (user: "research is empty"; I WITNESSED: dead).
-Build per banked RE: tech tree from the .bin tables, per-race start
-techs, costs, current project + progress, click-to-SET research (user:
-"can't select a technology"). Engine law pinned (t203/t284 era); this
-row is the WINDOW. Pins: set-research mutates campaign + resolves at
-turn end (headless assertion); owned/available partition.
+LANDED t408 — see the LANDED block; law docs/re/_wip_t408.md. [original
+brief:] Build per banked RE: tech tree, current project + progress,
+click-to-SET research; pins incl. set-research resolves at turn end.
 
 t409 SPECIAL ABILITY + SPECIES SCREEN (user: "special ability button
 doesn't even do anything" + "species screen quite off"). Census

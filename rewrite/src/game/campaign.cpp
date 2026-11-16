@@ -221,6 +221,7 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     ind_.assign(owners, 0.0);  // IND accumulates as a stockpile (§3)
     queuedTech.assign(owners, -1);
     techProgress.assign(owners, 0.0);
+    techRate_.assign(owners, 0.0);  // t408 ETA denominator (display-only)
     dipState_.assign(cfg_.aiCount, DipPolicyState{});
     // Relationship starts at the race's own START_ATTITUDE [verified field,
     // docs/re/diplomacy.md §1; start-at-zero is a campaign-level choice that
@@ -1475,6 +1476,7 @@ void Campaign::researchPhase() {
         }
         const Tech& tq = tree_->all()[queuedTech[o]];
         techProgress[o] += res[o];  // all stockpiled RES goes into research
+        techRate_[o] = res[o];      // t408 display-only ETA denominator
         res[o] = 0;
         if (techProgress[o] >= tq.runtimeCost()) {
             ownedTech[o][queuedTech[o]] = true;

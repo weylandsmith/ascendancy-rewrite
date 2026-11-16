@@ -293,6 +293,17 @@ public:
     int planItemCount() const {
         return items_ ? static_cast<int>(items_->size()) : 0;
     }
+    // t408: read-only gizmo-table accessors for the RESEARCH ALLOWS join
+    // (ui/researchview.h allowsList; Gizmo.resReq IS the restree tech field,
+    // economy.h). Null out of domain; never mutates. Same posture as
+    // planetItem() above.
+    const Gizmo* gizmoAt(int idx) const {
+        return (gizmos_ && idx >= 0 && idx < int(gizmos_->size()))
+                   ? &(*gizmos_)[idx] : nullptr;
+    }
+    int gizmoCount() const {
+        return gizmos_ ? static_cast<int>(gizmos_->size()) : 0;
+    }
     // t406: the player's owned-tech vector for the PROJECT LIST membership
     // law (ui/planetview.h; requiresAvailable gate, income-law.md S4).
     const std::vector<bool>& playerTechs() const { return ownedTech[kPlayer]; }
@@ -470,9 +481,19 @@ public:
     // t203 pin surface: total table rows, queued-target readback, single-row
     // owned readback (mirror of ownedTech / queuedTech; docs/re/_wip_t203.md).
     int techCountTotal() const { return static_cast<int>(tree_->all().size()); }
+    // t408: read-only tree pointer for the RESEARCH VIEW module
+    // (ui/researchview.h partition/layout laws). Never mutates.
+    const ResearchTree* researchTree() const { return tree_; }
     bool isTechQueuedFor(int owner, int row) const { return queuedTech[owner] == row; }
     bool techRowOwnedFor(int owner, int row) const { return ownedTech[owner][row]; }
     void setQueuedTechFor(int owner, int row) { queuedTech[owner] = row; }
+    // t408 RESEARCH VIEW read surface (ui/researchview.h): the current topic's
+    // accumulated progress, and the rate the LAST researchPhase actually
+    // contributed (techRate_ records the stockpile applied before res[o] was
+    // zeroed, campaign.cpp researchPhase). Pure reads; zero rng consumption
+    // (seed regression must not move).
+    double techProgressFor(int owner) const { return techProgress[owner]; }
+    double techRateFor(int owner) const { return techRate_[owner]; }
     // TWO-LAYER CLAMPED ABSORB SPLIT [verified 0x4b7c4..0x4b7d1 + apply
     // 0x4b87a..0x4b890, S2h-audited]: the shield layer absorbs
     // min(volley, charges) and ONLY the remainder spills to the hull layer.
@@ -725,6 +746,9 @@ private:
     std::vector<double> ind_;                  // per-turn industry budget (buildPhase)
     std::vector<int> queuedTech;               // per owner, Tech id or -1
     std::vector<double> techProgress;          // per owner
+    // t408: the stockpile the LAST researchPhase contributed per owner (the
+    // ETA denominator; written next to techProgress, never read by the sim).
+    std::vector<double> techRate_;
     std::vector<ShipInTransit> fleet_;
     // t365 ENGINE FLIP: the per-ship engine (combatPhase owns its boundary
     // steps; docs/re/campaign_fleet_bridge doc header). Lazily constructed;
