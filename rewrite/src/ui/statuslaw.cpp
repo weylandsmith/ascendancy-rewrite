@@ -13,6 +13,7 @@ bool screenKnown(int screen) {
         case kScreenIntel:
         case kScreenFleet:
         case kScreenResearch:
+        case kScreenPlanet:   // t406 PLANETALLOC (opener = status row click)
             return true;
         default:
             return false;  // 13 NEGSCREEN, 17 PLANETALLOC, ...: no chrome yet
@@ -101,6 +102,10 @@ const char* screenShapeLib(int screen) {
     switch (screen) {
         case kScreenMap:      return "1starmap.shp";
         case kScreenStatus:   return "10status.shp";
+        case kScreenPlanet:   return "17np.shp";  // t406: STATE-id prefix +
+                                   // k0 639x479 decoded, panel borders land
+                                   // on the windows.txt panel rects
+                                   // (_wip_t406.md F6) [inferred binding]
         case kScreenIntel:    return "14intel.shp";
         case kScreenResearch: return "20res.shp";
         default:              return nullptr;  // species menu, FLEETWND:

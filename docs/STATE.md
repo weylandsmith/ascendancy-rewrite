@@ -230,17 +230,16 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t406 per queue row t406 below (phase 14: PLANETS OWNED-ONLY FILTER +
-PLANET VIEW state 17 + project-set) — with the t405 AFTERCARE note folded
-in (row-frame clips the art "name" header cell; grade rows against the t3
-capture). Ordering rationale: t405 landed the navigation/hit-map law every
-later screen row is walked THROUGH (screens swap, rail map-only, Esc back,
-status hit-map unified at MEASURED art rects); t406 is the owner's
-loudest remaining planets complaint ("displays planets I don't own",
-"can't set a project") and owns the row-assembly seam t405 banked. Do NOT
-re-litigate rail liveness — refuted with three evidence lines in
-docs/re/_wip_t405.md F3; re-trying "rail live in sub-screens" is a dead
-route (add to REFUTED-ROUTES if temptation recurs).
+NEXT t407 per queue row t407 below (phase 14: SHIPS SCREEN — "ships screen
+is EMPTY"). Ordering rationale: t406 landed the planets->planet-view->
+project-set chain (owned-only list, state 17 opens, orders mutate the
+queue — witness PASS), so the rail's next dead button is FLEET; the ships
+row reuses the t402 row-assembly + t405 hit-map machinery verbatim and the
+per-ship data law is already banked (shipsave/shipsim). t410 (system view)
+may consume the t406 planet-view open path — keep its escape-chain note
+(F8e) in view there. Do NOT re-litigate rail liveness (REFUTED,
+_wip_t405.md F3) and do NOT re-census the queue writer (t341/t342 CLOSED —
+t406 reused it as banked law).
 The WAIT-USER-RULING t374 sentinel is RETIRED (tag itself never
 renumbered; history below). D13 queue rows t407..t413 stand as written.
 OQ-027 still closes only on the user's final audio verdict.
@@ -259,6 +258,46 @@ verbatim in docs/re/_wip_t403.md F7+ and disposition the named screen item;
 if a ruling reopens a screen, author ONE queue row citing the ruling phrase
 (no fix-by-eye). NOTE: the 11:37 D11 ruling PREDATES the t401/t402 landings —
 it grades neither; do not treat it as their disposition.
+
+t406 LANDED 2026-11-16 (PLANETS OWNED-ONLY + PLANET VIEW STATE 17 + PROJECT
+SET; law + full working log docs/re/_wip_t406.md F0-F9). THE OWNER'S TWO
+PLANETS COMPLAINTS ARE CLOSED AT THE MECHANISM LEVEL. (1) MEMBERSHIP:
+statusPlanets/statusHeaderFor emitted ONE ROW PER STAR-RECORD NAME (Amoroso
+II..N have no pop/items/queue — fabricated worlds = "displays planets I
+don't own"); now ONE COLONISED PLANET per owned star, the port's per-star
+PlanetState being the ownership unit (vendor basis t248 PROOF 1/2: owner byte
+set == colonised, header counts NAMED+owner). Repro shot
+/tmp/t406_repro/status-open.png showed 2 rows for a 1-colony campaign; the
+after-shot shows exactly 1 ("Amoroso I (Small Husk Planet)"). (2) THE PLANET
+VIEW EXISTS: row click -> state 17 (planet.txt info05 "click on either the
+planet or the star to go directly to them"); NEW pure ui/planetview.{h,cpp}
+(readout = shared statusLine1 assembly + pop/used/cap + the t276 gauge
+selectors + project/days + the 0x508da noFreePopulation predicate); 17np.shp
+k0 DECODED and joins the chrome libs (five panel borders land on the
+windows.txt TYPE-29 rects — binding [inferred], rects cited). (3) PROJECT
+SET: PLBUILD click opens the PLANLIST (planet.txt info04), list = REQUIRES-
+gated table order with item<39 (0x388ec), and Campaign::orderProject applies
+fn 0x38840 cmd0 gates verbatim (queue-empty 0x388e2, item<39 0x388ec,
+freePop>=UPOP 0x388f7..0x38922); a gate failure stores NOTHING (silent
+reject = vendor shape, SOUNDCHANNEL 0 on every PLANETALLOC child); the acc
+word is untouched (resets live at completion 0x39290) and the cell stays the
+cited t43 completion picker. [honest negative] the 0x3892a 4th leg
+(ds:0x73e3c vs [rec+0x18]) is UNRESOLVED and unexercised (no cell passed) —
+recorded, not modelled. AFTERCARE FIXED BY MEASUREMENT: kStatusRowsTop
+46->117 (t3 capture table top border native 116.8; art header cells y 48..85
+numpy) so the "name"/"size and type" cells are fully visible; marker/sphere/
+text moved into the art's columns (62 / icon cell 136..167 / x 200). PINS
+test_planetview_t406.cpp x4, suite 356->360/0 (t402 membership + t388
+no-clamp pins re-scoped with regression fences, not deleted). WITNESS
+scripts/t406_planetview_witness.sh VERDICT PASS (open view / list open /
+"Amoroso I Factory (ordered)"). NAMED SEAMS left open (F8a-e): 17np's flat
+green field (palette/key class), PLANLIST over the readout (PORT placement;
+PLSQUARE surface grid unimplemented), decorative 34px art grid showing
+through (vendor does the same), no surface/orbital grid, Esc from 17 ->
+MAP per escapeToMap (vendor returns to the opener [unmeasured] — t410 pins
+the chain depth). LEDGER: closes NOTHING (strict-close honest negative — no
+OQ row owns D13 chrome/function rows; OQ-016/019/027 untouched). Gate 0;
+ledger audit OK.
 
 t405 LANDED 2026-11-16 (SUB-SCREEN NAVIGATION + RAIL STATEMENT; law +
 full working log docs/re/_wip_t405.md F1-F10). PREMISE REFUTED with three

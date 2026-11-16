@@ -1404,6 +1404,24 @@ void Campaign::buildPhase() {
     }
 }
 
+bool Campaign::orderProject(int star, int item) {
+    // t406 PROJECT SET — fn 0x38840 cmd0 gates, verbatim order (see header;
+    // citations docs/re/_wip_t406.md F3). Silent reject = the vendor shape
+    // (recalc + return; SOUNDCHANNEL 0 on every PLANETALLOC child).
+    if (star < 0 || star >= int(planets_.size())) return false;
+    if (item < 0 || item >= 39) return false;                       // 0x388ec
+    PlanetState& ps = planets_[star];
+    if (ps.pendingItem >= 0) return false;                          // 0x388e2
+    const PlanetItem* pi = planetItem(item);
+    if (!pi) return false;
+    const int freePop = static_cast<int>(ps.pop) - usedPopFor(star); // 0x388f7
+    if (freePop < pi->upop) return false;                           // 0x38922
+    // 0x38b26: +0x54 := item. The +0x52 cell word is the completion
+    // picker's domain (t43); the acc word is untouched (resets 0x39290).
+    ps.pendingItem = item;
+    return true;
+}
+
 void Campaign::researchPhase() {
     for (size_t o = 0; o < ownedTech.size(); ++o) {
         // OQ-013 CLOSED (research.md §7): the original loads only the 66

@@ -33,11 +33,14 @@ TEST(statuslaw_switch_no_clamp) {
     CHECK(au::screenAfterRailPress(au::kScreenStatus, 7, 0) == au::kScreenStatus);
     CHECK(au::screenAfterRailPress(au::kScreenStatus, 8, 0) == au::kScreenStatus);
     // Unknown target ids are inert — never clamped into the known set.
-    // 13 = NEGSCREEN (RACE rows' target), 17 = PLANETALLOC, 99 = nothing.
+    // 13 = NEGSCREEN (RACE rows' target), 99 = nothing. t406: 17
+    // PLANETALLOC JOINED the known set (it now has chrome); the no-clamp
+    // property is pinned on the ids that remain unknown. NOTE no windows.txt
+    // rail button carries SENDPARAM1 17 (t405 F1 census) — the planet view
+    // opens via the status-row click, never via a rail press.
     CHECK(au::screenAfterRailPress(au::kScreenMap, 1, 13) == au::kScreenMap);
-    CHECK(au::screenAfterRailPress(au::kScreenMap, 1, 17) == au::kScreenMap);
     CHECK(au::screenAfterRailPress(au::kScreenMap, 1, 99) == au::kScreenMap);
-    CHECK(!au::screenKnown(13) && !au::screenKnown(17) && au::screenKnown(10));
+    CHECK(!au::screenKnown(13) && au::screenKnown(17) && au::screenKnown(10));
     // msg 0 (window bookkeeping) never switches either.
     CHECK(au::screenAfterRailPress(au::kScreenFleet, 0, 10) == au::kScreenFleet);
 }

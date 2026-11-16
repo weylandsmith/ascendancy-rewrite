@@ -22,6 +22,7 @@
 #include "ui/statuslaw.h"
 #include "ui/planetwin.h"
 #include "ui/statuslist.h"
+#include "ui/planetview.h"
 #include "ui/ui_internal.h"
 
 namespace ascend::ui {
@@ -119,6 +120,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // have yet: the selection marker is shown and the seam printed).
     int statusScroll = 0;
     int statusSel = -1;
+    // t406 PLANET VIEW (state 17) session state: the planet the list opened
+    // (star + display name) and whether the PLBUILD->PLANLIST project list
+    // is open (planet.txt info04: clicking the Project Display shows the
+    // list; an order closes it).
+    int planetStar = -1;
+    std::string planetName;
+    bool projectOpen = false;
     int played = 0;
     Uint32 nextAuto = autoplay ? SDL_GetTicks() + 250 : 0xFFFFFFFFu;
     bool quit = false;
@@ -133,10 +141,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // (55 records = 11 groups x 5-size ladder 11/18/25/35/47, shp.md S23.3
     // — the group/size axes match the status row's type/size words; the
     // group law itself is a NAMED SEAM, see the row painter).
-    const char* kLibFiles[5] = {"1starmap.shp", "10status.shp", "14intel.shp",
-                                "20res.shp", "planets.shp"};
-    ascend::formats::ShapeLibrary kLibs[5];
-    for (int i = 0; i < 5; i++) {
+    // t406: 17np.shp joins the set — the PLANETALLOC backdrop candidate
+    // (k0 639x479, decoded this session, docs/re/_wip_t406.md F6).
+    const char* kLibFiles[6] = {"1starmap.shp", "10status.shp", "14intel.shp",
+                                "20res.shp", "planets.shp", "17np.shp"};
+    ascend::formats::ShapeLibrary kLibs[6];
+    for (int i = 0; i < 6; i++) {
         std::string lerr;
         if (!kLibs[i].load(dataRoot + "/extracted/ascend01/data/" + kLibFiles[i],
                            &lerr))
@@ -179,7 +189,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     auto libFor = [&](int s) -> int {
         const char* want = screenShapeLib(s);
         if (!want) return -1;
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 6; i++)
             if (std::string(kLibFiles[i]) == want) return i;
         return -1;
     };
@@ -301,9 +311,21 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         const auto win = statusWindow(all, statusScroll);
                         if (h.row < int(win.size())) {
                             statusSel = statusScroll + h.row;
-                            const auto& s = camp.galaxy().stars[win[h.row].star];
-                            std::printf("ui status select %s (planet detail = "
-                                        "state-17 seam)\n", s.name.c_str());
+                            // t406: the row click OPENS the planet view
+                            // (state 17) — planet.txt info05: from the
+                            // Planets screen "click on either the planet or
+                            // the star to go directly to them". (The old
+                            // line printed a state-17 seam instead.)
+                            const auto& key = win[h.row];
+                            const auto& s = camp.galaxy().stars[key.star];
+                            planetStar = key.star;
+                            planetName = key.planetIndex < int(s.planets.size())
+                                             ? s.planets[key.planetIndex].name
+                                             : s.name;
+                            projectOpen = false;
+                            screen = kScreenPlanet;
+                            std::printf("ui status select %s -> planet view "
+                                        "(state 17)\n", planetName.c_str());
                         }
                     }
                 } else if (screen == kScreenStatus) {
@@ -311,6 +333,33 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // table, scroll column) are SILENT and inert — the
                     // D13 fall-through (rail-position clicks scrolling the
                     // list) is closed by the hit-map, not by a sound.
+                } else if (screen == kScreenPlanet && projectOpen &&
+                           projectRowFor(p, 0)) {
+                    // t406 PROJECT SET leg 2: pick from the PLANLIST. The
+                    // order law (fn 0x38840 cmd0 gates) lives in
+                    // Campaign::orderProject / ui/planetview.h; a gate
+                    // failure is a SILENT reject (vendor shape, SOUNDCHANNEL
+                    // 0 on every PLANETALLOC child).
+                    const int item = *projectRowFor(p, 0);
+                    const auto opts = projectOptionsFor(camp, planetStar);
+                    if (item >= 0 && item < int(opts.size())) {
+                        const bool ok =
+                            camp.orderProject(planetStar, opts[item].item);
+                        std::printf("ui planet project %s %s (%s)\n",
+                                    planetName.c_str(), opts[item].name.c_str(),
+                                    ok ? "ordered" : "rejected");
+                        std::fflush(stdout);
+                        if (ok) projectOpen = false;
+                    }
+                } else if (screen == kScreenPlanet &&
+                           inRect(kPlanetPanels[4].rect, p)) {
+                    // PLBUILD "Project Display" click opens the project list
+                    // (planet.txt info04). Sound: click08 per the sfxForPress
+                    // button law (PORT: the vendor panel's SOUNDCHANNEL is 0;
+                    // the owner's t404 pin covers rail/next-turn/title only).
+                    projectOpen = !projectOpen;
+                    std::printf("ui planet project-list %s\n",
+                                projectOpen ? "open" : "closed");
                 } else if (screen == kScreenMap && inRect(kNextTurnBtn, p)) {
                     // NEXTTURN's STATE is "1 1" (map-only) — same gate.
                     std::printf("ui click next-turn\n");
@@ -681,6 +730,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                     interior = Rect{7, 46, 632, 472}; break;
                 case kScreenResearch: hdr = Rect{kResWin.x0, kResWin.y0, kResWin.x1, kResWin.y1};
                                       interior = kResWin; break;
+                case kScreenPlanet:   hdr = Rect{};  // 17np k0 backdrop IS
+                                       interior = kPlanetAllocRect; break;  // the frame
                 case kScreenSpecies: hdr = Rect{};  // NO cited header: the
                                      interior = Rect{}; break;          // menu
                                                                         // is rows
@@ -700,7 +751,9 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     txt.draw(ren, hs.x + 8, hs.y + 6, screenTitle(screen), true,
                              kText);
             }
-            if (screen != kScreenSpecies) {
+            if (screen != kScreenSpecies && screen != kScreenPlanet) {
+                // t406: the planet screen's frame IS the 17np k0 backdrop
+                // (outer frame measured on the decode) — no vector overlay.
                 SDL_Rect is{interior.x0, interior.y0,
                             interior.x1 - interior.x0 + 1, interior.y1 - interior.y0 + 1};
                 SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
@@ -770,7 +823,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // selection marker: green bar left edge (witness: a
                     // ~15px marker at x 16..; PORT rect law, colour CVD-safe)
                     if (statusScroll + int(i) == statusSel) {
-                        SDL_Rect mk{16, y + 24, 10, 15};
+                        // t406 MEASURED: the t3 capture's selection marker
+                        // runs native x 64..69 (was 16 — inside the art's
+                        // "name" cell).
+                        SDL_Rect mk{62, y + 24, 10, 15};
                         SDL_SetRenderDrawColor(ren, 0, 200, 80, 255);
                         SDL_RenderFillRect(ren, &mk);
                     }
@@ -780,7 +836,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // x>=619 is the SCROLLBAR COLUMN painted in the backdrop
                     // (arrow boxes + trough), which the old 632-wide fill
                     // covered up.
-                    SDL_Rect rf{32, y, 618 - 32, kStatusRowPitch - 8};
+                    SDL_Rect rf{60, y, 618 - 60, kStatusRowPitch - 8};
                     SDL_SetRenderDrawColor(ren, 40, 40, 56, 255);
                     SDL_RenderFillRect(ren, &rf);
                     SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);
@@ -796,7 +852,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         sizeIdx >= 0) {
                         const int rec = typeIdx * 5 + sizeIdx;
                         const auto& r = kLibs[planetLibIdx].record(rec);
-                        blitShape(ren, kLibs[planetLibIdx], rec, 44,
+                        // t406 MEASURED: the art's planet-ICON CELL is x
+                        // 136..167 (10status k0 header cells, F4); centring
+                        // the sphere there replaces the old x 44 (which
+                        // painted over the "name" cell).
+                        blitShape(ren, kLibs[planetLibIdx], rec,
+                                  136 + (167 - 136 - int(r.width)) / 2,
                                   y + (kStatusRowPitch - 8 - int(r.height)) / 2);
                     }
                     // line 1 + line 2 (the cited assembly)
@@ -822,7 +883,11 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     } else {
                         l2 = "Building ???";  // refuse-not-crash
                     }
-                    const int tx = 100;
+                    // t406 MEASURED: the art's "size and type" column
+                    // starts x 168 (numpy on the header cells); the t3
+                    // capture's row text runs start native ~206+. PORT:
+                    // text column at 200, inside the art's third cell.
+                    const int tx = 200;
                     txt.draw(ren, tx, y + 14, l1, true, kText);
                     txt.draw(ren, tx, y + 40, l2, false, kDim);
                     // pop band strip (cited popBandsFor; 17np k1/k2/k3 art
@@ -835,7 +900,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                               : bands[b] == 2
                                               ? SDL_Color{200, 180, 60, 255}
                                               : SDL_Color{60, 120, 90, 255};
-                        SDL_Rect px{300 + b * 5, y + 66, 4, 4};
+                        SDL_Rect px{380 + b * 5, y + 66, 4, 4};
                         SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
                         SDL_RenderFillRect(ren, &px);
                     }
@@ -851,6 +916,77 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 if (win.empty())
                     txt.draw(ren, interior.x0 + 8, interior.y0 + 8,
                              "No planets owned", false, kDim);
+            } else if (screen == kScreenPlanet) {
+                // ---- t406 PLANET VIEW (state 17 PLANETALLOC) -------------
+                // Composition cited windows.txt ln1486..1604 via planetwin.h;
+                // readout law ui/planetview.h. The five TYPE-29 panels are
+                // the windows.txt rects; PLBUILD is the PROJECT slot whose
+                // click opens the PLANLIST (planet.txt info04).
+                const auto pv = planetViewFor(camp, planetStar, planetName);
+                for (int pi = 0; pi < kPlanetPanelCount; pi++) {
+                    const auto& pan = kPlanetPanels[pi];
+                    SDL_Rect pr{pan.rect.x0, pan.rect.y0,
+                                pan.rect.x1 - pan.rect.x0 + 1,
+                                pan.rect.y1 - pan.rect.y0 + 1};
+                    SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);
+                    SDL_RenderDrawRect(ren, &pr);
+                }
+                txt.draw(ren, 12, 118, pv.title, true, kText);
+                char pbuf[160];
+                std::snprintf(pbuf, sizeof(pbuf), "Population %d / %d  (working %d)",
+                              pv.pop, pv.cap, pv.used);
+                txt.draw(ren, 12, 142, pbuf, false, kText);
+                std::snprintf(pbuf, sizeof(pbuf), "RES %d   IND %d   PROS %d",
+                              pv.res, pv.ind, pv.pros);
+                txt.draw(ren, 12, 162, pbuf, false, kDim);
+                // The PROJECT slot (PLBUILD panel, 463,8-632,106): current
+                // project or "No Project" + the open-list affordance.
+                {
+                    const Rect& pb = kPlanetPanels[4].rect;  // PLBUILD
+                    std::string pl;
+                    if (pv.noProject)
+                        pl = statusLine2NoProject(pv.noFreePopulation);
+                    else if (const auto* it = camp.planetItem(pv.pendingItem)) {
+                        pl = "Project: ";
+                        pl += it->name;
+                        if (pv.days < 0) pl += " - No Progress";
+                        else { char db[64];
+                            std::snprintf(db, sizeof(db), " - %d day%s until completion",
+                                          pv.days, pv.days == 1 ? "" : "s");
+                            pl += db; }
+                    } else pl = "Project: ???";
+                    txt.draw(ren, pb.x0 + 6, pb.y0 + 8, pl, false, kText);
+                    txt.draw(ren, pb.x0 + 6, pb.y1 - 14,
+                             projectOpen ? "list open: pick one" : "click: set project",
+                             false, kDim);
+                }
+                if (projectOpen) {
+                    // PLANLIST (120,120-520,420) over the field: the
+                    // REQUIRES-gated options in table order.
+                    const auto& lr = kProjectListRect;
+                    SDL_Rect lb{lr.x0, lr.y0, lr.x1 - lr.x0 + 1,
+                                lr.y1 - lr.y0 + 1};
+                    SDL_SetRenderDrawColor(ren, 8, 12, 20, 235);
+                    SDL_RenderFillRect(ren, &lb);
+                    SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
+                    SDL_RenderDrawRect(ren, &lb);
+                    const auto opts = projectOptionsFor(camp, planetStar);
+                    for (size_t oi = 0; oi < opts.size() &&
+                                      int(oi) < kProjectVisibleRows; oi++) {
+                        const int ry = lr.y0 + 2 + int(oi) * kProjectRowPitch;
+                        const bool ok = projectOrderable(camp, planetStar,
+                                                         opts[oi].item);
+                        char ob[128];
+                        std::snprintf(ob, sizeof(ob), "%-24s cost %3d%s",
+                                      opts[oi].name.c_str(), opts[oi].cost,
+                                      ok ? "" : "  (no free population)");
+                        txt.draw(ren, lr.x0 + 8, ry + 4, ob, false,
+                                 ok ? kText : kDim);
+                    }
+                    if (opts.empty())
+                        txt.draw(ren, lr.x0 + 8, lr.y0 + 6,
+                                 "No projects available", false, kDim);
+                }
             } else {
                 txt.draw(ren, interior.x0 + 8, interior.y0 + 8,
                          "frame + title only: content law seam", false, kDim);

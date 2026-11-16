@@ -130,10 +130,15 @@ std::vector<StatusRowKey> statusWindow(const std::vector<StatusRowKey>& all,
 inline constexpr int kStatusVisibleRows = 3;   // measured (three markers)
 inline constexpr int kStatusRowPitch = 112;    // measured 112.6 +- 0.2
 inline constexpr Rect kStatusInterior{7, 46, 632, 457};  // frame fill lines
-// Row 0 top: the port anchors at the interior top (the vendor header text
-// sits inside its own interior; the port's header strip is the STATUSWND
-// band above). Documented port layout.
-inline constexpr int kStatusRowsTop = 46;
+// Row 0 top — t406 MEASURED FIX (the t405 aftercare): the backdrop's column
+// header cells ("name" x 7..135, icon cell 136..167, "size and type" from
+// 168; numpy on 10status k0, docs/re/_wip_t406.md F4/F7) occupy y 48..85,
+// and the t3 capture's table TOP BORDER is native y 116.8 (HLINE cap y 146
+// /1.25; bottom border 457.6). Rows therefore start at 117, BELOW the header
+// cells; the old 46 painted row 0's dark frame OVER the art "name" cell
+// (rendered "na"). 3 x 112 = 336 <= 457-117+1 = 341 < 4 x 112 — still
+// exactly three visible rows.
+inline constexpr int kStatusRowsTop = 117;
 // Scroll arrows — t405 RECTS MEASURED on the vendor backdrop itself
 // (10status.shp k0, decoded via tools/shp_pngdump this session;
 // docs/re/_wip_t405.md F8): the arrow BOXES are painted in the art at

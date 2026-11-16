@@ -187,23 +187,43 @@ TEST(statuslist_membership_and_window_t402) {
     for (const auto& s : c.galaxy().stars)
         if (c.starOwner(s.id) == ag::kPlayer)
             expect += static_cast<int>(s.planets.size());
-    CHECK(int(all.size()) == expect);
-    CHECK(expect > au::kStatusVisibleRows);  // the window is load-bearing
+    // t406 MEMBERSHIP UPGRADE: the vendor list holds COLONISED planets only
+    // (owner byte NAME+0x33 set, t248 PROOF 1/2; the header count PROOF 2
+    // counts NAMED planets with owner==race0). The port models ONE planet
+    // state per owned star, so the list is one row per owned star — the old
+    // per-star-record-NAME loop fabricated rows for uninhabited worlds
+    // (D13 "displays planets I don't own").
+    int colonised = 0;
+    for (const auto& s : c.galaxy().stars)
+        if (c.starOwner(s.id) == ag::kPlayer && !s.planets.empty())
+            ++colonised;
+    CHECK(int(all.size()) == colonised);
+    CHECK(all.size() == c.starsOwned(ag::kPlayer));
+    CHECK(int(expect) > colonised);  // the old shape emitted MORE rows (regression fence)
+    CHECK(colonised > 0);
     // Order: (star, index) ascending.
     for (size_t i = 1; i < all.size(); i++)
         CHECK(all[i - 1].star < all[i].star ||
               (all[i - 1].star == all[i].star &&
                all[i - 1].planetIndex <= all[i].planetIndex));
-    // Window: always 3 rows inside the range; clamps at both ends; the LAST
-    // window ends with the last planet (no gap, no repeat).
-    CHECK(au::statusWindow(all, 0).size() == size_t(au::kStatusVisibleRows));
-    CHECK(au::statusWindow(all, -5).size() == size_t(au::kStatusVisibleRows));
-    const int maxS = expect - au::kStatusVisibleRows;
-    CHECK(au::statusWindow(all, maxS + 99).size() ==
+    // Window law (pitch-independent): always 3 rows inside the range;
+    // clamps at both ends; the LAST window ends with the last planet. t406:
+    // run over a SYNTHETIC five-row list — the seeded campaign legitimately
+    // holds ONE colonised planet (one owned star), so the campaign list can
+    // no longer exercise the multi-row window.
+    std::vector<au::StatusRowKey> five{{10, 0}, {11, 0}, {12, 0}, {13, 0},
+                                       {14, 0}};
+    CHECK(au::statusWindow(five, 0).size() == size_t(au::kStatusVisibleRows));
+    CHECK(au::statusWindow(five, -5).size() == size_t(au::kStatusVisibleRows));
+    const int maxS = 5 - au::kStatusVisibleRows;
+    CHECK(au::statusWindow(five, maxS + 99).size() ==
           size_t(au::kStatusVisibleRows));
-    CHECK(au::statusWindow(all, 0)[0].star == all[0].star);
-    CHECK(au::statusWindow(all, maxS)[2].star == all.back().star);
-    CHECK(au::statusWindow(all, maxS)[2].planetIndex == all.back().planetIndex);
+    CHECK(au::statusWindow(five, 0)[0].star == five[0].star);
+    CHECK(au::statusWindow(five, maxS)[2].star == five.back().star);
+    CHECK(au::statusWindow(five, maxS)[2].planetIndex ==
+          five.back().planetIndex);
+    // The campaign list itself: one row per owned star, never more.
+    CHECK(all.size() <= c.starsOwned(ag::kPlayer));
     // Small list (< 3): window == list.
     std::vector<au::StatusRowKey> two{{3, 0}, {3, 1}};
     CHECK(au::statusWindow(two, 0).size() == 2);
@@ -220,11 +240,14 @@ TEST(statuslist_header_counts_t402) {
     if (!copt) return;
     ag::Campaign& c = *copt;
     const auto h = au::statusHeaderFor(c, ag::kPlayer);
+    // t406: the header PLANETS number counts COLONISED planets (one per
+    // owned star in the port's model — same law as statusPlanets; the old
+    // per-name sum was the header form of the D13 defect).
     int planets = 0, systems = 0;
     for (const auto& s : c.galaxy().stars)
         if (c.starOwner(s.id) == ag::kPlayer) {
             ++systems;
-            planets += static_cast<int>(s.planets.size());
+            if (!s.planets.empty()) ++planets;
         }
     CHECK(h.planets == planets);
     CHECK(h.systems == systems);

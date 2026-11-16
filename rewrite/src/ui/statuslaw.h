@@ -49,6 +49,10 @@ enum Screen : int {
     kScreenIntel = 14,       // INTELSCREEN 7,7-632,34 header + INTELLIST 7,46-632,472
     kScreenFleet = 18,       // FLEETWND 7,7-632,472
     kScreenResearch = 20,    // RESWIN 7,46-476,472
+    // t406: PLANETALLOC 0,0-639,479 (windows.txt ln1486). NO rail button
+    // targets it (STATE census t405 F1) — the openers are list/system clicks
+    // (planet.txt info00/info05): the STATUS LIST row click lands here.
+    kScreenPlanet = 17,
 };
 
 // True iff the port renders chrome for `screen` (the known set). Presses

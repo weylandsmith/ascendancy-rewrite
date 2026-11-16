@@ -81,15 +81,22 @@ int statusDays(int cost, int acc, int ind) {
 std::vector<StatusRowKey> statusPlanets(const ascend::game::Campaign& camp,
                                         int owner) {
     // t249 MEMBERSHIP LAW: exactly the planets whose owner == the player
-    // race. The rewrite models one planet per star (campaign.h planets_ per
-    // star); ownership is star-level (starOwner), so a player star
-    // contributes its planets[] names exactly like the vendor list.
+    // race (vendor owner byte NAME+0x33, t248 PROOF 1/2 — the list holds
+    // COLONISED worlds, never the bare names of a system). t406 FIX: the
+    // rewrite models ONE PlanetState per star (campaign.h planets_ "per
+    // star (only owned stars use it)"), so an owned star contributes
+    // EXACTLY ONE row (the old loop over s.planets emitted a row per
+    // star-record NAME — Amoroso II..N have no pop, no items, no queue:
+    // the owner's D13 "displays planets I don't own"). The row's name is
+    // the system's first planet name [documented default: the port has no
+    // per-orbit ownership — which orbit is colonised is unmodelled, named
+    // on the header].
     std::vector<StatusRowKey> out;
     const auto& g = camp.galaxy();
     for (const auto& s : g.stars) {
         if (camp.starOwner(s.id) != owner) continue;
-        for (const auto& p : s.planets)
-            out.push_back({s.id, p.index});
+        if (s.planets.empty()) continue;
+        out.push_back({s.id, s.planets.front().index});
     }
     std::sort(out.begin(), out.end(), [](const StatusRowKey& a,
                                          const StatusRowKey& b) {
@@ -151,7 +158,11 @@ StatusHeader statusHeaderFor(const ascend::game::Campaign& camp, int owner) {
     for (const auto& s : g.stars) {
         if (camp.starOwner(s.id) != owner) continue;
         ++h.systems;
-        h.planets += static_cast<int>(s.planets.size());
+        // t406: one COLONISED planet per owned star (same law as
+        // statusPlanets — the port's PlanetState is per star; the old
+        // s.planets.size() counted bare star-record names, the "displays
+        // planets I don't own" defect in header form).
+        if (!s.planets.empty()) ++h.planets;
     }
     return h;
 }

@@ -285,6 +285,22 @@ public:
         return (idx >= 0 && items_ && idx < int(items_->size()))
                    ? &(*items_)[idx] : nullptr;
     }
+    int planItemCount() const {
+        return items_ ? static_cast<int>(items_->size()) : 0;
+    }
+    // t406: the player's owned-tech vector for the PROJECT LIST membership
+    // law (ui/planetview.h; requiresAvailable gate, income-law.md S4).
+    const std::vector<bool>& playerTechs() const { return ownedTech[kPlayer]; }
+    // t406 PROJECT SET (ui/planetview.h PROJECT-SET LAW, fn 0x38840 cmd0
+    // legs 0x388e2/0x388ec/0x388f7 verbatim): arm pendingItem iff (a) the
+    // queue is empty, (b) item < 39, (c) free pop >= item UPOP. The ACC
+    // word is NOT touched (resets live at completion 0x39290 / worldgen
+    // 0x37f8d); the CELL stays the cited completion picker (t43). Returns
+    // false (silent reject, vendor shape) on any gate failure. Player-only:
+    // the vendor legs are reachable only through the planet-window UI
+    // messages (t342 S2.7) and the selector never runs here for kPlayer
+    // (t341 gate).
+    bool orderProject(int star, int item);
     // Public +0x4a analog for tests/UI (income-law.md S10 seed law).
     int popCapAt(int star) const { return storedCapFor(star); }
     // Per-planet channel words +0x44/+0x46/+0x48 incl. the t45 governor

@@ -343,3 +343,22 @@ select Amoroso"); shots /tmp/t402_shots/ show "Amoroso I (Small Husk Planet)"
 Controlled)" with correct singular/plural — D11 "planets list screen is wrong
 and unusable" is no longer true of the rewrite. D11 ITSELF stays open until
 the USER ruling (strict-close).
+
+## 9. PLANET VIEW (STATE 17) + PROJECT-SET LAW LANDED AS CODE (t406, 2026-11-16)
+The status row click now OPENS the planet display (planet.txt info05), and
+the PLBUILD panel opens the project list whose click SETS the project
+(planet.txt info04). Laws, citations in rewrite/src/ui/planetview.h:
+- MEMBERSHIP UPGRADE: the list holds ONE COLONISED planet per owned star
+  (t248 PROOF 1/2 owner-byte law; the port's PlanetState is per star). The
+  old per-star-record-NAME loop fabricated uninhabited rows — the machine
+  form of D13 "displays planets I don't own".
+- ORDER LAW fn 0x38840 cmd0 (r331_disasm verbatim): queue-empty 0x388e2 &&
+  item<39 0x388ec && (pop-used) >= UPOP 0x388f7..0x38922; reject stores
+  NOTHING (silent, SOUNDCHANNEL 0); acc word untouched (resets 0x39290);
+  the cell stays the t43 completion picker. The 0x3892a leg is UNRESOLVED
+  and unexercised (honest negative).
+- ROWS TOP MEASURED 117 (t3 capture table border native 116.8; art header
+  cells y 48..85 on 10status k0) — kills the t405 "na" clip; text columns
+  follow the art cells (icon 136..167, text from ~200).
+Full working log: docs/re/_wip_t406.md F0-F9. Pins test_planetview_t406
+x4 (suite 360/0); witness scripts/t406_planetview_witness.sh PASS.
