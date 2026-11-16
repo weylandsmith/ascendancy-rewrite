@@ -351,7 +351,7 @@ fallback. What to re-check live, per screen, is in the WALKTHROUGH TABLE in
 docs/STATE.md (NEXT block). AUDIO NOTE unchanged: only the pasted `audio:`
 startup line + a verdict closes OQ-027.
 
-## D14 — ROUND-3 GRADE + COMPILER WARNING (USER, 2026-11-16, verbatim excerpts)
+## D15 — ROUND-3 GRADE + COMPILER WARNING (USER, 2026-11-16, verbatim excerpts) [heading was D14; collision with the loop-sent D14 sheet above — user ruling renumbered, content verbatim]
 
 > the decorative framing is still wrong and mostly missing, there should
 > be a spinning star field commensurate with the star density in the
