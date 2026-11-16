@@ -230,25 +230,56 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t409 per queue row t409 below (phase 14: SPECIAL ABILITY + SPECIES
-SCREEN — user: "special ability button doesn't even do anything" + "species
-screen quite off"). Ordering rationale: t408 landed the RESEARCH screen
-(ui/researchview, state 20) — pins 376/0, mutation 9/9 CAUGHT, witness PASS +
-native grade — so the rail's remaining dead buttons are SPECIALAB and the
-SPECIES menu content. t409's FIRST act is the census the row demands:
-windows.txt for a special-ability window; if NONE exists (grep the STATE
-id-lists + TYPE census; SPECIALAB is msg 5 p1 0 — screenAfterRailPress NO-OPs
-it per t388), SAY SO with the table citation and disposition the rail label
-per its SENDPARAM/help index — do NOT invent a screen. Species screen:
-RACE_1..7 rows are NEGSCREEN (state 13) clicks — the t252/t268 dossiers bank
-the negotiation law (PLAYERDIP rows, Goodbye hoist); every species + portrait
-stays a seam until the 7racesel witness strengthens (t391). Reuse the t408
-machinery: pure ui/<screen>law module + hit-map precedence + the marker-driven
-static reader + the t408-style witness script (sleep-before-grep, sleep-1.2-
-before-shot, probe.log NEVER inside app.log). PRE-FLIGHT: none owed (t407
-F13 closed this session; both mutation campaigns proven). D13 queue rows
-t410..t413 stand as written. OQ-027 still closes only on the user's final
-audio verdict.
+NEXT t410 per queue row t410 below (phase 14: SYSTEM VIEW + MAP->PLANET
+CHAIN). Ordering rationale: t409 closed the rail's last dead button
+(SPECIALAB opens the cited ABILITYWIN modal — the vendor msg-5 path decoded
+end-to-end) and gave the SPECIES menu real content; the owner's remaining
+unreachable-screen complaint ("haven't found any way to pull up the system
+view screen") is the next D13 row, and t406's planet view already exists as
+the chain's far end — t410 wires the near end (star click on the map ->
+system view -> planet dot -> state 17) with the Escape chain depth pinned.
+Reuse the t408/t409 machinery: pure ui/<law> module, Campaign display-only
+zero-rng accessors, witness with the modal-law pattern (t409's
+"ui key next" COUNT probe beat turn-md5 greps for suppression claims),
+mutation script shape scripts/t409_mutate.py. PRE-FLIGHT: none owed (t409
+mutation campaign 9/9 CAUGHT incl the M8 vacuous-fixture re-scope). D13
+queue rows t411..t413 stand as written. OQ-027 still closes only on the
+user's final audio verdict.
+
+t409 LANDED 2026-11-16 (SPECIAL ABILITY DIALOG + SPECIES MENU CONTENT; law
++ full working log docs/re/_wip_t409.md F1-F6; durable law docs/re/
+ui-runtime.md "t409" section). CENSUS VERDICT: a special-ability window
+EXISTS — ABILITYWIN windows.txt ln2136 TYPE 22 STATE "0" 60,100-395,355
+SHAPEFRAME -1 (code-drawn modal lib with HELPWINDOW/EVENTWIN; ABILBUTTON0/1
+ln2152-2185 both cover the FULL rect, msg 50 dismiss). THE VENDOR BUTTON IS
+WIRED: winmgr 0x55ffb `MOV EDX,0x85975`("ABILITYWIN")+CALL 0x56d1c -> CALL
+0x37b14: specnum [0x7458e] -> race table 0x12e16+specnum*494 word +0x19a
+>>24 -> sprintf "abil%02d" (pool 0x84848) -> CALL 0x33f40 -> WAIT (0x56015/
+0x5526c). The rewrite's msg-5 NO-OP WAS the D13 defect. LANDED: ui/
+abilitylaw.{h,cpp} (21-block parse, refusal census, rect+hit, %d day%s
+formatter), ui/speciesmenu.{h,cpp} (static #11 header "K of T Species
+Known" — t252 live "3 of 3"; rows = contacted owners, dipName in owner
+colour + raceflag face (frame==specnum), static #12 "Extinct" at 0 stars —
+t252 third row), Campaign ownerCount()/playerKnows()/ownerName()
+(display-only), ui.cpp modal (draw last; swallows Esc/Return/Space/Alt +
+all clicks; inside-dismiss/outside-inert) + species rows in kRaceRows[1..6]
++ row-press NEGSCREEN seam log. PINS test_speciesmenu_t409.cpp x7, suite
+376->384/0. MUTATION scripts/t409_mutate.py 9/9 CAUGHT (M8 first MISSED =
+VACUOUS FIXTURE seed-11 no-contact; re-scoped to seed-5 flip-observable ->
+CAUGHT :298). WITNESS scripts/t409_species_witness.sh VERDICT PASS (open
+abil00 / inside-dismiss / modal swallowed 2 of 10 Returns via "ui key next"
+count=8 / species-row log / zero laser01) + NATIVE VISION GRADE ("Minions
+Special Ability" + body + OK legible inside bounds; "1 of 6 Species Known"
++ FLUDENTRI row w/ flag over the map; shots /tmp/t409_shots/{ability-open,
+ability-closed,species-menu}.png). SEED REGRESSION seeds 1/2024/23 md5
+7e794a6d/332a8cf3/0a6b7876 == record EXACTLY. SEAMS (honest): S1 per-button
+split of the full-rect hit law unmapped; S2 body wrap width = port choice;
+Use-Ability msg-1 FIRE path (dispatcher 0x37b6a DX==1 -> 0x43b50 edx=1) NOT
+wired — sim stays auto-fire (abilities.md §3), click-to-use would move the
+seed md5s and needs its own sim row; species portrait art over the map +
+NEGSCREEN state-13 chrome stay named seams. LEDGER: closes NOTHING
+(strict-close honest negative — no OQ row owns the D13 chrome; OQ-016/019/
+027 untouched). Gate 0; ledger audit OK; index check OK (17 closed/3 open).
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`

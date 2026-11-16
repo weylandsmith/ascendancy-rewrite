@@ -574,3 +574,48 @@ Full working log: docs/re/_wip_t405.md F1-F10. Durable laws:
 - Pins test_statusnav_t405.cpp x4; witness scripts/t405_statusnav_witness.sh
   PASS; mutation 5 named CAUGHT + M2c (old-code shape) CAUGHT, M2/M3
   single-guard mutants banked as VACUOUS (guards mutually redundant).
+
+## t409 SPECIAL ABILITY DIALOG + SPECIES MENU CONTENT (2026-11-16)
+
+- THE SPECIAL ABILITY BUTTON IS WIRED IN THE VENDOR [verified disassembly,
+  restored image base-0]: winmgr site 0x55ffb `MOV EDX,0x85975`("ABILITYWIN")
+  + CALL 0x56d1c (window-by-name) -> CALL 0x37b14 (opener) which reads the
+  player specnum [0x7458e], indexes the race table (base 0x12e16, stride 494)
+  word +0x19a >>24 = ability index, sprintf's "abil%02d" (pool 0x84848
+  "help.txt"), CALL 0x33f40 (topic panel), then WAITS (0x56015 wait-check +
+  0x5526c cleanup). The rewrite's msg-5 NO-OP was the D13 "special ability
+  button doesn't even do anything" defect.
+- ABILITYWIN = windows.txt ln2136 TYPE 22, STATE "0" (the code-drawn modal
+  pool: HELPWINDOW TYPE 20 / EVENTWIN TYPE 23 / ABILITYWIN TYPE 22), rect
+  60,100-395,355, SHAPEFRAME -1 (CODE-DRAWN, no art cited). ABILBUTTON0/1
+  ln2152-2185 BOTH cover the FULL rect, msg 50 = the dialog dismiss family.
+  Port modal law: inside-click dismisses, outside inert, Esc dismisses, all
+  other keys/chords swallowed (the vendor waits).
+- abilNN BLOCK FORMAT [verified 21 blocks]: title pos 10 50 / body pos 10
+  125 / charged line pos 10 160 ("It will take %d day%s to amass...") +
+  buttons "Use Ability"(msg 1)+"Cancel"(msg 0) charged, "OK"(msg 0) passive;
+  passive set {0,1,2,3,4,15,18} == the gate-3m split. Parser: ui/abilitylaw
+  .{h,cpp} (refuses unless 21 blocks, indices 0..20 contiguous).
+  SEAMS: S1 per-button split of the full-rect hit law unmapped; S2 body
+  wrap width = port rendering choice (bytes verbatim); the Use-Ability
+  msg-1 fire path (dispatcher 0x37b6a DX==1 -> CALL 0x43b50 edx=1) is NOT
+  wired — the sim model stays auto-fire (abilities.md §3); click-to-use
+  would move the seed-regression md5s and needs its own sim row.
+- SPECIES MENU (state 7) CONTENT [verified static.txt + t252 live]: header
+  static #11 "%d of %d Species Known" (t252 rendered "3 of 3"); rows =
+  CONTACTED owners in owner order — dip-header name in the owner colour +
+  raceflag.shp face (frame==specnum, t400 §2); eliminated owner reads
+  static #12 "Extinct" (t252 third row; help.txt:775: clicking it only
+  highlights). Row slots: static #11 header in kRaceRows[0], rows from
+  kRaceRows[1] (pitch 39 matches both the table and the t287 drawn bands;
+  absolute top sitting-dependent [unverified]). Four large portraits over
+  the map (t252 vision) = NAMED SEAM (art source unmapped, lgraceNN class).
+  Row click msg 1 p1 13 (NEGSCREEN) stays honest-inert (no state-13 chrome
+  in the port) but LOGS the press.
+- Campaign read-only surface (display-only, zero rng, pinned
+  readonly_accessors_no_state_delta_t409): ownerCount(), playerKnows(owner)
+  (contacted_ row), ownerName(owner).
+- Pins test_speciesmenu_t409.cpp x7; witness scripts/t409_species_witness.sh
+  VERDICT PASS (open abil00 / inside-dismiss / modal swallowed 2 of 10
+  Returns / species-row log / zero laser01) + native vision grade (dialog
+  legible inside bounds, "1 of 6 Species Known" + FLUDENTRI row w/ flag).

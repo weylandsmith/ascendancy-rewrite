@@ -275,15 +275,28 @@ TEST(species_menu_membership_t409) {
 TEST(extinct_row_law_t409) {
     REQUIRE_DATA();
     std::vector<ag::SpeciesInfo> roster;
-    auto camp = seededCampaign(11, &roster);
+    // Seed 5 contacted FLUDENTRI by turn ~9 in the t409 witness; seed 11
+    // proved contact-slow (the original fixture skipped vacuously).
+    auto camp = seededCampaign(5, &roster);
     if (!camp) { std::printf("    (campaign fixture unavailable)\n"); return; }
-    // Strip every star from owner 2; a KNOWN owner 2 row must read extinct
-    // (static #12; t252 witness "the third row prints Extinct").
+    // Drive until a KNOWN owner exists (the t409 row gate), then strip that
+    // owner's stars: the row must FLIP to extinct — a flip only the
+    // starsOwned()==0 branch can produce (mutation M8 re-scope: the naive
+    // pre-contact fixture was vacuous, no known owner existed at turn 1).
+    int target = -1;
+    for (int t = 0; t < 60 && target < 1; t++) {
+        for (const auto& r : au::speciesMenuRows(*camp, &roster))
+            if (r.owner >= 1 && !r.extinct) { target = r.owner; break; }
+        if (target < 1) camp->advance();
+    }
+    if (target < 1) { std::printf("    (no known owner within 60 turns)\n"); return; }
     for (size_t i = 0; i < camp->galaxy().stars.size(); i++)
-        if (camp->starOwner(int(i)) == 2) camp->setStarOwnerForTest(int(i), -1);
-    CHECK(camp->starsOwned(2) == 0);
+        if (camp->starOwner(int(i)) == target) camp->setStarOwnerForTest(int(i), -1);
+    CHECK(camp->starsOwned(target) == 0);
+    bool sawTarget = false;
     for (const auto& r : au::speciesMenuRows(*camp, &roster))
-        if (r.owner == 2) CHECK(r.extinct);
+        if (r.owner == target) { sawTarget = true; CHECK(r.extinct); }
+    CHECK(sawTarget);  // the owner is still known -> the row still exists
 }
 
 // ---- 5. the t409 accessors are display-only --------------------------------

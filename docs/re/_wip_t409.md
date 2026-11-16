@@ -118,6 +118,20 @@ RACE_1..7 = NEGSCREEN (state 13) clicks per banked law.
 ## stars -> row reads extinct); read-only accessors no-state-delta x30
 ## turns two-campaign diff). Seed regression + witness NEXT.
 
+## F6 MUTATION CAMPAIGN: scripts/t409_mutate.py (anchor count==1, revert by
+## FILE COPY from /tmp/t409-snap, verdict = run_tests exit code):
+## M1 passive-block-gains-use-button CAUGHT; M2 index-census-dropped CAUGHT;
+## M3 rect-x1-widened CAUGHT; M4 hit-exclusive-interior CAUGHT;
+## M5 plural-law-inverted CAUGHT; M6 negative-clamp-dropped CAUGHT;
+## M7 unknown-owner-rows-emitted CAUGHT (membership FAILs :261/:264);
+## M8 extinct-law-dropped: first run MISSED — VACUOUS FIXTURE (seed 11 had
+## no known owner at turn 1, so the extinct assertion never executed).
+## Re-scoped the pin (drive to a known owner — seed 5, contact by ~t9 per
+## the witness — strip its stars, require the row FLIP + still exist) ->
+## re-run CAUGHT (:298). M9 specnum-skip-law-broken CAUGHT (flag==specnum
+## FAILs :268). FINAL: 9/9 CAUGHT, restored suite 384/0.
+
+
 ## F4 IMPLEMENTATION PLAN (as executed):
 
 1. ui/abilitylaw.{h,cpp} pure: parse help.txt abilNN blocks (title text +
