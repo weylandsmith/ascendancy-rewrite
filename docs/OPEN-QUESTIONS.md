@@ -294,6 +294,10 @@ soundfx.txt, so play("click08") had been a no-op; census re-run
 scripts/t395_soundchannel_census.py re-pins {0 x118, -0 x1}, closes nothing).
 t397: item (a)+(b) both askable on the D11 grading page (item 4 = paste the
 `audio:`/`degraded:` startup line); row OPEN until the ruling lands.
+t403: D11 item-4 answer recorded 11:37 ("seems OK at first listen... will
+answer better when the game is more playable") — per this row's own bar that
+is NOT the closing verdict; the ask RE-ISSUED as D12 item 5 (paste + match/
+differ verdict on the rebuilt sheet :8613). Row STAYS OPEN (strict-close).
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor cost hack, Orbital Docks effect

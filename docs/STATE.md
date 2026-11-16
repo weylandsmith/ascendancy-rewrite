@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-15T13:05
+updated: 2026-11-15T21:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,18 +230,19 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t403 per queue row t403 below (VERIFY + PUSH, MANDATORY push-gap law).
-ORDERING RATIONALE: t402 landed the planets-list law as code (planets-ui.md
-S8: row assembly 0x50647..0x5091f cited, word tables joined vs shipped
-static.txt, days law FUN_0x47010, membership t249, pitch 112/3 rows measured;
-7 pins, suite 347/0, MUTATION 8/8 CAUGHT, Xvfb witness open/scroll/select).
-Two D11 sub-items now await USER grading and t403 is the channel: build the
-grading sheet from work/r1/loop/t401-newgame{,-set}.png + t402-status-*.png +
-t398/t400 shots (scripts/t397_grading_page.py pattern), push, and record
-rulings verbatim. D11 items stay USER-PENDING until graded (R13: no
-self-accept). After t403, remaining D11 chrome queue items (intel/fleet/
-research screen contents = state-17 seam work) re-rank by what the rulings
-say — do NOT pre-start them.
+NEXT WAIT-USER-RULING t374 — phase 11/12 is PUBLIC (remote main ==
+06da9b2fa8a4); the D12 grading sheet is LIVE on :8613 (items: title hover /
+new game / galaxy map / planets list / audio line). Every remaining closer
+for the D11/D12 chrome items is the user's eyes/ears; strict-close forbids
+self-acceptance (R13). DO NOT pre-start intel/fleet/research screen contents
+(state-17 seam work) — re-rank ONLY by what the D12 rulings say.
+ORDERING RATIONALE: t403 closed the last authored queue row (verify+export+
+push; caught + fixed the t402 data-optional regression on the export battery,
+cda9cb1). The D12 sheet consolidates every USER-PENDING item with vendor-
+reference pairs and 2x native-res crops; a ruling line per item is the only
+measurement that dispositions them. OQ-027 closes ONLY on the sheet's item-5
+paste + match verdict ("seems OK at first listen" is NOT it, per the row's
+own bar).
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
@@ -252,9 +253,33 @@ lines; regenerate page+crops with the HERMES venv python
 after the newest block; apply answers per strict-close (audio OQ-027 closes
 only on a final HEARING verdict — the 11:37 line "seems OK at first listen"
 is NOT it; chrome grades close nothing by themselves; D11b answered = drop).
-(2) If a USER line grades the t401 New Game shots
-(work/r1/loop/t401-newgame{,-set}.png), record it verbatim in
-docs/re/t401-newgame-art.md S12 and disposition the D11 item.
+(2) D12 ruling lines (labels 'D12 title hover ='..'D12 audio ='): record
+verbatim in docs/re/_wip_t403.md F7+ and disposition the named screen item;
+if a ruling reopens a screen, author ONE queue row citing the ruling phrase
+(no fix-by-eye). NOTE: the 11:37 D11 ruling PREDATES the t401/t402 landings —
+it grades neither; do not treat it as their disposition.
+
+t403 LANDED 2026-11-15 (PHASE-12 VERIFY + RE-EXPORT + PUSH + D12 SHEET;
+full account docs/re/packaging.md t403 block + docs/re/_wip_t403.md).
+Verification: gate 0; suite 347/0; seed regression seeds 1/2024/23 md5
+EXACTLY the banked record (7e794a6d/332a8cf3/0a6b7876, Extinct t266 /
+Extinct t285 / Control t1406) — transitivity law: t396 proved cbe7b8f ==
+baseline c7a3fda, so phase-11/12 UI rows moved ZERO sim rng WITHOUT a
+redundant baseline rebuild. REAL FINDING (export battery's reason to
+exist): t402 REGRESSED the t396 data-optional law —
+statuslist_word_tables_match_static_txt_t402 lacked REQUIRE_DATA();
+data-less clone -> empty vector -> s[41+i] OOB UB -> run_tests SIGSEGV
+139 (stdbuf -o0 pinned it). LAW: run the guard census (awk TEST/
+REQUIRE_DATA pairing) on EVERY new data-reading test file. Fix cda9cb1.
+Export /tmp/pubpush-t403: vendor-free 6654 obj, 0-warning build without
+data, 347/218-skipped/0-failed, gate --portable 0. PUSH fast-forward
+3be7e9a..06da9b2 (lease-pinned to fetched tip; t389 export-origin trap
+RE-HIT — set-url BEFORE the deciding fetch); ls-remote verified ==
+06da9b2fa8a4dc1a5e21838def2964a85b2ec262; askpass deleted. D12 SHEET
+LIVE :8613 (scripts/t403_grading_page.py tracked; 12 crops non-flat PASS;
+POST self-test PASS scratch port 8699/scratch DECISIONS; server serves
+ROOT/index.html so no restart needed). LEDGER: closes NOTHING
+(strict-close; honest negative); OQ-027 awaits the item-5 verdict.
 
 t402 LANDED 2026-11-15 (PLANETS LIST SCREEN AS CODE, D11 "wrong and
 unusable"). rewrite/src/ui/statuslist.{h,cpp} (pure law, no SDL) + ui.cpp
@@ -818,7 +843,9 @@ the campaign model, chrome per windows.txt (17np lib, state 17), click
 to select. Content law citations over pixel-perfection; screenshots ->
 t402-*.png for user grading.
 
-t403 PHASE-12 VERIFY + RE-EXPORT + PUSH (push-gap law: MANDATORY). Full
+t403 PHASE-12 VERIFY + RE-EXPORT + PUSH — LANDED 2026-11-15 (see LANDED
+block + packaging.md t403; data-optional regression caught+fixed cda9cb1;
+remote == 06da9b2fa8a4; D12 sheet live :8613). Original brief: Full
 gate + run_tests + headless seed regression byte-identical; export;
 verify vendor-free/build-without-data/identity; fetch FIRST; push;
 ls-remote verify; rewrite NEXT to WAIT-USER-RULING t374 verbatim with

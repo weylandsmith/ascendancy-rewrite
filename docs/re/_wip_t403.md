@@ -58,3 +58,45 @@ t397_grading_page.py; run with ~/tools/revenv/bin/python — system python3 has
 NO PIL). D12 fields: title-hover / new game / galaxy map / planets list (NEW
 item, t402) / audio line (OQ-027 closer re-ask per row's own bar — "seems OK
 at first listen" is NOT the verdict). Vendor refs copied local-only.
+
+F5 (export + push). First export attempt FOUND A REAL REGRESSION: run_tests on
+   the data-less export SIGSEGV 139. stdbuf -o0 pinned the crasher:
+   statuslist_word_tables_match_static_txt_t402 (t402) lacked REQUIRE_DATA();
+   no static.txt -> empty vector -> its own CHECK fails -> s[41+i] OOB UB.
+   The SAME class t396 fixed for newgame_t393_lore_file_real_data — t402
+   re-introduced it (data-optional law needs a per-file guard census, not
+   memory). Guard census over all t398-t402 test files (awk TEST/REQUIRE_DATA
+   pairing): the only unguarded test that dereferences data reads
+   (rail_t400's game.pal read is if(load)-guarded by design). Fix commit
+   cda9cb1; working tree 347/0/0 with data.
+   RE-EXPORT /tmp/pubpush-t403 (from cda9cb1): "vendor-free history, 6654
+   objects, 6.0M .git, tree intact"; refs/original 0; identity uniform Weyland
+   Smith noreply; keep-checks pass (campaign.cpp/statuslist.cpp/
+   test_statuslist_t402.cpp/NOTICE/LICENSE/docs STATE). Build WITHOUT data
+   exit 0 ZERO warnings/errors; run_tests WITHOUT data 347 tests / 218
+   skipped / 0 failed; gate --portable on the export ALL CHECKS PASS exit 0.
+   PUSH: FETCH-FIRST law respected — first fetch went to the LOCAL SRC path
+   (export clone default, the t389 trap re-hit); set-url to GitHub BEFORE the
+   deciding fetch. Remote tip 3be7e9af6c24 (== t396 push, no foreign/web-UI
+   commits: `git log origin/main --not main` empty); export tip 06da9b2
+   (filter-branch rewrites SHAs — 06da9b2 IS cda9cb1's public twin);
+   merge-base --is-ancestor => FAST_FORWARD_OK (no history rewrite this round,
+   so no GC exposure added). Push --force-with-lease=main:3be7e9a landed
+   3be7e9a..06da9b2. POST-PUSH ls-remote origin main ==
+   06da9b2fa8a4dc1a5e21838def2964a85b2ec262 (verified, not self-reported).
+   Askpass helper /tmp/t403_askpass.sh deleted (verified absent).
+
+F6 (grading channel). D12 sheet LIVE on :8613 (the long-running server serves
+   ROOT/index.html, so no restart needed — verified GET 200 + 'D12' x7/8).
+   12 crops all PASS non-flat census (>=4 colours). Self-test
+   (scripts/_wip_t403_selftest.py, in-process, SCRATCH port 8699 + SCRATCH
+   DECISIONS per server docstring rule): POST fields -> USER: lines PASS;
+   traversal 404 PASS. D12 ask block appended to docs/DECISIONS.md.
+   t401 wake-step: NO USER line grades the t401/t402 shots (ruling 11:37
+   predates both landings) — nothing to record verbatim; D11 items stay
+   USER-PENDING pending D12.
+
+LEDGER: 17 closed / 3 open UNCHANGED. Honest negative: t403 closes nothing —
+verify+push moves no measurement, and the D11/D12 grades are testimony for the
+STATE queue items, not witnesses for any OQ row's named closer. OQ-027 stays
+OPEN on its own bar (audio line paste + match verdict).

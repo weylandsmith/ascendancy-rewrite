@@ -345,3 +345,36 @@ trivially satisfied — nothing closable and nothing closed).
   disposition (not a credential).
 - Ledger: NO row closed (strict-close — verify+push is not a measurement;
   OQ-027 stays open on the Athens audio-line witness).
+
+## t403 PHASE-12 VERIFY + RE-EXPORT + PUSH LANDED (2026-11-15) — data-optional law REGRESSED in t402, caught on the export, fixed; fast-forward push verified
+
+- VERIFICATION: gate ALL PASS GATE_EXIT=0; run_tests 347/0/0; SEED REGRESSION
+  seeds 1/2024/23 `--headless --campaign 1600` md5 EXACTLY the banked record
+  (7e794a6d/332a8cf3/0a6b7876; victories Extinct t266 / Extinct t285 / Control
+  t1406 == t365 record). Transitivity law: t396 proved cbe7b8f == baseline
+  c7a3fda with these md5s and t397-t402 are UI-only rows -> phase 11/12 moved
+  ZERO sim rng, no redundant baseline rebuild needed.
+- REAL FINDING (export-only, the reason the export battery exists): t402's
+  statuslist_word_tables_match_static_txt_t402 lacked REQUIRE_DATA() -> on a
+  data-less clone the vector is empty, the CHECK fails, s[41+i] is OOB UB ->
+  run_tests SIGSEGV 139 (stdbuf -o0 pinned the true crasher). SAME class as
+  t396's lore[0] crash — the data-optional law needs a fresh guard census with
+  EVERY new data-reading test, not memory. Fix cda9cb1; awk TEST/REQUIRE_DATA
+  pairing over t398-t402 files confirmed the only other unguarded reads are
+  if(load)-guarded by design.
+- EXPORT /tmp/pubpush-t403 (from cda9cb1): vendor-free 6654 objects, 6.0M
+  .git, refs/original 0, uniform noreply identity, keep-checks pass; build
+  WITHOUT data 0 warnings; tests WITHOUT data 347/218-skipped/0-failed;
+  gate --portable exit 0.
+- PUSH: fetch-first (export origin defaulted to the LOCAL SRC path — t389 trap
+  re-hit; set-url BEFORE deciding fetch). Remote tip 3be7e9af6c24, zero
+  foreign commits, FAST-FORWARD (no history rewrite this round => no new GC
+  exposure). `git push --force-with-lease=main:3be7e9a` landed 3be7e9a..06da9b2;
+  POST-PUSH ls-remote == 06da9b2fa8a4dc1a5e21838def2964a85b2ec262 (verified).
+  Askpass helper deleted (verified absent).
+- D12 grading sheet live on :8613 (server serves ROOT/index.html — no restart
+  needed; GET 200 verified). Generator scripts/t403_grading_page.py tracked;
+  crops by measurement (t403_sheet_inventory.py + ink-run probes).
+  Self-test PASS on scratch port 8699 + scratch DECISIONS.
+- LEDGER: 17 closed / 3 open UNCHANGED (strict-close: verify+push moves no
+  measurement; the seed-md5 match corroborates but closes no row).
