@@ -230,19 +230,24 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-USER-RULING t374 — phase 11/12 is PUBLIC (remote main ==
-06da9b2fa8a4); the D12 grading sheet is LIVE on :8613 (items: title hover /
-new game / galaxy map / planets list / audio line). Every remaining closer
-for the D11/D12 chrome items is the user's eyes/ears; strict-close forbids
-self-acceptance (R13). DO NOT pre-start intel/fleet/research screen contents
-(state-17 seam work) — re-rank ONLY by what the D12 rulings say.
-ORDERING RATIONALE: t403 closed the last authored queue row (verify+export+
-push; caught + fixed the t402 data-optional regression on the export battery,
-cda9cb1). The D12 sheet consolidates every USER-PENDING item with vendor-
-reference pairs and 2x native-res crops; a ruling line per item is the only
-measurement that dispositions them. OQ-027 closes ONLY on the sheet's item-5
-paste + match verdict ("seems OK at first listen" is NOT it, per the row's
-own bar).
+NEXT t404 per queue row t404 below (phase 14: SCREEN FUNCTIONALITY +
+LOOK, per D13 — the OWNER LIFTED R13 for our own UI renders: sessions
+self-grade with NATIVE vision and iterate until their own grade passes;
+see SELF-GRADE LAW at the head of the phase-14 block). The
+WAIT-USER-RULING t374 sentinel is RETIRED (tag itself never renumbered;
+history below). USER D13 (verbatim in DECISIONS.md): "step through the
+new game setup and menus with your own vision... come back when you've
+stepped through all the screens and they look and work right... set up
+the loop to keep working through it until all the screens look right to
+you." Assistant's own walkthrough 2026-11-15 (native vision): title
+PASSES; New Game frames OK but species squares empty + race intro
+MISSING; map renders but flat/no frame/empty day ovals/noisy rail;
+Begin logged but campaign slow-or-dead unreproduced; Planets shows
+Empire status (owned filter + click->detail MISSING); Ships/Research
+screens ABSENT; Special-Ability dead; rail inert inside sub-screens;
+laser01 fires on EVERY map click (ui.cpp:348 placeholder). D12 sheet
+superseded by t413's D14 sheet at the end. OQ-027 still closes only on
+the user's final audio verdict.
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
@@ -852,6 +857,123 @@ ls-remote verify; rewrite NEXT to WAIT-USER-RULING t374 verbatim with
 D11-item-by-item grading handoff. AUDIO NOTE: user tentative-OK ("music
 plays, heard a click") — OQ-027 stays OPEN until the final "more
 playable" verdict per the row's own bar.
+
+SELF-GRADE LAW (D13, applies to EVERY row in phase 14): R13 is LIFTED by
+owner order for OUR OWN UI screens. Harness fact banked: vision_analyze
+routes NATIVE (image lands in your own context) only when
+agent.image_input_mode=native AND model.supports_vision=true — set on
+this box 2026-11-15 via `hermes config set model.supports_vision true`
+(before that every call silently went to the external aux model; the
+user caught it). Walkthrough kit: scripts/r1_ui_walk.sh STATE [click X
+Y|key K]... -> work/r1/loop/walk/STATE.png (xsend takes WINDOW coords,
+now focuses first; kill via pkill -x ascendancy, NEVER -f = self-kill).
+Per row: walk the screen, grade it with your OWN eyes, fix, re-walk,
+re-grade; a row may NOT close while your own grade still lists a defect
+the evidence can fix; honest seams only where the DATA law is missing
+(name the witness that would close it).
+
+t404 LASER-SOUND REGRESSION + INPUT HYGIENE (user D13: "clicking
+anywhere in the galaxy map makes a laser-fire sound"). ROOT CAUSE
+LOCALISED: ui.cpp:348 — ANY click inside the COSMOSWnd rect plays
+audio->play("laser01") (early placeholder). Fix: laser01 only on a real
+fire-order interaction (or removed until combat UI exists — cite the
+soundfx/help law for what laser01 IS); map clicks follow windows.txt
+SOUNDCHANNEL (census map children); dead areas play NOTHING. Sweep all
+placeholder sounds (grep play( sites, cite each or remove). Pins:
+click-empty-map silent / rail click click08 / no laser without fire.
+
+t405 SUB-SCREEN NAVIGATION + RAIL LIVENESS (I WITNESSED D13: Planets
+opens Empire status, then Ships/Research/Species clicks route into the
+status screen's scroll/select — ui.cpp:342-348 deliberately makes the
+rail inert while a screen is open; vendor law: rail stays live, screens
+SWAP; 'Esc: return to galaxy' is printed bottom-left). Implement per the
+windows.txt STATE id-lists (t388 banked 123/123 law — cite which list
+keeps the rail live during sub-screens): rail rects evaluated before
+sub-screen children; Esc returns to map from ANY sub-screen. Pins:
+Ships-from-Planets swaps screens; Esc from every sub-screen -> map;
+scroll still lives inside its own rects.
+
+t406 PLANETS: OWNED-ONLY + PLANET VIEW (user: "displays planets I don't
+own, can't click a planet"; I WITNESSED: Empire status lists the 3
+Highbeam planets + logs 'ui status select Highbeam (planet detail =
+state-17 seam)' — selection exists, planet view does NOT). (a) statuslist
+filter to OWNER == player (0x50647 law banked _wip_t402; find the owner
+predicate — ours absent/wrong); (b) BUILD the planet view (state 17,
+17np lib, windows.txt PLANET* sections; planetalloc docs bank the data
+law): name, atmosphere, size, population+growth, manufacturing, and the
+PROJECT slot with project-SET interaction (user: "can't set a project on
+my home planet" — project list law in planetalloc/income docs), terrain/
+keywords, surface art record; row click opens it. Pins: owned-only count
+== campaign model; project-set mutates PLANETALLOC state; row->detail
+routing.
+
+t407 SHIPS SCREEN (user: "ships screen is empty"; I WITNESSED: click
+dead, no fleet window). Build the fleet list from the per-ship model
+(shipsave+shipsim hold the data): row per owned ship — name (word 26
+law), design, system/position, fuel/damage; click row = select;
+right-click deselect (selfplay.md) lands here; chrome: t391 proved NO
+18*.shp exists -> honestly-vector WITH citation. Map interplay may stay
+a named seam; the LIST renders real campaign ships.
+
+t408 RESEARCH SCREEN (user: "research is empty"; I WITNESSED: dead).
+Build per banked RE: tech tree from the .bin tables, per-race start
+techs, costs, current project + progress, click-to-SET research (user:
+"can't select a technology"). Engine law pinned (t203/t284 era); this
+row is the WINDOW. Pins: set-research mutates campaign + resolves at
+turn end (headless assertion); owned/available partition.
+
+t409 SPECIAL ABILITY + SPECIES SCREEN (user: "special ability button
+doesn't even do anything" + "species screen quite off"). Census
+windows.txt for a special-ability window: if NONE exists in vendor data,
+say so with the table citation and disposition the rail label per its
+SENDPARAM/help index (do NOT invent a screen). Species screen: every
+species + portrait (7racesel after t398 palettes) + ability text
+(help.txt verbatim) + relation standing from the campaign model.
+
+t410 SYSTEM VIEW + MAP->PLANET CHAIN (user: "haven't found any way to
+pull up the system view screen, or planet view screen"). System view law
+lives in the playtest/selfplay docs (system view = planets-in-orbit
+layout + ships present; Escape unwinds — the t1253 turn-drive era walked
+it live). Wire: click (or double-click — cite which from the vendor
+table/law) a STAR on the map -> system view; click a PLANET dot there ->
+t406 planet view; Escape chain depth pinned. This is ALSO the route the
+user has been missing.
+
+t411 MAP LOOK PASS 2 (my own native-vision grade of
+work/r1/loop/walk/map_view.png, 2026-11-15): structure right, LOOK
+wrong: (1) no bevel frame around the map area (find the record:
+1starmap frames or generic frame lib; cite or honest-seam); (2) resource
+ovals EMPTY — vendor shows big green LED day digits (t399 claimed digits
+landed; my shot shows empty ovals: re-derive which record/slot paints
+them + does the counter bind campaign day); (3) rail panel reads noisy
+grey (t398 palette partial — re-check vs game.pal); (4) star field FLAT
+2D — camera rotation/zoom law (if the projection witness is genuinely
+missing, derive the affine from captures + bank witnesses, else seam);
+(5) lane visibility: at game start ONLY home-system lanes (user D11
+law); (6) home star visually findable. Bottom-right 8-dial cluster:
+witness EACH dial via xsend, log current behavior, wire per SENDPARAM
+law (user: controls "don't work quite right"). Pins per item.
+
+t412 NEW GAME FIXES + RACE INTRO (user: "new game screen still off" +
+"race introduction screen that appears after the new game screen and
+before the galaxy map display is MISSING"). My grade: frames present,
+species-row squares EMPTY (no portraits — after t398 palettes re-derive
+the 7racesel 8x158x30 mapping; the user's original DOES show portraits),
+bottom-row wheels small/greyish. RACE INTRO: vendor plays a race
+sequence after Begin — content law = history.txt per-race opening text
+(verbatim, supply-your-own data); art = race*.dip or movie (census,
+cite; minimum ship the text panel + click-to-continue, name the art
+seam). Begin robustness: my witness logged 'raceconfig begin density 50
+species 7 atmosphere 1' but the campaign never appeared in that session
+— distinguish SLOW mapgen (this box) vs DEAD: log line before/after
+generation, and verify fresh-process Begin lands intro->map.
+
+t413 PHASE-14 VERIFY + PUSH + HANDOFF (push-gap law MANDATORY). Full
+gate + run_tests + seed regression byte-identical; export; fetch FIRST;
+push; ls-remote verify; rewrite NEXT to WAIT-USER-RULING t374 verbatim
+with a WALKTHROUGH TABLE: per screen, own-grade before/after + what the
+user should re-check live. Rebuild the :8613 sheet to the D14 asks
+(scripts/t403_grading_page.py pattern; t397b server hardening stays).
 
 DISPOSITIONED t403-prep (D11b USER: drop, 2026-11-15): no support email
 will be sent; old-object GC exposure (manual pages + the one ISP-email
