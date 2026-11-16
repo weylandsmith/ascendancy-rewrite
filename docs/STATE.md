@@ -230,7 +230,17 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT WAIT-USER-RULING t374 (sentinel; queue DRAINED after t413). The
+NEXT t414 per queue row t414 below (phase 15: NEW GAME ROUND 3 +
+ROTATION AXIS + PLANET RENDER + ESC TRAP + CORNER EXIT, per the USER'S
+ROUND-3 RULING — DECISIONS.md heading D15 (my ruling was first filed as
+D14, colliding with the loop's D14 grading sheet; renumbered, text
+verbatim). D13 self-grade law CONTINUES. User's live grade confirms
+phase-14 direction ("looking better", race intro present, planet view
+present-but-empty, "making progress") while listing the next gaps; the
+compile warning (sign-compare x2) fixed on receipt — 0 warnings 401/0.
+SHORTHAND FACT: public SHAs never exist locally (history-rewritten
+export); verify pushes by ls-remote only. Sentinel history below.
+PRE-BLOCK CONTEXT: the
 phase-13/14 work is PUSHED (remote main == c178a43c1f71, ls-remote
 verified) and the D14 grading sheet is LIVE on :8613 (9 fields; D14 ask
 block in docs/DECISIONS.md). This session does NOT start new feature work;
@@ -1196,6 +1206,85 @@ ls-remote verify; rewrite NEXT to WAIT-USER-RULING t374 verbatim with
 D11-item-by-item grading handoff. AUDIO NOTE: user tentative-OK ("music
 plays, heard a click") — OQ-027 stays OPEN until the final "more
 playable" verdict per the row's own bar.
+
+t414 NEW GAME ROUND 3 (user D15, verbatim): (a) DECORATIVE FRAMING
+still wrong/mostly missing — the bevel law: find the record that paints
+window frames in the vendor (generic frame lib? 3cfgnew edge records?
+census which shp file's records match the original's bevel pixels —
+user originals in scratchpad/ are allowed geometry evidence); (b) UPPER
+LEFT = SPINNING STARFIELD preview scaled to Star Density (vendor shows a
+live rotating preview; ours missing — implement: rotating 3D point
+preview reusing the t411 camera, point count == density setting, in the
+preview rect per windows.txt); (c) icons under Star Density/Species/
+Atmosphere REPEAT — wheel frame mapping wrong: k0..kN per value step
+must be DISTINCT records (census 3cfgnew record count vs value range);
+(d) Player Color box: player icons MISSING (raceflag/square color
+records — cite); (e) right-hand race images are 4x SIZE — blit scale
+law: our shp decoder or blitShape scaling frames with 4-byte headers?
+compare record dims vs drawn dims mechanically (PIL), fix the divisor;
+(f) race info frame missing the PLANET image (home-world planet art
+record — planet*.shp? cite). Self-grade law: walk newgame, grade, fix,
+re-walk.
+
+t415 RACE INTRO FRAMING + ART (user D15: text present now — good — but
+needs decorative framing + race image). Same frame law as t414(a); race
+portrait = race*.dip or the 7racesel big frames (t412 banked
+FUN_0002b48a + history.txt law — check what that FUN blits alongside
+the text; the vendor intro screen shows the species portrait large).
+Cite the record the vendor uses; seam only if genuinely undecidable.
+
+t416 ROTATION AXIS WIRING (user D15: upper-left rotation control should
+rotate about Z [in-plane spin] but ours rotates about Y [tumble]). The
+8-dial cluster: t400/t411 banked SENDPARAMs; map each dial to its axis
+per the SENDPARAM value + vendor behavior (spin = screen-plane rotation
+= our yaw-vs-roll naming; verify by rotating a KNOWN star: pick a star,
+click dial, assert its screen-space path is circular-about-center (Z)
+not vertical-arc (Y) — PIL mechanical witness on two shots). Fix the
+dial->axis table; pin per-dial behavior.
+
+t417 PLANETS LIST BACKGROUND (user D15: background = one of the images
+we determined was NOT used anywhere — wrong lib). Re-derive: which
+record is the status-list backdrop per windows.txt SHAPEITEM/SHAPEFRAME
+for the status window; the "unused" finding (D1 ruling: A-series
+historical curiosity) says we picked a dead asset. Fix to the cited
+record; if the vendor backdrop is actually the starfield + frame chrome
+(t393 law), do that instead — cite which.
+
+t418 PLANET VIEW: THE PLANET ITSELF + TILE GRID (user D15: planet
+display present but renders NO planet; should be a PICTURE of the planet
+overlaid with colored squares in ISOMETRIC view, selectable, adjacent-to-
+structure -> build order). Data law already RE'd (planetalloc docs:
+tile grid, terrain colors, structure placement, adjacency for build
+placement): render the planet disc (planet art record per atmosphere/
+size class — cite; race0X-style libs? planet*.shp?) + isometric tile
+overlay (colored squares per terrain per the palette law), click tile =
+select, adjacent-to-existing-structure -> project/build-order UI (reuse
+t406 project-set seam; the ADJACENCY rule is in the planetalloc docs —
+cite the FUN). Self-grade: planet visible + tiles clickable + build
+order lands in PLANETALLOC state.
+
+t419 RESEARCH ESCAPE TRAP + CORNER EXIT POPUP (user D15: "trapped in
+the research screen, escape doesn't work" + "mouse in a corner pops up
+a box that says Exit <ESC>, I think you found an image file for that in
+a previous round"). (a) debug WHY Esc fails on research specifically
+(its key handler eating Esc? screen-stack push without pop? t405 Esc
+law applies — verify EVERY screen Esc->map now, regression test per
+screen); (b) CORNER EXIT: census shp libs for the popup art (user
+recalls we found it — grep prior rounds' docs for corner/exit popup
+records; 1starmap/10status frames?) + windows.txt corner window
+sections; implement: mouse enters corner rect -> popup art + 'Exit
+<ESC>' text, Esc returns (vendor: this is the map-corner exit-to-menu
+helper). Self-grade: walk every screen, Esc from each lands map; corner
+popup renders.
+
+t420 PHASE-15 VERIFY + PUSH + HANDOFF (push-gap law MANDATORY). Full
+gate + run_tests + seed regression byte-identical; export; fetch FIRST;
+push; ls-verify (NOTE banked: public SHAs NEVER exist locally — the
+export is history-rewritten; "c178a43 not a valid object" locally is
+NORMAL, not a push gap); rewrite NEXT to WAIT-USER-RULING t374 verbatim
++ D16 sheet (:8613, per-screen before/after from OUR native-vision
+grades + the live re-check list); comparison screenshots from user
+welcome, not blocking.
 
 SELF-GRADE LAW (D13, applies to EVERY row in phase 14): R13 is LIFTED by
 owner order for OUR OWN UI screens. Harness fact banked: vision_analyze
