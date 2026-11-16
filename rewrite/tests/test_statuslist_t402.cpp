@@ -96,6 +96,10 @@ std::optional<ag::Campaign> seededCampaign() {
 
 // ---- word tables vs the shipped file --------------------------------------
 TEST(statuslist_word_tables_match_static_txt_t402) {
+    // Data-optional law (t396): without static.txt the vector is EMPTY and the
+    // s[41+i] reads below are OOB UB -> run_tests SIGSEGV on data-less clones
+    // (MEASURED t403 on export /tmp/pubpush-t403: FAIL line 100 then 139).
+    REQUIRE_DATA();
     const auto s = staticTxtStrings();
     CHECK(s.size() >= 57);
     // #41-45 sizes, #46-56 types (0-indexed quoted strings).
