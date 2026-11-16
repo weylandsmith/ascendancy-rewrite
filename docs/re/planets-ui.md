@@ -305,3 +305,41 @@ SDL; module template hudlayout.h t264). Working notes docs/re/_wip_t276.md.
    moved (composition of already-cited laws; the planitem identity extension
    for 39 items stays an OQ-005 contact-sheet fold, the pluralization stays
    [inferred] — strict-close unaffected).
+
+## 8. STATUS-SIDE PLANETS LIST LANDED AS CODE (t402, 2026-11-15)
+The rail-opened PLANETS LIST (state 10 STATUSWND child STATPLANLST, windows.txt
+ln1019/1504) is now a real screen in the rewrite: rewrite/src/ui/statuslist.{h,cpp}
+(pure law, compiled into run_tests per the planetwin precedent) + the ui.cpp
+status painter/click branch. Laws, all cited in statuslist.h headers:
+- ROW STRING (0x50647..0x5091f): line1 = "%s (%s %s Planet)" (#136) with size
+  word table static.txt #41-45 (Tiny..Enormous) and type word table #46-56
+  (Husk..Cornucopia) — the vendor reads them via pointer tables indexed by the
+  planet-record +0x14/+0x16 WORDs; the rewrite indexes its own sizeIdx/terrainRow
+  (content-anchor census scripts/r402_sizetype_census.py PASS: slot order ==
+  runtime table order). Self-Managed substitution (#137) at 0x5077f.
+- LINE2 (0x507fc..0x508d5): "Building %s%s" (#140); suffix " - No Progress"
+  (#138) on the 0xffff sentinel leg, else " - %d day%s until completion" (#139,
+  singular iff days==1, pair #28/#29 cited 0x5084e/0x50855); no-project leg
+  "No Project" (#141) + "   (No Free Population)" (#142, THREE leading spaces,
+  appended iff pop==used, 0x508da).
+- DAYS LAW = FUN_0x47010 verbatim shape: ind<=0 -> 0xffff sentinel, else
+  (cost-acc-1)/ind+1. Automation x3 leg (FUN_0x394d8) NOT modelled — named seam.
+- MEMBERSHIP t249 law (owner==player planets only); HEADER = #151 via
+  planetwin::formatPlanetHeader (t248 PROOF 3 maintained counter); row pitch 112
+  + three visible rows MEASURED on work/screens/t3/planets_header_t1086_after_open.png
+  (selection markers native y-centres 135.6/248.8/360.8).
+PINS: tests/test_statuslist_t402.cpp 7 cases (word tables joined vs SHIPPED
+static.txt; both templates byte-exact; days law; membership+window clamp;
+header counts; row geometry). MUTATION 8/8 CAUGHT (M0 word-table content,
+M1 days division, M2 singular law, M3 self-managed leg, M4b zero-ind wrong
+sentinel — original M4 ind<0 mutant was a SIGFPE crash not a clean catch,
+skill rule 7 re-scope —, M5 scroll overrun, M6 hit off-by-one, M7 header
+systems). Driver scripts/t402_mutate.py reverts by FILE COPY (/tmp snapshot) —
+the land was uncommitted, git checkout would have destroyed it (skill rule 1).
+WITNESS scripts/t402_status_witness.sh (Xvfb): rail STATUS opens the screen,
+scroll x2 lands ("ui status scroll down 2"), row click selects ("ui status
+select Amoroso"); shots /tmp/t402_shots/ show "Amoroso I (Small Husk Planet)"
+/ "No Project" rows and the #151 header "(2 Planets Occupied, 1 System
+Controlled)" with correct singular/plural — D11 "planets list screen is wrong
+and unusable" is no longer true of the rewrite. D11 ITSELF stays open until
+the USER ruling (strict-close).

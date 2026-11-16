@@ -230,18 +230,18 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t402 per queue row t402 below (PLANETS LIST SCREEN — D11: "the
-planets list screen is wrong and unusable"). ORDERING RATIONALE: t401
-landed the New Game art law (docs/re/t401-newgame-art.md S1-S12: wheel-
-frame law, smrace portrait class 49x49 scaled 2x, raceflag crest class
-21x14x24 native, page-texture bands, opaque DESC panel; 6 pins + MUTATION
-6/6 CAUGHT + witness census PASS). The planets list reuses that plumbing
-(blitShapeScaled now exists; windows.txt state-17 17np chrome is already
-banked in planetwin.{h,cpp} + docs/re/planetalloc*.md) — do it while the
-shape-blit seams are fresh. t403 (verify + push, MANDATORY push-gap law)
-follows unchanged and builds the grading sheet from
-work/r1/loop/t401-newgame{,-set}.png + t402 shots + t398/t400 shots.
-D11 New Game item stays USER-PENDING until graded (R13: no self-accept).
+NEXT t403 per queue row t403 below (VERIFY + PUSH, MANDATORY push-gap law).
+ORDERING RATIONALE: t402 landed the planets-list law as code (planets-ui.md
+S8: row assembly 0x50647..0x5091f cited, word tables joined vs shipped
+static.txt, days law FUN_0x47010, membership t249, pitch 112/3 rows measured;
+7 pins, suite 347/0, MUTATION 8/8 CAUGHT, Xvfb witness open/scroll/select).
+Two D11 sub-items now await USER grading and t403 is the channel: build the
+grading sheet from work/r1/loop/t401-newgame{,-set}.png + t402-status-*.png +
+t398/t400 shots (scripts/t397_grading_page.py pattern), push, and record
+rulings verbatim. D11 items stay USER-PENDING until graded (R13: no
+self-accept). After t403, remaining D11 chrome queue items (intel/fleet/
+research screen contents = state-17 seam work) re-rank by what the rulings
+say — do NOT pre-start them.
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
@@ -255,6 +255,33 @@ is NOT it; chrome grades close nothing by themselves; D11b answered = drop).
 (2) If a USER line grades the t401 New Game shots
 (work/r1/loop/t401-newgame{,-set}.png), record it verbatim in
 docs/re/t401-newgame-art.md S12 and disposition the D11 item.
+
+t402 LANDED 2026-11-15 (PLANETS LIST SCREEN AS CODE, D11 "wrong and
+unusable"). rewrite/src/ui/statuslist.{h,cpp} (pure law, no SDL) + ui.cpp
+status painter/click branch + campaign.h buildAccFor/itemAt accessors +
+runCampaignUi optional roster param (species dipName for the #151 header).
+Laws cited in-file and banked planets-ui.md S8: row-assembly cluster
+0x50647..0x5091f (size word = record+0x14 -> static.txt #41-45 Tiny..
+Enormous; type word = +0x16 -> #46-56 Husk..Cornucopia; content-anchor
+census r402_sizetype_census.py PASS slot order == runtime table order;
+#137 Self-Managed leg 0x5077f); line2 #138/#139/#140/#141/#142 verbatim
+(singular iff days==1 cited 0x5084e/0x50855); DAYS = FUN_0x47010 shape
+(ind<=0 -> 0xffff sentinel else (cost-acc-1)/ind+1; Automation x3 leg =
+named seam); membership t249 (owner==player); header #151 via
+formatPlanetHeader; pitch 112 + 3 visible rows MEASURED on the t3 capture
+(markers native y 135.6/248.8/360.8). PINS test_statuslist_t402.cpp 7
+cases, suite 340->347/0. MUTATION 8/8 CAUGHT (scripts/t402_mutate.py —
+reverts by FILE COPY from /tmp/t402-snap, land uncommitted; M0 word-table
+content, M1 days division, M2 singular, M3 self-managed, M4b zero-ind
+wrong sentinel [M4 ind<0 was SIGFPE crash not clean catch, skill rule 7],
+M5 scroll overrun, M6 hit off-by-one, M7 header systems). WITNESS
+scripts/t402_status_witness.sh on Xvfb: STATUS rail opens the screen,
+scroll x2 + row-click land ("ui status select Amoroso"); shots
+work/r1/loop/t402-status-{open,scroll1,select}.png show "Amoroso I
+(Small Husk Planet)" / "No Project" rows + header "(2 Planets Occupied,
+1 System Controlled)" correct singular. LEDGER: no OQ row matches (D11
+chrome items live in the STATE queue); strict-close held — D11 planets
+item USER-PENDING, nothing closed (honest negative).
 
 t401 LANDED 2026-11-15 (NEW GAME FRAMING + PANELS, D11). Proved by
 cited measurement + pins, law doc docs/re/t401-newgame-art.md:

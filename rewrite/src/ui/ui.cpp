@@ -20,6 +20,8 @@
 #include "ui/menulaw.h"
 #include "ui/mapchrome.h"
 #include "ui/statuslaw.h"
+#include "ui/planetwin.h"
+#include "ui/statuslist.h"
 #include "ui/ui_internal.h"
 
 namespace ascend::ui {
@@ -61,7 +63,8 @@ void applyLogicalSize(SDL_Renderer* ren) {
 
 int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                   const std::string& dataRoot, AudioEngine* audio,
-                  void* window, const std::string& savesDir) {
+                  void* window, const std::string& savesDir,
+                  const std::vector<ag::SpeciesInfo>* roster) {
     // t385: on a title->campaign transition the title loop hands over its
     // LIVE window (ui.h law: a fresh Xvfb window drops its first synthetic
     // click, so per-state window swaps eat injected gate input). Reuse it;
@@ -110,6 +113,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     cam.mapSize = 1024;  // MapConfig default (mapgen.h)
     bool lanesOn = true;
     int selected = -1;
+    // t402 PLANETS LIST screen state: scroll step + selected row (indices
+    // into statusPlanets(); selection is PORT law — the vendor row click
+    // opens the planet detail screen (state 17), which the port does not
+    // have yet: the selection marker is shown and the seam printed).
+    int statusScroll = 0;
+    int statusSel = -1;
     int played = 0;
     Uint32 nextAuto = autoplay ? SDL_GetTicks() + 250 : 0xFFFFFFFFu;
     bool quit = false;
@@ -120,10 +129,14 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // absurd). A screen whose lib refuses to load still draws frame + title
     // (honest degraded chrome, never a blank swap).
     int screen = kScreenMap;
-    const char* kLibFiles[4] = {"1starmap.shp", "10status.shp", "14intel.shp",
-                                "20res.shp"};
-    ascend::formats::ShapeLibrary kLibs[4];
-    for (int i = 0; i < 4; i++) {
+    // t402: planets.shp joins the set for the PLANETS LIST row spheres
+    // (55 records = 11 groups x 5-size ladder 11/18/25/35/47, shp.md S23.3
+    // — the group/size axes match the status row's type/size words; the
+    // group law itself is a NAMED SEAM, see the row painter).
+    const char* kLibFiles[5] = {"1starmap.shp", "10status.shp", "14intel.shp",
+                                "20res.shp", "planets.shp"};
+    ascend::formats::ShapeLibrary kLibs[5];
+    for (int i = 0; i < 5; i++) {
         std::string lerr;
         if (!kLibs[i].load(dataRoot + "/extracted/ascend01/data/" + kLibFiles[i],
                            &lerr))
@@ -166,7 +179,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     auto libFor = [&](int s) -> int {
         const char* want = screenShapeLib(s);
         if (!want) return -1;
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 5; i++)
             if (std::string(kLibFiles[i]) == want) return i;
         return -1;
     };
@@ -264,6 +277,27 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         std::printf("ui rail %s msg %d p1 %d (no screen change)\n",
                                     kRailName[static_cast<int>(*rb)], rc.sendMessage, rc.sendParam1);
                         std::fflush(stdout);
+                    }
+                } else if (screen == kScreenStatus && inRect(kStatusArrowUp, p)) {
+                    // PORT hit-map (the vendor TYPE-10 list arrows sit at the
+                    // interior right edge — witness top/bottom corners; the
+                    // exact arrow rects are uncited).
+                    statusScroll = std::max(0, statusScroll - 1);
+                    std::printf("ui status scroll up %d\n", statusScroll);
+                } else if (screen == kScreenStatus &&
+                           inRect(kStatusArrowDown, p)) {
+                    ++statusScroll;  // statusWindow clamps
+                    std::printf("ui status scroll down %d\n", statusScroll);
+                } else if (screen == kScreenStatus &&
+                           statusRowAt(p, kStatusRowsTop)) {
+                    const auto all = statusPlanets(camp, ag::kPlayer);
+                    const auto win = statusWindow(all, statusScroll);
+                    const int i = *statusRowAt(p, kStatusRowsTop);
+                    if (i < int(win.size())) {
+                        statusSel = statusScroll + i;
+                        const auto& s = camp.galaxy().stars[win[i].star];
+                        std::printf("ui status select %s (planet detail = "
+                                    "state-17 seam)\n", s.name.c_str());
                     }
                 } else if (screen == kScreenMap && inRect(kNextTurnBtn, p)) {
                     // NEXTTURN's STATE is "1 1" (map-only) — same gate.
@@ -639,7 +673,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             hdr.y1 - hdr.y0 + 1};
                 SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
                 SDL_RenderDrawRect(ren, &hs);
-                txt.draw(ren, hs.x + 8, hs.y + 6, screenTitle(screen), true, kText);
+                // t402: on the status screen the HEADER is the static.txt
+                // #151 string (t246/t249 law), drawn centred below — the
+                // generic rail-label title would collide with it.
+                if (screen != kScreenStatus)
+                    txt.draw(ren, hs.x + 8, hs.y + 6, screenTitle(screen), true,
+                             kText);
             }
             if (screen != kScreenSpecies) {
                 SDL_Rect is{interior.x0, interior.y0,
@@ -662,6 +701,132 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                          "race rows: NEGSCREEN seam (state 13)", false, kDim);
                 txt.draw(ren, kRaceRows[0].x0, 340, "Esc: return to galaxy",
                          false, kDim);
+            } else if (screen == kScreenStatus) {
+                // ---- t402 PLANETS LIST (D11 "wrong and unusable" FIXED).
+                // Law: ui/statuslist.h (row assembly 0x50647..0x5091f cited
+                // instruction-exact; word tables content-anchored; pitch 112
+                // + three rows MEASURED on the t3 capture; membership t249).
+                const auto all = statusPlanets(camp, ag::kPlayer);
+                const auto win = statusWindow(all, statusScroll);
+                // Header (static.txt #151 via planetwin; owner display name
+                // from the species roster, fallback "Player").
+                std::string owner = "Player";
+                if (roster) {
+                    const int ps = camp.playerSpecies();
+                    if (ps >= 0 && ps < int(roster->size()) &&
+                        !roster->at(size_t(ps)).dipName.empty())
+                        owner = roster->at(size_t(ps)).dipName;
+                }
+                const auto hdr = statusHeaderFor(camp, ag::kPlayer);
+                const std::string htxt =
+                    formatPlanetHeader(owner, hdr.planets, hdr.systems);
+                {
+                    const int w = txt.width(htxt, true);
+                    txt.draw(ren, kStatusWnd.x0 +
+                                 ((kStatusWnd.x1 - kStatusWnd.x0 + 1 - w) / 2),
+                             kStatusWnd.y0 + 6, htxt, true, kText);
+                }
+                // Scroll arrows (PORT rects; vendor arrow art uncited —
+                // honest vector triangles).
+                for (const auto& ar : {kStatusArrowUp, kStatusArrowDown}) {
+                    SDL_Rect rr{ar.x0, ar.y0, ar.x1 - ar.x0 + 1,
+                                ar.y1 - ar.y0 + 1};
+                    SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
+                    SDL_RenderFillRect(ren, &rr);
+                    SDL_SetRenderDrawColor(ren, 200, 200, 200, 255);
+                    const int cx = (ar.x0 + ar.x1) / 2, cy = (ar.y0 + ar.y1) / 2;
+                    const bool up = (&ar == &kStatusArrowUp);
+                    SDL_RenderDrawLine(ren, cx - 6, cy + (up ? 3 : -3),
+                                       cx + 6, cy + (up ? 3 : -3));
+                    SDL_RenderDrawLine(ren, cx, cy + (up ? -4 : 4),
+                                       cx, cy + (up ? 3 : -3));
+                }
+                // Rows (pitch kStatusRowPitch from kStatusRowsTop).
+                const int planetLibIdx = 4;  // planets.shp (kLibFiles order)
+                for (size_t i = 0; i < win.size(); i++) {
+                    const auto& key = win[i];
+                    const auto& s = camp.galaxy().stars[key.star];
+                    const int y = kStatusRowsTop + int(i) * kStatusRowPitch;
+                    // selection marker: green bar left edge (witness: a
+                    // ~15px marker at x 16..; PORT rect law, colour CVD-safe)
+                    if (statusScroll + int(i) == statusSel) {
+                        SDL_Rect mk{16, y + 24, 10, 15};
+                        SDL_SetRenderDrawColor(ren, 0, 200, 80, 255);
+                        SDL_RenderFillRect(ren, &mk);
+                    }
+                    // row frame (PORT; the vendor row separator is part of
+                    // the 10status chrome style anomaly, ui-runtime.md)
+                    SDL_Rect rf{32, y, 632 - 32, kStatusRowPitch - 8};
+                    SDL_SetRenderDrawColor(ren, 40, 40, 56, 255);
+                    SDL_RenderFillRect(ren, &rf);
+                    SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);
+                    SDL_RenderDrawRect(ren, &rf);
+                    // planet sphere: planets.shp record =
+                    // terrainRow*5 + sizeClass (the 11-group x 5-ladder
+                    // census, shp.md S23.3). GROUP LAW NAMED SEAM (biome
+                    // per group unverified); SIZE axis cited.
+                    const auto& ps = camp.planetAt(key.star);
+                    const int sizeIdx = ag::Campaign::sizeClassFor(ps.surfaceCells);
+                    const int typeIdx = ps.terrainRow;
+                    if (planetLibIdx < 5 && kLibs[planetLibIdx].count() == 55 &&
+                        sizeIdx >= 0) {
+                        const int rec = typeIdx * 5 + sizeIdx;
+                        const auto& r = kLibs[planetLibIdx].record(rec);
+                        blitShape(ren, kLibs[planetLibIdx], rec, 44,
+                                  y + (kStatusRowPitch - 8 - int(r.height)) / 2);
+                    }
+                    // line 1 + line 2 (the cited assembly)
+                    std::string pname = s.name;
+                    if (key.planetIndex < int(s.planets.size()))
+                        pname = s.planets[key.planetIndex].name;
+                    const std::string l1 = statusLine1(pname, sizeIdx, typeIdx);
+                    std::string l2;
+                    const auto cw0 = camp.channelWordsFor(key.star);
+                    const int pend = camp.pendingItemFor(key.star);
+                    if (pend < 0) {
+                        l2 = statusLine2NoProject(
+                            int(camp.planetAt(key.star).pop) ==
+                            camp.usedPopFor(key.star));
+                    } else if (const auto* pi = camp.planetItem(pend)) {
+                        // IND word = channelWordsFor().ind (the cited
+                        // +0x44 analog, incl. the Hyperpower leg).
+                        l2 = statusLine2(pi->name,
+                                         statusDays(pi->cost,
+                                                    camp.buildAccFor(key.star),
+                                                    cw0.ind),
+                                         (pi->flags & 0x2) != 0);
+                    } else {
+                        l2 = "Building ???";  // refuse-not-crash
+                    }
+                    const int tx = 100;
+                    txt.draw(ren, tx, y + 14, l1, true, kText);
+                    txt.draw(ren, tx, y + 40, l2, false, kDim);
+                    // pop band strip (cited popBandsFor; 17np k1/k2/k3 art
+                    // would need the pop lib — vector bands, PORT)
+                    const auto bands = camp.popBandsFor(key.star);
+                    const int n = std::min<int>(bands.size(), 40);
+                    for (int b = 0; b < n; b++) {
+                        const SDL_Color c = bands[b] == 1
+                                              ? SDL_Color{200, 60, 60, 255}
+                                              : bands[b] == 2
+                                              ? SDL_Color{200, 180, 60, 255}
+                                              : SDL_Color{60, 120, 90, 255};
+                        SDL_Rect px{300 + b * 5, y + 66, 4, 4};
+                        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                        SDL_RenderFillRect(ren, &px);
+                    }
+                    // gauges RES/IND/PRO selectors as numbers (content law;
+                    // the dot-ladder art is the state-17 panel's, seam)
+                    const auto cw = camp.channelWordsFor(key.star);
+                    char gbuf[64];
+                    std::snprintf(gbuf, sizeof(gbuf), "RES %d  IND %d  PRO %d",
+                                  gaugeSelector(cw.res), gaugeSelector(cw.ind),
+                                  prosSelector(cw.pros));
+                    txt.draw(ren, tx, y + 84, gbuf, false, kDim);
+                }
+                if (win.empty())
+                    txt.draw(ren, interior.x0 + 8, interior.y0 + 8,
+                             "No planets owned", false, kDim);
             } else {
                 txt.draw(ren, interior.x0 + 8, interior.y0 + 8,
                          "frame + title only: content law seam", false, kDim);

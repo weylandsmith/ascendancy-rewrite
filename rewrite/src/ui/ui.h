@@ -52,7 +52,9 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
 int runCampaignUi(ascend::game::Campaign& camp, int turns, bool autoplay,
                   const std::string& dataRoot, AudioEngine* audio = nullptr,
                   void* window = nullptr,
-                  const std::string& savesDir = std::string());
+                  const std::string& savesDir = std::string(),
+                  const std::vector<ascend::game::SpeciesInfo>* roster =
+                      nullptr);
 
 // Plays an FLC video 1:1 into a 640x480 window (docs/re/flc.md): palette +
 // indices converted on the CPU to ARGB, uploaded per frame via a streaming

@@ -605,7 +605,8 @@ int main(int argc, char** argv) {
         }
         const int rc = ascend::ui::runCampaignUi(*camp, o.campaign, o.autoplay,
                                                  o.dataRoot.string(), audio.get(),
-                                                 handedWindow, savesDir);
+                                                 handedWindow, savesDir,
+                                                 &rosterForUi(o));
         SDL_Quit();  // also tears down the handed-over window
         return rc;
     }

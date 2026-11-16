@@ -278,6 +278,13 @@ public:
     }
     int pendingItemFor(int star) const { return planets_[star].pendingItem; }
     int buildAccFor(int star) const { return planets_[star].buildAcc; }
+    // t402: read-only planitem-table row for the PLANETS LIST display law
+    // (ui/statuslist.h: item name + COST feed "Building %s%s"). Null out of
+    // domain; never mutates.
+    const PlanetItem* planetItem(int idx) const {
+        return (idx >= 0 && items_ && idx < int(items_->size()))
+                   ? &(*items_)[idx] : nullptr;
+    }
     // Public +0x4a analog for tests/UI (income-law.md S10 seed law).
     int popCapAt(int star) const { return storedCapFor(star); }
     // Per-planet channel words +0x44/+0x46/+0x48 incl. the t45 governor
