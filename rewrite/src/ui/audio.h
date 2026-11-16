@@ -17,6 +17,22 @@
 #include <SDL_mixer.h>
 
 namespace ascend::ui {
+
+// t404 CLICK-SFX LAW (D13 regression fix; docs/re/audio.md §6.5/§6.6/§6.7).
+// The shipped windows.txt SOUNDCHANNEL column is {0 x118, -0 x1} — it carries
+// NO per-button sound id, so every UI press sound is a DOCUMENTED PORT CHOICE
+// and must live in ONE pure lookup (headless-pinnable), never inline guesses.
+// Map clicks are SILENT: laser01 is a combat sample (soundfx.txt index 2,
+// band2) with no fire-order interaction in the port; playing it on every
+// COSMOSWnd click was the t400-era regression the owner reported.
+enum class UiPressSite { MapClick, RailButton, NextTurn, TitleButton };
+const char* sfxForPress(UiPressSite site);  // nullptr -> play nothing
+
+// Event sounds (not presses): the turn-advance "captured" call-out. Kept in
+// the same lookup so EVERY sound choice in the UI is one cited line and the
+// sweep pin (no play("<literal>") anywhere in ui/) can be total.
+const char* sfxForEvent(const std::string& eventText);
+
 // t388b VOLUME LAW (docs/re/audio.md §6, MEASURED): the vendor music-volume
 // setter FUN_0004feec @0x4feec stores the byte ONLY when -1 < v <= 0x7f
 // (out-of-range silently dropped — no clamp), then pokes the device via

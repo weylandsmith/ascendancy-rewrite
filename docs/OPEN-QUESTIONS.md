@@ -298,6 +298,13 @@ t403: D11 item-4 answer recorded 11:37 ("seems OK at first listen... will
 answer better when the game is more playable") — per this row's own bar that
 is NOT the closing verdict; the ask RE-ISSUED as D12 item 5 (paste + match/
 differ verdict on the rebuilt sheet :8613). Row STAYS OPEN (strict-close).
+t404 update: the port-name list above is SUPERSEDED — laser01 map-click was
+a placeholder REGRESSION (owner D13), now removed; port law is
+sfxForPress/sfxForEvent (click08 on rail/next-turn/title presses, map clicks
+SILENT, bang01 on "captured") — audio.md §6.7, pins sfx_*_t404 x5 + witness
+scripts/t404_sfx_witness.sh PASS. Strict-close held: removing a placeholder
+measures nothing about the vendor's per-button choice; (a) and (b) both stay
+OPEN on their own closure bars.
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor cost hack, Orbital Docks effect

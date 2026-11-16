@@ -205,8 +205,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         if (audio) {
             const auto& ev = camp.events();
             for (size_t i = before; i < ev.size(); i++)
-                if (ev[i].text.find("captured") != std::string::npos) {
-                    audio->play("bang01");
+                if (const char* sfx = sfxForEvent(ev[i].text)) {
+                    audio->play(sfx);  // t404: sfxForEvent law (audio.md §5)
                     break;
                 }
         }
@@ -262,6 +262,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 // screens; Escape is the cited way back).
                 const auto rb = railButtonForScreen(p, screen);
                 if (rb.has_value()) {
+                    // t404: rail presses click like every other button press
+                    // (sfxForPress law; owner pin "rail click click08").
+                    if (const char* sfx = sfxForPress(UiPressSite::RailButton))
+                        if (audio) audio->play(sfx);
                     const RailControl rc = railControl(*rb);
                     const int next =
                         screenAfterRailPress(screen, rc.sendMessage, rc.sendParam1);
@@ -302,7 +306,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 } else if (screen == kScreenMap && inRect(kNextTurnBtn, p)) {
                     // NEXTTURN's STATE is "1 1" (map-only) — same gate.
                     std::printf("ui click next-turn\n");
-                    if (audio) audio->play("click08");
+                    if (const char* sfx = sfxForPress(UiPressSite::NextTurn))
+                        if (audio) audio->play(sfx);
                     advanceOnce();
                 } else if (screen == kScreenMap && inRect(kNextTurnCont, p)) {
                     // t394 NEXTTURNCONT (msg 8, ln556): the vendor's mid-turn
@@ -345,7 +350,14 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // so map selection is inert inside a screen too.
                     // Right-click deselect (selfplay.md) will land HERE once
                     // selection widgets exist — no selection UI this row.
-                    if (audio) audio->play("laser01");
+                    // t404 INPUT HYGIENE (D13): map clicks are SILENT. The
+                    // laser01 here was an early placeholder that fired on
+                    // EVERY click; the vendor SOUNDCHANNEL table names no
+                    // sample (audio.md §6.5/§6.6) and the port has no
+                    // fire-order interaction, so laser01 plays NOWHERE
+                    // until combat UI exists (sfxForPress law).
+                    if (const char* sfx = sfxForPress(UiPressSite::MapClick))
+                        if (audio) audio->play(sfx);
                     selected = hitStarCam(cam, camp.galaxy(), p);
                     std::printf("ui click map (%d,%d) -> %s\n", p.x, p.y,
                                 selected >= 0 ? camp.galaxy().stars[selected].name.c_str()

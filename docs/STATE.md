@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-15T21:40
+updated: 2026-11-15T23:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,24 +230,21 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t404 per queue row t404 below (phase 14: SCREEN FUNCTIONALITY +
-LOOK, per D13 — the OWNER LIFTED R13 for our own UI renders: sessions
-self-grade with NATIVE vision and iterate until their own grade passes;
-see SELF-GRADE LAW at the head of the phase-14 block). The
-WAIT-USER-RULING t374 sentinel is RETIRED (tag itself never renumbered;
-history below). USER D13 (verbatim in DECISIONS.md): "step through the
-new game setup and menus with your own vision... come back when you've
-stepped through all the screens and they look and work right... set up
-the loop to keep working through it until all the screens look right to
-you." Assistant's own walkthrough 2026-11-15 (native vision): title
-PASSES; New Game frames OK but species squares empty + race intro
-MISSING; map renders but flat/no frame/empty day ovals/noisy rail;
-Begin logged but campaign slow-or-dead unreproduced; Planets shows
-Empire status (owned filter + click->detail MISSING); Ships/Research
-screens ABSENT; Special-Ability dead; rail inert inside sub-screens;
-laser01 fires on EVERY map click (ui.cpp:348 placeholder). D12 sheet
-superseded by t413's D14 sheet at the end. OQ-027 still closes only on
-the user's final audio verdict.
+NEXT t405 per queue row t405 below (phase 14: SUB-SCREEN NAVIGATION +
+RAIL LIVENESS — the owner's D13 witness "Ships/Research clicks route
+into the status screen's scroll" is STILL TRUE after t404: t404 fixed
+what the clicks SOUND like, not where they GO; ui.cpp:342-348 still
+deliberately makes the rail inert while a screen is open, and the
+vendor law is screens SWAP with the rail live). Ordering rationale:
+t405 is the navigation fix every later screen row (t406 planets-view,
+t407 ships, t408 research, t410 system chain) is walked THROUGH, so it
+must land first; t404 closed the audio-hygiene half of D13 (laser01
+plays nowhere — witness PASS, MUTATION 6/6, audio.md §6.7). Reuse the
+t404 witness harness shape (SDL_AUDIODRIVER=dummy + --audio-trace makes
+rail-press click08 a machine-visible marker for "the rail branch ran").
+The WAIT-USER-RULING t374 sentinel is RETIRED (tag itself never
+renumbered; history below). D13 queue rows t406..t413 stand as written.
+OQ-027 still closes only on the user's final audio verdict.
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
 `ss -tlnp | grep 8613`; if dead, `cd work/r1/d1page && python3 server.py`
@@ -263,6 +260,41 @@ verbatim in docs/re/_wip_t403.md F7+ and disposition the named screen item;
 if a ruling reopens a screen, author ONE queue row citing the ruling phrase
 (no fix-by-eye). NOTE: the 11:37 D11 ruling PREDATES the t401/t402 landings —
 it grades neither; do not treat it as their disposition.
+
+t404 LANDED 2026-11-15 (LASER-SOUND REGRESSION + INPUT HYGIENE; law
+docs/re/audio.md §6.7). Root cause ui.cpp:348 (pre-fix): EVERY left click
+in COSMOSWnd played laser01 — an early placeholder the §5 note itself
+labelled a documented port choice, never vendor law (SOUNDCHANNEL census
+{0 x118, -0 x1} names no sample; laser01 = soundfx index 2, band2 combat
+sample; port has NO fire-order interaction). Fix shape: ONE pure lookup
+sfxForPress/sfxForEvent in ui/audio.{h,cpp} — MapClick SILENT,
+RailButton/NextTurn/TitleButton click08 (rail GAINS it per the owner pin),
+event "captured" -> bang01, out-of-range -> silent; all four call sites
+(ui.cpp x3 incl. bang01, title.cpp x1) route through it, so the sweep pin
+"no play(\"<literal> anywhere in ui/ui.cpp|title.cpp|main.cpp" is TOTAL.
+PINS test_sfxpress_t404.cpp x5, suite 347->352/0. MUTATION 6/6 CAUGHT
+(scripts/t404_mutate.py, revert by FILE COPY from /tmp/t402-style snap —
+land uncommitted, skill rule 1; M1 map=laser01, M2 rail silent, M3
+out-of-range->bang01, M4 captured-typo, M5 inverted gate, M6 placeholder
+re-added). PIN LESSON (banked in-file + audio.md §6.7): CHECK(std::string(f())
+=="x") is std::string(nullptr) UB when a mutant goes silent — suite died
+rc-crash "CAUGHT ?" with no FAIL lines (M2/M4/M5); null-safe streq() helper
+makes silent mutants fail with NAMED lines, re-run confirmed. WITNESS
+scripts/t404_sfx_witness.sh (Xvfb :97, SDL_AUDIODRIVER=dummy — the
+silent-degrade law nulls the engine, and the trace rides on it, so the dummy
+driver is what makes --audio-trace deterministic; campaign seed 5 ENDS AFTER
+TURN 1: order the script map->rail->Esc->next-turn or the window dies):
+map click zero sfx lines, rail press click08 before its switch line,
+next-turn click08 after its marker, laser01 zero anywhere — VERDICT PASS.
+LEDGER: closes NOTHING (strict-close honest negative — removing a
+placeholder measures nothing about the vendor's per-button choice; OQ-027
+(a)+(b) stay OPEN on their own bars; D13 audio line unchanged, still awaits
+the final hearing verdict). ADOPTION: tools/winpos ELF was untracked —
+.gitignore now lists it beside the other three tool binaries.
+t412 queue note updated (uncommitted prior-session USER WITNESS adopted in
+the same commit): Begin->map ~3 s is mapgen time exposed BECAUSE the race
+intro screen that should sit between them doesn't exist — sequence the
+intro, don't chase a slow-mapgen bug.
 
 t403 LANDED 2026-11-15 (PHASE-12 VERIFY + RE-EXPORT + PUSH + D12 SHEET;
 full account docs/re/packaging.md t403 block + docs/re/_wip_t403.md).
@@ -881,6 +913,8 @@ soundfx/help law for what laser01 IS); map clicks follow windows.txt
 SOUNDCHANNEL (census map children); dead areas play NOTHING. Sweep all
 placeholder sounds (grep play( sites, cite each or remove). Pins:
 click-empty-map silent / rail click click08 / no laser without fire.
+LANDED t404 — see the LANDED block above; laser01 plays NOWHERE until a
+cited fire-order interaction exists.
 
 t405 SUB-SCREEN NAVIGATION + RAIL LIVENESS (I WITNESSED D13: Planets
 opens Empire status, then Ships/Research/Species clicks route into the
@@ -966,7 +1000,13 @@ cite; minimum ship the text panel + click-to-continue, name the art
 seam). Begin robustness: my witness logged 'raceconfig begin density 50
 species 7 atmosphere 1' but the campaign never appeared in that session
 — distinguish SLOW mapgen (this box) vs DEAD: log line before/after
-generation, and verify fresh-process Begin lands intro->map.
+generation, and verify fresh-process Begin lands
+intro->map. USER WITNESS 2026-11-15: Begin -> map takes ~3 s on this
+box = generation time (intro absent, so nothing masks it). SEQUENCE the
+vendor flow: Begin -> race intro (text scroll takes seconds naturally)
+-> map; if gen still shows, pre-generate behind the intro panel. The
+delay is NOT the missing intro causing work — it's mapgen exposed
+because the intro screen that should sit between them doesn't exist.
 
 t413 PHASE-14 VERIFY + PUSH + HANDOFF (push-gap law MANDATORY). Full
 gate + run_tests + seed regression byte-identical; export; fetch FIRST;

@@ -12,6 +12,29 @@
 namespace ascend::ui {
 namespace af = ascend::formats;
 
+// t404 CLICK-SFX LAW (see audio.h; audio.md §6.5-§6.7). Pure lookup so the
+// silence choice is headless-pinnable: MapClick has NO sample (the vendor
+// table names none and the port has no fire-order interaction); every other
+// press site is click08 — a documented port choice, symmetric across
+// rail / next-turn / title presses (user D11 accepted this click sound).
+const char* sfxForPress(UiPressSite site) {
+    switch (site) {
+        case UiPressSite::MapClick:    return nullptr;
+        case UiPressSite::RailButton:  return "click08";
+        case UiPressSite::NextTurn:    return "click08";
+        case UiPressSite::TitleButton: return "click08";
+    }
+    return nullptr;
+}
+
+// t404: the one event sound the port plays. audio.md §5 documents bang01 on
+// a new event line containing "captured" (names verbatim from soundfx.txt);
+// every other event text is silent — the vendor table names no id (§6.6).
+const char* sfxForEvent(const std::string& eventText) {
+    return eventText.find("captured") != std::string::npos ? "bang01"
+                                                           : nullptr;
+}
+
 namespace {
 // SDL2_mixer has no raw-PCM loader; wrap vendor PCM in a minimal RIFF WAV
 // in memory (docs/re/audio.md §5). u8 mono/stereo PCM.

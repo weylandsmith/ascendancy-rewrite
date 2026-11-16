@@ -118,6 +118,7 @@ add_executable(run_tests
   tests/test_terrain_t294.cpp
   tests/test_audio.cpp
   tests/test_sound_t395.cpp
+  tests/test_sfxpress_t404.cpp
   tests/test_ships.cpp
   tests/test_flic.cpp
   tests/test_gif_t390.cpp

@@ -418,3 +418,38 @@ state kTuneNoChange(-2) (boot.h, pinned); the title loop requests it every
 frame (idempotent via the playTune same-tune no-op). playTune hardened: any
 t < -1 is a no-op (pre-fix, t=-2 indexed music_ out of bounds — UB).
 
+
+### 6.7 t404 CLICK-SFX LAW (2026-11-15; D13 "clicking anywhere in the galaxy
+map makes a laser-fire sound")
+
+The t400-era map branch played laser01 on EVERY left click inside COSMOSWnd
+(an early placeholder, ui.cpp:348 pre-fix). §6.5/§6.6 already established the
+shipped windows.txt SOUNDCHANNEL column {0 x118, -0 x1} carries NO per-button
+sound id, so laser01-on-click was never vendor-flavoured — and laser01 is a
+combat sample (soundfx.txt name index 2; span 45277 = band2/1-voice per the
+§2 header-pair census) while the port has no fire-order interaction at all.
+
+LAW (rewrite/src/ui/audio.h/.cpp, pinned test_sfxpress_t404.cpp x5): every
+sound the UI plays resolves through ONE pure lookup, so silence is pinnable
+and no call site may hand-play a literal:
+  sfxForPress: MapClick -> nullptr (SILENT — no cited sample, no combat UI);
+    RailButton/NextTurn/TitleButton -> "click08" (documented port choice,
+    §6.5; owner D11 heard and accepted the click sound). Rail presses gained
+    click08 this iteration — symmetric with title/next-turn.
+  sfxForEvent: event text containing "captured" -> "bang01" (§5 pairing),
+    everything else silent.
+  Out-of-range enum -> nullptr (same defensive shape as t395 playTune).
+Witness scripts/t404_sfx_witness.sh (Xvfb + --audio-trace, SDL dummy driver):
+map click logs zero sfx, rail press logs click08 before its switch line,
+next-turn logs click08 after its marker, laser01 zero times — VERDICT PASS.
+MUTATION 6/6 CAUGHT (scripts/t404_mutate.py, revert by FILE COPY from
+/tmp/t404-snap — land was uncommitted, skill rule 1): M1 map=laser01,
+M2 rail silent, M3 out-of-range->bang01, M4 "captured" typo, M5 inverted
+event gate, M6 call-site placeholder re-added. Pin lesson banked in the test
+file: CHECK(std_string(f())=="x") CRASHES the suite (std::string(nullptr) UB)
+when a mutant makes a site silent — use the null-safe streq() helper so
+silent mutants fail with named lines (M2/M4/M5 first ran rc-crash "?").
+STATUS: laser01 now plays NOWHERE in the rewrite; it returns with a cited
+fire-order interaction (combat UI), not before. OQ-027b (channel->sample
+mapping) stays OPEN — this row removed a placeholder, it measured nothing
+new about the vendor's per-button choice.
