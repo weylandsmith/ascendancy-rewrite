@@ -198,7 +198,7 @@ TEST(statuslist_membership_and_window_t402) {
         if (c.starOwner(s.id) == ag::kPlayer && !s.planets.empty())
             ++colonised;
     CHECK(int(all.size()) == colonised);
-    CHECK(all.size() == c.starsOwned(ag::kPlayer));
+    CHECK(all.size() == static_cast<size_t>(c.starsOwned(ag::kPlayer)));
     CHECK(int(expect) > colonised);  // the old shape emitted MORE rows (regression fence)
     CHECK(colonised > 0);
     // Order: (star, index) ascending.
@@ -223,7 +223,7 @@ TEST(statuslist_membership_and_window_t402) {
     CHECK(au::statusWindow(five, maxS)[2].planetIndex ==
           five.back().planetIndex);
     // The campaign list itself: one row per owned star, never more.
-    CHECK(all.size() <= c.starsOwned(ag::kPlayer));
+    CHECK(all.size() <= static_cast<size_t>(c.starsOwned(ag::kPlayer)));
     // Small list (< 3): window == list.
     std::vector<au::StatusRowKey> two{{3, 0}, {3, 1}};
     CHECK(au::statusWindow(two, 0).size() == 2);

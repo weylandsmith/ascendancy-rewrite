@@ -350,3 +350,33 @@ your live run after `git pull`; the sheet carries our own-vision captures as
 fallback. What to re-check live, per screen, is in the WALKTHROUGH TABLE in
 docs/STATE.md (NEXT block). AUDIO NOTE unchanged: only the pasted `audio:`
 startup line + a verdict closes OQ-027.
+
+## D14 — ROUND-3 GRADE + COMPILER WARNING (USER, 2026-11-16, verbatim excerpts)
+
+> the decorative framing is still wrong and mostly missing, there should
+> be a spinning star field commensurate with the star density in the
+> upper left, the icons below "Star Density", "Species", and
+> "Atmosphere" are repeating, the player icons are missing from the
+> "Player Color" box, the race images in the right-hand frame are all 4x
+> size, the planet image is missing from the race info frame... the next
+> screen for race info is now present and displays the text, but it
+> should also show the decorative framing and a race image.... the
+> rotation controls are still a bit off - the upper left rotation control
+> should rotate the galaxy about the Z axis, but it here seems to rotate
+> it around the Y axis... the planets list screen is looking better but
+> the background is still off, it seems to be using one of those images
+> we determined wasn't used anywhere as a background. The planet display
+> itself is now present, but it doesn't render... you know... the planet.
+> THere should be a picture of a planet overlaid with squares of various
+> colors in isometric view, which can be selected, and if adjacent to an
+> existing structure given a build order. ... I'm actually trapped in the
+> research screen, escape to return to galaxy doesn't work. There should
+> also be a UI feature where putting the mouse in a corner pops up a box
+> that says "Exit <ESC>", I think you found an image file for that in a
+> previous round. ... Making progress though!
+
+Applied: phase-15 queue t414-t419 (self-grade law D13 continues).
+Compile warning (sign-compare x2 test_statuslist_t402.cpp) fixed on
+receipt: 0 warnings, 401/0. Corner "Exit <ESC>" popup: user recalls an
+image found earlier — census the shp libs for it (t419). Comparison
+screenshots: welcome but not required (D13 self-grade is the bar).
