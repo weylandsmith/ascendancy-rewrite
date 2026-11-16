@@ -83,6 +83,12 @@ int main(int argc, char** argv) {
     memset(&e, 0, sizeof e);
     int press;
     if (!is_key) {
+        /* D13: SDL2 apps (our rewrite) drop synthetic buttons while the
+         * window is unfocused — Xvfb has no WM to focus it. DOSBox (the
+         * production game) accepted sends without this; SDL checks
+         * XIInputFocus. Explicit focus first, then warp. */
+        XSetInputFocus(d, w, RevertToParent, CurrentTime);
+        XSync(d, False);
         XWarpPointer(d, None, w, 0, 0, 0, 0, x, y);
         XSync(d, False);
         usleep(20000);
