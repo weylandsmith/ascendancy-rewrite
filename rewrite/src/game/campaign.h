@@ -207,6 +207,20 @@ public:
     ~Campaign();
     Campaign(Campaign&&);
     int starsOwned(int owner) const;
+    // t409 SPECIES MENU read-only surface (ui/speciesmenu.h law): owner
+    // count incl. the player, the player's first-contact knowledge row
+    // (contacted_ IS the receive-leg ledger, visibilityPhase), and the
+    // dip-header display name for owner 1..N. Display-only, zero rng —
+    // same posture as fleet()/gizmoAt() (t407/t408).
+    int ownerCount() const { return Nowner_; }
+    bool playerKnows(int owner) const {
+        return owner > 0 && owner < Nowner_ &&
+               contacted_[kPlayer * Nowner_ + owner] != 0;
+    }
+    std::string ownerName(int owner) const {
+        return (owner > 0 && owner - 1 < int(aiDip_.size()))
+                   ? aiDip_[size_t(owner - 1)].displayName : std::string();
+    }
     int starOwner(int starId) const { return owner_[starId]; }
     // t399: the owner's home star id (pickHomeStars result, fixed for the
     // campaign), or -1. Consumer: the cosmos map marks it visually distinct

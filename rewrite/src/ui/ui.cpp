@@ -23,6 +23,8 @@
 #include "ui/planetwin.h"
 #include "ui/statuslist.h"
 #include "ui/planetview.h"
+#include "ui/abilitylaw.h"
+#include "ui/speciesmenu.h"
 #include "ui/fleetlist.h"
 #include "ui/researchview.h"
 #include "ui/ui_internal.h"
@@ -143,6 +145,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // (t252 pixel-diff). No clamp law exists in vendor data -> the offsets
     // are unbounded [labelled port choice]; nodes derive from them purely.
     int resPanX = 0, resPanY = 0;
+    // t409 ABILITY DIALOG session state: the SPECIALAB press opens the
+    // ABILITYWIN modal (ui/abilitylaw.h — vendor msg-5 path 0x55ffb ->
+    // 0x37b14: sprintf("abil%02d") of the PLAYER SPECIES into ABILITYWIN,
+    // then WAIT). Modal: while open, clicks inside the full window rect are
+    // the ABILBUTTON msg-50 dismiss (both buttons cover 60,100-395,355),
+    // clicks outside are inert, Escape also dismisses.
+    bool abilityOpen = false;
     int played = 0;
     Uint32 nextAuto = autoplay ? SDL_GetTicks() + 250 : 0xFFFFFFFFu;
     bool quit = false;
@@ -177,6 +186,19 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         if (!raceflagLib.load(dataRoot + "/extracted/ascend01/data/raceflag.shp",
                               &ferr))
             std::printf("ui raceflag lib refused: %s\n", ferr.c_str());
+    }
+    // t409 ABILITY DIALOG panels (ui/abilitylaw.h): the help.txt abilNN
+    // blocks that the vendor's msg-5 opener sprintf's into ABILITYWIN.
+    // Refusal = the Special Ability press logs the seam and no-ops (never
+    // a blank/garbled modal).
+    std::vector<AbilityPanel> abilityPanels;
+    {
+        std::string aerr;
+        if (!loadAbilityPanels(dataRoot + "/extracted/ascend00/help.txt",
+                               &abilityPanels, &aerr)) {
+            std::printf("ui ability panels refused: %s\n", aerr.c_str());
+            abilityPanels.clear();
+        }
     }
     // t400 FRAME TEXTURE (mapchrome.h law): one static texture over the
     // measured bands (alpha 0 elsewhere), built ONCE — 87k draw-points per
@@ -246,13 +268,20 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         if (SDL_WaitEventTimeout(&ev, 16)) {
             if (ev.type == SDL_QUIT) quit = true;
             else if (ev.type == SDL_KEYDOWN && screen == kScreenMap &&
+                     !abilityOpen &&  // t409: the modal waits (vendor CALL
+                                       // 0x37b14 blocks; keys are inert)
                      (ev.key.keysym.sym == SDLK_RETURN || ev.key.keysym.sym == SDLK_SPACE)) {
                 std::printf("ui key next\n");
                 advanceOnce();
             } else if (ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_ESCAPE) {
-                // t388 Escape law (t252 live): inside a screen, Esc returns
-                // to the map; on the map it quits (standing port law).
-                if (escapeToMap(screen)) {
+                // t409 modal precedence: an open dialog swallows Escape
+                // first (the vendor waits for the dialog; the screen below
+                // never sees it).
+                if (abilityOpen) {
+                    abilityOpen = false;
+                    std::printf("ui ability dialog dismiss (esc)\n");
+                    std::fflush(stdout);
+                } else if (escapeToMap(screen)) {
                     std::printf("ui screen %s -> map (esc)\n",
                                 screenTitle(screen));
                     std::fflush(stdout);
@@ -260,7 +289,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 } else {
                     quit = true;
                 }
-            } else if (ev.type == SDL_KEYDOWN && (ev.key.keysym.mod & KMOD_ALT)) {
+            } else if (ev.type == SDL_KEYDOWN && (ev.key.keysym.mod & KMOD_ALT) &&
+                       !abilityOpen) {  // t409 modal: chords inert too
                 // t388 PORT ADDITION (labelled): the title-screen D9 chords'
                 // twins inside the campaign. windows.txt has NO save/load
                 // control on the campaign rail (they are STATE "1 0" title
@@ -282,6 +312,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 }
             } else if (ev.type == SDL_MOUSEBUTTONDOWN && ev.button.button == SDL_BUTTON_LEFT) {
                 Pt p{ev.button.x, ev.button.y};
+                if (abilityOpen) {
+                    // t409 MODAL LAW: ABILBUTTON0/1 both cover the full
+                    // ABILITYWIN rect (windows.txt ln2152-2185) — any click
+                    // inside dismisses (msg 50 family); outside, the click
+                    // is inert (the vendor waits; nothing else is live).
+                    if (abilityDialogHit(p.x, p.y)) {
+                        abilityOpen = false;
+                        std::printf("ui ability dialog dismiss\n");
+                        std::fflush(stdout);
+                    }
+                } else {
                 // t388: the rail is the screen switch. railButtonForScreen
                 // honours the STATE id-list law, so on a non-map screen no
                 // rail button hits at all (vendor: rail hidden inside
@@ -301,12 +342,52 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                     kRailName[static_cast<int>(*rb)]);
                         std::fflush(stdout);
                         screen = next;
+                    } else if (rb == RailButton::SpecialAbility &&
+                               rc.sendMessage == 5) {
+                        // t409 msg 5 IS WIRED in the vendor (never a silent
+                        // no-op): the winmgr path looks ABILITYWIN up by
+                        // name and the opener fills it with the PLAYER
+                        // SPECIES' help.txt abilNN panel, then waits
+                        // (ui/abilitylaw.h, docs/re/_wip_t409.md F2).
+                        const int abIdx = int(camp.abilityOf(ag::kPlayer));
+                        if (abIdx >= 0 && panelForIndex(abilityPanels, abIdx)) {
+                            abilityOpen = true;
+                            std::printf("ui ability dialog open (abil%02d)\n",
+                                        abIdx);
+                        } else {
+                            // Human player (-1) or panels refused: the
+                            // vendor always has a species row; the port
+                            // says so instead of guessing a panel.
+                            std::printf("ui ability dialog seam: no player "
+                                        "species panel (ability %d)\n", abIdx);
+                        }
+                        std::fflush(stdout);
                     } else {
                         // Not a switch (SPECIALAB msg 5) or a target with no
                         // chrome: acknowledge, never guess.
                         std::printf("ui rail %s msg %d p1 %d (no screen change)\n",
                                     kRailName[static_cast<int>(*rb)], rc.sendMessage, rc.sendParam1);
                         std::fflush(stdout);
+                    }
+                } else if (screen == kScreenSpecies) {
+                    // t409: a race-row press. The vendor sends msg 1 p1 13
+                    // (NEGSCREEN); the port has no state-13 chrome, so the
+                    // t388 known-set law makes it inert — but the press is
+                    // LOGGED (witness surface), and an Extinct row prints
+                    // the highlight-only law (help.txt:775, diplomacy.md
+                    // §21.3).
+                    const auto rows = speciesMenuRows(camp, roster);
+                    for (size_t i = 0; i < rows.size() && i + 1 < 7; i++) {
+                        const Rect& slot = kRaceRows[i + 1];
+                        if (p.x >= slot.x0 && p.x <= slot.x1 &&
+                            p.y >= slot.y0 && p.y <= slot.y1) {
+                            std::printf("ui species row %s (%s)\n",
+                                        rows[i].extinct ? "Extinct - highlight only"
+                                                        : rows[i].name.c_str(),
+                                        "NEGSCREEN state 13 seam");
+                            std::fflush(stdout);
+                            break;
+                        }
                     }
                 } else if (screen == kScreenStatus &&
                            statusHitFor(p, kStatusRowsTop).kind != StatusHit::None) {
@@ -504,6 +585,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                 selected >= 0 ? camp.galaxy().stars[selected].name.c_str()
                                               : "none");
                 }
+                }  // t409 end: !abilityOpen left-click chain
             } else if (ev.type == SDL_MOUSEBUTTONDOWN &&
                        ev.button.button == SDL_BUTTON_RIGHT &&
                        screen == kScreenFleet) {
@@ -856,21 +938,50 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
                 SDL_RenderDrawRect(ren, &is);
             }
-            // Species menu: the seven RACE_1..7 row frames (cited rects).
-            // Rows are msg 1 p1 13 (NEGSCREEN) — not in the known set, so
-            // they render as frames and stay inert (no fake diplomacy).
+            // t409 SPECIES MENU (state 7) CONTENT (ui/speciesmenu.h law):
+            // the slot-0 window is the static.txt #11 header ("3 of 3
+            // Species Known" — t252 live), the six rows below it are the
+            // KNOWN species: dip-header name in the owner colour + the
+            // raceflag.shp face (specnum-indexed, t400 §2), or static.txt
+            // #12 "Extinct" when the owner holds no stars (t252: extinct
+            // rows highlight only). Rows are msg 1 p1 13 (NEGSCREEN) — no
+            // chrome in the port, so clicks stay inert (t388 known-set law)
+            // and the seam prints. The Intelligence item below (STATE "1 7")
+            // is drawn by the rail loop.
             if (screen == kScreenSpecies) {
-                for (int i = 0; i < 7; i++) {
-                    SDL_Rect rr{kRaceRows[i].x0, kRaceRows[i].y0,
-                                kRaceRows[i].x1 - kRaceRows[i].x0 + 1,
-                                kRaceRows[i].y1 - kRaceRows[i].y0 + 1};
+                const std::string hdr = speciesMenuHeader(camp);
+                {
+                    const int w = txt.width(hdr, false);
+                    txt.draw(ren, kRaceRows[0].x0 +
+                                 ((kRaceRows[0].x1 - kRaceRows[0].x0 + 1 - w) / 2),
+                             kRaceRows[0].y0 + 8, hdr, false, kText);
+                }
+                const auto rows = speciesMenuRows(camp, roster);
+                for (size_t i = 0; i < rows.size() && i + 1 < 7; i++) {
+                    const Rect& slot = kRaceRows[i + 1];
+                    SDL_Rect rr{slot.x0, slot.y0, slot.x1 - slot.x0 + 1,
+                                slot.y1 - slot.y0 + 1};
                     SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
                     SDL_RenderDrawRect(ren, &rr);
+                    // flag face (raceflag.shp frame == specnum; refusal or
+                    // human rows simply omit the face — honest)
+                    const SpeciesRow& sr = rows[i];
+                    int tx = slot.x0 + 8;
+                    if (sr.flagSpecnum >= 0 &&
+                        sr.flagSpecnum < int(raceflagLib.count())) {
+                        blitShape(ren, raceflagLib, sr.flagSpecnum, tx,
+                                  slot.y0 + 3);
+                        tx += 14 + 6;
+                    }
+                    const std::string label =
+                        sr.extinct ? std::string("Extinct")  // static #12
+                                   : sr.name;
+                    SDL_Color c = toSdl(kOwnerRgb[sr.owner % 7]);
+                    txt.draw(ren, tx, slot.y0 + 8, label, false, c);
                 }
-                txt.draw(ren, kRaceRows[0].x0, 280,
-                         "race rows: NEGSCREEN seam (state 13)", false, kDim);
-                txt.draw(ren, kRaceRows[0].x0, 340, "Esc: return to galaxy",
-                         false, kDim);
+                if (rows.empty())
+                    txt.draw(ren, kRaceRows[1].x0, kRaceRows[1].y0 + 8,
+                             "no species known", false, kDim);
             } else if (screen == kScreenStatus) {
                 // ---- t402 PLANETS LIST (D11 "wrong and unusable" FIXED).
                 // Law: ui/statuslist.h (row assembly 0x50647..0x5091f cited
@@ -1355,6 +1466,58 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
             if (interior.x1 > interior.x0)
                 txt.draw(ren, interior.x0 + 8, interior.y1 - 16,
                          "Esc: return to galaxy", false, kDim);
+        }
+        // ---- t409 ABILITY DIALOG (ABILITYWIN) — drawn LAST over the
+        // current screen: the vendor path (0x55ffb -> CALL 0x37b14) opens
+        // the modal over whatever state is showing and waits. windows.txt
+        // ln2136: rect 60,100-395,355, SHAPEFRAME -1 => CODE-DRAWN (no art
+        // cited). Text layout uses the FIRST cited geometry in the block:
+        // pos 10 50 (title) / 10 125 (body) / 10 160 (charge line),
+        // WINDOW-RELATIVE. Button faces: the block's `title` strings; the
+        // per-button split of the full-rect hit law is unmapped (S1 seam) —
+        // every inside click dismisses.
+        if (abilityOpen) {
+            const int ai = int(camp.abilityOf(ag::kPlayer));
+            const AbilityPanel* ap = panelForIndex(abilityPanels, ai);
+            if (ap) {
+                SDL_Rect win{kAbilityWin.x0, kAbilityWin.y0,
+                             kAbilityWin.x1 - kAbilityWin.x0 + 1,
+                             kAbilityWin.y1 - kAbilityWin.y0 + 1};
+                SDL_SetRenderDrawColor(ren, 8, 12, 24, 255);
+                SDL_RenderFillRect(ren, &win);
+                SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
+                SDL_RenderDrawRect(ren, &win);
+                const SDL_Color grn{0, 230, 90, 255};
+                txt.draw(ren, kAbilityWin.x0 + 10, kAbilityWin.y0 + 50,
+                         ap->title, false, grn);
+                // body (pos 10 125): wrapped to the modal width (seam S2:
+                // wrap width is a port rendering choice; the bytes are the
+                // verbatim block)
+                int y = kAbilityWin.y0 + 125;
+                for (const auto& ln : wrapBody(ap->body, 44)) {
+                    txt.draw(ren, kAbilityWin.x0 + 10, y, ln, false, kText);
+                    y += 12;
+                }
+                if (!ap->chargeLine.empty()) {
+                    const int cad = ascend::game::abilityChargeTurns(
+                        camp.abilityOf(ag::kPlayer));
+                    const int rem = cad - camp.chargeFor(ag::kPlayer);
+                    txt.draw(ren, kAbilityWin.x0 + 10, kAbilityWin.y0 + 160,
+                             formatChargeLine(ap->chargeLine, rem), false,
+                             kDim);
+                }
+                int bx = kAbilityWin.x0 + 10;
+                for (const auto& b : ap->buttons) {
+                    const int w = txt.width(b.title, false) + 12;
+                    SDL_Rect br{bx, kAbilityWin.y1 - 40, w, 22};
+                    SDL_SetRenderDrawColor(ren, 24, 48, 96, 255);
+                    SDL_RenderFillRect(ren, &br);
+                    SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
+                    SDL_RenderDrawRect(ren, &br);
+                    txt.draw(ren, br.x + 6, br.y + 5, b.title, false, kText);
+                    bx += w + 10;
+                }
+            }
         }
         SDL_RenderPresent(ren);
     }
