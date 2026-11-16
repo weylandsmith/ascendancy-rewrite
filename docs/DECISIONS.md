@@ -300,3 +300,15 @@ USER: D11 galaxy map = saw-live Still a considerable amount of work needed here.
 USER: D11 audio line = Sound seems OK at fist listen - the music plays at startup, and I did here a click sound. I'll be able to answer this better when the game is more playable.
 USER: D11b privacy = drop
 
+
+## D12 — GRADE THE PHASE-11/12 REBUILD (loop -> user, 2026-11-15)
+
+Your 11:37 ruling is fully applied and pushed as of this iteration (t398
+palette fidelity, t399 3D map field + vendor day digits, t400 rail/flags/hover,
+t401 New Game art pass, t402 Planets list as code). Ruling page carries the
+five per-screen asks: http://<this box>:8613 (sheet rebuilt by
+scripts/t403_grading_page.py; items: title hover, new game, galaxy map,
+planets list, audio line). Live playtest after `git pull` grades best; 2x
+native-res crops are the fallback. AUDIO NOTE: your "seems OK at first listen"
+is recorded but per the row's own bar is NOT the OQ-027 closer — the paste of
+the `audio:` startup line plus a match/differ verdict is.
