@@ -68,6 +68,7 @@ add_library(ascend_ui STATIC
   src/ui/cam3d.cpp
   src/ui/statuslaw.cpp
   src/ui/statuslist.cpp
+  src/ui/fleetlist.cpp
   src/ui/planetview.cpp
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp
@@ -114,6 +115,7 @@ add_executable(run_tests
   tests/test_statuslist_t402.cpp
   tests/test_planetview_t406.cpp
   tests/test_statusnav_t405.cpp
+  tests/test_fleetlist_t407.cpp
   tests/test_econres_t274.cpp
   tests/test_planetwin_t276.cpp
   tests/test_score_t284.cpp

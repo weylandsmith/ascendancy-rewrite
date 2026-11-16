@@ -23,6 +23,7 @@
 #include "ui/planetwin.h"
 #include "ui/statuslist.h"
 #include "ui/planetview.h"
+#include "ui/fleetlist.h"
 #include "ui/ui_internal.h"
 
 namespace ascend::ui {
@@ -127,6 +128,14 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     int planetStar = -1;
     std::string planetName;
     bool projectOpen = false;
+    // t407 FLEET LIST (state 18) session state: scroll step + selected row
+    // (index into fleetRows()). The vendor LEFT click jumps the camera to
+    // the ship (help fleetwin + t253 live); the port SELECTS + logs instead
+    // — named seam, no fake camera move. RIGHT click deselects per the
+    // selfplay.md RIGHT-CLICK DESELECT law (user testimony + live witness
+    // 2026-11-11: "right-click ... to clear the ship selection").
+    int fleetScroll = 0;
+    int fleetSel = -1;
     int played = 0;
     Uint32 nextAuto = autoplay ? SDL_GetTicks() + 250 : 0xFFFFFFFFu;
     bool quit = false;
@@ -333,6 +342,34 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // table, scroll column) are SILENT and inert — the
                     // D13 fall-through (rail-position clicks scrolling the
                     // list) is closed by the hit-map, not by a sound.
+                } else if (screen == kScreenFleet &&
+                           fleetHitFor(p, kFleetRowsTop).kind !=
+                               FleetHit::None) {
+                    // t407 FLEET LIST hit-map (fleetlist.h): arrows own
+                    // their measured boxes, the scroll column is inert, rows
+                    // own x 7..605. Rejected points fall through silent —
+                    // MapClick law (t404): the list interior is not a sound.
+                    const auto h = fleetHitFor(p, kFleetRowsTop);
+                    if (h.kind == FleetHit::ArrowUp) {
+                        fleetScroll = std::max(0, fleetScroll - 1);
+                        std::printf("ui fleet scroll up %d\n", fleetScroll);
+                    } else if (h.kind == FleetHit::ArrowDown) {
+                        ++fleetScroll;  // fleetWindow clamps
+                        std::printf("ui fleet scroll down %d\n", fleetScroll);
+                    } else {
+                        const auto all = fleetRows(camp, ag::kPlayer);
+                        const auto win = fleetWindow(all, fleetScroll);
+                        if (h.row < int(win.size())) {
+                            fleetSel = fleetScroll + h.row;
+                            // PORT seam (labelled): the vendor row click
+                            // JUMPS the camera to the ship (help fleetwin,
+                            // t253 live (200,93)); the port has no per-ship
+                            // position (t256c) — select + log, never fake
+                            // the jump.
+                            std::printf("ui fleet select row %d\n", fleetSel);
+                        }
+                    }
+                    std::fflush(stdout);
                 } else if (screen == kScreenPlanet && projectOpen &&
                            projectRowFor(p, 0)) {
                     // t406 PROJECT SET leg 2: pick from the PLANLIST. The
@@ -419,6 +456,19 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     std::printf("ui click map (%d,%d) -> %s\n", p.x, p.y,
                                 selected >= 0 ? camp.galaxy().stars[selected].name.c_str()
                                               : "none");
+                }
+            } else if (ev.type == SDL_MOUSEBUTTONDOWN &&
+                       ev.button.button == SDL_BUTTON_RIGHT &&
+                       screen == kScreenFleet) {
+                // t407 RIGHT-CLICK DESELECT (selfplay.md, user testimony +
+                // live witness 2026-11-11): right-click clears the ship
+                // selection. The witness cleared it from empty space too —
+                // the port clears anywhere inside the FLEET window (the
+                // t256c-adjacent shape: no per-widget hit law was captured
+                // for the right button). Silent: MapClick law.
+                if (fleetSel >= 0) {
+                    std::printf("ui fleet deselect (was row %d)\n", fleetSel);
+                    fleetSel = -1;
                 }
             }
             std::fflush(stdout);
@@ -987,6 +1037,95 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         txt.draw(ren, lr.x0 + 8, lr.y0 + 6,
                                  "No projects available", false, kDim);
                 }
+            } else if (screen == kScreenFleet) {
+                // ---- t407 SHIPS LIST (D13 "ships screen is EMPTY") ------
+                // Law ui/fleetlist.h: header #152 via the t276-pinned
+                // formatShipHeader; rows = the campaign's ship census;
+                // geometry MEASURED on work/screens/t253/fleet_open_game.png
+                // (rows top 52, pitch 106, four rows, columns name/chevron/
+                // spheres/location, arrow boxes x606..635). Chrome is
+                // honestly-vector DECISIVE (t391: no 18*.shp exists).
+                const auto all = fleetRows(camp, ag::kPlayer);
+                const auto win = fleetWindow(all, fleetScroll);
+                std::string owner = "Player";
+                if (roster) {
+                    const int ps = camp.playerSpecies();
+                    if (ps >= 0 && ps < int(roster->size()) &&
+                        !roster->at(size_t(ps)).dipName.empty())
+                        owner = roster->at(size_t(ps)).dipName;
+                }
+                const std::string htxt =
+                    fleetHeaderText(camp, ag::kPlayer, owner, int(all.size()));
+                {
+                    const int w = txt.width(htxt, true);
+                    txt.draw(ren, kFleetWnd.x0 +
+                                 ((kFleetWnd.x1 - kFleetWnd.x0 + 1 - w) / 2),
+                             kFleetWnd.y0 + 6, htxt, true, kText);
+                }
+                // Arrow boxes (honest vector triangles, same shape as the
+                // status pair; boxes MEASURED fleetlist.h).
+                for (const auto& ar : {kFleetArrowUp, kFleetArrowDown}) {
+                    SDL_Rect rr{ar.x0, ar.y0, ar.x1 - ar.x0 + 1,
+                                ar.y1 - ar.y0 + 1};
+                    SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
+                    SDL_RenderFillRect(ren, &rr);
+                    SDL_SetRenderDrawColor(ren, 200, 200, 200, 255);
+                    const int cx = (ar.x0 + ar.x1) / 2, cy = (ar.y0 + ar.y1) / 2;
+                    const bool up = (&ar == &kFleetArrowUp);
+                    SDL_RenderDrawLine(ren, cx - 6, cy + (up ? 3 : -3),
+                                       cx + 6, cy + (up ? 3 : -3));
+                    SDL_RenderDrawLine(ren, cx, cy + (up ? -4 : 4),
+                                       cx, cy + (up ? 3 : -3));
+                }
+                const std::string shipName = fleetShipName(camp);
+                for (size_t i = 0; i < win.size(); i++) {
+                    const auto& sh = camp.fleet()[win[i].fleetIndex];
+                    const int y = kFleetRowsTop + int(i) * kFleetRowPitch;
+                    // selection marker (CVD-safe luminance bar, statuslist
+                    // precedent; the vendor's own marker is art this port
+                    // does not have)
+                    if (fleetScroll + int(i) == fleetSel) {
+                        SDL_Rect mk{20, y + 20, 10, 15};
+                        SDL_SetRenderDrawColor(ren, 0, 200, 80, 255);
+                        SDL_RenderFillRect(ren, &mk);
+                    }
+                    // row frame (PORT vector; no fleet backdrop art exists)
+                    SDL_Rect rf{60, y, kFleetRowsRight - 60,
+                                kFleetRowPitch - 8};
+                    SDL_SetRenderDrawColor(ren, 40, 40, 56, 255);
+                    SDL_RenderFillRect(ren, &rf);
+                    SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);
+                    SDL_RenderDrawRect(ren, &rf);
+                    // NAME column green at x159 (MEASURED); LOCATION at
+                    // x389 (MEASURED) — the #146 lane string, ETA default 1
+                    // (the port's transit resolves at the next boundary).
+                    txt.draw(ren, 159, y + 10, shipName, true,
+                             SDL_Color{0, 230, 90, 255});
+                    const auto& dest = camp.galaxy().stars[sh.target];
+                    const std::string loc = fleetLaneLocation(dest.name, 1);
+                    // multi-line draw: split on '\n' (the renderer draws one
+                    // line per call; the vendor string IS multi-line)
+                    int ly = y + 10;
+                    size_t pos = 0;
+                    while (pos <= loc.size()) {
+                        const size_t nl = loc.find('\n', pos);
+                        txt.draw(ren, 389, ly,
+                                 loc.substr(pos, nl == std::string::npos
+                                                     ? std::string::npos
+                                                     : nl - pos),
+                                 false, SDL_Color{0, 200, 220, 255});
+                        if (nl == std::string::npos) break;
+                        pos = nl + 1;
+                        ly += 14;
+                    }
+                }
+                if (win.empty())
+                    txt.draw(ren, interior.x0 + 8, interior.y0 + 8,
+                             all.empty()
+                                 ? "No ships in transit (the model holds no "
+                                   "idle fleets — named seam)"
+                                 : "Scrolled past the last ship",
+                             false, kDim);
             } else {
                 txt.draw(ren, interior.x0 + 8, interior.y0 + 8,
                          "frame + title only: content law seam", false, kDim);

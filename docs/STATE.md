@@ -230,18 +230,18 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t407 per queue row t407 below (phase 14: SHIPS SCREEN — "ships screen
-is EMPTY"). Ordering rationale: t406 landed the planets->planet-view->
-project-set chain (owned-only list, state 17 opens, orders mutate the
-queue — witness PASS), so the rail's next dead button is FLEET; the ships
-row reuses the t402 row-assembly + t405 hit-map machinery verbatim and the
-per-ship data law is already banked (shipsave/shipsim). t410 (system view)
-may consume the t406 planet-view open path — keep its escape-chain note
-(F8e) in view there. Do NOT re-litigate rail liveness (REFUTED,
-_wip_t405.md F3) and do NOT re-census the queue writer (t341/t342 CLOSED —
-t406 reused it as banked law).
-The WAIT-USER-RULING t374 sentinel is RETIRED (tag itself never
-renumbered; history below). D13 queue rows t407..t413 stand as written.
+NEXT t408 per queue row t408 below (phase 14: RESEARCH SCREEN — user:
+"research is empty"; witnessed dead). Ordering rationale: t407 landed the
+SHIPS LIST law module (ui/fleetlist, state 18) with pins 368/0 and a native-
+vision PASS witness — the rail's next dead button is RESEARCH, and t408
+reuses the SAME machinery (t402 row assembly, t405 hit-map, t407 marker-driven
+static.txt reader — use it, NOT the naive quoted-line counter, F10 of
+docs/re/fleet-screen.md). PRE-FLIGHT for t408 (both are cheap and owed):
+(1) re-run scripts/t407_mutate.sh FIXED (cwd bug: it cd's to rewrite/build
+then uses repo-relative paths — all mutants no-op'd; see fleet-screen.md F13;
+run mutate/restore from repo root) so the t407 pins are proven, not just
+green; fold results into the t408 commit; (2) the WAIT-USER-RULING t374
+sentinel stays retired. D13 queue rows t408..t413 stand as written.
 OQ-027 still closes only on the user's final audio verdict.
 
 WAKE PROCEDURE (t397, updated): (0) health-check the page server FIRST —
@@ -4548,3 +4548,23 @@ Per-iteration LANDED blocks t1..t292: archive/state-v2-full/2026-11-03/STATE.md
   Sitting NEGATIVE t1086; production :9 (136357/136359, Xvfb 1461) never
   signalled; game/ read-only. NEXT=t337 STATE-table reader walk VERBATIM
 
+## LANDED 2026-11-16 t407: ships screen (state 18) — fleet list law, pins, PASS witness
+- ui/fleetlist.{h,cpp} (pure law): row per owned ship = campaign.fleet()
+  (ships exist ONLY in transit in the model — named seam), vendor fn 0x50d12
+  location law: orbiting "#143 Orbiting %s" / in-lane "#146 In Starlane to
+  %s\nETA - %d %s"; header "#152 %s (%d %s, %d more allowed)"; allowance =
+  systems+1-ships clamped>=0. Hit-map: arrows x619..638 (art rects, up y48-94
+  down y425-476), trough inert, rows x7..605 top52 pitch106 (windows.txt
+  STATSHIPLST rect 7,46-632,472).
+- ui.cpp: kScreenFleet render+press branches, right-click deselect (selfplay
+  law), scroll state, log lines "ui fleet select/deselect/scroll".
+- static.txt GETTER INDEX LAW measured: marker-driven ("// N" comment ==
+  entry N); naive line counter misaligns from ~90 (F10, fleet-screen.md).
+- pins test_fleetlist_t407.cpp: suite 360->368, 0 failed.
+- witness scripts/t407_fleetlist_witness.sh VERDICT PASS + native vision
+  grade (header singular legs, cyan 2-line location, selection marker);
+  timing law seed 5: ship in transit t278 only (F12).
+- HONEST NEGATIVES: mutation campaign NOT proven (script cwd bug, F13 —
+  t408 pre-flight); ship-name source stays PORT DEFAULT "Ship" (vendor name
+  pool seam); SHIPDESSCREEN art + production census seams unchanged; NO OQ
+  row closed (strict-close).

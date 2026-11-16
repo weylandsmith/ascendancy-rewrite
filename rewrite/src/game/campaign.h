@@ -262,6 +262,11 @@ public:
     // drives, and its engagement census (seed-comparison evidence, ruling
     // D2 "removed after seeds agree" — test_campaign_fleet_t365).
     const class CampaignFleetBridge* fleetSim() const;
+    // t407: read-only ship census for the FLEET LIST screen (ui/fleetlist.h
+    // membership law). The transit vector IS the port's entire ship state
+    // (t256c boundary) — the list shows what exists, honestly zero when the
+    // model holds nothing. No mutation, no derived state.
+    const std::vector<ShipInTransit>& fleet() const { return fleet_; }
     // --- read-only inspection (tests + UI; docs/re/abilities.md §5) ---
     SpeciesAbility abilityOf(int owner) const { return ability_[owner]; }
     int chargeFor(int owner) const { return charge_[owner]; }
