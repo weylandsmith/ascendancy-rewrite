@@ -155,6 +155,15 @@ bool blitShapeScaled(SDL_Renderer* ren,
                                          SDL_TEXTUREACCESS_STATIC,
                                          int(r.width), int(r.height));
     if (!tex) return false;
+    // t411 TRANSPARENCY LAW [measured]: SDL_CreateTexture defaults the
+    // blend mode to NONE, which IGNORES the alpha byte — every .shp
+    // TRANSPARENT-SKIP pixel (never written by walkRows, so it keeps the
+    // 0xAA first-decode stuffer -> game.pal[170] (146,178,134) pale sage)
+    // painted OPAQUE. Measured: 3340 px of exactly (146,178,134) across our
+    // map screen's chrome zones (docs/re/_wip_t411.md F2) — the washed-out
+    // digit faces / dial faces / rail bands defect. BLEND makes alpha 0
+    // mean skip, matching the vendor blit (skip = dst untouched).
+    SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
     SDL_UpdateTexture(tex, nullptr, argb.data(),
                       int(r.width) * int(sizeof(uint32_t)));
     SDL_Rect dst{x, y, int(r.width) * scale, int(r.height) * scale};

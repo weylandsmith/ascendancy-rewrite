@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-16T09:55
+updated: 2026-11-16T15:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,22 +230,64 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t411 per queue row t411 below (phase 14: MAP LOOK PASS 2). Ordering
-rationale: t410 landed the system-view chain (map star click -> state-16
-System Display -> colonised dot -> t406 planet view; Escape unwinds one
-level; witness scripts/t410_sysview_witness.sh VERDICT PASS + my own
-native-vision grade of both shots; suite 384->391/0; mutation 9/9 CAUGHT),
-so every rail button and the escape chain now work — the owner's D13 list
-next names the map's LOOK (queue row t411: bevel frame, LED resource
-digits, palette noise, flat starfield, start-lane law, dials), which is
-purely visual and independent of t410's wiring. Reuse t410's machinery:
-pure ui/<law> module + witness + mutation shape scripts/t410_mutate.py —
-AND HEED t410's mutation pitfall (F6): run campaigns of 3+ mutants inside
-execute_code or background with restore-guard; a foreground run killed at
-the tool timeout poisons the /tmp snapshot mid-mutant. PRE-FLIGHT: none
-owed (t410 campaign 9/9 CAUGHT incl. re-run of M7 standalone). D13 queue
-rows t412..t413 stand as written. OQ-027 still closes only on the user's
-final audio verdict.
+NEXT t412 per queue row t412 below (NEW GAME FIXES + RACE INTRO). Ordering
+rationale: t411 landed map look pass 2 (blend-mode root cause, mottle,
+bevel, depth dim; witness PASS incl dial walk; mutation 9/9 pin-CAUGHT +
+M10 wiring honestly pin-MISSED/witness-CAUGHT), so the map rails are done
+and the owner's D13 list next names the New Game screen (queue row t412:
+EMPTY species-row squares = 7racesel portrait mapping after t398 palettes,
+small/greyish bottom wheels) PLUS the MISSING RACE INTRO screen (vendor
+plays history.txt per-race opening text after Begin; minimum ship = text
+panel + click-to-continue, name the art seam) PLUS the Begin robustness
+question (user witness: Begin -> map ~3 s = mapgen time exposed BECAUSE the
+intro that should sit between them doesn't exist — sequence Begin -> intro
+-> map). Reuse the t411 machinery: pure ui/<law> module + mechanical
+witness + scripts/t411_mutate.py shape (background + restore-guard, t410 F6
+pitfall). The xsend walk kit scripts/r1_ui_walk.sh reaches the New Game
+screen (title FRESHGAME click is witnessed, commit be2cacb). D13 queue row
+t413 (verify + push + handoff) stands after t412. OQ-027 still closes only
+on the user's final audio verdict.
+
+t411 LANDED 2026-11-16 (MAP LOOK PASS 2; measurement log docs/re/_wip_t411.md
+F0-F11; durable law docs/re/t399-galaxy-map-3d.md §7). ROOT CAUSE [verified]:
+blitShapeScaled never set SDL_BLENDMODE_BLEND — SDL default NONE IGNORES the
+alpha byte, so every .shp transparent-skip pixel (kept the 0xAA decode
+stuffer) painted game.pal[170] (146,178,134) opaque pale sage: 3340 px on
+the map screen = the washed digit faces ("empty ovals"), dial faces, rail
+bands. One-line fix vendortext.cpp; witness census pale 3340->0. DAY
+COUNTER premise RESOLVED: the vendor at day 0 shows five outline-ring ZERO
+faces (vision + pixel census: vendor slot green 14-17%, ours 63%) — ours
+binds camp.turn() to kDigitFirstFrame+d CORRECTLY (ui.cpp:912); after the
+blend fix slot green 0.20 (vendor 0.14-0.17). MOTTLE LAW [measured]: vendor
+sidebar band lag-1 diff/dev 0.23, our per-pixel hash 1.45 (TV static);
+textureColourAt now generates the cited colour set+weights on a 6x6 cell
+grid (scripts/t411_mottle.py sweeps our own statistic: cell1 1.57/2 0.78/
+4 0.38/6 0.25/8 0.19 -> cell 6 closest); pattern SOURCE record stays the
+t400 seam. Witness lag-1 on our shot 0.22. BEVEL LAW [measured vendor
+scans]: field sits in a dark recess ramping to near-black at all four edges
+(left x6 65->x7 49->x8 5->black; top/bottom/right in _wip F5); flat
+(120,120,120) frame line replaced by kBevelMid(49,54,53)+kBevelIn(5,6,6)
+two-line ramp (mapchrome.h); witness pixel (240,7) 136->5. DEPTH DIM:
+cam3d pipDim256 {96,160,224,256} far->near wired into pip paint (vendor
+pips vary brightness AND size, blob census 1..20+; ramp VALUES documented
+defaults, cos_star unreadable OQ-005). DIAL WITNESS (queue item 6):
+scripts/t411_maplook_witness.sh dial walk = 11 cam lines + exactly 3
+named-seam lines (TogEmpire/TogShips/TogColonies = no-overlay seam);
+t399 wiring confirmed live, nothing silently dead. Lanes-at-start + home-
+star findability: verified correct in the grade (2 lanes touch the boxed
+home star). PINS tests/test_maplook_t411.cpp x3 (mottle cell law incl
+non-power-of-2 boundary probe, depth-dim monotone+domain, bevel verbatim+
+ramp contract); suite 391->394/0. MUTATION scripts/t411_mutate.py (run in
+BACKGROUND with restore-guard per t410 F6): 9/9 pin-CAUGHT; M10
+(blend-line-removed) MISSED BY PINS AS EXPECTED — SDL wiring, the witness
+pale census catches it (honest record F9). AFTER-RESTORE 394/0. NATIVE
+VISION GRADE of work/r1/loop/t411-map.png: outline-ring green digits,
+mottled sidebar, recessed field, dim far pips, no pale wash. SEED
+REGRESSION seeds 1/2024/23 md5 7e794a6d/332a8cf3/0a6b7876 EXACTLY per
+record (display-only, zero rng). LEDGER: NOTHING closed (strict-close
+honest negative — D13 map-look has no OQ owner; seams S-a recess/pattern
+art, S-b home-marker capsule ART, S-c pip brightness table, S-d overlay
+toggles named in _wip F11). GATE_EXIT=0; audits OK (17 closed/3 open).
 
 t410 LANDED 2026-11-16 (SYSTEM VIEW + MAP->PLANET CHAIN; law + working log
 docs/re/_wip_t410.md F1-F6; state-16 census = windows.txt STATE "1 16" x20

@@ -101,3 +101,33 @@ gate 0; seed-1 trajectory byte-identical (above).
 - 3D lane z-gate: port standoff makes it vacuous (stated, not hidden).
 - No ledger row closed this iteration (strict-close; queue work t399).
   OQ-012/OQ-005 notes unchanged — the digit seam was never a ledger row.
+
+## 7. t411 MAP LOOK PASS 2 (amendments, 2026-11-16) [measured]
+- TRANSPARENCY LAW (vendortext.cpp blitShapeScaled): SDL shape textures
+  default to BLENDMODE_NONE which IGNORES the alpha byte; the .shp
+  transparent-skip pixels kept the 0xAA decode-stuffer and painted
+  game.pal[170] (146,178,134) opaque pale sage — 3340 such px on the map
+  screen (washed digit faces, dial faces, rail bands). Fix: set
+  SDL_BLENDMODE_BLEND on every blitShape texture (skip = dst untouched,
+  matching the vendor blit). Witness census pale px == 0.
+- TEXTURE PATTERN (mapchrome.cpp): the vendor sidebar band is SMOOTH at
+  pixel scale (lag-1 diff/dev 0.23); the per-pixel hash measured 1.45 (TV
+  static). Port now generates the cited colour set + weights on a 6x6 cell
+  grid — scripts/t411_mottle.py sweeps the generator's own statistic
+  (cell 1:1.57, 2:0.78, 4:0.38, 6:0.25, 8:0.19; vendor 0.23). Pattern
+  SOURCE record seam stands (t400).
+- COSMOS BEVEL (mapchrome.h kBevelMid/kBevelIn): the field sits in a dark
+  recess — texture ramps down to near-black at the edge all four sides
+  (scans in _wip_t411 F5). Two-line port ramp replaces the flat
+  (120,120,120) frame line.
+- DEPTH DIM (cam3d pipDim256 {96,160,224,256} far->near): vendor pips vary
+  in BRIGHTNESS with distance (vision + blob census: sizes 1..20+ with
+  dim members). Ramp values documented defaults (cos_star unreadable,
+  OQ-005); the monotone law is measured.
+- Day-counter binding CONFIRMED (not a defect): the vendor at day 0 shows
+  five outline-ring ZERO faces — ours binds camp.turn() to kDigitFirstFrame
+  +d correctly; the "empty ovals" complaint was the pale-skip wash above.
+  Slot green fraction now 0.20 vs vendor 0.14-0.17 (was 0.63).
+- Dial wiring witness: 8 cluster clicks print the cam line (7 movers +
+  TogLanes), the 3 overlay toggles print the named-seam line x3
+  (scripts/t411_maplook_witness.sh dial walk).

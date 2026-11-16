@@ -756,14 +756,29 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         // off the home systems. Projection law = cam3d.h (vendor affine
         // FUN_00053324 + pinhole FUN_00053374).
         {
-            // cosmos frame (same anchor as t394: rect +1 outset) + the field
-            // clip: zoomed-in stars beyond the frame must not paint the rail.
+            // cosmos frame + the field clip: zoomed-in stars beyond the
+            // frame must not paint the rail. t411 BEVEL LAW [measured,
+            // docs/re/_wip_t411.md F5]: the vendor field sits in a RECESS —
+            // texture luminance ramps DOWN to near-black at the edge on all
+            // four sides (left scan x6 (65,65,65) x7 (49,54,53) x8 (5,6,6)
+            // x9 black; top y7 (31,46,49) y8 black; right x466 (27,32,33);
+            // bottom y472 black y473 (54,76,76)). The old flat (120,120,120)
+            // 1-px line was the "no bevel frame" defect: two dark lines
+            // (mid at the outset, near-black at the window rect) reproduce
+            // the ramp; the recess ART itself stays the t400 seam.
             SDL_Rect frame{kCosmosWnd.x0 - 1, kCosmosWnd.y0 - 1,
                            kCosmosWnd.x1 - kCosmosWnd.x0 + 3,
                            kCosmosWnd.y1 - kCosmosWnd.y0 + 3};
-            SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
+            SDL_SetRenderDrawColor(ren, kBevelMid.r, kBevelMid.g, kBevelMid.b,
+                                   255);
             SDL_RenderDrawRect(ren, &frame);
-            SDL_RenderSetClipRect(ren, &frame);
+            SDL_Rect bevel{kCosmosWnd.x0, kCosmosWnd.y0,
+                           kCosmosWnd.x1 - kCosmosWnd.x0 + 1,
+                           kCosmosWnd.y1 - kCosmosWnd.y0 + 1};
+            SDL_SetRenderDrawColor(ren, kBevelIn.r, kBevelIn.g, kBevelIn.b,
+                                   255);
+            SDL_RenderDrawRect(ren, &bevel);
+            SDL_RenderSetClipRect(ren, &bevel);
         }
         if (lanesOn) {
             for (size_t li = 0; li < camp.galaxy().lanes.size(); ++li) {
@@ -789,12 +804,20 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 Pt q = projectStar(cam, s);
                 const int o = camp.starOwner(s.id);
                 const bool owned = o >= 0;
-                const int r = pipRadius(depthClass(double(s.z)), owned);
+                const int cls = depthClass(double(s.z));
+                const int r = pipRadius(cls, owned);
+                const int dim = pipDim256(cls);  // t411 depth dim
                 if (owned) {
                     SDL_Color c = toSdl(kOwnerRgb[o]);
+                    c.r = uint8_t(int(c.r) * dim / 256);
+                    c.g = uint8_t(int(c.g) * dim / 256);
+                    c.b = uint8_t(int(c.b) * dim / 256);
                     SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
                 } else {
                     SDL_Color c = toSdl(neutralTint(s.type));
+                    c.r = uint8_t(int(c.r) * dim / 256);
+                    c.g = uint8_t(int(c.g) * dim / 256);
+                    c.b = uint8_t(int(c.b) * dim / 256);
                     SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
                 }
                 filledCircle(ren, q.x, q.y, r);

@@ -72,6 +72,11 @@ int depthClass(double fieldZ);
 // monotone non-decreasing with nearness).
 int pipRadius(int cls, bool owned);
 
+// t411 DEPTH DIM: 256ths brightness multiplier per depth class, monotone
+// non-decreasing with nearness (law measured on the vendor original: pips
+// dim with distance; ramp values documented port defaults).
+int pipDim256(int cls);
+
 // Neutral-star tint by star type (13 rows). PORT PALETTE [documented]: the
 // vendor pip art is unreadable (OQ-005); hues follow the user-supplied
 // original's red/yellow/blue/white point families (external vision read,

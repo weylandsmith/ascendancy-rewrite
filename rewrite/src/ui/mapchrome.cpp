@@ -70,10 +70,19 @@ const RGB kTextureColours[10] = {
 const int kTextureWeights[10] = {4, 15, 9, 8, 7, 7, 7, 7, 6, 4};
 
 RGB textureColourAt(int x, int y) {
-    // splitmix64 over (x,y) — deterministic (no engine rng_; a texture
-    // that shimmered per frame would be a bug, and consuming rng_ would
-    // break the seed-reproducibility law).
-    uint64_t z = (uint64_t(uint32_t(x)) << 32) ^ uint64_t(uint32_t(y)) ^
+    // t411 MOTTLE LAW [measured]: the vendor texture is SMOOTH at pixel
+    // scale — lag-1 neighbour diff / mean dev = 0.23 on the sidebar band
+    // (4x4-block lag-1 0.28), while our old per-pixel hash measured 1.45
+    // (pure TV static). The pattern SOURCE record is still unidentified
+    // (t400 seam), so the port keeps the cited colour set + weights but
+    // generates them on a 6x6 CELL grid (one colour per cell): within-cell
+    // neighbours identical, cell-to-cell weighted-random. scripts/
+    // t411_mottle.py sweeps this generator's own lag-1 statistic: cell 1
+    // (old) 1.57, cell 2 0.78, cell 4 0.38, cell 6 0.25, cell 8 0.19 —
+    // cell 6 is the closest to the vendor's measured 0.23. Still
+    // deterministic per pixel (no engine rng_; law mirrors Star.z).
+    const int cx = x / 6, cy = y / 6;
+    uint64_t z = (uint64_t(uint32_t(cx)) << 32) ^ uint64_t(uint32_t(cy)) ^
                  0x9e3779b97f4a7c15ull;
     z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
     z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;

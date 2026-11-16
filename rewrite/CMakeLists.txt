@@ -123,6 +123,7 @@ add_executable(run_tests
   tests/test_researchview_t408.cpp
   tests/test_speciesmenu_t409.cpp
   tests/test_sysview_t410.cpp
+  tests/test_maplook_t411.cpp
   tests/test_econres_t274.cpp
   tests/test_planetwin_t276.cpp
   tests/test_score_t284.cpp

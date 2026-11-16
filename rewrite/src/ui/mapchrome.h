@@ -115,6 +115,18 @@ inline constexpr Rect kTextureBands[kTextureBandCount] = {
                           // pinned +40-shift capture confirms rows 0..439]
     {466, 0, 639, 479},   // right column incl. sidebar + cluster bg
 };
+// ---- t411 COSMOS BEVEL LAW (docs/re/_wip_t411.md F5) -----------------------
+// The vendor starfield sits in a RECESS: texture luminance ramps DOWN to
+// near-black at the field edge on all four sides [measured scans of
+// scratchpad/galaxymap-original.png: left x6 (65,65,65) x7 (49,54,53)
+// x8 (5,6,6) x9 black; top y7 (31,46,49) y8 black; right x466 (27,32,33)
+// then texture; bottom y472 black y473 (54,76,76)]. The port reproduces the
+// ramp with two lines: kBevelMid at the rect outset (x0-1), kBevelIn at the
+// windows.txt rect itself; both strictly darker than the old flat
+// (120,120,120) frame line the vendor never shows at the edge. The recess
+// ART record stays the t400 named seam.
+inline constexpr RGB kBevelMid{49, 54, 53};
+inline constexpr RGB kBevelIn{5, 6, 6};
 // The census colour set (game.pal entries; index 0 = black).
 extern const RGB kTextureColours[10];
 extern const int kTextureWeights[10];  // percent weights, sum 74 (tail = 26)

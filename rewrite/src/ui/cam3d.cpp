@@ -89,6 +89,19 @@ int pipRadius(int cls, bool owned) {
     return owned ? base + 1 : base;
 }
 
+// t411 DEPTH DIM [vision-measured law, documented ramp]: the vendor field
+// shows pips of VARYING BRIGHTNESS, dimmer with distance (external vision
+// read of scratchpad/galaxymap-original.png; pixel census F0: vendor pip
+// sizes 1..20+ AND several dim members). Returns the 256ths multiplier on
+// the tint per depth class — monotone non-decreasing with nearness, near
+// bands unscaled. Values are PORT DEFAULTS (the vendor cos_star brightness
+// table is unreadable until OQ-005), the LAW (monotone dim-with-distance)
+// is measured.
+int pipDim256(int cls) {
+    static const int kDim[4] = {96, 160, 224, 256};  // far -> near
+    return cls < 0 || cls > 3 ? 256 : kDim[cls];
+}
+
 RGB neutralTint(int starType) {
     // 13 rows (starstat.txt types). PORT PALETTE [documented default] —
     // families from the user-supplied original (red/yellow/blue/white
