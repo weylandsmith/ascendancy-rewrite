@@ -55,8 +55,11 @@ BootState bootClick(BootState from, Pt p) {
         case BootState::Tutorial:
         case BootState::Load:
         case BootState::Save:
+        case BootState::RaceIntro:
             // Overlay states: their exit is driver-signalled (movie EOF,
-            // cancel key), not a blind click. Inert here by law.
+            // cancel key), not a blind click. Inert here by law. (t412:
+            // RaceIntro's dismiss is handled by its own driver loop in
+            // title.cpp, same pattern as Load's runLoadScreen.)
             return from;
         case BootState::Campaign:
         case BootState::Quit:
@@ -77,6 +80,7 @@ const char* bootStateName(BootState s) {
         case BootState::Intro: return "intro";
         case BootState::Tutorial: return "tutorial";
         case BootState::RaceConfig: return "raceconfig";
+        case BootState::RaceIntro: return "raceintro";
         case BootState::Load: return "load";
         case BootState::Save: return "save";
         case BootState::Campaign: return "campaign";

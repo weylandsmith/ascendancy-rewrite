@@ -230,23 +230,46 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t412 per queue row t412 below (NEW GAME FIXES + RACE INTRO). Ordering
-rationale: t411 landed map look pass 2 (blend-mode root cause, mottle,
-bevel, depth dim; witness PASS incl dial walk; mutation 9/9 pin-CAUGHT +
-M10 wiring honestly pin-MISSED/witness-CAUGHT), so the map rails are done
-and the owner's D13 list next names the New Game screen (queue row t412:
-EMPTY species-row squares = 7racesel portrait mapping after t398 palettes,
-small/greyish bottom wheels) PLUS the MISSING RACE INTRO screen (vendor
-plays history.txt per-race opening text after Begin; minimum ship = text
-panel + click-to-continue, name the art seam) PLUS the Begin robustness
-question (user witness: Begin -> map ~3 s = mapgen time exposed BECAUSE the
-intro that should sit between them doesn't exist — sequence Begin -> intro
--> map). Reuse the t411 machinery: pure ui/<law> module + mechanical
-witness + scripts/t411_mutate.py shape (background + restore-guard, t410 F6
-pitfall). The xsend walk kit scripts/r1_ui_walk.sh reaches the New Game
-screen (title FRESHGAME click is witnessed, commit be2cacb). D13 queue row
-t413 (verify + push + handoff) stands after t412. OQ-027 still closes only
-on the user's final audio verdict.
+NEXT t413 PHASE-14 VERIFY + PUSH + HANDOFF (queue row t413, push-gap law
+MANDATORY). Ordering rationale: t412 landed the race intro (history.txt
+parser law + BootState::RaceIntro + Begin -> intro -> map chain witnessed
+end-to-end, mutation 6/6 pin-CAUGHT, suite 394->401/0), which was the last
+feature item on the owner's D13 list before the verify/push/handoff row.
+t413 = full-suite + seeds 1/2024/23 md5 vs record + gate + push + handoff
+doc refresh. Residual t412 seams to carry (none block t413): (1) runtime
+race-colour bytes -- kIntroRaceBytes is the STATIC table census
+(0x12e18+specnum*494); a live game may carry scenario-populated bytes
+(OQ-style close: RAM census during a live intro); (2) vendor intro draw
+immediates unmapped (599>480) -- port layout documented in
+docs/re/_wip_t412.md F4/F5, not claimed vendor-exact; (3) intro has no
+scroll driver (honest truncation printed); (4) New Game bottom-wheel
+clipping/polish (queue t412 tail item) -- deferred, next cosmetic pass if
+the owner re-prioritises. OQ-027 still closes only on the user's final
+audio verdict.
+
+t412 LANDED 2026-11-16 (NEW GAME FIXES + RACE INTRO; measurement log
+docs/re/_wip_t412.md F0-F6). SPECIES-ROW SQUARES premise CLOSED by t411
+(the blend fix already paints them -- current capture shows full portrait
+art). RACE INTRO built: vendor law [verified Ghidra] FUN_0002b48a reads
+history.txt (pool 0x82BB0+0x1190), SPECNUM-block scan, POWER/INTRO/
+PEACE/NEUTRAL/HOSTILE/TEXT sections, transform '@'->newline '_'->space,
+missing species -> 'Species %d not found in history file.'; TEXT-ONLY
+screen (no portrait blit inside the parser -- the t412 queue's art census
+resolves to text). Port ui/raceintro.{h,cpp} pure law; real-file census
+[measured]: 21/21 blocks parse; specnum 1 is the ONLY race with non-empty
+atmosphere-gated sections (107/76/108 chars) -- pinned gating BOTH ways
+(including the 20 unchanged races). Ink law game.pal[racebyte*4+0x13] +
+kIntroRaceBytes[21] static census. Wiring pitfall landed with witness
+evidence: Begin handler's `continue` re-tests while(Title||RaceConfig), so
+runRaceIntro is called DIRECTLY (state-assign-only exited the loop --
+'ui title exit: raceintro'). WITNESS chain: raceconfig begin -> 'ui
+raceintro specnum 0 atmosphere 1 ok' -> native-vision PASS (heading
+'Supreme Planet Invaders', full Minion body red ink, no clipping, prompt
+line) -> dismiss -> campaign map ('ui home star Amoroso'). MUTATION 6/6
+pin-CAUGHT (terminator/'@'-law/clamp/ink*4/truncate/err-wording) +
+AFTER-RESTORE 401/0. Suite 394->401/0 (+7 pins; test_boot_t385 state loop
+7->8). LEDGER closes NOTHING (honest negative -- no OQ row covers the
+intro; seams above).
 
 t411 LANDED 2026-11-16 (MAP LOOK PASS 2; measurement log docs/re/_wip_t411.md
 F0-F11; durable law docs/re/t399-galaxy-map-3d.md §7). ROOT CAUSE [verified]:

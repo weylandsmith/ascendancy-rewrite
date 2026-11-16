@@ -5,6 +5,10 @@
 #include "ui/ui_internal.h"
 
 #include <algorithm>
+#include <fstream>
+#include <iterator>
+
+#include "ui/raceintro.h"
 
 namespace ascend::ui {
 
@@ -119,6 +123,11 @@ bool loadChromePalette(const std::string& dataRoot) {
     }
     std::printf("ui palette: %s (degraded: greyscale ramp)\n", err.c_str());
     return false;
+}
+
+uint32_t chromePaletteArgb(int index) {
+    if (!g_chromePal.ready()) return 0xFF808080u;
+    return g_chromePal.argb(index & 0xff);
 }
 
 bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
@@ -255,6 +264,89 @@ int runLoadScreen(SDL_Renderer* ren, VendorText& txt,
                         slots[size_t(idx)].day);
             std::fflush(stdout);
             return idx;
+        }
+    }
+}
+
+// ---- t412 race intro (docs/re/raceintro.h; law _wip_t412.md F3-F5) -------
+// The vendor loads history.txt at scenario start (FUN_0002b48a) and draws
+// the player species' block; the user's D13 witness places the screen
+// between the New Game screen and the map. PORT: black screen, header in
+// the RACE colour (game.pal[racebyte*4+0x13], F4), body paragraphs in the
+// same colour (the vendor body draw's colour immediate 0xf3 is a palette
+// index whose role is unmapped — using the race colour for the body is a
+// documented port choice, seam F5), click / any key continues.
+BootState runRaceIntro(SDL_Renderer* ren, VendorText& txt,
+                       const std::string& dataRoot, int specnum,
+                       int atmosphere) {
+    std::ifstream f(dataRoot + "/extracted/ascend00/history.txt",
+                    std::ios::binary);
+    std::string history;
+    if (f)
+        history.assign(std::istreambuf_iterator<char>(f),
+                       std::istreambuf_iterator<char>());
+    IntroPanel panel;
+    std::string err;
+    const bool ok =
+        f && buildIntroPanel(history, specnum, atmosphere, &panel, &err);
+    std::printf("ui raceintro specnum %d atmosphere %d %s\n", specnum,
+                atmosphere, ok ? "ok" : err.c_str());
+    std::fflush(stdout);
+
+    // Ink: game.pal[racebyte*4 + 0x13] (F4). kIntroRaceBytes is the static
+    // table census; chromePaletteArgb degrades to grey with no palette.
+    const int raceByte =
+        (specnum >= 0 && specnum < 21) ? kIntroRaceBytes[specnum] : 0;
+    const uint32_t argb = chromePaletteArgb(introPalIndex(raceByte));
+    const SDL_Color ink{uint8_t((argb >> 16) & 0xff),
+                        uint8_t((argb >> 8) & 0xff), uint8_t(argb & 0xff),
+                        255};
+
+    // Wrap the paragraphs to the body width; honest truncation at the
+    // screen edge (no scroll driver — named seam).
+    std::vector<std::string> lines;
+    for (const auto& para : panel.paragraphs) {
+        for (auto& l : wrapIntroLine(para, kIntroBodyWidth,
+                                     txt.width("M", false)))
+            lines.push_back(std::move(l));
+        lines.emplace_back();  // blank line between paragraphs
+    }
+    const int shown = std::min(int(lines.size()), kIntroMaxLines);
+    if (int(lines.size()) > shown)
+        std::printf("ui raceintro truncated %d of %zu lines (no scroll)\n",
+                    int(lines.size()) - shown, lines.size());
+    std::fflush(stdout);
+
+    for (;;) {
+        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+        SDL_RenderClear(ren);
+        if (ok) {
+            if (!panel.header.empty())
+                txt.draw(ren, kIntroHeaderX, kIntroHeaderY, panel.header,
+                         true, ink);
+            for (int i = 0; i < shown; i++)
+                if (!lines[size_t(i)].empty())
+                    txt.draw(ren, kIntroBodyX, kIntroBodyY + i * kIntroLinePitch,
+                             lines[size_t(i)], false, ink);
+        } else {
+            txt.draw(ren, kIntroBodyX, kIntroBodyY,
+                     "History file unavailable - supply extracted/ascend00/"
+                     "history.txt",
+                     false, ink);
+        }
+        txt.draw(ren, kIntroBodyX, 480 - 14, "Click or press a key to continue",
+                 false, ink);
+        SDL_RenderPresent(ren);
+
+        SDL_Event e;
+        SDL_WaitEvent(&e);
+        if (e.type == SDL_QUIT) return BootState::Quit;
+        if (e.type == SDL_KEYDOWN ||
+            (e.type == SDL_MOUSEBUTTONDOWN &&
+             e.button.button == SDL_BUTTON_LEFT)) {
+            std::printf("ui raceintro dismiss -> campaign\n");
+            std::fflush(stdout);
+            return BootState::Campaign;
         }
     }
 }

@@ -74,6 +74,7 @@ add_library(ascend_ui STATIC
   src/ui/abilitylaw.cpp
   src/ui/speciesmenu.cpp
   src/ui/sysview.cpp
+  src/ui/raceintro.cpp
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp
   src/ui/ui.cpp
@@ -124,6 +125,7 @@ add_executable(run_tests
   tests/test_speciesmenu_t409.cpp
   tests/test_sysview_t410.cpp
   tests/test_maplook_t411.cpp
+  tests/test_raceintro_t412.cpp
   tests/test_econres_t274.cpp
   tests/test_planetwin_t276.cpp
   tests/test_score_t284.cpp
@@ -161,6 +163,7 @@ add_executable(run_tests
   src/ui/statuslist.cpp
   src/ui/planetview.cpp
   src/ui/sysview.cpp
+  src/ui/raceintro.cpp
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp
 )

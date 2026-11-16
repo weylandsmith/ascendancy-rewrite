@@ -11,6 +11,7 @@
 #include "formats/fnt.h"
 #include "formats/gamepal.h"
 #include "formats/shp.h"
+#include "ui/boot.h"
 #include "ui/layout.h"
 #include "ui/menulaw.h"
 
@@ -64,6 +65,12 @@ bool blitShapeScaled(SDL_Renderer* ren,
 // path and the greyscale-ramp degradation (never aborts — silent-degrade).
 bool loadChromePalette(const std::string& dataRoot);
 
+// t412: the loaded game.pal entry as ARGB (alpha 255), or 0xFF808080 when
+// the palette refused to load (callers draw something honest, never abort).
+// Used by the race-intro ink law game.pal[racebyte*4 + 0x13]
+// (docs/re/_wip_t412.md F4).
+uint32_t chromePaletteArgb(int index);
+
 // t388: the load screen moved out of title.cpp's anonymous namespace so the
 // campaign loop can reuse it (t388 task: Save/Load reuse the t387 windows).
 // Return >=0 accepted slot index; kLoadCancel (Esc); kLoadQuit (SDL_QUIT).
@@ -72,5 +79,15 @@ constexpr int kLoadQuit = -2;
 int runLoadScreen(SDL_Renderer* ren, VendorText& txt,
                   const std::string& dataRoot,
                   const std::vector<SaveSlot>& slots);
+
+// t412: the race-intro screen (docs/re/raceintro.h + _wip_t412.md F3-F5).
+// Reads history.txt (supply-your-own; a refusal prints the reason and the
+// screen STILL shows the click-to-continue hint — silent-degrade), draws
+// the parsed panel in the race's own game.pal colour, and blocks until a
+// click or any key. Returns BootState::Campaign (continue) or Quit
+// (SDL_QUIT). historyPath = full path to history.txt.
+BootState runRaceIntro(SDL_Renderer* ren, VendorText& txt,
+                       const std::string& dataRoot, int specnum,
+                       int atmosphere);
 
 }  // namespace ascend::ui

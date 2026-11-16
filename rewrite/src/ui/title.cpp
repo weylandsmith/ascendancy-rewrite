@@ -169,6 +169,9 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
     int speciesSetting = 7;   // player + 6 AI (main.cpp buildCampaign law)
     int atmosphere = 1;       // Neutral (measured vendor default, see above)
     int selSlot = 0, scrollOffset = 0;  // RACELIST window (3 of roster)
+    // t412: the Begin press carries the species pick + atmosphere into the
+    // race intro (the intro's gated section is atmosphere-selected).
+    int beginSpecies = 0, beginAtmosphere = 1;
     const auto rosterCount = [&]() { return roster ? int(roster->size()) : 0; };
     const auto speciesNameAt = [&](int specnum) -> std::string {
         if (roster && specnum >= 0 && specnum < int(roster->size())) {
@@ -754,7 +757,19 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                             kDensityStarCounts[densityIdx], speciesSetting,
                             atmosphere, scrollOffset + selSlot);
                         std::fflush(stdout);
-                        st = BootState::Campaign;
+                        // t412: Begin -> the RACE INTRO (history.txt,
+                        // FUN_0002b48a) -> map. The pick + atmosphere ride
+                        // into the intro (the gated PEACE/NEUTRAL/HOSTILE
+                        // section is chosen by the Atmosphere wheel).
+                        beginSpecies = scrollOffset + selSlot;
+                        beginAtmosphere = atmosphere;
+                        // Call DIRECTLY: this `continue` re-tests the
+                        // while-condition (Title||RaceConfig), so a mere
+                        // `st = RaceIntro` here would EXIT the loop before
+                        // the intro branch below could run (t412 witness:
+                        // "ui title exit: raceintro").
+                        st = runRaceIntro(ren, txt, dataRoot, beginSpecies,
+                                          beginAtmosphere);
                         continue;
                     }
                     continue;  // dead zone on the full screen

@@ -70,7 +70,7 @@ TEST(boot_clicks_are_exact_and_never_clamp) {
     // (windows.txt rects are inclusive, layout.h inRect law).
     const Pt outside{100, 210};  // left of the column, INTRO row height
     CHECK(au::titleButtonAt(outside) == -1);
-    for (int s = 0; s <= 7; s++) {
+    for (int s = 0; s <= 8; s++) {  // t412: RaceIntro inserted -> 9 states
         const BootState st = static_cast<BootState>(s);
         CHECK(au::bootClick(st, outside) == st);
     }

@@ -16,6 +16,10 @@ enum class BootState {
     Intro,       // playing intro65a.flc (movie exit -> Title)
     Tutorial,    // seam: no tutorial driver exists in the rewrite yet
     RaceConfig,  // NEWGAMEWND (t387); RESUME edge -> Campaign
+    RaceIntro,   // t412: the history.txt race intro between Begin and the
+                 // map (FUN_0002b48a reads history.txt at scenario start;
+                 // user witness: the screen sits between the New Game
+                 // screen and the galaxy map — DECISIONS D13)
     Load,        // seam: 4loadgam.shp chrome + slot list (t387)
     Save,        // seam: STATUSWND save (t388)
     Campaign,    // runCampaignUi
