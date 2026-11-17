@@ -51,6 +51,15 @@ void filledCircle(SDL_Renderer* r, int cx, int cy, int rad) {
                 SDL_RenderDrawPoint(r, cx + dx, cy + dy);
 }
 
+// t418b: F2 tile diamond 68x34 (x cx±0x22, y cy±0x11 — the corners the
+// paint body pushes at 0x3c224/0x3c252/0x3bc78). Scanline fill; the hit
+// region matches tileHitFor's |dx|/34+|dy|/17<=1 law exactly.
+void filledDiamond(SDL_Renderer* r, int cx, int cy) {
+    for (int dy = -17; dy <= 17; ++dy) {
+        const int half = 34 - 2 * std::abs(dy);  // |dy|/17 + |dx|/34 <= 1
+        SDL_RenderDrawLine(r, cx - half, cy + dy, cx + half, cy + dy);
+    }
+}
 int ipow10(int e) { int v = 1; while (e-- > 0) v *= 10; return v; }
 
 // t394 WM-SCALE FIX (D10 "everything small/wonky"; diagnosis _wip_t394.md
@@ -134,6 +143,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     int planetStar = -1;
     std::string planetName;
     bool projectOpen = false;
+    // t418b SURFACE TILE GRID session state: the tile the player selected
+    // (surface cell index into planetAt(planetStar); -1 = none). The vendor
+    // PLSQUARE child (windows.txt ln1520) takes the cell click as the build
+    // CELL selection feeding the fn 0x38840 cmd0 cell leg; the port's order
+    // lands item-only (planetview.h), so the selection drives the F3
+    // adjacency REPORT (orderCellBlock) + the tile outline.
+    int planetCell = -1;
     // t407 FLEET LIST (state 18) session state: scroll step + selected row
     // (index into fleetRows()). The vendor LEFT click jumps the camera to
     // the ship (help fleetwin + t253 live); the port SELECTS + logs instead
@@ -205,6 +221,29 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                            &lerr))
             std::printf("ui chrome lib refused %s: %s\n", kLibFiles[i],
                         lerr.c_str());
+    }
+    // t418b PLANET-VIEW ART libs: planalNN.shp (11 libs x 5 recs, dims
+    // ladder 47/75/103/140/189 verified this session from the directories —
+    // the size axis is cited, the terrainRow->lib axis is the [inferred] F4
+    // seam) is THE PLANET PICTURE; planitem.shp (40 x ~33px, record index ==
+    // itemIdx, shp.md S23.4 1:1 pixel-match law) is the structure art ON the
+    // tiles. Refusal degrades to bare tiles (never a blank screen swap).
+    ascend::formats::ShapeLibrary planalLibs[11];
+    for (int i = 0; i < 11; i++) {
+        char fname[32];
+        std::snprintf(fname, sizeof(fname), "planal%02d.shp", i);
+        std::string lerr;
+        if (!planalLibs[i].load(dataRoot + "/extracted/ascend01/data/" + fname,
+                                &lerr))
+            std::printf("ui planal lib refused %s: %s\n", fname,
+                        lerr.c_str());
+    }
+    ascend::formats::ShapeLibrary planitemLib;
+    {
+        std::string lerr;
+        if (!planitemLib.load(dataRoot + "/extracted/ascend01/data/planitem.shp",
+                              &lerr))
+            std::printf("ui planitem lib refused: %s\n", lerr.c_str());
     }
     // t400: raceflag.shp (21 x 14x24 species flags for the Species rail
     // row; law ui/hudlayout.h). Refusal just drops the two flags.
@@ -519,6 +558,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                              ? s.planets[key.planetIndex].name
                                              : s.name;
                             projectOpen = false;
+                            planetCell = -1;  // t418b: fresh tile selection
                             stack.push(kScreenPlanet);  // t410: chain level
                             screen = kScreenPlanet;
                             std::printf("ui status select %s -> planet view "
@@ -610,11 +650,42 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     if (item >= 0 && item < int(opts.size())) {
                         const bool ok =
                             camp.orderProject(planetStar, opts[item].item);
-                        std::printf("ui planet project %s %s (%s)\n",
+                        // t418b: the F3 adjacency leg REFUSES at the vendor's
+                        // checker, not at orderProject's cmd0 gates — when a
+                        // tile is selected and the pick would touch an ACTIVE
+                        // neighbour, report the refuse (the port's order is
+                        // item-only, so this is the honesty line, never a
+                        // fake rollback).
+                        const auto blk = orderCellBlock(
+                            camp, planetStar, opts[item].item, planetCell);
+                        std::printf("ui planet project %s %s (%s%s)\n",
                                     planetName.c_str(), opts[item].name.c_str(),
-                                    ok ? "ordered" : "rejected");
+                                    ok ? "ordered" : "rejected",
+                                    ok && blk == OrderCellBlock::ActiveNeighbour
+                                        ? ", cell refuses: active neighbour"
+                                        : "");
                         std::fflush(stdout);
                         if (ok) projectOpen = false;
+                    }
+                } else if (screen == kScreenPlanet && !projectOpen &&
+                           planetStar >= 0 &&
+                           !inRect(kPlanetPanels[4].rect, p)) {
+                    // t418b TILE SELECT: the PLSQUARE cell click (vendor
+                    // planet.txt info02 "individual squares on which
+                    // structures may be built"). Diamond hit-map (F2).
+                    const auto& ptt2 = camp.terrainTables();
+                    const int sz2 = ag::Campaign::sizeClassFor(
+                        camp.planetAt(planetStar).surfaceCells);
+                    const int hit =
+                        sz2 >= 0
+                            ? tileHitFor(ptt2, sz2,
+                                         camp.planetAt(planetStar).surfaceCells,
+                                         p)
+                            : -1;
+                    if (hit >= 0) {
+                        planetCell = hit;
+                        std::printf("ui planet tile %d selected\n", hit);
+                        std::fflush(stdout);
                     }
                 } else if (screen == kScreenPlanet &&
                            inRect(kPlanetPanels[4].rect, p)) {
@@ -747,6 +818,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                              ? s.planets[size_t(hit)].name
                                              : s.name;
                             projectOpen = false;
+                            planetCell = -1;  // t418b: fresh tile selection
                             stack.push(kScreenPlanet);
                             screen = kScreenPlanet;
                             std::printf("ui system planet %s -> planet view "
@@ -1406,6 +1478,102 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);
                     SDL_RenderDrawRect(ren, &pr);
                 }
+                // ---- t418b SURFACE TILE GRID (D15 "no planet visible") ---
+                // Laws ui/planetview.h + docs/re/_wip_t418.md F1/F2/F3/F4/F5:
+                // the disc = planal[terrainRow].record(sizeIdx) [inferred F4
+                // seam, dims ladder cited], tiles = the 15-row diamond grid
+                // (F1) at F2 positions, structure art = planitem k[item] (F5).
+                const auto& psv = camp.planetAt(planetStar >= 0 ? planetStar : 0);
+                const int psize = planetStar >= 0
+                                      ? ag::Campaign::sizeClassFor(psv.surfaceCells)
+                                      : -1;
+                const auto& ptt = camp.terrainTables();
+                if (planetStar >= 0 && psize >= 0) {
+                    // Grid bbox centre (F2 lattice over the VALID cells).
+                    int minx = 1 << 30, maxx = -(1 << 30), miny = 1 << 30,
+                        maxy = -(1 << 30);
+                    for (int row = 0; row < 15; row++)
+                        for (int col = ptt.rowOffset[psize][row];
+                             col < ptt.rowOffset[psize][row] +
+                                   ptt.rowWidth[psize][row]; col++) {
+                            const Pt c = tileCenter(psize, row, col);
+                            minx = std::min(minx, c.x - 34);
+                            maxx = std::max(maxx, c.x + 34);
+                            miny = std::min(miny, c.y - 17);
+                            maxy = std::max(maxy, c.y + 17);
+                        }
+                    const int gcx = (minx + maxx) / 2, gcy = (miny + maxy) / 2;
+                    // THE PLANET PICTURE under the grid (F4 [inferred]:
+                    // terrainRow picks the lib, sizeIdx the rung).
+                    const int trow = psv.terrainRow;
+                    if (trow >= 0 && trow < 11 && planalLibs[trow].count() == 5) {
+                        const auto& dr = planalLibs[trow].record(psize);
+                        blitShape(ren, planalLibs[trow], psize,
+                                  gcx - int(dr.width) / 2,
+                                  gcy - int(dr.height) / 2);
+                    }
+                    // Tiles (F1 valid cells, F2 lattice). Bare fill pal[150]
+                    // (immediate 0x960000 @0x3c274); per-class colour table
+                    // 0x892ac UNRESOLVED (named seam) — rock cells |8 draw a
+                    // DARKER fill [documented default].
+                    const uint32_t bare = chromePaletteArgb(150);
+                    for (int row = 0; row < 15; row++)
+                        for (int col = ptt.rowOffset[psize][row];
+                             col < ptt.rowOffset[psize][row] +
+                                   ptt.rowWidth[psize][row]; col++) {
+                            const int cell = gridCellFor(ptt, psize, row, col);
+                            if (cell < 0) continue;
+                            const Pt c = tileCenter(psize, row, col);
+                            const bool rock =
+                                cell < int(psv.cellClasses.size()) &&
+                                (psv.cellClasses[cell] & 8);
+                            const uint32_t argb =
+                                rock ? ((bare >> 1) & 0x7F7F7F) | 0xFF000000u
+                                     : bare;
+                            SDL_SetRenderDrawColor(
+                                ren, (argb >> 16) & 0xFF, (argb >> 8) & 0xFF,
+                                argb & 0xFF, 255);
+                            filledDiamond(ren, c.x, c.y);
+                            // diamond outline (edge edges, 68x34)
+                            SDL_SetRenderDrawColor(ren, 24, 24, 32, 255);
+                            SDL_RenderDrawLine(ren, c.x - 34, c.y, c.x, c.y - 17);
+                            SDL_RenderDrawLine(ren, c.x, c.y - 17, c.x + 34, c.y);
+                            SDL_RenderDrawLine(ren, c.x + 34, c.y, c.x, c.y + 17);
+                            SDL_RenderDrawLine(ren, c.x, c.y + 17, c.x - 34, c.y);
+                        }
+                    // Structure art ON the tiles (F5: planitem record index
+                    // == itemIdx, 1:1 pixel-match law shp.md S23.4).
+                    if (planitemLib.count() == 40)
+                        for (size_t ii = 0; ii < psv.items.size(); ii++) {
+                            const int cell = psv.itemCells[ii];
+                            int row = 0, col = 0;
+                            if (cell < 0 || !gridRowCol(ptt, psize,
+                                                        psv.surfaceCells, cell,
+                                                        &row, &col))
+                                continue;  // orbital ring: no surface tile
+                            const int item = psv.items[ii];
+                            if (item < 0 || item >= 40) continue;
+                            const Pt c = tileCenter(psize, row, col);
+                            const auto& sr = planitemLib.record(item);
+                            blitShape(ren, planitemLib, item,
+                                      c.x - int(sr.width) / 2,
+                                      c.y - int(sr.height) / 2);
+                        }
+                    // Selected tile: bright outline (port affordance — the
+                    // vendor PLSQUARE cell-select, ln1520).
+                    if (planetCell >= 0) {
+                        int row = 0, col = 0;
+                        if (gridRowCol(ptt, psize, psv.surfaceCells, planetCell,
+                                       &row, &col)) {
+                            const Pt c = tileCenter(psize, row, col);
+                            SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+                            SDL_RenderDrawLine(ren, c.x - 34, c.y, c.x, c.y - 17);
+                            SDL_RenderDrawLine(ren, c.x, c.y - 17, c.x + 34, c.y);
+                            SDL_RenderDrawLine(ren, c.x + 34, c.y, c.x, c.y + 17);
+                            SDL_RenderDrawLine(ren, c.x, c.y + 17, c.x - 34, c.y);
+                        }
+                    }
+                }
                 txt.draw(ren, 12, 118, pv.title, true, kText);
                 char pbuf[160];
                 std::snprintf(pbuf, sizeof(pbuf), "Population %d / %d  (working %d)",
@@ -1451,12 +1619,21 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         const int ry = lr.y0 + 2 + int(oi) * kProjectRowPitch;
                         const bool ok = projectOrderable(camp, planetStar,
                                                          opts[oi].item);
+                        // t418b: with a tile selected, the F3 leg joins the
+                        // report (the vendor checker refuses an inactive new
+                        // item touching an ACTIVE neighbour, 0x386fe).
+                        const bool cellOk =
+                            planetCell < 0 ||
+                            orderCellBlock(camp, planetStar, opts[oi].item,
+                                           planetCell) !=
+                                OrderCellBlock::ActiveNeighbour;
                         char ob[128];
-                        std::snprintf(ob, sizeof(ob), "%-24s cost %3d%s",
+                        std::snprintf(ob, sizeof(ob), "%-24s cost %3d%s%s",
                                       opts[oi].name.c_str(), opts[oi].cost,
-                                      ok ? "" : "  (no free population)");
+                                      ok ? "" : "  (no free population)",
+                                      ok && !cellOk ? "  (cell refuses)" : "");
                         txt.draw(ren, lr.x0 + 8, ry + 4, ob, false,
-                                 ok ? kText : kDim);
+                                 ok && cellOk ? kText : kDim);
                     }
                     if (opts.empty())
                         txt.draw(ren, lr.x0 + 8, lr.y0 + 6,

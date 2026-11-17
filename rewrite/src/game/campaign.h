@@ -197,6 +197,10 @@ public:
     // t400: the player's species selection (specnum 0..20, -1 = human).
     // The Species-row flag law reads it (ui/hudlayout.h); no new state.
     int playerSpecies() const { return cfg_.playerSpecies; }
+    // t418: the loaded terrain source tables (grid B/C law, docs/re/_wip_t418
+    // .md F1). Display-only surface for the planet-view tile grid —
+    // same posture as playerSpecies()/fleet() (no engine state exposed).
+    const TerrainTables& terrainTables() const { return cfg_.terrain; }
     bool over() const { return victory_ != Victory::None; }
     Victory victory() const { return victory_; }
     // t365: unique_ptr member (fleetSim_) — out-of-line dtor so the

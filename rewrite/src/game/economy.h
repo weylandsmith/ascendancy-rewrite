@@ -103,17 +103,32 @@ struct TerrainTables {
     int weights[11][4];       // 0x744f4 analog (row = word[+0x16] draw rng%11)
     int surfaceBySize[5];     // grid C row SUMS (FUN_00037d80 +0x18 law)
     int popGrowth = 50;       // DS:0x66e4 analog (growth counter wrap value)
+    // t418 SURFACE GRID GRIDS (0x7445c = grid B rowOffset, 0x744a8 = grid C
+    // rowWidth; planitem.txt tokens 45..119 / 120..194, loader FUN_00037fc0
+    // 0x38070..0x380a9 / 0x380ad..0x380ed). Grid law MEASURED t418 from
+    // FUN_000395c4/FUN_0003965c (docs/re/_wip_t418.md F1): the surface grid
+    // is 15 row-slots per size class; valid cols B[size][row] <= col <
+    // B+C; cell = cumWidth(size,row)+col-B. Grid B's t294 "no consumer" note
+    // now has its consumer (ui/planetview.h tile grid).
+    int rowOffset[5][15];     // 0x7445c analog (grid B)
+    int rowWidth[5][15];      // 0x744a8 analog (grid C; row sum = +0x18)
     bool operator==(const TerrainTables& o) const {
         if (popGrowth != o.popGrowth) return false;
         for (int i = 0; i < 11; ++i)
             for (int j = 0; j < 4; ++j)
                 if (weights[i][j] != o.weights[i][j]) return false;
-        for (int i = 0; i < 5; ++i)
+        for (int i = 0; i < 5; ++i) {
             if (surfaceBySize[i] != o.surfaceBySize[i]) return false;
+            for (int j = 0; j < 15; ++j)
+                if (rowOffset[i][j] != o.rowOffset[i][j] ||
+                    rowWidth[i][j] != o.rowWidth[i][j])
+                    return false;
+        }
         return true;
     }
 };
-// Measured vendor values (file == banked runtime == live RAM, t294).
+// Measured vendor values (file == banked runtime == live RAM, t294; grids
+// file-verbatim t418).
 inline const TerrainTables& vendorTerrainTables() {
     static const TerrainTables t = {
         {{100,0,0,0}, {50,2,2,2}, {20,3,5,3}, {0,3,20,3}, {40,10,2,2},
@@ -121,6 +136,16 @@ inline const TerrainTables& vendorTerrainTables() {
          {0,33,34,33}},
         {7, 11, 23, 45, 73},
         50,
+        {{0,0,0,0,4,4,5,0,0,0,0,0,0,0,0},
+         {0,0,0,4,3,4,5,6,0,0,0,0,0,0,0},
+         {0,0,3,2,3,3,4,5,7,0,0,0,0,0,0},
+         {0,2,1,1,2,2,3,4,5,7,0,0,0,0,0},
+         {1,0,0,0,1,1,2,3,4,5,7,0,0,0,0}},
+        {{0,0,0,0,2,3,2,0,0,0,0,0,0,0,0},
+         {0,0,0,1,3,3,3,1,0,0,0,0,0,0,0},
+         {0,0,1,4,4,5,4,4,1,0,0,0,0,0,0},
+         {0,2,5,6,6,7,6,6,5,2,0,0,0,0,0},
+         {3,6,7,8,8,9,8,8,7,6,3,0,0,0,0}},
     };
     return t;
 }

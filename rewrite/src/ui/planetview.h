@@ -112,4 +112,54 @@ inline constexpr int kProjectVisibleRows = 12;  // (420-120)/24 rounded down
 // window starting at `first`); nullopt outside the rect/rows.
 std::optional<int> projectRowFor(Pt p, int first);
 
+// ---- t418b SURFACE TILE GRID (laws docs/re/_wip_t418.md F1/F2/F3) ---------
+//
+//   F1 GRID LAW [verified verbatim FUN_000395c4 + FUN_0003965c]: 15 row-
+//   slots per size class; valid cols B[size][row] <= col < B+C (B = grid B
+//   rowOffset @0x7445c, C = grid C rowWidth @0x744a8, planitem.txt tokens
+//   45..194 via TerrainTables); cell = cumWidth(size,row) + col - B.
+//   Inverse (0x396af..0x396c2): cell < surfaceCells required, walks rows
+//   while cum+B+C <= target; col = target - cum + B[size][row].
+//
+//   F2 ISOMETRIC LAW [verified immediates, paint body 0x3b96c]: center =
+//   origin + col*(34,17) + row*(17,-34); x-cursor 110 +17/row, y 410 -34/row
+//   => origin at (row,col)=(0,0) is (110,410). Tile diamond 68x34 (x±0x22,
+//   y..y+0x22 mid y+0x11); hit-test |dx|/34 + |dy|/17 <= 1. The lattice
+//   steps ARE the diamond-tiling half-steps, so the four probe neighbours
+//   (row±1,col),(row,col±1) are the four visual edge-neighbours.
+//
+//   F3 ADJACENCY LAW [verified verbatim build-checker 0x385b7..0x3870d]:
+//   the ACTIVE-neighbour refuse is SKIPPED when cell >= surfaceCells
+//   (0x385b7 jae accept), when the cell's own slot is ACTIVE (0x385ee),
+//   when item==5 Colony (0x385f6) or item==38 Xeno Dig (0x385ff). Else four
+//   probes; any ACTIVE (word+2 bit0) neighbour REFUSES (0x386fe).
+
+// Cell index for (row, col) on a size-class grid; -1 outside the valid cols
+// (0x395dc..0x39647 verbatim: row in [0,15), col >= B and col < B+C).
+int gridCellFor(const ascend::game::TerrainTables& tt, int size, int row,
+                int col);
+
+// Inverse (FUN_0003965c): (row,col) for a terrain cell; false when the cell
+// is not a surface cell (cell < 0 || cell >= surfaceCells — the vendor's
+// 0xffffffff leg).
+bool gridRowCol(const ascend::game::TerrainTables& tt, int size,
+                int surfaceCells, int cell, int* row, int* col);
+
+// F2 screen position of a tile centre on the planet-view field (col
+// ABSOLUTE incl. B). Pure arithmetic; the ui painter uses it verbatim.
+Pt tileCenter(int size, int row, int col);
+
+// F2 hit-test: the tile whose diamond contains p, or -1. Diamonds tile
+// edge-to-edge (touching at vertices), so at most one strict hit; boundary
+// ties resolve to the nearest centre [port tie law, named seam].
+int tileHitFor(const ascend::game::TerrainTables& tt, int size,
+               int surfaceCells, Pt p);
+
+// Why an order would NOT land on the SELECTED cell (the F3 leg; gates 1-3
+// are projectOrderable's domain). kOrderCellNone when the cell is fine
+// (including every skip leg).
+enum class OrderCellBlock { None, ActiveNeighbour };
+OrderCellBlock orderCellBlock(const ascend::game::Campaign& camp, int star,
+                              int item, int cell);
+
 }  // namespace ascend::ui

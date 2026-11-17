@@ -55,7 +55,11 @@ CELL INDEX = cumWidth(size,row) + col - B[size][row]
   (0x395f5..0x39612 ebx = SUM GridC[size][0..row-1]; 0x3963f..0x39647
    ebx = cum + col - B). 0xffff outside. row in [0,15), col >= 0 (0x395dc..).
 INVERSE FUN_0003965c: cell < WORD[rec+0x18] (terrainCells) required, else
-  0xffffffff; walks rows while cum+B+C <= target; returns (row<<16)|col
+  0xffffffff; walks rows while cum+C <= target (t418b CORRECTION: the loop
+  test at 0x396b0/0x396b5 is cum+C — B enters ONLY the col formula
+  0x3969a..0x396a6; the first-draft shorthand "cum+B+C" above was a misparse
+  and yields invalid cols whenever B>0, e.g. size2 cell18 lands row6 col8
+  (outside row 6's cols 4..7) vs the vendor's row7 col5); returns (row<<16)|col
   with col = target - cum + B[size][row]  [verified: 0x396af..0x396c2;
   caller 0x38613..0x3861b splits hi16=row lo16=col].
 planitem.txt grids [verified, extracted/ascend00/planitem.txt after '#',
@@ -120,4 +124,40 @@ during a vendor planet-view frame.
 planitem.shp record index == itemIdx (1:1 pixel match law, shp.md S23.4).
 Port blits planitem k[item] at the tile centre for occupied cells.
 
-## F5 implementation + pins + witness (in progress)
+## F6 t418b BUILD PLAN (this iteration, executing F1-F5)
+1. TerrainTables (economy.h): ADD rowOffset[5][15] (grid B) + rowWidth[5][15]
+   (grid C) verbatim from planitem.txt; loadTerrainTables reads tokens
+   45..119 into B (was "UNMAPPED here" — consumer now exists per t418 F1) and
+   120..194 into C (surfaceBySize stays the row-sums accessor). vendor
+   default table extended with the same measured values. operator== covers B/C.
+2. campaign.h: public `const TerrainTables& terrainTables() const` (display
+   surface, same posture as playerSpecies()).
+3. planetview.{h,cpp} PURE LAW (no SDL): gridCellFor (0x395c4: valid iff
+   B<=col<B+C, cell=cumWidth+col-B, -1 outside; row in [0,15), col>=0);
+   gridRowCol (0x3965c inverse: cell<surfaceCells required, walk rows while
+   cum+B+C<=target, col=target-cum+B); tileCenter (F2 origin (110,410) +
+   col*(34,17) + row*(17,-34)); tileHitFor (diamond |dx|/34+|dy|/17<=1 over
+   valid cells; the tiling touches edge-to-edge so <=1 cell matches — ties
+   resolved by least Euclidean distance); OrderBlock enum + projectBlockFor
+   (gates 1-3 verbatim + F3 adjacency leg: selected cell INACTIVE with an
+   ACTIVE graph-neighbour (row±1,col),(row,col±1) refuses; skips: cell>=
+   surfaceCells, own cell ACTIVE, item 5 Colony, item 38 Xeno Dig).
+4. ui.cpp kScreenPlanet: load 11x planalNN.shp + planitem.shp (separate
+   libs, chrome-lib posture); paint disc planal[terrainRow].record(sizeIdx)
+   centred on the valid-cell bbox centre; per-cell diamond fill pal[150]
+   (chromePaletteArgb(150)) + outline, rock cells darker [documented default
+   — per-class colour table 0x892ac stays the NAMED SEAM]; planitem k[item]
+   blit at tile centre for occupied cells; selected tile outline; click
+   tile -> select planetCell (diamond hit), project list annotates the
+   adjacency refuse; Escape unchanged.
+5. Pins tests/test_planetview_t418b.cpp: per-size-class valid-cell census ==
+   surfaceBySize; inverse round-trip all cells all classes; worked example
+   (size2 row2col3->0, row8col7->22); lattice steps (34,17)/(17,-34); hit at
+   every centre self-matches + gap point (centre+35,0) misses; adjacency
+   table (size2 cell0 neighbours {1,5}, far cell 22 no-refuse) + skip legs
+   (item 5, item 38, own-ACTIVE, orbital cell). MUTATION campaign per rules
+   (anchor guard, execute_code serial).
+6. Witness scripts/t418b_planetview_witness.sh (Xvfb :97 seed 5: RESUME ->
+   STATUS -> row click -> planet shot; tile click -> shot; PLBUILD open ->
+   shot) + census python (diamond pixels, disc non-black, structure sprite)
+   + native-vision grade of shots (D13).

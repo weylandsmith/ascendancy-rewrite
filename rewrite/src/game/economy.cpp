@@ -280,11 +280,16 @@ bool loadTerrainTables(const std::string& path, TerrainTables& out,
             }
             out.weights[i][j] = v;
         }
-    // grid B (tok 45..119) intentionally unread: no rewrite consumer (0x7445c
-    // window semantics unmapped -- t294 WIP).
+    // grid B (tok 45..119): t418 CONSUMER EXISTS (ui/planetview.h tile grid
+    // — row offsets 0x7445c), so the row lands verbatim; the t294 "no
+    // consumer" skip is retired.
     for (int i = 0; i < 5; ++i) {
         int sum = 0;
-        for (int j = 0; j < 15; ++j) sum += tok[120 + i * 15 + j];
+        for (int j = 0; j < 15; ++j) {
+            out.rowOffset[i][j] = tok[45 + i * 15 + j];
+            out.rowWidth[i][j] = tok[120 + i * 15 + j];
+            sum += out.rowWidth[i][j];
+        }
         if (sum < 1 || sum > 100) {
             errOut = "terrain: grid C row " + std::to_string(i) + " sums to " +
                      std::to_string(sum) + ", outside +0x18 cap 1..100";
