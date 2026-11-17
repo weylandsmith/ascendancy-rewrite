@@ -58,6 +58,14 @@ bool blitShapeScaled(SDL_Renderer* ren,
                      const ascend::formats::ShapeLibrary& lib, int rec,
                      int x, int y, int scale);
 
+// t414: blitShapeScaled with an optional CIRCULAR CLIP (clipR > 0 discards
+// scaled pixels outside radius clipR about the rect centre — the vendor's
+// ring-clipped race portraits; docs/re/_wip_t414.md S2e). clipR == 0 is
+// exactly blitShapeScaled.
+bool blitShapeCircular(SDL_Renderer* ren,
+                       const ascend::formats::ShapeLibrary& lib, int rec,
+                       int x, int y, int scale, int clipR);
+
 // t398: load DATA\game.pal for blitShape's colour path (process-wide; the
 // data root never changes mid-session — only the FIRST call in a process
 // reads the file and prints the diagnostic line; later calls just report

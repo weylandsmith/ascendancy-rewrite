@@ -230,31 +230,24 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t414 per queue row t414 below (phase 15: NEW GAME ROUND 3 +
-ROTATION AXIS + PLANET RENDER + ESC TRAP + CORNER EXIT, per the USER'S
-ROUND-3 RULING — DECISIONS.md heading D15 (my ruling was first filed as
-D14, colliding with the loop's D14 grading sheet; renumbered, text
-verbatim). D13 self-grade law CONTINUES. User's live grade confirms
-phase-14 direction ("looking better", race intro present, planet view
-present-but-empty, "making progress") while listing the next gaps; the
-compile warning (sign-compare x2) fixed on receipt — 0 warnings 401/0.
+NEXT t415 per queue row t415 below (RACE INTRO FRAMING + ART, phase 15
+per the USER'S ROUND-3 RULING D15). ORDERING: t414 (New Game round 3)
+LANDED 2026-11-16 — all six D15 New-Game defects fixed, own-graded with
+native vision, pinned (402/0/0, gate 0; docs/re/_wip_t414.md). t415 is
+next because it REUSES the t414 frame law verbatim (the intro screen needs
+the same chrome-page treatment) and the race-portrait question is already
+half-answered by t412's FUN_0002b48a law; the remaining rows t416-t419
+(rotation axis, planets-list bg, planet render, Esc trap) are independent
+of each other and of t415. D13 self-grade law CONTINUES.
 SHORTHAND FACT: public SHAs never exist locally (history-rewritten
 export); verify pushes by ls-remote only. Sentinel history below.
-PRE-BLOCK CONTEXT: the
-phase-13/14 work is PUSHED (remote main == c178a43c1f71, ls-remote
-verified) and the D14 grading sheet is LIVE on :8613 (9 fields; D14 ask
-block in docs/DECISIONS.md). This session does NOT start new feature work;
-it wakes on a DECISIONS.md USER: block or a ruling. On wake: apply the
-ruling per row, close per strict-close, then author the phase-15 queue from
-whatever the user flags. Carried items the ruling does NOT need (start the
-queue with these if the user grades everything "ok"):
-  (H1) hygiene: rewrite/tests/test_statuslist_t402.cpp:201,226 sign-compare
-      warnings — the export 0-warning law regressed since t403; fix + keep.
-  (H2) t412 tail: New Game bottom-wheel clipping/polish (deferred cosmetic).
-  (H3) t412 seams: runtime race-colour bytes census (live-RAM during intro);
-      vendor intro draw immediates unmapped; intro scroll driver.
-  (H4) OQ-027 closes ONLY on the user's pasted `audio:` line + verdict (D14
-      field q8). OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.
+CARRIED STATE: phase-13/14 pushed (remote main == c178a43c1f71 at t413;
+t414+ are LOCAL commits — t420 owns the mandatory push). H1 (sign-compare
+warnings) DONE t412-era. H2 (bottom-wheel clipping) CLOSED by t414's
+panel clipRect. Remaining carried seams: (H3) runtime race-colour bytes
+census (live-RAM during intro); vendor intro draw immediates unmapped;
+intro scroll driver. (H4) OQ-027 closes ONLY on the user's pasted `audio:`
+line + verdict; OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.
 
 WALKTHROUGH TABLE (own-grade before -> after; what to re-check LIVE after
 `git pull`; all rows self-graded via native vision PASS unless noted):
@@ -285,6 +278,32 @@ WALKTHROUGH TABLE (own-grade before -> after; what to re-check LIVE after
   escape chain    | flat -> one level per press map<->system<->planet
                   | (t252 law). LIVE: press Escape repeatedly, expect
                   | planet->system->map, map quit only at bottom.
+
+t414 LANDED 2026-11-16 (NEW GAME ROUND 3 — ALL SIX D15 DEFECTS; full
+account docs/re/_wip_t414.md). (a) FRAME: chrome-page law — textureColourAt
+full 640x480 as a static texture + black cosmos rect kNewgameCosmosRect
+(8,9)-(493,373) measured; panel gaps now show texture. (b) PREVIEW:
+spinning coloured point field, N == kDensityStarCounts (splitmix64 sphere,
+NEVER the sim rng; yaw += kPreviewSpinPerFrame; neutralTint); SPIN
+measured (79 cosmos px moved between shots), density scaling measured
+(633->699 visible-strip px, 50->100). The t393 previewCamp backdrop is
+REMOVED. (c) WHEELS: 3cfgnew class census (k0..k4 dot-wells / k5..k9
+icon-rings / k10 green / k11 blue / k12 red-spiked orbs) -> BIJECTION law
+density k0..k4, species k(2+n), atmosphere k(10+v); repeated-frame defect
+closed + pinned ("no frame unused, none repeated" test clause); k12
+Hostile = print-once refusal (EOF-truncated record; port decode law;
+named seam). Wheel blits clipped to panel (stacked-circle bleed caught by
+own-grade). (d) PLAYER ICONS: t401's "no chromatic px" census REFUTED
+(scanned the label rows); measured 7 chips x384+16k rows 434..459 with
+measured base+hi colours (kPlayerChipRgb) + panel extended to y472
+(measured navy extent). (e) PORTRAITS: blitShapeCircular clips the scaled
+smrace to the ring (r53/r52) — the square-corner "4x size" defect closed.
+(f) PLANET: planets.shp 35px-class sphere blit (group specnum%11, named
+seam) replaces the vector disc. Tests 402/0/0 (+1
+newgame_t414_frame_and_chip_law; wheel pins updated), 0 warnings, gate 0,
+ledger audit OK. LEDGER: closes NOTHING in OPEN-QUESTIONS (honest
+negative — D15 grades are user-ruling rows, t401 precedent); acceptance is
+the user's via the t420 D16 sheet.
 
 t413 LANDED 2026-11-16 (PHASE-14 VERIFY + RE-EXPORT + PUSH + D14 SHEET;
 full account docs/re/packaging.md t413 block + docs/re/_wip_t413.md).

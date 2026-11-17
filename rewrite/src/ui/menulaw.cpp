@@ -204,7 +204,8 @@ const Rect kNewgameTextureBands[2] = {
 
 int newgameWheelFrame(int control, int value) {
     switch (control) {
-        case 0: {  // Star Density: rank in the sorted ladder -> k0..k3,k3.
+        case 0: {  // Star Density: rank in the sorted ladder -> k0..k4
+                   // (t414 bijection; was k0..k3,k3).
             // Sorted copy of the t78 ladder rungs {50,75,100,15,25}.
             int ladder[5] = {kDensityStarCounts[0], kDensityStarCounts[1],
                              kDensityStarCounts[2], kDensityStarCounts[3],
@@ -216,18 +217,31 @@ int newgameWheelFrame(int control, int value) {
             for (int i = 0; i < 5; i++)
                 if (ladder[i] == value) rank = i;
             if (rank < 0) return -1;  // off-ladder: refuse, never clamp
-            return rank >= 3 ? 3 : rank;  // top-two share = named seam
+            return rank;
         }
         case 1:  // Species: k(2+n), 3..Seven (anchor k7 @ Five, measured).
             if (value < 3 || value > 7) return -1;
             return 2 + value;
-        case 2:  // Atmosphere: orbs k10 (Peaceful/Neutral) / k11 (Hostile).
+        case 2:  // Atmosphere: orbs k(10+v) — t414 bijection (was 0/1->k10).
             if (value < 0 || value > 2) return -1;
-            return value == 2 ? 11 : 10;
+            return 10 + value;
         default:
             return -1;
     }
 }
+
+// Player^Color chip colours [measured on the user original, rows 434..459,
+// chip runs x384..492; docs/re/_wip_t414.md S2d]. Base = the chip body
+// colour; hi = the highlight face (both counted per 14x26 chip zone).
+const RGB kPlayerChipRgb[kPlayerChipCount][2] = {
+    {{5, 118, 69}, {1, 78, 41}},      // green
+    {{103, 63, 127}, {158, 81, 174}}, // purple
+    {{164, 159, 79}, {255, 235, 97}}, // yellow
+    {{154, 108, 127}, {239, 154, 174}},  // pink
+    {{121, 105, 69}, {107, 96, 66}},     // tan (measured dominant; weak)
+    {{27, 85, 147}, {36, 117, 207}},     // blue
+    {{151, 88, 20}, {235, 121, 4}},      // orange
+};
 
 std::string portraitLibName(int specnum) {
     if (specnum < 0 || specnum > 20) return std::string();  // refuse

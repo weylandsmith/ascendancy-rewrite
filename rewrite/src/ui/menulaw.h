@@ -89,20 +89,52 @@ int newgameArrowAt(Pt p); // 0 = up, 1 = down, -1 = none
 // USER-SUPPLIED originals (scratchpad/newgame-original.png +
 // -very-dense- variant; capture->screen mapping cited there).
 
-// WHEEL FRAME LAW — which 3cfgnew.shp record a bottom-row control shows for
-// its value; -1 = refuse (draw nothing; never clamp). `control` indexes
-// kNewgameControls (0 Star Density / 1 Species / 2 Atmosphere).
+// WHEEL FRAME LAW t414 REVISED (user D15 "the icons below 'Star Density',
+// 'Species', and 'Atmosphere' are repeating"). 3cfgnew.shp holds 13 usable
+// records k0..k12 (k12 truncated at EOF but the visible 55 rows decode —
+// scripts/t414_3cfgnew_dump.py); the controls own exactly 5+5+3 = 13 value
+// steps, and the record CLASSES partition 5/5/3 (native-vision montage
+// census, docs/re/_wip_t414.md S4): k0..k4 DOT-WELLS (dot count increases
+// with index — t401 bright-cluster census 23/33/45/62 + k4), k5..k9
+// ICON-RINGS, k10/k11/k12 ORBS (green/blue/red-spike). BIJECTION:
 //   density    : star count RANKED in the sorted t78 ladder {15,25,50,75,
-//                100} -> k0,k1,k2,k3,k3. Dots increase with frame index
-//                (measured bright-cluster census 23/33/45/62 for k0..k3);
-//                the top-two share and the exact 5->4 bijection = SEAM.
-//   species    : n -> k(2+n). ANCHOR measured: the original at "Five
-//                Species" shows FOUR icons and k7 carries four icons;
-//                endpoints 3->k5 / 7->k9 inferred (SEAM).
-//   atmosphere : 0/1 -> k10, 2 -> k11. Both orbs carry the original's
-//                (36,138,190) chroma (k10 x123, k11 x195 px) — WEAK
-//                discriminator; declared port choice, seam named.
+//                100} -> k0..k4 (was k0..k3,k3 — the repeat the user saw).
+//   species    : n -> k(2+n), 3..Seven -> k5..k9 (unchanged; already
+//                distinct; anchor Five->k7 measured, t401 S10).
+//   atmosphere : v -> k(10+v): Peaceful->k10 (green orb), Neutral->k11
+//                (blue orb — the original Neutral chroma (36,138,190)
+//                matches k11's (36,137,190) x195 > k10 x123), Hostile->k12
+//                (RED SPIKED orb — order law + colour law).
 int newgameWheelFrame(int control, int value);
+
+// ---- t414 NEW GAME FRAME + PREVIEW LAW (docs/re/_wip_t414.md S2) --------
+// The screen is a TEXTURED CHROME PAGE with the cosmos punched in [all
+// measured on the user original]: at y=200 the left texture ends x7; at
+// x=300 the top texture ends y8 and the bottom texture starts y374; the
+// DESC->RACELIST gutter x494..501 is texture. Draw texture FULL 640x480
+// (textureColourAt), then black-fill kNewgameCosmosRect, then the points.
+inline constexpr Rect kNewgameCosmosRect{8, 9, 493, 373};
+// Preview point count == the density setting (user: "a spinning star field
+// commensurate with the star density"; the Very Dense original capture
+// shows ~100 coloured points == ladder rung 100). Yaw advances per frame
+// (spin); positions are splitmix64 on a sphere shell — deterministic, no
+// rng (gate 3l law: preview must never touch the sim rng).
+inline constexpr double kPreviewSpinPerFrame = 0.0035;
+
+// Player^Color icons [measured, REFUTES the t401 S10 negative]: SEVEN 14px
+// chips at x 384+16k (k=0..6), rows 434..459 (26 tall), base+highlight
+// colour pairs measured per chip (docs/re/_wip_t414.md S2d). The t401
+// "no chromatic px" census scanned rows 394..404 — the LABEL band, wrong
+// rows.
+inline constexpr int kPlayerChipX0 = 384, kPlayerChipPitch = 16,
+                     kPlayerChipY = 434, kPlayerChipW = 14,
+                     kPlayerChipH = 26, kPlayerChipCount = 7;
+// The VISUAL panel runs to the bottom row (measured navy x380..493 rows
+// 382..473 on the original); windows.txt's (379,381)-(493,419) is only
+// the label/interactive zone.
+inline constexpr Rect kPlayerColorPanel{379, 381, 493, 472};
+extern const RGB kPlayerChipRgb[kPlayerChipCount][2];  // {base, highlight}
+
 
 // Wheel blit anchor [measured]: the record's CONTENT circle (55 px wide)
 // centres on the panel — original non-navy bbox x38..92 y408..462 inside

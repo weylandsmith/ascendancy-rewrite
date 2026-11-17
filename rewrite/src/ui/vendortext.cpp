@@ -135,9 +135,28 @@ bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
     return blitShapeScaled(ren, lib, rec, x, y, 1);
 }
 
+// t414: blitShape at scale WITH an optional circular clip (clipR > 0
+// discards scaled pixels outside radius clipR about the rect centre; 0 =
+// no clip). Definition below; header law in ui_internal.h.
+bool blitShapeCircular(SDL_Renderer* ren,
+                       const ascend::formats::ShapeLibrary& lib, int rec,
+                       int x, int y, int scale, int clipR);
+
 bool blitShapeScaled(SDL_Renderer* ren,
                      const ascend::formats::ShapeLibrary& lib, int rec,
                      int x, int y, int scale) {
+    return blitShapeCircular(ren, lib, rec, x, y, scale, 0);
+}
+
+// t414: the vendor's race-list portraits are CIRCULAR ART clipped to the
+// ring (measured on the user original — 2x crop native-vision read: disc +
+// ring, no square corners; docs/re/_wip_t414.md S2e). clipR > 0 discards
+// every source pixel whose scaled centre falls outside a circle of that
+// radius about the scaled rect's centre (alpha 0 -> BLEND skips it, the
+// same skip-dst-untouched semantics as a TRANSPARENT-SKIP stream pixel).
+bool blitShapeCircular(SDL_Renderer* ren,
+                       const ascend::formats::ShapeLibrary& lib, int rec,
+                       int x, int y, int scale, int clipR) {
     if (scale < 1) scale = 1;  // refuse-not-clamp applies to the FRAME,
                                // never to the draw scale (a 0-scale blit
                                // would be an invisible no-op at best)
@@ -149,6 +168,12 @@ bool blitShapeScaled(SDL_Renderer* ren,
     if (!lib.decode(rec, a) || !lib.decode(rec, b)) return false;
     const auto& r = lib.record(rec);
     std::vector<uint32_t> argb(a.size());
+    // t414 circular clip: source pixel (sx,sy) centre in scaled destination
+    // coords is (sx+0.5)*scale from the rect left; clip about the rect
+    // centre (W*scale/2, H*scale/2).
+    const double halfW = double(r.width) * scale / 2.0;
+    const double halfH = double(r.height) * scale / 2.0;
+    const long clipR2 = long(clipR) * long(clipR);
     for (size_t k = 0; k < a.size(); k++) {
         const uint8_t idx = a[k];
         uint32_t rgb;
@@ -158,7 +183,13 @@ bool blitShapeScaled(SDL_Renderer* ren,
             const uint32_t lum = 40u + (uint32_t(idx) * 185u) / 255u;
             rgb = (lum << 16) | (lum << 8) | lum;
         }
-        argb[k] = (a[k] == b[k] ? 0xFF000000u : 0x00000000u) | rgb;
+        uint32_t alpha = a[k] == b[k] ? 0xFF000000u : 0x00000000u;
+        if (clipR > 0 && alpha != 0) {
+            const double dx = (double(k % r.width) + 0.5) * scale - halfW;
+            const double dy = (double(k / r.width) + 0.5) * scale - halfH;
+            if (dx * dx + dy * dy > double(clipR2)) alpha = 0x00000000u;
+        }
+        argb[k] = alpha | rgb;
     }
     SDL_Texture* tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
                                          SDL_TEXTUREACCESS_STATIC,

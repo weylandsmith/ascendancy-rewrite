@@ -50,12 +50,16 @@ bool loadPal(std::vector<int>* rgb) {  // 256*3 ints
 }  // namespace
 
 TEST(newgame_t401_wheel_frame_law) {
-    // Density: rank in the sorted ladder {15,25,50,75,100} -> k0,k1,k2,k3,k3.
+    // t414 BIJECTION (revised; docs/re/_wip_t414.md S2c): 13 records =
+    // 5 density + 5 species + 3 atmosphere steps, classes partition
+    // dot-wells k0..k4 / icon-rings k5..k9 / orbs k10..k12 (native-vision
+    // montage census scripts/t414_3cfgnew_dump.py).
+    // Density: rank in the sorted ladder {15,25,50,75,100} -> k0..k4.
     CHECK(au::newgameWheelFrame(0, 15) == 0);
     CHECK(au::newgameWheelFrame(0, 25) == 1);
     CHECK(au::newgameWheelFrame(0, 50) == 2);
     CHECK(au::newgameWheelFrame(0, 75) == 3);
-    CHECK(au::newgameWheelFrame(0, 100) == 3);  // top-two share = seam
+    CHECK(au::newgameWheelFrame(0, 100) == 4);  // t414: was the k3 repeat
     CHECK(au::newgameWheelFrame(0, 60) == -1);   // off-ladder refuses
     CHECK(au::newgameWheelFrame(0, 0) == -1);
     // Species: k(2+n); the MEASURED anchor is Five -> k7 (original shows
@@ -65,15 +69,21 @@ TEST(newgame_t401_wheel_frame_law) {
     CHECK(au::newgameWheelFrame(1, 7) == 9);
     CHECK(au::newgameWheelFrame(1, 2) == -1);
     CHECK(au::newgameWheelFrame(1, 8) == -1);
-    // Atmosphere: 0/1 -> k10, 2 -> k11 (declared choice; weak discriminator
-    // banked in the law docblock).
+    // Atmosphere: k(10+v) — green k10 / blue k11 / red-spiked k12.
     CHECK(au::newgameWheelFrame(2, 0) == 10);
-    CHECK(au::newgameWheelFrame(2, 1) == 10);
-    CHECK(au::newgameWheelFrame(2, 2) == 11);
+    CHECK(au::newgameWheelFrame(2, 1) == 11);
+    CHECK(au::newgameWheelFrame(2, 2) == 12);
     CHECK(au::newgameWheelFrame(2, 3) == -1);
     // Unknown control refuses; nothing clamps.
     CHECK(au::newgameWheelFrame(3, 50) == -1);
     CHECK(au::newgameWheelFrame(-1, 50) == -1);
+    // The law is a BIJECTION over the usable range: 5+5+3 distinct frames.
+    bool seen[13] = {};
+    const int vals0[5] = {15, 25, 50, 75, 100};
+    for (int v : vals0) seen[au::newgameWheelFrame(0, v)] = true;
+    for (int v = 3; v <= 7; v++) seen[au::newgameWheelFrame(1, v)] = true;
+    for (int v = 0; v <= 2; v++) seen[au::newgameWheelFrame(2, v)] = true;
+    for (bool s : seen) CHECK(s);  // no frame unused, none repeated
 }
 
 TEST(newgame_t401_geometry_constants) {
@@ -113,6 +123,34 @@ TEST(newgame_t401_geometry_constants) {
     CHECK(au::kNewgameTextureBands[1].x0 > 465);
     for (const auto& b : au::kNewgameTextureBands)
         CHECK(b.y1 < au::kDisplayH);
+}
+
+TEST(newgame_t414_frame_and_chip_law) {
+    // t414 frame law: the cosmos rect sits INSIDE the display with a
+    // texture margin all round (measured 8/9/493/373 on the original).
+    CHECK(au::kNewgameCosmosRect.x0 > 0);
+    CHECK(au::kNewgameCosmosRect.y0 > 0);
+    CHECK(au::kNewgameCosmosRect.x1 < au::kDisplayW - 100);  // racelist side
+    CHECK(au::kNewgameCosmosRect.y1 < au::kDisplayH - 10);   // bottom row
+    // Player chips: seven 14x26 chips at x 384+16k fit the VISUAL panel
+    // (379..493 x 381..472) and the measured icon rows (434..459).
+    CHECK(au::kPlayerChipCount == 7);
+    CHECK(au::kPlayerChipX0 >= au::kPlayerColorPanel.x0);
+    CHECK(au::kPlayerChipX0 + (au::kPlayerChipCount - 1) *
+                                      au::kPlayerChipPitch +
+              au::kPlayerChipW - 1 <=
+          au::kPlayerColorPanel.x1);
+    CHECK(au::kPlayerChipY >= au::kPlayerColorPanel.y0);
+    CHECK(au::kPlayerChipY + au::kPlayerChipH <= au::kPlayerColorPanel.y1);
+    // The measured green chip (5,118,69) is chromatic (the whole point of
+    // the refutation: the zone DOES carry coloured icons).
+    const au::RGB& g0 = au::kPlayerChipRgb[0][0];
+    CHECK(int(g0.g) - int(g0.r) > 60);
+    // Chip x-extent matches the measured bbox x384..492 (ours ends 493,
+    // the panel edge; measured run ends 492 — 1px slack).
+    CHECK(au::kPlayerChipX0 == 384);
+    CHECK(au::kPlayerChipX0 + 6 * au::kPlayerChipPitch +
+              au::kPlayerChipW - 1 == 493);
 }
 
 TEST(newgame_t401_portrait_lib_name) {

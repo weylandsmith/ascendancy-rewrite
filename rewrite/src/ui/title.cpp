@@ -19,6 +19,7 @@
 #include "formats/shp.h"
 #include "game/campaign.h"
 #include "ui/boot.h"
+#include "ui/cam3d.h"  // t414: neutralTint (preview point families)
 #include "ui/menulaw.h"
 #include "ui/mapchrome.h"  // t401: textureColourAt (the §4 hash-noise law)
 #include "ui/titlepalette.h"
@@ -47,18 +48,10 @@ const SDL_Color kDisc{128, 128, 128, 255};    // portrait-seam disc + ring
 const SDL_Color kArrowFill{26, 87, 146, 255};   // arrow square fill (measured)
 const SDL_Color kArrowInk{190, 255, 255, 255};  // arrow glyph (measured)
 
-// t393 map-preview primitives: IDENTICAL to ui.cpp's anonymous-namespace
-// pair (internal linkage each; the preview must project stars with the same
-// CosmosView-default law or the backdrop would drift from play). If either
-// changes, change both (pinned: preview uses starScreenPos law test).
-inline SDL_Color toSdl(RGB c) { return {c.r, c.g, c.b, 255}; }
-const SDL_Color kLane{120, 120, 120, 255};
-void filledCircle(SDL_Renderer* r, int cx, int cy, int rad) {
-    for (int dy = -rad; dy <= rad; ++dy)
-        for (int dx = -rad; dx <= rad; ++dx)
-            if (dx * dx + dy * dy <= rad * rad)
-                SDL_RenderDrawPoint(r, cx + dx, cy + dy);
-}
+// t414: the t393 map-preview primitives (toSdl/kLane/filledCircle) were
+// REMOVED with the previewCamp backdrop — the t414 spinning preview draws
+// neutralTint points directly (docs/re/_wip_t414.md S2b), and the 0-warning
+// export law does not tolerate dead statics.
 
 // t390: build the title texture once — 0opening.gif index plane through the
 // t386 palette, index 255 (the menu key-solid, title-art.md §2) as alpha 0
@@ -217,6 +210,17 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
         std::fflush(stdout);
     }
     std::vector<ascend::formats::ShapeLibrary> portraitLibs(21);
+    // t414: planets.shp — the planet-sphere library for the DESC panel
+    // (55 recs = 11 biome groups x size ladder; docs/re/shp.md geometry
+    // census, dims re-verified scripts/t414_dims_census.py).
+    ascend::formats::ShapeLibrary planetsLib;
+    {
+        std::string ferr;
+        if (!planetsLib.load(
+                dataRoot + "/extracted/ascend01/data/planets.shp", &ferr))
+            std::printf("ui raceconfig planets refused: %s\n", ferr.c_str());
+        std::fflush(stdout);
+    }
     std::vector<bool> portraitTried(21, false), portraitOk(21, false);
     const auto portraitFor = [&](int specnum)
         -> const ascend::formats::ShapeLibrary* {
@@ -339,40 +343,99 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
             SDL_RenderClear(ren);  // starfield zone measured BLACK (S: census)
 
-            // (1a) t401 PAGE TEXTURE (D11 "UI framing is missing"): the New
-            // Game original carries the t400 §4 mottled texture in the LEFT
-            // margin x0..6 and the RIGHT side x>=494 (sparse columns
-            // 494/498/502/614/634/637/639 measured at y=200 — the field
-            // runs to ~493 here, so the map screen's x466 band does NOT
-            // transfer). Same splitmix64 law as the map chrome; painted
-            // BEFORE the field so panels stay clean over it.
-            for (int b = 0; b < 2; b++) {
-                const Rect& band = kNewgameTextureBands[b];
-                for (int y = band.y0; y <= band.y1; y++)
-                    for (int x = band.x0; x <= band.x1; x++) {
-                        RGB c = textureColourAt(x, y);
-                        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
-                        SDL_RenderDrawPoint(ren, x, y);
-                    }
+            // (1a) t414 FRAME LAW (D15 "the decorative framing is still
+            // wrong and mostly missing"; docs/re/_wip_t414.md S2a): the
+            // original is a TEXTURED CHROME PAGE with the cosmos punched
+            // in — texture runs the FULL screen (measured: left band ends
+            // x7 at y=200, top ends y8 and bottom starts y374 at x=300,
+            // the DESC->RACELIST gutter x494..501 and the bottom-panel
+            // gaps are texture). t401 painted only 2 bands; the gaps read
+            // as missing frame. The page is built ONCE as a static
+            // texture (titleArt pattern — 307k splitmix points per frame
+            // would starve the 16 ms budget), copied full-screen, then
+            // the cosmos rect kNewgameCosmosRect (8,9)-(493,373) is
+            // black-filled over it.
+            static SDL_Texture* chromePage = nullptr;
+            if (!chromePage) {
+                chromePage =
+                    SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                                      SDL_TEXTUREACCESS_STATIC, kDisplayW,
+                                      kDisplayH);
+                if (chromePage) {
+                    std::vector<uint32_t> px(size_t(kDisplayW) * kDisplayH);
+                    for (int y = 0; y < kDisplayH; y++)
+                        for (int x = 0; x < kDisplayW; x++) {
+                            const RGB c = textureColourAt(x, y);
+                            px[size_t(y) * kDisplayW + x] =
+                                0xFF000000u | (uint32_t(c.r) << 16) |
+                                (uint32_t(c.g) << 8) | uint32_t(c.b);
+                        }
+                    SDL_UpdateTexture(chromePage, nullptr, px.data(),
+                                      kDisplayW * int(sizeof(uint32_t)));
+                }
+            }
+            if (chromePage) SDL_RenderCopy(ren, chromePage, nullptr, nullptr);
+            {
+                SDL_Rect cosmos{kNewgameCosmosRect.x0, kNewgameCosmosRect.y0,
+                                kNewgameCosmosRect.x1 - kNewgameCosmosRect.x0 + 1,
+                                kNewgameCosmosRect.y1 - kNewgameCosmosRect.y0 + 1};
+                SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+                SDL_RenderFillRect(ren, &cosmos);
             }
 
-            // (1) BACKDROP = live map preview (COSMOSWnd is STATE "4 1 3 7 13"
-            // — registered in state 3; the original shows the generated map
-            // behind the panels). Same projection law as the campaign loop.
-            if (previewCamp) {
-                const ascend::game::Galaxy& g = previewCamp->galaxy();
-                CosmosView view;  // mapSize default == MapConfig default
-                SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
-                for (const auto& ln : g.lanes) {
-                    Pt a = starScreenPos(view, g.stars[ln.a]);
-                    Pt b2 = starScreenPos(view, g.stars[ln.b]);
-                    SDL_RenderDrawLine(ren, a.x, a.y, b2.x, b2.y);
-                }
-                for (const auto& s : g.stars) {
-                    Pt q = starScreenPos(view, s);
-                    SDL_Color n = toSdl(kNeutralRgb);
-                    SDL_SetRenderDrawColor(ren, n.r, n.g, n.b, 255);
-                    filledCircle(ren, q.x, q.y, 2);
+            // (1) t414 SPINNING PREVIEW (D15 "there should be a spinning
+            // star field commensurate with the star density in the upper
+            // left"; the Very Dense original capture shows ~100 COLOURED
+            // points == ladder rung 100, no lanes — docs/re/_wip_t414.md
+            // S2b). The t393 previewCamp projection (grey pips + lanes of
+            // the 50-star build) is REPLACED: N = the density setting,
+            // splitmix64 points on a sphere shell (NEVER the sim rng —
+            // gate 3l byte-identity law), pinhole-projected with the
+            // t399 camera maths (standoff 1760, focal 500 -> shell radius
+            // 440 projects to 167 px, inside the rect half-height 182),
+            // yaw advancing kPreviewSpinPerFrame per frame. Tints follow
+            // the vendor point families via neutralTint (cam3d port
+            // palette). WHICH stars these are = preview, not the map:
+            // the original's preview does not match its own map either
+            // (it is a generic cosmos).
+            {
+                static double previewYaw = 0.0;
+                previewYaw += kPreviewSpinPerFrame;
+                const int n = kDensityStarCounts[densityIdx];
+                const double cx =
+                    (kNewgameCosmosRect.x0 + kNewgameCosmosRect.x1) / 2.0;
+                const double cy =
+                    (kNewgameCosmosRect.y0 + kNewgameCosmosRect.y1) / 2.0;
+                const double focal = 500.0, standoff = 1760.0, shell = 440.0;
+                for (int i = 0; i < n; i++) {
+                    uint64_t z = uint64_t(i) * 0x9e3779b97f4a7c15ull +
+                                 0x5851f42d403c3b23ull;
+                    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
+                    z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
+                    z = z ^ (z >> 31);
+                    // Random unit vector (two uniforms -> spherical; the
+                    // z-marginal is uniform, matching the OQ-012(c) shell
+                    // law).
+                    const double u = double(z % 2000001ull) / 1000000.0 - 1.0;
+                    const double th =
+                        double((z >> 21) % 2000001ull) / 1000000.0 *
+                        3.14159265358979;
+                    const double rr = std::sqrt(1.0 - u * u);
+                    const double x = shell * rr * std::cos(th + previewYaw);
+                    const double y = shell * u;
+                    const double zz = shell * rr * std::sin(th + previewYaw);
+                    const double depth = standoff + zz;
+                    if (depth < 100.0) continue;
+                    const int px = int(cx + x * focal / depth);
+                    const int py = int(cy + y * focal / depth);
+                    if (px < kNewgameCosmosRect.x0 ||
+                        px > kNewgameCosmosRect.x1 ||
+                        py < kNewgameCosmosRect.y0 ||
+                        py > kNewgameCosmosRect.y1)
+                        continue;
+                    const RGB t = neutralTint(int((z >> 42) % 13));
+                    SDL_SetRenderDrawColor(ren, t.r, t.g, t.b, 255);
+                    SDL_RenderDrawPoint(ren, px, py);
                 }
             }
 
@@ -438,24 +501,29 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 if (const auto* pl = portraitFor(selIndex)) {
                     const int d = int(pl->record(0).width) *
                                   kRacePortraitScale;  // 49x49 -> 98
-                    blitShapeScaled(ren, *pl, 0,
-                                    kDescRingCentre.x - d / 2,
-                                    kDescRingCentre.y - d / 2,
-                                    kRacePortraitScale);
+                    // t414: clipped to the ring (r 52) — vendor art is a
+                    // DISC, square corners were the "4x size" complaint.
+                    blitShapeCircular(ren, *pl, 0,
+                                      kDescRingCentre.x - d / 2,
+                                      kDescRingCentre.y - d / 2,
+                                      kRacePortraitScale, kDescRingR);
                 }
-                // Planet disc: three purple bands measured on the original.
-                const RGB kPlanet[3] = {{40, 20, 32}, {109, 56, 93},
-                                        {125, 121, 138}};
-                for (int dy = -kDescPlanetR; dy <= kDescPlanetR; dy++)
-                    for (int dx = -kDescPlanetR; dx <= kDescPlanetR; dx++) {
-                        if (dx * dx + dy * dy > kDescPlanetR * kDescPlanetR)
-                            continue;
-                        const int bandIdx = dy < -6 ? 0 : (dy < 7 ? 1 : 2);
-                        const RGB& c = kPlanet[bandIdx];
-                        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
-                        SDL_RenderDrawPoint(ren, kDescPlanetCentre.x + dx,
-                                            kDescPlanetCentre.y + dy);
-                    }
+                // t414 PLANET IMAGE (D15 "the planet image is missing from
+                // the race info frame"): the zone x383..419 y198..239
+                // (~37x42) carries a PLANET SPHERE record — planets.shp is
+                // the planet-sphere library (55 recs = 11 biome groups x
+                // size ladder 11/18/25/35/47, docs/re/shp.md S geometry);
+                // the 35px class matches the measured zone (37x42). Group
+                // = specnum % 11 (preview assignment, named seam — no
+                // citation maps race->biome for the DESC panel). The t401
+                // honest-vector purple circles are REPLACED.
+                if (planetsLib.count() >= 55) {
+                    const int rec = (selIndex % 11) * 5 + 3;  // 35px class
+                    const auto& pr = planetsLib.record(rec);
+                    blitShape(ren, planetsLib, rec,
+                              kDescPlanetCentre.x - int(pr.width) / 2,
+                              kDescPlanetCentre.y - int(pr.height) / 2);
+                }
                 if (raceflagLib.count() > 0 && selIndex >= 0 &&
                     selIndex < raceflagLib.count())
                     blitShape(ren, raceflagLib, selIndex, kDescCrestRect.x0,
@@ -525,9 +593,12 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     if (const auto* pl = portraitFor(specnum)) {
                         const int d = int(pl->record(0).width) *
                                       kRacePortraitScale;  // 98 inside r53
-                        blitShapeScaled(ren, *pl, 0,
-                                        kRacePortraitCx - d / 2, cy - d / 2,
-                                        kRacePortraitScale);
+                        // t414: ring-clipped disc (was a square 98x98
+                        // whose corners overflowed the ring — the user's
+                        // "race images are all 4x size").
+                        blitShapeCircular(ren, *pl, 0,
+                                          kRacePortraitCx - d / 2, cy - d / 2,
+                                          kRacePortraitScale, kRaceRingR);
                     }
                 }
             }
@@ -576,24 +647,46 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                                       ? kDensityStarCounts[densityIdx]
                                       : (i == 1 ? speciesSetting : atmosphere);
                 const int frame = newgameWheelFrame(i, value);
-                if (frame >= 0 && frame < cfgNew.count())
-                    blitShape(ren, cfgNew, frame, cxp - kWheelBlitHalfW,
-                              kWheelBlitTop);
-                else if (frame >= 0)
+                static bool wheelRefused[3] = {};
+                if (frame >= 0 && frame < cfgNew.count()) {
+                    // The 84x79 records carry a SECOND stacked-circle band
+                    // below the content circle (t401 S10 k0 shape); the
+                    // vendor panel shows only the top circle — clip the
+                    // blit to the panel rect (measured: no second wheel in
+                    // any original panel zone, docs/re/_wip_t414.md S4).
+                    SDL_Rect clip{c.rect.x0, c.rect.y0,
+                                  c.rect.x1 - c.rect.x0 + 1,
+                                  c.rect.y1 - c.rect.y0 + 1};
+                    SDL_RenderSetClipRect(ren, &clip);
+                    const bool drew = blitShape(ren, cfgNew, frame,
+                                                cxp - kWheelBlitHalfW,
+                                                kWheelBlitTop);
+                    SDL_RenderSetClipRect(ren, nullptr);
+                    if (!drew && !wheelRefused[i]) {
+                        // Present but UNDECODABLE (3cfgnew k12 = the
+                        // EOF-truncated record; the vendor paints past-EOF
+                        // resident garbage, the port refuses — named seam,
+                        // docs/re/_wip_t414.md S2c). Print-once.
+                        wheelRefused[i] = true;
+                        std::printf("ui raceconfig wheel refused: ctrl %d "
+                                    "k%d (lib %d recs)\n",
+                                    i, frame, cfgNew.count());
+                        std::fflush(stdout);
+                    }
+                } else if (frame >= 0 && !wheelRefused[i]) {
+                    wheelRefused[i] = true;
                     std::printf("ui raceconfig wheel refused: ctrl %d k%d "
                                 "(lib %d recs)\n",
                                 i, frame, cfgNew.count());
+                    std::fflush(stdout);
+                }
             }
-            // Player^Color (windows.txt L653, MSG 0 = inert). t401 census
-            // MEASURES the zone: label ink rows 383..393, an icon band rows
-            // 394..404, bevel rows 405..419 — and NO chromatic icon pixels
-            // exist anywhere in the capture (navy + greys only; the vision
-            // read's "six coloured icons" is compression bleed, refuted
-            // mechanically, docs/re/t401-newgame-art.md S10). The port draws six
-            // CVD-safe chips in the measured band; WHICH colours the vendor
-            // used stays a named seam (no citation exists).
+            // Player^Color (windows.txt L653, MSG 0 = inert). t414: the
+            // zone carries SEVEN measured player icons (see the chip loop
+            // below) — the t401 "no chromatic px" census scanned the label
+            // rows and is REFUTED (docs/re/_wip_t414.md S2d).
             {
-                const Rect c = kPlayerColorRect;
+                const Rect c = kPlayerColorPanel;  // t414 visual extent
                 SDL_Rect r{c.x0, c.y0, c.x1 - c.x0 + 1, c.y1 - c.y0 + 1};
                 SDL_SetRenderDrawColor(ren, kPanel.r, kPanel.g, kPanel.b, 255);
                 SDL_RenderFillRect(ren, &r);
@@ -603,11 +696,27 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 const int cxp = (c.x0 + c.x1) / 2;
                 const int wl = txt.width(lbl, false);
                 txt.draw(ren, cxp - wl / 2, c.y0 + 2, lbl, false, kInk);
-                for (int k = 0; k < 6; k++) {
-                    SDL_Color col = toSdl(kOwnerRgb[k]);
-                    SDL_SetRenderDrawColor(ren, col.r, col.g, col.b, 255);
-                    SDL_Rect chip{cxp - 45 + k * 16, c.y0 + 13, 12, 10};
-                    SDL_RenderFillRect(ren, &chip);
+                // t414 PLAYER ICONS (D15 "the player icons are missing
+                // from the 'Player Color' box"): MEASURED on the original
+                // at rows 434..459, seven 14x26 chips at x 384+16k with
+                // base+highlight colours (menulaw kPlayerChipRgb). The
+                // t401 census scanned the LABEL rows and reported "no
+                // chromatic px" — refuted (docs/re/_wip_t414.md S2d). The
+                // highlight is the top 14 rows (measured hi-count 37 vs
+                // base 60 per chip = a partial face; top-half placement is
+                // the port reading of the bevel class).
+                for (int k = 0; k < kPlayerChipCount; k++) {
+                    const SDL_Rect body{kPlayerChipX0 + k * kPlayerChipPitch,
+                                        kPlayerChipY, kPlayerChipW,
+                                        kPlayerChipH};
+                    const RGB& base = kPlayerChipRgb[k][0];
+                    SDL_SetRenderDrawColor(ren, base.r, base.g, base.b, 255);
+                    SDL_RenderFillRect(ren, &body);
+                    const RGB& hi = kPlayerChipRgb[k][1];
+                    SDL_SetRenderDrawColor(ren, hi.r, hi.g, hi.b, 255);
+                    SDL_Rect top{kPlayerChipX0 + k * kPlayerChipPitch,
+                                 kPlayerChipY, kPlayerChipW, 13};
+                    SDL_RenderFillRect(ren, &top);
                 }
             }
             // Begin New Game (measured rect; NOT windows.txt — STARTGAME is
