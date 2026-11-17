@@ -1282,19 +1282,38 @@ t406 project-set seam; the ADJACENCY rule is in the planetalloc docs —
 cite the FUN). Self-grade: planet visible + tiles clickable + build
 order lands in PLANETALLOC state.
 
-t419 RESEARCH ESCAPE TRAP + CORNER EXIT POPUP (user D15: "trapped in
-the research screen, escape doesn't work" + "mouse in a corner pops up
-a box that says Exit <ESC>, I think you found an image file for that in
-a previous round"). (a) debug WHY Esc fails on research specifically
-(its key handler eating Esc? screen-stack push without pop? t405 Esc
-law applies — verify EVERY screen Esc->map now, regression test per
-screen); (b) CORNER EXIT: census shp libs for the popup art (user
-recalls we found it — grep prior rounds' docs for corner/exit popup
-records; 1starmap/10status frames?) + windows.txt corner window
-sections; implement: mouse enters corner rect -> popup art + 'Exit
-<ESC>' text, Esc returns (vendor: this is the map-corner exit-to-menu
-helper). Self-grade: walk every screen, Esc from each lands map; corner
-popup renders.
+t419 RESEARCH SCREEN: CPU STALL FIX + 3D TREE REBUILD + CORNER EXIT
+(user D15 addendum: screen pegs one core at 100%, input + window close
+queue behind it and drain MINUTES later — console spurt like 'ui
+research readout Orbital Structures'; last round's 'Esc trap' is the
+SAME bug, reclassified). ROOT CAUSE STATIC-CITED (DECISIONS.md D15
+addendum): researchview.cpp:99 researchDepth() clears its memo EVERY
+call and re-walks the whole prereq graph; researchNodePos calls it once
+per slot row (O(n) each) => the painter (ui.cpp:1444-1466) recomputes
+every node position O(n^2 x graph) PER FRAME at ~60fps, and researchHit
+repeats it per click. FIX: compute the depth table ONCE per tree (build
+on load / cache keyed by tree pointer+count), node positions once per
+(pan, rotation) change not per frame; add a frame-budget pin (research
+paint of the full 66-row tree < 5 ms — measure inside the test with
+steady_clock, generous bound, it just has to prove the O(n^2/frame)
+class is gone). THEN the user spec: research screen = 3D ROTATING tree
+("another 3d rotating dealie") + info frame RIGHT + controls lower
+right: ROTATION about Z + SCROLL up/down. Derive the rendering from RE
+(user instruction): the vendor reswin draws the tech disks on a 3D
+spinning structure — Ghidra the reswin draw chain (start from the
+RESWIN window handler family / research.md's cited FUNs; find the
+projection: disk positions rotated by a global angle, depth -> size/
+brightness?), cite the FUN + the angle accumulator; reuse the t411
+camera + the t416 dial->axis law (upper-left rot controls = Z). The
+four pan-button rects already cited become the vendor's rotate/scroll
+controls per the table (census which SENDPARAM does what). Info frame
+right = the readout panel (name/cost/progress — data law already in
+researchview.h). Self-grade: walk research, watch CPU (pgrep + ps -o
+pcpu — must NOT peg), rotate/scroll respond, Esc instant, click disk
+sets study; screenshots t419-*.png. (b) CORNER EXIT POPUP stays:
+census shp libs for the Exit<ESC> art (user recalls an image found in a
+previous round — grep prior docs) + windows.txt corner sections; mouse
+in corner rect -> popup renders; Esc returns.
 
 t420 PHASE-15 VERIFY + PUSH + HANDOFF (push-gap law MANDATORY). Full
 gate + run_tests + seed regression byte-identical; export; fetch FIRST;
