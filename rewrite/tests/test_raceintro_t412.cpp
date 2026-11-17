@@ -203,3 +203,40 @@ TEST(raceintro_t412_wrap_budget_and_word_integrity) {
     const auto none2 = au::wrapIntroLine("keep me", 100, 0);
     CHECK(none2.size() == 1 && none2[0] == "keep me");
 }
+
+// t415 WELL SPLIT (docs/re/_wip_t415.md F5): INTRO -> introWell (the
+// right-well buffer acStack_16c); TEXT + the atmosphere-gated section ->
+// textWell (the body buffer acStack_624); `paragraphs` keeps the legacy
+// merged order INTRO+TEXT+gated (t412 pins ride on it).
+TEST(raceintro_t415_well_split) {
+    std::string err;
+    au::IntroPanel p0, p2;
+    CHECK(au::buildIntroPanel(fixture(), 0, 0, &p0, &err));
+    CHECK(au::buildIntroPanel(fixture(), 0, 2, &p2, &err));
+    // introWell holds ONLY the INTRO block paragraphs.
+    CHECK(!p0.introWell.empty());
+    CHECK(p0.introWell[0] == "Your ancient programming has been reactivated.");
+    for (const auto& l : p0.introWell)
+        CHECK(l.find("HOSTILE LINE") == std::string::npos);
+    // textWell holds TEXT + the gated section (atmosphere-selected).
+    bool bodyHasText = false, hostileIn2 = false, hostileIn0 = false;
+    for (const auto& l : p0.textWell) {
+        if (l.find("TEXT BODY") != std::string::npos) bodyHasText = true;
+        if (l.find("HOSTILE LINE") != std::string::npos) hostileIn0 = true;
+    }
+    for (const auto& l : p2.textWell)
+        if (l.find("HOSTILE LINE") != std::string::npos) hostileIn2 = true;
+    CHECK(bodyHasText);
+    CHECK(hostileIn2);
+    CHECK(!hostileIn0);
+    // Legacy merged body = introWell then textWell, same order.
+    CHECK(p0.paragraphs.size() == p0.introWell.size() + p0.textWell.size());
+    for (size_t i = 0; i < p0.introWell.size(); i++)
+        CHECK(p0.paragraphs[i] == p0.introWell[i]);
+    // Layout law: the right well is 320x199 (the Ghidra call#2 rect),
+    // portrait 296x199 at (7,46) fits its well (296+7 = 303 <= sep 305).
+    CHECK(au::kIntroRightX1 - au::kIntroRightX == 320);
+    CHECK(au::kIntroRightY1 - au::kIntroRightY == 199);
+    CHECK(au::kIntroPortraitX + 296 <= au::kIntroSepX);
+    CHECK(au::kIntroLinePitch == 13);
+}

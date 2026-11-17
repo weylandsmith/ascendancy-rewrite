@@ -230,24 +230,54 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t415 per queue row t415 below (RACE INTRO FRAMING + ART, phase 15
-per the USER'S ROUND-3 RULING D15). ORDERING: t414 (New Game round 3)
-LANDED 2026-11-16 — all six D15 New-Game defects fixed, own-graded with
-native vision, pinned (402/0/0, gate 0; docs/re/_wip_t414.md). t415 is
-next because it REUSES the t414 frame law verbatim (the intro screen needs
-the same chrome-page treatment) and the race-portrait question is already
-half-answered by t412's FUN_0002b48a law; the remaining rows t416-t419
-(rotation axis, planets-list bg, planet render, Esc trap) are independent
-of each other and of t415. D13 self-grade law CONTINUES.
+NEXT t416 per queue row t416 below (ROTATION AXIS WIRING, phase 15 per
+the USER'S ROUND-3 RULING D15). ORDERING: t415 (race intro framing+art)
+LANDED 2026-11-16 (docs/re/_wip_t415.md F1-F7; live witness graded with
+own vision). Remaining rows t416-t419 are independent of each other;
+t416 is next because it is the smallest measured-code change (a dial->
+axis table in the map view), and t419 (Esc trap) benefits from being
+last of the three UI rows so its per-screen regression sweep sees all
+phase-15 screen changes. D13 self-grade law CONTINUES.
 SHORTHAND FACT: public SHAs never exist locally (history-rewritten
 export); verify pushes by ls-remote only. Sentinel history below.
 CARRIED STATE: phase-13/14 pushed (remote main == c178a43c1f71 at t413;
 t414+ are LOCAL commits — t420 owns the mandatory push). H1 (sign-compare
 warnings) DONE t412-era. H2 (bottom-wheel clipping) CLOSED by t414's
 panel clipRect. Remaining carried seams: (H3) runtime race-colour bytes
-census (live-RAM during intro); vendor intro draw immediates unmapped;
-intro scroll driver. (H4) OQ-027 closes ONLY on the user's pasted `audio:`
-line + verdict; OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.
+census (live-RAM during intro) — t415 RE-SHARPENED it: the vendor intro
+screenshot shows Minions ink GREEN pal[19] (racebyte 0) while the static
+dump byte is 16 (red pal[83]); the ink LAW is verified, the runtime INPUT
+is the open question; a live-RAM census of 0x12e18+specnum*494 during a
+vendor intro would close it. Vendor intro draw immediates now MAPPED
+(t415). Intro scroll driver seam stays (truncation printed once).
+(OQ-027 closes ONLY on the user's pasted `audio:` line + verdict;
+OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.)
+
+t415 LANDED 2026-11-16 (RACE INTRO FRAMING + ART; full account
+docs/re/_wip_t415.md F1-F7). LGRACE identified from the payload pool
+(DATA\LGRACE%02d.SHP pool 0xB68, single PUSH site 0x233ff inside the
+shape-loader cluster FUN_00023388 — per-race preload of SMRACE/LGRACE/
+SMSHIP/DKSHIP, stride 0x1ee, verified). FUN_0002fb38's own field
+accesses RESOLVE the three t412 "unmapped" rects: header (7,7)-(632,37),
+right well (312,46)-(632,245), body (7,261)-(632,465) — all agree with
+the bright-run census off the user screenshot to <=1 px. Section->well
+mapping [verified decompile buffers + screenshot content]: INTRO ->
+acStack_16c -> right well WHITE (0xf3 == pal[243]); TEXT+gated ->
+acStack_624 -> body well race ink. PORTRAIT lgrace k0 NATIVE 296x199 at
+(7,46) — template match MSE 73 (vs 336 best-of-coarse) at that origin;
+EMBLEM raceflag k<specnum> native 14x24 at (9,10); FRAME colour pal[62]
+(124,180,180), outer (2,2)-(636,477), header divider y40, band divider
+y248, vertical separator x305 TOP BAND ONLY; pitch 13; both wells
+CENTRE their lines; background = the t414 chrome page (no black fill).
+Code: IntroPanel gains introWell/textWell (paragraphs KEPT for the t412
+pins); runRaceIntro rewritten (+raceName param, title.cpp passes
+speciesNameAt); lgrace from extracted/ascend02 refuse-once. Witness:
+walk/t415_raceintro.png native-vision PASS on all six elements; the ONE
+defect (body ink red vs vendor green for Minions) is the H3 runtime-
+table seam, NOT the law — do not hardcode. Tests 403/0/0
+(+raceintro_t415_well_split), 0 warnings, gate 0, ledger audit OK.
+LEDGER: closes NOTHING (honest negative — no OQ row covers the intro;
+t412 precedent); acceptance is the user's via the t420 D16 sheet.
 
 WALKTHROUGH TABLE (own-grade before -> after; what to re-check LIVE after
 `git pull`; all rows self-graded via native vision PASS unless noted):
@@ -259,11 +289,14 @@ WALKTHROUGH TABLE (own-grade before -> after; what to re-check LIVE after
                   | recess, outline-ring zero digits, depth-dim pips.
                   | LIVE: whole screen vs memory of vendor; day counter at
                   | turn 1; spin/zoom cluster still works.
-  race intro      | ABSENT (Begin jumped to map, mapgen delay exposed) ->
-                  | history.txt text screen in race ink between Begin and
-                  | map. LIVE: New Game -> Begin: intro shows, click -> map,
-                  | delay hidden; text right for YOUR species (loop only
-                  | witnessed Minions).
+  race intro      | ABSENT -> t412 text screen -> t415 FRAMED: chrome-
+                  | page bg, outer frame + 3 dividers (pal[62]), lgrace
+                  | portrait native (7,46), raceflag emblem (9,10),
+                  | centred "Name: Power" header, INTRO white right well,
+                  | TEXT+gated race-ink bottom well. LIVE: New Game ->
+                  | Begin: framing + portrait + emblem show; text right
+                  | for YOUR species; ink colour vs your species colour
+                  | (H3 seam: Minions show red, vendor screenshot green).
   system view     | unreachable -> map STAR click opens orbit grid + 17
                   | consoles. LIVE: click any star; TOGGRID toggles grid.
   planet view +   | unreachable / could not set project -> colonised dot in

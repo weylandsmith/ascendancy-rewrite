@@ -878,7 +878,8 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                         // the intro branch below could run (t412 witness:
                         // "ui title exit: raceintro").
                         st = runRaceIntro(ren, txt, dataRoot, beginSpecies,
-                                          beginAtmosphere);
+                                          beginAtmosphere,
+                                          speciesNameAt(beginSpecies));
                         continue;
                     }
                     continue;  // dead zone on the full screen

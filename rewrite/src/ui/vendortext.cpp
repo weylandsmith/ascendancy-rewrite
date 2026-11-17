@@ -5,9 +5,11 @@
 #include "ui/ui_internal.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <fstream>
 #include <iterator>
 
+#include "ui/mapchrome.h"  // t415: textureColourAt (the chrome page law)
 #include "ui/raceintro.h"
 
 namespace ascend::ui {
@@ -299,17 +301,26 @@ int runLoadScreen(SDL_Renderer* ren, VendorText& txt,
     }
 }
 
-// ---- t412 race intro (docs/re/raceintro.h; law _wip_t412.md F3-F5) -------
+// ---- t412/t415 race intro (docs/re/raceintro.h; law _wip_t412.md F3-F5
+// + _wip_t415.md F1-F5) ------------------------------------------------------
 // The vendor loads history.txt at scenario start (FUN_0002b48a) and draws
-// the player species' block; the user's D13 witness places the screen
-// between the New Game screen and the map. PORT: black screen, header in
-// the RACE colour (game.pal[racebyte*4+0x13], F4), body paragraphs in the
-// same colour (the vendor body draw's colour immediate 0xf3 is a palette
-// index whose role is unmapped — using the race colour for the body is a
-// documented port choice, seam F5), click / any key continues.
+// the player species' block in THREE wells (decompile rects + screenshot
+// census agree): header (7,7)-(632,37) emblem+name, right well
+// (312,46)-(632,245) INTRO block white, body (7,261)-(632,465) TEXT(+gate)
+// in race ink; the portrait lgrace k0 sits at (7,46) native. LGRACE is
+// preloaded per race at boot (FUN_00023388: SMRACE/LGRACE/SMSHIP/DKSHIP
+// registered per race byte, stride 0x1ee).
+static void introWellLines(const std::vector<std::string>& paras,
+                           int wrapPx, int charW,
+                           std::vector<std::string>* out) {
+    for (const auto& para : paras)
+        for (auto& l : wrapIntroLine(para, wrapPx, charW))
+            out->push_back(std::move(l));
+}
+
 BootState runRaceIntro(SDL_Renderer* ren, VendorText& txt,
                        const std::string& dataRoot, int specnum,
-                       int atmosphere) {
+                       int atmosphere, const std::string& raceName) {
     std::ifstream f(dataRoot + "/extracted/ascend00/history.txt",
                     std::ios::binary);
     std::string history;
@@ -332,41 +343,163 @@ BootState runRaceIntro(SDL_Renderer* ren, VendorText& txt,
     const SDL_Color ink{uint8_t((argb >> 16) & 0xff),
                         uint8_t((argb >> 8) & 0xff), uint8_t(argb & 0xff),
                         255};
+    // Right-well ink [measured t415 F5]: white; the Ghidra colour
+    // immediate 0xf3 == 243 decodes game.pal[243] = (252,252,252).
+    const uint32_t whiteArgb = chromePaletteArgb(0xf3);
+    const SDL_Color whiteInk{uint8_t((whiteArgb >> 16) & 0xff),
+                             uint8_t((whiteArgb >> 8) & 0xff),
+                             uint8_t(whiteArgb & 0xff), 255};
+    // Frame ink [measured t415 F5]: (125,182,182) ~= game.pal[62].
+    const uint32_t frameArgb = chromePaletteArgb(62);
+    const SDL_Color frameInk{uint8_t((frameArgb >> 16) & 0xff),
+                             uint8_t((frameArgb >> 8) & 0xff),
+                             uint8_t(frameArgb & 0xff), 255};
 
-    // Wrap the paragraphs to the body width; honest truncation at the
-    // screen edge (no scroll driver — named seam).
-    std::vector<std::string> lines;
-    for (const auto& para : panel.paragraphs) {
-        for (auto& l : wrapIntroLine(para, kIntroBodyWidth,
-                                     txt.width("M", false)))
-            lines.push_back(std::move(l));
-        lines.emplace_back();  // blank line between paragraphs
+    // Art: lgrace portrait (ascend02 data; refuse-once law) + raceflag
+    // emblem (ascend01; the t401 crest class).
+    ascend::formats::ShapeLibrary lgrace;
+    {
+        char path[64];
+        std::snprintf(path, sizeof(path),
+                      "%s/extracted/ascend02/data/lgrace%02d.shp",
+                      dataRoot.c_str(), specnum);
+        std::string aerr;
+        if (!lgrace.load(path, &aerr))
+            std::printf("ui raceintro portrait refused: %s\n", aerr.c_str());
+        std::fflush(stdout);
     }
-    const int shown = std::min(int(lines.size()), kIntroMaxLines);
-    if (int(lines.size()) > shown)
-        std::printf("ui raceintro truncated %d of %zu lines (no scroll)\n",
-                    int(lines.size()) - shown, lines.size());
+    ascend::formats::ShapeLibrary raceflag;
+    {
+        std::string aerr;
+        if (!raceflag.load(dataRoot + "/extracted/ascend01/data/raceflag.shp",
+                           &aerr))
+            std::printf("ui raceintro raceflag refused: %s\n", aerr.c_str());
+        std::fflush(stdout);
+    }
+
+    // Wrap law (t415): right well kIntroRightWrap, body kIntroBodyWrap,
+    // small face (pitch 13 measured; smfont h8). Honest truncation, count
+    // printed once (no scroll driver — named seam).
+    const int cw = txt.width("M", false);
+    std::vector<std::string> rightLines, bodyLines;
+    introWellLines(panel.introWell, kIntroRightWrap, cw, &rightLines);
+    introWellLines(panel.textWell, kIntroBodyWrap, cw, &bodyLines);
+    const int rightShown = std::min(int(rightLines.size()),
+                                    kIntroRightMaxLines);
+    const int bodyShown =
+        std::min(int(bodyLines.size()), kIntroBodyMaxLines);
+    if (int(rightLines.size()) > rightShown)
+        std::printf("ui raceintro right truncated %d of %zu lines\n",
+                    int(rightLines.size()) - rightShown, rightLines.size());
+    if (int(bodyLines.size()) > bodyShown)
+        std::printf("ui raceintro body truncated %d of %zu lines\n",
+                    int(bodyLines.size()) - bodyShown, bodyLines.size());
     std::fflush(stdout);
 
+    // Chrome page (t414 frame law): the textureColourAt noise texture as
+    // ONE static texture; the vendor intro shows the speckle inside every
+    // well (measured), so nothing is black-filled.
+    static SDL_Texture* chromePage = nullptr;
+    if (!chromePage) {
+        chromePage = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                                       SDL_TEXTUREACCESS_STATIC, kDisplayW,
+                                       kDisplayH);
+        if (chromePage) {
+            std::vector<uint32_t> px(size_t(kDisplayW) * kDisplayH);
+            for (int y = 0; y < kDisplayH; y++)
+                for (int x = 0; x < kDisplayW; x++) {
+                    const RGB c = textureColourAt(x, y);
+                    px[size_t(y) * kDisplayW + x] =
+                        0xFF000000u | (uint32_t(c.r) << 16) |
+                        (uint32_t(c.g) << 8) | uint32_t(c.b);
+                }
+            SDL_UpdateTexture(chromePage, nullptr, px.data(),
+                              kDisplayW * int(sizeof(uint32_t)));
+        }
+    }
+
+    // Centred line helper (t415: both wells centre their lines).
+    const auto drawCentred = [&](int x0, int x1, int y,
+                                 const std::string& s, const SDL_Color& c) {
+        if (s.empty()) return;
+        const int w = txt.width(s, false);
+        txt.draw(ren, x0 + ((x1 - x0) - w) / 2, y, s, false, c);
+    };
+
     for (;;) {
-        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-        SDL_RenderClear(ren);
+        if (chromePage)
+            SDL_RenderCopy(ren, chromePage, nullptr, nullptr);
+        else {
+            SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+            SDL_RenderClear(ren);
+        }
+
+        // FRAME (measured bright runs): outer rect + header divider + band
+        // divider + vertical separator (TOP BAND ONLY — verified present
+        // at y44..60 and y232..244, absent below y250).
+        SDL_SetRenderDrawColor(ren, frameInk.r, frameInk.g, frameInk.b, 255);
+        for (int t = 0; t < 2; t++) {  // 2-px-thick lines
+            SDL_Rect top{kIntroFrameX0, kIntroFrameY0 + t,
+                         kIntroFrameX1 - kIntroFrameX0 + 1, 1};
+            SDL_Rect bot{kIntroFrameX0, kIntroFrameY1 - t,
+                         kIntroFrameX1 - kIntroFrameX0 + 1, 1};
+            SDL_Rect lft{kIntroFrameX0 + t, kIntroFrameY0, 1,
+                         kIntroFrameY1 - kIntroFrameY0 + 1};
+            SDL_Rect rgt{kIntroFrameX1 - t, kIntroFrameY0, 1,
+                         kIntroFrameY1 - kIntroFrameY0 + 1};
+            SDL_RenderFillRect(ren, &top);
+            SDL_RenderFillRect(ren, &bot);
+            SDL_RenderFillRect(ren, &lft);
+            SDL_RenderFillRect(ren, &rgt);
+        }
+        {
+            SDL_Rect hdr{kIntroFrameX0, kIntroHeaderDivY,
+                         kIntroFrameX1 - kIntroFrameX0 + 1, 1};
+            SDL_Rect band{kIntroFrameX0, kIntroBandDivY,
+                          kIntroFrameX1 - kIntroFrameX0 + 1, 1};
+            SDL_Rect sep{kIntroSepX, kIntroHeaderDivY + 1, 1,
+                         kIntroBandDivY - kIntroHeaderDivY - 1};
+            SDL_RenderFillRect(ren, &hdr);
+            SDL_RenderFillRect(ren, &band);
+            SDL_RenderFillRect(ren, &sep);
+        }
+
         if (ok) {
-            if (!panel.header.empty())
-                txt.draw(ren, kIntroHeaderX, kIntroHeaderY, panel.header,
-                         true, ink);
-            for (int i = 0; i < shown; i++)
-                if (!lines[size_t(i)].empty())
-                    txt.draw(ren, kIntroBodyX, kIntroBodyY + i * kIntroLinePitch,
-                             lines[size_t(i)], false, ink);
+            // Header: emblem (raceflag native 14x24 at (9,10)) + centred
+            // "<Name>: <POWER>" in race ink (measured centre 319.4 == 320;
+            // the "%s: " pool prefix is verified FUN_0002b48a).
+            if (specnum >= 0 && specnum < raceflag.count())
+                blitShape(ren, raceflag, specnum, kIntroEmblemX,
+                          kIntroEmblemY);
+            if (!panel.header.empty()) {
+                const std::string h =
+                    raceName.empty() ? panel.header : raceName + ": " + panel.header;
+                const int w = txt.width(h, false);
+                txt.draw(ren, (kDisplayW - w) / 2, 17, h, false, ink);
+            }
+            // Portrait: lgrace k0 NATIVE at (7,46) (template match MSE 73;
+            // never scaled, never clamped — it fits its well exactly).
+            if (lgrace.count() > 0)
+                blitShape(ren, lgrace, 0, kIntroPortraitX, kIntroPortraitY);
+            // Right well: INTRO paras, white, centred, pitch 13 from one
+            // pitch inside the well top (measured first row y56 = 46+13-3;
+            // glyph top offset within the 13-px row ~3 px [measured]).
+            for (int i = 0; i < rightShown; i++)
+                drawCentred(kIntroSepX + 2, kIntroRightX1,
+                            kIntroRightY + kIntroLinePitch * (i + 1) - 3,
+                            rightLines[size_t(i)], whiteInk);
+            // Body well: TEXT(+gated) paras, race ink, centred (measured
+            // first row y271 = 261+13-3).
+            for (int i = 0; i < bodyShown; i++)
+                drawCentred(kIntroBodyX, kIntroBodyX1,
+                            kIntroBodyY + kIntroLinePitch * (i + 1) - 3,
+                            bodyLines[size_t(i)], ink);
         } else {
-            txt.draw(ren, kIntroBodyX, kIntroBodyY,
+            txt.draw(ren, kIntroBodyX, kIntroBodyY + 13,
                      "History file unavailable - supply extracted/ascend00/"
                      "history.txt",
                      false, ink);
         }
-        txt.draw(ren, kIntroBodyX, 480 - 14, "Click or press a key to continue",
-                 false, ink);
         SDL_RenderPresent(ren);
 
         SDL_Event e;

@@ -121,28 +121,42 @@ bool buildIntroPanel(const std::string& fileText, int specnum, int atmosphere,
     const HistoryRace r = parseHistoryRace(fileText, specnum, errOut);
     if (!r.found) return false;
     out->header = introTransform(r.power);
-    std::string body = introTransform(r.intro);
-    if (!r.text.empty())
-        body += (body.empty() ? "" : "\n") + introTransform(r.text);
+
+    // t415 WELL SPLIT (docs/re/_wip_t415.md F5). The decompile keeps TWO
+    // display buffers: INTRO -> acStack_16c (204 B, its own loop), while
+    // TEXT and the atmosphere-gated section concat into acStack_624
+    // (1000 B). The vendor screenshot content-matches: right well shows
+    // the INTRO text, bottom well shows TEXT(+gated). So the wells are
+    // per-buffer, NOT one merged body.
+    const auto splitParas = [](const std::string& body) {
+        std::vector<std::string> paras;
+        size_t pos = 0;
+        while (pos <= body.size()) {
+            size_t nl = body.find('\n', pos);
+            std::string p = trim(body.substr(
+                pos, nl == std::string::npos ? std::string::npos : nl - pos));
+            if (!p.empty()) paras.push_back(p);
+            if (nl == std::string::npos) break;
+            pos = nl + 1;
+        }
+        return paras;
+    };
+    out->introWell = splitParas(introTransform(r.intro));
+    std::string textBody = introTransform(r.text);
     const std::string gated = atmosphere == 0   ? introTransform(r.peace)
                               : atmosphere == 1 ? introTransform(r.neutral)
                               : atmosphere == 2 ? introTransform(r.hostile)
                                                 : std::string();
     if (!gated.empty())
-        body += (body.empty() ? "" : "\n") + gated;
-    // Split into paragraphs on the '@'-derived '\n'; the vendor draws the
-    // body buffer as one text run, paragraphs are the display unit the
-    // '@@' law implies.
-    out->paragraphs.clear();
-    size_t pos = 0;
-    while (pos <= body.size()) {
-        size_t nl = body.find('\n', pos);
-        std::string p = trim(body.substr(
-            pos, nl == std::string::npos ? std::string::npos : nl - pos));
-        if (!p.empty()) out->paragraphs.push_back(p);
-        if (nl == std::string::npos) break;
-        pos = nl + 1;
-    }
+        textBody += (textBody.empty() ? "" : "\n") + gated;
+    out->textWell = splitParas(textBody);
+
+    // Legacy merged body (t412 pins): INTRO + TEXT + gated, same order.
+    std::string body = introTransform(r.intro);
+    if (!r.text.empty())
+        body += (body.empty() ? "" : "\n") + introTransform(r.text);
+    if (!gated.empty()) body += (body.empty() ? "" : "\n") + gated;
+    out->paragraphs = splitParas(body);
     return true;
 }
 

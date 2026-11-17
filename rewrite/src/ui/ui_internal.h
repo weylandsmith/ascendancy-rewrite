@@ -88,14 +88,15 @@ int runLoadScreen(SDL_Renderer* ren, VendorText& txt,
                   const std::string& dataRoot,
                   const std::vector<SaveSlot>& slots);
 
-// t412: the race-intro screen (docs/re/raceintro.h + _wip_t412.md F3-F5).
-// Reads history.txt (supply-your-own; a refusal prints the reason and the
-// screen STILL shows the click-to-continue hint — silent-degrade), draws
-// the parsed panel in the race's own game.pal colour, and blocks until a
-// click or any key. Returns BootState::Campaign (continue) or Quit
-// (SDL_QUIT). historyPath = full path to history.txt.
+// t412: the race-intro screen (docs/re/raceintro.h + _wip_t412.md F3-F5 +
+// _wip_t415.md F1-F5). Reads history.txt (supply-your-own; a refusal
+// prints the reason and the screen STILL renders the chrome — silent-
+// degrade), draws the framed three-well panel (chrome page, lgrace
+// portrait, raceflag emblem, centred text) and blocks until a click or
+// any key. raceName feeds the centred "<Name>: <POWER>" header (empty ->
+// the bare POWER line). Returns BootState::Campaign or Quit.
 BootState runRaceIntro(SDL_Renderer* ren, VendorText& txt,
                        const std::string& dataRoot, int specnum,
-                       int atmosphere);
+                       int atmosphere, const std::string& raceName);
 
 }  // namespace ascend::ui
