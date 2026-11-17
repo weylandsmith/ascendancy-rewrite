@@ -404,3 +404,33 @@ trivially satisfied — nothing closable and nothing closed).
   block appended to docs/DECISIONS.md.
 - LEDGER: 17 closed / 3 open UNCHANGED (strict-close: verify+push moves no
   measurement).
+
+## t420 PHASE-15 VERIFY + RE-EXPORT + PUSH LANDED (2026-11-17) — fast-forward, 17-commit gap closed; 0-warning law HOLDS again; data-optional law HOLDS
+
+- VERIFICATION: gate ALL PASS GATE_EXIT=0; run_tests 421/0/0; SEED
+  REGRESSION seeds 1/2024/23 `--headless --campaign 1600` md5 EXACTLY the
+  banked record (7e794a6dfb495800502762def9331e85 /
+  332a8cf3cebc95359924ce6a6b94a830 / 0a6b7876719f38796e8235cb772a43d3;
+  Extinct t266 / Extinct t285 / Control t1406). Phase 15 (t414..t419b)
+  moved ZERO sim rng. Logs /tmp/t420-seed-{1,2024,23}.log.
+- EXPORT /tmp/pubpush-t420 (from ae76a1b): vendor-free 7080 objects, 6.5M
+  .git, uniform noreply identity. Build WITHOUT data exit 0, ZERO warnings
+  (the t413-carried sign-compare pair was fixed by 8877e8c — law restored).
+  run_tests WITHOUT data 421/245-skipped/0-failed; gate --portable exit 0.
+- PUSH: set-url BEFORE fetch (t389 trap avoided); remote tip c178a43c1f71,
+  zero foreign commits, FAST_FORWARD_OK; `--force-with-lease=main:c178a43`
+  landed c178a43..9692126; POST-PUSH ls-remote ==
+  96921269e9267d601711a9591834e2ffa2e075ed (verified). t413's askpass was
+  deleted per policy, so a throwaway was RECREATED from
+  ~/.config/gh-pub-token (chmod 700, /tmp), used once, DELETED, verified
+  absent.
+- D16 SHEET live :8613 (scripts/t420_grading_page.py tracked; 18 crops,
+  boxes from a MEASURED t403_sheet_inventory run; all nine phase-15 shots
+  md5-DISTINCT; t419 witness shots banked /tmp/t419_shots ->
+  work/r1/loop/). Scratch-8699 + scratch-DECISIONS self-test PASS (GET root
+  200, crop 200, POST -> USER: line in the SCRATCH file; scratch server
+  killed by pid taken from ss — the old pkill pattern matched nothing).
+  Live :8613 serves the new sheet WITHOUT restart (GET 200, D16 x4, crop
+  200). D16 ask block appended to docs/DECISIONS.md.
+- LEDGER: 17 closed / 3 open UNCHANGED (strict-close: verify+push+sheet
+  moves no measurement).

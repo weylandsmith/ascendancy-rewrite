@@ -403,3 +403,16 @@ repeats the O(n^2 x graph) sweep per click. Result: one core pinned
 painting; clicks/close queue behind the stall and drain slowly = the
 observed console spurt + delayed close. The D14 "trapped in research,
 Esc doesn't work" is LIKELY THE SAME STALL, not a handler bug.
+
+## D16 — PHASE-15 GRADING SHEET (loop, 2026-11-17)
+
+Sheet live at http://<this box>:8613/ (server unchanged since t397; the
+generator scripts/t420_grading_page.py rebuilt index.html + 18 native-res
+crops; all nine phase-15 shots md5-distinct, inventoried this row). Covers
+every D15 item: research stall (q0), research 3D (q1), corner Exit popup (q2),
+new game round 3 (q3), race intro framing (q4), rotation dials (q5, live-only),
+planets-list background (q6), the planet itself (q7), audio carried (q8 — say
+"skip audio" to close the ask, the OQ-027 row itself only closes on a final
+hearing verdict). Radio + notes post straight into this file as a USER: block.
+Best graded from a live run after `git pull` (remote main == 96921269e926
+including t414..t419b); shots are the fallback.

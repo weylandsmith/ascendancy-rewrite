@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-17T14:30
+updated: 2026-11-17T16:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,28 +230,55 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t420 — PHASE-15 VERIFY + PUSH + HANDOFF (push-gap law MANDATORY; the
-full row text is in the queue section below under "t420"). Full gate +
-run_tests + seed regression byte-identical; export; fetch FIRST; push;
-ls-verify ONLY (public SHAs NEVER exist locally — "c178a43 not a valid
-object" locally is NORMAL, not a push gap; remote main == c178a43c1f71 at
-t413, t414+ are LOCAL commits). Then rewrite this NEXT ACTION to
-WAIT-USER-RULING t374 verbatim + the D16 sheet (:8613, per-screen
-before/after from OUR native-vision grades + the live re-check list —
-include the t419 research screen: spin/scroll/Esc/corner-popup re-check by
-the user personally, since the D15 addendum was his live complaint).
-ORDERING RATIONALE: t419 landed (research CPU stall killed 2160us->2us/
-frame, 3D spin + scroll + corner Exit popup witnessed 5/5 + native-vision
-PASS); t420 was always scheduled after t419 and OWNS THE MANDATORY PUSH.
-Remaining carried seams (all named, none blocking): (H3) runtime race-colour
-bytes census (Minions ink GREEN pal[19] vs static byte 16; closing witness
-= live census of 0x12e18+specnum*494); the t418b per-class tile colour table
-0x892ac seam (bare pal[150] shipped; witness = live 0x3c2a3 esp+0x310 census
-during a vendor planet frame); the t418b disc provenance F4 [inferred]
-(witness = live 0x9f10c selector census); the t419 vendor reswin draw chain
-(mechanism reuse of the cited t416 cosmos basis shipped; seam in
-researchview.h). (OQ-027 closes ONLY on the user's pasted `audio:` line +
-verdict; OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.)
+NEXT = WAIT-USER-RULING t374 (tag law: never renumber). t420 LANDED: phase
+15 is verified, pushed (remote main == 96921269e926), and the D16 sheet is
+LIVE at :8613 covering every D15 item (q0 research stall, q1 research 3D,
+q2 corner Exit popup, q3 new game round 3, q4 intro framing, q5 rotation
+dials live-only, q6 planets-list background, q7 the planet itself, q8 audio
+carried). A new iteration starts ONLY on a trigger: USER: lines after the
+D16 block in docs/DECISIONS.md (apply per strict-close; a ruling that
+reopens a screen gets ONE queue row citing the ruling phrase), or a new
+playcap sitting (re-run scripts/r1_t85g_sitting.py FIRST). Do NOT re-ask
+anything the sheet already asks.
+LIVE RE-CHECK LIST (the user's own hands; the D15 addendum was his live
+complaint — q0/q1/q2/q5 are best answered in person): open Research, leave
+a minute, Esc promptly closes + machine responsive (q0); tree spins with
+perspective + scroll pair + right panel live (q1); mouse into any campaign
+corner pops Exit<ESC> (q2); dials latch: one click keeps spinning, re-click
+stops, opposite flips (q5). WALKTHROUGH TABLE below still stands for the
+earlier rounds.
+If NO trigger arrives, the honest queue of machine-closable work is EMPTY
+(this iteration re-audited it): every remaining seam needs a live-vendor
+witness the port cannot fabricate — (H3) runtime race-colour census of
+0x12e18+specnum*494; t418b tile-colour table 0x892ac (witness 0x3c2a3
+esp+0x310); t418b disc provenance F4 (witness 0x9f10c selector census);
+t419 vendor reswin draw chain (seam in researchview.h); t416 pump cadence.
+OQ-027 closes ONLY on the user's final hearing verdict (D16 q8 "skip audio"
+stands as the port-choice off-ramp); OQ-016/OQ-019 stay DEFERRED — do NOT
+re-ask.
+
+t420 LANDED 2026-11-17 (PHASE-15 VERIFY + RE-EXPORT + PUSH + D16 SHEET; full
+account docs/re/packaging.md t420 block + docs/re/_wip_t420.md). Verification
+PASS first: gate 0; run_tests 421/0/0; SEED REGRESSION seeds 1/2024/23 md5
+EXACTLY the banked record (7e794a6dfb495800502762def9331e85 / 332a8cf3cebc
+95359924ce6a6b94a830 / 0a6b7876719f38796e8235cb772a43d3; Extinct t266 /
+Extinct t285 / Control t1406) — phase 15 (t414..t419b) moved ZERO sim rng.
+Export /tmp/pubpush-t420 vendor-free 7080 obj, uniform noreply identity;
+data-less build 0 WARNINGS (t413's carried sign-compare hygiene CLOSED by
+8877e8c) ; data-less tests 421/245-skipped/0-failed; gate --portable 0. PUSH:
+set-url BEFORE fetch (t389 trap avoided), fetched tip c178a43 zero foreign
+commits, FAST_FORWARD_OK, --force-with-lease=main:c178a43 landed
+c178a43..9692126 (17-commit gap t413..t419b CLOSED); POST-PUSH ls-remote
+VERIFIED 96921269e9267d601711a9591834e2ffa2e075ed; throwaway askpass
+recreated from ~/.config/gh-pub-token, DELETED, verified absent. D16 SHEET:
+scripts/t420_grading_page.py (tracked), 18 crops from MEASURED inventory
+(t403_sheet_inventory run; all nine phase-15 shots md5-DISTINCT — no dead
+frames), t419 shots banked /tmp/t419_shots -> work/r1/loop/; scratch-8699 +
+scratch-DECISIONS self-test PASS (GET 200s, POST -> USER: line verified in
+the SCRATCH file, scratch server killed by pid from ss — pkill pattern
+didn't match); live :8613 serves D16 without restart (GET 200, crops 200).
+D16 ask block appended to DECISIONS. LEDGER: 17 closed / 3 open — closes
+NOTHING (strict-close honest negative: verify+push+sheet ships no measurement).
 
 t419 LANDED 2026-11-17 (RESEARCH SCREEN: CPU STALL KILLED + 3D TREE + CORNER
 EXIT POPUP; full account docs/re/_wip_t419.md F0-F7). STALL ROOT CAUSE fixed
