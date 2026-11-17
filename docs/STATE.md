@@ -230,7 +230,7 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT = SAVE-CENSUS H3 RACE-COLOUR TABLE 0x12e18+specnum*494, using the
+NEXT t422 — CHROME LAW: derive textured frame from RE (see PHASE-16 QUEUE row t422; run FIRST, root-cause row)
 t421 METHOD (ordering rationale: it is the one remaining t420 "live
 witness" seam plausibly closable from EXISTING saves the way 0x892ac just
 was — referrer census + esi-lifecycle + mem[B+off] verbatim across the 178
