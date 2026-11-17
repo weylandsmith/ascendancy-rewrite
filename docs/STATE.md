@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-16T15:30
+updated: 2026-11-17T01:15
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,14 +230,17 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t416 per queue row t416 below (ROTATION AXIS WIRING, phase 15 per
-the USER'S ROUND-3 RULING D15). ORDERING: t415 (race intro framing+art)
-LANDED 2026-11-16 (docs/re/_wip_t415.md F1-F7; live witness graded with
-own vision). Remaining rows t416-t419 are independent of each other;
-t416 is next because it is the smallest measured-code change (a dial->
-axis table in the map view), and t419 (Esc trap) benefits from being
-last of the three UI rows so its per-screen regression sweep sees all
-phase-15 screen changes. D13 self-grade law CONTINUES.
+NEXT t417 per queue row t417 below (PLANETS LIST BACKGROUND, phase 15 per
+the USER'S ROUND-3 RULING D15). ORDERING: t416 (rotation axis wiring)
+LANDED 2026-11-17 (docs/re/_wip_t416.md F1-F3; vendor dial law recovered
+fully static — latch+pump, world-Y/world-X basis rotations). Remaining
+rows t417/t418/t419 are independent of each other; t417 is next because
+it is the smallest (a backdrop-record choice in the status screen), and
+t419 (research CPU stall + 3D tree) benefits from being last: its tree's
+Z-rotation reuses the t416 dial->axis law and Camera3d basis API that just
+landed. D13 self-grade law CONTINUES. t416 SEAM to respect: Camera3d is
+now a BASIS (up/fwd + latch/pump), NOT yaw/pitch fields — any new camera
+consumer uses pressSpin/pressTilt/pressZoom + tick().
 SHORTHAND FACT: public SHAs never exist locally (history-rewritten
 export); verify pushes by ls-remote only. Sentinel history below.
 CARRIED STATE: phase-13/14 pushed (remote main == c178a43c1f71 at t413;
@@ -252,6 +255,36 @@ vendor intro would close it. Vendor intro draw immediates now MAPPED
 (t415). Intro scroll driver seam stays (truncation printed once).
 (OQ-027 closes ONLY on the user's pasted `audio:` line + verdict;
 OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.)
+
+t416 LANDED 2026-11-17 (ROTATION AXIS WIRING; full account
+docs/re/_wip_t416.md F1-F3; law docs/re/t399-galaxy-map-3d.md S8). VENDOR
+DIAL LAW recovered fully static (capstone base-0): dial msgs 50..55 latch
+an (active,dir) BIT PAIR on wnd+0xc0 (handler 0x26b34 chain
+0x27da2..0x279eb: press starts CONTINUOUS motion, repeat stops, opposite
+flips); the msg-0x3b pump (0x27a18, live ~1/s t302) applies +/-2 DEG/tick
+about WORLD Y (spin pair, FUN_000283e4 edx=-1 -> 0x53584 -> per-vector
+0x5324c x/z mix) / WORLD X (tilt pair, edx=0 -> 0x53554 -> 0x531dc y/z
+mix) to the camera BASIS at wnd+0x14e (up,fwd; right=cross by FUN_00053804
+every rotation); NO rotation clamp; recenter FUN_00026a9c rest immediates
+right(1,0,0)/up(0,1,0)/fwd(0,0,1)/zoom 35.0/pos -1500 z [verified]; delta
+unit = degrees (deg2rad f32@0x88b88). Sign table verbatim ROTLEFT +2 /
+ROTRIGHT -2 / ROTUP -2 / ROTDOWN +2. The user's "rotate about Z" = the
+vendor world-Y spin reading IN-PLANE at rest (vendor view axis = world z).
+Code: cam3d.{h,cpp} REWRITTEN as the basis model (dialLatch pure law,
+tick() pump application, yawLog/pitchLog keep the witness line shape);
+ui.cpp map dials + sysview RotateLeft/Right press the latches; pump loop
+before present gates on cam.moving() + kSpinTickMs 250 (documented; idle
+cost unchanged); depthClass fed the TRANSFORMED depth (node+0xd law,
+identical at rest). Rest projection reduces EXACTLY to the t399 formula —
+t399 pins pass UNCHANGED. Tests 407/0/0 (+4 test_axis_t416.cpp: latch
+table, world-Y in-plane + 90-degree fwd->x, world-X + 100k-tick
+orthonormality, recenter immediates). MUTATION NOT RUN (budget) — pins
+un-proven, named. SEAMS (S-a..S-d in _wip): pump cadence, standoff 1760
+kept over vendor 1500 (fit law), right-drag continuous unimplemented,
+f32[0x9f108] scale documented 1.0. LEDGER: closes NOTHING (honest
+negative — D15 grades have no OQ owner, t414/t415 precedent); acceptance
+is the user's via the t420 D16 sheet (LIVE re-check: one click = the field
+KEEPS spinning; click same dial = stops; opposite dial flips).
 
 t415 LANDED 2026-11-16 (RACE INTRO FRAMING + ART; full account
 docs/re/_wip_t415.md F1-F7). LGRACE identified from the payload pool
@@ -298,7 +331,12 @@ WALKTHROUGH TABLE (own-grade before -> after; what to re-check LIVE after
                   | for YOUR species; ink colour vs your species colour
                   | (H3 seam: Minions show red, vendor screenshot green).
   system view     | unreachable -> map STAR click opens orbit grid + 17
-                  | consoles. LIVE: click any star; TOGGRID toggles grid.
+                  | LIVE: click any star; TOGGRID toggles grid.
+  rotation dials  | one 0.25-rad step per click (t399 Euler port) -> t416
+                  | vendor LATCH: one click = field KEEPS spinning, click
+                  | again stops, opposite dial flips; spin = world-Y
+                  | (in-plane at rest), tilt = world-X, no clamp.
+                  | LIVE: click ROTLEFT once and watch; re-click stops.
   planet view +   | unreachable / could not set project -> colonised dot in
   project         | system view opens planet view; project list click sets.
                   | LIVE: set a project, next turn honours it.

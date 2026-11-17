@@ -116,6 +116,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // + the TOGLANES layer state (windows.txt ln342 control; default ON —
     // lanes are drawn, subject to the t192 visibility law).
     Camera3d cam;
+    Uint32 lastPumpMs = 0, lastSysPumpMs = 0;  // t416 pump cadence
     cam.mapSize = 1024;  // MapConfig default (mapgen.h)
     bool lanesOn = true;
     int selected = -1;
@@ -304,7 +305,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         // autoplay/gates do not spin CPU. (A trailing SDL_PollEvent here once
         // DISCARDED the next event — do not re-add it.)
         SDL_Event ev;
-        if (SDL_WaitEventTimeout(&ev, 16)) {
+        const bool gotEvent = SDL_WaitEventTimeout(&ev, 16) != 0;
+        if (gotEvent) {
             if (ev.type == SDL_QUIT) quit = true;
             else if (ev.type == SDL_KEYDOWN && screen == kScreenMap &&
                      !abilityOpen &&  // t409: the modal waits (vendor CALL
@@ -585,17 +587,22 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // NAMED SEAM: inert with a printed line, never a fake.
                     std::printf("ui click next-turn-cont seam (no mid-turn pause model)\n");
                 } else if (screen == kScreenMap && mapCtlFor(p)) {
-                    // t399: the cluster DRIVES the camera (msg numbers cited
-                    // in mapchrome.cpp; behaviour law cam3d.h). Per-click
-                    // step is the documented default (vendor continuous
-                    // right-drag, help.txt 1spin, not implemented).
+                    // t416 DIAL LAW (D15 fix; cam3d.h citations): a dial
+                    // press LATCHES continuous motion (vendor wnd+0xc0 bit
+                    // pairs, handler chain 0x27da2..0x279eb) — click starts
+                    // the spin, click again stops it, the opposite dial
+                    // flips direction. The pump (vendor msg 0x3b @0x27a18;
+                    // port SDL_GetTicks below) applies 2 DEG/tick about
+                    // WORLD Y (spin pair) / WORLD X (tilt pair). Signs
+                    // verbatim from the pump: ROTLEFT +2 / ROTRIGHT -2 /
+                    // ROTUP -2 / ROTDOWN +2.
                     switch (*mapCtlFor(p)) {
-                        case MapCtl::RotRight: cam.rotate(+1); break;
-                        case MapCtl::RotLeft:  cam.rotate(-1); break;
-                        case MapCtl::RotUp:    cam.tilt(+1); break;
-                        case MapCtl::RotDown:  cam.tilt(-1); break;
-                        case MapCtl::ZoomIn:   cam.zoom(+1); break;
-                        case MapCtl::ZoomOut:  cam.zoom(-1); break;
+                        case MapCtl::RotRight: cam.pressSpin(-1); break;
+                        case MapCtl::RotLeft:  cam.pressSpin(+1); break;
+                        case MapCtl::RotUp:    cam.pressTilt(-1); break;
+                        case MapCtl::RotDown:  cam.pressTilt(+1); break;
+                        case MapCtl::ZoomIn:   cam.pressZoom(+1); break;
+                        case MapCtl::ZoomOut:  cam.pressZoom(-1); break;
                         case MapCtl::CenterHolo: cam.reset(); break;
                         case MapCtl::TogLanes: lanesOn = !lanesOn; break;
                         default:
@@ -606,7 +613,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                         kMapCtl[static_cast<int>(*mapCtlFor(p))].sendMessage);
                     }
                     std::printf("ui cam yaw %.2f pitch %.2f focal %.0f lanes %d\n",
-                                cam.yaw, cam.pitch, cam.focal, lanesOn ? 1 : 0);
+                                cam.yawLog(), cam.pitchLog(), cam.focal,
+                                lanesOn ? 1 : 0);
                 } else if (screen == kScreenMap && kRaceControlsFrame.x0 <= p.x &&
                            inRect(kRaceControlsFrame, p)) {
                     std::printf("ui click race-controls seam (slot %s)\n",
@@ -654,8 +662,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         const SysCtlControl& cc =
                             kSysCtl[static_cast<int>(ctl)];
                         switch (ctl) {
-                            case SysCtl::RotateLeft:  systemCam.rotate(-1); break;
-                            case SysCtl::RotateRight: systemCam.rotate(+1); break;
+                            case SysCtl::RotateLeft:  systemCam.pressSpin(+1); break;
+                            case SysCtl::RotateRight: systemCam.pressSpin(-1); break;
                             case SysCtl::ZoomIn:      systemCam.zoom(+1); break;
                             case SysCtl::ZoomOut:     systemCam.zoom(-1); break;
                             case SysCtl::Recenter:    systemCam.reset(); break;
@@ -673,7 +681,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                 break;
                         }
                         std::printf("ui sysview cam yaw %.2f pitch %.2f focal %.0f grid %d\n",
-                                    systemCam.yaw, systemCam.pitch,
+                                    systemCam.yawLog(), systemCam.pitchLog(),
                                     systemCam.focal, gridOn ? 1 : 0);
                         std::fflush(stdout);
                     } else if (inRect(kBatModeWnd, p)) {
@@ -804,7 +812,11 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 Pt q = projectStar(cam, s);
                 const int o = camp.starOwner(s.id);
                 const bool owned = o >= 0;
-                const int cls = depthClass(double(s.z));
+                // t416: the ladder bands the TRANSFORMED depth (node+0xd =
+                // transformed z, FUN_000284bc) — view-axis field depth, not
+                // raw s.z. Identical at the rest basis (t399 pins hold).
+                const int cls = depthClass(viewDepth(cam, s) -
+                                           Camera3d::kStandoff);
                 const int r = pipRadius(cls, owned);
                 const int dim = pipDim256(cls);  // t411 depth dim
                 if (owned) {
@@ -1773,6 +1785,23 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     txt.draw(ren, br.x + 6, br.y + 5, b.title, false, kText);
                     bx += w + 10;
                 }
+            }
+        }
+        // t416 PUMP (vendor msg 0x3b handler 0x27a18; t302 measured the
+        // pump live at ~1/s): a latched dial applies its delta every tick
+        // until the opposite press stops it. Port cadence kSpinTickMs is a
+        // documented default; only a MOVING camera repaints beyond the
+        // event-driven frame (idle cost unchanged — gates/autoplay law).
+        {
+            const Uint32 nowMs = SDL_GetTicks();
+            if (cam.moving() && nowMs - lastPumpMs >= (Uint32)Camera3d::kSpinTickMs) {
+                cam.tick();
+                lastPumpMs = nowMs;
+            }
+            if (systemCam.moving() &&
+                nowMs - lastSysPumpMs >= (Uint32)Camera3d::kSpinTickMs) {
+                systemCam.tick();
+                lastSysPumpMs = nowMs;
             }
         }
         SDL_RenderPresent(ren);

@@ -114,6 +114,7 @@ add_executable(run_tests
   tests/test_hudlayout_t264.cpp
   tests/test_mapchrome_t394.cpp
   tests/test_cam3d_t399.cpp
+  tests/test_axis_t416.cpp
   tests/test_rail_t400.cpp
   tests/test_newgame_t401.cpp
   tests/test_statuslaw_t388.cpp

@@ -3,36 +3,70 @@
 #pragma once
 // t399 — 3D cosmos camera (D11 ruling: "a 3d field of colored points that
 // can be rotated and zoomed by the controls near the lower right").
-// Pure math (no SDL) so it is unit-testable: tests/test_cam3d_t399.cpp.
+// t416 — DIAL LAW UPGRADE (D15 ruling: "the upper left rotation control
+// should rotate the galaxy about the Z axis, but it here seems to rotate it
+// around the Y axis"). The t399 yaw/pitch-Euler port was NOT the vendor
+// mechanism. Full working log docs/re/_wip_t416.md F1-F2; pins
+// tests/test_axis_t416.cpp.
 //
-// VENDOR LAW (cited, docs/re/_wip_t399.md):
-//   FUN_00053324 (0x53324) applies a 3x4 float affine to each star's
-//   f32[x,y,z] (name-0x14, sphere law r1-savestate OQ-012(c));
-//   FUN_00053374 (0x53374) projects camera-space to screen:
-//     sx = round(x * zoom / z + K) + originX   (fdiv [eax+8] = pinhole;
-//     call 0x76e08 = frndint nearest; s16 stores; zoom = COSMOSWnd+0x102).
-//   Paint loop FUN_000284bc gates on a z-window and stores the TRANSFORMED
-//   depth at node+0xd, which the t200 selector ladder bands at ±0xdc
-//   (SEL = 4*type + cls, docs/re/planets-ui.md §6) -> depth-scaled pips.
-// PORT LAW (documented defaults where the vendor value was never captured):
-//   camera stands kStandoff units out along +z from the field centre
-//   (vendor D and the z-window bounds are runtime state, [unverified]);
-//   yaw/pitch rotate the FIELD (equivalently the camera); per-click step
-//   kRotStep is a documented default (vendor spin increments are runtime
-//   state; help.txt 1spin: right mouse = continuous — NOT implemented);
-//   the ladder offset f32@ds:0x105e is relocation-patched ([unverified]) so
-//   the port uses offset 0; K (ds:0x2c50) likewise -> screen centre.
+// VENDOR LAW (cited; base-0 restored image work/ascend_restored.bin):
+//  * COSMOSWnd class handler 0x26b34 (t302 LIVE-witnessed NAME='COSMOSWnd').
+//    Dial msgs 50..55 (0x32..0x37, windows.txt SENDMESSAGE per child) do NOT
+//    step the camera: they latch an (active, direction) BIT PAIR on
+//    wnd+0xc0 (bits 0/1 ROTLEFT/ROTRIGHT, 2/3 ROTUP/ROTDOWN, 4/5
+//    ZOOMIN/ZOOMOUT) — press inactive -> active(dir), press same dial ->
+//    STOP, press opposite dial -> FLIP dir (chain 0x27d6f..0x279eb).
+//  * The periodic pump (msg 0x3b, 0x27a18; t302 measured ~1/s unattended)
+//    applies motion per latched pair: spin pair delta = bit1 ? -2 : +2
+//    (0x27a28/0x27a32), tilt pair delta = bit3 ? +2 : -2 (0x27a60/0x27a6a),
+//    zoom edx = bit5 ? +1 : -1 -> FUN_00028428. Deltas are DEGREES:
+//    FUN_000531dc/0x5324c multiply the arg by deg2rad f32@0x88b88
+//    (0.017453292).
+//  * FUN_000283e4(wnd, edx, delta): edx == -1 -> FUN_00053584 else
+//    FUN_00053554, both on the camera basis at wnd+0x14e (vectors +0x14e,
+//    +0x15a "up", +0x166 "fwd"; right = cross(up,fwd) recomputed by
+//    FUN_00053804 after EVERY rotation). FUN_0005324c mixes (x,z) =
+//    RIGHT-HAND ROTATION ABOUT WORLD Y (x' = x*c + z*s, z' = z*c - x*s);
+//    FUN_000531dc mixes (y,z) = ABOUT WORLD X (y' = y*c - z*s,
+//    z' = z*c + y*s). So the spin pair yaws (up stays world-vertical at
+//    rest), the tilt pair pitches; NO clamp anywhere in the rotation path.
+//  * Recenter FUN_00026a9c (CENTERHOLO msg 56): zoom accumulator
+//    [wnd+0x57a] = 35.0 (0x420c0000), position (0,0,-1500.0) (0xc4bb8000),
+//    basis IDENTITY right(1,0,0)/up(0,1,0)/fwd(0,0,1) — immediates verified.
+//  * Zoom FUN_00028428: accumulator += edx*scale, latch stops at runtime
+//    bounds f32[0xfb0]/f32[0xfb4], hard clamp [1.0, 100000.0] (pushed
+//    0x3f800000/0x47c35000 at 0x28494/0x2848f).
+//  * Projection unchanged (t399): FUN_00053374 pinhole
+//    sx = round(v.x * zoom / v.z + K) + originX on the CAMERA-SPACE vector.
+// PORT LAW (documented defaults where the vendor value was runtime-only):
+//   camera stands kStandoff units behind the field centre along the view
+//   axis (vendor 1500 verified at recenter, but the port fit law needs
+//   standoff/focal >= 4; port keeps 1760/680 — adopting 1500 would break
+//   the t399 bounds pin; named seam); pump cadence kSpinTickMs (vendor
+//   ~1/s measured t302); zoom stays MULTIPLICATIVE per tick (vendor is
+//   additive on its accumulator; port focal units differ — documented).
+//   Right-drag continuous manipulation (help.txt 1spin ln220) is NOT
+//   modeled; the latch above is the click law.
+//
+// Pure math (no SDL) so it is unit-testable: tests/test_cam3d_t399.cpp,
+// tests/test_axis_t416.cpp.
 
 #include "game/mapgen.h"
 #include "ui/layout.h"
 
 namespace ascend::ui {
 
+struct Vec3d {
+    double x = 0.0, y = 0.0, z = 1.0;
+};
+
 struct Camera3d {
-    double yaw = 0.0;     // rad about the field z-axis (spin left/right)
-    double pitch = 0.0;   // rad about the screen x-axis (spin up/down)
-    // ZOOM analogue; zoom clicks scale by kZoomStep. DEFAULT FIT LAW
-    // (measured by the bounds pin): the nearest field plane is
+    // t416 vendor basis (FUN_00026a9c rest values verbatim): the dials
+    // rotate up/fwd about WORLD axes; right = cross(up, fwd) is derived.
+    Vec3d up{0.0, 1.0, 0.0};
+    Vec3d fwd{0.0, 0.0, 1.0};
+    // ZOOM analogue; the zoom latch scales it per pump tick. DEFAULT FIT
+    // LAW (measured by the bounds pin): the nearest field plane is
     // kStandoff - 440 = 1320 deep; the outer shell r=440 must project
     // inside the COSMOSWnd half-width 229 px -> focal <= 229*1320/440 =
     // 687. 680 keeps the whole galaxy on-window at zoom 1 (t399 D11:
@@ -41,30 +75,72 @@ struct Camera3d {
     int mapSize = 1024;    // MapConfig.mapSize (Star x/y grid)
     Rect bounds = kCosmosWnd;
 
+    // t416 dial latches (vendor wnd+0xc0 bit pairs): 0 = off, +/-1 = the
+    // spin/tilt delta sign the pump applies (ROTLEFT +2, ROTRIGHT -2,
+    // ROTUP -2, ROTDOWN +2 — pump 0x27a28/0x27a32/0x27a60/0x27a6a).
+    int latchSpin = 0;   // msg 50/51 pair -> rotation about WORLD Y
+    int latchTilt = 0;   // msg 52/53 pair -> rotation about WORLD X
+    int latchZoom = 0;   // msg 54/55 pair -> zoom
+
     static constexpr double kStandoff = 1760.0;  // 4x outer shell r=440
     static constexpr double kZoomStep = 1.25;
     static constexpr double kFocalMin = 340.0, kFocalMax = 2720.0;
-    static constexpr double kRotStep = 0.25;
-    static constexpr double kPitchLimit = 1.5;   // just under pi/2
+    static constexpr double kRotStepDeg = 2.0;   // pump delta [verified]
+    static constexpr double kDeg2Rad = 0.017453292519943295;
+    static constexpr int kSpinTickMs = 250;      // documented cadence default
 
-    void rotate(int dir);  // yaw += dir*kRotStep (wraps)
-    void tilt(int dir);    // pitch clamped to [-kPitchLimit, kPitchLimit]
-    void zoom(int dir);    // focal *= kZoomStep^dir, clamped
-    void reset();          // CENTERHOLO: yaw=pitch=0, focal default
+    // Vendor press law (pure): inactive -> start(dir); same dir -> stop;
+    // opposite dir -> flip.
+    static int dialLatch(int cur, int dir);
+    void pressSpin(int dir) { latchSpin = dialLatch(latchSpin, dir); }
+    void pressTilt(int dir) { latchTilt = dialLatch(latchTilt, dir); }
+    void pressZoom(int dir) { latchZoom = dialLatch(latchZoom, dir); }
+
+    // One pump tick of the vendor msg-0x3b handler (0x27a18): apply one
+    // delta per latched pair. No motion bits -> no-op.
+    void tick();
+    bool moving() const { return latchSpin != 0 || latchTilt != 0 || latchZoom != 0; }
+
+    void zoom(int dir);    // focal *= kZoomStep^dir, clamped (vendor has
+                           // runtime + hard [1,100000] clamps; rotation has NONE)
+    void reset();          // CENTERHOLO (0x26a9c): identity basis, latches 0,
+                           // zoom accumulator default (port focal default).
+
+    // Derived right vector = cross(up, fwd) (FUN_00053804 law). up/fwd stay
+    // orthonormal under the tick rotations (each is an isometry applied to
+    // both), so the cross product is already unit length.
+    Vec3d right() const;
+
+    // Basis rotations (exposed for pins): right-handed about the WORLD axis
+    // by `deg` degrees, applied to up and fwd, exactly like the vendor
+    // FUN_0005324c / FUN_000531dc component mixes.
+    void rotateBasisY(double deg);
+    void rotateBasisX(double deg);
+
+    // Log helpers (the "ui cam yaw ..." witness line keeps its old shape):
+    // derived Euler readings of fwd, radians.
+    double yawLog() const;    // atan2(fwd.x, fwd.z)
+    double pitchLog() const;  // atan2(fwd.y, std::fabs(fwd.z))
 };
 
-// Camera-space depth along the view axis (always >= kStandoff - 440 > 0 for
-// legal fields; NO z-culling needed in the port — the vendor z-window gate
-// stays vacuous at this standoff, which is stated, not hidden).
+// Camera-space depth along the view axis: kStandoff + dot(fwd, d). Always
+// >= kStandoff - 440 > 0 for legal fields (|d| <= shell radius); NO
+// z-culling needed in the port — the vendor z-window gate stays vacuous at
+// this standoff, which is stated, not hidden.
 double viewDepth(const Camera3d& cam, const ascend::game::Star& s);
 
 // Perspective project a star to screen px inside cam.bounds (documented
-// centre = bounds centre; y grows downward like SDL).
+// centre = bounds centre; y grows downward like SDL). Camera-space coords
+// are dot(right, d) / dot(up, d) / dot(fwd, d) + standoff — at the rest
+// basis this is EXACTLY the t399 formula (screen x = field x, y flipped,
+// depth = field z + standoff), so the t399 rest-pinhole pins survive.
 Pt projectStar(const Camera3d& cam, const ascend::game::Star& s);
 
-// Vendor 4-band ladder on the transformed z (planets-ui.md §6 thresholds
+// Vendor 4-band ladder on the TRANSFORMED z (planets-ui.md §6 thresholds
 // ±0xdc == ±220): v >= 220 -> 0 (far), 1..219 -> 1, -220..0 -> 2, below -> 3
-// (near). Port v = camera-space z MINUS the standoff (pure field depth).
+// (near). Pass viewDepth(cam, s) - kStandoff (t416: the ladder follows the
+// VIEW axis under rotation, matching node+0xd = transformed z in
+// FUN_000284bc).
 int depthClass(double fieldZ);
 
 // Pip radius by depth class (documented port default; the vendor cos_star

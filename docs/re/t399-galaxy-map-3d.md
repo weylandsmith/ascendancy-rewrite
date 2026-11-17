@@ -131,3 +131,25 @@ gate 0; seed-1 trajectory byte-identical (above).
 - Dial wiring witness: 8 cluster clicks print the cam line (7 movers +
   TogLanes), the 3 overlay toggles print the named-seam line x3
   (scripts/t411_maplook_witness.sh dial walk).
+
+## §8 t416 DIAL LAW SUPERSEDES §"PORT LAW" yaw/pitch EULER (2026-11-17)
+The vendor map dials are NOT per-click Euler steps. Press law (COSMOSWnd
+handler 0x26b34, latch chain 0x27da2..0x279eb on wnd+0xc0): a dial press
+latches (active, direction) — click starts CONTINUOUS motion, click again
+stops, the opposite dial flips direction. The periodic pump (msg 0x3b,
+0x27a18; live ~1/s t302) applies per latched pair: spin pair +/-2 DEG
+about WORLD Y (FUN_000283e4 edx=-1 -> FUN_00053584 -> per-vector
+FUN_0005324c mix x'=x*c+z*s, z'=z*c-x*s), tilt pair +/-2 DEG about WORLD
+X (edx=0 -> FUN_00053554 -> FUN_000531dc y'=y*c-z*s, z'=z*c+y*s), zoom
+pair FUN_00028428 (accumulator, runtime bounds + hard [1,100000]). The
+rotated struct at wnd+0x14e is a camera BASIS (up, fwd; right =
+cross(up,fwd) recomputed by FUN_00053804 every rotation). Recenter
+FUN_00026a9c rest values [verified immediates]: right(1,0,0) up(0,1,0)
+fwd(0,0,1), zoom 35.0, position (0,0,-1500). NO clamp on rotation.
+Signs verbatim: msg 50 ROTLEFT +2, 51 ROTRIGHT -2, 52 ROTUP -2,
+53 ROTDOWN +2. Delta args are degrees (deg2rad f32@0x88b88).
+Because the vendor rest view axis is world z and its spin axis world Y,
+the spin reads as IN-PLANE rotation at rest (the user's "rotate about Z").
+The port (cam3d.{h,cpp}) now models this basis directly; the depth ladder
+follows the TRANSFORMED depth (node+0xd law). Full working log:
+docs/re/_wip_t416.md F1-F3.

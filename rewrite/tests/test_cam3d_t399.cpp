@@ -72,15 +72,15 @@ TEST(cam3d_t399_zoom_clamps_and_rotation_wraps) {
     for (int i = 0; i < 100; i++) cam.zoom(-1);
     CHECK(cam.focal == Camera3d::kFocalMin);
     cam.reset();
-    CHECK(cam.focal == 680.0 && cam.yaw == 0.0 && cam.pitch == 0.0);
-    // yaw wraps into [0, 2pi) — no unbounded drift
-    for (int i = 0; i < 200; i++) cam.rotate(+1);
-    CHECK(cam.yaw >= 0.0 && cam.yaw < 6.283185307179586);
-    for (int i = 0; i < 200; i++) cam.rotate(-1);
-    CHECK(cam.yaw >= 0.0 && cam.yaw < 6.283185307179586);
-    // pitch clamps at the poles
-    for (int i = 0; i < 50; i++) cam.tilt(+1);
-    CHECK(cam.pitch == Camera3d::kPitchLimit);
+    CHECK(cam.focal == 680.0 && cam.yawLog() == 0.0 && cam.pitchLog() == 0.0);
+    // t416 REPLACES the old yaw-wrap/pitch-clamp reading: the vendor dial
+    // law is a latch + pump (cam3d.h citations); rotation is a free basis
+    // orbit with NO clamp. Latch semantics pinned in test_axis_t416.cpp.
+    cam.pressSpin(+1);
+    for (int i = 0; i < 2000; i++) cam.tick();  // no NaN, basis stays finite
+    CHECK(std::isfinite(cam.yawLog()) && std::isfinite(cam.pitchLog()));
+    cam.pressSpin(+1);  // same-dir press STOPS (vendor 0x27865 leg)
+    CHECK(!cam.moving());
 }
 
 TEST(cam3d_t399_field_projects_inside_bounds) {
