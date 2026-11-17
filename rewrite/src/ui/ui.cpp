@@ -28,6 +28,7 @@
 #include "ui/speciesmenu.h"
 #include "ui/fleetlist.h"
 #include "ui/researchview.h"
+#include "ui/exitpopup.h"
 #include "ui/sysview.h"
 #include "ui/ui_internal.h"
 
@@ -164,6 +165,24 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // (t252 pixel-diff). No clamp law exists in vendor data -> the offsets
     // are unbounded [labelled port choice]; nodes derive from them purely.
     int resPanX = 0, resPanY = 0;
+    // t419 RESEARCH 3D: dedicated camera on the t416 basis law (latch +
+    // pump). focal == kResStandoff makes the REST projection scale-exact
+    // 1:1 with the t408 2D law (researchview.h 3D LAW). The rotate dials
+    // pressSpin; the move pair scrolls resPanY (user spec).
+    Camera3d resCam;
+    resCam.focal = kResStandoff;
+    resCam.bounds = kResWin;
+    Uint32 lastResPumpMs = 0;
+    // t419 corner "Exit <ESC>" popup state (ui/exitpopup.h): the corner the
+    // cursor currently probes into (None = hidden).
+    ExitCorner exitCorner = ExitCorner::None;
+    ascend::formats::ShapeLibrary mouseLib;
+    {
+        std::string merr;
+        if (!mouseLib.load(dataRoot + "/extracted/ascend01/data/mouse.shp",
+                           &merr))
+            std::printf("ui mouse lib refused: %s\n", merr.c_str());
+    }
     // t409 ABILITY DIALOG session state: the SPECIALAB press opens the
     // ABILITYWIN modal (ui/abilitylaw.h — vendor msg-5 path 0x55ffb ->
     // 0x37b14: sprintf("abil%02d") of the PLAYER SPECIES into ABILITYWIN,
@@ -602,7 +621,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                            researchHit(*camp.researchTree(),
                                        researchNodes(camp, *camp.researchTree(),
                                                      ag::kPlayer),
-                                       p.x, p.y, resPanX, resPanY)
+                                       p.x, p.y, resPanX, resPanY, resCam)
                                    .kind != ResHit::None) {
                     // t408 RESEARCH hit-map (researchview.h): the four pan
                     // buttons (windows.txt msg 50..53, OUTSIDE the RESWIN
@@ -612,11 +631,15 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     const auto& tree = *camp.researchTree();
                     const auto nodes = researchNodes(camp, tree, ag::kPlayer);
                     const auto h = researchHit(tree, nodes, p.x, p.y,
-                                               resPanX, resPanY);
+                                               resPanX, resPanY, resCam);
                     bool panned = true;
                     switch (h.kind) {
-                        case ResHit::RotLeft:  resPanX += 96; break;
-                        case ResHit::RotRight: resPanX -= 96; break;
+                        // t419: the rotate pair LATCHES the camera spin on
+                        // the t416 press law (vendor msg 50/51 == the cosmos
+                        // dial msgs; pump signs +1/-1), the move pair
+                        // SCROLLS (user spec "up/down"; t252 pixel-diff).
+                        case ResHit::RotLeft:  resCam.pressSpin(+1); break;
+                        case ResHit::RotRight: resCam.pressSpin(-1); break;
                         case ResHit::MoveUp:   resPanY += 78; break;
                         case ResHit::MoveDown: resPanY -= 78; break;
                         case ResHit::Node: {
@@ -1757,20 +1780,32 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // never paints the header or the right panel.
                     SDL_Rect clip{7, 46, 470, 427};
                     SDL_RenderSetClipRect(ren, &clip);
-                    for (const auto& nd : nodes) {
+                    // t419: ONE layout + ONE projected-centre pass per frame
+                    // (was O(n^2 x graph) per frame — the D15 CPU stall).
+                    const auto resLayout = researchLayoutFor(*tree);
+                    const auto centres = researchNodeScreen(
+                        resLayout, nodes, resPanX, resPanY, resCam);
+                    for (size_t i = 0; i < nodes.size(); ++i) {
                         // prereq edges first (thin blue, the capture's lanes)
-                        const auto c = researchNodePos(*tree, nd.row,
-                                                       resPanX, resPanY);
-                        for (int pr : tree->all()[nd.row].prereqs) {
-                            const auto pc = researchNodePos(*tree, pr,
-                                                            resPanX, resPanY);
+                        const auto& c = centres[i];
+                        for (int pr : tree->all()[nodes[i].row].prereqs) {
+                            if (pr < 0 || pr >= int(centres.size())) continue;
+                            const auto& pc = centres[size_t(pr)];
                             SDL_SetRenderDrawColor(ren, 40, 40, 160, 255);
                             SDL_RenderDrawLine(ren, pc.x, pc.y, c.x, c.y);
                         }
                     }
-                    for (const auto& nd : nodes) {
-                        const auto c = researchNodePos(*tree, nd.row,
-                                                       resPanX, resPanY);
+                    // Painter order: far nodes first (z2 descending) so the
+                    // near disks overlap the far ones under rotation.
+                    std::vector<size_t> order(nodes.size());
+                    for (size_t i = 0; i < order.size(); ++i) order[i] = i;
+                    std::sort(order.begin(), order.end(),
+                              [&](size_t a, size_t b) {
+                                  return centres[a].z2 > centres[b].z2;
+                              });
+                    for (size_t oi = 0; oi < order.size(); ++oi) {
+                        const auto& nd = nodes[order[oi]];
+                        const auto& c = centres[order[oi]];
                         SDL_Color ring = {120, 130, 190, 255};   // empty disk
                         bool fill = false;
                         if (nd.state == TechNodeState::Owned)
@@ -1782,8 +1817,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             // choice; the captures never show a blocked node]
                         }
                         if (nd.state == TechNodeState::Owned) fill = true;
-                        // ring: two concentric circle outlines (r30/r27)
-                        for (int rr : {kResNodeRadius, kResNodeRadius - 3}) {
+                        // t419: ring radius follows the perspective scale
+                        // (rest scale == 1 -> exactly r30/r27, the t408 law).
+                        const int rr0 = c.r;
+                        for (int rr : {rr0, rr0 - 3}) {
                             SDL_SetRenderDrawColor(ren, ring.r, ring.g,
                                                    ring.b, 255);
                             int x = rr, y = 0, err = 1 - rr;
@@ -1802,10 +1839,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         if (fill) {  // discovered = filled disk (help reswin)
                             SDL_SetRenderDrawColor(ren, ring.r / 3, ring.g / 3,
                                                    ring.b / 2, 255);
-                            for (int dy = -kResNodeRadius + 4;
-                                 dy <= kResNodeRadius - 4; ++dy) {
-                                const int dx2 = (kResNodeRadius - 4) *
-                                                    (kResNodeRadius - 4) -
+                            for (int dy = -rr0 + 4; dy <= rr0 - 4; ++dy) {
+                                const int dx2 = (rr0 - 4) * (rr0 - 4) -
                                                 dy * dy;
                                 int dx = 0;
                                 while ((dx + 1) * (dx + 1) <= dx2) ++dx;
@@ -2086,6 +2121,36 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 nowMs - lastSysPumpMs >= (Uint32)Camera3d::kSpinTickMs) {
                 systemCam.tick();
                 lastSysPumpMs = nowMs;
+            }
+            // t419 research tree spin pump (same vendor msg-0x3b latch law).
+            if (resCam.moving() &&
+                nowMs - lastResPumpMs >= (Uint32)Camera3d::kSpinTickMs) {
+                resCam.tick();
+                lastResPumpMs = nowMs;
+            }
+        }
+        // t419 CORNER "Exit <ESC>" POPUP (ui/exitpopup.h): polled pointer
+        // (SDL_GetMouseState gives logical coords under SetLogicalSize —
+        // title.cpp precedent; synthetic MotionNotify is rejected by SDL so
+        // motion EVENTS are not an option). Drawn LAST: it is an overlay
+        // hint over every screen. Transition log only (no per-frame spam).
+        {
+            int mx = 0, my = 0;
+            SDL_GetMouseState(&mx, &my);
+            const ExitCorner c = exitCornerFor(mx, my, kDisplayW, kDisplayH);
+            if (c != exitCorner) {
+                exitCorner = c;
+                if (c != ExitCorner::None)
+                    std::printf("ui corner exit popup shown\n");
+                else
+                    std::printf("ui corner exit popup hidden\n");
+                std::fflush(stdout);
+            }
+            if (c != ExitCorner::None && mouseLib.count() > kExitGlyphRec) {
+                const Rect r = exitPopupRect(c, kDisplayW, kDisplayH);
+                if (!blitShape(ren, mouseLib, kExitGlyphRec, r.x0, r.y0))
+                    blitShape(ren, mouseLib, kExitGlyphRec == 5 ? 4 : 5,
+                              r.x0, r.y0);  // k4 fallback (canonical gate)
             }
         }
         SDL_RenderPresent(ren);

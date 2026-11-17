@@ -68,6 +68,7 @@
 
 #include "game/campaign.h"
 #include "game/research.h"
+#include "ui/cam3d.h"
 #include "ui/layout.h"
 
 namespace ascend::ui {
@@ -141,11 +142,69 @@ inline constexpr int kResRowPitch = 78;     // radius*2 + 18
 inline constexpr int kResFieldX0 = 40;      // interior 7 + ring margin
 inline constexpr int kResFieldY0 = 76;      // interior 46 + header room
 
-struct ResPoint { int x = 0; int y = 0; };
+struct ResPoint { int x = 0, y = 0; };
+
+// ---- t419: THE O(n^2/frame) KILLER + THE 3D TREE --------------------------
+// STALL LAW (D15 addendum; DECISIONS.md static root cause): the old law
+// recomputed researchDepth (a full memoised graph walk) once per slot-row
+// per NODE per FRAME. ResearchLayout computes depth AND column slot ONCE
+// (single memoised pass + single counting pass), so a frame costs O(n+e).
+// researchDepth()/researchNodePos() keep their t408 signatures (pins) by
+// delegating to a one-shot layout.
+struct ResearchLayout {
+    std::vector<int> depth;  // per row: longest prereq chain
+    std::vector<int> slot;   // per row: index within its depth column
+    int cx = kResFieldX0;    // field centre (bbox mid) at pan 0 — the 3D
+    int cy = kResFieldY0;    //   projection origin
+    int maxDepth = 0;
+};
+ResearchLayout researchLayoutFor(const ascend::game::ResearchTree& tree);
+
+// 2D centre from a precomputed layout (pure offset arithmetic).
+ResPoint researchNodePosAt(const ResearchLayout& layout, int row, int panX,
+                           int panY);
+
+// 3D LAW (D15 "another 3d rotating dealie"; NAMED SEAM: the vendor reswin
+// draw chain was never recovered — grep of every disassembly window on disk
+// finds no reswin/resmove FUN; the mechanism reuses the t416 COSMOSWnd
+// basis law verbatim, which IS cited). The tree is a FLAT XY field (screen
+// axes at rest): field point = (pos2D - layout centre, 0) px, y flipped to
+// field-up. The rotate dials (msg 50/51, windows.txt verbatim — the SAME
+// dial msgs as the cosmos, whose latch+pump law t416 recovered at
+// 0x27d6f../0x27a18) pressSpin on a dedicated Camera3d; the move pair
+// (msg 52/53) SCROLLS post-projection (user spec verbatim: "scrolling
+// (up/down)"). Projection is the t399 pinhole (FUN_00053374 law) via
+// projectPoint with standoff == focal == kResStandoff: at the REST basis
+// scale == 1.0 exactly and screen == the t408 2D law EXACTLY (pins + the
+// t408 witness click coordinates survive unchanged).
+inline constexpr double kResStandoff = 1200.0;  // == focal: rest scale 1
+
+// The dedicated research camera at REST (focal == standoff): projectPoint
+// through this camera is scale-EXACTLY 1 and reduces to the t408 2D law.
+inline Camera3d researchRestCam() {
+    Camera3d c;
+    c.focal = kResStandoff;
+    return c;
+}
+
+struct ResPoint3 {
+    int x = 0, y = 0;      // painted screen centre
+    int r = kResNodeRadius;  // ring radius scaled by the perspective factor
+    double z2 = 0.0;       // camera-space depth (back-to-front sort key)
+};
+
+// Screen-space centres for every node (index == nodes vector index == row,
+// the researchNodes order law). `cam` is the caller's dedicated research
+// camera (focal == kResStandoff); pan applies POST-projection in screen px.
+std::vector<ResPoint3> researchNodeScreen(const ResearchLayout& layout,
+                                          const std::vector<TechNode>& nodes,
+                                          int panX, int panY,
+                                          const Camera3d& cam);
 
 // The node centre for `row` given the tree (pure; deterministic) plus the
 // pan offsets (px). Pan clamping lives in the caller (ui.cpp) so the law
-// here stays a pure coordinate function.
+// here stays a pure coordinate function. t419: delegates to a one-shot
+// layout (identical answers, no per-call graph re-walk).
 ResPoint researchNodePos(const ascend::game::ResearchTree& tree, int row,
                          int panX, int panY);
 
@@ -157,9 +216,12 @@ int researchDepth(const ascend::game::ResearchTree& tree, int row);
 // FIRST (they sit outside the tree panel), then the node grid. A point near
 // no node is inert. `nodes` is the partition (only non-blocked... no: ALL
 // nodes are hittable — blocked nodes still show; the click law rejects
-// them via setStudy, matching the vendor's silent no-op).
+// them via setStudy, matching the vendor's silent no-op). t419: hits test
+// the PROJECTED centres (a `cam` is required — passing the rest camera is
+// exact 2D); the layout is built ONCE per call (O(n+e), not O(n^2 x graph)).
 ResHitResult researchHit(const ascend::game::ResearchTree& tree,
                          const std::vector<TechNode>& nodes, int px, int py,
-                         int panX, int panY);
+                         int panX, int panY,
+                         const Camera3d& cam = researchRestCam());
 
 }  // namespace ascend::ui

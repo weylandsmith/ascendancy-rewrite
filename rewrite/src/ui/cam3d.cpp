@@ -107,7 +107,27 @@ inline void centreOffset(const Camera3d& cam, const ascend::game::Star& s,
 double viewDepth(const Camera3d& cam, const ascend::game::Star& s) {
     double x, y, z;
     centreOffset(cam, s, &x, &y, &z);
-    return Camera3d::kStandoff + cam.fwd.x * x + cam.fwd.y * y + cam.fwd.z * z;
+    return pointDepth(cam, x, y, z, Camera3d::kStandoff);
+}
+
+// t419 generic field-point law (header): camera-space coords on the rotated
+// basis (same dot products as projectStar), depth = standoff + dot(fwd,d).
+double pointDepth(const Camera3d& cam, double x, double y, double z,
+                  double standoff) {
+    return standoff + cam.fwd.x * x + cam.fwd.y * y + cam.fwd.z * z;
+}
+
+Projected projectPoint(const Camera3d& cam, double x, double y, double z,
+                       double standoff) {
+    const Vec3d r = cam.right();
+    Projected p;
+    const double cx3 = r.x * x + r.y * y + r.z * z;        // dot(right, d)
+    const double cy3 = cam.up.x * x + cam.up.y * y + cam.up.z * z;  // dot(up, d)
+    p.z2 = pointDepth(cam, x, y, z, standoff);
+    p.scale = cam.focal / p.z2;
+    p.x = std::round(cx3 * p.scale);
+    p.y = std::round(cy3 * p.scale);
+    return p;
 }
 
 Pt projectStar(const Camera3d& cam, const ascend::game::Star& s) {

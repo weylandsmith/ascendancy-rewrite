@@ -129,6 +129,23 @@ struct Camera3d {
 // this standoff, which is stated, not hidden.
 double viewDepth(const Camera3d& cam, const ascend::game::Star& s);
 
+// t419 GENERIC field-point projection (the research tree reuses the t416
+// basis API on its own field plane; same vendor pinhole FUN_00053374 law as
+// projectStar but with raw field coordinates and an explicit standoff instead
+// of Star grid units). Field axes match projectStar: x right, y up, depth
+// grows with +fwd; screen origin = cam.bounds centre, y grows downward.
+// scale = focal / z2 (the perspective factor; 1.0 exactly at rest when the
+// caller sets focal == standoff — the t419 research rest-equality law).
+struct Projected {
+    double x = 0.0, y = 0.0;  // screen px offset from the bounds centre
+    double scale = 1.0;       // focal / z2
+    double z2 = 0.0;          // camera-space depth (painter sort key)
+};
+double pointDepth(const Camera3d& cam, double x, double y, double z,
+                  double standoff);
+Projected projectPoint(const Camera3d& cam, double x, double y, double z,
+                       double standoff);
+
 // Perspective project a star to screen px inside cam.bounds (documented
 // centre = bounds centre; y grows downward like SDL). Camera-space coords
 // are dot(right, d) / dot(up, d) / dot(fwd, d) + standoff — at the rest

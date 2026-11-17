@@ -72,6 +72,7 @@ add_library(ascend_ui STATIC
   src/ui/fleetlist.cpp
   src/ui/planetview.cpp
   src/ui/researchview.cpp
+  src/ui/exitpopup.cpp
   src/ui/abilitylaw.cpp
   src/ui/speciesmenu.cpp
   src/ui/sysview.cpp
@@ -126,6 +127,7 @@ add_executable(run_tests
   tests/test_statusbg_t417b.cpp
   tests/test_fleetlist_t407.cpp
   tests/test_researchview_t408.cpp
+  tests/test_research3d_t419.cpp
   tests/test_speciesmenu_t409.cpp
   tests/test_sysview_t410.cpp
   tests/test_maplook_t411.cpp

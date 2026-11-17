@@ -230,33 +230,62 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t419 — RESEARCH SCREEN: CPU STALL FIX + 3D TREE REBUILD + CORNER EXIT
-(queue row t419, docs/STATE.md line ~1480 has the full row text; phase 15,
-D15). THREE LEGS: (a) the CPU STALL is static-citable and independent — the
-port's research-view paint path spins when the tree field is panned/dirty
-(diagnose the frame loop in ui.cpp kScreenResearch + researchview.cpp first,
-fix, prove with a bounded CPU-time witness); (b) the 3D TREE REBUILD reuses
-the t416 Camera3d BASIS API — pressSpin/pressTilt/pressZoom + tick(), NOT
-yaw/pitch fields (t416 SEAM law); nodes derive from resPanX/resPanY per the
-t408 pan law; (c) CORNER EXIT POPUP per the row text. Witness via
-scripts/r1_ui_walk.sh research shots t419-*.png + own-eyes grade (D13 law
-CONTINUES). Self-grade: research screen interactive, no pegged CPU, exit
-popup behaves.
-ORDERING RATIONALE: t418b landed (planet view paints the disc + isometric
-tile grid, clickable, pins + witness green); t419 was always scheduled
-after t418b (its tree reuses the t416 Camera3d basis API and its CPU-stall
-fix is static-cited and independent); t420 (push + D16 sheet) follows both.
-t420 OWNS THE MANDATORY PUSH (t414+ are LOCAL commits; remote main ==
-c178a43c1f71 at t413; public SHAs never exist locally — verify pushes by
-ls-remote only). Remaining carried seams: (H3) runtime race-colour bytes
-census (live-RAM during intro; t415 re-sharpened — Minions ink GREEN
-pal[19] vs static dump byte 16; closing witness = live census of
-0x12e18+specnum*494); the t418b per-class tile colour table 0x892ac seam
-(bare pal[150] shipped; closing witness = live vertex-parameter census of
-the 0x3c2a3 esp+0x310 set during a vendor planet frame); the t418b disc
-provenance F4 [inferred] (closing witness = live 0x9f10c selector census).
-(OQ-027 closes ONLY on the user's pasted `audio:` line + verdict;
-OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.)
+NEXT t420 — PHASE-15 VERIFY + PUSH + HANDOFF (push-gap law MANDATORY; the
+full row text is in the queue section below under "t420"). Full gate +
+run_tests + seed regression byte-identical; export; fetch FIRST; push;
+ls-verify ONLY (public SHAs NEVER exist locally — "c178a43 not a valid
+object" locally is NORMAL, not a push gap; remote main == c178a43c1f71 at
+t413, t414+ are LOCAL commits). Then rewrite this NEXT ACTION to
+WAIT-USER-RULING t374 verbatim + the D16 sheet (:8613, per-screen
+before/after from OUR native-vision grades + the live re-check list —
+include the t419 research screen: spin/scroll/Esc/corner-popup re-check by
+the user personally, since the D15 addendum was his live complaint).
+ORDERING RATIONALE: t419 landed (research CPU stall killed 2160us->2us/
+frame, 3D spin + scroll + corner Exit popup witnessed 5/5 + native-vision
+PASS); t420 was always scheduled after t419 and OWNS THE MANDATORY PUSH.
+Remaining carried seams (all named, none blocking): (H3) runtime race-colour
+bytes census (Minions ink GREEN pal[19] vs static byte 16; closing witness
+= live census of 0x12e18+specnum*494); the t418b per-class tile colour table
+0x892ac seam (bare pal[150] shipped; witness = live 0x3c2a3 esp+0x310 census
+during a vendor planet frame); the t418b disc provenance F4 [inferred]
+(witness = live 0x9f10c selector census); the t419 vendor reswin draw chain
+(mechanism reuse of the cited t416 cosmos basis shipped; seam in
+researchview.h). (OQ-027 closes ONLY on the user's pasted `audio:` line +
+verdict; OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.)
+
+t419 LANDED 2026-11-17 (RESEARCH SCREEN: CPU STALL KILLED + 3D TREE + CORNER
+EXIT POPUP; full account docs/re/_wip_t419.md F0-F7). STALL ROOT CAUSE fixed
+as cited in the D15 addendum: researchDepth cleared its memo per call and
+researchNodePos called it O(row) times — the painter ran the full prereq
+graph O(n^2) PER FRAME. New law: ResearchLayout ONE memoised pass (depth +
+slot + bbox centre) + researchNodePosAt/researchNodeScreen; wrappers keep
+t408 signatures (all 8 t408 pins pass unchanged). MEASURED: 60 full-tree
+layout+screen passes = 122 us (2.0 us/frame) vs the OLD law 2160 us for ONE
+frame — the pin CHECK(old > 10x new-second) is self-contained. 3D: flat-XY
+tree field projected through the t416 Camera3d BASIS API (generic
+projectPoint added to cam3d, projectStar refactored onto it); focal ==
+kResStandoff == 1200 makes the REST projection EXACTLY the t408 2D law
+(pins + witness coordinates survive); rotate dials msg 50/51 pressSpin
+(latch+pump, kSpinTickMs), move pair scrolls (user spec "up/down"); depth
+z2 painter sort + perspective ring scale. RE LEG honest negative: no vendor
+reswin draw-chain FUN exists in any on-disk disassembly window and the
+Ghidra defined-strings table answered 0 even for known-present strings this
+session — mechanism reuse of the CITED cosmos law shipped with the seam
+NAMED. CORNER EXIT POPUP: ui/exitpopup.{h,cpp} pure law (24px corner probe
+[port default], 78x47 glyph tuck); art = mouse.shp k5 (the t367
+corner-anchor fallback record, shp.md S27/S28, D1 ruling KEEP — the image
+the user remembered); polled SDL_GetMouseState (synthetic MotionNotify is
+rejected by SDL — xsend warp still moves the real pointer); transition log
+"ui corner exit popup shown/hidden". PINS tests/test_research3d_t419.cpp
+(layout==old-oracle all rows; rest equality EXACT + spin moves view with z2
+spread + dialLatch stop + hit-map follows rotation; frame budget; corner
+law). Suite 417->421/0/0, 0 warnings. WITNESS
+scripts/t419_research3d_witness.sh 5/5 PASS: study click lands, popup
+shown+hidden, ESC 204 ms (was minutes), CPU delta 138 ticks/4s ~35% core
+(ps pcpu 14.7-15.3 — NOT pegged), NATIVE-VISION PASS (rest grid + mid-spin
+perspective + live Current Project panel). LEDGER closes NOTHING
+(strict-close honest negative — D15 chrome has no OQ owner; t414..t418b
+precedent). Gate 0, audits OK (17/3).
 
 t418b LANDED 2026-11-17 (PLANET VIEW IMPLEMENTED — the planet itself, the
 isometric tile grid, tile select, the F3 adjacency report; full account

@@ -96,50 +96,110 @@ std::string researchDaysLine(double remaining, double rateLastTurn) {
     return "(" + std::to_string(n) + (n == 1 ? " day)" : " days)");
 }
 
-int researchDepth(const ag::ResearchTree& tree, int row) {
-    // Longest prereq chain (research.md §3 spreads depths 0..17 on the live
-    // 66 rows). Iterative memo to stay recursion-free on deep chains.
-    static thread_local std::unordered_map<int, int> memo;
-    memo.clear();
-    for (int r = 0; r < tree.mainCount(); ++r) {
-        // Walk up prereqs computing depth(r) on demand.
+// t419 STALL FIX. The old law re-walked the whole prereq graph once PER
+// CALL, and researchNodePos called it O(row) times per node — the painter
+// (ui.cpp kScreenResearch) then did that for every node every frame at
+// ~60fps, pinning one core (D15 addendum; DECISIONS.md static root cause).
+// The layout computes each row's depth ONCE (memoised iterative DFS over
+// all rows, `done` marks finality since depth 0 is a legal value) and each
+// row's column slot ONCE (single counting pass).
+ResearchLayout researchLayoutFor(const ag::ResearchTree& tree) {
+    ResearchLayout L;
+    const int n = tree.mainCount();
+    L.depth.assign(size_t(n), 0);
+    L.slot.assign(size_t(n), 0);
+    std::vector<char> done(size_t(n), 0);
+    for (int r = 0; r < n; ++r) {
+        if (done[r]) continue;
         std::vector<int> stack{r};
         while (!stack.empty()) {
             const int cur = stack.back();
             bool ready = true;
             for (int p : tree.all()[cur].prereqs) {
-                if (p < 0 || p >= tree.mainCount()) continue;
-                if (!memo.count(p)) { stack.push_back(p); ready = false; break; }
+                if (p < 0 || p >= n || done[p]) continue;
+                stack.push_back(p);
+                ready = false;
+                break;
             }
             if (!ready) continue;
             int best = 0;
             for (int p : tree.all()[cur].prereqs)
-                if (p >= 0 && p < tree.mainCount())
-                    best = std::max(best, memo[p] + 1);
-            memo[cur] = best;
+                if (p >= 0 && p < n) best = std::max(best, L.depth[p] + 1);
+            L.depth[cur] = best;
+            done[cur] = 1;
             stack.pop_back();
         }
     }
-    auto it = memo.find(row);
-    return it == memo.end() ? 0 : it->second;
+    // Column slots: row order within each depth column (the same posture
+    // as the t402 membership-order default), plus the column-count maxima
+    // for the bbox centre (the 3D rotation origin, law in the header).
+    int maxDepth = 0;
+    for (int d : L.depth) maxDepth = std::max(maxDepth, d);
+    L.maxDepth = maxDepth;
+    std::vector<int> count(size_t(maxDepth + 1), 0);
+    int maxSlots = 0;
+    for (int r = 0; r < n; ++r) {
+        L.slot[r] = count[size_t(L.depth[r])]++;
+        maxSlots = std::max(maxSlots, L.slot[r]);
+    }
+    L.cx = kResFieldX0 + maxDepth * kResDepthPitch / 2;
+    L.cy = kResFieldY0 + maxSlots * kResRowPitch / 2;
+    return L;
+}
+
+ResPoint researchNodePosAt(const ResearchLayout& layout, int row, int panX,
+                           int panY) {
+    if (row < 0 || row >= int(layout.depth.size())) return ResPoint{0, 0};
+    return ResPoint{kResFieldX0 + layout.depth[size_t(row)] * kResDepthPitch +
+                        panX,
+                    kResFieldY0 + layout.slot[size_t(row)] * kResRowPitch +
+                        panY};
+}
+
+int researchDepth(const ag::ResearchTree& tree, int row) {
+    // t419: delegates to the one-shot layout (identical answers — pinned —
+    // but O(n+e) per call instead of O(n x graph) per call).
+    const auto L = researchLayoutFor(tree);
+    if (row < 0 || row >= int(L.depth.size())) return 0;
+    return L.depth[size_t(row)];
+}
+
+std::vector<ResPoint3> researchNodeScreen(const ResearchLayout& layout,
+                                          const std::vector<TechNode>& nodes,
+                                          int panX, int panY,
+                                          const Camera3d& cam) {
+    // Header 3D LAW: flat XY field centred on the layout bbox centre (y
+    // flipped to field-up), t399 pinhole via projectPoint at the t416
+    // basis; screen frame re-anchored at (cx, cy) so the REST basis yields
+    // the t408 2D centres EXACTLY (focal == kResStandoff -> scale 1).
+    std::vector<ResPoint3> out;
+    out.reserve(nodes.size());
+    for (const TechNode& nd : nodes) {
+        const ResPoint p2 = researchNodePosAt(layout, nd.row, 0, 0);
+        const double fx = double(p2.x - layout.cx);
+        const double fy = -double(p2.y - layout.cy);  // screen-down -> up
+        const Projected pr = projectPoint(cam, fx, fy, 0.0, kResStandoff);
+        ResPoint3 s;
+        s.x = layout.cx + int(pr.x) + panX;
+        s.y = layout.cy - int(pr.y) + panY;  // field-up -> screen-down
+        s.r = std::max(2, int(std::lround(double(kResNodeRadius) * pr.scale)));
+        s.z2 = pr.z2;
+        out.push_back(s);
+    }
+    return out;
 }
 
 ResPoint researchNodePos(const ag::ResearchTree& tree, int row, int panX,
                          int panY) {
     // Derived layout (labelled seam): column = longest-chain depth, slot =
     // row index within that depth column (row order == file order, the same
-    // posture as the t402 membership-order default).
-    const int depth = researchDepth(tree, row);
-    int slot = 0;
-    for (int r = 0; r < row; ++r)
-        if (researchDepth(tree, r) == depth) ++slot;
-    return ResPoint{kResFieldX0 + depth * kResDepthPitch + panX,
-                    kResFieldY0 + slot * kResRowPitch + panY};
+    // posture as the t402 membership-order default). t419: one-shot layout.
+    return researchNodePosAt(researchLayoutFor(tree), row, panX, panY);
 }
 
 ResHitResult researchHit(const ag::ResearchTree& tree,
                          const std::vector<TechNode>& nodes, int px, int py,
-                         int panX, int panY) {
+                         int panX, int panY, const Camera3d& cam) {
     ResHitResult h;
     // Pan buttons FIRST (they live outside the RESWIN rect; t405/t407
     // precedence law). Verbatim rects (windows.txt).
@@ -150,15 +210,19 @@ ResHitResult researchHit(const ag::ResearchTree& tree,
     if (in(kResRotRight, px, py))  { h.kind = ResHit::RotRight;  return h; }
     if (in(kResMoveUp, px, py))    { h.kind = ResHit::MoveUp;    return h; }
     if (in(kResMoveDown, px, py))  { h.kind = ResHit::MoveDown;  return h; }
-    // Nodes: nearest centre within the ring radius (only the visible tree
-    // panel area hosts nodes; the panel clip is the painter's job).
+    // Nodes: nearest PROJECTED centre within its scaled ring (t419 — the
+    // hit map follows the 3D view; at the rest basis this is exactly the
+    // t408 2D law). Layout built ONCE per click.
+    const auto centres =
+        researchNodeScreen(researchLayoutFor(tree), nodes, panX, panY, cam);
     int bestRow = -1;
-    long bestD2 = long{kResNodeRadius} * kResNodeRadius;
-    for (const TechNode& nd : nodes) {
-        const ResPoint c = researchNodePos(tree, nd.row, panX, panY);
-        const long dx = px - c.x, dy = py - c.y;
+    long bestD2 = -1;
+    for (size_t i = 0; i < nodes.size(); ++i) {
+        const long dx = px - centres[i].x, dy = py - centres[i].y;
         const long d2 = dx * dx + dy * dy;
-        if (d2 <= bestD2) { bestD2 = d2; bestRow = nd.row; }
+        const long r2 = long{centres[i].r} * centres[i].r;
+        if (d2 > r2) continue;
+        if (bestRow < 0 || d2 < bestD2) { bestD2 = d2; bestRow = nodes[i].row; }
     }
     if (bestRow >= 0) { h.kind = ResHit::Node; h.row = bestRow; }
     return h;
