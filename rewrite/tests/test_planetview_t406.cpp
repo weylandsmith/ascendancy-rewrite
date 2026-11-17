@@ -182,13 +182,16 @@ TEST(planetview_readout_and_rows_top_t406) {
     // Out-of-domain star: all-zero refuse, never a crash.
     const auto bad = au::planetViewFor(c, 99999, "X");
     CHECK(bad.pop == 0 && bad.pendingItem == -1);
-    // t406 MEASURED rows-top fence (F4/F7): rows start BELOW the art header
-    // cells (y 48..85) and AT the table top border (116.8); three rows still
-    // fit the interior exactly.
-    CHECK(au::kStatusRowsTop == 117);
-    CHECK(au::kStatusRowsTop > 85);
-    CHECK(3 * au::kStatusRowPitch <= au::kStatusInterior.y1 - au::kStatusRowsTop + 1);
-    CHECK(4 * au::kStatusRowPitch > au::kStatusInterior.y1 - au::kStatusRowsTop + 1);
+    // t417b RE-SCOPED (was the t406 "117" fence): rows top 57 / pitch 141
+    // MEASURED on the t3 capture itself (docs/re/_wip_t417.md F3 — flag-icon
+    // bands 57/198/339, autocorrelation single peak 0.634; user original
+    // agrees). The 117 anchored rows below the 10status k0 ART header cells,
+    // which the vendor never paints (F1/F6). Rows now govern themselves:
+    // 57 + 3*141 == 480 exactly, so three rows fill the screen bottom.
+    CHECK(au::kStatusRowsTop == 57);
+    CHECK(au::kStatusRowsTop > 46);  // below the code-drawn divider (F5)
+    CHECK(au::kStatusRowsTop + 3 * au::kStatusRowPitch == 480);
+    CHECK(4 * au::kStatusRowPitch > 480 - au::kStatusRowsTop);  // exactly 3
     // state 17 is a known screen (the row-click target); rail never opens it.
     CHECK(au::screenKnown(au::kScreenPlanet));
 }

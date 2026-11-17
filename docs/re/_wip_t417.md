@@ -167,3 +167,96 @@ IMPLEMENTATION (next session, t417b) — all laws measured above:
 LEDGER: closes NOTHING (strict-close honest negative — D15 chrome rows
 have no OQ owner, t414/t415/t416 precedent). Tools banked:
 scripts/t417_k0_register.py (game.pal-space registration + zone census).
+
+---
+# t417b — IMPLEMENTATION (session 2026-11-17)
+
+## F8 [measured 2026-11-17, /tmp/t417b_probe.py on /tmp/t417_t3_game640.png]
+- Marker zone y59..82 x16..69: red-dominant 409 px, mean (209,70,28); top
+  values (189,44,16) x69 / (156,4,0) x54 / (255,0,0) x46 -> PORT marker red
+  (255,0,0) sits inside the measured family; marker rect law x16..69 y+2..+26.
+- Divider ramp re-verified row-dominants: y38 (74,113,115).56, y39
+  (123,182,181).73, y41 (115,117,115)/(90,134,140), y42 (66,105,107), y43
+  (24,48,41)/(33,56,57), y45 (24,28,24)/(8,12,16), y46 SOLID (33,56,57) 1.000,
+  y47 black .997.
+- Header speckle totals re-verified: (0,0,0).349 (8,12,16).327 (8,12,8).172
+  (8,28,49).062 green(0,170,82).052 (8,32,49).011 (+ (8,36,49).006 tail).
+- Row-0 left well: bright px span x12..147 y57..184 (flag+sphere art).
+
+## Implementation shape (per F7)
+1. NEW pure module ui/statusbg.{h,cpp} (law lives beside statuslaw; statusbg
+   named to avoid clashing with statuslist geometry): kStatusBackdropOk()
+   DECLINES 10status citing F1 (TYPE-100 census binds no lib to state 10);
+   perimeter kStatusTextureBands (x0..6/x633..639/y0..6/y472..479); header
+   speckle kSpeckleColours/Weights + statusSpeckleAt(x,y) per-pixel weighted
+   hash; divider ramp statusRampColourAt(y) verbatim dominant/mode table
+   y38..46; left border (33,56,57) x7; kStatusMarkerRect law x16..69 top+2
+   h24; geometry kStatusRowsTop 57 / kStatusRowPitch 141 (F3).
+2. statuslist.h: kStatusRowsTop 117->57, kStatusRowPitch 112->141 with the F3
+   citation; kStatusInterior retired from the row law (F4: NO separators,
+   interior black) — pins re-scoped to the F3 facts, not deleted.
+3. ui.cpp: backdropFor -> backdropRecordFor = pure law call (mechanical size
+   test REPLACED per F7 item 1; 17np k0 still passes via the pure function);
+   status branch paints speckle texture + perimeter (frameTex now map OR
+   status), ramp lines, border x7; row painter: navy fill + frame OUT (F4),
+   marker red x16 via kStatusMarkerRect, text col 200->288, pop bands x428
+   (F5 thumbnail column), gauges stay row-relative; generic header/interior
+   frame lines skipped on status.
+4. Pins tests/test_statusbg_t417b.cpp; witness scripts/t417b_statusbg_witness.sh
+   + census (interior p_black, perimeter texfrac, NO (12,32,48) block >100k);
+   mutation scripts/t417b_mutate.py; seed regression display-only.
+
+## F9 [t417b landed] — implementation facts + witness
+- Code: NEW pure ui/statusbg.{h,cpp} (screenPaintsShapeBackdrop declines
+  kScreenStatus; speckle census+weights; ramp table; marker/well/border
+  constants). statuslist.h kStatusRowsTop 57 / kStatusRowPitch 141 (F3
+  citation replaces the t402 fit comment). ui.cpp: k0 full-frame blit gated
+  by the pure decline; status paints black fill + perim texture tex +
+  speckle tex (both built once at startup) + ramp lines y38..46 + border x7;
+  row navy frame+outline REMOVED (F4); marker RED (255,0,0) x16..69 y+2..25
+  via kStatusMarkerRect; text col 200->288; pop bands 380->428 (10 shown);
+  sphere centred x100 row-top+64; header title GREEN (0,170,82) at y18;
+  generic tan header box + grey interior box skipped on status.
+- Pins: tests/test_statusbg_t417b.cpp x5 (decline+geometry+speakle census+
+  ramp table+marker/wells+bands); re-scoped with F3: test_statuslist_t402
+  row_geometry (pitch==141, top=kStatusRowsTop, 57+3*141==480),
+  test_planetview_t406 rows-top fence, test_statusnav_t405 header probe ->
+  divider-strip probe (580,50 None). Suite 407->413/0/0, 0 warnings.
+- WITNESS scripts/t417b_statusbg_witness.sh + t417b_witness_census.py:
+  VERDICT PASS on status-open AND status-reopen (no k0 navy 0 px; interior
+  strip p_black 1.000; perim texfrac 0.951-0.977; speckle 4 census colours
+  present n=1099..6522; title green 624 px; y46 solid 1.000; y47 black
+  1.000; border x7 1.000; sep_rows 0). Marker mechanical grade:
+  status-reopen row0 red px 1296 (full 54x24 capsule), status-open 0.
+  Witness CAUGHT A REAL BUG: first-draft speckle weights summed 119 vs
+  modulus 98 -> indices 3..5 never fired ((8,28,49) n=0); weights rekeyed
+  to {37,35,18,6,1,1} (sum 98) + pin CHECK(sum==98)+CHECK(counts[3]>0).
+- WITNESS PITFALL banked: keys go via `xsend <win> key <NAME>` (bare `X
+  Escape` sends a CLICK at point "Escape" — silently inert).
+- MUTATION CAMPAIGN PITFALL RE-MANIFESTED (skill rule 8, third time):
+  (a) my parallel `make` raced the campaign build tree mid-run-1 (verdicts
+  still all-CAUGHT but AFTER-RESTORE red); (b) run-2 killed by a FOREGROUND
+  tool timeout left the M8 mutant on disk (statusRampColourAt case 40
+  dropped) and shutil.copy2's preserved mtime made make consider the
+  poisoned binary current. Recovery: grep every mutation anchor on disk +
+  diff vs /tmp/t417b-snap + touch all sources + rebuild 413/0. Script fixed
+  (restore() now os.utime) and run-3 launched as a TRACKED background
+  process with its own timeout > campaign length. LESSON: never run any
+  build/test in the same tree while a campaign lives; never launch a
+  campaign as a foreground call shorter than its runtime.
+
+## F10 [t417b] — native-vision self-grade (D13 law) on work/r1/loop/t417b-status.png
+- (1) PASS black interior + mottled perimeter band all four edges;
+- (2) PASS speckled header + green centred title "Player (1 Planet Occupied,
+  1 System Controlled)";
+- (3) PASS pale divider + solid teal line under header;
+- (4) PASS row 0: red selection capsule at left, sphere art mid-left, text
+  "Amoroso I (Small Husk Planet)"/"No Project"/"RES 0 IND 1 PRO 1" at x288+,
+  pop-band dots ~x428;
+- (5) PASS no row separators; (6) PASS arrow wells top+bottom far right.
+- Honest seams visible in the shot: the vendor marker is a red GRADIENT
+  (measured values (189,44,16)/(156,4,0)/(255,0,0)); ours is flat (255,0,0)
+  — shape/position law met, face art uncited. Sphere size class renders
+  small (25-px class for Small) where the vendor capture showed a 47-px
+  class planet — SIZE axis cited, only the sample differs. "Esc: return to
+  galaxy" bottom-left = labelled PORT affordance (t405 refuted route).

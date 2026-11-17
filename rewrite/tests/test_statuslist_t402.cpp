@@ -256,11 +256,16 @@ TEST(statuslist_header_counts_t402) {
           "Minions  (1 Planet Occupied, 1 System Controlled)");
 }
 
-// ---- row geometry (measured pitch 112.6 +- 0.2, three markers) -------------
+// ---- row geometry (t417b REPLACED: pitch 141 exactly, rows top 57) --------
+// The t402 "pitch 112.6 +- 0.2, three markers" fit was fitted to the
+// SURFACE-THUMBNAIL art-centres (135.6/248.8/360.8 = row-top + ~78), not row
+// tops; the t3 capture's own flag-icon bands (57/198/339) and column-profile
+// autocorrelation (single peak 0.634) give pitch EXACTLY 141 (docs/re/
+// _wip_t417.md F3). RE-SCOPED per the t406 precedent, not deleted.
 TEST(statuslist_row_geometry_t402) {
     CHECK(au::kStatusVisibleRows == 3);
-    CHECK(au::kStatusRowPitch >= 112 && au::kStatusRowPitch <= 113);
-    const int top = au::kStatusInterior.y0;
+    CHECK(au::kStatusRowPitch == 141);
+    const int top = au::kStatusRowsTop;
     CHECK(au::statusRowAt(au::Pt{300, top}, top).value_or(-9) == 0);
     CHECK(au::statusRowAt(au::Pt{300, top + au::kStatusRowPitch - 1}, top)
               .value_or(-9) == 0);
@@ -271,10 +276,8 @@ TEST(statuslist_row_geometry_t402) {
                 .value_or(-9) == 2);
     CHECK(!au::statusRowAt(au::Pt{300, top + 3 * au::kStatusRowPitch}, top));
     CHECK(!au::statusRowAt(au::Pt{300, top - 1}, top));
-    // Three rows fit the measured interior exactly once (46..457 = 412 px;
-    // 3 x 112 = 336 <= 412 < 4 x 112 — the witness shows THREE, not four).
-    CHECK(3 * au::kStatusRowPitch <= au::kStatusInterior.y1 -
-                                        au::kStatusInterior.y0 + 1);
-    CHECK(4 * au::kStatusRowPitch > au::kStatusInterior.y1 -
-                                        au::kStatusInterior.y0 + 1);
+    // Three rows fill the screen exactly once (57 + 3*141 == 480; the user
+    // original shows THREE rows, never four).
+    CHECK(top + 3 * au::kStatusRowPitch == 480);
+    CHECK(top + 4 * au::kStatusRowPitch > 480);
 }

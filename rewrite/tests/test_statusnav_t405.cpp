@@ -35,14 +35,14 @@ TEST(statusnav_arrows_measured_t405) {
     CHECK(au::statusHitFor(au::Pt{628, 60}, kTop).kind == H::ArrowUp);
     CHECK(au::statusHitFor(au::Pt{628, 450}, kTop).kind == H::ArrowDown);
     // The D13 defect zone: the old 566-wide arrows covered (566..632,
-    // 46..70). x 566..618 is list, never arrows. t406 re-measure: rows now
-    // start at the MEASURED table top (kStatusRowsTop 117, _wip_t406 F4/F7),
-    // so the list-zone probe moves into the table body; the old probe point
-    // (580,60) sits in the backdrop's COLUMN-HEADER band (art cells y
-    // 48..85) and is inert there, like the vendor's header row.
+    // 46..70). x 566..618 is list, never arrows. t417b re-measure: rows now
+    // start at 57 (docs/re/_wip_t417.md F3 — the k0 art header cells the
+    // t406 probe pointed at do not exist; the code-drawn divider is solid at
+    // y46), so the HEADER-zone-inert probe moves to the black strip between
+    // the divider and row 0 (y47..56 hits no row).
     CHECK(au::statusHitFor(au::Pt{580, kTop + 5}, kTop).kind == H::Row);
     CHECK(au::statusHitFor(au::Pt{580, kTop + 5}, kTop).row == 0);
-    CHECK(au::statusHitFor(au::Pt{580, 60}, kTop).kind == H::None);  // header
+    CHECK(au::statusHitFor(au::Pt{580, 50}, kTop).kind == H::None);  // divider strip
     // Trough between the boxes: inert (must not scroll, must not select).
     CHECK(au::statusHitFor(au::Pt{628, 200}, kTop).kind == H::None);
     // Outside the column entirely: None.

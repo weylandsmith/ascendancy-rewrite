@@ -142,6 +142,9 @@ StatusHitResult statusHitFor(Pt p, int topY) {
 }
 
 std::optional<int> statusRowAt(Pt p, int topY) {
+    // t417b: with rowsTop 57 (F3) the divider strip y47..56 is ABOVE row 0's
+    // top and hits nothing — matching the vendor's black margin below the
+    // (code-drawn) divider at y46.
     if (p.y < topY) return std::nullopt;
     const int i = (p.y - topY) / kStatusRowPitch;
     if (i < 0 || i >= kStatusVisibleRows) return std::nullopt;

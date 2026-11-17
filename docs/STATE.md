@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-17T04:30
+updated: 2026-11-17T08:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,26 +230,23 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t417b — IMPLEMENT THE MEASURED STATUS BACKGROUND LAW (completes
-queue row t417, phase 15, D15). The t417 session (2026-11-17) CLOSED THE
-ROOT CAUSE WITH MEASUREMENT and banked the full implementation spec in
-docs/re/_wip_t417.md F1-F7; read THAT FILE FIRST — it is the task. In
-one line: the vendor NEVER paints 10status k0 (registration 4.5%, interior
-navy vs vendor black — F1); the status screen is CODE-DRAWN chrome (black
-interior + perimeter texture bands + per-pixel header speckle + divider
-ramp, F4/F5), and the row geometry t402 shipped is REFUTED by its own
-cited capture (rows top 57 not 117, pitch 141 not 112 — F3). Work order
-per F7: (1) statuslaw.h pure backdrop law + backdropFor() declines
-10status citing F1; (2) geometry constants + re-scope the three pin sites
-named in F7 with the F3 measurement (do NOT delete pins); (3) witness
-script + census; (4) mutation + seed regression (display-only). ORDERING
-RATIONALE: t417b finishes a half-landed row before opening t418/t419
-(independent, but a half-fixed screen misleads the user's next grading
-round); t419 stays last per the original rationale (its tree reuses the
-t416 Camera3d basis API). D13 self-grade law CONTINUES. t416 SEAM to
-respect: Camera3d is now a BASIS (up/fwd + latch/pump), NOT yaw/pitch
-fields — any new camera consumer uses pressSpin/pressTilt/pressZoom +
-tick().
+NEXT t418 — PLANET VIEW: THE PLANET ITSELF + TILE GRID (completes queue
+row t418, phase 15, D15). Full brief at its queue row below (planet view
+renders NO planet; vendor = PICTURE of the planet overlaid with colored
+ISOMETRIC squares, selectable, adjacent-to-structure -> build order). The
+planetalloc data law is already RE'd (tile grid, terrain colours,
+structure placement, adjacency) — render + cite the adjacency FUN, reuse
+the t406 project-set seam. NOTE from t417b: the status row sphere uses
+planets.shp terrainRow*5+sizeClass with the GROUP law a named seam
+(shp.md S23.3) — the planet-view disc wants the same class census at the
+LARGER ladder rungs (47px class), and the t406 17np k0 backdrop stays the
+state-17 frame (t417b proved declines are per-screen: state 10 only).
+ORDERING RATIONALE: t417b landed (half-landed row closed); t419 stays
+LAST per the original rationale (its tree reuses the t416 Camera3d basis
+API and its CPU-stall fix is static-cited and independent); t420 (push +
+D16 sheet) follows both. D13 self-grade law CONTINUES. t416 SEAM to
+respect: Camera3d is a BASIS (up/fwd + latch/pump), NOT yaw/pitch fields —
+any new camera consumer uses pressSpin/pressTilt/pressZoom + tick().
 SHORTHAND FACT: public SHAs never exist locally (history-rewritten
 export); verify pushes by ls-remote only. Sentinel history below.
 CARRIED STATE: phase-13/14 pushed (remote main == c178a43c1f71 at t413;
@@ -264,6 +261,45 @@ vendor intro would close it. Vendor intro draw immediates now MAPPED
 (t415). Intro scroll driver seam stays (truncation printed once).
 (OQ-027 closes ONLY on the user's pasted `audio:` line + verdict;
 OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.)
+
+t417b LANDED 2026-11-17 (PLANETS LIST BACKGROUND — IMPLEMENTATION OF THE
+MEASURED LAW; full account docs/re/_wip_t417.md F8-F10). D15 defect
+closed: ui.cpp no longer blits 10status k0 on state 10 (pure decline
+screenPaintsShapeBackdrop in NEW ui/statusbg.{h,cpp}, citing the F1
+4.5%-registration measurement + F6 TYPE-100 census; 17np/other screens
+keep the size test). Status now paints the MEASURED code-drawn chrome:
+black full-screen fill, perimeter texture bands x0..6/x633..639/y0..6/
+y472..479 (textureColourAt, static tex built once), header speckle y8..36
+(per-pixel weighted census + green title (0,170,82) at y18), divider ramp
+y38..46 to solid (33,56,57), left border x7; row navy frame+outline
+REMOVED (F4 zero separators); marker RED x16..69 top+2 h24 (F5); text col
+200->288; pop bands 380->428; sphere centred x100/row-top+64 (F5 well);
+generic tan header box + grey interior box skipped on status. GEOMETRY:
+kStatusRowsTop 117->57, kStatusRowPitch 112->141 (F3; 57+3*141==480
+exact) with the three named pin sites RE-SCOPED not deleted
+(test_statuslist_t402 geometry, test_planetview_t406 fence,
+test_statusnav_t405 probes). PINS tests/test_statusbg_t417b.cpp x5; suite
+407->413/0/0, 0 warnings. MUTATION 9/9 CAUGHT (scripts/t417b_mutate.py:
+backdrop-accepts, pitch-112, top-117, ramp-y46, weights-119, marker-x62,
+rowguard-drop, ramp-pale-single, well-navy-k0) + AFTER-RESTORE 413/0.
+WITNESS scripts/t417b_statusbg_witness.sh + t417b_witness_census.py
+VERDICT PASS (k0 navy 0 px, interior strip p_black 1.000, perim texfrac
+0.951-0.977, speckle census n=1099..6522, y46 solid 1.000, sep_rows 0;
+marker red px 1296 on selected row, 0 unselected) + NATIVE VISION GRADE
+PASS all six law points (work/r1/loop/t417b-status.png). WITNESS CAUGHT A
+REAL BUG: first-draft speckle weights summed 119 vs modulus 98 -> rare
+teals never fired (n=0); rekeyed to sum EXACTLY 98 + CHECK(sum==98)+
+CHECK(counts[3]>0) pins. SEED REGRESSION seeds 1/2024/23 md5 7e794a6d/
+332a8cf3/0a6b7876 EXACTLY per record (display-only, zero rng). PITFALLS
+banked (F9): xsend keys need `key <NAME>` (bare word = click at point);
+mutation campaign + parallel make in the same tree = poisoned AFTER-
+RESTORE (skill rule 8 third manifestation — restore() now os.utime; run
+campaigns ONLY as tracked background with timeout > runtime). LEDGER:
+closes NOTHING (strict-close honest negative — D15 chrome rows have no OQ
+owner, t414/t415/t416/t417 precedent). REFUTED-ROUTES t405(3) annotated:
+arrow rects STAND, the "k0 is a backdrop" premise is dead — do not re-add
+a k0 blit. Seam: marker FACE is flat (255,0,0) vs the vendor's measured
+red gradient (face art uncited; shape/position law met).
 
 t417 LANDED 2026-11-17 (PLANETS LIST BACKGROUND — ROOT CAUSE CLOSED WITH
 MEASUREMENT; implementation deferred to t417b; full account

@@ -383,4 +383,9 @@ docs/re/_wip_t417.md F1-F5:
   agrees ~140), exactly 3 visible rows (57+3*141=480). The t402 pitch 112
   was fit to the surface-THUMBNAIL art-centres (135.6/248.8/360.8 = row
   top + ~78), not row tops. Selection marker: RED x16..69, top+2, h~24.
-Fix implementation (constants + backdrop law + pins) = STATE t417b.
+Fix implementation (constants + backdrop law + pins) = STATE t417b — LANDED
+2026-11-17 (t417b): ui/statusbg.{h,cpp} pure law + pins; witness
+scripts/t417b_statusbg_witness.sh + t417b_witness_census.py VERDICT PASS
+(including the census-caught weights/modulus bug: first-draft weights summed
+119 vs modulus 98, starving the rare teals — rekeyed to sum EXACTLY 98);
+suite 413/0. Working log docs/re/_wip_t417.md F8-F9.

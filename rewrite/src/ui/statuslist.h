@@ -128,17 +128,24 @@ std::vector<StatusRowKey> statusPlanets(const ascend::game::Campaign& camp,
 std::vector<StatusRowKey> statusWindow(const std::vector<StatusRowKey>& all,
                                        int scroll);
 inline constexpr int kStatusVisibleRows = 3;   // measured (three markers)
-inline constexpr int kStatusRowPitch = 112;    // measured 112.6 +- 0.2
-inline constexpr Rect kStatusInterior{7, 46, 632, 457};  // frame fill lines
-// Row 0 top — t406 MEASURED FIX (the t405 aftercare): the backdrop's column
-// header cells ("name" x 7..135, icon cell 136..167, "size and type" from
-// 168; numpy on 10status k0, docs/re/_wip_t406.md F4/F7) occupy y 48..85,
-// and the t3 capture's table TOP BORDER is native y 116.8 (HLINE cap y 146
-// /1.25; bottom border 457.6). Rows therefore start at 117, BELOW the header
-// cells; the old 46 painted row 0's dark frame OVER the art "name" cell
-// (rendered "na"). 3 x 112 = 336 <= 457-117+1 = 341 < 4 x 112 — still
-// exactly three visible rows.
-inline constexpr int kStatusRowsTop = 117;
+// t417b ROW PITCH REPLACED [measured, docs/re/_wip_t417.md F3]: the t3
+// capture's flag-icon bands sit at y57/198/339 (pitch EXACTLY 141; column-
+// profile autocorrelation single peak 0.634; user original agrees ~140).
+// The old 112 was fitted to the SURFACE-THUMBNAIL art-centres (135.6/248.8/
+// 360.8 = row-top + ~78), not row tops — REFUTED by the capture t402 itself
+// cited. 3 rows exact: 57 + 3*141 = 480 == screen bottom.
+inline constexpr int kStatusRowPitch = 141;    // measured 141 exactly (F3)
+inline constexpr Rect kStatusInterior{7, 46, 632, 457};  // t402 frame lines
+// RETIRED BY F4: the vendor interior is BLACK with NO row separators
+// (hline scan zero) — kStatusInterior is kept only for the hit-map's left
+// edge; its y1 no longer governs row fit (rows govern themselves: top+3*pitch
+// == 480).
+// Row 0 top — t417b MEASURED (F3): rows start at 57, immediately below the
+// code-drawn divider (solid (33,56,57) at y46, black y47). The t406 "117"
+// anchored rows BELOW the 10status k0 ART header cells — but the vendor
+// never paints k0 (F1/F6), so those cells do not exist on screen; 117 left a
+// 60 px black gap the vendor does not show.
+inline constexpr int kStatusRowsTop = 57;
 // Scroll arrows — t405 RECTS MEASURED on the vendor backdrop itself
 // (10status.shp k0, decoded via tools/shp_pngdump this session;
 // docs/re/_wip_t405.md F8): the arrow BOXES are painted in the art at

@@ -19,6 +19,7 @@
 #include "ui/layout.h"
 #include "ui/menulaw.h"
 #include "ui/mapchrome.h"
+#include "ui/statusbg.h"
 #include "ui/statuslaw.h"
 #include "ui/planetwin.h"
 #include "ui/statuslist.h"
@@ -250,6 +251,56 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         }
     }
     std::fflush(stdout);
+    // t417b STATUS BACKDROP TEXTURES [measured law ui/statusbg.h]: the
+    // status screen's perimeter bands (four edges, textureColourAt family)
+    // and the header speckle band (per-pixel weighted census F5), each
+    // built ONCE (18k+ draw-dots per frame would be absurd). Deterministic
+    // per pixel; no engine rng_. Alpha 0 everywhere else.
+    SDL_Texture* statusPerimTex = nullptr;
+    SDL_Texture* statusSpeckleTex = nullptr;
+    {
+        statusPerimTex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                                          SDL_TEXTUREACCESS_STATIC,
+                                          kDisplayW, kDisplayH);
+        if (statusPerimTex) {
+            std::vector<uint32_t> px(size_t(kDisplayW) * kDisplayH, 0u);
+            for (int b = 0; b < kStatusTextureBandCount; b++)
+                for (int y = kStatusTextureBands[b].y0;
+                     y <= kStatusTextureBands[b].y1; y++)
+                    for (int x = kStatusTextureBands[b].x0;
+                         x <= kStatusTextureBands[b].x1; x++) {
+                        const RGB c = textureColourAt(x, y);
+                        px[size_t(y) * kDisplayW + x] =
+                            0xFF000000u | (uint32_t(c.r) << 16) |
+                            (uint32_t(c.g) << 8) | c.b;
+                    }
+            SDL_UpdateTexture(statusPerimTex, nullptr, px.data(),
+                              kDisplayW * int(sizeof(uint32_t)));
+        }
+        statusSpeckleTex = SDL_CreateTexture(
+            ren, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC,
+            kStatusSpeckleRect.x1 - kStatusSpeckleRect.x0 + 1,
+            kStatusSpeckleRect.y1 - kStatusSpeckleRect.y0 + 1);
+        if (statusSpeckleTex) {
+            const int w = kStatusSpeckleRect.x1 - kStatusSpeckleRect.x0 + 1;
+            std::vector<uint32_t> px(size_t(w) *
+                                         (kStatusSpeckleRect.y1 -
+                                          kStatusSpeckleRect.y0 + 1),
+                                     0u);
+            for (int y = kStatusSpeckleRect.y0; y <= kStatusSpeckleRect.y1;
+                 y++)
+                for (int x = kStatusSpeckleRect.x0; x <= kStatusSpeckleRect.x1;
+                     x++) {
+                    const RGB c = statusSpeckleAt(x, y);
+                    px[size_t(y - kStatusSpeckleRect.y0) * w +
+                       (x - kStatusSpeckleRect.x0)] =
+                        0xFF000000u | (uint32_t(c.r) << 16) |
+                        (uint32_t(c.g) << 8) | c.b;
+                }
+            SDL_UpdateTexture(statusSpeckleTex, nullptr, px.data(),
+                              w * int(sizeof(uint32_t)));
+        }
+    }
     // t410 HOME-STAR DIAGNOSTIC (display-only, zero rng): the projected
     // home-star pixel under the DEFAULT camera, printed once so a witness
     // can click the map->system-view entry without guessing a pip.
@@ -748,8 +799,45 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         // full-backdrop test; the luminance-ramp palette seam is documented
         // on blitShape). Map screen intentionally keeps its vector map (no
         // 1starmap backdrop: its k0 is 158x75 element art, not a backdrop).
-        const int lib = backdropFor(libFor(screen)) ? libFor(screen) : -1;
+        // t417b STATUS DECLINE [measured, docs/re/_wip_t417.md F1/F6]: the
+        // vendor binds NO shape lib to state 10 (TYPE-100 census: states
+        // 0,1,3,7,8,13,16,20,TESTDLG only) and 10status k0 registers 4.5%
+        // exact on the t3 live capture (navy interior vs vendor black). The
+        // full-frame k0 blit WAS the D15 defect; the status chrome is
+        // code-drawn per ui/statusbg.h (painted below the clear).
+        const int lib = screenPaintsShapeBackdrop(screen) &&
+                                backdropFor(libFor(screen))
+                            ? libFor(screen)
+                            : -1;
         if (lib >= 0) blitShape(ren, kLibs[lib], 0, 0, 0);
+        // t417b STATUS CODE-DRAWN CHROME [measured law ui/statusbg.h]: black
+        // interior (the vendor rows zone is p_black 0.925 outside art — the
+        // kBg (16,16,24) clear is NOT it), perimeter texture bands, header
+        // speckle, divider ramp y38..46, left border x7. NO row separator
+        // lines (F4 hline scan: zero).
+        if (screen == kScreenStatus) {
+            SDL_Rect black{0, 0, kDisplayW, kDisplayH};
+            SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+            SDL_RenderFillRect(ren, &black);
+            if (statusPerimTex)
+                SDL_RenderCopy(ren, statusPerimTex, nullptr, nullptr);
+            if (statusSpeckleTex) {
+                SDL_Rect dst{kStatusSpeckleRect.x0, kStatusSpeckleRect.y0,
+                             kStatusSpeckleRect.x1 - kStatusSpeckleRect.x0 + 1,
+                             kStatusSpeckleRect.y1 - kStatusSpeckleRect.y0 + 1};
+                SDL_RenderCopy(ren, statusSpeckleTex, nullptr, &dst);
+            }
+            for (int y = 38; y <= 46; y++) {
+                RGB c;
+                if (!statusRampColourAt(y, &c)) continue;
+                SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                SDL_RenderDrawLine(ren, 7, y, 631, y);
+            }
+            SDL_SetRenderDrawColor(ren, kStatusBorderRgb.r,
+                                   kStatusBorderRgb.g, kStatusBorderRgb.b, 255);
+            SDL_RenderDrawLine(ren, kStatusBorderX, kStatusBorderY0,
+                               kStatusBorderX, kStatusBorderY1);
+        }
 
         const bool mapVisible =
             screen == kScreenMap || screen == kScreenSpecies;  // COSMOSWnd
@@ -1076,7 +1164,11 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                                                         // map
                 default: hdr = Rect{7, 7, 632, 34}; interior = Rect{7, 46, 632, 472};
             }
-            if (hdr.x1 > hdr.x0) {
+            if (hdr.x1 > hdr.x0 && screen != kScreenStatus) {
+                // t417b: the status header carries the CODE-DRAWN speckle +
+                // ramp chrome painted above (statusbg.h law) — the vendor
+                // shows NO tan header box there (t3 census: speckle + border
+                // x7 only).
                 SDL_Rect hs{hdr.x0, hdr.y0, hdr.x1 - hdr.x0 + 1,
                             hdr.y1 - hdr.y0 + 1};
                 SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
@@ -1089,10 +1181,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                              kText);
             }
             if (screen != kScreenSpecies && screen != kScreenPlanet &&
-                screen != kScreenSystemView) {
+                screen != kScreenSystemView && screen != kScreenStatus) {
                 // t406: the planet screen's frame IS the 17np k0 backdrop
                 // (outer frame measured on the decode) — no vector overlay.
                 // t410: the system view draws its own viewport frame.
+                // t417b: the status screen's frame IS the code-drawn border
+                // x7 (33,56,57) + perimeter bands (statusbg.h) — the grey
+                // kLane box at 7,46-632,472 is the port's own invention.
                 SDL_Rect is{interior.x0, interior.y0,
                             interior.x1 - interior.x0 + 1, interior.y1 - interior.y0 + 1};
                 SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
@@ -1162,17 +1257,24 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 const std::string htxt =
                     formatPlanetHeader(owner, hdr.planets, hdr.systems);
                 {
+                    // t417b MEASURED (F2/F5): the vendor header title is
+                    // GREEN (0,170,82) at text rows y20..26 — centred.
                     const int w = txt.width(htxt, true);
                     txt.draw(ren, kStatusWnd.x0 +
                                  ((kStatusWnd.x1 - kStatusWnd.x0 + 1 - w) / 2),
-                             kStatusWnd.y0 + 6, htxt, true, kText);
+                             18, htxt, true, SDL_Color{0, 170, 82, 255});
                 }
-                // Scroll arrows (PORT rects; vendor arrow art uncited —
-                // honest vector triangles).
+                // Scroll arrows (PORT triangles; the vendor arrow GLYPH art
+                // is uncited — honest vector). Box rects t405-measured; the
+                // well fill is the F4 navy (8,32,49), NOT the k0 idx-242
+                // navy (12,32,48) — that colour is the fingerprint of the
+                // never-painted backdrop record (F1).
                 for (const auto& ar : {kStatusArrowUp, kStatusArrowDown}) {
                     SDL_Rect rr{ar.x0, ar.y0, ar.x1 - ar.x0 + 1,
                                 ar.y1 - ar.y0 + 1};
-                    SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
+                    SDL_SetRenderDrawColor(ren, kStatusWellNavy.r,
+                                           kStatusWellNavy.g,
+                                           kStatusWellNavy.b, 255);
                     SDL_RenderFillRect(ren, &rr);
                     SDL_SetRenderDrawColor(ren, 200, 200, 200, 255);
                     const int cx = (ar.x0 + ar.x1) / 2, cy = (ar.y0 + ar.y1) / 2;
@@ -1188,27 +1290,28 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     const auto& key = win[i];
                     const auto& s = camp.galaxy().stars[key.star];
                     const int y = kStatusRowsTop + int(i) * kStatusRowPitch;
-                    // selection marker: green bar left edge (witness: a
-                    // ~15px marker at x 16..; PORT rect law, colour CVD-safe)
+                    // selection marker — t417b MEASURED (F5 + re-verify):
+                    // RED x16..69, row top+2, height ~24 (red-dominant 409
+                    // px, mean (209,70,28)). The port's green bar at x 62
+                    // was a CVD-avoidance choice fitted to the k0 art's
+                    // "name" cell — the art is never painted (F1), and the
+                    // vendor marker is unambiguously red (shape: a tall
+                    // capsule left of the flag well, plus the row's text
+                    // itself marks selection state).
                     if (statusScroll + int(i) == statusSel) {
-                        // t406 MEASURED: the t3 capture's selection marker
-                        // runs native x 64..69 (was 16 — inside the art's
-                        // "name" cell).
-                        SDL_Rect mk{62, y + 24, 10, 15};
-                        SDL_SetRenderDrawColor(ren, 0, 200, 80, 255);
+                        SDL_Rect mk{kStatusMarkerRect.x0,
+                                    y + kStatusMarkerRect.y0,
+                                    kStatusMarkerRect.x1 -
+                                        kStatusMarkerRect.x0 + 1,
+                                    kStatusMarkerRect.y1 -
+                                        kStatusMarkerRect.y0 + 1};
+                        SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
                         SDL_RenderFillRect(ren, &mk);
                     }
-                    // row frame (PORT; the vendor row separator is part of
-                    // the 10status chrome style anomaly, ui-runtime.md).
-                    // t405: right edge stops at the table boundary x 618 —
-                    // x>=619 is the SCROLLBAR COLUMN painted in the backdrop
-                    // (arrow boxes + trough), which the old 632-wide fill
-                    // covered up.
-                    SDL_Rect rf{60, y, 618 - 60, kStatusRowPitch - 8};
-                    SDL_SetRenderDrawColor(ren, 40, 40, 56, 255);
-                    SDL_RenderFillRect(ren, &rf);
-                    SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);
-                    SDL_RenderDrawRect(ren, &rf);
+                    // NO row frame [F4 measured]: the vendor interior is
+                    // black with ZERO separator lines (hline scan y100..470
+                    // = none). The t402 navy fill + outline painted over the
+                    // never-painted k0 grid they were fitted to.
                     // planet sphere: planets.shp record =
                     // terrainRow*5 + sizeClass (the 11-group x 5-ladder
                     // census, shp.md S23.3). GROUP LAW NAMED SEAM (biome
@@ -1220,13 +1323,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         sizeIdx >= 0) {
                         const int rec = typeIdx * 5 + sizeIdx;
                         const auto& r = kLibs[planetLibIdx].record(rec);
-                        // t406 MEASURED: the art's planet-ICON CELL is x
-                        // 136..167 (10status k0 header cells, F4); centring
-                        // the sphere there replaces the old x 44 (which
-                        // painted over the "name" cell).
-                        blitShape(ren, kLibs[planetLibIdx], rec,
-                                  136 + (167 - 136 - int(r.width)) / 2,
-                                  y + (kStatusRowPitch - 8 - int(r.height)) / 2);
+                        // t417b MEASURED (F5): the vendor's big sphere fills
+                        // the LEFT WELL — bright rows x60..140, y67..175 for
+                        // row 0 (centre ~ x100, y = row top + 64). The t406
+                        // "icon cell 136..167" came from the k0 art header
+                        // cells, which are never painted (F1).
+                        blitShape(ren, kLibs[planetLibIdx], rec, 100 - int(r.width) / 2,
+                                  y + 64 - int(r.height) / 2);
                     }
                     // line 1 + line 2 (the cited assembly)
                     std::string pname = s.name;
@@ -1251,24 +1354,28 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     } else {
                         l2 = "Building ???";  // refuse-not-crash
                     }
-                    // t406 MEASURED: the art's "size and type" column
-                    // starts x 168 (numpy on the header cells); the t3
-                    // capture's row text runs start native ~206+. PORT:
-                    // text column at 200, inside the art's third cell.
-                    const int tx = 200;
+                    // t417b MEASURED (F5 row-0 column census): the vendor's
+                    // planet-name text starts x288 (green cluster x288..341;
+                    // the cyan x190..260 cluster is the SYSTEM name — the
+                    // port folds system+planet into one line1). The old 200
+                    // landed inside the system-name zone.
+                    const int tx = 288;
                     txt.draw(ren, tx, y + 14, l1, true, kText);
                     txt.draw(ren, tx, y + 40, l2, false, kDim);
                     // pop band strip (cited popBandsFor; 17np k1/k2/k3 art
-                    // would need the pop lib — vector bands, PORT)
+                    // would need the pop lib — vector bands, PORT). t417b:
+                    // moved into the vendor's THUMBNAIL column x428..481
+                    // (F5 row-0 census) — on the black interior the old x380
+                    // ran into the text column's line2.
                     const auto bands = camp.popBandsFor(key.star);
-                    const int n = std::min<int>(bands.size(), 40);
+                    const int n = std::min<int>(bands.size(), 10);
                     for (int b = 0; b < n; b++) {
                         const SDL_Color c = bands[b] == 1
                                               ? SDL_Color{200, 60, 60, 255}
                                               : bands[b] == 2
                                               ? SDL_Color{200, 180, 60, 255}
                                               : SDL_Color{60, 120, 90, 255};
-                        SDL_Rect px{380 + b * 5, y + 66, 4, 4};
+                        SDL_Rect px{428 + b * 5, y + 66, 4, 4};
                         SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
                         SDL_RenderFillRect(ren, &px);
                     }

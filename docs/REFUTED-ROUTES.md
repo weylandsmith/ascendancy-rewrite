@@ -1351,3 +1351,9 @@ from a non-16 state is NOT evidence of unreachability.
 ## (3) STATUS ARROW RECTS ARE NO LONGER UNCITED: MEASURED on the 10status k0
 ##     pixel plane (up x619..638 y48..94, down x620..638 y425..476). Do not
 ##     revert to the 566-wide PORT rects or widen rows past x618.
+##     [t417b ANNOTATION: the rects STAND (independently corroborated on the
+##     t3 capture's own pixel plane, _wip_t417.md F4 — navy (8,32,49) well
+##     fills at those boxes); the block's PREMISE that "k0 IS a FULL-WIDTH
+##     backdrop" is REFUTED — the vendor never paints k0 (registration 4.5%
+##     exact, TYPE-100 census binds no lib to state 10). Status chrome is
+##     code-drawn per ui/statusbg.h; do not re-add a k0 blit.]
