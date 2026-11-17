@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-17T09:30
+updated: 2026-11-17T14:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,51 +230,65 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t418b — PLANET VIEW IMPLEMENTATION (completes queue row t418, phase
-15, D15). THE LAWS ARE ALREADY MEASURED AND BANKED — docs/re/_wip_t418.md
-F0..F5 (this session): F1 GRID LAW (15-row diamond grid; rowWidth grid C @
-0x744a8 + rowOffset grid B @0x7445c from planitem.txt tokens 45..194; cell
-= cumWidth+C-index law, FUN_000395c4/0x3965c verbatim; worked example size
-class 2); F2 ISOMETRIC SCREEN LAW (center = origin + col*(34,17) +
-row*(17,-34), origin x-cursor 110 step +17/row to 365, y 410 step -34/row;
-diamond 68x34; hit-test |dx|/34+|dy|/17<=1; bare-tile fill pal[150],
-per-class colour NAMED SEAM); F3 ADJACENCY LAW verbatim (four FUN_000395c4
-probes row±1/col±1, ACTIVE-neighbour refuses, skips: cell>=+0x18, own cell
-ACTIVE, item 5, item 38); F4 DISC = planal[terrainRow].record(sizeIdx)
-[inferred, seam named — live-cache census would close]; F5 structure art =
-planitem k[item] (t254 1:1). BUILD: pure law in planetview.{h,cpp} (grid
-map from Campaign::planetAt: cellClasses/itemCells/items + config terrain
-grids — extend TerrainTables with B/C per the t294 loader, planitem.txt
-tokens 45..194), paint in ui.cpp kScreenPlanet branch (disc blit from
-extracted/ascend01/data/planalNN.shp 11 libs, tiles, planitem art), click
-tile -> select (diamond hit), build-order UI reuses the t406 project-set
-seam; the ACTIVE-neighbour refuse feeds the projectOrderable report
-(planetview.h already exposes why an order fails). Pins per F1/F2/F3
-(inverse-map round-trip over all 5 size classes, lattice step check,
-adjacency table incl. the four skip legs); witness via
-scripts/r1_ui_walk.sh status->row-click -> grade with OWN eyes (D13);
-screenshots t418-*.png. Self-grade: planet visible + tiles clickable +
-order lands.
-ORDERING RATIONALE: t417b landed (half-landed row closed); t419 stays
-LAST per the original rationale (its tree reuses the t416 Camera3d basis
-API and its CPU-stall fix is static-cited and independent); t420 (push +
-D16 sheet) follows both. D13 self-grade law CONTINUES. t416 SEAM to
-respect: Camera3d is a BASIS (up/fwd + latch/pump), NOT yaw/pitch fields —
-any new camera consumer uses pressSpin/pressTilt/pressZoom + tick().
-SHORTHAND FACT: public SHAs never exist locally (history-rewritten
-export); verify pushes by ls-remote only. Sentinel history below.
-CARRIED STATE: phase-13/14 pushed (remote main == c178a43c1f71 at t413;
-t414+ are LOCAL commits — t420 owns the mandatory push). H1 (sign-compare
-warnings) DONE t412-era. H2 (bottom-wheel clipping) CLOSED by t414's
-panel clipRect. Remaining carried seams: (H3) runtime race-colour bytes
-census (live-RAM during intro) — t415 RE-SHARPENED it: the vendor intro
-screenshot shows Minions ink GREEN pal[19] (racebyte 0) while the static
-dump byte is 16 (red pal[83]); the ink LAW is verified, the runtime INPUT
-is the open question; a live-RAM census of 0x12e18+specnum*494 during a
-vendor intro would close it. Vendor intro draw immediates now MAPPED
-(t415). Intro scroll driver seam stays (truncation printed once).
+NEXT t419 — RESEARCH SCREEN: CPU STALL FIX + 3D TREE REBUILD + CORNER EXIT
+(queue row t419, docs/STATE.md line ~1480 has the full row text; phase 15,
+D15). THREE LEGS: (a) the CPU STALL is static-citable and independent — the
+port's research-view paint path spins when the tree field is panned/dirty
+(diagnose the frame loop in ui.cpp kScreenResearch + researchview.cpp first,
+fix, prove with a bounded CPU-time witness); (b) the 3D TREE REBUILD reuses
+the t416 Camera3d BASIS API — pressSpin/pressTilt/pressZoom + tick(), NOT
+yaw/pitch fields (t416 SEAM law); nodes derive from resPanX/resPanY per the
+t408 pan law; (c) CORNER EXIT POPUP per the row text. Witness via
+scripts/r1_ui_walk.sh research shots t419-*.png + own-eyes grade (D13 law
+CONTINUES). Self-grade: research screen interactive, no pegged CPU, exit
+popup behaves.
+ORDERING RATIONALE: t418b landed (planet view paints the disc + isometric
+tile grid, clickable, pins + witness green); t419 was always scheduled
+after t418b (its tree reuses the t416 Camera3d basis API and its CPU-stall
+fix is static-cited and independent); t420 (push + D16 sheet) follows both.
+t420 OWNS THE MANDATORY PUSH (t414+ are LOCAL commits; remote main ==
+c178a43c1f71 at t413; public SHAs never exist locally — verify pushes by
+ls-remote only). Remaining carried seams: (H3) runtime race-colour bytes
+census (live-RAM during intro; t415 re-sharpened — Minions ink GREEN
+pal[19] vs static dump byte 16; closing witness = live census of
+0x12e18+specnum*494); the t418b per-class tile colour table 0x892ac seam
+(bare pal[150] shipped; closing witness = live vertex-parameter census of
+the 0x3c2a3 esp+0x310 set during a vendor planet frame); the t418b disc
+provenance F4 [inferred] (closing witness = live 0x9f10c selector census).
 (OQ-027 closes ONLY on the user's pasted `audio:` line + verdict;
 OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.)
+
+t418b LANDED 2026-11-17 (PLANET VIEW IMPLEMENTED — the planet itself, the
+isometric tile grid, tile select, the F3 adjacency report; full account
+docs/re/_wip_t418.md F6-F8). THE INVERSE-LAW CORRECTION (the session's
+measurement delta): FUN_0003965c's row-walk test at 0x396b0/0x396b5 is
+cum+C — B enters ONLY the col formula 0x3969a..0x396a6; the t418 F1
+shorthand "cum+B+C" was a MISPARSE that lands invalid cols whenever B>0
+(size-2 cell14: buggy row5 col8 invalid vs vendor row6 col4; cell18: buggy
+row6 col8 vs vendor row7 col5). Code: TerrainTables carries grids B/C
+(rowOffset/rowWidth; loader tokens 45..119 READ — grid B's t294 "no
+consumer" skip retired, planetview is its cited consumer; operator==
+covers both so test_terrain_t294's file==vendor pin now covers the grids);
+Campaign::terrainTables() display accessor; planetview.{h,cpp} pure law
+gridCellFor/gridRowCol/tileCenter/tileHitFor/orderCellBlock (citations
+inline); ui.cpp kScreenPlanet paints planal[terrainRow].record(sizeIdx)
+[F4 inferred seam] centred on the grid bbox centre (365,325 for EVERY size
+class — derived), per-cell diamond fill pal[150] (0x960000 @0x3c274) +
+dark outline (rock |8 darker [documented default]), planitem k[item] art
+on occupied tiles, white outline on the selected tile; tile click selects
+(diamond hit |dx|/34+|dy|/17<=1; GAP points refuse honestly — the witness
+caught itself clicking one), project list annotates "(cell refuses)" via
+the F3 leg. PINS tests/test_planetview_t418b.cpp x4; suite 413->417/0/0,
+0 warnings. MUTATION 9/10 CAUGHT + M4 MISSED=PROVABLY VACUOUS (integer
+dominance: the walk fallback rejects cell==+0x18 under both gate laws —
+banked); M10 missed on run 1 (cell-0 fixtures only exercise +col/+row),
+fixed with the State C all-pairs directional scan -> standalone CAUGHT
+(skill rules 5+6 applied). WITNESS scripts/t418b_planetview_witness.sh +
+t418b_witness_census.py VERDICT PASS (fill pal[150] 100% of 7 centres;
+disc+structure art 1288 px; selection white 0->136) + NATIVE-VISION GRADE
+PASS (grid, highlight, disc crop, sprite, PLANLIST — own eyes, D13). LEDGER:
+closes NOTHING (strict-close honest negative — D15 chrome has no OQ owner;
+t414/t415/t416/t417 precedent). Gate 0, audits OK (17/3).
 
 t418 LANDED 2026-11-17 (PLANET VIEW — LAWS MEASURED; implementation ->
 t418b; full account docs/re/_wip_t418.md F0-F5). THE 15-ROW DIAMOND GRID

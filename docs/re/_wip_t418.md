@@ -124,6 +124,63 @@ during a vendor planet-view frame.
 planitem.shp record index == itemIdx (1:1 pixel match law, shp.md S23.4).
 Port blits planitem k[item] at the tile centre for occupied cells.
 
+## F7 t418b IMPLEMENTATION RESULTS (this session)
+- TerrainTables carries rowOffset/rowWidth (grids B/C) verbatim; the loader
+  reads tokens 45..119 (grid B's t294 "no consumer" skip RETIRED — the
+  planetview grid is its cited consumer); operator== covers both, so
+  test_terrain_t294's file==vendor equality now pins the grids too.
+- Campaign::terrainTables() public display accessor added.
+- planetview.{h,cpp}: gridCellFor / gridRowCol / tileCenter / tileHitFor /
+  orderCellBlock pure law (citations inline). THE INVERSE CORRECTION: the
+  0x396b0/0x396b5 loop test is cum+C (B only in the col formula) — the F1
+  shorthand was a misparse (see the F1 block annotation); pinned by
+  size-2 cell14 (row6 col4; buggy walk lands col8 invalid) + cell18 +
+  the full round-trip census.
+- ui.cpp kScreenPlanet: 11x planalNN.shp + planitem.shp chrome libs (load
+  verified: 5 recs dims ladder 47/75/103/140/189; planitem 40 recs ~33px —
+  read from the directories THIS session, matches shp.md S23.3); disc blit
+  planal[terrainRow].record(sizeIdx) centred on the F2 grid bbox centre
+  (365,325 for EVERY size class — derived this session); per-cell diamond
+  fill pal[150] + dark outline, rock |8 darker [documented default];
+  planitem k[item] at tile centres; white outline on the selected tile;
+  tile click -> planetCell (Escape unchanged; resets on every open);
+  project list annotates "(cell refuses)" when the F3 leg blocks the
+  selected tile, and the order log carries the refuse too.
+- Pins tests/test_planetview_t418b.cpp x4 (census/inverse/lattice/adjacency;
+  adjacency State B pins the 0x385ee own-skip non-vacuously per mutation
+  rule 5). Suite 413 -> 417/0/0, 0 warnings.
+- WITNESS scripts/t418b_planetview_witness.sh + t418b_witness_census.py
+  VERDICT PASS: size-0 home planet (Amoroso I, seed 5), fill [16,69,77]
+  == pal[150] under the conv at 100% of the 7 centres; disc+structure art
+  1288 non-fill bright px bbox x267..402 y300..361; selection outline white
+  px 0 -> 136 after the tile click (log "ui planet tile 5 selected").
+  NATIVE-VISION GRADE PASS (own eyes on the 3 shots): diamond grid, white
+  highlight centre tile, teal disc crop under the tiles, structure sprite
+  on the home-CB tile, PLANLIST rows readable, no artifacts. The first
+  witness click (390,320) MISSED — correct: it is a lattice GAP point
+  (diamond area 1156 < lattice cell 1445), the hit-map refused it honestly.
+- KNOWN RESIDUES (named seams, unchanged): per-class tile colour table
+  0x892ac unresolved (bare pal[150] everywhere + darker rock); disc
+  provenance F4 [inferred] (closing witness = live 0x9f10c selector census);
+  the vendor tile-click may also drive the cmd0 CELL word (0x38b0c) — the
+  port's order stays item-only, the selection drives the F3 report.
+- MUTATION: see the campaign block below (appended on completion).
+
+## F8 t418b MUTATION CAMPAIGN (scripts/t418b_mutate.py)
+Run 1 (10 mutants): M1 CAUGHT(115 failed) M2 CAUGHT(197) M3 CAUGHT(67 —
+THE misparse mutant, killed by the cell14/cell18 witnesses + the round-trip
+census) M4 MISSED M5 CAUGHT(5) M6 CAUGHT(2) M7 CAUGHT(3) M8 CAUGHT(1 — the
+rule-5 State B fixture did its job) M9 CAUGHT(2) M10 MISSED.
+TRIAGE: M10 (drop the row+1 probe) — the cell-0 fixtures only exercise the
++col/+row legs; fixed with State C (every ordered (A,B) pair over the
+seeded planet's grid vs the directional table) -> standalone re-run CAUGHT.
+M4 (gridRowCol gate >= -> >) MISSED = VACUOUS: with cell == surfaceCells the
+mutant enters the walk, but cum tops out at surfaceCells so r reaches 15 and
+the refuse-not-crash leg returns false anyway — the two laws agree on every
+input; banked (skill rule 6, integer dominance). Verdict: 9 CAUGHT + 1
+provably-vacuous mutant; AFTER-RESTORE 417/0/0 both runs (restore() copies
+the /tmp snapshot + os.utime; the campaign ran as tracked background).
+
 ## F6 t418b BUILD PLAN (this iteration, executing F1-F5)
 1. TerrainTables (economy.h): ADD rowOffset[5][15] (grid B) + rowWidth[5][15]
    (grid C) verbatim from planitem.txt; loadTerrainTables reads tokens

@@ -138,10 +138,13 @@ TEST(planetgrid_inverse_t418b) {
             CHECK(au::gridRowCol(TT, size, TT.surfaceBySize[size], cell, &r, &c));
             CHECK(au::gridCellFor(TT, size, r, c) == cell);
         }
-    // the 0xffffffff leg: non-surface cells refuse
+    // the 0xffffffff leg: non-surface cells refuse. DIRECT call (orderCell
+    // -Block's own 0x385b7 guard otherwise masks this boundary — mutation
+    // M4 triage): cell == surfaceCells must refuse (0x39671 jae).
     CHECK(!au::gridRowCol(TT, 2, 23, 23, &row, &col));
     CHECK(!au::gridRowCol(TT, 2, 23, -1, &row, &col));
     CHECK(!au::gridRowCol(TT, 2, 23, 30, &row, &col));  // orbital ring
+    CHECK(!au::gridRowCol(TT, 0, 7, 7, &row, &col));
 }
 
 // ---- F2: the isometric lattice + diamond hit-test --------------------------
@@ -196,7 +199,7 @@ TEST(planetgrid_adjacency_t418b) {
     const int size = ag::Campaign::sizeClassFor(surf);
     CHECK(size >= 0);
     if (size < 0) return;
-    // ONE active item on cell 0 (Factory, item 0).
+    // State A: ONE active item on cell 0 (Factory, item 0).
     ps.items = {0};
     ps.itemCells = {0};
     // Neighbours of cell 0 per size class, VERBATIM from the grid tables
@@ -208,8 +211,6 @@ TEST(planetgrid_adjacency_t418b) {
         if (kNbr0[size][k] >= 0)
             CHECK(au::orderCellBlock(c, star, 1, kNbr0[size][k]) ==
                   au::OrderCellBlock::ActiveNeighbour);
-    // skip leg 0x385ee: the cell is ITSELF active -> no adjacency question.
-    CHECK(au::orderCellBlock(c, star, 1, 0) == au::OrderCellBlock::None);
     // skip leg 0x385f6: item 5 Colony is exempt even on an active neighbour.
     CHECK(au::orderCellBlock(c, star, 5, kNbr0[size][0]) ==
           au::OrderCellBlock::None);
@@ -230,6 +231,55 @@ TEST(planetgrid_adjacency_t418b) {
     CHECK(far >= 0);
     if (far >= 0)
         CHECK(au::orderCellBlock(c, star, 1, far) == au::OrderCellBlock::None);
+    // State B (skip leg 0x385ee, mutation-rule-5 shape): items on cell 0 AND
+    // on its FIRST neighbour — so cell 0 is active AND HAS an active
+    // neighbour. The own-ACTIVE skip is now the only leg that can answer
+    // None for cell 0; deleting it flips this to ActiveNeighbour.
+    ps.items = {0, 0};
+    ps.itemCells = {0, kNbr0[size][0]};
+    CHECK(au::orderCellBlock(c, star, 1, 0) == au::OrderCellBlock::None);
+    // and cell 0's OTHER neighbour (active via cell 0) still refuses.
+    if (kNbr0[size][1] >= 0)
+        CHECK(au::orderCellBlock(c, star, 1, kNbr0[size][1]) ==
+              au::OrderCellBlock::ActiveNeighbour);
+    // State C (mutation M10 triage): the FOUR probes are the directional
+    // TABLE row±1/col±1 — losing any leg must flip some fixture. For the
+    // seeded planet's size class, scan every ordered (active cell A, other
+    // cell B) pair: B refuses iff B shares a row/col lattice line with A
+    // (B in {(Ar±1,Ac),(Ar,Ac±1)} via gridCellFor). This exercises all four
+    // directions (a dropped leg drops exactly the refusals it owns).
+    {
+        const auto& tt = c.terrainTables();
+        auto rc = [&](int cell, int& r, int& cc) {
+            return au::gridRowCol(tt, size, surf, cell, &r, &cc);
+        };
+        int checked = 0;
+        for (int A = 0; A < surf; A++) {
+            int ar = 0, ac = 0;
+            rc(A, ar, ac);
+            for (int Bc = 0; Bc < surf; Bc++) {
+                if (Bc == A) continue;
+                int br = 0, bc = 0;
+                rc(Bc, br, bc);
+                const bool nbr = au::gridCellFor(tt, size, ar + 1, ac) == Bc ||
+                                 au::gridCellFor(tt, size, ar - 1, ac) == Bc ||
+                                 au::gridCellFor(tt, size, ar, ac + 1) == Bc ||
+                                 au::gridCellFor(tt, size, ar, ac - 1) == Bc;
+                ps.items = {0};
+                ps.itemCells = {A};
+                const auto got = au::orderCellBlock(c, star, 1, Bc);
+                const bool wantRefuse = nbr;
+                if ((got == au::OrderCellBlock::ActiveNeighbour) != wantRefuse) {
+                    CHECK(false);  // names the pair below
+                    std::printf("adjacency mismatch size%d A%d(%d,%d) B%d(%d,%d) got %d\n",
+                                size, A, ar, ac, Bc, br, bc, int(got));
+                    return;
+                }
+                ++checked;
+            }
+        }
+        CHECK(checked == surf * (surf - 1));
+    }
     // NO active items at all: nothing refuses.
     ps.items.clear();
     ps.itemCells.clear();
