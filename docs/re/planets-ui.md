@@ -362,3 +362,25 @@ the PLBUILD panel opens the project list whose click SETS the project
   follow the art cells (icon 136..167, text from ~200).
 Full working log: docs/re/_wip_t406.md F0-F9. Pins test_planetview_t406
 x4 (suite 360/0); witness scripts/t406_planetview_witness.sh PASS.
+
+## 10. STATUS BACKDROP + ROW GEOMETRY — MEASURED CORRECTION (t417, 2026-11-17)
+Two S8/S9 claims are REFUTED by cited measurement on the very capture S8
+cited (work/screens/t3/planets_header_t1086_after_open.png); full numbers
+docs/re/_wip_t417.md F1-F5:
+- THE BACKDROP IS NOT 10status k0. Registration of the decoded k0 index
+  plane (game.pal colour space, scripts/t417_k0_register.py) against the
+  t3 vendor capture = 4.5% exact; k0's navy interior (idx 242, 12,32,48)
+  vs the vendor's BLACK interior. windows.txt binds no SHAPEFILE to state
+  10 (TYPE-100 census: only 0,1,3,7,8,13,16,20,TESTDLG). The vendor status
+  screen is CODE-DRAWN chrome: black interior, perimeter mottled texture
+  band (x0..6/x633..639/y0..6/y472..479), per-pixel dark header speckle
+  y8..36, divider ramp y38..46 to solid (33,56,57) at y46, left border x7
+  (33,56,57), NO row separator lines. The port's ui.cpp full-frame k0 blit
+  is the D15 "background uses an unused image" defect (k0 = the D1
+  "A-series historical curiosity" asset).
+- ROW GEOMETRY: rows top 57 (flag-box bands 57/198/339), pitch EXACTLY
+  141 (column-profile autocorrelation, single peak 0.634; user original
+  agrees ~140), exactly 3 visible rows (57+3*141=480). The t402 pitch 112
+  was fit to the surface-THUMBNAIL art-centres (135.6/248.8/360.8 = row
+  top + ~78), not row tops. Selection marker: RED x16..69, top+2, h~24.
+Fix implementation (constants + backdrop law + pins) = STATE t417b.

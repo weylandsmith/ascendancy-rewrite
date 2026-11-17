@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-17T01:15
+updated: 2026-11-17T04:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,17 +230,26 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t417 per queue row t417 below (PLANETS LIST BACKGROUND, phase 15 per
-the USER'S ROUND-3 RULING D15). ORDERING: t416 (rotation axis wiring)
-LANDED 2026-11-17 (docs/re/_wip_t416.md F1-F3; vendor dial law recovered
-fully static — latch+pump, world-Y/world-X basis rotations). Remaining
-rows t417/t418/t419 are independent of each other; t417 is next because
-it is the smallest (a backdrop-record choice in the status screen), and
-t419 (research CPU stall + 3D tree) benefits from being last: its tree's
-Z-rotation reuses the t416 dial->axis law and Camera3d basis API that just
-landed. D13 self-grade law CONTINUES. t416 SEAM to respect: Camera3d is
-now a BASIS (up/fwd + latch/pump), NOT yaw/pitch fields — any new camera
-consumer uses pressSpin/pressTilt/pressZoom + tick().
+NEXT t417b — IMPLEMENT THE MEASURED STATUS BACKGROUND LAW (completes
+queue row t417, phase 15, D15). The t417 session (2026-11-17) CLOSED THE
+ROOT CAUSE WITH MEASUREMENT and banked the full implementation spec in
+docs/re/_wip_t417.md F1-F7; read THAT FILE FIRST — it is the task. In
+one line: the vendor NEVER paints 10status k0 (registration 4.5%, interior
+navy vs vendor black — F1); the status screen is CODE-DRAWN chrome (black
+interior + perimeter texture bands + per-pixel header speckle + divider
+ramp, F4/F5), and the row geometry t402 shipped is REFUTED by its own
+cited capture (rows top 57 not 117, pitch 141 not 112 — F3). Work order
+per F7: (1) statuslaw.h pure backdrop law + backdropFor() declines
+10status citing F1; (2) geometry constants + re-scope the three pin sites
+named in F7 with the F3 measurement (do NOT delete pins); (3) witness
+script + census; (4) mutation + seed regression (display-only). ORDERING
+RATIONALE: t417b finishes a half-landed row before opening t418/t419
+(independent, but a half-fixed screen misleads the user's next grading
+round); t419 stays last per the original rationale (its tree reuses the
+t416 Camera3d basis API). D13 self-grade law CONTINUES. t416 SEAM to
+respect: Camera3d is now a BASIS (up/fwd + latch/pump), NOT yaw/pitch
+fields — any new camera consumer uses pressSpin/pressTilt/pressZoom +
+tick().
 SHORTHAND FACT: public SHAs never exist locally (history-rewritten
 export); verify pushes by ls-remote only. Sentinel history below.
 CARRIED STATE: phase-13/14 pushed (remote main == c178a43c1f71 at t413;
@@ -255,6 +264,38 @@ vendor intro would close it. Vendor intro draw immediates now MAPPED
 (t415). Intro scroll driver seam stays (truncation printed once).
 (OQ-027 closes ONLY on the user's pasted `audio:` line + verdict;
 OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.)
+
+t417 LANDED 2026-11-17 (PLANETS LIST BACKGROUND — ROOT CAUSE CLOSED WITH
+MEASUREMENT; implementation deferred to t417b; full account
+docs/re/_wip_t417.md F1-F7). D15 "the background... seems to be using one
+of those images we determined wasn't used anywhere" RESOLVED: the port
+blits 10status.shp k0 full-frame (ui.cpp:752 via backdropFor), and k0 IS
+the D1 "A-series historical curiosity" asset the user called unused.
+PROOF [measured, scripts/t417_k0_register.py — index plane via t391 law,
+colour through game.pal + DOSBox conv, vs the t3 LIVE capture
+work/screens/t3/planets_header_t1086_after_open.png]: registration at
+shift(0,0) = 4.5% exact / 6.4% within-30 / mean|d| 149; k0 interior is idx
+242 NAVY (12,32,48) x186,722 where the vendor shows (0,0,0) — THE VENDOR
+NEVER PAINTS k0. windows.txt re-census: TYPE-100 SHAPEFILE binds ONLY
+states 0,1,3,7,8,13,16,20,TESTDLG — no record binds 10status to any state
+(status chrome is CODE-DRAWN). Vendor law [measured on t3 + user original
+scratchpad/planets-screen-original.png, both agree]: BLACK interior;
+perimeter mottled texture band x0..6/x633..639/y0..6/y472..479 (texfrac
+0.94-1.0, same family as t400/t411); header y8..36 per-pixel dark speckle
+(0,0,0)/.349 (8,12,16)/.327 (8,12,8)/.172 (8,28,49)/.062 + green title
+(0,170,82); divider ramp y38..46 to SOLID (33,56,57) at y46; left border
+x7 (33,56,57); NO row separator lines. GEOMETRY REFUTED+REPLACED [F3]:
+rows top 57 (flag-box bands 57/198/339), pitch EXACTLY 141 (column-profile
+autocorrelation single peak 0.634; user original agrees ~140), 3 visible
+rows EXACT (57+3*141=480); t402's 112 was fit to the SURFACE-THUMBNAIL
+art-centres (135.6/248.8/360.8 = row-top + ~78), not row tops. Selection
+marker is RED x16..69 rows top+2 h~24 (t3 red census). Honest negatives
+banked: header speckle values are DISPLAY-space (no game.pal exact match
+under the conv — DOSBox X11 grab); row-0 column census ported to F5 table.
+Tests UNCHANGED this session (no code touched — measurement iteration);
+gate 0. LEDGER: closes NOTHING (strict-close honest negative — D15 chrome
+rows have no OQ owner; t414/t415/t416 precedent). Tool banked:
+scripts/t417_k0_register.py.
 
 t416 LANDED 2026-11-17 (ROTATION AXIS WIRING; full account
 docs/re/_wip_t416.md F1-F3; law docs/re/t399-galaxy-map-3d.md S8). VENDOR
