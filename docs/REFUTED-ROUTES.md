@@ -1357,3 +1357,13 @@ from a non-16 state is NOT evidence of unreachability.
 ##     backdrop" is REFUTED — the vendor never paints k0 (registration 4.5%
 ##     exact, TYPE-100 census binds no lib to state 10). Status chrome is
 ##     code-drawn per ui/statusbg.h; do not re-add a k0 blit.]
+
+## R-t421. THE 0x892ac PER-TILE-CLASS TILE-COLOUR LAW — REFUTED. Do not
+##     re-open and do not schedule a live esp+0x310 witness for it: the copy
+##     at 0x3c2a3 is an UNINDEXED mov $0x892ac (13-insn esi lifecycle: the
+##     load is the only write), the whole-image operand census finds exactly
+##     ONE referrer, callee 0x61770 never reads the caller stack, and the 8
+##     bytes are byte-verbatim in 178/178 saved runs. All four vertex colour
+##     slots take the same immediate 0x960000 = pal[150] for every class:
+##     the port's uniform fill IS the vendor law. Trail docs/re/_wip_t421.md
+##     + planets-ui.md §12.

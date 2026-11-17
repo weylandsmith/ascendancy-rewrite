@@ -401,8 +401,31 @@ Implementation deferred to t418b; full derivations docs/re/_wip_t418.md F1-F5:
   center = origin + col*(34,17) + row*(17,-34); x-cursor 110 +17/row (end
   365), y 410 -34/row; tile diamond 68x34; hit |dx|/34+|dy|/17<=1; bare
   fill pal[150]; per-class colour table 0x892ac UNRESOLVED (named seam).
+  [SUPERSEDED t421 — see §12: the per-class reading was a MISPARSE; uniform
+  pal[150] IS the vendor law.]
 - ADJACENCY (checker 0x385b7..0x3870d): four probes (row±1,col),(row,col±1)
   via 0x395c4; ACTIVE (word+2 bit0) neighbour refuses an inactive new item;
   skips cell>=+0x18, own-ACTIVE, item 5, item 38.
 - DISC: vendor provenance inside 0x3b96c UNRESOLVED (0x3b98b = 17np k4/k5
   backdrops); port default planal[terrainRow].record(sizeIdx) [inferred].
+
+## 12. THE 0x892ac 'PER-CLASS COLOUR TABLE' IS REFUTED (t421, 2026-11-17)
+Full derivation docs/re/_wip_t421.md F1-F5; probes scripts/
+r1_t421_referrer_census.py + r1_t421_c3_runtime.py (RC=0).
+- COPY SITE (ascend_restored.bin 0x3c274..0x3c2d9): mov $0x960000 stores the
+  SAME immediate into ALL FOUR vertex colour slots (esp+0x268/0x280/0x298/
+  0x2b0 of the 24B-stride diamond record), then mov $0x892ac,%esi is an
+  UNINDEXED immediate copy of 8 bytes to esp+0x310 (movsd x2). The only esi
+  write in the 13-insn window is the load itself. A per-class table cannot
+  be addressed by a constant; the t418 "selects per-something-per-class"
+  reading was a misparse.
+- CENSUS: capstone detail-mode operand walk over the whole code span finds
+  EXACTLY ONE referrer of 0x892ac in the image (0x3c2a3); zero data-region
+  pointers point into the block. esp+0x310 has exactly two refs in the
+  painter (the copy target; overwritten at 0x3c5b4) and callee 0x61770 never
+  reads the caller stack — the 8 bytes {00 00 01 03 01 03 02 02} are a
+  fixed draw-parameter artifact with no per-class consumer.
+- RUNTIME: mem[B+0x892ac] byte-verbatim in 178/178 independent saved runs
+  (+ deepest slot 60); no writer in any captured state.
+- CONSEQUENCE: the port's uniform pal[150] fill (t418b) MATCHES the cited
+  law; no rewrite delta; the seam leaves the live re-check list.

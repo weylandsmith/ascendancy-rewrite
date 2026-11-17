@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-17T16:35
+updated: 2026-11-17T16:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,32 +230,59 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT = WAIT-USER-RULING t374 (tag law: never renumber). t420 LANDED: phase
-15 is verified, pushed (remote main == 96921269e926), and the D16 sheet is
-LIVE at :8613 covering every D15 item (q0 research stall, q1 research 3D,
-q2 corner Exit popup, q3 new game round 3, q4 intro framing, q5 rotation
-dials live-only, q6 planets-list background, q7 the planet itself, q8 audio
-carried). A new iteration starts ONLY on a trigger: USER: lines after the
-D16 block in docs/DECISIONS.md (apply per strict-close; a ruling that
-reopens a screen gets ONE queue row citing the ruling phrase), or a new
-playcap sitting (re-run scripts/r1_t85g_sitting.py FIRST). Do NOT re-ask
-anything the sheet already asks.
-LIVE RE-CHECK LIST (the user's own hands; the D15 addendum was his live
-complaint — q0/q1/q2/q5 are best answered in person): open Research, leave
-a minute, Esc promptly closes + machine responsive (q0); tree spins with
-perspective + scroll pair + right panel live (q1); mouse into any campaign
-corner pops Exit<ESC> (q2); dials latch: one click keeps spinning, re-click
-stops, opposite flips (q5). WALKTHROUGH TABLE below still stands for the
-earlier rounds.
-If NO trigger arrives, the honest queue of machine-closable work is EMPTY
-(this iteration re-audited it): every remaining seam needs a live-vendor
-witness the port cannot fabricate — (H3) runtime race-colour census of
-0x12e18+specnum*494; t418b tile-colour table 0x892ac (witness 0x3c2a3
-esp+0x310); t418b disc provenance F4 (witness 0x9f10c selector census);
-t419 vendor reswin draw chain (seam in researchview.h); t416 pump cadence.
+NEXT = SAVE-CENSUS H3 RACE-COLOUR TABLE 0x12e18+specnum*494, using the
+t421 METHOD (ordering rationale: it is the one remaining t420 "live
+witness" seam plausibly closable from EXISTING saves the way 0x892ac just
+was — referrer census + esi-lifecycle + mem[B+off] verbatim across the 178
+runs; if the census finds a per-spec INDEXED read the row is a real law to
+measure; if unindexed-constant like 0x892ac, REFUTED + off the list; if
+saves cannot witness it, write the honest negative and fall back to
+WAIT-USER-RULING). aicode.md:1259 cites BYTE [race*2+0x12e18] (race row
++0x2) via FUN_0001fc34/FUN_0005caac — START there; reuse
+scripts/r1_t421_referrer_census.py + r1_t421_c3_runtime.py shapes; mind
+pitfall B-vs-P0 (bytes at mem[B+off], control = 16/16 law window).
+Trigger check FIRST as always: USER: lines after the D16 block in
+docs/DECISIONS.md win (apply per strict-close; a ruling that reopens a
+screen gets ONE queue row citing the ruling phrase); a new playcap sitting
+outranks this (re-run scripts/r1_t85g_sitting.py FIRST). t421 re-ran both:
+no trigger as of 2026-11-17 ~16:40. Do NOT re-ask anything the D16 sheet
+(:8613, live, covers every D15 item q0..q8) already asks.
+LIVE RE-CHECK LIST (the user's own hands): open Research, leave a minute,
+Esc promptly closes + machine responsive (q0); tree spins with perspective
++ scroll pair + right panel live (q1); mouse into any campaign corner pops
+Exit<ESC> (q2); dials latch: one click keeps spinning, re-click stops,
+opposite flips (q5). WALKTHROUGH TABLE below still stands for earlier
+rounds. t418b tile-colour 0x892ac is OFF this list (t421 CLOSED statically,
+REFUTED-ROUTES R-t421). Remaining live-only seams if H3 also falls: t418b
+disc provenance F4 (0x9f10c selector census — try the save-census method
+too before calling it live-only); t419 vendor reswin draw chain (seam in
+researchview.h — no on-disk disassembly window exists, genuinely blocked);
+t416 pump cadence.
 OQ-027 closes ONLY on the user's final hearing verdict (D16 q8 "skip audio"
 stands as the port-choice off-ramp); OQ-016/OQ-019 stay DEFERRED — do NOT
 re-ask.
+
+t421 LANDED 2026-11-17 (0x892ac TILE-COLOUR SEAM CLOSED — PER-CLASS LAW
+REFUTED; full account docs/re/_wip_t421.md F0-F5 + pitfalls). MEASUREMENT:
+copy site 0x3c274..0x3c2d9 capstone-verbatim — mov $0x892ac is UNINDEXED
+(esi lifecycle: load is the ONLY write in the 13-insn window), movsd x2 =
+8 bytes to esp+0x310, and all FOUR vertex colour slots get the same
+immediate 0x960000=pal[150]; whole-image operand census (md.detail +
+X86_OP_IMM/MEM walk; raw scan's 76 hits were misalignment false positives)
+= EXACTLY ONE referrer 0x3c2a3, zero data-region pointers; callee 0x61770
+never touches the caller stack; esp+0x310 overwritten at 0x3c5b4; runtime
+mem[B+0x892ac] byte-verbatim 178/178 saved runs + deepest slot 60
+(scripts/r1_t421_c3_runtime.py RC=0). CONSEQUENCE: t418's per-class reading
+was a misparse; the port's uniform pal[150] fill IS the vendor law; no
+rewrite delta; t420's blanket "every seam needs a live witness" is FALSE —
+machine-closable work EXISTED. PLANETS-UI §12 + SUPERSEDED marker §11;
+REFUTED-ROUTES R-t421. PITFALLS BANKED: payload-vs-restored fixup delta
+0x82bb0 at 0x3c2a3 (0x66fc intra form); B = byte base, P0 = pointer-decode
+constant (first C3 cut read P0 -> 178 false DIFFERs, law-window control
+catches it); capstone linear sweeps desync on mixed code/data (skipdata=
+True or trust banked objdump grep); capstone only in ~/tools/revenv.
+LEDGER closes NOTHING (strict-close honest negative — seam has no OQ owner,
+t414..t420 precedent). Gate + audits below.
 
 t420 LANDED 2026-11-17 (PHASE-15 VERIFY + RE-EXPORT + PUSH + D16 SHEET; full
 account docs/re/packaging.md t420 block + docs/re/_wip_t420.md). Verification
