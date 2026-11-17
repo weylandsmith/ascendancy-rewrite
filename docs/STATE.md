@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-17T08:40
+updated: 2026-11-17T09:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,17 +230,31 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t418 — PLANET VIEW: THE PLANET ITSELF + TILE GRID (completes queue
-row t418, phase 15, D15). Full brief at its queue row below (planet view
-renders NO planet; vendor = PICTURE of the planet overlaid with colored
-ISOMETRIC squares, selectable, adjacent-to-structure -> build order). The
-planetalloc data law is already RE'd (tile grid, terrain colours,
-structure placement, adjacency) — render + cite the adjacency FUN, reuse
-the t406 project-set seam. NOTE from t417b: the status row sphere uses
-planets.shp terrainRow*5+sizeClass with the GROUP law a named seam
-(shp.md S23.3) — the planet-view disc wants the same class census at the
-LARGER ladder rungs (47px class), and the t406 17np k0 backdrop stays the
-state-17 frame (t417b proved declines are per-screen: state 10 only).
+NEXT t418b — PLANET VIEW IMPLEMENTATION (completes queue row t418, phase
+15, D15). THE LAWS ARE ALREADY MEASURED AND BANKED — docs/re/_wip_t418.md
+F0..F5 (this session): F1 GRID LAW (15-row diamond grid; rowWidth grid C @
+0x744a8 + rowOffset grid B @0x7445c from planitem.txt tokens 45..194; cell
+= cumWidth+C-index law, FUN_000395c4/0x3965c verbatim; worked example size
+class 2); F2 ISOMETRIC SCREEN LAW (center = origin + col*(34,17) +
+row*(17,-34), origin x-cursor 110 step +17/row to 365, y 410 step -34/row;
+diamond 68x34; hit-test |dx|/34+|dy|/17<=1; bare-tile fill pal[150],
+per-class colour NAMED SEAM); F3 ADJACENCY LAW verbatim (four FUN_000395c4
+probes row±1/col±1, ACTIVE-neighbour refuses, skips: cell>=+0x18, own cell
+ACTIVE, item 5, item 38); F4 DISC = planal[terrainRow].record(sizeIdx)
+[inferred, seam named — live-cache census would close]; F5 structure art =
+planitem k[item] (t254 1:1). BUILD: pure law in planetview.{h,cpp} (grid
+map from Campaign::planetAt: cellClasses/itemCells/items + config terrain
+grids — extend TerrainTables with B/C per the t294 loader, planitem.txt
+tokens 45..194), paint in ui.cpp kScreenPlanet branch (disc blit from
+extracted/ascend01/data/planalNN.shp 11 libs, tiles, planitem art), click
+tile -> select (diamond hit), build-order UI reuses the t406 project-set
+seam; the ACTIVE-neighbour refuse feeds the projectOrderable report
+(planetview.h already exposes why an order fails). Pins per F1/F2/F3
+(inverse-map round-trip over all 5 size classes, lattice step check,
+adjacency table incl. the four skip legs); witness via
+scripts/r1_ui_walk.sh status->row-click -> grade with OWN eyes (D13);
+screenshots t418-*.png. Self-grade: planet visible + tiles clickable +
+order lands.
 ORDERING RATIONALE: t417b landed (half-landed row closed); t419 stays
 LAST per the original rationale (its tree reuses the t416 Camera3d basis
 API and its CPU-stall fix is static-cited and independent); t420 (push +
@@ -261,6 +275,39 @@ vendor intro would close it. Vendor intro draw immediates now MAPPED
 (t415). Intro scroll driver seam stays (truncation printed once).
 (OQ-027 closes ONLY on the user's pasted `audio:` line + verdict;
 OQ-016/OQ-019 stay DEFERRED — do NOT re-ask.)
+
+t418 LANDED 2026-11-17 (PLANET VIEW — LAWS MEASURED; implementation ->
+t418b; full account docs/re/_wip_t418.md F0-F5). THE 15-ROW DIAMOND GRID
+LAW CLOSED [verified verbatim, FUN_000395c4 + FUN_0003965c disasm]: grid =
+15 row-slots per size class; valid cols B[size][row] <= col < B+C
+(B=rowOffset grid @0x7445c, C=rowWidth grid @0x744a8 — planitem.txt tokens
+45..119 / 120..194, loader FUN_00037fc0 t294; the t294 loader SKIPS grid B
+("no consumer") — IT NOW HAS THE CONSUMER); cell = cumWidth(size,row)+col-
+B[size][row], inverse walks rows while cum+B+C<=target (0x396af..0x396c2).
+ISOMETRIC LAW CLOSED [verified immediates, paint body 0x3b96c
+work/t198_planwin.asm 0x3bb2c..0x3c26d]: center = origin + col*(34,17) +
+row*(17,-34); x-cursor 110 +17/row (end 365), y 410 -34/row; tile diamond
+68x34 (corners x±0x22, y/y+0x22 mid y+0x11) — the lattice steps are exactly
+the diamond-tiling half-steps, so the four build-probe neighbours ARE the
+four visual edge-neighbours; hit-test |dx|/34+|dy|/17<=1. Bare-tile fill
+pal[150] (0x960000 x4 @0x3c274); per-terrain-class colour table 0x892ac
+{00 00 01 03 01 03 02 02} -> 24-byte vertex-parameter sets UNRESOLVED
+(NAMED SEAM). ADJACENCY LAW CLOSED verbatim (checker 0x385b7..0x3870d):
+four FUN_000395c4 probes (row±1,col),(row,col±1); ACTIVE (word+2 bit0)
+neighbour REFUSES an inactive new item; skips: cell >= WORD[+0x18], own
+cell ACTIVE, item 5 Colony, item 38 Xeno Dig. DISC PROVENANCE HONEST
+NEGATIVE: 0x3b98b blits slot 44 = 17np k4/k5 BACKDROP panels (625x357/
+416x316), NOT the disc; port will use planal[terrainRow].record(sizeIdx)
+(11 libs x 5-rung ladder 47/75/103/140/189, shp.md S23.3) [inferred];
+closing witness = live-RAM census of cache 0x9f10c selectors during a
+vendor planet-view frame. NATIVE-VISION grade of the vendor capture
+work/r1/screens/t254/02_planet_detail.png: sphere ~250px centred (390,320)
+under ISOMETRIC diamonds, structures ON tiles — confirms the shape law.
+Tooling pitfall banked: r331_disasm.txt is INTEL syntax; store census must
+parse dest-FIRST (three failed regex attempts before the fix). Tests
+UNCHANGED (no code touched — measurement iteration). MUTATION N/A.
+LEDGER: closes NOTHING (strict-close honest negative — D15 chrome rows
+have no OQ owner; t414/t415/t416/t417 precedent). Gate 0.
 
 t417b LANDED 2026-11-17 (PLANETS LIST BACKGROUND — IMPLEMENTATION OF THE
 MEASURED LAW; full account docs/re/_wip_t417.md F8-F10). D15 defect

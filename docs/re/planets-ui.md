@@ -389,3 +389,20 @@ scripts/t417b_statusbg_witness.sh + t417b_witness_census.py VERDICT PASS
 (including the census-caught weights/modulus bug: first-draft weights summed
 119 vs modulus 98, starving the rare teals — rekeyed to sum EXACTLY 98);
 suite 413/0. Working log docs/re/_wip_t417.md F8-F9.
+
+## 11. PLANET-VIEW GRID + ISOMETRIC + ADJACENCY LAWS MEASURED (t418, 2026-11-17)
+Implementation deferred to t418b; full derivations docs/re/_wip_t418.md F1-F5:
+- GRID (FUN_000395c4/0x3965c, work/r331_disasm.txt): 15 row-slots per size
+  class; valid cols B[size][row]..B+C; cell = cumWidth(size,row)+col-B.
+  B = grid B tokens 45..119 (DAT 0x7445c) + C = grid C tokens 120..194
+  (DAT 0x744a8) of planitem.txt (loader FUN_00037fc0, t294). The t294
+  loader skipped grid B "no consumer" — grid B's consumer is NOW CITED.
+- ISOMETRIC (paint body 0x3b96c, work/t198_planwin.asm 0x3bb2c..0x3c26d):
+  center = origin + col*(34,17) + row*(17,-34); x-cursor 110 +17/row (end
+  365), y 410 -34/row; tile diamond 68x34; hit |dx|/34+|dy|/17<=1; bare
+  fill pal[150]; per-class colour table 0x892ac UNRESOLVED (named seam).
+- ADJACENCY (checker 0x385b7..0x3870d): four probes (row±1,col),(row,col±1)
+  via 0x395c4; ACTIVE (word+2 bit0) neighbour refuses an inactive new item;
+  skips cell>=+0x18, own-ACTIVE, item 5, item 38.
+- DISC: vendor provenance inside 0x3b96c UNRESOLVED (0x3b98b = 17np k4/k5
+  backdrops); port default planal[terrainRow].record(sizeIdx) [inferred].
