@@ -1492,6 +1492,8 @@ cite the FUN). Self-grade: planet visible + tiles clickable + build
 order lands in PLANETALLOC state.
 
 t419 RESEARCH SCREEN: CPU STALL FIX + 3D TREE REBUILD + CORNER EXIT
+(CORNER EXIT IS GLOBAL — see t419b; anything you build here is the seed
+of the shared component, NOT a research-only feature)
 (user D15 addendum: screen pegs one core at 100%, input + window close
 queue behind it and drain MINUTES later — console spurt like 'ui
 research readout Orbital Structures'; last round's 'Esc trap' is the
@@ -1523,6 +1525,23 @@ sets study; screenshots t419-*.png. (b) CORNER EXIT POPUP stays:
 census shp libs for the Exit<ESC> art (user recalls an image found in a
 previous round — grep prior docs) + windows.txt corner sections; mouse
 in corner rect -> popup renders; Esc returns.
+
+t419b CORNER "Exit <ESC>" — GLOBAL UI ELEMENT (user clarification
+2026-11-17, verbatim: "the corner exit isn't just in the research
+screen, that's a UI element across the whole game"). ART LEAD ALREADY
+BANKED: docs/re/shp.md:931 — the glyph is mouse.shp k6 (78x47 tile, the
+sibling of k0 "NEXT TURN <ENTER>"); _wip_d1page.md:24 has the crop +
+glyph dims. Scope: ONE shared component painted on EVERY full-screen
+view (map, system view, planets list, planet view, ships, research,
+species, intelligence, new game, race intro) at the vendor corner rect
+(census: which corner per windows.txt — the EXIT window section L2001 +
+mouse.shp's owning window's X0/Y0; do NOT eyeball). Behavior: mouse
+enters the corner rect -> popup renders (art + text per the tile); Esc
+per the t405 screen-stack law (sub-screen -> map; map -> title menu,
+cite which the vendor does). Register it as a component with a per-
+screen presence test (walk every screen, assert the corner responds) so
+a new screen can't forget it. If t419 already shipped a research-only
+version, GENERALIZE it rather than duplicating.
 
 t420 PHASE-15 VERIFY + PUSH + HANDOFF (push-gap law MANDATORY). Full
 gate + run_tests + seed regression byte-identical; export; fetch FIRST;
