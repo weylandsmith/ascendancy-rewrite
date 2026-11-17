@@ -1521,8 +1521,7 @@ cite the FUN). Self-grade: planet visible + tiles clickable + build
 order lands in PLANETALLOC state.
 
 t419 RESEARCH SCREEN: CPU STALL FIX + 3D TREE REBUILD + CORNER EXIT
-(CORNER EXIT IS GLOBAL — see t419b; anything you build here is the seed
-of the shared component, NOT a research-only feature)
+(corner popup built campaign-wide — user confirmed 2026-11-17 this matches the vendor: the original has no title-screen popup)
 (user D15 addendum: screen pegs one core at 100%, input + window close
 queue behind it and drain MINUTES later — console spurt like 'ui
 research readout Orbital Structures'; last round's 'Esc trap' is the
