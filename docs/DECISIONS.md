@@ -416,3 +416,47 @@ planets-list background (q6), the planet itself (q7), audio carried (q8 — say
 hearing verdict). Radio + notes post straight into this file as a USER: block.
 Best graded from a live run after `git pull` (remote main == 96921269e926
 including t414..t419b); shots are the fallback.
+
+## D17 — DERIVE-FROM-RE + PER-SCREEN ITERATION (USER, 2026-11-17, freeform)
+
+Directive 1 (verbatim): "Can you derive the exact UI drawing paradigms
+from reverse engineering" — every chrome/texture/art claim must cite a
+shape record (lib + idx + dims) or a FUN address; synthetic stand-ins
+(hash-noise texture, vector rings, shell-shell starfields) are banned.
+The planet-screen frame is the proof the method works (user: "You've
+gotten the frame exactly right there! How did you get that, can you
+apply that process to the other screens?") — windows.txt TYPE-29 panel
+table + cited paint dispatch + planetalloc terrain law.
+
+Directive 2 (verbatim): "instead of doing eight turns at a time doing
+minor incremental improvements, is there any reason we can't have it go
+through and work on a screen, do a comparison, and work on that screen
+again, iterating until it's right?" — phase 16 restructured to
+per-screen rows with internal walk->grade->fix->re-walk->re-grade
+cycles; a row closes only when its own native-vision grade is clean;
+unfinished rows re-queue as "<tag> CONT cycle N+1" (fresh tag arms the
+wake trigger).
+
+Round-4 grade items (all queued t422-t429): chrome texture grainier/
+larger than original EVERYWHERE; new-game wheel icons repeating + no
+hostile-atmosphere art + extra art under circles; species/planet art 4x
+size; species rings need thick textured lines; preview starfield shell-
+mapped not volume-filled, stars too small; original spins the starfield
+on the Begin New Game button; race intro bg greyscale, text unreadable,
+framing simple lines; galaxy dial rotates continuously on click (ours)
+but original does not; 3 of 8 lower-right map buttons dead; player
+filter buttons missing art; map border missing; player icon upper LEFT
+(user correction, not upper right); home star shows player icon + two
+rings at game start (meaning of rings [unverified] — census, don't copy
+the guess); planets list derive-from-RE; planet screen: top-row art,
+planet frame bg, planet art too small + covered by squares, squares
+drawn wrong, tile click pops a content-dependent window, orbital
+structures on left missing; corner popup drawn but INERT (no action);
+ships/research/special-ability/species still wrong.
+
+Process notes: web ruling sheet PAUSED ("nice workflow tool in general,
+but we just need to get nearer to the mark for it to be a good fit") —
+user answers freeform in chat; t430 handoff must NOT build a sheet.
+GhidraMCP headless v7.0.0 CONNECTED 2026-11-17 (check_connection OK):
+arbitrary-address decompiles available — the t419 "no on-disk
+disassembly window" block is RETIRED.

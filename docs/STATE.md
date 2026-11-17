@@ -1762,13 +1762,172 @@ blob at old tip 5373c66) is ACCEPTED risk by the user. Current remote
 history verified clean (fail-closed gates in publish_public.sh).
 REMOVED ITEM: GitHub backend GC may still serve old commit SHAs (Removal mechanics landed: docs/assets fully filtered,
 fail-closed gate + .gitignore, local copies untracked.)
+
+PHASE-16 QUEUE (authored ON USER RULING D17 2026-11-17 — DECISIONS.md;
+per-screen iteration structure, RE-FIRST LAW). Ordering: t422 first
+(one shared root cause: the chrome texture appears wrong on EVERY
+screen the user graded); then one row per screen in flow order; then
+verify+push. A COMPLETING SESSION REWRITES NEXT TO THE NEXT ROW
+VERBATIM (t422->t423->...->t432; after t432 park WAIT-USER-RULING).
+
+PHASE-16 DERIVE-FROM-RE LAW (binding every row; user D17 verbatim:
+"Can you derive the exact UI drawing paradigms from reverse
+engineering"; proof it works: the planet-screen frame landed EXACTLY
+via windows.txt panel table + cited paint dispatch — "can you apply
+that process to the other screens?"):
+  (1) NO SYNTHETIC STAND-INS. Every pixel class the user can see
+      (frame texture, ring stroke, star, icon, background) must trace
+      to a shape record (lib + record idx + dims from the shp census)
+      or a cited FUN address. splitmix64 hash-noise texture, hand-
+      drawn vector rings, and shell-mapped star dots are BANNED
+      placeholders — replacing one with derived art is progress;
+      adding a new synthetic one is a gate-level regression.
+  (2) DERIVE BEFORE CODING: per screen, decompile the vendor draw
+      chain FIRST (GhidraMCP headless v7.0.0 CONNECTED — check via
+      mcp ghidra check_connection; if down, fall back to banked
+      docs/re disassembly windows, and if the window is missing that
+      is an honest seam NAMED in the wip, not a licence to guess),
+      read the windows.txt table for the screen's windows (rects,
+      STATE, SHAPEFRAME, SENDMESSAGE/SENDPARAM), census which shape
+      lib+record the draw code selects, bank law + citations in
+      docs/re/_wip_tNNN.md, THEN implement.
+  (3) ITERATE TO CLEAN (user D17 verbatim: "work on a screen, do a
+      comparison, and work on that screen again, iterating until it's
+      right"): within the session, loop walk (scripts/r1_ui_walk.sh)
+      -> native-vision grade vs vendor refs (user screenshots in
+      scratchpad/ where present + own captures; vendor pixels are
+      always allowed) -> fix -> RE-WALK -> RE-GRADE. Mechanical
+      supports: render_mass_probe.sh zone masses, dims census
+      (drawn px vs record px — the 4x-scale class), md5 of painted
+      planes vs vendor-decoded planes (identity without vision).
+  (4) CLOSE LAW: a row closes only when its own final grade lists no
+      fixable-with-available-evidence defect AND its pins pass. If
+      defects remain at session end, rewrite NEXT to "<tag> CONT
+      cycle N+1" with the defect list verbatim (fresh tag arms the
+      wake trigger; a new session continues the cycle). Max 3 cycles
+      per screen, then bank the honest seam naming the missing
+      evidence.
+  (5) USER-TESTIMONY PRECEDENCE: round-4 items (D17) are the seed
+      defect list per screen; they do NOT cap the grade — the walk
+      may find more.
+
+t422 CHROME LAW — TEXTURED FRAME DERIVED FROM RE (ROOT-CAUSE ROW,
+runs FIRST). The synthetic hash-noise chrome (mapchrome texture-
+ColourAt / splitmix64, menulaw §4, statusbg, title) reads "larger,
+grainier than the original" on every screen (D17). Derive the real
+law: the vendor chrome is SHAPE ART — census the shp libs (165 files
+under extracted/ascend01/data/) for the frame/border families: the
+t391 note "vendor lacks 18*.shp" needs RE-VERIFICATION against the
+full lib list (13negot, 3cfgnew, 7racesel, 20res, 0opening, 2savegam,
+4loadgam... every window's chrome must come from SOME lib; windows.txt
+SHAPEFRAME fields + each window's paint FUN name the record). Ghidra:
+pick a window WITH textured chrome (e.g. a TYPE-29 panel or a dialog)
+and decompile its paint body — find the blit of frame tiles/records
+(corner+edge+tile tiling law? whole-panel records?). Deliverable: a
+CHROME LAW doc (docs/re/chrome.md): for each chrome class, lib+record
++dims+tiling, cited; a shared drawFrame() in the port using ONLY
+derived records; migrate EVERY screen off the synthetic texture in
+this row or name per-screen migration debt explicitly. Grade: side-
+by-side of one frame vs vendor pixels at 1:1 (md5 painted vs decoded
+is the identity pin). CONT cycle: remaining screens' migrations.
+
+t423 NEW GAME SCREEN CYCLE (seed defects D17): wheel icons repeat
+across steps AND hostile-atmosphere variant missing AND extra art
+drawn below the circles (census 3cfgnew.shp records per option step —
+the vendor TEXTITEM/SHAPEFRAME table in beginnew.txt names which
+record per state); species + planet art STILL 4x (dims pin: drawn
+rect == record dims /2 or as-cited — find the vendor scale law, do
+not eyeball); species rings need THICK TEXTURED lines (chrome law
+from t422 or the ring's own record, not a vector stroke); preview
+starfield fills the VOLUME not a shell, stars LARGER + pixelated
+(decompile the newgame preview draw — vendor star sprite + placement
+law: volume sampling, sprite size); Begin New Game BUTTON spins the
+starfield too (vendor law: spin pump while button held/hovered?
+census the button's SENDMESSAGE). Framing via t422 chrome law. Grade
+clean per close law.
+
+t424 RACE INTRO SCREEN CYCLE: background greyscale + text unreadable
+(root cause likely palette: the intro art needs the vendor palette
+transform the gif/cine path applies — decompile the intro screen
+paint, cite the palette source) + textured framing via t422 + race
+portrait position/size per the draw chain (t412's FUN_0002b48a lead).
+
+t425 GALAXY MAP CONTROLS + LIVENESS CYCLE: (a) dial SPIN LAW — ours
+rotates continuously on click, the original does NOT (D17): decompile
+the 8-button control cluster handlers (1starmap control windows,
+SENDPARAM law) — discrete step per click? latch-until-release? timed
+burst? implement the cited law; (b) THREE of the eight lower-right
+buttons DEAD — windows.txt table lists all eight with
+SENDMESSAGE/SENDPARAM; route each to its cited effect, verify each
+changes state (log line or frame diff); (c) player FILTER buttons
+missing art (census starmap/race lib for filter glyphs — t416 banked
+some filter law, reuse); (d) corner Exit popup is DRAWN BUT INERT
+(D17) — click on it must EXIT per screen per the t405 stack law;
+handler missing; wire + witness per screen.
+
+t426 GALAXY MAP VISUALS CYCLE: map BORDER missing (chrome law t422 +
+windows.txt COSMOS rect); PLAYER ICON UPPER LEFT (user correction
+2026-11-17 verbatim: "the galaxy map is supposed to show the player
+icon in the upper left, not the upper right" — census the status-bar
+icon records, 10status.shp lead); HOME STAR shows player icon + TWO
+rings at game start (user: smaller player-colour ring + larger white,
+meanings [unverified] — derive from the draw code which condition
+paints each ring; do NOT copy the guess); chrome texture per t422.
+
+t427 PLANETS LIST SCREEN CYCLE (user D17: "hard to describe, hoping
+you can just derive the drawing rules from reverse engineering"):
+full derive-from-RE pass on PLANLIST (windows.txt line ~1504 rect +
+paint FUN + planets.shp record selection per row: owned vs unowned
+marker law, row layout, scroll window law per menulaw three-slot
+precedent); grade vs scratchpad refs + vendor pixels.
+
+t428 PLANET SCREEN CYCLE (frame ALREADY EXACT — do not touch it;
+seed defects D17): top-row art missing (TYPE-29 panels PLRES/PLIND/
+PLPOP/PLPOP dispatch keys 0..4 paint which records? census); planet
+frame BACKGROUND missing (17np.shp already loaded — which record?);
+planet art TOO SMALL + covered by the squares (z-order: vendor paints
+planet THEN grid? dims per F4 law; squares overlay per-cell but the
+planet must read through); SQUARES DRAWN WRONG (compare diamond law
+|dx|/34+|dy|/17 hit vs vendor painted diamond dims — the FILL and
+OUTLINE records/colours come from the paint FUN, cite); tile click
+pops a CONTENT-DEPENDENT WINDOW (PLSQUARE child msg law + which
+window per tile state — empty/owned/structure); ORBITAL STRUCTURES
+column on the LEFT missing (planets-ui law).
+
+t429 SHIPS SCREEN CYCLE: full pass — derive the fleet list paint
+(fleetlist law banked t402 era; grade it against vendor now), row art
+(ship class sprites), selection/info panel, per close law.
+
+t430 RESEARCH SCREEN CYCLE: grade the t419 rebuild against the D15-
+addendum spec (3D tree, right info frame, Z-rotate + scroll controls,
+corner popup) + the live re-check list (spin latches per t425 law,
+Esc instant, no CPU peg — ps -o pcpu assertion); fix what fails.
+
+t431 SPECIES SCREEN + SPECIAL ABILITY CYCLE: species screen "quite
+off" (derive its window paint chain + race art records); SPECIAL
+ABILITY BUTTON DOES NOTHING (windows.txt button SENDMESSAGE -> which
+handler? decompile the target; implement or bank the honest negative
+IF the handler provably requires state we cannot reach — name the
+witness).
+
+t432 PHASE-16 VERIFY + PUSH + HANDOFF (push-gap law MANDATORY): full
+gate + run_tests + seed regression byte-identical; export; fetch
+FIRST; push; ls-verify (public SHAs never exist locally — ls-remote
+is truth). HANDOFF: NO ruling sheet (user D17: web sheet paused —
+"we just need to get nearer to the mark for it to be a good fit");
+instead rewrite NEXT to WAIT-USER-RULING and record in the LANDED
+block the per-screen final grade table (clean / CONT-cycled / honest
+seam) so the user's next freeform round grades against our own
+claims.
+
+
 Standing context: OQ-016/OQ-019 acceptance DEFERRED (rows stay OPEN; do
 NOT re-ask, do NOT apply the t329 S4 draft); user saves 887/1086/1253
 PROTECTED (~/ascendancy-saves-protected/, law: raw .SAV u32@0 = game-day).
 A session woken by a DECISIONS.md edit or a *ruling*/*reply* file: read
 docs/DECISIONS.md, apply what the ruling says, close rows per strict-close,
 then author the next queue or re-park a WAIT sentinel.
-QUEUE: EMPTY — phases 10-14 fully drained (t385..t413 all LANDED; per-row
+PHASE-16 QUEUE ACTIVE (t422..t432, above) — phases 10-15 fully drained (t385..t420 all LANDED; per-row
 text lives in git history + LANDED blocks). Phase-15 queue authored ON USER
 RULING (see NEXT carried items H1-H4).
 
