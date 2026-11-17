@@ -380,3 +380,26 @@ Compile warning (sign-compare x2 test_statuslist_t402.cpp) fixed on
 receipt: 0 warnings, 401/0. Corner "Exit <ESC>" popup: user recalls an
 image found earlier — census the shp libs for it (t419). Comparison
 screenshots: welcome but not required (D13 self-grade is the bar).
+
+### D15 addendum (user, 2026-11-16): RESEARCH SCREEN CPU STALL + spec
+
+> what's happening on the research screen is that it's pegging the CPU to
+> 100% ... couldn't even kill the task, and slowly, eventually, some
+> events displayed in the console, like "ui research readout Orbital
+> Structures" ... After a couple of minutes, it finally finished
+> processing whatever it was choking on, and the window closed.
+> ... the research screen should be another 3d rotating dealie, with an
+> info frame at the right-hand side, and controls for rotation (about the
+> z-axis) and scrolling (up/down) in the lower right. ... see if you can
+> derive the rendering process from reverse engineering.
+
+ASSISTANT STATIC ROOT CAUSE (cited, pre-loop): researchview.cpp:99-124
+researchDepth() memo.clear()s its thread_local memo on EVERY call and
+re-walks the full prereq graph; researchNodePos (127-138) calls
+researchDepth once per slot row -> O(row x graph) per node position;
+the painter (ui.cpp:1444-1466) recomputes ALL node positions EVERY frame
+at ~60 fps (WaitEventTimeout(16) redraw loop) AND researchHit (140-165)
+repeats the O(n^2 x graph) sweep per click. Result: one core pinned
+painting; clicks/close queue behind the stall and drain slowly = the
+observed console spurt + delayed close. The D14 "trapped in research,
+Esc doesn't work" is LIKELY THE SAME STALL, not a handler bug.
