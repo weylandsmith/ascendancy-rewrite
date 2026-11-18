@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-17T22:40
+updated: 2026-11-18T04:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,45 +230,64 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t423 CONT cycle 3 (ordering rationale: cycle 2 CLOSED the
-player-colour reassign law end-to-end (chip hit + FUN_000232ec + the
-DECISIVE racering-index==colour-index discovery, all ported with pins and
-witnesses — docs/re/t423-newgame-law.md SS9/SS10) and graded the screen
-clean on the art defects, but defect (d)'s CITED scale-source law is the
-one honest negative left; the row cannot close (close law 4) until either
-the TYPE-10 paint site is cited or the route is exhausted like t422's
-noise hunt. WORK ITEMS: (1) TYPE-10 PAINT-SITE HUNT (scale law): the
-cycle-2 static probes banked where NOT to look (RACELIST string has zero
-data refs; class-name strings are strcmp-matched in the 0x52xxx handler
-family, never pointer-referenced; the only stretch blitter with a
-computed size is the cosmos class 0x185d8 [obj+0x4f38] law, wrong class).
-Route: the row paint goes through the invalidate chain call dword
-[win+0xa7]+0xc (seen at 0x52daa/0x52e28) — resolve the vtable for the
-RACELIST window instance statically via the window-class table (the
-0x52xxx family's constructor set at window registration) and decompile
-the paint slot; look for the FUN_0001fc34->FUN_0005d5a1 (or 0x61058
-dims) call with a scale arg. If two probe sessions find nothing, declare
-the MEASURED-2x law the ceiling (t422 precedent: elimination census +
-cited mechanism, seam named) and grade-close (d). (2) CAMPAIGN-SIDE
-byte+8 PLUMBING (cycle-2 named seam): 78 stride-0x1ee sites consume
-race-record +8; census which read it for MAP/entity tinting (candidates:
-the 0x44xxx cluster near the diplo matrix code, 0x36xxx/0x37xxx) and map
-honestly to ui kOwnerRgb — if the vendor byte+8 feeds only UI ring/icon
-tints already covered, say so and close the seam. (3) FINAL GRADE:
-re-shoot t412 + t423_hostile + t423c_chip; if clean, write the row CLOSED
-line (t423 row, phase-16) with the per-defect scoreboard; else CONT cycle
-4 honestly. Tooling: GhidraMCP check_connection OK (v7.0.0-headless);
-capstone/PIL via /home/hrethric/tools/revenv/bin/python; restored DB
-coverage SPARSE — t399_disasm.py + t423_immcensus.py for undefined
-regions; vtable hunt = read the .rdata around each class's first
-referenced method (e.g. FUN_000185d8's family).
-Trigger check FIRST as always: USER: lines after the D17 block in
-docs/DECISIONS.md win; a new playcap sitting outranks this (re-run
-scripts/r1_t85g_sitting.py FIRST). t423c checked both as of 2026-11-18:
-none (timeline mtime Nov 12; last USER: line 301). Do NOT re-ask anything
-the D16 sheet already asks; web ruling sheet STAYS PAUSED per D17.
+NEXT t424 PHASE-16 VERIFY + RE-EXPORT + PUSH + D17 SHEET (ordering
+rationale: t423 cycles 1-3 are LANDED and the defect scoreboard for the
+New Game screen is complete — every defect closed or grade-closed with a
+named seam (docs/re/t423-newgame-law.md SS1-SS13, _wip_t423c3.md C3-F10);
+the remaining seams (selector-word->record binding via live BPLM at
+0x52867, pump cadence, param_7/8/9 exact semantics) are either heavy-live
+or user-acceptance rows, so the ONE valuable next task is shipping: the
+public remote is still at t420's 9692126 while local has t421..t423c3 —
+a 6+ commit gap. WORK ITEMS: (1) gate + run_tests + SEED REGRESSION seeds
+1/2024/23 md5 vs record (t423 touched display + newgame click law — the
+chip click CANNOT move sim md5s: FUN_000232ec equivalent assignRaceColours
+runs BEFORE buildCampaign? VERIFY at run_tests level; if md5s move, the
+rng-consumption law broke — stop and write the defect); (2) export
+/tmp/pubpush-t424 vendor-free (publish_public.sh, t396 hardened scan),
+data-less build + tests, gate --portable; (3) push fast-forward with
+set-url BEFORE fetch (t389 trap), ls-remote verify, askpass delete;
+(4) D17 sheet via scripts/t420_grading_page.py pattern: the t423 shots
+(/tmp/t412_shots, /tmp/t423_shots, /tmp/t423c_shots — bank to work/r1/loop/
+FIRST) + the t422 chrome field; scratch-8699 self-test protocol per t420.
+Tooling: health-check :8613 FIRST (WAKE PROCEDURE). Do NOT re-ask anything
+D16/D17 already asks; web ruling sheet STAYS PAUSED per D17.
 OQ-027 closes ONLY on the user's final hearing verdict; OQ-016/OQ-019
 stay DEFERRED — do NOT re-ask.
+
+t423 CYCLE 3 LANDED 2026-11-18 (SCALE-LAW PAINT SITE CITED + BYTE+8
+CENSUS CLOSED + FINAL GRADE PASS; working log docs/re/_wip_t423c3.md
+C3-F0..F10; laws docs/re/t423-newgame-law.md SS12/SS13). MEASUREMENTS:
+(i) PAINT-VTABLE ARCHITECTURE: window field +0xa7 = class vtable, paint/
+invalidate slot +0xc; FOUR data-pool vtables registered by ctors
+0x1abe6/0x31c5a/0x4d956/0x5b265 (0x88498/0x88838/0x88ac4/0x88c24, stride-4);
+census scripts/t423c3_a7census.py. PITFALLS: the low-region +0xa7 imms are
+SCRIPT pointers (different class, movsd chains) — conflated on first pass;
+0x49359 is a memset ZEROING loop not a registration. (ii) vtable 0x88838
+slot 0x32314 = generic shapeitem-list paint: FUN_0001fc34(0x9f10c,
+sel=word[win+0x18]) + FUN_0005caac NATIVE run-decode + child-record loop
+(stride 0xe, type->tint jump table 0x322f4, assert shapefile.cpp:0x186b).
+(iii) DECISIVE (d): the state-3 paint function 0x526b4 (sole rel32 caller
+0x52174, bounds == bottom panel EXACT) contains the CITED STRETCH SITE
+0x52834..0x52877 — FUN_0005d5a1 called with NON-IDENTITY 16.16 affine args
+(0,0x8000,0x8000; identity=(0,0x10000,0x10000) per decompile head) = the
+vendor stretches the portrait record at this site; the 0x62 immediate is
+the COLOUR arg (pal[62]) NOT a width (w98 coincidence superseded); exact
+param semantics unresolved statically (named seam: selector ds:[0x6fd98]
+->record, decider BPLM 0x52867). MEASURED 2x stands as the scale law.
+(iv) CHIP CHAIN COMPLETE: 8 native blits x=379+16i via 0x53ee0 (tint ramp
+pal[byte*4+0x13-k] from record +8), click stores word[win+0xb5] THEN
+FUN_000232ec THEN repaint — port law exact incl. the field. (v) BYTE+8
+CENSUS CLOSED "UI-only": imm 494 = EXACTLY 3 sites, the 0x44xxx pair is a
+494-byte rep movsd RECORD COPY; [reg+8] byte reads 4/49k instrs none
+race-adjacent => no campaign/map tinting consumer exists; cycle-2 "78
+stride sites" premise was record copies. SEAM CLOSED honestly.
+(vi) FINAL GRADE: t412/t423_hostile/t423c_chip witnesses all re-shot exit
+0 + native-vision PASS (distinct wheels, solid DESC, ring portrait, 7
+chips, red hostile orb). DEFECT (d) GRADE-CLOSED per the row's budget law
+(t422 precedent). No code delta (measurement iteration); tests UNCHANGED
+423/0/0. GATE_EXIT=0; LEDGER AUDIT OK 17/3 (closes NOTHING — New Game
+laws have no OQ owner, t414..t423c2 precedent). NEXT -> t424 verify+push.
+
 
 t423 CYCLE 2 LANDED 2026-11-18 (PLAYER-COLOUR LAW + RING-INDEX DISCOVERY;
 working log docs/re/_wip_t423c2.md C2-F0..F7; laws docs/re/t423-newgame-law.md

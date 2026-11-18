@@ -181,3 +181,63 @@ a cited field read. Defect (d): grade-clean in the t412 witness, LAW
 UNCLOSED — cycle 3 owns the TYPE-10 paint-site hunt (route: walk the
 0x52xxx handler family's invalidate/paint vtable via [win+0xa7]+0xc, or
 live-RAM frame pair).
+
+
+---
+
+## SS12 — Paint-vtable architecture + cited stretch paint site (t423 cycle 3)
+
+PAINT DISPATCH [verified disasm 0x52daa/0x52e28/0x52e49 + ctor census
+scripts/t423c3_a7census.py]: window objects carry a class vtable pointer at
+field +0xa7; invalidate/repaint = `call dword [win+0xa7]+0xc` (eax=window,
+edx=0). FOUR classes register data-pool vtables (ctors 0x1abe6/0x31c5a/
+0x4d956/0x5b265 -> 0x88498/0x88838/0x88ac4/0x88c24, stride-4 entries, slot
++0xc = 3rd entry). Base defaults recur: 0x30d08/0x311b8/0x316f0. The
+low-region (+0xa7) imms in the census land in the script region = a
+DIFFERENT object class (movsd chains), not vtables. PITFALL: 0x49359
+`mov [ebx+0xa7],ecx` is a memset ZEROING loop, not a registration.
+
+GENERIC SHAPEITEM-LIST PAINT (vtable 0x88838 slot 0x32314) [verified disasm]:
+fetch FUN_0001fc34(cache 0x9f10c, sel=word[win+0x18]) -> FUN_0005caac NATIVE
+1:1 run-decode blit; then loop child records (stride 0xe at [win+0xab], count
+word[win+0xaf]): child+0xa type byte -> jump table 0x322f4 (tint 0..4; >7
+asserts shapefile.cpp:0x186b) -> SAME lib re-fetch sel=type+child[0xa], blit
+at child rect minus window origin. FUN_0005caac is THE native blitter
+(75 call sites; RLE, zero scale math).
+
+CITED STRETCH PAINT SITE FOR THE NEW-GAME PORTRAIT (defect d) [verified
+disasm 0x526b4 whole function; sole rel32 caller 0x52174]: the state-3 paint
+function (frame bounds x379..632 y472 == bottom panel EXACT) contains at
+0x52834..0x52877: push (0, 0x8000, 0x8000, 0, rect@0x48c44, [win+0xb1]>>16,
+colour 0x62, sel=word ds:[0x6fd98]) -> FUN_0001fc34 -> FUN_0005d5a1. Per the
+blitter's head (decompile): (param_7,8,9)==(0,0x10000,0x10000) = identity ->
+plain native path; the site's 0x8000 args are 16.16 AFFINE parameters fed to
+FUN_000604e9 (sin/cos vertex builder, table 0x8408..0x8457) — a NON-IDENTITY
+stretched draw of the selector's record AT THIS SITE. The 0x62=98 immediate
+is the COLOUR arg (pal[62] frame-colour law t415), NOT a width (the
+w=0x62=98 coincidence is superseded). Exact param semantics UNRESOLVED
+statically (cdecl stack model defeats the decompiler; the cosmos site 0x18635
+pushes an FPU-computed size into the same slots) — MEASURED 2x (C2-F4
+elimination census) remains the operative scale law; the remaining named
+seam = selector word ds:[0x6fd98] -> record binding (decider: live BPLM at
+0x52867 reading ecx/edx).
+
+CHIP ROW + CLICK FULL CHAIN [verified disasm 0x525eb..0x52647 + 0x529d2]:
+8 native chip blits x=379+16i (sel word ds:[0x6fd84]) via 0x53ee0 (tinted
+blit — builds a 5-entry ramp pal[byte*4+0x13 - k] from the race-record +8
+colour byte, then 0x5cf96); selected slot (si==word[win+0xb5]) paints the
+0xf3 well instead. Click: zone test x379..493 y420..472 -> idx=(x-379)>>4 ->
+STORE word[win+0xb5] -> FUN_000232ec(0x12e10, idx) -> [win+0xa7]+0xc repaint.
+The port's click->assign->ring-update law is EXACT including the field.
+
+## SS13 — byte+8 consumer census CLOSED "UI-only" (t423 cycle 3)
+
+[verified] imm 494 (stride 0x1ee) exists at EXACTLY 3 code sites (0x25627,
+0x44207, 0x4425f); the 0x44xxx pair is a 494-byte `rep movsd` RECORD COPY
+(load/insert path), not a tinting consumer. Direct byte reads [reg+8]
+(8A mod01 disp8=8): 4 sites image-wide, none race-record-adjacent; SIB/movzx
+variants: zero. CONCLUSION: the vendor consumes race-record byte+8 ONLY in
+the UI/intro paths the port already models (ring index SS9/SS10 law, chip
+tint ramp 0x53ee0, intro ink game.pal[byte*4+0x13] t412, FUN_000232ec
+write). No campaign/map tinting consumer exists; the cycle-2 "78 stride
+sites" premise was record copies. SEAM CLOSED.
