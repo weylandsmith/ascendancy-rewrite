@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-18T04:10
+updated: 2026-11-18T04:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,29 +230,64 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t424 PHASE-16 VERIFY + RE-EXPORT + PUSH + D17 SHEET (ordering
-rationale: t423 cycles 1-3 are LANDED and the defect scoreboard for the
-New Game screen is complete — every defect closed or grade-closed with a
-named seam (docs/re/t423-newgame-law.md SS1-SS13, _wip_t423c3.md C3-F10);
-the remaining seams (selector-word->record binding via live BPLM at
-0x52867, pump cadence, param_7/8/9 exact semantics) are either heavy-live
-or user-acceptance rows, so the ONE valuable next task is shipping: the
-public remote is still at t420's 9692126 while local has t421..t423c3 —
-a 6+ commit gap. WORK ITEMS: (1) gate + run_tests + SEED REGRESSION seeds
-1/2024/23 md5 vs record (t423 touched display + newgame click law — the
-chip click CANNOT move sim md5s: FUN_000232ec equivalent assignRaceColours
-runs BEFORE buildCampaign? VERIFY at run_tests level; if md5s move, the
-rng-consumption law broke — stop and write the defect); (2) export
-/tmp/pubpush-t424 vendor-free (publish_public.sh, t396 hardened scan),
-data-less build + tests, gate --portable; (3) push fast-forward with
-set-url BEFORE fetch (t389 trap), ls-remote verify, askpass delete;
-(4) D17 sheet via scripts/t420_grading_page.py pattern: the t423 shots
-(/tmp/t412_shots, /tmp/t423_shots, /tmp/t423c_shots — bank to work/r1/loop/
-FIRST) + the t422 chrome field; scratch-8699 self-test protocol per t420.
-Tooling: health-check :8613 FIRST (WAKE PROCEDURE). Do NOT re-ask anything
-D16/D17 already asks; web ruling sheet STAYS PAUSED per D17.
-OQ-027 closes ONLY on the user's final hearing verdict; OQ-016/OQ-019
-stay DEFERRED — do NOT re-ask.
+NEXT t425 GALAXY MAP CONTROLS + LIVENESS CYCLE (ordering rationale: t424
+shipped everything through t423c3 — remote main == 8525086bc31bea4d458dbe8
+d6b2822259b16c322 verified by ls-remote — and the D17r2 fallback sheet is
+live on :8613; the phase-16 queue's next row is the galaxy-map controls
+because FOUR defects there are machine-attackable static work (no user
+ruling needed to START): (a) dial SPIN LAW — ours rotates continuously on
+click, the original does NOT (D17 verbatim); decompile the 8-button
+control-cluster handlers (1starmap windows, SENDPARAM law): discrete step
+per click vs latch-until-release vs timed burst — CITE the law, implement
+it (this SUPERSEDES the t416 latch model, which was recovered from the
+msg-50..55 handlers but contradicts the user's live observation — check
+whether the pump applies only while the button stays pressed / whether a
+stop-message exists on release); (b) THREE of eight lower-right buttons
+DEAD — windows.txt lists all eight with SENDMESSAGE/SENDPARAM; route each
+to its cited target, verify each changes state (log line or frame diff);
+(c) player FILTER buttons missing art — census starmap/race libs for the
+filter glyphs (t416 banked partial filter law, reuse); (d) corner Exit
+popup DRAWN BUT INERT — click must exit per screen per the t252/t405
+stack law; wire handler + witness per screen. Iterate per the D17
+walk->grade->fix->re-grade law; re-queue as "t425 CONT cycle N+1" if the
+cycle budget hits mid-row. WORK ITEMS: GhidraMCP headless is CONNECTED
+(check_connection OK per D17 block) — use it for the handler decompiles;
+witness = a scripts/t411_maplook_witness.sh-pattern script asserting each
+button's state change; pins per screen law; D17 law (1): no synthetic
+stand-ins — filter art must cite a shape record. Tooling: capstone only
+in ~/tools/revenv; r331_disasm.txt is INTEL syntax. Do NOT re-ask
+anything D16/D17 covers; web sheet STAYS PAUSED. OQ-027 closes ONLY on
+the final hearing verdict; OQ-016/OQ-019 DEFERRED — do NOT re-ask.
+
+t424 LANDED 2026-11-18 (PHASE-16 VERIFY + RE-EXPORT + PUSH + D17r2 SHEET;
+full account docs/re/_wip_t424.md F0-F5). Verification PASS first: gate 0;
+run_tests 423/0/0; SEED REGRESSION seeds 1/2024/23 md5 EXACTLY the banked
+record (7e794a6dfb495800502762def9331e85 / 332a8cf3cebc95359924ce6a6b94a830
+/ 0a6b7876719f38796e8235cb772a43d3; Extinct t266 / Extinct t285 / Control
+t1406) — phase 16 (t421..t423c3) moved ZERO sim rng. CHIP-CLICK RNG AUDIT
+(the row's VERIFY item): assignRaceColours (menulaw.cpp:47) consumes ONLY
+the local colourLcg in the title loop, never the sim rng — click path
+cannot move md5s; the regression is the mechanical confirmation. EXPORT
+/tmp/pubpush-t424 vendor-free 7202 obj; data-less build 0 warnings;
+data-less tests 423/245-skipped/0-failed; gate --portable 0. PUSH: remote
+NAME pitfall hit in-flight (ascendancy.git does not exist — canonical is
+ascendancy-rewrite.git); set-url BEFORE fetch (t389 law), fetched tip
+9692126 zero foreign commits, FAST_FORWARD --force-with-lease landed
+9692126..8525086 (11-commit gap t421..t423c3 CLOSED); POST-PUSH ls-remote
+VERIFIED 8525086bc31bea4d458dbe8d6b2822259b16c322; askpass deleted,
+verified absent. D17r2 SHEET (fallback only — web workflow PAUSED per D17):
+scripts/t424_grading_page.py (tracked), 10 crops from MEASURED inventory +
+PIL before/after DIFF-CLUSTER scan (chip diff -> DESC ring zone
+352..448/32..160; hostile diff -> atmosphere wheel 288..352/384..480);
+native-vision verified live content (red spiked orb + chip row; pink ring);
+scratch-8699 self-test PASS incl traversal 403 (pitfall: server.py forks —
+kill the LISTEN pid, not the shell pid); live :8613 serves it without
+restart; D17r2 ask block appended to DECISIONS (q0 chrome/q1 newgame/q2
+hostile orb/q3 chip — zero re-asks, no audio row). Shots banked
+/tmp->work/r1/loop (t412-newgame refreshed; t412-raceintro-current added).
+LEDGER: 17 closed / 3 open — closes NOTHING (strict-close honest negative:
+verify+push+sheet ships no measurement; t420/t413/t403 precedent). NEXT ->
+t425 galaxy-map controls cycle.
 
 t423 CYCLE 3 LANDED 2026-11-18 (SCALE-LAW PAINT SITE CITED + BYTE+8
 CENSUS CLOSED + FINAL GRADE PASS; working log docs/re/_wip_t423c3.md

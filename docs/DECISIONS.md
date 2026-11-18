@@ -460,3 +460,16 @@ user answers freeform in chat; t430 handoff must NOT build a sheet.
 GhidraMCP headless v7.0.0 CONNECTED 2026-11-17 (check_connection OK):
 arbitrary-address decompiles available — the t419 "no on-disk
 disassembly window" block is RETIRED.
+
+## D17r2 — CHROME + NEW GAME GRADING (loop, 2026-11-18)
+
+Sheet live at http://<this box>:8613/ (scripts/t424_grading_page.py rebuilt
+index.html + 10 native-res crops; all shots md5-distinct, crop boxes from the
+before/after diff-cluster scan, not memory). The web workflow stays PAUSED per
+your D17 note — answer here only if quicker than chat. Four rows, nothing
+D16/D17 already asked: q0 chrome grain after the t422 Markov-field law;
+q1 New Game wheels + volume preview + 2x portrait after the three t423
+cycles; q2 the Hostile-atmosphere red orb (vendor-truncated record now
+paints); q3 the player-colour chip click (ring + AI recolour, FUN_000232ec).
+Best graded live after `git pull` (remote main == 8525086bc31b includes
+t421..t423c3); shots are the fallback.
