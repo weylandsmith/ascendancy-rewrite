@@ -1982,7 +1982,12 @@ per-screen iteration structure, RE-FIRST LAW). Ordering: t422 first
 (one shared root cause: the chrome texture appears wrong on EVERY
 screen the user graded); then one row per screen in flow order; then
 verify+push. A COMPLETING SESSION REWRITES NEXT TO THE NEXT ROW
-VERBATIM (t422->t423->...->t432; after t432 park WAIT-USER-RULING).
+VERBATIM in EXECUTION order t422,t423,t424(push done),t425,t424b(race
+intro — re-slotted after a session mis-renumbered the push row into
+the original race-intro tag, 2026-11-18),t426,t427,t428,t429,t430,
+t431,t432(final verify+push+handoff); after t432 park WAIT-USER-
+RULING. NEVER reuse a consumed tag and never move a row's TEXT under
+another row's executed tag — the lineage must stay greppable.
 
 PHASE-16 DERIVE-FROM-RE LAW (binding every row; user D17 verbatim:
 "Can you derive the exact UI drawing paradigms from reverse
@@ -2063,7 +2068,7 @@ starfield too (vendor law: spin pump while button held/hovered?
 census the button's SENDMESSAGE). Framing via t422 chrome law. Grade
 clean per close law.
 
-t424 RACE INTRO SCREEN CYCLE: background greyscale + text unreadable
+t424b RACE INTRO SCREEN CYCLE: background greyscale + text unreadable
 (root cause likely palette: the intro art needs the vendor palette
 transform the gif/cine path applies — decompile the intro screen
 paint, cite the palette source) + textured framing via t422 + race
