@@ -103,7 +103,11 @@ while :; do
   # run never marks the queue task done. Sentinels WAIT*/IDLE*/PARK*/steer/
   # empty NEVER arm; empty last_task (fresh install) never arms.
   next=$(awk '/^#+ *NEXT ACTION/{f=1;next} f&&NF{print;exit}' docs/STATE.md)
-  task=$(echo "$next" | awk 'NF{print $2; exit}' | tr -d ':')
+  # CONT-cycle rows ("NEXT tNNN CONT cycle K —") must extract a tag that
+  # DIFFERS from the parent task AND from prior cycles, else field-2 ==
+  # last_done and the wake trigger reads "already done" (t422 stopped the
+  # batch this way 2026-11-17): tag = tNNNCONT<K>.
+  task=$(echo "$next" | awk 'NF{ if ($3=="CONT" && $4=="cycle") print $2 "CONT" $5; else print $2; exit }' | tr -d ':')
   [ -n "$task" ] || task=steer
   queue_wake=""; steer_used=""
   last_ok_tag=$(cat "$LOOPDIR/last_task" 2>/dev/null)
