@@ -1985,7 +1985,8 @@ verify+push. A COMPLETING SESSION REWRITES NEXT TO THE NEXT ROW
 VERBATIM in EXECUTION order t422,t423,t424(push done),t425,t424b(race
 intro — re-slotted after a session mis-renumbered the push row into
 the original race-intro tag, 2026-11-18),t426,t427,t428,t429,t430,
-t431,t432(final verify+push+handoff); after t432 park WAIT-USER-
+t431,t433(chrome-generator EXACT law),t432(final verify+push+
+handoff); after t432 park WAIT-USER-
 RULING. NEVER reuse a consumed tag and never move a row's TEXT under
 another row's executed tag — the lineage must stay greppable.
 
@@ -2131,6 +2132,33 @@ ABILITY BUTTON DOES NOTHING (windows.txt button SENDMESSAGE -> which
 handler? decompile the target; implement or bank the honest negative
 IF the handler provably requires state we cannot reach — name the
 witness).
+
+t433 CHROME: EXACT LAW VIA MEMORY-SURFACE CENSUS (user D18 verbatim:
+"it looks like it's still trying to guess at what things should look
+like, rather than recreate exactly from the original code" — the
+statistical Markov field is the named ceiling of the STATIC route per
+t422c; this row attacks the remaining hypothesis class directly).
+HYPOTHESIS H-CHROME-SURFACE: the mottle is NOT painted per-frame at
+all — it is a PRE-GENERATED surface (built once at init, or shipped
+as a data blob) that the chrome blit samples screen-fixed. Evidence
+shape: t422c proved no rand() call in any paint path AND no static
+colour-pattern table — a pre-baked surface fits both facts. METHOD:
+run the DEBUGGER dosbox-x build (banked: --enable-debug=heavy +
+mcp_server, see docs/re/debugger notes; scratch savedir law, production
+stays down) to a title/menu screen, DUMP the DOS memory region(s)
+behind the chrome rects (window-manager backdrop pointers from the
+winmgr chain ui-runtime.md:581 neighbourhood), census each candidate
+region for the t422 band statistics (run-stats match + lag-1 skew
+0.62). If a region MATCHES byte-for-byte against vendor screen pixels
+(the screenshot IS the ground truth): the surface + its addressing
+law = exact law; implement port-side generation to reproduce the
+dumped bytes (seed + algorithm cited from the init code that wrote
+it). If no region matches: dump-adjacent code census for the writer
+(RUNWATCH on the paint address, one-shot, banked tooling). CLOSE:
+md5/pixel-exact chrome vs vendor capture at 1:1 on at least the
+newgame + map frames, or honest seam naming what the dump showed.
+Blanket grant 2026-11-14 covers scratch experimentation; NEVER mount
+the production game dir; bank ring first if anything touches saves.)
 
 t432 PHASE-16 VERIFY + PUSH + HANDOFF (push-gap law MANDATORY): full
 gate + run_tests + seed regression byte-identical; export; fetch

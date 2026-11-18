@@ -473,3 +473,22 @@ cycles; q2 the Hostile-atmosphere red orb (vendor-truncated record now
 paints); q3 the player-colour chip click (ring + AI recolour, FUN_000232ec).
 Best graded live after `git pull` (remote main == 8525086bc31b includes
 t421..t423c3); shots are the fallback.
+
+## D18 — ROUND-5 GRADE: GUESSING PERCEIVED, SCOPE NARROW (USER, 2026-11-18, verbatim)
+
+> It looks like it just focused on the new game screen and ignored
+> everything else, and it looks like it's still trying to guess at what
+> things should look like, rather than recreate exactly from the
+> original code.
+
+DISPOSITION (assistant, same turn): (1) scope — true in appearance:
+t423 burned 3 CONT cycles on new game while 8 screens wait; cycles
+capped at 2 unless a cycle measurably closes something, breadth rows
+(t426-t431) run before any further new-game polish. (2) guessing — the
+one acknowledged guess is the chrome noise field (t422c named ceiling);
+user rejects statistical-match as close enough -> t433 QUEUED: memory-
+surface census via debugger build to find the EXACT chrome generator/
+surface (byte-exact target). Everything else already lands cited (wheel
+dispatcher 0x528eb, racering index law, msg map handler 0x26b34, scale
+paint site cited t423c3) — keep citations visible IN the wip grade so
+"derived" reads as derived.
