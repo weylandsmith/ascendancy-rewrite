@@ -42,9 +42,18 @@
 // span (X class: planind k0..k12, 3cfgnew k0..k11, 14intel k8, 1starmap
 // k3/k4/k6) decode; past-span rows desync into the next record's bytes and
 // paint whatever the vendor would paint. Records that still fail: garbage
-// dims words (cos_star k40..k51, 1starmap k1) and genuine EOF truncation
-// (3cfgnew k12) — reported, never silently stubbed
-// (docs/BLOCKED.md t68 residue).
+// dims words (cos_star k40..k51, 1starmap k1).
+//
+// LAST-RECORD PARTIAL WALK (t423, docs/re/_wip_t423.md F5b): the final
+// record of a library may be truncated IN THE SHIPPED ARCHIVE (3cfgnew
+// k12: ascend01.cob blob == extracted twin, both end mid-row ~55/79).
+// The vendor blit has no length arg and paints resident bytes; the port
+// paints the rows that walk inside the file and leaves the rest of the
+// plane untouched (named seam: the past-EOF bytes themselves are vendor
+// heap, not shippable data). Only the LAST record gets partialOk — every
+// other record's stream hits the next record's bytes long before EOF, so
+// the t197 span-cross behaviour is unchanged for the whole rest of the
+// corpus.
 //
 // CORNER-ANCHOR GATE FALLBACK (t367, docs/re/shp.md S28, D1 ruling KEEP):
 // when the canonical dims gate FAILS for k>=1, a SIGNED bbox read

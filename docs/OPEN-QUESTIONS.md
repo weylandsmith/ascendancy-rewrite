@@ -39,7 +39,13 @@ S25, cited): of the 44 C-rows, 39 are CITED-NO-WITNESS (12 cos_star k40..51
 zero dims every slot -> blit -1 gate @0x5cb2b draws nothing; 25 ladder slots
 zero STREAM bytes span==header + batfx.txt battle attribution; 1starmap k1
 zero-stream + no selector), 1 junk-certain (3cfgnew k12 vendor EOF
-truncation), 1 UNREACHABLE (sg64expl k0 combat, t323), and ONLY mouse
+truncation — t423 MEASUREMENT: the truncation is IN THE SHIPPED ARCHIVE
+(ascend01.cob blob size 27349 == extracted twin md5 b2550068bb6260f8980d5de65d680db4,
+scripts/t423_f5_sibling.py), rows 0..~54 walk clean (bbox glyph y25..79),
+so the vendor PAINTS the orb glyph + resident-bytes rows; the port
+partial-paints via walkRows partialOk on the LAST record only (rewrite/src/formats/shp.cpp,
+TEST shp_span_free_t197 flipped to assert k12 decodes with glyph content —
+docs/re/_wip_t423.md F5b/F10 witness shot), 1 UNREACHABLE (sg64expl k0 combat, t323), and ONLY mouse
 k5/k6/k7 remain witnessable — real art 46x77x2038B with dims u16@rec+0
 (EXACT-H walk; t196 "not walkable" was canonical-slot-only) vs canonical
 u32@+0x10 zero-component: a dims-slot-location dispute. T330 DRAW-CAPTURE

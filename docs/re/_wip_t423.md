@@ -168,3 +168,153 @@ stride 0xd at DAT_0003067e, z at +0xd law matches cosmos node+0xd t399):
 
 
 
+## F5 — sibling/tmp census + cos_star sprite law [verified, scripts/t423_f5_sibling.py + t423_f5b_decode.py]
+- 3cfgnew.tmp is NOT an intact .shp sibling: magic "1.10" (0x312e3130),
+  count=1 tsz=16, ONE record dims pair (479,639) unsigned = 639x479 SWAPPED
+  (S16 residual class) = a FULL-SCREEN screen-state temp (640x480 minus
+  border). Every shp lib with a .tmp sibling (10status, 13negot, 16battle,
+  1starmap, 20res, 7racesel, 8shipdes) likely holds that screen's saved
+  state => VENDOR GROUND-TRUTH SCREENSHOTS for grading (F6).
+- 3cfgnew.shp k0..k12 census (correct offsets: dims k0 at 0x10+tsz, k>0 at
+  rec+0x10; stream k0 at rec+8, k>0 at rec+0x18): 13 records, dims
+  k0-k10 84x79, k5-k9 84x80, k11 88x79, k12 84x79. Header intact for k12.
+- Row-walk WITH directory-span bound: EVERY record runs slack=0 (streams
+  are exactly span-sized; walk stops mid-row ~55 at the next start) — the
+  t197 X-class span-crossing behaviour, consistent with shp.cpp:180-187
+  ("3cfgnew k0..k11" named in the no-span-bound comment).
+- k12 (Hostile) hits TRUE EOF mid-row at 0x6ad5 = file end: the LAST
+  record's stream is missing ~24 rows of bytes IN THE EXTRACTED FILE.
+  k0..k11 recover by crossing spans; k12 has nothing past EOF. OPEN: is
+  the truncation an extraction artifact (check source archive) or does the
+  vendor file itself end there (then vendor k12 paints heap-garbage rows
+  and the user's "hostile variant missing" = the vendor's own truncation,
+  which the user would have seen as working — LESS LIKELY: user graded
+  the vendor screen as HAVING the hostile art).
+- cos_star.shp 55 records: k1..k15 2x2, k16..k39 1x1, k40..k51 zero-header
+  (banked vendor-cannot-draw set, REFUTED-ROUTES L1329), k52 3x6, k53 8x8,
+  k54 8x8 — the LARGER star sprites D17(f) wants. k0 header odd (w=2 h=2
+  but stream overlaps k1; decode OOB at row 0). Sprite-size law pending:
+  which k does the newgame preview use? (F4 regeneration path stores star
+  records stride 0xd — frame idx likely a field there.)
+## F5b — shipped-archive proof + bbox census [verified]
+- k12 truncation is IN THE SHIPPED ARCHIVE: ascend01.cob entry
+  data\3cfgnew.shp blob size=27349 md5 b2550068bb6260f8980d5de65d680db4 ==
+  extracted twin; blob == [off_i, off_i+1) monotone table (cob.offsets OK,
+  n=328). NOT an extraction artifact. The vendor file itself ends mid-k12
+  row-stream => vendor paints k12 rows 0..~54 (the glyph rows) then
+  desync/garbage rows exactly like the port's no-span model (t197). So the
+  port's BLANK k12 refusal is a PORT bug (walkRows false-on-EOF), not a
+  data gap: partial-decode-and-paint is the vendor behaviour.
+- Record header rec+0x08 = SIGNED bbox (L,T,R,B) [verified 3cfgnew k1..k12
+  + cos_star k1..k39,k52..k54 all sane]: 3cfgnew wheels bbox=(30,25,84,79)
+  => GLYPH IS 55x55 at (30,25) inside the 84x79 canvas (k11 (27,25,88,79)
+  62x55); stream rows ~= bbox height (walk stops ~55). cos_star: k1..k15
+  2x2 px bbox(-2,-2,2,2); k16..k39 1x1 bbox(-1,-1,1,1); k52 3x6; k53/k54
+  8x8 px bbox(-8,-8,8,8) 17x17 GLOW box — the LARGER star sprites D17(f).
+  k40..k51 zero-header (banked cannot-draw). NOTE: canonical dims read at
+  rec+0x10 == bbox (R,B) pair — t367 gate already knows slot overlap;
+  banked live-measured decode model (H rows, span-cross, t197) STANDS.
+## F6 — 3cfgnew.tmp is a SPARSE CHROME LAYER, not a screenshot [verified, scripts/t423_f6_tmpscreen.py]
+- k0-law decode (W=639 H=479, stream rec+0x08) walks OK 479/479 rows, but
+  only 30223 px (10%) non-transparent: row bands rows 0..47 + 368..479
+  dense, middle rows ~21 px each; col bands x<64 and x>=448 dense. = the
+  screen's saved CHROME FRAME/margin layer (texture bands + borders), NOT
+  full-screen ground truth. No wheel/starfield content. Grading use:
+  frame extents only. (tmp head dims (479,639) = swapped pair, S16 class.)
+
+## F3-CORRECTION (this session, reading the REAL port code) [verified title.cpp/menulaw.cpp]
+- newgameWheelFrame case 1 returns 2+value with value=speciesSetting 3..7
+  => k5..k9 EXACTLY the vendor k(count+2) law. The WIP F3 "OFF BY THREE"
+  was a MISREAD (it assumed n=0..4). No species fix needed.
+- Density: vendor frame=idx over table {15,25,50,75,100} @0x895c8 (F1);
+  port frame = RANK of the count in the SORTED ladder = same set, same
+  bijection count->k0..k4 (50->k2, 75->k3, 100->k4, 15->k0, 25->k1). The
+  t78 live cycle order 50,75,100,15,25 == vendor idx ring +phase 2 (a ring
+  is order-invariant under rotation: Vacuous->Sparse->Avg->Dense->V.Dense
+  wraps to the same ring t78 measured). Mapping EQUIVALENT; the pre-t414
+  "k0,k1,k2,k2,k3" REPEAT is already fixed by t414's bijection. Residual
+  D17 "repeats" witness therefore either predates t414 or is about the
+  k0..k4 dot-wells being VISUALLY similar at panel scale — the vendor
+  shows the same five records (law-identical), so the port cannot differ
+  while the law holds: named seam, NOT a law defect.
+- k12 hostile (defect b): CONFIRMED PORT bug — shipped-blob truncation
+  (F5b) means vendor paints rows 0..~54 (bbox H=55 = the orb glyph) then
+  desync/heap-garbage rows; port's walkRows false-on-EOF refuses the
+  WHOLE record => blank panel. FIX: partial paint (rows decoded before EOF
+  painted, below-EOF left transparent = named seam vs vendor garbage).
+- Extra art below circles (defect c): port blits the full 84x79 record
+  clipped to the panel; k0..k11 desync rows paint next-record bytes
+  (t197 law) — same as the vendor's resident-bytes behaviour. With k12
+  partial-painted the port matches the vendor model for all 13 records.
+## F7 — spin pump + galaxy gen + sprite selector [verified decompile/xrefs]
+- ds:0x7458e xrefs: 43 total, ZERO writes inside the state-3 dispatcher
+  (sole WRITE = FUN_00021a84); DATA refs at 0x30f0/0x6a64 (the script
+  operands @0x69b8: `02 8e4507 00 | 07 003b0e` = op2 SET ds:0x7458e, op7
+  imm 0x3b). The button-hold arm (F2) queues that script; the cosmos
+  repaint READS 0x7458e per star (FUN_00053fe8 chain). => spin law for the
+  PORT: pump previewYaw whenever cursor inside the Begin zone
+  (387..493 x 420..476 measured F2), ON TOP of the idle spin. No SEND-
+  MESSAGE exists on the Begin box (windows.txt F0 negative re-confirmed).
+- FUN_00022ce4 (species click regen, 0x22ce4): race-slot assignment loop
+  picks stars via rand()%starCount (LCG FUN_0007824f), marks owner bits
+  (1<<slot) on star+0x14/+0x17 + colonised planets; difficulty byte
+  [mgr+0xdb4]: 0 = nerf starting stats (-30,-20 x6,+30), 2 = buff (+20s,
+  +30,-20). NOT the preview paint path.
+- STAR-PIP SPRITE LAW (t200 banked, planets-ui.md SS6): SEL = 4*type + cls,
+  cls = 4-band ladder on v=round(z' + f32@ds:0x105e): >=220 -> 0, 1..219 ->
+  1, -220..0 -> 2, < -220 -> 3. cos_star census (F5): types 0..3 land on
+  2x2 records, types 4..9 on 1x1, types 10..12 on the zero-header k40..k51
+  = vendor draws NOTHING for those. k52..k54 (3x6, 8x8x2) unaddressable by
+  SEL (banked t399). => PREVIEW SPRITE LAW for the port: blit cos_star
+  k(4*type+cls), skip zero-header classes; nearest-neighbour 2x = the
+  user's "LARGER + pixelated".
+## F8 — FUN_00022728 re-read (decompiler noise resolved) + racering [verified]
+- The stride-0xd preview records DAT_0003067e: {float x,y,z} + a leading
+  char index byte at DAT_0003067d (the 0x67d/0x67e overlap is the index
+  byte, NOT a dims pair). Per star: vector (·,1000.0f,300.0f,0) rotated by
+  FUN_0005324c at angle (rand%seedword + cum - prev); z += rand%600 - 300.
+  The WIP F4 summary (circle r300 XY + uniform z ±300 = VOLUME) stands as
+  the port law; the per-star seedword chain (seed[i+1]=cum) is decompiler
+  artefact-adjacent — named seam on the exact angle distribution, NOT on
+  the volume shape (both F4 readings agree on r300/z±300).
+- Preview records carry NO type byte => the cosmos SEL=4*type+cls law
+  (planets-ui §6) uses a different site for the state-3 preview; the port
+  fixes K=0 (cls-only) and maps cls0->k1 (k0 header overlap fails the
+  walk, F5) — NAMED SEAM, honest.
+- racering.shp: 8 records, k0 53x53 (bbox zero), k1..k7 53x53
+  bbox(-55,-55,53,53) — the portrait-ring RECORD for defect (e) (t401
+  already cites racering k0 53x53). Port currently draws 1px vector rings;
+  FIX: blit racering k0 native-size at both ring sites (desc + list),
+  vector fallback only if the lib fails to load.
+## F9 — regenerate chain consumers + port edits [verified decompile; edits applied]
+- FUN_000234a4 (chain step 3) = galaxy GRAPH post-processing (planet/owner
+  tables, FUN_00024018/0002446c) — NOT a preview paint site. Chain:
+  FUN_00022878 full galaxy gen (N=100 candidates via LCG: type class from
+  the 13-entry weight table DAT_000063aa, coords uniform(-500,500)^3 x
+  scale) -> FUN_00022728 PREVIEW table (stride 0xd, circle r300 + z
+  uniform +-300) -> FUN_000234a4 graph -> FUN_00022ce4 race assignment.
+  The state-3 preview paint site is COSMOSWnd (STATE "4 1 3 7") reading
+  display nodes; the stride-0xd preview records carry NO type byte —
+  K=0 in SEL=4*K+cls is the honest reading (NAMED SEAM, port applies it).
+- PORT EDITS (this session): (1) shp.cpp/h + test_shp.cpp: last-record
+  PARTIAL walk (k12 hostile orb paints rows 0..~54, defect b); (2)
+  title.cpp preview = circle r300 x depth 1000+-300 VOLUME (defect f
+  placement) + cos_star sprites k(cls) at scale 2 pixelated (defect f
+  sprite) + hover spin pump zone 387..493x420..476 x6 (defect g, F7);
+  (3) racering.shp k0 record at both ring sites (defect e). Defect d
+  (4x scale): vendor scale law NOT yet derived — the measured original
+  portrait zone 96..109 px == 2x smrace (t401 S8); kept at measured 2x,
+  row stays OPEN for the TYPE 10 list-handler decompile.
+## F10 — witnesses [verified runs]
+- scripts/t412_newgame_shot.sh rerun post-edits: /tmp/t412_shots/t412-newgame.png
+  native-vision: starfield = SPREAD POINTS FILLING THE RECTANGLE (depth
+  variety, 2px sprites), three wheel panels DISTINCT art, race portraits
+  inside GREEN TEXTURED RINGS (racering record), no garbage.
+- scripts/t423_hostile_shot.sh (new): one Atmosphere click -> summary
+  "Hostile Atmosphere", panel shows the RED SPIKED ORB ART (k12 partial
+  rows 0..~54 = the orb glyph; nothing below = the named seam, vendor
+  paints heap there). Pre-fix this panel was BLANK. app.log: "click
+  DIFFICULTYMORE msg 505 -> Hostile".
+- BUILD+TESTS: cmake build clean; run_tests 421/0/0 (test_shp k12 pin
+  FLIPPED from reject to partial-paint WITH the law change; content
+  witness rows 25..50 nonzero).

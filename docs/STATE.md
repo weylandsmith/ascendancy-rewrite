@@ -230,41 +230,77 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t423 NEW GAME SCREEN CYCLE (ordering rationale: t422 CLOSED both
-cycles — cycle 1 landed the statistical field law, cycle 2 exhausted
-the generator-decompile decider and banked the honest ceiling per the
-close law + REFUTED-ROUTES R-t422c; the phase-16 queue order says one
-root cause first, then screens in flow order, and New Game is the next
-screen after the shared chrome cause. Do NOT re-open the chrome
-generator: R-t422c is binding; chrome.md SS1.5 is the ceiling and the
-port's splitmix fresh-draw stands.). QUEUE ROW TEXT VERBATIM: "t423
-NEW GAME SCREEN CYCLE (seed defects D17): wheel icons repeat across
-steps AND hostile-atmosphere variant missing AND extra art drawn below
-the circles (census 3cfgnew.shp records per option step — the vendor
-TEXTITEM/SHAPEFRAME table in beginnew.txt names which record per
-state); species + planet art STILL 4x (dims pin: drawn rect == record
-dims /2 or as-cited — find the vendor scale law, do not eyeball);
-species rings need THICK TEXTURED lines (chrome law from t422 or the
-ring's own record, not a vector stroke); preview starfield fills the
-VOLUME not a shell, stars LARGER + pixelated (decompile the newgame
-preview draw — vendor star sprite + placement law: volume sampling,
-sprite size); Begin New Game BUTTON spins the starfield too (vendor
-law: spin pump while button held/hovered? census the button's
-SENDMESSAGE). Framing via t422 chrome law. Grade clean per close law."
-Full row + PHASE-16 law: STATE.md PHASE-16 QUEUE section (line ~1846).
-Tooling ready: GhidraMCP check_connection OK; rel32 call census
-scripts/t422c_callgraph.py (instant, vs >180s capstone sweep); capstone
-ONLY via /home/hrethric/tools/revenv/bin/python; restored DB function
-coverage is SPARSE — for undefined regions use t399_disasm.py + the
-rel32 census, not Ghidra name queries.
+NEXT t423 CONT cycle 2 (ordering rationale: cycle 1 landed the
+wheel/spin/preview/starfield/ring laws with witnesses
+(docs/re/t423-newgame-law.md) but the row cannot close until the grade
+is clean (close law 4) — the two remaining named items are defect (d)
+the species/planet 4x scale law and the player-colour click-reassign.
+Do NOT re-derive the wheel frames, the k12 partial paint, the preview
+volume law, or the rings: all FIXED/pinned this cycle. WORK ITEMS:
+(1) SCALE LAW (d): the row hints "drawn rect == record dims /2 or
+as-cited — find the vendor scale law, do not eyeball". Decompile the
+TYPE 10 RACELIST paint path (windows.txt L670 RACELIST SF7 -> the
+TYPE-10 class handler; start from the RACELIST click handler msg
+0x1c01 chain at 0x52d6c and walk the class vtable) and the desc-panel
+paint for the scale source (window-class scale field vs per-record
+/2). Pin: drawn rect dims == cited formula for smrace 49 -> measured
+96..109 zone (t401 S8) — the port's kRacePortraitScale=2 matches the
+MEASUREMENT but not yet a CITED law; if the vendor draws smrace NATIVE
+and the zone is a different record, say so and fix the port. Planet
+record: planets.shp class/size law for the desc panel (port uses
+(specnum%11)*5+3 = 35px class, seam-named t414) — census whether the
+vendor scales it. (2) PLAYER-COLOUR REASSIGN: vendor chip zone
+x379..493 y420..472, 16-px chips idx=(x-0x17b)>>4, click ->
+FUN_0004fb30(0x78638,0) + word[win+0xb5]=idx + FUN_000232ec(0x12e10,
+idx) re-seeds the race-slot colour array (stride 0x1ee, rand()%7
+distinct-adjacent, LCG 0x7824f) — port paints chips static only
+(t414); implement click + re-derive of the raceflag/portrait tinting
+the port can honestly map (decompile FUN_000232ec fully for what the
+idx feeds: player-colour index vs slot permutation). (3) Re-shoot
+scripts/t412_newgame_shot.sh + t423_hostile_shot.sh and GRADE per
+close law 4; if any fixable defect remains, write the CONT cycle 3
+row honestly. Tooling ready: GhidraMCP check_connection OK; rel32
+call census scripts/t422c_callgraph.py (instant, vs >180s capstone
+sweep); capstone ONLY via /home/hrethric/tools/revenv/bin/python
+(PIL lives there too); restored DB function coverage is SPARSE — for
+undefined regions use t399_disasm.py + the rel32 census, not Ghidra
+name queries.
 Trigger check FIRST as always: USER: lines after the D17 block in
 docs/DECISIONS.md win; a new playcap sitting outranks this (re-run
-scripts/r1_t85g_sitting.py FIRST). t422c checked both as of
-2026-11-17 ~22:30: none (timeline mtime Nov 12; last USER: line 301).
+scripts/r1_t85g_sitting.py FIRST). t423 checked both as of
+2026-11-17 ~23:40: none (timeline mtime Nov 12; last USER: line 301).
 Do NOT re-ask anything the D16 sheet already asks; web ruling sheet
 STAYS PAUSED per D17.
 OQ-027 closes ONLY on the user's final hearing verdict; OQ-016/OQ-019
 stay DEFERRED — do NOT re-ask.
+
+t423 CYCLE 1 LANDED 2026-11-17 (NEW GAME LAWS: wheels/k12/volume/
+sprites/spin/rings — deliverable docs/re/t423-newgame-law.md, working
+log docs/re/_wip_t423.md F0-F10). MEASUREMENTS: (i) windows.txt state-3
+table F0 (beginnew.txt premise FALSE — it's the tutorial script;
+per-state record = RUNTIME field child+0x72); (ii) dispatcher 0x528eb
+wheel law: density k(idx 0..4) table {15,25,50,75,100}@0x895c8,
+species k(count+2)=k5..k9 (Five=k7 == t401 anchor), atmosphere
+k10/11/12; port mapping EQUIVALENT (WIP F3 off-by-three was a misread);
+(iii) 3cfgnew k12 truncation is IN THE SHIPPED ARCHIVE (cob blob 27349
+md5 b2550068... == extracted; scripts/t423_f5_sibling.py) -> port
+refusal was a BUG: walkRows partialOk LAST-record-only paints the
+Hostile orb (test_shp pin FLIPPED; witness scripts/t423_hostile_shot.sh
+shows red spiked orb + "Hostile Atmosphere"); (iv) FUN_00022728 preview
+= circle r300 + depth 1000+-300 VOLUME (LCG consumer; R-t422c chrome
+census unaffected), sprites cos_star SEL=4*K+cls K=0 seam -> k1..k3
+2x2 native (census: k1..k15 2x2, k16..k39 1x1, k40..k51 zero, k52 3x6,
+k53/54 8x8); (v) spin pump = script @0x69b8 SET ds:0x7458e armed by
+cursor zone x379..493 y420..472 (0x52993/0x529c1; 43 xrefs, zero
+state-3 writers) -> port hover-pump x6 (rate = named seam); (vi) rings
+= racering.shp k0 53x53 record @2x both sites (defect e); (vii)
+3cfgnew.tmp = SPARSE chrome-frame layer (10% px, margins only), NOT a
+screenshot — sibling .tmp files same class. DEFECT SCOREBOARD: b,e,f,g
+FIXED w/ witnesses; a law-equivalence; c no-delta; d OPEN (cycle 2);
+player-colour click-reassign OPEN (cycle 2, SS7). Tests 421/0/0 (k12
+pin flipped WITH the law, content witness rows 25..50). GATE_EXIT=0;
+LEDGER AUDIT OK 17/3 (OQ-005 residue note updated with the shipped-
+archive measurement; closes NOTHING new). NEXT -> t423 CONT cycle 2.
 
 t422 CONT CYCLE 2 LANDED 2026-11-17 (NOISE-GENERATOR ROUTE EXHAUSTED —
 STATISTICAL LAW DECLARED CEILING per the row's budget law; full account

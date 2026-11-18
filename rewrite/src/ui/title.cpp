@@ -209,6 +209,26 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             std::printf("ui raceconfig raceflag refused: %s\n", ferr.c_str());
         std::fflush(stdout);
     }
+    // t423 DEFECT (e): the species rings are the racering.shp RECORD
+    // (k0 53x53 walk-OK; scripts/t423 census), not a vector stroke.
+    ascend::formats::ShapeLibrary raceringLib;
+    {
+        std::string rerr;
+        if (!raceringLib.load(
+                dataRoot + "/extracted/ascend01/data/racering.shp", &rerr))
+            std::printf("ui raceconfig racering refused: %s\n", rerr.c_str());
+        std::fflush(stdout);
+    }
+    // t423 DEFECT (f): preview star sprites = cos_star.shp through the
+    // t200 SEL = 4*type + cls law (planets-ui.md §6).
+    ascend::formats::ShapeLibrary cosStarLib;
+    {
+        std::string serr;
+        if (!cosStarLib.load(
+                dataRoot + "/extracted/ascend01/data/cos_star.shp", &serr))
+            std::printf("ui raceconfig cos_star refused: %s\n", serr.c_str());
+        std::fflush(stdout);
+    }
     std::vector<ascend::formats::ShapeLibrary> portraitLibs(21);
     // t414: planets.shp — the planet-sphere library for the DESC panel
     // (55 recs = 11 biome groups x size ladder; docs/re/shp.md geometry
@@ -398,34 +418,54 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             // palette). WHICH stars these are = preview, not the map:
             // the original's preview does not match its own map either
             // (it is a generic cosmos).
+            // t423 PREVIEW PLACEMENT + SPRITE LAW (defects f/g,
+            // docs/re/_wip_t423.md F4/F7/F8): the vendor generator
+            // FUN_00022728 places each star on a CIRCLE of radius 300 in
+            // the screen plane (angle from the LCG rand chain) at depth
+            // 1000 + UNIFORM(-300,+300) — a filled CYLINDER VOLUME, not a
+            // sphere shell (the port's pre-t423 splitmix spherical-surface
+            // model was the "fills the VOLUME not a shell" defect).
+            // Sprites = cos_star.shp through the t200 SEL law SEL = 4*K +
+            // cls, cls = 4-band ladder on the transformed depth (v>=220 ->
+            // 0, 1..219 -> 1, -220..0 -> 2, v<-220 -> 3; planets-ui.md §6);
+            // the preview records carry no type byte so K=0 (NAMED SEAM)
+            // -> k1..k3 (2x2 vendor sprite at NATIVE size = larger than
+            // the old 1px point and pixelated; k0's header overlap fails
+            // the walk, F5). SPIN
+            // PUMP (defect g): the vendor arms script @0x69b8 (SET
+            // ds:0x7458e, read by the cosmos repaint; F7) while the cursor
+            // is inside zone x379..493 y420..472 (dispatcher
+            // 0x52993/0x529c1 cmp ebx 0x17b/0x1ed, ecx 0x1a4/0x1d8 — F2) —
+            // the port advances yaw
+            // faster while that zone is hovered, on top of the idle spin.
             {
                 static double previewYaw = 0.0;
-                previewYaw += kPreviewSpinPerFrame;
+                int hmx = -1, hmy = -1;
+                SDL_GetMouseState(&hmx, &hmy);
+                const bool beginHover =
+                    hmx >= 379 && hmx <= 493 && hmy >= 420 && hmy <= 472;
+                previewYaw +=
+                    kPreviewSpinPerFrame * (beginHover ? 6.0 : 1.0);
                 const int n = kDensityStarCounts[densityIdx];
                 const double cx =
                     (kNewgameCosmosRect.x0 + kNewgameCosmosRect.x1) / 2.0;
                 const double cy =
                     (kNewgameCosmosRect.y0 + kNewgameCosmosRect.y1) / 2.0;
-                const double focal = 500.0, standoff = 1760.0, shell = 440.0;
+                const double focal = 500.0;
                 for (int i = 0; i < n; i++) {
                     uint64_t z = uint64_t(i) * 0x9e3779b97f4a7c15ull +
                                  0x5851f42d403c3b23ull;
                     z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
                     z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
                     z = z ^ (z >> 31);
-                    // Random unit vector (two uniforms -> spherical; the
-                    // z-marginal is uniform, matching the OQ-012(c) shell
-                    // law).
-                    const double u = double(z % 2000001ull) / 1000000.0 - 1.0;
+                    // Vendor law: circle radius 300, depth 1000 +- 300.
                     const double th =
-                        double((z >> 21) % 2000001ull) / 1000000.0 *
-                        3.14159265358979;
-                    const double rr = std::sqrt(1.0 - u * u);
-                    const double x = shell * rr * std::cos(th + previewYaw);
-                    const double y = shell * u;
-                    const double zz = shell * rr * std::sin(th + previewYaw);
-                    const double depth = standoff + zz;
-                    if (depth < 100.0) continue;
+                        double(z % 1000000ull) / 1000000.0 * 6.283185307;
+                    const double dz =
+                        double((z >> 20) % 601ull) - 300.0;
+                    const double x = 300.0 * std::cos(th + previewYaw);
+                    const double y = 300.0 * std::sin(th + previewYaw);
+                    const double depth = 1000.0 + dz;
                     const int px = int(cx + x * focal / depth);
                     const int py = int(cy + y * focal / depth);
                     if (px < kNewgameCosmosRect.x0 ||
@@ -433,9 +473,21 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                         py < kNewgameCosmosRect.y0 ||
                         py > kNewgameCosmosRect.y1)
                         continue;
-                    const RGB t = neutralTint(int((z >> 42) % 13));
-                    SDL_SetRenderDrawColor(ren, t.r, t.g, t.b, 255);
-                    SDL_RenderDrawPoint(ren, px, py);
+                    // SEL law, K=0: cls from the transformed depth offset.
+                    const long v = lround(dz);
+                    const int cls = v >= 220 ? 0 : (v >= 1 ? 1 : (v >= -220 ? 2 : 3));
+                    const int rec = 4 * 0 + cls;  // K=0 named seam
+                    bool drew = false;
+                    if (cosStarLib.count() > rec)
+                        drew = blitShape(ren, cosStarLib, rec, px - 1, py - 1);
+                    if (!drew) {
+                        // cos_star unavailable/k0: 2x2 tint block (the
+                        // point-family law stays honest, no fake art).
+                        const RGB t = neutralTint(int((z >> 42) % 13));
+                        SDL_SetRenderDrawColor(ren, t.r, t.g, t.b, 255);
+                        SDL_Rect q{px - 1, py - 1, 2, 2};
+                        SDL_RenderFillRect(ren, &q);
+                    }
                 }
             }
 
@@ -490,13 +542,26 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             // measured; honest-vector concentric circles), crest raceflag
             // k<specnum> NATIVE at (441,205). A missing lib degrades to the
             // ring-only drawing (never a fake stand-in).
+            // t423 DEFECT (e): the ring is the racering.shp k0 RECORD
+            // (53x53, walk-OK), NOT a vector stroke. Scale law pin: the
+            // measured ring radius 53 (menulaw kDescRingR/kRaceRingR) ==
+            // record 53 drawn at 2x — the SAME scale as the smrace
+            // portraits (49 -> 98, t401 S8), so the class scale is 2.
             {
-                SDL_SetRenderDrawColor(ren, kLore.r, kLore.g, kLore.b, 255);
-                for (int a = 0; a < 360; a += 1) {  // dense ring, 1px step
-                    const double rad = a * 3.14159265 / 180.0;
-                    SDL_RenderDrawPoint(
-                        ren, kDescRingCentre.x + int(kDescRingR * cos(rad)),
-                        kDescRingCentre.y + int(kDescRingR * sin(rad)));
+                bool ringDrawn = false;
+                if (raceringLib.count() > 0)
+                    ringDrawn = blitShapeScaled(ren, raceringLib, 0,
+                                                kDescRingCentre.x - 53,
+                                                kDescRingCentre.y - 53, 2);
+                if (!ringDrawn) {
+                    SDL_SetRenderDrawColor(ren, kLore.r, kLore.g, kLore.b,
+                                           255);
+                    for (int a = 0; a < 360; a += 1) {  // dense ring, 1px step
+                        const double rad = a * 3.14159265 / 180.0;
+                        SDL_RenderDrawPoint(
+                            ren, kDescRingCentre.x + int(kDescRingR * cos(rad)),
+                            kDescRingCentre.y + int(kDescRingR * sin(rad)));
+                    }
                 }
                 if (const auto* pl = portraitFor(selIndex)) {
                     const int d = int(pl->record(0).width) *
@@ -582,13 +647,24 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     SDL_RenderFillRect(ren, &band);
                 }
                 if (specnum < rosterCount()) {
-                    SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b,
-                                           255);
-                    for (int a = 0; a < 360; a += 2) {  // silver ring r53
-                        const double rad = a * 3.14159265 / 180.0;
-                        SDL_RenderDrawPoint(
-                            ren, kRacePortraitCx + int(kRaceRingR * cos(rad)),
-                            cy + int(kRaceRingR * sin(rad)));
+                    // t423 DEFECT (e): racering k0 record at 2x (same law
+                    // as the desc-panel ring above); vector fallback only
+                    // when the lib is unavailable.
+                    bool ringDrawn = false;
+                    if (raceringLib.count() > 0)
+                        ringDrawn = blitShapeScaled(ren, raceringLib, 0,
+                                                    kRacePortraitCx - 53,
+                                                    cy - 53, 2);
+                    if (!ringDrawn) {
+                        SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g,
+                                               kBevel.b, 255);
+                        for (int a = 0; a < 360; a += 2) {  // silver ring r53
+                            const double rad = a * 3.14159265 / 180.0;
+                            SDL_RenderDrawPoint(
+                                ren,
+                                kRacePortraitCx + int(kRaceRingR * cos(rad)),
+                                cy + int(kRaceRingR * sin(rad)));
+                        }
                     }
                     if (const auto* pl = portraitFor(specnum)) {
                         const int d = int(pl->record(0).width) *
@@ -663,10 +739,10 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                                                 kWheelBlitTop);
                     SDL_RenderSetClipRect(ren, nullptr);
                     if (!drew && !wheelRefused[i]) {
-                        // Present but UNDECODABLE (3cfgnew k12 = the
-                        // EOF-truncated record; the vendor paints past-EOF
-                        // resident garbage, the port refuses — named seam,
-                        // docs/re/_wip_t414.md S2c). Print-once.
+                        // Present but UNDECODABLE after the t423 partial
+                        // walk (k12 now paints rows 0..~54 — the shipped
+                        // archive truncation is INSIDE ascend01.cob,
+                        // F5b; only a load failure lands here). Print-once.
                         wheelRefused[i] = true;
                         std::printf("ui raceconfig wheel refused: ctrl %d "
                                     "k%d (lib %d recs)\n",

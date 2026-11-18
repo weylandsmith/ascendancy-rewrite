@@ -166,13 +166,29 @@ TEST(shp_span_free_t197) {
     }
     CHECK(tail_nonuniform);  // bottom band was written (span-crossing walk)
 
-    // (2) 3cfgnew k0..k11 decode; k12 stays REJECTED (EOF-truncated at
-    // 55/79 rows — real broken vendor data, strict-close discipline).
+    // (2) 3cfgnew k0..k11 decode; k12 PARTIAL-Paints (t423 law change,
+    // docs/re/_wip_t423.md F5b): the truncation is IN the shipped archive
+    // (ascend01.cob blob md5 == extracted twin, both end mid-row ~55/79),
+    // the vendor blit has no length arg and paints resident bytes, so the
+    // blank-refusal was a PORT bug. Pin: decode succeeds, the top 50 rows
+    // (inside the bbox y25..79 glyph) carry content, and the walk consumed
+    // the file to EOF (rows below the truncation stay untouched).
     for (int k = 0; k <= 11; ++k) {
         std::vector<uint8_t> px;
         CHECK(cfg.decode(k, px));
     }
-    { std::vector<uint8_t> px; CHECK(!cfg.decode(12, px)); }
+    {
+        std::vector<uint8_t> px;
+        CHECK(cfg.decode(12, px));
+        CHECK(px.size() == size_t(cfg.record(12).width) *
+                               cfg.record(12).height);
+        const auto& r12 = cfg.record(12);
+        bool top_content = false;
+        for (uint32_t y = 25; y < 50 && !top_content; ++y)
+            for (uint32_t x = 0; x < r12.width; ++x)
+                if (px[size_t(y) * r12.width + x]) { top_content = true; break; }
+        CHECK(top_content);  // the orb glyph rows ARE painted
+    }
 
     // (3) Garbage dims still rejected despite the unbounded walk:
     // 1starmap k1 dims word 0x7ffffdbb-class (no negative bbox anchor).
