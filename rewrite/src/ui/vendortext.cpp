@@ -215,6 +215,46 @@ bool blitShapeCircular(SDL_Renderer* ren,
     return true;
 }
 
+// t425c: blitShape with one palette substitution on the colour path (see
+// ui_internal.h for the measured law). Decodes twice exactly like
+// blitShapeCircular (transparent-skip detection), then maps index `from`
+// through game.pal entry `to`.
+bool blitShapePalSwap(SDL_Renderer* ren,
+                      const ascend::formats::ShapeLibrary& lib, int rec,
+                      int x, int y, int from, int to) {
+    std::vector<uint8_t> a, b;
+    if (!lib.decode(rec, a) || a.empty()) return false;
+    b = a;
+    std::fill(b.begin(), b.end(), uint8_t(0x55));
+    std::fill(a.begin(), a.end(), uint8_t(0xAA));
+    if (!lib.decode(rec, a) || !lib.decode(rec, b)) return false;
+    const auto& r = lib.record(rec);
+    std::vector<uint32_t> argb(a.size());
+    for (size_t k = 0; k < a.size(); k++) {
+        const uint8_t idx = (int(a[k]) == from) ? uint8_t(to) : a[k];
+        uint32_t rgb;
+        if (g_chromePal.ready()) {
+            rgb = g_chromePal.argb(idx) & 0x00FFFFFFu;
+        } else {
+            const uint32_t lum = 40u + (uint32_t(idx) * 185u) / 255u;
+            rgb = (lum << 16) | (lum << 8) | lum;
+        }
+        const uint32_t alpha = a[k] == b[k] ? 0xFF000000u : 0x00000000u;
+        argb[k] = alpha | rgb;
+    }
+    SDL_Texture* tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                                         SDL_TEXTUREACCESS_STATIC,
+                                         int(r.width), int(r.height));
+    if (!tex) return false;
+    SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);  // t411 law
+    SDL_UpdateTexture(tex, nullptr, argb.data(),
+                      int(r.width) * int(sizeof(uint32_t)));
+    SDL_Rect dst{x, y, int(r.width), int(r.height)};
+    SDL_RenderCopy(ren, tex, nullptr, &dst);
+    SDL_DestroyTexture(tex);
+    return true;
+}
+
 // The load screen (t387 windows, t388-reusable). Windows law: LOADSCREEN
 // title strip (7,7)-(632,37) + LOADLIST interior (7,46)-(632,472) over the
 // 4loadgam.shp k0 backdrop (single 639x479 record; [inferred] backdrop role

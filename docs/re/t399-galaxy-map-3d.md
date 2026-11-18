@@ -201,3 +201,48 @@ diagonal [+0x1b2+2i] == 0, [0x13b98]=4, [0x7458e]=0); byte +2 = [0,1,6,2,1] —
 NON-INJECTIVE, so it is not a colour permutation, and the paint-site table at
 [esp+0x38] plus that loop's row origin (bound 0xd82) are UNRESOLVED. The port
 keeps slot i == owner index i and the seam note says so.
+
+## t425c — TOGGLE WELL LAW MEASURED BIT-EXACT + SLOT COLOUR IS OCCUPANT DATA
+Hand-authored (no script writes this file). Working log docs/re/_wip_t425.md
+F7-F10. Tools: scripts/t425c_toggle_state_law.py (the pin-grade measurement),
+t425c_slot_faces.py (second shot), t425c_circle_census.py /
+t425c_button_measure.py / t425c_face_diff.py / t425c_shift_sweep.py (censuses).
+
+THE LAW [verified 900/900 bit-exact x4, zero residual pixels]: a TYPE-25
+layer toggle blits its SHAPEFRAME (1starmap k15..k18) at its verbatim rect and
+substitutes ONE palette entry by state — face well idx242 (raw (3,8,12) ->
+conv (12,32,48) navy) renders as idx80 (raw (22,6,14) -> conv (89,24,56)
+maroon) when the layer is ON, and stays 242 when OFF. Measured on
+docs/assets/refcap/original-strategic-map.png at png = screen + 40 (that png's
+rows 0..39 are pure black and the TURNCOUNT digits 474,7-632,43 land at png
+y52..80): TOGLANES/TOGSHIPS/TOGCOLONIES (BUTTONSTATE 1) are exact under the
+swap, TOGEMPIRE (BUTTONSTATE 0) is exact raw. Three independent sources name
+each button's state (windows.txt BUTTONSTATE, the refcap well colour, handler
+init 0x2718c) and all three agree, which is what makes a 4/4 exact result
+possible from ONE capture. NEGATIVE CONTROL: the spin/zoom row is not
+state-painted — the same swap degrades it 74.6% -> 21.5%.
+Code: ui_internal.h/vendortext.cpp blitShapePalSwap (blitShape + one index
+substitution); paint site ui.cpp step 3 gates on i >= MapCtl::TogLanes and
+passes on ? kToggleWellOnIdx : kToggleWellIdx. Constants mapchrome.h
+kToggleWellIdx=242 / kToggleWellOnIdx=80. Pins test_mapwell_t425c.cpp x3
+(palette colours named, well dominance 577..647 of 900 in every face + glyph
+survival, default-state -> colour prediction), mutation-verified: ON idx
+80->81 fails 4, well idx 242->200 fails 6. Witness PASS adds togships well
+maroon 647->0 / navy 0->647 and togempire 0->644 / 644->0 — the port's
+swap-able pixel counts equal the vendor faces' well counts exactly.
+
+RACE SLOTS (second shot only) [geometry verified, colour a NAMED SEAM]:
+scratchpad/galaxymap-original.png (642x481, identity mapping) is the only
+vendor capture containing the strip. Each slot's best match over all five
+family members x 49 offsets is the +2 OUTLINED member at dx0/dy0 (62.3 / 52.6
+/ 61.2% for slots 1/6/7; +1/+3/+4 never exceed 13.8%), so t425b's help.txt
+VISIBLE=+2 reading holds on real pixels. But the dominant tone in each rect is
+idx 16, 24, 20, 32, 28, 36, 40 — the family pair for slots 2<->3 and 4<->5 is
+SWAPPED, i.e. [inferred] the vendor draws slot i's GEOMETRY with the COLOUR
+PAIR of whichever species occupies slot i (the same substitution mechanism as
+the toggles; this is the S-f data-driven colour the t425b RAM probe could not
+locate). CAVEAT: that shot is not a pure game.pal render (off-table colours
+(95,73,111), (125,121,138) and blends like (0,138,66) between conv idx16 and
+idx19), which caps its exact-match percentages and is why the 640x480 refcap
+stays the authoritative diff source. The port keeps family-base colours for
+slot i; correct only under an identity species order.

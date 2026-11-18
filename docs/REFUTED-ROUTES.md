@@ -1394,3 +1394,15 @@ from a non-16 state is NOT evidence of unreachability.
 FUN_00023388's inlined calls reach SMRACE at base+8 off the LGRACE
 string). Do NOT re-run data-ref/imm censuses on these strings; the paint
 route is the vtable chain [win+0xa7]+0xc (STATE.md cycle-3 row).
+
+## R-t425c — MEASURING RACE-STRIP/SLOT PIXELS IN original-strategic-map.png IS
+DEAD (t425 cycle 3). That png is 640x480 with png = screen + 40 (rows 0..39
+pure black; TURNCOUNT 474,7-632,43 measures at png y52..80), so the strip
+(screen y 442..472 => png 482..512) is CLIPPED OUT of the file. Every
+"refcap slot" colour anyone has read from it (t425 cycle 1's "runtime ramp",
+t425b cycle 2's "slot1 maroon / slot3 navy") was read from the TOGGLE BUTTON
+row instead — png rows 443..473 are screen 403..433 = the four TYPE-25 toggles
+at pitch 39 (x 479/518/557/596; "pitch 44" was RACE1/3/5/7 x0s, a
+mis-attribution). Use scratchpad/galaxymap-original.png (642x481, identity
+mapping) for the strip, and the 640x480 png ONLY for the toggle/cluster rows
+where it is the exact-diff authority. Trail docs/re/_wip_t425.md F7-F10.

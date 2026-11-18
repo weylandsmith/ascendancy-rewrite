@@ -1276,6 +1276,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         // 3) spin/zoom/toggle cluster (COSMOSWnd children ln223-414,
         //    SHAPEFRAMEs 8..18 -> 1starmap; DRAW cited, pan/zoom BEHAVIOUR is
         //    the named seam — CosmosView has no scroll model to drive).
+        //    t425c TOGGLE-STATE WELL LAW [measured 900/900 bit-exact x4,
+        //    scripts/t425c_toggle_state_law.py]: the four layer toggles blit
+        //    their SHAPEFRAME with well idx242 -> idx80 (game.pal raw
+        //    (22,6,14) = conv (89,24,56) maroon) when their layer is ON, raw
+        //    navy when OFF. The spin/zoom row is NOT state-painted (negative
+        //    control: the same swap degrades it 74.6% -> 21.5%).
         {
             const int iconLib = libFor(kScreenMap);
             for (int i = 0; i < kMapCtlCount; i++) {
@@ -1283,8 +1289,24 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 SDL_Rect r{mc.rect.x0, mc.rect.y0,
                            mc.rect.x1 - mc.rect.x0 + 1,
                            mc.rect.y1 - mc.rect.y0 + 1};
-                if (!(iconLib >= 0 && blitShape(ren, kLibs[iconLib],
-                                                mc.shapeFrame, r.x, r.y))) {
+                bool on = false;
+                switch (MapCtl(i)) {
+                    case MapCtl::TogLanes: on = lanesOn; break;
+                    case MapCtl::TogEmpire: on = empireOn; break;
+                    case MapCtl::TogShips: on = shipsOn; break;
+                    case MapCtl::TogColonies: on = coloniesOn; break;
+                    default: on = false; break;
+                }
+                const bool isToggle = i >= int(MapCtl::TogLanes);
+                const bool painted =
+                    iconLib >= 0 &&
+                    (isToggle ? blitShapePalSwap(
+                                     ren, kLibs[iconLib], mc.shapeFrame, r.x,
+                                     r.y, kToggleWellIdx,
+                                     on ? kToggleWellOnIdx : kToggleWellIdx)
+                               : blitShape(ren, kLibs[iconLib], mc.shapeFrame,
+                                          r.x, r.y));
+                if (!painted) {
                     SDL_SetRenderDrawColor(ren, 40, 40, 56, 255);
                     SDL_RenderFillRect(ren, &r);
                     SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);

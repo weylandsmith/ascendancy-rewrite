@@ -230,31 +230,78 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t425 CONT CYCLE 3 GALAXY-MAP CONTROLS (ordering rationale: cycle 2
-KILLED the S-e premise outright — there is no runtime palette ramp. The
-seven RACECONTROLS faces are distinct 2-tone glyphs that live verbatim in
-static game.pal, the port now paints the vendor face family law, and the
-witness PASSes on it (scripts/t425_mapctl_witness.sh, mutation-verified x2).
-S-f got an honest negative: no stride-0x1ee race table with a colour byte
-was validated in any save, so the port's slot i == owner i assumption
-STANDS unrefuted (see docs/re/t399-galaxy-map-3d.md t425b section). What
-cycle 2 did NOT do: (a) the D17 dial FEEL verdict is still open — it gates
-OQ-027 and needs the user, not a probe; (b) the refcap strip at
-474,442-632,472 shows FOUR ~37px circles at pitch 44 (x 479,523,567,611)
-whose fill is converted game.pal idx 80 (89,24,56) = raw (22,6,14), NOT the
-16px race-slot faces the windows.txt table names — i.e. the refcap's
-bottom-right corner is a DIFFERENT control set (layer toggles) than the
-race strip, and the port has no equivalent for those circles. Cycle 3
-starts with the circles: identify which windows.txt controls they are
-(TOGLANES/TOGSHIPS/TOGCOLONIES/TOGEMPIRE rects vs the measured geometry),
-decide port-side whether they need painting or whether the existing toggle
-buttons already cover them, and pin it. THEN re-run the witness (must stay
-PASS) and ask the D16 q5 dial-feel verdict ONLY at the next natural user
-touchpoint (sheet PAUSED per D17; do NOT pop a question). WORK ITEMS:
-capstone only in ~/tools/revenv; refcap = docs/assets/refcap/original-
-strategic-map.png which is 640x480 and ALREADY the window — do NOT add a
-+40 title-band offset (cycle 2 burned probes on that). OQ-027 closes ONLY
-on the final hearing verdict; OQ-016/OQ-019 DEFERRED.
+NEXT t426 GALAXY MAP VISUALS CYCLE (ordering rationale: the t425 controls
+thread is CLOSED ON ITS EVIDENCE at cycle 3 — the layer-state paint law is
+now bit-exact (900/900 x4), the race-slot geometry is confirmed on real vendor
+pixels, and the two remaining threads there are NOT probe-shaped: the S-f
+slot->colour byte needs the paint-site table at [esp+0x38] + row origin 0xd82
+(t425b honest negative), and the dial FEEL verdict needs the user (sheet
+PAUSED per D17 — do NOT pop a question). D18 caps a thread at ~2 cycles and
+sends breadth first, and t426 is the queued breadth row for THIS SAME screen:
+map BORDER missing, PLAYER ICON UPPER LEFT (user verbatim 2026-11-17), HOME
+STAR = player icon + TWO rings at game start (derive which condition paints
+each; do NOT copy the guess), chrome texture per t422. NEW WEAPON t426 must
+use: t425c proved docs/assets/refcap/original-strategic-map.png is
+png = screen + 40 (rows 0..39 pure black; TURNCOUNT 474,7-632,43 measures at
+png y52..80) and is the palette-PURE shot (palette.md S3 307200/307200), while
+scratchpad/galaxymap-original.png is 642x481 IDENTITY but is NOT palette-pure
+(off-table colours + blends). So: exact-diff the BORDER/bevel/icon rects
+against the 640x480 png at +40 (its screen rows 0..439 are present; 440..479
+are clipped — the strip AND the bottom border row are only in the 642x481
+shot), and prefer exact-diff over statistical match everywhere: D18's standing
+complaint is guessing, and this iteration's 900/900 result is the bar.
+WORK ITEMS: capstone only in ~/tools/revenv; REFUTED ROUTE R-t425c — do NOT
+read race-strip/slot pixels out of the 640x480 png (they are clipped; what is
+there is the toggle row). OQ-027 closes ONLY on the final hearing verdict;
+OQ-016/OQ-019 DEFERRED.
+
+t425c LANDED 2026-11-18 (GALAXY-MAP CONTROLS CYCLE 3; working log
+docs/re/_wip_t425.md F7/F8/F9/F10; distilled docs/re/t399-galaxy-map-3d.md
+"t425c" section). TOGGLE WELL LAW MEASURED BIT-EXACT AND SHIPPED. (i) THE
+ASSIGNMENT'S PREMISE WAS WRONG: the four circles are NOT "pitch 44 inside the
+race strip" — the strip is not in original-strategic-map.png at ALL. That png
+is png = screen + 40 (rows 0..39 pure black, TURNCOUNT 474,7-632,43 measures
+at png y52..80), so png rows 443..473 == screen 403..433 == the FOUR TYPE-25
+LAYER TOGGLES at pitch 39 (x 479/518/557/596 = TOGLANES/TOGEMPIRE/TOGSHIPS/
+TOGCOLONIES). Cycle 2's "pitch 44" numbers were RACE1/3/5/7 x0s. Cycle 2's own
+ui.cpp comment ("strip at png rows 482..512, outside the shot") had it right
+and contradicted the assignment's "do NOT add +40" — REFUTED ROUTE R-t425c
+banked so nobody re-reads slot pixels from this file. (ii) THE LAW [verified
+900/900 bit-exact x4, ZERO residual pixels]: a toggle blits its SHAPEFRAME
+(1starmap k15..k18) at its verbatim rect and substitutes ONE palette entry by
+state — well idx242 (raw (3,8,12) -> (12,32,48) navy) renders as idx80
+(raw (22,6,14) -> (89,24,56) maroon) when ON, stays 242 when OFF. TOGLANES/
+TOGSHIPS/TOGCOLONIES (BUTTONSTATE 1) exact under the swap, TOGEMPIRE
+(BUTTONSTATE 0) exact raw; three independent sources agree on each button's
+state (windows.txt BUTTONSTATE, the refcap well colour, handler init 0x2718c).
+NEGATIVE CONTROL: the spin/zoom row is not state-painted (same swap degrades
+74.6% -> 21.5%). (iii) PORT: blitShapePalSwap (vendortext.cpp + ui_internal.h)
+= blitShape with one index substitution; ui.cpp step 3 gates i >=
+MapCtl::TogLanes and passes on ? kToggleWellOnIdx : kToggleWellIdx; constants
+mapchrome.h kToggleWellIdx=242 / kToggleWellOnIdx=80. PINS
+test_mapwell_t425c.cpp x3, MUTATION-VERIFIED x2 (ON 80->81 fails 4; well
+242->200 fails 6). SUITE 431/0/0 (+3). WITNESS PASS extended: togships well
+maroon 647->0 / navy 0->647, togempire 0->644 / 644->0 — the port's swappable
+pixel counts EQUAL the vendor faces' well counts (t425b face checks still
+PASS; slot5 chroma 35.6->0.2). (iv) SECOND-SHOT SLOT RESULT
+(scripts/t425c_slot_faces.py on scratchpad/galaxymap-original.png, the only
+capture containing the strip): GEOMETRY confirmed — each slot's best match over
+all five family members x 49 offsets is the +2 OUTLINED member at dx0/dy0
+(62.3/52.6/61.2% slots 1/6/7; +1/+3/+4 <=13.8%), so t425b's help.txt
+VISIBLE=+2 reading survives on real pixels. COLOUR is a NAMED SEAM: dominant
+tone per slot is idx 16/24/20/32/28/36/40 — the family pair is SWAPPED for
+slots 2<->3 and 4<->5 => [inferred] the vendor paints slot i's geometry with
+the colour pair of the species occupying it (same substitution mechanism as
+the toggles; this is the S-f data-driven colour). CAVEAT [verified]: that shot
+is NOT palette-pure (off-table (95,73,111), (125,121,138); blend (0,138,66)
+between conv idx16/idx19), which caps its percentages and keeps the 640x480 png
+the exact-diff authority. (v) t425b's own "measured" slot numbers are now
+corrected in place: they were toggle pixels (maroon/navy/maroon/maroon ==
+BUTTONSTATE 1,0,1,1 — an independent confirmation of (ii)). LEDGER closes
+NOTHING (strict-close: galaxy-map controls have no OQ owner, t414..t425b
+precedent; the dial row needs the live feel verdict). GATE_EXIT=0; LEDGER
+AUDIT OK (17 closed / OQ-016, OQ-019, OQ-027 open). NEXT -> t426 galaxy-map
+VISUALS (breadth row for the same screen; D18 cycle cap reached for controls).
 
 t425b LANDED 2026-11-18 (GALAXY-MAP CONTROLS CYCLE 2; working log
 docs/re/_wip_t425.md F3/F4/F5; distilled docs/re/t399-galaxy-map-3d.md

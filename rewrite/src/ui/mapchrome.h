@@ -90,6 +90,20 @@ inline constexpr bool kCtlDefaultColonies = true;
 inline constexpr bool kCtlDefaultEmpire = false;
 inline constexpr unsigned kRaceFilterInit = 0xff;
 
+// t425c TOGGLE-STATE WELL LAW [measured, scripts/t425c_toggle_state_law.py]:
+// each layer toggle blits its SHAPEFRAME (1starmap k15..k18) with ONE palette
+// substitution: the face's well index 242 (game.pal raw (3,8,12), converted
+// (12,32,48) navy) renders as index 80 (raw (22,6,14), converted (89,24,56)
+// maroon) when the layer is ON, and stays 242 when OFF. Measurement over the
+// full 30x30 face of every toggle in docs/assets/refcap/original-
+// strategic-map.png (mapping png = screen + 40): TOGLANES/TOGSHIPS/
+// TOGCOLONIES (BUTTONSTATE 1) match 900/900 under the swap, TOGEMPIRE
+// (BUTTONSTATE 0) matches 900/900 raw — zero residual pixels on all four, so
+// the well colour IS the vendor's layer-state signal. The spin/zoom cluster is
+// NOT state-painted (negative control: the swap degrades it 74.6% -> 21.5%).
+inline constexpr int kToggleWellIdx = 242;
+inline constexpr int kToggleWellOnIdx = 80;
+
 // t425 MSG MAP of the COSMOSWnd handler 0x26b34 [verified, capstone
 // base-0 work/ascend_restored.bin, full table docs/re/_wip_t425.md F1b]:
 // 26 store win+0xd9; 27..55 dial latch chain 0x27d6f; 56 CENTERHOLO

@@ -73,6 +73,28 @@ field = a[10:468, 10:462]
 n = int((b[10:468, 10:462].max(axis=2) > 60).sum())
 print(f"after-field non-black px: {n}")
 if n < 50: fails.append(f"field nearly empty after toggles ({n})")
+# 3b) t425c TOGGLE-STATE WELL LAW (docs/re/_wip_t425.md F8): the button WELL
+#     (face idx 242) renders game.pal idx 80 (89,24,56) maroon when the layer
+#     is ON and stays (12,32,48) navy when OFF. The witness clicks all four
+#     toggles, so every button must SWAP well colour, and the swap must be
+#     BIT-EXACT (the vendor measurement was 900/900).
+MAROON, NAVY = (89, 24, 56), (12, 32, 48)
+def wells(img, x0):
+    c = img[403:433, x0:x0+30].astype(int)
+    mar = int(((c == np.array(MAROON)).all(axis=2)).sum())
+    navy = int(((c == np.array(NAVY)).all(axis=2)).sum())
+    return mar, navy
+# TOGSHIPS 557 and TOGEMPIRE 518 start opposite (BS 1 / BS 0) and both flip.
+for name, x0, exp_from, exp_to in [("togships", 557, MAROON, NAVY),
+                                   ("togempire", 518, NAVY, MAROON)]:
+    ma, na = wells(a, x0)
+    mb, nb = wells(b, x0)
+    print(f"{name} well maroon {ma}->{mb}, navy {na}->{nb}")
+    if exp_from == MAROON and not ma > 400: fails.append(f"{name} base well not maroon ({ma})")
+    if exp_from == NAVY and not na > 400: fails.append(f"{name} base well not navy ({na})")
+    if exp_to == NAVY and not nb > 400: fails.append(f"{name} after well not navy ({nb})")
+    if exp_to == MAROON and not mb > 400: fails.append(f"{name} after well not maroon ({mb})")
+    if abs(mb - ma) < 200: fails.append(f"{name} well did not swap ({ma}->{mb})")
 print('VERDICT', 'FAIL: ' + '; '.join(fails) if fails else 'PASS')
 sys.exit(1 if fails else 0)
 EOF

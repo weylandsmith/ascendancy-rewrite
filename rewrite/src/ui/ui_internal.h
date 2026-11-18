@@ -66,6 +66,17 @@ bool blitShapeCircular(SDL_Renderer* ren,
                        const ascend::formats::ShapeLibrary& lib, int rec,
                        int x, int y, int scale, int clipR);
 
+// t425c TOGGLE-STATE WELL LAW: blitShape with ONE palette substitution
+// applied on the colour path (source index `from` renders as `to`). The
+// vendor paints layer-toggle buttons this way: SHAPEFRAME k15..k18 blitted
+// with well idx242 -> idx80 when ON, raw when OFF — measured 900/900
+// bit-exact on all four buttons of docs/assets/refcap/original-
+// strategic-map.png (png = screen + 40) by scripts/t425c_toggle_state_law.py;
+// law docs/re/_wip_t425.md F8. from == to is exactly blitShape.
+bool blitShapePalSwap(SDL_Renderer* ren,
+                      const ascend::formats::ShapeLibrary& lib, int rec,
+                      int x, int y, int from, int to);
+
 // t398: load DATA\game.pal for blitShape's colour path (process-wide; the
 // data root never changes mid-session — only the FIRST call in a process
 // reads the file and prints the diagnostic line; later calls just report

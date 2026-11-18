@@ -230,3 +230,122 @@ ln361-373, HELPINDEX rcontrol == the RACECONTROLS HELPINDEX, verbatim):
 VERDICT: S-f stays OPEN (strict-close: no cited colour-permutation law). The
 port's slot i == owner index i mapping is UNCHANGED and the seam note must
 say "vendor colour index is data-driven (byte +2), permutation unresolved".
+
+## F7 — CYCLE 3: THE FOUR CIRCLES ARE THE TOGGLE BUTTONS THEMSELVES (cycle-2
+## geometry claim REFUTED) [measured this session, scripts/t425c_circle_census.py
+## + t425c_button_measure.py + t425c_face_diff.py + t425c_shift_sweep.py]
+
+(i) GEOMETRY. The four circles are NOT inside the race strip and are NOT at
+pitch 44. windows.txt verbatim: TOGLANES 479,403..509,433 f15 msg57 BS1;
+TOGEMPIRE 518,403..548,433 f16 msg60 BS0; TOGSHIPS 557,403..587,433 f17
+msg58 BS1; TOGCOLONIES 596,403..626,433 f18 BS1 msg61 — pitch 39, row ABOVE
+the strip. The cycle-2 "x 479,523,567,611 pitch 44" numbers are RACE1/3/5/7
+x0s (pitch 22 x2) — a mis-attribution. Native vision on the 4x corner crop
+confirms: row (a) 4 small buttons (spin/zoom cluster row), row (b) FOUR ROUND
+BLUE-RINGED buttons at x 479/518/557/596, row (c) the maroon strip.
+
+(ii) PAINT LAW +1y. Shift sweep (-3..3): best exact-match for k15/k16/k17/k18
+is at dx+0 dy+1 with 71.9/71.4/71.4/81.9% and CONSISTENT index->colour
+correspondence (TOGCOLONIES: 34/45 indices >90% consistent; k109/k106/k107
+100% consistent). => the vendor blits the SHAPEFRAME at rect.y0+1 (art top
+row lands on png row 404, face bottom row 433). The residual 18-28% is
+concentrated on idx242->idx103 (ring highlight over face bg) — see (iii).
+The race faces k20..k39 match 0.0-1.0% at EVERY offset: the refcap race slots
+are NOT the static faces (consistent with the t425b finding; this now has a
+number).
+
+(iii) OPEN SUB-QUESTIONS at handoff: (A) the idx242->103 residual — is the
+ring partly overpainted (hover/pressed state) or is it the starfield speckle
+showing through? (B) the STRIP backdrop in the refcap is conv idx80
+(89,24,56) maroon 1900px, NOT k19's idx200 (12,12,16) — k19 exact-match 0.3%.
+The strip's runtime colour source is UNKOWN (race colour? remap? different
+record?). NOT yet the port's problem unless the port paints k19 there (it
+does — ui.cpp step 4) — check the port shot.
+
+## F8 — THE TOGGLE STATE PAINT LAW, 900/900 EXACT [measured,
+## scripts/t425c_toggle_state_law.py] and the refcap OFFSET CORRECTION
+
+THE OFFSET. docs/assets/refcap/original-strategic-map.png is 640x480 and is
+NOT window-relative: png rows 0..39 are PURE BLACK (all 40 rows, verified
+A[y].any()==False) and the green TURNCOUNT digits (windows.txt TURNCOUNT
+474,7-632,43) measure at png y 52..80. => PNG y = SCREEN y + 40, the refcap.md
+S1 root law, for THIS file. (t394's identity-mapping note belongs to the
+OTHER shot, scratchpad/galaxymap-original.png 642x481 — the two captures do
+not share a mapping law.) Cycle 2's assignment line "ALREADY the window — do
+NOT add +40" is REFUTED; cycle 2's own ui.cpp comment ("the strip is at png
+rows 482..512, outside the shot") was RIGHT and contradicts the assignment.
+
+WHAT THE FOUR CIRCLES ARE. png rows 443..473 == screen rows 403..433 == the
+FOUR LAYER TOGGLES at pitch 39 (x 479 TOGLANES / 518 TOGEMPIRE / 557 TOGSHIPS
+/ 596 TOGCOLONIES), SHAPEFRAMEs k15..k18. Not pitch 44, not the race strip.
+The row above them (png 404..434 == screen 364..394) is the spin/zoom cluster
+(4 columns holding the 7 ROT*/ZOOM*/CENTERHOLO controls). THE RACE STRIP
+(screen y 442..472 => png 482..512) IS NOT IN THIS CAPTURE AT ALL — clipped
+below the root edge. So this file carries ZERO pixels of the race slots, and
+every "refcap slot" reading in t425 (cycle 1) and t425b (cycle 2) was reading
+TOGGLE BUTTON pixels at png 449..465.
+
+THE LAW [verified, 4/4 buttons bit-exact over the full 30x30 face]:
+  the vendor blits the SHAPEFRAME at (X0, Y0+40) and substitutes ONE palette
+  entry according to the button's state:
+      face idx 242 (raw (3,8,12) navy well) -> idx 80 (raw (22,6,14) =
+      conv (89,24,56) maroon) when the toggle is ON; left 242 (navy) OFF.
+  TOGLANES BS1 -> 900/900 EXACT under 242->80; TOGSHIPS BS1 -> 900/900;
+  TOGCOLONIES BS1 -> 900/900; TOGEMPIRE BS0 -> 900/900 under the RAW palette.
+  Zero residual pixels on all four. Three independent sources agree on which
+  button is which state: windows.txt BUTTONSTATE, the refcap well colour, and
+  the handler init 0x2718c (dword win+0xc4/c8/d0 = -1 visible, win+0x58a /
+  byte win+0xd8 empire OFF).
+NEGATIVE CONTROL: the spin/zoom row is NOT state-painted — the same remap
+degrades it 74.6% -> 21.5% (raw match 74.6..94.9%; the residual is cosmos
+speckle over the navy well, the t422 chrome effect, not a colour law).
+CONSEQUENCE FOR THE PORT: ui.cpp step 3 blits kMapCtl frames RAW, so the port
+shows an ON toggle identical to an OFF one — the vendor's only visual layer-
+state signal. Fix = well-colour substitution idx242->idx80 for the four
+toggles by state.
+
+## F9 — COLLATERAL: t425b's slot readings were toggle pixels [verified]
+t425b measured "slot1 (89,24,56) / slot3 navy / slot5 maroon / slot7 maroon"
+at png 449..465 x {479,523,567,611}. With the corrected mapping those x are
+inside the toggle cells 479..509 / 518..548 / 557..587 / 596..627, and the
+colour pattern (maroon, NAVY, maroon, maroon) is exactly BUTTONSTATE 1,0,1,1
+== TOGLANES ON, TOGEMPIRE OFF, TOGSHIPS ON, TOGCOLONIES ON. That is a second,
+independent confirmation of F8 (and it means the t425b "face family" law has
+NO refcap support — it rests on the .shp family structure + help.txt only).
+
+## F10 — SECOND VENDOR SHOT: SLOT GEOMETRY CONFIRMED, SLOT COLOUR IS
+## OCCUPANT-DATA (the port's family-colour assumption is a named seam)
+## [measured, scripts/t425c_slot_faces.py on scratchpad/galaxymap-original.png]
+
+WHY THIS SHOT MATTERS: it is 642x481 with IDENTITY mapping (t394), so it is
+the ONLY vendor capture we have that actually contains the race strip (rows
+442..472; its dominant colour is idx200 == 1starmap k19's own backdrop). The
+640x480 refcap never showed a slot pixel (F8).
+
+GEOMETRY [verified]: every slot rect matches the +2 (outlined) family member
+at dx0/dy0 as the BEST of all five members and all 49 offsets — slot1 k22
+62.3%, slot6 k27 52.6%, slot7 k32 61.2%; the +1/+3 bright and +4 grey members
+score 1.2..13.8% / 0.0%. So "visible slot == outlined member at the verbatim
+rect" holds on real vendor pixels (t425b's help.txt reading survives).
+
+COLOUR [inferred from a blend-degraded capture — see caveat]: the DOMINANT
+tone in each rect is an exact game.pal entry, but NOT the family's own pair:
+  slot@479 idx16 ✓ | slot@501 idx24 | slot@523 idx20 | slot@545 idx32 |
+  slot@567 idx28 | slot@589 idx36 ✓ | slot@611 idx40 ✓
+Family pair for slot i is (16+4i, 19+4i), so slots 2<->3 and 4<->5 are
+SWAPPED relative to the family order. [inferred] The vendor paints slot i with
+the GEOMETRY of family i and the COLOUR PAIR of whichever species occupies
+slot i — the same palette-substitution mechanism F8 measures on the toggles.
+That is a data-driven slot->colour map, i.e. exactly the S-f colour byte the
+t425b probe could not locate. The port's current paint (family base colours,
+ui.cpp step 4) is therefore correct only when the save's species order is the
+identity — a NAMED SEAM, not a pin (no cited colour-byte source yet).
+
+CAPTURE CAVEAT [verified]: this shot is NOT a pure game.pal render — it
+contains colours outside the converted table ((95,73,111), (125,121,138)) and
+blends like (0,138,66) between conv idx16 (0,85,40) and idx19 (0,170,81). That
+is why slot1 tops out at 62.3% rather than 100%, and why the same shot scores
+the toggle well law only 37.3%/39.0% (DIRECTION still right: the swap lifts
+LANES/SHIPS/COLONIES from 0.1-0.3% and hurts EMPIRE 39.0% -> 0.6%). The
+640x480 refcap remains the authoritative exact-diff source (palette.md S3:
+307200/307200 px inside the converted pal).
