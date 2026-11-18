@@ -230,41 +230,60 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t425 CONT CYCLE 2 GALAXY-MAP CONTROLS RESIDUES (ordering rationale:
-cycle 1 shipped (b)(c)(d) fully — three dead buttons routed to cited
-toggle fields with a PASSing witness, race filter law ported, corner popup
-click wired — and (a) the dial row produced a static self-correction plus
-a cadence upgrade, but the D17 "original does not spin on click" FEEL
-verdict is still open; cycle 2 attacks the two named seams that gate it,
-both machine-attackable static work, zero user ruling needed to START:
-(S-e) RUNTIME PALETTE RAMP: the RACECONTROLS slot faces k20..k50 (16x16
-solid swatches, indices 16,19/20,23/../49,52 measured t425) decode DARK in
-static game.pal ((18,10,19) at idx 20) while the refcap slot reads
-(89,24,56) — nearest static entry (63,39,41) idx 229 delta 1126. Find the
-runtime writer of the ramp (t348 runtime-pal precedent: run-RANDOM values
-written at runtime; search writers near the cosmos paint 0x284bc/scene
-param frame 0x29514, and the STRIDE-0x1ee race-record owner: race-record
-byte +8 was the player-COLOUR index per t423c2 racering law — test whether
-the slot face index = 20+5*colourIdx law holds against the RACE<N>CONTROL
-FRAME column 20,25,30,35,40,45,50 (it does verbatim in windows.txt — the
-open question is whether the vendor tints frames by race via a RUNTIME pal
-ramp or ships distinct face content; census frames 20 vs 25 pixel-diff:
-BOTH solid, diff only in indices — so the law is face-index-pair -> pal
-pair; decode what indices 16/19 vs 20/23 vs 25/25+ mean in the RUNTIME
-pal). Cite or keep the port's luminance encoding (honest either way).
-(S-f) FILTER->OWNER CHAIN: the d8 consumer 0x27258 skips records by race
-index i (stride 0x1ee table at file 0x12fd6/0x12e19); the port assumes
-slot i == owner index i. Trace race-index -> player/empire mapping (race
-records vs the 7 playable slots; t414 chip palette order == race order
-corroborates) and pin or correct. THEN: re-run scripts/t425_mapctl_
-witness.sh (must stay PASS) + ask the D16 q5 dial-feel verdict ONLY via
-the next natural user touchpoint (sheet stays PAUSED per D17; do NOT pop
-a question). WORK ITEMS: capstone only in ~/tools/revenv (r331_disasm.txt
-is INTEL syntax); GhidraMCP headless CONNECTED for decompiles; NO new
-capture unless S-e/S-f genuinely require live RAM (pointer law
-docs/re/r1-savestate.md; scratch copies only). Do NOT re-ask anything
-D16/D17 covers; OQ-027 closes ONLY on the final hearing verdict;
-OQ-016/OQ-019 DEFERRED.
+NEXT t425 CONT CYCLE 3 GALAXY-MAP CONTROLS (ordering rationale: cycle 2
+KILLED the S-e premise outright — there is no runtime palette ramp. The
+seven RACECONTROLS faces are distinct 2-tone glyphs that live verbatim in
+static game.pal, the port now paints the vendor face family law, and the
+witness PASSes on it (scripts/t425_mapctl_witness.sh, mutation-verified x2).
+S-f got an honest negative: no stride-0x1ee race table with a colour byte
+was validated in any save, so the port's slot i == owner i assumption
+STANDS unrefuted (see docs/re/t399-galaxy-map-3d.md t425b section). What
+cycle 2 did NOT do: (a) the D17 dial FEEL verdict is still open — it gates
+OQ-027 and needs the user, not a probe; (b) the refcap strip at
+474,442-632,472 shows FOUR ~37px circles at pitch 44 (x 479,523,567,611)
+whose fill is converted game.pal idx 80 (89,24,56) = raw (22,6,14), NOT the
+16px race-slot faces the windows.txt table names — i.e. the refcap's
+bottom-right corner is a DIFFERENT control set (layer toggles) than the
+race strip, and the port has no equivalent for those circles. Cycle 3
+starts with the circles: identify which windows.txt controls they are
+(TOGLANES/TOGSHIPS/TOGCOLONIES/TOGEMPIRE rects vs the measured geometry),
+decide port-side whether they need painting or whether the existing toggle
+buttons already cover them, and pin it. THEN re-run the witness (must stay
+PASS) and ask the D16 q5 dial-feel verdict ONLY at the next natural user
+touchpoint (sheet PAUSED per D17; do NOT pop a question). WORK ITEMS:
+capstone only in ~/tools/revenv; refcap = docs/assets/refcap/original-
+strategic-map.png which is 640x480 and ALREADY the window — do NOT add a
++40 title-band offset (cycle 2 burned probes on that). OQ-027 closes ONLY
+on the final hearing verdict; OQ-016/OQ-019 DEFERRED.
+
+t425b LANDED 2026-11-18 (GALAXY-MAP CONTROLS CYCLE 2; working log
+docs/re/_wip_t425.md F3/F4/F5; distilled docs/re/t399-galaxy-map-3d.md
+"t425b" section). S-e CLOSED AS REFUTED, S-f HONEST NEGATIVE, FACE LAW
+SHIPPED. (i) RUNTIME-RAMP PREMISE DEAD: (89,24,56) IS converted game.pal
+idx 80 = raw (22,6,14) — cycle 1 compared refcap pixels against the RAW
+table (false miss) AND mis-attributed refcap bottom-right pixels to race
+slots when they are four ~37px layer-toggle circles at pitch 44 (x
+479,523,567,611; scripts/t425b_face_census.py + vision). palette.md S3
+already said the refcap is 307200/307200 inside the CONVERTED pal. No
+runtime palette writer needed or found. (ii) FACE FAMILY LAW [verified,
+canonical B-family rowwalk stream@rec+0x18 — the t399 k>=1 grammar
+stream@rec+8 MIS-WALKS 1starmap, desyncs on over-paint ops]: slot i owns
+FIVE records k(20+5i)..k(24+5i): dark face / bright face x plain + 103-
+outline variant + grey k(24+5i). Faces are structurally IDENTICAL glyphs;
+only the 2-colour index pair differs (16/19,20/23,24/27,28/31,32/35,
+36/39,40/43). Port now paints them (ui.cpp drawMapOverlay step 4 +
+mapchrome.h kRaceSlotFrameBase/Visible/Dimmed; visible=+2, dimmed=+4).
+(iii) S-f: stride-0x1ee race-table colour byte (star-draw 0x29980 reads
+race-row+2 as pal idx 0x10+4*b) could NOT be validated in any save —
+scripts/t425b_race_probe.py found no base passing independent anchors;
+diplomacy.md S10 already flagged the t423c2 0x12e16 census as unvalidated.
+Port assumption slot i == owner i STANDS (unrefuted, not confirmed).
+(iv) help.txt verbatim filter law banked ("species whose colors are
+OUTLINED" == the +103 outline variant — vendor outline law). TESTS 428/0/0
+(+1 mapctl_t425b_face_family_five_records_per_slot, mutation-verified x2:
++2->+0 fails, +4->+3 fails 7 tests). Witness PASS on the new law (slot5
+chroma 35.6->0.2, lum 88.3->22.5, neighbours stable). LEDGER closes
+NOTHING (no OQ owner; t414 precedent). GATE_EXIT=0; LEDGER AUDIT OK.
 
 t425 LANDED 2026-11-18 (GALAXY-MAP CONTROLS CYCLE 1; working log
 docs/re/_wip_t425.md F0/F1/F1b/F2). MEASUREMENTS: (i) COSMOSWnd 0x26b34

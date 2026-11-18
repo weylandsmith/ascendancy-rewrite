@@ -144,3 +144,89 @@ OPEN: which msg does a plain button press actually deliver (0x32 with
 param1=999 => NO-OP for dials) — does the vendor dial click do ANYTHING?
 Next: trace 0x27d6f fallthrough tail + msg 0x32 default; and check whether
 buttons with SENDPARAM1 999 get 0x32 at all (button engine 0x56xxx).
+
+## F3 — CYCLE 2 S-e: THE RUNTIME-RAMP PREMISE IS REFUTED (two compounding
+## cycle-1 errors) [measured this session, scripts/t425b_face_census.py]
+ERROR 1 (wrong rect). The (89,24,56) refcap reading is NOT the race strip.
+original-strategic-map.png rows are GAME rows + 40 (palette.md S4 law: "game
+coords = root rows - 40", refcap.md S1). The RACECONTROLS strip is game
+y 442..472 -> png rows 482..512 = OUTSIDE the 640x480 png: NO refcap shows
+the race slots. The maroon blobs cycle 1 measured are the THREE
+BUTTONSTATE-1 toggle buttons (TOGLANES/TOGSHIPS/TOGCOLONIES, windows.txt
+X0 479/557/596 y403..433 -> png 443..473; connected-component bbox of idx80
+gives EXACTLY x 479-509, 557-587, 596-626 + the TOGEMPIRE slot x518-548
+which is NAVY (12,32,48) = idx 242 — the BUTTONSTATE-0 button).
+BONUS LAW from that: TYPE-25 button face = SHAPEFRAME 15/16/17/18 (1starmap)
+circle glyph over fill idx80 (maroon, ON) vs idx242 (navy, OFF) — vision
+confirmed 3 maroon + 1 navy at exactly the BUTTONSTATE 1/1/0/1 pattern.
+ERROR 2 (missing conversion). (89,24,56) IS in game.pal: idx 80 raw
+(22,6,14), converted via c=(v<<2)|(v>>4) = (89,24,56) EXACT (palette.md S2).
+Cycle 1 compared refcap pixels against the RAW 6-bit table ("(18,10,19) at
+idx 20") — a units error. palette.md S3 already refuted any runtime palette
+for this screen: the strategic-map shot is 307200/307200 px inside the
+CONVERTED table. No runtime ramp exists to find.
+
+## F4 — THE REAL FACE LAW (scripts/t425b_face_census.py, 1starmap.shp,
+## row-walk = t399_digit_faces.py grammar) [measured]
+The seven slot faces are NOT solid swatches: each is 16x16, exactly TWO
+opaque indices + transparent skip, 80 px dark tone + 51 px bright tone
+(a glyph), and both indices decode fine through static game.pal:
+  k20 slot1 idx16(0,85,40)/idx19(0,170,81)      GREEN
+  k25 slot2 idx20(73,40,77)/idx23(158,81,174)    PURPLE
+  k30 slot3 idx24(166,101,4)/idx27(255,235,97)   YELLOW
+  k35 slot4 idx28(186,65,89)/idx31(239,154,174)  PINK
+  k40 slot5 idx32(65,56,40)/idx35(121,105,69)    BROWN
+  k45 slot6 idx36(20,56,93)/idx39(36,117,207)    BLUE
+  k50 slot7 idx40(117,48,4)/idx43(235,121,4)     ORANGE
+  (stride frame k19 = 158x30 strip backdrop, idx200/0/196 — not a swatch)
+Cycle 1's "indices 16,19/20,23/../49,52" enumeration was off for the later
+slots (k30 is 24/27, not 24/23; k50 is 40/43, not 49/52).
+CONSEQUENCE for the port: the honest fix is to paint each slot's OWN face
+(frame 20+5i) through the converted game.pal — the hues above ARE the
+per-slot colours; the CVD-safe kOwnerRgb fill was a placeholder for a seam
+that does not exist. (Face glyph shape census: next section.)
+
+## F5 — FACE FAMILY LAW + THE OUTLINE LAW (help.txt) [measured]
+Full census of 1starmap k20..k54 (scripts/t425b_face_census.py): every slot
+i (0-based) owns a FAMILY OF FIVE records at base = 20 + 5i:
+  base+0  16x16  dark tone + bright tone, NO outline        (windows.txt
+                                                            SHAPEFRAME col)
+  base+1  16x16  BRIGHTER dark tone + same bright tone
+  base+2  17x17  base+0 glyph + idx103 OUTLINE (190,255,255), 28 px
+  base+3  17x17  base+1 glyph + idx103 outline
+  base+4  16x16  GREY variant: idx0 (0,0,0) + idx6 (97,97,97)
+Tone pairs per slot: 16/19, 20/23, 24/27, 28/31, 32/35, 36/39, 40/43
+(brighter variants 18/19, 22/23, ...). All seven glyphs are STRUCTURALLY
+IDENTICAL (pixel-class compare) — only the palette pair differs, so the slot
+colour IS the species colour and the glyph is a fixed mark.
+DECISIVE SEMANTICS from the vendor's own help (extracted/ascend00/help.txt
+ln361-373, HELPINDEX rcontrol == the RACECONTROLS HELPINDEX, verbatim):
+  "This group of colored buttons is used to filter Galactic Display
+   information by species. @@Only information pertaining to the species
+   whose colors are OUTLINED will be displayed."
+=> VISIBLE slot = the OUTLINED frame (base+2/+3), FILTERED slot = the GREY
+   frame (base+4). The port's "half luminance" encoding is superseded by
+   cited vendor art. (dark vs bright variant inside the outlined pair is a
+   named residual — no static site resolves it; k22/k23 differ only in tone.)
+
+## F6 — S-f TRACE + HONEST NEGATIVE [measured static + live-RAM census]
+(i) The d8 consumer at 0x29976..0x29998 (star paint) does:
+      dl = [esp+0x54] (running bit 1<<i)  AND  cl = [win+0xd8]  -> skip if 0
+      al = byte [ebp + 0x12e18]           ; race-record byte +2
+      edx = 0x13 + 4*al - 3 = 0x10 + 4*al ; then add ebx ([esp+0x38]) -> push
+    so the vendor's per-race COLOUR is DATA-DRIVEN (race record byte +2),
+    NOT "slot i == owner i". The filter is an AND on the same byte-indexed
+    race row, i.e. filter slot i filters RACE ROW i.
+(ii) LIVE-RAM census (scripts/t425b_race_colour.py + t425b_race_probe.py,
+    pointer law B+0x82bb0+X, B=0x1bf4d8, 20 slots work/r1/playcap/save):
+    row base VALIDATED by independent anchors — byte +0 == race index i for
+    rows 0..4 (rows 5,6 = 0xFF absent), relation-diagonal word [+0x1b2+2i]
+    == 0 on every row, [0x13b98]=4 (races present), [0x7458e]=0 (local race).
+    byte+2 = [0, 1, 6, 2, 1] for races 0..4 — NON-INJECTIVE, so byte +2 is
+    NOT a 7-way colour permutation of the slot ramp and the paint-site table
+    at [esp+0x38] is NOT resolved (also: the loop bound at 0x29957 is 0xd82,
+    which is 7*0x1ee + 0x40 — the row-walk origin of THAT loop differs from
+    the 0x12e16 base used by the diplo/AI sites; unresolved).
+VERDICT: S-f stays OPEN (strict-close: no cited colour-permutation law). The
+port's slot i == owner index i mapping is UNCHANGED and the seam note must
+say "vendor colour index is data-driven (byte +2), permutation unresolved".

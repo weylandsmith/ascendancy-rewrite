@@ -806,9 +806,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // byte[win+0xd8] bit dl, where dl is the RACE<N>CONTROL
                     // row's bit column (ln429-435: bits 1,2,4,8,16,32,64 ==
                     // 1<<slot). Consumer 0x27258..0x272ac skips every record
-                    // of a race whose bit is clear. The port's analog: slot i
-                    // == owner index i (kOwnerRgb order), so a cleared slot
-                    // hides that owner's star tint and its fleet pips.
+                    // of a race whose bit is clear. t425b S-f UPDATE: the
+                    // vendor's per-race COLOUR is DATA-DRIVEN — the star
+                    // paint site 0x29980 reads race-record byte +2 (row =
+                    // 0x12e16 + 0x1ee*i, base VALIDATED by the +0 == i and
+                    // diagonal-0 anchors, scripts/t425b_race_probe.py) and
+                    // indexes a table with 0x10 + 4*byte; the byte census
+                    // [0,1,6,2,1] is NON-INJECTIVE so byte+2 is NOT a colour
+                    // permutation and the permutation stays UNRESOLVED
+                    // (docs/re/_wip_t425.md F6, honest negative). The port's
+                    // analog: slot i == owner index i (kOwnerRgb order), so a
+                    // cleared slot hides that owner's star tint and fleet pips.
                     if (const auto slot = raceSlotFor(p)) {
                         raceVisibleMask ^= (1u << *slot);
                         std::printf("ui race filter slot %d mask 0x%02x\n",
@@ -1286,8 +1294,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         }
         // 4) RACECONTROLS strip 474,442-632,472 (SHAPEFRAME 19 = 1starmap
         //    k19 158x30; MEASURED slot-1 square 479,448-495,465 == table).
-        //    Slot SQUARES carry species colour — vendor palette is the named
-        //    luminance seam, so the port's CVD-safe kOwnerRgb fills them.
+        //    t425b: slots paint their OWN vendor FACE (family law
+        //    mapchrome.h: visible = outlined member, filtered = grey member),
+        //    coloured through game.pal by blitShape. The t425 "runtime ramp"
+        //    seam was REFUTED (docs/re/_wip_t425.md F3): the faces decode fine
+        //    in the static palette; cycle 1 had compared refcap pixels against
+        //    the RAW 6-bit table and had measured the toggle-button row (the
+        //    strip is at png rows 482..512, outside the 640x480 shot).
         {
             const int iconLib = libFor(kScreenMap);
             if (!(iconLib >= 0 && blitShape(ren, kLibs[iconLib],
@@ -1307,19 +1320,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 SDL_Rect r{rs.rect.x0, rs.rect.y0,
                            rs.rect.x1 - rs.rect.x0 + 1,
                            rs.rect.y1 - rs.rect.y0 + 1};
+                const bool visible = (raceVisibleMask & (1u << i)) != 0u;
+                const int face = visible ? kRaceSlotFrameVisible(i)
+                                         : kRaceSlotFrameHidden(i);
+                if (iconLib >= 0 && blitShape(ren, kLibs[iconLib], face,
+                                              r.x, r.y))
+                    continue;
+                // DEGRADED (data-less clone path, publish law): CVD-safe
+                // kOwnerRgb fill, luminance-halved when filtered.
                 RGB c = kOwnerRgb[i];
-                if ((raceVisibleMask & (1u << i)) == 0) {
-                    // t425 FILTERED state: luminance halved (shape + colour
-                    // redundancy — the D-page CVD law never encodes in one
-                    // channel). [PORT CHOICE: the vendor's own slot faces
-                    // k20..k50 are 16x16 records whose indices (16,19 /
-                    // 20,23 / ...) DECODE dark in game.pal ((18,10,19)...),
-                    // while the refcap slot reads (89,24,56) — a RUNTIME
-                    // ramp, not the static palette; blitting them raw would
-                    // paint near-black squares, so the port keeps its
-                    // CVD-safe fills and encodes the mask in luminance.]
+                if (!visible)
                     c = RGB{uint8_t(c.r / 2), uint8_t(c.g / 2), uint8_t(c.b / 2)};
-                }
                 SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
                 SDL_RenderFillRect(ren, &r);
                 SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);

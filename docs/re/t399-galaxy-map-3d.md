@@ -153,3 +153,51 @@ the spin reads as IN-PLANE rotation at rest (the user's "rotate about Z").
 The port (cam3d.{h,cpp}) now models this basis directly; the depth ladder
 follows the TRANSFORMED depth (node+0xd law). Full working log:
 docs/re/_wip_t416.md F1-F3.
+
+## t425b — RACE FILTER FACE LAW + S-f HONEST NEGATIVE (2026-11-18)
+
+Hand-authored (no script writes this file; grep scripts/ for the name = 0 hits).
+Working log: docs/re/_wip_t425.md F3-F6. Census tool: scripts/t425b_face_census.py.
+
+FACE FAMILY LAW [measured, 1starmap.shp canonical rowwalk S16/S17]: filter
+slot i (windows.txt RACE<N>CONTROL, rect 479+22i..495+22i / 449..465) owns
+FIVE records at base = 20 + 5i:
+  +0 16x16 dark tone      +1 16x16 brighter tone
+  +2 17x17 dark + idx103 OUTLINE   +3 17x17 brighter + outline
+  +4 16x16 GREY (idx0/idx6 neutral)
+Tone pairs 16/19, 20/23, 24/27, 28/31, 32/35, 36/39, 40/43 — all seven glyphs
+structurally IDENTICAL, only the palette pair differs, so the slot colour IS
+the species colour. VISIBLE = +2 / FILTERED = +4 per the vendor's own help
+(ascend00/help.txt ln370-373, HELPINDEX rcontrol, verbatim): "Only information
+pertaining to the species whose colors are OUTLINED will be displayed."
+Measured over the 17x17 rect on the k19 stride backdrop: visible mean lum
+82.8..149.8 and CHROMATIC per slot; hidden 23.2 NEUTRAL — on/off encodes hue
++ outline AND luminance, so the vendor art satisfies the CVD law by itself.
+Code: rewrite/src/ui/mapchrome.h kRaceSlotFrameBase/Visible/Hidden; paint site
+ui.cpp (blitShape through game.pal; kOwnerRgb fill kept ONLY as the data-less
+degradation). Pin mapctl_t425b_face_family_five_records_per_slot, mutation
+verified +2->+0 and +4->+3 (7 fails each). Witness
+scripts/t425_mapctl_witness.sh PASS: slot5 chroma 35.6->0.2, lum 88.3->22.5,
+slot1 chroma unchanged 101.8.
+
+REFUTED (two compounding cycle-1 errors, kept so nobody re-walks them):
+(1) the "(89,24,56) refcap slot" was NOT the strip — original-strategic-map.png
+rows are game rows + 40, so the strip (game y 442..472) is OUTSIDE the 640x480
+shot; the maroon blobs measured are the three BUTTONSTATE-1 toggle buttons
+(components x 479-509 / 557-587 / 596-626) plus the navy BUTTONSTATE-0 slot.
+(2) (89,24,56) IS in game.pal: idx 80 raw (22,6,14) converted via
+c=(v<<2)|(v>>4) — cycle 1 compared pixels against the RAW 6-bit table. There is
+NO runtime palette for this screen (palette.md S3: 307200/307200 px inside the
+CONVERTED table). BONUS LAW from the same components: TYPE-25 toggle faces
+SHAPEFRAME 15/16/17/18 read fill idx80 (ON) vs idx242 (OFF).
+
+S-f (filter -> owner/colour) HONEST NEGATIVE, row stays open: the d8 consumer
+at 0x29976..0x29998 skips race i when the bit is clear, then reads race-record
+BYTE +2 and indexes the colour table with 0x10 + 4*byte (data-driven, NOT
+"slot i == owner i"). Live-RAM census over 20 slots (pointer law B+0x82bb0+X,
+B=0x1bf4d8; scripts/t425b_race_colour.py + t425b_race_probe.py): row base
+VALIDATED by independent anchors (byte +0 == race index i rows 0..4, relation
+diagonal [+0x1b2+2i] == 0, [0x13b98]=4, [0x7458e]=0); byte +2 = [0,1,6,2,1] —
+NON-INJECTIVE, so it is not a colour permutation, and the paint-site table at
+[esp+0x38] plus that loop's row origin (bound 0xd82) are UNRESOLVED. The port
+keeps slot i == owner index i and the seam note says so.

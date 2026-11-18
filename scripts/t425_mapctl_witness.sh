@@ -46,15 +46,25 @@ x,y,w,h = (int(v) for v in sys.argv[1:5])
 a = np.asarray(Image.open('/tmp/t425_base.png').convert('RGB'))[y:y+h, x:x+w]
 b = np.asarray(Image.open('/tmp/t425_after.png').convert('RGB'))[y:y+h, x:x+w]
 fails=[]
-# 1) slot-5 square (567..583, 449..465) must have CHANGED (filter feedback:
-#    luminance halved on the CVD-safe fill).
-s5a = a[449:466, 567:584].mean(); s5b = b[449:466, 567:584].mean()
-print(f"slot5 mean lum before {s5a:.1f} after {s5b:.1f}")
-if not s5b < s5a - 10: fails.append(f"slot5 not dimmed ({s5a:.1f}->{s5b:.1f})")
-# 2) the OTHER slots must be UNCHANGED (the mask touches only slot 5)
-o5a = a[449:466, 479:496].mean(); o5b = b[449:466, 479:496].mean()
-print(f"slot1 mean lum before {o5a:.1f} after {o5b:.1f}")
-if abs(o5b-o5a) > 2: fails.append(f"slot1 changed too ({o5a:.1f}->{o5b:.1f})")
+# t425b FACE LAW (docs/re/_wip_t425.md F5): visible slot paints the OUTLINED
+# member (chromatic), filtered slot paints the GREY member (neutral). Check
+# BOTH the chroma collapse on the clicked slot and the neighbour stability.
+def chroma(img, x0):
+    c = img[449:466, x0:x0+17].astype(int)
+    return (c.max(axis=2) - c.min(axis=2)).mean()
+def lum(img, x0):
+    c = img[449:466, x0:x0+17].astype(float)
+    return (0.299*c[:,:,0] + 0.587*c[:,:,1] + 0.114*c[:,:,2]).mean()
+ca, cb = chroma(a, 567), chroma(b, 567)
+la, lb = lum(a, 567), lum(b, 567)
+print(f"slot5 chroma {ca:.1f} -> {cb:.1f}; lum {la:.1f} -> {lb:.1f}")
+if not ca > 12: fails.append(f"slot5 not chromatic while visible (chroma {ca:.1f})")
+if not cb < 4: fails.append(f"slot5 still chromatic after filtering (chroma {cb:.1f})")
+if lb > la: fails.append(f"slot5 did not dim ({la:.1f}->{lb:.1f})")
+# the OTHER slots must be UNCHANGED (the mask touches only slot 5)
+oa, ob = chroma(a, 479), chroma(b, 479)
+print(f"slot1 chroma {oa:.1f} -> {ob:.1f}")
+if abs(ob-oa) > 2: fails.append(f"slot1 changed too ({oa:.1f}->{ob:.1f})")
 # 3) the field must still render (non-trivial content; lanes toggled back ON
 #    is NOT part of this witness — the four clicks leave lanes OFF, ships ON,
 #    colonies OFF, empire ON; field pixels must still exist: stars draw

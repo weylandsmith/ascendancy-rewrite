@@ -105,6 +105,27 @@ inline constexpr int kRaceControlsShape = 19;  // SHAPEFRAME verbatim (k19)
 struct RaceSlot { int bit; Rect rect; };       // verbatim RACE<N>CONTROL
 extern const RaceSlot kRaceSlots[7];
 
+// t425b FACE FAMILY LAW (docs/re/_wip_t425.md F5, census
+// scripts/t425b_face_census.py over extracted/ascend01/data/1starmap.shp):
+// slot i owns FIVE records at base = 20 + 5i —
+//   +0 16x16 dark tone, +1 16x16 brighter tone,
+//   +2 17x17 dark tone + idx103 OUTLINE, +3 17x17 brighter + outline,
+//   +4 16x16 GREY variant (idx0/idx6, neutral).
+// The windows.txt SHAPEFRAME column (20,25,...,50) is the +0 member, and the
+// control RECT is 17x17 inclusive (479..495 / 449..465) — exactly the size of
+// the outlined members. Which member the vendor paints is decided by the
+// vendor's own help text (extracted/ascend00/help.txt ln370-373, HELPINDEX
+// rcontrol == the RACECONTROLS HELPINDEX, verbatim): "Only information
+// pertaining to the species whose colors are OUTLINED will be displayed" =>
+// VISIBLE = +2 (outlined), FILTERED = +4 (grey). Measured over the 17x17 rect
+// with the stride backdrop (k19 idx200): visible mean lum 82.8..149.8 and
+// CHROMATIC per slot; hidden 23.2 and NEUTRAL (max-min channel < 1) — so the
+// on/off encoding is hue+outline AND luminance (the CVD law is satisfied by
+// the vendor art itself, no port ramp needed).
+inline constexpr int kRaceSlotFrameBase(int i) { return 20 + 5 * i; }
+inline constexpr int kRaceSlotFrameVisible(int i) { return kRaceSlotFrameBase(i) + 2; }
+inline constexpr int kRaceSlotFrameHidden(int i) { return kRaceSlotFrameBase(i) + 4; }
+
 // The race-control slot (if any) owning p. Slots are disjoint (pitch 22,
 // width 16: gaps 517..522 etc. hit nothing).
 std::optional<int> raceSlotFor(Pt p);  // returns index 0..6

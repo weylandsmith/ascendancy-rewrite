@@ -72,6 +72,35 @@ TEST(mapctl_t425_race_slot_bits_are_powers_of_two) {
     CHECK(!raceSlotFor({519, 457}).has_value());
 }
 
+TEST(mapctl_t425b_face_family_five_records_per_slot) {
+    // t425b FACE FAMILY LAW (docs/re/_wip_t425.md F5; census
+    // scripts/t425b_face_census.py): slot i owns five 1starmap records at
+    // base = 20 + 5i. The windows.txt SHAPEFRAME column (20,25,...,50) is the
+    // +0 member; the outlined member is +2 and the grey member is +4.
+    // VISIBLE = OUTLINED per the vendor's own help text (help.txt ln370-373,
+    // HELPINDEX rcontrol == the RACECONTROLS HELPINDEX, verbatim): "Only
+    // information pertaining to the species whose colors are OUTLINED will be
+    // displayed".
+    for (int i = 0; i < 7; i++) {
+        CHECK(kRaceSlotFrameBase(i) == 20 + 5 * i);
+        CHECK(kRaceSlotFrameVisible(i) == 22 + 5 * i);
+        CHECK(kRaceSlotFrameHidden(i) == 24 + 5 * i);
+        for (int j = i + 1; j < 7; j++) {
+            CHECK(kRaceSlotFrameVisible(i) != kRaceSlotFrameVisible(j));
+            CHECK(kRaceSlotFrameHidden(i) != kRaceSlotFrameHidden(j));
+        }
+    }
+    CHECK(kRaceSlotFrameBase(0) == 20);   // windows.txt ln429 SHAPEFRAME
+    CHECK(kRaceSlotFrameBase(6) == 50);   // windows.txt ln435 SHAPEFRAME
+    // The control rect is 17x17 INCLUSIVE (479..495, 449..465) — exactly the
+    // measured size of the OUTLINED members (16x16 for +0/+1/+4), so the
+    // painted face covers its own rect and the outline lands on the rect edge.
+    for (int i = 0; i < 7; i++) {
+        CHECK(kRaceSlots[i].rect.x1 - kRaceSlots[i].rect.x0 + 1 == 17);
+        CHECK(kRaceSlots[i].rect.y1 - kRaceSlots[i].rect.y0 + 1 == 17);
+    }
+}
+
 TEST(exitpopup_t425_click_geometry_resolves_at_every_corner) {
     // The click branch recomputes exitCornerFor at the click point and
     // requires the point inside exitPopupRect: pin that a corner pixel
