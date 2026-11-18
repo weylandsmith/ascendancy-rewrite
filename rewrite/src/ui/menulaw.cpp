@@ -36,6 +36,41 @@ int newgameControlAt(Pt p) {
     return -1;
 }
 
+int newgameChipAt(Pt p) {
+    // Vendor zone [verified 0x529d2]: 379 <= x <= 493 (0x17b/0x1ed),
+    // 420 <= y <= 472 (0x1a4/0x1d8); idx = (x - 0x17b) >> 4 verbatim —
+    // inclusive edges, no clamp (a click at x493 lands on idx 7).
+    if (p.x < 379 || p.x > 493 || p.y < 420 || p.y > 472) return -1;
+    return (p.x - 0x17b) >> 4;
+}
+
+void assignRaceColours(int clicked, int count, unsigned int* lcgState,
+                       unsigned char* out) {
+    // FUN_000232ec [verified capstone 0x232ec..0x23385]: guard is
+    // `1 < word[base+0xd88]`, so count <= 1 writes nothing at all (not
+    // even slot 0). Slot 0 = clicked verbatim (byte store, dl). Slots
+    // 1..count-1: cand = rand()%7 (signed idiv — LCG value is
+    // (state>>16)&0x7fff, always >= 0, so the C++ % matches); re-draw
+    // while cand equals ANY written out[j], j < i (scan bound cmp ax,cx
+    // at 0x23360 = i, not count).
+    if (count <= 1 || out == nullptr || lcgState == nullptr) return;
+    out[0] = static_cast<unsigned char>(clicked);
+    for (int i = 1; i < count; i++) {
+        unsigned char cand;
+        do {
+            *lcgState = *lcgState * 0x41C64E6Du + 0x3039u;
+            cand = static_cast<unsigned char>((*lcgState >> 16) & 0x7fffu) %
+                   7u;
+            for (int j = 0; j < i; j++)
+                if (out[j] == cand) {
+                    cand = 0xFF;  // collision sentinel: never a real value
+                    break;
+                }
+        } while (cand == 0xFF);
+        out[i] = cand;
+    }
+}
+
 // ---- t393 New Game full-screen law ----------------------------------------
 int newgameRowAt(Pt p) {
     if (!inside(kRaceList, p)) return -1;

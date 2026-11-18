@@ -162,6 +162,18 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
     int speciesSetting = 7;   // player + 6 AI (main.cpp buildCampaign law)
     int atmosphere = 1;       // Neutral (measured vendor default, see above)
     int selSlot = 0, scrollOffset = 0;  // RACELIST window (3 of roster)
+    // t423c PLAYER COLOUR state [verified FUN_000232ec + racering census]:
+    // byte[raceRow+8] = colour idx 0..7 (racering.shp record index — the
+    // lib IS 8 colour-tinted 53x53 rings, docs/re/_wip_t423c2.md C2-F5).
+    // Default idx 0 (green == the measured DESC ring (0,142,69) == racering
+    // k0 (0,141,68)); AI races get distinct rand()%7 values. LCG seed is a
+    // NAMED SEAM (vendor srand chain 0x21490 feeds saved state; no cited
+    // initial value for a fresh New Game screen).
+    int playerColourIdx = 0;
+    unsigned int colourLcg = 0x12e10u;  // seam: seed value, not law
+    unsigned char raceColours[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    assignRaceColours(playerColourIdx, speciesSetting, &colourLcg,
+                      raceColours);
     // t412: the Begin press carries the species pick + atmosphere into the
     // race intro (the intro's gated section is atmosphere-selected).
     int beginSpecies = 0, beginAtmosphere = 1;
@@ -549,8 +561,9 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             // portraits (49 -> 98, t401 S8), so the class scale is 2.
             {
                 bool ringDrawn = false;
-                if (raceringLib.count() > 0)
-                    ringDrawn = blitShapeScaled(ren, raceringLib, 0,
+                if (raceringLib.count() > playerColourIdx)
+                    ringDrawn = blitShapeScaled(ren, raceringLib,
+                                                playerColourIdx,
                                                 kDescRingCentre.x - 53,
                                                 kDescRingCentre.y - 53, 2);
                 if (!ringDrawn) {
@@ -647,12 +660,16 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     SDL_RenderFillRect(ren, &band);
                 }
                 if (specnum < rosterCount()) {
-                    // t423 DEFECT (e): racering k0 record at 2x (same law
-                    // as the desc-panel ring above); vector fallback only
-                    // when the lib is unavailable.
+                    // t423c: RACELIST row rings = racering k7 (NEUTRAL
+                    // grey record) at 2x [verified: row ring edges on the
+                    // pinned original are greys 35..186 with ZERO chroma
+                    // (C2-F6); racering k7 = (28,28,28)+(165,165,165)].
+                    // The DESC ring above is k<playerColourIdx> — the lib
+                    // is 8 colour-tinted rings (C2-F5). Vector fallback
+                    // only when the lib is unavailable.
                     bool ringDrawn = false;
-                    if (raceringLib.count() > 0)
-                        ringDrawn = blitShapeScaled(ren, raceringLib, 0,
+                    if (raceringLib.count() > 7)
+                        ringDrawn = blitShapeScaled(ren, raceringLib, 7,
                                                     kRacePortraitCx - 53,
                                                     cy - 53, 2);
                     if (!ringDrawn) {
@@ -930,10 +947,31 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                         std::fflush(stdout);
                         continue;
                     }
+                    const int chip = newgameChipAt(p);
+                    if (chip >= 0) {
+                        // t423c PLAYER-COLOUR REASSIGN [verified 0x529d2 +
+                        // FUN_000232ec]: a click in x379..493 y420..472
+                        // stores word[win+0xb5]=idx and re-derives every
+                        // race-slot colour (player keeps the clicked idx,
+                        // AI races draw distinct rand()%7). Visible here:
+                        // the DESC-panel ring = racering k<idx> (C2-F5).
+                        // windows.txt MSG 0 (L664) only means the zone
+                        // SENDS no message — the handler is real (the
+                        // t401 "inert" reading is REFUTED by the disasm).
+                        playerColourIdx = chip;
+                        colourLcg = 0x12e10u;  // seam: per-click reseed
+                        assignRaceColours(playerColourIdx, speciesSetting,
+                                          &colourLcg, raceColours);
+                        std::printf(
+                            "ui raceconfig player colour idx %d (races %d)\n",
+                            playerColourIdx, speciesSetting);
+                        std::fflush(stdout);
+                        continue;
+                    }
                     if (inRect(kPlayerColorRect, p)) {
                         std::printf("ui raceconfig click Player^Color msg 0\n");
                         std::fflush(stdout);
-                        continue;  // MSG 0 = inert zone (windows.txt L664)
+                        continue;  // label band (windows.txt L653) = MSG 0
                     }
                     if (inRect(kBeginNewGameBtn, p)) {
                         std::printf(

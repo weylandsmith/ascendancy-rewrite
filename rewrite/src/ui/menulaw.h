@@ -43,6 +43,22 @@ extern const NewgameControl kNewgameControls[kNewgameControlCount];
 // (same law as titleButtonAt).
 int newgameControlAt(Pt p);
 
+// t423c PLAYER-CHIP HIT LAW [verified disasm 0x529d2 zone cmp ebx
+// 0x17b/0x1ed, ecx 0x1a4/0x1d8; idx = (x-0x17b)>>4]: the vendor chip zone
+// is x379..493 y420..472 (BELOW windows.txt's MSG-0 label rect); chip idx
+// rides a 16-px grid from x=379, so idx 0..7 are reachable (idx 7 = the
+// neutral sliver at x>=491). Returns 0..7 or -1 outside the zone.
+int newgameChipAt(Pt p);
+
+// t423c COLOUR REASSIGN LAW [verified FUN_000232ec @0x232ec, capstone
+// 0x232ec..0x23385]: out[0] = clicked; for i = 1..count-1 draw cand =
+// rand()%7 (Borland LCG FUN_0007824f, *lcgState) re-picked while cand
+// equals any ALREADY-WRITTEN out[j], j < i. All count colours distinct;
+// the clicked idx is stored verbatim (7 = neutral allowed). No-op unless
+// 2 <= count (vendor guard `1 < word[base+0xd88]`).
+void assignRaceColours(int clicked, int count, unsigned int* lcgState,
+                       unsigned char* out);
+
 // ---- New Game full-screen layout (t393; docs/re/_wip_t393.md S6-S12) ------
 // D10 (user 2026-11-14): the vendor New Game screen is a FULL-SCREEN switch
 // (starfield backdrop + panels), not an overlay. The four bottom-row panels

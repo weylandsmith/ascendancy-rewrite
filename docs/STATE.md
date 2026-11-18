@@ -230,49 +230,73 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t423 CONT cycle 2 (ordering rationale: cycle 1 landed the
-wheel/spin/preview/starfield/ring laws with witnesses
-(docs/re/t423-newgame-law.md) but the row cannot close until the grade
-is clean (close law 4) — the two remaining named items are defect (d)
-the species/planet 4x scale law and the player-colour click-reassign.
-Do NOT re-derive the wheel frames, the k12 partial paint, the preview
-volume law, or the rings: all FIXED/pinned this cycle. WORK ITEMS:
-(1) SCALE LAW (d): the row hints "drawn rect == record dims /2 or
-as-cited — find the vendor scale law, do not eyeball". Decompile the
-TYPE 10 RACELIST paint path (windows.txt L670 RACELIST SF7 -> the
-TYPE-10 class handler; start from the RACELIST click handler msg
-0x1c01 chain at 0x52d6c and walk the class vtable) and the desc-panel
-paint for the scale source (window-class scale field vs per-record
-/2). Pin: drawn rect dims == cited formula for smrace 49 -> measured
-96..109 zone (t401 S8) — the port's kRacePortraitScale=2 matches the
-MEASUREMENT but not yet a CITED law; if the vendor draws smrace NATIVE
-and the zone is a different record, say so and fix the port. Planet
-record: planets.shp class/size law for the desc panel (port uses
-(specnum%11)*5+3 = 35px class, seam-named t414) — census whether the
-vendor scales it. (2) PLAYER-COLOUR REASSIGN: vendor chip zone
-x379..493 y420..472, 16-px chips idx=(x-0x17b)>>4, click ->
-FUN_0004fb30(0x78638,0) + word[win+0xb5]=idx + FUN_000232ec(0x12e10,
-idx) re-seeds the race-slot colour array (stride 0x1ee, rand()%7
-distinct-adjacent, LCG 0x7824f) — port paints chips static only
-(t414); implement click + re-derive of the raceflag/portrait tinting
-the port can honestly map (decompile FUN_000232ec fully for what the
-idx feeds: player-colour index vs slot permutation). (3) Re-shoot
-scripts/t412_newgame_shot.sh + t423_hostile_shot.sh and GRADE per
-close law 4; if any fixable defect remains, write the CONT cycle 3
-row honestly. Tooling ready: GhidraMCP check_connection OK; rel32
-call census scripts/t422c_callgraph.py (instant, vs >180s capstone
-sweep); capstone ONLY via /home/hrethric/tools/revenv/bin/python
-(PIL lives there too); restored DB function coverage is SPARSE — for
-undefined regions use t399_disasm.py + the rel32 census, not Ghidra
-name queries.
+NEXT t423 CONT cycle 3 (ordering rationale: cycle 2 CLOSED the
+player-colour reassign law end-to-end (chip hit + FUN_000232ec + the
+DECISIVE racering-index==colour-index discovery, all ported with pins and
+witnesses — docs/re/t423-newgame-law.md SS9/SS10) and graded the screen
+clean on the art defects, but defect (d)'s CITED scale-source law is the
+one honest negative left; the row cannot close (close law 4) until either
+the TYPE-10 paint site is cited or the route is exhausted like t422's
+noise hunt. WORK ITEMS: (1) TYPE-10 PAINT-SITE HUNT (scale law): the
+cycle-2 static probes banked where NOT to look (RACELIST string has zero
+data refs; class-name strings are strcmp-matched in the 0x52xxx handler
+family, never pointer-referenced; the only stretch blitter with a
+computed size is the cosmos class 0x185d8 [obj+0x4f38] law, wrong class).
+Route: the row paint goes through the invalidate chain call dword
+[win+0xa7]+0xc (seen at 0x52daa/0x52e28) — resolve the vtable for the
+RACELIST window instance statically via the window-class table (the
+0x52xxx family's constructor set at window registration) and decompile
+the paint slot; look for the FUN_0001fc34->FUN_0005d5a1 (or 0x61058
+dims) call with a scale arg. If two probe sessions find nothing, declare
+the MEASURED-2x law the ceiling (t422 precedent: elimination census +
+cited mechanism, seam named) and grade-close (d). (2) CAMPAIGN-SIDE
+byte+8 PLUMBING (cycle-2 named seam): 78 stride-0x1ee sites consume
+race-record +8; census which read it for MAP/entity tinting (candidates:
+the 0x44xxx cluster near the diplo matrix code, 0x36xxx/0x37xxx) and map
+honestly to ui kOwnerRgb — if the vendor byte+8 feeds only UI ring/icon
+tints already covered, say so and close the seam. (3) FINAL GRADE:
+re-shoot t412 + t423_hostile + t423c_chip; if clean, write the row CLOSED
+line (t423 row, phase-16) with the per-defect scoreboard; else CONT cycle
+4 honestly. Tooling: GhidraMCP check_connection OK (v7.0.0-headless);
+capstone/PIL via /home/hrethric/tools/revenv/bin/python; restored DB
+coverage SPARSE — t399_disasm.py + t423_immcensus.py for undefined
+regions; vtable hunt = read the .rdata around each class's first
+referenced method (e.g. FUN_000185d8's family).
 Trigger check FIRST as always: USER: lines after the D17 block in
 docs/DECISIONS.md win; a new playcap sitting outranks this (re-run
-scripts/r1_t85g_sitting.py FIRST). t423 checked both as of
-2026-11-17 ~23:40: none (timeline mtime Nov 12; last USER: line 301).
-Do NOT re-ask anything the D16 sheet already asks; web ruling sheet
-STAYS PAUSED per D17.
+scripts/r1_t85g_sitting.py FIRST). t423c checked both as of 2026-11-18:
+none (timeline mtime Nov 12; last USER: line 301). Do NOT re-ask anything
+the D16 sheet already asks; web ruling sheet STAYS PAUSED per D17.
 OQ-027 closes ONLY on the user's final hearing verdict; OQ-016/OQ-019
 stay DEFERRED — do NOT re-ask.
+
+t423 CYCLE 2 LANDED 2026-11-18 (PLAYER-COLOUR LAW + RING-INDEX DISCOVERY;
+working log docs/re/_wip_t423c2.md C2-F0..F7; laws docs/re/t423-newgame-law.md
+SS9-SS11). MEASUREMENTS: (i) RACERING lib IS 8 colour-tinted 53x53 rings —
+run-decode palette census: k0 green (0,141,68) .. k6 orange, k7 NEUTRAL
+grey; same 7 hues + neutral as the t414 chip palette, same ORDER => ring
+record index == player-colour index (race-record byte +8, stride 0x1ee);
+DESC ring = k<idx> (measured (0,142,69)==k0), RACELIST row rings = k7
+(row ring edges ZERO chroma, greys 35..186) — cycle-1's fixed k0 was a
+port bug; FIXED both sites. (ii) FUN_000232ec CAPSTONE law (0x232ec..
+0x23385; first decompiler read INVERTED the collision flag): slot0 =
+clicked idx verbatim (7 allowed), AI slots rand()%7 distinct vs
+already-written (scan bound j<i); guard 1<count. Ported pure
+(menulaw newgameChipAt + assignRaceColours) + title.cpp click; tests
+test_racecolour_t423c.cpp; witness scripts/t423c_chip_shot.sh (click
+435,446 -> "player colour idx 3", DESC ring green->pink, 1105px diff).
+(iii) windows.txt MSG 0 on Player^Color = "sends no message", NOT inert —
+t401 reading REFUTED by the 0x529d2 handler. (iv) SCALE LAW (d): full
+archive census — NO lib has a ~98 square record; lgrace 296x199 aspect-
+wrong; portrait art run 94..101 px (2 bboxes) => smrace 49 STRETCHED 2x
+via cited FUN_0005d5a1; per-site scale SOURCE (TYPE-10 paint field) NOT
+found (RACELIST/class strings have zero data refs — strcmp family);
+HONEST NEGATIVE, (d) grade-clean but law-unclosed -> cycle 3. Planet
+zone w38 vs planets.shp 35px class NATIVE = no scaling, port stands.
+(v) SMRACE preload string = "HBDATA\SMRACE%02d.SHP" (fallback dir absent
+from the archives; DATA\ twin loaded). Tests 423/0/0; GATE_EXIT=0;
+LEDGER AUDIT OK 17/3 (closes NOTHING — New Game laws have no OQ owner,
+t414..t423 precedent). NEXT -> t423 CONT cycle 3.
 
 t423 CYCLE 1 LANDED 2026-11-17 (NEW GAME LAWS: wheels/k12/volume/
 sprites/spin/rings — deliverable docs/re/t423-newgame-law.md, working

@@ -119,6 +119,7 @@ add_executable(run_tests
   tests/test_axis_t416.cpp
   tests/test_rail_t400.cpp
   tests/test_newgame_t401.cpp
+  tests/test_racecolour_t423c.cpp
   tests/test_statuslaw_t388.cpp
   tests/test_statuslist_t402.cpp
   tests/test_planetview_t406.cpp

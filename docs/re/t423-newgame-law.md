@@ -122,3 +122,62 @@ rewrite/src/ui/title.cpp (preview volume+sprites+hover pump; racering at
 both ring sites; k12 refusal comment), rewrite/tests/test_shp.cpp (k12
 pin flipped). Tests 421/0/0; gate GATE_EXIT=0; ledger 17/3 unchanged
 (OQ-005 residue note updated with the shipped-archive measurement).
+
+---
+
+# CYCLE 2 ADDENDUM (t423 CONT cycle 2, LANDED 2026-11-18)
+
+Full working log: docs/re/_wip_t423c2.md (C2-F0..F7). Laws below SUPERSEDE
+cycle-1 SS6/SS7 where noted.
+
+## 9. RING LAW REFINED: racering index == player-colour index [verified]
+racering.shp is 8 COLOUR-TINTED 53x53 rings (run-decoded dominant palette
+colours, game.pal 6-bit): k0 green (0,141,68), k1 purple, k2 yellow, k3
+pink, k4 tan, k5 blue, k6 orange, k7 NEUTRAL GREY (28,28,28)+(165,165,165)
+— the SAME 7 hues + neutral as the measured chip palette (t414 S2d), same
+order. SITE LAW (pinned-original census C2-F6): DESC ring =
+racering k<playerColourIdx> (capture default 0; measured (0,142,69) == k0
+(0,141,68) exact); RACELIST row rings = racering k7 NEUTRAL (row ring
+edges greys 35..186, ZERO chroma pixels). Cycle-1's fixed k0 at both sites
+was a port bug for every non-green race and for the rows. Port: title.cpp
+DESC ring blitShapeScaled(racering, playerColourIdx, 2); rows k7.
+
+## 10. PLAYER-COLOUR REASSIGN LAW [verified capstone 0x232ec..0x23385]
+windows.txt MSG 0 on Player^Color means "sends no message" — the handler
+IS REAL (0x529d2): zone x379..493 y420..472 (BELOW the windows.txt label
+rect), chip idx = (x-0x17b)>>4 (16-px grid from 379; idx 0..7 reachable);
+FUN_000232ec(0x12e10, idx): byte[raceRow0+8]=idx VERBATIM (7 = neutral
+allowed); for i=1..count-1 (guard 1 < word[base+0xd88]) draw cand =
+rand()%7 (Borland LCG FUN_0007824f) re-picked while cand equals any
+ALREADY-WRITTEN out[j] (scan bound j<i — the first decompiler read
+INVERTED the collision flag; capstone settles it). All count colours
+DISTINCT; player keeps the clicked idx. Colour index field = race-record
+byte +8 (stride 0x1ee); +7 = species lib id (FUN_00023388 preload law).
+FUN_00020fd4 (init) runs the SAME routine at startup — initial colours
+are a default-idx call of it. PORT: menulaw.cpp newgameChipAt +
+assignRaceColours (pure, tested test_racecolour_t423c.cpp); title.cpp chip
+click -> reassign + DESC ring follows. Witness scripts/t423c_chip_shot.sh:
+click (435,446) -> log "player colour idx 3", DESC ring green->pink,
+1105-px diff. NAMED SEAMS: LCG seed value (vendor srand chain from saved
+state; no cited fresh-game initial), and the 78 stride-0x1ee consumers of
+byte+8 in the CAMPAIGN (map tints etc.) — traced to ui/kOwnerRgb only
+partially; the campaign-side colour plumbing stays owed (cycle 3).
+
+## 11. SCALE LAW (d) — HONEST NEGATIVE [measurements + elimination]
+Planet: measured chromatic zone w38 (t401 37) vs planets.shp 35px class
+NATIVE — no scaling evidence; port stands (group mapping = named seam).
+Portrait: art run 94..101 px (this session, rows 2/3 chromatic bboxes 97
+x 94 and 94 x 73) vs smrace 49x49; FULL-ARCHIVE census: NO lib has a
+~98 SQUARE record (only planal* 103x103, planind/pro/res 107x99 = building
+art, sg48expl k8 93x98 explosion); lgrace 296x199 stretched to 98 wide =
+66 tall (wrong aspect, and lgrace is the race-INTRO full portrait per the
+0x23388 preload cluster). => vendor draws smrace STRETCHED 2x via the
+cited affine blitter FUN_0005d5a1; the per-site scale SOURCE (TYPE-10
+paint field) was NOT located: RACELIST string has ZERO data refs (the
+0x52xxx dispatcher family matches window objects by other means; class
+vtable slot for TYPE 10 unidentified; restored-DB coverage sparse).
+"2x" is a MEASURED law (two independent bboxes + elimination census), NOT
+a cited field read. Defect (d): grade-clean in the t412 witness, LAW
+UNCLOSED — cycle 3 owns the TYPE-10 paint-site hunt (route: walk the
+0x52xxx handler family's invalidate/paint vtable via [win+0xa7]+0xc, or
+live-RAM frame pair).

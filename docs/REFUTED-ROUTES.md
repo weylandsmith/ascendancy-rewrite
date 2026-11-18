@@ -1384,3 +1384,13 @@ from a non-16 state is NOT evidence of unreachability.
 ##     statistical field law (chrome.md SS1.5) is the CEILING; do not swap
 ##     the fresh draw for an uncited neighbour-skew rule (D17 law (1)).
 ##     Trail docs/re/_wip_t422.md F11-F16.
+
+## R-t423c — finding window-class paint via STRING POINTER refs is DEAD
+(t423 cycle 2). Whole-image dword census: the class/window name strings
+("RACELIST" 0x857e9, "..\winmgr.cpp" 0x85806, "HBDATA\SMRACE%02d.SHP"
+0x83702, "windows.txt" 0x85bac) have ZERO pointer references anywhere
+(data or code) — the vendor matches windows by strcmp chains inside the
+0x52xxx handler family (and loads files via sibling-offset sprintfs, e.g.
+FUN_00023388's inlined calls reach SMRACE at base+8 off the LGRACE
+string). Do NOT re-run data-ref/imm censuses on these strings; the paint
+route is the vtable chain [win+0xa7]+0xc (STATE.md cycle-3 row).
