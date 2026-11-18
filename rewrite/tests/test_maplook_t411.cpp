@@ -13,41 +13,54 @@
 
 using namespace ascend::ui;
 
-TEST(mottle_cell_law_t411) {
-    // t411 F4: texture colour is constant over a 6x6 CELL (the vendor band
-    // is smooth at pixel scale: lag-1 0.23 vs per-pixel 1.45), still
-    // deterministic, and the cell grid must NOT be a power of two (a cell-4
-    // mutant must fail: pixel 11 vs 12 straddle a cell boundary, 7 vs 8 do
-    // not under >>2).
-    for (int x = 0; x < 64; x += 1)
-        for (int y = 0; y < 64; y += 1) {
-            const RGB a = textureColourAt(x, y);
-            CHECK(a.r == textureColourAt(x - x % 6, y - y % 6).r);
-            CHECK(a.g == textureColourAt(x - x % 6, y - y % 6).g);
-            CHECK(a.b == textureColourAt(x - x % 6, y - y % 6).b);
-        }
-    // Determinism (same input -> same colour; no rng consumption).
+TEST(mottle_field_law_t422) {
+    // t422 SUPERSEDES the t411 6x6-cell mottle law (see _wip_t422.md F2/
+    // F4: the cell grid was calibrated on a widget-contaminated band;
+    // the vendor PURE left band has run stats 0.616/0.234/0.092 that
+    // match a per-pixel Markov chain, not cells). Pins now:
+    //  (1) determinism (same input -> same colour; no rng consumption);
+    //  (2) NON-degeneracy (noise, not flat);
+    //  (3) VERTICAL CORRELATION: in a 200-row column, repeat-count is
+    //      far above the iid floor (Markov P(repeat)=0.25 + copy-left
+    //      chains) but far below 1 (not stripes);
+    //  (4) the cell law is GONE: a mutant that re-quantises to a 6x6
+    //      grid must change at least some pixels (probe: pixels (1,y)
+    //      and (6,y) inside one row are NOT systematically equal, and
+    //      (x,y) vs (x - x%6, y - y%6) DIFFER for most pixels).
     for (int i = 0; i < 40; i++) {
         const RGB a = textureColourAt(3, 100 + i), b = textureColourAt(3, 100 + i);
         CHECK(a.r == b.r && a.g == b.g && a.b == b.b);
     }
-    // Non-degenerate: distinct cells produce distinct colours (if EVERY
-    // cell mapped to one colour the texture would be flat).
     std::set<uint32_t> seen;
     for (int i = 0; i < 60; i++)
-        seen.insert((uint32_t(textureColourAt(6 * i, 12).r) << 16) |
-                    (uint32_t(textureColourAt(6 * i, 12).g) << 8) |
-                    textureColourAt(6 * i, 12).b);
+        seen.insert((uint32_t(textureColourAt(470 + i, 12).r) << 16) |
+                    (uint32_t(textureColourAt(470 + i, 12).g) << 8) |
+                    textureColourAt(470 + i, 12).b);
     CHECK(seen.size() >= 8);
-    // Cell-boundary probe: x=5 and x=6 are in DIFFERENT cells (kills a
-    // cell-8 mutant that keeps 5|6 together).
-    int diffs = 0;
-    for (int y = 0; y < 60; y++)
-        if (textureColourAt(5, 6 * y).r != textureColourAt(6, 6 * y).r ||
-            textureColourAt(5, 6 * y).g != textureColourAt(6, 6 * y).g ||
-            textureColourAt(5, 6 * y).b != textureColourAt(6, 6 * y).b)
-            diffs++;
-    CHECK(diffs >= 30);  // ~66% chance the weighted draw differs per row
+    // Vertical correlation window [0.27,0.45] [measured: Markov law
+    // gives vrep@x3 = 0.330; the iid floor for this column's census is
+    // sum(w_i^2)/sum(w)^2 = 0.206 (mutant M2 "chain removed" caught at
+    // the floor); the 6x6-cell grid gives 5/6 = 0.833 (mutant M1 caught
+    // by both this and the cell probe)].
+    int vrep = 0, vtot = 0;
+    for (int y = 0; y < 200; y++) {
+        const RGB a = textureColourAt(3, y), b = textureColourAt(3, y + 1);
+        vtot++;
+        if (a.r == b.r && a.g == b.g && a.b == b.b) vrep++;
+    }
+    CHECK(vrep * 100 >= 27 * vtot);
+    CHECK(vrep * 100 <= 45 * vtot);
+    // Cell quantisation must be ABSENT: (x,y) equals its own cell-anchor
+    // colour for a MINORITY of pixels (a cell-grid generator gives 100%).
+    int cellSame = 0, cellTot = 0;
+    for (int y = 0; y < 120; y++)
+        for (int x = 8; x < 40; x++) {
+            const RGB a = textureColourAt(x, y);
+            const RGB c = textureColourAt(x - x % 6, y - y % 6);
+            cellTot++;
+            if (a.r == c.r && a.g == c.g && a.b == c.b) cellSame++;
+        }
+    CHECK(cellSame * 100 < 60 * cellTot);  // mutant cell-grid: 100%
 }
 
 TEST(depth_dim_law_t411) {

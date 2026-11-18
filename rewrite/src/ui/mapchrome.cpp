@@ -51,6 +51,26 @@ std::optional<int> raceSlotFor(Pt p) {
     return std::nullopt;
 }
 
+// t422 CHROME FIELD LAW (docs/re/chrome.md + _wip_t422.md F1-F9) replaces
+// the t400/t411 hash-noise + 6x6-cell generator. MEASURED on the pinned
+// 640x480 vendor captures (docs/assets/refcap/original-strategic-map.png,
+// original-planet-view.png, original-species-research.png):
+//  * The mottle is a SCREEN-FIXED noise FIELD, not window art: the left
+//    band x1..6 is 83-99% pixel-identical across three different screens
+//    at zero shift (map vs planet 83.2%, planet vs species 99.1%).
+//  * NOT a repeating tile: y-periodicity k=8..240 all at noise floor.
+//  * NOT iid colour sampling and NOT a cell grid: vendor vertical run
+//    lengths 0.616/0.234/0.092/0.026 (k=1..4) vs iid 0.907/0.08; lag-1
+//    luminance h 0.62 / v 0.40 vs iid 1.36/1.36 vs our old per-pixel
+//    hash 1.46/1.21 (t411's 0.23 calibration band x474..632 was
+//    CONTAMINATED by sidebar widget art — the cell grid it produced is
+//    REFUTED on the pure left band).
+//  * LAW: per-pixel Markov field — P(repeat the pixel above)=0.385,
+//    P(copy the pixel left)=0.05 (grid fit over 8 statistics, mean abs
+//    dev 0.063; scripts/t422_fit.py), else a fresh weighted draw from the
+//    PER-COLUMN census below. Deterministic: the chain is replayed
+//    backwards from (x,y) to its fresh-draw anchor using splitmix64 of
+//    (x,y), so the function stays pure (no rng_, no state).
 // t400 texture census (mapchrome.h): colour set + percent weights as
 // MEASURED on the pinned shot's margin bands (docs/re/_wip_t400.md S12).
 // The residue (100 - sum = 34%) is spread over the remaining game.pal
@@ -70,35 +90,57 @@ const RGB kTextureColours[10] = {
 const int kTextureWeights[10] = {4, 15, 9, 8, 7, 7, 7, 7, 6, 4};
 
 RGB textureColourAt(int x, int y) {
-    // t411 MOTTLE LAW [measured]: the vendor texture is SMOOTH at pixel
-    // scale — lag-1 neighbour diff / mean dev = 0.23 on the sidebar band
-    // (4x4-block lag-1 0.28), while our old per-pixel hash measured 1.45
-    // (pure TV static). The pattern SOURCE record is still unidentified
-    // (t400 seam), so the port keeps the cited colour set + weights but
-    // generates them on a 6x6 CELL grid (one colour per cell): within-cell
-    // neighbours identical, cell-to-cell weighted-random. scripts/
-    // t411_mottle.py sweeps this generator's own lag-1 statistic: cell 1
-    // (old) 1.57, cell 2 0.78, cell 4 0.38, cell 6 0.25, cell 8 0.19 —
-    // cell 6 is the closest to the vendor's measured 0.23. Still
-    // deterministic per pixel (no engine rng_; law mirrors Star.z).
-    const int cx = x / 6, cy = y / 6;
-    uint64_t z = (uint64_t(uint32_t(cx)) << 32) ^ uint64_t(uint32_t(cy)) ^
+    // t422 MARKOV FIELD LAW [measured, docs/re/chrome.md]: per-pixel
+    // chain — P(copy pixel LEFT)=0.05, else P(repeat pixel ABOVE)=0.25,
+    // else a fresh weighted draw from the per-column census (left band
+    // x0..6) or the right-zone census (x466..; every producible colour is
+    // an exact game.pal entry). Deterministic WITHOUT state: the chain
+    // decision at each step is splitmix64(x,y); recursion walks up/left
+    // to the fresh-draw anchor (bounded: 480 up + 7 left). Replaces the
+    // t411 6x6 cell grid — REFUTED on the PURE left band (the t411
+    // calibration band x474..632 was contaminated by sidebar widget art;
+    // vendor pure-band run stats 0.616/0.234/0.092 match a Markov chain,
+    // cells give 0.574/0.262 with lag-1 v 0.55 vs vendor 0.40).
+    uint64_t z = (uint64_t(uint32_t(x)) << 32) ^ uint64_t(uint32_t(y)) ^
                  0x9e3779b97f4a7c15ull;
     z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
     z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
     z = z ^ (z >> 31);
-    const int r = int(z % 100u);
+    const uint64_t r = z % 1000000ull;
+    if (r < 50000ull && x > 0) return textureColourAt(x - 1, y);   // 5%
+    if (r < 300000ull && y > 0) return textureColourAt(x, y - 1);  // 25%
+    // Fresh draw. kLeft = per-column census of the vendor left chrome
+    // band (pinned original-strategic-map.png rows 40..479; weights are
+    // raw pixel counts; docs/re/_wip_t422.md F7). kRight = right-zone
+    // chrome census (F10, chrome-set colours of x466..639).
+    struct Ent { uint8_t r, g, b, pad; int w; };
+    static const Ent kLeft[7][10] = {
+        /* x0 */ {{97,97,97,0,98},{77,113,117,0,130},{85,125,125,0,120},{89,134,138,0,53},{97,146,146,0,8},{89,89,89,0,26},{81,81,81,0,5},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}},
+        /* x1 */ {{97,97,97,0,46},{77,113,117,0,209},{85,125,125,0,94},{89,134,138,0,59},{89,89,89,0,28},{81,81,81,0,2},{97,146,146,0,2},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}},
+        /* x2 */ {{81,81,81,0,42},{69,105,109,0,143},{77,113,117,0,126},{85,125,125,0,45},{89,89,89,0,76},{89,134,138,0,6},{73,73,85,0,2},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}},
+        /* x3 */ {{60,93,97,0,58},{69,105,109,0,150},{77,113,117,0,49},{73,73,85,0,92},{89,89,89,0,53},{48,48,48,0,15},{81,81,81,0,11},{85,125,125,0,8},{89,134,138,0,2},{60,52,56,0,2}},
+        /* x4 */ {{28,28,28,0,5},{48,48,48,0,47},{48,77,81,0,83},{60,93,97,0,103},{69,105,109,0,90},{73,73,85,0,92},{60,52,56,0,10},{77,113,117,0,7},{85,125,125,0,1},{89,134,138,0,2}},
+        /* x5 */ {{48,48,48,0,39},{48,77,81,0,80},{60,93,97,0,117},{69,105,109,0,76},{73,73,85,0,108},{60,52,56,0,10},{40,65,69,0,1},{56,85,89,0,1},{77,113,117,0,5},{85,125,125,0,3}},
+        /* x6 */ {{28,28,28,0,6},{48,48,48,0,123},{24,48,40,0,45},{36,56,60,0,143},{40,65,69,0,86},{48,77,81,0,27},{56,85,89,0,7},{60,93,97,0,1},{77,113,117,0,2},{0,0,0,0,0}},
+    };
+    static const Ent kRight[10] = {
+        {77,113,117,0,7587},{97,97,97,0,3514},{85,125,125,0,3093},{89,89,89,0,2018},
+        {89,134,138,0,1997},{97,146,146,0,1483},{24,48,40,0,1163},{36,56,60,0,1095},
+        {28,28,28,0,968},{60,93,97,0,928},
+    };
+    const Ent* tab; int n;
+    if (x >= 0 && x <= 6) { tab = kLeft[x]; n = 10; }
+    else { tab = kRight; n = 10; }
+    int total = 0;
+    for (int i = 0; i < n; i++) total += tab[i].w;
+    const uint64_t d = (z >> 20) % uint64_t(total ? total : 1);
     int acc = 0;
-    for (int i = 0; i < 10; i++) {
-        acc += kTextureWeights[i];
-        if (r < acc) return kTextureColours[i];
+    for (int i = 0; i < n; i++) {
+        acc += tab[i].w;
+        if (int(d) < acc)
+            return RGB{tab[i].r, tab[i].g, tab[i].b};
     }
-    // Residue tail: neighbours of the mode within the measured families
-    // (all game.pal entries; (48,77,81) and (105,154,144)-family greys
-    // observed in the census).
-    static const RGB kTail[4] = {{48, 77, 81}, {105, 154, 154},
-                                 {81, 81, 81}, {36, 56, 60}};
-    return kTail[z % 4u];
+    return RGB{tab[n - 1].r, tab[n - 1].g, tab[n - 1].b};
 }
 
 }  // namespace ascend::ui

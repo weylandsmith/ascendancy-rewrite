@@ -230,37 +230,62 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t422 — CHROME LAW: derive textured frame from RE (see PHASE-16 QUEUE row t422; run FIRST, root-cause row)
-t421 METHOD (ordering rationale: it is the one remaining t420 "live
-witness" seam plausibly closable from EXISTING saves the way 0x892ac just
-was — referrer census + esi-lifecycle + mem[B+off] verbatim across the 178
-runs; if the census finds a per-spec INDEXED read the row is a real law to
-measure; if unindexed-constant like 0x892ac, REFUTED + off the list; if
-saves cannot witness it, write the honest negative and fall back to
-WAIT-USER-RULING). aicode.md:1259 cites BYTE [race*2+0x12e18] (race row
-+0x2) via FUN_0001fc34/FUN_0005caac — START there; reuse
-scripts/r1_t421_referrer_census.py + r1_t421_c3_runtime.py shapes; mind
-pitfall B-vs-P0 (bytes at mem[B+off], control = 16/16 law window).
-Trigger check FIRST as always: USER: lines after the D16 block in
-docs/DECISIONS.md win (apply per strict-close; a ruling that reopens a
-screen gets ONE queue row citing the ruling phrase); a new playcap sitting
-outranks this (re-run scripts/r1_t85g_sitting.py FIRST). t421 re-ran both:
-no trigger as of 2026-11-17 ~16:40. Do NOT re-ask anything the D16 sheet
-(:8613, live, covers every D15 item q0..q8) already asks.
-LIVE RE-CHECK LIST (the user's own hands): open Research, leave a minute,
-Esc promptly closes + machine responsive (q0); tree spins with perspective
-+ scroll pair + right panel live (q1); mouse into any campaign corner pops
-Exit<ESC> (q2); dials latch: one click keeps spinning, re-click stops,
-opposite flips (q5). WALKTHROUGH TABLE below still stands for earlier
-rounds. t418b tile-colour 0x892ac is OFF this list (t421 CLOSED statically,
-REFUTED-ROUTES R-t421). Remaining live-only seams if H3 also falls: t418b
-disc provenance F4 (0x9f10c selector census — try the save-census method
-too before calling it live-only); t419 vendor reswin draw chain (seam in
-researchview.h — no on-disk disassembly window exists, genuinely blocked);
-t416 pump cadence.
-OQ-027 closes ONLY on the user's final hearing verdict (D16 q8 "skip audio"
-stands as the port-choice off-ramp); OQ-016/OQ-019 stay DEFERRED — do NOT
-re-ask.
+NEXT t422 CONT cycle 2 — CHROME LAW: close the lag-1 residual via the
+vendor noise-generator decompile, then migrate + grade the remaining
+chrome consumers (ordering rationale: t422 cycle 1 LANDED the field law
+(docs/re/chrome.md: screen-fixed Markov field, run-stats match vendor,
+grainy-hash root cause FIXED, suite 421/0/0, gate 0) but its grade
+lists ONE residual defect that has an AVAILABLE decider — our fresh
+draws are census-iid (lag-1 h 0.96) while the vendor's are luminance-
+adjacent-skewed (0.62); the generator is a single routine in the exe
+and GhidraMCP headless v7.0.0 is CONNECTED (check_connection OK this
+session). ROUTE: the chrome field is painted by the window-manager
+backdrop path; decompile around FUN_0005d5a1 (blit w/ transparency-255)
+callers and the winmgr site 0x55ffb neighbourhood (ui-runtime.md:581),
+and census-game.pal-index the noise-generator immediate tables. BUDGET
+LAW for this cycle: if the generator is not pinned within ~25 probes,
+declare the statistical law the CEILING, bank the honest seam naming
+the missing evidence (close law SS5), and rewrite NEXT to t423 VERBATIM
+(NEW GAME SCREEN CYCLE, phase-16 queue row text at STATE.md
+PHASE-16 QUEUE). Cycle-2 deliverables if the law DOES land: swap the
+fresh-draw step for the cited neighbour law, re-run scripts/t422_fit.py
+statistics witness (target lag1 h <=0.75 on work/r1/loop/walk shot),
+update chrome.md SS4(a) -> CLOSED with the FUN address.
+Trigger check FIRST as always: USER: lines after the D17 block in
+docs/DECISIONS.md win; a new playcap sitting outranks this (re-run
+scripts/r1_t85g_sitting.py FIRST). t422 checked both as of 2026-11-17
+~19:30: none (timeline mtime Nov 12; last USER: line 301).
+Do NOT re-ask anything the D16 sheet already asks; web ruling sheet
+STAYS PAUSED per D17.
+OQ-027 closes ONLY on the user's final hearing verdict; OQ-016/OQ-019
+stay DEFERRED — do NOT re-ask.
+
+t422 LANDED 2026-11-17 (CHROME FIELD LAW DERIVED — root-cause row; full
+account docs/re/chrome.md + docs/re/_wip_t422.md F0-F10). MEASUREMENT
+(all on the PINNED 640x480 refcap shots; the 642x481 scratchpad shots
+are interpolated garbage for texture stats — pitfall F3): the vendor
+chrome mottle is a SCREEN-FIXED noise FIELD, not shape art — left band
+x1..6 is 83.2%/99.1% pixel-identical across three DIFFERENT vendor
+screens at zero shift; NOT a repeating tile (y-period k=8..240 at noise
+floor); NOT iid and NOT cells (vendor v-run 0.616/0.234/0.092 vs iid
+0.907/0.08). ROOT CAUSE of D17 "grainier everywhere": our per-pixel
+splitmix hash = TV static (lag1 1.46/1.21 vs vendor 0.62/0.40) AND
+t411's 6x6-cell recalibration was fitted on a WIDGET-CONTAMINATED band
+(x474..632; pure-band v lag-1 is 0.40 not 0.23) so the cell grid was
+wrong in KIND. NEW LAW (implemented, mapchrome.cpp textureColourAt):
+per-pixel Markov chain copy-left 5% / repeat-up 25% / fresh draw from
+the PER-COLUMN game.pal census (left kLeft[7][10] F7, right kRight[10]
+F10), deterministic via splitmix64(x,y), no rng_. Witness: ours v_eq
+0.405 (vendor 0.398), vrun 0.603/0.233/0.098 (vendor .616/.234/.092),
+off-palette 120-grey px 0; native-vision grade: fine per-pixel noise,
+no blocks/stripes. RESIDUAL (why CONT cycle 2): lag-1 h 0.96 vs 0.62 —
+fresh-draw neighbour skew, decider = vendor generator decompile (above).
+PINS: mottle_cell_law_t411 REPLACED by mottle_field_law_t422 (vrep
+window [0.27,0.45] + cell-absence <60%); MUTATION M1 cell-quantisation
+CAUGHT, M2 iid CAUGHT; suite 421/0/0; scripts/t422_fit.py tracked
+(PH=0.05 PV=0.25-0.30 err 0.074). LEDGER closes NOTHING (strict-close
+honest negative — chrome seam has no OQ owner; t414..t421 precedent).
+GATE_EXIT=0; LEDGER AUDIT OK (17/3).
 
 t421 LANDED 2026-11-17 (0x892ac TILE-COLOUR SEAM CLOSED — PER-CLASS LAW
 REFUTED; full account docs/re/_wip_t421.md F0-F5 + pitfalls). MEASUREMENT:

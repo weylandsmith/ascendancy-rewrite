@@ -90,7 +90,8 @@ extern const RaceSlot kRaceSlots[7];
 std::optional<int> raceSlotFor(Pt p);  // returns index 0..6
 
 // ---- t400 FRAME TEXTURE LAW (D11 "background art ... rendered in
-// greyscale" / cluster bg) ----------------------------------------------------
+// greyscale" / cluster bg) — GEOMETRY still valid, GENERATOR superseded
+// by the t422 MARKOV FIELD LAW (docs/re/chrome.md) ------------------------
 // The vendor map screen carries a mottled grey-teal texture in VERTICAL
 // BANDS outside the cosmos field [measured on BOTH independent vendor
 // shots — pinned docs/assets/refcap/original-strategic-map.png and the
@@ -98,17 +99,13 @@ std::optional<int> raceSlotFor(Pt p);  // returns index 0..6
 // S12]: left margin x0..6 for the full height, and the whole right column
 // x466..639 (the sidebar gaps included — the texture shows BETWEEN the
 // buttons and behind the cluster zone). The field interior is black: the
-// texture is chrome, not backdrop art of the map. Colour census of the
-// bands (pinned shot): (77,113,117) 14.9%, (85,125,125) 8.7,
-// (97,146,146) 8.0, (69,105,109) 7.4, (97,97,97) 7.2, (89,134,138) 6.7,
-// (89,89,89) 6.6, (60,93,97) 5.6, black 4.5, (73,73,85) 4.1 — every one
-// verified inside game.pal. The SOURCE RECORD is unidentified: 1starmap
-// k0 (158x75) is REFUTED at the cluster zone (registration 7172
-// conflicts, 21% in palette); no .shp record matches the band extent. The
-// port therefore paints DETERMINISTIC hash-noise over the measured colour
-// set with the measured weights — the noise PATTERN is a named seam
-// (decider: a vendor screen-record of a scroll, or the identifying
-// record); the geometry and the palette are cited.
+// texture is chrome, not backdrop art of the map.
+// t422 UPDATE [measured]: the field is SCREEN-FIXED noise (83-99% pixel-
+// identical across three different vendor screens at zero shift), NOT a
+// shape record — 1starmap k0 stays REFUTED (t400), and no SHAPEFRAME
+// governs it. The hash-noise generator (t400) and the 6x6-cell grid
+// (t411) are BOTH superseded by the Markov chain in textureColourAt;
+// census per column in docs/re/_wip_t422.md F7 + chrome.md.
 inline constexpr int kTextureBandCount = 2;
 inline constexpr Rect kTextureBands[kTextureBandCount] = {
     {0, 0, 6, 479},       // left margin  [user original full height; the
