@@ -79,6 +79,26 @@ extern const MapControl kMapCtl[kMapCtlCount];  // order == enum
 // shared line resolves to the LATER record; no live click lands there.
 std::optional<MapCtl> mapCtlFor(Pt p);
 
+// t425 TOGGLE-LAYER DEFAULTS [verified windows.txt BUTTONSTATE lines:
+// TOGLANES ln347 BS 1, TOGSHIPS ln382 BS 1, TOGCOLONIES ln400 BS 1,
+// TOGEMPIRE ln365 BS 0 (the vendor's empire overlay starts OFF); the
+// handler init 0x2718c..0x271b4 sets dword win+0xc4/c8/cc/d0 = -1 and
+// byte win+0xd8 = 0xff — visible]. RACE filter starts all-visible (0xff).
+inline constexpr bool kCtlDefaultLanes = true;
+inline constexpr bool kCtlDefaultShips = true;
+inline constexpr bool kCtlDefaultColonies = true;
+inline constexpr bool kCtlDefaultEmpire = false;
+inline constexpr unsigned kRaceFilterInit = 0xff;
+
+// t425 MSG MAP of the COSMOSWnd handler 0x26b34 [verified, capstone
+// base-0 work/ascend_restored.bin, full table docs/re/_wip_t425.md F1b]:
+// 26 store win+0xd9; 27..55 dial latch chain 0x27d6f; 56 CENTERHOLO
+// recenter 0x27b02 (call 0x26a9c); 57 TOGLANES toggle win+0xc4 0x27b58;
+// 58 TOGSHIPS toggle win+0xc8 0x27d40; 59 pump 0x27a18; 60 TOGEMPIRE
+// toggle win+0x58a 0x27b29; 61 TOGCOLONIES toggle win+0xd0 AND win+0xcc
+// 0x27cce; 62 RACECONTROLS toggle byte win+0xd8 bit(param) 0x27824;
+// 63 latch mask-clear 0x27ad2; 66 0x27b87; default -> parent 0x336b4.
+
 // ---- RACECONTROLS (ln415-435) ----------------------------------------------
 inline constexpr Rect kRaceControlsFrame{474, 442, 632, 472};
 inline constexpr int kRaceControlsShape = 19;  // SHAPEFRAME verbatim (k19)

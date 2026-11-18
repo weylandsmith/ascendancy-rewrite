@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-18T04:35
+updated: 2026-11-18T06:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,34 +230,75 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t425 GALAXY MAP CONTROLS + LIVENESS CYCLE (ordering rationale: t424
-shipped everything through t423c3 — remote main == 8525086bc31bea4d458dbe8
-d6b2822259b16c322 verified by ls-remote — and the D17r2 fallback sheet is
-live on :8613; the phase-16 queue's next row is the galaxy-map controls
-because FOUR defects there are machine-attackable static work (no user
-ruling needed to START): (a) dial SPIN LAW — ours rotates continuously on
-click, the original does NOT (D17 verbatim); decompile the 8-button
-control-cluster handlers (1starmap windows, SENDPARAM law): discrete step
-per click vs latch-until-release vs timed burst — CITE the law, implement
-it (this SUPERSEDES the t416 latch model, which was recovered from the
-msg-50..55 handlers but contradicts the user's live observation — check
-whether the pump applies only while the button stays pressed / whether a
-stop-message exists on release); (b) THREE of eight lower-right buttons
-DEAD — windows.txt lists all eight with SENDMESSAGE/SENDPARAM; route each
-to its cited target, verify each changes state (log line or frame diff);
-(c) player FILTER buttons missing art — census starmap/race libs for the
-filter glyphs (t416 banked partial filter law, reuse); (d) corner Exit
-popup DRAWN BUT INERT — click must exit per screen per the t252/t405
-stack law; wire handler + witness per screen. Iterate per the D17
-walk->grade->fix->re-grade law; re-queue as "t425 CONT cycle N+1" if the
-cycle budget hits mid-row. WORK ITEMS: GhidraMCP headless is CONNECTED
-(check_connection OK per D17 block) — use it for the handler decompiles;
-witness = a scripts/t411_maplook_witness.sh-pattern script asserting each
-button's state change; pins per screen law; D17 law (1): no synthetic
-stand-ins — filter art must cite a shape record. Tooling: capstone only
-in ~/tools/revenv; r331_disasm.txt is INTEL syntax. Do NOT re-ask
-anything D16/D17 covers; web sheet STAYS PAUSED. OQ-027 closes ONLY on
-the final hearing verdict; OQ-016/OQ-019 DEFERRED — do NOT re-ask.
+NEXT t425 CONT CYCLE 2 GALAXY-MAP CONTROLS RESIDUES (ordering rationale:
+cycle 1 shipped (b)(c)(d) fully — three dead buttons routed to cited
+toggle fields with a PASSing witness, race filter law ported, corner popup
+click wired — and (a) the dial row produced a static self-correction plus
+a cadence upgrade, but the D17 "original does not spin on click" FEEL
+verdict is still open; cycle 2 attacks the two named seams that gate it,
+both machine-attackable static work, zero user ruling needed to START:
+(S-e) RUNTIME PALETTE RAMP: the RACECONTROLS slot faces k20..k50 (16x16
+solid swatches, indices 16,19/20,23/../49,52 measured t425) decode DARK in
+static game.pal ((18,10,19) at idx 20) while the refcap slot reads
+(89,24,56) — nearest static entry (63,39,41) idx 229 delta 1126. Find the
+runtime writer of the ramp (t348 runtime-pal precedent: run-RANDOM values
+written at runtime; search writers near the cosmos paint 0x284bc/scene
+param frame 0x29514, and the STRIDE-0x1ee race-record owner: race-record
+byte +8 was the player-COLOUR index per t423c2 racering law — test whether
+the slot face index = 20+5*colourIdx law holds against the RACE<N>CONTROL
+FRAME column 20,25,30,35,40,45,50 (it does verbatim in windows.txt — the
+open question is whether the vendor tints frames by race via a RUNTIME pal
+ramp or ships distinct face content; census frames 20 vs 25 pixel-diff:
+BOTH solid, diff only in indices — so the law is face-index-pair -> pal
+pair; decode what indices 16/19 vs 20/23 vs 25/25+ mean in the RUNTIME
+pal). Cite or keep the port's luminance encoding (honest either way).
+(S-f) FILTER->OWNER CHAIN: the d8 consumer 0x27258 skips records by race
+index i (stride 0x1ee table at file 0x12fd6/0x12e19); the port assumes
+slot i == owner index i. Trace race-index -> player/empire mapping (race
+records vs the 7 playable slots; t414 chip palette order == race order
+corroborates) and pin or correct. THEN: re-run scripts/t425_mapctl_
+witness.sh (must stay PASS) + ask the D16 q5 dial-feel verdict ONLY via
+the next natural user touchpoint (sheet stays PAUSED per D17; do NOT pop
+a question). WORK ITEMS: capstone only in ~/tools/revenv (r331_disasm.txt
+is INTEL syntax); GhidraMCP headless CONNECTED for decompiles; NO new
+capture unless S-e/S-f genuinely require live RAM (pointer law
+docs/re/r1-savestate.md; scratch copies only). Do NOT re-ask anything
+D16/D17 covers; OQ-027 closes ONLY on the final hearing verdict;
+OQ-016/OQ-019 DEFERRED.
+
+t425 LANDED 2026-11-18 (GALAXY-MAP CONTROLS CYCLE 1; working log
+docs/re/_wip_t425.md F0/F1/F1b/F2). MEASUREMENTS: (i) COSMOSWnd 0x26b34
+FULL MSG MAP closed (tree 0x26b4b + 0x27d2a + 0x27cce; 56 recenter
+0x26a9c, 57 toggle win+0xc4, 58 toggle win+0xc8, 60 toggle win+0x58a,
+61 toggle win+0xd0 AND win+0xcc, 62 toggle byte win+0xd8 bit(param),
+63 mask-clear; init 0x2718c sets all visible, d8=0xff). PITFALL BANKED:
+the handler's misaligned dword reads at [esp+0x36] sar 0x10 == the MSG ID
+(word at esp+0x38) — NOT param1; a mid-iteration retraction is in the WIP
+(F1b). (ii) DIAL-LAW SELF-CORRECTION: the t416 latch-on-click model was
+RIGHT (gate 0x27d99 compares msg ids 50..55; buttons send SENDMESSAGE
+50..55 — the earlier "gate on param1" draft claim refuted by the default
+path 0x26b8f passing the same read to parent 0x336b4); what was wrong was
+CADENCE — t302 measured msg 0x3b PERIODIC ~1/s, so the vendor spins at
+2 DEG/s; kSpinTickMs 250->1000 (cam3d.h, cited). The D17 feel verdict
+stays open pending a live read (not closed). (iii) THREE DEAD BUTTONS
+ROUTED (ui.cpp): TOGSHIPS->shipsOn (transit pips), TOGCOLONIES->coloniesOn
+(owner tint), TOGEMPIRE->empireOn (single-owner lane re-strike, starts OFF
+per BUTTONSTATE 0 ln365); printed-only seam removed. (iv) RACE FILTER
+(msg 62): raceVisibleMask XOR (1<<slot), slots' bit column verbatim 1..64
+(ln429-435), consumer hides owner stars+pips, slot square dims half
+luminance; FILTER ART honest negative: k20..k50 are solid swatches dark in
+static pal vs refcap (89,24,56) runtime ramp — seam S-e named, NOT faked.
+(v) CORNER POPUP CLICK: doEscape factored (t409+t410 verbatim), click in
+exitPopupRect fires it. PINS test_mapctl_t425.cpp x4, MUTATION-VERIFIED x2
+(empire default flip -> 1 fail; race-5 bit 16->8 -> 3 fails). Suite
+427/0/0. WITNESS scripts/t425_mapctl_witness.sh PASS (four toggle flips in
+one log line; slot5 mask 0xef; slot5 lum 137.0->68.5, slot1 unchanged;
+field 1348 px; corner click EXITS the process). Shots
+work/r1/loop/t425_{base,after}.png. LEDGER: closes NOTHING (strict-close:
+galaxy-map controls have no OQ owner, t414..t423c3 precedent; the dial row
+needs the live feel verdict). NEXT -> t425 CONT cycle 2 (S-e runtime-pal
+ramp, S-f filter->owner chain).
+
 
 t424 LANDED 2026-11-18 (PHASE-16 VERIFY + RE-EXPORT + PUSH + D17r2 SHEET;
 full account docs/re/_wip_t424.md F0-F5). Verification PASS first: gate 0;

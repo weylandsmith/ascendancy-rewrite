@@ -87,7 +87,12 @@ struct Camera3d {
     static constexpr double kFocalMin = 340.0, kFocalMax = 2720.0;
     static constexpr double kRotStepDeg = 2.0;   // pump delta [verified]
     static constexpr double kDeg2Rad = 0.017453292519943295;
-    static constexpr int kSpinTickMs = 250;      // documented cadence default
+    // t425 CADENCE UPGRADE: t302 MEASURED the vendor pump msg 0x3b firing
+    // PERIODIC ~1/s unattended (docs/re/_wip_t302.md ln88-90,138,148-154 —
+    // live BP witness edx=0x3b on COSMOSWnd within ~1 s of RUN). 2 DEG/tick
+    // at 1 tick/s: the vendor dial feel is a SLOW crawl, which is what the
+    // D17 grade row reported ("original does not [spin visibly] on click").
+    static constexpr int kSpinTickMs = 1000;     // vendor-measured (t302)
 
     // Vendor press law (pure): inactive -> start(dir); same dir -> stop;
     // opposite dir -> flip.

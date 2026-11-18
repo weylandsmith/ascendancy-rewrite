@@ -129,7 +129,16 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     Camera3d cam;
     Uint32 lastPumpMs = 0, lastSysPumpMs = 0;  // t416 pump cadence
     cam.mapSize = 1024;  // MapConfig default (mapgen.h)
-    bool lanesOn = true;
+    bool lanesOn = kCtlDefaultLanes;
+    // t425 TOGGLE LAYER STATE [verified msg map 0x26b34 + BUTTONSTATE
+    // defaults in windows.txt ln360-414]: TOGSHIPS BS 1, TOGCOLONIES BS 1,
+    // TOGEMPIRE BS 0 (the vendor's empire overlay starts OFF).
+    bool shipsOn = kCtlDefaultShips, coloniesOn = kCtlDefaultColonies,
+         empireOn = kCtlDefaultEmpire;
+    // t425 RACE FILTER MASK (vendor byte[win+0xd8], init 0xff at 0x271b4;
+    // msg 62 toggles bit (1<<slot); consumer 0x27258 skips a race's records
+    // when its bit is clear). bit i == race slot i VISIBLE.
+    unsigned raceVisibleMask = kRaceFilterInit;
     int selected = -1;
     // t402 PLANETS LIST screen state: scroll step + selected row (indices
     // into statusPlanets(); selection is PORT law — the vendor row click
@@ -409,6 +418,26 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         }
     };
 
+    // t425: the Escape CHAIN factored out so the corner "Exit <ESC>" popup
+    // click performs the SAME action the glyph names (t419 drew it; the D17
+    // grade row: "corner popup drawn but INERT"). t409 modal precedence +
+    // t410 one-level unwind + quit-at-bottom, verbatim.
+    auto doEscape = [&] {
+        if (abilityOpen) {
+            abilityOpen = false;
+            std::printf("ui ability dialog dismiss (esc)\n");
+            std::fflush(stdout);
+        } else if (stack.escape()) {
+            const int from = screen;
+            screen = stack.top();
+            std::printf("ui screen %s -> %s (esc)\n",
+                        screenName(from), screenName(screen));
+            std::fflush(stdout);
+        } else {
+            quit = true;
+        }
+    };
+
     while (!quit) {
         // One event per frame at ~60fps; WaitEventTimeout sleeps when idle so
         // autoplay/gates do not spin CPU. (A trailing SDL_PollEvent here once
@@ -424,27 +453,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 std::printf("ui key next\n");
                 advanceOnce();
             } else if (ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_ESCAPE) {
-                // t409 modal precedence: an open dialog swallows Escape
-                // first (the vendor waits for the dialog; the screen below
-                // never sees it).
-                if (abilityOpen) {
-                    abilityOpen = false;
-                    std::printf("ui ability dialog dismiss (esc)\n");
-                    std::fflush(stdout);
-                } else if (stack.escape()) {
-                    // t410 CHAIN LAW: Escape unwinds ONE level (t252 measured
-                    // pixel-diff; t369 corroborated in the system view). The
-                    // stack knows the level we came from: 17->16 when the
-                    // planet view was opened FROM the system view, 17->1 when
-                    // it came from the status list, 16->1 always.
-                    const int from = screen;
-                    screen = stack.top();
-                    std::printf("ui screen %s -> %s (esc)\n",
-                                screenName(from), screenName(screen));
-                    std::fflush(stdout);
-                } else {
-                    quit = true;
-                }
+                doEscape();
             } else if (ev.type == SDL_KEYDOWN && (ev.key.keysym.mod & KMOD_ALT) &&
                        !abilityOpen) {  // t409 modal: chords inert too
                 // t388 PORT ADDITION (labelled): the title-screen D9 chords'
@@ -478,6 +487,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         std::printf("ui ability dialog dismiss\n");
                         std::fflush(stdout);
                     }
+                } else if (exitCornerFor(p.x, p.y, kDisplayW, kDisplayH) != ExitCorner::None &&
+                           inRect(exitPopupRect(exitCornerFor(p.x, p.y, kDisplayW, kDisplayH),
+                                                kDisplayW, kDisplayH), p)) {
+                    // t425 CORNER POPUP ACTIVATION (D17: "corner popup drawn
+                    // but INERT (no action)"). The glyph literally names the
+                    // action — "Exit <ESC>" — so the click performs the
+                    // Escape chain verbatim (modal dismiss / one-level
+                    // unwind / quit at the bottom).
+                    std::printf("ui corner exit popup click\n");
+                    std::fflush(stdout);
+                    doEscape();
                 } else {
                 // t388: the rail is the screen switch. railButtonForScreen
                 // honours the STATE id-list law, so on a non-map screen no
@@ -750,21 +770,53 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         case MapCtl::ZoomOut:  cam.pressZoom(-1); break;
                         case MapCtl::CenterHolo: cam.reset(); break;
                         case MapCtl::TogLanes: lanesOn = !lanesOn; break;
-                        default:
-                            // TOGEMPIRE/TOGSHIPS/TOGCOLONIES: the port has
-                            // no ship/colony overlay layers yet — named
-                            // seam, printed, never a fake toggle.
-                            std::printf("ui click map-ctl seam (msg %d)\n",
-                                        kMapCtl[static_cast<int>(*mapCtlFor(p))].sendMessage);
+                        case MapCtl::TogEmpire:
+                        case MapCtl::TogShips:
+                        case MapCtl::TogColonies:
+                            // t425 MSG MAP [verified, handler 0x26b34]:
+                            // TOGEMPIRE(60)->toggle dword[win+0x58a];
+                            // TOGSHIPS(58)->toggle dword[win+0xc8];
+                            // TOGCOLONIES(61)->toggle dword[win+0xd0] AND
+                            // dword[win+0xcc] (0x27b29/0x27d40/0x27cce
+                            // sete/dec pairs). Init 0x2718c sets c8/cc/d0 =
+                            // -1 (visible); 0x58a takes its default from
+                            // BUTTONSTATE (windows.txt: EMPIRE 0, the other
+                            // three 1). The port's overlay layers: SHIPS =
+                            // the transit-fleet pips (campaign.fleet(), the
+                            // port's entire ship state, campaign.h:284);
+                            // COLONIES = star-owner tinting; EMPIRE = the
+                            // lane web's owner colouring. Each toggle flips
+                            // REAL state and repaints — no printed-only seam.
+                            if (*mapCtlFor(p) == MapCtl::TogShips)
+                                shipsOn = !shipsOn;
+                            else if (*mapCtlFor(p) == MapCtl::TogColonies)
+                                coloniesOn = !coloniesOn;
+                            else
+                                empireOn = !empireOn;
+                            break;
                     }
-                    std::printf("ui cam yaw %.2f pitch %.2f focal %.0f lanes %d\n",
+                    std::printf("ui cam yaw %.2f pitch %.2f focal %.0f lanes %d ships %d colonies %d empire %d\n",
                                 cam.yawLog(), cam.pitchLog(), cam.focal,
-                                lanesOn ? 1 : 0);
+                                lanesOn ? 1 : 0, shipsOn ? 1 : 0,
+                                coloniesOn ? 1 : 0, empireOn ? 1 : 0);
                 } else if (screen == kScreenMap && kRaceControlsFrame.x0 <= p.x &&
                            inRect(kRaceControlsFrame, p)) {
-                    std::printf("ui click race-controls seam (slot %s)\n",
-                                raceSlotFor(p) ? std::to_string(*raceSlotFor(p) + 1).c_str()
-                                               : "frame");
+                    // t425 RACE FILTER LAW [verified]: RACECONTROLS sends
+                    // msg 62 (windows.txt ln424); handler 0x27824 toggles
+                    // byte[win+0xd8] bit dl, where dl is the RACE<N>CONTROL
+                    // row's bit column (ln429-435: bits 1,2,4,8,16,32,64 ==
+                    // 1<<slot). Consumer 0x27258..0x272ac skips every record
+                    // of a race whose bit is clear. The port's analog: slot i
+                    // == owner index i (kOwnerRgb order), so a cleared slot
+                    // hides that owner's star tint and its fleet pips.
+                    if (const auto slot = raceSlotFor(p)) {
+                        raceVisibleMask ^= (1u << *slot);
+                        std::printf("ui race filter slot %d mask 0x%02x\n",
+                                    *slot + 1, raceVisibleMask);
+                        std::fflush(stdout);
+                    } else {
+                        std::printf("ui click race-controls seam (slot %s)\n", "frame");
+                    }
                 } else if (screen == kScreenMap && inRect(kTurnCount, p)) {
                     // TURNCOUNT MOUSEFOCUS 0 (ln525): inert by the table.
                 } else if (screen == kScreenMap && inRect(kCosmosWnd, p)) {
@@ -979,6 +1031,21 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 Pt b2 = projectStar(cam, camp.galaxy().stars[ln.b]);
                 SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
                 SDL_RenderDrawLine(ren, a.x, a.y, b2.x, b2.y);
+                // t425 EMPIRE LAYER (msg 60 TOGEMPIRE toggles dword
+                // [win+0x58a]; BUTTONSTATE 0 = OFF by default, windows.txt
+                // ln365). ON: a lane whose endpoints share one owner is
+                // redrawn in that owner's colour (the vendor's empire
+                // overlay reads the same scene param frame as the lanes —
+                // paint snapshot 0x29514 copies +0x58a at offset +8).
+                if (empireOn) {
+                    const int oa = camp.starOwner(ln.a), ob = camp.starOwner(ln.b);
+                    if (oa >= 0 && oa == ob &&
+                        (raceVisibleMask & (1u << (oa % 7))) != 0) {
+                        const RGB c = kOwnerRgb[oa % 7];
+                        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                        SDL_RenderDrawLine(ren, a.x, a.y, b2.x, b2.y);
+                    }
+                }
             }
         }
         {
@@ -994,7 +1061,16 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 const auto& s = camp.galaxy().stars[sid];
                 Pt q = projectStar(cam, s);
                 const int o = camp.starOwner(s.id);
-                const bool owned = o >= 0;
+                // t425 RACE FILTER (vendor d8 consumer 0x27258): a cleared
+                // slot hides that owner's records entirely. Slot i covers
+                // owner index i (kOwnerRgb order; the vendor's 7 RACE rows
+                // cover all seven playable races, the player among them).
+                if (o >= 0 && (raceVisibleMask & (1u << (o % 7))) == 0)
+                    continue;
+                // t425 COLONIES LAYER (msg 61 toggles win+0xd0/+0xcc): with
+                // the layer off, owned stars render as plain neutral points —
+                // the ownership tinting IS the layer.
+                const bool owned = coloniesOn && o >= 0;
                 // t416: the ladder bands the TRANSFORMED depth (node+0xd =
                 // transformed z, FUN_000284bc) — view-axis field depth, not
                 // raw s.z. Identical at the rest basis (t399 pins hold).
@@ -1032,6 +1108,26 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     SDL_Rect sel{q.x - 6, q.y - 6, 13, 13};
                     SDL_RenderDrawRect(ren, &sel);
                 }
+            }
+        }
+        // t425 SHIPS LAYER (msg 58 TOGSHIPS toggles dword[win+0xc8]; init
+        // -1 visible; COS_SHIP.SHP is the vendor's sprite lib). The port's
+        // entire ship state is the transit vector (campaign.h:284), so the
+        // layer draws one owner-coloured pip per ship in transit at the
+        // from/target midpoint. shipsOn OFF hides them — a REAL state change.
+        if (shipsOn) {
+            for (const auto& sh : camp.fleet()) {
+                if (sh.from < 0 || sh.from >= int(camp.galaxy().stars.size()) ||
+                    sh.target < 0 || sh.target >= int(camp.galaxy().stars.size()))
+                    continue;
+                if ((raceVisibleMask & (1u << (sh.owner % 7))) == 0) continue;
+                const Pt a = projectStar(cam, camp.galaxy().stars[sh.from]);
+                const Pt b2 = projectStar(cam, camp.galaxy().stars[sh.target]);
+                const RGB c = kOwnerRgb[sh.owner % 7];
+                SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                const int mx = (a.x + b2.x) / 2, my = (a.y + b2.y) / 2;
+                SDL_Rect pip{mx - 2, my - 2, 5, 5};
+                SDL_RenderFillRect(ren, &pip);
             }
         }
         SDL_RenderSetClipRect(ren, nullptr);  // end field clip
@@ -1211,7 +1307,19 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 SDL_Rect r{rs.rect.x0, rs.rect.y0,
                            rs.rect.x1 - rs.rect.x0 + 1,
                            rs.rect.y1 - rs.rect.y0 + 1};
-                const RGB c = kOwnerRgb[i];
+                RGB c = kOwnerRgb[i];
+                if ((raceVisibleMask & (1u << i)) == 0) {
+                    // t425 FILTERED state: luminance halved (shape + colour
+                    // redundancy — the D-page CVD law never encodes in one
+                    // channel). [PORT CHOICE: the vendor's own slot faces
+                    // k20..k50 are 16x16 records whose indices (16,19 /
+                    // 20,23 / ...) DECODE dark in game.pal ((18,10,19)...),
+                    // while the refcap slot reads (89,24,56) — a RUNTIME
+                    // ramp, not the static palette; blitting them raw would
+                    // paint near-black squares, so the port keeps its
+                    // CVD-safe fills and encodes the mask in luminance.]
+                    c = RGB{uint8_t(c.r / 2), uint8_t(c.g / 2), uint8_t(c.b / 2)};
+                }
                 SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
                 SDL_RenderFillRect(ren, &r);
                 SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
