@@ -1367,3 +1367,20 @@ from a non-16 state is NOT evidence of unreachability.
 ##     slots take the same immediate 0x960000 = pal[150] for every class:
 ##     the port's uniform fill IS the vendor law. Trail docs/re/_wip_t421.md
 ##     + planets-ui.md §12.
+
+## R-t422c. THE VENDOR CHROME NOISE-GENERATOR DECOMPILE ROUTE — EXHAUSTED.
+##     Do not re-open a "find the noise generator in the exe" row: the only
+##     RNG is the Borland C-runtime LCG 0x7824f (state*0x41C64E6D+0x3039,
+##     (state>>16)&0x7fff; srand 0x78273; MSVC constants absent image-wide),
+##     and NONE of its 59 rel32 call sites is a paint path (all sim/init/
+##     save-restore — clusters walked 0x24f4b new-game init, 0x3f67a
+##     planitem picker, 0x2caec position pair, 0x463xx diplomacy). The
+##     hinted blitter FUN_0005d5a1 is an affine shape-record stretch blit
+##     (vertex table 0x8408..0x8457, cache 0x9f10c, 255=transparent key) —
+##     no noise math. No pattern table exists on disk (single 13-byte run
+##     of the chrome colour set image-wide). The stretched-noise-buffer
+##     hypothesis is measured-dead: row-identity id(k) has NO plateau for
+##     k=1..440 on the pinned left band (scripts/t422c_rowperiod.py). The
+##     statistical field law (chrome.md SS1.5) is the CEILING; do not swap
+##     the fresh draw for an uncited neighbour-skew rule (D17 law (1)).
+##     Trail docs/re/_wip_t422.md F11-F16.

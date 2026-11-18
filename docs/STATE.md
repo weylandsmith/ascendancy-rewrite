@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-17T16:55
+updated: 2026-11-17T22:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,35 +230,69 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t422 CONT cycle 2 — CHROME LAW: close the lag-1 residual via the
-vendor noise-generator decompile, then migrate + grade the remaining
-chrome consumers (ordering rationale: t422 cycle 1 LANDED the field law
-(docs/re/chrome.md: screen-fixed Markov field, run-stats match vendor,
-grainy-hash root cause FIXED, suite 421/0/0, gate 0) but its grade
-lists ONE residual defect that has an AVAILABLE decider — our fresh
-draws are census-iid (lag-1 h 0.96) while the vendor's are luminance-
-adjacent-skewed (0.62); the generator is a single routine in the exe
-and GhidraMCP headless v7.0.0 is CONNECTED (check_connection OK this
-session). ROUTE: the chrome field is painted by the window-manager
-backdrop path; decompile around FUN_0005d5a1 (blit w/ transparency-255)
-callers and the winmgr site 0x55ffb neighbourhood (ui-runtime.md:581),
-and census-game.pal-index the noise-generator immediate tables. BUDGET
-LAW for this cycle: if the generator is not pinned within ~25 probes,
-declare the statistical law the CEILING, bank the honest seam naming
-the missing evidence (close law SS5), and rewrite NEXT to t423 VERBATIM
-(NEW GAME SCREEN CYCLE, phase-16 queue row text at STATE.md
-PHASE-16 QUEUE). Cycle-2 deliverables if the law DOES land: swap the
-fresh-draw step for the cited neighbour law, re-run scripts/t422_fit.py
-statistics witness (target lag1 h <=0.75 on work/r1/loop/walk shot),
-update chrome.md SS4(a) -> CLOSED with the FUN address.
+NEXT t423 NEW GAME SCREEN CYCLE (ordering rationale: t422 CLOSED both
+cycles — cycle 1 landed the statistical field law, cycle 2 exhausted
+the generator-decompile decider and banked the honest ceiling per the
+close law + REFUTED-ROUTES R-t422c; the phase-16 queue order says one
+root cause first, then screens in flow order, and New Game is the next
+screen after the shared chrome cause. Do NOT re-open the chrome
+generator: R-t422c is binding; chrome.md SS1.5 is the ceiling and the
+port's splitmix fresh-draw stands.). QUEUE ROW TEXT VERBATIM: "t423
+NEW GAME SCREEN CYCLE (seed defects D17): wheel icons repeat across
+steps AND hostile-atmosphere variant missing AND extra art drawn below
+the circles (census 3cfgnew.shp records per option step — the vendor
+TEXTITEM/SHAPEFRAME table in beginnew.txt names which record per
+state); species + planet art STILL 4x (dims pin: drawn rect == record
+dims /2 or as-cited — find the vendor scale law, do not eyeball);
+species rings need THICK TEXTURED lines (chrome law from t422 or the
+ring's own record, not a vector stroke); preview starfield fills the
+VOLUME not a shell, stars LARGER + pixelated (decompile the newgame
+preview draw — vendor star sprite + placement law: volume sampling,
+sprite size); Begin New Game BUTTON spins the starfield too (vendor
+law: spin pump while button held/hovered? census the button's
+SENDMESSAGE). Framing via t422 chrome law. Grade clean per close law."
+Full row + PHASE-16 law: STATE.md PHASE-16 QUEUE section (line ~1846).
+Tooling ready: GhidraMCP check_connection OK; rel32 call census
+scripts/t422c_callgraph.py (instant, vs >180s capstone sweep); capstone
+ONLY via /home/hrethric/tools/revenv/bin/python; restored DB function
+coverage is SPARSE — for undefined regions use t399_disasm.py + the
+rel32 census, not Ghidra name queries.
 Trigger check FIRST as always: USER: lines after the D17 block in
 docs/DECISIONS.md win; a new playcap sitting outranks this (re-run
-scripts/r1_t85g_sitting.py FIRST). t422 checked both as of 2026-11-17
-~19:30: none (timeline mtime Nov 12; last USER: line 301).
+scripts/r1_t85g_sitting.py FIRST). t422c checked both as of
+2026-11-17 ~22:30: none (timeline mtime Nov 12; last USER: line 301).
 Do NOT re-ask anything the D16 sheet already asks; web ruling sheet
 STAYS PAUSED per D17.
 OQ-027 closes ONLY on the user's final hearing verdict; OQ-016/OQ-019
 stay DEFERRED — do NOT re-ask.
+
+t422 CONT CYCLE 2 LANDED 2026-11-17 (NOISE-GENERATOR ROUTE EXHAUSTED —
+STATISTICAL LAW DECLARED CEILING per the row's budget law; full account
+docs/re/_wip_t422.md F11-F16 + REFUTED-ROUTES R-t422c). MEASUREMENTS:
+(1) the exe's ONLY RNG is the Borland C-runtime LCG 0x7824f
+(state=state*0x41C64E6D+0x3039, return (state>>16)&0x7fff; srand
+0x78273; MSVC 0x343FD/0x269EC3 absent image-wide — not MSVC-built);
+rel32 census = 59 call sites, 27 clusters, ALL sim/init/save-restore
+(walked: 0x24f4b new-game seed draws then the banked preload cluster;
+0x3f67a planitem picker %100; 0x2caec position pair; 0x21490/0x54f0d
+srand FROM SAVED state) — NO chrome paint path consumes rand().
+(2) FUN_0005d5a1 decompiled: affine shape-record STRETCH blit (16
+vertex sets 0x8408..0x8457, 16.16 interpolation, byte 255 =
+transparent skip, cache 0x9f10c via FUN_0001fc34, single xref 0x18676)
+— zero noise math; FUN_00061058 = record-dims getter. (3) DECISIVE
+scripts/t422c_rowperiod.py: the F8 stretched-buffer hypothesis REFUTED
+— left-band row-identity has NO plateau at any k=1..440 (max 0.040).
+(4) no static pattern table (single 13-byte run of the chrome colour
+set image-wide). CONSEQUENCE: chrome.md SS4(a) rewritten as the named
+honest seam (remaining conceivable decider = live debugger frame-pair,
+NOT queued); NO rewrite delta shipped — swapping the fresh draw for an
+uncited neighbour rule would violate D17 law (1); suite UNCHANGED
+421/0/0 (no code touched — measurement iteration). PITFALLS: restored
+DB coverage sparse (created FUN_00018686 this session; queries fail on
+undefined regions); Cs.disasm has no skipdata kwarg in the revenv
+build; Hermes kernel python has NO capstone/numpy — terminal +
+revenv. LEDGER closes NOTHING (strict-close honest negative — chrome
+seam has no OQ owner; t414..t421 precedent).
 
 t422 LANDED 2026-11-17 (CHROME FIELD LAW DERIVED — root-cause row; full
 account docs/re/chrome.md + docs/re/_wip_t422.md F0-F10). MEASUREMENT
@@ -1837,6 +1871,9 @@ that process to the other screens?"):
       may find more.
 
 t422 CHROME LAW — TEXTURED FRAME DERIVED FROM RE (ROOT-CAUSE ROW,
+[CLOSED 2 CYCLES 2026-11-17: cycle 1 field law chrome.md SS1.5, cycle 2
+generator route EXHAUSTED -> statistical ceiling is the close reading;
+R-t422c binds. Original row text follows for history.])
 runs FIRST). The synthetic hash-noise chrome (mapchrome texture-
 ColourAt / splitmix64, menulaw §4, statusbg, title) reads "larger,
 grainier than the original" on every screen (D17). Derive the real

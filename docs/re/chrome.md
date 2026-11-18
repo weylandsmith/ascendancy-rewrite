@@ -77,12 +77,26 @@ class — per-pixel noise lag-1 1.304 [t417b measurement] — deliberately
 NOT Markov; leave as-is unless a pure-band re-measurement refutes it.
 
 ## 4. Named seams (honest negatives)
-(a) The EXACT vendor pattern (which pixel gets which colour) cannot be
-    replicated from still captures: the field is random per launch
-    (planet-view vs species-research 99.1% identical vs map 83.2% says
-    it is regenerated at least across sessions). Decider: vendor
-    disassembly of the noise generator (GhidraMCP route open for a
-    follow-up row) or acceptance that a STATISTICAL law is the ceiling.
+(a) [CYCLE 2 UPDATE] The EXACT vendor pattern (which pixel gets which
+    colour) cannot be replicated from still captures, and the STATIC
+    DECOMPILE ROUTE IS NOW EXHAUSTED (t422 CONT cycle 2, _wip F11-F16):
+    the only RNG in the exe is the Borland LCG at 0x7824f
+    (state*0x41C64E6D+0x3039, return (state>>16)&0x7fff) and NONE of its
+    59 call sites is a chrome/backdrop paint path (all sim/init); the
+    hinted blitter FUN_0005d5a1 is an affine shape-record stretch blit
+    (cache 0x9f10c, 255-transparent key) with zero noise math; there is
+    no on-disk pattern table (single 13-byte run image-wide); and the
+    F8 stretched-buffer hypothesis is REFUTED (row-identity has no
+    plateau at any k=1..440, scripts/t422c_rowperiod.py). Where the
+    field's pixels are BORN remains uncited: F1's cross-screen identity
+    says one screen-space surface painted once; F13 says the hinted
+    blitter only stretches decoded records (no noise math); no static
+    generator or table exists to feed it. Closing the encoder would be
+    OQ-005-class codec work and blind sweeps are forbidden. STATISTICAL
+    LAW IS THE CEILING — SS1.5
+    stands; swapping the fresh draw for an uncited neighbour rule would
+    violate the D17 derive-from-RE law. Remaining conceivable decider
+    (NOT queued): live debugger frame-pair of the backdrop surface.
 (b) SHAPEFRAME widget-lib table (which lib each window TYPE uses for
     its frame records) — census contradiction found (F6); needs the
     winmgr table decompile. This is the t423+ chrome-framing question,

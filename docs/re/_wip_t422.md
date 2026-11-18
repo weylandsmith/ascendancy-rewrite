@@ -153,3 +153,65 @@ SS4(a) (decider: vendor noise-generator decompile). MUTATION: M1 cell-
 quantisation CAUGHT (seen>=8 fails), M2 iid CAUGHT (vrep floor).
 Suite 421/0/0; gate GATE_EXIT=0; ledger 17/3 (closes NOTHING — chrome
 seam has no OQ owner, t414..t421 precedent).
+
+---
+# t422 CONT CYCLE 2 (2026-11-17 late) — NOISE-GENERATOR DECOMPILE ROUTE
+# F11 [VERIFIED disasm 0x78249..0x78282] THE VENDOR RNG IS ONE LCG, the
+# Borland C runtime rand(): state block = malloc(0x9730) handle 0x9730;
+# rand 0x7824f: state=state*0x41C64E6D+0x3039, return (state>>16)&0x7fff;
+# srand 0x78273 stores the seed. MSVC constants 0x343FD/0x269EC3: ZERO
+# hits image-wide (struct scan) — the exe is NOT MSVC-built.
+# F12 [MEASURED rel32 census, scripts/t422c_callgraph.py] rand() has 59
+# call sites in obj0 code [0x10000,0x82bb0), 27 clusters (sanity-verified:
+# the known call 0x18676->0x5d5a1 appears). ALL walked clusters are SIM/
+# INIT paths, NONE is chrome/backdrop paint: 0x24f4b..0x24fa9 = new-game
+# init (seed draws %21, %5+3, %76+32, %6 then FUN_000226e4/002351c/
+# 00238e8/0023388 = the banked shape-preload cluster); 0x3f67a = planitem
+# picker (%100 draw feeding the 0x73e48 cost table loop); 0x2caec/0x2cb16
+# = random position pair; 0x21490/0x54f0d = srand from SAVED state (rand
+# state persists in saves — saves restore it); 0x46375 region = diplomacy.
+# CONCLUSION: the chrome paint path consumes NO rand() — the field is not
+# drawn through the C RNG at all in any statically reachable site.
+# F13 [VERIFIED decompile] FUN_0005d5a1 (the queue's hinted blitter) is a
+# general affine STRETCH/INTERPOLATE blit: 16 vertex parameter sets at
+# 0x8408..0x8457 (5 u32 each), 16.16 fixed-point edge interpolation,
+# source byte -1 (255) = transparent skip (the chrome law's 255 key),
+# unrolled x6 inner loop. ONE xref (0x18676, caller region 0x18686 —
+# undefined in the 799-function restored DB; FUN_00018686 created this
+# session). Its source comes from the shape cache 0x9f10c via FUN_0001fc34
+# (record-idx lookup, 200-entry LRU) — SHAPE ART blit, zero noise math.
+# FUN_00061058 = record-dims getter (rect-table [handle+8+8*idx] -> ptr,
+# w=x1-x0+1, h=y1-y0+1). The backdrop paint path is record-driven; the
+# noise itself is INSIDE a record's decoded stream, not generated at paint.
+# F14 [MEASURED, scripts/t422c_rowperiod.py — DECISIVE] the F8
+# "blit-from-smaller-buffer with vertical stretch" hypothesis is REFUTED:
+# left band rows 40..479 x1..6 row-identity id(k) has NO plateau at ANY
+# k=1..440 (max 0.040 at k=390; perfect-identity set EMPTY). An integer
+# row-stretch of a periodic buffer forces id(k)=1.0 at k=j*H/s. The
+# vertical>horizontal correlation anisotropy is therefore per-axis draw
+# bias (our Markov model's shape), not resampling.
+# F15 [MEASURED] static-census negative (the queue's "immediate tables"
+# ask): scanning the image for RUNS of the chrome colour set (grey 2..6 +
+# teal 48..58 + accents 157/201, >=12 bytes, >=4 distinct) finds exactly
+# ONE 13-byte run (0x8940c, values {2,3,4,5} — data sliver, not a pattern
+# table). There is NO on-disk pattern table for the field.
+# F16 BUDGET-LAW VERDICT: generator NOT pinned in cycle 2. Per the row's
+# own budget law: the STATISTICAL law (chrome.md SS1.5) is the CEILING of
+# still-capture + static-RE evidence. chrome.md SS4(a) NAMED EVIDENCE now:
+# (i) static decompile route EXHAUSTED (no generator, no table, paint
+# path is record-blit of a decoded stream); (ii) remaining conceivable
+# decider = a debugger capture PAIR of the backdrop surface inside a live
+# vendor session (frame N vs N+1) to see if the stream is LCG-raster —
+# the field is session-fixed (F9), so even that needs the generator to
+# run per-pixel at surface-build time, whose code sits BEHIND the shape
+# decode (OQ-005 partial codec territory, 7th blind sweep FORBIDDEN per
+# GOAL). No rewrite delta shipped (swapping the fresh-draw step for an
+# UNCITED neighbour law would violate D17 law (1)); splitmix draws stand.
+# PITFALLS: (a) restored-DB function coverage is SPARSE (799 fns) —
+# Ghidra xref/name queries fail on undefined regions; use the rel32 census
+# + t399_disasm there. (b) capstone in the Hermes kernel python is ABSENT;
+# run via /home/hrethric/tools/revenv/bin/python (terminal), and
+# Cs.disasm(skipdata=) is not a kwarg in this build — step manually
+# (a full-image manual sweep >180s; rel32 scan is instant). (c) creating
+# functions mutates the shared Ghidra DB (FUN_00018686 added) — harmless,
+# but don't re-create.
