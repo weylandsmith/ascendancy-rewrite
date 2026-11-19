@@ -259,6 +259,12 @@ while :; do
   fi
   post_head=$(git rev-parse --short HEAD 2>/dev/null)
   if [ "$verdict" = OK ] && [ "$rc" = 137 ]; then verdict=KILLED; fi
+  # rc!=0 means the session never reached its own finish sequence (2026-11-18:
+  # a cgroup OOM surfaced as rc=130 "Interrupted"; the adoption commit
+  # advanced HEAD and the OK verdict marked the queue tag DONE — t426 was
+  # skipped). HEAD-advanced proves a COMMIT happened, never that the TASK
+  # finished; adoption commits advance HEAD too. Only rc=0 closes a task.
+  if [ "$verdict" = OK ] && [ "$rc" != 0 ]; then verdict=ABORT; fi
   if [ "$verdict" = OK ] && [ "$post_head" = "$pre_head" ]; then verdict=NO_COMMIT; fi
   committed=$(git log -1 --format='%h %s' 2>/dev/null)
 

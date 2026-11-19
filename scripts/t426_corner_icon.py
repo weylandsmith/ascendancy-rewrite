@@ -62,10 +62,18 @@ def decode(rec):
     off = rec if k == 0 else rec + 0x10
     s = rec + 8 if k == 0 else rec + 0x18
     w, h = struct.unpack_from("<II", d, off)
-    pos, rows = s, []
-    for _ in range(h):
+    # MEMORY GUARD (2026-11-18: this script's unbounded h from a bogus
+    # record offset ballooned to the cgroup cap and got OOM-killed):
+    # plausible records are 10..90 px; refuse anything else BEFORE
+    # building rows, and never walk past the file end.
+    if not (0 < w <= 512 and 0 < h <= 512) or s >= len(d):
+        raise ValueError(f"implausible dims {w}x{h} @ {rec:#x}")
+    pos, rows = s, min(h, 512)
+    for _ in range(rows):
         row = []
         while True:
+            if pos >= len(d):
+                raise ValueError("ran off end of file")
             c = d[pos]; pos += 1
             if c == 0:
                 break
