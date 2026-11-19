@@ -258,7 +258,12 @@ rows 473..479 (scratchpad; refcap clips at 479), left cols 0..6, right col
 bevel line at the field edge; the kBevelMid/kBevelIn rect pair WAS the port
 defect (t411's "x7 (49,54,53)" scan was the non-pure scratchpad). Port:
 pure-black field fill + frameTex bands extended 2 -> 4 (mapchrome.h
-kTextureBands). In-band edge gradient stays a named seam (flat census mix).
+kTextureBands). In-band edge gradient CLOSED t426 CYCLE 2: per-row census
+kTopRow[7] rows 0..6 full width (chain runs ALONG-band, copy-left 25%),
+per-column kRightEdge[7] x466..472 (bright idx58/173 ridge — no mirror
+law); bottom band stays flat (no pure source on disk). Law docs/re/
+chrome.md §6, pins test_bandgrad_t426c.cpp, witness
+scripts/t426c_grad_witness.sh PASS.
 
 PLAQUE LAW (F2/F2b, 336/336 exact): raceflag.shp k0 decoded at rec+8 (k0
 header law — a probe decode at rec+0x18 silently shifts k0; the C++ decoder

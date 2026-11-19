@@ -111,3 +111,44 @@ rewrite/tests/test_maplook_t411.cpp TEST(mottle_field_law_t422)
 correlation window [0.10,0.45] (iid floor / stripes ceiling), cell-
 quantisation ABSENT (cell-grid mutant caught at 100% vs <60% pin).
 Suite 421/0/0.
+
+## 6. t426c BAND GRADIENT LAW — the field is EDGE-NORMAL and per-EDGE
+[MEASURED 2026-11-19, docs/re/_wip_t426.md F6.1-F6.4; probes
+scripts/t426c_band_gradient.py + t426c_chi2.py + scripts/t426c_tune.py]
+
+The t422 flat per-column mix is REFUTED for two classes of the field:
+1. TOP BAND (screen rows 0..6, FULL WIDTH incl. corners and over the
+   sidebar): per-ROW census, colour families bright (55/6/56/57/176) ->
+   mid (53/54/52/157/4) -> dark (50/51/49/48) -> near-black (2/1/200);
+   mean-lum 106.5/106.2/83.7/65.5/45.5/46.9/28.3 then 100% black row 7+.
+   Cross-screen identity vs planet-view AND species-research rows 0..6
+   x0..465: 99.8/69.5*/96.6/93.1/93.1/92.3/66.1% (*rows 1/6/7 carry
+   shifted overlay content) -> the gradient is the SAME screen-fixed
+   field, so census tables (not a ramp generator) are the law shape.
+   CHAIN ORIENTATION: noise repeats ALONG the band — copy-left 25%, no
+   repeat-up (vendor h-run k1 0.653; edge-normal 5/25 replay 0.788 blows
+   rows 2-4 chi-square: 147/182/168 vs 17/14/12).
+2. RIGHT FIELD-EDGE STRIP x466..472: per-COLUMN census (rows 60..460,
+   n=401/col); col467/468 carry the bright idx58/173/59 ridge (col means
+   133.6/133.7) — colours absent from kRight, and the right edge is
+   BRIGHT at the field edge while the left col6 is dark: NO symmetric
+   mirror law; per-edge tables only. Chain stays 5/25 (strip v-run k1
+   0.574 == along-band orientation for a vertical strip).
+3. BOTTOM BAND rows 473..479: mean-lum profile exists (scratchpad 65 ->
+   ridge 160@475 -> 104) but the scratchpad census is 24-100% OFF-palette
+   interpolation and every pure refcap is png=screen+40 clipped at screen
+   439 — NO colour table derivable on disk. Stays flat kRight. NAMED SEAM
+   (closer: a pure bottom-edge capture, e.g. a live frame grab).
+4. Left band x0..6 rows 40..479: NO row gradient (per-row censuses flat
+   across y) — the t422 per-column law stands; rows 0..6 of columns 0..6
+   belong to the top-band table (vendor corner px are the bright family).
+Port: mapchrome.cpp textureColourAt dispatches y-first (kTopRow[7] rows
+0..6, chain 25/0), then kRightEdge[7] (x466..472), then kLeft/kRight.
+Pins tests/test_bandgrad_t426c.cpp x3, mutation-verified x4 (edge-normal
+chain CAUGHT hrep+vrep; flat top CAUGHT dark+envelope; flat right strip
+CAUGHT x4 named FAILs; AFTER-RESTORE 437/0/0). Witness
+scripts/t426c_grad_witness.sh + t426c_witness_census.py VERDICT PASS on
+our render (row means 109.0/106.7/82.8/64.6/46.4/46.2/28.8 vs vendor
+106.5/106.2/83.7/65.5/45.3/46.9/28.3; strip 87.0/131.2/133.2/121.8 vs
+vendor 86.1/133.6/133.7/120.7). Residual: our h-repeat 0.406 vs vendor
+0.347 (copy-left 25% slightly long; 25/30 scored worse on row chi2).

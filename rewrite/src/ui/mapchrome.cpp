@@ -89,6 +89,31 @@ const RGB kTextureColours[10] = {
 };
 const int kTextureWeights[10] = {4, 15, 9, 8, 7, 7, 7, 7, 6, 4};
 
+// ---- t426c BAND GRADIENT LAW [measured, docs/re/_wip_t426.md F6.1-F6.3] ----
+// The band census is EDGE-NORMAL and per-EDGE, not one flat mix:
+//  * TOP band (screen rows 0..6, FULL WIDTH incl. over the sidebar): a
+//    per-ROW census whose colour families run bright (55/6/56/57/176) ->
+//    mid (53/54/52/157/4) -> dark (50/51/49/48) -> near-black (2/1/200).
+//    Cross-screen identity rows 0..6 x0..465 vs planet-view AND
+//    species-research: row0 99.8%, rows2-5 92-97% -> the gradient belongs
+//    to the same screen-fixed field (chrome.md F1), so it is census data,
+//    not a ramp generator. Chain runs ALONG-band: copy-left 25%, NO
+//    repeat-up (tuner scripts/t426c_tune.py: edge-normal 5/25 blows the
+//    per-row chi-square on rows 2-4 — 147/182/168 vs 18/14/12; along-band
+//    h-run k1 0.609 vs vendor 0.653).
+//  * RIGHT field-edge strip x466..472: per-COLUMN census (rows 60..460,
+//    n=401/col, pure refcap). col467/468 carry a BRIGHT idx58/173/59
+//    ridge — colours ABSENT from kRight, so the flat law was refuted for
+//    these columns; the right edge does NOT mirror the dark left edge.
+//    Chain stays edge-normal 5/25 (strip v-run k1 0.574 == the left
+//    band's along-band orientation).
+//  * BOTTOM band rows 473..479: mean-lum profile measured on the
+//    scratchpad (65 -> ridge 160 at 475) but the scratchpad census is
+//    24-100% OFF-palette interpolation — NO colour table is derivable
+//    from any on-disk pure shot (every refcap is png=screen+40, clipped
+//    at screen 439). It stays the flat kRight law; NAMED SEAM.
+// Entries are {r,g,b,pad, weight} with VENDOR rounded pixels
+// (round(v*255/63)) and RAW census counts as weights.
 RGB textureColourAt(int x, int y) {
     // t422 MARKOV FIELD LAW [measured, docs/re/chrome.md]: per-pixel
     // chain — P(copy pixel LEFT)=0.05, else P(repeat pixel ABOVE)=0.25,
@@ -107,8 +132,14 @@ RGB textureColourAt(int x, int y) {
     z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
     z = z ^ (z >> 31);
     const uint64_t r = z % 1000000ull;
-    if (r < 50000ull && x > 0) return textureColourAt(x - 1, y);   // 5%
-    if (r < 300000ull && y > 0) return textureColourAt(x, y - 1);  // 25%
+    // t426c: the top band's noise runs ALONG the band (copy-left 25%, no
+    // repeat-up); every other chrome class keeps the t422 5/25 chain.
+    if (y >= 0 && y <= 6) {
+        if (r < 250000ull && x > 0) return textureColourAt(x - 1, y);
+    } else {
+        if (r < 50000ull && x > 0) return textureColourAt(x - 1, y);   // 5%
+        if (r < 300000ull && y > 0) return textureColourAt(x, y - 1);  // 25%
+    }
     // Fresh draw. kLeft = per-column census of the vendor left chrome
     // band (pinned original-strategic-map.png rows 40..479; weights are
     // raw pixel counts; docs/re/_wip_t422.md F7). kRight = right-zone
@@ -128,8 +159,41 @@ RGB textureColourAt(int x, int y) {
         {89,134,138,0,1997},{97,146,146,0,1483},{24,48,40,0,1163},{36,56,60,0,1095},
         {28,28,28,0,968},{60,93,97,0,928},
     };
+    // t426c kTopRow[7]: per-row census of the vendor TOP band, FULL WIDTH
+    // (pinned original-strategic-map.png png rows 40..46 = screen 0..6,
+    // x7..465, n=459/row, round-palette space, OFF=0). docs/re/_wip_t426.md
+    // F6.2. The y-branch precedes the x-branch: rows 0..6 read this table
+    // across the whole width (the census over x466..639 matches the same
+    // per-row shape), and the corners x0..6 y0..6 belong to it too (the
+    // vendor corner px are the 56/53/52 bright family, not kLeft[0]).
+    static const Ent kTopRow[7][10] = {
+        /* y0 */ {{77,113,117,0,149},{97,97,97,0,104},{85,125,125,0,99},{89,134,138,0,53},{89,89,89,0,37},{97,146,146,0,10},{81,81,81,0,7},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}},
+        /* y1 */ {{77,113,117,0,202},{85,125,125,0,90},{97,97,97,0,79},{89,89,89,0,44},{89,134,138,0,40},{97,146,146,0,3},{81,81,81,0,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}},
+        /* y2 */ {{61,93,97,0,157},{69,105,109,0,71},{57,85,89,0,64},{73,73,85,0,58},{65,65,65,0,46},{77,113,117,0,22},{49,77,81,0,16},{61,53,57,0,11},{85,125,125,0,9},{89,89,89,0,5}},
+        /* y3 */ {{40,65,69,0,131},{49,77,81,0,109},{36,57,61,0,74},{57,85,89,0,71},{61,93,97,0,32},{49,49,49,0,15},{24,49,40,0,14},{28,28,28,0,9},{77,113,117,0,3},{69,105,109,0,1}},
+        /* y4 */ {{24,49,40,0,136},{36,57,61,0,110},{28,28,28,0,72},{40,65,69,0,64},{49,77,81,0,33},{12,12,12,0,22},{57,85,89,0,10},{12,12,16,0,9},{0,0,0,0,2},{61,93,97,0,1}},
+        /* y5 */ {{24,49,40,0,120},{36,57,61,0,117},{40,65,69,0,77},{28,28,28,0,61},{49,77,81,0,40},{12,12,12,0,31},{57,85,89,0,10},{12,12,16,0,2},{61,93,97,0,1},{0,0,0,0,0}},
+        /* y6 */ {{28,28,28,0,151},{12,12,12,0,125},{24,49,40,0,95},{36,57,61,0,45},{12,12,16,0,32},{40,65,69,0,10},{0,0,0,0,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}},
+    };
+    // t426c kRightEdge[7]: per-column census of the RIGHT field-edge strip
+    // x466..472 (pinned map rows 60..460, n=401/col, OFF=0). col467/468 =
+    // bright idx58/173/59 ridge; the strip does NOT mirror the dark left
+    // edge. Trailing colours past 14 entries are <1% and folded into the
+    // dominant neighbours' mass (chi2 re-verified in F6.3's shape).
+    static const Ent kRightEdge[7][14] = {
+        /* x466 */ {{81,81,81,0,151},{89,89,89,0,138},{61,93,97,0,82},{69,105,109,0,30},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}},
+        /* x467 */ {{97,146,146,0,217},{125,121,138,0,102},{105,154,154,0,68},{117,117,117,0,8},{109,162,166,0,6},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}},
+        /* x468 */ {{97,146,146,0,208},{125,121,138,0,102},{105,154,154,0,77},{117,117,117,0,9},{109,162,166,0,5},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}},
+        /* x469 */ {{89,134,138,0,137},{117,117,117,0,117},{97,146,146,0,53},{85,125,125,0,39},{97,97,97,0,35},{125,121,138,0,12},{105,154,154,0,4},{77,113,117,0,3},{109,162,166,0,1},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0},{0,0,0,0,0}},
+        /* x470 */ {{69,105,109,0,94},{97,97,97,0,67},{85,125,125,0,65},{77,113,117,0,61},{89,134,138,0,45},{89,89,89,0,37},{117,117,117,0,13},{81,81,81,0,7},{97,146,146,0,4},{109,162,166,0,2},{73,73,85,0,2},{125,121,138,0,2},{65,65,65,0,1},{105,154,154,0,1}},
+        /* x471 */ {{61,93,97,0,71},{77,113,117,0,64},{69,105,109,0,51},{73,73,85,0,49},{49,77,81,0,42},{85,125,125,0,27},{97,97,97,0,27},{89,89,89,0,20},{89,134,138,0,12},{65,65,65,0,10},{57,85,89,0,6},{97,146,146,0,4},{105,154,154,0,4},{61,53,57,0,4}},
+        /* x472 */ {{77,113,117,0,75},{73,73,85,0,53},{61,93,97,0,47},{49,77,81,0,42},{69,105,109,0,37},{97,97,97,0,30},{65,65,65,0,23},{85,125,125,0,22},{89,89,89,0,17},{61,53,57,0,8},{97,146,146,0,5},{150,150,150,0,5},{40,65,69,0,5},{89,134,138,0,4}},
+    };
     const Ent* tab; int n;
-    if (x >= 0 && x <= 6) { tab = kLeft[x]; n = 10; }
+    if (y >= 0 && y <= 6) { tab = kTopRow[y]; n = 10; }
+    else if (x >= 466 && x <= 472) { tab = kRightEdge[x - 466]; n =
+        (x - 466 == 4 || x - 466 == 5 || x - 466 == 6) ? 14 : 9; }
+    else if (x >= 0 && x <= 6) { tab = kLeft[x]; n = 10; }
     else { tab = kRight; n = 10; }
     int total = 0;
     for (int i = 0; i < n; i++) total += tab[i].w;

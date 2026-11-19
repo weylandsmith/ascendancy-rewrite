@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-18T06:05
+updated: 2026-11-19T10:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,29 +230,65 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t426 CYCLE 2 — CHROME-BAND GRADIENT LAW (ordering rationale: D18 caps
-a thread at ~2 cycles and t426 cycle 1 shipped the border/plaque/crest laws
-375/375-exact; the ONE named seam left on THIS screen is the in-band
-luminance GRADIENT of the four chrome bands — the pure refcap top band runs
-bright teal rows 0..1 (idx 6/19/24/56/176 + grey) -> mid row 2 (grey 52/53 +
-157/201) -> darkening rows 3..6 to near-black teal (48/49/2/1/200, (40,65,69))
-before row 7 pure black; the port's textureColourAt is a FLAT census mix
-(t422 SS1.5) and paints every band row with the same distribution. WORK:
-per-row colour census of the pure refcap bands (rows 0..6 x 60..420, and the
-mirror law for cols 0..6 / 466+ / rows 473..479 via scratchpad), decide
-whether the gradient is (a) a per-row WEIGHT reweighting of the same 10-colour
-census set (implementable inside textureColourAt as a row-dependent weight
-table — the D17-legal move), or (b) a deterministic per-pixel ramp (needs the
-vendor noise/decompile route — Ghidra instance was NOT running 2026-11-19).
-If neither holds on measurement, bank the honest negative per t422 SS1.5
-(statistical law is the ceiling) and STOP the thread — do not invent a ramp.
-Exact-diff bar: per-row census chi-square against the vendor rows, not
-hand-tuning. Do NOT repaint any bevel line (REFUTED R-t426). Authority docs:
-docs/re/_wip_t426.md F1 (band extents + row samples), docs/re/chrome.md
-(t422 census law + SS1.5 ceiling), docs/re/t399-galaxy-map-3d.md "t426"
-(composite laws + witness). After this cycle the galaxy-map screen has NO
-more probe-shaped seams; the remaining map threads (S-f slot colour byte,
-dial FEEL) need the paint-site table / the user and stay parked.
+NEXT t427 — PLANETS LIST SCREEN CYCLE (ordering rationale: PHASE-16 queue
+runs in EXECUTION order and t426 closed at its D18 cycle cap of 2 — cycle
+2 shipped the band-gradient law chi2-cited, and the remaining map threads
+(S-f slot colour byte, dial FEEL) need the paint-site table / the user and
+stay parked; planets list is the next screen row, user D17 verbatim "hard
+to describe, hoping you can just derive the drawing rules from reverse
+engineering"). WORK per the queue row (STATE.md PHASE-16 section): full
+derive-from-RE pass on PLANLIST — windows.txt line ~1504 rect, the paint
+FUN, planets.shp record selection per row (owned vs unowned marker law,
+row layout, scroll window law per the menulaw three-slot precedent);
+grade vs scratchpad refs + vendor pixels. RE-FIRST LAW binding (D17):
+decompile the vendor draw chain FIRST (Ghidra headless check via
+scripts/ghidra_headless_up.sh — the instance was NOT running 2026-11-19;
+fall back to banked docs/re windows and NAME the seam honestly), windows.txt
+table for the screen's windows, NO synthetic stand-ins. Authority docs:
+docs/re/planets-ui.md (S8 t402 row-assembly cluster 0x50647..0x5091f,
+word tables #41-56, days law FUN_0x47010), docs/re/_wip_t405.md (hit-map
+law statusHitFor, arrows measured), docs/re/_wip_t417.md F1-F7 (vendor
+status chrome: black interior, perimeter texture, rows top 57 pitch 141,
+RED marker x16..69) + F8-F10 (t417b shipped state), docs/re/_wip_t406.md
+(membership owner-law, PLANLIST open chain). NOTE the t417b seam "marker
+FACE is flat (255,0,0) vs vendor red gradient" is an open sub-item of this
+row. Do NOT touch the planet screen frame (t428 territory).
+
+t426 CYCLE 2 LANDED 2026-11-19 (CHROME-BAND GRADIENT LAW — option (a)
+CONFIRMED, (b) NOT NEEDED; working log docs/re/_wip_t426.md F6.1-F6.4;
+durable law docs/re/chrome.md §6). MEASUREMENTS on the pure refcap
+(round-palette space; pitfall: the *255//63 FLOOR map mislabels ~50% of
+band px OFF — always round): (i) TOP band rows 0..6 = per-ROW census with
+disjoint colour families bright(55/6/56/57/176)->mid(53/54/52/157/4)->
+dark(50/51/49/48)->near-black(2/1/200), mean-lum 106.5->28.3, row7 100%
+black; census IDENTICAL across map/planet-view/species-research (92-99.8%
+rows 0,2-5) -> same screen-fixed field, census tables are the law shape,
+NOT a ramp generator (option (b) dead by measurement, matching R-t422c).
+(ii) CHAIN ORIENTATION: noise repeats ALONG the band (vendor h-run k1
+0.653); edge-normal 5/25 replay blows the per-row chi-square on rows 2-4
+(147/182/168 vs along-band 25/0 = 17/14/12, n=459/row). (iii) RIGHT
+field-edge strip x466..472 = per-COLUMN census; col467/468 bright idx58/
+173/59 ridge (133.6/133.7 mean lum) ABSENT from kRight -> flat law
+refuted there; right edge BRIGHT vs left edge dark = NO mirror symmetry,
+per-edge tables. (iv) LEFT band has NO row gradient (t422 F7 stands);
+BOTTOM band mean-lum profile measured (65->ridge 160@475->104) but the
+scratchpad census is 24-100% OFF-palette interpolation and every refcap
+clips at screen 439 -> NO colour table derivable on disk, stays flat,
+NAMED SEAM (closer: pure bottom-edge capture). PORT: textureColourAt
+dispatches y-first kTopRow[7] (chain copy-left 25%, no repeat-up), then
+kRightEdge[7]. PINS test_bandgrad_t426c.cpp x3, MUTATION x4 CAUGHT
+(edge-normal chain -> hrep/vrep FAILs; flat-top -> dark+envelope FAILs;
+flat right strip -> 4 named FAILs incl idx173-absent; AFTER-RESTORE 437/
+0/0). WITNESS scripts/t426c_grad_witness.sh + t426c_witness_census.py
+VERDICT PASS on our render (row means 109.0..28.8 vs vendor 106.5..28.3;
+strip 87.0/131.2/133.2/121.8 vs 86.1/133.6/133.7/120.7); t426_plaque_
+witness.sh still PASS (plaque 375/375). Residual: our h-repeat 0.406 vs
+vendor 0.347 (copy-left 25% slightly long; 25/30 scored worse on row
+chi2 — kept 25/25). LEDGER closes NOTHING (strict-close honest negative —
+map visuals have no OQ owner; t414..t426c1 precedent). GATE_EXIT=0;
+LEDGER AUDIT OK (17 closed / OQ-016, OQ-019, OQ-027 open). NEXT -> t427
+planets list screen cycle (queue EXECUTION order; t426 thread closed at
+its D18 cap).
 
 t426 LANDED 2026-11-19 (GALAXY-MAP VISUALS CYCLE 1; working log
 docs/re/_wip_t426.md F1-F5; distilled docs/re/t399-galaxy-map-3d.md "t426").
