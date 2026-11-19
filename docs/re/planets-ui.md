@@ -408,6 +408,12 @@ Implementation deferred to t418b; full derivations docs/re/_wip_t418.md F1-F5:
   skips cell>=+0x18, own-ACTIVE, item 5, item 38.
 - DISC: vendor provenance inside 0x3b96c UNRESOLVED (0x3b98b = 17np k4/k5
   backdrops); port default planal[terrainRow].record(sizeIdx) [inferred].
+  [t428c RESOLVED for k4: k4 IS blitted — registration anchor screen (7,115)
+  = the 0x3b9c0 pushes; scripts/t428c_field_register.py z-test + shuffle
+  control; docs/re/_wip_t428c.md F2. k5 registers too (screen (224,107),
+  z=18.6) but only 14.6% — widget/selector open. The lattice index law is
+  15*[planet+0x14] + row for BOTH B and C reads (_wip_t428c F1) — the port's
+  rowOffset[psize][row] at ui.cpp:1767 already matches.]
 
 ## 12. THE 0x892ac 'PER-CLASS COLOUR TABLE' IS REFUTED (t421, 2026-11-17)
 Full derivation docs/re/_wip_t421.md F1-F5; probes scripts/

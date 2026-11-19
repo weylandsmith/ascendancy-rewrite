@@ -93,6 +93,11 @@ snapshot-time pristine hash and ABORTS rather than continuing.
 - Field backdrop 17np k4 (625x357 per shp.md S23.2) decode-and-compare against
   witness B's field region: NOT run (dims are already cited; the CONTENT
   comparison is the open half). Row-table identity 0x7445c/0x744a8 unpinned.
+  [t428c SUPERSEDED BOTH: k4 registers at screen (7,115) (shuffle control
+  6..12 vs real 158/269); the tables are planitem.txt grids B/C (OQ-014,
+  closed 2026-10-06) indexed 15*[planet+0x14]+row — this file's "per-cell"
+  reduction above was wrong in GRANULARITY (per-(size,row)); the
+  no-vendor-gate conclusion stands. docs/re/_wip_t428c.md F1-F2.]
 - Tile-click CONTENT-DEPENDENT popup law (PLSQUARE SENDMESSAGE 1 -> command fn
   0x3aa0a legs): NOT touched.
 - Seam T428-B (witness A lineage) now has STATIC SUPPORT from F1 and stays a

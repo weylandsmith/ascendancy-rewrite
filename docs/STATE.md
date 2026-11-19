@@ -230,21 +230,53 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t428c — PLANET SCREEN CYCLE 3: FIELD PROVENANCE (ordering rationale:
-t428b closed the t428b mutation battery 4/4 CAUGHT and REFUTED the H-FIELD-STATE
-premise statically (grid walk unconditional once 0x3bb19 is reached — see
-_wip_t428b F1), so the field thread's remaining live half is PROVENANCE, not a
-gate hunt: (a) identify the row tables BYTE[0x7445c]/BYTE[0x744a8] the lattice
-loop reads (0x3bb8e, 0x3c1f2/0x3c1fa — static: find their init/loader writer in
-the restored image; they bound WHICH cells of each of the 15 rows get art);
-(b) decode 17np k4 (625x357, shp.md S23.2 dims already cited) and compare its
-CONTENT against witness B's field region (work/r1/screens/t254/02_planet_detail.png,
-screen origin (80,100)) to settle/kill the k4-as-field-backdrop candidate at the
-0x3b98b site; (c) if budget remains, the tile-click CONTENT-DEPENDENT popup law
-(PLSQUARE SENDMESSAGE 1 -> command fn 0x3aa0a legs; windows.txt table). Do NOT
-re-hunt a grid gate (F1 refuted it) and do NOT touch the frame (ALREADY EXACT,
-t406). SEAMS carried: T428-A RE-SCOPED by F1 into a witness-A-lineage artifact
-(folds into T428-B — DECISIONS page candidate), T427-A..F unchanged.
+NEXT t428d — PLANET SCREEN CYCLE 4: PORT THE k4 FIELD STARFIELD + k5 SELECTOR
+(ordering rationale: t428c settled the field-provenance thread at the content
+level — 17np k4 IS blitted at screen (7,115) (registration 158/269, shuffle
+control 6..12; scripts/t428c_field_register.py), and the rewrite paints
+NOTHING there (ui.cpp has the B/C lattice at :1767-1792 but no backdrop
+speckle). So (a) PORT k4: blit 17np rec 4 at screen (7,115) under the widget
+paint per the S12.1 blit law (lib slot u16[0x6fd9c], desc payload FUN_0x1fc34
+analog = the port's shape-cache), pin the anchor + a census leg on the t428
+witness (the k4 px are 269 scattered navy/grey specks; the witness check must
+tolerate overpaint — 101/111 mismatches at the anchor are BRIGHT overpaint px,
+so census against the MATCHED set, not the whole pattern); (b) if budget
+remains, k5: it registers at screen (224,107) z=18.6 but only 14.6% — find
+WHICH widget blits it (the 0x3b9e4 cond-2 site x=296,y=408 vs x=408,y=296 push
+order is F4a's open question — resolve push order once from a known-good blit
+like blit-1's (7,115) k4 anchor, then read the cond-2 selector writer at
+esp+0x374); (c) ONLY if (a)+(b) finish: the tile-click popup law (PLSQUARE
+SENDMESSAGE 1 -> command fn 0x3aa0a legs). Do NOT re-hunt a grid gate (t428b F1
+refuted it), do NOT touch the frame (ALREADY EXACT, t406), and do NOT re-derive
+grids B/C (planitem.txt, OQ-014 CLOSED — t428c F1 corrected the t428b F1
+"per-cell" misread: index = 15*[planet+0x14]+row, B=start col, C=cell count).
+SEAMS carried: T428-B (witness-A lineage; DECISIONS page candidate), T427-A..F
+unchanged. NEW seam T428c-A: k5 widget identity + selector UNRESOLVED; k4's
+record-index law for THIS call site open (selector==SENDMESSAGE==1 yet record
+k4 registers — t254's SEL(i)==record law is the POP panel's, not this site's).
+
+t428c LANDED 2026-11-19 (FIELD PROVENANCE: k4 BLIT ANCHORED + B/C INDEX LAW
+CORRECTED; working log docs/re/_wip_t428b.md F1 correction + docs/re/
+_wip_t428c.md F1-F4). (i) B/C TABLES PINNED (they were already banked — t428b's
+"unpinned" was a ledger misread): 0x7445c/0x744a8 = planitem.txt grids B/C,
+OQ-014 CLOSED 2026-10-06; NEW index law [verified asm]: both reads use
+idx = 15*u16[planet+0x14] + row (0x3bb2c shl4-sub builds 15*size into esp+0x358,
+0x3bb63 inc/row; 0x3c1e2..0x3c20b inner loop runs EXACTLY C[size][row] cells at
+cols B..B+C-1). t428b F1's "per-cell count" reduction WRONG in granularity —
+per-(size,row); its no-vendor-gate conclusion STANDS. Port ui.cpp:1767 already
+matches — no edit. (ii) k4 MEASURED: decoded 9/9 17np recs; k4 = 625x357,
+99.88% black, 269 navy/grey specks (starfield). Exhaustive-offset registration
+in witness B: 158/269 at png (87,215) = SCREEN (7,115) = EXACTLY the 0x3b9c0
+blit-1 pushes; colour-shuffle control 6..12 (pairing real); fresh-array
+random-offset best 13 = background (peak unique). k4-as-field-backdrop SETTLED (painted at (7,115),
+overpainted by lattice/pop art — 101/111 anchor mismatches are BRIGHT px).
+(iii) k5 registers at screen (224,107) z=18.6 but 14.6% — widget/selector open
+(seam T428c-A). (iv) PORT GAP found: nothing paints the k4 speckle -> t428d(a).
+Banked: scripts/t428c_field_register.py; docs/re/planets-ui.md §11 annotated;
+_wip_t428b F4 annotated. LEDGER closes NOTHING (strict-close honest negative —
+planet-screen visuals have no OQ owner; t414..t428b precedent; OQ-016/019/027
+untouched — OQ-014 re-cited, stays CLOSED). GATE_EXIT=0; LEDGER AUDIT OK
+(17 closed / 3 open); LEDGER INDEX OK.
 
 t428b LANDED 2026-11-19 (MUTATION 4/4 + H-FIELD-STATE PREMISE REFUTED; working
 log docs/re/_wip_t428b.md F0-F4). (i) VACUITY PROBE before any mutant: seed-2024
