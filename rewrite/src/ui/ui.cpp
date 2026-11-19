@@ -1578,13 +1578,15 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // suns.shp, selector = raw star type; 2x scale per the
                     // measured 130-px drawn sun vs 61-px record; centre
                     // MEASURED x80 y=row+64).
-                    if (sunLibIdx < 8 && kLibs[sunLibIdx].count() > 0 &&
-                        s.type >= 0 && s.type < int(kLibs[sunLibIdx].count())) {
-                        const auto& sr = kLibs[sunLibIdx].record(s.type);
-                        blitShapeScaled(ren, kLibs[sunLibIdx], s.type,
+                    if (sunLibIdx < 8 && kLibs[sunLibIdx].count() > 0) {
+                        const int sel = statusSunSelector(s.type);
+                        if (sel >= 0 && sel < int(kLibs[sunLibIdx].count())) {
+                        const auto& sr = kLibs[sunLibIdx].record(sel);
+                        blitShapeScaled(ren, kLibs[sunLibIdx], sel,
                                         kStatusSunCx - int(sr.width),
                                         y + kStatusSunCy - int(sr.height),
                                         kStatusArtScale);
+                        }
                     }
                     // t427 BLIT #3 FLAG (raceflag.shp, slot [0x6fd84]=32
                     // measured; vendor paints it for owned rows — our list
@@ -1604,11 +1606,11 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     const auto& ps = camp.planetAt(key.star);
                     const int sizeIdx = ag::Campaign::sizeClassFor(ps.surfaceCells);
                     const int typeIdx = ps.terrainRow;
+                    const int prec = statusPlanetSelector(typeIdx, sizeIdx);
                     if (planetLibIdx < 8 && kLibs[planetLibIdx].count() == 55 &&
-                        sizeIdx >= 0) {
-                        const int rec = typeIdx * 5 + sizeIdx;
-                        const auto& r = kLibs[planetLibIdx].record(rec);
-                        blitShapeScaled(ren, kLibs[planetLibIdx], rec,
+                        prec >= 0) {
+                        const auto& r = kLibs[planetLibIdx].record(prec);
+                        blitShapeScaled(ren, kLibs[planetLibIdx], prec,
                                         kStatusPlanetCx - int(r.width),
                                         y + kStatusPlanetCy - int(r.height),
                                         kStatusArtScale);

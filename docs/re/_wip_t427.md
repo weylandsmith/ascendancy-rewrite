@@ -238,3 +238,21 @@ sun art's upper-left arc; rows 1/2 red-pixel control below x185 = ZERO).
   STATE NEXT ACTION). kStatusMarkerRect constant RETAINED in statusbg.h
   (t417b pin still checks it) though the painter no longer uses it —
   re-scope or retire with the witness next session.
+
+## F9 [t427b, measured 2026-11-19] — WITNESS PASS on our own render
+scripts/t427_statusrow_witness.sh (Xvfb :97, seed 5 --species 0; RESUME ->
+STATUS rail -> shot; row-0 click -> Escape -> shot) +
+scripts/t427_witness_census.py VERDICT PASS 14/14 on /tmp/t427_shots/:
+open row0 line1 GREEN g=413 w=0; sel row0 WHITE w=413 g=0 (the colour IS
+the marker — same-row control, stronger than two rows in one frame); rows
+1/2 never WHITE; NO flat (255,0,0) capsule px on any row (n255=0 x3); sun
+warm px x16..145 n=6512; raceflag px x12..26 n=336 (needs --species 0:
+default playerSpecies=-1 paints nothing — fixture law, not a port bug);
+pip dots start x498 exactly, dot-start pitch 5/5/5/5/5, 2px dots; old
+x428..481 strip zone n=0; planet art px x150..245 n=976.
+FIXTURE NOTE: seed 5 owns ONE planet ("1 Planet Occupied") — rows 1/2 are
+empty; GREEN/WHITE control is the same row across the two shots.
+CAPSULE RETIREMENT (t427b step 4): kStatusMarkerRect DELETED from
+statusbg.h; test_statusbg_marker_and_wells_t417b re-scoped to
+statusbg_wells_t417b (arrow-well navy half kept, capsule half deleted,
+citing F6). Suite 442/0/0 after re-scope; GATE_EXIT=0; LEDGER AUDIT OK.

@@ -127,14 +127,12 @@ TEST(statusbg_ramp_table_t417b) {
     CHECK(au::kStatusBorderY0 == 48 && au::kStatusBorderY1 == 470);
 }
 
-TEST(statusbg_marker_and_wells_t417b) {
-    // F5/F8: RED marker capsule x16..69, row-rel y2..25 (top+2, h~24).
-    CHECK(au::kStatusMarkerRect.x0 == 16 && au::kStatusMarkerRect.x1 == 69);
-    CHECK(au::kStatusMarkerRect.y0 == 2);
-    CHECK(au::kStatusMarkerRect.y1 - au::kStatusMarkerRect.y0 + 1 >= 20 &&
-          au::kStatusMarkerRect.y1 - au::kStatusMarkerRect.y0 + 1 <= 26);
-    // The marker sits INSIDE the row band (row 2: 339+2..339+25 < 339+141).
-    CHECK(au::kStatusMarkerRect.y1 < au::kStatusRowPitch);
+TEST(statusbg_wells_t417b) {
+    // t427b RE-SCOPE: the capsule half of this pin is DELETED — the red
+    // marker rect was REFUTED by measurement (docs/re/_wip_t427.md F6:
+    // unselected rows 1/2 have ZERO red px below x185; the fitted zone was
+    // the sun art's arc). The selection law is line1 text colour, pinned in
+    // test_statusrow_t427.cpp. The arrow-well half stands:
     // Arrow-well navy is the MEASURED (8,32,49) — explicitly NOT the k0
     // idx-242 navy (12,32,48) that fingerprinted the never-painted backdrop.
     CHECK(au::kStatusWellNavy.r == 8 && au::kStatusWellNavy.g == 32 &&

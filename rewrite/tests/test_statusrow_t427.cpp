@@ -94,6 +94,23 @@ TEST(statusrow_pip_grid_t427) {
     CHECK(!au::statusPipAt(-1, 57, x, y));
 }
 
+TEST(statusrow_selector_laws_t427b) {
+    // BLIT #1: raw star type, domain 0..12 (13 starstat types), else -1.
+    CHECK(au::statusSunSelector(0) == 0);
+    CHECK(au::statusSunSelector(12) == 12);
+    CHECK(au::statusSunSelector(13) == -1);
+    CHECK(au::statusSunSelector(-1) == -1);
+    // BLIT #2: 5*type + size (0x50567..0x50581 imul 5 / add), NOT
+    // 5*size + type and NOT 4*K banding: asymmetric args pin the form.
+    CHECK(au::statusPlanetSelector(4, 3) == 23);
+    CHECK(au::statusPlanetSelector(3, 4) == 19);
+    CHECK(au::statusPlanetSelector(0, 0) == 0);
+    CHECK(au::statusPlanetSelector(10, 4) == 54);   // last record
+    CHECK(au::statusPlanetSelector(11, 0) == -1);   // 11 type words max
+    CHECK(au::statusPlanetSelector(0, 5) == -1);    // 5 size words max
+    CHECK(au::statusPlanetSelector(-1, 0) == -1);
+}
+
 TEST(statusrow_scale_and_anchors_t427) {
     // 2x law: content ~61-68 sun -> measured drawn 130x126 (F5).
     CHECK(au::kStatusArtScale == 2);

@@ -89,11 +89,12 @@ inline constexpr int kStatusBorderY0 = 48;
 inline constexpr int kStatusBorderY1 = 470;
 inline constexpr RGB kStatusBorderRgb{33, 56, 57};
 
-// Selection marker [measured F5 + t417b re-verify]: RED, x16..69, top+2,
-// height ~24 (red-dominant 409 px in the zone, mean (209,70,28), top values
-// (189,44,16)/(156,4,0)/(255,0,0) — the port face (255,0,0) is inside the
-// measured family). Rect is ROW-RELATIVE (add the row top to y).
-inline constexpr Rect kStatusMarkerRect{16, 2, 69, 25};
+// Selection marker: RETIRED t427b. The t417b "red capsule x16..69" was
+// REFUTED by measurement (docs/re/_wip_t427.md F6): rows 1/2 (unselected)
+// have ZERO red px below x185 in the same shot — the fitted zone was the
+// SUN ART's upper-left arc. The vendor selection law is line-1 TEXT COLOUR
+// (WHITE vs GREEN; kStatusLine1Sel/kStatusLine1Norm in statuslist.h). The
+// constant kStatusMarkerRect is deleted with it.
 
 // Arrow-well box fill [measured F4]: the wells carry navy (8,32,49) — NOT
 // the k0 idx-242 navy (12,32,48) the port painted (that colour is the F1

@@ -192,6 +192,21 @@ inline constexpr int kStatusFlagY = 0;         // flag top-left y (bbox y57..81)
 // The vendor flag is PALETTE-RAMP-TINTED (0x53e81..0x53ea5 rewrites
 // palette slots 15..19 := raceByte - i, i=0..4, before the blit): the
 // port blits the record's native colours — NAMED SEAM T427-D.
+// BLIT #1 SELECTOR LAW (0x50525, selector = [esi+0] dword): the RAW star
+// type indexes suns.shp — NO 4*K+cls banding (map pips), NO view-class
+// term. Domain = the 13 starstat types == suns.shp count 13; out of domain
+// -> -1 = paint nothing (refuse-not-crash).
+inline int statusSunSelector(int starType) {
+    return (starType >= 0 && starType < 13) ? starType : -1;
+}
+// BLIT #2 SELECTOR LAW (0x50567..0x50581): 5*terrainType + sizeIdx over
+// the 55-record planets.shp (type 0..11 words #46-56, size 0..4 words
+// #41-45); out of domain -> -1.
+inline int statusPlanetSelector(int typeIdx, int sizeIdx) {
+    return (typeIdx >= 0 && typeIdx < 11 && sizeIdx >= 0 && sizeIdx < 5)
+               ? typeIdx * 5 + sizeIdx
+               : -1;
+}
 // SELECTION LAW [measured t427 F6, decisive]: row 0 (selected) line-1
 // text is WHITE (255,255,255) x522 px; rows 1/2 (unselected) GREEN
 // (0,170,82) x551/x375 px. There is NO capsule/marker rect — the t417b
