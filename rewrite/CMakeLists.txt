@@ -117,6 +117,7 @@ add_executable(run_tests
   tests/test_mapchrome_t394.cpp
   tests/test_mapctl_t425.cpp
   tests/test_mapwell_t425c.cpp
+  tests/test_plaque_t426.cpp
   tests/test_cam3d_t399.cpp
   tests/test_axis_t416.cpp
   tests/test_rail_t400.cpp

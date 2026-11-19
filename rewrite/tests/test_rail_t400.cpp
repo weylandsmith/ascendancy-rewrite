@@ -94,9 +94,14 @@ TEST(title_hover_fill_t400) {
 
 TEST(frame_texture_law_t400) {
     // Bands [verified both vendor shots]: left margin + right column.
-    CHECK(kTextureBandCount == 2);
+    // t426 EXTENDS the law to four sides (top rows 0..6, bottom rows
+    // 473..479; docs/re/_wip_t426.md F1 — the pure refcap's chrome frames
+    // the field on all four edges; the old 2-band set was the "map border
+    // missing" defect). Vertical-band geometry unchanged.
+    CHECK(kTextureBandCount == 4);
     CHECK(kTextureBands[0].x0 == 0 && kTextureBands[0].x1 == 6);
     CHECK(kTextureBands[1].x0 == 466 && kTextureBands[1].x1 == 639);
+    CHECK(kTextureBands[2].y1 == 6 && kTextureBands[3].y0 == 473);
     // Determinism: same pixel -> same colour across calls (no rng_).
     for (int i = 0; i < 5; i++)
         {

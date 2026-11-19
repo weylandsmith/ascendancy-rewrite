@@ -1406,3 +1406,13 @@ at pitch 39 (x 479/518/557/596; "pitch 44" was RACE1/3/5/7 x0s, a
 mis-attribution). Use scratchpad/galaxymap-original.png (642x481, identity
 mapping) for the strip, and the 640x480 png ONLY for the toggle/cluster rows
 where it is the exact-diff authority. Trail docs/re/_wip_t425.md F7-F10.
+
+## R-t426 — THE t411 TWO-LINE COSMOS BEVEL IS DEAD (t426 border pass). The
+kBevelMid/kBevelIn rect pair (mapchrome.h, ui.cpp 2026-11-16..18) was built
+from scans of scratchpad/galaxymap-original.png — a capture that is NOT
+palette-pure (t425c caveat; off-table colours + blends). The palette-PURE
+refcap shows NO line at the field edge: chrome texture runs INTO the window
+edge (top rows 0..6, left cols 0..6, right col 466+, bottom rows 473+) and
+the interior is pure black to 7,7..465,472 (col 7 is BLACK, not (49,54,53)).
+Do not repaint any bevel/edge line at COSMOSWnd; the border is the four
+chrome bands + black field. Trail docs/re/_wip_t426.md F1.

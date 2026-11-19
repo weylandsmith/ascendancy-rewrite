@@ -1008,28 +1008,43 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         // FUN_00053324 + pinhole FUN_00053374).
         {
             // cosmos frame + the field clip: zoomed-in stars beyond the
-            // frame must not paint the rail. t411 BEVEL LAW [measured,
-            // docs/re/_wip_t411.md F5]: the vendor field sits in a RECESS —
-            // texture luminance ramps DOWN to near-black at the edge on all
-            // four sides (left scan x6 (65,65,65) x7 (49,54,53) x8 (5,6,6)
-            // x9 black; top y7 (31,46,49) y8 black; right x466 (27,32,33);
-            // bottom y472 black y473 (54,76,76)). The old flat (120,120,120)
-            // 1-px line was the "no bevel frame" defect: two dark lines
-            // (mid at the outset, near-black at the window rect) reproduce
-            // the ramp; the recess ART itself stays the t400 seam.
-            SDL_Rect frame{kCosmosWnd.x0 - 1, kCosmosWnd.y0 - 1,
-                           kCosmosWnd.x1 - kCosmosWnd.x0 + 3,
-                           kCosmosWnd.y1 - kCosmosWnd.y0 + 3};
-            SDL_SetRenderDrawColor(ren, kBevelMid.r, kBevelMid.g, kBevelMid.b,
-                                   255);
-            SDL_RenderDrawRect(ren, &frame);
-            SDL_Rect bevel{kCosmosWnd.x0, kCosmosWnd.y0,
+            // frame must not paint the rail. t426 BORDER LAW [measured,
+            // docs/re/_wip_t426.md F1; supersedes the t411 two-line ramp]:
+            // in the PALETTE-PURE refcap the chrome texture runs INTO the
+            // window edge on all four sides (top rows 0..6 full-width
+            // texture, left cols 0..6 texture, col 7+ pure black; right
+            // col 466 texture; scratchpad bottom rows 473+ texture) and the
+            // field interior is PURE BLACK to 7,7..465,472. The vendor has
+            // NO bevel line at the edge — the old kBevelMid/kBevelIn rects
+            // were the port defect (t411's "x7 (49,54,53)" scan was the
+            // non-pure scratchpad; the pure refcap says col 7 is black).
+            // Top/bottom texture bands are the frameTex extension below;
+            // the in-band luminance GRADIENT toward the edge stays a named
+            // seam (textureColourAt is a flat census mix).
+            SDL_Rect field{kCosmosWnd.x0, kCosmosWnd.y0,
                            kCosmosWnd.x1 - kCosmosWnd.x0 + 1,
                            kCosmosWnd.y1 - kCosmosWnd.y0 + 1};
-            SDL_SetRenderDrawColor(ren, kBevelIn.r, kBevelIn.g, kBevelIn.b,
-                                   255);
-            SDL_RenderDrawRect(ren, &bevel);
-            SDL_RenderSetClipRect(ren, &bevel);
+            SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+            SDL_RenderFillRect(ren, &field);
+            SDL_RenderSetClipRect(ren, &field);
+            // t426 PLAYER PLAQUE (upper-LEFT law, user verbatim 2026-11-17):
+            // 15x25 idx19 outline + navy interior at (10,10), raceflag
+            // k<player species> blitted at frame+(0,+2) — 100.0% exact
+            // (322/322) against the pure refcap. Human (-1) has no flag
+            // record (rail precedent): frame stays, slot honest-empty.
+            {
+                SDL_Rect pf{kPlaqueX, kPlaqueY, kPlaqueW, kPlaqueH};
+                SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
+                SDL_RenderFillRect(ren, &pf);
+                const uint32_t ga = chromePaletteArgb(kPlaqueFrameIdx);
+                SDL_SetRenderDrawColor(ren, uint8_t((ga >> 16) & 0xff),
+                                       uint8_t((ga >> 8) & 0xff),
+                                       uint8_t(ga & 0xff), 255);
+                SDL_RenderDrawRect(ren, &pf);
+                const int ps = camp.playerSpecies();
+                if (ps >= 0 && ps < int(raceflagLib.count()))
+                    blitShape(ren, raceflagLib, ps, kPlaqueX, kPlaqueY);
+            }
         }
         if (lanesOn) {
             for (size_t li = 0; li < camp.galaxy().lanes.size(); ++li) {
@@ -1101,15 +1116,34 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 }
                 filledCircle(ren, q.x, q.y, r);
                 if (s.id == home) {
-                    // HOME MARKER [named seam shape]: the vendor original
-                    // shows a distinct marker at the player's system
-                    // (external vision read, scratchpad/galaxymap-original
-                    // .png); the record is unmapped, so the port rings it —
-                    // shape + colour redundancy (CVD law).
+                    // t426 HOME MARKER LAW [measured 100.0% exact 322/322,
+                    // docs/re/_wip_t426.md F3]: ONE white ring (game.pal
+                    // idx15, ellipse rx 6 centred (starx, stary-2)) + the
+                    // plaque frame + raceflag crest at (starx-7, stary+3).
+                    // The user's "two rings" second ring is the lane-trace
+                    // diamond (idx111/idx115), not a marker ring — the
+                    // vendor paints no second ring (pure-refcap radius
+                    // census). Replaces the t399 white-square seam.
                     SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
-                    SDL_Rect hm{q.x - r - 3, q.y - r - 3, 2 * (r + 3) + 1,
-                                2 * (r + 3) + 1};
-                    SDL_RenderDrawRect(ren, &hm);
+                    for (int a = 0; a < 64; a++) {
+                        const double th = a * 6.2831853 / 64.0;
+                        const int rxp = q.x + int(0.5 + kCrestRingRx * std::cos(th));
+                        const int ryp = q.y + kCrestRingDy +
+                                        int(0.5 + (kCrestRingRx - 2) * std::sin(th));
+                        SDL_RenderDrawPoint(ren, rxp, ryp);
+                    }
+                    SDL_Rect cf{q.x + kCrestDx, q.y + kCrestDy, kPlaqueW,
+                                kPlaqueH};
+                    SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
+                    SDL_RenderFillRect(ren, &cf);
+                    const uint32_t ca = chromePaletteArgb(kPlaqueFrameIdx);
+                    SDL_SetRenderDrawColor(ren, uint8_t((ca >> 16) & 0xff),
+                                           uint8_t((ca >> 8) & 0xff),
+                                           uint8_t(ca & 0xff), 255);
+                    SDL_RenderDrawRect(ren, &cf);
+                    const int ps = camp.playerSpecies();
+                    if (ps >= 0 && ps < int(raceflagLib.count()))
+                        blitShape(ren, raceflagLib, ps, cf.x, cf.y);
                 }
                 if (s.id == selected) {
                     SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);

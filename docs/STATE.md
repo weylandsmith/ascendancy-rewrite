@@ -230,30 +230,54 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t426 GALAXY MAP VISUALS CYCLE (ordering rationale: the t425 controls
-thread is CLOSED ON ITS EVIDENCE at cycle 3 — the layer-state paint law is
-now bit-exact (900/900 x4), the race-slot geometry is confirmed on real vendor
-pixels, and the two remaining threads there are NOT probe-shaped: the S-f
-slot->colour byte needs the paint-site table at [esp+0x38] + row origin 0xd82
-(t425b honest negative), and the dial FEEL verdict needs the user (sheet
-PAUSED per D17 — do NOT pop a question). D18 caps a thread at ~2 cycles and
-sends breadth first, and t426 is the queued breadth row for THIS SAME screen:
-map BORDER missing, PLAYER ICON UPPER LEFT (user verbatim 2026-11-17), HOME
-STAR = player icon + TWO rings at game start (derive which condition paints
-each; do NOT copy the guess), chrome texture per t422. NEW WEAPON t426 must
-use: t425c proved docs/assets/refcap/original-strategic-map.png is
-png = screen + 40 (rows 0..39 pure black; TURNCOUNT 474,7-632,43 measures at
-png y52..80) and is the palette-PURE shot (palette.md S3 307200/307200), while
-scratchpad/galaxymap-original.png is 642x481 IDENTITY but is NOT palette-pure
-(off-table colours + blends). So: exact-diff the BORDER/bevel/icon rects
-against the 640x480 png at +40 (its screen rows 0..439 are present; 440..479
-are clipped — the strip AND the bottom border row are only in the 642x481
-shot), and prefer exact-diff over statistical match everywhere: D18's standing
-complaint is guessing, and this iteration's 900/900 result is the bar.
-WORK ITEMS: capstone only in ~/tools/revenv; REFUTED ROUTE R-t425c — do NOT
-read race-strip/slot pixels out of the 640x480 png (they are clipped; what is
-there is the toggle row). OQ-027 closes ONLY on the final hearing verdict;
-OQ-016/OQ-019 DEFERRED.
+NEXT t426 CYCLE 2 — CHROME-BAND GRADIENT LAW (ordering rationale: D18 caps
+a thread at ~2 cycles and t426 cycle 1 shipped the border/plaque/crest laws
+375/375-exact; the ONE named seam left on THIS screen is the in-band
+luminance GRADIENT of the four chrome bands — the pure refcap top band runs
+bright teal rows 0..1 (idx 6/19/24/56/176 + grey) -> mid row 2 (grey 52/53 +
+157/201) -> darkening rows 3..6 to near-black teal (48/49/2/1/200, (40,65,69))
+before row 7 pure black; the port's textureColourAt is a FLAT census mix
+(t422 SS1.5) and paints every band row with the same distribution. WORK:
+per-row colour census of the pure refcap bands (rows 0..6 x 60..420, and the
+mirror law for cols 0..6 / 466+ / rows 473..479 via scratchpad), decide
+whether the gradient is (a) a per-row WEIGHT reweighting of the same 10-colour
+census set (implementable inside textureColourAt as a row-dependent weight
+table — the D17-legal move), or (b) a deterministic per-pixel ramp (needs the
+vendor noise/decompile route — Ghidra instance was NOT running 2026-11-19).
+If neither holds on measurement, bank the honest negative per t422 SS1.5
+(statistical law is the ceiling) and STOP the thread — do not invent a ramp.
+Exact-diff bar: per-row census chi-square against the vendor rows, not
+hand-tuning. Do NOT repaint any bevel line (REFUTED R-t426). Authority docs:
+docs/re/_wip_t426.md F1 (band extents + row samples), docs/re/chrome.md
+(t422 census law + SS1.5 ceiling), docs/re/t399-galaxy-map-3d.md "t426"
+(composite laws + witness). After this cycle the galaxy-map screen has NO
+more probe-shaped seams; the remaining map threads (S-f slot colour byte,
+dial FEEL) need the paint-site table / the user and stay parked.
+
+t426 LANDED 2026-11-19 (GALAXY-MAP VISUALS CYCLE 1; working log
+docs/re/_wip_t426.md F1-F5; distilled docs/re/t399-galaxy-map-3d.md "t426").
+BORDER + PLAQUE + HOME MARKER MEASURED AND SHIPPED. (i) BORDER LAW: chrome
+frames the field on all four sides (top rows 0..6, bottom 473..479, left
+cols 0..6, right 466+), interior pure black to 7,7..465,472 — the t411
+two-line bevel was the port defect (built off the NON-pure scratchpad);
+REFUTED R-t426 banked. Port: black field fill + kTextureBands 2->4. (ii)
+PLAQUE LAW 336/336 exact: raceflag k0 (rec+8 header law — my probe's
+rec+0x18 k0 decode was WRONG; the C++ pin caught it) is a 14x24 half-frame
+(row 0 = 14x idx19, col 0 idx19); vendor = 15x25 idx19 outline + navy at A
++ raceflag k<specnum> at the SAME A; residual 39 = right col 25 + bottom row
+14. Plaque A=(10,10) UPPER-LEFT per user verbatim. (iii) HOME MARKER: same
+composite at (starx-7, stary+3) + ONE white idx15 ring (ellipse centre
+(starx,stary-2) rx6; NOT a shape record — census best 37.1% junk). The user's
+"two rings" second ring = the lane-trace diamond idx111/idx115 through the
+star [inferred]; no second constant-radius ring exists in the pure shot.
+(iv) PINS test_plaque_t426.cpp x3 + test_rail_t400 band 2->4; SUITE 434/0/0.
+WITNESS scripts/t426_plaque_witness.sh (--species 0): plaque block exact-diff
+vs pure refcap 375/375 ZERO residual, bands 360/360 at y3/y473, crest frame
+at the LOGGED home anchor; VERDICT PASS. MUTATION x2 caught (anchor +1 ->
+166/375; band row shift -> black). LEDGER closes NOTHING (map visuals have
+no OQ owner; t414..t425c precedent). GATE_EXIT=0; LEDGER AUDIT OK (17 closed
+/ OQ-016, OQ-019, OQ-027 open). NEXT -> t426 cycle 2 chrome-band gradient
+(the last named seam on this screen; D18 cycle 2 of 2).
 
 t425c LANDED 2026-11-18 (GALAXY-MAP CONTROLS CYCLE 3; working log
 docs/re/_wip_t425.md F7/F8/F9/F10; distilled docs/re/t399-galaxy-map-3d.md

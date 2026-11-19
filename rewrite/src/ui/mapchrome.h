@@ -104,6 +104,27 @@ inline constexpr unsigned kRaceFilterInit = 0xff;
 inline constexpr int kToggleWellIdx = 242;
 inline constexpr int kToggleWellOnIdx = 80;
 
+// ---- t426 PLAQUE + HOME-CREST LAW (docs/re/_wip_t426.md F2/F3) ------------
+// Measured 100.0% exact (336/336 opaque px, tol<=3, vendor round(v*255/63))
+// against docs/assets/refcap/original-strategic-map.png (png = screen + 40),
+// raceflag k0 decoded at rec+8 (k0 header law; k>=1 dims at rec+0x10,
+// stream rec+0x18): the record IS a 14x24 half-frame (row 0 = 14x idx19,
+// every row's col 0 = idx19, navy interior + glyph). The vendor draws a
+// 15x25 idx19 outline + navy interior at anchor A and blits raceflag
+// k<specnum> at the SAME A — the visible 15x25 block's residual 39 px are
+// exactly the frame's right column + bottom row (both idx19). Two anchors:
+//   PLAQUE  A = screen (10,10) — player emblem upper-LEFT of the field
+//           (user verbatim 2026-11-17 "upper left, not upper right").
+//   CREST   A = (starx-7, stary+3) under the home star dot; plus ONE
+//           white ring (idx15) ellipse rx 6 centred (starx, stary-2) (the
+//           apparent "second ring" in the user's read is the lane-trace
+//           diamond idx111/idx115, measured — NOT a marker ring).
+inline constexpr int kPlaqueFrameIdx = 19;      // game.pal (0,170,81)
+inline constexpr int kPlaqueW = 15, kPlaqueH = 25;
+inline constexpr int kPlaqueX = 10, kPlaqueY = 10;   // upper-left plaque
+inline constexpr int kCrestDx = -7, kCrestDy = 3;    // rel. home star dot
+inline constexpr int kCrestRingRx = 6, kCrestRingDy = -2;
+
 // t425 MSG MAP of the COSMOSWnd handler 0x26b34 [verified, capstone
 // base-0 work/ascend_restored.bin, full table docs/re/_wip_t425.md F1b]:
 // 26 store win+0xd9; 27..55 dial latch chain 0x27d6f; 56 CENTERHOLO
@@ -161,11 +182,19 @@ std::optional<int> raceSlotFor(Pt p);  // returns index 0..6
 // governs it. The hash-noise generator (t400) and the 6x6-cell grid
 // (t411) are BOTH superseded by the Markov chain in textureColourAt;
 // census per column in docs/re/_wip_t422.md F7 + chrome.md.
-inline constexpr int kTextureBandCount = 2;
+// t426 BORDER LAW [measured, docs/re/_wip_t426.md F1]: the chrome frames the
+// cosmos field on ALL FOUR sides — top screen rows 0..6 full-width texture
+// (row 7+ pure black), bottom rows 473..479 texture (scratchpad rows 473+;
+// the pure refcap clips at 479), left cols 0..6, right col 466+. The two
+// horizontal bands were missing (the field edges showed flat black — the
+// "map border missing" defect, user verbatim 2026-11-17).
+inline constexpr int kTextureBandCount = 4;
 inline constexpr Rect kTextureBands[kTextureBandCount] = {
     {0, 0, 6, 479},       // left margin  [user original full height; the
                           // pinned +40-shift capture confirms rows 0..439]
     {466, 0, 639, 479},   // right column incl. sidebar + cluster bg
+    {7, 0, 465, 6},       // t426 top band (between the vertical bands)
+    {7, 473, 465, 479},   // t426 bottom band (COSMOSWnd y1=472 + 1)
 };
 // ---- t411 COSMOS BEVEL LAW (docs/re/_wip_t411.md F5) -----------------------
 // The vendor starfield sits in a RECESS: texture luminance ramps DOWN to

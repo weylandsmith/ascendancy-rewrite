@@ -246,3 +246,37 @@ locate). CAVEAT: that shot is not a pure game.pal render (off-table colours
 idx19), which caps its exact-match percentages and is why the 640x480 refcap
 stays the authoritative diff source. The port keeps family-base colours for
 slot i; correct only under an identity species order.
+
+## t426 — MAP BORDER, PLAYER PLAQUE UPPER-LEFT, HOME MARKER (2026-11-19)
+Working log docs/re/_wip_t426.md (F1-F5). Authority: palette-pure
+docs/assets/refcap/original-strategic-map.png, png = screen + 40.
+
+BORDER LAW (F1, supersedes the t411 two-line bevel): the chrome frames the
+cosmos field on ALL FOUR sides — top rows 0..6 full-width texture, bottom
+rows 473..479 (scratchpad; refcap clips at 479), left cols 0..6, right col
+466+ — and the interior is PURE BLACK to 7,7..465,472. The vendor paints NO
+bevel line at the field edge; the kBevelMid/kBevelIn rect pair WAS the port
+defect (t411's "x7 (49,54,53)" scan was the non-pure scratchpad). Port:
+pure-black field fill + frameTex bands extended 2 -> 4 (mapchrome.h
+kTextureBands). In-band edge gradient stays a named seam (flat census mix).
+
+PLAQUE LAW (F2/F2b, 336/336 exact): raceflag.shp k0 decoded at rec+8 (k0
+header law — a probe decode at rec+0x18 silently shifts k0; the C++ decoder
+pin caught it) is a 14x24 HALF-FRAME: row 0 = 14x idx19, col 0 = idx19 every
+row, navy interior + species glyph. The vendor draws a 15x25 idx19 outline +
+navy interior at anchor A and blits raceflag k<specnum> AT THE SAME A; the
+block's residual 39 px are exactly the frame's right column (25) + bottom
+row (14). Plaque A = screen (10,10) — upper-LEFT (user verbatim 2026-11-17).
+
+HOME MARKER LAW (F3): at the home star dot the SAME composite sits at
+(starx-7, stary+3) plus ONE white ring (idx15) — ellipse centre
+(starx, stary-2) rx 6 (extent png y108..116 x286..298; NOT a shape record:
+census best 37.1% junk). The user's "two rings": the apparent second ring is
+the lane-trace diamond (idx111/idx115 diagonals through the star), not a
+marker ring — the pure shot shows no other constant-radius ring.
+
+WITNESS BAR (scripts/t426_plaque_witness.sh, --species 0): port plaque block
+exact-diff vs the pure refcap 375/375 ZERO residual; bands 360/360 at y3 and
+y473; crest frame at the logged home-star anchor. MUTATION x2 caught (anchor
++1 -> 166/375; band row 473->474 -> black at the sampled edge row). SUITE
+434/0/0 (test_plaque_t426.cpp x3; test_rail_t400 band count 2->4).
