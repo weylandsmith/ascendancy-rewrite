@@ -161,6 +161,60 @@ inline constexpr Rect kStatusArrowDown{620, 425, 638, 476};
 // thumb-drag model — inert, named seam).
 inline constexpr Rect kStatusScrollCol{619, 48, 638, 476};
 
+// ---- t427 ROW COMPOSITION LAW (docs/re/_wip_t427.md F1-F6) -------------
+// The vendor row painter fn 0x500e0 (state-10 STATUS list; disasm
+// work/r331_disasm.txt 0x504d0..0x50647) composes each row from THREE
+// shape blits + text, on a row surface:
+//   BLIT #1 sun:  lib slot [0x8957e] (init 0x51954 resolves
+//                 "DATA\\suns.shp", string verbatim at file 0x856a7),
+//                 selector = raw star-type dword (suns.shp count 13 ==
+//                 the 13 starstat types, mapgen.md S1).
+//   BLIT #2 planet: lib slot [0x69d0] (init 0x51911 resolves
+//                 "data\\planets.shp"), selector = 5*type + size
+//                 (0x50567..0x50581 words +0x16/+0x14 = the SAME words
+//                 the row string reads via word tables #46-56/#41-45).
+//   BLIT #3 flag: raceflag.shp (slot global [0x6fd84]=32 MEASURED in
+//                 60.sav) via FUN_0x53dd8 at row-local (10,4), gated by
+//                 the owner-mask law 0x505f1..0x50647 (planet owned by
+//                 this species -> paint).
+// SCALE LAW (t427 F5/F6): MEASURED drawn sun 130x126 vs suns k0 content
+// 61x68 (u32 pair rec+0x10), and the "Large" planet ~70px vs content 35
+// => the row art blits at 2x (blitShapeScaled path). Drawn-centre anchors
+// are MEASURED on the t3 capture (warm-px bbox row0 x16..145 y59..184;
+// blue bbox x174..~240 y66..155; rows 1/2 centres agree within +-3 px):
+inline constexpr int kStatusArtScale = 2;      // 2x blit (F5)
+inline constexpr int kStatusSunCx = 80;        // sun centre x (row-rel 0)
+inline constexpr int kStatusSunCy = 64;        // sun centre y offset
+inline constexpr int kStatusPlanetCx = 215;    // planet centre x
+inline constexpr int kStatusPlanetCy = 53;     // planet centre y offset
+inline constexpr int kStatusFlagX = 12;        // flag top-left x (bbox 12..26)
+inline constexpr int kStatusFlagY = 0;         // flag top-left y (bbox y57..81)
+// The vendor flag is PALETTE-RAMP-TINTED (0x53e81..0x53ea5 rewrites
+// palette slots 15..19 := raceByte - i, i=0..4, before the blit): the
+// port blits the record's native colours — NAMED SEAM T427-D.
+// SELECTION LAW [measured t427 F6, decisive]: row 0 (selected) line-1
+// text is WHITE (255,255,255) x522 px; rows 1/2 (unselected) GREEN
+// (0,170,82) x551/x375 px. There is NO capsule/marker rect — the t417b
+// flat (255,0,0) block x16..69 was fitted to the SUN ART's upper-left
+// arc (rows 1/2 red px below x185 = ZERO) and is DELETED.
+inline constexpr RGB kStatusLine1Sel{255, 255, 255};
+inline constexpr RGB kStatusLine1Norm{0, 170, 82};
+// POP PIP GRID [measured F6]: 10 cols x 4 rows, pitch 5, dot ~2px, at
+// x498..544 (col pairs 498/499,503/504,...) y row+50..row+67 (bands
+// 107/112/117/122 on row 0), red family. Replaces the t417b single
+// 10-band strip at x428 (wrong column AND wrong shape).
+inline constexpr int kStatusPipX = 498, kStatusPipY = 50;
+inline constexpr int kStatusPipPitch = 5, kStatusPipCols = 10,
+                     kStatusPipRows = 4;
+// Pure pip position (index clamped to the 40-cell grid; returns false for
+// i >= capacity so callers paint nothing beyond 40 bands).
+inline bool statusPipAt(int i, int rowTop, int& x, int& y) {
+    if (i < 0 || i >= kStatusPipCols * kStatusPipRows) return false;
+    x = kStatusPipX + (i % kStatusPipCols) * kStatusPipPitch;
+    y = rowTop + kStatusPipY + (i / kStatusPipCols) * kStatusPipPitch;
+    return true;
+}
+
 // t405 UNIFIED STATUS HIT-MAP (pure; pins test_statusnav_t405.cpp).
 // Vendor precedence evidence: the arrow boxes are painted OVER the list
 // column in the backdrop, so they own their rects; the list interior owns

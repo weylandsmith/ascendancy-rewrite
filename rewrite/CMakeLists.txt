@@ -130,6 +130,7 @@ add_executable(run_tests
   tests/test_planetview_t418b.cpp
   tests/test_statusnav_t405.cpp
   tests/test_statusbg_t417b.cpp
+  tests/test_statusrow_t427.cpp
   tests/test_fleetlist_t407.cpp
   tests/test_researchview_t408.cpp
   tests/test_research3d_t419.cpp

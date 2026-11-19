@@ -230,29 +230,59 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t427 — PLANETS LIST SCREEN CYCLE (ordering rationale: PHASE-16 queue
-runs in EXECUTION order and t426 closed at its D18 cycle cap of 2 — cycle
-2 shipped the band-gradient law chi2-cited, and the remaining map threads
-(S-f slot colour byte, dial FEEL) need the paint-site table / the user and
-stay parked; planets list is the next screen row, user D17 verbatim "hard
-to describe, hoping you can just derive the drawing rules from reverse
-engineering"). WORK per the queue row (STATE.md PHASE-16 section): full
-derive-from-RE pass on PLANLIST — windows.txt line ~1504 rect, the paint
-FUN, planets.shp record selection per row (owned vs unowned marker law,
-row layout, scroll window law per the menulaw three-slot precedent);
-grade vs scratchpad refs + vendor pixels. RE-FIRST LAW binding (D17):
-decompile the vendor draw chain FIRST (Ghidra headless check via
-scripts/ghidra_headless_up.sh — the instance was NOT running 2026-11-19;
-fall back to banked docs/re windows and NAME the seam honestly), windows.txt
-table for the screen's windows, NO synthetic stand-ins. Authority docs:
-docs/re/planets-ui.md (S8 t402 row-assembly cluster 0x50647..0x5091f,
-word tables #41-56, days law FUN_0x47010), docs/re/_wip_t405.md (hit-map
-law statusHitFor, arrows measured), docs/re/_wip_t417.md F1-F7 (vendor
-status chrome: black interior, perimeter texture, rows top 57 pitch 141,
-RED marker x16..69) + F8-F10 (t417b shipped state), docs/re/_wip_t406.md
-(membership owner-law, PLANLIST open chain). NOTE the t417b seam "marker
-FACE is flat (255,0,0) vs vendor red gradient" is an open sub-item of this
-row. Do NOT touch the planet screen frame (t428 territory).
+NEXT t427b — VERIFY + CLOSE t427 (ordering rationale: t427's derive-from-RE
+pass LANDED with laws + port + 5 pins and suite 442/0/0, but the iteration
+hit its run budget BEFORE the witness/mutation/gate steps — a port without
+a mechanical witness on our own render is exactly the t417b lesson (the
+witness caught a real weights bug there). Finish the loop before opening
+t428). WORK: (1) bash scripts/gate.sh must exit 0 and
+python3 scripts/ledger_audit.py must print LEDGER AUDIT OK (the t427 edits
+were never gated); (2) Xvfb witness scripts/t427_statusrow_witness.sh +
+census on our render: row0 line1 has WHITE (255,255,255) px >200 and rows
+1/2 line1 GREEN (0,170,82); NO flat (255,0,0) block x16..69 (capsule is
+gone); sun warm-px present x16..145 y+2..+127; raceflag green px x12..26;
+pip grid red dots cols x498..543 bands y+50..+67; planets.shp sphere
+present x~150..245. (3) MUTATION campaign x3+ per skill rules (anchors:
+selection colour swap, pip pitch, sun selector s.type->0): all CAUGHT,
+AFTER-RESTORE suite green; NEVER run any build in the tree while the
+campaign lives (t417b rule). (4) Retire or re-scope kStatusMarkerRect +
+its t417b pin (statusbg_marker_and_wells_t417b checks a constant the
+painter no longer uses — keep the arrow-well half, drop the capsule half,
+citing docs/re/_wip_t427.md F6). (5) Native-vision self-grade of the
+screenshot vs /tmp/t427_row0.png (vendor) — D13 law. SEAMS to keep named:
+T427-A [0x8957e] value while status open (capture with screen open),
+T427-B suns/planets stream desync past row ~124/96 (drawn content is the
+canonical-dims frame; fine), T427-D flag palette-ramp tint (0x53e81 law
+banked, port paints native colours). Do NOT touch the planet screen frame
+(t428 territory).
+
+t427 LANDED 2026-11-19 (PLANETS LIST ROW COMPOSITION DERIVED FROM RE;
+working log docs/re/_wip_t427.md F1-F8). (i) VENDOR ROW PAINT fn 0x500e0
+(disasm 0x504d0..0x50647) decoded: 3 blits per row on the row surface —
+SUN = suns.shp (init 0x51954 resolves verbatim "DATA\\suns.shp" @0x856a7)
+selector RAW star-type dword; PLANET = planets.shp selector 5*type+size
+(words +0x16/+0x14, the SAME words the row string reads); FLAG =
+raceflag.shp via FUN_0x53dd8 at row-local (10,4) gated by the owner-mask
+law 0x505f1..0x50647; slot globals + cache dir resolved from live save
+60.sav (count 150; slot 29 planets, 32 raceflag, 52 suns). (ii) VENDOR
+BUG CANDIDATE: init stores the suns slot into [0x69ce], not the [0x8957e]
+it reads (byte-level scan: [0x8957e] has exactly 2 refs, both READs, zero
+writers; 20/20 in-game slots read 0). NAMED SEAM T427-A. (iii) FLAG FACE
+ROOT CAUSE for the t417b "flat red vs vendor gradient" seam: 0x53e81..
+0x53ea5 rewrites palette slots 15..19 := raceByte-i (race row +0x1)
+before the flag blit — palette-ramp shading, seam T427-D. (iv) t417b RED
+CAPSULE REFUTED [measured, decisive]: row0 line1 WHITE x522 vs rows1/2
+GREEN x551/x375 — the SELECTION LAW IS TEXT COLOUR; the capsule was
+fitted to the sun art's upper-left arc (rows 1/2 red px below x185 =
+ZERO). Capsule DELETED from the port. (v) SCALE LAW: drawn sun 130x126
+vs content 61x68 => 2x blit; anchors MEASURED sun centre (80,row+64),
+planet centre (215,row+53), flag (12,row). (vi) POP PIP GRID 10x4 pitch
+5 at x498 row+50 (replaces the wrong-column x428 strip). PORT:
+statuslist.h pure constants + suns.shp lib + row painter rewritten; PINS
+test_statusrow_t427.cpp x5; SUITE 442/0/0. NOT RUN: gate/witness/mutation
+(budget — owned by t427b NOW). LEDGER closes NOTHING (strict-close honest
+negative — status-list visuals have no OQ owner; t414..t426c1 precedent;
+OQ-016/019/027 untouched).
 
 t426 CYCLE 2 LANDED 2026-11-19 (CHROME-BAND GRADIENT LAW — option (a)
 CONFIRMED, (b) NOT NEEDED; working log docs/re/_wip_t426.md F6.1-F6.4;

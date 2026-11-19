@@ -233,17 +233,20 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // (55 records = 11 groups x 5-size ladder 11/18/25/35/47, shp.md S23.3
     // — the group/size axes match the status row's type/size words; the
     // group law itself is a NAMED SEAM, see the row painter).
+    // t427: suns.shp joins the set — THE ROW SUN (init 0x51954 resolves
+    // "DATA\\suns.shp" into the row-paint slot global; selector = raw star
+    // type, count 13 == the 13 starstat types; docs/re/_wip_t427.md F1/F2).
     // t406: 17np.shp joins the set — the PLANETALLOC backdrop candidate
     // (k0 639x479, decoded this session, docs/re/_wip_t406.md F6).
     // t410: 16battle.shp joins the set — the SYSTEM VIEW console faces
     // (TYPE-100 STATENUMBER 16 ln1140-1142; dims census _wip_t410 F3: the
     // lib has NO backdrop record, so backdropFor() declines it and only the
     // SHAPEFRAME-identified faces blit).
-    const char* kLibFiles[7] = {"1starmap.shp", "10status.shp", "14intel.shp",
+    const char* kLibFiles[8] = {"1starmap.shp", "10status.shp", "14intel.shp",
                                 "20res.shp", "planets.shp", "17np.shp",
-                                "16battle.shp"};
-    ascend::formats::ShapeLibrary kLibs[7];
-    for (int i = 0; i < 7; i++) {
+                                "16battle.shp", "suns.shp"};
+    ascend::formats::ShapeLibrary kLibs[8];
+    for (int i = 0; i < 8; i++) {
         std::string lerr;
         if (!kLibs[i].load(dataRoot + "/extracted/ascend01/data/" + kLibFiles[i],
                            &lerr))
@@ -385,7 +388,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     auto libFor = [&](int s) -> int {
         const char* want = screenShapeLib(s);
         if (!want) return -1;
-        for (int i = 0; i < 7; i++)
+        for (int i = 0; i < 8; i++)
             if (std::string(kLibFiles[i]) == want) return i;
         return -1;
     };
@@ -1556,50 +1559,59 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 }
                 // Rows (pitch kStatusRowPitch from kStatusRowsTop).
                 const int planetLibIdx = 4;  // planets.shp (kLibFiles order)
+                const int sunLibIdx = 7;     // suns.shp (t427)
                 for (size_t i = 0; i < win.size(); i++) {
                     const auto& key = win[i];
                     const auto& s = camp.galaxy().stars[key.star];
                     const int y = kStatusRowsTop + int(i) * kStatusRowPitch;
-                    // selection marker — t417b MEASURED (F5 + re-verify):
-                    // RED x16..69, row top+2, height ~24 (red-dominant 409
-                    // px, mean (209,70,28)). The port's green bar at x 62
-                    // was a CVD-avoidance choice fitted to the k0 art's
-                    // "name" cell — the art is never painted (F1), and the
-                    // vendor marker is unambiguously red (shape: a tall
-                    // capsule left of the flag well, plus the row's text
-                    // itself marks selection state).
-                    if (statusScroll + int(i) == statusSel) {
-                        SDL_Rect mk{kStatusMarkerRect.x0,
-                                    y + kStatusMarkerRect.y0,
-                                    kStatusMarkerRect.x1 -
-                                        kStatusMarkerRect.x0 + 1,
-                                    kStatusMarkerRect.y1 -
-                                        kStatusMarkerRect.y0 + 1};
-                        SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
-                        SDL_RenderFillRect(ren, &mk);
-                    }
+                    // t427 SELECTION LAW [measured]: the vendor marks the
+                    // selected row by line-1 TEXT COLOUR (white vs green),
+                    // NOT a marker rect — the t417b flat (255,0,0) capsule
+                    // was fitted to the SUN ART's upper-left arc (rows 1/2
+                    // red px below x185 = ZERO; docs/re/_wip_t427.md F6).
+                    // Capsule DELETED.
                     // NO row frame [F4 measured]: the vendor interior is
                     // black with ZERO separator lines (hline scan y100..470
                     // = none). The t402 navy fill + outline painted over the
                     // never-painted k0 grid they were fitted to.
-                    // planet sphere: planets.shp record =
-                    // terrainRow*5 + sizeClass (the 11-group x 5-ladder
-                    // census, shp.md S23.3). GROUP LAW NAMED SEAM (biome
-                    // per group unverified); SIZE axis cited.
+                    // t427 BLIT #1 SUN (row painter 0x50525..0x5053a: lib
+                    // suns.shp, selector = raw star type; 2x scale per the
+                    // measured 130-px drawn sun vs 61-px record; centre
+                    // MEASURED x80 y=row+64).
+                    if (sunLibIdx < 8 && kLibs[sunLibIdx].count() > 0 &&
+                        s.type >= 0 && s.type < int(kLibs[sunLibIdx].count())) {
+                        const auto& sr = kLibs[sunLibIdx].record(s.type);
+                        blitShapeScaled(ren, kLibs[sunLibIdx], s.type,
+                                        kStatusSunCx - int(sr.width),
+                                        y + kStatusSunCy - int(sr.height),
+                                        kStatusArtScale);
+                    }
+                    // t427 BLIT #3 FLAG (raceflag.shp, slot [0x6fd84]=32
+                    // measured; vendor paints it for owned rows — our list
+                    // membership is owner-law (t249), so EVERY row qualifies
+                    // for the local player). Palette-ramp tint is seam
+                    // T427-D; native record colours.
+                    {
+                        const int fps = camp.playerSpecies();
+                        if (fps >= 0 && fps < int(raceflagLib.count()))
+                            blitShape(ren, raceflagLib, fps,
+                                      kStatusFlagX, y + kStatusFlagY);
+                    }
+                    // t427 BLIT #2 PLANET (0x50565..0x50592: planets.shp,
+                    // selector 5*type + size — the same +0x16/+0x14 words
+                    // the row string reads; 2x scale, centre MEASURED
+                    // x215 y=row+53 on the t3 capture).
                     const auto& ps = camp.planetAt(key.star);
                     const int sizeIdx = ag::Campaign::sizeClassFor(ps.surfaceCells);
                     const int typeIdx = ps.terrainRow;
-                    if (planetLibIdx < 5 && kLibs[planetLibIdx].count() == 55 &&
+                    if (planetLibIdx < 8 && kLibs[planetLibIdx].count() == 55 &&
                         sizeIdx >= 0) {
                         const int rec = typeIdx * 5 + sizeIdx;
                         const auto& r = kLibs[planetLibIdx].record(rec);
-                        // t417b MEASURED (F5): the vendor's big sphere fills
-                        // the LEFT WELL — bright rows x60..140, y67..175 for
-                        // row 0 (centre ~ x100, y = row top + 64). The t406
-                        // "icon cell 136..167" came from the k0 art header
-                        // cells, which are never painted (F1).
-                        blitShape(ren, kLibs[planetLibIdx], rec, 100 - int(r.width) / 2,
-                                  y + 64 - int(r.height) / 2);
+                        blitShapeScaled(ren, kLibs[planetLibIdx], rec,
+                                        kStatusPlanetCx - int(r.width),
+                                        y + kStatusPlanetCy - int(r.height),
+                                        kStatusArtScale);
                     }
                     // line 1 + line 2 (the cited assembly)
                     std::string pname = s.name;
@@ -1630,22 +1642,28 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // port folds system+planet into one line1). The old 200
                     // landed inside the system-name zone.
                     const int tx = 288;
-                    txt.draw(ren, tx, y + 14, l1, true, kText);
+                    // t427 SELECTION LAW [measured]: line1 WHITE on the
+                    // selected row, GREEN (0,170,82) otherwise.
+                    txt.draw(ren, tx, y + 14, l1, true,
+                             statusScroll + int(i) == statusSel
+                                 ? toSdl(kStatusLine1Sel)
+                                 : toSdl(kStatusLine1Norm));
                     txt.draw(ren, tx, y + 40, l2, false, kDim);
-                    // pop band strip (cited popBandsFor; 17np k1/k2/k3 art
-                    // would need the pop lib — vector bands, PORT). t417b:
-                    // moved into the vendor's THUMBNAIL column x428..481
-                    // (F5 row-0 census) — on the black interior the old x380
-                    // ran into the text column's line2.
+                    // t427 POP PIP GRID [measured F6]: 10 cols x 4 rows,
+                    // pitch 5 at x498, y = rowTop+50 (bands measured
+                    // y107..124 on row 0 = row-rel 50..67), red family.
+                    // Replaces the t417b 10-band strip at x428 (wrong
+                    // column AND wrong shape).
                     const auto bands = camp.popBandsFor(key.star);
-                    const int n = std::min<int>(bands.size(), 10);
-                    for (int b = 0; b < n; b++) {
+                    for (size_t b = 0; b < bands.size(); b++) {
+                        int px0, py0;
+                        if (!statusPipAt(int(b), y, px0, py0)) break;
                         const SDL_Color c = bands[b] == 1
                                               ? SDL_Color{200, 60, 60, 255}
                                               : bands[b] == 2
                                               ? SDL_Color{200, 180, 60, 255}
                                               : SDL_Color{60, 120, 90, 255};
-                        SDL_Rect px{428 + b * 5, y + 66, 4, 4};
+                        SDL_Rect px{px0, py0, 2, 2};
                         SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
                         SDL_RenderFillRect(ren, &px);
                     }
