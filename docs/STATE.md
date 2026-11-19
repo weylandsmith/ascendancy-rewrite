@@ -230,30 +230,55 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t428e — K5 WIDGET HUNT + BLIT-2 PORT DECISION (ordering rationale:
-t428d closed the paint-body head COMPLETELY (docs/re/_wip_t428d.md F1-F4):
-blit-1 = 17np k4 (immediate $0x4) at (7,115) — PORTED, pinned x3
-(test_planetfield_t428d), witness leg 246/269 matched PASS; blit-2 =
-lib WORD[widget+0x175+2*WORD[planet+0x16]], RECORD = SIZE CLASS
-(esp0+0x340), at (408,296), gate BYTE[widget+0x18b]&4; blit-3 = 17np k1
-at (0,0) — unported, no witness. k5 is NOT any of the three under slot 44
-(the record law is 4 / size 0..4 / 1 — 5 unreachable; t428c scan covered
-(408,296), peak (224,107) 14.6%). So (a) find WHICH code site blits slot
-44 (or another lib) with a selector that CAN reach 5: grep ALL listings
-(work/t*.asm) for `0x1fc34` callers whose selector is a variable, then
-check k5 416x316 registration against the state-17 CHILD widgets' rects
-(the PLSQUARE children at windows.txt ln1622-1707 — PLANLIST etc.);
-(b) ONLY IF (a) resolves: port blit-2 per its law IF the widget+0x175
-table can be pinned from windows.txt/extracted data (gate &4 semantics +
-what paints at (408,296) on witness B — census that rect first; if it is
-the pop-grid/lattice overpaint zone with no distinct sprite, blit-2 is
-inert and stays unported — say so honestly); (c) tile-click popup law
-(PLSQUARE SENDMESSAGE 1 -> command fn 0x3aa0a legs) ONLY if (a)+(b) land.
-Do NOT re-hunt a grid gate (t428b F1), do NOT touch the frame (ALREADY
-EXACT, t406), do NOT re-derive grids B/C (OQ-014 CLOSED), do NOT re-derive
-the blit-1/2/3 laws (this block cites them; work/t198_planwin.asm is the
-listing). SEAMS carried: T428-B (witness-A lineage), T427-A..F unchanged,
-T428c-A narrowed to k5 widget identity ONLY.
+NEXT t428f — K5 ORIGIN VIA RUNTIME FRAME READ (ordering rationale: t428e
+closed k5's SITE and IDENTITY but proved the origin is statically unpinnable
+— docs/re/_wip_t428e.md E6: fn 0x5caac composes x = p4 + struct[+4] +
+WORD*(payload+0x10), y twin (work/combat_decomp/5caac.c:58-64), and the k5
+site (0x3c82d) pushes ONLY p1,p2 — p3/p4/p5 are frame leftovers + the payload
+slot rect is runtime cache state (shp.md S12.2). The closed pointer law
+(docs/re/r1-savestate.md) is exactly the tool for this: run ONE bounded R1
+save-state session (mandatory invariants: scratch copy never mounts game/,
+headless, -time-limit, pkill -x dosbox-x only), open the planet screen (state
+17 — geometry clicks per windows.txt; t65's queued recipe in docs/re/shp.md
+S12), checkpoint, then read from RAM: (1) the PLANLIST widget object found by
+the 0x56d1c walk (game obj 0x7a35c member table; verify DWORD[widget+0x35] —
+tests the E1 gate on a live frame AND settles whether witness B's peak implies
+gate-pass); (2) the 17np cache slot (runtime cache base = RAM ctx - image VA
+law, shp.md S12.2/S12.4) — its +0x10/+0x14 rect fields; (3) if reachable, the
+paint-body frame words at the 0x5caac call. THEN: compute the E6-law origin;
+if it lands on the witness-B peak (224,107) within tolerance, PORT k5 as the
+planet backdrop (ui.cpp kScreenPlanet, under the k4 field blit per vendor
+order) with a pin binding the law; if it lands elsewhere, bank the corrected
+origin and re-run the t428e_k5_origin census at the computed point before any
+port. Do NOT port (224,107) directly — that is a plausible default, not a
+law. Do NOT re-hunt the k5 site (E1/E2 CLOSED), do NOT re-derive blit-1/2/3
+laws (t428d F2/F4), do NOT touch blit-2 (census NEGATIVE E5, stays unported),
+do NOT start the tile-click popup law (task (c) was gated on (a)+(b) landing;
+(b) came back negative). SEAMS carried: T428-B (witness-A lineage),
+T427-A..F unchanged, T428c-A narrowed to k5 ORIGIN ONLY (identity CLOSED).
+
+t428e LANDED 2026-11-19 (K5 SITE + IDENTITY CLOSED; BLIT-2 CENSUS NEGATIVE;
+working log docs/re/_wip_t428e.md E0-E7 + docs/re/planets-ui.md §13). (i) THE
+k5 BLIT EXISTS IN THE SAME PAINT BODY: 0x3c7bc..0x3c832 [verified asm] —
+0x56d1c(0x7a35c, 0x1f06) lookup, gate DWORD[result+0x35]==-1, fetch 17np
+(lib slot esp0+0x370 = WORD[0x6fd9c] = 44) record IMMEDIATE 5 at (0,0)-args,
+blit 0x5caac with struct {112, stale, 528}; the only edge to the site is the
+lattice loop exit (0x3c4ed, bound WORD[planet+0x1a] — NEW record field) and NO
+ret exists between head and site, so every paint runs it unless the gate fails
+(t428d's "k5 unreachable" was head-scoped — corrected). (ii) WIDGET =
+"PLANLIST": 0x1f06+0x82bb0=0x84ab6 [measured in work/ascend_restored.bin],
+RESWIN control 0x2c0c+0x82bb0=0x857bc EXACT — pool-relative law holds for
+0x56d1c name immediates. (iii) ORIGIN OPEN: 0x5caac arg law +
+struct/payload composition pinned (work/combat_decomp/5caac.c:58-64), but the
+site pushes only 2 of 5 args — origin = stale frame words + runtime payload
+rect; measured placements (224,107)=1566/10748 (permute ~360) vs
+(112,120)=56, (0,0)=436, (408,296)=28 [scripts/t428e_k5_origin.py]; PLSQUARE
+interior 0/2048 matched (backdrop-behind-panel consistent). NOT ported
+(strict-close). (iv) BLIT-2 CENSUS at (408,296): rec0 62/49558, rec1-3 zero,
+rec4 1/269; rect 71% pure black -> blit-2 INERT, stays unported. SUITE
+unchanged (no code delta). LEDGER closes NOTHING (strict-close honest negative
+— planet-screen visuals have no OQ owner; t414..t428d precedent; OQ-016/019/
+027 untouched). GATE_EXIT=0; LEDGER AUDIT OK.
 
 t428d LANDED 2026-11-19 (k4 FIELD PORTED + PAINT-BODY HEAD FULLY CLOSED;
 working log docs/re/_wip_t428d.md F1-F4). (i) BLIT-1 SELECTOR CORRECTION

@@ -435,3 +435,27 @@ r1_t421_referrer_census.py + r1_t421_c3_runtime.py (RC=0).
   (+ deepest slot 60); no writer in any captured state.
 - CONSEQUENCE: the port's uniform pal[150] fill (t418b) MATCHES the cited
   law; no rewrite delta; the seam leaves the live re-check list.
+
+## 13. THE FOURTH PAINT-BODY BLIT: 17np k5, PLANLIST-GATED (t428e, 2026-11-19)
+
+Full working log: docs/re/_wip_t428e.md (E0-E7). Durable laws:
+
+- SITE [verified work/t198_planwin.asm 0x3c7bc..0x3c82d]: after the lattice
+  row loop exits (0x3c4ed jle; bound WORD[planet+0x1a]), the body looks up
+  widget 0x1f06 via 0x56d1c(game obj 0x7a35c) and, IFF DWORD[widget+0x35]==-1,
+  fetches 17np (lib slot esp+0x370 = WORD[0x6fd9c] = 44) RECORD 5 (immediate
+  push $0x5) and blits via 0x5caac with struct {112, stale, 528}. No ret
+  exists between the head (0x3ba5e) and this site: every paint reaches it.
+- WIDGET IDENTITY [measured]: 0x1f06 + 0x82bb0 = 0x84ab6 = "PLANLIST"
+  (adjacent ..\planwin.cpp). Control: RESWIN imm 0x2c0c + 0x82bb0 = 0x857bc
+  = "RESWIN" — the pool-relative law (REFUTED-ROUTES t344) holds for 0x56d1c
+  name immediates.
+- ORIGIN [open]: 0x5caac composes x = p4 + struct[+4] + *(payload+0x10), y
+  twin (work/combat_decomp/5caac.c:58-64), and this site pushes ONLY p1,p2 —
+  p3/p4/p5 are frame leftovers; payload rect fields are runtime cache state
+  (shp.md S12.2). Witness B: k5 peak 1566/10748 (14.6%) at screen (224,107)
+  (permute control ~360), but (112,120)=56, (120,120)=43, (408,296)=28,
+  (0,0)=436 [scripts/t428e_k5_origin.py]. NOT ported (strict-close).
+- BLIT-2 CENSUS NEGATIVE [measured]: no size-class record registers at
+  (408,296) on B (rect 71% pure black) -> blit-2 stays unported; law stands
+  (t428d F4).
