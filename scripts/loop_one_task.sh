@@ -236,14 +236,20 @@ while :; do
   # --format stream-json: NDJSON events land in $out AS THEY HAPPEN (a -Q run
   # writes nothing until the final response, so a working session looks dead
   # and a killed session leaves a 0-byte log). tee keeps the tmux pane live.
-  timeout -s KILL "$KILL_AT" \
-    hermes chat --query-file "$LOOPDIR/prompt-$n.txt" --oneshot \
-      --format stream-json \
-      --yolo --max-turns "$MAX_TURNS" --run-budget "$RUN_BUDGET" \
+  # OOM FENCE (2026-11-18): a t426 numpy census ballooned to the tmux
+  # scope's 20.8G peak and the OOM killer killed the tmux SERVER (and the
+  # scheduler with it) — scope death takes everything down. Run each
+  # session in its OWN systemd user scope capped at 14G: a runaway child
+  # OOMs inside its cgroup (SIGKILL -> rc=137, journal KILLED, next
+  # iteration adopts the dirty tree) instead of nuking the host session.
+  systemd-run --user --scope --quiet -p MemoryMax=14G -p MemorySwapMax=1G \
+    bash -c 'timeout -s KILL "$1" hermes chat --query-file "$2" --oneshot \
+      --format stream-json --yolo --max-turns "$3" --run-budget "$4"' \
+    _ "$KILL_AT" "$LOOPDIR/prompt-$n.txt" "$MAX_TURNS" "$RUN_BUDGET" \
       2>&1 | tee "$out"
   rc=${PIPESTATUS[0]}
   log "iter $n: session exited rc=$rc (log: $out)"
-  [ "$rc" = 137 ] && log "iter $n: KILLED at budget+grace (${KILL_AT}s wall)"
+  [ "$rc" = 137 ] && log "iter $n: KILLED at budget+grace (${KILL_AT}s wall) OR cgroup OOM (check journalctl -k)"
 
   # POST-FLIGHT: honest verdict — green tree alone is NOT progress.
   verdict=OK
