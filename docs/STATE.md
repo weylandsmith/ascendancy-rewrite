@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-19T10:40
+updated: 2026-11-19T17:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,24 +230,51 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t428b — PLANET SCREEN CYCLE 2: MUTATION + FIELD THREAD (ordering
-rationale: t428 cycle 1 shipped the STRIP law (pins 447/0/0, witness
-PASS) but ran no mutation battery — the t426/t427 pattern is
-cycle-2 = MUTATION the strip pins (swap gauge lib order, move the pop
-anchor off (355,7), const-0 the selectors, drop the planitem thumbnail)
-+ restore + gate; THEN attack the FIELD thread in the same cycle if
-budget allows: (a) H-FIELD-STATE closer — the t254 witness B shows the
-sphere+lattice, witness A shows BLACK; hunt the paint-invocation
-condition in fn 0x3b96c TYPE dispatch (which widget type reaches the
-grid loop) or bank the honest negative; (b) field backdrop 17np k4
-625x357 candidate at the 0x3b98b site (blit selector [0x6fd9c] at
-(7,115) — decode k4, compare its content against witness B's field
-backdrop region); (c) the tile-click CONTENT-DEPENDENT popup law
-(PLSQUARE SENDMESSAGE 1 -> command fn 0x3aa0a legs; windows.txt table).
-SEAMS carried (do not silently fix): T428-A vendor field BLACK on
-witness A, T428-B witness A lineage ruling (DECISIONS page candidate),
-T427-A..F unchanged. Do NOT open a second screen thread while t428b
-runs; the frame is ALREADY EXACT — do not touch it.
+NEXT t428c — PLANET SCREEN CYCLE 3: FIELD PROVENANCE (ordering rationale:
+t428b closed the t428b mutation battery 4/4 CAUGHT and REFUTED the H-FIELD-STATE
+premise statically (grid walk unconditional once 0x3bb19 is reached — see
+_wip_t428b F1), so the field thread's remaining live half is PROVENANCE, not a
+gate hunt: (a) identify the row tables BYTE[0x7445c]/BYTE[0x744a8] the lattice
+loop reads (0x3bb8e, 0x3c1f2/0x3c1fa — static: find their init/loader writer in
+the restored image; they bound WHICH cells of each of the 15 rows get art);
+(b) decode 17np k4 (625x357, shp.md S23.2 dims already cited) and compare its
+CONTENT against witness B's field region (work/r1/screens/t254/02_planet_detail.png,
+screen origin (80,100)) to settle/kill the k4-as-field-backdrop candidate at the
+0x3b98b site; (c) if budget remains, the tile-click CONTENT-DEPENDENT popup law
+(PLSQUARE SENDMESSAGE 1 -> command fn 0x3aa0a legs; windows.txt table). Do NOT
+re-hunt a grid gate (F1 refuted it) and do NOT touch the frame (ALREADY EXACT,
+t406). SEAMS carried: T428-A RE-SCOPED by F1 into a witness-A-lineage artifact
+(folds into T428-B — DECISIONS page candidate), T427-A..F unchanged.
+
+t428b LANDED 2026-11-19 (MUTATION 4/4 + H-FIELD-STATE PREMISE REFUTED; working
+log docs/re/_wip_t428b.md F0-F4). (i) VACUITY PROBE before any mutant: seed-2024
+turn-0 fixture has res=0 ind=1 pros=1 pending=-1 for EVERY star, so the const-0
+arm was moved to IND and the res/ind swap + project+1 confirmed visible.
+(ii) MUTATION 4/4 CAUGHT (scripts/t428b_mutate.py; AFTER-RESTORE 447/0/0;
+pristine md5s verified after every restore): M1 RES/IND panel-binding swap ->
+planetstrip_gauge_rects :101/:102; M2 kPopGridOrigin 355->350 ->
+planetstrip_pop_anchor :141; M3 PLIND selector const-0 -> gauge_rects :102;
+M4 projectItem=pending+1 -> star_domain :154. No MISSED mutant -> the t428
+strip pins encode the law. (iii) STATIC FIELD FINDING [verified control flow,
+work/t198_planwin.asm 0x3bb19..0x3c26d]: the lattice walk is UNCONDITIONAL once
+reached — head edi=110/eax=410/edx=0, step +0x11/-0x22/+1, bound cmp $0x16d ->
+15 iterations always; the only skip legs are the owner test (0x3baf4, jumps to
+the TAIL and only for non-owned planets) and the fixed per-cell table test
+(0x3c1f2/0x3c1fa reads BYTE[0x7445c]/BYTE[0x744a8] — table identity UNPINNED,
+semantics [inferred] per-cell art counts). Witness A shows the player OWNS the
+planet, so its own state would RUN the walk => A's BLACK field is NOT a vendor
+conditional: H-FIELD-STATE premise REFUTED, seam T428-A re-scoped into the
+T428-B lineage question. Port lattice UNCHANGED (no edit justified).
+(iv) CAMPAIGN PITFALL banked (F3 + skill rule 8 family): first battery run was
+fully bogus — mutant tuples keyed the SNAPSHOT path, so M1 built pristine
+(false MISSED) and "restored" the mutated file, poisoning M2/M4 + AFTER-RESTORE.
+Detection = red AFTER-RESTORE + FAIL lines naming tests unrelated to the
+mutant; recovery = git checkout (only after git status proves no hand edits in
+those files), rebuild, green, re-run; prevention = mutants on WORKING paths +
+md5-verified restores that ABORT on mismatch. LEDGER closes NOTHING
+(strict-close honest negative — planet-screen visuals have no OQ owner;
+t414..t428 precedent; OQ-016/019/027 untouched). GATE_EXIT=0; LEDGER AUDIT OK
+(17 closed / 3 open); LEDGER INDEX OK.
 
 t428 LANDED 2026-11-19 (PLANET-SCREEN STRIP LAW MEASURED + SHIPPED;
 working log docs/re/_wip_t428.md F1-F10). (i) WITNESS SPLIT [measured]:
