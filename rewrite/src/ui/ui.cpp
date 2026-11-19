@@ -1702,6 +1702,18 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 // the windows.txt rects; PLBUILD is the PROJECT slot whose
                 // click opens the PLANLIST (planet.txt info04).
                 const auto pv = planetViewFor(camp, planetStar, planetName);
+                // ---- t428d FIELD STARFIELD (law ui/planetstrip.h) --------
+                // Paint-body blit-1 [verified 0x3b9c0..0x3b9df]: 17np
+                // record 4 (immediate selector $0x4) at screen (7,115) —
+                // the 269-px navy/grey speckle UNDER everything else
+                // (t428c registration 158/269 on witness B; the bright
+                // mismatches are the strip/lattice overpaint). Painted
+                // first so every later layer composes over it, matching
+                // the vendor order (blit-1 precedes the grid loop and the
+                // TYPE-29 child panels).
+                if (kLibs[5].count() == 9)  // 17np.shp (kLibFiles order)
+                    blitShape(ren, kLibs[5], kFieldRecord, kFieldBlitOrigin.x,
+                              kFieldBlitOrigin.y);
                 // ---- t428 STRIP ART (seed defect "top-row art missing") --
                 // Law ui/planetstrip.h (docs/re/_wip_t428.md F5/F9): the
                 // three gauge panels blit planres/planind/planpro record

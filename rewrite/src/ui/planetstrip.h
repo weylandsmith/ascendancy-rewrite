@@ -48,6 +48,24 @@ inline constexpr const char* kStripGaugeLibs[3] = {
 // bound): 21 records, indices 0..20.
 inline constexpr int kStripGaugeRecords = 21;
 
+// ---- t428d FIELD STARFIELD (17np record 4) --------------------------------
+// THE FIELD BLIT LAW [verified work/t198_planwin.asm 0x3b9c0..0x3b9df]:
+// the PLSQUARE paint body's blit-1 pushes push $0x73 (y=115), push $0x7
+// (x=7), push $0x4 (SELECTOR = RECORD 4, an IMMEDIATE — t428 F4's
+// "selector = SENDMESSAGE" reading conflated the gate test at 0x3b9b1 with
+// the arg pushes), payload = FUN_0x1fc34(cache 0x9f10c, slot WORD[0x6fd9c]
+// = 44 = 17np.shp, shp.md S23.1), then call FUN_0x5caac (S12.1 arg map:
+// pushes are reverse order — law calibrated against the t428c measured
+// registration of k4 at exactly screen (7,115), 158/269 tol-8, shuffle
+// control 6..12; scripts/t428c_field_register.py). k4 = 625x357, 99.88%
+// idx 0, 269 navy/grey specks (starfield). It paints UNDER the strip
+// panels and the lattice (the vendor witness shows 101/111 anchor
+// mismatches as BRIGHT overpaint px).
+inline constexpr int kFieldRecord = 4;
+inline constexpr Pt kFieldBlitOrigin{7, 115};
+inline constexpr int kFieldRecordW = 625;  // shp.md S23.2 dims census
+inline constexpr int kFieldRecordH = 357;
+
 // The PLPOP paint origin == the windows.txt rect origin (355,7) [verified
 // ln1587 block; t263 panel-geometry note].
 inline constexpr Pt kPopGridOrigin{355, 7};
@@ -78,5 +96,12 @@ StripPlan stripPlanFor(const ascend::game::Campaign& camp, int star);
 // EVERY record is 107x99 (the rect-fill dims census, F9). *err describes
 // the first violation.
 bool stripGaugeLibraryConforms(const std::string& path, std::string* err);
+
+// t428d FIELD-library gate (stripGaugeLibraryConforms precedent): true iff
+// `path` is the 17np pop/field library per the shp.md S23.2 census — magic
+// ok, EXACTLY 9 records, and record kFieldRecord (4) is kFieldRecordW x
+// kFieldRecordH (625x357, the starfield dims the t428c registration
+// measured). *err describes the first violation.
+bool fieldLibraryConforms(const std::string& path, std::string* err);
 
 }  // namespace ascend::ui

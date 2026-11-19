@@ -59,4 +59,28 @@ bool stripGaugeLibraryConforms(const std::string& path, std::string* err) {
     return true;
 }
 
+bool fieldLibraryConforms(const std::string& path, std::string* err) {
+    ascend::formats::ShapeLibrary lib;
+    std::string lerr;
+    if (!lib.load(path, &lerr)) {
+        if (err) *err = "load refused: " + lerr;
+        return false;
+    }
+    if (lib.count() != 9) {
+        if (err)
+            *err = "record count " + std::to_string(lib.count()) +
+                   " != 9 (17np census: 9)";
+        return false;
+    }
+    const auto& r = lib.record(kFieldRecord);
+    if (int(r.width) != kFieldRecordW || int(r.height) != kFieldRecordH) {
+        if (err)
+            *err = "record " + std::to_string(kFieldRecord) + " dims " +
+                   std::to_string(r.width) + "x" + std::to_string(r.height) +
+                   " != 625x357 (the t428c-registered starfield)";
+        return false;
+    }
+    return true;
+}
+
 }  // namespace ascend::ui

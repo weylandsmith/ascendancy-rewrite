@@ -64,6 +64,36 @@ print(f"PLBUILD white text px={int(w)}")
 if w < 40:
     fails.append(f"PLBUILD: only {int(w)} white px (no project text)")
 
+# t428d FIELD STARFIELD: 17np rec 4 lit px at screen (7,115) (blit law
+# docs/re/_wip_t428d.md F1; the vendor witness B registered 158/269 with
+# 101/111 mismatches BRIGHT = overpaint). On OUR render the non-overpainted
+# stars must match through game.pal EXACTLY (same decode path); overpainted
+# ones read brighter. PASS iff matched >= 50% of lit (vendor floor).
+import os
+_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_idx = os.path.join(_root, "work/r1/shp_png/t428c/raw/17np--4.idx")
+_pal = os.path.join(_root, "extracted/ascend01/data/game.pal")
+if os.path.exists(_idx) and os.path.exists(_pal):
+    kimg = np.fromfile(_idx, dtype=np.uint8).reshape(357, 625)
+    pal = (np.fromfile(_pal, dtype=np.uint8).reshape(256, 3)
+           .astype(np.int32) * 255) // 63
+    ys, xs = np.nonzero(kimg)
+    px_y, px_x = ys + 115, xs + 7  # screen coords == crop coords
+    ok = (px_y >= 0) & (px_y < 480) & (px_x >= 0) & (px_x < 640)
+    got = rgb[px_y[ok], px_x[ok]]
+    want = pal[kimg[ys[ok], xs[ok]]]
+    d = np.abs(got - want).max(1)
+    matched = int((d <= 8).sum())
+    bright = int(((d > 8) & (got.sum(1) > 60)).sum())
+    dark = int(((d > 8) & (got.sum(1) <= 60)).sum())
+    print(f"FIELD k4@(7,115): lit={int(ok.sum())} matched={matched} "
+          f"bright(overpaint)={bright} dark={dark}")
+    if matched * 2 < int(ok.sum()):
+        fails.append(f"FIELD: only {matched}/{int(ok.sum())} star px match "
+                     "(k4 blit unpainted?)")
+else:
+    print("FIELD: rec4 idx or game.pal missing (skipped)")
+
 print("VERDICT " + ("PASS" if not fails else "FAIL"))
 for f in fails:
     print("  -", f)

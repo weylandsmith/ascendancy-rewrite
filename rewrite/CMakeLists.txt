@@ -133,6 +133,7 @@ add_executable(run_tests
   tests/test_statusbg_t417b.cpp
   tests/test_statusrow_t427.cpp
   tests/test_planetstrip_t428.cpp
+  tests/test_planetfield_t428d.cpp
   tests/test_fleetlist_t407.cpp
   tests/test_researchview_t408.cpp
   tests/test_research3d_t419.cpp

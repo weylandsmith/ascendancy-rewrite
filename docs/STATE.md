@@ -230,30 +230,53 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t428d — PLANET SCREEN CYCLE 4: PORT THE k4 FIELD STARFIELD + k5 SELECTOR
-(ordering rationale: t428c settled the field-provenance thread at the content
-level — 17np k4 IS blitted at screen (7,115) (registration 158/269, shuffle
-control 6..12; scripts/t428c_field_register.py), and the rewrite paints
-NOTHING there (ui.cpp has the B/C lattice at :1767-1792 but no backdrop
-speckle). So (a) PORT k4: blit 17np rec 4 at screen (7,115) under the widget
-paint per the S12.1 blit law (lib slot u16[0x6fd9c], desc payload FUN_0x1fc34
-analog = the port's shape-cache), pin the anchor + a census leg on the t428
-witness (the k4 px are 269 scattered navy/grey specks; the witness check must
-tolerate overpaint — 101/111 mismatches at the anchor are BRIGHT overpaint px,
-so census against the MATCHED set, not the whole pattern); (b) if budget
-remains, k5: it registers at screen (224,107) z=18.6 but only 14.6% — find
-WHICH widget blits it (the 0x3b9e4 cond-2 site x=296,y=408 vs x=408,y=296 push
-order is F4a's open question — resolve push order once from a known-good blit
-like blit-1's (7,115) k4 anchor, then read the cond-2 selector writer at
-esp+0x374); (c) ONLY if (a)+(b) finish: the tile-click popup law (PLSQUARE
-SENDMESSAGE 1 -> command fn 0x3aa0a legs). Do NOT re-hunt a grid gate (t428b F1
-refuted it), do NOT touch the frame (ALREADY EXACT, t406), and do NOT re-derive
-grids B/C (planitem.txt, OQ-014 CLOSED — t428c F1 corrected the t428b F1
-"per-cell" misread: index = 15*[planet+0x14]+row, B=start col, C=cell count).
-SEAMS carried: T428-B (witness-A lineage; DECISIONS page candidate), T427-A..F
-unchanged. NEW seam T428c-A: k5 widget identity + selector UNRESOLVED; k4's
-record-index law for THIS call site open (selector==SENDMESSAGE==1 yet record
-k4 registers — t254's SEL(i)==record law is the POP panel's, not this site's).
+NEXT t428e — K5 WIDGET HUNT + BLIT-2 PORT DECISION (ordering rationale:
+t428d closed the paint-body head COMPLETELY (docs/re/_wip_t428d.md F1-F4):
+blit-1 = 17np k4 (immediate $0x4) at (7,115) — PORTED, pinned x3
+(test_planetfield_t428d), witness leg 246/269 matched PASS; blit-2 =
+lib WORD[widget+0x175+2*WORD[planet+0x16]], RECORD = SIZE CLASS
+(esp0+0x340), at (408,296), gate BYTE[widget+0x18b]&4; blit-3 = 17np k1
+at (0,0) — unported, no witness. k5 is NOT any of the three under slot 44
+(the record law is 4 / size 0..4 / 1 — 5 unreachable; t428c scan covered
+(408,296), peak (224,107) 14.6%). So (a) find WHICH code site blits slot
+44 (or another lib) with a selector that CAN reach 5: grep ALL listings
+(work/t*.asm) for `0x1fc34` callers whose selector is a variable, then
+check k5 416x316 registration against the state-17 CHILD widgets' rects
+(the PLSQUARE children at windows.txt ln1622-1707 — PLANLIST etc.);
+(b) ONLY IF (a) resolves: port blit-2 per its law IF the widget+0x175
+table can be pinned from windows.txt/extracted data (gate &4 semantics +
+what paints at (408,296) on witness B — census that rect first; if it is
+the pop-grid/lattice overpaint zone with no distinct sprite, blit-2 is
+inert and stays unported — say so honestly); (c) tile-click popup law
+(PLSQUARE SENDMESSAGE 1 -> command fn 0x3aa0a legs) ONLY if (a)+(b) land.
+Do NOT re-hunt a grid gate (t428b F1), do NOT touch the frame (ALREADY
+EXACT, t406), do NOT re-derive grids B/C (OQ-014 CLOSED), do NOT re-derive
+the blit-1/2/3 laws (this block cites them; work/t198_planwin.asm is the
+listing). SEAMS carried: T428-B (witness-A lineage), T427-A..F unchanged,
+T428c-A narrowed to k5 widget identity ONLY.
+
+t428d LANDED 2026-11-19 (k4 FIELD PORTED + PAINT-BODY HEAD FULLY CLOSED;
+working log docs/re/_wip_t428d.md F1-F4). (i) BLIT-1 SELECTOR CORRECTION
+[verified asm 0x3b9c0..0x3b9df]: the third push is `push $0x4` — record 4
+is an IMMEDIATE (t428 F4's "selector = SENDMESSAGE" conflated the gate
+test at 0x3b9b1 with the arg pushes); pushes $0x73,$0x7 = y=115,x=7
+calibrated against the t428c measured k4 registration — seam T428c-A's
+record-index question CLOSED by nonexistence (no selector law; constant).
+(ii) PORT: planetstrip.{h,cpp} kFieldRecord/kFieldBlitOrigin/
+fieldLibraryConforms + ui.cpp kScreenPlanet branch blits 17np k4 at (7,115)
+FIRST (under strip+lattice, vendor order). Pins test_planetfield_t428d x3
+(blit-law constants + span; census 17np conforms/gauge libs decline;
+DECODED rec4 byte census lit=269 bbox x26..620 y2..353 == the t428c
+script, scatter test, rec0 frame-class control 49558 lit px MEASURED).
+SUITE 450/0/0. (iii) WITNESS: t428_witness_census.py FIELD leg on our own
+render: 246/269 matched tol-8, 22 bright (overpaint), 1 dark -> VERDICT
+PASS. (iv) BLIT-2 LAW [verified stack arithmetic]: lib = widget+0x175
+slot table, record = SIZE CLASS (esp0+0x340), at (408,296), gate
+BYTE[widget+0x18b]&4; BLIT-3 = 17np k1 at (0,0) unported (no witness).
+k5 NOT reachable from the head (5 not in {4, size 0..4, 1}) — k5 hunt is
+t428e(a). LEDGER closes NOTHING (strict-close honest negative — no OQ
+owner; t414..t428c precedent; OQ-016/019/027 untouched). GATE_EXIT=0;
+LEDGER AUDIT OK (17 closed / 3 open); LEDGER INDEX OK.
 
 t428c LANDED 2026-11-19 (FIELD PROVENANCE: k4 BLIT ANCHORED + B/C INDEX LAW
 CORRECTED; working log docs/re/_wip_t428b.md F1 correction + docs/re/
