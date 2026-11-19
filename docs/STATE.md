@@ -230,27 +230,51 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t428 — PLANET SCREEN CYCLE (ordering rationale: t427/t427b closed the
-planets-LIST thread with witness + mutation + gate all green; the queue's
-EXECUTION order puts the planet DISPLAY screen next, and it is the screen
-the list row-click opens, so its defects were directly observed this
-iteration's witness run — see the queue entry t428 at ~line 2263 for the
-full seed-defect list: top-row TYPE-29 panel art, planet frame background
-record (17np.shp already loaded), planet art too small + z-order under the
-cell squares, diamond FILL/OUTLINE law, tile-click content-dependent popup,
-orbital structures column on the LEFT). The frame is ALREADY EXACT — do not
-touch it. WORK SHAPE (t426-style cycles): cycle 1 = MEASURE the defects on
-pure vendor captures (scratchpad + work/screens) + derive the paint laws
-from the banked disasm (work/r331_disasm.txt covers fn 0x500e0; the state-17
-planet-view paint fn needs its own locate pass — the t406/t418b docs name
-its window rect and TYPE-29 panel dispatch), then port + pins + witness +
-mutation. Do NOT open a second screen thread while t428 runs.
-SEAMS carried (do not silently fix, do not re-open t427): T427-A
-[0x8957e] value while status open (needs in-screen capture), T427-B suns/
-planets stream desync past row ~124/96 (fine), T427-D flag palette-ramp
-tint (law banked 0x53e81, port paints native), T427-E vendor row thumbnails
-x288..445 not painted (record law underived), T427-F pip colour law
-unmeasured (port green band-3 invented).
+NEXT t428b — PLANET SCREEN CYCLE 2: MUTATION + FIELD THREAD (ordering
+rationale: t428 cycle 1 shipped the STRIP law (pins 447/0/0, witness
+PASS) but ran no mutation battery — the t426/t427 pattern is
+cycle-2 = MUTATION the strip pins (swap gauge lib order, move the pop
+anchor off (355,7), const-0 the selectors, drop the planitem thumbnail)
++ restore + gate; THEN attack the FIELD thread in the same cycle if
+budget allows: (a) H-FIELD-STATE closer — the t254 witness B shows the
+sphere+lattice, witness A shows BLACK; hunt the paint-invocation
+condition in fn 0x3b96c TYPE dispatch (which widget type reaches the
+grid loop) or bank the honest negative; (b) field backdrop 17np k4
+625x357 candidate at the 0x3b98b site (blit selector [0x6fd9c] at
+(7,115) — decode k4, compare its content against witness B's field
+backdrop region); (c) the tile-click CONTENT-DEPENDENT popup law
+(PLSQUARE SENDMESSAGE 1 -> command fn 0x3aa0a legs; windows.txt table).
+SEAMS carried (do not silently fix): T428-A vendor field BLACK on
+witness A, T428-B witness A lineage ruling (DECISIONS page candidate),
+T427-A..F unchanged. Do NOT open a second screen thread while t428b
+runs; the frame is ALREADY EXACT — do not touch it.
+
+t428 LANDED 2026-11-19 (PLANET-SCREEN STRIP LAW MEASURED + SHIPPED;
+working log docs/re/_wip_t428.md F1-F10). (i) WITNESS SPLIT [measured]:
+refcap original-planet-view.png (A) is NOT state-17 geometry — its strip
+is the STATUS-ROW composition (F8 seam T428-B: flag/sun/planet anchors
+disagree with the t3-derived t417/t427 laws; sun/planet vertical order
+REVERSED); t254/02_planet_detail.png (B, 1:1, origin (80,100)) IS the
+state-17 strip. (ii) STRIP LAW [measured on B + byte-level census]:
+PLRES/PLIND/PLPRO blit planres/planind/planpro record = the compressed
+gauge selector at the windows.txt rect origins (each lib EXACTLY 21 recs
+x 107x99 filling the 108x100 rect; rec0 = navy mottle); PLPOP = the t263
+pop-grid law anchored (355,7); PLBUILD = centred WHITE project name +
+planitem k[item] thumbnail (B "Scientist Takeover"), "No Project" text
+only when none (A, static.txt #141). (iii) PAINT BODY 0x3b96c head +
+grid-gate hunt decoded (F4/F6): the two owner-vs-player tests are NOT
+grid gates (0x3958c = cell-array byte search; jump target is the tail
+loop) — H-FIELD-STATE stays OPEN, port field unchanged (T428-A).
+(iv) PORT: new PURE ui/planetstrip.{h,cpp} + conform census; ui.cpp
+grey-outline loop DELETED -> strip painter; t406 "Project: X - N days"
+line DELETED (witness B: name only). PINS test_planetstrip_t428 x4,
+SUITE 447/0/0. WITNESS scripts/t428_strip_witness.sh +
+t428_witness_census.py VERDICT PASS (PLIND/PLPRO >40-colour photos,
+PLPOP sprites, PLBUILD white n=111; PLRES rec0 mottle 8 cols = low
+gauge, threshold per record). NOT RUN: mutation battery (t428b).
+LEDGER closes NOTHING (strict-close honest negative — planet-screen
+visuals have no OQ owner; t414..t427b precedent; OQ-016/019/027
+untouched). GATE_EXIT=0; LEDGER AUDIT OK (17 closed / 3 open).
 
 t427b LANDED 2026-11-19 (VERIFY + CLOSE t427 — witness, mutation, capsule
 retirement; working log docs/re/_wip_t427.md F9-F11). (i) GATE_EXIT=0 on

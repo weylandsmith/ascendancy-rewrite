@@ -22,6 +22,7 @@
 #include "ui/statusbg.h"
 #include "ui/statuslaw.h"
 #include "ui/planetwin.h"
+#include "ui/planetstrip.h"
 #include "ui/statuslist.h"
 #include "ui/planetview.h"
 #include "ui/abilitylaw.h"
@@ -270,6 +271,19 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         lerr.c_str());
     }
     ascend::formats::ShapeLibrary planitemLib;
+    // t428: the three STRIP gauge libraries (planetstrip.h: each 21 x
+    // 107x99, record == the compressed gauge level; the windows.txt
+    // TYPE-29 rects are 108x100 so the record fills its panel). Refusal
+    // just leaves that panel empty (the t427 row-lib precedent).
+    ascend::formats::ShapeLibrary stripGaugeLibs[3];
+    for (int i = 0; i < 3; i++) {
+        std::string lerr;
+        if (!stripGaugeLibs[i].load(
+                dataRoot + "/extracted/ascend01/data/" + kStripGaugeLibs[i],
+                &lerr))
+            std::printf("ui strip lib refused %s: %s\n", kStripGaugeLibs[i],
+                        lerr.c_str());
+    }
     {
         std::string lerr;
         if (!planitemLib.load(dataRoot + "/extracted/ascend01/data/planitem.shp",
@@ -1688,14 +1702,53 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 // the windows.txt rects; PLBUILD is the PROJECT slot whose
                 // click opens the PLANLIST (planet.txt info04).
                 const auto pv = planetViewFor(camp, planetStar, planetName);
-                for (int pi = 0; pi < kPlanetPanelCount; pi++) {
-                    const auto& pan = kPlanetPanels[pi];
-                    SDL_Rect pr{pan.rect.x0, pan.rect.y0,
-                                pan.rect.x1 - pan.rect.x0 + 1,
-                                pan.rect.y1 - pan.rect.y0 + 1};
-                    SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);
-                    SDL_RenderDrawRect(ren, &pr);
+                // ---- t428 STRIP ART (seed defect "top-row art missing") --
+                // Law ui/planetstrip.h (docs/re/_wip_t428.md F5/F9): the
+                // three gauge panels blit planres/planind/planpro record
+                // selector[i] at the windows.txt rect origins (21 x 107x99
+                // rect-fill census); PLPOP = the t263 pop-grid law at
+                // (355,7); PLBUILD = project name + planitem k[item] thumb,
+                // "No Project" when none. The grey-outline loop is DELETED
+                // (the vendor strip is PHOTO ART, measured 1:1 on the t254
+                // witness — witness B).
+                {
+                    const auto sp = stripPlanFor(camp, planetStar);
+                    for (int gi = 0; gi < 3; gi++) {
+                        const auto& gl = stripGaugeLibs[gi];
+                        if (gl.count() == kStripGaugeRecords)
+                            blitShape(ren, gl, sp.gauges[gi].rec,
+                                      sp.gauges[gi].rect.x0,
+                                      sp.gauges[gi].rect.y0);
+                    }
+                    // Pop grid: 17np k1/k2/k3 (index == selector, t254).
+                    if (kLibs[5].count() == 9)  // 17np.shp (kLibFiles order)
+                        for (const auto& pc : sp.popCells)
+                            blitShape(ren, kLibs[5], pc.record, pc.pos.x,
+                                      pc.pos.y);
+                    // PLBUILD content: WHITE name text top-centre, planitem
+                    // thumbnail below (witness B); "No Project" text when
+                    // pending (static.txt #141, witness A).
+                    const Rect& pb = kPlanetPanels[4].rect;
+                    std::string pj;
+                    if (sp.projectItem < 0) {
+                        pj = "No Project";
+                    } else if (const auto* it =
+                                   camp.planetItem(sp.projectItem)) {
+                        pj = it->name;
+                        if (planitemLib.count() == 40) {
+                            const auto& tr = planitemLib.record(
+                                sp.projectItem);
+                            blitShape(ren, planitemLib, sp.projectItem,
+                                      (pb.x0 + pb.x1) / 2 - int(tr.width) / 2,
+                                      pb.y0 + 30);
+                        }
+                    } else
+                        pj = "???";
+                    txt.draw(ren,
+                             (pb.x0 + pb.x1) / 2 - txt.width(pj, false) / 2,
+                             pb.y0 + 10, pj, false, kText);
                 }
+
                 // ---- t418b SURFACE TILE GRID (D15 "no planet visible") ---
                 // Laws ui/planetview.h + docs/re/_wip_t418.md F1/F2/F3/F4/F5:
                 // the disc = planal[terrainRow].record(sizeIdx) [inferred F4
@@ -1800,23 +1853,14 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 std::snprintf(pbuf, sizeof(pbuf), "RES %d   IND %d   PROS %d",
                               pv.res, pv.ind, pv.pros);
                 txt.draw(ren, 12, 162, pbuf, false, kDim);
-                // The PROJECT slot (PLBUILD panel, 463,8-632,106): current
-                // project or "No Project" + the open-list affordance.
+                // The PROJECT slot affordance (the t428 strip block above
+                // now paints the PLBUILD CONTENT: centred name + planitem
+                // thumbnail / "No Project" per witnesses A/B). The vendor
+                // panel shows NO days line (witness B: name only) — the
+                // t406 "Project: X - N days" line is DELETED; the click
+                // affordance stays at the panel bottom (port affordance).
                 {
                     const Rect& pb = kPlanetPanels[4].rect;  // PLBUILD
-                    std::string pl;
-                    if (pv.noProject)
-                        pl = statusLine2NoProject(pv.noFreePopulation);
-                    else if (const auto* it = camp.planetItem(pv.pendingItem)) {
-                        pl = "Project: ";
-                        pl += it->name;
-                        if (pv.days < 0) pl += " - No Progress";
-                        else { char db[64];
-                            std::snprintf(db, sizeof(db), " - %d day%s until completion",
-                                          pv.days, pv.days == 1 ? "" : "s");
-                            pl += db; }
-                    } else pl = "Project: ???";
-                    txt.draw(ren, pb.x0 + 6, pb.y0 + 8, pl, false, kText);
                     txt.draw(ren, pb.x0 + 6, pb.y1 - 14,
                              projectOpen ? "list open: pick one" : "click: set project",
                              false, kDim);

@@ -79,6 +79,7 @@ add_library(ascend_ui STATIC
   src/ui/raceintro.cpp
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp
+  src/ui/planetstrip.cpp
   src/ui/ui.cpp
   src/ui/audio.cpp
 )
@@ -131,6 +132,7 @@ add_executable(run_tests
   tests/test_statusnav_t405.cpp
   tests/test_statusbg_t417b.cpp
   tests/test_statusrow_t427.cpp
+  tests/test_planetstrip_t428.cpp
   tests/test_fleetlist_t407.cpp
   tests/test_researchview_t408.cpp
   tests/test_research3d_t419.cpp
@@ -179,6 +181,7 @@ add_executable(run_tests
   src/ui/raceintro.cpp
   src/ui/poppanel.cpp
   src/ui/planetwin.cpp
+  src/ui/planetstrip.cpp
 )
 target_link_libraries(run_tests PRIVATE ascend_core ascend_ui)
 add_test(NAME unit_tests COMMAND run_tests)
