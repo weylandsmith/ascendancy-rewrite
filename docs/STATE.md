@@ -230,31 +230,52 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t427b — VERIFY + CLOSE t427 (ordering rationale: t427's derive-from-RE
-pass LANDED with laws + port + 5 pins and suite 442/0/0, but the iteration
-hit its run budget BEFORE the witness/mutation/gate steps — a port without
-a mechanical witness on our own render is exactly the t417b lesson (the
-witness caught a real weights bug there). Finish the loop before opening
-t428). WORK: (1) bash scripts/gate.sh must exit 0 and
-python3 scripts/ledger_audit.py must print LEDGER AUDIT OK (the t427 edits
-were never gated); (2) Xvfb witness scripts/t427_statusrow_witness.sh +
-census on our render: row0 line1 has WHITE (255,255,255) px >200 and rows
-1/2 line1 GREEN (0,170,82); NO flat (255,0,0) block x16..69 (capsule is
-gone); sun warm-px present x16..145 y+2..+127; raceflag green px x12..26;
-pip grid red dots cols x498..543 bands y+50..+67; planets.shp sphere
-present x~150..245. (3) MUTATION campaign x3+ per skill rules (anchors:
-selection colour swap, pip pitch, sun selector s.type->0): all CAUGHT,
-AFTER-RESTORE suite green; NEVER run any build in the tree while the
-campaign lives (t417b rule). (4) Retire or re-scope kStatusMarkerRect +
-its t417b pin (statusbg_marker_and_wells_t417b checks a constant the
-painter no longer uses — keep the arrow-well half, drop the capsule half,
-citing docs/re/_wip_t427.md F6). (5) Native-vision self-grade of the
-screenshot vs /tmp/t427_row0.png (vendor) — D13 law. SEAMS to keep named:
-T427-A [0x8957e] value while status open (capture with screen open),
-T427-B suns/planets stream desync past row ~124/96 (drawn content is the
-canonical-dims frame; fine), T427-D flag palette-ramp tint (0x53e81 law
-banked, port paints native colours). Do NOT touch the planet screen frame
-(t428 territory).
+NEXT t428 — PLANET SCREEN CYCLE (ordering rationale: t427/t427b closed the
+planets-LIST thread with witness + mutation + gate all green; the queue's
+EXECUTION order puts the planet DISPLAY screen next, and it is the screen
+the list row-click opens, so its defects were directly observed this
+iteration's witness run — see the queue entry t428 at ~line 2263 for the
+full seed-defect list: top-row TYPE-29 panel art, planet frame background
+record (17np.shp already loaded), planet art too small + z-order under the
+cell squares, diamond FILL/OUTLINE law, tile-click content-dependent popup,
+orbital structures column on the LEFT). The frame is ALREADY EXACT — do not
+touch it. WORK SHAPE (t426-style cycles): cycle 1 = MEASURE the defects on
+pure vendor captures (scratchpad + work/screens) + derive the paint laws
+from the banked disasm (work/r331_disasm.txt covers fn 0x500e0; the state-17
+planet-view paint fn needs its own locate pass — the t406/t418b docs name
+its window rect and TYPE-29 panel dispatch), then port + pins + witness +
+mutation. Do NOT open a second screen thread while t428 runs.
+SEAMS carried (do not silently fix, do not re-open t427): T427-A
+[0x8957e] value while status open (needs in-screen capture), T427-B suns/
+planets stream desync past row ~124/96 (fine), T427-D flag palette-ramp
+tint (law banked 0x53e81, port paints native), T427-E vendor row thumbnails
+x288..445 not painted (record law underived), T427-F pip colour law
+unmeasured (port green band-3 invented).
+
+t427b LANDED 2026-11-19 (VERIFY + CLOSE t427 — witness, mutation, capsule
+retirement; working log docs/re/_wip_t427.md F9-F11). (i) GATE_EXIT=0 on
+the t427 tree BEFORE any edit (the never-gated t427 edits pass; suite
+442/0/0). (ii) WITNESS scripts/t427_statusrow_witness.sh +
+t427_witness_census.py VERDICT PASS 14/14 on our own Xvfb render (seed 5
+--species 0; the --species flag is REQUIRED — default playerSpecies=-1
+paints no flag): row0 line1 GREEN g=413 unselected -> WHITE w=413 selected
+(same-row control; seed-5 owns ONE planet so rows 1/2 are the never-WHITE
+control), ZERO flat-(255,0,0) capsule px x3 rows, sun warm px x16..145
+n=6512, raceflag px x12..26 n=336, pip dots start x498 exactly with
+dot-start pitch 5/5/5/5/5, old x428 strip n=0, planet art px n=976.
+(iii) CAPSULE RETIRED: kStatusMarkerRect DELETED from statusbg.h; pin
+statusbg_marker_and_wells_t417b re-scoped to statusbg_wells_t417b
+(arrow-well navy half kept; capsule half deleted citing F6). (iv) SELECTOR
+LAWS made PURE + pinned (statusSunSelector raw type 0..12 else -1;
+statusPlanetSelector 5*type+size with asymmetric-arg pin) and wired into
+ui.cpp; pin statusrow_selector_laws_t427b; suite 443/0/0. (v) MUTATION
+4/4 CAUGHT (M1 colour swap, M2 pip pitch 5->4, M3 sun selector const-0,
+M4 5*s+t swap; checkpoint-commit 106b9db first; AFTER-RESTORE 443/0/0).
+(vi) NATIVE self-grade vs /tmp/t427_row0.png: composition law holds; NEW
+named seams T427-E (row thumbnails unpainted) + T427-F (pip colour law).
+LEDGER closes NOTHING (strict-close honest negative — status-list visuals
+have no OQ owner; t414..t427 precedent; OQ-016/019/027 untouched).
+GATE_EXIT=0 (post-everything); LEDGER AUDIT OK (17 closed / 3 open).
 
 t427 LANDED 2026-11-19 (PLANETS LIST ROW COMPOSITION DERIVED FROM RE;
 working log docs/re/_wip_t427.md F1-F8). (i) VENDOR ROW PAINT fn 0x500e0

@@ -256,3 +256,36 @@ CAPSULE RETIREMENT (t427b step 4): kStatusMarkerRect DELETED from
 statusbg.h; test_statusbg_marker_and_wells_t417b re-scoped to
 statusbg_wells_t417b (arrow-well navy half kept, capsule half deleted,
 citing F6). Suite 442/0/0 after re-scope; GATE_EXIT=0; LEDGER AUDIT OK.
+
+## F10 [t427b, 2026-11-19] — MUTATION CAMPAIGN 4/4 CAUGHT
+Anchors all in statuslist.h (checkpoint-commit 106b9db first; revert-by-copy
++ os.utime per skill rules; no parallel builds). Selector laws made PURE
+(statusSunSelector raw-type domain 0..12 -> -1; statusPlanetSelector
+5*type+size, asymmetric-arg pin catches the 5*s+t swap) and wired into the
+ui.cpp row painter + pin statusrow_selector_laws_t427b (suite 443/0/0).
+M1 selection-colour swap -> statusrow_selection_law_t427 FAIL (CAUGHT);
+M2 pip pitch 5->4 -> statusrow_pip_grid_t427 FAIL x3 (CAUGHT);
+M3 sun selector ->const 0 -> selector pin FAIL x3 (CAUGHT);
+M4 5*type+size -> 5*size+type -> selector pin FAIL x3 (CAUGHT).
+AFTER-RESTORE suite 443/0/0. Script /tmp/t427b_mutate.py (throwaway).
+
+## F11 [t427b, 2026-11-19] — NATIVE-VISION SELF-GRADE (D13 law)
+/t427_row0.png (vendor, Oslo II) vs /tmp/t427_shots/status-sel.png (ours,
+Amoroso I, seed 5 --species 0). MATCHES: left-to-right composition — flag
+(green raceflag at x12), sun art left, planet sphere mid, WHITE line1
+selected, line2 below, pip grid right at x498. DIFFERENCES (all either
+fixture or named seams, none a law violation):
+- Fixture: different star/planet (Amoroso husk = gray k-record; vendor
+  shot = Oslo Cathedral blue). Sun warm bbox ours 94x94 (content ~47 x2)
+  vs vendor ~130 — same 2x law, different record.
+- SEAM T427-E [new]: the vendor's THREE surface thumbnails x288..445
+  (pitch 70, w~54; F5 measured) are NOT painted by the port (surface-art
+  record law not derived). The port paints the "RES/IND/PRO" number row
+  there instead.
+- Known port decision (t417b F5 comment): vendor shows the SYSTEM name
+  cyan above the sun right edge separately; the port folds it into line1.
+- SEAM T427-F [new]: vendor pip colours are red with a trailing AMBER
+  (partial band); the port's band==3 GREEN is an invented default — pip
+  COLOUR law unmeasured, geometry is the cited part.
+VERDICT: composition law holds on our render; thumbnails + pip colour +
+ramp tint (T427-D) + [0x8957e] value (T427-A) remain named seams.
