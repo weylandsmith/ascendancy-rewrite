@@ -103,11 +103,27 @@ while :; do
   # run never marks the queue task done. Sentinels WAIT*/IDLE*/PARK*/steer/
   # empty NEVER arm; empty last_task (fresh install) never arms.
   next=$(awk '/^#+ *NEXT ACTION/{f=1;next} f&&NF{print;exit}' docs/STATE.md)
-  # CONT-cycle rows ("NEXT tNNN CONT cycle K —") must extract a tag that
-  # DIFFERS from the parent task AND from prior cycles, else field-2 ==
-  # last_done and the wake trigger reads "already done" (t422 stopped the
-  # batch this way 2026-11-17): tag = tNNNCONT<K>.
-  task=$(echo "$next" | awk 'NF{ w3=toupper($3); w4=toupper($4); if (w3=="CONT" && w4 ~ /^CYCLE/) print $2 "CONT" toupper($5); else print $2; exit }' | tr -d ':')
+  # Cycle-row tags must extract DISTINCTLY from the parent AND across
+  # cycles, else field-2 == last_done and the wake trigger reads "already
+  # done". Sessions write the cycle form inconsistently (t422 "CONT cycle
+  # 2", t425 "CONT CYCLE 3", t426 "CYCLE 2" — each broke a stricter
+  # matcher in turn; 2026-11-18 three times). GENERIC LAW: scan fields
+  # 3..8; any CYCLE token (optionally after CONT, digits allowed inline)
+  # + its following number -> tag = <task>C<num>. Plain "NEXT tNNN —"
+  # still extracts tNNN; sentinels unaffected (they never carry CYCLE).
+  task=$(echo "$next" | awk 'NF{
+    tag=$2;
+    if(toupper($2) ~ /^(WAIT|IDLE|PARK)/){ print tag; exit }
+    for(i=3;i<=8 && i<=NF;i++){
+      u=toupper($i);
+      if(u ~ /^CYCLE[0-9]+$/){ n=u; gsub(/[^0-9]/,"",n); tag=$2 "C" n; break }
+      if(u=="CYCLE" && $(i+1) ~ /^[0-9]+$/){ tag=$2 "C" $(i+1); break }
+      if(u=="CONT"){
+        u2=toupper($(i+1));
+        if(u2 ~ /^CYCLE[0-9]+$/){ n=u2; gsub(/[^0-9]/,"",n); tag=$2 "C" n; break }
+      }
+    }
+    print tag; exit }' | tr -d ':')
   [ -n "$task" ] || task=steer
   queue_wake=""; steer_used=""
   last_ok_tag=$(cat "$LOOPDIR/last_task" 2>/dev/null)
