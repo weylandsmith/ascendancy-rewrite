@@ -93,8 +93,15 @@ inline constexpr int introPalIndex(int raceColourByte) {
 // diplo table is scenario-populated (diplomacy.md), so a live game may
 // carry different bytes than the shipped defaults. Decider: a RAM census
 // of 0x12e18+2 during a live intro.
+// t424b ENTRY [0] OVERWRITTEN [measured witness, docs/re/_wip_t424b.md F3]:
+// the vendor screenshot (Minions intro) body ink = (56,170,85) =
+// game.pal[0*4+0x13] => RUNTIME racebyte 0, not the static byte 16 (which
+// renders red pal[83]). Only the WITNESSED entry changes; the other 20
+// static bytes stay seam H3 (one race's witness cannot set 21 bytes, t415
+// law). The static dump byte is recorded here so the change is auditable:
+//   [0] static 16 -> witnessed 0.
 inline constexpr int kIntroRaceBytes[21] = {
-    16, 7, 0, 6, 135, 57, 2, 65, 16, 7, 0,
+    0, 7, 0, 6, 135, 57, 2, 65, 16, 7, 0,
     1,  8, 116, 12, 0, 232, 92, 15, 0, 84};
 
 // ---- PORT LAYOUT (t415 MEASURED, docs/re/_wip_t415.md F5) ---------------

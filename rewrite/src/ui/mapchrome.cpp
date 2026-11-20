@@ -207,4 +207,46 @@ RGB textureColourAt(int x, int y) {
     return RGB{tab[n - 1].r, tab[n - 1].g, tab[n - 1].b};
 }
 
+// t424b DARK SPECKLE FIELD (race-intro frame interior; docs/re/_wip_t424b.md
+// F1/F2) [measured census, docs/re/_wip_t424b.md F2]: the vendor's race-intro
+// background inside the outer frame is NOT the bright chrome page — it is a
+// dark near-black speckle of game.pal {0:(0,0,0) 48%, 200:(12,12,16) 29%,
+// 1:(12,12,12) 24%, 196:(12,28,48) 8%} (renormalised over the four-family
+// base of the text-free well pixels). Grain law [measured]: mean |lum delta|
+// at game-px lags 1..6 = 3.41/5.74/7.25/7.92/8.27/8.72 (sub-linear =>
+// correlated, same Markov shape as the t422 chrome chain; iid would plateau
+// by lag 2). Same stateless chain law as textureColourAt (copy-left 5%,
+// repeat-up 25%, else fresh draw; splitmix64(x,y) decisions), different seed
+// salt and different census. GENERATOR ORIGIN [named seam]: the vendor
+// routine that produced this field is not yet cited (t433's memory-surface
+// census is the route); the COLOUR census + grain statistics are measured.
+RGB introSpeckleAt(int x, int y) {
+    uint64_t z = (uint64_t(uint32_t(x)) << 32) ^ uint64_t(uint32_t(y)) ^
+                 0x5851f42d403c3b23ull;  // distinct salt: decorrelate chrome
+    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
+    z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
+    z = z ^ (z >> 31);
+    const uint64_t r = z % 1000000ull;
+    if (r < 50000ull && x > 0) return introSpeckleAt(x - 1, y);   // 5%
+    if (r < 300000ull && y > 0) return introSpeckleAt(x, y - 1);  // 25%
+    // Fresh draw from the measured census. Two independent censuses of the
+    // text-free well pixels (_wip_t424b F2): exact-match renormalised over
+    // the 4-family base = 40.2/32.5/24.1/3.2; tol-60 nearest over the
+    // gap-band rows = 38.7/28.1/26.6/6.7 (the exact-match run under-counts
+    // blends of 0). Weights = the two censuses averaged.
+    static const struct { RGB c; int w; } kSpeckle[4] = {
+        {{0, 0, 0}, 40},      // game.pal[0]
+        {{12, 12, 16}, 30},   // game.pal[200]
+        {{12, 12, 12}, 25},   // game.pal[1]
+        {{12, 28, 48}, 5},    // game.pal[196]
+    };
+    const uint64_t d = (z >> 20) % 100ull;
+    int acc = 0;
+    for (int i = 0; i < 4; i++) {
+        acc += kSpeckle[i].w;
+        if (int(d) < acc) return kSpeckle[i].c;
+    }
+    return kSpeckle[0].c;
+}
+
 }  // namespace ascend::ui

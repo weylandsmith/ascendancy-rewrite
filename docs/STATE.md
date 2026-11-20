@@ -229,22 +229,47 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t424b RACE INTRO SCREEN (FIRST: user-visible, deferred three
-times — ordering rationale: breadth over depth per D18; the audio
-record-field plan moved VERBATIM to queue row t437 below this heading
-region). Row text: background greyscale + text unreadable (root cause
-likely palette: the intro art needs the vendor palette transform the
-gif/cine path applies — decompile the intro screen paint, cite the
-palette source) + textured framing per the t426 chrome-band gradient
-law + race portrait position/size per the draw chain (t412's
-FUN_0002b48a lead). SEAMS carried from t428: T428-B (witness-A
-lineage), T427-A..F unchanged. Derive-before-code + iterate-to-clean
-laws of the PHASE-16 header apply; CONT requeues allowed (tag
-extraction is generic now).
+NEXT t434 SHIPS SCREEN CYCLE (FIRST: next row in flow order — t424b race
+intro landed 2026-11-20; ordering rationale per the PHASE-16 execution note
+below: t434(ships) -> t435(research) -> t436(species+ability) -> t433(chrome
+EXACT memory-surface) -> t437(OQ-027b record-field) -> t432(final
+verify+push+handoff)). Row text: full pass — derive the fleet list paint
+(fleetlist law banked t402 era; grade it against vendor now), row art
+(ship class sprites), selection/info panel, per close law. SEAMS carried
+from t424b: speckle generator origin/parameters (t433 route; R-t424b(3)
+bars fitting from the scaled shot), H3 race-colour bytes for races 1..20,
+T428-B (witness-A lineage), T427-A..F unchanged. Derive-before-code +
+iterate-to-clean laws of the PHASE-16 header apply; CONT requeues allowed
+(tag extraction is generic now).
 
 SEAMS/OQ standing notes:
- SEAMS carried: T428-B (witness-A lineage),
-T427-A..F unchanged.
+ SEAMS carried: speckle generator origin (t433),
+H3 race bytes 1..20, T428-B (witness-A lineage), T427-A..F unchanged.
+
+t424b LANDED 2026-11-20 (RACE INTRO BACKGROUND + INK FIXED; docs/re/
+_wip_t424b.md F0-F5 + REFUTED-ROUTES R-t424b + _wip_t415.md corrections).
+All OFFLINE census off the user vendor screenshot + one Xvfb witness run
+(scripts/t424b_intro_witness.sh + t424b_witness_census.py VERDICT PASS) — no
+R1 session. (i) GIF/CINE PREMISE DEAD: zero .cine/.FLI strings in the payload;
+gif sites = logo/Alt-G/0opening only. (ii) BOUNDARY LAW [measured]: the bright
+chrome page covers ONLY the margins outside the outer frame (x0..6, x634..639,
+y0..6, y474..479); the ENTIRE frame interior is a DARK speckle
+{game.pal 0:40% 200:30% 1:25% 196:5%} — t415's "chrome page full-screen"
+reading was the root cause of BOTH reported defects (greyscale background +
+unreadable ink). Port: mapchrome.{h,cpp} introSpeckleAt (stateless 5/25
+Markov chain, distinct salt, measured census); vendortext.cpp runRaceIntro
+renders chrome margins + dark interior. (iii) GRAIN: correlated not iid
+(vendor lag profile + same-colour adjacency 0.348 > iid 0.315); exact chain
+parameters UNFITTABLE from the 1.6266x-scaled shot (simulated discriminator
+collapse — R-t424b(3)); generator origin stays a named seam (t433 route).
+(iv) INK WITNESS: Minions runtime racebyte = 0 (vendor ink pal[19]) — static
+kIntroRaceBytes[0] 16->0; other 20 bytes stay seam H3. (v) INCIDENTAL FIX:
+lgrace portrait path snprintf char[64] TRUNCATED long dataRoots (portrait
+silently never loaded on this machine); now std::string. Tests 454/454
+(+4 introspeckle_t424b; t412 ink pin updated), 0 warnings. LEDGER closes
+NOTHING (strict-close honest negative — race-intro visuals have no OQ owner;
+t414..t429 precedent; OQ-016/019/027 untouched). GATE_EXIT=0; LEDGER AUDIT OK
+(open rows unchanged: OQ-016/019/027).
 
 t429 LANDED 2026-11-20 (OQ-027(b) PREMISE REFUTED + FULL PLAY-PATH CENSUS;
 docs/re/audio.md S6.8 + docs/re/_wip_t429.md T429-A..C + REFUTED-ROUTES
@@ -2356,8 +2381,8 @@ screen the user graded); then one row per screen in flow order; then
 verify+push. A COMPLETING SESSION REWRITES NEXT TO THE NEXT ROW
 VERBATIM in EXECUTION order (2026-11-20 reconciliation): done
 t422,t423,t424(push),t425,t426(+C2),t427(+b),t428(+b..f),t429(audio
-premise REFUTED),t430-audio(next); REMAINING t424b(race intro — FIRST,
-user-visible, deferred 3x),t434(ships),t435(research),t436(species+
+premise REFUTED),t424b(race intro LANDED 2026-11-20); REMAINING
+t434(ships — FIRST),t435(research),t436(species+
 ability),t433(chrome EXACT memory-surface),t437(OQ-027b record-field
 closure),t432(final verify+push+handoff); after t432 park WAIT-USER-
 RULING. NEVER reuse a consumed tag and never move a row's TEXT under
@@ -2442,11 +2467,16 @@ starfield too (vendor law: spin pump while button held/hovered?
 census the button's SENDMESSAGE). Framing via t422 chrome law. Grade
 clean per close law.
 
-t424b RACE INTRO SCREEN CYCLE: background greyscale + text unreadable
+t424b RACE INTRO SCREEN CYCLE: LANDED 2026-11-20 (background greyscale +
+text unreadable root-caused: the frame interior is the DARK speckle, not
+the bright chrome page — docs/re/_wip_t424b.md F1-F5; portrait truncation
+bug fixed; ink byte witnessed). Original row text kept for lineage:
+background greyscale + text unreadable
 (root cause likely palette: the intro art needs the vendor palette
 transform the gif/cine path applies — decompile the intro screen
 paint, cite the palette source) + textured framing via t422 + race
 portrait position/size per the draw chain (t412's FUN_0002b48a lead).
+[GIF/CINE PREMISE REFUTED — R-t424b(1).]
 
 t425 GALAXY MAP CONTROLS + LIVENESS CYCLE: (a) dial SPIN LAW — ours
 rotates continuously on click, the original does NOT (D17): decompile

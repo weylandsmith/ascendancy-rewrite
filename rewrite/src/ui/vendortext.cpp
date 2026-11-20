@@ -399,12 +399,15 @@ BootState runRaceIntro(SDL_Renderer* ren, VendorText& txt,
     // emblem (ascend01; the t401 crest class).
     ascend::formats::ShapeLibrary lgrace;
     {
-        char path[64];
-        std::snprintf(path, sizeof(path),
-                      "%s/extracted/ascend02/data/lgrace%02d.shp",
-                      dataRoot.c_str(), specnum);
+        // t424b FIX: the old char[64] snprintf TRUNCATED long dataRoots at
+        // 63 chars (".../extracted/ascend0" — witness t424b_intro_witness.sh
+        // with the repo at a 63+ char path), so the portrait never loaded.
+        const std::string lp = dataRoot + "/extracted/ascend02/data/lgrace" +
+                               (specnum < 10 ? "0" : "") +
+                               std::to_string(specnum < 0 ? 0 : specnum) +
+                               ".shp";
         std::string aerr;
-        if (!lgrace.load(path, &aerr))
+        if (!lgrace.load(lp, &aerr))
             std::printf("ui raceintro portrait refused: %s\n", aerr.c_str());
         std::fflush(stdout);
     }
@@ -436,24 +439,32 @@ BootState runRaceIntro(SDL_Renderer* ren, VendorText& txt,
                     int(bodyLines.size()) - bodyShown, bodyLines.size());
     std::fflush(stdout);
 
-    // Chrome page (t414 frame law): the textureColourAt noise texture as
-    // ONE static texture; the vendor intro shows the speckle inside every
-    // well (measured), so nothing is black-filled.
-    static SDL_Texture* chromePage = nullptr;
-    if (!chromePage) {
-        chromePage = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
-                                       SDL_TEXTUREACCESS_STATIC, kDisplayW,
-                                       kDisplayH);
-        if (chromePage) {
+    // t424b BACKGROUND LAW (docs/re/_wip_t424b.md F1) [measured boundary
+    // census]: the bright chrome page covers ONLY the screen-fixed margins
+    // OUTSIDE the outer frame (x0..6, x634..639, y0..6, y474..479); the
+    // ENTIRE frame interior (7,7)-(633,473) — all three wells AND the gaps
+    // between them — is the DARK speckle field (introSpeckleAt, F2 census).
+    // The t415 "chrome page full-screen" reading was wrong: it produced the
+    // D-report "background greyscale + text unreadable" (bright grey-teal
+    // field, race ink with no contrast). ONE static texture, deterministic.
+    static SDL_Texture* introPage = nullptr;
+    if (!introPage) {
+        introPage = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                                      SDL_TEXTUREACCESS_STATIC, kDisplayW,
+                                      kDisplayH);
+        if (introPage) {
             std::vector<uint32_t> px(size_t(kDisplayW) * kDisplayH);
             for (int y = 0; y < kDisplayH; y++)
                 for (int x = 0; x < kDisplayW; x++) {
-                    const RGB c = textureColourAt(x, y);
+                    const bool margin =
+                        x <= 6 || x >= 634 || y <= 6 || y >= 474;
+                    const RGB c = margin ? textureColourAt(x, y)
+                                         : introSpeckleAt(x, y);
                     px[size_t(y) * kDisplayW + x] =
                         0xFF000000u | (uint32_t(c.r) << 16) |
                         (uint32_t(c.g) << 8) | uint32_t(c.b);
                 }
-            SDL_UpdateTexture(chromePage, nullptr, px.data(),
+            SDL_UpdateTexture(introPage, nullptr, px.data(),
                               kDisplayW * int(sizeof(uint32_t)));
         }
     }
@@ -467,8 +478,8 @@ BootState runRaceIntro(SDL_Renderer* ren, VendorText& txt,
     };
 
     for (;;) {
-        if (chromePage)
-            SDL_RenderCopy(ren, chromePage, nullptr, nullptr);
+        if (introPage)
+            SDL_RenderCopy(ren, introPage, nullptr, nullptr);
         else {
             SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
             SDL_RenderClear(ren);

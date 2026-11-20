@@ -178,11 +178,12 @@ TEST(raceintro_t412_real_history_all_21) {
 TEST(raceintro_t412_ink_law_matches_table) {
     // introPalIndex(b) = b*4 + 0x13; the 21 census bytes are the static
     // table at 0x12e18 + specnum*494 (verified _wip_t412 F4). Orfa (2)
-    // byte 0 -> pal 19 = the vendor lore green family; Minions (0) byte 16
-    // -> pal 83.
+    // byte 0 -> pal 19 = the vendor lore green family.
     CHECK(au::introPalIndex(0) == 0x13);
     CHECK(au::introPalIndex(16) == 83);
-    CHECK(au::kIntroRaceBytes[0] == 16);
+    // t424b: Minions (0) WITNESSED runtime byte is 0 (vendor screenshot ink
+    // (56,170,85) = pal[19]; _wip_t424b F3) — static dump byte was 16.
+    CHECK(au::kIntroRaceBytes[0] == 0);
     CHECK(au::kIntroRaceBytes[2] == 0);
     CHECK(au::kIntroRaceBytes[20] == 84);
 }

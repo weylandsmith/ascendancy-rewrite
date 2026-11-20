@@ -216,4 +216,9 @@ extern const int kTextureWeights[10];  // percent weights, sum 74 (tail = 26)
 // (no rng_ touched; law mirrors cam3d's Star.z discipline).
 RGB textureColourAt(int x, int y);
 
+// t424b: the race-intro frame-interior dark speckle field (same stateless
+// Markov law as textureColourAt, measured dark census; docs/re/_wip_t424b.md
+// F1/F2). Screen coordinates, deterministic, no state.
+RGB introSpeckleAt(int x, int y);
+
 }  // namespace ascend::ui

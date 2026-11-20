@@ -141,6 +141,7 @@ add_executable(run_tests
   tests/test_sysview_t410.cpp
   tests/test_maplook_t411.cpp
   tests/test_raceintro_t412.cpp
+  tests/test_introspeckle_t424b.cpp
   tests/test_econres_t274.cpp
   tests/test_planetwin_t276.cpp
   tests/test_score_t284.cpp

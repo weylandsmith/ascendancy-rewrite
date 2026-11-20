@@ -59,7 +59,13 @@ Frame census (PIL bright-run scan, game px):
   Header: small square emblem at left (~x14..44,y10..35) + centred
   "<Power>: <Title>" in race ink (green for Minions).
   Backgrounds inside all wells = the cosmos hash-noise texture (t414 law),
-  NOT flat black.
+    NOT flat black.
+  [t424b CORRECTION: the last line was a native-vision read of speckle
+   PRESENCE. The colour census (docs/re/_wip_t424b.md F1/F2) shows the
+   in-well speckle is DARK {pal 0/1/200/196}, NOT the bright chrome page;
+   the chrome page covers only the margins outside the outer frame. The
+   full-screen chrome-page render this section motivated was the
+   "background greyscale + text unreadable" defect, fixed in t424b.]
 
 ## F5 — FULL INTRO LAYOUT LAW [measured off user screenshot + Ghidra rects agree]
 Section->well mapping (decompile + screenshot content both agree):
@@ -85,6 +91,9 @@ Section->well mapping (decompile + screenshot content both agree):
     centre 315 vs 319.5). Vendor small-font advance ~5.5-5.8 px/char.
   Background = the chrome-page noise texture full-screen (t414 law); no
     black well fill (wells show the speckle in the screenshot).
+    [t424b: SPECKLE YES, CHROME PAGE NO — the in-well field is the DARK
+     speckle {pal 0/1/200/196}; see the correction under F4 and
+     docs/re/_wip_t424b.md F1/F2.]
   FUN_00053dd8 sits between the right-well and header text calls = the
     emblem/window-shape draw (-> FUN_00053e58); identity = raceflag by
     size+position match (14x24 native at the measured bbox).

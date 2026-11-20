@@ -1450,3 +1450,29 @@ route: per-record sfx id at record+0x57 HIWORD (-1 = silent), 6 call sites
 (0x30e75/0x3220f/0x3336f/0x3af9e/0x4e453/0x4e512); windows.txt keyword "SOUNDCHANNEL" has ZERO literal in the
 payload (case-insensitive MEASURED) — find the windows.txt parser's store
 (0x575e4 region, opened via pool-rel 0x2ffc) before assuming +0x57 == SOUNDCHANNEL.
+
+
+## R-t424b. THREE RACE-INTRO PREMISES ARE DEAD (t424b census).
+(1) "The intro art needs the vendor palette transform the gif/cine path
+applies" — there is NO cine path: b'.cine'/'CINE'/'.FLI' = 0 hits in
+work/ascend_payload.bin (MEASURED); the three .gif string sites are logo
+(0x834d8), Alt-G screenshot scr%03d.gif (0x8473f, debugflags.md), and the
+0opening title (0x835be). The title TSV palette stays title-only
+(title-art.md §4). Do not re-open "cine palette" for the intro.
+(2) "The intro background is the bright chrome page full-screen" (the t415
+F4/F5 reading that shipped in t415) — REFUTED by boundary census
+(docs/re/_wip_t424b.md F1): chrome-family pixels exist ONLY in the margins
+outside the outer frame (x0..6, x634..639, y0..6, y474..479); the entire
+frame interior is the DARK speckle {game.pal 0/1/200/196}. 17np k0 is also
+refuted as the interior source (its decode = frame art: 83.8% black + 8.8%
+teal-242 + chrome-family lines).
+(3) Pixel-level GRAIN-PARAMETER fitting of the intro speckle from
+scratchpad/species-introduction-original.png is dead: the shot is
+1041x780 = 640x480 x 1.6266 (upscaled), and simulating iid vs the 5/25
+chain through the same scale pipeline collapses their lag profiles to
+0.30-0.33 vs 0.35-0.36 — the scaling erases the discriminator (MEASURED,
+docs/re/_wip_t424b.md F2 corollary). Only the COLOUR census + the
+correlated-vs-iid sign are gradeable from this shot. Exact chain
+parameters (if any) need a pure capture: t433's memory-surface census or a
+native 640x480 Alt-G shot (debugflags.md Alt-G writes GIF SCRATCH in the
+ascend dir — scratch copies only). Trail docs/re/_wip_t424b.md.
