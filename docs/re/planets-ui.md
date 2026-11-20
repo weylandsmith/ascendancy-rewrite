@@ -459,3 +459,33 @@ Full working log: docs/re/_wip_t428e.md (E0-E7). Durable laws:
 - BLIT-2 CENSUS NEGATIVE [measured]: no size-class record registers at
   (408,296) on B (rect 71% pure black) -> blit-2 stays unported; law stands
   (t428d F4).
+
+## 14. THE k5 BLIT IS GATED OFF LIVE — ORIGIN QUESTION CLOSED AS A
+## NON-QUESTION; (224,107) PEAK = FALSE POSITIVE (t428f, 2026-11-19)
+
+- LIVE GATE WITNESS [measured, run work/r1/dbg-t428f-20261119-210504, tool
+  scripts/r428f_k5_session.py]: BP at 0x3c7cd fired on the planet-detail paint
+  (Oct-29 RESUME.GAM t1086, Planets click -> row click; blit1 control fired
+  same paint). eax = 0xfe6814 = widget head (magic 0x12345678, NAME@+0x20
+  "PLANLIST"); DWORD[widget+0x35] == 0 -> cmpl $-1 FAILS -> 0x3c835; the k5
+  fetch+blit NEVER executed (k5_blit leg armed, 0 fires). Offline corroboration
+  [measured]: bank-t251-live1255 20/20 slots PLANLIST+0x35 == 0; 0/126
+  magic-records in RAM hold -1 there.
+- ARG-COUNT CORRECTION to §13/E6 [verified asm + live]: the k5 site pushes
+  FIVE args explicitly — $0 (y), $0 (x), $5 (sel) before the 0x1fc34 fetch
+  (Watcom clobber discipline), then handle + &struct; `add $0x14,%esp` proves
+  it. "p3/p4/p5 are frame leftovers" RETIRED (the composition law
+  5caac.c:58-64 itself stands).
+- CONSEQUENCE: the t428c (224,107) registration peak (1566 px, z=18.6) is a
+  FALSE POSITIVE — lattice/pop-art pixels sharing k5's speckle palette; the
+  vendor draws NO k5 on this screen class. k5 STAYS UNPORTED (porting it would
+  add art the original does not draw). Seam T428c-A CLOSED.
+- RESIDUAL (banked, unchased): what sets widget+0x35 == -1 — writers of -1:
+  0x3ab24 (bulk init after the 0x56ce4 widget loop, also +0x39=-1, +0xab=0xff,
+  +0xac=-1), 0x3d3a7 (button-handler branch); 0x3d765 clears +0x35/+0x39 to 0.
+  k5 would paint at (0 + struct[+4] + dir[+0x10], 0 + struct[+8] + dir[+0x14])
+  in such a state — no witness of that state exists in any captured screen.
+- HARNESS LAW [measured]: cold-leg censuses must POLL-BY-BREAK (BREAK -> EV
+  eip -> attribute -> bank; resume = BPDEL fired-index only + RUN) — the stock
+  resume_and_rearm BPDEL * releases a pending halt at the NEXT cold leg
+  unbanked (t428f attempt 1 lost exactly the gate stop this way).

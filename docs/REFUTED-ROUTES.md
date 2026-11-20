@@ -1416,3 +1416,21 @@ edge (top rows 0..6, left cols 0..6, right col 466+, bottom rows 473+) and
 the interior is pure black to 7,7..465,472 (col 7 is BLACK, not (49,54,53)).
 Do not repaint any bevel/edge line at COSMOSWnd; the border is the four
 chrome bands + black field. Trail docs/re/_wip_t426.md F1.
+
+## R-t428f — THE k5 REGISTRATION PEAK (224,107) IS DEAD AS A PORT SIGNAL, AND
+## "PIN THE k5 ORIGIN" IS DEAD AS A TASK (t428f). Live BP witness
+## (work/r1/dbg-t428f-20261119-210504): the paint body REACHES the k5 gate
+## 0x3c7cd every paint, and the gate FAILS (PLANLIST widget head 0xfe6814,
+## magic+name verified, DWORD[+0x35]==0 != -1) -> the 0x1fc34 fetch + 0x5caac
+## blit NEVER execute on the planet-detail screen; offline corroboration:
+## PLANLIST+0x35==0 in 20/20 bank-t251-live1255 slots and 0/126 RAM
+## magic-records hold -1. Therefore the t428c peak (1566 px at screen
+## (224,107)) is palette coincidence, NOT k5 pixels: DO NOT port 17np record 5
+## anywhere, and do not spend an iteration "resolving" its origin — on every
+## witnessed state the blit does not run, so there is no origin. k5 law is
+## FINAL (docs/re/planets-ui.md S13+S14): fourth paint blit, record-5
+## immediate, gate widget+0x35==-1, gated off. The only live sub-question is
+## what SETS +0x35=-1 (writers 0x3ab24/0x3d3a7; no captured screen shows the
+## state) — chase it only if a witness of that state ever appears.
+## Harness corollary: cold-leg censuses MUST poll-by-BREAK (BPDEL * releases a
+## pending halt unbanked — t428f attempt-1). Trail docs/re/_wip_t428f.md.

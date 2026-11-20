@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-19T17:05
+updated: 2026-11-19T21:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,6 +230,55 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
+NEXT t429 — OQ-027(b) CONTROL-RECORD SFX-ID CAPTURE (ordering rationale:
+t428f CLOSED the k5 line as a binding negative R-t428f — planet-screen
+visual work is DONE; the remaining open rows are OQ-016 (user adjudication,
+D3), OQ-019 (user acceptance, t329 packet) and OQ-027 — and OQ-027(b) is the
+ONLY row with a named measurement closure bar reachable without the user:
+"capture diff of control-record +0x1bcc across control classes"
+(docs/OPEN-QUESTIONS.md OQ-027). The row's own statics: FUN_000500e0 UI
+callers 0x17488/0x1749b read sound ids from control-record +0x1bcc/+0x1bce
+(runtime window-item tables); windows.txt SOUNDCHANNEL census carries NO id
+{0 x118, -0 x1}. PLAN: reuse scripts/r428f_k5_session.py's POLL-BY-BREAK
+machinery (t428f F5 law — cold legs must never be released by BPDEL *): arm
+0x17488 (and 0x1749b if the last-4 audit passes; else offline-match the pty
+code view), drive clicks across control CLASSES (NEXTTURN, sidebar
+Planets/Fleet/Research, a planet row, an event-popup OK), and per stop bank
+[eax/edx] + the control-record head (magic+name@+0x20) + u16@+0x1bcc/+0x1bce.
+CLOSURE SHAPE: if ids DIFFER by class and match audio.md §6.7 port names for
+click08-family presses, upgrade sfxForPress to the cited table and CLOSE (b)
+with the census; if all witnessed ids are 0 (= silent per windows.txt), the
+port's click08 is a documented DELIBERATE divergence — bank the census, row
+movement still needs the user on (a)+(b) hearing bar; either way run the
+honest-negative discipline. Do NOT re-derive FUN_000500e0 (cited), do NOT
+touch k5/planets visuals (R-t428f), do NOT re-run t428 sessions. SEAMS
+carried: T428-B (witness-A lineage), T427-A..F unchanged; T428c-A CLOSED
+t428f.
+
+t428f LANDED 2026-11-19 (k5 GATED OFF LIVE — ORIGIN QUESTION CLOSED AS A
+NON-QUESTION; working log docs/re/_wip_t428f.md F0-F5 + docs/re/planets-ui.md
+§14 + REFUTED-ROUTES R-t428f). (i) LIVE WITNESS (run
+work/r1/dbg-t428f-20261119-210504, tool scripts/r428f_k5_session.py): BP
+0x3c7cd fired on the planet-detail paint with the paint head control (blit1
+0x3b9df) firing the SAME paint; eax = PLANLIST widget head 0xfe6814 (magic
+0x12345678 + NAME@+0x20 verified live), DWORD[+0x35]==0 -> cmpl $-1 FAILS ->
+k5 fetch+blit NEVER execute (k5_blit leg armed, 0 fires). Offline: PLANLIST
++0x35==0 in 20/20 bank-t251-live1255 slots; 0/126 RAM magic-records hold -1.
+(ii) The t428c (224,107) peak (1566 px, z=18.6) = FALSE POSITIVE (palette
+coincidence); k5 STAYS UNPORTED — porting would add art the vendor does not
+draw. (iii) E6 ARG LAW CORRECTED: the k5 site pushes FIVE explicit args
+($0,$0,$5 + handle + &struct; add $0x14 esp) — "p3/p4/p5 frame leftovers"
+retired (composition law 5caac.c:58-64 stands). (iv) HARNESS LAW F5: cold-leg
+censuses must POLL-BY-BREAK — stock resume_and_rearm's BPDEL * releases a
+pending halt at the NEXT cold leg UNBANKED (attempt 1 lost the gate stop this
+way; the whole-log census then counted the mem_ctl filename as a false fire —
+census filenames must not contain leg signatures). Residual banked: what sets
++0x35=-1 (writers 0x3ab24/0x3d3a7; state never witnessed). LEDGER closes
+NOTHING (strict-close honest negative — planet-screen visuals have no OQ
+owner; t414..t428e precedent; OQ-016/019/027 untouched). GATE_EXIT=0;
+LEDGER AUDIT OK.
+
+<!-- SUPERSEDED t428f assignment (kept for archaeology):
 NEXT t428f — K5 ORIGIN VIA RUNTIME FRAME READ (ordering rationale: t428e
 closed k5's SITE and IDENTITY but proved the origin is statically unpinnable
 — docs/re/_wip_t428e.md E6: fn 0x5caac composes x = p4 + struct[+4] +
@@ -256,6 +305,7 @@ laws (t428d F2/F4), do NOT touch blit-2 (census NEGATIVE E5, stays unported),
 do NOT start the tile-click popup law (task (c) was gated on (a)+(b) landing;
 (b) came back negative). SEAMS carried: T428-B (witness-A lineage),
 T427-A..F unchanged, T428c-A narrowed to k5 ORIGIN ONLY (identity CLOSED).
+-->
 
 t428e LANDED 2026-11-19 (K5 SITE + IDENTITY CLOSED; BLIT-2 CENSUS NEGATIVE;
 working log docs/re/_wip_t428e.md E0-E7 + docs/re/planets-ui.md §13). (i) THE
