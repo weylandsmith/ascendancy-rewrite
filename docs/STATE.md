@@ -229,22 +229,45 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t434 SHIPS SCREEN CYCLE (FIRST: next row in flow order — t424b race
-intro landed 2026-11-20; ordering rationale per the PHASE-16 execution note
-below: t434(ships) -> t435(research) -> t436(species+ability) -> t433(chrome
+NEXT t434b COMPLETE SHIPS SCREEN (FIRST: t434 landed its ink/selection leg
+2026-11-20 — finish the SAME row before advancing to t435; PHASE-16 order
+unchanged: t434b -> t435(research) -> t436(species+ability) -> t433(chrome
 EXACT memory-surface) -> t437(OQ-027b record-field) -> t432(final
-verify+push+handoff)). Row text: full pass — derive the fleet list paint
-(fleetlist law banked t402 era; grade it against vendor now), row art
-(ship class sprites), selection/info panel, per close law. SEAMS carried
-from t424b: speckle generator origin/parameters (t433 route; R-t424b(3)
-bars fitting from the scaled shot), H3 race-colour bytes for races 1..20,
-T428-B (witness-A lineage), T427-A..F unchanged. Derive-before-code +
-iterate-to-clean laws of the PHASE-16 header apply; CONT requeues allowed
-(tag extraction is generic now).
+verify+push+handoff)). Two remaining legs, in order:
+(1) RUN the already-written witness (no new code needed):
+    OUT=/tmp/t434_shots bash scripts/t407_fleetlist_witness.sh &&
+    python3 scripts/t434_witness_census.py /tmp/t434_shots/fleet-rows.png
+    — expects name/location green-family ink, ZERO cyan, WHITE on the
+    selected row 0 name band, navy-frame px ~0 (census thresholds in the
+    script). If green is absent on OUR render, the ink path (ui.cpp
+    palInk/chromePaletteArgb, ~line 1960) has a bug — fix, rebuild, rerun.
+(2) ROW ART identity (sprite column MEASURED x27..122 row0): the vendor
+    blits a per-ship render at row left; smship/dkship TOC probes this
+    iteration were INCONCLUSIVE (honest negative _wip_t434.md F5/F6). Route:
+    fn 0x50d12 push sequence 0x50d28..0x50d86 (work/t434_fleetwin.asm) names
+    the library/record args — decode the blit call's shape-pointer chain,
+    do NOT guess from filenames (R-t434 premise: filename==record is
+    unproven). SEAMS carried: speckle params (t433), H3 race bytes 1..20,
+    T428-B, T427-A..F unchanged. Derive-before-code + iterate-to-clean.
 
 SEAMS/OQ standing notes:
  SEAMS carried: speckle generator origin (t433),
 H3 race bytes 1..20, T428-B (witness-A lineage), T427-A..F unchanged.
+
+t434 LANDED 2026-11-20 (SHIPS SCREEN INK/SELECTION LEG; ROW ART STAYS OPEN;
+docs/re/_wip_t434.md F0-F6). (i) PAINT LAW [verified fn 0x50d12 0x50d50..
+0x50d8d, work/t434_fleetwin.asm]: row name+location drawn game.pal[raceByte*4
++0x13] (race row +0x1, stride 0x1ee, BYTE-masked 0x50d6c), SELECTED row
+overrides to immediate 0xf3 == pal[243] white — same law family as t427
+planets rows. Witness [measured t253]: row1 name band 48px (255,255,255),
+rows 0/2/3 (0,170,82) green, ZERO cyan. (ii) PORT DEFECTS FIXED: fixed-cyan
+location line, synthetic navy row frame + green marker (t253 census: vendor
+paints NEITHER). fleetRowPalIndex() in fleetlist.h; 3 pins
+tests/test_fleetlist_t434.cpp; BUILD clean, run_tests 457/457. (iii) HONEST
+NEGATIVE: row-art library identity NOT closed (smship/dkship TOC probes
+inconclusive; F5/F6) — t434b leg (2) routes via the 0x50d12 blit arg chain,
+NOT filenames. Witness census script written (scripts/t434_witness_census.py)
+but UNRUN — t434b leg (1). NO OQ closed this iteration (strict-close).
 
 t424b LANDED 2026-11-20 (RACE INTRO BACKGROUND + INK FIXED; docs/re/
 _wip_t424b.md F0-F5 + REFUTED-ROUTES R-t424b + _wip_t415.md corrections).

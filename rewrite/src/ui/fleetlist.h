@@ -118,6 +118,24 @@ inline constexpr Rect kFleetScrollCol{606, 48, 635, 470};
 // Rows own the table left of the scroll column.
 inline constexpr int kFleetRowsRight = 605;
 
+// ---- t434 SELECTION/INK LAW [verified fn 0x50d12 pushes] -----------------
+// The vendor paints the row NAME (and its ship render, 0x50d28..0x50d86)
+// with game.pal[raceColourByte*4 + 0x13] UNSELECTED, and OVERRIDES the
+// colour to 0xf3 == pal[243] (white) when the row is selected:
+//   0x50d50..0x50d77  eax = BYTE_HI(race row 0x12e18+2 + spec*494);
+//                     idx = eax*4 + 0x13 -> [esp+0x154] (the blit colour)
+//   0x50d7e..0x50d8d  test edi,edi; je keep;  mov [esp+0x154], 0xf3
+// The same law governs the planets-list row text (t427 F6: WHITE selected,
+// GREEN unselected) — MEASURED a second time here on
+// work/screens/t253/fleet_open_game.png: row 1 name band 48 px
+// (255,255,255), rows 0/2/3 (0,170,82) = pal[0*4+0x13] through the DOSBox
+// conversion (kIntroRaceBytes[19]==0; t253's Chamachies witness).
+// There is NO marker glyph and NO row frame in the vendor shot (the t407
+// navy frame + green bar were port inventions; deleted t434).
+inline constexpr int fleetRowPalIndex(bool selected, int raceColourByte) {
+    return selected ? 0xf3 : ((raceColourByte & 0xff) * 4 + 0x13);
+}
+
 enum class FleetHit { None, ArrowUp, ArrowDown, Row };
 struct FleetHitResult {
     FleetHit kind = FleetHit::None;

@@ -28,6 +28,7 @@
 #include "ui/abilitylaw.h"
 #include "ui/speciesmenu.h"
 #include "ui/fleetlist.h"
+#include "ui/raceintro.h"  // t434: kIntroRaceBytes (race colour-byte table)
 #include "ui/researchview.h"
 #include "ui/exitpopup.h"
 #include "ui/sysview.h"
@@ -1954,29 +1955,35 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                        cx, cy + (up ? 3 : -3));
                 }
                 const std::string shipName = fleetShipName(camp);
+                // t434 INK/SELECTION LAW [verified fn 0x50d12 0x50d50..0x50d8d]:
+                // name + LOCATION are drawn game.pal[racebyte*4+0x13], the
+                // SELECTED row overrides to pal[243] white (law
+                // fleetRowPalIndex; t253 witness: row 1 white 48 px, others
+                // (0,170,82)). NO row frame, NO marker glyph (t253 census:
+                // pure-black field between rows — the t407 navy frame and
+                // green bar were port inventions).
+                const int ps = camp.playerSpecies();
+                const int raceByte =
+                    (ps >= 0 && ps < 21) ? kIntroRaceBytes[ps] : 0;
+                auto palInk = [](int idx) {
+                    const uint32_t argb = chromePaletteArgb(idx);
+                    return SDL_Color{uint8_t((argb >> 16) & 0xff),
+                                     uint8_t((argb >> 8) & 0xff),
+                                     uint8_t(argb & 0xff), 255};
+                };
                 for (size_t i = 0; i < win.size(); i++) {
                     const auto& sh = camp.fleet()[win[i].fleetIndex];
                     const int y = kFleetRowsTop + int(i) * kFleetRowPitch;
-                    // selection marker (CVD-safe luminance bar, statuslist
-                    // precedent; the vendor's own marker is art this port
-                    // does not have)
-                    if (fleetScroll + int(i) == fleetSel) {
-                        SDL_Rect mk{20, y + 20, 10, 15};
-                        SDL_SetRenderDrawColor(ren, 0, 200, 80, 255);
-                        SDL_RenderFillRect(ren, &mk);
-                    }
-                    // row frame (PORT vector; no fleet backdrop art exists)
-                    SDL_Rect rf{60, y, kFleetRowsRight - 60,
-                                kFleetRowPitch - 8};
-                    SDL_SetRenderDrawColor(ren, 40, 40, 56, 255);
-                    SDL_RenderFillRect(ren, &rf);
-                    SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);
-                    SDL_RenderDrawRect(ren, &rf);
-                    // NAME column green at x159 (MEASURED); LOCATION at
-                    // x389 (MEASURED) — the #146 lane string, ETA default 1
+                    const bool sel = fleetScroll + int(i) == fleetSel;
+                    const SDL_Color ink =
+                        palInk(fleetRowPalIndex(sel, raceByte));
+                    // NAME column at x159 (MEASURED); LOCATION at x389
+                    // (MEASURED) — the #146 lane string, ETA default 1
                     // (the port's transit resolves at the next boundary).
-                    txt.draw(ren, 159, y + 10, shipName, true,
-                             SDL_Color{0, 230, 90, 255});
+                    // t434: the vendor draws BOTH lines in the same row ink
+                    // (t253 location band census: (0,170,82) green, zero
+                    // cyan px) — the previous fixed-cyan was a port defect.
+                    txt.draw(ren, 159, y + 10, shipName, true, ink);
                     const auto& dest = camp.galaxy().stars[sh.target];
                     const std::string loc = fleetLaneLocation(dest.name, 1);
                     // multi-line draw: split on '\n' (the renderer draws one
@@ -1989,7 +1996,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                  loc.substr(pos, nl == std::string::npos
                                                      ? std::string::npos
                                                      : nl - pos),
-                                 false, SDL_Color{0, 200, 220, 255});
+                                 false, ink);
                         if (nl == std::string::npos) break;
                         pos = nl + 1;
                         ly += 14;
