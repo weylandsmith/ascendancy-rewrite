@@ -85,10 +85,13 @@ def rows(path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ledger", default="docs/OPEN-QUESTIONS.md")
+    # t440: OQ-027 CLOSED ((b) t437 SOUNDCHANNEL measurement + (a) t440 tune-
+    # table save witness; pin audio_tuneid_zero_based_t440) — removed from this
+    # default the same way t367/t292/t195 removed their closed rows.
     # t388b: OQ-027 (intro TUNEID base + per-button SFX id) OPENED with the
     # sound-fidelity row — added to this default the same way t193 opened
     # OQ-026.
-    ap.add_argument("--expect", default="OQ-019,OQ-016,OQ-027")
+    ap.add_argument("--expect", default="OQ-019,OQ-016")
     # t367: OQ-005 CLOSED by the D1 USER RULING (ruling page 2026-11-09 12:45,
     # DECISIONS.md verbatim block; shp.md S28; corner-anchor fallback + pin
     # TEST(shp_corner_anchor_fallback_t367)) — removed from this default the

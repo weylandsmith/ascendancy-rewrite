@@ -308,14 +308,31 @@ image: the numbers are the real verb ids; the words label them in the file.
   `16` is NEVER stored — the handler ignores its own argument number.
 - case 11 (FADEMUSIC arg): stores type word 0xb at rec+0x206 (0x2ea81);
   CHANNEL -> rec+0x208 (0x2eac2); VOLUME -> rec+0x204 (0x2eb36, word).
-- tick/consumer loop 0x2ed37 (stride-0xc records): 0xb -> 0x2ee72 calls
-  FUN_0004feec(obj, movsx VOLUME); 0x1e -> 0x2edf5: TUNEID==-1 ->
-  FUN_00067b85(handle) (stop), else FUN_000678ec(handle, TUNEID) (play);
-  0x1f -> 0x4f9bc (stop/finish); type 1 -> frame bookkeeping.
-- FUN_000678ec -> FUN_00074a88(handle, tuneid): opens slot table entry,
-  stores tuneid at [handle+0x8868]; the tune table is heap-relative, so the
-  BASE (0- vs 1-indexed) is NOT statically decidable — same limitation
-  class as §3.4's +0x48a6 fields.
+- tick/consumer loop 0x2ed37 (stride-0xc records): type word read at 0x2ee9e
+  (`mov ax,[edx+0x206]`), dispatch 0x2eea5..0x2eebd MEASURED t440: ax==3 ->
+  0x2edf5; ax==0x1e (DIGITALMUSIC) -> 0x2ee3b; ax==0x1f -> 0x2ee5c (stop);
+  ax==0xb (FADEMUSIC) -> 0x2ee72 calls FUN_0004feec(obj, movsx VOLUME);
+  else "Bad Track Event" reporter 0x2eec7.
+- t440 CORRECTION (the §6.1 closure-bar premise was built on this): the older
+  text here claimed "0x1e -> 0x2edf5: TUNEID==-1 -> FUN_00067b85(handle), else
+  FUN_000678ec(handle,TUNEID)". FALSE — 0x2edf5 is the ax==3 branch. The real
+  DIGITALMUSIC target 0x2ee3b is `b8 38 86 07 00` (mov eax, AUDIO_OBJ — a
+  fixup slot) `8b 92 08 02 00 00` (mov edx,[edx+0x208] = TUNEID) `0f bf d2`
+  `e8 1c 0a 02 00` (call 0x4f86c). FUN_00074a88 (the [handle+0x8868] setter,
+  0x74a99) is a PIT/timer-slot path — 0x74307 scans the STATIC slot table
+  0x87e8/0x8868 (16 dwords), 0x742d4 -> 0x742a4 out 0x43/0x40 = 8253 PIT — that
+  the DIGITALMUSIC cue never calls. Its tuneid is a SAMPLE-RATE value
+  (0x742f5/0x742f7 eax = tuneid*10000/8380), not a music.txt index.
+- THE TUNE TABLE IS STATICALLY ADDRESSED (t440, closes §6.3's base question;
+  see §6.3a for the witness). FUN_0004f86c @0x4f86c (esi = audio object,
+  edi = TUNEID): 0x4f87a/0x4f883 no-device guard ([+0x22b]==-1 or [+0x20b]==0
+  -> return 0); 0x4f896/0x4f89a range check tuneid<0 || tuneid>=WORD[+0x6fa]
+  -> error 0x2963; 0x4f929 movsx edx,di / 0x4f92c lea eax,[edx*8] / 0x4f933
+  sub eax,edx / 0x4f93a shl eax,2 => eax = tuneid*28 (NO -1, NO bias);
+  0x4f93d lea edx,[esi+0x37a] / 0x4f945 add edx,eax => NAME = obj+0x37a +
+  tuneid*28; 0x4f947 lea eax,[esi+0x240] / 0x4f94d call 0x207ac (name lookup in
+  the LOADED container — not a DOS open); 0x4f9aa mov WORD [esi+0x6fc],di
+  (current tune id, same index space).
 
 ### 6.2 VOLUME law [verified]
 FUN_0004feec @0x4feec: stores the volume byte at [audioObj+0x6fe] ONLY when
@@ -334,15 +351,18 @@ audio_vendor_volume_scale_law.
 (file order: the VOLUME-127 line precedes the TUNEID-7 block, so the dip
 100->30 recovers to full volume ON the switch frame.) Pin
 audio_subtitle_script_cues_oq018 pins these lines byte-exactly.
-TUNEID->track mapping [inferred, NOT statically decidable — §6.1]: 1-based
-music.txt reading 6=intro00.raw, 7=intro01.raw. Consistency witness:
-intro00 2,000,000 B = 90.7 s @22050 mono covers frames 20..988 (80.6 s)
-without looping; intro01 479,670 B = 21.75 s covers the movie tail (988 ->
-1144 frames = 11.1 s) plus title handoff. The 0-based reading (6=intro01
-looping ~4x over 80.6 s, 7=race00 as intro music) is structurally possible
-but content-incoherent. HONEST STATUS: 1-based banked as the port's law,
-labelled inferred; a USER listening check (intro tune count/character) is
-the closing witness if ever needed.
+TUNEID->track mapping [MEASURED t440 — the older "inferred / NOT statically
+decidable" status is SUPERSEDED by §6.1's index law + the save witness §6.3a]:
+ZERO-BASED into the 29-entry music.txt-order table (theme00 = 0), so
+6=data\intro00.raw and 7=data\intro01.raw. The size story survives intact and
+is CONSISTENT with the measured base: intro00 2,000,000 B = 90.7 s @22050 mono
+covers frames 20..988 (80.6 s) without looping; intro01 479,670 B = 21.75 s
+covers the tail (988 -> 1144 frames = 11.1 s) plus title handoff. REFUTED by
+the RAM read: (i) the older text's claim that the base is undecidable and its
+warning that "0-based would loop intro01 ~4x, 7=race00" — that alternative was
+muddled arithmetic (under the measured law 0-based IS the scheme and gives
+6=intro00); (ii) any strict 1-based reading (theme00=1 -> 6=victory,
+7=intro00). The port's OUTCOME (6->intro00, 7->intro01) was already right.
 Rewrite: AudioEngine::trackNames() = {theme00, intro00, intro01} (cited
 members only; race00..20 stay UNLOADED — the race->theme selector never
 materialised in any capture, §3.3); playIntro(flic, maxFrames, audio) fires
@@ -351,6 +371,29 @@ the cue table at frame index == FRAMENUMBER-1 (the FRAMENUMBER base is
 (theme00, the captured-selector law §3.3) after the movie. playTune switch
 law: different tune replaces, same tune never restarts, -1 stops (vendor
 TUNEID -1 path). Pins audio_tune_switch_law + audio_music_tune_table_law.
+
+### 6.3a t440 SAVE WITNESS: the loaded tune table read from a banked save
+Probe scripts/t440_music_table.py, bank work/r1/bank-t438-ring-2200 (41..60).
+COORDINATE LAW: a guest LINEAR L lives at Memory-member offset L + H (H=0x88
+here via the BDA signature); the audio object is .bss (data-seg base 0x242000 +
+0x78638) so it exists ONLY in a save, never in the payload file.
+1. The dispatch site is located run-independently: scan the member for the
+   stable tail `8b 92 08 02 00 00` and read the `b8 imm32` fixup before it ->
+   runtime audio-object linear 0x2ba638 (site linear 0x1ee28b == P0+0x2ee3b,
+   matching the CLOSED pointer law).
+2. WORD[0x2ba638+0x6fa] = 29 = the 0x4f89a bound = the entry count.
+3. Applying the §6.1 law (obj+0x37a + tuneid*28) decodes 29/29 ASCII names in
+   EXACTLY music.txt order: [0] data\theme00.raw, [1..4] theme01..04,
+   [5] victory, [6] data\intro00.raw, [7] data\intro01.raw, [8..28]
+   race00..race20.
+4. CENSUS 20/20 saves 41..60: identical esi 0x2ba638, count 29, [6]=intro00,
+   [7]=intro01 (VERDICT PASS, RC=0). WORD[+0x6fc] (the id stored by 0x4f9aa)
+   reads 2..4 across slots — same 0-based space (theme00..04 menu band).
+=> TUNEID IS ZERO-BASED. No debugger session, scratch tree, or INT 21h
+breakpoint was needed. METHOD LAW: before arming a debugger on a live game,
+check whether the target is (i) named by a fixup-addressed operand and (ii)
+resident in a banked save.
+
 Instrument: --audio-trace prints `sfx <name>` / `music <n> <name>` (fflush)
 per played sound — wiring is machine-verified, hearing stays the USER's
 grade (R13). Live witness 2026-11-14 (scripts/_wip_t388b_intro_witness.sh,

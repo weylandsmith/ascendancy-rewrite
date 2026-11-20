@@ -240,8 +240,8 @@ TEST(audio_subtitle_script_cues_oq018) {
     while ((n = std::fread(buf, 1, sizeof(buf), f)) > 0) all.append(buf, n);
     std::fclose(f);
     // DIGITALMUSIC lines: TUNEID 6 at FRAMENUMBER 20, TUNEID 7 at 988
-    // (1-based music.txt reading -> intro00 over the bulk of the movie,
-    // intro01 over the tail — audio.md §6.3; sizes fit that order only).
+    // (intro00 over the bulk of the movie, intro01 over the tail — audio.md
+    // §6.3; TUNEID base measured t440, see audio_tuneid_zero_based_t440).
     CHECK(all.find("DIGITALMUSIC  16\r\nTUNEID        6\r\nCOMMAND       1\r\nFRAMENUMBER   20 ") != std::string::npos);
     CHECK(all.find("DIGITALMUSIC  16\r\nTUNEID        7\r\nCOMMAND       1\r\nFRAMENUMBER   988 ") != std::string::npos);
     // FADEMUSIC ramp: 100/80/60/30 at 966/971/976/981, 127 at 988
@@ -275,6 +275,67 @@ TEST(audio_music_tune_table_law) {
     CHECK(s.rate == 22050);
     CHECK(s.channels == 1);
     CHECK(std::abs(int(s.pcm.front()) - 0x80) <= 4);
+}
+
+TEST(audio_tuneid_zero_based_t440) {
+    REQUIRE_DATA();
+    // MEASURED LAW (t440, audio.md 6.1 + 6.3a): the vendor's DIGITALMUSIC
+    // consumer FUN_0004f86c indexes names at obj+0x37a + tuneid*28 with NO
+    // bias (0x4f929 movsx / 0x4f92c lea [edx*8] / 0x4f933 sub eax,edx /
+    // 0x4f93a shl 2 => tuneid*28), bounds-checked against WORD[obj+0x6fa]
+    // (0x4f89a), which reads 29 in 20/20 banked saves
+    // (scripts/t440_music_table.py VERDICT PASS). The table decodes in
+    // music.txt order, so TUNEID is a ZERO-BASED index: 6=intro00, 7=intro01.
+    // Leg 1: the vendor data agrees with the measured base.
+    std::FILE* f = std::fopen((kRepo + "/extracted/ascend00/music.txt").c_str(), "rb");
+    CHECK(f != nullptr);
+    if (!f) return;
+    std::string all;
+    char buf[4096];
+    size_t n;
+    while ((n = std::fread(buf, 1, sizeof(buf), f)) > 0) all.append(buf, n);
+    std::fclose(f);
+    std::vector<std::string> lines;
+    size_t pos = 0;
+    while (pos < all.size()) {
+        size_t e = all.find('\n', pos);
+        if (e == std::string::npos) e = all.size();
+        std::string l = all.substr(pos, e - pos);
+        while (!l.empty() && (l.back() == '\r' || l.back() == ' ')) l.pop_back();
+        if (!l.empty()) lines.push_back(l);
+        pos = e + 1;
+    }
+    // Line 0 is the COUNT line ("29"); the names follow in file order.
+    CHECK(!lines.empty() && lines[0] == "29");
+    CHECK(lines.size() == 30);                       // 1 count + 29 names
+    if (lines.size() == 30) {
+        const std::string* L = lines.data() + 1;     // L[t] = TUNEID t
+        CHECK(L[0] == "data\\theme00.raw");
+        CHECK(L[6] == "data\\intro00.raw");
+        CHECK(L[7] == "data\\intro01.raw");
+        CHECK(L[8] == "data\\race00.raw");
+    }
+    // Leg 2: the port's cue translation lands on the same tunes the vendor
+    // names. trackNames() is the port's OWN subset, so the invariant is the
+    // PAIRING, not the numeric index: vendor 6 -> intro00, vendor 7 -> intro01.
+    const auto& t = ascend::ui::AudioEngine::trackNames();
+    CHECK(t.size() == 3);
+    if (t.size() == 3) {
+        CHECK(t[1] == "intro00");
+        CHECK(t[2] == "intro01");
+        CHECK(t[1] != t[2]);                         // a swap is detectable
+    }
+    // Leg 3: the intro cue table maps the two DIGITALMUSIC frames to the
+    // intro members in vendor order (frame 20 -> intro00, 988 -> intro01).
+    std::FILE* s = std::fopen((kRepo + "/rewrite/src/ui/ui.cpp").c_str(), "rb");
+    CHECK(s != nullptr);
+    if (s) {
+        std::string src;
+        while ((n = std::fread(buf, 1, sizeof(buf), s)) > 0) src.append(buf, n);
+        std::fclose(s);
+        CHECK(src.find("{20, 1, -1},") != std::string::npos);
+        CHECK(src.find("{988, 2, -1},") != std::string::npos);
+    }
 }
 
 TEST(audio_vendor_volume_scale_law) {

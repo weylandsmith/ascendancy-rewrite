@@ -2621,9 +2621,11 @@ int playIntro(const std::string& flicPath, int maxFrames, AudioEngine* audio) {
         return 1;
     }
     // SUBTITLE.TXT cue table (the vendor subtitle script for this movie;
-    // law + addresses docs/re/audio.md §6). DIGITALMUSIC lines carry the
-    // 1-based music.txt TUNEIDs (6, 7); we address our own loaded table
-    // (audio.cpp trackNames: 0 theme00, 1 intro00, 2 intro01).
+    // law + addresses docs/re/audio.md §6). DIGITALMUSIC lines carry vendor
+    // TUNEIDs 6/7 — ZERO-BASED into the vendor's 29-entry music.txt table
+    // (measured t440, audio.md §6.3a): 6=intro00, 7=intro01. We address our
+    // own loaded table (audio.cpp trackNames: 0 theme00, 1 intro00, 2
+    // intro01), so the translation is 6->1, 7->2.
     struct Cue {
         int frame;   // FRAMENUMBER verbatim from subtitle.txt
         int tune;    // playTune index, or -1 = none

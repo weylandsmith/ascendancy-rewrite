@@ -63,7 +63,8 @@ int runCampaignUi(ascend::game::Campaign& camp, int turns, bool autoplay,
 // on clean finish/interrupt, 1 on load failure.
 // `audio` (t388b, docs/re/audio.md §6): when set, the cited SUBTITLE.TXT
 // cue table fires by frame number — DIGITALMUSIC TUNEID 6 at frame 20 and
-// TUNEID 7 at frame 988 (intro00/intro01 on the 1-based music.txt law),
+// TUNEID 7 at 988 (intro00/intro01; TUNEID is 0-based into the vendor's
+// 29-entry music.txt table, measured t440 audio.md §6.3a),
 // FADEMUSIC VOLUME 100/80/60/30 at frames 966/971/976/981 (dip) and 127 at
 // 988 (restore; file order puts the 127 line before the TUNEID-7 block, so
 // volume is restored before the tune switch). The ±1 base of FRAMENUMBER is

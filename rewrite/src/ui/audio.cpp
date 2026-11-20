@@ -84,8 +84,12 @@ const std::vector<std::string>& AudioEngine::trackNames() {
     //  1 intro00  2 intro01  -- the intro-movie script law: subtitle.txt
     //    DIGITALMUSIC/TUNEID 6 at FRAMENUMBER 20 and TUNEID 7 at 988, with
     //    the FADEMUSIC dip 100->30 at frames 966-981 and VOLUME 127 restore
-    //    at 988 (audio.md §6; the 1-based TUNEID reading banked there —
-    //    0-based would loop intro01 ~4x and play race00 over the opening).
+    //    at 988 (audio.md §6). TUNEID IS ZERO-BASED into the vendor's 29-
+    //    entry music.txt-order table -- MEASURED t440 (index law 0x4f929..
+    //    0x4f945 obj+0x37a+tuneid*28; table read from banked saves 20/20,
+    //    scripts/t440_music_table.py): vendor 6 = intro00, vendor 7 =
+    //    intro01. This vector is the port's OWN loaded subset; the cue
+    //    table in ui.cpp translates vendor ids 6/7 to indices 1/2.
     // The race00..20 themes stay UNLOADED: the race->theme selector never
     // materialised in any capture (OQ-018 residue, §3.3) — named seam.
     static const std::vector<std::string> kNames{"theme00", "intro00",

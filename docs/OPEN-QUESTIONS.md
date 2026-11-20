@@ -287,7 +287,7 @@ open per D3. t397: D11 grading page is the answer channel
 acceptance close still requires the USER ruling, nothing closed here.
 
 OQ-027 | audio | intro TUNEID index base + per-button vendor SFX id
-| open | OPENED t388b 2026-11-14 (docs/re/audio.md §6). Two named residues
+| CLOSED 2026-11-20 t440 | OPENED t388b 2026-11-14 (docs/re/audio.md §6). Two named residues
 of the sound-fidelity row. (a) TUNEID base: subtitle.txt DIGITALMUSIC
 TUNEID 6@FRAMENUMBER 20 / 7@988 maps into music.txt either 0- or 1-based;
 the tune table is heap-relative (FUN_00074a88 stores [handle+0x8868]; same
@@ -358,9 +358,36 @@ SITE CHANGED: rewrite/src/ui/audio.cpp sfxForPress RailButton/NextTurn/
 TitleButton click08 -> "button" (click08 off-manifest, vendor-unreachable);
 MapClick nullptr now cited. Pin sfx_press_buttons_button_t437; witnesses
 t404_sfx_witness.sh + t395_sound_witness.sh updated to "sfx button", both live
-VERDICT PASS. ITEM (a) (TUNEID index base) STAYS OPEN on its own bar: user
-hearing (D12 item 5 pending) or a heap tune-table capture read. ROW STAYS OPEN
-until (a) lands.
+VERDICT PASS. t440 update (docs/re/audio.md S6.1/S6.3/S6.3a, trail docs/re/_wip_t440.md F0-F7;
+adopted from a killed session whose draft contained three errors, all corrected
+and re-verified end-to-end): ITEM (a) IS CLOSED BY MEASUREMENT — the row's own
+named bar ("a capture read of the ... tune table") is met, and the
+"heap-relative" PREMISE of that bar is REFUTED (it described the wrong
+subsystem). (i) audio.md S6.1's dispatch claim was FALSE: the type-word
+dispatch 0x2eea5..0x2eebd sends 0x1e (DIGITALMUSIC) to 0x2ee3b — mov eax,0x78638
+(fixup slot); mov edx,[rec+0x208]; movsx; call 0x4f86c — NOT to 0x2edf5 (that is
+the ax==3 branch); FUN_00074a88's [handle+0x8868] is a PIT/timer-slot table the
+cue never calls (0x742f5 eax=tuneid*10000/8380 -> PIT 8253). (ii) THE OBJECT IS
+NAMED BY THE INSTRUCTION: the save's copy of site 0x2ee3b reads b8 38 a6 2b 00
+(Watcom fixup) -> runtime LINEAR 0x2ba638; found run-independently by scanning
+the Memory member for tail 8b 92 08 02 00 00 (site linear 0x1ee28b == P0+0x2ee3b,
+pointer law consistent). COORDINATE LAW banked: member offset = linear + H; the
+object is .bss (0x242000+0x78638), exists ONLY in saves. (iii) THE INDEX LAW
+0x4f929..0x4f945 (movsx di; lea [edx*8]; sub edx; shl 2; lea edx,[esi+0x37a];
+add) = obj+0x37a + tuneid*28, NO bias; bound WORD[+0x6fa]==29 (0x4f89a).
+(iv) WITNESS: applying the law to banked work/r1/bank-t438-ring-2200 decodes
+29/29 pitch-28 names in EXACTLY music.txt order ([0] theme00 ... [5] victory,
+[6] data\\intro00.raw, [7] data\\intro01.raw, [8..28] race00..20); CENSUS
+20/20 saves 41..60 identical (scripts/t440_music_table.py VERDICT PASS RC=0).
+=> TUNEID IS ZERO-BASED: 6=intro00, 7=intro01. REFUTED: the 1-based port
+justification (theme00=1 -> 6=victory) AND the older docs' scare that "0-based
+would loop intro01, 7=race00" (muddled arithmetic). CODE SITE: port OUTCOME was
+already correct; comments corrected to the measured law in rewrite/src/ui/audio.cpp
+trackNames(), rewrite/src/ui/ui.{h,cpp} cue table; pin audio_tuneid_zero_based_t440
+(music.txt 0-based indices + cue pairing {20->1},{988->2}; mutation-verified:
+cue-swap mutant CAUGHT) — 467 tests 0 fail. No debugger session/scratch tree/
+INT 21h breakpoint needed; D12 item 5 (user hearing) is now MOOT for (a).
+ROW CLOSED: (b) t437 measurement+code-site, (a) t440 capture read+code-site.
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor cost hack, Orbital Docks effect

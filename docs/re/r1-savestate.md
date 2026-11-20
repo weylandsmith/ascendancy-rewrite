@@ -1047,3 +1047,19 @@ window title ("sent button1 to 0x200008 ... window died before release") run
 their OWN scratch window; a production :9 session coexisting did not break them
 (gate green with production live), but xsend's "window died before release"
 text is NOT evidence of a dead window — do not chase it.
+
+## TWO SAVE COORDINATE SYSTEMS — NEVER MIX THEM (t440)
+The zip member "Memory" holds the guest's whole linear RAM at a constant slide:
+  member offset = guest LINEAR + H        (H from the BDA signature, 0x88 here)
+The B+P0+file-offset form (the CLOSED pointer law, OQ-011) applies to payload
+CONTENT only: B = the payload's runtime base (find_base vote), P0 = B - H.
+Reading a .bss global as mem[B + 0x78638] returns garbage — the payload is
+0x8cc83 B while the data segment runs to 0x242000+..., so .bss objects exist
+ONLY in the L+H system. MEASURED t440: audio object file-slot 0x78638 ->
+runtime LINEAR 0x2ba638 (save fixup b8 38 a6 2b 00 at the dispatch site);
+table name at linear 0x2baa3a = member 0x2baac2, while the naive B+0x78638
+read decoded nothing (scripts/t440_music_table.py first draft, RC=1).
+RUN-INDEPENDENT LOCATOR (prefer it to base math): scan the member for a stable
+instruction tail and read the fixup immediate before it — scripts/
+t440_music_table.py locates the dispatch (site linear 0x1ee28b == P0+0x2ee3b,
+pointer-law consistent) and the object linear in one pass, no anchors.

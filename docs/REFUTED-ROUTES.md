@@ -1536,3 +1536,25 @@ that spends probes trying to get back to it is wasted:
 Corollary for every future capture driver: if a sitting's evidence depends on
 a particular campaign state, TAKE AN IN-GAME SAVE (Save Game, Alt-S) during the
 sitting. Autosave-ring depth is ~200 s and does not survive the process.
+
+## R-t440. THE "TUNE TABLE IS HEAP-RELATIVE / NOT STATICALLY DECIDABLE" CLASS IS DEAD.
+docs/re/audio.md S6.1 (and the OQ-027 closure bar built on it) claimed the
+DIGITALMUSIC tune table is reached via [handle+0x8868] and is therefore
+heap-relative, "same limitation class as S3.4's +0x48a6 fields". FALSE twice
+(t440, instruction-verified + 20/20 banked-save census):
+- 0x2ee3b (the real type-0x1e target) calls FUN_0004f86c on eax = a Watcom
+  FIXUP SLOT (file 0x78638 -> runtime linear 0x2ba638); FUN_00074a88/[handle+
+  0x8868] is a PIT/timer-slot path (0x74307 scans static 0x87e8/0x8868; 0x742f5
+  eax = tuneid*10000/8380 -> PIT 8253) that the cue NEVER calls. Its "tuneid"
+  is a sample-rate value, not a music index.
+- The name table is read at obj+0x37a + tuneid*28 (0x4f929..0x4f945) from RAM
+  that sits in every banked save at member offset linear+H.
+DO NOT spend a debugger session, scratch tree, or INT 21h AH=3D breakpoint on
+"the table needs a live open" — scripts/t440_music_table.py answers it from a
+bank (VERDICT PASS 20/20, 0 mismatched). GENERALISE before arming a debugger on
+a live game: is the target (i) named by a fixup-addressed operand and (ii)
+resident in a banked save? Both true here; the live route was the second choice.
+SECOND DEAD END: grepping work/ascend_payload.bin for the object's
+bytes — the audio object is .bss (data-seg base 0x242000 + 0x78638, payload is
+0x8cc83 B), so it exists ONLY in save states; payload bytes at the naive
+"same offset" are unrelated garbage (measured t440).

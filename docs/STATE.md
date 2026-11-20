@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-20T22:35
+updated: 2026-11-20T17:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -31,6 +31,18 @@ ledger:
       ('Your score is 42%', 'Interstellar Subjugator'); law distilled
       docs/re/score.md S20; rewrite arm campaign.cpp:2157 upgraded t291 to the
       cited law (pins test_control_t291.cpp x4 mutation-verified)."
+    - "OQ-027 intro TUNEID index base + per-button vendor SFX id CLOSED
+      2026-11-20 t440 ((b) t437 + (a) t440). (a) MEASURED ZERO-BASE: DIGITALMUSIC
+      dispatch 0x2ee3b calls FUN_0004f86c on static audio obj (save fixup
+      runtime linear 0x2ba638); index law 0x4f929..0x4f945 obj+0x37a+tuneid*28
+      NO bias, bound WORD[+0x6fa]==29; table 29/29 music.txt order in 20/20
+      banked saves (scripts/t440_music_table.py PASS) -> TUNEID 6=intro00,
+      7=intro01; 'heap-relative/not statically decidable' REFUTED (audio.md
+      S6.1/S6.3a); port outcome already correct, comments cited, pin
+      audio_tuneid_zero_based_t440 mutation-verified. (b) windows.txt
+      SOUNDCHANNEL -> record +0x59 == 0 on 2400/2400 x 20 saves: vendor plays
+      manifest[0] 'button' on file-declared presses, nothing on map
+      (audio.md S6.9); sfxForPress upgraded + pin sfx_press_buttons_button_t437"
     - "OQ-026 visibility layer CLOSED 2026-10-29 t195 (implement+pin, the
       row's own closure bar set t194): rewrite campaign.{h,cpp} models
       laneVis_ (rec+0x20) + starLaneVis_/starSelVis_ (obj +0x16/+0x17 twins,
@@ -181,14 +193,6 @@ ledger:
       the fn(0x17c54)/fn(0x16147) walk — income-law.md S-T326.)"
     - "OQ-019 ship design model (hull+gizmo inventory, cost hack, Orbital
       Docks); per-ship combat application = OQ-010 aggregate caveats S2i"
-    - "OQ-027 audio intro TUNEID index base + per-button vendor SFX id
-      (OPENED t388b 2026-11-14): tune table heap-relative (FUN_00074a88
-      stores [handle+0x8868]) so the 0/1-base of subtitle.txt TUNEID 6/7 is
-      not statically decidable — port law 1-based (6=intro00, 7=intro01,
-      sizes-fit-only witness); closes on user hearing or pointer-law capture
-      of the heap table. Per-button SFX ids come from runtime control fields
-      +0x1bcc/+0x1bce (windows.txt SOUNDCHANNEL census {0 x118, -0 x1} = no
-      id); port click names stay documented choices. law docs/re/audio.md §6"
 
 ## WHAT IS IN HAND (tools + laws — start here, not from scratch)
 Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
@@ -229,65 +233,51 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t440 OQ-027(a) TUNEID INDEX BASE — LIVE TUNE-TABLE / FILE-OPEN CAPTURE
-(ordering rationale: t439 restored a live production game, so for the first
-time since 2026-11-11 every live route is executable again; of the three open
-rows this is the ONLY one that is machine-closable without a user. OQ-016's
-residue list is EXHAUSTED and its remaining sub-law is user adjudication per
-D3; OQ-019's scripted-mouse session class is BUDGET-SPENT by binding law
-(REFUTED-ROUTES.md:465-467 — t293 x3 + t297 x1 + t298 x3, "the next witness on
-the selection/order legs is the debugger class"), so do NOT run
-scripts/r297_order_session.py; OQ-027(a) closes on "a capture read of the heap
-tune table via the pointer law" (docs/OPEN-QUESTIONS.md OQ-027) and needs one
-debugger session on the intro path. The t438 handoff listed r297 as an option —
-that suggestion is SUPERSEDED by the t298 budget law, which t439 checked.)
-
-THE QUESTION (verbatim from the ledger): subtitle.txt DIGITALMUSIC
-TUNEID 6@FRAMENUMBER 20 / 7@988 maps into music.txt either 0- or 1-based. Port
-law in force is 1-based (6=intro00, 7=intro01) on a SIZE argument only
-(intro00 2,000,000 B = 90.7 s covers frames 20..988 unlooped). audio.md S6.1
-proves the base is NOT statically decidable: FUN_000678ec -> FUN_00074a88
-(handle, tuneid) "opens slot table entry, stores tuneid at [handle+0x8868]" and
-the table is heap-relative.
+NEXT t441 = CLOSE SEAMS T436-A / T436-B (species-screen portrait COUNT law and
+owner->racering ring INDEX law) — OFFLINE-FIRST census, capture only if the
+bank cannot answer (ordering rationale: after t440 the open ledger is
+OQ-016 + OQ-019 and BOTH are user-gated — OQ-016's residue list is EXHAUSTED
+and its remaining sub-law is USER ADJUDICATION per D3; OQ-019 needs the
+debugger class per the t298 budget law (REFUTED-ROUTES.md:465-467) plus user
+acceptance per D2 — so no machine-closable LEDGER work exists this turn; the
+t439 GOAL.txt rule says continue other open items, and T436-A/B are the two
+named, measurable seams whose subject (the t436b species screen) shipped THIS
+week with the laws still open. The t440 method law applies directly: the race/
+owner tables are save-resident, and the two-coordinate-system rule is now
+pinned in docs/re/r1-savestate.md — do NOT mix member=L+H with B+P0+file.)
 
 DO, in order:
-(1) SCRATCH SESSION ONLY, never production :9. The trigger is the intro, and
-    any New Game writes work/r1/game/RESUME.GAM — the md5-pinned witness
-    5b382afbb789186c3654f3cec085b2e2 and production's only resume store. Copy
-    the scratch tree (work/r1/game -> work/r1/game-t440), give it its OWN ring
-    dir and its OWN Xvfb display, per the two-writer law (t266) and the
-    BLOCKED.md R1 runbook. Production :9 must stay untouched and keep banking.
-(2) TRIGGER the DIGITALMUSIC cue with title-menu row R1 "Play Introduction"
-    (movie-only, no campaign state written). Use the t439 input laws: read the
-    window origin from `DISPLAY=:<n> xwininfo -root -tree | grep -i dosbox`,
-    pass RFB_XOFF/RFB_YOFF to scripts/r287_vncinput.py, hover-verify the band,
-    then a POSITIONAL click (keys are unreliable without X focus — t439
-    negative). If R1 does not reach the subtitle consumer loop, fall back to
-    New Game IN THE SCRATCH TREE and say so in the record.
-(3) INSTRUMENT the open, in preference order, smallest instrument first:
-    (a) DOS INT 21h open (AH=3Dh) breakpoint and read the ASCIIZ name — the
-        name IS the answer (intro00 vs intro01 for TUNEID 6);
-    (b) entry breakpoint on FUN_00074a88 reading the tuneid arg, plus the
-        slot-table base it dereferences, then map the slot back to a name via
-        the music.txt loader FUN_00020fd4 name table (audio.md S3.3);
-    (c) memory read of [handle+0x8868] after the cue.
-    Compose with scripts/r1_dbg_session.py (t327 tool, declarative legs) — do
-    NOT re-derive instrument laws (docs/re/dosbox-debugger.md).
-(4) HAZARD TO CHECK FIRST, and record the answer either way: BLOCKED.md
-    mandates nosound=true for save-state runs, but a nosound build may
-    short-circuit the DIGITALMUSIC path entirely, making the session vacuous.
-    Run the census with sound ENABLED in the scratch conf (production's
-    session.conf already uses nosound=false) and confirm the cue fires before
-    spending legs. A vacuous session is an honest negative, not a result.
-(5) CLOSE ONLY IF the opened track name is read from the live process. Then
-    upgrade rewrite/src/ui/audio.cpp (or the music path that picks intro00) to
-    the cited base, pin it, update docs/re/audio.md S6.1 + the OQ-027 row. If
-    the cue cannot be reached, keep the row open, write the negative, and name
-    the seam. Do NOT re-ask the user (D12 item 5 audio ask is still pending —
-    DECISIONS.md mtime 2026-11-18 13:05, no submission newer than HEAD; the
-    ruling page server is up on :8613).
+(1) READ FIRST: docs/re/ui-runtime.md "t436b SPECIES SCREEN" + _wip_t436.md
+    F9/G-laws (what was measured: 4 rings vs 3 known rows; ring rec index ==
+    colour index per t423c2; port draws racering k<owner%7>). Do not re-derive
+    the t423c2 law or the smrace/racering asset shapes.
+(2) OFFLINE CENSUS on the FROZEN bank work/r1/bank-t438-ring-2200 (NEVER the
+    live ring, t439 law; member offset = linear + H, H=0x88): enumerate per-
+    owner home-world + species rows (the race/species tables the species
+    screen reads — start from the rewrite's homeStarFor/specnum sources and
+    the t326 known-tech mask law at ds:0x7478e+0x4b*i), and the raceVisibleMask
+    inputs. Hypotheses to test per save: H1 count = #owners with KNOWN rows
+    (port law); H2 count = #owners with home worlds (vendor 4 vs 3 known rows
+    suggests an owner whose row is not yet visible); H3 index = owner%7
+    (T436-B) vs index = species/specnum (t423c2 says ring rec == colour index —
+    disambiguate using owners where species != owner%7).
+(3) IF the bank answers both -> bank the laws in ui-runtime.md (hand-authored;
+    check nothing regenerates it — BLOCKED traps), upgrade the rewrite
+    speciesmenu/ui portrait selection to the cited law, pin it (pattern:
+    tests/test_speciesmenu_t436.cpp x6, mutation-verify), done.
+(4) IF the bank cannot distinguish -> ONE cheap capture leg on the PRODUCTION
+    game (pid in work/r1/vnc/dosbox.pid, HEALTHY as of t440 17:18): open the
+    species screen (state-neutral), screenshot via the t436b witness chain
+    (scripts/t409_species_witness.sh + scripts/t436b_witness_census.py exist),
+    count rings + sample ring colours vs the logged "ui species portrait owner
+    N at x,y" lines. A screenshot census is NOT the budget-spent scripted-mouse
+    class (that law covers selection/order legs, REFUTED-ROUTES t298) — but do
+    not drive any ship/fleet/order control.
+(5) LEDGER: this task touches NO OQ row (seams are not ledger rows). If it
+    incidentally produces a datum that moves OQ-016/019, record it in the row
+    as a note WITHOUT closing (both rows' closure bars are user-side).
 
-GAME STATE t440 STARTS FROM (verified t439, do not re-verify): production pid
+GAME STATE t441 STARTS FROM (re-verified t440 17:18): production pid
 1182156 HEALTHY, TL expiry 2026-11-22 12:02:26, watcher 1182171, ring 41..60
 banking every 10 s, resumed to the strategic map at turn 1086. SITTING TEST:
 compare the TURN via `python3 scripts/t368_ring_turn.py` (baseline 1086), NOT
@@ -298,16 +288,54 @@ SEAMS carried: T433-C chrome generator seed/state (live debugger only, NOT
 queued), T436-A portrait COUNT, T436-B owner->racering index, H3 race bytes
 1..20, T428-B, T427-A..F, gizmo-icon rows + class selector (t434b), research
 panel art join D3 (t435 F6).
-OPEN-LEDGER HANDOFF STATE (unchanged by t439, gate-owners named):
+OPEN-LEDGER HANDOFF STATE (updated t440, gate-owners named):
+OQ-027 CLOSED t440 — do NOT re-open and do NOT re-run the tune-table census
+(scripts/t440_music_table.py PASS 20/20; R-t440 makes the heap-relative premise
+dead). D12 item 5 (audio match/differ on :8613) is MOOT for OQ-027(a): the row
+closed on machine measurement first; a late user answer is a bonus, not a gate.
 OQ-016 = USER ADJUDICATION per D3 (residue list EXHAUSTED; the Phase-Bomb
 nuke-law sub-capture is machine-closable and now has a live game, but it needs
 a Phase-Bomb-carrying fleet built first — expensive, schedule deliberately);
 OQ-019 = user-gated (acceptance of the per-ship sim, docs/re/pership-spec.md)
 + debugger-class witness for the selection/order legs, NOT another scripted
 mouse session (t298 budget law); OQ-027 = item (b) CLOSED with measurement +
-code site (t437), item (a) TUNEID base = t440's target or the user's ears.
+code site (t437), item (a) CLOSED t440 (tune table = static obj+0x37a+tuneid*28,
+20/20 saves, pin audio_tuneid_zero_based_t440).
 NO GIT REMOTE IS CONFIGURED (git remote -v empty) — deliverables are local
 commits only.
+
+t440 LANDED 2026-11-20 (OQ-027 CLOSED — TUNEID INDEX BASE MEASURED, ledger
+open=[016,019]). (i) A prior session was killed mid-task (OPEN-QUESTIONS.md
+edited + _wip_t440.md + t440_music_table.py untracked); its CENTRAL claim was
+true but its draft had THREE errors, all corrected: it called save-member
+0x2baa3a a "payload file offset" (wrong system: member = linear+H; the object
+is .bss 0x242000+0x78638, payload bytes at the naive offset are garbage —
+measured); its script used stride 0xc and mem[B+0x78638] (returned RC=1 as
+left); its 0-vs-1-base scare text ("0-based would loop intro01, 7=race00") was
+muddled arithmetic. LESSON: an adopted draft's self-report is a hypothesis —
+re-verified every address this iteration before banking. (ii) MEASUREMENTS
+(objdump + banked saves, zero capture): DIGITALMUSIC dispatch 0x2ee9e/0x2eeb7
+-> 0x2ee3b `b8 38 86 07 00` (fixup -> runtime linear 0x2ba638) call 0x4f86c;
+0x4f89a bounds WORD[obj+0x6fa]==29; index law 0x4f929..0x4f945 = obj+0x37a +
+tuneid*28 NO bias; 29/29 pitch-28 names in EXACTLY music.txt order in 20/20
+saves 41..60 (scripts/t440_music_table.py VERDICT PASS, run-independent
+locator = scan tail 8b9208020000 + read fixup). => TUNEID ZERO-BASED: 6=
+intro00, 7=intro01. audio.md S6.1's dispatch claim + the heap-relative/
+"not statically decidable" class REFUTED -> R-t440 written. (iii) CODE: port
+outcome was already correct (cue table ui.cpp 6->1, 7->2); comments corrected
+in audio.cpp/ui.h/ui.cpp to the measured law; NEW PIN audio_tuneid_zero_based_
+t440 (music.txt 0-based indices + cue pairing; mutation-verified: {20,2}
+swap-mutant CAUGHT); suite 467/0 (was 466). (iv) LAWS banked: r1-savestate.md
+"TWO SAVE COORDINATE SYSTEMS — NEVER MIX THEM" + run-independent locator
+pattern; REFUTED-ROUTES R-t440 generalises: before arming a debugger on a live
+game, check (i) fixup-addressed operand (ii) save-resident — both true here,
+the whole INT 21h/scratch-tree/nosound-vacuity plan was unnecessary. (v)
+RULING CHECK NEGATIVE: d1page find -newermt 2026-11-18 13:05 EMPTY; D2 +
+OQ-019 acceptance still PENDING; D12 item 5 now MOOT for OQ-027(a). (vi)
+LEDGER: OQ-027 row CLOSED (both items measured + code sites); STATE index
+re-derived; ledger_audit --expect -> OQ-019,OQ-016 (rows=20 closed=18 OK);
+gate green. NEXT t441 = seams T436-A/T436-B (offline-first; no ledger row is
+machine-closable until the user rules on D2/D3).
 
 t439 LANDED 2026-11-20 (GAME-RING RECOVERY — LIVE GAME RESTORED, ZERO CAPTURE,
 no OQ closed: recovery enables routes, it measures nothing). (i) DEATH CAUSE
