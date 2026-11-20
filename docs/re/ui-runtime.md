@@ -663,3 +663,29 @@ vs its own map baseline_game.png, plus tools/shp_pngdump decodes.
 - ABILITY LEG: unchanged, wired+witnessed since t409 (open/dismiss/swallow);
   the Use-Ability fire stays the sim-model seam (seed-md5 law).
 - FULL BRIEF for the implementation iteration (t436b): _wip_t436.md F9.
+
+## t436b SPECIES SCREEN (STATE 7) IMPLEMENTATION LANDED (2026-11-20)
+Executed the _wip_t436.md F9 brief end-to-end (measurement leg t436 above;
+implementation evidence G1/G2 in the same file). Landed in rewrite/:
+- ui.cpp: frameTex (chrome mottle) now draws on state 7 as well as the map
+  (cluster zone measured 99.85% identical to the map screen); speciesWellTex
+  (dark-speckle wells over the seven kRaceRows rects) drawn on state 7;
+  populated rows flat navy kStatusWellNavy with the grey 1px outline DELETED
+  and names CENTRED (bbox centre 553 law), Extinct white, flag at row-local
+  (14,3); portraits per KNOWN AI owner at projectStar(homeStarFor(o)) =
+  smrace<specnum> rec0 scale2 clipR49 + racering k<owner%7> scale2 drawn
+  ring-last; raceVisibleMask filters portraits; witness log
+  "ui species portrait owner N at x,y".
+- mapchrome.{h,cpp}: speciesWellAt (chain 45% copy-left + 35% repeat-up,
+  census pal {200:625, 0:257, 196:90}, distinct salt; G1 fit on measured
+  mean run 3.88, iid floor 1.92).
+- speciesmenu.h: kSpeciesRowFlagDx/Dy, kSpeciesPortraitScale/ClipR,
+  kSpeciesRingHalf law constants; seam T436-A (portrait COUNT: vendor
+  capture 4 rings vs 3 known rows; port paints known owners only) and
+  T436-B (owner->racering index = owner%7 reading) stay OPEN, named.
+- PINS tests/test_speciesmenu_t436.cpp x6; suite 466/0.
+- WITNESS scripts/t409_species_witness.sh VERDICT PASS + new census leg
+  scripts/t436b_witness_census.py (venv python): navy 90.4% populated row,
+  100.0% well-family empty slots, ink centre 553 exact, 0 grey-outline px,
+  disc+ring at the logged centre — VERDICT PASS on
+  /tmp/t436b_shots2/species-menu.png (seed 5, --species 0).

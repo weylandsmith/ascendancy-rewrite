@@ -31,8 +31,17 @@
 // ROW CLICK: msg 1 p1 13 = NEGSCREEN, whose chrome is not in the port —
 // the t388 known-set law makes it a NO-OP (never a blank screen). Honest.
 //
-// FOUR LARGE PORTRAITS over the map (t252 vision): art source unmapped
-// (lgraceNN class) = NAMED SEAM, not invented here.
+// FOUR LARGE PORTRAITS over the map (t252 vision): art source CLOSED t436b
+// [measured t252 F5/F7/F8, docs/re/_wip_t436.md]: centred on home stars,
+// content disc r~48 + three-tone owner ring r50..55 == smrace<specnum> rec 0
+// (49x49) at scale 2 clipped r49, ringed by racering k<colour idx> (53x53)
+// at scale 2 (the t423c2 ring-index law: ring record == colour index; the
+// racering decoded palettes green/purple/gold/orange == the four measured
+// rings). SEAM T436-A (open): the capture carries FOUR portraits vs THREE
+// known rows and the player home has NO portrait — the count law is
+// unresolved; the port paints one portrait per KNOWN AI owner (never a
+// fourth invented one). SEAM T436-B: owner->racering colour index is the
+// port's owner%7 reading (uncited for AI owners on this screen).
 #include <string>
 #include <vector>
 
@@ -40,6 +49,11 @@
 #include "game/species.h"
 
 namespace ascend::ui {
+
+inline constexpr int kSpeciesRowFlagDx = 14, kSpeciesRowFlagDy = 3;
+inline constexpr int kSpeciesPortraitScale = 2;   // class scale (t401 law)
+inline constexpr int kSpeciesPortraitClipR = 49;  // disc r (smrace 49 x2/2)
+inline constexpr int kSpeciesRingHalf = 53;       // racering 53x53 at 2x
 
 struct SpeciesRow {
     int owner = -1;         // campaign owner id (1..N)

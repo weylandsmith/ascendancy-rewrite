@@ -316,6 +316,40 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                               &ferr))
             std::printf("ui raceflag lib refused: %s\n", ferr.c_str());
     }
+    // t436b SPECIES-SCREEN PORTRAIT ART [measured t252, _wip_t436.md F5/F7]:
+    // the ringed home-star portraits are smrace<specnum> record 0 (49x49)
+    // scaled 2x clipped to r49, ringed by racering k<colour idx> (53x53)
+    // scaled 2x — the band r50..55 == the measured three-tone owner ring
+    // (t423c2 ring-index law reconfirmed by the palette census F8: racering
+    // palettes decode green/purple/gold/orange == the four measured rings).
+    // Same refuse-once lazy-cache pattern as title.cpp's portraitFor.
+    ascend::formats::ShapeLibrary raceringLib;
+    {
+        std::string rerr;
+        if (!raceringLib.load(
+                dataRoot + "/extracted/ascend01/data/racering.shp", &rerr))
+            std::printf("ui species racering refused: %s\n", rerr.c_str());
+    }
+    std::vector<ascend::formats::ShapeLibrary> speciesPortraitLibs(21);
+    std::vector<bool> spTried(21, false), spOk(21, false);
+    const auto speciesPortraitFor = [&](int specnum)
+        -> const ascend::formats::ShapeLibrary* {
+        if (specnum < 0 || specnum > 20) return nullptr;
+        if (!spTried[size_t(specnum)]) {
+            spTried[size_t(specnum)] = true;
+            std::string perr;
+            spOk[size_t(specnum)] = speciesPortraitLibs[size_t(specnum)].load(
+                dataRoot + "/extracted/ascend01/data/" +
+                    portraitLibName(specnum),
+                &perr);
+            if (!spOk[size_t(specnum)])
+                std::printf("ui species portrait refused: smrace%02d: %s\n",
+                            specnum, perr.c_str());
+            std::fflush(stdout);
+        }
+        return spOk[size_t(specnum)] ? &speciesPortraitLibs[size_t(specnum)]
+                                     : nullptr;
+    };
     // t409 ABILITY DIALOG panels (ui/abilitylaw.h): the help.txt abilNN
     // blocks that the vendor's msg-5 opener sprintf's into ABILITYWIN.
     // Refusal = the Special Ability press logs the seam and no-ops (never
@@ -400,6 +434,32 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 }
             SDL_UpdateTexture(statusSpeckleTex, nullptr, px.data(),
                               w * int(sizeof(uint32_t)));
+        }
+    }
+    // t436b SPECIES-WELL TEXTURE (mapchrome.h speciesWellAt law): the state-7
+    // header slot + the row slots of UNKNOWN species paint the dark-speckle
+    // well [measured t252: header/slot4/5/6 = (8,12,16)~50-63% + (0,0,0)
+    // ~26-47% + (8,28,49) families; populated slots are flat navy, NOT this
+    // field]. Built once over the seven kRaceRows rects; populated slots are
+    // OVERPAINTED flat navy by the content branch (the well under them is
+    // never visible, so no per-frame knowledge check is needed here).
+    SDL_Texture* speciesWellTex = nullptr;
+    {
+        speciesWellTex = SDL_CreateTexture(
+            ren, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC,
+            kDisplayW, kDisplayH);
+        if (speciesWellTex) {
+            std::vector<uint32_t> px(size_t(kDisplayW) * kDisplayH, 0u);
+            for (int s = 0; s < 7; s++)
+                for (int y = kRaceRows[s].y0; y <= kRaceRows[s].y1; y++)
+                    for (int x = kRaceRows[s].x0; x <= kRaceRows[s].x1; x++) {
+                        const RGB c = speciesWellAt(x, y);
+                        px[size_t(y) * kDisplayW + x] =
+                            0xFF000000u | (uint32_t(c.r) << 16) |
+                            (uint32_t(c.g) << 8) | c.b;
+                    }
+            SDL_UpdateTexture(speciesWellTex, nullptr, px.data(),
+                              kDisplayW * int(sizeof(uint32_t)));
         }
     }
     // t410 HOME-STAR DIAGNOSTIC (display-only, zero rng): the projected
@@ -981,9 +1041,18 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         SDL_RenderClear(ren);
         // t400: the map screen's frame texture (mapchrome.h law — measured
         // on the vendor map shot; opened screens have no texture witness,
-        // so it is drawn on the map ONLY, honestly-degraded elsewhere).
-        if (frameTex && screen == kScreenMap)
+        // so it is drawn on the map ONLY, honestly-degraded elsewhere.
+        // t436b EXCEPTION [measured t252 species capture vs own baseline,
+        // docs/re/_wip_t436.md F4]: the species screen (state 7) carries
+        // the SAME chrome mottle in the right column — the dial/toggle
+        // cluster zone y360..472 is 99.85% pixel-identical to the map.
+        // COSMOSWnd STATE list "4 1 3 7 13" keeps the chrome alive there.)
+        if (frameTex && (screen == kScreenMap || screen == kScreenSpecies))
             SDL_RenderCopy(ren, frameTex, nullptr, nullptr);
+        // t436b: species-screen slot wells over the chrome (header +
+        // unknown-species rows; populated rows overpaint flat navy below).
+        if (speciesWellTex && screen == kScreenSpecies)
+            SDL_RenderCopy(ren, speciesWellTex, nullptr, nullptr);
         // t388: screen chrome backdrop (see backdropFor for the measured
         // full-backdrop test; the luminance-ramp palette seam is documented
         // on blitShape). Map screen intentionally keeps its vector map (no
@@ -1183,6 +1252,49 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
                     SDL_Rect sel{q.x - 6, q.y - 6, 13, 13};
                     SDL_RenderDrawRect(ren, &sel);
+                }
+            }
+            // t436b SPECIES PORTRAITS (state 7 only; law ui/speciesmenu.h +
+            // _wip_t436.md F5/F7/F8): one ringed portrait per KNOWN AI owner
+            // centred on its HOME STAR — smrace<specnum> rec 0 at scale 2
+            // clipped r49 (disc), racering k<owner%7> at scale 2 (the
+            // three-tone ring band r50..55; SEAM T436-B on the index). The
+            // player home carries NO portrait [measured F8]. Drawn AFTER the
+            // star pips so the disc covers the marker (vendor capture: star
+            // under each portrait centre, marker not visible on it).
+            if (screen == kScreenSpecies) {
+                static std::vector<int> printedPortraits;  // once per owner
+                const auto srows = speciesMenuRows(camp, roster);
+                for (const auto& sr : srows) {
+                    const int hs2 = camp.homeStarFor(sr.owner);
+                    if (hs2 < 0 ||
+                        hs2 >= int(camp.galaxy().stars.size()))
+                        continue;
+                    if ((raceVisibleMask & (1u << (sr.owner % 7))) == 0)
+                        continue;  // t425 race filter hides the record
+                    const Pt hp2 = projectStar(cam, camp.galaxy().stars[size_t(hs2)]);
+                    if (std::find(printedPortraits.begin(),
+                                  printedPortraits.end(), sr.owner) ==
+                        printedPortraits.end()) {
+                        printedPortraits.push_back(sr.owner);
+                        std::printf("ui species portrait owner %d at %d,%d\n",
+                                    sr.owner, hp2.x, hp2.y);
+                        std::fflush(stdout);
+                    }
+                    if (const auto* pl =
+                            speciesPortraitFor(sr.flagSpecnum)) {
+                        const int d = int(pl->record(0).width) *
+                                      kSpeciesPortraitScale;  // 49 -> 98
+                        blitShapeCircular(ren, *pl, 0, hp2.x - d / 2,
+                                          hp2.y - d / 2,
+                                          kSpeciesPortraitScale,
+                                          kSpeciesPortraitClipR);
+                    }
+                    if (raceringLib.count() > sr.owner % 7)
+                        blitShapeScaled(ren, raceringLib, sr.owner % 7,
+                                        hp2.x - kSpeciesRingHalf,
+                                        hp2.y - kSpeciesRingHalf,
+                                        kSpeciesPortraitScale);
                 }
             }
         }
@@ -1518,29 +1630,54 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 const auto rows = speciesMenuRows(camp, roster);
                 for (size_t i = 0; i < rows.size() && i + 1 < 7; i++) {
                     const Rect& slot = kRaceRows[i + 1];
+                    // POPULATED-ROW FILL [measured t252 F4]: flat navy
+                    // (8,32,49) at 91-94% of the slot — the well texture the
+                    // backdrop painted under known rows is COVERED here
+                    // (empty slots keep it; the vendor paints none there).
+                    // The grey 1px SDL outline the port drew is DELETED —
+                    // the vendor row has no outline (t252 census: the slot
+                    // census is flat navy + ink, no grey family).
                     SDL_Rect rr{slot.x0, slot.y0, slot.x1 - slot.x0 + 1,
                                 slot.y1 - slot.y0 + 1};
-                    SDL_SetRenderDrawColor(ren, kLane.r, kLane.g, kLane.b, 255);
-                    SDL_RenderDrawRect(ren, &rr);
+                    SDL_SetRenderDrawColor(ren, kStatusWellNavy.r,
+                                           kStatusWellNavy.g,
+                                           kStatusWellNavy.b, 255);
+                    SDL_RenderFillRect(ren, &rr);
                     // flag face (raceflag.shp frame == specnum; refusal or
-                    // human rows simply omit the face — honest)
+                    // human rows simply omit the face — honest). OFFSET
+                    // [measured F7]: bbox x488..502 on every row == slot
+                    // row-local (14,3), native 14x24.
                     const SpeciesRow& sr = rows[i];
-                    int tx = slot.x0 + 8;
                     if (sr.flagSpecnum >= 0 &&
-                        sr.flagSpecnum < int(raceflagLib.count())) {
-                        blitShape(ren, raceflagLib, sr.flagSpecnum, tx,
-                                  slot.y0 + 3);
-                        tx += 14 + 6;
-                    }
+                        sr.flagSpecnum < int(raceflagLib.count()))
+                        blitShape(ren, raceflagLib, sr.flagSpecnum,
+                                  slot.x0 + kSpeciesRowFlagDx,
+                                  slot.y0 + kSpeciesRowFlagDy);
+                    // NAME CENTRED [decisive F7]: bbox centre 553 ==
+                    // (474+632)/2 for all three vendor rows (Orfa/Ungooma/
+                    // Extinct); text rows y(rowTop+8)..(rowTop+17). The
+                    // LEFT-aligned-after-flag reading was the port defect.
                     const std::string label =
                         sr.extinct ? std::string("Extinct")  // static #12
                                    : sr.name;
-                    SDL_Color c = toSdl(kOwnerRgb[sr.owner % 7]);
-                    txt.draw(ren, tx, slot.y0 + 8, label, false, c);
+                    // ink: species colour per row; Extinct reads WHITE
+                    // [measured F7: (255,255,255) on the extinct row].
+                    SDL_Color c = sr.extinct ? kText
+                                             : toSdl(kOwnerRgb[sr.owner % 7]);
+                    const int w = txt.width(label, false);
+                    txt.draw(ren, slot.x0 +
+                                 ((slot.x1 - slot.x0 + 1 - w) / 2),
+                             slot.y0 + 8, label, false, c);
                 }
-                if (rows.empty())
-                    txt.draw(ren, kRaceRows[1].x0, kRaceRows[1].y0 + 8,
-                             "no species known", false, kDim);
+                if (rows.empty()) {
+                    // no known species: the header well alone is the vendor
+                    // reading; the dim line sits in slot 1's well.
+                    txt.draw(ren, kRaceRows[1].x0 +
+                                 ((kRaceRows[1].x1 - kRaceRows[1].x0 + 1 -
+                                   txt.width("no species known", false)) / 2),
+                             kRaceRows[1].y0 + 8, "no species known", false,
+                             kDim);
+                }
             } else if (screen == kScreenStatus) {
                 // ---- t402 PLANETS LIST (D11 "wrong and unusable" FIXED).
                 // Law: ui/statuslist.h (row assembly 0x50647..0x5091f cited

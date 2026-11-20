@@ -221,4 +221,14 @@ RGB textureColourAt(int x, int y);
 // F1/F2). Screen coordinates, deterministic, no state.
 RGB introSpeckleAt(int x, int y);
 
+// t436b: the SPECIES-SCREEN empty-well dark speckle (header slot + the row
+// slots of unknown species). Same chain shape, DIFFERENT census and salt:
+// [measured t252 species_menu_game.png, docs/re/_wip_t436.md G1] the wells
+// carry display-space {(8,12,16) ~54-63%, (0,0,0) ~26-47%, (8,28,49) ~3-9%}
+// with mean run length h 4.03 / v 3.74 (N=3434/3694; iid gives 1.92/0.48
+// same-adjacency). Chain fit on the run-length statistic: COPY-LEFT 45% +
+// REPEAT-UP 35% (run 3.92; the +0.4 lag-1 residual over the measured 2.78/
+// 2.82 is DOSBox display interpolation the port cannot reproduce at 1:1).
+RGB speciesWellAt(int x, int y);
+
 }  // namespace ascend::ui

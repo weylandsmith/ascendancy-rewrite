@@ -249,4 +249,38 @@ RGB introSpeckleAt(int x, int y) {
     return kSpeckle[0].c;
 }
 
+// t436b SPECIES-SCREEN EMPTY-WELL SPECKLE (docs/re/_wip_t436.md G1).
+// [measured t252 species_menu_game.png x474..632, slots 4/5/6 + header]:
+// display-space families (8,12,16) 50-63% / (0,0,0) 26-47% / (8,28,49)
+// 2.5-9%; mean run length h 4.03 v 3.74 (N=3434/3694) — correlated field,
+// NOT iid (iid: run 1.92, same-adjacency 0.48). The display triplets are
+// the DOSBox-scaled readings of game.pal {200:(3,3,4), 0:(0,0,0),
+// 196:(3,7,12)} under round(v*255/63) = {(12,12,16), 0, (12,28,48)} (the
+// t424b family set minus pal[1]); the port paints the PALETTE values, the
+// witness grades OUR 1:1 render against the family shares. Chain weights
+// 45% copy-left + 35% repeat-up fitted on the run-length statistic
+// (simulated run 3.92 vs measured 3.88 pooled; grid scripts see G1).
+RGB speciesWellAt(int x, int y) {
+    uint64_t z = (uint64_t(uint32_t(x)) << 32) ^ uint64_t(uint32_t(y)) ^
+                 0x436b1f7c2a9d5e11ull;  // distinct salt: decorrelate chrome
+    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
+    z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
+    z = z ^ (z >> 31);
+    const uint64_t r = z % 1000000ull;
+    if (r < 450000ull && x > 0) return speciesWellAt(x - 1, y);    // 45%
+    if (r < 800000ull && y > 0) return speciesWellAt(x, y - 1);    // +35%
+    static const struct { RGB c; int w; } kWell[3] = {
+        {{12, 12, 16}, 625},  // game.pal[200]
+        {{0, 0, 0}, 257},     // game.pal[0]
+        {{12, 28, 48}, 90},   // game.pal[196]
+    };
+    const uint64_t d = (z >> 20) % 972ull;
+    int acc = 0;
+    for (int i = 0; i < 3; i++) {
+        acc += kWell[i].w;
+        if (int(d) < acc) return kWell[i].c;
+    }
+    return kWell[0].c;
+}
+
 }  // namespace ascend::ui

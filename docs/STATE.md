@@ -229,28 +229,49 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t436b SPECIES SCREEN IMPLEMENTATION (ordering rationale: t436 closed
-the MEASUREMENT leg of the t436 row — the state-7 layer law, row-content
-geometry, portrait ring law, and the 7racesel identity are all banked with
-citations (docs/re/_wip_t436.md F1-F9 + ui-runtime.md t436 block) — and the
-run-time budget died before the code pass (a first speciesmenu.h edit was
-REVERTED, tree clean); per D18 per-screen cycle law the row re-queues as
-t436b, and the brief at _wip_t436.md F9 is ready to execute IN ORDER: (1)
-state-7 column = chrome textureColourAt + per-slot fill (Header/Empty =
-dark-speckle chain re-weighted 200:63/0:26/196:9 distinct salt, Populated =
-flat (12,32,48)); (2) row content = raceflag k<specnum> at row-local
-(14,3), name CENTRED at x553 (extinct white "Extinct"), DELETE the grey
-outline loop; (3) portraits = project homeStarFor(o), blitShapeCircular
-smrace<specnum> scale2 clipR49 + racering k<owner%7> scale2, seam T436-A
-count law; (4) pins test_speciesmenu_t436 + witness census leg on
-scripts/t409_species_witness.sh (populated-row navy dominant, empty-slot
-speckle families + lag-1 stats, centred-text bbox, zero grey-outline px,
-ring hue present). ABILITY leg: NO code work — wired+witnessed since t409;
-Use-Ability fire stays the named sim seam (seed-md5 law, F6). Queue after
-t436b: t433(chrome EXACT memory-surface) -> t437(OQ-027b record-field) ->
-final verify+push+handoff. SEAMS carried: speckle generator origin (t433),
-H3 race bytes 1..20, T436-A portrait count, T428-B, T427-A..F, gizmo-icon
-rows + class selector (t434b), research panel art join D3 (t435 F6).
+NEXT t433 CHROME EXACT MEMORY-SURFACE ROUTE (ordering rationale: t436b
+CLOSED the t436 species-screen implementation row — chrome mottle on state
+7, dark-speckle wells (speciesWellAt, chain 45/35 fitted on the G1 mean-run
+statistic), flat-navy populated rows with CENTRED names, smrace+racering
+portraits at home stars, pins x6, suite 466/0, witness census VERDICT PASS
+(_wip_t436.md G1/G2 + ui-runtime.md t436b block) — so the remaining named
+seams all route through the ONE generator question t433 owns: the vendor
+routine behind the correlated speckle/chrome fields (intro interior t424b,
+status header t417b, species wells t436b are three salt-variants of ONE
+family, each currently a fitted Markov approximation, never the vendor's
+exact memory surface). Route: R1 scratch-copy session, capture the chrome
+surface from guest RAM via the pointer law (docs/re/r1-savestate.md) while
+the map screen is up, diff against textureColourAt's field — exact match
+closes the generator law for the whole family, a clean negative is banked
+as its own honest result (scripts/r434b_art_session.py is the live-capture
+tool pattern; do NOT re-try static base schemes — R-t4xx fifth-scheme ban).
+Queue after t433: t437 (OQ-027b record-field) -> final verify+push+handoff.
+SEAMS carried: T436-A portrait COUNT (vendor capture 4 rings vs 3 known
+rows; port paints known owners only), T436-B owner->racering index, H3 race
+bytes 1..20, T428-B, T427-A..F, gizmo-icon rows + class selector (t434b),
+research panel art join D3 (t435 F6).
+
+t436b LANDED 2026-11-20 (SPECIES SCREEN IMPLEMENTATION COMPLETE — all F9
+items; docs/re/_wip_t436.md G1/G2 + ui-runtime.md t436b block). (i) STATE-7
+RIGHT COLUMN = frameTex chrome (cluster zone measured 99.85% == map) +
+speciesWellAt dark-speckle wells (header + EMPTY slots; census pal
+{200:625,0:257,196:90}, chain 45% copy-left/35% repeat-up FITTED on the
+re-measured mean-run statistic 4.03/3.74 — the F8 lag-1 numbers were the
+interpolation-affected ones; fit on run length instead). (ii) POPULATED ROWS
+= flat kStatusWellNavy (8,32,49), grey outline DELETED, names CENTRED (bbox
+centre 553 law), Extinct WHITE, flag row-local (14,3). F9's "(12,32,48)"
+stale quote CORRECTED to (8,32,49) per the F4 decisive colour law (G1).
+(iii) PORTRAITS = smrace<specnum> rec0 scale2 clipR49 + racering k<owner%7>
+scale2 ring-LAST at projectStar(homeStarFor(o)), per KNOWN AI owner,
+raceVisibleMask-filtered, witness log "ui species portrait owner N at x,y".
+Census lesson [measured]: point-sampling the ring circle is brittle (art
+gaps); annulus census at the LOGGED centre is the robust law (244 chromatic
+px band + 4668 px disc on the witness shot). PINS test_speciesmenu_t436 x6,
+suite 466/0. Witness t409 VERDICT PASS + t436b_witness_census.py VERDICT
+PASS. SEAMS T436-A (count) + T436-B (ring index) stay open, named. NO OQ
+closed (strict-close honest negative — species-screen visuals have no OQ
+owner; t409..t436 precedent; OQ-016/019/027 untouched). GATE_EXIT=0, LEDGER
+AUDIT OK.
 
 t436 LANDED 2026-11-20 (SPECIES SCREEN LAWS MEASURED — measurement-only
 iteration, NO code delta; docs/re/_wip_t436.md F0-F9 + ui-runtime.md t436

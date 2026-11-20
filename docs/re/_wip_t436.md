@@ -178,3 +178,56 @@ t436b implementation brief (all inputs now measured):
     families, centred-text bbox, zero grey-outline px, portrait ring hue).
 ABILITY LEG: nothing further measured — wired+witnessed since t409 (F6); the
 Use-Ability FIRE stays the named sim seam (seed-md5 law).
+
+---
+# t436b IMPLEMENTATION ITERATION (2026-11-20)
+
+## G1 [MEASURED re-census, venv PIL, work/screens/t252/species_menu_game.png]
+Per-slot family census (x474..632 inclusive, DISPLAY-space colours):
+  slot4 y163..192: (8,12,16) 54.1% (0,0,0) 35.6% | lag1h 2.60 lag1v 2.54 same 0.890
+  slot5 y202..231: (8,12,16) 62.5% (0,0,0) 25.7% (8,28,49) 9.0% | 2.81/2.89 0.881
+  slot6 y241..270: (8,12,16) 50.0% (0,0,0) 46.7% | 2.79/2.70 0.877
+  header y7..36 : (8,12,16) 52.3% (0,0,0) 31.3% (8,28,49) 6.6% +white 5.8% | 2.78/2.82 0.882
+Run-length census over the three fam-restricted slots: mean run h 4.03, v 3.74
+(N=3434/3694) — the discriminating statistic (iid gives 1.92, same-adj 0.48).
+CHAIN FIT (splitmix chain, same shape as introSpeckleAt, weights 625/257/90):
+best on (lag1h,lag1v,meanrun) target (2.78,2.82,3.88) = COPY-LEFT 45% +
+REPEAT-UP 35% -> h 3.20 v 3.50 run 3.92 (residual ~+0.4 lag — the vendor shot
+carries display interpolation the port cannot reproduce at 1:1; same-adj 0.74
+vs 0.88 is the same interpolation effect: measured run census is robust, the
+pixel-diff stats are NOT — fit to run length, grade loosely on lag).
+CORRECTION to F9 item (1): populated-row fill = kStatusWellNavy (8,32,49)
+(the F4 decisive colour law: (12,32,48) occurs ZERO times in both captures;
+F9's "(12,32,48)" was a stale re-quote of the 7racesel decode colour).
+
+## G2 t436b IMPLEMENTATION LANDED (all F9 items executed)
+1. CHROME: frameTex draw extended to kScreenSpecies (ui.cpp — the measured
+   99.85% cluster-zone identity justifies it; kTextureBands already covers
+   x466..639 full height).
+2. WELLS: mapchrome.cpp speciesWellAt — t424b chain shape, distinct salt
+   0x436b..., census {pal200 625 / pal0 257 / pal196 90}, chain 45% copy-
+   left + 35% repeat-up (G1 fit on mean run 3.88; iid floor 1.92). Built
+   once as speciesWellTex over the seven kRaceRows rects; drawn after
+   frameTex on state 7 only.
+3. ROWS: populated slot = flat kStatusWellNavy fill (grey outline DELETED);
+   flag at row-local (14,3) via kSpeciesRowFlagDx/Dy; name CENTRED at the
+   slot centre (bbox centre 553 law); Extinct ink WHITE.
+4. PORTRAITS: per KNOWN AI owner (never the player), centre =
+   projectStar(homeStarFor(o)), smrace<specnum> rec0 blitShapeCircular
+   scale2 clipR49 + racering k<owner%7> blitShapeScaled at (cx-53,cy-53)
+   scale2 (drawn ring-LAST so the band sits over the disc edge). Honours
+   the t425 raceVisibleMask filter. Witness log line
+   "ui species portrait owner N at x,y" (printed once per owner) so the
+   census grades the annulus at the projection law's OWN output.
+   SEAMS kept open: T436-A count law (port = known owners only; vendor
+   capture had 4 rings vs 3 known rows), T436-B owner->ring index.
+5. PINS tests/test_speciesmenu_t436.cpp x6 (rects/553 centre, navy, flag
+   offset + raceflag 14x24 record dims, ring radii + racering 53/smrace 49
+   record dims, well speckle correlated-not-iid + family set + census
+   shares, determinism + salt decorrelation). Suite 466/0.
+6. WITNESS: scripts/t409_species_witness.sh VERDICT PASS unchanged +
+   scripts/t436b_witness_census.py on the live shot: row1 navy 90.4%,
+   empty slots well-family 100.0%, ink centre 553 EXACT, grey-outline 0 px,
+   logged centre (216,417) disc 4668 px + ring band 244 chromatic px —
+   VERDICT PASS. Census lesson: point-sampling a ring circle is brittle
+   (art gaps); the annulus census at the LOGGED centre is the robust law.
