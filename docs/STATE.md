@@ -229,31 +229,21 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
+NEXT t424b RACE INTRO SCREEN (FIRST: user-visible, deferred three
+times — ordering rationale: breadth over depth per D18; the audio
+record-field plan moved VERBATIM to queue row t437 below this heading
+region). Row text: background greyscale + text unreadable (root cause
+likely palette: the intro art needs the vendor palette transform the
+gif/cine path applies — decompile the intro screen paint, cite the
+palette source) + textured framing per the t426 chrome-band gradient
+law + race portrait position/size per the draw chain (t412's
+FUN_0002b48a lead). SEAMS carried from t428: T428-B (witness-A
+lineage), T427-A..F unchanged. Derive-before-code + iterate-to-clean
+laws of the PHASE-16 header apply; CONT requeues allowed (tag
+extraction is generic now).
 
-NEXT t430 — OQ-027(b) VIA THE RECORD-FIELD ROUTE: DOES windows.txt
-SOUNDCHANNEL LAND AT RECORD +0x57, AND WHICH SITE COVERS STRATEGIC RAIL /
-NEXTTURN PRESSES (ordering rationale: t429 refuted the +0x1bcc premise
-(R-t429) and left exactly one measurable path for the only OQ row with a
-user-free closure bar. t429 measured the full play-path census: 8 immediate-0
-("button") sites — 0x1b0b0/0x1b1c5/0x27e46 inside rect click hit-tests,
-0x47e09/0x529f9/0x52a5b/0x36632/0x549f9 modules UNIDENTIFIED — and 6 sites
-reading record-HIWORD sfx id at +0x57 with -1 = silent (0x30e75 et al., records
-reached through control pool 0x7a35c = the strategic pool per t428e). PLAN
-(offline-first, ~no live session needed): (1) identify the windows.txt parser:
-the file opens via pool-rel imm 0x2ffc ("windows.txt" @payload 0x85bac) at
-0x575c2 (call 0x5b587, enclosing 0x575e4 parses; second referrer 0x750ba is the
-resource-mount path) — trace where the parser stores each keyword's value; the
-keyword literals are NOT plaintext in the payload (case-insensitive census
-MEASURED t429), so find the keyword TABLE (likely a struct of {name-ptr,
-offset} pairs) and read the SOUNDCHANNEL field offset. (2) IF that offset ==
-0x57: the t395 census {0 x118, -0 x1} becomes cited law "vendor strategic
-controls play manifest[0] button.voc (3,340 B), -1 records silent" -> UPGRADE
-sfxForPress rail/next-turn/title click08->button + retarget pins/witness
-(t404_sfx_witness.sh pattern), CLOSE (b) with the census. (3) IF offset !=
-0x57 or keyword table absent: honest negative, row stays open on the hearing
-bar, R-t429 stands. Do NOT re-derive FUN_000500e0/0x4fb30 (cited audio.md
-S6.8); do NOT re-plan click censuses at 0x17488/0x1749b (R-t429); do NOT touch
-k5/planets visuals (R-t428f). SEAMS carried: T428-B (witness-A lineage),
+SEAMS/OQ standing notes:
+ SEAMS carried: T428-B (witness-A lineage),
 T427-A..F unchanged.
 
 t429 LANDED 2026-11-20 (OQ-027(b) PREMISE REFUTED + FULL PLAY-PATH CENSUS;
@@ -2364,11 +2354,12 @@ per-screen iteration structure, RE-FIRST LAW). Ordering: t422 first
 (one shared root cause: the chrome texture appears wrong on EVERY
 screen the user graded); then one row per screen in flow order; then
 verify+push. A COMPLETING SESSION REWRITES NEXT TO THE NEXT ROW
-VERBATIM in EXECUTION order t422,t423,t424(push done),t425,t424b(race
-intro — re-slotted after a session mis-renumbered the push row into
-the original race-intro tag, 2026-11-18),t426,t427,t428,t429,t430,
-t431,t433(chrome-generator EXACT law),t432(final verify+push+
-handoff); after t432 park WAIT-USER-
+VERBATIM in EXECUTION order (2026-11-20 reconciliation): done
+t422,t423,t424(push),t425,t426(+C2),t427(+b),t428(+b..f),t429(audio
+premise REFUTED),t430-audio(next); REMAINING t424b(race intro — FIRST,
+user-visible, deferred 3x),t434(ships),t435(research),t436(species+
+ability),t433(chrome EXACT memory-surface),t437(OQ-027b record-field
+closure),t432(final verify+push+handoff); after t432 park WAIT-USER-
 RULING. NEVER reuse a consumed tag and never move a row's TEXT under
 another row's executed tag — the lineage must stay greppable.
 
@@ -2499,16 +2490,19 @@ pops a CONTENT-DEPENDENT WINDOW (PLSQUARE child msg law + which
 window per tile state — empty/owned/structure); ORBITAL STRUCTURES
 column on the LEFT missing (planets-ui law).
 
-t429 SHIPS SCREEN CYCLE: full pass — derive the fleet list paint
+t434 SHIPS SCREEN CYCLE (RE-TAGGED: original t429 tag was consumed by
+the audio-premise row 2026-11-19, lineage law): full pass — derive the fleet list paint
 (fleetlist law banked t402 era; grade it against vendor now), row art
 (ship class sprites), selection/info panel, per close law.
 
-t430 RESEARCH SCREEN CYCLE: grade the t419 rebuild against the D15-
+t435 RESEARCH SCREEN CYCLE (RE-TAGGED: original t430 tag consumed by
+the audio record-field row 2026-11-20): grade the t419 rebuild against the D15-
 addendum spec (3D tree, right info frame, Z-rotate + scroll controls,
 corner popup) + the live re-check list (spin latches per t425 law,
 Esc instant, no CPU peg — ps -o pcpu assertion); fix what fails.
 
-t431 SPECIES SCREEN + SPECIAL ABILITY CYCLE: species screen "quite
+t436 SPECIES SCREEN + SPECIAL ABILITY CYCLE (RE-TAGGED: original
+t431 collided with the loop's own D16-era numbering): species screen "quite
 off" (derive its window paint chain + race art records); SPECIAL
 ABILITY BUTTON DOES NOTHING (windows.txt button SENDMESSAGE -> which
 handler? decompile the target; implement or bank the honest negative
@@ -2541,6 +2535,34 @@ md5/pixel-exact chrome vs vendor capture at 1:1 on at least the
 newgame + map frames, or honest seam naming what the dump showed.
 Blanket grant 2026-11-14 covers scratch experimentation; NEVER mount
 the production game dir; bank ring first if anything touches saves.)
+
+
+t437 OQ-027(b) VIA THE RECORD-FIELD ROUTE (MOVED VERBATIM from NEXT
+2026-11-20 so race intro runs first; the tag t430 was already consumed by
+the audio-premise row): DOES windows.txt
+SOUNDCHANNEL LAND AT RECORD +0x57, AND WHICH SITE COVERS STRATEGIC RAIL /
+NEXTTURN PRESSES (ordering rationale: t429 refuted the +0x1bcc premise
+(R-t429) and left exactly one measurable path for the only OQ row with a
+user-free closure bar. t429 measured the full play-path census: 8 immediate-0
+("button") sites — 0x1b0b0/0x1b1c5/0x27e46 inside rect click hit-tests,
+0x47e09/0x529f9/0x52a5b/0x36632/0x549f9 modules UNIDENTIFIED — and 6 sites
+reading record-HIWORD sfx id at +0x57 with -1 = silent (0x30e75 et al., records
+reached through control pool 0x7a35c = the strategic pool per t428e). PLAN
+(offline-first, ~no live session needed): (1) identify the windows.txt parser:
+the file opens via pool-rel imm 0x2ffc ("windows.txt" @payload 0x85bac) at
+0x575c2 (call 0x5b587, enclosing 0x575e4 parses; second referrer 0x750ba is the
+resource-mount path) — trace where the parser stores each keyword's value; the
+keyword literals are NOT plaintext in the payload (case-insensitive census
+MEASURED t429), so find the keyword TABLE (likely a struct of {name-ptr,
+offset} pairs) and read the SOUNDCHANNEL field offset. (2) IF that offset ==
+0x57: the t395 census {0 x118, -0 x1} becomes cited law "vendor strategic
+controls play manifest[0] button.voc (3,340 B), -1 records silent" -> UPGRADE
+sfxForPress rail/next-turn/title click08->button + retarget pins/witness
+(t404_sfx_witness.sh pattern), CLOSE (b) with the census. (3) IF offset !=
+0x57 or keyword table absent: honest negative, row stays open on the hearing
+bar, R-t429 stands. Do NOT re-derive FUN_000500e0/0x4fb30 (cited audio.md
+S6.8); do NOT re-plan click censuses at 0x17488/0x1749b (R-t429); do NOT touch
+k5/planets visuals (R-t428f).
 
 t432 PHASE-16 VERIFY + PUSH + HANDOFF (push-gap law MANDATORY): full
 gate + run_tests + seed regression byte-identical; export; fetch
