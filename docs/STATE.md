@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-19T21:40
+updated: 2026-11-20T00:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -230,30 +230,54 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 
 ## NEXT ACTION (exactly one)
 
-NEXT t429 — OQ-027(b) CONTROL-RECORD SFX-ID CAPTURE (ordering rationale:
-t428f CLOSED the k5 line as a binding negative R-t428f — planet-screen
-visual work is DONE; the remaining open rows are OQ-016 (user adjudication,
-D3), OQ-019 (user acceptance, t329 packet) and OQ-027 — and OQ-027(b) is the
-ONLY row with a named measurement closure bar reachable without the user:
-"capture diff of control-record +0x1bcc across control classes"
-(docs/OPEN-QUESTIONS.md OQ-027). The row's own statics: FUN_000500e0 UI
-callers 0x17488/0x1749b read sound ids from control-record +0x1bcc/+0x1bce
-(runtime window-item tables); windows.txt SOUNDCHANNEL census carries NO id
-{0 x118, -0 x1}. PLAN: reuse scripts/r428f_k5_session.py's POLL-BY-BREAK
-machinery (t428f F5 law — cold legs must never be released by BPDEL *): arm
-0x17488 (and 0x1749b if the last-4 audit passes; else offline-match the pty
-code view), drive clicks across control CLASSES (NEXTTURN, sidebar
-Planets/Fleet/Research, a planet row, an event-popup OK), and per stop bank
-[eax/edx] + the control-record head (magic+name@+0x20) + u16@+0x1bcc/+0x1bce.
-CLOSURE SHAPE: if ids DIFFER by class and match audio.md §6.7 port names for
-click08-family presses, upgrade sfxForPress to the cited table and CLOSE (b)
-with the census; if all witnessed ids are 0 (= silent per windows.txt), the
-port's click08 is a documented DELIBERATE divergence — bank the census, row
-movement still needs the user on (a)+(b) hearing bar; either way run the
-honest-negative discipline. Do NOT re-derive FUN_000500e0 (cited), do NOT
-touch k5/planets visuals (R-t428f), do NOT re-run t428 sessions. SEAMS
-carried: T428-B (witness-A lineage), T427-A..F unchanged; T428c-A CLOSED
-t428f.
+NEXT t430 — OQ-027(b) VIA THE RECORD-FIELD ROUTE: DOES windows.txt
+SOUNDCHANNEL LAND AT RECORD +0x57, AND WHICH SITE COVERS STRATEGIC RAIL /
+NEXTTURN PRESSES (ordering rationale: t429 refuted the +0x1bcc premise
+(R-t429) and left exactly one measurable path for the only OQ row with a
+user-free closure bar. t429 measured the full play-path census: 8 immediate-0
+("button") sites — 0x1b0b0/0x1b1c5/0x27e46 inside rect click hit-tests,
+0x47e09/0x529f9/0x52a5b/0x36632/0x549f9 modules UNIDENTIFIED — and 6 sites
+reading record-HIWORD sfx id at +0x57 with -1 = silent (0x30e75 et al., records
+reached through control pool 0x7a35c = the strategic pool per t428e). PLAN
+(offline-first, ~no live session needed): (1) identify the windows.txt parser:
+the file opens via pool-rel imm 0x2ffc ("windows.txt" @payload 0x85bac) at
+0x575c2 (call 0x5b587, enclosing 0x575e4 parses; second referrer 0x750ba is the
+resource-mount path) — trace where the parser stores each keyword's value; the
+keyword literals are NOT plaintext in the payload (case-insensitive census
+MEASURED t429), so find the keyword TABLE (likely a struct of {name-ptr,
+offset} pairs) and read the SOUNDCHANNEL field offset. (2) IF that offset ==
+0x57: the t395 census {0 x118, -0 x1} becomes cited law "vendor strategic
+controls play manifest[0] button.voc (3,340 B), -1 records silent" -> UPGRADE
+sfxForPress rail/next-turn/title click08->button + retarget pins/witness
+(t404_sfx_witness.sh pattern), CLOSE (b) with the census. (3) IF offset !=
+0x57 or keyword table absent: honest negative, row stays open on the hearing
+bar, R-t429 stands. Do NOT re-derive FUN_000500e0/0x4fb30 (cited audio.md
+S6.8); do NOT re-plan click censuses at 0x17488/0x1749b (R-t429); do NOT touch
+k5/planets visuals (R-t428f). SEAMS carried: T428-B (witness-A lineage),
+T427-A..F unchanged.
+
+t429 LANDED 2026-11-20 (OQ-027(b) PREMISE REFUTED + FULL PLAY-PATH CENSUS;
+docs/re/audio.md S6.8 + docs/re/_wip_t429.md T429-A..C + REFUTED-ROUTES
+R-t429). All OFFLINE (objdump over work/ascend_payload.bin + banked decomp
+work/coswnd_decomp/500e0.c) — no R1 session run. (i) The cited sites 0x17488/
+0x1749b are KEYBOARD gizmo-fire calls: lea ebx,[ecx+4*keycharcode], read
+[ebx+0x1bcc]/+0x1bce, sar $0x10 (HIWORD = manifest index), eax=0x78638 audio
+object — batmode.cpp handlers; mouse clicks never reach them. (ii) LOADER LAW:
+the +0x1bcc table IS batfx.txt — ctor 0x1acd0 opens it (pool-rel 0x3bd),
+sscanf "%d" count<=0x64, "%s" key chars -> u16[obj+0x19c6+2i], "%d %d %d %d"
+columns -> low u16s at +0x1a92/+0x1a94/+0x1bce/+0x1bcc; batfx columns 3/4 =
+sfx1/sfx2 per the file's own header comment. windows.txt SOUNDCHANNEL never
+feeds it. (iii) CENSUS of the whole play path (34 call sites, eax=0x78638 at
+all): 17 batfx-keyboard table reads (13 wrapper + 2 direct + 2 variants); 8 immediate-0 = manifest[0] "button" (md5
+cef40f13a210357d8d9379d52a5ab484; 0x1b0b0/0x1b1c5/0x27e46 verified inside
+rectangle click hit-tests); 6 record-field sites mov edx,[obj+0x57]; sar 0x10;
+cmp -1; je skip (records via control pool 0x7a35c = strategic pool); 1
+imm7="trust01" (0x1791c); 2 computed. (iv) FUN_000500e0 id-space = the 86-name
+soundfx.txt manifest BY CONSTRUCTION — button01/button02/click08 are
+vendor-unreachable. LEDGER closes NOTHING (strict-close: the strategic rail/
+NEXTTURN site is not yet identified; sfxForPress UNCHANGED, click08 stays a
+documented port choice; OQ-027 stays OPEN, row text updated with the narrowed
+question; OQ-016/019 untouched). GATE_EXIT=0; LEDGER AUDIT OK (open rows unchanged: OQ-016/019/027).
 
 t428f LANDED 2026-11-19 (k5 GATED OFF LIVE — ORIGIN QUESTION CLOSED AS A
 NON-QUESTION; working log docs/re/_wip_t428f.md F0-F5 + docs/re/planets-ui.md

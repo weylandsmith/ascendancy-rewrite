@@ -453,3 +453,85 @@ STATUS: laser01 now plays NOWHERE in the rewrite; it returns with a cited
 fire-order interaction (combat UI), not before. OQ-027b (channel->sample
 mapping) stays OPEN — this row removed a placeholder, it measured nothing
 new about the vendor's per-button choice.
+
+
+### 6.8 t429 — WHAT +0x1bcc ACTUALLY IS: batfx.txt GIZMO-FX TABLE, NOT A
+CONTROL-RECORD SFX FIELD (premise correction; OQ-027b narrowed, stays OPEN)
+
+The OQ-027b closure bar ("capture diff of control-record +0x1bcc across control
+classes") rests on a FALSE PREMISE, measured this iteration over
+work/ascend_payload.bin (imagebase 0, OQ-008 law) with the full call-site census
+of the play path plus its loader. Working log docs/re/_wip_t429.md.
+
+1. FUN_000500e0(param_1=audio object handle 0x78638, param_2=MANIFEST INDEX) —
+   the index selects names at [obj+0x702 + 10i] (count [obj+0x700]) played as
+   "data\%s.voc" (work/coswnd_decomp/500e0.c:26-48). Index <0 or >= count ->
+   FUN_0002a428 vendor error; guards [obj+0x213]==-1 / [obj+0x20b]==0 return
+   silently. THEREFORE the vendor's entire SFX id-space is the 86-name
+   soundfx.txt manifest. button01/button02/click08 exist in ascend01/data but are
+   OFF-manifest (t395 measured click08; the manifest list is banked in
+   _wip_t429.md) — the vendor cannot play them through this path BY CONSTRUCTION.
+
+2. The two cited sites read the HIWORD of a dword in a 4-byte-stride table:
+   0x17439 `lea ebx,[ecx+eax]` with eax = 4*(key charcode), then
+   `mov edx,[ebx+0x1bcc]; sar edx,0x10; mov eax,0x78638; call 0x500e0`
+   (0x1747a..0x17488) and the +0x1bce twin (0x1748d..0x1749b). The index is the
+   KEY CHARACTER, and the enclosing function (starts 0x17224 region, handler
+   0x1af00 dispatches on `cmp dx,0x3a/0x4c/0x52/0x53/0x54...`) is a KEYBOARD
+   handler in batmode.cpp — mouse clicks on rail/NEXTTURN buttons never reach it.
+
+3. LOADER LAW (0x1acd0..0x1aef6, strings "batfx.txt" @0x82f6d + fmts "%d"
+   @0x82f86 / "%s" @0x82f98 / "%d %d %d %d" @0x82f9b, all four referenced ONLY
+   inside this function): open batfx.txt; sscanf "%d" -> count [obj+0x1a8e]
+   (bounds >0x64 -> error ..\batmode.cpp); loop: sscanf "%s" -> 0x1fe20 -> u16
+   [obj+0x19c6+2i] (the key char); loop: sscanf "%d %d %d %d" -> the LOW u16 of
+   each of the four columns written to [obj+0x1a92], [obj+0x1a94], [obj+0x1bce],
+   [obj+0x1bcc] per entry (ebx steps +4; 0x1aeb2/0x1aec7/0x1aed8 field order
+   MEASURED). So +0x1bcc/+0x1bce = batfx.txt COLUMNS 3/4 = sfx1/sfx2 for the
+   GIZMO fired by that key. batfx.txt is self-documenting ("shape1 shape2 sfx1
+   sfx2", "sfx #s refer to list in soundfx.txt"); 79 four-int lines, entry i
+   keyed by charcode i (i=32 ' ' Laneblocker sfx1=46 sg62bull; i=72 'H'
+   SelfDestruct sfx1=82 SM72EXPL; i=74 'J' MassCondensor 84 ST74BULL / 34
+   sg33bull). windows.txt SOUNDCHANNEL NEVER FEEDS THIS TABLE — the t395 census
+   {0 x118, -0 x1} is about a different field entirely.
+
+4. FULL PLAY-PATH CENSUS (32 call sites of wrapper 0x4fb30(obj,id) + the 2 cited
+   direct calls to 0x500e0 = 34 sites; every site loads eax=0x78638;
+   breakdown 13+1+1+8+6+1+2 = 32 (verified byte-exact per-site scan; the 2
+   remaining 'computed' sites 0x17eca movsx edx,di / 0x180c3 are counted in
+   the imm/computed bucket — see _wip_t429 T429-C):
+   - 13 sites read the batfx table `mov edx,[reg+0x1bcc(+idx*4)]`
+     (0x17b02, 0x17d37, 0x184e4, 0x189dd, 0x18e50, 0x18f91, 0x1913d, 0x1928b,
+     0x195a3, 0x198d3, 0x19ca3, 0x19dab, 0x19f6a) — battle-mode gizmo fire
+     keys; plus 2 batfx-adjacent variants: 0x1a1bd reads a FRAME COPY of the
+     entry (`mov edx,[esp+0x1ba]` after a 0x1ce1c bounds check) and 0x1853d
+     reads the +0x1bce twin via wrapper; plus the 2 direct-call table reads
+     above = 17 table-driven sites total.
+   - 8 sites pass IMMEDIATE 0 = manifest[0] "button" (re-count MEASURED,
+     byte-exact `31 d2` before the call, eax=0x78638 at all 8):
+     0x1b0b0/0x1b1c5 (both
+     inside rectangle hit-tests `cmp ecx,[ebp+0xc]/[ebp+0x14]`, 0x1b097..0x1b0a3
+     MEASURED), 0x27e46 (same rect pattern at 0x27e2d..0x27e39), 0x47e09 (after
+     a 0x46d3c test on handle 0x74744), 0x529f9/0x52a5b (message-id ranges
+     0x145..0x1d8 / 0x1a4..0x1d8), 0x549f9. THE VENDOR DOES PLAY A CLICK SOUND,
+     and where it is cited it is manifest index 0 = "button.voc" (3,340 B,
+     md5 cef40f13a210357d8d9379d52a5ab484).
+   - 6 sites read a per-OBJECT sfx field: `mov edx,[obj+0x57]; sar edx,0x10;
+     cmp edx,-1; je skip` (0x30e75, 0x3220f, 0x3336f, 0x3af9e, 0x4e453, 0x4e512)
+     — record field +0x57 HIWORD, -1 = silent, i.e. per-unit/per-gizmo sound
+     identity lives on the RECORD, not on a control table.
+   - 0x1791c `mov edx,7` = manifest[7] "trust01"; 0x17ecf/0x180c8 computed.
+
+VERDICT FOR OQ-027b: the row's question ("which sample per button press") is
+now NARROWED, not closed. Cited: click branches play "button" (manifest 0), and
+the strategic-UI rail cannot use the batfx table. UNMEASURED: which of the
+id-0 sites (or a +0x57 record field) covers the strategic map's rail/NEXTTURN
+presses — the enclosing modules of 0x27e4b/0x47e0e/0x549fe are unidentified
+(no .cpp literal inside those bodies; functions_full.tsv rows there are 1734-byte
+blobs, so tsv attribution is unusable). NO rewrite change this iteration:
+sfxForPress stays click08 as a DOCUMENTED PORT CHOICE (§6.5/§6.7), because
+promoting it to "button" for rail/next-turn without a cited strategic-UI site
+would be exactly the plausible-default move strict-close forbids. The port's
+click08 divergence is now quantified: the vendor's only reachable click sample
+is "button", so a fidelity swap is a one-line change once the strategic site is
+identified (probe named in docs/OPEN-QUESTIONS.md OQ-027).

@@ -311,6 +311,26 @@ SILENT, bang01 on "captured") — audio.md §6.7, pins sfx_*_t404 x5 + witness
 scripts/t404_sfx_witness.sh PASS. Strict-close held: removing a placeholder
 measures nothing about the vendor's per-button choice; (a) and (b) both stay
 OPEN on their own closure bars.
+t429 update (docs/re/audio.md S6.8, trail docs/re/_wip_t429.md): the (b)
+closure bar's PREMISE is REFUTED by static measurement — +0x1bcc/+0x1bce are NOT
+control-record fields and windows.txt SOUNDCHANNEL does not feed them. They are
+columns 3/4 (sfx1/sfx2) of batfx.txt, loaded by the battle-control window ctor
+0x1acd0 (sscanf "%d %d %d %d") and read HIWORD-first by KEYBOARD gizmo-fire
+handlers 0x17af3..0x1a1c2 indexed by key charcode (0x17439 lea ebx,[ecx+4*key]).
+MEASURED census of the whole play path (34 sites, every one eax=0x78638 audio
+object): 17 batfx-keyboard table reads (13 wrapper + 2 direct + 2 variants); 8 immediate-0 sites (= manifest[0] "button",
+md5 cef40f13a210357d8d9379d52a5ab484) of which 0x1b0b0/0x1b1c5/0x27e46 sit
+inside rectangle click hit-tests; 7 sites read a per-RECORD sfx id at +0x57
+HIWORD with -1 = silent (0x30e75/0x3220f/0x3336f/0x3af9e/0x4e453/0x4e512,
+records reached through control pool
+0x7a35c — the STRATEGIC control pool per t428e). FUN_000500e0's id-space is the
+86-name soundfx.txt manifest, so button01/button02/click08 are vendor-UNREACHABLE
+by construction. NET: (b) is narrowed to one measurable question — which
+id-0/+0x57 site covers the strategic rail/NEXTTURN press, and does windows.txt
+SOUNDCHANNEL write +0x57 (if it does, the t395 census {0 x118} means the vendor
+plays "button" on those controls). Row STAYS OPEN (strict-close: no strategic-UI
+site identified yet; sfxForPress unchanged, click08 remains a documented port
+choice).
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor cost hack, Orbital Docks effect

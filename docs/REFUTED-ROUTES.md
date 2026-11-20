@@ -1434,3 +1434,19 @@ chrome bands + black field. Trail docs/re/_wip_t426.md F1.
 ## state) — chase it only if a witness of that state ever appears.
 ## Harness corollary: cold-leg censuses MUST poll-by-BREAK (BPDEL * releases a
 ## pending halt unbanked — t428f attempt-1). Trail docs/re/_wip_t428f.md.
+
+
+## R-t429. THE "DRIVE CLICKS AT 0x17488/0x1749b" OQ-027b CAPTURE PLAN IS DEAD
+(t429 static census). The two cited FUN_000500e0 callers are KEYBOARD
+gizmo-fire sites in batmode.cpp: index = 4*(key charcode) over the batfx.txt
+table (loader 0x1acd0, sscanf "%d %d %d %d" -> columns 3/4 = sfx1/sfx2 at
++0x1bcc/+0x1bce, read via `sar edx,0x10`). Mouse clicks never reach them, so a
+click-driven BP census banks nothing, and "capture diff of +0x1bcc across
+control classes" is unmeasurable as written (batfx has no control classes).
+Do NOT re-run this plan and do NOT re-derive FUN_000500e0 (cited
+work/coswnd_decomp/500e0.c). Live residue + law: docs/re/audio.md S6.8, trail
+docs/re/_wip_t429.md. The strategic-UI question moved to the record-field
+route: per-record sfx id at record+0x57 HIWORD (-1 = silent), 6 call sites
+(0x30e75/0x3220f/0x3336f/0x3af9e/0x4e453/0x4e512); windows.txt keyword "SOUNDCHANNEL" has ZERO literal in the
+payload (case-insensitive MEASURED) — find the windows.txt parser's store
+(0x575e4 region, opened via pool-rel 0x2ffc) before assuming +0x57 == SOUNDCHANNEL.
