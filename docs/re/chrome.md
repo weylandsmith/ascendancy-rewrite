@@ -152,3 +152,63 @@ our render (row means 109.0/106.7/82.8/64.6/46.4/46.2/28.8 vs vendor
 106.5/106.2/83.7/65.5/45.3/46.9/28.3; strip 87.0/131.2/133.2/121.8 vs
 vendor 86.1/133.6/133.7/120.7). Residual: our h-repeat 0.406 vs vendor
 0.347 (copy-left 25% slightly long; 25/30 scored worse on row chi2).
+
+## 7. t433 MEMORY-SURFACE VERDICT — MANY DETERMINISTIC INSTANCES, NO SURFACE
+[MEASURED 2026-11-20, docs/re/_wip_t433.md F0-F7; probes
+scripts/t433_surface_probe.py, t433_canonical_probe.py,
+scripts/t433_instance_relation.py, scripts/t433_fb_resident_probe.py]
+
+1. SS4(a)'s "which pixel gets which colour cannot be replicated from still
+   captures" holds, but the companion premise behind t433 (ONE canonical
+   memory surface exists to be extracted) is REFUTED. The field comes in
+   INSTANCES that are a deterministic function of UI/repaint state. A 49-shot
+   sweep of work/screens/{t252,t253,t268} (left band screen x0..6 y40..439,
+   palette-index plane) lands every shot on one of a few instances at 100.0%
+   identity: the strategic-map instance (t252 baseline/species_menu, t253
+   baseline, t268 baseline/races — three independent sessions, byte-identical,
+   and identical to ref-map); a window-open instance (t252 intel_open, t268
+   intel_row, t253 fleet_open, = ref-planet; planet-vs-species refcaps agree
+   99.1%); a research-window instance (= ref-species: t252 research_open/
+   res_pan_v*, t268 node_*/reswin); a design-screen instance (all 10 t253
+   tab*/design*/reopen shots at exactly 75.1/85.5/85.5 vs map/planet/species);
+   a diplomacy instance shared by t252 sel_orfa and t268 neg_orfa
+   (78.7/65.7/66.2). Repainting DOES happen — SS1.1's "painted once" is
+   painted-once-per-repaint — and each repaint reproduces ITS instance exactly.
+   [verified]
+2. Instances are NOT phases of one buffer: vertical shift sweep dy=-300..300
+   over all 20 ordered instance pairs gains at most 2.0 identity points; no
+   index offset k satisfies B == A+k (top delta is always the 0 of identity).
+   One extracted surface therefore cannot be re-phased to cover them.
+3. NO SURFACE ON DISK: 396 signatures of 4 stacked left-band rows (28 B) ->
+   0/471 files in extracted/; a 448 B top-band block -> 0. Single 7-B rows hit
+   16 files (max 147 in 7racesel.tmp/1starmap.tmp) but the same regions give 0
+   at 28 B, so those are low-entropy coincidences, not a stored field.
+4. NO SURFACE IN THE SAVE CORPUS: 63 28-B and 400 7-B band signatures -> 0
+   hits in Memory (17,055,880 B) and Vga (2,647,348 B) of 20 saves
+   (work/r1/bank-play-20261111). Vacuity gate closed: game.pal's raw 768 B IS
+   in both members (Vga 0x845c5, Memory 0x28a6b3 -> phys 0x28a62b), but 45
+   64-B signatures of distinctive screen content score 0/45 in BOTH — the
+   displayed frame is not stored packed anywhere. Planar caveat handled by
+   vertical-run testing at pitch 80/160/320/640: pitch 640 gets 183 supports
+   (639/641/632/648 -> 0; shuffled-band null control -> 4), so a REAL
+   640-pitch paletted buffer exists around member 0x2f69f9..0x335979 — and it
+   is NOT the backdrop: 60 of its 40-B rows are found 0/60 in every refcap and
+   its census is 82% black / 6.2% chrome-family.
+=> SS1.5's statistical law STAYS the port's ceiling (R-t422c unchanged). The
+   remaining conceivable decider is a live debugger session on the generator's
+   SEED/STATE for a named UI instance — a different experiment from "extract
+   the surface", and it buys at best one instance. NAMED SEAM T433-C.
+5. Tooling laws for successors (each cost this iteration to learn):
+   (a) refcap png row = screen row + 40; work/screens/*_game.png rows ARE
+   screen rows. Mixing the two families at equal file rows silently yields
+   junk identities (measured 22.8% where the aligned value is 100.0%).
+   (b) THE PALETTE SCALE IS rgb = raw6*4 + raw6//16 (100.0% exact on
+   original-strategic-map.png); the *255//63 scale quoted in SS1 is close but
+   only 91.2% exact. Compare a refcap to a VNC grab in the INDEX plane, not
+   raw rgb: the DOSBox scaler blends rgb (VNC grabs are 69.3% palette-exact,
+   max distance 8) yet decodes back to the vendor index 100.0% of the time
+   (tie control: game.pal has 253 unique rgb, 758/281600 ambiguous px, and
+   excluding them changes nothing).
+   (c) numpy index planes MUST be cast to uint8 before .tobytes() (int64 makes
+   a "7-byte row" a 56-byte garbage needle), and signatures must be asserted
+   non-empty — bytes.find(b'') matches every file at offset 0.

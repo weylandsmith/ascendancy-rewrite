@@ -1490,3 +1490,31 @@ in its own baseline_game.png ((8,32,49) is the DOSBox-displayed navy,
 Do NOT blit 7racesel k0..k6 as row art. The vendor state-7 layer law is
 chrome + dark-speckle wells + flat navy populated rows (docs/re/ui-runtime.md
 t436 block). Trail: docs/re/_wip_t436.md F2/F4.
+
+
+## R-t433. THE "EXTRACT THE CHROME MEMORY SURFACE" ROUTE IS DEAD (t433).
+The premise that ONE canonical vendor chrome pattern sits in guest RAM (or on
+disk) waiting to be lifted by the pointer law is REFUTED by measurement
+(docs/re/chrome.md SS7, docs/re/_wip_t433.md F2/F4b/F5/F7):
+(1) the field has MANY instances tied deterministically to UI/repaint state
+    (map / window-open / research / design / diplomacy instances, each
+    reproduced byte-exactly across independent sessions — 49-shot census), so
+    a single surface could not describe the UI even if found;
+(2) instances are not phases of one buffer (shift sweep gains <=2.0 pts, no
+    index-offset law);
+(3) zero verbatim >=28 B band runs in all 471 extracted/ files and zero in the
+    Memory+Vga members of 20 saves — and the saves demonstrably do not store
+    the displayed frame packed at all (45 distinctive-content 64 B signatures
+    score 0/45 in both members), so a save-scan successor is vacuous;
+(4) the one real 640-pitch paletted buffer in Memory (member
+    0x2f69f9..0x335979, pitch controls 639/641/632/648 = 0 vs 183 supports,
+    null control 4) is NOT the backdrop (82% black, 6.2% chrome-family, 0/60
+    of its rows appear in any refcap).
+Do NOT re-run the save-corpus or extracted/ surface scan, and do NOT schedule
+another "chrome surface" capture. What remains conceivable is a DIFFERENT
+experiment — a live debugger session on the generator's seed/state for one
+named instance (seam T433-C) — and R-t422c's static-generator exhaustion
+applies to it. chrome.md SS1.5 (Markov law) stays the port's ceiling.
+NOTE the census-comparison laws in chrome.md SS7.5 (refcap row = screen+40;
+palette scale raw6*4+raw6//16; compare INDEX planes, uint8-cast) — t433 wasted
+half its probe budget re-deriving them.

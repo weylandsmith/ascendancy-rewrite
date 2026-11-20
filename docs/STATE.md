@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-20T07:05
+updated: 2026-11-20T11:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -229,27 +229,74 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t433 CHROME EXACT MEMORY-SURFACE ROUTE (ordering rationale: t436b
-CLOSED the t436 species-screen implementation row — chrome mottle on state
-7, dark-speckle wells (speciesWellAt, chain 45/35 fitted on the G1 mean-run
-statistic), flat-navy populated rows with CENTRED names, smrace+racering
-portraits at home stars, pins x6, suite 466/0, witness census VERDICT PASS
-(_wip_t436.md G1/G2 + ui-runtime.md t436b block) — so the remaining named
-seams all route through the ONE generator question t433 owns: the vendor
-routine behind the correlated speckle/chrome fields (intro interior t424b,
-status header t417b, species wells t436b are three salt-variants of ONE
-family, each currently a fitted Markov approximation, never the vendor's
-exact memory surface). Route: R1 scratch-copy session, capture the chrome
-surface from guest RAM via the pointer law (docs/re/r1-savestate.md) while
-the map screen is up, diff against textureColourAt's field — exact match
-closes the generator law for the whole family, a clean negative is banked
-as its own honest result (scripts/r434b_art_session.py is the live-capture
-tool pattern; do NOT re-try static base schemes — R-t4xx fifth-scheme ban).
-Queue after t433: t437 (OQ-027b record-field) -> final verify+push+handoff.
-SEAMS carried: T436-A portrait COUNT (vendor capture 4 rings vs 3 known
-rows; port paints known owners only), T436-B owner->racering index, H3 race
-bytes 1..20, T428-B, T427-A..F, gizmo-icon rows + class selector (t434b),
-research panel art join D3 (t435 F6).
+NEXT t437 OQ-027(b) PER-BUTTON SFX ID VIA LIVE CONTROL-RECORD DIFF (ordering
+rationale: t433 CLOSED the chrome memory-surface question with a cited
+negative and zero capture — the field has many UI-state-deterministic
+instances, no surface on disk (0/471 files) and none in the save corpus
+(0/45 distinctive-frame signatures in Memory AND Vga), so chrome.md SS1.5
+stands and the route is now R-t433-dead; that leaves the ledger's three open
+rows OQ-016 / OQ-019 / OQ-027, of which OQ-016 is capture-gated on a Phase
+Bomb nobody ever builds (BLOCKED.md), OQ-019 is a cited-dead-route packet
+awaiting USER ruling D2 (t329, acceptance explicitly deferred — do NOT
+re-ask), and OQ-027(b) is the ONLY open row with a LIVE route that has never
+been exercised). Route (row text, docs/OPEN-QUESTIONS.md OQ-027): FUN_000500e0's
+UI callers 0x17488/0x1749b read the sound id from CONTROL-RECORD +0x1bcc /
++0x1bce in the runtime window-item tables; windows.txt carries no id
+(SOUNDCHANNEL census {0 x118, -0 x1}, re-verified t395). ONE R1 scratch-copy
+session, map screen up, walk a few control classes, dump the live record
+fields at +0x1bcc/+0x1bce per control and diff across classes — a non-zero
+spread closes the row (and then upgrade the port's documented
+click08/laser01/bang01 choices in audio.md SS5); an all-zero spread is the
+honest negative that retires the capture route and leaves the row USER-gated
+(hearing). Tool pattern scripts/r434b_art_session.py (scratch game-wp only,
+OWN ring dir, private Xvfb :97 NEVER production :9, md5-verified RESUME.GAM,
+never loadstate, base assert, SIGKILL by recorded PID); P0 from
+r1_dbg_session.P0, legs registered through r299_leg_session. Do NOT re-run
+the extracted/ or save-corpus chrome scans (R-t433), do NOT re-open the
+static chrome generator (R-t422c), do NOT re-ask D2.
+Queue after t437: final verify + push + handoff.
+SEAMS carried: T433-C chrome generator seed/state for a named instance
+(needs a live debugger session; R-t422c applies; NOT queued), T436-A portrait
+COUNT, T436-B owner->racering index, H3 race bytes 1..20, T428-B, T427-A..F,
+gizmo-icon rows + class selector (t434b), research panel art join D3 (t435 F6).
+
+t433 LANDED 2026-11-20 (CHROME MEMORY-SURFACE ROUTE ANSWERED, ZERO CAPTURE,
+NEGATIVE; docs/re/chrome.md SS7 + docs/re/_wip_t433.md F0-F7). (i) THE t433
+PREMISE IS REFUTED: the chrome field is not ONE canonical pattern but MANY
+instances tied deterministically to UI/repaint state — a 49-shot census over
+work/screens/{t252,t253,t268} puts every shot on one of five instances at
+100.0% index identity (map / window-open / research / design / diplomacy), the
+map instance byte-identical across THREE independent sessions, so repainting
+happens per window transition and reproduces its instance exactly (SS1.1
+"painted once" -> painted once PER repaint). (ii) Instances are NOT phases of
+one buffer: dy sweep +-300 over all 20 ordered pairs gains <=2.0 pts, no
+index-offset law. (iii) NO SURFACE ON DISK: 396 x 28 B band signatures + one
+448 B top-band block, 0/471 extracted/ files (the 16 files hitting on 7 B rows
+are low-entropy coincidences — same regions give 0 at 28 B). (iv) NO SURFACE
+IN THE SAVES: 0 hits in Memory (17 MB) and Vga (2.6 MB) of 20 saves, and the
+vacuity gate is CLOSED — game.pal's raw 768 B is found in both members
+(Vga 0x845c5, Memory 0x28a6b3 -> phys 0x28a62b) while 45 64 B signatures of
+distinctive screen content score 0/45 in BOTH, i.e. the displayed frame is not
+stored packed anywhere. (v) Planar caveat handled: vertical-run pitch test
+gives 183 supports at pitch 640 vs 0 at 639/641/632/648 and 4 on a shuffled
+null control, so a real 640-pitch paletted buffer exists (member
+0x2f69f9..0x335979) — but it is 82% black / 6.2% chrome-family and 0/60 of its
+40 B rows appear in any refcap: NOT the backdrop. (vi) CENSUS TOOLING LAWS
+banked (chrome.md SS7.5, each cost probes): refcap png row = screen row + 40
+while work/screens/*_game.png rows ARE screen rows (mixing them silently gave
+22.8% where aligned is 100.0%); the palette scale is raw6*4+raw6//16 (100.0%
+exact; the *255//63 quoted in SS1 only 91.2%); compare INDEX planes not rgb
+(the DOSBox scaler blends rgb — VNC grabs 69.3% palette-exact, max distance 8 —
+yet decodes to the vendor index 100.0% of the time, tie-controlled); numpy
+index planes must be uint8-cast before .tobytes() and needles asserted
+non-empty. R-t433 written. NO OQ closed (strict-close honest negative: the
+chrome generator has no OQ owner — open rows remain OQ-016/019/027, none
+touched). GATE_EXIT=0, LEDGER AUDIT OK.
+PROCESS LESSON (self-inflicted, bank so no one repeats it): do NOT rebuild a
+docs file from read_file() output — read_file returns 'N|'-prefixed lines and
+the renumbering write CLOBBERED docs/re/chrome.md mid-iteration; recovered by
+`git checkout -- docs/re/chrome.md` (the file was clean at HEAD) and re-applied
+as an append. Append with patch(), never rewrite-by-read.
 
 t436b LANDED 2026-11-20 (SPECIES SCREEN IMPLEMENTATION COMPLETE — all F9
 items; docs/re/_wip_t436.md G1/G2 + ui-runtime.md t436b block). (i) STATE-7
