@@ -619,3 +619,14 @@ Full working log: docs/re/_wip_t405.md F1-F10. Durable laws:
   VERDICT PASS (open abil00 / inside-dismiss / modal swallowed 2 of 10
   Returns / species-row log / zero laser01) + native vision grade (dialog
   legible inside bounds, "1 of 6 Species Known" + FLUDENTRI row w/ flag).
+
+## t435 RESEARCH PAN-FACE + PLAQUE LAWS (2026-11-20, docs/re/_wip_t435.md)
+- SHAPEFRAME n == 20res.shp RECORD n [measured]: k0 15x30 LEFT arrow /
+  k1 14x30 RIGHT / k2 30x15 UP pair / k3 30x14 DOWN; the four windows.txt
+  child rects match the record dims HALF-OPEN (539-524==15 etc); faces carry
+  their own (12,32,48) panel background (plurality index, 220..243 px).
+  k4/k5 (30x15/30x14) exist with NO windows.txt consumer — not blitted.
+- PLAYER PLAQUE (10,10) frame idx19 15x25 + raceflag k<species> is on EVERY
+  vendor screen [census 38/38 *_game.png, crest green bbox x10..24 y10..34;
+  the single 0-px shot is modal-covered]. Port paints it on research now
+  (t426 map law reused); pins test_resface_t435.

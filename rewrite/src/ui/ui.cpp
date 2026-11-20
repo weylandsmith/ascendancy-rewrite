@@ -2056,6 +2056,26 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         txt.draw(ren, (640 - w) / 2, 14, htxt, true,
                                  SDL_Color{0, 230, 90, 255});
                     }
+                    // t435 D2 FIX: PLAYER PLAQUE upper-left, same t426 law as
+                    // the map screen (frame 15x25 idx19 outline at (10,10) +
+                    // raceflag k<species>). CENSUS [measured this session]:
+                    // EVERY banked vendor *_game.png (38 shots, t252/t253
+                    // families) holds the green crest bbox x10..24 y10..34 ==
+                    // the plaque at the SAME position on every screen.
+                    {
+                        SDL_Rect pf{kPlaqueX, kPlaqueY, kPlaqueW, kPlaqueH};
+                        SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
+                        SDL_RenderFillRect(ren, &pf);
+                        const uint32_t ga = chromePaletteArgb(kPlaqueFrameIdx);
+                        SDL_SetRenderDrawColor(ren, uint8_t((ga >> 16) & 0xff),
+                                               uint8_t((ga >> 8) & 0xff),
+                                               uint8_t(ga & 0xff), 255);
+                        SDL_RenderDrawRect(ren, &pf);
+                        const int ps2 = camp.playerSpecies();
+                        if (ps2 >= 0 && ps2 < int(raceflagLib.count()))
+                            blitShape(ren, raceflagLib, ps2, kPlaqueX,
+                                      kPlaqueY);
+                    }
                     // Tree field: clip to the RESWIN interior so panning
                     // never paints the header or the right panel.
                     SDL_Rect clip{7, 46, 470, 427};
@@ -2130,9 +2150,18 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         }
                     }
                     SDL_RenderSetClipRect(ren, nullptr);
-                    // Pan button faces (honest vector; 20res frames 0..3 are
-                    // the cited art, 15x30 each — blit seam named).
-                    auto arrowBox = [&](const Rect& r, bool horiz, bool neg) {
+                    // t435 D1 FIX: pan-button faces = 20res.shp records
+                    // SHAPEFRAME 0..3 blitted at the verbatim windows.txt
+                    // rects (dims match per child exactly; faces carry their
+                    // own (12,32,48) panel bg). Law docs/re/_wip_t435.md F5.
+                    // Fallback stays vector ONLY if the lib refused.
+                    const int resArt = libFor(kScreenResearch);
+                    auto arrowFace = [&](const Rect& r, int frame, bool horiz,
+                                         bool neg) {
+                        if (resArt >= 0 &&
+                            frame < int(kLibs[resArt].count()) &&
+                            blitShape(ren, kLibs[resArt], frame, r.x0, r.y0))
+                            return;
                         SDL_Rect rr{r.x0, r.y0, r.x1 - r.x0 + 1,
                                     r.y1 - r.y0 + 1};
                         SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
@@ -2155,10 +2184,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                                cx + 4, cy + 4 * s);
                         }
                     };
-                    arrowBox(kResRotLeft, true, false);
-                    arrowBox(kResRotRight, true, true);
-                    arrowBox(kResMoveUp, false, true);
-                    arrowBox(kResMoveDown, false, false);
+                    arrowFace(kResRotLeft, 0, true, false);
+                    arrowFace(kResRotRight, 1, true, true);
+                    arrowFace(kResMoveUp, 2, false, true);
+                    arrowFace(kResMoveDown, 3, false, false);
                     // RIGHT PANEL x 484..632 (code-drawn; t252 verbatim
                     // order): #122, name (wrapped), #124 days, #125, Allows
                     // entries. No project -> panel BLANK (t268 witness;

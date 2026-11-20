@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-20T04:20
+updated: 2026-11-20T05:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -229,23 +229,46 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t435 RESEARCH SCREEN LEGS (ordering rationale: t434/t434b closed the
-ships-screen row COMPLETE — ink, selection, AND row art — so per the
-"finish the SAME row before advancing" law the queue advances; PHASE-16 order
-unchanged: t435(research) -> t436(species+ability) -> t433(chrome EXACT
-memory-surface) -> t437(OQ-027b record-field) -> t432(final verify+push+
-handoff)). Start from docs/re/_wip_t408.md (research screen law: header
-static #130 first-%s join centred, nodes rings r30 depth x row, RIGHT PANEL
-x484..632 code-drawn, 20res.shp arrow faces; vendor node POSITIONS are the
-named seam) and the t434b HARNESS PRECEDENT: scripts/r434b_art_session.py is
-the current cold-leg BPPM template (poll-by-break, delete-fired-BP resume,
-content-identity dumps). Two carry-warnings from t434b: (a) rail-screen
-switches = the FLEET/RESEARCH windows.txt widgets (474,169-632,199 /
-474,208-632,238), NOT the TOG* widgets — attempt-1 wasted on TOGSHIPS;
-(b) census scripts need ~/.hermes/hermes-agent/venv/bin/python (numpy+PIL
-live there, NOT in the repo .venv). SEAMS carried: speckle generator origin
+NEXT t436 SPECIES SCREEN + SPECIAL ABILITY CYCLE (ordering rationale: t435
+closed the research row's live re-check list and its two available-evidence
+defects (20res faces + plaque), so per PHASE-16 execution order the queue
+advances: t436(species+ability) -> t433(chrome EXACT memory-surface) ->
+t437(OQ-027b record-field) -> t432(final verify+push+handoff)). Row text
+(STATE.md t436 queue row): species screen "quite off" (derive its window
+paint chain + race art records); SPECIAL ABILITY BUTTON DOES NOTHING
+(windows.txt button SENDMESSAGE -> which handler? decompile the target;
+implement or bank the honest negative IF the handler provably requires
+unreachable state — name the witness). TOOLING NOTES from t435: (1) the
+Ghidra headless (8089) had NO program loaded — that, not a dead route, was
+t419's zero-strings negative; load_program work/ascend_restored.bin
+(Raw Binary x86:LE:32 gcc, imagebase 0) works but yields 0 functions until
+scripted create — the banked capstone window work/t425_dispatch.txt +
+objdump over work/ascend_payload.bin remain the faster path; (2) rail
+switches = the rail widgets (t434b law), census scripts need
+~/.hermes/hermes-agent/venv/bin/python; (3) windows.txt child rects for
+SHAPEFRAME buttons are HALF-OPEN (539-524==record width, t435 pins) — do not
+add 1 when matching rects to records. SEAMS carried: speckle generator origin
 (t433), H3 race bytes 1..20, T428-B, T427-A..F, gizmo-icon rows + per-ship
-class selector (t434b F6 seams).
+class selector (t434b), research panel art join D3 (t435 F6).
+
+t435 LANDED 2026-11-20 (RESEARCH SCREEN live re-check + 2 defects fixed;
+docs/re/ui-runtime.md t435 block via _wip_t435.md F0-F6). LIVE RE-CHECK LIST ALL PASS:
+t419 witness FAIL was a WITNESS-ORDERING bug (t425(d) made the popup click
+fire doEscape -> Esc poll counted on the map screen); fixed order, 5/5 PASS,
+esc_ms=204, CPU delta 144 ticks/4s (~36% core), spin-latch stop law
+witnessed by md5 (stopped frame == spin2 frame BYTE-IDENTICAL). D1 FIX: pan
+faces = 20res.shp records SHAPEFRAME 0..3 blitted at the verbatim rects
+(rect==record dims HALF-OPEN; faces carry (12,32,48) panel bg; k4/k5 exist
+but no windows.txt record consumes them — not blitted); our-render box
+censuses == decoded-record histograms EXACTLY (220/29/24, +18 orange, 243,
+171). D2 FIX: player plaque upper-left (t426 map law reused; vendor census
+38/38 *_game.png crest bbox x10..24 y10..34 — ours matches). PINS
+test_resface_t435 x2, suite 460/0. NAMED SEAMS: D3 panel disk-icon + planet
+art join (needs the STATE-20 vtable [win+0xa7]+0xc paint chain identified
+live — closure witness named), D4 chrome frame = t433's row. NO OQ closed
+(strict-close; research-screen complaints have no OQ owner — t408/t419
+precedent). GATE_EXIT=0, LEDGER AUDIT OK (open rows unchanged:
+OQ-016/019/027).
 
 t434b LANDED 2026-11-20 (COMPLETE SHIPS SCREEN — BOTH legs closed; docs/re/
 _wip_t434b.md F0-F6 + ships.md S70). LEG 1: witness t407_fleetlist_witness.sh

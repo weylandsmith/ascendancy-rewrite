@@ -65,17 +65,9 @@ shot research-stopped
 X 578 465; sleep 0.5
 shot research-scrolldn
 
-# CORNER POPUP: warp+click into the top-left corner (0,0 is outside every
-# hit-map on state 20 -> the click itself is inert; the WARP moves the real
-# pointer so the polled SDL_GetMouseState sees it).
-X click 2 2
-sleep 0.6
-shot corner-topleft
-X 320 240            # leave the corner (inert centre point)
-sleep 0.4
-
-# ESC INSTANT: count existing "ui screen" log lines, send Escape, poll for a
-# NEW one (the t410 chain unwinds research -> map).
+# ESC INSTANT: measured ON the research screen BEFORE the corner-popup block
+# (t435 F1 fix: since t425(d) the popup CLICK itself fires doEscape, so the
+# old order counted n0 after research had already exited -> vacuous poll).
 n0=$(grep -c "ui screen" "$OUT/app.log")
 t_esc=$(date +%s.%N)
 K Escape
@@ -90,6 +82,17 @@ for i in $(seq 1 30); do
     fi
 done
 echo "esc_ms=$esc_ms" >> "$OUT/cpu.txt"
+
+# CORNER POPUP: re-enter research, then warp+click into the top-left corner
+# (the WARP moves the real pointer so the polled SDL_GetMouseState sees it;
+# the click inside exitPopupRect fires the Escape chain per t425(d) law).
+X 553 223            # rail Research again
+sleep 1
+X click 2 2
+sleep 0.6
+shot corner-topleft
+X 320 240            # leave the corner (inert centre point)
+sleep 0.4
 kill $APP 2>/dev/null; kill $XV 2>/dev/null
 
 echo "--- research/corner log lines:"
