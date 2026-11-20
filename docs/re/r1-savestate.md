@@ -1027,3 +1027,23 @@ OQ-003 status: load-path question CLOSED (verbatim blob + pointer
 preservation, this section is the evidence). Field MEANINGS (+0x0a/+0x20/
 +0x4a/+0x55 packed regions) STAY OPEN — this capture proved HOW records
 arrive in RAM, not what every word means.
+
+## PIN A BANK, NEVER THE LIVE RING (t439)
+`work/r1/playcap/save/` is a 20-slot ROTATING window (autosave=10 41-60) owned
+by whichever dosbox-x session is live. Any rewrite test that pins scalar
+witnesses (day/turn, ship count, name) against `playcap/save/NN.sav` is a
+time-bomb: it passes only until the next relaunch or the next 200 s of play.
+MEASURED t439: after the recovery relaunch, `observer_savestate_import_t382`
+failed 5 assertions (day 1254->1086, ships.size, kind4, attributed,
+ships[0].name) with ZERO code change — the fixture had been silently living on
+the rotating ring.
+FIX (in force): tests read a frozen bank — the test now uses
+`kWitnessSave = "/work/r1/bank-t438-ring-2200/60.sav"`, the `cp -a` of the ring
+at banking time (identical bytes, zero writers), and the 466/0 suite passes
+against it. When banking a capture that tests will pin, bank BEFORE any
+relaunch and point the test at the bank dir.
+Related hazard (t439, benign but note it): gate stages that drive DOSBox by
+window title ("sent button1 to 0x200008 ... window died before release") run
+their OWN scratch window; a production :9 session coexisting did not break them
+(gate green with production live), but xsend's "window died before release"
+text is NOT evidence of a dead window — do not chase it.

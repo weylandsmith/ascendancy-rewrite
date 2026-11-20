@@ -34,9 +34,19 @@ std::vector<uint8_t> slurp(const std::string& p) {
                                 std::istreambuf_iterator<char>());
 }
 
+// t439 FIXTURE LAW: the witness below is the frozen t1254 capture, so it must
+// NOT be read from the LIVE ring work/r1/playcap/save/ — that directory is a
+// rotating 20-slot window owned by whatever dosbox session is running, and
+// t439's recovery relaunch rotated it to turn 1086, which silently invalidated
+// every pinned scalar in observer_savestate_import_t382 (5 failures, gate red).
+// work/r1/bank-t438-ring-2200/ is the `cp -a` of the ring as it stood when that
+// capture was banked: same bytes, ZERO writers. Rule for every future ring pin:
+// pin a bank dir (immutable), never playcap/save/ (rotating).
+const char* kWitnessSave = "/work/r1/bank-t438-ring-2200/60.sav";
+
 bool corpusSaves() {
     return fs::exists(kRepo + "/work/r1/game/04.SAV") &&
-           fs::exists(kRepo + "/work/r1/playcap/save/60.sav");
+           fs::exists(kRepo + kWitnessSave);
 }
 
 }  // namespace
@@ -121,7 +131,7 @@ TEST(observer_savestate_import_t382) {
     std::vector<Observer::StarRow> stars;
     std::vector<Observer::ShipRow> ships;
     std::string err;
-    CHECK(Observer::importSavestate(kRepo + "/work/r1/playcap/save/60.sav", payload,
+    CHECK(Observer::importSavestate(kRepo + kWitnessSave, payload,
                                     &day, &stars, &ships, &err));
     CHECK(day == 1254);
     CHECK(stars.size() == 50);

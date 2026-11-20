@@ -1063,3 +1063,72 @@ b8f62f5325 -> 1efc92201c. Screens work/screens/t5/rightclick-probe-{0,1}.png.
 Implication for scripted driving: every ship-select sequence must begin with
 Button3 deselect, or stale selection hijacks the next click (candidate cause
 for t293-class selection failures — CHECK before re-running captures).
+
+## GAME-RING RECOVERY LAW (t439, 2026-11-20, measured on the live recovery)
+The production session died of TL expiry at 2026-11-11 01:07 and sat dead for
+9 days while the loop correctly refused to relaunch (loop_one_task.sh:205 puts
+relaunch on the research schedule, not the harness's). Recovery is a 4-step
+procedure, all steps verified this iteration:
+
+1. BANK FIRST, then verify the bank — never re-copy. `cp -a` of
+   work/r1/playcap/save to work/r1/bank-tNNN-* (t438 bank: 20 slots / 43M).
+2. GATE ON THE HUMAN: `ss -tn | grep 5910` must show no VNC client before
+   touching the stack (killing a live client's session is the one thing that
+   cannot be undone). Also confirm zero dosbox-x via the structured /proc
+   census (basename(argv[0])=='dosbox-x'), never pkill.
+3. RELAUNCH with the stock command, no hand-rolled flags:
+   `bash scripts/r1_playcap_vnc.sh start` -> reuses Xvfb :9, reaps stale
+   watchers, writes session.conf, records work/r1/vnc/dosbox.pid, and self-verifies
+   (`BRINGUP OK (ring row landed within 30 s: 41.sav)`). Confirm with
+   `python3 scripts/r1_game_health.py` -> HEALTHY + new TL expiry.
+4. RESUME FROM THE TITLE MENU with the RFB channel, not a blind click (below).
+
+DEATH SIGNATURE (t277 law, reconfirmed): dosbox.log ends
+`LOG: Active save slot: 1 [Empty]` and the ring froze ~TL expiry minus ring
+depth. A death with that signature needs NO crash investigation.
+
+t439 MEASURED OUTCOME: pid 1182156 (args `-conf .../work/r1/vnc/session.conf
+-nogui -time-limit 172800`), TL expiry 2026-11-22 12:02:26, watcher 1182171,
+ring banking every 10 s (slot age 1-3 s), and the ring census
+(scripts/t368_ring_turn.py) reads turn=1086 on 20/20 slots — the resumed world,
+not the pre-death 1254.
+
+## WINDOW-ORIGIN DRIFT: RE-DERIVE BEFORE ANY TITLE-MENU INPUT (t439)
+The t250/t287 "+80,+100 root offset" law is NOT stable across launches. t439
+measured the dosbox window at `640x480+192+184`
+(`DISPLAY=:9 xwininfo -root -tree | grep -i dosbox` ->
+`"DOSBox-X 2025.02.01: ASCEND - 100%"  640x480+192+184`). Consequences:
+- r287_title_nav.py (hard-coded XOFF,YOFF=80,100) MISREADS the title menu: it
+  reported `highlight=NONE bands=3:0.49` while the real highlight was on
+  Tutorial. Pressing Enter on that reading would have started the tutorial.
+- r287_vncinput.py takes `RFB_XOFF`/`RFB_YOFF` env overrides — USE THEM with
+  the live xwininfo numbers. With 192/184, `move 318 333` produced band
+  R4=0.88 and vision confirmed the highlighted label "Return to Current Game".
+- LAW: before any title-menu Enter/click, (a) read the window origin from
+  xwininfo, (b) crop the screenshot at THAT origin, (c) confirm the highlight
+  band >= 0.5 AND read the highlighted row's LABEL from the rendered pixels
+  (vision_analyze). Three channels agreeing is cheap; the tutorial-clobber
+  class (t287 08:40:48, t259) is not.
+
+## KEYS vs POINTERS OVER RFB ARE NOT EQUALLY RELIABLE (t439, negative result)
+On the t439 fresh session, RFB PointerEvents worked (hover band moved to R4)
+but neither key channel fired the menu: `r287_vncinput.py key Return` and
+`xsend "DOSBox-X" key Return` both left the title menu up (xsend even reported
+`window died before release`, a red herring — the window was alive and later
+accepted clicks). Presumed cause: X input focus was not on the guest window
+after the unattended restart. WORKAROUND THAT WORKS: a POSITIONAL click —
+`RFB_XOFF=192 RFB_YOFF=184 r287_vncinput.py click 318 333` — because XTEST
+button events at a coordinate are delivered positionally and do not depend on
+focus. Rule: prefer hover-verify + positional click over keys for menu
+activation; use keys only after confirming the window has focus.
+
+## SITTING TEST MUST USE THE TURN NUMBER, NOT TIMELINE GROWTH (t439)
+Since t439 restored an unattended live game, work/r1/playcap/live-timeline.jsonl
+grows ~1 row / 10 s with NO human at the keyboard (9,385,663,364 B at session
+start -> 9,388,633,285 B ~17 min later, turn still 1086). Therefore the
+"did the user play since the last iteration" pre-step is only valid on a TURN
+CHANGE: run `python3 scripts/t368_ring_turn.py` (read-only, 20/20 slots) and
+compare against the last recorded turn. t439 baseline: turn=1086. A timeline
+that merely got bigger is the autosave cadence, not a sitting — adjudicating it
+with scripts/r1_t85g_sitting.py replays the old t1253/1254 sitting as if it
+were new evidence (the t152 silent-wrong-input shape).

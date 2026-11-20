@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-20T22:10
+updated: 2026-11-20T22:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -229,56 +229,137 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t439 GAME-RING RECOVERY (ordering rationale: t438 final-verify ran
-green — gate GATE_EXIT=0, suite 466/0, LEDGER AUDIT OK, LEDGER INDEX OK —
-and surfaced the one live fact that outranks every gate-blocked ledger row:
-work/r1/loop/GAME_DEAD.txt (2026-11-20 11:31:10) says the production dosbox-x
-(pid 107664) is GONE with zero harness dosbox-x in /proc, the watch feed is
-not banking, and the newest ring slot 60.sav is 514658 s old. The health
-tool deliberately does NOT relaunch (loop_one_task.sh:205 'relaunching the
-game is research-schedule policy'), so recovery is loop work, not harness
-work. Do, in order: (1) BANK THE RING — DONE at t438:
-work/r1/bank-t438-ring-2200 holds 20 slots / 43M (cp -a of playcap/save,
-newest 60.sav Nov 14 12:33); verify it still exists, do NOT re-copy.
-(2) Decide relaunch vs park per docs/BLOCKED.md SOP (t277 block, ~line 235):
-r1_playcap_vnc.sh defaults (TL=172800, headless x11 under Xvfb, nosound,
-scratch rules — production ring dir gets EXACTLY ONE writer, two-writer law
-t266), production resumes via title 'Return to Current Game' (318,333) and
-the live state lives in the RING not RESUME.GAM (t259). Record the new pid
-to work/r1/vnc/dosbox.pid so r1_game_health.py can watch it, and verify the
-feed banks a NEW slot within ~30 s before calling it healthy. (3) If the
-relaunch softlocks or the title resume path fails, do NOT open a crash
-investigation (t277 law) — bank what exists, write the state into BLOCKED.md
-under the sentinel park log, and land the iteration parked. WHY THIS BEFORE
-LEDGER WORK: OQ-016's Phase-Bomb capture route, OQ-019's sugar-cube scripted
-session (scripts/r297_order_session.py, Gate: End Turn ONCE before picking),
-and any future heap tune-table capture for OQ-027(a) ALL need a live game;
-the corpus alternative is refuted three times over (t49/t58/t265 — do NOT
-re-mine saves for movement). Do NOT: re-run extracted/ or save-corpus chrome
-scans (R-t433); re-open the static chrome generator (R-t422c); re-ask D2 or
-the D12 item-5 audio ask (both pending, unanswered as of this iteration —
-ruling page server IS up on :8613, pid 646702, cwd work/r1/d1page, newest
-submission file 2026-11-18); re-derive the t437 SOUNDCHANNEL law (audio.md
-S6.9); pkill -f / pkill -x dosbox-x (BLOCKED.md kill law — structured ps
-match only); mount game/ for any run.
+NEXT t440 OQ-027(a) TUNEID INDEX BASE — LIVE TUNE-TABLE / FILE-OPEN CAPTURE
+(ordering rationale: t439 restored a live production game, so for the first
+time since 2026-11-11 every live route is executable again; of the three open
+rows this is the ONLY one that is machine-closable without a user. OQ-016's
+residue list is EXHAUSTED and its remaining sub-law is user adjudication per
+D3; OQ-019's scripted-mouse session class is BUDGET-SPENT by binding law
+(REFUTED-ROUTES.md:465-467 — t293 x3 + t297 x1 + t298 x3, "the next witness on
+the selection/order legs is the debugger class"), so do NOT run
+scripts/r297_order_session.py; OQ-027(a) closes on "a capture read of the heap
+tune table via the pointer law" (docs/OPEN-QUESTIONS.md OQ-027) and needs one
+debugger session on the intro path. The t438 handoff listed r297 as an option —
+that suggestion is SUPERSEDED by the t298 budget law, which t439 checked.)
+
+THE QUESTION (verbatim from the ledger): subtitle.txt DIGITALMUSIC
+TUNEID 6@FRAMENUMBER 20 / 7@988 maps into music.txt either 0- or 1-based. Port
+law in force is 1-based (6=intro00, 7=intro01) on a SIZE argument only
+(intro00 2,000,000 B = 90.7 s covers frames 20..988 unlooped). audio.md S6.1
+proves the base is NOT statically decidable: FUN_000678ec -> FUN_00074a88
+(handle, tuneid) "opens slot table entry, stores tuneid at [handle+0x8868]" and
+the table is heap-relative.
+
+DO, in order:
+(1) SCRATCH SESSION ONLY, never production :9. The trigger is the intro, and
+    any New Game writes work/r1/game/RESUME.GAM — the md5-pinned witness
+    5b382afbb789186c3654f3cec085b2e2 and production's only resume store. Copy
+    the scratch tree (work/r1/game -> work/r1/game-t440), give it its OWN ring
+    dir and its OWN Xvfb display, per the two-writer law (t266) and the
+    BLOCKED.md R1 runbook. Production :9 must stay untouched and keep banking.
+(2) TRIGGER the DIGITALMUSIC cue with title-menu row R1 "Play Introduction"
+    (movie-only, no campaign state written). Use the t439 input laws: read the
+    window origin from `DISPLAY=:<n> xwininfo -root -tree | grep -i dosbox`,
+    pass RFB_XOFF/RFB_YOFF to scripts/r287_vncinput.py, hover-verify the band,
+    then a POSITIONAL click (keys are unreliable without X focus — t439
+    negative). If R1 does not reach the subtitle consumer loop, fall back to
+    New Game IN THE SCRATCH TREE and say so in the record.
+(3) INSTRUMENT the open, in preference order, smallest instrument first:
+    (a) DOS INT 21h open (AH=3Dh) breakpoint and read the ASCIIZ name — the
+        name IS the answer (intro00 vs intro01 for TUNEID 6);
+    (b) entry breakpoint on FUN_00074a88 reading the tuneid arg, plus the
+        slot-table base it dereferences, then map the slot back to a name via
+        the music.txt loader FUN_00020fd4 name table (audio.md S3.3);
+    (c) memory read of [handle+0x8868] after the cue.
+    Compose with scripts/r1_dbg_session.py (t327 tool, declarative legs) — do
+    NOT re-derive instrument laws (docs/re/dosbox-debugger.md).
+(4) HAZARD TO CHECK FIRST, and record the answer either way: BLOCKED.md
+    mandates nosound=true for save-state runs, but a nosound build may
+    short-circuit the DIGITALMUSIC path entirely, making the session vacuous.
+    Run the census with sound ENABLED in the scratch conf (production's
+    session.conf already uses nosound=false) and confirm the cue fires before
+    spending legs. A vacuous session is an honest negative, not a result.
+(5) CLOSE ONLY IF the opened track name is read from the live process. Then
+    upgrade rewrite/src/ui/audio.cpp (or the music path that picks intro00) to
+    the cited base, pin it, update docs/re/audio.md S6.1 + the OQ-027 row. If
+    the cue cannot be reached, keep the row open, write the negative, and name
+    the seam. Do NOT re-ask the user (D12 item 5 audio ask is still pending —
+    DECISIONS.md mtime 2026-11-18 13:05, no submission newer than HEAD; the
+    ruling page server is up on :8613).
+
+GAME STATE t440 STARTS FROM (verified t439, do not re-verify): production pid
+1182156 HEALTHY, TL expiry 2026-11-22 12:02:26, watcher 1182171, ring 41..60
+banking every 10 s, resumed to the strategic map at turn 1086. SITTING TEST:
+compare the TURN via `python3 scripts/t368_ring_turn.py` (baseline 1086), NOT
+live-timeline.jsonl growth — an unattended game grows the timeline ~1 row/10 s
+with no human (docs/re/selfplay.md t439 law).
+
 SEAMS carried: T433-C chrome generator seed/state (live debugger only, NOT
 queued), T436-A portrait COUNT, T436-B owner->racering index, H3 race bytes
 1..20, T428-B, T427-A..F, gizmo-icon rows + class selector (t434b), research
 panel art join D3 (t435 F6).
-OPEN-LEDGER HANDOFF STATE (t438 verified, each row names its gate-owner):
-OQ-016 = USER ADJUDICATION per D3 (residue list EXHAUSTED; only the
-Phase-Bomb nuke-law sub-capture is machine-closable and it needs a live
-game); OQ-019 = live scripted session (r297 driver ready, needs live game;
-per-ship build path is BOUNDARY-by-decision D3, not RE); OQ-027 = item (b)
-CLOSED with measurement+code site (t437), item (a) TUNEID base = USER
-HEARING (D12 item 5, pending) or heap tune-table capture (needs live game).
-No machine-only-closable row remains: the loop's productive modes from here
-are (i) keep the game alive so capture routes exist, (ii) land seams/seams-
-adjacent polish under D13 vision rules, (iii) apply user rulings the moment
-they land. NO GIT REMOTE IS CONFIGURED (git remote -v empty; .git/config has
-no remote sections) — 'push' steps in older LANDED blocks referred to the
-pre-sanitization repo; deliverables are local commits only unless the user
-adds a remote.
+OPEN-LEDGER HANDOFF STATE (unchanged by t439, gate-owners named):
+OQ-016 = USER ADJUDICATION per D3 (residue list EXHAUSTED; the Phase-Bomb
+nuke-law sub-capture is machine-closable and now has a live game, but it needs
+a Phase-Bomb-carrying fleet built first — expensive, schedule deliberately);
+OQ-019 = user-gated (acceptance of the per-ship sim, docs/re/pership-spec.md)
++ debugger-class witness for the selection/order legs, NOT another scripted
+mouse session (t298 budget law); OQ-027 = item (b) CLOSED with measurement +
+code site (t437), item (a) TUNEID base = t440's target or the user's ears.
+NO GIT REMOTE IS CONFIGURED (git remote -v empty) — deliverables are local
+commits only.
+
+t439 LANDED 2026-11-20 (GAME-RING RECOVERY — LIVE GAME RESTORED, ZERO CAPTURE,
+no OQ closed: recovery enables routes, it measures nothing). (i) DEATH CAUSE
+CONFIRMED t277 TL-EXPIRY, no crash investigation opened: dosbox.log tail
+`LOG: Active save slot: 1 [Empty]` + `X connection to :9 broken`; TL expiry
+2026-11-11 01:07, ring froze Nov 14 12:33, dead 9 days because
+loop_one_task.sh:205 puts relaunch on the research schedule. (ii) PRE-FLIGHT
+GATES PASSED: bank-t438-ring-2200 present (20 slots/43M, not re-copied);
+structured /proc census (basename(argv[0])=='dosbox-x') = ZERO procs; `ss -tn
+| grep 5910` empty => no human VNC client to evict. (iii) RELAUNCH (not park):
+`bash scripts/r1_playcap_vnc.sh start` -> `BRINGUP OK (ring row landed within
+30 s: 41.sav)`; r1_game_health.py 12:04:18 `HEALTHY | game pid 1182156; TL
+expiry 2026-11-22 12:02:26; watcher 1182171; ring 51.sav age 1s`; pid recorded
+to work/r1/vnc/dosbox.pid; re-check 12:11:21 still HEALTHY slot age 3s.
+(iv) RESUME TO THE MAP: title menu reached, hover-verified R4 'Return to
+Current Game' (band 0.88 + vision label) then POSITIONAL RFB click (318,333) ->
+strategic map, HUD '01086'. (v) t259 LAW MEASURED WITH NUMBERS + R-t439
+WRITTEN: pre-death ring = 20/20 slots turn=1254; post-resume ring = 20/20
+turn=1086 == RESUME.GAM (md5 5b382afbb789186c3654f3cec085b2e2, untouched). The
+168 turns 1086->1254 existed ONLY in dosbox Memory and are unrecoverable — do
+NOT try to restore them; capture drivers must take an in-game Save if evidence
+depends on a state. (vi) THREE NEW OPERATIONAL LAWS banked docs/re/selfplay.md:
+WINDOW-ORIGIN DRIFT (t250/t287 +80,+100 is NOT stable — measured
+`640x480+192+184`; r287_title_nav.py's hard-coded crop reported
+`highlight=NONE bands=3:0.49` while the real highlight was TUTORIAL; use
+RFB_XOFF/RFB_YOFF env overrides + xwininfo, and confirm the row LABEL by vision
+before Enter — the t287 tutorial-clobber class); KEYS vs POINTERS OVER RFB (on
+a focus-less restart both `r287_vncinput.py key Return` and `xsend ... Return`
+failed to fire the menu while PointerEvents worked; positional XTEST click is
+the focus-independent channel — xsend's `window died before release` is a red
+herring, the window kept accepting clicks); SITTING TEST BY TURN NUMBER
+(an unattended live game grows live-timeline.jsonl ~1 row/10 s — 9,385,663,364
+-> 9,388,633,285 B in 17 min at constant turn 1086 — so use t368_ring_turn.py,
+baseline 1086, never file size). (vii) CORRECTION TO THE t438 HANDOFF: it
+offered scripts/r297_order_session.py as an OQ-019 route; REFUTED-ROUTES.md:
+465-467 makes the scripted-mouse session class budget-spent (t293 x3 + t297 x1
++ t298 x3, next witness = debugger class) — t440 must NOT run it. (viii) NO
+ruling arrived: DECISIONS.md 2026-11-18 13:05 < HEAD 2026-11-20 11:52, no
+d1page submission newer than HEAD, :8613 still listening; D2 + D12 item 5
+remain PENDING, nothing interpreted for the user. (ix) GATE WENT RED AND WAS
+FIXED AT THE ROOT — THE LESSON OF THIS ITERATION: the relaunch rotated the LIVE
+ring work/r1/playcap/save/ (20-slot window, now turn 1086), which silently
+invalidated rewrite/tests/test_observer_t382.cpp
+`observer_savestate_import_t382` (5 failures: day 1254->1086, ships.size,
+kind4, attributed, ships[0].name) with ZERO code change — a scalar witness was
+pinned to a rotating directory. FIX: the test now reads the frozen t438 bank via
+`kWitnessSave = "/work/r1/bank-t438-ring-2200/60.sav"` (identical bytes, zero
+writers) — suite back to 466 tests / 0 skipped / 0 failed, gate GATE_EXIT=0
+with production live. LAW banked docs/re/r1-savestate.md "PIN A BANK, NEVER THE
+LIVE RING": future ring pins point at a bank dir, never playcap/save/. Ledger
+stays rows=20 open=[OQ-016,OQ-019,OQ-027] closed=17; LEDGER AUDIT OK, LEDGER
+INDEX OK, production HEALTHY at 12:39:18 (pid 1182156, ring age 0 s).
 
 t438 LANDED 2026-11-20 (FINAL VERIFY + HANDOFF, ZERO CAPTURE, no OQ closed —
 none was closable). (i) SITTING CHECK NEGATIVE: live-timeline.jsonl and every

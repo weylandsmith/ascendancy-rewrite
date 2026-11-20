@@ -1518,3 +1518,21 @@ applies to it. chrome.md SS1.5 (Markov law) stays the port's ceiling.
 NOTE the census-comparison laws in chrome.md SS7.5 (refcap row = screen+40;
 palette scale raw6*4+raw6//16; compare INDEX planes, uint8-cast) — t433 wasted
 half its probe budget re-deriving them.
+
+## R-t439: DO NOT ATTEMPT TO RESTORE THE PRE-DEATH CAMPAIGN STATE (turn 1254).
+The session that died of TL expiry on 2026-11-11 had played to turn 1254
+(ring census at t439: 20/20 slots 41..60 turn=1254, banked at
+work/r1/bank-t438-ring-2200). That state is UNRECOVERABLE and any iteration
+that spends probes trying to get back to it is wasted:
+- the ring slots are dosbox-x Memory dumps (evidence), not game saves; the
+  loadstate GUI path is input-dead (t261 law) and the softlock class lives
+  inside the save;
+- the vendor's own resume store work/r1/game/RESUME.GAM was never written by
+  the drivers (md5 5b382afbb789186c3654f3cec085b2e2, the untouched Oct-29
+  witness), so title "Return to Current Game" returns turn 1086;
+- MEASURED at t439 after a clean relaunch + title resume: ring reads
+  turn=1086 on 20/20 slots. The 168 turns (1086 -> 1254) are gone and the
+  correct posture is to bank new evidence forward from 1086, not to mourn it.
+Corollary for every future capture driver: if a sitting's evidence depends on
+a particular campaign state, TAKE AN IN-GAME SAVE (Save Game, Alt-S) during the
+sitting. Autosave-ring depth is ~200 s and does not survive the process.

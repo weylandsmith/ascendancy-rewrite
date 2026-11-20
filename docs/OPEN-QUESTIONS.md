@@ -13,6 +13,15 @@ Do-not-retry prohibitions: docs/REFUTED-ROUTES.md.
 
 Format: ID | area | question | status | what closes it (in-hand route)
 
+OPERATIONAL STATE (t439, 2026-11-20): a LIVE production game exists again
+(pid 1182156, TL expiry 2026-11-22 12:02:26, ring banking 10 s, resumed to the
+strategic map at turn 1086). This changes NO status cell: the three open rows
+below stay open under strict-close. It does mean their live-capture routes are
+executable again — OQ-016 Phase-Bomb nuke-law sub-capture, OQ-019 sugar-cube
+session (scripts/r297_order_session.py), OQ-027(a) heap tune-table capture.
+Recovery procedure + the window-origin/input laws: docs/re/selfplay.md
+"GAME-RING RECOVERY LAW (t439)".
+
 OQ-005 | shp | .shp shape-library codec: in-record DIMS location for the
 80-record residual class (container CLOSED 208/208; grammar CLOSED t61-t69)
 | CLOSED 2026-11-09 t367 — D1 USER RULING, the row's own named closer | CLOSING (t367): USER RULING 2026-11-09 12:45:01 (from ruling page; duplicate submit 12:45:31, applied once), docs/DECISIONS.md, verbatim: "USER: D1 mouse k5/k6/k7 = keep as-is / D1 batch 41 dispositions = accept all 41 / D1 A6 keep=True, A7 keep=True, A8 keep=True / D1 B-rows misidentified = none" + notes (A series keep as historical curiosity; B3 = star-map research menu button icon; B4 unrecognized; B5-B16 new-game menu, B17-B29 planet-screen manufacturing indicators). The ask's closure bar was the ruling or a drawn-frame capture (R13 bars self-grading) — the ruling landed. t367 MEASURED (shp.md S28): k5/k6/k7 signed-bbox dims 78x47 walk 47/47 rows, planes byte-identical md5 b2d049bbf5b571bfc4ea3b97db7a4fa7 (census 543287, nonzero 3666); rewrite corner-anchor gate fallback (shp.cpp decode(), TEST shp_corner_anchor_fallback_t367) admits EXACTLY these 3 corpus-wide — cos_star k40..k51 / 1starmap k1 / sg50expl k9 stay rejected per the vendor blit -1 gate @0x5cb2b (S25.2). Decision sheet rebuilt via generator (dispositions final: 40 NO-ASK + 1 JUNK-CERTAIN + 3 KEEP-RULED). Residue render-fidelity testimony (B5-B29 top-part chain) banked shp.md S28 — not a ledger row. | CLOSED PORTION (full evidence: archive 2026-11-03 + shp.md):
