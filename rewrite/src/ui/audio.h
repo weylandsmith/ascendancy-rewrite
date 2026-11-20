@@ -18,13 +18,17 @@
 
 namespace ascend::ui {
 
-// t404 CLICK-SFX LAW (D13 regression fix; docs/re/audio.md §6.5/§6.6/§6.7).
-// The shipped windows.txt SOUNDCHANNEL column is {0 x118, -0 x1} — it carries
-// NO per-button sound id, so every UI press sound is a DOCUMENTED PORT CHOICE
-// and must live in ONE pure lookup (headless-pinnable), never inline guesses.
-// Map clicks are SILENT: laser01 is a combat sample (soundfx.txt index 2,
-// band2) with no fire-order interaction in the port; playing it on every
-// COSMOSWnd click was the t400-era regression the owner reported.
+// t437 CLICK-SFX LAW (supersedes t404's port choice; docs/re/audio.md §6.9,
+// trail docs/re/_wip_t437.md). MEASURED: the windows.txt parser stores each
+// window's SOUNDCHANNEL value at record +0x59 (0x57e7a), and the strategic
+// press handler plays HIWORD(dword record+0x57) (-1 = silent, site 0x30e75).
+// SOUNDCHANNEL == 0 on all 119 file lines => file-declared buttons play
+// soundfx manifest[0] "button"; the runtime windows COSMOSWnd/BatModeWnd/
+// INTROFLIC/WMGRDEBUG (no file block) carry -1 => silent. Every press sound
+// must live in ONE pure lookup (headless-pinnable), never inline guesses.
+// Map clicks are SILENT: the map surface is COSMOSWnd (+0x59 == -1, 20/20
+// saves); laser01 is a combat sample (soundfx.txt index 2) with no fire-order
+// interaction in the port — playing it on every click was the t400-era bug.
 enum class UiPressSite { MapClick, RailButton, NextTurn, TitleButton };
 const char* sfxForPress(UiPressSite site);  // nullptr -> play nothing
 

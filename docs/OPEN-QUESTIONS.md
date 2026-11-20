@@ -331,6 +331,27 @@ SOUNDCHANNEL write +0x57 (if it does, the t395 census {0 x118} means the vendor
 plays "button" on those controls). Row STAYS OPEN (strict-close: no strategic-UI
 site identified yet; sfxForPress unchanged, click08 remains a documented port
 choice).
+t437 update (docs/re/audio.md S6.9, trail docs/re/_wip_t437.md F1-F6): ITEM (b)
+IS CLOSED BY MEASUREMENT (zero capture). (i) windows.txt SOUNDCHANNEL IS stored
+by the parser at window-record +0x59 (0x57e7a mov WORD [edx+0x59],ax; grammar
+position pinned by the X0/Y0/X1/Y1 rect stores +8/+c/+10/+14 in file order) —
++0x59 IS the HIWORD of dword[+0x57], the exact value the seven strategic play
+sites read. (ii) The strategic press handler is identified: 0x30c9c..0x30edb,
+rect hit-test over [rec+8..+0x14] then play HIWORD(dword[rec+0x57]) (site
+0x30e75) then SENDMESSAGE/SENDPARAM1 dispatch into control pool 0x7a35c.
+(iii) VALUE MEASURED: SOUNDCHANNEL == 0 on all 119 file lines (the "-0" scans
+to 0), and +0x59 == 0 on 2,400/2,400 file-declared window records across 20
+saves (scripts/t437_soundchannel_store_census.py); the only -1 records are the
+four runtime windows COSMOSWnd/BatModeWnd/INTROFLIC/WMGRDEBUG (silent branch).
+=> the vendor plays soundfx manifest[0] "button" on every file-declared button
+press and nothing on the map surface; there is NO per-button vendor id. CODE
+SITE CHANGED: rewrite/src/ui/audio.cpp sfxForPress RailButton/NextTurn/
+TitleButton click08 -> "button" (click08 off-manifest, vendor-unreachable);
+MapClick nullptr now cited. Pin sfx_press_buttons_button_t437; witnesses
+t404_sfx_witness.sh + t395_sound_witness.sh updated to "sfx button", both live
+VERDICT PASS. ITEM (a) (TUNEID index base) STAYS OPEN on its own bar: user
+hearing (D12 item 5 pending) or a heap tune-table capture read. ROW STAYS OPEN
+until (a) lands.
 
 OQ-019 | ships | per-ship design model (hull+gizmo inventory), sugar-cube->
 hop scale, vendor cost hack, Orbital Docks effect

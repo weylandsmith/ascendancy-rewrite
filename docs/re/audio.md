@@ -535,3 +535,52 @@ would be exactly the plausible-default move strict-close forbids. The port's
 click08 divergence is now quantified: the vendor's only reachable click sample
 is "button", so a fidelity swap is a one-line change once the strategic site is
 identified (probe named in docs/OPEN-QUESTIONS.md OQ-027).
+
+## 6.9 t437 SOUNDCHANNEL -> record+0x59 LAW: the strategic press sound is
+## manifest[0] "button" (CLOSES the (b) half's question; trail _wip_t437.md)
+
+The t429 residue ("which id-0/+0x57 site covers the strategic rail/NEXTTURN
+press, and does windows.txt SOUNDCHANNEL write +0x57") is ANSWERED by static
+disasm + save-corpus census, zero capture:
+
+1. STORE. Parser fn 0x575e4 scan sequence (fmt '%s %d' each), pinned by the
+   rect stores X0/Y0/X1/Y1 -> +8/+0xc/+0x10/+0x14 in windows.txt file order:
+   ... Y1 -> SHAPEFRAME (+0x1e word) -> SOUNDCHANNEL -> SENDMESSAGE (+0x45)
+   -> SENDPARAM1 (+0x4b) -> SENDPARAM2 (+0x4f) -> WINITEMS (+0x6d).
+   The SOUNDCHANNEL scan's store is 0x57e7a `mov WORD [edx+0x59],ax` — the
+   u16 at record+0x59, i.e. the HIWORD of dword[record+0x57]. Byte-scan:
+   inside the parser there is exactly ONE write to any disp in 0x55..0x5c
+   (0x57e7b; caveat banked: modrm rm=5 mod=01 is EBP+disp32 STACK, not a
+   record +0x5d — naive disp8 scans over-count).
+2. READ. Strategic press handler 0x30c9c..0x30edb (record base esi): rect
+   hit-test over [esi+8/+0xc/+0x10/+0x14], then 0x30e65 `mov edx,[esi+0x57];
+   sar edx,0x10; cmp edx,-1; je skip` -> 0x4fb30(eax=0x78638) -> FUN_000500e0
+   manifest play; then dispatches [esi+0x45]/[esi+0x4b] into strategic control
+   pool 0x7a35c (call 0x56ad4). Same record shape the parser writes (handle
+   [esi+0x41] used at 0x30d79..0x30dad exactly as the parser uses [ebp+0x41]).
+3. VALUE. File census: SOUNDCHANNEL is 0 on all 119 lines (the lone "-0" in
+   ALIENDIP scans to 0). Live census scripts/t437_soundchannel_store_census.py
+   over 20 saves: 2,480 named window records; +0x59 distribution {0: 2400,
+   0xffff: 80}; the 80 are COSMOSWnd/BatModeWnd/INTROFLIC/WMGRDEBUG x 20 —
+   the four runtime-created windows with NO windows.txt TYPE block. Every
+   file-declared window (NEXTTURN, NEXTTURNCONT, TOG*, RESEARCH, FLEET,
+   STATUS, GALAXY_MORE, PLANLIST, RESWIN, ALIENDIP, title buttons, ...) is 0
+   in 20/20 saves, zero mismatch.
+4. IDENTITY. soundfx.txt manifest[0] == "button" (line 5 after count 86).
+
+LAW (measured): the vendor plays soundfx manifest[0] "button.voc" on a press
+of ANY file-declared strategic window, and NOTHING (-1) on COSMOSWnd,
+BatModeWnd, INTROFLIC, WMGRDEBUG. There is no per-button vendor id for the
+strategic UI (per-key ids exist only in batfx.txt, t429). The t429 id-0
+immediate sites and these +0x57 sites agree: both resolve to "button".
+
+PORT UPGRADE (this commit): sfxForPress RailButton/NextTurn/TitleButton
+"click08" -> "button" (click08 is off-manifest, t395 — the vendor cannot play
+it; the trace line made silence audible-proof only in the wiring sense).
+MapClick stays nullptr, now CITED (COSMOSWnd +0x59 == -1, 20/20 saves).
+Pins: sfx_press_buttons_button_t437 (rewritten from the t404 click08 pin);
+witnesses t404_sfx_witness.sh + t395_sound_witness.sh expectations updated
+to "sfx button", both VERDICT PASS live (SDL_AUDIODRIVER=dummy --audio-trace).
+The audio_click08_offmanifest_t395 pin stays (click08.voc existence +
+off-manifest status are still true facts; the explicit chunk load is kept so
+any future deliberate use still resolves).

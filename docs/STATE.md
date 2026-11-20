@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-20T11:40
+updated: 2026-11-20T12:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -229,36 +229,61 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t437 OQ-027(b) PER-BUTTON SFX ID VIA LIVE CONTROL-RECORD DIFF (ordering
-rationale: t433 CLOSED the chrome memory-surface question with a cited
-negative and zero capture — the field has many UI-state-deterministic
-instances, no surface on disk (0/471 files) and none in the save corpus
-(0/45 distinctive-frame signatures in Memory AND Vga), so chrome.md SS1.5
-stands and the route is now R-t433-dead; that leaves the ledger's three open
-rows OQ-016 / OQ-019 / OQ-027, of which OQ-016 is capture-gated on a Phase
-Bomb nobody ever builds (BLOCKED.md), OQ-019 is a cited-dead-route packet
-awaiting USER ruling D2 (t329, acceptance explicitly deferred — do NOT
-re-ask), and OQ-027(b) is the ONLY open row with a LIVE route that has never
-been exercised). Route (row text, docs/OPEN-QUESTIONS.md OQ-027): FUN_000500e0's
-UI callers 0x17488/0x1749b read the sound id from CONTROL-RECORD +0x1bcc /
-+0x1bce in the runtime window-item tables; windows.txt carries no id
-(SOUNDCHANNEL census {0 x118, -0 x1}, re-verified t395). ONE R1 scratch-copy
-session, map screen up, walk a few control classes, dump the live record
-fields at +0x1bcc/+0x1bce per control and diff across classes — a non-zero
-spread closes the row (and then upgrade the port's documented
-click08/laser01/bang01 choices in audio.md SS5); an all-zero spread is the
-honest negative that retires the capture route and leaves the row USER-gated
-(hearing). Tool pattern scripts/r434b_art_session.py (scratch game-wp only,
-OWN ring dir, private Xvfb :97 NEVER production :9, md5-verified RESUME.GAM,
-never loadstate, base assert, SIGKILL by recorded PID); P0 from
-r1_dbg_session.P0, legs registered through r299_leg_session. Do NOT re-run
-the extracted/ or save-corpus chrome scans (R-t433), do NOT re-open the
-static chrome generator (R-t422c), do NOT re-ask D2.
-Queue after t437: final verify + push + handoff.
+NEXT t438 FINAL VERIFY + HANDOFF (ordering rationale: t437 CLOSED OQ-027(b)
+with cited zero-capture measurement — SOUNDCHANNEL store 0x57e7a -> record
++0x59 == HIWORD(dword+0x57), value 0 on all 119 file lines and 2,400/2,400
+file-declared records in 20 saves, strategic press handler 0x30c9c..0x30edb
+plays manifest[0] "button"; port upgraded sfxForPress -> "button", pin
+sfx_press_buttons_button_t437 mutation-verified, witnesses t404/t395 updated
+and live PASS. That exhausts every open row with a live route: OQ-016 is
+capture-gated on a Phase Bomb nobody builds (BLOCKED.md), OQ-019 awaits USER
+ruling D2 (acceptance explicitly deferred — do NOT re-ask), OQ-027(a) TUNEID
+base awaits user hearing (D12 item 5) or a heap tune-table capture. The
+standing queue after t437 was always "final verify + push + handoff". Do:
+(1) sitting check per the loop header (live-timeline.jsonl growth ->
+scripts/r1_t85g_sitting.py first); (2) ruling check (DECISIONS.md /
+decision-sheet.md mtimes vs last commit, git status sweep; a D12 item-5
+"match/differ" verdict on the click sound would let OQ-027 fully close — the
+port now plays the cited "button", so record what the answer says verbatim,
+do not interpret FOR the user); (3) full bash scripts/gate.sh + both ledger
+audits; (4) write the handoff summary (open ledger = exactly OQ-016/019/027a,
+each naming its gate-owner) into STATE.md; (5) git push if a remote is
+configured (check `git remote -v` — never invent one). Do NOT re-run the
+extracted/ or save-corpus chrome scans (R-t433), do NOT re-open the static
+chrome generator (R-t422c), do NOT re-ask D2, do NOT re-derive the t437
+SOUNDCHANNEL law (banked audio.md S6.9).
 SEAMS carried: T433-C chrome generator seed/state for a named instance
 (needs a live debugger session; R-t422c applies; NOT queued), T436-A portrait
 COUNT, T436-B owner->racering index, H3 race bytes 1..20, T428-B, T427-A..F,
 gizmo-icon rows + class selector (t434b), research panel art join D3 (t435 F6).
+
+t437 LANDED 2026-11-20 (OQ-027(b) CLOSED BY MEASUREMENT, ZERO CAPTURE;
+docs/re/audio.md S6.9 + docs/re/_wip_t437.md F0-F6; assignment note: the STATE
+t437 text still quoted the +0x1bcc route — superseded by R-t429; the LIVE
+residue (t429-narrowed question) is what was worked). (i) windows.txt
+SOUNDCHANNEL IS the strategic sfx id: parser fn 0x575e4 stores it at
+record+0x59 (0x57e7a mov WORD [edx+0x59],ax), grammar position pinned by the
+X0/Y0/X1/Y1 rect stores +8/+c/+10/+14 in file order; +0x59 == HIWORD of
+dword[+0x57]. (ii) Strategic press handler identified 0x30c9c..0x30edb: rect
+hit-test then play HIWORD(dword[rec+0x57]) (0x30e75, -1 = silent) then
+SENDMESSAGE/SENDPARAM1 into control pool 0x7a35c. (iii) VALUE: 0 on all 119
+file lines ("-0" scans to 0); live RAM +0x59 == 0 on 2,400/2,400 file-declared
+records x 20 saves (scripts/t437_soundchannel_store_census.py); only
+COSMOSWnd/BatModeWnd/INTROFLIC/WMGRDEBUG (runtime, no file block) carry -1.
+=> vendor plays soundfx manifest[0] "button" on every file-declared button
+press; NOTHING on the map; no per-button vendor id exists for the strategic
+UI. (iv) PORT UPGRADE: rewrite/src/ui/audio.cpp sfxForPress
+RailButton/NextTurn/TitleButton click08 -> "button" (click08 off-manifest,
+vendor-unreachable since t395 — the old port sound was ALWAYS silent);
+MapClick nullptr now cited (COSMOSWnd -1). Pin sfx_press_buttons_button_t437
+mutation-verified (click08 mutant CAUGHT); suite 466/0; witnesses
+t404_sfx_witness.sh + t395_sound_witness.sh updated to "sfx button", both
+live VERDICT PASS. TOOLING LAWS banked: modrm rm=5 mod=01 is EBP+disp32
+(STACK), not record disp8 — naive disp8 scans over-count record writes ~10x;
+byte-scan + objdump grammar walk is the reliable store-census pair. LEDGER:
+OQ-027 STAYS OPEN (item (a) TUNEID base = user-hearing/heap-capture bar;
+(b) closed text carries the measurement + code site). GATE_EXIT=0,
+LEDGER AUDIT OK, LEDGER INDEX OK.
 
 t433 LANDED 2026-11-20 (CHROME MEMORY-SURFACE ROUTE ANSWERED, ZERO CAPTURE,
 NEGATIVE; docs/re/chrome.md SS7 + docs/re/_wip_t433.md F0-F7). (i) THE t433

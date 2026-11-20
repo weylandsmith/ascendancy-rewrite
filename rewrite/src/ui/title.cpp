@@ -1001,13 +1001,12 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 const int idx = titleButtonAt(p);
                 const BootState next = bootClick(st, p);
                 if (next == st) continue;  // click outside any live button
-                // t395 BUTTON SFX (D10): click08 on every title-menu button
-                // press, routed through the t404 sfxForPress law — the
-                // windows.txt SOUNDCHANNEL census {0 x118, -0 x1} carries no
-                // sound id (audio.md §6.5, t395 re-census), so which sample
-                // the vendor played per button class is uncited; click08 is
-                // the documented port choice, symmetric with the campaign
-                // rail / next-turn presses.
+                // t437 BUTTON SFX: title-menu buttons play soundfx
+                // manifest[0] "button" — the windows.txt SOUNDCHANNEL value
+                // (0 on every file line) that the vendor's press handler
+                // plays via HIWORD(record+0x57) (audio.md §6.9, cited;
+                // supersedes the t395/t404 click08 port choice — click08 is
+                // off-manifest and vendor-unreachable).
                 if (const char* sfx = sfxForPress(UiPressSite::TitleButton))
                     if (audio) audio->play(sfx);
                 std::printf("ui title click %s -> %s\n",

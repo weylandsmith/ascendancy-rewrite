@@ -32,13 +32,17 @@ TEST(sfx_press_mapclick_silent_t404) {
     CHECK(sfxForPress(UiPressSite::MapClick) == nullptr);
 }
 
-TEST(sfx_press_buttons_click08_t404) {
-    // Every press site that IS a button keeps click08 (documented port
-    // choice, §6.5; owner D11 heard and accepted it). Rail gains it this
-    // iteration — symmetric with title/next-turn.
-    CHECK(streq(sfxForPress(UiPressSite::RailButton), "click08"));
-    CHECK(streq(sfxForPress(UiPressSite::NextTurn), "click08"));
-    CHECK(streq(sfxForPress(UiPressSite::TitleButton), "click08"));
+TEST(sfx_press_buttons_button_t437) {
+    // t437 MEASURED LAW (supersedes the t404 click08 port choice): the
+    // windows.txt SOUNDCHANNEL store 0x57e7a (mov WORD [rec+0x59],ax) feeds
+    // the strategic press handler's play (HIWORD dword[rec+0x57], site
+    // 0x30e75); SOUNDCHANNEL == 0 on all 119 file lines and +0x59 == 0 on
+    // 2,400/2,400 file-declared records in 20 saves; manifest[0] == "button"
+    // (audio.md §6.9, docs/re/_wip_t437.md F1-F5). click08 is OFF-manifest
+    // (t395) — the vendor cannot play it at all.
+    CHECK(streq(sfxForPress(UiPressSite::RailButton), "button"));
+    CHECK(streq(sfxForPress(UiPressSite::NextTurn), "button"));
+    CHECK(streq(sfxForPress(UiPressSite::TitleButton), "button"));
 }
 
 TEST(sfx_press_out_of_range_silent_t404) {

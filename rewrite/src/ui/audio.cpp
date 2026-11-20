@@ -12,17 +12,27 @@
 namespace ascend::ui {
 namespace af = ascend::formats;
 
-// t404 CLICK-SFX LAW (see audio.h; audio.md §6.5-§6.7). Pure lookup so the
-// silence choice is headless-pinnable: MapClick has NO sample (the vendor
-// table names none and the port has no fire-order interaction); every other
-// press site is click08 — a documented port choice, symmetric across
-// rail / next-turn / title presses (user D11 accepted this click sound).
+// t437 VENDOR CLICK-SFX LAW (see audio.h; audio.md §6.9, trail
+// docs/re/_wip_t437.md F1-F6). MEASURED, replaces the t404 port choice:
+// the windows.txt parser fn 0x575e4 stores the SOUNDCHANNEL line as
+// mov WORD [rec+0x59],ax (0x57e7a) — the HIWORD of dword[rec+0x57] — and the
+// strategic-window press handler plays exactly that value
+// (mov edx,[esi+0x57]; sar edx,0x10; cmp edx,-1; je skip -> 0x4fb30 ->
+// FUN_000500e0, site 0x30e75 inside the X0/Y0/X1/Y1 rect hit-test).
+// SOUNDCHANNEL is 0 on all 119 file lines (file census) and +0x59 == 0 on all
+// 2,400 file-declared window records in 20 saves (scripts/
+// t437_soundchannel_store_census.py); manifest[0] == "button". So every
+// file-declared button (rail, NEXTTURN, title, planet panels) plays
+// soundfx.txt manifest[0] "button"; -1 (COSMOSWnd/BatModeWnd/INTROFLIC/
+// WMGRDEBUG — runtime windows with no windows.txt block) is silent.
+// MapClick therefore stays nullptr: the map surface is COSMOSWnd, +0x59 == -1
+// in 20/20 saves => the vendor map click is SILENT (now cited, was assumed).
 const char* sfxForPress(UiPressSite site) {
     switch (site) {
-        case UiPressSite::MapClick:    return nullptr;
-        case UiPressSite::RailButton:  return "click08";
-        case UiPressSite::NextTurn:    return "click08";
-        case UiPressSite::TitleButton: return "click08";
+        case UiPressSite::MapClick:    return nullptr;   // COSMOSWnd -1 silent
+        case UiPressSite::RailButton:  return "button";  // manifest[0]
+        case UiPressSite::NextTurn:    return "button";  // NEXTTURN SC=0
+        case UiPressSite::TitleButton: return "button";  // INTRO/RESUME SC=0
     }
     return nullptr;
 }

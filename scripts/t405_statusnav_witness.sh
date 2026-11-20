@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # t405 witness: SUB-SCREEN NAVIGATION + HIT-MAP. Xvfb, campaign seed 5,
-# SDL_AUDIODRIVER=dummy + --audio-trace so a rail press leaves a click08
+# SDL_AUDIODRIVER=dummy + --audio-trace so a rail press leaves a "sfx button"
 # marker line (t404 harness shape). Assertions are on the APP LOG:
 #  1. STATUS rail opens the status screen.
 #  2. (580,60) — inside the OLD 566-wide arrow rect — is now a ROW, not a

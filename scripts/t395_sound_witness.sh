@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # t395 witness: SOUND AUDIBILITY law on a live run.
 #  (A) default-on: NO --audio flag -> diagnostic line prints, tune 0 plays;
-#  (B) click INTRO button centre (318,215) -> 'sfx click08' trace line;
+#  (B) click INTRO button centre (318,215) -> 'sfx button' trace line;
+#      (t437: the cited title-button sample is soundfx manifest[0] "button" —
+#      windows.txt SOUNDCHANNEL 0 -> HIWORD(record+0x57) play, audio.md S6.9.
+#      The old 'sfx click08' expectation named an OFF-manifest sample that
+#      played nothing audible even when the trace line appeared.)
 #  (C) bad --data (ascend01/data emptied) -> degrade line names last path.
 set -u
 ROOT=/home/hrethric/projects/ascendancy
@@ -22,6 +26,6 @@ grep -E '^audio|^music|^sfx|title click' /tmp/t395_witness.log
 FAIL=0
 grep -q 'audio: driver=' /tmp/t395_witness.log || { echo "FAIL: no diagnostic line"; FAIL=1; }
 grep -q 'music 0 theme00' /tmp/t395_witness.log || { echo "FAIL: tune0 not played on title entry"; FAIL=1; }
-grep -q 'sfx click08' /tmp/t395_witness.log || { echo "FAIL: no click sfx on title button"; FAIL=1; }
+grep -q 'sfx button' /tmp/t395_witness.log || { echo "FAIL: no 'sfx button' on title click"; FAIL=1; }
 [ $FAIL -eq 0 ] && echo T395_WITNESS_PASS
 exit $FAIL

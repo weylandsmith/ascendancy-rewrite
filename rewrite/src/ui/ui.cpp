@@ -599,8 +599,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 // screens; Escape is the cited way back).
                 const auto rb = railButtonForScreen(p, screen);
                 if (rb.has_value()) {
-                    // t404: rail presses click like every other button press
-                    // (sfxForPress law; owner pin "rail click click08").
+                    // t437: rail presses play soundfx manifest[0] "button"
+                    // (sfxForPress law, cited — audio.md §6.9).
                     if (const char* sfx = sfxForPress(UiPressSite::RailButton))
                         if (audio) audio->play(sfx);
                     const RailControl rc = railControl(*rb);
@@ -827,9 +827,11 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 } else if (screen == kScreenPlanet &&
                            inRect(kPlanetPanels[4].rect, p)) {
                     // PLBUILD "Project Display" click opens the project list
-                    // (planet.txt info04). Sound: click08 per the sfxForPress
-                    // button law (PORT: the vendor panel's SOUNDCHANNEL is 0;
-                    // the owner's t404 pin covers rail/next-turn/title only).
+                    // (planet.txt info04). No press sfx call here: the panel
+                    // is a TYPE-29 window whose vendor press sound is
+                    // manifest[0] "button" (t437 law), but the port only
+                    // wires sfxForPress sites (rail/next-turn/title);
+                    // PLBUILD is not one (t404 pin scope).
                     projectOpen = !projectOpen;
                     std::printf("ui planet project-list %s\n",
                                 projectOpen ? "open" : "closed");
@@ -928,10 +930,11 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // selection widgets exist — no selection UI this row.
                     // t404 INPUT HYGIENE (D13): map clicks are SILENT. The
                     // laser01 here was an early placeholder that fired on
-                    // EVERY click; the vendor SOUNDCHANNEL table names no
-                    // sample (audio.md §6.5/§6.6) and the port has no
-                    // fire-order interaction, so laser01 plays NOWHERE
-                    // until combat UI exists (sfxForPress law).
+                    // EVERY click; MEASURED t437: the map surface is
+                    // COSMOSWnd, whose runtime record carries +0x59 == -1
+                    // (silent branch) in 20/20 saves, so a map click plays
+                    // NOTHING; laser01 plays NOWHERE until combat UI exists
+                    // (sfxForPress law, audio.md §6.9).
                     if (const char* sfx = sfxForPress(UiPressSite::MapClick))
                         if (audio) audio->play(sfx);
                     selected = hitStarCam(cam, camp.galaxy(), p);

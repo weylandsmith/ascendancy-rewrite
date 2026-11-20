@@ -6,6 +6,12 @@
 #   STATUS rail press           -> "sfx click08" adjacent to the screen switch
 #   NEXT TURN press             -> "sfx click08" right after "ui click next-turn"
 # and laser01 appears ZERO times in the whole log. The census decides.
+# t437 UPDATE: the expected press sound is "button" (soundfx manifest[0]) —
+# the windows.txt SOUNDCHANNEL value the vendor's press handler plays
+# (store 0x57e7a -> record+0x59 = HIWORD dword+0x57; 0 on all 119 file lines;
+# docs/re/_wip_t437.md F1-F6, audio.md S6.9). click08 was off-manifest and a
+# silent no-op, so the click08 expectation here could never have proven sound
+# actually played; "button" is the cited sample (audio.md S6.9).
 set -u
 cd "$(dirname "$0")/.."
 BIN=./rewrite/build/ascendancy
@@ -68,11 +74,11 @@ if stray: fails.append("STRAY SOUND DURING MAP->RAIL WINDOW")
 # 2) RAIL PRESS click08.
 r = sfx_at(rail - 1)
 print("sfx before rail switch:", r)
-if r != "sfx click08": fails.append("RAIL PRESS NOT click08")
+if r != "sfx button": fails.append("RAIL PRESS NOT button")
 # 3) NEXT TURN click08.
 n = sfx_at(nt + 1)
 print("sfx after next-turn:", n)
-if n != "sfx click08": fails.append("NEXTTURN NOT click08")
+if n != "sfx button": fails.append("NEXTTURN NOT button")
 # 4) laser01 anywhere = the D13 regression is still alive.
 laser = [l for l in lines if l.startswith("sfx ") and "laser" in l]
 print("laser lines:", laser)
