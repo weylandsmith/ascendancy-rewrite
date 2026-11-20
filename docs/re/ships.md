@@ -3296,3 +3296,47 @@ removed / M6 off-by-one (need=shieldUnits) / M8 consume-stop-removed /
 M9 charge-from-power-not-design. M7 window-widening mutants DROPPED vacuous
 (rule 6): need <= real module count always, phantom slots unreachable.
 Suite 263/0. NO OQ row closes (user-gated).
+
+## S70 t434b (2026-11-20) — SHIPS-SCREEN ROW ART MEASURED: LIB IDENTITY + ORIGIN LAW
+
+LIVE WITNESS (debugger BPPM, run work/r1/dbg-t434b2-a1-20261120-034958,
+tool scripts/r434b_art_session.py, scratch game-wp / Oct-29 RESUME.GAM /
+Xvfb :97, base 0x1BF4D8 asserted). Full working log docs/re/_wip_t434b.md.
+
+1. CLICK LAW: the rail widget that opens the ships screen is FLEET
+   (windows.txt rect 474,169-632,199, SENDMESSAGE 1 SENDPARAM1 18), click
+   (553,184). TOGSHIPS (557,403-587,433) is a DIFFERENT widget — clicking it
+   changed 924 px and fired zero paint legs (attempt-1 measured).
+
+2. ROW-ART LIBRARY IDENTITY [MEASURED, content not filename]: blit stop
+   0x50d49 dumps p2 (the FUN_0001fc34 payload, cache slot WORD ds:0x895c2 ==
+   14) 16 KB; the dump is BYTE-IDENTICAL to
+   extracted/ascend01/data/smship19.shp (unique match over all 208 libs).
+   => the ships-screen row render is DATA\SMSHIP<player-race>.SHP. The t434
+   F3 slot-name witness and the content match AGREE; identity is no longer
+   [inferred].
+
+3. SELECTOR LAW: p3 = BYTE_HI([ship+0xa7]) (ship class); live value 1;
+   smship libs hold N=4 records [measured headers smship19/00/01, dkship19].
+   t434 F5's "record 0x41=65 cannot exist" was an x-coordinate misread: push
+   order 0x50d39..0x50d49 is cdecl (y=0x32, x=0x41, sel, payload, struct).
+
+4. ORIGIN LAW [MEASURED, E6 shape 5caac.c:58-64 with live operands]:
+   x = arg_x(65) + dest_struct[+4](8) + s32[rec+8](-46) = 27
+   y = arg_y(50) + dest_struct[+8](47) + s32[rec+0xc](-26) = 71
+   rec = payload+0x49f (dir entry sel=1); the signed s32 pair at rec+8 IS the
+   hotspot (container slot-N-1 i32x2 reading, shp.md S1) and the dims pair
+   (rec+0x10 = 49x15) does NOT reproduce the origin. Origin (27,71) == the
+   t253 measured sprite bbox top-left EXACTLY.
+
+5. HONEST RESIDUALS: (a) record dims 49x15 < the t253 ink extent 95x42 —
+   the vendor paints the gizmo-icon rows (t434 F2(iii)) into the same column;
+   NOT ported, named seam. (b) per-ship class field absent in the port model
+   (t256c) — selector defaults to the witnessed 1. OQ-019 (design model)
+   UNTOUCHED; no OQ closed this iteration (strict-close).
+
+6. PORT LANDED: fleetlist.h kFleetArtX/kFleetArtDy/kFleetArtRecord; ui.cpp
+   loads smship<species>.shp and blitShape(27, rowTop+19) per row; pin
+   fleetlist_row_art_origin_t434b; witness render census: 114 ink px in the
+   49x15 window at (27,71), ink/selection census still VERDICT PASS
+   (green 69+397, white 69, cyan 0, navy-frame 0).

@@ -194,6 +194,22 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                            &merr))
             std::printf("ui mouse lib refused: %s\n", merr.c_str());
     }
+    // t434b: the PLAYER race's ship library DATA\SMSHIP<species>.SHP — the
+    // ships-screen ROW ART, identity MEASURED live (blit stop 0x50d49: the
+    // cache payload dump is byte-identical to smship19.shp for race 19;
+    // fleetlist.h ROW-ART LAW). Refusal degrades to a bare art column.
+    ascend::formats::ShapeLibrary smshipLib;
+    {
+        const int ps0 = camp.playerSpecies();
+        char sname[40];
+        std::snprintf(sname, sizeof(sname), "smship%02d.shp",
+                      (ps0 >= 0 && ps0 < 21) ? ps0 : 0);
+        std::string serr;
+        if (!smshipLib.load(
+                dataRoot + "/extracted/ascend01/data/" + sname, &serr))
+            std::printf("ui smship lib refused %s: %s\n", sname,
+                        serr.c_str());
+    }
     // t409 ABILITY DIALOG session state: the SPECIALAB press opens the
     // ABILITYWIN modal (ui/abilitylaw.h — vendor msg-5 path 0x55ffb ->
     // 0x37b14: sprintf("abil%02d") of the PLAYER SPECIES into ABILITYWIN,
@@ -1977,6 +1993,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     const bool sel = fleetScroll + int(i) == fleetSel;
                     const SDL_Color ink =
                         palInk(fleetRowPalIndex(sel, raceByte));
+                    // t434b ROW ART [MEASURED]: smship<species> record 1 at
+                    // origin (27, rowTop+19) — E6-law origin reproduces the
+                    // t253 sprite bbox top-left exactly (fleetlist.h law
+                    // block; gizmo-icon rows stay a named seam).
+                    blitShape(ren, smshipLib, kFleetArtRecord, kFleetArtX,
+                              y + kFleetArtDy);
                     // NAME column at x159 (MEASURED); LOCATION at x389
                     // (MEASURED) — the #146 lane string, ETA default 1
                     // (the port's transit resolves at the next boundary).

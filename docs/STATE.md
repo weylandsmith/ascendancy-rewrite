@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-20T00:05
+updated: 2026-11-20T04:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -229,33 +229,49 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t434b COMPLETE SHIPS SCREEN (FIRST: t434 landed its ink/selection leg
-2026-11-20 — finish the SAME row before advancing to t435; PHASE-16 order
-unchanged: t434b -> t435(research) -> t436(species+ability) -> t433(chrome
-EXACT memory-surface) -> t437(OQ-027b record-field) -> t432(final
-verify+push+handoff)). Two remaining legs, in order:
-(1) RUN the already-written witness (no new code needed):
-    OUT=/tmp/t434_shots bash scripts/t407_fleetlist_witness.sh &&
-    python3 scripts/t434_witness_census.py /tmp/t434_shots/fleet-rows.png
-    — expects name/location green-family ink, ZERO cyan, WHITE on the
-    selected row 0 name band, navy-frame px ~0 (census thresholds in the
-    script). If green is absent on OUR render, the ink path (ui.cpp
-    palInk/chromePaletteArgb, ~line 1960) has a bug — fix, rebuild, rerun.
-(2) ROW ART identity (sprite column MEASURED x27..122 row0): the vendor
-    blits a per-ship render at row left; smship/dkship TOC probes this
-    iteration were INCONCLUSIVE (honest negative _wip_t434.md F5/F6). Route:
-    fn 0x50d12 push sequence 0x50d28..0x50d86 (work/t434_fleetwin.asm) names
-    the library/record args — decode the blit call's shape-pointer chain,
-    do NOT guess from filenames (R-t434 premise: filename==record is
-    unproven). SEAMS carried: speckle params (t433), H3 race bytes 1..20,
-    T428-B, T427-A..F unchanged. Derive-before-code + iterate-to-clean.
+NEXT t435 RESEARCH SCREEN LEGS (ordering rationale: t434/t434b closed the
+ships-screen row COMPLETE — ink, selection, AND row art — so per the
+"finish the SAME row before advancing" law the queue advances; PHASE-16 order
+unchanged: t435(research) -> t436(species+ability) -> t433(chrome EXACT
+memory-surface) -> t437(OQ-027b record-field) -> t432(final verify+push+
+handoff)). Start from docs/re/_wip_t408.md (research screen law: header
+static #130 first-%s join centred, nodes rings r30 depth x row, RIGHT PANEL
+x484..632 code-drawn, 20res.shp arrow faces; vendor node POSITIONS are the
+named seam) and the t434b HARNESS PRECEDENT: scripts/r434b_art_session.py is
+the current cold-leg BPPM template (poll-by-break, delete-fired-BP resume,
+content-identity dumps). Two carry-warnings from t434b: (a) rail-screen
+switches = the FLEET/RESEARCH windows.txt widgets (474,169-632,199 /
+474,208-632,238), NOT the TOG* widgets — attempt-1 wasted on TOGSHIPS;
+(b) census scripts need ~/.hermes/hermes-agent/venv/bin/python (numpy+PIL
+live there, NOT in the repo .venv). SEAMS carried: speckle generator origin
+(t433), H3 race bytes 1..20, T428-B, T427-A..F, gizmo-icon rows + per-ship
+class selector (t434b F6 seams).
 
-SEAMS/OQ standing notes:
- SEAMS carried: speckle generator origin (t433),
-H3 race bytes 1..20, T428-B (witness-A lineage), T427-A..F unchanged.
+t434b LANDED 2026-11-20 (COMPLETE SHIPS SCREEN — BOTH legs closed; docs/re/
+_wip_t434b.md F0-F6 + ships.md S70). LEG 1: witness t407_fleetlist_witness.sh
+VERDICT PASS (select/deselect/scroll, zero laser01); t434_witness_census.py
+"FAIL" was a CENSUS BUG x2 (wrong ink y-window 56..76 vs measured 62..83;
+green censused on the SELECTED shot where white is law) — fixed script now
+VERDICT PASS on the same shots (green 69+397, white-on-selected 69, cyan 0,
+navy-frame 0). LEG 2 [MEASURED LIVE, run work/r1/dbg-t434b2-a1-20261120-
+034958, tool scripts/r434b_art_session.py]: ROW-ART LIB IDENTITY = the cache
+payload is BYTE-IDENTICAL to smship19.shp (16 KB dump, unique over 208 libs)
+— identity by CONTENT, R-t434 honored; selector = BYTE_HI([ship+0xa7]) live
+1 (t434 F5's 0x41-record reading was an x-coord misread — push order account
+F4); ORIGIN LAW x=65+8+(-46)=27, y=50+47+(-26)=71 == t253 bbox top-left
+EXACTLY (rec+8 signed pair = hotspot; dims 49x15 do NOT give the origin).
+PORT: smship<species>.shp loaded + blitShape(27, rowTop+19) per row
+(ui.cpp), kFleetArt* law constants (fleetlist.h), pin
+fleetlist_row_art_origin_t434b; our render census: 114 ink px in the 49x15
+window. HONEST RESIDUALS (named seams, not claimed): gizmo-icon rows not
+ported (t253 column extends y112), per-ship class field absent (t256c) ->
+selector default 1. CLICK LAW: rail switch = FLEET widget (553,184), NOT
+TOGSHIPS. BUILD clean, run_tests 458/458. NO OQ closed (strict-close;
+OQ-016/019/027 untouched — ships-screen visuals have no OQ owner, t424b/
+t428f precedent). GATE_EXIT=0, LEDGER AUDIT OK.
 
-t434 LANDED 2026-11-20 (SHIPS SCREEN INK/SELECTION LEG; ROW ART STAYS OPEN;
-docs/re/_wip_t434.md F0-F6). (i) PAINT LAW [verified fn 0x50d12 0x50d50..
+t434 LANDED 2026-11-20 (SHIPS SCREEN INK/SELECTION LEG; ROW ART NOW CLOSED
+BY t434b ABOVE; docs/re/_wip_t434.md F0-F6). (i) PAINT LAW [verified fn 0x50d12 0x50d50..
 0x50d8d, work/t434_fleetwin.asm]: row name+location drawn game.pal[raceByte*4
 +0x13] (race row +0x1, stride 0x1ee, BYTE-masked 0x50d6c), SELECTED row
 overrides to immediate 0xf3 == pal[243] white — same law family as t427

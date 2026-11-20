@@ -136,6 +136,28 @@ inline constexpr int fleetRowPalIndex(bool selected, int raceColourByte) {
     return selected ? 0xf3 : ((raceColourByte & 0xff) * 4 + 0x13);
 }
 
+// ---- t434b ROW-ART LAW [MEASURED live 2026-11-20, blit stop 0x50d49,
+// run work/r1/dbg-t434b2-a1-20261120-034958; full log docs/re/_wip_t434b.md]
+// The vendor blits the per-ship render: FUN_0001fc34(cache 0x9f10c, slot
+// WORD ds:0x895c2 == 14) -> payload BYTE-IDENTICAL (16 KB dump vs all 208
+// libs, unique match) to DATA\SMSHIP<race>.SHP — the PLAYER race's ship lib
+// (t434 F3 slot-name witness and the content match AGREE; identity is now
+// MEASURED, not inferred). Selector = BYTE_HI([ship+0xa7]) (ship class);
+// live witness value 1 -> dir entry p2+8+8*1 -> record @+0x49f, dims (49,15)
+// @rec+0x10, hotspot i32x2 (-46,-26) @rec+8/+0xc.
+// ORIGIN LAW (E6, work/combat_decomp/5caac.c:58-64, live numbers):
+//   x = arg_x(0x41=65) + dest_struct[+4](8) + s32[rec+8](-46) = 27
+//   y = arg_y(0x32=50) + dest_struct[+8](47) + s32[rec+0xc](-26) = 71
+// == the t253 MEASURED sprite bbox top-left (x27, row0). Row-relative:
+// (27, rowTop+19). SEAMS (labelled, not claimed): (a) the port has no
+// per-ship class field (t256c boundary) — record selector DEFAULTS to the
+// witnessed 1; (b) the t253 art column extends y71..112, so the vendor
+// paints MORE than this one record (gizmo-icon rows, t434 F2(iii), NOT
+// ported) — the port draws the one MEASURED record, never invented art.
+inline constexpr int kFleetArtX = 27;      // MEASURED origin x
+inline constexpr int kFleetArtDy = 19;     // MEASURED: rowTop 52 -> y 71
+inline constexpr int kFleetArtRecord = 1;  // witnessed sel (port default)
+
 enum class FleetHit { None, ArrowUp, ArrowDown, Row };
 struct FleetHitResult {
     FleetHit kind = FleetHit::None;

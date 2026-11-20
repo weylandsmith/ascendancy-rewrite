@@ -45,4 +45,23 @@ TEST(fleetlist_row_ink_witness_legs_t434) {
     CHECK(au::fleetRowPalIndex(false, 7) != au::fleetRowPalIndex(false, 0));
 }
 
+TEST(fleetlist_row_art_origin_t434b) {
+    // MEASURED live (blit stop 0x50d49, run
+    // work/r1/dbg-t434b2-a1-20261120-034958). The E6 composition shape
+    // (work/combat_decomp/5caac.c:58-64) with the WITNESSED operands:
+    //   x = arg_x(0x41) + dest_struct[+4](8) + s32[rec+8](-46)  = 27
+    //   y = arg_y(0x32) + dest_struct[+8](47) + s32[rec+0xc](-26) = 71
+    // rec = payload+0x49f (dir entry sel=1); the s32 pair at rec+8 is the
+    // record's signed-hotspot field. Result == the t253 sprite bbox
+    // top-left (x27, row0 y71). NOTE: dims (rec+0x10 = 49x15) do NOT
+    // reproduce the origin — the hotspot terms do (live arithmetic).
+    const int arg_x = 0x41, s_w = 8, hot_x = -46;   // live-witnessed
+    const int arg_y = 0x32, s_h = 47, hot_y = -26;  // live-witnessed
+    CHECK(arg_x + s_w + hot_x == au::kFleetArtX);            // 27
+    CHECK(arg_y + s_h + hot_y == au::kFleetRowsTop + au::kFleetArtDy);  // 71
+    // Selector domain: smship libs hold N=4 records [measured headers];
+    // the witnessed class selector was 1 (record @ payload+0x49f).
+    CHECK(au::kFleetArtRecord >= 0 && au::kFleetArtRecord < 4);
+}
+
 }  // namespace
