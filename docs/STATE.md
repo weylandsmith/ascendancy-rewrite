@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-20T05:05
+updated: 2026-11-20T07:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -229,27 +229,51 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t436 SPECIES SCREEN + SPECIAL ABILITY CYCLE (ordering rationale: t435
-closed the research row's live re-check list and its two available-evidence
-defects (20res faces + plaque), so per PHASE-16 execution order the queue
-advances: t436(species+ability) -> t433(chrome EXACT memory-surface) ->
-t437(OQ-027b record-field) -> t432(final verify+push+handoff)). Row text
-(STATE.md t436 queue row): species screen "quite off" (derive its window
-paint chain + race art records); SPECIAL ABILITY BUTTON DOES NOTHING
-(windows.txt button SENDMESSAGE -> which handler? decompile the target;
-implement or bank the honest negative IF the handler provably requires
-unreachable state — name the witness). TOOLING NOTES from t435: (1) the
-Ghidra headless (8089) had NO program loaded — that, not a dead route, was
-t419's zero-strings negative; load_program work/ascend_restored.bin
-(Raw Binary x86:LE:32 gcc, imagebase 0) works but yields 0 functions until
-scripted create — the banked capstone window work/t425_dispatch.txt +
-objdump over work/ascend_payload.bin remain the faster path; (2) rail
-switches = the rail widgets (t434b law), census scripts need
-~/.hermes/hermes-agent/venv/bin/python; (3) windows.txt child rects for
-SHAPEFRAME buttons are HALF-OPEN (539-524==record width, t435 pins) — do not
-add 1 when matching rects to records. SEAMS carried: speckle generator origin
-(t433), H3 race bytes 1..20, T428-B, T427-A..F, gizmo-icon rows + per-ship
-class selector (t434b), research panel art join D3 (t435 F6).
+NEXT t436b SPECIES SCREEN IMPLEMENTATION (ordering rationale: t436 closed
+the MEASUREMENT leg of the t436 row — the state-7 layer law, row-content
+geometry, portrait ring law, and the 7racesel identity are all banked with
+citations (docs/re/_wip_t436.md F1-F9 + ui-runtime.md t436 block) — and the
+run-time budget died before the code pass (a first speciesmenu.h edit was
+REVERTED, tree clean); per D18 per-screen cycle law the row re-queues as
+t436b, and the brief at _wip_t436.md F9 is ready to execute IN ORDER: (1)
+state-7 column = chrome textureColourAt + per-slot fill (Header/Empty =
+dark-speckle chain re-weighted 200:63/0:26/196:9 distinct salt, Populated =
+flat (12,32,48)); (2) row content = raceflag k<specnum> at row-local
+(14,3), name CENTRED at x553 (extinct white "Extinct"), DELETE the grey
+outline loop; (3) portraits = project homeStarFor(o), blitShapeCircular
+smrace<specnum> scale2 clipR49 + racering k<owner%7> scale2, seam T436-A
+count law; (4) pins test_speciesmenu_t436 + witness census leg on
+scripts/t409_species_witness.sh (populated-row navy dominant, empty-slot
+speckle families + lag-1 stats, centred-text bbox, zero grey-outline px,
+ring hue present). ABILITY leg: NO code work — wired+witnessed since t409;
+Use-Ability fire stays the named sim seam (seed-md5 law, F6). Queue after
+t436b: t433(chrome EXACT memory-surface) -> t437(OQ-027b record-field) ->
+final verify+push+handoff. SEAMS carried: speckle generator origin (t433),
+H3 race bytes 1..20, T436-A portrait count, T428-B, T427-A..F, gizmo-icon
+rows + class selector (t434b), research panel art join D3 (t435 F6).
+
+t436 LANDED 2026-11-20 (SPECIES SCREEN LAWS MEASURED — measurement-only
+iteration, NO code delta; docs/re/_wip_t436.md F0-F9 + ui-runtime.md t436
+block). (i) CHROME LIB CLOSED: state 7 binds DATA\7RACESEL.SHP (TYPE-100
+ln720) — but k0..k6 decode BYTE-IDENTICAL FLAT navy (t393 row-face premise
+REFUTED) and (12,32,48) occurs ZERO times in both t252 captures; k7 == the
+RACECONTROLS strip face. (ii) LAYER LAW [measured t252 capture vs own
+baseline]: column = CHROME mottle; header + EMPTY slots = DARK SPECKLE
+(pal 200:63/0:26/196:9, lag-1 2.96/2.99 correlated); POPULATED rows +
+Intelligence = FLAT navy idx242; cluster zone y360..472 99.85% identical to
+map => overlay never repaints it. Root cause of "quite off": port paints
+flat (16,16,24) + grey outlines + LEFT-aligned names; vendor = speckle/
+navy wells + names CENTRED (bbox centre 553 all rows) + flag row-local
+(14,3). (iii) PORTRAITS: centred on star markers, disc r~48 + three-tone
+owner ring r50..55 == smrace x2 + racering x2 (t423c2 ring-index law
+RECORROBORATED: racering palettes green/purple/gold/orange/grey == the four
+measured ring hues); player home has NO portrait; count law = seam T436-A.
+(iv) ABILITY leg UNCHANGED (wired+witnessed t409; use-fire = sim seam).
+Tooling notes for successors: shp_pngdump needs <out>/raw/ to EXIST; the
+kernel python has NO PIL — census scripts run under
+~/.hermes/hermes-agent/venv/bin/python. NO OQ closed (strict-close honest
+negative — species-screen visuals have no OQ owner; t414..t435 precedent;
+OQ-016/019/027 untouched). GATE_EXIT=0, LEDGER AUDIT OK.
 
 t435 LANDED 2026-11-20 (RESEARCH SCREEN live re-check + 2 defects fixed;
 docs/re/ui-runtime.md t435 block via _wip_t435.md F0-F6). LIVE RE-CHECK LIST ALL PASS:

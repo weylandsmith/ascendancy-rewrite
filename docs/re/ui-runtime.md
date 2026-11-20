@@ -630,3 +630,36 @@ Full working log: docs/re/_wip_t405.md F1-F10. Durable laws:
   vendor screen [census 38/38 *_game.png, crest green bbox x10..24 y10..34;
   the single 0-px shot is modal-covered]. Port paints it on research now
   (t426 map law reused); pins test_resface_t435.
+
+## t436 SPECIES SCREEN (STATE 7) LAYER LAW (2026-11-20, docs/re/_wip_t436.md F1-F9)
+MEASUREMENT iteration (no code delta; a first speciesmenu.h pass was reverted
+on budget). Authority: work/screens/t252/species_menu_game.png (1:1 640x480)
+vs its own map baseline_game.png, plus tools/shp_pngdump decodes.
+- CHROME LIB: windows.txt TYPE-100 STATENUMBER 7 binds DATA\7RACESEL.SHP
+  (ln720-723; the eight TYPE-100 blocks are states 0/1/3/7/8/13/16/20).
+  7racesel.shp content [measured]: k0..k6 decode BYTE-IDENTICAL, 158x30,
+  100% idx 242 (flat navy); k7 = the RACECONTROLS-strip face (rect
+  474,442-632,472 == 158x30 exact). t393's "row-face size match" is REFUTED
+  as row ART — the faces are solid panels — and (12,32,48) occurs ZERO
+  times in both t252 captures ((8,32,49) is the DOSBox-displayed navy), so
+  the flat faces are not the panel source on this capture either.
+- LAYER LAW [measured]: right column = CHROME mottle (t422 textureColourAt
+  family) everywhere; the header slot + EMPTY row slots = DARK SPECKLE
+  (t424b family; slot5 maps game.pal 200:62.6% 0:25.5% 196:9.0% zero far
+  px; lag-1 |lum| 2.96/2.99 correlated, same-adjacent 0.74); POPULATED rows
+  + the Intelligence button = FLAT navy idx242 (93.8/94%). The dial/toggle
+  cluster zone y360..472 is 99.85% identical to the map screen — the species
+  overlay never repaints it. PORT DEFECT root cause: flat (16,16,24) column
+  + grey 1px outlines + left-aligned names (vendor: names CENTRED, bbox
+  centre 553 == (474+632)/2 for all three rows; flag at row-local (14,3),
+  native 14x24).
+- PORTRAITS [measured]: FOUR ringed portraits centred on star positions
+  (baseline carries a star marker under each); content disc r~48, THREE-TONE
+  owner-colour ring r50..55, black beyond r56 == smrace 49x49 x2 + racering
+  53x53 x2 (the t423c2 ring-index law: ring rec index == colour index;
+  racering palettes decode green/purple/gold/orange/grey exactly matching
+  the four measured rings). The player home star has NO portrait; ring
+  COUNT vs known-row count is seam T436-A (4 vs 3 in the capture).
+- ABILITY LEG: unchanged, wired+witnessed since t409 (open/dismiss/swallow);
+  the Use-Ability fire stays the sim-model seam (seed-md5 law).
+- FULL BRIEF for the implementation iteration (t436b): _wip_t436.md F9.

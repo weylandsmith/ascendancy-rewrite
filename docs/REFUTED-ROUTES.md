@@ -1476,3 +1476,17 @@ correlated-vs-iid sign are gradeable from this shot. Exact chain
 parameters (if any) need a pure capture: t433's memory-surface census or a
 native 640x480 Alt-G shot (debugflags.md Alt-G writes GIF SCRATCH in the
 ascend dir — scratch copies only). Trail docs/re/_wip_t424b.md.
+
+
+## R-t436. THE 7RACESEL ROW-FACE PREMISE IS DEAD (t436 census).
+"7racesel.shp k0..k7 are eight records of exactly the 158x30 row size, so
+they are the species-row faces" (the t393 size-match witness) — REFUTED by
+decode: k0..k6 are BYTE-IDENTICAL (md5 e1c2578c0645 over the 4740-px index
+plane) and 100% palette idx 242: solid navy panels, zero art. k7 is the
+RACECONTROLS-strip face (rect 474,442-632,472). Second, decisive: the navy
+(12,32,48) occurs ZERO times in work/screens/t252/species_menu_game.png AND
+in its own baseline_game.png ((8,32,49) is the DOSBox-displayed navy,
+22150/25890 px), so blitting those faces cannot reproduce this capture.
+Do NOT blit 7racesel k0..k6 as row art. The vendor state-7 layer law is
+chrome + dark-speckle wells + flat navy populated rows (docs/re/ui-runtime.md
+t436 block). Trail: docs/re/_wip_t436.md F2/F4.
