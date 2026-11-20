@@ -88,6 +88,13 @@ times.
 - 2026-11-09 t349: parked, no trigger. Sitting check NEGATIVE (400 KB tail-seek,
   16 lines, newest turn 1086; ring rotation only — newest save 51.sav
   2026-11-09T04:52:29.856 ns, game pid 1555 HEALTHY, TL expiry 2026-11-11 01:07).
+- 2026-11-20 t438: final-verify iteration, gate/audits/suite all green
+  (466/0). GAME DEAD since feed stop ~2026-11-12 06:45 (GAME_DEAD.txt
+  11:31:10; pid 107664 gone; TL expiry 2026-11-11 01:07 is the leading
+  cause per t277 — NO crash investigation). Ring banked by this iteration:
+  work/r1/bank-t438-ring-2200 (20 slots, 43M, newest 60.sav Nov 14 12:33).
+  Relaunch queued as t439 (recovery SOP per this file's t277 block). Best
+  default proceeded under: local-commit-only delivery (git remote -v empty).
   No D1/D2/D3 ruling: DECISIONS.md mtime 03:31 (pre-t348-commit), no USER:/RULING
   markers, post-commit find -newermt shows only capture/loop artifacts.
   decision-sheet.md 03:40 = t347 generator output, not an annotation. NEXT stays

@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-20T12:20
+updated: 2026-11-20T22:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -229,33 +229,82 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t438 FINAL VERIFY + HANDOFF (ordering rationale: t437 CLOSED OQ-027(b)
-with cited zero-capture measurement — SOUNDCHANNEL store 0x57e7a -> record
-+0x59 == HIWORD(dword+0x57), value 0 on all 119 file lines and 2,400/2,400
-file-declared records in 20 saves, strategic press handler 0x30c9c..0x30edb
-plays manifest[0] "button"; port upgraded sfxForPress -> "button", pin
-sfx_press_buttons_button_t437 mutation-verified, witnesses t404/t395 updated
-and live PASS. That exhausts every open row with a live route: OQ-016 is
-capture-gated on a Phase Bomb nobody builds (BLOCKED.md), OQ-019 awaits USER
-ruling D2 (acceptance explicitly deferred — do NOT re-ask), OQ-027(a) TUNEID
-base awaits user hearing (D12 item 5) or a heap tune-table capture. The
-standing queue after t437 was always "final verify + push + handoff". Do:
-(1) sitting check per the loop header (live-timeline.jsonl growth ->
-scripts/r1_t85g_sitting.py first); (2) ruling check (DECISIONS.md /
-decision-sheet.md mtimes vs last commit, git status sweep; a D12 item-5
-"match/differ" verdict on the click sound would let OQ-027 fully close — the
-port now plays the cited "button", so record what the answer says verbatim,
-do not interpret FOR the user); (3) full bash scripts/gate.sh + both ledger
-audits; (4) write the handoff summary (open ledger = exactly OQ-016/019/027a,
-each naming its gate-owner) into STATE.md; (5) git push if a remote is
-configured (check `git remote -v` — never invent one). Do NOT re-run the
-extracted/ or save-corpus chrome scans (R-t433), do NOT re-open the static
-chrome generator (R-t422c), do NOT re-ask D2, do NOT re-derive the t437
-SOUNDCHANNEL law (banked audio.md S6.9).
-SEAMS carried: T433-C chrome generator seed/state for a named instance
-(needs a live debugger session; R-t422c applies; NOT queued), T436-A portrait
-COUNT, T436-B owner->racering index, H3 race bytes 1..20, T428-B, T427-A..F,
-gizmo-icon rows + class selector (t434b), research panel art join D3 (t435 F6).
+NEXT t439 GAME-RING RECOVERY (ordering rationale: t438 final-verify ran
+green — gate GATE_EXIT=0, suite 466/0, LEDGER AUDIT OK, LEDGER INDEX OK —
+and surfaced the one live fact that outranks every gate-blocked ledger row:
+work/r1/loop/GAME_DEAD.txt (2026-11-20 11:31:10) says the production dosbox-x
+(pid 107664) is GONE with zero harness dosbox-x in /proc, the watch feed is
+not banking, and the newest ring slot 60.sav is 514658 s old. The health
+tool deliberately does NOT relaunch (loop_one_task.sh:205 'relaunching the
+game is research-schedule policy'), so recovery is loop work, not harness
+work. Do, in order: (1) BANK THE RING — DONE at t438:
+work/r1/bank-t438-ring-2200 holds 20 slots / 43M (cp -a of playcap/save,
+newest 60.sav Nov 14 12:33); verify it still exists, do NOT re-copy.
+(2) Decide relaunch vs park per docs/BLOCKED.md SOP (t277 block, ~line 235):
+r1_playcap_vnc.sh defaults (TL=172800, headless x11 under Xvfb, nosound,
+scratch rules — production ring dir gets EXACTLY ONE writer, two-writer law
+t266), production resumes via title 'Return to Current Game' (318,333) and
+the live state lives in the RING not RESUME.GAM (t259). Record the new pid
+to work/r1/vnc/dosbox.pid so r1_game_health.py can watch it, and verify the
+feed banks a NEW slot within ~30 s before calling it healthy. (3) If the
+relaunch softlocks or the title resume path fails, do NOT open a crash
+investigation (t277 law) — bank what exists, write the state into BLOCKED.md
+under the sentinel park log, and land the iteration parked. WHY THIS BEFORE
+LEDGER WORK: OQ-016's Phase-Bomb capture route, OQ-019's sugar-cube scripted
+session (scripts/r297_order_session.py, Gate: End Turn ONCE before picking),
+and any future heap tune-table capture for OQ-027(a) ALL need a live game;
+the corpus alternative is refuted three times over (t49/t58/t265 — do NOT
+re-mine saves for movement). Do NOT: re-run extracted/ or save-corpus chrome
+scans (R-t433); re-open the static chrome generator (R-t422c); re-ask D2 or
+the D12 item-5 audio ask (both pending, unanswered as of this iteration —
+ruling page server IS up on :8613, pid 646702, cwd work/r1/d1page, newest
+submission file 2026-11-18); re-derive the t437 SOUNDCHANNEL law (audio.md
+S6.9); pkill -f / pkill -x dosbox-x (BLOCKED.md kill law — structured ps
+match only); mount game/ for any run.
+SEAMS carried: T433-C chrome generator seed/state (live debugger only, NOT
+queued), T436-A portrait COUNT, T436-B owner->racering index, H3 race bytes
+1..20, T428-B, T427-A..F, gizmo-icon rows + class selector (t434b), research
+panel art join D3 (t435 F6).
+OPEN-LEDGER HANDOFF STATE (t438 verified, each row names its gate-owner):
+OQ-016 = USER ADJUDICATION per D3 (residue list EXHAUSTED; only the
+Phase-Bomb nuke-law sub-capture is machine-closable and it needs a live
+game); OQ-019 = live scripted session (r297 driver ready, needs live game;
+per-ship build path is BOUNDARY-by-decision D3, not RE); OQ-027 = item (b)
+CLOSED with measurement+code site (t437), item (a) TUNEID base = USER
+HEARING (D12 item 5, pending) or heap tune-table capture (needs live game).
+No machine-only-closable row remains: the loop's productive modes from here
+are (i) keep the game alive so capture routes exist, (ii) land seams/seams-
+adjacent polish under D13 vision rules, (iii) apply user rulings the moment
+they land. NO GIT REMOTE IS CONFIGURED (git remote -v empty; .git/config has
+no remote sections) — 'push' steps in older LANDED blocks referred to the
+pre-sanitization repo; deliverables are local commits only unless the user
+adds a remote.
+
+t438 LANDED 2026-11-20 (FINAL VERIFY + HANDOFF, ZERO CAPTURE, no OQ closed —
+none was closable). (i) SITTING CHECK NEGATIVE: live-timeline.jsonl and every
+playcap file oldest-modified 2026-11-12 06:45; no new sitting, so
+r1_t85g_sitting.py correctly NOT run. (ii) RULING CHECK NEGATIVE: DECISIONS.md
+mtime 2026-11-18 13:05 < last commit 2026-11-20 11:28; decision-sheet.md
+2026-11-09; d1page dir (server :8613 alive, pid 646702) has no submission
+file newer than HEAD; D2 acceptance and D12 item-5 (audio match/differ) both
+still PENDING — recorded verbatim-status, nothing interpreted for the user.
+(iii) FULL VERIFY REAL: bash scripts/gate.sh GATE_EXIT=0 ('ALL CHECKS PASS
+(milestone=6)'); unit suite /tmp/gate_tests.log tail '466 tests, 0 skipped,
+0 failed' (gate runs run_tests under VENDOR=1); ledger_audit.py 'rows=20
+open=[OQ-016, OQ-019, OQ-027] closed=17 LEDGER AUDIT OK';
+ledger_index_check.py 'LEDGER INDEX OK' (STATE index mirrors record).
+(iv) t437 ARTIFACTS SPOT-VERIFIED on disk: pin
+rewrite/tests/test_sfxpress_t404.cpp:35 sfx_press_buttons_button_t437;
+sfxForPress MapClick nullptr / RailButton|NextTurn|TitleButton 'button'
+(rewrite/src/ui/audio.cpp:30-38); scripts/t437_soundchannel_store_census.py
+present; R-t433 present (REFUTED-ROUTES.md:1495). (v) NEW ENVIRONMENT FACT:
+GAME_DEAD.txt 2026-11-20 11:31:10 — production game process gone, feed
+stale (slot 60.sav 514658 s), watchdog intentionally does not relaunch
+(loop_one_task.sh:205); recovery queued as t439. RING BANKED THIS ITERATION:
+work/r1/bank-t438-ring-2200 (cp -a, 20 slots, 43M, newest 60.sav Nov 14
+12:33) — t439 starts at the relaunch-decision step, banking is done. (vi) NO GIT REMOTE — push step closed as N/A with evidence
+(git remote -v empty), recorded in the handoff block so future sessions stop
+checking. GATE_EXIT=0, LEDGER AUDIT OK, LEDGER INDEX OK.
 
 t437 LANDED 2026-11-20 (OQ-027(b) CLOSED BY MEASUREMENT, ZERO CAPTURE;
 docs/re/audio.md S6.9 + docs/re/_wip_t437.md F0-F6; assignment note: the STATE
