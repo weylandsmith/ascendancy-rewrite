@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-21T13:30
+updated: 2026-11-21T16:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,65 +233,85 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-C2 NEW GAME CONTENT GATE CYCLE 2 — IMPLEMENT THE tNG-C LAWS
-(ordering rationale: tNG-C cycle 1 measured every cited law this
-session and banked them in docs/re/_wip_tNGC.md F1-F12; the queue law
-says defects at session end -> CONT cycle N+1 with the defect list;
-cycle 2 is pure implementation + harness + pins, no re-derivation).
-Trigger check FIRST: USER: lines after the D19 block in DECISIONS.md
-win. READ FIRST: docs/re/_wip_tNGC.md (ALL of F1-F12 — the field map
-F7, planet law F3/F9, chip law F8/F10, wheel law F6/F7/F9b, Begin
-starfield F11), docs/re/_wip_tA1.md harness contract.
-DO, in order (all citations already banked; do NOT re-disasm the
-painter — work/tNGC_paint526b4.asm + work/tNGC_paint_head.asm hold
-it):
-(1) DESC PLANET (title.cpp ~:640): replace planets.shp k[(sel%11)*5+1]
-    at kDescPlanetCentre with raceflag-style NATIVE blit of
-    smhome.shp k<selIndex> at content screen (382,191) (blitShape at
-    334+72-(-24)=.. — use window X0=334/Y0=12 + push (0x48,0xcd) +
-    bbox law; load smhome.shp like planetsLib). dimsCheck
-    "desc-planet" cited fixed (52,52).
-(2) CHIP ROW (title.cpp ~:895): replace solid kPlayerChipRgb rects with
-    raceflag k<selIndex> blitted SEVEN times at rects
-    (381+16i,433)..(395+16i,463), chip i rendering palette slots
-    16..19 := game.pal[16+4i..19+4i] (new blitShapePalRamp helper in
-    vendortext.cpp mirroring blitShapePalSwap; ink indices {16,17,18,
-    19}, navy 242 untouched); SELECTED chip i==playerColourIdx gets a
-    1-px WHITE (255,255,255) frame rect (382+16i,434)..(395+16i,459).
-    Ref witness: scratchpad/newgame-original.png chip-i brightest ink ==
-    pal[4i+19] EXACT for i=1..6 (census work/tNGC_chip_cols.py).
-(3) t441_screen_diff.py: desc-planet region cited ("planets",) ->
-    ("fixed",(52,52)) + SMHOME const; ADD region playercolor-chiprow
-    (vendor rect (379,428,495,464), vkind content, ours dimscheck
-    chip blit) — G2 single home.
-(4) PINS: test_newgame_content_tNGC.cpp — (a) smhome index law (rec ==
-    selIndex, bounds 21, smhome dims 52x52 census), (b) chip ramp law
-    (pal[4i+19] per i, seven chips, pitch 16 from 381, frame on
-    selected), (c) wheel child-frame bijection already pinned — extend
-    with species wrap 8->3 + atmosphere wrap 3->0 verbatim terms.
-    MUTATION-VERIFY each constant (green-tree launch guard r1_ta3_
-    mutate.py pattern; background+notify, never foreground).
-(5) Witness: extend scripts/r1_tA3_capture.sh flow with a newgame shot
-    -> ours-vs-ref chip census (brightest-ink-per-chip == pal[4i+19]) +
-    planet presence at (382..433,191..242); run t441_screen_diff.py
-    newgame (all regions incl new ones) to green.
-(6) BANK laws into docs/re/t423-newgame-law.md as SS14+ (hand-authored
-    file — append via patch(), never rewrite) + close-out
-    docs/re/_wip_tNGC.md; LEDGER seam work (no OQ row); CLOSE = G1+G2
-    per queue row; if defects remain -> tNG-C3 with list verbatim.
-HINTS THIS SESSION LEARNED (reuse, don't rediscover): python image
-work runs under ~/tools/revenv/bin/python; browser-crop law =
-im[1:481,1:641]; browser shots drift per-window +-1 px (NEVER derive a
-law from one row — docs/re/typography.md §3); centre law cell x =
-(x0+x1)/2 - adv/2 (NOT +1 form); fnt.md + text.md are GATE-REGENERATED
-(never hand-edit; typography.md is the hand-authored home); mutate
-scripts must launch on a GREEN suite (killed foreground run poisons
-the snapshot — see r1_ta3_mutate.py guard + skill note); full mutate
-campaign > 420 s = background+notify, never foreground.
+NEXT tNG-C3 NEW GAME CONTENT GATE CYCLE 3 — LAST CYCLE PER D18 CAP.
+(ordering rationale: tNG-C2 closed the two headline D19 seeds with cited
+laws + pins + mutation 10/10 (planet index, chip row); G2 mechanical is
+GREEN (t441 newgame 18/18 incl the two new regions); what remains of the
+tNG-C seed list is the residue below — one cycle for it, then the queue
+folds to tNG-B (G3 behavior) / tNG-U (user-grade park) regardless, since
+cycles stay capped at 2 per D18 for the SAME screen and tNG-C is at its
+cap after this. Trigger check FIRST: USER: lines after the D19 block in
+DECISIONS.md win. READ FIRST: docs/re/_wip_tNGC.md F11+F13+F14,
+docs/re/t423-newgame-law.md SS14/SS15/SS16.)
+DEFECT LIST (verbatim seeds + this session's open items):
+(1) ATMOSPHERE WHEEL ghost sliver + stray white line under
+    peaceful/neutral — tNG-C cycle 1 proved the FRAME-INDEX law matches
+    the port EXACTLY (child+0x72 = idx+10, k10/k11/k12), so the cause is
+    a DOUBLE BLIT or clip edge in OUR painter: G1 side-by-side the three
+    wheel panels (ours vs scratchpad/newgame-original.png) and find the
+    extra draw; hostile panel is the correct reference.
+(2) STAR DENSITY + SPECIES boxes extraneous art (D19 verbatim) — same
+    G1 pass on those two panels.
+(3) BEGIN NEW GAME starfield: IMPLEMENT the cited SHRUNK-VOLUME law
+    (full-field coords /5 + 5; idiv 5 at 0x527a4/0x527c9; sprite-class
+    law body 0x52787..0x5282f banked _wip_tNGC F11: value>0 -> class 1,
+    <=-220 -> class 2, else 0; record [eax+0xab] via 0x5caac) — the port
+    still draws N=kDensityStarCounts[idx] random points (t423 SS4).
+    Thick BEVELED green ring on the same panel (D19) rides along.
+(4) SELECTED-CHIP GREYS mechanism: the white hlines law is pinned
+    (434/458), the vline greys (164,171,177)/(225,227,229) draw at
+    measured positions but their SOURCE (button chrome vs FUN_0002fe04
+    args — decompile shows 4 x FUN_0005bf71, color param 0xf3, unaff_EBX
+    garbage) is undecidable statically; ONE probe: our render vs refcap
+    pixel-diff of chip0 zone rows 435..457 at x 381/395 — if exact,
+    close as measured-position law; if not, chrome hypothesis -> map
+    chrome family lookup.
+CLOSE = G1 (side-by-side vision pass on the three panels + chip zone) +
+G2 (t441 newgame stays 18/18; add wheel-panel regions if the G1 pass
+names them). If defects remain after tNG-C3 -> fold to tNG-B/tNG-U with
+the list verbatim (D18 cap; do NOT open tNG-C4).
+HINTS THIS SESSION LEARNED (reuse, don't rediscover): ctest verdict =
+EXIT CODE ONLY ("0 tests failed out of 1" contains "tests failed" — the
+launch guard caught itself); mutation campaign launches on a GREEN suite
+only and runs background+notify; chip/wheel work: raceflag 15x25 bbox
+(0,0), smhome 52x52 bbox (-24,-26) — F13 census; browser-crop law =
+im[1:481,1:641]; python = ~/tools/revenv/bin/python; dimsCheck prints
+ONCE per name per process (region harness reads app.log).
 GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 on 20/20
-saves (scripts/t368_ring_turn.py re-verified this iteration — the
-sitting test; timeline growth is NOT the signal). turn > 1086 -> re-run
-scripts/r1_t85g_sitting.py FIRST. Ghidra :8089 UP, program analyzed.
+saves (scripts/t368_ring_turn.py re-verified this iteration — the sitting
+test; timeline growth is NOT the signal). turn > 1086 -> re-run
+scripts/r1_t85g_sitting.py FIRST. Ghidra :8089 UP, program analyzed
+(FUN_0002fe04 decompiled this session; 0x53ee0/0x52xxx remain GAP fns ->
+scripts/t442_disasm.py, dumps work/tNGC_paint*.asm).
+
+tNG-C2 CYCLE 2 LANDED 2026-11-21 (NEW GAME CONTENT IMPLEMENTED — planet
+index + chip row laws in code, pinned, mutation-proven; ledger
+open=[016,019] unchanged, seam work, NO OQ row moved — honest negative:
+this row's laws have no OQ row by design, they are PHASE-17 queue work).
+(i) DESC PLANET = smhome.shp k<race row> NATIVE 52x52 at screen (382,191)
+(title.cpp smhomeLib; kDescPlanetCentre {406,217} = NEWGAMEWND X0/Y0 +
+push (72,205); bbox census (-24,-26) F13) — the t414 planets-ladder
+invention REPLACED. (ii) CHIP ROW = SEVEN raceflag ramp blits at
+(381+16i,433) via NEW blitShapePalRamp/chipInkSlot (slots 16..19 :=
+pal[16+4i..19+4i], 0x53ee0 law; navy 242 + strays identity) +
+selected-chip frame (white hlines 434/458, grey vlines 435..457,
+refcap-measured); t401 constants superseded, kPlayerChipRgb DELETED (the
+D19 "2 rows of solid swatches" root). (iii) HARNESS: desc-planet region
+cited ("fixed",(52,52)) + widened rect; NEW playercolor-chiprow region
+(tight-to-content rect law — the padded task rect saturated the NAVY
+detector, banked); t441 newgame 18/18 PASS. (iv) PINS
+test_newgame_content_tNGC.cpp x4 (smhome class+anchor, ramp slot law+
+geometry+frame, raceflag data+ink-domain census, wheel bijection wrap
+terms) all ok; ctest 0 failed. (v) WITNESS scripts/r1_tNGC_chip_witness.py
+GREEN on BOTH sides: chip-i brightest ink == pal[4i+19] EXACT i=1..6,
+framed-chip count == 1, framed-chip presence check (brightest test is
+frame-polluted on both sides — banked), planet 51x51 vendor / 51x50 ours
+(52+-2 law). (vi) MUTATION 10/10 CAUGHT (scripts/r1_tNGC_mutate.py:
+M1-M8 constants via tests, M10 family-zero + M11 frame-off via live
+witness; launch guard + md5-verified restore, AFTER-RESTORE tree clean).
+(vii) SS12 READING CORRECTED in t423-newgame-law.md (7 blits not 8,
+4-slot rewrite not 5-entry ramp, white FRAME not 0xf3 well) + SS14/15/16
+banked. Full detail: docs/re/_wip_tNGC.md F13/F14.
 
 tNG-C CYCLE 1 LANDED 2026-11-21 (NEW GAME CONTENT MEASUREMENTS —
 MEASUREMENT-ONLY, NO CODE DELTA; budget exhausted before implementation,

@@ -248,6 +248,7 @@ are superseded; the arm STRUCTURE below stands).
   CAVEAT: the +0xbb inc with +0xb9 wrap test reads oddly; [eax+0xb9] where
   eax=eax-at-entry (dispatcher sets ebp=eax at 0x528f2) — same window. The
   wrap law AS CODED: atm counter lives +0xb9; +0xbb is a shadow/pair word.
+
 - CHILD WINDOW LAW (new, generalises t423 SS2): the three wheel widgets are
   children [win+0x67][0..2]; the PARENT writes each child's +0x72 = shape
   record idx (density verbatim, species +2, atmosphere +10); child paint =
@@ -257,3 +258,30 @@ are superseded; the arm STRUCTURE below stands).
   clicked: word[win+0xb3] = clicked ; setter FUN_00022ce4(0x12e10,
   +0xb1, +0xb7) ; repaint. (SELECTOR A/B PAIR semantics OPEN.)
 - PLANET arm region starts 0x52f59 (cmp dx,2 jb 0x52f88 ...) — NEXT probe.
+
+## F14 — CYCLE-2 CLOSE-OUT RECORD [tNG-C2, executed 2026-11-21]
+IMPLEMENTED: smhomeLib DESC planet (title.cpp, kDescPlanetCentre {406,217});
+blitShapePalRamp + chipInkSlot (vendortext.cpp); chip row = 7 raceflag ramp
+blits + selected-chip frame (white hlines 434/458, grey vlines 435..457);
+t401 chip constants superseded; kPlayerChipRgb REMOVED (the D19 "2 rows of
+solid swatches" defect root). HARNESS: t441 desc-planet cited
+("fixed",(52,52)) rect widened (377,188,436,246) + playercolor-chiprow
+region (tight-to-content law rect (381,433,491,458); the task's padded rect
+saturated the NAVY detector — banked pitfall). PINS:
+rewrite/tests/test_newgame_content_tNGC.cpp x4 all ok; ctest suite green
+(0 failed). WITNESS scripts/r1_tNGC_chip_witness.py: vendor 7/7 + ours 7/7
+chip ramp law PASS, framed-chip-count==1 both sides, planet 51x51 vendor /
+51x50 ours (52+-2 law) PASS; t441_screen_diff newgame 18/18 PASS incl the
+two new regions. MUTATION 10/10 CAUGHT (launched on a GREEN suite per the
+launch guard; M1 chipx0, M2 chipy, M3 ramp-shift, M4 ramp-domain,
+M5/M6 frame rows, M7 planet-anchor, M8 species-domain = tests-class;
+M10 family-zero, M11 frame-off = witness-class; AFTER-RESTORE tree
+md5-clean, git status shows only docs edits). PITFALLS ADDED: (i) ctest
+substring trap — "0 tests failed
+out of 1" CONTAINS "tests failed"; launch guard must use exit code only
+(caught itself, tree never mutated); (ii) framed-chip brightest-ink test is
+frame-polluted on BOTH sides -> presence-of-pal[4i+19] check (vendor 7 px
+vs ours 67 px — count parity is NOT law; the vendor's chip0 emblem decodes
+sparser than the port's k0 walk produces, open sub-question logged here,
+NOT a gate failure). MUTATION: scripts/r1_tNGC_mutate.py, table M1..M8 +
+M10..M11 (no M9 by design).
