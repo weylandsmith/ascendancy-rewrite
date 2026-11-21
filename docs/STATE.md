@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-21T04:05
+updated: 2026-11-21T08:35
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,41 +233,53 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tA2-CONT CHROME CLOSE (PHASE-17 STAGE A second row CLOSE; the tA2
-law LANDED this iteration — this row finishes it. Ordering rationale:
-D19 Stage-A-first; tA2 items (1)(2)(4) measured + implemented, but the
-ridge witness is ~14 lum dark (named root cause banked) and the CLOSE
-clauses (harness chrome-band regions, mutation, map/title application)
-are owed before tNG-C may run; tA3 text follows Stage A completion.
-Trigger check FIRST: USER: lines after the D19 block in docs/DECISIONS.md win.
-READ FIRST: docs/re/_wip_tA2.md (F1 double-layer verdict, F3 recess/ridge
-censuses, F4 mineral census, F5 bar-extent law + pitfalls, F6 what landed
-and the named ridge bias).
-DO, in order:
-(1) FIX THE RIDGE CHAIN: newgameWellEdgeColourAt (rewrite/src/ui/
-    mapchrome.cpp) — the repeat-up recursion from y=373 lands on y=372
-    (well interior, not an edge) and draws recess-tab colours; anchor the
-    ridge band (row 373 never recurses up; row 374 recurses only within
-    373/374). Rebuild, re-run scripts/t412_newgame_shot.sh, assert ridge
-    row means within +-6 of vendor 64.5/102.8 (witness numbers in _wip F6).
-(2) EXTEND scripts/t441_screen_diff.py with chrome-band regions (NEVER
-    re-home the harness): newgame top-bar rows 0..6 x7..493, recess row 7,
-    ridge rows 373..374, panel-inset edges (top row 381 census band);
-    PASS thresholds = census-family presence + mean-lum windows cited in
-    _wip_tA2. Keep newgame 7/7 + planetslist 2/2 green.
-(3) MUTATION-VERIFY every tA2 constant/weight (checkpoint commit first,
-    md5-restore each): kNewgameCosmosRect y0/x1/y1, kRidge0/kRidge1
-    weights, recess kTop/kLeft/kRight, kBeginPanelVisual.x0,
-    newgamePanelTopAt/LeftAt table swap. ctest 100% after restore.
-(4) MAP/TITLE application checks (tA2 CLOSE clause): map = frameTex law
-    already 100% pixel-exact (_wip F1) — cite, no change; title = GIF art
-    (no kBevel sites) — cite, no change. Bank both verdicts in chrome.md
-    §Migration (hand-authored).
-(5) BANK chrome.md (tA2 section: recess/ridge/inset laws + citations) +
-    finish _wip_tA2; LEDGER: seam work, touches no OQ row (open=[016,019]).
+NEXT tA3 TEXT LAW (PHASE-17 STAGE A third and final law row — tA1 blit
+scale CLOSED tA1-CONT, tA2 chrome CLOSED tA2-CONT this iteration; D19
+ruling: Stage A completes before screen rows, and tNG-C's gate needs the
+text law for its button-text regions. Ordering rationale inline: queue
+order tA1->tA2->tA3 per PHASE-17 QUEUE; nothing in Stage A remains after
+tA3). Trigger check FIRST: USER: lines after the D19 block in
+docs/DECISIONS.md win.
+READ FIRST: docs/re/chrome.md 3a (frame law, done), the queue row tA3
+verbatim (STATE below), font notes in docs/re (vendor .fnt law banked,
+OQ-017 CLOSED), and the D19 note that Athens 512x384 shots are NEVER
+pixel-scale evidence (G5).
+DO (per queue row tA3): measure font identity + cell size + baseline +
+color classes from refcaps ONLY; render a reference string table at 1:1
+and diff glyph metrics (height, advance, weight) vs refcap text rows —
+witness witnesses: scratchpad/newgame-original.png label rows (e.g.
+'STAR DENSITY'/'PLAYER SPECIES'/'Begin New Game') and the map refcap
+button text; fix rewrite/src/ui text draw to cited metrics. CLOSE: metric
+diff within 1px on title + newgame + map button text + pins.
+HINTS THIS SESSION LEARNED (reuse, don't rediscover): python image work
+runs under ~/tools/revenv/bin/python (repo .venv has NO numpy/PIL);
+browser-crop law = 643x481 -> im[1:481,1:641] (load640 in
+scripts/t441_screen_diff.py); mutation campaigns: exact-colour share
+windows catch census-weight mutations that mean windows are blind to
+(scripts/r1_ta2c_mutate.py is the template).
 GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 on 20/20 saves
 (scripts/t368_ring_turn.py re-verified this iteration). turn > 1086 ->
 re-run scripts/r1_t85g_sitting.py FIRST. Ghidra :8089 UP.
+
+tA2-CONT CHROME CLOSE LANDED 2026-11-21 (all five items; ledger
+open=[016,019] unchanged, seam work). (i) RIDGE CHAIN-ANCHOR FIXED:
+newgameWellEdgeColourAt recursion now excludes rows 373/374 entirely
+(vendor census proves per-row rung draws: grey 169/169, teal 108/107 —
+not a vertical carry; the 374->373 variant rejected on stationary math
+~92.7). Witness scripts/r1_tA2c_witness.py: ridge 64.4/103.1 vs vendor
+64.5/102.8 (was 50.6/90.4), recess row7 22.5/24.3, col7 6.5/6.5, col493
+19.1/22.9, well rows pure black — WITNESS PASS. (ii) HARNESS: 10
+chrome-band regions kind='band' ADDED to scripts/t441_screen_diff.py
+(mean-lum window + exact-census family share both sides; row0 geometry-
+only per t433 per-instance law); newgame 17/17 PASS, planetslist 2/2
+PASS unchanged. (iii) MUTATION 12/12 CAUGHT (scripts/r1_ta2c_mutate.py;
+pin strengthened first with band-mean + exact-colour-share windows —
+mean alone blind to weight swaps, proven by M4/M5 caught only by shares);
+AFTER-RESTORE 472 tests 0 failed, md5 -c pristine OK. (iv) APPLICATION
+VERDICTS cited, no change: map frameTex 100.00% pixel-exact bands (right
+deviations = windows.txt widget rects); title = 0opening.gif single
+RenderCopy, no kBevel site. Banked chrome.md 3a + _wip_tA2 F7-F11. Build
+0, ctest 100%. FULL DETAIL: docs/re/_wip_tA2.md + docs/re/chrome.md 3a.
 
 tA2 LANDED 2026-11-21 (CHROME LAW ROUND 2 — double-layer RESOLVED, bar
 extent FIXED, bevel law MEASURED; ridge bias + harness bands owed via
@@ -2929,7 +2941,9 @@ planet disc) AND planets-list sun+planet render at cited dims; diff
 harness on those two screens exits clean on dims+presence (content
 index errors may remain — tNG-C/tPL-C own those).
 
-tA2 CHROME LAW ROUND 2 (STAGE A; user D19: texture = MINERAL (stone/
+tA2 CHROME LAW ROUND 2 (STAGE A — CLOSED tA2-CONT 2026-11-21: law landed,
+witness within +-6, harness bands, mutation 12/12; named lag-1 mineral
+ceiling stays in chrome.md 4; queue verbatim below) (user D19: texture = MINERAL (stone/
 galvanized), not static; our top bar CLOSE but 1-2px short; TWO chrome
 layers — almost-right bar laid ON TOP of the older rougher frame).
 ASSISTANT PRE-PROBE 2026-11-21 (user: planet screen frame PIXEL-PERFECT

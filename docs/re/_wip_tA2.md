@@ -222,3 +222,46 @@ every band inside its window with >=1.5 lum margin both sides).
 VERDICT: newgame 17/17 PASS (7 tA1 + 10 bands), planetslist 2/2 PASS
 unchanged (/tmp/ta1c_shots/status-open.png vs
 work/r1/loop/vendor-planetslist-t3-640.png, exit 0).
+
+## F9 — MAP/TITLE APPLICATION VERDICTS [CITED 2026-11-21, item (4)]
+- MAP: frameTex (kTextureBands + textureColourAt, ui.cpp:1068) is 100.00%
+  pixel-exact vs the generator field dump in the left/bottom/top bands (F1);
+  right-column deviations coincide exactly with windows.txt sidebar widget
+  rects = content over chrome, not a second chrome painter. NO CHANGE.
+- TITLE: title screen = 0opening.gif decode (title.cpp:77 buildTitleTexture
+  -> gifDecodeFile; 341 single RenderCopy). No kBevel site, no chromePage on
+  Title (chromePage begins at RaceConfig/New Game, title.cpp:407-426). The
+  only kBevel use left in title.cpp is the racering FALLBACK ring (741) —
+  dead whenever the shape lib loads (dimscheck witness 109x109). NO CHANGE.
+Both verdicts banked chrome.md 3a.
+
+## F10 — PIN STRENGTHENING + MUTATION CAMPAIGN [2026-11-21, item (3)]
+Pin (test_mapchrome_tA2_well_edge_law) strengthened: band means (m373
+58..71, m374 96..110, m7 17..28, ml 4..9.5, mr 14..26, mp 21..33, mql
+27..40) + EXACT-COLOUR share windows vs tab marginals (n24 0.16..0.45,
+n61/n97 0.21..0.50, n578 0.25..0.55, n000 0.27..0.57, npl 0.17..0.52,
+n12_24_34 0.19..0.50) + exact kBeginPanelVisual {502,381,632,472} +
+kNewgameCosmosRect.x0==8. Why: per-pixel bounds alone are BLIND to weight
+mutations (chain preserves the marginal; a near() distance window was also
+wrong — all kLeft families sit within dist 30 of each other — exact eq()
+counts are provably chain-invariant). Checkpoints a77c789 + 2 more BEFORE
+first mutant. Campaign scripts/r1_ta2c_mutate.py (working-path keys,
+md5-verify restore + abort, os.utime, background+notify per skill):
+VERDICT 12/12 CAUGHT, every one naming mapchrome_tA2_well_edge_law:
+M1/M2/M3 cosmos rect y0/x1/y1 (exact pins, lines 134-136); M4/M5 ridge
+grey weights 169->60 (n61/n97 share windows — MEAN was blind, shares
+caught); M6 recess-top 93->20 (n24); M7 recess-left 90->20 (n578); M8
+recess-right 102->20 (mr + n000); M9 kBeginPanelVisual.x0 502->494 (exact
++ gutter pins); M10 ridge table swap (dark-above/light-below + m373/m374,
+5 FAILs); M11 CHAIN-REVERT 'y>7' (the fixed defect re-appears, m373/m374
+— the anchor law is pinned, not just witnessed); M12 recess L/R table
+swap (ml/mr). AFTER-RESTORE build 0, 472 tests 0 failed; md5sum -c
+pristine OK all three files.
+
+## F11 — tA2 CLOSE VERDICT [2026-11-21]
+tA2-CONT items (1)-(5) all landed: ridge chain fixed + witnessed within
++-6; harness bands 17/17 + planetslist 2/2; mutation 12/12; map/title
+application cited (F9, chrome.md 3a); banked here + chrome.md. LEDGER:
+seam work, touches no OQ row, open=[016,019] unchanged. tA2 STAYS OPEN
+as a row ONLY for its named D19-deferred residue (mineral lag-1 ceiling,
+chrome.md 4); the chrome LAW + harness clause is CLOSED in substance.

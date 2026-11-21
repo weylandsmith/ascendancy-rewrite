@@ -76,6 +76,30 @@ HEADER SPECKLE (statusbg.cpp statusSpeckleAt) is a DIFFERENT measured
 class — per-pixel noise lag-1 1.304 [t417b measurement] — deliberately
 NOT Markov; leave as-is unless a pure-band re-measurement refutes it.
 
+### 3a. tA2/CONT WELL + PANEL FRAME LAW, NEWGAME (2026-11-21) [MEASURED]
+One chrome generator pass per screen (F1 pixel-exactness proof, STATE tA2
+LANDED). Well geometry kNewgameCosmosRect {8,8,492,372}; recess = row 7
+x7..493 + cols x7/x493 rows 8..372 (dark noise censuses, per-edge tables in
+newgameWellEdgeColourAt); ridge = rows 373..374 x7..493, dark rung above /
+light rung below, SAME x-quantisation (grey 169/169, teal 108/107, 71/70 =
+per-row draws from the rung-shifted tables, NOT a vertical carry — the
+chain NEVER recurses up from 373/374; tA2-CONT anchor fix, witness band
+means 64.4/103.1 vs vendor 64.5/102.9). Panel inset law newgamePanelTopAt/
+LeftAt: dark inset top+left, NO line right/bottom (91/91 + 115/116 flat
+fill witnesses). Begin panel VISUAL extent {502,381,632,472} (hit rect
+unchanged). Full censuses + witness chain: docs/re/_wip_tA2.md F3/F5/F7/F8.
+MAP/TITLE APPLICATION VERDICTS (tA2 CLOSE clause):
+- MAP: frameTex law (kTextureBands + textureColourAt) is 100.00% pixel-exact
+  vs a field dump in left/bottom/top bands (_wip_tA2 F1); right-column
+  deviations are exactly the windows.txt sidebar widget rects (content over
+  chrome, not a chrome painter). NO CHANGE — law already applied.
+- TITLE: the title screen is the 0opening.gif decode (title.cpp
+  buildTitleTexture -> gifDecodeFile, 640x480, single RenderCopy); NO kBevel
+  site and no chromePage on the Title screen (chromePage starts at
+  RaceConfig/New Game, title.cpp:407-426). NO CHANGE — nothing to apply.
+  Remaining title defect (D11: button hover highlight) is behavior work,
+  not chrome law.
+
 ## 4. Named seams (honest negatives)
 (a) [CYCLE 2 UPDATE] The EXACT vendor pattern (which pixel gets which
     colour) cannot be replicated from still captures, and the STATIC
