@@ -61,6 +61,11 @@ const SDL_Color kBg{16, 16, 24, 255};
 const SDL_Color kLane{120, 120, 120, 255};
 const SDL_Color kText{235, 235, 235, 255};
 const SDL_Color kDim{150, 130, 110, 255};
+// tA3 RAIL TEXT LAW (hudlayout.h, docs/re/_wip_tA3.md F1b): the palette-exact
+// map refcap rail label core is (255,255,255) (260 px, original-
+// strategic-map.png rows 328..338) — NOT kText (a port value no refcap
+// site ever measured). Rail labels draw kRailInk; other kText sites stay.
+const SDL_Color kRailInk{255, 255, 255, 255};
 
 void filledCircle(SDL_Renderer* r, int cx, int cy, int rad) {
     for (int dy = -rad; dy <= rad; ++dy)
@@ -1369,23 +1374,22 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
             SDL_RenderFillRect(ren, &rr);
             SDL_SetRenderDrawColor(ren, kText.r, kText.g, kText.b, 255);
             SDL_RenderDrawRect(ren, &rr);
-            int tx = rr.x + 6;
+            const int tx = rr.x + kRailLabelDx;  // tA3 law (hudlayout.h)
             // Icons come from 1starmap.shp (the sidebar icon law) — load it
             // for the icon regardless of the screen's own library.
             const int iconLib = libFor(kScreenMap);
             // t400 PLACEMENT LAW (hudlayout.h): x = rect.x0 + dx(109) = RIGHT
             // of the label, native size, vertically centred. The old code
-            // painted at rr.x+4 (LEFT) — the D11 "wrong side" defect.
+            // painted at rr.x+4 (LEFT) — the D11 "wrong side" defect. tA3:
+            // the icon is RIGHT of the label, so it never displaces the
+            // label (widest big label 71 px ends at x0+73 < x0+109).
             if (const auto icon = sidebarIcon(b); icon && iconLib >= 0) {
                 const IconPos ip =
                     railIconPos(b, int(kLibs[iconLib].record(icon->frame).height));
-                if (blitShape(ren, kLibs[iconLib], icon->frame, ip.x, ip.y)) {
-                    // label keeps its left slot; the icon sits right of it
-                } else {
-                    tx = rr.x + 4 + int(kLibs[iconLib].record(icon->frame).width) + 6;
-                }
+                blitShape(ren, kLibs[iconLib], icon->frame, ip.x, ip.y);
             }
-            txt.draw(ren, tx, rr.y + 8, railLabel(b), false, kText);
+            txt.draw(ren, tx, rr.y + kRailLabelDy, railLabel(b), true,
+                     kRailInk);
             // t400 SPECIES FLAGS (hudlayout.h law): RACES has no SHAPEITEM
             // yet the vendor shows two 14x24 raceflag faces right of the
             // label (measured runs x521..552). Left = player species

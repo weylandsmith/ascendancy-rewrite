@@ -59,6 +59,12 @@ const SDL_Color kBand{150, 130, 110, 255};
 // hue alone here (selection = luminance band, labels carry the words).
 const SDL_Color kPanel{12, 32, 48, 255};      // navy panel interior
 const SDL_Color kBevel{97, 97, 97, 255};      // grey bevel lines
+// tA3 TEXT LAW: the newgame screen runs on game.pal, where the label ink
+// core measures (255,255,255) on the user original (Begin label 48 core
+// px, Player Species header 61 px; edges blend to (225,227,229)/(164,171,
+// 177) in the browser capture — the CORE is the class). kInk (215) is the
+// TITLE palette's white and stays title-only.
+const SDL_Color kNewgameInk{255, 255, 255, 255};
 const SDL_Color kLore{0, 142, 69, 255};       // vendor green ink
 const SDL_Color kSelBg{28, 56, 74, 255};      // selection band (lighter navy)
 const SDL_Color kDisc{128, 128, 128, 255};    // portrait-seam disc + ring
@@ -532,10 +538,10 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             newgameSummary(kDensityStarCounts[densityIdx], speciesSetting,
                            atmosphere, &summary);
             for (size_t i = 0; i < summary.size(); i++) {
-                const int w = txt.width(summary[i], false);
+                const int w = txt.width(summary[i], true);  // tA3 BIG face
                 txt.draw(ren, kSummaryCentreX - w / 2,
                          kSummaryTop + int(i) * kSummaryPitch, summary[i],
-                         false, kInk);
+                         true, kNewgameInk);
             }
 
             // (3) NEWGAMEWND description panel — t401 REBUILD (D11 "the
@@ -559,15 +565,15 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             const int selIndex = scrollOffset + selSlot;
             const std::string selName = speciesNameAt(selIndex);
             {
-                const int w = txt.width(selName, false);
+                const int w = txt.width(selName, true);  // tA3 BIG face
                 txt.draw(ren, (kNewgameWnd.x0 + kNewgameWnd.x1 + 1) / 2 - w / 2,
-                         kNameTop, selName, false, kLore);
+                         kNameTop, selName, true, kLore);
             }
             {
                 const std::string hdr = "Player Species";  // static.txt //153
-                const int w = txt.width(hdr, false);
+                const int w = txt.width(hdr, true);  // tA3 BIG face
                 txt.draw(ren, (kRaceList.x0 + kRaceList.x1 + 1) / 2 - w / 2,
-                         kHeaderTop, hdr, false, kInk);
+                         kHeaderTop, hdr, true, kNewgameInk);
             }
 
             // (3b) t401 PANEL ART: portrait ring (green, the vendor ring
@@ -669,10 +675,10 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                             return txt.width(s, false);
                         });
                     for (size_t i = 0; i < lines.size(); i++) {
-                        const int w = txt.width(lines[i], false);
+                        const int w = txt.width(lines[i], false);  // SM face
                         txt.draw(ren,
                                  (kLoreBox.x0 + kLoreBox.x1 + 1) / 2 - w / 2,
-                                 kLoreBox.y0 + int(i) * kLoreLinePitch,
+                                 kLoreTextTop + int(i) * kLoreLinePitch,
                                  lines[i], false, kLore);
                     }
                 }
@@ -811,9 +817,9 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     SDL_RenderDrawPoint(ren, c.rect.x0, y);
                 }
                 const int cxp = (c.rect.x0 + c.rect.x1) / 2;
-                const int wl = txt.width(c.label, false);
-                txt.draw(ren, cxp - wl / 2, c.rect.y0 + 12, c.label, false,
-                         kInk);
+                const int wl = txt.width(c.label, true);  // tA3 BIG face
+                txt.draw(ren, cxp - wl / 2, c.rect.y0 + kControlLabelDy,
+                         c.label, true, kNewgameInk);
                 const int value = i == 0
                                       ? kDensityStarCounts[densityIdx]
                                       : (i == 1 ? speciesSetting : atmosphere);
@@ -876,8 +882,9 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 }
                 const std::string lbl = "Player Color";  // NAME 'Player^Color'
                 const int cxp = (c.x0 + c.x1) / 2;
-                const int wl = txt.width(lbl, false);
-                txt.draw(ren, cxp - wl / 2, c.y0 + 2, lbl, false, kInk);
+                const int wl = txt.width(lbl, true);  // tA3 BIG face
+                txt.draw(ren, cxp - wl / 2, c.y0 + kPlayerColorLabelDy, lbl,
+                         true, kNewgameInk);
                 // t414 PLAYER ICONS (D15 "the player icons are missing
                 // from the 'Player Color' box"): MEASURED on the original
                 // at rows 434..459, seven 14x26 chips at x 384+16k with
@@ -961,10 +968,10 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     blitShape(ren, *pl, 0, kBeginEmblemRect.x0,
                               kBeginEmblemRect.y0);
                 const std::string lbl = "Begin New Game";  // static.txt //169
-                const int w = txt.width(lbl, false);
+                const int w = txt.width(lbl, true);  // tA3 BIG face
                 txt.draw(ren,
-                         (r.x + (r.w - w) / 2), kBeginLabelTop, lbl, false,
-                         kInk);
+                         (r.x + (r.w - w) / 2), kBeginLabelTop, lbl, true,
+                         kNewgameInk);
             }
         }
         SDL_RenderPresent(ren);

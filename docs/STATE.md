@@ -233,33 +233,65 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tA3 TEXT LAW (PHASE-17 STAGE A third and final law row — tA1 blit
-scale CLOSED tA1-CONT, tA2 chrome CLOSED tA2-CONT this iteration; D19
-ruling: Stage A completes before screen rows, and tNG-C's gate needs the
-text law for its button-text regions. Ordering rationale inline: queue
-order tA1->tA2->tA3 per PHASE-17 QUEUE; nothing in Stage A remains after
-tA3). Trigger check FIRST: USER: lines after the D19 block in
-docs/DECISIONS.md win.
-READ FIRST: docs/re/chrome.md 3a (frame law, done), the queue row tA3
-verbatim (STATE below), font notes in docs/re (vendor .fnt law banked,
-OQ-017 CLOSED), and the D19 note that Athens 512x384 shots are NEVER
-pixel-scale evidence (G5).
-DO (per queue row tA3): measure font identity + cell size + baseline +
-color classes from refcaps ONLY; render a reference string table at 1:1
-and diff glyph metrics (height, advance, weight) vs refcap text rows —
-witness witnesses: scratchpad/newgame-original.png label rows (e.g.
-'STAR DENSITY'/'PLAYER SPECIES'/'Begin New Game') and the map refcap
-button text; fix rewrite/src/ui text draw to cited metrics. CLOSE: metric
-diff within 1px on title + newgame + map button text + pins.
-HINTS THIS SESSION LEARNED (reuse, don't rediscover): python image work
-runs under ~/tools/revenv/bin/python (repo .venv has NO numpy/PIL);
-browser-crop law = 643x481 -> im[1:481,1:641] (load640 in
-scripts/t441_screen_diff.py); mutation campaigns: exact-colour share
-windows catch census-weight mutations that mean windows are blind to
-(scripts/r1_ta2c_mutate.py is the template).
-GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 on 20/20 saves
-(scripts/t368_ring_turn.py re-verified this iteration). turn > 1086 ->
-re-run scripts/r1_t85g_sitting.py FIRST. Ghidra :8089 UP.
+NEXT tNG-C NEW GAME CONTENT GATE (PHASE-17 flow order — ordering
+rationale inline: D19 ruling "Stage A completes before screen rows,
+screens in flow order starting at New Game"; Stage A CLOSED this
+iteration tA3; tNG-C's queue row says framing = A2 application check
+and needs the tA1 scale + tA3 text laws, both now banked). Trigger
+check FIRST: USER: lines after the D19 block in docs/DECISIONS.md win.
+READ FIRST: docs/STATE.md queue row "tNG-C" VERBATIM (below this block;
+D19 seed-defect list in it), docs/re/typography.md (tA3 text law),
+docs/re/_wip_tA1.md (blit-scale law + harness contract), docs/re/
+chrome.md 3a (frame law), docs/re/_wip_tA3.md F5/F6 (witness +
+mutation templates to copy).
+DO (per queue row): per-region record index + clip mask + palette
+cited for EVERY newgame region; D19 seed defects: planet art INDEX law
+(husk-for-Minions witness, race->planet record law from the vendor
+painter via Ghidra :8089; cite), atmosphere wheel frame-per-option
+(hostile = correct reference), star-density/species boxes extraneous
+art, Player Color = ONE row of SEVEN outlined race-emblem chips
+(tinted) not solid swatches, Begin panel starfield law + thick beveled
+ring. Extend scripts/t441_screen_diff.py region table (G2 single home)
++ r1_tA3_capture.sh flow. CLOSE: G1+G2 (per queue row).
+HINTS THIS SESSION LEARNED (reuse, don't rediscover): python image
+work runs under ~/tools/revenv/bin/python; browser-crop law =
+im[1:481,1:641]; browser shots drift per-window +-1 px (NEVER derive a
+law from one row — docs/re/typography.md §3); centre law cell x =
+(x0+x1)/2 - adv/2 (NOT +1 form); fnt.md + text.md are GATE-REGENERATED
+(never hand-edit; typography.md is the hand-authored home); mutate
+scripts must launch on a GREEN suite (killed foreground run poisons
+the snapshot — see r1_ta3_mutate.py guard + skill note); full mutate
+campaign > 420 s = background+notify, never foreground.
+GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 on 20/20
+saves (scripts/t368_ring_turn.py re-verified this iteration — the
+sitting test; timeline growth is NOT the signal). turn > 1086 -> re-run
+scripts/r1_t85g_sitting.py FIRST. Ghidra :8089 UP, program analyzed.
+
+tA3 TEXT LAW LANDED 2026-11-21 (PHASE-17 STAGE A ROW 3 CLOSED — Stage A
+(tA1 blit scale + tA2 chrome + tA3 text) COMPLETE; ledger open=[016,019]
+unchanged, seam work). (i) FONT-FIELD LAW: TEXTITEM face fields 0/2/3
+ALL render the BIG face — measured decisive at all three (rail iou
+1.000 vs sm 0.24-0.37 palette-exact map refcap; control labels big
+0.80-0.85 vs sm 0.21-0.30; title t392); smfont = body text only (lore
+8-row bands, sm>big). (ii) BASELINE LAW: TEXTITEM draw TOP = y0+dy
+VERBATIM (rail dy=2 EXACT, root=window+40); rail cell x = x0+2; centred
+x = (x0+x1)/2 - adv/2; browser drift +-1 per window banked as a PITFALL
+(pre-tA3 kNameTop/kHeaderTop/kSummaryTop were raw-row errors off by 1;
+lore drew 7 px high). (iii) CODE: rail labels bigface kRailInk
+(255,255,255) at x0+2/y0+2 (D19 "button text too small" root cause);
+control/PlayerColor/header/name/summary/Begin labels bigface
+kNewgameInk; kNameTop 17, kHeaderTop 15, kSummaryTop 326, kLoreTextTop
+265 new; title untouched (t392 palette). (iv) WITNESS GREEN:
+scripts/r1_tA3_capture.sh + r1_tA3_witness.py — ours 11/11 sites big-
+face iou 0.935-1.000 + core255 frac 1.000 + first-ink-row baselines
+exact; vendor 8/8 static sites big wins (dynamic-word sites SKIP per
+tA1-CONT contract). CLOSE term met: ours-vs-law 0 px (<=1px). (v)
+MUTATION 12/12 CAUGHT (8 pins + 4 witness; honest two-run record
+_wip_tA3 F6 — a killed foreground run poisoned run 1's snapshot; M7
+re-verified CAUGHT on a green tree; launch-guard added). Pins
+test_textlaw_tA3.cpp x3. Build 0, ctest 475 0 failed, gate 0, ledger
+audit OK open=[016,019]. LAW HOME: docs/re/typography.md (hand-
+authored; fnt.md/text.md are generated — never hand-edit).
 
 tA2-CONT CHROME CLOSE LANDED 2026-11-21 (all five items; ledger
 open=[016,019] unchanged, seam work). (i) RIDGE CHAIN-ANCHOR FIXED:

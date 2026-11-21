@@ -86,14 +86,32 @@ inline constexpr Rect kPlayerColorRect{379, 381, 493, 419};
 // rows measured 456..464 -> label top 455.
 inline constexpr int kSummaryCentreX = 170, kBeginLabelTop = 455;
 
-// Text placements [measured S9, screen coords, ink rows]: species name
-// (green) rows 18..27 centred x 412 ~= NEWGAMEWND centre 411; "Player
-// Species" header (white) rows 16..25 centred x 568 ~= RACELIST centre 567;
-// lore block inside NEWGAMEWND; summary block centred under the starfield.
-inline constexpr int kNameTop = 18, kHeaderTop = 16;
+// Text placements [tA3 RE-MEASURED on the user original under the tA1 crop
+// law (screen = image - 1; docs/re/_wip_tA3.md F2/F3), screen coords, ink
+// rows]: species name (green) rows 17..26 centred x 412 ~= NEWGAMEWND
+// centre 411; "Player Species" header (white) rows 15..24 centred x 568 ~=
+// RACELIST centre 567. The pre-tA3 values 18/16 were the RAW browser rows
+// (one below the crop-law screen rows — the S9 block predates the crop law).
+// Both sites draw the BIG face (name: 10-row caps + big template win;
+// header: caps rows 15..24 = bigfont's 10-row caps, sm 7-row REFUTED).
+inline constexpr int kNameTop = 17, kHeaderTop = 15;
 inline constexpr Rect kLoreBox{334, 258, 488, 330};
+// tA3: lore TEXT starts at the measured ink top 265 (bands 265/276/287,
+// pitch 11 CONFIRMED), not the box top 258 — the port drew 7 px high.
+// Lore is the SM face (template 'the' sm 0.63 > bg 0.47; 8-row bands).
+inline constexpr int kLoreTextTop = 265;
 inline constexpr int kLoreLinePitch = 11;  // measured bands pitch 11
-inline constexpr int kSummaryTop = 327, kSummaryPitch = 13;
+// tA3: summary lines measured (big-face template fits) at tops 326/339/352
+// — top 326 (pre-tA3 327 = raw-row error), pitch 13 CONFIRMED.
+inline constexpr int kSummaryTop = 326, kSummaryPitch = 13;
+// tA3 CONTROL LABEL LAW: the three GALAXY/PLAYERS/DIFFICULTY TEXTITEMs are
+// "0 <str> 2 0 10" — dy=10 verbatim, BIG face (Star Density/Species/
+// Atmosphere big template fits 0.80-0.85 vs sm 0.21-0.30), centred on the
+// rect (measured within 1 px). Player Color (no TEXTITEM; NAME label)
+// measures browser row 394; under the same-window browser +1 drift law
+// (the three dy=10 labels measure 392) its logical top is 393 = y0+12,
+// centred, big face.
+inline constexpr int kControlLabelDy = 10, kPlayerColorLabelDy = 12;
 
 // RACELIST ROW LAW [MEASURED t393 on the user-supplied original]: the list
 // is a THREE-SLOT scroll window, not a 7-row list. Silver bevel-ring census

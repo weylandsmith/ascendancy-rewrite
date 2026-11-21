@@ -173,6 +173,7 @@ add_executable(run_tests
   tests/test_shipsim_t380.cpp
   tests/test_shipsim_t381.cpp
   tests/test_titletext_t392.cpp
+  tests/test_textlaw_tA3.cpp
   src/ui/layout.cpp
   src/ui/boot.cpp
   src/ui/menulaw.cpp

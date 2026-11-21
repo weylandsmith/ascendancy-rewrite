@@ -101,6 +101,17 @@ std::optional<ShapeRef> sidebarIcon(RailButton b);
 // pixels within 12 of game.pal (palette.md §4); the D11 "wrong size"
 // symptom was the pre-t394 vector-rect build, not a vendor scale.
 inline constexpr int kRailIconDx = 109;  // SHAPEITEM dx verbatim
+
+// ---- tA3 RAIL TEXT LAW (docs/re/_wip_tA3.md F1b/F3) ------------------------
+// The rail label is the window's TEXTITEM (e.g. "0 Species 0 2 2"): font
+// field 0 renders the BIG face (measured: ink band 11 rows, per-glyph runs
+// == bigfont extents exactly on all five rails of the palette-exact map
+// refcap; smfont's 7-row caps REFUTED), draw TOP = y0+dy with dy=2 hit
+// EXACTLY (root row = window row + 40), and the first glyph cell origin is
+// x0+2 ('S' cell 476 in rect x0=474; bigfont 'S' inks from cell column 1).
+// Ink class (255,255,255) — palette-exact white, 260 core px (t403's
+// (235,235,235) read was OUR render, not the vendor's).
+inline constexpr int kRailLabelDx = 2, kRailLabelDy = 2;
 struct IconPos { int x, y; };
 // Placement for an icon of width `w`/height `h` (native record dims) in
 // button `b`. x ignores `w` (LEFT-anchored at dx, the vendor law).
