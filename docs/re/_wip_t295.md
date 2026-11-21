@@ -160,6 +160,12 @@ ADDRESS ARITHMETIC RECONCILED: state base = image 0x12e10 (phys 0x254e10 =
 the banked TURN-counter phys — self-confirming). Star-owner records ARE the
 star records: entry(j) = state+0xdb5+0x60j; NAME0 = state+0xdd1 = entry(0)+
 0x1C, so base(k)=NAME(k)-0x1C == entry(k) EXACTLY (t270 join, now derived).
+[t441 CORRECTION: the record BASE is state+0xd8d+0x60j — the stored row+0xd
+home pointer lands there; state+0xdb5 is the record's +0x28 field, so every
+disp8 above must be re-based by -0x28 when read from +0xdb5 (marker +0x14 ->
+base+0x3c, bitset +0x17 -> base+0x3e, name +0x1c -> base+0x44). Verified
+50/50 star records + all four homeptrs in bank-t251-live1255/45.sav;
+scripts/t441_race_table_census.py. The DRAW LAW itself is unaffected.]
 word[state+0xd88] = RACE COUNT (0x13b98, diplomacy loop bound);
 dword[state+0x3333] hi word = T.
 

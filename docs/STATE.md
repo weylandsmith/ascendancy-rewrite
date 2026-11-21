@@ -233,76 +233,102 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t441 = CLOSE SEAMS T436-A / T436-B (species-screen portrait COUNT law and
-owner->racering ring INDEX law) — OFFLINE-FIRST census, capture only if the
-bank cannot answer (ordering rationale: after t440 the open ledger is
-OQ-016 + OQ-019 and BOTH are user-gated — OQ-016's residue list is EXHAUSTED
-and its remaining sub-law is USER ADJUDICATION per D3; OQ-019 needs the
-debugger class per the t298 budget law (REFUTED-ROUTES.md:465-467) plus user
-acceptance per D2 — so no machine-closable LEDGER work exists this turn; the
-t439 GOAL.txt rule says continue other open items, and T436-A/B are the two
-named, measurable seams whose subject (the t436b species screen) shipped THIS
-week with the laws still open. The t440 method law applies directly: the race/
-owner tables are save-resident, and the two-coordinate-system rule is now
-pinned in docs/re/r1-savestate.md — do NOT mix member=L+H with B+P0+file.)
+NEXT t442 = FIND THE STATE-7 PORTRAIT PAINTER IN THE ORIGINAL CODE (offline
+static hunt, Ghidra headless 127.0.0.1:8089 + work/ascend_restored.bin +
+work/functions_full.tsv) — the function that, on COSMOSWnd state 7, iterates the
+race table and blits smrace<specnum> + racering k<colour> at the r=170 slots.
+(ordering rationale: t441 CLOSED the portrait law by IMAGE measurement but its
+n>4 tail is explicitly unmeasured — the t252 campaign has 4 rows and no 5+-race
+capture exists, so the port ships 90+360/n as a NAMED reading; the painter
+function settles count-vs-n, the angle formula, and whether the ring index is
+byte +8 verbatim, converting three named caveats into cited law. It is offline,
+so it does not touch the user-gated OQ-016/019 and cannot collide with the live
+game. R-t441's method law applies: the target is code, not heap — the restored
+image is the right substrate. DO NOT re-measure what t441 already measured: the
+image evidence, slot geometry, and the owner%7 refutation are banked in
+docs/re/ui-runtime.md "t441 SPECIES-SCREEN PORTRAIT LAW CLOSED" +
+docs/re/_wip_t441.md — read those first, do not re-census the PNGs.)
 
 DO, in order:
-(1) READ FIRST: docs/re/ui-runtime.md "t436b SPECIES SCREEN" + _wip_t436.md
-    F9/G-laws (what was measured: 4 rings vs 3 known rows; ring rec index ==
-    colour index per t423c2; port draws racering k<owner%7>). Do not re-derive
-    the t423c2 law or the smrace/racering asset shapes.
-(2) OFFLINE CENSUS on the FROZEN bank work/r1/bank-t438-ring-2200 (NEVER the
-    live ring, t439 law; member offset = linear + H, H=0x88): enumerate per-
-    owner home-world + species rows (the race/species tables the species
-    screen reads — start from the rewrite's homeStarFor/specnum sources and
-    the t326 known-tech mask law at ds:0x7478e+0x4b*i), and the raceVisibleMask
-    inputs. Hypotheses to test per save: H1 count = #owners with KNOWN rows
-    (port law); H2 count = #owners with home worlds (vendor 4 vs 3 known rows
-    suggests an owner whose row is not yet visible); H3 index = owner%7
-    (T436-B) vs index = species/specnum (t423c2 says ring rec == colour index —
-    disambiguate using owners where species != owner%7).
-(3) IF the bank answers both -> bank the laws in ui-runtime.md (hand-authored;
-    check nothing regenerates it — BLOCKED traps), upgrade the rewrite
-    speciesmenu/ui portrait selection to the cited law, pin it (pattern:
-    tests/test_speciesmenu_t436.cpp x6, mutation-verify), done.
-(4) IF the bank cannot distinguish -> ONE cheap capture leg on the PRODUCTION
-    game (pid in work/r1/vnc/dosbox.pid, HEALTHY as of t440 17:18): open the
-    species screen (state-neutral), screenshot via the t436b witness chain
-    (scripts/t409_species_witness.sh + scripts/t436b_witness_census.py exist),
-    count rings + sample ring colours vs the logged "ui species portrait owner
-    N at x,y" lines. A screenshot census is NOT the budget-spent scripted-mouse
-    class (that law covers selection/order legs, REFUTED-ROUTES t298) — but do
-    not drive any ship/fleet/order control.
-(5) LEDGER: this task touches NO OQ row (seams are not ledger rows). If it
-    incidentally produces a datum that moves OQ-016/019, record it in the row
-    as a note WITHOUT closing (both rows' closure bars are user-side).
+(1) READ: ui-runtime.md t441 block (end of file), _wip_t441.md T2/T6, and the
+    t436b draw block rewrite/src/ui/ui.cpp (state 7, "t436b/t441 SPECIES
+    PORTRAITS"). Known anchors: the screen's chrome binds DATA\7RACESEL.SHP via
+    windows.txt TYPE-100 STATENUMBER 7 (_wip_t436 F1); race-row stride 0x1ee,
+    colour byte +8 (t423-newgame-law S10); FUN_00023388 preloads
+    SMRACE%02d/LGRACE%02d per race (t415 F3); the new-game DESC-ring blitter is
+    title-side, NOT this one.
+(2) LOCATE: start from the SMRACE shape-lib handle consumers — the shape item
+    painter family (FUN_0005d5a1 affine blitter per t423 S11; the 0x52xxx
+    window-handler family matches window objects per t423) — and walk callers
+    until a function reads word[state+0xd88] (race count) AND references a
+    radius/angle constant pair consistent with 170 px (or a lookup table).
+    Alternative route: search for the state-7 invalidate/paint path via the
+    COSMOSWnd object (state list "4 1 3 7 13", speciesmenu.h header) and its
+    vtable paint slot.
+(3) DECOMPILE the winner with capstone cross-check (t423c2 discipline: the
+    decompiler inverted a collision flag once; verify loop bounds + operand
+    displacements in raw disasm before banking).
+(4) BANK in ui-runtime.md (hand-authored; no generator touches it — verified
+    t441) + _wip_t442.md; if the cited law DIFFERS from the port's named
+    readings (angle pitch for n>4, count filter, ring index), upgrade
+    ui/speciesmenu.cpp + ui.cpp and re-pin (pattern:
+    tests/test_speciesportrait_t441.cpp x4, mutation-verify each changed
+    constant). If it CONFIRMS them, say so with the address and close the
+    named caveats.
+(5) LEDGER: touches no OQ row (seam work). If the painter function incidentally
+    names a diplomacy/relation field relevant to OQ-016, note it in the row
+    WITHOUT closing.
 
-GAME STATE t441 STARTS FROM (re-verified t440 17:18): production pid
-1182156 HEALTHY, TL expiry 2026-11-22 12:02:26, watcher 1182171, ring 41..60
-banking every 10 s, resumed to the strategic map at turn 1086. SITTING TEST:
-compare the TURN via `python3 scripts/t368_ring_turn.py` (baseline 1086), NOT
-live-timeline.jsonl growth — an unattended game grows the timeline ~1 row/10 s
-with no human (docs/re/selfplay.md t439 law).
+GAME STATE t442 STARTS FROM (re-verified t441 end): production pid 1182156
+HEALTHY (TL expiry 2026-11-22 12:02:26, watcher 1182171), ring turn 1086 on
+20/20 saves (scripts/t368_ring_turn.py — the sitting test; live-timeline.jsonl
+growth is NOT the signal, t439 law). SITTING CHECK: run t368_ring_turn.py; turn
+> 1086 means the user played -> re-run scripts/r1_t85g_sitting.py BEFORE the
+task.
 
 SEAMS carried: T433-C chrome generator seed/state (live debugger only, NOT
-queued), T436-A portrait COUNT, T436-B owner->racering index, H3 race bytes
-1..20, T428-B, T427-A..F, gizmo-icon rows + class selector (t434b), research
-panel art join D3 (t435 F6).
-OPEN-LEDGER HANDOFF STATE (updated t440, gate-owners named):
-OQ-027 CLOSED t440 — do NOT re-open and do NOT re-run the tune-table census
-(scripts/t440_music_table.py PASS 20/20; R-t440 makes the heap-relative premise
-dead). D12 item 5 (audio match/differ on :8613) is MOOT for OQ-027(a): the row
-closed on machine measurement first; a late user answer is a bonus, not a gate.
-OQ-016 = USER ADJUDICATION per D3 (residue list EXHAUSTED; the Phase-Bomb
-nuke-law sub-capture is machine-closable and now has a live game, but it needs
-a Phase-Bomb-carrying fleet built first — expensive, schedule deliberately);
-OQ-019 = user-gated (acceptance of the per-ship sim, docs/re/pership-spec.md)
-+ debugger-class witness for the selection/order legs, NOT another scripted
-mouse session (t298 budget law); OQ-027 = item (b) CLOSED with measurement +
-code site (t437), item (a) CLOSED t440 (tune table = static obj+0x37a+tuneid*28,
-20/20 saves, pin audio_tuneid_zero_based_t440).
-NO GIT REMOTE IS CONFIGURED (git remote -v empty) — deliverables are local
-commits only.
+queued), H3 race bytes 1..20, T428-B, T427-A..F, gizmo-icon rows + class
+selector (t434b), research panel art join D3 (t435 F6). CLOSED t441: T436-A,
+T436-B (do not re-open; R-t441 in REFUTED-ROUTES.md).
+OPEN-LEDGER HANDOFF STATE (unchanged from t440): OQ-016 = USER ADJUDICATION per
+D3 (residue list EXHAUSTED; Phase-Bomb sub-capture machine-closable but needs a
+Phase-Bomb fleet built first); OQ-019 = user acceptance of the per-ship sim +
+debugger-class witness (t298 budget law, REFUTED-ROUTES.md:465-467). RULING
+CHECK t441: find work/r1/d1page -newermt 2026-11-20 11:52 = EMPTY -> D2/OQ-019
+acceptance still PENDING. NO GIT REMOTE (deliverables = local commits).
+
+t441 LANDED 2026-11-20 (SEAMS T436-A + T436-B CLOSED — species-screen portrait
+law measured offline; ledger open=[016,019] unchanged, seam work).
+(i) FINGERPRINT: the t252 species capture campaign == bank-t251-live1255
+(turn 1255, n=4): Chamachies(col 0, player)/Orfa(1)/Ungooma(6)/Minions(2,
+eliminated ships=0) via the watcher name law — the capture's races are
+save-known, not hypothesised. (ii) T436-B CLOSED: ring index = race colour byte
+row+8, NOT owner%7 — Ungooma (row2, colour 6) wears the ORANGE ring while GOLD
+(k2, Minions' colour) sits at row3's slot; second witness = row ink follows the
+same byte (t436 F7). (iii) T436-A CLOSED: ONE portrait per RACE TABLE ROW,
+PLAYER INCLUDED (row0 = top slot), contact/elimination IRRELEVANT. t436's
+"portraits on home stars, player excluded" REFUTED two ways: the baseline band
+under every slot is 90% pure black (star markers 64-105 px away; the four blob
+centres are an r=170 circle about (234.2,238.0) at angles 89.7/180.3/269.9/0.0
+= cardinals), and home-star map-y signs (+214.7 vs -234.4 -> same screen row 238)
+are impossible under projection. METHOD LAW banked (R-t441): census the
+REPAINT DIFF of a baseline+overlay capture pair, never blobs in the overlay
+image alone. (iv) SAVE-LAW CORRECTION: star record base = STATE+0xd8d+0x60j,
+NOT t295's STATE+0xdb5 (that is the record's +0x28 field; +0x2c sequential
+index, +0x30/+0x34 float x/y, +0x3c marker|race, +0x3e owner bitset, +0x44
+name) — verified 50/50 records + all four homeptrs; _wip_t295.md patched;
+scripts/t441_race_table_census.py decodes every bank tried (50/50, n matches
+word[STATE+0xd88]). (v) CODE: speciesmenu.{h,cpp} speciesSpecnumOfOwner +
+speciesPortraitSlot (r=170; n>4 uses 90+360/n — UNMEASURED tail, named, since
+no 5+-race capture exists and fixed-90 overlaps rows 4..6 on 0..2); ui.cpp
+state-7 block rewritten (owners 0..min(count,7), racering k<colour byte> via
+the vendor-default assignRaceColours call). (vi) PINS
+tests/test_speciesportrait_t441.cpp x4, mutation-verified (fixed-90 pitch 3
+fails, r=160 4, y-sign flip 7, nslots-ignored 17 — all CAUGHT); suite 471/0
+(was 467). Witness t409_species_witness.sh VERDICT PASS, 7 owners at 7 distinct
+slots. (vii) gate.sh GATE_EXIT=0; ledger_audit rows=20 open=[016,019] OK;
+ledger_index_check OK. NEXT t442 = state-7 portrait PAINTER static hunt (closes
+the n>4 caveats with code, offline).
 
 t440 LANDED 2026-11-20 (OQ-027 CLOSED — TUNEID INDEX BASE MEASURED, ledger
 open=[016,019]). (i) A prior session was killed mid-task (OPEN-QUESTIONS.md

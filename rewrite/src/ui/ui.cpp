@@ -1257,46 +1257,54 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     SDL_RenderDrawRect(ren, &sel);
                 }
             }
-            // t436b SPECIES PORTRAITS (state 7 only; law ui/speciesmenu.h +
-            // _wip_t436.md F5/F7/F8): one ringed portrait per KNOWN AI owner
-            // centred on its HOME STAR — smrace<specnum> rec 0 at scale 2
-            // clipped r49 (disc), racering k<owner%7> at scale 2 (the
-            // three-tone ring band r50..55; SEAM T436-B on the index). The
-            // player home carries NO portrait [measured F8]. Drawn AFTER the
-            // star pips so the disc covers the marker (vendor capture: star
-            // under each portrait centre, marker not visible on it).
+            // t436b/t441 SPECIES PORTRAITS (state 7 only; law ui/speciesmenu.h
+            // + docs/re/_wip_t441.md T2/T6, superseding _wip_t436.md F5's
+            // home-star reading): ONE RINGED PORTRAIT PER RACE TABLE ROW —
+            // player included (row 0 = top slot), contact/elimination state
+            // IRRELEVANT (the "Extinct" Minions row still wears its gold ring).
+            // POSITION IS FIXED, not projected: slot k = cosmos centre + r170
+            // at angle 90+90k (measured 89.7/180.3/269.9/0.0). RING INDEX =
+            // the race colour byte (vendor row+8 / FUN_000232ec; t436-B CLOSED
+            // — owner%7 put Ungooma's ring on the wrong hue). Content disc =
+            // smrace<specnum> rec 0 scale 2 clip r49 (t436b, unchanged); the
+            // human player (specnum -1) has NO smrace lib -> ring only.
             if (screen == kScreenSpecies) {
                 static std::vector<int> printedPortraits;  // once per owner
-                const auto srows = speciesMenuRows(camp, roster);
-                for (const auto& sr : srows) {
-                    const int hs2 = camp.homeStarFor(sr.owner);
-                    if (hs2 < 0 ||
-                        hs2 >= int(camp.galaxy().stars.size()))
-                        continue;
-                    if ((raceVisibleMask & (1u << (sr.owner % 7))) == 0)
-                        continue;  // t425 race filter hides the record
-                    const Pt hp2 = projectStar(cam, camp.galaxy().stars[size_t(hs2)]);
+                // Port-side colour table = the vendor default call (player
+                // chip 0, seed 0x12e10) — the SAME call title.cpp runs at New
+                // Game. SEAM (pre-existing t423c3): a chip click in the title
+                // is not plumbed into runCampaignUi, so mid-session colour
+                // edits do not reach this screen.
+                unsigned char raceColours[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+                unsigned int colourLcg = 0x12e10u;
+                assignRaceColours(0, camp.ownerCount(), &colourLcg, raceColours);
+                const auto specnumOf = speciesSpecnumOfOwner(camp, roster);
+                const int nslots = camp.ownerCount() < 2 ? 4 : camp.ownerCount();
+                for (int o = 0; o < camp.ownerCount() && o < 7; ++o) {
+                    const Pt ps = speciesPortraitSlot(kCosmosWnd, o, nslots);
                     if (std::find(printedPortraits.begin(),
-                                  printedPortraits.end(), sr.owner) ==
+                                  printedPortraits.end(), o) ==
                         printedPortraits.end()) {
-                        printedPortraits.push_back(sr.owner);
+                        printedPortraits.push_back(o);
                         std::printf("ui species portrait owner %d at %d,%d\n",
-                                    sr.owner, hp2.x, hp2.y);
+                                    o, ps.x, ps.y);
                         std::fflush(stdout);
                     }
-                    if (const auto* pl =
-                            speciesPortraitFor(sr.flagSpecnum)) {
+                    const int spec =
+                        o < int(specnumOf.size()) ? specnumOf[size_t(o)] : -1;
+                    if (const auto* pl = speciesPortraitFor(spec)) {
                         const int d = int(pl->record(0).width) *
                                       kSpeciesPortraitScale;  // 49 -> 98
-                        blitShapeCircular(ren, *pl, 0, hp2.x - d / 2,
-                                          hp2.y - d / 2,
+                        blitShapeCircular(ren, *pl, 0, ps.x - d / 2,
+                                          ps.y - d / 2,
                                           kSpeciesPortraitScale,
                                           kSpeciesPortraitClipR);
                     }
-                    if (raceringLib.count() > sr.owner % 7)
-                        blitShapeScaled(ren, raceringLib, sr.owner % 7,
-                                        hp2.x - kSpeciesRingHalf,
-                                        hp2.y - kSpeciesRingHalf,
+                    const int ring = raceColours[o] < 7 ? raceColours[o] : 7;
+                    if (raceringLib.count() > ring)
+                        blitShapeScaled(ren, raceringLib, ring,
+                                        ps.x - kSpeciesRingHalf,
+                                        ps.y - kSpeciesRingHalf,
                                         kSpeciesPortraitScale);
                 }
             }

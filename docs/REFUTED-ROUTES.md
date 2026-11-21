@@ -1558,3 +1558,21 @@ SECOND DEAD END: grepping work/ascend_payload.bin for the object's
 bytes — the audio object is .bss (data-seg base 0x242000 + 0x78638, payload is
 0x8cc83 B), so it exists ONLY in save states; payload bytes at the naive
 "same offset" are unrelated garbage (measured t440).
+
+## R-t441. "SPECIES PORTRAITS SIT ON THE PROJECTED HOME STARS" IS DEAD (t441).
+t436 read four ringed portraits on the species screen, found "a star marker
+within 12 px" under each, and concluded they are home-star projections with the
+player excluded — t436b shipped that. MEASURED (t252 pair, campaign
+fingerprinted to bank-t251-live1255 turn 1255): the four blob centres are
+(235,68) (64,239) (404,238) (234,407) — an r=170 circle at the cardinals about
+the cosmos centre (234.2,238.0); the baseline band under every slot is 90% pure
+black (star markers are 64-105 px from three of four slots), and the race home
+stars' map-y signs (+214.7 vs -234.4 landing at the SAME screen row 238) are
+impossible under any projection. The player HAS a portrait (row 0 = top slot).
+DO NOT re-project homeStarFor() on this screen, DO NOT re-derive "player has no
+portrait", and do not index the ring by owner%7 (Ungooma row2 colour 6 = orange
+ring; gold belongs to row3). Law + evidence: docs/re/ui-runtime.md "t441
+SPECIES-SCREEN PORTRAIT LAW CLOSED", docs/re/_wip_t441.md.
+METHOD LAW banked: on a capture PAIR (baseline + overlay screen), census the
+REPAINT DIFF, not blobs in the overlay image — the diff says exactly what the
+screen adds and where, and it is what exposed the phantom star markers.

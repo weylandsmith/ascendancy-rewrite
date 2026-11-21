@@ -689,3 +689,50 @@ implementation evidence G1/G2 in the same file). Landed in rewrite/:
   100.0% well-family empty slots, ink centre 553 exact, 0 grey-outline px,
   disc+ring at the logged centre — VERDICT PASS on
   /tmp/t436b_shots2/species-menu.png (seed 5, --species 0).
+
+## t441 SPECIES-SCREEN PORTRAIT LAW CLOSED — seams T436-A + T436-B (2026-11-20)
+Full working log: docs/re/_wip_t441.md (T1..T6). This block SUPERSEDES
+_wip_t436.md F5's "portraits are centred on the AI species HOME STARS" and
+t436b's SEAM notes above (count source, position, filter, ring index).
+- CAMPAIGN FINGERPRINT [measured]: the t252 capture session ==
+  work/r1/bank-t251-live1255 (turn 1255, n=word[STATE+0xd88]=4): rows
+  Chamachies(colour 0, PLAYER)/Orfa(1)/Ungooma(6)/Minions(2, eliminated,
+  ships=0) via the production watcher name law. Save base facts re-verified
+  there: STATE = DS+0x12e10, race rows STATE+0x1ee*r (+7 specnum, +8 colour,
+  +0xd home-star pointer), 50/50 star records decoded.
+- STAR RECORD CORRECTION [measured]: base = STATE+0xd8d+0x60*j, NOT t295's
+  STATE+0xdb5 (that is the record's +0x28 field; the stored row+0xd pointer
+  lands at base). Fields: +0x2c sequential index, +0x30/+0x34 float x/y,
+  +0x3c bit7-marker|race, +0x3e owner bitset, +0x44 name. scripts/
+  t441_race_table_census.py implements it (50/50 on every bank tried).
+- COUNT (T436-A) [measured, t252 pair x2 captures]: ONE ringed portrait per
+  RACE TABLE ROW, PLAYER INCLUDED (row 0 = top slot), contact/elimination
+  state IRRELEVANT (the "Extinct" Minions row still wears its gold ring — the
+  rows list and the rings use different filters). t436's "player home carries
+  NO portrait" is REFUTED: the baseline r50..55 band under every slot is 90%
+  pure black and the white star markers are 64-105 px from three of the four
+  slots; the rings are ADDED by the species screen over empty space.
+- POSITION [measured]: NOT a projection. Fixed slots: cosmos-field centre
+  (measured (234.2,238.0) ~ kCosmosWnd centre (236,239)), radius 170
+  (169.0..170.3), slot k at angle 90+90k for rows 0..3 (89.7/180.3/269.9/0.0
+  = top/left/bottom/right). Home-star y-signs make the old reading impossible
+  (Orfa +214.7 and Ungooma -234.4 map to the SAME screen row 238). n>4 is
+  UNMEASURED (no 5+-race capture exists): port uses 90+360/n (keeps the 7
+  vendor rows' slots distinct; a fixed 90 pitch overlaps rows 4..6 on 0..2) —
+  NAMED, mutation-pinned as the unmeasured tail.
+- RING INDEX (T436-B) [measured]: racering k<colour byte row+8>, NOT owner%7.
+  Discriminator: Ungooma is row 2 with colour 6 — the capture's ORANGE ring
+  (k6) sits at ITS slot while GOLD (k2 = Minions' colour) sits at row 3's;
+  owner%7 predicts gold for Ungooma and is wrong. Second witness: row name/
+  flag ink follows the same byte (t436 F7). Port: speciesPortraitSlot +
+  assignRaceColours (the title's vendor-default call, chip 0 seed 0x12e10;
+  mid-session chip clicks reaching the campaign stays the pre-existing
+  t423c3 seam).
+- CODE: ui/speciesmenu.{h,cpp} (speciesSpecnumOfOwner, speciesPortraitSlot,
+  kSpeciesRingRadius=170), ui.cpp state-7 draw block (owners 0..min(count,7)).
+- PINS tests/test_speciesportrait_t441.cpp x4; suite 471/0 (was 467; +4).
+  Mutation-verified: fixed-90 pitch CAUGHT (3 fails), radius 160 CAUGHT (4),
+  y-sign flip CAUGHT (7), nslots ignored CAUGHT (17).
+- WITNESS scripts/t409_species_witness.sh VERDICT PASS + t436b census; log
+  law unchanged ("ui species portrait owner N at x,y"), now 7 owners at 7
+  distinct slots (seed 5 default campaign).

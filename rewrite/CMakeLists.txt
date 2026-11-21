@@ -141,6 +141,7 @@ add_executable(run_tests
   tests/test_research3d_t419.cpp
   tests/test_speciesmenu_t409.cpp
   tests/test_speciesmenu_t436.cpp
+  tests/test_speciesportrait_t441.cpp
   tests/test_sysview_t410.cpp
   tests/test_maplook_t411.cpp
   tests/test_raceintro_t412.cpp
