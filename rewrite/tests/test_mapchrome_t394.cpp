@@ -151,41 +151,69 @@ TEST(mapchrome_tA2_well_edge_law) {
     const RGB d0 = newgameWellEdgeColourAt(100, 373);
     const RGB l0 = newgameWellEdgeColourAt(100, 374);
     CHECK(int(d0.r) + d0.g + d0.b < int(l0.r) + l0.g + l0.b);
-    // tA2-CONT PIN STRENGTHENING (mutation-campaign skill rule 4/5): the
+    // tA2-CONT PIN STRENGTHING (mutation-campaign skill rule 4/5): the
     // census WEIGHTS and the chain-anchor law are only observable through
-    // band means. Chain math: a left-pull/up-pull chain preserves the tab
-    // mean in stationarity, so any mean shift = wrong weights or a chain
-    // crossing a band boundary. Row 373 recursing up (the fixed defect)
-    // drags the mean to ~50 (witnessed 50.6 pre-fix); swapping ridge
-    // weights moves it too. Tolerances +-6/+-7 = sampling sd <0.5 at
-    // n=487 plus chain variance.
+    // band statistics. Chain math: the left/up pull chain preserves the
+    // tab MARGINAL distribution (mean AND per-colour shares) in
+    // stationarity, so any shift = wrong weights or a chain crossing a
+    // band boundary. Row 373 recursing up (the fixed defect) drags the
+    // mean to ~50 (witnessed 50.6 pre-fix). Share windows are +-0.10
+    // around w/total: n=365..487 with run-inflated variance (mean run
+    // ~3-4) gives sd <=0.045; a weight mutation like 169->60 lands at
+    // 0.16 (CAUGHT) while mean moves <1.5 (blind). Tolerances cited from
+    // vendor means in docs/re/_wip_tA2.md F3.
     {
         auto lum = [](const RGB& c) { return (int(c.r) + c.g + c.b) / 3.0; };
+        auto eq = [](const RGB& c, int r, int g, int b) {
+            return c.r == uint8_t(r) && c.g == uint8_t(g) && c.b == uint8_t(b);
+        };
         double m373 = 0, m374 = 0, m7 = 0;
+        int n24 = 0, n61 = 0, n97 = 0, n12_24_34 = 0;
         for (int x = 7; x <= 493; x++) {
-            m373 += lum(newgameWellEdgeColourAt(x, 373));
-            m374 += lum(newgameWellEdgeColourAt(x, 374));
-            m7 += lum(newgameWellEdgeColourAt(x, 7));
+            const RGB a = newgameWellEdgeColourAt(x, 373);
+            const RGB b = newgameWellEdgeColourAt(x, 374);
+            const RGB c = newgameWellEdgeColourAt(x, 7);
+            m373 += lum(a); m374 += lum(b); m7 += lum(c);
+            if (eq(a, 61, 61, 61)) n61++;
+            if (eq(b, 97, 97, 97)) n97++;
+            if (eq(c, 24, 24, 24)) n24++;
         }
         m373 /= 487; m374 /= 487; m7 /= 487;
         CHECK(m373 >= 58.0 && m373 <= 71.0);    // vendor 64.5
         CHECK(m374 >= 96.0 && m374 <= 110.0);   // vendor 102.8
         CHECK(m7 >= 17.0 && m7 <= 28.0);        // vendor 24.3
+        // Exact-colour shares vs tab marginal w/sum (pull-chain copies
+        // exact colours, fresh draws hit the tab exactly: marginal IS the
+        // tab's). Windows = expected +-5 sd (run-inflated n_eff ~ n/4).
+        CHECK(n24 >= 0.16 * 487 && n24 <= 0.45 * 487);    // 93/306 = 0.304
+        CHECK(n61 >= 0.21 * 487 && n61 <= 0.50 * 487);    // 169/482 = 0.351
+        CHECK(n97 >= 0.21 * 487 && n97 <= 0.50 * 487);    // 169/481 = 0.351
         double ml = 0, mr = 0;
+        int n578 = 0, n000 = 0;
         for (int y = 8; y <= 372; y++) {
-            ml += lum(newgameWellEdgeColourAt(7, y));
-            mr += lum(newgameWellEdgeColourAt(493, y));
+            const RGB l = newgameWellEdgeColourAt(7, y);
+            const RGB rr = newgameWellEdgeColourAt(493, y);
+            ml += lum(l); mr += lum(rr);
+            if (eq(l, 5, 7, 8)) n578++;
+            if (eq(rr, 0, 0, 0)) n000++;
         }
         ml /= 365; mr /= 365;
         CHECK(ml >= 4.0 && ml <= 9.5);          // vendor 6.5
         CHECK(mr >= 14.0 && mr <= 26.0);        // vendor 22.9
+        CHECK(n578 >= 0.25 * 365 && n578 <= 0.55 * 365);  // 90/226 = 0.398
+        CHECK(n000 >= 0.27 * 365 && n000 <= 0.57 * 365);  // 102/243 = 0.420
         double mp = 0, mql = 0;
-        for (int x = 7; x <= 493; x++) mp += lum(newgamePanelTopAt(x));
+        for (int x = 7; x <= 493; x++) {
+            const RGB p = newgamePanelTopAt(x);
+            mp += lum(p);
+            if (eq(p, 12, 24, 34)) n12_24_34++;
+        }
         mp /= 487;
         for (int y = 382; y <= 472; y++) mql += lum(newgamePanelLeftAt(y));
         mql /= 91;
         CHECK(mp >= 21.0 && mp <= 33.0);        // vendor topline 27.1-36.0
         CHECK(mql >= 27.0 && mql <= 40.0);      // vendor left inset 33.0
+        CHECK(n12_24_34 >= 0.19 * 487 && n12_24_34 <= 0.50 * 487);  // 25/74
     }
     // Determinism (no state): same pixel -> same colour, twice.
     {
