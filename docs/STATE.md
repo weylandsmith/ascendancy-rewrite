@@ -233,18 +233,7 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t443 = FINISH THE STATE-7 PORTRAIT-PAINTER ATTRIBUTION IN GAP REGION
-0x2b3d2..0x2cf04 (offline, capstone; t442 located the region and the shape-slot
-indirection law but left ONE question open: does the loop 0x2c823..0x2c90a paint
-the r=170 cardinal portrait ring (then the strip pitch 62 is a misread and the
-angle law is right THERE) or the right-column race list (then the r=170 ring
-painter is elsewhere in the region, e.g. 0x2c4ec..0x2c7c5, whose blits 0x2c772
-fetch word[0x6fd52+2*player] = the PLAYER's own portrait shape).
-(ordering rationale: this is the same seam t442 was assigned — it moved ~80% of
-the way and the residue is small and fully specified below; abandoning it now
-would strand the region notes. Still offline, still touches no OQ row. The t441
-IMAGE laws (r=170 cardinals, row->slot, colour-byte ring) STAND unless the code
-contradicts them with cited disasm.)
+NEXT tA1 BLIT-SCALE LAW (PHASE-17 STAGE A FIRST — see the PHASE-17 QUEUE row tA1 verbatim; ordering rationale: user D19 ruling 2026-11-20 — one blit-scale law explains the quadrant family on newgame portrait/species column/planet art AND planets-list art; fix the law before per-screen content gates). Trigger check FIRST: USER: lines after the D19 block in docs/DECISIONS.md win.
 
 DO, in order (all inputs are in docs/re/_wip_t442.md P3/T-OPEN + the ui-runtime.md
 "t442 ... PARTIAL" block — READ THOSE FIRST; do NOT re-run t442's censuses):
