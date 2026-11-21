@@ -492,3 +492,52 @@ surface (byte-exact target). Everything else already lands cited (wheel
 dispatcher 0x528eb, racering index law, msg map handler 0x26b34, scale
 paint site cited t423c3) — keep citations visible IN the wip grade so
 "derived" reads as derived.
+
+## D19 — PIPELINE RULING + NEW-GAME SIDE-BY-SIDE (USER, 2026-11-20, essence + key verbatim)
+
+RULING: Stage A (global laws) first, then screens in flow order
+starting at New Game; user-grade checkpoint per screen for the FIRST
+screen only, then per batch. Pipeline = framing everywhere -> per-screen
+content -> per-screen behavior -> polish backlog. Loop self-grades with
+mechanical diff + TRUE side-by-side vision (render vs refcap crop);
+defect lists must be written against the original, not the session's
+memory of the law.
+
+CORRECTIONS to assistant's grade (user verbatim essence):
+- Original framing texture = MINERAL (stone columns / galvanized steel),
+  not fine static; our top bar is CLOSE (defer nuance to backlog) but
+  renders as an almost-right bar LAID ON TOP of the older rougher frame
+  = double chrome layering bug; our top bar is 1-2 px shorter than the
+  original's.
+- Race portrait / species column / planet art / planets-list sun+planet:
+  "top left quadrant of a 4x-size render ... clipped into a circle" =
+  ONE blit-scale bug family. Green selection ring also 4x (portrait
+  circle sits inside the ring's top-left quadrant).
+- Planet art shows the HUSK planet image for Minions AND wrong planet
+  art for most/all species cycled = index law bug (separate from scale).
+- Player Color: original = ONE row of SEVEN outlined race-emblem chips;
+  rewrite = two rows of seven solid swatches.
+- Atmosphere control is CLOSE (original disc has radial grayscale
+  gradient too; icon correct). Defects: art drifts position between
+  options; peaceful + neutral draw the NEXT disc's top sliver + a stray
+  white line beneath; hostile is completely correct. Star density +
+  species boxes also have extraneous art in frame.
+- Begin New Game panel: original = rotating starfield tied to density
+  setting (same field, larger stars OR smaller volume — undetermined);
+  green ring exists in rewrite but 1-px vs original's THICK BEVELED.
+- Starfield axis of rotation is wrong (not visible in stills).
+- Text: user sees SMALLER text on Athens — EXPLAINED: Athens screenshot
+  is 512x384 = 0.8x scaled window; captures from Athens are layout/
+  color evidence only, never pixel-scale measurements.
+
+SCREEN DEFECT SEEDS for later gates (user, verbatim list): species
+intro (frame, text size/font, background still wrong; improvement
+acknowledged); galaxy map (stars too big; CIRCLES not ovals around
+stars; frame slightly off; button text too small/possibly wrong font;
+starfield control buttons still not right; Hanshaks: all player
+species visible on species button; bottom colored buttons only for
+PRESENT players); planets list (close; frame texture; 4x art quadrants;
+research/industry/prosperity as PICTURES not text; population
+indicator probably more circles; NO 'Esc return to galaxy' text lower
+left; click behaviors off); then planet screen, system screen, ships,
+research, etc.

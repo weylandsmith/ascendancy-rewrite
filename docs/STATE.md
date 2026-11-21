@@ -2758,6 +2758,129 @@ history verified clean (fail-closed gates in publish_public.sh).
 REMOVED ITEM: GitHub backend GC may still serve old commit SHAs (Removal mechanics landed: docs/assets fully filtered,
 fail-closed gate + .gitignore, local copies untracked.)
 
+PHASE-17 QUEUE (authored ON USER RULING D19 2026-11-20 — DECISIONS.md).
+PIPELINE: Stage A = global draw laws ONCE (blit scale, chrome, text);
+then per screen in FLOW ORDER two gates (C=content, B=behavior);
+framing per screen is an A2 APPLICATION CHECK inside each C-gate, not
+a separate pass. Polish backlog items NEVER block a gate. First screen
+(New Game) ends with a USER-GRADE PARK; later screens batch-park.
+
+PHASE-17 GRADE LAWS (binding every row; supersedes phase-16 self-grade
+practice; root cause of six rounds of 'minor improvements': element
+laws closed against the session's own expectations, composite never
+graded):
+ G1 SIDE-BY-SIDE, NOT MEMORY: every vision grade loads OUR render AND
+   the vendor refcap crop for the same region in one pass; the defect
+   list is written against the ORIGINAL pixels. A grade citing only
+   the law doc is void.
+ G2 MECHANICAL FIRST: per named region, palette-class histogram diff +
+   drawn-dims-vs-cited-dims assertion + art-presence mass, via a shared
+   harness scripts/t441_screen_diff.py (BUILD it in tA1; every later
+   row extends its region table, never re-homes it). Mechanical FAIL
+   = gate FAIL regardless of how the render looks.
+ G3 BEHAVIOR GATES ARE SCRIPTED: clicks/wheels/spin/filters asserted
+   via log lines + state reads (xsend + app log), never screenshots.
+   Rotation-axis-class bugs live here.
+ G4 USER-TESTIMONY MECHANIZATION: D19 correction list is the seed
+   defect list for the matching gates; close each by measurement,
+   pin by test.
+ G5 HONEST MEASUREMENT SOURCES: Athens screenshots are 512x384 scaled
+   = layout/color evidence ONLY; pixel-scale numbers come from refcap
+   captures or Xvfb :9 640x480 root grabs, never from Athens shots.
+ G6 ONE FIX PER ROOT CAUSE: when two screens show the same signature
+   (e.g. quadrant-blit), fix the LAW, then verify BOTH screens in the
+   same row; per-screen patches of a shared bug are rejected.
+
+tA1 BLIT-SCALE LAW (STAGE A, FIRST; user D19: portrait/species column/
+planet art/planets-list art = 'top left quadrant of a 4x-size render'
+clipped to circle = ONE bug family). Derive the vendor destination-size
+law per call site class: FUN_0005d5a1 is an affine STRETCH blit (t422c
+cited: 16.16 interpolation, 16 vertex sets 0x8408..0x8457) — find WHO
+supplies dest dims for each UI record class (portrait circles, planet
+discs, list icons, wheel frames): decompile 2-3 representative paint
+bodies (newgame portrait painter, planet painter, PLANLIST row painter
+0x500e0 t427) and read the dims source (record header? fixed const?
+scale word?). THEN: port blitShape call sites to the cited law (per
+class), add drawn-dims pin tests per class, build
+scripts/t441_screen_diff.py (region table: name, rect, expected palette
+classes, dims assertion; diff report per region; exit code = gate).
+CLOSE: quadrant signature GONE on newgame (portrait, species column,
+planet disc) AND planets-list sun+planet render at cited dims; diff
+harness on those two screens exits clean on dims+presence (content
+index errors may remain — tNG-C/tPL-C own those).
+
+tA2 CHROME LAW ROUND 2 (STAGE A; user D19: texture = MINERAL (stone/
+galvanized), not static; our top bar CLOSE but 1-2px short; TWO chrome
+layers — almost-right bar laid ON TOP of the older rougher frame).
+(a) FIND + REMOVE the double paint: grep the paint path for both the
+t426 gradient band AND the legacy splitmix/static call sites; one
+chrome renderer, one pass (G6). (b) bar width: measure the vendor top
+bar extent from refcap at 1:1 (G5), fix the 1-2px. (c) mineral
+character: correlation-length census of vendor vs ours (run-length
+2-D, lag-1/2 h+v per band from _wip_t422 data + chrome.md); tune the
+Markov parameters toward the mineral signature; if the census says our
+parameters cannot reach it, bank the measured gap as the named ceiling
+(D18 ruling stands: honest seam, not new guessing). (d) BEVEL DIRECTION
+law: original panels are RAISED (light top/left, dark bottom/right) —
+derive from refcap edge pixels, cite, implement one drawBevel used by
+all frames. CLOSE: single-layer verified (paint-order log or debugger
+breakpoint at both sites), dims match, bevel cited + applied on
+newgame + map + title, diff harness chrome-band regions pass.
+
+tA3 TEXT LAW (STAGE A): font identity + cell size + baseline + color
+classes measured from refcaps ONLY (G5): the vendor .fnt law is banked
+(docs/re font notes); render a reference string table at 1:1 and diff
+glyph metrics vs refcap text rows (height, advance, weight). Fix the
+port's text draw to cited metrics. CLOSE: metric diff within 1px on
+title + newgame + map button text; pins.
+
+tNG-C NEW GAME CONTENT GATE (gate C = every region: record index +
+clip mask + palette cited; framing = A2 application check). Seed
+defects (D19): portrait circle clip + green ring correct size (after
+tA1); planet art INDEX law (husk shown for Minions; wrong for most
+species cycled — derive the race->planet record law from the vendor
+painter, cite); atmosphere wheel: frame-per-option (ghost sliver +
+stray white line under peaceful/neutral = wrong frame index or double
+blit; hostile is the correct reference); star-density + species boxes
+extraneous art; Player Color = ONE row of SEVEN outlined race-emblem
+chips (tinted), not 2 rows of solid swatches; Begin New Game panel:
+starfield tied to density setting (rotating; same-field-scaled vs
+shrunk-volume undetermined — derive from the vendor painter), thick
+BEVELED green ring. G1+G2 close.
+
+tNG-B NEW GAME BEHAVIOR GATE (G3): star density/species/atmosphere
+wheels cycle state + art together (no drift — D19); starfield spin
+AXES correct per dial (user: axis wrong; reuse t416/t425 dial law);
+Begin New Game launches race intro with chosen settings; player-color
+chips select. Assert via log/state.
+
+tNG-U NEW GAME USER-GRADE PACKAGE + PARK (FIRST-SCREEN checkpoint per
+D19): build side-by-side composite (ours | refcap | diff report) at
+scratchpad/NG-usergrade.png + per-region table; rewrite NEXT to
+WAIT-USER-GRADE-NG sentinel (human wake resumes: user reply ->
+DISPOSITIONS row or straight to tSI-C per ruling).
+
+tSI-C/tSI-B RACE INTRO gates (seeds: frame texture (A2), text size/
+font (A3), background still wrong).
+tGM-C/tGM-B GALAXY MAP gates (seeds: stars too big + CIRCLES not ovals
+around stars; frame slightly off; button text size/font; starfield
+control buttons behavior; Hanshaks species-button shows ALL player
+species; bottom colored buttons ONLY for present players).
+tPL-C/tPL-B PLANETS LIST gates (seeds: frame texture; 4x quadrant art
+(tA1 verify); research/industry/prosperity as PICTURES not text;
+population indicator circle count vs refcap; REMOVE 'Esc return to
+galaxy' lower-left text; click behaviors).
+tPS-C/tPS-B PLANET SCREEN gates (frame EXACT — do not touch; seeds:
+top-row art, planet frame bg, disc size/z-order vs grid, tile click
+window, orbital column).
+tSV-C/tSV-B SYSTEM VIEW gates. tSH-C/tSH-B SHIPS gates.
+tRS-C/tRS-B RESEARCH gates. tSP-C/tSP-B SPECIES + SPECIAL ABILITY
+gates. t17-V FINAL VERIFY + PUSH + HANDOFF (push-gap law; handoff =
+per-screen grade table, NO ruling sheet; park WAIT-USER-RULING).
+Rows tSI..tSP: if a gate closes clean first try, the session MAY fold
+the next gate of the SAME screen into one run (breadth preserved);
+CONT cycles stay capped at 2 per D18.
+
 PHASE-16 QUEUE (authored ON USER RULING D17 2026-11-17 — DECISIONS.md;
 per-screen iteration structure, RE-FIRST LAW). Ordering: t422 first
 (one shared root cause: the chrome texture appears wrong on EVERY
