@@ -69,6 +69,14 @@ void assignRaceColours(int clicked, int count, unsigned int* lcgState,
 // border; screen coord = capture coord - 1; anchor: GALAXY_MORE x0=7 lands
 // exactly on the capture's navy/left-bevel boundary).
 inline constexpr Rect kBeginNewGameBtn{494, 373, 639, 472};
+// tA2 [MEASURED browser shot +1,+1 law]: the BEGIN panel's VISUAL extent
+// is NARROWER than the hit rect — navy interior row 430 runs x502..632
+// (x494..501 is page texture per the t414 gutter law; x633 = (18,40,54)
+// dark edge then chrome), interior starts y382 with the dark inset row
+// 381 (col x560 y381 (12,24,34)); bottom y472 navy, y473 (65,73,79) then
+// the bright rung y474 (97,97,97) = the same RAISED law. The pre-tA2
+// fill painted navy over the gutter.
+inline constexpr Rect kBeginPanelVisual{502, 381, 632, 472};
 // Player^Color (windows.txt L653, TYPE 0, PARENT NONE, MSG 0): the fourth
 // bottom-row zone. Label + colour chips; MSG 0 means the vendor sends no
 // message on click (inert zone in the window table).
@@ -129,7 +137,21 @@ int newgameWheelFrame(int control, int value);
 // x=300 the top texture ends y8 and the bottom texture starts y374; the
 // DESC->RACELIST gutter x494..501 is texture. Draw texture FULL 640x480
 // (textureColourAt), then black-fill kNewgameCosmosRect, then the points.
-inline constexpr Rect kNewgameCosmosRect{8, 9, 493, 373};
+// tA2 RECESS LAW [MEASURED 2026-11-21, docs/re/_wip_tA2.md F2/F4; browser
+// shot scratchpad/newgame-original.png game-rect +1,+1 law]: the pure
+// black well is rows 8..372 x 8..492 (was {8,9,493,373} — 1px short at
+// top, 1px over at right+bottom). The well is framed by a 1-px DARK
+// RECESS on top/left/right (row 7 x7..493 vendor mean lum 24.2, colours
+// (24,24,24)/(10,10,10)/(21,42,35)-class noise; col x7 mean 6.5; col
+// x493 mean 22.9 — dark noise, NOT chrome, NOT pure black) and a 2-row
+// RAISED RIDGE below (row 373 (61,61,61)/(53,78,78)-class mean 64.4, row
+// 374 (97,97,97)/(85,125,125)-class mean 102.8 — the RAISED bevel: light
+// BELOW, dark ABOVE = the well sits raised through the page; the vendor
+// never shows the port's symmetric kBevel outline class here). The
+// recess/ridge are drawn by the ONE chromePage pass (mapchrome
+// newgameWellFrameAt), so the double-bar D19 signature (two bright chrome
+// rows 7-8 below the top bar, docs F2) cannot recur.
+inline constexpr Rect kNewgameCosmosRect{8, 8, 492, 372};
 // Preview point count == the density setting (user: "a spinning star field
 // commensurate with the star density"; the Very Dense original capture
 // shows ~100 coloured points == ladder rung 100). Yaw advances per frame

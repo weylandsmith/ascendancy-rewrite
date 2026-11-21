@@ -221,6 +221,33 @@ RGB textureColourAt(int x, int y);
 // F1/F2). Screen coordinates, deterministic, no state.
 RGB introSpeckleAt(int x, int y);
 
+// tA2 NEW GAME WELL RECESS + RIDGE LAW [MEASURED 2026-11-21,
+// docs/re/_wip_tA2.md F3/F5; browser shot scratchpad/newgame-original.png
+// game-rect +1,+1 law]. The cosmos well (kNewgameCosmosRect 8,8..492,372)
+// is framed by ONE dark RECESS pixel wide on top/left/right — row 7
+// x7..493 (vendor mean lum 24.3, census {24,24,24}x93 {10,10,10}x62
+// {21,42,35}x54 {12,12,12}x26 {32,49,53}x26 + tail), col x7 rows 8..372
+// (mean 6.5, {5,7,8}x90 {6,6,6}x71 {5,8,9}x43 + tail), col x493 rows
+// 8..372 (mean 22.9, {0,0,0}x102 {30,30,30}x65 {33,33,33}x40 + tail) —
+// and a 2-row RAISED RIDGE below (row 373 dark rungs {61,61,61}x169
+// {53,78,78}x108 {48,71,73}x71, row 374 the SAME x-quantisation one rung
+// LIGHTER {97,97,97}x169 {85,125,125}x107 {77,113,117}x70: dark above,
+// light below = the well sits raised through the page; the symmetric
+// grey kBevel outline the port used to draw is a fabricated class).
+// Tables are the vendor censuses verbatim (display-space, browser-shot
+// quantisation — same evidence class as statusSpeckleAt's t3 census).
+// Chain = the t422 5/25 Markov law. Deterministic, no state.
+bool newgameWellEdgeAt(int x, int y);
+RGB newgameWellEdgeColourAt(int x, int y);
+
+// tA2 PANEL INSET LAW (the ONE frame law for the New Game panels;
+// docs/re/_wip_tA2.md F3). Dark noise inset on TOP + LEFT only, no line
+// right/bottom (measured at GALAXY_MORE {7,381,122,472}: topline mean
+// 27.1 census {12,24,34}..; leftline col x7 mean 33.0 census {15,35,49}..;
+// right col + bottom row flat fill). Deterministic splitmix64, no state.
+RGB newgamePanelTopAt(int x);
+RGB newgamePanelLeftAt(int y);
+
 // t436b: the SPECIES-SCREEN empty-well dark speckle (header slot + the row
 // slots of unknown species). Same chain shape, DIFFERENT census and salt:
 // [measured t252 species_menu_game.png, docs/re/_wip_t436.md G1] the wells

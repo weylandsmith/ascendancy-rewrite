@@ -6,6 +6,7 @@
 // dims census). The dims-parity test reads the REAL extracted/ascend01/
 // data/1starmap.shp (read-only, gate-safe, REQUIRE_DATA).
 #include "ui/mapchrome.h"
+#include "ui/menulaw.h"  // tA2: kNewgameCosmosRect, kBeginPanelVisual
 
 #include <string>
 
@@ -124,4 +125,56 @@ TEST(mapchrome_t394_hit_laws) {
     CHECK(fits(kTurnCount));
     CHECK(fits(kNextTurnCont));
     CHECK(fits(kRaceControlsFrame));
+}
+
+TEST(mapchrome_tA2_well_edge_law) {
+    using namespace ascend::ui;
+    // Geometry follows kNewgameCosmosRect {8,8,492,372} (tA2 recess law):
+    CHECK(kNewgameCosmosRect.y0 == 8);
+    CHECK(kNewgameCosmosRect.x1 == 492);
+    CHECK(kNewgameCosmosRect.y1 == 372);
+    // Recess: row 7 x7..493, cols x7/x493 rows 8..372, ridge rows 373/374.
+    CHECK(newgameWellEdgeAt(7, 7));
+    CHECK(newgameWellEdgeAt(493, 7));
+    CHECK(!newgameWellEdgeAt(6, 7));
+    CHECK(!newgameWellEdgeAt(494, 7));
+    CHECK(newgameWellEdgeAt(7, 200));
+    CHECK(newgameWellEdgeAt(493, 200));
+    CHECK(!newgameWellEdgeAt(8, 200));   // well interior is NOT an edge
+    CHECK(!newgameWellEdgeAt(492, 200));
+    CHECK(newgameWellEdgeAt(250, 373));
+    CHECK(newgameWellEdgeAt(250, 374));
+    CHECK(!newgameWellEdgeAt(250, 375)); // chrome resumes
+    CHECK(!newgameWellEdgeAt(250, 8));
+    // RAISED law: ridge row 374 is LIGHTER than row 373 for every census
+    // entry pair (dark above, light below).
+    const RGB d0 = newgameWellEdgeColourAt(100, 373);
+    const RGB l0 = newgameWellEdgeColourAt(100, 374);
+    CHECK(int(d0.r) + d0.g + d0.b < int(l0.r) + l0.g + l0.b);
+    // Determinism (no state): same pixel -> same colour, twice.
+    {
+        const RGB a = newgameWellEdgeColourAt(123, 7), b = newgameWellEdgeColourAt(123, 7);
+        CHECK(a.r == b.r && a.g == b.g && a.b == b.b);
+    }
+    // Recess is DARK: row-7 / col-7 samples stay below the chrome band.
+    for (int x = 7; x <= 493; x += 37) {
+        const RGB c = newgameWellEdgeColourAt(x, 7);
+        CHECK(int(c.r) + c.g + c.b < 330);
+    }
+    const RGB lc = newgameWellEdgeColourAt(7, 150);
+    CHECK(int(lc.r) + lc.g + lc.b < 120);
+    // Panel inset law: top/left noise is dark navy, deterministic.
+    const RGB pt = newgamePanelTopAt(60);
+    CHECK(pt.r < 32 && pt.g < 64 && pt.b < 72);
+    const RGB pl = newgamePanelLeftAt(430);
+    CHECK(int(pl.r) + pl.g + pl.b > int(pt.r) + pt.g + pt.b);  // navy band
+    {
+        const RGB a = newgamePanelTopAt(60), b = newgamePanelTopAt(60);
+        CHECK(a.r == b.r && a.g == b.g && a.b == b.b);
+    }
+    // Begin panel: visual extent strictly inside the windows.txt hit rect.
+    CHECK(kBeginPanelVisual.x0 > kBeginNewGameBtn.x0);   // gutter stays chrome
+    CHECK(kBeginPanelVisual.x1 < kBeginNewGameBtn.x1);
+    CHECK(kBeginPanelVisual.y0 >= 381);
+    CHECK(kBeginPanelVisual.y1 == 472);
 }

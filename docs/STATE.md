@@ -233,39 +233,73 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tA2 CHROME LAW ROUND 2 (PHASE-17 STAGE A second row; verbatim in the
-PHASE-17 QUEUE below. Ordering rationale: D19 Stage-A-first ruling — tA1
-(blit-scale/bbox-dims) CLOSED tA1-CONT (LANDED block below: harness green,
-9/9 mutation, quadrant family gone on both gated screens), so the next
-global law is chrome (mineral texture, single-layer, bevel direction);
-tA3 text follows; per-screen C-gates (tNG-C) run only after Stage A.
+NEXT tA2-CONT CHROME CLOSE (PHASE-17 STAGE A second row CLOSE; the tA2
+law LANDED this iteration — this row finishes it. Ordering rationale:
+D19 Stage-A-first; tA2 items (1)(2)(4) measured + implemented, but the
+ridge witness is ~14 lum dark (named root cause banked) and the CLOSE
+clauses (harness chrome-band regions, mutation, map/title application)
+are owed before tNG-C may run; tA3 text follows Stage A completion.
 Trigger check FIRST: USER: lines after the D19 block in docs/DECISIONS.md win.
-DO, in order (queue items a-d; extend scripts/t441_screen_diff.py region
-table with chrome-band regions — NEVER re-home the harness):
-(1) DOUBLE-LAYER HUNT: grep the paint path for BOTH the t426 gradient band
-    and the legacy splitmix/static chrome call sites; identify which screen
-    paints both (D19: "almost-right bar laid ON TOP of the older rougher
-    frame"). Fix = ONE renderer, one pass (G6). Verify with a paint-order
-    log line or debugger breakpoint at both sites.
-(2) BAR EXTENT: measure the vendor top-bar extent at 1:1 from refcap crops
-    ONLY (G5; our top bar is 1-2px short per D19) — cite, fix, pin.
-(3) MINERAL CHARACTER: correlation-length census (run-length 2-D, lag-1/2
-    h+v per band; _wip_t422 data + chrome.md) vendor vs ours; tune Markov
-    params toward the mineral signature; if params cannot reach it, bank the
-    measured gap as the named ceiling (D18 ruling; no guessing).
-(4) BEVEL LAW: derive RAISED (light top/left, dark bottom/right) from
-    refcap edge pixels, cite, implement ONE drawBevel used by all frames.
-CLOSE (queue): single-layer verified, dims match, bevel cited+applied on
-newgame + map + title, t441_screen_diff chrome-band regions PASS on those
-screens (build the band regions as part of this row).
-GAME STATE tA2 STARTS FROM: production pid 1182156 HEALTHY (TL expiry
-2026-11-22 12:02:26, watcher 1182171), ring turn 1086 on 20/20 saves
-(scripts/t368_ring_turn.py = the sitting test; turn > 1086 -> re-run
-scripts/r1_t85g_sitting.py FIRST). Ghidra headless :8089 UP, analyzed.
-LEDGER: seam work, touches no OQ row (open=[016,019] unchanged since t440).
-WITNESS CROPS banked for G1/G2: scratchpad/newgame-original.png (game rect
-+1,+1), work/r1/loop/vendor-planetslist-t3-640.png; harness
-scripts/t441_screen_diff.py usage + dimscheck contract: docs/re/_wip_tA1.md F6.
+READ FIRST: docs/re/_wip_tA2.md (F1 double-layer verdict, F3 recess/ridge
+censuses, F4 mineral census, F5 bar-extent law + pitfalls, F6 what landed
+and the named ridge bias).
+DO, in order:
+(1) FIX THE RIDGE CHAIN: newgameWellEdgeColourAt (rewrite/src/ui/
+    mapchrome.cpp) — the repeat-up recursion from y=373 lands on y=372
+    (well interior, not an edge) and draws recess-tab colours; anchor the
+    ridge band (row 373 never recurses up; row 374 recurses only within
+    373/374). Rebuild, re-run scripts/t412_newgame_shot.sh, assert ridge
+    row means within +-6 of vendor 64.5/102.8 (witness numbers in _wip F6).
+(2) EXTEND scripts/t441_screen_diff.py with chrome-band regions (NEVER
+    re-home the harness): newgame top-bar rows 0..6 x7..493, recess row 7,
+    ridge rows 373..374, panel-inset edges (top row 381 census band);
+    PASS thresholds = census-family presence + mean-lum windows cited in
+    _wip_tA2. Keep newgame 7/7 + planetslist 2/2 green.
+(3) MUTATION-VERIFY every tA2 constant/weight (checkpoint commit first,
+    md5-restore each): kNewgameCosmosRect y0/x1/y1, kRidge0/kRidge1
+    weights, recess kTop/kLeft/kRight, kBeginPanelVisual.x0,
+    newgamePanelTopAt/LeftAt table swap. ctest 100% after restore.
+(4) MAP/TITLE application checks (tA2 CLOSE clause): map = frameTex law
+    already 100% pixel-exact (_wip F1) — cite, no change; title = GIF art
+    (no kBevel sites) — cite, no change. Bank both verdicts in chrome.md
+    §Migration (hand-authored).
+(5) BANK chrome.md (tA2 section: recess/ridge/inset laws + citations) +
+    finish _wip_tA2; LEDGER: seam work, touches no OQ row (open=[016,019]).
+GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 on 20/20 saves
+(scripts/t368_ring_turn.py re-verified this iteration). turn > 1086 ->
+re-run scripts/r1_t85g_sitting.py FIRST. Ghidra :8089 UP.
+
+tA2 LANDED 2026-11-21 (CHROME LAW ROUND 2 — double-layer RESOLVED, bar
+extent FIXED, bevel law MEASURED; ridge bias + harness bands owed via
+tA2-CONT; ledger open=[016,019] unchanged, seam work). (i) DOUBLE-LAYER
+VERDICT: grep + pixel-exactness (static-texture argument) prove ONE chrome
+generator pass per screen — map left/bottom/top bands 100.00% exact vs a
+textureColourAt field dump; right-column deviations = windows.txt widget
+rects exactly; newgame chromePage pixel-exact everywhere except the
+designed t401 dot band. The D19 "almost-right bar ON TOP of the older
+rougher frame" root cause = the port's bar EXTENT: kNewgameCosmosRect
+{8,9,493,373} exposed two BRIGHT chrome rows 7-8 where the vendor shows a
+1-px DARK RECESS row 7 + pure-black well from row 8. (ii) BAR EXTENT LAW
+(browser shot +1,+1; pure refcap for the map bar): gradient rows 0..6,
+recess row 7 x7..493 (mean 24.3), well 8..372 x8..492, RAISED RIDGE rows
+373..374 (dark rung row 64.5 + same-x-quantisation light rung row 102.8 =
+DARK-ABOVE/LIGHT-BELOW everywhere; light never appears above a fill edge).
+PITFALLS banked: browser-vs-refcap row-0 means differ per t433 repaint
+INSTANCE (never infer offsets from one row); refcap png row = screen+40.
+(iii) IMPLEMENTED: newgameWellEdgeAt/ColourAt (per-edge vendor censuses,
+full 98.5%-mass ridge tables) painted INSIDE the one chromePage pass (G6);
+kNewgameCosmosRect -> {8,8,492,372}; FOUR symmetric kBevel outlines
+replaced by newgamePanelTopAt/LeftAt dark-inset law (right/bottom = no
+line, 91/91 + 115/116 flat-fill witnesses); Begin panel fill moved to the
+MEASURED kBeginPanelVisual {502,381,632,472} (gutter x494..501 no longer
+navy; hit rect unchanged). (iv) MINERAL CENSUS (item 3): run-length ratios
+match vendor +-0.03 on all three band classes; residual = lag-1 luminance
+step 1.58x too jumpy (ramp-adjacent fresh-draw rule uncited) — NAMED
+CEILING re-quantified, no guessing attempted. (v) WITNESS post-fix: row7
+22.5 (vendor 24.3), col7 6.5 (6.5), col493 19.1 (22.9), well 100% black;
+ridge 50.6/90.4 vs 64.5/102.8 = the NAMED chain-anchor defect for
+tA2-CONT. Build 0; ctest 100% (new pin mapchrome_tA2_well_edge_law);
+gate GATE_EXIT=0; ledger audit OK rows=20 open=[016,019].
 
 --- SUPERSEDED tA1 ASSIGNMENT (law landed; only the CLOSE remains above) ---
 NEXT tA1 BLIT-SCALE LAW (PHASE-17 STAGE A FIRST — see the PHASE-17 QUEUE row tA1 verbatim; ordering rationale: user D19 ruling 2026-11-20 — one blit-scale law explains the quadrant family on newgame portrait/species column/planet art AND planets-list art; fix the law before per-screen content gates). Trigger check FIRST: USER: lines after the D19 block in docs/DECISIONS.md win.

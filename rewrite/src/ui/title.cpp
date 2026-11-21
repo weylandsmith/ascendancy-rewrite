@@ -414,7 +414,13 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     std::vector<uint32_t> px(size_t(kDisplayW) * kDisplayH);
                     for (int y = 0; y < kDisplayH; y++)
                         for (int x = 0; x < kDisplayW; x++) {
-                            const RGB c = textureColourAt(x, y);
+                            // tA2 WELL EDGE LAW (mapchrome.h): the cosmos
+                            // recess (row 7, cols x7/x493) and the 2-row
+                            // RAISED ridge (rows 373/374) are part of the
+                            // ONE page pass — no second renderer (G6).
+                            const RGB c = newgameWellEdgeAt(x, y)
+                                              ? newgameWellEdgeColourAt(x, y)
+                                              : textureColourAt(x, y);
                             px[size_t(y) * kDisplayW + x] =
                                 0xFF000000u | (uint32_t(c.r) << 16) |
                                 (uint32_t(c.g) << 8) | uint32_t(c.b);
@@ -686,8 +692,20 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                         kRaceList.y1 - kRaceList.y0 + 1};
             SDL_SetRenderDrawColor(ren, kPanel.r, kPanel.g, kPanel.b, 255);
             SDL_RenderFillRect(ren, &rl);
-            SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
-            SDL_RenderDrawRect(ren, &rl);
+            // tA2 PANEL INSET LAW (mapchrome.h; replaces the fabricated
+            // symmetric kBevel outline): dark inset top+left, NOTHING at
+            // right/bottom. RACELIST left edge family (15,35,49) confirmed
+            // on the row-200 probe (x503/x504).
+            for (int x = kRaceList.x0; x <= kRaceList.x1; x++) {
+                const RGB c = newgamePanelTopAt(x);
+                SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                SDL_RenderDrawPoint(ren, x, kRaceList.y0);
+            }
+            for (int y = kRaceList.y0 + 1; y <= kRaceList.y1; y++) {
+                const RGB c = newgamePanelLeftAt(y);
+                SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                SDL_RenderDrawPoint(ren, kRaceList.x0, y);
+            }
             for (int i = 0; i < kRaceSlotCount; i++) {
                 const int specnum = scrollOffset + i;
                 const int cy = kRaceSlotTop + i * kRaceSlotPitch +
@@ -777,8 +795,21 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                            c.rect.y1 - c.rect.y0 + 1};
                 SDL_SetRenderDrawColor(ren, kPanel.r, kPanel.g, kPanel.b, 255);
                 SDL_RenderFillRect(ren, &r);
-                SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
-                SDL_RenderDrawRect(ren, &r);
+                // tA2 PANEL INSET LAW (mapchrome.h): dark inset top+left,
+                // no line right/bottom (measured at this panel's edges —
+                // topline y381 mean 27.1, left col x7 mean 33.0, right/
+                // bottom flat fill; the symmetric kBevel rect was the port
+                // defect).
+                for (int x = c.rect.x0; x <= c.rect.x1; x++) {
+                    const RGB e = newgamePanelTopAt(x);
+                    SDL_SetRenderDrawColor(ren, e.r, e.g, e.b, 255);
+                    SDL_RenderDrawPoint(ren, x, c.rect.y0);
+                }
+                for (int y = c.rect.y0 + 1; y <= c.rect.y1; y++) {
+                    const RGB e = newgamePanelLeftAt(y);
+                    SDL_SetRenderDrawColor(ren, e.r, e.g, e.b, 255);
+                    SDL_RenderDrawPoint(ren, c.rect.x0, y);
+                }
                 const int cxp = (c.rect.x0 + c.rect.x1) / 2;
                 const int wl = txt.width(c.label, false);
                 txt.draw(ren, cxp - wl / 2, c.rect.y0 + 12, c.label, false,
@@ -830,8 +861,19 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 SDL_Rect r{c.x0, c.y0, c.x1 - c.x0 + 1, c.y1 - c.y0 + 1};
                 SDL_SetRenderDrawColor(ren, kPanel.r, kPanel.g, kPanel.b, 255);
                 SDL_RenderFillRect(ren, &r);
-                SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
-                SDL_RenderDrawRect(ren, &r);
+                // tA2 PANEL INSET LAW (mapchrome.h): topline y381
+                // x384..493 mean 28.5 same families (panel1 was 27.1);
+                // symmetric kBevel rect REFUTED at this panel too.
+                for (int x = c.x0; x <= c.x1; x++) {
+                    const RGB e = newgamePanelTopAt(x);
+                    SDL_SetRenderDrawColor(ren, e.r, e.g, e.b, 255);
+                    SDL_RenderDrawPoint(ren, x, c.y0);
+                }
+                for (int y = c.y0 + 1; y <= c.y1; y++) {
+                    const RGB e = newgamePanelLeftAt(y);
+                    SDL_SetRenderDrawColor(ren, e.r, e.g, e.b, 255);
+                    SDL_RenderDrawPoint(ren, c.x0, y);
+                }
                 const std::string lbl = "Player Color";  // NAME 'Player^Color'
                 const int cxp = (c.x0 + c.x1) / 2;
                 const int wl = txt.width(lbl, false);
@@ -868,14 +910,27 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             // the page texture — the PATTERN is the named seam) and (b) the
             // species emblem: smrace NATIVE 49x49 at (577,394), inside the
             // green-ring zone x573..629 y390..446 (centre (601,418)).
+            // tA2: the FILL uses the MEASURED visual extent (502,381)..
+            // (632,472) — the hit rect kBeginNewGameBtn stays windows.txt
+            // {494,373,639,472}; the old full-hit-rect navy fill painted
+            // over the page-texture gutter x494..501 (docs F5). Inset law:
+            // dark noise top row 381 + left col 502, nothing right/bottom.
             {
-                SDL_Rect r{kBeginNewGameBtn.x0, kBeginNewGameBtn.y0,
-                           kBeginNewGameBtn.x1 - kBeginNewGameBtn.x0 + 1,
-                           kBeginNewGameBtn.y1 - kBeginNewGameBtn.y0 + 1};
+                const Rect vis = kBeginPanelVisual;
+                SDL_Rect r{vis.x0, vis.y0, vis.x1 - vis.x0 + 1,
+                           vis.y1 - vis.y0 + 1};
                 SDL_SetRenderDrawColor(ren, kPanel.r, kPanel.g, kPanel.b, 255);
                 SDL_RenderFillRect(ren, &r);
-                SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g, kBevel.b, 255);
-                SDL_RenderDrawRect(ren, &r);
+                for (int x = vis.x0; x <= vis.x1; x++) {
+                    const RGB e = newgamePanelTopAt(x);
+                    SDL_SetRenderDrawColor(ren, e.r, e.g, e.b, 255);
+                    SDL_RenderDrawPoint(ren, x, vis.y0);
+                }
+                for (int y = vis.y0 + 1; y <= vis.y1; y++) {
+                    const RGB e = newgamePanelLeftAt(y);
+                    SDL_SetRenderDrawColor(ren, e.r, e.g, e.b, 255);
+                    SDL_RenderDrawPoint(ren, vis.x0, y);
+                }
                 // (a) dot cluster: ~6% of the band pixels, deterministic.
                 for (int y = kBeginDotsBand.y0; y <= kBeginDotsBand.y1; y++)
                     for (int x = kBeginDotsBand.x0; x <= kBeginDotsBand.x1;

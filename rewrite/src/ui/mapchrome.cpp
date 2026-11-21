@@ -249,6 +249,134 @@ RGB introSpeckleAt(int x, int y) {
     return kSpeckle[0].c;
 }
 
+// tA2 NEW GAME WELL RECESS + RIDGE (mapchrome.h law; docs/re/_wip_tA2.md
+// F3/F5). Geometry is kNewgameCosmosRect (8,8,492,372): recess = row 7
+// x7..493 (top), col x7 rows 8..372 (left), col x493 rows 8..372 (right);
+// ridge = rows 373..374 x7..493 (dark rung row, then the SAME
+// x-quantisation one rung lighter). Censuses are the vendor rows verbatim
+// (browser-shot display space, +1,+1 game-rect law). Chain = the t422
+// 5/25 Markov law over the per-edge census; deterministic, no state.
+bool newgameWellEdgeAt(int x, int y) {
+    if (y == 7) return x >= 7 && x <= 493;
+    if (y >= 8 && y <= 372) return x == 7 || x == 493;
+    if (y == 373 || y == 374) return x >= 7 && x <= 493;
+    return false;
+}
+
+// tA2 PANEL INSET LAW (the ONE frame law replacing the port's symmetric
+// kBevel outline on every New Game panel; docs/re/_wip_tA2.md F3).
+// [MEASURED browser shot +1,+1 law] GALAXY_MORE panel {7,381,122,472}:
+// TOP inset row 381 x7..122 mean 27.1, census {12,24,34}x25 {12,24,36}x14
+// {18,31,40}x12 {17,30,40}x8 {12,24,35}x8 {16,38,45}x7; LEFT inset col
+// x7 rows 382..472 mean 33.0, census {15,35,49}x24 {16,34,48}x18
+// {15,35,50}x10 {16,35,49}x9 {15,36,50}x7; RIGHT col x122 rows 382..472
+// = 91/91 flat navy fill and BOTTOM row 472 = 115/116 flat fill — the
+// vendor shows NO line at right/bottom (the RAISED edge reads as the dark
+// inset above/left, light chrome below). Same law measured at the chips
+// panel (topline y381 x384..493 mean 28.5, same families) and the Begin
+// panel (topline y381 x494..639 mean 36.0, same families).
+RGB newgamePanelTopAt(int x) {
+    uint64_t z = (uint64_t(uint32_t(x)) << 32) ^ 0x8d3b0a1f2c4e6a77ull ^
+                 (uint64_t(381) * 0x9e3779b97f4a7c15ull);
+    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
+    z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
+    z = z ^ (z >> 31);
+    static const struct { RGB c; int w; } kT[6] = {
+        {{12, 24, 34}, 25}, {{12, 24, 36}, 14}, {{18, 31, 40}, 12},
+        {{17, 30, 40}, 8},  {{12, 24, 35}, 8},  {{16, 38, 45}, 7},
+    };
+    int total = 0;
+    for (int i = 0; i < 6; i++) total += kT[i].w;
+    const uint64_t d = (z >> 20) % uint64_t(total);
+    int acc = 0;
+    for (int i = 0; i < 6; i++) {
+        acc += kT[i].w;
+        if (int(d) < acc) return kT[i].c;
+    }
+    return kT[0].c;
+}
+RGB newgamePanelLeftAt(int y) {
+    uint64_t z = (uint64_t(uint32_t(y)) << 32) ^ 0x2f7c91a5d3e08b48ull ^
+                 (uint64_t(7) * 0x9e3779b97f4a7c15ull);
+    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
+    z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
+    z = z ^ (z >> 31);
+    static const struct { RGB c; int w; } kL[5] = {
+        {{15, 35, 49}, 24}, {{16, 34, 48}, 18}, {{15, 35, 50}, 10},
+        {{16, 35, 49}, 9},  {{15, 36, 50}, 7},
+    };
+    int total = 0;
+    for (int i = 0; i < 5; i++) total += kL[i].w;
+    const uint64_t d = (z >> 20) % uint64_t(total);
+    int acc = 0;
+    for (int i = 0; i < 5; i++) {
+        acc += kL[i].w;
+        if (int(d) < acc) return kL[i].c;
+    }
+    return kL[0].c;
+}
+
+RGB newgameWellEdgeColourAt(int x, int y) {
+    // splitmix64 decisions, chrome salt (one field family).
+    uint64_t z = (uint64_t(uint32_t(x)) << 32) ^ uint64_t(uint32_t(y)) ^
+                 0x9e3779b97f4a7c15ull;
+    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
+    z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
+    z = z ^ (z >> 31);
+    const uint64_t r = z % 1000000ull;
+    if (r < 50000ull && x > 7) return newgameWellEdgeColourAt(x - 1, y);
+    if (r < 300000ull && y > 7) return newgameWellEdgeColourAt(x, y - 1);
+    struct Ent { RGB c; int w; };
+    // Top recess row 7 x7..493: n=487 mean 24.3 — dark noise: greys
+    // 147 / teals 155 / near-black 185 (family split F3 probe).
+    static const Ent kTop[6] = {
+        {{24, 24, 24}, 93},  {{10, 10, 10}, 62},  {{21, 42, 35}, 54},
+        {{12, 12, 12}, 26},  {{32, 49, 53}, 26},  {{10, 10, 14}, 25},
+    };
+    // Left recess col x7 rows 8..372: n=365 mean 6.5.
+    static const Ent kLeft[4] = {
+        {{5, 7, 8}, 90},  {{6, 6, 6}, 71},  {{5, 8, 9}, 43},  {{3, 6, 5}, 22},
+    };
+    // Right recess col x493 rows 8..372: n=365 mean 22.9.
+    static const Ent kRight[4] = {
+        {{0, 0, 0}, 102},   {{30, 30, 30}, 65},  {{33, 33, 33}, 40},
+        {{23, 35, 36}, 36},
+    };
+    // Ridge row 373 (dark rungs; n=487 mean 64.5) and row 374 (same
+    // x-quantisation rung-lighter; n=487 mean 102.8). FULL 98.5%-mass
+    // censuses (top-3-only scored 50.8/90.3 vs vendor 64.5/102.8 — the
+    // blend tail is BRIGHT, truncation skews dark; verified witness
+    // scripts run 2026-11-21).
+    static const Ent kRidge0[14] = {
+        {{61, 61, 61}, 169}, {{53, 78, 78}, 108}, {{48, 71, 73}, 71},
+        {{50, 69, 72}, 22},  {{53, 77, 78}, 22},  {{49, 72, 74}, 22},
+        {{59, 62, 62}, 21},  {{50, 73, 75}, 13},  {{56, 64, 65}, 10},
+        {{53, 67, 68}, 9},   {{51, 75, 76}, 4},   {{56, 72, 72}, 4},
+        {{60, 63, 63}, 4},   {{54, 76, 76}, 3},
+    };
+    static const Ent kRidge1[14] = {
+        {{97, 97, 97}, 169},  {{85, 125, 125}, 107},  {{77, 113, 117}, 71},
+        {{84, 124, 124}, 22}, {{78, 114, 118}, 22},   {{80, 111, 114}, 22},
+        {{95, 99, 99}, 21},   {{80, 117, 120}, 12},   {{90, 103, 105}, 10},
+        {{84, 107, 110}, 9},  {{82, 121, 122}, 5},    {{96, 100, 100}, 4},
+        {{90, 114, 114}, 4},  {{86, 122, 122}, 3},
+    };
+    const Ent* tab = kTop;
+    int n = 6;
+    if (y >= 8 && y <= 372) { tab = (x <= 250) ? kLeft : kRight; n = 4; }
+    if (y == 373) { tab = kRidge0; n = 14; }
+    if (y == 374) { tab = kRidge1; n = 14; }
+    int total = 0;
+    for (int i = 0; i < n; i++) total += tab[i].w;
+    const uint64_t d = (z >> 20) % uint64_t(total);
+    int acc = 0;
+    for (int i = 0; i < n; i++) {
+        acc += tab[i].w;
+        if (int(d) < acc) return tab[i].c;
+    }
+    return tab[0].c;
+}
+
 // t436b SPECIES-SCREEN EMPTY-WELL SPECKLE (docs/re/_wip_t436.md G1).
 // [measured t252 species_menu_game.png x474..632, slots 4/5/6 + header]:
 // display-space families (8,12,16) 50-63% / (0,0,0) 26-47% / (8,28,49)
