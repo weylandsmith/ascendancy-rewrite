@@ -736,3 +736,47 @@ t436b's SEAM notes above (count source, position, filter, ring index).
 - WITNESS scripts/t409_species_witness.sh VERDICT PASS + t436b census; log
   law unchanged ("ui species portrait owner N at x,y"), now 7 owners at 7
   distinct slots (seed 5 default campaign).
+
+## t442 STATE-7 PORTRAIT PAINTER HUNT — PARTIAL (2026-11-20, _wip_t442.md)
+Region located + indirection law; the n>4 angle question NOT yet settled.
+- PAINTER REGION = UNINDEXED GAP 0x2b3d2..0x2cf04 (no functions_full.tsv row;
+  Ghidra auto-analysis reproduces the tsv (1143 fns) so GAP bodies need capstone
+  (scripts/t442_disasm.py)). Caller dispatch: one GAP fn ~0x2b3d2..0x2bf90
+  jumptable 0x2bf90 indexed by byte[0x43510] (display state) with arms landing
+  at 0x2c034/0x2c04d/... and internal calls 0x2b774->0x2c034, 0x2ba35->0x2c4f5,
+  0x2bb09->0x2c2c9.
+- SHAPE-SLOT INDIRECT LAW [verified disasm]: the painter never names a shape
+  file. A 9-byte-entry boot table at 0x32f1 {u16 val, u16 0x1007, u32 dst}
+  (0x32f1..0x3478, 42 entries; decoder notes in _wip_t442 P3) pre-seeds WORD
+  slots: 0x6fd44 (per-ROW race shape ids, read word[0x6fd44+2*k]), 0x6fd52
+  (per-PLAYER shape id, read word[0x6fd52+2*DAT_0007458e] at 0x2c764/0x2bc84/
+  0x26ef7), 0x6fd96 (RING shape id, read at 0x2c7e0/0x2c894), 0x6fd9a (shape id
+  read at 0x2c556), plus cache/draw-list capacities (0x9f10c, 0x4850c, 0x48c44,
+  0x13b96). Fetch = FUN_0001fc34(cache=0x9f10c, id=word[slot]). Static image
+  values at those slots are PRE-PATCH (runtime loader FUN_00023388's name
+  registrations re-assign ids) — static decode of the id VALUES needs the
+  boot-table + loader join, NEXT iteration's job.
+- SPECIES OVERLAY LOOP 0x2c823..0x2c90a [verified disasm]: bound =
+  (dword[0x13b96]>>16) = race-count mirror; per row k: fetch word[0x6fd44+2k]
+  -> blit via 0x5d5a1 (0x2c883), fetch word[0x6fd96] (ring) -> 0x53e58 rect +
+  0x53dd8 blit (0x2c8ae..0x2c8cc); relation gate dl = byte[0x12e16 + k +
+  player*0x1ee + 0x1c0], cmp 3 -> ebx=8 else (cmp dl,2 -> ebx=8 / else -1 skip)
+  at 0x2c7c7..0x2c7d1; positions esi += 0x3e (pitch 62), k==4 special
+  esi=0x15b edi=0x85. [INTERPRETATION UNRESOLVED: strip painter (right-column
+  race list) vs the r=170 ring painter — pitch 62 does NOT match the measured
+  r=170 cardinals, so t441's IMAGE law is NOT contradicted, but the r=170 code
+  path is not yet found either. NO float-170 constant exists anywhere (P2) =>
+  expect an integer/lookup construction.]
+- Ruled out by decompile this session (full list + reasons in _wip_t442 P2):
+  0x2635c spread metric, 0x2547c known-list, 0x41260 fleet AI, 0x196c8/0x19e94
+  ship anim, 0x284bc label sprites, 0x2925c view save/load, 0x3aa0a COSMOSWnd
+  dispatcher, 0x156d4 state-setter (msg 0x320 sets byte obj+0xab=STATE, maps
+  obj+0xb9, vtable+0xc repaint), 0x28fc0 draw-list builder (stars/anomalies/
+  colonies, NO race portraits), 0x53fe8 (save/load screen: builds 3 seven-word
+  arrays from byte[0x12e17]/[0x12e18]=specnum/colour + word[0x12fd3+o*0x1ee]
+  (relation to player) then calls 0x25604).
+- FUN_0001fc34 shape-cache law [verified decompile]: cache obj 0x9f10c; name
+  table obj+0x7cd+id*0x32 (200 ids max); item ptrs obj+id*4; LRU words
+  obj+0x63e/0x640.
+- Trig: FUN_00077514 fsin wrapper, 0x77556 sin wrapper, 0x5324c rotate
+  (sin+cos pair from 0x7754a/0x77556). Only 5 fsin sites total in the image.

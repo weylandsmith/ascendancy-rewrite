@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-20T17:35
+updated: 2026-11-20T23:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,58 +233,53 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT t442 = FIND THE STATE-7 PORTRAIT PAINTER IN THE ORIGINAL CODE (offline
-static hunt, Ghidra headless 127.0.0.1:8089 + work/ascend_restored.bin +
-work/functions_full.tsv) — the function that, on COSMOSWnd state 7, iterates the
-race table and blits smrace<specnum> + racering k<colour> at the r=170 slots.
-(ordering rationale: t441 CLOSED the portrait law by IMAGE measurement but its
-n>4 tail is explicitly unmeasured — the t252 campaign has 4 rows and no 5+-race
-capture exists, so the port ships 90+360/n as a NAMED reading; the painter
-function settles count-vs-n, the angle formula, and whether the ring index is
-byte +8 verbatim, converting three named caveats into cited law. It is offline,
-so it does not touch the user-gated OQ-016/019 and cannot collide with the live
-game. R-t441's method law applies: the target is code, not heap — the restored
-image is the right substrate. DO NOT re-measure what t441 already measured: the
-image evidence, slot geometry, and the owner%7 refutation are banked in
-docs/re/ui-runtime.md "t441 SPECIES-SCREEN PORTRAIT LAW CLOSED" +
-docs/re/_wip_t441.md — read those first, do not re-census the PNGs.)
+NEXT t443 = FINISH THE STATE-7 PORTRAIT-PAINTER ATTRIBUTION IN GAP REGION
+0x2b3d2..0x2cf04 (offline, capstone; t442 located the region and the shape-slot
+indirection law but left ONE question open: does the loop 0x2c823..0x2c90a paint
+the r=170 cardinal portrait ring (then the strip pitch 62 is a misread and the
+angle law is right THERE) or the right-column race list (then the r=170 ring
+painter is elsewhere in the region, e.g. 0x2c4ec..0x2c7c5, whose blits 0x2c772
+fetch word[0x6fd52+2*player] = the PLAYER's own portrait shape).
+(ordering rationale: this is the same seam t442 was assigned — it moved ~80% of
+the way and the residue is small and fully specified below; abandoning it now
+would strand the region notes. Still offline, still touches no OQ row. The t441
+IMAGE laws (r=170 cardinals, row->slot, colour-byte ring) STAND unless the code
+contradicts them with cited disasm.)
 
-DO, in order:
-(1) READ: ui-runtime.md t441 block (end of file), _wip_t441.md T2/T6, and the
-    t436b draw block rewrite/src/ui/ui.cpp (state 7, "t436b/t441 SPECIES
-    PORTRAITS"). Known anchors: the screen's chrome binds DATA\7RACESEL.SHP via
-    windows.txt TYPE-100 STATENUMBER 7 (_wip_t436 F1); race-row stride 0x1ee,
-    colour byte +8 (t423-newgame-law S10); FUN_00023388 preloads
-    SMRACE%02d/LGRACE%02d per race (t415 F3); the new-game DESC-ring blitter is
-    title-side, NOT this one.
-(2) LOCATE: start from the SMRACE shape-lib handle consumers — the shape item
-    painter family (FUN_0005d5a1 affine blitter per t423 S11; the 0x52xxx
-    window-handler family matches window objects per t423) — and walk callers
-    until a function reads word[state+0xd88] (race count) AND references a
-    radius/angle constant pair consistent with 170 px (or a lookup table).
-    Alternative route: search for the state-7 invalidate/paint path via the
-    COSMOSWnd object (state list "4 1 3 7 13", speciesmenu.h header) and its
-    vtable paint slot.
-(3) DECOMPILE the winner with capstone cross-check (t423c2 discipline: the
-    decompiler inverted a collision flag once; verify loop bounds + operand
-    displacements in raw disasm before banking).
-(4) BANK in ui-runtime.md (hand-authored; no generator touches it — verified
-    t441) + _wip_t442.md; if the cited law DIFFERS from the port's named
-    readings (angle pitch for n>4, count filter, ring index), upgrade
-    ui/speciesmenu.cpp + ui.cpp and re-pin (pattern:
-    tests/test_speciesportrait_t441.cpp x4, mutation-verify each changed
-    constant). If it CONFIRMS them, say so with the address and close the
-    named caveats.
-(5) LEDGER: touches no OQ row (seam work). If the painter function incidentally
-    names a diplomacy/relation field relevant to OQ-016, note it in the row
-    WITHOUT closing.
+DO, in order (all inputs are in docs/re/_wip_t442.md P3/T-OPEN + the ui-runtime.md
+"t442 ... PARTIAL" block — READ THOSE FIRST; do NOT re-run t442's censuses):
+(1) BOOT TABLE: parse 0x32f1..0x3478 as 9-byte entries {u16 val, u16 0x1007,
+    u32 dst} (anchor pattern '07 10' at entry+2; 42 entries; t442's first-entry
+    parse at 0x32f1 is correct, its 10-byte walk desynced). Produce the full
+    slot map: which val lands at 0x6fd44/0x6fd52/0x6fd96/0x6fd9a (word slots the
+    painter reads) and the capacity words. NOTE static bytes at those slots are
+    PRE-PATCH; the table is the runtime ground truth.
+(2) DISASM 0x2c4ec..0x2c7c5 (the pre-loop half of the same GAP function; entry
+    ~0x2c053/0x2c0be prologue region) tracking registers esi/edi/ebp from the
+    window-object fields [esp+0x2c8]/[esp+0x2d4] (windows.txt RACE_k rects are
+    x474..632 pitch 39 — compare against the pitch-62 strip) and locating EVERY
+    fetch of word[0x6fd52+2*o] vs word[0x6fd44+2*k]. The discriminator: the
+    r=170 ring painter MUST produce centres ~ (234,238)+170*{0,90,180,270deg};
+    the race-list painter produces x>=474 rows. sin/cos helpers 0x77514/0x77556
+    have only 5 call sites total (P3) — check them.
+(3) If (2) finds the ring painter: read its slot->position construction verbatim
+    (integer math or table — NO float-170 constant exists), and settle t441's
+    n>4 named caveats (angle pitch, count filter, ring index). If the law
+    DIFFERS from the port, upgrade ui/speciesmenu.{h,cpp} + ui.cpp state-7 block
+    and re-pin against tests/test_speciesportrait_t441.cpp (mutation-verify each
+    changed constant). If it CONFIRMS, cite addresses and say so.
+(4) BANK in ui-runtime.md (hand-authored) + _wip_t442.md (continue it; do not
+    create _wip_t443.md until P3 is resolved).
+(5) LEDGER: seam work, touches no OQ row. If the region names a relation field
+    relevant to OQ-016, note WITHOUT closing.
 
-GAME STATE t442 STARTS FROM (re-verified t441 end): production pid 1182156
+GAME STATE t443 STARTS FROM (re-verified t442 end): production pid 1182156
 HEALTHY (TL expiry 2026-11-22 12:02:26, watcher 1182171), ring turn 1086 on
 20/20 saves (scripts/t368_ring_turn.py — the sitting test; live-timeline.jsonl
 growth is NOT the signal, t439 law). SITTING CHECK: run t368_ring_turn.py; turn
 > 1086 means the user played -> re-run scripts/r1_t85g_sitting.py BEFORE the
-task.
+task. Ghidra headless :8089 is UP and PROGRAM ANALYZED (1143 fns; t442 ran
+run_analysis — decompiles work again).
 
 SEAMS carried: T433-C chrome generator seed/state (live debugger only, NOT
 queued), H3 race bytes 1..20, T428-B, T427-A..F, gizmo-icon rows + class
@@ -296,6 +291,32 @@ Phase-Bomb fleet built first); OQ-019 = user acceptance of the per-ship sim +
 debugger-class witness (t298 budget law, REFUTED-ROUTES.md:465-467). RULING
 CHECK t441: find work/r1/d1page -newermt 2026-11-20 11:52 = EMPTY -> D2/OQ-019
 acceptance still PENDING. NO GIT REMOTE (deliverables = local commits).
+
+t442 LANDED 2026-11-20 (STATE-7 PAINTER HUNT — PARTIAL, region located; seam
+work, ledger open=[016,019] unchanged, NO OQ row moved, no code delta).
+(i) PAINTER REGION = unindexed GAP 0x2b3d2..0x2cf04 (functions_full.tsv ==
+Ghidra's 1143 auto-fns exactly, so GAP bodies are invisible to both — capstone
+via scripts/t442_disasm.py). One GAP fn dispatches on byte[0x43510] through
+jumptable 0x2bf90 into the painter arms. (ii) SHAPE-SLOT INDIRECT LAW [verified
+disasm]: no RACERING string exists in the image (0 hits, any case) and no float
+170.0 (f32/f64); a 9-byte boot table 0x32f1..0x3478 {u16 val,u16 0x1007,u32 dst}
+(42 entries) pre-seeds word slots 0x6fd44 (per-row shape), 0x6fd52 (per-player),
+0x6fd96 (ring), 0x6fd9a + capacities; the painter fetches FUN_0001fc34(0x9f10c,
+word[slot]) then blits 0x5d5a1/0x53dd8. (iii) Overlay loop 0x2c823..0x2c90a:
+bound dword[0x13b96]>>16 (race-count mirror — the painter does NOT read
+word[STATE+0xd88]; exhaustive disp32 census in _wip_t442 P2), per-row shape +
+ring shape + relation gate byte[0x12e16+k+player*0x1ee+0x1c0]==3/2 -> ebx 8 vs
+skip; strip pitch 0x3e with k==4 override — ATTRIBUTION OPEN (race-list strip vs
+r=170 ring; t441 image laws stand either way, nothing contradicts them).
+(iv) RULED OUT by decompile (reasons banked): 0x2635c, 0x2547c, 0x41260,
+0x196c8, 0x19e94, 0x284bc, 0x2925c, 0x3aa0a, 0x156d4 (state-setter: msg 0x320
+obj+0xab=STATE, obj+0xb9 mode, vtable+0xc repaint), 0x28fc0 (draw-list builder:
+stars/anomalies/colonies only), 0x53fe8 (screen save/load; reads
+byte[0x12e17]=specnum, [0x12e18]=colour, word[0x12fd3+o*0x1ee]=relation-to-player
+— SECOND WITNESS that display code keys on specnum/colour/relation, consistent
+with t441). (v) GAME UNTOUCHED (turn 1086, HEALTHY); gate.sh GATE_EXIT=0;
+ledger_audit rows=20 open=[016,019] OK; ledger_index_check OK. NEXT t443 =
+finish the region attribution (boot-table slot map + 0x2c4ec..0x2c7c5 disasm).
 
 t441 LANDED 2026-11-20 (SEAMS T436-A + T436-B CLOSED — species-screen portrait
 law measured offline; ledger open=[016,019] unchanged, seam work).
