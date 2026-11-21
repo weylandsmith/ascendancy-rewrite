@@ -285,3 +285,9 @@ vs ours 67 px — count parity is NOT law; the vendor's chip0 emblem decodes
 sparser than the port's k0 walk produces, open sub-question logged here,
 NOT a gate failure). MUTATION: scripts/r1_tNGC_mutate.py, table M1..M8 +
 M10..M11 (no M9 by design).
+
+## F15 — tNG-C3 CYCLE 3 (G1 side-by-side pass + Begin starfield law) [in progress]
+Trigger check: no USER: lines after D19 in DECISIONS.md; ring turn 1086 on
+tail saves (53/54.sav) = no new sitting; pid 1182156 alive. Assignment =
+STATE.md defect list (1) wheel ghost sliver (2) density/species extraneous
+art (3) Begin starfield SHRUNK-VOLUME law + green ring (4) chip-grey probe.
