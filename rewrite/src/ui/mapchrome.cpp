@@ -325,7 +325,20 @@ RGB newgameWellEdgeColourAt(int x, int y) {
     z = z ^ (z >> 31);
     const uint64_t r = z % 1000000ull;
     if (r < 50000ull && x > 7) return newgameWellEdgeColourAt(x - 1, y);
-    if (r < 300000ull && y > 7) return newgameWellEdgeColourAt(x, y - 1);
+    // tA2-CONT CHAIN-ANCHOR FIX: the repeat-up recursion stays INSIDE the
+    // pixel's band. The ridge rows 373/374 NEVER recurse up: (x,372) is the
+    // pure-black well interior, and drawing from the kLeft/kRight RECESS
+    // tabs there dragged 25% of ridge pixels dark (witness 50.6/90.4 vs
+    // tab means 64.4/102.8). Pulling 374->373 instead mixes the DARK rung
+    // into row 374 (stationary expectation 0.7*102.8+0.3*64.4 ~ 92.7,
+    // outside the +-6 window) — and the vendor census shows each ridge row
+    // holds its OWN rung family in matching counts (grey 169/169, teal
+    // 108/107, 71/70), i.e. per-row draws from the rung-shifted tables,
+    // not a vertical carry. Rows 373/374 draw fresh-or-left-anchored from
+    // their own tab; recess columns 8..372 chain up within their column as
+    // before (witness col7 6.5 == vendor 6.5). docs/re/_wip_tA2.md F6.
+    if (r < 300000ull && y > 7 && y != 373 && y != 374)
+        return newgameWellEdgeColourAt(x, y - 1);
     struct Ent { RGB c; int w; };
     // Top recess row 7 x7..493: n=487 mean 24.3 — dark noise: greys
     // 147 / teals 155 / near-black 185 (family split F3 probe).

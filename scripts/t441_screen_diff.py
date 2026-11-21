@@ -136,6 +136,48 @@ REGIONS = {
         # index (which husk/biome) is tNG-C; scale is tA1.
         dict(name="desc-planet", vkind="content", rect=(377, 190, 427, 246),
              cited=("planets",), mass=(150, 150), dimscheck="desc-planet"),
+        # ---- tA2-CONT CHROME-BAND REGIONS (tA2 law, docs/re/_wip_tA2.md
+        # F3/F5/F7). kind="band": mean-lum window + census-family presence
+        # on BOTH sides (vendor crop = ground truth). Windows are MEASURED
+        # this session (scripts/r1_tA2c_bandprobe.py): ours vs vendor means
+        # recess-row7 22.5/24.3, ridge373 64.4/64.5, ridge374 103.1/102.9,
+        # panel-top381 29.5/31.6, rows1-6 60.5/72.3. Family = within
+        # <=10/channel of a cited census top colour; fam_min = share of the
+        # band covered by the TOP-3 census families (summed, so ridge rows
+        # with 3 grey + 3 teal rungs score up to ~1.7). NO band region may
+        # re-home the harness: rects are the cited well geometry
+        # (kNewgameCosmosRect {8,8,492,372} + recess/ridge law).
+        dict(name="chrome-topbar-rows1-6", kind="band",
+             rect=(7, 1, 493, 6), mean=(66.4, 15.0), fam_min=None),
+        # Row 0 excluded from the mean window ON PURPOSE: per-instance
+        # chrome law (t433) — newgame instance vendor row0 mean 39.0 vs the
+        # pinned map refcap 104.5; a mean window here would grade instance
+        # noise, not law. Geometry-only: it must not be pure black.
+        dict(name="chrome-topbar-row0", kind="band",
+             rect=(7, 0, 493, 0), mean=(20.0, 220.0), fam_min=None),
+        dict(name="chrome-recess-row7", kind="band",
+             rect=(7, 7, 493, 7), mean=(23.4, 3.0),
+             fam=[(24, 24, 24), (10, 10, 10), (21, 42, 35)], fam_min=0.90),
+        dict(name="chrome-recess-col7", kind="band",
+             rect=(7, 8, 7, 372), mean=(6.5, 2.5), fam_min=None),
+        dict(name="chrome-recess-col493", kind="band",
+             rect=(493, 8, 493, 372), mean=(21.0, 3.5), fam_min=None),
+        dict(name="chrome-well-row8", kind="band",
+             rect=(8, 8, 492, 8), mean=(0.0, 0.5), fam_min=None),
+        dict(name="chrome-well-row372", kind="band",
+             rect=(8, 372, 492, 372), mean=(0.0, 0.5), fam_min=None),
+        dict(name="chrome-ridge-row373", kind="band",
+             rect=(7, 373, 493, 373), mean=(64.5, 6.0),
+             fam=[(61, 61, 61), (53, 78, 78), (48, 71, 73)], fam_min=1.40),
+        dict(name="chrome-ridge-row374", kind="band",
+             rect=(7, 374, 493, 374), mean=(103.0, 6.0),
+             fam=[(97, 97, 97), (85, 125, 125), (77, 113, 117)],
+             fam_min=1.30),
+        # Panel-inset census band (tA2 inset law top line): GALAXY_MORE +
+        # chips + Begin panels all show the dark inset family at row 381.
+        dict(name="chrome-panel-top381", kind="band",
+             rect=(7, 381, 493, 381), mean=(30.5, 4.5),
+             fam=[(12, 24, 34), (12, 24, 36), (18, 31, 40)], fam_min=2.20),
     ],
     "planetslist": [
         # Row 0 (t427 laws): sun centre (80,121) suns ladder; planet
@@ -172,6 +214,41 @@ def run_screen(screen, ours_p, vendor_p, log_path):
     for rg in REGIONS[screen]:
         x0, y0, x1, y1 = rg["rect"]
         fails = []
+        if rg.get("kind") == "band":
+            # tA2-CONT chrome band: mean-lum window + census-family share
+            # on BOTH sides. No dimscheck (chrome has no blit record).
+            def band_stats(im):
+                px = im[y0:y1 + 1, x0:x1 + 1].reshape(-1, 3).astype(int)
+                m = float(px.mean(axis=1).mean())
+                f = None
+                if rg.get("fam"):
+                    f = 0.0
+                    for c in rg["fam"]:
+                        d = np.abs(px - np.array(c)).sum(axis=1)
+                        f += float((d <= 30).sum()) / len(px)
+                return m, f
+            mo, fo = band_stats(ours)
+            mv, fv = band_stats(vendor)
+            lo, tol = rg["mean"]
+            if not (lo - tol <= mv <= lo + tol):
+                fails.append(f"vendor mean {mv:.1f} outside cited "
+                             f"{lo}+-{tol} (law witness broken?)")
+            if not (lo - tol - 1.0 <= mo <= lo + tol + 1.0):
+                fails.append(f"ours mean {mo:.1f} outside window "
+                             f"{lo}+-{tol} (+-1 shot noise)")
+            if rg.get("fam_min") is not None:
+                if fv < rg["fam_min"]:
+                    fails.append(f"vendor fam share {fv:.2f} < "
+                                 f"{rg['fam_min']} (crop misaligned?)")
+                if fo < rg["fam_min"]:
+                    fails.append(f"ours fam share {fo:.2f} < "
+                                 f"{rg['fam_min']} (census tables not "
+                                 "drawing the family)")
+            ok &= not fails
+            print(f"  {rg['name']:<24} ours {mo:6.1f}/{'' if fo is None else f'{fo:.2f}'} "
+                  f"vendor {mv:6.1f}/{'' if fv is None else f'{fv:.2f}'} "
+                  f"{'PASS' if not fails else 'FAIL: ' + '; '.join(fails)}")
+            continue
         # --- ours: dims-vs-cited via dimscheck declaration
         dv = None
         n_ours = 0

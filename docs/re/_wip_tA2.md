@@ -179,13 +179,46 @@ ridge is drawn but ~14 lum too dark. NAMED ROOT CAUSE (not yet fixed):
 newgameWellEdgeColourAt's repeat-up chain at y=373 recurses to (x,372),
 which is NOT an edge pixel but the function draws anyway from the kLeft/
 kRight RECESS tabs — ~30% of ridge pixels take dark recess colours.
-tA2-CONT: restrict the chain to the ridge band (recursion anchor = row
-373 for y=374; row 373 always fresh-or-left-anchored, NEVER up), rebuild,
-re-witness (target row means within +-6 of 64.5/102.8), then extend
-t441_screen_diff.py with chrome-band regions (top bar rows 0..6, recess
-row 7, ridge rows 373/374, panel insets) and mutation-verify every tA2
-constant (kNewgameCosmosRect corners, ridge/recess census weights,
-kBeginPanelVisual). Map/title chrome-band application checks per the tA2
-CLOSE clause also remain (title = GIF art, no kBevel sites found; map
-buttons already vendor-shape). LEDGER: seam work, open=[016,019]
-unchanged. Gate green this iteration.
+tA2-CONT: restrict the chain to the ridge band, extend t441_screen_diff.py
+with chrome-band regions, mutation-verify every tA2 constant, bank
+map/title application checks. LEDGER: seam work, open=[016,019].
+
+## F7 — RIDGE CHAIN-ANCHOR FIX [MEASURED 2026-11-21, tA2-CONT item (1)]
+Fix in newgameWellEdgeColourAt (mapchrome.cpp): the repeat-up recursion now
+excludes BOTH ridge rows (`y > 7 && y != 373 && y != 374`). Two rejected
+variants, both reasoned BEFORE building:
+- 374 recurses to 373 (band-internal carry): stationary expectation
+  0.7*102.8 + 0.3*64.4 ~ 92.7 — outside the +-6 window. The vendor census
+  settles it independently: each ridge row holds its OWN rung family in
+  matching counts (grey 169/169, teal 108/107, 71/70) = per-row draws from
+  the rung-shifted tables, NOT a vertical carry.
+- Recess columns keep chaining up within their own column (witness col7
+  6.5 == vendor 6.5 before and after — the guard doesn't touch them).
+WITNESS (scripts/r1_tA2c_witness.py, run via ~/tools/revenv/bin/python —
+NOTE: repo .venv has NO numpy/PIL; t441 harness runs under revenv too):
+post-fix shot /tmp/t412_shots/t412-newgame.png (scripts/t412_newgame_shot.sh):
+  row7 22.5 (vendor 24.3, tol 6) PASS
+  col7 6.5 (6.5) PASS; col493 19.1 (22.9, tol 6) PASS
+  row373 64.4 (64.5, delta -0.1) PASS; row374 103.1 (102.8, +0.3) PASS
+  well rows 8/372 blackfrac 1.000 PASS  -> WITNESS PASS, exit 0.
+The ~14-lum ridge defect is CLOSED at measurement; the census tables were
+already correct (tab means 64.40/102.82 computed from source).
+
+## F8 — t441 HARNESS CHROME-BAND REGIONS [VERIFIED 2026-11-21, item (2)]
+scripts/t441_screen_diff.py EXTENDED (not re-homed): new region kind
+"band" = mean-lum window + census-family share on BOTH sides (vendor crop
+= ground truth for the law; ours = the render). Family = pixel within
+<=10/channel of a cited top-3 census colour; fam_min sums family shares
+(ridge rows score up to ~1.7 = grey+teal rungs). 10 new regions on
+newgame: topbar rows1-6 (window 66.4+-15), topbar row0 (geometry-only —
+per-instance chrome law t433 makes a mean window meaningless: ours 105.8
+vs vendor instance 39.0 BOTH inside 20..220), recess row7 (23.4+-3 +
+fam 0.90), recess col7 (6.5+-2.5), col493 (21.0+-3.5), well rows 8/372
+(mean <=0.5 pure black), ridge 373 (64.5+-6 + fam 1.40), ridge 374
+(103.0+-6 + fam 1.30), panel-top381 (30.5+-4.5 + fam 2.20). Windows set
+from scripts/r1_tA2c_bandprobe.py BOTH-SIDE measurement (ours/vendor:
+row7 22.5/24.3, ridge 64.4/64.5 + 103.1/102.9, panel381 29.5/31.6 —
+every band inside its window with >=1.5 lum margin both sides).
+VERDICT: newgame 17/17 PASS (7 tA1 + 10 bands), planetslist 2/2 PASS
+unchanged (/tmp/ta1c_shots/status-open.png vs
+work/r1/loop/vendor-planetslist-t3-640.png, exit 0).
