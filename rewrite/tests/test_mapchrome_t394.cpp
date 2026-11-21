@@ -130,6 +130,7 @@ TEST(mapchrome_t394_hit_laws) {
 TEST(mapchrome_tA2_well_edge_law) {
     using namespace ascend::ui;
     // Geometry follows kNewgameCosmosRect {8,8,492,372} (tA2 recess law):
+    CHECK(kNewgameCosmosRect.x0 == 8);
     CHECK(kNewgameCosmosRect.y0 == 8);
     CHECK(kNewgameCosmosRect.x1 == 492);
     CHECK(kNewgameCosmosRect.y1 == 372);
@@ -209,8 +210,14 @@ TEST(mapchrome_tA2_well_edge_law) {
             if (eq(p, 12, 24, 34)) n12_24_34++;
         }
         mp /= 487;
-        for (int y = 382; y <= 472; y++) mql += lum(newgamePanelLeftAt(y));
+        int npl = 0;
+        for (int y = 382; y <= 472; y++) {
+            const RGB q = newgamePanelLeftAt(y);
+            mql += lum(q);
+            if (eq(q, 15, 35, 49)) npl++;
+        }
         mql /= 91;
+        CHECK(npl >= 0.17 * 91 && npl <= 0.52 * 91);  // 24/74 = 0.324
         CHECK(mp >= 21.0 && mp <= 33.0);        // vendor topline 27.1-36.0
         CHECK(mql >= 27.0 && mql <= 40.0);      // vendor left inset 33.0
         CHECK(n12_24_34 >= 0.19 * 487 && n12_24_34 <= 0.50 * 487);  // 25/74
@@ -236,9 +243,14 @@ TEST(mapchrome_tA2_well_edge_law) {
         const RGB a = newgamePanelTopAt(60), b = newgamePanelTopAt(60);
         CHECK(a.r == b.r && a.g == b.g && a.b == b.b);
     }
-    // Begin panel: visual extent strictly inside the windows.txt hit rect.
+    // Begin panel: MEASURED visual extent {502,381,632,472} (browser shot
+    // +1,+1), strictly inside the windows.txt hit rect kBeginNewGameBtn
+    // {494,373,639,472}. Exact values pinned: a shrunk x0 re-paints the
+    // chrome gutter x494..501 navy (the landed defect).
+    CHECK(kBeginPanelVisual.x0 == 502);
+    CHECK(kBeginPanelVisual.y0 == 381);
+    CHECK(kBeginPanelVisual.x1 == 632);
+    CHECK(kBeginPanelVisual.y1 == 472);
     CHECK(kBeginPanelVisual.x0 > kBeginNewGameBtn.x0);   // gutter stays chrome
     CHECK(kBeginPanelVisual.x1 < kBeginNewGameBtn.x1);
-    CHECK(kBeginPanelVisual.y0 >= 381);
-    CHECK(kBeginPanelVisual.y1 == 472);
 }
