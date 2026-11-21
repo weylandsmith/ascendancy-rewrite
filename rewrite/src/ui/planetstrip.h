@@ -63,8 +63,8 @@ inline constexpr int kStripGaugeRecords = 21;
 // mismatches as BRIGHT overpaint px).
 inline constexpr int kFieldRecord = 4;
 inline constexpr Pt kFieldBlitOrigin{7, 115};
-inline constexpr int kFieldRecordW = 625;  // shp.md S23.2 dims census
-inline constexpr int kFieldRecordH = 357;
+inline constexpr int kFieldRecordW = 626;  // tA1 bbox (0,0,625,357)
+inline constexpr int kFieldRecordH = 358;
 
 // The PLPOP paint origin == the windows.txt rect origin (355,7) [verified
 // ln1587 block; t263 panel-geometry note].

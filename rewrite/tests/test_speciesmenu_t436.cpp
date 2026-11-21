@@ -64,14 +64,14 @@ TEST(species_row_flag_offset_matches_the_measured_bbox_t436) {
     // [measured F7] flag bbox x488..502 == slot.x0 + 14 (474+14), rows
     // rowTop+3 .. rowTop+27 (native 14x24).
     CHECK(au::kSpeciesRowFlagDx == 14);
-    CHECK(au::kSpeciesRowFlagDy == 3);
+    CHECK(au::kSpeciesRowFlagDy == 3);  // tA1: flag bbox 15x25 at (0,0)
     REQUIRE_DATA();
     ascend::formats::ShapeLibrary flags;
     std::string err;
     CHECK(flags.load(kA01 + "raceflag.shp", &err));
     if (flags.count() < 1) return;
-    CHECK(int(flags.record(0).width) == 14);   // bbox width exact
-    CHECK(int(flags.record(0).height) == 24);  // bbox height exact
+    CHECK(int(flags.record(0).width) == 15);   // tA1 bbox exact
+    CHECK(int(flags.record(0).height) == 25);  // tA1 bbox exact
 }
 
 TEST(species_portrait_ring_radii_match_the_measured_band_t436) {
@@ -79,9 +79,11 @@ TEST(species_portrait_ring_radii_match_the_measured_band_t436) {
     // smrace 49x49 at scale 2 -> drawn 98 (r49 clipped); racering 53x53 at
     // scale 2 -> drawn 106 (outer r53; the ring's own band lands r50..55
     // because the record's ring px sit at r25..28 native x2).
-    CHECK(au::kSpeciesPortraitScale == 2);
-    CHECK(au::kSpeciesPortraitClipR == 49);
-    CHECK(au::kSpeciesRingHalf == 53);
+    // tA1 BBOX-DIFF LAW: class scale 1; content disc 100 px (r50), ring
+    // 109 px (outer r55 measured band r50..55 lands natively).
+    CHECK(au::kSpeciesPortraitScale == 1);
+    CHECK(au::kSpeciesPortraitClipR == 50);
+    CHECK(au::kSpeciesRingHalf == 55);
     REQUIRE_DATA();
     ascend::formats::ShapeLibrary ring;
     std::string err;
@@ -89,10 +91,10 @@ TEST(species_portrait_ring_radii_match_the_measured_band_t436) {
     ascend::formats::ShapeLibrary disc;
     CHECK(disc.load(kA01 + "smrace00.shp", &err));
     if (ring.count() < 1 || disc.count() < 1) return;
-    CHECK(int(ring.record(0).width) == 53);
-    CHECK(int(ring.record(0).height) == 53);
-    CHECK(int(disc.record(0).width) == 49);
-    CHECK(int(disc.record(0).height) == 49);
+    CHECK(int(ring.record(0).width) == 109);  // tA1 bbox (-55,-55,53,53)
+    CHECK(int(ring.record(0).height) == 109);
+    CHECK(int(disc.record(0).width) == 100);  // tA1 bbox (-50,-50,49,49)
+    CHECK(int(disc.record(0).height) == 100);
 }
 
 TEST(species_well_speckle_is_correlated_not_iid_t436) {

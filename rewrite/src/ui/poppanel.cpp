@@ -76,7 +76,8 @@ bool popSlotLibraryConforms(const std::string& path, std::string* err) {
                         " != 9 (17np census: 9)";
         return false;
     }
-    const int want[3][2] = {{9, 9}, {7, 9}, {8, 8}};  // k1,k2,k3 [verified]
+    // tA1 BBOX-DIFF re-cite: k1 9x9, k2 6x9 (L,T=(2,1)), k3 8x8 (bboxes verbatim)
+    const int want[3][2] = {{9, 9}, {6, 9}, {8, 8}};
     for (int r = 0; r < 3; ++r) {
         const auto& rec = lib.record(r + 1);
         if (int(rec.width) != want[r][0] || int(rec.height) != want[r][1]) {

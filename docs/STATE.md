@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-20T23:55
+updated: 2026-11-21T02:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,6 +233,37 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
+NEXT tA1-CONT = FINISH THE tA1 BLIT-SCALE CLOSE (STAGE A; the LAW LANDED
+tA1 — see the tA1 LANDED block below and docs/re/_wip_tA1.md F5; ordering
+rationale: the quadrant-family law is in the tree but UNVERIFIED at the
+composite level, and G2's harness scripts/t441_screen_diff.py does not
+exist yet — tNG-C/tPL-C cannot grade until it does. Do NOT start tA2).
+DO, in order:
+(1) BUILD scripts/t441_screen_diff.py (region table: name, rect, expected
+    palette classes, drawn-dims-vs-cited assertion, art-presence mass;
+    per-region diff report; exit code = gate). Inputs: our render at
+    640x480 (Xvfb :9 root grab per G5 — NEVER Athens shots for scale)
+    + the refcap crop for the same region.
+(2) RENDER witnesses: newgame (portrait circle, species column rows, DESC
+    planet) and planets-list (sun+planet row art) via the existing shot
+    scripts (t412_newgame_shot.sh pattern); assert the quadrant signature
+    is GONE and drawn dims == bbox dims (smrace 100, racering 109, suns
+    selector bbox, planets selector bbox).
+(3) MUTATION-VERIFY each changed constant (kRacePortraitScale,
+    kStatusArtScale, kSpeciesPortraitScale/ClipR/RingHalf,
+    kFieldRecordW/H, poppanel want-table, stripGauge width 108): flip it,
+    the pin must fail, restore.
+(4) BANK the witness verdicts in _wip_tA1.md; if a site renders wrong,
+    root-cause it (G6) — the DESC-planet SIZE index +3->+1 guess and the
+    DESC-planet GROUP seam are the two most likely defect carriers.
+(5) LEDGER: seam work, touches no OQ row.
+GAME STATE tA1-CONT STARTS FROM: production pid 1182156 HEALTHY (TL expiry
+2026-11-22 12:02:26, watcher 1182171), ring turn 1086 on 20/20 saves
+(scripts/t368_ring_turn.py = the sitting test; turn > 1086 -> re-run
+scripts/r1_t85g_sitting.py FIRST). Ghidra headless :8089 UP, analyzed.
+Trigger check FIRST: USER: lines after the D19 block in DECISIONS.md win.
+
+--- SUPERSEDED tA1 ASSIGNMENT (law landed; only the CLOSE remains above) ---
 NEXT tA1 BLIT-SCALE LAW (PHASE-17 STAGE A FIRST — see the PHASE-17 QUEUE row tA1 verbatim; ordering rationale: user D19 ruling 2026-11-20 — one blit-scale law explains the quadrant family on newgame portrait/species column/planet art AND planets-list art; fix the law before per-screen content gates). Trigger check FIRST: USER: lines after the D19 block in docs/DECISIONS.md win.
 
 DO, in order (all inputs are in docs/re/_wip_t442.md P3/T-OPEN + the ui-runtime.md
@@ -281,6 +312,36 @@ debugger-class witness (t298 budget law, REFUTED-ROUTES.md:465-467). RULING
 CHECK t441: find work/r1/d1page -newermt 2026-11-20 11:52 = EMPTY -> D2/OQ-019
 acceptance still PENDING. NO GIT REMOTE (deliverables = local commits).
 
+tA1 LANDED 2026-11-21 (BLIT-SCALE / BBOX-DIFF DIMS LAW — the D19 quadrant
+family root cause; ledger open=[016,019] unchanged, seam work, CLOSE owed
+via tA1-CONT). (i) TRUE DIMS LAW [verified decompile FUN_00061058 =
+(short)[hdr+0x10]-[hdr+8]+1 bbox DIFFERENCE; FUN_0006108c returns (L,T),
+0x5d5a1 places anchor+(L,T)] + EXACT-SPAN CENSUS over all 165 libs:
+bbox-at-stream-0x10 completes 1413/1436 (1403 exact-span + t197 cross-span
+class), old u32-pair law 31/1436 and every one of those is the SAME quad's
+corner/canvas re-read (zero regressions, script-measured). Four witnesses
+banked _wip_tA1 F2 (code/census/pixel-render/measured-drawn-sizes 1:1:
+suns k1 130x127 vs drawn 130x126; racering 109; smrace 100; planets k1 38
+vs zone 37). The port's fake 2x scales (portrait/ring/statuslist) were
+COMPENSATING the port's own truncated dims read — the vendor blits NATIVE.
+(ii) CODE: shp.{h,cpp} parse = bbox-diff, Record.left/top; render sites
+title.cpp DESC ring+portrait+planet (size idx +3->+1 cited: ladder
+{24,38,52,71,95}, measured zone matches 38 only), RACELIST rows, ui.cpp
+state-7 portraits+rings, planets-list sun+planet — all NATIVE at
+anchor+(L,T); constants kRacePortraitScale/kStatusArtScale 2->1,
+kSpeciesPortraitScale 1/ClipR 50/RingHalf 55, kFieldRecord 626x358,
+poppanel {9x9,6x9,8x8}, stripGauge width 108 (heights vary per record —
+dropped from identity term). (iii) PINS RE-CITED to bbox values x12 test
+files (mapchrome/sysview/resface parity becomes FULL-INCLUSIVE-RECT; the
+old minus-1 parity WAS the misparse; suns/planets/raceflag/racering/smrace
+ladders re-measured; cos_star k40..k51 + sg50expl k9 = 1x1 degenerate
+placeholders that DECODE; 1starmap k1 0x7FFFFFBB variant decodes 3x3 —
+old rejects were misparse artifacts). SUITE ctest 100% (62.25s).
+(iv) HONEST NEGATIVE: the affine blitter's 16.16 scale direction stays
+UNRESOLVED statically (C3-F8 pitfall stands; not needed — 1:1 reproduces
+every measured witness); tA1's CLOSE (t441_screen_diff.py harness, 1:1
+render witnesses, mutation verification) is OWED — see NEXT tA1-CONT.
+(v) GAME UNTOUCHED (turn 1086 HEALTHY, sitting test run this iteration).
 t442 LANDED 2026-11-20 (STATE-7 PAINTER HUNT — PARTIAL, region located; seam
 work, ledger open=[016,019] unchanged, NO OQ row moved, no code delta).
 (i) PAINTER REGION = unindexed GAP 0x2b3d2..0x2cf04 (functions_full.tsv ==

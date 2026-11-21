@@ -173,7 +173,7 @@ inline constexpr int kDescPlanetR = 18;
 // x506..511 / x608..612 -> dia ~107, r 53); smrace 49x49 SCALED 2x (98 px)
 // inside the ring — the scale filter is a NAMED SEAM. The vendor rows
 // carry NO text (two independent vision reads of the original crop).
-inline constexpr int kRacePortraitCx = 559, kRacePortraitScale = 2;
+inline constexpr int kRacePortraitCx = 559, kRacePortraitScale = 1;
 inline constexpr int kRaceRingR = 53;
 
 // Begin-box art [measured]: emblem zone green px x573..629 y390..446

@@ -186,8 +186,9 @@ TEST(sysview_shape_identity_parity_t410) {
         if (rec < 0 || rec >= lib.count()) continue;
         const auto& r = lib.record(rec);
         // DIMS PARITY: shape == rect minus 1 on both axes (t394 law re-run).
-        CHECK(int(r.width) == cc.rect.x1 - cc.rect.x0 + 1 - 1);
-        CHECK(int(r.height) == cc.rect.y1 - cc.rect.y0 + 1 - 1);
+        // tA1 BBOX-DIFF LAW: content == the full inclusive rect span.
+        CHECK(int(r.width) == cc.rect.x1 - cc.rect.x0 + 1);
+        CHECK(int(r.height) == cc.rect.y1 - cc.rect.y0 + 1);
     }
 }
 

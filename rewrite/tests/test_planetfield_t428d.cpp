@@ -32,8 +32,9 @@ TEST(planetfield_blit_law_t428d) {
     CHECK(au::kFieldRecord == 4);
     CHECK(au::kFieldBlitOrigin.x == 7);
     CHECK(au::kFieldBlitOrigin.y == 115);
-    CHECK(au::kFieldRecordW == 625);
-    CHECK(au::kFieldRecordH == 357);
+    // tA1 BBOX-DIFF LAW: k4 bbox (0,0,625,357) -> content 626x358.
+    CHECK(au::kFieldRecordW == 626);
+    CHECK(au::kFieldRecordH == 358);
     // The blit reaches the visible field: k4 at (7,115) spans y 115..471
     // (within the 480-row display) and x 7..631 — the t428c witness peak.
     CHECK(au::kFieldBlitOrigin.y + au::kFieldRecordH <= 480);

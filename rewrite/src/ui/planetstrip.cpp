@@ -48,7 +48,10 @@ bool stripGaugeLibraryConforms(const std::string& path, std::string* err) {
     }
     for (int i = 0; i < kStripGaugeRecords; i++) {
         const auto& r = lib.record(i);
-        if (r.width != 107 || r.height != 99) {
+        // tA1: under the bbox law the gauge WIDTH is 108 on all 21
+        // records of all three libs (verbatim); heights VARY per record
+        // (planind {77,80,89,95,99}) so height is not an identity term.
+        if (r.width != 108) {
             if (err)
                 *err = "record " + std::to_string(i) + " dims " +
                        std::to_string(r.width) + "x" +

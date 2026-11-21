@@ -93,8 +93,10 @@ TEST(mapchrome_t394_shape_dims_parity_law) {
     auto parity = [&](int frame, const ascend::ui::Rect& r) {
         if (frame >= int(lib.count())) { CHECK(frame < int(lib.count())); return; }
         const auto& rec = lib.record(frame);
-        CHECK(int(rec.width) == r.x1 - r.x0);   // inclusive w - 1
-        CHECK(int(rec.height) == r.y1 - r.y0);  // inclusive h - 1
+        // tA1 BBOX-DIFF LAW: content == the FULL inclusive rect (the old
+        // minus-1 parity was the port mis-reading the R,B corner as dims).
+        CHECK(int(rec.width) == r.x1 - r.x0 + 1);
+        CHECK(int(rec.height) == r.y1 - r.y0 + 1);
     };
     for (int i = 0; i < ascend::ui::kMapCtlCount; i++)
         parity(kMapCtl[i].shapeFrame, kMapCtl[i].rect);

@@ -46,11 +46,11 @@ TEST(statusrow_suns_lib_identity_t427) {
         CHECK(suns.decode(k, px));
         // content frames are SMALL (the drawn 130px sun is the 2x law);
         // a 150x150 read would mean the u16 header pair leaked in.
-        CHECK(suns.record(k).width <= 70);
-        CHECK(suns.record(k).height <= 70);
+        CHECK(suns.record(k).width <= 140);   // tA1 bbox ladder 76..139
+        CHECK(suns.record(k).height <= 142);
     }
-    // k0 content dims are the u32 pair (61,68) measured this session.
-    CHECK(suns.record(0).width == 61 && suns.record(0).height == 68);
+    // tA1: k0 bbox (-65,-64,61,68) -> 127x133 content.
+    CHECK(suns.record(0).width == 127 && suns.record(0).height == 133);
 }
 
 TEST(statusrow_planet_selector_domain_t427) {
@@ -61,9 +61,11 @@ TEST(statusrow_planet_selector_domain_t427) {
     CHECK(pl.count() == 55);
     // selector = 5*type + size; the size axis is the cited content ladder
     // 11/18/25/35/47 (shp.md S23.3) within EVERY type group.
-    CHECK(pl.record(0).width == 11);
-    CHECK(pl.record(4).width == 47);
-    CHECK(pl.record(5).width == 11);   // next group restarts the ladder
+    // tA1 bbox ladder {24,38,52,71,95} (was 11/18/25/35/47 under the
+    // R,B-corner misparse; the drawn-size witnesses match bbox 1:1).
+    CHECK(pl.record(0).width == 24);
+    CHECK(pl.record(4).width == 95);
+    CHECK(pl.record(5).width == 24);   // next group restarts the ladder
     std::vector<uint8_t> px;
     CHECK(pl.decode(4 * 5 + 4, px));
 }
@@ -112,8 +114,9 @@ TEST(statusrow_selector_laws_t427b) {
 }
 
 TEST(statusrow_scale_and_anchors_t427) {
-    // 2x law: content ~61-68 sun -> measured drawn 130x126 (F5).
-    CHECK(au::kStatusArtScale == 2);
+    // tA1 BBOX-DIFF LAW: content dims == drawn size (k1 130x127 vs
+    // measured 130x126); the old 2x compensated the port misparse.
+    CHECK(au::kStatusArtScale == 1);
     // Drawn centres measured on the t3 capture (warm-px bbox x16..145
     // y59..184 row 0 -> centre (80,64)+; blue sphere x174..245 y66..155).
     CHECK(au::kStatusSunCx == 80);

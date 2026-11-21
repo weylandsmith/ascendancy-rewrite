@@ -71,7 +71,7 @@ TEST(poppanel_17np_library_census_t263) {
     //     the 0x0a pitch; every other pop candidate is excluded by min dims
     //     (planets 11x11, planitem 24x23, planalNN 47x47 — shp.md S23.3).
     CHECK(lib.record(1).width == 9 && lib.record(1).height == 9);
-    CHECK(lib.record(2).width == 7 && lib.record(2).height == 9);
+    CHECK(lib.record(2).width == 6 && lib.record(2).height == 9);  // tA1 bbox
     CHECK(lib.record(3).width == 8 && lib.record(3).height == 8);
 
     // (b) the conformance gate agrees on the real file and rejects a

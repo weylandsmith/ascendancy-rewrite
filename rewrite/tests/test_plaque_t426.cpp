@@ -52,22 +52,22 @@ TEST(plaque_t426_record_is_14x24_with_transparent_row0) {
     CHECK(lib.load(kA01 + "raceflag.shp", &err));
     if (lib.count() < 1) return;
     const auto& rec = lib.record(0);
-    CHECK(int(rec.width) == 14 && int(rec.height) == 24);
+    CHECK(int(rec.width) == 15 && int(rec.height) == 25);  // tA1 bbox
     std::vector<uint8_t> px;
     CHECK(lib.decode(0, px));
-    if (px.size() != 14u * 24u) return;
+    if (px.size() != 15u * 25u) return;
     // k0 stream sits at rec+8 (t425b law — verified here: the C++ decoder
     // and a rec+8 Python decode agree, and the k0 match against the refcap
     // is 336/336 EXACT at the frame anchor). Every row is fully opaque:
     // row 0 is the green top line (14x idx19), rows 1..23 are navy with
     // the idx19 left border + glyph strokes.
-    for (int c = 0; c < 14; c++) CHECK(px[c] == 19);  // row 0 = frame green
-    for (int r = 1; r < 24; r++) {
-        CHECK(px[size_t(r) * 14] == 19);  // left border column
+    for (int c = 0; c < 15; c++) CHECK(px[c] == 19);  // row 0 = frame green
+    for (int r = 1; r < 25; r++) {
+        CHECK(px[size_t(r) * 15] == 19);  // left border column
         int nonzero = 0;
-        for (int c = 0; c < 14; c++)
-            if (px[size_t(r) * 14 + c] != 0) nonzero++;
-        CHECK(nonzero == 14);
+        for (int c = 0; c < 15; c++)
+            if (px[size_t(r) * 15 + c] != 0) nonzero++;
+        CHECK(nonzero == 15);
     }
     // 21 records = 21 species (t400 census class).
     CHECK(lib.count() == 21);

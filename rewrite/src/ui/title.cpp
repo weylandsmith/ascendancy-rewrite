@@ -559,13 +559,19 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             // measured ring radius 53 (menulaw kDescRingR/kRaceRingR) ==
             // record 53 drawn at 2x — the SAME scale as the smrace
             // portraits (49 -> 98, t401 S8), so the class scale is 2.
+            // tA1 BBOX-DIFF LAW: racering k<idx> is 109x109 CONTENT at
+            // (L,T)=(-55,-55) [measured header verbatim] — the vendor blits
+            // it NATIVE at centre+(L,T); the old 53x53/2x reading was the
+            // port's own dims misparse (docs/re/_wip_tA1.md F2). Vector
+            // fallback only when the lib is unavailable.
             {
                 bool ringDrawn = false;
-                if (raceringLib.count() > playerColourIdx)
-                    ringDrawn = blitShapeScaled(ren, raceringLib,
-                                                playerColourIdx,
-                                                kDescRingCentre.x - 53,
-                                                kDescRingCentre.y - 53, 2);
+                if (raceringLib.count() > playerColourIdx) {
+                    const auto& rr = raceringLib.record(playerColourIdx);
+                    ringDrawn = blitShape(ren, raceringLib, playerColourIdx,
+                                          kDescRingCentre.x + rr.left,
+                                          kDescRingCentre.y + rr.top);
+                }
                 if (!ringDrawn) {
                     SDL_SetRenderDrawColor(ren, kLore.r, kLore.g, kLore.b,
                                            255);
@@ -577,14 +583,14 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     }
                 }
                 if (const auto* pl = portraitFor(selIndex)) {
-                    const int d = int(pl->record(0).width) *
-                                  kRacePortraitScale;  // 49x49 -> 98
-                    // t414: clipped to the ring (r 52) — vendor art is a
-                    // DISC, square corners were the "4x size" complaint.
-                    blitShapeCircular(ren, *pl, 0,
-                                      kDescRingCentre.x - d / 2,
-                                      kDescRingCentre.y - d / 2,
-                                      kRacePortraitScale, kDescRingR);
+                    // tA1: smrace content = bbox 100x100 at (L,T)=(-50,-50)
+                    // [measured verbatim]; NATIVE blit at the ring centre,
+                    // the record's own TRANSPARENT-SKIP corners clip it to
+                    // the disc (t414's manual circle compensated the port's
+                    // truncated 49x49 read — no longer needed).
+                    const auto& pr0 = pl->record(0);
+                    blitShape(ren, *pl, 0, kDescRingCentre.x + pr0.left,
+                              kDescRingCentre.y + pr0.top);
                 }
                 // t414 PLANET IMAGE (D15 "the planet image is missing from
                 // the race info frame"): the zone x383..419 y198..239
@@ -596,11 +602,18 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 // citation maps race->biome for the DESC panel). The t401
                 // honest-vector purple circles are REPLACED.
                 if (planetsLib.count() >= 55) {
-                    const int rec = (selIndex % 11) * 5 + 3;  // 35px class
+                    // tA1 SIZE-CLASS CORRECTION [measured]: under the
+                    // bbox-diff law the ladder is {24,38,52,71,95} and the
+                    // DESC zone's measured chromatic extent 37x42 (t401 S8)
+                    // matches size index 1 (38) ONLY; the old "+3" fitted
+                    // the port's truncated dims read. NATIVE blit at
+                    // centre+(L,T). The GROUP axis stays the named seam —
+                    // tNG-C owns the race->planet law (D19).
+                    const int rec = (selIndex % 11) * 5 + 1;
                     const auto& pr = planetsLib.record(rec);
                     blitShape(ren, planetsLib, rec,
-                              kDescPlanetCentre.x - int(pr.width) / 2,
-                              kDescPlanetCentre.y - int(pr.height) / 2);
+                              kDescPlanetCentre.x + pr.left,
+                              kDescPlanetCentre.y + pr.top);
                 }
                 if (raceflagLib.count() > 0 && selIndex >= 0 &&
                     selIndex < raceflagLib.count())
@@ -660,18 +673,20 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     SDL_RenderFillRect(ren, &band);
                 }
                 if (specnum < rosterCount()) {
-                    // t423c: RACELIST row rings = racering k7 (NEUTRAL
-                    // grey record) at 2x [verified: row ring edges on the
-                    // pinned original are greys 35..186 with ZERO chroma
-                    // (C2-F6); racering k7 = (28,28,28)+(165,165,165)].
-                    // The DESC ring above is k<playerColourIdx> — the lib
-                    // is 8 colour-tinted rings (C2-F5). Vector fallback
+                    // tA1 BBOX-DIFF LAW (supersedes the t423c 2x reading):
+                    // racering k7 content = 109x109 at (L,T)=(-55,-55),
+                    // smrace content = 100x100 at (-50,-50) — NATIVE blits
+                    // anchored at the row centre reproduce the MEASURED
+                    // vendor art exactly (ring band r50..55, disc ~98-100;
+                    // docs/re/_wip_tA1.md F2 witness 4). Vector fallback
                     // only when the lib is unavailable.
                     bool ringDrawn = false;
-                    if (raceringLib.count() > 7)
-                        ringDrawn = blitShapeScaled(ren, raceringLib, 7,
-                                                    kRacePortraitCx - 53,
-                                                    cy - 53, 2);
+                    if (raceringLib.count() > 7) {
+                        const auto& rr = raceringLib.record(7);
+                        ringDrawn = blitShape(ren, raceringLib, 7,
+                                              kRacePortraitCx + rr.left,
+                                              cy + rr.top);
+                    }
                     if (!ringDrawn) {
                         SDL_SetRenderDrawColor(ren, kBevel.r, kBevel.g,
                                                kBevel.b, 255);
@@ -684,14 +699,9 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                         }
                     }
                     if (const auto* pl = portraitFor(specnum)) {
-                        const int d = int(pl->record(0).width) *
-                                      kRacePortraitScale;  // 98 inside r53
-                        // t414: ring-clipped disc (was a square 98x98
-                        // whose corners overflowed the ring — the user's
-                        // "race images are all 4x size").
-                        blitShapeCircular(ren, *pl, 0,
-                                          kRacePortraitCx - d / 2, cy - d / 2,
-                                          kRacePortraitScale, kRaceRingR);
+                        const auto& pr0 = pl->record(0);
+                        blitShape(ren, *pl, 0, kRacePortraitCx + pr0.left,
+                                  cy + pr0.top);
                     }
                 }
             }

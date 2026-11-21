@@ -180,9 +180,11 @@ TEST(cam3d_t399_digit_faces_identity_law) {
         w[d] = int(r.width);
         CHECK(r.height >= 30);  // tall faces = the LARGE day-counter digits
     }
-    CHECK(w[1] == 18);
+    // tA1 bbox re-cite (k55..k64 verbatim): the thin "1" is 9 px; the
+    // rest 18..25 (the old 18/24 split was the R,B-corner misparse).
+    CHECK(w[1] == 9);
     for (int d = 0; d < 10; d++)
-        if (d != 1) CHECK(w[d] >= 24);
+        if (d != 1) CHECK(w[d] >= 18);
     // decoded ink exists (a dims-zero/undecodable face fails here)
     std::vector<uint8_t> px;
     for (int d = 0; d < 10; d++) {

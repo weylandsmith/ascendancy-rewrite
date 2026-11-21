@@ -780,3 +780,18 @@ Region located + indirection law; the n>4 angle question NOT yet settled.
   obj+0x63e/0x640.
 - Trig: FUN_00077514 fsin wrapper, 0x77556 sin wrapper, 0x5324c rotate
   (sin+cos pair from 0x7754a/0x77556). Only 5 fsin sites total in the image.
+
+## tA1 BLIT-SCALE / BBOX-DIFF DIMS LAW LANDED (2026-11-21, _wip_tA1.md)
+THE bug family behind D19's "top left quadrant of a 4x-size render": the
+port read .shp record dims from the WRONG header words (u32@rec+0 k0 /
+u32@rec+0x10 k>=1 — actually the canvas pair or the bbox's R,B corner),
+then compensated with fake 2x scales. TRUE LAW [verified FUN_00061058 +
+FUN_0006108c + FUN_0005d5a1 decompiles + exact-span census 1413/1436]:
+dims = (R-L+1, B-T+1) of the signed bbox quad at stream-0x10; placement
+dest = caller anchor + (L,T); content dims == measured vendor drawn size
+1:1 (suns k1 130x127 vs drawn 130x126; racering 109 vs band r50..55;
+smrace 100x100 vs art 94..101; planets k1 38 vs zone 37). All named art
+sites now NATIVE blits (no scale); format Record carries left/top. The
+affine blitter's internal 16.16 scale semantics stay a NAMED SEAM (not
+needed: 1:1 reproduces every measured witness). Dims-law pins re-cited
+suite-wide; ctest 100%. tA1 CLOSE (diff harness + 1:1 renders) owed.

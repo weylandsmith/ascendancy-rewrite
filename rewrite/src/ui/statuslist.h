@@ -182,7 +182,7 @@ inline constexpr Rect kStatusScrollCol{619, 48, 638, 476};
 // => the row art blits at 2x (blitShapeScaled path). Drawn-centre anchors
 // are MEASURED on the t3 capture (warm-px bbox row0 x16..145 y59..184;
 // blue bbox x174..~240 y66..155; rows 1/2 centres agree within +-3 px):
-inline constexpr int kStatusArtScale = 2;      // 2x blit (F5)
+inline constexpr int kStatusArtScale = 1;      // tA1: bbox dims == drawn
 inline constexpr int kStatusSunCx = 80;        // sun centre x (row-rel 0)
 inline constexpr int kStatusSunCy = 64;        // sun centre y offset
 inline constexpr int kStatusPlanetCx = 215;    // planet centre x

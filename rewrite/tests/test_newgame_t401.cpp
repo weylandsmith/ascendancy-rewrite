@@ -111,10 +111,11 @@ TEST(newgame_t401_geometry_constants) {
     CHECK(au::kBeginEmblemRect.y1 <= au::kBeginNewGameBtn.y1);
     CHECK(au::kBeginDotsBand.x0 >= au::kBeginNewGameBtn.x0);
     CHECK(au::kBeginDotsBand.x1 < au::kBeginEmblemRect.x0);  // dots LEFT
-    // RACELIST portrait: scaled 98 fits the r53 ring's bounding box, and
-    // the ring centre x is inside the list interior.
-    CHECK(au::kRacePortraitScale == 2);
-    CHECK(49 * au::kRacePortraitScale / 2 <= au::kRaceRingR);
+    // tA1 BBOX-DIFF LAW: the class scale is 1 (vendor blits content
+    // native); the 100-px smrace content disc sits inside the r53 ring
+    // bounding box, and the ring centre x is inside the list interior.
+    CHECK(au::kRacePortraitScale == 1);
+    CHECK(100 / 2 <= au::kRaceRingR + 1);
     CHECK(au::kRacePortraitCx > au::kRaceList.x0 &&
           au::kRacePortraitCx < au::kRaceList.x1);
     // Texture bands fit the display; right band starts RIGHT of the field
@@ -177,8 +178,8 @@ TEST(newgame_t401_raceflag_crest_class) {
     }
     CHECK(lib.count() == 21);
     for (int i = 0; i < lib.count(); i++) {
-        CHECK(lib.record(i).width == 14);
-        CHECK(lib.record(i).height == 24);
+        CHECK(lib.record(i).width == 15);  // tA1 bbox (L,T)=(0,0)
+        CHECK(lib.record(i).height == 25);
     }
 }
 
@@ -240,10 +241,10 @@ TEST(newgame_t401_portrait_smrace_decodes) {
             continue;
         }
         CHECK(lib.count() >= 1);
-        CHECK(lib.record(0).width == 49);
-        CHECK(lib.record(0).height == 49);
+        CHECK(lib.record(0).width == 100);  // tA1 bbox (-50,-50,49,49)
+        CHECK(lib.record(0).height == 100);
         std::vector<uint8_t> px;
         CHECK(lib.decode(0, px));
-        CHECK(px.size() == size_t(49) * 49);
+        CHECK(px.size() == size_t(100) * 100);
     }
 }

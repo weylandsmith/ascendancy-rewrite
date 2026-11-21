@@ -145,17 +145,38 @@ bool ShapeLibrary::parse(std::vector<uint8_t> img, std::string* err) {
     }
     records_.clear();
     records_.reserve(count);
+    // tA1 BBOX-DIFF DIMS LAW [verified decompile FUN_00061058 @0x61058:
+    // dims = (short)[hdr+0x10]-[hdr+8]+1, (short)[hdr+0x14]-[hdr+0xc]+1 --
+    // the DIFFERENCE of the signed bbox quad; FUN_0006108c returns the
+    // (L,T) corner and FUN_0005d5a1 places dest = anchor + (L,T)] plus the
+    // exact-span census over all 165 libraries (scripts/ta1_dims_law.py +
+    // this-session krule run: bbox-at-stream-0x10 law completes EXACTLY on
+    // 1403/1436 records; the old u32-pair law matched 31 -- every one of
+    // those is the R,B corner or canvas half of the SAME quad re-read, and
+    // all 31 still complete under the new law; witness: suns k1 header
+    // verbatim (149,149,75,75 | -67,-63,62,63) -> content 130x127 == the
+    // MEASURED drawn sun 130x126, while the old (62,63) read walked short
+    // and produced the top-left slice the user reported as "top left
+    // quadrant of a 4x-size render" (D19)).
+    // Record layout: k==0 stream at rec+0x08, bbox quad at stream-0x10;
+    //              k>=1 stream at rec+0x18 (canvas header first), bbox
+    //              quad at rec+0x08. Placement offsets = (L,T).
     for (uint32_t k = 0; k < count; ++k) {
         const uint32_t rec = starts[k];
         const uint32_t nxt = k + 1 < count ? starts[k + 1]
                                            : uint32_t(img_.size());
-        const uint32_t d_off = k == 0 ? rec : rec + 0x10;
         const uint32_t s_off = k == 0 ? rec + 8 : rec + 0x18;
-        if (d_off + 8 > img_.size() || s_off > nxt)
+        const uint32_t b_off = s_off - 0x10;
+        // k0's quad lives at rec-0x08 == the final directory slot (measured:
+        // the u64 "directory entries" double as rec0's metadata); k>=1's at
+        // rec+0x08. Only image bounds apply.
+        if (b_off < 0x10 || b_off + 16 > img_.size() || s_off > nxt)
             return fail("record header out of span");
         Record r;
-        r.width = rd32(img_, d_off);
-        r.height = rd32(img_, d_off + 4);
+        r.left = rd32s(img_, b_off);
+        r.top = rd32s(img_, b_off + 4);
+        r.width = uint32_t(rd32s(img_, b_off + 8) - r.left + 1);
+        r.height = uint32_t(rd32s(img_, b_off + 12) - r.top + 1);
         r.start = rec;
         r.end = nxt;
         r.stream = s_off;

@@ -64,9 +64,9 @@
 namespace ascend::ui {
 
 inline constexpr int kSpeciesRowFlagDx = 14, kSpeciesRowFlagDy = 3;
-inline constexpr int kSpeciesPortraitScale = 2;   // class scale (t401 law)
-inline constexpr int kSpeciesPortraitClipR = 49;  // disc r (smrace 49 x2/2)
-inline constexpr int kSpeciesRingHalf = 53;       // racering 53x53 at 2x
+inline constexpr int kSpeciesPortraitScale = 1;   // tA1: native bbox dims
+inline constexpr int kSpeciesPortraitClipR = 50;  // disc r (content 100)
+inline constexpr int kSpeciesRingHalf = 55;       // racering content 109
 inline constexpr int kSpeciesRingRadius = 170;    // [t441 T6] slot circle r, px
 
 struct SpeciesRow {

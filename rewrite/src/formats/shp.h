@@ -77,6 +77,8 @@ class ShapeLibrary {
     struct Record {
         uint32_t width = 0;
         uint32_t height = 0;
+        int32_t left = 0;   // bbox L (content offset from the caller anchor)
+        int32_t top = 0;    // bbox T
         uint32_t start = 0;   // header offset in the image
         uint32_t end = 0;     // exclusive span end
         uint32_t stream = 0;  // RLE stream start

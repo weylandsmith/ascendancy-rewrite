@@ -1293,19 +1293,20 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     const int spec =
                         o < int(specnumOf.size()) ? specnumOf[size_t(o)] : -1;
                     if (const auto* pl = speciesPortraitFor(spec)) {
-                        const int d = int(pl->record(0).width) *
-                                      kSpeciesPortraitScale;  // 49 -> 98
-                        blitShapeCircular(ren, *pl, 0, ps.x - d / 2,
-                                          ps.y - d / 2,
-                                          kSpeciesPortraitScale,
-                                          kSpeciesPortraitClipR);
+                        // tA1 BBOX-DIFF LAW: smrace content 100x100 at
+                        // (L,T)=(-50,-50); NATIVE native-size blit at the
+                        // slot centre reproduces the measured t436 art disc
+                        // (the old 2x was the port's dims misparse).
+                        const auto& pr0 = pl->record(0);
+                        blitShape(ren, *pl, 0, ps.x + pr0.left,
+                                  ps.y + pr0.top);
                     }
                     const int ring = raceColours[o] < 7 ? raceColours[o] : 7;
-                    if (raceringLib.count() > ring)
-                        blitShapeScaled(ren, raceringLib, ring,
-                                        ps.x - kSpeciesRingHalf,
-                                        ps.y - kSpeciesRingHalf,
-                                        kSpeciesPortraitScale);
+                    if (raceringLib.count() > ring) {
+                        const auto& rr = raceringLib.record(ring);
+                        blitShape(ren, raceringLib, ring, ps.x + rr.left,
+                                  ps.y + rr.top);
+                    }
                 }
             }
         }
@@ -1760,11 +1761,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     if (sunLibIdx < 8 && kLibs[sunLibIdx].count() > 0) {
                         const int sel = statusSunSelector(s.type);
                         if (sel >= 0 && sel < int(kLibs[sunLibIdx].count())) {
+                        // tA1: suns content dims ARE the measured drawn
+                        // size (k1 bbox 130x127 == measured 130x126 sun);
+                        // NATIVE blit at centre+(L,T), no 2x.
                         const auto& sr = kLibs[sunLibIdx].record(sel);
-                        blitShapeScaled(ren, kLibs[sunLibIdx], sel,
-                                        kStatusSunCx - int(sr.width),
-                                        y + kStatusSunCy - int(sr.height),
-                                        kStatusArtScale);
+                        blitShape(ren, kLibs[sunLibIdx], sel,
+                                  kStatusSunCx + sr.left,
+                                  y + kStatusSunCy + sr.top);
                         }
                     }
                     // t427 BLIT #3 FLAG (raceflag.shp, slot [0x6fd84]=32
@@ -1788,11 +1791,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     const int prec = statusPlanetSelector(typeIdx, sizeIdx);
                     if (planetLibIdx < 8 && kLibs[planetLibIdx].count() == 55 &&
                         prec >= 0) {
+                        // tA1: content bbox == drawn size (k3 bbox 71x71 ==
+                        // the measured ~70px Large planet); NATIVE, no 2x.
                         const auto& r = kLibs[planetLibIdx].record(prec);
-                        blitShapeScaled(ren, kLibs[planetLibIdx], prec,
-                                        kStatusPlanetCx - int(r.width),
-                                        y + kStatusPlanetCy - int(r.height),
-                                        kStatusArtScale);
+                        blitShape(ren, kLibs[planetLibIdx], prec,
+                                  kStatusPlanetCx + r.left,
+                                  y + kStatusPlanetCy + r.top);
                     }
                     // line 1 + line 2 (the cited assembly)
                     std::string pname = s.name;

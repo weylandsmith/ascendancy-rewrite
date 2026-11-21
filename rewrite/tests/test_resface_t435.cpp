@@ -39,8 +39,9 @@ TEST(research_pan_faces_are_20res_records_0_to_3_t435) {
         // children [measured]: 539-524=15 == k0.w, 554-540=14 == k1.w,
         // 593-563=30 == k2.w, 472-458=14 == k3.w (the +1-inclusive reading
         // fails all four; the vendor blit uses the record dims regardless).
-        CHECK(int(rec.width) == c.r->x1 - c.r->x0);
-        CHECK(int(rec.height) == c.r->y1 - c.r->y0);
+        // tA1: content == full inclusive rect under the bbox law.
+        CHECK(int(rec.width) == c.r->x1 - c.r->x0 + 1);
+        CHECK(int(rec.height) == c.r->y1 - c.r->y0 + 1);
         std::vector<uint8_t> px;
         CHECK(lib.decode(c.frame, px));
         CHECK(px.size() == size_t(rec.width) * rec.height);

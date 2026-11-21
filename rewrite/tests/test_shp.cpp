@@ -190,12 +190,14 @@ TEST(shp_span_free_t197) {
         CHECK(top_content);  // the orb glyph rows ARE painted
     }
 
-    // (3) Garbage dims still rejected despite the unbounded walk:
-    // 1starmap k1 dims word 0x7ffffdbb-class (no negative bbox anchor).
-    // t367 AMENDMENT: mouse k6/k7 formerly asserted REJECT here; under the
-    // D1 keep ruling + the corner-anchor gate fallback (shp.md S28) they
-    // decode at 78x47 — see TEST(shp_corner_anchor_fallback_t367).
-    { std::vector<uint8_t> px; CHECK(!star.decode(1, px)); }
+    // (3) tA1 CORRECTION: 1starmap k1 is the 0x7FFFFFBB header VARIANT
+    // (shp.md S3, unmodelled): its bbox quad reads 3x3 degenerate and the
+    // stream walks — it DECODES as a 3x3 placeholder (the old reject was
+    // an artifact of the R,B-corner misparse reading 0x7ffffdbb as dims).
+    { std::vector<uint8_t> px;
+      CHECK(star.decode(1, px));
+      CHECK(px.size() == size_t(star.record(1).width) *
+                             star.record(1).height); }
 
     // (4) 14intel k8 + 1starmap k3/k4/k6 (the other X members) decode.
     ShapeLibrary intel;
@@ -269,16 +271,18 @@ TEST(shp_corner_anchor_fallback_t367) {
     // naive bbox read would rescue them. cos_star k40..k51 zero headers,
     // sg50expl k9 1x1 bbox, 1starmap k1 no negative anchor.
     ShapeLibrary cos, sg50;
+    // tA1 CORRECTION: the cos_star k40..k51 "zero-header" class and
+    // sg50expl k9 are 1x1 DEGENERATE PLACEHOLDERS under the bbox law
+    // (quads verbatim R=L+1,B=T+1); they decode to 1x1 planes. The old
+    // reject asserted garbage u32 dims, not a vendor gate.
     CHECK(cos.load(kA01 + "cos_star.shp", &err));
     for (int k = 40; k <= 51; ++k) {
         std::vector<uint8_t> px;
-        CHECK(!cos.decode(k, px));
+        CHECK(cos.decode(k, px));
+        CHECK(px.size() == 1u);
     }
     CHECK(sg50.load(kA01 + "sg50expl.shp", &err));
-    { std::vector<uint8_t> px; CHECK(!sg50.decode(9, px)); }
-    ShapeLibrary star;
-    CHECK(star.load(kA01 + "1starmap.shp", &err));
-    { std::vector<uint8_t> px; CHECK(!star.decode(1, px)); }
+    { std::vector<uint8_t> px; CHECK(sg50.decode(9, px)); CHECK(px.size() == 1u); }
 
     // (5) k4 stays on the CANONICAL gate (dims 77x46 valid): the fallback
     // never runs for it. Its canonical plane differs from the 78x47 plane
@@ -286,5 +290,7 @@ TEST(shp_corner_anchor_fallback_t367) {
     std::vector<uint8_t> p4;
     CHECK(mous.decode(4, p4));
     CHECK(p4.size() == size_t(mous.record(4).width) * mous.record(4).height);
-    CHECK(mous.record(4).width == 77u && mous.record(4).height == 46u);
+    // tA1 BBOX-DIFF LAW: k4 bbox (0,0,77,46) -> content 78x47 exactly;
+    // the canonical gate is the bbox itself, so k4 needs no fallback.
+    CHECK(mous.record(4).width == 78u && mous.record(4).height == 47u);
 }

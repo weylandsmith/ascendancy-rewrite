@@ -69,8 +69,8 @@ TEST(mapctl_t425c_every_toggle_face_carries_the_well_as_background) {
         CHECK(ok);
         if (!ok) continue;
         const auto& rec = lib.record(frame);
-        CHECK(int(rec.width) == 30 && int(rec.height) == 30);
-        CHECK(int(px.size()) == 900);
+        CHECK(int(rec.width) == 31 && int(rec.height) == 31);  // tA1 bbox
+        CHECK(int(px.size()) == 961);
         int well = 0;
         for (size_t k = 0; k < px.size(); k++)
             if (px[k] == uint8_t(kToggleWellIdx)) well++;
@@ -78,7 +78,7 @@ TEST(mapctl_t425c_every_toggle_face_carries_the_well_as_background) {
         // 577. The substitution only ever touches these pixels, so the well
         // count is also the number of pixels the state law can change.
         CHECK(well >= 500);
-        CHECK(well < 900);  // never the whole face: the glyph must survive
+        CHECK(well < int(px.size()));  // never the whole face: glyph survives
     }
 }
 
