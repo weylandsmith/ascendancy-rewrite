@@ -144,3 +144,45 @@ scripts/t441_screen_diff.py (region table + dims assertion + presence mass,
 G2), witness newgame + planets-list renders at 1:1 (quadrant signature
 GONE), mutation-verify each changed constant. Honest status: LAW LANDED,
 CLOSE UNVERIFIED — tA1 stays open, next row finishes it.
+
+## F6 — tA1-CONT CLOSE: G2 HARNESS + WITNESSES + MUTATION [verified this session]
+(1) scripts/t441_screen_diff.py EXISTS (G2 home; region tables newgame +
+    planetslist). Contract: the port prints one-shot
+    `ui dimscheck <name> W H x y` at each gated blit (title.cpp 5 sites:
+    desc-ring/desc-portrait/desc-planet/racelist-row{0,1,2}-{ring,portrait};
+    ui.cpp 2 sites: row{i}-sun/row{i}-planet). The harness crops OUR render
+    at the declared rect and asserts the measured content bbox FILLS it
+    (>=0.85 cited, <= cited+2) — the quadrant signature (~0.5*cited slice)
+    FAILS by construction. Vendor side: presence mass + cited-ladder/fixed
+    witness (crops come from DIFFERENT campaign states by design — content
+    equality is NOT asserted; content-index laws stay tNG-C/tPL-C).
+    Vendor crops banked: scratchpad/newgame-original.png (643x481 browser
+    shot, game rect law +1,+1 CONFIRMED by texture-band scan texL/R 1.000)
+    + work/r1/loop/vendor-planetslist-t3-640.png (t3 capture game rect
+    rows100..579 cols80..719 per t417 F1).
+(2) VERDICTS: newgame 7/7 PASS — racelist rows ours ring 109x109 == cited
+    RACERING (vendor 111 incl. AA-class greys), portrait 100x100 == SMRACE
+    both sides, desc-ring 107x106 both sides (band, not full circle),
+    desc-planet ours 37x38 on ladder {24,38,52,71,95} (vendor 47x51 = its
+    own species/size), QUADRANT SIGNATURE GONE (drawn dims fill the cited
+    rect on every region). planetslist 2/2 PASS — ours row0 sun 107x107
+    (suns k8) on ladder, vendor 130x126 (k1, different star) on ladder;
+    ours planet 37x38 on ladder, vendor 68x69 (tol 6) on ladder rung 71.
+    Row0-planet vendor rect re-anchored y80..160 (y60 top pulled in the
+    header divider line at y66-68 -> false 71x88; the sphere band is
+    y87..156).
+(3) MUTATION 9/9 CAUGHT (checkpoint commit d719e33 first, restore md5-
+    verified each step): M1 kRacePortraitScale 1->2 (t401), M2
+    kStatusArtScale 1->2 (t427), M3 kSpeciesPortraitScale 1->2 (t436),
+    M4 kFieldRecordW 626->625 (t428d), M5 kSpeciesPortraitClipR 50->52
+    (t436), M6 kSpeciesRingHalf 55->53 (t436), M7 poppanel want k2
+    6x9->7x9 (t263), M8 stripGauge width 108->107 (t428), M9
+    kFieldRecordH 358->357 (t428d). AFTER-RESTORE build 0; ctest 100%.
+(4) ROOT-CAUSE CHECKS the assignment named: DESC-planet SIZE index +1 is
+    CONFIRMED by the harness (ours 37x38 fills the 38 cited rect; the old
+    +3 class 71 could not have); the DESC-planet GROUP seam stays named
+    (tNG-C owns race->planet law). No site rendered wrong this session.
+    HONEST LIMIT: the vendor crops are different campaign states, so this
+    CLOSE proves the SCALE LAW (dims fill cited rect + vendor on ladder),
+    not pixel equality vs these crops; the tNG-U user-grade park does the
+    side-by-side vision on the same state.

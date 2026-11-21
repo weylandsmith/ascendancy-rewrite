@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-21T02:40
+updated: 2026-11-21T04:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,35 +233,39 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tA1-CONT = FINISH THE tA1 BLIT-SCALE CLOSE (STAGE A; the LAW LANDED
-tA1 — see the tA1 LANDED block below and docs/re/_wip_tA1.md F5; ordering
-rationale: the quadrant-family law is in the tree but UNVERIFIED at the
-composite level, and G2's harness scripts/t441_screen_diff.py does not
-exist yet — tNG-C/tPL-C cannot grade until it does. Do NOT start tA2).
-DO, in order:
-(1) BUILD scripts/t441_screen_diff.py (region table: name, rect, expected
-    palette classes, drawn-dims-vs-cited assertion, art-presence mass;
-    per-region diff report; exit code = gate). Inputs: our render at
-    640x480 (Xvfb :9 root grab per G5 — NEVER Athens shots for scale)
-    + the refcap crop for the same region.
-(2) RENDER witnesses: newgame (portrait circle, species column rows, DESC
-    planet) and planets-list (sun+planet row art) via the existing shot
-    scripts (t412_newgame_shot.sh pattern); assert the quadrant signature
-    is GONE and drawn dims == bbox dims (smrace 100, racering 109, suns
-    selector bbox, planets selector bbox).
-(3) MUTATION-VERIFY each changed constant (kRacePortraitScale,
-    kStatusArtScale, kSpeciesPortraitScale/ClipR/RingHalf,
-    kFieldRecordW/H, poppanel want-table, stripGauge width 108): flip it,
-    the pin must fail, restore.
-(4) BANK the witness verdicts in _wip_tA1.md; if a site renders wrong,
-    root-cause it (G6) — the DESC-planet SIZE index +3->+1 guess and the
-    DESC-planet GROUP seam are the two most likely defect carriers.
-(5) LEDGER: seam work, touches no OQ row.
-GAME STATE tA1-CONT STARTS FROM: production pid 1182156 HEALTHY (TL expiry
+NEXT tA2 CHROME LAW ROUND 2 (PHASE-17 STAGE A second row; verbatim in the
+PHASE-17 QUEUE below. Ordering rationale: D19 Stage-A-first ruling — tA1
+(blit-scale/bbox-dims) CLOSED tA1-CONT (LANDED block below: harness green,
+9/9 mutation, quadrant family gone on both gated screens), so the next
+global law is chrome (mineral texture, single-layer, bevel direction);
+tA3 text follows; per-screen C-gates (tNG-C) run only after Stage A.
+Trigger check FIRST: USER: lines after the D19 block in docs/DECISIONS.md win.
+DO, in order (queue items a-d; extend scripts/t441_screen_diff.py region
+table with chrome-band regions — NEVER re-home the harness):
+(1) DOUBLE-LAYER HUNT: grep the paint path for BOTH the t426 gradient band
+    and the legacy splitmix/static chrome call sites; identify which screen
+    paints both (D19: "almost-right bar laid ON TOP of the older rougher
+    frame"). Fix = ONE renderer, one pass (G6). Verify with a paint-order
+    log line or debugger breakpoint at both sites.
+(2) BAR EXTENT: measure the vendor top-bar extent at 1:1 from refcap crops
+    ONLY (G5; our top bar is 1-2px short per D19) — cite, fix, pin.
+(3) MINERAL CHARACTER: correlation-length census (run-length 2-D, lag-1/2
+    h+v per band; _wip_t422 data + chrome.md) vendor vs ours; tune Markov
+    params toward the mineral signature; if params cannot reach it, bank the
+    measured gap as the named ceiling (D18 ruling; no guessing).
+(4) BEVEL LAW: derive RAISED (light top/left, dark bottom/right) from
+    refcap edge pixels, cite, implement ONE drawBevel used by all frames.
+CLOSE (queue): single-layer verified, dims match, bevel cited+applied on
+newgame + map + title, t441_screen_diff chrome-band regions PASS on those
+screens (build the band regions as part of this row).
+GAME STATE tA2 STARTS FROM: production pid 1182156 HEALTHY (TL expiry
 2026-11-22 12:02:26, watcher 1182171), ring turn 1086 on 20/20 saves
 (scripts/t368_ring_turn.py = the sitting test; turn > 1086 -> re-run
 scripts/r1_t85g_sitting.py FIRST). Ghidra headless :8089 UP, analyzed.
-Trigger check FIRST: USER: lines after the D19 block in DECISIONS.md win.
+LEDGER: seam work, touches no OQ row (open=[016,019] unchanged since t440).
+WITNESS CROPS banked for G1/G2: scratchpad/newgame-original.png (game rect
++1,+1), work/r1/loop/vendor-planetslist-t3-640.png; harness
+scripts/t441_screen_diff.py usage + dimscheck contract: docs/re/_wip_tA1.md F6.
 
 --- SUPERSEDED tA1 ASSIGNMENT (law landed; only the CLOSE remains above) ---
 NEXT tA1 BLIT-SCALE LAW (PHASE-17 STAGE A FIRST — see the PHASE-17 QUEUE row tA1 verbatim; ordering rationale: user D19 ruling 2026-11-20 — one blit-scale law explains the quadrant family on newgame portrait/species column/planet art AND planets-list art; fix the law before per-screen content gates). Trigger check FIRST: USER: lines after the D19 block in docs/DECISIONS.md win.
@@ -311,6 +315,36 @@ Phase-Bomb fleet built first); OQ-019 = user acceptance of the per-ship sim +
 debugger-class witness (t298 budget law, REFUTED-ROUTES.md:465-467). RULING
 CHECK t441: find work/r1/d1page -newermt 2026-11-20 11:52 = EMPTY -> D2/OQ-019
 acceptance still PENDING. NO GIT REMOTE (deliverables = local commits).
+
+tA1-CONT LANDED 2026-11-21 (BLIT-SCALE CLOSE — tA1 CLOSED; harness built,
+witnesses green, mutation-verified; ledger open=[016,019] unchanged, seam
+work). (i) scripts/t441_screen_diff.py BUILT (G2 single home; region tables
+newgame 7 regions + planetslist 2). CONTRACT: port prints one-shot "ui
+dimscheck <name> W H x y" (cited bbox dims + dest anchor) at each gated
+blit — title.cpp x5 (desc ring/portrait/planet, racelist rows), ui.cpp x2
+(row sun/planet); harness crops our render at the declared rect and asserts
+the measured content bbox FILLS it (>=0.85 cited, <=cited+2) — the D19
+quadrant slice (~0.5x) fails by construction; vendor side = presence mass +
+cited-ladder/fixed witness (crops are DIFFERENT campaign states by design;
+content equality is tNG-C/tPL-C territory, NOT claimed here). (ii) VERDICTS:
+newgame 7/7 PASS (ours ring 109, portrait 100x100 == vendor 99..101,
+desc-ring band 107x106 BOTH sides, desc-planet 37x38 on ladder — the +1
+size-index correction CONFIRMED by the harness), planetslist 2/2 PASS (ours
+sun 107x107 vendor 130x126 both on the suns ladder; ours planet 37x38,
+vendor 68x69 on the size ladder). QUADRANT SIGNATURE GONE on both screens.
+Vendor crop rects: newgame game-rect +1,+1 CONFIRMED by texture-band scan;
+planets row0-planet vendor rect re-anchored y80..160 (header divider at
+y66-68 contaminated the y60 top — banked as detector pitfall).
+(iii) MUTATION 9/9 CAUGHT (checkpoint commit d719e33 first; every restore
+md5-verified): kRacePortraitScale, kStatusArtScale, kSpeciesPortraitScale,
+kSpeciesPortraitClipR, kSpeciesRingHalf, kFieldRecordW, kFieldRecordH,
+poppanel want-table, stripGauge width 108. AFTER-RESTORE build 0; ctest
+100% (62s); gate.sh GATE_EXIT=0; ledger_audit rows=20 open=[016,019] OK;
+ledger_index_check OK. (iv) HONEST LIMIT banked _wip_tA1 F6: the CLOSE
+proves the SCALE LAW (fill + ladder), not pixel equality vs the crops; the
+tNG-U user-grade park does same-state side-by-side vision. F3 (affine
+scale direction) stays a named static seam — unneeded by any port site.
+(v) GAME UNTOUCHED (turn 1086 HEALTHY, sitting test run this iteration).
 
 tA1 LANDED 2026-11-21 (BLIT-SCALE / BBOX-DIFF DIMS LAW — the D19 quadrant
 family root cause; ledger open=[016,019] unchanged, seam work, CLOSE owed
@@ -2841,7 +2875,9 @@ graded):
    (e.g. quadrant-blit), fix the LAW, then verify BOTH screens in the
    same row; per-screen patches of a shared bug are rejected.
 
-tA1 BLIT-SCALE LAW (STAGE A, FIRST; user D19: portrait/species column/
+tA1 BLIT-SCALE LAW [CLOSED tA1-CONT 2026-11-21 — see the tA1-CONT
+LANDED block + _wip_tA1 F6; the harness/ladder/dimscheck contract there is what
+every later C-gate row reuses] (STAGE A, FIRST; user D19: portrait/species column/
 planet art/planets-list art = 'top left quadrant of a 4x-size render'
 clipped to circle = ONE bug family). Derive the vendor destination-size
 law per call site class: FUN_0005d5a1 is an affine STRETCH blit (t422c
