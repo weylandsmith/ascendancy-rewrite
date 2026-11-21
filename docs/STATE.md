@@ -2862,6 +2862,25 @@ index errors may remain — tNG-C/tPL-C own those).
 tA2 CHROME LAW ROUND 2 (STAGE A; user D19: texture = MINERAL (stone/
 galvanized), not static; our top bar CLOSE but 1-2px short; TWO chrome
 layers — almost-right bar laid ON TOP of the older rougher frame).
+ASSISTANT PRE-PROBE 2026-11-21 (user: planet screen frame PIXEL-PERFECT
+— 'whatever you did there, do it everywhere'; scratchpad/athens-
+comparison-t439-v-original.png): the planet frame is pixel-perfect
+because it BLITS 17np.shp k0 (ui.cpp:1613) — the method = find the
+vendor record, never synthesize. CENSUS (165 libs, scripts/
+tA1_chrome_backdrop_probe.py): full-screen 639x479 records exist ONLY
+in 10status/17np/2savegam/4loadgam; the two decoded ones share only
+20.2% of overlapping opaque px = per-screen ART, not one global frame.
+=> PRIMARY ROUTE for tA2: hunt the chrome ART for record-less screens
+(map/newgame/species/research): candidates (a) per-window SHAPEFRAME
+widget-lib records the winmgr tiles (cross-check windows.txt SHAPEFRAME
+values x 1starmap/3cfgnew/7racesel record dims), (b) winmgr backdrop
+paint FUN (debugger RUNWATCH on the band region, scratch game —
+blanket grant). PITFALLS banked: pinned refcap = direct 640x480 (NO
++40 offset — that's scratchpad-only; my first probe mis-aligned on
+this and got a phantom 0%); xcorr scripts on disk =
+scripts/tA1_chrome_{backdrop_probe,xcorr}.py (fix alignment, re-run
+before ANY new chrome synthesis is considered; t422c no-rand-in-paint
++ t433 zero-capture now READ AS 'art not yet found', not 'generated').
 (a) FIND + REMOVE the double paint: grep the paint path for both the
 t426 gradient band AND the legacy splitmix/static call sites; one
 chrome renderer, one pass (G6). (b) bar width: measure the vendor top
