@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-21T16:20
+updated: 2026-11-21T18:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,56 +233,73 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-C3 NEW GAME CONTENT GATE CYCLE 3 — LAST CYCLE PER D18 CAP.
-(ordering rationale: tNG-C2 closed the two headline D19 seeds with cited
-laws + pins + mutation 10/10 (planet index, chip row); G2 mechanical is
-GREEN (t441 newgame 18/18 incl the two new regions); what remains of the
-tNG-C seed list is the residue below — one cycle for it, then the queue
-folds to tNG-B (G3 behavior) / tNG-U (user-grade park) regardless, since
-cycles stay capped at 2 per D18 for the SAME screen and tNG-C is at its
-cap after this. Trigger check FIRST: USER: lines after the D19 block in
-DECISIONS.md win. READ FIRST: docs/re/_wip_tNGC.md F11+F13+F14,
-docs/re/t423-newgame-law.md SS14/SS15/SS16.)
-DEFECT LIST (verbatim seeds + this session's open items):
-(1) ATMOSPHERE WHEEL ghost sliver + stray white line under
-    peaceful/neutral — tNG-C cycle 1 proved the FRAME-INDEX law matches
-    the port EXACTLY (child+0x72 = idx+10, k10/k11/k12), so the cause is
-    a DOUBLE BLIT or clip edge in OUR painter: G1 side-by-side the three
-    wheel panels (ours vs scratchpad/newgame-original.png) and find the
-    extra draw; hostile panel is the correct reference.
-(2) STAR DENSITY + SPECIES boxes extraneous art (D19 verbatim) — same
-    G1 pass on those two panels.
-(3) BEGIN NEW GAME starfield: IMPLEMENT the cited SHRUNK-VOLUME law
-    (full-field coords /5 + 5; idiv 5 at 0x527a4/0x527c9; sprite-class
-    law body 0x52787..0x5282f banked _wip_tNGC F11: value>0 -> class 1,
-    <=-220 -> class 2, else 0; record [eax+0xab] via 0x5caac) — the port
-    still draws N=kDensityStarCounts[idx] random points (t423 SS4).
-    Thick BEVELED green ring on the same panel (D19) rides along.
-(4) SELECTED-CHIP GREYS mechanism: the white hlines law is pinned
-    (434/458), the vline greys (164,171,177)/(225,227,229) draw at
-    measured positions but their SOURCE (button chrome vs FUN_0002fe04
-    args — decompile shows 4 x FUN_0005bf71, color param 0xf3, unaff_EBX
-    garbage) is undecidable statically; ONE probe: our render vs refcap
-    pixel-diff of chip0 zone rows 435..457 at x 381/395 — if exact,
-    close as measured-position law; if not, chrome hypothesis -> map
-    chrome family lookup.
-CLOSE = G1 (side-by-side vision pass on the three panels + chip zone) +
-G2 (t441 newgame stays 18/18; add wheel-panel regions if the G1 pass
-names them). If defects remain after tNG-C3 -> fold to tNG-B/tNG-U with
-the list verbatim (D18 cap; do NOT open tNG-C4).
+NEXT tNG-B PHASE-17 G3 (BEHAVIOR) OPENING CYCLE — the tNG-C content
+queue is CLOSED at the D18 cap after tNG-C3 (3 cycles, same screen
+family; the fold is MANDATORY, do NOT open tNG-C4).
+(ordering rationale: tNG-C3 closed defects 3+4 with cited
+measurements/implementation and 1+2 as honest NOT-REPRODUCING negatives
+(docs/re/_wip_tNGC.md F15); what remains of tNG-C is a polish list with
+NO cited-law content left to measure — it rides into tNG-U. Pipeline
+per D19 ruling: framing -> content -> BEHAVIOR -> polish. G1 (vision)
+and G2 (mechanical t441 18/18) are green on newgame; the screen's
+behavior layer is untouched: wheel clicks must drive the BUILT galaxy
+(density -> star count law word[obj+0x572] == the Begin starfield count
+ALREADY implemented, so the density wheel -> mapgen link is the first
+B3 row), species wheel -> player count, atmosphere -> intro section
+(t412 wires pick+atmosphere but the wheels do NOT rebuild the preview
+galaxy). READ FIRST: docs/re/_wip_tNGC.md F15 close-out (fold list),
+rewrite/src/ui/title.cpp Begin block (c), docs/re/t423-newgame-law.md
+SS14/SS15/SS16.)
+B-SEED LIST (verbatim residues from tNG-C3, in priority order):
+(B1) density wheel -> preview galaxy REBUILD (kDensityStarCounts rung ->
+    regenerate mapgen preview; the Begin starfield + summary counts must
+    follow the wheel — currently only the label/word changes; cite law
+    FUN_000226e4 setter census F6).
+(B2) species wheel -> roster/player-count behavior seam.
+(B3) wheel ANCHOR polish (1-2px offsets F15-1: atmos ours = vendor
+    +(+2,+2), density (-1,+1)) — cheap, do inside B1's file touch.
+(B4) Begin K-family seam: which cos_star colour family (rec = 4K+cls)
+    per state — needs a vendor capture of a warm-star galaxy New Game
+    screen (playcap drive, NOT a new long capture; scratchpad refcap is
+    one seed only).
 HINTS THIS SESSION LEARNED (reuse, don't rediscover): ctest verdict =
-EXIT CODE ONLY ("0 tests failed out of 1" contains "tests failed" — the
-launch guard caught itself); mutation campaign launches on a GREEN suite
-only and runs background+notify; chip/wheel work: raceflag 15x25 bbox
-(0,0), smhome 52x52 bbox (-24,-26) — F13 census; browser-crop law =
-im[1:481,1:641]; python = ~/tools/revenv/bin/python; dimsCheck prints
-ONCE per name per process (region harness reads app.log).
-GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 on 20/20
-saves (scripts/t368_ring_turn.py re-verified this iteration — the sitting
-test; timeline growth is NOT the signal). turn > 1086 -> re-run
-scripts/r1_t85g_sitting.py FIRST. Ghidra :8089 UP, program analyzed
-(FUN_0002fe04 decompiled this session; 0x53ee0/0x52xxx remain GAP fns ->
-scripts/t442_disasm.py, dumps work/tNGC_paint*.asm).
+EXIT CODE ONLY; mutation campaign on GREEN suite only; the terminal tool
+REJECTS '&' backgrounding — use scripts (t412_newgame_shot.sh captures +
+navigates the New Game screen in one shot; scripts/tNGC3_begin_sbs.py
+builds the Begin side-by-side + green-mass census; scripts/
+tNGC3_wheel_decode.py = S9 decode of 3cfgnew records); the 3cfgnew
++0x08 quad is NOT a bbox for this lib (k0 stream starts +0x08; the V/A
+law holds) — do not "fix" shp.h; python = ~/tools/revenv/bin/python;
+browser-crop law = im[1:481,1:641].
+GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 (saves
+53/54.sav re-verified this iteration — the sitting test). turn > 1086 ->
+re-run scripts/r1_t85g_sitting.py FIRST. Ghidra :8089 UP; 0x52xxx GAP
+fns disassembled via scripts/t442_disasm.py (capstone in revenv, NOT
+system python).
+tNG-C3 CYCLE 3 LANDED 2026-11-21 (LAST tNG-C CYCLE PER D18 CAP — NEW
+GAME DEFECT LIST RESOLVED: 2 closed-by-measurement+implementation, 2
+closed-as-NOT-REPRODUCING honest negatives; ledger open=[016,019]
+unchanged, seam work, NO OQ row moved — this queue has no OQ row by
+design). (i) DEFECT 4 chip-greys CLOSED as measured-position law: chip0
+vlines x381/x395 rows 435..456 pixel-EXACT vs refcap (164,171,177)/
+(225,227,229); sole diff row 457 = vendor emblem-bleed (_wip_tNGC F15-4).
+(ii) DEFECTS 1/2 wheel sliver + extraneous art NOT-REPRODUCING: stream
+decode proves the blue lens band + pal103 highlights in 3cfgnew k10/k11
+are VENDOR ART present on both sides (F15-1 a/b); residue = 1-2px anchor
+offsets -> tNG-B B3; the D19 witness pre-dated t401/t414/tNGC2 fixes.
+(iii) DEFECT 3 CLOSED: Begin starfield = cited SHRUNK-FIELD law
+implemented (every galaxy star, x=502+(mx/5)+5 grid law, static
+positions, FOUR-WAY class law 0x52817..0x5282d SUPERSEDES F11's
+three-way read, cos_star K=0 seam, clip panel) + THICK BEVELED RING
+(annulus 23.5..29 about (600,417.5), 5-rung census colours, portrait
+clipR=23 hole) — witness green-mass 933 vs vendor 847 (was 332), vision
+pass ring/hole-clip match; pure laws pinned in menulaw.h
+(beginStarPos/beginStarClass/beginRingAt). (iv) HARNESS: t441 newgame
+18/18 PASS post-change; ctest 0 failed; gate GREEN. (v) FOLD (D18):
+remaining polish list rides into tNG-B seeds B3/B4 — NO tNG-C4.
+Scripts added: tNGC3_atm_shot.sh (3-state wheel capture),
+tNGC3_k10_autopsy.py, tNGC3_wheel_decode.py, tNGC3_cosstar_census.py,
+tNGC3_begin_sbs.py.
 
 tNG-C2 CYCLE 2 LANDED 2026-11-21 (NEW GAME CONTENT IMPLEMENTED — planet
 index + chip row laws in code, pinned, mutation-proven; ledger

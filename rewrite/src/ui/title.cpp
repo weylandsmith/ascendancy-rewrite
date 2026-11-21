@@ -972,17 +972,100 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                         SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
                         SDL_RenderDrawPoint(ren, x, y);
                     }
-                // (b) emblem ring + portrait of the SELECTED species.
-                SDL_SetRenderDrawColor(ren, kLore.r, kLore.g, kLore.b, 255);
-                for (int a = 0; a < 360; a += 2) {
-                    const double rad = a * 3.14159265 / 180.0;
-                    SDL_RenderDrawPoint(
-                        ren, kBeginEmblemCentre.x + int(28 * cos(rad)),
-                        kBeginEmblemCentre.y + int(28 * sin(rad)));
+                // (c) tNG-C3 BEGIN STARFIELD (D19 seed #3; cited law body
+                // 0x526f0..0x5282f, F15-3): EVERY galaxy star (count law
+                // word[obj+0x572]) shrunk into the panel: x = mx/5 + 5,
+                // y = my/5 + 5 with (mx,my) the map pixel coords (hiword
+                // law — our 1024-grid scaled 640/480 per 1024), panel
+                // origin (502,381), clipped to kBeginPanelVisual. Sprite =
+                // cos_star record 4*K + cls (K=0 named seam, same as the
+                // map screen); FOUR-WAY class law (0x52817..0x5282d):
+                // v>220 -> 0, 0<v<=220 -> 1, -220<v<=0 -> 2, v<=-220 -> 3
+                // with v the rotated depth term (plane rotation of the
+                // shell vector by preview yaw — [inferred] formula, class
+                // ORDER is cited). Positions are STATIC (the rotation
+                // drives only the class). Drawn BEFORE the ring/portrait
+                // (refcap: no star px over the emblem disc) and after the
+                // dots.
+                if (previewCamp) {
+                    SDL_Rect clip{vis.x0, vis.y0, vis.x1 - vis.x0 + 1,
+                                  vis.y1 - vis.y0 + 1};
+                    SDL_RenderSetClipRect(ren, &clip);
+                    static double beginYaw = 0.0;
+                    beginYaw += kPreviewSpinPerFrame;
+                    for (const ascend::game::Star& s :
+                         previewCamp->galaxy().stars) {
+                        const int px = vis.x0 + (s.x * 640 / 1024) / 5 + 5;
+                        const int py = vis.y0 + (s.y * 480 / 1024) / 5 + 5;
+                        if (px < vis.x0 || px > vis.x1 || py < vis.y0 ||
+                            py > vis.y1)
+                            continue;
+                        const double rr = double(s.z);
+                        const double ang =
+                            std::atan2(double(s.y - 512), double(s.x - 512)) +
+                            beginYaw;
+                        const long v = lround(rr * std::sin(ang));
+                        const int cls = v > 220 ? 0
+                                      : v > 0   ? 1
+                                      : v > -220 ? 2
+                                                 : 3;
+                        const int rec = cls;  // K=0 named seam
+                        if (cosStarLib.count() > rec) {
+                            // bbox quad (-2,-2,2,2): content 5x5 at
+                            // (L,T); dest = anchor + (L,T) -> centred.
+                            blitShape(ren, cosStarLib, rec, px - 2, py - 2);
+                        } else {
+                            SDL_SetRenderDrawColor(ren, 225, 227, 229, 255);
+                            SDL_Rect q{px - 1, py - 1, 2, 2};
+                            SDL_RenderFillRect(ren, &q);
+                        }
+                    }
+                    SDL_RenderSetClipRect(ren, nullptr);
                 }
-                if (const auto* pl = portraitFor(scrollOffset + selSlot))
-                    blitShape(ren, *pl, 0, kBeginEmblemRect.x0,
-                              kBeginEmblemRect.y0);
+                // (b) emblem ring + portrait of the SELECTED species.
+                // tNG-C3 THICK BEVELED RING LAW (refcap census,
+                // docs/re/_wip_tNGC.md F15-3b): centre (600,417.5), OUTER
+                // diam 57 (x572..628 @ y418; rows 389..393/442..446 @
+                // x601), band 5 px. Measured radial rungs: top (out->in)
+                // (10,46,51),(0,142,69),(0,124,61),(0,113,56),(8,82,43);
+                // bottom (out->in) (0,153,74),(0,153,74),(0,142,69),
+                // (0,110,54),(5,65,43). The 1-px kLore circle r28 (the D19
+                // "1-px vs THICK BEVELED" defect) is REPLACED by the
+                // annulus r in [23.5,29] with a top/bottom bevel blend.
+                static const RGB kRingTop[5] = {{10, 46, 51}, {0, 142, 69},
+                                                {0, 124, 61}, {0, 113, 56},
+                                                {8, 82, 43}};
+                static const RGB kRingBot[5] = {{0, 153, 74}, {0, 153, 74},
+                                                {0, 142, 69}, {0, 110, 54},
+                                                {5, 65, 43}};
+                const double kcx = 600.0, kcy = 417.5;
+                for (int ry = 388; ry <= 447; ry++)
+                    for (int rx = 571; rx <= 629; rx++) {
+                        const double dx = rx - kcx, dy = ry - kcy;
+                        const double rr = std::sqrt(dx * dx + dy * dy);
+                        if (rr < 23.5 || rr > 29.0) continue;
+                        const int t =
+                            std::min(4, std::max(0, int((29.0 - rr) / 1.1)));
+                        const double bv = (dy + 29.0) / 58.0;  // 0 top 1 bot
+                        SDL_SetRenderDrawColor(
+                            ren,
+                            uint8_t(kRingTop[t].r + (kRingBot[t].r - kRingTop[t].r) * bv),
+                            uint8_t(kRingTop[t].g + (kRingBot[t].g - kRingTop[t].g) * bv),
+                            uint8_t(kRingTop[t].b + (kRingBot[t].b - kRingTop[t].b) * bv),
+                            255);
+                        SDL_RenderDrawPoint(ren, rx, ry);
+                    }
+                // Portrait clipped to the ring HOLE (refcap: the emblem
+                // fills the 47-px hole exactly, the annulus stays fully
+                // visible — the raw native blit overflowed it): smrace
+                // content 100x100 at (L,T)=(-50,-50), NATIVE at the ring
+                // centre with blitShapeCircular clipR=23 about the rect
+                // centre (vendortext.cpp clip law).
+                if (const auto* pl = portraitFor(scrollOffset + selSlot)) {
+                    const auto& pr0 = pl->record(0);
+                    blitShapeCircular(ren, *pl, 0, 600 + int(pr0.left),
+                                      417 + int(pr0.top), 1, 23);
+                }
                 const std::string lbl = "Begin New Game";  // static.txt //169
                 const int w = txt.width(lbl, true);  // tA3 BIG face
                 txt.draw(ren,

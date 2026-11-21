@@ -326,4 +326,38 @@ int loadRowAt(Pt p, int slotCount);
 bool loadPickAccepts(const std::vector<SaveSlot>& slots, int index,
                      std::string* why);
 
+// tNG-C3 BEGIN STARFIELD LAW (D19 seed #3 CLOSED; cited law body
+// 0x526f0..0x5282f, docs/re/_wip_tNGC.md F15-3): every galaxy star
+// (vendor count law word[obj+0x572]) shrinks into the Begin panel:
+// x = mx/5 + 5, y = my/5 + 5 where (mx,my) are MAP PIXEL coords (the
+// /5 inputs are the hiwords of the record's position dwords — the same
+// 0..639/0..479 space the map screen uses). OUR stars live on the
+// 1024-grid (mapgen), so mx = x*640/1024, my = y*480/1024 BEFORE the /5.
+// Positions are STATIC; rotation drives only the sprite class. Panel
+// origin = kBeginPanelVisual (502,381); draw clipped to it.
+// Returns false when the star falls outside the panel.
+inline bool beginStarPos(int gx, int gy, int* px, int* py) {
+    const int x = 502 + ((gx * 640 / 1024) / 5) + 5;
+    const int y = 381 + ((gy * 480 / 1024) / 5) + 5;
+    if (x < 502 || x > 632 || y < 381 || y > 472) return false;
+    *px = x; *py = y;
+    return true;
+}
+
+// FOUR-WAY SPRITE-CLASS LAW [verified 0x52817..0x5282d — supersedes the
+// three-way F11 read]: v>220 -> 0, 0<v<=220 -> 1, -220<v<=0 -> 2,
+// v<=-220 -> 3 (0x52817 pre-sets ecx=3; the cmp 0xdc jle KEEPS it).
+inline int beginStarClass(long v) {
+    return v > 220 ? 0 : (v > 0 ? 1 : (v > -220 ? 2 : 3));
+}
+
+// tNG-C3 THICK BEVELED RING LAW (refcap census, F15-3b): centre
+// (600,417.5), OUTER diam 57, annulus r in [23.5,29], 5-px band; the
+// emblem clips to the hole (clipR 23 about the centre).
+inline bool beginRingAt(int x, int y) {
+    const double dx = x - 600.0, dy = y - 417.5;
+    const double rr = dx * dx + dy * dy;
+    return rr >= 23.5 * 23.5 && rr <= 29.0 * 29.0;
+}
+
 }  // namespace ascend::ui

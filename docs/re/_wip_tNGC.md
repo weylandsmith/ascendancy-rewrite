@@ -291,3 +291,133 @@ Trigger check: no USER: lines after D19 in DECISIONS.md; ring turn 1086 on
 tail saves (53/54.sav) = no new sitting; pid 1182156 alive. Assignment =
 STATE.md defect list (1) wheel ghost sliver (2) density/species extraneous
 art (3) Begin starfield SHRUNK-VOLUME law + green ring (4) chip-grey probe.
+### F15-4 CHIP-GREY PROBE [CLOSED as measured-position law, 2026-11-21]
+Pixel diff ours(t412 shot, post-tNGC2 build) vs refcap, chip0 zone:
+LEFT vline x=381 rows 435..456 EXACT (164,171,177) both sides; RIGHT
+vline x=395 rows 435..456 EXACT (225,227,229) both sides. Row 457 is the
+sole diff row: vendor (221,224,226)/(244,245,245) = emblem-content bleed
+into the frame bottom corner; our painter keeps the vline to 457 uniform.
+=> shipped measured-position law (white hlines 434/458 + grey vlines
+435..457) is PIXEL-TRUE on the chrome; no chrome-family lookup needed.
+Static source question (button chrome vs FUN_0002fe04 args) stays
+undecidable and is IRRELEVANT to the port now — measurement closed it.
+### F15-1/2 G1 PASS wheel panels [in progress]
+t412 shot atmosphere value=1: best-shift pixel agreement panel interiors
+(408..466) vs refcap: atmos 91.4% @(-2,-1), density 93.6% @(1,-1),
+species 80.0% @(1,0) (species CONTENT differs by setting: our 7 chips vs
+vendor ~5 — not a defect class). Vision pass: no ghost sliver / stray
+white line visible on atmos k11 panel in current build; diffs distributed
+across disc (gradient/antialias class), NOT a clip-edge band.
+### F15-1 ATMOSPHERE STATE CENSUS (current build, scripts/tNGC3_atm_shot.sh)
+Ours cycled k10->k11->k12 (app.log msg 505 x2): content bbox
+k10 x284..345 (W=62!) y411..459; k11 x288..336 (W=49); k12 x290..336
+(W=47). WHITEISH (min>150) px: k10 24 px rows 431..437 ONLY; k11 0; k12
+0. => THE DEFECT REPRODUCES on OUR k10: a bright-blue horizontal LENS
+BAND rows ~431..437 extending ~13 px past the disc both sides with stray
+dashes at x284/x344 — this is the D19 "ghost sliver + stray white line"
+family (user saw it on peaceful/neutral pre-tNGC2; now only k10). k11
+(pixel-compared vs refcap: 91.4% agreement @( -2,-1), diffs = gradient
+dither class) and k12 are CLEAN. Next: k10 stream walk autopsy vs codec.
+### F15-1 VERDICT (defect 1 + 2): GHOST SLIVER / EXTRAOUS ART NOT IN CURRENT BUILD
+(a) STRAM-DECODE PROOF (scripts/tNGC3_wheel_decode.py): the k11 stream
+(88x79) GENUINELY CONTAINS the bright-blue lens band (pal 98/251/252/254
+runs rows ~20..33) and the (190,255,255)=pal103 eye highlights; the k10
+stream the same family. The lens + highlights are VENDOR ART, not a port
+artifact.
+(b) PIXEL PROOF vs refcap (atmosphere panel, ours k11 vs vendor): BOTH
+sides show the lens tips extending beyond the disc (vendor rows 430/431
+content x282..343 vs disc-only x289..337; ours rows 433/434 x284..345 vs
+disc-only x293..338) and BOTH show the pal-103 white highlight clusters
+(ours x304..306/x322..323 rows 431..437; vendor x302..304/x320..321 rows
+429..436) — SAME features, offset ours = vendor + (+2,+2).
+(c) RESIDUE = ANCHOR OFFSET, not double-blit: disc-extent centres ours vs
+vendor: atmos k11 (315.5,435) vs (313,433.5) = +2.5,+1.5; density k2
+(64,436) vs (65,435) = -1,+1; species bbox ours (160..214) vs vendor
+(161..215) = -1,0 (content differs by setting: ours k9 seven-player vs
+vendor k7, not comparable beyond extent). kWheelBlitTop=408 / x=cxp-28 is
+within 1-2 px on all three panels; the D19 "art drifts between options /
+next-disc sliver / stray white line" class does NOT reproduce on the
+post-tNGC2 build (all three atmos states captured: whiteish-px census 0
+below-disc rows 460..471 on ours AND vendor; per-state bboxes consistent).
+HONEST NEGATIVE: defects 1/2 closed-as-not-reproducing (the D19 witness
+pre-dates the t401/t414/tNGC2 wheel fixes); no code change shipped for
+them this cycle; the 1-2px anchor offsets are banked here and are
+tNG-U (user-grade) polish, NOT tNG-C defects.
+### F15-3 BEGIN STARFIELD LAW, FULL DISASM RE-READ (0x526f0..0x5282f) [verified]
+Loop head 0x526f0: 0x52678 click-blocker gate; 0x55208 lookup -> obj;
+COUNT = word[obj+0x572] (galaxy star count — DENSITY setting feeds the
+galaxy, hence "tied to density"); record stride 0x172 (add esi,0x172);
+record ptrs deref'd from [esi].
+POSITION LAW: x = (hiword dword[rec+5])/5 + 5, y = (hiword dword[rec+3])/5
++ 5 (idiv 5 at 0x527b1/0x527c9) — raw MAP coords shrunk, NO rotation in
+position (rotation [0x2bf3] + trig 0x76e08 feeds CLASS only, via fistp
+into esp+0x20; ah=byte[rec+4] high != 0 SKIPS the class recompute, ecx
+keeps last value).
+CLASS LAW CORRECTION (supersedes F11!): 0x52817 pre-sets ecx=3;
+cmp eax,0xdc jle 0x52787 -> else 0x5282d xor ecx,ecx. At 0x52787:
+eax>0 -> 1; eax<=-220 -> jle keeps ecx=3; else 2. FOUR-WAY:
+  eax>220 -> cls 0 ; 0<eax<=220 -> 1 ; -220<eax<=0 -> 2 ; eax<=-220 -> 3.
+(F11's "value>0->1, <=-220->2, else 0" was a misread of the jle target.)
+SPRITE LAW: rec = 4* dword[ebp] + cls (0x527d1 shl 2); lib handle
+dword[obj+0xab]; blit 0x5caac. Panel extent: x,y<=~130x100 fits
+kBeginPanelVisual 131x92 = the D19 "starfield" IS this shrunk draw.
+BEGIN RING MEASURED (refcap): centre (600,417.5), OUTER diam 57
+(green runs x572..575 / x625..628 at y418; rows 389..393 / 442..446 at
+x601) BAND 4-5 px, colour (0,113,56) family + bevel ring at inner edge
+(576..579 greys/teals). Ours: 1-px circle r28 centre kBeginEmblemCentre.
+### F15-3b BEGIN PANEL COORD READING + RING GEOMETRY [verified]
+COORD LAW REFINED: the /5+5 inputs are S16 HIWORDS of dwords[rec+3]/
+[rec+5] = the vendor MAP PIXEL coords (x 0..639, y 0..479): /5+5 maps
+0..639 -> 5..133 (panel width 131) and 0..479 -> 5..101 (height 92).
+=> the Begin starfield = the FULL galaxy map shrunk 5x into the panel,
+positions STATIC (rotation drives only the sprite class), panel origin =
+kBeginPanelVisual (502,381) + (mx/5+5, my/5+5), clipped at the panel.
+REFCAP BEGIN PANEL FACTS: left band x503..570 holds BOTH the grey hash
+dots (families (225,227,229)/(164,171,177)/(103,116,126)/white) AND
+COLOURED star px ((60,40,16),(65,4,6),(20,52,117),(164,90,7)) — the
+starfield is ADDED to the dots, not a replacement. RING: centre
+(600,417.5), OUTER diam 57 (x572..628 y418; rows 389..393/442..446 at
+x=601), BAND 5 px, radial rungs top (10,46,51)/(0,142,69)/(0,124,61)/
+(0,113,56)/(8,82,43), bottom (0,153,74)/(0,153,74)/(0,142,69)/(0,110,54)/
+(5,65,43) — bevel: bright outer edge on the BOTTOM, dark inner edge.
+CLASS LAW (four-way, supersedes F11): v>220->0, 0<v<=220->1,
+-220<v<=0->2, v<=-220->3; v from trig(z_angle + accumulator) (0x76e08),
+accumulator [0x2bf3]; byte[rec+4] high set skips recompute.
+IMPLEMENT (this cycle): (i) Begin panel starfield = every galaxy star
+(count law word[obj+0x572] == stars.size()), pos = origin+(mx/5+5,
+my/5+5) with mx=my from OUR 1024-grid scaled *640/1024, clip panel;
+sprite cos_star rec 4*K+cls, K=0 named seam (same as map screen);
+rotation formula for v [inferred] (plane rotation of (x,z)); (ii) ring =
+annulus r in [23.5,29] about (600,417.5), 5 radial rung colours with
+top/bottom asymmetry per census. Dots KEPT (vendor has them).
+### F15-3c BEGIN STARFIELD + RING IMPLEMENTED [tNG-C3, verified by build+shot]
+title.cpp Begin panel: (i) starfield block (c) draws EVERY galaxy star
+pos = beginStarPos (menulaw.h pure law: 502+(x*640/1024)/5+5,
+381+(y*480/1024)/5+5, clip kBeginPanelVisual), sprite cos_star rec cls
+(K=0 named seam), FOUR-WAY class law beginStarClass (v>220->0, 0<v<=220
+->1, -220<v<=0->2, <=-220->3); draw order = dots -> STARFIELD -> ring ->
+portrait (refcap: no star px over the emblem). (ii) ring = annulus r in
+[23.5,29] about (600,417.5), 5 radial rung colours kRingTop/kRingBot
+blended by vertical position (census F15-3b); 1-px kLore circle DELETED.
+(iii) portrait = blitShapeCircular clipR=23 about the hole (native 100x100
+smrace at centre overflowed the ring before — vision pass caught it).
+WITNESS: green-mass begin panel ours 933 vs vendor 847 (was 332 vs 847 —
+defect class CLOSED, residue = rung blend lands some near-green px);
+side-by-side vision: ring thickness/position/hole-clip = match; star
+COLOURS differ by galaxy seed (cos_star k1..k3 blue vs k4..k7 warm — the
+K byte [ebp] selects the colour family; K=0 seam named, same as map).
+PURE-LAW PINS added to menulaw.h (beginStarPos/beginStarClass/beginRingAt);
+ctest 0 failed. ROTATION: class-only spin (beginYaw) per cited law; the
+vendor accumulator [0x2bf3] value is a named seam.
+### F15 CLOSE-OUT SUMMARY (tNG-C3, D18 cap reached — no tNG-C4)
+(1) atmosphere sliver: NOT REPRODUCING post-tNGC2 (F15-1; lens band +
+white highlights are vendor art present on BOTH sides; residue = 1-2px
+anchor offsets -> tNG-U polish). (2) density/species extraneous art: NOT
+REPRODUCING (93.6%/80% pixel agreement; species content differs by
+setting, not defect). (3) Begin starfield + thick beveled ring: CLOSED
+with cited law implemented + witness (F15-3c). (4) chip-grey probe:
+CLOSED as measured-position law — vlines pixel-EXACT rows 435..456
+(F15-4). Fold list for tNG-B/tNG-U: 1-2px wheel anchor offsets; chip0
+row-457 frame/emblem corner bleed; Begin K-family seam (which cos_star
+colour family per race); vendor starfield class-rotation accumulator
+[0x2bf3]; species-desc vendor 5-chip vs ours 7 (content setting).
