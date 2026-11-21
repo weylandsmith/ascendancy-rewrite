@@ -77,6 +77,19 @@ bool blitShapePalSwap(SDL_Renderer* ren,
                       const ascend::formats::ShapeLibrary& lib, int rec,
                       int x, int y, int from, int to);
 
+// tNG-C CHIP RAMP LAW [verified 0x53ee0 decompile + F13 refcap census]:
+// the chip row blits the SELECTED race's raceflag record SEVEN times, chip
+// i with palette slots 0x10..0x13 remapped to game.pal[0x10+4i..0x13+4i]
+// (0x53ee0 rewrites the four slots in a loop eax 0..3, then blits). Only
+// indices {16,17,18,19} shift (raceflag ink census k3/k5; navy 242 and any
+// stray render through their own entries). Witness: chip i brightest ink ==
+// pal[4i+19] EXACT i=1..6 on scratchpad/newgame-original.png. family==0 is
+// the identity map = exactly blitShape.
+int chipInkSlot(int family, int slot);
+bool blitShapePalRamp(SDL_Renderer* ren,
+                      const ascend::formats::ShapeLibrary& lib, int rec,
+                      int x, int y, int family);
+
 // t398: load DATA\game.pal for blitShape's colour path (process-wide; the
 // data root never changes mid-session — only the FIRST call in a process
 // reads the file and prints the diagnostic line; later calls just report

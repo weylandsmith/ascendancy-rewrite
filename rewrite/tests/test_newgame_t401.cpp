@@ -133,25 +133,24 @@ TEST(newgame_t414_frame_and_chip_law) {
     CHECK(au::kNewgameCosmosRect.y0 > 0);
     CHECK(au::kNewgameCosmosRect.x1 < au::kDisplayW - 100);  // racelist side
     CHECK(au::kNewgameCosmosRect.y1 < au::kDisplayH - 10);   // bottom row
-    // Player chips: seven 14x26 chips at x 384+16k fit the VISUAL panel
-    // (379..493 x 381..472) and the measured icon rows (434..459).
+    // Player chips [tNG-C law supersedes the t414 swatch read]: SEVEN
+    // raceflag emblems 15x25 at x 381+16k, content rows 433..457, inside
+    // the VISUAL panel (379..493 x 381..472). Refcap tight content bbox
+    // (381,433)-(491,458); frame rows 434/458 (docs F13).
     CHECK(au::kPlayerChipCount == 7);
+    CHECK(au::kPlayerChipX0 == 381);
     CHECK(au::kPlayerChipX0 >= au::kPlayerColorPanel.x0);
+    CHECK(au::kPlayerChipW == 15);
+    CHECK(au::kPlayerChipH == 25);
     CHECK(au::kPlayerChipX0 + (au::kPlayerChipCount - 1) *
                                       au::kPlayerChipPitch +
-              au::kPlayerChipW - 1 <=
-          au::kPlayerColorPanel.x1);
-    CHECK(au::kPlayerChipY >= au::kPlayerColorPanel.y0);
-    CHECK(au::kPlayerChipY + au::kPlayerChipH <= au::kPlayerColorPanel.y1);
-    // The measured green chip (5,118,69) is chromatic (the whole point of
-    // the refutation: the zone DOES carry coloured icons).
-    const au::RGB& g0 = au::kPlayerChipRgb[0][0];
-    CHECK(int(g0.g) - int(g0.r) > 60);
-    // Chip x-extent matches the measured bbox x384..492 (ours ends 493,
-    // the panel edge; measured run ends 492 — 1px slack).
-    CHECK(au::kPlayerChipX0 == 384);
-    CHECK(au::kPlayerChipX0 + 6 * au::kPlayerChipPitch +
-              au::kPlayerChipW - 1 == 493);
+              au::kPlayerChipW - 1 ==
+          491);  // refcap strip right edge
+    CHECK(au::kPlayerChipY == 433);
+    CHECK(au::kPlayerChipY + au::kPlayerChipH - 1 == 457);  // emblem bottom
+    CHECK(au::kChipFrameTop == 434 && au::kChipFrameBottom == 458);
+    CHECK(au::kChipFrameLeftGrey.r == 164 && au::kChipFrameLeftGrey.g == 171);
+    CHECK(au::kChipFrameRightGrey.r == 225 && au::kChipFrameRightGrey.g == 227);
 }
 
 TEST(newgame_t401_portrait_lib_name) {

@@ -265,18 +265,8 @@ int newgameWheelFrame(int control, int value) {
     }
 }
 
-// Player^Color chip colours [measured on the user original, rows 434..459,
-// chip runs x384..492; docs/re/_wip_t414.md S2d]. Base = the chip body
-// colour; hi = the highlight face (both counted per 14x26 chip zone).
-const RGB kPlayerChipRgb[kPlayerChipCount][2] = {
-    {{5, 118, 69}, {1, 78, 41}},      // green
-    {{103, 63, 127}, {158, 81, 174}}, // purple
-    {{164, 159, 79}, {255, 235, 97}}, // yellow
-    {{154, 108, 127}, {239, 154, 174}},  // pink
-    {{121, 105, 69}, {107, 96, 66}},     // tan (measured dominant; weak)
-    {{27, 85, 147}, {36, 117, 207}},     // blue
-    {{151, 88, 20}, {235, 121, 4}},      // orange
-};
+// kPlayerChipRgb REMOVED (tNG-C chip law): chips are raceflag ramp blits,
+// not solid swatches. See menulaw.h + docs/re/_wip_tNGC.md F10/F13.
 
 std::string portraitLibName(int specnum) {
     if (specnum < 0 || specnum > 20) return std::string();  // refuse

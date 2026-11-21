@@ -174,6 +174,47 @@ screen (527,119) = INSIDE RACELIST (x502..632 y45..372) row0 slot. The
 DESC crest site is therefore NOT this call; port's kDescCrestRect law
 (t426 family) stays, index question stays a named caveat (do not touch).
 
+## F13 — CYCLE-2 IMPLEMENTATION MEASUREMENTS (tNG-C2 session) [verified]
+- smhome.shp census under the PORT's OWN bbox-diff law (scripts read via
+  formats/shp.h layout: k>=1 bbox quad at rec+0x08): 21 records, EVERY one
+  L,T,R,B = (-24,-26,27,25) -> content 52x52, placement (L,T). The "CANON
+  27x25" u32-pair at rec+0x10 is the R,B half (tA1 refutation re-confirmed).
+  Vendor blit 0x5234b/0x52356 pushes (0x48,0xcd)=(72,205) win-rel; window
+  X0=334 Y0=12 -> dest = (334+72-24, 12+205-26) = screen (382,191).
+- raceflag.shp census: 21 recs, bbox quad (0,0,14,24) -> 15x25 content,
+  (L,T)=(0,0) (blit dest == rect corner verbatim).
+- REFCAP re-measure scratchpad/newgame-original.png (browser law [1:481,
+  1:641]): chip i brightest ink == pal[4i+19] EXACT for i=1..6 (chip0
+  brightest = WHITE frame pixel; frame law). Chip strip content bbox
+  (380,428)-(495,464) n=1814 (NAVY detector). Planet zone content bbox
+  (381,191)-(433,241) n=1840 = 53x51 (52x52 content + 1px antialiasing
+  drift; +-6 tol covers it). Vendor frame: 28 white px in (382,434)..
+  (395,459) for chip0 (the selected chip in that shot).
+- FRAME GEOMETRY: task law rect (382+16i,434)..(395+16i,459) (14x26
+  outline). F10's "ecx=0xe push 0x18" read is ambiguous (14x24 vs 15x25);
+  the refcap white-px positions sit on the task-law outline, so the task
+  law is what ships. Named caveat: interior frame style (single hline/
+  vline family FUN_0005bf71) not pixel-diffed against a rect-outline draw.
+- FRAME REFINED [verified px census, tNG-C2]: white pixels are EXACTLY two
+  hlines y=434 and y=458, x 381..395 (30 px, chip0 selected). The vertical
+  edges x381/x395 rows 435..457 are NOT white: left (164,171,177), right
+  (225,227,229) (the chrome-noise grey family, 22+1 px each). Emblem
+  content occupies rows 433..457 (per-row content census: 433 = 108 px,
+  458 = 109 = bottom hline, 459+ = panel navy). FUN_0002fe04 decompile =
+  4 x FUN_0005bf71 (argparse ambiguous, unaff_EBX) — consistent with
+  2 hlines + 2 vlines, colours not statically decidable. SHIPPED LAW:
+  top/bottom WHITE hlines (381+16i..395+16i @ 434 and 458), left vline
+  (164,171,177) x=381+16i y435..457, right vline (225,227,229)
+  x=395+16i y435..457. The t401 chip constants (X0=384, rows 434..459)
+  are SUPERSEDED (tA3 raw-row drift class: emblem content starts 433).
+- raceflag ink census (walk law, k3/k5): ink {16:22-48, 17:28-40,
+  18:9-37, 19:114-145} + navy 242:124-174 + strays (k3: 151x8, 196x1).
+  Ramp shift 4k applies ONLY to {16,17,18,19}; 242 and strays render
+  through their own pal entries.
+- Port law constants (menulaw.h): kChipRowX0=381 pitch 16 rect 15x31
+  (381+16i,433)..(395+16i,463); ramp slots {16,17,18,19}; chip i maps
+  slot 19 -> pal[4i+19]; navy 242 untouched; frame pal 243 WHITE.
+
 ## F5 — WHEEL DISPATCHER arms [verified 0x528eb..0x52945]
 - msg dx: <0x1f5 -> 0x52f59 ; 0x1f5..0x1f8 -> 0x52db9 ; 0x1f9 -> 0x52eec ;
   0x1fa -> fallthrough ; 0x1c01 -> 0x52d6c ; else parent 0x336b4.

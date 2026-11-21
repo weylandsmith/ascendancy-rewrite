@@ -265,15 +265,18 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
         std::fflush(stdout);
     }
     std::vector<ascend::formats::ShapeLibrary> portraitLibs(21);
-    // t414: planets.shp — the planet-sphere library for the DESC panel
-    // (55 recs = 11 biome groups x size ladder; docs/re/shp.md geometry
-    // census, dims re-verified scripts/t414_dims_census.py).
-    ascend::formats::ShapeLibrary planetsLib;
+    // tNG-C PLANET INDEX LAW [verified 0x5231d..0x5236d + bbox census]:
+    // the DESC panel's planet = smhome.shp k<selected race row> NATIVE
+    // 52x52 (name fetch 0x5231d "DATA\\smhome.shp", push (72,205) win-rel,
+    // blit 0x5caac with bbox (-24,-26) -> screen (382,191); bounds assert
+    // cmp 0x15 == 21 records). The t414 planets.shp k[(sel%11)*5+1]
+    // invented biome mapping is REPLACED (named seam t414 closed).
+    ascend::formats::ShapeLibrary smhomeLib;
     {
         std::string ferr;
-        if (!planetsLib.load(
-                dataRoot + "/extracted/ascend01/data/planets.shp", &ferr))
-            std::printf("ui raceconfig planets refused: %s\n", ferr.c_str());
+        if (!smhomeLib.load(
+                dataRoot + "/extracted/ascend01/data/smhome.shp", &ferr))
+            std::printf("ui raceconfig smhome refused: %s\n", ferr.c_str());
         std::fflush(stdout);
     }
     std::vector<bool> portraitTried(21, false), portraitOk(21, false);
@@ -628,29 +631,21 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     blitShape(ren, *pl, 0, kDescRingCentre.x + pr0.left,
                               kDescRingCentre.y + pr0.top);
                 }
-                // t414 PLANET IMAGE (D15 "the planet image is missing from
-                // the race info frame"): the zone x383..419 y198..239
-                // (~37x42) carries a PLANET SPHERE record — planets.shp is
-                // the planet-sphere library (55 recs = 11 biome groups x
-                // size ladder 11/18/25/35/47, docs/re/shp.md S geometry);
-                // the 35px class matches the measured zone (37x42). Group
-                // = specnum % 11 (preview assignment, named seam — no
-                // citation maps race->biome for the DESC panel). The t401
-                // honest-vector purple circles are REPLACED.
-                if (planetsLib.count() >= 55) {
-                    // tA1 SIZE-CLASS CORRECTION [measured]: under the
-                    // bbox-diff law the ladder is {24,38,52,71,95} and the
-                    // DESC zone's measured chromatic extent 37x42 (t401 S8)
-                    // matches size index 1 (38) ONLY; the old "+3" fitted
-                    // the port's truncated dims read. NATIVE blit at
-                    // centre+(L,T). The GROUP axis stays the named seam —
-                    // tNG-C owns the race->planet law (D19).
-                    const int rec = (selIndex % 11) * 5 + 1;
-                    const auto& pr = planetsLib.record(rec);
+                // tNG-C PLANET INDEX LAW (D19 seed #2 CLOSED): smhome.shp
+                // k<selected race row> NATIVE at the window push (72,205) —
+                // NEWGAMEWND X0=334 Y0=12 (windows.txt L584) plus bbox
+                // (L,T)=(-24,-26) [census: every smhome record] puts the
+                // content at screen (382,191), i.e. kDescPlanetCentre +
+                // (L,T) with centre (406,217). 0x523b1 asserts the row <
+                // 0x15 (21 race records) — the port refuses instead of
+                // asserting. The t414 planets-ladder biome mapping is gone.
+                if (smhomeLib.count() >= 21 && selIndex >= 0 &&
+                    selIndex < 21) {
+                    const auto& pr = smhomeLib.record(selIndex);
                     dimsCheck("desc-planet", int(pr.width), int(pr.height),
                               kDescPlanetCentre.x + int(pr.left),
                               kDescPlanetCentre.y + int(pr.top));
-                    blitShape(ren, planetsLib, rec,
+                    blitShape(ren, smhomeLib, selIndex,
                               kDescPlanetCentre.x + pr.left,
                               kDescPlanetCentre.y + pr.top);
                 }
@@ -885,27 +880,48 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 const int wl = txt.width(lbl, true);  // tA3 BIG face
                 txt.draw(ren, cxp - wl / 2, c.y0 + kPlayerColorLabelDy, lbl,
                          true, kNewgameInk);
-                // t414 PLAYER ICONS (D15 "the player icons are missing
-                // from the 'Player Color' box"): MEASURED on the original
-                // at rows 434..459, seven 14x26 chips at x 384+16k with
-                // base+highlight colours (menulaw kPlayerChipRgb). The
-                // t401 census scanned the LABEL rows and reported "no
-                // chromatic px" — refuted (docs/re/_wip_t414.md S2d). The
-                // highlight is the top 14 rows (measured hi-count 37 vs
-                // base 60 per chip = a partial face; top-half placement is
-                // the port reading of the bevel class).
+                // tNG-C CHIP ROW LAW (D19 seed #4 CLOSED) [verified head
+                // 0x5258d..0x52647 + 0x53ee0 decompile + F13 refcap]: the
+                // vendor blits the SELECTED race's raceflag emblem SEVEN
+                // times at (381+16i,433), chip i through the palette ramp
+                // slots 16..19 := game.pal[16+4i..19+4i] (blitShapePalRamp;
+                // witness chip-i brightest ink == pal[4i+19] EXACT i=1..6).
+                // The player's own chip (i == playerColourIdx, the 0x52621
+                // compare) gets the FUN_0002fe04 frame: white hlines 434/
+                // 458, grey vlines 435..457 (constants in menulaw.h). The
+                // t401 solid kPlayerChipRgb swatches are REMOVED (D19 "the
+                // artwork is rendered incorrectly in the bottom row").
                 for (int k = 0; k < kPlayerChipCount; k++) {
-                    const SDL_Rect body{kPlayerChipX0 + k * kPlayerChipPitch,
-                                        kPlayerChipY, kPlayerChipW,
-                                        kPlayerChipH};
-                    const RGB& base = kPlayerChipRgb[k][0];
-                    SDL_SetRenderDrawColor(ren, base.r, base.g, base.b, 255);
-                    SDL_RenderFillRect(ren, &body);
-                    const RGB& hi = kPlayerChipRgb[k][1];
-                    SDL_SetRenderDrawColor(ren, hi.r, hi.g, hi.b, 255);
-                    SDL_Rect top{kPlayerChipX0 + k * kPlayerChipPitch,
-                                 kPlayerChipY, kPlayerChipW, 13};
-                    SDL_RenderFillRect(ren, &top);
+                    const int cx = kPlayerChipX0 + k * kPlayerChipPitch;
+                    if (raceflagLib.count() > selIndex && selIndex >= 0) {
+                        const auto& cr = raceflagLib.record(selIndex);
+                        dimsCheck("playercolor-chiprow", int(cr.width),
+                                  int(cr.height), cx + int(cr.left),
+                                  kPlayerChipY + int(cr.top));
+                        blitShapePalRamp(ren, raceflagLib, selIndex,
+                                         cx + cr.left, kPlayerChipY + cr.top,
+                                         k);
+                    }
+                    if (k == playerColourIdx) {
+                        for (int x = cx; x < cx + kPlayerChipW; x++) {
+                            SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
+                            SDL_RenderDrawPoint(ren, x, kChipFrameTop);
+                            SDL_RenderDrawPoint(ren, x, kChipFrameBottom);
+                        }
+                        for (int y = kChipFrameTop + 1; y < kChipFrameBottom;
+                             y++) {
+                            SDL_SetRenderDrawColor(
+                                ren, kChipFrameLeftGrey.r,
+                                kChipFrameLeftGrey.g, kChipFrameLeftGrey.b,
+                                255);
+                            SDL_RenderDrawPoint(ren, cx, y);
+                            SDL_SetRenderDrawColor(
+                                ren, kChipFrameRightGrey.r,
+                                kChipFrameRightGrey.g, kChipFrameRightGrey.b,
+                                255);
+                            SDL_RenderDrawPoint(ren, cx + kPlayerChipW - 1, y);
+                        }
+                    }
                 }
             }
             // Begin New Game (measured rect; NOT windows.txt — STARTGAME is

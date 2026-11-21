@@ -177,19 +177,33 @@ inline constexpr Rect kNewgameCosmosRect{8, 8, 492, 372};
 // rng (gate 3l law: preview must never touch the sim rng).
 inline constexpr double kPreviewSpinPerFrame = 0.0035;
 
-// Player^Color icons [measured, REFUTES the t401 S10 negative]: SEVEN 14px
-// chips at x 384+16k (k=0..6), rows 434..459 (26 tall), base+highlight
-// colour pairs measured per chip (docs/re/_wip_t414.md S2d). The t401
-// "no chromatic px" census scanned rows 394..404 — the LABEL band, wrong
-// rows.
-inline constexpr int kPlayerChipX0 = 384, kPlayerChipPitch = 16,
-                     kPlayerChipY = 434, kPlayerChipW = 14,
-                     kPlayerChipH = 26, kPlayerChipCount = 7;
+// Player^Color chips [tNG-C CHIP LAW, supersedes the t401 swatch read].
+// Vendor head 0x5258d..0x52647: SEVEN raceflag emblems blitted at rect
+// corners (381+16i, 433) (rect (381+16i,433)..(395+16i,463), pitch 16);
+// raceflag content 15x25 with (L,T)=(0,0) [census F13] -> emblems occupy
+// rows 433..457, x 381..395 (+16i). Chip i renders with palette slots
+// 16..19 := game.pal[16+4i..19+4i] (0x53ee0). The t401 constants (X0=384,
+// rows 434..459) were the tA3 raw-row drift class: emblem content starts
+// 433, strip x-extent 381..491 (refcap tight bbox (381,433)-(491,458)).
+inline constexpr int kPlayerChipX0 = 381, kPlayerChipPitch = 16,
+                     kPlayerChipY = 433, kPlayerChipW = 15,
+                     kPlayerChipH = 25, kPlayerChipCount = 7;
+// SELECTED-CHIP FRAME LAW [measured F13, refcap chip0 white-px census]:
+// white (255,255,255) hlines at y=434 and y=458 spanning x 381..395
+// (+16i); the two VERTICALS rows 435..457 are NOT white — left edge
+// (164,171,177), right edge (225,227,229) (chrome-grey family; unselected
+// chips show their emblem ink at those columns, proving the greys are the
+// frame). FUN_0002fe04 = 4 x FUN_0005bf71 line family (colours not
+// statically decidable; refcap is the authority).
+inline constexpr int kChipFrameTop = 434, kChipFrameBottom = 458;
+inline constexpr RGB kChipFrameLeftGrey{164, 171, 177},
+    kChipFrameRightGrey{225, 227, 229};
 // The VISUAL panel runs to the bottom row (measured navy x380..493 rows
 // 382..473 on the original); windows.txt's (379,381)-(493,419) is only
 // the label/interactive zone.
 inline constexpr Rect kPlayerColorPanel{379, 381, 493, 472};
-extern const RGB kPlayerChipRgb[kPlayerChipCount][2];  // {base, highlight}
+// kPlayerChipRgb (t401 solid-swatch colours) REMOVED by the tNG-C chip law:
+// the chips are raceflag ramp blits, not solid rects (D19 seed #4).
 
 
 // Wheel blit anchor [measured]: the record's CONTENT circle (55 px wide)
@@ -206,7 +220,12 @@ inline constexpr int kWheelBlitTop = 408, kWheelBlitHalfW = 28;
 inline constexpr Pt kDescRingCentre{409, 97};
 inline constexpr int kDescRingR = 52;
 inline constexpr Rect kDescCrestRect{441, 205, 454, 228};
-inline constexpr Pt kDescPlanetCentre{401, 218};
+// tNG-C PLANET LAW [verified]: the vendor anchor is NEWGAMEWND-relative
+// (72,205) = screen (334+72, 12+205) = (406,217); dest = anchor + bbox
+// (L,T) = (382,191). The old (401,218) fitted the t414 planets-ladder
+// slice and is SUPERSEDED. kDescPlanetR (honest-vector fallback radius)
+// stays until its consumer goes.
+inline constexpr Pt kDescPlanetCentre{406, 217};
 inline constexpr int kDescPlanetR = 18;
 
 // RACELIST row art [measured]: portrait centre x 559 (row-2 ring greys at

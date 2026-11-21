@@ -229,6 +229,56 @@ colour byte, then 0x5cf96); selected slot (si==word[win+0xb5]) paints the
 0xf3 well instead. Click: zone test x379..493 y420..472 -> idx=(x-379)>>4 ->
 STORE word[win+0xb5] -> FUN_000232ec(0x12e10, idx) -> [win+0xa7]+0xc repaint.
 The port's click->assign->ring-update law is EXACT including the field.
+[SS12 READING CORRECTED by tNG-C: SEVEN blits at 381+16i (seed ebx=0x17d,
+loop cmp 7 at 0x525ee), 0x53ee0 rewrites FOUR slots 16..19 := pal[16+4i..
+19+4i] (not a 5-entry ramp), and the selected chip gets a WHITE FRAME, not
+"the 0xf3 well" — 0xf3=pal243=(255,255,255), drawn via FUN_0002fe04 line
+family. SS14 below is the cited law.]
+
+## SS14 — DESC PLANET INDEX LAW (tNG-C cycle 1+2, D19 seed #2 CLOSED)
+
+[verified disasm 0x5231d..0x5236d + bbox census + windows.txt L584] The
+DESC-panel planet is smhome.shp record k<SELECTED RACE ROW> (word[win+
+0xb3]), NATIVE 1:1 via 0x5caac, pushed at NEWGAMEWND-relative (72,205).
+windows.txt NEWGAMEWND X0=334 Y0=12 -> anchor screen (406,217); every
+smhome record's bbox quad = (-24,-26,27,25) -> content 52x52 at screen
+(382,191). Bounds 0x523b1: race row < 0x15 == 21 records (assert). The
+t414 planets.shp k[(sel%11)*5+1] size-class mapping was INVENTED and is
+REPLACED. Port site title.cpp smhomeLib; constants kDescPlanetCentre
+{406,217}; pins test_newgame_content_tNGC tngc_smhome_index_law; witness
+scripts/r1_tNGC_chip_witness.py planet zone (52+-2 measured 51x51 vendor,
+51x50 ours).
+
+## SS15 — CHIP ROW LAW (tNG-C cycle 1+2, D19 seed #4 CLOSED)
+
+[verified head 0x5258d..0x52647 + FUN_00053ee0 decompile + refcap census]
+SEVEN blits, chip i rect (381+16i,433)..(395+16i,463); record = raceflag
+k<word[+0xb3] SELECTED race row> (0x525f6/0x52603), 15x25 content, bbox
+(0,0) -> emblem occupies rows 433..457. Chip i renders with palette slots
+16..19 := game.pal[16+4i..19+4i] (0x53ee0 four-slot rewrite, loop eax
+0..3); ONLY indices {16,17,18,19} shift (ink census k3/k5; navy 242 and
+strays 151/196 pass through). Witness: chip-i brightest ink == pal[4i+19]
+EXACT i=1..6 (chip0 = framed chip: frame greys outshine the ink on BOTH
+vendor and ours -> presence check). Selected chip (i == word[+0xb5],
+0x52621): FUN_0002fe04 frame — WHITE (255,255,255) hlines rows 434 and
+458 x 381..395 (+16i); vlines rows 435..457 measured (164,171,177) left /
+(225,227,229) right (line colours not statically decidable, refcap is
+authority). Port: blitShapePalRamp (vendortext.cpp) + chipInkSlot;
+constants menulaw.h; pins tngc_chip_ramp_law + tngc_chip_ramp_data_
+witness; witness r1_tNGC_chip_witness.py (framed-chip count = 1 law).
+
+## SS16 — WHEEL CHILD LAW CONFIRMED + BEGIN STARFIELD (tNG-C cycle 1)
+
+(a) Parent writes child[win+0x67][j]->obj+0x72: density rank VERBATIM
+k0..k4, species COUNT+2 k5..k9, atmosphere idx+10 k10..k12 — the port's
+newgameWheelFrame bijection matches EXACTLY (no delta); wrap laws verbatim
+(density 0..4, species 3..7 wrap 8->3, atmosphere 0..2 wrap 3->0); pins
+tngc_wheel_frame_bijection_wrap_terms. (b) Begin-panel starfield = SHRUNK
+VOLUME: full-field coords /5 + 5 (idiv 5 at 0x527a4/0x527c9), NOT
+same-field-scaled (D19 open question answered; per-sprite sprite-class law
+body 0x52787..0x5282f banked _wip_tNGC F11). (c) The 0x52389 crest call is
+RACELIST row0's flag (window-rel 193,107), NOT the DESC crest — DESC crest
+index stays a named caveat (do not touch).
 
 ## SS13 — byte+8 consumer census CLOSED "UI-only" (t423 cycle 3)
 

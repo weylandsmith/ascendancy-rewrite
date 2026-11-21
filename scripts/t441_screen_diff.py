@@ -51,6 +51,7 @@ SUNS = {0: (127, 133), 1: (130, 127), 2: (128, 127), 3: (139, 142),
 PLANETS_SIZE = [24, 38, 52, 71, 95]  # size-axis ladder (tA1 F5)
 RACERING = (109, 109)                # all 8 colour records
 SMRACE = (100, 100)                  # content bbox of every smrace rec0
+SMHOME = (52, 52)                    # every smhome rec (tNG-C census F13)
 
 NAVY = np.array((12, 32, 48))
 BLACK = np.array((0, 0, 0))
@@ -132,10 +133,24 @@ REGIONS = {
         dict(name="desc-portrait", vkind="content", rect=(359, 47, 459, 147),
              cited=("fixed", SMRACE), mass=(1200, 1200),
              dimscheck="desc-portrait"),
-        # DESC planet zone centre (401,218) on the size ladder. Content
-        # index (which husk/biome) is tNG-C; scale is tA1.
-        dict(name="desc-planet", vkind="content", rect=(377, 190, 427, 246),
-             cited=("planets",), mass=(150, 150), dimscheck="desc-planet"),
+        # DESC planet (tNG-C PLANET INDEX LAW): smhome k<race row> NATIVE
+        # 52x52 at screen (382,191) (anchor (406,217) + bbox (-24,-26)).
+        # Vendor refcap bbox (381,191)-(433,241) = 53x51 (1px drift law).
+        dict(name="desc-planet", vkind="content", rect=(377, 188, 436, 246),
+             cited=("fixed", SMHOME), mass=(150, 150),
+             dimscheck="desc-planet"),
+        # tNG-C CHIP ROW: seven raceflag ramp emblems, refcap tight content
+        # bbox (381,433)-(491,458) n=1698. RECT IS TIGHT-TO-CONTENT, not the
+        # task's padded (379,428,495,464): measured, the padding rows/cols
+        # hold panel-inset noise that saturates the NAVY detector's bbox to
+        # the full region (vendor bbox (380,428)-(495,464)), which grades
+        # nothing. mass: ours floor is PER-CHIP (n_ours is measured inside
+        # the dimscheck window = one 15x25 chip; ink census k3 = 242+9 px);
+        # vendor floor is the whole strip. cited dims = strip extent
+        # 7*16-1 = 111 wide x 26 tall (frame rows included).
+        dict(name="playercolor-chiprow", vkind="content",
+             rect=(381, 433, 491, 458), cited=("fixed", (111, 26)),
+             mass=(200, 1200), dimscheck="playercolor-chiprow"),
         # ---- tA2-CONT CHROME-BAND REGIONS (tA2 law, docs/re/_wip_tA2.md
         # F3/F5/F7). kind="band": mean-lum window + census-family presence
         # on BOTH sides (vendor crop = ground truth). Windows are MEASURED
