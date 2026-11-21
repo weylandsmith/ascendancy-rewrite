@@ -21,6 +21,23 @@
 #include "ui/boot.h"
 #include "ui/cam3d.h"  // t414: neutralTint (preview point families)
 #include "ui/menulaw.h"
+
+// tA1-CONT DIMSCHECK WITNESS: one-shot printf of the cited record dims +
+// destination anchor at each gated blit, consumed by
+// scripts/t441_screen_diff.py (G2). Names are region keys; printed once
+// per name per process.
+namespace {
+void dimsCheck(const char* name, int w, int h, int x, int y) {
+    static std::vector<std::string> seen;
+    const std::string n(name);
+    for (const auto& s : seen)
+        if (s == n)
+            return;
+    seen.push_back(n);
+    std::printf("ui dimscheck %s %d %d %d %d\n", name, w, h, x, y);
+    std::fflush(stdout);
+}
+}  // namespace
 #include "ui/mapchrome.h"  // t401: textureColourAt (the §4 hash-noise law)
 #include "ui/titlepalette.h"
 #include "ui/ui_internal.h"
@@ -568,6 +585,9 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 bool ringDrawn = false;
                 if (raceringLib.count() > playerColourIdx) {
                     const auto& rr = raceringLib.record(playerColourIdx);
+                    dimsCheck("desc-ring", int(rr.width), int(rr.height),
+                              kDescRingCentre.x + int(rr.left),
+                              kDescRingCentre.y + int(rr.top));
                     ringDrawn = blitShape(ren, raceringLib, playerColourIdx,
                                           kDescRingCentre.x + rr.left,
                                           kDescRingCentre.y + rr.top);
@@ -589,6 +609,10 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     // the disc (t414's manual circle compensated the port's
                     // truncated 49x49 read — no longer needed).
                     const auto& pr0 = pl->record(0);
+                    dimsCheck("desc-portrait", int(pr0.width),
+                              int(pr0.height),
+                              kDescRingCentre.x + int(pr0.left),
+                              kDescRingCentre.y + int(pr0.top));
                     blitShape(ren, *pl, 0, kDescRingCentre.x + pr0.left,
                               kDescRingCentre.y + pr0.top);
                 }
@@ -611,6 +635,9 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     // tNG-C owns the race->planet law (D19).
                     const int rec = (selIndex % 11) * 5 + 1;
                     const auto& pr = planetsLib.record(rec);
+                    dimsCheck("desc-planet", int(pr.width), int(pr.height),
+                              kDescPlanetCentre.x + int(pr.left),
+                              kDescPlanetCentre.y + int(pr.top));
                     blitShape(ren, planetsLib, rec,
                               kDescPlanetCentre.x + pr.left,
                               kDescPlanetCentre.y + pr.top);
@@ -683,6 +710,11 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     bool ringDrawn = false;
                     if (raceringLib.count() > 7) {
                         const auto& rr = raceringLib.record(7);
+                        dimsCheck(("racelist-row" + std::to_string(i) +
+                                   "-ring").c_str(),
+                                  int(rr.width), int(rr.height),
+                                  kRacePortraitCx + int(rr.left),
+                                  cy + int(rr.top));
                         ringDrawn = blitShape(ren, raceringLib, 7,
                                               kRacePortraitCx + rr.left,
                                               cy + rr.top);
@@ -700,6 +732,11 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     }
                     if (const auto* pl = portraitFor(specnum)) {
                         const auto& pr0 = pl->record(0);
+                        dimsCheck(("racelist-row" + std::to_string(i) +
+                                   "-portrait").c_str(),
+                                  int(pr0.width), int(pr0.height),
+                                  kRacePortraitCx + int(pr0.left),
+                                  cy + int(pr0.top));
                         blitShape(ren, *pl, 0, kRacePortraitCx + pr0.left,
                                   cy + pr0.top);
                     }

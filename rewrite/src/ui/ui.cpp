@@ -27,6 +27,21 @@
 #include "ui/planetview.h"
 #include "ui/abilitylaw.h"
 #include "ui/speciesmenu.h"
+
+// tA1-CONT DIMSCHECK WITNESS (see title.cpp): one-shot cited-dims +
+// destination printf consumed by scripts/t441_screen_diff.py.
+namespace {
+void dimsCheck(const char* name, int w, int h, int x, int y) {
+    static std::vector<std::string> seen;
+    const std::string n(name);
+    for (const auto& s : seen)
+        if (s == n)
+            return;
+    seen.push_back(n);
+    std::printf("ui dimscheck %s %d %d %d %d\n", name, w, h, x, y);
+    std::fflush(stdout);
+}
+}  // namespace
 #include "ui/fleetlist.h"
 #include "ui/raceintro.h"  // t434: kIntroRaceBytes (race colour-byte table)
 #include "ui/researchview.h"
@@ -1765,6 +1780,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         // size (k1 bbox 130x127 == measured 130x126 sun);
                         // NATIVE blit at centre+(L,T), no 2x.
                         const auto& sr = kLibs[sunLibIdx].record(sel);
+                        dimsCheck(("row" + std::to_string(i) + "-sun").c_str(),
+                                  int(sr.width), int(sr.height),
+                                  kStatusSunCx + int(sr.left),
+                                  y + kStatusSunCy + int(sr.top));
                         blitShape(ren, kLibs[sunLibIdx], sel,
                                   kStatusSunCx + sr.left,
                                   y + kStatusSunCy + sr.top);
@@ -1794,6 +1813,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         // tA1: content bbox == drawn size (k3 bbox 71x71 ==
                         // the measured ~70px Large planet); NATIVE, no 2x.
                         const auto& r = kLibs[planetLibIdx].record(prec);
+                        dimsCheck(("row" + std::to_string(i) + "-planet").c_str(),
+                                  int(r.width), int(r.height),
+                                  kStatusPlanetCx + int(r.left),
+                                  y + kStatusPlanetCy + int(r.top));
                         blitShape(ren, kLibs[planetLibIdx], prec,
                                   kStatusPlanetCx + r.left,
                                   y + kStatusPlanetCy + r.top);
