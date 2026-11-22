@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-22T10:40
+updated: 2026-11-22T12:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,6 +233,104 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
+NEXT tNG-S CYCLE 3 — Z-AXIS GEN LAW + AUTO-ROTATE WITNESS + PORT (D21
+verbatim: "The original is a rotating sphere containing a volume of
+stars in both places. Rather than trying to make something that looks
+approximately like that, can we reverse engineer that in the original
+and reimplement faithfully in the rewrite?" — grading HELD until this
+closes + re-package). CYCLE 2 LANDED (below): P1 CLOSED — the star
+source IS the campaign galaxy table (star record +0x30/+0x34/+0x38
+float triple, STATE+0xd8d+0x60j law, t441 census); producer
+FUN_00028fc0 fills the 21B clip cursor array [win+0xb3] (kind 0 =
+stars &LAB_00013bc5+k*0x60), builder FUN_000284bc transforms +0x30
+triple via FUN_00053324 and appends visible clips to the [win+0x172]
+pointer array (count word +0x572) — the cycle-1 +0x172-vs-+0xb3
+confusion is RESOLVED, one table two stages. Rotation law ALREADY
+CLOSED by t416 (docs/re/_wip_t416.md F1-F3: +-2 DEG per pump tick
+about WORLD Y (L/R) / WORLD X (U/D) on basis [win+0x14e], toggle
+latch [win+0xc0], pump msg 0x3b ~1/s t302-measured, no clamp; port
+cam3d.cpp implements it). f32[0x9f108] delta-scale measured ~0 in
+bank-41 (t416 S-d stands). REMAINING = z-gen law, the newgame
+auto-rotate question, port, pins, re-package. ORDER (rationale: W1 is
+one dbg session and decides whether the port must auto-spin at all;
+Z1 is cheap static and gates source fidelity; port can't be cited
+without both; re-package last per D21):
+ W1 AUTO-ROTATE WITNESS (dbg build work/r1/bin/dosbox-x-dbg, scratch
+    savedir law, t302 BPDEL-before-RUN protocol): to the newgame
+    screen (r287_title_nav + positional RFB click law, NEVER Escape),
+    BP FUN_000283e4 ENTRY (the rotation writer, NAMED tNGS cycle 2,
+    payload 0x283e4); bank edx selector + pushed angle f32 +
+    [win+0xc0] twice ~2 s apart. FIRING unattended => vendor
+    auto-latches on newgame (find who sets [win+0xc0] bits then);
+    ZERO fires => newgame field is STATIC in the vendor and D21's
+    "rotating" refers to the COSMOSWnd map — that verdict changes the
+    port (no auto-spin) and is itself the measurement.
+ Z1 STAR Z LAW: who writes the float at star rec +0x34 (z) at
+    new-game? Hunt writers around the mapgen family (OQ-012c shell
+    position law is CLOSED for x/y; z is the uncited third axis).
+    Measured envelope to reproduce (41.sav T=50, 50/50 decoded):
+    x[-412.9,376.9] y[-421.9,436.3] z[-421.3,402.4], radius in
+    [50,440], z independent of x/y. If the writer is found, lift the
+    law verbatim; if not (static exhaustion class, t212/t213), the
+    port draws z uniform-in-envelope as a NAMED STATISTICAL SEAM —
+    say so honestly, do not present it as law.
+ P4 PORT: newgame starfield = galaxy-table stars (x,y mapgen law + z
+    law/seam), camera (0,0,-1500) FOV 35 near 1 far 1e5, perspective
+    divide + 0.5-bias round + viewport-centre offsets, depth-banded
+    sprite classes v=round(d-1500): >220/1..220/-219..0/<=-220 ->
+    shapes 0..3, NO sphere clip (containment intrinsic — our clip is
+    the D21 bug); reuse cam3d.cpp basis math for any rotation the W1
+    verdict requires (latch law already pinned there); retire the
+    ad-hoc shell sampler. Pins: count + radial profile + colour census
+    vs refcap (t441_screen_diff newgame regions) + rotation pin per
+    W1 verdict.
+ P5 re-package scratchpad/NG-usergrade.png (tNGU_composite --checklist)
+    -> rewrite NEXT to WAIT-USER-GRADE-NG3.
+Budget: cycle 3 of the D18 <=3 rule — HARD cap; anything unresolved
+goes on the plain-language open list in the package, honestly. KNOWN
+(do NOT re-derive): colour law tNG-F1; Begin panel = SHRUNK same field
+(tNG-C F11, /5+5 law); projection + sprite bands + camera FUN_00026a9c
+(cycle 1 S5); producer/builder/table chain (cycle 2 S10-S13);
+rotation +-2deg axes t416; pump ~1/s t302; capstone =
+~/tools/revenv/bin/python scripts/t442_disasm.py; Ghidra bridge
+127.0.0.1:8089 live. GAME UNTOUCHED this iteration (turn 1086
+baseline re-verified 20/20; do NOT mount the pristine dir).
+
+tNG-S CYCLE 2 LANDED 2026-11-22 (P1 CLOSED WITH CITATIONS + t416
+SUPERSEDURE; no code change, no OQ row moved — D21 starfield work
+tracks no ledger row, honest negative: open=[016,019] unchanged. Full
+record docs/re/_wip_tNGS.md S9-S13).
+(i) CYCLE-1 LEAD REFUTED: FUN_0004709c is the TECH-TREE layout
+  generator (iterates RESTREE census WORD[0x74744] stride 0x4b, places
+  nodes y=240+30*step+15*(step&1), rotates 360/(slot-1)+0.1*i — asm
+  work/tNGS_gen1/2.asm), NOT the star source. reswin.txt absence
+  stands but is moot.
+(ii) PRODUCER/CONSUMER CHAIN CLOSED: FUN_00028fc0 (cycle-1 mislabelled
+  pump-only) appends 21B clips at [win+0xb3]+count*0x15: kind0 stars
+  = star-record pointers (&LAB_00013bc5+k*0x60 == STATE+0xdb5), kind1
+  lines, kind2 ships; builder 0x284bc kind-0 leg transforms
+  [clip_src+0x30] triple via FUN_00053324 (VERIFIED 4x4 affine decomp)
+  + 0x53374 perspective -> rec+5/+7/+0xd, appends to [win+0x172] ptr
+  array via 0x2974c (count +0x572). Allocation 0x26a4f size count*21.
+(iii) MEASURED: star float triple at rec+0x30/34/38 IS the campaign
+  star table (t441 census coords match); 41.sav T=50: full 3D spread,
+  radius [50,440], z independent — the volume is the GALAXY, D21
+  honest-negative branch stays resolved-negative.
+(iv) ROTATION: independently re-derived the dispatcher (0x27a18 latches
+  [win+0xc0], writer 0x283e4 -> 0x53554/0x53584 on [win+0x14e]) then
+  found t416 already closed it (+-2deg world-Y/X, latch semantics,
+  cam3d.cpp shipped) — corroboration, not new law; f32[0x9f108]
+  measured ~0 (bank-41, P0-anchored via pi/180 const).
+(v) PITFALLS banked: guest-physical vs MEMBER anchor slip (P0 =
+  member-0x88-X, not B+X twice-over); restored-bin bytes past
+  0x8cc83 absent — bss fields (0x9f108, 0xfb0/fb4) must be read from
+  SAVES not the image; t441 census script is the star-table reader
+  (manual STATE math error-prone, reuse it).
+(vi) GAME UNTOUCHED (turn 1086 HEALTHY 20/20 via t368_ring_turn; no
+  sitting — r1_t85g_sitting NOT run; no capture session this
+  iteration).
+
+--- SUPERSEDED tNG-S CYCLE 2 assignment (executed above; kept for archaeology):
 NEXT tNG-S CYCLE 2 — STARFIELD ROTATION WITNESS + FAITHFUL PORT (D21
 2026-11-22 verbatim: "The original is a rotating sphere containing a
 volume of stars in both places. Rather than trying to make something

@@ -163,6 +163,140 @@ centre offset; 4. sprite = bank*4 + depth-class bands (>220 / 1..220 / -219..0
 / <=-220); 5. self-reposting timer pump; 6. NO sphere clip — containment is
 intrinsic to the 3D positions (our clip is the bug D21 sees).
 
+## S9. CYCLE 2 P1 — FUN_0004709c GENERATOR: NOT THE STAR SOURCE (REFUTED)
+[measured, asm work/tNGS_gen1.asm + work/tNGS_gen2.asm, 0x4709c..0x47464]
+- The 0x471f9 "generator" body is the TECH-TREE layout generator, not a star
+  generator. Evidence: it iterates the tech census WORD[0x74744] over records
+  stride 0x4b at 0x74784 (the RESTREE record law, OQ-013), reads the 5
+  child/prereq slots (0x74784+rec, bytes 0xFF-terminated), builds a
+  child-after-parent ORDER array (0x47240..0x472c0), rng-permutes it
+  (0x472d4..0x47300), then places each star record at y = 240 + 30*step +
+  15*(step&1) (0x473e0..0x47428: fild [esp+0xdc], fstp [ebx+4]), z-degrees =
+  0 or 23 (0x473b6), x=0, then rotates by angle = 360/(childSlot-1) + 0.1*i
+  (0x4743d..0x47464, idiv 0x168=360, fadd [esp+0x100]). Camera fov30/z-150/
+  320-wide = the research-tree view. The cycle-1 note "rotate loop ... via
+  FUN_0005324c degrees" was a misread: 0x4743d is INSIDE this body, not a
+  separate star loop.
+- File branch 0x4713e..0x471e3 reads N records x 3 ints (fmt ds:0x24bb,
+  3x ds:0x24be) gated on WORD[0x74744]==file-count — also tech-tree (count
+  must equal the tech census), and its file is absent anyway.
+=> CONSEQUENCE: the COSMOSWnd star table source ([COSMOSWnd+0x172], count
+   WORD +0x572) is STILL UNNAMED. P1 re-scoped: find who allocates/fills it.
+   Clue: records are 21-byte CLIPS with PRECOMPUTED screen x/y at rec+5/+7 —
+   so the rotator writes clip coords every tick; the clip builder FUN_000284bc
+   + its callers is the direct hunt (this also serves P2).
+## S10. CYCLE 2 P1 CONT — CLIP BUILDER FUN_000284bc DECOMPILED (VERIFIED)
+- Sole caller 0x2745b (GAP fn; also sibling tail 0x273e6) — both legs:
+  call FUN_00028fc0 (pump re-post) then FUN_000284bc(win) then vtable
+  [win+0xa7]+0xc repaint. So the builder runs right before each repaint.
+- Body law [verified decompile]: cursor piVar11 = *(win+0xb3), start
+  adjusted -0x15, loop stride +0x15 (21B). WIN IS param_1+0xb3 POINTER —
+  NOT +0x172 (cycle-1 said table=[COSMOSWnd+0x172] from the painter;
+  reconcile: +0x172 is the painter-side array, +0xb3 the builder cursor —
+  may be same block via different fields, UNRESOLVED, name it).
+- Per-record kind byte = byte[rec+1] (piVar11+1):
+  0 = STAR: FUN_00053324 (point x 4x4 matrix -> vec3, VERIFIED decompile:
+  out = m[0..3]*v etc incl translation column m[3]/[7]/[11]) then near/far
+  gate (win+0x106/+0x10a) then FUN_00053374 perspective -> writes rec+5=x,
+  rec+7=y, rec+0xd=depth, rec+0x11 = 0 (visible) or -1 (skip). MATRIX ARG
+  = the transform operand of 0x53324 at 0x28552 (register-passed; identify
+  which = THE rotation question).
+  1 = LINE segment (two 0x53324 + two 0x53374, writes rec+5/7/9/b).
+  2 = object sprite (ship): byte[src+0x58]==5 special 3D; else copies
+  src+5/+7 coords with owner-bitset x-offset +2 per owner (0x28b0x loop
+  over 7 bits of [src+0x14] & [win+0xd8]) — MAP objects, not stars.
+- Loop exit: win+0xb5>>16 <= counter -> FUN_0002976c, return.
+- NEXT: identify the matrix operand at the 0x28552 star site (disasm
+  0x28540..0x28560); xref FUN_0005324c 4th caller 0x38f68; find writer of
+  rec+0/+4 (world xyz) for kind-0 records; find allocation of the +0xb3
+  block (count + 3D coords).
+## S11. CYCLE 2 P2 PREMATURE WIN — ROTATION LAW FOUND STATICALLY (VERIFIED asm)
+THE COSMOSWnd message-handler GAP fn (0x27100..0x27ad7 region; esi=win)
+CONTAINS THE ROTATION PUMP + WRITER. Cited verbatim:
+- WINDOW-INIT leg (msg==3 @0x27107): sets rect fields +0x8/+0xc/+0x10/+0x14,
+  viewport words: [win+0x576]=((y1-y0)>>1) (0x27147), [win+0x578] via x
+  (x1-x0)>>1; [win+0x57a]=0x420c0000=35.0 (FOV, 0x2716c); camera re-init
+  FUN_000203b8(win+0xda, fov=[win+0x57a], near 1.0, far 5e4, w) @0x27187.
+- ROTATION WRITER FUN_000283e4(win, edx, f32 angle_deg) [asm 0x283e4..0x28422]:
+  fmul [0x9f108] (radian factor, VERIFY) -> edx==-1 ? FUN_00053584 :
+  FUN_00053554 on MATRIX lea eax,[win+0x14e]. THE ORIENTATION WRITER, NAMED.
+- FUN_00028428 [0x28428..0x284b9]: guard [win+0x57a] vs consts [0xfb0]/[0xfb4];
+  [win+0x57a] += int * [0x9f108] (0x28477); camera re-init 0x203b8;
+  invalidate via FUN_00029740. ZOOM/FOV control, not the spin.
+- DISPATCHER leg (0x27a18..0x27acb, esi=win), gates on byte [win+0xc0]:
+  bit0 -> FUN_000283e4(angle = bit1 ? -2.0 : +2.0, edx=-1)  @0x27a4b
+  bit2 -> FUN_000283e4(angle = bit3 ? +2.0 : -2.0, edx=0)   @0x27a80
+  bit4 -> FUN_00028428(edx = bit5 ? +1 : -1)                @0x27aa3
+  any(bit0|bit2|bit4) -> FUN_000284bc (rebuild clips) + vtable +0xc repaint
+  @0x27ab7..0x27ac6. NONE -> ret.
+=> ROTATION LAW: each pump tick with a direction bit set rotates the
+   [win+0x14e] orientation matrix by 2.0 DEGREES about one of THREE axes
+   (edx selector), then rebuilds the clip table and repaints. The three
+   counters +0xb7/+0xb9/+0xbb (wraps 5/8/3) are the carousel indices; WHO
+   sets [win+0xc0] bits is the remaining sub-question (auto-spin vs key
+   press — keys 0x1f6/0x1f7/0x1f9 arms in the painter dispatcher 0x528eb
+   inc those counters; [win+0xc0] setter hunt next).
+- Clip builder FUN_000284bc CONFIRMED CONSUMER: cursor [win+0xb3], radian
+  matrix ops via FUN_00053324 (4x4 affine point transform, VERIFIED).
+## S12. t416 SUPERSEDURE + FIELD RECONCILIATION (VERIFIED)
+- THE ROTATION LAW IS ALREADY CLOSED by t416 (docs/re/_wip_t416.md F1/F2 —
+  banked 2026-11-17, port cam3d.cpp implemented F3): COSMOSWnd msg pairs
+  0x32/0x33 (L/R latch bits0/1), 0x34/0x35 (U/D bits2/3), 0x36/0x37 (zoom
+  bits4/5) on [win+0xc0]; pump msg 0x3b (~1/s, t302 MEASURED) applies
+  delta = +-2 DEG per latched pair: L/R -> FUN_00053584 (mixes x,z = WORLD
+  Y), U/D -> FUN_00053554 (mixes y,z = WORLD X) on basis [win+0x14e]
+  (eye (1,0,-1500), up (0,1,0), fwd (0,0,1) — FUN_00026a9c immediates),
+  right=cross(up,fwd) recomputed FUN_00053804; NO clamp; toggle-latch press
+  semantics. S11 this-session = INDEPENDENT RE-DERIVATION of the same law
+  (dispatcher 0x27a18, writer 0x283e4, radian mult via 0x531dc/0x5324c ->
+  DAT_00088b88 pi/180) — CORROBORATION, not new law. P2's debugger witness
+  is CONFIRMATORY ONLY; the axis+rate citation for P4 = t416 F2 + t302.
+- f32[0x9f108] = bss delta-scale, runtime value measured ~0 in bank-41.sav
+  (reads denormal, effectively 0 => delta degenerates to +-2 immediates;
+  t416 S-d law 'port documents scale 1.0' stands).
+- FIELD RECONCILIATION: runtime window fields = static + 0xbf (runtime
+  +0xb3 == static +0x143 'camera basis'?? NO — cycle-1 painter read static
+  +0x572 == runtime +0x4b3; builder reads RUNTIME +0xb3/+0xb5/+0xc0/+0x57a
+  (0x57a appears with the SAME role in both t416 and 0x2716c init 35.0).
+  UNRESOLVED which address system each doc used; the BUILDER asm is ground
+  truth: cursor ptr runtime[win+0xb3], count runtime[win+0xb5]>>16, latches
+  runtime[win+0xc0], zoom runtime[win+0x57a]. Name it; do not blend.
+## S13. CYCLE 2 P1 CLOSED — THE STAR SOURCE IS THE CAMPAIGN GALAXY TABLE
+[verified: work/coswnd_decomp/28fc0.c + 268d4.c + fresh asm 0x284d8..0x28570,
+ 0x26a13..0x26a86; measured: bank-t438-ring-2200/41.sav via
+ scripts/t441_race_table_census.py coordinate law]
+- FUN_00028fc0 IS THE CLIP-TABLE PRODUCER (cycle-1 called it only a pump
+  re-post — WRONG; correction banked). Three append loops, each writing at
+  ([win+0xb3] + ([win+0xb5]>>16)*0x15): rec+0 = SOURCE POINTER, rec+4 = KIND:
+  kind 0 = STARS: &LAB_00013bc5 + k*0x60, k < DAT_00016143._2_2_ (star count);
+  kind 1 = LINE segs: &PTR_DAT_00016147 + k*0x27 gated by DAT_00089324 bits;
+  kind 2 = SHIPS: &DAT_0003a095 region stride 0x162, k < 0x6b, gated by
+  DAT_00043489 count + byte==5. 21-byte cursor array allocated at 0x26a4f
+  size = count*21 ((edi*4+edi)<<2+edi), freed/realloc'd on init (0x26a13..).
+- RECONCILIATION (the cycle-1 +0x172/+0x572 vs +0xb3/+0xb5 confusion):
+  [win+0xb3] = 21-byte CLIP RECORD cursor array the producer fills and
+  builder 0x284bc walks; [win+0x172] = u32 POINTER array the builder appends
+  visible clips into via FUN_0002974c (0x29740 zeroes count at +0x172+0x400
+  = +0x572). Painter reads the pointer array + count word. ONE table, two
+  stages, both cited.
+- STAR COORDINATES: star rec pointer stored at rec+0x28 of the star record
+  (LAB_00013bc5 == STATE+0xdb5 == star-base STATE+0xd8d + 0x28); builder
+  kind-0 leg (asm 0x2853f..0x28552): mov eax,[clip]; add eax,8 ->
+  FUN_00053324 transforms THE FLOAT TRIPLE AT STAR RECORD +0x30/+0x34/+0x38
+  — the EXACT campaign star table (t441 law, STATE+0xd8d+0x60j).
+- MEASURED 3D DISTRIBUTION (41.sav, T=50 decoded 50/50): x [-412.9,376.9]
+  y [-421.9,436.3] z [-421.3,402.4]; radius sqrt(x2+y2+z2) in [50,440];
+  z independent of x,y (0/50 zero, stdev 222) — the galaxy is a VOLUME, not
+  a plane. Mapgen (OQ-012c/OQ-025 CLOSED shells) supplies x,y; z is the
+  third axis of the same generation. => D21 'rotating sphere containing a
+  volume of stars' = THE GALAXY ITSELF projected; newgame screen shows the
+  demo galaxy (~100 clips per tNGF census).
+- CONSEQUENCE FOR PORT: star source = existing closed mapgen law extended
+  to 3D (z same magnitude as x/y, sphere containment intrinsic — max radius
+  440 at T=50); NO separate star RNG; NO reswin.txt (that fn 0x4709c is the
+  TECH-TREE layout, S9). Rotation law = t416 (world Y/X basis orbit +-2deg
+  per pump tick, pump ~1/s t302-measured) — P2 dbg witness now CONFIRMATORY
+  only, not a port prerequisite.
 ## S7. CYCLE 2 PROBES, ORDERED
  P1 decode FUN_0004709c's file format string ds:0x24bb + find the shipped
     star file; if absent -> generator law only (say so honestly).
