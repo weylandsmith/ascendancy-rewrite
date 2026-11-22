@@ -412,3 +412,95 @@ campaign star table, t441 base law):
   fix had not yet been observed end-to-end when budget closed. NEXT session:
   run scripts/r_tNGS3_w1_relaunch.sh; verdict lands in dbg-tngs3w1-*/w1.json
   ("AUTO-SPIN ON..." vs "STATIC..." per the S14 leg table).
+
+## S17. CYCLE 3b W1 RUN — NAV ROOT CAUSE MEASURED (run dbg-tngs3w1-20261122-151714)
+Frame diff _raw_03 (title settled, orange 0.679) vs _raw_04 (after the
+two-click nav): changed row bands = 339..370 and 380..410, ZERO px in
+275..315. Vision on _raw_03: rows are PlayIntro ~295-338, Tutorial
+~339-371 (TEAL highlighted), New Game ~378-412, Return/Load/Save/Exit
+below; game 640x480 content sits at root (80,100)..(720,580) on the
+800x600 private Xvfb.
+=> TWO LAWS: (1) xsend click coords are WINDOW coords (root = +80,+100);
+   the script's (250,295) landed EXACTLY on the New Game row (root y 395).
+   The fresh-boot row table 280..310 NewGame in GAME/window coords is
+   CORRECT. (2) The neutral-first-click variant was WRONG: the target-row
+   click DID move hover onto New Game (band diff proves it) but the press
+   was still consumed as hover-establishment. t385b REFINED: the first
+   click ON A ROW only hovers; click the SAME row twice (first=hover,
+   second=fire). Script patched: NewGame click x2 with 2 s settle, plus a
+   conditional third; Begin click likewise x2.
+## S17b. Same-row DOUBLE-click also FAILED (runs 153216/153535: identical
+frame diff — hover moved to New Game, orange unchanged 0.679). Combined
+with the t439 law ("xsend key Return failed; RFB/PointerEvents worked"):
+xsend's XSendEvent ButtonPress is SYNTHETIC and the dbg dosbox ignores it;
+the hover moves because XWarpPointer is a real warp. FIX = XTEST channel
+(xdotool mousemove+click = real fake-input events).
+## S18. ROOT CAUSE OF ALL NAV FAILURES + FIX (verified on disk)
+The RFB channel (the ONLY proven firing input: t292/t439 entered campaigns
+through it) was DEAD in every tNGS3 session: x11vnc.out verbatim
+"error while loading shared libraries: libvncserver.so.1". Production
+(r1_playcap_vnc.sh:158) exports LD_LIBRARY_PATH=$DEB/root/usr/lib/... when
+launching x11vnc; r_tNGS3_w1_session.py launched it WITHOUT that env, and
+set rfb_* helpers to the WRONG offsets (192/184) — the fresh-Xvfb window
+origin is (80,100) (vision-measured game content 80..720 x 100..580),
+matching r287_vncinput defaults RFB_XOFF/YOFF=80/100. xsend's XSendEvent
+presses are SYNTHETIC: they warp the real cursor (hover moves) but the
+vendor never fires them — that is the complete t385b "first click only
+hovers" explanation. FIX: LD_LIBRARY_PATH in the Popen env + nav via
+rfb_move/rfb_click (offsets 80/100) with double-click insurance.
+
+## S19. CYCLE 3b VERDICT: W1 STILL UNDECIDED — nav fixed to the LAST
+## open question (one control experiment away). Honest negative, banked in
+## full. Runs: 151714/153216/153339/153535/155426/155552/155718 (+3 BREAK
+## lottery losses).
+WHAT THIS ITERATION PROVED (all measured, runs above):
+ 1. xsend (XSendEvent) presses are SYNTHETIC: XWarpPointer moves the real
+    cursor (hover repaints) but the vendor NEVER fires the press. Neutral-
+    first-click and same-row-double-click variants BOTH failed with the
+    IDENTICAL frame diff (bands 339-370 + 380-410 only).
+ 2. The bundled x11vnc died at exec EVERY prior tNGS3 session
+    (libvncserver.so.1) — FIXED this iteration by exporting
+    LD_LIBRARY_PATH=work/r1/localdeb/root/usr/lib/x86_64-linux-gnu in the
+    Popen env (r1_playcap_vnc.sh:158 precedent). Verified: x11vnc 0.9.17
+    starts, accepts connections (x11vnc.out of 155718 logs them).
+ 3. rfb_* helpers carried the WRONG offsets (192/184 production-drift);
+    fresh-Xvfb window origin is (80,100) (vision: content 80..720 x
+    100..580) = r287 defaults. FIXED.
+ 4. With RFB move+click at correct coords: hover lands ON New Game and
+    STAYS (vision on _raw_04 of 155718), guest is RUNNING (frames
+    repaint), yet orange stays 0.679 — the press does not activate.
+STILL OPEN (the ONE question): do synthetic button events fire the dbg
+dosbox-x-dbg title menu AT ALL? t287 (production) shows an RFB click DID
+activate a row (the stale-hover Tutorial — DOSBox processed press with
+pre-move coords). If clicks fire on dbg, the New Game row should have
+transitioned (stale-hover would fire TUTORIAL, changing the screen — it
+did not). Therefore suspicion: the dbg build or the unfocused fresh-Xvfb
+window gates BUTTON delivery while motion still repaints hover.
+CONTROL EXPERIMENT FOR NEXT (one session, decide in minutes):
+ C1 after arming at the settled title, RFB click the "Exit to DOS" row
+    (window (250,448) -> r287 +80/+100 = root (330,548)). Guest QUITTING =
+    clicks fire -> then the New Game problem is coordinate/timing-local
+    (try click at the vision cursor pos exactly, and a 1 s hold:
+    move, press, sleep 1.0, release).
+ C2 if no quit: RFB key Return (fires the HOVERED row per t287 — default
+    hover is Tutorial; if the tutorial launches, KEYS fire -> nav law =
+    move-to-row, wait 1 s, Return; NOTE S16: arrows do NOT move hover).
+    Also try xsend key Return once more (xsend calls XSetInputFocus on the
+    DOSBox window — t439 said it failed on production, re-verify on dbg).
+ C3 if NEITHER fires: the dbg window is input-deaf on fresh Xvfb; then
+    run the SAME control against the PRODUCTION binary on a scratch copy
+    (no breakpoints needed for C1/C2) to isolate build vs environment.
+    If production-scratch fires and dbg does not, W1's dynamic half is
+    dbg-instrument-limited: fall back to the STATIC verdict (S14: latch
+    auto-fires iff state==3) and CLOSE W1 as "static law cited, dynamic
+    witness blocked — named instrument ceiling", then P4 PORT proceeds on
+    the static law (auto-spin ON with the t416 +-2deg law) with the
+    ceiling stated in the package open-list.
+
+## S20. C2 EXECUTED (run 165042): RFB key Return ALSO did not fire
+(after_ng_orange_key=0.679, hover verified on New Game). Both input
+channels move hover, neither activates, on dosbox-x-dbg at a fresh :97.
+The C3 production-binary control (S19) is the decisive next probe; if it
+fires, W1's dynamic half is dbg-instrument-limited and W1 CLOSES on the
+S14 static law with the ceiling named (auto-spin ON per state==3 latch,
+t416 +-2deg rotation in the port).

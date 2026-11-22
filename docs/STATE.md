@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-22T15:00
+updated: 2026-11-22T17:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,25 +233,91 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-S CYCLE 3b — RUN THE W1 WITNESS, THEN PORT (D21; cycle cap: this
-is the LAST cycle of the D18 <=3 rule, everything unresolved goes on the
-package's plain-language open list). ORDER (rationale: W1 is one script
-invocation and its verdict decides whether the port auto-spins at all, so
-nothing downstream can be written before it; Z1 is CLOSED (see LANDED) so
-the port's star source is fully cited; re-package last per D21):
- W1 RUN: bash scripts/r_tNGS3_w1_relaunch.sh (5-launch BREAK-lottery wrap;
-    the script is FIXED and was armed successfully 4x this iteration — do
-    NOT rewrite it). Verdict lands in work/r1/dbg-tngs3w1-<ts>/w1.json:
-    "AUTO-SPIN ON..." (writer 0x283e4 fired, axis+angle cited) vs
-    "STATIC..." (pump fired with latch==0 / no fire) vs a NEGATIVE.
-    If NEGATIVE again: the two-click nav (neutral 320,60 then 250,295 on the
-    NewGame row 280..310) is the suspect — verify by diffing _raw_03 vs
-    _raw_04 (a real transition repaints the whole well, hover repaints a
-    30-px band); if the click still only hovers, fall back to the KEYBOARD
-    channel (r287_vncinput key Return is dead this build — x11vnc missing;
-    use s.send(["key", ...]) xsend keys, which ARE accepted per t287) and
-    bank the nav law. A zero-fire verdict IS a measurement: newgame field
-    static, D21's "rotating" = the COSMOSWnd map only, port must NOT spin.
+NEXT tNG-S CYCLE 3c — C3 CONTROL, THEN CLOSE W1, THEN PORT (D21; final
+cycle of the D18 <=3 rule — whatever is unresolved goes on the package's
+plain-language open list). ORDER (rationale: one control experiment
+decides whether W1's dynamic half is instrument-limited or fixable; the
+port's star source is fully cited (S15) so P4 can proceed on the static
+law either way; re-package last per D21):
+ C3 CONTROL (docs/re/_wip_tNGS.md S19/S20 have the full failure chain —
+    READ THAT FIRST): on a SCRATCH copy (work/r1/game-wp, never game/),
+    launch the PRODUCTION /usr/bin/dosbox-x on a fresh private Xvfb :97
+    (copy r299_leg_session launch minus dbg bits; x11vnc WITH
+    LD_LIBRARY_PATH=work/r1/localdeb/root/usr/lib/x86_64-linux-gnu —
+    required, S18), then RFB (r287_vncinput, offsets 80/100): move(250,295),
+    click x2, and key Return. VERDICT: if the production binary LEAVES the
+    title (orange <0.20), input works there and the dbg build is
+    INPUT-DEAF at fresh Xvfb (hover repaints, presses/keys never fire —
+    4 witnesses this iteration: runs 151714/153216/155718/165042). Then
+    CLOSE W1 on the S14 STATIC LAW (auto-latch 0x26dd1 fires iff state==3
+    => the newgame field does NOT auto-spin; D21's "rotating" = the COSMOS
+    map), name the instrument ceiling, and P4 proceeds with NO auto-spin
+    for the newgame field (Begin-panel field too — same law).
+    If production ALSO does not fire: the fresh-Xvfb unfocused-window class
+    is the blocker; try xsend key Return once (it XSetInputFocus first) and
+    a 1-s press-hold (move, press, sleep 1.0, release) before concluding;
+    if still deaf, W1 closes on the same static law with the ceiling named
+    (the verdict is identical either way for the port).
+ P4 PORT (spec docs/re/_wip_tNGS.md S15+S19; unblocked by C3 either way):
+    newgame starfield = the galaxy generator law (3x rng%1000-500 ->
+    normalize -> x shell(k); shell 440 start, -75 step, clamp 50 —
+    replaces the t423 FUN_00022728 cylinder AND the splitmix sampler in
+    title.cpp:536-600; per-slot shell = shellRadiiFor(n) mapgen.cpp:20,
+    type = wheelGal->stars[i].type already wired); camera (0,0,-1500)
+    FOV 35 (focal = 242.5/tan(17.5deg) = 769.1 px; shell 440 -> 225.6 px
+    fits the 8..492 well); perspective divide + 0.5-bias + viewport
+    centre offsets; depth-band sprite classes v=round(d-1500): >220 /
+    1..220 / -219..0 / <=-220 -> cos_star 4*type+cls; NO sphere clip.
+    Rotation: per C3 verdict — static law says NO auto-spin at newgame
+    (Begin-hover faster-spin zone law t423 F7 stays as-is until cited
+    otherwise); cam3d.cpp's +-2deg law stays for the COSMOS map.
+    Pins: count + radial profile + colour census vs refcap (t441
+    newgame regions); mutation-verify changed constants.
+ P5 re-package scratchpad/NG-usergrade.png (scripts/tNGU_composite.py
+    --checklist; open list MUST state honestly: starfield law cited,
+    auto-rotate dynamic witness blocked by instrument ceiling) -> rewrite
+    NEXT to WAIT-USER-GRADE-NG3.
+GAME: production ring HEALTHY (pid 1470999, TL expiry 2026-11-24 14:53,
+turn 1086 20/20 re-verified this iteration; sitting check NEGATIVE).
+NEVER pkill Xvfb with -u (matches :9). Kill scratch orphans by exact PID.
+KNOWN (do NOT re-derive): Z1 star law S15; W1 static half S14; rotation
++-2deg t416; pump ~1/s t302; projection+camera cycle-1 S5; colour law
+tNG-F1; Begin panel /5+5; RFB = only proven firing channel on
+production (t439); xsend presses are synthetic (S17); x11vnc needs
+LD_LIBRARY_PATH (S18); fresh-Xvfb window origin (80,100) (S18).
+
+tNG-S CYCLE 3b LANDED 2026-11-22 (W1 WITNESS STILL UNDECIDED — honest
+negative, NO OQ row moved, open=[016,019] unchanged; the nav failure
+chain is now FULLY DIAGNOSED to one control experiment. Full record
+docs/re/_wip_tNGS.md S17-S20).
+PROVED THIS ITERATION (all measured on real runs):
+ - xsend (XSendEvent) presses are SYNTHETIC on this SDL build: the
+   XWarpPointer half moves the real cursor (hover repaints — frame diff
+   bands 339-370/380-410, ZERO px elsewhere) but the press NEVER fires;
+   neutral-first AND same-row-double variants both failed (runs 151714,
+   153216, 153535). scripts/tNGS3_w1_framediff.py = the band-diff tool.
+ - ROOT CAUSE of the dead RFB channel (all prior tNGS3 sessions): the
+   bundled x11vnc died at exec (libvncserver.so.1). FIX = LD_LIBRARY_PATH
+   =work/r1/localdeb/root/usr/lib/x86_64-linux-gnu in the Popen env
+   (r1_playcap_vnc.sh:158 precedent); verified 0.9.17 starts + accepts.
+   rfb_* helpers also carried WRONG offsets (192/184); fresh-Xvfb window
+   origin is (80,100) (vision: content 80..720 x 100..580) = r287
+   defaults. Both FIXED in r_tNGS3_w1_session.py.
+ - With a LIVE RFB channel at correct coords on the dbg build: hover
+   lands on New Game and stays (vision 155718 _raw_04), guest RUNNING,
+   yet clicks AND key Return (C2, run 165042 after_ng_orange_key=0.679)
+   do not activate. => the dbg dosbox-x-dbg at a fresh unfocused Xvfb is
+   INPUT-DEAF for activation; the C3 production-binary control (NEXT)
+   decides the class. Consequence banked: W1 can CLOSE on the S14 static
+   law (auto-latch 0x26dd1 iff state==3 => newgame field does NOT
+   auto-spin) with the instrument ceiling named, if C3 confirms.
+ - GAME UNTOUCHED: ring HEALTHY (pid 1470999), turn 1086 20/20, sitting
+   check NEGATIVE (t368_ring_turn baseline re-confirmed). Scratch orphans
+   killed by exact PID only (never pkill -u). ~10 scratch runs under
+   work/r1/dbg-tngs3w1-20261122-15*/16* (frames/logs kept for archaeology).
+
+--- SUPERSEDED tNG-S CYCLE 3b assignment (remnant; P4/P5 specs moved into
+the CYCLE 3c assignment above):
  P4 PORT (unblocked once W1 lands): newgame starfield = the galaxy generator
     law now fully cited (S15: 3x rng%1000-500 -> normalize -> x shell(k);
     shell 440 start, -75 step, clamp 50 — replaces the t423 FUN_00022728

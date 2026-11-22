@@ -141,7 +141,10 @@ def crop_diff(im1, im2, box):
 
 
 def rfb_move(x, y):
-    env = dict(os.environ, RFB_XOFF="192", RFB_YOFF="184",
+    # tNGS3b (S18): fresh-Xvfb window origin is (80,100) — vision-measured
+    # game content 80..720 x 100..580 — the r287 defaults. The old 192/184
+    # were production-drift values and WRONG here.
+    env = dict(os.environ, RFB_XOFF="80", RFB_YOFF="100",
                RFB_PORT=str(VNC_PORT))
     r = subprocess.run([sys.executable, op.join(ROOT, "scripts", "r287_vncinput.py"),
                         "move", str(x), str(y)],
@@ -150,10 +153,19 @@ def rfb_move(x, y):
 
 
 def rfb_click(x, y):
-    env = dict(os.environ, RFB_XOFF="192", RFB_YOFF="184",
+    env = dict(os.environ, RFB_XOFF="80", RFB_YOFF="100",
                RFB_PORT=str(VNC_PORT))
     r = subprocess.run([sys.executable, op.join(ROOT, "scripts", "r287_vncinput.py"),
                         "click", str(x), str(y)],
+                       capture_output=True, timeout=30, env=env)
+    return r.returncode
+
+
+def rfb_key(name):
+    env = dict(os.environ, RFB_XOFF="80", RFB_YOFF="100",
+               RFB_PORT=str(VNC_PORT))
+    r = subprocess.run([sys.executable, op.join(ROOT, "scripts", "r287_vncinput.py"),
+                        "key", name],
                        capture_output=True, timeout=30, env=env)
     return r.returncode
 
@@ -271,7 +283,12 @@ def main():
             [XVNC, "-display", DISP, "-rfbport", str(VNC_PORT),
              "-localhost", "-nopw", "-forever", "-shared"],
             stdout=open(op.join(out, "x11vnc.out"), "wb"),
-            stderr=subprocess.STDOUT)
+            stderr=subprocess.STDOUT,
+            # tNGS3b ROOT CAUSE (S18): without this the bundled x11vnc dies
+            # at exec (libvncserver.so.1) and EVERY RFB input is silently
+            # lost. Same env as r1_playcap_vnc.sh:158.
+            env=dict(os.environ, LD_LIBRARY_PATH=op.join(
+                ROOT, "work/r1/localdeb/root/usr/lib/x86_64-linux-gnu")))
         time.sleep(3)
         # t286 law: settle BEFORE the first BREAK; BREAK ITSELF IS A LOTTERY
         # (tngs3w1 attempt-3: hdr=None at 45 s settle, attempt-2 same code
@@ -321,18 +338,31 @@ def main():
         im = s.grab("title_settled")
         rec["title_orange"] = round(s.orange_frac(im), 3) if im else None
         save()
-        # t385b FIRST-CLICK-DROPPED LAW: the first synthetic click only
-        # establishes hover (attempt-5 witness: New Game row highlighted,
-        # no transition). Neutral click, then hover-settle, then the REAL
-        # click on the same row.
-        s.send(["click", "320", "60"])
+        # tNGS3b (S18): RFB IS THE ONLY PROVEN FIRING CHANNEL (t292/t439);
+        # xsend XSendEvent presses are synthetic (hover moves, never fires).
+        # Fresh-boot rows (window coords): PlayIntro 200-230 / Tutorial
+        # 240-270 / NewGame 280-310 -> click (250,295); r287 adds +80/+100.
+        # Double-click insurance: first=hover, second=fire.
+        rfb_move(250, 295)
+        time.sleep(1)
+        rfb_click(250, 295)
         time.sleep(2)
-        s.send(["click", "250", "295"])
+        rfb_click(250, 295)
         time.sleep(8)
         im2 = s.grab("after_ng_click")
         f2 = s.orange_frac(im2) if im2 else 1.0
         rec["after_ng_orange"] = round(f2, 3)
         save()
+        # tNGS3b C2 (S19): if the RFB click pair did not fire, the hovered
+        # row is provably New Game (vision on 155718 _raw_04) -> RFB key
+        # Return fires the HOVERED row (t287 law).
+        if f2 > 0.20:
+            rfb_key("Return")
+            time.sleep(8)
+            im2 = s.grab("after_ng_key")
+            f2 = s.orange_frac(im2) if im2 else 1.0
+            rec["after_ng_orange_key"] = round(f2, 3)
+            save()
         if f2 > 0.20:
             rec["verdict"] = "NEGATIVE: New Game click did not leave title"
             save()
@@ -345,9 +375,18 @@ def main():
             rec["field_px_changed"] = crop_diff(f1, f2, FIELD_BOX)
             rec["field_box"] = FIELD_BOX
         save()
-        # Begin -> campaign map (xsend warp-click, same t292 fresh-Xvfb law)
-        s.send(["click", str(BEGIN_CLICK[0]), str(BEGIN_CLICK[1])])
-        time.sleep(8)
+        # Begin -> campaign map (tNGS3b: RFB channel, S18; same-row
+        # double-click insurance)
+        rfb_move(*BEGIN_CLICK)
+        time.sleep(1)
+        rfb_click(*BEGIN_CLICK)
+        time.sleep(2)
+        rfb_click(*BEGIN_CLICK)
+        time.sleep(4)
+        rfb_move(320, 60)   # neutral hover: Return must NOT re-fire NewGame
+        time.sleep(1)
+        rfb_key("Return")   # tNGS3b C2: fire focused control if clicks deaf
+        time.sleep(4)
         grab_map = s.grab("map_post")
         phase["now"] = "map"
         poll("map", 15, stop_cap=6)
