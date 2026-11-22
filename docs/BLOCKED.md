@@ -313,3 +313,12 @@ Enforced statically by gate 3n/3n3.
   wheels only; kNewgameControls is 3 wheel zones). The dial law is t416/t425
   (closed for the GALAXY MAP; the user's axis complaint was the map dial);
   the spin-axes leg rides tGM-B ("starfield control buttons behavior").
+
+- 2026-11-21 tNG-U TRAP (harness): PIL Image.crop box is (l,t,r,b) with r,b
+  EXCLUSIVE — crop((1,1,642,482)) is 641x481, NOT the numpy law
+  im[1:481,1:641] (640x480). The browser-shot crop in
+  scripts/tNGU_composite.py is (1,1,641,481); any new side-by-side must use
+  that or trip the size assert (which exists precisely to catch this).
+  Related: t441's "ours (W,H) n=" dims come ONLY from --log dimscheck lines
+  (app log); a composite built without the log arg truthfully prints
+  "None n=0" — verdicts unaffected, but pass the log for a gradeable strip.

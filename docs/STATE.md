@@ -233,51 +233,48 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-U PHASE-17 — NEW GAME USER-GRADE PACKAGE + PARK (FIRST-SCREEN
-CHECKPOINT PER D19)
-(ordering rationale: the tNG-B behavior gate is CLOSED this iteration — B1
-density REBUILD (c1), B2 species roster+default (c2), B3 anchors (c1/c2),
-B4 begin-press settings-apply (c3, below); the gate line's one remaining
-seed "starfield spin AXES correct per dial" was RE-SCOPED to tGM-B this
-cycle (the New Game screen has NO dials — 3 wheel zones only; the axis law
-t416/t425 is closed for the galaxy map where the user's complaint lived —
-docs/BLOCKED.md 2026-11-21 tNG-B c3 entry). Per the PHASE-17 PIPELINE the
-first screen ends with the USER-GRADE PARK, so tNG-U runs BEFORE tSI-C.)
-SCOPE: (1) build the side-by-side composite ours|refcap|diff-report at
-scratchpad/NG-usergrade.png + per-region table (reuse t441_screen_diff
-regions; G1 law: OUR render AND the vendor crop in one pass — the canonical
-pair is scripts/t412_newgame_shot.sh output vs scratchpad/newgame-original
-.png, browser-crop law im[1:481,1:641]); (2) fold the CLOSED-law inventory
-into the table: every region names its law home (t423-newgame-law.md
-SS1..SS18) + its mechanical verdict + its behavior witness; (3) the D19
-correction list (G4) is the defect ledger — mark each closed/open with the
-citing witness; (4) harness polish ONLY if cheap: chrome-recess-row7 knife-
-edge (fam_min 0.90 sits inside the spin dither band 0.8994..0.9035 — lower
-to 0.89 or freeze animation for chrome regions; NOT a product defect, see
-_wip_tNGB.md 't441 RUN' block); (5) REWRITE NEXT to the WAIT-USER-GRADE-NG
-sentinel verbatim (human wake resumes: user reply -> DISPOSITIONS row or
-straight to tSI-C per ruling). NO new law probes — this row PACKAGES.
-READ FIRST: docs/re/t423-newgame-law.md (the law home, SS18 = B4),
-docs/re/_wip_tNGB.md (all four B seeds + harness traps), docs/re/_wip_tA2.md
-(recess law), scripts/t441_screen_diff.py (region table), DECISIONS.md D19.
-HINTS THIS SESSION LEARNED (reuse, don't rediscover): tNGB_b3_anchor.py
-with NO arg reads the STALE default /tmp/tNGB_density/rung0.png — ALWAYS
-pass the fresh capture (BLOCKED.md trap); the B2 capture script is
-tNGB_species_shot.sh (spec0.png = the default-Five screen for the species
-anchor 88.8 @(0,0)); t441 takes TWO positional shots (ours + refcap) and
-row7 FAIL at fam share 0.90 is the known knife-edge (exit stays 0);
-mutation scripts run GREEN-SUITE-only with copy-revert + md5 verify
-(tNGB4_mutate.py is the newest template); witness law lines are the
-reliable class — pixel equal-N tests are dead (flicker); law lines added
-this cycle: 'ui raceconfig atmos wheel G' (atmosphere click), 'ui newgame
-apply stars S owners O gov G' (Begin intent), 'newgame live stars S
-owners O gov G' (rebuilt campaign LIVE terms via Campaign::govByte());
-terminal REJECTS '&' backgrounding — use scripts; python =
-~/tools/revenv/bin/python; canonical shot = scripts/t412_newgame_shot.sh.
+NEXT WAIT-USER-GRADE-NG tNG-U — HUMAN WAKE: the New Game user-grade
+package is SHIPPED for grading (D19 first-screen checkpoint).
+ARTIFACT: scratchpad/NG-usergrade.png (ours | vendor refcap side-by-side +
+18/18 t441 verdict strip with law-home per region; regenerate:
+scripts/t412_newgame_shot.sh then
+~/tools/revenv/bin/python scripts/tNGU_composite.py
+/tmp/t412_shots/t412-newgame.png scratchpad/newgame-original.png
+scratchpad/NG-usergrade.png /tmp/t412_shots/app.log).
+DEFECT LEDGER for the grader: docs/re/_wip_tNGU.md 'D19 CORRECTION LEDGER'
+(closed-with-witness vs open; named seams: portrait scale-SOURCE SS12,
+top-bar mineral nuance D19-deferred by user ruling).
+RESUME RULES on user reply: (a) defect ruling -> DISPOSITIONS row + fix
+cycle for the named screen region; (b) ACCEPT -> straight to tSI-C/tSI-B
+RACE INTRO gates (seeds: frame texture A2, text size/font A3, background —
+STATE.md queue below); (c) no reply -> do NOT self-grade past this
+checkpoint (D19 reserves it), re-park this sentinel verbatim.
 GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 (checked this
 iteration == floor). turn > 1086 -> re-run scripts/r1_t85g_sitting.py FIRST.
 Ghidra :8089 UP; 0x52xxx GAP fns disassembled via scripts/t442_disasm.py
 (capstone in revenv).
+tNG-U LANDED 2026-11-21 (USER-GRADE PACKAGE — composite + law-home table +
+D19 ledger + harness polish; NO law probes by design; ledger open=[016,019]
+unchanged — package work moves no OQ row).
+(i) ARTIFACT scratchpad/NG-usergrade.png (1290x946): ours (t412 canonical)
+| vendor (newgame-original.png browser crop im[1:481,1:641]) + verdict
+strip that RE-RUNS t441 as a subprocess (image can never disagree with the
+harness); verdicts text+shape P/F boxes (deuteranopia-safe); 18/18 PASS
+exit 0; vision-verified legible/aligned. 4th arg = app.log -> strip shows
+real ours-dims (dimscheck lines are log-only).
+(ii) SCRIPT scripts/tNGU_composite.py (new; LAW_HOME dict mirrors
+t423-newgame-law.md heads — keep in sync). TRAP: PIL crop is (l,t,r,b)
+exclusive — (1,1,642,482) is 641x481, NOT im[1:481,1:641]; the size assert
+caught it.
+(iii) HARNESS POLISH t441 chrome-recess-row7 fam_min 0.90->0.89 (the share
+dithers 0.8994..0.9035 across grabs — spin-animation cosmos stars x304..306
+at the chrome edge; threshold was INSIDE the band; NOT a product defect,
+_wip_tNGB.md 't441 RUN'). Canonical + rung0 shots stay green.
+(iv) LAW-HOME + D19 LEDGER banked docs/re/_wip_tNGU.md: every t441 region ->
+SS home + witness; D19 corrections: 9 CLOSED cited, 1 RE-SCOPED (axis ->
+tGM-B), 2 OPEN named seams (portrait scale-source SS12 static-exhausted;
+mineral nuance user-deferred). HONEST NEGATIVE: no new vendor measurement
+this iteration — packaging only, per the assignment.
 tNG-B CYCLE 3 LANDED 2026-11-21 (B4 BEGIN-PRESS -> SETTINGS-APPLY SEAM
 CLOSED — the STATE-IDENTITY law: every wheel arm passes eax=0x12e10 == THE
 play state base (density 0x52dd7, species 0x52e76; work/tNGC_paint526b4.asm),
