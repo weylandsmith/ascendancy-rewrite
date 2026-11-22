@@ -88,6 +88,73 @@ int newgameArrowAt(Pt p) {
     return -1;
 }
 
+// tNG-F2 SCROLL-ARROW GLYPH LAW (see menulaw.h). Grids are the refcap
+// per-pixel family map, x616..631, UP rows y47..63, DOWN rows y356..372
+// (dumped by scripts/tNGF_arrow_map.py; families N/D/M/C/B/W = the exact
+// colours in arrowGlyphColourAt below). '?' family-unknown px were
+// nearest-mapped at dump time (none remain).
+namespace {
+const char* const kArrowUpGlyph[17] = {
+    "NNNNNNNNNNNNNNNN",
+    "NDDDDDDDDDDDDDDD",
+    "NWCCCCCCBCCCCCBW",
+    "NBNNNNNNCNNNNNMW",
+    "NBNNNNDMBMNNNNMW",
+    "NBNNNNDCWMNNNNMW",
+    "NBNNNNMBBCNNNNMW",
+    "NBNNNNCWMBMDNNMW",
+    "NBNNNDBBMBCMNNMW",
+    "NBNNNDBBMBBMNNMW",
+    "NBNNNMBCMCWMNNMW",
+    "NBNNNCBCCCWBDNMW",
+    "NBNNMWBCCCBBMNMW",
+    "NBNNMWBBBBBWCNMW",
+    "NBNNMCCCCCCCMNMW",
+    "NWCCCCCCCCCCCCBW",
+    "NDDDDDDDDDDDDDDD",
+};
+const char* const kArrowDownGlyph[17] = {
+    "NNNNNNNNNNNNNNNN",
+    "NMMMMMMMMMMMMMMM",
+    "NBMMMMMMMMMMMMCW",
+    "NBNNCBBBBBBBCNMW",
+    "NBNNCWWWWWWWCNMW",
+    "NBNNMBBCCCBBMNMW",
+    "NBNNNCBCCCWCDNMW",
+    "NBNNNCBMMCWCNNMW",
+    "NBNNNDBBMBWMNNMW",
+    "NBNNNDCBMBCDNNMW",
+    "NBNNNNMWCBDDNNMW",
+    "NBNNNNMWCBNNNNMW",
+    "NBNNNNMCWCNNNNMW",
+    "NBNNNNDMBMNNNNMW",
+    "NBNNNNNNCNNNNNMW",
+    "NBNNNNNNMNNNNNMW",
+    "NBBBBBBBBBBBBBBB",
+};
+}  // namespace
+
+bool arrowGlyphCovers(bool up, int x, int y) {
+    if (x < kRaceArrowUp.x0 || x > kRaceArrowUp.x1) return false;
+    const int y0 = up ? 47 : 356;   // measured paint top (hit rects differ)
+    return y >= y0 && y <= y0 + 16;
+}
+
+RGB arrowGlyphColourAt(bool up, int x, int y) {
+    if (!arrowGlyphCovers(up, x, y)) return RGB{0, 0, 0};
+    const char* row =
+        (up ? kArrowUpGlyph : kArrowDownGlyph)[y - (up ? 47 : 356)];
+    switch (row[x - kRaceArrowUp.x0]) {
+        case 'N': return RGB{12, 32, 48};     // navy well
+        case 'D': return RGB{34, 60, 74};     // dark-slate frame
+        case 'M': return RGB{79, 116, 126};   // mid slate
+        case 'C': return RGB{123, 171, 177};  // cyan body
+        case 'B': return RGB{168, 227, 229};  // bright cyan
+        case 'W': return RGB{190, 255, 255};  // highlight
+    }
+    return RGB{0, 0, 0};
+}
+
 // static.txt //155-159 verbatim; star counts = the t78 MEASURED cycle
 // (docs/re/mapgen.md OQ-012(a): Average 50 measured 5/5, Dense 75, Very
 // Dense 100, Vacuous 15, Sparse 25; cycle order Average->Dense->Very

@@ -125,6 +125,26 @@ inline constexpr Rect kRaceArrowDown{616, 356, 631, 371};
 int newgameRowAt(Pt p);   // slot 0..2 or -1 (gutters/arrows dead for rows)
 int newgameArrowAt(Pt p); // 0 = up, 1 = down, -1 = none
 
+// ---- tNG-F2 SCROLL-ARROW GLYPH LAW (D20 F3 "arrow buttons still the wrong
+// style and color"). [MEASURED refcap scratchpad/newgame-original.png,
+// scripts/tNGF_arrow_map.py + grid dump docs/re/_wip_tNGF.md F3] The vendor
+// arrows are NOT filled blue boxes: each is a 16-px-wide recessed cell with
+// a dark-slate frame row, a navy well, and a small cyan triangle pointing
+// out of a bright-rimmed base — six exact colour families:
+//   navy well (12,32,48)   dark-slate frame (34,60,74)  mid slate (79,116,126)
+//   cyan body (123,171,177) bright cyan (168,227,229)   highlight (190,255,255)
+// The glyph ART is measured verbatim (per-px family map below); the widget
+// record that supplies it (SHAPEFRAME vs painter blit) is NOT yet cited —
+// named seam, the grid is the evidence. Paint extents are the MEASURED rows
+// (up y47..63, down y356..372), one row taller than the cited hit rects
+// (which stay kRaceArrowUp/kRaceArrowDown unchanged).
+enum ArrowFamily {
+    kArrowNone = -1, kArrowNavy = 0, kArrowDark, kArrowMid, kArrowCyan,
+    kArrowBright, kArrowHi
+};
+RGB arrowGlyphColourAt(bool up, int x, int y);  // kArrowNone colour if off-glyph
+bool arrowGlyphCovers(bool up, int x, int y);
+
 // ---- t401 NEW GAME ART LAW (D11: framing missing, bottom-row artwork
 // wrong, species column art not rendered, Begin box empty, description
 // transparent). Measurement trail docs/re/t401-newgame-art.md S1-S10 on the

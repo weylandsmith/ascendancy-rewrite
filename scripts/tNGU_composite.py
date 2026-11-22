@@ -76,13 +76,23 @@ def run_t441(ours, vendor, log=None):
 
 
 def main():
-    if len(sys.argv) not in (4, 5):
+    if len(sys.argv) not in (4, 5, 6, 7):
         raise SystemExit(__doc__)
-    ours_p, vendor_p, out_p = sys.argv[1:4]
-    log_p = sys.argv[4] if len(sys.argv) == 5 else None
+    argv = list(sys.argv[1:])
+    checklist_p = None
+    if "--checklist" in argv:
+        i = argv.index("--checklist")
+        checklist_p = argv[i + 1]
+        del argv[i:i + 2]
+    ours_p, vendor_p, out_p = argv[0:3]
+    log_p = argv[3] if len(argv) > 3 else None
     rows, rc = run_t441(ours_p, vendor_p, log_p)
     if not rows:
         raise SystemExit("no t441 rows parsed — harness output shape changed")
+    checklist = []
+    if checklist_p:
+        with open(checklist_p, encoding="utf-8") as fh:
+            checklist = [ln.rstrip("\n") for ln in fh if ln.strip()]
 
     ours = Image.open(ours_p).convert("RGB")
     vendor = Image.open(vendor_p).convert("RGB")
@@ -93,20 +103,41 @@ def main():
         raise SystemExit(f"unexpected sizes {ours.size} {vendor.size}")
 
     f14, f18, f12 = font(14), font(18), font(12)
-    gut, pad, strip = 10, 12, 19 * len(rows) + 90
-    W, H = 640 * 2 + gut, 480 + 34 + strip
+    f20 = font(20)
+    gut, pad = 10, 12
+    strip = 19 * len(rows) + 90
+    # D20 usability correction: the PLAIN-LANGUAGE NUMBERED CHECKLIST rides
+    # ON the composite (what changed / what to look at / what stays open).
+    # wip docs are the machine record, never the grader's interface.
+    import textwrap
+    wrapped = []
+    for ln in checklist:
+        wrapped += textwrap.wrap(ln, width=110) or [""]
+    list_h = 40 + 26 * len(wrapped) + 16 if wrapped else 0
+    W, H = 640 * 2 + gut, 480 + 34 + strip + list_h
     canvas = Image.new("RGB", (W, H), (32, 32, 32))
-    canvas.paste(ours, (0, 34))
-    canvas.paste(vendor, (640 + gut, 34))
     d = ImageDraw.Draw(canvas)
-    d.text((8, 8), "OURS (port render, t412 canonical shot)", font=f18,
+    # Checklist first (the grader reads this before the pixels).
+    y = 10
+    if wrapped:
+        d.text((pad, y), "HOW TO GRADE THIS SCREEN (plain language):",
+               font=f20, fill=(250, 250, 250))
+        y += 34
+        for ln in wrapped:
+            d.text((pad + 6, y), ln, font=f14, fill=(235, 235, 235))
+            y += 26
+        y += 10
+    img_top = y
+    canvas.paste(ours, (0, img_top + 34))
+    canvas.paste(vendor, (640 + gut, img_top + 34))
+    d.text((8, img_top + 8), "OURS (port render, t412 canonical shot)",
+           font=f18, fill=(235, 235, 235))
+    d.text((640 + gut + 8, img_top + 8), "VENDOR (refcap crop)", font=f18,
            fill=(235, 235, 235))
-    d.text((640 + gut + 8, 8), "VENDOR (refcap crop)", font=f18,
-           fill=(235, 235, 235))
-    d.line([(640 + gut // 2, 0), (640 + gut // 2, 480 + 34)],
+    d.line([(640 + gut // 2, img_top), (640 + gut // 2, img_top + 480 + 34)],
            fill=(200, 200, 200), width=2)
 
-    y = 480 + 34 + 6
+    y = img_top + 480 + 34 + 6
     n_pass = sum(1 for _, v, _ in rows if v == "P")
     d.text((pad, y), f"t441 region table  {n_pass}/{len(rows)} PASS   "
                      f"(P = pass box, F = fail box — text+shape, greyscale-safe)",

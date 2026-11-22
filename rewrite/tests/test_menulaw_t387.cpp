@@ -133,3 +133,49 @@ TEST(menulaw_load_row_geometry_and_refusal) {
     CHECK(au::loadPickAccepts(slots, 2, &why) == false);  // past end: no clamp
     CHECK(au::loadPickAccepts(slots, -1, &why) == false);
 }
+
+// tNG-F2 SCROLL-ARROW GLYPH LAW pins (D20 F3). Values are the refcap
+// measured grid (docs/re/_wip_tNGF.md F3; scripts/tNGF_arrow_map.py):
+// cell x616..631, UP rows y47..63, DOWN rows y356..372, six exact families.
+TEST(menulaw_arrow_glyph_law) {
+    using au::arrowGlyphColourAt;
+    using au::arrowGlyphCovers;
+    // Coverage: exactly the measured 16x17 cells, nothing else.
+    CHECK(arrowGlyphCovers(true, 616, 47) && arrowGlyphCovers(true, 631, 63));
+    CHECK(!arrowGlyphCovers(true, 615, 47) && !arrowGlyphCovers(true, 632, 47));
+    CHECK(!arrowGlyphCovers(true, 616, 46) && !arrowGlyphCovers(true, 616, 64));
+    CHECK(arrowGlyphCovers(false, 616, 356) && arrowGlyphCovers(false, 631, 372));
+    CHECK(!arrowGlyphCovers(false, 616, 355) && !arrowGlyphCovers(false, 616, 373));
+    // UP: frame row y48 dark slate; top rim y49 cyan; base y62 full cyan run;
+    // triangle apex column x623..624 rows y51..58 carry the bright families.
+    CHECK(arrowGlyphColourAt(true, 617, 48).r == 34 &&
+          arrowGlyphColourAt(true, 617, 48).g == 60 &&
+          arrowGlyphColourAt(true, 617, 48).b == 74);
+    CHECK(arrowGlyphColourAt(true, 617, 49).r == 190 &&
+          arrowGlyphColourAt(true, 617, 49).b == 255);   // highlight corner
+    CHECK(arrowGlyphColourAt(true, 618, 62).r == 123 &&
+          arrowGlyphColourAt(true, 618, 62).g == 171 &&
+          arrowGlyphColourAt(true, 618, 62).b == 177);   // base run cyan
+    CHECK(arrowGlyphColourAt(true, 622, 59).r == 168 &&
+          arrowGlyphColourAt(true, 622, 59).b == 229);   // base-body bright
+    // Navy well inside the frame (recessed, not a filled box colour).
+    CHECK(arrowGlyphColourAt(true, 618, 51).r == 12 &&
+          arrowGlyphColourAt(true, 618, 51).g == 32 &&
+          arrowGlyphColourAt(true, 618, 51).b == 48);
+    // DOWN: mirror-ish top rim mid slate + white row y360.
+    CHECK(arrowGlyphColourAt(false, 617, 357).r == 79 &&
+          arrowGlyphColourAt(false, 617, 357).b == 126);
+    CHECK(arrowGlyphColourAt(false, 621, 360).r == 190 &&
+          arrowGlyphColourAt(false, 621, 360).b == 255);
+    // The D20 defect colour (blue box 26,87,146) must be ABSENT everywhere
+    // in both cells.
+    for (int pass = 0; pass < 2; pass++) {
+        const bool up = pass == 0;
+        for (int y = up ? 47 : 356; y <= (up ? 63 : 372); y++)
+            for (int x = 616; x <= 631; x++) {
+                const ascend::ui::RGB c = arrowGlyphColourAt(up, x, y);
+                const bool isBlueBox = c.r == 26 && c.g == 87 && c.b == 146;
+                CHECK(!isBlueBox);
+            }
+    }
+}

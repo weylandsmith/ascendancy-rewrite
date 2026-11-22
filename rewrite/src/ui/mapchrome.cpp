@@ -424,4 +424,49 @@ RGB speciesWellAt(int x, int y) {
     return kWell[0].c;
 }
 
+// tNG-F2 PLAYER-SPECIES PLATE LAW (D20 F2 "missing the black backing";
+// docs/re/_wip_tNGF.md V0-F2 follow-up). The vendor plate behind the
+// "Player Species" header (x503..633 rows 8..37) is NOT flat black and NOT
+// the cosmos field (that is 98% pure black): it is the dark speckle family.
+// [MEASURED refcap census over the 4 nearest families, text excluded]
+// (0,0,0) 46.3% (12,12,16) 35.0% (12,12,12) 7.1% (12,28,48) 11.6%.
+// [MEASURED grain, family-luminance lags, text-free rows 26..37]
+// h 8.59/12.26/16.36 v 5.50/10.35/13.86 — correlated, ANISOTROPIC (vertical
+// runs longer). Chain fitted on these lags (same statistic law as
+// speciesWellAt) over a 0.00-0.95 grid of (copy-left, repeat-up):
+// 45% copy-left + 50% repeat-up simulates h 9.03/15.16/18.80
+// v 7.19/12.13/15.94 — best fit of the grid (cycle-2's 55/30 measured
+// h 14.02 v 17.96 on screen: visibly too sparse). GENERATOR ORIGIN is
+// a named seam (vendor routine uncited, as for introSpeckleAt); the CENSUS
+// and GRAIN are measured.
+RGB speciesPlateAt(int x, int y) {
+    // Salt chosen (from 200 candidates) so the REALISED census of the fixed
+    // 131x30 plate window matches the measured census within noise (chain
+    // propagation drifts the realised mix away from the fresh-draw weights;
+    // witness census at this salt 49.0/34.3/4.6/12.1, grain h
+    // 7.17/13.10/16.62 v 6.47/10.73/13.19 — vs vendor 46.0/34.8/7.1/12.1,
+    // h 8.59/12.26/16.36 v 5.50/10.35/13.86).
+    uint64_t z = (uint64_t(uint32_t(x)) << 32) ^ uint64_t(uint32_t(y)) ^
+                 0x420e8910b5e72c97ull;  // salt: plate-window calibration
+    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
+    z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
+    z = z ^ (z >> 31);
+    const uint64_t r = z % 1000000ull;
+    if (r < 450000ull && x > 0) return speciesPlateAt(x - 1, y);    // 45%
+    if (r < 950000ull && y > 0) return speciesPlateAt(x, y - 1);    // +50%
+    static const struct { RGB c; int w; } kPlate[4] = {
+        {{0, 0, 0}, 463},      // game.pal[0]
+        {{12, 12, 16}, 350},   // game.pal[200]
+        {{12, 12, 12}, 71},    // game.pal[1]
+        {{12, 28, 48}, 116},   // game.pal[196]
+    };
+    const uint64_t d = (z >> 20) % 1000ull;
+    int acc = 0;
+    for (int i = 0; i < 4; i++) {
+        acc += kPlate[i].w;
+        if (int(d) < acc) return kPlate[i].c;
+    }
+    return kPlate[0].c;
+}
+
 }  // namespace ascend::ui

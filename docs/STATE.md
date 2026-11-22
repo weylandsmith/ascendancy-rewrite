@@ -233,9 +233,61 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-F2 NEW GAME FIX CYCLE 2 (D20 budget <=3 cycles, 1 spent; ordering:
-verify-first because F1/F2/F4 code landed UNWITNESSED, then the two open
-defects, then package — packaging last keeps the checklist honest).
+NEXT WAIT-USER-GRADE-NG2 — tNG-F fix cycle 2 LANDED 2026-11-22 (below). The
+user-grade package scratchpad/NG-usergrade.png (plain-language numbered
+checklist ON the image, t441 18/18 PASS, vision-verified) awaits the user's
+numbered verdict. RESUME RULES (same as WAIT-USER-GRADE-NG): on a new
+DECISIONS.md USER reply (D21), (a) ACCEPT -> retire tNG-F, NEXT -> tSI-C per
+the prior resume rule; (b) PARTIAL with defects -> cycle 3 (D20 budget: this
+was cycle 2 of 3) working ONLY the defects the user names, in their words;
+named candidates already banked if un-named: F6-D1 RIGHT-band census fix
+(per-column kNewgameRight x632..639 measured on the refcap, branch before
+kRight in textureColourAt — census banked _wip_tNGF F6), F4 sprite-size/
+dots nuance, plate pal[1] share; (c) any reply -> record D21 verbatim in
+DECISIONS.md FIRST. Do NOT re-run fix cycles without a user reply — the
+loop must not churn against a stale grade.
+TRIGGER CHECK (standing): tail DECISIONS.md = D20; ring turn test
+scripts/t368_ring_turn.py (1086 = no new sitting; >1086 -> re-run
+scripts/r1_t85g_sitting.py FIRST per the standing rule).
+
+tNG-F2 CYCLE 2 LANDED 2026-11-22 (V0 all-PASS; F2 REFINED + F3 CODED +
+F6 AUDITED + PACKAGE rebuilt with on-image checklist; build ok, run_tests
+489/489, gate GATE_EXIT=0; ledger open=[016,019] unchanged — honest
+negative: seam work moves no OQ row). Full record docs/re/_wip_tNGF.md.
+(i) V0-F1 PASS: warm class 0%->5% (vendor 10%), blue 34%->20% (vendor 16%),
+radial r50 147 vs 152 — type-K colour law live on screen.
+(ii) V0-F2 -> F2 REFINED: cycle-1 flat black slab was wrong — vendor plate
+x503..633 y8..37 is the dark SPECKLE family (census 46.0/34.8/7.1/12.1 over
+(0,0,0)/(12,12,16)/(12,12,12)/(12,28,48), anisotropic grain h 8.59/12.26/
+16.36 v 5.50/10.35/13.86 [measured]). mapchrome speciesPlateAt (chain 45/50,
+salt 0x420e8910b5e72c97 selected so the REALISED 131x30 window matches —
+chain propagation otherwise drifts the mix; honest: salt-fit = statistical
+match, generator origin named seam). On-screen census 48.6/34.7/4.6/12.1,
+grain h 7.17/13.10/16.62 — reads as the vendor backing (vision 4x).
+(iii) F3 CODED: menulaw arrowGlyphCovers/arrowGlyphColourAt — 16x17 exact
+refcap family grids (6 families), title.cpp px-by-px paint, kArrowFill/
+kArrowInk REMOVED. Witness: 272/272 family-match both cells, ZERO blue-box
+px; test menulaw_arrow_glyph_law pinned. Named seam: vendor widget record
+supplying the glyph uncited (grid = evidence); 4 interior blend px
+nearest-mapped.
+(iv) V0-F4 PASS: Begin cluster round bbox x511..566 y400..443 (vendor
+x510..568 y389..448), multi-colour, dots intact; residuals (ours sprites
+smaller/sparser: 17 1-px comps vs vendor 3; dots lean (255,255,255))
+banked honestly, on the package open-list.
+(v) F6 AUDITED (close form = 1:1 bands + defect list): ONE paint path
+(chromePage/textureColourAt) — no second legacy painter. TOP/LEFT/BOTTOM
+match on census+brightness; RIGHT x632..639 DEFECT D1: vendor ridge lum
+158,309,393,393,362,330,318,314 vs ours 90,265,293,285,285,275,276,295
+(~20% dark, ridge shape absent) — root cause: no per-column census for the
+newgame right band, falls through to the MAP-screen kRight census. Fix
+named for cycle 3; witness scratchpad/F6-bands.png.
+(vi) PACKAGE: tNGU_composite.py --checklist renders the plain-language
+numbered checklist ON the image (scratchpad/NG-checklist.txt, 7 items: 5
+changed 2 open; drafted item 8 REMOVED as unverified — no unverified claims
+on the grader's interface). scratchpad/NG-usergrade.png 18/18 PASS,
+vision-verified legible.
+
+tNG-F2 NEW GAME FIX CYCLE 2 assignment (executed above; kept for history):
  V0 VERIFY: bash scripts/t412_newgame_shot.sh; then with
    ~/tools/revenv/bin/python: scripts/tNGF_star_census.py /tmp/t412_shots/
    t412-newgame.png (PASS = ours warm class >0% AND blue share drops toward

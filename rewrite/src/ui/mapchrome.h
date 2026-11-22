@@ -258,4 +258,11 @@ RGB newgamePanelLeftAt(int y);
 // 2.82 is DOSBox display interpolation the port cannot reproduce at 1:1).
 RGB speciesWellAt(int x, int y);
 
+// tNG-F2 PLAYER-SPECIES PLATE LAW (docs/re/_wip_tNGF.md V0-F2 follow-up):
+// the header plate x503..633 rows 8..37 is the dark speckle family
+// (measured census 46.3/35.0/7.1/11.6 over (0,0,0)/(12,12,16)/(12,12,12)/
+// (12,28,48)), chain 45/50 fitted on the measured text-free-row grain lags.
+// Generator origin = named seam (as introSpeckleAt).
+RGB speciesPlateAt(int x, int y);
+
 }  // namespace ascend::ui

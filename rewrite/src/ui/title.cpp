@@ -71,8 +71,9 @@ const SDL_Color kNewgameInk{255, 255, 255, 255};
 const SDL_Color kLore{0, 142, 69, 255};       // vendor green ink
 const SDL_Color kSelBg{28, 56, 74, 255};      // selection band (lighter navy)
 const SDL_Color kDisc{128, 128, 128, 255};    // portrait-seam disc + ring
-const SDL_Color kArrowFill{26, 87, 146, 255};   // arrow square fill (measured)
-const SDL_Color kArrowInk{190, 255, 255, 255};  // arrow glyph (measured)
+// kArrowFill/kArrowInk REMOVED (tNG-F2): the race-list scroll arrows are the
+// cited 16x17 glyph-cell law (menulaw arrowGlyphColourAt), not a blue square
+// plus drawn triangle. See docs/re/_wip_tNGF.md F3.
 
 // t414: the t393 map-preview primitives (toSdl/kLane/filledCircle) were
 // REMOVED with the previewCamp backdrop — the t414 spinning preview draws
@@ -648,16 +649,17 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             }
             {
                 const std::string hdr = "Player Species";  // static.txt //153
-                // tNG-F F2 BLACK BACKING LAW (D20; refcap census
-                // scripts/tNGF_box_geom.py): a PURE-BLACK plate sits behind
-                // the header title — measured dark-family run x503..633
-                // rows 8..37 (dominant exact colour (0,0,0), dither
-                // (12,12,16) = named seam), the same width as RACELIST
-                // below it. Pre-fix the chrome texture showed through
-                // (header band mean (85,110,112) = the D20 defect).
-                SDL_Rect plate{503, 8, 633 - 503 + 1, 37 - 8 + 1};
-                SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-                SDL_RenderFillRect(ren, &plate);
+                // tNG-F2 PLATE LAW (D20 F2, refined cycle 2): the vendor
+                // backing is the dark speckle family, NOT flat black —
+                // measured census + grain in mapchrome.h speciesPlateAt.
+                // (Cycle 1's flat black rect was the "painted over" look;
+                // pre-fix the chrome texture showed through entirely.)
+                for (int py = 8; py <= 37; py++)
+                    for (int px2 = 503; px2 <= 633; px2++) {
+                        const RGB c = speciesPlateAt(px2, py);
+                        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                        SDL_RenderDrawPoint(ren, px2, py);
+                    }
                 const int w = txt.width(hdr, true);  // tA3 BIG face
                 txt.draw(ren, (kRaceList.x0 + kRaceList.x1 + 1) / 2 - w / 2,
                          kHeaderTop, hdr, true, kNewgameInk);
@@ -845,23 +847,14 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     }
                 }
             }
-            for (int i = 0; i < 2; i++) {  // arrows (measured corner squares)
-                const Rect& ar = i == 0 ? kRaceArrowUp : kRaceArrowDown;
-                SDL_Rect r{ar.x0, ar.y0, ar.x1 - ar.x0 + 1,
-                           ar.y1 - ar.y0 + 1};
-                SDL_SetRenderDrawColor(ren, kArrowFill.r, kArrowFill.g,
-                                       kArrowFill.b, 255);
-                SDL_RenderFillRect(ren, &r);
-                SDL_SetRenderDrawColor(ren, kArrowInk.r, kArrowInk.g,
-                                       kArrowInk.b, 255);
-                const int cx = (ar.x0 + ar.x1) / 2, cy = (ar.y0 + ar.y1) / 2;
-                for (int d = -4; d <= 4; d++) {
-                    const int len = 4 - std::abs(d);
-                    for (int t = 0; t <= len; t++)
-                        SDL_RenderDrawPoint(
-                            ren, cx + d,
-                            i == 0 ? cy - t + 2 : cy + t - 2);
-                }
+            for (int i = 0; i < 2; i++) {  // tNG-F2: cited glyph cells (D20 F3)
+                const bool up = i == 0;
+                for (int y = 47 + (up ? 0 : 309); y <= 63 + (up ? 0 : 309); y++)
+                    for (int x = kRaceArrowUp.x0; x <= kRaceArrowUp.x1; x++) {
+                        const RGB c = arrowGlyphColourAt(up, x, y);
+                        SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                        SDL_RenderDrawPoint(ren, x, y);
+                    }
             }
 
             // (7) Bottom config bar: four windows.txt-cited panels + the
