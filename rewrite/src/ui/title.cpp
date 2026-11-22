@@ -573,17 +573,35 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                         py < kNewgameCosmosRect.y0 ||
                         py > kNewgameCosmosRect.y1)
                         continue;
-                    // SEL law, K=0: cls from the transformed depth offset.
+                    // SEL law t200 (planets-ui §6): SEL = 4*K + cls, K = the
+                    // star TYPE (13 starstat families; cos_star k(4K)..k(4K+3)
+                    // = one bright-ramp per family — file census tNG-F: K0
+                    // blues, K2 reds, K3 oranges, K5 tans, ...). tNG-F F1:
+                    // the pre-fix K=0 named seam painted EVERY preview star
+                    // from the blue family (D20 "all one color"). The
+                    // stride-0xd preview records carry no type byte (t423
+                    // F8), so the port takes star i's type from the wheel
+                    // galaxy it already mirrors for the count law (tNG-B B1:
+                    // N == wheelGal->stars.size()); dims-zero cells
+                    // (types 10..12, t200) blit nothing -> honest skip.
                     const long v = lround(dz);
                     const int cls = v >= 220 ? 0 : (v >= 1 ? 1 : (v >= -220 ? 2 : 3));
-                    const int rec = 4 * 0 + cls;  // K=0 named seam
+                    const int ktype =
+                        wheelGal && i < int(wheelGal->stars.size())
+                            ? wheelGal->stars[size_t(i)].type
+                            : int((z >> 42) % 13);
+                    const int rec = 4 * ktype + cls;
                     bool drew = false;
-                    if (cosStarLib.count() > rec)
+                    // t200 cited law: cells k40..k51 (types 10..12) are
+                    // dims-zero — the vendor blit walks zero rows = draws
+                    // NOTHING. Skip honestly (no fallback tint).
+                    if (!(rec >= 40 && rec <= 51) && cosStarLib.count() > rec)
                         drew = blitShape(ren, cosStarLib, rec, px - 1, py - 1);
-                    if (!drew) {
-                        // cos_star unavailable/k0: 2x2 tint block (the
-                        // point-family law stays honest, no fake art).
-                        const RGB t = neutralTint(int((z >> 42) % 13));
+                    if (!drew && (rec < 40 || rec > 51)) {
+                        // cos_star unavailable/empty-cell: 2x2 tint block in
+                        // the SAME family law (neutralTint rows = the port
+                        // palette per star type; no fake art).
+                        const RGB t = neutralTint(ktype);
                         SDL_SetRenderDrawColor(ren, t.r, t.g, t.b, 255);
                         SDL_Rect q{px - 1, py - 1, 2, 2};
                         SDL_RenderFillRect(ren, &q);
@@ -630,6 +648,16 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             }
             {
                 const std::string hdr = "Player Species";  // static.txt //153
+                // tNG-F F2 BLACK BACKING LAW (D20; refcap census
+                // scripts/tNGF_box_geom.py): a PURE-BLACK plate sits behind
+                // the header title — measured dark-family run x503..633
+                // rows 8..37 (dominant exact colour (0,0,0), dither
+                // (12,12,16) = named seam), the same width as RACELIST
+                // below it. Pre-fix the chrome texture showed through
+                // (header band mean (85,110,112) = the D20 defect).
+                SDL_Rect plate{503, 8, 633 - 503 + 1, 37 - 8 + 1};
+                SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+                SDL_RenderFillRect(ren, &plate);
                 const int w = txt.width(hdr, true);  // tA3 BIG face
                 txt.draw(ren, (kRaceList.x0 + kRaceList.x1 + 1) / 2 - w / 2,
                          kHeaderTop, hdr, true, kNewgameInk);
@@ -1056,17 +1084,37 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 else if (previewCamp)
                     beginStars = &previewCamp->galaxy().stars;
                 if (beginStars) {
+                    // tNG-F F4 CONTAINMENT LAW (D20 "taking up too much of
+                    // the frame and not spherical"; refcap census
+                    // scripts/tNGF_begin_probe.py): the vendor stars occupy a
+                    // CLUSTER bbox x510..568 y389..448 (59x60) centred
+                    // (538.1,417.4) r99=31 — NOT the full panel rect. The
+                    // /5+5 law stands (cited 0x527b1/0x527c9); the vendor
+                    // new-game galaxy is CLUSTERED in map space (source of
+                    // that clustering = named seam), so the port fits the
+                    // field into the measured circle: offset from the panel
+                    // centre scaled to the cluster radius, then hard-clipped
+                    // to the circle. Dots stay panel-wide (measured: 778/799
+                    // dot px are OUTSIDE the star circle — dots and stars are
+                    // different families).
                     SDL_Rect clip{vis.x0, vis.y0, vis.x1 - vis.x0 + 1,
                                   vis.y1 - vis.y0 + 1};
                     SDL_RenderSetClipRect(ren, &clip);
                     static double beginYaw = 0.0;
                     beginYaw += kPreviewSpinPerFrame;
+                    const double kClCx = 538.1, kClCy = 417.4, kClR = 32.0;
+                    const double kPcX = (vis.x0 + vis.x1) / 2.0,
+                                 kPcY = (vis.y0 + vis.y1) / 2.0;
+                    const double kFit = kClR / 66.0;  // /5+5 half-extent 66
                     for (const ascend::game::Star& s : *beginStars) {
-                        const int px = vis.x0 + (s.x * 640 / 1024) / 5 + 5;
-                        const int py = vis.y0 + (s.y * 480 / 1024) / 5 + 5;
-                        if (px < vis.x0 || px > vis.x1 || py < vis.y0 ||
-                            py > vis.y1)
-                            continue;
+                        const int px0 = vis.x0 + (s.x * 640 / 1024) / 5 + 5;
+                        const int py0 = vis.y0 + (s.y * 480 / 1024) / 5 + 5;
+                        const int px =
+                            int(kClCx + (px0 - kPcX) * kFit + 0.5);
+                        const int py =
+                            int(kClCy + (py0 - kPcY) * kFit + 0.5);
+                        const double ddx = px - kClCx, ddy = py - kClCy;
+                        if (ddx * ddx + ddy * ddy > kClR * kClR) continue;
                         const double rr = double(s.z);
                         const double ang =
                             std::atan2(double(s.y - 512), double(s.x - 512)) +
@@ -1076,7 +1124,11 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                                       : v > 0   ? 1
                                       : v > -220 ? 2
                                                  : 3;
-                        const int rec = cls;  // K=0 named seam
+                        // tNG-F F4: SAME type-K colour law as the big
+                        // preview (D20: vendor Begin stars are multi-
+                        // colour too); dims-zero cells draw nothing.
+                        const int rec = 4 * s.type + cls;
+                        if (rec >= 40 && rec <= 51) continue;
                         if (cosStarLib.count() > rec) {
                             // bbox quad (-2,-2,2,2): content 5x5 at
                             // (L,T); dest = anchor + (L,T) -> centred.

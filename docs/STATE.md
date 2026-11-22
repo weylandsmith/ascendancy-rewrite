@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-21T22:05
+updated: 2026-11-22T01:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,8 +233,34 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-F NEW GAME FIX CYCLE (user D20 grade 2026-11-21, verbatim in
-DECISIONS.md D20 — PARTIAL ACCEPT; work ONLY these 6, in order):
+NEXT tNG-F2 NEW GAME FIX CYCLE 2 (D20 budget <=3 cycles, 1 spent; ordering:
+verify-first because F1/F2/F4 code landed UNWITNESSED, then the two open
+defects, then package — packaging last keeps the checklist honest).
+ V0 VERIFY: bash scripts/t412_newgame_shot.sh; then with
+   ~/tools/revenv/bin/python: scripts/tNGF_star_census.py /tmp/t412_shots/
+   t412-newgame.png (PASS = ours warm class >0% AND blue share drops toward
+   vendor 16%); scripts/tNGF_backing_probe.py /tmp/t412_shots/t412-newgame.png
+   (PASS = ours header-zone points go black (0,0,0) in the plate rows);
+   vision side-by-side /tmp/tNGF_begin_ref.png vs a fresh ours-crop (Begin
+   cluster round, multi-colour, dots intact). If a check FAILS, fix root
+   cause first; bank verdicts in docs/re/_wip_tNGF.md.
+ F3 SCROLL ARROWS (measured, not yet coded): replace the blue kArrowFill
+   boxes at kRaceArrowUp/Down with the cited glyph map (scripts/
+   tNGF_arrow_map.py output, banked _wip_tNGF F3): navy well (12,32,48),
+   dark-slate frame (34,60,74) + mid (79,116,126), cyan triangle body
+   (123,171,177) bright (168,227,229) highlight (190,255,255); UP apex
+   row 51 base rows 60..62 x619..629 (cell x617..631), DOWN mirror y357..372.
+   Pin pure-law arrowGlyphAt in menulaw.h + test.
+ F6 FRAME TEXTURE REST OF SCREEN: audit which paint path covers the
+   side/bottom bands in RaceConfig vs the tA2 generator (top bar close per
+   user — do NOT touch sharpness, user-deferred). CLOSE = 1:1 side-by-side
+   of ALL four bands vs refcap + written defect list (G1).
+ PACKAGE: rewrite scripts/tNGU_composite.py output scratchpad/NG-usergrade.
+   png WITH the PLAIN-LANGUAGE NUMBERED CHECKLIST ON THE IMAGE (D20
+   usability correction: what changed / what to look at / what stays open —
+   machine wip is never the grader's interface). Then rewrite NEXT to
+   WAIT-USER-GRADE-NG2 (same resume rules as WAIT-USER-GRADE-NG).
+F1 NEW GAME FIX CYCLE 1 (2026-11-22) = LANDED below. Original assignment:
  F1 STARFIELD COLOR + VOLUME (user: "stars... are all one color, and
     they don't appear to be contained within a volumetric sphere").
     Multi-color law: the vendor star palette is a RECORD/palette
@@ -284,6 +310,40 @@ stays open; wip docs = machine record only, never the grader's
 interface). Then rewrite NEXT to WAIT-USER-GRADE-NG2 with the same
 resume rules. Budget: <=3 cycles per D18; anything unresolved goes on
 the open list in plain language, honestly.
+
+tNG-F1 CYCLE 1 LANDED 2026-11-22 (D20 F1/F2/F4 CODE + F5 MEASURED-CLOSED;
+F3/F6 OPEN -> tNG-F2; ledger open=[016,019] unchanged — honest negative:
+this cycle moves no OQ row, PHASE-17 seam work; build ok, run_tests
+488/488, gate GATE_EXIT=0). Full record docs/re/_wip_tNGF.md.
+(i) F1 ROOT CAUSE MEASURED: cos_star.shp decoded (S9 walk; FIRST census used
+a wrong (count,val) grammar — corrected in-file) = SEL=4K+cls grid, ONE
+bright-ramp per star TYPE (K0 blues, K2 reds, K3 oranges, K5 tans, K6/K7
+pinks/reds); our K=0 named seam = the "all one color" defect. Code: preview
+rec = 4*type+cls, type from the wheel galaxy (count law ties N since tNG-B
+B1); dims-zero cells k40..k51 (types 10..12, cited t200) draw NOTHING ->
+skipped honestly. Refcap census: vendor warm 10% blue 16% vs ours warm 0%.
+(ii) VOLUME adjudicated: big-field radial profile ALREADY matches (r50
+148v152, r90 188v189) — the sphere complaint is the BEGIN PANEL: vendor
+star cluster = circle centre (538.1,417.4) r99=31 bbox 59x60 (dots are
+panel-wide hash, 778/799 dot px OUTSIDE the cluster — different family).
+F4 CODE: /5+5 law KEPT, fit-to-circle + hard clip + type-K colours there.
+(iii) F2 MEASURED + CODED: pure-black plate rows 8..37 x503..633 behind
+"Player Species" (vendor 32% lum<12, ours 0%); RACELIST navy well already
+matches (7racesel k0..k7 = solid pal242 (12,32,48), file-decoded).
+(iv) F5 MEASURED-CLOSED NO CODE: vendor hole content bbox x578..622
+y395..440 centre (600.2,417.7) == ours (599.8,418.0) <=0.4px, identical
+radial profile (rmax 28.0 both) — D20 witness pre-dated the tNGC3 clipR=23
+clip; vision: full composition, not a crop.
+(v) UNIFIED-FIELD HYPOTHESIS REFUTED (scripts/tNGF_field_match.py): big
+field vs Begin panel star sets match 2% — different sets, consistent with
+t423 F8/F9 (preview table vs galaxy walk). Preview-table static consumer:
+still ZERO (D19 negative re-confirmed).
+(vi) TOOLS new: tNGF_star_census.py, tNGF_field_match.py,
+tNGF_refcap_probe.py, tNGF_backing_probe.py, tNGF_header_arrow_geom.py,
+tNGF_box_geom.py, tNGF_arrow_map.py, tNGF_begin_probe.py (all
+~/tools/revenv/bin/python). F3 glyph map + F6 pointer in NEXT.
+CAVEAT: F1/F2/F4 code is UNWITNESSED (no graded fresh shot this cycle) —
+tNG-F2 V0 is the gate before packaging.
 
 tNG-C2 CYCLE 2 LANDED 2026-11-21 (NEW GAME CONTENT IMPLEMENTED — planet
 index + chip row laws in code, pinned, mutation-proven; ledger
