@@ -212,6 +212,12 @@ inline constexpr Rect kPlayerColorPanel{379, 381, 493, 472};
 // kWheelBlitTop). The pre-t401 port blitted k0 always at (cx-42, y0+26) =
 // the "wrong artwork / wrong place" defect.
 inline constexpr int kWheelBlitTop = 408, kWheelBlitHalfW = 28;
+// tNG-B B3 PER-CONTROL ANCHOR RESIDUAL [measured, docs/re/_wip_tNGC.md
+// F15-1c disc-extent centres ours-vs-vendor on the refcap state]: density
+// ours (-1,+1), species ours (-1,0), atmosphere ours (+2.5,+1.5) — the
+// blit must move by MINUS the residual: {+1,-1}, {+1,0}, {-2,-1}.
+inline constexpr int kWheelBlitDx[3] = {1, 1, -2};
+inline constexpr int kWheelBlitDy[3] = {-1, 0, -1};
 
 // Description-panel art [measured]: portrait ring (green px x357..461,
 // rows 45..149 -> centre (409,97) r 52); crest = raceflag frame <specnum>
@@ -261,6 +267,30 @@ std::string portraitLibName(int specnum);
 inline constexpr int kDensityCycleCount = 5;
 extern const char* const kDensityWords[kDensityCycleCount];
 extern const int kDensityStarCounts[kDensityCycleCount];  // parallel, cited
+
+// tNG-B B1 DENSITY CYCLE LAW [verified disasm 0x52db9..0x52dd7]: the click
+// increments the rank word; when the OTHER density field hiword hits 5 the
+// rank resets to 0 (wrap 5). Pure so the pin can test the wrap term.
+inline int densityRankNext(int rank) {
+    const int r = rank + 1;
+    return r >= kDensityCycleCount ? 0 : r;
+}
+// Star-count law [verified straddle read 0x52df4/0x52dfb]: the arm reads
+// hiword(dword[esp + rank*4 - 2]) over the dispatcher-head copy of table
+// 0x895c8 {15,25,50,75,100} — the SORTED ladder indexed by rank 0..4.
+// kDensityStarCounts is the same set in cycle order; rung count is identical
+// either way (docs/re/_wip_tNGB.md straddle decode). Defined in menulaw.cpp.
+int densityStarCount(int rank);
+
+// tNG-B B1 PREVIEW-COSMOS HASH LAW: the per-star scatter value. The gen key
+// (wheelGen * 0x100000001) is what makes a density click draw a NEW SET
+// (vendor FUN_000226e4 full-regen is a rand() consumer at 0x22728); without
+// it the points are per-index STABLE across clicks — the pre-tNG-B defect.
+// Pure so the pin pins the gen-key term directly (mutation M7).
+inline std::uint64_t cosmosHash(int i, unsigned gen) {
+    return uint64_t(i) * 0x9e3779b97f4a7c15ull + 0x5851f42d403c3b23ull +
+           uint64_t(gen) * 0x100000001ull;
+}
 const char* densityWord(int starCount);  // "Average" for 50; nullptr off-ladder
 const char* speciesCountWord(int n);     // "Three".."Seven"; nullptr else
 const char* atmosphereWord(int v);       // 0 Peaceful / 1 Neutral / 2 Hostile

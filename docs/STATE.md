@@ -233,49 +233,77 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-B PHASE-17 G3 (BEHAVIOR) OPENING CYCLE — the tNG-C content
-queue is CLOSED at the D18 cap after tNG-C3 (3 cycles, same screen
-family; the fold is MANDATORY, do NOT open tNG-C4).
-(ordering rationale: tNG-C3 closed defects 3+4 with cited
-measurements/implementation and 1+2 as honest NOT-REPRODUCING negatives
-(docs/re/_wip_tNGC.md F15); what remains of tNG-C is a polish list with
-NO cited-law content left to measure — it rides into tNG-U. Pipeline
-per D19 ruling: framing -> content -> BEHAVIOR -> polish. G1 (vision)
-and G2 (mechanical t441 18/18) are green on newgame; the screen's
-behavior layer is untouched: wheel clicks must drive the BUILT galaxy
-(density -> star count law word[obj+0x572] == the Begin starfield count
-ALREADY implemented, so the density wheel -> mapgen link is the first
-B3 row), species wheel -> player count, atmosphere -> intro section
-(t412 wires pick+atmosphere but the wheels do NOT rebuild the preview
-galaxy). READ FIRST: docs/re/_wip_tNGC.md F15 close-out (fold list),
-rewrite/src/ui/title.cpp Begin block (c), docs/re/t423-newgame-law.md
-SS14/SS15/SS16.)
-B-SEED LIST (verbatim residues from tNG-C3, in priority order):
-(B1) density wheel -> preview galaxy REBUILD (kDensityStarCounts rung ->
-    regenerate mapgen preview; the Begin starfield + summary counts must
-    follow the wheel — currently only the label/word changes; cite law
-    FUN_000226e4 setter census F6).
-(B2) species wheel -> roster/player-count behavior seam.
-(B3) wheel ANCHOR polish (1-2px offsets F15-1: atmos ours = vendor
-    +(+2,+2), density (-1,+1)) — cheap, do inside B1's file touch.
-(B4) Begin K-family seam: which cos_star colour family (rec = 4K+cls)
-    per state — needs a vendor capture of a warm-star galaxy New Game
-    screen (playcap drive, NOT a new long capture; scratchpad refcap is
-    one seed only).
-HINTS THIS SESSION LEARNED (reuse, don't rediscover): ctest verdict =
-EXIT CODE ONLY; mutation campaign on GREEN suite only; the terminal tool
-REJECTS '&' backgrounding — use scripts (t412_newgame_shot.sh captures +
-navigates the New Game screen in one shot; scripts/tNGC3_begin_sbs.py
-builds the Begin side-by-side + green-mass census; scripts/
-tNGC3_wheel_decode.py = S9 decode of 3cfgnew records); the 3cfgnew
-+0x08 quad is NOT a bbox for this lib (k0 stream starts +0x08; the V/A
-law holds) — do not "fix" shp.h; python = ~/tools/revenv/bin/python;
-browser-crop law = im[1:481,1:641].
-GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 (saves
-53/54.sav re-verified this iteration — the sitting test). turn > 1086 ->
+NEXT tNG-B PHASE-17 G3 CYCLE 2 — B2 SPECIES WHEEL -> PLAYER-COUNT
+BEHAVIOR SEAM (B1 density->rebuild CLOSED this cycle with 8/8
+mutation-caught pins + log witness; B3 anchors CLOSED, verified
+best-shift-at-origin both panels; B4 rides after B2).
+(ordering rationale: B1+B3 landed together in title.cpp; B2 is the next
+priority seed from the tNG-C fold and uses the SAME click-arm machinery
+(0x52db9 family dispatch, PLAYERS_MORE msg 503). The vendor species arm
+sets word[win+0xb9] (3..7, wrap 8->3) and — per the BEGIN-PRESS block
+cited THIS cycle at 0x52a44..0x52b75 — the wheel settings are applied at
+Begin via call 0x238e8(0x12e10, ebx=0) WORLD GEN; the port's species
+setting currently drives ONLY the label + wheel art + the kDescPlanet
+chip-row count, never a roster/preview observable. B2 scope: cite the
+species arm's own regenerate call (does PLAYERS_MORE re-run 0x226e4 like
+GALAXY_MORE, or only store the rank? the arm census in
+work/tNGC_paint526b4.asm answers this FIRST — grep the 0x52e58..0x52f5x
+region for the 503 arm), then port the OBSERVABLE (chip-row lit-chip
+count == species count is the already-cited consequence; verify it moves
+with the wheel), pin pure speciesRankNext + witness via the log law-line
+pattern.)
+READ FIRST: docs/re/_wip_tNGB.md (B1 pattern = the template: pure laws in
+menulaw.h, law lines 'ui raceconfig ...', h15-style set-identity, mutation
+campaign scripts/tNGB_mutate.py shape), docs/re/_wip_tNGC.md F15 close-out,
+rewrite/src/ui/title.cpp ci==1 click arm, docs/re/t423-newgame-law.md
+SS14/SS15/SS16.
+HINTS THIS SESSION LEARNED (reuse, don't rediscover): PIXEL equal-N set
+tests on the Begin band are DEAD — the four-way class law (beginYaw) makes
+each shot detect a random ~30% subset (centroid containment ~0.3-0.45 on
+BOTH clean and mutant; log law-lines are the reliable discriminator);
+MapGenerator is a pure fn of (seed,count) and NOT prefix-structured across
+counts (shell radii allocate from n, mapgen.cpp:114) — set-identity pairs
+must share the RUNG (6-click wrap gen1-vs-gen6 pattern); mutation
+campaign: agreement-at-best-shift is anchor-INVARIANT, pin the shift
+POSITION (tNGB_b3_anchor.py law); CAUGHT = exit-code != 0 for EVERY
+catcher class (round-1 bug); chrome-recess-row7 t441 region is knife-edge
+at fam_min 0.90 on the ANIMATED cosmos column (rung0 shots may flip
+0.899/0.904 — canonical shot = scripts/t412_newgame_shot.sh, 18/18);
+BEGIN-PRESS world-gen call site cited at _wip_tNGB 'BEGIN-PRESS BLOCK'
+(t393 settings-apply seam, B4 candidate). ctest verdict = EXIT CODE ONLY;
+mutation on GREEN suite only; terminal REJECTS '&' backgrounding — use
+scripts; python = ~/tools/revenv/bin/python; browser-crop law =
+im[1:481,1:641]; refcap = scratchpad/newgame-original.png.
+GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 (checked this
+iteration — timeline tail 57/58.sav turn 1086 == floor). turn > 1086 ->
 re-run scripts/r1_t85g_sitting.py FIRST. Ghidra :8089 UP; 0x52xxx GAP
-fns disassembled via scripts/t442_disasm.py (capstone in revenv, NOT
-system python).
+fns disassembled via scripts/t442_disasm.py (capstone in revenv).
+tNG-B CYCLE 1 LANDED 2026-11-21 (ADOPTED killed-session work + finished:
+B1 density-wheel REBUILD law in code, B3 anchor corrections verified;
+ledger open=[016,019] unchanged, seam work, NO OQ row moved — this queue
+has no OQ row by design; honest negative: B2/B4 stay open seeds).
+(i) B1 LAW: vendor density click 0x52db9..0x52e57 = rank++ (wrap 5,
+0x52dc9) + FUN_000226e4 FULL REGENERATE with N = straddle read
+hiword(dword[esp+rank*4-2]) over copy of table 0x895c8 {15,25,50,75,100}
+= SORTED ladder; rand-consumer => NEW SET every click. Port: wheelGal
+(std::optional<Galaxy>) rebuilt via MapGenerator(rung, base+gen) on every
+click; preview cosmos N + hash key on gen (pure cosmosHash in menulaw.h);
+Begin starfield iterates wheelGal (word[obj+0x572] consequence); live
+campaign untouched (t393 named seam). (ii) B3: kWheelBlitDx/Dy
+{1,1,-2}x{-1,0,-1} — post-change best-shift sits AT ORIGIN all three
+panels, density 93.6->94.3%, atmos holds 91.2~91.4% (F15-1c law KEPT).
+(iii) PINS test_newgame_behavior_tNGB x6 (straddle byte-emulator, visited
+sequence, wrap+guard, per-gen determinism, cosmosHash gen-key, mapgen
+pure-(seed,count)); run_tests all green. (iv) WITNESS log-based: regen
+lines 75,100,15,25,50,75 + cosmos-n [50,75,100,15,25,50,75] + h15 SIX
+DISTINCT + mass monotone — GREEN clean, RED under M4/M8. (v) MUTATION 8/8
+CAUGHT round 2 with named verdicts (M1-M3 tests pins, M4 h15-repeat,
+M5/M6 anchor-position, M7 pure pin :132, M8 cosmos-n ['100']);
+AFTER-RESTORE green, md5-verified copy revert. (vi) HARNESS: t441
+newgame 18/18 on canonical t412 shot; ctest 0 failed; gate GREEN.
+Scripts added: tNGB_density_shot.sh (6-click wrap capture),
+tNGB_density_witness.py, tNGB_b3_anchor.py, tNGB_mutate.py,
+tNGB_var_shot.sh (row-7 knife-edge probe).
 tNG-C3 CYCLE 3 LANDED 2026-11-21 (LAST tNG-C CYCLE PER D18 CAP — NEW
 GAME DEFECT LIST RESOLVED: 2 closed-by-measurement+implementation, 2
 closed-as-NOT-REPRODUCING honest negatives; ledger open=[016,019]

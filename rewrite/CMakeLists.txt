@@ -175,6 +175,7 @@ add_executable(run_tests
   tests/test_titletext_t392.cpp
   tests/test_textlaw_tA3.cpp
   tests/test_newgame_content_tNGC.cpp
+  tests/test_newgame_behavior_tNGB.cpp
   src/ui/layout.cpp
   src/ui/boot.cpp
   src/ui/menulaw.cpp

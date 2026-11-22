@@ -102,6 +102,15 @@ const char* densityWord(int starCount) {
     return nullptr;  // off the measured ladder: no word is cited, say so
 }
 
+// tNG-B B1 star-count law (see menulaw.h): cycle-order ladder rung; the
+// vendor's sorted-table straddle read yields the same count (the pin
+// test_newgame_behavior_tNGB emulates the byte read and checks equality).
+int densityStarCount(int rank) {
+    return kDensityStarCounts[rank >= 0 && rank < kDensityCycleCount
+                                  ? rank
+                                  : 0];
+}
+
 const char* speciesCountWord(int n) {  // static.txt //163-167
     static const char* const kWords[5] = {"Three", "Four", "Five", "Six",
                                           "Seven"};

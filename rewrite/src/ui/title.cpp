@@ -13,11 +13,14 @@
 #include <cmath>
 #include <cstdio>
 #include <algorithm>
+#include <optional>
 #include <vector>
 
 #include "formats/gif.h"
 #include "formats/shp.h"
 #include "game/campaign.h"
+#include "game/mapgen.h"  // tNG-B B1: wheel-galaxy rebuild (MapGenerator)
+#include "game/starstat.h"
 #include "ui/boot.h"
 #include "ui/cam3d.h"  // t414: neutralTint (preview point families)
 #include "ui/menulaw.h"
@@ -185,6 +188,37 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
     int speciesSetting = 7;   // player + 6 AI (main.cpp buildCampaign law)
     int atmosphere = 1;       // Neutral (measured vendor default, see above)
     int selSlot = 0, scrollOffset = 0;  // RACELIST window (3 of roster)
+    // tNG-B B1 WHEEL-GALAXY LAW [verified disasm 0x52db9..0x52e57 + t295 S2]:
+    // the vendor density click calls FUN_000226e4 = FULL REGENERATE (0x22878
+    // parse + 0x22728 rand-consumer star POSITIONS + 0x234a4 lanes + 0x22ce4
+    // reset) with N = hiword(dword[esp + rank*4 - 2]) = sorted ladder rung
+    // {15,25,50,75,100}[rank]. The preview cosmos and the Begin-panel
+    // starfield (count law word[obj+0x572]) are consequences of THAT galaxy:
+    // every click draws a NEW star set (rand), never the same set clipped to
+    // N (the pre-tNG-B defect: splitmix points were per-index stable, so the
+    // field only grew/shrank at the tail). The port models the DISPLAY
+    // galaxy with MapGenerator (placement laws untouched, splitmix-keyed,
+    // never the sim rng — gate 3l byte identity); applying settings to the
+    // LIVE campaign remains the t393 named seam (Begin enters play on the
+    // built galaxy).
+    const unsigned wheelBaseSeed =
+        previewCamp ? unsigned(previewCamp->galaxy().seed) : 1u;
+    int wheelGen = 0;
+    std::optional<ascend::game::Galaxy> wheelGal;
+    auto rebuildWheelGalaxy = [&](int rank, unsigned gen) {
+        std::string werr;
+        auto stats = ascend::game::StarStats::load(
+            dataRoot + "/extracted/ascend00/starstat.txt", &werr);
+        auto names = ascend::game::loadStarNames(
+            dataRoot + "/extracted/ascend00/names.txt", &werr);
+        if (!stats || names.empty()) return;  // honest: keep previous galaxy
+        ascend::game::MapConfig mc;
+        mc.starCount = densityStarCount(rank);
+        mc.seed = wheelBaseSeed + gen;  // new set per regen (rand law)
+        wheelGal = ascend::game::MapGenerator(mc, *stats, std::move(names))
+                       .generate();
+    };
+    rebuildWheelGalaxy(densityIdx, 0);
     // t423c PLAYER COLOUR state [verified FUN_000232ec + racering census]:
     // byte[raceRow+8] = colour idx 0..7 (racering.shp record index — the
     // lib IS 8 colour-tinted 53x53 rings, docs/re/_wip_t423c2.md C2-F5).
@@ -490,15 +524,29 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     hmx >= 379 && hmx <= 493 && hmy >= 420 && hmy <= 472;
                 previewYaw +=
                     kPreviewSpinPerFrame * (beginHover ? 6.0 : 1.0);
-                const int n = kDensityStarCounts[densityIdx];
+                // tNG-B B1: N = the WHEEL galaxy's star count (count law
+                // word[obj+0x572] is the regenerated galaxy, not the ladder
+                // label), and each star's hash keys on wheelGen so a density
+                // click DRAWS A NEW SET (vendor 0x22728 rand consumer) —
+                // pre-tNG-B the points were per-index stable across clicks.
+                const int n = wheelGal ? int(wheelGal->stars.size())
+                                       : kDensityStarCounts[densityIdx];
+                // tNG-B: the rendered cosmos count is an observable law line
+                // (witness asserts it tracks the regen rungs; the pre-fix
+                // defect froze n independently of the wheel galaxy).
+                static int lastCosmosN = -1;
+                if (n != lastCosmosN) {
+                    std::printf("ui raceconfig cosmos n %d\n", n);
+                    std::fflush(stdout);
+                    lastCosmosN = n;
+                }
                 const double cx =
                     (kNewgameCosmosRect.x0 + kNewgameCosmosRect.x1) / 2.0;
                 const double cy =
                     (kNewgameCosmosRect.y0 + kNewgameCosmosRect.y1) / 2.0;
                 const double focal = 500.0;
                 for (int i = 0; i < n; i++) {
-                    uint64_t z = uint64_t(i) * 0x9e3779b97f4a7c15ull +
-                                 0x5851f42d403c3b23ull;
+                    uint64_t z = cosmosHash(i, unsigned(wheelGen));
                     z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
                     z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
                     z = z ^ (z >> 31);
@@ -830,9 +878,13 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                                   c.rect.x1 - c.rect.x0 + 1,
                                   c.rect.y1 - c.rect.y0 + 1};
                     SDL_RenderSetClipRect(ren, &clip);
-                    const bool drew = blitShape(ren, cfgNew, frame,
-                                                cxp - kWheelBlitHalfW,
-                                                kWheelBlitTop);
+                    // tNG-B B3: per-control anchor residual (menulaw.h
+                    // kWheelBlitDx/Dy, F15-1c measured) — the uniform
+                    // anchor left a 1-2 px offset per panel.
+                    const bool drew = blitShape(
+                        ren, cfgNew, frame,
+                        cxp - kWheelBlitHalfW + kWheelBlitDx[i],
+                        kWheelBlitTop + kWheelBlitDy[i]);
                     SDL_RenderSetClipRect(ren, nullptr);
                     if (!drew && !wheelRefused[i]) {
                         // Present but UNDECODABLE after the t423 partial
@@ -986,15 +1038,22 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 // ORDER is cited). Positions are STATIC (the rotation
                 // drives only the class). Drawn BEFORE the ring/portrait
                 // (refcap: no star px over the emblem disc) and after the
-                // dots.
-                if (previewCamp) {
+                // dots. tNG-B B1: the star SET is the WHEEL galaxy (the
+                // density click regenerates it — word[obj+0x572] is that
+                // galaxy's count), falling back to the built campaign only
+                // when no wheel galaxy could be built (honest zero).
+                const std::vector<ascend::game::Star>* beginStars = nullptr;
+                if (wheelGal)
+                    beginStars = &wheelGal->stars;
+                else if (previewCamp)
+                    beginStars = &previewCamp->galaxy().stars;
+                if (beginStars) {
                     SDL_Rect clip{vis.x0, vis.y0, vis.x1 - vis.x0 + 1,
                                   vis.y1 - vis.y0 + 1};
                     SDL_RenderSetClipRect(ren, &clip);
                     static double beginYaw = 0.0;
                     beginYaw += kPreviewSpinPerFrame;
-                    for (const ascend::game::Star& s :
-                         previewCamp->galaxy().stars) {
+                    for (const ascend::game::Star& s : *beginStars) {
                         const int px = vis.x0 + (s.x * 640 / 1024) / 5 + 5;
                         const int py = vis.y0 + (s.y * 480 / 1024) / 5 + 5;
                         if (px < vis.x0 || px > vis.x1 || py < vis.y0 ||
@@ -1137,9 +1196,39 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     if (ci >= 0) {
                         // *_MORE = advance one rung (density cycles the t78
                         // ladder; species 3..Seven; atmosphere 0..2).
-                        if (ci == 0)
-                            densityIdx = (densityIdx + 1) % kDensityCycleCount;
-                        else if (ci == 1)
+                        if (ci == 0) {
+                            // tNG-B B1 [verified 0x52db9..0x52e57]: the
+                            // density click REGENERATES the display galaxy
+                            // (FUN_000226e4 full-regen, rand consumer) —
+                            // the visible star set changes EVERY click.
+                            densityIdx = densityRankNext(densityIdx);
+                            rebuildWheelGalaxy(densityIdx, ++wheelGen);
+                            // SET-IDENTITY hash (witness discriminator):
+                            // hash of the first 15 star positions (15 = the
+                            // min ladder rung, so always defined). MapGen
+                            // at a FIXED seed is prefix-structured (same
+                            // stream clipped by count), so a seed NOT
+                            // riding gen yields the SAME h15 across the
+                            // 15/25-rung clicks — the witness requires h15
+                            // to differ EVERY click (rand-consumer law).
+                            uint64_t h15 = 1469598103934665603ull;
+                            if (wheelGal)
+                                for (size_t si = 0;
+                                     si < 15 && si < wheelGal->stars.size();
+                                     si++) {
+                                    h15 = (h15 ^ uint64_t(wheelGal->stars[si].x)) *
+                                          1099511628211ull;
+                                    h15 = (h15 ^ uint64_t(wheelGal->stars[si].y)) *
+                                          1099511628211ull;
+                                }
+                            std::printf(
+                                "ui raceconfig galaxy regen gen %d stars %d "
+                                "h15 %016llx\n",
+                                wheelGen,
+                                wheelGal ? int(wheelGal->stars.size()) : -1,
+                                (unsigned long long)h15);
+                            std::fflush(stdout);
+                        } else if (ci == 1)
                             speciesSetting =
                                 speciesSetting >= 7 ? 3 : speciesSetting + 1;
                         else
