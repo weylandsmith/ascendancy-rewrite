@@ -322,3 +322,18 @@ Enforced statically by gate 3n/3n3.
   Related: t441's "ours (W,H) n=" dims come ONLY from --log dimscheck lines
   (app log); a composite built without the log arg truthfully prints
   "None n=0" — verdicts unaffected, but pass the log for a gradeable strip.
+
+## PITFALL tNGS3 (2026-11-22): the bundled x11vnc is DEAD on this build.
+  work/r1/localdeb/root/usr/bin/x11vnc fails at exec:
+  "error while loading shared libraries: libvncserver.so.1" (verbatim in
+  each dbg-*/x11vnc.out). Consequence: every scripts/r287_vncinput.py
+  move/click/key is a SILENT NO-OP (connect fails or never lands) and
+  captured frames stay byte-identical — diff _raw shots before blaming
+  the game. Use xsend warp-clicks via the debugger session's send(["click",
+  x, y]) channel (t292 law; works on a fresh private Xvfb with no stale
+  hover). r287_vncinput.py now honours RFB_PORT env (default 5910, the
+  production port, unchanged for existing callers).
+## PITFALL tNGS3: NEVER `pkill -x Xvfb -u <user>` — it matches production
+  Xvfb :9 as well as scratch displays. Kill by DISPLAY-specific pid
+  (pgrep -f "Xvfb :97") instead. An -u kill on 2026-11-22 took production
+  down mid-iteration (recovered via r1_playcap_vnc.sh start).

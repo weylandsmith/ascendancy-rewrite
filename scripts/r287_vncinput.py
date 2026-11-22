@@ -27,7 +27,9 @@ usage:
 """
 import os, socket, socketserver, struct, subprocess, sys, time
 
-HOST, PORT = "127.0.0.1", 5910
+HOST = "127.0.0.1"
+PORT = int(os.environ.get("RFB_PORT", "5910"))   # tNGS3: scratch sessions
+                                                 # target their own x11vnc
 XOFF, YOFF = (int(os.environ.get("RFB_XOFF", 80)),
               int(os.environ.get("RFB_YOFF", 100)))
 # CALIBRATION (t287, three-way evidence): RFB PointerEvent coords == X ROOT

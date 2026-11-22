@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-22T12:30
+updated: 2026-11-22T15:00
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,6 +233,49 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
+NEXT tNG-S CYCLE 3b — RUN THE W1 WITNESS, THEN PORT (D21; cycle cap: this
+is the LAST cycle of the D18 <=3 rule, everything unresolved goes on the
+package's plain-language open list). ORDER (rationale: W1 is one script
+invocation and its verdict decides whether the port auto-spins at all, so
+nothing downstream can be written before it; Z1 is CLOSED (see LANDED) so
+the port's star source is fully cited; re-package last per D21):
+ W1 RUN: bash scripts/r_tNGS3_w1_relaunch.sh (5-launch BREAK-lottery wrap;
+    the script is FIXED and was armed successfully 4x this iteration — do
+    NOT rewrite it). Verdict lands in work/r1/dbg-tngs3w1-<ts>/w1.json:
+    "AUTO-SPIN ON..." (writer 0x283e4 fired, axis+angle cited) vs
+    "STATIC..." (pump fired with latch==0 / no fire) vs a NEGATIVE.
+    If NEGATIVE again: the two-click nav (neutral 320,60 then 250,295 on the
+    NewGame row 280..310) is the suspect — verify by diffing _raw_03 vs
+    _raw_04 (a real transition repaints the whole well, hover repaints a
+    30-px band); if the click still only hovers, fall back to the KEYBOARD
+    channel (r287_vncinput key Return is dead this build — x11vnc missing;
+    use s.send(["key", ...]) xsend keys, which ARE accepted per t287) and
+    bank the nav law. A zero-fire verdict IS a measurement: newgame field
+    static, D21's "rotating" = the COSMOSWnd map only, port must NOT spin.
+ P4 PORT (unblocked once W1 lands): newgame starfield = the galaxy generator
+    law now fully cited (S15: 3x rng%1000-500 -> normalize -> x shell(k);
+    shell 440 start, -75 step, clamp 50 — replaces the t423 FUN_00022728
+    cylinder model AND the splitmix sampler in title.cpp:536-600); camera
+    (0,0,-1500) FOV 35 (focal = half-width 242.5/tan(17.5deg) = 769.1 px;
+    shell 440 -> 225.6 px, fits the 8..492 well); perspective divide +
+    0.5-bias + viewport centre offsets; depth-band sprite classes
+    v=round(d-1500): >220 / 1..220 / -219..0 / <=-220 -> cos_star
+    4*type+cls; NO sphere clip (containment intrinsic). Rotation per the W1
+    verdict using cam3d.cpp's already-pinned +-2deg latch law.
+ P5 re-package scratchpad/NG-usergrade.png (scripts/tNGU_composite.py
+    --checklist) -> rewrite NEXT to WAIT-USER-GRADE-NG3.
+GAME: production ring was RESTARTED this iteration (my pkill -x Xvfb -u
+hrethric killed Xvfb :9; recovered via r1_playcap_vnc.sh start — HEALTHY
+pid 1470999, TL expiry 2026-11-24 14:53, ring banking age 0-5 s). NEVER
+run pkill with -u against Xvfb again: it matches the production :9 too.
+The ring is now at the resume.gam baseline (turn 1086 class); the t368
+sitting test baseline must be RE-DERIVED before the next sitting check.
+KNOWN (do NOT re-derive): Z1 star-position law S15; W1 static half S14
+(auto-latch 0x26dd1 state==3); rotation +-2deg t416; pump ~1/s t302;
+projection + camera cycle-1 S5; colour law tNG-F1; Begin panel /5+5.
+
+--- SUPERSEDED tNG-S CYCLE 3 assignment part 1 (W1 witness remains live
+above; Z1 CLOSED, see the LANDED block):
 NEXT tNG-S CYCLE 3 — Z-AXIS GEN LAW + AUTO-ROTATE WITNESS + PORT (D21
 verbatim: "The original is a rotating sphere containing a volume of
 stars in both places. Rather than trying to make something that looks
@@ -295,6 +338,40 @@ rotation +-2deg axes t416; pump ~1/s t302; capstone =
 ~/tools/revenv/bin/python scripts/t442_disasm.py; Ghidra bridge
 127.0.0.1:8089 live. GAME UNTOUCHED this iteration (turn 1086
 baseline re-verified 20/20; do NOT mount the pristine dir).
+
+tNG-S CYCLE 3 LANDED 2026-11-22 (Z1 STAR-Z LAW CLOSED WITH CITATIONS; W1
+INSTRUMENT FIXED BUT VERDICT PENDING — honest negative, no OQ row moved,
+D21 starfield work tracks no ledger row, open=[016,019] unchanged. Full
+record docs/re/_wip_tNGS.md S14-S16).
+PROVED THIS ITERATION:
+ - Z1 CLOSED (S15): the star-position generator is FUN_00022878
+   (work/tNGS3_22878a/b.asm): 3x (rng%1000-500) -> normalize (FUN_00052fa0)
+   -> scale by shell radius from the schedule at tables 0x63ac/0x63aa
+   (start 440, -75 step, clamp 50). The z-coordinate is REAL (unit-sphere
+   direction x shell), replacing the t423 cylinder model and the
+   splitmix sampler in title.cpp. P4 focal math pre-computed: FOV 35,
+   half-width 242.5 -> focal 769.1 px; shell 440 at depth 1500 -> 225.6 px
+   (fits the 8..492 well).
+ - W1 static half (S14): auto-latch site 0x26dd1 (COSMOSWnd init, fires iff
+   state==3 i.e. the COSMOS map; writer leg 0x283e4, pump leg 0x27a18).
+ - W1 witness NOT decided (S16): legs armed 4x via
+   scripts/r_tNGS3_w1_relaunch.sh (BREAK lottery ~50%/launch, t286 law), but
+   the title->NewGame nav failed for three now-diagnosed reasons: (1) fresh
+   scratch title rows sit 200..310 NOT the t287 193..473 table; (2) the
+   bundled x11vnc cannot exec this build (libvncserver.so.1 missing) so the
+   RFB channel is silently dead — all r287_vncinput moves/clicks were lost;
+   (3) xsend's first click only establishes hover (t385b law re-witnessed).
+   Script now: xsend-only nav, neutral click then NewGame click (250,295).
+   Next session runs the relaunch wrapper ONCE; verdict semantics are in the
+   NEXT ACTION block.
+ - GAME INCIDENT (disclosed, recovered): cleanup pkill "-x Xvfb -u hrethric"
+   matched production Xvfb :9 and killed it (its dosbox was already TL-dead
+   since 12:02). Restarted via r1_playcap_vnc.sh start; HEALTHY pid 1470999,
+   TL expiry 2026-11-24 14:53, ring banking (45/47.sav age 0-5s). Ring is at
+   the resume.gam baseline; t368 sitting baseline must be re-derived. NEVER
+   pkill Xvfb with -u again.
+ - r287_vncinput.py now honours RFB_PORT (default 5910 unchanged); session
+   scripts must run under ~/.hermes/hermes-agent/venv/bin/python (PIL).
 
 tNG-S CYCLE 2 LANDED 2026-11-22 (P1 CLOSED WITH CITATIONS + t416
 SUPERSEDURE; no code change, no OQ row moved — D21 starfield work

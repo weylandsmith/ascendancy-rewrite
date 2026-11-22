@@ -352,3 +352,63 @@ CONTAINS THE ROTATION PUMP + WRITER. Cited verbatim:
   that stores 0 => static). W1 witness decides: BP 0x283e4 (writer entry:
   eax=win, edx selector, f32 angle at [esp+0xc] per VERIFIED asm 0x283e4..
   0x28422) + BP 0x26b34 (read DAT_0007e582 at entry = the screen state code).
+
+## S15. CYCLE 3 — Z1 STAR-Z LAW CLOSED [verified asm, work/tNGS3_22878a/b.asm]
+THE STAR-POSITION GENERATOR IS FUN_00022878 (0x22878..0x22ce1; sole caller
+0x226fe = the msg-0x1f6 arm family). Per star k (loop 0x22a0c..0x22cc4,
+ebp = [esp+0x7fc] + k*0x60, [esp+0x7fc] = lea [game+0xdb5] at 0x229ab — the
+campaign star table, t441 base law):
+ 1. field clears +6=0xffff, +0x14..17=0, +0x44=0, +0x5a=0 (0x22a20..0x22a49).
+ 2. TYPE draw: rng (FUN_0007824f) % [esp+0x810] + 1, weighted scan of the
+    13-entry starstat population table u16[0x63ac..] (0x22b2c..0x22b61),
+    STORED [ebp+0] = record type.
+ 3. POSITION TRIPLE: THREE consecutive draws (0x22b61/0x22b8d/0x22bb4):
+    v = (rng%1000-500, rng%1000-500, rng%1000-500) (idiv ecx=0x3e8, sub
+    edx,0x1f4 — VERIFIED bytes 0x22b66 'b9 e8 03 00 00 ... 81 ea f4 01 00 00'),
+    fild each -> f32 at esp+0x7e8/7ec/7f0; FUN_00052fa0 = NORMALIZE
+    (sqrt(x2+y2+z2) via 0x76da0, divide by length when length>0 — VERIFIED
+    asm 0x52fa0..0x52ff0); then multiply all three by the SHELL ACCUMULATOR
+    [esp+0x820]; store esp+0x7dc/7ec/7f0 -> [ebp+8], [ebp+c], [ebp+0x10]
+    == rec+0x30/+0x34/+0x38 (base game+0xdb5 = STATE+0xd8d+0x28 law).
+ 4. SHELL SCHEDULE constants CODE-VERIFIED (the r1-savestate.md 'INFERRED'
+    formula r=max(50,440-75j) is now law): start edi=440.0 (0x2288c
+    'bf 00 00 dc 43'), per-shell add -75.0 (f32 [0x836fc]=0xc2960000 VERIFIED),
+    reset imm 50.0 (0x22aee 'c7 84 24 20 08 00 00 00 00 48 42' = 0x42480000
+    VERIFIED) gated on fcomp [0xb50] (bss, runtime — cycle-2 pitfall stands).
+=> Z LAW: z is NOT an independent axis — (x,y,z) = normalize(uniform
+   [-500,499]^3) x shell_radius. Direction = uniform-in-box NORMALIZED to the
+   unit sphere (refines OQ-012c 'uniform on sphere [inferred]': the actual
+   mechanism is box-normalize, which is ALMOST sphere-uniform but slightly
+   favours axis directions; density weight = 1/|v(direction)|^2 of the box
+   ray). Envelope: r = shell(k) in {440,365,290,215,140,65,50} — matches the
+   measured 41.sav radius band [50,440] exactly; z-independent-of-x/y observed
+   IS the isotropy of the normalize.
+=> PORT (P4): draw 3 ints rng%1000-500, normalize, scale by the OQ-025 shell
+   radii list — no separate z sampler, no statistical seam. The tNGS cycle-2
+   'port draws z uniform-in-envelope as a NAMED SEAM' clause is RETIRED.
+
+## S16. CYCLE 3 W1 WITNESS — NOT YET DECIDED (honest negative); instrument
+## fixed to the point of one more session. State of play:
+- Legs armed successfully 4x (w1_writer 0x283e4, w1_pump 0x27a18, w1_hdlr
+  0x26b34 at P0+off; BPLIST confirmed each time; BREAK lottery ~50% per
+  launch -> scripts/r_tNGS3_w1_relaunch.sh wraps 5 launches).
+- Navigation failure chain (each fix banked as a PITFALL):
+  1. t287 title slot table (193..473) does NOT apply to a fresh-boot scratch
+     title: rows sit 200..230 PlayIntro / 240..270 Tutorial / 280..310
+     NewGame (navy-row detector measured on run 141025). Arrow keys do NOT
+     move the menu highlight (it is HOVER state).
+  2. RFB CHANNEL DEAD on this machine build: bundled
+     work/r1/localdeb/root/usr/bin/x11vnc fails at exec —
+     libvncserver.so.1 missing (x11vnc.out verbatim). Every RFB move/click
+     was silently lost (frames byte-identical). scripts/r287_vncinput.py now
+     honours RFB_PORT env (default 5910 unchanged).
+  3. xsend warp-click DOES work on the private Xvfb (t292 law) but the
+     FIRST click only establishes hover (t385b law re-witnessed: New Game
+     row highlighted teal, no transition). Session now sends neutral click
+     (320,60) then the New Game click (250,295).
+  4. BREAK lottery: settle 45 s then BREAK; hdr=None/no-PONG kills the whole
+     launch (in-process retry useless) -> relaunch loop.
+- LAST RUN (145012) reached exactly the fixed nav sequence; the two-click
+  fix had not yet been observed end-to-end when budget closed. NEXT session:
+  run scripts/r_tNGS3_w1_relaunch.sh; verdict lands in dbg-tngs3w1-*/w1.json
+  ("AUTO-SPIN ON..." vs "STATIC..." per the S14 leg table).
