@@ -330,3 +330,25 @@ CONTAINS THE ROTATION PUMP + WRITER. Cited verbatim:
   one-shot re-post. WHO ROTATES the COSMOSWnd orientation matrix
   ([cam+0x14e]) is STILL UNNAMED statically (honest negative; instrument =
   dbg BP at clip builder FUN_000284bc entry, dump matrix twice ~2s apart).
+
+## S14. CYCLE 3 — W1 STATIC HALF: AUTO-LATCH SITE FOUND (VERIFIED asm,
+## work/tNGS3 state-map census + t442_disasm 0x26b34..0x26e90)
+- COSMOSWnd msg handler ENTRY = 0x26b34 (esi=win; msg cascade dx: 0x3b pump ->
+  0x27a18 VERIFIED at entry 0x26b5b/0x26b65; dials 0x32..0x37 -> latch chain
+  0x27824..0x27d2a region per t416).
+- WINDOW-STATE DISPATCH: state = DAT_0007e582 >> 16 (same read at 0x26cf6 for
+  the race-count mirror 0x13b96 — HIWORD law). Branches inside the init leg:
+  * state==3 (0x26d43): rect (17,12,324,320), FOV 35.0, camera re-init
+    0x203b8, and 0x26dd1: `mov dword [esi+0xc0], 1` — BIT0 LATCH SET =
+    AUTO-ROTATE ON at window init. (t416 msg-3 leg = this branch.)
+  * state==0xd (0x26e36): rect (0,0,323,315) — the 320-wide DEMO field; latch
+    store for this branch NOT yet read (disasm owed 0x26e90..0x26f65).
+  * state==7 (0x26e1f setne->dec): [esi+0xd4] = (state!=7 ? 1 : 0).
+- Generic init tail 0x26c89: `mov dword [esi+0xc0], 0` (latch CLEAR) preceded by
+  call 0x56374(0x7a35c, ecx=0, edx=[esi+0x41], 0, 0) with ebx=0x3b pending —
+  pump-post context.
+- CONSEQUENCE: whether the NEWGAME field auto-spins = WHICH state value the
+  newgame screen opens COSMOSWnd in (state 3 => latched spin at init; a branch
+  that stores 0 => static). W1 witness decides: BP 0x283e4 (writer entry:
+  eax=win, edx selector, f32 angle at [esp+0xc] per VERIFIED asm 0x283e4..
+  0x28422) + BP 0x26b34 (read DAT_0007e582 at entry = the screen state code).
