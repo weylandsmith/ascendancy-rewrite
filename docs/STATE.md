@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-22T01:30
+updated: 2026-11-22T10:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,15 +233,58 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-S STARFIELD VOLUME + ROTATION — FAITHFUL RE (user D21
+NEXT tNG-S CYCLE 2 — STARFIELD ROTATION WITNESS + FAITHFUL PORT (D21
 2026-11-22 verbatim: "The original is a rotating sphere containing a
 volume of stars in both places. Rather than trying to make something
 that looks approximately like that, can we reverse engineer that in
 the original and reimplement faithfully in the rewrite?" — grading
-HELD until this closes + re-package).
-KNOWN (do NOT re-derive): colour law CLOSED tNG-F1 (sprite cos_star
-rec 4K+cls, K=star type); Begin panel = SHRUNK same field (tNG-C F11);
-painter chain 0x52114 (head) -> 0x526b4 (body+event dispatcher, arm
+HELD until this closes + re-package). CYCLE 1 LANDED (below): L1
+star-table + L2 projection LAWS CLOSED WITH CITATIONS (docs/re/
+_wip_tNGS.md S5-S8: 100 stars, 21-byte clips at COSMOSWnd+0x172,
+count WORD +0x572; camera pos (0,0,-1500) FOV 35 far 1e5 (FUN_00026a9c);
+perspective divide + 0.5-bias (FUN_00053374); depth-banded sprite
+classes v=round(d-1500): >220/1..220/-219..0/<=-220 -> shapes 0..3).
+The 3D model is REAL (not a 2D fake — the honest-negative branch of
+the assignment is resolved: volume exists). REMAINING = L3 rotation
+law + port + pins + re-package. ORDER (rationale: P1 is one cheap
+string decode and gates the star SOURCE; P2 is THE witness and needs
+the dbg build; port/pins can't be cited without P2's axis+rate;
+re-package last per D21):
+ P1 star source: FUN_0004709c opens 'reswin.txt' (ds:0x24b0 VERIFIED)
+    which is ABSENT from the shipped tree -> generator branch is the
+    vendor law; decode the FULL generator body (asm 0x471f9..0x47320+
+    rng draws over the tech-record census 0x74784 stride 0x4b, then
+    the rotate loop at 0x4743d via FUN_0005324c degrees) and lift the
+    exact N=100 (x,y,z) law. NOTE 0x4709c's own camera (fov 30, z=-150,
+    far 5e4, 320) is a DIFFERENT camera from the COSMOSWnd one — do
+    not blend them.
+ P2 ROTATION WITNESS (dbg build work/r1/bin/dosbox-x-dbg, scratch
+    savedir law, t302 BPDEL-before-RUN protocol): BP at clip-builder
+    FUN_000284bc entry; bank [cam+0x14e..0x16e] orientation matrix +
+    ret0 twice ~2 s apart => AXIS + RATE MEASURED. If zero fires at
+    the newgame screen, the builder is campaign-only — then BP the
+    painter FUN_000526b4 and watch the clip record coords rec+5/+7
+    across two stops instead.
+ P3 pump rate: read FUN_00028fc0 body (delay arg) + census msg
+    0x1f6/0x1f7/0x1f9 fires/s. CAUTION: those arms' counters
+    (+0xb7/+0xb9/+0xbb, wraps 5/8/3) are read by the HEAD painter
+    0x52160 as TEXT-carousel indices (0x524f8..0x5252a) — they may
+    NOT be the star spin; do not assume, witness.
+ P4 PORT (spec = _wip_tNGS.md S6): 3D star gen, camera (0,0,-1500)
+    FOV 35, perspective divide + 0.5 round, depth-banded sprite, NO
+    sphere clip (containment is intrinsic — our clip is the D21 bug);
+    retire the ad-hoc shell sampler. Pins: count=100 + radial profile
+    + colour census vs refcap (t441 regions) + ROTATION pin (two
+    shots ~2 s apart, cited rate/axis).
+ P5 re-package scratchpad/NG-usergrade.png (tNGU_composite --checklist)
+    -> rewrite NEXT to WAIT-USER-GRADE-NG3.
+Budget: cycles 2+3 of the D18 <=3 rule. KNOWN (do NOT re-derive):
+colour law tNG-F1; Begin panel = SHRUNK same field (tNG-C F11);
+painter chain + disasm dumps work/tNGC_paint_head.asm /
+tNGC_paint526b4.asm; capstone = ~/tools/revenv/bin/python
+scripts/t442_disasm.py; Ghidra bridge 127.0.0.1:8089 live,
+FUN_000526b4 created this iteration (save project if prompted).
+tNG-S-CYCLE1-ASSIGNMENT (kept for provenance): derive L1 star table /
 0x52eb->0x528eb wheels); disasm dumps work/tNGC_paint_head.asm
 (0x52100..0x526b4) + work/tNGC_paint526b4.asm (0x526b4..0x52f60);
 capstone helper scripts/t442_disasm.py; debugger build available
@@ -277,6 +320,42 @@ profiles pass, laws cited FUN-by-FUN in _wip_tNGS.md. Then RE-PACKAGE
 NG-usergrade.png (checklist format) and rewrite NEXT to
 WAIT-USER-GRADE-NG3. Budget <=3 cycles (D18); if L1 proves a 2D fake,
 that IS the faithful answer and ships as cited law.
+
+tNG-S CYCLE 1 LANDED 2026-11-22 (L1+L2 CLOSED WITH CITATIONS; L3 partial
+with named instrument; no code change yet, no OQ row moved — D21 starfield
+work tracks no ledger row, honest negative for the ledger: open=[016,019]
+unchanged. Full record docs/re/_wip_tNGS.md S3-S8).
+(i) L1 STAR TABLE CLOSED: painter FUN_000526b4 resolves COSMOSWnd by name
+(0x56d8c, ds:0x2bdb VERIFIED 'COSMOSWnd'); count = WORD [COSMOSWnd+0x572]
+(sole read 0x52768), table = [COSMOSWnd+0x172] u32 ptr array; records are
+21-byte clips (stride proven by builder FUN_000284bc tail += 0x15): +0 shape
+bank, +4 skip-flag, +5/+7 screen x/y PRECOMPUTED, +0xd f32 depth.
+(ii) L2 PROJECTION CLOSED: perspective divide FUN_00053374 (fdiv [cam+8],
+0.5 bias qword ds:0x2c50 VERIFIED, frndint helper 0x76e08) + viewport
+offsets [COSMOSWnd+0x574/0x576]>>16; camera init FUN_00026a9c (call chain
+VERBATIM in banked dump at 0x52aa1..0x52aad): pos (0,0,-1500.0) [0xc4bb8000],
+FOV 35, near 1, far 1e5, orientation identity 3x3 at cam+0x14e. Sprite class
+law: v=round(depth-1500) bands >220 / 1..220 / -219..0 / <=-220 -> shapes
+bank+0..3 (asm 0x52817..0x5282f+0x52787..0x5279e, Ghidra agrees).
+(iii) THE VOLUME IS REAL: not a 2D fake — the assignment's honest-negative
+branch is resolved negative; containment is intrinsic to 3D+camera, OUR
+sphere clip is the D21 bug class.
+(iv) STAR SOURCE LEAD: FUN_0004709c (sole caller = window-parse fn 0x575e4)
+opens 'reswin.txt' (ds:0x24b0 VERIFIED) — ABSENT from the shipped tree ->
+generator branch is the vendor law: N=100 (x=0, y=k, z=0) init then rng/
+rotate passes (degrees primitive FUN_0005324c, DAT_00088b88=pi/180 VERIFIED).
+Its own camera (FOV 30, z=-150, far 5e4, 320) is DISTINCT — do not blend.
+(v) L3 PARTIAL (honest): pump = self-reposting one-shot FUN_00028fc0; msg
+0x1f6/0x1f7/0x1f9 arms inc counters +0xb7/+0xb9/+0xbb (wraps 5/8/3 -> period
+120 ticks) BUT those counters are read by head painter 0x52160 as TEXT
+carousel indices — NOT proven to be the star spin. The orientation-matrix
+writer is UNNAMED statically; instrument named for cycle 2 (dbg BP at
+FUN_000284bc entry, matrix dump twice ~2s apart).
+(vi) GAME UNTOUCHED (production ring turn 1086 healthy, watcher 1182171 up,
+dosbox 1182154 up; NO capture run this iteration; no new sitting — live-
+timeline tail 09:46-10:13 all t=1086 in_game=True, no turn change in last
+60 MB => r1_t85g_sitting re-run NOT triggered). Ghidra: FUN_000526b4 created
+in the live project (was function-less); no image edits.
 
 tNG-F2 CYCLE 2 LANDED 2026-11-22 (V0 all-PASS; F2 REFINED + F3 CODED +
 F6 AUDITED + PACKAGE rebuilt with on-image checklist; build ok, run_tests
