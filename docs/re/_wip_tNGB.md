@@ -254,6 +254,96 @@ consistent. Centroid containment printed INFORMATIONAL only.
 - M7 re-aimed at the PURE cosmosHash gen-key term (menulaw.h) -> tests
   catcher. M8 catcher = the cosmos-n law line (frozen n prints [50] only).
 - Campaign round 2 launched with bug-1 fixed (CAUGHT = rc!=0, all catchers).
+
+
+## B2 PLAN (decided after probes; 3 findings so far)
+F-A SPECIES ARM [verified 0x52e58..0x52ecc]: NOT a regen. rank word[+0xb9]
+   ++, wrap 8->3, setter 0x22ce4, repaint, child[1] art = count+2. The STAR
+   SET IS PRESERVED (0x22ce4 zeroes only owner/OR bytes +0x14..+0x17 of the
+   stride-0x60 star records, never the +0x30/+0x34 position floats [t441
+   record law]). => the species click's law is the OPPOSITE of B1's:
+   positions INVARIANT, roster re-rolled.
+F-B 0x22ce4 [verified decompile]: word[state+0xd88]=N (PLAYER COUNT), clears
+   all star-owner bits, re-rolls HOME WORLDS per player k<N: star =
+   state+0xdb5 + (FUN_0007824f()%starcount)*0x60 retry-until-free (rand
+   consumers), then FUN_0003e6bc per player (species pick rand%0x15 distinct),
+   then FUN_000232ec (COLOUR assignment — the chip-click law fn runs on the
+   SPECIES CLICK TOO via this tail call).
+F-C PORT DEFECT: title.cpp speciesSetting default = 7 (wheel k9 'Seven');
+   VENDOR DEFAULT = 5 (window-init 0x52c55: word[+0xb9]=5, child art +0x72=7
+   = k7 'Five' — matches t401 anchor 'k7 @ Five measured'). The B3 species
+   anchor 'content confound ours k9 vs vendor k7' IS this defect. Fix default
+   -> 5: species panel becomes a REAL pixel-verdict vs refcap (no longer
+   informational). The 'word = campaign player count Seven' coupling comment
+   (title.cpp ~176) decouples; live-campaign apply stays the t393 named seam.
+## B2 WITNESS GREEN (first run, post-code)
+- Law lines: roster n 6,7,3,4 wheelgen 0 h15 827d710cd0409ed0 CONSTANT all
+  four clicks (positions preserved; wheelgen 0 == no regen). h15 == the B1
+  rung0 hash — same galaxy, independent confirmation.
+- tNGB_b3_anchor.py on spec0.png: species 88.8% @(0,0) (was 80.0% @(1,0)
+  with the k9 default) — THE DEFAULT FIX IS PIXEL-VISIBLE. Species UPGRADED
+  informational->verdict: best shift must sit at ORIGIN and agreement must
+  stay >= 87.0 (a default-7 mutant sits ~80 = RED; margin to 88.8 = 1.8pt,
+  the row-7 knife-edge class caution applies — canonical shot only).
+## B2 PLAN (decided after probes; 3 findings so far)
+DO: (1) menulaw.h pure speciesRankNext (wrap 8->3, cited); (2) title.cpp
+default 5 + click uses speciesRankNext + re-runs assignRaceColours (cited
+0x22ce4 tail 0x232ec) + law line 'ui raceconfig roster n N h15 H' (h15 from
+wheelGal — INVARIANT across species clicks, the log-side counterpart of the
+positions-preserved law; a mutant that bumps wheelGen on species click turns
+it RED); (3) pins speciesRankNext wrap/visited-from-5 + default-frame k7;
+(4) witness tNGB_species_shot.sh + tNGB_species_witness.py (words Six,Seven,
+Three,Four; roster 6,7,3,4; h15 constant) + tNGB_b3_anchor.py species panel
+UPGRADED informational->verdict (best shift at origin + agreement jump);
+(5) mutation tNGB2_mutate.py S1-S4 (wrap term, wrap value, species-click
+regen mutant via h15, default 7 via words+anchor).
+
+## B2 SPECIES ARM FULL DECODE (this session, capstone work/tNGC_paint526b4.asm + Ghidra decompile FUN_00022ce4)
+ARM 0x52e58 (msg 0x1f7 = 503 SPECIES_MORE; dispatched 0x5291e->0x52f49->je 0x52e58):
+  inc word[win+0xb9]                       ; species-count counter
+  cmp hiword(dword[win+0xb7]), 8           ; F7 pairing: hiword(dword[+0xb7]) == word[+0xb9]
+                                           ; == SAME word just incremented (not a shadow)
+  je -> word[ebp+0xb9] = 3                 ; WRAP 8->3 (0x52e6b..0x52e6d): domain 3..7,
+                                           ; visited from DEFAULT 5: 6,7,3,4,5 cycle
+INIT BLOCK 0x52c3d..0x52c77 (window open, cited verbatim):
+  word[+0xb7]=2 child[0]+0x72=2   ; density rank 2 = Average(50)
+  word[+0xb9]=5 child[1]+0x72=7   ; *** SPECIES DEFAULT = 5 (Five) -> WHEEL ART k7 ***
+  word[+0xbb]=1 child[2]+0x72=0xb ; atmosphere 1 = Neutral
+  then 0x52caa straddle read over rank 2 -> edx=50 -> call 0x226e4 (initial regen N=50)
+=> PORT DEFECT FOUND: title.cpp speciesSetting default = 7 (k9 'Seven') where the
+   VENDOR DEFAULT IS 5 (k7 'Five'). The B3 'content confound ours k9 vs vendor
+   k7' is EXACTLY THIS — not a confound, a wrong default. Chip-row hypothesis
+   REFUTED: painter-head chip loop 0x525eb..0x5264c binds to LITERAL 7
+   (cmp eax,7 at 0x525f1) — all seven chips ALWAYS draw; only the white frame
+   moves (cmp si, word[+0xb5] = player colour idx). Chip count does NOT follow
+   the species wheel.
+  call 0x22ce4(0x12e10, ebx=word[win+0xb1]hi=word[+0xb3] SELECTED RACE ROW,
+               edx=word[win+0xb7]hi=word[+0xb9] SPECIES COUNT)   ; *** RACE ASSIGNMENT, NOT REGEN ***
+  call 0x28fc0(0x7a360-law repaint)
+  repaint self
+  child[0]=[[win+0x67]+4]: child->obj+0x72 = count + 2 (0x52ec9) ; wheel art idx law
+  child repaint
+=> ANSWERS THE ASSIGNMENT'S FIRST QUESTION: PLAYERS_MORE does NOT re-run
+   FUN_000226e4 (no star POSITION regen). It runs FUN_00022ce4 ONLY.
+FUN_00022ce4 [verified decompile 2026-11-21, Ghidra :8089]:
+  word[state+0xd88] = param_2 (= species count N)  ; *** THE PLAYER-COUNT FIELD (t441: n = word[STATE+0xd88])
+  zero star-owner bits: loop i<NSTARS(state+0x3333): state+0xdc9+i*0x60..+0xdcc = 0 (star rec +0x14..+0x17 owner+OR words, t441 stride-0x60 law)
+  zero anomaly bits: loop state+0x3357 stride 0x27 (anomaly table)
+  clear 7 race-slot words (0x76490-family = 0xffff, 0x764a0+ = 0) + per-race visibility
+  HOME-WORLD ASSIGNMENT: loop attempts local_24<=600 (or 0x1c2=450 if starcount<25):
+    per player k<word[+0xd88]: star = state+0xdb5 + (FUN_0007824f() % starcount)*0x60  ; LCG rand
+      if star+0x14==0: set +0x14 |= 0x80 | (1<<k); OR bit into +0x17 + every system rec (+0x2c array)
+      else: sVar10-- (RETRY same player)
+    then FUN_0002635c() per attempt
+  post: FUN_0003e6bc per player (species pick, rand%0x15 distinct-check), FUN_000232ec,
+    ability/homeworld tweaks by byte[state+0xdb4], relations reset (0x1b8 matrix, type 3/4/0xf arms).
+=> VENDOR BEHAVIOR LAW (B2): species-wheel click KEEPS the star set (positions
+   UNTOUCHED — 0x22ce4 never writes star x/y) and RE-ROLLS HOME-WORLD
+   ASSIGNMENT: N = species count players each get a random distinct home star
+   + OR visibility, species ids re-drawn distinct (rand%0x15 = 21 species),
+   relation matrix reset. word[STATE+0xd88] = N is the player-count field.
+PORT GAP: species click sets label+wheel art+chip frame only; no roster/ownership consequence modelled.
+
 ## MUTATION ROUND 2: 8/8 CAUGHT, ALL WITH NAMED VERDICTS (bug-1 fixed)
 M1 wrap term (straddle pin :81); M2 count-table (:82); M3 guard-fallback
 (wrap pin :92); M4 seed-no-gen wITNESS: h15 repeated 827d710cd0409ed0 x4
@@ -263,3 +353,14 @@ M6 anchor-dx: atmos (-2,0)!=origin; M7 hash-no-gen: pure pin :132; M8
 n-frozen: cosmos-n ['100'] != full sequence. AFTER-RESTORE rc=0, md5-ok x3.
 Round-1 lesson banked: an agreement-at-best-shift metric is anchor-INVARIANT
 (mutants just move the shift) — pin the SHIFT POSITION, not the agreement.
+
+## B2 MUTATION 4/4 CAUGHT (scripts/tNGB2_mutate.py, round-1 clean)
+S1 wrap term -> pin tngb_species_rank_cycle :137 (n 3..7 domain);
+S2 wrap value -> :138 (visited sequence); S3 species-click-regen -> witness
+'wheelgen [1,2,3,4]' (positions-preserved law, LOG-side); S4 default-seven
+-> witness 'roster [3,4,5,6] != [6,7,3,4]' (word-sequence shift catches the
+default WITHOUT needing pixels). AFTER-RESTORE rc=0 build=0, md5-ok x2.
+HONEST NOTE: S4 was caught by the log leg before its anchor leg ran; the
+anchor floor 87.0 (clean 88.8 vs old-k9 80.0) remains the designed pixel
+backstop, unexercised by this run.
+## B2 CLOSE-OUT

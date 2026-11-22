@@ -66,7 +66,18 @@ def main():
         print(f"{name}: post-B3 best {s:.1f}% @({dx},{dy})  "
               f"baseline {base}% @({bdx},{bdy})")
         if name == "species":
-            continue  # content differs by setting, informational only
+            # tNG-B B2: with the vendor default FIXED to 5 (k7 'Five',
+            # window-init 0x52c55) the species panel is the SAME content as
+            # the refcap — verdict like the others: best shift at origin.
+            # Floor 87.0: clean default-5 measures 88.8; the old wrong
+            # default 7 (k9) measured 80.0 — a default mutant is RED.
+            if (dx, dy) != (0, 0):
+                fails.append(f"species best shift ({dx},{dy}) != (0,0) — "
+                             f"wheel blit anchor off the corrected law")
+            elif s < 87.0:
+                fails.append(f"species agreement {s:.1f}% < 87.0 — species "
+                             f"setting/content off the vendor default Five")
+            continue
         # ANCHOR LAW (mutation-campaign lesson): agreement-at-best-shift is
         # INVARIANT to the blit anchor (a 1px mutant just moves the best
         # shift), so the discriminator is the best-shift POSITION: after the

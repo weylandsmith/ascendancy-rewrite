@@ -282,6 +282,19 @@ inline int densityRankNext(int rank) {
 // either way (docs/re/_wip_tNGB.md straddle decode). Defined in menulaw.cpp.
 int densityStarCount(int rank);
 
+// tNG-B B2 SPECIES CYCLE LAW [verified disasm 0x52e58..0x52e6d]: the
+// PLAYERS_MORE click increments word[win+0xb9]; when the incremented word
+// hits 8 it resets to 3 — domain 3..Seven, visited from the vendor default
+// 5 (window-init 0x52c55: word[+0xb9]=5, child wheel art +0x72=7 == k7
+// 'Five', the t401 anchor) the sequence is 6,7,3,4,5,wrap. The arm then
+// calls FUN_00022ce4 = RACE ASSIGNMENT (word[state+0xd88]=N, owner bits +
+// home worlds re-rolled, star POSITIONS untouched) — NOT the full regen
+// 0x226e4 the density arm runs. Pure so the pin pins the wrap term.
+inline int speciesRankNext(int n) {
+    const int v = n + 1;
+    return v >= 8 ? 3 : v;
+}
+
 // tNG-B B1 PREVIEW-COSMOS HASH LAW: the per-star scatter value. The gen key
 // (wheelGen * 0x100000001) is what makes a density click draw a NEW SET
 // (vendor FUN_000226e4 full-regen is a rand() consumer at 0x22728); without

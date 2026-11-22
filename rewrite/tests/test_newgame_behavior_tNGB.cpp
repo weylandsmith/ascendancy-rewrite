@@ -125,6 +125,28 @@ TEST(tngb_wheel_galaxy_count_tracks_rung) {
     }
 }
 
+TEST(tngb_species_rank_cycle) {
+    // tNG-B B2 SPECIES CYCLE LAW [verified 0x52e58..0x52e6d]: increment,
+    // wrap 8->3. Visited from the vendor default 5 (window-init 0x52c55
+    // word[+0xb9]=5, child art k7) the sequence is Six,Seven,Three,Four,
+    // Five,wrap. Domain is 3..Seven inclusive; 8 is never observable.
+    int n = 5;  // vendor default 'Five'
+    const int expect[6] = {6, 7, 3, 4, 5, 6};
+    for (int i = 0; i < 6; i++) {
+        n = au::speciesRankNext(n);
+        CHECK(n >= 3 && n <= 7);
+        CHECK(n == expect[i]);
+    }
+    // Wrap term alone (mutation targets): 7->3 (never 8), 6->7.
+    CHECK(au::speciesRankNext(7) == 3);
+    CHECK(au::speciesRankNext(6) == 7);
+    // Wheel art law consequence [t401 anchor, child +0x72 = count+2]:
+    // the DEFAULT screen shows k7 == newgameWheelFrame(1, 5).
+    CHECK(au::newgameWheelFrame(1, 5) == 7);
+    CHECK(au::newgameWheelFrame(1, 7) == 9);
+    CHECK(au::newgameWheelFrame(1, 2) == -1);  // off-domain refuses
+}
+
 TEST(tngb_cosmos_hash_gen_key) {
     // The gen key (gen * 0x100000001) is the NEW-SET law term: gen 0 is
     // the base key, and every gen shift changes the scatter value.

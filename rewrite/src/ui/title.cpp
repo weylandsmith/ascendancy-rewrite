@@ -185,7 +185,14 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             if (int(kDensityStarCounts[i]) ==
                 int(previewCamp->galaxy().stars.size()))
                 densityIdx = i;
-    int speciesSetting = 7;   // player + 6 AI (main.cpp buildCampaign law)
+    // tNG-B B2 SPECIES DEFAULT LAW [verified window-init 0x52c55]: the
+    // vendor opens the screen with word[win+0xb9]=5 and child wheel art
+    // +0x72 = 7 (k7 'Five' — the t401 anchor). The old value 7 was the
+    // port's campaign player-count coupling (player + 6 AI); the vendor
+    // wheel is INDEPENDENT of the built campaign (the click runs 0x22ce4
+    // race-assignment, applying settings to play is the t393 named seam).
+    // This was the B3 'species content confound ours k9 vs vendor k7'.
+    int speciesSetting = 5;
     int atmosphere = 1;       // Neutral (measured vendor default, see above)
     int selSlot = 0, scrollOffset = 0;  // RACELIST window (3 of roster)
     // tNG-B B1 WHEEL-GALAXY LAW [verified disasm 0x52db9..0x52e57 + t295 S2]:
@@ -1228,10 +1235,39 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                                 wheelGal ? int(wheelGal->stars.size()) : -1,
                                 (unsigned long long)h15);
                             std::fflush(stdout);
-                        } else if (ci == 1)
-                            speciesSetting =
-                                speciesSetting >= 7 ? 3 : speciesSetting + 1;
-                        else
+                        } else if (ci == 1) {
+                            // tNG-B B2 SPECIES CLICK LAW [verified
+                            // 0x52e58..0x52ecc]: word[+0xb9]++ with wrap
+                            // 8->3, then FUN_00022ce4 = RACE ASSIGNMENT:
+                            // word[state+0xd88]=N, star owner/OR bytes and
+                            // home worlds re-rolled, species ids re-drawn
+                            // distinct, colours re-derived (its tail calls
+                            // FUN_000232ec). STAR POSITIONS ARE PRESERVED —
+                            // the opposite of the density arm's full regen.
+                            // Port model: roster count + colours re-derive;
+                            // wheelGal UNCHANGED (the h15 law line below is
+                            // the invariant witness term).
+                            speciesSetting = speciesRankNext(speciesSetting);
+                            colourLcg = 0x12e10u;  // seam: per-click reseed
+                            assignRaceColours(playerColourIdx, speciesSetting,
+                                              &colourLcg, raceColours);
+                            uint64_t rh = 1469598103934665603ull;
+                            if (wheelGal)
+                                for (size_t si = 0;
+                                     si < 15 && si < wheelGal->stars.size();
+                                     si++) {
+                                    rh = (rh ^ uint64_t(wheelGal->stars[si].x)) *
+                                         1099511628211ull;
+                                    rh = (rh ^ uint64_t(wheelGal->stars[si].y)) *
+                                         1099511628211ull;
+                                }
+                            std::printf(
+                                "ui raceconfig roster n %d wheelgen %d h15 "
+                                "%016llx\n",
+                                speciesSetting, wheelGen,
+                                (unsigned long long)rh);
+                            std::fflush(stdout);
+                        } else
                             atmosphere = (atmosphere + 1) % 3;
                         std::printf("ui raceconfig click %s msg %d -> %s\n",
                                     kNewgameControls[ci].name,

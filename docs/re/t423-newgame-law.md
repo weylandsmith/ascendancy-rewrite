@@ -291,3 +291,38 @@ the UI/intro paths the port already models (ring index SS9/SS10 law, chip
 tint ramp 0x53ee0, intro ink game.pal[byte*4+0x13] t412, FUN_000232ec
 write). No campaign/map tinting consumer exists; the cycle-2 "78 stride
 sites" premise was record copies. SEAM CLOSED.
+
+## SS17 — SPECIES WHEEL ARM + RACE-ASSIGNMENT LAW (tNG-B cycle 2, 2026-11-21)
+PLAYERS_MORE (msg 503/0x1f7) arm [verified disasm work/tNGC_paint526b4.asm
+0x52e58..0x52ecc]: word[win+0xb9]++ ; if the incremented word == 8 write 3
+(0x52e6b..0x52e6d; domain 3..Seven) ; call FUN_00022ce4(0x12e10,
+ebx=word[+0xb3] selected race row, edx=word[+0xb9] count) ; repaint ;
+child[1] (= [[win+0x67]+4]) +0x72 = count+2 (0x52ec9, k5..k9 law).
+WINDOW-INIT DEFAULT [verified 0x52c55]: word[+0xb9]=5, child art +0x72=7
+(k7 'Five' — the t401 anchor). Density default 2 (Average, 0x52c40), atmos 1
+(Neutral, 0x52c6b). The pre-B2 port default 7 was a campaign-coupling
+invention; fixed (title.cpp), and the B3 'species content confound' died
+with it (panel agreement 80.0 -> 88.8 @(0,0) vs refcap).
+FUN_00022ce4 [verified decompile 2026-11-21 Ghidra :8089] = RACE ASSIGNMENT,
+NOT a regenerate: word[state+0xd88]=N (player count); zeroes star owner/OR
+bytes (+0x14..+0x17 of the stride-0x60 records, base state+0xdb5) and the
+anomaly table bits; per player k<N draws home stars
+star = state+0xdb5 + (FUN_0007824f()%starcount)*0x60 retry-until-free;
+species ids via FUN_0003e6bc (rand%0x15, distinct); colours via its tail
+FUN_000232ec (the chip-click law fn runs on EVERY species click too);
+relation matrix +0x1b8 reset arms (type 3/4/0xf). STAR POSITIONS (+0x30/+0x34)
+ARE NEVER WRITTEN — the species click PRESERVES the galaxy (opposite of the
+density arm's full regen 0x226e4). OQ-016 NOTE (not a close): this is the
+static home-placement ASSIGNMENT law the open row's 'home placement
+verification' residue needs; the rand-law (LCG FUN_0007824f, retry-until-free)
+is now cited, live verification still owed.
+Chip-row hypothesis REFUTED: painter-head loop 0x525eb..0x5264c binds to
+LITERAL 7 (cmp eax,7 at 0x525f1) — all seven chips always draw; only the
+white frame tracks word[+0xb5] (player colour). Chip count does NOT follow
+the species wheel.
+Port model: species click = speciesRankNext (menulaw.h pure) + re-derive
+assignRaceColours + law line 'ui raceconfig roster n N wheelgen G h15 H'
+(h15 CONSTANT across species clicks = the positions-preserved witness term;
+a regen mutant moves it, S3 caught). Pins tngb_species_rank_cycle; witness
+scripts/tNGB_species_shot.sh + tNGB_species_witness.py; mutation
+scripts/tNGB2_mutate.py 4/4. Full log: docs/re/_wip_tNGB.md.
