@@ -541,3 +541,32 @@ research/industry/prosperity as PICTURES not text; population
 indicator probably more circles; NO 'Esc return to galaxy' text lower
 left; click behaviors off); then planet screen, system screen, ships,
 research, etc.
+
+## D20 — NEW GAME USER GRADE (USER, 2026-11-21, verbatim, bedtime freeform)
+
+> Great progress - the images and their circles (with the exception of
+> the "Begin New Game" button) are all correct now, the text is good,
+> the Player Color frame is good, and the top bar of the frame is close
+> enough that I might be inclined to accept it (still not perfect, it
+> looks sharper than the original, but it's good enough that if that's
+> what you gave me, I would leave that to one of the last things to
+> fix). The rest of the frame is still the old wrong texture, you're
+> missing the black backing to the "Player Species" box in the upper
+> right, the starfield is still off (the stars appear to be the right
+> size now, which is good, but they're all one color, and they don't
+> appear to be contained within a volumetric sphere from the
+> screenshot), the arrow buttons in the Player Species frame are still
+> the wrong style and color, the starfield in the "Begin New Game"
+> section is taking up too much of the frame and not spherical, the
+> species art in the green circle in "Begin New Game" is drawn too
+> large, cropped, and not perfectly centered inside the green circle.
+
+DISPOSITION (assistant same turn): PARTIAL ACCEPT — circles/images/
+text/Player-Color frame pass; top-bar sharpness -> polish backlog
+(USER DEFERRED, per their ruling). 6 open defects -> tNG-F fix cycle
+queued; re-package on reply; resume rule (a) applies. USABILITY
+CORRECTION from the same message: the dense _wip ledger format FAILED
+the grader ("dense and hard for me to read") — future user-grade
+packages carry a PLAIN-LANGUAGE numbered checklist (what changed, what
+to look at, what's open) on the composite itself; wip docs stay the
+machine record only.

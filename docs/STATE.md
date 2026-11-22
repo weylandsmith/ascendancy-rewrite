@@ -233,169 +233,57 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT WAIT-USER-GRADE-NG tNG-U — HUMAN WAKE: the New Game user-grade
-package is SHIPPED for grading (D19 first-screen checkpoint).
-ARTIFACT: scratchpad/NG-usergrade.png (ours | vendor refcap side-by-side +
-18/18 t441 verdict strip with law-home per region; regenerate:
-scripts/t412_newgame_shot.sh then
-~/tools/revenv/bin/python scripts/tNGU_composite.py
-/tmp/t412_shots/t412-newgame.png scratchpad/newgame-original.png
-scratchpad/NG-usergrade.png /tmp/t412_shots/app.log).
-DEFECT LEDGER for the grader: docs/re/_wip_tNGU.md 'D19 CORRECTION LEDGER'
-(closed-with-witness vs open; named seams: portrait scale-SOURCE SS12,
-top-bar mineral nuance D19-deferred by user ruling).
-RESUME RULES on user reply: (a) defect ruling -> DISPOSITIONS row + fix
-cycle for the named screen region; (b) ACCEPT -> straight to tSI-C/tSI-B
-RACE INTRO gates (seeds: frame texture A2, text size/font A3, background —
-STATE.md queue below); (c) no reply -> do NOT self-grade past this
-checkpoint (D19 reserves it), re-park this sentinel verbatim.
-GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 (checked this
-iteration == floor). turn > 1086 -> re-run scripts/r1_t85g_sitting.py FIRST.
-Ghidra :8089 UP; 0x52xxx GAP fns disassembled via scripts/t442_disasm.py
-(capstone in revenv).
-tNG-U LANDED 2026-11-21 (USER-GRADE PACKAGE — composite + law-home table +
-D19 ledger + harness polish; NO law probes by design; ledger open=[016,019]
-unchanged — package work moves no OQ row).
-(i) ARTIFACT scratchpad/NG-usergrade.png (1290x946): ours (t412 canonical)
-| vendor (newgame-original.png browser crop im[1:481,1:641]) + verdict
-strip that RE-RUNS t441 as a subprocess (image can never disagree with the
-harness); verdicts text+shape P/F boxes (deuteranopia-safe); 18/18 PASS
-exit 0; vision-verified legible/aligned. 4th arg = app.log -> strip shows
-real ours-dims (dimscheck lines are log-only).
-(ii) SCRIPT scripts/tNGU_composite.py (new; LAW_HOME dict mirrors
-t423-newgame-law.md heads — keep in sync). TRAP: PIL crop is (l,t,r,b)
-exclusive — (1,1,642,482) is 641x481, NOT im[1:481,1:641]; the size assert
-caught it.
-(iii) HARNESS POLISH t441 chrome-recess-row7 fam_min 0.90->0.89 (the share
-dithers 0.8994..0.9035 across grabs — spin-animation cosmos stars x304..306
-at the chrome edge; threshold was INSIDE the band; NOT a product defect,
-_wip_tNGB.md 't441 RUN'). Canonical + rung0 shots stay green.
-(iv) LAW-HOME + D19 LEDGER banked docs/re/_wip_tNGU.md: every t441 region ->
-SS home + witness; D19 corrections: 9 CLOSED cited, 1 RE-SCOPED (axis ->
-tGM-B), 2 OPEN named seams (portrait scale-source SS12 static-exhausted;
-mineral nuance user-deferred). HONEST NEGATIVE: no new vendor measurement
-this iteration — packaging only, per the assignment.
-tNG-B CYCLE 3 LANDED 2026-11-21 (B4 BEGIN-PRESS -> SETTINGS-APPLY SEAM
-CLOSED — the STATE-IDENTITY law: every wheel arm passes eax=0x12e10 == THE
-play state base (density 0x52dd7, species 0x52e76; work/tNGC_paint526b4.asm),
-so the wheel writes play state AT CLICK TIME; Begin (0x52a44..0x52b75)
-passes ebx=0 to worldgen and applies exactly ONE setting: byte[win+0xbb] ->
-byte[0x13bc4] (0x52b3c/0x52b44, SOLE wheel writer of the dip-on-attack
-subtrahend key 10*(gov+1), diplomacy.md SS17.1; consumers aicode gov==2 +
-raceintro section gate). Honest negative banked: NO deferred density/species
-apply exists — the assignment's "Begin applies the wheels" premise is FALSE;
-Begin's other delta is the WORLD layer (0x238e8 planets over the CURRENT
-click-regen'd starfield, t295 S1). RACE-COUNT IDENTITY: species word ->
-word[state+0xd88] == race-count global 0x13b98 == TOTAL races incl. player
-(port owners=species, aiCount=species-1, NUMCONTROLS 7 cap). WINDOW-INIT
-0x52c3d..0x52ce4 runs the density arm INLINE (state density-configured at
-window open). ATMOSPHERE ARM 0x52eec..0x52f0a: word[+0xbb]++ wrap 3, NO
-state call. CODE: menulaw.h atmosphereRankNext + NewGameSettings/
-newGameSettings pure identity map; title.cpp atmosphere law line + Begin
-out-param fill; main.cpp buildCampaign(apply) rebuild on Begin exit with
-honest-degrade branch + LIVE terms line (Campaign::govByte() accessor);
-CampaignConfig.govByte feeds campaign.cpp:2126 (was the constant);
---resume/no-Begin untouched. PINS tngb_atmosphere_rank_cycle +
-tngb_newgame_settings_identity; run_tests 488/488, ctest exit 0; WITNESS
-scripts/tNGB4_begin_shot.sh + tNGB4_begin_witness.py GREEN (apply (75,6,2)
-from one click each wheel off vendor defaults 2/5/1; live == apply —
-pre-built 50/7 REFUTED; intro rides gov 2); MUTATION scripts/tNGB4_mutate
-.py 4/4 CAUGHT named (T1 atmos wrap term pin :201, T2 owners-minus-one pin
-:234, T3 apply-never-runs witness log leg, T4 gov-not-plumbed witness LIVE
-gov leg); AFTER-RESTORE rc=0 md5-ok. BEHAVIOUR CHANGE: a default Begin now
-enters play at 50 stars / 5 owners / gov 1 (vendor wheel defaults 2/5/1)
-instead of the port's built 50/7 — that IS the seam closing. Harness:
-t441 newgame 18/18 on the canonical t412 shot (row7 knife-edge informational,
-exit 0); B3 anchor GREEN on the FRESH spec0 (88.8 @(0,0)); B2 witness re-run
-GREEN; gate GATE_EXIT=0; ledger open=[016,019] unchanged — seam work, NO OQ
-row moved (this queue has no OQ row by design). Law home docs/re/
-t423-newgame-law.md SS18. Scripts added: tNGB4_begin_shot.sh,
-tNGB4_begin_witness.py, tNGB4_mutate.py. NEXT -> tNG-U (queued above).
-tNG-B CYCLE 2 LANDED 2026-11-21 (B2 SPECIES WHEEL -> PLAYER-COUNT BEHAVIOR
-SEAM CLOSED with 4/4 mutation-caught pins + log witness; ledger
-open=[016,019] unchanged, seam work, NO OQ row moved — this queue has no OQ
-row by design; B4 stays the one open seed, queued above).
-(i) B2 LAW [verified disasm 0x52e58..0x52ecc + decompile FUN_00022ce4]:
-PLAYERS_MORE click = word[win+0xb9]++ wrap 8->3 (domain 3..Seven), then
-FUN_00022ce4 = RACE ASSIGNMENT — word[state+0xd88]=N, star owner/OR bytes
-re-rolled, home worlds drawn per player via LCG retry-until-free, species
-ids distinct rand%0x15, colours re-derived (tail 0x232ec); STAR POSITIONS
-PRESERVED (never written) — the OPPOSITE of the density arm's full regen.
-(ii) VENDOR DEFAULT DEFECT FOUND+FIXED: window-init 0x52c55 sets species
-word=5 (k7 'Five'); the port defaulted 7 (k9, a campaign player-count
-invention). title.cpp speciesSetting 7->5; the B3 'species content confound'
-was exactly this (panel agreement 80.0 -> 88.8 @(0,0) vs refcap) — species
-anchor UPGRADED informational->verdict (origin + floor 87.0).
-(iii) CHIP-ROW HYPOTHESIS REFUTED: the painter chip loop binds to LITERAL 7
-(0x525f1) — chip count never follows the wheel; only the white frame tracks
-word[+0xb5]. The assignment's 'chip-row lit-chip count == species count'
-suggested observable is FALSE; the roster law line replaced it.
-(iv) CODE: menulaw.h pure speciesRankNext (wrap 8->3); title.cpp default 5 +
-click arm (speciesRankNext + assignRaceColours re-derive cited via 0x22ce4
-tail + law line 'ui raceconfig roster n N wheelgen G h15 H' — h15 CONSTANT
-across species clicks = positions-preserved witness term).
-(v) PINS tngb_species_rank_cycle (wrap term, visited 6,7,3,4,5 from default
-5, k7/k9 art law, off-domain refuse); WITNESS scripts/tNGB_species_shot.sh +
-tNGB_species_witness.py GREEN (roster [6,7,3,4], h15 constant 827d710cd040
-9ed0 == the B1 rung0 hash independent confirmation, words Six/Seven/Three/
-Four, species art moved, density panel INVARIANT across species clicks);
-MUTATION 4/4 CAUGHT named (S1 wrap term pin :137, S2 wrap value :138,
-S3 species-click-regen witness log leg, S4 default-seven word sequence);
-AFTER-RESTORE rc=0 md5-ok. (vi) HARNESS: t441 newgame 18/18 on canonical
-t412 shot (note: t441 takes TWO positional shots — ours + vendor refcap);
-anchor script green on canonical; ctest 0 failed; gate GATE_EXIT=0. Law home
-docs/re/t423-newgame-law.md SS17. Scripts added: tNGB_species_shot.sh,
-tNGB_species_witness.py, tNGB2_mutate.py; tNGB_b3_anchor.py species verdict.
-tNG-B CYCLE 1 LANDED 2026-11-21 (ADOPTED killed-session work + finished:
-B1 density-wheel REBUILD law in code, B3 anchor corrections verified;
-ledger open=[016,019] unchanged, seam work, NO OQ row moved — this queue
-has no OQ row by design; honest negative: B2/B4 stay open seeds).
-(i) B1 LAW: vendor density click 0x52db9..0x52e57 = rank++ (wrap 5,
-0x52dc9) + FUN_000226e4 FULL REGENERATE with N = straddle read
-hiword(dword[esp+rank*4-2]) over copy of table 0x895c8 {15,25,50,75,100}
-= SORTED ladder; rand-consumer => NEW SET every click. Port: wheelGal
-(std::optional<Galaxy>) rebuilt via MapGenerator(rung, base+gen) on every
-click; preview cosmos N + hash key on gen (pure cosmosHash in menulaw.h);
-Begin starfield iterates wheelGal (word[obj+0x572] consequence); live
-campaign untouched (t393 named seam). (ii) B3: kWheelBlitDx/Dy
-{1,1,-2}x{-1,0,-1} — post-change best-shift sits AT ORIGIN all three
-panels, density 93.6->94.3%, atmos holds 91.2~91.4% (F15-1c law KEPT).
-(iii) PINS test_newgame_behavior_tNGB x6 (straddle byte-emulator, visited
-sequence, wrap+guard, per-gen determinism, cosmosHash gen-key, mapgen
-pure-(seed,count)); run_tests all green. (iv) WITNESS log-based: regen
-lines 75,100,15,25,50,75 + cosmos-n [50,75,100,15,25,50,75] + h15 SIX
-DISTINCT + mass monotone — GREEN clean, RED under M4/M8. (v) MUTATION 8/8
-CAUGHT round 2 with named verdicts (M1-M3 tests pins, M4 h15-repeat,
-M5/M6 anchor-position, M7 pure pin :132, M8 cosmos-n ['100']);
-AFTER-RESTORE green, md5-verified copy revert. (vi) HARNESS: t441
-newgame 18/18 on canonical t412 shot; ctest 0 failed; gate GREEN.
-Scripts added: tNGB_density_shot.sh (6-click wrap capture),
-tNGB_density_witness.py, tNGB_b3_anchor.py, tNGB_mutate.py,
-tNGB_var_shot.sh (row-7 knife-edge probe).
-tNG-C3 CYCLE 3 LANDED 2026-11-21 (LAST tNG-C CYCLE PER D18 CAP — NEW
-GAME DEFECT LIST RESOLVED: 2 closed-by-measurement+implementation, 2
-closed-as-NOT-REPRODUCING honest negatives; ledger open=[016,019]
-unchanged, seam work, NO OQ row moved — this queue has no OQ row by
-design). (i) DEFECT 4 chip-greys CLOSED as measured-position law: chip0
-vlines x381/x395 rows 435..456 pixel-EXACT vs refcap (164,171,177)/
-(225,227,229); sole diff row 457 = vendor emblem-bleed (_wip_tNGC F15-4).
-(ii) DEFECTS 1/2 wheel sliver + extraneous art NOT-REPRODUCING: stream
-decode proves the blue lens band + pal103 highlights in 3cfgnew k10/k11
-are VENDOR ART present on both sides (F15-1 a/b); residue = 1-2px anchor
-offsets -> tNG-B B3; the D19 witness pre-dated t401/t414/tNGC2 fixes.
-(iii) DEFECT 3 CLOSED: Begin starfield = cited SHRUNK-FIELD law
-implemented (every galaxy star, x=502+(mx/5)+5 grid law, static
-positions, FOUR-WAY class law 0x52817..0x5282d SUPERSEDES F11's
-three-way read, cos_star K=0 seam, clip panel) + THICK BEVELED RING
-(annulus 23.5..29 about (600,417.5), 5-rung census colours, portrait
-clipR=23 hole) — witness green-mass 933 vs vendor 847 (was 332), vision
-pass ring/hole-clip match; pure laws pinned in menulaw.h
-(beginStarPos/beginStarClass/beginRingAt). (iv) HARNESS: t441 newgame
-18/18 PASS post-change; ctest 0 failed; gate GREEN. (v) FOLD (D18):
-remaining polish list rides into tNG-B seeds B3/B4 — NO tNG-C4.
-Scripts added: tNGC3_atm_shot.sh (3-state wheel capture),
-tNGC3_k10_autopsy.py, tNGC3_wheel_decode.py, tNGC3_cosstar_census.py,
-tNGC3_begin_sbs.py.
+NEXT tNG-F NEW GAME FIX CYCLE (user D20 grade 2026-11-21, verbatim in
+DECISIONS.md D20 — PARTIAL ACCEPT; work ONLY these 6, in order):
+ F1 STARFIELD COLOR + VOLUME (user: "stars... are all one color, and
+    they don't appear to be contained within a volumetric sphere").
+    Multi-color law: the vendor star palette is a RECORD/palette
+    question — census the newgame starfield painter (tNG-C cited
+    0x52114/0x526b4) for the color-selection source (pal indices per
+    star? record k-frames? per-star random index from the SAME seed
+    draw?); the refcap newgame-original.png has the ground-truth color
+    census (reds/oranges/blues/whites per D19). VOLUME containment:
+    stars must read as INSIDE a sphere (dimmer/denser toward the
+    shell, none outside) — compare our render vs refcap radial density
+    profile; the tNG-C3 shrunk-field law may apply per-star clipping
+    the viewport not the sphere. Pins: radial profile + color-class
+    histogram vs refcap (mechanical, t441_screen_diff region).
+ F2 PLAYER SPECIES BLACK BACKING (user: "missing the black backing to
+    the Player Species box in the upper right"). windows.txt NEWGAMEWND
+    child census for that box: is the black a window STATE/paint or a
+    record? cite + paint (the refcap shows pure black behind the three
+    portraits inside the frame).
+ F3 SCROLL ARROW STYLE (user: "arrow buttons... still the wrong style
+    and color"). The vendor arrows are SMALL glyphs in the chrome
+    recess (refcap: tiny light triangles top/bottom of a groove), not
+    blue boxes. Find their record (widget lib per SHAPEFRAME or the
+    painter's own blit; tNG-C painter region) and blit cited art.
+ F4 BEGIN-PANEL STARFIELD RECT (user: "taking up too much of the frame
+    and not spherical"). Field must be clipped to the sphere volume
+    inside the panel (refcap: round field, generous black margin);
+    our rect-fill = wrong clip. Cite the clip from the painter
+    (same 0x52114 family), fix, pin dims+round-profile.
+ F5 BEGIN-PANEL PORTRAIT SIZE/CENTER (user: "species art in the green
+    circle... drawn too large, cropped, and not perfectly centered").
+    Portrait circle CENTERED in the green ring at the ring's inner
+    diameter (tA1 dims law applies; check the center math against the
+    ring rect, not the panel rect). Pin: center offset <=1px + dims.
+ F6 FRAME TEXTURE REST OF SCREEN (user: "the rest of the frame is
+    still the old wrong texture" — only the TOP BAR is close).
+    tA2's single generator evidently reaches the top bar but the
+    side/bottom bands still show the legacy look: find WHY (second
+    paint path still live in newgame specifically? different band
+    widths sampling the field wrong?). CLOSE = side-by-side of ALL
+    four bands vs refcap at 1:1, defect list written against the
+    original (G1). Top-bar SHARPNESS nuance = POLISH BACKLOG, user-
+    deferred, do NOT touch.
+FINISH: re-package scratchpad/NG-usergrade.png with the NEW PLAIN-
+LANGUAGE CHECKLIST format (D20 usability correction: numbered plain
+lines ON the composite image — what changed / what to look at / what
+stays open; wip docs = machine record only, never the grader's
+interface). Then rewrite NEXT to WAIT-USER-GRADE-NG2 with the same
+resume rules. Budget: <=3 cycles per D18; anything unresolved goes on
+the open list in plain language, honestly.
 
 tNG-C2 CYCLE 2 LANDED 2026-11-21 (NEW GAME CONTENT IMPLEMENTED — planet
 index + chip row laws in code, pinned, mutation-proven; ledger
