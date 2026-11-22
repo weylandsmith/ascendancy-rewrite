@@ -233,22 +233,50 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT WAIT-USER-GRADE-NG2 — tNG-F fix cycle 2 LANDED 2026-11-22 (below). The
-user-grade package scratchpad/NG-usergrade.png (plain-language numbered
-checklist ON the image, t441 18/18 PASS, vision-verified) awaits the user's
-numbered verdict. RESUME RULES (same as WAIT-USER-GRADE-NG): on a new
-DECISIONS.md USER reply (D21), (a) ACCEPT -> retire tNG-F, NEXT -> tSI-C per
-the prior resume rule; (b) PARTIAL with defects -> cycle 3 (D20 budget: this
-was cycle 2 of 3) working ONLY the defects the user names, in their words;
-named candidates already banked if un-named: F6-D1 RIGHT-band census fix
-(per-column kNewgameRight x632..639 measured on the refcap, branch before
-kRight in textureColourAt — census banked _wip_tNGF F6), F4 sprite-size/
-dots nuance, plate pal[1] share; (c) any reply -> record D21 verbatim in
-DECISIONS.md FIRST. Do NOT re-run fix cycles without a user reply — the
-loop must not churn against a stale grade.
-TRIGGER CHECK (standing): tail DECISIONS.md = D20; ring turn test
-scripts/t368_ring_turn.py (1086 = no new sitting; >1086 -> re-run
-scripts/r1_t85g_sitting.py FIRST per the standing rule).
+NEXT tNG-S STARFIELD VOLUME + ROTATION — FAITHFUL RE (user D21
+2026-11-22 verbatim: "The original is a rotating sphere containing a
+volume of stars in both places. Rather than trying to make something
+that looks approximately like that, can we reverse engineer that in
+the original and reimplement faithfully in the rewrite?" — grading
+HELD until this closes + re-package).
+KNOWN (do NOT re-derive): colour law CLOSED tNG-F1 (sprite cos_star
+rec 4K+cls, K=star type); Begin panel = SHRUNK same field (tNG-C F11);
+painter chain 0x52114 (head) -> 0x526b4 (body+event dispatcher, arm
+0x52eb->0x528eb wheels); disasm dumps work/tNGC_paint_head.asm
+(0x52100..0x526b4) + work/tNGC_paint526b4.asm (0x526b4..0x52f60);
+capstone helper scripts/t442_disasm.py; debugger build available
+(RUNWATCH, scratch savedir law, blanket grant).
+DERIVE (the three laws, in order):
+ L1 STAR TABLE: where do the stars live? candidates: (a) 3D xyz table
+    generated at new-game (Borland LCG cluster 0x24f4b is the banked
+    new-game seed site — census its draws for a triple/normalized
+    vector pattern), (b) pre-baked table in data, (c) 2D-only table
+    (then "volume" is FAKE and we say so honestly). Find the table
+    base + stride + count (vendor field ~100 stars per tNGF census).
+ L2 PROJECTION: how does 3D->screen happen — orthographic drop-one-
+    axis, or perspective divide? Read it FROM THE PAINT CODE (the
+    0x526b4 body between the event arm and the blit site: look for
+    the sprite blit 0x1fc34/0x5d5a1 call and walk backwards what
+    computes its x,y args; sin/cos lookup table? multiply by a global
+    angle?). Cite every step. The clipping-to-sphere question (user:
+    stars must read INSIDE the sphere) is answered by L1+L2: if the
+    table is spherical, no clip is needed and our clip is the bug.
+ L3 ROTATION: who advances the angle — msg pump (the 0x52eb arm), a
+    timer tick, or the main loop? Rate + axis (per D19 the axis was
+    wrong; the law says which axis, not us). BOTH fields share the
+    painter => one law, two rects (big field + Begin shrunk rect
+    (538.1,417.4) r32 per F4).
+IMPLEMENT: port the cited laws (table gen at seed time, projection,
+angle pump), retire our ad-hoc shell/volume sampler; pins: star-count
++ radial profile + color census vs refcap (t441 regions) AND a
+ROTATION pin — two shots ~2s apart, assert the field rotated by the
+cited rate about the cited axis (xsend-free: the app pumps it; log
+angle per frame behind a debug flag if needed).
+CLOSE: both fields rotate on screen (witness pair), mechanical
+profiles pass, laws cited FUN-by-FUN in _wip_tNGS.md. Then RE-PACKAGE
+NG-usergrade.png (checklist format) and rewrite NEXT to
+WAIT-USER-GRADE-NG3. Budget <=3 cycles (D18); if L1 proves a 2D fake,
+that IS the faithful answer and ships as cited law.
 
 tNG-F2 CYCLE 2 LANDED 2026-11-22 (V0 all-PASS; F2 REFINED + F3 CODED +
 F6 AUDITED + PACKAGE rebuilt with on-image checklist; build ok, run_tests
