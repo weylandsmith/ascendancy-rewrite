@@ -2123,7 +2123,7 @@ void Campaign::combatPhase() {
             if (a == kPlayer && b >= 1 && b - 1 < static_cast<int>(dipState_.size())) {
                 DipPolicyState& vst = dipState_[b - 1];
                 if (applyAttackDipCost(aiDip_[b - 1].values, vst.atWar, vst.allied,
-                                       kAttackDipGovByte, &vst.attitude)) {
+                                       cfg_.govByte, &vst.attitude)) {
                     // t205 INDEX CORRECTION: original 0x43afa ORs into
                     // byte[0x48304 + star_index] where the star is the
                     // ENGAGEMENT LOCATION (the handler's EDX is a STAR record

@@ -295,6 +295,47 @@ inline int speciesRankNext(int n) {
     return v >= 8 ? 3 : v;
 }
 
+// tNG-B B4 ATMOSPHERE CYCLE LAW [verified disasm 0x52eec..0x52f01]: the
+// DIFFICULTYMORE click increments word[win+0xbb]; when it hits 3 it resets
+// to 0 — domain 0..2 (Peaceful/Neutral/Hostile), visited from the vendor
+// default 1 (window-init 0x52c6b) the sequence 2,0,1,wrap. The arm makes
+// NO state-fn call (unlike density 0x226e4 / species 0x22ce4) — atmosphere
+// reaches campaign state ONLY through the Begin press, which stores
+// byte[win+0xbb] into the global byte[0x13bc4] (0x52b3c/0x52b44, sole
+// wheel writer; window-init 0x52c86 stores 1 unconditionally). Pure so the
+// pin can test the wrap term.
+inline int atmosphereRankNext(int v) {
+    const int r = v + 1;
+    return r >= 3 ? 0 : r;
+}
+
+// tNG-B B4 SETTINGS-APPLY LAW [verified begin block 0x52a44..0x52b75 +
+// arm arg regs eax=0x12e10 on 0x52dfe/0x52e8d]: the wheel arms write THE
+// PLAY STATE BASE at CLICK time (state-identity law) — Begin passes NO
+// wheel words to worldgen (ebx=0 at 0x52a65) and applies exactly ONE
+// setting: atmosphere -> byte[0x13bc4]. The triple below is the port's
+// Begin-handoff contract: stars = the density rung the last regen drew,
+// owners = the species word TOTAL races including the player (word
+// [state+0xd88] == the race-count global 0x13b98, B2 law), gov = the
+// atmosphere wheel (the byte[0x13bc4] value the dip-on-attack subtrahend
+// 10*(gov+1) consumes, diplomacy.md §17.1). Pure so the pins pin the
+// identity terms.
+struct NewGameSettings {
+    int stars = 0;
+    int owners = 0;
+    int gov = 1;
+    bool set = false;
+};
+inline NewGameSettings newGameSettings(int densityRank, int species,
+                                       int atmosphere) {
+    NewGameSettings s;
+    s.stars = densityStarCount(densityRank);
+    s.owners = species;  // identity law: wheel value == TOTAL races
+    s.gov = atmosphere;  // sole Begin-press global write [0x52b44]
+    s.set = true;
+    return s;
+}
+
 // tNG-B B1 PREVIEW-COSMOS HASH LAW: the per-star scatter value. The gen key
 // (wheelGen * 0x100000001) is what makes a density click draw a NEW SET
 // (vendor FUN_000226e4 full-regen is a rand() consumer at 0x22728); without

@@ -19,6 +19,7 @@
 //      the witness counterpart of the rand law; plus the Begin-panel count
 //      law consequence (word[obj+0x572] == the wheel galaxy's count).
 #include "ui/menulaw.h"
+#include "game/diplomacy.h"  // kAttackDipGovByte (B4 gov-identity default)
 #include "game/mapgen.h"
 #include "game/starstat.h"
 
@@ -183,4 +184,67 @@ TEST(tngb_mapgen_same_seed_same_count_identical) {
     }
     CHECK(sameAB);   // deterministic per (seed, count)
     CHECK(!sameAC);  // seed-sensitive
+}
+
+// ---- tNG-B B4 BEGIN-PRESS -> SETTINGS-APPLY SEAM --------------------------
+TEST(tngb_atmosphere_rank_cycle) {
+    // tNG-B B4 ATMOSPHERE CYCLE LAW [verified 0x52eec..0x52f01]: increment,
+    // wrap 3 (own word via dword[+0xb9] sar 16 — the straddle read, so the
+    // tested value IS word[+0xbb]). Visited from the vendor default 1
+    // (window-init 0x52c6b word[+0xbb]=1) the sequence is Hostile, Peaceful,
+    // Neutral, wrap. Domain 0..2 == the byte[0x13bc4] gate domain (raceintro
+    // PEACE/NEUTRAL/HOSTILE + aicode gov==2 arms).
+    int v = 1;  // vendor default 'Neutral'
+    const int expect[4] = {2, 0, 1, 2};
+    for (int i = 0; i < 4; i++) {
+        v = au::atmosphereRankNext(v);
+        CHECK(v >= 0 && v <= 2);
+        CHECK(v == expect[i]);
+    }
+    // Wrap term alone (mutation targets): 2->0 (never 3), 1->2.
+    CHECK(au::atmosphereRankNext(2) == 0);
+    CHECK(au::atmosphereRankNext(1) == 2);
+    // Wheel art law consequence [t401 anchor, child +0x72 = 10+v]:
+    CHECK(au::newgameWheelFrame(2, 0) == 10);
+    CHECK(au::newgameWheelFrame(2, 1) == 11);
+    CHECK(au::newgameWheelFrame(2, 2) == 12);
+    CHECK(au::newgameWheelFrame(2, 3) == -1);  // off-domain refuses
+}
+
+TEST(tngb_newgame_settings_identity) {
+    // tNG-B B4 SETTINGS-APPLY LAW [verified begin block 0x52a44..0x52b75]:
+    // Begin passes ebx=0 to worldgen (0x52a65) — NO wheel word is re-read
+    // for density/species because the click arms ALREADY wrote the play
+    // state base (eax=0x12e10 on 0x52dfe density / 0x52e8d species: the
+    // STATE-IDENTITY law). The handoff triple therefore maps each wheel to
+    // play state IDENTITY, not a transform:
+    //   stars  = the density rung (sorted ladder 0x895c8, B1 law),
+    //   owners = the species word VERBATIM (word[state+0xd88] == the race-
+    //            count global 0x13b98 — TOTAL races incl. the player; B2),
+    //   gov    = the atmosphere word VERBATIM (Begin 0x52b3c/0x52b44 is the
+    //            SOLE wheel writer of byte[0x13bc4], the dip-on-attack
+    //            subtrahend key 10*(gov+1), diplomacy.md SS17.1).
+    // stars uses the port CYCLE-INDEX ladder kDensityStarCounts (the same
+    // VISITED sequence as the vendor sorted table 0x895c8 from the Average
+    // default — B1 equivalence: cycle-index == visited-order). Cycle index
+    // 2 == 'Very Dense' == 100.
+    const au::NewGameSettings s = au::newGameSettings(2, 5, 1);
+    CHECK(s.set);
+    CHECK(s.stars == au::kDensityStarCounts[2]);  // cycle law, cited above
+    CHECK(s.owners == 5);   // identity: wheel Five == FIVE total races
+    CHECK(s.gov == 1);      // identity: Neutral wheel == gov byte 1
+    // Default wheel triple == the shipped-scenario rung + gov: cycle index
+    // 0 == Average == 50 stars (fresh campaigns 5/5) and gov 1 matches the
+    // byte[0x13bc4]==1 census (20/20 playcap saves). Owners 5 is the VENDOR
+    // new-game default (window-init 0x52c55), NOT the shipped scenario's 4.
+    const au::NewGameSettings d = au::newGameSettings(0, 5, 1);
+    CHECK(d.stars == 50 && d.gov == ag::kAttackDipGovByte);
+    // Off-ladder rank / off-domain values still map identity-wise (the
+    // clamp lives in the builder, not the pure law): owners 7 -> owners 7.
+    const au::NewGameSettings h = au::newGameSettings(2, 7, 2);
+    CHECK(h.stars == 100 && h.owners == 7 && h.gov == 2);
+    // The default-constructed struct is UNSET (the --resume path leaves the
+    // built campaign alone — Begin never pressed, nothing applies).
+    au::NewGameSettings u;
+    CHECK(!u.set);
 }

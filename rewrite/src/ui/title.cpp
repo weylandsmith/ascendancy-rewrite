@@ -129,7 +129,8 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          AudioEngine* audio,
                          const ascend::game::Campaign* previewCamp,
                          const std::vector<ascend::game::SpeciesInfo>* roster,
-                         const std::vector<std::string>* lore) {
+                         const std::vector<std::string>* lore,
+                         NewGameSettings* newGameOut) {
     SDL_Window* win = SDL_CreateWindow("Ascendancy", SDL_WINDOWPOS_CENTERED,
                                        SDL_WINDOWPOS_CENTERED, kDisplayW,
                                        kDisplayH, SDL_WINDOW_SHOWN);
@@ -1267,8 +1268,18 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                                 speciesSetting, wheelGen,
                                 (unsigned long long)rh);
                             std::fflush(stdout);
-                        } else
-                            atmosphere = (atmosphere + 1) % 3;
+                        } else {
+                            // tNG-B B4 ATMOSPHERE CLICK LAW [verified
+                            // 0x52eec..0x52f01]: word[+0xbb]++ wrap 3 (own
+                            // word via the straddle dword). NO state-fn call
+                            // — the value reaches play state ONLY via the
+                            // Begin press (0x52b3c/0x52b44 -> byte[0x13bc4],
+                            // the dip-on-attack subtrahend key).
+                            atmosphere = atmosphereRankNext(atmosphere);
+                            std::printf("ui raceconfig atmos wheel %d\n",
+                                        atmosphere);
+                            std::fflush(stdout);
+                        }
                         std::printf("ui raceconfig click %s msg %d -> %s\n",
                                     kNewgameControls[ci].name,
                                     kNewgameControls[ci].message,
@@ -1312,6 +1323,27 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                             "atmosphere %d species-pick %d\n",
                             kDensityStarCounts[densityIdx], speciesSetting,
                             atmosphere, scrollOffset + selSlot);
+                        // tNG-B B4 SETTINGS-APPLY LAW [verified begin block
+                        // 0x52a44..0x52b75]: Begin passes ebx=0 to worldgen
+                        // (0x52a65) — density/species are NOT re-applied
+                        // here because the click arms ALREADY wrote the play
+                        // state base 0x12e10 (state-identity law, 0x52dfe/
+                        // 0x52e8d eax operand). The vendor Begin delta:
+                        // world layer (0x238e8 planets over the CURRENT
+                        // starfield) + byte[win+0xbb] -> byte[0x13bc4]
+                        // (0x52b3c/0x52b44, sole wheel writer). Port: the
+                        // out-param is the handoff contract the campaign
+                        // builder consumes (main.cpp rebuilds play from the
+                        // wheel triple — closes the t393 named seam).
+                        if (newGameOut) {
+                            *newGameOut = newGameSettings(densityIdx,
+                                                          speciesSetting,
+                                                          atmosphere);
+                            std::printf("ui newgame apply stars %d owners %d "
+                                        "gov %d\n",
+                                        newGameOut->stars, newGameOut->owners,
+                                        newGameOut->gov);
+                        }
                         std::fflush(stdout);
                         // t412: Begin -> the RACE INTRO (history.txt,
                         // FUN_0002b48a) -> map. The pick + atmosphere ride

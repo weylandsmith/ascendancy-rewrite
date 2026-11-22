@@ -7,6 +7,7 @@
 #include "game/species.h"  // SpeciesInfo (t393 New Game roster param)
 #include "ui/audio.h"
 #include "ui/boot.h"
+#include "ui/menulaw.h"  // NewGameSettings (tNG-B B4 Begin-handoff out-param)
 
 namespace ascend::formats { class Flic; }
 
@@ -38,7 +39,14 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          const ascend::game::Campaign* previewCamp = nullptr,
                          const std::vector<ascend::game::SpeciesInfo>* roster =
                              nullptr,
-                         const std::vector<std::string>* lore = nullptr);
+                         const std::vector<std::string>* lore = nullptr,
+                         // tNG-B B4 SETTINGS-APPLY out-param: the Begin press
+                         // fills it with the wheel triple (law ui/menulaw.h
+                         // newGameSettings — state-identity: the vendor arms
+                         // already write the play state at click time; Begin
+                         // adds the world layer + the atmosphere global).
+                         // nullptr / no-Begin = untouched (Resume path).
+                         NewGameSettings* newGameOut = nullptr);
 
 // Opens the P5a window over a LIVE campaign (docs/re/ui-runtime.md §5).
 // Blocks until quit or `turns` turns elapsed (0 = until quit). Returns 0 on

@@ -9,6 +9,7 @@
 #include <SDL.h>
 #include <SDL_mixer.h>
 
+#include <algorithm>
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
@@ -197,8 +198,17 @@ bool loadGameData(const Options& o, GameData* g, std::string* err) {
 // Shared campaign builder for --campaign and --ui (docs/re/turnloop.md).
 // The tables are function-local statics because Campaign stores pointers into
 // them (research tree, item/gizmo tables).
-std::unique_ptr<ascend::game::Campaign> buildCampaign(const Options& o,
-                                                      std::string* err) {
+// tNG-B B4: `apply` (optional) is the New Game wheel triple the Begin press
+// produced (ui::NewGameSettings). Vendor law [verified begin block
+// 0x52a44..0x52b75 + arms 0x52dfe/0x52e8d pass eax=0x12e10 == THE play
+// state base]: the wheel state IS the play state (state-identity), so a
+// Begin-built campaign takes starCount from the density rung, TOTAL owners
+// from the species word (owners-1 AIs; NUMCONTROLS 7 caps at Seven) and the
+// byte[0x13bc4] value from the atmosphere wheel (0x52b44). Null apply =
+// pre-B4 behaviour (the built defaults / --resume path).
+std::unique_ptr<ascend::game::Campaign> buildCampaign(
+    const Options& o, std::string* err,
+    const ascend::ui::NewGameSettings* apply = nullptr) {
     namespace ag = ascend::game;
     static const ag::ResearchTree tree =
         ag::ResearchTree::loadFromFile(
@@ -241,10 +251,15 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(const Options& o,
     }
     // Six AI races = first six specnums that are not the player's [documented
     // default policy; the original's slot assignment is runtime-blocked].
+    // tNG-B B4: a Begin-built campaign loads owners-1 AI races instead (the
+    // species wheel is TOTAL races incl. the player — word[state+0xd88] ==
+    // the race-count global 0x13b98, B2/t295 S1), capped by NUMCONTROLS 7.
+    const int aiWant =
+        apply && apply->set ? std::max(0, std::min(7, apply->owners) - 1) : 6;
     std::vector<ag::DipFile> ai;
     std::vector<ag::SpeciesAbility> abilities;
     for (const ag::SpeciesInfo& si : roster) {
-        if (static_cast<int>(abilities.size()) >= 6) break;
+        if (static_cast<int>(abilities.size()) >= aiWant) break;
         if (o.playerSpecies >= 0 && si.specnum == o.playerSpecies) continue;
         char name[32];
         std::snprintf(name, sizeof(name), "/race%02d.dip", si.specnum);
@@ -260,6 +275,14 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(const Options& o,
     ag::MapConfig mc;
     mc.seed = o.seed;
     mc.starCount = o.stars;   // t78 density ladder (mapgen.md OQ-012(a))
+    if (apply && apply->set) {
+        // tNG-B B4 state-identity apply: the wheel triple IS the play
+        // scenario (see buildCampaign header comment).
+        cfg.aiCount = aiWant;
+        cfg.starCount = apply->stars;
+        cfg.govByte = apply->gov;
+        mc.starCount = apply->stars;
+    }
     ag::Galaxy g = ag::MapGenerator(mc, *stats, names).generate();
     return std::make_unique<ag::Campaign>(cfg, g, &tree, items, gizmos, ai,
                                           abilities, err);
@@ -583,6 +606,7 @@ int main(int argc, char** argv) {
         std::error_code sec;
         const std::string savesDir =
             fs::is_directory(sdir, sec) ? sdir.string() : std::string();
+        ascend::ui::NewGameSettings newGame;  // tNG-B B4 Begin handoff
         const BootState exit = ascend::ui::runTitleScreen(
             o.dataRoot.string(), entry,
             o.introFrames >= 0 ? o.introFrames : 0,  // 0 = all frames
@@ -591,7 +615,7 @@ int main(int argc, char** argv) {
             // galaxy the campaign plays (buildCampaign already ran), roster
             // names from raceNN.dip headers, lore from newgame.txt (read,
             // never embedded; a missing file = no lore, screen still draws).
-            camp.get(), &rosterForUi(o), &loreForUi(o));
+            camp.get(), &rosterForUi(o), &loreForUi(o), &newGame);
         if (exit == BootState::Quit && entry != BootState::Quit &&
             !terr.empty()) {
             std::printf("title: %s\n", terr.c_str());
@@ -602,6 +626,32 @@ int main(int argc, char** argv) {
             std::printf("ui title exit: %s\n", bootStateName(exit));
             SDL_Quit();
             return 0;
+        }
+        // tNG-B B4 SETTINGS-APPLY: a Begin press means play MUST run the
+        // wheel scenario (state-identity law — the vendor's wheel arms
+        // wrote the play state base 0x12e10 at click time; Begin adds the
+        // world layer + the atmosphere global 0x52b44). Rebuild from the
+        // handoff triple; on build failure keep the pre-built campaign and
+        // print the honest degrade (play still enters, settings unapplied).
+        if (newGame.set) {
+            std::string aerr;
+            auto applied = buildCampaign(o, &aerr, &newGame);
+            if (applied) {
+                std::printf("newgame applied stars %d owners %d gov %d\n",
+                            newGame.stars, newGame.owners, newGame.gov);
+                camp = std::move(applied);
+                // LIVE terms: the rebuild actually took — ownerCount() ==
+                // owners (cfg.aiCount+1) and the play galaxy carries the
+                // rung count (witness reads this line, not the intent line).
+                std::printf("newgame live stars %zu owners %d gov %d\n",
+                            camp->galaxy().stars.size(),
+                            camp->ownerCount(), camp->govByte());
+            } else {
+                std::printf("newgame apply FAILED (play on built campaign): "
+                            "%s\n",
+                            aerr.c_str());
+            }
+            std::fflush(stdout);
         }
         const int rc = ascend::ui::runCampaignUi(*camp, o.campaign, o.autoplay,
                                                  o.dataRoot.string(), audio.get(),

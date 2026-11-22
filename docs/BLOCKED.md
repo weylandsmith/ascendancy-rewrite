@@ -301,3 +301,15 @@ Enforced statically by gate 3n/3n3.
   pointer law (OQ-011 CLOSED) is the answer.
 - title-menu glyph readouts (t57): the only density readout is glyph-rendered
   (R13), no needle exists — closed to default stars=50, do not re-probe.
+
+- 2026-11-21 tNG-B c3 TRAP (harness, not a blocker): scripts/tNGB_b3_anchor.py
+  with NO argument runs its DEFAULT input /tmp/tNGB_density/rung0.png, which
+  goes STALE across cycles — it read RED (species 76.0 < 87.0) against the
+  pre-default-fix capture while the fresh spec0.png read GREEN (88.8 @(0,0)).
+  ALWAYS pass the current capture path explicitly. Proceeding default: the
+  anchor verdicts quoted in STATE.md are fresh-capture-only. ALSO resolved
+  this cycle (not a trap, a re-scope): the tNG-B gate line "starfield spin
+  AXES correct per dial" cannot apply to the New Game screen (no dials —
+  wheels only; kNewgameControls is 3 wheel zones). The dial law is t416/t425
+  (closed for the GALAXY MAP; the user's axis complaint was the map dial);
+  the spin-axes leg rides tGM-B ("starfield control buttons behavior").

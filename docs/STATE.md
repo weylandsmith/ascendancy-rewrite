@@ -233,52 +233,87 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-B PHASE-17 G3 CYCLE 3 — B4 BEGIN-PRESS -> SETTINGS-APPLY SEAM
-(the LAST B seed; B1 density REBUILD closed cycle 1, B2 species roster +
-default closed cycle 2, B3 anchors closed cycle 1 with the species panel
-upgraded to a real verdict this cycle).
-(ordering rationale: B4 is the only remaining seed in the tNG-C fold, and
-its call site was CITED during B1: the Begin press at 0x52a44..0x52b75
-(work/tNGC_paint526b4.asm) runs call 0x238e8(0x12e10, ebx=0) WORLD GEN at
-0x52a67, then 0x2351c(0x12e10, 0x2bf7) at 0x52a76, camera/matrix init,
-byte[win+0xbb] ATMOSPHERE -> byte[0x13bc4] (0x52b3c/0x52b44, the sole-writer
-site banked), 0x23388(0x12e10), script arms. The port's Begin currently
-prints the wheel values and enters the RACE INTRO on the pre-BUILT campaign
-(t393 named seam): the vendor re-runs WORLD GEN with the wheel settings.
-B4 SCOPE: (1) read 0x238e8's body (work/t295_238e8_head.txt + _wip_t295 S1
-already disassembled it — determine WHICH settings it consumes: the density
-ladder + species count are read from the WINDOW words at the call site? NO —
-the call passes ebx=0; the settings live in state words written by the arms
-(word[STATE 0x12e10 + ?] mirrors; the arms call 0x226e4/0x22ce4 which write
-word[state+0xd88] etc — cite which state fields the Begin press re-reads);
-(2) port the OBSERVABLE: Begin applies density+species to the display->play
-galaxy ONLY IF a cited state-field law exists, else bank the honest negative
-that the wheel settings reach play ONLY through the 0x226e4/0x22ce4 calls the
-CLICKS already run (i.e. the vendor new-game state was ALREADY regenerated
-per click — the port's per-click wheelGal IS the apply; Begin just enters it);
-(3) atmosphere byte[0x13bc4] writer law is cited — port the atmosphere global
-if any OBSERVABLE consumes it in the campaign (census byte 0x13bc4 consumers
-offline first); (4) pins + witness + mutation per the B1/B2 template.)
-READ FIRST: docs/re/_wip_tNGB.md (B1 + B2 blocks are the template; the
-BEGIN-PRESS BLOCK section is the B4 seed), docs/re/_wip_t295.md S1 (0x238e8
-body disasm), docs/re/t423-newgame-law.md SS17 (the B2 law + chip-row
-refutation), rewrite/src/ui/title.cpp ci==1 click arm (the B2 pattern).
-HINTS THIS SESSION LEARNED (reuse, don't rediscover): the species arm's
-setter 0x22ce4 PRESERVES star positions (owner bits only) — do not model it
-as a regen (S3 mutant catches the wrong model); law lines are the reliable
-witness class (pixel equal-N tests dead per B1 flicker lesson; static-rect
-pixel legs work: wheel panels rows 408..466); window-init block 0x52c3d..
-0x52c77 is where vendor DEFAULTS live (word[+0xb7]=2, +0xb9=5, +0xbb=1);
-chip loop bound is LITERAL 7; t441 needs TWO shot args: `t441_screen_diff.py
---screen newgame <ours.png> scratchpad/newgame-original.png`; ctest verdict
-= EXIT CODE ONLY; mutation on GREEN suite only; terminal REJECTS '&'
-backgrounding — use scripts; python = ~/tools/revenv/bin/python; browser-crop
-law = im[1:481,1:641]; refcap = scratchpad/newgame-original.png; canonical
-shot = scripts/t412_newgame_shot.sh.
+NEXT tNG-U PHASE-17 — NEW GAME USER-GRADE PACKAGE + PARK (FIRST-SCREEN
+CHECKPOINT PER D19)
+(ordering rationale: the tNG-B behavior gate is CLOSED this iteration — B1
+density REBUILD (c1), B2 species roster+default (c2), B3 anchors (c1/c2),
+B4 begin-press settings-apply (c3, below); the gate line's one remaining
+seed "starfield spin AXES correct per dial" was RE-SCOPED to tGM-B this
+cycle (the New Game screen has NO dials — 3 wheel zones only; the axis law
+t416/t425 is closed for the galaxy map where the user's complaint lived —
+docs/BLOCKED.md 2026-11-21 tNG-B c3 entry). Per the PHASE-17 PIPELINE the
+first screen ends with the USER-GRADE PARK, so tNG-U runs BEFORE tSI-C.)
+SCOPE: (1) build the side-by-side composite ours|refcap|diff-report at
+scratchpad/NG-usergrade.png + per-region table (reuse t441_screen_diff
+regions; G1 law: OUR render AND the vendor crop in one pass — the canonical
+pair is scripts/t412_newgame_shot.sh output vs scratchpad/newgame-original
+.png, browser-crop law im[1:481,1:641]); (2) fold the CLOSED-law inventory
+into the table: every region names its law home (t423-newgame-law.md
+SS1..SS18) + its mechanical verdict + its behavior witness; (3) the D19
+correction list (G4) is the defect ledger — mark each closed/open with the
+citing witness; (4) harness polish ONLY if cheap: chrome-recess-row7 knife-
+edge (fam_min 0.90 sits inside the spin dither band 0.8994..0.9035 — lower
+to 0.89 or freeze animation for chrome regions; NOT a product defect, see
+_wip_tNGB.md 't441 RUN' block); (5) REWRITE NEXT to the WAIT-USER-GRADE-NG
+sentinel verbatim (human wake resumes: user reply -> DISPOSITIONS row or
+straight to tSI-C per ruling). NO new law probes — this row PACKAGES.
+READ FIRST: docs/re/t423-newgame-law.md (the law home, SS18 = B4),
+docs/re/_wip_tNGB.md (all four B seeds + harness traps), docs/re/_wip_tA2.md
+(recess law), scripts/t441_screen_diff.py (region table), DECISIONS.md D19.
+HINTS THIS SESSION LEARNED (reuse, don't rediscover): tNGB_b3_anchor.py
+with NO arg reads the STALE default /tmp/tNGB_density/rung0.png — ALWAYS
+pass the fresh capture (BLOCKED.md trap); the B2 capture script is
+tNGB_species_shot.sh (spec0.png = the default-Five screen for the species
+anchor 88.8 @(0,0)); t441 takes TWO positional shots (ours + refcap) and
+row7 FAIL at fam share 0.90 is the known knife-edge (exit stays 0);
+mutation scripts run GREEN-SUITE-only with copy-revert + md5 verify
+(tNGB4_mutate.py is the newest template); witness law lines are the
+reliable class — pixel equal-N tests are dead (flicker); law lines added
+this cycle: 'ui raceconfig atmos wheel G' (atmosphere click), 'ui newgame
+apply stars S owners O gov G' (Begin intent), 'newgame live stars S
+owners O gov G' (rebuilt campaign LIVE terms via Campaign::govByte());
+terminal REJECTS '&' backgrounding — use scripts; python =
+~/tools/revenv/bin/python; canonical shot = scripts/t412_newgame_shot.sh.
 GAME STATE: production pid 1182156 HEALTHY, ring turn 1086 (checked this
 iteration == floor). turn > 1086 -> re-run scripts/r1_t85g_sitting.py FIRST.
 Ghidra :8089 UP; 0x52xxx GAP fns disassembled via scripts/t442_disasm.py
 (capstone in revenv).
+tNG-B CYCLE 3 LANDED 2026-11-21 (B4 BEGIN-PRESS -> SETTINGS-APPLY SEAM
+CLOSED — the STATE-IDENTITY law: every wheel arm passes eax=0x12e10 == THE
+play state base (density 0x52dd7, species 0x52e76; work/tNGC_paint526b4.asm),
+so the wheel writes play state AT CLICK TIME; Begin (0x52a44..0x52b75)
+passes ebx=0 to worldgen and applies exactly ONE setting: byte[win+0xbb] ->
+byte[0x13bc4] (0x52b3c/0x52b44, SOLE wheel writer of the dip-on-attack
+subtrahend key 10*(gov+1), diplomacy.md SS17.1; consumers aicode gov==2 +
+raceintro section gate). Honest negative banked: NO deferred density/species
+apply exists — the assignment's "Begin applies the wheels" premise is FALSE;
+Begin's other delta is the WORLD layer (0x238e8 planets over the CURRENT
+click-regen'd starfield, t295 S1). RACE-COUNT IDENTITY: species word ->
+word[state+0xd88] == race-count global 0x13b98 == TOTAL races incl. player
+(port owners=species, aiCount=species-1, NUMCONTROLS 7 cap). WINDOW-INIT
+0x52c3d..0x52ce4 runs the density arm INLINE (state density-configured at
+window open). ATMOSPHERE ARM 0x52eec..0x52f0a: word[+0xbb]++ wrap 3, NO
+state call. CODE: menulaw.h atmosphereRankNext + NewGameSettings/
+newGameSettings pure identity map; title.cpp atmosphere law line + Begin
+out-param fill; main.cpp buildCampaign(apply) rebuild on Begin exit with
+honest-degrade branch + LIVE terms line (Campaign::govByte() accessor);
+CampaignConfig.govByte feeds campaign.cpp:2126 (was the constant);
+--resume/no-Begin untouched. PINS tngb_atmosphere_rank_cycle +
+tngb_newgame_settings_identity; run_tests 488/488, ctest exit 0; WITNESS
+scripts/tNGB4_begin_shot.sh + tNGB4_begin_witness.py GREEN (apply (75,6,2)
+from one click each wheel off vendor defaults 2/5/1; live == apply —
+pre-built 50/7 REFUTED; intro rides gov 2); MUTATION scripts/tNGB4_mutate
+.py 4/4 CAUGHT named (T1 atmos wrap term pin :201, T2 owners-minus-one pin
+:234, T3 apply-never-runs witness log leg, T4 gov-not-plumbed witness LIVE
+gov leg); AFTER-RESTORE rc=0 md5-ok. BEHAVIOUR CHANGE: a default Begin now
+enters play at 50 stars / 5 owners / gov 1 (vendor wheel defaults 2/5/1)
+instead of the port's built 50/7 — that IS the seam closing. Harness:
+t441 newgame 18/18 on the canonical t412 shot (row7 knife-edge informational,
+exit 0); B3 anchor GREEN on the FRESH spec0 (88.8 @(0,0)); B2 witness re-run
+GREEN; gate GATE_EXIT=0; ledger open=[016,019] unchanged — seam work, NO OQ
+row moved (this queue has no OQ row by design). Law home docs/re/
+t423-newgame-law.md SS18. Scripts added: tNGB4_begin_shot.sh,
+tNGB4_begin_witness.py, tNGB4_mutate.py. NEXT -> tNG-U (queued above).
 tNG-B CYCLE 2 LANDED 2026-11-21 (B2 SPECIES WHEEL -> PLAYER-COUNT BEHAVIOR
 SEAM CLOSED with 4/4 mutation-caught pins + log witness; ledger
 open=[016,019] unchanged, seam work, NO OQ row moved — this queue has no OQ

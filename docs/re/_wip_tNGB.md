@@ -364,3 +364,162 @@ HONEST NOTE: S4 was caught by the log leg before its anchor leg ran; the
 anchor floor 87.0 (clean 88.8 vs old-k9 80.0) remains the designed pixel
 backstop, unexercised by this run.
 ## B2 CLOSE-OUT
+
+## B4 BEGIN-PRESS SCOPE (cycle 3, this session)
+Assignment: tNG-B cycle 3 B4 begin-press -> settings-apply seam (last B seed).
+Playcap unchanged (turn 1086 == floor, pid 1182156 alive) -> no re-sitting.
+Re-read of the cited blocks (work/tNGC_paint526b4.asm):
+- BEGIN PRESS 0x52a44..0x52b75: 0x52a60 mov eax,0x12e10; 0x52a65 xor ebx,ebx;
+  0x52a67 call 0x238e8 WORLDGEN (ebx=0 CONFIRMED at call site — the wheel
+  words are NOT args); 0x52a76 call 0x2351c(0x12e10, 0x2bf7); 0x52a80..0x52b16
+  camera/matrix block on 0x7a35c; 0x52b3c/0x52b44 byte[win+0xbb] low byte ->
+  byte[0x13bc4]; 0x52b50 call 0x23388(0x12e10); script arms 0x52b55..0x52b65;
+  returns 0xffffffff.
+- WINDOW-INIT BLOCK 0x52c3d..0x52c86 (NEW FINDING this session): init sets
+  word[+0xb7]=2 / word[+0xb9]=5 / word[+0xbb]=1 (0x52c40/52c55/52c6b — the
+  known defaults) AND THEN IMMEDIATELY RUNS THE DENSITY ARM + COLOURS:
+  0x52c80 mov ebx,[ebp+0xb7]; 0x52c95 sar ebx,0x10 (ladder word); 0x52caa mov
+  edx,[esp+eax*4-2] (chip-word -> T via ladder table); 0x52cb6 call 0x226e4
+  (eax=0x12e10) = REGEN; 0x52ce4 call 0x232ec(0x12e10, edx=word[+0xb3]>>16)
+  = COLOURS. => the vendor new-game state is ALREADY density/species-configured
+  at window open; Begin does NOT apply window words — it re-runs WORLDGEN on
+  the current state. HYPOTHESIS (b): the wheel settings reach play ONLY via
+  the per-click 0x226e4/0x22ce4 arms; Begin's worldgen adds PLANETS to the
+  existing star field (t295 S1: planets-per-star rng%5+1, home worlds, pop=2)
+  and does NOT write star positions.
+Probes: (1) Ghidra census byte[0x13bc4] consumers; (2) Ghidra census
+state+0x27283 (the worldgen planet-total += site) writers/readers — does
+0x226e4 also touch it / does double-worldgen double it; (3) confirm 0x238e8
+never writes star position fields; (4) port delta: Begin builds the PLAY
+campaign from wheel settings (vendor: play galaxy = worldgen(current state),
+NOT the preview cosmos).
+
+## B4 FULL ARM DECODE (this session, work/tNGC_paint526b4.asm lines 488-599)
+- DENSITY arm 0x52db9: inc word[+0xb7]; if word[+0xb5]==5 -> word[+0xb7]=0
+  (the noted odd cross-read, B1-banked); call 0x226e4(eax=0x12e10,
+  ebx=word[+0xb7]>>16, edx=ladder[word[+0xb5]>>16]>>16, ecx=word[+0xb1]>>16).
+- SPECIES arm 0x52e58: inc word[+0xb9]; if word[+0xb7]>>16==8 -> word[+0xb9]=3
+  (the B2 wrap; NOTE the tested reg is the DENSITY word read via eax-after-
+  inc quirk — B2 bank stands); call 0x22ce4(0x12e10, ebx=+0xb1>>16,
+  edx=+0xb7>>16). NO state call for atmosphere.
+- ATMOSPHERE arm 0x52eec: inc word[+0xbb]; if word[+0xb9]>>16==3 ->
+  word[+0xbb]=0; refresh widgets ONLY — NO state-fn call. => atmosphere
+  reaches campaign state ONLY via the BEGIN block 0x52b3c/0x52b44
+  (byte[win+0xbb] low byte -> byte[0x13bc4]). THE B4 FINDING (i).
+- WINDOW-INIT 0x52c3d..0x52ce4: defaults 2/5/1 THEN density arm inline
+  (0x52cb6 call 0x226e4) THEN colours (0x52ce4 call 0x232ec) => state is
+  density-configured at WINDOW OPEN, before any click.
+- DISPATCH 0x52f49: cmp dx,0x1f7 -> species arm.
+
+## B4 ATMOSPHERE CONSUMER CENSUS (offline, DONE — finding (ii))
+byte[0x13bc4] is a LIVE OBSERVABLE GLOBAL, not decorative:
+- diplomacy.md §17.1 [verified 0x43a99]: dip-on-attack subtrahend
+  d = 10*(MOVSX(byte[0x13bc4])+1), doubled iff victim state==3; the port
+  ALREADY consumes it (diplomacy.h:98 govByte param, campaign.cpp:2125).
+- aicode.md:242/315: gov-type gate byte[0x13bc4]==2 arms AI behaviours.
+- raceintro.h:16: the intro's gated section is on DAT_00013bc4 == 0/1/2.
+- IDENTITY ID = 1: window-init default word[+0xbb]=1 (0x52c6b) AND
+  byte[0x13bc4]==1 in 20/20 playcap saves (diplomacy.md §17.3). The wheel
+  domain 0..2 (arm wrap 0x52efc) == the gate domain 0/1/2.
+=> Begin press 0x52b3c/0x52b44 stores the ATMOSPHERE WHEEL into the gameplay
+   global. The port's Begin currently drops it into the intro ONLY
+   (beginAtmosphere -> runRaceIntro); the vendor ALSO sets the campaign
+   subtrahend key. PORT DELTA: plumb atmosphere 0..2 into the govByte the
+   campaign passes to applyAttackDipCost (vendor: wheel value verbatim).
+
+## B4 VERDICT: DISPLAY==PLAY STATE-IDENTITY LAW (this session, cited)
+- Click arms pass eax=0x12e10 — THE PLAY STATE BASE (0x52dd7 density,
+  0x52e76 species; t295 S2 "state base is static"). Begin's worldgen
+  0x52a67 reads that SAME base. => the wheel writes the PLAY state directly
+  at CLICK time; there is no "apply at Begin" step for density/species
+  (Begin passes ebx=0, reads no wheel words for them — honest negative
+  scope (2) SATISFIED as state-identity, not as absence).
+- 0x226e4 = STARFIELD regen (positions/owners) WITHOUT planets; 0x238e8 =
+  WORLD (planet) gen over the current starfield (t295 S1: planet-total +=
+  word[state+0x27283] after outer loop). New-game init 0x2142e+0x21438 is
+  the same pair. Vendor play galaxy = state starfield (last click regen) +
+  Begin's planets.
+- PORT DEFECT NAMED: the port's Begin enters play on the PRE-BUILT campaign
+  (buildCampaign ran with o.stars/6-AI before the screen) — the vendor's
+  play galaxy/species count IS the wheel state. Fix = rebuild the campaign
+  from the wheel settings on the Begin handoff (state-identity law).
+- ATMOSPHERE POSITIVE LAW: Begin 0x52b3c/0x52b44 is the SOLE WHEEL->GLOBAL
+  writer byte[0x13bc4] = byte[win+0xbb] (window-init 0x52c86 hardcodes 1
+  independent of the wheel). Consumers cited: dip-on-attack subtrahend
+  10*(gov+1) (diplomacy §17.1 — port kAttackDipGovByte=1 constant),
+  aicode gov==2 gates, raceintro section gate. Port delta: govByte becomes
+  a Campaign value (default 1 == shipped-scenario census 20/20), set from
+  the wheel at Begin.
+
+## B4 VERDICT ROUND 2 — BYTE-LEVEL ARM ARGS (this session, supersedes the
+## sloppy arg notes above; work/tNGC_paint526b4.asm 488-599 re-read)
+WINDOW WORD MAP (word slots; the dwords straddle pairs): dword[+0xb1]=
+[word+0xb1|word+0xb3(chip idx)], dword[+0xb5]=[pad|word+0xb7 DENSITY RANK],
+dword[+0xb7]=[rank|word+0xb9 SPECIES COUNT], dword[+0xb9]=[count|word+0xbb
+ATMOSPHERE]. Each arm's wrap test reads its OWN word via the straddle dword
+(B1's "the OTHER field" phrasing was the straddle, behaviourally wrap-ON-OWN;
+t423c's "chip stores word[+0xb5]" is mislabelled — the store at 0x52d83 is
+word[+0xb3], and the colours call 0x52ce4 reads word[+0xb3]).
+- DENSITY 0x52db9: word[+0xb7]++; if word[+0xb7]==5 ->0 (wrap 5, own word);
+  call 0x226e4(eax=0x12e10, ebx=rank, edx=hiword(dword[esp+rank*4-2])=rung,
+  ecx=word[+0xb3] chip) — B1 STRADDLE LAW CONFIRMED ARGS.
+- SPECIES 0x52e58: word[+0xb9]++; if word[+0xb9]==8 ->3 (wrap 8->3, own word
+  via dword[+0xb7] sar16); call 0x22ce4(eax=0x12e10, ebx=word[+0xb3],
+  edx=word[+0xb9] via dword[+0xb7] sar16). B2 LAW CONFIRMED ARGS.
+- ATMOSPHERE 0x52eec: word[+0xbb]++; if word[+0xbb]==3 ->0 (wrap 3, own word
+  via dword[+0xb9] sar16); NO state call; widget refresh only.
+STATE-IDENTITY LAW [verified: every arm passes eax=0x12e10 == THE PLAY STATE
+BASE (t295 S2)]: the wheel writes the play state AT CLICK TIME. Begin
+0x52a44..0x52b75 passes ebx=0 to worldgen and reads ONLY byte[win+0xbb] ->
+byte[0x13bc4] (0x52b3c/0x52b44; window-init 0x52c86 stores 1 unconditionally,
+wheel-independent). => "Begin applies density/species" is FALSE (honest
+negative, scope (2)); Begin's delta = the WORLD layer (0x238e8 planets over
+the CURRENT starfield — the click-regen'd one) + THE ATMOSPHERE GLOBAL.
+RACE-COUNT IDENTITY [verified t295 S1 + B2]: word[state+0xd88] (=0x13b98,
+the census'd race count, ==4 in 20/20 shipped saves) = the species wheel
+value N = TOTAL races INCLUDING the player. => owners = speciesSetting,
+aiCount = speciesSetting-1 (NUMCONTROLS 7 caps at Seven).
+PORT DELTA (decided):
+ D1 menulaw.h pure atmosphereRankNext (wrap 3, domain 0..2; default 1 ->
+    visited 2,0,1,...); title.cpp atmosphere click uses it (behaviour-
+    identical to the old %3 — pure-law home for the pin).
+ D2 ui.h NewGameApply out-param on runTitleScreen; Begin press fills
+    {stars=rung, owners=species, govByte=atmosphere} + prints law line
+    "ui newgame apply stars S owners O gov G".
+ D3 main.cpp: on Campaign exit with apply set, REBUILD the campaign
+    (starCount=apply.stars, cfg.aiCount=owners-1, cfg.govByte=apply.govByte)
+    — closes the t393 named seam via the state-identity law; --resume / no-
+    Begin paths keep the built campaign (defaults unchanged).
+ D4 CampaignConfig.govByte (default kAttackDipGovByte==1 == shipped census
+    20/20); campaign.cpp:2126 passes cfg_.govByte (was the constant).
+ BEHAVIOUR CHANGE NOTED: default Begin now enters play with owners 5 (vendor
+ default word 2/5/1) instead of the port's 7 — that IS the seam closing.
+
+## B4 CODE LANDED + WITNESS GREEN (this session)
+- menulaw.h: atmosphereRankNext (wrap 3) + NewGameSettings/newGameSettings
+  pure law (identity map: stars=cycle rung, owners=species VERBATIM,
+  gov=atmosphere VERBATIM). title.cpp: atmosphere arm uses the pure law +
+  law line 'ui raceconfig atmos wheel G'; Begin fills newGameOut + prints
+  'ui newgame apply stars S owners O gov G'. main.cpp buildCampaign takes
+  an optional apply (aiWant=owners-1 cap 6 via NUMCONTROLS; cfg.starCount/
+  govByte + mc.starCount from the triple); --ui rebuilds the campaign on
+  Begin exit ('newgame live stars S owners O' line = LIVE terms) with an
+  honest-degrade branch (apply FAILED -> play on the built campaign).
+  campaign.h CampaignConfig.govByte (default kAttackDipGovByte); campaign
+  .cpp:2126 passes cfg_.govByte. --resume / no-Begin: untouched defaults.
+- PINS tngb_atmosphere_rank_cycle (wrap term, visited 2,0,1 from default 1,
+  orb art k10..k12, off-domain refuse) + tngb_newgame_settings_identity
+  (identity terms + UNSET default struct). run_tests 488/488, ctest exit 0.
+- WITNESS scripts/tNGB4_begin_shot.sh + tNGB4_begin_witness.py GREEN first
+  run: atmos 1->2; apply (75,6,2) == one click each wheel from the vendor
+  defaults 2/5/1; live (75,6) == apply (pre-built was 50/7 — the rebuild
+  provably took); intro atmosphere 2 rides the same wheel.
+
+## B4 MUTATION 4/4 CAUGHT (scripts/tNGB4_mutate.py, round-1 clean)
+T1 atmos wrap term -> pin tngb_atmosphere_rank_cycle :201 (domain 0..2);
+T2 owners-minus-one -> pin tngb_newgame_settings_identity :234 (identity);
+T3 apply-never-runs -> witness log leg (no 'newgame live' line);
+T4 gov-not-plumbed -> witness live gov term (live (75,6,1) != apply
+(75,6,2)). AFTER-RESTORE rc=0, md5-ok both files. LIVE-terms line extended
+with Campaign::govByte() (campaign.h accessor added this cycle) so T4 is a
+LIVE catch, not an intent catch.

@@ -161,6 +161,13 @@ struct CampaignConfig {
     // loadTerrainTables(); the default is the measured vendor table (file ==
     // banked runtime == live RAM), NOT a guess.
     TerrainTables terrain = vendorTerrainTables();
+    // tNG-B B4: the LIVE value of the global byte[0x13bc4] (the dip-on-attack
+    // subtrahend key, diplomacy.md §17.1). The shipped scenario's window-init
+    // stores 1 (0x52c86) and the census agrees (==1, 20/20 playcap saves), so
+    // the default IS kAttackDipGovByte; a New Game Begin press OVERRIDES it
+    // with the atmosphere wheel (vendor 0x52b3c/0x52b44 — the sole wheel
+    // writer of the global; main.cpp plumbs NewGameSettings.gov).
+    int govByte = kAttackDipGovByte;
 };
 
 // Colony income channel stored value (MEASURED law, docs/re/income-law.md
@@ -210,6 +217,10 @@ public:
     // makeCampaign; copy stays deleted, which is correct for campaign state).
     ~Campaign();
     Campaign(Campaign&&);
+    // tNG-B B4: the LIVE byte[0x13bc4] value this campaign's dip-on-attack
+    // charge consumes (cfg_.govByte). Read-only; the witness asserts it
+    // equals the Begin handoff gov (proves the plumb, not the intent).
+    int govByte() const { return cfg_.govByte; }
     int starsOwned(int owner) const;
     // t409 SPECIES MENU read-only surface (ui/speciesmenu.h law): owner
     // count incl. the player, the player's first-contact knowledge row

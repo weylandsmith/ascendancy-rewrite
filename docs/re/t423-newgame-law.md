@@ -326,3 +326,42 @@ assignRaceColours + law line 'ui raceconfig roster n N wheelgen G h15 H'
 a regen mutant moves it, S3 caught). Pins tngb_species_rank_cycle; witness
 scripts/tNGB_species_shot.sh + tNGB_species_witness.py; mutation
 scripts/tNGB2_mutate.py 4/4. Full log: docs/re/_wip_tNGB.md.
+
+## SS18 — BEGIN-PRESS -> SETTINGS-APPLY SEAM (tNG-B cycle 3, 2026-11-21)
+STATE-IDENTITY LAW [verified disasm work/tNGC_paint526b4.asm]: every wheel
+arm passes eax=0x12e10 — THE play state base (density 0x52dd7, species
+0x52e76; t295 S2) — so the wheel writes the PLAY state at CLICK time; there
+is no deferred "apply" for density/species. The Begin block 0x52a44..0x52b75
+passes ebx=0 to worldgen 0x238e8 (0x52a65) and reads NO wheel word for them.
+Begin's actual delta is exactly two things:
+ (1) the WORLD layer: 0x238e8 draws planets over the CURRENT starfield (the
+     click-regen'd one; planet-total += word[state+0x27283] after the outer
+     loop, t295 S1) — new-game init 0x2142e+0x21438 is the same call pair;
+ (2) THE ATMOSPHERE GLOBAL: byte[win+0xbb] -> byte[0x13bc4] at
+     0x52b3c/0x52b44, the SOLE wheel writer of the global (window-init
+     0x52c86 stores 1 unconditionally, wheel-independent). The atmosphere
+     arm itself (0x52eec..0x52f0a: word[+0xbb]++ wrap 3 via the straddle
+     dword[+0xb9] sar 16) makes NO state-fn call.
+byte[0x13bc4] CONSUMERS [verified]: dip-on-attack subtrahend 10*(gov+1)
+(diplomacy.md §17.1, 0x43a99), AI gov==2 gates (aicode.md), the race-intro
+PEACE/NEUTRAL/HOSTILE section gate (raceintro.h). Wheel domain 0..2 == gate
+domain; identity value 1 == window-init default AND the 20/20 playcap census.
+WINDOW-INIT RUNS THE DENSITY ARM INLINE [verified 0x52c3d..0x52ce4]:
+defaults 2/5/1 then 0x226e4 regen then 0x232ec colours — the state is
+density-configured at window open, before any click.
+RACE-COUNT IDENTITY: species word -> word[state+0xd88] (== the race-count
+global 0x13b98, census 4 in the shipped scenario) = TOTAL races INCLUDING
+the player => port owners = species, aiCount = species-1 (NUMCONTROLS 7 cap).
+PORT (closes the t393 named seam): menulaw.h atmosphereRankNext +
+newGameSettings (pure identity map); title.cpp Begin fills the
+NewGameSettings out-param + law line 'ui newgame apply stars S owners O gov
+G'; main.cpp rebuilds the campaign from the triple on Begin exit ('newgame
+live stars S owners O gov G' = LIVE terms via Campaign::govByte()), honest
+degrade on build failure; CampaignConfig.govByte feeds the dip charge
+(campaign.cpp:2126, was the constant). --resume/no-Begin: untouched.
+PINS tngb_atmosphere_rank_cycle + tngb_newgame_settings_identity; witness
+scripts/tNGB4_begin_shot.sh + tNGB4_begin_witness.py GREEN (apply
+(75,6,2) from one click each wheel off defaults 2/5/1; live == apply; intro
+rides gov); mutation scripts/tNGB4_mutate.py 4/4 CAUGHT (T1 wrap term, T2
+owners-minus-one, T3 apply-never-runs, T4 gov-not-plumbed). Full log
+docs/re/_wip_tNGB.md.
