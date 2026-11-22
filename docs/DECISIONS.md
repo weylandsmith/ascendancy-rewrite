@@ -570,3 +570,18 @@ the grader ("dense and hard for me to read") — future user-grade
 packages carry a PLAIN-LANGUAGE numbered checklist (what changed, what
 to look at, what's open) on the composite itself; wip docs stay the
 machine record only.
+
+## D21 — PRE-GRADE WORK ORDER: STARFIELDS BY FAITHFUL RE (USER, 2026-11-22, verbatim)
+
+> Before we grade, let's work on those two starfields more. The original
+> is a rotating sphere containing a volume of stars in both places.
+> Rather than trying to make something that looks approximately like
+> that, can we reverse engineer that in the original and reimplement
+> faithfully in the rewrite?
+
+DISPOSITION: grading held; tNG-S row queued (starfield geometry +
+rotation derived from the vendor draw code, not tuned by eye). The
+color law is already cited (tNG-F1 type-K law); what remains is the
+VOLUME/PROJECTION/ROTATION law + sphere clipping, for BOTH fields
+(big upper-left + Begin panel). After tNG-S closes: re-package, then
+user grades.
