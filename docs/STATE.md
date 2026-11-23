@@ -233,24 +233,30 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPL-B1 PLANET BUILD LOOP — MAKE BUILDING POSSIBLE (D26 top
-priority: "double-clicking a square doesn't do anything, so I can't
-build anything"). RE-FIRST: t428 already identified the tile-click
-CONTENT-DEPENDENT POPUP law (docs/re/_wip_t428.md:6,313) but the popup
-was never PORTED. Derive from the vendor: which handler owns tile
-double-click (planet window msg map; window table in windows.txt +
-paint/click fn sites already cited in _wip_t428), what menu it pops
-(build menu: available structures for that tile's terrain + cost +
-disabled/adjacency gating), what state it writes (build order field in
-planet record — PLANETALLOC docs have the record layout), and the
-adjacency rule (only tiles adjacent to existing structures accept
-orders; user confirms OUR grey hover already matches the vendor hover
-law — keep it, extend to click). PORT + pins: scripted walkthrough
-(scripts/r1_ui_walk.sh on scratch save, NEVER protected saves):
-double-click adjacent tile -> menu appears -> select structure ->
-build order recorded in save state + drawn on tile; double-click
-NON-adjacent tile -> refused per law. CLOSE: walkthrough witness +
-suite green. Budget <=2 cycles, CONT cycle 2 on shortfall.
+NEXT tPL-B1b PLANET BUILD LOOP — SHIP THE TWO-STEP (D26 top priority
+unchanged: "double-clicking a square doesn't do anything, so I can't build
+anything"). tPL-B1 (2026-11-23) DERIVED the complete law and banked it in
+docs/re/_wip_tPLB1.md F1-F6 — READ THAT FILE FIRST; it is the spec. Core
+facts already proven there: the tile click is ORDER STEP 2 not a popup
+(msg-map 0x1c01 branch 0x3b3b6, decompile work/coswnd_decomp/3aa0a.c
+L535-566); the vendor adjacency polarity is INVERTED in our port (F5: raw
+asm 0x38666..0x386fc — ACTIVE neighbour = LEGAL, all-inactive = refuse;
+t43 + planet.txt info02 agree); flag-bit1 items {31,32,33,34,37} order
+cell-less (0x3b402 leg); the UI call is 0x38840 CMD2 whose writer is t341
+S1. EXECUTE in one atomic change set: (1) flip orderCellBlock polarity +
+enum meaning in rewrite/src/ui/planetview.{h,cpp}; (2) re-derive the two
+adjacency tests in tests/test_planetview_t418b.cpp from the F5 law (the old
+pins pin the port's own inverted reading — replacing them with vendor-law
+pins is the fix, cite the raw-asm addresses); (3) wire ui.cpp: PLANLIST row
+click SETS the pick (no order), tile click WITH pick runs placementBlock
+(XOR leg + occupied-unless-bit2 + adjacency) then orderProject, pick
+cleared after every attempt (0x3b487), tile click WITHOUT pick keeps the
+tile-select affordance; update the "cell refuses" report strings to the
+new polarity; (4) unit pins for XOR + occupied + bit1 legs (F4/F2);
+(5) witness scripts/tPLB1_buildloop_witness.sh per F5 (pick Factory ->
+non-adjacent tile refuses, adjacent tile orders; seed 5 scratch, NEVER
+protected saves). CLOSE: witness PASS + suite green. Budget <=2 cycles,
+CONT cycle 2 on shortfall.
 THEN tPL-V1 TILE GRID + COLORS (D26): isometric grid with rows
 ADJACENT/TOUCHING on both axes (ours has gaps — re-derive row/col
 pitch from the vendor paint fn already cited t428, do not tweak
@@ -294,6 +300,31 @@ game ring TL EXPIRES 2026-11-24 14:53 — if a live witness needs the
 production ring and it's dead, run the t439 recovery pattern FIRST;
 C1-C5 cosmetic backlog + race intro stay DEFERRED (D25) — do not
 touch.
+
+tPL-B1 LANDED 2026-11-23 (BUILD-LOOP LAW DERIVED + BANKED; SHIP DEFERRED
+to tPL-B1b; no OQ row touched — tPL tracks none, honest negative under
+strict-close; open=[016,019] unchanged). PROVED (docs/re/_wip_tPLB1.md
+F1-F6):
+ - F1 TILE CLICK = ORDER STEP 2, NOT a POPUP: msg 0x1c01 branch 0x3b3b6
+   verbatim (asm + decompile L535-566): list pick writes rec+0xb2; tile
+   click runs checker 0x3830c then writer 0x38840 CMD2; fields cleared
+   unconditionally after the attempt (0x3b487). The t428
+   "content-dependent popup" premise is VOID for the build path.
+ - F5 DECISIVE: adjacency polarity INVERTED in our t418b port — raw asm
+   0x38666..0x386fc: ACTIVE neighbour jne-exits WITHOUT xor edi,edi =
+   LEGAL; all-inactive zeroes EDI = refuse. t43 static law + planet.txt
+   info02 ("Squares adjacent to existing structures ... indicate valid
+   locations") corroborate. A flip attempt was REVERTED mid-iteration to
+   keep the tree green (code+enum+pins+ui report must flip together);
+   full ship spec handed to tPL-B1b.
+ - F2 FLAG CENSUS (extracted planitem.txt, loader SHL law): bit1
+   {31,32,33,34,37} cell-less items; bit2 {17,28,29,30} build-on-top;
+   bit0 {5,21,35,36,38} cell-ban (race-exception arm unverified, NOT
+   modelled). F4 XOR leg (item<31: surface-vs-ring) + item-38 adjacency
+   exemption confirmed from fresh Ghidra decompile of 0x3830c.
+ - SITTING CHECK ran first (r1_t85g_sitting, exit 0): newest trusted
+   turn still 1086 in the shared playcap dir (tail rows wall 14:50-15:04
+   all turn=1086) — no new sitting, stale assignment stood.
 
 tNG-S S30 LANDED 2026-11-23 (HOVER-ADDER CLOSED BY MEASUREMENT — NEGATIVE;
 checklist item 5 done; no OQ row touched — tNG-S tracks none, honest
