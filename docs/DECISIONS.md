@@ -585,3 +585,27 @@ color law is already cited (tNG-F1 type-K law); what remains is the
 VOLUME/PROJECTION/ROTATION law + sphere clipping, for BOTH fields
 (big upper-left + Begin panel). After tNG-S closes: re-package, then
 user grades.
+
+## D22 — STARFIELD SPIN LAW (USER RULING, 2026-11-22, verbatim)
+
+> both starfields do spin all the time, no matter where the mouse is,
+> and it takes a given star about five seconds to complete a circuit.
+
+(User message also references 15 refcap screenshots; they landed in a
+typo'd dir `scratcphad/` — moved to scratchpad/Screenshot_2026-11-22_23-*.png,
+15 files, Athens window 512x398 incl titlebar, ~1 s spacing.)
+
+ASSISTANT MEASUREMENT (scripts/d22_star_spin_witness.py + cluster pass):
+- big field: ~440-570 changed px per 1 s step, spread across the field
+  => continuous rotation CONFIRMED, mouse-independent (mouse not in any
+  special band during capture).
+- Begin-panel field: CHANGES (hot cluster window x416-447 y320-383 =>
+  640-space ~x520-560 y382-461). My first region probe read 0 due to a
+  scale bug in the probe, NOT absence of motion. Both fields animate.
+- 5 s period: NOT confirmed mechanically (no changed-pixel dip at lag
+  5; a sphere rotation need not pixel-repeat per-pixel anyway). Treat
+  5 s as USER EYEBALL estimate; the RATE must come from the paint/timer
+  code (L3), and the witness should track a single star blob across
+  consecutive 1 s shots (displacement arc), not whole-region diff.
+- ANY loop claim that spin is mouse-band-gated is REFUTED by this
+  witness (captured with mouse parked) — retract it where written.
