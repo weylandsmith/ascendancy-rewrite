@@ -233,34 +233,67 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT = WAIT-USER-GRADE-NG5. Ordering rationale: S29 shipped both seams
-(cadence + direction) and S30 closed the last open spin question — the
-hover-adder — by MEASUREMENT: cursor OUT vs INSIDE kPreviewSpinZone gives
-58.5 / 57.5 / 59.5 deg/s (run dbg-tngh-20261123-130254, ratio 0.98;
-docs/re/_wip_tNGS.md S30-X5/X6), so the original's newgame beat is
-cursor-independent and our port already matches it. The NG5 package is
-verified reproducible THIS session (build 500/500, composite md5
-790da4ccfa22b911722d792e8cb4e982 unchanged, 18/18 PASS t441 rc=0). What
-remains on the checklist (6 right-edge chrome, 7 Begin-cluster sprites) is
-user-priority work that should not ship ahead of the grade. Nothing ships
-ahead of the user's grade.
-IF THE HARNESS FIRES THIS SESSION ANYWAY (no grade yet), do exactly:
-1. Verify the tree is still green and the package reproducible: rebuild,
-   run_tests 500/500, gate 0, ledger OK, and re-run
-   ~/tools/revenv/bin/python scripts/tNGU_composite.py
-   /tmp/tngs4_ours/ng_t0.png scratchpad/newgame-original.png
-   scratchpad/NG-usergrade.png --checklist scratchpad/NG-checklist.txt
-   (regen ng_t0 first via scripts/tNGS4_ours_shot.sh if /tmp was cleared).
-2. Then do NOT invent new spin work: cadence, direction, AND hover-adder
-   are all measured and pinned (REFUTED-ROUTES tNG-S S28 block kills
-   poll-counts and 1 s blob fits; S30 kills "hover speeds the spin").
-   The nearest unblocked ledger work is checklist item 6 (right-edge frame
-   texture ~20% too dark, missing bright ridge — static SHP/palette
-   comparison of the right-edge chrome records against the port's band
-   generator, no live instrument needed) and item 7 (Begin-cluster sprite
-   size/density — numbers banked in S27-X5). Pick item 6 only if the tree
-   is green and note it as checklist work, not an OQ row.
-Budget <=1 cycle.
+NEXT tPL-B1 PLANET BUILD LOOP — MAKE BUILDING POSSIBLE (D26 top
+priority: "double-clicking a square doesn't do anything, so I can't
+build anything"). RE-FIRST: t428 already identified the tile-click
+CONTENT-DEPENDENT POPUP law (docs/re/_wip_t428.md:6,313) but the popup
+was never PORTED. Derive from the vendor: which handler owns tile
+double-click (planet window msg map; window table in windows.txt +
+paint/click fn sites already cited in _wip_t428), what menu it pops
+(build menu: available structures for that tile's terrain + cost +
+disabled/adjacency gating), what state it writes (build order field in
+planet record — PLANETALLOC docs have the record layout), and the
+adjacency rule (only tiles adjacent to existing structures accept
+orders; user confirms OUR grey hover already matches the vendor hover
+law — keep it, extend to click). PORT + pins: scripted walkthrough
+(scripts/r1_ui_walk.sh on scratch save, NEVER protected saves):
+double-click adjacent tile -> menu appears -> select structure ->
+build order recorded in save state + drawn on tile; double-click
+NON-adjacent tile -> refused per law. CLOSE: walkthrough witness +
+suite green. Budget <=2 cycles, CONT cycle 2 on shortfall.
+THEN tPL-V1 TILE GRID + COLORS (D26): isometric grid with rows
+ADJACENT/TOUCHING on both axes (ours has gaps — re-derive row/col
+pitch from the vendor paint fn already cited t428, do not tweak
+spacing by eye); tile colors LIGHT: white/blue/green/red (+black
+drawn distinctly — derive the palette from the vendor tile-class law,
+census refcap planet captures scripts/r1_ui_walk + docs/re/planetalloc
+tile classes); shape/size/angle APPROVED by user, do not change those.
+THEN tPL-V2 ORBITAL SLOTS LEFT (D26): 10 slots, 5 rows x 2,
+NOT isometric, hover shows thin greyish box OUTLINE (not fill). t428
+notes twice identify "orbital column LEFT" with the PLRES window —
+START THERE (resolve that identity properly: windows.txt PLRES rect +
+shape records; if it is a separate window, port its layout law + hover
+outline handler). CLOSE: live witness 10/10 slots + hover outline.
+THEN tPL-B2 PRODUCTIVITY-BOX POPUPS (D26): clicking a top-row
+productivity indicator pops an info window; EXACT witness text given:
+"Crimea 1 / Prosperity: 1 per day / Population will grow in 50 days"
+(/ = line break). Derive the string templates + values law from
+windows.txt/string table (planet name + facility name + per-day rate +
+growth ETA); port all three (or however many) indicator boxes.
+THEN tPL-D1 HOME PLANET BY RACE (D26): Chamachi home planet shows
+WRONG ART and WRONG MAX POPULATION. Derive the vendor new-game home-
+planet law per race (art index + size/quality/pop-cap fields; check
+whether it's a fixed per-race TABLE in data vs RNG at seed time —
+debugger on scratch new-game as Chamachies settles it; cross-check
+Minions which already looks right). Fix our mapgen/home-planet init;
+pin: Chamachi home planet art + pop cap match vendor scratch game.
+THEN tRS-B1 RESEARCH: SET PROJECT (D26: "I can't set any projects").
+Derive the vendor set-project handler (research window msg map; state
+written: current-project field + queue semantics; prerequisites gate
+from the tree table). PORT + walkthrough witness: click available node
+-> project set -> turns advance research; locked node -> refused.
+THEN tRS-V1 RESEARCH TREE DRAW (D26: "tree not being drawn
+correctly"): side-by-side vendor refcap per D19 G1/G2 (we have the 3D
+projection ported t419/t399; diff node/link/label regions, fix laws
+not pixels). THEN tPR-U: USER GRADE PACKAGE (checklist format, ours|
+vendor side-by-side) for planet + research; NEXT becomes
+WAIT-USER-GRADE-PR1. RULES: D19 G1-G6 binding; Athens shots layout/
+color only; no synthetic stand-ins (RE-FIRST t423 law); protected
+saves 01/02/03/04.SAV + RESUME.GAM untouchable (scratch savedir law);
+game ring TL EXPIRES 2026-11-24 14:53 — if a live witness needs the
+production ring and it's dead, run the t439 recovery pattern FIRST;
+C1-C5 cosmetic backlog + race intro stay DEFERRED (D25) — do not
+touch.
 
 tNG-S S30 LANDED 2026-11-23 (HOVER-ADDER CLOSED BY MEASUREMENT — NEGATIVE;
 checklist item 5 done; no OQ row touched — tNG-S tracks none, honest
