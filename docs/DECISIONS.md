@@ -652,3 +652,35 @@ tngs_s29_near_star_moves_left_per_tick + tngs_s29_title_wiring_is_unnegated;
 mutations M1 (inverse rotation) and M2 (re-negation) both die. USER LAW
 stands unchanged; what closed by witness is the LAW, what closes S29 is the
 COMPLIANCE (pins, docs/re/_wip_tNGS.md S29-X1/X2).
+
+## D25 — NG5 GRADE: ACCEPT-WITH-DEFERRAL; PIVOT TO GALAXY MAP (USER, 2026-11-23, verbatim)
+
+> Go ahead and push. This is pretty good. There are still some minor
+> cosmetic things to address (the frame looks like a refinement of the
+> guessed-at one rather than one derived from reverse-engineering the
+> original routines, and it lacks the beveled edges; the big starfield
+> looks a tad bit spars, and the small one on the "Begin New Game"
+> button fills too much of the frame and doesn't appear to be a shrunk
+> sphere, but is cropped rectangularly... I can't judge rotation from
+> the screenshot, I'll get back to that after I build the game; the
+> race portrait on the "Begin New Game" button is still drawn too large
+> and not centered within the green circle; also your species
+> description text ... is center-justified where the original is
+> left-justified, though to be honest I think it looks better the way
+> you did it), but I'd like to defer those and the subsequent race
+> introduction screen to a later clean-up phase after we get the game
+> generally playable, and start focusing on the galaxy map screen.
+
+DISPOSITION:
+- New Game branch: CLOSED (accept). Rotation grade deferred to user's
+  own build (assistant will not claim it graded).
+- COSMETIC BACKLOG (all deferred to CLEANUP PHASE, user's words, do not
+  silently fix mid-flow): C1 frame = guessed-at refinement not RE'd,
+  lacks bevel edges; C2 big starfield slightly sparse; C3 Begin field
+  fills too much frame + cropped RECTANGULARLY (not a shrunk sphere —
+  contradicts our F4 round-clip claim: RE-VERIFY the Begin clip shape);
+  C4 Begin portrait too large + off-center in green circle; C5 species
+  description center-justified vs vendor left-justified (user prefers
+  ours: log as deliberate deviation, revisit only if user flips).
+- RACE INTRO (tSI-*): DEFERRED to cleanup phase (user ruling).
+- NEXT FLOW TARGET: GALAXY MAP screen (state it in the queue next).
