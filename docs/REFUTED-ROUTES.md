@@ -1623,3 +1623,16 @@ drift; fires = dtheta/2 exactly): 28-33 fires/s (~60-65 deg/s, 5.6-6.1 s
 circuit). DO NOT re-cite the ~1/s figure or re-fit the tngs4 1 s frames for
 rate. The pass-1 zero-fires lesson also binds: a hot-leg zero is only
 evidence when BPLIST shows the leg armed AND a control leg fires.
+
+## tNG-S S30 — "HOVERING kPreviewSpinZone SPEEDS THE NEWGAME SPIN" IS DEAD
+## (2026-11-23). MEASURED on the original (run work/r1/dbg-tngh-20261123-130254,
+## basis integration = the S28 channel, pump fire witnessed win 0xfd2310
+## latch=1): cursor OUT (600,250) / INSIDE (436,446) / OUT again give unwrapped
+## 58.5 / 57.5 / 59.5 deg/s (ratio 0.98, +-10% band never approached,
+## reversible). The static chain agrees: the hover script (FUN_00056ad4 @0x69b8)
+## only SETs the repaint specnum ds:0x7458e; the pump latch [win+0xc0] is set at
+## init and has ZERO writers on the hover path. Do not re-measure an adder, do
+## not re-port the superseded t423 cycle-1 "x6 while hovered" law. Instrument
+## laws from this run: BREAK-caught stops at leg 0x27a18 may report eip=BP+6
+## (accept BP..BP+6); basis windows >4.5 s at 60 deg/s wrap — unwrap before
+## aggregating (see docs/re/_wip_tNGS.md S30-X5).

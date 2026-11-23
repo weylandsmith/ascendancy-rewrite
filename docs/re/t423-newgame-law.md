@@ -73,6 +73,14 @@ the specnum global the cosmos repaint reads (43 xrefs; sole writer
 FUN_00021a84; ZERO writers inside the state-3 dispatcher). Port law: yaw
 advances kPreviewSpinPerFrame x6 while that zone is hovered, on top of the
 idle spin (exact vendor pump rate UNMEASURED — named seam).
+[S30 CLOSURE 2026-11-23: the hover-ADDER seam is CLOSED by measurement —
+run work/r1/dbg-tngh-20261123-130254, basis integration (S28 channel) with
+cursor OUT (600,250) / IN (436,446) / OUT: unwrapped 58.5 / 57.5 / 59.5
+deg/s (ratio 0.98, +-10% band never approached) => hovering the zone adds
+NOTHING to the cadence; the static chain agrees (latch [win+0xc0] set at
+init, never written by the hover path; the script only SETs the repaint
+specnum). The "x6 while hovered" sentence above is the SUPERSEDED cycle-1
+port law (removed S22/S27). Full log docs/re/_wip_tNGS.md S30-X5/X6.]
 
 ## 6. RINGS = racering.shp RECORD [verified census + witness, F8]
 racering.shp: 8 records, k0 53x53 walk-OK (bbox zero header), k1..k7

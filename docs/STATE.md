@@ -233,14 +233,17 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT = WAIT-USER-GRADE-NG5. Ordering rationale: S29 closed both shipped
-seams — cadence (tick 32 ms, circuit-band pin) AND direction (the S28-X3
-double-inversion was caught by the steering audit and removed; behavioural
-pin + source-text pin + mutations M1/M2 banked, suite 500/500) — and the
-NG5 package is on disk: scratchpad/NG-usergrade.png 1290x1782, 18/18 PASS
-t441 rc=0, with the cycle-5 checklist (speed owned, 5.3 s confirmed,
-direction CLOSED-by-user-witness, open items 5-7 = hover-adder / right-edge
-chrome / Begin-cluster sprites). Nothing ships ahead of the user's grade.
+NEXT = WAIT-USER-GRADE-NG5. Ordering rationale: S29 shipped both seams
+(cadence + direction) and S30 closed the last open spin question — the
+hover-adder — by MEASUREMENT: cursor OUT vs INSIDE kPreviewSpinZone gives
+58.5 / 57.5 / 59.5 deg/s (run dbg-tngh-20261123-130254, ratio 0.98;
+docs/re/_wip_tNGS.md S30-X5/X6), so the original's newgame beat is
+cursor-independent and our port already matches it. The NG5 package is
+verified reproducible THIS session (build 500/500, composite md5
+790da4ccfa22b911722d792e8cb4e982 unchanged, 18/18 PASS t441 rc=0). What
+remains on the checklist (6 right-edge chrome, 7 Begin-cluster sprites) is
+user-priority work that should not ship ahead of the grade. Nothing ships
+ahead of the user's grade.
 IF THE HARNESS FIRES THIS SESSION ANYWAY (no grade yet), do exactly:
 1. Verify the tree is still green and the package reproducible: rebuild,
    run_tests 500/500, gate 0, ledger OK, and re-run
@@ -248,15 +251,41 @@ IF THE HARNESS FIRES THIS SESSION ANYWAY (no grade yet), do exactly:
    /tmp/tngs4_ours/ng_t0.png scratchpad/newgame-original.png
    scratchpad/NG-usergrade.png --checklist scratchpad/NG-checklist.txt
    (regen ng_t0 first via scripts/tNGS4_ours_shot.sh if /tmp was cleared).
-2. Then do NOT invent new spin work: docs/REFUTED-ROUTES.md S28 block kills
-   poll-counts and 1 s blob fits as cadence channels, and the direction is
-   pinned both ways. The nearest unblocked ledger work is the user-open
-   items themselves — hover-adder measurement (cursor-in-zone witness on the
-   ORIGINAL, run dbg-tngr harness with mouse parked INSIDE kPreviewSpinZone
-   379,420-493,472 vs outside, basis-counter method of S28-X3) is the one
-   with a live instrument; pick it only if the tree is green and note it as
-   checklist-item-5 work, not an OQ row.
+2. Then do NOT invent new spin work: cadence, direction, AND hover-adder
+   are all measured and pinned (REFUTED-ROUTES tNG-S S28 block kills
+   poll-counts and 1 s blob fits; S30 kills "hover speeds the spin").
+   The nearest unblocked ledger work is checklist item 6 (right-edge frame
+   texture ~20% too dark, missing bright ridge — static SHP/palette
+   comparison of the right-edge chrome records against the port's band
+   generator, no live instrument needed) and item 7 (Begin-cluster sprite
+   size/density — numbers banked in S27-X5). Pick item 6 only if the tree
+   is green and note it as checklist work, not an OQ row.
 Budget <=1 cycle.
+
+tNG-S S30 LANDED 2026-11-23 (HOVER-ADDER CLOSED BY MEASUREMENT — NEGATIVE;
+checklist item 5 done; no OQ row touched — tNG-S tracks none, honest
+negative under strict-close; open=[016,019] unchanged). PROVED (docs/re/
+_wip_tNGS.md S30-X0..X6):
+ - S30-X1 GREEN+REPRODUCIBLE: cmake/build 0, run_tests 500/500, composite
+   re-run byte-IDENTICAL (md5 == committed S29 NG-usergrade.png), sitting
+   check 20/20 turn=1086 (no new play; r1_t85g_sitting NOT run).
+ - S30-X5 HOVER-ADDER NEGATIVE (run dbg-tngh-20261123-130254, scratch
+   debugger, pump fire witnessed win 0xfd2310 latch=1): basis-integration
+   windows cursor OUT(600,250)/IN(436,446 zone centre)/OUT — UNWRAPPED
+   totals 690/678/702 deg over 11.8 s = 58.5/57.5/59.5 deg/s, ratio 0.98,
+   reversibility holds => hovering the zone adds NOTHING to cadence. Base
+   beat re-measured 58.5+-1 deg/s (agrees S28 60-65; port 62.5 inside
+   circuit band). Static corroboration (t423 §5 F2/F7): hover script only
+   SETs specnum ds:0x7458e (repaint flag); latch [win+0xc0] never written
+   by the hover path. t423-newgame-law.md §5 amended with the closure.
+ - INSTRUMENT LAWS BANKED: (1) dosbox-x BREAK-caught stops at the pump leg
+   may report eip = BP+6 (next instr boundary after the 6-byte mov
+   dh,[esi+0xc0]) — accept BP..BP+6 as a fire (run 124235 lost P0 to the
+   strict equality); (2) basis windows >4.5 s at 60 deg/s exceed the
+   +-180 wrap — UNWRAP (+360, cap 65 deg/s) BEFORE aggregating medians
+   (S28's -62/-78 = 298/642; S30 run-2's -30/-56/-32 = 330/304/328).
+ - NEXT = WAIT-USER-GRADE-NG5 (above); items 6-7 are user-priority calls.
+
 
 tNG-S S29 LANDED 2026-11-23 (SIGN DOUBLE-INVERSION CAUGHT + REMOVED,
 MUTATION-PROVED; NG5 PACKAGED; no OQ row touched — tNG-S tracks none, honest

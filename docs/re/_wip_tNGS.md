@@ -1045,3 +1045,84 @@ Cadence law SHIPPED and pinned; direction law SHIPPED UN-NEGATED, pinned
 behaviourally + at source text, and mutation-proof; S28-X4 residue closed;
 NG5 packaged. No OQ row touched (tNG-S tracks none — honest negative).
 NEXT = WAIT-USER-GRADE-NG5.
+
+## S30. CYCLE 5 WAIT-BRANCH: GREEN-VERIFY + HOVER-ADDER MEASUREMENT (2026-11-23)
+Assignment = WAIT-USER-GRADE-NG5 with the harness-fire branch (verify green +
+reproducibility; then checklist-item-5 hover-adder if green).
+
+### S30-X0 SITTING CHECK
+t368_ring_turn.py: 20/20 saves turn=1086 (max=min=1086) => no new play;
+r1_t85g_sitting.py NOT run (correct). Production pid 1470999 HEALTHY, TL
+expiry 2026-11-24 14:53:09, watcher 1471014.
+
+### S30-X1 GREEN + REPRODUCIBILITY (branch step 1) PASS
+- cmake configure 0, build 0, run_tests: 500 tests, 0 skipped, 0 failed.
+- tNGU_composite re-run on the SAME inputs (/tmp/tngs4_ours/ng_t0.png +
+  scratchpad/newgame-original.png + cycle-5 checklist) ->
+  "COMPOSITE scratchpad/NG-usergrade.png 1290x1782 18/18 PASS t441 rc=0"
+  and md5 UNCHANGED 790da4ccfa22b911722d792e8cb4e982 == the committed S29
+  composite. The package is deterministic; nothing rotted since S29.
+
+### S30-X2 S28 RAW-JSON RECONCILIATION (side-read, banked)
+dbg-tngr-20261123-103130/tngr.json windows: +104/+132/+128 over 2.25 s,
+then -62 (5.25 s) and -78 (10.25 s). The negatives are WRAP ALIASING of the
+LANDED figures: -62+360=298, -78+720=642 — the 10 s windows exceed the
++-180 wrap band at ~60 deg/s (10.25 s ~ 615 deg > 720 wrap budget cap).
+The three 2.25 s windows are inside the cap and give 46-59 deg/s directly.
+Law for future basis work: windows <= 5 s, or unwrap by counting fires.
+
+### S30-X3 HOVER-ADDER INSTRUMENT (built, running)
+scripts/r_tNGH_hover_session.py — S28 PHASE-D instrument, cadence channel
+unchanged (basis integration; the ONLY alive channel per REFUTED-ROUTES
+tNG-S S28 block), phases: P0 pump-window locate (cursor OUT), A_out
+(600,250), B_in (436,446 = centre of kPreviewSpinZone 379..493x420..472),
+C_out (reversibility). Windows 2/2/2/5 s (aliasing-capped). Moves happen
+STOPPED (t302 freeze law). Verdict rule: |ratio-1|>0.10 => ADDER number;
+else honest NEGATIVE. Run dir work/r1/dbg-tngh-*.
+
+### S30-X4 RUN 1 NEGATIVE -> INSTRUMENT DEFECT FOUND (banked before retry)
+dbg-tngh-20261123-124235 (rc=1): title->NewGame clean (orange 0.679->0.006),
+but P0 recorded zero fires. Transcript shows SIX stops with the pump BP armed
+and EV eip = 1e6e6e = P0+0x27a1E = BP+6 — i.e. the pump leg WAS hitting; the
+session's strict `eip == P0+PUMP_OFF` comparison discarded them. Bytes at
+0x27a18: 8a b6 c0 00 00 00 (mov dh,[esi+0xc0], 6 bytes) — dosbox-x reported
+the stop at the NEXT instruction boundary after the BP'd load (S28's run
+reported the BP address itself; environment-dependent reporting). LAW: a
+BREAK-caught stop anywhere inside the 6-byte load is a pump fire (esi valid,
+latch loaded, unmutated). FIX applied: hit_eips = {BP, BP+6}, esi sanity
+0x10000<=esi<0x1000000, eip banked per fire, P0 window 30 s/budget 10.
+
+### S30-X5 HOVER-ADDER MEASURED: NEGATIVE (run dbg-tngh-20261123-130254)
+Pump fire witnessed (eip 0x1e6e6e = BP+6 quirk stop, win 0xfd2310, latch=1)
+=> PHASE A/B/C basis windows. RAW medians (signed, script verdict): OUT
+61.79 / IN 60.88 / OUT 59.97 ratio 0.99. NOTE the script's median mixes the
+alias-capped 2.2 s windows with the 5.2 s windows (338 deg cap vs 720 wrap
+budget => the 5 s negatives -30/-56/-32 are -390/-416/-392, NOT small
+back-rotations). UNWRAPPED phase totals (spin unidirectional; +360 once is
+the only reading inside the cap): A_out 690 deg / 11.8 s = 58.5 deg/s;
+B_in 678 / 11.8 = 57.5; C_out 702 / 11.8 = 59.5. BAND: all three within
++-1.7% of each other; IN/OUT ratio 0.983-0.99 => HOVER ADDS NOTHING
+MEASURABLE to the newgame spin rate (the +-10% verdict band was never
+approached). Reversibility (C == A) holds. Base beat re-measured
+58.5+-1 deg/s, consistent with the S28 law 60-65 and the shipped 62.5
+(2 deg / 32 ms tick) and the circuit band pin 5.4-6.3 s.
+
+### S30-X6 STATIC CORROBORATION (docs/re/t423-newgame-law.md §5, F2/F7)
+The hover zone x379..493 y420..472 dispatches FUN_00056ad4(0x7a35c, 5,
+script @0x69b8) which op2-SETs ds:0x7458e — the specnum repaint flag. Sole
+writer FUN_00021a84; ZERO writers inside the state-3 dispatcher; the pump
+latch [win+0xc0] is set at init (S26) and never touched by the hover path.
+So the static chain already said the hover zone CANNOT change the pump
+cadence — it marks-for-repaint at most. t423 §5's port-law sentence
+("yaw advances kPreviewSpinPerFrame x6 while hovered") is the SUPERSEDED
+cycle-1 reading (removed in S22/S27); checklist item 5 is now CLOSED by
+measurement, not by re-reading the dead law.
+
+### S30 VERDICT
+Checklist item 5 (hover-adder) CLOSED-Negative: the original's newgame spin
+rate is cursor-INDEPENDENT (~58-62 deg/s base beat, hover adds 0 +-2%).
+Our port (62.5 deg/s, cursor-independent by construction) already matches.
+No OQ row touched (tNG-S tracks none — honest negative under strict-close;
+open=[016,019] unchanged). Instrument laws banked: (1) BP+6 eip reporting
+quirk; (2) unwrap-before-median for >4.5 s basis windows.
+NEXT = WAIT-USER-GRADE-NG5 (items 6-7 are user-priority calls).
