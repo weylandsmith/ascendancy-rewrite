@@ -624,3 +624,18 @@ CADENCE: ~1/s is a t302 GALAXY-MAP figure inherited onto this screen,
 and the cited re-posting fn 0x28fc0 contains no timer call (verified
 asm 0x28fc0..0x29010). 2 deg at ~36 Hz = 5.6 s = user's figure. tNG-R
 queued: breakpoint hit-count at 0x27a18 on New Game settles it.
+
+## D24 — SPIN DIRECTION LAW (USER WITNESS, 2026-11-23, verbatim)
+
+> the direction of rotation ... clockwise when looking from above. The
+> follow-on text about the closest stars moving to the left is correct.
+(Original message said "counter-clockwise" then corrected to clockwise;
+the operational clause — near stars left, far stars right — is
+unchanged and matches clockwise-from-above, so the law is unambiguous.)
+
+ASSISTANT CHECK (exact shipped math, menulaw.h previewSpinWorldY +
+previewStar projection, accumulator += kPreviewSpinDegPerTick as
+title.cpp:459 does): near star (z=-400) sx 200.00->190.24 LEFT; far
+star (z=+400) 200.00->205.65 RIGHT. == USER LAW. Direction seam
+(S27-X2 "screen-side direction NOT pixel-verified") CLOSED by user
+witness; NO code change; the sign we shipped is the vendor's.
