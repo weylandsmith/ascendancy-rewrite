@@ -102,7 +102,7 @@ TEST(species_well_speckle_is_correlated_not_iid_t436) {
     // these chain weights; iid gives 1.92) and must stay inside the
     // measured family set {pal200 (12,12,16), pal0 (0,0,0), pal196
     // (12,28,48)}.
-    int runs = 0, n = 0, same = 0;
+    int runs = 0, same = 0;
     int c200 = 0, c0 = 0, c196 = 0, other = 0;
     for (int y = 163; y <= 192; y++) {
         int prev = -1;
