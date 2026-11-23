@@ -233,13 +233,78 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-S CYCLE 3c — C3 CONTROL, THEN CLOSE W1, THEN PORT (D21; final
-cycle of the D18 <=3 rule — whatever is unresolved goes on the package's
-plain-language open list). ORDER (rationale: one control experiment
-decides whether W1's dynamic half is instrument-limited or fixable; the
-port's star source is fully cited (S15) so P4 can proceed on the static
-law either way; re-package last per D21):
- C3 CONTROL (docs/re/_wip_tNGS.md S19/S20 have the full failure chain —
+NEXT WAIT-USER-GRADE-NG3 — tNG-S cycle 3 (D21) is DONE and the user-grade
+package scratchpad/NG-usergrade.png (plain-language numbered checklist ON
+the image, t441 18/18 PASS, reproducible) awaits the user's numbered
+verdict. Do NOT re-run fix cycles without a user reply — the loop must not
+churn against a stale grade (tNG-F2 WAIT-block law).
+RESUME RULES: on a new DECISIONS.md USER reply (record it verbatim as D22
+FIRST), (a) ACCEPT -> retire tNG-S, NEXT -> tSI-C per the prior resume rule
+(docs/STATE.md tNG-F2/F1 history + DECISIONS.md D19 disposition); (b)
+PARTIAL with defects -> a fix cycle working ONLY the defects the user names,
+in their words. Named candidates already banked if un-named: (1) hover-spin
+RATE seam (zone cited 0x52993/0x529c1; rate = port reading — measure it on
+PRODUCTION inside kPreviewSpinZone via the c3 template, run frames not
+debugger legs, R-tNGS3c); (2) F6-D1 RIGHT-band x632..639 ~20% dark ridge
+(per-column kNewgameRight census on the refcap, branch before kRight in
+textureColourAt — banked _wip_tNGF F6); (3) Begin-cluster sprite size/
+density + dot whiteness (numbers banked _wip_tNGF V0-F4).
+TRIGGER CHECK (standing): tail DECISIONS.md = D21; ring turn test
+scripts/t368_ring_turn.py (1086 = no new sitting; >1086 -> re-run
+scripts/r1_t85g_sitting.py FIRST per the standing rule).
+GAME: production ring HEALTHY (pid 1470999, TL expiry 2026-11-24 14:53,
+turn 1086 re-verified this iteration; sitting check NEGATIVE).
+NEVER pkill Xvfb with -u (matches :9). Kill scratch orphans by exact PID.
+KNOWN (do NOT re-derive): Z1 star law S15; W1 CLOSED — newgame field does
+NOT auto-spin (S22 measured, production); rotation +-2deg t416 = COSMOS MAP
+only; pump ~1/s t302; projection+camera cycle-1 S5; colour law tNG-F1;
+Begin panel /5+5; RFB = only proven firing channel (t439); dbg build is
+INPUT-DEAF at fresh Xvfb (S22/R-tNGS3c — never witness newgame dynamics with
+debugger legs); xsend presses synthetic (S17); x11vnc needs LD_LIBRARY_PATH
+(S18); fresh-Xvfb window origin (80,100) (S18); PIL scripts run under
+~/tools/revenv/bin/python (S24).
+
+tNG-S CYCLE 3c LANDED 2026-11-22 (ADOPTED — the executing session died
+before its FINISH SEQUENCE; a fresh session verified + committed it as
+6263f62, then wrote this block. Full record docs/re/_wip_tNGS.md S21-S24).
+PROVED THIS ITERATION (measured on production /usr/bin/dosbox-x, scratch
+game-wp, fresh Xvfb :97, runs c3-20261122-214652 / 215511):
+ - C3 CONTROL FIRED: RFB move(250,295)+click x2 takes production off the
+   title (orange 0.679 -> 0.006; hover band teal rows 240..270 -> 280..310).
+   => the dbg build dosbox-x-dbg IS input-deaf at a fresh unfocused Xvfb
+   (S19/S20 four witnesses explained); R-tNGS3c banked: newgame dynamic
+   questions are answered with PRODUCTION + FRAMES, never debugger legs.
+ - W1 CLOSED BY MEASUREMENT: the newgame starfield does NOT auto-spin —
+   6 frames over 60 s, star-centroid displacement MEDIAN 0.0 px (p90 4 =
+   twinkle), field-changed px flat ~1085, control box 0; run 214652
+   corroborates (rotation-correlation peak at theta=0). Consistent with the
+   S14 static law (latch store 0x26dd1 only in the state==3 cosmos-map
+   branch; newgame init tail 0x26c89 CLEARS [win+0xc0]). D21's "rotating" =
+   the cosmos map. Scope honest: at-rest field, first 60 s, cursor inside
+   the panel; the t423 F7 hover-spin zone law is separate.
+ - P4 PORT LANDED: menulaw.h kCosmosCamZ/FovDeg/FocalPx + previewDraws/
+   previewStar (3x %1000-500 -> normalize x shellRadiiFor(k), camera
+   (0,0,-1500), focal 769.1, +0.5 bias, class ladder, NO sphere clip);
+   shellRadiiFor made public; title.cpp t423 cylinder + old sphere sampler
+   REMOVED; idle spin REMOVED (F7 zone spin kept). 5 new pins incl.
+   boundary-reachability and exact-shell tests; mutation-verified (cls
+   220->221 and %1000->%999 both FAIL as intended). Suite 494/494.
+   Honest negative: refcap radial-census pin RETIRED (well contains the
+   summary text block — R-tNGS3c-B).
+ - P5 RE-PACKAGED: scratchpad/NG-usergrade.png 1290x1704 18/18 PASS t441
+   rc=0; checklist states honestly: placement law cited, at-rest law
+   MEASURED, hover-spin rate = named seam.
+ - ADOPTION VERIFICATION (S24): rebuild 0, run_tests 494/494, composite
+   reproducible via ~/tools/revenv/bin/python (system python3 has no PIL —
+   trap banked), gate 0, ledger OK open=[016,019], ring HEALTHY pid
+   1470999, sitting check NEGATIVE. No OQ row moved this cycle (tNG-S
+   tracks no ledger row — honest negative under strict-close).
+NEXT: WAIT-USER-GRADE-NG3 (assignment above).
+
+--- SUPERSEDED tNG-S CYCLE 3c assignment (EXECUTED; record S21-S24 in
+docs/re/_wip_tNGS.md, LANDED block above):
+
+C3 CONTROL (docs/re/_wip_tNGS.md S19/S20 have the full failure chain —
     READ THAT FIRST): on a SCRATCH copy (work/r1/game-wp, never game/),
     launch the PRODUCTION /usr/bin/dosbox-x on a fresh private Xvfb :97
     (copy r299_leg_session launch minus dbg bits; x11vnc WITH

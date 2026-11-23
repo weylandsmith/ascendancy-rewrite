@@ -604,3 +604,19 @@ chrome + Begin-cluster sprite seam — honest: starfield law cited, at-rest
 law MEASURED on the original, hover-spin rate is a named seam);
 scripts/tNGU_composite.py -> scratchpad/NG-usergrade.png 1290x1704
 18/18 PASS t441 rc=0.
+
+## S24. ADOPTION VERIFICATION (fresh session, 2026-11-22 ~23:05)
+The cycle-3c session died before its FINISH SEQUENCE; this session adopted
+its uncommitted tree. Verification of the adopted state (all re-run, not
+trusted):
+- rebuild BUILD_EXIT=0; run_tests 494/494 ok (5 tngs_p4_* pins green).
+- composite RE-VERIFIED: the shipped scratchpad/NG-usergrade.png is
+  reproducible — tNGU_composite.py /tmp/t412_shots/t412-newgame.png
+  scratchpad/newgame-original.png OUT --checklist scratchpad/NG-checklist.txt
+  -> 1290x1704 18/18 PASS t441 rc=0 (COMPOSITE_EXIT=0).
+  HARNESS TRAP: system python3 has NO PIL; the documented interpreter is
+  ~/tools/revenv/bin/python (usage string line 22) — has PIL 12.3.0.
+- gate GATE_EXIT=0; ledger_audit LEDGER AUDIT OK open=[016,019].
+- GAME ring HEALTHY: pid 1470999 up 08:10, Xvfb :9 + x11vnc 5910 alive.
+  Timeline tail 2000 lines: turn_max 1086 => NO new sitting (no steering).
+No content changes were needed; adoption = verify + commit + NEXT rewrite.
