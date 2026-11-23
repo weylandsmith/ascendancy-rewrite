@@ -684,3 +684,33 @@ DISPOSITION:
   ours: log as deliberate deviation, revisit only if user flips).
 - RACE INTRO (tSI-*): DEFERRED to cleanup phase (user ruling).
 - NEXT FLOW TARGET: GALAXY MAP screen (state it in the queue next).
+
+## D26 — FLOW PRIORITY: PLANET + RESEARCH PLAYABILITY FIRST (USER, 2026-11-23, verbatim)
+
+> Let's actually focus on the planet screen and research screens first.
+> On the planet screen, the biggest problem is that double-clicking a
+> square doesn't do anything, so I can't build anything on a given
+> square. I started a game with the Chamachies, and the home planet is
+> wrong - wrong art, wrong max population. The isometric squares are
+> drawn wrong - it should be an isometric grid, with rows adjacent
+> (touching) on both axes. The square colors should be light - white,
+> blue, green, red, and even black squares should be drawn differently
+> than what's here. The drawn squares do appear to be approximately the
+> right shape, size, and angle, and the colony base is now drawn
+> correctly on its square, so that's an improvement. When you hover
+> over a square adjacent to an existing structure, it does turn grey,
+> rather like the way you're drawing it. Clicking on the productivity
+> indicators on the top should pull up information about that item -
+> for example, if I click on the plant box in the middle, it should pop
+> up a window that says "Crimea 1 Prosperity: 1 per day/Population will
+> grow in 50 days." (the '/' there denotes that the text is split
+> across two lines.) Also, there still aren't any orbital squares to
+> the left of the planet, there should be 10 squares there, in five
+> rows of 2. When hovering over an orbital square, a thin greyish box
+> outline should appear. The orbital squares are not isometric.
+> On the research screen, in addition to the tree not being drawn
+> correctly, I can't set any projects. Let's nail these items down
+> first, and that will get the game a long way toward being playable.
+
+GALAXY-MAP phase (proposed tGM-*) is SUPERSEDED in order by D26; the
+tGM seams stay banked in the docs for when its turn comes.
