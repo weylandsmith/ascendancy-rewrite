@@ -628,3 +628,99 @@ bar visible). No script in scripts/ or work/r1 writes that path (grep).
 Not mine; left untracked, NOT committed, NOT deleted. BONUS corroboration
 (free): frame 1 vs 15 (~12 s apart) whole-frame changed px = 1263/203776
 (0.6% twinkle floor) — independent support for the S22 no-auto-spin verdict.
+
+## S26. CYCLE 4 START — D22 CONTRADICTS S22 (the W1 verdict is at risk)
+D22 (USER, verbatim): "both starfields do spin all the time, no matter
+where the mouse is, and it takes a given star about five seconds to
+complete a circuit." S22 measured ZERO displacement over 60 s on
+production run 215511 with the cursor PARKED AT (250,295) — inside the
+Begin panel. The two are reconcilable ONLY if spin is cursor-state
+dependent (S22's cursor sat inside the t423 F7 spin-zone; the D22
+witness was captured with the mouse parked elsewhere), or S22's run
+never had the pump alive. P4 ("no auto-spin for the newgame field") is
+built on S22 and must be treated as SUSPECT until this is resolved.
+PLAN (cycle 4, in order): (X1) static: read the state==0xd init branch
+0x26e36..0x26f65 for the [esi+0xc0] latch store (S14 debt) + pump body
+0x28fc0 delay arg (L3 debt) + per-tick angle delta at the 0x3b pump leg
+0x27a18 region; (X2) production frames witness, 60 s, cursor parked
+OUTSIDE both fields, single-star arc tracking (per D22-assistant note);
+verdict rewrites W1 + the P4 spin clause.
+
+### S26-X1 STATIC (byte-exhaustive, capstone-confirmed)
+- Full-obj0 byte scan for ALL base+0xc0 dword stores (c7/89 modrm x6 regs,
+  mod=10 disp32 — 0xc0>127 so disp8 form impossible, scan is exhaustive):
+  ONLY 0x26c89 ([esi+0xc0]=0, generic init tail) and 0x26dd1 (=1, state==3).
+  => state==0xd branch (0x26e36..0x26f65) has NO latch store (S14 debt CLOSED;
+  0xd inherits whatever the tail order gives). Capstone linear sweep of
+  0x14bb0..0x82bb0 finds only esp+0xc0 stores — consistent.
+- NOTE THE RATE MISMATCH: t416 +-2deg/tick at ~1/s pump = 180 s/circuit, NOT
+  D22's ~5 s. If D22 is right, the newgame spin is NOT the t416 latch leg —
+  it must be the L3 pump family (msg 0x1f6/0x1f7/0x1f9 counters
+  +0xb7/+0xb9/+0xbb, fn 0x226e4/0x22ce4), whose RATE (fn 0x28fc0 delay arg)
+  is still unread.
+
+### S26-X2a S22 WITNESS RE-READ — THE "AT-REST" VERDICT IS UNSUPPORTED
+Re-measured run 215511 frames directly (raw numpy, threshold >30/channel):
+ - consecutive 12 s steps: field changed px = 1147/1152/1145/1146/1153,
+   control box = 0 EVERY STEP. Vision confirms the frames ARE the New Game
+   screen (big field + Begin cluster present).
+ - A field with a ~5 s rotation period sampled every 12 s (~2.4 circuits
+   between samples) shows EXACTLY this signature: a flat, dt-independent
+   changed-pixel floor with nothing repeating. "Flat ~1085 px" is evidence
+   of CONTINUOUS MOTION, not of twinkle — a truly static field's diff vs
+   f1 would dip whenever a sample landed near a full turn.
+ - The centroid-match (tol 6 px) "median 0.0" only proves no star moved
+   LESS than ~6 px between 12 s samples; with 5 s circuits stars are at
+   unrelated positions every sample (only 34/150 matched at all — the
+   expected ~random overlap, not a static field).
+ - The t416-vs-D22 rate mismatch (180 s/circuit law vs ~5 s eyeball) was
+   the hidden premise that let S22 read the floor as twinkle. The t416
+   law governs the state==3 latch leg; the L3 pump family (0x1f6/0x1f7/
+   0x1f9, painters 0x52114/0x526b4) is the newgame-field candidate and
+   its RATE was NEVER READ (fn 0x28fc0 delay arg outstanding since L3).
+VERDICT SO FAR: S22's W1 close is WITHDRAWN (over-claim from an aliasing
+measurement); S22's C3 verdicts (production fires, dbg input-deaf) STAND.
+D22 (user, vendor game, mouse parked) + this re-read both say the big
+newgame field SPINS CONTINUOUSLY. Begin-panel field: D22-assistant
+measured it changing with mouse parked (band-gate REFUTED); needs the
+same fine-rate treatment.
+
+### S26-X2b D22 REFCAP STAR-ARC MEASUREMENT (vendor game, 1 s cadence)
+Bright-peak matching (3x3-max, lum>350, tol 5 content-px) on the 15
+vendor refcaps, big field: 23 matched pairs across 14 consecutive 1 s
+steps, displacement median 3.16 content-px (p25 1.5, p75 ~3.5; 82% of
+matched stars moved >=1.5 px). Twinkle does not translate peaks: the big
+field MOVES ~3 content-px/s (= ~3.8 px in 640-space) with the mouse
+parked. Consistent with D22 (continuous, mouse-independent). RATE NOTE:
+3.8 px/s at r~100 px = ~2.2 deg/s = ~165 s/circuit — matches the t416
++-2deg/tick @ ~1/s pump rate almost EXACTLY, and contradicts the "~5 s
+circuit" eyeball. The 5 s figure is NOT supported by the pixel data;
+treat the t416 RATE as the leading candidate, D22's 5 s as an eyeball
+estimate of "visible motion". (S22's aliasing trap: sampling a 2 deg/s
+field every 12 s still shows a flat changed-px floor because the star
+set is sparse and repaints reshuffle dim/bright.)
+
+### S26-X2c LAG-CURVE + ROTATION-CORRELATION (vendor refcaps, 15 shots)
+- changed-px vs LAG (big field, >30/chan, content px): lag1..9 all
+  ~856-889 FLAT, min never below 742; control strip ~15-20. A 5 s
+  circuit would dip at lag 5 (874, no dip) => D22's "~5 s circuit" is
+  NOT supported by the pixel data [measurement]. Flat-from-lag-1 = the
+  field decorrelates within ~1 s (star set sparse: ~880 changed px/s
+  over ~150 stars).
+- rotation-correlation over the peak clouds (theta -12..+12 deg, tol 4):
+  aggregate best -9 deg (score 22) vs theta=0 (17) — WEAK, per-pair
+  thetas scatter sign. NOT a rate witness; honest negative on rate.
+- matched-star displacement median 3.16 px/s (content) [measurement].
+CONCLUSION (S26 verdict): the vendor big newgame field ANIMATES
+CONTINUOUSLY with the mouse parked (refcap changed-px 880/s vs control
+17/s; S22 production run 1146/step 640-space vs ctrl 0). W1's S22
+"does NOT auto-spin" is WITHDRAWN as an over-claim: (a) it was decided
+with the cursor parked INSIDE the Begin panel (D22 refutes band-gating
+anyway), (b) the centroid tol-6 method cannot see >=6 px steps and the
+"flat changed-px floor" is equally the signature of continuous motion —
+the discriminator is a lag curve on the VENDOR (done here: no dip), not
+a flatness read. RATE remains OPEN (eyeball 5 s vs displacement ~3 px/s
+vs t416 2deg/tick@1/s ~ 180 s/circuit — all unreconciled). D22 is the
+binding ruling: BOTH fields spin, mouse-independent; the PORT must
+re-implement spin and MEASURE the rate on production frames (1 s
+cadence x 60 s, star-arc + lag curve), never 12 s sampling.

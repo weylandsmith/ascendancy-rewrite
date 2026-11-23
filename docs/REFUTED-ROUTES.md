@@ -1598,3 +1598,16 @@ block: a bright-pixel census yields 1124 "clusters" at median r 175 —
 text-dominated, useless as a radial-profile pin for the preview starfield.
 Do not re-run this census expecting stars. The shell law is pinned
 code-exactly instead (tngs_p4_star_lies_on_its_shell).
+
+## R-tNGS26. "A FLAT CHANGED-PX FLOOR AT 12 s SAMPLING = A STATIC FIELD" IS DEAD (S26).
+A sparse star field sampled far past its decorrelation time shows a FLAT,
+dt-independent changed-pixel floor whether it spins or not (vendor refcaps:
+lag curve flat 856-889 px for lags 1..9 s; production run 215511: flat
+~1150 px per 12 s step). The S22 W1 close ("does NOT auto-spin") read this
+floor as twinkle — WRONG. Discriminators that work: (a) 1 s-cadence
+matched-star displacement (vendor: median 3.16 content-px/s = motion),
+(b) a lag curve checked for a DIP at the circuit period (none at lag 5 =>
+no 5 s circuit). Any future at-rest claim on a sparse animated field MUST
+use cadence well under the expected per-step displacement (<=1 s), never
+12 s. S22's C3 verdicts (production fires via RFB; dbg input-deaf) are
+unaffected and STAND.
