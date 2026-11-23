@@ -23,6 +23,9 @@
 #include "game/mapgen.h"
 #include "game/starstat.h"
 
+#include <cmath>
+#include <fstream>
+#include <sstream>
 #include <cstring>
 #include <string>
 #include <vector>
@@ -338,19 +341,123 @@ TEST(tngs_p4_projection_fits_the_well) {
 }
 
 TEST(tngs_p4_no_idle_spin_term) {
-    // S22 [MEASURED run work/r1/c3-20261122-215511]: the field does NOT
-    // auto-spin; only the t423 F7 hover zone advances it. Pin: the idle
-    // constant is ZERO (the armed constant is nonzero), so a frame with the
-    // cursor OUTSIDE the zone cannot rotate the model.
+    // SUPERSEDED by S27 (CYCLE 4): this pinned the S22 "does NOT auto-spin"
+    // reading, WITHDRAWN in S26 (12 s aliasing) and refuted by witness run
+    // tngs4-20261123-010308 (production, 1 s cadence, ~950 changed px/step,
+    // ctrl 0, matched stars 3.58 px/s = 2.05 deg/s). The t423 zone rects
+    // remain a documented geometric constant; the spin pins now live in
+    // tngs_s27_*. The purity claim (previewStar is a pure function of its
+    // inputs) STANDS and is re-pinned here.
     CHECK(au::kPreviewSpinZone.x0 == 379 && au::kPreviewSpinZone.x1 == 493);
     CHECK(au::kPreviewSpinZone.y0 == 420 && au::kPreviewSpinZone.y1 == 472);
-    CHECK(au::kPreviewSpinArmedPerFrame > 0.0);
-    // The painter's idle advance term is literally `if (beginHover)` —
-    // there is no idle constant to pin, so pin the geometric consequence:
-    // previewStar is a pure function of its inputs (no internal clock),
-    // i.e. identical inputs -> identical screen point, forever.
     const au::Rect well{8, 8, 492, 372};
     const auto s1 = au::previewStar(123, -45, 67, 365.0, 250.0, 190.0, well);
     const auto s2 = au::previewStar(123, -45, 67, 365.0, 250.0, 190.0, well);
     CHECK(s1.sx == s2.sx && s1.sy == s2.sy && s1.cls == s2.cls);
+}
+
+TEST(tngs_s27_spin_rate_is_two_deg_per_tick) {
+    // S27-X2 [verified asm]: pump dispatcher 0x27a18 applies the IMMEDIATE
+    // 2 at 0x27a32 per msg-0x3b tick; cadence t302 ~1/s.
+    CHECK(au::kPreviewSpinDegPerTick == 2.0);
+    CHECK(au::kPreviewSpinTickMs == 1000);
+}
+
+TEST(tngs_s27_spin_is_world_y_and_isometric) {
+    // The vendor latch axis (FUN_00053584 mixes x,z = world Y, t416 F2).
+    // Pin: y preserved, |p| preserved (isometry), and a 90-deg yaw maps
+    // (x,0,z) -> (z,0,-x).
+    double ox = 0, oz = 0;
+    au::previewSpinWorldY(100.0, 0.0, 90.0, &ox, &oz);
+    CHECK(std::abs(oz - -100.0) < 1e-9);
+    CHECK(std::abs(ox) < 1e-9);
+    const au::Rect well{8, 8, 492, 372};
+    for (int i = 0; i < 50; i++) {
+        const auto d = au::previewDraws(au::cosmosHash(i, 3u));
+        const auto a = au::previewStar(d.vx, d.vy, d.vz, 440.0, 250.0, 190.0,
+                                       well);
+        const auto b = au::previewStar(d.vx, d.vy, d.vz, 440.0, 250.0, 190.0,
+                                       well, 37.0);
+        CHECK(std::abs(a.y - b.y) < 1e-9);  // world-Y spin preserves y
+        const double ra = std::sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+        const double rb = std::sqrt(b.x * b.x + b.y * b.y + b.z * b.z);
+        CHECK(std::abs(ra - rb) < 1e-6);    // shell radius preserved
+    }
+}
+
+TEST(tngs_s27_pump_wiring_pin) {
+    // Source-text pin (sfx_no_literal_play_sites_t404 precedent): the spin
+    // must be WIRED — the pump advances by the cited constant and the big
+    // field's draw call passes the yaw. Witness run 010308 refuted the
+    // static field; a detached call site (mutation: pass 0.0) must fail
+    // even though no behavioural test renders pixels here.
+    std::ifstream in(kRepo + "/rewrite/src/ui/title.cpp");
+    std::stringstream ss;
+    ss << in.rdbuf();
+    const std::string src = ss.str();
+    CHECK(src.find("newgameSpinDeg += kPreviewSpinDegPerTick") !=
+          std::string::npos);
+    CHECK(src.find("kNewgameCosmosRect, previewYaw)") != std::string::npos);
+    // Begin cluster reads the SAME accumulator (class-cycling term)
+    CHECK(src.find("newgameSpinDeg * 3.14159265358979323846 / 180.0") !=
+          std::string::npos);
+}
+
+TEST(tngs_s27_motion_determinism_and_census_pins) {
+    // D22-cycle motion pins: (a) two renders at the SAME yaw are identical
+    // (determinism); (b) renders at yaw t and t+2deg DIFFER in star
+    // positions but NOT in the in-well COUNT per shell or the type census —
+    // the spin moves/recycles depth, it never invents or deletes stars.
+    const au::Rect well{8, 8, 492, 372};
+    auto census = [&](double yaw) {
+        int inWell = 0;
+        for (int i = 0; i < 100; i++) {
+            const auto d = au::previewDraws(au::cosmosHash(i, 11u));
+            const auto s = au::previewStar(d.vx, d.vy, d.vz, 440.0, 250.0,
+                                           190.0, well, yaw);
+            if (s.inWell) inWell++;
+        }
+        return inWell;
+    };
+    // (a) determinism: same yaw -> identical screen points
+    bool identical = true;
+    for (int i = 0; i < 100; i++) {
+        const auto d = au::previewDraws(au::cosmosHash(i, 11u));
+        const auto s1 = au::previewStar(d.vx, d.vy, d.vz, 440.0, 250.0, 190.0,
+                                        well, 13.0);
+        const auto s2 = au::previewStar(d.vx, d.vy, d.vz, 440.0, 250.0, 190.0,
+                                        well, 13.0);
+        if (s1.sx != s2.sx || s1.sy != s2.sy || s1.cls != s2.cls)
+            identical = false;
+    }
+    CHECK(identical);
+    // (b) motion: one tick (2 deg) moves at least one in-well star
+    int moved = 0;
+    for (int i = 0; i < 100; i++) {
+        const auto d = au::previewDraws(au::cosmosHash(i, 11u));
+        const auto s0 = au::previewStar(d.vx, d.vy, d.vz, 440.0, 250.0, 190.0,
+                                        well, 0.0);
+        const auto s1 = au::previewStar(d.vx, d.vy, d.vz, 440.0, 250.0, 190.0,
+                                        well, au::kPreviewSpinDegPerTick);
+        if (s0.sx != s1.sx || s0.sy != s1.sy) moved++;
+    }
+    CHECK(moved > 0);
+    // (c) the spin is NOT a screen-plane roll: at 2 deg a world-Y spin
+    // changes DEPTH (class can change) for some star; the old x,y-roll
+    // mutation (below) leaves z untouched by construction.
+    bool depthChanged = false;
+    for (int i = 0; i < 100; i++) {
+        const auto d = au::previewDraws(au::cosmosHash(i, 11u));
+        const auto s0 = au::previewStar(d.vx, d.vy, d.vz, 440.0, 250.0, 190.0,
+                                        well, 0.0);
+        const auto s1 = au::previewStar(d.vx, d.vy, d.vz, 440.0, 250.0, 190.0,
+                                        well, 45.0);
+        if (std::abs(s0.z - s1.z) > 1.0) depthChanged = true;
+    }
+    CHECK(depthChanged);
+    // census sanity: the field is never empty at any yaw (a spin that
+    // evicted every star from the well would read as "stopped")
+    for (double yaw : {0.0, 30.0, 90.0, 170.0, 359.0}) {
+        CHECK(census(yaw) > 0);
+    }
 }

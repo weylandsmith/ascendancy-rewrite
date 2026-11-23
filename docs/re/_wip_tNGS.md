@@ -724,3 +724,152 @@ vs t416 2deg/tick@1/s ~ 180 s/circuit — all unreconciled). D22 is the
 binding ruling: BOTH fields spin, mouse-independent; the PORT must
 re-implement spin and MEASURE the rate on production frames (1 s
 cadence x 60 s, star-arc + lag curve), never 12 s sampling.
+
+## S27. CYCLE 4 — L3 RATE DEBT CLOSED (static) + R1 WITNESS RUNNING
+### S27-X1 THE "0x28fc0 delay arg" DEBT WAS A MISIDENTIFICATION [verified asm]
+S26 carried "read fn 0x28fc0's delay arg" as the outstanding rate leg. The
+body (t442_disasm 0x28fc0..0x29090, work/ascend_restored.bin) has NO timer
+call and no delay argument — it is the COSMOS DRAW-LIST BUILDER, exactly as
+docs/re/ships.md:1181 and docs/re/ui-runtime.md:774 already named it. The
+early cycle-1 note ("0x28fc0 = one-shot re-poster") was wrong; the pump is
+MSG 0x3b handled at 0x27a18. Cited verbatim:
+  28fcd: mov word ptr [eax+0xb7], 0        (clear carousel index)
+  2901c: movsx esi, di / imul esi,0x60 / add esi,0x13bc5
+  2903a: mov [edx+eax], esi                (store record ptr at cursor)
+The leg S26 flagged (0x2900b ebx=0x659 edx=0xff0 call 0x2a428) is an
+ASSERT, not a period: 0x2a428 = `test eax,eax; jne ret; push ebx; push edx;
+push 0x106a; jmp 0x2a4cc` -> 0x2a4cc pushes 0x6500 (assert-context string
+head, 2-byte entries) and calls sprintf 0x76c79 with coswnd.cpp (cstr at
+0x83bae) + line 0x106a; failure path ends at int3 0x2a424. ebx=0x659/0x66b
+are ASSERT-CONTEXT IDs, edx=0xff0/0x83bae the message. => no cadence info
+there; the L3 rate question is answered by the PUMP, below.
+
+### S27-X2 THE RATE CITATION (code law) — 2 DEG PER PUMP TICK AT ~1/s
+  dispatcher 0x27a18 (esi=win), gates on byte [win+0xc0]:
+    27a1e: test dh,1  -> 27a28: mov dword [esp+0x14],0xfffffffe  (bit1 set)
+                        27a32: mov dword [esp+0x14],2            (bit1 clear)
+    27a3a: fild [esp+0x14] ; 27a4b: call 0x283e4 (win, edx=-1, f32 angle)
+    27a50: test bh,4  -> 27a60/27a6a: +-2 -> call 0x283e4 (edx=0)
+  => per-tick delta is the IMMEDIATE 2.0 deg (radians via DAT_00088b88
+  pi/180, t416 S / tNGS S11 independent re-derivation). Cadence = msg 0x3b,
+  t302 LIVE-measured ~1/s (docs/re/_wip_t416.md:36, t302 stop-names).
+  CODE RATE = 2 deg/s = ~180 s/circuit.
+  NOTE 0x27a28 sign quirk: bit1 SET gives -2, bit1 CLEAR (bit0 only) gives
+  +2 — the latched-pair semantics t416 F2 documented.
+
+### S27-X3 NEWGAME IS THE state==3 BRANCH => LATCH IS SET AT INIT
+S14: state==3 (0x26d43) sets rect (17,12,324,320) and 0x26dd1
+`mov dword [esi+0xc0], 1` = bit0 latch SET. The C3 vision-confirmed newgame
+field box IS (17,12,324,320) (scripts/r_tNGS3c_c3_session.py FIELD_BOX,
+run c3-20261122-215511). Combined with S26-X1 (no OTHER latch store
+anywhere in obj0), the newgame field opens LATCHED bit0 => the 0x3b pump
+applies +2 deg/tick continuously with no input. That is the static half of
+the spin law and it agrees with D22 and with the vendor pixel data
+(3.16 content-px/s at r~100 => ~1.8 deg/s [S26-X2b]).
+=> RATE VERDICT (D22's tie-break rule "code wins"): 2 deg/s about WORLD Y
+   (bit0/bit1 = spin pair, FUN_00053584 mixes x,z per t416 F2). The blob
+   fit and the code AGREE (~1.8-2.2 deg/s); D22's ~5 s/circuit (= 72 deg/s)
+   is NOT supported by code OR pixels and is recorded as an eyeball figure.
+
+### S27-X4 R1 PRODUCTION WITNESS RUN 20261123-010310 (61 grabs @1 s)
+Harness: /usr/bin/dosbox-x, scratch game-wp, Xvfb :97, RFB 5911, offsets
+80/100. B_click2 FIRED on attempt 1 (orange 0.679 -> 0.006). Cursor parked
+(600,250) — OUTSIDE FIELD_BOX(17,12,324,320), BEGIN_BOX(515,380,565,465)
+and the menu band. 61 frames saved work/r1/tngs4-20261123-010310/caps/frames/.
+MEASURED (median over 60 steps): big field ~950 changed px/step (range
+884-995), Begin cluster ~700 (449-755), control strip (500,30,630,80) = 0
+EVERY STEP. => BOTH fields ANIMATE CONTINUOUSLY on production with the
+mouse parked [measurement]. Matches the vendor refcap signature (856-889
+content px/s, ctrl 15-20) and D22's ruling.
+HARNESS ROOT CAUSE (3 failed fires before this): my first versions omitted
+makedirs(out/save). dosbox autosave=10 then fails writing <savedir>/CMOS
+and the GAME shows a MODAL "Failed to save the current state." dialog that
+swallows every click (vision on _raw_004: dialog over the menu, New Game
+row at y313 image-space). NOT a channel failure. The C3 script pre-created
+save/ — that, not the hover rung, is what made C3 fire. Banked as a trap.
+OPEN SUB-QUESTION: bright-peak nearest-neighbour match returned n=0 on
+every step (threshold lum>350 on 0..765 scale, tol 6 px) — either the
+field has no peaks above 350, or the ~950 px/s churn is twinkle-dominated
+rather than coherent translation. Offline analysis on the saved frames
+(peak census, lag curve, rotation correlation) decides the RATE.
+
+### S27-X5 OFFLINE RATE ANALYSIS (scripts/tNGS4_rate_analyze.py, run 010308)
+BIG FIELD (box 17,12,324,320), 61 frames @1 s:
+ - bright peaks (3x3-max, lum>120): ~27/frame. Consecutive match at tol 6:
+   median n=3 (twinkle turns peaks on/off, so few survive), and the
+   SURVIVORS move median 3.58 px/s. At r~100 px that is 2.05 DEG/S —
+   INDEPENDENT blob confirmation of the code rate 2 deg/tick @ ~1/s
+   (S27-X2) within 3%. Vendor refcap agreed: 3.16 content-px/s = 1.8 deg/s.
+   (The in-session run reported n=0 because its threshold was lum>350 on a
+   0..765 scale where only 102 px/frame qualify; offline census used 120.)
+ - lag curve changed-px: lag1 972, lag2 985, lag3 984, lag4 988, lag5 993,
+   lag8 986 — FLAT, no dip at lag 5. Second confirmation (vendor +
+   production) that D22's "~5 s circuit" is NOT the period; 5 s would put a
+   minimum there. Consistent with a ~180 s circuit sampled at 1 s.
+ - rotation-correlation on the 27-peak clouds (theta -14..+14, tol 4, pair
+   5 s apart): scores 0-1 at EVERY theta incl. +10 (the 2deg/s prediction).
+   HONEST NEGATIVE: the peak set is too sparse + twinkle-scrambled for this
+   estimator; the displacement-median is the working statistic. The blob fit
+   and the code AGREE on 2 deg/s, so no disagreement to report per D22.
+BEGIN CLUSTER (box 515,380,565,465), same run:
+ - ~147 peaks/frame (lum>120); consecutive match at tol 3: median 130/145
+   matched with displacement median 0.0 px — POSITIONS ARE STATIC.
+ - mass (sum lum-60) churns median 944 units/s and ~700 px/step change
+   >30/chan, while centroid wanders only 0.7/1.4 px/s. => the Begin field's
+   animation is BRIGHTNESS/CLASS CYCLING AT FIXED POSITIONS, exactly the
+   tNG-C3 port law ("Positions are STATIC (the rotation drives only the
+   class)", title.cpp:1062). D22's "both fields spin" holds for the Begin
+   panel as the colour/dark cycle sweeping the cluster, not translation.
+RATE VERDICT (all three channels): code 2 deg/s (S27-X2) == production blob
+fit 2.05 deg/s == vendor refcap 1.8 deg/s. D22's 5 s/circuit = eyeball,
+refuted by TWO independent flat lag curves. PORT RATE = 2 deg/s.
+
+### S27-X6 R3 PORT LANDED (spin restored, pump law, both fields)
+rewrite/src/ui/menulaw.h: kPreviewSpinDegPerTick=2.0 (imm at 0x27a32),
+kPreviewSpinTickMs=1000 (t302), previewSpinWorldY(x,z,yaw) pure helper;
+previewStar takes yawDeg=0.0 default (WORLD-Y, applied to the model point
+BEFORE depth band + divide). rewrite/src/ui/title.cpp: ONE accumulator
+newgameSpinDeg pumped SDL_GetTicks-driven at the top of the newgame screen
+block; big field passes it to previewStar; Begin cluster uses the same
+accumulator (radians) for its class term — replacing the per-frame
+kPreviewSpinPerFrame fudge AND the S22 hover-only advance. SIGN: the
+bit0-only latch (the newgame init value) selects the +2 immediates at
+0x27a32 [verified asm]; the screen-side direction of OUR +yaw vs the
+vendor's FUN_00053584 mixer (v0'=v0c+v8s, v8'=v8c-v0s at 0x5329a/0x532ab,
+on basis slots +0xc/+0x18 = the vectors rotated by the writer) is NOT
+pixel-verified — NAMED SEAM: rotation direction unmeasured (a
+left-vs-right on-screen check needs a marked-star witness; mutation M4
+(sign flip) surviving the suite is the honest state of that seam).
+PINS (test_newgame_behavior_tNGB.cpp): tngs_s27_spin_rate_is_two_deg_per_
+tick, tngs_s27_spin_is_world_y_and_isometric (y and |p| preserved, 90deg
+maps (100,0,0)->(0,0,-100)), tngs_s27_pump_wiring_pin (source-text: pump
+advances by the constant, call site passes previewYaw, Begin reads the
+same accumulator), tngs_s27_motion_determinism_and_census_pins (same yaw
+identical; 2deg tick moves stars; depth changes; never-empty at any yaw).
+tngs_p4_no_idle_spin_term rewritten to SUPERSEDED (keeps the zone rects +
+purity claim, drops the withdrawn armed-rate CHECK).
+MUTATION-VERIFY (measured): M1 rate 2.0->1.0 FAILS rate pin; M2 axis z->y
+(roll shape) FAILS 51 pins; M3 call-site detached to 0.0 FAILS wiring pin;
+M4 sign flip SURVIVES (direction seam, above). Suite 498/498 green
+(494 + 4 new).
+
+### S27-X7 SINGLE-BLOB ARC TRACK (D22's requested fit) — HONEST NEGATIVE
+Continuity tracker (seed lum>180 peaks, +-4 px/step, require lum>140 next
+frame) on run 010308: 20 seeds, ZERO survived 10 steps — the twinkle
+reclass cycles every star's brightness below the floor within a few
+seconds (this IS the class-cycling the pump drives). The matched-pair
+displacement median (S27-X5, 3.58 px/s) is therefore the working rate
+statistic; per-star signed arcs (=> rotation DIRECTION) are not recoverable
+from 1 s pixel data on this field. Direction stays a named seam (checklist
+item 5).
+
+### S27-X8 W1 STATUS: CLOSED-BY-USER-REFCAP (per D22 steering rule 3)
+W1 (does the newgame field auto-spin?) = YES, CONTINUOUSLY, mouse-
+independent. Evidence: (a) user refcaps scratchpad/Screenshot_2026-11-
+22_23-03-55..23-04-10.png (15 shots ~1 s apart, mouse parked) — matched
+bright stars median 3.16 content-px/s [S26-X2b]; (b) production witness
+work/r1/tngs4-20261123-010308 (61 frames @1 s, cursor (600,250)) — big
+field ~950 changed px/step ctrl 0, matched stars 3.58 px/s [S27-X4/X5];
+(c) static law: state==3 latch store 0x26dd1 + pump imm 2 @0x27a28..32
+[S27-X2/X3]. Rate = 2 deg/s (code wins per D22; blob fit agrees). PORTED
+(S27-X6) with pins; direction = named seam (S27-X7).

@@ -444,6 +444,23 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
             SDL_RenderClear(ren);  // starfield zone measured BLACK (S: census)
 
+            // tNG-S S27 PUMP (shared by BOTH fields; docs S27-X2/X5): the
+            // vendor msg-0x3b pump (~1/s, t302) applies +-2 DEG world-Y per
+            // tick to the preview orientation; the big field reads it as
+            // POSITION, the Begin cluster as the rotated-depth CLASS term
+            // (cited 0x526f0..0x5282f). One accumulator, both consumers.
+            static double newgameSpinDeg = 0.0;
+            static Uint32 newgameSpinMs = 0;
+            {
+                const Uint32 nowMs = SDL_GetTicks();
+                if (newgameSpinMs == 0) newgameSpinMs = nowMs;
+                while (nowMs - newgameSpinMs >=
+                       Uint32(kPreviewSpinTickMs)) {
+                    newgameSpinDeg += kPreviewSpinDegPerTick;
+                    newgameSpinMs += Uint32(kPreviewSpinTickMs);
+                }
+            }
+
             // (1a) t414 FRAME LAW (D15 "the decorative framing is still
             // wrong and mostly missing"; docs/re/_wip_t414.md S2a): the
             // original is a TEXTURED CHROME PAGE with the cosmos punched
@@ -512,27 +529,26 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             // <=-220 -> 3 (cos_star; type from the wheel galaxy this field
             // mirrors for the count law — tNG-B B1; dims-zero types
             // 10..12 skip honestly, t200). NO sphere clip (S5).
-            // ROTATION (S22 MEASURED 2026-11-22): the field does NOT
-            // auto-spin at rest — 6 production frames over 60 s, star
-            // centroid displacement median 0.0 px, control box 0
-            // (work/r1/c3-20261122-215511), consistent with the S14 static
-            // law (latch store 0x26dd1 only in the state==3 cosmos-map
-            // branch; the newgame init tail 0x26c89 CLEARS [win+0xc0]).
-            // The t423 F7 hover-armed spin zone (cursor x379..493
-            // y420..472, dispatcher 0x52993/0x529c1) still spins — rate is
-            // the port's t423 reading (named seam), idle rate is ZERO.
+            // ROTATION (S27 CYCLE 4 MEASURED+CODED; the S22 "does NOT
+            // auto-spin" clause is WITHDRAWN — S26 re-read its 12 s
+            // sampling as an aliasing artifact). LAW: the newgame field IS
+            // the state==3 COSMOSWnd branch (rect 17,12,324,320 = the
+            // vision-confirmed well); init 0x26dd1 latches [win+0xc0]=1
+            // and the msg-0x3b pump (dispatcher 0x27a18, imm 2 at 0x27a32;
+            // cadence t302 ~1/s) rotates WORLD Y by +-2 DEG per tick with
+            // NO input. Witness run tngs4-20261123-010310 (61 frames @1 s,
+            // cursor parked (600,250) outside both fields): big field ~950
+            // changed px/step, ctrl 0; matched bright stars median 3.58
+            // px/s at r~100 = 2.05 deg/s (vendor refcaps 1.8 deg/s). The
+            // t423 F7 hover-armed zone is NOT modelled as a rate ADDER
+            // this cycle: the witness parked the cursor outside the zone
+            // and shows the pump alone at 2 deg/s; whether hovering adds
+            // rate is unmeasured (named seam, owed a cursor-in-zone
+            // witness), and D22 rules the base spin mouse-independent.
             {
-                static double previewYaw = 0.0;
-                int hmx = -1, hmy = -1;
-                SDL_GetMouseState(&hmx, &hmy);
-                const bool beginHover =
-                    hmx >= kPreviewSpinZone.x0 &&
-                    hmx <= kPreviewSpinZone.x1 &&
-                    hmy >= kPreviewSpinZone.y0 &&
-                    hmy <= kPreviewSpinZone.y1;
-                // S22: idle rate ZERO (no auto-spin); only the t423 F7
-                // hover zone advances the field.
-                if (beginHover) previewYaw += kPreviewSpinArmedPerFrame;
+                // S27: pump advance lives at the top of this screen block
+                // (newgameSpinDeg) — ONE accumulator for both fields.
+                const double previewYaw = newgameSpinDeg;
                 // tNG-B B1: N = the WHEEL galaxy's star count (count law
                 // word[obj+0x572] is the regenerated galaxy, not the ladder
                 // label), and each star's hash keys on wheelGen so a density
@@ -560,21 +576,14 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                 for (int i = 0; i < n; i++) {
                     const uint64_t z = cosmosHash(i, unsigned(wheelGen));
                     const auto d = previewDraws(z);
-                    // S15 box draw -> normalize -> shell; the t423-F7 hover
-                    // spin (when armed) is a yaw rotation of the model point
-                    // about the camera axis BEFORE the divide.
+                    // S15 box draw -> normalize -> shell; the S27 pump spin
+                    // is a WORLD-Y yaw of the model point BEFORE the depth
+                    // band + divide (previewStar applies it; class cycles
+                    // with depth, matching the measured reclass churn).
                     const double r = double(i < int(shellR.size())
                                                 ? shellR[size_t(i)] : 50);
                     auto s = previewStar(d.vx, d.vy, d.vz, r, cx, cy,
-                                         kNewgameCosmosRect);
-                    if (previewYaw != 0.0) {
-                        const double c = std::cos(previewYaw),
-                                     sn = std::sin(previewYaw);
-                        const double rx = s.x * c - s.y * sn,
-                                     ry = s.x * sn + s.y * c;
-                        s = previewStar(int(rx), int(ry), d.vz, r, cx, cy,
-                                        kNewgameCosmosRect);
-                    }
+                                         kNewgameCosmosRect, previewYaw);
                     if (!s.inWell) continue;  // honest well clip (S5)
                     // SEL law t200 (planets-ui §6): SEL = 4*K + cls, K = the
                     // star TYPE (13 starstat families; cos_star k(4K)..k(4K+3)
@@ -1090,8 +1099,14 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     SDL_Rect clip{vis.x0, vis.y0, vis.x1 - vis.x0 + 1,
                                   vis.y1 - vis.y0 + 1};
                     SDL_RenderSetClipRect(ren, &clip);
-                    static double beginYaw = 0.0;
-                    beginYaw += kPreviewSpinPerFrame;
+                    // S27: the class-cycling term is the SAME pump as the
+                    // big field (measured run 010308: cluster positions
+                    // static — 130/145 matched peaks at displacement 0.0 —
+                    // while ~700 px/step churn brightness: the vendor
+                    // rotation drives ONLY the class). kPreviewSpinDegPerTick
+                    // replaces the per-frame kPreviewSpinPerFrame fudge.
+                    const double beginYaw =
+                        newgameSpinDeg * 3.14159265358979323846 / 180.0;
                     const double kClCx = 538.1, kClCy = 417.4, kClR = 32.0;
                     const double kPcX = (vis.x0 + vis.x1) / 2.0,
                                  kPcY = (vis.y0 + vis.y1) / 2.0;

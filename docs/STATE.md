@@ -233,59 +233,89 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-S CYCLE 4 — PORT THE SPIN (D22 is a user reply; the
-WAIT-USER-GRADE-NG3 block is superseded by D22 resume rule (b): the user
-named the defect "both starfields do spin all the time, no matter where
-the mouse is"). Ordering rationale: S26 WITHDREW the S22 "does not
-auto-spin" verdict and MEASURED the vendor field moving ~3 content-px/s
-with the mouse parked — so the cycle-3c P4 port (idle spin REMOVED from
-rewrite/src/ui/title.cpp) ships a known-wrong static field; the spin
-fix must land before any re-package or grade. Steps, in order:
-  (R1) RATE on PRODUCTION frames: reuse scripts/r_tNGS3c_c3_session.py
-      (production /usr/bin/dosbox-x, scratch game-wp, fresh Xvfb :97,
-      RFB offsets 80/100; fire with B_click2, then PARK THE CURSOR
-      OUTSIDE both fields — e.g. (600,460) — the S22 cursor-in-panel
-      scope was the trap). Sample the big field at 1 s x 60 s (NOT 12 s
-      — 12 s aliasing is what fooled S22). Witness = bright-peak cloud
-      matching + lag curve (code proven this iteration, inline in
-      docs/re/_wip_tNGS.md S26-X2b/X2c; scipy NOT available on host).
-      Verdict target: deg/s of the big field; check the t416 2deg/tick@
-      1/s candidate (~180 s/circuit; consistent with 3.8 px/s at r~100)
-      against D22's ~5 s eyeball (refuted at 1 s cadence already —
-      S26-X2c lag curve shows no 5 s dip on vendor).
-  (R2) Begin-panel field: same witness on the hot cluster window
-      (640-space ~x520-560 y382-461, D22 measurement) — rate may differ
-      from the big field (L3 three-counter pump family +0xb7/+0xb9/+0xbb
-      = three animated windows; fn 0x28fc0 clears +0xb7 and posts via
-      0x2a428 — the delay/period leg 0x2900b..0x29017 (ebx=0x659,
-      edx=0xff0) is READ but NOT yet interpreted; finish that static leg
-      only if R1 is ambiguous).
-  (R3) PORT: restore rotation in rewrite/src/ui/title.cpp previewDraws/
-      previewStar driven by the MEASURED rate (t416 cam3d law shape,
-      NOT eyeball), both fields; pins incl. a determinism pin (two
-      renders at same t identical) and a motion pin (renders at t and
-      t+1s differ in star positions but NOT in count/colour census);
-      mutation-verify. Suite must stay green (494 + new).
-  (R4) re-package scratchpad/NG-usergrade.png (scripts/tNGU_composite.py
-      --checklist, run under ~/tools/revenv/bin/python) stating the spin
-      law + measured rate honestly; NEXT -> WAIT-USER-GRADE-NG4.
-DO NOT re-litigate W1 with 12 s sampling or debugger legs (R-tNGS3c);
-DO NOT re-read the whole _wip file — sections S22/S26 have it.
+NEXT WAIT-USER-GRADE-NG4 (tNG-S cycle 4 LANDED IN FULL: rate derived
+from code + two independent pixel witnesses, spin PORTED with pins,
+composite re-packaged). Ordering rationale: the spin defect the user
+named (D22) is fixed and pinned; every remaining tNG-S seam (rotation
+DIRECTION, hover rate-adder, Begin-sprite size) needs either the user's
+eyes (direction is gradeable in 20 s on the shipped composite) or is a
+polish row only the user can prioritize. Do NOT start a new probe family
+while a grade is pending — the tNG-S branch idles here by design (the
+standing OQ-016/OQ-019 live-capture routes are the OTHER trigger path:
+if a new sitting exists, r1_t85g_sitting.py first).
+IF THE GRADE ANSWERS:
+  - "wrong direction" -> sign flip is ONE character in
+    rewrite/src/ui/menulaw.h previewStar's call of previewSpinWorldY
+    (mutation M4 surviving = the known seam); re-run suite + re-package.
+  - "hover speeds it up" -> re-arm a rate adder ONLY with a witness:
+    reuse scripts/r_tNGS4_rate_session.py with PARK_XY INSIDE
+    kPreviewSpinZone (379,420,493,472) and compare matched-star px/s
+    against the parked-witness baseline 3.58 px/s (run 010308).
+  - "both good" -> tNG-S closes; next = Begin-cluster sprite size/dots
+    polish (checklist items 7-8) or the loop's OQ rows.
 TRIGGER CHECK (standing): tail DECISIONS.md = D22 (recorded d997ab6);
 ring turn test scripts/t368_ring_turn.py (1086 = no new sitting; >1086
 -> re-run scripts/r1_t85g_sitting.py FIRST per the standing rule).
 GAME: production ring HEALTHY (pid 1470999, TL expiry 2026-11-24 14:53,
 turn 1086 re-verified this iteration; sitting check NEGATIVE).
 NEVER pkill Xvfb with -u (matches :9). Kill scratch orphans by exact PID.
-KNOWN (do NOT re-derive): Z1 star law S15; ~~W1 CLOSED at-rest~~ SUPERSEDED
-BY S26 (W1 verdict WITHDRAWN — vendor + production fields DO animate;
-see S26-X2a/b/c and the cycle-4 assignment above); rotation +-2deg t416 =
-COSMOS MAP only; pump ~1/s t302; projection+camera cycle-1 S5; colour law
-tNG-F1; Begin panel /5+5; RFB = only proven firing channel (t439); dbg
-build is INPUT-DEAF at fresh Xvfb (S22/R-tNGS3c — never witness newgame
-dynamics with debugger legs); xsend presses synthetic (S17); x11vnc needs
-LD_LIBRARY_PATH (S18); fresh-Xvfb window origin (80,100) (S18); PIL
-scripts run under ~/tools/revenv/bin/python (S24).
+KNOWN (do NOT re-derive): Z1 star law S15; W1 CLOSED-BY-USER-REFCAP
+(S27-X8: both fields spin continuously, mouse-independent; 2 deg/s code
++ 2.05 blob-fit + 1.8 vendor; D22's ~5 s = eyeball, refuted by TWO flat
+lag curves); spin port S27-X6 (menulaw.h kPreviewSpinDegPerTick/TickMs +
+previewSpinWorldY; title.cpp ONE accumulator newgameSpinDeg — big field
+POSITION + Begin cluster CLASS); +-2deg t416 = COSMOS MAP law, SAME
+constant now on the newgame preview via the state==3 latch (0x26dd1) —
+NOT a re-derivation; pump ~1/s t302; projection+camera cycle-1 S5;
+colour law tNG-F1; Begin panel /5+5; RFB = only proven firing channel
+(t439); dbg build is INPUT-DEAF at fresh Xvfb (S22/R-tNGS3c); xsend
+presses synthetic (S17); x11vnc needs LD_LIBRARY_PATH (S18); fresh-Xvfb
+window origin (80,100) (S18); PIL scripts run under
+~/tools/revenv/bin/python (S24); SCRATCH-CAPTURE TRAP (S27-X4): omit
+makedirs(out/save) and dosbox autosave=10 pops a MODAL "Failed to save
+the current state." dialog that swallows EVERY click — always create the
+savedir BEFORE booting, and check for the dialog when clicks "miss";
+0x28fc0 is the DRAW-LIST BUILDER not a timer (S27-X1 — the "delay arg"
+debt was a misidentification; 0x2a428 = assert, ebx=assert-context id).
+
+tNG-S S27 LANDED 2026-11-23 (CYCLE 4 PORT THE SPIN, D22 steering fully
+executed; no OQ row touched — tNG-S tracks none, honest negative under
+strict-close; open=[016,019] unchanged). PROVED + SHIPPED (docs/re/
+_wip_tNGS.md S27):
+ - L3 RATE DEBT CLOSED (S27-X1/X2): the "0x28fc0 delay arg" was a
+   MISIDENTIFICATION (it is the draw-list builder; 0x2900b/0x2a428 =
+   assert with context-id ebx, not a period). Code rate = dispatcher
+   0x27a18 imm 2 at 0x27a32 per msg-0x3b tick (t302 ~1/s) = 2 DEG/S,
+   world-Y. Newgame IS the state==3 branch (well rect match) => latch
+   0x26dd1 ON at init => spins with no input. Agrees with D22 + pixels.
+ - PRODUCTION WITNESS (S27-X4/X5, run tngs4-20261123-010308, 61 frames
+   @1 s, cursor parked (600,250)): big field ~950 changed px/step ctrl 0
+   = ANIMATES; matched bright stars 3.58 px/s = 2.05 deg/s; lag curve
+   FLAT lag1..8 (972-993, no dip at 5) — D22's ~5 s/circuit REFUTED by
+   pixels (2nd independent flat curve after the vendor's); rotation-
+   correlation + single-blob arc = honest negatives (twinkle reclass
+   kills continuity; direction NOT recoverable from 1 s pixels).
+ - BEGIN CLUSTER (S27-X5): positions STATIC (130/145 matched peaks,
+   displacement 0.0) while ~700 px/step churn brightness = the class-
+   cycling law; D22's "both spin" holds as the colour sweep. HARNESS
+   TRAP banked (S27-X4): missing save/ dir -> autosave modal swallows
+   every click (3 false "deaf" fires before root-caused).
+ - PORT (S27-X6): menulaw.h kPreviewSpinDegPerTick=2.0/kPreviewSpinTickMs
+   =1000 + previewSpinWorldY; previewStar(yawDeg) world-Y BEFORE depth;
+   title.cpp ONE accumulator newgameSpinDeg pumps both fields (big =
+   POSITION, Begin = CLASS); S22 hover-only advance + per-frame fudge
+   REMOVED. Pins: rate, world-Y isometry, wiring (source-text), motion+
+   determinism+census; tngs_p4_no_idle_spin_term rewritten SUPERSEDED.
+   MUTATION-VERIFY: M1 rate FAILS, M2 axis FAILS (51), M3 detach FAILS,
+   M4 sign SURVIVES = named seam (direction unmeasured, checklist #5).
+   Suite 498/498 (494+4). OUR PORT ANIMATES: scripts/tNGS4_ours_shot.sh,
+   539 changed px/4 s ctrl 0 (pre-port 0).
+ - W1 CLOSED-BY-USER-REFCAP (S27-X8, D22 rule 3) + composite
+   scratchpad/NG-usergrade.png re-packaged (18/18 PASS t441 rc=0) with
+   NG-checklist.txt cycle-4 text: owns the wrong-at-rest claim, states
+   the 2 deg/s law with both witnesses cited, corrects the 5 s eyeball
+   gently, opens direction (#5) + hover-adder (#6). NEXT =
+   WAIT-USER-GRADE-NG4.
 
 tNG-S S26 LANDED 2026-11-23 (D22 adoption + W1 WITHDRAWAL; no OQ row
 touched — tNG-S tracks none, honest negative under strict-close; open=

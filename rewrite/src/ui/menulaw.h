@@ -416,10 +416,43 @@ inline PreviewDraws previewDraws(std::uint64_t z) {
                         int((z >> 40) % 1000ull) - 500};
 }
 
+// tNG-S CYCLE 4 SPIN LAW (docs/re/_wip_tNGS.md S27; supersedes the S22
+// "no auto-spin" clause WITHDRAWN in S26). The vendor newgame field is
+// the state==3 COSMOSWnd branch (rect 17,12,324,320 — the vision-
+// confirmed newgame well): init 0x26dd1 STORES [win+0xc0]=1, latching
+// rotation ON, and the msg-0x3b pump dispatcher 0x27a18 applies the
+// IMMEDIATE 2 DEG per tick (27a32 `mov dword [esp+0x14],2`; writer
+// 0x283e4 -> FUN_00053584 mixes x,z = WORLD Y per t416 F2). Cadence =
+// t302 live-measured ~1/s. CROSS-CHECKS (run tngs4-20261123-010308,
+// 61 frames @1 s, cursor parked OUTSIDE both fields): matched bright
+// stars move median 3.58 px/s at r~100 = 2.05 DEG/S; vendor refcaps
+// 3.16 content-px/s = 1.8 deg/s. D22's "~5 s circuit" is an eyeball
+// figure — REFUTED by two independent flat lag curves (no dip at lag 5,
+// production 972..993 px, vendor 856..889 px). Mouse position is
+// irrelevant (D22 + production ctrl=0 witness).
+inline constexpr double kPreviewSpinDegPerTick = 2.0;   // 0x27a32 imm
+inline constexpr int kPreviewSpinTickMs = 1000;         // t302 pump
+
+// World-Y rotation of a model point by yawDeg (the vendor latch axis:
+// FUN_00053584 mixes x,z; a screen-plane roll of x,y was the pre-S27
+// defect shape). Pure: same inputs -> same outputs (determinism pin).
+inline void previewSpinWorldY(double x, double z, double yawDeg,
+                              double* ox, double* oz) {
+    if (yawDeg == 0.0) { *ox = x; *oz = z; return; }
+    const double t = yawDeg * 3.14159265358979323846 / 180.0;
+    const double c = std::cos(t), sn = std::sin(t);
+    *ox = x * c + z * sn;
+    *oz = -x * sn + z * c;
+}
+
 // One preview star: model position (normalized box draw x shellRadius),
 // depth-band sprite class, and the projected screen point (perspective
 // divide + 0.5 bias + viewport centre). inWell=false when the point falls
 // outside the cosmos rect (honest clip; NO sphere clip — S5).
+// tNG-S S27: yawDeg rotates the model point about WORLD Y BEFORE the
+// depth band + divide — the vendor pump rotates the camera basis, which
+// is the star-side equivalent; the class (depth band) therefore cycles
+// with the spin (measured: ~950 changed px/s includes reclass churn).
 struct PreviewStar {
     double x, y, z;
     int cls;        // 0..3
@@ -427,7 +460,8 @@ struct PreviewStar {
     bool inWell;
 };
 inline PreviewStar previewStar(int vx, int vy, int vz, double shellRadius,
-                               double cx, double cy, const Rect& well) {
+                               double cx, double cy, const Rect& well,
+                               double yawDeg = 0.0) {
     const double fx = double(vx), fy = double(vy), fz = double(vz);
     const double len = std::sqrt(fx * fx + fy * fy + fz * fz);
     PreviewStar s{};
@@ -435,6 +469,14 @@ inline PreviewStar previewStar(int vx, int vy, int vz, double shellRadius,
         s.x = fx / len * shellRadius;
         s.y = fy / len * shellRadius;
         s.z = fz / len * shellRadius;
+    }
+    // S27 spin: world-Y rotation of the model point BEFORE depth/projection
+    // (isometry: |p| and y are preserved — pinned tngs_s27_*).
+    if (yawDeg != 0.0) {
+        double rx = 0.0, rz = 0.0;
+        previewSpinWorldY(s.x, s.z, yawDeg, &rx, &rz);
+        s.x = rx;
+        s.z = rz;
     }
     const long v = std::lround(s.z);  // depth - 1500 with cam at -1500
     s.cls = v > 220 ? 0 : (v >= 1 ? 1 : (v >= -219 ? 2 : 3));
