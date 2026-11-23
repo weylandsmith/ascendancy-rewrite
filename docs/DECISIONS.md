@@ -609,3 +609,18 @@ ASSISTANT MEASUREMENT (scripts/d22_star_spin_witness.py + cluster pass):
   consecutive 1 s shots (displacement arc), not whole-region diff.
 - ANY loop claim that spin is mouse-band-gated is REFUTED by this
   witness (captured with mouse parked) — retract it where written.
+
+## D23 — USER STOPWATCH REFUTES SHIPPED SPIN RATE (2026-11-23, verbatim)
+
+> I just timed the rotation with a stopwatch five times. Tracking a
+> particular tan/orange star as it makes a circuit, every measurement
+> was about 5.3 seconds to complete a rotation.
+
+ASSISTANT ANALYSIS: shipped law (2 deg/tick @ ~1/s = 180 s/circuit)
+and user's 5.3 s differ ~36x. Re-verified the asm: the +/-2 deg delta
+and the basis-rotation applier are REAL (0x27a18/0x283e4/0x53584, read
+from work/ascend_restored.bin this session). The broken leg is the
+CADENCE: ~1/s is a t302 GALAXY-MAP figure inherited onto this screen,
+and the cited re-posting fn 0x28fc0 contains no timer call (verified
+asm 0x28fc0..0x29010). 2 deg at ~36 Hz = 5.6 s = user's figure. tNG-R
+queued: breakpoint hit-count at 0x27a18 on New Game settles it.

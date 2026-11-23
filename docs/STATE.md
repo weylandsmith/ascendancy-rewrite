@@ -233,50 +233,44 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT WAIT-USER-GRADE-NG4 (tNG-S cycle 4 LANDED IN FULL: rate derived
-from code + two independent pixel witnesses, spin PORTED with pins,
-composite re-packaged). Ordering rationale: the spin defect the user
-named (D22) is fixed and pinned; every remaining tNG-S seam (rotation
-DIRECTION, hover rate-adder, Begin-sprite size) needs either the user's
-eyes (direction is gradeable in 20 s on the shipped composite) or is a
-polish row only the user can prioritize. Do NOT start a new probe family
-while a grade is pending — the tNG-S branch idles here by design (the
-standing OQ-016/OQ-019 live-capture routes are the OTHER trigger path:
-if a new sitting exists, r1_t85g_sitting.py first).
-IF THE GRADE ANSWERS:
-  - "wrong direction" -> sign flip is ONE character in
-    rewrite/src/ui/menulaw.h previewStar's call of previewSpinWorldY
-    (mutation M4 surviving = the known seam); re-run suite + re-package.
-  - "hover speeds it up" -> re-arm a rate adder ONLY with a witness:
-    reuse scripts/r_tNGS4_rate_session.py with PARK_XY INSIDE
-    kPreviewSpinZone (379,420,493,472) and compare matched-star px/s
-    against the parked-witness baseline 3.58 px/s (run 010308).
-  - "both good" -> tNG-S closes; next = Begin-cluster sprite size/dots
-    polish (checklist items 7-8) or the loop's OQ rows.
-TRIGGER CHECK (standing): tail DECISIONS.md = D22 (recorded d997ab6);
-ring turn test scripts/t368_ring_turn.py (1086 = no new sitting; >1086
--> re-run scripts/r1_t85g_sitting.py FIRST per the standing rule).
-GAME: production ring HEALTHY (pid 1470999, TL expiry 2026-11-24 14:53,
-turn 1086 re-verified this iteration; sitting check NEGATIVE).
-NEVER pkill Xvfb with -u (matches :9). Kill scratch orphans by exact PID.
-KNOWN (do NOT re-derive): Z1 star law S15; W1 CLOSED-BY-USER-REFCAP
-(S27-X8: both fields spin continuously, mouse-independent; 2 deg/s code
-+ 2.05 blob-fit + 1.8 vendor; D22's ~5 s = eyeball, refuted by TWO flat
-lag curves); spin port S27-X6 (menulaw.h kPreviewSpinDegPerTick/TickMs +
-previewSpinWorldY; title.cpp ONE accumulator newgameSpinDeg — big field
-POSITION + Begin cluster CLASS); +-2deg t416 = COSMOS MAP law, SAME
-constant now on the newgame preview via the state==3 latch (0x26dd1) —
-NOT a re-derivation; pump ~1/s t302; projection+camera cycle-1 S5;
-colour law tNG-F1; Begin panel /5+5; RFB = only proven firing channel
-(t439); dbg build is INPUT-DEAF at fresh Xvfb (S22/R-tNGS3c); xsend
-presses synthetic (S17); x11vnc needs LD_LIBRARY_PATH (S18); fresh-Xvfb
-window origin (80,100) (S18); PIL scripts run under
-~/tools/revenv/bin/python (S24); SCRATCH-CAPTURE TRAP (S27-X4): omit
-makedirs(out/save) and dosbox autosave=10 pops a MODAL "Failed to save
-the current state." dialog that swallows EVERY click — always create the
-savedir BEFORE booting, and check for the dialog when clicks "miss";
-0x28fc0 is the DRAW-LIST BUILDER not a timer (S27-X1 — the "delay arg"
-debt was a misidentification; 0x2a428 = assert, ebx=assert-context id).
+NEXT tNG-R PUMP CADENCE MEASUREMENT — USER STOPWATCH REFUTES SHIPPED
+RATE (D23; supersedes WAIT-USER-GRADE-NG4 — do NOT re-package until the
+rate is settled; user timed 5.3 s/circuit x5 on a tan/orange star,
+shipped law says 180 s; both cannot be true).
+ASSISTANT VERIFICATION 2026-11-23 (re-read asm, agree with S27-X2):
+ per-tick delta IS the immediate +/-2 deg at 0x27a18 (latch byte
+ window+0xC0; New Game inits bit0 at 0x26dd1 => +2 forever; mouse
+ never consulted). Applier 0x283e4: deg->rad (fmul [0x9f108]), then
+ 0x53584/0x53554 rotate the camera BASIS at wnd+0x14e IN PLACE (no
+ angle variable). THE UNPROVEN LEG IS CADENCE: "~1/s" is inherited
+ from t302 measured on the GALAXY MAP, not this screen; S26's "self-
+ reposting one-shot" note names fn 0x28fc0 whose body we verified has
+ NO timer call => cadence chain is BROKEN, not merely unmeasured.
+ User's 5.3 s = 2deg/tick at ~36 Hz (frame-loop-shaped!). Assistant
+ blob-forensics on D22 refcaps INCONCLUSIVE (median 22 px/s matched
+ blobs; matcher confuses twinkle with motion; scripts/d22b_*.py) -
+ do not re-litigate with those files.
+MEASURE (scratch DOSBox-X + debugger, blanket grant, savedir law):
+ 1. BP 0x27a18 entry, hit-count per wall second while sitting on New
+    Game (mouse parked). If hits/s ~36: cadence=frame loop; user is
+    RIGHT; shipped 180 s is WRONG by ~36x.
+ 2. ALSO log [esi+0xC0] at each hit (does anything ever flip bits?)
+    and esi (is the New Game window the one hit? confirm state==3
+    window object vs galaxy map window - the 1/s t302 figure may be
+    true for the MAP and false here).
+ 3. If cadence hits/s * 2deg does NOT reproduce ~5.3 s, then the
+    user's star may be tracked on a DIFFERENT structure (e.g. the
+    Begin panel field cycles colors - could read as a fast circuit?
+    or a bright star crossing near side). Say so plainly; do not
+    fudge either direction.
+FIX (if cadence confirms): rewrite/src/ui/menulaw.h kPreviewSpinTickMs
+ 1000 -> measured (one constant + pins); re-run suite; re-derive the
+ Begin-panel beat from the SAME measurement; DIRECTION seam: while the
+ debugger session is open, ALSO capture two refcap shots ~1/3 circuit
+ apart to fit signed arc -> closes checklist item 5 for free.
+CLOSE: cadence number cited by hit-count log; rate law = delta x
+cadence both fields; pins updated; suite green; THEN re-package NG5
+and rewrite NEXT WAIT-USER-GRADE-NG5. Budget <=2 cycles.
 
 tNG-S S27 LANDED 2026-11-23 (CYCLE 4 PORT THE SPIN, D22 steering fully
 executed; no OQ row touched — tNG-S tracks none, honest negative under
