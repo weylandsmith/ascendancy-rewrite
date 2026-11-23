@@ -986,3 +986,62 @@ basis level (newgame only; map dial directions unchanged, t416 F2).
 - Suite 498/498. MUTATION CHECK PARTIAL (budget): circuit-band pin kills any
   slow-cadence mutation by construction; the SIGN negation is NOT
   mutation-verified this iteration (pixel channel needed) — named residue.
+
+## S29. CYCLE 5 RE-PACKAGE — SIGN AUDIT FINDING FIRST (2026-11-23, steering D24)
+### S29-X1 THE SHIPPED WIRING VIOLATES THE D24 USER LAW (double negation)
+D24's assistant check computed the menulaw FORMULA at raw +2 deg (near z=-400
+sx 200->190.24 LEFT) and declared the seam closed. But title.cpp:558 passes
+previewYaw = -newgameSpinDeg (the S28-X3 negation), so the COMPOSED shipped
+behaviour was never checked. Composition audit this session (/tmp/
+s29_sign_check.cpp, g++ -I rewrite/src, run rc=0):
+  formula +2deg:   near sx 200->190 LEFT ; far 200->206 RIGHT   (== D24 law)
+  shipped (yaw=-spin): near sx 200->210->219->229->239->248 RIGHT every tick;
+                       far LEFT every tick.  == LAW INVERTED in both fields
+  (beginYaw at title.cpp:1115 carries the same negation).
+READ-BACK: the S28-X3 sign argument (camera basis +2/fire => apparent stars
+-2/fire => negate the star-model term) double-counted the inversion: the
+vendor's apparent-star result IS what raw +2 deg on the star model produces
+(measured azimuth increase + user near-left law are the SAME fact about one
+rotation; converting camera->star terms is the one inversion, not two).
+The pre-S28 code (no negation) was direction-CORRECT; S28 broke it while
+fixing cadence. Cadence (tick 32 ms) is untouched by this.
+FIX: remove BOTH negations (previewYaw = newgameSpinDeg; beginYaw =
++spin*rad), then add the steering-requested unit pin (near-side star sx
+strictly decreases per +kPreviewSpinDegPerTick shipped tick) + a source-text
+pin that title.cpp passes the accumulator UNNEGATED. Mutation-verify by
+re-negating and confirming the pins FAIL.
+### S29-X2 FIX + PINS + MUTATION-VERIFY (suite 500/500)
+- title.cpp:558 previewYaw = newgameSpinDeg (negation REMOVED); title.cpp
+  beginYaw likewise un-negated (same double-inversion). Cadence constants
+  untouched (tick 32 ms, 2 deg/tick).
+- NEW PINS (test_newgame_behavior_tNGB.cpp):
+  tngs_s29_near_star_moves_left_per_tick — composes the shipped accumulator
+  exactly; near on-axis star (z=-400) sx STRICTLY decreases and far star
+  strictly increases per +2 deg tick, 35 ticks (0..70 deg window; the
+  monotone window is measured, /tmp/s29 sweep: strict through 72 deg, flat
+  px quantisation past ~73 deg near the camera plane — window pinned, not
+  hand-waved).
+  tngs_s29_title_wiring_is_unnegated — source-text pin:
+  "const double previewYaw = newgameSpinDeg;" present AND "-newgameSpinDeg"
+  absent anywhere in title.cpp (S28-X3 defect shape killed at the text level;
+  closes the S28-X4 sign-mutation residue).
+- MUTATION-VERIFY (S28-X4 residue CLOSED):
+  M1 previewSpinWorldY R(-t) (true inverse rotation): FAILS 71 tests incl.
+  both direction claims (tngs_s29 ln399, tngs_s27 isometry ln427) — DEAD.
+  M2 previewYaw re-negated in title.cpp: FAILS the wiring pin (ln416) — DEAD.
+  Both reverted; suite re-run 500/500 (498 + 2 new).
+- PIXEL WITNESS post-fix (scripts/tNGS4_ours_shot.sh run 12:16): 1095
+  changed px total / 774 in-well over 4 s ctrl 0 = animates at tick 32.
+- PACKAGE NG5: scratchpad/NG-checklist.txt rewritten (cycle 5: owns the
+  30x mis-ship as poll-rate transfer, CONFIRMS the 5.3 s stopwatch with the
+  dbg-tngr-20261123-103130 + basis-integration witnesses, states the CLOSED
+  direction item honestly incl. the caught-in-time inversion, renumbers open
+  items 5-7 = hover-adder / right-edge chrome / Begin-cluster sprites);
+  tNGU_composite.py ng_t0.png + newgame-original.png ->
+  scratchpad/NG-usergrade.png 1290x1782, 18/18 PASS, t441 rc=0.
+  (scratchpad/ is gitignored — package artifacts live on disk, not in git.)
+### S29 VERDICT
+Cadence law SHIPPED and pinned; direction law SHIPPED UN-NEGATED, pinned
+behaviourally + at source text, and mutation-proof; S28-X4 residue closed;
+NG5 packaged. No OQ row touched (tNG-S tracks none — honest negative).
+NEXT = WAIT-USER-GRADE-NG5.

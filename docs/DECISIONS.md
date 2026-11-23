@@ -639,3 +639,16 @@ title.cpp:459 does): near star (z=-400) sx 200.00->190.24 LEFT; far
 star (z=+400) 200.00->205.65 RIGHT. == USER LAW. Direction seam
 (S27-X2 "screen-side direction NOT pixel-verified") CLOSED by user
 witness; NO code change; the sign we shipped is the vendor's.
+
+AMENDMENT (S29, same day): the ASSISTANT CHECK above validated the menulaw
+FORMULA at raw +2 deg, not the SHIPPED composition — title.cpp fed the
+accumulator NEGATED (the S28-X3 camera->star conversion), so the composed
+field ran near-side RIGHT (law inverted). The S28-X3 argument
+double-counted the inversion: the measured basis-azimuth increase and the
+user near-left law are the SAME fact about one rotation; converting
+camera->star terms is one inversion, not two. FIX SHIPPED S29: both
+negations removed (previewYaw, beginYaw); pins
+tngs_s29_near_star_moves_left_per_tick + tngs_s29_title_wiring_is_unnegated;
+mutations M1 (inverse rotation) and M2 (re-negation) both die. USER LAW
+stands unchanged; what closed by witness is the LAW, what closes S29 is the
+COMPLIANCE (pins, docs/re/_wip_tNGS.md S29-X1/X2).

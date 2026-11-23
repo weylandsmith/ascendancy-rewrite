@@ -372,6 +372,52 @@ TEST(tngs_s28_spin_rate_is_two_deg_per_tick_at_frame_cadence) {
     CHECK(circuit >= 5.4 && circuit <= 6.3);
 }
 
+TEST(tngs_s29_near_star_moves_left_per_tick) {
+    // D24 USER LAW (docs/DECISIONS.md): clockwise from above == NEAR-side
+    // stars move LEFT, far-side RIGHT. Steering S29 requires: the near-side
+    // star's sx STRICTLY DECREASES per shipped +2 deg tick. Composition
+    // audit found the S28-X3 negation inverted this (near RIGHT); this pin
+    // kills a re-negation mutation without pixels. The shipped wiring is
+    // previewStar(..., previewYaw) with previewYaw = +newgameSpinDeg
+    // (title.cpp), so the pin composes the accumulator exactly as shipped.
+    const ascend::ui::Rect well{-1000, -1000, 1000, 1000};
+    double spin = 0.0;
+    int prevNear = ascend::ui::previewStar(0, 0, -400, 400.0, 200.0, 190.0,
+                                           well, spin).sx;
+    int prevFar = ascend::ui::previewStar(0, 0, 400, 400.0, 200.0, 190.0,
+                                          well, spin).sx;
+    // Window 0..70 deg: strictly monotone at integer px (measured sweep
+    // /tmp/s29 probe: near on-axis star 200->11 LEFT every tick through
+    // 72 deg; beyond ~73 deg the star nears the camera plane and pixel
+    // quantisation goes flat — geometry, not direction).
+    for (int tick = 1; tick <= 35; tick++) {
+        spin += ascend::ui::kPreviewSpinDegPerTick;
+        const int nearSx = ascend::ui::previewStar(0, 0, -400, 400.0, 200.0,
+                                                   190.0, well, spin).sx;
+        const int farSx = ascend::ui::previewStar(0, 0, 400, 400.0, 200.0,
+                                                  190.0, well, spin).sx;
+        CHECK(nearSx < prevNear);  // near star moves LEFT every tick
+        CHECK(farSx > prevFar);    // far star moves RIGHT every tick
+        prevNear = nearSx;
+        prevFar = farSx;
+    }
+}
+
+TEST(tngs_s29_title_wiring_is_unnegated) {
+    // Source-text pin (tngs_s27_pump_wiring_pin precedent): the shipped
+    // accumulators must enter the draw terms UNNEGATED. "-newgameSpinDeg"
+    // is the S28-X3 double-inversion defect shape.
+    std::ifstream in(kRepo + "/rewrite/src/ui/title.cpp");
+    const std::string src = [&] {
+        std::stringstream ss;
+        ss << in.rdbuf();
+        return ss.str();
+    }();
+    CHECK(src.find("const double previewYaw = newgameSpinDeg;") !=
+          std::string::npos);
+    CHECK(src.find("-newgameSpinDeg") == std::string::npos);
+}
+
 TEST(tngs_s27_spin_is_world_y_and_isometric) {
     // The vendor latch axis (FUN_00053584 mixes x,z = world Y, t416 F2).
     // Pin: y preserved, |p| preserved (isometry), and a 90-deg yaw maps

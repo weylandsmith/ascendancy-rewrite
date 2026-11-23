@@ -233,27 +233,59 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-S S29 — NG5 RE-PACKAGE + CLOSE THE REMAINING SEAMS. Ordering
-rationale: the rate law is now MEASURED and SHIPPED (S28: tick 32 ms,
-60-65 deg/s, 5.6-6.1 s circuit; user stopwatch vindicated), so the NG4
-grade package's rate claim is stale and re-packaging was blocked on exactly
-this measurement ("do NOT re-package until the rate is settled" — D23).
-1. REWRITE scratchpad/NG-usergrade.png + NG-checklist.txt cycle-5 text:
-   state the 60-65 deg/s law with the dbg-tngr-20261123-103130 witness, own
-   the 180 s mis-ship (poll-limited census transfer), CONFIRM the user's
-   5.3 s stopwatch, and state the direction result (camera basis +2 deg/fire
-   world-Y; apparent stars drift -; checklist #5 closed at the basis level).
-   Re-run the t441-style rc=0 verification before declaring packaged.
-2. SIGN MUTATION RESIDUE (S28-X4): our port's negated previewYaw is NOT
-   mutation-verified. Cheapest decisive check: run scripts/tNGS4_ours_shot.sh
-   pair at tick 32 and confirm >0 changed px/step ctrl 0 (rate pin survives),
-   and add a pure unit pin asserting previewStar(100,0,0,...,+2deg) moves x
-   toward 0 while -2deg moves x away (kills a re-negation mutation without
-   pixels). Do this BEFORE re-packaging so the package cites a verified sign.
-3. THEN rewrite NEXT = WAIT-USER-GRADE-NG5. Do NOT re-open the cadence
-   question (docs/REFUTED-ROUTES.md S28 block: poll-counts and 1 s blob
-   fits are dead channels).
-Budget <=2 cycles.
+NEXT = WAIT-USER-GRADE-NG5. Ordering rationale: S29 closed both shipped
+seams — cadence (tick 32 ms, circuit-band pin) AND direction (the S28-X3
+double-inversion was caught by the steering audit and removed; behavioural
+pin + source-text pin + mutations M1/M2 banked, suite 500/500) — and the
+NG5 package is on disk: scratchpad/NG-usergrade.png 1290x1782, 18/18 PASS
+t441 rc=0, with the cycle-5 checklist (speed owned, 5.3 s confirmed,
+direction CLOSED-by-user-witness, open items 5-7 = hover-adder / right-edge
+chrome / Begin-cluster sprites). Nothing ships ahead of the user's grade.
+IF THE HARNESS FIRES THIS SESSION ANYWAY (no grade yet), do exactly:
+1. Verify the tree is still green and the package reproducible: rebuild,
+   run_tests 500/500, gate 0, ledger OK, and re-run
+   ~/tools/revenv/bin/python scripts/tNGU_composite.py
+   /tmp/tngs4_ours/ng_t0.png scratchpad/newgame-original.png
+   scratchpad/NG-usergrade.png --checklist scratchpad/NG-checklist.txt
+   (regen ng_t0 first via scripts/tNGS4_ours_shot.sh if /tmp was cleared).
+2. Then do NOT invent new spin work: docs/REFUTED-ROUTES.md S28 block kills
+   poll-counts and 1 s blob fits as cadence channels, and the direction is
+   pinned both ways. The nearest unblocked ledger work is the user-open
+   items themselves — hover-adder measurement (cursor-in-zone witness on the
+   ORIGINAL, run dbg-tngr harness with mouse parked INSIDE kPreviewSpinZone
+   379,420-493,472 vs outside, basis-counter method of S28-X3) is the one
+   with a live instrument; pick it only if the tree is green and note it as
+   checklist-item-5 work, not an OQ row.
+Budget <=1 cycle.
+
+tNG-S S29 LANDED 2026-11-23 (SIGN DOUBLE-INVERSION CAUGHT + REMOVED,
+MUTATION-PROVED; NG5 PACKAGED; no OQ row touched — tNG-S tracks none, honest
+negative under strict-close; open=[016,019] unchanged). PROVED (docs/re/
+_wip_tNGS.md S29-X1/X2, steering D24 executed):
+ - S29-X1 THE SHIPPED WIRING VIOLATED THE D24 LAW. The D24 check validated
+   the menulaw FORMULA at raw +2 deg, never the composition: title.cpp fed
+   previewYaw = -newgameSpinDeg (S28-X3), so near-side stars moved RIGHT.
+   Composition probe (/tmp/s29_sign_check.cpp, g++ -I rewrite/src): raw +2
+   near 200->190 LEFT (== law); shipped negated 200->210->...->248 RIGHT.
+   Root read-back: azimuth-increase and near-left are ONE fact about one
+   rotation; the camera->star conversion is a single inversion, S28 applied
+   it twice. Cadence constants untouched.
+ - FIX + PINS (suite 500/500 = 498+2): both negations removed (previewYaw,
+   beginYaw); tngs_s29_near_star_moves_left_per_tick (near z=-400 sx
+   strictly decreases / far strictly increases per +2 deg tick, 35 ticks —
+   window measured strict through 72 deg, flat past ~73 at px quantisation);
+   tngs_s29_title_wiring_is_unnegated (source-text: "previewYaw =
+   newgameSpinDeg" present, "-newgameSpinDeg" absent).
+ - MUTATION-VERIFY (S28-X4 residue CLOSED): M1 previewSpinWorldY=R(-t)
+   FAILS 71 incl. both direction pins; M2 re-negation FAILS the wiring pin;
+   both reverted, re-run green. PIXEL WITNESS: tNGS4_ours_shot.sh 1095 px /
+   774 in-well over 4 s ctrl 0 = animates post-fix.
+ - NG5 PACKAGE: scratchpad/NG-checklist.txt cycle-5 (owns the 30x mis-ship,
+   CONFIRMS 5.3 s, direction CLOSED-by-user-witness, open 5-7 = hover-adder/
+   right-edge/Begin-sprites) + tNGU_composite -> scratchpad/NG-usergrade.png
+   1290x1782 18/18 PASS t441 rc=0. docs/DECISIONS.md D24 amended (law stands;
+   S29 closes COMPLIANCE).
+ - NEXT = WAIT-USER-GRADE-NG5 (above).
 
 tNG-R S28 LANDED 2026-11-23 (PUMP CADENCE MEASURED — USER VINDICATED, SHIPPED
 RATE WAS 30x SLOW; no OQ row touched — tNG-S tracks none, honest negative
