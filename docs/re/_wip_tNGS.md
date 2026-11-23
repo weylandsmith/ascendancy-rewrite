@@ -620,3 +620,11 @@ trusted):
 - GAME ring HEALTHY: pid 1470999 up 08:10, Xvfb :9 + x11vnc 5910 alive.
   Timeline tail 2000 lines: turn_max 1086 => NO new sitting (no steering).
 No content changes were needed; adoption = verify + commit + NEXT rewrite.
+
+## S25. STRAY scratcphad/ DIR (typo) — UNEXPLAINED, LEFT UNTRACKED
+15 desktop screenshots (512x398) landed in ./scratcphad/ at 23:03-23:04
+while this session ran. Content = the VENDOR newgame screen (DOSBox menu
+bar visible). No script in scripts/ or work/r1 writes that path (grep).
+Not mine; left untracked, NOT committed, NOT deleted. BONUS corroboration
+(free): frame 1 vs 15 (~12 s apart) whole-frame changed px = 1263/203776
+(0.6% twinkle floor) — independent support for the S22 no-auto-spin verdict.
