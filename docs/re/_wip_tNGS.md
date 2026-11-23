@@ -873,3 +873,116 @@ field ~950 changed px/step ctrl 0, matched stars 3.58 px/s [S27-X4/X5];
 (c) static law: state==3 latch store 0x26dd1 + pump imm 2 @0x27a28..32
 [S27-X2/X3]. Rate = 2 deg/s (code wins per D22; blob fit agrees). PORTED
 (S27-X6) with pins; direction = named seam (S27-X7).
+
+## S28. CYCLE 5 — tNG-R PUMP CADENCE (assigned; user stopwatch 5.3 s vs shipped 180 s)
+### S28-X0 STATIC CADENCE CHAIN (pre-session, base-0 work/ascend_restored.bin, revenv capstone)
+- NO immediate msg-0x3b poster: d32 `mov edx,0x3b` = 0 hits; push 0x3b = 0 hits.
+  The pump msg id is NOT hardcoded at the dispatch call — it flows through the
+  window SCHEDULER queue. Chain (verified asm this session):
+  POSTER 0x26c66 (loop tail of the 0x26b34-region fn; 0x26bcf `cmp ebx,7;
+  jge 0x26c66`): `push 0; mov ebx,0x3b; mov eax,0x7a35c; mov ebp,0x168;
+  mov edx,[esi+0x41]; push 0; xor ecx,ecx; xor edi,edi; call 0x56374`.
+  SCHEDULER 0x56374: scans 17 slots stride 0x16 at [win+0x44ae]; free slot gets
+  msg word at +0x44b2 (=bx low word), param1 +0x44ae, +0x44b4, +0x44b8, and
+  FIRE-TIME dword +0x44c0 = [DAT_000a2044] + ebp (0x563f4..0x56401). => msg 0x3b
+  is a SELF-REPOSTING DELAYED message: delay = 0x168 = 360 units of whatever
+  clock DAT_000a2044 counts (unit UNKNOWN statically — ms? ticks? that IS the
+  open leg). This is the cadence chain S26 said was broken: it exists, but its
+  period is a data value whose clock unit is not statically decidable here.
+- Corollary (t302 ~1/s figure): consistent with delay 360 @ ~1 kHz clock, but
+  a frame-loop clock (60 Hz) would give 6 s, and 36 Hz ~10 s. NOT decidable.
+- Latch/pump/applier re-verified verbatim (S27-X2 stands): 0x27a18 gates on
+  [esi+0xc0] bit0, delta imm ±2, call 0x283e4; 0x283e4 fmuls [0x9f108]
+  (pi/180) and rotates the basis at win+0x14e via 0x53584 (edx=-1) — 0x53584
+  rotates [eax+0xc] and [eax+0x18] = win+0x15a/+0x166 (up,fwd per 0x26a9c init:
+  eye@+0x10e=(0,0,-1500), A@+0x14e=(1,0,0), up@+0x15a=(0,1,0), fwd@+0x166=(0,0,1)).
+  => LIVE INTEGRATION WITNESS AVAILABLE: dump win+0x14e..0x180 per pump fire;
+  accumulated rotation / accumulated guest-run time = the rate law, aliasing-
+  free (this closes S27-X7's twinkle-negative by a different channel).
+- S28-X0b CLOCK TICKER: DAT_000a2044 has exactly ONE increment site, fn 0x53d84
+  (`inc dword [0xa2044]; ret`). The dword at file 0x8b35c == 0x53d84 sits in an
+  EDGE-STEPPING table (0x735f3 raster loop indexes [ebp*4+0x8b350] as a y-step
+  LUT) — a numeric coincidence, NOT a callback registration. No static
+  reference to 0x53d84 as a handler exists => the tick source is installed at
+  runtime (DPMI/IRQ/timer hook). Cadence unit is NOT statically decidable;
+  Phase D measures units/s live.
+### S28-X1 PASS 1 RESULT (run dbg-tngr-20261123-102741, rc=0) — PUMP LEG COLD AT NEWGAME
+- BREAK lottery won (relaunch attempt 1); leg w1_pump 0x27A18 armed BPLIST
+  '00. BP 0160:1E6E68' (= P0+0x27a18 exact); New Game click fired
+  (after_ng_orange 0.006, vision-confirmed NEWGAME screen 04_after_ng_click.png);
+  cursor parked (600,250). 30 s armed window, 12-stop budget: ZERO FIRES.
+- READ: the msg-0x3b pump leg (the 2-deg applier) DOES NOT RUN at the newgame
+  screen. The frame-loop hypothesis for a 5.3 s spin (2 deg/tick @ ~36 Hz) is
+  REFUTED at this leg. Two survivors: (a) msg 0x3b never posts to the newgame
+  window (spin law = campaign-map only; the field's visible churn is the
+  CLASS-CYCLING law — D23's own alternative); (b) a gate between handler entry
+  and the leg. DISCRIMINATOR (pass 2): arm cos_hdlr ENTRY 0x26b34 too; bank
+  msg=[esp+0x38] (t425 law) + esi per stop. If 0x3b reaches the entry but not
+  the leg -> gate; if no 0x3b ever -> no pump scheduled here, period.
+- Cross-check banked: t302/t305/t318 census measured msg-0x3b ~1/s ON THE
+  CAMPAIGN MAP (cos_hdlr/s2_56cda legs). The S27-X2 chain silently TRANSFERRED
+  that cadence to newgame — the transfer is now measured FALSE at the leg.
+- Note: S27-X4's ~950 changed-px/step at newgame STANDS (field animates) but
+  its spin INTERPRETATION is now contested by X1. S22's tol-6 centroid said
+  positions STATIC; both pixel channels + this leg agree on NO POSITION SPIN.
+### S28-X2 PASS 2 RESULT (run dbg-tngr-20261123-103130, rc=0, attempt 4) — USER VINDICATED
+- Pump leg 0x27a18 FIRES at newgame: 12 stops, win=0xfd2310, latch=1 (bit0)
+  every fire. (Pass-1 zero-fires = artifact: leg armed but BREAK cadence lost
+  it; the cos_hdlr entry leg never armed that run — lesson: verify BPLIST
+  shows BOTH legs before trusting a zero.)
+- BASIS INTEGRATION (aliasing-free): camera fwd azimuth at win+0x166 sampled
+  stopped->RUN->stopped, 5 windows T=2.25/2.25/2.25/5.25/10.25 s wall:
+  az (-147.3->-43.3->88.7->-143.3->154.7->76.7). fwd.y CONSTANT 0.3796 across
+  all samples => pure world-Y rotation, no tilt. Wrap-consistent deltas
+  (+104,+132,+128,+298,+282) => 46-66 deg/s (dump-overhead 0-0.5 s family);
+  ALL rotation happens while RUNNING (gap deltas exactly 0.0 — the dump
+  quiescence law self-proved).
+- FIT: 59-65 deg/s == user stopwatch 360/5.3 = 67.9 deg/s. The shipped
+  2 deg/s (180 s/circuit) is REFUTED by ~30x. Frame-loop-shaped: 2 deg/tick
+  at ~30 Hz (cadence = msg-0x3b repost delay 360 units on a ~10.8 kHz clock).
+- SIGN: azimuth increases while latch=1 (init-only, mouse parked) => +2 deg
+  world-Y is the NEWGAME direction => DIRECTION SEAM (checklist #5) CLOSED for
+  newgame at the basis level (azimuth = atan2(fwd.x, fwd.z), stored law).
+- HIT-COUNT CAVEAT banked: banked inter-fire gaps 2.45 s = debugger poll
+  overhead lower-bound, NOT cadence (30 s window / 12-stop budget). Do not
+  cite hit-count at a hot leg as cadence on this instrument.
+- CLOCK SAMPLE DEFECT: dump_mem tag 'clk' reused -> same file overwritten;
+  only last sample survived (=0x0) => units/s unmeasured in this run. Pass 3
+  = dedicated ticker census: leg 0x53D84 (`inc dword [0xa2044]; ret`, the ONLY
+  incrementer), count stops over wall T + unique-tag clock samples + 17-slot
+  scheduler scan (stride 0x16, msg word +4, fire_at +0x12) for the pending
+  0x3b slot. cadence = units/s / 360 decides 30 vs 36 Hz exactly.
+### S28-X3 CADENCE VERDICT (from S28-X2 data; basis = exact fire counter)
+Each pump fire rotates EXACTLY +2 deg (imm 2 @0x27a32, applier verified), so
+the azimuth integral IS a hit-count log: fires = dtheta/2.
+  T=2.25 s windows: +104,+132,+128 (k=0) -> 23-33 fires/s
+  T=5.25 s window: -62+360=+298 (k=1) -> 28.4 fires/s
+  T=10.25 s window: -78+720=+642 (k=2) -> 31.3 fires/s
+Constant-rate fit UNIQUELY selects k=0/1/2 (k=1 at 2.25 s => 207 deg/s would
+require wrapped +7 at 5.25 s, observed -62 — excluded). CADENCE ~30 +/-4
+fires/s => RATE 60-66 deg/s => CIRCUIT 5.5-6.0 s.
+USER STOPWITNESS CONFIRMED (5.3 s = 67.9 deg/s). SHIPPED 2 deg/s (180 s)
+REFUTED by ~30x. tNGS4 blob fit (S27-X5 "3.58 px/s = 2.05 deg/s") ALSO
+REFUTED: tol-6 centroid matcher at 1 s cadence against ~100 px steps can only
+match twinkle coincidences — the exact trap REFUTED-ROUTES ln1607 names.
+t302 "~1/s" RE-READ: the census banked at most 6 stops/window and the pty
+count tracked our ~1 s poll loop => it measured POLL RATE, never cadence; the
+transfer of that figure to the spin law was the root error.
+CLOCK LEG FAILED (honest): units/s unmeasured — dump_mem tag collision
+overwrote every sample (filename = tag+addr; constant tag 'clk'), and the
+final surviving sample read 0x0 (mapping of DAT_000a2044 unverified). Cadence
+cited from the basis counter instead. Scheduler slot layout guess was garbage
+(msg 0x600) — layout stays unverified; do not cite slot offsets.
+DIRECTION: azimuth atan2(fwd.x, fwd.z) INCREASES with latch=1 bit0, mouse
+parked => +2 deg world-Y is the newgame direction. Checklist #5 CLOSED at the
+basis level (newgame only; map dial directions unchanged, t416 F2).
+### S28-X4 FIX LANDED (rate + sign; suite 498/498)
+- menulaw.h kPreviewSpinTickMs 1000 -> 32 (band 28-33 fires/s cited; circuit
+  law pin 5.4-6.3 s added; kPreviewSpinDegPerTick 2.0 unchanged); comments
+  rewritten to cite dbg-tngr-20261123-103130 and to name the two refuted
+  channels (poll-limited map census; 1 s blob matcher).
+- title.cpp previewYaw = -newgameSpinDeg AND beginYaw negated (camera-basis
+  +2/fire => apparent star/class drift -2/fire; checklist #5 CLOSED newgame).
+- Suite 498/498. MUTATION CHECK PARTIAL (budget): circuit-band pin kills any
+  slow-cadence mutation by construction; the SIGN negation is NOT
+  mutation-verified this iteration (pixel channel needed) — named residue.

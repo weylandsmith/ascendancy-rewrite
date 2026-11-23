@@ -356,11 +356,20 @@ TEST(tngs_p4_no_idle_spin_term) {
     CHECK(s1.sx == s2.sx && s1.sy == s2.sy && s1.cls == s2.cls);
 }
 
-TEST(tngs_s27_spin_rate_is_two_deg_per_tick) {
+TEST(tngs_s28_spin_rate_is_two_deg_per_tick_at_frame_cadence) {
     // S27-X2 [verified asm]: pump dispatcher 0x27a18 applies the IMMEDIATE
-    // 2 at 0x27a32 per msg-0x3b tick; cadence t302 ~1/s.
+    // 2 at 0x27a32 per msg-0x3b tick. CADENCE S28-X3 [MEASURED, run
+    // dbg-tngr-20261123-103130]: basis integration 60-65 deg/s =>
+    // 28-33 fires/s => tick 32 ms (circuit 5.6-6.1 s; user stopwatch 5.3 s).
+    // The pre-S28 pin value 1000 ms was the poll-limited t302 "~1/s"
+    // transferred from the campaign map — REFUTED ~30x.
     CHECK(au::kPreviewSpinDegPerTick == 2.0);
-    CHECK(au::kPreviewSpinTickMs == 1000);
+    CHECK(au::kPreviewSpinTickMs == 32);
+    // Circuit law pin: 360 deg at the shipped rate must land in the measured
+    // 5.4-6.3 s band (kills any mutation that restores a slow cadence).
+    const double circuit =
+        360.0 / au::kPreviewSpinDegPerTick * au::kPreviewSpinTickMs / 1000.0;
+    CHECK(circuit >= 5.4 && circuit <= 6.3);
 }
 
 TEST(tngs_s27_spin_is_world_y_and_isometric) {

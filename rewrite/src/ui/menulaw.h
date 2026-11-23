@@ -416,22 +416,29 @@ inline PreviewDraws previewDraws(std::uint64_t z) {
                         int((z >> 40) % 1000ull) - 500};
 }
 
-// tNG-S CYCLE 4 SPIN LAW (docs/re/_wip_tNGS.md S27; supersedes the S22
-// "no auto-spin" clause WITHDRAWN in S26). The vendor newgame field is
-// the state==3 COSMOSWnd branch (rect 17,12,324,320 — the vision-
-// confirmed newgame well): init 0x26dd1 STORES [win+0xc0]=1, latching
+// tNG-S CYCLE 5 CADENCE LAW (docs/re/_wip_tNGS.md S28; supersedes the S27
+// cadence transfer). The vendor newgame field is the state==3 COSMOSWnd
+// branch (rect 17,12,324,320): init 0x26dd1 STORES [win+0xc0]=1, latching
 // rotation ON, and the msg-0x3b pump dispatcher 0x27a18 applies the
-// IMMEDIATE 2 DEG per tick (27a32 `mov dword [esp+0x14],2`; writer
-// 0x283e4 -> FUN_00053584 mixes x,z = WORLD Y per t416 F2). Cadence =
-// t302 live-measured ~1/s. CROSS-CHECKS (run tngs4-20261123-010308,
-// 61 frames @1 s, cursor parked OUTSIDE both fields): matched bright
-// stars move median 3.58 px/s at r~100 = 2.05 DEG/S; vendor refcaps
-// 3.16 content-px/s = 1.8 deg/s. D22's "~5 s circuit" is an eyeball
-// figure — REFUTED by two independent flat lag curves (no dip at lag 5,
-// production 972..993 px, vendor 856..889 px). Mouse position is
-// irrelevant (D22 + production ctrl=0 witness).
+// IMMEDIATE 2 DEG per tick (27a32 `mov dword [esp+0x14],2`; writer 0x283e4
+// -> FUN_00053584 rotates the camera basis at win+0x14e, world Y per t416 F2).
+// CADENCE MEASURED (run dbg-tngr-20261123-103130, scratch debugger, cursor
+// parked): pump leg fires at newgame (12 banked, win 0xfd2310, latch=1);
+// camera fwd azimuth sampled stopped->RUN->stopped drifts +104/+132/+128/
+// +298/+642 deg over 2.25/2.25/2.25/5.25/10.25 s wall (fwd.y CONSTANT =>
+// pure world-Y; zero drift during stopped phases). Each fire = exactly 2 deg,
+// so fires/s = dtheta/2/T => 28-33 fires/s (overhead family), best long-window
+// fit ~30-32/s => 60-65 DEG/S => CIRCUIT 5.6-6.1 s. USER STOPWATCH 5.3 s
+// CONFIRMED. The S27 figure (2 deg/s, 180 s) was a poll-limited "~1/s"
+// transferred from the t302/t305 campaign-map census — those counts tracked
+// the ~1 s poll loop, never the cadence (banked law: hit-count at a hot leg
+// on this instrument measures POLL RATE). The S27-X5 blob fit (3.58 px/s) was
+// twinkle-coincidence matching at 1 s cadence vs ~100 px steps — the exact
+// trap REFUTED-ROUTES ln1607 names.
 inline constexpr double kPreviewSpinDegPerTick = 2.0;   // 0x27a32 imm
-inline constexpr int kPreviewSpinTickMs = 1000;         // t302 pump
+inline constexpr int kPreviewSpinTickMs = 32;           // ~31/s, S28-X3 band
+                                                        // 28-33/s (5.6-6.1 s
+                                                        // circuit; user 5.3 s)
 
 // World-Y rotation of a model point by yawDeg (the vendor latch axis:
 // FUN_00053584 mixes x,z; a screen-plane roll of x,y was the pre-S27

@@ -233,44 +233,54 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNG-R PUMP CADENCE MEASUREMENT — USER STOPWATCH REFUTES SHIPPED
-RATE (D23; supersedes WAIT-USER-GRADE-NG4 — do NOT re-package until the
-rate is settled; user timed 5.3 s/circuit x5 on a tan/orange star,
-shipped law says 180 s; both cannot be true).
-ASSISTANT VERIFICATION 2026-11-23 (re-read asm, agree with S27-X2):
- per-tick delta IS the immediate +/-2 deg at 0x27a18 (latch byte
- window+0xC0; New Game inits bit0 at 0x26dd1 => +2 forever; mouse
- never consulted). Applier 0x283e4: deg->rad (fmul [0x9f108]), then
- 0x53584/0x53554 rotate the camera BASIS at wnd+0x14e IN PLACE (no
- angle variable). THE UNPROVEN LEG IS CADENCE: "~1/s" is inherited
- from t302 measured on the GALAXY MAP, not this screen; S26's "self-
- reposting one-shot" note names fn 0x28fc0 whose body we verified has
- NO timer call => cadence chain is BROKEN, not merely unmeasured.
- User's 5.3 s = 2deg/tick at ~36 Hz (frame-loop-shaped!). Assistant
- blob-forensics on D22 refcaps INCONCLUSIVE (median 22 px/s matched
- blobs; matcher confuses twinkle with motion; scripts/d22b_*.py) -
- do not re-litigate with those files.
-MEASURE (scratch DOSBox-X + debugger, blanket grant, savedir law):
- 1. BP 0x27a18 entry, hit-count per wall second while sitting on New
-    Game (mouse parked). If hits/s ~36: cadence=frame loop; user is
-    RIGHT; shipped 180 s is WRONG by ~36x.
- 2. ALSO log [esi+0xC0] at each hit (does anything ever flip bits?)
-    and esi (is the New Game window the one hit? confirm state==3
-    window object vs galaxy map window - the 1/s t302 figure may be
-    true for the MAP and false here).
- 3. If cadence hits/s * 2deg does NOT reproduce ~5.3 s, then the
-    user's star may be tracked on a DIFFERENT structure (e.g. the
-    Begin panel field cycles colors - could read as a fast circuit?
-    or a bright star crossing near side). Say so plainly; do not
-    fudge either direction.
-FIX (if cadence confirms): rewrite/src/ui/menulaw.h kPreviewSpinTickMs
- 1000 -> measured (one constant + pins); re-run suite; re-derive the
- Begin-panel beat from the SAME measurement; DIRECTION seam: while the
- debugger session is open, ALSO capture two refcap shots ~1/3 circuit
- apart to fit signed arc -> closes checklist item 5 for free.
-CLOSE: cadence number cited by hit-count log; rate law = delta x
-cadence both fields; pins updated; suite green; THEN re-package NG5
-and rewrite NEXT WAIT-USER-GRADE-NG5. Budget <=2 cycles.
+NEXT tNG-S S29 — NG5 RE-PACKAGE + CLOSE THE REMAINING SEAMS. Ordering
+rationale: the rate law is now MEASURED and SHIPPED (S28: tick 32 ms,
+60-65 deg/s, 5.6-6.1 s circuit; user stopwatch vindicated), so the NG4
+grade package's rate claim is stale and re-packaging was blocked on exactly
+this measurement ("do NOT re-package until the rate is settled" — D23).
+1. REWRITE scratchpad/NG-usergrade.png + NG-checklist.txt cycle-5 text:
+   state the 60-65 deg/s law with the dbg-tngr-20261123-103130 witness, own
+   the 180 s mis-ship (poll-limited census transfer), CONFIRM the user's
+   5.3 s stopwatch, and state the direction result (camera basis +2 deg/fire
+   world-Y; apparent stars drift -; checklist #5 closed at the basis level).
+   Re-run the t441-style rc=0 verification before declaring packaged.
+2. SIGN MUTATION RESIDUE (S28-X4): our port's negated previewYaw is NOT
+   mutation-verified. Cheapest decisive check: run scripts/tNGS4_ours_shot.sh
+   pair at tick 32 and confirm >0 changed px/step ctrl 0 (rate pin survives),
+   and add a pure unit pin asserting previewStar(100,0,0,...,+2deg) moves x
+   toward 0 while -2deg moves x away (kills a re-negation mutation without
+   pixels). Do this BEFORE re-packaging so the package cites a verified sign.
+3. THEN rewrite NEXT = WAIT-USER-GRADE-NG5. Do NOT re-open the cadence
+   question (docs/REFUTED-ROUTES.md S28 block: poll-counts and 1 s blob
+   fits are dead channels).
+Budget <=2 cycles.
+
+tNG-R S28 LANDED 2026-11-23 (PUMP CADENCE MEASURED — USER VINDICATED, SHIPPED
+RATE WAS 30x SLOW; no OQ row touched — tNG-S tracks none, honest negative
+under strict-close; open=[016,019] unchanged). PROVED (docs/re/_wip_tNGS.md
+S28; run dbg-tngr-20261123-103130 rc=0, scratch debugger, cursor parked):
+ - PUMP LEG FIRES AT NEWGAME: 12 banked stops 0x27a18, win 0xfd2310,
+   latch=1 (bit0) every fire. Pass-1's zero-fires was an instrument artifact
+   (leg armed but BREAK cadence lost it) — law banked: a hot-leg zero counts
+   only with BPLIST proof + a control fire.
+ - CADENCE MEASURED ALIASING-FREE (basis integration): camera fwd azimuth at
+   win+0x166 drifts +104/+132/+128/+298/+642 deg over 2.25/2.25/2.25/5.25/
+   10.25 s RUN windows (fwd.y constant = pure world-Y; zero drift while
+   stopped). Each fire = exactly 2 deg => 28-33 fires/s => 60-65 DEG/S =>
+   CIRCUIT 5.6-6.1 s. USER STOPWATCH 5.3 s CONFIRMED; shipped 2 deg/s
+   (180 s) REFUTED ~30x; the t302 "~1/s" was OUR POLL RATE on the campaign
+   map (REFUTED-ROUTES S28 block); S27-X5 blob fit was twinkle-matching
+   (1 s cadence vs ~100 px steps).
+ - DIRECTION (checklist #5, newgame): azimuth atan2(fwd.x,fwd.z) INCREASES
+   with latch bit0, mouse parked => camera basis +2 deg/fire world-Y =>
+   apparent stars -2 deg/fire. SIGN FIX SHIPPED: menulaw.h
+   kPreviewSpinTickMs 1000->32; title.cpp previewYaw AND beginYaw negated;
+   pins tngs_s28_* (rate + circuit-band 5.4-6.3 s kills slow mutations);
+   suite 498/498. RESIDUES: sign not mutation-verified (pixel-free pin owed,
+   step 2); clock units/s unmeasured (dump_mem tag collision + DAT_000a2044
+   mapping unverified — cadence cited from the basis counter instead);
+   scheduler slot layout guess garbage, do not cite.
+ - NEXT = S29 NG5 RE-PACKAGE (above).
 
 tNG-S S27 LANDED 2026-11-23 (CYCLE 4 PORT THE SPIN, D22 steering fully
 executed; no OQ row touched — tNG-S tracks none, honest negative under

@@ -1611,3 +1611,15 @@ no 5 s circuit). Any future at-rest claim on a sparse animated field MUST
 use cadence well under the expected per-step displacement (<=1 s), never
 12 s. S22's C3 verdicts (production fires via RFB; dbg input-deaf) are
 unaffected and STAND.
+
+## tNG-S S28 — POLL-LIMITED HIT-COUNTS ARE NOT CADENCE; 1 s BLOB MATCHING IS
+## DEAD FOR >~100 px STEPS. The t302/t305/t318 "~1/s msg-0x3b" figure measured
+OUR POLL LOOP (census windows bank max 6 stops at ~1 s poll cadence on the
+campaign map), never the pump. And the S27-X5 rate fit (3.58 px/s) matched
+twinkle coincidences at 1 s cadence against ~100 px/tick steps. Both produced
+a 30x-slow rate law that the user's stopwatch beat. MEASURED TRUE CADENCE:
+basis integration, run dbg-tngr-20261123-103130 (stop->RUN->stopped azimuth
+drift; fires = dtheta/2 exactly): 28-33 fires/s (~60-65 deg/s, 5.6-6.1 s
+circuit). DO NOT re-cite the ~1/s figure or re-fit the tngs4 1 s frames for
+rate. The pass-1 zero-fires lesson also binds: a hot-leg zero is only
+evidence when BPLIST shows the leg armed AND a control leg fires.

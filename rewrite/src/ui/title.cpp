@@ -548,7 +548,14 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             {
                 // S27: pump advance lives at the top of this screen block
                 // (newgameSpinDeg) — ONE accumulator for both fields.
-                const double previewYaw = newgameSpinDeg;
+                // S28-X3 SIGN [MEASURED, run dbg-tngr-20261123-103130]: the
+                // vendor spins the CAMERA BASIS fwd azimuth atan2(x,z) +2
+                // deg/fire (latch bit0, mouse parked); a fixed star then
+                // APPARENTLY drifts -2 deg/fire in view. The port rotates the
+                // STAR model in a fixed camera, so the accumulator enters
+                // NEGATED (this closes checklist #5 for the newgame field;
+                // pre-S28 the sign was an unmeasured coin flip — M4 seam).
+                const double previewYaw = -newgameSpinDeg;
                 // tNG-B B1: N = the WHEEL galaxy's star count (count law
                 // word[obj+0x572] is the regenerated galaxy, not the ladder
                 // label), and each star's hash keys on wheelGen so a density
@@ -1106,7 +1113,9 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     // rotation drives ONLY the class). kPreviewSpinDegPerTick
                     // replaces the per-frame kPreviewSpinPerFrame fudge.
                     const double beginYaw =
-                        newgameSpinDeg * 3.14159265358979323846 / 180.0;
+                        -newgameSpinDeg * 3.14159265358979323846 / 180.0;
+                        // S28-X3: same negation law as previewYaw (camera
+                        // basis spins +2/fire => apparent class drift -2/fire).
                     const double kClCx = 538.1, kClCy = 417.4, kClR = 32.0;
                     const double kPcX = (vis.x0 + vis.x1) / 2.0,
                                  kPcY = (vis.y0 + vis.y1) / 2.0;
