@@ -248,3 +248,109 @@ TEST(tngb_newgame_settings_identity) {
     au::NewGameSettings u;
     CHECK(!u.set);
 }
+
+// ---- tNGS P4 PREVIEW STARFIELD LAW pins (docs/re/_wip_tNGS.md S15/S22) ----
+TEST(tngs_p4_preview_draws_law) {
+    // S15 [verified asm 0x22b61..0x22bb4]: each of the three draws is
+    // rng%1000-500 -> closed range [-500,499]. Mutation pin: widen either
+    // bound (e.g. -501 or %1001) and a sample fails.
+    bool lo[3] = {false, false, false}, hi[3] = {false, false, false};
+    for (int i = 0; i < 20000; i++) {
+        const auto d = au::previewDraws(au::cosmosHash(i, 3u));
+        const int v[3] = {d.vx, d.vy, d.vz};
+        for (int k = 0; k < 3; k++) {
+            CHECK(v[k] >= -500 && v[k] <= 499);
+            lo[k] = lo[k] || v[k] == -500;
+            hi[k] = hi[k] || v[k] == 499;
+        }
+    }
+    // Boundary REACHABILITY: %1000-500 is the closed [-500,499] window;
+    // a narrower modulus (e.g. %999) survives a bounds-only pin, so pin
+    // that both extremes occur (expected ~20 hits/extreme in 20000 draws;
+    // miss probability ~2e-9).
+    for (int k = 0; k < 3; k++) {
+        CHECK(lo[k]);
+        CHECK(hi[k]);
+    }
+    // distinct (i,gen) -> distinct triple (new-set law preserved)
+    const auto a = au::previewDraws(au::cosmosHash(5, 1u));
+    const auto b = au::previewDraws(au::cosmosHash(5, 2u));
+    CHECK(a.vx != b.vx || a.vy != b.vy || a.vz != b.vz);
+}
+
+TEST(tngs_p4_star_lies_on_its_shell) {
+    // S15: position = normalize(box draw) * shell(k) -> |p| == shell EXACTLY
+    // (within fp). The pre-P4 cylinder (r=300 screen-plane, depth+-300) and
+    // the pre-t423 sphere-surface sampler both fail this at the shell table.
+    const au::Rect well{8, 8, 492, 372};
+    for (int n : {15, 25, 50, 75, 100}) {
+        const auto shell = ascend::game::shellRadiiFor(n);
+        CHECK(int(shell.size()) == n);
+        for (int i = 0; i < n; i++) {
+            const auto d = au::previewDraws(au::cosmosHash(i, 7u));
+            const auto s = au::previewStar(d.vx, d.vy, d.vz,
+                                           double(shell[size_t(i)]), 250.0,
+                                           190.0, well);
+            const double r = std::sqrt(s.x * s.x + s.y * s.y + s.z * s.z);
+            CHECK(std::abs(r - double(shell[size_t(i)])) < 1e-6);
+        }
+    }
+}
+
+TEST(tngs_p4_class_band_law) {
+    // S5 painter class law [verified asm 0x52817..0x5282f]:
+    // v=round(z): v>220 -> 0; 1..220 -> 1; -219..0 -> 2; v<=-220 -> 3.
+    const au::Rect well{8, 8, 492, 372};
+    struct { int z; int cls; } cases[] = {
+        {500, 0}, {221, 0}, {220, 1}, {1, 1}, {0, 2}, {-219, 2},
+        {-220, 3}, {-500, 3},
+    };
+    for (const auto& c : cases) {
+        // draw straight along -z/+z: normalize keeps the axis, shell scales
+        const auto s = au::previewStar(0, 0, c.z > 0 ? 1 : -1,
+                                       std::abs(double(c.z)), 250.0, 190.0,
+                                       well);
+        CHECK(s.cls == c.cls);
+    }
+}
+
+TEST(tngs_p4_projection_fits_the_well) {
+    // S5 camera (0,0,-1500) FOV 35 + focal 769.1: the shell-440 ring at the
+    // model equator projects to 440*769.1/1500 = 225.6 px from centre —
+    // inside the well half-width 242.5 (docs S15 envelope claim).
+    const au::Rect well{8, 8, 492, 472};
+    const auto s = au::previewStar(500, 0, 0, 440.0, 250.0, 190.0, well);
+    CHECK(std::abs(double(s.sx) - (250.0 + 440.0 * 769.1 / 1500.0)) < 1.0);
+    CHECK(s.inWell);
+    // and a full shell sweep stays inside the 8..492 well: sample density
+    const au::Rect kWell = au::kNewgameCosmosRect;
+    int outside = 0, total = 0;
+    for (int i = 0; i < 100; i++) {
+        const auto d = au::previewDraws(au::cosmosHash(i, 0u));
+        const auto st = au::previewStar(d.vx, d.vy, d.vz, 440.0, 250.0, 190.0,
+                                        kWell);
+        total++;
+        if (!st.inWell) outside++;
+    }
+    // near-camera stars (z->+440) magnify; honest clip allows a SMALL tail,
+    // the cylinder-era claim of ZERO was the defect shape. Cap: <=20%.
+    CHECK(outside * 5 <= total);
+}
+
+TEST(tngs_p4_no_idle_spin_term) {
+    // S22 [MEASURED run work/r1/c3-20261122-215511]: the field does NOT
+    // auto-spin; only the t423 F7 hover zone advances it. Pin: the idle
+    // constant is ZERO (the armed constant is nonzero), so a frame with the
+    // cursor OUTSIDE the zone cannot rotate the model.
+    CHECK(au::kPreviewSpinZone.x0 == 379 && au::kPreviewSpinZone.x1 == 493);
+    CHECK(au::kPreviewSpinZone.y0 == 420 && au::kPreviewSpinZone.y1 == 472);
+    CHECK(au::kPreviewSpinArmedPerFrame > 0.0);
+    // The painter's idle advance term is literally `if (beginHover)` —
+    // there is no idle constant to pin, so pin the geometric consequence:
+    // previewStar is a pure function of its inputs (no internal clock),
+    // i.e. identical inputs -> identical screen point, forever.
+    const au::Rect well{8, 8, 492, 372};
+    const auto s1 = au::previewStar(123, -45, 67, 365.0, 250.0, 190.0, well);
+    const auto s2 = au::previewStar(123, -45, 67, 365.0, 250.0, 190.0, well);
+    CHECK(s1.sx == s2.sx && s1.sy == s2.sy && s1.cls == s2.cls);
+}

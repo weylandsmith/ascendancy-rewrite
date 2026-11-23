@@ -494,45 +494,45 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
             // star field commensurate with the star density in the upper
             // left"; the Very Dense original capture shows ~100 COLOURED
             // points == ladder rung 100, no lanes — docs/re/_wip_t414.md
-            // S2b). The t393 previewCamp projection (grey pips + lanes of
-            // the 50-star build) is REPLACED: N = the density setting,
-            // splitmix64 points on a sphere shell (NEVER the sim rng —
-            // gate 3l byte-identity law), pinhole-projected with the
-            // t399 camera maths (standoff 1760, focal 500 -> shell radius
-            // 440 projects to 167 px, inside the rect half-height 182),
-            // yaw advancing kPreviewSpinPerFrame per frame. Tints follow
-            // the vendor point families via neutralTint (cam3d port
-            // palette). WHICH stars these are = preview, not the map:
-            // the original's preview does not match its own map either
-            // (it is a generic cosmos).
-            // t423 PREVIEW PLACEMENT + SPRITE LAW (defects f/g,
-            // docs/re/_wip_t423.md F4/F7/F8): the vendor generator
-            // FUN_00022728 places each star on a CIRCLE of radius 300 in
-            // the screen plane (angle from the LCG rand chain) at depth
-            // 1000 + UNIFORM(-300,+300) — a filled CYLINDER VOLUME, not a
-            // sphere shell (the port's pre-t423 splitmix spherical-surface
-            // model was the "fills the VOLUME not a shell" defect).
-            // Sprites = cos_star.shp through the t200 SEL law SEL = 4*K +
-            // cls, cls = 4-band ladder on the transformed depth (v>=220 ->
-            // 0, 1..219 -> 1, -220..0 -> 2, v<-220 -> 3; planets-ui.md §6);
-            // the preview records carry no type byte so K=0 (NAMED SEAM)
-            // -> k1..k3 (2x2 vendor sprite at NATIVE size = larger than
-            // the old 1px point and pixelated; k0's header overlap fails
-            // the walk, F5). SPIN
-            // PUMP (defect g): the vendor arms script @0x69b8 (SET
-            // ds:0x7458e, read by the cosmos repaint; F7) while the cursor
-            // is inside zone x379..493 y420..472 (dispatcher
-            // 0x52993/0x529c1 cmp ebx 0x17b/0x1ed, ecx 0x1a4/0x1d8 — F2) —
-            // the port advances yaw
-            // faster while that zone is hovered, on top of the idle spin.
+            // S2b). WHICH stars these are = preview, not the map: the
+            // original's preview does not match its own map either (it is
+            // a generic cosmos).
+            // tNGS P4 PLACEMENT LAW (docs/re/_wip_tNGS.md S15; RETIRES the
+            // t423 FUN_00022728 cylinder AND the pre-t423 splitmix
+            // sphere-surface sampler): the vendor star generator is
+            // FUN_00022878 — per star k THREE draws v = rng%1000-500,
+            // NORMALIZE to the unit sphere (FUN_00052fa0), scale by the
+            // SHELL ACCUMULATOR (440 start, -75 step, reset 50 — the
+            // mapgen §OQ-025 table; shellRadiiFor). Camera (0,0,-1500),
+            // FOV 35 (S5/FUN_00026a9c); focal 769.1 px puts the shell-440
+            // ring at 225.6 px inside the well half-width 242.5.
+            // Projection = perspective divide + 0.5 bias + viewport centre
+            // (FUN_00053374). Sprite SEL = 4*type + cls with the S5 class
+            // ladder v = round(z): >220 -> 0, 1..220 -> 1, -219..0 -> 2,
+            // <=-220 -> 3 (cos_star; type from the wheel galaxy this field
+            // mirrors for the count law — tNG-B B1; dims-zero types
+            // 10..12 skip honestly, t200). NO sphere clip (S5).
+            // ROTATION (S22 MEASURED 2026-11-22): the field does NOT
+            // auto-spin at rest — 6 production frames over 60 s, star
+            // centroid displacement median 0.0 px, control box 0
+            // (work/r1/c3-20261122-215511), consistent with the S14 static
+            // law (latch store 0x26dd1 only in the state==3 cosmos-map
+            // branch; the newgame init tail 0x26c89 CLEARS [win+0xc0]).
+            // The t423 F7 hover-armed spin zone (cursor x379..493
+            // y420..472, dispatcher 0x52993/0x529c1) still spins — rate is
+            // the port's t423 reading (named seam), idle rate is ZERO.
             {
                 static double previewYaw = 0.0;
                 int hmx = -1, hmy = -1;
                 SDL_GetMouseState(&hmx, &hmy);
                 const bool beginHover =
-                    hmx >= 379 && hmx <= 493 && hmy >= 420 && hmy <= 472;
-                previewYaw +=
-                    kPreviewSpinPerFrame * (beginHover ? 6.0 : 1.0);
+                    hmx >= kPreviewSpinZone.x0 &&
+                    hmx <= kPreviewSpinZone.x1 &&
+                    hmy >= kPreviewSpinZone.y0 &&
+                    hmy <= kPreviewSpinZone.y1;
+                // S22: idle rate ZERO (no auto-spin); only the t423 F7
+                // hover zone advances the field.
+                if (beginHover) previewYaw += kPreviewSpinArmedPerFrame;
                 // tNG-B B1: N = the WHEEL galaxy's star count (count law
                 // word[obj+0x572] is the regenerated galaxy, not the ladder
                 // label), and each star's hash keys on wheelGen so a density
@@ -553,58 +553,55 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                     (kNewgameCosmosRect.x0 + kNewgameCosmosRect.x1) / 2.0;
                 const double cy =
                     (kNewgameCosmosRect.y0 + kNewgameCosmosRect.y1) / 2.0;
-                const double focal = 500.0;
+                // tNGS P4: per-slot shell radius table (mapgen §OQ-025 law,
+                // S15 step -75 from 440, reset 50).
+                const std::vector<int> shellR =
+                    ascend::game::shellRadiiFor(n);
                 for (int i = 0; i < n; i++) {
-                    uint64_t z = cosmosHash(i, unsigned(wheelGen));
-                    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
-                    z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
-                    z = z ^ (z >> 31);
-                    // Vendor law: circle radius 300, depth 1000 +- 300.
-                    const double th =
-                        double(z % 1000000ull) / 1000000.0 * 6.283185307;
-                    const double dz =
-                        double((z >> 20) % 601ull) - 300.0;
-                    const double x = 300.0 * std::cos(th + previewYaw);
-                    const double y = 300.0 * std::sin(th + previewYaw);
-                    const double depth = 1000.0 + dz;
-                    const int px = int(cx + x * focal / depth);
-                    const int py = int(cy + y * focal / depth);
-                    if (px < kNewgameCosmosRect.x0 ||
-                        px > kNewgameCosmosRect.x1 ||
-                        py < kNewgameCosmosRect.y0 ||
-                        py > kNewgameCosmosRect.y1)
-                        continue;
+                    const uint64_t z = cosmosHash(i, unsigned(wheelGen));
+                    const auto d = previewDraws(z);
+                    // S15 box draw -> normalize -> shell; the t423-F7 hover
+                    // spin (when armed) is a yaw rotation of the model point
+                    // about the camera axis BEFORE the divide.
+                    const double r = double(i < int(shellR.size())
+                                                ? shellR[size_t(i)] : 50);
+                    auto s = previewStar(d.vx, d.vy, d.vz, r, cx, cy,
+                                         kNewgameCosmosRect);
+                    if (previewYaw != 0.0) {
+                        const double c = std::cos(previewYaw),
+                                     sn = std::sin(previewYaw);
+                        const double rx = s.x * c - s.y * sn,
+                                     ry = s.x * sn + s.y * c;
+                        s = previewStar(int(rx), int(ry), d.vz, r, cx, cy,
+                                        kNewgameCosmosRect);
+                    }
+                    if (!s.inWell) continue;  // honest well clip (S5)
                     // SEL law t200 (planets-ui §6): SEL = 4*K + cls, K = the
                     // star TYPE (13 starstat families; cos_star k(4K)..k(4K+3)
                     // = one bright-ramp per family — file census tNG-F: K0
-                    // blues, K2 reds, K3 oranges, K5 tans, ...). tNG-F F1:
-                    // the pre-fix K=0 named seam painted EVERY preview star
-                    // from the blue family (D20 "all one color"). The
-                    // stride-0xd preview records carry no type byte (t423
-                    // F8), so the port takes star i's type from the wheel
-                    // galaxy it already mirrors for the count law (tNG-B B1:
-                    // N == wheelGal->stars.size()); dims-zero cells
+                    // blues, K2 reds, K3 oranges, K5 tans, ...). tNG-F F1
+                    // stands: types come from the wheel galaxy (the pre-fix
+                    // K=0 seam painted every star blue). dims-zero cells
                     // (types 10..12, t200) blit nothing -> honest skip.
-                    const long v = lround(dz);
-                    const int cls = v >= 220 ? 0 : (v >= 1 ? 1 : (v >= -220 ? 2 : 3));
                     const int ktype =
                         wheelGal && i < int(wheelGal->stars.size())
                             ? wheelGal->stars[size_t(i)].type
                             : int((z >> 42) % 13);
-                    const int rec = 4 * ktype + cls;
+                    const int rec = 4 * ktype + s.cls;
                     bool drew = false;
                     // t200 cited law: cells k40..k51 (types 10..12) are
                     // dims-zero — the vendor blit walks zero rows = draws
                     // NOTHING. Skip honestly (no fallback tint).
                     if (!(rec >= 40 && rec <= 51) && cosStarLib.count() > rec)
-                        drew = blitShape(ren, cosStarLib, rec, px - 1, py - 1);
+                        drew = blitShape(ren, cosStarLib, rec, s.sx - 1,
+                                         s.sy - 1);
                     if (!drew && (rec < 40 || rec > 51)) {
                         // cos_star unavailable/empty-cell: 2x2 tint block in
                         // the SAME family law (neutralTint rows = the port
                         // palette per star type; no fake art).
                         const RGB t = neutralTint(ktype);
                         SDL_SetRenderDrawColor(ren, t.r, t.g, t.b, 255);
-                        SDL_Rect q{px - 1, py - 1, 2, 2};
+                        SDL_Rect q{s.sx - 1, s.sy - 1, 2, 2};
                         SDL_RenderFillRect(ren, &q);
                     }
                 }

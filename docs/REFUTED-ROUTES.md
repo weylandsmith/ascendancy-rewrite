@@ -1576,3 +1576,25 @@ SPECIES-SCREEN PORTRAIT LAW CLOSED", docs/re/_wip_t441.md.
 METHOD LAW banked: on a capture PAIR (baseline + overlay screen), census the
 REPAINT DIFF, not blobs in the overlay image — the diff says exactly what the
 screen adds and where, and it is what exposed the phantom star markers.
+
+## R-tNGS3c. "THE DBG BUILD CAN WITNESS THE NEWGAME FIELD" IS DEAD (cycle 3c).
+MEASURED (runs c3-20261122-214652/215511 vs dbg runs 155718/165042): the
+SAME RFB channel (x11vnc+LD_LIBRARY_PATH, offsets 80/100) that is input-DEAF
+on dosbox-x-dbg at a fresh Xvfb FIRES the title menu on the PRODUCTION
+/usr/bin/dosbox-x (orange 0.679 -> 0.006 on the second click). The dbg build
+at a fresh unfocused Xvfb never activates rows (hover repaints only; clicks,
+1-s holds, RFB key Return, xsend key Return all failed — S17-S20). DO NOT
+spend another session arming debugger legs to answer a question the
+production binary can answer with screenshots: for any NEWGAME-screen
+dynamic question, launch production on scratch game-wp + private Xvfb +
+own x11vnc and measure FRAMES (scripts/r_tNGS3c_c3_session.py is the
+template; rung ladder A-E records which channel fires). The debugger legs
+(w1_writer/w1_pump/w1_hdlr) stay valid for the COSMOS MAP (state==3), which
+is reachable in-game where input works.
+
+## R-tNGS3c-B. "REFCAP NEWGAME WELL = A STAR CENSUS" IS DEAD (cycle 3c).
+scratchpad/newgame-original.png's cosmos well CONTAINS the summary text
+block: a bright-pixel census yields 1124 "clusters" at median r 175 —
+text-dominated, useless as a radial-profile pin for the preview starfield.
+Do not re-run this census expecting stars. The shell law is pinned
+code-exactly instead (tngs_p4_star_lies_on_its_shell).

@@ -67,6 +67,12 @@ struct MapConfig {
     unsigned seed = 1;
 };
 
+// Measured shell-population law (mapgen.md §OQ-025 t79): per-slot shell
+// radius table for ANY galaxy size (shell0 = n/2+1 at 440, halving
+// remainder through 365/290/215/140/65, tail at 50). tNGS P4: also drives
+// the newgame preview starfield (docs/re/_wip_tNGS.md S15/S22).
+std::vector<int> shellRadiiFor(int n);
+
 class MapGenerator {
   public:
     MapGenerator(MapConfig cfg, const StarStats& stats, std::vector<std::string> names);

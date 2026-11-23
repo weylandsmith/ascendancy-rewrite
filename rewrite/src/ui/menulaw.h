@@ -11,6 +11,7 @@
 // is NOT a coordinate offset (relative reading puts RACELIST at x=836 and
 // overlaps the bottom-row buttons; absolute puts them disjoint, equal-width,
 // 9-px gutters).
+#include <cmath>
 #include <cstdint>
 #include <functional>
 #include <string>
@@ -364,6 +365,85 @@ inline NewGameSettings newGameSettings(int densityRank, int species,
 inline std::uint64_t cosmosHash(int i, unsigned gen) {
     return uint64_t(i) * 0x9e3779b97f4a7c15ull + 0x5851f42d403c3b23ull +
            uint64_t(gen) * 0x100000001ull;
+}
+
+// ---- tNGS P4 NEWGAME PREVIEW STARFIELD LAW (docs/re/_wip_tNGS.md S15,
+// S22; supersedes the t423 cylinder model AND the pre-t423 splitmix
+// sphere-surface sampler) --------------------------------------------------
+// VENDOR GENERATOR LAW [verified asm FUN_00022878 0x22878..0x22ce1,
+// work/tNGS3_22878a/b.asm]: per star k the vendor draws THREE ints
+// v = rng%1000-500 (0x22b61/0x22b8d/0x22bb4, VERIFIED bytes 'b9 e8 03
+// 00 00 ... 81 ea f4 01 00 00'), NORMALIZES the triple to the unit sphere
+// (FUN_00052fa0), and scales by the SHELL ACCUMULATOR (start 440.0, step
+// -75.0, reset 50.0 — the mapgen §OQ-025 shell table). z is NOT an
+// independent axis: (x,y,z) = normalize(uniform[-500,499]^3) * shell(k).
+// CAMERA LAW [verified FUN_00026a9c, S5]: position (0,0,-1500), FOV 35,
+// identity orientation. Projection FUN_00053374: perspective divide,
+// frndint with +0.5 bias, then viewport centre offsets.
+// SPRITE CLASS LAW [verified asm 0x52817..0x5282f]: v = round(depth -
+// 1500) = round(z); v>220 -> cls 0, 1..220 -> 1, -219..0 -> 2, <=-220 -> 3;
+// shape = 4*type + cls (cos_star, t200 SEL law).
+// ROTATION LAW [MEASURED 2026-11-22, run work/r1/c3-20261122-215511 +
+// S14 static law]: the newgame field does NOT auto-spin — 6 frames over
+// 60 s, star centroid displacement median 0.0 px, field-changed px flat
+// (twinkle floor ~1085), control box 0. The t416 +-2deg/tick law belongs
+// to the COSMOS MAP (state==3 latch 0x26dd1); the newgame screen opens
+// COSMOSWnd through the generic init tail 0x26c89 which CLEARS the latch.
+// The t423 F7 hover-armed spin zone (cursor x379..493 y420..472) is a
+// separate cited law and stays modelled; only the IDLE spin is removed.
+inline constexpr double kCosmosCamZ = -1500.0;      // [verified FUN_00026a9c]
+inline constexpr double kCosmosFovDeg = 35.0;       // [verified 0x2716c]
+// focal = well half-width / tan(FOV/2) = 242.5 / tan(17.5deg) = 769.1;
+// the shell-440 ring then projects to 440*769.1/1500 = 225.6 px, inside
+// the 8..492 well half-width 242.5 (fits; docs S15 envelope).
+inline constexpr double kCosmosFocalPx = 769.1;
+// Spin while the cursor is inside the t423 F7 armed zone (dispatcher
+// 0x52993/0x529c1 cmp ebx 0x17b/0x1ed, ecx 0x1a4/0x1d8). Rate stays the
+// port's t423 reading (6x) — cited as a zone, not a rate; IDLE = 0 (S22).
+inline constexpr Rect kPreviewSpinZone{379, 420, 493, 472};
+inline constexpr double kPreviewSpinArmedPerFrame = 6.0 * 0.0035;
+
+// The three vendor draws from one hashed word: v = rng%1000-500 each.
+// Splitmix64-mixed (gate 3l: preview must never touch the sim rng).
+struct PreviewDraws {
+    int vx, vy, vz;  // each in [-500, 499]
+};
+inline PreviewDraws previewDraws(std::uint64_t z) {
+    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9ull;
+    z = (z ^ (z >> 27)) * 0x94d045bb41f336ull;
+    z = z ^ (z >> 31);
+    return PreviewDraws{int(z % 1000ull) - 500, int((z >> 20) % 1000ull) - 500,
+                        int((z >> 40) % 1000ull) - 500};
+}
+
+// One preview star: model position (normalized box draw x shellRadius),
+// depth-band sprite class, and the projected screen point (perspective
+// divide + 0.5 bias + viewport centre). inWell=false when the point falls
+// outside the cosmos rect (honest clip; NO sphere clip — S5).
+struct PreviewStar {
+    double x, y, z;
+    int cls;        // 0..3
+    int sx, sy;     // screen px
+    bool inWell;
+};
+inline PreviewStar previewStar(int vx, int vy, int vz, double shellRadius,
+                               double cx, double cy, const Rect& well) {
+    const double fx = double(vx), fy = double(vy), fz = double(vz);
+    const double len = std::sqrt(fx * fx + fy * fy + fz * fz);
+    PreviewStar s{};
+    if (len > 0.0) {  // vendor divides only when length>0 (FUN_00052fa0)
+        s.x = fx / len * shellRadius;
+        s.y = fy / len * shellRadius;
+        s.z = fz / len * shellRadius;
+    }
+    const long v = std::lround(s.z);  // depth - 1500 with cam at -1500
+    s.cls = v > 220 ? 0 : (v >= 1 ? 1 : (v >= -219 ? 2 : 3));
+    const double depth = s.z - kCosmosCamZ;  // > 0 (shell <= 440 << 1500)
+    s.sx = int(cx + s.x * kCosmosFocalPx / depth + 0.5);  // +0.5 bias S5
+    s.sy = int(cy + s.y * kCosmosFocalPx / depth + 0.5);
+    s.inWell = s.sx >= well.x0 && s.sx <= well.x1 && s.sy >= well.y0 &&
+               s.sy <= well.y1;
+    return s;
 }
 const char* densityWord(int starCount);  // "Average" for 50; nullptr off-ladder
 const char* speciesCountWord(int n);     // "Three".."Seven"; nullptr else

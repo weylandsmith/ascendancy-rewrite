@@ -10,13 +10,15 @@
 #include <unordered_set>
 
 namespace ascend::game {
-namespace {
 
 // Measured shell-population law (docs/re/mapgen.md §OQ-025, t79): build the
 // per-slot shell-radius table for ANY galaxy size: shell0 = n/2+1 stars at
 // r=440, each next shell (365,290,215,140,65) takes half the remainder
 // (a remainder of 1 keeps it), shell6 (r=50) takes the final tail. At
 // n=50 this reproduces the k0..k49 battery table exactly (26/12/6/3/1/1/1).
+// tNGS P4: PUBLIC — the newgame preview starfield draws each slot at its
+// shell radius (docs/re/_wip_tNGS.md S15; the vendor generator FUN_00022878
+// scales the normalized direction by the shell accumulator).
 std::vector<int> shellRadiiFor(int n) {
     static const int kRadii[7] = {440, 365, 290, 215, 140, 65, 50};
     std::vector<int> out;
@@ -31,6 +33,8 @@ std::vector<int> shellRadiiFor(int n) {
     }
     return out;
 }
+
+namespace {
 
 uint64_t dist2(const Star& a, const Star& b) {
     const int64_t dx = a.x - b.x, dy = a.y - b.y;

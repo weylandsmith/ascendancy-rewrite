@@ -504,3 +504,103 @@ The C3 production-binary control (S19) is the decisive next probe; if it
 fires, W1's dynamic half is dbg-instrument-limited and W1 CLOSES on the
 S14 static law with the ceiling named (auto-spin ON per state==3 latch,
 t416 +-2deg rotation in the port).
+
+## S21. CYCLE 3c C3 CONTROL — LAUNCHED (scripts/r_tNGS3c_c3_session.py)
+Design (decided BEFORE the run so the verdict can't drift): production
+/usr/bin/dosbox-x on a fresh private Xvfb :97, scratch game-wp only, own
+x11vnc 5911 with LD_LIBRARY_PATH (S18), RFB offsets 80/100, RESUME.GAM = the
+md5-asserted Oct-29 copy (same menu geometry as the dbg sessions). A rung
+ladder is recorded SEPARATELY so the first FIRING channel is identified:
+  A RFB move(250,295) hover witness (teal rows + band diff)
+  B RFB click x2      C RFB press-hold 1.0 s
+  D xsend key Return (TITLE arg law xsend.c:54; XSetInputFocus first)
+  E RFB key Return (hovered-row law t287)
+Fired = title orange < 0.20 (wait_title law r293_move_session.py:374).
+VERDICT TABLE: production fires => dbg BUILD is input-deaf => W1 dynamic
+half dbg-instrument-limited => W1 closes on the S14 static law, P4 ports NO
+auto-spin for the newgame/Begin field. Production deaf too => the fresh
+unfocused-Xvfb window class is the blocker (build-independent) => same
+static-law close, ceiling named as the environment class. Either branch
+closes W1 on the static law; only the ceiling wording differs.
+Bonus (fires-branch only): two production newgame grabs 12 s apart inside
+the state==3 cosmos rect (17,12,324,320) vs a control box (400,40,630,120) =
+a VISUAL spin witness for W1 (field px ~ ctrl noise => static; >> => spinning).
+
+## S22. C3 VERDICT + W1 CLOSED BY MEASUREMENT (runs c3-20261122-214652,
+## c3-20261122-215511 — production /usr/bin/dosbox-x, scratch game-wp,
+## fresh Xvfb :97, own x11vnc 5911, RFB offsets 80/100)
+1. PRODUCTION FIRES via rung B (RFB move+click x2 at game (250,295)):
+   title orange 0.679 -> 0.006. Rung A hover witness clean: default teal
+   band rows 240..270 (Tutorial) -> 280..310 (New Game) after move. =>
+   the dbg build dosbox-x-dbg IS input-deaf at a fresh Xvfb (S19/S20 four
+   witnesses); the RFB+XTEST channel itself is fine (build-independent,
+   t439 production law re-confirmed on a SECOND production session).
+2. BONUS: production reaches the NEWGAME screen, so W1's dynamic half was
+   NEVER instrument-limited — the debugger legs were the wrong instrument;
+   a plain visual witness works. RUN 215511 sampled the state-law cosmos
+   panel 6x over 60 s (cursor parked inside the panel at (250,295)):
+     frame t+0/12/24/36/48/60 s: field-rect changed px =
+       0 / 1082 / 1095 / 1080 / 1085 / 1087  (FLAT, not accumulating)
+     control box (400,40,630,120) changed px = 0 at every frame
+     star centroid match f1<->f6 (brightest-cluster census, tol 6):
+       n1=131 n6=150 matched=34, displacement MEDIAN 0.0 px, p90=4,
+       only 8/34 >= 3 px (twinkle jitter, not translation)
+   The t416 law is +-2 deg/tick at the ~1/s pump (t302): 60 s of spin
+   would be ~120 deg — at r=100 px a star would sweep ~200 px. Observed:
+   zero systematic displacement, flat twinkle floor, dead-quiet control.
+   RUN 214652 corroborates at 12 s (median 0, rotation-correlation peak
+   at theta=0: overlap 0.281 vs <=0.048 at every tested rotation).
+3. W1 VERDICT: THE NEWGAME STARFIELD DOES NOT AUTO-SPIN. [verified: two
+   production runs, 60 s + 12 s witnesses, pixel-measured] Consistent with
+   the S14 static law: the latch store 0x26dd1 sits ONLY in the state==3
+   branch (campaign cosmos map); the newgame screen opens COSMOSWnd in a
+   different state whose init tail (0x26c89) CLEARS [win+0xc0]. D21's
+   "rotating" recollection = the cosmos map, not the newgame field.
+   Scope stated honestly: witness covers the at-rest field for the first
+   60 s after the New Game click with cursor inside the panel; the
+   hover-driven spin-zone law (t423 F7, Begin panel) is separate and
+   unaffected. => P4 ports NO auto-spin for the newgame field; the t416
+   +-2deg law stays for the COSMOS map only.
+4. HARNESS NOTE: crop-pixel counting on RGB must use the per-channel
+   zero-bins (min(h[0],h[256],h[512])); the histogram-sum form is
+   identically -2*npix on RGB (measured: field=-189112 for a 307x308
+   crop). Fixed in scripts/r_tNGS3c_c3_session.py.
+
+## S23. CYCLE 3c P4 PORT + P5 RE-PACKAGE LANDED
+P4 (the S15+S22 law, rewrite):
+- ascend::game::shellRadiiFor(n) made PUBLIC (mapgen.h/.cpp — declaration
+  added, body unchanged); title.cpp preview painter now:
+  previewDraws (three rng%1000-500 draws from the cosmosHash word, splitmix
+  finalizer) -> previewStar (normalize x shellRadiiFor[i], camera
+  (0,0,-1500), focal 769.1, +0.5 bias, well clip) -> SEL = 4*type + cls
+  (S5 class ladder). The t423 cylinder (circle r300 + depth+-300) and the
+  old focal-500 sphere maths are GONE from this site.
+- ROTATION: idle advance REMOVED (S22); only the t423 F7 zone
+  (kPreviewSpinZone 379..493 x 420..472, kPreviewSpinArmedPerFrame) turns
+  the field. The Begin-panel mini-cluster (beginYaw, title.cpp:1097) is a
+  separate site — untouched this cycle.
+- New pure law home = ui/menulaw.h (kCosmosCamZ/kCosmosFovDeg/
+  kCosmosFocalPx/previewDraws/previewStar).
+- PINS (test_newgame_behavior_tNGB.cpp, 5 new): draws range [-500,499] +
+  BOUNDARY REACHABILITY (both extremes must occur in 20k draws — the
+  bounds-only pin survived a %999 mutant, the reachability term kills it),
+  |p| == shell(k) exactly (kills cylinder + sphere-surface samplers),
+  class-band edges {221/220/1/0/-219/-220}, projection envelope (shell-440
+  equator 440*769.1/1500=225.6 inside well; near-camera tail <=20% honest),
+  no-idle-spin (zone geometry + purity of previewStar). SUITE 494/494.
+- MUTATION-VERIFIED: cls boundary 220->221 FAILS class test; %1000->%999
+  FAILS draws test (after strengthening). Both reverted; suite green.
+- RADIAL CENSUS vs refcap: attempted, RETIRED AS UNUSABLE — the vendor
+  refcap's cosmos well contains the summary text block (1124 "bright
+  clusters" at median r 175 = text-dominated, not a star census). Honest
+  negative; the shell pin is code-law-exact instead.
+- Witness render: scripts/t412_newgame_shot.sh -> /tmp/t412_shots/
+  t412-newgame.png (n 50 law line printed); vision confirms well-wide
+  depth-scaled multi-colour field, no circle clip. t441_screen_diff
+  newgame PASS on the P4 build.
+P5: scratchpad/NG-checklist.txt rewritten (cycle 3: placement law,
+NO-auto-spin measurement story, open list = spin RATE seam + right-edge
+chrome + Begin-cluster sprite seam — honest: starfield law cited, at-rest
+law MEASURED on the original, hover-spin rate is a named seam);
+scripts/tNGU_composite.py -> scratchpad/NG-usergrade.png 1290x1704
+18/18 PASS t441 rc=0.
