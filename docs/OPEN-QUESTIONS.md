@@ -269,6 +269,12 @@ buildPhase comment upgraded to cite the corpus witness (no code delta). The
 OQ-016 residue list is now EXHAUSTED ((1) cited-dead x8 legs = user ruling,
 (2)(3)(4) CLOSED, (6) CLOSED as misattribution) — row movement per D3 is
 USER ADJUDICATION; row stays open strict-close.
+HOME-PLACEMENT SUB-LAW EXTENDED tPL-D1 2026-11-24 MEASURED (income-law.md
+"tPL-D1 HOME-PLANET-BY-RACE TABLE LAW"): home SIZE CLASS and TERRAIN ROW are
+per-SPECNUM static tables (payload 0x88f90 / 0x88fe4), 85/85 homes across 26
+independent lineages; no special home capBase seed (cap55==nb/3+5 144/144);
+t30's index-operand reading corrected (race row, not star cluster). Port +
+4 pins test_homeplanets_tpld1; row status unchanged (D3).
 item-35/35 completion branches = MEASURED zero-witness + AI-unreachable
 (REFUTED t271, re-open conditions there). t299 debugger leg witness ran
 (2026-11-04): zero fires; t301 re-attributed as ARMING-FAILURE not a bypass

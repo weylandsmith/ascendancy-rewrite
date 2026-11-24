@@ -310,6 +310,20 @@ TEST(species_cornucopia_repaints_min_pop_colony_t281) {
     // a row-10 world); this leg can: deleting the skip line fires the event.)
     auto s8 = makeCrafted(10, 1, ag::SpeciesAbility::Cornucopia);
     auto s8ctrl = makeCrafted(10, 1, ag::SpeciesAbility::Unknown);
+    // tPL-D1 FIXTURE UPDATE: under the MEASURED home-table law (payload
+    // 0x88fe4; docs/re/income-law.md S10 tPL-D1 block) an AI home can never
+    // sit on rng row 10 — owner 1 is specnum 0, whose home row is table
+    // value 5. The skip-leg premise is therefore forced directly: pin
+    // terrainRow = 10 on owner-1's home in BOTH campaigns (t204 planetAt
+    // const_cast idiom), preserving the original intent — the Cornucopia AI
+    // owns exactly one colony, it sits on a zero-barren (row-10) world, the
+    // cited skip leaves no eligible planet, the body exits at the null test.
+    for (auto* cc : {&s8, &s8ctrl}) {
+        const int h = cc->homeStarFor(1);
+        CHECK(h >= 0);
+        if (h >= 0)
+            const_cast<ag::PlanetState&>(cc->planetAt(h)).terrainRow = 10;
+    }
     bool s8Row10Home = false;
     for (size_t s = 0; s < s8.galaxy().stars.size(); ++s)
         if (s8.starOwner((int)s) == 1 && s8.planetAt((int)s).terrainRow == 10)

@@ -2610,3 +2610,51 @@ THE LAW (slot word2 = (MARKER << 8) | ACTIVE-bit; every writer/consumer cited):
    OQ-019 per-ship model lands. NO code delta this iteration (pre-authorised:
    insufficient -> bank, change no code). residue-(4) stays CLOSED as a law
    question; OQ-016 row movement remains D3 user adjudication.
+
+## tPL-D1 HOME-PLANET-BY-RACE TABLE LAW (D26; CLOSED MEASURED 2026-11-24)
+
+Working log docs/re/_wip_tPLD1.md P1-P5; tools scripts/tpld1_homecap_census.py
++ tpld1_race_join.py + tpld1_spec_home.py (outputs work/r1/tpld1_*.out).
+
+LAW (fixed TABLE, not RNG-at-seed) [MEASURED 85/85 homes, 26 independent
+fresh lineages (r1ad-*/r1deep-*), earliest in-game save each, template saves
+excluded by the t270 name set]:
+  T1 = payload 0x88f90, 21 u32 = (4,4,3,4,3,4,3,3,4,3,3,3,4,4,4,3,4,3,2,3,3)
+       == HOME planet SIZE-CLASS index into surfaceBySize {7,11,23,45,73},
+       keyed by SPECNUM: T1[spec]==home size idx 85/85 (Chamachies spec19 ->
+       3 -> 45 cells 6/6; Minions spec0 -> 4 -> 73 17/17; Chronomyst spec18
+       -> 2 -> 23 2/2).
+  T2 = payload 0x88fe4, 21 u32 = (5,1,1,6,3,2,8,6,4,4,10,2,7,8,9,7,3,5,3,7,9)
+       == HOME planet terrain weight row (+0x16): T2[spec]==home +0x16 85/85.
+  NON-HOME planets span the full rng distribution (barren share 47.2% vs
+  home 36.0%; sizes 0..73) — the table path is HOME-ONLY. Home nb, barren
+  pattern and CB cell stay rng (nb varies run-to-run within the row shares).
+  No special HOME capBase seed: cap55==nb/3+5 on 144/144 home worlds (P1).
+
+KEYING CORRECTION to t30 (supersedes its read of the index operand, t30's
+table VALUES and copy sites stand): t30 read `MOV DL,[EAX+7]` @0x23aeb as
+byte[STAR+7] cluster. Star record idx is the u32 @base+4 (t270 [verified]),
+so byte+7 is 0 for every star — a star-keyed read could not produce the
+per-SPEC constancy measured here (race-row functional scan: the ONLY
+home-size-functional row bytes are +0x07==specnum, +0x1a3==specnum copy,
++0x1cd==NEG_PLAYER_TURNS). EAX is the race row; the tables are specnum-keyed.
+The t30 "special mode" gate ([ESP+0x108]==0 && scenario-index match
+@0x23aaa..0x23ac2) is NOT resolved; the shipped-scenario measurement IS the
+table path in 26/26 fresh games [verified], so the gate presumably holds for
+the shipped scenario (normal new-game) [inferred].
+
+D26 DISPOSITION: both complaint halves explained — "wrong art" and "wrong
+max population" are one bug: the port drew home size class rng%5, giving
+Chamachies homes of 7/11/73 cells instead of the vendor's constant 45; the
+different nb then shifts capBase = nb/3+5 (45 cells -> 16-17 typical vs the
+rng sizes' 5-29). PORT: campaign.cpp terrain loop consumes kHomeSizeIdx/
+kHomeTerrainRow for every species-owned home (pickHomeStars moved above the
+loop; owner->specnum = the documented default roster mapping shared with
+main.cpp/speciesmenu.cpp). Human player (-1) keeps the rng path — documented
+DEFAULT, no vendor capture of a species-less game exists. Pins
+tests/test_homeplanets_tpld1.cpp x4 (table verbatim + Chamachies 45/row-7 +
+capBase law on homes across 5 seeds + AI-species table + human rng
+anti-vacuity); mutant M-D1 (T1[19] 3->0) CAUGHT by 6 checks. test_species
+cornucopia skip-leg fixture updated: an AI home can no longer rng-roll row
+10, so the premise is forced directly (terrainRow=10 on both campaigns'
+owner-1 home; the skip leg itself unchanged and still mutation-meaningful).

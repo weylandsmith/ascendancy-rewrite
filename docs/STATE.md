@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-24T00:30
+updated: 2026-11-24T06:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,33 +233,68 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPL-D1 HOME PLANET BY RACE (D26) — ordering rationale: tPL-B2
-(2026-11-24) landed the msg-50 productivity-box popups with a PASSing
-pixel + vision witness (docs/re/_wip_tPLB2.md P8/P9), so the planet-view
-D26 queue advances. D1: the Chamachi home planet shows WRONG ART and
-WRONG MAX POPULATION vs the vendor new-game. Derive the vendor new-game
-home-planet law per race: fixed TABLE vs RNG-at-seed decides the route —
-debugger on a scratch new-game as Chamachies settles it (scratch savedir
-law; protected saves untouchable); cross-check Minions. The max-pop
-half likely folds into the seeded capBase law (income-law.md S10 t29+t33
-— capBase = NONBARRENCOUNT/3 + 5 into +0x55/+0x4a): if the vendor home
-worlds carry a DIFFERENT seeded cap, measure it against the save corpus
-first (cheap) before any debugger leg. Recipe reminders: capture via the
-shot() in scripts/tplb2_port_witness.sh (winpos substring + root-crop +
-assert 640x480; NEVER import -window NAME — title flips at RESUME;
-export DISPLAY in scripts; clear stale /tmp/.X99-lock; POINTER-ONLY moves
-use `xsend warp x y` — the legacy `x y` mode CLICKS). THEN tRS-B1
-RESEARCH: SET PROJECT (D26: "I can't set any projects") — derive the
-vendor set-project handler, PORT + walkthrough witness. THEN tRS-V1
-RESEARCH TREE DRAW (D26) per D19 G1/G2 (3D projection ported t419/t399;
-diff regions, fix laws not pixels). THEN tPR-U: USER GRADE PACKAGE
-(checklist format, ours|vendor side-by-side) for planet + research; NEXT
-becomes WAIT-USER-GRADE-PR1. RULES: D19 G1-G6 binding; Athens shots layout/
-color only; no synthetic stand-ins (RE-FIRST t423 law); protected saves
+NEXT tRS-B1 RESEARCH: SET PROJECT (D26: "I can't set any projects") —
+ordering rationale: tPL-D1 (2026-11-24) CLOSED the home-planet law with a
+port + 4 pins, which empties the D26 planet-screen queue (tPL-B1 build
+loop, tPL-B2 popups, tPL-V1 grid, tPL-V2 orbital slots, tPL-D1 homes all
+landed); the research screen is the remaining D26 half. Derive the vendor
+set-project handler (restored image; research.md + aicode.md decision-block
+cites point at the restree click path — grep the msg handlers around the
+research window class, windows.txt "RESEARCH" row first), PORT into
+rewrite/src/ui + campaign queuedTech path, and WITNESS with a walkthrough:
+click a tree row -> queuedTech set -> "Building <tech>"-class status line
+(the statuslist precedent shows the text shape). THEN tRS-V1 RESEARCH TREE
+DRAW (D26) per D19 G1/G2 (3D projection ported t419/t399; diff regions, fix
+laws not pixels). THEN tPR-U: USER GRADE PACKAGE (checklist format,
+ours|vendor side-by-side) for planet + research; NEXT becomes
+WAIT-USER-GRADE-PR1. RULES: D19 G1-G6 binding; Athens shots layout/color
+only; no synthetic stand-ins (RE-FIRST t423 law); protected saves
 01/02/03/04.SAV + RESUME.GAM untouchable (scratch savedir law); game ring
 TL EXPIRES 2026-11-24 14:53 — if a live witness needs the production ring
-and it's dead, run the t439 recovery pattern FIRST; C1-C5 cosmetic backlog
-+ race intro stay DEFERRED (D25) — do not touch.
+and it's dead, run the t439 recovery pattern FIRST (kill Xvfb BY PID only —
+tPL-V1f law); C1-C5 cosmetic backlog + race intro stay DEFERRED (D25) — do
+not touch.
+
+tPL-D1 LANDED 2026-11-24 (HOME PLANET BY RACE: PER-SPEC SIZE+ROW TABLE,
+PORTED + 4 MUTATION-PINNED PINS; OQ-016 home-placement sub-law EXTENDED,
+row status unchanged per D3 — honest negative on row movement; open=[016,
+019] unchanged).
+PROVED (docs/re/income-law.md "tPL-D1 HOME-PLANET-BY-RACE TABLE LAW";
+working log docs/re/_wip_tPLD1.md P0-P5; tools scripts/tpld1_homecap_
+census.py, tpld1_race_join.py, tpld1_spec_home.py; outputs
+work/r1/tpld1_*.out):
+ - FIXED TABLE, NOT RNG-AT-SEED: payload 0x88f90 21 u32 T1=(4,4,3,4,3,4,3,
+   3,4,3,3,3,4,4,4,3,4,3,2,3,3) = home SIZE-CLASS idx into {7,11,23,45,73};
+   payload 0x88fe4 21 u32 T2=(5,1,1,6,3,2,8,6,4,4,10,2,7,8,9,7,3,5,3,7,9) =
+   home terrain row (+0x16). MEASURED 85/85 homes / 26 independent fresh
+   lineages (Chamachies spec19 -> 45 cells row 7, 6/6; Minions 73, 17/17;
+   Chronomyst 23, 2/2). Non-home span full rng (barren 47.2% vs 36.0%).
+ - NO special home capBase: cap55==nb/3+5 144/144 homes — the D26 "wrong
+   max population" is a CONSEQUENCE of the wrong home size class (one bug
+   behind both complaint halves).
+ - t30 CORRECTION: `MOV DL,[EAX+7]` @0x23aeb indexes the RACE ROW (specnum),
+   not a star cluster (star idx is u32@base+4 per t270 -> byte+7 always 0;
+   row functional scan: only +0x07/+0x1a3/+0x1cd size-functional). t30's
+   special-mode gate stays banked unresolved; shipped scenario = table path
+   26/26.
+ - PORT: campaign.cpp pickHomeStars() moved above the terrain loop; home
+   stars consume kHomeSizeIdx/kHomeTerrainRow via the documented owner->
+   specnum roster map (shared default with main.cpp/speciesmenu.cpp).
+   Human (-1) keeps the rng path — documented default, no species-less
+   capture exists. Cell draws + rock event stay rng.
+ - PINS tests/test_homeplanets_tpld1.cpp x4; MUTANT M-D1 (T1[19] 3->0)
+   CAUGHT by 6 checks, restored, suite 515/0/0 (was 511). test_species
+   cornucopia skip-leg FIXTURE updated (an AI home can no longer rng-roll
+   row 10; premise forced directly via planetAt const_cast, skip leg itself
+   unchanged).
+ - SITTING CHECK ran first (r1_t85g_sitting exit 0, newest t=1335, ring
+   alive). NO live screenshot witness this iteration — the gold-standard
+   evidence IS 26 live vendor RAM captures; a port-surface shot belongs to
+   the tPR-U grade package.
+ - SEAMS: owner->specnum mapping is the documented default (vendor slot
+     assignment is runtime-blocked, tNG-B note); rng interleave of the
+     overridden size/row draws UNMEASURED (stream shape preserved);
+     species-less-player home law UNMEASURED.
 
 tPL-B2 LANDED 2026-11-24 (PRODUCTIVITY-BOX POPUPS PORTED + LIVE WITNESS
 PASS; no OQ row touched — tPL tracks none, honest negative under

@@ -149,6 +149,21 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     // t295: isolated home-draw stream (same form, different seed salt so the
     // streams never alias; pickHomeStars is the SOLE consumer).
     homeLcg_ = static_cast<uint32_t>(cfg.seed) ^ 0x295u;
+    // tPL-D1: homes must exist BEFORE the terrain loop so the per-spec home
+    // TABLE can feed size/row (law block at the terrain loop below).
+    pickHomeStars();
+    // tPL-D1 owner->specnum: same documented default as main.cpp buildCampaign
+    // / ui/speciesmenu.cpp speciesSpecnumOfOwner ("AI races = first specnums
+    // that are not the player's", roster in specnum order). owner 0 = player
+    // (-1 human -> NO table entry: the human home keeps the rng path, which
+    // is the honest default — the vendor always plays a species [unverified
+    // for a species-less game; no capture exists]).
+    std::vector<int> specOf(cfg_.aiCount + 1, -1);
+    specOf[0] = cfg_.playerSpecies;
+    for (int sp = 0, o = 1; sp < 21 && o < int(specOf.size()); ++sp) {
+        if (sp == cfg_.playerSpecies) continue;
+        specOf[size_t(o++)] = sp;
+    }
     auto next = [this]() { return worldNext(); };
     {
         // t294 (OQ-016 residue 3 CLOSED): the rows below are NO LONGER a
@@ -162,9 +177,29 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
         // +0x18 surface counts per size class: grid C row SUMS (file values
         // per-byte MEASURED t294; the original sums 15 bytes @0x37de3).
         const int (&kSurfaceBySize)[5] = cfg_.terrain.surfaceBySize;
+        // tPL-D1 HOME TABLE LAW (docs/re/income-law.md S10 tPL-D1 block):
+        // the two 21-dword static tables at payload 0x88f90 / 0x88fe4 give
+        // the HOME planet's size-class index and terrain weight row keyed by
+        // SPECNUM — MEASURED 85/85 home worlds across 26 independent fresh
+        // lineages (scripts/tpld1_spec_home.py): T1[spec]==home size idx and
+        // T2[spec]==home +0x16, every home, every lineage; non-home planets
+        // span the full rng distribution. Chamachies (spec 19) is ALWAYS 45
+        // cells (size idx 3) row 7; Minions always 73. The cell-class DRAWS
+        // and the rock event stay rng (home nb varies run to run).
+        static const int kHomeSizeIdx[21] = {4,4,3,4,3,4,3,3,4,3,3,3,4,4,4,3,4,3,2,3,3};
+        static const int kHomeTerrainRow[21] = {5,1,1,6,3,2,8,6,4,4,10,2,7,8,9,7,3,5,3,7,9};
         for (int s = 0; s < n; ++s) {
-            const int size = next() % 5;  // rng%5 @0x23a86/95
-            const int row = next() % 11;  // rng%11 @0x23a97/aa8
+            int size = next() % 5;  // rng%5 @0x23a86/95
+            int row = next() % 11;  // rng%11 @0x23a97/aa8
+            const int ho = owner_[s];
+            if (ho >= 0 && ho < int(specOf.size()) && specOf[ho] >= 0 &&
+                specOf[ho] < 21) {
+                // tPL-D1: home world of a species -> table values. The rng
+                // draws above still fire (stream shape preserved; the
+                // interleave is unmeasured — t30 banked).
+                size = kHomeSizeIdx[specOf[ho]];
+                row = kHomeTerrainRow[specOf[ho]];
+            }
             planets_[s].terrainRow = row;  // +0x16 analog (t281: read by the
                                            // SA_Cornucopia skip; see PlanetState)
             const int cells = kSurfaceBySize[size];  // +0x18 analog
@@ -262,7 +297,8 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
         for (int x = 0; x < Nowner_; ++x)
             for (int y = 0; y < Nowner_; ++y)
                 if (x != y) war_[x * Nowner_ + y] = 1;
-    pickHomeStars();
+    // tPL-D1: pickHomeStars() moved ABOVE the terrain loop (home size/row
+    // table law); it still runs before seedVisibility() and the CB seeding.
     // OQ-026 visibility seed (after homes exist; masks per ships.md S23 L5
     // + L9, seeding law per L6/L7 witnesses — see seedVisibility()).
     laneVis_.assign(galaxy_.lanes.size(), 0);   // rec+0x20 analog, zeroed
