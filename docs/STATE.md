@@ -233,25 +233,20 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPL-V2 ORBITAL SLOTS LEFT (D26) — ordering rationale: tPL-V1f
-(2026-11-24) CLOSED the formal port census (census v2
-scripts/tplv1f_census_v2.py VERDICT PASS 2x on a clean geometry grab,
-anti-vacuity mutant M-T1 caught, suite 502/0/0, docs/re/_wip_tPLV1.md F5 +
-planets-ui.md §14) — the grid law tPL-V2 consumes is now fully banked, so
-the queue head advances. 10 slots, 5 rows x 2, NOT isometric, hover shows a
-thin greyish box OUTLINE (not fill). t428 notes twice identify "orbital
-column LEFT" with the PLRES window — START THERE (resolve that identity
-properly: windows.txt PLRES rect + shape records; if it is a separate
-window, port its layout law + hover outline handler). CLOSE: live witness
-10/10 slots + hover outline (capture recipe: the shot() in
-scripts/tplv1_port_witness.sh — winpos substring + root-crop + assert
-640x480; NEVER import -window NAME, the title flips at RESUME; export
-DISPLAY in scripts; clear stale /tmp/.X99-lock first). THEN tPL-B2
-PRODUCTIVITY-BOX POPUPS (D26): clicking a top-row productivity indicator
-pops an info window; EXACT witness text:
+NEXT tPL-B2 PRODUCTIVITY-BOX POPUPS (D26) — ordering rationale: tPL-V2
+(2026-11-24) landed the orbital slot grid + hover outline with a PASSing
+pixel census (docs/re/_wip_tPLV2.md F7), so the planet-view queue advances
+to its next D26 defect. CLICKING a top-row productivity indicator pops an
+info window; EXACT witness text:
 "Crimea 1 / Prosperity: 1 per day / Population will grow in 50 days"
 (/ = line break). Derive templates + values law from windows.txt/string
-table; port all indicator boxes. THEN tPL-D1 HOME PLANET BY RACE (D26):
+table; port all indicator boxes. CLOSE: live witness of each indicator's
+popup (capture recipe: the shot() in scripts/tplv2_port_witness.sh — winpos
+substring + root-crop + assert 640x480; NEVER import -window NAME, the
+title flips at RESUME; export DISPLAY in scripts; clear stale
+/tmp/.X99-lock first; for POINTER-ONLY moves use the NEW `xsend warp x y`
+mode — the legacy `x y` mode CLICKS, and a corner click can kill the app).
+THEN tPL-D1 HOME PLANET BY RACE (D26):
 Chamachi home planet WRONG ART + WRONG MAX POPULATION; derive the vendor
 new-game home-planet law per race (fixed TABLE vs RNG at seed — debugger on
 scratch new-game as Chamachies settles it; cross-check Minions). THEN
@@ -266,6 +261,33 @@ color only; no synthetic stand-ins (RE-FIRST t423 law); protected saves
 TL EXPIRES 2026-11-24 14:53 — if a live witness needs the production ring
 and it's dead, run the t439 recovery pattern FIRST; C1-C5 cosmetic backlog
 + race intro stay DEFERRED (D25) — do not touch.
+
+tPL-V2 LANDED 2026-11-24 (ORBITAL SLOTS LEFT + HOVER OUTLINE PORTED,
+PORT PIXEL CENSUS VERDICT PASS; no OQ row touched — tPL tracks none,
+honest negative under strict-close; open=[016,019] unchanged).
+PROVED (docs/re/_wip_tPLV2.md F1-F7):
+ - GEOMETRY LAW (FUN_0003b96c loop 2): 10 slots, origin (13,119), pitch 70,
+   col0 x13 / col1 x83, rows y=119+70*r — NOT isometric; occupied slot =
+   planitem art CENTRED in the 70x70 box; empty slot at rest paints
+   NOTHING (witness t254: eight empties are starfield). Witness-confirmed
+   against t254 screenshot (x=83 col1 exact; occupied blobs land on cells).
+ - HIT LAW (FUN_0003a880 verbatim): rect x in [14,152] y in [120,468]
+   (1px INSIDE the paint origin — vendor quirk pinned), k = (x-13)/70 +
+   2*((y-119)/70); hover word +0xac set at 0x3ac14.
+ - HOVER OUTLINE LAW (0x3c546..0x3c5d7): 69x69 box OUTLINE pal 150
+   (conv6->8 = (16,69,77)) iff hovered cell == +0xac PER SLOT DRAWN, slot
+   EMPTY, no pick pending. The per-slot compare is load-bearing: the first
+   port built a whole-field compare and the census CAUGHT all ten boxes
+   outlining at once (leak 2447px) — fixed via orbitalHoverOutline(...,
+   int slot, ...) + anti-leak pins.
+ - PORT WITNESS PASS: scripts/tplv2_port_witness.sh + tplv2_census.py —
+   rest 0px all ten boxes (x2 shots), hover-slot0 box(13,119) 276/272 pts
+   exact pal-150 colour with other nine 0, hover-slot6 box(83,189) same.
+ - TOOLING: tools/xsend gained `warp x y` (XWarpPointer, NO button events)
+   — pointer-only moves for hover witnesses; suite 505/0/0 (3 new
+   test_planetview_tplv2 pins: geometry, hit law incl. bounds quirk, hover).
+ - SEAMS banked: TPLV2-A item-23 race-table runtime-unrecovered (Ship
+   draws planitem icon); flag334 tutorial ghost leg not modelled.
 
 tPL-V1f LANDED 2026-11-24 (FORMAL PORT PIXEL CENSUS VERDICT PASS; no OQ
 row touched — tPL tracks none, honest negative under strict-close;

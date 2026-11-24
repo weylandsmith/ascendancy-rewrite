@@ -216,4 +216,40 @@ PlacementBlock placementBlock(const ascend::game::Campaign& camp, int star,
 // 0x38a5a): true iff the item orders WITHOUT a cell.
 bool ordersWithoutCell(const ascend::game::Campaign& camp, int item);
 
+// ---- tPL-V2 ORBITAL SLOT LAW (docs/re/_wip_tPLV2.md F1..F5) ---------------
+// The paint body FUN_0003b96c's SECOND loop (0x3c33a..0x3c4d9) paints the
+// ORBITAL slots — the ten ring cells [surfaceCells, +10) — as a flat
+// two-column x five-row grid LEFT of the sphere (NOT isometric, D26):
+//   seed 0x3c33a/0x3c33f: X0 = 13, Y0 = 119; Y += 70 per slot (0x3c47e);
+//   on (idx - surface)%5 == 4 (0x3c470 idiv 5): Y := 119, X += 70.
+// => slot k (k = cell - surfaceCells, 0..9) origin (top-left):
+//      X = 13 + 70*(k/5),  Y = 119 + 70*(k%5)      [exact immediates]
+// Witness (work/r1/screens/t254/02_planet_detail.png, origin (80,100) per
+// t428 F9): the two occupied art blobs measure screen x83..151 y127..183
+// (col1 row0 box (83,119)) and x14..80 y404..468 (col0 row4 box (13,399))
+// — both land exactly inside the predicted 70x70 boxes; the eight empty
+// slots are starfield (vendor paints NOTHING for an empty slot at rest).
+constexpr int kOrbitalSlots = 10;  // +0x1a == +0x18 + 10 (OQ-014 census)
+constexpr int kOrbitalPitch = 70;  // 0x46: the slot pitch immediates
+Pt orbitalSlotOrigin(int k);
+
+// Hover/click cell for a field point (FUN_0003a880 orbital leg, verbatim):
+//   if (x < 0xe || x > 0x98 || y < 0x78 || y > 0x1d4) -> NOT orbital;
+//   else cell = surface + ((x-0xd)/0x46)*5 + ((y-0x77)/0x46).
+// Returns the ring cell index (surfaceCells + k) or -1.
+int orbitalSlotHitFor(int surfaceCells, Pt p);
+
+// The HOVER OUTLINE law (0x3c546..0x3c5d7): the vendor paints a 69x69 box
+// outline (call 0x2fe04, rect (X,Y)..(X+0x46), colour immediate 0x96 ==
+// pal 150) on the hovered slot iff the slot is EMPTY (cell item byte
+// 0xff), the hover word +0xac names it, and NO pick is pending (+0xab ==
+// 0xff). That is D26's "thin greyish box outline should appear".
+// `slot` is the k the paint loop is drawing: the vendor tests EACH slot
+// against +0xac (per-slot compare), so only the hovered box outlines.
+bool orbitalHoverOutline(const ascend::game::Campaign& camp, int star,
+                         int slot, Pt p, bool pickPending);
+
+// The active item occupying ring cell (surfaceCells + k), or -1.
+int orbitalSlotItem(const ascend::game::Campaign& camp, int star, int k);
+
 }  // namespace ascend::ui

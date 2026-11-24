@@ -283,4 +283,51 @@ bool ordersWithoutCell(const ascend::game::Campaign& camp, int item) {
     return pi && (pi->flags & 0x2);
 }
 
+// ---- tPL-V2 ORBITAL SLOT LAW ------------------------------------------------
+// Citations: docs/re/_wip_tPLV2.md F1..F5 (paint body FUN_0003b96c loop 2
+// 0x3c33a..0x3c4d9 immediates; hover leg 0x3c546..0x3c5d7; hit law
+// FUN_0003a880 verbatim; witness pixel census on the t254 capture).
+
+Pt orbitalSlotOrigin(int k) {
+    if (k < 0 || k >= kOrbitalSlots) return Pt{-1, -1};
+    return Pt{13 + 70 * (k / 5), 119 + 70 * (k % 5)};
+}
+
+int orbitalSlotHitFor(int surfaceCells, Pt p) {
+    // FUN_0003a880 orbital leg verbatim: the field test is
+    // !(x < 0xe || x > 0x98 || y < 0x78 || y > 0x1d4), then
+    // cell = surface + ((x-0xd)/0x46)*5 + (y-0x77)/0x46 (integer divs).
+    if (p.x < 0xe || p.x > 0x98 || p.y < 0x78 || p.y > 0x1d4) return -1;
+    const int k = ((p.x - 0xd) / 0x46) * 5 + (p.y - 0x77) / 0x46;
+    if (k < 0 || k >= kOrbitalSlots) return -1;
+    return surfaceCells + k;
+}
+
+int orbitalSlotItem(const ascend::game::Campaign& camp, int star, int k) {
+    if (star < 0 || star >= int(camp.galaxy().stars.size())) return -1;
+    if (k < 0 || k >= kOrbitalSlots) return -1;
+    const auto& ps = camp.planetAt(star);
+    const int cell = ps.surfaceCells + k;
+    for (size_t i = 0; i < ps.items.size() && i < ps.itemCells.size(); ++i)
+        if (ps.itemCells[i] == cell) return ps.items[i];
+    return -1;
+}
+
+bool orbitalHoverOutline(const ascend::game::Campaign& camp, int star,
+                         int slot, Pt p, bool pickPending) {
+    // 0x3c546..0x3c574: outline iff hovered cell == +0xac AND the cell's
+    // item byte == 0xff (empty) AND no pick pending (+0xab == 0xff). The
+    // vendor's flag334 leg is the tutorial "ghost structure" mode
+    // (0x3c383 sets it from FUN_0003958c) — not modelled; false.
+    // NOTE the == +0xac compare is PER SLOT DRAWN (the paint loop tests
+    // each k against the mousemove-stored hovered cell) — an outline for
+    // every empty slot at once is the bug this parameter exists to kill.
+    if (pickPending) return false;
+    if (star < 0 || star >= int(camp.galaxy().stars.size())) return false;
+    const int surf = camp.planetAt(star).surfaceCells;
+    const int cell = orbitalSlotHitFor(surf, p);
+    if (cell != surf + slot) return false;
+    return orbitalSlotItem(camp, star, slot) < 0;
+}
+
 }  // namespace ascend::ui

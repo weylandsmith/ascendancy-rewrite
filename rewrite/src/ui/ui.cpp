@@ -864,12 +864,21 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     const auto& ptt2 = camp.terrainTables();
                     const int sz2 = ag::Campaign::sizeClassFor(
                         camp.planetAt(planetStar).surfaceCells);
-                    const int hit =
-                        sz2 >= 0
-                            ? tileHitFor(ptt2, sz2,
-                                         camp.planetAt(planetStar).surfaceCells,
-                                         p)
-                            : -1;
+                    // tPL-V2: the orbital slot grid is a CELL too — the
+                    // vendor's hover word (+0xac) shares one index space
+                    // with the surface cells (FUN_0003a880 returns
+                    // surface + k for the orbital rect, else the lattice
+                    // leg). Hit the orbital rect FIRST (it cannot overlap
+                    // the lattice: x <= 0x98 vs lattice x >= ~230).
+                    int hit = orbitalSlotHitFor(
+                        camp.planetAt(planetStar).surfaceCells, p);
+                    if (hit < 0)
+                        hit = sz2 >= 0
+                                  ? tileHitFor(ptt2, sz2,
+                                               camp.planetAt(planetStar)
+                                                   .surfaceCells,
+                                               p)
+                                  : -1;
                     const int item = planetPick;
                     const auto* pi = camp.planetItem(item);
                     if (hit < 0) {
@@ -924,12 +933,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     const auto& ptt2 = camp.terrainTables();
                     const int sz2 = ag::Campaign::sizeClassFor(
                         camp.planetAt(planetStar).surfaceCells);
-                    const int hit =
-                        sz2 >= 0
-                            ? tileHitFor(ptt2, sz2,
-                                         camp.planetAt(planetStar).surfaceCells,
-                                         p)
-                            : -1;
+                    // tPL-V2: orbital slots share the cell-select space
+                    // (same FUN_0003a880 index law as the order leg above).
+                    int hit = orbitalSlotHitFor(
+                        camp.planetAt(planetStar).surfaceCells, p);
+                    if (hit < 0)
+                        hit = sz2 >= 0
+                                  ? tileHitFor(ptt2, sz2,
+                                               camp.planetAt(planetStar)
+                                                   .surfaceCells,
+                                               p)
+                                  : -1;
                     if (hit >= 0) {
                         planetCell = hit;
                         std::printf("ui planet tile %d selected\n", hit);
@@ -1989,7 +2003,9 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 // readout law ui/planetview.h. The five TYPE-29 panels are
                 // the windows.txt rects; PLBUILD is the PROJECT slot whose
                 // click opens the PLANLIST (planet.txt info04).
-                const auto pv = planetViewFor(camp, planetStar, planetName);
+                // tPL-V2: the planetViewFor debug readout is DELETED (it
+                // overlapped orbital column 0); the strip block below paints
+                // the vendor content instead.
                 // ---- t428d FIELD STARFIELD (law ui/planetstrip.h) --------
                 // Paint-body blit-1 [verified 0x3b9c0..0x3b9df]: 17np
                 // record 4 (immediate selector $0x4) at screen (7,115) —
@@ -2160,14 +2176,53 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         }
                     }
                 }
-                txt.draw(ren, 12, 118, pv.title, true, kText);
-                char pbuf[160];
-                std::snprintf(pbuf, sizeof(pbuf), "Population %d / %d  (working %d)",
-                              pv.pop, pv.cap, pv.used);
-                txt.draw(ren, 12, 142, pbuf, false, kText);
-                std::snprintf(pbuf, sizeof(pbuf), "RES %d   IND %d   PROS %d",
-                              pv.res, pv.ind, pv.pros);
-                txt.draw(ren, 12, 162, pbuf, false, kDim);
+                // ---- tPL-V2 ORBITAL SLOTS (D26 "10 squares, five rows of
+                // 2, LEFT of the planet, NOT isometric") ------------------
+                // Law ui/planetview.h orbitalSlotOrigin (paint body
+                // FUN_0003b96c loop 2, 0x3c33a seed X=13 Y=119, +70 pitch;
+                // docs/re/_wip_tPLV2.md F1). Occupied slot: the vendor
+                // blits the item art (0x3c8b0 selector -> cache [0x6fd80],
+                // selector == item for normal items; the item-23 Ship
+                // race-table DAT_0x6fd60 is a RUNTIME table, unrecovered
+                // statically -> SEAM TPLV2-A: Ship draws its planitem icon
+                // like every other item). Empty slot at rest: NOTHING
+                // (0x3c546 arm only paints hover; witness t254: the eight
+                // empty slots are starfield). HOVER (0x3c546..0x3c5d7):
+                // 69x69 box outline, pal 150 — D26's "thin greyish box".
+                if (planetStar >= 0) {
+                    int mx = 0, my = 0;
+                    SDL_GetMouseState(&mx, &my);
+                    for (int k = 0; k < kOrbitalSlots; k++) {
+                        const Pt o = orbitalSlotOrigin(k);
+                        const int item = orbitalSlotItem(camp, planetStar, k);
+                        if (item >= 0 && planitemLib.count() == 40) {
+                            const auto& sr = planitemLib.record(item);
+                            // Witness t254: the col1-row0 blob spans
+                            // x83..151 y127..183 inside box (83,119)+70x70
+                            // => art CENTRED in the slot box (+-1 px).
+                            blitShape(ren, planitemLib, item,
+                                      o.x + (kOrbitalPitch - int(sr.width)) / 2,
+                                      o.y + (kOrbitalPitch - int(sr.height)) / 2);
+                        } else if (item < 0 &&
+                                   orbitalHoverOutline(camp, planetStar, k,
+                                                       Pt{mx, my},
+                                                       planetPick >= 0)) {
+                            const uint32_t ga = chromePaletteArgb(150);
+                            SDL_SetRenderDrawColor(ren, (ga >> 16) & 0xFF,
+                                                   (ga >> 8) & 0xFF, ga & 0xFF,
+                                                   255);
+                            SDL_Rect box{o.x, o.y, kOrbitalPitch - 1,
+                                         kOrbitalPitch - 1};  // 0x2fe04 rect
+                            SDL_RenderDrawRect(ren, &box);
+                        }
+                    }
+                }
+                // tPL-V2: the t406 debug readout (title / Population /
+                // RES-IND-PROS at x12 y118..170) is DELETED — it sat
+                // exactly on orbital slot column 0 (x13.., y119..), and
+                // every number it showed is now on the shipped strip art
+                // (gauges + PLPOP grid + PLBUILD, t428d). The vendor paints
+                // no text in the field (t428 F1/F2 witness).
                 // The PROJECT slot affordance (the t428 strip block above
                 // now paints the PLBUILD CONTENT: centred name + planitem
                 // thumbnail / "No Project" per witnesses A/B). The vendor

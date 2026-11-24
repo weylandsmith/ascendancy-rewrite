@@ -57,10 +57,11 @@ int main(int argc, char** argv) {
      * ONLY, for hold semantics), click x y / click3 x y (Button1/Button3 —
      * Ascendancy ship move/attack orders are RIGHT-click), legacy x y. */
     int is_key = strcmp(mode, "key") == 0 || strcmp(mode, "keyup") == 0;
+    int is_warp = strcmp(mode, "warp") == 0;  // tPL-V2: pointer-only move
     int press_only = strcmp(mode, "keyup") == 0;
     int button = strcmp(mode, "click3") == 0 ? Button3 : Button1;
-    if (argc < (is_key || strcmp(mode,"click")==0 || strcmp(mode,"click3")==0 ? 4 : 3)) {
-        fprintf(stderr, "usage: xsend title (key|keyup KEYSYM [ch] | click|click3 x y | x y)\n");
+    if (argc < (is_key || strcmp(mode,"click")==0 || strcmp(mode,"click3")==0 || is_warp ? 4 : 3)) {
+        fprintf(stderr, "usage: xsend title (key|keyup KEYSYM [ch] | click|click3 x y | warp x y | x y)\n");
         return 2;
     }
     int x = 0, y = 0; KeySym ks = 0; KeyCode kc = 0;
@@ -70,7 +71,7 @@ int main(int argc, char** argv) {
         ks = XStringToKeysym(argv[3]);
         if (ks == 0L) { fprintf(stderr, "bad keysym '%s'\n", argv[3]); return 2; }
         kc = XKeysymToKeycode(d, ks);
-    } else if (strcmp(mode, "click") == 0 || strcmp(mode, "click3") == 0) {
+    } else if (strcmp(mode, "click") == 0 || strcmp(mode, "click3") == 0 || is_warp) {
         x = atoi(argv[3]); y = atoi(argv[4]);
     } else {   /* legacy positional: xsend title x y */
         x = atoi(argv[2]); y = atoi(argv[3]);
@@ -92,6 +93,11 @@ int main(int argc, char** argv) {
         XWarpPointer(d, None, w, 0, 0, 0, 0, x, y);
         XSync(d, False);
         usleep(20000);
+        if (is_warp) {   // tPL-V2: pointer moved, NO button events
+            fprintf(stderr, "warped to %d,%d on 0x%lx\n", x, y, w);
+            XCloseDisplay(d);
+            return 0;
+        }
         e.xbutton.window = w;
         e.xbutton.x = x; e.xbutton.y = y;
         e.xbutton.button = button;
