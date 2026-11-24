@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-24T08:05
+updated: 2026-11-24T09:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,47 +233,82 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tRS-V1 RESEARCH TREE DRAW (D26 "the tree not being drawn correctly" +
-the clickability half of "I can't set any projects") — ordering rationale:
-tRS-B1 (2026-11-24) proved the set-project LOOP is alive (witness PASS) and
-shipped the vendor hit law; what the user still cannot see is WHICH disks
-are clickable — help reswin: clickability IS the disk's content ("empty
-disks represent technologies you CAN CHOOSE TO STUDY"), and the vendor's
-layout/positions come from FUN_0004709c + the projected node table, not our
-derived grid. tPL-D1 emptied the planet queue, so the research DRAW is the
-last D26 machine-closable item.
-DO (per D19 G1/G2 — diff regions, fix laws not pixels; Athens shots
-layout/colour only; NO synthetic stand-ins, RE-FIRST t423 law):
- 1. DERIVE the layout generator law from FUN_0004709c (dumps
-    work/tNGS_gen1/2.asm + re-disasm 0x471f9..0x47478 of
-    work/tRS_reswin_fn.asm): the reswin.txt-absent generator branch — node
-    slots, y=240+30*step+15*(step&1), the 360/(slot-1)+0.1*i rotation, the
-    100-slot stride-0xc table at win+0x143 (init 0x470c1), and the PROJECTED
-    words [winptr+0x5f1+2k]/[+0x6b9+2k] sar 16 the hit law consumes
-    (research.md S7a). The generator feeds the table — recover the
-    generator->table->projection chain and lift the placement VERBATIM;
-    if a leg stays unrecovered, name it, do not invent.
- 2. PORT into researchview.{h,cpp} replacing the derived depth-x-slot-y
-    layout (keep the one-shot ResearchLayout shape — the t419 stall law
-    stands); hit law kResHitHalf=24 ALREADY correct (do not re-derive).
- 3. NODE ART: restree.shp per-row pictures inside the disks (the vendor
-    affordance). Join rows->frames via the loader/shape-slot law (windows
-    .txt SHAPEITEM census + 0x1fc34 fetch posture, t442 precedent); if the
-    row->frame join is unrecovered, draw the measured EMPTY-disk content
-    (what restree.shp k-frames actually hold — decode first, never fake).
- 4. WITNESS scripts/tRSV1_witness.sh: ours-vs-vendor region diff on the
-    tree field (t441_screen_diff region table precedent) + the tRSB1
-    witness re-run must stay PASS (hit law survives the layout swap —
-    re-derive the witness centre from the NEW layout, never hard-code).
- 5. Pins for the layout law + mutation-verify each changed constant;
-    suite green; LEDGER: seam work, honest negative unless a row is touched.
+NEXT tRS-V1b PORT THE TREE GEOMETRY (finish what tRS-V1 derived — same task
+id family; ordering rationale: tRS-V1 (2026-11-24) FULLY derived the
+generator/placement/camera/draw-scope/art laws (docs/re/research.md S8a-S8f,
+working record docs/re/_wip_tRSV1.md P1-P8) but shipped NO code — the one
+uncited leg (0x53374 arg roles = the projection scale) must close before a
+scale lands on the user's screen. tPL-D1 emptied the planet queue; tRS-V1b +
+then tPR-U remain the last D26 machine-closable items.)
+DO, in order:
+ 1. CLOSE LEG P6 (_wip_tRSV1 P6): diff the reswin 0x53374 call site
+    (0x48035..0x48076, pushes esi=&win+0x6bb+2k, edi=&win+0x5f3+2k, 240,
+    235, [win+0xd3]) against the COSMOS call site 0x285bb whose scale law
+    tNGS cycle-1 already pinned (docs/re/_wip_tNGS.md S5: focal =
+    half-width/tan(fov/2), +0.5 bias) — same callee, so the arg ROLES
+    transfer by diff, no new measurement. Fallback if the diff is
+    ambiguous: ONE scratch debugger capture of win+0x143 (world) +
+    win+0x5f1/+0x6b9 (projected) from a live reswin and fit (r290 poke
+    skeleton; scratch savedir law; production ring TL EXPIRES 2026-11-24
+    14:53 — if a live leg is needed after that, run the t439 recovery
+    pattern FIRST, kill Xvfb BY PID only).
+ 2. PORT researchTreeGeometry() into researchview.{h,cpp} VERBATIM per
+    research.md S8b/S8c + _wip P8 PORT NOTE (repeated-float-add angle
+    posture; C[k] table pinned [3,4,3,5,6,5,3,4,2,4,4,4,4,4,5,3,2,1],
+    esi=18; R0/d rules incl. the odd-k C>2 quirk; rotation 0x5324c as
+    X=R sin, Z=R cos). Replace the derived depth-x-slot-y layout; keep the
+    one-shot ResearchLayout shape (t419 stall law stands) and keep
+    researchHit reading the PROJECTED centre (kResHitHalf=24 is CORRECT —
+    do not re-derive). Draw scope = FRONTIER ONLY (S8e) + prereq lines
+    with the +27 Y offset and the z-shaded palette; ring art = resring.shp
+    frames 0..3 by the S8f state law (decode via formats/shp.cpp — 29x29
+    records VERIFIED). The restree.shp per-row picture consumer stays
+    UNRECOVERED (TRSV1-C) — draw rings + lines per the cited law; do NOT
+    fake per-row pictures into the disks.
+ 3. WITNESS: ours-vs-vendor on the tree field (t441_screen_diff region
+    precedent; t252 capture = the vendor reference: few disks, big,
+    panned) + scripts/tRSB1_witness.sh MUST re-run PASS with its click
+    centre RE-DERIVED from the NEW layout (never hard-code).
+ 4. Pins for the geometry law (depth table, C[k], R0/d rules, node world
+    triple vs the python replay in _wip P8) + mutation-verify each changed
+    constant; suite green.
 THEN tPR-U: USER GRADE PACKAGE (checklist format, ours|vendor side-by-side)
 for planet + research; NEXT becomes WAIT-USER-GRADE-PR1.
 RULES: D19 G1-G6 binding; protected saves 01/02/03/04.SAV + RESUME.GAM
-untouchable (scratch savedir law); game ring TL EXPIRES 2026-11-24 14:53 —
-if a live witness needs the production ring and it's dead, run the t439
-recovery pattern FIRST (kill Xvfb BY PID only — tPL-V1f law); C1-C5
-cosmetic backlog + race intro stay DEFERRED (D25) — do not touch.
+untouchable (scratch savedir law); NO synthetic stand-ins, RE-FIRST t423;
+C1-C5 cosmetic backlog + race intro stay DEFERRED (D25) — do not touch.
+
+tRS-V1 LANDED 2026-11-24 (TREE-GEOMETRY LAW DERIVED END-TO-END + MEASURED
+COLUMN TABLE; NO code shipped — one uncited leg named; no OQ row touched,
+honest negative under strict-close; open=[016,019] unchanged).
+PROVED (docs/re/research.md S8; working log docs/re/_wip_tRSV1.md P1-P9;
+fresh disasm work/tRSV1_proj0.asm + tRSV1_proj.asm):
+ - GENERATOR (FUN_0004709c, reswin.txt-absent branch) = depth relaxation +
+   a CHAIN OF CIRCLES: one circle per depth column k, acc angle 240+30k deg,
+   Y=30k+15*(i&1), radius 23 except first node R0(k) (23 iff even-k C>1 or
+   odd-k C==2), step 360/d per node via repeated f32 adds, rotation 0x5324c
+   VERBATIM. MEASURED replay on restree.txt: 66/66 rows converge, esi=18,
+   C=[3,4,3,5,6,5,3,4,2,4,4,4,4,4,5,3,2,1]. NOT a grid, NOT a spiral.
+ - SELF-CORRECTION (the iteration's key trap): 0x47367 reads byte[esp+k] =
+   the COUNT array C[k], not depth A[k] — the A-reading implied a vendor
+   SIGFPE class that the measured table refutes; the C-reading is the only
+   self-consistent law (divisor never 0).
+ - CAMERA cited: focal 320/tan(15deg)=1194.19, pos (0,0,-150), affine
+   0x53324 + perspective 0x53374 writing the u16 HIGH HALVES at
+   win+0x5f3/0x6bb == the hit law's +0x5f1/+0x6b9 (pointer identity proven
+   by the lea pair). CONSEQUENCE: the tree is ~7-9x screen scale — the
+   vendor reswin is a PANNED WINDOW (t252 vision corroborates: 3 disks +
+   lines off-frame), so D26's "tree not drawn correctly" includes SCALE.
+ - DRAW SCOPE frontier-only (0x48566 calls FUN_00046d3c per row); line
+   +27px-Y + z-shaded palette 0x6b-clamp; node state law 0x483fa..0x48470
+   (ring frames = 'data\resring.shp' 4x29x29, gold path iff SELECTED).
+ - ART MEASURED: restree.shp = 66 records 24x24 (one per live row) but ZERO
+   code references its name — picture consumer UNRECOVERED (seam
+   TRSV1-C named; do not attribute the t252 in-disk picture to any law yet).
+ - OPEN LEGS for tRS-V1b: 0x53374 arg roles (P6 — diff vs cosmos 0x285bb,
+   whose scale is already pinned) then port+pins+witness.
+ - SITTING CHECK ran FIRST (r1_t85g_sitting exit 0, ring alive, stale
+   assignment stood). Production ring untouched; no scratch X servers left.
 
 tRS-B1 LANDED 2026-11-24 (RESEARCH SET-PROJECT: HANDLER LAW FULLY DERIVED,
 VENDOR HIT LAW PORTED + MUTATION-PINNED, LIVE WITNESS PASS; no OQ row

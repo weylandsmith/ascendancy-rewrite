@@ -306,3 +306,61 @@ disjoint (pinned premise in the test); TRSB1-B call 0x4fb30(0x78638)
 unrecovered; TRSB1-C the vendor SELECT-vs-COMMIT split means an illegal
 click never even sets the selection word (the port collapses both into
 setStudy — same observable outcome, no separate dossier state).
+
+## 8. tRS-V1 TREE-GEOMETRY LAW (2026-11-24, D26 "the tree not being drawn
+correctly"). FULL WORKING RECORD docs/re/_wip_tRSV1.md (P1-P9); this is the
+distilled law. Generator = FUN_0004709c reswin init (asm work/tNGS_gen1/2.asm
++ fresh capstone windows work/tRSV1_proj0.asm, work/tRSV1_proj.asm of the
+same function 0x4709c..0x48f80).
+
+(a) FILE BRANCH DEAD: init opens 'reswin.txt' (ds:0x24b0 pool VERIFIED);
+    absent in the shipped tree => generator branch 0x471f9 is the vendor law.
+(b) DEPTH LAW = iterative relaxation over the <=5 prereq bytes (record
+    stride 0x4b at census 0x74784): A[row] = max(A[p]+1) once every prereq
+    has a final value; rows retry across passes until no pass marks an
+    unmarked prereq. Converges to the LONGEST-CHAIN depth == the port's
+    researchDepth (MEASURED replay: 66/66 rows, esi = maxdepth+1 = 18
+    columns, max 17 — agrees §3).
+(c) PLACEMENT LAW = A CHAIN OF CIRCLES, one per depth column k in [0,esi):
+    C[k] = rows at depth k (measured [3,4,3,5,6,5,3,4,2,4,4,4,4,4,5,3,2,1]).
+    Column angle acc = 240 + 30*k DEGREES. Per node i in column (file order):
+    Y = 30*k + 15*(i&1); radius = R0(k) for i==0 else 23, where R0(k)=23 iff
+    (k even AND C[k]>1) OR (k odd AND C[k]==2), else 4; X=0, Z=radius;
+    node angle = acc + i*(360/d) accumulated by REPEATED FLOAT ADDS after
+    each write (d = C[k], except odd k with C[k]>2 -> C[k]-1: the vendor
+    quirk that such columns do not close the circle). Rotation primitive
+    0x5324c VERBATIM (degrees, pi/180 ds:0x88b88): (X,Z) -> (X sin+Z cos,
+    Z sin - X cos); with X=0 at call time: X = R sin(t), Z = R cos(t).
+    KEY CORRECTION (self-caught, _wip P1c): the operand at 0x47367 is
+    byte[esp+k] == C[k] (the count array zeroed at esp+0), NOT A[k] — the
+    C-reading is the only one under which the divisor is never 0.
+(d) CAMERA LAW (0x470ef call 0x203b8, args VERIFIED): fov 30, near 1, far
+    1e5, half-width 320 => focal = 320/tan(15deg) = 1194.19 px (0x203e4:
+    320/tan(fov*pi/180 * 0.5), fptan 0x77562, pi/180 pool 0x884b0, 0.5 pool
+    0x833a4); position (0,0,-150) (0xc3160000). World = (X, Y, Z) via the
+    row-major affine 0x53324 (VERIFIED); perspective 0x53374 (the tNGS-S5
+    primitive) writes the u16 screen words at win+0x5f3+2k / win+0x6bb+2k ==
+    the HIGH HALVES of the u32s the hit law reads at +0x5f1/+0x6b9 (lea pair
+    0x47fe3/0x47fe9) + centres 240/235 + pan word [win+0xd3].
+    CONSEQUENCE (arithmetic of the cited law): scale 1194.19/(Z+150) in
+    [7.0,9.2] => the 18-column tree spans FAR beyond the 470x426 window —
+    THE VENDOR SCREEN IS A PANNED WINDOW onto the tree (t252 capture
+    corroborates: 3 disks + lines running off-frame). OPEN LEG (named,
+    uncited): 0x53374's arg roles (which push is the focal factor) — diff
+    vs cosmos call site 0x285bb (tNGS cycle-1 pinned) FIRST.
+(e) DRAW-SCOPE LAW (0x48566): ONLY rows passing FUN_00046d3c (the frontier:
+    all-prereqs-owned AND not-owned) are drawn; ancestors exist in the table
+    for the prereq LINES only. Line = projected endpoints each shifted
+    +27 px Y (0x48334/0x48353 `0x1b`), palette 0x6b - clamp(round(0.25*
+    (win+0xe7 + depth word [win+0x783+4k])), -3, +3) (z-shaded).
+(f) ART LAW: node ring = 'data\resring.shp' (pool 0x850bc VERIFIED, sole
+    refs 0x48476/0x487b6), 4 records 29x29 = frames 0..3 by the state law
+    0x483fa..0x48470: 1 default; 0 iff row==studied AND not owned; 3 iff
+    owned; 2 (SELECTED, gold path 0x5caac) iff row==word[win+0x9db].
+    'data\restree.shp' = 66 records 24x24 = ONE PICTURE PER LIVE ROW, but
+    NO code immediate references its name (the only 'restree' string is
+    restree.txt for the text loader 0x468d3) — the picture consumer is
+    UNRECOVERED (seam TRSV1-C; the t252 picture-in-disk is real, its
+    painter is not yet found).
+(g) HIT LAW survives: tRS-B1's +-24 square consumes the SAME projected
+    words — unchanged by any layout swap.
