@@ -157,38 +157,100 @@ int tileHitFor(const ascend::game::TerrainTables& tt, int size,
     return best;
 }
 
-OrderCellBlock orderCellBlock(const ascend::game::Campaign& camp, int star,
+// ---- tPL-B1b PLACEMENT BLOCK (was t418b orderCellBlock, INVERTED) ---------
+// Chain order verbatim from checker FUN_0003830c (citations in the header
+// F3 block + docs/re/_wip_tPLB1.md F7/F9). EDI semantics: 0x38444 resets
+// EDI=0 for the placement region; return 0x38706 yields -1 (legal) iff
+// EDI != 0 — the zeroing arms are the vetoes.
+
+namespace {
+// ds:0x73e3c == 22 surface-item rows [verified RAM census 4/4, OQ-014
+// ledger + income-law.md S4 XOR law verbatim].
+constexpr int kSurfaceItemCount = 22;
+constexpr int kRingSlots = 10;  // slot-array cap +0x1a == cells+10 (OQ-014)
+}  // namespace
+
+PlacementBlock placementBlock(const ascend::game::Campaign& camp, int star,
                               int item, int cell) {
-    // F3 build-checker legs in verbatim order (0x385b7..0x3870d).
     if (star < 0 || star >= int(camp.galaxy().stars.size()))
-        return OrderCellBlock::None;
+        return PlacementBlock::None;
     const auto& ps = camp.planetAt(star);
     const int surf = ps.surfaceCells;
-    if (cell < 0 || cell >= surf) return OrderCellBlock::None;  // 0x385b7 jae
-    std::vector<char> active(size_t(surf), 0);
+    if (item == 0xff) return PlacementBlock::None;  // demolish exempt (S4)
+    if (cell < 0 || cell >= surf + kRingSlots)
+        return PlacementBlock::None;  // 0x3843a slot-cap early exit
+    const auto* pi = camp.planetItem(item);
+    const bool bit2 = pi && (pi->flags & 0x4);  // build-on-top class (S4)
+    // Occupancy + active census (slot byte0 / word+2 bit0 analogs; the port
+    // stores ACTIVE items only, parallel itemCells).
     bool own = false;
-    for (size_t i = 0; i < ps.items.size(); ++i) {
+    std::vector<char> active(size_t(surf > 0 ? surf : 0), 0);
+    for (size_t i = 0; i < ps.items.size() && i < ps.itemCells.size(); ++i) {
         const int c = ps.itemCells[i];
         if (c == cell) own = true;
-        if (c >= 0 && c < surf) active[size_t(c)] = 1;  // word+2 bit0 analog
+        if (c >= 0 && c < surf) active[size_t(c)] = 1;
     }
-    if (own) return OrderCellBlock::None;               // 0x385ee jne
-    if (item == 5 || item == 38) return OrderCellBlock::None;  // 0x385f6/ff
+    // F10 GRANT ACCUMULATOR: 0x38444 `xor edi,edi` resets EDI=0 at the
+    // placement-region entry; the region's `mov edi,-1` legs (A 0x38446
+    // bit0/race-state, B 0x38493 byte0!=0/demolish/bit2) GRANT and the
+    // `xor edi,edi` legs VETO. Rule B is ALWAYS granted for observed play
+    // (t43 barren-build census 263/892 == terrain rate; the picker filters
+    // by this checker) — so the port implements only the vetoes. THERE IS
+    // NO OCCUPIED VETO: occupancy lives in word+2 bit0, read by own-active
+    // 0x385ee (a skip) and rules E/F — never as a refuse (F10 consequence
+    // 1; t43's empty-cell law is a PICKER law, the port's completion
+    // re-picks the cell).
+    (void)own; (void)bit2;
+    // XOR 0x384db, ONLY item < 31 (0x384e0 cmp dl,0x1e ja): booleans EQUAL
+    // pass (0x38515 je skips the veto), DIFFER zero EDI -> refuse.
+    if (item < 31) {
+        const bool cellSurface = cell < surf;         // 0x384e5 setb
+        const bool itemSurface = item < kSurfaceItemCount;  // 0x384f5 setl
+        if (cellSurface != itemSurface) return PlacementBlock::SurfaceVsRing;
+    }
+    // ROCK 0x38519: veto iff (byte0 bit3) != (item == 38) — Xeno Dig is
+    // legal ONLY ON ROCK (dig arm 0x38546 sete), normal items refuse on
+    // rock. Ring slots skip (T36 forces class 1 == dig-equal reading).
+    if (cell < surf && cell < int(ps.cellClasses.size())) {
+        const bool rock = ps.cellClasses[size_t(cell)] & 8;
+        if (rock != (item == 38)) return PlacementBlock::RockMismatch;
+    }
+    // 0x38554 item 36 Terraforming: requires byte0==0 (barren) AND
+    // byte1==0xff (empty) AND a surface cell (ring class 1 vetoes).
+    if (item == 36) {
+        const bool barren = cell < surf && cell < int(ps.cellClasses.size()) &&
+                            ps.cellClasses[size_t(cell)] == 0;
+        if (!barren || own) return PlacementBlock::TerraformSite;
+    }
+    // ADJACENCY 0x385b7..0x386fc. Ring cells skip (0x385b7 jae).
+    if (cell >= surf) return PlacementBlock::None;
+    if (own) return PlacementBlock::None;  // 0x385ee own-ACTIVE jne-exit
+    if (item == 5 || item == 35) return PlacementBlock::None;  // 0x385f6/ff
     const int size = ascend::game::Campaign::sizeClassFor(surf);
-    if (size < 0) return OrderCellBlock::None;          // unknown geometry
+    if (size < 0) return PlacementBlock::None;  // unknown geometry
     int row = 0, col = 0;
     if (!gridRowCol(camp.terrainTables(), size, surf, cell, &row, &col))
-        return OrderCellBlock::None;
+        return PlacementBlock::None;
     const auto& tt = camp.terrainTables();
-    // Four probes (row-1,col),(row+1,col),(row,col-1),(row,col+1); each:
-    // slot exists AND ACTIVE -> REFUSE (0x386fe edi=1).
-    const int dr[4] = {-1, 1, 0, 0}, dc[4] = {0, 0, -1, 1};
+    // FOUR probes (0x38624..0x38661 call order: row+1, row-1, col-1, col+1).
+    // An existing ACTIVE neighbour exits via `jne 0x386fe` WITHOUT running
+    // 0x386fc `xor edi,edi` => ACTIVE neighbour is LEGAL. All four
+    // inactive/absent => 0x386fc zeroes EDI => REFUSE. (The t418b port had
+    // this inverted — tPL-B1 F5; flipped here per the raw bytes.)
+    const int dr[4] = {1, -1, 0, 0}, dc[4] = {0, 0, -1, 1};
     for (int d = 0; d < 4; ++d) {
         const int n = gridCellFor(tt, size, row + dr[d], col + dc[d]);
         if (n >= 0 && n < surf && active[size_t(n)])
-            return OrderCellBlock::ActiveNeighbour;
+            return PlacementBlock::None;  // active neighbour: jne-exit, legal
     }
-    return OrderCellBlock::None;
+    return PlacementBlock::NoActiveNeighbour;  // 0x386fc xor edi,edi
+}
+
+bool ordersWithoutCell(const ascend::game::Campaign& camp, int item) {
+    // FLAG bit1 (0x3b3f5 `and al,0x2` + 0x38a5a cmd2 skip): the cell-less
+    // items {31,32,33,34,37} order with edx=0xffff (tPL-B1 F2 census).
+    const auto* pi = camp.planetItem(item);
+    return pi && (pi->flags & 0x2);
 }
 
 }  // namespace ascend::ui

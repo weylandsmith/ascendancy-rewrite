@@ -181,8 +181,15 @@ TEST(planetgrid_lattice_t418b) {
           au::gridCellFor(TT, 2, 5, 5));
 }
 
-// ---- F3: the adjacency refuse + the four skip legs -------------------------
-TEST(planetgrid_adjacency_t418b) {
+// ---- tPL-B1b: the placement chain (XOR / occupied / rock / adjacency) -----
+// Pins RE-DERIVED from the raw checker asm (ui/planetview.h F3 block,
+// docs/re/_wip_tPLB1.md F7/F9). The t418b original pinned the port's own
+// INVERTED adjacency reading (active neighbour = refuse); tPL-B1 F5 proved
+// that wrong from raw bytes 0x38666..0x386fc (ACTIVE neighbour exits the
+// probe block via jne WITHOUT the 0x386fc `xor edi,edi` = LEGAL; all four
+// probes inactive/absent = REFUSE). Replacing those pins with vendor-law
+// pins IS the fix.
+TEST(planetgrid_placement_t418b) {
     REQUIRE_DATA();
     auto copt = seededCampaign();
     CHECK(copt.has_value());
@@ -199,89 +206,195 @@ TEST(planetgrid_adjacency_t418b) {
     const int size = ag::Campaign::sizeClassFor(surf);
     CHECK(size >= 0);
     if (size < 0) return;
-    // State A: ONE active item on cell 0 (Factory, item 0).
-    ps.items = {0};
+    const auto& tt = c.terrainTables();
+    // Isolate the placement chain: no pop/queue state (placementBlock never
+    // reads it — the queue gates are projectOrderable's domain, t406).
+    ps.pop = 0;
+    // Deterministic fixture terrain: all class 1 (non-rock), one ROCK cell
+    // (last surface cell) and one BARREN cell (surf-2) — the rock/dig and
+    // terraform arms need both. Cell 0 is non-rock, so the kNbr0 lattice
+    // fixtures below hold.
+    ps.cellClasses.assign(size_t(surf) + 10, 1);
+    ps.cellClasses[size_t(surf - 1)] = 8;
+    ps.cellClasses[size_t(surf - 2)] = 0;
+    // ---- 0) NO active items at all: rule G zeroes (0x386fc) -> REFUSE.
+    // The t418b port returned None here; the vendor refuses every cell for a
+    // normal item until something ACTIVE exists (planet.txt info02).
+    ps.items.clear();
+    ps.itemCells.clear();
+    CHECK(au::placementBlock(c, star, 0, 0) ==
+          au::PlacementBlock::NoActiveNeighbour);
+    // exempt items still order on a bare planet: 5 Colony Base (0x385f6),
+    // 35 Automation (0x385ff cmp dl,0x23 — NOT 38; F9 correction).
+    CHECK(au::placementBlock(c, star, 5, 0) == au::PlacementBlock::None);
+    CHECK(au::placementBlock(c, star, 35, 0) == au::PlacementBlock::None);
+    // 38 Xeno Dig is NOT adjacency-exempt, and its rock leg REQUIRES rock
+    // (F10: veto iff rock XOR dig) — on non-rock cell 0 it refuses:
+    CHECK(au::placementBlock(c, star, 38, 0) ==
+          au::PlacementBlock::RockMismatch);
+    // ---- 1) XOR leg 0x384db (item < 31 only; EQUAL booleans pass) --------
+    // surface item on the orbital ring refuses (true != false):
+    CHECK(au::placementBlock(c, star, 0, surf) ==
+          au::PlacementBlock::SurfaceVsRing);
+    CHECK(au::placementBlock(c, star, 21, surf + 3) ==
+          au::PlacementBlock::SurfaceVsRing);
+    // orbital item (22..30) on a surface cell refuses (false != true) —
+    // INDEPENDENT of adjacency (the t418b code skipped the leg for surface
+    // cells entirely; a bare planet separates the two readings):
+    CHECK(au::placementBlock(c, star, 22, 0) ==
+          au::PlacementBlock::SurfaceVsRing);
+    // items 31..38 are EXEMPT from XOR (0x384e0 cmp dl,0x1e ja): 32 on a
+    // surface cell reaches the adjacency leg, not the XOR refuse.
+    CHECK(au::placementBlock(c, star, 32, 0) !=
+          au::PlacementBlock::SurfaceVsRing);
+    // the equal-pass shape: surface item on a surface cell is NOT refused
+    // by XOR (whatever adjacency says):
+    ps.items = {5};
     ps.itemCells = {0};
-    // Neighbours of cell 0 per size class, VERBATIM from the grid tables
-    // (measured by hand this session: size0 {1,2}, size1 {2}, size2 {2},
-    // size3 {1,3}, size4 {1,4}). Each neighbour REFUSES, each non-neighbour
-    // inactive cell ACCEPTS (None).
+    CHECK(au::placementBlock(c, star, 0, 1) !=
+          au::PlacementBlock::SurfaceVsRing);
+    // ---- 2) NO OCCUPIED VETO (F10 consequence 1) --------------------------
+    // The checker's rule B (0x38493) reads the CELL-CLASS byte, not
+    // occupancy, and is granted for observed play; occupancy is read only
+    // by own-active 0x385ee (a SKIP of rule G) and rules E/F. A surface
+    // item on the CB's own cell therefore passes: XOR equal, rock law
+    // equal, own-active skips adjacency. (The t43 "built items land on
+    // EMPTY cells" law is a PICKER law — completion re-picks the cell.)
+    CHECK(au::placementBlock(c, star, 0, 0) == au::PlacementBlock::None);
+    // occupied ring slot, orbital item: None (XOR equal, ring skips G).
+    ps.items = {28};
+    ps.itemCells = {surf};  // ring slot 0
+    CHECK(au::placementBlock(c, star, 24, surf) == au::PlacementBlock::None);
+    // ---- 3) ROCK/LEG 0x38519 + 0x38554 ------------------------------------
+    // rock veto = (byte0 bit3) != (item==38): normal item on rock refuses;
+    // dig 38 on rock passes the rock leg (adjacency then decides); dig on
+    // NON-rock refuses (dig arm 0x38546 sete).
+    int rock = -1, nonrock = -1;
+    for (int cell = 0; cell < surf; cell++) {
+        if (cell >= int(ps.cellClasses.size())) break;
+        if (ps.cellClasses[size_t(cell)] & 8) { if (rock < 0) rock = cell; }
+        else if (nonrock < 0) nonrock = cell;
+    }
+    ps.items.clear();
+    ps.itemCells.clear();
+    if (rock >= 0) {
+        CHECK(au::placementBlock(c, star, 0, rock) ==
+              au::PlacementBlock::RockMismatch);
+        // 38 on rock: rock leg passes; adjacency vetoes on a bare planet.
+        CHECK(au::placementBlock(c, star, 38, rock) !=
+              au::PlacementBlock::RockMismatch);
+    }
+    if (nonrock >= 0)
+        CHECK(au::placementBlock(c, star, 38, nonrock) ==
+              au::PlacementBlock::RockMismatch);
+    // 36 Terraforming requires barren+empty+surface (0x38554): on a rock or
+    // ring cell it refuses TerraformSite (the rock leg is equal-both-false
+    // for 36 on non-rock, so this separates the legs).
+    // 36 >= 31 skips XOR; ring skips rock + adjacency; ring is not barren
+    // (T36 forces class 1) -> the 0x38554 barren+empty veto:
+    CHECK(au::placementBlock(c, star, 36, surf + 1) ==
+          au::PlacementBlock::TerraformSite);
+    // on a NON-barren surface cell the same veto fires; on the barren cell
+    // (surf-2, empty) it passes the barren leg and adjacency decides
+    // (bare planet -> NoActiveNeighbour, item 36 not in the {5,35} set):
+    CHECK(au::placementBlock(c, star, 36, 1) ==
+          au::PlacementBlock::TerraformSite);
+    CHECK(au::placementBlock(c, star, 36, surf - 2) ==
+          au::PlacementBlock::NoActiveNeighbour);
+
+    // ---- 4) ADJACENCY 0x385b7..0x386fc, CORRECT POLARITY -----------------
+    // One active item on cell 0. Neighbours of cell 0 per size class,
+    // VERBATIM from the grid tables (t418b measurement: size0 {1,2},
+    // size1 {2}, size2 {2}, size3 {1,3}, size4 {1,4}). Each neighbour
+    // ACCEPTS (active neighbour = legal); each non-neighbour inactive cell
+    // REFUSES (0x386fc).
+    ps.items = {5};
+    ps.itemCells = {0};
     static const int kNbr0[5][2] = {{1, 2}, {2, -1}, {2, -1}, {1, 3}, {1, 4}};
     for (int k = 0; k < 2; k++)
         if (kNbr0[size][k] >= 0)
-            CHECK(au::orderCellBlock(c, star, 1, kNbr0[size][k]) ==
-                  au::OrderCellBlock::ActiveNeighbour);
-    // skip leg 0x385f6: item 5 Colony is exempt even on an active neighbour.
-    CHECK(au::orderCellBlock(c, star, 5, kNbr0[size][0]) ==
-          au::OrderCellBlock::None);
-    // skip leg 0x385ff: item 38 Xeno Dig exempt.
-    CHECK(au::orderCellBlock(c, star, 38, kNbr0[size][0]) ==
-          au::OrderCellBlock::None);
-    // skip leg 0x385b7: cell >= surfaceCells (orbital ring) never asks.
-    CHECK(au::orderCellBlock(c, star, 1, surf) == au::OrderCellBlock::None);
-    CHECK(au::orderCellBlock(c, star, 1, -1) == au::OrderCellBlock::None);
-    // a NON-neighbour inactive cell passes. Pick a surface cell that is
-    // neither 0 nor a neighbour (every shipped grid has one).
+            CHECK(au::placementBlock(c, star, 0, kNbr0[size][k]) ==
+                  au::PlacementBlock::None);
     int far = -1;
     for (int cell = 1; cell < surf; cell++) {
         if (cell == kNbr0[size][0] || cell == kNbr0[size][1]) continue;
+        if (cell < int(ps.cellClasses.size()) &&
+            (ps.cellClasses[size_t(cell)] & 8)) continue;  // rock arm owns it
         far = cell;
         break;
     }
     CHECK(far >= 0);
     if (far >= 0)
-        CHECK(au::orderCellBlock(c, star, 1, far) == au::OrderCellBlock::None);
-    // State B (skip leg 0x385ee, mutation-rule-5 shape): items on cell 0 AND
-    // on its FIRST neighbour — so cell 0 is active AND HAS an active
-    // neighbour. The own-ACTIVE skip is now the only leg that can answer
-    // None for cell 0; deleting it flips this to ActiveNeighbour.
-    ps.items = {0, 0};
-    ps.itemCells = {0, kNbr0[size][0]};
-    CHECK(au::orderCellBlock(c, star, 1, 0) == au::OrderCellBlock::None);
-    // and cell 0's OTHER neighbour (active via cell 0) still refuses.
-    if (kNbr0[size][1] >= 0)
-        CHECK(au::orderCellBlock(c, star, 1, kNbr0[size][1]) ==
-              au::OrderCellBlock::ActiveNeighbour);
-    // State C (mutation M10 triage): the FOUR probes are the directional
-    // TABLE row±1/col±1 — losing any leg must flip some fixture. For the
-    // seeded planet's size class, scan every ordered (active cell A, other
-    // cell B) pair: B refuses iff B shares a row/col lattice line with A
-    // (B in {(Ar±1,Ac),(Ar,Ac±1)} via gridCellFor). This exercises all four
-    // directions (a dropped leg drops exactly the refusals it owns).
+        CHECK(au::placementBlock(c, star, 0, far) ==
+              au::PlacementBlock::NoActiveNeighbour);
+    // skip leg 0x385b7: ring cells never ask (XOR passes an orbital item
+    // there; adjacency is surface-only):
+    CHECK(au::placementBlock(c, star, 22, surf) == au::PlacementBlock::None);
+    CHECK(au::placementBlock(c, star, 22, surf + 9) ==
+          au::PlacementBlock::None);
+    // skip leg 0x385ee own-ACTIVE: the jne-exit BYPASSES rule G (it does not
+    // re-grant the occupied veto — that leg fired earlier and stands; here
+    // the own cell is tested THROUGH the occupied veto by a bit2 item, and
+    // an exempt item 5 on its own cell answers None).
+    CHECK(au::placementBlock(c, star, 5, 0) == au::PlacementBlock::None);
+    // State C (mutation-M10 shape, polarity-corrected): the FOUR probes are
+    // the directional TABLE row±1/col±1 — losing any leg must flip some
+    // fixture. Scan every ordered (active A, target B) pair: B is None iff B
+    // is a lattice neighbour of A (and not rock), else NoActiveNeighbour.
     {
-        const auto& tt = c.terrainTables();
         auto rc = [&](int cell, int& r, int& cc) {
             return au::gridRowCol(tt, size, surf, cell, &r, &cc);
         };
-        int checked = 0;
+        int checked = 0, refused = 0;
         for (int A = 0; A < surf; A++) {
+            if (A < int(ps.cellClasses.size()) &&
+                (ps.cellClasses[size_t(A)] & 8)) continue;  // CB never on rock
             int ar = 0, ac = 0;
             rc(A, ar, ac);
             for (int Bc = 0; Bc < surf; Bc++) {
                 if (Bc == A) continue;
+                if (Bc < int(ps.cellClasses.size()) &&
+                    (ps.cellClasses[size_t(Bc)] & 8)) continue;  // rock arm
                 int br = 0, bc = 0;
                 rc(Bc, br, bc);
                 const bool nbr = au::gridCellFor(tt, size, ar + 1, ac) == Bc ||
                                  au::gridCellFor(tt, size, ar - 1, ac) == Bc ||
                                  au::gridCellFor(tt, size, ar, ac + 1) == Bc ||
                                  au::gridCellFor(tt, size, ar, ac - 1) == Bc;
-                ps.items = {0};
+                ps.items = {5};
                 ps.itemCells = {A};
-                const auto got = au::orderCellBlock(c, star, 1, Bc);
-                const bool wantRefuse = nbr;
-                if ((got == au::OrderCellBlock::ActiveNeighbour) != wantRefuse) {
+                const auto got = au::placementBlock(c, star, 0, Bc);
+                const bool wantLegal = nbr;
+                if ((got == au::PlacementBlock::None) != wantLegal) {
                     CHECK(false);  // names the pair below
-                    std::printf("adjacency mismatch size%d A%d(%d,%d) B%d(%d,%d) got %d\n",
+                    std::printf("placement mismatch size%d A%d(%d,%d) B%d(%d,%d) got %d\n",
                                 size, A, ar, ac, Bc, br, bc, int(got));
                     return;
                 }
+                if (!wantLegal) ++refused;
                 ++checked;
             }
         }
-        CHECK(checked == surf * (surf - 1));
+        CHECK(checked > 0);
+        CHECK(refused > 0);  // the refuse arm must be exercised, not vacuous
     }
-    // NO active items at all: nothing refuses.
-    ps.items.clear();
-    ps.itemCells.clear();
-    CHECK(au::orderCellBlock(c, star, 1, 0) == au::OrderCellBlock::None);
+}
+
+// ---- tPL-B1b: the FLAG-bit1 cell-less census (0x3b3f5 / 0x38a5a) ----------
+TEST(orders_cellless_bit1_t418b) {
+    REQUIRE_DATA();
+    auto copt = seededCampaign();
+    CHECK(copt.has_value());
+    if (!copt) return;
+    ag::Campaign& c = *copt;
+    // Census (tPL-B1 F2 + F9 re-run on the 39-row runtime table): bit1 rows
+    // {31 Alien Hospitality, 32 Interstellar Trucking, 33 Endless Party,
+    // 34 Scientist Takeover, 37 Lush Growth Bomb} order WITHOUT a cell.
+    for (int id = 0; id < c.planItemCount(); id++) {
+        const auto* pi = c.planetItem(id);
+        if (!pi) continue;
+        const bool want = (id == 31 || id == 32 || id == 33 || id == 34 ||
+                           id == 37);
+        CHECK(au::ordersWithoutCell(c, id) == want);
+    }
 }

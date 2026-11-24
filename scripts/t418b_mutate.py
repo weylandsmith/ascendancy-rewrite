@@ -25,12 +25,28 @@ MUT = {
         "return Pt{110 + col * 34 + row * 34, 410 + col * 17 - row * 34};"),  # row x-step
  "M7": ("if (17 * std::abs(dx) + 34 * std::abs(dy) > 578) continue;",
         "if (17 * std::abs(dx) + 34 * std::abs(dy) > 1156) continue;"),       # diamond size
- "M8": ("if (own) return OrderCellBlock::None;               // 0x385ee jne",
-        "// own-skip deleted (0x385ee mutant)"),
- "M9": ("if (item == 5 || item == 38) return OrderCellBlock::None;  // 0x385f6/ff",
-        "if (item == 6 || item == 39) return OrderCellBlock::None;"),
- "M10": ("const int dr[4] = {-1, 1, 0, 0}, dc[4] = {0, 0, -1, 1};",
-         "const int dr[4] = {-1, -1, 0, 0}, dc[4] = {0, 0, -1, 1};"),  # row+1 probe lost
+ "M8": ("        if (rock != (item == 38)) return PlacementBlock::RockMismatch;",
+        "        // rock veto deleted (0x38519 mutant)"),
+ "M9": ("if (item == 5 || item == 35) return PlacementBlock::None;  // 0x385f6/ff",
+        "if (item == 6 || item == 39) return PlacementBlock::None;"),
+ "M10": ("const int dr[4] = {1, -1, 0, 0}, dc[4] = {0, 0, -1, 1};",
+         "const int dr[4] = {1, 1, 0, 0}, dc[4] = {0, 0, -1, 1};"),  # row-1 probe lost
+ # tPL-B1b: the polarity flip is THE bug this iteration fixed — each mutant
+ # re-introduces one inverted/wrong-polarity reading.
+ "M11": ("            return PlacementBlock::None;  // active neighbour: jne-exit, legal",
+         "            return PlacementBlock::NoActiveNeighbour;  // INVERTED (t418b bug)"),
+ "M12": ("    return PlacementBlock::NoActiveNeighbour;  // 0x386fc xor edi,edi",
+         "    return PlacementBlock::None;  // all-inactive mutant"),
+ "M13": ("        if (cellSurface != itemSurface) return PlacementBlock::SurfaceVsRing;",
+         "        if (cellSurface == itemSurface) return PlacementBlock::SurfaceVsRing;"),
+ "M14": ("    if (item < 31) {",
+         "    if (item < 22) {"),  # 0x384e0 cmp dl,0x1e
+ "M15": ("    if (cell < 0 || cell >= surf + kRingSlots)",
+         "    if (cell < 0 || cell >= surf)"),  # ring domain lost
+ "M16": ("        if (!barren || own) return PlacementBlock::TerraformSite;",
+         "        if (own) return PlacementBlock::TerraformSite;"),  # barren arm lost
+ "M17": ("    if (own) return PlacementBlock::None;  // 0x385ee own-ACTIVE jne-exit",
+         "    // own-skip deleted (0x385ee mutant)"),
 }
 
 def restore():

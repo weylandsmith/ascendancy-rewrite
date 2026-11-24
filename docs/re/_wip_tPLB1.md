@@ -168,3 +168,130 @@ re-pick -> click a tile ADJACENT to the ordered one => refused line (the F3
 leg). XOR-refuse of orbital items has NO UI witness early-game (every
 orbital row is REQUIRES-gated, planitem.txt) — pinned in the unit suite
 instead, honestly.
+
+## F7 — tPL-B1b RE-DERIVATION FROM RAW ASM (this iteration, work/r331_disasm.txt)
+Full leg chain of checker 0x3830c read raw (0x38444..0x38714), EDI!=0 == LEGAL,
+return 0x38706 mov eax,0xffffffff when EBP==0 || (EBP&&EDI):
+  - rule A 0x38446: item FLAG bit0 ban SKIPPED when bit0 set... [leg reads
+    `flags&1 jne 0x3848e(set)` — ban arm + race-state==2 exception; NOT
+    modelled port-side (race-exception arm unverified, tPL-B1 F2 stands)].
+  - rule B 0x38493: slot byte0 != 0 sets EDI:=-1; item 0xff exempt; item
+    FLAG bit2 skips the leg. POLARITY AMBIGUITY BANKED (drawCbCell comment
+    reads B as a zeroing rule, t43 reads it as enabling; F5's decisive
+    reading + the steering leg-list "occupied-unless-bit2" keep B as
+    occupied-REFUSES-unless-bit2. B never fires in the witness fixtures
+    (all-clicked-cells-empty), so it cannot flip the closure either way).
+  - rule C 0x384db XOR leg VERBATIM raw (0x384e5..0x38517): only item<31
+    (0x384e0 cmp 0x1e ja skips the leg); `setb al = cell<+0x18`,
+    `setl dh = item<ds:0x73e3c(22)`, then `cmp eax,ecx; je 0x38519` skips
+    the veto, fallthrough `xor edi,edi` zeroes. => booleans DIFFER = REFUSE,
+    EQUAL = pass (domain check: surface item on surface cell = true==true
+    pass; orbital item on ring = false==false pass; cross combos refuse —
+    income-law.md S4 "!= refuses" agrees verbatim).
+  - rule D 0x38519: slot word+2 bit3 (rock) zeroes EDI unless item==38.
+  - rule E 0x38554: item 36 requires fully-empty slot.
+  - rule F 0x38576: item 35 (Automation) leg — NOT modelled (named).
+  - rule G 0x385b7 ADJACENCY: cell>=+0x18 jae exit (0x386fe = legal tail);
+    own slot word+2 bit0 !=0 -> jne 0x386fe; item 5 je-exit; item 38 je-exit;
+    FOUR probes via 0x395c4 (row+1,row-1,col-1,row,col+1 order 0x38624..
+    0x38661): each existing neighbour with word+2 bit0 set -> `jne 0x386fe`
+    exits WITHOUT executing 0x386fc `xor edi,edi`; fallthrough 0x386fc ZEROES
+    EDI. => ACTIVE neighbour = LEGAL; ALL-inactive = REFUSE (F5 confirmed
+    independently from raw bytes). COROLLARY THE PORT MISSES: the own-active
+    jne-exit is NOT a benign skip — it BYPASSES rule G, so clicking an
+    OCCUPIED cell with a non-bit2 item must REFUSE (the t418b port returned
+    None there and State-B pinned that wrong reading).
+  - cmd arm 0x38a3a (ecx==2, the tile-click writer path): flags&2 -> SKIP
+    checker 0x38a65 entirely (bit1/cell-less items go straight to writer);
+    checker==0 -> silent refuse 0x38b92. NOTE the dispatch numbering: the
+    gates at 0x388e2 (queue empty/item<39/free-pop) sit in the arm reached
+    at 0x388ba `jb 0x38b8a` — the raw cmp-chain says they are NOT the cmd2
+    arm [honest label correction: planetview.h calls them "cmd0 gates";
+    cmd2 = 0x38a3a; keep the gates port-side as the queue-dedup law and
+    relabel, per tPL-B1 F5 "keep both, label correctly"].
+
+## F8 — PORT WIRING SHIPPED (tPL-B1b)
+planetview: OrderCellBlock {None, Occupied, NoActiveNeighbour} — enum renamed
+from ActiveNeighbour (the old name encoded the inverted polarity). Chain now
+implements C (XOR), B (occupied-unless-bit2), G (active-neighbour LEGAL,
+own-active REFUSES, items 5/38 + ring + no-active-exempt... note: NO active
+items at all => rule G zeroes => refuse; the home planet's first build is
+Colony Base (exempt) or requires an active CB cell). ui.cpp: PLANLIST row
+click SETS planetPick (no order); tile click WITH pick runs
+placementBlock+projectOrderable then orderProject, pick cleared after every
+attempt (0x3b487); tile click WITHOUT pick keeps tile-select. Report strings
+updated to the new polarity.
+
+## F9 — tPL-B1b CORRECTIONS + FINAL SHIP LAW (raw-asm decisive, this iteration)
+- ADJACENCY EXEMPT SET IS {5, 35}, NOT {5, 38}: raw 0x385ff `cmp dl,0x23`
+  (0x23 = 35 Automation). The F5 line "CB item 5 and Xeno Dig item 38 exempt,
+  0x385f6/0x385ff" mis-set 38; income-law.md T42 drawCbCell comment already
+  had it right ("Rule G adjacency is SKIPPED for items 5/35"). Xeno Dig 38's
+  real exemption is the ROCK leg 0x38546 `cmp dl,0x26`.
+- FLAG WORD CENSUS re-run against the RUNTIME table (39 rows; the quick file
+  parse that dropped Transport^Tubes shifted indices — loader/loader-test
+  39/39 byte-exact stands, OQ-014): bit0 {5,21,35,36,38}, bit1 {31,32,33,34,
+  37}, bit2 {17,28,29,30}, bit3 {18,19,25,26,27} (file rows; runtime bit3
+  set per income-law S4 "cell FLAG bit3 unbuildable terrain" is the CELL's
+  class byte, distinct from the item flag — the port models it via
+  cellClasses[cell] & 8, T36).
+- cmd DISPATCH NUMBERING settled raw: 0x388ba `cmp cl,1; jb 0x38b8a` ->
+  `test cl,cl; je 0x388e2` — the queue-empty/item<39/free-pop gates at
+  0x388e2..0x38922 are the CMD0 arm ONLY; cl==1 (demolish) -> 0x389be;
+  cl in {2,3} -> 0x38a38; the tile-click UI calls CMD2 which gates on the
+  CHECKER (0x38a65) + the bit1 skip (0x38a5a `and al,0x2` = BIT1, cell-less
+  items bypass the checker) — NOT on queue emptiness. The port keeps
+  projectOrderable's cmd0 gates as its one-project-per-planet law (t406
+  pins, planet.txt info04) — label stands [inferred for the UI path].
+- SHIPPED orderCellBlock chain (veto reading; enum {None, Occupied,
+  SurfaceVsRing, Rock, NoActiveNeighbour}):
+  occupied-unless-bit2/0xff (0x38493, income-law S4 verbatim) ->
+  XOR item<31 (0x384db) -> rock unless 38 (0x38519/0x38546) ->
+  adjacency (ring skip 0x385b7; own-active skip 0x385ee; exempt {5,35};
+  FOUR probes, ACTIVE=legal jne-exit, all-inactive = refuse 0x386fc).
+  AMBIGUOUS re-grant arms 0x3848e (bit0||race-state==2) and 0x384d6 NOT
+  modelled; the veto reading is the only one consistent with t341 S1 (fresh
+  Factory reserved legal) AND rule-G zeroing (0/362 census).
+- UI miss leg 0x3b3f5/0x3b402: click WITH pick, NO cell -> orders cell-less
+  iff FLAG bit1, else refresh-only (pick persists in +0xb2). Port helper
+  ordersCellLessWithoutCell; miss + bit1-clear keeps the pick.
+
+## F10 — GRANT/VETO ACCUMULATOR RESOLVED (tPL-B1b, THE decisive correction)
+Full EDI trace of FUN_0003830c (raw work/r331_disasm.txt): 0x3831f EDI:=EBI
+(-1), but 0x38444 `xor edi,edi` RESETS EDI=0 at the placement-region entry
+(ALL paths reach 0x3843a->0x38444). Return 0x38706 = -1 (legal) iff
+EBP!=0 && EDI!=0. So the placement region is a GRANT ACCUMULATOR:
+  - GRANTS: rule A 0x38446 `mov edi,-1` when item FLAG bit0 OR
+    ds:0x12fb3[owner*0x1ee]==2; rule B 0x38493 `mov edi,-1` when slot
+    BYTE0 != 0 (THE CELL-CLASS BYTE, T36 — NOT occupancy; occupancy lives in
+    word+2 bit0, read only by own-active 0x385ee and rules E/F) OR
+    item==0xff OR flags bit2.
+  - VETOES (all `xor edi,edi`): C 0x384db XOR (item<31, booleans DIFFER);
+    D 0x38519 veto iff (byte0 bit3) != (item==38) — Xeno Dig legal ONLY ON
+    ROCK (0x38546 sete/dig arm; normal items refuse on rock);
+    E 0x38554 item 36 Terraforming requires byte0==0 AND byte1==0xff
+    (barren AND empty; ring slots forced class 1 by T36 -> veto);
+    F 0x38576 item 35 requires own-ACTIVE w/ word+2 bit1 [UNMODELLED —
+    port Automation is the governor path];
+    G 0x385b7 adjacency (polarity per F5: active neighbour = jne-exit =
+    NO veto; all-inactive = 0x386fc veto).
+  - A is ALWAYS granted for observed play: the t43 barren-build census
+    (campaign.h:745: items on barren 263/892 == terrain rate 31.6%) is
+    impossible unless the checker grants normal items on class-0 cells, and
+    the picker (FUN_0003875c, t43 law) filters by THIS checker. So the port
+    models A as always-granted [inferred from measurement] and implements
+    only the vetoes.
+CONSEQUENCES SHIPPED (supersede F7 rule-B line and F8 chain):
+  1. NO OCCUPIED VETO in the checker for the tile click. An occupied target
+     passes C, passes D (rock law only), passes E (unless 36), and SKIPS G
+     via own-active 0x385ee -> legal. (t43's "built items land on EMPTY
+     cells" is a PICKER law, not a UI refuse; the port's queue is
+     item-only and completion re-picks a cell, so no overwrite risk.)
+     The Occupied enum value is DELETED; Occupied-shape fixtures now pin
+     None ("occupancy never vetoes").
+  2. Rock veto is RockMismatch (rock XOR dig), not "rock refuses unless 38":
+     dig on NON-rock also refuses (0x38519 raw). Ring cells skip D (port
+     ring byte0 forced 1 == dig-equal reading agrees with T36).
+  3. TerraformSite veto for item 36 unless barren+empty+surface.
+  4. 38 Xeno Dig is NOT adjacency-exempt (F9); 35's adjacency exemption is
+     real (0x385ff cmp dl,0x23) but its rule F is unmodelled (named seam).

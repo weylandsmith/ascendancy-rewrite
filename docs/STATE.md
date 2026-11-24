@@ -233,30 +233,24 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPL-B1b PLANET BUILD LOOP — SHIP THE TWO-STEP (D26 top priority
-unchanged: "double-clicking a square doesn't do anything, so I can't build
-anything"). tPL-B1 (2026-11-23) DERIVED the complete law and banked it in
-docs/re/_wip_tPLB1.md F1-F6 — READ THAT FILE FIRST; it is the spec. Core
-facts already proven there: the tile click is ORDER STEP 2 not a popup
-(msg-map 0x1c01 branch 0x3b3b6, decompile work/coswnd_decomp/3aa0a.c
-L535-566); the vendor adjacency polarity is INVERTED in our port (F5: raw
-asm 0x38666..0x386fc — ACTIVE neighbour = LEGAL, all-inactive = refuse;
-t43 + planet.txt info02 agree); flag-bit1 items {31,32,33,34,37} order
-cell-less (0x3b402 leg); the UI call is 0x38840 CMD2 whose writer is t341
-S1. EXECUTE in one atomic change set: (1) flip orderCellBlock polarity +
-enum meaning in rewrite/src/ui/planetview.{h,cpp}; (2) re-derive the two
-adjacency tests in tests/test_planetview_t418b.cpp from the F5 law (the old
-pins pin the port's own inverted reading — replacing them with vendor-law
-pins is the fix, cite the raw-asm addresses); (3) wire ui.cpp: PLANLIST row
-click SETS the pick (no order), tile click WITH pick runs placementBlock
-(XOR leg + occupied-unless-bit2 + adjacency) then orderProject, pick
-cleared after every attempt (0x3b487), tile click WITHOUT pick keeps the
-tile-select affordance; update the "cell refuses" report strings to the
-new polarity; (4) unit pins for XOR + occupied + bit1 legs (F4/F2);
-(5) witness scripts/tPLB1_buildloop_witness.sh per F5 (pick Factory ->
-non-adjacent tile refuses, adjacent tile orders; seed 5 scratch, NEVER
-protected saves). CLOSE: witness PASS + suite green. Budget <=2 cycles,
-CONT cycle 2 on shortfall.
+NEXT tPL-B1c MUTATION-PROVE THE NEW PLACEMENT PINS — tPL-B1b (2026-11-23)
+SHIPPED the two-step build loop + the corrected placement chain: witness
+scripts/tPLB1b_buildloop_witness.sh VERDICT PASS (run 2026-11-23: seed 5,
+"ui planet pick Factory" then non-adjacent tile 297,376 ->
+"rejected, cell refuses: no active neighbour", adjacent tile 314,342 ->
+"ordered"), suite 501/501. The sweep proving the PINS is what remains: run
+scripts/t418b_mutate.py M8..M17 (M8 rock veto, M9 exempt set, M10 row-1
+probe, M11 POLARITY INVERSION, M12 all-inactive pass, M13 XOR polarity,
+M14 XOR bound 31->22, M15 ring domain, M16 terraform barren arm, M17
+own-skip) — CAUGHT required for every mutant. RUN IT AS BACKGROUND/
+execute_code (skill rule 8: never foreground-with-timeout; one full sweep
+cost 420s+ and blew a foreground budget once this session). RESTORE LAW
+(learned the hard way this session): /tmp/t418b_planetview.orig.cpp IS the
+correct post-tPL-B1b file (snapshotted before mutation); a mid-flight
+`git checkout --` reverts to the PRE-tPL-B1b commit and DESTROYS the ship —
+restore = copy the snapshot back + touch + rebuild, NEVER git checkout.
+If any mutant MISSES, add the separating pin (cited) and re-run. CLOSE:
+all CAUGHT + suite green -> NEXT becomes tPL-V1.
 THEN tPL-V1 TILE GRID + COLORS (D26): isometric grid with rows
 ADJACENT/TOUCHING on both axes (ours has gaps — re-derive row/col
 pitch from the vendor paint fn already cited t428, do not tweak
@@ -300,6 +294,44 @@ game ring TL EXPIRES 2026-11-24 14:53 — if a live witness needs the
 production ring and it's dead, run the t439 recovery pattern FIRST;
 C1-C5 cosmetic backlog + race intro stay DEFERRED (D25) — do not
 touch.
+
+tPL-B1b LANDED 2026-11-23 (BUILD LOOP SHIPPED: TWO-STEP UI + CORRECTED
+PLACEMENT CHAIN + POLARITY FLIP; no OQ row touched — tPL tracks none,
+honest negative under strict-close; open=[016,019] unchanged). PROVED
+(docs/re/_wip_tPLB1.md F7-F10 + ui/planetview.h F3 block):
+ - F10 DECISIVE: checker FUN_0003830c placement region is a GRANT
+   ACCUMULATOR (0x38444 xor edi,edi reset; mov edi,-1 legs grant, xor legs
+   veto). Rule B 0x38493 reads the CELL-CLASS byte, NOT occupancy — there
+   is NO OCCUPIED VETO (t43's empty-cell law is a PICKER law). Vetoes
+   shipped: XOR (item<31, booleans differ refuse, 0x384db), rock/dig XOR
+   (0x38519 dig legal ONLY on rock, 0x38546), terraform barren+empty+
+   surface (0x38554), adjacency (0x385b7..0x386fc). Rule A modelled
+   always-granted [inferred: t43 barren-build census 263/892==terrain rate
+   + picker filters by this checker]; rule F (item 35 own-active+bit1)
+   UNMODELLED, named.
+ - POLARITY FLIP SHIPPED: ACTIVE neighbour = LEGAL (jne-exit skips the
+   0x386fc xor), ALL-inactive = REFUSE. OrderCellBlock{None,
+   ActiveNeighbour} -> PlacementBlock{None, SurfaceVsRing, RockMismatch,
+   TerraformSite, NoActiveNeighbour}; test planetgrid_adjacency_t418b
+   (which pinned the port's INVERTED reading) REPLACED by
+   planetgrid_placement_t418b + orders_cellless_bit1_t418b (bit1 census
+   {31,32,33,34,37} pinned vs ordersWithoutCell).
+ - UI TWO-STEP (ui.cpp): PLANLIST row click SETS planetPick (no order,
+   msg 0x1c02 shape); tile click WITH pick = checker + orderProject, pick
+   cleared on accept AND refuse (0x3b487/0x3b419); tile click WITHOUT pick
+   keeps the outline affordance; FLAG-bit1 items skip the checker (0x38a5a)
+   and order on a miss (0x3b402); PLBUILD click always re-opens the list.
+   Witness instrument: planet-view open logs "home-cb cell/size/surf +
+   classes"; scripts/tPLB1b_tilepx.py derives tile pixels from the B/C
+   tables (never eyeballed).
+ - WITNESS PASS (scripts/tPLB1b_buildloop_witness.sh, seed 5 scratch):
+   pick Factory (no order) -> non-adjacent 297,376 REFUSED "no active
+   neighbour" -> re-pick -> adjacent 314,342 ORDERED. Suite 501/500->501/0.
+ - RESIDUES: mutation sweep M8..M17 NOT RUN (foreground timeout blew the
+   budget; restore-from-snapshot law above) -> queued as tPL-B1c; sitting
+   check ran first (tail rows all turn=1086, no new play, stale assignment
+   stood); cmd-numbering label correction banked (queue gates = cmd0 arm
+   0x38b8c, tile click = cmd2 0x38a38; port keeps both, labelled).
 
 tPL-B1 LANDED 2026-11-23 (BUILD-LOOP LAW DERIVED + BANKED; SHIP DEFERRED
 to tPL-B1b; no OQ row touched — tPL tracks none, honest negative under

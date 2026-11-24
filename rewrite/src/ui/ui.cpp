@@ -182,6 +182,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // lands item-only (planetview.h), so the selection drives the F3
     // adjacency REPORT (orderCellBlock) + the tile outline.
     int planetCell = -1;
+    // tPL-B1b TWO-STEP BUILD LOOP session state (msg 0x1c01 branch 0x3b3b6,
+    // docs/re/_wip_tPLB1.md F1/F3): the PLANLIST pick (rec+0xb2 analog, -1
+    // == 0xff). Step 1 (list row click) SETS this; step 2 (tile click)
+    // runs placementBlock + orderProject and CLEARS it on both the accept
+    // and the refuse leg (0x3b487/0x3b419). Tile click WITHOUT a pick keeps
+    // the tile-select affordance (vendor does nothing for orders there).
+    int planetPick = -1;
     // t407 FLEET LIST (state 18) session state: scroll step + selected row
     // (index into fleetRows()). The vendor LEFT click jumps the camera to
     // the ship (help fleetwin + t253 live); the port SELECTS + logs instead
@@ -712,8 +719,34 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                              : s.name;
                             projectOpen = false;
                             planetCell = -1;  // t418b: fresh tile selection
+                            planetPick = -1;  // tPL-B1b: fresh pick
                             stack.push(kScreenPlanet);  // t410: chain level
                             screen = kScreenPlanet;
+                            // tPL-B1b WITNESS INSTRUMENT: the build-loop
+                            // witness needs the home Colony-Base cell to
+                            // pick an adjacent vs non-adjacent tile (the
+                            // lattice law is in the census; the CB cell is
+                            // rng-seeded port-side, so the app reports it).
+                            for (size_t wi = 0; wi < camp.planetAt(key.star)
+                                                              .items.size(); ++wi)
+                                if (camp.planetAt(key.star).items[wi] == 5) {
+                                    std::printf("ui planet home-cb cell %d "
+                                                "size %d surf %d\n",
+                                                camp.planetAt(key.star)
+                                                    .itemCells[wi],
+                                                ag::Campaign::sizeClassFor(
+                                                    camp.planetAt(key.star)
+                                                        .surfaceCells),
+                                                camp.planetAt(key.star)
+                                                    .surfaceCells);
+                                    std::printf("ui planet classes");
+                                    for (const int cc :
+                                         camp.planetAt(key.star).cellClasses)
+                                        std::printf(" %d", cc);
+                                    std::printf("\n");
+                                    std::fflush(stdout);
+                                    break;
+                                }
                             std::printf("ui status select %s -> planet view "
                                         "(state 17)\n", planetName.c_str());
                         }
@@ -797,39 +830,97 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     std::fflush(stdout);
                 } else if (screen == kScreenPlanet && projectOpen &&
                            projectRowFor(p, 0)) {
-                    // t406 PROJECT SET leg 2: pick from the PLANLIST. The
-                    // order law (fn 0x38840 cmd0 gates) lives in
-                    // Campaign::orderProject / ui/planetview.h; a gate
-                    // failure is a SILENT reject (vendor shape, SOUNDCHANNEL
-                    // 0 on every PLANETALLOC child).
-                    const int item = *projectRowFor(p, 0);
+                    // tPL-B1b STEP 1 (msg 0x1c02 shape, branch 0x3b50e): a
+                    // PLANLIST row click SETS the pick (rec+0xb2 analog) and
+                    // closes the list — NO order lands yet (F1: the order is
+                    // step 2, the tile click). Cell-less FLAG-bit1 items are
+                    // the exception the vendor orders on the pick leg ONLY
+                    // when no cell is pending (0x3b3d4 arm); the port's
+                    // single-pick model orders them at the next tile click
+                    // too, and orders them here when clicked on PLBUILD
+                    // territory — honest simplification, pinned in the unit
+                    // suite via ordersWithoutCell.
+                    const int row = *projectRowFor(p, 0);
                     const auto opts = projectOptionsFor(camp, planetStar);
-                    if (item >= 0 && item < int(opts.size())) {
-                        const bool ok =
-                            camp.orderProject(planetStar, opts[item].item);
-                        // t418b: the F3 adjacency leg REFUSES at the vendor's
-                        // checker, not at orderProject's cmd0 gates — when a
-                        // tile is selected and the pick would touch an ACTIVE
-                        // neighbour, report the refuse (the port's order is
-                        // item-only, so this is the honesty line, never a
-                        // fake rollback).
-                        const auto blk = orderCellBlock(
-                            camp, planetStar, opts[item].item, planetCell);
-                        std::printf("ui planet project %s %s (%s%s)\n",
-                                    planetName.c_str(), opts[item].name.c_str(),
-                                    ok ? "ordered" : "rejected",
-                                    ok && blk == OrderCellBlock::ActiveNeighbour
-                                        ? ", cell refuses: active neighbour"
-                                        : "");
+                    if (row >= 0 && row < int(opts.size())) {
+                        planetPick = opts[row].item;
+                        projectOpen = false;
+                        std::printf("ui planet pick %s (%s)\n",
+                                    opts[row].name.c_str(),
+                                    ordersWithoutCell(camp, planetPick)
+                                        ? "no cell needed"
+                                        : "click a tile");
                         std::fflush(stdout);
-                        if (ok) projectOpen = false;
                     }
                 } else if (screen == kScreenPlanet && !projectOpen &&
+                           planetPick >= 0 &&
                            planetStar >= 0 &&
                            !inRect(kPlanetPanels[4].rect, p)) {
-                    // t418b TILE SELECT: the PLSQUARE cell click (vendor
-                    // planet.txt info02 "individual squares on which
-                    // structures may be built"). Diamond hit-map (F2).
+                    // tPL-B1b STEP 2 (msg 0x1c01 branch 0x3b3b6): tile click
+                    // WITH a pick. Hit-test the lattice first: a miss is the
+                    // vendor's 0xffff leg — cell-less bit1 items order
+                    // immediately (0x3b402), everything else refreshes with
+                    // the pick PERSISTING (rec+0xb2 keeps its value).
+                    const auto& ptt2 = camp.terrainTables();
+                    const int sz2 = ag::Campaign::sizeClassFor(
+                        camp.planetAt(planetStar).surfaceCells);
+                    const int hit =
+                        sz2 >= 0
+                            ? tileHitFor(ptt2, sz2,
+                                         camp.planetAt(planetStar).surfaceCells,
+                                         p)
+                            : -1;
+                    const int item = planetPick;
+                    const auto* pi = camp.planetItem(item);
+                    if (hit < 0) {
+                        if (ordersWithoutCell(camp, item)) {
+                            const bool ok = camp.orderProject(planetStar, item);
+                            std::printf("ui planet project %s %s (%s)\n",
+                                        planetName.c_str(),
+                                        pi ? pi->name.c_str() : "?",
+                                        ok ? "ordered" : "rejected");
+                            if (ok) planetPick = -1;  // 0x3b419 accept-clear
+                        }
+                        // else: refresh-only leg 0x3b4ab, pick persists.
+                        std::fflush(stdout);
+                    } else {
+                        // CELL SELECTED leg 0x3b425: checker then writer.
+                        // FLAG-bit1 items SKIP the checker (cmd2 gate
+                        // 0x38a5a `and al,0x2`: jne straight to the writer,
+                        // which stores +0x52=0xffff for them anyway).
+                        const auto blk = ordersWithoutCell(camp, item)
+                                             ? PlacementBlock::None
+                                             : placementBlock(camp, planetStar,
+                                                              item, hit);
+                        const bool ok = blk == PlacementBlock::None &&
+                                        projectOrderable(camp, planetStar, item) &&
+                                        camp.orderProject(planetStar, item);
+                        std::printf("ui planet project %s %s (%s%s)\n",
+                                    planetName.c_str(),
+                                    pi ? pi->name.c_str() : "?",
+                                    ok ? "ordered" : "rejected",
+                                    ok ? ""
+                                       : blk == PlacementBlock::SurfaceVsRing
+                                             ? ", cell refuses: surface/ring"
+                                             : blk == PlacementBlock::RockMismatch
+                                                   ? ", cell refuses: rock/dig mismatch"
+                                                   : blk == PlacementBlock::TerraformSite
+                                                         ? ", cell refuses: not barren+empty"
+                                                         : blk == PlacementBlock::NoActiveNeighbour
+                                                               ? ", cell refuses: no active neighbour"
+                                                               : "");
+                        std::fflush(stdout);
+                        planetPick = -1;  // 0x3b487 unconditional clear
+                        planetCell = -1;  // rec+0xae := 0xffff (0x3b49a)
+                    }
+                } else if (screen == kScreenPlanet && !projectOpen &&
+                           planetStar >= 0 && planetPick < 0 &&
+                           !inRect(kPlanetPanels[4].rect, p)) {
+                    // t418b TILE SELECT (no pick pending): the PLSQUARE cell
+                    // click the vendor answers with repaint-only (F1: "click
+                    // does NOTHING" without a pending item — exactly the
+                    // pre-tPL-B1b experience). The port keeps the outline
+                    // affordance; the NEXT click with a pick orders (above).
                     const auto& ptt2 = camp.terrainTables();
                     const int sz2 = ag::Campaign::sizeClassFor(
                         camp.planetAt(planetStar).surfaceCells);
@@ -1019,6 +1110,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                              : s.name;
                             projectOpen = false;
                             planetCell = -1;  // t418b: fresh tile selection
+                            planetPick = -1;  // tPL-B1b: fresh pick
                             stack.push(kScreenPlanet);
                             screen = kScreenPlanet;
                             std::printf("ui system planet %s -> planet view "
@@ -2070,7 +2162,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 {
                     const Rect& pb = kPlanetPanels[4].rect;  // PLBUILD
                     txt.draw(ren, pb.x0 + 6, pb.y1 - 14,
-                             projectOpen ? "list open: pick one" : "click: set project",
+                             projectOpen ? "list open: pick one"
+                                         : planetPick >= 0
+                                               ? (std::string("picked: ") +
+                                                  (camp.planetItem(planetPick)
+                                                       ? camp.planetItem(planetPick)->name
+                                                       : "?") +
+                                                  (ordersWithoutCell(camp, planetPick)
+                                                       ? " — no cell needed"
+                                                       : " — click a tile"))
+                                                      .c_str()
+                                               : "click: set project",
                              false, kDim);
                 }
                 if (projectOpen) {
@@ -2089,21 +2191,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         const int ry = lr.y0 + 2 + int(oi) * kProjectRowPitch;
                         const bool ok = projectOrderable(camp, planetStar,
                                                          opts[oi].item);
-                        // t418b: with a tile selected, the F3 leg joins the
-                        // report (the vendor checker refuses an inactive new
-                        // item touching an ACTIVE neighbour, 0x386fe).
-                        const bool cellOk =
-                            planetCell < 0 ||
-                            orderCellBlock(camp, planetStar, opts[oi].item,
-                                           planetCell) !=
-                                OrderCellBlock::ActiveNeighbour;
+                        // tPL-B1b: the placement legs join the report at the
+                        // TILE CLICK (step 2), not here — the list only
+                        // reports the queue gates (the vendor list shows
+                        // everything REQUIRES-legal; planet.txt info04).
                         char ob[128];
                         std::snprintf(ob, sizeof(ob), "%-24s cost %3d%s%s",
                                       opts[oi].name.c_str(), opts[oi].cost,
                                       ok ? "" : "  (no free population)",
-                                      ok && !cellOk ? "  (cell refuses)" : "");
+                                      opts[oi].item == planetPick ? "  <" : "");
                         txt.draw(ren, lr.x0 + 8, ry + 4, ob, false,
-                                 ok && cellOk ? kText : kDim);
+                                 ok ? kText : kDim);
                     }
                     if (opts.empty())
                         txt.draw(ren, lr.x0 + 8, lr.y0 + 6,

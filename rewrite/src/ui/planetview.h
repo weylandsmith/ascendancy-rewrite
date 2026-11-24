@@ -128,11 +128,51 @@ std::optional<int> projectRowFor(Pt p, int first);
 //   steps ARE the diamond-tiling half-steps, so the four probe neighbours
 //   (row±1,col),(row,col±1) are the four visual edge-neighbours.
 //
-//   F3 ADJACENCY LAW [verified verbatim build-checker 0x385b7..0x3870d]:
-//   the ACTIVE-neighbour refuse is SKIPPED when cell >= surfaceCells
-//   (0x385b7 jae accept), when the cell's own slot is ACTIVE (0x385ee),
-//   when item==5 Colony (0x385f6) or item==38 Xeno Dig (0x385ff). Else four
-//   probes; any ACTIVE (word+2 bit0) neighbour REFUSES (0x386fe).
+//   F3 PLACEMENT LAW [verified raw asm 0x38444..0x386fc, VETO chain: EDI is
+//   reset to 0 at 0x38444 for the placement region and the return 0x38706
+//   hands back -1 (legal) only when EDI != 0 — the region's zeroing arms are
+//   the vetoes; the two `mov edi,-1` legs (0x3848e bit0/race-state, 0x384d6
+//   occupied/demolish/bit2) are RE-GRANT arms whose literal polarity is
+//   AMBIGUOUS and NOT modelled. The veto reading is the one corroborated by
+//   MEASUREMENT: r1_built_cell_law.py 0/362 active Factories without an
+//   active neighbour (rule G must be able to refuse) and t341 S1 item 0
+//   RESERVED on an empty cell (a fresh empty surface placement must be
+//   legal) — docs/re/_wip_tPLB1.md F7.
+//     - 0x3843a cell >= +0x1a (slot-array cap) exits early; 0x385b7 cell >=
+//       +0x18 (surfaceCells) skips adjacency — the orbital ring is NOT
+//       asked (the port has no ring model: ring cells return None).
+//     - F10 CORRECTION (docs/re/_wip_tPLB1.md): 0x38444 `xor edi,edi`
+//       resets EDI at the placement-region entry — the region is a GRANT
+//       ACCUMULATOR (mov edi,-1 legs grant, xor legs veto). Rule B
+//       (0x38493) reads the CELL-CLASS byte (byte0 != 0 grants), NOT
+//       occupancy; it is always granted for observed play (t43 barren-build
+//       census 263/892 == terrain rate; the picker filters by this
+//       checker). THERE IS NO OCCUPIED VETO — occupancy (word+2 bit0) is
+//       read only by own-active 0x385ee (a skip of adjacency) and rules
+//       E/F. t43's "built items land on EMPTY cells" is a PICKER law; the
+//       port's completion re-picks the cell, so an occupied click cannot
+//       overwrite.
+//     - 0x38554 item 36 Terraforming vetoes unless byte0==0 (barren) &&
+//       byte1==0xff (empty) && surface (ring class 1 vetoes).
+//     - XOR law 0x384db, ONLY for item < 31 (0x384e0 cmp 0x1e ja):
+//       (cell < +0x18) != (item < ds:0x73e3c == 22) REFUSES — surface items
+//       need a surface cell, orbital items (22..30) need the ring; 31..38
+//       exempt. Raw 0x38513/0x38515: `cmp eax,ecx; je` SKIPS the veto, so
+//       EQUAL booleans pass and DIFFERING booleans zero EDI.
+//     - ROCK leg 0x38519: veto iff (byte0 bit3) != (item == 38) — Xeno Dig
+//       legal ONLY ON ROCK (dig arm 0x38546 sete), normal items refuse on
+//       rock (income-law.md S4 agrees).
+//     - ADJACENCY 0x385b7..0x386fc: SKIPPED when the cell's own slot is
+//       ACTIVE (0x385ee jne), item == 5 Colony Base (0x385f6) or item == 35
+//       Automation (0x385ff cmp dl,0x23 — NOT 38; the t418b header had this
+//       wrong). Else FOUR probes via 0x395c4 — (row+1,col),(row-1,col),
+//       (row,col-1),(row,col+1): an existing neighbour with word+2 bit0 set
+//       exits the block via `jne 0x386fe` WITHOUT executing 0x386fc
+//       `xor edi,edi` => ACTIVE neighbour = LEGAL; ALL FOUR inactive/absent
+//       => 0x386fc zeroes EDI => REFUSE. t43 static law
+//       (r1_built_cell_law.py header "BUILT ITEMS MUST ADJOIN AN ACTIVE
+//       ITEM") + vendor help planet.txt info02 ln54-56 corroborate. The
+//       t418b port had this INVERTED (tPL-B1 F5); tPL-B1b flips it.
 
 // Cell index for (row, col) on a size-class grid; -1 outside the valid cols
 // (0x395dc..0x39647 verbatim: row in [0,15), col >= B and col < B+C).
@@ -155,11 +195,17 @@ Pt tileCenter(int size, int row, int col);
 int tileHitFor(const ascend::game::TerrainTables& tt, int size,
                int surfaceCells, Pt p);
 
-// Why an order would NOT land on the SELECTED cell (the F3 leg; gates 1-3
-// are projectOrderable's domain). kOrderCellNone when the cell is fine
-// (including every skip leg).
-enum class OrderCellBlock { None, ActiveNeighbour };
-OrderCellBlock orderCellBlock(const ascend::game::Campaign& camp, int star,
+// Why a tile-click order would NOT land (the checker chain above; the
+// projectOrderable gates are the queue law). None == legal (including every
+// skip leg). tPL-B1b: renamed from t418b's OrderCellBlock{None,
+// ActiveNeighbour}, which encoded the INVERTED polarity (F5).
+enum class PlacementBlock { None, SurfaceVsRing, RockMismatch,
+                            TerraformSite, NoActiveNeighbour };
+PlacementBlock placementBlock(const ascend::game::Campaign& camp, int star,
                               int item, int cell);
+
+// The FLAG-bit1 leg of the no-cell click path (0x3b3f5/0x3b402 + cmd2 skip
+// 0x38a5a): true iff the item orders WITHOUT a cell.
+bool ordersWithoutCell(const ascend::game::Campaign& camp, int item);
 
 }  // namespace ascend::ui
