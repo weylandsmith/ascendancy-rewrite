@@ -2552,9 +2552,21 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                                pc.x, pc.y + 27);
                         }
                     }
-                    // NODES: resring.shp frames 0..3 blitted 1:1 CENTRED at
-                    // (x-14, y-14) (P10 esi law + the P11 blit/hit word
-                    // identity). Painter order far->near (z2 descending).
+                    // NODES: resring.shp frames 0..3 blitted 1:1 at the
+                    // VENDOR ANCHOR LAW (tRS-V1d, docs/re/_wip_tRSV1d.md
+                    // P0-P2): the projected word goes to the blitter
+                    // VERBATIM (0x4849f/0x484a5 pass word[win+0x5f1/0x6b9]
+                    // sar 16 with NO centring arithmetic), and FUN_0005caac
+                    // shifts the content by the record's signed bbox
+                    // (0x5caac: dest = rec[+8/+0xc] + passed_x/y; 0x5cf96
+                    // twin at 0x5d04b/0x5d057). resring bbox quads are
+                    // MEASURED (-30,-30,29,29) => content centres on the
+                    // anchor word BY CONSTRUCTION, so drawn-centre ==
+                    // hit-centre. blitShape draws its rect top-left at the
+                    // blit point, hence blit at (x + rec.left, y + rec.top).
+                    // The old (x-14) was the dead 29x29 dims assumption —
+                    // seam TRSV1c-E (+15,+15) CLOSED.
+                    // Painter order far->near (z2 descending).
                     // Blocked rows are NOT DRAWN (vendor 0x48566 gate).
                     int queuedRow = -1;
                     for (const auto& nd : nodes)
@@ -2575,10 +2587,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             nd.state == TechNodeState::Owned,
                             nd.row == resSel);
                         if (kLibs[resRingLib].count() > 0 &&
-                            frame < int(kLibs[resRingLib].count()))
+                            frame < int(kLibs[resRingLib].count())) {
+                            const auto& rr =
+                                kLibs[resRingLib].record(frame);
                             blitShape(ren, kLibs[resRingLib], frame,
-                                      c.x - 14, c.y - 14);
-                        else {
+                                      c.x + rr.left, c.y + rr.top);
+                        } else {
                             // Silent-degrade: vector ring fallback ONLY if
                             // the lib refused (never a blank tree).
                             const uint32_t argb = chromePaletteArgb(

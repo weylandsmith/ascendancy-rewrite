@@ -145,6 +145,7 @@ add_executable(run_tests
   tests/test_research3d_t419.cpp
   tests/test_researchhit_trsb1.cpp
   tests/test_researchgeom_trsvc.cpp
+  tests/test_researchanchor_tRSV1d.cpp
   tests/test_speciesmenu_t409.cpp
   tests/test_speciesmenu_t436.cpp
   tests/test_speciesportrait_t441.cpp

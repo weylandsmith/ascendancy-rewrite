@@ -375,6 +375,28 @@ same function 0x4709c..0x48f80).
     painter is not yet found).
 (g) HIT LAW survives: tRS-B1's +-24 square consumes the SAME projected
     words — unchanged by any layout swap.
+(h) BLITTER ANCHOR LAW (tRS-V1d, seam TRSV1c-E CLOSED) [MEASURED, raw asm
+    + decompile work/combat_decomp/5caac.c:58-64]: the research draw passes
+    the projected word VERBATIM (0x4849f/0x484a5 word[win+0x5f1]/[+0x6b9]
+    sar 16, NO centring arithmetic; frame esi==2 -> FUN_0005caac at
+    0x484c4, else FUN_0005cf96 at 0x48501), and the blitter composes the
+    destination from the record's SIGNED BBOX:
+      dest = (bboxL + passed_x, bboxT + passed_y) .. (bboxR + passed_x,
+      bboxB + passed_y)   (0x5caac 0x5cd0e..; 0x5cf96 twin 0x5d04b/0x5d057;
+      dims/anchor getters FUN_00061058/FUN_0006108c, shp.md S27 law).
+    The passed point is an ANCHOR, not a top-left. resring bbox
+    (-30,-30,29,29) centres the 60x60 content on the anchor BY CONSTRUCTION
+    => vendor drawn-centre == hit-centre. Port fix VERBATIM: blit at
+    (x + record().left, y + record().top) (ui.cpp NODES block; the old
+    (x-14) was the dead 29x29 dims reading). WITNESS scripts/tRSV1d_witness.sh
+    + tRSV1d_ringcentre_census.py seed 5: content bbox (0,0,59,59) about the
+    logged centre (397,240), offset (-0.5,-0.5), control +30/+30 crop
+    non-full; MUTANT (-15,-15) CAUGHT (bbox (15,15,59,59), +7,+7), restored
+    md5 089d35bf2644513f90aae1f62132027a. PINS test_researchanchor_tRSV1d.cpp
+    x3 (record centring, source wiring, hit-at-drawn-centre); census v1
+    lesson banked: a BRIGHTNESS threshold measures the bright-rim subset
+    (art-biased -1.5 px artifact) — measure the CONTENT bbox vs the flat
+    field bg instead.
 
 ## S8-CORRECTION (tRS-V1b, 2026-11-24) — supersedes S8d/S8e lines it contradicts
 Full working record docs/re/_wip_tRSV1.md P6/P10/P11 (raw x87 hand-decode;

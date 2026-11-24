@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-24T13:05
+updated: 2026-11-24T18:25
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,28 +233,64 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT = WAIT-USER-GRADE-PR1. The research-screen grade package SHIPPED:
-scratchpad/PR-usergrade.png (1882x2676: on-image plain-language checklist +
-ours|vendor RESWIN-field side-by-side 2x + 3x zoom strips) and
-scratchpad/PR-checklist.txt (6 numbered items: disk size, tree-fit/camera
-feel, line-colour gradient, inside-disk picture KNOWN-MISSING = seam
-TRSV1-C, field background black-vs-16/16/24, ring-colour MEANING). Grading
-questions are in the checklist; answer format "1 yes, 2 no - ...". Same
-shape as WAIT-USER-GRADE-NG5.
-WHEN THE RULING ARRIVES, the first work item is named and pre-verified:
-tRS-V1d SEAM TRSV1c-E (docs/re/_wip_tPRU.md P4b): the port's DRAWN ring
-centre sits +15,+15 off the logged projection/hit centre (measured: log
-(397,240), drawn bbox centre (412,255)); the (x-14,y-14) blit offset carries
-the dead 29x29 assumption — resring.shp bbox quads are MEASURED 60x60
-(S8.2). Re-derive the vendor blitter anchor semantics (FUN_0001fc34/0x5caac:
-does the passed word name the bbox top-left, or does the blitter shift by
-the bbox?) BEFORE changing the offset; then pin drawn-centre == hit-centre.
-If the user ruling adds items, they queue behind TRSV1c-E in the ruling's
-own order (NG5 precedent).
-RULES: D19 G1-G6 binding; NO synthetic stand-ins; restree.shp per-row
-pictures stay UNRECOVERED (TRSV1-C); never re-capture the vendor (REFUTED
-class). Sitting check FIRST (r1_t85g_sitting exit 0 = stale assignment
-stands).
+NEXT = WAIT-USER-GRADE-PR1 (ruling still not in as of 2026-11-24 18:20; if a
+later session finds the ruling in docs/DECISIONS.md USER block, execute it).
+The research-screen grade package SHIPPED unchanged:
+scratchpad/PR-usergrade.png + scratchpad/PR-checklist.txt (6 items; answer
+format "1 yes, 2 no - ..."). tRS-V1d LANDED the pre-queued seam TRSV1c-E
+early (drawn ring centre now == logged hit centre, law cited + pinned +
+witnessed) — the package stays valid (the seam was never a graded item).
+WHEN THE RULING ARRIVES: execute its items in the ruling's own order (NG5
+precedent). If NO ruling has arrived when this session starts, the ONE task
+is tRSV1-C: the restree.shp picture-consumer hunt (checklist item 4 is the
+only KNOWN-MISSING row on the grade sheet — closing it before the user looks
+saves a whole grading cycle, D18 <=3 rule). Start from the banked facts:
+restree.shp = 66 records 24x24 one-per-live-row, ZERO code immediates
+reference its name (research.md S8f); the t252 in-disk picture is real.
+Candidate leads NOT yet tried: the shape-cache slot scan at runtime (which
+libs does the reswin paint path actually fetch — BPLM on FUN_0001fc34
+during a research-screen sitting would enumerate slot ids; 0x6fd82 study-
+chip word is runtime-only), and the record CONTENT (do the 24x24 pictures
+match the t252 disk interiors per row?). Sitting check FIRST
+(r1_t85g_sitting exit 0 = stale assignment stands).
+RULES: D19 G1-G6 binding; NO synthetic stand-ins; never re-capture the
+vendor (REFUTED class); scratch copies only.
+
+tRS-V1d LANDED 2026-11-24 (SEAM TRSV1c-E CLOSED EARLY — VENDOR BLITTER
+ANCHOR LAW DERIVED + PORTED + 3 PINS + MUTATION-PROVED + PIXEL WITNESS PASS;
+no OQ row touched — the research screen tracks none, honest negative under
+strict-close; open=[016,019] unchanged). PROVED (docs/re/research.md S8(h);
+working log docs/re/_wip_tRSV1d.md P0-P6):
+ - ANCHOR LAW [measured]: the reswin passes the projected word VERBATIM
+   (0x4849f/0x484a5 word[win+0x5f1/0x6b9] sar 16, NO centring arithmetic;
+   frame esi==2 -> FUN_0005caac 0x484c4, else FUN_0005cf96 0x48501), and the
+   blitter composes dest = record signed-bbox + passed (x,y)
+   (5caac.c:58-64; 0x5cf96 twin 0x5d04b/0x5d057; getters 0x61058/0x6108c).
+   The passed point is an ANCHOR, not a top-left. resring bbox (-30,-30,
+   29,29) centres the 60x60 content on the anchor BY CONSTRUCTION => vendor
+   drawn-centre == hit-centre. shp.h:80 already documented left/top that way.
+ - PORT: ui.cpp NODES block blits at (c.x + rr.left, c.y + rr.top); the dead
+   29x29 (x-14) constant deleted; vector-ring fallback untouched.
+ - SUITE 523 -> 526, 0 failed (tests/test_researchanchor_tRSV1d.cpp: record
+   centring, source-text wiring, hit-at-drawn-centre). MUTANT M-V1d
+   (offset -> -15,-15) CAUGHT by the wiring pin x4 checks; restored md5
+   089d35bf2644513f90aae1f62132027a; suite green after restore.
+ - PIXEL WITNESS scripts/tRSV1d_witness.sh + tRSV1d_ringcentre_census.py
+   seed 5: CONTENT bbox about the logged centre (397,240) = (0,0,59,59)
+   n=828, centre offset (-0.5,-0.5); control crop +30,+30 n=207 (not full).
+   VERDICT PASS. Pixel-level mutant leg: -15,-15 renders content bbox
+   (15,15,59,59) offset (+7,+7) -> census FAILs; restored -> PASS.
+   CENSUS LESSON banked: brightness thresholding measures the bright-RIM
+   subset (art-biased -1.5 px artifact on the CORRECT render) — measure the
+   CONTENT bbox vs the flat field bg instead.
+ - tRSB1_witness.sh RE-RUN post-fix: VERDICT PASS (study Xenobiology, panel-
+   green 0->690, changed-px near click 563 -> 827 — content moved ONTO the
+   click point). xsend "window died before release" stderr = known red
+   herring (t439 law).
+ - SEAMS: TRSV1c-E CLOSED; TRSV1-C/TRSV1c-D/TRSV1b-A unchanged. Sitting
+   check ran FIRST (exit 0, 45,227 rows, newest t=1335 — stale assignment
+   stood). Production ring untouched; scratch Xvfb killed BY PID.
+ - NEXT = WAIT-USER-GRADE-PR1 (above); fallback task tRSV1-C named there.
 
 tPR-U LANDED 2026-11-24 (RESEARCH-SCREEN GRADE PACKAGE SHIPPED + TWO LAW
 SIDE-CORRECTIONS; no code shipped, no OQ row touched — honest negative under
