@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-22T17:10
+updated: 2026-11-23T21:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,25 +233,11 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPL-B1c MUTATION-PROVE THE NEW PLACEMENT PINS — tPL-B1b (2026-11-23)
-SHIPPED the two-step build loop + the corrected placement chain: witness
-scripts/tPLB1b_buildloop_witness.sh VERDICT PASS (run 2026-11-23: seed 5,
-"ui planet pick Factory" then non-adjacent tile 297,376 ->
-"rejected, cell refuses: no active neighbour", adjacent tile 314,342 ->
-"ordered"), suite 501/501. The sweep proving the PINS is what remains: run
-scripts/t418b_mutate.py M8..M17 (M8 rock veto, M9 exempt set, M10 row-1
-probe, M11 POLARITY INVERSION, M12 all-inactive pass, M13 XOR polarity,
-M14 XOR bound 31->22, M15 ring domain, M16 terraform barren arm, M17
-own-skip) — CAUGHT required for every mutant. RUN IT AS BACKGROUND/
-execute_code (skill rule 8: never foreground-with-timeout; one full sweep
-cost 420s+ and blew a foreground budget once this session). RESTORE LAW
-(learned the hard way this session): /tmp/t418b_planetview.orig.cpp IS the
-correct post-tPL-B1b file (snapshotted before mutation); a mid-flight
-`git checkout --` reverts to the PRE-tPL-B1b commit and DESTROYS the ship —
-restore = copy the snapshot back + touch + rebuild, NEVER git checkout.
-If any mutant MISSES, add the separating pin (cited) and re-run. CLOSE:
-all CAUGHT + suite green -> NEXT becomes tPL-V1.
-THEN tPL-V1 TILE GRID + COLORS (D26): isometric grid with rows
+NEXT tPL-V1 TILE GRID + COLORS (D26) — ordering rationale: tPL-B1c
+(2026-11-23) closed the placement-pin proof 10/10 CAUGHT (docs/re/
+_wip_tPLB1c.md), so the build LOGIC line is done until the user-grade pass;
+the D26 visual list is the next user-visible chain and V1 gates V2 (orbital
+slots draw on the same grid law). TASK: isometric grid with rows
 ADJACENT/TOUCHING on both axes (ours has gaps — re-derive row/col
 pitch from the vendor paint fn already cited t428, do not tweak
 spacing by eye); tile colors LIGHT: white/blue/green/red (+black
@@ -294,6 +280,26 @@ game ring TL EXPIRES 2026-11-24 14:53 — if a live witness needs the
 production ring and it's dead, run the t439 recovery pattern FIRST;
 C1-C5 cosmetic backlog + race intro stay DEFERRED (D25) — do not
 touch.
+
+tPL-B1c LANDED 2026-11-23 (PLACEMENT PINS MUTATION-PROVEN 10/10 CAUGHT;
+no OQ row touched — tPL tracks none, honest negative under strict-close;
+open=[016,019] unchanged). PROVED (docs/re/_wip_tPLB1c.md):
+ - scripts/t418b_mutate.py M8..M17 one background session (notify), ~78s/
+   mutant, ALL CAUGHT, failing pin every time planetgrid_placement_t418b;
+   AFTER-RESTORE 501/0. Per-mutant FAIL line cites in the wip doc (M8 L233/
+   L281 rock; M9 L229/230 exempt {5,35}; M10 L316/369 row-1 probe; M11
+   POLARITY INVERSION L316/369 — the t418b bug re-introduced is caught, pin
+   encodes the raw 0x38666..0x386fc law; M12 L225/302 all-inactive; M13 15
+   fails XOR polarity; M14 L244 bound item22; M15 L237/239 ring domain; M16
+   L295/300 terraform barren arm; M17 L263 own-skip). The corrected chain
+   has NO vacuous pin and NO missing separator.
+ - HAZARD NEW VARIANT: a killed background campaign (SIGTERM mid-M8) left
+   the MUTANT ON DISK; recovery = md5 vs /tmp snapshot, copy back + touch +
+   rebuild green BEFORE relaunch. Snapshot pre-flight verified clean this
+   run (md5 91932a9704d412c91c476183bc344b07 == working file at 0925966).
+ - SITTING CHECK ran first (r1_t85g_sitting exit 0): playcap tail all
+   turn=1086 (newest wall 20:34), production dosbox-x pid 1470999 alive, no
+   new sitting, stale assignment stood.
 
 tPL-B1b LANDED 2026-11-23 (BUILD LOOP SHIPPED: TWO-STEP UI + CORRECTED
 PLACEMENT CHAIN + POLARITY FLIP; no OQ row touched — tPL tracks none,
