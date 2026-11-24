@@ -210,18 +210,26 @@ ResHitResult researchHit(const ag::ResearchTree& tree,
     if (in(kResRotRight, px, py))  { h.kind = ResHit::RotRight;  return h; }
     if (in(kResMoveUp, px, py))    { h.kind = ResHit::MoveUp;    return h; }
     if (in(kResMoveDown, px, py))  { h.kind = ResHit::MoveDown;  return h; }
-    // Nodes: nearest PROJECTED centre within its scaled ring (t419 — the
-    // hit map follows the 3D view; at the rest basis this is exactly the
-    // t408 2D law). Layout built ONCE per click.
+    // Nodes: THE VENDOR HIT LAW (tRS-B1, sub 0x47478 @0x474fb..0x4752d,
+    // work/tRS_reswin_fn.asm): per node the click must satisfy
+    //   x-25 < cx < x+25  AND  y-25 < cy < y+25   (signed `jle/jge` rejects
+    // at exactly +-25 => INCLUSIVE +-24 SQUARE, half-open at 25), a FIXED
+    // half-size on the PROJECTED centre — the vendor does NOT scale the hit
+    // box with the node's perspective radius, and it is a SQUARE not a disc
+    // (corner clicks (24,24) hit; edge clicks at 25 miss). The vendor scan
+    // walks rows high->low and takes the FIRST hit among LEGAL rows (call
+    // 0x46d3c gates before the range test); with pitch 78/96 the +-24 boxes
+    // never overlap, so nearest-among-hits (kept below) is equivalent —
+    // labelled, not asserted as vendor-identical scan order.
     const auto centres =
         researchNodeScreen(researchLayoutFor(tree), nodes, panX, panY, cam);
     int bestRow = -1;
     long bestD2 = -1;
     for (size_t i = 0; i < nodes.size(); ++i) {
         const long dx = px - centres[i].x, dy = py - centres[i].y;
+        if (dx < -kResHitHalf || dx > kResHitHalf) continue;
+        if (dy < -kResHitHalf || dy > kResHitHalf) continue;
         const long d2 = dx * dx + dy * dy;
-        const long r2 = long{centres[i].r} * centres[i].r;
-        if (d2 > r2) continue;
         if (bestRow < 0 || d2 < bestD2) { bestD2 = d2; bestRow = nodes[i].row; }
     }
     if (bestRow >= 0) { h.kind = ResHit::Node; h.row = bestRow; }

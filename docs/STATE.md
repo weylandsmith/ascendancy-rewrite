@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-24T06:40
+updated: 2026-11-24T08:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,27 +233,86 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tRS-B1 RESEARCH: SET PROJECT (D26: "I can't set any projects") —
-ordering rationale: tPL-D1 (2026-11-24) CLOSED the home-planet law with a
-port + 4 pins, which empties the D26 planet-screen queue (tPL-B1 build
-loop, tPL-B2 popups, tPL-V1 grid, tPL-V2 orbital slots, tPL-D1 homes all
-landed); the research screen is the remaining D26 half. Derive the vendor
-set-project handler (restored image; research.md + aicode.md decision-block
-cites point at the restree click path — grep the msg handlers around the
-research window class, windows.txt "RESEARCH" row first), PORT into
-rewrite/src/ui + campaign queuedTech path, and WITNESS with a walkthrough:
-click a tree row -> queuedTech set -> "Building <tech>"-class status line
-(the statuslist precedent shows the text shape). THEN tRS-V1 RESEARCH TREE
-DRAW (D26) per D19 G1/G2 (3D projection ported t419/t399; diff regions, fix
-laws not pixels). THEN tPR-U: USER GRADE PACKAGE (checklist format,
-ours|vendor side-by-side) for planet + research; NEXT becomes
-WAIT-USER-GRADE-PR1. RULES: D19 G1-G6 binding; Athens shots layout/color
-only; no synthetic stand-ins (RE-FIRST t423 law); protected saves
-01/02/03/04.SAV + RESUME.GAM untouchable (scratch savedir law); game ring
-TL EXPIRES 2026-11-24 14:53 — if a live witness needs the production ring
-and it's dead, run the t439 recovery pattern FIRST (kill Xvfb BY PID only —
-tPL-V1f law); C1-C5 cosmetic backlog + race intro stay DEFERRED (D25) — do
-not touch.
+NEXT tRS-V1 RESEARCH TREE DRAW (D26 "the tree not being drawn correctly" +
+the clickability half of "I can't set any projects") — ordering rationale:
+tRS-B1 (2026-11-24) proved the set-project LOOP is alive (witness PASS) and
+shipped the vendor hit law; what the user still cannot see is WHICH disks
+are clickable — help reswin: clickability IS the disk's content ("empty
+disks represent technologies you CAN CHOOSE TO STUDY"), and the vendor's
+layout/positions come from FUN_0004709c + the projected node table, not our
+derived grid. tPL-D1 emptied the planet queue, so the research DRAW is the
+last D26 machine-closable item.
+DO (per D19 G1/G2 — diff regions, fix laws not pixels; Athens shots
+layout/colour only; NO synthetic stand-ins, RE-FIRST t423 law):
+ 1. DERIVE the layout generator law from FUN_0004709c (dumps
+    work/tNGS_gen1/2.asm + re-disasm 0x471f9..0x47478 of
+    work/tRS_reswin_fn.asm): the reswin.txt-absent generator branch — node
+    slots, y=240+30*step+15*(step&1), the 360/(slot-1)+0.1*i rotation, the
+    100-slot stride-0xc table at win+0x143 (init 0x470c1), and the PROJECTED
+    words [winptr+0x5f1+2k]/[+0x6b9+2k] sar 16 the hit law consumes
+    (research.md S7a). The generator feeds the table — recover the
+    generator->table->projection chain and lift the placement VERBATIM;
+    if a leg stays unrecovered, name it, do not invent.
+ 2. PORT into researchview.{h,cpp} replacing the derived depth-x-slot-y
+    layout (keep the one-shot ResearchLayout shape — the t419 stall law
+    stands); hit law kResHitHalf=24 ALREADY correct (do not re-derive).
+ 3. NODE ART: restree.shp per-row pictures inside the disks (the vendor
+    affordance). Join rows->frames via the loader/shape-slot law (windows
+    .txt SHAPEITEM census + 0x1fc34 fetch posture, t442 precedent); if the
+    row->frame join is unrecovered, draw the measured EMPTY-disk content
+    (what restree.shp k-frames actually hold — decode first, never fake).
+ 4. WITNESS scripts/tRSV1_witness.sh: ours-vs-vendor region diff on the
+    tree field (t441_screen_diff region table precedent) + the tRSB1
+    witness re-run must stay PASS (hit law survives the layout swap —
+    re-derive the witness centre from the NEW layout, never hard-code).
+ 5. Pins for the layout law + mutation-verify each changed constant;
+    suite green; LEDGER: seam work, honest negative unless a row is touched.
+THEN tPR-U: USER GRADE PACKAGE (checklist format, ours|vendor side-by-side)
+for planet + research; NEXT becomes WAIT-USER-GRADE-PR1.
+RULES: D19 G1-G6 binding; protected saves 01/02/03/04.SAV + RESUME.GAM
+untouchable (scratch savedir law); game ring TL EXPIRES 2026-11-24 14:53 —
+if a live witness needs the production ring and it's dead, run the t439
+recovery pattern FIRST (kill Xvfb BY PID only — tPL-V1f law); C1-C5
+cosmetic backlog + race intro stay DEFERRED (D25) — do not touch.
+
+tRS-B1 LANDED 2026-11-24 (RESEARCH SET-PROJECT: HANDLER LAW FULLY DERIVED,
+VENDOR HIT LAW PORTED + MUTATION-PINNED, LIVE WITNESS PASS; no OQ row
+touched — tRS tracks none, honest negative under strict-close; open=[016,
+019] unchanged).
+PROVED (docs/re/research.md S7; working log docs/re/_wip_tRSB1.md P0-P6;
+disasm work/tRS_reswin_fn.asm + tRS_click_tail.asm):
+ - TWO-STAGE HANDLER (reswin fn 0x41e34..0x47eb0): SELECT sub 0x47478 =
+   projected-table scan (100 slots stride 0xc win+0x143; legality 0x46d3c
+   FIRST; bounds legs 0x474fb..0x4752d => INCLUSIVE +-24 SQUARE, fixed,
+   NOT radius-scaled); store word [win+0x9db] on CHANGE only (0x4753a) +
+   scratch clears 0x764bc/c0. COMMIT 0x47d99..0x47e43 = OWNED gate ->
+   LEGALITY (FUN_00046d3c verbatim: all-prereqs-owned AND not-owned) ->
+   DAT_00076492[specnum]=row (0x47e34, the t91 human-picker writer) +
+   side effect 0x4fb30(0x78638) UNRECOVERED (seam TRSB1-B).
+ - PORT setStudy() gate-for-gate MATCHES the vendor commit chain (honest
+   answer to "can't set projects": the loop has been alive since t408).
+   PROBE scripts/tRSB1_probe.sh: field clicks produced TWO "ui research
+   study" lines on seed 5. D26 ATTRIBUTION [inferred]: the missing half is
+   the DRAW (uniform rings communicate no affordance; vendor clickability
+   = disk content) -> tRS-V1.
+ - HIT-LAW DELTA SHIPPED: researchHit disc-of-scaled-radius -> kResHitHalf
+   =24 inclusive square (wrong BOTH ways before: missed corners (24,24),
+   accepted axis 25..29). Pin test_researchhit_trsb1.cpp; MUTANTS M-R1
+   (24->25) and M-R2 (disc restored) both CAUGHT, restored, suite 516/0/0
+   (was 515).
+ - WITNESS scripts/tRSB1_witness.sh + tRSB1_census.py VERDICT PASS x2
+   (log study line; panel-green 0->854 = the t268 blank-at-rest canvas
+   filling; gold Study rim 0->320). Vision: "Current Project: /
+   Superconductivity / (0 days) / Allows / Mass Barrage Gun / Surface
+   Shield" — the t252 panel shape live.
+ - SITTING CHECK ran FIRST (t368_ring_turn 20/20 turn=1086 == baseline;
+   stale assignment stood). Production ring untouched; scratch Xvfb :99
+   killed BY PID. HARNESS: xsend "window died before release" stderr is a
+   RED HERRING here (t439 law re-witnessed — clicks landed anyway).
+ - SEAMS: TRSB1-A scan order (vendor first-hit high->low legality-gated vs
+   port nearest — equivalent while pitch keeps +-24 boxes disjoint, premise
+   CHECKed in the pin); TRSB1-B 0x4fb30 side effect; TRSB1-C vendor
+   select-vs-commit split (port collapses; same observable).
 
 tPL-D1 LANDED 2026-11-24 (HOME PLANET BY RACE: PER-SPEC SIZE+ROW TABLE,
 PORTED + 4 MUTATION-PINNED PINS; OQ-016 home-placement sub-law EXTENDED,

@@ -130,8 +130,15 @@ struct ResHitResult {
 // Node hit radius: rings measured ~50 px diameter on the t268 capture
 // (native-vision; empty ring at ~(72,327) spans ~41..100 per the t268
 // pixel-diff bbox 41-100 x 299-358 — 60 px box INCLUDING the ring, so the
-// disk radius is 30).
+// disk radius is 30). PAINT size only since tRS-B1 — the hit box is the
+// vendor square below.
 inline constexpr int kResNodeRadius = 30;
+
+// tRS-B1 HIT LAW [verified sub 0x47478 @0x474fb..0x4752d]: the click hits a
+// node iff |dx|<=24 AND |dy|<=24 from the node's projected centre — an
+// INCLUSIVE +-24 SQUARE (reject legs `jle` at node-25 and `jge`/`jle` at
+// node+25), fixed size, NOT scaled with the perspective ring radius.
+inline constexpr int kResHitHalf = 24;
 
 // Derived layout law (labelled; seam in the header block): x = depth by the
 // LONGEST prereq chain (0..17 per research.md §3) scaled by kResDepthPitch;

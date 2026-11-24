@@ -249,3 +249,60 @@ that reading:
 - Residue, stated not papered over: the file-level meaning of variant field0
   (0..4) is still unknown, but it is dead data — rows past the count line never
   reach memory, so no runtime behaviour can depend on it.
+
+
+## 7. tRS-B1 SET-PROJECT HANDLER LAW (2026-11-24, D26 "I can't set any projects")
+
+The research-window UI function spans payload 0x41e34..0x47eb0 (single
+function per work/functions_full.tsv; disassembly window
+work/tRS_reswin_fn.asm). The set-project path is TWO-STAGE:
+
+(a) SELECT (sub 0x47478, entry via the msg-arm call at 0x47da5 guarded by
+    dword[win+0x35]!=0): scans the projected node table (100 slots stride
+    0xc at win+0x143, zero-init loop 0x470c1..0x470ed, count checked
+    against WORD[0x74744] at 0x4715d) from the LAST row downward; per node
+    k: legality call 0x46d3c FIRST (0x474e8), then the bounds legs
+    0x474fb..0x4752d — x word [winptr+0x5f1+2k] and y word [+0x6b9+2k],
+    each sar 16, reject `jle` at centre-25 and `jge` at centre+25 on BOTH
+    axes => accept iff |dx|<=24 AND |dy|<=24: an INCLUSIVE +-24 SQUARE,
+    fixed size, NOT scaled with any radius. First hit wins (0x4752f->0x47533);
+    store word [win+0x9db]=row ONLY if different (0x4753a), and a change
+    clears dwords 0x764bc/0x764c0 to 0xffffffff (0x4754f/0x47555).
+(b) COMMIT (0x47d99..0x47e43, msg arm dx>3): word [win+0x9db]==0xffff ->
+    no-op; then OWNED gate (row+0x47 owned-mask dword >>24, race bit
+    [0x7458e]) -> reject 0x47718; then LEGALITY call 0x46d3c (ebx=0xffff
+    terminator) -> reject; then `mov word [specnum*2+0x76492],ax` (0x47e34,
+    the t91 human-picker writer) + call 0x4fb30 with eax=0x78638 (side
+    effect UNRECOVERED — named seam TRSB1-B) + the two scratch clears again.
+
+FUN_00046d3c VERBATIM (0x46d3c..0x46dde): already-owned -> FALSE; else the
+<=5 prereq bytes row+0x40 (0xFF terminator) must EVERY one have the race bit
+set in [prereq+0x47]>>24 -> legality = ALL-prereqs-owned AND not-owned.
+The port's setStudy() conjunction (researchview.cpp) matches gate-for-gate;
+the queue field is DAT_00076492 == the SAME table as the AI picker target
+(aicode.md S3b, t91 field identity 0x74744+0x1d4e).
+
+PORT DELTA shipped tRS-B1: the hit box. The pre-tRS-B1 port hit-tested a
+DISC of the ring radius (r30 scaled by perspective) — WRONG in both
+directions vs (a): missed the square corners, accepted axis points 25..29.
+researchview.cpp researchHit() now uses kResHitHalf=24 (inclusive square on
+the PROJECTED centre). Pin test_researchhit_trsb1.cpp (mutation M-R1 half
+25 CAUGHT, M-R2 disc CAUGHT; suite 515->516/0). Live witness
+scripts/tRSB1_witness.sh VERDICT PASS (log "ui research study
+Superconductivity"; right-panel green text px 0->854 — the t268 blank-at-
+rest panel is the feedback canvas; gold Study rim 0->320 near the click).
+
+D26 ATTRIBUTION [inferred, not a closure]: the click->queue loop is alive
+in the port since t408; what the vendor communicates and the port did not
+is WHICH disks are clickable ("empty disks represent technologies you CAN
+CHOOSE TO STUDY" — help reswin ln1668-1690: clickability is the disk's
+CONTENT, and the vendor's node art comes from restree.shp pictures). The
+tree DRAW (tRS-V1) carries that half: layout generator FUN_0004709c
+(work/tNGS_gen1/2.asm) + the projected table + per-node art.
+
+SEAMS: TRSB1-A scan order first-hit(high->low, legality-gated) vs port
+nearest-among-hits — equivalent while pitch 78/96 keeps the +-24 boxes
+disjoint (pinned premise in the test); TRSB1-B call 0x4fb30(0x78638)
+unrecovered; TRSB1-C the vendor SELECT-vs-COMMIT split means an illegal
+click never even sets the selection word (the port collapses both into
+setStudy — same observable outcome, no separate dossier state).
