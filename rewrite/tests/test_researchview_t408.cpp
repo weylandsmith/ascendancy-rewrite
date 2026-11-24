@@ -316,7 +316,13 @@ TEST(researchview_geometry_t408) {
     CHECK(au::researchHit(tree, none, 558, 460, 0, 0).kind == au::ResHit::None);  // the gap
 }
 
-// ---- 8. node layout determinism + hit round-trip --------------------------
+// ---- 8. node determinism + hit round-trip --------------------------------
+// tRS-V1c SUPERSESSION: the t408 GRID coordinates (x = depth*96, prereqs
+// strictly LEFT) are dead — the vendor chain-of-circles has no left->right
+// invariant (depth runs along the tilted circle-chain axis). What survives
+// of this pin: determinism, exact pan offsets, and a hit round-trip on a
+// centre that is VERIFIED isolated before the click (never a hard-coded
+// row: with overlapping +-24 boxes first-hit-high-wins, not row-30-wins).
 TEST(researchview_layout_hit_roundtrip_t408) {
     REQUIRE_DATA();
     auto camp = seededCampaign();
@@ -325,25 +331,38 @@ TEST(researchview_layout_hit_roundtrip_t408) {
     ag::ResearchTree tree = ag::ResearchTree::loadFromFile(
         kRepo + "/extracted/ascend00/restree.txt", err);
     const auto nodes = au::researchNodes(*camp, tree, ag::kPlayer);
+    const au::ResCam cam;
     // Determinism: same inputs -> same centres; pan shifts exactly.
     const auto a = au::researchNodePos(tree, 5, 0, 0);
     const auto b = au::researchNodePos(tree, 5, 0, 0);
     const auto c = au::researchNodePos(tree, 5, -120, 30);
     CHECK(a.x == b.x && a.y == b.y);
     CHECK(c.x == a.x - 120 && c.y == a.y + 30);
-    // Depth law: prereqs sit strictly LEFT of their dependents (edges run
-    // left->right by construction).
-    for (const au::TechNode& nd : nodes)
-        for (int p : tree.all()[nd.row].prereqs)
-            CHECK(au::researchNodePos(tree, p, 0, 0).x <
-                  au::researchNodePos(tree, nd.row, 0, 0).x);
-    // Hit round-trip: clicking a node centre resolves THAT row; a far point
-    // is inert.
-    const auto centre = au::researchNodePos(tree, 30, 0, 0);
-    const auto h = au::researchHit(tree, nodes, centre.x, centre.y, 0, 0);
-    CHECK(h.kind == au::ResHit::Node);
-    CHECK(h.row == 30);
-    // A point above-left of every node centre (field x0 40, y0 76; radius
-    // 30): distance to the nearest possible centre > radius -> inert.
+    // Hit round-trip on an ISOLATED centre: pick the first row whose
+    // projected centre has no other centre within 49 px on either axis.
+    const auto G = au::researchTreeGeometry(tree);
+    const auto centres = au::researchNodeScreen(G, nodes, 0, 0, cam);
+    int probe = -1;
+    for (int r = 0; r < tree.mainCount(); ++r) {
+        if (!centres[size_t(r)].visible) continue;
+        bool iso = true;
+        for (int q = 0; q < tree.mainCount() && iso; ++q) {
+            if (q == r || !centres[size_t(q)].visible) continue;
+            if (std::abs(centres[size_t(q)].x - centres[size_t(r)].x) <= 49 &&
+                std::abs(centres[size_t(q)].y - centres[size_t(r)].y) <= 49)
+                iso = false;
+        }
+        if (iso) { probe = r; break; }
+    }
+    CHECK(probe >= 0);
+    if (probe >= 0) {
+        const auto& cc = centres[size_t(probe)];
+        const auto h = au::researchHit(tree, nodes, cc.x, cc.y, 0, 0);
+        CHECK(h.kind == au::ResHit::Node);
+        CHECK(h.row == probe);
+    }
+    // A corner point is inert: at rest every projected centre has
+    // x in [19,451] (|focal*23/127| + 235) and y >= 240 - a hair, so (5,5)
+    // is >24 px from every centre on BOTH axes.
     CHECK(au::researchHit(tree, nodes, 5, 5, 0, 0).kind == au::ResHit::None);
 }

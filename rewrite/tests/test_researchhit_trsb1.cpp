@@ -47,36 +47,47 @@ TEST(research_hit_square_law_trsb1) {
     // The constant itself is the law (researchview.h cites 0x474fb..52d).
     CHECK(au::kResHitHalf == 24);
 
-    // Row 30's +-24 box probes below must be answered by row 30 (or, at
-    // the 25-legs, by nobody-but-30): verify no other centre lies within
-    // 49 px of row 30's centre on the free axes first (pitch 96/78 makes
-    // this hold by construction; the CHECK makes the premise explicit).
-    const auto c = au::researchNodePos(tree, 30, 0, 0);
-    for (const auto& nd : nodes) {
-        if (nd.row == 30) continue;
-        const auto o = au::researchNodePos(tree, nd.row, 0, 0);
-        if (std::abs(o.x - c.x) <= 49 && std::abs(o.y - c.y) <= 49) {
-            CHECK(!"neighbour premise broken for row probe");
+    // tRS-V1c UPDATE: the probe row is no longer hard-coded (row 30's grid
+    // centre is gone; under the vendor circle law some centres overlap).
+    // Pick the FIRST visible row with no other centre within 49 px on both
+    // axes, then the probe premise holds by construction and the +-24 legs
+    // below are answered by THAT row alone.
+    const auto G = au::researchTreeGeometry(tree);
+    const auto centres = au::researchNodeScreen(G, nodes, 0, 0, au::ResCam{});
+    int probe = -1;
+    for (int r = 0; r < tree.mainCount(); ++r) {
+        if (!centres[size_t(r)].visible) continue;
+        bool iso = true;
+        for (int q = 0; q < tree.mainCount() && iso; ++q) {
+            if (q == r || !centres[size_t(q)].visible) continue;
+            if (std::abs(centres[size_t(q)].x - centres[size_t(r)].x) <= 49 &&
+                std::abs(centres[size_t(q)].y - centres[size_t(r)].y) <= 49)
+                iso = false;
         }
+        if (iso) { probe = r; break; }
     }
+    CHECK(probe >= 0);
+    if (probe < 0) return;
+    const au::ResPoint3 c = centres[size_t(probe)];
     auto hitAt = [&](int dx, int dy) {
         return au::researchHit(tree, nodes, c.x + dx, c.y + dy, 0, 0);
     };
-    // INCLUSIVE boundary: axis edges AND corners hit row 30. The corners
-    // are the disc-vs-square discriminator (the r30 disc missed (24,24)).
+    // INCLUSIVE boundary: axis edges AND corners hit the probe row. The
+    // corners are the disc-vs-square discriminator (the r30 disc missed
+    // (24,24)).
     for (auto [dx, dy] : std::vector<std::pair<int, int>>{
              {24, 0}, {-24, 0}, {0, 24}, {0, -24},
              {24, 24}, {24, -24}, {-24, 24}, {-24, -24}}) {
         const auto h = hitAt(dx, dy);
         CHECK(h.kind == au::ResHit::Node);
-        CHECK(h.row == 30);
+        CHECK(h.row == probe);
     }
-    // EXCLUSIVE at 25: the jle/jge legs reject at exactly 25, so row 30
-    // must NEVER answer an axis probe at +-25.
+    // EXCLUSIVE at 25: the jle/jge legs reject at exactly 25, so the probe
+    // row must NEVER answer an axis probe at +-25.
     for (auto [dx, dy] : std::vector<std::pair<int, int>>{
              {25, 0}, {-25, 0}, {0, 25}, {0, -25}}) {
         const auto h = hitAt(dx, dy);
-        CHECK(!(h.kind == au::ResHit::Node && h.row == 30));
+        CHECK(!(h.kind == au::ResHit::Node && h.row == probe));
     }
 }
 }  // namespace

@@ -104,18 +104,20 @@ int oldDepth(const ag::ResearchTree& tree, int row) {
     }
     return row < 0 || row >= tree.mainCount() ? 0 : memo[size_t(row)];
 }
+// The t408 GRID law (superseded by tRS-V1c's vendor circles; kept ONLY as
+// the cost oracle for the frame-budget census — its constants are inlined
+// because the header no longer carries them).
 au::ResPoint oldNodePos(const ag::ResearchTree& tree, int row, int panX,
                         int panY) {
     const int depth = oldDepth(tree, row);
     int slot = 0;
     for (int r = 0; r < row; ++r)
         if (oldDepth(tree, r) == depth) ++slot;
-    return au::ResPoint{au::kResFieldX0 + depth * au::kResDepthPitch + panX,
-                        au::kResFieldY0 + slot * au::kResRowPitch + panY};
+    return au::ResPoint{40 + depth * 96 + panX, 76 + slot * 78 + panY};
 }
 }  // namespace
 
-// ---- 1. layout == old law (all rows) --------------------------------------
+// ---- 1. depth law UNCHANGED (the t408 oracle still rules P1b) -------------
 TEST(researchlayout_equivalence_t419) {
     REQUIRE_DATA();
     auto camp = seededCampaign();
@@ -123,25 +125,15 @@ TEST(researchlayout_equivalence_t419) {
     std::string err;
     ag::ResearchTree tree = ag::ResearchTree::loadFromFile(
         kRepo + "/extracted/ascend00/restree.txt", err);
-    const auto L = au::researchLayoutFor(tree);
-    CHECK(int(L.depth.size()) == tree.mainCount());
-    for (int r = 0; r < tree.mainCount(); ++r) {
-        CHECK(L.depth[size_t(r)] == oldDepth(tree, r));
-        CHECK(au::researchNodePosAt(L, r, 0, 0).x == oldNodePos(tree, r, 0, 0).x);
-        CHECK(au::researchNodePosAt(L, r, 0, 0).y == oldNodePos(tree, r, 0, 0).y);
-        // pan law preserved on the fast path too
-        CHECK(au::researchNodePosAt(L, r, -37, 91).x ==
-              oldNodePos(tree, r, -37, 91).x);
-    }
-    // researchDepth()/researchNodePos() delegating wrappers agree
-    for (int r = 0; r < tree.mainCount(); ++r) {
+    // tRS-V1c SUPERSESSION NOTE: the grid PLACEMENT (oldNodePos below) is
+    // dead — the vendor law is the chain of circles (researchview.h). What
+    // SURVIVES is the DEPTH law: the vendor relaxation (P1b) computes the
+    // same longest-prereq-chain value the t408 oracle does. Pinned per row.
+    for (int r = 0; r < tree.mainCount(); ++r)
         CHECK(au::researchDepth(tree, r) == oldDepth(tree, r));
-        CHECK(au::researchNodePos(tree, r, 11, -5).x ==
-              oldNodePos(tree, r, 11, -5).x);
-    }
 }
 
-// ---- 2. rest 3D equality + 3. spin moves the view --------------------------
+// ---- 2. vendor window law + 3. rotation/dolly move the view ----------------
 TEST(research3d_rest_and_spin_t419) {
     REQUIRE_DATA();
     auto camp = seededCampaign();
@@ -150,59 +142,55 @@ TEST(research3d_rest_and_spin_t419) {
     ag::ResearchTree tree = ag::ResearchTree::loadFromFile(
         kRepo + "/extracted/ascend00/restree.txt", err);
     const auto nodes = au::researchNodes(*camp, tree, ag::kPlayer);
-    const auto L = au::researchLayoutFor(tree);
-    const auto rest = au::researchNodeScreen(L, nodes, 0, 0,
-                                             au::researchRestCam());
+    const auto L = au::researchTreeGeometry(tree);
+    // REST WINDOW LAW (t252 corroboration + P4 scale): the 66-node field is
+    // ~7-9x the window — at rest exactly THREE disks sit inside the RESWIN
+    // rect (rows 0/2/6 at (64,240),(235,344),(407,240) — the t252 "three
+    // disks, lines off-frame" grade).
+    const auto rest = au::researchNodeScreen(L, nodes, 0, 0, au::ResCam{});
     CHECK(rest.size() == nodes.size());
-    for (size_t i = 0; i < nodes.size(); ++i) {
-        const auto p2 = au::researchNodePos(tree, nodes[i].row, 0, 0);
-        CHECK(rest[i].x == p2.x);
-        CHECK(rest[i].y == p2.y);
-        CHECK(rest[i].r == au::kResNodeRadius);  // scale exactly 1 at rest
-    }
-    // Scroll law: post-projection pan is exact screen px.
-    const auto scrolled = au::researchNodeScreen(L, nodes, 0, -78,
-                                                 au::researchRestCam());
-    for (size_t i = 0; i < nodes.size(); ++i) {
-        CHECK(scrolled[i].y == rest[i].y - 78);
-        CHECK(scrolled[i].x == rest[i].x);
-    }
-    // Spin: latch + pump (t416 law), then the view genuinely changed AND
-    // depths spread (z2 not all-equal) — a flat 2D rehash cannot do that.
-    au::Camera3d cam = au::researchRestCam();
-    cam.pressSpin(+1);
+    int inwin = 0;
+    for (size_t i = 0; i < nodes.size(); ++i)
+        if (rest[i].visible && rest[i].x >= 7 && rest[i].x <= 476 &&
+            rest[i].y >= 46 && rest[i].y <= 472)
+            ++inwin;
+    CHECK(inwin == 3);
+    // The tRSB1 witness click re-derivation relies on an Available visible
+    // node existing at rest; on a fresh campaign rows 0/2/6 are Available.
+    // Spin law (yaw, NOT the old spin latch): +-3 deg/tick moves centres.
+    au::ResCam cam;
+    cam.pressRot(false);
     CHECK(cam.moving());
-    for (int t = 0; t < 20; ++t) cam.tick();  // 40 deg
+    for (int t = 0; t < 10; ++t) cam.tick();  // 30 deg
     const auto spun = au::researchNodeScreen(L, nodes, 0, 0, cam);
     bool moved = false;
     double zmin = spun.empty() ? 0.0 : spun[0].z2, zmax = zmin;
     for (size_t i = 0; i < nodes.size(); ++i) {
+        if (!spun[i].visible || !rest[i].visible) { moved = true; continue; }
         if (spun[i].x != rest[i].x || spun[i].y != rest[i].y) moved = true;
         zmin = std::min(zmin, spun[i].z2);
         zmax = std::max(zmax, spun[i].z2);
     }
     CHECK(moved);
     CHECK(zmax > zmin);  // perspective depth spread under rotation
-    // Stop law: opposite press then same press stops (dialLatch pair).
-    cam.pressSpin(-1);   // flip direction, still moving
-    CHECK(cam.moving());
-    cam.pressSpin(-1);   // same direction again -> stop
-    CHECK(!cam.moving());
-    // Hit map follows the rotated view: rest centres hit at rest; under a
-    // big spin the rest centre of a node must no longer resolve THAT node
-    // for (nearly) every node — at least one centre stops resolving.
-    au::Camera3d cam2 = au::researchRestCam();
-    const auto h0 = au::researchHit(tree, nodes, rest[10].x, rest[10].y, 0, 0);
+    // Dolly law: MOVEDOWN pair => posZ += 1/tick (0x47d03..0x47d12 VERBATIM:
+    // (1,1) lands +1.0) => camera NEARS the z~0 tree plane => the field
+    // GROWS. Row 0's world X is negative, so growing means x moves LEFT
+    // (further from centre 235).
+    au::ResCam dolly;
+    dolly.pressMove(false);  // (1,0) => posZ -= 1 (backs away, shrinks)
+    dolly.tick();
+    CHECK(std::fabs(dolly.posZ - (-151.0)) < 1e-9);
+    dolly.pressMove(true);   // (1,1) => posZ += 1 per tick
+    for (int t = 0; t < 31; ++t) dolly.tick();  // net posZ = -120
+    const auto zoomed = au::researchNodeScreen(L, nodes, 0, 0, dolly);
+    CHECK(std::fabs(dolly.posZ - (-120.0)) < 1e-9);
+    const double spreadRest = double(rest[0].x), spreadDolly = double(zoomed[0].x);
+    CHECK(spreadDolly < spreadRest);
+    // Hit map follows the view: a rest centre resolves its node at rest.
+    const auto h0 = au::researchHit(tree, nodes, rest[0].x, rest[0].y, 0, 0);
     CHECK(h0.kind == au::ResHit::Node);
-    CHECK(h0.row == nodes[10].row);
-    cam2.pressSpin(+1);
-    for (int t = 0; t < 45; ++t) cam2.tick();  // 90 deg: edge-on field
-    const auto spun2 = au::researchNodeScreen(L, nodes, 0, 0, cam2);
-    const auto h1 = au::researchHit(tree, nodes, rest[10].x, rest[10].y, 0, 0,
-                                    cam2);
-    // At 90 deg the flat field collapses onto a vertical line: the point
-    // that was disk 10's centre is not inside disk 10's projected centre.
-    CHECK(spun2[10].x != rest[10].x || h1.row != nodes[10].row);
+    CHECK(h0.row == nodes[0].row);
 }
 
 // ---- 4. frame budget: the O(n^2/frame) class is gone -----------------------
@@ -214,15 +202,16 @@ TEST(researchframe_budget_t419) {
     ag::ResearchTree tree = ag::ResearchTree::loadFromFile(
         kRepo + "/extracted/ascend00/restree.txt", err);
     const auto nodes = au::researchNodes(*camp, tree, ag::kPlayer);
-    const auto cam = au::researchRestCam();
+    const au::ResCam cam;  // tRS-V1c camera law (rest yaw 0, posZ -150)
     // Warm up once (first-touch allocations), then time 60 passes (a second
-    // of painter at 60fps): layout ONCE + screen pass per pass, exactly the
-    // per-frame cost shape of the fixed painter.
-    (void)au::researchNodeScreen(au::researchLayoutFor(tree), nodes, 0, 0,
+    // of painter at 60fps): geometry ONCE + screen pass per pass, exactly
+    // the per-frame cost shape of the painter (the t419 stall class stays
+    // pinned away under the NEW law too).
+    (void)au::researchNodeScreen(au::researchTreeGeometry(tree), nodes, 0, 0,
                                  cam);
     const auto t0 = std::chrono::steady_clock::now();
     for (int f = 0; f < 60; ++f) {
-        const auto L = au::researchLayoutFor(tree);
+        const auto L = au::researchTreeGeometry(tree);
         const auto c = au::researchNodeScreen(L, nodes, f, -f, cam);
         CHECK(c.size() == nodes.size());
     }

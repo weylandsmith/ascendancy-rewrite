@@ -423,3 +423,83 @@ RESWIN SITE LAW (0x48009..0x480c0 loop, all dwords cited above):
   sar16) to 0x1fc34/0x5caac; the HIT law tests the SAME words as CENTRES
   (+-24 square around them) => the vendor blitter CENTRES the sprite
   [inferred from that identity]; port draws 29x29 resring at (x-14, y-14).
+
+
+## P12 tRS-V1c PORT DESIGN (frozen before first edit, 2026-11-24)
+- API (researchview.{h,cpp}): ResearchGeom researchTreeGeometry(tree) =
+  per-row WORLD triple (f32 posture: angle acc REPEATED float adds per P11;
+  sin/cos via libm double, documented deviation from x87 fprem fsin), depth,
+  column k, slot i; C[0..esi-1]; esi. researchDepth() keeps its law (P1b
+  equivalence already measured). researchNodeScreen(geom, nodes, cam) =
+  vendor chain: v = Ry(yaw)*world + t(posZ) (0x5324c mixing VERBATIM on the
+  (X,Z) pair, t=(0,0,-posZ), posZ rest -150); screen X = truncTowardZero(
+  focal*vX/vZ + 0.5f) + 235, Y likewise +240 (0x76e08 CHOP + 0.5 bias);
+  focal = 320/tan(15deg) computed at runtime per 0x203e4. vZ < 1.0 => row
+  NOT drawn (port guard vs div-by-zero; vendor word-wraps — documented).
+- SCOPE: draw + hit ONLY rows legal per 0x46d3c = OWNED or all-prereqs-owned
+  (Blocked excluded from BOTH). researchHit keeps its signature (pan args
+  stay additive screen offsets, labelled port affordance); vendor SELECT
+  semantics: click sets selection ALWAYS (resSel session), commit only if
+  Available (setStudy) — ui.cpp updated.
+- FRAME esi (P10 verbatim): 1 default; 0 iff row==studied && !owned; 3 iff
+  owned; 2 iff row==selected (override). resring.shp frames 0..3 blitted 1:1
+  centred (x-14, y-14); lib joins kLibFiles.
+- EDGES: only for DRAWN rows, from (this.x, this.y-27) to (prereq.x,
+  prereq.y+27), only when prereq is also DRAWN; colour chromePaletteArgb(
+  0x6b - k), k = clamp(chop(0.25f*(0.5f*(z_this+z_p) + posz)), -3, +3);
+  prereq==selected => 0xf3.
+- SCROLL: ResCam {yawDeg, posZ, latchRot, latchMove} replaces the t419
+  Camera3d pressSpin reuse. Latch state machine (dat_764c4 bit pairs P11):
+  enc pair as 2 bits; ROT msg: none->L(1,0), L->off, R->DEAD(0,1); ROTR:
+  none->R(1,1), L->R, R->L, DEAD->R. MOVE pair same transitions; deltas:
+  L/(1,0) rot +3deg, R/(1,1) rot -3; move (1,0) posZ -= step (dolly IN,
+  tree GROWS), (1,1) posZ += step, (0,1) DEAD. step=1.0 (seam TRSV1b-A).
+  Pump cadence kSpinTickMs precedent (documented deviation).
+- PINS tests/test_researchgeom_trsvc.cpp: C[k] census + esi=18; column-0
+  worked triple; R0/d parity rules; chop asymmetry (-2.7+0.5 -> -2); scope
+  law (blocked not hittable); latch table. t419/t408 coordinate pins
+  RE-DERIVED to the new law (updated, supersede note, not deleted).
+- WITNESS: ui.cpp logs 'ui research center <row> <x> <y> <state>' ONCE on
+  screen entry; tRSB1_witness.sh RE-DERIVES the click point by grepping the
+  first Available centre (never hard-code), re-runs the tRSB1 census.
+
+## P13 tRS-V1c LANDED (2026-11-24) — PORT + PINS + WITNESS ALL GREEN
+Port (rewrite/src/ui/researchview.{h,cpp} + ui.cpp kScreenResearch):
+- ResCam (posZ rest -150, yawDeg, dat_764c4 latches, press law P11 verbatim,
+  tick() one delta/pair/tick; cadence kSpinTickMs = documented deviation).
+- researchTreeGeometry(): P1b/P1c chain replayed verbatim (repeated-f32-add
+  angle acc += int(360/d), Y=30k+15*(i&1), R0 rules, esi=18 C-vector pinned).
+- researchNodeScreen(): 0x53324 affine + 0x53374 roles (P6): chop(focal*v/vZ
+  +0.5) via resVendorRound (0x76e08 asymmetric chop), +235/+240, int16 word
+  wrap, RESWIN map. Focal = 320/tan(15deg) = 1194.256 f64 (the doc's 1194.19
+  was the f32 tan value — fixture bug caught, corrected here).
+- researchHit(): P5 legality gate 0x46d3c FIRST, +-24 square, scan HIGH row
+  index -> LOW (painter order z2 desc; nearest wins overlaps).
+- Painter: frontier-only draw (P5), resring.shp lib index 8 KEPT OUT of
+  libFor's 8-entry scan, gold rim via shp frames (vector-rim RGB probe DEAD),
+  edges +27px-Y z-shaded 0x6b-clamp (k=clamp(round(0.5*(z2+pc.z2)/… -posZ…))
+  — round not chop, 0x76e08 cite; mutation -4 caught x3 tests).
+- P1a window-init: screen!=kScreenResearch clears resSel/resCenterLogged.
+TESTS: suite 515 -> 523, 0 failed. New tests/test_researchgeom_trsvc.cpp
+(gen fixture, latch pump, press law, round chop-vs-round, edge clamp, scan
+order, overlap geometry). MUTATION-VERIFIED: rotstep 3->2 CAUGHT; focal
+tan15->tan17.5 CAUGHT; clamp -3->-4 CAUGHT (3 tests); scan low->high CAUGHT
+(scan_order pin; first attempt was MY test bug — forgot to pass cam).
+t419 coordinate pins re-derived from extracted/ascend00/restree.txt replay
+(same chain, 66/66 converge esi=18); t408 round-trip leg + trsb1 fixture
+comments updated to the new law.
+WITNESS tRSB1 VERDICT PASS on the vendor-law render (seed 5): dolly-out x2
+presses kResMoveUp (578,449) -> app re-logs "ui research center 6 397 240
+available" -> click re-derived from log (NEVER hard-coded) -> "ui research
+study Xenobiology"; panel-green 0->690; local leg 563 changed px within 40
+of the centre. Census rewritten: gold-rim RGB probe replaced by local-change
+leg (the old probe measured the dead vector rim).
+NEW AFFORDANCE LAW (port addition, labelled): the frontier disk is OFF-FRAME
+at rest (row 3 y=684 seed 5) — the vendor rest camera shows NO clickable
+disk at game start?! [unverified vs vendor; seam TRSV1c-D] The witness
+dolly-outs to make one visible. resCenter re-log fires on (row,x,y) CHANGE;
+"offframe" line when no visible Available centre.
+OPEN SEAMS carried: TRSV1b-A (dolly step f32[0x9f108] unrecovered, pinned 1.0),
+TRSV1c-D (rest camera shows no clickable frontier disk — vendor may dolly-in
+on entry or the frontier geometry differs; hit law itself is cited), restree
+.shp consumer (TRSV1-C, unchanged).

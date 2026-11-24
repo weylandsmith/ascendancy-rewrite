@@ -394,3 +394,12 @@ capstone in ~/tools/revenv; linear dumps desync on this image).
 5. Rotation 0x5324c raw VERBATIM: X' = X*cos + Z*sin, Z' = Z*cos - X*sin
    (0x7754a = fcos, 0x77556 = fsin, fprem reduce 0x7751e); angle step is
    INTEGER 360/d THEN repeated f32 adds (0x4743d).
+
+S8.1 FOCAL VALUE CORRECTION (tRS-V1c, 2026-11-24). The "1194.19" cited in
+   S8(d)/S8-CORRECTION is a transcription slip, NOT a law constant. The
+   cited law is 320/tan(15deg): f64 = 1194.2562584; the vendor's f32 chain
+   (fptan 0x77562 then fdiv, both single-precision) yields
+   1194.2562255859375 (measured with struct round-trip this iteration). The
+   port pins resFocal() = 320.0/std::tan(15.0*pi/180) in double and the
+   mutation focal->tan(17.5deg) is CAUGHT by tests/test_researchgeom_trsvc.
+   cpp. Scale consequences in S8 are unchanged at the cited precision.

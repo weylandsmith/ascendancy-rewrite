@@ -50,25 +50,28 @@
 //   remaining / last-turn research rate, rate<=0 -> 0 days. Strict-close:
 //   closes nothing.
 //
-//   LAYOUT [port-derived, labelled]: restree.txt carries NO coordinates and
-//   no banked capture covers the full 66-node field, so node placement is
-//   the deterministic derived law below (depth by longest prereq chain x
-//   row order). NAMED SEAM: the vendor's organic positions (the captures
-//   prove non-grid placement) need a pointer-law capture of the reswin node
-//   table to close.
+//   LAYOUT [VERIFIED tRS-V1/V1b — SUPERSEDES the t408 derived grid]: the
+//   generator is FUN_0004709c's reswin.txt-absent branch — depth relaxation
+//   plus a CHAIN OF CIRCLES (one per depth column), camera pos (0,0,-150),
+//   focal 320/tan(15deg), pinhole 0x53374 with the 0x76e08 chop rounding.
+//   Full law + per-section citations: docs/re/_wip_tRSV1.md P1-P12 and
+//   docs/re/research.md S8. The field is ~7-9x the window: reswin is a
+//   PANNED WINDOW (t252 corroborates) — scale was part of D26.
 //
-//   PAN LAW [verified windows.txt + t252 pixel-diff]: four buttons OUTSIDE
-//   the RESWIN rect — RESROTLEFT 524,442-539,472 msg 50, RESROTRIGHT
-//   540,442-554,472 msg 51, RESMOVEUP 563,442-593,457 msg 52, RESMOVEDOWN
-//   563,458-593,472 msg 53. The rotate pair pans horizontally, the move
-//   pair vertically (the t252 diff at (570,455) moved the view column).
+//   SCROLL LAW [VERIFIED tRS-V1b — SUPERSEDES "rotate pans X, move pans Y"]:
+//   four buttons OUTSIDE the RESWIN rect (windows.txt verbatim rects below,
+//   msg 50..53). The dat_764c4 bit-pair state machine (0x47b44..0x47c42)
+//   latches: the ROTATE pair yaws the camera basis +-3 deg/tick, the MOVE
+//   pair DOLLIES camera posZ -1/+1 per tick (NOT a screen pan). The t252
+//   pixel-diff that read as a column shift is consistent with the dolly.
+//   Node art = resring.shp frames 0..3 1:1 centred (P3/P10); blocked rows
+//   are neither drawn nor hittable (0x46d3c scope, P10).
 
 #include <string>
 #include <vector>
 
 #include "game/campaign.h"
 #include "game/research.h"
-#include "ui/cam3d.h"
 #include "ui/layout.h"
 
 namespace ascend::ui {
@@ -127,108 +130,127 @@ struct ResHitResult {
     int row = -1;  // valid iff kind == Node
 };
 
-// Node hit radius: rings measured ~50 px diameter on the t268 capture
-// (native-vision; empty ring at ~(72,327) spans ~41..100 per the t268
-// pixel-diff bbox 41-100 x 299-358 — 60 px box INCLUDING the ring, so the
-// disk radius is 30). PAINT size only since tRS-B1 — the hit box is the
-// vendor square below.
-inline constexpr int kResNodeRadius = 30;
-
 // tRS-B1 HIT LAW [verified sub 0x47478 @0x474fb..0x4752d]: the click hits a
 // node iff |dx|<=24 AND |dy|<=24 from the node's projected centre — an
 // INCLUSIVE +-24 SQUARE (reject legs `jle` at node-25 and `jge`/`jle` at
 // node+25), fixed size, NOT scaled with the perspective ring radius.
 inline constexpr int kResHitHalf = 24;
 
-// Derived layout law (labelled; seam in the header block): x = depth by the
-// LONGEST prereq chain (0..17 per research.md §3) scaled by kResDepthPitch;
-// y = row index within the depth column by kResRowPitch. Nodes are laid out
-// column-major so prereq edges always run left->right.
-inline constexpr int kResDepthPitch = 96;   // 2*radius + 36 lane room
-inline constexpr int kResRowPitch = 78;     // radius*2 + 18
-inline constexpr int kResFieldX0 = 40;      // interior 7 + ring margin
-inline constexpr int kResFieldY0 = 76;      // interior 46 + header room
+// ---- tRS-V1c: THE VENDOR TREE GEOMETRY (supersedes the t408/t419 derived
+// layout; law docs/re/_wip_tRSV1.md P1-P12 + research.md S8) ---------------
+// FUN_0004709c GENERATOR: depth relaxation (P1b) then a CHAIN OF CIRCLES —
+// one circle per depth column k (0..esi-1, esi = maxdepth+1), column angle
+// acc0 = 240+30k degrees, per node i (FILE order within the column):
+//   Y = 30k + 15*(i&1);  Z0 = (i==0 ? R0(k) : 23);  X = 0;
+//   rotate 0x5324c: X' = Z*sin(acc), Z' = Z*cos(acc);  acc += int(360/d(k))
+//   as REPEATED f32 adds (integer division FIRST — 0x4743d VERBATIM).
+//   R0(k) = 23 iff (k even AND C[k]>1) OR (k odd AND C[k]==2), else 4;
+//   d(k)  = C[k] except odd k with C[k]>2 -> C[k]-1 (circle stays open).
+// MEASURED on restree.txt (66 rows): esi=18, C=[3,4,3,5,6,5,3,4,2,4,4,4,4,
+// 4,5,3,2,1] — the port pins reproduce it.
+struct ResWorld { float x = 0.0f, y = 0.0f, z = 0.0f; };
 
-struct ResPoint { int x = 0, y = 0; };
-
-// ---- t419: THE O(n^2/frame) KILLER + THE 3D TREE --------------------------
-// STALL LAW (D15 addendum; DECISIONS.md static root cause): the old law
-// recomputed researchDepth (a full memoised graph walk) once per slot-row
-// per NODE per FRAME. ResearchLayout computes depth AND column slot ONCE
-// (single memoised pass + single counting pass), so a frame costs O(n+e).
-// researchDepth()/researchNodePos() keep their t408 signatures (pins) by
-// delegating to a one-shot layout.
-struct ResearchLayout {
-    std::vector<int> depth;  // per row: longest prereq chain
-    std::vector<int> slot;   // per row: index within its depth column
-    int cx = kResFieldX0;    // field centre (bbox mid) at pan 0 — the 3D
-    int cy = kResFieldY0;    //   projection origin
-    int maxDepth = 0;
+struct ResearchGeom {
+    std::vector<int> depth;       // per row: longest prereq chain (P1b)
+    std::vector<int> slot;        // per row: index i within its column
+    std::vector<int> C;           // C[k] = rows at depth k, size esi
+    std::vector<ResWorld> world;  // per row: the vendor world triple
+    int esi = 0;                  // column count = maxdepth + 1
 };
-ResearchLayout researchLayoutFor(const ascend::game::ResearchTree& tree);
+ResearchGeom researchTreeGeometry(const ascend::game::ResearchTree& tree);
 
-// 2D centre from a precomputed layout (pure offset arithmetic).
-ResPoint researchNodePosAt(const ResearchLayout& layout, int row, int panX,
-                           int panY);
+// The vendor camera (win+0xab block): position z win+0xe3 (rest -150.0,
+// 0xc3160000 VERIFIED) and the orientation basis yaw (win+0x11f, rotated by
+// 0x53504 = the 0x5324c world-Y mix — the t416 cosmos law). FOCAL is NOT a
+// field: 0x203e4 computes 320/tan((30deg)/2) = 1194.19 once at window init.
+struct ResCam {
+    double posZ = -150.0;   // win+0xe3 (MOVE pair dollies this)
+    double yawDeg = 0.0;    // basis yaw (ROT pair)
+    // dat_764c4 bit-pair latches encoded 0=(0,0) 1=(1,0) 2=(1,1) 3=(0,1).
+    int latchRot = 0, latchMove = 0;
 
-// 3D LAW (D15 "another 3d rotating dealie"; NAMED SEAM: the vendor reswin
-// draw chain was never recovered — grep of every disassembly window on disk
-// finds no reswin/resmove FUN; the mechanism reuses the t416 COSMOSWnd
-// basis law verbatim, which IS cited). The tree is a FLAT XY field (screen
-// axes at rest): field point = (pos2D - layout centre, 0) px, y flipped to
-// field-up. The rotate dials (msg 50/51, windows.txt verbatim — the SAME
-// dial msgs as the cosmos, whose latch+pump law t416 recovered at
-// 0x27d6f../0x27a18) pressSpin on a dedicated Camera3d; the move pair
-// (msg 52/53) SCROLLS post-projection (user spec verbatim: "scrolling
-// (up/down)"). Projection is the t399 pinhole (FUN_00053374 law) via
-// projectPoint with standoff == focal == kResStandoff: at the REST basis
-// scale == 1.0 exactly and screen == the t408 2D law EXACTLY (pins + the
-// t408 witness click coordinates survive unchanged).
-inline constexpr double kResStandoff = 1200.0;  // == focal: rest scale 1
+    // Press law (0x47b44..0x47c42 VERBATIM, P11): pair A = msg 50/52,
+    // pair B = msg 51/53. A: (0,0)->(1,0) start; (1,0)->(0,0) stop;
+    //   (1,1)->(0,1) DEAD; (0,1)->(1,0) revive-left.
+    // B: (0,0)/(1,0)/(0,1)->(1,1); (1,1)->(1,0).
+    static int pressPair(int state, bool pairB);
+    void pressRot(bool pairB) { latchRot = pressPair(latchRot, pairB); }
+    void pressMove(bool pairB) { latchMove = pressPair(latchMove, pairB); }
 
-// The dedicated research camera at REST (focal == standoff): projectPoint
-// through this camera is scale-EXACTLY 1 and reduces to the t408 2D law.
-inline Camera3d researchRestCam() {
-    Camera3d c;
-    c.focal = kResStandoff;
-    return c;
-}
+    // Pump deltas (0x47c88/0x47cdb VERBATIM): rot (1,0)->+3deg, (1,1)->-3,
+    // else 0 (DEAD pumps nothing); move (1,0)->-1, (1,1)->+1 x step, else 0
+    // applied to posZ. NOTE: posZ -= 1 moves the camera AWAY from the tree
+    // at z~0 (vZ = z - posZ grows), so RESMOVEUP SHRINKS the tree — the
+    // _wip P10 draft parenthetical "(dolly IN: tree grows)" contradicts the
+    // cited fadd chain and is superseded.
+    static constexpr double kRotStepDeg = 3.0;
+    static constexpr double kDollyStep = 1.0;  // seam TRSV1b-A (runtime
+                                               // f32[0x9f108] not restored)
+    void tick();
+    bool moving() const { return latchRot != 0 || latchMove != 0; }
+};
+
+// 320/tan(15deg) = 1194.19 (0x203b8+0x203e4 VERBATIM; the HALF-width-320
+// convention matches the tNGS cosmos camera).
+double resFocal();
+
+// 0x76e08 ROUNDING VERBATIM: frndint with RC=chop (toward zero) — with the
+// +0.5 bias this rounds positives to nearest and chops negatives
+// ASYMMETRICALLY (-2.7+0.5 = -2.2 -> -2, NOT -3). Pinned.
+int resVendorRound(double v);
 
 struct ResPoint3 {
-    int x = 0, y = 0;      // painted screen centre
-    int r = kResNodeRadius;  // ring radius scaled by the perspective factor
-    double z2 = 0.0;       // camera-space depth (back-to-front sort key)
+    int x = 0, y = 0;      // painted screen centre (absolute frame px)
+    double z2 = 0.0;       // camera-space depth (edge-colour + sort key)
+    bool legal = false;    // 0x46d3c scope: OWNED or all-prereqs-owned
+    bool visible = false;  // legal && vZ >= 1.0 (port div guard)
 };
 
-// Screen-space centres for every node (index == nodes vector index == row,
-// the researchNodes order law). `cam` is the caller's dedicated research
-// camera (focal == kResStandoff); pan applies POST-projection in screen px.
-std::vector<ResPoint3> researchNodeScreen(const ResearchLayout& layout,
+// Screen centres for every node via the vendor chain: v = B*(world) - pos
+// (0x53324 affine, B rows right/up/fwd per the 0x5324c yaw mix), then
+// 0x53374: X = word(chop(focal*vX/vZ + 0.5) + 235) + panX mapped into the
+// RESWIN interior, Y likewise +240. The u16 word-wrap of the vendor's
+// `add word[...]` is replicated (int16 result). Blocked rows get
+// legal=false and are NEVER drawn or hittable (P5/P10: 0x48566 gates the
+// draw with the SAME 0x46d3c predicate as the hit sub). panX/panY are a
+// labelled PORT affordance (post-projection screen offsets; the vendor has
+// none — its scroll law is the ResCam basis yaw + posZ dolly above).
+std::vector<ResPoint3> researchNodeScreen(const ResearchGeom& geom,
                                           const std::vector<TechNode>& nodes,
                                           int panX, int panY,
-                                          const Camera3d& cam);
+                                          const ResCam& cam);
 
-// The node centre for `row` given the tree (pure; deterministic) plus the
-// pan offsets (px). Pan clamping lives in the caller (ui.cpp) so the law
-// here stays a pure coordinate function. t419: delegates to a one-shot
-// layout (identical answers, no per-call graph re-walk).
+// The node centre for `row` at the given camera (pure convenience wrapper:
+// geometry + one screen pass; O(n+e)).
+struct ResPoint { int x = 0, y = 0; };
 ResPoint researchNodePos(const ascend::game::ResearchTree& tree, int row,
-                         int panX, int panY);
+                         int panX, int panY, const ResCam& cam = ResCam{});
 
-// Longest-prereq-chain depth of a row (memoised DFS; the tree is acyclic —
-// research.md §2 — cycles would be a loader bug, refused upstream).
+// Longest-prereq-chain depth of a row (P1b value; memoised one-shot).
 int researchDepth(const ascend::game::ResearchTree& tree, int row);
 
-// Hit precedence (t405/t407 law shape): the four pan buttons are evaluated
-// FIRST (they sit outside the tree panel), then the node grid. A point near
-// no node is inert. `nodes` is the partition (only non-blocked... no: ALL
-// nodes are hittable — blocked nodes still show; the click law rejects
-// them via setStudy, matching the vendor's silent no-op). t419: hits test
-// the PROJECTED centres (a `cam` is required — passing the rest camera is
-// exact 2D); the layout is built ONCE per call (O(n+e), not O(n^2 x graph)).
+// Hit precedence (t405/t407 law shape): the four pan buttons FIRST (they
+// sit outside the tree panel), then the node grid. THE SCOPE GATE: only
+// LEGAL rows (state != Blocked == the 0x46d3c true-set, P10) are tested —
+// blocked rows are not drawn and not hittable (0x48566 + 0x474fb). Scan
+// order: rows HIGH->low, FIRST hit wins (the vendor SELECT sub 0x47478
+// walks the row list downward; with the circle layout nodes CAN overlap, so
+// the scan order is now observable — port follows it verbatim).
 ResHitResult researchHit(const ascend::game::ResearchTree& tree,
                          const std::vector<TechNode>& nodes, int px, int py,
                          int panX, int panY,
-                         const Camera3d& cam = researchRestCam());
+                         const ResCam& cam = ResCam{});
+
+// The node FRAME index (resring.shp record) per the P10 esi law VERBATIM
+// (0x483fa..0x48470): 1 default; 0 iff row==studied && !owned; 3 iff owned;
+// 2 iff row==selected (overrides 3).
+int resNodeFrame(int row, bool studied, bool owned, bool selected);
+
+// The prereq-edge colour INDEX per the corrected P11 law: 0x6b - k with
+// k = clamp(chop(0.25f*(0.5f*(z_this + z_prereq) + posz)), -3, +3); the
+// caller substitutes index 0xf3 when the prereq is the SELECTED row
+// (0x48314..0x48321 VERBATIM). z values are camera-space depths (ResPoint3
+// z2); posz the camera position z.
+int resEdgeColorIndex(double z_this, double z_prereq, double posz);
 
 }  // namespace ascend::ui

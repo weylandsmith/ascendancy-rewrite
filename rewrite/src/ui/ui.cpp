@@ -213,14 +213,16 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // (t252 pixel-diff). No clamp law exists in vendor data -> the offsets
     // are unbounded [labelled port choice]; nodes derive from them purely.
     int resPanX = 0, resPanY = 0;
-    // t419 RESEARCH 3D: dedicated camera on the t416 basis law (latch +
-    // pump). focal == kResStandoff makes the REST projection scale-exact
-    // 1:1 with the t408 2D law (researchview.h 3D LAW). The rotate dials
-    // pressSpin; the move pair scrolls resPanY (user spec).
-    Camera3d resCam;
-    resCam.focal = kResStandoff;
-    resCam.bounds = kResWin;
+    // tRS-V1c RESEARCH CAMERA (supersedes the t419 Camera3d reuse): the
+    // vendor reswin camera law — basis yaw (win+0x11f) + position z dolly
+    // (win+0xe3, rest -150), dat_764c4 bit-pair latches, pump +-3 deg / +-1
+    // (docs/re/_wip_tRSV1.md P10/P11). resSel = the SELECTED row (vendor
+    // word win+0x9db; frame-2 + gold-rim + edge-0xf3 driver).
+    ResCam resCam;
+    int resSel = -1;
     Uint32 lastResPumpMs = 0;
+    int resCenterLogged = -1;  // row of the last "ui research center" line
+    int resCenterX = -1, resCenterY = -1;  // its centre (change-detector)
     // t419 corner "Exit <ESC>" popup state (ui/exitpopup.h): the corner the
     // cursor currently probes into (None = hidden).
     ExitCorner exitCorner = ExitCorner::None;
@@ -297,11 +299,14 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // (TYPE-100 STATENUMBER 16 ln1140-1142; dims census _wip_t410 F3: the
     // lib has NO backdrop record, so backdropFor() declines it and only the
     // SHAPEFRAME-identified faces blit).
-    const char* kLibFiles[8] = {"1starmap.shp", "10status.shp", "14intel.shp",
+    // tRS-V1c: resring.shp joins at index 8 — the NODE RING sprites (4 x
+    // 29x29 frames; law docs/re/_wip_tRSV1.md P3/P10). It is deliberately
+    // OUTSIDE the libFor() 8-entry scan (screenShapeLib never names it).
+    const char* kLibFiles[9] = {"1starmap.shp", "10status.shp", "14intel.shp",
                                 "20res.shp", "planets.shp", "17np.shp",
-                                "16battle.shp", "suns.shp"};
-    ascend::formats::ShapeLibrary kLibs[8];
-    for (int i = 0; i < 8; i++) {
+                                "16battle.shp", "suns.shp", "resring.shp"};
+    ascend::formats::ShapeLibrary kLibs[9];
+    for (int i = 0; i < 9; i++) {
         std::string lerr;
         if (!kLibs[i].load(dataRoot + "/extracted/ascend01/data/" + kLibFiles[i],
                            &lerr))
@@ -801,27 +806,31 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                                      ag::kPlayer),
                                        p.x, p.y, resPanX, resPanY, resCam)
                                    .kind != ResHit::None) {
-                    // t408 RESEARCH hit-map (researchview.h): the four pan
-                    // buttons (windows.txt msg 50..53, OUTSIDE the RESWIN
-                    // rect) first, then the node grid. Click law = help
-                    // reswin: an Available ("empty disk") node SETS the
-                    // study topic; Owned = dossier read; Blocked = silent.
+                    // t408/tRS-V1c RESEARCH hit-map (researchview.h): the
+                    // four pan buttons (windows.txt msg 50..53, OUTSIDE the
+                    // RESWIN rect) first, then the node grid (LEGAL rows
+                    // only — the 0x46d3c scope). Click law = help reswin +
+                    // the vendor SELECT chain: a click sets the SELECTION
+                    // (win+0x9db) and commits ONLY for an Available row
+                    // (setStudy); Owned = dossier read; Blocked rows are
+                    // never hit at all (hit law gates 0x46d3c first).
                     const auto& tree = *camp.researchTree();
                     const auto nodes = researchNodes(camp, tree, ag::kPlayer);
                     const auto h = researchHit(tree, nodes, p.x, p.y,
                                                resPanX, resPanY, resCam);
                     bool panned = true;
                     switch (h.kind) {
-                        // t419: the rotate pair LATCHES the camera spin on
-                        // the t416 press law (vendor msg 50/51 == the cosmos
-                        // dial msgs; pump signs +1/-1), the move pair
-                        // SCROLLS (user spec "up/down"; t252 pixel-diff).
-                        case ResHit::RotLeft:  resCam.pressSpin(+1); break;
-                        case ResHit::RotRight: resCam.pressSpin(-1); break;
-                        case ResHit::MoveUp:   resPanY += 78; break;
-                        case ResHit::MoveDown: resPanY -= 78; break;
+                        // tRS-V1c SCROLL LAW (dat_764c4 bit pairs, msg 50..53
+                        // = windows.txt SENDMESSAGE verbatim): the rotate
+                        // pair latches basis yaw +-3 deg/tick, the move pair
+                        // dollies camera posZ -1/+1 (P10/P11 VERBATIM).
+                        case ResHit::RotLeft:  resCam.pressRot(false); break;
+                        case ResHit::RotRight: resCam.pressRot(true);  break;
+                        case ResHit::MoveUp:   resCam.pressMove(false); break;
+                        case ResHit::MoveDown: resCam.pressMove(true);  break;
                         case ResHit::Node: {
                             panned = false;
+                            resSel = h.row;  // vendor selection word
                             const std::string tname = tree.all()[h.row].name;
                             if (setStudy(camp, tree, ag::kPlayer, h.row))
                                 std::printf("ui research study %s\n",
@@ -829,15 +838,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             else if (camp.techRowOwnedFor(ag::kPlayer, h.row))
                                 std::printf("ui research readout %s\n",
                                             tname.c_str());
-                            // Blocked: SILENT (no capture shows reject
-                            // feedback; MapClick law t404).
                             break;
                         }
                         default: panned = false; break;
                     }
                     if (panned)
-                        std::printf("ui research pan %d %d\n", resPanX,
-                                    resPanY);
+                        std::printf("ui research latch %d %d\n",
+                                    resCam.latchRot, resCam.latchMove);
                     std::fflush(stdout);
                 } else if (screen == kScreenPlanet && projectOpen &&
                            projectRowFor(p, 0)) {
@@ -2479,77 +2486,115 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             blitShape(ren, raceflagLib, ps2, kPlaqueX,
                                       kPlaqueY);
                     }
-                    // Tree field: clip to the RESWIN interior so panning
-                    // never paints the header or the right panel.
+                    // Tree field: clip to the RESWIN interior so the huge
+                    // vendor field never paints header or right panel.
                     SDL_Rect clip{7, 46, 470, 427};
                     SDL_RenderSetClipRect(ren, &clip);
-                    // t419: ONE layout + ONE projected-centre pass per frame
-                    // (was O(n^2 x graph) per frame — the D15 CPU stall).
-                    const auto resLayout = researchLayoutFor(*tree);
+                    // tRS-V1c: ONE geometry pass + ONE projected-centre pass
+                    // per frame. THE VENDOR CHAIN (researchview.h): chain of
+                    // circles -> 0x53324 affine -> 0x53374 pinhole. Scale
+                    // ~7-9x: this IS a window onto the tree (t252).
+                    const auto resGeom = researchTreeGeometry(*tree);
                     const auto centres = researchNodeScreen(
-                        resLayout, nodes, resPanX, resPanY, resCam);
+                        resGeom, nodes, resPanX, resPanY, resCam);
+                    // Witness line (tRSB1 click re-derivation): log the
+                    // FIRST Available centre the player can actually see —
+                    // inside the RESWIN clip rect (the vendor field is a
+                    // WINDOW; off-frame centres are unclickable). Re-logs
+                    // whenever that row CHANGES (camera dolly/rotation, or
+                    // a tech completing) — never per-frame spam.
+                    {
+                        int cw = -1, cx2 = -1, cy2 = -1;
+                        for (size_t i = 0; i < nodes.size(); ++i)
+                            if (nodes[i].state == TechNodeState::Available &&
+                                centres[i].visible &&
+                                centres[i].x >= 7 && centres[i].x <= 476 &&
+                                centres[i].y >= 46 && centres[i].y <= 472) {
+                                cw = nodes[i].row;
+                                cx2 = centres[i].x;
+                                cy2 = centres[i].y;
+                                break;
+                            }
+                        // Re-log on (row,x,y) CHANGE — a dolly moves the
+                        // same row's centre, and a witness must never click
+                        // a stale coordinate. 1 line/tick worst case.
+                        if (cw != resCenterLogged || cx2 != resCenterX ||
+                            cy2 != resCenterY) {
+                            std::printf("ui research center %d %d %d %s\n",
+                                        cw, cx2, cy2,
+                                        cw >= 0 ? "available" : "offframe");
+                            std::fflush(stdout);
+                            resCenterLogged = cw;
+                            resCenterX = cx2;
+                            resCenterY = cy2;
+                        }
+                    }
+                    // PREREQ EDGES first (under the disks): DRAWN rows only
+                    // (P5 scope), endpoint law CORRECTED per P11 — from
+                    // (this.x, this.y-27) to (prereq.x, prereq.y+27); colour
+                    // 0x6b - k z-shaded, prereq==selected -> 0xf3.
                     for (size_t i = 0; i < nodes.size(); ++i) {
-                        // prereq edges first (thin blue, the capture's lanes)
+                        if (!centres[i].visible) continue;
                         const auto& c = centres[i];
                         for (int pr : tree->all()[nodes[i].row].prereqs) {
                             if (pr < 0 || pr >= int(centres.size())) continue;
+                            if (!centres[size_t(pr)].visible) continue;
                             const auto& pc = centres[size_t(pr)];
-                            SDL_SetRenderDrawColor(ren, 40, 40, 160, 255);
-                            SDL_RenderDrawLine(ren, pc.x, pc.y, c.x, c.y);
+                            const int idx = pr == resSel
+                                ? 0xf3
+                                : resEdgeColorIndex(c.z2, pc.z2, resCam.posZ);
+                            const uint32_t argb = chromePaletteArgb(idx);
+                            SDL_SetRenderDrawColor(
+                                ren, uint8_t((argb >> 16) & 0xff),
+                                uint8_t((argb >> 8) & 0xff),
+                                uint8_t(argb & 0xff), 255);
+                            SDL_RenderDrawLine(ren, c.x, c.y - 27,
+                                               pc.x, pc.y + 27);
                         }
                     }
-                    // Painter order: far nodes first (z2 descending) so the
-                    // near disks overlap the far ones under rotation.
+                    // NODES: resring.shp frames 0..3 blitted 1:1 CENTRED at
+                    // (x-14, y-14) (P10 esi law + the P11 blit/hit word
+                    // identity). Painter order far->near (z2 descending).
+                    // Blocked rows are NOT DRAWN (vendor 0x48566 gate).
+                    int queuedRow = -1;
+                    for (const auto& nd : nodes)
+                        if (nd.state == TechNodeState::Study) queuedRow = nd.row;
                     std::vector<size_t> order(nodes.size());
                     for (size_t i = 0; i < order.size(); ++i) order[i] = i;
                     std::sort(order.begin(), order.end(),
                               [&](size_t a, size_t b) {
                                   return centres[a].z2 > centres[b].z2;
                               });
+                    const int resRingLib = 8;  // kLibFiles index (above)
                     for (size_t oi = 0; oi < order.size(); ++oi) {
                         const auto& nd = nodes[order[oi]];
                         const auto& c = centres[order[oi]];
-                        SDL_Color ring = {120, 130, 190, 255};   // empty disk
-                        bool fill = false;
-                        if (nd.state == TechNodeState::Owned)
-                            ring = {90, 200, 255, 255};          // discovered
-                        if (nd.state == TechNodeState::Study)
-                            ring = {230, 160, 40, 255};          // gold rim
-                        if (nd.state == TechNodeState::Blocked) {
-                            ring = {70, 70, 90, 255};            // dim [port
-                            // choice; the captures never show a blocked node]
-                        }
-                        if (nd.state == TechNodeState::Owned) fill = true;
-                        // t419: ring radius follows the perspective scale
-                        // (rest scale == 1 -> exactly r30/r27, the t408 law).
-                        const int rr0 = c.r;
-                        for (int rr : {rr0, rr0 - 3}) {
-                            SDL_SetRenderDrawColor(ren, ring.r, ring.g,
-                                                   ring.b, 255);
-                            int x = rr, y = 0, err = 1 - rr;
-                            while (x >= y) {
-                                const SDL_Point pts[8] = {
-                                    {c.x + x, c.y + y}, {c.x + y, c.y + x},
-                                    {c.x - y, c.y + x}, {c.x - x, c.y + y},
-                                    {c.x - x, c.y - y}, {c.x - y, c.y - x},
-                                    {c.x + y, c.y - x}, {c.x + x, c.y - y}};
-                                SDL_RenderDrawPoints(ren, pts, 8);
-                                y++;
-                                if (err < 0) err += 2 * y + 1;
-                                else { x--; err += 2 * (y - x) + 1; }
+                        if (!c.visible) continue;
+                        const int frame = resNodeFrame(
+                            nd.row, nd.row == queuedRow,
+                            nd.state == TechNodeState::Owned,
+                            nd.row == resSel);
+                        if (kLibs[resRingLib].count() > 0 &&
+                            frame < int(kLibs[resRingLib].count()))
+                            blitShape(ren, kLibs[resRingLib], frame,
+                                      c.x - 14, c.y - 14);
+                        else {
+                            // Silent-degrade: vector ring fallback ONLY if
+                            // the lib refused (never a blank tree).
+                            const uint32_t argb = chromePaletteArgb(
+                                frame == 3 ? 0xf3 : 0x6b);
+                            SDL_SetRenderDrawColor(
+                                ren, uint8_t((argb >> 16) & 0xff),
+                                uint8_t((argb >> 8) & 0xff),
+                                uint8_t(argb & 0xff), 255);
+                            SDL_Point pts[16];
+                            int npts = 0;
+                            for (int a = 0; a < 16 && npts < 16; ++a) {
+                                const double th = a * (2.0 * 3.14159265 / 16.0);
+                                pts[npts++] = {c.x + int(14 * std::cos(th)),
+                                               c.y + int(14 * std::sin(th))};
                             }
-                        }
-                        if (fill) {  // discovered = filled disk (help reswin)
-                            SDL_SetRenderDrawColor(ren, ring.r / 3, ring.g / 3,
-                                                   ring.b / 2, 255);
-                            for (int dy = -rr0 + 4; dy <= rr0 - 4; ++dy) {
-                                const int dx2 = (rr0 - 4) * (rr0 - 4) -
-                                                dy * dy;
-                                int dx = 0;
-                                while ((dx + 1) * (dx + 1) <= dx2) ++dx;
-                                SDL_RenderDrawLine(ren, c.x - dx, c.y + dy,
-                                                   c.x + dx, c.y + dy);
-                            }
+                            SDL_RenderDrawPoints(ren, pts, npts);
                         }
                     }
                     SDL_RenderSetClipRect(ren, nullptr);
@@ -2834,7 +2879,15 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 systemCam.tick();
                 lastSysPumpMs = nowMs;
             }
-            // t419 research tree spin pump (same vendor msg-0x3b latch law).
+            // tRS-V1c research pump: the vendor msg-0x3b equivalent applies
+            // ONE dat_764c4 delta per tick per latched pair (yaw/dolly).
+            // Cadence reuses kSpinTickMs (documented deviation, P11).
+            if (screen != kScreenResearch) {
+                // Vendor window-init law (P1a): re-entry clears the
+                // selection word win+0x9db (and the witness row).
+                resSel = -1;
+                resCenterLogged = -1;
+            }
             if (resCam.moving() &&
                 nowMs - lastResPumpMs >= (Uint32)Camera3d::kSpinTickMs) {
                 resCam.tick();
