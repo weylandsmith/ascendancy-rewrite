@@ -514,6 +514,12 @@ public:
     // (ui/researchview.h partition/layout laws). Never mutates.
     const ResearchTree* researchTree() const { return tree_; }
     bool isTechQueuedFor(int owner, int row) const { return queuedTech[owner] == row; }
+    // tPL-B2: the CURRENT topic row (queuedTech analog of WORD[0x76492+2r];
+    // -1 == 0xffff "no current research"). Read-only.
+    int queuedTechFor(int owner) const {
+        return owner >= 0 && owner < int(queuedTech.size()) ? queuedTech[owner]
+                                                            : -1;
+    }
     bool techRowOwnedFor(int owner, int row) const { return ownedTech[owner][row]; }
     void setQueuedTechFor(int owner, int row) { queuedTech[owner] = row; }
     // t408 RESEARCH VIEW read surface (ui/researchview.h): the current topic's

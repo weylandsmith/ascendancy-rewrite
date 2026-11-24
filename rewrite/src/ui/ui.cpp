@@ -22,6 +22,7 @@
 #include "ui/statusbg.h"
 #include "ui/statuslaw.h"
 #include "ui/planetwin.h"
+#include "ui/indpopups.h"  // tPL-B2 msg-50 indicator popups
 #include "ui/planetstrip.h"
 #include "ui/statuslist.h"
 #include "ui/planetview.h"
@@ -189,6 +190,15 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // and the refuse leg (0x3b487/0x3b419). Tile click WITHOUT a pick keeps
     // the tile-select affordance (vendor does nothing for orders there).
     int planetPick = -1;
+    // tPL-B2 INDICATOR POPUP session state (msg-50 arm 0x3d80b + builder
+    // FUN_0x3db80, law ui/indpopups.h): the lines the builder queued for
+    // the last panel click (empty = no popup) and the popup RECT (builder
+    // 0x3dbe5..0x3dc34 law from the clicked widget origin). The vendor
+    // queue-consumer (hold ticks) is unrecovered (SEAM named in the header)
+    // — the port shows all lines until the next planet-screen click
+    // dismisses (documented default; the witness read a persisting popup).
+    std::vector<ascend::ui::PopupLine> planetPopup;
+    Rect planetPopupRect{};
     // t407 FLEET LIST (state 18) session state: scroll step + selected row
     // (index into fleetRows()). The vendor LEFT click jumps the camera to
     // the ship (help fleetwin + t253 live); the port SELECTS + logs instead
@@ -720,6 +730,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             projectOpen = false;
                             planetCell = -1;  // t418b: fresh tile selection
                             planetPick = -1;  // tPL-B1b: fresh pick
+                            planetPopup.clear();  // tPL-B2: fresh popup
                             stack.push(kScreenPlanet);  // t410: chain level
                             screen = kScreenPlanet;
                             // tPL-B1b WITNESS INSTRUMENT: the build-loop
@@ -853,9 +864,30 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         std::fflush(stdout);
                     }
                 } else if (screen == kScreenPlanet && !projectOpen &&
+                           planetPanelFor(p) &&
+                           *planetPanelFor(p) !=
+                               ascend::ui::PlanetPanel::PlBuild &&
+                           planetStar >= 0) {
+                    // tPL-B2 MSG-50 ARM (0x3d80b: store key + repaint
+                    // shows the builder's lines). A click on PLRES/PLIND/
+                    // PLPRO/PLPOP opens that panel's info popup — even
+                    // with a pick pending: the click belongs to the panel
+                    // widget (SENDMESSAGE 50), not to PLSQUARE.
+                    const auto panel = *planetPanelFor(p);
+                    planetPopup = popupLinesFor(camp, planetStar, panel,
+                                                planetName);
+                    planetPopupRect = indicatorPopupRect(
+                        kPlanetPanels[int(panel)].rect);
+                    std::printf("ui planet popup %s (%zu lines)\n",
+                                kPlanetPanels[int(panel)].helpIndex,
+                                planetPopup.size());
+                    std::fflush(stdout);
+                } else if (screen == kScreenPlanet && !projectOpen &&
                            planetPick >= 0 &&
                            planetStar >= 0 &&
                            !inRect(kPlanetPanels[4].rect, p)) {
+                    planetPopup.clear();  // tPL-B2 dismiss (documented
+                                          // default: next click clears)
                     // tPL-B1b STEP 2 (msg 0x1c01 branch 0x3b3b6): tile click
                     // WITH a pick. Hit-test the lattice first: a miss is the
                     // vendor's 0xffff leg — cell-less bit1 items order
@@ -925,6 +957,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 } else if (screen == kScreenPlanet && !projectOpen &&
                            planetStar >= 0 && planetPick < 0 &&
                            !inRect(kPlanetPanels[4].rect, p)) {
+                    planetPopup.clear();  // tPL-B2 dismiss (documented
+                                          // default: next click clears)
                     // t418b TILE SELECT (no pick pending): the PLSQUARE cell
                     // click the vendor answers with repaint-only (F1: "click
                     // does NOTHING" without a pending item — exactly the
@@ -1125,6 +1159,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             projectOpen = false;
                             planetCell = -1;  // t418b: fresh tile selection
                             planetPick = -1;  // tPL-B1b: fresh pick
+                            planetPopup.clear();  // tPL-B2: fresh popup
                             stack.push(kScreenPlanet);
                             screen = kScreenPlanet;
                             std::printf("ui system planet %s -> planet view "
@@ -2276,6 +2311,27 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     if (opts.empty())
                         txt.draw(ren, lr.x0 + 8, lr.y0 + 6,
                                  "No projects available", false, kDim);
+                }
+                // ---- tPL-B2 INDICATOR POPUP (msg-50 builder lines) ------
+                // Lines queued by the msg-50 arm render in the builder's
+                // rect (wrec+10 origin, 0x145x0xcf size — indpopups.h).
+                // The vendor queue consumer (hold ticks, text colour,
+                // window art) is UNRECOVERED (SEAM in indpopups.h): the
+                // port draws plain kText lines over a dim backing — the
+                // backing shape is a port affordance, the TEXT is the law.
+                if (!planetPopup.empty()) {
+                    const Rect& pr = planetPopupRect;
+                    SDL_Rect pb{pr.x0, pr.y0, pr.x1 - pr.x0 + 1,
+                                pr.y1 - pr.y0 + 1};
+                    SDL_SetRenderDrawColor(ren, 8, 12, 20, 235);
+                    SDL_RenderFillRect(ren, &pb);
+                    SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
+                    SDL_RenderDrawRect(ren, &pb);
+                    int ly = pr.y0 + 6;
+                    for (const auto& ln : planetPopup) {
+                        txt.draw(ren, pr.x0 + 8, ly, ln.text, false, kText);
+                        ly += 14;
+                    }
                 }
             } else if (screen == kScreenFleet) {
                 // ---- t407 SHIPS LIST (D13 "ships screen is EMPTY") ------

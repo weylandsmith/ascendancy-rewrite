@@ -233,24 +233,23 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPL-B2 PRODUCTIVITY-BOX POPUPS (D26) — ordering rationale: tPL-V2
-(2026-11-24) landed the orbital slot grid + hover outline with a PASSing
-pixel census (docs/re/_wip_tPLV2.md F7), so the planet-view queue advances
-to its next D26 defect. CLICKING a top-row productivity indicator pops an
-info window; EXACT witness text:
-"Crimea 1 / Prosperity: 1 per day / Population will grow in 50 days"
-(/ = line break). Derive templates + values law from windows.txt/string
-table; port all indicator boxes. CLOSE: live witness of each indicator's
-popup (capture recipe: the shot() in scripts/tplv2_port_witness.sh — winpos
-substring + root-crop + assert 640x480; NEVER import -window NAME, the
-title flips at RESUME; export DISPLAY in scripts; clear stale
-/tmp/.X99-lock first; for POINTER-ONLY moves use the NEW `xsend warp x y`
-mode — the legacy `x y` mode CLICKS, and a corner click can kill the app).
-THEN tPL-D1 HOME PLANET BY RACE (D26):
-Chamachi home planet WRONG ART + WRONG MAX POPULATION; derive the vendor
-new-game home-planet law per race (fixed TABLE vs RNG at seed — debugger on
-scratch new-game as Chamachies settles it; cross-check Minions). THEN
-tRS-B1 RESEARCH: SET PROJECT (D26: "I can't set any projects") — derive the
+NEXT tPL-D1 HOME PLANET BY RACE (D26) — ordering rationale: tPL-B2
+(2026-11-24) landed the msg-50 productivity-box popups with a PASSing
+pixel + vision witness (docs/re/_wip_tPLB2.md P8/P9), so the planet-view
+D26 queue advances. D1: the Chamachi home planet shows WRONG ART and
+WRONG MAX POPULATION vs the vendor new-game. Derive the vendor new-game
+home-planet law per race: fixed TABLE vs RNG-at-seed decides the route —
+debugger on a scratch new-game as Chamachies settles it (scratch savedir
+law; protected saves untouchable); cross-check Minions. The max-pop
+half likely folds into the seeded capBase law (income-law.md S10 t29+t33
+— capBase = NONBARRENCOUNT/3 + 5 into +0x55/+0x4a): if the vendor home
+worlds carry a DIFFERENT seeded cap, measure it against the save corpus
+first (cheap) before any debugger leg. Recipe reminders: capture via the
+shot() in scripts/tplb2_port_witness.sh (winpos substring + root-crop +
+assert 640x480; NEVER import -window NAME — title flips at RESUME;
+export DISPLAY in scripts; clear stale /tmp/.X99-lock; POINTER-ONLY moves
+use `xsend warp x y` — the legacy `x y` mode CLICKS). THEN tRS-B1
+RESEARCH: SET PROJECT (D26: "I can't set any projects") — derive the
 vendor set-project handler, PORT + walkthrough witness. THEN tRS-V1
 RESEARCH TREE DRAW (D26) per D19 G1/G2 (3D projection ported t419/t399;
 diff regions, fix laws not pixels). THEN tPR-U: USER GRADE PACKAGE
@@ -261,6 +260,41 @@ color only; no synthetic stand-ins (RE-FIRST t423 law); protected saves
 TL EXPIRES 2026-11-24 14:53 — if a live witness needs the production ring
 and it's dead, run the t439 recovery pattern FIRST; C1-C5 cosmetic backlog
 + race intro stay DEFERRED (D25) — do not touch.
+
+tPL-B2 LANDED 2026-11-24 (PRODUCTIVITY-BOX POPUPS PORTED + LIVE WITNESS
+PASS; no OQ row touched — tPL tracks none, honest negative under
+strict-close; open=[016,019] unchanged).
+PROVED (docs/re/_wip_tPLB2.md P1-P9; prior session derived P1-P6, this
+session re-verified every leg instruction-exact on work/ascend_restored.bin
+and shipped the port):
+ - KEY->CASE LAW (live jump table, member delta 0xfd0): PLRES=RESEARCH
+   (0x3dc61), PLIND=INDUSTRY (0x3dd17), PLPRO=PROSPERITY (0x3ddc0),
+   PLPOP=FULL-INFO (0x3e2c8); key>4 = no lines (0x3dc53 ja).
+ - TWO-LINE LAW 0x3e4db..0x3e5db: L-D getter(99) "%s %s: %d per day"
+   (hold 0xf) + L-E getter(100) "%s will %s in %d day%s." (hold 0x50,
+   plural pair getter28/29 iff days==1); sentinel fmt getter(67/73/74)
+   on the 0xffff leg. COUNTDOWN 0x47010 = max(1,ceil((target-acc)/rate)),
+   rate<=0 -> 0xffff.
+ - PROSPERITY fill 0x3ddc0 EXACT incl. `cmp %bx,%dx; jae` (pop >= maxpop
+   -> getter74) and 0x47010(eax=wrap 50 @0x66e4, edx=+0x4e counter,
+   ebx=+0x48 pros). POPUP RECT (wrec+10, wrec+0x145/0xcf).
+ - PORT: rewrite/src/ui/indpopups.{h,cpp} (pure law + Campaign-fed
+   builders), Campaign::queuedTechFor read, ui.cpp msg-50 arm (BEFORE the
+   tile arms — panel click wins) + dismiss + render. SEAMS named:
+   TPLB2-A Ship/Automation cost legs (statuslist precedent), TPLB2-B
+   inline |%d| chip not rendered (code computed+pinned), TPLB2-C chip
+   raceIdx runtime table analog, hold-tick consumer unrecovered (show
+   until next click = documented default).
+ - PINS: tests/test_indpopups_tplb2.cpp x6 (countdown values, rect law,
+   L-D/L-E verbatim+gates+plural+sentinel, full-info chain+"No One"+chip
+   code, campaign cases all keys). Suite 511/0/0 (was 505).
+ - WITNESS (scripts/tplb2_port_witness.sh + tplb2_census.py): per-key
+   line counts 1/1/2/5 match the law; pixel census VERDICT PASS (own-rect
+   93.8% changed x4, no-overlap control 0px, dismiss 0px full-frame);
+   vision oracle reads "Amoroso I Prosperity: 1 per day / Population will
+   grow in 50 days." — the D26 user-witness text shape reproduced.
+ - HARNESS NOTE: tests/harness.h has CHECK/REQUIRE_DATA only (no REQUIRE);
+   local REQUIRE = CHECK+return idiom (now used in the tplb2 pins).
 
 tPL-V2 LANDED 2026-11-24 (ORBITAL SLOTS LEFT + HOVER OUTLINE PORTED,
 PORT PIXEL CENSUS VERDICT PASS; no OQ row touched — tPL tracks none,
