@@ -714,3 +714,23 @@ DISPOSITION:
 
 GALAXY-MAP phase (proposed tGM-*) is SUPERSEDED in order by D26; the
 tGM seams stay banked in the docs for when its turn comes.
+
+## D27 — RESEARCH DISK FILL LAW + PR1 GRADE NOTES (USER, 2026-11-24, verbatim)
+
+> when you start out, and you don't know a technology, the circle is
+> empty. When you click the circle to select that item for research, it
+> shows a small portion of the center of that technology's picture. As
+> you progress in researching that technology, the portion of the image
+> displayed gets wider, until you complete the research, when the image
+> fills the disk (I believe, from memory.) ... from the screenshot it
+> looks pretty good, though the lines leading to other technologies
+> aren't connecting to the circles properly. I'll need to build the
+> game to see if it's behaving properly in other ways.
+
+DISPOSITION: two fix rows queued (tRS-V2 pie-wipe fill law — derive
+the wipe geometry from vendor paint code, user-law shape = center-out
+wedge/annulus TBD by RE; unknown tech = EMPTY disk, NOT dimmed art;
+tRS-V3 link endpoints — lines must attach to circle rims, derive
+endpoint law from the same paint fn); behavior verification is the
+user's own build (assistant does not claim it). PUSH requested ->
+export+lease push to public main.
