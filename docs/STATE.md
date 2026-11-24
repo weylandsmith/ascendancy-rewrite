@@ -233,28 +233,33 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT = WAIT-USER-GRADE-PR1 (ruling still not in as of 2026-11-24 18:20; if a
-later session finds the ruling in docs/DECISIONS.md USER block, execute it).
-The research-screen grade package SHIPPED unchanged:
-scratchpad/PR-usergrade.png + scratchpad/PR-checklist.txt (6 items; answer
-format "1 yes, 2 no - ..."). tRS-V1d LANDED the pre-queued seam TRSV1c-E
-early (drawn ring centre now == logged hit centre, law cited + pinned +
-witnessed) — the package stays valid (the seam was never a graded item).
-WHEN THE RULING ARRIVES: execute its items in the ruling's own order (NG5
-precedent). If NO ruling has arrived when this session starts, the ONE task
-is tRSV1-C: the restree.shp picture-consumer hunt (checklist item 4 is the
-only KNOWN-MISSING row on the grade sheet — closing it before the user looks
-saves a whole grading cycle, D18 <=3 rule). Start from the banked facts:
-restree.shp = 66 records 24x24 one-per-live-row, ZERO code immediates
-reference its name (research.md S8f); the t252 in-disk picture is real.
-Candidate leads NOT yet tried: the shape-cache slot scan at runtime (which
-libs does the reswin paint path actually fetch — BPLM on FUN_0001fc34
-during a research-screen sitting would enumerate slot ids; 0x6fd82 study-
-chip word is runtime-only), and the record CONTENT (do the 24x24 pictures
-match the t252 disk interiors per row?). Sitting check FIRST
-(r1_t85g_sitting exit 0 = stale assignment stands).
-RULES: D19 G1-G6 binding; NO synthetic stand-ins; never re-capture the
-vendor (REFUTED class); scratch copies only.
+NEXT tRS-V2 RESEARCH DISK FILL LAW (D27 user law, supersedes
+WAIT-USER-GRADE-PR1): unknown tech = EMPTY disk (no art at all);
+SELECTING it for research shows a SMALL PORTION OF THE CENTER of the
+tech's picture; as research progresses the portion WIDENS; on
+completion the picture FILLS THE DISK (user memory - verify the
+end-state against vendor, and derive the wipe SHAPE (center-out wedge
+vs growing inner disc) from the vendor paint code, do not guess).
+RE-FIRST: research-window paint fn chain already cited (tRS-V1b
+docs/re/_wip_tRSV1.md + research win msg map); find the per-disk clip
+or source-rect computation keyed to progress. PORT: progress->wipe
+law + empty-disk state; pins: 0% = empty, mid = center portion only
+(pixels outside wipe absent), 100% = full art; selected-but-0% shows
+the sliver (user: portion appears ON SELECT). Budget <=2 cycles.
+THEN tRS-V3 LINK ATTACH (D27 grade: "lines leading to other
+technologies aren't connecting to the circles properly"): derive the
+vendor link endpoint law from the same paint fn (rim-attach vs center
+vs projected-offset) and fix ours; G2 region diff vs refcap at the
+link pixels; pin: each link's endpoint within N px of target circle
+rim at multiple yaws. Budget <=1 cycle.
+THEN tPR2-U: re-package grade sheet (checklist format, ours|vendor
+side-by-side per D19) covering research screen + planet screen; NEXT
+becomes WAIT-USER-GRADE-PR2. Context: user is BUILDING c68e8bd locally
+to test planet functionality himself - if his report names planet
+defects, those rows take priority over tRS-V3. Ring TL expired
+2026-11-24 14:53 - production game needs t439 recovery pattern before
+ANY live witness; scratch DOSBox unaffected. Protected saves law
+stands. C1-C5 + race intro remain DEFERRED (D25).
 
 tRS-V1d LANDED 2026-11-24 (SEAM TRSV1c-E CLOSED EARLY — VENDOR BLITTER
 ANCHOR LAW DERIVED + PORTED + 3 PINS + MUTATION-PROVED + PIXEL WITNESS PASS;
