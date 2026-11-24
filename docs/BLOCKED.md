@@ -336,4 +336,10 @@ Enforced statically by gate 3n/3n3.
 ## PITFALL tNGS3: NEVER `pkill -x Xvfb -u <user>` — it matches production
   Xvfb :9 as well as scratch displays. Kill by DISPLAY-specific pid
   (pgrep -f "Xvfb :97") instead. An -u kill on 2026-11-22 took production
-  down mid-iteration (recovered via r1_playcap_vnc.sh start).
+  down mid-iteration (recovered via r1_playcap_vnc.sh start). THE --older
+  VARIANT IS EQUALLY DEAD: `pkill -x Xvfb -u $USER --older 3600` (tPL-V1f,
+  2026-11-24) was meant for stale witness Xvfbs and STILL killed production
+  :9 (dosbox 1470999 gone 00:01:33, t277 golden farewell; recovered via the
+  t439 pattern, new pid 1623906). Age is not an identifier — production has
+  been up LONGER than any scratch display. There is no safe predicate
+  variant of this command; PID only.

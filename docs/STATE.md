@@ -294,6 +294,12 @@ open=[016,019] unchanged). PROVED (docs/re/_wip_tPLV1.md F5):
  - SITTING CHECK ran first (r1_t85g_sitting exit 0): tail rows all
    turn=1086 (newest wall ~23:37), production dosbox-x pid 1470999 alive,
    no new sitting, stale assignment stood.
+ - INCIDENT + RECOVERY (full text _wip_tPLV1.md F6): my cleanup
+   `pkill -x Xvfb --older ...` killed the PRODUCTION Xvfb :9 at 00:01:33 ->
+   dosbox-x 1470999 died (t277 golden farewell, not a crash). RECOVERED per
+   the t439 pattern: no VNC client attached, `bash scripts/r1_playcap_vnc.sh
+   start`, new pid 1623906, ring rotating 00:30:38+. LAW: on this host kill
+   Xvfb BY PID only — never bulk-pkill by user/age.
 
 tPL-V1 LANDED 2026-11-23 (TILE GRID PITCH + COLOURS: THE PORT'S CURSORS
 WERE TRANSPOSED; no OQ row touched — tPL tracks none, honest negative under

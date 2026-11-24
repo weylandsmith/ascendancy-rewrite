@@ -175,3 +175,18 @@ scripts/tplv1f_pair_probe.py (adjacency pair probe), scripts/tplv1f_probe.sh
 scripts/tplv1_port_census.py stays on disk as the refuted-premises witness;
 tplv1f_census_v2.py is THE census for tPL-V2 onward.
 
+## F6 — PRODUCTION-RING KILL INCIDENT + t439 RECOVERY (tPL-V1f, 2026-11-24)
+HAZARD SELF-INFLICTED, BANKED SO NO REPEAT: cleanup commands
+`pkill -x Xvfb -u $USER --older 3600` (and a second at --older 1200) intended
+for my own stale witness Xvfbs ALSO killed the PRODUCTION Xvfb :9 -> dosbox-x
+pid 1470999 lost its display at 00:01:33 (dosbox.log ends `X connection to :9
+broken` — the t277 golden farewell, NOT a crash). NEVER bulk-pkill Xvfb by
+user/age on this host: the production ring's Xvfb (:9) and the VNC Xvfb (:97)
+are indistinguishable that way. Kill BY PID only (pgrep -a Xvfb first;
+production pids are the ones matching the vnc/session.conf lineage).
+RECOVERY (t439 pattern, verbatim): pre-gate `ss -tn | grep 5910` empty (no
+human VNC client) -> `bash scripts/r1_playcap_vnc.sh start` -> NEW dosbox-x
+pid 1623906, ring rotating again by 00:30:38 (44..47.sav at the 10 s cadence,
+live-timeline growing). Ring bank bank-t438-ring-2200 untouched. No OQ row
+touched by the incident or the recovery (measures nothing).
+
