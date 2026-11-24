@@ -2083,11 +2083,16 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                   gcx - int(dr.width) / 2,
                                   gcy - int(dr.height) / 2);
                     }
-                    // Tiles (F1 valid cells, F2 lattice). Bare fill pal[150]
-                    // (immediate 0x960000 @0x3c274); per-class colour table
-                    // 0x892ac UNRESOLVED (named seam) — rock cells |8 draw a
-                    // DARKER fill [documented default].
+                    // Tiles (F1 valid cells). tPL-V1: bare fill pal[150]
+                    // (immediate 0x960000 stored to ALL FOUR vertex colour
+                    // slots @0x3c274; t421 refuted the per-class reading),
+                    // edges = the CLASS-COLOUR selector law
+                    // tileEdgePaletteIndex (0x3bbd6..0x3bc52: black/red/
+                    // green/blue/white in game.pal-conv) — replaces the
+                    // t418b invented (24,24,32) outline and the rock-darker
+                    // fill default (no vendor basis; t421: uniform fill).
                     const uint32_t bare = chromePaletteArgb(150);
+                    // PASS 1: fills (uniform pal[150] per t421).
                     for (int row = 0; row < 15; row++)
                         for (int col = ptt.rowOffset[psize][row];
                              col < ptt.rowOffset[psize][row] +
@@ -2095,18 +2100,28 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             const int cell = gridCellFor(ptt, psize, row, col);
                             if (cell < 0) continue;
                             const Pt c = tileCenter(psize, row, col);
-                            const bool rock =
-                                cell < int(psv.cellClasses.size()) &&
-                                (psv.cellClasses[cell] & 8);
-                            const uint32_t argb =
-                                rock ? ((bare >> 1) & 0x7F7F7F) | 0xFF000000u
-                                     : bare;
                             SDL_SetRenderDrawColor(
-                                ren, (argb >> 16) & 0xFF, (argb >> 8) & 0xFF,
-                                argb & 0xFF, 255);
+                                ren, (bare >> 16) & 0xFF, (bare >> 8) & 0xFF,
+                                bare & 0xFF, 255);
                             filledDiamond(ren, c.x, c.y);
-                            // diamond outline (edge edges, 68x34)
-                            SDL_SetRenderDrawColor(ren, 24, 24, 32, 255);
+                        }
+                    // PASS 2: class-coloured diamond outlines — painted AFTER
+                    // all fills so shared edges stay visible (vendor witness:
+                    // t254 tiles carry white conv(12) edge px over the fill).
+                    for (int row = 0; row < 15; row++)
+                        for (int col = ptt.rowOffset[psize][row];
+                             col < ptt.rowOffset[psize][row] +
+                                   ptt.rowWidth[psize][row]; col++) {
+                            const int cell = gridCellFor(ptt, psize, row, col);
+                            if (cell < 0) continue;
+                            const Pt c = tileCenter(psize, row, col);
+                            const uint32_t ea = chromePaletteArgb(
+                                tileEdgePaletteIndex(cell < int(psv.cellClasses.size())
+                                                         ? psv.cellClasses[cell]
+                                                         : 1));
+                            SDL_SetRenderDrawColor(
+                                ren, (ea >> 16) & 0xFF, (ea >> 8) & 0xFF,
+                                ea & 0xFF, 255);
                             SDL_RenderDrawLine(ren, c.x - 34, c.y, c.x, c.y - 17);
                             SDL_RenderDrawLine(ren, c.x, c.y - 17, c.x + 34, c.y);
                             SDL_RenderDrawLine(ren, c.x + 34, c.y, c.x, c.y + 17);

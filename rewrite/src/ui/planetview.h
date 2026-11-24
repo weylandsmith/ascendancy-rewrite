@@ -187,7 +187,15 @@ bool gridRowCol(const ascend::game::TerrainTables& tt, int size,
 
 // F2 screen position of a tile centre on the planet-view field (col
 // ABSOLUTE incl. B). Pure arithmetic; the ui painter uses it verbatim.
+// tPL-V1: centre = (410 + 34*(col-row), 127 + 17*(col+row)) — an EXACT
+// edge-to-edge diamond tiling (witness 100% vs the old transposed law 26%).
 Pt tileCenter(int size, int row, int col);
+
+// tPL-V1 F2: the vendor tile-EDGE game.pal index for a slot class byte
+// (0->0 black, 2->117 red, 3->146 green, 4->255 blue, else 12 white —
+// EXACT-equality compares 0x3bbd6..0x3bc52; a rock-flagged byte takes the
+// white default). Converted colours per the t398 palette law.
+int tileEdgePaletteIndex(int cellClass);
 
 // F2 hit-test: the tile whose diamond contains p, or -1. Diamonds tile
 // edge-to-edge (touching at vertices), so at most one strict hit; boundary

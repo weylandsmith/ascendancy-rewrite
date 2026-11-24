@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-23T21:05
+updated: 2026-11-23T22:10
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,53 +233,72 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPL-V1 TILE GRID + COLORS (D26) — ordering rationale: tPL-B1c
-(2026-11-23) closed the placement-pin proof 10/10 CAUGHT (docs/re/
-_wip_tPLB1c.md), so the build LOGIC line is done until the user-grade pass;
-the D26 visual list is the next user-visible chain and V1 gates V2 (orbital
-slots draw on the same grid law). TASK: isometric grid with rows
-ADJACENT/TOUCHING on both axes (ours has gaps — re-derive row/col
-pitch from the vendor paint fn already cited t428, do not tweak
-spacing by eye); tile colors LIGHT: white/blue/green/red (+black
-drawn distinctly — derive the palette from the vendor tile-class law,
-census refcap planet captures scripts/r1_ui_walk + docs/re/planetalloc
-tile classes); shape/size/angle APPROVED by user, do not change those.
-THEN tPL-V2 ORBITAL SLOTS LEFT (D26): 10 slots, 5 rows x 2,
-NOT isometric, hover shows thin greyish box OUTLINE (not fill). t428
-notes twice identify "orbital column LEFT" with the PLRES window —
-START THERE (resolve that identity properly: windows.txt PLRES rect +
-shape records; if it is a separate window, port its layout law + hover
-outline handler). CLOSE: live witness 10/10 slots + hover outline.
-THEN tPL-B2 PRODUCTIVITY-BOX POPUPS (D26): clicking a top-row
-productivity indicator pops an info window; EXACT witness text given:
+NEXT tPL-V1f PORT CENSUS CLOSE-OUT — ordering rationale: tPL-V1 (2026-11-23)
+CORRECTED the lattice law (tileCenter = (410+34*(col-row), 127+17*(col+row)),
+exact tiling; vendor witness 100% vs 26%) and shipped the class edge-colour
+law + pins (502/0/0, docs/re/planets-ui.md §14, docs/re/_wip_tPLV1.md), but
+the FORMAL port pixel census was cut by budget: re-run
+scripts/tplv1_port_witness.sh (fresh Xvfb :99, window-by-name grab — the
+host has stale Xvfbs :9/:97, NEVER trust -window root; assert png 640x480)
+then ~/tools/revenv/bin/python scripts/tplv1_port_census.py; the census
+currently hard-codes zero-offset centres — if the window grab is clean it
+should pass as-is (the offset-fit on the first shot found 11/11 size-1 fill
+hits under the corrected law); if it still fails, find the port's screen
+offset (the field clip at ui.cpp:1247) and fix the CENSUS, not the law.
+Bank the VERDICT PASS line into _wip_tPLV1.md F4. THEN tPL-V2 ORBITAL SLOTS
+LEFT (D26): 10 slots, 5 rows x 2, NOT isometric, hover shows thin greyish
+box OUTLINE (not fill). t428 notes twice identify "orbital column LEFT"
+with the PLRES window — START THERE (resolve that identity properly:
+windows.txt PLRES rect + shape records; if it is a separate window, port
+its layout law + hover outline handler). CLOSE: live witness 10/10 slots +
+hover outline. THEN tPL-B2 PRODUCTIVITY-BOX POPUPS (D26): clicking a
+top-row productivity indicator pops an info window; EXACT witness text:
 "Crimea 1 / Prosperity: 1 per day / Population will grow in 50 days"
-(/ = line break). Derive the string templates + values law from
-windows.txt/string table (planet name + facility name + per-day rate +
-growth ETA); port all three (or however many) indicator boxes.
-THEN tPL-D1 HOME PLANET BY RACE (D26): Chamachi home planet shows
-WRONG ART and WRONG MAX POPULATION. Derive the vendor new-game home-
-planet law per race (art index + size/quality/pop-cap fields; check
-whether it's a fixed per-race TABLE in data vs RNG at seed time —
-debugger on scratch new-game as Chamachies settles it; cross-check
-Minions which already looks right). Fix our mapgen/home-planet init;
-pin: Chamachi home planet art + pop cap match vendor scratch game.
-THEN tRS-B1 RESEARCH: SET PROJECT (D26: "I can't set any projects").
-Derive the vendor set-project handler (research window msg map; state
-written: current-project field + queue semantics; prerequisites gate
-from the tree table). PORT + walkthrough witness: click available node
--> project set -> turns advance research; locked node -> refused.
-THEN tRS-V1 RESEARCH TREE DRAW (D26: "tree not being drawn
-correctly"): side-by-side vendor refcap per D19 G1/G2 (we have the 3D
-projection ported t419/t399; diff node/link/label regions, fix laws
-not pixels). THEN tPR-U: USER GRADE PACKAGE (checklist format, ours|
-vendor side-by-side) for planet + research; NEXT becomes
-WAIT-USER-GRADE-PR1. RULES: D19 G1-G6 binding; Athens shots layout/
-color only; no synthetic stand-ins (RE-FIRST t423 law); protected
-saves 01/02/03/04.SAV + RESUME.GAM untouchable (scratch savedir law);
-game ring TL EXPIRES 2026-11-24 14:53 — if a live witness needs the
-production ring and it's dead, run the t439 recovery pattern FIRST;
-C1-C5 cosmetic backlog + race intro stay DEFERRED (D25) — do not
-touch.
+(/ = line break). Derive templates + values law from windows.txt/string
+table; port all indicator boxes. THEN tPL-D1 HOME PLANET BY RACE (D26):
+Chamachi home planet WRONG ART + WRONG MAX POPULATION; derive the vendor
+new-game home-planet law per race (fixed TABLE vs RNG at seed — debugger on
+scratch new-game as Chamachies settles it; cross-check Minions). THEN
+tRS-B1 RESEARCH: SET PROJECT (D26: "I can't set any projects") — derive the
+vendor set-project handler, PORT + walkthrough witness. THEN tRS-V1
+RESEARCH TREE DRAW (D26) per D19 G1/G2 (3D projection ported t419/t399;
+diff regions, fix laws not pixels). THEN tPR-U: USER GRADE PACKAGE
+(checklist format, ours|vendor side-by-side) for planet + research; NEXT
+becomes WAIT-USER-GRADE-PR1. RULES: D19 G1-G6 binding; Athens shots layout/
+color only; no synthetic stand-ins (RE-FIRST t423 law); protected saves
+01/02/03/04.SAV + RESUME.GAM untouchable (scratch savedir law); game ring
+TL EXPIRES 2026-11-24 14:53 — if a live witness needs the production ring
+and it's dead, run the t439 recovery pattern FIRST; C1-C5 cosmetic backlog
++ race intro stay DEFERRED (D25) — do not touch.
+
+tPL-V1 LANDED 2026-11-23 (TILE GRID PITCH + COLOURS: THE PORT'S CURSORS
+WERE TRANSPOSED; no OQ row touched — tPL tracks none, honest negative under
+strict-close; open=[016,019] unchanged). PROVED (docs/re/_wip_tPLV1.md
+F1-F4, planets-ui.md §14):
+ - PITCH RE-DERIVED from the raw paint record 0x3c211..0x3c274: the field
+   with SYMMETRIC +-0x22 offsets is X (68-wide), the 0/+11/+22 field is Y
+   => centre = (410+34*(col-row), 127+17*(col+row)); |det| 1156 == diamond
+   area = EXACT tiling (D26 "rows have gaps" was the t418 shorthand's
+   |det| 1445). VENDOR WITNESS scripts/tplv1_lattice_witness.py on
+   t254/02_planet_detail.png: corrected law 100.0% edge support vs 26.0%;
+   controls (shifted fits) <=52.9%, baseline 0.6%.
+ - EDGE COLOUR LAW 0x3bbd6..0x3bc52: EXACT class-byte compares 0->black,
+   2->red(117), 3->green(146), 4->blue(255), default white(12) in game.pal
+   — exactly the user's "white/blue/green/red + black"; rock-flagged byte =
+   white. Grey-ramp fill arm gated by widget+0x18b bit0, ZERO pixels in the
+   witness (SEAM TPLV1-A). Fill stays uniform pal[150] (t421 reconfirmed).
+ - PORT SHIPPED: tileCenter corrected, tileEdgePaletteIndex pure law,
+   fills-then-outlines two-pass painter, invented (24,24,32) outline +
+   rock-darker fill DELETED. Pins re-derived + new edge-colour pin; suite
+   502/0/0. LIVE CLICK PROOF: seed-5 clicks at computed centres (410,297)/
+   (444,280) select tiles 5 then 3 (adjacent) — the hit-map follows the
+   corrected law. HONEST NEGATIVE: formal pixel census PASS cut by budget
+   (stale-Xvfb root-grab offset; fixed the script to window-by-name on
+   :99) -> queued as tPL-V1f, the FIRST task above.
+ - SITTING CHECK ran first (r1_t85g_sitting exit 0): tail all turn=1086, no
+   new sitting, stale assignment stood.
+ - HAZARD BANKED: never `import -window root` on this host (stale Xvfbs
+   :9/:97); grab the app window by name and assert 640x480.
 
 tPL-B1c LANDED 2026-11-23 (PLACEMENT PINS MUTATION-PROVEN 10/10 CAUGHT;
 no OQ row touched — tPL tracks none, honest negative under strict-close;

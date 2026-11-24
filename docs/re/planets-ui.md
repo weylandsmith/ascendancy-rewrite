@@ -489,3 +489,35 @@ Full working log: docs/re/_wip_t428e.md (E0-E7). Durable laws:
   eip -> attribute -> bank; resume = BPDEL fired-index only + RUN) — the stock
   resume_and_rearm BPDEL * releases a pending halt at the NEXT cold leg
   unbanked (t428f attempt 1 lost exactly the gate stop this way).
+
+## 14. THE TILE LATTICE PITCH + EDGE-COLOUR LAWS (tPL-V1, 2026-11-23)
+Full working log docs/re/_wip_tPLV1.md F0-F4. Durable laws:
+
+- PITCH [verified asm work/t198_planwin.asm 0x3bb19..0x3c274 + witness]:
+  the paint record's SYMMETRIC +-0x22-offset field is X, the 0/+0x11/+0x22
+  field is Y => centre(row,col) = (410 + 34*(col-row), 127 + 17*(col+row));
+  col step (34,17), row step (-34,17), |det| = 1156 == the 68x34 diamond
+  area => EXACT edge-to-edge tiling, NO gaps. The t418 F2 shorthand
+  "origin + col*(34,17) + row*(17,-34)" TRANSPOSED the two cursors
+  (|det| 1445, 80% coverage = the D26 "rows have gaps" complaint).
+  VENDOR WITNESS scripts/tplv1_lattice_witness.py on
+  work/r1/screens/t254/02_planet_detail.png: 100.0% edge support for the
+  corrected law vs 26.0% for the transposed one; shifted-fit controls
+  <=52.9%, baseline edge density 0.6%.
+- EDGE COLOUR [verified asm 0x3bbd6..0x3bc52 + 0x3bd3a]: EXACT compares on
+  the slot CLASS byte (BYTE[rec+0x10]+0): 0 -> pal 0 black, 2 -> 117 red,
+  3 -> 146 green, 4 -> 255 blue, default 12 white (game.pal conv:
+  (0,0,0) (190,44,16) (44,195,12) (0,0,255) (203,203,203)); a rock-flagged
+  byte (class|8) matches NO compare -> white. The companion grey-ramp fill
+  selector (7/8/9/10/13) is gated by widget byte +0x18b bit0 (0x3bbcb je
+  0x3be53) and drew ZERO pixels in the witness — NAMED SEAM TPLV1-A (what
+  sets 0x18b bit0; the [0x48c33]+colour*0x100 block contents). The tile
+  FILL stays the cited uniform 0x96=150 (t421).
+- PORT: tileCenter corrected; tileEdgePaletteIndex new pure law; painter
+  fills-then-outlines two passes so shared edges stay visible; the t418b
+  invented (24,24,32) outline + rock-darker fill DELETED (no vendor basis).
+  Pins planetgrid_lattice_t418b RE-DERIVED + planettile_edge_colour_tPLV1;
+  suite 502/0/0. Formal port pixel-census PASS (scripts/tplv1_port_
+  witness.sh + tplv1_port_census.py, window-by-name grab on :99) still
+  owed — the offset-fit on the first shot already showed the port render
+  satisfies the law 11/11 at size 1.

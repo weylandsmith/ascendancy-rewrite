@@ -127,11 +127,41 @@ bool gridRowCol(const ascend::game::TerrainTables& tt, int size,
 }
 
 Pt tileCenter(int size, int row, int col) {
-    // F2: center = origin + col*(34,17) + row*(17,-34); the x/y cursors at
-    // (row,col)=(0,0) read 0x6e=110 / 0x19a=410 (0x3bb5d / loop head).
+    // tPL-V1 F1/F3 (supersedes the t418 F2 shorthand, which TRANSPOSED the
+    // two cursors). Vendor record 0x3c211..0x3c274: the field carrying the
+    // SYMMETRIC +-0x22 offsets is X (68-wide diamond), the field carrying
+    // 0/+0x11/+0x22 is Y (34 tall):
+    //   X = 410 + 34*col - 34*row ; Y(anchor top vertex) = 110 + 17*col +
+    //   17*row ; centre = anchor + (0,17). col step (34,17), row step
+    //   (-34,17): |det| = 1156 == diamond area (68*34/2) => EXACT edge-to-
+    //   edge tiling, NO gaps (the old law's |det| = 1445 gave 80% coverage
+    //   = the D26 "rows have gaps" complaint). Witness on the VENDOR
+    //   capture t254/02_planet_detail.png: 100.0% edge support for THIS law
+    //   vs 26.0% for the old one (scripts/tplv1_lattice_witness.py).
     (void)size;  // the lattice is size-independent; size kept for call-site
                  // symmetry (the painter clamps validity via gridCellFor)
-    return Pt{110 + col * 34 + row * 17, 410 + col * 17 - row * 34};
+    return Pt{410 + col * 34 - row * 34, 127 + col * 17 + row * 17};
+}
+
+int tileEdgePaletteIndex(int cellClass) {
+    // tPL-V1 F2 EDGE-COLOUR selector, paint body 0x3bbd6..0x3bc52: EXACT
+    // compares on the slot class byte (BYTE[rec+0x10]+0): 0 -> 0 (black,
+    // 0x3bc00), 2 -> 117 red (0x3bc16), 3 -> 146 green (0x3bc2e), 4 -> 255
+    // blue (0x3bc46), default 12 white (0x3bbdc). game.pal converted
+    // (t398 law): 12 -> (203,203,203), 117 -> (190,44,16), 146 -> (44,195,
+    // 12), 255 -> (0,0,255) — the D26 list white/red/green/blue + black.
+    // Exact-equality is the law: a rock-flagged byte (1|8 = 9) takes the
+    // WHITE default, and so does 0xff (empty item) — the compares run on
+    // the raw byte. The companion grey-ramp FILL selector (7/8/8/9/10/13)
+    // is gated by widget byte 0x18b bit0 (0x3bbcb) and drew ZERO pixels in
+    // the witness — seam TPLV1-A; the fill stays the cited uniform 0x96.
+    switch (cellClass) {
+        case 0: return 0;
+        case 2: return 117;
+        case 3: return 146;
+        case 4: return 255;
+        default: return 12;
+    }
 }
 
 int tileHitFor(const ascend::game::TerrainTables& tt, int size,

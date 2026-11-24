@@ -148,20 +148,35 @@ TEST(planetgrid_inverse_t418b) {
 }
 
 // ---- F2: the isometric lattice + diamond hit-test --------------------------
+// tPL-V1 RE-DERIVATION: the t418b original pinned a law that TRANSPOSED the
+// vendor's two cursors (row step (17,-34)). Raw re-read of the paint record
+// 0x3c211..0x3c274: the field with the SYMMETRIC +-0x22 offsets is X, the
+// field with 0/+0x11/+0x22 is Y => row step (-34,17); |det| = 1156 == the
+// diamond area (exact tiling). Witness on the VENDOR capture
+// work/r1/screens/t254/02_planet_detail.png: 100.0% edge support for the
+// corrected law vs 26.0% for the transposed one
+// (scripts/tplv1_lattice_witness.py, VERDICT PASS). Replacing the pin IS
+// the fix.
 TEST(planetgrid_lattice_t418b) {
-    // Immediates: x-cursor 110 step +17/row (0x3bb5d), y 410 step -34/row;
-    // per-cell x += 34 (imul 0x22 @0x3c211), y += 17 (imul 0x11 @0x3c23f).
+    // Immediates: 410-cursor steps -34/row into X (0x3bb60 sub 0x22), the
+    // 0x6e=110 cursor steps +17/row into Y (0x3bb5d add 0x11); per-cell
+    // X += 34 (imul 0x22 @0x3c211), Y += 17 (imul 0x11 @0x3c23f); the
+    // record's anchor is the TOP vertex, centre = anchor + (0,17).
     const au::Pt o = au::tileCenter(0, 0, 0);
-    CHECK(o.x == 110 && o.y == 410);
+    CHECK(o.x == 410 && o.y == 127);
     const au::Pt a = au::tileCenter(2, 3, 4), b = au::tileCenter(2, 3, 5),
                  d = au::tileCenter(2, 4, 4);
-    CHECK(b.x - a.x == 34 && b.y - a.y == 17);   // col step (34,17)
-    CHECK(d.x - a.x == 17 && d.y - a.y == -34);  // row step (17,-34)
+    CHECK(b.x - a.x == 34 && b.y - a.y == 17);    // col step (34,17)
+    CHECK(d.x - a.x == -34 && d.y - a.y == 17);   // row step (-34,17)
     // absolute col law (col incl. B — the paint loop counts from B[row]):
-    // size-2 row2 (B=3) first cell col3 sits at 110 + 2*17 + 3*34 = 246.
+    // size-2 row2 (B=3) first cell col3: X = 410 + 34*(3-2) = 444,
+    // Y = 127 + 17*(3+2) = 212.
     const au::Pt t = au::tileCenter(2, 2, 3);
-    CHECK(t.x == 246 && t.y == 410 + 3 * 17 - 2 * 34);
-    // hit-test: EVERY tile centre hits ITSELF (uniqueness over the tiling).
+    CHECK(t.x == 444 && t.y == 212);
+    // TILING CENSUS (the gap-refuting law): every lattice cell's four
+    // edge-neighbours share an EDGE, not a gap: the midpoint between
+    // centres must lie strictly INSIDE both diamonds (hit maps to one of
+    // the two) and the per-cell area |det| == the diamond area 1156.
     for (int size = 0; size < 5; size++)
         for (int r = 0; r < 15; r++)
             for (int c = TT.rowOffset[size][r];
@@ -169,16 +184,48 @@ TEST(planetgrid_lattice_t418b) {
                 const au::Pt p = au::tileCenter(size, r, c);
                 CHECK(au::tileHitFor(TT, size, TT.surfaceBySize[size], p) ==
                       au::gridCellFor(TT, size, r, c));
+                // Edge-mid probe: (+17,+8) from a centre satisfies
+                // 17*17+34*8 = 561 <= 578 (own diamond) while every
+                // neighbour centre is 595+ away — so it MUST hit the tile
+                // itself (a transposed or gap-y lattice misses it).
+                const au::Pt me{p.x + 17, p.y + 8};
+                CHECK(au::tileHitFor(TT, size, TT.surfaceBySize[size], me) ==
+                      au::gridCellFor(TT, size, r, c));
             }
-    // outside the diamond: 35 px right of a centre is beyond the x±34
-    // vertex (and the col-neighbour centre at +34,+17 is beyond too:
-    // 17*1+34*17 > 578) -> miss.
+    // EXACT-TILING consequence (this is what refuted the transposed law:
+    // under IT the plane is only 80% covered and (35,0)-type points miss;
+    // under the vendor law the plane is fully tiled, so those same points
+    // land in the FAR diamond, never in a gap): 35 px right of the centre
+    // of (5,5) is 33 px left of the centre of (row-1,col+1) -> that tile;
+    // 18 px down is 16 px above (row+1,col+1) -> that tile.
     const au::Pt mid = au::tileCenter(2, 5, 5);
-    CHECK(au::tileHitFor(TT, 2, 23, au::Pt{mid.x + 35, mid.y}) == -1);
-    CHECK(au::tileHitFor(TT, 2, 23, au::Pt{mid.x, mid.y + 18}) == -1);
-    // inside: 33 px right (within the vertex) hits the same tile.
+    CHECK(au::tileHitFor(TT, 2, 23, au::Pt{mid.x + 35, mid.y}) ==
+          au::gridCellFor(TT, 2, 4, 6));
+    CHECK(au::tileHitFor(TT, 2, 23, au::Pt{mid.x, mid.y + 18}) ==
+          au::gridCellFor(TT, 2, 6, 6));
+    // inside: 33 px right (within the vertex) hits the same tile (own
+    // centre 33 px away beats the (r-1,c+1) centre 35 px away — the
+    // nearest-centre tie law is exercised non-vacuously here).
     CHECK(au::tileHitFor(TT, 2, 23, au::Pt{mid.x + 33, mid.y}) ==
           au::gridCellFor(TT, 2, 5, 5));
+    // far outside the lattice entirely: 100 px above the top row is beyond
+    // every diamond (the 110-cursor origin row sits at y >= 127; the top
+    // vertex of the topmost tile is 17 above its centre).
+    CHECK(au::tileHitFor(TT, 2, 23, au::Pt{mid.x, 127 + 17 * (2 + 2) - 60}) == -1);
+}
+
+// ---- tPL-V1 F2: the tile EDGE colour selector (0x3bbd6..0x3bc52) ----------
+TEST(planettile_edge_colour_tPLV1) {
+    // EXACT-equality compares on the raw slot class byte.
+    CHECK(au::tileEdgePaletteIndex(0) == 0);     // barren -> black
+    CHECK(au::tileEdgePaletteIndex(2) == 117);   // red
+    CHECK(au::tileEdgePaletteIndex(3) == 146);   // green
+    CHECK(au::tileEdgePaletteIndex(4) == 255);   // blue
+    CHECK(au::tileEdgePaletteIndex(1) == 12);    // white default
+    CHECK(au::tileEdgePaletteIndex(9) == 12);    // rock-flagged class 1:
+                                                 // 9 != any compare -> white
+    CHECK(au::tileEdgePaletteIndex(10) == 12);   // rock class 2 likewise
+    CHECK(au::tileEdgePaletteIndex(0xff) == 12); // empty item byte
 }
 
 // ---- tPL-B1b: the placement chain (XOR / occupied / rock / adjacency) -----
