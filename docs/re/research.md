@@ -364,3 +364,33 @@ same function 0x4709c..0x48f80).
     painter is not yet found).
 (g) HIT LAW survives: tRS-B1's +-24 square consumes the SAME projected
     words — unchanged by any layout swap.
+
+## S8-CORRECTION (tRS-V1b, 2026-11-24) — supersedes S8d/S8e lines it contradicts
+Full working record docs/re/_wip_tRSV1.md P6/P10/P11 (raw x87 hand-decode;
+capstone in ~/tools/revenv; linear dumps desync on this image).
+1. S8d "pan word [win+0xd3]" REFUTED: win+0xd3 == cam+0x28 == the FOCAL
+   (320/tan 15deg = 1194.19, 0x203b8/0x203e4) — pointer identity. Projection
+   law (both legs perspective-divided, chop-rounding 0x76e08 = RC-forced
+   trunc of v+0.5f):
+     screenX = chop(1194.19f*vX/Z + 0.5f) + 235   (word win+0x5f3+2k)
+     screenY = chop(1194.19f*vY/Z + 0.5f) + 240   (word win+0x6bb+2k)
+   0x53374 arg roles CLOSED by callee trace + cosmos diff (0x285bb same
+   shape). No pan term exists in the projection.
+2. S8e edge law CORRECTED: the prereq line runs (this.x, this.y-27) ->
+   (prereq.x, prereq.y+27) (raw bytes 0x48343 `sub eax,0x1b` on the CURRENT
+   node at 0x48353's counterpart; the "+27 both endpoints" reading was wrong).
+   Colour index = 0x6b - clamp(chop(0.25f*(0.5f*(z_this+z_prereq) + posz)),
+   -3,+3), posz = win+0xe7 = camera pos.z = -150; prereq == selected word ->
+   index 0xf3 (0x48321).
+3. 0x46d3c TRUE-FORM: returns TRUE for OWNED rows WITHOUT the prereq loop
+   (0x46d88) — draw scope AND hit scope = OWNED + FRONTIER; Blocked rows are
+   drawn by NOBODY and hittable by NOBODY. (tRS-B1's "legality" note was
+   imprecise; the not-owned gate lives only in the commit chain 0x47d99.)
+4. SCROLL LAW (supersedes the t419 screen-pan reuse): msg 50/51 = camera
+   basis yaw +3/-3 deg per pump tick via the dat_764c4 bit-pair latch
+   (0x47b44..0x47c42 verbatim, incl the DEAD (0,1) state); msg 52/53 =
+   camera posZ += -1/+1 x runtime f32[0x9f108] (value NOT in the restored
+   image — seam TRSV1b-A, port default 1.0). DOLLY, not screen translate.
+5. Rotation 0x5324c raw VERBATIM: X' = X*cos + Z*sin, Z' = Z*cos - X*sin
+   (0x7754a = fcos, 0x77556 = fsin, fprem reduce 0x7751e); angle step is
+   INTEGER 360/d THEN repeated f32 adds (0x4743d).

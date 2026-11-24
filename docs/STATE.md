@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-24T09:40
+updated: 2026-11-24T13:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,50 +233,100 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tRS-V1b PORT THE TREE GEOMETRY (finish what tRS-V1 derived — same task
-id family; ordering rationale: tRS-V1 (2026-11-24) FULLY derived the
-generator/placement/camera/draw-scope/art laws (docs/re/research.md S8a-S8f,
-working record docs/re/_wip_tRSV1.md P1-P8) but shipped NO code — the one
-uncited leg (0x53374 arg roles = the projection scale) must close before a
-scale lands on the user's screen. tPL-D1 emptied the planet queue; tRS-V1b +
-then tPR-U remain the last D26 machine-closable items.)
-DO, in order:
- 1. CLOSE LEG P6 (_wip_tRSV1 P6): diff the reswin 0x53374 call site
-    (0x48035..0x48076, pushes esi=&win+0x6bb+2k, edi=&win+0x5f3+2k, 240,
-    235, [win+0xd3]) against the COSMOS call site 0x285bb whose scale law
-    tNGS cycle-1 already pinned (docs/re/_wip_tNGS.md S5: focal =
-    half-width/tan(fov/2), +0.5 bias) — same callee, so the arg ROLES
-    transfer by diff, no new measurement. Fallback if the diff is
-    ambiguous: ONE scratch debugger capture of win+0x143 (world) +
-    win+0x5f1/+0x6b9 (projected) from a live reswin and fit (r290 poke
-    skeleton; scratch savedir law; production ring TL EXPIRES 2026-11-24
-    14:53 — if a live leg is needed after that, run the t439 recovery
-    pattern FIRST, kill Xvfb BY PID only).
- 2. PORT researchTreeGeometry() into researchview.{h,cpp} VERBATIM per
-    research.md S8b/S8c + _wip P8 PORT NOTE (repeated-float-add angle
-    posture; C[k] table pinned [3,4,3,5,6,5,3,4,2,4,4,4,4,4,5,3,2,1],
-    esi=18; R0/d rules incl. the odd-k C>2 quirk; rotation 0x5324c as
-    X=R sin, Z=R cos). Replace the derived depth-x-slot-y layout; keep the
-    one-shot ResearchLayout shape (t419 stall law stands) and keep
-    researchHit reading the PROJECTED centre (kResHitHalf=24 is CORRECT —
-    do not re-derive). Draw scope = FRONTIER ONLY (S8e) + prereq lines
-    with the +27 Y offset and the z-shaded palette; ring art = resring.shp
-    frames 0..3 by the S8f state law (decode via formats/shp.cpp — 29x29
-    records VERIFIED). The restree.shp per-row picture consumer stays
-    UNRECOVERED (TRSV1-C) — draw rings + lines per the cited law; do NOT
-    fake per-row pictures into the disks.
- 3. WITNESS: ours-vs-vendor on the tree field (t441_screen_diff region
-    precedent; t252 capture = the vendor reference: few disks, big,
-    panned) + scripts/tRSB1_witness.sh MUST re-run PASS with its click
-    centre RE-DERIVED from the NEW layout (never hard-code).
- 4. Pins for the geometry law (depth table, C[k], R0/d rules, node world
-    triple vs the python replay in _wip P8) + mutation-verify each changed
-    constant; suite green.
-THEN tPR-U: USER GRADE PACKAGE (checklist format, ours|vendor side-by-side)
-for planet + research; NEXT becomes WAIT-USER-GRADE-PR1.
-RULES: D19 G1-G6 binding; protected saves 01/02/03/04.SAV + RESUME.GAM
-untouchable (scratch savedir law); NO synthetic stand-ins, RE-FIRST t423;
-C1-C5 cosmetic backlog + race intro stay DEFERRED (D25) — do not touch.
+NEXT tRS-V1c PORT THE TREE GEOMETRY (the tRS-V1b law work is DONE — every
+leg is cited in docs/re/_wip_tRSV1.md P1-P11 + research.md S8; ordering
+rationale: this iteration closed the LAST uncited leg (0x53374 arg roles, P6,
+by callee-body trace + call-site diff — no debugger needed) and refuted two
+draft readings (axis mapping, edge -27/+27); what remains is MECHANICAL
+porting + pins + witness. tPL-D1 emptied the planet queue; this + tPR-U are
+the last D26 machine-closable items.)
+DO, in order (all law references = _wip_tRSV1.md sections):
+ 1. researchview.{h,cpp}: replace the derived depth-x-slot-y layout with
+    researchTreeGeometry() VERBATIM per P1b/P1c + P8 PORT NOTE: depth
+    relaxation (0x471f9 shape: multi-pass, A=0xff sentinel, esi=maxdepth+1);
+    C[k] counts; per column acc=240+30k; per node (FILE order, i = index in
+    column): Y=30k+15*(i&1), Z=(i==0?R0(k):23), X=0, rotate 0x5324c law
+    X'=Z*sin(acc) Z'=Z*cos(acc) (P11 raw VERBATIM); acc += int(360/d) as
+    REPEATED f32 adds (integer division FIRST — P11); R0(k)=23 iff (k even &&
+    C[k]>1) || (k odd && C[k]==2) else 4; d=C[k] except odd-k C>2 -> C[k]-1.
+    Keep ResearchLayout one-shot shape (t419 stall law) and keep researchHit
+    reading the PROJECTED centre with kResHitHalf=24 (tRS-B1, correct).
+ 2. Camera/projection VERBATIM per P4+P6+P11: view = M*world + t with M
+    identity-at-rest, t=(0,0,150) (pos (0,0,-150) negated); screen
+    X = trunc(1194.19f*vX/Z + 0.5f) + 235 (stored as u16-word truncation —
+    replicate the 0x76e08 CHOP rounding: trunc-toward-zero of (v+0.5f), P10);
+    screen Y = same with vY, +240. focal = 320/tan(15deg) per 0x203e4.
+    NOTE the vendor passes P0=focal as the multiplier of BOTH legs (raw-byte
+    trace P6; the Ghidra arg-blind decompile mislabels — trust the trace).
+ 3. Draw scope = OWNED + FRONTIER per P10/P11 0x46d3c verbatim (OWNED rows
+    ARE drawn — the current port draws all states incl Blocked; the vendor
+    skips Blocked entirely, hit law too). Node art = resring.shp frames 0..3
+    blitted 1:1 CENTRED at (x-14,y-14) per the P11 blit-identity argument;
+    frame esi law per P5/P11 (1 default, 0 studied-unowned, 3 owned rec+0x0c
+    dword, 2 selected overrides). Prereq lines ONLY when the row is drawn,
+    from (this.x, this.y-27) to (prereq.x, prereq.y+27) (P11 CORRECTED),
+    colour index 0x6b - clamp(chop(0.25f*(0.5f*(z_t+z_p) - 150)),+-3) via
+    chromePaletteArgb, prereq==selected -> index 0xf3.
+ 4. Scroll law per P11 state machine: ROTLEFT/ROTRIGHT = basis yaw +3/-3 deg
+    per tick (dat_764c4 bit-pair latch port; replace the t419 pressSpin
+    reuse), MOVEUP/MOVEDOWN = camera posZ -1/+1 per tick (DOLLY, not screen
+    pan — resCam needs a z-offset field; port default step 1.0, seam
+    TRSV1b-A named). Pump = kSpinTickMs precedent (documented deviation).
+ 5. Pins: depth table + C[k] == [3,4,3,5,6,5,3,4,2,4,4,4,4,4,5,3,2,1]
+    esi=18 (P8 measured); node world triple for columns 0/8/15 worked
+    examples; projection chop-rounding asymmetry (negative v); R0/d quirk
+    rules; mutation-verify EVERY changed constant. EXPECT test_research3d_
+    t419 rest-equality + t408 coordinate pins to DIE — re-derive them to the
+    new law honestly (update, do not delete; note the vendor law supersedes).
+ 6. WITNESS: ours-vs-vendor on the tree field (t441_screen_diff region
+    precedent; t252 = vendor reference: few disks, BIG, lines off-frame) +
+    scripts/tRSB1_witness.sh re-run PASS with click centre RE-DERIVED from
+    the new layout (never hard-code). THEN tPR-U: USER GRADE PACKAGE
+    (ours|vendor side-by-side); NEXT becomes WAIT-USER-GRADE-PR1.
+RULES: D19 G1-G6 binding; protected saves untouchable (scratch savedir law);
+NO synthetic stand-ins, RE-FIRST t423; restree.shp per-row pictures stay
+UNRECOVERED (TRSV1-C) — rings+lines only; C1-C5 + race intro DEFERRED (D25).
+Sitting check FIRST (r1_t85g_sitting exit 0 = stale assignment stands).
+
+tRS-V1b LANDED 2026-11-24 (PROJECTION-ARG LEG P6 CLOSED + FOUR LAW
+CORRECTIONS BANKED; NO code shipped — budget died mid-port; no OQ row
+touched, honest negative under strict-close; open=[016,019] unchanged).
+PROVED (docs/re/_wip_tRSV1.md P6/P10/P11; disasm via
+~/tools/revenv/bin/python scripts/t442_disasm.py — capstone is in tools/
+revenv, NOT .venv; linear capstone dumps DESYNC on this image, the stepping
+script is clean; raw x87 hand-decode of 0x53374/0x5324c/0x53324 bodies):
+ - P6 CLOSED without a debugger: 0x53374 roles from the callee body + call
+   sites (reswin 0x48035, cosmos 0x285bb same shape): screen X =
+   chop(focal*vX/Z+0.5)+235, Y = chop(focal*vY/Z+0.5)+240; P0 arg = the
+   focal dword (win+0xd3 == cam+0x28 POINTER IDENTITY — no pan term exists);
+   the Ghidra arg-blind decompile MISLABELS the legs — raw trace is the
+   authority. Both legs perspective-divided (the "Y orthographic" first
+   draft REFUTED).
+ - ROUNDING 0x76e08 VERBATIM: RC forced to CHOP (cw high byte 0x1f) before
+   frndint — with the +0.5 bias this is trunc(v+0.5) toward zero, NOT
+   round-half-away for negatives. The port must replicate it.
+ - 0x46d3c TRUE-FORM = OWNED-OR-all-prereqs (owned skips the loop, 0x46d88)
+   => the vendor DRAWS OWNED+FRONTIER and skips Blocked from BOTH draw and
+   hit; the tRS-B1 note "legality = all-prereqs AND not-owned" was imprecise
+   (the not-owned gate is only in the commit chain 0x47d99).
+ - EDGE LAW CORRECTED: line runs (this.x, this.y-27) -> (prereq.x,
+   prereq.y+27) (raw bytes 0x48343/0x483aa; the "+27 both endpoints" reading
+   REFUTED); colour 0x6b - clamp(chop(0.25*(0.5*(zt+zp)+posz)),+-3),
+   posz=-150 cited via win+0xe7 == camera pos.z; prereq==selected -> 0xf3.
+ - SCROLL LAW DERIVED: msg 50/51 = basis yaw +3/-3 deg/tick bit-pair latch
+   (dat_764c4, 0x47b44..0x47c42 verbatim incl the DEAD state); msg 52/53 =
+   camera posZ dolly -1/+1 x runtime-float[0x9f108] (value NOT in the
+   restored image — seam TRSV1b-A, port default 1.0). The t419 screen-pan
+   reuse is superseded.
+ - ART: node ring = resring.shp (imm 0x250c -> 'data\resring.shp' VERIFIED
+   again) frames 0..3 1:1 CENTRED (blit/hit word identity argument); study
+   chip shape word 0x6fd82 runtime-only (skip, seam stands); restree.shp
+   consumer TRSV1-C stays open.
+ - SITTING CHECK ran FIRST (exit 0, ring alive, stale assignment stood);
+   production ring untouched; no scratch servers spawned.
+ - BLOCKER SELF-REPORT: iteration budget exhausted after ~55 tool calls
+   (law work + 4 self-corrections); port+pins+witness moved whole into the
+   NEXT ACTION above as tRS-V1c, law references frozen in _wip P1-P11.
 
 tRS-V1 LANDED 2026-11-24 (TREE-GEOMETRY LAW DERIVED END-TO-END + MEASURED
 COLUMN TABLE; NO code shipped — one uncited leg named; no OQ row touched,

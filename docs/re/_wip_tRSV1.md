@@ -288,3 +288,138 @@ projection-arg leg (P6) and picture-consumer (TRSV1-C) open; NO code shipped
 shipping the layout without P6 would put an uncited scale on the user's
 screen — refused under strict-close).
 
+
+## P6 CLOSED 2026-11-24 (tRS-V1b) — 0x53374 ARG ROLES DERIVED (RAW-BYTE x87)
+## Disasm: work/ascend_restored.bin via ~/tools/revenv/bin/python
+## scripts/t442_disasm.py (capstone lives in ~/tools/revenv, NOT .venv); raw
+## hex of 0x53374..0x533db hand-decoded (the linear capstone dump desyncs on
+## this body; the stepping script is clean).
+
+STACK (ret 0x14, callee frame push ebx/edx/sub 0xc): last-pushed = [esp+0x18]
+= P0 float; +0x1c = P1 int; +0x20 = P2 int; +0x24 = OUT-X ptr (ebx);
++0x28 = OUT-Y ptr (edx). eax at the CALL = the affine OUT triple (0x48062
+`lea eax,[esp+0xec]` = the [esp+0xdc] scratch 0x53324 wrote — survives the
+five pushes; the 0x48036 `mov eax,[esp+0xe8]` is an EARLIER use, overwritten).
+
+x87 trace from EMPTY stack (depth-checked every op; first-pass error was
+missing that `fmul st(1)` leaves st1=P0 and that `fstp st(2)` re-stores):
+  s0=X*P0 (X=[eax]); fld1; s0=1/Z (Z=[eax+8]); fld st(1)=X*P0; ->X*P0/Z;
+  fstp st(2) -> stack (1/Z, X*P0/Z, P0); fld Y -> (Y,1/Z,Xf/Z,P0);
+  fmulp st(3): P0*Y, pop; fmulp st(2): (P0*Y)/Z, pop -> (Xf/Z, Yf/Z);
+  fld 0.5; fxch; fadd -> Xf/Z+0.5; 0x76e08 (fldcw RC=round, frndint VERBATIM
+  0x76e08..0x76e24); fistp -> word[ebx] = round(X*focal/Z + 0.5);
+  faddp st(1): the SAME 0.5 lands on Yf/Z (vendor quirk — one bias constant
+  serves both legs); frndint; fistp -> word[edx] = round(Y*focal/Z + 0.5).
+  THEN word[ebx] += P1; word[edx] += P2. Net FPU balance 0 (reentrant).
+
+RESWIN SITE LAW (0x48009..0x480c0 loop, all dwords cited above):
+  view = M*world + t  (0x53324 row-major, M = win+0xeb = 0x20414(cam win+0xab)
+  output at cam+0x40; camera pos win+0xdf = (0,0,-150))
+  AXIS MAPPING (hit law 0x474fd/0x47514 arbitrates: +0x5f1 compared vs mouse
+  X ds:0x484ec FIRST, +0x6b9 vs mouse Y ds:0x484f0; blit site 0x48496 pushes
+  +0x6b9 sar16 as y THEN +0x5f1 sar16 as x):
+    word win+0x5f3+2k (HIGH half of +0x5f1) = screen X = round(focal*vX/Z+0.5)+235
+    word win+0x6bb+2k (HIGH half of +0x6b9) = screen Y = round(focal*vY/Z+0.5)+240
+  (call-site lea esi=+0x6bb lands in [esp+0x24]=ebx=OUT-A=Y leg; edi=+0x5f3
+  = [esp+0x28]=edx=OUT-B=X leg — the FIRST draft of this note had them
+  swapped; the hit-law comparison direction above is the authority.)
+  P0 = dword[win+0xd3] = cam+0x28 = FOCAL = 320/tan(15deg) = 1194.19
+  (0x203b8/0x203e4 VERBATIM; win+0xab+0x28 = win+0xd3 POINTER IDENTITY — the
+  "pan word" reading is REFUTED, there is NO pan term in the projection).
+  depth word: win+0x783+4k = view.Z (0x4805c). COSMOS site 0x285bb passes the
+  SAME shape (P0=[cos+0x102]=its focal) — roles transfer by diff, CONFIRMED.
+  *** BOTH X AND Y ARE PERSPECTIVE-DIVIDED (the "Y orthographic" first-draft
+  reading is WRONG; raw-byte trace above is the authority). ***
+  Z' = Z_world+150 in [127,173] => scale 6.9..9.4; Y up to 30*17+15=525 world
+  => ~3600 px column span: the reswin is a WINDOW onto a huge field (t252
+  corroborates). Scroll/rotation of win+0xeb-basis is OUT OF SCOPE (no writer
+  of win+0xdf outside init 0x4710e in the reswin fn; camera basis law =
+  0x20414 verbatim, identity-at-rest ported).
+
+## P10 SCROLL + LEGALITY + ROUNDING LAWS (tRS-V1b, all cited this iteration)
+- FUN_00046d3c(exe=0x74744 table, edx=row, ebx=0xffff|raceIdx) VERBATIM
+  (0x46d3c..0x46dde): returns -1 (TRUE) iff OWNED (dword[rec+0x47]>>24 has
+  race bit — if owned it JUMPS to return true WITHOUT the prereq loop) OR all
+  prereqs (bytes rec+0x40..44, 0xFF term) owned; else 0. => THE DRAW SCOPE IS
+  OWNED + FRONTIER (blocked rows are not drawn); the tRS-B1 note "legality =
+  all-prereqs AND not-owned" was imprecise — the not-owned gate lives in the
+  COMMIT chain (0x47d99), not in 0x46d3c.
+- ROUNDING 0x76e08 VERBATIM: saves cw, forces HIGH byte 0x1f (RC=11 = chop/
+  toward zero), frndint, restores. With the +0.5 bias: positive values round
+  to nearest; NEGATIVE values chop asymmetrically (-2.7+0.5=-2.2 -> -2). The
+  port replicates trunc(v+0.5f) in f32 and stores the low 16 bits (u16 word).
+- win+0xe7 == camera pos.z (pos triple win+0xdf/+e3/+e7 = (0,0,-150) — the
+  0x4710e init writes +8 = win+0xe7). The line-colour float law is therefore
+  fully cited: k = clamp(chop(0.25f*(depth_p + posz)), -3, +3) with posz=-150,
+  depth_p in [127,173] => k in 0..6 (palette-line offset), pixel index 0x6b.
+- MSG LAW (window fn 0x47b41..0x47d65, DAT_0x764c4 key-flag byte):
+  msg 50 (RESROTLEFT) sets/clears bit4, msg 51 bit8, msg 52 bit1, msg 53 bit2
+  (press-when-idle sets BOTH bits of the pair: 0xc / 0x3 — the toggle logic at
+  0x47b44..0x47c42; release clears). PER-EVENT (0x47c88..):
+  ROTATE: if bit4: angle = +3.0f, if bit8 too: -3.0f; fmul ds:[0x9f108]
+  (RUNTIME float — NOT in the restored image (file ends < 0x9f108); [unverified
+  value, port default 1.0f, seam TRSV1b-A]); call 0x53504 on win+0x11f =
+  cam+0x74 = the camera ORIENTATION basis: rotates the pair at +0x18/+0x20 of
+  that block by angle (0x53504 VERBATIM -> 0x5324c + rebuild 0x536f4).
+  MOVE: if bit1: delta = -1.0f, if bit2 too: +1.0f; fmul [0x9f108];
+  win+0xe3 (pos.z!) += delta*scale — THE MOVE PAIR MOVES CAMERA Z (dolly),
+  not Y. fld [esi+0xe3]; fadd; fstp [esi+0xe3] VERBATIM 0x47d03..0x47d12.
+  => SCROLL LAW: RESMOVEUP = camera z -= 3?/tick (dolly IN: tree grows),
+  RESMOVEDOWN = z += (tree shrinks). RESROTLEFT = basis yaw +3deg/tick.
+  Repaint via [win+0xa7 vt +0xc] after each event.
+- NODE FRAME LAW re-verified verbatim 0x483fa..0x48470 (esi): 1 default; 0 iff
+  row==studied(word[race*2+0x76492]) AND NOT owned(rec+0x0b>>24 bit); 3 iff
+  owned(rec+0x0c>>24 bit — NOTE dword +0x0c here vs +0x47 in 0x46d3c: the
+  frame law reads rec+0x7478b/+0x7478c = rec+0x07/+0x0c of the 0x4b record —
+  seam TRSV1b-B: which of the two ownership dwords is authoritative; the
+  DRAW-path 0x48566 gates with 0x46d3c (+0x47), so +0x47 is authoritative for
+  scope; frame 3 uses +0x0c); 2 iff row==word[win+0x9db] (selected, overrides).
+  Blit: 0x1fc34(lib 0x9f10c, resring shape, frame=esi, x=word+0x5f1 sar16,
+  y=word+0x6b9 sar16) then 0x5caac (esi==2) / 0x5cf96 — 1:1 UNSCALED 29x29.
+  => the port blits resring.shp frames, NOT vector r30 circles.
+
+## P11 LAWS FROZEN FOR THE PORT (tRS-V1b; raw-byte x87 + Ghidra double-check)
+- 0x5324c RAW VERBATIM (bytes 53252.. decoded by hand; Ghidra agrees):
+  X' = X*cos + Z*sin ; Z' = Z*cos - X*sin (angle f32 deg * pi/180 -> f64;
+  0x7754a = fcos LOOP (fprem range-reduce 0x7751e VERIFIED), 0x77556 = fsin).
+  With X=0 at call time: X'=Z*sin(acc), Z'=Z*cos(acc). WIP P1c line stands.
+- 0x53324 RAW VERBATIM + Ghidra: eax = MATRIX+TRANSLATION block (12 floats,
+  rows [m0 m1 m2 t]); edx = POINT triple; ebx = out. out = M*P + t.
+  0x20414 writes the reswin view block win+0xeb: rows = basis, t = -pos.
+  Rest: identity, pos (0,0,-150) => view = (X, Y, Z+150).
+- ANGLE STEP 0x4743d VERBATIM: eax=360; INTEGER idiv d; fild; fadd acc;
+  fstp acc — the step is int(360/d) THEN repeated f32 adds. For the measured
+  C table every d divides 360 exactly (1,2,2,3,3,4,4,5,5,6) — no residue.
+- EDGE LAW CORRECTION (raw bytes 0x48343/0x483aa): the line runs from
+  (this.x, this.y - 27) to (prereq.x, prereq.y + 27) — MINUS 27 on the
+  CURRENT node, PLUS 27 on the PREREQ (disk-top to disk-bottom connector;
+  the P5 note's "+27 both endpoints" is REFUTED). Colour = 0x6b - k with
+  k = clamp0x76e08(0.25f*(0.5f*(z_this+z_prereq) + posz)), posz = -150
+  (f32 chain 0x482a8..0x482c7 VERBATIM: fld z_row; fadd z_p; fmul 0.5;
+  fadd posz; fmul 0.25); prereq == selected word => colour 0xf3 (243)
+  VERBATIM 0x48314..0x48321. Palette INDEX space (game.pal).
+- SCOPE 0x48566 + 0x46d3c VERBATIM: draw iff legal = OWNED OR (all prereqs
+  owned) — 0x46d3c returns TRUE for owned rows WITHOUT the prereq loop
+  (0x46d88 jne->0x46dd5) and true iff all prereqs owned otherwise. Blocked
+  rows are NOT drawn and NOT hittable (hit sub gates 0x46d3c first).
+  The study MARKER chip block 0x4838e runs only when [esp+0x120] != 0
+  (owned 0x14 / studied progress class) — port skips the chip (runtime-only
+  shape word 0x6fd82; seam stands).
+- SCROLL STATE MACHINE (DAT_0x764c4 bit pairs, 0x47b44..0x47c42 VERBATIM):
+  ROT pair bits 4=A(msg50) 8=B(msg51); states (bit4,bit8): S0 none,
+  L=(1,0) => +3.0 deg, R=(1,1) => -3.0 deg, DEAD=(0,1) no motion.
+  msg50: bit4==0 -> (1,0); bit4==1 -> bit4=0 (from L -> DEAD, from R -> DEAD
+  ... re-trace: msg50 always clears bit4 when set; sets (1,0) when clear).
+  msg51: bit4==0 -> (1,1); bit4==1&&bit8==0 -> (1,1); both -> (1,0).
+  MOVE pair bits 1=A(msg52 RESMOVEUP) 2=B(msg53 RESMOVEDOWN); delta law
+  0x47cdb..0x47d12: (1,0) => -1.0, (1,1) => +1.0, (0,1) DEAD; posZ(win+0xe3)
+  += delta * f32[0x9f108] (RUNTIME factor NOT in the restored image — seam
+  TRSV1b-A, port default 1.0). ROT path 0x47c88: angle +-3.0 * [0x9f108] ->
+  0x53504(win+0x11f = basis vec0) = world-Y yaw + rebuild 0x536f4. Motion is
+  APPLIED on phase ebp==4 events (button-hold re-posts msg 0x38 via 0x5669c
+  0x47c51..0x47c7a); the port applies per pump tick (cosmos cadence
+  precedent, documented deviation).
+- BLIT COORDS: 0x48496..0x484c4 pushes (y=word+0x6b9 sar16, x=word+0x5f1
+  sar16) to 0x1fc34/0x5caac; the HIT law tests the SAME words as CENTRES
+  (+-24 square around them) => the vendor blitter CENTRES the sprite
+  [inferred from that identity]; port draws 29x29 resring at (x-14, y-14).
