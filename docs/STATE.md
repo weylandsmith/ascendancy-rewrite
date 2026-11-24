@@ -233,43 +233,57 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPR-U USER GRADE PACKAGE PR1 (research screen) — ordering rationale:
-tRS-V1c shipped the whole tree-geometry machine (port + 8 pins + mutation
-proofs + tRSB1 witness PASS), so the D26 research-screen attribution question
-("does the port LOOK like the vendor tree?") is now answerable ONLY by a human
-side-by-side; every machine-closable leg is closed. NG5 (tNG-S S29/S30) is
-the packaging precedent — same shape: composite PNG + checklist + ruling-page
-friendly.
-DO, in order:
- 1. PORT shot: Xvfb scratch (kill BY PID), seed 5 campaign, walk RESUME ->
-    RESEARCH rail (553,223), dolly-out x2 presses of kResMoveUp centre
-    (578,449) with sleep 6 between (same choreography as
-    scripts/tRSB1_witness.sh — reuse it, the centre comes from the app's own
-    "ui research center" log line), shot the 640x480 frame.
- 2. VENDOR side: work/screens/t252/*.png ARE the vendor reference captures
-    (research.md S8 cites them; do NOT re-capture the vendor — REFUTED route
-    class "second long-running capture"). Pick the frame showing the tree
-    field; crop the field region to match the port RESWIN aspect (470x426
-    field within 640x480).
- 3. COMPOSITE: side-by-side ours|vendor at 2x NEAREST, labelled ours-left,
-    plus a 3x zoom of the port's frontier disk + prereq line (the resring
-    frame law). Save scratchpad/PR-usergrade.png. Verify with
-    t441_screen_diff or PIL sanity (nonblank, right dims) — report actual
-    numbers.
- 4. CHECKLIST scratchpad/PR-checklist.txt: the observable claims the grader
-    rules on (disk size vs vendor, disk count on-frame after dolly-out, line
-    colour gradient direction, ring art vs vendor picture-in-disk seam
-    TRSV1-C, panel text shape), each with the port value AND the t252
-    observation; mark TRSV1-C (restree.shp pictures) as KNOWN-MISSING, not
-    broken.
- 5. Rewrite NEXT to WAIT-USER-GRADE-PR1 (one-line pointer to the two files +
-    the open grading questions), append LANDED block for THIS packaging
-    iteration. Gate + ledger_audit + commit ("tPR-U: research-screen grade
-    package").
-RULES: D19 G1-G6 binding; scratch saves only; NO synthetic stand-ins — if
-the composite would need an invented vendor view, STOP and write the blocker;
-restree.shp per-row pictures stay UNRECOVERED (TRSV1-C) — rings+lines only.
-Sitting check FIRST (r1_t85g_sitting exit 0 = stale assignment stands).
+NEXT = WAIT-USER-GRADE-PR1. The research-screen grade package SHIPPED:
+scratchpad/PR-usergrade.png (1882x2676: on-image plain-language checklist +
+ours|vendor RESWIN-field side-by-side 2x + 3x zoom strips) and
+scratchpad/PR-checklist.txt (6 numbered items: disk size, tree-fit/camera
+feel, line-colour gradient, inside-disk picture KNOWN-MISSING = seam
+TRSV1-C, field background black-vs-16/16/24, ring-colour MEANING). Grading
+questions are in the checklist; answer format "1 yes, 2 no - ...". Same
+shape as WAIT-USER-GRADE-NG5.
+WHEN THE RULING ARRIVES, the first work item is named and pre-verified:
+tRS-V1d SEAM TRSV1c-E (docs/re/_wip_tPRU.md P4b): the port's DRAWN ring
+centre sits +15,+15 off the logged projection/hit centre (measured: log
+(397,240), drawn bbox centre (412,255)); the (x-14,y-14) blit offset carries
+the dead 29x29 assumption — resring.shp bbox quads are MEASURED 60x60
+(S8.2). Re-derive the vendor blitter anchor semantics (FUN_0001fc34/0x5caac:
+does the passed word name the bbox top-left, or does the blitter shift by
+the bbox?) BEFORE changing the offset; then pin drawn-centre == hit-centre.
+If the user ruling adds items, they queue behind TRSV1c-E in the ruling's
+own order (NG5 precedent).
+RULES: D19 G1-G6 binding; NO synthetic stand-ins; restree.shp per-row
+pictures stay UNRECOVERED (TRSV1-C); never re-capture the vendor (REFUTED
+class). Sitting check FIRST (r1_t85g_sitting exit 0 = stale assignment
+stands).
+
+tPR-U LANDED 2026-11-24 (RESEARCH-SCREEN GRADE PACKAGE SHIPPED + TWO LAW
+SIDE-CORRECTIONS; no code shipped, no OQ row touched — honest negative under
+strict-close, open=[016,019] unchanged). PROVED (docs/re/_wip_tPRU.md):
+ - PORT SHOT: tRSB1_witness.sh VERDICT PASS (seed 5, dolly-out, click
+   re-derived from the app log (397,240), study Xenobiology, panel-green
+   0->690, local leg 563 px). after.png = the OURS half.
+ - MEASURED SIDE-BY-SIDE (t252 vendor frame vs port shot, same field crop
+   (8,46)-(476,472)): RINGS 60 px on BOTH sides; dim-line mean RGB ours
+   10/33/91 vs vendor 9/32/82; FIELD BACKGROUND differs materially —
+   vendor pure black (0,0,0), ours flat (16,16,24) [checklist item 5];
+   inside-disk picture vendor-yes/ours-no (TRSV1-C, item 4); ring-colour
+   MEANING never witnessed either side (item 6 — the "gold rim" label on
+   0x5caac is INFERRED, our selected/studied disk renders blue).
+ - S8.2 CORRECTION (research.md): resring.shp "29x29" was a header-pair
+   reading; MEASURED bbox quads (-30,-30,29,29) => 60x60 by the bbox-diff
+   law (starts 56/1200/2363/3532) — agrees the 60 px rendered rings.
+ - SEAM TRSV1c-E NAMED (P4b): drawn ring centre +15,+15 off the logged
+   hit centre — the (x-14) blit offset vs the 60 px bbox; the +-24 hit
+   square absorbs it (witness passes) but click-vs-pixel mismatch is real.
+   Fix requires the vendor blitter anchor law FIRST (next-action block).
+ - ARTIFACTS: scripts/tPRU_composite.py (PIL sanity: dims 468x426 x2,
+   ours_mean 20.70 vs vendor_mean 1.01, differing-px frac 1.000),
+   scratchpad/PR-usergrade.png, scratchpad/PR-checklist.txt. t441 has no
+   "research" region table (REGIONS=newgame,planetslist) — PIL sanity leg
+   used, cited.
+ - SITTING CHECK ran FIRST (exit 0, 45,227 rows, no new sitting — stale
+   assignment stood). Production ring untouched; Xvfb killed by PID.
+ - NEXT = WAIT-USER-GRADE-PR1 (above).
 
 tRS-V1c LANDED 2026-11-24 (TREE GEOMETRY PORTED + 8 PINS + MUTATION-PROVED +
 tRSB1 WITNESS PASS ON THE VENDOR-LAW RENDER; no OQ row touched — the research

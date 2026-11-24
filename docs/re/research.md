@@ -354,9 +354,20 @@ same function 0x4709c..0x48f80).
     +27 px Y (0x48334/0x48353 `0x1b`), palette 0x6b - clamp(round(0.25*
     (win+0xe7 + depth word [win+0x783+4k])), -3, +3) (z-shaded).
 (f) ART LAW: node ring = 'data\resring.shp' (pool 0x850bc VERIFIED, sole
-    refs 0x48476/0x487b6), 4 records 29x29 = frames 0..3 by the state law
+    refs 0x48476/0x487b6), 4 records = frames 0..3 by the state law
     0x483fa..0x48470: 1 default; 0 iff row==studied AND not owned; 3 iff
     owned; 2 (SELECTED, gold path 0x5caac) iff row==word[win+0x9db].
+    S8.2 DIMS CORRECTION (tPR-U, 2026-11-24): the earlier "4 records 29x29"
+    was a header-pair reading, NOT the bbox. MEASURED directory (unified
+    shp law; record starts 56/1200/2363/3532): bbox quads k1..k3 =
+    (-30,-30,29,29) => dims 60x60 by the bbox-diff law, and the port's
+    1:1-rendered rings measure 60 px on screen — MATCHING the vendor's
+    measured 60 px rings (t252 vs tRSB1 shots, tPR-U P2/P3). Blit stays
+    1:1 unscaled (0x5caac row-RLE) — the law is unchanged; only the
+    quoted dims number is. The "gold path" label on 0x5caac is an
+    INFERRED name, never pixel-witnessed (tPR-U: the selected/studied
+    disk renders blue in our capture; ring-colour MEANING is now an
+    open human-grading question, PR-checklist item 6).
     'data\restree.shp' = 66 records 24x24 = ONE PICTURE PER LIVE ROW, but
     NO code immediate references its name (the only 'restree' string is
     restree.txt for the text loader 0x468d3) — the picture consumer is
