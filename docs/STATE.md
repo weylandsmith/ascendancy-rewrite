@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-23T22:10
+updated: 2026-11-24T00:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,26 +233,22 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPL-V1f PORT CENSUS CLOSE-OUT — ordering rationale: tPL-V1 (2026-11-23)
-CORRECTED the lattice law (tileCenter = (410+34*(col-row), 127+17*(col+row)),
-exact tiling; vendor witness 100% vs 26%) and shipped the class edge-colour
-law + pins (502/0/0, docs/re/planets-ui.md §14, docs/re/_wip_tPLV1.md), but
-the FORMAL port pixel census was cut by budget: re-run
-scripts/tplv1_port_witness.sh (fresh Xvfb :99, window-by-name grab — the
-host has stale Xvfbs :9/:97, NEVER trust -window root; assert png 640x480)
-then ~/tools/revenv/bin/python scripts/tplv1_port_census.py; the census
-currently hard-codes zero-offset centres — if the window grab is clean it
-should pass as-is (the offset-fit on the first shot found 11/11 size-1 fill
-hits under the corrected law); if it still fails, find the port's screen
-offset (the field clip at ui.cpp:1247) and fix the CENSUS, not the law.
-Bank the VERDICT PASS line into _wip_tPLV1.md F4. THEN tPL-V2 ORBITAL SLOTS
-LEFT (D26): 10 slots, 5 rows x 2, NOT isometric, hover shows thin greyish
-box OUTLINE (not fill). t428 notes twice identify "orbital column LEFT"
-with the PLRES window — START THERE (resolve that identity properly:
-windows.txt PLRES rect + shape records; if it is a separate window, port
-its layout law + hover outline handler). CLOSE: live witness 10/10 slots +
-hover outline. THEN tPL-B2 PRODUCTIVITY-BOX POPUPS (D26): clicking a
-top-row productivity indicator pops an info window; EXACT witness text:
+NEXT tPL-V2 ORBITAL SLOTS LEFT (D26) — ordering rationale: tPL-V1f
+(2026-11-24) CLOSED the formal port census (census v2
+scripts/tplv1f_census_v2.py VERDICT PASS 2x on a clean geometry grab,
+anti-vacuity mutant M-T1 caught, suite 502/0/0, docs/re/_wip_tPLV1.md F5 +
+planets-ui.md §14) — the grid law tPL-V2 consumes is now fully banked, so
+the queue head advances. 10 slots, 5 rows x 2, NOT isometric, hover shows a
+thin greyish box OUTLINE (not fill). t428 notes twice identify "orbital
+column LEFT" with the PLRES window — START THERE (resolve that identity
+properly: windows.txt PLRES rect + shape records; if it is a separate
+window, port its layout law + hover outline handler). CLOSE: live witness
+10/10 slots + hover outline (capture recipe: the shot() in
+scripts/tplv1_port_witness.sh — winpos substring + root-crop + assert
+640x480; NEVER import -window NAME, the title flips at RESUME; export
+DISPLAY in scripts; clear stale /tmp/.X99-lock first). THEN tPL-B2
+PRODUCTIVITY-BOX POPUPS (D26): clicking a top-row productivity indicator
+pops an info window; EXACT witness text:
 "Crimea 1 / Prosperity: 1 per day / Population will grow in 50 days"
 (/ = line break). Derive templates + values law from windows.txt/string
 table; port all indicator boxes. THEN tPL-D1 HOME PLANET BY RACE (D26):
@@ -270,6 +266,34 @@ color only; no synthetic stand-ins (RE-FIRST t423 law); protected saves
 TL EXPIRES 2026-11-24 14:53 — if a live witness needs the production ring
 and it's dead, run the t439 recovery pattern FIRST; C1-C5 cosmetic backlog
 + race intro stay DEFERRED (D25) — do not touch.
+
+tPL-V1f LANDED 2026-11-24 (FORMAL PORT PIXEL CENSUS VERDICT PASS; no OQ
+row touched — tPL tracks none, honest negative under strict-close;
+open=[016,019] unchanged). PROVED (docs/re/_wip_tPLV1.md F5):
+ - CENSUS v2 scripts/tplv1f_census_v2.py PASS 2x (f1, then f2 after
+   mutation-restore): old (24,24,32) outline 0 px; size-1 fill 11/11 (10
+   exact conv(150) + 1 structure-art-covered cell (4,3)); adjacency 12/12
+   pairs OK; CONTROL 5/5 law-A centres outside the painted B-union BLACK
+   (anti-vacuity). Mutant M-T1 (tileCenter re-transposed to law A) CAUGHT:
+   census FAILs "best size class 4 != expected 1"; source restored md5
+   9c55fe6a3ccfb7130013048f57bd9b39, rebuild green, suite 502/0/0.
+ - V1 CENSUS PREMISES REFUTED (the law was never wrong): (a) >=200 white
+   edge px — seed-5 home planet surface classes are ALL 0 (app log), and
+   class 0 draws BLACK edges (0x3bbd6), so white-px count is meaningless
+   there (edge colour law stays pinned by planettile_edge_colour_tPLV1);
+   (b) "midpoint non-black" — the midpoint sits ON the shared edge line,
+   legitimately black; the gap signature is a black point that should be
+   INSIDE a diamond (census v2 probes 3px inside each side).
+ - GRAB LAW REPLACED: `import -window NAME` needs EXACT WM_NAME; title
+   flips "Ascendancy" (title.cpp:135) -> "Ascendancy rewrite (P5a)"
+   (ui.cpp:114/122) at RESUME, so the tPL-V1 name grab died exactly there.
+   SHIPPED recipe in tplv1_port_witness.sh shot(): tools/winpos substring +
+   `import -window root -crop WxH+X+Y +repage` + assert 640x480. Also:
+   export DISPLAY inside scripts (per-cmd DISPLAY= prefixes didn't reach
+   import); rm stale /tmp/.X99-lock + /tmp/.X11-unix/X99 before Xvfb.
+ - SITTING CHECK ran first (r1_t85g_sitting exit 0): tail rows all
+   turn=1086 (newest wall ~23:37), production dosbox-x pid 1470999 alive,
+   no new sitting, stale assignment stood.
 
 tPL-V1 LANDED 2026-11-23 (TILE GRID PITCH + COLOURS: THE PORT'S CURSORS
 WERE TRANSPOSED; no OQ row touched — tPL tracks none, honest negative under

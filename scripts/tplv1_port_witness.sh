@@ -18,10 +18,17 @@ sleep 1
 DISPLAY=$DISP "$BIN" --ui --campaign 1 --seed 5 >"$OUT/app.log" 2>&1 &
 APP=$!
 sleep 3
-# grab the APP WINDOW (not root): a stray Xvfb on the display would make a
-# root grab larger than 640x480 with the window offset inside it (tPL-V1
-# lesson). ImageMagick resolves -window by NAME.
-shot() { DISPLAY=$DISP import -window "Ascendancy" "$OUT/$1.png" 2>>"$OUT/app.log"; }
+# grab by GEOMETRY, not name: ImageMagick `-window NAME` demands an EXACT
+# WM_NAME match (the campaign window is titled "Ascendancy" early, and a
+# name that drifts makes import hang/retry — tPL-V1f). winpos resolves the
+# substring and prints "X Y W H TITLE"; crop the root at that geometry and
+# assert 640x480 (never a bare root grab — stale-Xvfb hazard, tPL-V1).
+shot() {
+  local g; g=$(DISPLAY=$DISP ./tools/winpos "Ascendancy") || { echo "winpos FAIL $1" >>"$OUT/app.log"; return 1; }
+  local X=${g%% *} rest=${g#* }; local Y=${rest%% *} rest2=${rest#* }; local W=${rest2%% *} rest3=${rest2#* }; local H=${rest3%% *}
+  [ "$W" = 640 ] && [ "$H" = 480 ] || { echo "shot FAIL $1 geometry $g" >>"$OUT/app.log"; return 1; }
+  DISPLAY=$DISP timeout 15 import -window root -crop "${W}x${H}+${X}+${Y}" +repage "$OUT/$1.png" 2>>"$OUT/app.log"
+}
 X() { DISPLAY=$DISP ./tools/xsend "Ascendancy" "$@"; sleep 0.4; }  # t408 grep-race law
 X 318 335            # RESUME -> campaign map
 X 553 145            # STATUS rail -> planets list

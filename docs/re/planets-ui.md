@@ -517,7 +517,15 @@ Full working log docs/re/_wip_tPLV1.md F0-F4. Durable laws:
   fills-then-outlines two passes so shared edges stay visible; the t418b
   invented (24,24,32) outline + rock-darker fill DELETED (no vendor basis).
   Pins planetgrid_lattice_t418b RE-DERIVED + planettile_edge_colour_tPLV1;
-  suite 502/0/0. Formal port pixel-census PASS (scripts/tplv1_port_
-  witness.sh + tplv1_port_census.py, window-by-name grab on :99) still
-  owed — the offset-fit on the first shot already showed the port render
-  satisfies the law 11/11 at size 1.
+  suite 502/0/0. FORMAL PORT CENSUS CLOSED tPL-V1f (2026-11-24): census v2
+  scripts/tplv1f_census_v2.py VERDICT PASS on a clean geometry grab
+  (winpos + root-crop; the name grab failed because the window title flips
+  "Ascendancy" -> "Ascendancy rewrite (P5a)" at RESUME). size-1 fill 11/11,
+  adjacency 12/12 (3px-inside probes; the v1 "midpoint non-black" premise
+  was invalid — class-0 tiles draw BLACK edges per 0x3bbd6, so the gap
+  signature is a black INSIDE point, not a black midpoint), and an
+  anti-vacuity control (law-A centres outside the painted union all black;
+  mutant M-T1 re-transposing tileCenter -> census FAILS,
+  scripts/tplv1f_mutate_census.sh). The v1 >=200-white-px premise is also
+  invalid for the seed-5 home planet (all surface classes 0). Details
+  docs/re/_wip_tPLV1.md F5.

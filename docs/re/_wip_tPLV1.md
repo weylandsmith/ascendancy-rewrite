@@ -136,3 +136,42 @@ formal PASS before tPL-V2 consumes this grid law.
 HAZARD BANKED: never trust `import -window root` on this host — stale Xvfbs
 (:9, :97) sit on other displays AND the production dosbox may hold :97;
 grab the app window by name and assert the png is 640x480.
+
+## F5 — tPL-V1f FORMAL PORT CENSUS: VERDICT PASS (2026-11-24)
+CENSUS v2 scripts/tplv1f_census_v2.py on a CLEAN window grab
+(scripts/tplv1_port_witness.sh, fresh Xvfb :99, seed 5, OUT=/tmp/tplv1_shots_f2):
+  VERDICT PASS (exit 0), REPRODUCED 2x (f1 + post-mutation-restore f2):
+  old (24,24,32) outline px 0; size1 fill 11/11 (10 exact + 1 art-covered
+  cell (4,3) = structure blit (113,81,40) at centre); adjacency 12/12 pairs
+  OK (3px-inside probe each side non-black, midpoint black|edge|art);
+  CONTROL: 5 law-A centres fall OUTSIDE the B-cell union — ALL black (had
+  the port painted law A they'd carry fill). Anti-vacuity PROVEN: mutant
+  M-T1 (tileCenter re-transposed to law A, scripts/tplv1f_mutate_census.sh)
+  -> census FAIL "best size class 4 != expected 1"; source restored (md5
+  9c55fe6a3ccfb7130013048f57bd9b39), rebuild green, suite 502/0/0.
+WHY v1 failed (its two premises were WRONG for this shot, not the law):
+  (a) >=200 white edge px: the seed-5 home planet's SURFACE classes are ALL
+      0 (app log "ui planet classes 0 0 0 0 0 ..."), and class 0 draws BLACK
+      edges per law 0x3bbd6 — indistinguishable from starfield. Edge-COLOUR
+      pixels are pinned by planettile_edge_colour_tPLV1, not by pixels here;
+      census v2 reports them (white 94) without asserting.
+  (b) "midpoint non-black": the midpoint sits ON the shared edge line, which
+      is legitimately black for class-0 tiles. Gap signature is instead a
+      BLACK point that should be INSIDE a diamond -> census v2 probes 3px
+      inside each side of every adjacent pair.
+GRAB LAW (supersedes the F4 hazard note): `import -window NAME` needs an
+EXACT WM_NAME match; the campaign window is titled "Ascendancy" (title.cpp:
+135) but becomes "Ascendancy rewrite (P5a)" (ui.cpp:114/122) at the RESUME
+transition -> name-grab hung/failed exactly after that click. WORKING
+RECIPE (shipped in tplv1_port_witness.sh shot()): ./tools/winpos
+"Ascendancy" resolves substring + geometry, then `import -window root
+-crop WxH+X+Y +repage` + assert 640x480. Also: DISPLAY must be EXPORTED in
+the script (per-command DISPLAY= prefixes did not reach `import` in the
+probed shell); kill stale lock files (/tmp/.X99-lock, /tmp/.X11-unix/X99)
+before starting Xvfb.
+DIAG SCRIPTS KEPT: scripts/tplv1f_census_diag.py (per-cell centre dump),
+scripts/tplv1f_pair_probe.py (adjacency pair probe), scripts/tplv1f_probe.sh
+(grab recipe), scripts/tplv1f_mutate_census.sh (M-T1). The v1 census
+scripts/tplv1_port_census.py stays on disk as the refuted-premises witness;
+tplv1f_census_v2.py is THE census for tPL-V2 onward.
+
