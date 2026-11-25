@@ -344,6 +344,16 @@ TileHalfExtents tileOverlayHalfExtents(bool inset) {
     return inset ? TileHalfExtents{32, 16, 32, 16} : TileHalfExtents{6, 3, 6, 3};
 }
 
+bool tileOverlaySolidFill(bool inset, int cellClass) {
+    // Header law (tPF-3c F13): the vendor's TINY branch fills its interior
+    // with the class colour (0.79-fraction solid red measured on the vendor
+    // half of the 433 composite; blue/white likewise), and BOTH branches skip
+    // the filler call when the pen is 0 (0x3bd31 / 0x3be2a `test, je`) — pen
+    // 0 is exactly class 0 (F9 table). The INSET branch's ramp fill is not
+    // recovered, so it ships outline-only.
+    return !inset && cellClass != 0;
+}
+
 Pt structureBlitPos(Pt centre, int recLeft, int recTop) {
     // Vendor anchor = diamond TOP VERTEX (centre - (0,17)); blitter adds the
     // record signed bbox. Verbatim composition, no centring arithmetic.

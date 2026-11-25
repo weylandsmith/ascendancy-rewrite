@@ -264,3 +264,22 @@ TEST(tileoverlay_paint_wiring_tpf3b) {
     // Full-boundary pass retained with the 34/17 half-extents.
     CHECK(src.find("c.x - 34, c.y, c.x, c.y - 17") != std::string::npos);
 }
+
+TEST(tiny_fill_law_tpf3c) {
+    // 5. tPF-3c F13 FILL LAW. Vendor pixels (433 composite RIGHT half): tiny
+    //    class-colour diamonds are SOLID-filled (red 58/73 = 0.79 of the bbox
+    //    diamond, raw (188,44,17) == conv(117) family); BOTH vendor fill calls
+    //    are skipped when the pen is 0 (0x3bd31 / 0x3be2a `test,je`) — pen 0
+    //    is exactly class 0 (F9). The inset ramp is unrecovered -> no fill.
+    CHECK(au::tileOverlaySolidFill(false, 2) == true);    // tiny red
+    CHECK(au::tileOverlaySolidFill(false, 3) == true);    // tiny green
+    CHECK(au::tileOverlaySolidFill(false, 4) == true);    // tiny blue
+    CHECK(au::tileOverlaySolidFill(false, 1) == true);    // tiny white (default)
+    CHECK(au::tileOverlaySolidFill(false, 0) == false);   // black pen skip
+    CHECK(au::tileOverlaySolidFill(true, 2) == false);    // inset: ramp open
+    CHECK(au::tileOverlaySolidFill(true, 0) == false);
+    // Wiring: the painter consults the law and never fills the inset branch.
+    const std::string src = slurp(kRepoDir() + "/rewrite/src/ui/ui.cpp");
+    REQUIRE(!src.empty());
+    CHECK(src.find("tileOverlaySolidFill(inset, cls)") != std::string::npos);
+}

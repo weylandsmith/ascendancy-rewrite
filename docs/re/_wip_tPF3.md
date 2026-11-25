@@ -340,3 +340,114 @@ MEASUREMENT HAZARDS BANKED THIS SESSION:
 - NOT CLAIMED: that the overlay's per-cell inset/tiny CHOICE matches the vendor
   on this shot (no vendor capture of the same planet), and the FILL (seam
   TPF3-B) is still not painted — outline-only, per F6's conv(150) census.
+
+## tPF-3c STEP 1 [measured code grep, 2026-11-25] — tPF-1b PRECONDITION FAILS: PORT BEGIN BUILDS turn_ == 0
+
+Question (STATE.md tPF-3c step 1): does the Begin path boot turns!=0? ONE grep,
+STOP on fail. ANSWER: NO.
+  - campaign.h:850 `int turn_ = 0;` member default.
+  - ONLY increment site in the whole rewrite: campaign.cpp:2320 `++turn_;`
+    inside Campaign::advance().
+  - Begin apply path main.cpp:643-661 (buildCampaign(o,&aerr,&newGame)) sets
+    cfg.aiCount/starCount/govByte ONLY — no turn write anywhere on the path
+    (grep 'turn_ *=' over rewrite/src/game+ui: no assignment outside advance).
+  => A Begin-built PORT campaign enters play at turn 0, structurally identical
+     to the seeded builds the tPF-1 soak already ran 30 turns on. A port soak
+     adds nothing about the vendor day-20 exit; and the vendor side is
+     user-time-gated (D30: user denied --campaign). tPF-1b: precondition
+     FAILED -> STOPPED per assignment. The day-20 exit stays OPEN awaiting a
+     VENDOR witness (user's own Begin-built game), not a port soak.
+
+## tPF-3c STEP 2 [measured pixels + vision, 2026-11-25] — F6 FILL NO-OP DOES
+## NOT GENERALISE: TINY DIAMONDS ARE SOLID CLASS-COLOUR FILLED (433 right half)
+
+Targeted census scripts/tPF3c_fill_census.py + tPF3c_fill_interior.py on the
+433 refcap (the only capture with red/green/blue class px), + 400% zoom crops:
+ - LEFT half (F6's field): flat teal, interior5x5 blobs of teal150 = 24,727 —
+   no class interiors anywhere. F6's no-op reading stands AT THAT STATE.
+ - RIGHT half (different zoom, textured tile art): the class-colour px form
+   TINY diamonds ~8-24 ref-px wide whose INTERIORS are solid class colour:
+   red tiny bbox (1385,447)-(1400,448): interior px (184,40,16)/(176,40,16)
+   == conv(117) family (outside = teal (16,64,72)); blue tiny interiors
+   (0,0,248) == conv(255); white tiny interiors (160,168,176) == conv(12)
+   family; a BLACK tiny diamond's interior stays the dark field (class 0 fill
+   skip 0x3be2a 'test si,si je' — byte-consistent). Vision on the crop
+   confirms: solid red / solid blue / light-grey tiny diamonds + one large
+   blue-outlined diamond whose interior is TEXTURED BLUE (visibly tinted vs
+   the teal field, indistinguishable between fill-over-art and blue tile art
+   at this resampled scale).
+ => THE NO-OP CLAIM IS REFUTED FOR NON-TEAL CELLS. The filler 0x62d15 paints
+    the tiny-diamond interior with the CLASS colour (state-block law opaque,
+    pixels decisive). F6's teal no-op was the special case fill-colour ==
+    base-colour... no: teal field interiors had ZERO class px because teal
+    cells' class is the field itself at that zoom. LARGE/inset-diamond fill
+    law stays OPEN (stipple vs solid vs tile-art indistinguishable on the
+    resampled 433; unscaled t254 has NO non-teal cell: red 6 px / green 6 px
+    scattered, no interior).
+
+## F13 [tPF-3c MEASURED — MAJOR CORRECTION] — THE 433 COMPOSITE: LEFT HALF IS
+## THE PORT; THE VENDOR FILL IS NOT A NO-OP; FILL MECHANISM = COLOUR-TRANSLATION MAP
+
+1) HALF IDENTITY (vision on the full composite + per-half exact-px census):
+   - per-half EXACT conv(150) teal: LEFT 34,194 px / RIGHT 555 px; green146
+     127/1; blue255 0/101. An upsampled image CANNOT hold 34k exact palette
+     values — the LEFT half is a pixel-exact paste of the PORT's flat-teal
+     planet view (opaque tiles + CB sprite = exactly the D28 complaint text);
+     the RIGHT half is the VENDOR (textured tile art, structure sprites, the
+     t254 art style, scattered TINY diamonds + a few LARGE blue-outlined ones).
+   - CONSEQUENCE: F6's "DECISIVE PIXEL CENSUS ... vendor refcap left half,
+     20,495 px EXACTLY conv(150)" measured OUR OWN OUTPUT, not the vendor.
+     RETRACT: "the vendor interior is 20,495 px of exactly conv(150)" is NOT
+     a vendor fact. (tPF-3b's F7 disjoint test used the unscaled VENDOR t254
+     capture, so the geometry law stands; only the F6 fill inference falls.)
+2) VENDOR FILL IS NOT A NO-OP (assignment step 2 answer, NEGATIVE): on the
+   RIGHT (vendor) half, tiny class-colour diamonds have SOLID class interiors:
+   red blob bbox (1384,443)-(1400,451) 58 strong-red px / 73 bbox-diamond
+   cells = 0.79 FILL (raw px e.g. (188,44,17),(175,47,22) == conv(117) family;
+   surrounding field teal (16,64,72)); blue tiny interiors (0,0,248)==conv(255)
+   family; white tiny interiors (160,168,176) family; the black tiny diamond's
+   interior stays field-dark (class-0 fill skip 0x3be2a — byte-consistent).
+   The large blue-outlined diamonds' interiors are TEXTURED BLUE (modulated,
+   not flat) — see 3).
+3) FILLER 0x62d15 INTERNAL LAW [measured raw disasm 0x62d15..0x63175]:
+   args (esp): +8 state block ([0x48c33]+pen*0x100, per-pen CLIP/BOUNDS ctx:
+   reads +0 base,+4/+8 extents,+c/+10 limits), +0xc vertex count (4),
+   +0x10 = 0x4850c DRAW CONTEXT, +0x14 = FILL MAP POINTER read at 0x63015.
+   Interior loop (0x63015..): esi=[ebp+0x14]; per pixel screen := MAP[old
+   screen byte] (0x63023/0x63026 mov dl,[eax+esi] / mov [edi],dl; word/dword
+   unrolled paths write the SAME byte replicated). So the fill is a 256-entry
+   COLOUR TRANSLATION of what is already on screen: texture survives as
+   in-family modulation (matches the textured-blue interiors EXACTLY), and an
+   IDENTITY map is a pixel-exact no-op. THIS is the mechanism behind the user's
+   "SEMI-TRANSPARENT colored squares" — no alpha arithmetic, a per-colour ramp.
+   The scanline geometry (0x62d21..0x62f81) is a standard edge-walk into the
+   clip ctx; bounds come from the state block.
+4) STILL OPEN (TPF3-B refined): (a) WHO writes 0x48c33 (payload-wide census:
+   17 a1-READ sites incl 0x3be31, ZERO direct write encodings a3/89 */c7 05
+   for imm 0x48c33 -> written indirectly via [reg+disp], window-runtime alloc —
+   consistent with DAT_00048c33==0 in every banked save); (b) the identity of
+   the MAP at draw-ctx+0x14 (the ramp TABLE — the real alpha law) and its
+   writer. The pixel evidence constrains it: for pen=class colour the map sends
+   field colours INTO the class family (tiny = near-solid => map is nearly
+   constant-class on the sampled colours; large = modulated => identity-ish on
+   some colours). NOT recovered; do not invent a ramp.
+
+## F14 [tPF-3c SHIPPED + PINNED + MUTATED + WITNESSED] — TINY FILL LAW IN THE PORT
+- CODE: planetview.h/.cpp `bool tileOverlaySolidFill(bool inset,int cls)` =
+  `!inset && cls != 0` (law block cites F13); ui.cpp pass 3 fills the TINY
+  diamond solid in the class colour before outlining it; inset stays
+  outline-only. Stale comment citing the retracted 20,495-px census replaced.
+- PIN tiny_fill_law_tpf3c (7 law checks + wiring): suite 557/0/0 (was 556).
+  MUTATION 2/2 CAUGHT: drop the cls!=0 term -> FAIL line 278; invert the law
+  (fill inset, never tiny) -> 6 FAILs; restored green both times.
+- WITNESS (scripts/tPF3b_witness.sh re-run, same nav, /tmp/tpf3c_shots):
+  class-colour px OFF the full lattice on the tiny (6x3) paths went 24->46
+  green, 72->138 blue, 121->231 white vs the tPF-3b outline-only build — the
+  FILL paints (edge px + interior px); black 395->395 unchanged (class-0 skip
+  is a no-op against field-dark, as designed). VERDICT(a) OVERLAY PASS VISIBLE,
+  WITNESS_RC=0. GATE_EXIT=0.
+- STEP 3 (per-cell inset/tiny CHOICE vs vendor): HONEST NEGATIVE. No same-
+  planet vendor capture exists (the 433 vendor half is a DIFFERENT planet and
+  its checker states are unknown), and no D28 ruling page covers it. The
+  choice LAW is byte-pinned (checker 0x3830c item-0xff reduction, tPF-3b); the
+  per-cell corroboration stays UN-WITNESSED, named not claimed.

@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-25T11:30
+updated: 2026-11-25T15:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,46 +233,80 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-3c OVERLAY FILL + PER-CELL VERDICT (law docs/re/_wip_tPF3.md
-F1-F12, INTACT — do NOT re-derive). ORDER: (1) FIRST one grep of the Begin
-path for whether Begin-built boots turns!=0 (tPF-1b precondition, one probe,
-then STOP if it fails — the soak is user-time-gated anyway); (2) the overlay
-FILL seam TPF3-B: the polygon filler 0x62d15 reads a window-runtime state
-block [0x48c33]+pen*0x100 whose contents are unrecovered — the F6 census says
-the vendor interior is 20,495 px of EXACTLY conv(150), so the fill is a no-op
-at that state: PROVE the no-op claim holds for a NON-teal cell too (one
-refcap with a red/green class cell interior), else name the alpha law open;
-(3) WITNESS the per-cell inset/tiny CHOICE against a vendor capture (needs a
-D28 user ruling page or a capture of the same planet — if neither exists,
-record the honest negative and keep the choice un-witnessed; the legality LAW
-is already byte-pinned, so this is corroboration, not a blocker).
-RATIONALE: tPF-3b (this session) SHIPPED the overlay geometry+legality and
-the anchor law with 5 pins + 4/4 mutations + a control-isolated witness, so
-what remains on the tile-overlay family is exactly the two named seams
-(TPF3-A widget byte +0x18b gate writer, TPF3-B fill state block) and the
-per-cell corroboration. Do NOT start tPF-4 PLANLIST case-bodies here: it is
-a list-work session (fallthrough walk 0x3cca4..0x3d1bc, D10) and mixing it in
-burns the context budget mid-walk. help.shp-k0 FRAME SHIP stays gated on the
-user's OQ-005 ruling (DECISIONS.md D1).
-PRIOR-SESSION QUEUE (tPF-3c now = the NEXT ACTION above):
-tPF-4 home planet table read; tPF-5 indicators; tPF-6 orbital click +
-hover CPU; tPF-7 research controls; tPF-8 tree visibility; tPF-1b
-begin-built day-20 soak (D30 — user denied --campaign; his game is
-Begin-built with a factory pending; check whether Begin-built boots
-turns!=0 FIRST, one grep of the Begin path, before any soak).
-STANDING: D28 file scratchpad/t433-build-feedback.txt is the item
-authority; refcap PNGs in scratchpad/; scratch savedir law; C1-C5 +
-race intro stay DEFERRED (D25); when a counter reads zero check
-PRODUCER EXISTENCE first (D29); POPUP/DERIVATION LAW (D30, binding):
-every visible property cited or named-open, no eyeballed geometry.
-NEW STANDING (tPF-3b): NEVER read whole lines of
-work/r1/playcap/live-timeline.jsonl (10 GB; one tail -3 cost ~30k tokens) —
-use scripts/r1_t85g_sitting.py or jq with keys only. Pixel geometry probes
-must use the UNSCALED capture work/r1/screens/t254/02_planet_detail.png (the
-resampled composites in scratchpad/ destroy 1px palette-exact lines), and
-must DISCRIMINATE with a disjoint-sample/disjoint-geometry comparison plus a
-density-matched control — the tplv1 witness's any-hit-per-edge scorer
-collapses to ~1 px per edge group and is NOT a per-pixel fit.
+NEXT tPF-3d FILL-RAMP + GATE-WRITER WRITER-CENSUS (static, no capture). Two
+named seams, ONE census script, both targets: (1) THE RAMP TABLE — the filler
+0x62d15 interior does screen := MAP[screen] with MAP = [draw-ctx 0x4850c +
+0x14] (read at 0x63015; F13 law docs/re/_wip_tPF3.md — do NOT re-derive).
+Census every write encoding to ds:0x48520 (a3/89 */c7 05 imm 20 85 04 00) and
+to [reg+0x14] where the register provably holds 0x4850c (push-imm32 sites
+68 0c 85 04 00 are the ctx's callers; the INIT site loads the ramp from a data
+table or an alloc — name whichever it is). If the ramp table is a static data
+block, DUMP it and the semi-transparency law closes with cited bytes; if it is
+window-runtime, name that with the writer site and STOP (then the only route is
+a debugger session, which needs its own iteration). (2) THE GATE — widget byte
++0x18b bit0 (0x3bbcb skip test, SEAM TPF3-A): same method, writes to [widget
+base + 0x18b]; the widget base identity is in the tPF-2c/tPLB2 notes (0x31004
+widget-frame path). RATIONALE: tPF-3c (this session) shipped the TINY solid
+fill (F14: law+pin 557/0/0+mutation 2/2+witness green) and RETRACTED F6 — the
+433 composite's LEFT half is the PORT (34,194 exact conv(150) px is impossible
+in an upsampled image; the vendor half has 555), so the inset ramp is the ONLY
+remaining overlay law the pixels demand but bytes have not yet pinned; TPF3-A
+shares the method and the census script. Do NOT start tPF-4 PLANLIST
+case-bodies (list-work session, D10 fallthrough walk 0x3cca4..0x3d1bc). Do NOT
+re-run the tPF-1b soak: precondition FAILED this session — the port's Begin
+path builds turn_==0 (campaign.h:850 member default, sole ++turn_ in
+Campaign::advance campaign.cpp:2320; main.cpp Begin apply sets stars/owners/
+gov only), so a port soak proves nothing about the vendor day-20 exit; that row
+awaits a VENDOR witness from the user's own game. help.shp-k0 FRAME SHIP stays
+gated on the user's OQ-005 ruling (DECISIONS.md D1).
+PRIOR-SESSION QUEUE: tPF-4 home planet table read; tPF-5 indicators; tPF-6
+orbital click + hover CPU; tPF-7 research controls; tPF-8 tree visibility;
+tPF-1b VENDOR day-20 repro (user-time-gated, D30; port soak REFUTED as
+evidence tPF-3c).
+STANDING: D28 file scratchpad/t433-build-feedback.txt is the item authority;
+refcap PNGs in scratchpad/; scratch savedir law; C1-C5 + race intro stay
+DEFERRED (D25); when a counter reads zero check PRODUCER EXISTENCE first
+(D29); POPUP/DERIVATION LAW (D30, binding): every visible property cited or
+named-open, no eyeballed geometry. NEVER read whole lines of
+work/r1/playcap/live-timeline.jsonl. NEW (tPF-3c, BINDING): the 433 composite
+planet-screen-iter-433-v-original.png is SIDE-BY-SIDE — LEFT = PORT (pixel-
+exact flat teal), RIGHT = VENDOR; NEVER cite left-half pixels as vendor
+evidence (the F6 retraction). Pixel discriminators on the vendor half must
+tolerate resampling (exact-conv counts are floors, families are the signal).
+
+tPF-3c LANDED 2026-11-25 (TINY FILL SHIPPED; F6 RETRACTED — 433 LEFT HALF IS
+THE PORT; Begin-path tPF-1b precondition FAILED; no OQ row closed — tPF tracks
+none, honest negative, open=[016,019] unchanged). PROVED
+(docs/re/_wip_tPF3.md F13/F14 + scripts/tPF3c_fill_census.py,
+tPF3c_fill_interior.py, tPF3c_solid_vs_hollow.py):
+ - STEP 1 (one grep, STOPPED per assignment): the port's Begin path builds
+   turn_==0 — campaign.h:850 `int turn_ = 0;`, sole increment campaign.cpp:2320
+   inside Campaign::advance(); main.cpp Begin apply (buildCampaign o,&err,
+   &newGame) sets stars/owners/gov ONLY. A port day-20 soak proves nothing
+   about the vendor exit -> tPF-1b stays a VENDOR-witness row (user-time, D30).
+ - STEP 2 F6 RETRACTED (major): the 433 "vendor refcap" is a SIDE-BY-SIDE;
+   per-half exact conv(150) census LEFT 34,194 px / RIGHT 555 px — an
+   upsampled composite CANNOT hold 34k exact palette values, and the left half
+   is the flat-teal opaque port view (vision-confirmed). tPF-3b's F6 fill
+   no-op "20,495 px" measured OUR OUTPUT, not the vendor. Geometry laws stand
+   (F7 used the unscaled vendor t254).
+ - VENDOR FILL LAW (vendor half pixels + filler 0x62d15 disasm 0x62d15..
+   0x63175): filler interior does screen := MAP[old screen byte], MAP =
+   [draw-ctx 0x4850c+0x14] (0x63015..0x63026) — a 256-entry colour
+   TRANSLATION (the semi-transparency mechanism; NO alpha arithmetic). Vendor
+   TINY diamonds are SOLID class colour (red blob 58 strong-red px / 73-cell
+   bbox diamond = 0.79, raw (188,44,17)==conv(117) family, field teal);
+   class-0 tiny stays hollow (pen-0 fill skips 0x3bd31/0x3be2a byte-consistent);
+   inset interiors modulated texture -> ramp table NOT recovered, named open.
+ - SHIPPED: planetview tileOverlaySolidFill(inset,cls)=!inset&&cls!=0 + ui.cpp
+   pass-3 tiny solid fill; stale F6 comment replaced. PIN tiny_fill_law_tpf3c,
+   suite 557/0/0, MUTATION 2/2 CAUGHT (drop class-0 skip -> 1 FAIL; invert law
+   -> 6 FAILs), restored green. WITNESS tPF3b_witness.sh re-run: tiny-path
+   class px 24->46 green / 72->138 blue / 121->231 white vs outline-only build,
+   black 395->395 (skip by design), RC=0. GATE_EXIT=0.
+ - STEP 3 per-cell inset/tiny CHOICE: honest negative — no same-planet vendor
+   capture, no ruling page; the choice law is byte-pinned (checker item-0xff
+   reduction), corroboration stays named-un-witnessed.
 
 tPF-3b LANDED 2026-11-25 (TILE OVERLAY + CB ANCHOR SHIPPED; F7 CLOSED;
 F5's barren gate REFUTED at bytes; no OQ row closed — tPF tracks none,

@@ -2459,12 +2459,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // extents 32,16), illegal -> TINY 12x6 (0x3bd4d, 6,3), lines
                     // in the class colour (pen EDI, F9 — NOT the 7/8/9/10/13 grey
                     // ramp, which is the filler state-block index only).
-                    // OUTLINE-ONLY: the polygon filler 0x62d15 reads a window-
-                    // runtime state block [0x48c33]+pen*0x100 whose contents are
-                    // UNRECOVERED (SEAM TPF3-B) and the vendor refcap interiors
-                    // are 20,495 px of EXACTLY conv(150) — zero class-blend px —
-                    // so the fill is a visual no-op at that state and no alpha
-                    // law is invented here. SEAM TPF3-A: the vendor gates the
+                    // FILL (tPF-3c F13, supersedes the tPF-3b "outline-only"
+                    // call): the polygon filler 0x62d15 translates screen
+                    // pixels through the draw-ctx 0x4850c+0x14 ramp (interior
+                    // 0x63015..); the ramp table is window-runtime and
+                    // UNRECOVERED (SEAM TPF3-B), and the tPF-3b "20,495 px of
+                    // conv(150)" census measured the PORT half of the 433
+                    // composite (F13 retraction). What the VENDOR half pins:
+                    // TINY diamonds solid class colour, class-0 never filled
+                    // (0x3bd31/0x3be2a pen-0 skip), inset modulated -> the
+                    // port fills tiny only (tileOverlaySolidFill) and leaves
+                    // the inset ramp open. SEAM TPF3-A: the vendor gates the
                     // whole pass on widget byte +0x18b bit0 (0x3bbc3, writer
                     // unrecovered); the port default is always-on.
                     for (int row = 0; row < 15; row++)
@@ -2481,8 +2486,22 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             SDL_SetRenderDrawColor(
                                 ren, (ea >> 16) & 0xFF, (ea >> 8) & 0xFF,
                                 ea & 0xFF, 255);
-                            const TileHalfExtents he = tileOverlayHalfExtents(
-                                tileOverlayInset(camp, planetStar, cell));
+                            const bool inset =
+                                tileOverlayInset(camp, planetStar, cell);
+                            const TileHalfExtents he =
+                                tileOverlayHalfExtents(inset);
+                            // tPF-3c F13 FILL: the vendor's TINY diamonds are
+                            // SOLID class colour on screen (filler 0x62d15 map
+                            // law, header planetview.h); the inset ramp stays
+                            // unrecovered -> outline-only there.
+                            if (tileOverlaySolidFill(inset, cls)) {
+                                for (int y = c.y - he.top; y <= c.y + he.bottom; ++y) {
+                                    const int dy = y < c.y ? c.y - y : y - c.y;
+                                    const int ht = he.top > 0 ? he.top : 1;
+                                    const int span = he.left * (ht - dy) / ht;
+                                    SDL_RenderDrawLine(ren, c.x - span, y, c.x + span, y);
+                                }
+                            }
                             SDL_RenderDrawLine(ren, c.x - he.left, c.y, c.x, c.y - he.top);
                             SDL_RenderDrawLine(ren, c.x, c.y - he.top, c.x + he.right, c.y);
                             SDL_RenderDrawLine(ren, c.x + he.right, c.y, c.x, c.y + he.bottom);

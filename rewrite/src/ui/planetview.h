@@ -289,6 +289,24 @@ bool tileOverlayInset(const ascend::game::Campaign& camp, int star, int cell);
 struct TileHalfExtents { int left, top, right, bottom; };
 TileHalfExtents tileOverlayHalfExtents(bool inset);
 
+// tPF-3c TPF3-B FILL LAW (tPF-3c, MEASURED on the VENDOR half of the 433
+// composite + the filler 0x62d15 internals). The vendor fill is a 256-entry
+// colour TRANSLATION of the pixels already on screen (filler interior
+// 0x63015..0x63026: screen byte := MAP[old byte], MAP = draw-ctx 0x4850c
+// +0x14) — the ramp TABLE itself is unrecovered (window-runtime), so the port
+// ships ONLY what the vendor pixels pin:
+//   TINY (illegal branch) with class != 0: interior SOLID class colour —
+//     red tiny bbox (1384,443)-(1400,451): 58 strong-red px inside a 73-cell
+//     bbox diamond (0.79), raw (188,44,17)/(175,47,22) == conv(117) family,
+//     field teal (16,64,72); blue/white tiny interiors likewise.
+//   TINY with class == 0: NEVER filled — both fill calls are skipped when the
+//     pen is 0 (inset 0x3bd31 'test di,di / je 0x3be53'; tiny 0x3be2a), and
+//     the vendor black tiny diamond's interior stays the dark field.
+//   INSET (legal branch): outline-only. The vendor inset interiors are
+//     modulated texture, not solid class px; the ramp that produces them is
+//     NOT recovered, and strict-close forbids inventing one.
+bool tileOverlaySolidFill(bool inset, int cellClass);
+
 // tPF-3b STRUCTURE-ART ANCHOR LAW (F4/F5 + tRSV1d research.md S8(h)). The
 // vendor blits tile structure art with the diamond's TOP VERTEX as the anchor
 // (0x3c13e/0x3c110 push esp+0x264 == the V0 y; the centre is V0 y+17) and the
