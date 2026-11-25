@@ -306,6 +306,50 @@ int orbitalSlotHitFor(int surfaceCells, Pt p) {
     return surfaceCells + k;
 }
 
+bool tileOverlayInset(const ascend::game::Campaign& camp, int star, int cell) {
+    // Item-0xff reduction of checker FUN_0003830c (see the header law block).
+    if (star < 0 || star >= int(camp.galaxy().stars.size())) return false;
+    const auto& ps = camp.planetAt(star);
+    const int surf = ps.surfaceCells;
+    if (cell < 0 || cell >= surf) return false;  // the painter only overlays
+                                                 // surface slots
+    // rule D 0x38519 with item != 38: rock vetoes.
+    if (cell < int(ps.cellClasses.size()) && (ps.cellClasses[size_t(cell)] & 8))
+        return false;
+    // active census (word+2 bit0 analog: the port stores ACTIVE items only).
+    std::vector<char> active(size_t(surf > 0 ? surf : 0), 0);
+    for (size_t i = 0; i < ps.items.size() && i < ps.itemCells.size(); ++i) {
+        const int c = ps.itemCells[i];
+        if (c >= 0 && c < surf) active[size_t(c)] = 1;
+    }
+    if (active[size_t(cell)]) return true;  // 0x385ee own-active SKIPS adjacency
+    // rule G: the four probes (row+-1, col+-1); ANY active neighbour exits
+    // without the 0x386fc veto => legal.
+    const auto& tt = camp.terrainTables();
+    const int size = ascend::game::Campaign::sizeClassFor(ps.surfaceCells);
+    if (size < 0) return false;
+    int row = 0, col = 0;
+    if (!gridRowCol(tt, size, surf, cell, &row, &col)) return false;
+    for (int d = 0; d < 4; ++d) {
+        const int r2 = row + (d == 0 ? 1 : d == 1 ? -1 : 0);
+        const int c2 = col + (d == 2 ? -1 : d == 3 ? 1 : 0);
+        const int nb = gridCellFor(tt, size, r2, c2);
+        if (nb >= 0 && nb < surf && active[size_t(nb)]) return true;
+    }
+    return false;  // 0x386fc xor edi,edi
+}
+
+TileHalfExtents tileOverlayHalfExtents(bool inset) {
+    // Deltas cited in the header; the full diamond is {34,17,34,17}.
+    return inset ? TileHalfExtents{32, 16, 32, 16} : TileHalfExtents{6, 3, 6, 3};
+}
+
+Pt structureBlitPos(Pt centre, int recLeft, int recTop) {
+    // Vendor anchor = diamond TOP VERTEX (centre - (0,17)); blitter adds the
+    // record signed bbox. Verbatim composition, no centring arithmetic.
+    return Pt{centre.x + recLeft, centre.y - 17 + recTop};
+}
+
 int orbitalSlotItem(const ascend::game::Campaign& camp, int star, int k) {
     if (star < 0 || star >= int(camp.galaxy().stars.size())) return -1;
     if (k < 0 || k >= kOrbitalSlots) return -1;

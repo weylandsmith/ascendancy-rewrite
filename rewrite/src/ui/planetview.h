@@ -263,4 +263,42 @@ bool orbitalHoverOutline(const ascend::game::Campaign& camp, int star,
 // The active item occupying ring cell (surfaceCells + k), or -1.
 int orbitalSlotItem(const ascend::game::Campaign& camp, int star, int k);
 
+// ---- tPF-3b TILE-OVERLAY LAW (docs/re/_wip_tPF3.md F8..F11) --------------
+// The surface painter's overlay pass calls the placement checker 0x3830c with
+// ITEM ARG 0xff (mov edx,0xff @0x3c2c7) and picks the diamond SIZE from the
+// return: -1 (legal) -> INSET half-extents (32,16) = 64x32 about the cell
+// centre (0x3bc5b: V0 y+1, V1 x-2, V2 y-1, V3 x+2); 0 -> TINY half-extents
+// (6,3) = 12x6 (0x3bd4d: y+14, x-28, y-14, x+28). With item 0xff the legs
+// reduce AT BYTES: rule B 0x38493 grants UNCONDITIONALLY (class==0 falls to
+// 0x384af `cmp dl,0xff` / 0x384b2 `je 0x384d6` GRANT), rule C 0x384db is
+// skipped (item >= 31), rule D 0x38519 vetoes ROCK, rule G 0x385b7..0x386fc
+// vets ALL-INACTIVE and skips the probe when the cell's own slot is ACTIVE.
+// => inset iff NOT rock AND (own slot active OR any ACTIVE 4-neighbour).
+// NOTE F5's "class==0 -> TINY always" is REFUTED by the 0x384af leg: barren
+// non-rock adjacent cells take the INSET branch too, drawn in black lines
+// (the pen EDI is 0 for class 0, F9).
+bool tileOverlayInset(const ascend::game::Campaign& camp, int star, int cell);
+
+// The overlay diamond's half-extents about the CELL CENTRE, read off the two
+// branch bodies as deltas from the full vertex table (esp+0x260..0x2a8, whose
+// vertices are centre +-{34} x, centre +-{17} y):
+//   INSET 0x3bc5b: V0 y+1, V1 x-2, V2 y-1, V3 x+2  -> {32,16,32,16}
+//   TINY  0x3bd4d: V0 y+14, V1 x-28, V2 y-14, V3 x+28 -> {6,3,6,3}
+// Both are strictly INSIDE the full (34,17) diamond on every side, which is
+// what "coloured squares ... SMALLER when not" (D28 P2) looks like on screen.
+struct TileHalfExtents { int left, top, right, bottom; };
+TileHalfExtents tileOverlayHalfExtents(bool inset);
+
+// tPF-3b STRUCTURE-ART ANCHOR LAW (F4/F5 + tRSV1d research.md S8(h)). The
+// vendor blits tile structure art with the diamond's TOP VERTEX as the anchor
+// (0x3c13e/0x3c110 push esp+0x264 == the V0 y; the centre is V0 y+17) and the
+// blitter composes dest = anchor + record signed bbox (FUN_0005caac). Port
+// tileCenter() returns the CENTRE, so:
+//     dest = (c.x + recLeft, c.y - 17 + recTop)
+// Measured planitem.shp (extracted/ascend01/data, bbox-diff law shp.cpp:159):
+// surface items 0..21 are ALL left=-34 with top in {-1..-18} (rec0 Colony Base
+// -34,-9 H=43) -- the port's previous (c.x-w/2, c.y-h/2) centring was 5 px LOW
+// for the CB and wrong per-record for every tall item (D28 P7).
+Pt structureBlitPos(Pt centre, int recLeft, int recTop);
+
 }  // namespace ascend::ui

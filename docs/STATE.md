@@ -233,27 +233,28 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-3b TILE-OVERLAY PORT + CB ANCHOR SHIP (law docs/re/_wip_tPF3.md
-F1-F7, INTACT — do NOT re-derive). ORDER: (1) RESOLVE F7 FIRST (boundary-
-vs-inset witness conflict named in tPF-3's landing); (2) port the overlay
-law: inset diamond 64x31 (2px in, 0x3bc5b vertex table) iff NOT rock AND
-(own-active OR active-4-neighbour), else TINY 12x6 (0x3bd4d); colour di
-class table 0->black/2->117/3->146/4->255/else 12 white; keyed on checker
-0x3830c RETURN WITH ITEM ARG 0xff (mov edx,0xff @0x3c2c7); OUTLINE-ONLY
-(port seam TPF3-B: fill alpha law NOT recovered, refcap doesn't constrain
-it — fill is a visual no-op at 20,495 px conv(150) census); (3) CB ANCHOR:
-blit = diamond TOP-VERTEX + signed bbox (planitem L=-34, T{-1..-18}) — the
-port is currently 5px LOW; fix + pin + witness.
-RATIONALE: tPF-2d (this session) CLOSED the popup law family (buttons,
-band geometry, labels, frame identity) and shipped it; tPF-3b was the
-prior assignment, untouched, law fully banked. The two owed follow-ups
-from tPF-2d are SMALL and fold into later queue rows, not a dedicated
-session: PLANLIST paint case-bodies via FALLTHROUGH WALK 0x3cca4..0x3d1bc
-(no jump table — D10 proved cs:[0x27fe8] is statically+runtime invisible;
-walk the sequential blocks) belongs with tPF-4 list work; help.shp-k0 FRAME
-SHIP is GATED on the user's OQ-005 ruling (DECISIONS.md D1) — do not ship
-shape art before that ruling.
-PRIOR-SESSION QUEUE (tPF-3b now = the NEXT ACTION above):
+NEXT tPF-3c OVERLAY FILL + PER-CELL VERDICT (law docs/re/_wip_tPF3.md
+F1-F12, INTACT — do NOT re-derive). ORDER: (1) FIRST one grep of the Begin
+path for whether Begin-built boots turns!=0 (tPF-1b precondition, one probe,
+then STOP if it fails — the soak is user-time-gated anyway); (2) the overlay
+FILL seam TPF3-B: the polygon filler 0x62d15 reads a window-runtime state
+block [0x48c33]+pen*0x100 whose contents are unrecovered — the F6 census says
+the vendor interior is 20,495 px of EXACTLY conv(150), so the fill is a no-op
+at that state: PROVE the no-op claim holds for a NON-teal cell too (one
+refcap with a red/green class cell interior), else name the alpha law open;
+(3) WITNESS the per-cell inset/tiny CHOICE against a vendor capture (needs a
+D28 user ruling page or a capture of the same planet — if neither exists,
+record the honest negative and keep the choice un-witnessed; the legality LAW
+is already byte-pinned, so this is corroboration, not a blocker).
+RATIONALE: tPF-3b (this session) SHIPPED the overlay geometry+legality and
+the anchor law with 5 pins + 4/4 mutations + a control-isolated witness, so
+what remains on the tile-overlay family is exactly the two named seams
+(TPF3-A widget byte +0x18b gate writer, TPF3-B fill state block) and the
+per-cell corroboration. Do NOT start tPF-4 PLANLIST case-bodies here: it is
+a list-work session (fallthrough walk 0x3cca4..0x3d1bc, D10) and mixing it in
+burns the context budget mid-walk. help.shp-k0 FRAME SHIP stays gated on the
+user's OQ-005 ruling (DECISIONS.md D1).
+PRIOR-SESSION QUEUE (tPF-3c now = the NEXT ACTION above):
 tPF-4 home planet table read; tPF-5 indicators; tPF-6 orbital click +
 hover CPU; tPF-7 research controls; tPF-8 tree visibility; tPF-1b
 begin-built day-20 soak (D30 — user denied --campaign; his game is
@@ -264,6 +265,58 @@ authority; refcap PNGs in scratchpad/; scratch savedir law; C1-C5 +
 race intro stay DEFERRED (D25); when a counter reads zero check
 PRODUCER EXISTENCE first (D29); POPUP/DERIVATION LAW (D30, binding):
 every visible property cited or named-open, no eyeballed geometry.
+NEW STANDING (tPF-3b): NEVER read whole lines of
+work/r1/playcap/live-timeline.jsonl (10 GB; one tail -3 cost ~30k tokens) —
+use scripts/r1_t85g_sitting.py or jq with keys only. Pixel geometry probes
+must use the UNSCALED capture work/r1/screens/t254/02_planet_detail.png (the
+resampled composites in scratchpad/ destroy 1px palette-exact lines), and
+must DISCRIMINATE with a disjoint-sample/disjoint-geometry comparison plus a
+density-matched control — the tplv1 witness's any-hit-per-edge scorer
+collapses to ~1 px per edge group and is NOT a per-pixel fit.
+
+tPF-3b LANDED 2026-11-25 (TILE OVERLAY + CB ANCHOR SHIPPED; F7 CLOSED;
+F5's barren gate REFUTED at bytes; no OQ row closed — tPF tracks none,
+honest negative, open=[016,019] unchanged). PROVED
+(docs/re/_wip_tPF3.md F8-F12 + work/tPF3b_inset.asm, work/tPF3b_5bf71_census.txt):
+ - F7 WITNESS CONFLICT CLOSED, DECISIVE: on the unscaled vendor capture
+   t254/02_planet_detail.png at the witness's own fit (law tileCenter, size 0,
+   dx=-23, dy=48), a DISJOINT-GEOMETRY test scores the FULL-boundary diamond
+   28/28 edge groups vs the 2px-INSET diamond 3/28 on the SAME white mask, with
+   a density-matched scatter control at 0/28 — the 3/28 IS the control, so
+   scoring 100% is not automatic. The vendor's visible grid lines ARE at the
+   full lattice boundary; the vendor's inset branch is an OVERLAY, not a
+   replacement. Hypothesis (b) (a separate full-size line pass outside the
+   0x3bc5b/0x3bd4d branches) REFUTED by callsite census: the painter has
+   exactly THREE 0x5bf71 sites (0x3bd1d inset, 0x3be13 tiny, 0x3bec4 hover-full
+   pal 150).
+ - F9 PEN IDENTITY AT BYTES: 0x3bcd7 `mov ax,di / push eax` — the LINE colour
+   is the CLASS colour (EDI = 0/117/146/255/12 table); the 7/8/9/10/13 ramp at
+   esp+0x364 is the polygon FILLER state-block index only. F1/F3-F6 resolved
+   in favour of class-coloured lines.
+ - F10 RULE B GRANTS UNCONDITIONALLY FOR ITEM 0xff (0x384af `cmp dl,0xff` /
+   je 0x384d6 precedes any class test; rule C skipped since item>=31). So
+   BARREN (class 0) non-rock adjacent cells take the INSET overlay drawn in
+   BLACK lines. tPF-3's F5 "class==0 -> TINY always" is REFUTED. Rock still
+   vetoes (0x38519, item != 38) and the own-active slot skips adjacency
+   (0x385ee).
+ - SHIPPED CODE: planetview tileOverlayHalfExtents {32,16,32,16}/{6,3,6,3},
+   tileOverlayInset (item-0xff checker reduction), structureBlitPos =
+   (centre.x+L, centre.y-17+T); ui.cpp pass 3 ADDED (full-boundary pass 2
+   RETAINED per F11 — tPF-3's plan to REPLACE it is superseded) and the
+   invented (w/2,h/2) tile-art centring removed (CB was 5 px low, D28 P7).
+   planitem.shp bbox census re-measured through the port's own loader: records
+   0..21 all left=-34, top in {-1..-18}, rec0 -34/-9/H=43 (4 records at
+   left=-35, named).
+ - PINS 5 (tests/test_tileoverlay_tpf3b.cpp), suite 556/0/0, MUTATION 4/4
+   CAUGHT (anchor offset, refuted barren gate re-inserted, tiny bottom extent,
+   rock veto dropped), tree restored green each time.
+ - WITNESS scripts/tPF3b_witness.sh + tPF3b_overlay_measure.py, CONTROL-BUILT:
+   class-colour px on the TINY (6x3) paths OFF the full lattice — shipped
+   green 24 / blue 72 / white 121 vs control (overlay forced to full boundary)
+   0 / 0 / 1; black 395 vs 323 is sprite-art-confounded and NOT claimed.
+   Per-cell inset/tiny CHOICE remains UN-witnessed against the vendor (no
+   same-planet capture) and the FILL stays unpainted (seam TPF3-B): both named,
+   neither claimed.
 
 tPF-2d LANDED 2026-11-25 (POPUP LAW SHIPPED: BUTTON ARRAY + BAND + LABELS
 + FRAME IDENTITY; 4 of 5 steps CLOSED, 1 named-open; no OQ row closed —

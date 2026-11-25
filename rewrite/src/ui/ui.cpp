@@ -2425,6 +2425,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // PASS 2: class-coloured diamond outlines — painted AFTER
                     // all fills so shared edges stay visible (vendor witness:
                     // t254 tiles carry white conv(12) edge px over the fill).
+                    // tPF-3b F11 KEPT this pass (it was nearly deleted on tPF-3's
+                    // F5 reading): the disjoint-sample pixel test on the UNSCALED
+                    // vendor capture scores the FULL-boundary geometry 28/28 edge
+                    // groups and the 2px-INSET geometry 3/28 on the SAME mask and
+                    // the SAME lattice fit, with a density-matched scatter control
+                    // at 0/28 (scripts/_tpf3b_f7_control.py). The vendor's visible
+                    // grid lines ARE at the full boundary.
                     for (int row = 0; row < 15; row++)
                         for (int col = ptt.rowOffset[psize][row];
                              col < ptt.rowOffset[psize][row] +
@@ -2444,6 +2451,43 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             SDL_RenderDrawLine(ren, c.x + 34, c.y, c.x, c.y + 17);
                             SDL_RenderDrawLine(ren, c.x, c.y + 17, c.x - 34, c.y);
                         }
+                    // PASS 3: tPF-3b THE TILE OVERLAY (D28 P2 "coloured squares
+                    // when adjacent to a structure, SMALLER when not"). The
+                    // vendor's overlay pass calls the placement checker with
+                    // ITEM ARG 0xff (mov edx,0xff @0x3c2c7) and picks the SIZE
+                    // from the return: legal -> INSET 64x32 (0x3bc5b, half-
+                    // extents 32,16), illegal -> TINY 12x6 (0x3bd4d, 6,3), lines
+                    // in the class colour (pen EDI, F9 — NOT the 7/8/9/10/13 grey
+                    // ramp, which is the filler state-block index only).
+                    // OUTLINE-ONLY: the polygon filler 0x62d15 reads a window-
+                    // runtime state block [0x48c33]+pen*0x100 whose contents are
+                    // UNRECOVERED (SEAM TPF3-B) and the vendor refcap interiors
+                    // are 20,495 px of EXACTLY conv(150) — zero class-blend px —
+                    // so the fill is a visual no-op at that state and no alpha
+                    // law is invented here. SEAM TPF3-A: the vendor gates the
+                    // whole pass on widget byte +0x18b bit0 (0x3bbc3, writer
+                    // unrecovered); the port default is always-on.
+                    for (int row = 0; row < 15; row++)
+                        for (int col = ptt.rowOffset[psize][row];
+                             col < ptt.rowOffset[psize][row] +
+                                   ptt.rowWidth[psize][row]; col++) {
+                            const int cell = gridCellFor(ptt, psize, row, col);
+                            if (cell < 0) continue;
+                            const Pt c = tileCenter(psize, row, col);
+                            const int cls = cell < int(psv.cellClasses.size())
+                                                ? psv.cellClasses[cell] : 1;
+                            const uint32_t ea = chromePaletteArgb(
+                                tileEdgePaletteIndex(cls));
+                            SDL_SetRenderDrawColor(
+                                ren, (ea >> 16) & 0xFF, (ea >> 8) & 0xFF,
+                                ea & 0xFF, 255);
+                            const TileHalfExtents he = tileOverlayHalfExtents(
+                                tileOverlayInset(camp, planetStar, cell));
+                            SDL_RenderDrawLine(ren, c.x - he.left, c.y, c.x, c.y - he.top);
+                            SDL_RenderDrawLine(ren, c.x, c.y - he.top, c.x + he.right, c.y);
+                            SDL_RenderDrawLine(ren, c.x + he.right, c.y, c.x, c.y + he.bottom);
+                            SDL_RenderDrawLine(ren, c.x, c.y + he.bottom, c.x - he.left, c.y);
+                        }
                     // Structure art ON the tiles (F5: planitem record index
                     // == itemIdx, 1:1 pixel-match law shp.md S23.4).
                     if (planitemLib.count() == 40)
@@ -2458,9 +2502,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             if (item < 0 || item >= 40) continue;
                             const Pt c = tileCenter(psize, row, col);
                             const auto& sr = planitemLib.record(item);
-                            blitShape(ren, planitemLib, item,
-                                      c.x - int(sr.width) / 2,
-                                      c.y - int(sr.height) / 2);
+                            // tPF-3b ANCHOR LAW (F4/F5 + tRSV1d S8(h)): the
+                            // vendor passes the diamond TOP VERTEX (0x3c13e
+                            // pushes esp+0x264 == V0 y; the centre is V0 y+17)
+                            // and the blitter composes dest = anchor + record
+                            // signed bbox. Measured planitem.shp bboxes are NOT
+                            // symmetric (surface items 0..21 all left=-34, top
+                            // in {-1..-18}; CB rec0 = -34,-9 H=43), so the old
+                            // (w/2, h/2) centring sat 5 px LOW for the CB and
+                            // wrong per-record for every tall item (D28 P7).
+                            const Pt d = structureBlitPos(c, sr.left, sr.top);
+                            blitShape(ren, planitemLib, item, d.x, d.y);
                         }
                     // Selected tile: bright outline (port affordance — the
                     // vendor PLSQUARE cell-select, ln1520).
