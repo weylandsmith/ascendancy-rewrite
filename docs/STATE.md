@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-25T03:55
+updated: 2026-11-25T06:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,29 +233,26 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-2b SQUARE-POPUP LIVE WITNESS + LIST ART (finish what tPF-2
-started — code+pins LANDED, the scripted walkthrough was NEVER
-witnessed): run scripts/tPF2_witness.sh (docs/re/_wip_tPF2.md F5 has the
-failure analysis: app reached planet view, probe clicks never produced a
-'ui planet tile' line, Xvfb died mid-run — suspect first-click racing the
-screen swap and/or the winpos/import path). PASS = app.log shows a tile
-select with BUILD, a 'ui planet popup build cell N', a PLANLIST pick
-'ordered armed cell N', and an OK dismiss; shots popup-build/popup-ok
-visually match the D28 refcaps (title + body + button strip). THEN the
-remaining tPF-2 refcap delta: PLANLIST rows need ART NEXT TO NAME + teal
-selected row + scroll arrows (refcap original-planet-screen-build-list.png;
-planitemLib already loaded in ui.cpp — blit record == itemIdx per the
-t428 1:1 law). Budget <=2.
-RATIONALE for ordering: tPF-2's law+port+pins are done (545/0); an
-unwitnessed UI chain is not closed under this project's standards, and
-the witness is the cheapest remaining step before tPF-3. The rest of the
-phase-19 queue stands:
-THEN tPF-3 TILE OVERLAY + BASE (D28 P2/P6): overlays are SEMI-
+NEXT tPF-3 TILE OVERLAY + BASE (D28 P2/P6): overlays are SEMI-
 TRANSPARENT colored squares, SMALLER when not adjacent (refcap
 planet-screen-iter-433-v-original.png — ours opaque; derive alpha +
-both sizes + per-class colors from vendor paint fn); colony-base art
-misaligned since lattice fix — re-anchor to the corrected
-(410+34*(col-row),127+17*(col+row)) center law. Budget <=2.
+both sizes + per-class colors from vendor paint fn 0x3bbd6..0x3bc52
+family in work/ascend_restored.bin); colony-base art misaligned since
+the tPL-V1 lattice fix — re-anchor to the corrected
+(410+34*(col-row),127+17*(col+row)) center law (the tile blit at
+ui.cpp structure-art pass uses tileCenter directly; check the CB
+record's own anchor offset vs the diamond centre). Budget <=2.
+RATIONALE for ordering: tPF-2 is now FULLY CLOSED (law+port+pins+
+LIVE WITNESS+refcap art, this iteration) — the phase-19 queue advances
+in order. tPF-3 is next in D28 and shares the planet-view paint code
+just touched, so the working context is warm.
+WITNESS-HARNESS LESSON CARRIED: probe scripts must enumerate REAL
+cell centres from the planitem.txt B/C grids (never offsets around
+tileCenter(0,0) — size-2's rows 0..3 are EMPTY); scripts/
+tPF2_witness.sh embeds the working enumeration; reuse it for tPF-3/5/6
+planet-view witnesses. xsend's "window died before release" is BENIGN
+(prints on every click); "X connection broken" at the log tail is our
+own PID kill.
 THEN tPF-4 HOME PLANET TABLE READ (D28 P1): Chamachi must be LARGE
 CATHEDRAL, ours gives medium eden — tPL-D1 found the per-spec tables
 (payload 0x88f90/0x88fe4, 85 homes x 26 lineages) but the READ/INDEX
@@ -293,6 +290,37 @@ scratchpad/; production ring needs t439 recovery before live witness
 intro stay DEFERRED (D25); when a counter reads zero check PRODUCER
 EXISTENCE first (D29).
 
+tPF-2b LANDED 2026-11-25 (SQUARE-POPUP LIVE WITNESS PASS + PLANLIST
+ART/TEAL/ARROWS — tPF-2 NOW FULLY CLOSED; no OQ row touched — tPF
+tracks none, honest negative under strict-close; open=[016,019]
+unchanged). PROVED (docs/re/_wip_tPF2.md F6-F8):
+ - ATTEMPT-1 ROOT CAUSE MEASURED: probe clicked around tileCenter(0,0)=
+   (410,127); size-2's grid has ZERO cells in rows 0..3 (planitem.txt
+   B/C tokens, centres y 212..382) — all 15 probes missed, NOT an app
+   bug or X race. Fixed probe enumerates REAL cell centres keyed off
+   the app's own home-cb size line + need() navigation guard.
+ - WITNESS PASS (seed 5, /tmp/tpf2_shots): tile 2 "White Square OK" /
+   tile 5 "Black Square BUILD" -> 'ui planet popup build cell 5' ->
+   list pick -> 'ordered armed cell 5' (Factory art lands on cell 5
+   next to Colony Base, PLBUILD shows Factory) -> popup ok; shots
+   vision-checked against D28 P3/P5 refcaps (title+body+Build|Cancel /
+   OK law holds verbatim).
+ - PLANLIST ART (refcap original-planet-screen-build-list.png
+   MEASURED): pitch 72 logical (60px @0.825 scale), 4 visible rows,
+   planitemLib record==itemIdx art thumb LEFT + name right (cost
+   column DELETED — none in refcap), TEAL band rgb(16,69,77) on hover
+   row (new SDL_MOUSEMOTION->projectHover) or committed pick, framed
+   vector up/down arrows at x482 owning the right edge (projectRowFor
+   refuses x>=482); click arms scroll projectFirst clamped n-4.
+   MUTATION CAUGHT BY WITNESS: first arrow draft drew both boxes
+   v-shaped — zoomed vision check caught, fixed, re-ran.
+ - PINS squarepopup_planlist_geometry_tpf2b; suite 545->546/0/0;
+   witness run3 logs scroll down 1/up 0 + full chain. GATE_EXIT=0,
+   LEDGER AUDIT OK.
+ - SITTING CHECK re-ran FIRST (r1_t85g_sitting RC=0, work/r1/
+   tPF2b_sitting.out): byte-identical to tPF2_pre_sitting.out apart
+   from the path line — the growing timeline is the watcher's own
+   rewrites, no user sitting; assignment stood.
 tPF-2 LANDED 2026-11-25 (SQUARE-INFO POPUP LAW + PORT + PINS; LIVE
 WITNESS OWED as tPF-2b; no OQ row touched — tPF tracks none, honest
 negative under strict-close; open=[016,019] unchanged). PROVED

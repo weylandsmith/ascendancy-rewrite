@@ -180,3 +180,33 @@ TEST(square_popup_button_law_tpf2) {
     CHECK(si.buildable);
     CHECK(si.lines.size() == 2);
 }
+
+// tPF-2b PLANLIST GEOMETRY pins (refcap scratchpad/original-planet-screen-
+// build-list.png MEASURED; docs/re/_wip_tPF2.md F7): row pitch 72 logical,
+// 4 visible rows, the arrow column (x >= kProjectArrowUpRect.x0) owns the
+// right edge and NO row hits there; arrows are disjoint and inside the
+// list rect; the `first` scroll offset threads through both arrows' clamp
+// law (maxFirst = n - visible).
+TEST(squarepopup_planlist_geometry_tpf2b) {
+    const auto& r = au::kProjectListRect;
+    CHECK(au::kProjectRowPitch == 72);
+    CHECK(au::kProjectVisibleRows == 4);
+    // A row never extends under the arrow column.
+    CHECK(au::projectRowFor(au::Pt{au::kProjectArrowUpRect.x0, 200}, 0) ==
+          std::nullopt);
+    CHECK(au::projectRowFor(au::Pt{au::kProjectArrowUpRect.x0 - 1, 200}, 0)
+              .has_value());
+    // Row 3 (last visible) hit; one pitch past it -> none.
+    CHECK(au::projectRowFor(au::Pt{200, r.y0 + 2 + 3 * 72}, 0).value_or(-9) ==
+          3);
+    CHECK(au::projectRowFor(au::Pt{200, r.y0 + 2 + 4 * 72}, 0) ==
+          std::nullopt);
+    // Arrows: inside the list rect, disjoint, up above down.
+    CHECK(au::kProjectArrowUpRect.x1 <= r.x1 &&
+          au::kProjectArrowDownRect.x1 <= r.x1);
+    CHECK(au::kProjectArrowUpRect.y1 < au::kProjectArrowDownRect.y0);
+    CHECK(au::kProjectArrowUpRect.y0 >= r.y0 &&
+          au::kProjectArrowDownRect.y1 <= r.y1);
+    // Scroll offset threads: first=1 maps top row -> option 1.
+    CHECK(au::projectRowFor(au::Pt{200, r.y0 + 2}, 1).value_or(-9) == 1);
+}

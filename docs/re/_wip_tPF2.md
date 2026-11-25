@@ -171,3 +171,67 @@ t333 (2)/(4) laws; the refcaps are the live witness.
   button-set gate, verbatim strings. Witness: scripted walkthrough both
   paths (adjacent => Build/Cancel lines + order lands; non-adjacent =>
   OK only).
+
+## F6 — tPF-2b LIVE WITNESS PASS (2026-11-25, attempt 3)
+- ATTEMPT-1 ROOT CAUSE (MEASURED): the probe loop walked offsets around
+  tileCenter(size,row=0,col=0)=(410,127). For size class 2 the vendor grid
+  (planitem.txt B/C tokens, economy.cpp tok 45..194) has ZERO valid cells
+  in rows 0..3 — C[size2]=rows4..10 (1 4 4 5 4 4 1), centres y 212..382.
+  All 15 probes hit empty space -> tileHitFor -1 -> zero 'ui planet tile'
+  lines. NOT an app bug, NOT an X race: the app stayed alive the whole
+  time ("X connection broken" = our own kill at script end; xsend's
+  "window died before release" is a benign artifact of its press/release
+  loop — it prints for EVERY click).
+- FIX: probe enumerates REAL cell centres from the B/C tables (embedded in
+  scripts/tPF2_witness.sh) keyed off the app's own 'home-cb ... size S'
+  line; plus a need() guard that fails loud if navigation doesn't land.
+- WITNESS LOG (seed 5, /tmp/tpf2_shots/app.log):
+    tile 2 (White Square OK) / tile 5 (Black Square BUILD)
+    'ui planet popup build cell 5' -> PLANLIST open -> row 0 pick
+    'ui planet project Amoroso I Factory (ordered armed cell 5)'
+    re-click tile 2 -> 'ui planet popup ok'
+- SHOTS (vision-checked): popup-build.png = "Black Square"/"Black squares
+  are uninhabitable.  Most structures cannot be built on them." + Build |
+  Cancel strip, white outline on the selected tile; popup-ok.png = "White
+  Square"/#91 text + centred OK; after-pick.png = NO popup + Factory art
+  on cell 5 next to Colony Base + PLBUILD panel shows "Factory".
+  MATCHES the D28 P3/P5 refcaps (title+body+button strip law).
+- VERDICT tPF-2 chain: WITNESSED PASS.
+
+## F7 — PLANLIST ART DELTA (tPF-2 remainder) — refcap measured
+- scratchpad/original-planet-screen-build-list.png (vision oracle):
+  * each row = isometric ART thumb (planitemLib record, same art as the
+    tile blit) at LEFT, name text to its right, NO cost column visible;
+  * SELECTED row = TEAL full-width band (Factory top row in refcap);
+  * SCROLL ARROWS: up/down buttons at the RIGHT edge (up at list top,
+    down at list bottom), mineral-framed triangles in small boxes;
+  * rows are widely spaced (~60px pitch, 4 visible in the refcap window
+    which spans roughly the PLBUILD column area) — our 24px pitch and
+    12 rows is a PORT default seam (planetview.h kProjectRowPitch).
+- ours (list-open.png): text-only rows "Name   cost N", no art, no teal,
+  no arrows. planitemLib is already loaded in ui.cpp (tile art) — blit
+  record == itemIdx per the t428 1:1 law.
+
+## F8 — PLANLIST ART LANDED + WITNESSED (tPF-2b close, 2026-11-25)
+- PORT (planetview.h/.cpp + ui.cpp): row pitch 24->72, visible 12->4
+  (refcap-measured, F7); arrow column x>=482 owns the right edge
+  (projectRowFor refuses there); rows paint planitemLib record==itemIdx
+  art thumb left + name right, cost column DELETED (none in refcap);
+  TEAL band rgb(16,69,77) (refcap-measured over navy rgb(12,32,48)) on
+  the hover row (SDL_MOUSEMOTION -> projectHover) or the committed pick;
+  framed up/down vector arrows (t407 precedent) at (482,125..157)/(482,
+  388..420); click arms scroll projectFirst +-1 clamped to n-4.
+- MUTATION CAUGHT BY THE WITNESS: first arrow draft drew BOTH boxes
+  v-shaped (widen-with-y in both branches inverted the up triangle);
+  zoomed vision check caught it, fix = narrow-at-pointed-end, re-ran.
+- WITNESS run3 (seed 5): full chain + 'project-list scroll down 1' +
+  'scroll up 0' + ordered armed cell 5 + popup ok; shots list-hover.png
+  (art + teal band row 1 + arrows) and list-scrolled.png (rows 1..4);
+  arrow zooms confirm up-triangle up, down-triangle down.
+- PINS: squarepopup_planlist_geometry_tpf2b (pitch/visible/arrow-column/
+  disjointness/first-thread). Suite 545 -> 546/0/0.
+- tPF-2 FULLY CLOSED (law+port+pins+WITNESS+refcap art). Remaining
+  honest seams: selected-row band colour is the MEASURED rgb but the
+  vendor's selection-vs-hover distinction is unrecovered (port bands
+  both); arrow chrome is vector (no vendor arrow art identified); row
+  pitch 72 is a single-refcap measurement (one capture scale 0.825).

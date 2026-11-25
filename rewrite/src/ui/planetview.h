@@ -105,9 +105,20 @@ bool projectOrderable(const ascend::game::Campaign& camp, int star, int item);
 
 // ---- the project-list window (PLANLIST rect, verbatim ln1504) --------------
 inline constexpr Rect kProjectListRect{120, 120, 520, 420};
-inline constexpr int kProjectRowPitch = 24;  // PORT default (no vendor row
-                                             // pitch witness; named seam)
-inline constexpr int kProjectVisibleRows = 12;  // (420-120)/24 rounded down
+// tPF-2b ROW GEOMETRY (refcap scratchpad/original-planet-screen-build-list.png
+// MEASURED): capture scale 0.825 (window 90..419 x 100..352 px == the 400x300
+// logical rect); rows = isometric ART thumb left + name right, NO cost column;
+// selected/hovered row = full-width TEAL band (measured band y110..170 ==
+// 60px == one row pitch); row pitch 60/0.825 ~= 72 logical; 4 rows visible.
+// The t406 "24 px PORT default" is SUPERSEDED by this refcap measurement.
+inline constexpr int kProjectRowPitch = 72;
+inline constexpr int kProjectVisibleRows = 4;  // (300-4)/72
+// tPF-2b SCROLL ARROWS (refcap: small framed up/down triangles at the RIGHT
+// edge, up at the list top, down at the bottom; measured x388..417 -> logical
+// ~482..517, up y~104..130 -> ~125..157, down y~325..350 -> ~394..424).
+// PORT vector chrome (t407 fleet-arrow precedent: honest vectors, no art).
+inline constexpr Rect kProjectArrowUpRect{482, 125, 517, 157};
+inline constexpr Rect kProjectArrowDownRect{482, 388, 517, 420};
 // Which option row owns point p within the list (0-based over the visible
 // window starting at `first`); nullopt outside the rect/rows.
 std::optional<int> projectRowFor(Pt p, int first);

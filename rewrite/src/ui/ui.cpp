@@ -195,6 +195,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     int planetStar = -1;
     std::string planetName;
     bool projectOpen = false;
+    // tPF-2b PLANLIST SCROLL + HOVER state (refcap
+    // original-planet-screen-build-list.png: 4 rows visible, framed
+    // up/down arrows at the right edge, teal band on the row under the
+    // cursor). PORT law (fleetlist t407 precedent): arrows scroll the
+    // first-visible index, hover paints the band; click law unchanged.
+    int projectFirst = 0;
+    int projectHover = -1;
     // t418b SURFACE TILE GRID session state: the tile the player selected
     // (surface cell index into planetAt(planetStar); -1 = none). The vendor
     // PLSQUARE child (windows.txt ln1520) takes the cell click as the build
@@ -654,6 +661,19 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     std::printf("ui save seam: no campaign writer (t382)\n");
                     std::fflush(stdout);
                 }
+            } else if (ev.type == SDL_MOUSEMOTION) {
+                // tPF-2b PLANLIST HOVER (refcap build-list: the row under
+                // the cursor carries the teal band). Motion ONLY touches
+                // the hover index — nothing else repaints differently, so
+                // this stays cheap (tPF-6 CPU lesson).
+                if (screen == kScreenPlanet && projectOpen) {
+                    const auto r = projectRowFor(Pt{ev.motion.x, ev.motion.y},
+                                                 projectFirst);
+                    const int h = r.has_value() ? *r : -1;
+                    if (h != projectHover) projectHover = h;
+                } else if (projectHover != -1) {
+                    projectHover = -1;
+                }
             } else if (ev.type == SDL_MOUSEBUTTONDOWN && ev.button.button == SDL_BUTTON_LEFT) {
                 Pt p{ev.button.x, ev.button.y};
                 if (abilityOpen) {
@@ -937,7 +957,28 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     }
                     std::fflush(stdout);
                 } else if (screen == kScreenPlanet && projectOpen &&
-                           projectRowFor(p, 0)) {
+                           inRect(kProjectArrowUpRect, p)) {
+                    // tPF-2b SCROLL ARROW (refcap up-triangle at the list
+                    // top-right): one row up, clamped.
+                    projectFirst = std::max(0, projectFirst - 1);
+                    std::printf("ui planet project-list scroll up %d\n",
+                                projectFirst);
+                    std::fflush(stdout);
+                } else if (screen == kScreenPlanet && projectOpen &&
+                           inRect(kProjectArrowDownRect, p)) {
+                    // tPF-2b SCROLL ARROW (refcap down-triangle bottom-
+                    // right): one row down, clamped to keep a full page
+                    // (or the whole list if shorter).
+                    const int n = int(projectOptionsFor(camp, planetStar)
+                                          .size());
+                    const int maxFirst =
+                        std::max(0, n - kProjectVisibleRows);
+                    projectFirst = std::min(maxFirst, projectFirst + 1);
+                    std::printf("ui planet project-list scroll down %d\n",
+                                projectFirst);
+                    std::fflush(stdout);
+                } else if (screen == kScreenPlanet && projectOpen &&
+                           projectRowFor(p, projectFirst)) {
                     // tPL-B1b STEP 1 (msg 0x1c02 shape, branch 0x3b50e): a
                     // PLANLIST row click SETS the pick (rec+0xb2 analog) and
                     // closes the list — NO order lands yet (F1: the order is
@@ -948,7 +989,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // too, and orders them here when clicked on PLBUILD
                     // territory — honest simplification, pinned in the unit
                     // suite via ordersWithoutCell.
-                    const int row = *projectRowFor(p, 0);
+                    const int row = *projectRowFor(p, projectFirst);
                     const auto opts = projectOptionsFor(camp, planetStar);
                     if (row >= 0 && row < int(opts.size())) {
                         planetPick = opts[row].item;
@@ -2477,6 +2518,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 if (projectOpen) {
                     // PLANLIST (120,120-520,420) over the field: the
                     // REQUIRES-gated options in table order.
+                    // tPF-2b ROW ART (D28 build-list refcap MEASURED): each
+                    // row = isometric ART thumb (planitemLib record == item,
+                    // the t428 1:1 law) at LEFT + name text right, NO cost
+                    // column; the row under the cursor carries a full-width
+                    // TEAL band (measured rgb(16,69,77) over the navy field
+                    // rgb(12,32,48)); framed up/down ARROWS own the right
+                    // edge. Pitch 72 logical (60 px capture at 0.825 scale).
                     const auto& lr = kProjectListRect;
                     SDL_Rect lb{lr.x0, lr.y0, lr.x1 - lr.x0 + 1,
                                 lr.y1 - lr.y0 + 1};
@@ -2485,23 +2533,73 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
                     SDL_RenderDrawRect(ren, &lb);
                     const auto opts = projectOptionsFor(camp, planetStar);
-                    for (size_t oi = 0; oi < opts.size() &&
-                                      int(oi) < kProjectVisibleRows; oi++) {
-                        const int ry = lr.y0 + 2 + int(oi) * kProjectRowPitch;
+                    const int rowsX1 = kProjectArrowUpRect.x0;  // band width
+                    for (int oi = projectFirst;
+                         oi < int(opts.size()) &&
+                         oi < projectFirst + kProjectVisibleRows; oi++) {
+                        const int slot = oi - projectFirst;
+                        const int ry = lr.y0 + 2 + slot * kProjectRowPitch;
                         const bool ok = projectOrderable(camp, planetStar,
                                                          opts[oi].item);
+                        // TEAL BAND: hover row (refcap) or the committed
+                        // pick (the port keeps the pick visible too — the
+                        // refcap's band IS on the row the cursor holds).
+                        if (oi == projectHover ||
+                            opts[oi].item == planetPick) {
+                            SDL_Rect band{lr.x0 + 2, ry,
+                                          rowsX1 - lr.x0 - 3,
+                                          kProjectRowPitch};
+                            SDL_SetRenderDrawColor(ren, 16, 69, 77, 255);
+                            SDL_RenderFillRect(ren, &band);
+                        }
+                        // ART thumb: planitemLib record == itemIdx (1:1
+                        // pixel-match law shp.md S23.4), vertically centred
+                        // in the row, left inset.
+                        int nameX = lr.x0 + 10;
+                        if (planitemLib.count() == 40 &&
+                            opts[oi].item >= 0 &&
+                            opts[oi].item < 40) {
+                            const auto& sr = planitemLib.record(opts[oi].item);
+                            blitShape(ren, planitemLib, opts[oi].item,
+                                      lr.x0 + 12,
+                                      ry + (kProjectRowPitch - int(sr.height)) / 2);
+                            nameX = lr.x0 + 12 + int(sr.width) + 14;
+                        }
                         // tPL-B1b: the placement legs join the report at the
                         // TILE CLICK (step 2), not here — the list only
                         // reports the queue gates (the vendor list shows
                         // everything REQUIRES-legal; planet.txt info04).
                         char ob[128];
-                        std::snprintf(ob, sizeof(ob), "%-24s cost %3d%s%s",
-                                      opts[oi].name.c_str(), opts[oi].cost,
-                                      ok ? "" : "  (no free population)",
-                                      opts[oi].item == planetPick ? "  <" : "");
-                        txt.draw(ren, lr.x0 + 8, ry + 4, ob, false,
+                        std::snprintf(ob, sizeof(ob), "%s%s", opts[oi].name.c_str(),
+                                      ok ? "" : "  (no free population)");
+                        txt.draw(ren, nameX,
+                                 ry + kProjectRowPitch / 2 - 5, ob, false,
                                  ok ? kText : kDim);
                     }
+                    // SCROLL ARROWS (framed triangles, honest vector chrome
+                    // per the t407 fleet-arrow precedent).
+                    auto arrow = [&](const Rect& a, bool up) {
+                        SDL_Rect ab{a.x0, a.y0, a.x1 - a.x0 + 1,
+                                    a.y1 - a.y0 + 1};
+                        SDL_SetRenderDrawColor(ren, 8, 12, 20, 255);
+                        SDL_RenderFillRect(ren, &ab);
+                        SDL_SetRenderDrawColor(ren, 125, 182, 182, 255);
+                        SDL_RenderDrawRect(ren, &ab);
+                        const int cx = (a.x0 + a.x1) / 2,
+                                cy = (a.y0 + a.y1) / 2;
+                        SDL_SetRenderDrawColor(ren, 168, 233, 255, 255);
+                        // Triangle: NARROW at the pointed end. up -> narrow
+                        // at TOP (y = cy-3, w=0) widening to cy+3; down the
+                        // mirror. (tPF-2b witness caught an inverted sign
+                        // here — both boxes drew v-shaped.)
+                        for (int i = 0; i <= 6; ++i) {
+                            const int dy = up ? (cy - 3 + i) : (cy + 3 - i);
+                            const int w = i;
+                            SDL_RenderDrawLine(ren, cx - w, dy, cx + w, dy);
+                        }
+                    };
+                    arrow(kProjectArrowUpRect, true);
+                    arrow(kProjectArrowDownRect, false);
                     if (opts.empty())
                         txt.draw(ren, lr.x0 + 8, lr.y0 + 6,
                                  "No projects available", false, kDim);

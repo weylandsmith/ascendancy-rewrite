@@ -75,6 +75,9 @@ bool projectOrderable(const ascend::game::Campaign& camp, int star, int item) {
 
 std::optional<int> projectRowFor(Pt p, int first) {
     if (!inRect(kProjectListRect, p)) return std::nullopt;
+    // tPF-2b: the arrow column owns its x-range (rows never extend under it
+    // — refcap rows end left of the framed arrows).
+    if (p.x >= kProjectArrowUpRect.x0) return std::nullopt;
     const int rel = p.y - (kProjectListRect.y0 + 2);  // 2 px inner padding
     if (rel < 0) return std::nullopt;
     const int i = rel / kProjectRowPitch;
