@@ -233,86 +233,88 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-3b OVERLAY PORT + CB ANCHOR SHIP (D28 P2/P6; law FULLY
-DERIVED this iteration — docs/re/_wip_tPF3.md F1-F7 is the complete spec,
-do NOT re-derive): (1) RESOLVE F7 FIRST (decisive probe: perpendicular
-colour profile across a known tile boundary on the 433 refcap left half —
-full-outline vs doubled-inset lines; ~5 probes, no debugger); (2) PORT:
-ui.cpp PASS 2 full-diamond outline REPLACED by the overlay law (inset
-64x31 centre-relative diamond iff NOT rock AND (own OR active-4-neighbour),
-else TINY 12x6; line colour = tileEdgePaletteIndex; outline-only fill,
-seam TPF3-B named); legality helper = checker with item 0xff (rule D rock
-veto + rule G adjacency only — squareBuildable in indpopups.cpp lacks the
-rock veto and own-active leg, extend or add a painter variant); (3) CB
-ANCHOR FIX (D28 P7): structure blit dest = (c.x + rec.left, c.y - 17 +
-rec.top) — MEASURED planitem bboxes L=-34, T in {-1..-18} (rec0 CB
-T=-9/H=43), port's (c.x-w/2, c.y-h/2) is 5px LOW for the CB;
-(4) pins + pixel witness (reuse tPF2_witness.sh enumeration + census
-v2 premises; anti-vacuity control mandatory). Budget <=2.
-RATIONALE for ordering: tPF-3's law half CLOSED this iteration (F1-F6
-cited; F7 conflict named); shipping without resolving F7 risks painting
-the wrong geometry a second time (tPL-B1 polarity lesson), and the
-profile probe is cheap — law then port in ONE next session.
-WITNESS-HARNESS LESSON CARRIED: probe scripts must enumerate REAL
-cell centres from the planitem.txt B/C grids (never offsets around
-tileCenter(0,0) — size-2's rows 0..3 are EMPTY); scripts/
-tPF2_witness.sh embeds the working enumeration; reuse it for tPF-3/5/6
-planet-view witnesses. xsend's "window died before release" is BENIGN
-(prints on every click); "X connection broken" at the log tail is our
-own PID kill.
-THEN tPF-4 HOME PLANET TABLE READ (D28 P1): Chamachi must be LARGE
-CATHEDRAL, ours gives medium eden — tPL-D1 found the per-spec tables
-(payload 0x88f90/0x88fe4, 85 homes x 26 lineages) but the READ/INDEX
-is wrong; re-derive index law, verify ALL species against the table,
-pin Chamachi + Minions. Budget <=2.
-THEN tPF-5 INDICATORS (D28 P8/P9): top frames click -> mineral-framed
-window same size as tile popup; Industry tile art cropped high + black/
-bled band at bottom (derive blit rect + source thumb from tPL-B2's
-msg-50 sites). Budget <=1.
-THEN tPF-6 ORBITAL CLICK + HOVER CPU (D28 P10/P11): orbital click pops
-context/build menu (post-research gating law); hover sluggish + CPU
-100% — same paint-stall family as t419 research fix, find the per-
-frame recompute and cache. Budget <=2.
-THEN tPF-7 RESEARCH CONTROLS + SELECTION (D28 R1-R5 + D27 fill-wipe
-growth witness): tree rotation too slow (derive rate from vendor pump
-cadence like tNG-R did — breakpoint hit-count, do NOT inherit
-galaxy-map 1/s); rotation + scroll buttons are PRESS-AND-HOLD, NO
-LATCH (left/right opposite dirs); set-project must PERSIST across
-screen exit and show state; hover=blue highlight, set=yellowish.
-GROWN-ENDPOINT fill witness (owed since tRS-V2p): BUILD A LABORATORY
-first (D29 — res==0 without a producer is CORRECT, do not diagnose it
-as a defect again). Budget <=3 (CONT cycle).
-THEN tPF-8 TREE VISIBILITY + CHROME (D28 R6 + item 13): links ONLY
-from KNOWN techs (new game = 3 circles, no lines, no unknown children
-— derive the reveal law from the tree table + known-tech state);
-mineral framing on research screen; DELETE our "click set project"
-upper-right + "Esc return to galaxy" lower-left texts (both screens).
-Budget <=1.
-THEN tPF-1b DAY-20 EXIT, BEGIN-BUILT SOAK (D30: user denies using
---campaign VERBATIM — the tPF-1 flag-path claim does NOT cover his
-game, which is Begin-built (Chamachies) with a factory order pending;
-his exit is either an unexplained real defect or the cap being set by
-OUR OWN code on the Begin path — check whether Begin-built ui boots
-default turns!=0!). Soak a begin-built campaign 30+ days with the
-factory order; if exit reproduces, instrument every quit path with a
-logged reason and fix the root cause; if not reproducible after 2
-tries, state that plainly in the wip doc and leave the announcement.
-Budget <=2.
-THEN tPF-2c POPUP CITATION AUDIT (D30 law): walk every popup property
-shipped under tPF-2/tPF-2b (info window rect, mineral frame source,
-button labels/records, build-list row art, teal selection) and mark
-each CITED (windows.txt/SHP/FUN) or EYEBALLED; re-derive every
-EYEBALLED property from the vendor surfaces; the audit table lives in
-docs/re/_wip_tPF2.md and a row is not closed with un-cited visible
-properties. Budget <=2.
-THEN tPR3-U: re-package grade sheet (checklist format, ours|vendor
-side-by-side per D19) for planet + research; NEXT becomes
-WAIT-USER-GRADE-PR3. STANDING: D28 file scratchpad/
-t433-build-feedback.txt is the item authority; refcap PNGs in
-scratchpad/; production ring needs t439 recovery before live witness
-(TL expired 2026-11-24 14:53); scratch savedir law; C1-C5 + race
-intro stay DEFERRED (D25); when a counter reads zero check PRODUCER
-EXISTENCE first (D29).
+NEXT tPF-2d POPUP LAW SHIP (D30 audit CLOSED as tPF-2c with C1-C11 in
+docs/re/_wip_tPF2c.md — do NOT re-derive; SHIP what it proved and close the
+three named residues). ORDER INSIDE THE TASK: (1) LIVE-RAM witness (C10):
+one scratch save-state in a planet-view state, dump guest 0x74480..0x74590,
+resolve every u32 pointer to its string -> settles the 0x744a0 id->label
+registry BASE and the C9/C11 arithmetic question in ONE probe family
+(pointer law CLOSED tooling, scripts/r1_pointer_law.py; TL recovery per
+t439 first if expired). (2) PORT the C6 button law: msg-1-leg id-array
+law (51 always; 54-loop cl=0..0x26 skip 5 append-per-checker-0x3830c —
+the active-neighbour leg lives INSIDE the checker, OQ-014 law, do not
+duplicate; 53 non-empty-non-ship; ship legs 52/57/55/58 per C6; 58 tail
+= checker(item 35 arg, cell)); consumer law: x starts 160, width=479-x
+divided evenly, y from the widget field, bottom 367, label = registry
+ptr — REPLACE the invented y1+2..+30 left-quarter strip (F3c was an
+eyeball, now refuted). (3) FRAME: decode help.shp k0 (336x256, C7 —
+dims == popup-rect-minus-1 parity) with the r1_shp_decode_law codec and
+pixel-diff its border vs the refcap popup; ship only on a match, else
+keep the vector frame and bank the negative. (4) TYPE-14 lib-binding
+site: one targeted probe (state-change path near 0x3d2fe / winmgr
+dword[+0x1c] writer via the 0x31004 read-back); if not found, name it.
+(5) PLANLIST row-art: find the PLANLIST paint fn (0x3cbdc PLANLIST
+string site = fn 0x3cbb4 region, ALREADY partly disassembled: type
+field widget+0x47 mapped 4->3, 0x33->4, jump table 0x27fe8 — read that
+switch, it IS the list paint). Pins + witness (tPF2_witness.sh
+enumeration) + mutations. Budget <=2 sessions.
+RATIONALE: tPF-2 is the row D30 named; tPF-2c proved the shipped button
+gate is REFUTED and the frame/label citations are MISSING — shipping
+anything else first leaves known-wrong geometry in the build (tPL-B1
+polarity lesson). tPF-3b (overlay port) stays queued BEHIND this: it was
+the prior assignment, untouched, law F1-F7 intact.
+PRIOR-SESSION QUEUE (unchanged, in order): tPF-3b overlay port + CB
+anchor ship (law in docs/re/_wip_tPF3.md F1-F7, resolve F7 first);
+tPF-4 home planet table read; tPF-5 indicators; tPF-6 orbital click +
+hover CPU; tPF-7 research controls; tPF-8 tree visibility; tPF-1b
+begin-built day-20 soak (D30 — user denied --campaign; his game is
+Begin-built with a factory pending; check whether Begin-built boots
+turns!=0 FIRST, one grep of the Begin path, before any soak).
+STANDING: D28 file scratchpad/t433-build-feedback.txt is the item
+authority; refcap PNGs in scratchpad/; scratch savedir law; C1-C5 +
+race intro stay DEFERRED (D25); when a counter reads zero check
+PRODUCER EXISTENCE first (D29); POPUP/DERIVATION LAW (D30, binding):
+every visible property cited or named-open, no eyeballed geometry.
+
+tPF-2c LANDED 2026-11-25 (D30 POPUP CITATION AUDIT EXECUTED; NO code
+shipped; honest negative — tPF tracks no OQ row, open=[016,019] unchanged;
+the audit's verdict: the SHIPPED tPF-2 BUTTON LAW IS REFUTED, three
+citations named-missing, all closed statically except two named live
+residues). PROVED (docs/re/_wip_tPF2c.md C1-C11, raw asm
+work/ascend_restored.bin):
+ - SHAPEFRAME store re-verified INDEPENDENTLY: parser fn 0x575e4 store
+   0x57e10 mov %ax,0x1e(%edx) -> WORD[rec+0x1e]; TYPE-100 header rows
+   STATENUMBER->u16[rec+0x18] (0x57cdc).
+ - WIDGET-FRAME BLIT PATH FOUND: fn 0x30fb8 @0x31004 reads HIWORD
+   dword[rec+0x1c] (frame id; -1 = no frame -> fill+text path), cache
+   slot u16[rec+0x18], lib via FUN_0001fc34(0x9f10c) -> 0x5caac. The
+   parser NEVER writes +0x1c (zero-readers census) = runtime composition,
+   t333 law.
+ - planal-HYPOTHESIS KILLED by dims census: planal00..10 all n=5,
+   k0=47x47, k1..k4=399x399 (globe backdrops) — no popup-sized record.
+   Corpus-wide: the ONLY popup-parity record = help.shp k0 336x256 vs
+   popup rect 335x255 (t394 dims-parity parity EXACT) [inferred identity,
+   pixelwise owed].
+ - BUTTON LAW FULLY DERIVED (msg-1 leg 0x3d397..0x3d72e): id array — 51
+   always; EMPTY cell -> 54 ONCE PER BUILDABLE ITEM (loop cl 0..0x26
+   skip 5, append iff checker 0x3830c passes; the adjacency leg is INSIDE
+   the checker); non-empty-non-ship -> 53; ship legs 52/57-ship/55/58;
+   surface tail -> 58 iff checker(item-arg 35, cell). Consumer 0x3d591:
+   x0=160, width (479-x)/n EVEN SPREAD, bottom 367, label = ptr table
+   0x744a0[id]. => our shipped "Build iff surface+empty+neighbour, strip
+   y1+2..+30 left-quarter" was an APPROXIMATION + invented geometry; the
+   refcap's single Build button = the 54-loop with one buildable item.
+ - LABEL REGISTRY: fn 0x3d2a0 fills 0x74528+/0x74540+/0x7456c+ with
+   getter(41..61)/(46..57)/(57..88) POINTERS (and the indicator key
+   ds:0x74528 is registry slot 0 reused); 0x744a0 itself has ZERO static
+   writers -> id->label base needs ONE live-RAM dump (tPF-2d step 1).
+ - PLANLIST paint located-not-read: fn 0x3cbb4 (PLANLIST string 0x3cbdc;
+   type field widget+0x47, jump table 0x27fe8) — the row-art-source
+   citation owed there.
+HONEST NEGATIVES: no OQ closed; help.shp identity unverified pixelwise;
+TYPE-14 lib-binding site not found; 0x744a0 base unresolved statically.
+NEXT tPF-2d (above) ships the law. Session was ~35 probes, no capture,
+no code, gate untouched.
 
 tPF-3 LANDED 2026-11-25 (TILE-OVERLAY LAW DERIVED + CITED + CB ANCHOR
 ROOT CAUSE MEASURED; NO code shipped — F7 witness conflict named, ship
