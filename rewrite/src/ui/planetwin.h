@@ -69,8 +69,10 @@
 //   The identity mapping for the other 39 items stays an OQ-005 contact-
 //   sheet fold [inferred] — plbuildIcon documents that boundary.
 
+#include <functional>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include "game/campaign.h"
 #include "ui/layout.h"  // Rect, Pt, inRect
@@ -159,5 +161,41 @@ struct PlBuildIcon {
 // k34 (shp.md S23.4); nullopt for out-of-domain input (planitem.shp has 40
 // records, shp.md S23.3), identity elsewhere per the [inferred] extension.
 std::optional<PlBuildIcon> plbuildIcon(int itemIdx);
+
+// ---- tPF-2d POPUP BUTTON LAW (fn 0x3d397..0x3d67e, msg-1 leg) --------------
+// Citations: docs/re/_wip_tPF2d.md D2/D3/D5 + docs/re/_wip_tPF2c.md C6.
+// The vendor composes a u32 BUTTON-ID array, then a generic consumer spreads
+// it across an ABSOLUTE-SCREEN band: x from 160, width (479-x)/remaining
+// (even spread, x clamped 479), y 337..367 (rec+8=0x151, rec+0x10=0x16f at
+// 0x3d623/0x3d62c). The label is the runtime registry u32[ds:0x744a0 + id*4]
+// (live-resolved 20/20 saves, D2); if the array holds exactly ONE button the
+// special path 0x3d684 REPLACES the label with getter(30) "OK" regardless of
+// id — the mechanism behind the refcap "OK" popup (D5, pixel-corroborated).
+enum PopupButton : int {
+  kPbCancel = 51, kPbCreateColony = 52, kPbAbandon = 53, kPbBuild = 54,
+  kPbLeaveOrbit = 55, kPbRefit = 56, kPbInvade = 57, kPbAutomate = 58,
+};
+// The id->label table (D2 verbatim; ids 35..50 are the indicator words,
+// 51..58 the action words). Out-of-domain -> "".
+const char* popupButtonLabel(int id);
+// The vendor id-array law for a SURFACE-cell popup (cl = cell item; 0xff
+// empty). `buildable(item)` IS the build-checker 0x3830c(item, cell) — the
+// caller's cited checker, never a re-implementation here. Legs (0x3d397 gate
+// key==3; ship cl==0x17 legs are OUT OF DOMAIN for this port — the rewrite
+// models no ship square-popup, seam named in the test file):
+//   empty (cl==0xff): ONE 54 appended for the FIRST item 0..0x26 (skip 5)
+//     the checker passes, then the loop BREAKS (0x3d582 falls through to the
+//     tail — tPF-2c C6's "per item" reading refuted, D6);
+//   non-empty non-ship: cl != 5 -> 53; then checker(35, cell) -> 58;
+//   ALL paths: 51 last (0x3d591..0x3d5a4).
+std::vector<int> popupButtonIds(int cellItem,
+                                const std::function<bool(int)>& buildable);
+// The consumer geometry law (D3): one Rect (inclusive) per id, in array
+// order. y band 337..367 absolute; x cursor starts 160, each button takes
+// (479 - x) / remaining, next x = x + w clamped 479 (0x3d636).
+std::vector<Rect> popupButtonRects(int n);
+// The label for button `i` of an n-button popup: single button -> "OK"
+// (getter(30) special path 0x3d68e), else popupButtonLabel(ids[i]).
+const char* popupButtonText(const std::vector<int>& ids, int i);
 
 }  // namespace ascend::ui

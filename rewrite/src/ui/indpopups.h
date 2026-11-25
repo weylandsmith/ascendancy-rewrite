@@ -175,7 +175,12 @@ std::vector<PopupLine> popupLinesFor(const ascend::game::Campaign& camp,
 // unrecovered); the D28 refcaps show title+body only for empty cells.
 struct SquareInfo {
     std::vector<PopupLine> lines;  // title (+ body unless ruins)
-    bool buildable = false;  // D28 button law: Build+Cancel iff true
+    bool buildable = false;  // D28 button law: Build+Cancel iff true.
+                             // SUPERSEDED for the ui button set by tPF-2d
+                             // (au::popupButtonIds, the vendor id array —
+                             // this field remains the CHECKER's adjacency
+                             // leg, pinned by test_squarepopup_tpf2; the
+                             // ui no longer reads it).
 };
 SquareInfo squareInfoLines(const ascend::game::Campaign& camp, int star,
                            int cell);

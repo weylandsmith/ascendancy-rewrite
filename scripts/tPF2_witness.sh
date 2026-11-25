@@ -84,9 +84,12 @@ while read -r tx ty; do
   [ -n "$BUILD_XY" ] && [ -n "$OK_XY" ] && break
   X $tx $ty
   line=$(grep 'ui planet tile' "$OUT/app.log" | tail -1)
+  # tPF-2d: the log carries the vendor id array (docs/re/_wip_tPF2d.md);
+  # BUILD popup = ids contain 54, OK popup = ids=51 alone (the n==1
+  # getter(30) label path).
   case "$line" in
-    *"BUILD)"*) [ -z "$BUILD_XY" ] && BUILD_XY="$tx $ty";;
-    *" OK)"*)   [ -z "$OK_XY" ] && OK_XY="$tx $ty";;
+    *"ids=54"*) [ -z "$BUILD_XY" ] && BUILD_XY="$tx $ty";;
+    *"ids=51)"*) [ -z "$OK_XY" ] && OK_XY="$tx $ty";;
   esac
 done <<< "$CENTERS"
 echo "WITNESS BUILD_XY='$BUILD_XY' OK_XY='$OK_XY'" >> "$OUT/app.log"

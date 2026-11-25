@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-25T06:05
+updated: 2026-11-25T11:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,38 +233,27 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-2d POPUP LAW SHIP (D30 audit CLOSED as tPF-2c with C1-C11 in
-docs/re/_wip_tPF2c.md — do NOT re-derive; SHIP what it proved and close the
-three named residues). ORDER INSIDE THE TASK: (1) LIVE-RAM witness (C10):
-one scratch save-state in a planet-view state, dump guest 0x74480..0x74590,
-resolve every u32 pointer to its string -> settles the 0x744a0 id->label
-registry BASE and the C9/C11 arithmetic question in ONE probe family
-(pointer law CLOSED tooling, scripts/r1_pointer_law.py; TL recovery per
-t439 first if expired). (2) PORT the C6 button law: msg-1-leg id-array
-law (51 always; 54-loop cl=0..0x26 skip 5 append-per-checker-0x3830c —
-the active-neighbour leg lives INSIDE the checker, OQ-014 law, do not
-duplicate; 53 non-empty-non-ship; ship legs 52/57/55/58 per C6; 58 tail
-= checker(item 35 arg, cell)); consumer law: x starts 160, width=479-x
-divided evenly, y from the widget field, bottom 367, label = registry
-ptr — REPLACE the invented y1+2..+30 left-quarter strip (F3c was an
-eyeball, now refuted). (3) FRAME: decode help.shp k0 (336x256, C7 —
-dims == popup-rect-minus-1 parity) with the r1_shp_decode_law codec and
-pixel-diff its border vs the refcap popup; ship only on a match, else
-keep the vector frame and bank the negative. (4) TYPE-14 lib-binding
-site: one targeted probe (state-change path near 0x3d2fe / winmgr
-dword[+0x1c] writer via the 0x31004 read-back); if not found, name it.
-(5) PLANLIST row-art: find the PLANLIST paint fn (0x3cbdc PLANLIST
-string site = fn 0x3cbb4 region, ALREADY partly disassembled: type
-field widget+0x47 mapped 4->3, 0x33->4, jump table 0x27fe8 — read that
-switch, it IS the list paint). Pins + witness (tPF2_witness.sh
-enumeration) + mutations. Budget <=2 sessions.
-RATIONALE: tPF-2 is the row D30 named; tPF-2c proved the shipped button
-gate is REFUTED and the frame/label citations are MISSING — shipping
-anything else first leaves known-wrong geometry in the build (tPL-B1
-polarity lesson). tPF-3b (overlay port) stays queued BEHIND this: it was
-the prior assignment, untouched, law F1-F7 intact.
-PRIOR-SESSION QUEUE (unchanged, in order): tPF-3b overlay port + CB
-anchor ship (law in docs/re/_wip_tPF3.md F1-F7, resolve F7 first);
+NEXT tPF-3b TILE-OVERLAY PORT + CB ANCHOR SHIP (law docs/re/_wip_tPF3.md
+F1-F7, INTACT — do NOT re-derive). ORDER: (1) RESOLVE F7 FIRST (boundary-
+vs-inset witness conflict named in tPF-3's landing); (2) port the overlay
+law: inset diamond 64x31 (2px in, 0x3bc5b vertex table) iff NOT rock AND
+(own-active OR active-4-neighbour), else TINY 12x6 (0x3bd4d); colour di
+class table 0->black/2->117/3->146/4->255/else 12 white; keyed on checker
+0x3830c RETURN WITH ITEM ARG 0xff (mov edx,0xff @0x3c2c7); OUTLINE-ONLY
+(port seam TPF3-B: fill alpha law NOT recovered, refcap doesn't constrain
+it — fill is a visual no-op at 20,495 px conv(150) census); (3) CB ANCHOR:
+blit = diamond TOP-VERTEX + signed bbox (planitem L=-34, T{-1..-18}) — the
+port is currently 5px LOW; fix + pin + witness.
+RATIONALE: tPF-2d (this session) CLOSED the popup law family (buttons,
+band geometry, labels, frame identity) and shipped it; tPF-3b was the
+prior assignment, untouched, law fully banked. The two owed follow-ups
+from tPF-2d are SMALL and fold into later queue rows, not a dedicated
+session: PLANLIST paint case-bodies via FALLTHROUGH WALK 0x3cca4..0x3d1bc
+(no jump table — D10 proved cs:[0x27fe8] is statically+runtime invisible;
+walk the sequential blocks) belongs with tPF-4 list work; help.shp-k0 FRAME
+SHIP is GATED on the user's OQ-005 ruling (DECISIONS.md D1) — do not ship
+shape art before that ruling.
+PRIOR-SESSION QUEUE (tPF-3b now = the NEXT ACTION above):
 tPF-4 home planet table read; tPF-5 indicators; tPF-6 orbital click +
 hover CPU; tPF-7 research controls; tPF-8 tree visibility; tPF-1b
 begin-built day-20 soak (D30 — user denied --campaign; his game is
@@ -275,6 +264,53 @@ authority; refcap PNGs in scratchpad/; scratch savedir law; C1-C5 +
 race intro stay DEFERRED (D25); when a counter reads zero check
 PRODUCER EXISTENCE first (D29); POPUP/DERIVATION LAW (D30, binding):
 every visible property cited or named-open, no eyeballed geometry.
+
+tPF-2d LANDED 2026-11-25 (POPUP LAW SHIPPED: BUTTON ARRAY + BAND + LABELS
++ FRAME IDENTITY; 4 of 5 steps CLOSED, 1 named-open; no OQ row closed —
+tPF tracks none, honest negative, open=[016,019] unchanged). PROVED
+(docs/re/_wip_tPF2d.md D1-D10):
+ - LABEL REGISTRY RESOLVED FROM BANKED SAVES (NO capture — pointer law
+   direct read, scripts/tPF2d_label_registry.py RC=0 20/20 unanimous):
+   u32[ds:0x744a0+id*4]; 51 Cancel 52 Create Colony 53 Abandon 54 Build
+   55 Leave Orbit 56 Refit 57 Invade 58 Automate; 35..50 indicator words;
+   strings in heap 0x2530a8+ (why static scan found nothing); slot 34
+   (ds:0x74528) = the indicator KEY inside the registry (tPLB2 re-confirmed
+   live at 0x3d3a1). C11 RESOLVED (0x744a0 IS the base); C9 RESOLVED
+   (naive static.txt map refuted; id 54='Build' FITS the refcap).
+ - tPF-2c C6's "54-LOOP APPENDS PER BUILDABLE ITEM" REFUTED AT BYTE LEVEL
+   (D6): 0x3d582 append FALLS THROUGH to tail 0x3d591 — AT MOST ONE 54
+   (first checker-legal item, scan 0..0x26 skip 5) then 51. The refcap
+   Build+Cancel popup = EXACTLY [54,51].
+ - CONSUMER GEOMETRY (D3, direct disasm supersedes C6's rec+8/+0xc detail):
+   ABSOLUTE band y 337..367, x0=160, w=(479-x)/remaining, clamp 479 then
+   +1; n==1 -> label getter(30) 'OK' REGARDLESS of id (0x3d684 — explains
+   the non-buildable popup's OK = ids [51] alone). Pixel-corroborated on
+   both refcaps (D5: text centres 233/400 vs law 239.5/399.5; OK centre
+   318.5 vs 319.5; band borders y335/371).
+ - help.shp k0 FRAME IDENTITY CONFIRMED (D8): dims 336x256 EXACT; rows
+   217..247 TRANSPARENT except 16px side edges = a CUT-OUT mapping to
+   logical y 337..367 = the consumer's button constants EXACTLY; refcap
+   band bg (12,32,48) measured (D8) and adopted as the port fill. FRAME
+   ART SHIP still gated on OQ-005 user ruling.
+ - TYPE-14 frame word ANSWERED (D9): PLSQUARE SHAPEFRAME 0 verbatim ->
+   hiword(+0x1c)=0 != -1 -> 0x31004 blit ACTIVE with frame record 0;
+   writer census: init 0x30b8f (0xffff default), parser 0x57e10, copies
+   0x3a5ed/0x38ec7, composition toggles 0x32c66/0x32c6e/0x341c8.
+ - PLANLIST paint fn 0x3cbb4 dispatch READ (key +0x47 remap 4->3, msg
+   hiword+0x43==0x33 -> 4, default 0x3d1bc) but case-bodies OWED: the
+   cs:[0x27fe8] table is code bytes in the image AND zero in BSS in 4
+   save banks — runtime-registered (t333 family); walk the fallthrough
+   0x3cca4..0x3d1bc instead (folded into tPF-4 note above).
+SHIPPED CODE: rewrite/src/ui/planetwin.{h,cpp} popupButtonLabel/Ids/Rects/
+Text (pure law, cited); ui.cpp arm/press/render use the id array + absolute
+band (the invented y1+2..+30 left-quarter strip is GONE); indpopups.h
+SquareInfo.buildable marked SUPERSEDED for the ui (stays the pinned
+checker-leg). Pins tests/test_popuplaw_tpf2d.cpp x5: suite 546->551/0/0;
+MUTATION-VERIFIED 4/4 caught (break-law, geometry, OK-path, 53-polarity).
+Witness tPF2_witness.sh UPDATED to the ids= log (live run: ids=54,51 on
+buildable cells, build cell-armed flow + list + scroll + OK/cancel all
+fire; picks rejected = named SEAM: PLANLIST row 0 != checker-passing item,
+vendor per-item pre-filter unrecovered).
 
 tPF-2c LANDED 2026-11-25 (D30 POPUP CITATION AUDIT EXECUTED; NO code
 shipped; honest negative — tPF tracks no OQ row, open=[016,019] unchanged;

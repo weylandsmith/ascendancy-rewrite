@@ -225,12 +225,16 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // dismisses (documented default; the witness read a persisting popup).
     std::vector<ascend::ui::PopupLine> planetPopup;
     Rect planetPopupRect{};
-    // tPF-2 SQUARE POPUP button state (D28 P3/P5 refcaps): the square-info
-    // popup carries Build+Cancel when the cell is buildable (adjacent,
-    // empty, surface), else a single OK. Build opens PLANLIST with the
-    // cell ARMED (planetCellArmed) so the list pick orders on that cell
-    // directly (merges the refcap flow with the msg-0x1c01 step-2 law).
-    bool planetPopupBuild = false;
+    // tPF-2d SQUARE POPUP BUTTON LAW (fn 0x3d397..0x3d67e; replaces the
+    // tPF-2 "Build+Cancel iff buildable" approximation, which tPF-2c C6
+    // REFUTED): the popup carries the vendor id array — empty cell: one 54
+    // 'Build' per checker-legal item (skip 5); occupied: 53 'Abandon' (item
+    // != 5) + 58 'Automate' (checker(35) leg, SEAM: the port has no
+    // governor-set order, refused like sysview); 51 'Cancel' always last.
+    // Geometry + labels via au::popupButtonRects/popupButtonText (single
+    // button -> getter(30) 'OK', 0x3d684). Build arms the cell (planetCell-
+    // Armed) so the list pick orders on that cell directly.
+    std::vector<int> planetPopupIds;
     bool planetCellArmed = false;
     // True iff the CURRENT popup is the square-info popup (msg-50
     // indicator popups share the planetPopup vector but have NO buttons).
@@ -912,48 +916,56 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     std::fflush(stdout);
                 } else if (screen == kScreenPlanet && planetSquarePopup &&
                            !planetPopup.empty() &&
-                           planetPopupRect.x0 <= p.x &&
-                           p.x <= planetPopupRect.x1 &&
-                           p.y >= planetPopupRect.y1 + 2 &&
-                           p.y <= planetPopupRect.y1 + 30) {
-                    // tPF-2 POPUP BUTTON STRIP (D28 P3/P5 refcaps): the
-                    // mineral bottom bar below the square-info popup holds
-                    // Build+Cancel (buildable) or a single centred OK. The
-                    // bar extends BELOW the text rect (refcap: strip is
-                    // the popup's bottom edge); the port draws it at
-                    // planetPopupRect.y1+2 .. +30. ONLY the square popup
-                    // has buttons (msg-50 indicator popups never do);
-                    // clicks elsewhere dismiss it via the existing tile/
-                    // panel arms' clear.
-                    if (planetPopupBuild) {
-                        const bool leftHalf =
-                            p.x < (planetPopupRect.x0 +
-                                   planetPopupRect.x1) / 2;
-                        if (leftHalf) {
-                            // BUILD: open PLANLIST with the cell ARMED —
-                            // the next list pick orders on planetCell
-                            // directly (step-2 merged, msg-0x1c01 law).
+                           p.y >= 337 && p.y <= 367 && p.x >= 160 &&
+                           p.x <= 479) {
+                    // tPF-2d POPUP BUTTON BAND (consumer 0x3d594..0x3d67e,
+                    // cited docs/re/_wip_tPF2d.md D3/D5): buttons live at
+                    // ABSOLUTE screen y 337..367, x spread from 160 to 479 —
+                    // NOT relative to the text rect (the tPF-2 strip law was
+                    // an eyeball, REFUTED by tPF-2c C6). Behaviour per id:
+                    // 54 Build -> open PLANLIST with the cell ARMED (the
+                    // next list pick orders on planetCell directly, step-2
+                    // merged, msg-0x1c01 law; SEAM: the vendor's per-item
+                    // 54 buttons presumably pre-filter PLANLIST to that
+                    // item — unrecovered, the port opens the full list);
+                    // 51 Cancel (or the n==1 getter(30) 'OK' special path)
+                    // -> dismiss; 53 Abandon / 58 Automate -> REFUSED (no
+                    // destruction / governor-set order model, sysview
+                    // precedent) with a log line, popup stays.
+                    const auto rects =
+                        ascend::ui::popupButtonRects(int(planetPopupIds.size()));
+                    for (size_t i = 0; i < rects.size(); ++i) {
+                        if (!inRect(rects[i], p)) continue;
+                        const int id = planetPopupIds[i];
+                        if (id == ascend::ui::kPbBuild) {
                             projectOpen = true;
                             planetCellArmed = true;
                             planetPopup.clear();
-                            planetPopupBuild = false;
+                            planetPopupIds.clear();
                             planetSquarePopup = false;
                             std::printf("ui planet popup build cell %d\n",
                                         planetCell);
+                        } else if (id == ascend::ui::kPbAbandon ||
+                                   id == ascend::ui::kPbAutomate) {
+                            std::printf("ui planet popup refused %s "
+                                        "(no model)\n",
+                                        ascend::ui::popupButtonLabel(id));
+                        } else if (planetPopupIds.size() == 1) {
+                            // OK: dismiss the popup only (cell stays).
+                            planetPopup.clear();
+                            planetPopupIds.clear();
+                            planetSquarePopup = false;
+                            std::printf("ui planet popup ok\n");
                         } else {
-                            // CANCEL: clear cell + popup.
+                            // 51 Cancel in a multi-button popup: clear cell.
                             planetCell = -1;
                             planetCellArmed = false;
                             planetPopup.clear();
-                            planetPopupBuild = false;
+                            planetPopupIds.clear();
                             planetSquarePopup = false;
                             std::printf("ui planet popup cancel\n");
                         }
-                    } else {
-                        // OK: dismiss the popup only (cell stays selected).
-                        planetPopup.clear();
-                        planetSquarePopup = false;
-                        std::printf("ui planet popup ok\n");
+                        break;
                     }
                     std::fflush(stdout);
                 } else if (screen == kScreenPlanet && projectOpen &&
@@ -1151,20 +1163,39 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         // tPF-2 SQUARE POPUP (D28 P3/P5): the tile click
                         // arms the msg-50 builder's key-3 case (widget
                         // +0xab = the cell). Content law squareInfoLines;
-                        // button set per the refcaps (Build+Cancel iff
-                        // buildable, else OK). Rect law: indicatorPopupRect
-                        // of the CLICKED widget = PLSQUARE (windows.txt
-                        // ln1519 X0 152 Y0 120).
+                        // Rect law: indicatorPopupRect of the CLICKED
+                        // widget = PLSQUARE (windows.txt ln1519 X0 152
+                        // Y0 120). BUTTONS (tPF-2d): the vendor id array
+                        // 0x3d397..0x3d58e — cl = the cell's ITEM (0xff
+                        // empty); the build-checker leg is the port's
+                        // cited placementBlock (0x3830c), NOT the tPF-2
+                        // adjacency approximation.
                         const auto si = squareInfoLines(camp, planetStar, hit);
                         planetPopup = si.lines;
-                        planetPopupBuild = si.buildable;
+                        const auto& pps = camp.planetAt(planetStar);
+                        int cellItem = 0xff;
+                        for (size_t i = 0; i < pps.items.size() &&
+                                          i < pps.itemCells.size(); ++i)
+                            if (pps.itemCells[i] == hit)
+                                cellItem = pps.items[i];
+                        planetPopupIds = ascend::ui::popupButtonIds(
+                            cellItem, [&](int item) {
+                                return placementBlock(camp, planetStar, item,
+                                                      hit) ==
+                                       PlacementBlock::None;
+                            });
                         planetSquarePopup = !si.lines.empty();
                         planetPopupRect = indicatorPopupRect(
                             Rect{152, 120, 487, 375});
-                        std::printf("ui planet tile %d selected (%s%s)\n", hit,
-                                    planetPopup.empty() ? "no popup"
-                                                        : planetPopup[0].text.c_str(),
-                                    si.buildable ? " BUILD" : " OK");
+                        std::printf("ui planet tile %d selected (%s ids=",
+                                    hit,
+                                    planetPopup.empty()
+                                        ? "no popup"
+                                        : planetPopup[0].text.c_str());
+                        for (size_t bi = 0; bi < planetPopupIds.size(); ++bi)
+                            std::printf("%s%d", bi ? "," : "",
+                                        planetPopupIds[bi]);
+                        std::printf(")\n");
                         std::fflush(stdout);
                     }
                 } else if (screen == kScreenPlanet &&
@@ -2624,26 +2655,38 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         txt.draw(ren, pr.x0 + 8, ly, ln.text, false, kText);
                         ly += 14;
                     }
-                    // tPF-2 BUTTON STRIP (D28 P3/P5 refcaps): a full-width
-                    // bar at the popup's bottom edge; buildable -> "Build"
-                    // left + "Cancel" right, else a centred "OK" (static.txt
-                    // #60/#57/#30 verbatim). Bar rect matches the click arm.
+                    // tPF-2d POPUP BUTTON BAND (consumer 0x3d594..0x3d67e,
+                    // cited docs/re/_wip_tPF2d.md D2/D3/D5): ABSOLUTE band
+                    // y 337..367, x spread 160..479 — one button per id in
+                    // planetPopupIds, label = registry word (single-button
+                    // popups read getter(30) "OK" per 0x3d684). Replaces the
+                    // tPF-2 invented y1+2..+30 left-quarter strip (REFUTED).
+                    // The vendor draws the label CENTRED in the button rect
+                    // (refcap text-cluster centres match the rect centres,
+                    // D5); the port centres with a char-width approximation
+                    // (fnt.h has no text-metrics API — named seam).
                     if (planetSquarePopup) {
-                        const int by = pr.y1 + 2;
-                        SDL_Rect bar{pr.x0, by, pr.x1 - pr.x0 + 1, 28};
-                        SDL_SetRenderDrawColor(ren, 8, 12, 20, 235);
-                        SDL_RenderFillRect(ren, &bar);
-                        SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
-                        SDL_RenderDrawRect(ren, &bar);
-                        const int bw = pr.x1 - pr.x0 + 1;
-                        if (planetPopupBuild) {
-                            txt.draw(ren, pr.x0 + bw / 4 - 14, by + 7,
-                                     "Build", false, kText);
-                            txt.draw(ren, pr.x0 + 3 * bw / 4 - 20, by + 7,
-                                     "Cancel", false, kText);
-                        } else {
-                            txt.draw(ren, pr.x0 + bw / 2 - 8, by + 7, "OK",
-                                     false, kText);
+                        const auto rects = ascend::ui::popupButtonRects(
+                            int(planetPopupIds.size()));
+                        for (size_t i = 0; i < rects.size(); ++i) {
+                            const Rect& b = rects[i];
+                            SDL_Rect bar{b.x0, b.y0, b.x1 - b.x0 + 1,
+                                         b.y1 - b.y0 + 1};
+                            // Band bg = the MEASURED refcap button-band colour
+                            // (12,32,48) — 362/480 samples on rows 338..366 of
+                            // the adjacent-structure refcap (D8); the help.shp
+                            // k0 frame art has a transparent cut-out exactly
+                            // at y 337..367 that this fill stands in for.
+                            SDL_SetRenderDrawColor(ren, 12, 32, 48, 255);
+                            SDL_RenderFillRect(ren, &bar);
+                            SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
+                            SDL_RenderDrawRect(ren, &bar);
+                            const char* lab =
+                                ascend::ui::popupButtonText(planetPopupIds,
+                                                            int(i));
+                            const int lw = int(std::string(lab).size()) * 7;
+                            txt.draw(ren, b.x0 + (b.x1 - b.x0 + 1 - lw) / 2,
+                                     b.y0 + 11, lab, false, kText);
                         }
                     }
                 }

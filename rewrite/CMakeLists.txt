@@ -139,6 +139,7 @@ add_executable(run_tests
   tests/test_planetstrip_t428.cpp
   tests/test_indpopups_tplb2.cpp
   tests/test_squarepopup_tpf2.cpp
+  tests/test_popuplaw_tpf2d.cpp
   tests/test_homeplanets_tpld1.cpp
   tests/test_planetfield_t428d.cpp
   tests/test_fleetlist_t407.cpp
