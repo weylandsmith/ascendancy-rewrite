@@ -281,6 +281,23 @@ from KNOWN techs (new game = 3 circles, no lines, no unknown children
 mineral framing on research screen; DELETE our "click set project"
 upper-right + "Esc return to galaxy" lower-left texts (both screens).
 Budget <=1.
+THEN tPF-1b DAY-20 EXIT, BEGIN-BUILT SOAK (D30: user denies using
+--campaign VERBATIM — the tPF-1 flag-path claim does NOT cover his
+game, which is Begin-built (Chamachies) with a factory order pending;
+his exit is either an unexplained real defect or the cap being set by
+OUR OWN code on the Begin path — check whether Begin-built ui boots
+default turns!=0!). Soak a begin-built campaign 30+ days with the
+factory order; if exit reproduces, instrument every quit path with a
+logged reason and fix the root cause; if not reproducible after 2
+tries, state that plainly in the wip doc and leave the announcement.
+Budget <=2.
+THEN tPF-2c POPUP CITATION AUDIT (D30 law): walk every popup property
+shipped under tPF-2/tPF-2b (info window rect, mineral frame source,
+button labels/records, build-list row art, teal selection) and mark
+each CITED (windows.txt/SHP/FUN) or EYEBALLED; re-derive every
+EYEBALLED property from the vendor surfaces; the audit table lives in
+docs/re/_wip_tPF2.md and a row is not closed with un-cited visible
+properties. Budget <=2.
 THEN tPR3-U: re-package grade sheet (checklist format, ours|vendor
 side-by-side per D19) for planet + research; NEXT becomes
 WAIT-USER-GRADE-PR3. STANDING: D28 file scratchpad/
