@@ -233,33 +233,69 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tRS-V3 RESEARCH LINK ATTACH (D27 "lines not connecting to the
-circles"). The port draws prereq edges from node centres (ui.cpp kScreen
-Research NODES block); the vendor law is cited: edge runs (this.x,
-this.y-27) -> (prereq.x, prereq.y+27) (raw bytes 0x48343/0x483aa,
-research.md S8; the "+27 both endpoints" reading was REFUTED) with colour
-0x6b - clamp(chop(0.25*(0.5*(zt+zp)+posz)),+-3) and prereq==selected ->
-0xf3. DO THIS ONE TASK: (1) port the endpoint-offset + colour law verbatim
-into the edge painter (researchview/ui.cpp), keeping the z-order and the
-selected-prereq 0xf3 leg; (2) pins x>=4 (endpoint offsets, colour clamp
-edges incl. the chop-not-round leg, selected-prereq colour, wiring
-source-text); mutation-verify every constant you touch (build-run check
-first — tRS-V2p vacuity hazard); (3) witness scripts/tRSV3_witness.sh:
-seed 5, dolly-out recipe from tRSV2p_witness.sh, assert edge pixels land
-ON the ring rims (the tRS-V1d content-vs-bg census law; ring bbox
-(-30,-30,29,29) means rim = centre +-30) — a gap between line end and rim
-is the D27 defect and FAILs. RATIONALE for ordering: tRS-V2w closed the
-grown-fill half of D27 (witness PASS); the link-attach half is the only
-remaining research-screen complaint, its law is ALREADY cited (pure port
-work, ~25 tool calls), and the grade package tPR2-U should ship after both
-halves so the user grades one coherent screen. THEN tPR2-U GRADE PACKAGE
-(port shot via tRSV2w_witness.sh progressed stage + side-by-side vs t252
-frame + updated checklist: grown fill WITNESSED, links attached, open list
-honest). Context unchanged: user is building c68e8bd locally to test
-planets - if his report names planet defects those rows PREEMPT tRS-V3;
-Ring TL expired 2026-11-24 14:53 (production game needs t439 recovery
-before ANY live witness; scratch DOSBox unaffected); protected saves law
-stands; C1-C5 + race intro remain DEFERRED (D25).
+NEXT tPF-1 TIME CONTROLS (D28 P7, FIRST — blocks all soak testing):
+(a) "advance until something happens" button does nothing — derive the
+vendor control (windows.txt TIME/ADVANCE section + handler) and wire;
+(b) game EXITS after 20 single-day advances. CHECK THE FLAG PATH
+FIRST: banked harness law says --campaign N in --ui mode IS a turn cap
+(main.cpp:656 -> ui.cpp:1215 quit at played>=N) — if the user's launch
+used it, that's the exit; else find the real loop-terminating defect.
+Either way: cap must not apply in normal play; witness = 30+ days
+advanced with factory-completion visible. Budget <=2.
+THEN tPF-2 TILE POPUP CHAIN (D28 P3/P4/P5 — USER REFCAPS ARE
+AUTHORITY, they REFUTE our shipped two-step no-popup flow from
+tPL-B1b): click tile -> mineral-framed window; ADJACENT to structure =
+square info + Build/Cancel buttons (refcap original-planet-screen-
+click-on-square-adjacent-to-structure.png); Build -> build-list window,
+ART NEXT TO NAME per row, scroll arrows (refcap original-planet-screen-
+build-list.png: Factory/Agrilot/Laboratory/Outpost, teal selected row);
+NON-ADJACENT = info + OK (refcap original-planet-screen-popup-after-
+clicking-non-adjacent-square.png). Derive from windows.txt + the
+planet-window msg map (t428 cites the content-dependent popup law —
+PORT IT PROPERLY THIS TIME). Pins + scripted walkthrough both paths.
+Budget <=3 (CONT cycle).
+THEN tPF-3 TILE OVERLAY + BASE (D28 P2/P6): overlays are SEMI-
+TRANSPARENT colored squares, SMALLER when not adjacent (refcap
+planet-screen-iter-433-v-original.png — ours opaque; derive alpha +
+both sizes + per-class colors from vendor paint fn); colony-base art
+misaligned since lattice fix — re-anchor to the corrected
+(410+34*(col-row),127+17*(col+row)) center law. Budget <=2.
+THEN tPF-4 HOME PLANET TABLE READ (D28 P1): Chamachi must be LARGE
+CATHEDRAL, ours gives medium eden — tPL-D1 found the per-spec tables
+(payload 0x88f90/0x88fe4, 85 homes x 26 lineages) but the READ/INDEX
+is wrong; re-derive index law, verify ALL species against the table,
+pin Chamachi + Minions. Budget <=2.
+THEN tPF-5 INDICATORS (D28 P8/P9): top frames click -> mineral-framed
+window same size as tile popup; Industry tile art cropped high + black/
+bled band at bottom (derive blit rect + source thumb from tPL-B2's
+msg-50 sites). Budget <=1.
+THEN tPF-6 ORBITAL CLICK + HOVER CPU (D28 P10/P11): orbital click pops
+context/build menu (post-research gating law); hover sluggish + CPU
+100% — same paint-stall family as t419 research fix, find the per-
+frame recompute and cache. Budget <=2.
+THEN tPF-7 RESEARCH CONTROLS + SELECTION (D28 R1-R5 + D27 fill-wipe
+growth witness): tree rotation too slow (derive rate from vendor pump
+cadence like tNG-R did — breakpoint hit-count, do NOT inherit
+galaxy-map 1/s); rotation + scroll buttons are PRESS-AND-HOLD, NO
+LATCH (left/right opposite dirs); set-project must PERSIST across
+screen exit and show state; hover=blue highlight, set=yellowish.
+GROWN-ENDPOINT fill witness (owed since tRS-V2p): BUILD A LABORATORY
+first (D29 — res==0 without a producer is CORRECT, do not diagnose it
+as a defect again). Budget <=3 (CONT cycle).
+THEN tPF-8 TREE VISIBILITY + CHROME (D28 R6 + item 13): links ONLY
+from KNOWN techs (new game = 3 circles, no lines, no unknown children
+— derive the reveal law from the tree table + known-tech state);
+mineral framing on research screen; DELETE our "click set project"
+upper-right + "Esc return to galaxy" lower-left texts (both screens).
+Budget <=1.
+THEN tPR3-U: re-package grade sheet (checklist format, ours|vendor
+side-by-side per D19) for planet + research; NEXT becomes
+WAIT-USER-GRADE-PR3. STANDING: D28 file scratchpad/
+t433-build-feedback.txt is the item authority; refcap PNGs in
+scratchpad/; production ring needs t439 recovery before live witness
+(TL expired 2026-11-24 14:53); scratch savedir law; C1-C5 + race
+intro stay DEFERRED (D25); when a counter reads zero check PRODUCER
+EXISTENCE first (D29).
 
 tRS-V2w LANDED 2026-11-25 (PLAYER-RES INCOME DIAGNOSIS CLOSED — NOT a
 defect: the vendor's own apply law is COMPRESSED and the shipped home's
