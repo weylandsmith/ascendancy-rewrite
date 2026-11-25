@@ -734,3 +734,57 @@ tRS-V3 link endpoints — lines must attach to circle rims, derive
 endpoint law from the same paint fn); behavior verification is the
 user's own build (assistant does not claim it). PUSH requested ->
 export+lease push to public main.
+
+## D28 — t433-BUILD USER FEEDBACK (2026-11-24, file scratchpad/t433-build-feedback.txt)
+
+Full 22-item list lives in that file (tracked path scratchpad/ is
+gitignored - summary here, file is the authority). Refcaps (also
+gitignored scratchpad/, cited by name): planet-screen-iter-433-v-
+original.png, original-planet-screen-click-on-square-adjacent-to-
+structure.png, original-planet-screen-build-list.png, original-
+planet-screen-popup-after-clicking-non-adjacent-square.png.
+
+PLANET (P1-P11): P1 Chamachi home = LARGE CATHEDRAL, ours gives medium
+eden (tPL-D1 table law shipped but WRONG TABLE READ - re-derive).
+P2 tiles = SEMI-TRANSPARENT colored squares (smaller when NOT
+adjacent); ours opaque grey/teal. P3 clicking a square pops a mineral-
+framed window (currently nothing). P4 adjacent-square popup has info +
+Build/Cancel; Build opens build-list window with ART NEXT TO NAME per
+row (refcap: Factory/Agrilot/Laboratory/Outpost, scroll arrows, teal
+selected row). P5 non-adjacent popup = info + OK. P6 colony-base art
+misaligned since lattice fix. P7 "advance until something happens"
+dead; single-day advance EXITS after 20 days (factory never seen
+built). P8 top indicator frames click -> same-size mineral-framed
+window. P9 Industry indicator art cropped high + black/bled band
+bottom. P10 orbital squares: hover outline works, CLICK does nothing;
+should pop context/build menu (post-research). P11 orbital hover =
+sluggish + CPU pegs 100% (research-screen stall family).
+RESEARCH (R1-R6): R1 tree rotation too slow. R2 rotation buttons must
+be PRESS-AND-HOLD (no latch; left one direction, right the other).
+R3 scroll up/down same hold law (currently no-op, console messages
+only). R4 clicking a circle shows no project-set state and selection
+does not survive leaving the screen. R5 hover=blue highlight,
+click/set=yellowish. R6 links only from KNOWN techs (new game: 3
+circles, no lines); mineral framing missing on this screen.
+EXTRA (item 13, planet+research chrome): remove our "click set
+project" upper-right and "Esc return to galaxy" lower-left texts.
+
+ASSISTANT NOTE on P7: harness law banked in _wip_tRSV2.md P11 says
+--campaign N in --ui mode IS a turn cap (main.cpp:656 -> ui.cpp:1215
+quit at played>=N). If the user's build used such a flag that IS the
+20-day exit; else P7b is a real defect. Diagnostic row must check the
+flag path FIRST, then the event-loop, and must also fix the advance-
+until button (R-side of the time-controls).
+
+## D29 — RESEARCH INCOME REQUIRES A PRODUCER (USER, 2026-11-25, verbatim)
+
+> Seems like the loop spent a bunch of time diagnosing why research
+> doesn't increment - you have to build a research-producing structure
+> first, like a laboratory.
+
+tRS-V2w (f8c51e1) burned an iteration diagnosing res==0 as a possible
+defect; per D29 it is CORRECT BEHAVIOR (no lab = no research points).
+GROWN-ENDPOINT fill witness (owed since tRS-V2p) must therefore BUILD
+a Laboratory (or queue one via the build law) on a scratch campaign
+before expecting growth frames. Standing law banked: when a counter
+reads zero, check PRODUCER EXISTENCE before suspecting the counter.
