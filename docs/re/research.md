@@ -436,3 +436,49 @@ S8.1 FOCAL VALUE CORRECTION (tRS-V1c, 2026-11-24). The "1194.19" cited in
    port pins resFocal() = 320.0/std::tan(15.0*pi/180) in double and the
    mutation focal->tan(17.5deg) is CAUGHT by tests/test_researchgeom_trsvc.
    cpp. Scale consequences in S8 are unchanged at the cited precision.
+
+## 9. tRS-V2 DISK FILL LAW (2026-11-24, D27 user law: empty -> center
+sliver on select -> widens with progress -> full on completion). Working
+record docs/re/_wip_tRSV2.md P1-P7; derivation RAW-STEPPER cited (the
+tRSV1b linear dump desyncs in this region).
+  (a) THE PICTURE CONSUMER (seam TRSV1-C CLOSED at code level): inside the
+      reswin per-row draw loop (FUN_00041e34), AFTER the prereq line loop
+      and BEFORE the ring blit, 0x48383..0x483f7: per-row value q =
+      [esp+0x120]; if q==0 SKIP (no picture); else Q = (int16)q << 16
+      (shl edx,0x10 = shift 16), qdiv = Q / 20 (signed idiv ebx=0x14),
+      shapeId = FUN_0001fc34(cache 0x9f10c, slot word [0x6fd82]), then
+      FUN_0005d5a1(shapeIdPtr, p2=[esp+0x154], p3=[esp+0x144], x=projX
+      sar16, y=projY sar16, 0x48c44, 0, scaleU=qdiv, scaleV=qdiv, flags=1).
+      The library at slot word 0x6fd82 = the 66-record per-row picture
+      library (file data\\restree.shp, extracted/ascend01/data/restree.shp;
+      READ sites 0x476c6/0x483dd/0x4873b/0x48785, no direct static writer -
+      bulk-registered by the shape loader).
+  (b) Q LAW (0x481aa..0x48239 VERBATIM): row = [esp+0x128]; rec = row*0x4b
+      (table base 0x74744 = the count u16, OQ-013); raceBit = [0x7458e].
+        q = 0;                       ; unowned AND not-studied -> EMPTY
+        if dword[rec+0x47]>>24 has raceBit:  q = 20;   ; OWNED -> FULL
+        else if row == word[0x76492 + 2*race] (the STUDIED/selected word,
+             set verbatim 0x48130..0x48141, the tRS-B1 specnum field):
+             q = (word[0x764a0+2*row]*18) / word[rec+0x3e] + 2;
+             clamp q to [-17, +17];
+      word[rec+0x3e] = the RUNTIME cost (S6b law, base+62/0x3e) - the
+      divisor is the SCALED cost, not the file cost. dword[rec+0x47] is the
+      SAME owned-mask field the ring-frame law reads at 0x4841d (consistency
+      check: owned rows get ring frame 3 AND fill 1.0). Negative clamp is
+      dead for real inputs (progress u16 >= 0 => q >= 2); ported verbatim.
+  (c) WIPE SHAPE (DERIVED, not guessed): FUN_0005d5a1's scaled branch
+      scales the whole source record by scaleU/scaleV about the passed
+      ANCHOR (the S8(h) blitter anchor law; dest = record signed-bbox +
+      anchor), clipped to the node rect. Both axes receive the SAME q/20
+      factor => a uniform CENTER-OUT RADIAL SCALE: at select (progress 0)
+      q=2 -> 0.10 of the picture (the central sliver the user sees APPEAR
+      ON SELECT); q grows 2 -> 20 as progress 0 -> cost (scale 0.10 ->
+      1.00, picture WIDENS from centre out); owned -> 1.00 = FULL DISK.
+      NOT an angular wedge: no angle term exists anywhere in the cited
+      chain. 16.16 pins: q=2 -> 0x19a9; q=11 -> 0x6988; q=17 -> 0xd9f9;
+      q=20 -> 0x10000.
+  (d) UNRECOVERED LEGS (named, not stubbed): the writer of word[0x764a0+
+      2*row] (the per-turn research progress accumulator) and the exact
+      arg roles of 0x5d5a1 p2/p3 (decompiler regparm mapping suspect; the
+      0x48c44 immediate sits in the code region). Endpoints (a)+(b) close
+      the user-law behavior regardless; port spec docs/re/_wip_tRSV2.md P7.

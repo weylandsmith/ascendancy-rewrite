@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-24T18:25
+updated: 2026-11-24T18:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,33 +233,66 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tRS-V2 RESEARCH DISK FILL LAW (D27 user law, supersedes
-WAIT-USER-GRADE-PR1): unknown tech = EMPTY disk (no art at all);
-SELECTING it for research shows a SMALL PORTION OF THE CENTER of the
-tech's picture; as research progresses the portion WIDENS; on
-completion the picture FILLS THE DISK (user memory - verify the
-end-state against vendor, and derive the wipe SHAPE (center-out wedge
-vs growing inner disc) from the vendor paint code, do not guess).
-RE-FIRST: research-window paint fn chain already cited (tRS-V1b
-docs/re/_wip_tRSV1.md + research win msg map); find the per-disk clip
-or source-rect computation keyed to progress. PORT: progress->wipe
-law + empty-disk state; pins: 0% = empty, mid = center portion only
-(pixels outside wipe absent), 100% = full art; selected-but-0% shows
-the sliver (user: portion appears ON SELECT). Budget <=2 cycles.
-THEN tRS-V3 LINK ATTACH (D27 grade: "lines leading to other
-technologies aren't connecting to the circles properly"): derive the
-vendor link endpoint law from the same paint fn (rim-attach vs center
-vs projected-offset) and fix ours; G2 region diff vs refcap at the
-link pixels; pin: each link's endpoint within N px of target circle
-rim at multiple yaws. Budget <=1 cycle.
-THEN tPR2-U: re-package grade sheet (checklist format, ours|vendor
-side-by-side per D19) covering research screen + planet screen; NEXT
-becomes WAIT-USER-GRADE-PR2. Context: user is BUILDING c68e8bd locally
-to test planet functionality himself - if his report names planet
-defects, those rows take priority over tRS-V3. Ring TL expired
-2026-11-24 14:53 - production game needs t439 recovery pattern before
-ANY live witness; scratch DOSBox unaffected. Protected saves law
-stands. C1-C5 + race intro remain DEFERRED (D25).
+NEXT tRS-V2p RESEARCH DISK FILL PORT + PINS (D27 user law; RE-FIRST
+landed this iteration - the vendor wipe law is DERIVED + cited, research.md
+S9 + docs/re/_wip_tRSV2.md P1-P7). DO THIS ONE TASK: port the fill law and
+pin it. Full spec in _wip_tRSV2.md P7 (a-d): (1) pure law resDiskQ() in
+researchview.{h,cpp} VERBATIM (owned->20; studied->clamp(p*18/cost+2,-17,17);
+else 0; fill=q/20; cost = the S6b RUNTIME cost word[rec+0x3e]); (2) render in
+ui.cpp NODES block: after the ring blit, if fill>0 blit this row's record from
+data\\restree.shp (extracted/ascend01/data/restree.shp, 66 recs, one per live
+row = slot word 0x6fd82) SCALED BY fill about the node centre (mirror 0x5d5a1's
+scaled branch; add a scaled blit to the shp lib if absent and cite it);
+unselected/unknown rows blit NOTHING (empty disk); (3) pins
+test_researchfill_tRSV2.cpp: p=0 unselected q==0; selected p=0 q==2 (0x19a9);
+p=cost/2 q==11; p=cost q==20 (0x10000); owned q==20; clamp leg engineered q>17
+-> 17; MUTATIONS +2->+0, 18->16, /20->/16, clamp 17->18 CAUGHT; (4) witness
+scripts/tRSV2p_witness.sh scratch seed-5: select a tech, content-bbox census at
+p=0 (sliver) / mid (wider) / owned (full) vs flat field bg (tRSV1d census
+lesson). Budget <=2 cycles. RATIONALE for ordering: the law is now cited
+(derivation done) so the port is a mechanical + pin task - do it before
+re-opening anything; tRS-V3 LINK ATTACH (D27 "lines not connecting to the
+circles") then tPR2-U grade package FOLLOW, in that order. Context unchanged:
+user is building c68e8bd locally to test planets - if his report names planet
+defects those rows PREEMPT tRS-V3; Ring TL expired 2026-11-24 14:53 (production
+game needs t439 recovery before ANY live witness; scratch DOSBox unaffected);
+protected saves law stands; C1-C5 + race intro remain DEFERRED (D25).
+
+tRS-V2r LANDED 2026-11-24 (RESEARCH DISK FILL LAW DERIVED + CITED — the
+tRS-V2 RE-FIRST half; port+pins named as tRS-V2p; no code shipped this
+iteration - run budget; no OQ row touched, honest negative under
+strict-close, open=[016,019] unchanged). PROVED (docs/re/research.md S9;
+working log docs/re/_wip_tRSV2.md P1-P7):
+ - TRSV1-C RESOLVED at code level: the per-row picture-in-disk painter is
+   in the reswin per-row loop at 0x48383..0x483f7 (raw-stepper cited; the
+   tRSV1b linear dump desyncs here) - per-row value q, if q!=0 then
+   FUN_0005d5a1 scaled-RLE blit of the record at slot word 0x6fd82 (= the
+   66-record restree.shp library, extracted/ascend01/data/restree.shp) with
+   scaleU=scaleV=(int16)q<<16 / 20 (idiv ebx=0x14), flags=1; shape id via
+   0x1fc34(cache 0x9f10c, [0x6fd82]).
+ - Q LAW (0x481aa..0x48239 verbatim): q=0 default; OWNED (dword[row*0x4b+
+   0x7478b]>>24 race bit = the SAME rec+0x47 field the ring law reads at
+   0x4841d - consistency check passed) -> q=20; else row==studied word
+   [esp+0x134] (= word[race*2+0x76492], set 0x48130..0x48141, the tRS-B1
+   specnum field) -> q = (word[0x764a0+2*row]*18)/word[row*0x4b+0x74782]+2
+   clamped [-17,17]; word[row*0x4b+0x74782] = base+0x3e = the S6b RUNTIME
+   cost (table base 0x74744 = count u16; the divisor is the SCALED cost).
+ - WIPE SHAPE DERIVED (the D27 ask, no guess): uniform CENTER-OUT RADIAL
+   SCALE of the whole record picture about the node centre (both axes same
+   q/20 factor, S8(h) anchor law; no angle term anywhere in the cited chain)
+   - EMPTY when unselected/unknown; SELECT at progress 0 -> q=2 = 0.10
+   (central sliver appears ON SELECT); widens 0.10->1.00 as progress 0->cost;
+   owned -> full disk. 16.16 pins 0x19a9/0x6988/0xd9f9/0x10000.
+ - OPEN LEGS carried (named, not stubbed): writer of word[0x764a0+2*row]
+   (progress accumulator); exact 0x5d5a1 p2/p3 roles (decompiler regparm
+   mapping suspect - the 0x48c44 immediate sits in the code region); slot
+   word 0x6fd82 load site (bulk-registered, no static writer). Endpoints
+   close the user-law behavior regardless.
+ - SITTING CHECK ran FIRST (exit 0, 45,227 rows, newest t=1335 - stale
+   assignment stood). Ghidra headless healthy. No scratch capture needed
+   (pure static derivation this iteration).
+ - NEXT = tRS-V2p (port + pins, full spec _wip_tRSV2.md P7; budget <=2
+   cycles), then tRS-V3, then tPR2-U.
 
 tRS-V1d LANDED 2026-11-24 (SEAM TRSV1c-E CLOSED EARLY — VENDOR BLITTER
 ANCHOR LAW DERIVED + PORTED + 3 PINS + MUTATION-PROVED + PIXEL WITNESS PASS;
