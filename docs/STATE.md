@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-24T18:55
+updated: 2026-11-24T23:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,30 +233,71 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tRS-V2p RESEARCH DISK FILL PORT + PINS (D27 user law; RE-FIRST
-landed this iteration - the vendor wipe law is DERIVED + cited, research.md
-S9 + docs/re/_wip_tRSV2.md P1-P7). DO THIS ONE TASK: port the fill law and
-pin it. Full spec in _wip_tRSV2.md P7 (a-d): (1) pure law resDiskQ() in
-researchview.{h,cpp} VERBATIM (owned->20; studied->clamp(p*18/cost+2,-17,17);
-else 0; fill=q/20; cost = the S6b RUNTIME cost word[rec+0x3e]); (2) render in
-ui.cpp NODES block: after the ring blit, if fill>0 blit this row's record from
-data\\restree.shp (extracted/ascend01/data/restree.shp, 66 recs, one per live
-row = slot word 0x6fd82) SCALED BY fill about the node centre (mirror 0x5d5a1's
-scaled branch; add a scaled blit to the shp lib if absent and cite it);
-unselected/unknown rows blit NOTHING (empty disk); (3) pins
-test_researchfill_tRSV2.cpp: p=0 unselected q==0; selected p=0 q==2 (0x19a9);
-p=cost/2 q==11; p=cost q==20 (0x10000); owned q==20; clamp leg engineered q>17
--> 17; MUTATIONS +2->+0, 18->16, /20->/16, clamp 17->18 CAUGHT; (4) witness
-scripts/tRSV2p_witness.sh scratch seed-5: select a tech, content-bbox census at
-p=0 (sliver) / mid (wider) / owned (full) vs flat field bg (tRSV1d census
-lesson). Budget <=2 cycles. RATIONALE for ordering: the law is now cited
-(derivation done) so the port is a mechanical + pin task - do it before
-re-opening anything; tRS-V3 LINK ATTACH (D27 "lines not connecting to the
-circles") then tPR2-U grade package FOLLOW, in that order. Context unchanged:
-user is building c68e8bd locally to test planets - if his report names planet
-defects those rows PREEMPT tRS-V3; Ring TL expired 2026-11-24 14:53 (production
-game needs t439 recovery before ANY live witness; scratch DOSBox unaffected);
+NEXT tRS-V2w PLAYER-RES INCOME DIAGNOSIS + GROWN-FILL WITNESS (the one leg
+tRS-V2p could not witness; docs/re/_wip_tRSV2.md P10). DO THIS ONE TASK:
+establish WHY the port's player research progress never accrues (UI witness
+queued Xenobiology on seed 5, advanced 15 turns, row 6 re-logged q=2 every
+re-entry), then re-run scripts/tRSV2p_witness.sh to PASS the grown leg.
+Procedure: (1) headless instrument ONE print of techProgress[0]/res[0] per
+turn (add behind a --dbg-res flag or a one-off patched build NOT committed
+with the flag if ugly — prefer the flag); run --campaign 20 --seed 5 and
+read the channel. (2) If res[0]==0 every turn: the defect is upstream in
+colonyChannel(a.res,...) (campaign.cpp:997) or the prosperity->RES split —
+compare against the income-law.md S6 RES law (cited) and the production
+ring saves where the vendor player DOES bank research; derive the missing
+arm, port, pin (mutation-verified). (3) If res[0]>0 but progress frozen:
+the bug is in researchPhase's player arm (campaign.cpp:1462..1522 — check
+the queuedTech[o] guard path for the human owner); fix + pin. (4) Re-run
+tRSV2p_witness.sh (already encodes sliver+grown+census; --campaign 30 cap)
+to a VERDICT PASS, and note the fix in research.md S9(e) + income-law.md.
+RATIONALE for ordering: tRS-V2p shipped the fill law port + 8 pins + 4
+mutations + sliver witness; the grown endpoint is the ONLY un-witnessed
+half of D27, and it is blocked by an income defect that ALSO silently
+starves the D26 build-loop UX — fixing it moves two complaints at once.
+tRS-V3 LINK ATTACH (D27 "lines not connecting to the circles") then tPR2-U
+grade package FOLLOW, in that order. Context unchanged: user is building
+c68e8bd locally to test planets - if his report names planet defects those
+rows PREEMPT tRS-V3; Ring TL expired 2026-11-24 14:53 (production game
+needs t439 recovery before ANY live witness; scratch DOSBox unaffected);
 protected saves law stands; C1-C5 + race intro remain DEFERRED (D25).
+
+tRS-V2p LANDED 2026-11-24 (DISK FILL PORTED + 8 PINS + 4 MUTATIONS CAUGHT
++ SLIVER WITNESS PASS; GROWN LEG BLOCKED ON AN INCOME DEFECT, named as
+tRS-V2w; no OQ row touched — the research screen tracks none, honest
+negative under strict-close; open=[016,019] unchanged). PROVED (docs/re/
+research.md S9 corrected; working log docs/re/_wip_tRSV2.md P8-P10):
+ - PORT: researchview.{h,cpp} resDiskQ/resDiskFill VERBATIM 0x481aa..
+   0x48239 (owned->20 beats studied->clamp((p*18)/cost+2,-17,17) beats
+   empty->0; cost<=0 -> 0 seam TRSV2p-A); vendortext.cpp blitShapeScaleF
+   (fractional ANCHOR-composed blit mirroring 0x5d5a1's scaled branch;
+   rounding seam TRSV2p-B); ui.cpp restree.shp at kLibFiles[9] + fill blit
+   behind the ring behind a q!=0 gate; witness instrument "ui research
+   fill <row> <q>" change-only.
+ - LAW CORRECTIONS the port forced (all cited, S9(b)/(c)): the clamp legs
+   fire AFTER add eax,2, so the studied branch MAXES AT 17 — p=cost is
+   0.85 and the last 15% is the OWN-completion JUMP 17->20; the P7 draft's
+   "p=cost -> 20" was wrong. 16.16 pins recomputed: 0x1999/0x8CCC/0xd999/
+   0x10000 (the doc's 0x19a9/0x6988/0xd9f9 were transcription slips —
+   compute hex, never transcribe). restree.shp records are 50x50 content
+   at bbox (-25,-25) (bbox-diff law), NOT 24x24 dims; centred by
+   construction, 66/66 pinned.
+ - SUITE 526 -> 534, 0 failed. MUTATIONS M1 +2->+0, M2 18->16, M3 /20->/16,
+   M4 clamp 17->18 ALL CAUGHT (first sweep was VACUOUS — stale cwd meant
+   cmake never built; hazard banked: verify the build ran before trusting
+   any survival verdict), restored md5-verified, suite green after.
+ - WITNESS scripts/tRSV2p_witness.sh + tRSV2p_census.py seed 5: sliver leg
+   PASS (select painted 94px inside the disk box, control 0px, study line,
+   fill-6-2 log; owned rows log 20, frontier rows 0). GROWN leg BLOCKED:
+   15 NEXT TURN advances (log-proven turn 15) left q=2 — player research
+   progress never accrues; headless scan: player techs stuck at 3 through
+   turn 40 on seeds 1,2,3,7,11,2024. Root cause [inferred] campaign.cpp:
+   997 colonyChannel res arm; full diagnosis = tRS-V2w (NEXT, above).
+   HARNESS LAWS banked: --campaign N in --ui mode IS the turn cap
+   (main.cpp:656 -> ui.cpp:1215) — N=1 dies on first NEXT TURN; NEXT TURN
+   is map-only (Escape off research first, gate.sh:623 recipe).
+ - SITTING CHECK ran FIRST (exit 0, 45,227 rows, newest t=1335 — stale
+   assignment stood). Production ring untouched; scratch Xvfb killed BY PID.
+ - NEXT = tRS-V2w (above); then tRS-V3, then tPR2-U.
 
 tRS-V2r LANDED 2026-11-24 (RESEARCH DISK FILL LAW DERIVED + CITED — the
 tRS-V2 RE-FIRST half; port+pins named as tRS-V2p; no code shipped this

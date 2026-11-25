@@ -253,4 +253,25 @@ int resNodeFrame(int row, bool studied, bool owned, bool selected);
 // z2); posz the camera position z.
 int resEdgeColorIndex(double z_this, double z_prereq, double posz);
 
+// ---- tRS-V2p: THE DISK FILL LAW (research.md S9; D27 user law) -----------
+// Per-row picture value q, VERBATIM 0x481aa..0x48239 (raw-stepper cited):
+//   q = 0;                                   ; unowned AND not-studied:
+//                                            ; EMPTY disk (0x4838c skips)
+//   owned (mask dword[rec+0x47]>>24 & raceBit): q = 20;   ; 0x481ce FULL
+//   else if row == studied word:               ; the 0x76492 specnum field
+//     q = (progress*18)/runtimeCost + 2;       ; 0x48205..0x48218
+//     clamp q to [-17, +17];                   ; 0x48222/0x48234 (AFTER
+//                                              ; the +2: max studied q=17)
+// progress = word[0x764a0+2*row] (u16), runtimeCost = word[rec+0x3e] (the
+// S6b RUNTIME cost). The clamp firing means p>=cost renders 0.85 and the
+// final 15% is the OWN-completion JUMP 17->20 (S9(c) corrected). The
+// negative leg is dead for real inputs (u16 progress >= 0 => q >= 2);
+// ported verbatim anyway. SEAM TRSV2p-A: the vendor has NO cost==0 guard
+// (idiv by zero = SIGFPE class); the port returns q=0 for cost<=0.
+int resDiskQ(bool owned, bool studied, int progress, int runtimeCost);
+
+// The blit scale factor q/20 (the 16.16 quotient of 0x48390..0x4839d:
+// (int16)q << 16 idiv 20). q==0 -> 0.0 == no picture at all.
+double resDiskFill(int q);
+
 }  // namespace ascend::ui

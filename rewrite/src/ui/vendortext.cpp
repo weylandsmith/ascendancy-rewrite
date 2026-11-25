@@ -5,6 +5,7 @@
 #include "ui/ui_internal.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <fstream>
 #include <iterator>
@@ -148,6 +149,55 @@ bool blitShapeScaled(SDL_Renderer* ren,
                      const ascend::formats::ShapeLibrary& lib, int rec,
                      int x, int y, int scale) {
     return blitShapeCircular(ren, lib, rec, x, y, scale, 0);
+}
+
+// tRS-V2p: fractional-scale ANCHORED blit (header law in ui_internal.h;
+// research.md S9(a)/(c)). Decode/alpha path identical to
+// blitShapeCircular; only the destination-rect composition differs: the
+// passed point is the vendor ANCHOR and the record's signed bbox scales
+// WITH the picture, so a centred-bbox record stays centred at q/20.
+bool blitShapeScaleF(SDL_Renderer* ren,
+                     const ascend::formats::ShapeLibrary& lib, int rec,
+                     int x, int y, double scale) {
+    if (!(scale > 0.0)) return false;  // refuse, never clamp-to-visible
+    std::vector<uint8_t> a, b;
+    if (!lib.decode(rec, a) || a.empty()) return false;
+    b = a;
+    std::fill(b.begin(), b.end(), uint8_t(0x55));
+    std::fill(a.begin(), a.end(), uint8_t(0xAA));
+    if (!lib.decode(rec, a) || !lib.decode(rec, b)) return false;
+    const auto& r = lib.record(rec);
+    std::vector<uint32_t> argb(a.size());
+    for (size_t k = 0; k < a.size(); k++) {
+        const uint8_t idx = a[k];
+        uint32_t rgb;
+        if (g_chromePal.ready()) {
+            rgb = g_chromePal.argb(idx) & 0x00FFFFFFu;
+        } else {
+            const uint32_t lum = 40u + (uint32_t(idx) * 185u) / 255u;
+            rgb = (lum << 16) | (lum << 8) | lum;
+        }
+        const uint32_t alpha = a[k] == b[k] ? 0xFF000000u : 0x00000000u;
+        argb[k] = alpha | rgb;
+    }
+    SDL_Texture* tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                                         SDL_TEXTUREACCESS_STATIC,
+                                         int(r.width), int(r.height));
+    if (!tex) return false;
+    SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);  // t411 law
+    SDL_UpdateTexture(tex, nullptr, argb.data(),
+                      int(r.width) * int(sizeof(uint32_t)));
+    // Anchor-composed rect: bbox corner AND extents both scale (the vendor
+    // scales the whole source polygon, corners included — 0x5d5a1's 5-pt
+    // project per _wip_tRSV2 P2).
+    SDL_Rect dst{
+        x + int(std::lround(scale * double(r.left))),
+        y + int(std::lround(scale * double(r.top))),
+        std::max(1, int(std::lround(scale * double(r.width)))),
+        std::max(1, int(std::lround(scale * double(r.height))))};
+    SDL_RenderCopy(ren, tex, nullptr, &dst);  // NEAREST (SDL default)
+    SDL_DestroyTexture(tex);
+    return true;
 }
 
 // t414: the vendor's race-list portraits are CIRCULAR ART clipped to the

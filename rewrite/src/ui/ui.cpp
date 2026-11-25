@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <map>
 #include <vector>
 
 #include "formats/flic.h"
@@ -223,6 +224,9 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     Uint32 lastResPumpMs = 0;
     int resCenterLogged = -1;  // row of the last "ui research center" line
     int resCenterX = -1, resCenterY = -1;  // its centre (change-detector)
+    // tRS-V2p witness instrument: last logged fill q per row (change-only
+    // logging; cleared with resSel on screen re-entry, same law).
+    std::map<int, int> resFillLogged;
     // t419 corner "Exit <ESC>" popup state (ui/exitpopup.h): the corner the
     // cursor currently probes into (None = hidden).
     ExitCorner exitCorner = ExitCorner::None;
@@ -302,11 +306,15 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // tRS-V1c: resring.shp joins at index 8 — the NODE RING sprites (4 x
     // 29x29 frames; law docs/re/_wip_tRSV1.md P3/P10). It is deliberately
     // OUTSIDE the libFor() 8-entry scan (screenShapeLib never names it).
-    const char* kLibFiles[9] = {"1starmap.shp", "10status.shp", "14intel.shp",
+    // tRS-V2p: restree.shp joins at index 9 — the 66-record PER-ROW disk
+    // PICTURE library (record index == live row; every record bbox
+    // (-25,-25) 24x24 measured this iteration; law research.md S9(a)).
+    const char* kLibFiles[10] = {"1starmap.shp", "10status.shp", "14intel.shp",
                                 "20res.shp", "planets.shp", "17np.shp",
-                                "16battle.shp", "suns.shp", "resring.shp"};
-    ascend::formats::ShapeLibrary kLibs[9];
-    for (int i = 0; i < 9; i++) {
+                                "16battle.shp", "suns.shp", "resring.shp",
+                                "restree.shp"};
+    ascend::formats::ShapeLibrary kLibs[10];
+    for (int i = 0; i < 10; i++) {
         std::string lerr;
         if (!kLibs[i].load(dataRoot + "/extracted/ascend01/data/" + kLibFiles[i],
                            &lerr))
@@ -2610,6 +2618,39 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             }
                             SDL_RenderDrawPoints(ren, pts, npts);
                         }
+                        // tRS-V2p DISK FILL (research.md S9): after the
+                        // ring, the per-row PICTURE from restree.shp scaled
+                        // q/20 about the node anchor. q==0 rows blit
+                        // NOTHING (the empty disk the user law names);
+                        // studied row = the queued topic (0x76492 word
+                        // analog); progress = the campaign's accumulated
+                        // progress for that topic. Blocked rows never
+                        // reach here (not drawn at all, 0x48566 gate).
+                        if (kLibs[9].count() > nd.row) {
+                            const bool studied = nd.row == queuedRow;
+                            const int q = resDiskQ(
+                                nd.state == TechNodeState::Owned, studied,
+                                studied ? int(camp.techProgressFor(ag::kPlayer))
+                                        : 0,
+                                tree->all()[size_t(nd.row)].runtimeCost());
+                            if (q != 0)
+                                blitShapeScaleF(ren, kLibs[9], nd.row, c.x,
+                                                c.y, resDiskFill(q));
+                            // Witness instrument (tRS-V2p): log q per row
+                            // on CHANGE only (the center-log pattern) so a
+                            // pixel census can assert the LAW value at
+                            // each stage, not just "pixels appeared".
+                            {
+                                auto it = resFillLogged.find(nd.row);
+                                if (it == resFillLogged.end() ||
+                                    it->second != q) {
+                                    std::printf("ui research fill %d %d\n",
+                                                nd.row, q);
+                                    std::fflush(stdout);
+                                    resFillLogged[nd.row] = q;
+                                }
+                            }
+                        }
                     }
                     SDL_RenderSetClipRect(ren, nullptr);
                     // t435 D1 FIX: pan-button faces = 20res.shp records
@@ -2901,6 +2942,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 // selection word win+0x9db (and the witness row).
                 resSel = -1;
                 resCenterLogged = -1;
+                resFillLogged.clear();
             }
             if (resCam.moving() &&
                 nowMs - lastResPumpMs >= (Uint32)Camera3d::kSpinTickMs) {

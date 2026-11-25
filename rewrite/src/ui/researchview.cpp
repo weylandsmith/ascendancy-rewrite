@@ -354,4 +354,20 @@ ResHitResult researchHit(const ag::ResearchTree& tree,
     return h;
 }
 
+// tRS-V2p: THE DISK FILL LAW VERBATIM (research.md S9(b), raw-stepper cited
+// 0x481aa..0x48239). Branch order matters: owned beats studied.
+int resDiskQ(bool owned, bool studied, int progress, int runtimeCost) {
+    if (owned) return 20;                            // 0x481ce
+    if (!studied) return 0;                          // 0x481aa default +
+                                                     // 0x481f1 jne exit
+    if (runtimeCost <= 0) return 0;                  // SEAM TRSV2p-A: the
+                                                     // vendor idivs blind
+    const int q = (progress * 18) / runtimeCost + 2;  // 0x48205..0x48218
+    if (q < -17) return -17;                          // 0x48222..0x48227
+    if (q > 17) return 17;                            // 0x48234..0x48239
+    return q;
+}
+
+double resDiskFill(int q) { return double(q) / 20.0; }  // 0x48390..0x4839d
+
 }  // namespace ascend::ui

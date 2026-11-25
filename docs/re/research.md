@@ -472,11 +472,17 @@ tRSV1b linear dump desyncs in this region).
       anchor), clipped to the node rect. Both axes receive the SAME q/20
       factor => a uniform CENTER-OUT RADIAL SCALE: at select (progress 0)
       q=2 -> 0.10 of the picture (the central sliver the user sees APPEAR
-      ON SELECT); q grows 2 -> 20 as progress 0 -> cost (scale 0.10 ->
-      1.00, picture WIDENS from centre out); owned -> 1.00 = FULL DISK.
+      ON SELECT); q grows 2 -> 17 as progress 0 -> cost (scale 0.10 ->
+      0.85 — the clamp legs 0x48222/0x48234 fire AFTER `add eax,2`, so the
+      studied branch NEVER reaches 20; tRS-V2p recheck 2026-11-24 corrects
+      the earlier "grows to 1.00 as progress -> cost" phrasing); the last
+      15% is the OWN-completion JUMP 17 -> 20 (0.85 -> 1.00) at
+      0x481ce; owned -> 1.00 = FULL DISK.
       NOT an angular wedge: no angle term exists anywhere in the cited
-      chain. 16.16 pins: q=2 -> 0x19a9; q=11 -> 0x6988; q=17 -> 0xd9f9;
-      q=20 -> 0x10000.
+      chain. 16.16 pins (recomputed tRS-V2p against the cited truncating
+      idiv q<<16/20: the earlier 0x19a9/0x6988/0xd9f9 were transcription
+      slips — 0x19a9=0.1002, 0x6988=0.4123, 0xd9f9=0.8516 match no q):
+      q=2 -> 0x1999; q=11 -> 0x8CCC; q=17 -> 0xd999; q=20 -> 0x10000.
   (d) UNRECOVERED LEGS (named, not stubbed): the writer of word[0x764a0+
       2*row] (the per-turn research progress accumulator) and the exact
       arg roles of 0x5d5a1 p2/p3 (decompiler regparm mapping suspect; the

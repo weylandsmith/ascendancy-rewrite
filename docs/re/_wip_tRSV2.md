@@ -235,3 +235,100 @@ direct static writer found — bulk-registered by the shape loader); (b)
 0x5d5a1 exact arg roles (decompiler mapping untrusted — regparm-suspect;
 the 0x48c44 immediate sits in the code region; pin via the 0x5caac/0x5cf96
 sibling sites' [esp+0x140] push); (c) writer of word[0x764a0+2*row].
+
+## P8 - tRS-V2p PORT ITERATION (2026-11-24, this session)
+
+PRE-CODE LAW RECHECK (raw stepper 0x481aa..0x48240, ~/tools/revenv
+scripts/t442_disasm.py) - CORRECTION to the P7 pin list: the clamp legs
+0x48222 (cmp eax,-0x11 / jge) and 0x48234 (cmp eax,0x11 / jle) fire AFTER
+`add eax,2` (0x48218), so the studied branch MAXES AT q=17, NOT 20. At
+p=cost: 18+2=20 -> clamped 17 (0.85). q=20 (16.16 0x10000) is reachable
+ONLY via the OWNED leg 0x481ce. The P7 spec line "p=runtimeCost -> q==20
+(0x10000, full)" is WRONG against the cited law; the correct pins are
+p=cost -> 17 and owned -> 20. "engineered q>17 -> 17" is not an edge case,
+it is what p>=cost does. research.md S9(b) amended.
+Also verified verbatim: p load `mov dx,[edx*2+0x764a0]; and edx,0xffff`
+(u16 zero-extend, indexed by the STUDIED row), imul 0x12, divisor
+`mov bx,[eax+0x74782]` (u16 zero-extend = runtime cost word), signed idiv
+(sign-ext via sar 0x1f), owned mask dword[rec+0x47]>>24 and (1<<byte[0x7458e]).
+Div-by-zero: the vendor has NO cost==0 guard (SIGFPE class); the port
+returns q=0 for cost<=0 as a NAMED SEAM (TRSV2p-A).
+
+ART MEASURED THIS SESSION (restree.shp directory + bbox-diff law):
+66 records; EVERY record's signed bbox quad = (-25,-25,24,24) i.e. the
+A1 BBOX-DIFF law gives content 50x50 at L,T=(-25,-25) - centred on the
+node anchor BY CONSTRUCTION exactly like resring's (-30,-30,29,29)
+(tRS-V1d anchor law applies unchanged: blit dest = anchor + scaled bbox
+corner). FIRST-DRAFT SLIP banked: reading the raw u32 words at rec+0x10
+as dims gives (24,24) - those are the R,B CORNERS; the failing
+researchfill_art_centred pin caught it (66/66 records assert 50x50).
+SECOND SLIP banked same session: hand-transcribing 16.16 hex - 11<<16/20
+= 0x8CCC, "corrected" once to 0x8C6C by hand, wrong; compute hex, never
+transcribe. Also the S9 doc's original 0x19a9/0x6988/0xd9f9 were all
+transcription slips (real: 0x1999/0x8CCC/0xd999).
+
+PORT SHAPE:
+- researchview.{h,cpp}: resDiskQ(owned, studied, progress, runtimeCost)
+  VERBATIM + resDiskFill(q) = q/20.
+- vendortext.cpp: NEW blitShapeScaleF(ren,lib,rec,x,y,scaleF) - fractional
+  scale about the passed anchor: dest rect = (x + round(scaleF*rec.left),
+  y + round(scaleF*rec.top), round(scaleF*W), round(scaleF*H)); same
+  decode/alpha path as blitShapeCircular. Rounding mode = seam TRSV2p-B
+  (0x5d5a1's affine step math unrecovered; p2/p3 roles suspect per P7).
+- ui.cpp: restree.shp joins kLibFiles at index 9 (libFor 8-scan unchanged);
+  NODES loop: after the ring blit, q=resDiskQ(...); if q!=0 blit record
+  [row] scaled q/20 at the node centre. Blocked rows never reach it (not
+  drawn at all, 0x48566 gate).
+
+## P9 - PORT + PINS + MUTATIONS LANDED (this session)
+
+- SHIPPED: researchview.{h,cpp} resDiskQ/resDiskFill VERBATIM (branch order
+  owned>studied>empty; cost<=0 -> q=0 seam TRSV2p-A); vendortext.cpp
+  blitShapeScaleF (anchor-composed fractional blit, seam TRSV2p-B rounding);
+  ui.cpp restree.shp at kLibFiles[9] (libFor 8-scan untouched) + the NODES
+  loop fill blit behind the ring, q!=0 gate.
+- SUITE 526 -> 534, 0 failed (tests/test_researchfill_trsv2p.cpp x8:
+  empty/sliver/midway+monotone/cost-clamps-17/owned-20/cost-zero-seam/
+  art-centred-66x50/wiring source-text).
+- MUTATIONS ALL CAUGHT (researchview.cpp mutated 4x, rebuilt, restored,
+  md5-verified, suite green after restore): M1 +2->+0 (select_sliver FAIL),
+  M2 18->16 (midway FAIL), M3 /20->/16 (select_sliver FAIL - the fill pin
+  is rational-exact so 0.125 != 0.1), M4 clamp 17->18 (midway's
+  prev==17 monotone-leg FAIL). HAZARD RE-WITNESSED: the FIRST mutation
+  pass ran with a stale kernel cwd so cmake never executed and every
+  mutant "SURVIVED" - a mutation sweep with no build is VACUOUS; verify
+  the build ran (absolute paths) before trusting any survival verdict.
+- LAW CORRECTIONS this port forced (all in research.md S9 + P8 above):
+  studied branch maxes at 17 not 20; 16.16 pins recomputed 0x1999/0x8CCC/
+  0xd999; restree.shp records are 50x50 content at bbox (-25,-25) not
+  24x24 dims.
+
+## P10 - WITNESS RUN (scripts/tRSV2p_witness.sh + tRSV2p_census.py, seed 5)
+
+VERDICT: PARTIAL PASS - SLIVER LEG PASS, GROWN LEG BLOCKED (named below).
+- PASS legs: select painted 94 px INSIDE the +-20 disk box (before->sliver)
+  with control box 120px away 0 px; log leg 'ui research study Xenobiology'
+  + 'ui research fill 6 2' (the law q=2 at p=0) both present; owned rows
+  log q=20 (rows 0/1/2), frontier rows log q=0 - the full q law is live on
+  the instrument line at rest.
+- BLOCKED (grown leg): after Escape->map + 15 NEXT TURN clicks (log proves
+  15 'ui click next-turn' + 'ui ok: turn 15'), row 6 re-logs q=2 - progress
+  NEVER accrued. ROOT-CAUSE SCAN (headless, cheap): --campaign 40 --headless
+  on seeds 1,2,3,3,7,11,2024 shows the PLAYER at techs 3 score 2% at turn
+  40 in EVERY seed (AI stars move; player never researches). researchPhase
+  adds res[o] (campaign.cpp:1514) and res[o] only grows via
+  colonyChannel(a.res,...) (:997) - i.e. the shipped-scenario player RES
+  channel reads 0. [inferred] The D26-era build loop has the same shape
+  (player builds only what the witness queues). This is a GAMEPLAY-INCOME
+  finding (OQ-016 neighbourhood), NOT a fill-law failure: the fill law's
+  arithmetic is pinned x8 + 4 mutations; the sliver endpoint is witnessed.
+  GROWN-ENDPOINT WITNESS owed as its own task (tRS-V2w): first diagnose
+  WHY player res[o]==0 (print the channel per phase headless), fix/derive,
+  THEN re-run this witness for the mid/owned growth frames.
+- WITNESS HARNESS LAWS BANKED: (1) in --ui mode --campaign N is the TURN
+  CAP (main.cpp:656 -> ui.cpp:1215 quit at played>=N) - N=1 dies on the
+  first NEXT TURN; the earlier witnesses never advanced turns so never hit
+  it; (2) NEXT TURN is map-only (kNextTurnBtn gated on kScreenMap) - leave
+  research with xsend key Escape (gate.sh:623 recipe) first; (3) xsend
+  'window died before release' stderr stays a red herring (t439 law,
+  re-witnessed x20).

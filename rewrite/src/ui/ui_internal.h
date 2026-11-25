@@ -51,6 +51,22 @@ struct VendorText {
 bool blitShape(SDL_Renderer* ren, const ascend::formats::ShapeLibrary& lib,
                int rec, int x, int y);
 
+// tRS-V2p: FRACTIONAL-SCALE ANCHORED BLIT (the research disk picture law,
+// research.md S9(a)/(c)). Mirrors FUN_0005d5a1's scaled branch shape: the
+// passed (x,y) is an ANCHOR, not a top-left — dest rect =
+// (x + scale*rec.left, y + scale*rec.top, round(scale*W), round(scale*H)),
+// so a record whose signed bbox is centred (restree.shp: EVERY record
+// L,T=(-25,-25), 24x24, measured this iteration) stays centred on the
+// anchor at every scale (the tRS-V1d anchor law, unchanged). scale in
+// (0,1] here (q/20 = 0.10..1.00); scale<=0 or decode failure -> false,
+// nothing painted. Same decode/transparent-skip/palette path as
+// blitShapeCircular. SEAM TRSV2p-B: the vendor rounds its 16.16 affine
+// step math unrecovered (0x5d5a1 p2/p3 roles suspect per _wip_tRSV2 P7);
+// the port uses nearest (lround) per edge.
+bool blitShapeScaleF(SDL_Renderer* ren,
+                     const ascend::formats::ShapeLibrary& lib, int rec,
+                     int x, int y, double scale);
+
 // t401: same decode/palette path as blitShape, drawn at scale (integer,
 // NEAREST filter — the scale FACTOR for RACELIST portraits is a port law;
 // the vendor's own filter is a named seam, docs/re/t401-newgame-art.md S10).
