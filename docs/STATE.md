@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-24T23:30
+updated: 2026-11-25T01:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,33 +233,75 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tRS-V2w PLAYER-RES INCOME DIAGNOSIS + GROWN-FILL WITNESS (the one leg
-tRS-V2p could not witness; docs/re/_wip_tRSV2.md P10). DO THIS ONE TASK:
-establish WHY the port's player research progress never accrues (UI witness
-queued Xenobiology on seed 5, advanced 15 turns, row 6 re-logged q=2 every
-re-entry), then re-run scripts/tRSV2p_witness.sh to PASS the grown leg.
-Procedure: (1) headless instrument ONE print of techProgress[0]/res[0] per
-turn (add behind a --dbg-res flag or a one-off patched build NOT committed
-with the flag if ugly — prefer the flag); run --campaign 20 --seed 5 and
-read the channel. (2) If res[0]==0 every turn: the defect is upstream in
-colonyChannel(a.res,...) (campaign.cpp:997) or the prosperity->RES split —
-compare against the income-law.md S6 RES law (cited) and the production
-ring saves where the vendor player DOES bank research; derive the missing
-arm, port, pin (mutation-verified). (3) If res[0]>0 but progress frozen:
-the bug is in researchPhase's player arm (campaign.cpp:1462..1522 — check
-the queuedTech[o] guard path for the human owner); fix + pin. (4) Re-run
-tRSV2p_witness.sh (already encodes sliver+grown+census; --campaign 30 cap)
-to a VERDICT PASS, and note the fix in research.md S9(e) + income-law.md.
-RATIONALE for ordering: tRS-V2p shipped the fill law port + 8 pins + 4
-mutations + sliver witness; the grown endpoint is the ONLY un-witnessed
-half of D27, and it is blocked by an income defect that ALSO silently
-starves the D26 build-loop UX — fixing it moves two complaints at once.
-tRS-V3 LINK ATTACH (D27 "lines not connecting to the circles") then tPR2-U
-grade package FOLLOW, in that order. Context unchanged: user is building
-c68e8bd locally to test planets - if his report names planet defects those
-rows PREEMPT tRS-V3; Ring TL expired 2026-11-24 14:53 (production game
-needs t439 recovery before ANY live witness; scratch DOSBox unaffected);
-protected saves law stands; C1-C5 + race intro remain DEFERRED (D25).
+NEXT tRS-V3 RESEARCH LINK ATTACH (D27 "lines not connecting to the
+circles"). The port draws prereq edges from node centres (ui.cpp kScreen
+Research NODES block); the vendor law is cited: edge runs (this.x,
+this.y-27) -> (prereq.x, prereq.y+27) (raw bytes 0x48343/0x483aa,
+research.md S8; the "+27 both endpoints" reading was REFUTED) with colour
+0x6b - clamp(chop(0.25*(0.5*(zt+zp)+posz)),+-3) and prereq==selected ->
+0xf3. DO THIS ONE TASK: (1) port the endpoint-offset + colour law verbatim
+into the edge painter (researchview/ui.cpp), keeping the z-order and the
+selected-prereq 0xf3 leg; (2) pins x>=4 (endpoint offsets, colour clamp
+edges incl. the chop-not-round leg, selected-prereq colour, wiring
+source-text); mutation-verify every constant you touch (build-run check
+first — tRS-V2p vacuity hazard); (3) witness scripts/tRSV3_witness.sh:
+seed 5, dolly-out recipe from tRSV2p_witness.sh, assert edge pixels land
+ON the ring rims (the tRS-V1d content-vs-bg census law; ring bbox
+(-30,-30,29,29) means rim = centre +-30) — a gap between line end and rim
+is the D27 defect and FAILs. RATIONALE for ordering: tRS-V2w closed the
+grown-fill half of D27 (witness PASS); the link-attach half is the only
+remaining research-screen complaint, its law is ALREADY cited (pure port
+work, ~25 tool calls), and the grade package tPR2-U should ship after both
+halves so the user grades one coherent screen. THEN tPR2-U GRADE PACKAGE
+(port shot via tRSV2w_witness.sh progressed stage + side-by-side vs t252
+frame + updated checklist: grown fill WITNESSED, links attached, open list
+honest). Context unchanged: user is building c68e8bd locally to test
+planets - if his report names planet defects those rows PREEMPT tRS-V3;
+Ring TL expired 2026-11-24 14:53 (production game needs t439 recovery
+before ANY live witness; scratch DOSBox unaffected); protected saves law
+stands; C1-C5 + race intro remain DEFERRED (D25).
+
+tRS-V2w LANDED 2026-11-25 (PLAYER-RES INCOME DIAGNOSIS CLOSED — NOT a
+defect: the vendor's own apply law is COMPRESSED and the shipped home's
+RES channel is 0; PORT UPGRADED to the cited law + grown-fill WITNESS
+PASS; no OQ row touched — the research screen tracks none, honest
+negative under strict-close; open=[016,019] unchanged). PROVED (docs/re/
+research.md S9(d)/(e) CLOSED the accumulator-writer leg; docs/re/
+income-law.md tRS-V2w block; working log docs/re/_wip_tRSV2.md P11-P12):
+ - DIAGNOSIS (--dbg-res headless seed 5): owner 0 bucket 0 add 0 prog 0
+   t1..t117 EXACT, bucket 1 from t118 (kBuildOrder Factory,Factory,
+   Laboratory on the IND-grant chain). q=2-for-15-turns was FAITHFUL, not
+   an income bug; the tRS-V2p [inferred] campaign.cpp:997 defect is
+   REFUTED — res arm arithmetic matches the T34 law (raw +0x46, no grant).
+ - LAW CITED (work/tRSV2w_46aec.asm = FUN_00046aec verbatim, turn site
+   0x2502f): bucket rebuild 0x46b24..0x46b88 (+ word[planet+0x46]; +1/
+   planet iff owner!=current-player AND gov[0x13bc4]==2 AND word<15 —
+   live gov==1 => DEAD shipped); APPLY 0x46bcd..0x46c1b adds TRUNC((b+1)^
+   0.85) (0x3feb3333:0x33333333 == double 0.85; pow 0x78a90, chop 0x76e08),
+   zero adds NOTHING; completion -> mask |= , target := 0xffff, prog := 0.
+ - PORT: researchProgressAdd + resFreeloaderAdd (campaign.cpp/.h exposed),
+   researchPhase applies the law (old RAW add over-accrued b>=2 upward),
+   freeloader wired gov-gated (zero shipped-scenario delta), --dbg-res
+   flag main.cpp both paths + Begin rebuild. SUITE 534 -> 538, 0 failed;
+   gate campaign seed 2024 still FINITE (Extinct t303; PLAYTHROUGH.md
+   REGENERATED — harness fix: record_playthrough.sh expected 85 sfx, the
+   binary prints 86 since the last regen; gate.sh:719 already said 86).
+ - MUTATIONS M1 pow->raw / M2 +0.5 round / M3 < -> <= / M4 zero-gate drop
+   ALL CAUGHT (individual runs after the batch script timed out mid-sweep
+   with a MUTANT ON DISK — recovered md5-verified 975edeae2b5e7c5a5c3b37
+   d2b08495b5, suite green after; hazard re-witnessed: never trust a
+   sweep that did not finish).
+ - WITNESS scripts/tRSV2w_witness.sh VERDICT PASS (seed 5, scratch Xvfb
+   :99 killed BY PID): --autoplay --campaign 400 --dbg-res; stages
+   before(q=0) -> sliver(q=2, 94px) -> progressed "ui research fill 6 3"
+   + 50px advance, control 0px, census tRSV2p_census.py UNCHANGED. The
+   --autoplay channel replaces 200 manual NEXT TURN clicks for long-horizon
+   grown states (HARNESS LAW).
+ - SEAM TRSV2w-A named: port KEEPS progress across re-queue; vendor zeroes
+   it whenever target == 0xffff (0x46b90). Sitting check ran FIRST (exit
+   0, 45,227 rows, newest t=1335 — stale assignment stood). Production
+   ring untouched.
+ - NEXT = tRS-V3 (above); then tPR2-U.
 
 tRS-V2p LANDED 2026-11-24 (DISK FILL PORTED + 8 PINS + 4 MUTATIONS CAUGHT
 + SLIVER WITNESS PASS; GROWN LEG BLOCKED ON AN INCOME DEFECT, named as

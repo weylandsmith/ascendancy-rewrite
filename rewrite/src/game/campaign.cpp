@@ -50,6 +50,31 @@ constexpr double kColonyIncomeGrant = 1.0;
 
 }  // namespace
 
+// tRS-V2w RESEARCH APPLY LAW (cited FUN_00046aec 0x46bcd..0x46c1b,
+// work/tRSV2w_46aec.asm; call site 0x2502f eax=0x74744): the per-turn RES
+// bucket adds NOTHING when 0 (je 0x46c02); otherwise progress +=
+// TRUNC((bucket+1)^0.85) — push 0x3feb3333:0x33333333 (double 0.85), pow
+// 0x78a90, frndint-chop 0x76e08, fistp. The SAME (v+1)^0.85 floor shape as
+// the IND display law (income-law.md T34). The port's old RAW add
+// (techProgress += res) over-accrued for every bucket >= 2 — the tRS-V2p
+// "income defect" diagnosis resolves as: accrual was near-ZERO (home RES
+// channel 0 by T34 law, freeloader gov-gated off), and where nonzero the
+// port was too FAST. Pure fn so the pin is mutation-testable.
+int researchProgressAdd(double resBucket) {
+    if (resBucket <= 0.0) return 0;  // je 0x46c02: zero adds nothing
+    return static_cast<int>(std::floor(std::pow(resBucket + 1.0, 0.85)));
+}
+
+// tRS-V2w FRELOADER TERM (cited 0x46b5b..0x46b77): per planet NOT owned by
+// the current-turn player, +1 into that owner's RES bucket iff the
+// government byte == 2 AND the planet's stored RES word < 15 (gate reads
+// word[+0x46] BEFORE the sum; 0 < 15 passes). Live byte[0x13bc4] == 1 in
+// 20/20 playcap saves (combat.md S278) => DEAD in the shipped scenario;
+// modelled so a New-Game gov override drives it like the vendor.
+int resFreeloaderAdd(int storedResWord, int govByte) {
+    return (govByte == 2 && storedResWord < 15) ? 1 : 0;
+}
+
 double colonyChannel(int acc, bool firstDoubleActive, bool compress) {
     if (acc == 0 && compress) return kColonyIncomeGrant;  // IND-only grant
     // (t19; IND-at-acc-0 is UNOBSERVABLE in captures — no owned planet ever
@@ -995,6 +1020,17 @@ void Campaign::incomeAndGrow() {
         const ChannelAcc a = channelAccFor(static_cast<int>(s));
         income[o] += colonyChannel(a.ind, a.dblI, /*compress=*/true);
         res[o] += colonyChannel(a.res, a.dblR, /*compress=*/false);
+        // tRS-V2w FRELOADER TERM (cited FUN_00046aec 0x46b5b..0x46b77):
+        // +1 per planet whose owner != the current-turn player (the port's
+        // o != kPlayer reading, same as the growth law's alien term) iff
+        // gov byte == 2 AND the stored RES word < 15. The stored word here
+        // IS the raw channel (T34: +0x46 = accumulator, no compression).
+        // Live gov == 1 (20/20 saves) => DEAD in the shipped scenario;
+        // wired so a New-Game gov override drives it like the vendor.
+        if (o != kPlayer)
+            res[o] += resFreeloaderAdd(
+                static_cast<int>(colonyChannel(a.res, a.dblR, false)),
+                cfg_.govByte);
         // PROS channel for GROWTH: the STORED +0x48 WORD (storedProsFor),
         // NOT the raw item sum (T37b correction, docs/re/income-law.md):
         // corpus battery scripts/r1_pros_growth.py over 13 runs — of the
@@ -1511,9 +1547,19 @@ void Campaign::researchPhase() {
             }
         }
         const Tech& tq = tree_->all()[queuedTech[o]];
-        techProgress[o] += res[o];  // all stockpiled RES goes into research
+        // tRS-V2w APPLY LAW (cited, see researchProgressAdd header): the
+        // vendor adds TRUNC((bucket+1)^0.85), not the raw stockpile. Zero
+        // adds nothing; the stockpile is CONSUMED either way (the vendor
+        // zeroes the bucket race-wide each turn — 0x46b0d/0x46b24 rebuild).
+        const double add = researchProgressAdd(res[o]);
+        const int bucket = static_cast<int>(res[o]);  // dbg: pre-consume
+        techProgress[o] += add;
         techRate_[o] = res[o];      // t408 display-only ETA denominator
         res[o] = 0;
+        if (dbgRes_)  // tRS-V2w instrument: one line/owner/turn
+            std::printf("dbg-res t%d owner %d bucket %d add %d prog %.0f cost %d\n",
+                        turn_, static_cast<int>(o), bucket,
+                        static_cast<int>(add), techProgress[o], tq.runtimeCost());
         if (techProgress[o] >= tq.runtimeCost()) {
             ownedTech[o][queuedTech[o]] = true;
             events_.push_back({turn_, "owner " + std::to_string(o) + " researched " + tq.name});

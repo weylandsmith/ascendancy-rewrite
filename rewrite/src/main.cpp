@@ -55,6 +55,7 @@ struct Options {
     bool noAudio = false;                       // t395: explicit opt-out (UI default is ON)
     bool mute = false;                          // load everything, volume 0
     bool audioTrace = false;                    // t388b: print per played sound
+    bool dbgRes = false;                        // tRS-V2w: dbg-res lines per turn
     int playerSpecies = -1;                     // specnum 0..20 (docs/re/species.md)
     int stars = 50;                             // galaxy density (t78 ladder
                                                 // 15/25/50/75/100; mapgen.md
@@ -93,6 +94,8 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->mute = true;
         else if (a == "--audio-trace")
             o->audioTrace = true;  // t388b headless SFX wiring instrument
+        else if (a == "--dbg-res")
+            o->dbgRes = true;  // tRS-V2w per-turn research-channel instrument
         else if (a == "--species" && i + 1 < argc)
             o->playerSpecies = std::atoi(argv[++i]);
         else if (a == "--stars" && i + 1 < argc)
@@ -128,6 +131,8 @@ void usage() {
         "                default; a silent-degrade line always prints)\n"
         "  --mute        load audio but master volume 0\n"
         "  --audio-trace print one line per played sound (wiring instrument)\n"
+        "  --dbg-res     print 'dbg-res t<turn> owner <o> bucket <b> add <a>\n"
+        "                prog <p> cost <c>' per owner per turn (tRS-V2w)\n"
         "  --campaign N  play N turns of a seeded campaign (docs/re/turnloop.md)\n"
         "  --seed S      seed for --campaign (default 1)\n"
         "  --ui          boot to the TITLE SCREEN (t385, docs/re/boot.md);\n"
@@ -330,6 +335,7 @@ int runCampaign(const Options& o) {
     std::string err;
     auto c = buildCampaign(o, &err);
     if (!c) { std::printf("campaign: %s\n", err.c_str()); return 1; }
+    c->setDbgRes(o.dbgRes);  // tRS-V2w instrument
     std::printf("campaign seed=%u stars=%zu lanes=%zu ai=6\n", o.seed,
                 c->galaxy().stars.size(), c->galaxy().lanes.size());
     for (int t = 0; t < o.campaign && !c->over(); ++t) {
@@ -549,6 +555,7 @@ int main(int argc, char** argv) {
             SDL_Quit();
             return 1;
         }
+        camp->setDbgRes(o.dbgRes);  // tRS-V2w instrument (witness leg)
         // t385 (D8 user ruling 2026-11-14): --ui boots to the TITLE SCREEN;
         // the campaign is reached through ONE transition (vendor RESUME
         // button, msg 1/1), not the constructor path. --resume pre-selects
@@ -640,6 +647,8 @@ int main(int argc, char** argv) {
                 std::printf("newgame applied stars %d owners %d gov %d\n",
                             newGame.stars, newGame.owners, newGame.gov);
                 camp = std::move(applied);
+                camp->setDbgRes(o.dbgRes);  // tRS-V2w (rebuild replaces the
+                                            // instrumented campaign)
                 // LIVE terms: the rebuild actually took — ownerCount() ==
                 // owners (cfg.aiCount+1) and the play galaxy carries the
                 // rung count (witness reads this line, not the intent line).

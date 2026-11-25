@@ -2658,3 +2658,50 @@ anti-vacuity); mutant M-D1 (T1[19] 3->0) CAUGHT by 6 checks. test_species
 cornucopia skip-leg fixture updated: an AI home can no longer rng-roll row
 10, so the premise is forced directly (terrainRow=10 on both campaigns'
 owner-1 home; the skip leg itself unchanged and still mutation-meaningful).
+
+## tRS-V2w RESEARCH APPLY + FRELOADER LAW (2026-11-25; disasm work/tRSV2w_46aec.asm)
+
+FUN_00046aec (turn call site 0x25028 mov eax,0x74744 / 0x2502f call; the
+t91-banked site) is the per-turn RESEARCH ACCUMULATOR WRITER — the field
+identity 0x74744+0x1d5c == 0x764a0 (t91) makes its target the same word
+the S9 disk-fill law reads (docs/re/research.md S9(e)).
+
+  BUCKET REBUILD (0x46b01..0x46b88): per-race RES bucket is rebuilt from
+  ZERO each turn (0x46b0d clears the race array; 0x46b24 rebuild loop) =
+  sum of word[planet+0x46] over that race's planets (0x46b80/0x46b84),
+  plus +1 PER PLANET iff owner != current-turn player ([0x7458e]) AND
+  byte[0x13bc4] == 2 AND that planet's RES word < 15 (0x46b5b..0x46b77 —
+  the gate reads word[+0x46] BEFORE the sum, so a RES-0 planet passes).
+  Live byte == 1 in 20/20 playcap saves (combat.md S278) => the freeloader
+  term is DEAD in the shipped scenario; wired in the port behind cfg_.govByte.
+
+  APPLY (0x46bcd..0x46c1b): if bucket == 0 -> je 0x46c02 adds NOTHING;
+  else progress word[0x764a0 + 2*row] += TRUNC((bucket+1)^0.85) — the
+  immediates 0x3feb3333:0x33333333 pushed at 0x46bdc/0x46be5 ARE the double
+  0.85, pow 0x78a90, frndint-CHOP helper 0x76e08, fistp 0x46bfe. Same
+  (v+1)^0.85 floor shape as the IND display law (T34 above); the bucket is
+  CONSUMED either way. Completion cmp progress >= word[rec+0x3e] (the
+  OQ-013 runtime cost) -> owned mask bytes +0x4a/+0x4b |= 1<<race, target
+  word 0x76492[race] := 0xffff, progress := 0, event 0x55a60 iff human
+  (0x46c7e). Target == 0xffff -> progress := 0 EVERY turn (0x46b90).
+
+  CONSEQUENCE for the tRS-V2p "player income defect": NOT a defect. The
+  shipped-scenario home world's RES channel is 0 (T34: +0x46 = raw
+  accumulator, no grant; Colony Base RES file field 0), the freeloader is
+  gov-gated off, so the player's research bucket reads 0 until a RES-field
+  item (Laboratory) completes — MEASURED --dbg-res headless seed 5: bucket
+  0 add 0 prog 0 for t1..t117, bucket 1 from t118 (kBuildOrder Factory,
+  Factory, Laboratory on the IND-grant chain). The port's REAL delta was
+  the RAW add (techProgress += res[o], pre-fix campaign.cpp:1514): it
+  over-accrued for every bucket >= 2 (raw 4 vs law 3; raw 15 vs law 10).
+
+  REWRITE UPGRADE: campaign.cpp researchProgressAdd() + resFreeloaderAdd()
+  (pure, cited headers), researchPhase applies researchProgressAdd(res[o]),
+  incomeAndGrow carries the gov-gated freeloader; instrument --dbg-res
+  (main.cpp both build paths + Begin rebuild). Pins tests/
+  test_resapply_trsv2w.cpp x4, mutation-verified M1 pow->raw / M2 +0.5
+  round / M3 < -> <= / M4 zero-gate removal ALL CAUGHT, restored md5
+  975edeae2b5e7c5a5c3b37d2b08495b5 (md5sum -c OK), suite 538/538. Gate campaign seed 2024 remains
+  FINITE (Extinct t303 re-captured into docs/PLAYTHROUGH.md). SEAM
+  TRSV2w-A: the port KEEPS progress across a re-queue; vendor zeroes it
+  whenever the target word reads 0xffff (0x46b90 leg unmodelled).

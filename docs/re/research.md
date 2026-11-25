@@ -483,8 +483,35 @@ tRSV1b linear dump desyncs in this region).
       idiv q<<16/20: the earlier 0x19a9/0x6988/0xd9f9 were transcription
       slips — 0x19a9=0.1002, 0x6988=0.4123, 0xd9f9=0.8516 match no q):
       q=2 -> 0x1999; q=11 -> 0x8CCC; q=17 -> 0xd999; q=20 -> 0x10000.
-  (d) UNRECOVERED LEGS (named, not stubbed): the writer of word[0x764a0+
-      2*row] (the per-turn research progress accumulator) and the exact
+  (d) UNRECOVERED LEGS (named, not stubbed): ~~the writer of word[0x764a0+
+      2*row] (the per-turn research progress accumulator)~~ CLOSED tRS-V2w
+      (see (e): FUN_00046aec, field identity 0x74744+0x1d5c==0x764a0 per
+      t91); the exact
       arg roles of 0x5d5a1 p2/p3 (decompiler regparm mapping suspect; the
       0x48c44 immediate sits in the code region). Endpoints (a)+(b) close
       the user-law behavior regardless; port spec docs/re/_wip_tRSV2.md P7.
+  (e) PROGRESS-ACCUMULATOR WRITER LAW CLOSED tRS-V2w (raw-stepper
+      work/tRSV2w_46aec.asm = FUN_00046aec verbatim; turn call site
+      0x25028 mov eax,0x74744 / 0x2502f call — t91's site):
+      (1) per-turn RES bucket[race] rebuilds from zero: + word[planet+0x46]
+          per owned planet (0x46b80/0x46b84), plus +1 per planet NOT owned
+          by the current-turn player iff byte[0x13bc4]==2 AND that planet's
+          RES word < 15 (0x46b5b..0x46b77; live gov == 1 in 20/20 saves =>
+          DEAD in the shipped scenario).
+      (2) APPLY 0x46bcd..0x46c1b: bucket==0 -> je 0x46c02 adds NOTHING;
+          else progress word[0x764a0+2*row] += TRUNC((bucket+1)^0.85)
+          (0x3feb3333:0x33333333 == double 0.85; pow 0x78a90, chop 0x76e08,
+          fistp 0x46bfe). Completion cmp progress >= word[rec+0x3e] ->
+          owned mask +0x4a/+0x4b |= 1<<race, target 0x76492[r] := 0xffff,
+          progress := 0, event 0x55a60 iff human (0x46c7e).
+      (3) target==0xffff -> progress := 0 EVERY turn (0x46b90).
+      CONSEQUENCES: the S9 q law's input is a COMPRESSED accrual — the
+      player's first ~117 turns on headless seed 5 run bucket 0 (home RES
+      channel 0 by income-law T34; measured --dbg-res), so q=2 for many
+      turns is FAITHFUL, and the port's old RAW add over-accrued for every
+      bucket >= 2. Ported campaign.cpp researchPhase + incomeAndGrow; pins
+      tests/test_resapply_trsv2w.cpp x4 (mutation-verified M1 pow->raw,
+      M2 round, M3 strict-<, M4 zero-gate); instrument --dbg-res. Witness
+      scripts/tRSV2w_witness.sh VERDICT PASS (grown fill q 2->3, seed 5,
+      --autoplay). SEAM TRSV2w-A: the port KEEPS progress across a
+      re-queue where the vendor zeroes it (0x46b90 leg unmodelled).

@@ -332,3 +332,73 @@ VERDICT: PARTIAL PASS - SLIVER LEG PASS, GROWN LEG BLOCKED (named below).
   research with xsend key Escape (gate.sh:623 recipe) first; (3) xsend
   'window died before release' stderr stays a red herring (t439 law,
   re-witnessed x20).
+
+## P11 - tRS-V2w INCOME DIAGNOSIS (2026-11-25 fresh session)
+- SITTING CHECK ran FIRST (exit 0, 45,227 rows, newest t=1335 - stale
+  assignment stood). Production ring untouched.
+- REPRO (headless, seed 5, 40 turns): player techs 3 score 2% every turn,
+  AI stars move - matches P10 scan. BUT 900-turn run shows owner 0 DOES
+  research eventually: [t207] Spacetime Surfing, [t297] Xenobiology. So
+  res[0] is NOT identically zero - the accrual rate is near-zero.
+- SHAPE OF THE LAW (cited, income-law.md T34 2720/2720): +0x46 RES = RAW
+  accumulator, NO compression, NO grant; home worlds acc 0 -> +0x46 == 0
+  157/157 (t40). IND at acc 0 HAS the max(1,v) grant. Port colony.cpp:997
+  implements exactly this. => A home world with only Colony Base produces
+  RES 0 BY VENDOR LAW. The vendor player researches early only by BUILDING
+  res-field items (Labs) with the IND grant. [inferred] The port defect is
+  NOT the res arm arithmetic - it is that NOTHING in the port feeds RES to
+  the player unless a build completes, and in headless/--witness flows the
+  player never builds. NEXT: --dbg-res per-turn channel print to confirm
+  res[0]==0 while queued, and find where owner 0's late RES actually came
+  from (ability? event? colonization?).
+- VENDOR ACCRUAL LAW CITED (work/tRSV2w_46aec.asm, FUN_00046aec verbatim,
+  call site 0x2502f with eax=0x74744):
+  (1) per-turn RES bucket[race] (0x46b24..0x46b88): sum word[planet+0x46]
+      over planets owned by race; +1 PER PLANET iff owner != current-turn
+      player [0x7458e] AND byte[0x13bc4]==2 AND word[+0x46] < 15 (0x46b5b..
+      0x46b77; gov-gated FRELOADER term - live byte == 1 in 20/20 saves
+      (combat.md S278) => OFF in the shipped scenario, AI-side only).
+  (2) progress apply (0x46bcd..0x46c30): bucket==0 -> add NOTHING (je
+      0x46c02); else progress word[0x764a0+2r] += TRUNC((bucket+1)^0.85)
+      (pushes 0x3feb3333/0x33333333 = double 0.85, call 0x78a90 pow,
+      0x76e08 frndint-chop, fistp). Completion cmp progress >= word[rec+
+      0x3e] (runtime cost) -> owned mask bytes +0x4a/+0x4b |= 1<<race,
+      target := 0xffff, progress := 0, event 0x55a60 iff human.
+  (3) target==0xffff -> progress := 0 EVERY turn (0x46b90) - the port KEEPS
+      stale progress across re-queue; named seam TRSV2w-A.
+- CONCLUSION: res[0]==0 for the first ~30-110 turns is VENDOR FAITHFUL, not
+  an income defect: Colony Base RES file field = 0 (planitem.txt), RES
+  channel has NO grant (T34 2720/2720), freeloader term gov-gated OFF.
+  The port's REAL delta is the apply law: campaign.cpp:1514 adds RAW res,
+  vendor adds trunc((res+1)^0.85) - port accrues FASTER for res>=2.
+  The witness grown leg was simply under-length: Lab (cost 50, IND 1/turn
+  from CB grant, AFTER 2 Factories per kBuildOrder) lands ~t110 on seed 5;
+  900-turn run proves the chain: owner 0 researched Xenobiology t207.
+- FIX PLAN (tRS-V2w): (a) researchPhase compression law + pin; (b)
+  gov-gated freeloader term + pin; (c) --dbg-res per-turn instrument flag;
+  (d) witness tRSV2w_witness.sh = tRSV2p stages + --autoplay to the grown
+  q (no 200 manual clicks); seam TRSV2w-A documented, not stubbed.
+
+## P12 - tRS-V2w SHIP + WITNESS (2026-11-25)
+- SHIPPED: researchProgressAdd + resFreeloaderAdd (campaign.cpp, cited
+  above); researchPhase apply law replaces the RAW add; freeloader wired
+  in incomeAndGrow (gov-gated, DEAD at live gov==1 - zero semantic delta
+  shipped-scenario); --dbg-res flag (main.cpp both paths + Begin rebuild),
+  prints "dbg-res t<turn> owner <o> bucket <b> add <a> prog <p> cost <c>".
+- HEADLESS CHANNEL (seed 5, --dbg-res): owner 0 bucket 0 add 0 prog 0 for
+  t1..t117 EXACTLY (CB-only home, RES channel 0 by T34 - the diagnosis of
+  P11 confirmed at channel level); t118 first bucket 1 (Laboratory built by
+  kBuildOrder after 2 Factories on the IND grant chain).
+- SUITE 534/0 after the law change; gate campaign seed 2024 still FINITE:
+  VICTORY Extinct t303 (was Extinct too; compression slows AI research, no
+  stall class).
+- WITNESS scripts/tRSV2w_witness.sh VERDICT PASS (scratch Xvfb :99, seed
+  5, --autoplay --campaign 400 --dbg-res): stages before(q=0)->sliver(q=2,
+  94px select)->progressed q=3 LOG line "ui research fill 6 3" + 50px
+  advance inside the +-20 box, control 0px, content non-shrinking. The
+  GROWN endpoint of the S9 wipe law is now WITNESSED. Census reused
+  UNCHANGED (tRSV2p_census.py).
+- SEAM TRSV2w-A (named, not stubbed): vendor zeroes progress[r] every turn
+  the target word is 0xffff (0x46b90); the port KEEPS progress across a
+  re-queue. Observable only if the player re-picks mid-project; the commit
+  chain gates make it rare. Left as documented deviation.

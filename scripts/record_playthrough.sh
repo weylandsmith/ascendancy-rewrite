@@ -42,7 +42,7 @@ capture A "VICTORY"          "$BIN" --headless --campaign 1600 --seed 2024
 capture B "VICTORY"          "$BIN" --headless --campaign 1600 --seed 23
 capture C "VICTORY"          xvfb-run -a "$BIN" --campaign 1600 --seed 13
 capture D "ui ok: turn 3"    xvfb-run -a "$BIN" --ui --resume --campaign 3 --autoplay --seed 9
-capture E "audio ok: 85 sfx chunks, music 8191719 B" \
+capture E "audio ok: 86 sfx chunks, music 8191719 B" \
         env SDL_AUDIODRIVER=dummy xvfb-run -a "$BIN" --ui --resume --audio --campaign 1 --autoplay --seed 4
 # F: real injected input (own Xvfb so xsend can find the window)
 Xvfb :77 -screen 0 640x480x24 >/dev/null 2>&1 & XV=$!

@@ -174,6 +174,10 @@ struct CampaignConfig {
 // S6/t18b + t19; battery scripts/r1_income_channels.py). Exposed for the
 // pinning test; semantics documented at campaign.cpp definition.
 double colonyChannel(int acc, bool firstDoubleActive, bool compress);
+// tRS-V2w cited laws (campaign.cpp headers): research APPLY apply-amount
+// and the gov-gated freeloader +1. Exposed for pins.
+int researchProgressAdd(double resBucket);
+int resFreeloaderAdd(int storedResWord, int govByte);
 
 class Campaign {
 public:
@@ -283,6 +287,10 @@ public:
     // Header-inline scenario hook, NO production call site: zero semantic
     // delta (t206 no-re-run rule).
     void setIndustryForTest(int owner, double v) { ind_[owner] = v; }
+    // tRS-V2w INSTRUMENT: print "dbg-res t<turn> owner <o> bucket <b> add
+    // <a> prog <p> cost <c>" once per owner per researchPhase. Flag-driven
+    // (--dbg-res), zero semantic delta when off.
+    void setDbgRes(bool on) { dbgRes_ = on; }
     int driveHopsFor(int owner) const;  // docs/re/ships.md §3 (launch range)
     int techsOwned(int owner) const;
     double resources(int owner) const;
@@ -784,6 +792,7 @@ private:
     // t408: the stockpile the LAST researchPhase contributed per owner (the
     // ETA denominator; written next to techProgress, never read by the sim).
     std::vector<double> techRate_;
+    bool dbgRes_ = false;  // tRS-V2w instrument flag (setDbgRes)
     std::vector<ShipInTransit> fleet_;
     // t365 ENGINE FLIP: the per-ship engine (combatPhase owns its boundary
     // steps; docs/re/campaign_fleet_bridge doc header). Lazily constructed;
