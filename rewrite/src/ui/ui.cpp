@@ -102,6 +102,24 @@ void applyLogicalSize(SDL_Renderer* ren) {
 
 }  // namespace
 
+// tPF-1 (D28 P7): the NEXTTURNCONT attention predicate (ui.h law, seam
+// TPF1-A named there). Player-relevance test on the NEW event lines only:
+// VICTORY (the port's own end-of-turn producer, campaign.cpp:2337) or a
+// line naming the player ("owner 0 ..." lines are raw ids and never name
+// the player; the diplomacy lines at campaign.cpp:1716/1727/1739 and the
+// colonise/research lines are the player-touching families). The cited
+// notification-sfx law (sfxForEvent, audio.md §5) is folded in so a line
+// loud enough to play bang01 always stops the pump.
+bool nextTurnContAttends(const std::string& eventText) {
+    if (eventText.rfind("VICTORY", 0) == 0) return true;
+    // The player's OWN producer lines carry the raw id ("owner 0 colonised",
+    // campaign.cpp:1591; "owner 0 completed", :1991) — the most
+    // attention-worthy family there is.
+    if (eventText.rfind("owner 0 ", 0) == 0) return true;
+    if (eventText.find("player") != std::string::npos) return true;
+    return sfxForEvent(eventText) != nullptr;
+}
+
 int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                   const std::string& dataRoot, AudioEngine* audio,
                   void* window, const std::string& savesDir,
@@ -282,6 +300,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     bool gridOn = true;
     int played = 0;
     Uint32 nextAuto = autoplay ? SDL_GetTicks() + 250 : 0xFFFFFFFFu;
+    // tPF-1 (D28 P7): NEXTTURNCONT continuous-advance latch. The vendor's
+    // button (windows.txt ln556 msg 8, TYPE 25 BUTTONSTATE 0) advances time
+    // continually until an attention event (help 1next2); the port pumps on
+    // the SAME 250 ms cadence the autoplay harness law banked (ui.h/main.cpp
+    // --autoplay). A manual NEXT TURN press cancels it (the vendor's one-day
+    // button is the stop control the help text implies).
+    bool contMode = false;
     bool quit = false;
 
     // ---- t388: the campaign is a set of vendor SCREENS (state ids) -------
@@ -1012,15 +1037,25 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 } else if (screen == kScreenMap && inRect(kNextTurnBtn, p)) {
                     // NEXTTURN's STATE is "1 1" (map-only) — same gate.
                     std::printf("ui click next-turn\n");
+                    if (contMode) {
+                        contMode = false;
+                        std::printf("ui cont advance cancelled\n");
+                    }
                     if (const char* sfx = sfxForPress(UiPressSite::NextTurn))
                         if (audio) audio->play(sfx);
                     advanceOnce();
                 } else if (screen == kScreenMap && inRect(kNextTurnCont, p)) {
-                    // t394 NEXTTURNCONT (msg 8, ln556): the vendor's mid-turn
-                    // combat-continue pump. The port's advance() runs a full
-                    // turn with no pause, so there is nothing to continue —
-                    // NAMED SEAM: inert with a printed line, never a fake.
-                    std::printf("ui click next-turn-cont seam (no mid-turn pause model)\n");
+                    // tPF-1 (D28 P7) NEXTTURNCONT (msg 8, ln556): the t394
+                    // "no mid-turn pause model" seam is SUPERSEDED — the
+                    // vendor's help text (help 1next2) defines this button as
+                    // CONTINUOUS advance until an attention event, not a
+                    // mid-turn continue. Press latches the pump (BUTTONSTATE
+                    // 0 -> pressed state per the TYPE-25 family); the pump
+                    // below stops it on the attention predicate TPF1-A, on
+                    // victory, or on game-over.
+                    contMode = true;
+                    nextAuto = SDL_GetTicks();
+                    std::printf("ui click next-turn-cont (continuous advance)\n");
                 } else if (screen == kScreenMap && mapCtlFor(p)) {
                     // t416 DIAL LAW (D15 fix; cam3d.h citations): a dial
                     // press LATCHES continuous motion (vendor wnd+0xc0 bit
@@ -1212,7 +1247,47 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
             advanceOnce();
             nextAuto = SDL_GetTicks() + 250;
         }
-        if (turns > 0 && played >= turns) quit = true;
+        // tPF-1 (D28 P7): the NEXTTURNCONT pump (help 1next2 law; cadence =
+        // the banked autoplay 250 ms). Stops on the seam TPF1-A attention
+        // predicate over THIS turn's new event lines, on victory, or when
+        // the campaign is over (advanceOnce is a no-op then — without this
+        // leg the pump would spin forever). !autoplay: the flag's own pump
+        // above already advances on this cadence — never double-advance.
+        if (contMode && !autoplay && SDL_GetTicks() >= nextAuto) {
+            const size_t before = camp.events().size();
+            advanceOnce();
+            // Witness instrument (change-only, contMode-gated; the banked
+            // 1-line/tick law): the pump is otherwise silent mid-run.
+            std::printf("ui cont advance t%d\n", camp.turn());
+            std::fflush(stdout);
+            nextAuto = SDL_GetTicks() + 250;
+            const auto& evs = camp.events();
+            for (size_t i = before; i < evs.size(); ++i) {
+                if (nextTurnContAttends(evs[i].text)) {
+                    contMode = false;
+                    std::printf("ui cont advance stop t%d event: %s\n",
+                                camp.turn(), evs[i].text.c_str());
+                    std::fflush(stdout);
+                    break;
+                }
+            }
+            if (contMode && camp.over()) {
+                contMode = false;
+                std::printf("ui cont advance stop t%d game over\n",
+                            camp.turn());
+                std::fflush(stdout);
+            }
+        }
+        if (turns > 0 && played >= turns) {
+            // tPF-1 (D28 P7): the harness turn cap announces itself. D28 P7
+            // ("the game exits after 20 days") was THIS line firing on a
+            // launch that passed --campaign 20; a silent death read as a
+            // game defect. scripts/tPF1_repro_exit.sh witnesses the plain
+            // --ui path (turns=0) surviving 30 manual days.
+            std::printf("ui turn cap %d reached (harness instrument, not "
+                        "game law)\n", turns);
+            quit = true;
+        }
         if (camp.over()) quit = true;
 
         // ---- draw ----

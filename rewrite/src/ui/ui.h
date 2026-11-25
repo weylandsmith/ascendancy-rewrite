@@ -64,6 +64,16 @@ int runCampaignUi(ascend::game::Campaign& camp, int turns, bool autoplay,
                   const std::vector<ascend::game::SpeciesInfo>* roster =
                       nullptr);
 
+// tPF-1 (D28 P7) NEXTTURNCONT attention predicate — the stop condition of
+// "advance time continually until an event requiring your attention occurs"
+// (help.txt help 1next2 VERBATIM; window windows.txt ln556 NEXTTURNCONT
+// msg 8). WHICH events the vendor counts is NOT captured (seam TPF1-A):
+// the port stops on a NEW event line that is player-relevant (VICTORY
+// prefix, the player's own "owner 0 " producer lines, or a line naming
+// "player") or carries the one cited notification sound (sfxForEvent,
+// audio.md §5); every other line stays non-attending.
+bool nextTurnContAttends(const std::string& eventText);
+
 // Plays an FLC video 1:1 into a 640x480 window (docs/re/flc.md): palette +
 // indices converted on the CPU to ARGB, uploaded per frame via a streaming
 // texture, paced by the file's per-frame delay / header speed. Any key or

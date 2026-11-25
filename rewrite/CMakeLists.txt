@@ -104,6 +104,7 @@ add_executable(run_tests
   tests/test_diplomacy.cpp
   tests/test_species.cpp
   tests/test_campaign.cpp
+  tests/test_timecontrols_tPF1.cpp
   tests/test_campaign_fleet_t365.cpp
   tests/test_diponattack_t204.cpp
   tests/test_invasion_war_t207.cpp

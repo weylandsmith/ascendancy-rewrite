@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-25T01:30
+updated: 2026-11-25T02:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,16 +233,7 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-1 TIME CONTROLS (D28 P7, FIRST — blocks all soak testing):
-(a) "advance until something happens" button does nothing — derive the
-vendor control (windows.txt TIME/ADVANCE section + handler) and wire;
-(b) game EXITS after 20 single-day advances. CHECK THE FLAG PATH
-FIRST: banked harness law says --campaign N in --ui mode IS a turn cap
-(main.cpp:656 -> ui.cpp:1215 quit at played>=N) — if the user's launch
-used it, that's the exit; else find the real loop-terminating defect.
-Either way: cap must not apply in normal play; witness = 30+ days
-advanced with factory-completion visible. Budget <=2.
-THEN tPF-2 TILE POPUP CHAIN (D28 P3/P4/P5 — USER REFCAPS ARE
+NEXT tPF-2 TILE POPUP CHAIN (D28 P3/P4/P5 — USER REFCAPS ARE
 AUTHORITY, they REFUTE our shipped two-step no-popup flow from
 tPL-B1b): click tile -> mineral-framed window; ADJACENT to structure =
 square info + Build/Cancel buttons (refcap original-planet-screen-
@@ -254,6 +245,10 @@ clicking-non-adjacent-square.png). Derive from windows.txt + the
 planet-window msg map (t428 cites the content-dependent popup law —
 PORT IT PROPERLY THIS TIME). Pins + scripted walkthrough both paths.
 Budget <=3 (CONT cycle).
+RATIONALE for ordering: tPF-1 closed (below) so soak testing is unblocked;
+tPF-2 is the highest-severity remaining planet defect (the whole build
+entry-point is missing) and its refcaps make it derivable without new
+vendor capture. The rest of the phase-19 queue stands:
 THEN tPF-3 TILE OVERLAY + BASE (D28 P2/P6): overlays are SEMI-
 TRANSPARENT colored squares, SMALLER when not adjacent (refcap
 planet-screen-iter-433-v-original.png — ours opaque; derive alpha +
@@ -297,6 +292,32 @@ scratchpad/; production ring needs t439 recovery before live witness
 intro stay DEFERRED (D25); when a counter reads zero check PRODUCER
 EXISTENCE first (D29).
 
+tPF-1 LANDED 2026-11-25 (TIME CONTROLS CLOSED — D28 P7 BOTH HALVES:
+NEXTTURNCONT WIRED to the cited help-1next2 law + harness turn-cap made
+ANNOUNCING; no OQ row touched — time controls track none, honest negative
+under strict-close; open=[016,019] unchanged). PROVED (docs/re/_wip_tPF1.md
+P1-P2):
+ - (b) "exits after 20 days" = THE FLAG PATH, MEASURED: scripts/
+   tPF1_repro_exit.sh runs the README-exact `--ui` launch (turns=0) seed 5,
+   30 manual NEXT TURN -> ALIVE, 30 clicks logged; headless 60-turn runs
+   seeds 1/5 show no day-20 game-over. The user's launch carried
+   --campaign 20 (repo witnesses all pass --campaign N). The cap now prints
+   "ui turn cap N reached (harness instrument, not game law)" — never an
+   anonymous exit again.
+ - (a) NEXTTURNCONT (windows.txt ln556 msg 8 TYPE 25) was the t394 INERT
+   seam; SUPERSEDED: press latches a 250 ms pump (banked autoplay cadence,
+   !autoplay-guarded against double-advance), stops on the attention
+   predicate nextTurnContAttends (ui.h seam TPF1-A: VICTORY prefix / player's
+   own "owner 0 " lines / "player" / cited bang01 sfxForEvent law) or game
+   over; manual NEXT TURN cancels. Law text help.txt help 1next2 VERBATIM.
+ - PINS test_timecontrols_tPF1.cpp x5; SUITE 538 -> 543, 0 failed.
+   MUTATIONS M1-M7 work/tPF1_mutations.py ALL CAUGHT, md5-verified restore
+   each step. LESSON: M1 survived its first sweep because the counter-
+   example was lowercase "Victory" — a case-sensitive PREFIX pin needs an
+   UPPERCASE mid-string counter-example.
+ - WITNESS scripts/tPF1_witness.sh VERDICT PASS seed 5: no pump lines pre-
+   press; 16 ticks post-press with app alive; cancel freezes ticks 16->16.
+ - NEXT = tPF-2 (above).
 tRS-V2w LANDED 2026-11-25 (PLAYER-RES INCOME DIAGNOSIS CLOSED — NOT a
 defect: the vendor's own apply law is COMPRESSED and the shipped home's
 RES channel is 0; PORT UPGRADED to the cited law + grown-fill WITNESS
