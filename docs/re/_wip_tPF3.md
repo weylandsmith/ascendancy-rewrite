@@ -451,3 +451,103 @@ Targeted census scripts/tPF3c_fill_census.py + tPF3c_fill_interior.py on the
   its checker states are unknown), and no D28 ruling page covers it. The
   choice LAW is byte-pinned (checker 0x3830c item-0xff reduction, tPF-3b); the
   per-cell corroboration stays UN-WITNESSED, named not claimed.
+
+## tPF-3d STEP 0 [measured, census in progress] — RAMP MAP + 0x18b WRITER
+- Sitting check: live-timeline.jsonl tail turn=1086 (unchanged since t316-era
+  sittings; no new play) -> no r1_t85g_sitting.py rerun needed.
+- Census method: objdump -b binary -M intel -D work/ascend_payload.bin ->
+  /tmp/payload_all.asm (linear==file offset, P0-law linearity; same windowing
+  as scripts/r290_disasm.py).
+- RAW-NEEDLE RESULT (payload-wide, tPF-3d): occurrences of imm32 0x48520 as a
+  PUSH-IMM32 = 0; a3/c7 05 direct-write encodings to 0x4850c OR 0x48520 = 0.
+  push-imm32 0x4850c = 26 sites (callers passing the draw ctx, incl the three
+  filler callsites 0x3bd17/0x3be0d/0x3be46 region). => no STATIC initializer
+  writes the ramp pointer; consistent with F13(4)(a)'s indirect-write finding.
+- [reg+0x14] WRITE CENSUS (42 sites, full list in this doc's scratch): the
+  dword-wide candidates that could plausibly be the draw-ctx init are few;
+  analysis of register provenance in progress (next section).
+
+## tPF-3d F15 [MEASURED, MAJOR] — THE FILLER ARG LAW IS CORRECTED; THE "RAMP
+## TABLE" IS RUNTIME-HEAP AT [ds:0x48c33]+idx*0x100 AND READABLE FROM SAVES
+1) ARG LAW FIX (bytes 0x62d15..0x62d9b + callsites 0x3bd3a..0x3be4b, 0x55502):
+   filler 0x62d15 stdcall args: [ebp+8]=SURFACE DESCRIPTOR (0x4850c — reads
+   +0 bits-ptr, +4/+4-cmp vs the vertex bbox; NOT a clip ctx), [ebp+0xc]=vertex
+   count 4, [ebp+0x10]=vertex ARRAY, [ebp+0x14]=MAP POINTER. The painter's
+   fill push sequence (0x3be31..0x3be4b) is: eax = [0x48c33] + fillidx*0x100;
+   push eax (MAP, arg4) / lea vertex / push / push 4 / push 0x4850c — i.e.
+   THE MAP IS THE PER-INDEX 256-BYTE TABLE ITSELF, block base [ds:0x48c33].
+   tPF-3c F13(3)'s "MAP = [draw-ctx 0x4850c + 0x14]" is REFUTED at runtime:
+   ds:0x48520 holds 640/480 (ds:0x48518..0x48524 = 639,479,640,480 and
+   ds:0x48528 = ASCII 'DATA') — 0x4850c is a SURFACE DESCRIPTOR
+   {bits=0x28a4f8, 0, 0, 639, 479, 640, 480, 'DATA'}, not a map holder.
+2) FILL INDEX IS THE GREY-RAMP SLOT, NOT THE CLASS COLOUR (bytes 0x3bbd6..
+   0x3bc4b): [esp+0x364] = 13 default (0x3bbea), overridden by WORD[esp+0x374]:
+   0->7, 2->8, 3->9, 4->10 (the second 9-write 0x3bc29 path); the LINE pen EDI
+   separately carries the class colour (F9 stands). Fill skip when [esp+0x364]==0
+   (0x3bd31/0x3be2a).
+3) RUNTIME TABLE READ (bank-play-20261111-t377/60.sav, H=0x88, data base
+   0x242000 self-verified via the 639/479/640/480+'DATA' signature):
+   [ds:0x48c33] = 0xfcdc7c (HEAP). 256-byte tables at base+idx*0x100:
+     idx 0:  39 distinct — many-to-one TRANSLATION (10 11 11 94 94 94 b3 b4 b4
+             fe fe a9 a9 a9 3b 3c ...)
+     idx 1:  IDENTITY except 0x79->0x57, 0xf1->0xf0, 0xf3->0x0f (252 distinct)
+     idx 7:  103 distinct | idx 8: 92 | idx 9: 80 | idx 10: 83 | idx 13: 112
+   => the translucent fill law IS `screen := TABLE[idx][old]` with per-ramp-slot
+   many-to-one maps; the tables are RUNTIME-COMPUTED heap data, NOT a static
+   block (zero write encodings to 0x48c33 payload-wide, tPF-3c census; zero
+   push-imm32/a3/c7-05 to 0x48520, re-run tPF-3d). The table PRODUCER (who
+   computes TABLE[idx][i] at init) is NOT located — named-open leg TPF3d-A;
+   static [reg+0x14] write census (42 sites) has NO provable 0x4850c-ctx hit
+   (the ctx is passed by imm32 push, never held in a reg across a +0x14 write).
+4) TPF3-A GATE WRITER CENSUS [CLOSED at bytes, payload-wide]: exactly FIVE
+   references to [reg+0x18b]:
+     0x3a7cf  mov BYTE PTR [ecx+0x18b],0x5   (ctor 0x3a7b0; bits 0 AND 2 SET at
+              construction -> overlay pass + BLIT-2 enabled by DEFAULT)
+     0x3ae66  xor BYTE PTR [eax+0x18b],0x1   (interactive bit0 TOGGLE, message-
+              handler region 0x3adfc..0x3ae6d; widget ptr = [ebp-0x8])
+     0x3b9e4  read &4 (BLIT-2 gate, t428d)   0x3bbc3  read bit0 (overlay gate)
+     0x3ca85  lea edx,[ecx+0x18b] + ebx=1 -> call 0x1db44/0xec48 (bit-set/clear
+              helper pair, ebx discriminates)
+   Ctor chain: alloc wrapper 0x3a750 (sole caller 0x577b5) -> call 0x3a7b0 at
+   0x3a762. So no code ever CLEARS bit0 except the toggle: a widget built by
+   this ctor shows overlays from birth; the port's unconditional overlay is
+   CONSISTENT with the vendor default (corroboration, not a new law).
+
+## tPF-3d F16 [MEASURED, DECISIVE] — THE SEVEN RAMP TABLES ARE BYTE-STABLE
+## ACROSS 60/60 BANKED SAVES: THE SEMI-TRANSPARENCY LAW IS NOW CITED DATA
+scripts/tPF3d_ramp_runtime.py over bank-play-20261111-t377 + -late +
+bank-t1086-preplay (60 saves): every save passes the base self-verification
+(ds:0x48518..0x48524 == 639,479,640,480 and ds:0x48528 == 'DATA'), every save
+reads [ds:0x48c33] == 0xfcdc7c, and all 7 tables at base+idx*0x100 for
+idx in {0,1,7,8,9,10,13} hash to EXACTLY ONE variant across 60/60 saves
+(FULL HEX PRINTED BY THE SCRIPT — the authoritative copy; do not retype it
+from this doc). Key structural facts read from the tables:
+  idx 1  = IDENTITY except 0x79->0x57, 0xf1->0xf0, 0xf3->0x0f  (a "solid/no-op"
+           slot: filling with it leaves the screen as-is -> explains how a fill
+           call can be visually a no-op WITHOUT the map being an identity)
+  idx 0  = 39 distinct values, many-to-one (field colours collapse into a small
+           family: 0x94/0xb3/0xb4/0xa9/0xe1/0xfe dominate)
+  idx 7/8/9/10/13 = 103/92/80/83/112 distinct — graded blends (the ramp ladder)
+CONSEQUENCE FOR THE PORT: the vendor fill law is not "paint class colour" but
+`dst[i] := TABLE[idx][dst[i]]` with the tables above. A faithful port either
+embeds these 7x256 tables as data (they are vendor law data, byte-stable, and
+the corpus is the citation) or reproduces the map law; the producer that
+computes them at init is still unnamed (TPF3d-A below).
+
+## TPF3d-A [NAMED OPEN, honest negative] — THE TABLE PRODUCER IS NOT LOCATED
+Static routes tried and exhausted this session (do NOT repeat): (a) payload-wide
+write census for imm32 0x48c33 — 38 occurrences, ALL reads (a1/a3-absent,
+0x8b 0d, add-imm, push); ZERO write encodings, so the block base is stored
+indirectly; (b) write census for 0x48520 — zero hits of any kind (the F13(3)
+route was a dead end, see F15(1)); (c) [reg+0x14] write census — 42 sites, none
+provable against the 0x4850c ctx (the surface descriptor is always passed as an
+imm32 push, never held in a register across a +0x14 store); (d) the 24
+mov-reg,0x4850c sites are all consumer-side (rep movs sources / push args).
+Best remaining route (NEXT): the heap block is 0x100*256 = 64 KiB-strided, so
+the allocator is asked for a large block near session start — search for the
+alloc whose size/stride matches and for a loop writing 256 iterations per slot
+(indexed [reg+idx] stores with a table-of-256 source), OR observe it live with
+scripts/r1_wp_session.py --target data:0x48c33 (write-watchpoint, one-shot,
+already-built harness). The 60/60-stable tables are enough to SHIP the law
+without the producer; the producer only matters if a table must be generated
+for a palette the corpus never covered (it is 640x480 game.pal only).

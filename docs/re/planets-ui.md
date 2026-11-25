@@ -510,8 +510,16 @@ Full working log docs/re/_wip_tPLV1.md F0-F4. Durable laws:
   (0,0,0) (190,44,16) (44,195,12) (0,0,255) (203,203,203)); a rock-flagged
   byte (class|8) matches NO compare -> white. The companion grey-ramp fill
   selector (7/8/9/10/13) is gated by widget byte +0x18b bit0 (0x3bbcb je
-  0x3be53) and drew ZERO pixels in the witness — NAMED SEAM TPLV1-A (what
-  sets 0x18b bit0; the [0x48c33]+colour*0x100 block contents). The tile
+  0x3be53) and drew ZERO pixels in the witness. BOTH former seams CLOSED at
+  bytes/bank-saves tPF-3d (docs/re/_wip_tPF3.md F15): bit0 is SET AT
+  CONSTRUCTION (ctor 0x3a7cf `mov BYTE PTR [ecx+0x18b],0x5`, sole alloc chain
+  0x577b5->0x3a750->0x3a7b0; the only other writers are an interactive
+  `xor [eax+0x18b],0x1` toggle at 0x3ae66 and a set/clear helper pair via
+  0x3ca85), and the [0x48c33]+idx*0x100 blocks ARE the fill MAPS — runtime
+  heap 256-entry colour-translation tables read from banked saves (idx 0: 39
+  distinct; idx 7/8/9/10/13: 103/92/80/83/112 distinct; filler 0x62d15 law
+  `screen := MAP[old]` at 0x63023/0x63026; the fill INDEX is the ramp slot at
+  [esp+0x364], NOT the class colour). The tile
   FILL stays the cited uniform 0x96=150 (t421).
 - PORT: tileCenter corrected; tileEdgePaletteIndex new pure law; painter
   fills-then-outlines two passes so shared edges stay visible; the t418b
