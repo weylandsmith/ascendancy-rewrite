@@ -490,7 +490,7 @@ Targeted census scripts/tPF3c_fill_census.py + tPF3c_fill_interior.py on the
    [ds:0x48c33] = 0xfcdc7c (HEAP). 256-byte tables at base+idx*0x100:
      idx 0:  39 distinct — many-to-one TRANSLATION (10 11 11 94 94 94 b3 b4 b4
              fe fe a9 a9 a9 3b 3c ...)
-     idx 1:  IDENTITY except 0x79->0x57, 0xf1->0xf0, 0xf3->0x0f (252 distinct)
+     idx 1:  IDENTITY except 0x79->0x80, 0x7f->0x57, 0xf1->0xf0, 0xf3->0x0f (252 distinct)
      idx 7:  103 distinct | idx 8: 92 | idx 9: 80 | idx 10: 83 | idx 13: 112
    => the translucent fill law IS `screen := TABLE[idx][old]` with per-ramp-slot
    many-to-one maps; the tables are RUNTIME-COMPUTED heap data, NOT a static
@@ -522,7 +522,9 @@ reads [ds:0x48c33] == 0xfcdc7c, and all 7 tables at base+idx*0x100 for
 idx in {0,1,7,8,9,10,13} hash to EXACTLY ONE variant across 60/60 saves
 (FULL HEX PRINTED BY THE SCRIPT — the authoritative copy; do not retype it
 from this doc). Key structural facts read from the tables:
-  idx 1  = IDENTITY except 0x79->0x57, 0xf1->0xf0, 0xf3->0x0f  (a "solid/no-op"
+  idx 1  = IDENTITY except FOUR swaps 0x79->0x80, 0x7f->0x57, 0xf1->0xf0,
+           0xf3->0x0f (252 distinct; tPF-3e byte re-count — the first draft of this line
+           had the first pair transposed and omitted 0x7f)  (a "solid/no-op"
            slot: filling with it leaves the screen as-is -> explains how a fill
            call can be visually a no-op WITHOUT the map being an identity)
   idx 0  = 39 distinct values, many-to-one (field colours collapse into a small
@@ -551,3 +553,88 @@ scripts/r1_wp_session.py --target data:0x48c33 (write-watchpoint, one-shot,
 already-built harness). The 60/60-stable tables are enough to SHIP the law
 without the producer; the producer only matters if a table must be generated
 for a palette the corpus never covered (it is 640x480 game.pal only).
+
+## tPF-3e F17 [MEASURED, bytes 0x3c2c5/0x3c2cc + 0x3bbd6..0x3bc52] — THE LADDER
+## INPUT WORD[esp+0x374] IS THE CELL CLASS BYTE; THE OVERLAY FILL INDEX LAW IS
+## FULLY DERIVABLE (and tPF-3c's "class-0 NEVER filled" is SUPERSEDED)
+- Writer of the ladder input (0x3c2cc): `mov al,BYTE PTR [edx]` (0x3c2c5, EDX =
+  [esp+0x34c] = the per-cell record pointer loaded at 0x3c2ad; record byte 0 =
+  the slot CLASS byte — same byte tileEdgePaletteIndex consumes), then
+  `mov DWORD PTR [esp+0x374],eax` (0x3c2cc, eax zero-extended AL). Immediately
+  before: `mov edx,0xff` (0x3c2c7) — the F5 item-0xff overlay pass.
+- LADDER (0x3bbd6..0x3bc4b, re-disassembled verbatim tPF-3e): default
+  [esp+0x364]=13 (0x3bbea, ESI=0xd preloaded 0x3bbd6); WORD[esp+0x374]:
+  0 -> 7 (0x3bbf5), 2 -> 8 (0x3bc1b), 3 -> 9 (0x3bc33), 4 -> 10 (0x3bc4b);
+  any other class byte KEEPS 13. Parallel EDI (line pen, F9): default 12,
+  2->0x75(117), 3->0x92(146), 4->0xff(255) — class 0 keeps pen 0 (black lines).
+- CONSEQUENCE (byte-level, supersedes tPF-3c F13's "TINY class-0 never
+  filled"): the fill-skip tests 0x3bd31/0x3be2a read [esp+0x364] — the FILL
+  INDEX — not the pen. In the overlay pass the ladder yields 7/8/9/10/13,
+  NEVER 0, so BOTH branches always call the filler 0x62d15 (gated only by
+  +0x18b bit0, TPF3-A). A black (class-0) tiny diamond IS map-filled with
+  TABLE[7]; its interior stays dark because TABLE[7] maps dark -> dark
+  (7->0xc8, 0xc8->0xc6... per F16 hex). The tPF-3c pixel observation (black
+  interior = field-ish) is CONSISTENT with map-fill through idx7; the
+  "never filled" reading was the wrong mechanism.
+- NO ROCK LEG in the ladder: a rock-flagged byte (class|8, e.g. 8/10/11/12)
+  matches none of {0,2,3,4} -> fill idx 13 (the line pen keeps the rock-white
+  default per the tPL-V1 law).
+
+## tPF-3e F18 [measured law data + SHIPPED] — MAP-FILL IN THE PORT: ANALYTIC
+## SOURCE SET, PEN FIXED POINTS EXPLAIN THE VENDOR PIXELS
+- scripts/tPF3e_gen_tables.py reads the 7 tables from the banked corpus with
+  the tPF3d law + self-verification (60/60 saves, one variant each) and emits
+  rewrite/src/ui/rampfill_law.h (byte-exact rows + sha256 provenance). Header
+  rows verified EQUAL to the tPF3d printed hex for all 7 slots. (Trap hit:
+  the ds:0x48518 signature dims are FOUR u32, not u16 — "<4I" over 16 bytes.)
+- FIXED POINTS (decisive for why the vendor screen shows class-coloured lines
+  even though the filler runs AFTER the line loop 0x3bcd7..0x3be28): each
+  class pen is a fixed point of ITS OWN ladder table: T7[0]==0, T8[117]==117,
+  T9[146]==146, T10[255]==255; the exception is class 1 (pen 12, T13[12]==13
+  -> the vendor maps its own white line to ramp-13). tPF-3c's "solid red tiny"
+  is EXPLAINED: the 12x6 diamond is nearly ALL outline, outline red survives
+  the map (fixed point), and the field between outline lines maps 150->201
+  (61,53,57 grey-red) — the 0.79 fraction was line-dominated.
+- PORT SHIP SHAPE (ui.cpp pass 3, replaces tileOverlaySolidFill): per overlay
+  row, span = he.left*(ht-|dy|)/ht (the port's own floor-span raster); the two
+  ENDPOINT pixels are pen pixels (SDL_RenderDrawLine's edges land there) and
+  map through row[tileEdgePaletteIndex(cls)]; the interior run maps the pass-1
+  screen value pal 150 through row[150]. Analytic source set == what the
+  vendor filler would READ at that moment (pass 1 fill 150 + the overlay's own
+  lines; no other pass overlaps the strictly-inside diamond; structure art
+  blits AFTER). Seam named: if SDL's line raster deviates from the endpoint
+  law mid-edge, a pixel or two maps as fill instead of pen (1-step ramp
+  difference; the law itself is unaffected).
+
+## tPF-3e F19 [witness-measured, Xvfb 640x480] — MAP SHIPPED: CLASS-PX COUNTS
+## DROP AS THE INTERIOR MODULATES; THE OVERLAY BECOMES A SINGLE EDGE-SET PASS
+- WITNESS TRAP (first run misled me, recorded so no one re-runs it):
+  scripts/tPF3b_witness.sh runs ./rewrite/build/ascendancy — building ONLY
+  run_tests witnesses the OLD app. Run 1 (stale 15:28 binary) reproduced the
+  tPF-3c numbers EXACTLY (green 46/blue 138/white 231/black 395/red 0), which
+  is how I caught it. Always `make run_tests ascendancy` before witnessing.
+- MAP-SHIPPED WITNESS (fresh binary): green 46->18, blue 138->54, white
+  231->~1..31, black 395->377, red 0 (red is ZERO on this witness in EVERY
+  build — there are no tiny red cells on the home planet; it is NOT evidence
+  either way). The drop IS THE LAW WORKING: the interiors are no longer
+  solid/equal class colour — they are TABLE[idx][150] (never a class colour,
+  F18) — while the DIAMOND EDGES keep the class colour because each pen is a
+  FIXED POINT of its own table (T7[0]=0, T8[117]=117, T9[146]=146,
+  T10[255]=255). VERDICT(a) still OVERLAY PASS VISIBLE (strong off-lattice
+  449 >= 20). The absolute counts are fit-dependent (the measure script's
+  +-1 band about its own lattice fit), so the DIRECTION + edge survival is
+  the signal, not the numbers.
+- SHIP SHAPE (supersedes the endpoint heuristic AND the SDL line draw): the
+  overlay paints ONE pass over the diamond span; source = pen index iff the
+  pixel is on the diamond EDGE SET (four edges rasterised by our own integer
+  Bresenham through the vertex deltas, deterministic), else 150; the pixel
+  drawn is ALWAYS conv(TABLE[idx][source]). "Draw pen then map" collapses to
+  this because of the fixed points, so no separate line pass is needed.
+  For these two diamond shapes (32,16)/(6,3) the span endpoints and the
+  Bresenham edge set COINCIDE (span is exact: 32*(16-dy)/16 and 6*(3-dy)/3
+  never floor off) — the edge-set form is shipped because it states the law
+  geometrically instead of accidentally.
+- WHY NO RAW STRAY PX (measured side-effect): the tPF-3c build drew SDL lines
+  whose raster deviates ~1px from the ideal boundary OUTSIDE the mapped span,
+  leaving raw class-colour stray px (white 31 -> 1 after the line pass was
+  removed). The single-pass form cannot emit unmapped pixels.

@@ -266,20 +266,15 @@ TEST(tileoverlay_paint_wiring_tpf3b) {
 }
 
 TEST(tiny_fill_law_tpf3c) {
-    // 5. tPF-3c F13 FILL LAW. Vendor pixels (433 composite RIGHT half): tiny
-    //    class-colour diamonds are SOLID-filled (red 58/73 = 0.79 of the bbox
-    //    diamond, raw (188,44,17) == conv(117) family); BOTH vendor fill calls
-    //    are skipped when the pen is 0 (0x3bd31 / 0x3be2a `test,je`) — pen 0
-    //    is exactly class 0 (F9). The inset ramp is unrecovered -> no fill.
-    CHECK(au::tileOverlaySolidFill(false, 2) == true);    // tiny red
-    CHECK(au::tileOverlaySolidFill(false, 3) == true);    // tiny green
-    CHECK(au::tileOverlaySolidFill(false, 4) == true);    // tiny blue
-    CHECK(au::tileOverlaySolidFill(false, 1) == true);    // tiny white (default)
-    CHECK(au::tileOverlaySolidFill(false, 0) == false);   // black pen skip
-    CHECK(au::tileOverlaySolidFill(true, 2) == false);    // inset: ramp open
-    CHECK(au::tileOverlaySolidFill(true, 0) == false);
-    // Wiring: the painter consults the law and never fills the inset branch.
+    // 5. tPF-3c F13 + tPF-3e F17 FILL LAW (SUPERSEDES the tPF-3c "solid class
+    //    colour / class-0 never filled" reading — the fill-skip tests
+    //    0x3bd31/0x3be2a read the FILL INDEX ladder, which never yields 0, so
+    //    every class fills; see test_rampfill_tpf3e.cpp for the map law).
+    //    Wiring pin: the painter consults the ladder and the law-data row.
     const std::string src = slurp(kRepoDir() + "/rewrite/src/ui/ui.cpp");
     REQUIRE(!src.empty());
-    CHECK(src.find("tileOverlaySolidFill(inset, cls)") != std::string::npos);
+    CHECK(src.find("tileOverlayFillIndex(cls)") != std::string::npos);
+    CHECK(src.find("rampFillRow(") != std::string::npos);
+    // The superseded stopgap stays gone.
+    CHECK(src.find("tileOverlaySolidFill(") == std::string::npos);
 }

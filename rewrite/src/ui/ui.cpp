@@ -27,6 +27,7 @@
 #include "ui/planetstrip.h"
 #include "ui/statuslist.h"
 #include "ui/planetview.h"
+#include "ui/rampfill_law.h"  // tPF-3e ramp-fill law data (docs/re/_wip_tPF3.md F15/F16)
 #include "ui/abilitylaw.h"
 #include "ui/speciesmenu.h"
 
@@ -2451,27 +2452,33 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             SDL_RenderDrawLine(ren, c.x + 34, c.y, c.x, c.y + 17);
                             SDL_RenderDrawLine(ren, c.x, c.y + 17, c.x - 34, c.y);
                         }
-                    // PASS 3: tPF-3b THE TILE OVERLAY (D28 P2 "coloured squares
-                    // when adjacent to a structure, SMALLER when not"). The
-                    // vendor's overlay pass calls the placement checker with
+                    // PASS 3: tPF-3b/3c/3e THE TILE OVERLAY (D28 P2 "coloured
+                    // squares when adjacent to a structure, SMALLER when not").
+                    // The vendor's overlay pass calls the placement checker with
                     // ITEM ARG 0xff (mov edx,0xff @0x3c2c7) and picks the SIZE
                     // from the return: legal -> INSET 64x32 (0x3bc5b, half-
                     // extents 32,16), illegal -> TINY 12x6 (0x3bd4d, 6,3), lines
-                    // in the class colour (pen EDI, F9 — NOT the 7/8/9/10/13 grey
-                    // ramp, which is the filler state-block index only).
-                    // FILL (tPF-3c F13, supersedes the tPF-3b "outline-only"
-                    // call): the polygon filler 0x62d15 translates screen
-                    // pixels through the draw-ctx 0x4850c+0x14 ramp (interior
-                    // 0x63015..); the ramp table is window-runtime and
-                    // UNRECOVERED (SEAM TPF3-B), and the tPF-3b "20,495 px of
-                    // conv(150)" census measured the PORT half of the 433
-                    // composite (F13 retraction). What the VENDOR half pins:
-                    // TINY diamonds solid class colour, class-0 never filled
-                    // (0x3bd31/0x3be2a pen-0 skip), inset modulated -> the
-                    // port fills tiny only (tileOverlaySolidFill) and leaves
-                    // the inset ramp open. SEAM TPF3-A: the vendor gates the
-                    // whole pass on widget byte +0x18b bit0 (0x3bbc3, writer
-                    // unrecovered); the port default is always-on.
+                    // in the class colour (pen EDI, F9 — NOT the grey ramp).
+                    // FILL (tPF-3e F15..F18, supersedes the tPF-3c "tiny solid
+                    // class colour" stopgap): the filler 0x62d15 TRANSLATES the
+                    // pixels already under the polygon, dst[i] := TABLE[idx]
+                    // [dst[i]] (interior 0x63015..0x63026), MAP = [ds:0x48c33]
+                    // +idx*0x100 pushed as arg4 (0x3be31..0x3be4b). The seven
+                    // 256-byte tables are byte-stable 60/60 banked saves (F16)
+                    // and ride in ui/rampfill_law.h; the index is the LADDER
+                    // over the cell class byte (tileOverlayFillIndex, F17),
+                    // never the class colour, and never 0 — the fill-skip tests
+                    // 0x3bd31/0x3be2a never fire here, class 0 included (its
+                    // TABLE7 maps dark->dark). Port source set (F18): the
+                    // overlay's own outline pixels (pen index) + the pass-1
+                    // fill (pal 150) everywhere else — the diamond is strictly
+                    // inside the cell and structure art blits AFTER. Class pens
+                    // are FIXED POINTS of their own table (T7[0]=0, T8[117]=
+                    // 117, T9[146]=146, T10[255]=255), which is why the vendor
+                    // screen still shows crisp class-coloured lines after the
+                    // map (F18); the line pass below redraws them. SEAM: the
+                    // +0x18b bit0 gate (0x3bbc3) is always-on in the port —
+                    // ctor 0x3a7cf sets it at construction (TPF3-A closed).
                     for (int row = 0; row < 15; row++)
                         for (int col = ptt.rowOffset[psize][row];
                              col < ptt.rowOffset[psize][row] +
@@ -2490,22 +2497,77 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                 tileOverlayInset(camp, planetStar, cell);
                             const TileHalfExtents he =
                                 tileOverlayHalfExtents(inset);
-                            // tPF-3c F13 FILL: the vendor's TINY diamonds are
-                            // SOLID class colour on screen (filler 0x62d15 map
-                            // law, header planetview.h); the inset ramp stays
-                            // unrecovered -> outline-only there.
-                            if (tileOverlaySolidFill(inset, cls)) {
-                                for (int y = c.y - he.top; y <= c.y + he.bottom; ++y) {
-                                    const int dy = y < c.y ? c.y - y : y - c.y;
-                                    const int ht = he.top > 0 ? he.top : 1;
-                                    const int span = he.left * (ht - dy) / ht;
-                                    SDL_RenderDrawLine(ren, c.x - span, y, c.x + span, y);
+                            // VENDOR ORDER (0x3bd1d line loop, THEN 0x3be2a
+                            // fill) as ONE pass (F19): the filler reads what
+                            // the line loop drew, and every class pen is a
+                            // FIXED POINT of its ladder table, so "draw pen,
+                            // then map" == "edge pixels keep the pen colour,
+                            // interior pixels take TABLE[idx][150]" (the
+                            // pass-1 screen value; the diamond is strictly
+                            // inside the cell, structure art blits AFTER).
+                            // EDGE SET = the four diamond edges rasterised by
+                            // OUR OWN Bresenham (deterministic; the vendor's
+                            // raster may differ by 1 px mid-edge — named seam,
+                            // 1-step ramp difference). No SDL line draw here:
+                            // mapping the pen pixel back IS the line.
+                            if (const uint8_t* rmap = rampFillRow(
+                                    tileOverlayFillIndex(cls))) {
+                                const int penIdx = tileEdgePaletteIndex(cls);
+                                // Mark the edge pixels in a bbox-sized set.
+                                const int w = 2 * he.left + 1;
+                                const int hgt = he.top + he.bottom + 1;
+                                std::vector<char> edge(
+                                    size_t(w) * size_t(hgt), 0);
+                                auto mark = [&](int ax, int ay, int bx,
+                                                int by) {
+                                    // Integer Bresenham, inclusive endpoints
+                                    // (dx/dy in cell-relative coords).
+                                    const int ddx = abs(bx - ax),
+                                              ddy = -abs(by - ay);
+                                    const int sx = ax < bx ? 1 : -1,
+                                              sy = ay < by ? 1 : -1;
+                                    int err = ddx + ddy;
+                                    for (;;) {
+                                        if (ax >= -he.left &&
+                                            ax <= he.right &&
+                                            ay >= -he.top &&
+                                            ay <= he.bottom)
+                                            edge[size_t(ay + he.top) *
+                                                     size_t(w) +
+                                                 size_t(ax + he.left)] = 1;
+                                        if (ax == bx && ay == by) break;
+                                        const int e2 = 2 * err;
+                                        if (e2 >= ddy) { err += ddy; ax += sx; }
+                                        if (e2 <= ddx) { err += ddx; ay += sy; }
+                                    }
+                                };
+                                mark(0, -he.top, -he.left, 0);
+                                mark(-he.left, 0, 0, he.bottom);
+                                mark(0, he.bottom, he.right, 0);
+                                mark(he.right, 0, 0, -he.top);
+                                for (int y = c.y - he.top; y <= c.y + he.bottom;
+                                     ++y) {
+                                    const int dy =
+                                        y < c.y ? c.y - y : y - c.y;
+                                    const int span =
+                                        he.left * (he.top - dy) / he.top;
+                                    for (int x = c.x - span; x <= c.x + span;
+                                         ++x) {
+                                        const int src =
+                                            edge[size_t(y - c.y + he.top) *
+                                                     size_t(w) +
+                                                 size_t(x - c.x + he.left)]
+                                                ? penIdx
+                                                : 150;
+                                        const uint32_t ma = chromePaletteArgb(
+                                            rmap[src]);
+                                        SDL_SetRenderDrawColor(
+                                            ren, (ma >> 16) & 0xFF,
+                                            (ma >> 8) & 0xFF, ma & 0xFF, 255);
+                                        SDL_RenderDrawPoint(ren, x, y);
+                                    }
                                 }
                             }
-                            SDL_RenderDrawLine(ren, c.x - he.left, c.y, c.x, c.y - he.top);
-                            SDL_RenderDrawLine(ren, c.x, c.y - he.top, c.x + he.right, c.y);
-                            SDL_RenderDrawLine(ren, c.x + he.right, c.y, c.x, c.y + he.bottom);
-                            SDL_RenderDrawLine(ren, c.x, c.y + he.bottom, c.x - he.left, c.y);
                         }
                     // Structure art ON the tiles (F5: planitem record index
                     // == itemIdx, 1:1 pixel-match law shp.md S23.4).

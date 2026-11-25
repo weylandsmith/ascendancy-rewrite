@@ -289,23 +289,25 @@ bool tileOverlayInset(const ascend::game::Campaign& camp, int star, int cell);
 struct TileHalfExtents { int left, top, right, bottom; };
 TileHalfExtents tileOverlayHalfExtents(bool inset);
 
-// tPF-3c TPF3-B FILL LAW (tPF-3c, MEASURED on the VENDOR half of the 433
-// composite + the filler 0x62d15 internals). The vendor fill is a 256-entry
-// colour TRANSLATION of the pixels already on screen (filler interior
-// 0x63015..0x63026: screen byte := MAP[old byte], MAP = draw-ctx 0x4850c
-// +0x14) — the ramp TABLE itself is unrecovered (window-runtime), so the port
-// ships ONLY what the vendor pixels pin:
-//   TINY (illegal branch) with class != 0: interior SOLID class colour —
-//     red tiny bbox (1384,443)-(1400,451): 58 strong-red px inside a 73-cell
-//     bbox diamond (0.79), raw (188,44,17)/(175,47,22) == conv(117) family,
-//     field teal (16,64,72); blue/white tiny interiors likewise.
-//   TINY with class == 0: NEVER filled — both fill calls are skipped when the
-//     pen is 0 (inset 0x3bd31 'test di,di / je 0x3be53'; tiny 0x3be2a), and
-//     the vendor black tiny diamond's interior stays the dark field.
-//   INSET (legal branch): outline-only. The vendor inset interiors are
-//     modulated texture, not solid class px; the ramp that produces them is
-//     NOT recovered, and strict-close forbids inventing one.
-bool tileOverlaySolidFill(bool inset, int cellClass);
+// tPF-3c/3d/3e FILL LAW (docs/re/_wip_tPF3.md F13..F17; supersedes the
+// tPF-3c "tiny solid class colour / class-0 never filled" reading). The
+// vendor filler 0x62d15 does dst[i] := TABLE[idx][dst[i]] (interior
+// 0x63015..0x63026) with MAP = [ds:0x48c33]+idx*0x100 pushed as arg4
+// (0x3be31..0x3be4b); the seven 256-byte tables are byte-stable across the
+// whole banked save corpus (F16, 60/60) and ride in the port as law data in
+// ui/rampfill_law.h (scripts/tPF3e_gen_tables.py regenerates + re-verifies).
+// THE INDEX IS THE LADDER, NOT THE CLASS COLOUR (F15(2)/F17): the overlay
+// pass sets [esp+0x364] from WORD[esp+0x374] == the cell class BYTE (writer
+// 0x3c2cc `mov al,[edx]`/`mov [esp+0x374],eax`, EDX the cell record):
+//   0 -> 7, 2 -> 8, 3 -> 9, 4 -> 10, anything else -> 13 (default 0x3bbea;
+//   rock-flagged bytes match none of {0,2,3,4} -> 13). The fill-skip tests
+//   0x3bd31/0x3be2a read the INDEX, and this ladder never yields 0, so BOTH
+//   branches always fill, class 0 included (its interior stays dark because
+//   TABLE7 maps dark->dark: T7[0]==0, T7[150]==151). The line pen EDI is a
+//   SEPARATE product of the same ladder (F9: 0/117/146/255/12) — unchanged.
+// The whole pass is gated on widget byte +0x18b bit0 (0x3bbc3; ctor 0x3a7cf
+// sets it at construction, TPF3-A CLOSED) — the port default is always-on.
+int tileOverlayFillIndex(int cellClass);
 
 // tPF-3b STRUCTURE-ART ANCHOR LAW (F4/F5 + tRSV1d research.md S8(h)). The
 // vendor blits tile structure art with the diamond's TOP VERTEX as the anchor

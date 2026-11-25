@@ -233,46 +233,74 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-3e SHIP THE RAMP-FILL LAW IN THE PORT (code + pins + witness; the
-static RE is DONE — F15/F16 in docs/re/_wip_tPF3.md are the frozen law, do NOT
-re-derive or re-census). Law: vendor tile-overlay fill = dst[i] :=
-TABLE[idx][dst[i]] where idx is the GREY-RAMP SLOT at painter [esp+0x364]
-(13 default; WORD[esp+0x374] 0->7, 2->8, 3->9, 4->10; fill SKIPPED when 0),
-gated by widget byte +0x18b bit0 (SET AT CONSTRUCTION 0x3a7cf, toggle 0x3ae66
-— TPF3-A CLOSED), and the seven 256-entry tables at [ds:0x48c33]+idx*0x100 are
-BYTE-STABLE 60/60 banked saves — dump canonical hex with
-python3 scripts/tPF3d_ramp_runtime.py work/r1/bank-play-20261111-t377 (one run,
-it prints every table; embed as a header of law data WITH the save-corpus
-citation). Steps: (1) planetview: rampFillTables[7][256] + pure law
-tileOverlayFillIndex(inset/size-class -> idx|0) matching the 0x3bbd6..0x3bc4b
-select ladder; (2) ui.cpp pass 3: instead of solid class fill, apply the map to
-the pixels inside the diamond (port framebuffer is RGB — map PALETTE INDICES via
-game.pal conv before/after; the tables are 8-bit index space); (3) pins: table
-identity vs the script's hex (byte-exact), index-law checks, mutation-verified;
-(4) witness: tPF3b_witness.sh re-run — the inset interiors must change from
-flat-150 toward the mapped family (counts printed by the existing measure
-script). RATIONALE: tPF-3d (this session) CLOSED both named seams and turned
-the last open overlay law into cited data; shipping it is the only tPF step
-that moves pixels toward the vendor without new RE. TPF3d-A (who COMPUTES the
-tables at init) stays named-open — irrelevant for a corpus-faithful port
-(640x480 game.pal only); route if ever needed: r1_wp_session.py
---target data:0x48c33. Do NOT start tPF-4 PLANLIST case-bodies (D10 walk). Do
-NOT re-run the tPF-1b soak (precondition FAILED tPF-3c; VENDOR witness only).
-help.shp-k0 FRAME SHIP stays gated on the user's OQ-005 ruling (DECISIONS.md D1).
-PRIOR-SESSION QUEUE: tPF-4 home planet table read; tPF-5 indicators; tPF-6
-orbital click + hover CPU; tPF-7 research controls; tPF-8 tree visibility;
-tPF-1b VENDOR day-20 repro (user-time-gated, D30; port soak REFUTED as
-evidence tPF-3c).
+NEXT tPF-4 HOME PLANET TABLE READ (prior-queue item now first: the overlay
+fill law is SHIPPED, so the planet screen's next cited gap is the home-planet
+table). Steps: (1) locate the vendor home-planet list producer (D10 walk over
+the PLANLIST case-bodies per the prior queue; work/tPF3_paint.asm windowing
+via scripts/r290_disasm.py — doc addresses ARE file offsets in
+work/ascend_payload.bin, NO -0x88 for CODE; saves need -H only for DATA);
+(2) port the read law into the home-planets UI path with pins; (3) witness.
+DO NOT re-litigate tPF-3: the ramp-fill law + tables are frozen in
+docs/re/_wip_tPF3.md F15..F19 + rewrite/src/ui/rampfill_law.h (regenerate +
+diff with scripts/tPF3e_gen_tables.py if suspicious; NEVER hand-edit that
+header). TPF3d-A (table PRODUCER) stays named-open — route if ever needed:
+scripts/r1_wp_session.py --target data:0x48c33. Do NOT re-run the tPF-1b port
+soak (precondition FAILED tPF-3c; VENDOR witness only, user-time D30).
+help.shp-k0 FRAME SHIP stays gated on the user's OQ-005 ruling (DECISIONS.md
+D1). PRIOR-SESSION QUEUE: tPF-5 indicators; tPF-6 orbital click + hover CPU;
+tPF-7 research controls; tPF-8 tree visibility; tPF-1b VENDOR day-20 repro.
 STANDING: D28 file scratchpad/t433-build-feedback.txt is the item authority;
 refcap PNGs in scratchpad/; scratch savedir law; C1-C5 + race intro stay
 DEFERRED (D25); when a counter reads zero check PRODUCER EXISTENCE first
 (D29); POPUP/DERIVATION LAW (D30, binding): every visible property cited or
 named-open, no eyeballed geometry. NEVER read whole lines of
-work/r1/playcap/live-timeline.jsonl. NEW (tPF-3c, BINDING): the 433 composite
-planet-screen-iter-433-v-original.png is SIDE-BY-SIDE — LEFT = PORT (pixel-
-exact flat teal), RIGHT = VENDOR; NEVER cite left-half pixels as vendor
-evidence (the F6 retraction). Pixel discriminators on the vendor half must
-tolerate resampling (exact-conv counts are floors, families are the signal).
+work/r1/playcap/live-timeline.jsonl. The 433 composite is SIDE-BY-SIDE — LEFT
+= PORT, RIGHT = VENDOR (the F6 retraction); vendor-half pixel counts tolerate
+resampling (families, not exact values). WITNESS TRAP (tPF-3e): port
+witnesses run ./rewrite/build/ascendancy — build BOTH run_tests AND
+ascendancy before any witness, or you witness the old app (run 1 of tPF-3e
+reproduced tPF-3c's numbers exactly for this reason).
+
+tPF-3e LANDED 2026-11-25 (RAMP-FILL LAW SHIPPED IN THE PORT: LAW DATA +
+LADDER + SINGLE-PASS EDGE-SET PAINT; no OQ row closed — tPF tracks none,
+honest negative, open=[016,019] unchanged). PROVED/SHIPPED
+(docs/re/_wip_tPF3.md F17/F18/F19 + scripts/tPF3e_gen_tables.py +
+rewrite/src/ui/rampfill_law.h + tests/test_rampfill_tpf3e.cpp):
+ - F17 (bytes): the ladder input WORD[esp+0x374] IS THE CELL CLASS BYTE
+   (writer 0x3c2cc `mov al,[edx]`/`mov [esp+0x374],eax`, EDX = cell record at
+   [esp+0x34c]); ladder 0->7/2->8/3->9/4->10/else 13 re-derived verbatim
+   0x3bbd6..0x3bc4b; the fill-skip tests 0x3bd31/0x3be2a read the INDEX,
+   which never yields 0 here -> EVERY class fills, INCLUDING class 0 (tPF-3c's
+   "class-0 never filled" SUPERSEDED; its dark interior = TABLE7 dark->dark).
+ - LAW DATA: tPF3e_gen_tables.py reads the 7 tables from the banked corpus
+   (60/60 verified, one variant each) and emits rampfill_law.h byte-exact
+   (verified EQUAL to the tPF3d printed hex; sha256 provenance in the header;
+   regeneration diff-clean). Trap hit: the ds:0x48518 signature dims are FOUR
+   u32 ("<4I"), not u16. Doc correction banked: idx1's identity-except set is
+   FOUR swaps 0x79->0x80, 0x7f->0x57, 0xf1->0xf0, 0xf3->0x0f (the tPF-3d line
+   omitted one and transposed the first pair — the pins carry the measured
+   truth).
+ - SHIPPED: planetview tileOverlayFillIndex(cls) (ladder, cited per branch);
+   ui.cpp pass 3 replaced: tileOverlaySolidFill DELETED, single-pass edge-set
+   map fill (edge pixels = our own Bresenham through the vertex deltas take
+   the pen index, interior takes the pass-1 value 150, EVERY pixel is drawn
+   as conv(TABLE[idx][source])). F18 fixed points (T7[0]=0, T8[117]=117,
+   T9[146]=146, T10[255]=255, T13[12]=13) explain why class-coloured lines
+   survive the map on the vendor screen. Endpoint heuristic REFUTED by the
+   first witness run (red 46->0: SDL line raster != span endpoints) ->
+   boundary-set law (F19).
+ - PINS: 4 new tests (index law incl 256-value never-0 sweep; transcription
+   distinct-counts 39/252/103/92/80/83/112 + spot bytes + nullptr slots;
+   fixed points; wiring incl no-raw-line + four mark() calls). Suite
+   561/0/0. MUTATION 4/4 CAUGHT: ladder 0->7->0 (2 fails), hand-edit one
+   table byte (5), delete map block (12), drop one edge mark (2).
+ - WITNESS (fresh binary, Xvfb): map working as law predicts — interiors
+   modulate off class colour (green 46->18, blue 138->54, white 231->1,
+   black 395->377), edges keep class colour via fixed points, VERDICT(a)
+   OVERLAY PASS VISIBLE (449 strong >= 20). Red=0 on this witness in EVERY
+   build (no tiny red cells there) — not evidence either way.
+ - Sitting check: timeline tail turn=1086 (no new play) -> no sitting rerun.
+   GATE_EXIT=0, LEDGER AUDIT OK.
 
 tPF-3d LANDED 2026-11-25 (RAMP-FILL LAW CLOSED AS CITED DATA; TPF3-A CLOSED AT
 BYTES; F13(3) ARG READING RETRACTED; no OQ row closed — tPF tracks none, honest

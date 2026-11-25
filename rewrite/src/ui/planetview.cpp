@@ -344,14 +344,21 @@ TileHalfExtents tileOverlayHalfExtents(bool inset) {
     return inset ? TileHalfExtents{32, 16, 32, 16} : TileHalfExtents{6, 3, 6, 3};
 }
 
-bool tileOverlaySolidFill(bool inset, int cellClass) {
-    // Header law (tPF-3c F13): the vendor's TINY branch fills its interior
-    // with the class colour (0.79-fraction solid red measured on the vendor
-    // half of the 433 composite; blue/white likewise), and BOTH branches skip
-    // the filler call when the pen is 0 (0x3bd31 / 0x3be2a `test, je`) — pen
-    // 0 is exactly class 0 (F9 table). The INSET branch's ramp fill is not
-    // recovered, so it ships outline-only.
-    return !inset && cellClass != 0;
+int tileOverlayFillIndex(int cellClass) {
+    // Ladder 0x3bbd6..0x3bc4b verbatim (header law block; input WORD[esp+0x374]
+    // == the cell class byte, writer 0x3c2cc — F17). Default 13 (0x3bbea);
+    // EXACT-equality compares (no ranges): 0->7 (0x3bbf5), 2->8 (0x3bc1b),
+    // 3->9 (0x3bc33), 4->10 (0x3bc4b). Rock-flagged bytes (class|8) and any
+    // other value match no compare and keep 13. NEVER returns 0, so the
+    // vendor's fill-skip tests (0x3bd31/0x3be2a, reading THIS value) never
+    // fire in the overlay pass — class 0 fills through TABLE7.
+    switch (cellClass) {
+        case 0: return 7;
+        case 2: return 8;
+        case 3: return 9;
+        case 4: return 10;
+        default: return 13;
+    }
 }
 
 Pt structureBlitPos(Pt centre, int recLeft, int recTop) {
