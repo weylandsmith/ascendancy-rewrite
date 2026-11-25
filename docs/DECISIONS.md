@@ -788,3 +788,24 @@ GROWN-ENDPOINT fill witness (owed since tRS-V2p) must therefore BUILD
 a Laboratory (or queue one via the build law) on a scratch campaign
 before expecting growth frames. Standing law banked: when a counter
 reads zero, check PRODUCER EXISTENCE before suspecting the counter.
+
+## D30 — USER CORRECTIONS ON tPF-1 AND POPUP DERIVATION (2026-11-25, verbatim)
+
+> I did not launch with "--campaign".
+> Also, a reminder, please derive the popup drawing behavior from
+> reverse engineering, rather than guesses or approximation.
+
+tPF-1 (f32267e-era) claimed the day-20 exit was "THE FLAG PATH,
+MEASURED" and asserted "the user's launch carried --campaign 20".
+USER DENIES IT. The loop's repro only proved --ui alone survives 30
+turns on SEEDED campaigns; the user's game is a BEGIN-BUILT Chamachi
+campaign with a factory under construction - an UNTESTED configuration.
+The self-announcing cap is genuinely useful (no more anonymous exit),
+but the day-20 exit stays OPEN as a possible real defect until a
+begin-built-campaign soak reproduces it or rules it out. Row tPF-1b
+queued below.
+Popup law (binding for tPF-2 remainder, tPF-5, tPF-6): every popup
+property - window id/rect/shape/frame from windows.txt, frame art from
+a named SHP record, string-table ids for text, button records, list
+row art-source law - cited to windows.txt / shape records / handler
+FUNs. Refcaps VERIFY citations; they are not a substitute for them.
