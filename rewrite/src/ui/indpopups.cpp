@@ -6,6 +6,7 @@
 
 #include <cstdio>
 
+#include "ui/planetview.h"  // tPF-2: gridRowCol / gridCellFor
 #include "ui/statuslist.h"  // statusSizeWord / statusTypeWord
 
 namespace ascend::ui {
@@ -189,6 +190,90 @@ std::vector<PopupLine> popupLinesFor(const ascend::game::Campaign& camp,
             return {};
     }
     return indicatorLines(planetName, c);
+}
+
+// ---- tPF-2 SQUARE-INFO POPUP (msg-50 builder key-3 case 0x3de5a) ----------
+// Law + citations: indpopups.h header block / docs/re/_wip_tPF2.md F3b/F3c.
+// static.txt getter numbers in comments; strings are the file's verbatim.
+
+bool squareBuildable(const ascend::game::Campaign& camp, int star, int cell) {
+    if (star < 0 || star >= int(camp.galaxy().stars.size())) return false;
+    const auto& ps = camp.planetAt(star);
+    const int surf = ps.surfaceCells;
+    // Surface cells only (D28 gate is the adjacency-leg domain 0x385b7
+    // jae-skips ring cells); in-range; empty (no active item on the cell).
+    if (cell < 0 || cell >= surf) return false;
+    std::vector<char> active(size_t(surf > 0 ? surf : 0), 0);
+    for (size_t i = 0; i < ps.items.size() && i < ps.itemCells.size(); ++i) {
+        const int c = ps.itemCells[i];
+        if (c >= 0 && c < surf) active[size_t(c)] = 1;
+    }
+    if (active[size_t(cell)]) return false;
+    const int size = ascend::game::Campaign::sizeClassFor(surf);
+    if (size < 0) return false;
+    int row = 0, col = 0;
+    if (!gridRowCol(camp.terrainTables(), size, surf, cell, &row, &col))
+        return false;
+    // Same four probes as the checker adjacency leg (0x38624..0x38661):
+    // ANY active 4-neighbour grants; none refuses.
+    const int dr[4] = {1, -1, 0, 0}, dc[4] = {0, 0, -1, 1};
+    for (int d = 0; d < 4; ++d) {
+        const int n = gridCellFor(camp.terrainTables(), size, row + dr[d],
+                                  col + dc[d]);
+        if (n >= 0 && n < surf && active[size_t(n)]) return true;
+    }
+    return false;
+}
+
+SquareInfo squareInfoLines(const ascend::game::Campaign& camp, int star,
+                           int cell) {
+    SquareInfo out;
+    if (star < 0 || star >= int(camp.galaxy().stars.size())) return out;
+    const auto& ps = camp.planetAt(star);
+    const int surf = ps.surfaceCells;
+    if (cell < 0 || cell >= surf + 10) return out;  // 0x3de66 jl / slot cap
+    const int cls =
+        cell < int(ps.cellClasses.size()) ? ps.cellClasses[size_t(cell)] : 1;
+    const bool orbital = cell >= surf;  // 0x3df2e cmp dx,WORD[+0x18]
+    const bool ruins = (cls & 8) != 0;  // BYTE[cell]&8 (0x3e134)
+    const bool ruinsTitle = ruins && camp.starOwner(star) == ascend::game::kPlayer;
+    // Colour word (0x3dedb..0x3df34): orbital overrides; else &7 table.
+    const char* colour = "White";   // getter(75) default
+    const char* producer = nullptr; // getter(78/80/82) leg
+    if (orbital) colour = "Orbital";  // getter(83)
+    else switch (cls & 7) {
+        case 0: colour = "Black"; break;                  // getter(76)
+        case 2: colour = "Red";   producer = "industry";    break;   // 77/78
+        case 3: colour = "Green"; producer = "prosperity";  break;   // 79/80
+        case 4: colour = "Blue";  producer = "research";    break;   // 81/82
+        default: break;  // 1 and anything else take the White default
+    }
+    // TITLE (0x3e12f): ruins+owner -> getter(88) verbatim, NO body.
+    if (ruinsTitle) {
+        out.lines.push_back({"Xenoarcheological Ruins", 0x14});
+    } else {
+        out.lines.push_back({std::string(colour) + " Square", 0x14});
+        // BODY (0x3e1c7..0x3e2c8, push hold 0x50):
+        if (orbital) {
+            // getter(90), CRLF verbatim from static.txt:272
+            out.lines.push_back({"Orbital squares are used for building orbital structures such as \nShipyards and Ships.", 0x50});
+        } else if ((cls & 7) == 1) {
+            out.lines.push_back({"White squares are ordinary habitable surface squares.", 0x50});  // getter(91)
+        } else if ((cls & 7) == 0) {
+            out.lines.push_back({"Black squares are uninhabitable.  Most structures cannot be built on them.", 0x50});  // getter(92), TWO spaces
+        } else {
+            // getter(93): "%s squares increase the effectiveness of
+            // %s-producing structures."
+            out.lines.push_back({std::string(colour) +
+                                     " squares increase the effectiveness of " +
+                                     (producer ? producer : "") +
+                                     "-producing structures.",
+                                 0x50});
+        }
+    }
+    // D28 button law (refcaps P3/P5): Build+Cancel iff buildable.
+    out.buildable = !ruins && squareBuildable(camp, star, cell);
+    return out;
 }
 
 }  // namespace ascend::ui

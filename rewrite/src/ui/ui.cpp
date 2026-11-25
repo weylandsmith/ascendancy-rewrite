@@ -218,6 +218,16 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // dismisses (documented default; the witness read a persisting popup).
     std::vector<ascend::ui::PopupLine> planetPopup;
     Rect planetPopupRect{};
+    // tPF-2 SQUARE POPUP button state (D28 P3/P5 refcaps): the square-info
+    // popup carries Build+Cancel when the cell is buildable (adjacent,
+    // empty, surface), else a single OK. Build opens PLANLIST with the
+    // cell ARMED (planetCellArmed) so the list pick orders on that cell
+    // directly (merges the refcap flow with the msg-0x1c01 step-2 law).
+    bool planetPopupBuild = false;
+    bool planetCellArmed = false;
+    // True iff the CURRENT popup is the square-info popup (msg-50
+    // indicator popups share the planetPopup vector but have NO buttons).
+    bool planetSquarePopup = false;
     // t407 FLEET LIST (state 18) session state: scroll step + selected row
     // (index into fleetRows()). The vendor LEFT click jumps the camera to
     // the ship (help fleetwin + t253 live); the port SELECTS + logs instead
@@ -769,6 +779,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             planetCell = -1;  // t418b: fresh tile selection
                             planetPick = -1;  // tPL-B1b: fresh pick
                             planetPopup.clear();  // tPL-B2: fresh popup
+                            planetSquarePopup = false;  // tPF-2
                             stack.push(kScreenPlanet);  // t410: chain level
                             screen = kScreenPlanet;
                             // tPL-B1b WITNESS INSTRUMENT: the build-loop
@@ -879,6 +890,52 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         std::printf("ui research latch %d %d\n",
                                     resCam.latchRot, resCam.latchMove);
                     std::fflush(stdout);
+                } else if (screen == kScreenPlanet && planetSquarePopup &&
+                           !planetPopup.empty() &&
+                           planetPopupRect.x0 <= p.x &&
+                           p.x <= planetPopupRect.x1 &&
+                           p.y >= planetPopupRect.y1 + 2 &&
+                           p.y <= planetPopupRect.y1 + 30) {
+                    // tPF-2 POPUP BUTTON STRIP (D28 P3/P5 refcaps): the
+                    // mineral bottom bar below the square-info popup holds
+                    // Build+Cancel (buildable) or a single centred OK. The
+                    // bar extends BELOW the text rect (refcap: strip is
+                    // the popup's bottom edge); the port draws it at
+                    // planetPopupRect.y1+2 .. +30. ONLY the square popup
+                    // has buttons (msg-50 indicator popups never do);
+                    // clicks elsewhere dismiss it via the existing tile/
+                    // panel arms' clear.
+                    if (planetPopupBuild) {
+                        const bool leftHalf =
+                            p.x < (planetPopupRect.x0 +
+                                   planetPopupRect.x1) / 2;
+                        if (leftHalf) {
+                            // BUILD: open PLANLIST with the cell ARMED —
+                            // the next list pick orders on planetCell
+                            // directly (step-2 merged, msg-0x1c01 law).
+                            projectOpen = true;
+                            planetCellArmed = true;
+                            planetPopup.clear();
+                            planetPopupBuild = false;
+                            planetSquarePopup = false;
+                            std::printf("ui planet popup build cell %d\n",
+                                        planetCell);
+                        } else {
+                            // CANCEL: clear cell + popup.
+                            planetCell = -1;
+                            planetCellArmed = false;
+                            planetPopup.clear();
+                            planetPopupBuild = false;
+                            planetSquarePopup = false;
+                            std::printf("ui planet popup cancel\n");
+                        }
+                    } else {
+                        // OK: dismiss the popup only (cell stays selected).
+                        planetPopup.clear();
+                        planetSquarePopup = false;
+                        std::printf("ui planet popup ok\n");
+                    }
+                    std::fflush(stdout);
                 } else if (screen == kScreenPlanet && projectOpen &&
                            projectRowFor(p, 0)) {
                     // tPL-B1b STEP 1 (msg 0x1c02 shape, branch 0x3b50e): a
@@ -896,12 +953,39 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     if (row >= 0 && row < int(opts.size())) {
                         planetPick = opts[row].item;
                         projectOpen = false;
-                        std::printf("ui planet pick %s (%s)\n",
-                                    opts[row].name.c_str(),
-                                    ordersWithoutCell(camp, planetPick)
-                                        ? "no cell needed"
-                                        : "click a tile");
-                        std::fflush(stdout);
+                        // tPF-2 ARMED-CELL LEG (D28 P4 flow): the popup's
+                        // Build button armed a cell, so the pick ORDERS on
+                        // it directly — the msg-0x1c01 step-2 arms
+                        // (checker 0x3830c + writer 0x38840 cmd2) run here
+                        // instead of waiting for a second tile click.
+                        if (planetCellArmed && planetCell >= 0 &&
+                            !ordersWithoutCell(camp, planetPick)) {
+                            const auto blk = placementBlock(
+                                camp, planetStar, planetPick, planetCell);
+                            const bool ok = blk == PlacementBlock::None &&
+                                            projectOrderable(camp, planetStar,
+                                                             planetPick) &&
+                                            camp.orderProject(planetStar,
+                                                              planetPick);
+                            const auto* pi = camp.planetItem(planetPick);
+                            std::printf("ui planet project %s %s (%s armed cell %d)\n",
+                                        planetName.c_str(),
+                                        pi ? pi->name.c_str() : "?",
+                                        ok ? "ordered" : "rejected",
+                                        planetCell);
+                            std::fflush(stdout);
+                            planetPick = -1;   // 0x3b487 unconditional clear
+                            planetCell = -1;   // rec+0xae := 0xffff
+                            planetCellArmed = false;
+                        } else {
+                            planetCellArmed = false;
+                            std::printf("ui planet pick %s (%s)\n",
+                                        opts[row].name.c_str(),
+                                        ordersWithoutCell(camp, planetPick)
+                                            ? "no cell needed"
+                                            : "click a tile");
+                            std::fflush(stdout);
+                        }
                     }
                 } else if (screen == kScreenPlanet && !projectOpen &&
                            planetPanelFor(p) &&
@@ -918,6 +1002,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                                 planetName);
                     planetPopupRect = indicatorPopupRect(
                         kPlanetPanels[int(panel)].rect);
+                    planetSquarePopup = false;  // tPF-2: no buttons here
                     std::printf("ui planet popup %s (%zu lines)\n",
                                 kPlanetPanels[int(panel)].helpIndex,
                                 planetPopup.size());
@@ -928,6 +1013,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                            !inRect(kPlanetPanels[4].rect, p)) {
                     planetPopup.clear();  // tPL-B2 dismiss (documented
                                           // default: next click clears)
+                    planetSquarePopup = false;  // tPF-2
                     // tPL-B1b STEP 2 (msg 0x1c01 branch 0x3b3b6): tile click
                     // WITH a pick. Hit-test the lattice first: a miss is the
                     // vendor's 0xffff leg — cell-less bit1 items order
@@ -999,6 +1085,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                            !inRect(kPlanetPanels[4].rect, p)) {
                     planetPopup.clear();  // tPL-B2 dismiss (documented
                                           // default: next click clears)
+                    planetSquarePopup = false;  // tPF-2 (re-armed below)
                     // t418b TILE SELECT (no pick pending): the PLSQUARE cell
                     // click the vendor answers with repaint-only (F1: "click
                     // does NOTHING" without a pending item — exactly the
@@ -1020,7 +1107,23 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                   : -1;
                     if (hit >= 0) {
                         planetCell = hit;
-                        std::printf("ui planet tile %d selected\n", hit);
+                        // tPF-2 SQUARE POPUP (D28 P3/P5): the tile click
+                        // arms the msg-50 builder's key-3 case (widget
+                        // +0xab = the cell). Content law squareInfoLines;
+                        // button set per the refcaps (Build+Cancel iff
+                        // buildable, else OK). Rect law: indicatorPopupRect
+                        // of the CLICKED widget = PLSQUARE (windows.txt
+                        // ln1519 X0 152 Y0 120).
+                        const auto si = squareInfoLines(camp, planetStar, hit);
+                        planetPopup = si.lines;
+                        planetPopupBuild = si.buildable;
+                        planetSquarePopup = !si.lines.empty();
+                        planetPopupRect = indicatorPopupRect(
+                            Rect{152, 120, 487, 375});
+                        std::printf("ui planet tile %d selected (%s%s)\n", hit,
+                                    planetPopup.empty() ? "no popup"
+                                                        : planetPopup[0].text.c_str(),
+                                    si.buildable ? " BUILD" : " OK");
                         std::fflush(stdout);
                     }
                 } else if (screen == kScreenPlanet &&
@@ -1210,6 +1313,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             planetCell = -1;  // t418b: fresh tile selection
                             planetPick = -1;  // tPL-B1b: fresh pick
                             planetPopup.clear();  // tPL-B2: fresh popup
+                            planetSquarePopup = false;  // tPF-2
                             stack.push(kScreenPlanet);
                             screen = kScreenPlanet;
                             std::printf("ui system planet %s -> planet view "
@@ -2421,6 +2525,28 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     for (const auto& ln : planetPopup) {
                         txt.draw(ren, pr.x0 + 8, ly, ln.text, false, kText);
                         ly += 14;
+                    }
+                    // tPF-2 BUTTON STRIP (D28 P3/P5 refcaps): a full-width
+                    // bar at the popup's bottom edge; buildable -> "Build"
+                    // left + "Cancel" right, else a centred "OK" (static.txt
+                    // #60/#57/#30 verbatim). Bar rect matches the click arm.
+                    if (planetSquarePopup) {
+                        const int by = pr.y1 + 2;
+                        SDL_Rect bar{pr.x0, by, pr.x1 - pr.x0 + 1, 28};
+                        SDL_SetRenderDrawColor(ren, 8, 12, 20, 235);
+                        SDL_RenderFillRect(ren, &bar);
+                        SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
+                        SDL_RenderDrawRect(ren, &bar);
+                        const int bw = pr.x1 - pr.x0 + 1;
+                        if (planetPopupBuild) {
+                            txt.draw(ren, pr.x0 + bw / 4 - 14, by + 7,
+                                     "Build", false, kText);
+                            txt.draw(ren, pr.x0 + 3 * bw / 4 - 20, by + 7,
+                                     "Cancel", false, kText);
+                        } else {
+                            txt.draw(ren, pr.x0 + bw / 2 - 8, by + 7, "OK",
+                                     false, kText);
+                        }
                     }
                 }
             } else if (screen == kScreenFleet) {

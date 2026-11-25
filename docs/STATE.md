@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-25T02:20
+updated: 2026-11-25T03:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,22 +233,23 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-2 TILE POPUP CHAIN (D28 P3/P4/P5 — USER REFCAPS ARE
-AUTHORITY, they REFUTE our shipped two-step no-popup flow from
-tPL-B1b): click tile -> mineral-framed window; ADJACENT to structure =
-square info + Build/Cancel buttons (refcap original-planet-screen-
-click-on-square-adjacent-to-structure.png); Build -> build-list window,
-ART NEXT TO NAME per row, scroll arrows (refcap original-planet-screen-
-build-list.png: Factory/Agrilot/Laboratory/Outpost, teal selected row);
-NON-ADJACENT = info + OK (refcap original-planet-screen-popup-after-
-clicking-non-adjacent-square.png). Derive from windows.txt + the
-planet-window msg map (t428 cites the content-dependent popup law —
-PORT IT PROPERLY THIS TIME). Pins + scripted walkthrough both paths.
-Budget <=3 (CONT cycle).
-RATIONALE for ordering: tPF-1 closed (below) so soak testing is unblocked;
-tPF-2 is the highest-severity remaining planet defect (the whole build
-entry-point is missing) and its refcaps make it derivable without new
-vendor capture. The rest of the phase-19 queue stands:
+NEXT tPF-2b SQUARE-POPUP LIVE WITNESS + LIST ART (finish what tPF-2
+started — code+pins LANDED, the scripted walkthrough was NEVER
+witnessed): run scripts/tPF2_witness.sh (docs/re/_wip_tPF2.md F5 has the
+failure analysis: app reached planet view, probe clicks never produced a
+'ui planet tile' line, Xvfb died mid-run — suspect first-click racing the
+screen swap and/or the winpos/import path). PASS = app.log shows a tile
+select with BUILD, a 'ui planet popup build cell N', a PLANLIST pick
+'ordered armed cell N', and an OK dismiss; shots popup-build/popup-ok
+visually match the D28 refcaps (title + body + button strip). THEN the
+remaining tPF-2 refcap delta: PLANLIST rows need ART NEXT TO NAME + teal
+selected row + scroll arrows (refcap original-planet-screen-build-list.png;
+planitemLib already loaded in ui.cpp — blit record == itemIdx per the
+t428 1:1 law). Budget <=2.
+RATIONALE for ordering: tPF-2's law+port+pins are done (545/0); an
+unwitnessed UI chain is not closed under this project's standards, and
+the witness is the cheapest remaining step before tPF-3. The rest of the
+phase-19 queue stands:
 THEN tPF-3 TILE OVERLAY + BASE (D28 P2/P6): overlays are SEMI-
 TRANSPARENT colored squares, SMALLER when not adjacent (refcap
 planet-screen-iter-433-v-original.png — ours opaque; derive alpha +
@@ -291,6 +292,33 @@ scratchpad/; production ring needs t439 recovery before live witness
 (TL expired 2026-11-24 14:53); scratch savedir law; C1-C5 + race
 intro stay DEFERRED (D25); when a counter reads zero check PRODUCER
 EXISTENCE first (D29).
+
+tPF-2 LANDED 2026-11-25 (SQUARE-INFO POPUP LAW + PORT + PINS; LIVE
+WITNESS OWED as tPF-2b; no OQ row touched — tPF tracks none, honest
+negative under strict-close; open=[016,019] unchanged). PROVED
+(docs/re/_wip_tPF2.md F1-F5):
+ - CONTENT LAW (builder key-3 case 0x3de5a..0x3e2c8, objdump-verified):
+   title getter(89) "<Colour> Square" / ruins+owner getter(88) with NO
+   body; body per class byte &7: White getter(91), Black getter(92)
+   (TWO spaces), Red/Green/Blue getter(93)+producer noun, orbital
+   getter(90); holds 0x14/0x50. The D28 refcap texts ("White Square" /
+   "Blue squares increase the effectiveness of research-producing
+   structures.") are EXACTLY static.txt #89+#91/#93 — the t428
+   content-dependent popup law, ported properly this time.
+ - BUTTON LAW (refcap authority): Build+Cancel iff surface cell, EMPTY,
+   ACTIVE 4-neighbour (checker adjacency leg reused); else OK. Build
+   opens PLANLIST with the cell ARMED -> pick orders via the msg-0x1c01
+   step-2 arms directly. Seam-named: occupied item line + progress line
+   NOT rendered; ruins/orbital -> OK-only is an honest default.
+ - PORT: indpopups squareInfoLines/squareBuildable; ui.cpp tile-click
+   arm (rect = indicatorPopupRect(PLSQUARE) = (162,130)..(477,327)),
+   button strip y1+2..+30, armed-cell order leg, msg-50 popups keep NO
+   buttons. Suite 543->545/0/0 (pins test_squarepopup_tpf2.cpp).
+ - SITTING CHECK ran FIRST (r1_t85g_sitting RC=0,
+   work/r1/tPF2_pre_sitting.out): no decisive new event; assignment stood.
+ - OWED (tPF-2b): scripts/tPF2_witness.sh never produced a tile-click
+   line (attempt-1 analysis in _wip F5); PLANLIST row ART/teal/scroll
+   arrows still port-side plain.
 
 tPF-1 LANDED 2026-11-25 (TIME CONTROLS CLOSED — D28 P7 BOTH HALVES:
 NEXTTURNCONT WIRED to the cited help-1next2 law + harness turn-cap made

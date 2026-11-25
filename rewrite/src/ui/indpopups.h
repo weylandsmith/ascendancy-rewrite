@@ -156,4 +156,34 @@ std::vector<PopupLine> popupLinesFor(const ascend::game::Campaign& camp,
                                      int star, PlanetPanel panel,
                                      const std::string& planetName);
 
+// ---- tPF-2 SQUARE-INFO POPUP (D28 P3/P5; law docs/re/_wip_tPF2.md F3b) ----
+// The msg-50 builder's KEY-3 case body 0x3de5a..0x3e2c8, armed by a tile
+// click (widget+0xab = the clicked cell). Content law (objdump-verified):
+//   title  BYTE[cell]&8 ruins && owner==player -> getter(88)
+//          "Xenoarcheological Ruins" (NO body, 0x3e1c1 jne); else
+//          getter(89) "%s Square" with the colour word below (hold 0x14).
+//   colour cell >= surfaceCells -> getter(83) "Orbital"; else the
+//          cs:[0x28fa4] table on BYTE[cell]&7: 0 Black(76), 1 White(75),
+//          2 Red+industry(77/78), 3 Green+prosperity(79/80), 4 Blue+
+//          research(81/82) — same class map as tileEdgePaletteIndex.
+//   body   orbital -> getter(90); White -> getter(91) verbatim; Black ->
+//          getter(92) verbatim; else getter(93) "%s squares increase the
+//          effectiveness of %s-producing structures." (hold 0x14 tail).
+// SEAMS (documented, NOT modelled): the occupied-cell item line 0x3df46
+// (race-append 0x396cc + "Automated " 0x1ff2 legs — no campaign-side
+// automation flag) and the empty-cell progress line 0x3e07e (queue order
+// unrecovered); the D28 refcaps show title+body only for empty cells.
+struct SquareInfo {
+    std::vector<PopupLine> lines;  // title (+ body unless ruins)
+    bool buildable = false;  // D28 button law: Build+Cancel iff true
+};
+SquareInfo squareInfoLines(const ascend::game::Campaign& camp, int star,
+                           int cell);
+
+// The button law gate alone (pure, pin target): Build iff `cell` is a
+// SURFACE cell (cell < surfaceCells), EMPTY (no active item), and has an
+// ACTIVE 4-neighbour in the lattice. Ruins/orbital/occupied refuse the
+// Build button (OK only) — seam-named honest default (F3c).
+bool squareBuildable(const ascend::game::Campaign& camp, int star, int cell);
+
 }  // namespace ascend::ui
