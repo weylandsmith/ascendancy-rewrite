@@ -233,19 +233,26 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-3 TILE OVERLAY + BASE (D28 P2/P6): overlays are SEMI-
-TRANSPARENT colored squares, SMALLER when not adjacent (refcap
-planet-screen-iter-433-v-original.png — ours opaque; derive alpha +
-both sizes + per-class colors from vendor paint fn 0x3bbd6..0x3bc52
-family in work/ascend_restored.bin); colony-base art misaligned since
-the tPL-V1 lattice fix — re-anchor to the corrected
-(410+34*(col-row),127+17*(col+row)) center law (the tile blit at
-ui.cpp structure-art pass uses tileCenter directly; check the CB
-record's own anchor offset vs the diamond centre). Budget <=2.
-RATIONALE for ordering: tPF-2 is now FULLY CLOSED (law+port+pins+
-LIVE WITNESS+refcap art, this iteration) — the phase-19 queue advances
-in order. tPF-3 is next in D28 and shares the planet-view paint code
-just touched, so the working context is warm.
+NEXT tPF-3b OVERLAY PORT + CB ANCHOR SHIP (D28 P2/P6; law FULLY
+DERIVED this iteration — docs/re/_wip_tPF3.md F1-F7 is the complete spec,
+do NOT re-derive): (1) RESOLVE F7 FIRST (decisive probe: perpendicular
+colour profile across a known tile boundary on the 433 refcap left half —
+full-outline vs doubled-inset lines; ~5 probes, no debugger); (2) PORT:
+ui.cpp PASS 2 full-diamond outline REPLACED by the overlay law (inset
+64x31 centre-relative diamond iff NOT rock AND (own OR active-4-neighbour),
+else TINY 12x6; line colour = tileEdgePaletteIndex; outline-only fill,
+seam TPF3-B named); legality helper = checker with item 0xff (rule D rock
+veto + rule G adjacency only — squareBuildable in indpopups.cpp lacks the
+rock veto and own-active leg, extend or add a painter variant); (3) CB
+ANCHOR FIX (D28 P7): structure blit dest = (c.x + rec.left, c.y - 17 +
+rec.top) — MEASURED planitem bboxes L=-34, T in {-1..-18} (rec0 CB
+T=-9/H=43), port's (c.x-w/2, c.y-h/2) is 5px LOW for the CB;
+(4) pins + pixel witness (reuse tPF2_witness.sh enumeration + census
+v2 premises; anti-vacuity control mandatory). Budget <=2.
+RATIONALE for ordering: tPF-3's law half CLOSED this iteration (F1-F6
+cited; F7 conflict named); shipping without resolving F7 risks painting
+the wrong geometry a second time (tPL-B1 polarity lesson), and the
+profile probe is cheap — law then port in ONE next session.
 WITNESS-HARNESS LESSON CARRIED: probe scripts must enumerate REAL
 cell centres from the planitem.txt B/C grids (never offsets around
 tileCenter(0,0) — size-2's rows 0..3 are EMPTY); scripts/
@@ -307,6 +314,39 @@ scratchpad/; production ring needs t439 recovery before live witness
 intro stay DEFERRED (D25); when a counter reads zero check PRODUCER
 EXISTENCE first (D29).
 
+tPF-3 LANDED 2026-11-25 (TILE-OVERLAY LAW DERIVED + CITED + CB ANCHOR
+ROOT CAUSE MEASURED; NO code shipped — F7 witness conflict named, ship
+moved whole into tPF-3b above; no OQ row touched — tPF tracks none,
+honest negative under strict-close; open=[016,019] unchanged). PROVED
+(docs/re/_wip_tPF3.md F1-F7, all raw asm 0x3bb19..0x3c335 on
+work/ascend_restored.bin via t442_disasm):
+ - THE COLOURED DIAMONDS ARE OVERLAYS KEYED ON THE CHECKER 0x3830c RETURN
+   WITH ITEM ARG 0xff (mov edx,0xff @0x3c2c7): legal (EDI grant survives,
+   -1) -> INSET diamond 64x31 (2px in, 0x3bc5b vertex table) + polygon
+   fill via state block [0x48c33]+di*0x100 -> filler 0x62d15; illegal ->
+   TINY 12x6 diamond (0x3bd4d). Line colour di = class table 0->black/
+   2->117 red/3->146 green/4->255 blue/else 12 white. tPL-V1's 'grey-ramp
+   selector 7/8/9/10/13' re-read: OVERLAY OUTLINE PENS, not fills.
+ - LEGALITY REDUCED (item 0xff): inset iff NOT rock AND (own-active OR
+   active-4-neighbour); barren class-0 non-adjacent -> TINY BLACK (the
+   vendor zoom's small diamonds — D28 'smaller when not adjacent').
+ - 'SEMI-TRANSPARENT' CENSUSED: vendor refcap tile interiors are 20,495
+   px of EXACTLY conv(150) (16,69,77), ZERO class-blend px -> the fill
+   is visually a no-op at the refcap state; PORT = outline-only, alpha
+   law NOT recovered (seam TPF3-B, honestly named, refcap doesn't
+   constrain it). DAT_00048c33==0 in all banked saves (runtime alloc).
+ - CB ANCHOR [measured]: vendor blits structure art at the diamond TOP
+   VERTEX + record signed bbox (0x3bed1/0x3c1ab 0x5caac, tRSV1d anchor
+   law). planitem.shp ALL bboxes L=-34, T in {-1..-18} (CB rec0 T=-9
+   H=43) -> port (c.x-w/2, c.y-h/2) is 5px LOW for the CB (D28 P7 root
+   cause). FIX SPEC: dest = (c.x + left, c.y - 17 + top).
+ - F7 OPEN CONFLICT (do not silently pick): tPL-V1 lattice witness saw
+   100% support at FULL boundaries; paint fn draws only inset/tiny.
+   Decisive profile probe specced in _wip F7 (t254 has ZERO conv(150)
+   px — different palette state, do not mix witnesses).
+ - SITTING CHECK ran FIRST (r1_t85g_sitting exit 0, work/r1/
+   tPF3_pre_sitting.out: 45,227 rows, newest t=1335 — stale assignment
+   stood). Production ring untouched; no scratch servers spawned.
 tPF-2b LANDED 2026-11-25 (SQUARE-POPUP LIVE WITNESS PASS + PLANLIST
 ART/TEAL/ARROWS — tPF-2 NOW FULLY CLOSED; no OQ row touched — tPF
 tracks none, honest negative under strict-close; open=[016,019]
