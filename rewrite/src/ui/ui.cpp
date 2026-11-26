@@ -1003,7 +1003,9 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // tPF-2b SCROLL ARROW (refcap down-triangle bottom-
                     // right): one row down, clamped to keep a full page
                     // (or the whole list if shorter).
-                    const int n = int(projectOptionsFor(camp, planetStar)
+                    const int n = int(projectOptionsFor(
+                                          camp, planetStar,
+                                          planetCellArmed ? planetCell : -1)
                                           .size());
                     const int maxFirst =
                         std::max(0, n - kProjectVisibleRows);
@@ -1024,7 +1026,9 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // territory — honest simplification, pinned in the unit
                     // suite via ordersWithoutCell.
                     const int row = *projectRowFor(p, projectFirst);
-                    const auto opts = projectOptionsFor(camp, planetStar);
+                    const auto opts = projectOptionsFor(
+                        camp, planetStar,
+                        planetCellArmed ? planetCell : -1);
                     if (row >= 0 && row < int(opts.size())) {
                         planetPick = opts[row].item;
                         projectOpen = false;
@@ -2760,7 +2764,9 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     SDL_RenderFillRect(ren, &lb);
                     SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
                     SDL_RenderDrawRect(ren, &lb);
-                    const auto opts = projectOptionsFor(camp, planetStar);
+                    const auto opts = projectOptionsFor(
+                        camp, planetStar,
+                        planetCellArmed ? planetCell : -1);
                     // tPF-4: owner -> specnum (the vendor's byte[rec+0x57])
                     // for the Ship shape-table index; same roster law as the
                     // species rail (speciesSpecnumOfOwner).

@@ -43,10 +43,12 @@ PlanetView planetViewFor(const ascend::game::Campaign& camp, int star,
 }
 
 std::vector<ProjectOption> projectOptionsFor(
-    const ascend::game::Campaign& camp, int star) {
+    const ascend::game::Campaign& camp, int star, int armedCell) {
     // LIST MEMBERSHIP (planetview.h header): table order, REQUIRES-gated
     // (income-law S4), domain < 39 (0x388ec). Free-pop is an ORDER gate,
     // not a list filter — the vendor shows the row and the order rejects.
+    // tPF-6: an ARMED cell additionally filters by the placement checker
+    // (the vendor's 54-loop checks 0x3830c per item before offering Build).
     std::vector<ProjectOption> out;
     if (star < 0 || star >= int(camp.galaxy().stars.size())) return out;
     const int n = camp.planItemCount();
@@ -56,6 +58,10 @@ std::vector<ProjectOption> projectOptionsFor(
         if (!ascend::game::requiresAvailable(pi->reqByte, camp.techCountTotal(),
                                              camp.playerTechs()))
             continue;
+        if (armedCell >= 0 &&
+            placementBlock(camp, star, id, armedCell) != PlacementBlock::None)
+            continue;  // the vendor's Build button never appears for this
+                       // (item, cell) — so the row never appears either
         out.push_back(ProjectOption{id, pi->name, pi->cost});
     }
     return out;

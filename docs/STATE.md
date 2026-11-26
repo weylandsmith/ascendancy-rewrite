@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-25T21:30
+updated: 2026-11-25T23:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,44 +233,35 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-6 ORBITAL CLICK + HOVER CPU (D28 items 11+12: "Orbital squares do
-show an outline when I hover over them, but clicking does nothing. It should
-pop up an info/context window (IE, once a technology with orbital structures
-has been researched, it should give a build menu.)" + "Hovering over the
-orbital squares isn't as responsive as it should be, and my CPU jumps to 100%
-utilization while I'm hovering around that area.").
-Ordering rationale: tPF-5 closed item 10; item 9's SIZE/SHAPE leg is already
-satisfied by indicatorPopupRect (tPL-B2) and its remaining mineral-framing leg
-is GATED on the user's OQ-005/D1 ruling (help.shp-k0 frame ship) — a gated row
-must not stall the queue. Item 12 is a MEASURABLE perf bug (port hover path),
-item 11 reuses the tPF-2d popup law (button array + band) plus the orbital
-context: orbitalHoverOutline already exists (ui.cpp ~2665) so the click arm is
-the gap.
-Steps: (1) profile the port's planet-screen hover path (orbitalHoverOutline +
-tile-edge recompute run per frame? — time the pure fns and count calls per
-frame from a log; the 100%-CPU symptom means per-frame full recompute or an
-unthrottled event loop — cite which); (2) read the vendor orbital-click path:
-PLSQUARE paint body 0x3b9xx region + msg arms in work/t198_planwin.asm (the
-orbital squares are PLSQUARE cells at the lattice ring — find the click arm
-that pops the orbital context/build menu, windows.txt PLSQUARE SENDMESSAGE
-law); (3) port + pins + witness (tPF5_port_witness.sh is the newest rig;
-build BOTH run_tests AND ascendancy before any witness).
-DO NOT re-derive the STRIP ANCHOR law (closed tPF-5: docs/re/_wip_tPF5.md P1..P8;
-vendor dest = anchor + (L,T) at FUN_0005caac 0x5cb61/0x5cb6a; stripGaugeBlitPos
-is the single law fn — NEVER re-add a bare-rect blitShape for the gauges;
-scripts/tPF5_witness_census.py re-ran the differential). DO NOT re-derive the
-PLANLIST law (closed tPF-4: docs/re/_wip_tPF4.md; the runtime JT is at member
-0x1fc070; scripts/tPF4_jt_and_registry.py re-runs it). DO NOT re-litigate
-tPF-3: ramp-fill law + tables frozen in docs/re/_wip_tPF3.md F15..F19 +
-rewrite/src/ui/rampfill_law.h (regenerate + diff with
-scripts/tPF3e_gen_tables.py if suspicious; NEVER hand-edit that header).
-TPF3d-A (table PRODUCER) stays named-open — route if ever needed:
-scripts/r1_wp_session.py --target data:0x48c33. TPF5-A (item 9 frame-art ship)
-and TPF4-A/B named-open — see _wip_tPF5.md P7 / _wip_tPF4.md. Do NOT re-run the
-tPF-1b port soak (precondition FAILED tPF-3c; VENDOR witness only, user-time
-D30). help.shp-k0 FRAME SHIP stays gated on the user's OQ-005 ruling
-(DECISIONS.md D1). PRIOR-SESSION QUEUE: tPF-6 orbital click + hover CPU;
-tPF-7 research controls; tPF-8 tree visibility; tPF-1b VENDOR day-20 repro.
+NEXT tPF-7 RESEARCH CONTROLS (PRIOR-SESSION QUEUE item 2; D28 file
+scratchpad/t433-build-feedback.txt — read the file's research-screen items
+FIRST and take the highest-numbered unresolved research-screen complaint as
+the task definition; if none remains open, re-derive the queue entry from the
+D28 file and say so in the landing).
+Ordering rationale: tPF-6 closed item 11's port gap and measured item 12 to
+an attributed honest negative (hover adds no CPU class; the planet screen's
+constant 60fps full-repaint floor is the cost — TPF6-CPU-A named-open, a PORT
+decision needing a user ruling, not vendor law, so it must not stall the
+queue). The research screen is where the freshest user traffic sits (tRS
+chain landed V1d/V2p/V2w recently; TRSV2w-A/TRSV1-C seams live there) and
+items 11/12 needed no user input, so the next queue rows are tPF-7 then
+tPF-8 tree visibility; tPF-1b VENDOR day-20 repro stays user-time-gated (D30).
+Steps: (1) read D28 research items + docs/re/research.md S7-S9 + _wip_tRSV2.md
+P11-P12 (the --autoplay --dbg-res rig and the tRSV2p_witness.sh census are the
+proven instruments — reuse them, do NOT re-derive the disk-fill law);
+(2) port + pins (CMakeLists entry for any new test file — tPF-4 trap);
+(3) witness: build BOTH run_tests AND ascendancy first; Xvfb BY-PID kill.
+DO NOT re-derive the ORBITAL SLOT/CLICK laws (closed tPL-V2/tPF-6:
+docs/re/_wip_tPF6.md P0-P7 + _wip_tPLV2.md; orbitalSlotHitFor/orbitalHoverOutline/
+projectOptionsFor(armedCell) are the three law fns — scripts/tPF6_witness.sh +
+tPF6_cpu_probe.sh re-run both arms). DO NOT re-derive the STRIP ANCHOR law
+(closed tPF-5). DO NOT re-litigate tPF-3. TPF6-A (Build whose list holds no
+buildable row, item-35 exemption shape), TPF6-B (vendor PLANLIST per-cell
+filter site unrecovered — our filter is an inferred bridge), TPF6-CPU-A
+(port repaint throttle — user ruling) named-open. TPF5-A/TPF4-A/B named-open.
+help.shp-k0 FRAME SHIP stays gated on the user's OQ-005 ruling (DECISIONS.md
+D1). PRIOR-SESSION QUEUE: tPF-8 tree visibility; tPF-1b VENDOR day-20 repro;
+TPF6-CPU-A if the user rules.
 STANDING: D28 file scratchpad/t433-build-feedback.txt is the item authority;
 refcap PNGs in scratchpad/; scratch savedir law; C1-C5 + race intro stay
 DEFERRED (D25); when a counter reads zero check PRODUCER EXISTENCE first
@@ -282,10 +273,50 @@ resampling (families, not exact values). WITNESS TRAP (tPF-3e): port witnesses
 run ./rewrite/build/ascendancy — build BOTH run_tests AND ascendancy before
 any witness. APPEND TRAP (tPF-5): `open(p,"w").write(open(p).read()+x)`
 TRUNCATES BEFORE reading — read first, or open(p,"a") (cost a WIP section
-once). MUTATION TRAP (tPF-5): a campaign's stdout is BLOCK-BUFFERED — an empty
-log is NOT death; pgrep -f is the only liveness test, and never touch target
-files until pgrep is empty (mid-run restores poison verdicts); pkill -f kills
-your own tool shell.
+once). MUTATION TRAP (tPF-5, RE-WITNESSED tPF-6): a campaign's stdout is
+BLOCK-BUFFERED — an empty log is NOT death; pgrep -f is the only liveness
+test; and restore() must COPY BACK from the snapshot THEN md5-verify — a
+verify-only restore leaves the mutant on disk when a later patch assert fails
+mid-campaign (old_string is gone because the previous mutant rewrote it).
+Fixture trap (tPF-6): fixed-item CHECKs must use base-list (REQUIRES-passing)
+items, and ACTIVE/armed cell pairs must be DERIVED from the grid law, never
+hard-coded.
+
+tPF-6 LANDED 2026-11-25 (ORBITAL CLICK CHAIN VERIFIED WORKING + ARMED-CELL
+PLANLIST FILTER SHIPPED/PINNED/MUTATION-PROVEN; ITEM 12 ATTRIBUTED BY
+MEASUREMENT, HONEST NEGATIVE, NO FIX; no OQ row closed — tPF tracks none,
+open=[016,019] unchanged).
+PROVED (docs/re/_wip_tPF6.md P0..P7 + scripts/tPF6_witness.sh +
+tPF6_cpu_probe.sh + tPF6_mutate.sh):
+  - ITEM 11: the orbital click/popup chain ALREADY WORKS (D28 report predates
+    tPL-V2/tPF-2d landing): slot0 click -> 'tile 23 selected (Orbital Square
+    ids=54,51)' -> Build -> PLANLIST -> order. THE REAL GAP was the list
+    offering checker-refused rows on an armed cell (witness-caught: Factory on
+    ring cell 'rejected armed cell 23'). FIX: projectOptionsFor(camp, star,
+    armedCell) filters by placementBlock when armed (vendor corroboration
+    [verified]: 54-loop 0x3d550..0x3d58e calls 0x3830c per item before
+    appending Build — never offers a refused Build; [inferred] bridge to the
+    list itself, seam TPF6-B). Post-fix witness: ring-armed n=3 [22,23,26] +
+    'Shipyard (ordered armed cell 23)'; D1 unarmed control n=8 EXACTLY; D2
+    surface-armed n=0 EXPLAINED (popup's 54 came from checker-exempt item 35
+    Automation, REQUIRES-dropped from the list — seam TPF6-A). NOT claimed:
+    vendor pixel-identity (no orbital refcap).
+  - ITEM 12 MEASURED: /proc utime+stime 5s windows — idle 37.0-42.2%,
+    slow-hover 47.2%, FLOOD-hover 41.2% => motion adds NO cost class; the
+    planet screen repaints fully every frame unconditionally (ui.cpp draw
+    block) at ~40% of a core on THIS host; slower hardware = 100%. Vendor
+    repaints on hover too (+0xac), no hover economy to port. Throttle = PORT
+    decision, TPF6-CPU-A named-open, item stays user-symptom-open.
+  - PINS test_optionsfilter_tpf6 x2 (kept-set law both domains + non-emptiness
+    + wiring), suite 570->572/0/0, CMakeLists entry ADDED. MUTATION 3/3
+    CAUGHT (M1 drop-block 24 fails, M2 polarity 32, M3 unwire 1), restored
+    md5-verified, green after. Campaign incident: verify-only restore left M1
+    on disk when M2's assert fired (mutated old_string) — recovered from
+    /tmp copies, script fixed, rule banked in STATE.md STANDING block.
+  - Sitting check ran FIRST (exit 0, trusted rows 45,227, newest t=1335 —
+    stale assignment stood; the 10.4 GB timeline growth is watcher rewrites).
+    Production ring untouched; scratch Xvfb killed BY PID. GATE_EXIT=0,
+    LEDGER AUDIT OK. NEXT tPF-7 research controls.
 
 tPF-5 LANDED 2026-11-25 (STRIP-ART ANCHOR LAW CLOSED AT RAW BYTES; INDUSTRY
 TILE FIX SHIPPED + PINNED + WITNESSED DIFFERENTIALLY; no OQ row closed — tPF

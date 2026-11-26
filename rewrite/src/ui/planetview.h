@@ -95,8 +95,15 @@ struct ProjectOption { int item; std::string name; int cost; };
 // requiresAvailable(reqByte) (income-law S4) and item < 39 (0x388ec).
 // Does NOT pre-filter the free-pop gate (3) — the vendor LIST shows them;
 // the ORDER rejects them (and the row's suffix already says why).
+// tPF-6 ARMED-CELL FILTER (D28 item 11): when the list opens from a square
+// popup's Build button on cell `armedCell`, drop every item the placement
+// checker refuses on THAT cell (placementBlock != None). Vendor corroboration:
+// the 54-append loop 0x3d550..0x3d58e calls checker 0x3830c(item, cell) per
+// item BEFORE appending Build — the vendor never offers a Build it would
+// refuse (docs/re/_wip_tPF2d.md D6 + picker law income-law.md S13). -1 = no
+// armed cell (plain PLBUILD open): full REQUIRES-gated list, law unchanged.
 std::vector<ProjectOption> projectOptionsFor(
-    const ascend::game::Campaign& camp, int star);
+    const ascend::game::Campaign& camp, int star, int armedCell = -1);
 
 // The cmd0 gate predicate (1)+(2)+(3) above, evaluated against campaign
 // state. Pure; the caller's orderProject applies the SAME law — exposed so
