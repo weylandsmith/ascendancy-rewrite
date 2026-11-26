@@ -334,6 +334,9 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // inside the kBatModeWnd half-height (472-7)/2 = 232. Zoom is user-driven.
     bool gridOn = true;
     int played = 0;
+    // tPF-1b: >0 when the harness turn cap ended the run; the final line
+    // (after "ui ok: turn N") names it so it can never read like game-over.
+    int capFired = 0;
     Uint32 nextAuto = autoplay ? SDL_GetTicks() + 250 : 0xFFFFFFFFu;
     // tPF-1 (D28 P7): NEXTTURNCONT continuous-advance latch. The vendor's
     // button (windows.txt ln556 msg 8, TYPE 25 BUTTONSTATE 0) advances time
@@ -1551,13 +1554,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
             }
         }
         if (turns > 0 && played >= turns) {
-            // tPF-1 (D28 P7): the harness turn cap announces itself. D28 P7
-            // ("the game exits after 20 days") was THIS line firing on a
-            // launch that passed --campaign 20; a silent death read as a
-            // game defect. scripts/tPF1_repro_exit.sh witnesses the plain
-            // --ui path (turns=0) surviving 30 manual days.
-            std::printf("ui turn cap %d reached (harness instrument, not "
-                        "game law)\n", turns);
+            // tPF-1 (D28 P7) + tPF-1b REPRO A/B (2026-11-26, MEASURED):
+            // "the game exits after 20 days" is THIS cap firing on a launch
+            // that passed --campaign 20. REPRO A (--ui --campaign 20,
+            // Begin-built, 20 x NEXT TURN) exits 0 with the cap line; REPRO
+            // B (--ui alone, 40 presses) is ALIVE with zero cap lines —
+            // scripts/tPF1b_ab_repro.sh. The cap is a harness instrument,
+            // never game law, so it must read that way: the in-loop print
+            // was moved to the FINAL line of the run (after "ui ok: turn
+            // N", which the gate greps and stays), prefixed with the
+            // harness-cap marker (see the return site below).
+            capFired = turns;
             quit = true;
         }
         if (camp.over()) quit = true;
@@ -3684,6 +3691,15 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     }
 
     std::printf("ui ok: turn %d\n", camp.turn());
+    // tPF-1b (2026-11-26 REPRO A/B): the cap announcement is the LAST line
+    // and carries the harness-cap prefix, so a capped run's tail can never
+    // be misread as the game ending on its own (D28 P7 testimony: "the game
+    // exits after 20 days" came from a launcher that passed --campaign 20).
+    if (capFired > 0)
+        std::printf("HARNESS-CAP: turn cap %d reached (harness instrument, "
+                    "not game law; play = --ui without --campaign)\n",
+                    capFired);
+    std::fflush(stdout);
     txt.release();  // atlases before their renderer (destructor is idempotent)
     SDL_DestroyRenderer(ren);
     if (owned) SDL_DestroyWindow(win);  // a handed-over window: caller's duty

@@ -235,14 +235,15 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
 ## NEXT ACTION (exactly one)
 NEXT tPF-11 RESEARCH-SCREEN MINERAL FRAMING (D28 item 22: "The mineral
 framing is missing from this screen") + TPF5-A RESOLUTION.
-Ordering rationale: tPF-10 just landed (items 19/20); item 22 is the ONLY
-research-screen D28 item left. The STATE note "help.shp-k0 FRAME SHIP
-stays gated on the user's OQ-005 ruling (D1)" is PROBABLY STALE — D1
-RULED 2026-11-09 (docs/DECISIONS.md ruling-page blocks) and OQ-005 CLOSED
-t367 with the corner-anchor fallback; step (1) must VERIFY that reading
-against the ruling text before treating the ship as gated. tPF-1b VENDOR
-day-20 repro stays user-time-gated (D30); TPF6-CPU-A awaits a user
-throttle ruling; TPF7-C is a feel-grading ask — none iterable.
+Ordering rationale: tPF-1b CLOSED this iteration (launcher-flag, REPRO A/B
+measured on the Begin path — the PRIOR-SESSION QUEUE item is gone); item 22
+is the ONLY research-screen D28 item left. The STATE note "help.shp-k0
+FRAME SHIP stays gated on the user's OQ-005 ruling (D1)" is PROBABLY STALE
+— D1 RULED 2026-11-09 (docs/DECISIONS.md ruling-page blocks) and OQ-005
+CLOSED t367 with the corner-anchor fallback; step (1) must VERIFY that
+reading against the ruling text before treating the ship as gated.
+TPF6-CPU-A awaits a user throttle ruling; TPF7-C is a feel-grading ask —
+neither iterable.
 Steps: (1) GATE AUDIT FIRST: read docs/DECISIONS.md D1 ruling blocks +
 the OQ-005 ledger row; record verbatim what the ruling does/does not
 cover for FRAME-ART SHIP (vs codec decode). If a real gate stands, name
@@ -267,12 +268,11 @@ start/edge law, the RESEARCH control laws (tPF-7/7b), the ORBITAL
 SLOT/CLICK laws, the STRIP ANCHOR law, the DISK FILL law (S9), or
 re-litigate tPF-3. TPF7-A/C/D, TPF6-A/B/CPU-A, TPF4-A/B, TRSB1-B and
 TRSV1b-A (PARTIAL CLOSED tPF-7: f32[0x9f108]==1.0 4233/4233 saves)
-named-open. PRIOR-SESSION QUEUE: tPF-1b VENDOR day-20 repro;
-TPF6-CPU-A if the user rules.
-STANDING: D28 file scratchpad/t433-build-feedback.txt is the item authority;
-refcap PNGs in scratchpad/; scratch savedir law; C1-C5 + race intro stay
-DEFERRED (D25); when a counter reads zero check PRODUCER EXISTENCE first
-(D29); POPUP/DERIVATION LAW (D30, binding): every visible property cited or
+named-open. STANDING: D28 file scratchpad/t433-build-feedback.txt is the
+item authority; refcap PNGs in scratchpad/; scratch savedir law; C1-C5 +
+race intro stay DEFERRED (D25); when a counter reads zero check PRODUCER
+EXISTENCE first (D29); POPUP/DERIVATION LAW (D30, binding): every visible
+property cited or
 named-open, no eyeballed geometry. NEVER read whole lines of
 work/r1/playcap/live-timeline.jsonl. The 433 composite is SIDE-BY-SIDE —
 LEFT = PORT, RIGHT = VENDOR (the F6 retraction); vendor-half pixel counts
@@ -294,7 +294,41 @@ clickdn/clickup + a POLLLED stop condition on the app's own log, never a
 fixed sleep sized for an old cadence. PIXEL-CENSUS TRAP (tPF-9): the RESWIN
 frame border gray (120,120,120) sits INSIDE the kDim/kText +-40 tolerance —
 corner-text boxes must start at x>=16, and the planet starfield scatters
-few white px anywhere: empty-box threshold <=8, label-present >=30. RUN_TESTS CRASH TRAP (tPF-10): harness CHECK does NOT return — a source-window pin that substr()s a find() result after the CHECK ABORTS the whole suite (substr(npos) throw) and mutation sweeps mis-score it; guard extractions with if (pos != npos) and count a nonzero exit with no FAIL line as CAUGHT (crash). SHP DUMP TRAP (tPF-10): tools/shp_pngdump raw .idx planes can be PARTIAL walks (resring: 197 px vs the port decode 828 px = the on-screen witness n) — pin pixels from ShapeLibrary::decode, never from the dump tool.
+few white px anywhere: empty-box threshold <=8, label-present >=30. RUN_TESTS CRASH TRAP (tPF-10): harness CHECK does NOT return — a source-window pin that substr()s a find() result after the CHECK ABORTS the whole suite (substr(npos) throw) and mutation sweeps mis-score it; guard extractions with if (pos != npos) and count a nonzero exit with no FAIL line as CAUGHT (crash). SHP DUMP TRAP (tPF-10): tools/shp_pngdump raw .idx planes can be PARTIAL walks (resring: 197 px vs the port decode 828 px = the on-screen witness n) — pin pixels from ShapeLibrary::decode, never from the dump tool. WINDOW-PIN
+TRAP (tPF-1b): source-window pins that substr(cap, N) must size N past
+the anchor's COMMENT body (tPF-1b comment pushed "capFired = turns;" past
+500 — suite FAIL round 1), and a single-occurrence pin on a marker string
+means NO comment may contain that literal (de-literalized to "harness-cap
+marker").
+
+tPF-1b LANDED 2026-11-26 (D28 P7(b) "EXITS AFTER 20 DAYS" CLOSED AS
+LAUNCHER-FLAG, MEASURED WITHOUT THE USER; cap line re-ordered + prefixed;
+no OQ row touched — D28 is a defect queue, not the ledger; open=[016,019]
+unchanged). Steering note overrode STATE (the user's launcher prints "ui ok:
+turn 20" = ui.cpp clean return, reachable via the cap only when turns>0 =
+exclusively o.campaign on the Begin path, main.cpp:665).
+ - REPRO scripts/tPF1b_ab_repro.sh, Begin-built BOTH legs (neutral 320,60 ->
+   FRESHGAME 318,295 -> BEGIN 566,422 -> intro dismiss 320,450; both logs
+   carry "newgame live stars 50 owners 5 gov 1"): A (--ui --campaign 20,
+   NEXT TURN x20) EXITED exit_code=0 at press 20 with "ui ok: turn 20";
+   B (--ui ALONE, x40) ALIVE at turn 40, 40 clicks logged, ZERO cap lines.
+   A prints + B survives => launcher-flag, NOT game law; the third branch
+   (B dies at 20 => instrument quit paths) did NOT trigger.
+ - SHIP: cap arm LATCHES capFired (ui.cpp:1568); announcement moved to the
+   run's LAST line after "ui ok: turn N" (gate greps it at 5 sites — kept),
+   prefixed "HARNESS-CAP: turn cap N reached (harness instrument, not game
+   law; play = --ui without --campaign)"; README Run section carries the
+   "play = --ui only; --campaign N is a test instrument" callout.
+   Re-witnessed A/B on the SHIPPED binary: A tail = ui ok then HARNESS-CAP
+   as final line, B alive at 40.
+ - PINS timecont_wiring_tPF1 extended in place (latch + tail-window +
+   single-occurrence); SUITE 590/0/0. MUTATION scripts/tPF1b_mutate.sh
+   M1/M2/M3 ALL CAUGHT, md5-verified restore 2939be4d...
+ - NAME AUDIT: NO repo script hardcodes --campaign 20 (witnesses pair 1/3/
+   4/40/65/1200/1500/1600; the literal lived only in docs prose + the new
+   repro) => the user's launcher flag is hand-typed or private run-config;
+   repo-side any copied --ui witness line reproduces the class at its own N.
+ - NEXT tPF-11 mineral framing + TPF5-A (D28 item 22).
 
 tPF-10 LANDED 2026-11-26 (HOVER-WORD LAW MEASURED + HOVER/SELECT FIX
 SHIPPED: D28 ITEMS 19/20 CLOSED AT BYTES + PIXELS; no OQ row closed — tPF

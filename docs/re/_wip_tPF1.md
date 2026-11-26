@@ -57,3 +57,58 @@
 - NO OQ ROW TOUCHED (the time controls track no OPEN-QUESTIONS row; D28 is
   a defect queue, not the ledger) — honest negative under strict-close;
   open=[016,019] unchanged.
+
+## tPF-1b LANDED 2026-11-26 (D28 P7(b) CLOSED AS LAUNCHER-FLAG, MEASURED
+END-TO-END ON THE BEGIN PATH; cap line re-ordered + prefixed; no OQ row
+touched — D28 is a defect queue; open=[016,019] unchanged)
+
+STEERING NOTE (user evidence: launcher console prints "ui ok: turn 20"):
+that line is ui.cpp runCampaignUi clean return; reachable via the cap ONLY
+when turns>0, which on the Begin path is exclusively o.campaign
+(main.cpp:665). Two-branch repro executed WITHOUT the user.
+
+REPRO scripts/tPF1b_ab_repro.sh (Xvfb :96, Begin-built both legs: neutral
+click 320,60 -> FRESHGAME 318,295 -> BEGIN 566,422 (kBeginNewGameBtn
+menulaw.h:72 494,373-639,472) -> intro dismiss 320,450; log lines
+"ui raceintro dismiss -> campaign" + "newgame live stars 50 owners 5 gov 1"
+present in BOTH app logs — the Begin path is genuinely exercised):
+ - A: --ui --campaign 20, xsend NEXT TURN (kNextTurnBtn 474,52-548,82) x20
+   -> 20 clicks logged, process EXITED exit_code=0 at press 20, log carries
+   "ui ok: turn 20" then (post-fix) "HARNESS-CAP: turn cap 20 reached
+   (harness instrument, not game law; play = --ui without --campaign)" as
+   the LAST line.
+ - B: --ui ALONE, 40 presses -> ALIVE at turn 40, 40 clicks logged, ZERO
+   cap lines, no game-over/victory line.
+VERDICT: A prints + B survives => the day-20 exit IS the launcher flag,
+not game law. The steering's third branch (B also dies at 20 => instrument
+quit paths) did NOT trigger; no quit-path instrumentation needed.
+
+SHIP: ui.cpp — cap arm now LATCHES capFired=turns (ui.cpp:1568 capFired
+assignment; declaration ~:337); the announcement prints ONCE after
+"ui ok: turn %d" at the return site (~:3698) with the HARNESS-CAP: prefix
+and names the fix ("play = --ui without --campaign"). "ui ok: turn N" is
+KEPT — gate.sh greps it at 5 sites (562,593,632,670,721). README.md Run
+section: PLAY = --ui callout added.
+
+PINS test_timecontrols_tPF1.cpp timecont_wiring_tPF1 extended: cap arm
+window (1200 chars — the 500-char window was the round-1 FAIL: the tPF-1b
+comment body pushed the assignment past 500; widen-the-window trap) pins
+"capFired = turns;" + "quit = true;"; ui-ok tail window pins
+"HARNESS-CAP:" + "capFired > 0" + "txt.release()" (last-print-before-
+teardown); single-occurrence pin src.find==rfind("HARNESS-CAP") bars a
+second in-loop print (comments must NOT contain the literal — round-1 trap:
+a comment word tripped it, de-literalized). SUITE 590/0/0 (count unchanged;
+pins extended in place). MUTATION scripts/tPF1b_mutate.sh M1 latch-removed
+/ M2 mid-run-print re-added / M3 prefix-stripped ALL CAUGHT, md5-verified
+restore 2939be4df673c5812b53410425c4e018.
+
+--campaign 20 NAME AUDIT (step 3(iii)): NO repo script hardcodes
+--campaign 20 (grep across scripts/ tools/: witnesses use 1/3/4/40/65/1200/
+1500/1600; ui_vendor_shot.sh 40, ui_input_check.sh 4, tRSV2p 30, tRSV2w
+400, record_playthrough 3/1200/1600, gate 1/3/65/600-path/1500/1600). The
+literal existed only in docs prose (DECISIONS.md:799, STATE.md:960) and my
+new repro. => the user's "--campaign 20" is NOT copied from a repo script;
+it is hand-typed or from a private run-config. The user should check his own
+launcher/desktop-entry; repo-side, every --ui witness pairs a --campaign N
+that exits after N days, so copying one of those lines into a launcher
+reproduces the class at whatever N it carries.

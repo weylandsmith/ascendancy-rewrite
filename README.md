@@ -62,6 +62,11 @@ vendor .fnt faces — no SDL2_ttf; the codec is docs/re/fnt.md.)
     ./build/ascendancy --data DIR --campaign 600 --seed 2024   # headless to victory
     ./build/ascendancy --data DIR --ui                          # interactive window
 
+PLAY = `--ui` only. `--campaign N` is a test instrument: in `--ui` it caps
+the game at N manually-advanced days and the run's LAST line reads
+`HARNESS-CAP: turn cap N reached ...` — a capped exit is not the game
+ending on its own (tPF-1b REPRO A/B, scripts/tPF1b_ab_repro.sh).
+
 `--data DIR` is the directory containing `extracted/` (§ below; default:
 repo root). The binary reads the ORIGINAL extracted data (manifests,
 star/tech/economy tables, race diplomacy files, audio samples) — never

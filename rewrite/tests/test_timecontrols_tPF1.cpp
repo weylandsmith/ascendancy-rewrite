@@ -125,7 +125,25 @@ TEST(timecont_wiring_tPF1) {
     const size_t cap = src.find("if (turns > 0 && played >= turns)");
     CHECK(cap != std::string::npos);
     if (cap != std::string::npos) {
-        const std::string cBlock = src.substr(cap, 500);
-        CHECK(cBlock.find("ui turn cap") != std::string::npos);
+        const std::string cBlock = src.substr(cap, 1200);
+        // tPF-1b REPRO A/B law: the cap LATCHES (capFired) instead of
+        // printing mid-run, so the announcement can only appear as the
+        // FINAL line after "ui ok: turn N" with the HARNESS-CAP: prefix.
+        CHECK(cBlock.find("capFired = turns;") != std::string::npos);
+        CHECK(cBlock.find("quit = true;") != std::string::npos);
     }
+    const size_t ok = src.find("ui ok: turn %d");
+    CHECK(ok != std::string::npos);
+    if (ok != std::string::npos) {
+        const std::string tail = src.substr(ok, 700);
+        CHECK(tail.find("HARNESS-CAP:") != std::string::npos);
+        CHECK(tail.find("capFired > 0") != std::string::npos);
+        CHECK(tail.find("txt.release()") != std::string::npos);
+        // anti-vacuity: the prefix sits between the ui-ok line and the
+        // teardown, so it is the run's last print — a re-order that emits
+        // the cap mid-run (before ui ok) is caught by the single-occurrence
+        // check below plus the latch pin above.
+    }
+    // tPF-1b: no second cap print may exist in-loop (single announcement).
+    CHECK(src.find("HARNESS-CAP") == src.rfind("HARNESS-CAP"));
 }
