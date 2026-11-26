@@ -5,12 +5,18 @@
 // Pure (no SDL); pins tests/test_planetstrip_t428.cpp; working notes
 // docs/re/_wip_t428.md F5/F9.
 //
-//   PANEL ART PROVENANCE [verified byte-level this iteration + windows.txt]:
-// planres.shp / planind.shp / planpro.shp each hold EXACTLY 21 records, all
-// 107x99 (tools/shp_pngdump census on the extracted libs; rec0 = navy mottle
-// = the 0-level panel). The windows.txt TYPE-29 rects PLRES 7,7-114,106 /
-// PLIND 123,7-230,106 / PLPRO 239,7-346,106 are 108x100 — the records fill
-// the rects at the rect origin, and 21 == the clamp0..20 domain of the
+//   PANEL ART PROVENANCE [verified byte-level t428 + tPF-5 bbox census
+// scripts/tPF5_strip_bbox.py + windows.txt]:
+// planres.shp / planind.shp / planpro.shp each hold EXACTLY 21 records with
+// bbox R=107, B=99 (so WIDTH=108 and the content's bottom-right pins to the
+// windows.txt TYPE-29 rects PLRES 7,7-114,106 / PLIND 123,7-230,106 /
+// PLPRO 239,7-346,106, all 108x100). planres and planpro are FULL-BLEED
+// (L=0,T=0, 108x100 on all 21); planind is NOT: its records carry T in
+// {23,20,11,5,1} by gauge level (H 77/80/89/95/99), i.e. the industry art is
+// BOTTOM-anchored and must be blitted at rect origin + (L,T) per the vendor
+// blit law (FUN_0005caac 0x5cb61/0x5cb6a add the bbox corner to screen x/y) —
+// see tPF-5 in docs/re/_wip_tPF5.md and the call site in ui.cpp. rec0 = navy
+// mottle = the 0-level panel. 21 == the clamp0..20 domain of the
 // gauge-selector law (layout.h gaugeSelector/prosSelector, planets-ui.md
 // S3). The switch dispatch binds case key 0->PLRES 1->PLIND 2->PLPRO
 // (planets-ui.md S2, table verified live), so panel i takes record
@@ -70,6 +76,20 @@ inline constexpr int kFieldRecordH = 358;
 // ln1587 block; t263 panel-geometry note].
 inline constexpr Pt kPopGridOrigin{355, 7};
 
+// THE STRIP BLIT PLACEMENT LAW [verified raw bytes work/ascend_restored.bin
+// FUN_0005caac 0x5cb5b..0x5cb7c]: the blit resolves the record entry
+// (payload + [payload+8+8*sel]) and then ADDS the entry's signed bbox corner
+// to the pushed screen x/y (dest_x = [entry+8] + x @0x5cb61, dest_y =
+// [entry+0xc] + y @0x5cb6a; right/bottom likewise from +0x10/+0x14). The
+// caller's x/y is therefore an ANCHOR, not a top-left. A caller that pushes a
+// windows.txt rect ORIGIN (the strip panels do) must add (L,T) itself.
+//
+// This matters because planind's records are bottom-anchored inside the 108x100
+// rect (bbox (0,T,107,99), T in {23,20,11,5,1}); dropping T painted the
+// industry gauge T px too high with a band below it -- D28 item 10 verbatim.
+// planres/planpro carry (0,0), so the term is a no-op there.
+Pt stripGaugeBlitPos(const Rect& rect, int32_t recLeft, int32_t recTop);
+
 // One panel's paint entry.
 struct GaugePanel {
     int lib;   // index into kStripGaugeLibs (0/1/2)
@@ -93,8 +113,10 @@ StripPlan stripPlanFor(const ascend::game::Campaign& camp, int star);
 
 // Library conformance gate (poppanel popSlotLibraryConforms precedent):
 // true iff `path` parses with EXACTLY kStripGaugeRecords (21) records and
-// EVERY record is 107x99 (the rect-fill dims census, F9). *err describes
-// the first violation.
+// EVERY record has WIDTH 108 (bbox R=107). HEIGHT IS DELIBERATELY NOT AN
+// IDENTITY TERM: planind's 21 records carry H in {77,80,89,95,99} (bottom-
+// anchored art, tPF-5) and rejecting them would be a fabricated law. *err
+// describes the first violation.
 bool stripGaugeLibraryConforms(const std::string& path, std::string* err);
 
 // t428d FIELD-library gate (stripGaugeLibraryConforms precedent): true iff

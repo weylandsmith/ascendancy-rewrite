@@ -33,6 +33,10 @@ StripPlan stripPlanFor(const ascend::game::Campaign& camp, int star) {
     return s;
 }
 
+Pt stripGaugeBlitPos(const Rect& rect, int32_t recLeft, int32_t recTop) {
+    return Pt{rect.x0 + recLeft, rect.y0 + recTop};
+}
+
 bool stripGaugeLibraryConforms(const std::string& path, std::string* err) {
     ascend::formats::ShapeLibrary lib;
     std::string lerr;
@@ -55,7 +59,9 @@ bool stripGaugeLibraryConforms(const std::string& path, std::string* err) {
             if (err)
                 *err = "record " + std::to_string(i) + " dims " +
                        std::to_string(r.width) + "x" +
-                       std::to_string(r.height) + " != 107x99 (rect-fill)";
+                       std::to_string(r.height) +
+                       " (width must be 108: bbox R=107; heights VARY by "
+                       "gauge level on planind, tPF-5)";
             return false;
         }
     }

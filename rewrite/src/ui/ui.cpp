@@ -2352,10 +2352,33 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     const auto sp = stripPlanFor(camp, planetStar);
                     for (int gi = 0; gi < 3; gi++) {
                         const auto& gl = stripGaugeLibs[gi];
-                        if (gl.count() == kStripGaugeRecords)
-                            blitShape(ren, gl, sp.gauges[gi].rec,
-                                      sp.gauges[gi].rect.x0,
-                                      sp.gauges[gi].rect.y0);
+                        if (gl.count() == kStripGaugeRecords) {
+                            // tPF-5 (D28 item 10): THE ANCHOR TERM. The vendor
+                            // blit adds the record's signed bbox corner to the
+                            // pushed screen x/y [verified raw bytes
+                            // work/ascend_restored.bin FUN_0005caac
+                            // 0x5cb61 dest_x=[entry+8]+x, 0x5cb6a
+                            // dest_y=[entry+0xc]+y; entry = payload +
+                            // [payload+8+8*sel] @0x5cb5b], so a caller that
+                            // passes the windows.txt rect ORIGIN must add
+                            // (L,T) itself — the same convention already used
+                            // at the status-list sun/planet blits below
+                            // (kStatusSunCx + sr.left) and ui.cpp:1748.
+                            // planind is the first strip lib whose records are
+                            // NOT full-bleed: bbox (0,T,107,99) with
+                            // T in {23,20,11,5,1} by gauge level, so R/B pin
+                            // the content to the rect's BOTTOM-RIGHT
+                            // (x0+R=rect.x1, y0+T+H-1=rect.y1 for all 21).
+                            // Dropping T painted every industry gauge 1..23 px
+                            // too HIGH with a black band below — D28 item 10
+                            // verbatim. planres/planpro are (0,0) so this term
+                            // is a no-op there (scripts/tPF5_anchor_census.py).
+                            const auto& gr = sp.gauges[gi];
+                            const auto& grr = gl.record(gr.rec);
+                            const Pt gp = stripGaugeBlitPos(gr.rect, grr.left,
+                                                            grr.top);
+                            blitShape(ren, gl, gr.rec, gp.x, gp.y);
+                        }
                     }
                     // Pop grid: 17np k1/k2/k3 (index == selector, t254).
                     if (kLibs[5].count() == 9)  // 17np.shp (kLibFiles order)
