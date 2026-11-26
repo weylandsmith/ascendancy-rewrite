@@ -73,4 +73,32 @@ bool statusRampColourAt(int y, RGB* out) {
     }
 }
 
+// ---- tPF-11 RESEARCH CHROME (D28 item 22; law statusbg.h + _wip_tPF11 P3)
+
+bool resChromeBandAt(int x, int y) {
+    for (int b = 0; b < kResChromeBandCount; b++) {
+        const Rect& r = kResChromeBands[b];
+        if (x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1) return true;
+    }
+    return false;
+}
+
+bool resRampColourAt(int y, RGB* out) {
+    // Per-row mode on the research capture (x8..476, scripts/
+    // tPF11_chrome_measure.py section C). NO y46 case: y46 measured BLACK
+    // 580/580 (the tree field top edge), unlike the status screen's solid
+    // (33,56,57) tail.
+    switch (y) {
+        case 38: *out = RGB{82, 125, 123}; return true;
+        case 39:
+        case 40: *out = RGB{123, 182, 181}; return true;
+        case 41: *out = RGB{115, 117, 115}; return true;
+        case 42: *out = RGB{66, 105, 107}; return true;
+        case 43: *out = RGB{33, 56, 57}; return true;   // 118 vs (24,48,41) 114
+        case 44: *out = RGB{24, 48, 41}; return true;
+        case 45: *out = RGB{24, 28, 24}; return true;
+        default: return false;
+    }
+}
+
 }  // namespace ascend::ui

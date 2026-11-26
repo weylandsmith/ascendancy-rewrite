@@ -566,6 +566,29 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                               w * int(sizeof(uint32_t)));
         }
     }
+    // tPF-11 RESEARCH CHROME TEXTURE [measured law ui/statusbg.h, D28 item
+    // 22 "the mineral framing is missing from this screen"]: perimeter bands
+    // + right-panel border/well in the textureColourAt family, built ONCE
+    // over the six kResChromeBands (alpha 0 elsewhere).
+    SDL_Texture* resChromeTex = nullptr;
+    {
+        resChromeTex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888,
+                                        SDL_TEXTUREACCESS_STATIC,
+                                        kDisplayW, kDisplayH);
+        if (resChromeTex) {
+            std::vector<uint32_t> px(size_t(kDisplayW) * kDisplayH, 0u);
+            for (int y = 0; y < kDisplayH; y++)
+                for (int x = 0; x < kDisplayW; x++) {
+                    if (!resChromeBandAt(x, y)) continue;
+                    const RGB c = textureColourAt(x, y);
+                    px[size_t(y) * kDisplayW + x] =
+                        0xFF000000u | (uint32_t(c.r) << 16) |
+                        (uint32_t(c.g) << 8) | c.b;
+                }
+            SDL_UpdateTexture(resChromeTex, nullptr, px.data(),
+                              kDisplayW * int(sizeof(uint32_t)));
+        }
+    }
     // t436b SPECIES-WELL TEXTURE (mapchrome.h speciesWellAt law): the state-7
     // header slot + the row slots of UNKNOWN species paint the dark-speckle
     // well [measured t252: header/slot4/5/6 = (8,12,16)~50-63% + (0,0,0)
@@ -1629,6 +1652,34 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
             SDL_RenderDrawLine(ren, kStatusBorderX, kStatusBorderY0,
                                kStatusBorderX, kStatusBorderY1);
         }
+        // tPF-11 RESEARCH CHROME [measured law ui/statusbg.h, D28 item 22]:
+        // black interior + perimeter bands + header speckle + divider ramp
+        // rows 38..45 (NO y46 tail, NO x7 line — both measured black on the
+        // t252 capture) + the right-panel border/well texture. Replaces the
+        // port's tan header box + gray interior rect (inventions; the vendor
+        // tree field is flush-black to x7 / under the speckle header).
+        if (screen == kScreenResearch) {
+            SDL_Rect black{0, 0, kDisplayW, kDisplayH};
+            SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+            SDL_RenderFillRect(ren, &black);
+            if (resChromeTex)
+                SDL_RenderCopy(ren, resChromeTex, nullptr, nullptr);
+            if (statusSpeckleTex) {
+                SDL_Rect dst{kStatusSpeckleRect.x0, kStatusSpeckleRect.y0,
+                             kStatusSpeckleRect.x1 - kStatusSpeckleRect.x0 + 1,
+                             kStatusSpeckleRect.y1 - kStatusSpeckleRect.y0 + 1};
+                SDL_RenderCopy(ren, statusSpeckleTex, nullptr, &dst);
+            }
+            for (int y = 38; y <= 45; y++) {
+                RGB c;
+                if (!resRampColourAt(y, &c)) continue;
+                SDL_SetRenderDrawColor(ren, c.r, c.g, c.b, 255);
+                // The ramp LINE spans the tree field only (x8..476); the
+                // panel-top band x477..639 rows 38..45 is texture (painted
+                // by resChromeTex above).
+                SDL_RenderDrawLine(ren, 8, y, 476, y);
+            }
+        }
 
         const bool mapVisible =
             screen == kScreenMap || screen == kScreenSpecies;  // COSMOSWnd
@@ -2121,11 +2172,14 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                                                         // map
                 default: hdr = Rect{7, 7, 632, 34}; interior = Rect{7, 46, 632, 472};
             }
-            if (hdr.x1 > hdr.x0 && screen != kScreenStatus) {
+            if (hdr.x1 > hdr.x0 && screen != kScreenStatus &&
+                screen != kScreenResearch) {
                 // t417b: the status header carries the CODE-DRAWN speckle +
                 // ramp chrome painted above (statusbg.h law) — the vendor
                 // shows NO tan header box there (t3 census: speckle + border
-                // x7 only).
+                // x7 only). tPF-11: the RESEARCH header is the same code-drawn
+                // family (t252: speckle y8..36, no box, no rail title — the
+                // header text is the species line drawn by the content arm).
                 SDL_Rect hs{hdr.x0, hdr.y0, hdr.x1 - hdr.x0 + 1,
                             hdr.y1 - hdr.y0 + 1};
                 SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
@@ -2138,7 +2192,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                              kText);
             }
             if (screen != kScreenSpecies && screen != kScreenPlanet &&
-                screen != kScreenSystemView && screen != kScreenStatus) {
+                screen != kScreenSystemView && screen != kScreenStatus &&
+                screen != kScreenResearch) {
                 // t406: the planet screen's frame IS the 17np k0 backdrop
                 // (outer frame measured on the decode) — no vector overlay.
                 // t410: the system view draws its own viewport frame.
@@ -3371,9 +3426,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // order): #122, name (wrapped), #124 days, #125, Allows
                     // entries. No project -> panel BLANK (t268 witness;
                     // #123 "(No Progress)" is data, never rendered there).
-                    SDL_Rect pf{484, 46, 632 - 484 + 1, 472 - 46 + 1};
-                    SDL_SetRenderDrawColor(ren, 90, 90, 110, 255);
-                    SDL_RenderDrawRect(ren, &pf);
+                    // tPF-11: the panel border is the MEASURED texture band
+                    // x477..484 (kResChromeBands, painted by resChromeTex) —
+                    // the t408 gray SDL_RenderDrawRect at 484..632 was a port
+                    // invention (t252: interior black to x485, no gray line).
                     const int panelCx = (484 + 632) / 2;
                     int queued = -1;
                     for (const auto& nd : nodes)

@@ -652,3 +652,52 @@ tPF10_hover_census.py VERDICT PASS seed 5 (hover 827 changed px / blue
 hover 0 -> -1 -> study). HARNESS: run_tests CHECK does not return — a
 substr(find-token npos) in a wiring pin ABORTS the whole suite (mutation
 M3 round 1); guard window extractions after a find CHECK.
+
+## S14 RESEARCH-SCREEN CHROME LAW (tPF-11, 2026-11-26) — D28 item 22
+"The mineral framing is missing from this screen."
+
+(a) NOT A SHAPE LIB. The TYPE-100 STATENUMBER-20 header
+    (windows.txt:1756-1758 DATA\20RES.SHP) binds the PAN-BUTTON lib:
+    20res.shp decodes to 6 records, k0 16x31 + k1..k5 ~15x31 (scripts/
+    tPF11_res_frame.py) — the arrow faces t391 named, nothing window-sized.
+    RESWIN SHAPEFRAME 0 composes no frame. The "mineral framing" is the
+    CODE-DRAWN full-screen chrome family (statusbg.h precedent t417b).
+(b) MEASURED LAW on work/screens/t252/research_open_game.png (scripts/
+    tPF11_chrome_measure.py + tPF11_panel_edges.py; full numbers
+    _wip_tPF11 P3): perimeter texture bands texfrac 1.000 (x0..6,
+    x633..639, y0..6, y473..479 — bottom resumes y473, y472 measured
+    BLACK in the field span, ONE ROW LOWER than the status band); header
+    speckle y8..36 x8..630 (same six non-text colours as the t3 status
+    census); divider ramp y38..45 then BLACK (the status y46 SOLID
+    (33,56,57) tail and the x7 border line are STATUS-ONLY — x7 y48..470
+    measured (0,0,0) 423/423, y46 BLACK 580/580).
+(c) RIGHT PANEL BORDER: left texture band x477..484 continuous y46..433
+    (331/331 per col x477..483 in y100..430; x485 BLACK), interior
+    x485..632 black, bottom WELL x477..639 y434..472 (the pan buttons
+    paint over it), top edge inside the ramp rows (tex runs reach x639 at
+    y38..42). Table kResChromeBands (7 bands) in statusbg.h; the t408
+    gray (90,90,110) panel rect and the tan header box + gray kLane
+    interior rect are REFUTED port inventions (vendor: no line there).
+(d) SPECKLE SHARES: research header census (0,0,0) 47.1% vs the status
+    kSpeckle weights 34.9% — the status capture has row content under its
+    header; the six non-text COLOURS match, so the port reuses
+    statusSpeckleAt verbatim [inferred same generator; the per-screen
+    share delta is named, not modelled].
+(e) SHIP: ui.cpp research arm (black interior + resChromeTex + speckle +
+    ramp 38..45 via resRampColourAt x8..476); tan-box + kLane-rect
+    conditions decline kScreenResearch; pins tests/test_reschrome_tpf11.cpp
+    x5 (incl ui.cpp wiring window-pin); MUTATION 5/5 CAUGHT (M1 band
+    membership 11, M2 ramp-43 status-mode 1, M3 arm unwired 1, M4 loop
+    leaks y46 2, M5 bottom band y472 1 — anchored at the .h inline table),
+    md5-verified restore (4a554e96/95395ebe/606a0994). WITNESS PASS seed 5
+    (scripts/tPF11_witness.sh: bands/speckle/ramp/black-split/panel/well
+    all census-PASS at rest AND after Escape re-entry; vision confirms).
+    CENSUS TRAP (tPF-11): the port's textureColourAt family includes DARK
+    mottle cells ((12,12,12),(24,49,40)) — the vendor-bright min>=40
+    classifier reads them as unpainted; band census = non-black frac.
+(f) TPF5-A GATE AUDIT: the tPF-5 note "help.shp-k0 FRAME SHIP gated on
+    OQ-005/D1" is STALE — OQ-005 CLOSED t367 by the D1 USER RULING
+    (OPEN-QUESTIONS:25-27, ruling verbatim DECISIONS.md:192-196, "accept
+    all 41"); no gate stands on shipping decoded frame art. TPF5-A itself
+    (INDICATOR-popup lib) stays open — this iteration answers the RESEARCH
+    screen only.

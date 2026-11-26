@@ -101,4 +101,51 @@ inline constexpr RGB kStatusBorderRgb{33, 56, 57};
 // fingerprint of the never-painted backdrop record).
 inline constexpr RGB kStatusWellNavy{8, 32, 49};
 
+// ---- tPF-11 RESEARCH-SCREEN CHROME (D28 item 22 "the mineral framing is
+// missing from this screen") ----------------------------------------------
+// The research screen carries the SAME code-drawn chrome family as the
+// status screen, MEASURED on the vendor capture
+// work/screens/t252/research_open_game.png (scripts/tPF11_chrome_measure.py
+// + tPF11_panel_edges.py; law docs/re/_wip_tPF11.md P3):
+//   - perimeter texture bands texfrac 1.000 (x0..6, x633..639 full height;
+//     y0..6; y473..479) — textureColourAt family;
+//   - header speckle y8..36 x8..630 (kStatusSpeckleRect reused verbatim:
+//     measured census (0,0,0) 47.1% / (8,12,16) 26.4% / (8,12,8) 13.5% /
+//     (8,28,49) 4.7% + green text — same six non-text colours as F5);
+//   - divider ramp rows 38..45 ONLY: y46 x8..476 measured BLACK 580/580
+//     (the status y46 SOLID (33,56,57) tail and the x7 border line are
+//     STATUS-ONLY — the tree field is flush-black to x7, x7 y48..470
+//     measured (0,0,0) 423/423);
+//   - the tree field bottom is flush-black to y472 (x10..469 y472 texfrac
+//     0.000), texture resumes y473 — one row LOWER than the status band.
+// RIGHT PANEL (code-drawn; STATE 20 census = RESWIN + 4 pan buttons):
+// mineral-texture border bands MEASURED — left band x477..484 continuous
+// y46..433 (tex count 331/331 per col x477..483 in y100..430; x485 black),
+// the panel interior x485..632 y46..433 BLACK, and below the panel a
+// texture WELL x477..639 y434..472 (y434..438 runs 477..639; the pan
+// buttons x524..593 y442..472 sit IN the well, painted over it). The panel
+// top edge is inside the ramp band rows (tex runs 0..639 at y39/y41).
+inline constexpr int kResChromeBandCount = 7;
+inline constexpr Rect kResChromeBands[kResChromeBandCount] = {
+    {0, 0, 639, 6},      // top rows 0..6 (texfrac 0.999)
+    {0, 473, 639, 479},  // bottom rows 473..479 (y472 measured BLACK)
+    {0, 0, 6, 479},      // left  x0..6
+    {633, 0, 639, 479},  // right x633..639
+    {477, 38, 639, 45},  // panel TOP border (inside the ramp band rows:
+                         // y38..42 x460+ runs reach 639; the ramp LINE is
+                         // drawn x8..476, the panel edge is texture)
+    {477, 46, 484, 433}, // panel left border band
+    {477, 434, 639, 472} // panel bottom well (buttons painted over)
+};
+
+// True iff (x,y) is inside a research-chrome texture band (membership
+// test over kResChromeBands; the pin asserts the measured edge cases).
+bool resChromeBandAt(int x, int y);
+
+// Research divider ramp [measured per-row mode, x8..476 span]: same
+// family as statusRampColourAt rows 38..45 but with the research modes
+// (y38 (82,125,123) 303/580; y43 splits (33,56,57) 118 / (24,48,41) 114 —
+// the mode here is the teal) and NO y46 tail (BLACK at y46, 580/580).
+bool resRampColourAt(int y, RGB* out);
+
 }  // namespace ascend::ui

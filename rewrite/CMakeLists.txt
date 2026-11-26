@@ -143,6 +143,7 @@ add_executable(run_tests
   tests/test_planetview_tplv2.cpp
   tests/test_statusnav_t405.cpp
   tests/test_statusbg_t417b.cpp
+  tests/test_reschrome_tpf11.cpp
   tests/test_statusrow_t427.cpp
   tests/test_planetstrip_t428.cpp
   tests/test_indpopups_tplb2.cpp

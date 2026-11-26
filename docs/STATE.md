@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-26T10:05
+updated: 2026-11-26T13:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,73 +233,90 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-11 RESEARCH-SCREEN MINERAL FRAMING (D28 item 22: "The mineral
-framing is missing from this screen") + TPF5-A RESOLUTION.
-Ordering rationale: tPF-1b CLOSED this iteration (launcher-flag, REPRO A/B
-measured on the Begin path — the PRIOR-SESSION QUEUE item is gone); item 22
-is the ONLY research-screen D28 item left. The STATE note "help.shp-k0
-FRAME SHIP stays gated on the user's OQ-005 ruling (D1)" is PROBABLY STALE
-— D1 RULED 2026-11-09 (docs/DECISIONS.md ruling-page blocks) and OQ-005
-CLOSED t367 with the corner-anchor fallback; step (1) must VERIFY that
-reading against the ruling text before treating the ship as gated.
-TPF6-CPU-A awaits a user throttle ruling; TPF7-C is a feel-grading ask —
-neither iterable.
-Steps: (1) GATE AUDIT FIRST: read docs/DECISIONS.md D1 ruling blocks +
-the OQ-005 ledger row; record verbatim what the ruling does/does not
-cover for FRAME-ART SHIP (vs codec decode). If a real gate stands, name
-TPF11-A and fall back THIS iteration to TPF7-A (per-msg release-mask
-split 0x38 vs 0x39, fully static, shippable — research.md S10 SEAMS).
-(2) FRAME LAW: which lib + record frames RESWIN itself — walk windows.txt
-SHAPEFRAME words for RESWIN and the PLIND/PLPRO/PLPOP/PLRES indicators
-(D9 banked: parser 0x57e10 stores WORD[rec+0x1e]; widget blit 0x31004
-reads HIWORD dword[rec+0x1c], -1 = no frame; PLSQUARE carries SHAPEFRAME
-0 = record 0). Runtime registry law tPF-4: ctx ds:0x9f10c+0x7d0+id*32 +
-the bulk-registration sites; help.shp k0 (336x256, tPF-5 measured) is the
-POPUP answer — do NOT assume it is the reswin answer. (3) SHIP + pins
-(new tests/test_frame_tpf11.cpp WITH CMakeLists entry — tPF-4 trap) +
-mutation (scripts/tPF10_mutate.sh skeleton: snapshot preflight, anchors
-at DEFINITION incl .h inline helpers, copy-back + md5) + witness (Xvfb
-:99 scratch, kill BY PID; census boxes x>=16; crop y46/y>=456; PIN
-PIXELS ONLY FROM THE PORT decode plane, never tools/shp_pngdump raw .idx
-— tPF-10 partial-walk trap).
-DO NOT re-derive: the tPF-10 hover-word/frame/colour law (research.md
-S13 — closed this iteration), the tPF-9 stray-text law (S12), the tPF-8
-start/edge law, the RESEARCH control laws (tPF-7/7b), the ORBITAL
-SLOT/CLICK laws, the STRIP ANCHOR law, the DISK FILL law (S9), or
-re-litigate tPF-3. TPF7-A/C/D, TPF6-A/B/CPU-A, TPF4-A/B, TRSB1-B and
-TRSV1b-A (PARTIAL CLOSED tPF-7: f32[0x9f108]==1.0 4233/4233 saves)
-named-open. STANDING: D28 file scratchpad/t433-build-feedback.txt is the
-item authority; refcap PNGs in scratchpad/; scratch savedir law; C1-C5 +
-race intro stay DEFERRED (D25); when a counter reads zero check PRODUCER
-EXISTENCE first (D29); POPUP/DERIVATION LAW (D30, binding): every visible
-property cited or
-named-open, no eyeballed geometry. NEVER read whole lines of
-work/r1/playcap/live-timeline.jsonl. The 433 composite is SIDE-BY-SIDE —
-LEFT = PORT, RIGHT = VENDOR (the F6 retraction); vendor-half pixel counts
-tolerate resampling (families, not exact values). WITNESS TRAP (tPF-3e):
-port witnesses run ./rewrite/build/ascendancy — build BOTH run_tests AND
-ascendancy before any witness. APPEND TRAP (tPF-5): `open(p,"w").write(
-open(p).read()+x)` TRUNCATES BEFORE reading — read first, or open(p,"a")
-(cost a WIP section once). MUTATION TRAP (tPF-5, RE-WITNESSED tPF-6/tPF-7):
-a campaign's stdout is BLOCK-BUFFERED — an empty log is NOT death; pgrep -f
-is the only liveness test; restore() must COPY BACK from the snapshot THEN
-md5-verify; and ANCHOR THE MUTATION AT THE DEFINITION (tPF-7 M5 first
-draft anchored pressPair in the .h where only the declaration lives — the
-count==1 assert caught it, no mutant shipped, but the sweep lost a slot).
-Fixture trap (tPF-6): fixed-item CHECKs must use base-list (REQUIRES-passing)
-items, and ACTIVE/armed cell pairs must be DERIVED from the grid law, never
-hard-coded. HOLD WITNESS LAW (tPF-7): measure stickiness AFTER the click
-settles (press->release gap ticks are legitimate); hold legs use xsend
-clickdn/clickup + a POLLLED stop condition on the app's own log, never a
-fixed sleep sized for an old cadence. PIXEL-CENSUS TRAP (tPF-9): the RESWIN
-frame border gray (120,120,120) sits INSIDE the kDim/kText +-40 tolerance —
-corner-text boxes must start at x>=16, and the planet starfield scatters
-few white px anywhere: empty-box threshold <=8, label-present >=30. RUN_TESTS CRASH TRAP (tPF-10): harness CHECK does NOT return — a source-window pin that substr()s a find() result after the CHECK ABORTS the whole suite (substr(npos) throw) and mutation sweeps mis-score it; guard extractions with if (pos != npos) and count a nonzero exit with no FAIL line as CAUGHT (crash). SHP DUMP TRAP (tPF-10): tools/shp_pngdump raw .idx planes can be PARTIAL walks (resring: 197 px vs the port decode 828 px = the on-screen witness n) — pin pixels from ShapeLibrary::decode, never from the dump tool. WINDOW-PIN
-TRAP (tPF-1b): source-window pins that substr(cap, N) must size N past
-the anchor's COMMENT body (tPF-1b comment pushed "capFired = turns;" past
-500 — suite FAIL round 1), and a single-occurrence pin on a marker string
-means NO comment may contain that literal (de-literalized to "harness-cap
-marker").
+NEXT tPF-12 COSMOS/SYSTEMCAM PUMP PERIOD (research.md S10 named seam:
+"tPF-7b cosmos/systemCam pumps still on kSpinTickMs=1000 (29x slow by this
+derivation — next research-screen adjacent task)").
+Ordering rationale: ALL SEVEN research-screen D28 items (16-22) are now
+shipped/cited (16/17/18 tPF-7, 19/20 tPF-10, 21 tPF-8, 22 tPF-11 LANDED
+this iteration); the planet-screen items are closed or named-open
+(TPF6-A/B build-list seams need their own citations; TPF6-CPU-A awaits a
+user throttle ruling; TPF7-C is a feel-grading ask — none iterable). The
+pump fix is the LAST standing "too slow" symptom (item 16's map/system
+halves), fully static, cited (0x3a pump ~29/s = 34.2+-0.6 ms, research.md
+S10), and witnessable on the existing xsend/Xvfb harness. TPF7-A (per-msg
+release-mask split 0x38 vs 0x39) is the follow-up ONLY if the pump work
+lands early — do NOT open both.
+Steps: (1) census kSpinTickMs users in ui.cpp (cosmos spin + systemCam)
+and re-read the cited derivation in research.md S10 / _wip_tPF7.md;
+(2) RE-DERIVE the vendor period for the cosmos/system consumers from the
+framework msg 0x3a scheduling — do NOT copy the research constant without
+checking the consumer (D30 POPUP/DERIVATION LAW: every visible property
+cited or named-open);
+(3) SHIP + pins (new tests/test_spin_tpf12.cpp WITH CMakeLists entry —
+tPF-4 trap) + mutation (scripts/tPF11_mutate.sh skeleton: snapshot
+preflight, anchors at DEFINITION incl .h inline/constexpr tables — tPF-10
+M2 + tPF-11 M5 both anchored wrong-file round 1; copy-back THEN md5-
+verify) + witness (Xvfb :99 scratch, kill BY PID; build run_tests AND
+ascendancy before any witness — tPF-3e trap).
+TRAPS STILL STANDING (full per-iteration detail in git history of this
+block + docs/re/*): NEVER read whole lines of work/r1/playcap/live-
+timeline.jsonl; D28 file scratchpad/t433-build-feedback.txt is the item
+authority; the 433 composite is SIDE-BY-SIDE (LEFT=PORT, RIGHT=VENDOR,
+vendor-half pixel counts tolerate resampling); when a counter reads zero
+check PRODUCER EXISTENCE first (D29); C1-C5 + race intro stay DEFERRED
+(D25); harness CHECK does NOT return — guard every window-pin substr after
+a find CHECK, count a nonzero exit with no FAIL line as CAUGHT (tPF-10);
+window-pins size past comment bodies and NO comment may contain a single-
+occurrence pin literal (tPF-1b); a campaign stdout is BLOCK-BUFFERED —
+pgrep -f is the only liveness test (tPF-5); hold witnesses measure AFTER
+the click settles, polled stop conditions not fixed sleeps (tPF-7); fixed-
+item CHECKs use base-list items, ACTIVE cell pairs DERIVED from the grid
+law (tPF-6); pin pixels from ShapeLibrary::decode, never tools/shp_pngdump
+raw .idx (tPF-10 partial-walk); `open(p,"w").write(open(p).read()+x)`
+TRUNCATES BEFORE reading (tPF-5); corner-text census boxes start x>=16,
+planet starfield empty-box <=8 / label >=30 (tPF-9); band census on code-
+drawn chrome = NON-BLACK frac, the textureColourAt family includes dark
+mottle cells the vendor-bright min>=40 classifier misreads (tPF-11).
+
+tPF-11 LANDED 2026-11-26 (RESEARCH-SCREEN MINERAL FRAMING SHIPPED AT
+PIXELS — D28 ITEM 22 CLOSED AT MEASUREMENT; no OQ row touched — D28 is a
+defect queue, not the ledger; open=[016,019] unchanged).
+ - GATE AUDIT: the tPF-5 "help.shp-k0 gated on OQ-005/D1" note was STALE —
+   OQ-005 CLOSED t367 by the D1 USER RULING (OPEN-QUESTIONS:25-27, verbatim
+   DECISIONS.md:192-196, "accept all 41"); no gate stands on decoded frame
+   art. And STATE's warning was right: help.shp k0 is the POPUP answer.
+ - REFRAME [measured]: 20res.shp (TYPE-100 STATENUMBER-20 binding,
+   windows.txt:1756-1758) decodes to 6 records k0 16x31 + k1..k5 ~15x31 =
+   the pan-button arrow faces ONLY (scripts/tPF11_res_frame.py) — the
+   mineral framing is the CODE-DRAWN chrome family, not a shape lib.
+ - CHROME LAW MEASURED on work/screens/t252/research_open_game.png
+   (scripts/tPF11_chrome_measure.py + tPF11_panel_edges.py): perimeter
+   texture bands texfrac 1.000 (x0..6/x633..639/y0..6/y473..479 — bottom
+   resumes y473, y472 BLACK, ONE ROW LOWER than the status band); header
+   speckle y8..36 x8..630 (same six non-text colours as the t3 status
+   census; shares differ — named, not modelled); ramp y38..45 then BLACK
+   (status y46 SOLID + x7 line are STATUS-ONLY: y46 BLACK 580/580, x7
+   (0,0,0) 423/423); RIGHT PANEL left band x477..484 y46..433 (331/331
+   per col), interior x485..632 black, bottom WELL x477..639 y434..472,
+   top edge inside the ramp rows.
+ - SHIP: statusbg.h kResChromeBands x7 + resChromeBandAt +
+   resRampColourAt; ui.cpp research arm (black + resChromeTex + speckle +
+   ramp 38..45 x8..476); tan header box + kLane interior rect + the t408
+   gray (90,90,110) panel rect DECLINED/deleted (port inventions).
+ - PINS tests/test_reschrome_tpf11.cpp x5 (band edge cases, ramp table,
+   two-way status split, speckle sharing, ui.cpp wiring window-pin with
+   the retired invention colour absent ENTIRELY); CMakeLists entry ADDED;
+   suite 590->595/0/0. MUTATION 5/5 CAUGHT (M1 band membership 11 fails,
+   M2 ramp-43 status-mode 1, M3 arm unwired 1, M4 loop leaks y46 2, M5
+   bottom band y472 1 — round-1 anchor miss: the table lives in the .h),
+   md5-verified restore (4a554e96/95395ebe/606a0994).
+ - WITNESS PASS seed 5 (scripts/tPF11_witness.sh, at rest AND after
+   Escape re-entry): bands 1.000, speckle-family 0.965, ramp share >=0.6,
+   y46/x7 black 1.000, panel band 1.000, well 1.000, zero tan/gray
+   invention px; vision confirms mineral frame + speckle header + panel
+   band/well.
+ - LAW BANKED docs/re/research.md S14 + docs/re/_wip_tPF11.md P1-P4.
+ - NEXT tPF-12 cosmos/systemCam pump period (research.md S10 seam).
 
 tPF-1b LANDED 2026-11-26 (D28 P7(b) "EXITS AFTER 20 DAYS" CLOSED AS
 LAUNCHER-FLAG, MEASURED WITHOUT THE USER; cap line re-ordered + prefixed;
