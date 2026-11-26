@@ -233,36 +233,42 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-9 RESEARCH-SCREEN STRAY TEXTS (D28 item 13: "There should be no
-'click set project' text in the upper right frame, and no 'Esc return to
-galaxy' text in the lower left"). Both strings are STILL RENDERED by the
-port: ui.cpp:2784 ("click: set project", the upper-right hint) and
-ui.cpp:3495 ("Esc: return to galaxy", bottom-left).
-Ordering rationale: this is the ONLY remaining D28 item actionable without
-the user — item 22 (mineral framing of the research screen) is the help.shp
-k0 FRAME SHIP gated on the user's OQ-005 D1 ruling (TPF5-A); tPF-1b VENDOR
-day-20 repro is user-time-gated (D30); TPF6-CPU-A awaits a user throttle
-ruling. tPF-8 just landed the rest-state law, so the research-screen paint
-site is fresh in the docs.
-Steps: (1) CITATION FIRST (D30 POPUP/DERIVATION LAW): check t252 vendor
-frame (work/screens/t252/research_open_game.png, crop law in _wip_tPRU.md:
-RESWIN interior (8,46)-(476,472)) for ANY text in the upper-right and
-bottom-left corners — vision + pixel leg; corroborate against the reswin
-paint chain (0x48165..0x485b5 body has NO text call — grep the banked dump
-work/tRS_reswin_fn.asm for 0x5c2xx/0x5c3xx text-primitive callsites inside
-the loop) and windows.txt for a TYPE that would own such a label. If the
-vendor DOES paint something there (a different text), that is the law to
-port, not delete — report honestly. (2) SHIP: delete/gate the two strings
-in ui.cpp per the citation (the Escape-ROUTING behaviour stays — ui.cpp:1829
-comment cites t252 "Escape returns to galaxy" as BEHAVIOUR; item 13 is
-about the LABEL). (3) pins (reuse test_starttech_tpf8.cpp file or a new
-test_strays_tpf9.cpp WITH a CMakeLists entry — tPF-4 trap) + mutation
-(scripts/tPF8_mutate.sh skeleton: snapshot preflight, copy-back + md5) +
-witness (extend scripts/tPF8_witness.sh census with a text-pixel leg in
-the two corner boxes, control = pre-fix build or the crop's other corners).
-DO NOT re-derive: the tPF-8 start/edge/frame law (closed this iteration —
-docs/re/research.md S11; TRSV1c-D CLOSED), the RESEARCH control laws
-(tPF-7), the fire-loop CADENCE (tPF-7b), the ORBITAL SLOT/CLICK laws
+NEXT tPF-10 RESEARCH HOVER/SELECT VISIBILITY (D28 items 19/20: "when I
+hover over a circle, it should be highlighted blue, and when I click a
+circle, the circle should turn a kind of yellowish color"; plus "If I exit
+that screen and return, the circle I selected is no longer highlighted" —
+selection must PERSIST across screen re-entry, and the SET project must be
+distinguishable from a mere hover).
+Ordering rationale: tPF-9 just landed (D28 item 13), and items 19/20 are
+the ONLY research-screen D28 items left that need no user ruling — item 22
+(mineral framing) is the help.shp k0 FRAME SHIP gated on the OQ-005 D1
+ruling (TPF5-A), tPF-1b VENDOR day-20 repro is user-time-gated (D30),
+TPF6-CPU-A awaits a user throttle ruling, TPF7-C is a feel-grading ask.
+The frame law is ALREADY CITED (research.md P10 esi law 0x483fa..0x48470:
+resNodeFrame 1 default / 0 studied-not-owned / 3 owned / 2 SELECTED
+override, gold path 0x5caac) and the selected-row word is cited
+(row==word[win+0x9db]) — the port has resNodeFrame wired at ui.cpp:3229.
+Steps: (1) CITATION FIRST (D30): diff the port's frame-selection against
+the esi law — does the port pass a live SELECTED flag (click sets it,
+survives screen exit/re-entry = vendor win+0x9db lifetime; check whether
+the vendor word survives leaving state 20: the win struct init site from
+tRS-V1 banked work/ asm; hover word law per tPF-6 sibling 0xac @0x3ac14
+was PLANET-screen — find the RESWIN hover/selected msg pair in the input
+chain 0x47xxx bank, do NOT assume)? (2) MEASURE the ring-frame colours:
+resring.shp k0..k3 ring-mean colours (port blit already 1:1 per tRS-V1d)
+— confirm frame 2 reads yellowish and what the HOVER leg paints (vendor
+may highlight hover via the edge-colour 0xf3 substitution ALREADY ported
+— 0x48314..0x48321; if the hover-blue is an artifact of the selected-edge
+law, port the SELECTED state and both symptoms may close together). (3)
+SHIP + pins (new tests/test_hoverselect_tpf10.cpp WITH CMakeLists entry —
+tPF-4 trap) + mutation (scripts/tPF9_mutate.sh skeleton: snapshot preflight,
+anchor at DEFINITION, copy-back + md5) + witness (Xvfb :99 scratch, kill
+BY PID; census boxes must start x>=16 — tPF-9 frame-border trap; the
+hover leg needs xsend warp + a POLLLED read of the app's own hover log if
+one exists, else pixel-diff hover-vs-idle frames).
+DO NOT re-derive: the tPF-9 stray-text law (closed this iteration —
+research.md S12), the tPF-8 start/edge/frame law, the RESEARCH control
+laws (tPF-7), the fire-loop CADENCE (tPF-7b), the ORBITAL SLOT/CLICK laws
 (tPL-V2/tPF-6), the STRIP ANCHOR law (tPF-5), the DISK FILL law (tRS-V2),
 or re-litigate tPF-3. TPF7-A/C/D, TPF6-A/B/CPU-A, TPF5-A/TPF4-A/B,
 TRSV1b-A, TRSV1-C named-open. help.shp-k0 FRAME SHIP stays gated on the
@@ -290,7 +296,44 @@ items, and ACTIVE/armed cell pairs must be DERIVED from the grid law, never
 hard-coded. HOLD WITNESS LAW (tPF-7): measure stickiness AFTER the click
 settles (press->release gap ticks are legitimate); hold legs use xsend
 clickdn/clickup + a POLLLED stop condition on the app's own log, never a
-fixed sleep sized for an old cadence.
+fixed sleep sized for an old cadence. PIXEL-CENSUS TRAP (tPF-9): the RESWIN
+frame border gray (120,120,120) sits INSIDE the kDim/kText +-40 tolerance —
+corner-text boxes must start at x>=16, and the planet starfield scatters
+few white px anywhere: empty-box threshold <=8, label-present >=30.
+
+tPF-9 LANDED 2026-11-26 (STRAY TEXTS D28 ITEM 13 CLOSED AT THREE CITING
+LEGS; no OQ row closed — tPF tracks none, honest negative, open=[016,019]
+unchanged).
+PROVED (docs/re/_wip_tPF9.md P1-P3 + docs/re/research.md S12 + scripts/
+tPF9_mutate.sh + tPF9_witness.sh + tPF9_witness_census.py):
+  - LAW (three agreeing legs): "click: set project" and "Esc: return to
+    galaxy" are PORT INVENTIONS, not vendor law — (a) ABSENT from the
+    vendor ship: strings-negative in game/ascend.exe and all three .cob
+    ('return to' hits = tutorial prose only); (b) the 433 composite VENDOR
+    half shows no text in either corner [vision, full-frame + two full-res
+    crops] and the t252 research frame corners are empty; (c) the draw loop
+    0x48165..0x485b5 has exactly 13 calls, ALL shape/line primitives
+    (0x1fc34/0x5caac/0x5cf96/0x5d5a1/0x46d3c/0x76e08/0x5cf77/0x5bf71), ZERO
+    text callsites (work/t91_code_disasm.txt). History: the idle hint
+    entered at t406 as an uncited "port affordance" (git log -S d521e38).
+  - SHIP: ui.cpp idle arm DELETED behind `if (projectOpen || planetPick >=
+    0)` (transient "list open: pick one"/"picked: ..." KEPT — D28 items
+    19/20 demand visible set-project feedback); every-screen "Esc: return
+    to galaxy" block DELETED; Escape ROUTING (KEYDOWN handler, t252-cited)
+    untouched.
+  - PINS test_strays_tpf9 x3 (CMakeLists entry ADDED; statement-window
+    scan so deletion-comments can't false-fail the label test), suite
+    583->586/0/0. MUTATION 4/4 CAUGHT (M1 idle-hint restored 1 / M2
+    feedback-killed 1 / M3 escape-routing-broken 1 / M4 esc-label restored
+    1), md5-verified restore, green after.
+  - WITNESS VERDICT PASS seed 5: planet-idle UR ink=0 BL ink=0; list-open
+    CONTROL UR ink=172 (census sees text where text legitimately paints);
+    research BL ink=0; vision overlay on research.png: three root disks,
+    zero corner text (consistent with the tPF-8 rest law).
+  - Sitting check ran FIRST (exit 0, 45,227 rows, byte-identical to
+    tPF8_pre_sitting.out — stale assignment stood). Production ring
+    untouched; scratch Xvfb killed BY PID. GATE_EXIT=0, LEDGER AUDIT OK.
+    NEXT tPF-10 hover/select visibility (D28 items 19/20).
 
 tPF-8 LANDED 2026-11-26 (OPENING-RESEARCH LAW MEASURED + ZERO-START SHIPPED:
 D28 ITEM 21 CLOSED AT BYTES + 72/72 SAVES; TRSV1c-D CLOSED; no OQ row closed

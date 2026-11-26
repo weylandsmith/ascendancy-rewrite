@@ -108,6 +108,7 @@ add_executable(run_tests
   tests/test_stripanchor_tpf5.cpp
   tests/test_optionsfilter_tpf6.cpp
   tests/test_starttech_tpf8.cpp
+  tests/test_strays_tpf9.cpp
   tests/test_campaign_fleet_t365.cpp
   tests/test_diponattack_t204.cpp
   tests/test_invasion_war_t207.cpp

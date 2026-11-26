@@ -597,3 +597,17 @@ chrome the tree law does not constrain.
 OPEN RESIDUE (named): early-AI lethality on smoke seeds (seed 42 Extinct
 t10) — the zero-mask start changes early dynamics; finiteness holds on all
 recorded runs (PLAYTHROUGH tPF-8 block), per-seed outcomes are not law.
+
+## S12 STRAY-TEXT LAW (tPF-9, 2026-11-26) — D28 item 13
+The research/planet chrome paints NO hint labels. "click: set project"
+(PLBUILD strip idle arm) and "Esc: return to galaxy" (every-screen
+bottom-left) were PORT INVENTIONS: absent from the vendor ship
+(game/ascend.exe + all .cob strings-negative for the phrases), absent from
+the 433 composite vendor half (vision, full-frame + two full-res crops),
+and the draw loop 0x48165..0x485b5 has 13 calls, ALL shape/line
+primitives, ZERO text callsites (work/t91_code_disasm.txt). Both deleted
+in ui.cpp; transient set-project feedback ("list open: pick one" /
+"picked: ...") kept behind `if (projectOpen || planetPick >= 0)`; Escape
+ROUTING (t252) untouched. Pins tests/test_strays_tpf9.cpp; witness
+scripts/tPF9_witness.sh (census trap: RESWIN frame border gray
+(120,120,120) sits inside kDim +-40 — corner boxes must start x>=16).

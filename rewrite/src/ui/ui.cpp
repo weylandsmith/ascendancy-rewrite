@@ -2766,23 +2766,31 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 // now paints the PLBUILD CONTENT: centred name + planitem
                 // thumbnail / "No Project" per witnesses A/B). The vendor
                 // panel shows NO days line (witness B: name only) — the
-                // t406 "Project: X - N days" line is DELETED; the click
-                // affordance stays at the panel bottom (port affordance).
+                // t406 "Project: X - N days" line is DELETED. tPF-9 (D28
+                // item 13 USER RULING + vendor-cited): the IDLE "click: set
+                // project" hint is DELETED — the string exists nowhere in
+                // the vendor ship (ascend.exe/.cob strings negative), the
+                // 433 composite vendor half shows no text under the
+                // 'No Project' panel, and the vendor draw loop
+                // 0x48165..0x485b5 has zero text-primitive callsites. The
+                // TRANSIENT state feedback (list-open / picked) stays: the
+                // user ruled on the idle label, and D28 separately demands
+                // visible set-project feedback.
                 {
                     const Rect& pb = kPlanetPanels[4].rect;  // PLBUILD
-                    txt.draw(ren, pb.x0 + 6, pb.y1 - 14,
-                             projectOpen ? "list open: pick one"
-                                         : planetPick >= 0
-                                               ? (std::string("picked: ") +
-                                                  (camp.planetItem(planetPick)
-                                                       ? camp.planetItem(planetPick)->name
-                                                       : "?") +
-                                                  (ordersWithoutCell(camp, planetPick)
-                                                       ? " — no cell needed"
-                                                       : " — click a tile"))
-                                                      .c_str()
-                                               : "click: set project",
-                             false, kDim);
+                    if (projectOpen || planetPick >= 0)
+                        txt.draw(ren, pb.x0 + 6, pb.y1 - 14,
+                                 projectOpen
+                                     ? "list open: pick one"
+                                     : (std::string("picked: ") +
+                                        (camp.planetItem(planetPick)
+                                             ? camp.planetItem(planetPick)->name
+                                             : "?") +
+                                        (ordersWithoutCell(camp, planetPick)
+                                             ? " — no cell needed"
+                                             : " — click a tile"))
+                                               .c_str(),
+                                 false, kDim);
                 }
                 if (projectOpen) {
                     // PLANLIST (120,120-520,420) over the field: the
@@ -3490,9 +3498,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 txt.draw(ren, interior.x0 + 8, interior.y0 + 8,
                          "frame + title only: content law seam", false, kDim);
             }
-            if (interior.x1 > interior.x0)
-                txt.draw(ren, interior.x0 + 8, interior.y1 - 16,
-                         "Esc: return to galaxy", false, kDim);
+            // tPF-9 (D28 item 13 USER RULING + vendor-cited): the
+            // "Esc: return to galaxy" chrome label is DELETED for ALL
+            // screens — the string exists nowhere in the vendor ship, the
+            // 433 composite vendor half has no lower-left text, and the
+            // draw loop 0x48165..0x485b5 has zero text-primitive callsites.
+            // The Escape ROUTING behaviour (t252-cited) is untouched.
         }
         // ---- t409 ABILITY DIALOG (ABILITYWIN) — drawn LAST over the
         // current screen: the vendor path (0x55ffb -> CALL 0x37b14) opens
