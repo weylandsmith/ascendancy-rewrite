@@ -233,37 +233,20 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-1c DAY-20 CAMPAIGN-OVER DEFECT (closure fe0fb45 VOIDED by
-user evidence; full account work/r1/loop/LOOPSTEER.txt 2026-11-26).
-User's exact launch "./build/ascendancy --data ... --ui" has NO
---campaign (turns is file-configless, main.cpp:80) and console shows
-ONLY "ui ok: turn 20" (no cap announce line) => clean exit came via
-ui.cpp:1593 camp.over(). The game is declaring victory/defeat ~day 20
-on a Begin-built game. SUSPECTS in campaign.cpp checkVictory (:2265):
-(a) Extinct :2270 if starsOwned(kPlayer) miscounts Begin-built;
-(b) LastAlive :2286 if Begin-built AI owners never GET home stars
-(tNG-B B4 path) or lose them instantly. REPRO with the user's EXACT
-command line, Begin-built Chamachies, factory order pending, xsend
-next-day past day 25. On exit: log the Victory enum + branch at the
-exit site; fix the ROOT ownership/setup law (not the check's order);
-VERIFY survival 40+ days. If current HEAD does not reproduce, name
-the rev delta (user built ~c68e8bd) that already fixed it — no
-silent "couldn't reproduce". THEN continue with the prior NEXT:
-TPF7-A PER-MSG RELEASE-MASK SPLIT (0x38 vs 0x39, research.md S10
+NEXT TPF7-A PER-MSG RELEASE-MASK SPLIT (0x38 vs 0x39, research.md S10
 seam; the LAST iterable item in the pump/release family).
-Ordering rationale: tPF-12 (the previous assignment) is CLOSED this
-iteration at the MECHANISM level with a banked negative — fire-loop
-0x56608 has NO wait, interval-0 cadence IS the free-run loop rate, tick
-DAT_000a2044 MEASURED 94.7+-0.3/s, and the vendor's own FPS-DUDE meter
-proves the loop rate was machine-watched, not a liftable constant
-(docs/re/research.md S15, docs/re/_wip_tPF12.md). kFireLoopMs=34 stands
-inside both banked bands; no code change. That removes the pump cadence
-from the queue. What remains iterable in this family: TPF7-A (which
-pair's bits does msg 0x38 vs 0x39 clear — handler 0x47d3b masks with
-~ebp, ebp = 3rd handler arg, role OWED; fully STATIC, ship-safe reading
-already shipped tPF-7). TPF6-A/B need their own build-list citations,
-TPF6-CPU-A awaits a user throttle ruling, TPF7-C is a feel-grading ask
-(only re-open it if the tick-rate finding ever motivates a capture).
+Ordering rationale: tPF-1c (this iteration) CLOSED the day-20 exit report
+at MECHANISM — scripts/tPF1c_repro.sh + tPF1c_escape_test.sh prove the
+user's verbatim cmdline survives 45 registered NEXT TURN presses with zero
+VICTORY lines, and reproduce his symptom line 'ui ok: turn 20' EXACTLY via
+one Escape at the stack bottom (doEscape else-branch, era ui.cpp:573 ==
+HEAD ui.cpp:683 — the cited t410 quit-at-bottom law, vendor-faithful, NOT
+a defect). No code change, no fixing commit needed, victory-law suspects
+REFUTED (docs/REFUTED-ROUTES.md R-tPF1c). That removes tPF-1c from the
+queue; TPF7-A was the standing follow-on. TPF6-A/B need their own
+build-list citations, TPF6-CPU-A awaits a user throttle ruling, TPF7-C is
+a feel-grading ask (re-open only if the tick-rate finding motivates a
+capture).
 Steps: (1) re-read 0x47d3b + the press tail 0x47c48 (0x5669c queue args:
 push (msg==0x34/0x35 ? 1 : 0)) — the pushed flag is the PRIME suspect
 for selecting which msg (0x38 vs 0x39) the press arms; (2) find the
@@ -296,7 +279,48 @@ raw .idx (tPF-10 partial-walk); `open(p,"w").write(open(p).read()+x)`
 TRUNCATES BEFORE reading (tPF-5); corner-text census boxes start x>=16,
 planet starfield empty-box <=8 / label >=30 (tPF-9); band census on code-
 drawn chrome = NON-BLACK frac, the textureColourAt family includes dark
-mottle cells the vendor-bright min>=40 classifier misreads (tPF-11).
+mottle cells the vendor-bright min>=40 classifier misreads (tPF-11);
+tPF-1c x11: an interactive soak is VACUOUS unless EVERY leg asserts its
+own log line (a 45-press run with 0 registered presses prints the same
+'ALIVE' as a real one — grep -c the click line per press), the order log
+reads 'ordered armed cell N' INSIDE parens (ui.cpp:1146), an armed n=0
+PLANLIST cell leaves projectOpen set (recovery = Escape to STATUS + row
+re-select resets, ui.cpp:899), Escape from planet view lands on STATUS
+NOT the map, repro scripts need a cleanup trap (a leaked Xvfb makes the
+next run print a fake 'Xvfb dead'), and BIN/DATA must be env-overridable
+before an era-tree A/B is trusted (the first era run silently used the
+HEAD binary).
+tPF-1c LANDED 2026-11-26 (DAY-20 EXIT REPORT CLOSED AT MECHANISM — THE
+QUIT LEG, NOT A VICTORY; no OQ row touched — open=[016,019] unchanged,
+honest negative; NO code change, docs+scripts only).
+ - USER-EXACT REPRO (scripts/tPF1c_repro.sh): '--data ROOT --ui', NO
+   --campaign, seed 1 default, Begin-built wheel defaults ('newgame live
+   stars 50 owners 5 gov 1'), FACTORY ORDER LANDED ('ui planet project
+   Parsimony I Factory (ordered armed cell 10)'), 45 x NEXT TURN with a
+   PER-PRESS 'ui click next-turn' assertion: ALIVE, zero VICTORY lines,
+   zero camp.over() exit. Headless controls: '--campaign 45 --seed 1' and
+   '--stars 50' both FINITE, no victory.
+ - SYMPTOM REPRODUCED (scripts/tPF1c_escape_test.sh): era build (656ce2e —
+   the HEAD when the user was told to build; c68e8bd is NOT a rev here:
+   rev-parse/reflog/fsck NEGATIVE, it lives in the user's own clone) and
+   HEAD alike: Begin, 20 presses, ONE Escape at the map -> process exits
+   rc=0 printing 'ui ok: turn 20' VERBATIM with ZERO victory conditions
+   firing. Mechanism = doEscape else-branch quit-at-bottom (era ui.cpp:573
+   == HEAD ui.cpp:683, the cited t410 law — vendor-faithful, keep).
+ - STEERING CLAIMS DISPOSITIONED: (a) 'declaring VICTORY/DEFEAT ~day 20'
+   REFUTED (45-press soak, both binaries); (b) Extinct/LastAlive setup
+   suspects REFUTED AT CONSTRUCTION — pickHomeStars (t295 cited law)
+   assigns every owner a distinct home before any consumer, and
+   checkVictory is BYTE-IDENTICAL 656ce2e..HEAD (diff = tRS-V2w
+   research/freeloader + tPL-D1 home-table hunks only). Rev delta: none
+   fixes it because it was never a victory defect; '20' = press count,
+   not a law. D30 respected: the user's --campaign denial was CORRECT.
+   R-tPF1c written (route DEAD).
+ - HARNESS VACUITY LAWS banked (x11 in the TRAPS block): per-press click
+   assertions; 'ordered armed cell N' inside parens; armed-n=0 PLANLIST
+   recovery; Escape chain STATUS-then-map; cleanup trap in every Xvfb
+   script; BIN/DATA env overrides before era A/B (run 1 silently used the
+   HEAD binary).
 
 tPF-12 LANDED 2026-11-26 (TPF7-D CLOSED AT MECHANISM NEGATIVE; ASSIGNMENT
 WAS STALE — PREMISE AUDIT FIRST; no OQ row touched — open=[016,019]

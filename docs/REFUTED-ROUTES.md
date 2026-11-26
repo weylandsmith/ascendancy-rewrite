@@ -1636,3 +1636,22 @@ evidence when BPLIST shows the leg armed AND a control leg fires.
 ## laws from this run: BREAK-caught stops at leg 0x27a18 may report eip=BP+6
 ## (accept BP..BP+6); basis windows >4.5 s at 60 deg/s wrap — unwrap before
 ## aggregating (see docs/re/_wip_tNGS.md S30-X5).
+
+## R-tPF1c. "THE DAY-20 EXIT IS checkVictory FIRING ON A BEGIN-BUILT GAME"
+## IS DEAD (tPF-1c, 2026-11-26). MEASURED, both binaries, user's verbatim
+## flags ('--data ROOT --ui', NO --campaign, seed default 1, Begin wheel
+## defaults 50/5/1): scripts/tPF1c_repro.sh runs 45 REGISTERED NEXT TURN
+## presses (per-press 'ui click next-turn' assertion — a run without that
+## assertion is VACUOUS, self-caught) and HEAD is ALIVE with zero VICTORY
+## lines; scripts/tPF1c_escape_test.sh reproduces the user's symptom line
+## VERBATIM — 'ui ok: turn 20' with the process exiting rc=0 — after 20
+## presses + ONE Escape at the map (stack bottom), with ZERO victory
+## conditions firing. The exit leg is doEscape's else-branch (era ui.cpp:573
+## == HEAD ui.cpp:683, identical code): Escape at the stack bottom quits.
+## The steering's suspects are refuted at construction: pickHomeStars
+## (cited t295 law) gives EVERY owner a distinct home star before any
+## consumer, and checkVictory is byte-identical era(656ce2e)..HEAD. 'day 20'
+## = how many presses the user made, not a law. No fixing commit exists or
+## is needed; c68e8bd is NOT a rev in this repo (rev-parse/reflog/fsck all
+## negative — it lives in the user's own clone). Do not re-open Extinct/
+## LastAlive setup defects for this report.
