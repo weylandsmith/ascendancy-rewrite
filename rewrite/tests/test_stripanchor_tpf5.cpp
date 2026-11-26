@@ -164,7 +164,34 @@ TEST(stripanchor_tpf5_ui_call_site_is_wired) {
           std::string::npos);
 }
 
-// 5. The conformance gate accepts planind's VARYING heights and still rejects
+// 5b. SYNTHETIC ARGS (mutation-campaign rule 6: M1 drop-L was MISSED because
+// every strip record carries L==0 — an equivalent mutant ON DATA). The law fn
+// is pure, so pin it on inputs the data never produces: both terms must enter
+// ADDITIVELY with their own axis, including negative anchors (the centre-art
+// shape other libs use).
+TEST(stripanchor_tpf5_pure_law_synthetic) {
+    {
+        au::Rect r{100, 200, 207, 299};
+        const au::Pt p = au::stripGaugeBlitPos(r, 7, -3);
+        CHECK(p.x == 107 && p.y == 197);
+    }
+    {
+        au::Rect r{0, 0, 107, 99};
+        const au::Pt a = au::stripGaugeBlitPos(r, 5, 23);
+        CHECK(a.x == 5 && a.y == 23);  // NOT swapped, NOT dropped
+    }
+    {  // axis independence: changing L never moves y and vice versa
+        au::Rect r{10, 10, 117, 109};
+        const au::Pt base = au::stripGaugeBlitPos(r, 0, 0);
+        CHECK(base.x == 10 && base.y == 10);
+        CHECK(au::stripGaugeBlitPos(r, 4, 0).x == 14 &&
+              au::stripGaugeBlitPos(r, 4, 0).y == 10);
+        CHECK(au::stripGaugeBlitPos(r, 0, 4).x == 10 &&
+              au::stripGaugeBlitPos(r, 0, 4).y == 14);
+    }
+}
+
+// 6. The conformance gate accepts planind's VARYING heights and still rejects
 //    a wrong record count (so the fix cannot later be "corrected" into a
 //    fabricated uniform-dims law).
 TEST(stripanchor_tpf5_gate_accepts_varying_heights) {

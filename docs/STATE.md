@@ -233,31 +233,43 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-5 INDICATOR POPUP FRAMES (D28 items 9+10: "clicking the frames
-along the top should pop up a window the same size and shape with the same
-mineral framing" + "Industry indicator tile art too high, top cut off").
-Ordering rationale: tPF-4 closed the last PLANLIST citation, so the planet
-screen's remaining user-visible gaps are the indicator tiles; item 10 is a
-MEASURABLE geometry bug (record bbox vs panel rect) and item 9 reuses the
-tPF-2d popup law (button array + band + help.shp frame) already ported.
-Steps: (1) read the vendor PLRES/PLIND/PLPRO click->popup path (tPL-B2
-already ported the LINES law docs/re/_wip_tPLB2.md; what is owed is the
-FRAME/framing leg: which SHAPEFRAME the popup widget carries and how the
-strip gauge record is positioned in its 108x100 panel — windows.txt TYPE-29
-rects + 0x31004 widget-frame blit law, docs/re/shp.md S12); (2) census the
-planres/planind/planpro record bboxes through the port loader (bbox-diff law)
-vs the drawn panel to cite the vertical offset; (3) port + pins + witness
-(tplb2_port_witness.sh is the log baseline).
-DO NOT re-derive the PLANLIST law (closed tPF-4: docs/re/_wip_tPF4.md; the
-runtime JT is at member 0x1fc070, the registry join names every shape id —
-scripts/tPF4_jt_and_registry.py re-runs it). DO NOT re-litigate tPF-3: the ramp-fill law + tables are frozen in
-docs/re/_wip_tPF3.md F15..F19 + rewrite/src/ui/rampfill_law.h (regenerate +
-diff with scripts/tPF3e_gen_tables.py if suspicious; NEVER hand-edit that
-header). TPF3d-A (table PRODUCER) stays named-open — route if ever needed:
-scripts/r1_wp_session.py --target data:0x48c33. Do NOT re-run the tPF-1b port
-soak (precondition FAILED tPF-3c; VENDOR witness only, user-time D30).
-help.shp-k0 FRAME SHIP stays gated on the user's OQ-005 ruling (DECISIONS.md
-D1). PRIOR-SESSION QUEUE: tPF-5 indicators; tPF-6 orbital click + hover CPU;
+NEXT tPF-6 ORBITAL CLICK + HOVER CPU (D28 items 11+12: "Orbital squares do
+show an outline when I hover over them, but clicking does nothing. It should
+pop up an info/context window (IE, once a technology with orbital structures
+has been researched, it should give a build menu.)" + "Hovering over the
+orbital squares isn't as responsive as it should be, and my CPU jumps to 100%
+utilization while I'm hovering around that area.").
+Ordering rationale: tPF-5 closed item 10; item 9's SIZE/SHAPE leg is already
+satisfied by indicatorPopupRect (tPL-B2) and its remaining mineral-framing leg
+is GATED on the user's OQ-005/D1 ruling (help.shp-k0 frame ship) — a gated row
+must not stall the queue. Item 12 is a MEASURABLE perf bug (port hover path),
+item 11 reuses the tPF-2d popup law (button array + band) plus the orbital
+context: orbitalHoverOutline already exists (ui.cpp ~2665) so the click arm is
+the gap.
+Steps: (1) profile the port's planet-screen hover path (orbitalHoverOutline +
+tile-edge recompute run per frame? — time the pure fns and count calls per
+frame from a log; the 100%-CPU symptom means per-frame full recompute or an
+unthrottled event loop — cite which); (2) read the vendor orbital-click path:
+PLSQUARE paint body 0x3b9xx region + msg arms in work/t198_planwin.asm (the
+orbital squares are PLSQUARE cells at the lattice ring — find the click arm
+that pops the orbital context/build menu, windows.txt PLSQUARE SENDMESSAGE
+law); (3) port + pins + witness (tPF5_port_witness.sh is the newest rig;
+build BOTH run_tests AND ascendancy before any witness).
+DO NOT re-derive the STRIP ANCHOR law (closed tPF-5: docs/re/_wip_tPF5.md P1..P8;
+vendor dest = anchor + (L,T) at FUN_0005caac 0x5cb61/0x5cb6a; stripGaugeBlitPos
+is the single law fn — NEVER re-add a bare-rect blitShape for the gauges;
+scripts/tPF5_witness_census.py re-ran the differential). DO NOT re-derive the
+PLANLIST law (closed tPF-4: docs/re/_wip_tPF4.md; the runtime JT is at member
+0x1fc070; scripts/tPF4_jt_and_registry.py re-runs it). DO NOT re-litigate
+tPF-3: ramp-fill law + tables frozen in docs/re/_wip_tPF3.md F15..F19 +
+rewrite/src/ui/rampfill_law.h (regenerate + diff with
+scripts/tPF3e_gen_tables.py if suspicious; NEVER hand-edit that header).
+TPF3d-A (table PRODUCER) stays named-open — route if ever needed:
+scripts/r1_wp_session.py --target data:0x48c33. TPF5-A (item 9 frame-art ship)
+and TPF4-A/B named-open — see _wip_tPF5.md P7 / _wip_tPF4.md. Do NOT re-run the
+tPF-1b port soak (precondition FAILED tPF-3c; VENDOR witness only, user-time
+D30). help.shp-k0 FRAME SHIP stays gated on the user's OQ-005 ruling
+(DECISIONS.md D1). PRIOR-SESSION QUEUE: tPF-6 orbital click + hover CPU;
 tPF-7 research controls; tPF-8 tree visibility; tPF-1b VENDOR day-20 repro.
 STANDING: D28 file scratchpad/t433-build-feedback.txt is the item authority;
 refcap PNGs in scratchpad/; scratch savedir law; C1-C5 + race intro stay
@@ -266,10 +278,55 @@ DEFERRED (D25); when a counter reads zero check PRODUCER EXISTENCE first
 named-open, no eyeballed geometry. NEVER read whole lines of
 work/r1/playcap/live-timeline.jsonl. The 433 composite is SIDE-BY-SIDE — LEFT
 = PORT, RIGHT = VENDOR (the F6 retraction); vendor-half pixel counts tolerate
-resampling (families, not exact values). WITNESS TRAP (tPF-3e): port
-witnesses run ./rewrite/build/ascendancy — build BOTH run_tests AND
-ascendancy before any witness, or you witness the old app (run 1 of tPF-3e
-reproduced tPF-3c's numbers exactly for this reason).
+resampling (families, not exact values). WITNESS TRAP (tPF-3e): port witnesses
+run ./rewrite/build/ascendancy — build BOTH run_tests AND ascendancy before
+any witness. APPEND TRAP (tPF-5): `open(p,"w").write(open(p).read()+x)`
+TRUNCATES BEFORE reading — read first, or open(p,"a") (cost a WIP section
+once). MUTATION TRAP (tPF-5): campaigns leave mutants on disk when killed —
+pgrep-verify dead BEFORE touching target files; pkill -f kills your own tool
+shell.
+
+tPF-5 LANDED 2026-11-25 (STRIP-ART ANCHOR LAW CLOSED AT RAW BYTES; INDUSTRY
+TILE FIX SHIPPED + PINNED + WITNESSED DIFFERENTIALLY; no OQ row closed — tPF
+tracks none, honest negative, open=[016,019] unchanged).
+PROVED (docs/re/_wip_tPF5.md P1..P8 + scripts/tPF5_strip_bbox.py +
+tPF5_anchor_census.py + tPF5_mutate.py + tPF5_port_witness.sh +
+tPF5_witness_census.py):
+  - D28 ITEM 10 ROOT-CAUSED AT BYTES: vendor blit FUN_0005caac adds the record's
+    signed bbox corner to the pushed screen x/y [verified raw asm 0x5cb61
+    dest_x=[entry+8]+x, 0x5cb6a dest_y=[entry+0xc]+y; widget pass 0x3143a pushes
+    desc+7>>16/desc+9>>16 as the ANCHOR] => dest = anchor + (L,T) is LAW.
+    planind is the only gauge lib with T!=0 (bbox (0,T,107,99), T ladder
+    {23,20,11,5,1} by gauge level; R/B pin content to the rect bottom-right);
+    planres/planpro are (0,0). The port's strip call site dropped (L,T): art
+    painted at rect.y0 = "too high, top cut off, black band below" verbatim.
+  - FIX: ui::stripGaugeBlitPos(rect,L,T) (planetstrip.{h,cpp}); ui.cpp composes
+    it at the gauge blit; blast-area census (tPF5_anchor_census.py) keeps the
+    negative-anchor centre-art libs (planitem/smship/planal) on their own
+    centre law — unchanged. Stale "all 107x99" claims corrected in
+    planetstrip.h + gate error string (gate must NOT re-tighten on height:
+    planind heights ARE law).
+  - PINS test_stripanchor_tpf5 x6 suite 564->570/0/0 (CMakeLists entry added —
+    tPF-4 trap avoided). MUTATION 5/5 CAUGHT (M2 drop-T, M3 sign-flip, M4
+    swap-L/T, M5 call-site neutralised round 1; M1 drop-L was an EQUIVALENT
+    MUTANT ON DATA — all strip records L==0 — caught only after adding the
+    synthetic-args pure-law pin, skill rule 6). Campaign had two self-inflicted
+    incidents (mutant left on disk after a silent death; mid-run restore
+    poisoning) — both recovered, traps banked in the mutation-campaign skill
+    (new rules 9/10) + STATE.md.
+  - WITNESS: seed-5 LOG PASS "ui strip planind.shp rec 1 bbox(0,23) rect(123,7)
+    blit(123,30)"; DIFFERENTIAL census fixed-vs-mutant-build VERDICT PASS:
+    fixed band rows (0,0,0)/nb 0.000 + foot art nb 1.000; mutant band art nb
+    0.958 + foot black nb 0.000; in-rect diff 0.942, outside 0.000. The mutant
+    build reproduces the user's symptom; the fixed build bottom-anchors. NOT
+    claimed: vendor pixel-identity (no 1:1 vendor planet capture).
+  - ITEM 9 SPLIT: size/shape leg already holds (indicatorPopupRect, tPL-B2);
+    the mineral-framing leg = help.shp-k0 (measured 336x256 bbox (0,0,335,255)
+    this session) whose SHIP stays GATED on the user's D1 ruling => TPF5-A
+    named-open (which lib 0x9f10c resolves for the INDICATOR widgets).
+  - Sitting check ran FIRST (exit 0, 45,227 rows, newest t=1335 — stale
+    assignment stood). Production ring untouched; scratch Xvfb killed BY PID.
+    GATE_EXIT=0, LEDGER AUDIT OK. NEXT tPF-6 orbital click + hover CPU.
 
 tPF-4 LANDED 2026-11-25 (PLANLIST ROW-ART LAW CLOSED AT BYTES + RUNTIME
 REGISTRY JOIN; SHIP ROW SHIPPED + PINNED + WITNESSED; TPLV2-A CLOSED; no OQ

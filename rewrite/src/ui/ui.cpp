@@ -8,6 +8,8 @@
 #include <cmath>
 #include <cstdio>
 #include <map>
+#include <set>
+#include <utility>
 #include <vector>
 
 #include "formats/flic.h"
@@ -2377,6 +2379,21 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             const auto& grr = gl.record(gr.rec);
                             const Pt gp = stripGaugeBlitPos(gr.rect, grr.left,
                                                             grr.top);
+                            // tPF-5 LAW LINE (once per (lib,rec) — witness
+                            // cites the ANCHOR, not just the selector).
+                            static std::set<std::pair<int, int>>
+                                sLoggedStripAnchor;
+                            if (!sLoggedStripAnchor.count(
+                                    {gi, gr.rec})) {
+                                sLoggedStripAnchor.insert({gi, gr.rec});
+                                std::printf(
+                                    "ui strip %s rec %d bbox(%d,%d) rect(%d,%d)"
+                                    " blit(%d,%d)\n",
+                                    kStripGaugeLibs[gi], gr.rec, grr.left,
+                                    grr.top, gr.rect.x0, gr.rect.y0, gp.x,
+                                    gp.y);
+                                std::fflush(stdout);
+                            }
                             blitShape(ren, gl, gr.rec, gp.x, gp.y);
                         }
                     }
