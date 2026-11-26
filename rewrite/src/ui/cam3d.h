@@ -42,8 +42,10 @@
 //   camera stands kStandoff units behind the field centre along the view
 //   axis (vendor 1500 verified at recenter, but the port fit law needs
 //   standoff/focal >= 4; port keeps 1760/680 — adopting 1500 would break
-//   the t399 bounds pin; named seam); pump cadence kSpinTickMs (vendor
-//   ~1/s measured t302); zoom stays MULTIPLICATIVE per tick (vendor is
+//   the t399 bounds pin; named seam); pump cadence kFireLoopMs=34 (the
+//   framework fire-loop period, derived tPF-7b — the earlier "vendor ~1/s
+//   measured t302" citation was POLL-LIMITED and is refuted, tNG-S S28);
+//   zoom stays MULTIPLICATIVE per tick (vendor is
 //   additive on its accumulator; port focal units differ — documented).
 //   Right-drag continuous manipulation (help.txt 1spin ln220) is NOT
 //   modeled; the latch above is the click law.
@@ -87,12 +89,21 @@ struct Camera3d {
     static constexpr double kFocalMin = 340.0, kFocalMax = 2720.0;
     static constexpr double kRotStepDeg = 2.0;   // pump delta [verified]
     static constexpr double kDeg2Rad = 0.017453292519943295;
-    // t425 CADENCE UPGRADE: t302 MEASURED the vendor pump msg 0x3b firing
-    // PERIODIC ~1/s unattended (docs/re/_wip_t302.md ln88-90,138,148-154 —
-    // live BP witness edx=0x3b on COSMOSWnd within ~1 s of RUN). 2 DEG/tick
-    // at 1 tick/s: the vendor dial feel is a SLOW crawl, which is what the
-    // D17 grade row reported ("original does not [spin visibly] on click").
-    static constexpr int kSpinTickMs = 1000;     // vendor-measured (t302)
+    // tPF-7b FIRE-LOOP CADENCE (supersedes the t425 "t302 ~1/s" upgrade —
+    // that figure was POLL-LIMITED, refuted tNG-S S28 / REFUTED-ROUTES
+    // "tNG-S S28": the ~1/s measured our census poll loop, never the pump).
+    // DERIVED (docs/re/_wip_tPF7b.md P2, same chain as ResCam::kPumpMs
+    // tPF-7 P6): both windows self-register their pump msg on an INTERVAL-0
+    // slot (cosmos 0x3b poster 0x26c66 -> 0x56374; reswin 0x3a 0x47713) and
+    // the framework fire-loop 0x56608 fires interval-0 slots EVERY pass, so
+    // the rate IS the fire-loop period. 58.5+-1 deg/s MEASURED live at the
+    // pump leg (tNG-S S30-X5, dbg-tngh-20261123-130254) / 2.0 deg verbatim
+    // tick (S27-X2 0x27a32) = 29.25 passes/s => 34.19 ms. Cross-check: the
+    // independent S28-X3 fire-count 28-33/s band (30.3-35.7 ms) contains 34;
+    // circuit 360/2*0.034 s = 6.12 s, inside the tngs_s28 pin band 5.4-6.3.
+    // (The initial registration delay ebp=0x168 S28-X0 is unit-unknown and
+    // irrelevant to the steady state: `add [slot+0x12], 0` never advances.)
+    static constexpr int kFireLoopMs = 34;       // 1000/29.25, derived tPF-7b
 
     // Vendor press law (pure): inactive -> start(dir); same dir -> stop;
     // opposite dir -> flip.

@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-26T01:40
+updated: 2026-11-26T03:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,38 +233,33 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-7b COSMOS/SYSTEM-VIEW PUMP CADENCE (sibling defect of tPF-7,
-banked docs/re/_wip_tPF7.md P6 + docs/re/research.md S10; the PRIOR-SESSION
-QUEUE's tPF-8 tree visibility follows).
-Ordering rationale: tPF-7 MEASURED the framework fire-loop rate (58.5 deg/s
-live cosmos pump / 2 deg cited delta = 29.25 passes/s, kPumpMs=34 shipped
-for the RESEARCH pump) — the cosmos dial (Camera3d::kSpinTickMs=1000,
-cam3d.h:95) and systemCam pump in the SAME ui.cpp block ride the same
-misread constant and are 29x slow by the SAME derivation; the fix is now a
-small mechanical port + pins + witness with the law already banked. tPF-8
-(tree visibility, D28 item 21 lines-from-known-only) is a fresh law
-derivation and costs more; tPF-1b VENDOR day-20 repro stays user-time-gated
-(D30); TPF6-CPU-A awaits a user ruling.
-Steps: (1) ui.cpp: pump the cosmos/systemCam on the derived cadence
-(ResCam::kPumpMs analog or shared constant — decide once, cite once);
-confirm the galaxy-map spin witness scripts (tNGS4_ours_shot.sh family)
-still pass, ADD a cadence leg like scripts/tPF7_witness.sh (census via
-"ui cam yaw" log rate); (2) pins: cam3d cadence + wiring (CMakeLists entry
-only if a new test file — tPF-4 trap); (3) mutation campaign reusing the
-tPF7_mutate.sh restore-copy-back+md5 skeleton; (4) RE-VERIFY the t302
-misread claim in cam3d.h:92-95 comments while there (bank the correction in
-docs/re/t399-galaxy-map-3d.md + _wip_t425 lineage so no doc re-tightens on
-1000 ms).
-DO NOT re-derive the RESEARCH control laws (closed tPF-7: research.md S10 +
-_wip_tPF7.md P1-P7; ResCam::pressPair/releaseRot/releaseMove/kPumpMs are
-the four law fns; scripts/tPF7_witness.sh re-runnable). DO NOT re-derive
-the ORBITAL SLOT/CLICK laws (tPL-V2/tPF-6), the STRIP ANCHOR law (tPF-5),
-or re-litigate tPF-3. TPF7-A (per-msg release mask split 0x38 vs 0x39),
-TPF7-C (user feel ruling on item-16 speed), TPF7-D (direct fire-loop
-period measurement, expected 34.2+-0.6 ms), TPF6-A/B/CPU-A, TPF5-A/TPF4-A/B
-named-open. help.shp-k0 FRAME SHIP stays gated on the user's OQ-005 ruling
-(D1). PRIOR-SESSION QUEUE: tPF-8 tree visibility; tPF-1b VENDOR day-20
-repro; TPF6-CPU-A if the user rules.
+NEXT tPF-8 RESEARCH-TREE VISIBILITY (D28 item 21: "frontier nodes not
+visible / tree unreadable at rest"; the PRIOR-SESSION QUEUE's first entry,
+follows tPF-7b which closed the sibling cadence defect).
+Ordering rationale: tPF-7b LANDED the fire-loop cadence on all three pumps
+(cosmos/systemCam/research all 34 ms, witnessed 30/s) — of the remaining
+queue items, tPF-8 is the only one actionable without the user: tPF-1b
+VENDOR day-20 repro is user-time-gated (D30), TPF6-CPU-A awaits a user
+ruling on throttle-vs-repaint. tPF-8 is a fresh law derivation (D28 item 21
+says lines-from-known-only in the vendor): the port already draws edges
+(+27px law, research.md S8) and frontier disks; the derivation owed is WHICH
+lines/nodes the vendor renders visible at rest vs only-on-hover/select, and
+whether the rest camera's off-frame frontier (TRSV1c-D) is vendor law or port
+fit error. Static material is in hand (reswin painter chain 0x48383..0x48501
+fully cited, _wip_tRSV1.md P1-P13); expect 1 debugger session at most.
+Steps: (1) re-read the vendor edge-draw gate (0x48566 legality call per row —
+which edges survive when NEITHER endpoint is frontier?); (2) census our
+render vs t252 vendor frame (crop law in _wip_tPRU.md); (3) ship + pins +
+mutation (reuse tPF7b_mutate.sh skeleton — restore-copy-back+md5) + witness
+(tRSB1_witness.sh family).
+DO NOT re-derive the RESEARCH control laws (closed tPF-7), the fire-loop
+CADENCE (closed tPF-7b: Camera3d::kFireLoopMs=34 + ResCam::kPumpMs=34, both
+witnessed; scripts/tPF7b_witness.sh re-runnable), the ORBITAL SLOT/CLICK
+laws (tPL-V2/tPF-6), the STRIP ANCHOR law (tPF-5), or re-litigate tPF-3.
+TPF7-A/C/D, TPF6-A/B/CPU-A, TPF5-A/TPF4-A/B, TRSV1c-D (may CLOSE via tPF-8
+step 2) named-open. help.shp-k0 FRAME SHIP stays gated on the user's OQ-005
+ruling (D1). PRIOR-SESSION QUEUE: tPF-1b VENDOR day-20 repro; TPF6-CPU-A if
+the user rules.
 STANDING: D28 file scratchpad/t433-build-feedback.txt is the item authority;
 refcap PNGs in scratchpad/; scratch savedir law; C1-C5 + race intro stay
 DEFERRED (D25); when a counter reads zero check PRODUCER EXISTENCE first
@@ -288,6 +283,49 @@ hard-coded. HOLD WITNESS LAW (tPF-7): measure stickiness AFTER the click
 settles (press->release gap ticks are legitimate); hold legs use xsend
 clickdn/clickup + a POLLLED stop condition on the app's own log, never a
 fixed sleep sized for an old cadence.
+
+tPF-7b LANDED 2026-11-26 (COSMOS/SYSTEMCAM PUMP CADENCE FIXED AT THE
+FIRE-LOOP PERIOD 34 ms — SHIPPED/PINNED/MUTATION-PROVEN/WITNESSED 30/s; the
+"vendor ~1/s (t302)" citation retired everywhere; no OQ row closed — tPF
+tracks none, honest negative, open=[016,019] unchanged).
+PROVED (docs/re/_wip_tPF7b.md P1..P9):
+  - DEFECT: ui.cpp pumped cam + systemCam every Camera3d::kSpinTickMs=1000 —
+    the t425 upgrade had turned the t302 POLL-LIMITED "~1/s" (REFUTED-ROUTES
+    tNG-S S28) into a "vendor-measured" constant. Vendor law: pump msgs
+    self-register on INTERVAL-0 slots (cosmos 0x3b poster 0x26c66 -> 0x56374;
+    reswin 0x3a) and fire-loop 0x56608 fires them EVERY pass => rate IS the
+    fire-loop period.
+  - NUMBER (no new measurement; two independent cited channels): 58.5+-1 deg/s
+    (S30-X5 basis integration, dbg-tngh-20261123-130254) / 2.0 deg verbatim
+    tick (S27-X2 0x27a32) = 29.25/s => 34.19 ms; S28-X3 fire-count band
+    28-33/s contains 34; circuit 6.12 s inside the tngs_s28 band 5.4-6.3.
+    Registration delay 0x168 unit-unknown and IRRELEVANT (interval 0 never
+    advances [slot+0x12]). DECISION: single shared Camera3d::kFireLoopMs=34;
+    ResCam::kPumpMs=34 (tPF-7, closed) untouched; kSpinTickMs DELETED.
+  - PINS test_campump_tpf7b x2 (cadence self-consistency vs BOTH bands +
+    circuit; wiring count==2 + retired-name-GONE incl comments + instruments +
+    ResCam constant intact), CMakeLists entry ADDED, suite 576->578/0/0.
+    MUTATION 5/5 CAUGHT (M1 1000 at definition: 6; M2/M3 each gate on a stale
+    1000u literal: 1 each — wiring pins load-bearing; M4 instrument removed:
+    1; M5 60 ms outside-bands-but-small: 5 — bands, not magnitude), restored
+    md5-verified (d6164913/9db07a9a), green after.
+  - WITNESS VERDICT PASS seed 5 (scripts/tPF7b_witness.sh): idle 0 pump lines
+    (latch-gated); latched ROTLEFT 62 fires/2002 ms = 30/s IN BAND; toggle-off
+    press -> 0. Two instrument flaws fixed en route (banked): pump printfs
+    need fflush (block-buffer trap THIRD witness) and the rate window must
+    bracket the LATCH leg only (tPF-7 precedent). HONEST NEGATIVE: systemCam
+    line wired+pin-checked but its cadence leg not separately witnessed
+    (shared loop).
+  - DOC CORRECTIONS so nothing re-tightens on 1000 ms: cam3d.h constant +
+    PORT-LAW header; t399-galaxy-map-3d.md pump line in place; dated
+    correction appended to _wip_t425.md (record kept). ENV HAZARD banked (P9):
+    t425_mapctl_witness well-census fails on 16-bit Xvfb :9 (production) —
+    pixel witnesses must assert bit-depth; its cam legs PASS and 0 pump lines
+    at idle confirms latch-gating; NOT a tPF-7b regression (diff is pump block
+    + comments only).
+  - Sitting check ran FIRST (exit 0, 45,227 rows, newest t=1335 — stale
+    assignment stood). Production ring untouched; scratch Xvfb killed BY PID.
+    GATE_EXIT=0, LEDGER AUDIT OK. NEXT tPF-8 research-tree visibility.
 
 tPF-7 LANDED 2026-11-26 (RESEARCH CONTROLS: HOLD-WITHOUT-LATCH RELEASE LEG
 + PUMP 0x3a AT DERIVED ~29/s SHIPPED/PINNED/MUTATION-PROVEN/WITNESSED; the

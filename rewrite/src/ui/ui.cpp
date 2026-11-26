@@ -3546,25 +3546,35 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 }
             }
         }
-        // t416 PUMP (vendor msg 0x3b handler 0x27a18; t302 measured the
-        // pump live at ~1/s): a latched dial applies its delta every tick
-        // until the opposite press stops it. Port cadence kSpinTickMs is a
-        // documented default; only a MOVING camera repaints beyond the
-        // event-driven frame (idle cost unchanged — gates/autoplay law).
+        // t416 PUMP (vendor msg 0x3b handler 0x27a18) + tPF-7b CADENCE: the
+        // vendor self-registers msg 0x3b on an INTERVAL-0 slot (poster
+        // 0x26c66 -> 0x56374) and the fire-loop 0x56608 fires it EVERY pass,
+        // so the dial applies 2 deg every fire-loop period (kFireLoopMs=34,
+        // derived _wip_tPF7b.md P2 — the retired 1000 ms constant was the t302
+        // poll-limited misread, 29x slow). Only a MOVING camera pumps beyond
+        // the event-driven frame (idle cost unchanged — gates/autoplay law).
         {
             const Uint32 nowMs = SDL_GetTicks();
-            if (cam.moving() && nowMs - lastPumpMs >= (Uint32)Camera3d::kSpinTickMs) {
+            if (cam.moving() && nowMs - lastPumpMs >= (Uint32)Camera3d::kFireLoopMs) {
                 cam.tick();
                 lastPumpMs = nowMs;
+                // tPF-7b witness instrument (change-only: fires only while a
+                // dial latch is latched): the pump cadence census counts these.
+                // fflush REQUIRED (tPF-5 block-buffer trap: without it the
+                // lines sit in the 4 KB buffer and a live census sees bursts).
+                std::printf("ui cosmos pump yaw %.3f\n", cam.yawLog());
+                std::fflush(stdout);
             }
             if (systemCam.moving() &&
-                nowMs - lastSysPumpMs >= (Uint32)Camera3d::kSpinTickMs) {
+                nowMs - lastSysPumpMs >= (Uint32)Camera3d::kFireLoopMs) {
                 systemCam.tick();
                 lastSysPumpMs = nowMs;
+                std::printf("ui sysview pump yaw %.3f\n", systemCam.yawLog());
+                std::fflush(stdout);
             }
             // tPF-7 RESEARCH PUMP: fires at the framework fire-loop period
-            // (ResCam::kPumpMs=34, derived _wip_tPF7.md P6) — the old
-            // kSpinTickMs=1000 reuse was a t302 misread, 29x slow.
+            // (ResCam::kPumpMs=34, derived _wip_tPF7.md P6) — reuse of the
+            // retired 1000 ms constant was a t302 misread, 29x slow.
             if (screen != kScreenResearch) {
                 // Vendor window-init law (P1a): re-entry clears the
                 // selection word win+0x9db (and the witness row). tPF-7:

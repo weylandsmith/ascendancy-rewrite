@@ -137,7 +137,9 @@ The vendor map dials are NOT per-click Euler steps. Press law (COSMOSWnd
 handler 0x26b34, latch chain 0x27da2..0x279eb on wnd+0xc0): a dial press
 latches (active, direction) — click starts CONTINUOUS motion, click again
 stops, the opposite dial flips direction. The periodic pump (msg 0x3b,
-0x27a18; live ~1/s t302) applies per latched pair: spin pair +/-2 DEG
+0x27a18; cadence tPF-7b: interval-0 slot fired every fire-loop pass, period
+34 ms derived — the earlier "live ~1/s t302" citation was POLL-LIMITED and is
+REFUTED, tNG-S S28 / REFUTED-ROUTES) applies per latched pair: spin pair +/-2 DEG
 about WORLD Y (FUN_000283e4 edx=-1 -> FUN_00053584 -> per-vector
 FUN_0005324c mix x'=x*c+z*s, z'=z*c-x*s), tilt pair +/-2 DEG about WORLD
 X (edx=0 -> FUN_00053554 -> FUN_000531dc y'=y*c-z*s, z'=z*c+y*s), zoom

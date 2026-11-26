@@ -349,3 +349,13 @@ the toggle well law only 37.3%/39.0% (DIRECTION still right: the swap lifts
 LANES/SHIPS/COLONIES from 0.1-0.3% and hurts EMPIRE 39.0% -> 0.6%). The
 640x480 refcap remains the authoritative exact-diff source (palette.md S3:
 307200/307200 px inside the converted pal).
+
+
+## CORRECTION (tPF-7b, 2026-11-26): the cadence upgrade 250->1000 was NOT
+## measurement-backed. The t302 "~1/s" it cited measured OUR POLL LOOP
+(census bank windows at ~1 s poll cadence), never the pump — REFUTED at the
+pump leg by tNG-S S28 (REFUTED-ROUTES, basis integration 28-33 fires/s) and
+independently at the reswin timer by tPF-7 P6. The 1000 ms constant this
+session wrote into cam3d.h made the cosmos dials 29x slow (user-visible;
+tPF-7b shipped kFireLoopMs=34 + pins + witness). Historical F-block text
+above (ln 49, 104-108) kept as the record of what was believed then.
