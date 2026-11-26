@@ -233,7 +233,23 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT TPF7-A PER-MSG RELEASE-MASK SPLIT (0x38 vs 0x39, research.md S10
+NEXT tPF-1c DAY-20 CAMPAIGN-OVER DEFECT (closure fe0fb45 VOIDED by
+user evidence; full account work/r1/loop/LOOPSTEER.txt 2026-11-26).
+User's exact launch "./build/ascendancy --data ... --ui" has NO
+--campaign (turns is file-configless, main.cpp:80) and console shows
+ONLY "ui ok: turn 20" (no cap announce line) => clean exit came via
+ui.cpp:1593 camp.over(). The game is declaring victory/defeat ~day 20
+on a Begin-built game. SUSPECTS in campaign.cpp checkVictory (:2265):
+(a) Extinct :2270 if starsOwned(kPlayer) miscounts Begin-built;
+(b) LastAlive :2286 if Begin-built AI owners never GET home stars
+(tNG-B B4 path) or lose them instantly. REPRO with the user's EXACT
+command line, Begin-built Chamachies, factory order pending, xsend
+next-day past day 25. On exit: log the Victory enum + branch at the
+exit site; fix the ROOT ownership/setup law (not the check's order);
+VERIFY survival 40+ days. If current HEAD does not reproduce, name
+the rev delta (user built ~c68e8bd) that already fixed it — no
+silent "couldn't reproduce". THEN continue with the prior NEXT:
+TPF7-A PER-MSG RELEASE-MASK SPLIT (0x38 vs 0x39, research.md S10
 seam; the LAST iterable item in the pump/release family).
 Ordering rationale: tPF-12 (the previous assignment) is CLOSED this
 iteration at the MECHANISM level with a banked negative — fire-loop
