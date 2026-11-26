@@ -157,6 +157,13 @@ HISTORY NOTE: the 276-vs-272 count = 4 corner pixels double-counted by the
 perimeter walk; census counts >= 200 as hit.
 
 ## SEAMS (unchanged, carried forward)
-- TPLV2-A: item-23 (Ship) race-table DAT_0x6fd60 runtime-unrecovered ->
-  Ship draws its planitem icon like every item.
+- TPLV2-A CLOSED tPF-4 (2026-11-25): DAT_0x6fd60 read from 60 banked saves
+  (= ids 14..34, registry names smship{19,2,11,0,9,5,6} for specnums 0..6);
+  decisively, producer 0x3c8b0 (the ORBITAL leg this seam was about) has NO
+  item-23 branch — only 0x3c84c (tile/build-list) swaps the race table, so
+  the orbital Ship drawing its planitem icon is CORRECT vendor behavior,
+  now cited (docs/re/_wip_tPF4.md P4/P6; port list-row leg shipped + pinned
+  test_rowart_tpf4). Residual named-open TPF4-B: 0x3c8b0 selector is the
+  item-record sub-table byte ([rec+0x10]+4*idx+1 else byte[0]&8), not raw
+  item — unported, no witness distinguishes them yet.
 - flag334 tutorial ghost-mode leg not modelled (orbitalHoverOutline false).

@@ -217,6 +217,8 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // and the refuse leg (0x3b487/0x3b419). Tile click WITHOUT a pick keeps
     // the tile-select affordance (vendor does nothing for orders there).
     int planetPick = -1;
+    int planetListShipLogged = -1;  // tPF-4 witness instrument (change-only)
+    int planetListOptsLogged = -1;  // tPF-4 debug: list membership once
     // tPL-B2 INDICATOR POPUP session state (msg-50 arm 0x3d80b + builder
     // FUN_0x3db80, law ui/indpopups.h): the lines the builder queued for
     // the last panel click (empty = no popup) and the popup RECT (builder
@@ -385,6 +387,23 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         lerr.c_str());
     }
     ascend::formats::ShapeLibrary planitemLib;
+    // tPF-4 SHIP ROW ART (docs/re/_wip_tPF4.md P4/P6): item 23 swaps the
+    // shape word WORD[ds:0x6fd80] for WORD[ds:0x6fd60+2*specnum]; measured
+    // 60/60 the race slots name smship{19,2,11,0,9,5,6}.shp (a permutation,
+    // kShipShapeFile). All seven loaded up front (each ~20 KB; refusal just
+    // falls back to the planitem icon for that race, the lib-refusal
+    // precedent). SEAM TPLV2-A CLOSED.
+    ascend::formats::ShapeLibrary smshipLibs[7];
+    for (int i = 0; i < 7; i++) {
+        char fname[32];
+        std::snprintf(fname, sizeof(fname), "smship%02d.shp",
+                      kShipShapeFile[i]);
+        std::string lerr;
+        if (!smshipLibs[i].load(
+                dataRoot + "/extracted/ascend01/data/" + fname, &lerr))
+            std::printf("ui smship lib refused %s: %s\n", fname,
+                        lerr.c_str());
+    }
     // t428: the three STRIP gauge libraries (planetstrip.h: each 21 x
     // 107x99, record == the compressed gauge level; the windows.txt
     // TYPE-29 rects are 108x100 so the record fills its panel). Refusal
@@ -2616,10 +2635,15 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 // FUN_0003b96c loop 2, 0x3c33a seed X=13 Y=119, +70 pitch;
                 // docs/re/_wip_tPLV2.md F1). Occupied slot: the vendor
                 // blits the item art (0x3c8b0 selector -> cache [0x6fd80],
-                // selector == item for normal items; the item-23 Ship
-                // race-table DAT_0x6fd60 is a RUNTIME table, unrecovered
-                // statically -> SEAM TPLV2-A: Ship draws its planitem icon
-                // like every other item). Empty slot at rest: NOTHING
+                    // selector == item for normal items; tPF-4 CLOSED AT
+                    // BYTES: 0x3c8b0 has NO item-23 branch (only 0x3c84c,
+                    // the tile/list producer, swaps the race table), so the
+                    // orbital Ship slot legitimately draws its planitem
+                    // icon — SEAM TPLV2-A CLOSED (docs/re/_wip_tPF4.md).
+                    // Nuance named-open TPF4-B: 0x3c8b0's selector is the
+                    // item-record SUB-TABLE byte ([rec+0x10]+4*idx+1, else
+                    // byte[0]&8), not the raw item — unported, no witness
+                    // yet distinguishing the two). Empty slot at rest: NOTHING
                 // (0x3c546 arm only paints hover; witness t254: the eight
                 // empty slots are starfield). HOVER (0x3c546..0x3c5d7):
                 // 69x69 box outline, pal 150 — D26's "thin greyish box".
@@ -2697,6 +2721,20 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
                     SDL_RenderDrawRect(ren, &lb);
                     const auto opts = projectOptionsFor(camp, planetStar);
+                    // tPF-4: owner -> specnum (the vendor's byte[rec+0x57])
+                    // for the Ship shape-table index; same roster law as the
+                    // species rail (speciesSpecnumOfOwner).
+                    const auto specnumOfRow = speciesSpecnumOfOwner(camp,
+                                                                    roster);
+                    if (planetListOptsLogged != int(opts.size())) {
+                        planetListOptsLogged = int(opts.size());
+                        std::string ids;
+                        for (const auto& op : opts)
+                            ids += std::to_string(op.item) + ",";
+                        std::printf("ui planlist opts n=%zu [%s]\n",
+                                    opts.size(), ids.c_str());
+                        std::fflush(stdout);
+                    }
                     const int rowsX1 = kProjectArrowUpRect.x0;  // band width
                     for (int oi = projectFirst;
                          oi < int(opts.size()) &&
@@ -2717,10 +2755,42 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             SDL_RenderFillRect(ren, &band);
                         }
                         // ART thumb: planitemLib record == itemIdx (1:1
-                        // pixel-match law shp.md S23.4), vertically centred
-                        // in the row, left inset.
+                        // pixel-match law shp.md S23.4, premise now VERIFIED
+                        // at bytes tPF-4 P4), vertically centred in the row,
+                        // left inset. tPF-4 SHIP LEG (body F 0x3d06d calls
+                        // producer 0x3c84c; item 23 swaps to the race smship
+                        // lib record 0 AND scales 0x8000/0x10000 = 0.5,
+                        // 0x3d08c..0x3d091 `cmp bl,0x17 / mov edi,0x8000`):
                         int nameX = lr.x0 + 10;
-                        if (planitemLib.count() == 40 &&
+                        // The r-value indexes smshipLibs (loaded in SPECNUM
+                        // order from the permutation); shipFile is the law
+                        // result (file number) — the witness caught the two
+                        // being conflated (smshipLibs[19] out of range).
+                        const int rowSpec =
+                            (planetStar >= 0 &&
+                             camp.starOwner(planetStar) >= 0 &&
+                             size_t(camp.starOwner(planetStar)) <
+                                 specnumOfRow.size())
+                                ? specnumOfRow[size_t(camp.starOwner(
+                                      planetStar))]
+                                : -1;
+                        const int shipFile =
+                            shipShapeFileNum(opts[oi].item, rowSpec);
+                        if (shipFile >= 0 && rowSpec >= 0 && rowSpec < 7 &&
+                            smshipLibs[rowSpec].count() > 0) {
+                            if (planetListShipLogged != shipFile) {
+                                planetListShipLogged = shipFile;
+                                std::printf("ui planlist ship row file %d "
+                                            "scale 0.5\n", shipFile);
+                            }
+                            const auto& sr = smshipLibs[rowSpec].record(0);
+                            blitShapeScaleF(ren, smshipLibs[rowSpec], 0,
+                                            lr.x0 + 12,
+                                            ry + (kProjectRowPitch -
+                                                  int(sr.height * 0.5)) / 2,
+                                            0.5);
+                            nameX = lr.x0 + 12 + int(sr.width * 0.5) + 14;
+                        } else if (planitemLib.count() == 40 &&
                             opts[oi].item >= 0 &&
                             opts[oi].item < 40) {
                             const auto& sr = planitemLib.record(opts[oi].item);

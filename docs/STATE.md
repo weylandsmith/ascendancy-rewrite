@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-25T17:30
+updated: 2026-11-25T21:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,14 +233,24 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-4 HOME PLANET TABLE READ (prior-queue item now first: the overlay
-fill law is SHIPPED, so the planet screen's next cited gap is the home-planet
-table). Steps: (1) locate the vendor home-planet list producer (D10 walk over
-the PLANLIST case-bodies per the prior queue; work/tPF3_paint.asm windowing
-via scripts/r290_disasm.py — doc addresses ARE file offsets in
-work/ascend_payload.bin, NO -0x88 for CODE; saves need -H only for DATA);
-(2) port the read law into the home-planets UI path with pins; (3) witness.
-DO NOT re-litigate tPF-3: the ramp-fill law + tables are frozen in
+NEXT tPF-5 INDICATOR POPUP FRAMES (D28 items 9+10: "clicking the frames
+along the top should pop up a window the same size and shape with the same
+mineral framing" + "Industry indicator tile art too high, top cut off").
+Ordering rationale: tPF-4 closed the last PLANLIST citation, so the planet
+screen's remaining user-visible gaps are the indicator tiles; item 10 is a
+MEASURABLE geometry bug (record bbox vs panel rect) and item 9 reuses the
+tPF-2d popup law (button array + band + help.shp frame) already ported.
+Steps: (1) read the vendor PLRES/PLIND/PLPRO click->popup path (tPL-B2
+already ported the LINES law docs/re/_wip_tPLB2.md; what is owed is the
+FRAME/framing leg: which SHAPEFRAME the popup widget carries and how the
+strip gauge record is positioned in its 108x100 panel — windows.txt TYPE-29
+rects + 0x31004 widget-frame blit law, docs/re/shp.md S12); (2) census the
+planres/planind/planpro record bboxes through the port loader (bbox-diff law)
+vs the drawn panel to cite the vertical offset; (3) port + pins + witness
+(tplb2_port_witness.sh is the log baseline).
+DO NOT re-derive the PLANLIST law (closed tPF-4: docs/re/_wip_tPF4.md; the
+runtime JT is at member 0x1fc070, the registry join names every shape id —
+scripts/tPF4_jt_and_registry.py re-runs it). DO NOT re-litigate tPF-3: the ramp-fill law + tables are frozen in
 docs/re/_wip_tPF3.md F15..F19 + rewrite/src/ui/rampfill_law.h (regenerate +
 diff with scripts/tPF3e_gen_tables.py if suspicious; NEVER hand-edit that
 header). TPF3d-A (table PRODUCER) stays named-open — route if ever needed:
@@ -260,6 +270,47 @@ resampling (families, not exact values). WITNESS TRAP (tPF-3e): port
 witnesses run ./rewrite/build/ascendancy — build BOTH run_tests AND
 ascendancy before any witness, or you witness the old app (run 1 of tPF-3e
 reproduced tPF-3c's numbers exactly for this reason).
+
+tPF-4 LANDED 2026-11-25 (PLANLIST ROW-ART LAW CLOSED AT BYTES + RUNTIME
+REGISTRY JOIN; SHIP ROW SHIPPED + PINNED + WITNESSED; TPLV2-A CLOSED; no OQ
+row closed — tPF tracks none, honest negative, open=[016,019] unchanged).
+PROVED (docs/re/_wip_tPF4.md P1..P8 + scripts/tPF4_rowart_runtime.py +
+tPF4_jt_and_registry.py + tPF4_witness.sh):
+ - D10 CLOSED WITHOUT A DEBUGGER: the cs: jump table is IN THE CODE IMAGE
+   (member offset 0x1fc070 — D10's zero-read used the DATA segment, wrong
+   base); 5 u32 entries unanimous across all decoded saves convert (value-P0)
+   to file offsets 0x3cca7/0x3cd3b/0x3cdcf/0x3ce39/0x3cefd = EXACTLY the
+   fallthrough bodies. The 0x3cca4 "walk start" was mid-instruction (the
+   dispatch ends 0x3cca7) — why both capstone passes printed garbage.
+ - ROW-ART LAW: producers 0x3c84c (tile/list) / 0x3c8b0 (orbital) default to
+   WORD[ds:0x6fd80]; ONLY item 23 swaps WORD[ds:0x6fd60+2*specnum] sel 0
+   (race=byte[rec+0x57]). Registry join (ctx ds:0x9f10c+0x7d0+id*32, shp.md
+   S2) over 60/60 saves: 0x6fd80=30=planitem.shp (tPF-2b 1:1 premise now
+   VERIFIED); case bodies A/B/C/loop = planres/planind/planpro/17np; race
+   slots = smship{19,2,11,0,9,5,6} for specnums 0..6 (a PERMUTATION, not
+   rNN); specnums 7..13 name DKSHIP files that DON'T EXIST in ascend01.cob.
+   Live +0x57=0 read off the ds:0x43508 record (pointer-value law +0x88).
+ - SHIPPED: planetview shipShapeFileNum + kShipShapeFile[7]; ui.cpp loads the
+   7 permutation libs, PLANLIST Ship row blits smship rec 0 scale 0.5
+   (0x3d08c cmp 0x17 -> 0x8000/0x10000) else planitem as before. WITNESS-
+   CAUGHT BUG banked as hazard: smshipLibs indexes SPECNUM, shipShapeFileNum
+   returns the FILE NUMBER — conflating them = silent no-op behind the
+   count()>0 guard; ALWAYS run the differential witness before pins-passes-
+   means-shipped.
+ - PINS test_rowart_tpf4 x3, suite 561->564/0/0 (new test file needs a
+   CMakeLists entry — first build shipped 0 new tests silently). MUTATION
+   3/3 CAUGHT (perm byte 19->0: 1 fail; polarity: 85; wiring removed: 1;
+   first M3 draft VACUOUS, re-run). WITNESS: seed 5 --species 0 LOG PASS
+   "ui planlist ship row file 19 scale 0.5"; differential pixel census Ship-
+   row strip 2726/5600 differing (48.5%) vs adjacent strip 0 (anti-vacuity).
+   NOT claimed: vendor pixel-identity (no vendor Ship-row capture).
+ - TPLV2-A CLOSED: 0x3c8b0 has NO item-23 branch -> orbital Ship drawing its
+   planitem icon IS the vendor law; residual TPF4-B named-open (0x3c8b0
+   selector = item-record sub-table byte, unported). TPF4-A named-open: what
+   the 17np 10-row body-D loop paints.
+ - Sitting check ran FIRST (exit 0, 45,227 rows, newest t=1335 — stale
+   assignment stood). Production ring untouched; scratch Xvfb killed BY PID.
+   GATE_EXIT=0, LEDGER AUDIT OK. NEXT tPF-5 indicator popup frames.
 
 tPF-3e LANDED 2026-11-25 (RAMP-FILL LAW SHIPPED IN THE PORT: LAW DATA +
 LADDER + SINGLE-PASS EDGE-SET PAINT; no OQ row closed — tPF tracks none,

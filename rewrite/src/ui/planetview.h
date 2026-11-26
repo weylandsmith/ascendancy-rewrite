@@ -321,4 +321,24 @@ int tileOverlayFillIndex(int cellClass);
 // for the CB and wrong per-record for every tall item (D28 P7).
 Pt structureBlitPos(Pt centre, int recLeft, int recTop);
 
+// tPF-4 ROW/SHAPE ART-SOURCE LAW (docs/re/_wip_tPF4.md P4/P6, cited). The
+// vendor shape-id producers 0x3c84c (tile/tile-click legs) and 0x3c8b0
+// (orbital leg) BOTH default to WORD[ds:0x6fd80], and the ONLY exception is
+// the Ship item: `cmp dl,0x17 / je` swaps in WORD[ds:0x6fd60 + 2*race] with
+// selector forced to 0 (0x3c888..0x3c8a6; race = byte[planet rec +0x57]).
+// MEASURED 60/60 banked saves (scripts/tPF4_rowart_runtime.py) x the shape-
+// cache registry join (ctx ds:0x9f10c + 0x7d0 + id*0x32, shp.md S2):
+//   WORD[ds:0x6fd80] = 30 = 'data\planitem.shp'  (the port's planitemLib;
+//     selector == item index — the tPF-2b 1:1 premise now VERIFIED at bytes)
+//   WORD[ds:0x6fd60 + 2r], r = specnum: ids 14..34 sequential; registry names
+//     r0..6 = SMSHIP19, SMSHIP02, SMSHIP11, SMSHIP00, SMSHIP09, smship05,
+//     smship06 — a PERMUTATION of the 21 extracted smshipNN.shp files, NOT
+//     rNN. SEAM TPLV2-A CLOSED: Ship art = smship{kShipShapeFile[r]} rec 0.
+// Returns the smship file number for item 23 (specnum-indexed), -1 otherwise
+// (item 23 with an unknown specnum ALSO yields -1 = planitem fallback, an
+// honest port default: the vendor table always holds 0..20).
+constexpr int kShipItem = 23;  // dl==0x17 leg, 0x3c888
+constexpr int kShipShapeFile[7] = {19, 2, 11, 0, 9, 5, 6};
+int shipShapeFileNum(int item, int specnum);
+
 }  // namespace ascend::ui

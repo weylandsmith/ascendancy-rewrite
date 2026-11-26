@@ -134,6 +134,7 @@ add_executable(run_tests
   tests/test_planetview_t418b.cpp
   tests/test_tileoverlay_tpf3b.cpp
   tests/test_rampfill_tpf3e.cpp
+  tests/test_rowart_tpf4.cpp
   tests/test_planetview_tplv2.cpp
   tests/test_statusnav_t405.cpp
   tests/test_statusbg_t417b.cpp

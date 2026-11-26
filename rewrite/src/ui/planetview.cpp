@@ -377,6 +377,19 @@ int orbitalSlotItem(const ascend::game::Campaign& camp, int star, int k) {
     return -1;
 }
 
+int shipShapeFileNum(int item, int specnum) {
+    // 0x3c888 `cmp byte,0x17` -> 0x3c88e swaps the shape word for the Ship
+    // item; every other item falls through with the planitem default (the
+    // caller's WORD[ds:0x6fd80] == 30 == planitem.shp, measured 60/60).
+    // specnum = byte[planet rec +0x57] (the value the vendor indexes with at
+    // 0x3c893..0x3c89b); -1/out-of-range -> planitem fallback.
+    if (item != kShipItem) return -1;
+    if (specnum < 0 ||
+        specnum >= int(sizeof(kShipShapeFile) / sizeof(kShipShapeFile[0])))
+        return -1;
+    return kShipShapeFile[specnum];
+}
+
 bool orbitalHoverOutline(const ascend::game::Campaign& camp, int star,
                          int slot, Pt p, bool pickPending) {
     // 0x3c546..0x3c574: outline iff hovered cell == +0xac AND the cell's
