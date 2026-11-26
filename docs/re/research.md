@@ -701,3 +701,32 @@ M3 round 1); guard window extractions after a find CHECK.
     all 41"); no gate stands on shipping decoded frame art. TPF5-A itself
     (INDICATOR-popup lib) stays open — this iteration answers the RESEARCH
     screen only.
+
+## 15. FRAMEWORK TICK/FIRE-LOOP LAW (tPF-12, 2026-11-26) — closes S10 seam TPF7-D
+Full working log docs/re/_wip_tPF12.md P0-P6. Headlines:
+- FIRE LOOP 0x56608 VERBATIM (slot-count guard caller 0x54812; cmp
+  DAT_000a2044,[slot+0x12] 0x56666; interval re-add 0x5663b): it contains NO
+  WAIT. For INTERVAL-0 slots (both pumps, P4/P5) the cadence IS the
+  main-loop pass rate — there is no vendor period constant between the pump
+  and the loop, and the tick DAT only arms the first fire / paces nonzero
+  slots. A "direct fire-loop period" tighter than the banked wall-clock spin
+  bands does not exist to be lifted.
+- TICK LAW: fn 0x53d84 `inc [0xa2044]; ret` is the SOLE increment site (whole-
+  image u32 scan; sole pointer 0x8b35c in callback table {0x6cec0,0x53d84,
+  0x650ec}; zero-reset 0x545af at run init). Installer 0x74b36 registers the
+  table via extender service 0x66241 (param 0x600, thunk 0x78cfd->0x7c3a4) —
+  NO rate literal at the install site (extender-config side).
+- TICK RATE MEASURED 94.7 +-0.3 ticks/s (bank-play-20261111 ring saves,
+  pointer-law read of DAT_000a2044 vs 10.009 s autosave mtimes;
+  scripts/tPF12_tick_census.py, work/r1/tPF12_tick_census.out; second run dir
+  91.5/s). NOT 18.2 Hz, NOT 1000 Hz.
+- FPS-DUDE METER (fn 0x55020, string ds:0x895ec verbatim): sprintfs
+  1000/(ticks per 10 calls) — the vendors' own overlay displayed the
+  main-loop rate, i.e. the loop rate was machine-dependent BY DESIGN and
+  actively watched. Meter state words rest at 0 in 100/100 saves (counter
+  resets after sampling, 0x55068) — expected, not producer-absence.
+- CONSEQUENCE: Camera3d::kFireLoopMs=34 / ResCam::kPumpMs=34 stand as the
+  port's rate MATCHING the observed vendor feel (S28-X3 direct 28-33 fires/s
+  + S30-X5 29.25+-0.5/s both contain 34), explicitly NOT a lifted constant.
+  TPF7-D CLOSED with this negative; a tighter capture (>29 Hz yaw sampling)
+  is only worth queuing behind a landed feel complaint (TPF7-C).

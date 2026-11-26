@@ -233,50 +233,90 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-12 COSMOS/SYSTEMCAM PUMP PERIOD (research.md S10 named seam:
-"tPF-7b cosmos/systemCam pumps still on kSpinTickMs=1000 (29x slow by this
-derivation — next research-screen adjacent task)").
-Ordering rationale: ALL SEVEN research-screen D28 items (16-22) are now
-shipped/cited (16/17/18 tPF-7, 19/20 tPF-10, 21 tPF-8, 22 tPF-11 LANDED
-this iteration); the planet-screen items are closed or named-open
-(TPF6-A/B build-list seams need their own citations; TPF6-CPU-A awaits a
-user throttle ruling; TPF7-C is a feel-grading ask — none iterable). The
-pump fix is the LAST standing "too slow" symptom (item 16's map/system
-halves), fully static, cited (0x3a pump ~29/s = 34.2+-0.6 ms, research.md
-S10), and witnessable on the existing xsend/Xvfb harness. TPF7-A (per-msg
-release-mask split 0x38 vs 0x39) is the follow-up ONLY if the pump work
-lands early — do NOT open both.
-Steps: (1) census kSpinTickMs users in ui.cpp (cosmos spin + systemCam)
-and re-read the cited derivation in research.md S10 / _wip_tPF7.md;
-(2) RE-DERIVE the vendor period for the cosmos/system consumers from the
-framework msg 0x3a scheduling — do NOT copy the research constant without
-checking the consumer (D30 POPUP/DERIVATION LAW: every visible property
-cited or named-open);
-(3) SHIP + pins (new tests/test_spin_tpf12.cpp WITH CMakeLists entry —
-tPF-4 trap) + mutation (scripts/tPF11_mutate.sh skeleton: snapshot
-preflight, anchors at DEFINITION incl .h inline/constexpr tables — tPF-10
-M2 + tPF-11 M5 both anchored wrong-file round 1; copy-back THEN md5-
-verify) + witness (Xvfb :99 scratch, kill BY PID; build run_tests AND
-ascendancy before any witness — tPF-3e trap).
+NEXT TPF7-A PER-MSG RELEASE-MASK SPLIT (0x38 vs 0x39, research.md S10
+seam; the LAST iterable item in the pump/release family).
+Ordering rationale: tPF-12 (the previous assignment) is CLOSED this
+iteration at the MECHANISM level with a banked negative — fire-loop
+0x56608 has NO wait, interval-0 cadence IS the free-run loop rate, tick
+DAT_000a2044 MEASURED 94.7+-0.3/s, and the vendor's own FPS-DUDE meter
+proves the loop rate was machine-watched, not a liftable constant
+(docs/re/research.md S15, docs/re/_wip_tPF12.md). kFireLoopMs=34 stands
+inside both banked bands; no code change. That removes the pump cadence
+from the queue. What remains iterable in this family: TPF7-A (which
+pair's bits does msg 0x38 vs 0x39 clear — handler 0x47d3b masks with
+~ebp, ebp = 3rd handler arg, role OWED; fully STATIC, ship-safe reading
+already shipped tPF-7). TPF6-A/B need their own build-list citations,
+TPF6-CPU-A awaits a user throttle ruling, TPF7-C is a feel-grading ask
+(only re-open it if the tick-rate finding ever motivates a capture).
+Steps: (1) re-read 0x47d3b + the press tail 0x47c48 (0x5669c queue args:
+push (msg==0x34/0x35 ? 1 : 0)) — the pushed flag is the PRIME suspect
+for selecting which msg (0x38 vs 0x39) the press arms; (2) find the
+framework dispatcher that turns the queued slot into the handler's ebp
+(0x56ca4 dispatch chain — P5 banked its address); (3) if ebp is the
+queued param verbatim, the mask law FOLLOWS (0x38 arms with flag 0/1
+=> rot vs move pair) and SHIP + pins; if not, write the honest negative
+and keep TPF7-A open. TRAPS: disasm script =
+~/tools/revenv/bin/python scripts/t442_disasm.py START END (project
+.venv has NO capstone — tPF-12 trap); bash hex math $((0x..+0x..)) mixes
+bases — pass EXPLICIT hex END (tPF-12 10MB-flood trap); anchors at
+DEFINITIONS; window-pin substr guards; no pin literal in comments.
 TRAPS STILL STANDING (full per-iteration detail in git history of this
 block + docs/re/*): NEVER read whole lines of work/r1/playcap/live-
 timeline.jsonl; D28 file scratchpad/t433-build-feedback.txt is the item
 authority; the 433 composite is SIDE-BY-SIDE (LEFT=PORT, RIGHT=VENDOR,
 vendor-half pixel counts tolerate resampling); when a counter reads zero
-check PRODUCER EXISTENCE first (D29); C1-C5 + race intro stay DEFERRED
-(D25); harness CHECK does NOT return — guard every window-pin substr after
-a find CHECK, count a nonzero exit with no FAIL line as CAUGHT (tPF-10);
-window-pins size past comment bodies and NO comment may contain a single-
-occurrence pin literal (tPF-1b); a campaign stdout is BLOCK-BUFFERED —
-pgrep -f is the only liveness test (tPF-5); hold witnesses measure AFTER
-the click settles, polled stop conditions not fixed sleeps (tPF-7); fixed-
-item CHECKs use base-list items, ACTIVE cell pairs DERIVED from the grid
-law (tPF-6); pin pixels from ShapeLibrary::decode, never tools/shp_pngdump
+check PRODUCER EXISTENCE first (D29; tPF-12 addendum: a sample-and-reset
+meter legitimately rests at 0 in every snapshot — read the reset site
+before calling absence); C1-C5 + race intro stay DEFERRED (D25); harness
+CHECK does NOT return — guard every window-pin substr after a find CHECK,
+count a nonzero exit with no FAIL line as CAUGHT (tPF-10); window-pins
+size past comment bodies and NO comment may contain a single-occurrence
+pin literal (tPF-1b); a campaign stdout is BLOCK-BUFFERED — pgrep -f is
+the only liveness test (tPF-5); hold witnesses measure AFTER the click
+settles, polled stop conditions not fixed sleeps (tPF-7); fixed-item
+CHECKs use base-list items, ACTIVE cell pairs DERIVED from the grid law
+(tPF-6); pin pixels from ShapeLibrary::decode, never tools/shp_pngdump
 raw .idx (tPF-10 partial-walk); `open(p,"w").write(open(p).read()+x)`
 TRUNCATES BEFORE reading (tPF-5); corner-text census boxes start x>=16,
 planet starfield empty-box <=8 / label >=30 (tPF-9); band census on code-
 drawn chrome = NON-BLACK frac, the textureColourAt family includes dark
 mottle cells the vendor-bright min>=40 classifier misreads (tPF-11).
+
+tPF-12 LANDED 2026-11-26 (TPF7-D CLOSED AT MECHANISM NEGATIVE; ASSIGNMENT
+WAS STALE — PREMISE AUDIT FIRST; no OQ row touched — open=[016,019]
+unchanged; no code change, docs+script only).
+ - ASSIGNMENT AUDIT: STATE named tPF-12 "cosmos/systemCam pumps STILL on
+   kSpinTickMs=1000" — FALSE: tPF-7b (e43fc2e, ancestor of HEAD) shipped
+   Camera3d::kFireLoopMs=34 (cam3d.h:106, ui.cpp:3665/3676) and
+   test_campump_tpf7b pins the retired name GONE (grep: 6 hits, all
+   prose/pins). Sitting check first: timeline mtime 00:30 < HEAD 13:44,
+   stale stood.
+ - FIRE-LOOP LAW (verbatim, fresh disasm): 0x56608 slot scan cmp DAT vs
+   [slot+0x12] 0x5666c, re-add 0x5663b; caller 0x5481e guarded by slot-
+   count; NO WAIT ANYWHERE => interval-0 pump cadence = main-loop free-run
+   rate; DAT gates first-fire + nonzero-interval slots ONLY.
+ - TICK LAW: 0x53d84 `inc [0xa2044]; ret` sole increment; sole u32 pointer
+   0x8b35c (table 0x8b358); installer 0x74b36 via extender service 0x66241
+   (0x600 param, thunk 0x78cfd->0x7c3a4) — NO rate literal install-side
+   (dead end declared after 2 probes, budget kept). Zero-reset 0x545af.
+ - MEASURED: tick rate 94.7 +-0.3/s (18 consecutive-pair windows,
+   bank-play-20261111; 91.5/s second dir) — scripts/tPF12_tick_census.py
+   (pointer law, ZERO new capture), output work/r1/tPF12_tick_census.out.
+   NOT 18.2, NOT 1000 Hz.
+ - FPS-DUDE METER FOUND (string ds:0x895ec verbatim; fn 0x55020 sprintfs
+   1000/(ticks per 10 calls); 3 call sites = per-main-loop-pass): vendor
+   WATCHED the loop rate => machine-dependent by design. Meter words 0 in
+   100/100 saves = sample-and-reset resting state (0x55068), NOT absence.
+ - DISPOSITION: kFireLoopMs=34 / kPumpMs=34 stand (both banked bands
+   contain it; NOT a liftable constant — derivation comments already say
+   "derived"). TPF7-D closed negative; tighter capture queued behind
+   TPF7-C feel ask. LAW BANKED research.md S15 + _wip_tPF12 P0-P6.
+ - TRAPS BANKED: project .venv has NO capstone (use ~/tools/revenv);
+   bash $((0x54820+0x40)) mixed-base arithmetic flooded 10 MB of disasm —
+   pass explicit hex END bounds to t442_disasm.py.
+ - GATE: see GATE_EXIT below; LEDGER AUDIT OK.
+ - NEXT TPF7-A per-msg release-mask split (0x47d3b ~ebp, ebp-role owed).
+
 
 tPF-11 LANDED 2026-11-26 (RESEARCH-SCREEN MINERAL FRAMING SHIPPED AT
 PIXELS — D28 ITEM 22 CLOSED AT MEASUREMENT; no OQ row touched — D28 is a
