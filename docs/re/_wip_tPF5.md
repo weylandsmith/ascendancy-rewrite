@@ -171,13 +171,15 @@ Round 1 (before the synthetic pin): 4/5 CAUGHT.
   re-run of M1 after the pin: CAUGHT (3 failed tests). Round-2 suite 570/0/0
   green after restore (md5-verified).
 HARNESS INCIDENTS (all mine, all recovered, all banked as skill traps):
-  (a) first campaign launch died silently with an EMPTY log and the M1 mutant
-      LEFT ON DISK (skill trap 8b(i) in the wild); I then restored the file
-      WHILE a still-alive campaign was mid-run, poisoning round 1's verdicts
-      — lesson: after killing a campaign, pgrep the interpreter child (the
-      wrapper bash PID and the python child differ; pkill -f matched my own
-      tool shell and killed IT, exit -15). Round 2 ran fully detached with
-      line-buffered stdout and completed 5/5.
+  (a) ROOT CAUSE OF THE POISONED ROUND 1: the campaign was NEVER dead — its
+      stdout was BLOCK-BUFFERED, so the log stayed empty while it ran and
+      mutated files. I read "empty log" as death, pgrep'd only the wrapper PID,
+      and restored target files under the still-live python child, corrupting
+      round-1 verdicts (and the SIGTERM'd child's late reap landed its finally-
+      restore after my commit — tree verified clean post-hoc, suite 570/0/0).
+      Lesson: pgrep -f is the ONLY liveness test; launch line-buffered
+      (sys.stdout.reconfigure) so an empty log stops being ambiguous. Round 2
+      ran fully detached, line-buffered, and completed 5/5.
   (b) an execute_code decorator edit nearly turned main() into a print-call —
       caught by re-reading before building.
   (c) FILE-APPEND TRAP: `open(p,"w").write(open(p).read()+append)` truncates p

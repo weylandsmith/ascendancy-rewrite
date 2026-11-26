@@ -282,9 +282,10 @@ resampling (families, not exact values). WITNESS TRAP (tPF-3e): port witnesses
 run ./rewrite/build/ascendancy — build BOTH run_tests AND ascendancy before
 any witness. APPEND TRAP (tPF-5): `open(p,"w").write(open(p).read()+x)`
 TRUNCATES BEFORE reading — read first, or open(p,"a") (cost a WIP section
-once). MUTATION TRAP (tPF-5): campaigns leave mutants on disk when killed —
-pgrep-verify dead BEFORE touching target files; pkill -f kills your own tool
-shell.
+once). MUTATION TRAP (tPF-5): a campaign's stdout is BLOCK-BUFFERED — an empty
+log is NOT death; pgrep -f is the only liveness test, and never touch target
+files until pgrep is empty (mid-run restores poison verdicts); pkill -f kills
+your own tool shell.
 
 tPF-5 LANDED 2026-11-25 (STRIP-ART ANCHOR LAW CLOSED AT RAW BYTES; INDUSTRY
 TILE FIX SHIPPED + PINNED + WITNESSED DIFFERENTIALLY; no OQ row closed — tPF
