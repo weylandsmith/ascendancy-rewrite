@@ -261,8 +261,9 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // tRS-V1c RESEARCH CAMERA (supersedes the t419 Camera3d reuse): the
     // vendor reswin camera law — basis yaw (win+0x11f) + position z dolly
     // (win+0xe3, rest -150), dat_764c4 bit-pair latches, pump +-3 deg / +-1
-    // (docs/re/_wip_tRSV1.md P10/P11). resSel = the SELECTED row (vendor
-    // word win+0x9db; frame-2 + gold-rim + edge-0xf3 driver).
+    // (docs/re/_wip_tRSV1.md P10/P11). resSel = the HOVER row (vendor word
+    // win+0x9db; tPF-10: 0x47478 tracks the legal row under the cursor on
+    // every msg — frame-2 blue + edge-0xf3 driver, NEVER a click latch).
     ResCam resCam;
     int resSel = -1;
     // tPF-7 HOLD TRACKER: which research control pair the LEFT button is
@@ -708,6 +709,33 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 } else if (projectHover != -1) {
                     projectHover = -1;
                 }
+                // tPF-10 RESEARCH HOVER WORD (vendor 0x47478 VERBATIM,
+                // docs/re/_wip_tPF10.md P1/P2): word[win+0x9db] is a HOVER
+                // tracker, not a click latch — the select sub re-hits the
+                // projected table from the MOUSE words on EVERY framework
+                // msg (all switch arms + default 0x47b33) and stores the
+                // legal row under the cursor, 0xffff when off any disk.
+                // Frame 2 (bright blue resring k2, MEASURED P3) therefore
+                // paints under the cursor (D28 item 20 "hover -> blue"), and
+                // the edge 0xf3 arm (0x48314) reads the SAME word. Motion
+                // legs re-run it here; camera-leg re-runs live in the pump
+                // (nodes sliding under a still cursor).
+                if (screen == kScreenResearch && camp.researchTree()) {
+                    const auto nodes =
+                        researchNodes(camp, *camp.researchTree(), ag::kPlayer);
+                    const auto h = researchHit(*camp.researchTree(), nodes,
+                                               ev.motion.x, ev.motion.y,
+                                               resPanX, resPanY, resCam);
+                    const int hv = resHoverWord(resSel, h);
+                    if (hv != resSel) {
+                        resSel = hv;
+                        // Witness instrument (change-only, same discipline
+                        // as "ui research center"): the hover leg's whole
+                        // observable is this word.
+                        std::printf("ui research hover %d\n", resSel);
+                        std::fflush(stdout);
+                    }
+                }
             } else if (ev.type == SDL_MOUSEBUTTONUP &&
                        ev.button.button == SDL_BUTTON_LEFT && resHold) {
                 // tPF-7 RELEASE LEG (vendor msg 0x38/0x39 handler 0x47d3b:
@@ -957,7 +985,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             break;
                         case ResHit::Node: {
                             panned = false;
-                            resSel = h.row;  // vendor selection word
+                            // tPF-10: the vendor click msg ALSO re-runs
+                            // 0x47478 (site 0x47da5), so the hover word
+                            // equals the clicked row at click time — the
+                            // assignment below is that re-hit, NOT a latch:
+                            // the next motion off-disk clears it (0xffff).
+                            resSel = resHoverWord(resSel, h);
                             const std::string tname = tree.all()[h.row].name;
                             if (setStudy(camp, tree, ag::kPlayer, h.row))
                                 std::printf("ui research study %s\n",
@@ -3602,6 +3635,25 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 nowMs - lastResPumpMs >= (Uint32)ResCam::kPumpMs) {
                 resCam.tick();
                 lastResPumpMs = nowMs;
+                // tPF-10: the vendor pump msg 0x3a arm falls through to
+                // 0x47478 (site 0x47b33), so the hover word re-hits EVERY
+                // fire-loop pass — a still cursor over sliding disks keeps
+                // frame 2 glued to the row actually under it.
+                if (screen == kScreenResearch && camp.researchTree()) {
+                    int mx = 0, my = 0;
+                    SDL_GetMouseState(&mx, &my);
+                    const auto nodes = researchNodes(
+                        camp, *camp.researchTree(), ag::kPlayer);
+                    const auto h = researchHit(*camp.researchTree(), nodes,
+                                               mx, my, resPanX, resPanY,
+                                               resCam);
+                    const int hv = resHoverWord(resSel, h);
+                    if (hv != resSel) {
+                        resSel = hv;
+                        std::printf("ui research hover %d\n", resSel);
+                        std::fflush(stdout);
+                    }
+                }
             }
         }
         // t419 CORNER "Exit <ESC>" POPUP (ui/exitpopup.h): polled pointer

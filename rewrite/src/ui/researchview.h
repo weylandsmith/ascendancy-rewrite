@@ -269,8 +269,23 @@ ResHitResult researchHit(const ascend::game::ResearchTree& tree,
 
 // The node FRAME index (resring.shp record) per the P10 esi law VERBATIM
 // (0x483fa..0x48470): 1 default; 0 iff row==studied && !owned; 3 iff owned;
-// 2 iff row==selected (overrides 3).
-int resNodeFrame(int row, bool studied, bool owned, bool selected);
+// 2 iff row==word[win+0x9db] — the HOVER word (tPF-10: 0x47478 tracks the
+// legal row under the cursor, so frame 2 = the bright-blue hover highlight,
+// MEASURED resring k2 mean (76,157,198) on the port decode plane; the old
+// "gold" label was a misread
+// of the 0x5caac blitter choice, docs/re/_wip_tPF10.md P3).
+int resNodeFrame(int row, bool studied, bool owned, bool hover);
+
+// tPF-10 HOVER-WORD LAW (sub 0x47478 VERBATIM, work/tRS_reswin_fn.asm
+// 0x47484..0x47555): the select sub re-hits the projected table from the
+// MOUSE words on EVERY framework msg (all switch arms + default 0x47b33),
+// stores the legal row under the cursor — 0xffff (-1 here) when off any
+// disk — and writes word[win+0x9db] ONLY on change (0x4753a je / 0x47548).
+// It is NOT a click latch: the commit chain (0x47d99) only READS the word.
+inline int resHoverWord(int prev, const ResHitResult& h) {
+    const int hit = (h.kind == ResHit::Node) ? h.row : -1;  // 0xffff leg
+    return hit == prev ? prev : hit;                        // 0x4753a/0x47548
+}
 
 // The prereq-edge colour INDEX per the corrected P11 law: 0x6b - k with
 // k = clamp(chop(0.25f*(0.5f*(z_this + z_prereq) + posz)), -3, +3); the

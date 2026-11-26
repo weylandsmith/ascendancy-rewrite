@@ -357,6 +357,9 @@ same function 0x4709c..0x48f80).
     refs 0x48476/0x487b6), 4 records = frames 0..3 by the state law
     0x483fa..0x48470: 1 default; 0 iff row==studied AND not owned; 3 iff
     owned; 2 (SELECTED, gold path 0x5caac) iff row==word[win+0x9db].
+    S13 CORRECTION (tPF-10, 2026-11-26): word[win+0x9db] is the HOVER row
+    (not a selection latch), frame 2 is MEASURED bright blue (76,157,198),
+    and the frame-2 write is LAST (overrides 0/3) — see S13.
     S8.2 DIMS CORRECTION (tPR-U, 2026-11-24): the earlier "4 records 29x29"
     was a header-pair reading, NOT the bbox. MEASURED directory (unified
     shp law; record starts 56/1200/2363/3532): bbox quads k1..k3 =
@@ -424,6 +427,8 @@ capstone in ~/tools/revenv; linear dumps desync on this image).
    (0x47b44..0x47c42 verbatim, incl the DEAD (0,1) state); msg 52/53 =
    camera posZ += -1/+1 x runtime f32[0x9f108] (value NOT in the restored
    image — seam TRSV1b-A, port default 1.0). DOLLY, not screen translate.
+   TRSV1b-A PARTIAL CLOSE (tPF-7): FLOAT[0x9f108] MEASURED 1.0 EXACTLY
+   4233/4233 saves — the dolly step is 1 unit per pump tick at default.
 5. Rotation 0x5324c raw VERBATIM: X' = X*cos + Z*sin, Z' = Z*cos - X*sin
    (0x7754a = fcos, 0x77556 = fsin, fprem reduce 0x7751e); angle step is
    INTEGER 360/d THEN repeated f32 adds (0x4743d).
@@ -611,3 +616,39 @@ in ui.cpp; transient set-project feedback ("list open: pick one" /
 ROUTING (t252) untouched. Pins tests/test_strays_tpf9.cpp; witness
 scripts/tPF9_witness.sh (census trap: RESWIN frame border gray
 (120,120,120) sits inside kDim +-40 — corner boxes must start x>=16).
+
+## S13 HOVER-WORD LAW (tPF-10, 2026-11-26) — D28 items 19/20
+word[win+0x9db] is a HOVER tracker, NOT a click latch (sub 0x47478
+VERBATIM, work/tRS_reswin_fn.asm 0x47484..0x47555): it re-hits the
+projected table from the MOUSE words [0x484ec]/[0x484f0] (minus window
+origin) on EVERY framework msg — all switch arms AND the default 0x47b33,
+which the interval-0 pump msg 0x3a (tPF-7) drives ~29x/s — stores the
+legality-gated row under the cursor or 0xffff off any disk, and writes the
+word ONLY on change (0x4753a/0x47548). The commit chain (0x47d99) only
+READS it. Frame law 0x483fa..0x48470 (work/tPF8_gate.asm): frame 2 is the
+LAST write (0x48460..0x4846b), so a hovered disk of ANY state (owned or
+studied) draws frame 2; the edge 0xf3 arm (0x48314) keys on the same word.
+COLOUR MEASUREMENT (the port's OWN decode plane, 828 px — the tRSV1d
+witness n; tools/shp_pngdump's raw .idx is a PARTIAL 197-px walk for this
+lib, do not pin from it): resring k0 mean (170,108,75) WARM, k1 (63,99,145)
+dim, k2 (76,157,198) BRIGHT BLUE (brightest frame), k3 (171,104,99).
+D28 item 20 "hover -> highlighted blue" = frame 2 [verified]; the pre-
+tPF-10 "gold path 0x5caac" label was a MISREAD of the blitter CHOICE at
+0x484c4 (frame 2 is blue at pixels). Item 19's "click turns yellowish"
+maps [inferred] to the WARM k0 studied ring the disk settles into after
+the commit + cursor leaves — no yellow frame exists in the lib; vendor
+day-20 repro stays user-time-gated (D30). Re-entry clears the word
+(0x476f2) — the vendor persists NOTHING of the ring highlight across
+screens; persistence = the studied row DAT_00076492 (frame 0 + disk fill
+q + panel text), already ported.
+PORT FIX: resSel re-driven by SDL_MOUSEMOTION + the resCam pump leg via
+resHoverWord (researchview.h inline, store-on-change verbatim); click leg
+uses the same helper (vendor re-hit 0x47da5), the bare latch is gone.
+Pins tests/test_hoverselect_tpf10.cpp x4 (word law incl 0xffff leg,
+frame last-write order, colour measurement, ui wiring); mutation 5/5
+scripts/tPF10_mutate.sh; witness scripts/tPF10_witness.sh +
+tPF10_hover_census.py VERDICT PASS seed 5 (hover 827 changed px / blue
+545->789, off-disk clears to idle render, re-entry re-acquires; log legs
+hover 0 -> -1 -> study). HARNESS: run_tests CHECK does not return — a
+substr(find-token npos) in a wiring pin ABORTS the whole suite (mutation
+M3 round 1); guard window extractions after a find CHECK.

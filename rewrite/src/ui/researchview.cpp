@@ -299,13 +299,14 @@ void ResCam::tick() {
     else if (latchMove == 2) posZ += kDollyStep;
 }
 
-int resNodeFrame(int row, bool studied, bool owned, bool selected) {
+int resNodeFrame(int row, bool studied, bool owned, bool hover) {
     // 0x483fa..0x48470 VERBATIM (P10): esi=1 default; studied-and-not-owned
-    // -> 0; owned -> 3; SELECTED overrides with 2.
+    // -> 0; owned -> 3; the HOVER word (win+0x9db, tPF-10) overrides with 2
+    // LAST (0x48460..0x4846b) — a hovered owned row draws frame 2.
     int esi = 1;
     if (studied && !owned) esi = 0;
     if (owned) esi = 3;
-    if (selected) esi = 2;
+    if (hover) esi = 2;
     (void)row;
     return esi;
 }

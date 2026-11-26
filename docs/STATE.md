@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-26T07:40
+updated: 2026-11-26T10:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,46 +233,41 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-10 RESEARCH HOVER/SELECT VISIBILITY (D28 items 19/20: "when I
-hover over a circle, it should be highlighted blue, and when I click a
-circle, the circle should turn a kind of yellowish color"; plus "If I exit
-that screen and return, the circle I selected is no longer highlighted" —
-selection must PERSIST across screen re-entry, and the SET project must be
-distinguishable from a mere hover).
-Ordering rationale: tPF-9 just landed (D28 item 13), and items 19/20 are
-the ONLY research-screen D28 items left that need no user ruling — item 22
-(mineral framing) is the help.shp k0 FRAME SHIP gated on the OQ-005 D1
-ruling (TPF5-A), tPF-1b VENDOR day-20 repro is user-time-gated (D30),
-TPF6-CPU-A awaits a user throttle ruling, TPF7-C is a feel-grading ask.
-The frame law is ALREADY CITED (research.md P10 esi law 0x483fa..0x48470:
-resNodeFrame 1 default / 0 studied-not-owned / 3 owned / 2 SELECTED
-override, gold path 0x5caac) and the selected-row word is cited
-(row==word[win+0x9db]) — the port has resNodeFrame wired at ui.cpp:3229.
-Steps: (1) CITATION FIRST (D30): diff the port's frame-selection against
-the esi law — does the port pass a live SELECTED flag (click sets it,
-survives screen exit/re-entry = vendor win+0x9db lifetime; check whether
-the vendor word survives leaving state 20: the win struct init site from
-tRS-V1 banked work/ asm; hover word law per tPF-6 sibling 0xac @0x3ac14
-was PLANET-screen — find the RESWIN hover/selected msg pair in the input
-chain 0x47xxx bank, do NOT assume)? (2) MEASURE the ring-frame colours:
-resring.shp k0..k3 ring-mean colours (port blit already 1:1 per tRS-V1d)
-— confirm frame 2 reads yellowish and what the HOVER leg paints (vendor
-may highlight hover via the edge-colour 0xf3 substitution ALREADY ported
-— 0x48314..0x48321; if the hover-blue is an artifact of the selected-edge
-law, port the SELECTED state and both symptoms may close together). (3)
-SHIP + pins (new tests/test_hoverselect_tpf10.cpp WITH CMakeLists entry —
-tPF-4 trap) + mutation (scripts/tPF9_mutate.sh skeleton: snapshot preflight,
-anchor at DEFINITION, copy-back + md5) + witness (Xvfb :99 scratch, kill
-BY PID; census boxes must start x>=16 — tPF-9 frame-border trap; the
-hover leg needs xsend warp + a POLLLED read of the app's own hover log if
-one exists, else pixel-diff hover-vs-idle frames).
-DO NOT re-derive: the tPF-9 stray-text law (closed this iteration —
-research.md S12), the tPF-8 start/edge/frame law, the RESEARCH control
-laws (tPF-7), the fire-loop CADENCE (tPF-7b), the ORBITAL SLOT/CLICK laws
-(tPL-V2/tPF-6), the STRIP ANCHOR law (tPF-5), the DISK FILL law (tRS-V2),
-or re-litigate tPF-3. TPF7-A/C/D, TPF6-A/B/CPU-A, TPF5-A/TPF4-A/B,
-TRSV1b-A, TRSV1-C named-open. help.shp-k0 FRAME SHIP stays gated on the
-user's OQ-005 ruling (D1). PRIOR-SESSION QUEUE: tPF-1b VENDOR day-20 repro;
+NEXT tPF-11 RESEARCH-SCREEN MINERAL FRAMING (D28 item 22: "The mineral
+framing is missing from this screen") + TPF5-A RESOLUTION.
+Ordering rationale: tPF-10 just landed (items 19/20); item 22 is the ONLY
+research-screen D28 item left. The STATE note "help.shp-k0 FRAME SHIP
+stays gated on the user's OQ-005 ruling (D1)" is PROBABLY STALE — D1
+RULED 2026-11-09 (docs/DECISIONS.md ruling-page blocks) and OQ-005 CLOSED
+t367 with the corner-anchor fallback; step (1) must VERIFY that reading
+against the ruling text before treating the ship as gated. tPF-1b VENDOR
+day-20 repro stays user-time-gated (D30); TPF6-CPU-A awaits a user
+throttle ruling; TPF7-C is a feel-grading ask — none iterable.
+Steps: (1) GATE AUDIT FIRST: read docs/DECISIONS.md D1 ruling blocks +
+the OQ-005 ledger row; record verbatim what the ruling does/does not
+cover for FRAME-ART SHIP (vs codec decode). If a real gate stands, name
+TPF11-A and fall back THIS iteration to TPF7-A (per-msg release-mask
+split 0x38 vs 0x39, fully static, shippable — research.md S10 SEAMS).
+(2) FRAME LAW: which lib + record frames RESWIN itself — walk windows.txt
+SHAPEFRAME words for RESWIN and the PLIND/PLPRO/PLPOP/PLRES indicators
+(D9 banked: parser 0x57e10 stores WORD[rec+0x1e]; widget blit 0x31004
+reads HIWORD dword[rec+0x1c], -1 = no frame; PLSQUARE carries SHAPEFRAME
+0 = record 0). Runtime registry law tPF-4: ctx ds:0x9f10c+0x7d0+id*32 +
+the bulk-registration sites; help.shp k0 (336x256, tPF-5 measured) is the
+POPUP answer — do NOT assume it is the reswin answer. (3) SHIP + pins
+(new tests/test_frame_tpf11.cpp WITH CMakeLists entry — tPF-4 trap) +
+mutation (scripts/tPF10_mutate.sh skeleton: snapshot preflight, anchors
+at DEFINITION incl .h inline helpers, copy-back + md5) + witness (Xvfb
+:99 scratch, kill BY PID; census boxes x>=16; crop y46/y>=456; PIN
+PIXELS ONLY FROM THE PORT decode plane, never tools/shp_pngdump raw .idx
+— tPF-10 partial-walk trap).
+DO NOT re-derive: the tPF-10 hover-word/frame/colour law (research.md
+S13 — closed this iteration), the tPF-9 stray-text law (S12), the tPF-8
+start/edge law, the RESEARCH control laws (tPF-7/7b), the ORBITAL
+SLOT/CLICK laws, the STRIP ANCHOR law, the DISK FILL law (S9), or
+re-litigate tPF-3. TPF7-A/C/D, TPF6-A/B/CPU-A, TPF4-A/B, TRSB1-B and
+TRSV1b-A (PARTIAL CLOSED tPF-7: f32[0x9f108]==1.0 4233/4233 saves)
+named-open. PRIOR-SESSION QUEUE: tPF-1b VENDOR day-20 repro;
 TPF6-CPU-A if the user rules.
 STANDING: D28 file scratchpad/t433-build-feedback.txt is the item authority;
 refcap PNGs in scratchpad/; scratch savedir law; C1-C5 + race intro stay
@@ -299,7 +294,51 @@ clickdn/clickup + a POLLLED stop condition on the app's own log, never a
 fixed sleep sized for an old cadence. PIXEL-CENSUS TRAP (tPF-9): the RESWIN
 frame border gray (120,120,120) sits INSIDE the kDim/kText +-40 tolerance —
 corner-text boxes must start at x>=16, and the planet starfield scatters
-few white px anywhere: empty-box threshold <=8, label-present >=30.
+few white px anywhere: empty-box threshold <=8, label-present >=30. RUN_TESTS CRASH TRAP (tPF-10): harness CHECK does NOT return — a source-window pin that substr()s a find() result after the CHECK ABORTS the whole suite (substr(npos) throw) and mutation sweeps mis-score it; guard extractions with if (pos != npos) and count a nonzero exit with no FAIL line as CAUGHT (crash). SHP DUMP TRAP (tPF-10): tools/shp_pngdump raw .idx planes can be PARTIAL walks (resring: 197 px vs the port decode 828 px = the on-screen witness n) — pin pixels from ShapeLibrary::decode, never from the dump tool.
+
+tPF-10 LANDED 2026-11-26 (HOVER-WORD LAW MEASURED + HOVER/SELECT FIX
+SHIPPED: D28 ITEMS 19/20 CLOSED AT BYTES + PIXELS; no OQ row closed — tPF
+tracks none, honest negative, open=[016,019] unchanged).
+PROVED (docs/re/_wip_tPF10.md P1-P3 + docs/re/research.md S13 + scripts/
+tPF10_mutate.sh + tPF10_witness.sh + tPF10_hover_census.py):
+  - LAW: word[win+0x9db] is a HOVER tracker, NOT a click latch — sub
+    0x47478 re-hits the projected table from the MOUSE words on EVERY
+    framework msg (all switch arms + default 0x47b33, pump-driven ~29/s),
+    stores the legal row or 0xffff off-disk, writes ONLY on change
+    (0x4753a/0x47548); commit 0x47d99 only READS it (tRSB1 "SELECTED row
+    word" label corrected). Frame 2 writes LAST (0x48460..0x4846b) so a
+    hovered disk of ANY state shows it; edge 0xf3 keys the same word
+    (0x48314, fresh disasm work/tPF10_edge.asm). Re-entry clears
+    (0x476f2) — vendor persists NO ring highlight; persistence = studied
+    row (frame 0 + fill q + panel), already ported.
+  - COLOURS MEASURED (port decode plane, 828 px): k2 (76,157,198) BRIGHT
+    BLUE = item 20's hover highlight [verified]; k0 (170,108,75) WARM =
+    post-commit settle [inferred bridge]; the "gold path 0x5caac" label
+    was a MISREAD of the blitter choice — corrected in place S8(f).
+  - SHIP: resSel re-driven by SDL_MOUSEMOTION + resCam pump leg via
+    resHoverWord (researchview.h inline, store-on-change verbatim); click
+    leg uses the same helper (vendor re-hit 0x47da5); bare latch GONE;
+    witness instrument "ui research hover <row>" (fflush law honoured).
+  - PINS test_hoverselect_tpf10 x4 (word law incl 0xffff + pan-button
+    legs; frame last-write order; colour measurement +-6; ui wiring with
+    npos-guarded windows), CMakeLists entry ADDED, suite 586->590/0/0.
+    MUTATION 5/5 CAUGHT (M1 hover-override dropped 6; M2 off-disk leg
+    removed 3 — anchored at the .h INLINE definition after round-1
+    anchor miss; M3 motion leg unwired 1 after the crash trap was fixed
+    — round 1 ABORTED the suite pre-FAIL, mis-scored SURVIVED; M4 pump
+    leg 1; M5 bare-latch revert 2), md5-verified restore (f7341fd0/
+    c995b9c4/bf0f1f75), green after.
+  - WITNESS VERDICT PASS seed 5: box(34,210)-(94,270) hover 827 changed
+    px, blue-family 545->789, off-disk clears to idle render (0 changed,
+    blue back to 545), re-entry hover re-acquires and matches first
+    hover (21 px); log legs hover 0 -> -1 -> 0 -> "ui research study
+    Orbital Structures". HARNESS: awk fields off the app's OWN center
+    line are $5/$6 ("center <row> <x> <y>") — first draft read $4/$5 and
+    warped to (0,64).
+  - Sitting check ran FIRST (exit 0, byte-identical to
+    tPF9_pre_sitting.out — stale assignment stood). Production ring
+    untouched; scratch Xvfb killed BY PID. GATE_EXIT=0, LEDGER AUDIT OK.
+    NEXT tPF-11 mineral framing + TPF5-A (D28 item 22).
 
 tPF-9 LANDED 2026-11-26 (STRAY TEXTS D28 ITEM 13 CLOSED AT THREE CITING
 LEGS; no OQ row closed — tPF tracks none, honest negative, open=[016,019]
