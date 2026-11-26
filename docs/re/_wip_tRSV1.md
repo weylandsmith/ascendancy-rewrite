@@ -500,6 +500,9 @@ disk at game start?! [unverified vs vendor; seam TRSV1c-D] The witness
 dolly-outs to make one visible. resCenter re-log fires on (row,x,y) CHANGE;
 "offframe" line when no visible Available centre.
 OPEN SEAMS carried: TRSV1b-A (dolly step f32[0x9f108] unrecovered, pinned 1.0),
-TRSV1c-D (rest camera shows no clickable frontier disk — vendor may dolly-in
-on entry or the frontier geometry differs; hit law itself is cited), restree
+TRSV1c-D CLOSED tPF-8 2026-11-26 (docs/re/research.md S11): the off-frame
+frontier at rest was the PORT's uncited owned-rows-0/1/2 start default, not
+the camera — vendor start mask is 0x00 for every row x race (72/72 boot
+saves), so the roots {0,2,6} ARE the frontier and sit on-frame at the rest
+camera (witness centres (63,239)/(406,239)/(234,343), no dolly needed), restree
 .shp consumer (TRSV1-C, unchanged).

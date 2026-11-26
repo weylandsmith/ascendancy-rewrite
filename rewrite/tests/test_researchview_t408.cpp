@@ -22,6 +22,7 @@
 #include "ui/researchview.h"
 
 #include <cctype>
+#include <algorithm>
 #include <cstdio>
 #include <fstream>
 #include <map>
@@ -204,9 +205,20 @@ TEST(researchview_partition_t408) {
         if (nd.state == au::TechNodeState::Blocked) CHECK(!prereq);
         if (nd.state == au::TechNodeState::Owned) CHECK(camp->techRowOwnedFor(ag::kPlayer, nd.row));
     }
-    CHECK(owned > 0);        // scenario start-techs exist
-    CHECK(avail > 0);        // and at least the roots' children are studyable
-    CHECK(blocked > 0);      // the deep tree is gated
+    CHECK(owned == 0);       // tPF-8 START LAW: vendor mask 0x00 for every
+                             // row x race at game start (72/72 boot saves,
+                             // scripts/tPF8_startmask_census.py)
+    CHECK(avail == 3);       // EXACTLY the three prereq-empty roots
+    {
+        int availRows[3] = {-1, -1, -1};
+        int k = 0;
+        for (const auto& nd : nodes)
+            if (nd.state == au::TechNodeState::Available && k < 3)
+                availRows[k++] = nd.row;
+        std::sort(availRows, availRows + 3);
+        CHECK(availRows[0] == 0 && availRows[1] == 2 && availRows[2] == 6);
+    }
+    CHECK(blocked == 63);    // everything else gated (roots unowned)
     CHECK(study <= 1);       // at most one current topic
 }
 
@@ -220,8 +232,13 @@ TEST(researchview_set_study_law_t408) {
         kRepo + "/extracted/ascend00/restree.txt", err);
     const auto nodes = au::researchNodes(*camp, tree, ag::kPlayer);
     int availRow = -1, blockedRow = -1, ownedRow = -1;
-    for (const auto& nd : nodes) {
-        if (nd.state == au::TechNodeState::Available && availRow < 0) availRow = nd.row;
+    // tPF-8: nothing is owned at start (vendor law), so the Owned-state row
+    // comes from the cited FREE GRANT channel (0x46f4f..0x46f64 marks one
+    // unowned row; test_freetech_t203 pins that law separately).
+    const int granted = camp->freeTechGrantFor(ag::kPlayer);
+    for (const auto& nd : au::researchNodes(*camp, tree, ag::kPlayer)) {
+        if (nd.state == au::TechNodeState::Available && availRow < 0 && nd.row != granted)
+            availRow = nd.row;
         if (nd.state == au::TechNodeState::Blocked) blockedRow = nd.row;
         if (nd.state == au::TechNodeState::Owned) ownedRow = nd.row;
     }

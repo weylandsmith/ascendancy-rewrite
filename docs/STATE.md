@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-26T03:30
+updated: 2026-11-26T07:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,33 +233,41 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-8 RESEARCH-TREE VISIBILITY (D28 item 21: "frontier nodes not
-visible / tree unreadable at rest"; the PRIOR-SESSION QUEUE's first entry,
-follows tPF-7b which closed the sibling cadence defect).
-Ordering rationale: tPF-7b LANDED the fire-loop cadence on all three pumps
-(cosmos/systemCam/research all 34 ms, witnessed 30/s) — of the remaining
-queue items, tPF-8 is the only one actionable without the user: tPF-1b
-VENDOR day-20 repro is user-time-gated (D30), TPF6-CPU-A awaits a user
-ruling on throttle-vs-repaint. tPF-8 is a fresh law derivation (D28 item 21
-says lines-from-known-only in the vendor): the port already draws edges
-(+27px law, research.md S8) and frontier disks; the derivation owed is WHICH
-lines/nodes the vendor renders visible at rest vs only-on-hover/select, and
-whether the rest camera's off-frame frontier (TRSV1c-D) is vendor law or port
-fit error. Static material is in hand (reswin painter chain 0x48383..0x48501
-fully cited, _wip_tRSV1.md P1-P13); expect 1 debugger session at most.
-Steps: (1) re-read the vendor edge-draw gate (0x48566 legality call per row —
-which edges survive when NEITHER endpoint is frontier?); (2) census our
-render vs t252 vendor frame (crop law in _wip_tPRU.md); (3) ship + pins +
-mutation (reuse tPF7b_mutate.sh skeleton — restore-copy-back+md5) + witness
-(tRSB1_witness.sh family).
-DO NOT re-derive the RESEARCH control laws (closed tPF-7), the fire-loop
-CADENCE (closed tPF-7b: Camera3d::kFireLoopMs=34 + ResCam::kPumpMs=34, both
-witnessed; scripts/tPF7b_witness.sh re-runnable), the ORBITAL SLOT/CLICK
-laws (tPL-V2/tPF-6), the STRIP ANCHOR law (tPF-5), or re-litigate tPF-3.
-TPF7-A/C/D, TPF6-A/B/CPU-A, TPF5-A/TPF4-A/B, TRSV1c-D (may CLOSE via tPF-8
-step 2) named-open. help.shp-k0 FRAME SHIP stays gated on the user's OQ-005
-ruling (D1). PRIOR-SESSION QUEUE: tPF-1b VENDOR day-20 repro; TPF6-CPU-A if
-the user rules.
+NEXT tPF-9 RESEARCH-SCREEN STRAY TEXTS (D28 item 13: "There should be no
+'click set project' text in the upper right frame, and no 'Esc return to
+galaxy' text in the lower left"). Both strings are STILL RENDERED by the
+port: ui.cpp:2784 ("click: set project", the upper-right hint) and
+ui.cpp:3495 ("Esc: return to galaxy", bottom-left).
+Ordering rationale: this is the ONLY remaining D28 item actionable without
+the user — item 22 (mineral framing of the research screen) is the help.shp
+k0 FRAME SHIP gated on the user's OQ-005 D1 ruling (TPF5-A); tPF-1b VENDOR
+day-20 repro is user-time-gated (D30); TPF6-CPU-A awaits a user throttle
+ruling. tPF-8 just landed the rest-state law, so the research-screen paint
+site is fresh in the docs.
+Steps: (1) CITATION FIRST (D30 POPUP/DERIVATION LAW): check t252 vendor
+frame (work/screens/t252/research_open_game.png, crop law in _wip_tPRU.md:
+RESWIN interior (8,46)-(476,472)) for ANY text in the upper-right and
+bottom-left corners — vision + pixel leg; corroborate against the reswin
+paint chain (0x48165..0x485b5 body has NO text call — grep the banked dump
+work/tRS_reswin_fn.asm for 0x5c2xx/0x5c3xx text-primitive callsites inside
+the loop) and windows.txt for a TYPE that would own such a label. If the
+vendor DOES paint something there (a different text), that is the law to
+port, not delete — report honestly. (2) SHIP: delete/gate the two strings
+in ui.cpp per the citation (the Escape-ROUTING behaviour stays — ui.cpp:1829
+comment cites t252 "Escape returns to galaxy" as BEHAVIOUR; item 13 is
+about the LABEL). (3) pins (reuse test_starttech_tpf8.cpp file or a new
+test_strays_tpf9.cpp WITH a CMakeLists entry — tPF-4 trap) + mutation
+(scripts/tPF8_mutate.sh skeleton: snapshot preflight, copy-back + md5) +
+witness (extend scripts/tPF8_witness.sh census with a text-pixel leg in
+the two corner boxes, control = pre-fix build or the crop's other corners).
+DO NOT re-derive: the tPF-8 start/edge/frame law (closed this iteration —
+docs/re/research.md S11; TRSV1c-D CLOSED), the RESEARCH control laws
+(tPF-7), the fire-loop CADENCE (tPF-7b), the ORBITAL SLOT/CLICK laws
+(tPL-V2/tPF-6), the STRIP ANCHOR law (tPF-5), the DISK FILL law (tRS-V2),
+or re-litigate tPF-3. TPF7-A/C/D, TPF6-A/B/CPU-A, TPF5-A/TPF4-A/B,
+TRSV1b-A, TRSV1-C named-open. help.shp-k0 FRAME SHIP stays gated on the
+user's OQ-005 ruling (D1). PRIOR-SESSION QUEUE: tPF-1b VENDOR day-20 repro;
+TPF6-CPU-A if the user rules.
 STANDING: D28 file scratchpad/t433-build-feedback.txt is the item authority;
 refcap PNGs in scratchpad/; scratch savedir law; C1-C5 + race intro stay
 DEFERRED (D25); when a counter reads zero check PRODUCER EXISTENCE first
@@ -283,6 +291,48 @@ hard-coded. HOLD WITNESS LAW (tPF-7): measure stickiness AFTER the click
 settles (press->release gap ticks are legitimate); hold legs use xsend
 clickdn/clickup + a POLLLED stop condition on the app's own log, never a
 fixed sleep sized for an old cadence.
+
+tPF-8 LANDED 2026-11-26 (OPENING-RESEARCH LAW MEASURED + ZERO-START SHIPPED:
+D28 ITEM 21 CLOSED AT BYTES + 72/72 SAVES; TRSV1c-D CLOSED; no OQ row closed
+— tPF tracks none, honest negative, open=[016,019] unchanged).
+PROVED (docs/re/_wip_tPF8.md P1..P4 + docs/re/research.md S11 + scripts/
+tPF8_startmask_census.py + tPF8_witness.sh + tPF8_rest_census.py +
+tPF8_mutate.sh):
+  - LAW: (a) vendor starts ZERO techs — mask byte ds:0x7478e+0x4b*i == 0x00
+    for 66 rows x 8 races in 72/72 boot saves (progress ds:0x764a0 all 0,
+    studied ds:0x76492 = 0xffff; matrix ring saves show 0x0f roots LATER =
+    play, not start). (b) draw loop 0x48524: gate 0x48566 (0x46d3c THIS row)
+    je 0x48504 skips the WHOLE body incl. the prereq-edge loop 0x48275 (per-
+    prereq legality 0x4829f) => edge iff BOTH endpoints legal; 0x46d3c
+    verbatim raw (owned-bit short-circuit 0x46d88; 0xFF-terminated prereq
+    loop = roots ALWAYS legal). (c) roots = column k=0 -> screen y 240..381
+    INSIDE the clip at rest [inferred from cited constants; witnessed].
+    Item 21 ("three circles, no lines at start") is the THEOREM of a+b.
+  - DEFECT: campaign.cpp constructor granted ownedTech rows 0/1/2 to every
+    owner — uncited pre-t45 default ("banked open" comment, now GONE).
+    Consequences: roots rendered owned, frontier off-frame (the TRSV1c-D
+    scare), lines at start. FIX = delete the grant; engine draw code needed
+    NO change (already matched the law — the ui edge loop gates both
+    endpoints verbatim).
+  - PINS test_starttech_tpf8 x5 (CMakeLists entry ADDED), suite 578->583/
+    0/0; fixture migrations cited in place (t408 partition pinned to
+    owned==0/avail==3=={0,2,6}; tPF-6 filter premise via setAllTechs; four
+    turn-bound extensions where research must now actually happen).
+    MUTATION 4/4 CAUGHT (M1 grant-at-definition 15; M2 legality polarity 3;
+    M3 edge-endpoint gate dropped 1; M4 Y-centre 240->640 8), restored
+    md5-verified (fac85a0c/2ac4d33c/9db07a9a), green after.
+  - WITNESS VERDICT PASS seed 5: FIRST-available centre row 0 at (64,240)
+    with ZERO dolly; census EXACTLY 3 ring comps n=828 (centres match the
+    k=0 arithmetic), 0 strays. Census crop law banked: exclude y=46 header
+    line + y>=456 panel row. tRSB1 RE-RUN PASS (study row 0 at (99,240),
+    panel-green 0->754). PLAYTHROUGH regenerated RC=0: A 2024 Extinct
+    t1067, B seed 23 CONTROL t1582, C 13 Extinct t536 — all FINITE; named
+    residue: zero-mask start makes some smoke seeds die early (42 t10) —
+    dynamics shift, not a law claim.
+  - Sitting check ran FIRST (exit 0, 45,227 rows, byte-identical to
+    tPF7b_pre_sitting.out — stale assignment stood). Production ring
+    untouched; scratch Xvfb killed BY PID. GATE_EXIT=0, LEDGER AUDIT OK.
+    NEXT tPF-9 stray texts (D28 item 13).
 
 tPF-7b LANDED 2026-11-26 (COSMOS/SYSTEMCAM PUMP CADENCE FIXED AT THE
 FIRE-LOOP PERIOD 34 ms — SHIPPED/PINNED/MUTATION-PROVEN/WITNESSED 30/s; the

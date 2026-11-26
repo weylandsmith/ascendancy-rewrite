@@ -108,6 +108,11 @@ TEST(planlist_armed_cell_filter_tpf6) {
     CHECK(size >= 0);
     ps.pop = 0;
     ps.cellClasses.assign(size_t(surf) + 10, 1);
+    // tPF-8: nothing is REQUIRES-legal at game start (vendor zero-mask law),
+    // which would make the filter test vacuous. The fixture's PREMISE is the
+    // full REQUIRES-passing table — force it directly (tPL-D1 fixture
+    // precedent); the filter law under test is tech-state-independent.
+    c.setAllTechs(ag::kPlayer, true);
 
     // -1 baseline: every REQUIRES-passing item, both domains present.
     const auto base = au::projectOptionsFor(c, star);

@@ -554,3 +554,46 @@ nothing"). Full working log docs/re/_wip_tPF7.md P1-P7; headline laws:
   on kSpinTickMs=1000 (29x slow by this derivation — next research-screen
   adjacent task); user item 16 "feel" ruling may still land via a grade
   page (TPF7-C).
+
+## 11. tPF-8 OPENING-RESEARCH + REST-VISIBILITY LAW (2026-11-26, D28 item 21)
+
+THE LAW (three legs, all cited):
+  (a) START MASK: the vendor begins with ZERO known techs for every race.
+      MEASURED [verified]: mask byte ds:0x7478e + 0x4b*i (the field the
+      legality predicate 0x46d3c reads via dword[rec+0x47]>>24, tPF-8 raw
+      disasm work/tPF8_legal.asm: owned-bit short-circuit 0x46d88; else
+      all-prereqs-owned loop 0x46d91..0x46dd3, 0xFF-terminated = vacuously
+      legal for roots) is 0x00 for all 66 rows x 8 races in 72/72 boot
+      captures; progress words ds:0x764a0 all 0; studied words ds:0x76492
+      = 0xffff (scripts/tPF8_startmask_census.py). The production-ring
+      matrix saves show 0x0f on the roots LATER (races own them via play).
+  (b) DRAW/EDGE GATE [verified, raw work/tPF8_gate.asm + tPF8_edge.asm]:
+      loop head 0x48524 reads row word[win+0x913+2k]; 0x48566 calls
+      0x46d3c(THIS row); je 0x48504 skips the ENTIRE body (shape word q,
+      prereq-edge loop 0x48275..0x48383, study chip, node blit). An
+      illegal row paints NOTHING. Edge(row->p) additionally requires
+      0x4829f legality(p). => edge exists iff BOTH endpoints legal.
+  (c) REST-CAMERA FRAME [inferred from cited constants; witnessed]: roots
+      are column k=0 (Y=30k+15*(i&1) in {0,15}); y = chop(1194.256*Y/Z+0.5)
+      +240 over Z_cam in [127,173] gives 240..381 — INSIDE the RESWIN clip
+      (7,46)-(476,472). Witness centres (63,239)/(406,239)/(234,343).
+
+CONSEQUENCES: at game start the screen is EXACTLY three root disks (rows
+0 Orbital Structures, 2 Tonklin Diary, 6 Xenobiology), zero lines, zero
+other circles — the direct theorem of (a)+(b), i.e. D28 item 21 verbatim.
+The frontier is clickable WITHOUT dollying (seam TRSV1c-D CLOSED: the
+off-frame-at-rest frontier was the port's wrong owned set, not the camera).
+
+PORT DEFECT FIXED: campaign.cpp constructor granted ownedTech rows 0/1/2
+to every owner — an uncited pre-t45 default ("banked open"). Now deleted;
+pins test_starttech_tpf8 x5 (zero mask, frontier=={0,2,6}, zero edges +
+anti-vacuity, roots on-frame, retired-name + both-edge-gate wiring).
+Mutation 4/4 caught (scripts/tPF8_mutate.sh). Witness
+scripts/tPF8_witness.sh + tPF8_rest_census.py VERDICT PASS (seed 5: first
+available centre row 0 at (64,240), no dolly; exactly 3 ring comps n=828,
+0 strays). tRSB1 re-run PASS (study row 0, panel-green 0->754).
+Census crop law: exclude y=46 (header line) and y>=456 (panel row) —
+chrome the tree law does not constrain.
+OPEN RESIDUE (named): early-AI lethality on smoke seeds (seed 42 Extinct
+t10) — the zero-mask start changes early dynamics; finiteness holds on all
+recorded runs (PLAYTHROUGH tPF-8 block), per-seed outcomes are not law.

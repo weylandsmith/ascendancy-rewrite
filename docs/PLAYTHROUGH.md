@@ -1,6 +1,6 @@
 # Headless playthrough record
 
-Regenerated 2026-11-25T01:07:29-05:00 by scripts/record_playthrough.sh from the
+Regenerated 2026-11-26T07:42:09-05:00 by scripts/record_playthrough.sh from the
 current binary. Victory conditions and their vendor files: docs/re/turnloop.md §1.
 
 ## Run A — headless, seed 2024 (t295 home draw: Extinct t285 — uniform homes put real lethal neighbours on the player; the old spread-BFS never could)
@@ -10,13 +10,13 @@ $ ./rewrite/build/ascendancy --headless --campaign 1600 --seed 2024
 archives: 3 54 328 89  (.bin tables parsed: 7)
 SDL 2.32.4 initialised (video driver: (null))
 campaign seed=2024 stars=50 lanes=53 ai=6
-turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-  ... (331 lines elided)
-  [t302] owner 6 captured Algol
-  [t303] owner 6 captured Cambria
-  [t303] VICTORY: Extinct (end-xtnc.txt)
-VICTORY Extinct via end-xtnc.txt on turn 303 (score 0%)
+turn   1 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
+turn   2 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
+  ... (2026 lines elided)
+  [t1067] owner 6 captured Nougat
+  [t1067] owner 1 captured Highbeam
+  [t1067] VICTORY: Extinct (end-xtnc.txt)
+VICTORY Extinct via end-xtnc.txt on turn 1067 (score 0%)
 ```
 
 ## Run B — headless, seed 23 (Control exemplar t1406 under the t295 home draw; t291's seed-1 exemplar re-drew to Extinct t266)
@@ -26,13 +26,13 @@ $ ./rewrite/build/ascendancy --headless --campaign 1600 --seed 23
 archives: 3 54 328 89  (.bin tables parsed: 7)
 SDL 2.32.4 initialised (video driver: (null))
 campaign seed=23 stars=50 lanes=53 ai=6
-turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-  ... (1722 lines elided)
-  [t1583] owner 0 colonised Bob
-  [t1583] Shared star-lane intelligence with FLUDENTRI (2 lanes)
-  [t1583] VICTORY: Control (end-ctrl.txt)
-VICTORY Control via end-ctrl.txt on turn 1583 (score 68%)
+turn   1 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
+turn   2 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
+  ... (1738 lines elided)
+  [t1582] owner 0 colonised Bob
+  [t1582] Shared star-lane intelligence with FLUDENTRI (2 lanes)
+  [t1582] VICTORY: Control (end-ctrl.txt)
+VICTORY Control via end-ctrl.txt on turn 1582 (score 68%)
 ```
 
 ## Run C — Xvfb/X11, seed 13
@@ -42,13 +42,13 @@ $ xvfb-run -a ./rewrite/build/ascendancy --campaign 1600 --seed 13
 archives: 3 54 328 89  (.bin tables parsed: 7)
 SDL 2.32.4 initialised (video driver: x11)
 campaign seed=13 stars=50 lanes=53 ai=6
-turn   1 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-turn   2 | player stars  1 score   2% techs  3 | ai stars 1 1 1 1 1 1
-  ... (539 lines elided)
-  [t486] owner 5 captured Menthol
-  [t486] owner 4 captured Ajax
-  [t486] VICTORY: Extinct (end-xtnc.txt)
-VICTORY Extinct via end-xtnc.txt on turn 486 (score 0%)
+turn   1 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
+turn   2 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
+  ... (616 lines elided)
+  [t536] owner 4 captured Ajax
+  [t536] owner 4 captured Menthol
+  [t536] VICTORY: Extinct (end-xtnc.txt)
+VICTORY Extinct via end-xtnc.txt on turn 536 (score 0%)
 ```
 
 ## Run D — UI under Xvfb, autoplay 3 turns (gate 4c)

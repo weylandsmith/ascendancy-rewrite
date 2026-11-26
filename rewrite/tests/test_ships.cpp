@@ -113,7 +113,10 @@ TEST(ship_drive_hops_gate_launches) {
     // driveHopsFor 0 or a researched ladder value; after enough turns owner
     // 0 must clear the gate and reach hops>=1.
     auto c = makeShipCampaign(7);
-    for (int t = 0; t < 40 && c.driveHopsFor(0) == 0; t++) c.advance();
+    // tPF-8: zero-mask start (vendor law) — row 7 must be RESEARCHED via
+    // 2 -> 7 before any drive gizmo gates open; 40 turns sufficed only
+    // under the retired free-rows-0/1/2 default.
+    for (int t = 0; t < 400 && c.driveHopsFor(0) == 0; t++) c.advance();
     CHECK(c.driveHopsFor(0) >= 1);
     CHECK(c.driveHopsFor(0) <= 3);  // clamp in ships.md §3
 }

@@ -448,7 +448,10 @@ TEST(species_player_species_selection) {
     CHECK(line.find("SA_FastLaneTravel") != std::string::npos);
     // Passive FastLaneTravel only shows its effect once a drive is researched
     // (hops gate, ships.md §3); driveHopsFor must stay inside its clamp.
-    for (int t = 0; t < 80 && c.driveHopsFor(0) == 0; ++t) c.advance();
+    // tPF-8: zero-mask start — the drive gate (resReq row 7) now needs the
+    // chain 2 -> 7 RESEARCHED first, so the bound is the research horizon,
+    // not 80 free-ladder turns.
+    for (int t = 0; t < 400 && c.driveHopsFor(0) == 0; ++t) c.advance();
     CHECK(c.driveHopsFor(0) >= 1);
     CHECK(c.driveHopsFor(0) <= 3);
 }

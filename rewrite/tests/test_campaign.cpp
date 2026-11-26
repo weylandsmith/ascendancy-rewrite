@@ -487,8 +487,12 @@ TEST(campaign_pop_cap_seed_law_oq016) {
 TEST(campaign_research_progresses) {
     REQUIRE_DATA();
     auto c = makeCampaign(3);
-    for (int t = 0; t < 40 && !c.over(); ++t) c.advance();
-    CHECK(c.techsOwned(ag::kPlayer) > 0);  // home lab researches within 40 turns
+    // tPF-8: with the vendor zero-mask start there is no free owned row —
+    // research must COMPLETE one (home res channel starts 0, accrues after
+    // the build order plants producers; tRS-V2w witness saw the first
+    // progress ~t118, completion later). 400 turns = the witness bound.
+    for (int t = 0; t < 400 && !c.over(); ++t) c.advance();
+    CHECK(c.techsOwned(ag::kPlayer) > 0);  // home lab researches within 400 turns
 }
 
 TEST(campaign_deterministic_same_seed) {
@@ -631,7 +635,10 @@ TEST(campaign_research_picker_law_oq016) {
     // always picks when candidates exist) — a "sentinel => never research"
     // model would show zero AI completions.
     auto c = makeCampaign(2024);
-    for (int t = 0; t < 60 && !c.over(); ++t) c.advance();
+    // tPF-8: zero-mask start — the AI chain must RESEARCH from the roots
+    // (its res bucket is likewise build-gated); 60 turns only saw the old
+    // free rows 0/1/2. 600 = same order as the expansion-gate guard.
+    for (int t = 0; t < 600 && !c.over(); ++t) c.advance();
     int totalOwned = 0;
     for (int o = 1; o <= 6; ++o) totalOwned += c.techsOwned(o);
     CHECK(totalOwned > 0);

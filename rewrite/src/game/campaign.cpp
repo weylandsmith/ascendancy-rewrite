@@ -355,7 +355,6 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     // 2.6, p~0.07) but has NO code counterpart — uniform draw per disasm.
     // Factory/Lab/Shipyard never on a first-save home (t40) — v1 seeding
     // stays RETIRED. The CB cell class feeds the channel words (T40).
-    // Constructor opening-research grant unmeasured — banked open.
     for (int s = 0; s < n; ++s) {
         if (owner_[s] < 0) continue;
         int b = itemId("Colony Base");
@@ -364,9 +363,16 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
         ps.items.push_back(b);
         ps.itemCells.push_back(drawCbCell(ps));
     }
-    if (tree_ && tree_->all().size() > 2)
-        for (auto& techSet : ownedTech)
-            if (techSet.size() > 2) { techSet[0] = true; techSet[1] = true; techSet[2] = true; }
+    // tPF-8 OPENING-RESEARCH LAW: the vendor starts EVERY race with ZERO
+    // known techs. MEASURED: mask byte ds:0x7478e + 0x4b*i (the field the
+    // legality predicate 0x46d3c reads via dword[rec+0x47]>>24) is 0x00 for
+    // all 66 rows x 8 races in 72/72 boot captures (scripts/
+    // tPF8_startmask_census.py; progress words ds:0x764a0 all 0, studied
+    // words ds:0x76492 = 0xffff sentinel). The old rows-0/1/2 grant was an
+    // uncited pre-t45 default ("banked open" comment) and caused D28 item
+    // 21: the roots rendered owned, the frontier sat off-frame, and the
+    // start screen showed lines the vendor never paints (edge law 0x48275
+    // gates BOTH endpoints on 0x46d3c; docs/re/_wip_tPF8.md P1-P3).
 }
 
 int Campaign::itemId(const std::string& name) const {
