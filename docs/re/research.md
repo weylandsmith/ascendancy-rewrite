@@ -515,3 +515,42 @@ tRSV1b linear dump desyncs in this region).
       scripts/tRSV2w_witness.sh VERDICT PASS (grown fill q 2->3, seed 5,
       --autoplay). SEAM TRSV2w-A: the port KEEPS progress across a
       re-queue where the vendor zeroes it (0x46b90 leg unmodelled).
+
+
+## 10. tPF-7 CONTROL LAW — HOLD-WITHOUT-LATCH + PUMP 0x3a AT ~29/s (2026-11-26)
+D28 items 16/17/18 ("rotation too slow / buttons latch / scroll does
+nothing"). Full working log docs/re/_wip_tPF7.md P1-P7; headline laws:
+- PRESS TABLE (0x47b44..0x47c42, masks 0xf7/0xfb/0xfd/0xfe) was already
+  ported faithfully — the complaint was NEVER the press table.
+- RELEASE LEG (the missing half): framework msg 0x38/0x39 -> handler
+  0x47d3b `latch &= ~mask` clears the released control's bit pair; press
+  tail 0x47c48 (kind ebp==4) SCHEDULES that release via 0x5669c. Vendor
+  help resmove states the resulting feel verbatim: "Use the right mouse
+  button if you want to move or rotate continuously." Port: SDL_BUTTON_UP
+  -> ResCam::releaseRot/releaseMove (resHold tracker, ui.cpp).
+- PUMP = msg 0x3a (NOT cosmos's 0x3b), self-scheduled at reswin init
+  (0x47713 -> 0x56374 with INTERVAL 0) and fired by the framework loop
+  0x56608 (`cmp DAT_000a2044,[slot+0x12]`; repeat-add interval=0 => fires
+  every pass). LOOP RATE derived from two cited measurements: live cosmos
+  pump 58.5 deg/s (tNG-S S30-X5) / 2 deg cosmos delta (t416 F2) = 29.25
+  passes/s => kPumpMs=34. The old kSpinTickMs=1000 rested on a t302 MISREAD
+  ("within ~1 s" first-fire latency, flagged 'NOT yet a law') -> research
+  controls ran 29x slow (same family as the tNG-R S28 30x cosmos defect).
+- FLOAT[0x9f108] (pump magnitude multiplier) MEASURED = 1.0 EXACTLY in
+  4233/4233 banked saves (scripts/tPF7_zoomscale_census.py); the earlier
+  "~0 denormal" note (_wip_tNGS S12) was an offset misread.
+- SHIPPED + PINS: test_rescontrols_tpf7 x4, suite 572->576/0/0; MUTATION
+  5/5 CAUGHT (M1 cadence 1000: 4 fails; M2 release no-op: 11; M3 pair-bleed:
+  3; M4 wiring removed: 2; M5 press polarity: 22; M5 first draft anchored
+  the .h but pressPair lives in researchview.cpp — anchor the DEFINITION).
+- WITNESS scripts/tPF7_witness.sh VERDICT PASS (seed 5): hold 4.75 s = 58
+  centre re-logs (~12/s logged-change floor, cadence leg), freeze after
+  clickup <= 1, no sticky latch after a plain click, latch 0 0 logged.
+  Four existing research witnesses migrated to xsend clickdn/clickup +
+  POLLLED hold (the sleep-6 idiom assumed the sticky 1 s latch).
+- SEAMS: TPF7-A per-msg release mask split (0x38 vs 0x39; ship-safe =
+  releasing control clears its own pair); TPF7-D direct fire-loop period
+  measurement (expected 34.2 +-0.6 ms); tPF-7b cosmos/systemCam pumps still
+  on kSpinTickMs=1000 (29x slow by this derivation — next research-screen
+  adjacent task); user item 16 "feel" ruling may still land via a grade
+  page (TPF7-C).

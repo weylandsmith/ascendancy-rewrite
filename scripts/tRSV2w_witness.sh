@@ -34,9 +34,18 @@ shot() { sleep 0.3; DISPLAY=$DISP import -window root -crop 640x480+0+0 +repage 
 die() { kill $APP 2>/dev/null; kill $XV 2>/dev/null; echo "VERDICT FAIL ($1)"; exit 1; }
 X 318 335            # RESUME -> campaign map
 X 553 223            # RESEARCH rail -> state 20
-X 578 449            # press MOVEUP: dolly out (frontier off-frame at rest)
-sleep 6
-X 578 449            # press again: dolly stops
+# tPF-7 HOLD LAW: the dolly runs ONLY while the button is held (vendor
+# release msg 0x47d3b). clickdn = press-only, clickup = release-only; the
+# hold is POLLED against the app's centre re-log (adaptive across cadences —
+# the pump now runs at ResCam::kPumpMs=34, not the old 1000).
+BEFORE_N=$(grep -c "ui research center " "$OUT/app.log")
+X clickdn 578 449
+for i in 1 2 3 4 40 80; do
+  sleep 0.5
+  NOW_N=$(grep -c "ui research center " "$OUT/app.log")
+  [ "$NOW_N" -ge $((BEFORE_N + 8)) ] && break
+done
+X clickup 578 449
 sleep 1
 shot before
 CENTER_LINE=$(grep "ui research center " "$OUT/app.log" | grep available | tail -1)

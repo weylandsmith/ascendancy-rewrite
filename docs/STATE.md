@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-25T23:55
+updated: 2026-11-26T01:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,54 +233,105 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF-7 RESEARCH CONTROLS (PRIOR-SESSION QUEUE item 2; D28 file
-scratchpad/t433-build-feedback.txt — read the file's research-screen items
-FIRST and take the highest-numbered unresolved research-screen complaint as
-the task definition; if none remains open, re-derive the queue entry from the
-D28 file and say so in the landing).
-Ordering rationale: tPF-6 closed item 11's port gap and measured item 12 to
-an attributed honest negative (hover adds no CPU class; the planet screen's
-constant 60fps full-repaint floor is the cost — TPF6-CPU-A named-open, a PORT
-decision needing a user ruling, not vendor law, so it must not stall the
-queue). The research screen is where the freshest user traffic sits (tRS
-chain landed V1d/V2p/V2w recently; TRSV2w-A/TRSV1-C seams live there) and
-items 11/12 needed no user input, so the next queue rows are tPF-7 then
-tPF-8 tree visibility; tPF-1b VENDOR day-20 repro stays user-time-gated (D30).
-Steps: (1) read D28 research items + docs/re/research.md S7-S9 + _wip_tRSV2.md
-P11-P12 (the --autoplay --dbg-res rig and the tRSV2p_witness.sh census are the
-proven instruments — reuse them, do NOT re-derive the disk-fill law);
-(2) port + pins (CMakeLists entry for any new test file — tPF-4 trap);
-(3) witness: build BOTH run_tests AND ascendancy first; Xvfb BY-PID kill.
-DO NOT re-derive the ORBITAL SLOT/CLICK laws (closed tPL-V2/tPF-6:
-docs/re/_wip_tPF6.md P0-P7 + _wip_tPLV2.md; orbitalSlotHitFor/orbitalHoverOutline/
-projectOptionsFor(armedCell) are the three law fns — scripts/tPF6_witness.sh +
-tPF6_cpu_probe.sh re-run both arms). DO NOT re-derive the STRIP ANCHOR law
-(closed tPF-5). DO NOT re-litigate tPF-3. TPF6-A (Build whose list holds no
-buildable row, item-35 exemption shape), TPF6-B (vendor PLANLIST per-cell
-filter site unrecovered — our filter is an inferred bridge), TPF6-CPU-A
-(port repaint throttle — user ruling) named-open. TPF5-A/TPF4-A/B named-open.
-help.shp-k0 FRAME SHIP stays gated on the user's OQ-005 ruling (DECISIONS.md
-D1). PRIOR-SESSION QUEUE: tPF-8 tree visibility; tPF-1b VENDOR day-20 repro;
-TPF6-CPU-A if the user rules.
+NEXT tPF-7b COSMOS/SYSTEM-VIEW PUMP CADENCE (sibling defect of tPF-7,
+banked docs/re/_wip_tPF7.md P6 + docs/re/research.md S10; the PRIOR-SESSION
+QUEUE's tPF-8 tree visibility follows).
+Ordering rationale: tPF-7 MEASURED the framework fire-loop rate (58.5 deg/s
+live cosmos pump / 2 deg cited delta = 29.25 passes/s, kPumpMs=34 shipped
+for the RESEARCH pump) — the cosmos dial (Camera3d::kSpinTickMs=1000,
+cam3d.h:95) and systemCam pump in the SAME ui.cpp block ride the same
+misread constant and are 29x slow by the SAME derivation; the fix is now a
+small mechanical port + pins + witness with the law already banked. tPF-8
+(tree visibility, D28 item 21 lines-from-known-only) is a fresh law
+derivation and costs more; tPF-1b VENDOR day-20 repro stays user-time-gated
+(D30); TPF6-CPU-A awaits a user ruling.
+Steps: (1) ui.cpp: pump the cosmos/systemCam on the derived cadence
+(ResCam::kPumpMs analog or shared constant — decide once, cite once);
+confirm the galaxy-map spin witness scripts (tNGS4_ours_shot.sh family)
+still pass, ADD a cadence leg like scripts/tPF7_witness.sh (census via
+"ui cam yaw" log rate); (2) pins: cam3d cadence + wiring (CMakeLists entry
+only if a new test file — tPF-4 trap); (3) mutation campaign reusing the
+tPF7_mutate.sh restore-copy-back+md5 skeleton; (4) RE-VERIFY the t302
+misread claim in cam3d.h:92-95 comments while there (bank the correction in
+docs/re/t399-galaxy-map-3d.md + _wip_t425 lineage so no doc re-tightens on
+1000 ms).
+DO NOT re-derive the RESEARCH control laws (closed tPF-7: research.md S10 +
+_wip_tPF7.md P1-P7; ResCam::pressPair/releaseRot/releaseMove/kPumpMs are
+the four law fns; scripts/tPF7_witness.sh re-runnable). DO NOT re-derive
+the ORBITAL SLOT/CLICK laws (tPL-V2/tPF-6), the STRIP ANCHOR law (tPF-5),
+or re-litigate tPF-3. TPF7-A (per-msg release mask split 0x38 vs 0x39),
+TPF7-C (user feel ruling on item-16 speed), TPF7-D (direct fire-loop
+period measurement, expected 34.2+-0.6 ms), TPF6-A/B/CPU-A, TPF5-A/TPF4-A/B
+named-open. help.shp-k0 FRAME SHIP stays gated on the user's OQ-005 ruling
+(D1). PRIOR-SESSION QUEUE: tPF-8 tree visibility; tPF-1b VENDOR day-20
+repro; TPF6-CPU-A if the user rules.
 STANDING: D28 file scratchpad/t433-build-feedback.txt is the item authority;
 refcap PNGs in scratchpad/; scratch savedir law; C1-C5 + race intro stay
 DEFERRED (D25); when a counter reads zero check PRODUCER EXISTENCE first
 (D29); POPUP/DERIVATION LAW (D30, binding): every visible property cited or
 named-open, no eyeballed geometry. NEVER read whole lines of
-work/r1/playcap/live-timeline.jsonl. The 433 composite is SIDE-BY-SIDE — LEFT
-= PORT, RIGHT = VENDOR (the F6 retraction); vendor-half pixel counts tolerate
-resampling (families, not exact values). WITNESS TRAP (tPF-3e): port witnesses
-run ./rewrite/build/ascendancy — build BOTH run_tests AND ascendancy before
-any witness. APPEND TRAP (tPF-5): `open(p,"w").write(open(p).read()+x)`
-TRUNCATES BEFORE reading — read first, or open(p,"a") (cost a WIP section
-once). MUTATION TRAP (tPF-5, RE-WITNESSED tPF-6): a campaign's stdout is
-BLOCK-BUFFERED — an empty log is NOT death; pgrep -f is the only liveness
-test; and restore() must COPY BACK from the snapshot THEN md5-verify — a
-verify-only restore leaves the mutant on disk when a later patch assert fails
-mid-campaign (old_string is gone because the previous mutant rewrote it).
+work/r1/playcap/live-timeline.jsonl. The 433 composite is SIDE-BY-SIDE —
+LEFT = PORT, RIGHT = VENDOR (the F6 retraction); vendor-half pixel counts
+tolerate resampling (families, not exact values). WITNESS TRAP (tPF-3e):
+port witnesses run ./rewrite/build/ascendancy — build BOTH run_tests AND
+ascendancy before any witness. APPEND TRAP (tPF-5): `open(p,"w").write(
+open(p).read()+x)` TRUNCATES BEFORE reading — read first, or open(p,"a")
+(cost a WIP section once). MUTATION TRAP (tPF-5, RE-WITNESSED tPF-6/tPF-7):
+a campaign's stdout is BLOCK-BUFFERED — an empty log is NOT death; pgrep -f
+is the only liveness test; restore() must COPY BACK from the snapshot THEN
+md5-verify; and ANCHOR THE MUTATION AT THE DEFINITION (tPF-7 M5 first
+draft anchored pressPair in the .h where only the declaration lives — the
+count==1 assert caught it, no mutant shipped, but the sweep lost a slot).
 Fixture trap (tPF-6): fixed-item CHECKs must use base-list (REQUIRES-passing)
 items, and ACTIVE/armed cell pairs must be DERIVED from the grid law, never
-hard-coded.
+hard-coded. HOLD WITNESS LAW (tPF-7): measure stickiness AFTER the click
+settles (press->release gap ticks are legitimate); hold legs use xsend
+clickdn/clickup + a POLLLED stop condition on the app's own log, never a
+fixed sleep sized for an old cadence.
+
+tPF-7 LANDED 2026-11-26 (RESEARCH CONTROLS: HOLD-WITHOUT-LATCH RELEASE LEG
++ PUMP 0x3a AT DERIVED ~29/s SHIPPED/PINNED/MUTATION-PROVEN/WITNESSED; the
+"~1/s" t302 reading REFUTED as a first-fire-latency MISREAD; no OQ row
+closed — tPF tracks none, honest negative, open=[016,019] unchanged).
+PROVED (docs/re/_wip_tPF7.md P1..P7 + docs/re/research.md S10 +
+scripts/tPF7_witness.sh + tPF7_mutate.sh + tPF7_zoomscale_census.py):
+  - ITEMS 17/18 ROOT CAUSE: the port had the vendor press table VERBATIM
+    (0x47b44..0x47c42) but NO release leg. Vendor law: press kind ebp==4
+    schedules msg 0x38 (0x47c48 -> 0x5669c one-shot queue); release family
+    msg 0x38/0x39 -> handler 0x47d3b `latch &= ~mask` + cancels pending
+    (0x56730, ebx=-1). help resmove TEXT corroborates ("move or rotate
+    continuously"). FIX: resHold tracker + SDL_MOUSEBUTTONUP ->
+    ResCam::releaseRot/releaseMove; screen-exit zeroes latches (window-init
+    0x47679 `mov [0x764c4],ecx` ecx=0).
+  - ITEM 16 + THE CADENCE MYTH: reswin self-schedules PUMP msg 0x3a (not
+    cosmos 0x3b!) with INTERVAL 0 at init (0x47713 -> 0x56374 stride-0x16
+    slot win+0x44ae); fire-loop 0x56608 `cmp DAT_000a2044,[slot+0x12]`
+    fires EVERY pass when interval=0. Loop rate DERIVED from two cited
+    numbers: 58.5 deg/s live (tNG-S S30-X5) / 2 deg cosmos delta (t416 F2)
+    = 29.25 passes/s => kPumpMs=34 (was 1000, a t302 MISREAD — 'within ~1 s'
+    was first-fire latency, flagged 'NOT yet a law'). FLOAT[0x9f108]
+    MEASURED 1.0 EXACTLY 4233/4233 saves (the 'denormal ~0' note was an
+    offset misread; neighbours ARE garbage — read the exact target).
+  - PINS test_rescontrols_tpf7 x4 (release every state + pair isolation;
+    hold monotonic + flip-while-held + DEAD (0,1) + freeze-after-release;
+    cadence self-consistency; ui.cpp wiring source-text), CMakeLists entry
+    ADDED, suite 572->576/0/0. MUTATION 5/5 CAUGHT (M1 1000ms: 4; M2
+    release no-op: 11; M3 pair-bleed: 3; M4 wiring removed: 2 — pure pins
+    blind, wiring pin load-bearing; M5 press polarity: 22 after re-anchoring
+    at the DEFINITION researchview.cpp, trap banked). Restored md5-verified
+    x3 files, green after.
+  - WITNESS VERDICT PASS seed 5: hold 4.75 s = 58 centre re-logs, freeze
+    <=1 after clickup, no sticky latch after a plain click, 'latch 0 0'
+    logged. Leg-(b) first FAIL was a MEASUREMENT-WINDOW flaw (press->release
+    gap ticks) — HOLD WITNESS LAW banked. tools/xsend gained clickdn/
+    clickup; FOUR existing research witnesses migrated to clickdn/clickup +
+    POLLLED hold (sleep-6 assumed the sticky 1 s latch); tRSB1 re-run post-
+    migration VERDICT PASS.
+  - SIBLING DEFECT queued tPF-7b: cosmos/systemCam pumps still
+    kSpinTickMs=1000 = 29x slow by the same derivation. Sitting check ran
+    FIRST (exit 0, 45,227 rows, newest t=1335 — stale assignment stood).
+    Production ring untouched; scratch Xvfb killed BY PID. GATE_EXIT=0,
+    LEDGER AUDIT OK. NEXT tPF-7b cosmos pump cadence.
 
 tPF-6 LANDED 2026-11-25 (ORBITAL CLICK CHAIN VERIFIED WORKING + ARMED-CELL
 PLANLIST FILTER SHIPPED/PINNED/MUTATION-PROVEN; ITEM 12 ATTRIBUTED BY

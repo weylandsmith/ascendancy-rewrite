@@ -153,6 +153,7 @@ add_executable(run_tests
   tests/test_research3d_t419.cpp
   tests/test_researchhit_trsb1.cpp
   tests/test_researchgeom_trsvc.cpp
+  tests/test_rescontrols_tpf7.cpp
   tests/test_researchanchor_tRSV1d.cpp
   tests/test_researchfill_trsv2p.cpp
   tests/test_resapply_trsv2w.cpp

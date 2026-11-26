@@ -31,9 +31,18 @@ X 553 223            # RESEARCH rail (windows.txt 474,208-632,238) -> state 20
 # legal disk). DOLLY OUT (MOVEUP pair, kResMoveUp centre 578,449): each tick
 # posZ -= 1 shrinks the tree toward (235,240); ~5 ticks pulls row 3's centre
 # inside the clip rect. The app RE-LOGS the centre on every change.
-X 578 449            # press MOVEUP: latch (1,0)
-sleep 6              # ~6 pump ticks (kSpinTickMs cadence)
-X 578 449            # press again: latch back to (0,0), dolly stops
+# tPF-7 HOLD LAW: the dolly runs ONLY while the button is held (vendor
+# release msg 0x47d3b). clickdn = press-only, clickup = release-only; the
+# hold is POLLED against the app's centre re-log (adaptive across cadences —
+# the pump now runs at ResCam::kPumpMs=34, not the old 1000).
+BEFORE_N=$(grep -c "ui research center " "$OUT/app.log")
+X clickdn 578 449
+for i in 1 2 3 4 40 80; do
+  sleep 0.5
+  NOW_N=$(grep -c "ui research center " "$OUT/app.log")
+  [ "$NOW_N" -ge $((BEFORE_N + 8)) ] && break
+done
+X clickup 578 449
 sleep 1
 shot before          # AFTER dolly settles: local leg isolates the CLICK
 # RE-DERIVE the click point from the app's LATEST centre report (vendor law).

@@ -55,13 +55,19 @@ int main(int argc, char** argv) {
     const char* mode = argv[2];
     /* t244 modes: key KEYSYM [ch] (press+release), keyup KEYSYM [ch] (press
      * ONLY, for hold semantics), click x y / click3 x y (Button1/Button3 —
-     * Ascendancy ship move/attack orders are RIGHT-click), legacy x y. */
+     * Ascendancy ship move/attack orders are RIGHT-click), clickdn x y /
+     * clickup x y (tPF-7: press-only / release-only BUTTON1 at (x,y) —
+     * hold-semantics witnesses), legacy x y. */
     int is_key = strcmp(mode, "key") == 0 || strcmp(mode, "keyup") == 0;
     int is_warp = strcmp(mode, "warp") == 0;  // tPL-V2: pointer-only move
-    int press_only = strcmp(mode, "keyup") == 0;
+    int is_dn = strcmp(mode, "clickdn") == 0;    // tPF-7 press only
+    int is_up = strcmp(mode, "clickup") == 0;    // tPF-7 release only
+    int press_only = strcmp(mode, "keyup") == 0 || is_dn;
+    int release_only = is_up;
     int button = strcmp(mode, "click3") == 0 ? Button3 : Button1;
-    if (argc < (is_key || strcmp(mode,"click")==0 || strcmp(mode,"click3")==0 || is_warp ? 4 : 3)) {
-        fprintf(stderr, "usage: xsend title (key|keyup KEYSYM [ch] | click|click3 x y | warp x y | x y)\n");
+    if (argc < (is_key || is_dn || is_up || strcmp(mode,"click")==0 ||
+                strcmp(mode,"click3")==0 || is_warp ? 4 : 3)) {
+        fprintf(stderr, "usage: xsend title (key|keyup KEYSYM [ch] | click|click3|clickdn|clickup x y | warp x y | x y)\n");
         return 2;
     }
     int x = 0, y = 0; KeySym ks = 0; KeyCode kc = 0;
@@ -71,7 +77,8 @@ int main(int argc, char** argv) {
         ks = XStringToKeysym(argv[3]);
         if (ks == 0L) { fprintf(stderr, "bad keysym '%s'\n", argv[3]); return 2; }
         kc = XKeysymToKeycode(d, ks);
-    } else if (strcmp(mode, "click") == 0 || strcmp(mode, "click3") == 0 || is_warp) {
+    } else if (strcmp(mode, "click") == 0 || strcmp(mode, "click3") == 0 ||
+               is_warp || is_dn || is_up) {
         x = atoi(argv[3]); y = atoi(argv[4]);
     } else {   /* legacy positional: xsend title x y */
         x = atoi(argv[2]); y = atoi(argv[3]);
@@ -104,7 +111,8 @@ int main(int argc, char** argv) {
         e.xbutton.same_screen = True;
         e.xbutton.subwindow = None;  /* target IS the event window */
     }
-    for (press = 1; press >= (press_only ? 1 : 0); press--) {
+    for (press = release_only ? 0 : 1;
+         press >= (press_only ? 1 : 0); press--) {
         if (is_key) {
             e.type = press ? KeyPress : KeyRelease;
             e.xkey.window = w;

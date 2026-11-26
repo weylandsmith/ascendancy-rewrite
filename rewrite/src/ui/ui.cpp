@@ -265,6 +265,14 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // word win+0x9db; frame-2 + gold-rim + edge-0xf3 driver).
     ResCam resCam;
     int resSel = -1;
+    // tPF-7 HOLD TRACKER: which research control pair the LEFT button is
+    // currently latched (0 none, 1 rot pair, 2 move pair). The vendor
+    // framework delivers a button-release msg (0x38/0x39 -> handler 0x47d3b,
+    // latch &= ~mask) when the mouse comes up; SDL gives us the same fact as
+    // SDL_MOUSEBUTTONUP. Without this leg the port's latches stuck forever
+    // (D28 item 17 "latch on when clicked once"). Cleared on screen exit too
+    // (vendor window-init 0x47679 zeroes the whole latch word).
+    int resHold = 0;
     Uint32 lastResPumpMs = 0;
     int resCenterLogged = -1;  // row of the last "ui research center" line
     int resCenterX = -1, resCenterY = -1;  // its centre (change-detector)
@@ -700,6 +708,19 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 } else if (projectHover != -1) {
                     projectHover = -1;
                 }
+            } else if (ev.type == SDL_MOUSEBUTTONUP &&
+                       ev.button.button == SDL_BUTTON_LEFT && resHold) {
+                // tPF-7 RELEASE LEG (vendor msg 0x38/0x39 handler 0x47d3b:
+                // latch &= ~pair-mask). The framework routes the button
+                // release to the control that holds the grab, so the release
+                // applies wherever the pointer drifted. rot pair = bits2/3,
+                // move pair = bits0/1 (windows.txt control->msg map).
+                if (resHold == 1) resCam.releaseRot();
+                else resCam.releaseMove();
+                resHold = 0;
+                std::printf("ui research latch %d %d\n",
+                            resCam.latchRot, resCam.latchMove);
+                std::fflush(stdout);
             } else if (ev.type == SDL_MOUSEBUTTONDOWN && ev.button.button == SDL_BUTTON_LEFT) {
                 Pt p{ev.button.x, ev.button.y};
                 if (abilityOpen) {
@@ -914,10 +935,26 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         // = windows.txt SENDMESSAGE verbatim): the rotate
                         // pair latches basis yaw +-3 deg/tick, the move pair
                         // dollies camera posZ -1/+1 (P10/P11 VERBATIM).
-                        case ResHit::RotLeft:  resCam.pressRot(false); break;
-                        case ResHit::RotRight: resCam.pressRot(true);  break;
-                        case ResHit::MoveUp:   resCam.pressMove(false); break;
-                        case ResHit::MoveDown: resCam.pressMove(true);  break;
+                        // tPF-7: the press also records WHICH PAIR the button
+                        // holds, so SDL_MOUSEBUTTONUP applies the vendor
+                        // release leg (0x47d3b) — motion runs only while the
+                        // button is held (D28 item 17; help resmove).
+                        case ResHit::RotLeft:
+                            resCam.pressRot(false);
+                            resHold = 1;
+                            break;
+                        case ResHit::RotRight:
+                            resCam.pressRot(true);
+                            resHold = 1;
+                            break;
+                        case ResHit::MoveUp:
+                            resCam.pressMove(false);
+                            resHold = 2;
+                            break;
+                        case ResHit::MoveDown:
+                            resCam.pressMove(true);
+                            resHold = 2;
+                            break;
                         case ResHit::Node: {
                             panned = false;
                             resSel = h.row;  // vendor selection word
@@ -3525,18 +3562,23 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 systemCam.tick();
                 lastSysPumpMs = nowMs;
             }
-            // tRS-V1c research pump: the vendor msg-0x3b equivalent applies
-            // ONE dat_764c4 delta per tick per latched pair (yaw/dolly).
-            // Cadence reuses kSpinTickMs (documented deviation, P11).
+            // tPF-7 RESEARCH PUMP: fires at the framework fire-loop period
+            // (ResCam::kPumpMs=34, derived _wip_tPF7.md P6) — the old
+            // kSpinTickMs=1000 reuse was a t302 misread, 29x slow.
             if (screen != kScreenResearch) {
                 // Vendor window-init law (P1a): re-entry clears the
-                // selection word win+0x9db (and the witness row).
+                // selection word win+0x9db (and the witness row). tPF-7:
+                // also zero the latch word + hold tracker — window init
+                // 0x47679 `mov [0x764c4], ecx` (ecx=0) runs on every reswin
+                // open, so a latch never survives a screen round-trip.
                 resSel = -1;
                 resCenterLogged = -1;
                 resFillLogged.clear();
+                resCam.latchRot = resCam.latchMove = 0;
+                resHold = 0;
             }
             if (resCam.moving() &&
-                nowMs - lastResPumpMs >= (Uint32)Camera3d::kSpinTickMs) {
+                nowMs - lastResPumpMs >= (Uint32)ResCam::kPumpMs) {
                 resCam.tick();
                 lastResPumpMs = nowMs;
             }

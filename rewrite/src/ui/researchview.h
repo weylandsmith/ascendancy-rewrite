@@ -177,6 +177,21 @@ struct ResCam {
     void pressRot(bool pairB) { latchRot = pressPair(latchRot, pairB); }
     void pressMove(bool pairB) { latchMove = pressPair(latchMove, pairB); }
 
+    // tPF-7 RELEASE LAW (0x47d3b VERBATIM shape: `ebx=[0x764c4]; not ebp;
+    // and ebx,ebp; mov [0x764c4],ebx` — the framework's button-release msg
+    // 0x38/0x39 ANDs OUT the released control's bit pair; our 2-bit pair
+    // encoding means AND-OUT == inactive state 0): releasing the mouse
+    // clears THAT control's pair. This is what makes the vendor dials
+    // CONTINUOUS-WITHOUT-LATCH (press moves while held, release stops) —
+    // the user's D28 item 17 target, corroborated verbatim by the vendor's
+    // own help resmove text (extracted/ascend00/help.txt: "Use the right
+    // mouse button if you want to move or rotate continuously").
+    // Per-msg mask split (0x38 vs 0x39) = seam TPF7-A; pair ownership by
+    // control is windows.txt (RESROTLEFT/RIGHT msg 50/51 = rot pair,
+    // RESMOVEUP/DOWN msg 52/53 = move pair).
+    void releaseRot() { latchRot = 0; }
+    void releaseMove() { latchMove = 0; }
+
     // Pump deltas (0x47c88/0x47cdb VERBATIM): rot (1,0)->+3deg, (1,1)->-3,
     // else 0 (DEAD pumps nothing); move (1,0)->-1, (1,1)->+1 x step, else 0
     // applied to posZ. NOTE: posZ -= 1 moves the camera AWAY from the tree
@@ -186,6 +201,17 @@ struct ResCam {
     static constexpr double kRotStepDeg = 3.0;
     static constexpr double kDollyStep = 1.0;  // seam TRSV1b-A (runtime
                                                // f32[0x9f108] not restored)
+    // tPF-7 PUMP CADENCE: the framework fire-loop period. The reswin
+    // self-schedules msg 0x3a with INTERVAL 0 at window init (0x47713 ->
+    // 0x56374, docs/re/_wip_tPF7.md P4/P5), so it fires every pass of the
+    // loop at 0x56608. The loop rate is DERIVED from two cited numbers:
+    // live-measured cosmos pump rate 58.5 deg/s (tNG-S S30-X5, run
+    // dbg-tngh-20261123-130254) / cosmos pump delta 2.0 deg VERBATIM
+    // (cam3d.h kRotStepDeg, t416 F2) = 29.25 passes/s => 34 ms. The old
+    // kSpinTickMs=1000 rested on a t302 MISREAD ("within ~1 s" first-fire
+    // latency, explicitly 'NOT yet a law'); see _wip_tPF7.md P6. Direct
+    // fire-loop measurement = seam TPF7-D.
+    static constexpr int kPumpMs = 34;
     void tick();
     bool moving() const { return latchRot != 0 || latchMove != 0; }
 };
