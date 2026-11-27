@@ -771,3 +771,63 @@ docs/re/_wip_tPF7a.md P1-P6. Headlines:
   table: 10 fails; M2 release-pair swap: 27). WITNESS tPF7_witness.sh
   VERDICT PASS post-fix (hold 60 re-logs/4.76 s, freeze-after-release 1,
   no sticky latch).
+
+## 17. tRS-SC SCROLL LAW — [win+0xe3] IS CAMERA POSITION Y (2026-11-27,
+D32-L4 "the up/down buttons on the research screen are supposed to scroll up
+and down, not zoom in and out"). Working log docs/re/_wip_tRS-SC.md P0-P4.
+
+(a) NO SEPARATE SCROLL MSG EXISTS (the assignment's honest-negative branch
+was NOT taken — the msg tree says more): the reswin handler dispatch tree
+0x47aa1..0x47b41 was read EXHAUSTIVELY. Arms: 0xc/0xd scale the pump
+multiplier GLOBAL f32[0x9f108] (guards qword[0x24fc]/f32[0x850a0]);
+0x21/0x2e/0x46 are debug owned/studied editors; 0x47 -> 0x47a53 writes
+[win+0xe3]=-100.0; 0x48-0x4f,0x51 -> 0x47a7a writes [win+0xe3]=1e15
+(0x49742400) — a scroll-to-start/scroll-to-end idiom; the press arms are
+msg 50..53 (0x32-0x35). The hotkey dispatcher 0x54d18 (key word [0x484c4],
+tree read in full) has NO reswin leg at all. So the buttons the user
+pressed ARE msg 52/53 and the vendor's scroll IS the move-pair pump.
+
+(b) FIELD-ROLE CORRECTION (the defect): the camera struct base is win+0xab
+(0x470fe lea eax,[ebp+0xab] -> 0x203b8); the POSITION triplet is cam+0x34
+== win+0xdf/0xe3/0xe7 (0x20414 negates it into the affine translation
+t=-pos). INIT 0x4710e-0x47123: mov [eax],0 / [eax+4],0 / [eax+8],0xc3160000
+=> x=0, y=0, z=-150.0 — the -150 immediate lands at win+0xe7, NOT +0xe3.
+The move-pair pump leg 0x47cd0..0x47d12 fadds +-1.0*[0x9f108] into +0xe3 =
+POSITION Y; win+0xe7 has ZERO write sites in the entire reswin asm window
+(grep census work/tRS_reswin_fn.asm). The tree is a helix along world Y
+(Y=30k+15(i&1), X/Z radius <=23), so the pump SLIDES the display along the
+helix axis — a list scroll — while the port's old posZ dolly changed DEPTH
+= zoom. Port fix: ResCam gains posY (rest 0.0); tick pumps posY; the
+projection vY = world.y - cam.posY (0x53374 consumes the affine output
+verbatim; centres 240/235 unchanged, research.md S8d).
+
+(c) PER-PAINT CLAMP LAW (newly found, previously unported): draw fn 0x47eac
+block 0x47ef1..0x47fc3 — min=max=worldY(row 0) (win+0x147 = first record's
++4; world array win+0x143 stride 0xc, INIT 0x4716b..0x471e3 writes it from
+the generator); loop every row PASSING THE 0x46d3c DRAW SCOPE (0x47f40)
+tightening min/max; then posY=clamp(posY,min,max) (0x47f89: below-min ->
+min, above-max -> max, mov [ebp+0xe3]) BEFORE 0x53374 writes the words the
+hit sub consumes. SEED law: min/max start from row 0's Y whether or not row
+0 passes scope (stale-seed clamp, ported faithfully). Port: resClampPosY
+(researchview.cpp) called at the ui.cpp paint site before projecting.
+Corroboration: the 1e15/-100.0 hotkey writes only make sense against this
+clamp (they saturate it to the ends).
+
+(d) SHIP + PINS + MUTATIONS + WITNESS: press/release law UNCHANGED (tPF-7
+hold semantics intact); pins test_resscroll_tRS_SC x4 (field roles,
+slide-not-scale per-row z2 invariance, clamp law incl seed + scope, paint
+wiring source-pin) + three existing tests re-anchored (t419 dolly block,
+trsvc dolly block, tpf7 move-pair block, tpf7a equivalence uses posY);
+suite 627->631/0/0. MUTATIONS scripts/tRS_SC_mutate.sh M1-M4 ALL CAUGHT
+(M1 posZ-dolly revert=18 fails, M2 clamp neutered=7, M3 paint wiring
+commented=2, M4 vY drops posY=17), restore md5-ok x4. WITNESS
+scripts/tRS_SC_witness.sh rc=0 seed 5: RESMOVEDOWN hold 2 s -> row 0's
+centre 64,240 -> 64,112 (15 pump lines, monotone UP-slide, X CONSTANT 64
+throughout), freeze 0 lines after clickup. The vendor feel: the display
+slides down the helix revealing later columns; nothing scales. TRAP: at
+game start the frontier is the depth-0 ring (Y=0), so posY=0 sits AT the
+clamp bound and BOTH buttons are legitimately inert until techs are owned
+— witnesses must hold RESMOVEDOWN: at posY=0 the UP pair is
+clamped at min (row-0 seed) and legitimately inert, while DOWN
+travels to the frontier's top Y (fresh game: depth-0 rows Y in {0,15} ->
+~100 px of slide, matching the witness 128 px).

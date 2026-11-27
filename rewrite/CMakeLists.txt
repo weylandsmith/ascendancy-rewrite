@@ -165,6 +165,7 @@ add_executable(run_tests
   tests/test_researchhit_trsb1.cpp
   tests/test_researchgeom_trsvc.cpp
   tests/test_rescontrols_tpf7.cpp
+  tests/test_resscroll_tRS_SC.cpp
   tests/test_releaseparam_tpf7a.cpp
   tests/test_campump_tpf7b.cpp
   tests/test_researchanchor_tRSV1d.cpp

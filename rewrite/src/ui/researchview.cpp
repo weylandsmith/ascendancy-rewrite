@@ -236,7 +236,9 @@ std::vector<ResPoint3> researchNodeScreen(const ResearchGeom& geom,
         if (nd.row >= 0 && nd.row < int(geom.world.size())) {
             const ResWorld& w = geom.world[size_t(nd.row)];
             const double vX = double(w.x) * cs - double(w.z) * sn;
-            const double vY = double(w.y);
+            // tRS-SC: vY carries the camera POSITION Y (t = -pos, 0x20414);
+            // the MOVE pair scrolls this — screen rows slide, depth does not.
+            const double vY = double(w.y) - cam.posY;
             const double vZ = double(w.x) * sn + double(w.z) * cs - cam.posZ;
             s.z2 = vZ;
             // Port guard (labelled): the vendor divides unconditionally into
@@ -267,11 +269,12 @@ ResPoint researchNodePos(const ag::ResearchTree& tree, int row, int panX,
     const double cs = std::cos(th), sn = std::sin(th);
     const ResWorld& w = G.world[size_t(row)];
     const double vX = double(w.x) * cs - double(w.z) * sn;
+    const double vY = double(w.y) - cam.posY;  // tRS-SC scroll leg
     const double vZ = double(w.x) * sn + double(w.z) * cs - cam.posZ;
     if (vZ < 1.0) return ResPoint{0, 0};
     return ResPoint{u16wrap(resVendorRound(resFocal() * vX / vZ + 0.5) + 235) +
                         panX,
-                    u16wrap(resVendorRound(resFocal() * double(w.y) / vZ + 0.5) +
+                    u16wrap(resVendorRound(resFocal() * vY / vZ + 0.5) +
                             240) +
                         panY};
 }
@@ -295,11 +298,30 @@ int ResCam::pressPair(int state, bool pairB) {
 
 void ResCam::tick() {
     // Pump deltas (0x47c88..0x47d12 VERBATIM): rot (1,0)->+3, (1,1)->-3,
-    // DEAD/none nothing; move (1,0)->-1, (1,1)->+1 x kDollyStep.
+    // DEAD/none nothing; move (1,0)->-1, (1,1)->+1 x kScrollStep applied to
+    // posY (tRS-SC: the fadd at 0x47d03/0x47d12 targets [esi+0xe3] = camera
+    // POSITION Y, not depth — see the struct comment).
     if (latchRot == 1) yawDeg += kRotStepDeg;
     else if (latchRot == 2) yawDeg -= kRotStepDeg;
-    if (latchMove == 1) posZ -= kDollyStep;
-    else if (latchMove == 2) posZ += kDollyStep;
+    if (latchMove == 1) posY -= kScrollStep;
+    else if (latchMove == 2) posY += kScrollStep;
+}
+
+double resClampPosY(const ResearchGeom& geom,
+                    const std::vector<TechNode>& nodes, double posY) {
+    // 0x47ef1: min=max=Y(row 0) (win+0x147 is the first record's +4 field).
+    if (geom.world.empty() || nodes.empty()) return posY;
+    float lo = geom.world[0].y, hi = geom.world[0].y;
+    for (const TechNode& nd : nodes) {  // 0x47f1f loop, 0x46d3c scope gate
+        if (nd.row < 0 || nd.row >= int(geom.world.size())) continue;
+        if (nd.state == TechNodeState::Blocked) continue;  // 0x47f40 gate
+        const float y = geom.world[size_t(nd.row)].y;
+        if (y < lo) lo = y;   // 0x47f4f/0x47f61
+        if (y > hi) hi = y;   // 0x47f68/0x47f80
+    }
+    if (posY < double(lo)) return double(lo);  // 0x47f89..0x47fa2
+    if (posY > double(hi)) return double(hi);  // 0x47fa4..0x47fbd
+    return posY;
 }
 
 int resNodeFrame(int row, bool studied, bool owned, bool hover) {

@@ -159,12 +159,21 @@ struct ResearchGeom {
 };
 ResearchGeom researchTreeGeometry(const ascend::game::ResearchTree& tree);
 
-// The vendor camera (win+0xab block): position z win+0xe3 (rest -150.0,
-// 0xc3160000 VERIFIED) and the orientation basis yaw (win+0x11f, rotated by
-// 0x53504 = the 0x5324c world-Y mix — the t416 cosmos law). FOCAL is NOT a
-// field: 0x203e4 computes 320/tan((30deg)/2) = 1194.19 once at window init.
+// The vendor camera (win+0xab block; 0x470fe lea eax,[ebp+0xab] -> 0x203b8):
+// position triplet at cam+0x34 == win+0xdf/x/e3/e7 (0x20414 negates it into
+// the affine translation t = -pos). INIT 0x4710e-0x47123 writes x=0, y=0,
+// z=-150.0 (0xc3160000 lands at eax+8 == win+0xe7).
+// tRS-SC FIELD-ROLE CORRECTION (2026-11-27, D32-L4; docs/re/research.md S17):
+// win+0xe3 is position Y (rest 0.0), NOT z. The MOVE pair (bits 0x1/0x2,
+// 0x47cd0..0x47d12) adds +-1.0*[0x9f108] to +0xe3 = a VERTICAL SCROLL along
+// the tree's helix axis; win+0xe7 (depth -150) has ZERO write sites in the
+// whole reswin window. The hotkey arms corroborate: 0x47a53 writes +0xe3 =
+// -100.0 and 0x47a7a writes 1e15 (0x49742400) then repaints — a scroll-to-
+// start / scroll-to-end idiom that only reads sanely for a coordinate the
+// per-paint clamp (resClampPosY below) bounds to the frontier extent.
 struct ResCam {
-    double posZ = -150.0;   // win+0xe3 (MOVE pair dollies this)
+    double posY = 0.0;      // win+0xe3 (MOVE pair scrolls this; tRS-SC)
+    double posZ = -150.0;   // win+0xe7 (rest -150.0; NEVER pumped)
     double yawDeg = 0.0;    // basis yaw (ROT pair)
     // dat_764c4 bit-pair latches encoded 0=(0,0) 1=(1,0) 2=(1,1) 3=(0,1).
     int latchRot = 0, latchMove = 0;
@@ -201,14 +210,16 @@ struct ResCam {
     void releaseMove() { latchMove = 0; }
 
     // Pump deltas (0x47c88/0x47cdb VERBATIM): rot (1,0)->+3deg, (1,1)->-3,
-    // else 0 (DEAD pumps nothing); move (1,0)->-1, (1,1)->+1 x step, else 0
-    // applied to posZ. NOTE: posZ -= 1 moves the camera AWAY from the tree
-    // at z~0 (vZ = z - posZ grows), so RESMOVEUP SHRINKS the tree — the
-    // _wip P10 draft parenthetical "(dolly IN: tree grows)" contradicts the
-    // cited fadd chain and is superseded.
+    // else 0 (DEAD pumps nothing); move (1,0)->-1, (1,1)->+1 applied to
+    // posY (tRS-SC CORRECTION: the pumped field [esi+0xe3] is camera
+    // POSITION Y — see the struct header; the old "posZ dolly shrinks the
+    // tree" reading made the up/down buttons a zoom, D32-L4).
     static constexpr double kRotStepDeg = 3.0;
-    static constexpr double kDollyStep = 1.0;  // seam TRSV1b-A (runtime
-                                               // f32[0x9f108] not restored)
+    static constexpr double kScrollStep = 1.0;  // win+0xe3 units per pump
+                                               // (was kDollyStep; seam
+                                               // TRSV1b-A closed tRS-SC —
+                                               // runtime f32[0x9f108] census
+                                               // 1.0 exact, tPF7_zoomscale)
     // tPF-7 PUMP CADENCE: the framework fire-loop period. The reswin
     // self-schedules msg 0x3a with INTERVAL 0 at window init (0x47713 ->
     // 0x56374, docs/re/_wip_tPF7.md P4/P5), so it fires every pass of the
@@ -223,6 +234,17 @@ struct ResCam {
     void tick();
     bool moving() const { return latchRot != 0 || latchMove != 0; }
 };
+
+// tRS-SC PER-PAINT SCROLL-CLAMP LAW (draw fn 0x47eac, block 0x47ef1..0x47fc3
+// VERBATIM): min=max=worldY(row 0) (win+0x147); for every row PASSING THE
+// 0x46d3c DRAW SCOPE min=min(Y), max=max(Y); then posY = clamp(posY, min,
+// max) (0x47f89: fld pos; fcomp min; jae -> fcomp max; jbe skip; above ->
+// max; below -> min; mov [ebp+0xe3]). Runs on EVERY repaint, so the scroll
+// can never drive the camera outside the frontier's Y-extent. Port: call
+// with the SAME legal predicate as the draw scope, at the paint site, before
+// projecting (the vendor hit sub consumes words the draw already clamped).
+double resClampPosY(const ResearchGeom& geom,
+                    const std::vector<TechNode>& nodes, double posY);
 
 // 320/tan(15deg) = 1194.19 (0x203b8+0x203e4 VERBATIM; the HALF-width-320
 // convention matches the tNGS cosmos camera).
@@ -248,7 +270,7 @@ struct ResPoint3 {
 // legal=false and are NEVER drawn or hittable (P5/P10: 0x48566 gates the
 // draw with the SAME 0x46d3c predicate as the hit sub). panX/panY are a
 // labelled PORT affordance (post-projection screen offsets; the vendor has
-// none — its scroll law is the ResCam basis yaw + posZ dolly above).
+// none — its scroll law is the ResCam basis yaw + posY scroll above, tRS-SC).
 std::vector<ResPoint3> researchNodeScreen(const ResearchGeom& geom,
                                           const std::vector<TechNode>& nodes,
                                           int panX, int panY,

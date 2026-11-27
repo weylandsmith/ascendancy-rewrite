@@ -108,20 +108,23 @@ TEST(research_hold_cycle_tpf7) {
     // Move pair opposes the same way and has the DEAD (0,1) state: press
     // pairA then pairA again reaches (0,0); press pairB from (0,0) reaches
     // (1,1)=2; the (0,1)=3 state pumps NOTHING (0x47cd0 bit0-clear leg).
+    // tRS-SC: the pumped coordinate is posY (win+0xe3), rest 0; depth posZ
+    // is NEVER pumped.
     au::ResCam m;
-    m.pressMove(false);                   // (1,0) => posZ -= 1/tick
+    m.pressMove(false);                   // (1,0) => posY -= 1/tick
     CHECK(m.latchMove == 1);
     m.tick();
-    CHECK(m.posZ < -150.0);
-    m.pressMove(true);                    // (1,1) => posZ += 1/tick
+    CHECK(m.posY < 0.0);
+    CHECK(m.posZ == -150.0);              // depth invariant (tRS-SC)
+    m.pressMove(true);                    // (1,1) => posY += 1/tick
     CHECK(m.latchMove == 2);
-    double z = m.posZ;
+    double z = m.posY;
     m.tick();
-    CHECK(m.posZ > z);
+    CHECK(m.posY > z);
     m.latchMove = 3;                      // vendor DEAD state (0,1)
-    z = m.posZ;
+    z = m.posY;
     m.tick();
-    CHECK(m.posZ == z);                   // pumps nothing
+    CHECK(m.posY == z);                   // pumps nothing
     m.releaseMove();
     CHECK(m.latchMove == 0);
 }

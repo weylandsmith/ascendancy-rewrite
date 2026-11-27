@@ -858,6 +858,9 @@ cluster + SEVEN species -> exits; AVERAGE density -> survives.
 Rows: tXT-1 (extinct law + capture provenance), tWIN-1 (eject must
 reuse window; two-window bug), tRS-SC (research up/down = SCROLL not
 zoom - our press-table row likely mapped them to the zoom pair).
+ALL THREE LANDED 2026-11-27 (tXT-1 peace-start root cause, tWIN-1
+single-window handoff arg, tRS-SC camera posY scroll law research.md S17 —
+the port's move pair was a depth dolly; fixed + clamped + witnessed).
 
 ## D33 — CAPTURE-LAW IMPOSSIBILITY + HOME PLANET/NAME LAWS (USER, 2026-11-27, verbatim)
 

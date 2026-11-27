@@ -123,9 +123,9 @@ TEST(release_gate_equivalence_tpf7a) {
                 applyPort(c, ops[k], vL);
                 double vy = 0.0, vz = 0.0;
                 vendorTick(vL, vy, vz);
-                const double py0 = c.yawDeg, pz0 = c.posZ;
+                const double py0 = c.yawDeg, pz0 = c.posY;
                 c.tick();
-                if (c.yawDeg - py0 != vy || c.posZ - pz0 != vz) bad = true;
+                if (c.yawDeg - py0 != vy || c.posY - pz0 != vz) bad = true;
             }
             // Gate state must agree (dead-state code 0 vs 3 may differ).
             const int vgate = (vL & 5);

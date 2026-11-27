@@ -1020,8 +1020,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     switch (h.kind) {
                         // tRS-V1c SCROLL LAW (dat_764c4 bit pairs, msg 50..53
                         // = windows.txt SENDMESSAGE verbatim): the rotate
-                        // pair latches basis yaw +-3 deg/tick, the move pair
-                        // dollies camera posZ -1/+1 (P10/P11 VERBATIM).
+                        // pair latches basis yaw +-3 deg/tick; the move pair
+                        // scrolls camera POSITION Y -1/+1 (tRS-SC: 0x47d03/
+                        // 0x47d12 fadd into win+0xe3 = posY — the old "posZ
+                        // dolly" reading was the D32-L4 zoom defect).
                         // tPF-7: the press also records WHICH PAIR the button
                         // holds, so SDL_MOUSEBUTTONUP applies the vendor
                         // release leg (0x47d3b) — motion runs only while the
@@ -3300,6 +3302,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // circles -> 0x53324 affine -> 0x53374 pinhole. Scale
                     // ~7-9x: this IS a window onto the tree (t252).
                     const auto resGeom = researchTreeGeometry(*tree);
+                    // tRS-SC: the vendor clamps camera posY to the DRAW
+                    // SCOPE's Y-extent on every repaint (0x47ef1..0x47fc3
+                    // inside draw fn 0x47eac) BEFORE projecting, so the
+                    // up/down scroll is bounded by the frontier. Clamp the
+                    // member here — the hit sub consumes the words this
+                    // paint wrote (vendor hit law), so one clamp covers it.
+                    resCam.posY = resClampPosY(resGeom, nodes, resCam.posY);
                     const auto centres = researchNodeScreen(
                         resGeom, nodes, resPanX, resPanY, resCam);
                     // Witness line (tRSB1 click re-derivation): log the

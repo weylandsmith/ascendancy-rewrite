@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-27T15:55
+updated: 2026-11-27T17:45
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,28 +233,39 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tRS-SC (D32 queue, fourth leg): research-screen UP/DOWN keys are
-documented by the user as SCROLL, but the port's press table maps the
-research arrow buttons to the ROT/MOVE camera pair (tPF-7a law: msgs
-50/51/52/53 -> gate bits, release 0x38). Reproduce first at the user's
-verbatim wording, then find the vendor leg that distinguishes SCROLL from
-ROT on the research window: candidate sites are the reswin msg arms
-around 0x47b44..0x47c42 (press table, fully read in tPF-7 — check whether
-an ARROW-key (not button) path exists in the hotkey dispatcher fn 0x54d18
-tree 0x54faf that posts a DIFFERENT param or msg), and the wheel-zoom pair
-(scrollOffset precedent on the title RACELIST, tSPEC-1). If the vendor
-arrows ARE the zoom pair verbatim, ship exactly that and cite; if the
-vendor distinguishes a scroll msg, port it. Pins + witness per the tPF-7
-pattern (clickdn/clickup hold semantics). Budget <=2 sessions; if the
-press-table read says "no separate scroll leg exists", that is an honest
-negative to bank in docs/re/research.md S16 addendum, not a fix.
-ORDERING: tWIN-1 LANDED this iteration (D32-L3 window defect fixed at the
-handoff arg; no OQ row — open=[016,019] unchanged). tRS-SC next per the
-standing D32 queue; it is small and needs no capture. ALTERNATIVES/PARKED:
-TPF7-A per-msg release-mask split (0x47d3b ~ebp role owed) if tRS-SC
-closes fast; TPF6-CPU-A parked (user throttle ruling pending); TPF7-C
-user feel-grading; TPF5-A ship gated on D1 ruling. OQ-016/OQ-019 remain
-the only open ledger rows (both capture-blocked classes).
+NEXT tOQ19-1: run the ONE scripted-move capture session that is the named
+closing route of OQ-019's sugar-cube residue (docs/BLOCKED.md "Scripted-move
+capture (t48/t49 route)": click own ship, click lane-adjacent destination,
+End-Turn x2, read per-autosave coords from the ring; driver
+scripts/r297_order_session.py, venv python; choreography authority
+docs/re/_wip_t297.md S1 + ships.md S24/S25; GATE: End Turn ONCE before
+picking — owner-0 fleet has no kind-4 ship at t=1086, slot 8 lands t1087;
+capability proven end-to-end t297, session died only at its own owner==0
+picker bug which was FIXED). The live game being dead (GAME_DEAD.txt t438)
+is NOT a blocker: this is a scratch-copy R1 session per the standing
+invariants (scratch copy never mounts game/, headless, -time-limit,
+pkill -x dosbox-x only, bounded output). If the coords law lands, UPGRADE
+the rewrite's arrival/landing model to the cited law and CLOSE the OQ-019
+residue clause; if the session cannot produce state-4 movement, that is the
+honest negative (bank, row stays open). Corpus mining is FORBIDDEN for this
+class (t49/t58/t265 closed it three times).
+ORDERING: tRS-SC LANDED this iteration (D32-L4 scroll defect fixed at the
+camera field role; no OQ row — open=[016,019] unchanged). The ENTIRE D32
+queue is now closed (tXT-1, tWIN-1, tRS-SC) and all three D33 legs shipped
+(tD34, tSPEC-1, tNAME-1), so the loop returns to the LEDGER: of the two
+open rows, OQ-019 has the cheaper named route (one scripted session,
+existing driver) vs OQ-016 Phase-Bomb (one R1 run forcing a gizmo build —
+keep as the FOLLOW-UP). ALTERNATIVES/PARKED: TPF6-CPU-A parked (user
+throttle ruling pending); TPF7-C user feel-grading; TPF5-A ship gated on
+D1 ruling. OQ-016/OQ-019 remain the only open ledger rows (both
+capture-blocked classes; both now have a concrete one-session route).
+NEW tRS-SC TRAPS (standing): a camera-struct field ROLE must be derived
+from the INIT writes (0x4710e triplet), never from a later write site's
+offset reuse — +0xe3 was 'position z' for two iterations because the -150
+immediate was assumed to land there; grep WRITE SITES of both triplet words
+before believing any dolly/scroll reading. Witness sign law: at rest the
+frontier sits at the clamp floor, so only the DOWN pair has travel — an UP
+hold legitimately does nothing on a fresh game (do NOT 'fix' that).
 NEW tWIN-1 TRAPS (add to the standing discipline): a mutation apply-guard
 must anchor on text UNIQUE to the mutated call — 'handedWindow);' also
 sits in the runCampaignUi call and produced a false "M1 NOT APPLIED";
@@ -313,6 +324,37 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+tRS-SC LANDED 2026-11-27 (D32-L4 RESEARCH UP/DOWN = SCROLL NOT ZOOM —
+ROOT CAUSE WAS A CAMERA FIELD-ROLE MISREAD, FIXED, PINNED, WITNESSED; no
+OQ row — open=[016,019] unchanged. THE ASSIGNMENT'S 'no separate scroll leg'
+branch was NOT taken: the reswin msg tree 0x47aa1..0x47b41 read EXHAUSTIVELY
+(arms 0xc/0xd scale pump multiplier f32[0x9f108]; 0x21/0x2e/0x46 debug
+editors; 0x47 writes [win+0xe3]=-100.0; 0x48-0x4f,0x51 write 1e15) and the
+hotkey dispatcher 0x54d18 has NO reswin leg — the buttons the user pressed
+ARE msg 52/53, and the vendor's scroll IS the move-pair pump. FIELD-ROLE
+CORRECTION [verified]: camera base win+0xab (0x470fe->0x203b8), position
+triplet cam+0x34 == win+0xdf/e3/e7, INIT 0x4710e-0x47123 writes x=0 y=0
+z=-150.0 (the 0xc3160000 lands at eax+8 == +0xe7) => win+0xe3 = POSITION Y
+(rest 0), and the pump 0x47cd0..0x47d12 fadds +-1.0*[0x9f108] into +0xe3 =
+a SCROLL along the helix axis; win+0xe7 has ZERO write sites in the whole
+reswin asm window. The port dollies posZ = depth = ZOOM — the user's
+verbatim defect. NEW LAW FOUND: per-paint clamp 0x47ef1..0x47fc3 (draw fn
+0x47eac): min/max seeded from row-0 world Y (win+0x147), tightened over the
+0x46d3c SCOPE, posY=clamp before 0x53374 writes the words the hit sub
+consumes (stale-seed lower bound ported faithfully). SHIPPED: ResCam.posY
+(rest 0) + tick pumps posY + projection vY = world.y - posY + resClampPosY
+at the ui.cpp paint site; press/release law UNCHANGED (tPF-7 intact); 4 old
+tests re-anchored (t419/trsvc dolly blocks, tpf7 move-pair, tpf7a
+equivalence). PINS test_resscroll_tRS_SC x4; MUTATIONS tRS_SC_mutate.sh
+M1-M4 ALL CAUGHT (M1 posZ-dolly revert 18 fails, M2 clamp neutered 7, M3
+paint wiring commented 2, M4 vY drops posY 17), restore md5-ok x4. WITNESS
+tRS_SC_witness.sh rc=0 seed 5: RESMOVEDOWN hold 2 s -> row 0 centre
+64,240->64,112 monotone, X CONSTANT 64 (11 same-row pairs), freeze 0 lines
+after clickup. Suite 627->631/0/0, gate 0, ledger OK. Law
+docs/re/research.md S17(a)-(d) + _wip_tRS-SC.md P0-P4. Residues: msg 0xc/
+0xd hotkeys + 0x47a53/0x47a7a scroll-to-end arms UNPORTED (no key bindings
+exist in the port UI; the f64 pool constants undecoded). D32 QUEUE CLOSED.)
 
 tWIN-1 LANDED 2026-11-27 (D32-L3 EJECT OPENS A SECOND WINDOW — DEFECT
 REPRODUCED AT THE X-WINDOW LEVEL, FIXED, PINNED, WITNESSED; no OQ row —

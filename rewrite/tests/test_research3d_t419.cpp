@@ -173,20 +173,27 @@ TEST(research3d_rest_and_spin_t419) {
     }
     CHECK(moved);
     CHECK(zmax > zmin);  // perspective depth spread under rotation
-    // Dolly law: MOVEDOWN pair => posZ += 1/tick (0x47d03..0x47d12 VERBATIM:
-    // (1,1) lands +1.0) => camera NEARS the z~0 tree plane => the field
-    // GROWS. Row 0's world X is negative, so growing means x moves LEFT
-    // (further from centre 235).
+    // tRS-SC SCROLL law: the MOVE pair moves camera POSITION Y (win+0xe3,
+    // 0x47d03..0x47d12 VERBATIM), never depth. (1,0) => posY -= 1; (1,1) =>
+    // posY += 1. Screen rows slide; the depth spread z2 is invariant.
     au::ResCam dolly;
-    dolly.pressMove(false);  // (1,0) => posZ -= 1 (backs away, shrinks)
+    dolly.pressMove(false);  // (1,0) => posY -= 1
     dolly.tick();
-    CHECK(std::fabs(dolly.posZ - (-151.0)) < 1e-9);
-    dolly.pressMove(true);   // (1,1) => posZ += 1 per tick
-    for (int t = 0; t < 31; ++t) dolly.tick();  // net posZ = -120
-    const auto zoomed = au::researchNodeScreen(L, nodes, 0, 0, dolly);
-    CHECK(std::fabs(dolly.posZ - (-120.0)) < 1e-9);
-    const double spreadRest = double(rest[0].x), spreadDolly = double(zoomed[0].x);
-    CHECK(spreadDolly < spreadRest);
+    CHECK(std::fabs(dolly.posY - (-1.0)) < 1e-9);
+    CHECK(std::fabs(dolly.posZ - (-150.0)) < 1e-9);  // depth never pumped
+    dolly.pressMove(true);   // (1,1) => posY += 1 per tick
+    for (int t = 0; t < 31; ++t) dolly.tick();  // net posY = +30
+    const auto scrolled = au::researchNodeScreen(L, nodes, 0, 0, dolly);
+    CHECK(std::fabs(dolly.posY - 30.0) < 1e-9);
+    // Rows slide UP under a +posY camera (vY shrinks), depth unchanged.
+    // Observation at a SMALL scroll: the u16 word law (u16wrap) legitimately
+    // wraps a row pushed far off-frame, so a +30 dolly of row 0 (Y=0, the
+    // topmost-visible check) is NOT a y<rest comparison — t419 wrap law.
+    au::ResCam small;
+    small.posY = 2.0;
+    const auto scr2 = au::researchNodeScreen(L, nodes, 0, 0, small);
+    CHECK(scr2[0].y < rest[0].y);
+    CHECK(scr2[0].z2 == rest[0].z2);
     // Hit map follows the view: a rest centre resolves its node at rest.
     const auto h0 = au::researchHit(tree, nodes, rest[0].x, rest[0].y, 0, 0);
     CHECK(h0.kind == au::ResHit::Node);

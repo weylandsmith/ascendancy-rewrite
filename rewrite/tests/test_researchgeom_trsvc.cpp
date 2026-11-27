@@ -253,17 +253,20 @@ TEST(researchgeom_latch_pump_trsvc) {
     CHECK(cam.latchRot == 3);
     cam.tick();
     CHECK(std::fabs(cam.yawDeg - 3.0) < 1e-9);  // DEAD pumps nothing
-    // Dolly: MOVEUP (pair A) => posZ -= 1 (camera backs away, tree SHRINKS;
-    // the fadd chain 0x47d03..0x47d12 is the authority, _wip P12 note).
+    // tRS-SC SCROLL law: MOVEUP (pair A) => posY -= 1 (camera slides down
+    // the helix axis; 0x47d03..0x47d12 adds +-1 to win+0xe3 = POSITION Y —
+    // the old posZ-dolly reading was the D32-L4 defect). Depth posZ is
+    // NEVER pumped (win+0xe7 has zero write sites).
     au::ResCam d;
     d.pressMove(false);
     d.tick();
-    CHECK(std::fabs(d.posZ - (-151.0)) < 1e-9);
+    CHECK(std::fabs(d.posY - (-1.0)) < 1e-9);
+    CHECK(std::fabs(d.posZ - (-150.0)) < 1e-9);   // depth untouched
     d.pressMove(true);     // (1,1) => +1 per tick
     d.tick();
-    CHECK(std::fabs(d.posZ - (-150.0)) < 1e-9);
-    // The dolly is OBSERVABLE through the projection: scale grows as the
-    // camera nears the tree plane (posZ -> 0-).
+    CHECK(std::fabs(d.posY - 0.0) < 1e-9);
+    // The scroll is OBSERVABLE through the projection: screen rows slide as
+    // posY moves (vY = world.y - posY), depth does not change.
     auto tree = loadedTree();
     if (tree.mainCount() != 66) { CHECK(tree.mainCount() == 66); return; }
     std::vector<au::TechNode> nodes;
@@ -274,12 +277,12 @@ TEST(researchgeom_latch_pump_trsvc) {
         nodes.push_back(nd);
     }
     const auto G = au::researchTreeGeometry(tree);
-    au::ResCam nearCam;
-    nearCam.posZ = -140.0;
-    const auto far = au::researchNodeScreen(G, nodes, 0, 0, au::ResCam{});
-    const auto nn = au::researchNodeScreen(G, nodes, 0, 0, nearCam);
-    // Row 0's world X is negative: nearer camera spreads it further out.
-    CHECK(nn[0].x < far[0].x);
+    au::ResCam scrolled;
+    scrolled.posY = -10.0;  // camera down => rows project LOWER (bigger y)
+    const auto rest2 = au::researchNodeScreen(G, nodes, 0, 0, au::ResCam{});
+    const auto sn = au::researchNodeScreen(G, nodes, 0, 0, scrolled);
+    CHECK(sn[0].y > rest2[0].y);
+    CHECK(sn[0].z2 == rest2[0].z2);  // same depth: scroll never dollies
 }
 
 TEST(researchgeom_frame_edge_laws_trsvc) {
