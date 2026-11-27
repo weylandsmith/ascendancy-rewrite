@@ -341,18 +341,32 @@ inline int atmosphereRankNext(int v) {
 // atmosphere wheel (the byte[0x13bc4] value the dip-on-attack subtrahend
 // 10*(gov+1) consumes, diplomacy.md §17.1). Pure so the pins pin the
 // identity terms.
+// tSPEC-1 ADDS species (the PLAYER specnum): the vendor RACELIST click arm
+// 0x52d6c..0x52db8 stores word[win+0xb3]=clicked row (init 0 at 0x52c8c)
+// and calls FUN_00022ce4(state, ebx=word[+0xb3], edx=count); inside
+// 0x22ce4 the PLAYER branch (k==0, 0x22f8d) takes specnum = that word with
+// NO rand (AI k>0 draw rand%21 distinct at 0x22fba), and 0x3e6bc stores it
+// at race-row+7 — which Begin's worldgen 0x238e8 then indexes into the
+// home TABLES 0x88f90/0x88fe4 (t30 0x23aeb mov dl,[eax+7]; tPL-D1 MEASURED
+// 85/85: home size=T1[spec], terrain row=T2[spec]). The species-COUNT arm
+// 0x52e58 passes the SAME word[+0xb3], so count clicks preserve the player
+// row (docs/re/_wip_tSPEC1.md S1/S2). The port applies it at Begin like
+// the rest of the triple.
 struct NewGameSettings {
     int stars = 0;
     int owners = 0;
     int gov = 1;
+    int species = 0;  // tSPEC-1: player specnum, word[win+0xb3] (vendor init 0)
     bool set = false;
 };
 inline NewGameSettings newGameSettings(int densityRank, int species,
-                                       int atmosphere) {
+                                       int atmosphere, int playerSpecies = 0) {
     NewGameSettings s;
     s.stars = densityStarCount(densityRank);
     s.owners = species;  // identity law: wheel value == TOTAL races
     s.gov = atmosphere;  // sole Begin-press global write [0x52b44]
+    s.species = playerSpecies;  // tSPEC-1: RACELIST row == specnum (roster is
+                                // specnum-ordered; speciesNameAt indexes it too)
     s.set = true;
     return s;
 }

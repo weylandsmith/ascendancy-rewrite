@@ -290,3 +290,33 @@ routing lines) + scripts/t393_witness.py (13 mechanical checks, RUN WITH
 ~/tools/revenv/bin/python — repo .venv has no PIL). Screenshots graded by
 the USER: work/r1/loop/t393-{title,newgame,newgame-set,after-begin}.png.
 
+
+## tSPEC-1 BEGIN-PRESS PLAYER-SPECIES LAW (2026-11-27; full derivation
+## docs/re/_wip_tSPEC1.md S1-S5)
+SUPERSEDES the "APPLYING settings ... named SEAM" paragraph above (stale since
+tNG-B B4): the Begin handoff (NewGameSettings) is stars/owners/gov PLUS
+species, and main.cpp rebuilds play from it.
+VENDOR LAW [verified disasm]: word[win+0xb3] (hiword alias of dword[win+0xb1])
+is the SELECTED RACE ROW; window-init 0x52c8c sets it to 0 (Minions). The
+RACELIST click arm 0x52d6c stores the clicked row and calls FUN_00022ce4
+(state=0x12e10, ebx=row, edx=count); inside, the PLAYER branch (k==0, 0x22f8d
+mov bl,[esp+0x10]) uses that word with NO rand - AI k>0 draw rand%21 with a
+distinctness scan vs byte[raceRow+7] (0x22fba..0x22fed). FUN_0003e6bc stores
+the specnum at race-row+7 (state+6+k*0x1ee; row+0 = owner idx). Begin's
+worldgen FUN_000238e8 (call 0x52a67; per-star loop 0x23a2a..0x23d22) indexes
+the home TABLES 0x88f90/0x88fe4 with byte[race-row+7] (0x23aeb mov dl,[eax+7]
+-> T1/T2 picks 0x23aee/af1) = the tPL-D1 home size/terrain law (income-law.md
+85/85). The species-COUNT arm 0x52e58 passes the SAME word[+0xb3]: count
+clicks never move the player's species.
+PORT [shipped tSPEC-1]: title.cpp Begin press feeds scrollOffset+selSlot into
+newGameSettings(..., playerSpecies); main.cpp buildCampaign prefers
+apply->species on the handoff leg (CLI --species stays authority elsewhere);
+live line prints species + new "newgame home <star> cells N row R".
+PINS tests/test_species_pick_tspec1.cpp x4; mutations M1-M3 scripts/
+tSPEC1_mutate.sh ALL CAUGHT (restore md5-verified x3). WITNESS scripts/
+tSPEC1_species_witness.sh rc=0: default run species 0 home 73/row5 (Minions),
+RACELIST-click run species 19 home 45/row7 (Chamachies) - same seed, same
+star, different TYPE. Residues (documented defaults): AI species draw stream
+(port roster-first mapping vs vendor rand%21 - same distinctness law, tables
+key on specnum only); race-row stat nudges 0x22ff8.. unmodelled (no consumer
+identified).

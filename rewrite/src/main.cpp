@@ -249,8 +249,14 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(
     static std::vector<ag::SpeciesInfo> roster;
     if (roster.empty() && !ag::loadAbilities(d0.string(), &roster, err))
         return nullptr;
-    if (o.playerSpecies < -1 || o.playerSpecies >= static_cast<int>(roster.size())) {
-        *err = "--species " + std::to_string(o.playerSpecies) +
+    // tSPEC-1: on the Begin handoff the RACELIST pick IS the player species
+    // (vendor: word[win+0xb3] -> race-row+7 at click time -> worldgen home
+    // TABLES; docs/re/_wip_tSPEC1.md S1/S2). The CLI --species stays the
+    // authority on every non-Begin build (headless matrix, --campaign).
+    const int playerSpecies =
+        (apply && apply->set) ? apply->species : o.playerSpecies;
+    if (playerSpecies < -1 || playerSpecies >= static_cast<int>(roster.size())) {
+        *err = "player species " + std::to_string(playerSpecies) +
                " out of range 0.." + std::to_string(roster.size() - 1);
         return nullptr;
     }
@@ -265,7 +271,7 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(
     std::vector<ag::SpeciesAbility> abilities;
     for (const ag::SpeciesInfo& si : roster) {
         if (static_cast<int>(abilities.size()) >= aiWant) break;
-        if (o.playerSpecies >= 0 && si.specnum == o.playerSpecies) continue;
+        if (playerSpecies >= 0 && si.specnum == playerSpecies) continue;
         char name[32];
         std::snprintf(name, sizeof(name), "/race%02d.dip", si.specnum);
         ag::DipFile df;
@@ -275,7 +281,7 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(
     }
     ag::CampaignConfig cfg;
     cfg.seed = o.seed;
-    cfg.playerSpecies = o.playerSpecies;
+    cfg.playerSpecies = playerSpecies;
     cfg.terrain = terrain;  // t294: planitem.txt-sourced world-gen tables
     ag::MapConfig mc;
     mc.seed = o.seed;
@@ -669,9 +675,22 @@ int main(int argc, char** argv) {
                 // LIVE terms: the rebuild actually took — ownerCount() ==
                 // owners (cfg.aiCount+1) and the play galaxy carries the
                 // rung count (witness reads this line, not the intent line).
-                std::printf("newgame live stars %zu owners %d gov %d\n",
+                // tSPEC-1: species = the LIVE cfg.playerSpecies (the play
+                // campaign's species, not the intent) + the HOME planet's
+                // table size/row — the user-visible consequence.
+                std::printf("newgame live stars %zu owners %d gov %d species %d\n",
                             camp->galaxy().stars.size(),
-                            camp->ownerCount(), camp->govByte());
+                            camp->ownerCount(), camp->govByte(),
+                            camp->playerSpecies());
+                {
+                    const int hs = camp->homeStarFor(0);
+                    if (hs >= 0) {
+                        const auto& hp = camp->planetAt(hs);
+                        std::printf("newgame home %s cells %d row %d\n",
+                                    camp->galaxy().stars[size_t(hs)].name.c_str(),
+                                    hp.surfaceCells, hp.terrainRow);
+                    }
+                }
             } else {
                 std::printf("newgame apply FAILED (play on built campaign): "
                             "%s\n",

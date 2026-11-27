@@ -1414,13 +1414,13 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                         // builder consumes (main.cpp rebuilds play from the
                         // wheel triple — closes the t393 named seam).
                         if (newGameOut) {
-                            *newGameOut = newGameSettings(densityIdx,
-                                                          speciesSetting,
-                                                          atmosphere);
+                            *newGameOut = newGameSettings(
+                                densityIdx, speciesSetting, atmosphere,
+                                scrollOffset + selSlot);
                             std::printf("ui newgame apply stars %d owners %d "
-                                        "gov %d\n",
+                                        "gov %d species %d\n",
                                         newGameOut->stars, newGameOut->owners,
-                                        newGameOut->gov);
+                                        newGameOut->gov, newGameOut->species);
                         }
                         std::fflush(stdout);
                         // t412: Begin -> the RACE INTRO (history.txt,

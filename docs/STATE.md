@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-27T13:30
+updated: 2026-11-27T14:20
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,28 +233,26 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tSPEC-1 (D33-L2, UPGRADED BY D33): Begin species pick must reach
-PLAY (user: home planet is medium eden REGARDLESS of species; vendor =
-per-species TYPE via the tPL-D1 table T1/T2 — the table read EXISTS in the
-constructor (campaign.cpp kHomeSizeIdx/kHomeTerrainRow, specOf[]) but the
-Begin path drops species before it: NewGameSettings (menulaw.h:344)
-carries only stars/owners/gov and main.cpp buildCampaign(&newGame)
-rebuilds from that triple only; tESC-1 witness re-confirmed the species
-word prints and drops). PLUMB: wheel species -> NewGameSettings -> cfg.
-playerSpecies -> home terrain row + art. Pins: Chamachies -> size idx 3 +
-terrain row 7 in PLAY state, Minions differs (tPL-D1 rows: Minions 4/5,
-Chamachies 3/7). Witness = two Begin runs, different species, different
-home terrain census. Re-derive at bytes what the vendor Begin writes about
-the PLAYER SPECIES (wheel-arms law tNG-B: state base 0x12e10 + atmosphere
-global 0x52b44 — find the species sibling write). Budget: full iteration.
-ORDERING: tD34 LANDED this iteration (capture law shipped; D33-L1 closed
-by measurement). tSPEC-1 before tNAME-1 per D33 pairing (per-species home
-TYPE read and the name draw share buildCampaign/mapgen plumbing). tWIN-1
-(eject reuses the window; D32) DROPS TO THIRD — it was top only because
-eject cross-talk corrupted post-game screens; the capture-law fix does not
-touch it, but tSPEC-1 is the user's ACTIVE complaint trio and shares the
-files tNAME-1 needs next. THEN tNAME-1 (D33 L3, per-game names, never
-always Phoebe), THEN tRS-SC (research up/down = scroll, D32 verbatim).
+NEXT tNAME-1 (D33-L3): per-game names must vary — the user's catch is
+"always Phoebe". With tSPEC-1 landed, buildCampaign(&newGame) now carries
+species (docs/re/boot.md tSPEC-1 block), so the name draw is the remaining
+identity term the Begin handoff drops. Re-derive at bytes what the vendor
+names per new game: the star-name pool draw is names.txt + the loader law
+(OQ-004: ascend02 .bin/.tsv via the RAM name table @0x250c1c from the .cob
+TOC), and the per-game variation lives in the draw stream, not the pool —
+first locate WHERE the vendor seeds/advances the star-name draw at worldgen
+(0x238e8 loop; candidate: name index = rng at 0x23a86/97 interleave vs the
+port's MapGenerator splitmix key). Pins: two Begin runs same seed ->
+different home star NAME (if the vendor varies by seed-at-init) OR same
+(gate the claim on what the corpus says: tpld1_spechome lineages already
+show home names varying across 26 fresh games — start there,
+work/r1/tpld1_spechome.out, before any new capture). Witness = two Begin
+runs, different home star names, plus the t399 homeStarFor marker intact.
+ORDERING: tSPEC-1 LANDED this iteration (D33-L2 closed by witness; no OQ
+row — open=[016,019] unchanged). tNAME-1 is next per the D33 pairing (it
+shares buildCampaign/mapgen files tSPEC-1 just touched). THEN tWIN-1
+(eject reuses the window; D32, third since the capture-law fix removed its
+urgency), THEN tRS-SC (research up/down = scroll, D32 verbatim).
 ALTERNATIVES/PARKED: TPF7-A per-msg release-mask split (0x47d3b ~ebp role
 owed) if tWIN-1 sizes out; TPF6-CPU-A parked (user throttle ruling
 pending); TPF7-C user feel-grading; TPF5-A ship gated on D1 ruling.
@@ -283,7 +281,13 @@ restore — REBUILD before any runtime witness or the witness measures the
 mutant (tESC-1: eject witness false-failed on the stale M3 build); a
 commented-out statement still matches a source-scan substring — pins on
 statements must check the line is not a comment (tESC-1 M1 survived, then
-CAUGHT with the anti-comment CHECK).
+CAUGHT with the anti-comment CHECK); source-scan pins must anchor on the
+STATEMENT itself, not a nearby constant (kBeginNewGameBtn also hits paint
+sites — tSPEC-1 pin anchored on '*newGameOut = newGameSettings(' and
+extracted args between the parens so a LOG line with the same expression
+cannot false-satisfy); slurp idiom is 'ss << f.rdbuf()' NOT 'f <<
+ss.rdbuf()'; 'newgame live' prints only after runTitleScreen RETURNS —
+dismiss the intro BEFORE grepping it (tSPEC-1 witness, tXT1 order).
 TRAPS STILL STANDING (full per-iteration detail in git history of this
 block + docs/re/*): NEVER read whole lines of work/r1/playcap/live-
 timeline.jsonl; D28 file scratchpad/t433-build-feedback.txt is the item
@@ -306,6 +310,40 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+tSPEC-1 LANDED 2026-11-27 (D33-L2 BEGIN SPECIES->PLAY SHIPPED — the
+RACELIST word IS the player species, verified end-to-end at bytes; no OQ row
+touched, open=[016,019] unchanged. VENDOR LAW [verified disasm
+FUN_00022ce4/0x3e6bc + arms 0x52c8c/0x52d6c/0x52e58]: word[win+0xb3] =
+selected race row (init 0 = Minions); RACELIST click stores it and calls
+0x22ce4(state,ebx=row,edx=count); the PLAYER branch (k==0, 0x22f8d) uses it
+with NO rand (AI k>0 rand%21 distinct 0x22fba..); 0x3e6bc stores specnum at
+race-row+7 (state+6+k*0x1ee); Begin's worldgen 0x238e8 (call 0x52a67, loop
+0x23a2a..0x23d22 CONTAINS the tPL-D1 table read 0x23aeb mov dl,[eax+7] ->
+T1/T2 picks) consumes exactly that byte; the COUNT arm passes the SAME word —
+count clicks never move the player's species. WORD ALIASING (hiword(dword
+[+0xbN]) == word[+0xbN+2]) is what makes the sar-0x10 reads readable —
+banked. PORT DEFECT (user: medium eden regardless of species): the Begin
+rebuild read cfg.playerSpecies = CLI --species (unset on the UI path -> -1 ->
+rng home every time). SHIPPED: NewGameSettings.species (identity carry,
+default 0 = vendor init); title.cpp Begin feeds scrollOffset+selSlot;
+main.cpp prefers apply->species on the handoff leg (CLI stays authority
+elsewhere — headless matrix untouched); live line + new 'newgame home <star>
+cells N row R'. PINS test_species_pick_tspec1 x4 (identity incl. default 0;
+title feeds RACELIST expr — anchored on the statement, args extracted
+between parens so the species-pick LOG line can't false-satisfy; main
+prefers apply; behavior Chamachies 45/7 vs Minions 73/5 x3 seeds); MUTATIONS
+tSPEC1_mutate.sh M1-M3 ALL CAUGHT, restore md5-ok x3, rebuild-before-witness
+honored. WITNESS tSPEC1_species_witness.sh rc=0: run A (no click) species 0
+home 73/row5; run B (18 arrows per-press-asserted + slot click -> 'select
+specnum 19') species 19 home 45/row7 — same seed, same star name, different
+TYPE. Suite 617->621/0/0; gate 0; ledger OK. Law distilled docs/re/boot.md
+tSPEC-1 block (supersedes the stale t393 'named SEAM' paragraph) +
+docs/re/_wip_tSPEC1.md S1..S5. RESIDUES: AI species draw stream = documented
+default (roster-first vs vendor rand%21 — distinctness law identical, tables
+key on specnum only); race-row stat nudges 0x22ff8.. unmodelled (no consumer
+identified); 0x22ce4's other reset legs (star-owner bits, anomaly table,
+race-slot words) already modelled elsewhere or out of Begin scope.)
 
 tD34 LANDED 2026-11-27 (D33-L1 CAPTURE LAW SHIPPED — FUN_0003a174
 re-derived FUN-by-FUN at bytes; the port's garrison-death pop-decider

@@ -270,7 +270,13 @@ OQ-016 residue list is now EXHAUSTED ((1) cited-dead x8 legs = user ruling,
 (2)(3)(4) CLOSED, (6) CLOSED as misattribution) — row movement per D3 is
 USER ADJUDICATION; row stays open strict-close.
 HOME-PLACEMENT SUB-LAW EXTENDED tPL-D1 2026-11-24 MEASURED (income-law.md
-"tPL-D1 HOME-PLANET-BY-RACE TABLE LAW"): home SIZE CLASS and TERRAIN ROW are
+"tPL-D1 HOME-PLANET-BY-RACE TABLE LAW"); tSPEC-1 2026-11-27: the port's
+Begin path now supplies the player SPECIES (RACELIST word -> NewGameSettings
+-> cfg.playerSpecies; docs/re/boot.md tSPEC-1 block; witness scripts/
+tSPEC1_species_witness.sh rc=0 Chamachies 45/row7 vs Minions 73/row5), so the
+human home takes the TABLE path exactly like the AI homes — the "human -1
+keeps rng" default now only covers non-Begin builds. Row status unchanged (D3).
+Home SIZE CLASS and TERRAIN ROW are
 per-SPECNUM static tables (payload 0x88f90 / 0x88fe4), 85/85 homes across 26
 independent lineages; no special home capBase seed (cap55==nb/3+5 144/144);
 t30's index-operand reading corrected (race row, not star cluster). Port +
