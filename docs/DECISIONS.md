@@ -836,3 +836,25 @@ DISPOSITION:
    Vendor truth decides; if vendor quits, we present the cited asm to
    the user before overriding. If vendor unwinds to title, ship that.
    (Instrument line ships either way.)
+
+## D32 — DAY-20 EXIT CAUGHT BY INSTRUMENT: victory:Extinct (USER, 2026-11-27, verbatim)
+
+> Same turn 20 exit. Two lines in the console before the exit line:
+> "ui cont advance stop t20 event: owner 1 captured Phoebe",
+> "ui quit cause=victory:Extinct turn=20". Dunno if the details matter,
+> but I've chosen a very dense star cluster and seven species. I just
+> tried it with average star density, and it didn't do it. ... one
+> thing - when escaping from the galaxy screen to the title screen, it
+> opens a new window instead of bouncing back in the existing window,
+> and things get buggy - UI elements don't get drawn in some windows,
+> hovering the mouse in the corner of one window will pop up the escape
+> art in another window, etc. Also ... the up/down buttons on the
+> research screen are supposed to scroll up and down, not zoom in and
+> out.
+
+INSTRUMENT VINDICATED (tPF-1d): exit cause = victory:Extinct at t20,
+preceded by "owner 1 captured Phoebe". Repro shape: VERY DENSE
+cluster + SEVEN species -> exits; AVERAGE density -> survives.
+Rows: tXT-1 (extinct law + capture provenance), tWIN-1 (eject must
+reuse window; two-window bug), tRS-SC (research up/down = SCROLL not
+zoom - our press-table row likely mapped them to the zoom pair).
