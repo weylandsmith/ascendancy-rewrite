@@ -10,6 +10,7 @@
 #include <SDL_mixer.h>
 
 #include <algorithm>
+#include <chrono>
 #include <cstdio>
 #include <filesystem>
 #include <fstream>
@@ -48,6 +49,8 @@ struct Options {
     bool headless = false;                      // SDL dummy driver, no audio
     int campaign = 0;                           // N turns of seeded campaign
     unsigned seed = 1;
+    bool seedExplicit = false;  // tNAME-1: --seed seen (vendor record-seed leg
+                                // 0x21489 cmp -1: only an explicit seed wins)
     bool ui = false;                            // P5a window (docs/re/ui-runtime.md)
     bool autoplay = false;
     bool resume = false;                        // t385: boot straight to Campaign
@@ -78,8 +81,10 @@ bool parseArgs(int argc, char** argv, Options* o) {
             o->headless = true;
         else if (a == "--campaign" && i + 1 < argc)
             o->campaign = std::atoi(argv[++i]);
-        else if (a == "--seed" && i + 1 < argc)
+        else if (a == "--seed" && i + 1 < argc) {
             o->seed = static_cast<unsigned>(std::atol(argv[++i]));
+            o->seedExplicit = true;  // tNAME-1
+        }
         else if (a == "--ui")
             o->ui = true;
         else if (a == "--autoplay")
@@ -293,6 +298,12 @@ std::unique_ptr<ascend::game::Campaign> buildCampaign(
         cfg.starCount = apply->stars;
         cfg.govByte = apply->gov;
         mc.starCount = apply->stars;
+        // tNAME-1 (D33-L3): the handoff seed is the per-game world seed
+        // (vendor fresh-run srand 0x213fc feeds worldgen 0x238e8's one LCG
+        // stream — the star-name draw IS the seed draw). CLI --seed stays
+        // authority on every non-Begin leg (headless matrix untouched).
+        cfg.seed = apply->seed;
+        mc.seed = apply->seed;
     }
     ag::Galaxy g = ag::MapGenerator(mc, *stats, names).generate();
     return std::make_unique<ag::Campaign>(cfg, g, &tree, items, gizmos, ai,
@@ -454,6 +465,31 @@ int main(int argc, char** argv) {
     if (!parseArgs(argc, argv, &o)) {
         usage();
         return 2;
+    }
+    // tNAME-1 (D33-L3) FRESH-RUN SEED LAW [verified disasm FUN_00020fd4 —
+    // the game's own main(), sole call site 0x7b817]: 0x213f7 call 0x7821c
+    // (clock accumulator via 0x7b5c0/0x7b683) then 0x213fc call 0x78273 =
+    // srand() on the single Borland LCG 0x7824f BEFORE any worldgen; the
+    // record/scenario leg (0x21480 mov ebx,[esp+0x550]; 0x21489 cmp ebx,-1;
+    // je keeps the clock seed, else 0x21490 srand(stored seed)) overrides
+    // ONLY with an explicit seed. Worldgen 0x238e8 draws every per-star/
+    // per-planet parameter (0x23da4 %5+1, 0x23a86 %5, 0x23a97 %11) from
+    // that one stream, so a fresh game re-draws the whole name/position/
+    // type layout — the star-name variation D33-L3 is the seed draw (the
+    // names.txt POOL is fixed, mapgen.md S2; corpus: 25 fresh vendor
+    // lineages, 25 distinct home star bases, home CELLS constant per spec
+    // — scripts/tname1_homename_census.py). PORT: only the INTERACTIVE UI
+    // boot draws the clock seed (headless default stays 1 — every gate /
+    // matrix / playthrough run passes --seed explicitly, so the seed-
+    // identity contracts are untouched); --seed is authority everywhere,
+    // exactly the vendor's cmp -1 leg.
+    if (o.ui && !o.seedExplicit) {
+        const auto ns = std::chrono::system_clock::now().time_since_epoch()
+                            .count();
+        o.seed = static_cast<unsigned>(ns) ^
+                 static_cast<unsigned>(static_cast<uint64_t>(ns) >> 32);
+        std::printf("main: fresh-run seed %u (clock; --seed overrides)\n",
+                    o.seed);
     }
     if (!o.saveFile.empty()) return runObserver(o);
     if (o.headless) SDL_SetHint(SDL_HINT_VIDEODRIVER, "dummy");
@@ -678,10 +714,10 @@ int main(int argc, char** argv) {
                 // tSPEC-1: species = the LIVE cfg.playerSpecies (the play
                 // campaign's species, not the intent) + the HOME planet's
                 // table size/row — the user-visible consequence.
-                std::printf("newgame live stars %zu owners %d gov %d species %d\n",
+                std::printf("newgame live stars %zu owners %d gov %d species %d seed %u\n",
                             camp->galaxy().stars.size(),
                             camp->ownerCount(), camp->govByte(),
-                            camp->playerSpecies());
+                            camp->playerSpecies(), camp->galaxy().seed);
                 {
                     const int hs = camp->homeStarFor(0);
                     if (hs >= 0) {

@@ -1414,13 +1414,23 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                         // builder consumes (main.cpp rebuilds play from the
                         // wheel triple — closes the t393 named seam).
                         if (newGameOut) {
+                            // tNAME-1 seed term = wheelBaseSeed + 1: the
+                            // vendor's single LCG stream has ADVANCED by the
+                            // time a new game's worldgen runs (fresh srand at
+                            // 0x213fc, then 0x226e4/0x238e8 consume draws), so
+                            // game N+1 never re-seeds to game N's value. The
+                            // +1 chains across eject re-entries: main.cpp sets
+                            // the live campaign's seed from this handoff, and
+                            // wheelBaseSeed re-reads it on the next title
+                            // visit, so Begin #2 = base+2, Begin #3 = base+3.
                             *newGameOut = newGameSettings(
                                 densityIdx, speciesSetting, atmosphere,
-                                scrollOffset + selSlot);
+                                scrollOffset + selSlot, wheelBaseSeed + 1u);
                             std::printf("ui newgame apply stars %d owners %d "
-                                        "gov %d species %d\n",
+                                        "gov %d species %d seed %u\n",
                                         newGameOut->stars, newGameOut->owners,
-                                        newGameOut->gov, newGameOut->species);
+                                        newGameOut->gov, newGameOut->species,
+                                        newGameOut->seed);
                         }
                         std::fflush(stdout);
                         // t412: Begin -> the RACE INTRO (history.txt,

@@ -320,3 +320,46 @@ star, different TYPE. Residues (documented defaults): AI species draw stream
 (port roster-first mapping vs vendor rand%21 - same distinctness law, tables
 key on specnum only); race-row stat nudges 0x22ff8.. unmodelled (no consumer
 identified).
+
+
+## tNAME-1 PER-GAME WORLD SEED LAW (2026-11-27; full derivation
+## docs/re/_wip_tNAME1.md S1-S7)
+D33-L3 (user: "the original has a different system/planet name each game,
+just with a particular planet type for the home planet for each species, but
+the rebuild always seems to pick Phoebe"). There is NO name RNG and no name
+draw law beyond the pool: names.txt is fixed (mapgen.md S2, OQ-004 loading),
+home TYPE is the tPL-D1 table law, and the per-game VARIATION is entirely the
+SEED fed to worldgen.
+VENDOR LAW [verified disasm FUN_00020fd4 = the game's own main(), sole call
+site 0x7b817 in the runtime startup]: FRESH path 0x213f7 call 0x7821c (clock
+accumulator via 0x7b5c0/0x7b683; tick semantics not claimed) then 0x213fc
+call 0x78273 = srand() on the single Borland LCG FUN_0007824f (R-t422c
+census: the exe's only RNG) BEFORE any worldgen. RECORD/scenario leg
+0x21442..0x21490: read a stored seed (0x77fe1, record 0x998), 0x21489 cmp
+ebx,-1 - je KEEPS the clock seed, else 0x21490 srand(stored). Worldgen
+FUN_000238e8 then draws every per-star/per-planet parameter from that one
+stream (0x23da4 rng%5+1 planets-per-star, 0x23a86 rng%5 size class, 0x23a97
+rng%11 weight row; scenario override 0x23aaa..0x23ac2), so a fresh game
+re-draws the whole name/position/type layout and the same stored seed
+reproduces it. srand census total is FIVE sites (0x213fc, 0x21490 fresh/
+record legs; 0x35800 srand(0) audio init; 0x54f0d/0x59aa9 save/restore -
+already known t422).
+CORPUS [measured scripts/tname1_homename_census.py + twin probe, 25 fresh
+r1ad-/r1deep- vendor lineages, earliest save each]: owner-0 home star BASES
+are 25 DISTINCT strings (Sophia, Byzantium, Masticon, Flammifer, Pendulon,
+..., Phoebe once), while tpld1 L1 shows home CELLS CONSTANT per spec across
+all lineages - both halves of the user's law confirmed against the vendor.
+PORT DEFECT: seed had exactly ONE source (Options.seed default 1); the Begin
+handoff carried no seed, so every Begin rebuild re-drew the SAME world -
+"always Phoebe" every game, every press.
+PORT [shipped tNAME-1]: (1) NewGameSettings.seed (default 1 = deterministic
+for unit/non-UI callers); title.cpp Begin press feeds wheelBaseSeed+1 (the
+vendor stream has advanced between games; +1 chains across eject re-entries
+because wheelBaseSeed re-reads the LIVE campaign's seed on the next title
+visit); (2) main.cpp buildCampaign prefers apply->seed on the Begin leg;
+(3) the interactive UI boot with NO --seed draws a clock seed (vendor-analog
+of 0x213fc; 'main: fresh-run seed %u' line); --seed is authority everywhere
+(vendor cmp -1 leg) - headless default stays 1 so every gate/matrix
+seed-identity contract is untouched.
+PINS tests/test_name_seed_tname1.cpp x4; mutations M1-M4 scripts/
+tNAME1_mutate.sh (round log below). WITNESS scripts/tNAME1_name_witness.sh.

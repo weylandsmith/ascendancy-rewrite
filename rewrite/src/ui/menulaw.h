@@ -357,16 +357,30 @@ struct NewGameSettings {
     int owners = 0;
     int gov = 1;
     int species = 0;  // tSPEC-1: player specnum, word[win+0xb3] (vendor init 0)
+    // tNAME-1 (D33-L3): the per-game world seed. VENDOR LAW [verified disasm
+    // FUN_00020fd4 0x213fc/0x21480..90]: the fresh path seeds the single
+    // Borland LCG (0x7824f) from the clock BEFORE worldgen 0x238e8 (whose
+    // per-star/per-planet draws 0x23da4/0x23a86/0x23a97 come from that one
+    // stream), and a record/scenario seed overrides only when != -1. There
+    // is no separate name RNG: the star-name pool is fixed (names.txt,
+    // mapgen.md S2), the DRAW ORDER is the seed — "a different system name
+    // each game" IS "a fresh seed". Port: main.cpp draws the boot seed once
+    // per interactive run (clock, vendor-analog) and the wheel feeds it +
+    // the begin counter so repeated Begin presses within a run differ too
+    // (the vendor stream advances between games).
+    unsigned seed = 1;
     bool set = false;
 };
 inline NewGameSettings newGameSettings(int densityRank, int species,
-                                       int atmosphere, int playerSpecies = 0) {
+                                       int atmosphere, int playerSpecies = 0,
+                                       unsigned seed = 1) {
     NewGameSettings s;
     s.stars = densityStarCount(densityRank);
     s.owners = species;  // identity law: wheel value == TOTAL races
     s.gov = atmosphere;  // sole Begin-press global write [0x52b44]
     s.species = playerSpecies;  // tSPEC-1: RACELIST row == specnum (roster is
                                 // specnum-ordered; speciesNameAt indexes it too)
+    s.seed = seed;  // tNAME-1: per-game seed travels with the handoff
     s.set = true;
     return s;
 }

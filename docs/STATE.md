@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-27T14:20
+updated: 2026-11-27T18:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,26 +233,33 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tNAME-1 (D33-L3): per-game names must vary — the user's catch is
-"always Phoebe". With tSPEC-1 landed, buildCampaign(&newGame) now carries
-species (docs/re/boot.md tSPEC-1 block), so the name draw is the remaining
-identity term the Begin handoff drops. Re-derive at bytes what the vendor
-names per new game: the star-name pool draw is names.txt + the loader law
-(OQ-004: ascend02 .bin/.tsv via the RAM name table @0x250c1c from the .cob
-TOC), and the per-game variation lives in the draw stream, not the pool —
-first locate WHERE the vendor seeds/advances the star-name draw at worldgen
-(0x238e8 loop; candidate: name index = rng at 0x23a86/97 interleave vs the
-port's MapGenerator splitmix key). Pins: two Begin runs same seed ->
-different home star NAME (if the vendor varies by seed-at-init) OR same
-(gate the claim on what the corpus says: tpld1_spechome lineages already
-show home names varying across 26 fresh games — start there,
-work/r1/tpld1_spechome.out, before any new capture). Witness = two Begin
-runs, different home star names, plus the t399 homeStarFor marker intact.
-ORDERING: tSPEC-1 LANDED this iteration (D33-L2 closed by witness; no OQ
-row — open=[016,019] unchanged). tNAME-1 is next per the D33 pairing (it
-shares buildCampaign/mapgen files tSPEC-1 just touched). THEN tWIN-1
-(eject reuses the window; D32, third since the capture-law fix removed its
-urgency), THEN tRS-SC (research up/down = scroll, D32 verbatim).
+NEXT tWIN-1 (D32, third leg): "escaping from the galaxy screen to the title
+screen OPENS A NEW WINDOW instead of bouncing back in the existing window,
+and things get buggy — UI elements don't get drawn in some windows, hovering
+the mouse in the corner of one window pops the escape art in another".
+tESC-1 shipped the title<->campaign LOOP with a window HANDOFF law
+(main.cpp hands `handedWindow` back; runTitleScreen takes windowIn), so the
+user's symptom means the handoff does NOT actually hold on the live eject
+leg — REPRODUCE FIRST (tPF1d-soak shape: --ui no --seed, Begin, eject, then
+assert ONE SDL window exists: xdotool search --name Ascendancy | wc -l, or
+the SDL window count via a 'ui windows N' instrument line if cheaper).
+Candidate root causes to check in order: (1) the eject leg passes
+handedWindow but the title loop re-enters runTitleScreen with a NULL
+windowIn somewhere (main.cpp loop: entryState path); (2) the tNAME-1 clock
+seed line changed nothing here but the eject witness (tESC1_eject_witness.sh
+--ui NO --seed) now runs with a random seed — re-run it and confirm it still
+passes BEFORE blaming tESC-1; (3) windowIn reuse skips a renderer/renderer-
+target rebind, which is exactly the "elements don't get drawn" half. The
+hover-art leak is a separate-citable symptom (escape art drawn into the
+wrong window = a palette/paint-context identity bug) — bank it, fix the
+window COUNT first. Vendor law: single window the whole session (t385
+single-window boot law; the vendor never creates a second SDL/X11 window —
+verify with the refcap corpus if needed). Pins + witness per the tESC-1
+pattern.
+ORDERING: tNAME-1 LANDED this iteration (D33-L3 closed by witness; no OQ
+row — open=[016,019] unchanged). tWIN-1 next per the standing D32 queue;
+THEN tRS-SC (research up/down = scroll, D32 verbatim — the press-table row
+likely maps them to the zoom pair; small task, good filler if tWIN-1 blocks).
 ALTERNATIVES/PARKED: TPF7-A per-msg release-mask split (0x47d3b ~ebp role
 owed) if tWIN-1 sizes out; TPF6-CPU-A parked (user throttle ruling
 pending); TPF7-C user feel-grading; TPF5-A ship gated on D1 ruling.
@@ -310,6 +317,37 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+tNAME-1 LANDED 2026-11-27 (D33-L3 PER-GAME NAMES SHIPPED — the vendor has
+NO name RNG: names.txt is a fixed pool (mapgen.md S2), home TYPE is the
+tPL-D1 table, and the per-game variation IS the worldgen SEED. VENDOR LAW
+[verified disasm FUN_00020fd4 = the game's main(), sole call site 0x7b817]:
+fresh path 0x213f7 clock getter 0x7821c -> 0x213fc srand 0x78273 on the one
+Borland LCG 0x7824f BEFORE worldgen; record leg 0x21489 cmp ebx,-1 keeps the
+clock seed unless a stored seed overrides (0x21490). Worldgen 0x238e8 draws
+every per-star/planet param from that stream (0x23da4/0x23a86/0x23a97).
+srand census total = 5 sites (2 fresh/record, 1 srand(0) audio, 2 save/
+restore). CORPUS [measured scripts/tname1_homename_census.py]: 25 fresh
+vendor lineages -> 25 DISTINCT owner-0 home star bases, home cells constant
+per spec — both halves of the user's law confirmed. PORT DEFECT: seed had
+one source (Options.seed=1), the Begin handoff carried none -> every game
+'always Phoebe'. SHIPPED: NewGameSettings.seed (default 1); title Begin
+feeds wheelBaseSeed+1 (chains across eject re-entries); main buildCampaign
+prefers apply->seed; interactive UI boot w/o --seed draws a CLOCK seed
+('main: fresh-run seed %u'); --seed authority everywhere, headless default
+stays 1 (gate seed-identity untouched — gate passes --seed explicitly).
+PINS test_name_seed_tname1 x4; mutations M1-M4 tNAME1_mutate.sh ALL CAUGHT
+(restore md5-ok x4). TRAP: a foreground tool-timeout mid-mutation-round
+leaves the running mutant on disk — restore from the script's /tmp backups
+and cmp-verify, don't trust the killed run's trap. WITNESS
+tNAME1_name_witness.sh rc=0: fresh A home Mira vs fresh B home Xerxes
+(different names, same 73/5 TYPE); --seed 7 x2 -> both Zoroaster (reproduces
++ handoff seed 8 = base+1 chain). Suite 621->625/0/0; gate 0; ledger OK.
+Law docs/re/boot.md tNAME-1 block + _wip_tNAME1.md S1..S8. Residues: clock
+tick semantics unclaimed (port = chrono hash; law is 'time-varies +
+explicit-seed authority'); between-game stream advance modelled as +1
+(only 'never the same seed twice in a run' is observable); port name->slot
+shuffle vs vendor table order — both seed-permutations of the same pool.)
 
 tSPEC-1 LANDED 2026-11-27 (D33-L2 BEGIN SPECIES->PLAY SHIPPED — the
 RACELIST word IS the player species, verified end-to-end at bytes; no OQ row
