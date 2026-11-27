@@ -1014,6 +1014,16 @@ labels + gate shape, closure class same as t323 accepted. Row STAYS OPEN.
 t397 NOTE: acceptance stays DEFERRED per standing ruling (do NOT re-ask);
 the D11 grading page does NOT ask D2 and must not be edited to. Nothing
 closed; only a USER ruling on the deferred packet closes the residue.
+tOQ19-AUDIT NOTE 2026-11-27 (zero capture; docs/re/_wip_tOQ19-audit.md A1-A6):
+the STATE.md assignment "run the ONE scripted-move capture session
+(r297_order_session.py)" was AUDITED DEAD and NOT run — the scripted-mouse
+class is budget-spent (REFUTED-ROUTES.md:465-467) and the batcon select/
+destination road is cited-dead three ways over (t322 mouse live-zero with the
+instrument verified, t323 no in-session activator, t324 class table absent
+fn 0x32100). The row has NO remaining capture route of ANY class and is
+USER-RULING work (D2 + accept cited-dead; t329 S4 draft stays DO-NOT-APPLY).
+Row STAYS OPEN (strict-close — honest negative; a refuted route is not a
+closure).
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

@@ -70,7 +70,16 @@ per-ship sim (t256c census, 62,762 trusted rows). AI dossier row 16 relabelled
 GAP->BOUNDARY PERMANENTLY. This is a BUILD decision, not an RE unknown:
 docs/DECISIONS.md D3.
 
-### Scripted-move capture (t48/t49 route) — LIVE, t298 owns the next launch
+### Scripted-move capture (t48/t49 route) — DEAD (tOQ19-AUDIT 2026-11-27; was mislabelled "LIVE" and re-queued a route retired at t439)
+STANDING CORRECTION: this block's "LIVE, t298 owns the next launch" header is
+what made STATE.md queue tOQ19-1 (run scripts/r297_order_session.py) AFTER
+REFUTED-ROUTES.md:465-467 had budget-spent the scripted-mouse class and t439
+item (vii) had said "r297_order_session.py is NOT available ... must not run
+it". The header was stale; the refutations were not. Full audit + all four
+citations: docs/re/_wip_tOQ19-audit.md A1-A6. Do NOT re-queue any scripted-move
+session for OQ-019: t319/t320 pump, t322 mouse, t323 activation, t324 class
+table are each binding, and DECISIONS.md D7 defers the row to USER ruling
+(D2 + accept cited-dead; t329 S4 draft stays DO-NOT-APPLY).
 Historical: the corpus CANNOT supply flight (t49: 484 saves, zero state-4, zero
 movement, zero item-23 landings; t58 scripted-fresh null too), and st4 is a
 DWELL state invisible at 10 s ring cadence (t265 law). The route that closes

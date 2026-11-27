@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-27T17:45
+updated: 2026-11-27T18:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,32 +233,51 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tOQ19-1: run the ONE scripted-move capture session that is the named
-closing route of OQ-019's sugar-cube residue (docs/BLOCKED.md "Scripted-move
-capture (t48/t49 route)": click own ship, click lane-adjacent destination,
-End-Turn x2, read per-autosave coords from the ring; driver
-scripts/r297_order_session.py, venv python; choreography authority
-docs/re/_wip_t297.md S1 + ships.md S24/S25; GATE: End Turn ONCE before
-picking — owner-0 fleet has no kind-4 ship at t=1086, slot 8 lands t1087;
-capability proven end-to-end t297, session died only at its own owner==0
-picker bug which was FIXED). The live game being dead (GAME_DEAD.txt t438)
-is NOT a blocker: this is a scratch-copy R1 session per the standing
-invariants (scratch copy never mounts game/, headless, -time-limit,
-pkill -x dosbox-x only, bounded output). If the coords law lands, UPGRADE
-the rewrite's arrival/landing model to the cited law and CLOSE the OQ-019
-residue clause; if the session cannot produce state-4 movement, that is the
-honest negative (bank, row stays open). Corpus mining is FORBIDDEN for this
-class (t49/t58/t265 closed it three times).
-ORDERING: tRS-SC LANDED this iteration (D32-L4 scroll defect fixed at the
-camera field role; no OQ row — open=[016,019] unchanged). The ENTIRE D32
-queue is now closed (tXT-1, tWIN-1, tRS-SC) and all three D33 legs shipped
-(tD34, tSPEC-1, tNAME-1), so the loop returns to the LEDGER: of the two
-open rows, OQ-019 has the cheaper named route (one scripted session,
-existing driver) vs OQ-016 Phase-Bomb (one R1 run forcing a gizmo build —
-keep as the FOLLOW-UP). ALTERNATIVES/PARKED: TPF6-CPU-A parked (user
-throttle ruling pending); TPF7-C user feel-grading; TPF5-A ship gated on
-D1 ruling. OQ-016/OQ-019 remain the only open ledger rows (both
-capture-blocked classes; both now have a concrete one-session route).
+NEXT tPF5-A: name and (if derivable) ship the planet INDICATOR-popup frame —
+the last open leg of D28 item 9 ("clicking the frames along the top should pop
+up a window ... with the same mineral framing as the rest of the UI").
+CONSTRAINT ALREADY MEASURED (docs/re/_wip_tOQ19-audit.md A7 — read that FIRST):
+the four indicator tiles PLRES/PLIND/PLPRO/PLPOP (extracted/ascend00/
+windows.txt lines 1536/1553/1570/1587) each carry SHAPEFRAME -1, so there is
+NO per-widget frame word; the framing must come from the lib the CODE resolves.
+STATIC ROUTE, ZERO guest boot, budget <=4 probes: (1) locate the popup-open
+site behind SENDMESSAGE 50 with SENDPARAM1 0/1/2/4 (the four tiles' params) and
+read which shape-lib id the indicator path pushes; (2) resolve that id through
+the ds:0x9f10c cache join (ctx+0x7d0+id*32 — tPF-4 pattern, script
+scripts/tPF4_rowart_runtime.py) over the FROZEN BANK
+work/r1/bank-t438-ring-2200 (t439 LAW: PIN A BANK, NEVER THE LIVE RING);
+(3) if it names a decoded lib, blit it at the indicator popup (ui.cpp draws a
+port vector frame there today) + pin + mutation; if it resolves to help.shp-k0
+then item 9 CLOSES as "same answer as the tile popup" with a citation and NO
+code delta. Frame-word precedent from the A7 census: list/popup windows all
+use frame 7 (RACELIST/LOADLIST/GIZLIST/PLANLIST/STATSHIPLST/PLAYERDIP/
+BatListWnd/HELPWINDOW). The tPF-5 note that TPF5-A is "gated on the user's D1
+ruling" is STALE and already audited: OQ-005 CLOSED t367 by the D1 ruling
+(research.md S14(f) verbatim) — no gate stands on shipping decoded frame art.
+ORDERING: tOQ19-1 (this file's previous assignment) was AUDITED-DEAD this
+iteration, not run — see the tOQ19-AUDIT LANDED block and
+docs/re/_wip_tOQ19-audit.md A1-A6; the scripted-mouse class is budget-spent
+(REFUTED-ROUTES.md:465-467) and every OQ-019 capture route is cited-dead
+(t319/t320 pump, t322 mouse, t323 activation, t324 class table), so OQ-019 is
+USER-RULING work (D2 + accept cited-dead, t329 S4 draft stays DO-NOT-APPLY),
+never capture work. That leaves NO capture route for either open row: OQ-016's
+residue list is EXHAUSTED (OPEN-QUESTIONS.md:269 — "(1) cited-dead x8 legs =
+user ruling, (2)(3)(4) CLOSED, (6) CLOSED as misattribution") and OQ-019's is
+cited-dead x4. Therefore the loop's live work is the D28/tPF DEFECT QUEUE, and
+TPF5-A is its only non-user-gated, statically derivable item. PARKED (do not
+run without the named ruling): TPF6-CPU-A (user throttle ruling), TPF7-C (user
+feel-grading), OQ-016/OQ-019 closures (D2/D3 adjudication). AFTER tPF5-A the
+defect queue has no derivable item left — the next session must either adopt a
+fresh user ruling or hand the two rows to D2/D3 adjudication rather than
+inventing a capture (t178).
+NEW CONTROL-PLANE LAW (tOQ19-AUDIT, standing): a NEXT ACTION names a ROUTE, and
+routes ROT. Before executing any assignment that spends a capture/budget class,
+grep the route's class in docs/REFUTED-ROUTES.md and check the row's USER-RULING
+status in docs/DECISIONS.md; if either forbids it, the assignment is stale —
+bank the premise audit as the iteration's honest negative and re-queue, do NOT
+run it and do NOT treat the stale text as authority. STATE.md:236 did re-queue
+a route the loop retired two handoffs earlier (t439 item (vii) had already said
+"r297_order_session.py is NOT available ... must not run it").
 NEW tRS-SC TRAPS (standing): a camera-struct field ROLE must be derived
 from the INIT writes (0x4710e triplet), never from a later write site's
 offset reuse — +0xe3 was 'position z' for two iterations because the -150
@@ -324,6 +343,40 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+tOQ19-AUDIT LANDED 2026-11-27 (ASSIGNED TASK tOQ19-1 AUDITED DEAD, NOT RUN —
+PREMISE AUDIT IS THE ITERATION'S HONEST NEGATIVE; no OQ row moved —
+open=[016,019] unchanged; zero capture, zero code change). THE ASSIGNMENT
+(STATE.md:236 "run the ONE scripted-move capture session ... driver
+scripts/r297_order_session.py") is FORBIDDEN by four independent binding
+sources, each cited verbatim in docs/re/_wip_tOQ19-audit.md: (A1.1)
+REFUTED-ROUTES.md:465-467 budgets the scripted-MOUSE session class SPENT
+(t293x3 + t297x1 + t298x3; "next witness = debugger, not launch #4"); (A1.2)
+t322 amendment — the four batcon click-road legs {0x1AEF8, 0x1B91C,
+w43508_1b5e6, w43508_1baa7} armed live for the FIRST time over the exact
+t298-shape battery: ALL ZERO, instrument-verified (census-ctl MATCH=True);
+(A1.3) t323 amendment — BatModeWnd activation has NO in-session trigger (the
+runtime switcher fn 0x31f30 is reached only from fn 0x32100, absent from the
+BATMODE class table), so no choreography can drive it; (A1.4) t324 — the
+re-open condition discharged NEGATIVE ABSOLUTE (live-RAM class table at data
+0x58e8 byte-for-byte cites fn 0x32100 ABSENT, 10/10 saves). A2: the loop had
+ALREADY retired this exact driver — t439 item (vii) "r297_order_session.py is
+NOT available ... must not run it"; the stale authority was BLOCKED.md's
+"LIVE, t298 owns the next launch" header, now corrected in place. A3: OQ-019
+is USER-RULING work regardless of route (DECISIONS.md D7 deferral; t329 S4
+draft DO-NOT-APPLY), so a capture could not close it even if alive. A4:
+production game UNHEALTHY again (GAME_HEALTH_LIVE: pid 1623906 gone, ring
+51.sav age 150161 s) — noted, NOT the reason. A5: sitting check performed
+FIRST and NEGATIVE (timeline 10,512,108,087 B unchanged, turn==1086 on every
+tail record; r1_t85g_sitting.py correctly not run); tree clean at start, no
+ruling, nothing to adopt (t178). BANKED GROUNDWORK for the re-queued task
+(A7): whole-file SHAPEFRAME census — PLRES/PLIND/PLPRO/PLPOP each SHAPEFRAME
+-1 (no per-widget frame word), and frame 7 is the list/popup precedent
+(RACELIST/LOADLIST/GIZLIST/PLANLIST/STATSHIPLST/PLAYERDIP/BatListWnd/
+HELPWINDOW). NEW STANDING CONTROL-PLANE LAW banked into NEXT ACTION: verify a
+route against REFUTED-ROUTES + the row's user-ruling status BEFORE executing a
+budget-spending assignment; a stale assignment is audited and re-queued, never
+run. NEXT tPF5-A (indicator-popup frame, static route, budget <=4).)
 
 tRS-SC LANDED 2026-11-27 (D32-L4 RESEARCH UP/DOWN = SCROLL NOT ZOOM —
 ROOT CAUSE WAS A CAMERA FIELD-ROLE MISREAD, FIXED, PINNED, WITNESSED; no
