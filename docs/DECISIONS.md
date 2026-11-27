@@ -858,3 +858,35 @@ cluster + SEVEN species -> exits; AVERAGE density -> survives.
 Rows: tXT-1 (extinct law + capture provenance), tWIN-1 (eject must
 reuse window; two-window bug), tRS-SC (research up/down = SCROLL not
 zoom - our press-table row likely mapped them to the zoom pair).
+
+## D33 — CAPTURE-LAW IMPOSSIBILITY + HOME PLANET/NAME LAWS (USER, 2026-11-27, verbatim)
+
+> Phoebe is my home planet in the build - still the incorrect planet
+> type, btw. Also, the original game has a different system/planet name
+> each game, just with a particular planet type for the home planet for
+> each species, but the rebuild always seems to pick Phoebe and medium
+> eden planet, regardless of species. Also, I just tried again with
+> Minions at a very dense star density and seven players, and it exited
+> at turn 20 as well. Also, there's no way any player would be able to
+> conquer another race on turn 20, even if they were directly adjacent
+> - every player should start out with an empty planet, and 20 days in
+> every player will still be building their first structure.
+
+GROUNDS: kPlayer=0 (campaign.h:31) => "owner 1" = an AI. User laws:
+L1 capture of an inhabited home is IMPOSSIBLE by day 20 (empty start,
+first structure still under construction) => our capture emitter
+(campaign.cpp:2258) fires illegally; derive the VENDOR capture law
+(what fleet arrival actually captures: defended? colonize-only?) and
+make ours match; the t20 Extinct is a CONSEQUENCE of the illegal
+capture (fix emitter, not the Extinct check, unless diagnosis says
+otherwise).
+L2 home planet TYPE is per-species (table, tPL-D1) but ours shows
+medium eden REGARDLESS of species => the Begin species pick never
+reaches play (loop banked: NewGameSettings has no species field —
+PLUMB IT: wheel species -> cfg -> home table read -> terrain row +
+art).
+L3 system/planet NAMES differ every game in the original; ours picks
+Phoebe every time => name assignment is not being randomized per game
+(or mapgen is deterministic where the vendor randomizes). Derive the
+vendor name-assignment law (names.txt draw order vs RNG per game).
+Repro: dense+7 exits t20 for BOTH Chamachies and Minions.
