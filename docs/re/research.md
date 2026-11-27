@@ -553,12 +553,9 @@ nothing"). Full working log docs/re/_wip_tPF7.md P1-P7; headline laws:
   clickup <= 1, no sticky latch after a plain click, latch 0 0 logged.
   Four existing research witnesses migrated to xsend clickdn/clickup +
   POLLLED hold (the sleep-6 idiom assumed the sticky 1 s latch).
-- SEAMS: TPF7-A per-msg release mask split (0x38 vs 0x39; ship-safe =
-  releasing control clears its own pair); TPF7-D direct fire-loop period
-  measurement (expected 34.2 +-0.6 ms); tPF-7b cosmos/systemCam pumps still
-  on kSpinTickMs=1000 (29x slow by this derivation — next research-screen
-  adjacent task); user item 16 "feel" ruling may still land via a grade
-  page (TPF7-C).
+- SEAMS: TPF7-A CLOSED tPF-7a (S16: param law + press-table fix); TPF7-D
+  CLOSED tPF-12 (S15 negative); tPF-7b shipped e43fc2e; user item 16
+  "feel" ruling may still land via a grade page (TPF7-C).
 
 ## 11. tPF-8 OPENING-RESEARCH + REST-VISIBILITY LAW (2026-11-26, D28 item 21)
 
@@ -730,3 +727,47 @@ Full working log docs/re/_wip_tPF12.md P0-P6. Headlines:
   + S30-X5 29.25+-0.5/s both contain 34), explicitly NOT a lifted constant.
   TPF7-D CLOSED with this negative; a tighter capture (>29 Hz yaw sampling)
   is only worth queuing behind a landed feel complaint (TPF7-C).
+
+## 16. tPF-7a RELEASE-PARAM LAW + PRESS-TABLE CORRECTION (2026-11-26)
+Closes the S10 seam TPF7-A (per-msg release-mask split). Full working log
+docs/re/_wip_tPF7a.md P1-P6. Headlines:
+- THE SPLIT IS A PARAM, NOT AN ID: reswin's only release producer is msg
+  0x38 (sole `mov ecx,0x38` in the image, 0x47c67 — the press tail
+  0x47c48); ids 56/57/58 in windows.txt belong to COSMOSWnd buttons
+  (CENTERHOLO/TOGLANES/TOGSHIPS ln336/354/390; msg-id space is per-window,
+  do not conflate — same trap as the tPF-7 pump 0x3a-vs-0x3b note). The
+  press arms msg 0x38 with queued PARAM = 1 after a MOVE press (msg 52/53)
+  and ebp VERBATIM = 4 after a ROT press (0x47c54 `mov eax,ebp` precedes
+  the 0x34/0x35 cmps; the earlier "(? 1 : 0)" phrasing mis-stated the
+  else-value).
+- DISPATCH VERBATIM CHAIN (the seam's ebp-role question): queue writer
+  0x5669c stores param at slot+0xa; one-shot walker 0x56798 leg-1 loads
+  `mov ecx,[slot+0xa]` (0x5683d) and calls 0x56ca4, which does `mov ebx,
+  ecx` and invokes the widget vtable [w+0xa7]+8; handler entry 0x47614
+  `mov ebp,ebx`. => ebp == queued param verbatim, so 0x47d3b's
+  `latch &= ~ebp` masks ~1 (MOVE GATE bit0) or ~4 (ROT GATE bit2) and the
+  DIRECTION bit survives the release. Walker guard banked: leg-1 needs
+  (filter&mask)!=0 where mask bit0 = (grab word 0x484dc == -1) — the
+  queued release fires only while no widget holds the mouse grab.
+- PRESS-TABLE DEFECT FOUND + FIXED (the iteration's real prize): the
+  exhaustive vendor-model pin caught the shipped pressPair having the two
+  pairs' (1,1)-state legs SWAPPED. Raw immediates (own hexdump
+  _wip_tPF7a P4): pair A legs (msg 50/52) `and 0xf7`/`and 0xfd` clear DIR
+  => (1,1)->(1,0) FLIP; pair B legs (msg 51/53) `and 0xfb`/`and 0xfe`
+  clear GATE => (1,1)->(0,1) DEAD. The old table had A(1,1)->DEAD,
+  B(1,1)->(1,0) — a MISREAD inherited from _wip_tPF7 P2 line 76
+  contradicting its own line 72/73, and pinned wrongly by
+  test_researchgeom_trsvc (corrected in place). Vendor feel: RIGHT/DOWN
+  press twice KILLS motion; LEFT/UP press twice FLIPS direction.
+- EQUIVALENCE (why pair-clear release stays): gate-clear (vendor) and the
+  port's pair-clear are indistinguishable to every consumer — the pump
+  tests the gate bit FIRST (0x47c8e/0x47cd6 je-skip) and every press leg
+  with gate clear re-normalises dir. Exhaustive pin: 256 raw latch bytes
+  x 6^4 op sequences, zero mismatches (test_releaseparam_tpf7a).
+- SHIP + PINS: pressPair corrected (researchview.cpp:279), comments cited
+  (.h), test_releaseparam_tpf7a x3 added (param law, exhaustive
+  equivalence, press-leg fidelity), test_researchgeom latch pins
+  re-anchored; suite 595->598/0/0. MUTATION 2/2 CAUGHT (M1 old swapped
+  table: 10 fails; M2 release-pair swap: 27). WITNESS tPF7_witness.sh
+  VERDICT PASS post-fix (hold 60 re-logs/4.76 s, freeze-after-release 1,
+  no sticky latch).

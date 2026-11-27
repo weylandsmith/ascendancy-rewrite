@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-26T13:40
+updated: 2026-11-26T18:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,63 +233,98 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT TPF7-A PER-MSG RELEASE-MASK SPLIT (0x38 vs 0x39, research.md S10
-seam; the LAST iterable item in the pump/release family).
-Ordering rationale: tPF-1c (this iteration) CLOSED the day-20 exit report
-at MECHANISM — scripts/tPF1c_repro.sh + tPF1c_escape_test.sh prove the
-user's verbatim cmdline survives 45 registered NEXT TURN presses with zero
-VICTORY lines, and reproduce his symptom line 'ui ok: turn 20' EXACTLY via
-one Escape at the stack bottom (doEscape else-branch, era ui.cpp:573 ==
-HEAD ui.cpp:683 — the cited t410 quit-at-bottom law, vendor-faithful, NOT
-a defect). No code change, no fixing commit needed, victory-law suspects
-REFUTED (docs/REFUTED-ROUTES.md R-tPF1c). That removes tPF-1c from the
-queue; TPF7-A was the standing follow-on. TPF6-A/B need their own
-build-list citations, TPF6-CPU-A awaits a user throttle ruling, TPF7-C is
-a feel-grading ask (re-open only if the tick-rate finding motivates a
-capture).
-Steps: (1) re-read 0x47d3b + the press tail 0x47c48 (0x5669c queue args:
-push (msg==0x34/0x35 ? 1 : 0)) — the pushed flag is the PRIME suspect
-for selecting which msg (0x38 vs 0x39) the press arms; (2) find the
-framework dispatcher that turns the queued slot into the handler's ebp
-(0x56ca4 dispatch chain — P5 banked its address); (3) if ebp is the
-queued param verbatim, the mask law FOLLOWS (0x38 arms with flag 0/1
-=> rot vs move pair) and SHIP + pins; if not, write the honest negative
-and keep TPF7-A open. TRAPS: disasm script =
-~/tools/revenv/bin/python scripts/t442_disasm.py START END (project
-.venv has NO capstone — tPF-12 trap); bash hex math $((0x..+0x..)) mixes
-bases — pass EXPLICIT hex END (tPF-12 10MB-flood trap); anchors at
-DEFINITIONS; window-pin substr guards; no pin literal in comments.
+NEXT TPF6-B: RECOVER THE VENDOR PLANLIST PER-CELL FILTER SITE (or certify
+its absence) — the list-construction function behind the planet-screen
+PLANLIST popup, and whether it gates rows by the ARMED CELL.
+Ordering rationale: tPF-7a (this iteration) closed the last iterable item
+in the pump/release family (research.md S16 + TPF7-A seam closed; TPF7-C
+is a user feel-grading ask, TPF7-D closed negative tPF-12) and turned up a
+SHIPPED press-table defect on the way, so the queue must move to the next
+family: the planet build-list. TPF6-A (does the vendor ever show a Build
+whose list has no buildable row) CANNOT be answered before TPF6-B, and
+TPF6-B is pure static RE with known anchors — the 54-append loop 0x3d550..
+0x3d58e already proves checker 0x3830c(item, cell) is cell-aware for the
+Build BUTTON (tPF-2d D6); the unanswered question is the ROW LIST.
+TPF6-CPU-A stays parked (user throttle ruling pending, port-decision not
+vendor law).
+Steps: (1) find the msg handler that fills the PLANLIST widget on popup
+open (window name PLANLIST in extracted/ascend00/windows.txt; its
+SENDMESSAGE id + the handler's dispatch entry, same method as tPF-7a P2:
+widget table -> handler entry -> dispatch on dx); (2) read the list-build
+loop and determine whether 0x3830c (or the REQUIRES predicate 0x46d3c, or
+placementBlock's vendor twin) is called with the ARMED CELL word or with a
+constant/-1; (3) if cell-aware, diff its gate against projectOptionsFor
+and SHIP any delta + pins; if it is NOT cell-aware, that is the honest
+negative: our per-cell filter (tPF-6) is then PORT-ONLY and must be
+re-examined against the vendor reading — record it and keep TPF6-B open
+per strict-close.
+TRAPS: disasm = ~/tools/revenv/bin/python scripts/t442_disasm.py START END
+(.venv has NO capstone); pass EXPLICIT hex END (bash $((0x..+0x..)) mixes
+bases and once flooded 10 MB); anchors at DEFINITIONS (pressPair lives in
+researchview.cpp, not .h — tPF-10 M3 trap); a mutation script's restore()
+must COPY BACK then md5-verify, verify-only leaves mutations on disk
+(tPF-6 incident); NEVER git checkout a file mid-mutation-cycle (this
+iteration's git checkout reverted BOTH the fix and the mutation — mutate,
+test, patch back explicitly); no single-occurrence pin literal in comments
+(window-pins size past comment bodies, tPF-1b); CHECKs on fixed items use
+base-list items and ACTIVE cell pairs DERIVED from the grid law (tPF-6).
 TRAPS STILL STANDING (full per-iteration detail in git history of this
 block + docs/re/*): NEVER read whole lines of work/r1/playcap/live-
 timeline.jsonl; D28 file scratchpad/t433-build-feedback.txt is the item
 authority; the 433 composite is SIDE-BY-SIDE (LEFT=PORT, RIGHT=VENDOR,
 vendor-half pixel counts tolerate resampling); when a counter reads zero
-check PRODUCER EXISTENCE first (D29; tPF-12 addendum: a sample-and-reset
-meter legitimately rests at 0 in every snapshot — read the reset site
-before calling absence); C1-C5 + race intro stay DEFERRED (D25); harness
-CHECK does NOT return — guard every window-pin substr after a find CHECK,
-count a nonzero exit with no FAIL line as CAUGHT (tPF-10); window-pins
-size past comment bodies and NO comment may contain a single-occurrence
-pin literal (tPF-1b); a campaign stdout is BLOCK-BUFFERED — pgrep -f is
+check PRODUCER EXISTENCE first (D29; a sample-and-reset meter legitimately
+rests at 0 — read the reset site before calling absence); C1-C5 + race
+intro stay DEFERRED (D25); harness CHECK does NOT return — guard every
+window-pin substr after a find CHECK, count a nonzero exit with no FAIL
+line as CAUGHT (tPF-10); a campaign stdout is BLOCK-BUFFERED — pgrep -f is
 the only liveness test (tPF-5); hold witnesses measure AFTER the click
-settles, polled stop conditions not fixed sleeps (tPF-7); fixed-item
-CHECKs use base-list items, ACTIVE cell pairs DERIVED from the grid law
-(tPF-6); pin pixels from ShapeLibrary::decode, never tools/shp_pngdump
-raw .idx (tPF-10 partial-walk); `open(p,"w").write(open(p).read()+x)`
-TRUNCATES BEFORE reading (tPF-5); corner-text census boxes start x>=16,
-planet starfield empty-box <=8 / label >=30 (tPF-9); band census on code-
-drawn chrome = NON-BLACK frac, the textureColourAt family includes dark
-mottle cells the vendor-bright min>=40 classifier misreads (tPF-11);
-tPF-1c x11: an interactive soak is VACUOUS unless EVERY leg asserts its
-own log line (a 45-press run with 0 registered presses prints the same
-'ALIVE' as a real one — grep -c the click line per press), the order log
-reads 'ordered armed cell N' INSIDE parens (ui.cpp:1146), an armed n=0
-PLANLIST cell leaves projectOpen set (recovery = Escape to STATUS + row
-re-select resets, ui.cpp:899), Escape from planet view lands on STATUS
-NOT the map, repro scripts need a cleanup trap (a leaked Xvfb makes the
-next run print a fake 'Xvfb dead'), and BIN/DATA must be env-overridable
-before an era-tree A/B is trusted (the first era run silently used the
-HEAD binary).
+settles, polled stop conditions not fixed sleeps (tPF-7); pin pixels from
+ShapeLibrary::decode, never tools/shp_pngdump raw .idx (tPF-10 partial-
+walk); `open(p,"w").write(open(p).read()+x)` TRUNCATES BEFORE reading
+(tPF-5); corner-text census boxes start x>=16, planet starfield empty-box
+<=8 / label >=30 (tPF-9); band census on code-drawn chrome = NON-BLACK
+frac (tPF-11); an interactive soak is VACUOUS unless EVERY leg asserts its
+own log line (grep -c the click line per press), the order log reads
+'ordered armed cell N' INSIDE parens (ui.cpp:1146), an armed n=0 PLANLIST
+cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
+ui.cpp:899), Escape from planet view lands on STATUS NOT the map, repro
+scripts need a cleanup trap, and BIN/DATA must be env-overridable before
+an era-tree A/B is trusted (tPF-1c x11).
+
+tPF-7a LANDED 2026-11-26 (RELEASE-PARAM LAW CLOSED + SHIPPED PRESS-TABLE
+DEFECT FIXED; no OQ row touched — open=[016,019] unchanged; CODE SHIPPED:
+researchview.{h,cpp} + pins).
+ - SEAM CLOSED AT MECHANISM: the '0x38 vs 0x39' framing was a cross-window
+   mis-map — reswin's ONLY release producer is msg 0x38 (sole 'mov
+   ecx,0x38' in the image, 0x47c67); ids 56/57/58 = COSMOSWnd buttons
+   (windows.txt ln336/354/390; msg-id space is per-window). The split that
+   matters is the queued PARAM: press tail 0x47c48 arms param 1 after a
+   MOVE press (52/53) and ebp-verbatim 4 after a ROT press (50/51; 0x47c54
+   'mov eax,ebp' PRECEDES the cmps — the '(? 1 : 0)' note mis-stated the
+   else value). DISPATCH VERBATIM: slot+0xa -> 0x5683d ecx -> 0x56ca4
+   'mov ebx,ecx' -> vtable [w+0xa7]+8 -> 0x47614 'mov ebp,ebx' => ebp ==
+   queued param; mask = pressed pair's GATE bit (bit0 move / bit2 rot),
+   DIR bit survives. Walker guard banked: leg-1 needs (filter&mask)!=0,
+   mask bit0 = (grab word 0x484dc == -1).
+ - *** DEFECT FOUND BY THE EXHAUSTIVE PIN ***: shipped pressPair had the
+   pairs' (1,1)-legs SWAPPED. Raw immediates: pair A (50/52) 'and f7/fd'
+   clears DIR => (1,1)->(1,0) FLIP; pair B (51/53) 'and fb/fe' clears GATE
+   => (1,1)->(0,1) DEAD. _wip_tPF7 P2 line 76 'pressPair CORRECT' was a
+   misread contradicting its own lines 72-73; test_researchgeom pinned the
+   wrong reading. Vendor feel: RIGHT/DOWN twice KILLS, LEFT/UP twice
+   FLIPS — part of the D28 item-17 family. Fixed + re-pinned.
+ - EQUIVALENCE: pair-clear release == vendor gate-clear for every consumer
+   (pump tests gate FIRST 0x47c8e/0x47cd6; press legs re-normalise dir) —
+   exhaustive pin 256 latch bytes x 6^4 sequences, ZERO mismatches
+   (tests/test_releaseparam_tpf7a.cpp x3, CMakeLists entry ADDED).
+ - SUITE 595->598/0/0; MUTATION 2/2 CAUGHT (M1 old swapped table: 10
+   fails — anchored at the .cpp DEFINITION; M2 release-pair swap: 27).
+   WITNESS tPF7_witness.sh VERDICT PASS post-fix (hold 60 re-logs/4.76 s,
+   freeze 1, no sticky latch). Law research.md S16; log _wip_tPF7a.md
+   P1-P6 + _wip_tPF7 correction addendum.
+ - TRAP x1 NEW: NEVER git checkout a file mid-mutation-cycle — it reverted
+   the fix AND the mutation simultaneously (patch back explicitly).
 tPF-1c LANDED 2026-11-26 (DAY-20 EXIT REPORT CLOSED AT MECHANISM — THE
 QUIT LEG, NOT A VICTORY; no OQ row touched — open=[016,019] unchanged,
 honest negative; NO code change, docs+scripts only).

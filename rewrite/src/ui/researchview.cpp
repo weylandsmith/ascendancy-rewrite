@@ -277,17 +277,20 @@ ResPoint researchNodePos(const ag::ResearchTree& tree, int row, int panX,
 }
 
 int ResCam::pressPair(int state, bool pairB) {
-    // dat_764c4 bit-pair transitions (0x47b44..0x47c42 VERBATIM, P11).
-    // Encoding 0=(0,0) 1=(1,0) 2=(1,1) 3=(0,1).
+    // dat_764c4 bit-pair transitions (0x47b44..0x47c42, RAW AND/OR
+    // immediates f7/fb/or8, fd/fe/or2, or0xc — tPF-7a re-derivation,
+    // docs/re/_wip_tPF7a.md P6; the earlier shipped table had the pair-A
+    // and pair-B case-(1,1) legs SWAPPED). Encoding 0=(0,0) 1=(1,0)
+    // 2=(1,1) 3=(0,1).
     if (!pairB) {  // pair A (msg 50 ROTLEFT / 52 MOVEUP)
-        // (0,0)->start(1,0); (1,0)->stop(0,0); (1,1)->DEAD(0,1);
+        // (0,0)->start(1,0); (1,0)->stop(0,0); (1,1)->FLIP(1,0) — the
+        //   0xf7/0xfd leg clears the DIR bit and KEEPS the gate;
         // (0,1)->revive-left(1,0).
-        switch (state) { case 0: return 1; case 1: return 0;
-                         case 2: return 3; default: return 1; }
+        switch (state) { case 1: return 0; default: return 1; }
     }
     // pair B (msg 51 ROTRIGHT / 53 MOVEDOWN): every state -> (1,1)
-    // except (1,1)->(1,0) (the 0x47b44..0x47c42 chain, P11).
-    return (state == 2) ? 1 : 2;
+    // except (1,1)->DEAD(0,1) — the 0xfb/0xfe leg clears the GATE.
+    return (state == 2) ? 3 : 2;
 }
 
 void ResCam::tick() {

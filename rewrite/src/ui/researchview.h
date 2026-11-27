@@ -169,26 +169,34 @@ struct ResCam {
     // dat_764c4 bit-pair latches encoded 0=(0,0) 1=(1,0) 2=(1,1) 3=(0,1).
     int latchRot = 0, latchMove = 0;
 
-    // Press law (0x47b44..0x47c42 VERBATIM, P11): pair A = msg 50/52,
-    // pair B = msg 51/53. A: (0,0)->(1,0) start; (1,0)->(0,0) stop;
-    //   (1,1)->(0,1) DEAD; (0,1)->(1,0) revive-left.
-    // B: (0,0)/(1,0)/(0,1)->(1,1); (1,1)->(1,0).
+    // Press law (0x47b44..0x47c42 raw immediates, tPF-7a P6 re-derivation
+    // — the earlier comment had the two pairs' (1,1) legs swapped):
+    // pair A = msg 50/52: (0,0)->(1,0) start; (1,0)->(0,0) stop;
+    //   (1,1)->(1,0) FLIP (keeps moving left/up); (0,1)->(1,0) revive.
+    // pair B = msg 51/53: (0,0)/(1,0)/(0,1)->(1,1); (1,1)->(0,1) DEAD.
     static int pressPair(int state, bool pairB);
     void pressRot(bool pairB) { latchRot = pressPair(latchRot, pairB); }
     void pressMove(bool pairB) { latchMove = pressPair(latchMove, pairB); }
 
     // tPF-7 RELEASE LAW (0x47d3b VERBATIM shape: `ebx=[0x764c4]; not ebp;
     // and ebx,ebp; mov [0x764c4],ebx` — the framework's button-release msg
-    // 0x38/0x39 ANDs OUT the released control's bit pair; our 2-bit pair
-    // encoding means AND-OUT == inactive state 0): releasing the mouse
-    // clears THAT control's pair. This is what makes the vendor dials
+    // ANDs OUT the released control's latch; our 2-bit pair encoding means
+    // AND-OUT == inactive state 0): releasing the mouse clears THAT
+    // control's pair. This is what makes the vendor dials
     // CONTINUOUS-WITHOUT-LATCH (press moves while held, release stops) —
     // the user's D28 item 17 target, corroborated verbatim by the vendor's
     // own help resmove text (extracted/ascend00/help.txt: "Use the right
     // mouse button if you want to move or rotate continuously").
-    // Per-msg mask split (0x38 vs 0x39) = seam TPF7-A; pair ownership by
-    // control is windows.txt (RESROTLEFT/RIGHT msg 50/51 = rot pair,
-    // RESMOVEUP/DOWN msg 52/53 = move pair).
+    // tPF-7a CLOSED the per-msg seam (docs/re/_wip_tPF7a.md P1-P5): the
+    // press tail arms msg 0x38 (reswin's ONLY release producer) with
+    // queued PARAM 1 after a move press (msg 52/53) and 4 after a rot
+    // press (msg 50/51); the dispatcher hands the slot param to the
+    // handler verbatim (slot+0xa -> 0x5683d ecx -> 0x56ca4 ebx -> 0x47614
+    // mov ebp,ebx), so the mask is the pressed pair's GATE bit and the
+    // direction bit SURVIVES. Pair-clear here is byte-equivalent to
+    // gate-clear — pinned tests/test_releaseparam_tpf7a.cpp. Pair
+    // ownership by control is windows.txt (RESROTLEFT/RIGHT msg 50/51 =
+    // rot pair, RESMOVEUP/DOWN msg 52/53 = move pair).
     void releaseRot() { latchRot = 0; }
     void releaseMove() { latchMove = 0; }
 

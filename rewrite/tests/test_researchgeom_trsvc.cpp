@@ -222,15 +222,18 @@ TEST(researchgeom_scan_order_trsvc) {
 }
 
 TEST(researchgeom_latch_pump_trsvc) {
-    // dat_764c4 transition table (0x47b44..0x47c42, P11). Encoding:
-    // 0=(0,0) 1=(1,0) 2=(1,1) 3=(0,1).
+    // dat_764c4 transition table (0x47b44..0x47c42 raw immediates;
+    // tPF-7a P6 CORRECTION — the first pin of this table had the pairs'
+    // (1,1) legs swapped: pair A 0xf7/0xfd clears DIR (FLIP), pair B
+    // 0xfb/0xfe clears GATE (DEAD)). Encoding: 0=(0,0) 1=(1,0) 2=(1,1)
+    // 3=(0,1).
     CHECK(au::ResCam::pressPair(0, false) == 1);
     CHECK(au::ResCam::pressPair(1, false) == 0);
-    CHECK(au::ResCam::pressPair(2, false) == 3);
+    CHECK(au::ResCam::pressPair(2, false) == 1);  // (1,1)->(1,0) FLIP
     CHECK(au::ResCam::pressPair(3, false) == 1);
     CHECK(au::ResCam::pressPair(0, true) == 2);
     CHECK(au::ResCam::pressPair(1, true) == 2);
-    CHECK(au::ResCam::pressPair(2, true) == 1);
+    CHECK(au::ResCam::pressPair(2, true) == 3);   // (1,1)->(0,1) DEAD
     CHECK(au::ResCam::pressPair(3, true) == 2);
     // Pump deltas (0x47c88/0x47cdb): rot +3/-3 deg, dolly -1/+1.
     au::ResCam cam;
@@ -241,10 +244,15 @@ TEST(researchgeom_latch_pump_trsvc) {
     cam.pressRot(true);    // (1,1)
     cam.tick();
     CHECK(std::fabs(cam.yawDeg - 0.0) < 1e-9);  // +3 then -3
-    cam.pressRot(false);   // (1,1)->(0,1) DEAD
+    cam.pressRot(false);   // (1,1)->(1,0) FLIP keeps rotating LEFT-signed
+    CHECK(cam.latchRot == 1);
+    cam.tick();
+    CHECK(std::fabs(cam.yawDeg - 3.0) < 1e-9);   // (1,0) pumps +3 again
+    cam.pressRot(true);                            // (1,1) again
+    cam.pressRot(true);                            // ->(0,1) DEAD
     CHECK(cam.latchRot == 3);
     cam.tick();
-    CHECK(std::fabs(cam.yawDeg - 0.0) < 1e-9);  // DEAD pumps nothing
+    CHECK(std::fabs(cam.yawDeg - 3.0) < 1e-9);  // DEAD pumps nothing
     // Dolly: MOVEUP (pair A) => posZ -= 1 (camera backs away, tree SHRINKS;
     // the fadd chain 0x47d03..0x47d12 is the authority, _wip P12 note).
     au::ResCam d;

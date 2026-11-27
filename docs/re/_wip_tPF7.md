@@ -194,3 +194,12 @@ MEASURED LIVE AT ~1/s (static; 0x56374/0x56608 + callers)
   again" idiom relied on the sticky latch + 1s pump; at 34ms it would dolly
   ~175 units. The poll adaptive-terminates on the app's own centre re-log
   count (>= 8 changes), so the scripts survive any future cadence change.
+
+## CORRECTION (tPF-7a, 2026-11-26): P2 line 76 "pressPair CORRECT, no
+## port bug in the table" WAS WRONG, and P2's own lines 72-75 were right.
+Raw immediates (hexdump, _wip_tPF7a P4): msg50/52 both-set legs AND 0xf7/
+0xfd clear DIR => (1,1)->(1,0) FLIP; msg51/53 both-set legs AND 0xfb/0xfe
+clear GATE => (1,1)->(0,1) DEAD. The shipped pressPair had these SWAPPED
+(A(1,1)->3, B(1,1)->1). Fixed in researchview.cpp pressPair + re-anchored
+test_researchgeom_trsvc pins; equivalence + fidelity pins
+test_releaseparam_tpf7a; law distilled research.md S16.
