@@ -443,6 +443,27 @@ census: docs/re/_wip_t388.md. Distilled facts:
   exists in the chain, and t285's live witness shows the ejection landing
   on the title menu while autosave kept writing; citations
   docs/re/_wip_tESC1.md P1-P5, witness scripts/tESC1_eject_witness.sh).
+- SINGLE WINDOW ACROSS THE EJECT (tWIN-1 2026-11-27, D32 third leg): the
+  eject handoff is only law if main.cpp FEEDS IT BACK — runTitleScreen's
+  windowIn is the LAST (12th) parameter (ui.h:34-55), and the re-entry call
+  omitting it made title.cpp take the winOwned branch and
+  SDL_CreateWindow a SECOND window while the handed-back campaign window
+  survived alive-but-renderer-less (ui.cpp destroys the renderer BEFORE
+  the handOff check) — the user's "opens a new window ... elements don't
+  get drawn" verbatim. MEASURED pre-fix (scripts/tWIN1_window_witness.sh):
+  2 "Ascendancy*" X windows after the first Escape (xwininfo -root -tree,
+  ids 0x200008 + 0x200012); post-fix 1 window, SAME id 0x200008, at all
+  four checkpoints (map / title-after-eject / campaign-after-resume /
+  second eject). The tESC-1 log-line witness was blind to this class —
+  SDL dispatches events for ALL of a process's windows and the title loop
+  does not filter by window id, so every leg passed with two windows.
+  WINDOW-COUNT CHECKPOINTS are now part of the eject law: pins
+  tests/test_windowcount_tWIN1.cpp x2, mutations M1-M3 scripts/
+  tWIN1_mutate.sh ALL CAUGHT. Hover-corner-art leaking into the other
+  window (D32 verbatim) is BANKED UNRESOLVED in _wip_tWIN1.md W2 per the
+  count-first ordering; the zombie-window repaint starvation (no renderer
+  services its Expose events) plausibly covers the visible bleed, no
+  mechanism claimed.
 - 10status.shp [measured t388, scripts/r388_status_census.py]: 2 records,
   k0 639x479 V FULLY OPAQUE (306081 painted px = W*H, zero skip rows) —
   the full-backdrop class (same as 4loadgam/2savegam k0); k1 32x31. The

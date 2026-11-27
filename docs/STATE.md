@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-27T18:40
+updated: 2026-11-27T15:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,38 +233,34 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tWIN-1 (D32, third leg): "escaping from the galaxy screen to the title
-screen OPENS A NEW WINDOW instead of bouncing back in the existing window,
-and things get buggy — UI elements don't get drawn in some windows, hovering
-the mouse in the corner of one window pops the escape art in another".
-tESC-1 shipped the title<->campaign LOOP with a window HANDOFF law
-(main.cpp hands `handedWindow` back; runTitleScreen takes windowIn), so the
-user's symptom means the handoff does NOT actually hold on the live eject
-leg — REPRODUCE FIRST (tPF1d-soak shape: --ui no --seed, Begin, eject, then
-assert ONE SDL window exists: xdotool search --name Ascendancy | wc -l, or
-the SDL window count via a 'ui windows N' instrument line if cheaper).
-Candidate root causes to check in order: (1) the eject leg passes
-handedWindow but the title loop re-enters runTitleScreen with a NULL
-windowIn somewhere (main.cpp loop: entryState path); (2) the tNAME-1 clock
-seed line changed nothing here but the eject witness (tESC1_eject_witness.sh
---ui NO --seed) now runs with a random seed — re-run it and confirm it still
-passes BEFORE blaming tESC-1; (3) windowIn reuse skips a renderer/renderer-
-target rebind, which is exactly the "elements don't get drawn" half. The
-hover-art leak is a separate-citable symptom (escape art drawn into the
-wrong window = a palette/paint-context identity bug) — bank it, fix the
-window COUNT first. Vendor law: single window the whole session (t385
-single-window boot law; the vendor never creates a second SDL/X11 window —
-verify with the refcap corpus if needed). Pins + witness per the tESC-1
-pattern.
-ORDERING: tNAME-1 LANDED this iteration (D33-L3 closed by witness; no OQ
-row — open=[016,019] unchanged). tWIN-1 next per the standing D32 queue;
-THEN tRS-SC (research up/down = scroll, D32 verbatim — the press-table row
-likely maps them to the zoom pair; small task, good filler if tWIN-1 blocks).
-ALTERNATIVES/PARKED: TPF7-A per-msg release-mask split (0x47d3b ~ebp role
-owed) if tWIN-1 sizes out; TPF6-CPU-A parked (user throttle ruling
-pending); TPF7-C user feel-grading; TPF5-A ship gated on D1 ruling.
-OQ-016/OQ-019 remain the only open ledger rows (both capture-blocked
-classes).
+NEXT tRS-SC (D32 queue, fourth leg): research-screen UP/DOWN keys are
+documented by the user as SCROLL, but the port's press table maps the
+research arrow buttons to the ROT/MOVE camera pair (tPF-7a law: msgs
+50/51/52/53 -> gate bits, release 0x38). Reproduce first at the user's
+verbatim wording, then find the vendor leg that distinguishes SCROLL from
+ROT on the research window: candidate sites are the reswin msg arms
+around 0x47b44..0x47c42 (press table, fully read in tPF-7 — check whether
+an ARROW-key (not button) path exists in the hotkey dispatcher fn 0x54d18
+tree 0x54faf that posts a DIFFERENT param or msg), and the wheel-zoom pair
+(scrollOffset precedent on the title RACELIST, tSPEC-1). If the vendor
+arrows ARE the zoom pair verbatim, ship exactly that and cite; if the
+vendor distinguishes a scroll msg, port it. Pins + witness per the tPF-7
+pattern (clickdn/clickup hold semantics). Budget <=2 sessions; if the
+press-table read says "no separate scroll leg exists", that is an honest
+negative to bank in docs/re/research.md S16 addendum, not a fix.
+ORDERING: tWIN-1 LANDED this iteration (D32-L3 window defect fixed at the
+handoff arg; no OQ row — open=[016,019] unchanged). tRS-SC next per the
+standing D32 queue; it is small and needs no capture. ALTERNATIVES/PARKED:
+TPF7-A per-msg release-mask split (0x47d3b ~ebp role owed) if tRS-SC
+closes fast; TPF6-CPU-A parked (user throttle ruling pending); TPF7-C
+user feel-grading; TPF5-A ship gated on D1 ruling. OQ-016/OQ-019 remain
+the only open ledger rows (both capture-blocked classes).
+NEW tWIN-1 TRAPS (add to the standing discipline): a mutation apply-guard
+must anchor on text UNIQUE to the mutated call — 'handedWindow);' also
+sits in the runCampaignUi call and produced a false "M1 NOT APPLIED";
+window-count greps must match the TITLE PREFIX ('"Ascendancy') — the
+title and campaign windows have DIFFERENT titles ("Ascendancy" vs
+"Ascendancy rewrite (P5a)") so an exact-quoted grep misses the zombie.
 D30/D31 LAW (standing): any closure of a user-reported defect must be by
 reproduction+fix, NEVER by attributing the symptom to the user's actions.
 TRAPS: disasm = ~/tools/revenv/bin/python scripts/t442_disasm.py START END
@@ -317,6 +313,35 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+tWIN-1 LANDED 2026-11-27 (D32-L3 EJECT OPENS A SECOND WINDOW — DEFECT
+REPRODUCED AT THE X-WINDOW LEVEL, FIXED, PINNED, WITNESSED; no OQ row —
+open=[016,019] unchanged. ROOT CAUSE [verified source]: main.cpp's re-entry
+runTitleScreen call omitted the 12th/last param windowIn (ui.h:34-55) ->
+title.cpp:138-143 winOwned branch -> SDL_CreateWindow a SECOND window per
+eject, while the handed-back campaign window survived alive-but-renderer-
+less (ui.cpp destroys the renderer BEFORE the handOff check) — the user's
+"opens a new window / elements don't get drawn" verbatim. REPRO pre-fix
+(scripts/tWIN1_window_witness.sh, xwininfo -root -tree): 2 windows after
+one Escape (0x200008 zombie + 0x200012 new). FIX: pass handedWindow as
+windowIn. POST-FIX: 1 window, SAME id 0x200008, at all four checkpoints
+(map/title/campaign/second-title) — one X window the whole session (t385
+law holds end-to-end). Candidate causes dispositioned: (1) TRUE; (2)
+REFUTED — tESC1_eject_witness.sh re-run rc=0 on the clock-seed build; (3)
+FALSE — title.cpp:161 creates a fresh renderer per visit. Hover-art bleed
+into the other window: BANKED UNRESOLVED (the other window can no longer
+exist; a fresh report if bleed persists on one window). WHY THE OLD
+WITNESS MISSED IT: SDL dispatches events for ALL of a process's windows
+and neither loop filters by window id — log-line legs pass with any window
+count; WINDOW-COUNT CHECKPOINTS are now part of the eject law. PINS
+test_windowcount_tWIN1.cpp x2 (balanced-paren arg extraction w/ comments
+stripped + last-arg law + gate-proximity chain pin); MUTATIONS M1-M3 ALL
+CAUGHT (M1 drop-arg = original defect, M2 nullptr slot, M3 gate neutered),
+restore md5-ok x2. TRAPS: mutation apply-guards must anchor text UNIQUE to
+the mutated call ('handedWindow);' also sits in the runCampaignUi call);
+window-count grep must use the title PREFIX ('"Ascendancy') — the two
+window families have different titles. Suite 625->627/0/0, gate 0, ledger
+OK. Law docs/re/ui-runtime.md SINGLE-WINDOW line + _wip_tWIN1.md W1..W8.)
 
 tNAME-1 LANDED 2026-11-27 (D33-L3 PER-GAME NAMES SHIPPED — the vendor has
 NO name RNG: names.txt is a fixed pool (mapgen.md S2), home TYPE is the

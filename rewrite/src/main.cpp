@@ -681,7 +681,15 @@ int main(int argc, char** argv) {
             // galaxy the campaign plays (buildCampaign already ran), roster
             // names from raceNN.dip headers, lore from newgame.txt (read,
             // never embedded; a missing file = no lore, screen still draws).
-            camp.get(), &rosterForUi(o), &loreForUi(o), &newGame);
+            camp.get(), &rosterForUi(o), &loreForUi(o), &newGame,
+            // tWIN-1 (D32): feed the handed-back window into the windowIn
+            // slot. Without this arg the eject re-entry CREATED A SECOND
+            // SDL window (measured scripts/tWIN1_window_witness.sh: 2
+            // "Ascendancy*" windows after the first Escape) and left the
+            // campaign's window alive-but-renderer-less as a zombie —
+            // exactly the user's "opens a new window / things get buggy".
+            // The vendor has ONE window for the whole session (t385 law).
+            handedWindow);
         if (exit == BootState::Quit && entry != BootState::Quit &&
             !terr.empty()) {
             std::printf("title: %s\n", terr.c_str());
