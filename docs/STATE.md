@@ -238,7 +238,19 @@ blocks all playtesting of dense games). INSTRUMENT CAUGHT IT: console
 "ui cont advance stop t20 event: owner 1 captured Phoebe" then
 "ui quit cause=victory:Extinct turn=20" => checkVictory mine==0
 (campaign.cpp:2270). REPRO SHAPE GIVEN BY USER: very dense cluster +
-seven species -> exits t20; average density -> survives. REPRO FIRST:
+seven species -> exits t20 (BOTH Chamachies AND Minions; average
+density survives). D33 SHARPENS THE TARGET: kPlayer=0 so "owner 1" =
+AI; user law says capture of an inhabited home by day 20 is
+IMPOSSIBLE in the vendor (empty planets at start, first structure
+still in construction at t20) => THE CAPTURE EMITTER
+(campaign.cpp:2258) IS THE DEFECT — derive the vendor capture law
+from the fleet-arrival handler (what arrival actually converts a
+star: colonize-on-empty? defended-only? never-inhabited?) and fix the
+emitter; the t20 Extinct is a consequence, do NOT patch the Extinct
+check first. If our AI sim can build+move+attack fleets by t20 at
+all, the AI production/aggro timing is ALSO suspect (vendor t20 =
+first structure still building — verify against the vendor income/
+build-rate laws already banked in docs/re/income-law.md). REPRO FIRST:
 scripts/tPF1c_repro.sh pattern, Begin-built wheels = density-highest
 rung + owners 7 (ring laws banked tNG-B/tPF1d: Begin species ring
 never reaches play state — check the density/owners handoff triple
@@ -282,7 +294,17 @@ Pin: pressing up moves tree pixels up (centroid delta) WITHOUT focal
 change; zoom only if vendor has zoom buttons there (verify vs refcap
 t252). Budget <=2.
 THEN continue prior NEXT:
-tSPEC-1: SIZE AND FIX THE BEGIN SPECIES PICK (banked tPF1d,
+tSPEC-1 UPGRADED BY D33: Begin species pick must reach PLAY
+(user: our home planet is medium eden REGARDLESS of species; vendor =
+per-species TYPE via the tPL-D1 table; plumb wheel-species ->
+NewGameSettings -> cfg -> home terrain row + art; pins: Chamachies ->
+size idx 3 + terrain row 7 in PLAY state, Minions differs; witness =
+two Begin runs, different species, different home terrain census).
+PLUS tNAME-1 (D33 L3): vendor system/planet names DIFFER EVERY GAME;
+ours always Phoebe => find where names are assigned (names.txt entry
+41 hit deterministically) and derive the vendor draw law (per-game
+RNG vs index); pin: two same-seed-name runs (different seeds) produce
+different home-star names.
 docs/re/_wip_tPF1d.md + this iteration's witness run). Port defect: the
 New Game screen's species selection never reaches the play state —
 NewGameSettings (menulaw.h:344) carries only stars/owners/gov, and main.cpp
