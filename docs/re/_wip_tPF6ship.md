@@ -127,3 +127,24 @@ merely a revocation:
   bit0 semantics: distinguishes completed/active items (0x39b28 family
   counts cells with byte+1==0x12/0x13 AND bit0 set — 'active shipyards').
   [bit0 WRITER site not yet pinned — P10]
+
+
+## P10 PORT SHIPPED + MUTATION (final)
+- vendorShipLegAllowed in planetview.{h,cpp}; wired at projectOptionsFor
+  (id==kShipItem, after pop leg) + ui.cpp popup lambda (after pop+req,
+  before placementBlock). projectOrderable UNCHANGED (P4b).
+- Pins: ship_leg_tpf6ship (no-yard revoke both open modes + anti-vacuity
+  n>1 + saturation at 1+sole+homeBit revokes + HOME-slack at 1+sole passes
+  (isolates HOME_BIT) + one-fewer passes + cell-independence) and
+  planlist_popup_leg_wiring_tpf6b extended (vendorShipLegAllowed token
+  required; window 1600->2200 — the lambda grew, placementBlock slid past
+  the old window: caught itself as FAIL at :274 pre-widening).
+- SUITE 601 -> 602/0/0. MUTATION 3/3 CAUGHT via LastTest.log named FAILs
+  (rc=8; the sweep's stdout grep saw no FAIL lines because ctest prints
+  them only with --output-on-failure — verdict from rc, names from
+  Testing/Temporary/LastTest.log): M1 active-yard leg neutered, M2 census
+  always-pass, M3 HOME_BIT dropped. AFTER-RESTORE md5
+  42f5132d4f4c4753b728ddcca0a0fd07 + ctest green.
+- TRAP x1 NEW: ctest source-text pins that substr(call, N) a lambda body
+  must size N to the GROWN body — a comment added inside the lambda can
+  push a later token out of the window and fail the pin (not the law).

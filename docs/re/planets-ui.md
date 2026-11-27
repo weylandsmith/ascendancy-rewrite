@@ -620,3 +620,56 @@ Full working detail: docs/re/_wip_tPF6a.md (F1-F8). The law:
   tightened (no 23 exemption at pop 0). Suite 600 -> 601/0/0; MUTATION 3/3
   CAUGHT (M1 lambda exemption: wiring pin; M2 list exemption: fill-law pin
   :237; M3 skip-5 removed: invariant pin :369 + tpf2d :66).
+
+## 17. THE 0x39a9c SHIP LEG: SHIP ROWS REQUIRE AN ACTIVE SHIPYARD AND A
+## FLEET BELOW THE SYSTEM CENSUS (tPF6-SHIP CLOSED, 2026-11-26)
+The last unrecovered leg inside checker 0x3830c (fill 0x3b6f3 + popup Build
+loop 0x3d550 share it, S15/S16). 0x38422..0x3842e replaces the verdict for
+item 23 ('Ship') ONLY after a pop PASS (0x38420 jne — tPF-6a F6 direction
+law). The replacement is `call 0x39a9c` (sole call site 0x38429), body
+0x39a9c..0x39b24 [verified]:
+  1. race = byte[planet+0x57] (bounds-checked vs word[0x13b96]>>16).
+  2. c = 0x3958c(planet, 0x16) — first cell whose BUILT-ITEM byte (cell+1)
+     == 22 (Shipyards; planitem.txt row 22). c == 0xffff -> RETURN 0.
+  3. word[cells+c*4 + 2] bit0 (0x39af3) — the ACTIVE flag; clear -> RETURN 0.
+  4. 0x402d8(0x12e16 + race*0x1ee) <= 0 -> RETURN 0 (0x39b11/0x39b16 jle);
+     else -1 (pass). The leg reads NO cell operand (cell-independent, F1).
+0x402d8 body 0x402d8..0x40347 [verified, fn size 112 — no desync]:
+  ebx = 1; ebp = 0x40ec0(edi, 0, 0); loop i < word[0x16145] over star
+  records 0x13bc5 + i*0x60: if byte[rec+0x14] == (1 << byte[edi]) inc ebx
+  (SOLE ownership — equality with a single bit);
+  eax = ebx - ebp; then if byte[DWORD[edi+7] + 0x14] & (1<<byte[edi]) inc
+  eax; return. i.e.
+      0x402d8(row) = 1 + SOLE_STARS(r) - SHIPS(r) + HOME_BIT(r)
+  - 0x40ec0 (0x40ec0..0x40f7b) = race SHIP census: walks the live ship array
+    base 0x3a095 stride 0x162 (pership-spec A1), matches slots with
+    ship+0x54>>16 == byte[row] (owner handle law, cross-confirmed 0x39a54),
+    returns the MATCH COUNT at [esp+8]; scan capped at 107 slots, early stop
+    when matches reach u32[0x43489]>>16.
+  - DWORD[edi+7] == DWORD[0x12e1d + r*0x1ee] is the race's HOME STAR record
+    pointer — the SAME field as the t246 PLANETALLOC header-law exclusion
+    pointer, measured live (scripts/r1_t246_header_law.py ln12).
+  - 0x13bc5/0x16145/+0x14 owner-mask laws: t248 (star+0x14 and 0x7f ==
+    OR(1<<owner)); word[0x16145] == star count MEASURED 50 == stars 20/20
+    (diplomacy.md ln632).
+Other 0x402d8 callers (per-function scan): 0x3e6f8 (sign-tested), 0x40e02
+(<=0 -> error 0x741@0x2098 + return 0), 0x51b8c (DISPLAY: clamped abs,
+0..100, in the PLANETALLOC header format family — the value is the
+"Planets Occupied"-style per-race count). The ORDER path (fn 0x38840)
+contains exactly ONE call (0x38ba4) — NO ship gate; a queued order is never
+re-gated, so projectOrderable stays unchanged.
+MEANING [inferred]: a race keeps being OFFERED Ships while its fleet stays
+below 1 + sole systems (+1 home slack) AND the planet has an active
+Shipyards cell — an anti-spam fleet-to-expansion governor at list/popup
+time only.
+PORT: planetview.{h,cpp} vendorShipLegAllowed (fleet() = ship-census analog,
+homeStarFor = row+7 analog, starOwner = +0x14 analog; port items are ACTIVE
+only so the item-22 scan IS the active-yard scan); wired into
+projectOptionsFor (id==kShipItem) AND the ui.cpp popup lambda (one checker
+for both paths). Pins: ship_leg_tpf6ship (no-yard revoke + anti-vacuity +
+saturation boundary EXACT + HOME-slack leg isolating +HOME_BIT +
+cell-independence) + planlist_popup_leg_wiring_tpf6b extended
+(vendorShipLegAllowed presence; window 1600->2200). Suite 601 -> 602/0/0;
+MUTATION 3/3 CAUGHT (M1 yard leg removed, M2 census always-pass, M3
+HOME_BIT dropped — all named FAILs in ship_leg_tpf6ship; AFTER-RESTORE
+md5 42f5132d4f4c4753b728ddcca0a0fd07 green).

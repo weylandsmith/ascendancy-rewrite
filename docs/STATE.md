@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-26T21:40
+updated: 2026-11-26T23:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,26 +233,20 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT TPF6-SHIP: CLOSE THE 0x402d8 SHIP-REVOCATION SEAM AT BYTES — the last
-unrecovered leg inside checker 0x3830c (the fill/popup predicate).
-Ordering rationale: tPF-6a (this iteration) closed TPF6-A at mechanism
-(planets-ui.md S16) and CORRECTED the 0x38422 direction (revocation, not
-rescue), which makes the 0x39a9c chain the only remaining unknown in the
-orderability law: 0x39a9c calls 0x402d8(arg = race*78 + 0x12e16) and its
-verdict >0 gates the vendor's pop-PASSING ship rows. tPF-6a already read
-the 0x402d8 prologue: per-entry loop over word[0x16145] records at stride
-0x60 base 0x13bc5, matching (1 << byte[edi]) against byte[rec+0x14]
-(ebx accumulates hits; caller tests <=0). Remaining: (1) finish the body
-(0x40323 tail + return law); (2) identify the 0x13bc5 table from save-RAM
-census or the loader (pointer law; likely ship-design or race-ship table —
-DO NOT assume); (3) decide port delta: currently projectOptionsFor keeps a
-pop-passing 23 always (weaker than vendor) — if 0x402d8 is liftable
-(e.g. 'race has >=1 built/completed ship design'), implement + pin, else
-bank the honest negative and keep the seam named. Static task, no capture,
-no user gate; ~30 probes.
-CHECKPOINT DISCIPLINE: the tPF-6a files (planetview.cpp, ui.cpp,
-test_optionsfilter_tpf6.cpp) are COMMITTED (a776184 + final commit) — safe
-as mutation-campaign targets now.
+NEXT TPA-AUTO: CLOSE THE AUTOMATION x3 LEG 0x394d8 AT BYTES — planets-ui.md
+S? named seam (ln ~326: 'Automation x3 leg (FUN_0x394d8) NOT modelled —
+named seam'). Ordering rationale: TPF6-SHIP CLOSED this iteration
+(planets-ui.md S17), so the checker chain around 0x3830c/0x38840 is now
+fully mapped and its neighbours are cheap reads; this is the last named
+seam inside the planet-project law family (the 0x892ac colour table is a
+DISPLAY seam needing refcap, worse first move). The port's Automation
+popup leg (popupButtonIds cellItem!=0x17 branch, buildable(35)) predates
+the tPF-6b checker law and may need the same treatment; the x3 multiplier
+is unmodelled income behaviour — decide port delta only from bytes.
+Static task, no capture, no user gate; ~30 probes.
+CHECKPOINT DISCIPLINE: planetview.{h,cpp}, ui.cpp,
+test_optionsfilter_tpf6.cpp are COMMITTED (5bed58e checkpoint + this
+iteration's final commit) — safe mutation targets.
 TPF6-CPU-A stays parked (user throttle ruling pending, port-decision not
 vendor law). TPF7-C is a user feel-grading ask. TPF5-A ship stays gated on
 the D1 ruling. OQ-016/OQ-019 remain the only open ledger rows (both
@@ -293,6 +287,36 @@ cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), Escape from planet view lands on STATUS NOT the map, repro
 scripts need a cleanup trap, and BIN/DATA must be env-overridable before
 an era-tree A/B is trusted (tPF-1c x11).
+
+tPF6-SHIP LANDED 2026-11-26 (THE 0x402d8 SHIP-REVOCATION SEAM CLOSED AT
+BYTES + PORT SHIPPED; no OQ row touched — open=[016,019] unchanged, seam
+closure; CODE SHIPPED: planetview.{h,cpp}, ui.cpp popup lambda,
+test_optionsfilter_tpf6.cpp; log docs/re/_wip_tPF6ship.md P1-P10).
+ - LAW [verified]: 0x39a9c(planet) replaces the item-23 verdict (pop-PASS
+   only, 0x38420 jne) iff ACTIVE Shipyards(22) cell (0x3958c cell+1 scan;
+   word+2 bit0 0x39af3) AND 0x402d8(0x12e16+race*0x1ee) > 0. 0x402d8 =
+   1 + SOLE_STARS(r) - SHIPS(r) + HOME_BIT(r): star table 0x13bc5 stride
+   0x60 owner byte == (1<<r) (t248); SHIPS = 0x40ec0 census (ship array
+   0x3a095 stride 0x162, +0x54>>16 == r, return [esp+8], 107-slot cap);
+   HOME_BIT = byte[DWORD[row+7]+0x14] & (1<<r) with row+7 == the t246
+   MEASURED home-star exclusion pointer. Meaning [inferred]: fleet-to-
+   expansion governor at LIST/POPUP time only — ORDER path 0x38840 has
+   exactly one call (0x38ba4), NO ship gate (projectOrderable unchanged).
+   Other callers: 0x3e6f8 sign-test, 0x40e02 error+zero, 0x51b8c DISPLAY
+   clamp 0..100 PLANETALLOC header family. Law planets-ui.md S17.
+ - PORT: vendorShipLegAllowed (fleet()/homeStarFor/starOwner analogs; port
+   items ACTIVE-only so item-22 scan == active-yard scan) wired into
+   projectOptionsFor (id==kShipItem) + ui popup lambda (one checker for
+   fill AND popup). Pins ship_leg_tpf6ship (no-yard revoke, anti-vacuity,
+   EXACT saturation boundary, HOME-slack leg isolating +HOME_BIT, cell-
+   independence) + wiring pin extended (vendorShipLegAllowed token; lambda
+   window 1600->2200). Suite 601 -> 602/0/0; MUTATION 3/3 CAUGHT (M1 yard
+   leg neutered, M2 census always-pass, M3 HOME_BIT dropped; named FAILs
+   in LastTest.log — ctest prints FAIL lines only via that log, verdict
+   from rc); AFTER-RESTORE md5 42f5132d... green.
+ - TRAP x1 NEW: substr(call,N) source pins must size N to the GROWN lambda
+   — a comment inside the lambda pushed placementBlock past N and failed
+   the pin (not the law).
 
 tPF-6a LANDED 2026-11-26 (BUILD IS NEVER ABOVE AN EMPTY PLANLIST — TPF6-A
 CLOSED AT MECHANISM; DIRECTION CORRECTION SHIPPED; no OQ row touched —
