@@ -291,6 +291,7 @@ Campaign::Campaign(const CampaignConfig& cfg, Galaxy galaxy, const ResearchTree*
     Nowner_ = cfg_.aiCount + 1;
     war_.assign(Nowner_ * Nowner_, 0);
     fortify_.assign(galaxy_.stars.size(), 0);
+    invModules_.assign(owners, 0);  // tD34: modules start at zero (D33-L1 law)
     attacked_.assign(galaxy_.stars.size(), 0);  // [0x48304] per-star array (t205)
     // Species ability assignment (docs/re/abilities.md §1): explicit vector
     // wins; otherwise derive from dip header tokens (race02 stays Unknown —
@@ -1658,6 +1659,36 @@ void Campaign::expansionPhase() {
             }
         }
     }
+    // tD34 (D33-L1) INVASION-MODULE PRODUCER. The vendor builds Invasion
+    // Modules (gizmos.txt row 73, cidx 0x49, resReq byte 8 == "Spectral
+    // Analysis") into carrier rings; the AI's build cadence is uncited
+    // residue, so this is a DOCUMENTED DEFAULT whose ONLY gate is the cited
+    // one: the row must be research-legal (requiresAvailable, OQ-014 CLOSED
+    // law). Rate +1 per turn, cap 6 = the widest ring census (Ignatz SIX
+    // cidx-73 slots, ships.md S69(a)). A Shipyard-star gate was tried FIRST
+    // and MEASURED-STALLED the campaign (seed 2024: ZERO capture events in
+    // 6000 turns, no victory; same build minus the gate: 48 captures,
+    // victory t1436) — some empires never complete a Shipyard under the
+    // kBuildOrder default, and no cited law gates gizmo build on a planet
+    // Shipyard. The day-20
+    // impossibility (user law L1) holds by construction regardless: modules
+    // start 0 and Spectral Analysis is mid-game tech (this build's seed-2024
+    // runs: first research t287/t336; "still building their first structure"
+    // at t20).
+    // docs/re/_wip_tD34.md S3b/S4.
+    if (gizmos_) {
+        const int techCount = static_cast<int>(tree_->all().size());
+        for (int o = 0; o < owners; ++o) {
+            if (invModules_[o] >= 6) continue;
+            bool moduleLegal = false;
+            for (const Gizmo& g : *gizmos_)
+                if (g.name == "Invasion Module" &&
+                    requiresAvailable(g.resReq, techCount, ownedTech[o]))
+                    { moduleLegal = true; break; }
+            if (!moduleLegal) continue;
+            ++invModules_[o];
+        }
+    }
 }
 
 int Campaign::driveHopsFor(int owner) const {
@@ -2190,7 +2221,40 @@ void Campaign::combatPhase() {
             // the guard above — it skips the engagement (aggregate stand-in
             // for the +0x9c 0x10 null-shield bit; the sim's garrison carries
             // the cited per-ship shield layer, bridge S8).
-            fleetSim_->recordDecider(out.captured, invadesAlwaysSucceeds(a));
+            // tD34 CAPTURE LAW (D33-L1; FUN_0003a174 0x3a45c verbatim,
+            // docs/re/_wip_tD34.md S2): an invasion ATTEMPT exists only when
+            // the resolver runs with modules at the objective (carrier
+            // selection gate 0x42d47 requires a cidx-0x49 slot; port operand
+            // = the per-owner invModules_ ledger); SUCCESS iff
+            //   count > active shields  OR  attacker ability byte == 0
+            // (SA_SuperMarines forced leg, need := 1). The garrison's death
+            // is NOT the verdict — pop/firepower NEVER enters 0x3a45c (its
+            // three operands are count, shields, ability). The pre-tD34
+            // decider (out.captured, bridge C4 garrison death) let a pop-rich
+            // empire take any adjacent at-war star with zero fleet — the
+            // illegal t20 home capture class the user's impossibility law
+            // (D33: "every player should start out with an empty planet")
+            // rules out. NEED/CONSUME (0x3a2a2..0x3a38b, min-form per
+            // ships.md S69(b)): need = min(count, shields+1), forced 1;
+            // the shield-item DISPLACEMENT legs 0x3a39d..0x3a45a stay
+            // UNMODELLED (semantics unread; named divergence).
+            const int modules = invModules_[a];
+            int shields = 0;   // ACTIVE planet items 18/19 (resolver deficit
+                               // walk 0x3a2c9..0x3a325: +1 Surface Shield,
+                               // +2 Mega Shield; income-law.md :565 ids)
+            for (int it : planets_[nb].items) {
+                const std::string nm = (*items_)[it].name;
+                if (nm == "Surface Shield") shields += 1;
+                else if (nm == "Surface Mega Shield") shields += 2;
+            }
+            const bool forced = invadesAlwaysSucceeds(a);   // ability byte 0
+            // Leg A (carrier) needs NO firepower (0x42d09 selects on the
+            // cidx-0x49 slot alone; the S3 power gate is Leg B only) — so
+            // the attempt exists iff modules are at the objective.
+            const bool invasionAttempt = modules > 0;
+            const bool captured =
+                invasionAttempt && (modules > shields || forced);
+            fleetSim_->recordDecider(captured, forced);
             // t204 DIPLOMACY-ON-ATTACK — FUN_00043a4c AT ITS CITED CALL SITE
             // 0x4b875: the hostility cost lands BEFORE the shield/hull
             // subtraction (0x4b87a/0x4b888) — the price of FIRING, not of
@@ -2221,37 +2285,37 @@ void Campaign::combatPhase() {
                     attacked_[nb] |= static_cast<unsigned char>(1 << b);
                 }
             }
+            if (!invasionAttempt)
+                continue;                              // no carrier: no resolver
             if (invadesAlwaysSucceeds(a)) {            // SA_SuperMarines (L1723 always succeed)
                 ind_[a] -= shipCostC;                  // the invasion ships
                 superUsed[a] = 1;
-            } else if (!out.captured) {                // t365: per-ship verdict (C4)
-                continue;
             }
+            // tD34 CONSUME (0x3a360..0x3a38b runs BEFORE the 0x3a45c success
+            // gate — a repelled invasion still burns its modules): need =
+            // min(count, shields+1), forced 1 (0x3a34e).
+            invModules_[a] -= forced ? 1 : std::min(modules, shields + 1);
             // t207 GUARANTEE-WAR CLAMP (FUN_0003a174 post-handler site
             // 0x3a25a..0x3a291, cited docs/re/_wip_t207.md S7b): the
             // INVASION path pays the t204 handler at 0x3a255 and on the -1
             // (not-at-war) return re-reads the cell and, while STILL
             // strictly above the victim's DECLARE_WAR line, slams it to
-            // declareWar-10 — the t180 chooser then GUARANTEES war. Wiring
-            // site = the rewrite's capture branch (below the repel test):
-            // the one place an invasion resolution is KNOWN to have run.
-            // t209 POSITION LAW (MEASURED, docs/re/_wip_t209.md S5): the
-            // original clamps AT ATTEMPT TIME — 0x3a25a runs before the
-            // defense score is even counted (loop 0x3a2c9.., result select
-            // 0x3a327), success/repel branches only at 0x3a45c, and the
-            // engine caller 0x42c8e DISCARDS the return (0x42c97 clobbers
-            // EAX; no order/ship-survival branch keys on the outcome). So
-            // a repelled invasion pays the clamp too in the original.
-            // DOCUMENTED UNDER-MODEL (kept, no semantic change t209): the
-            // rewrite's single aggregate volley cannot represent an
-            // attempt independent of its outcome; clamping at the capture
-            // branch under-fires vs the attempt-time law, and the gun-
-            // bombard caller 0x39f00 pays WITHOUT clamping (t207 S7c).
-            // Per-attempt wiring = OQ-019 boundary (BLOCKED-USER).
+            // declareWar-10 — the t180 chooser then GUARANTEES war.
+            // tD34 WIRING-SITE CORRECTION: the clamp sits below the
+            // !invasionAttempt continue, i.e. it fires per ATTEMPT (modules
+            // at the objective), exactly where the vendor runs it — the
+            // resolver is only entered via a carrier (0x42d09), and t209's
+            // ATTEMPT-TIME position law says a repelled invasion pays it too
+            // (previously wired at the capture branch = documented
+            // under-fire; tD34 made the attempt operand exist so the
+            // under-fire is closed for the module-gated path). The gun
+            // bombard caller 0x39f00 still pays NO clamp (t207 S7c) — the
+            // per-ship channel is OQ-019 boundary (BLOCKED-USER).
             if (a == kPlayer && b >= 1 && b - 1 < static_cast<int>(dipState_.size())) {
                 DipPolicyState& vst = dipState_[b - 1];
                 guaranteeWarOnInvasion(aiDip_[b - 1].values, vst.atWar, &vst.attitude);
             }
+            if (!captured) continue;                   // 0x3a46a fail tail
             owner_[nb] = a;
             planets_[nb].pop = 2;  // settlement seed :=2 MEASURED (income-law.md S6e)
             fortify_[nb] = 2;

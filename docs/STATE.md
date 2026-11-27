@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-27T04:30
+updated: 2026-11-27T13:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,60 +233,33 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tWIN-1 EJECT REUSES THE WINDOW (D32: eject opens a NEW window;
-some windows draw no UI elements; corner-hover exit art pops in the
-WRONG window). tESC-1 shipped windowOut handback "ONLY on eject leg"
-+ runTitleScreen(windowIn) reuse per t385 law — evidently the reuse
-is NOT taking (new window observed). DIAGNOSE: window handle identity
-across campaign->title->campaign (print SDL_Window* per leg in the
-witness); find where a fresh SDL_CreateWindow sneaks in (likely the
-title-boot path when windowIn!=null still creating, or the renderer
-recreated on old window). Corner-cross-talk = per-window state: the
-corner-exit overlay + any cached mouse state must key off the ACTIVE
-window. PIN: single SDL_Window* identity across eject+resume (witness
-prints the pointer twice, equal); no second X window in the witness
-screenshot; suite green. Budget <=2. Ordering: tXT-1 LANDED this
-iteration (peace-start fix, D32/D33-L1); tWIN-1 is the top remaining
-playability blocker (eject cross-talk corrupts the very screens the
-user playtests after every dense game).
-THEN tRS-SC RESEARCH UP/DOWN = SCROLL (D32 verbatim: "the up/down
-buttons on the research screen are supposed to scroll up and down, not
-zoom in and out"). Our research press-table row wired the same
-press-pair law as the MAP camera (ui.cpp:1426-1431 MapCtl RotUp/Down
-= pressTilt; research arm evidently reuses zoom/tilt semantics).
-RE-DERIVE the research-window button msg map (reswin handler chain
-cited _wip_tRSV1.md; the two-button cluster's sendparam ids) and ship
-the vendor law: up/down scroll the tree vertically (scroll offset
-state + clamp), hold-not-latch per tPF-7; left/right keep rotation.
-Pin: pressing up moves tree pixels up (centroid delta) WITHOUT focal
-change; zoom only if vendor has zoom buttons there (verify vs refcap
-t252). Budget <=2.
-THEN tSPEC-1 UPGRADED BY D33: Begin species pick must reach PLAY
-(user: our home planet is medium eden REGARDLESS of species; vendor =
-per-species TYPE via the tPL-D1 table; plumb wheel-species ->
-NewGameSettings -> cfg -> home terrain row + art; pins: Chamachies ->
-size idx 3 + terrain row 7 in PLAY state, Minions differs; witness =
-two Begin runs, different species, different home terrain census).
-Port defect banked docs/re/_wip_tPF1d.md: NewGameSettings (menulaw.h:
-344) carries only stars/owners/gov and main.cpp buildCampaign(&newGame)
-rebuilds from that triple only, so "started a game with the Chamachies"
-is impossible via Begin (tESC-1 eject witness re-confirmed: species
-pick printed and dropped). Re-derive at bytes what the vendor's Begin
-writes about the PLAYER SPECIES (wheel-arms law tNG-B cites: state
-base 0x12e10 + atmosphere global 0x52b44 — find the species sibling
-write), ship the field, pin + witness. Budget: full iteration.
-THEN tNAME-1 (D33 L3): vendor system/planet names DIFFER EVERY GAME;
-ours always Phoebe => find where names are assigned (names.txt entry
-41 hit deterministically) and derive the vendor draw law (per-game RNG
-vs index); pin: two runs at different seeds produce different
-home-star names. ORDERING: after tSPEC-1 — the per-species home TYPE
-table read and the name draw share buildCampaign/mapgen plumbing, and
-D33 pairs them as one user complaint.
-ALTERNATIVES/PARKED: TPF7-A per-msg release-mask split (0x47d3b ~ebp
-role owed) if tWIN-1 sizes out; TPF6-CPU-A parked (user throttle
-ruling pending); TPF7-C user feel-grading; TPF5-A ship gated on D1
-ruling. OQ-016/OQ-019 remain the only open ledger rows (both
-capture-blocked classes).
+NEXT tSPEC-1 (D33-L2, UPGRADED BY D33): Begin species pick must reach
+PLAY (user: home planet is medium eden REGARDLESS of species; vendor =
+per-species TYPE via the tPL-D1 table T1/T2 — the table read EXISTS in the
+constructor (campaign.cpp kHomeSizeIdx/kHomeTerrainRow, specOf[]) but the
+Begin path drops species before it: NewGameSettings (menulaw.h:344)
+carries only stars/owners/gov and main.cpp buildCampaign(&newGame)
+rebuilds from that triple only; tESC-1 witness re-confirmed the species
+word prints and drops). PLUMB: wheel species -> NewGameSettings -> cfg.
+playerSpecies -> home terrain row + art. Pins: Chamachies -> size idx 3 +
+terrain row 7 in PLAY state, Minions differs (tPL-D1 rows: Minions 4/5,
+Chamachies 3/7). Witness = two Begin runs, different species, different
+home terrain census. Re-derive at bytes what the vendor Begin writes about
+the PLAYER SPECIES (wheel-arms law tNG-B: state base 0x12e10 + atmosphere
+global 0x52b44 — find the species sibling write). Budget: full iteration.
+ORDERING: tD34 LANDED this iteration (capture law shipped; D33-L1 closed
+by measurement). tSPEC-1 before tNAME-1 per D33 pairing (per-species home
+TYPE read and the name draw share buildCampaign/mapgen plumbing). tWIN-1
+(eject reuses the window; D32) DROPS TO THIRD — it was top only because
+eject cross-talk corrupted post-game screens; the capture-law fix does not
+touch it, but tSPEC-1 is the user's ACTIVE complaint trio and shares the
+files tNAME-1 needs next. THEN tNAME-1 (D33 L3, per-game names, never
+always Phoebe), THEN tRS-SC (research up/down = scroll, D32 verbatim).
+ALTERNATIVES/PARKED: TPF7-A per-msg release-mask split (0x47d3b ~ebp role
+owed) if tWIN-1 sizes out; TPF6-CPU-A parked (user throttle ruling
+pending); TPF7-C user feel-grading; TPF5-A ship gated on D1 ruling.
+OQ-016/OQ-019 remain the only open ledger rows (both capture-blocked
+classes).
 D30/D31 LAW (standing): any closure of a user-reported defect must be by
 reproduction+fix, NEVER by attributing the symptom to the user's actions.
 TRAPS: disasm = ~/tools/revenv/bin/python scripts/t442_disasm.py START END
@@ -333,6 +306,36 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+tD34 LANDED 2026-11-27 (D33-L1 CAPTURE LAW SHIPPED — FUN_0003a174
+re-derived FUN-by-FUN at bytes; the port's garrison-death pop-decider
+REFUTED and replaced; no OQ row touched — open=[016,019] unchanged.
+REPRO FINDING FIRST, honest: the steering premise "dense+7 exits t20 for
+BOTH species" did NOT reproduce on the post-tXT-1 binary (headless matrix
+seeds 1/2/3 x species 0..4, 15/15 survive 60t, zero captures; Begin witness
+rc=0) — the tXT-1 peace-start fix stands. But the user's impossibility law
+exposed a REAL un-modelled class: the capture VERDICT. Vendor law (0x3a45c,
+three operands ONLY — count of cidx-0x49 modules on the carrier, active
+shield items 18(+1)/19(+2), attacker ability byte ==0 forced leg): pop/
+firepower NEVER flips an owner. Port pre-fix: bridge garrison death did,
+with zero fleet, whenever war existed. SHIPPED: invModules_ per-owner
+ledger (0 init; +1/turn once Invasion Module row research-legal, cap 6 —
+Ignatz census; a Shipyard-star producer gate was tried first and MEASURED-
+STALL seed 2024 to zero captures in 6000t, so it was dropped, evidence in
+the code comment); emitter attempt=captured=consume per 0x3a2a2..0x3a46a
+(repelled invasions burn modules; clamp moved to ATTEMPT-TIME per t209 —
+the documented under-fire is closed on this path). PINS test_capture_law_
+tD34 x6 incl. day-20 soak (0 capture events first 60t dense+7 x3 seeds),
+repel-burns-and-clamps exact-280 discriminator, SuperMarines-without-
+modules NO capture (decider refutation), forced-through-shield positive;
+MUTATIONS scripts/tD34_mutate.sh M1..M6 ALL CAUGHT, restore md5 448642ba,
+rebuild-before-witness re-honored. RE-PINS measured: campaign victory caps
+1200->2400 (seed 1 Control t1875, seed 2 Extinct t540, seed 2024 Extinct
+t1436); species/ships stall guards 1600->2400 (finite). PLAYTHROUGH
+re-recorded (greps green). Suite 611->617/0/0. Law distilled
+turnloop.md §5 + docs/re/_wip_tD34.md S1..S4. RESIDUES: producer rate/
+carrier AI = documented defaults (no cited build law); shield-displacement
+legs 0x3a39d..0x3a45a unmodelled; per-ship module rings = OQ-019.)
 
 tXT-1 LANDED 2026-11-27 (D32/D33-L1 DAY-20 EXTINCT ON DENSE+7 — ROOT
 CAUSE MEASURED + FIXED: the freeForAll=true ARCADE DEFAULT, not the

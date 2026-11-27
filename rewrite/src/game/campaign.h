@@ -269,6 +269,13 @@ public:
         starSelVis_[star] |= static_cast<char>(viewerMaskFor(viewer));
     }
     void setFleetForTest(std::vector<ShipInTransit> f) { fleet_ = std::move(f); }
+    // tD34 (D33-L1): the invasion-module stockpile (cidx-0x49 aggregate; the
+    // port has no per-ship inventory, gap row 16). Law docs/re/_wip_tD34.md.
+    int invasionModules(int owner) const { return invModules_[owner]; }
+    void setInvasionModulesForTest(int owner, int n) { invModules_[owner] = n; }
+    // tD34: grant a planitem row to a star's planet (queue-completion stand-in
+    // for producer pins; the item vector is not otherwise public).
+    void addItemForTest(int star, int item) { planets_[star].items.push_back(item); }
     void recomputeScoreStarsForTest() { recomputeScoreStars(); }
     // t291 PIN SURFACE: the end-ctrl comparator arm of checkVictory, callable
     // directly after staging scoreStars_/owner_ (the vendor evaluator is a pure
@@ -820,6 +827,13 @@ private:
     // set/clear pair 0x24e39/0x24e84). docs/re/_wip_t205.md S2/S4.
     std::vector<unsigned char> attacked_;
     std::vector<int> fortify_;
+    // tD34 (D33-L1 CAPTURE LAW, docs/re/_wip_tD34.md S2): per-owner
+    // invasion-module stockpile — the aggregate analogue of the cidx-0x49
+    // slots the vendor resolver counts on the CARRIER record
+    // (FUN_0003a174 0x3a2a2..0x3a2c5). Zero at scenario init: an empire can
+    // only take a star once it has researched the Invasion Module row
+    // (gizmos.txt resReq 8) AND built ships (producer gate below).
+    std::vector<int> invModules_;
     // Species abilities (docs/re/abilities.md): ability_[o] = owner o's SA_
     // (Unknown = none); charge_[o] is the MEASURED count-up counter (original
     // row+0x19e, aicode.md §6.4): +1 per abilityPhase, fires the body iff it

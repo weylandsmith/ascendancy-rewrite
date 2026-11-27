@@ -1,6 +1,6 @@
 # Headless playthrough record
 
-Regenerated 2026-11-27T10:00:41-05:00 by scripts/record_playthrough.sh from the
+Regenerated 2026-11-27T12:33:27-05:00 by scripts/record_playthrough.sh from the
 current binary. Victory conditions and their vendor files: docs/re/turnloop.md §1.
 
 ## Run A — headless, seed 2024 (t295 home draw: Extinct t285 — uniform homes put real lethal neighbours on the player; the old spread-BFS never could)
@@ -12,11 +12,11 @@ SDL 2.32.4 initialised (video driver: (null))
 campaign seed=2024 stars=50 lanes=53 ai=6
 turn   1 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
-  ... (2030 lines elided)
-  [t1066] owner 6 captured Algol
-  [t1067] owner 6 captured Nougat
-  [t1067] VICTORY: Extinct (end-xtnc.txt)
-VICTORY Extinct via end-xtnc.txt on turn 1067 (score 0%)
+  ... (1628 lines elided)
+  [t1435] owner 1 captured Quercus
+  [t1436] owner 1 captured Ungridge
+  [t1436] VICTORY: Extinct (end-xtnc.txt)
+VICTORY Extinct via end-xtnc.txt on turn 1436 (score 0%)
 ```
 
 ## Run B — headless, seed 23 (Control exemplar t1406 under the t295 home draw; t291's seed-1 exemplar re-drew to Extinct t266)

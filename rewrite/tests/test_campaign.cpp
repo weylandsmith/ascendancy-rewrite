@@ -511,14 +511,19 @@ TEST(campaign_reaches_a_victory) {
     REQUIRE_DATA();
     // CONTRACT: a seeded run reaches a victory condition (docs/PLAYTHROUGH.md
     // is generated from such a run). Combat (combat.md S2g/S2j) makes Control
-    // or LastAlive reachable; 1200-turn cap bounds the search.
+    // or LastAlive reachable; 2400-turn cap bounds the search.
     // t89 re-pin (deterministic combat, no hit roll): seeds 1 / 2 / 2024
     // resolve Control t842 / t677 / t777 (CLI --campaign 1200) — still FINITE,
     // so the stall contract is unchanged.
+    // tD34 RE-PIN (capture law FUN_0003a174 0x3a45c: invasions need invasion
+    // modules, pop-firepower no longer flips owners): conquest is slower by
+    // law — MEASURED Control t1875 / t1563 / t1450 on this law
+    // (CLI --campaign 2400, docs/re/_wip_tD34.md). Cap raised 1200 -> 2400;
+    // the contract (finite resolve) is unchanged.
     bool anyVictory = false;
     for (unsigned seed : {1u, 2u, 2024u}) {
         auto c = makeCampaign(seed);
-        for (int t = 0; t < 1200 && !c.over(); ++t) c.advance();
+        for (int t = 0; t < 2400 && !c.over(); ++t) c.advance();
         if (c.over()) { anyVictory = true; break; }
     }
     CHECK(anyVictory);
@@ -600,8 +605,9 @@ TEST(campaign_advance_after_victory_is_noop) {
     auto c = makeCampaign(1);
     ag::Victory v = ag::Victory::None;
     // t89 re-pin: seed 1 finite resolve Control t842 (deterministic combat;
-    // see campaign_reaches_a_victory note above).
-    for (int t = 0; t < 1200; ++t) {
+    // see campaign_reaches_a_victory note above). tD34: the capture law
+    // slows conquest to Control t1875 on seed 1 — cap raised to match.
+    for (int t = 0; t < 2400; ++t) {
         v = c.advance();
         if (v != ag::Victory::None) break;
     }

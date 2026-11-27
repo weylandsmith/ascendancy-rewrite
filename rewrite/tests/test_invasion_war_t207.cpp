@@ -219,9 +219,15 @@ TEST(invasion_capture_war_e2e_t208) {
     CHECK(!c.dipStateAt(0).atWar);            // diplo STATE still peace
     c.setWarForTest(ag::kPlayer, 1, true);    // engagement gate (scenario war bit)
     c.setIndustryForTest(ag::kPlayer, 50.0);  // clears the 1895 ship-cost gate
+    // tD34 (capture law 0x3a45c): the forced (SuperMarines) leg still needs
+    // the RESOLVER to run, and the resolver is entered only with an invasion
+    // module at the objective (carrier gate 0x42d09) — grant one module.
+    // The old PASS without modules measured the REFUTED pop-decider.
+    c.setInvasionModulesForTest(ag::kPlayer, 1);
     c.advance();
     // (E1) the capture RAN: star1 flipped to the player (owner flip 1969).
     CHECK(c.starOwner(1) == ag::kPlayer);
+    CHECK(c.invasionModules(ag::kPlayer) == 0);  // need=1 consumed (0x3a34e)
     // (E2) diplo STATE flipped: mood(1)==0 is already proven by T3's exact
     // 320 post-advance reading (green CI), so the full expected cascade
     // value is exact: clamp 280, chooser DeclareWar subtracts

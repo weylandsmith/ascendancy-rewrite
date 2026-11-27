@@ -133,10 +133,13 @@ TEST(ship_expansion_survives_gates) {
     // this seed resolves at ~t1420 (CLI --campaign 1600 --seed 2024), still
     // FINITE, which is what this guard actually tests. Window widens; law
     // stands.
+    // tD34 1600 -> 2400: the capture law (FUN_0003a174 0x3a45c) slows
+    // conquest — this fixture resolves FINITE inside 2400 (test green;
+    // CLI seed 2024 proxy: Extinct t1436).
     auto c = makeShipCampaign(2024);
     ag::Victory v = ag::Victory::None;
     int t = 0;
-    for (; t < 1600 && v == ag::Victory::None; ++t) v = c.advance();
+    for (; t < 2400 && v == ag::Victory::None; ++t) v = c.advance();
     CHECK(v != ag::Victory::None);
     CHECK(c.turn() >= 2);
 }

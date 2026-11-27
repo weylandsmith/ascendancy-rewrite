@@ -131,6 +131,19 @@ verified t85g..t88a):
 - Capture iff hull > defend. NO NOISE: combat has no hit roll (measured-
   negative, combat.md S2g) — v1's uniform 0..10/0..5 draws were an uncited
   abstraction and are removed (t89); timelines regenerated accordingly.
+- tD34 OWNER-TRANSFER LAW (D33-L1; FUN_0003a174 0x3a45c, full FUN-by-FUN
+  docs/re/_wip_tD34.md S2): the hull verdict decides the ENGAGEMENT, never
+  the OWNER FLIP. A star changes hands iff an invasion module (cidx 0x49)
+  attempt exists at it AND (count > active shield items 18/19 OR attacker
+  ability byte == 0 == SA_SuperMarines). Modules: per-owner ledger, 0 at
+  scenario init, +1/turn once the Invasion Module gizmo row is research-
+  legal, cap 6; consumed need = min(count, shields+1) (forced 1) on EVERY
+  attempt incl. repelled (0x3a360 runs before the success gate). The
+  pre-tD34 pop-decider (garrison death flips owners with zero fleet) is
+  REFUTED by the user's impossibility law + the byte law; pins
+  test_capture_law_tD34 x6, mutations M1..M6 all CAUGHT. Day-20 captures
+  are structurally impossible (modules 0 + mid-game tech; MEASURED 0
+  capture events in the first 60 turns, dense+7, seeds 1/2/3).
 - Star-id-ordered sequential pass over borders; a capture fortifies the star
   for 2 turns. Captured pop resets to the settlement seed.
 

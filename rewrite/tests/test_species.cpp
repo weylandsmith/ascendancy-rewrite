@@ -475,10 +475,15 @@ TEST(species_campaign_with_abilities_reaches_victory) {
     // activates 0x3f220 no-free-pop — builds serialize behind pop growth and
     // this seed now resolves Control at t1255 (CLI --campaign 1500 --seed
     // 2024, finite: not a stall). Window widens; the law stands.
+    // tD34 1600 -> 2400: the capture law (FUN_0003a174 0x3a45c: invasions
+    // need cidx-0x49 modules; pop no longer flips owners) slows conquest —
+    // this fixture resolves FINITE inside 2400 (test green; CLI proxy seed
+    // 2024: Extinct t1436, docs/re/_wip_tD34.md S4). Guard target (INFINITE
+    // stall) unchanged.
     auto c = makeCrafted(2024, 1, ag::SpeciesAbility::SuperMarines);
     ag::Victory v = ag::Victory::None;
     int t = 0;
-    for (; t < 1600 && v == ag::Victory::None; ++t) v = c.advance();
+    for (; t < 2400 && v == ag::Victory::None; ++t) v = c.advance();
     CHECK(v != ag::Victory::None);
 }
 
