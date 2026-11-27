@@ -809,3 +809,30 @@ property - window id/rect/shape/frame from windows.txt, frame art from
 a named SHP record, string-table ids for text, button records, list
 row art-source law - cited to windows.txt / shape records / handler
 FUNs. Refcaps VERIFY citations; they are not a substitute for them.
+
+## D31 — ESCAPE-AT-BOTTOM CLOSURE REFUTED; ESC LAW + QUIT INSTRUMENT (USER, 2026-11-26, verbatim)
+
+> I did not click escape. There were no popups yet, the mouse never
+> moved from the next day button. Yes, the console line at quit does
+> seem like a reasonable next step, if you're unable to reproduce the
+> issue. Also, that brings up a point on something else that needs some
+> work - escape from the galaxy screen should go back to the main
+> screen (Play Introduction, Tutorial, New Game, etc), not exit the
+> game completely.
+
+DISPOSITION:
+1. tPF-1c closure (9472ac2) REFUTED by user testimony (third such
+   pattern; D30 law applies): the day-20 exit is OPEN again as an
+   UNREPRODUCED defect. Mandatory next step = SELF-DIAGNOSING QUIT:
+   every exit path from runCampaignUi prints its CAUSE line (cause
+   enum + turn) BEFORE "ui ok"; the user's next run then names the
+   path itself. No more theorize-and-close.
+2. ESC-LAW ROW: user asserts Escape on the galaxy map returns to the
+   TITLE/main screen (Play Introduction, Tutorial, New Game...), not
+   quits. t410's "quit at bottom" citation is now CONTESTED — RE-
+   DERIVE the vendor Escape chain from the handler (t252 msg map +
+   the unwind fn) with citations: which stack level Escape pops at,
+   and whether the bottom pops to title-boot instead of process exit.
+   Vendor truth decides; if vendor quits, we present the cited asm to
+   the user before overriding. If vendor unwinds to title, ship that.
+   (Instrument line ships either way.)
