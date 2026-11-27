@@ -537,3 +537,49 @@ Full working log docs/re/_wip_tPLV1.md F0-F4. Durable laws:
   scripts/tplv1f_mutate_census.sh). The v1 >=200-white-px premise is also
   invalid for the seed-5 home planet (all surface classes 0). Details
   docs/re/_wip_tPLV1.md F5.
+
+## 15. THE PLANLIST FILL LAW 0x3b6f3 + THE CHECKER IS FULL ORDERABILITY (tPF-6b, 2026-11-26)
+- SITE RECOVERED [verified]: fn 0x3aa0a is the PLANLIST widget's message
+  handler (t428e E3 widget 0x1f06; entry eax=widget, dx=msgid, ecx=param).
+  msg 0x33 (51) handler 0x3b6f3 FILLS the rows: gate byte DAT_0007458e ==
+  byte[DAT_00043508+0x57] (fill runs only for the owner race); param 1 ->
+  word[widget+0xae] := 0xffff FIRST; loop ecx 0..0x26 with UNCONDITIONAL
+  skip of item 5 (0x3b76a je); append iff checker 0x3830c(item=dl, cell=
+  word[widget+0xae] in ebx) nonzero; row record stride 5 (byte item @+0xb2,
+  u32 0 @+0xb3); repaint 0x314e8+0x56ca4 iff count > 0 (count==0 leaves the
+  PREVIOUS rows on screen — TPF6-A witness note).
+- THE CELL IS ALWAYS -1 FOR HUMAN PLAY [verified]: the only msg-51 producer
+  in the planet window is PLBUILD, SENDPARAM1 1 (windows.txt ln1615; the
+  other msg-51 widgets ROTRIGHT/WEAPONS/BATROTRIGHT/RESROTRIGHT live in
+  other windows — msg-id space is per-window, tPF-7a law). The armed value
+  msg 5 writes into +0xae never reaches a fill. So vendor list membership =
+  item<39 AND item!=5 AND REQUIRES AND FREEPOP, cell legs inert.
+- CHECKER 0x3830c IS NOT PLACEMENT-ONLY (full body audit): LEG-A REQUIRES
+  0x3835d (req!=0xFF -> race-mask word[0x74744] > req AND tech bit
+  (1<<race) at req-UPOP row 0x7478b sar 0x18); LEG-B FREE-POP 0x383b3
+  (acc = word+0x42 - word+0x4c + SBYTE UPOP(pending@+0x54) when pending
+  != 0xff; pass acc >= UPOP(item); item 23 -> 0x39a9c replaces the verdict
+  at 0x38422 — seam TPF6-SHIP: 0x39a9c = first-empty-cell word+2 bit0 AND
+  0x402d8(race*160+0x12e16) > 0, semantics unrecovered); item==5 -> pop-leg
+  exempt 0x38435; LEG-C cell 0x3843a (cell >= word[+0x1a] cell-count jumps
+  to the final AND at 0x386fe — THE SENTINEL: cell -1 runs ONLY legs A+B).
+  Flags word 0x73e46 = stride-0x28 item table +6 (bit0/race-table 0x12fb3
+  grant, occupancy/bit2 grant, XOR surface-ring + rock + terraform +
+  adjacency vetoes as banked tPL-B1/F10). Return -1 on PASS.
+- PORT SHIPPED (planetview.{h,cpp}): projectOptionsFor now skips item 5
+  always and applies freePop = pop - usedPopFor(star) >= upop for item != 23
+  on EVERY open (armed and unarmed). Vendor acc nets to pop - ACTIVE-used
+  because usedPopFor stores ACTIVE items only (pending addback cancels).
+  The tPF-6 armed placementBlock filter REMAINS (port tile-first flow,
+  justified by popup D6, not by the fill law). THE POPUP LEG TOO: the
+  54-loop 0x3d579 calls the SAME full checker, so the ui.cpp popupButtonIds
+  buildable-lambda now runs freePop + requiresAvailable + placementBlock
+  (item 0xff demolish + item 23 exempt) — previously placementBlock only.
+  Pins planlist_fill_law_tpf6b (3 legs: skip-5 both paths; free==0 keeps
+  only upop<=0 + item 23; pop-up anti-vacuity) + planlist_popup_leg_wiring_
+  tpf6b (source-text: lambda carries all three legs); fixture pop 0 -> 50
+  (the old zero-pop premise was invalid under the new law — it emptied the
+  list and made the filter checks vacuous). Suite 598 -> 600/0/0; MUTATION
+  3/3 CAUGHT (M1 skip-5 removed: 2 fails; M2 free-pop leg disabled: 34
+  fails; M3 popup lambda reverted to placementBlock-only: wiring pin 2
+  fails).

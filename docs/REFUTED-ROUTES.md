@@ -1655,3 +1655,16 @@ evidence when BPLIST shows the leg armed AND a control leg fires.
 ## is needed; c68e8bd is NOT a rev in this repo (rev-parse/reflog/fsck all
 ## negative — it lives in the user's own clone). Do not re-open Extinct/
 ## LastAlive setup defects for this report.
+
+## R-tPF6b — "FREE-POP IS AN ORDER GATE, NOT A LIST FILTER" IS DEAD (tPF-6b,
+## 2026-11-26). The tPF-6-era bank (planetview.cpp comment, _wip_tPF6) claimed
+## the vendor PLANLIST shows pop-short rows and only 0x38840 cmd0 rejects
+## them. The fill loop 0x3b6f3 (fn 0x3aa0a msg 0x33) calls checker 0x3830c
+## per row, and the checker body CONTAINS the free-pop leg 0x383b3..0x38416
+## (acc = word+0x42 - word+0x4c + SBYTE UPOP(pending) >= UPOP(item); item 23
+## replaced by 0x39a9c at 0x38422). Rows whose UPOP exceeds free pop NEVER
+## appear in the vendor list. Also dead: "the PLANLIST fill is per-ARMED-cell
+## for human play" — PLBUILD SENDPARAM1==1 (windows.txt ln1615) forces
+## word[widget+0xae] := 0xffff before the loop (0x3b70d); cell -1 bypasses
+## ONLY the cell legs (0x3843a jae), legs A/B still run. Law + port delta:
+## docs/re/planets-ui.md S15; pins planlist_fill_law_tpf6b.

@@ -106,7 +106,10 @@ TEST(planlist_armed_cell_filter_tpf6) {
     CHECK(surf > 0);
     const int size = ag::Campaign::sizeClassFor(surf);
     CHECK(size >= 0);
-    ps.pop = 0;
+    // tPF-6b: pop must be ABUNDANT here — the fill law 0x3b6f3 runs the
+    // checker's FREE-POP leg (0x383b3) per row, so a zero-pop fixture would
+    // (correctly!) empty the list and make every filter assertion vacuous.
+    ps.pop = 50;
     ps.cellClasses.assign(size_t(surf) + 10, 1);
     // tPF-8: nothing is REQUIRES-legal at game start (vendor zero-mask law),
     // which would make the filter test vacuous. The fixture's PREMISE is the
@@ -194,6 +197,79 @@ TEST(planlist_armed_cell_filter_tpf6) {
             au::placementBlock(c, star, o.item, surf) == au::PlacementBlock::None;
         CHECK(ringKept == ringGrants);
     }
+}
+
+// tPF-6b FILL-LAW PINS (docs/re/_wip_tPF6b.md P4-P7): the vendor PLANLIST
+// fill 0x3b6f3 skips item 5 UNCONDITIONALLY (0x3b76a) and runs the checker's
+// FREE-POP leg (0x383b3) per row on EVERY open (PLBUILD param 1 forces the
+// cell to -1, windows.txt ln1615 + 0x3b70d; cell -1 bypasses only the CELL
+// legs at 0x3843a, not legs A/B).
+TEST(planlist_fill_law_tpf6b) {
+    REQUIRE_DATA();
+    auto copt = seededCampaign();
+    CHECK(copt.has_value());
+    if (!copt) return;
+    ag::Campaign& c = *copt;
+    const int star = playerStar(c);
+    CHECK(star >= 0);
+    if (star < 0) return;
+    auto& ps = const_cast<ag::PlanetState&>(c.planetAt(star));
+    ps.items.clear();
+    ps.itemCells.clear();
+    ps.cellClasses.assign(size_t(ps.surfaceCells) + 10, 1);
+    c.setAllTechs(ag::kPlayer, true);
+
+    // (1) item 5 is never a row, armed or unarmed, even with all techs and
+    // abundant pop (the ONLY law being pinned here).
+    ps.pop = 50;
+    CHECK(!holds(au::projectOptionsFor(c, star), 5));
+    CHECK(!holds(au::projectOptionsFor(c, star, 0), 5));
+
+    // (2) FREE-POP AT LIST TIME: with pop pinned so free == 0, no row with
+    // UPOP > 0 survives; item 23 (the 0x38422 replacement) is exempt.
+    ps.pop = 0;
+    const auto tight = au::projectOptionsFor(c, star);
+    for (const auto& o : tight) {
+        const auto* pi = c.planetItem(o.item);
+        if (o.item == 23) continue;  // seam TPF6-SHIP (exempt leg taken)
+        CHECK(pi && pi->upop <= 0);
+    }
+    // (3) ANTI-VACUITY: restoring pop brings the UPOP>0 rows back (a filter
+    // that always returns the same set would fail this leg).
+    ps.pop = 50;
+    const auto loose = au::projectOptionsFor(c, star);
+    CHECK(loose.size() > tight.size());
+    bool anyPositiveUpop = false;
+    for (const auto& o : loose) {
+        const auto* pi = c.planetItem(o.item);
+        if (pi && pi->upop > 0) anyPositiveUpop = true;
+    }
+    CHECK(anyPositiveUpop);
+}
+
+// Wiring pin (source-text): the ui.cpp popupButtonIds buildable-leg must
+// carry the FULL checker (free-pop + REQUIRES + placementBlock) — a lambda
+// reverted to placementBlock-only silently re-offers pop-short Builds (the
+// 0x3d579 loop runs the same 0x3830c as the fill).
+TEST(planlist_popup_leg_wiring_tpf6b) {
+    REQUIRE_DATA();
+    const std::string path =
+        std::string(kRepoDir()) + "/rewrite/src/ui/ui.cpp";
+    FILE* f = std::fopen(path.c_str(), "rb");
+    CHECK(f != nullptr);
+    if (!f) return;
+    std::string src;
+    char buf[8192];
+    size_t n;
+    while ((n = std::fread(buf, 1, sizeof(buf), f)) > 0) src.append(buf, n);
+    std::fclose(f);
+    const size_t call = src.find("popupButtonIds(");
+    CHECK(call != std::string::npos);
+    if (call == std::string::npos) return;
+    const std::string body = src.substr(call, 1600);
+    CHECK(body.find("usedPopFor") != std::string::npos);
+    CHECK(body.find("requiresAvailable") != std::string::npos);
+    CHECK(body.find("placementBlock") != std::string::npos);
 }
 
 // Wiring pin (source-text, tPF-6): the three ui.cpp call sites must pass the

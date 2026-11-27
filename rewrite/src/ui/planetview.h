@@ -91,17 +91,21 @@ PlanetView planetViewFor(const ascend::game::Campaign& camp, int star,
 
 // ---- the PROJECT LIST (PLBUILD -> PLANLIST) --------------------------------
 struct ProjectOption { int item; std::string name; int cost; };
-// Buildable options for one planet, planitem TABLE ORDER: rows with
-// requiresAvailable(reqByte) (income-law S4) and item < 39 (0x388ec).
-// Does NOT pre-filter the free-pop gate (3) — the vendor LIST shows them;
-// the ORDER rejects them (and the row's suffix already says why).
+// Buildable options for one planet, planitem TABLE ORDER — the vendor fill
+// law 0x3b6f3 (tPF-6b, docs/re/_wip_tPF6b.md P4-P7): item < 39 (0x388ec),
+// item != 5 (0x3b76a unconditional skip), requiresAvailable(reqByte)
+// (checker LEG-A 0x3835d = income-law S4), and the FREE-POP leg (checker
+// LEG-B 0x383b3: pop - used >= UPOP(item); item 23 exempt via the 0x38422
+// replacement, seam TPF6-SHIP). The old "list shows pop-short rows, the
+// ORDER rejects" reading is REFUTED (R-tPF6b) — leg B sits inside the
+// per-row checker the fill calls.
 // tPF-6 ARMED-CELL FILTER (D28 item 11): when the list opens from a square
-// popup's Build button on cell `armedCell`, drop every item the placement
-// checker refuses on THAT cell (placementBlock != None). Vendor corroboration:
-// the 54-append loop 0x3d550..0x3d58e calls checker 0x3830c(item, cell) per
-// item BEFORE appending Build — the vendor never offers a Build it would
-// refuse (docs/re/_wip_tPF2d.md D6 + picker law income-law.md S13). -1 = no
-// armed cell (plain PLBUILD open): full REQUIRES-gated list, law unchanged.
+// popup's Build button on cell `armedCell`, additionally drop every item the
+// placement checker refuses on THAT cell (placementBlock != None). NOTE the
+// vendor's own PLBUILD always opens cell -1 (SENDPARAM1 1 forces +0xae
+// 0xffff before the loop, windows.txt ln1615 + 0x3b70d) — this filter is
+// PORT-flow (tile-first), corroborated by the popup D6 law (no Build button
+// appears for a refused (item, cell)), not by the fill law.
 std::vector<ProjectOption> projectOptionsFor(
     const ascend::game::Campaign& camp, int star, int armedCell = -1);
 

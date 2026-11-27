@@ -44,24 +44,42 @@ PlanetView planetViewFor(const ascend::game::Campaign& camp, int star,
 
 std::vector<ProjectOption> projectOptionsFor(
     const ascend::game::Campaign& camp, int star, int armedCell) {
-    // LIST MEMBERSHIP (planetview.h header): table order, REQUIRES-gated
-    // (income-law S4), domain < 39 (0x388ec). Free-pop is an ORDER gate,
-    // not a list filter — the vendor shows the row and the order rejects.
-    // tPF-6: an ARMED cell additionally filters by the placement checker
-    // (the vendor's 54-loop checks 0x3830c per item before offering Build).
+    // LIST MEMBERSHIP LAW (tPF-6b, cited): the vendor PLANLIST fill is the
+    // msg-0x33 handler 0x3b6f3 inside fn 0x3aa0a (PLANLIST widget, t428e
+    // E3): loop ecx 0..0x26, UNCONDITIONAL skip of item 5 (0x3b76a je),
+    // append iff checker 0x3830c(item, cell) is nonzero. The checker is the
+    // FULL orderability predicate, not placement-only: LEG-A REQUIRES
+    // (0x3835d), LEG-B FREE-POP (0x383b3: pop - used [+0x42 - +0x4c, incl.
+    // the pending item's UPOP addback 0x383dd] >= UPOP(item); item 23
+    // replaced by 0x39a9c at 0x38422 — seam TPF6-SHIP), LEG-C cell geometry
+    // (0x3843a: cell >= cell-count jumps straight to the final AND, so
+    // cell -1 runs ONLY legs A+B). PLBUILD's SENDPARAM1 == 1
+    // (windows.txt ln1615) forces word[widget+0xae] := 0xffff BEFORE the
+    // loop (0x3b70d) — every human list open is cell -1. The banked
+    // "free-pop is an ORDER gate, not a list filter" reading is REFUTED
+    // (R-tPF6b): leg B is inside the per-row checker.
     std::vector<ProjectOption> out;
     if (star < 0 || star >= int(camp.galaxy().stars.size())) return out;
     const int n = camp.planItemCount();
+    // LEG-B free-pop budget: vendor acc = pop - used(+0x4c incl. pending)
+    // + UPOP(pending) == pop - ACTIVE-used; usedPopFor stores ACTIVE items
+    // only, so the port's expression needs no pending term.
+    const int freePop =
+        int(camp.planetAt(star).pop) - camp.usedPopFor(star);
     for (int id = 0; id < n && id < 39; ++id) {
+        if (id == 5) continue;  // 0x3b76a: Colony Base is never a list row
         const auto* pi = camp.planetItem(id);
         if (!pi) continue;
         if (!ascend::game::requiresAvailable(pi->reqByte, camp.techCountTotal(),
                                              camp.playerTechs()))
             continue;
+        if (id != 23 && freePop < pi->upop)
+            continue;  // 0x38416 jl; item 23 takes the 0x39a9c replacement
         if (armedCell >= 0 &&
             placementBlock(camp, star, id, armedCell) != PlacementBlock::None)
-            continue;  // the vendor's Build button never appears for this
-                       // (item, cell) — so the row never appears either
+            continue;  // PORT flow (tPF-6): guards the tile-first path — the
+                       // vendor popup D6 law says no Build button appears for
+                       // a refused (item, cell), so the row can't be used
         out.push_back(ProjectOption{id, pi->name, pi->cost});
     }
     return out;

@@ -1302,6 +1302,22 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                 cellItem = pps.items[i];
                         planetPopupIds = ascend::ui::popupButtonIds(
                             cellItem, [&](int item) {
+                                // tPF-6b: the 54-loop 0x3d579 calls the FULL
+                                // checker 0x3830c(item, cell) — legs A
+                                // (REQUIRES) + B (free-pop, item 23 exempt
+                                // via 0x38422) + C (placement), not C alone.
+                                if (item != 0xff && item != 23) {
+                                    const auto* pi = camp.planetItem(item);
+                                    const int fp = int(camp.planetAt(
+                                                           planetStar).pop) -
+                                                   camp.usedPopFor(planetStar);
+                                    if (!pi || fp < pi->upop) return false;
+                                    if (!ascend::game::requiresAvailable(
+                                            pi->reqByte,
+                                            camp.techCountTotal(),
+                                            camp.playerTechs()))
+                                        return false;
+                                }
                                 return placementBlock(camp, planetStar, item,
                                                       hit) ==
                                        PlacementBlock::None;

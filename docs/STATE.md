@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-26T18:40
+updated: 2026-11-26T20:55
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,41 +233,44 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT TPF6-B: RECOVER THE VENDOR PLANLIST PER-CELL FILTER SITE (or certify
-its absence) — the list-construction function behind the planet-screen
-PLANLIST popup, and whether it gates rows by the ARMED CELL.
-Ordering rationale: tPF-7a (this iteration) closed the last iterable item
-in the pump/release family (research.md S16 + TPF7-A seam closed; TPF7-C
-is a user feel-grading ask, TPF7-D closed negative tPF-12) and turned up a
-SHIPPED press-table defect on the way, so the queue must move to the next
-family: the planet build-list. TPF6-A (does the vendor ever show a Build
-whose list has no buildable row) CANNOT be answered before TPF6-B, and
-TPF6-B is pure static RE with known anchors — the 54-append loop 0x3d550..
-0x3d58e already proves checker 0x3830c(item, cell) is cell-aware for the
-Build BUTTON (tPF-2d D6); the unanswered question is the ROW LIST.
+NEXT TPF6-A: CLOSE "DOES THE VENDOR EVER SHOW A BUILD WHOSE LIST HAS NO
+BUILDABLE ROW" AT THE NOW-CITED FILL LAW — the static proof is nearly
+written by tPF-6b; finish it and pin the port side.
+Ordering rationale: tPF-6b (this iteration) recovered the fill site
+(planets-ui.md S15) and answered the hard half of TPF6-A: PLBUILD always
+opens cell -1 (SENDPARAM1 1 + 0x3b70d), and the popup Build button exists
+only when SOME item passes the full checker 0x3830c(item, hit) — legs A+B
+are cell-independent, so that same item passes the fill's legs A+B at cell
+-1 and lands in the list => the vendor list behind a visible Build is
+NEVER empty. Remaining work: (1) write that implication out as S15.1 with
+the two-callsites argument (0x3d579 vs 0x3b786, both 0x3830c), noting the
+cell-C asymmetry can only SHRINK the popup set, never the fill set;
+(2) port-side: the port list is painted from projectOptionsFor directly
+(no stale-row effect), and after the tPF-6b lambda fix the popup Build
+leg == fill legs for cell -1, so the port can no longer show an
+empty-list Build — pin it (source-text or unit: for every id where
+popupButtonIds yields Build under the ui.cpp lambda, projectOptionsFor(-1)
+is non-empty); (3) honest-negative check: the ONLY escape hatch is item 23
+(seam TPF6-SHIP: 0x38422 replacement may GRANT a row the pop leg refuses —
+if the popup's 0x3d579 item-23 leg and the fill's agree, emptiness stays
+impossible; verify the 0x3d564..0x3d58e loop runs the same 0x39a9c path
+before claiming closure).
 TPF6-CPU-A stays parked (user throttle ruling pending, port-decision not
-vendor law).
-Steps: (1) find the msg handler that fills the PLANLIST widget on popup
-open (window name PLANLIST in extracted/ascend00/windows.txt; its
-SENDMESSAGE id + the handler's dispatch entry, same method as tPF-7a P2:
-widget table -> handler entry -> dispatch on dx); (2) read the list-build
-loop and determine whether 0x3830c (or the REQUIRES predicate 0x46d3c, or
-placementBlock's vendor twin) is called with the ARMED CELL word or with a
-constant/-1; (3) if cell-aware, diff its gate against projectOptionsFor
-and SHIP any delta + pins; if it is NOT cell-aware, that is the honest
-negative: our per-cell filter (tPF-6) is then PORT-ONLY and must be
-re-examined against the vendor reading — record it and keep TPF6-B open
-per strict-close.
+vendor law). TPF7-C is a user feel-grading ask. OQ-016/OQ-019 remain the
+only open ledger rows (both capture-blocked classes).
 TRAPS: disasm = ~/tools/revenv/bin/python scripts/t442_disasm.py START END
 (.venv has NO capstone); pass EXPLICIT hex END (bash $((0x..+0x..)) mixes
-bases and once flooded 10 MB); anchors at DEFINITIONS (pressPair lives in
+bases and once flooded 10 MB); a LINEAR 0xe8 byte-scan DESYNCS and false-
+negatives — scan per-function from functions_full.tsv (scripts/
+tPF6b_callscan.py pattern); anchors at DEFINITIONS (pressPair lives in
 researchview.cpp, not .h — tPF-10 M3 trap); a mutation script's restore()
 must COPY BACK then md5-verify, verify-only leaves mutations on disk
-(tPF-6 incident); NEVER git checkout a file mid-mutation-cycle (this
-iteration's git checkout reverted BOTH the fix and the mutation — mutate,
-test, patch back explicitly); no single-occurrence pin literal in comments
-(window-pins size past comment bodies, tPF-1b); CHECKs on fixed items use
-base-list items and ACTIVE cell pairs DERIVED from the grid law (tPF-6).
+(tPF-6 incident); NEVER git checkout a file mid-mutation-cycle (tPF-7a);
+no single-occurrence pin literal in comments (window-pins size past
+comment bodies, tPF-1b); CHECKs on fixed items use base-list items and
+ACTIVE cell pairs DERIVED from the grid law (tPF-6); a zero-pop fixture is
+INVALID for any projectOptionsFor assertion post-tPF-6b (the free-pop leg
+empties the list and every filter check goes vacuous — set pop first).
 TRAPS STILL STANDING (full per-iteration detail in git history of this
 block + docs/re/*): NEVER read whole lines of work/r1/playcap/live-
 timeline.jsonl; D28 file scratchpad/t433-build-feedback.txt is the item
@@ -292,6 +295,43 @@ ui.cpp:899), Escape from planet view lands on STATUS NOT the map, repro
 scripts need a cleanup trap, and BIN/DATA must be env-overridable before
 an era-tree A/B is trusted (tPF-1c x11).
 
+tPF-6b LANDED 2026-11-26 (PLANLIST FILL LAW RECOVERED AT MECHANISM +
+SHIPPED: skip-5 + FREE-POP-AT-LIST-TIME; no OQ row touched — open=[016,019]
+unchanged, seam closure; CODE SHIPPED: planetview.{h,cpp}, ui.cpp popup
+lambda, test_optionsfilter_tpf6.cpp + 2 new tests).
+ - SITE [verified]: fn 0x3aa0a = PLANLIST msg handler; msg 0x33 handler
+   0x3b6f3 fills rows — owner-race gate (0x7458e == [world]+0x57), loop
+   0..0x26, UNCONDITIONAL skip item 5 (0x3b76a), append iff checker
+   0x3830c(item dl, cell=word[widget+0xae] ebx) nonzero, stride-5 rows
+   @+0xb2, repaint iff count>0 (count==0 leaves STALE rows — TPF6-A note).
+ - THE '0x38 vs the ARMED CELL' QUESTION ANSWERED BOTH WAYS: the fill IS
+   cell-aware in code, but PLBUILD SENDPARAM1==1 (windows.txt ln1615, sole
+   msg-51 producer in the planet window; per-window msg-id space law)
+   forces +0xae := 0xffff before the loop (0x3b70d) — every human open is
+   cell -1; the armed value msg 5 writes never reaches a fill.
+ - CHECKER 0x3830c IS FULL ORDERABILITY (body audit): LEG-A REQUIRES
+   0x3835d, LEG-B FREE-POP 0x383b3 (acc = +0x42 - +0x4c + SBYTE
+   UPOP(pending@+0x54); item 23 -> 0x39a9c replacement 0x38422, seam
+   TPF6-SHIP — 0x402d8 semantics unrecovered, honest negative), LEG-C cell
+   0x3843a whose jae (cell -1 => 0xffff >= count) skips to the final AND —
+   sentinel law: cell -1 runs legs A+B ONLY. R-tPF6b BANKED: 'free-pop is
+   an ORDER gate not a list filter' is DEAD (it sits inside the per-row
+   checker). Law planets-ui.md S15; log _wip_tPF6b.md P0-P7.
+ - PORT SHIPPED: projectOptionsFor skips 5 always + freePop>=upop for
+   item!=23 always (armed+unarmed; vendor acc nets to pop-ACTIVE-used,
+   usedPopFor stores ACTIVE only); ui.cpp popupButtonIds lambda upgraded
+   placementBlock-only -> freePop+requiresAvailable+placementBlock (the
+   54-loop 0x3d579 calls the SAME checker — defect class found by the
+   census, fixed at root). tPF-6 armed filter kept (port tile-first flow,
+   popup-D6 justification). Pins planlist_fill_law_tpf6b +
+   planlist_popup_leg_wiring_tpf6b; fixture pop 0->50 (zero-pop premise
+   invalid post-law — vacuity trap re-banked).
+ - SUITE 598 -> 600/0/0; MUTATION 3/3 CAUGHT (M1 skip-5 removed: 2 fails;
+   M2 free-pop leg off: 34; M3 popup lambda reverted: wiring pin 2).
+   GATE_EXIT=0, LEDGER AUDIT OK, LEDGER INDEX OK.
+ - TRAP x1 NEW: a LINEAR 0xe8 byte-scan for call sites DESYNCS mid-range
+   and false-negatives (once claimed fn 0x3d2fe had zero callers); scan
+   PER-FUNCTION from functions_full.tsv instead (scripts/tPF6b_callscan.py).
 tPF-7a LANDED 2026-11-26 (RELEASE-PARAM LAW CLOSED + SHIPPED PRESS-TABLE
 DEFECT FIXED; no OQ row touched — open=[016,019] unchanged; CODE SHIPPED:
 researchview.{h,cpp} + pins).
