@@ -233,31 +233,26 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tESC-1: RE-DERIVE THE VENDOR ESCAPE CHAIN AT BYTES (D31 user law:
-Escape from the galaxy map should return to the MAIN/TITLE screen (Play
-Introduction/Tutorial/New Game), NOT exit the process; t410 "quit at
-bottom" citation CONTESTED). Re-derive from the handler asm (t252 msg map,
-the unwind fn cited in t410): what does Escape pop at the bottom level —
-process exit or boot-to-title? Cite FUNs. If the vendor unwinds to title,
-ship exactly that + pin (Escape on map -> title loop state, RESUME path
-intact). IF the vendor asm genuinely quits the process, DO NOT silently
-keep it — write the cited asm excerpt into docs/re/_wip_tESC1.md and leave
-the question OPEN for the user's ruling (his memory may be of the DOS
-launcher; user law vs vendor law is HIS call, our job is the citation).
-Ordering rationale: tPF-1d CLOSED this iteration (instrument shipped +
-Chamachi soak honest-negative, below), and the day-20 exit stays OPEN as
-an unreproduced defect AWAITING THE INSTRUMENT — nothing more can be done
-there from our side, while tESC-1 is the other half of D31, is static
-(no capture, no user gate), and its answer directly shapes whether the
-instrument's escape-key-at-bottom cause needs a new non-exit sibling.
-TPF7-A per-msg release-mask split (0x47d3b ~ebp role owed) waits behind
-it. NEW QUEUE CANDIDATE (banked tPF1d, docs/re/_wip_tPF1d.md): Begin
-species ring pick never reaches play state (NewGameSettings has no species
-field; intro print only) — real port defect vs D-row 693 "started a game
-with the Chamachies"; size it after tESC-1. TPF6-CPU-A stays parked (user
-throttle ruling pending). TPF7-C is a user feel-grading ask. TPF5-A ship
-stays gated on the D1 ruling. OQ-016/OQ-019 remain the only open ledger
-rows (both capture-blocked classes).
+NEXT tSPEC-1: SIZE AND FIX THE BEGIN SPECIES PICK (banked tPF1d,
+docs/re/_wip_tPF1d.md + this iteration's witness run). Port defect: the
+New Game screen's species selection never reaches the play state —
+NewGameSettings (menulaw.h:344) carries only stars/owners/gov, and main.cpp
+buildCampaign(&newGame) rebuilds from that triple only, so "started a game
+with the Chamachies" (D-row 693) is impossible via Begin (this iteration's
+eject witness re-confirmed: Begin builds owners=5 gov=1 with the species
+pick printed and dropped). Re-derive at bytes what the vendor's Begin writes
+about the PLAYER SPECIES (the wheel-arms law tNG-B already cites: state base
+0x12e10 + atmosphere global 0x52b44 — find the species sibling write), ship
+the field through NewGameSettings + buildCampaign, pin + witness (Begin with
+a non-default species pick -> play state carries it). Ordering rationale:
+tESC-1 CLOSED this iteration (D31 resolved in the user's favour at bytes;
+ship + 4-leg witness green), the day-20 exit stays OPEN as an unreproduced
+defect AWAITING THE INSTRUMENT (nothing further from our side), and
+TPF7-A's per-msg release-mask split (0x47d3b ~ebp role owed) is the static
+alternative if tSPEC-1 sizes out mid-iteration. TPF6-CPU-A stays parked
+(user throttle ruling pending). TPF7-C is a user feel-grading ask. TPF5-A
+ship stays gated on the D1 ruling. OQ-016/OQ-019 remain the only open
+ledger rows (both capture-blocked classes).
 D30/D31 LAW (standing): any closure of a user-reported defect must be by
 reproduction+fix, NEVER by attributing the symptom to the user's actions.
 TRAPS: disasm = ~/tools/revenv/bin/python scripts/t442_disasm.py START END
@@ -276,7 +271,12 @@ empties the list and every filter check goes vacuous — set pop first);
 ui.cpp std::string composition for quitCause — .c_str() on a concatenated
 temporary DANGLES (tPF-1d); the order-phase return-to-map from the planet
 view is TWO escapes (Planet Display -> Planets -> map), assert per press
-(tPF-1d soak nav).
+(tPF-1d soak nav); a mutation cycle's LAST mutant binary persists after
+restore — REBUILD before any runtime witness or the witness measures the
+mutant (tESC-1: eject witness false-failed on the stale M3 build); a
+commented-out statement still matches a source-scan substring — pins on
+statements must check the line is not a comment (tESC-1 M1 survived, then
+CAUGHT with the anti-comment CHECK).
 TRAPS STILL STANDING (full per-iteration detail in git history of this
 block + docs/re/*): NEVER read whole lines of work/r1/playcap/live-
 timeline.jsonl; D28 file scratchpad/t433-build-feedback.txt is the item
@@ -299,6 +299,44 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+tESC-1 LANDED 2026-11-27 (VENDOR ESCAPE CHAIN RE-DERIVED AT BYTES — D31
+RESOLVED IN THE USER'S FAVOUR; EJECT-TO-TITLE SHIPPED + 4-LEG RUNTIME
+WITNESS; no OQ row touched — open=[016,019] unchanged; ADOPTED the prior
+session's uncommitted ui.cpp/ui.h/title.cpp half). PROVED: (1) the t410
+"Esc at bottom = quit" label was a PORT DEFAULT, never a vendor citation
+(_wip_t410.md L106-110 says "standing"; only the inside-screen->map leg was
+ever verified) — D31 vs t410 is user-law vs port-default, not user-law vs
+vendor-law. (2) BYTE LAW: ESC is keyed by SCAN CODE 1 in hotkey dispatcher
+fn 0x54d18 (tree 0x54faf; the only cmp ebx,0x1b in the image, 0x576d8, is a
+windows.txt parser bound — honest negative); ESC arm 0x54e96 precedence =
+modal flag [obj+0x489e] first (t409 law now cited), else pop ONE via
+FUN_00057020(obj,-1); the pop = screen-stack WORD array obj+0x4736, depth
+HIWORD obj+0x4756, tombstone 0xffff + depth-- (t410's ScreenStack CONFIRMED
+at bytes); NEITHER arm nor pop contains any exit syscall — the vendor
+escape chain has NO quit leg at all; at depth 0 the pop gate 0x57024 makes
+ESC inert. (3) THE EJECTION LANDS ON THE TITLE MENU WITH THE CAMPAIGN
+ALIVE: t285 LIVE witness (one Escape at the bare map -> title, autosave
+kept writing, in_game True, work/r1/bank-t285-flip1255/) + R-t439 (RESUME
+returned turn 1086 after exactly such an ejection) + t337 state-0 census
+(122/537 saves hold title state with a live campaign). NO user ruling
+needed — the citation question resolved in his favour. (4) PORT SHIP:
+ui.cpp doEscape bottom branch sets toTitle (cause still named via escCause
+param); 'ui to title' prints BEFORE 'ui ok'; window handed back via
+*windowOut ONLY on the eject leg; runTitleScreen(windowIn) reuses the live
+window (t385 single-window law); main() title<->campaign LOOP with
+per-entry newGame reset (a stale Begin triple would rebuild — destroy — the
+live mid-game campaign) and re-entry ALWAYS on Title (--resume players pick
+RESUME msg 1/1); witness line 'main: campaign -> title (campaign alive turn
+N)'. (5) RUNTIME: scripts/tESC1_eject_witness.sh ALL LEGS PASS — L1 eject
+alive, L2 RESUME click LANDED on the reused window, L3 resumed campaign
+advances (live object), L4 second eject + EXITTODOS exits. Pins
+test_toTitle_tESC1.cpp x3, MUTATION 3/3 CAUGHT (M1 comment-mutation
+survived first pass -> anti-comment CHECK added -> CAUGHT), after-restore
+md5 439f2b0b/1133f0fe green, rebuild-then-witness law re-verified. Suite
+605->608/0/0. tPF1d_cap_witness re-run green (shared exit path). Law
+corrected in ui-runtime.md ESCAPE line + _wip_t410.md annotation.
+
 
 tPF-1d LANDED 2026-11-27 (QUIT-CAUSE INSTRUMENT SHIPPED + CHAMACHI-EXACT
 SOAK HONEST-NEGATIVE; D31; no OQ row touched — open=[016,019] unchanged;

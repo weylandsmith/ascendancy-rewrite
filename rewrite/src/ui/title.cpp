@@ -131,10 +131,18 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          const ascend::game::Campaign* previewCamp,
                          const std::vector<ascend::game::SpeciesInfo>* roster,
                          const std::vector<std::string>* lore,
-                         NewGameSettings* newGameOut) {
-    SDL_Window* win = SDL_CreateWindow("Ascendancy", SDL_WINDOWPOS_CENTERED,
-                                       SDL_WINDOWPOS_CENTERED, kDisplayW,
-                                       kDisplayH, SDL_WINDOW_SHOWN);
+                         NewGameSettings* newGameOut, void* windowIn) {
+    // tESC-1: reuse the campaign's handed-back window when present (the
+    // campaign ejects to the title with the window ALIVE; creating a
+    // second one would eat the title's first synthetic click, t385 law).
+    SDL_Window* win = static_cast<SDL_Window*>(windowIn);
+    const bool winOwned = win == nullptr;
+    if (winOwned)
+        win = SDL_CreateWindow("Ascendancy", SDL_WINDOWPOS_CENTERED,
+                               SDL_WINDOWPOS_CENTERED, kDisplayW,
+                               kDisplayH, SDL_WINDOW_SHOWN);
+    else
+        SDL_SetWindowTitle(win, "Ascendancy");
     if (!win) {
         *err = std::string("title CreateWindow: ") + SDL_GetError();
         return BootState::Quit;

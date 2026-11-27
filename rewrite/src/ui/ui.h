@@ -46,7 +46,13 @@ BootState runTitleScreen(const std::string& dataRoot, BootState initial,
                          // already write the play state at click time; Begin
                          // adds the world layer + the atmosphere global).
                          // nullptr / no-Begin = untouched (Resume path).
-                         NewGameSettings* newGameOut = nullptr);
+                         NewGameSettings* newGameOut = nullptr,
+                         // tESC-1: REUSE an existing SDL_Window (as void*)
+                         // instead of creating one — the campaign's
+                         // to-title eject hands its live window back, and
+                         // swapping windows would eat the title's first
+                         // synthetic click (t385 law). nullptr = create.
+                         void* windowIn = nullptr);
 
 // Opens the P5a window over a LIVE campaign (docs/re/ui-runtime.md §5).
 // Blocks until quit or `turns` turns elapsed (0 = until quit). Returns 0 on
@@ -62,7 +68,19 @@ int runCampaignUi(ascend::game::Campaign& camp, int turns, bool autoplay,
                   void* window = nullptr,
                   const std::string& savesDir = std::string(),
                   const std::vector<ascend::game::SpeciesInfo>* roster =
-                      nullptr);
+                      nullptr,
+                  // tESC-1 (D31): Escape at the screen-stack bottom ejects
+                  // to the TITLE menu with the campaign ALIVE in RAM
+                  // (vendor law: ESC arm fn 0x54d18@0x54e96 pops via
+                  // FUN_00057020, no exit path; t285 live ejection
+                  // witness). Set true on that leg ONLY; main() re-enters
+                  // the title loop when it comes back true.
+                  bool* outToTitle = nullptr,
+                  // tESC-1: same handoff law as runTitleScreen's
+                  // windowOut — on the eject leg the window is handed
+                  // back ALIVE (the t385 single-window law holds across
+                  // the eject; a swap would eat the title's first click).
+                  void** windowOut = nullptr);
 
 // tPF-1 (D28 P7) NEXTTURNCONT attention predicate — the stop condition of
 // "advance time continually until an event requiring your attention occurs"

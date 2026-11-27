@@ -614,8 +614,25 @@ int main(int argc, char** argv) {
         const std::string savesDir =
             fs::is_directory(sdir, sec) ? sdir.string() : std::string();
         ascend::ui::NewGameSettings newGame;  // tNG-B B4 Begin handoff
+        // tESC-1 TITLE<->CAMPAIGN LOOP (D31; law + byte citations in
+        // docs/re/_wip_tESC1.md). Vendor Escape at the screen-stack bottom
+        // does NOT end the process (fn 0x54d18 ESC arm 0x54e96 -> pop
+        // FUN_00057020(obj,-1); no exit syscall anywhere in the chain) — it
+        // ejects to the TITLE menu with the campaign ALIVE in RAM (t285
+        // live witness + state-0 census). The port models exactly that:
+        // when runCampaignUi comes back on the eject leg it hands the same
+        // live Campaign and the same SDL_Window (t385 single-window law)
+        // back here, and the title loop re-enters. EXITTODOS / window-close
+        // / cap / victory legs never set the flag and fall through as
+        // before. newGame is reset PER ENTRY: a stale set from the first
+        // title visit would rebuild (i.e. destroy) the live mid-game
+        // campaign on re-entry.
+        int rc = 0;
+        BootState entryState = entry;  // tESC-1: re-entries land on Title
+        for (;;) {
+        newGame = ascend::ui::NewGameSettings{};
         const BootState exit = ascend::ui::runTitleScreen(
-            o.dataRoot.string(), entry,
+            o.dataRoot.string(), entryState,
             o.introFrames >= 0 ? o.introFrames : 0,  // 0 = all frames
             &terr, &handedWindow, savesDir, audio.get(),
             // t393 New Game screen inputs: preview backdrop = the SAME
@@ -662,10 +679,24 @@ int main(int argc, char** argv) {
             }
             std::fflush(stdout);
         }
-        const int rc = ascend::ui::runCampaignUi(*camp, o.campaign, o.autoplay,
-                                                 o.dataRoot.string(), audio.get(),
-                                                 handedWindow, savesDir,
-                                                 &rosterForUi(o));
+        bool toTitle = false;
+        rc = ascend::ui::runCampaignUi(*camp, o.campaign, o.autoplay,
+                                       o.dataRoot.string(), audio.get(),
+                                       handedWindow, savesDir, &rosterForUi(o),
+                                       &toTitle, &handedWindow);
+        if (!toTitle) break;
+        // tESC-1 eject leg: same law as the vendor — campaign ALIVE in RAM
+        // (t285: autosave kept writing after ejection), window handed back
+        // for the title loop's reuse. The turn counter in the witness line
+        // proves re-entry resumed the SAME campaign, not a rebuilt one.
+        // Re-entry ALWAYS lands on the Title menu (vendor: the ejection
+        // draws the title overlay); on --resume the player picks RESUME
+        // (msg 1/1, the same transition t440 models) to go back in.
+        entryState = BootState::Title;
+        std::printf("main: campaign -> title (campaign alive turn %d)\n",
+                    camp->turn());
+        std::fflush(stdout);
+        }
         SDL_Quit();  // also tears down the handed-over window
         return rc;
     }

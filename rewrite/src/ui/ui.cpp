@@ -126,7 +126,8 @@ bool nextTurnContAttends(const std::string& eventText) {
 int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                   const std::string& dataRoot, AudioEngine* audio,
                   void* window, const std::string& savesDir,
-                  const std::vector<ag::SpeciesInfo>* roster) {
+                  const std::vector<ag::SpeciesInfo>* roster,
+                  bool* outToTitle, void** windowOut) {
     // t385: on a title->campaign transition the title loop hands over its
     // LIVE window (ui.h law: a fresh Xvfb window drops its first synthetic
     // click, so per-state window swaps eat injected gate input). Reuse it;
@@ -351,6 +352,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // print below). Console-only; zero gameplay effect. std::string so the
     // victory leg can compose "victory:<ENUM>" without a dangling literal.
     std::string quitCause = "unknown";
+    // tESC-1 (D31 + vendor law, docs/re/_wip_tESC1.md): Escape at the
+    // STACK BOTTOM does not exit the process — it returns to the TITLE
+    // menu with the campaign alive in RAM. Vendor evidence: (1) the ESC
+    // arm fn 0x54d18@0x54e96 only calls the pop FUN_00057020 — no exit
+    // syscall anywhere in the chain; (2) t285 LIVE witness: one Escape at
+    // the bare map ejected to the title menu while autosave kept writing
+    // (in_game stayed True; work/r1/bank-t285-flip1255/); (3) 122/537
+    // banked saves hold winmgr state 0 = title with a live campaign
+    // (t337 census). Set ONLY by the escape legs (keyboard + corner
+    // click); main.cpp re-enters the title loop when it comes back true.
+    bool toTitle = false;
 
     // ---- t388: the campaign is a set of vendor SCREENS (state ids) -------
     // Screen law + citations: ui/statuslaw.h, docs/re/_wip_t388.md. Chrome
@@ -686,7 +698,16 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         screenName(from), screenName(screen));
             std::fflush(stdout);
         } else {
+            // tESC-1 (D31): the bottom of the stack is NOT the end of the
+            // process. Vendor ESC pops one level and never exits (fn
+            // 0x54d18 ESC arm 0x54e96 -> FUN_00057020 pop; no exit path
+            // anywhere in the chain), and at the map level the ejection
+            // lands on the TITLE menu with the campaign alive in RAM —
+            // t285 LIVE witness + state-0 census (citations: _wip_tESC1,
+            // ui.cpp quitCause block). Port law: name the cause, set the
+            // to-title flag, unwind out of the loop.
             quitCause = escCause;  // tPF-1d: which input hit the bottom
+            toTitle = true;
             quit = true;
         }
     };
@@ -3798,6 +3819,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // load-screen-quit / unknown).
     std::printf("ui quit cause=%s turn=%d\n", quitCause.c_str(),
                 camp.turn());
+    // tESC-1: the escape legs leave the PROCESS alive and hand control
+    // back to the title loop (vendor ejection law). The line is the pin
+    // witness; outToTitle is the machine handoff to main().
+    if (toTitle) std::printf("ui to title\n");
     std::printf("ui ok: turn %d\n", camp.turn());
     // tPF-1b (2026-11-26 REPRO A/B): the cap announcement is the LAST line
     // and carries the harness-cap prefix, so a capped run's tail can never
@@ -3810,7 +3835,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     std::fflush(stdout);
     txt.release();  // atlases before their renderer (destructor is idempotent)
     SDL_DestroyRenderer(ren);
-    if (owned) SDL_DestroyWindow(win);  // a handed-over window: caller's duty
+    // tESC-1 handoff: on the eject leg the window survives and is handed
+    // back for the title loop to reuse (t385 single-window law). Every
+    // other leg keeps the standing destroy discipline.
+    const bool handOff = toTitle && windowOut != nullptr;
+    if (owned && !handOff) SDL_DestroyWindow(win);
+    if (handOff) *windowOut = win;
+    if (outToTitle) *outToTitle = toTitle;
     return 0;
 }
 

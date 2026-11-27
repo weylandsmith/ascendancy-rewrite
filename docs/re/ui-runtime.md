@@ -436,7 +436,13 @@ census: docs/re/_wip_t388.md. Distilled facts:
   refuted by the rect 7,7-632,472 + the STATE lists).
 - SWITCH LAW: msg 1 + param1 (a known screen id) switches; msg 5/7/8 and
   unknown ids (13 NEGSCREEN, 17 PLANETALLOC) are NO-OPS — never a clamp.
-- ESCAPE: inside a screen -> map (t252 live); on the map -> quit (standing).
+- ESCAPE: inside a screen -> map (t252 live); on the map -> EJECT TO TITLE
+  with the campaign alive in RAM (tESC-1 2026-11-27: the old "quit
+  (standing)" label was a PORT default, never a vendor citation — the ESC
+  arm fn 0x54d18@0x54e96 calls ONLY pop FUN_00057020(obj,-1), no exit path
+  exists in the chain, and t285's live witness shows the ejection landing
+  on the title menu while autosave kept writing; citations
+  docs/re/_wip_tESC1.md P1-P5, witness scripts/tESC1_eject_witness.sh).
 - 10status.shp [measured t388, scripts/r388_status_census.py]: 2 records,
   k0 639x479 V FULLY OPAQUE (306081 painted px = W*H, zero skip rows) —
   the full-backdrop class (same as 4loadgam/2savegam k0); k1 32x31. The

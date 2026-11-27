@@ -107,6 +107,13 @@ click; t293/t296 measured a FLEET-ROW jump into the same view).
   intel->species->galaxy; corroborated t369 system-view]. Implemented as a
   pure ScreenStack (map always at bottom; push truncates if already
   present); 1 -> 16 -> 17: Esc 17->16, Esc 16->1, Esc 1 = standing quit.
+  [tESC-1 CORRECTION 2026-11-27: "Esc 1 = standing quit" was a PORT default
+  mislabelled as law — the vendor's ESC arm 0x54e96 calls ONLY pop
+  FUN_00057020 and at the map level ejects to the TITLE menu with the
+  campaign alive (t285 witness + asm, docs/re/_wip_tESC1.md P1-P4). Port
+  now matches: ui.cpp toTitle handoff + main() title<->campaign loop. The
+  ScreenStack model itself is CONFIRMED at bytes: pop = tombstone 0xffff +
+  depth-- at 0x5706b/0x5707c.]
   escapeToMap() keeps its t388/t405 meaning (a level exists to unwind).
 - ORBITAL LAYOUT: PORT LAW (no vendor per-planet position datum exists in
   the rewrite model): centre = viewport centre, ring radius
