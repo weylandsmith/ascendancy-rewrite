@@ -233,7 +233,56 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tSPEC-1: SIZE AND FIX THE BEGIN SPECIES PICK (banked tPF1d,
+NEXT tXT-1 PLAYER-EXTINCT-BY-DAY-20 ON DENSE+7 GAMES (D32, TOP —
+blocks all playtesting of dense games). INSTRUMENT CAUGHT IT: console
+"ui cont advance stop t20 event: owner 1 captured Phoebe" then
+"ui quit cause=victory:Extinct turn=20" => checkVictory mine==0
+(campaign.cpp:2270). REPRO SHAPE GIVEN BY USER: very dense cluster +
+seven species -> exits t20; average density -> survives. REPRO FIRST:
+scripts/tPF1c_repro.sh pattern, Begin-built wheels = density-highest
+rung + owners 7 (ring laws banked tNG-B/tPF1d: Begin species ring
+never reaches play state — check the density/owners handoff triple
+carries BOTH). Then DIAGNOSE the chain with citations: (a) does
+"owner N captured <star>" ever fire with the captured star NOT owned
+by the player, and does ownership bookkeeping corrupt on it (grep the
+capture emitter + the event text formatter — star name + wrong owner
+= provenance bug); (b) is the player's home star being captured
+legitimately by an AI within 20 turns (mapgen: dense+7 = home star
+adjacent to AI homes + AI colonize rush; compare vendor: vendor dense
+games do NOT end by t20 — that's the user's ground truth, and the
+vendor's early-game AI aggression law is the thing to compare); (c)
+fleetPending wait (turnloop self-caught law) — player colony ship in
+transit must delay Extinct. FIX THE ROOT (ownership law or mapgen
+spacing law or Extinct-wait law, whichever the diagnosis names) +
+pin: dense+7 seeded soak survives 60 turns with player owning >=1
+star; average stays green. Budget <=3 (CONT cycle).
+THEN tWIN-1 EJECT REUSES THE WINDOW (D32: eject opens a NEW window;
+some windows draw no UI elements; corner-hover exit art pops in the
+WRONG window). tESC-1 shipped windowOut handback "ONLY on eject leg"
++ runTitleScreen(windowIn) reuse per t385 law — evidently the reuse
+is NOT taking (new window observed). DIAGNOSE: window handle identity
+across campaign->title->campaign (print SDL_Window* per leg in the
+witness); find where a fresh SDL_CreateWindow sneaks in (likely the
+title-boot path when windowIn!=null still creating, or the renderer
+recreated on old window). Corner-cross-talk = per-window state: the
+corner-exit overlay + any cached mouse state must key off the ACTIVE
+window. PIN: single SDL_Window* identity across eject+resume (witness
+prints the pointer twice, equal); no second X window in the witness
+screenshot; suite green. Budget <=2.
+THEN tRS-SC RESEARCH UP/DOWN = SCROLL (D32 verbatim: "the up/down
+buttons on the research screen are supposed to scroll up and down, not
+zoom in and out"). Our research press-table row wired the same
+press-pair law as the MAP camera (ui.cpp:1426-1431 MapCtl RotUp/Down
+= pressTilt; research arm evidently reuses zoom/tilt semantics).
+RE-DERIVE the research-window button msg map (reswin handler chain
+cited _wip_tRSV1.md; the two-button cluster's sendparam ids) and ship
+the vendor law: up/down scroll the tree vertically (scroll offset
+state + clamp), hold-not-latch per tPF-7; left/right keep rotation.
+Pin: pressing up moves tree pixels up (centroid delta) WITHOUT focal
+change; zoom only if vendor has zoom buttons there (verify vs refcap
+t252). Budget <=2.
+THEN continue prior NEXT:
+tSPEC-1: SIZE AND FIX THE BEGIN SPECIES PICK (banked tPF1d,
 docs/re/_wip_tPF1d.md + this iteration's witness run). Port defect: the
 New Game screen's species selection never reaches the play state —
 NewGameSettings (menulaw.h:344) carries only stars/owners/gov, and main.cpp
