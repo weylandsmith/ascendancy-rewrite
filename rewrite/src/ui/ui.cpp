@@ -346,6 +346,11 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // button is the stop control the help text implies).
     bool contMode = false;
     bool quit = false;
+    // tPF-1d (D31): the SELF-DIAGNOSING quit. Every exit path names itself
+    // here and prints "ui quit cause=... turn=N" before "ui ok" (the final
+    // print below). Console-only; zero gameplay effect. std::string so the
+    // victory leg can compose "victory:<ENUM>" without a dangling literal.
+    std::string quitCause = "unknown";
 
     // ---- t388: the campaign is a set of vendor SCREENS (state ids) -------
     // Screen law + citations: ui/statuslaw.h, docs/re/_wip_t388.md. Chrome
@@ -669,7 +674,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
     // click performs the SAME action the glyph names (t419 drew it; the D17
     // grade row: "corner popup drawn but INERT"). t409 modal precedence +
     // t410 one-level unwind + quit-at-bottom, verbatim.
-    auto doEscape = [&] {
+    auto doEscape = [&](const char* escCause) {
         if (abilityOpen) {
             abilityOpen = false;
             std::printf("ui ability dialog dismiss (esc)\n");
@@ -681,6 +686,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                         screenName(from), screenName(screen));
             std::fflush(stdout);
         } else {
+            quitCause = escCause;  // tPF-1d: which input hit the bottom
             quit = true;
         }
     };
@@ -692,7 +698,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         SDL_Event ev;
         const bool gotEvent = SDL_WaitEventTimeout(&ev, 16) != 0;
         if (gotEvent) {
-            if (ev.type == SDL_QUIT) quit = true;
+            if (ev.type == SDL_QUIT) {
+                quitCause = "sdl-window-close";  // tPF-1d
+                quit = true;
+            }
             else if (ev.type == SDL_KEYDOWN && screen == kScreenMap &&
                      !abilityOpen &&  // t409: the modal waits (vendor CALL
                                        // 0x37b14 blocks; keys are inert)
@@ -700,7 +709,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 std::printf("ui key next\n");
                 advanceOnce();
             } else if (ev.type == SDL_KEYDOWN && ev.key.keysym.sym == SDLK_ESCAPE) {
-                doEscape();
+                doEscape("escape-key-at-bottom");  // tPF-1d
             } else if (ev.type == SDL_KEYDOWN && (ev.key.keysym.mod & KMOD_ALT) &&
                        !abilityOpen) {  // t409 modal: chords inert too
                 // t388 PORT ADDITION (labelled): the title-screen D9 chords'
@@ -717,7 +726,10 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 if (letter == 'l') {
                     const std::vector<SaveSlot> slots = listSaveSlots(savesDir);
                     const int pick = runLoadScreen(ren, txt, dataRoot, slots);
-                    if (pick == kLoadQuit) quit = true;
+                    if (pick == kLoadQuit) {
+                        quitCause = "load-screen-quit";  // tPF-1d
+                        quit = true;
+                    }
                 } else if (letter == 's') {
                     std::printf("ui save seam: no campaign writer (t382)\n");
                     std::fflush(stdout);
@@ -797,7 +809,7 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                     // unwind / quit at the bottom).
                     std::printf("ui corner exit popup click\n");
                     std::fflush(stdout);
-                    doEscape();
+                    doEscape("corner-exit-click");  // tPF-1d
                 } else {
                 // t388: the rail is the screen switch. railButtonForScreen
                 // honours the STATE id-list law, so on a non-map screen no
@@ -1614,9 +1626,16 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
             // N", which the gate greps and stays), prefixed with the
             // harness-cap marker (see the return site below).
             capFired = turns;
+            quitCause = "harness-turn-cap";
             quit = true;
         }
-        if (camp.over()) quit = true;
+        // tPF-1d: `if (!quit)` — a cap exit must never have its cause
+        // overwritten by the victory check in the same iteration.
+        if (camp.over() && !quit) {
+            quitCause =
+                std::string("victory:") + ag::victoryName(camp.victory());
+            quit = true;
+        }
 
         // ---- draw ----
         SDL_SetRenderDrawColor(ren, kBg.r, kBg.g, kBg.b, 255);
@@ -3772,6 +3791,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
         SDL_RenderPresent(ren);
     }
 
+    // tPF-1d (D31, user-refuted-closure law): the run must never end
+    // silently. The CAUSE line prints BEFORE "ui ok: turn N" so a console
+    // tail shows which exit path fired (victory:<ENUM> / harness-turn-cap /
+    // sdl-window-close / escape-key-at-bottom / corner-exit-click /
+    // load-screen-quit / unknown).
+    std::printf("ui quit cause=%s turn=%d\n", quitCause.c_str(),
+                camp.turn());
     std::printf("ui ok: turn %d\n", camp.turn());
     // tPF-1b (2026-11-26 REPRO A/B): the cap announcement is the LAST line
     // and carries the harness-cap prefix, so a capped run's tail can never

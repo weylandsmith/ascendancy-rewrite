@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-26T23:30
+updated: 2026-11-27T01:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,24 +233,33 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT TPA-AUTO: CLOSE THE AUTOMATION x3 LEG 0x394d8 AT BYTES — planets-ui.md
-S? named seam (ln ~326: 'Automation x3 leg (FUN_0x394d8) NOT modelled —
-named seam'). Ordering rationale: TPF6-SHIP CLOSED this iteration
-(planets-ui.md S17), so the checker chain around 0x3830c/0x38840 is now
-fully mapped and its neighbours are cheap reads; this is the last named
-seam inside the planet-project law family (the 0x892ac colour table is a
-DISPLAY seam needing refcap, worse first move). The port's Automation
-popup leg (popupButtonIds cellItem!=0x17 branch, buildable(35)) predates
-the tPF-6b checker law and may need the same treatment; the x3 multiplier
-is unmodelled income behaviour — decide port delta only from bytes.
-Static task, no capture, no user gate; ~30 probes.
-CHECKPOINT DISCIPLINE: planetview.{h,cpp}, ui.cpp,
-test_optionsfilter_tpf6.cpp are COMMITTED (5bed58e checkpoint + this
-iteration's final commit) — safe mutation targets.
-TPF6-CPU-A stays parked (user throttle ruling pending, port-decision not
-vendor law). TPF7-C is a user feel-grading ask. TPF5-A ship stays gated on
-the D1 ruling. OQ-016/OQ-019 remain the only open ledger rows (both
-capture-blocked classes).
+NEXT tESC-1: RE-DERIVE THE VENDOR ESCAPE CHAIN AT BYTES (D31 user law:
+Escape from the galaxy map should return to the MAIN/TITLE screen (Play
+Introduction/Tutorial/New Game), NOT exit the process; t410 "quit at
+bottom" citation CONTESTED). Re-derive from the handler asm (t252 msg map,
+the unwind fn cited in t410): what does Escape pop at the bottom level —
+process exit or boot-to-title? Cite FUNs. If the vendor unwinds to title,
+ship exactly that + pin (Escape on map -> title loop state, RESUME path
+intact). IF the vendor asm genuinely quits the process, DO NOT silently
+keep it — write the cited asm excerpt into docs/re/_wip_tESC1.md and leave
+the question OPEN for the user's ruling (his memory may be of the DOS
+launcher; user law vs vendor law is HIS call, our job is the citation).
+Ordering rationale: tPF-1d CLOSED this iteration (instrument shipped +
+Chamachi soak honest-negative, below), and the day-20 exit stays OPEN as
+an unreproduced defect AWAITING THE INSTRUMENT — nothing more can be done
+there from our side, while tESC-1 is the other half of D31, is static
+(no capture, no user gate), and its answer directly shapes whether the
+instrument's escape-key-at-bottom cause needs a new non-exit sibling.
+TPF7-A per-msg release-mask split (0x47d3b ~ebp role owed) waits behind
+it. NEW QUEUE CANDIDATE (banked tPF1d, docs/re/_wip_tPF1d.md): Begin
+species ring pick never reaches play state (NewGameSettings has no species
+field; intro print only) — real port defect vs D-row 693 "started a game
+with the Chamachies"; size it after tESC-1. TPF6-CPU-A stays parked (user
+throttle ruling pending). TPF7-C is a user feel-grading ask. TPF5-A ship
+stays gated on the D1 ruling. OQ-016/OQ-019 remain the only open ledger
+rows (both capture-blocked classes).
+D30/D31 LAW (standing): any closure of a user-reported defect must be by
+reproduction+fix, NEVER by attributing the symptom to the user's actions.
 TRAPS: disasm = ~/tools/revenv/bin/python scripts/t442_disasm.py START END
 (.venv has NO capstone); pass EXPLICIT hex END (bash $((0x..+0x..)) mixes
 bases and once flooded 10 MB); a LINEAR 0xe8 byte-scan DESYNCS and false-
@@ -263,7 +272,11 @@ no single-occurrence pin literal in comments (window-pins size past
 comment bodies, tPF-1b); CHECKs on fixed items use base-list items and
 ACTIVE cell pairs DERIVED from the grid law (tPF-6); a zero-pop fixture is
 INVALID for any projectOptionsFor assertion post-tPF-6b (the free-pop leg
-empties the list and every filter check goes vacuous — set pop first).
+empties the list and every filter check goes vacuous — set pop first);
+ui.cpp std::string composition for quitCause — .c_str() on a concatenated
+temporary DANGLES (tPF-1d); the order-phase return-to-map from the planet
+view is TWO escapes (Planet Display -> Planets -> map), assert per press
+(tPF-1d soak nav).
 TRAPS STILL STANDING (full per-iteration detail in git history of this
 block + docs/re/*): NEVER read whole lines of work/r1/playcap/live-
 timeline.jsonl; D28 file scratchpad/t433-build-feedback.txt is the item
@@ -284,9 +297,42 @@ frac (tPF-11); an interactive soak is VACUOUS unless EVERY leg asserts its
 own log line (grep -c the click line per press), the order log reads
 'ordered armed cell N' INSIDE parens (ui.cpp:1146), an armed n=0 PLANLIST
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
-ui.cpp:899), Escape from planet view lands on STATUS NOT the map, repro
-scripts need a cleanup trap, and BIN/DATA must be env-overridable before
-an era-tree A/B is trusted (tPF-1c x11).
+ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
+env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+tPF-1d LANDED 2026-11-27 (QUIT-CAUSE INSTRUMENT SHIPPED + CHAMACHI-EXACT
+SOAK HONEST-NEGATIVE; D31; no OQ row touched — open=[016,019] unchanged;
+day-20 exit stays OPEN as an UNREPRODUCED defect; CODE SHIPPED:
+ui.cpp, test_quitcause_tPF1d.cpp (new, +CMakeLists), scripts/
+tPF1d_soak.sh, scripts/tPF1d_cap_witness.sh, scripts/tPF1d_mutate.sh;
+log docs/re/_wip_tPF1d.md).
+ - INSTRUMENT: quitCause (std::string) beside quit; ALL 5 quit=true sites
+   named (doEscape else-branch via param: keyboard
+   'escape-key-at-bottom' vs corner click 'corner-exit-click';
+   'sdl-window-close'; 'load-screen-quit'; 'harness-turn-cap';
+   'victory:<ENUM>' via victoryName, guarded '&& !quit' so the cap cause
+   can never be stolen); "ui quit cause=%s turn=%d" prints BEFORE
+   "ui ok: turn %d", single site, console-only, zero gameplay change.
+ - RUNTIME WITNESSES: cap path — 'ui quit cause=harness-turn-cap turn=2'
+   before 'ui ok: turn 2' (tPF1d_cap_witness.sh); escape path —
+   'ui quit cause=escape-key-at-bottom turn=20' before ui ok (tPF1c
+   _escape_test re-run on instrumented HEAD). The two candidate day-20
+   paths are now DISTINGUISHABLE in the user's own console.
+ - SOAK [measured]: user flags (--data ROOT --ui, no --campaign, seed 1,
+   wheel 50/5/1) + --species 19 (Chamachies; Chamachi-home BY CONSTRUCTION
+   per tPL-D1 size idx 3 — witness 'home planet size class idx 3'),
+   factory ordered, 45 presses each asserting its own 'ui click
+   next-turn' line: SOAK SURVIVED, zero VICTORY/quit/ok lines, app alive.
+   HONEST NEGATIVE per D31: no repro at the closest expressible config;
+   NO user-behavior theory offered; instrument stays in and will name the
+   path from the user's own run.
+ - Suite 602 -> 605/0/0; MUTATION 3/3 CAUGHT (M1 victoryName dropped,
+   M2 print-after-uiok swap, M3 sdl leg neutered; named FAILs in
+   run_tests output); AFTER-RESTORE md5 28db198795767d0f21e25c8bb1f50af2.
+ - BANKED: Begin species ring pick reaches ONLY the intro print —
+   NewGameSettings (menulaw.h:344) has no species field, so Begin-built
+   play ignores the ring (queue candidate behind tESC-1).
+
 
 tPF6-SHIP LANDED 2026-11-26 (THE 0x402d8 SHIP-REVOCATION SEAM CLOSED AT
 BYTES + PORT SHIPPED; no OQ row touched — open=[016,019] unchanged, seam

@@ -105,6 +105,7 @@ add_executable(run_tests
   tests/test_species.cpp
   tests/test_campaign.cpp
   tests/test_timecontrols_tPF1.cpp
+  tests/test_quitcause_tPF1d.cpp
   tests/test_stripanchor_tpf5.cpp
   tests/test_optionsfilter_tpf6.cpp
   tests/test_starttech_tpf8.cpp

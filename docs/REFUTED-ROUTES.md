@@ -1655,6 +1655,15 @@ evidence when BPLIST shows the leg armed AND a control leg fires.
 ## is needed; c68e8bd is NOT a rev in this repo (rev-parse/reflog/fsck all
 ## negative — it lives in the user's own clone). Do not re-open Extinct/
 ## LastAlive setup defects for this report.
+## >>> SUPERSEDED BY D31 (2026-11-26): the ESCAPE-AT-BOTTOM EXPLANATION
+## >>> WITHIN THIS ENTRY IS REFUTED by user testimony ("I did not click
+## >>> escape ... the mouse never moved from the next day button"). What
+## >>> STANDS: the checkVictory refutation and the repro-script laws. What
+## >>> IS DEAD: closing the day-20 report via Escape attribution. The exit
+## >>> is an UNREPRODUCED defect; tPF-1d shipped the quit-cause instrument
+## >>> (ui.cpp 'ui quit cause=' before 'ui ok') and the Chamachi-exact soak
+## >>> SURVIVED 45 presses (docs/re/_wip_tPF1d.md). Do not re-propose any
+## >>> user-behavior closure (D30/D31 law).
 
 ## R-tPF6b — "FREE-POP IS AN ORDER GATE, NOT A LIST FILTER" IS DEAD (tPF-6b,
 ## 2026-11-26). The tPF-6-era bank (planetview.cpp comment, _wip_tPF6) claimed
