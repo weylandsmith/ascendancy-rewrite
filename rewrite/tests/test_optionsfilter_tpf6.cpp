@@ -272,6 +272,11 @@ TEST(planlist_popup_leg_wiring_tpf6b) {
     CHECK(body.find("usedPopFor") != std::string::npos);
     CHECK(body.find("requiresAvailable") != std::string::npos);
     CHECK(body.find("placementBlock") != std::string::npos);
+    // tPF-6a F6 REVOCATION LAW: the 0x38420 jne skips the 0x39a9c
+    // replacement on pop-FAIL, so item 23 takes the free-pop leg like every
+    // other in-domain item. A restored `item != 23` exemption in the lambda
+    // re-offers pop-short ship Builds the vendor never shows — CAUGHT here.
+    CHECK(body.find("item != 23") == std::string::npos);
 }
 
 // tPF-6a NEVER-EMPTY INVARIANT (docs/re/_wip_tPF6a.md F4/F8): the vendor
@@ -349,6 +354,27 @@ TEST(build_button_implies_nonempty_fill_tpf6a) {
     // ANTI-VACUITY: the fixture must actually produce Build buttons (an
     // all-refused planet would make the loop above vacuous).
     CHECK(buildCells > 0);
+
+    // POPUP SKIP-5 (0x3d55f) IS LOAD-BEARING and observed directly here:
+    // the checker passes item 5 at EVERY cell (pop-short/req-short both land
+    // on 0x38435 mov ebp,-1 — F7), so a popup loop WITHOUT the skip would
+    // show Build above a list that can never contain item 5 (the fill skips
+    // it unconditionally, 0x3b76a). Lambda passes ONLY item 5 => no Build.
+    {
+        const auto only5 = au::popupButtonIds(
+            0xff, [](int item) { return item == 5; });
+        bool build = false;
+        for (int id : only5)
+            if (id == au::kPbBuild) build = true;
+        CHECK(!build);
+        // Anti-vacuity for THIS leg: same loop, item 4 => Build appears.
+        const auto only4 = au::popupButtonIds(
+            0xff, [](int item) { return item == 4; });
+        bool build4 = false;
+        for (int id : only4)
+            if (id == au::kPbBuild) build4 = true;
+        CHECK(build4);
+    }
 }
 
 // Wiring pin (source-text, tPF-6): the three ui.cpp call sites must pass the

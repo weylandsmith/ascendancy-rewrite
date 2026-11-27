@@ -1668,3 +1668,14 @@ evidence when BPLIST shows the leg armed AND a control leg fires.
 ## word[widget+0xae] := 0xffff before the loop (0x3b70d); cell -1 bypasses
 ## ONLY the cell legs (0x3843a jae), legs A/B still run. Law + port delta:
 ## docs/re/planets-ui.md S15; pins planlist_fill_law_tpf6b.
+
+## R-tPF6b AMENDMENT (tPF-6a, 2026-11-26) — the 0x38422 "replacement" is a
+## REVOCATION, NOT AN EXEMPTION. 0x3834b xor ebp,ebp clears the verdict on
+## every in-domain item; the pop test sets -1 on PASS (0x38418); 0x3841d jne
+## 0x38430 SKIPS the item-23 comparison entirely on pop-FAIL. So a pop-short
+## Ship NEVER passes the checker (the 0x39a9c call can only REVOKE a
+## pop-PASSING ship row). Any future port or analysis treating item 23 as
+## pop-exempt at list/popup time is refuted by these bytes; pins
+## planlist_fill_law_tpf6b (leg 2) + planlist_popup_leg_wiring_tpf6b
+## ('item != 23' absence) + build_button_implies_nonempty_fill_tpf6a enforce
+## it (mutation-verified M1/M2). Law: docs/re/planets-ui.md S16.

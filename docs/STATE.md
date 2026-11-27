@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-26T20:55
+updated: 2026-11-26T21:40
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,31 +233,30 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT TPF6-A: CLOSE "DOES THE VENDOR EVER SHOW A BUILD WHOSE LIST HAS NO
-BUILDABLE ROW" AT THE NOW-CITED FILL LAW — the static proof is nearly
-written by tPF-6b; finish it and pin the port side.
-Ordering rationale: tPF-6b (this iteration) recovered the fill site
-(planets-ui.md S15) and answered the hard half of TPF6-A: PLBUILD always
-opens cell -1 (SENDPARAM1 1 + 0x3b70d), and the popup Build button exists
-only when SOME item passes the full checker 0x3830c(item, hit) — legs A+B
-are cell-independent, so that same item passes the fill's legs A+B at cell
--1 and lands in the list => the vendor list behind a visible Build is
-NEVER empty. Remaining work: (1) write that implication out as S15.1 with
-the two-callsites argument (0x3d579 vs 0x3b786, both 0x3830c), noting the
-cell-C asymmetry can only SHRINK the popup set, never the fill set;
-(2) port-side: the port list is painted from projectOptionsFor directly
-(no stale-row effect), and after the tPF-6b lambda fix the popup Build
-leg == fill legs for cell -1, so the port can no longer show an
-empty-list Build — pin it (source-text or unit: for every id where
-popupButtonIds yields Build under the ui.cpp lambda, projectOptionsFor(-1)
-is non-empty); (3) honest-negative check: the ONLY escape hatch is item 23
-(seam TPF6-SHIP: 0x38422 replacement may GRANT a row the pop leg refuses —
-if the popup's 0x3d579 item-23 leg and the fill's agree, emptiness stays
-impossible; verify the 0x3d564..0x3d58e loop runs the same 0x39a9c path
-before claiming closure).
+NEXT TPF6-SHIP: CLOSE THE 0x402d8 SHIP-REVOCATION SEAM AT BYTES — the last
+unrecovered leg inside checker 0x3830c (the fill/popup predicate).
+Ordering rationale: tPF-6a (this iteration) closed TPF6-A at mechanism
+(planets-ui.md S16) and CORRECTED the 0x38422 direction (revocation, not
+rescue), which makes the 0x39a9c chain the only remaining unknown in the
+orderability law: 0x39a9c calls 0x402d8(arg = race*78 + 0x12e16) and its
+verdict >0 gates the vendor's pop-PASSING ship rows. tPF-6a already read
+the 0x402d8 prologue: per-entry loop over word[0x16145] records at stride
+0x60 base 0x13bc5, matching (1 << byte[edi]) against byte[rec+0x14]
+(ebx accumulates hits; caller tests <=0). Remaining: (1) finish the body
+(0x40323 tail + return law); (2) identify the 0x13bc5 table from save-RAM
+census or the loader (pointer law; likely ship-design or race-ship table —
+DO NOT assume); (3) decide port delta: currently projectOptionsFor keeps a
+pop-passing 23 always (weaker than vendor) — if 0x402d8 is liftable
+(e.g. 'race has >=1 built/completed ship design'), implement + pin, else
+bank the honest negative and keep the seam named. Static task, no capture,
+no user gate; ~30 probes.
+CHECKPOINT DISCIPLINE: the tPF-6a files (planetview.cpp, ui.cpp,
+test_optionsfilter_tpf6.cpp) are COMMITTED (a776184 + final commit) — safe
+as mutation-campaign targets now.
 TPF6-CPU-A stays parked (user throttle ruling pending, port-decision not
-vendor law). TPF7-C is a user feel-grading ask. OQ-016/OQ-019 remain the
-only open ledger rows (both capture-blocked classes).
+vendor law). TPF7-C is a user feel-grading ask. TPF5-A ship stays gated on
+the D1 ruling. OQ-016/OQ-019 remain the only open ledger rows (both
+capture-blocked classes).
 TRAPS: disasm = ~/tools/revenv/bin/python scripts/t442_disasm.py START END
 (.venv has NO capstone); pass EXPLICIT hex END (bash $((0x..+0x..)) mixes
 bases and once flooded 10 MB); a LINEAR 0xe8 byte-scan DESYNCS and false-
@@ -294,6 +293,39 @@ cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), Escape from planet view lands on STATUS NOT the map, repro
 scripts need a cleanup trap, and BIN/DATA must be env-overridable before
 an era-tree A/B is trusted (tPF-1c x11).
+
+tPF-6a LANDED 2026-11-26 (BUILD IS NEVER ABOVE AN EMPTY PLANLIST — TPF6-A
+CLOSED AT MECHANISM; DIRECTION CORRECTION SHIPPED; no OQ row touched —
+open=[016,019] unchanged; CODE SHIPPED: planetview.cpp, ui.cpp lambda,
+test_optionsfilter_tpf6.cpp).
+ - MONOTONICITY LAW [verified+inferred]: 0x3830c legs A (0x3835d) + B
+   (0x383b3) read NO cell operand (0x39a9c pushes/restores ebx and derives
+   its own first-empty cell via pure scan 0x3958c — cell-independent at
+   every callsite), leg C inert at -1 => pass(item,c) => pass(item,-1).
+   Popup Build loop 0x3d550..0x3d58e (fn 0x3d2fe, empty-cell path ONLY via
+   0x3d3bc cl==0xff) + fill 0x3b75e share checker, item domain, skip-5
+   (0x3d55f/0x3b76a — load-bearing: checker passes item 5 at EVERY cell via
+   0x38430..0x38435). => vendor Build witness ALWAYS lands a row. TPF6-A
+   CLOSED; both hatches dead (item 5, item 23). Law planets-ui.md S16; log
+   _wip_tPF6a.md F1-F8/P8.
+ - *** F6 DIRECTION CORRECTION [verified 0x3840a..0x38430]: ebp cleared
+   0x3834b; 0x3841d jne 0x38430 SKIPS the 0x38422 item-23 test on pop-FAIL
+   => 0x39a9c REVOKES a pop-PASSING ship row, NEVER exempts a pop-short
+   one. tPF-6b's '23 exempt/replacement' wording reversed the direction.
+   0x402d8 prologue read: loop word[0x16145] records stride 0x60 @0x13bc5,
+   (1<<byte[edi]) vs byte[rec+0x14] — seam TPF6-SHIP narrowed to the body
+   + table ID (NEXT, above). TRAP: always read the jne GUARD at a
+   replacement site before calling a substitution an exemption.
+ - PORT SHIPPED: projectOptionsFor gates 23 on freePop like every row
+   (0x38416 jl applies to ALL in-domain items); ui.cpp lambda drops
+   'item != 23'. Pins: build_button_implies_nonempty_fill_tpf6a (every
+   cell: Build => armed+plain lists non-empty & contain witness; popup
+   skip-5 direct leg + item-4 anti-vacuity) + wiring pin extended
+   (lambda must NOT contain 'item != 23') + fill-law leg (2) tightened.
+   Suite 600 -> 601/0/0; MUTATION 3/3 CAUGHT (M1 lambda exemption: wiring
+   :279; M2 list exemption: fill-law :237; M3 skip-5 removed: invariant
+   :369 + tpf2d :66); AFTER-RESTORE md5-verified green. GATE_EXIT=0,
+   LEDGER AUDIT OK.
 
 tPF-6b LANDED 2026-11-26 (PLANLIST FILL LAW RECOVERED AT MECHANISM +
 SHIPPED: skip-5 + FREE-POP-AT-LIST-TIME; no OQ row touched — open=[016,019]

@@ -583,3 +583,40 @@ Full working log docs/re/_wip_tPLV1.md F0-F4. Durable laws:
   3/3 CAUGHT (M1 skip-5 removed: 2 fails; M2 free-pop leg disabled: 34
   fails; M3 popup lambda reverted to placementBlock-only: wiring pin 2
   fails).
+
+## 16. THE BUILD BUTTON IS NEVER ABOVE AN EMPTY LIST (tPF-6a, 2026-11-26)
+Full working detail: docs/re/_wip_tPF6a.md (F1-F8). The law:
+
+- MONOTONICITY [verified + inferred]: checker 0x3830c(item, cell) = LEG-A
+  (REQUIRES 0x3835d) AND LEG-B (FREE-POP 0x383b3) AND LEG-C (cell 0x3843a).
+  Legs A and B read only world state — no cell operand (0x39a9c, the item-23
+  pop-replacement, pushes/restores ebx and derives its own cell via the pure
+  first-empty scan 0x3958c: cell-independent at every callsite). LEG-C at
+  cell -1 bypasses to the final AND 0x386fe with edi pre-granted (S15/P6).
+  => pass(item, c) => pass(item, -1) for every item.
+- THE POPUP AND THE FILL AGREE [verified]: the popup Build loop 0x3d550..
+  0x3d58e (fn 0x3d2fe, reached ONLY on the empty-cell path 0x3d3bc cl==0xff)
+  and the fill loop 0x3b75e share the SAME checker 0x3830c, the same item
+  domain [0,0x27), and the same UNCONDITIONAL skip-5 (0x3d55f / 0x3b76a —
+  load-bearing, since the checker passes item 5 at every cell via the
+  0x38430..0x38435 exemption). The popup runs at word[widget+0xab] (an armed
+  EMPTY cell), the fill at -1; by monotonicity the popup's witness item is
+  always in the fill's row set. THE VENDOR NEVER SHOWS A BUILD BUTTON WHOSE
+  PLANLIST HAS NO BUILDABLE ROW. TPF6-A CLOSED at mechanism.
+- F6 DIRECTION CORRECTION [verified bytes 0x3840a..0x38430]: ebp is cleared
+  at 0x3834b; the pop test sets it -1 on PASS; 0x3841d jne SKIPS the 0x38422
+  item-23 comparison on pop-FAIL. The 0x39a9c replacement therefore REVOKES
+  a pop-PASSING ship row (needs first-empty active cell + 0x402d8 race leg —
+  seam TPF6-SHIP stays open but is emptiness-irrelevant: identical verdict
+  at both callsites); it NEVER exempts a pop-short one. The tPF-6b wording
+  "item 23 exempt" was the direction reversed.
+- PORT SHIPPED: projectOptionsFor gates item 23 on freePop like every other
+  row (planetview.cpp, 0x38416 jl comment); the ui.cpp popup lambda drops
+  its `item != 23` exemption (0x3d579 runs the same checker). Pins:
+  build_button_implies_nonempty_fill_tpf6a (every cell: Build => armed AND
+  plain lists non-empty AND contain the witness; plus popup skip-5 direct
+  leg with item-4 anti-vacuity) + planlist_popup_leg_wiring_tpf6b extended
+  (lambda must not contain "item != 23") + planlist_fill_law_tpf6b leg (2)
+  tightened (no 23 exemption at pop 0). Suite 600 -> 601/0/0; MUTATION 3/3
+  CAUGHT (M1 lambda exemption: wiring pin; M2 list exemption: fill-law pin
+  :237; M3 skip-5 removed: invariant pin :369 + tpf2d :66).

@@ -145,3 +145,22 @@ test_optionsfilter_tpf6.cpp — enumerate cells; for each empty cell run
 popupButtonIds with a lambda echoing the ui.cpp wiring; if Build present,
 assert projectOptionsFor(c, star, cell) non-empty AND the witness item is
 in the -1 list (monotonicity of the port predicates).
+
+## P8 — VERDICT (TPF6-A CLOSED AT MECHANISM)
+1. pass(item,cell) => pass(item,-1): legs A+B cell-independent (F1/F6),
+   leg C inert at -1 (tPF-6b jae law). Popup Build witness item therefore
+   ALWAYS lands as a fill row (fill forced cell -1). THE VENDOR NEVER SHOWS
+   A BUILD BUTTON OVER AN EMPTY PLANLIST. [verified + inferred]
+2. Both hatches dead: item 5 — popup skips it too (0x3d55f, F2/F7); item 23
+   — 0x39a9c is cell-independent AND is a REVOCATION not a rescue (F6), so
+   the fill's 23-set is a SUPERSET of the popup's. Seam TPF6-SHIP survives
+   (0x402d8 = per-race ship-count/flag scan over 0x13bc5 stride 0x60,
+   count word[0x16145] — semantics partial) but is emptiness-IRRELEVANT.
+3. PORT SHIPPED: 23-gate on freePop (planetview.cpp), lambda exemption
+   removed (ui.cpp), pins x3 + wiring extension. Suite 600->601/0/0,
+   MUTATION 3/3 CAUGHT (M1 wiring pin :279, M2 fill-law :237, M3 invariant
+   :369 + tpf2d :66), AFTER-RESTORE green md5-verified. Law banked
+   planets-ui.md S16. Ledger open=[016,019] unchanged (seam closure, no OQ
+   row). TRAP BANKED: tPF-6b's "replacement/exempt" wording hid a direction
+   question — always read the jne GUARD at the replacement site before
+   calling a substitution an exemption.
