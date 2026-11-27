@@ -2296,8 +2296,8 @@ Victory Campaign::checkVictory() const {
     // live AI allied to the player and no player-AI war bit. AI-vs-AI wars
     // are deliberately NOT part of the test — the diplomacy model has no
     // AI-AI relations at all (OQ-020/abilities.md), so only player-relative
-    // "one alliance" is internally expressible; the FFA arcade default's
-    // AI-AI bits are a documented setup artifact, not vendor semantics.
+    // "one alliance" is internally expressible. (tXT-1: the FFA arcade
+    // default is retired — fresh campaigns start at peace, diplomacy.md §19.)
     bool playerAtWar = false;
     for (int o = 1; o < Nowner_ && !playerAtWar; ++o)
         if (starsOwned(o) > 0 && war_[kPlayer * Nowner_ + o]) playerAtWar = true;

@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-27T01:30
+updated: 2026-11-27T04:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,42 +233,7 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tXT-1 PLAYER-EXTINCT-BY-DAY-20 ON DENSE+7 GAMES (D32, TOP —
-blocks all playtesting of dense games). INSTRUMENT CAUGHT IT: console
-"ui cont advance stop t20 event: owner 1 captured Phoebe" then
-"ui quit cause=victory:Extinct turn=20" => checkVictory mine==0
-(campaign.cpp:2270). REPRO SHAPE GIVEN BY USER: very dense cluster +
-seven species -> exits t20 (BOTH Chamachies AND Minions; average
-density survives). D33 SHARPENS THE TARGET: kPlayer=0 so "owner 1" =
-AI; user law says capture of an inhabited home by day 20 is
-IMPOSSIBLE in the vendor (empty planets at start, first structure
-still in construction at t20) => THE CAPTURE EMITTER
-(campaign.cpp:2258) IS THE DEFECT — derive the vendor capture law
-from the fleet-arrival handler (what arrival actually converts a
-star: colonize-on-empty? defended-only? never-inhabited?) and fix the
-emitter; the t20 Extinct is a consequence, do NOT patch the Extinct
-check first. If our AI sim can build+move+attack fleets by t20 at
-all, the AI production/aggro timing is ALSO suspect (vendor t20 =
-first structure still building — verify against the vendor income/
-build-rate laws already banked in docs/re/income-law.md). REPRO FIRST:
-scripts/tPF1c_repro.sh pattern, Begin-built wheels = density-highest
-rung + owners 7 (ring laws banked tNG-B/tPF1d: Begin species ring
-never reaches play state — check the density/owners handoff triple
-carries BOTH). Then DIAGNOSE the chain with citations: (a) does
-"owner N captured <star>" ever fire with the captured star NOT owned
-by the player, and does ownership bookkeeping corrupt on it (grep the
-capture emitter + the event text formatter — star name + wrong owner
-= provenance bug); (b) is the player's home star being captured
-legitimately by an AI within 20 turns (mapgen: dense+7 = home star
-adjacent to AI homes + AI colonize rush; compare vendor: vendor dense
-games do NOT end by t20 — that's the user's ground truth, and the
-vendor's early-game AI aggression law is the thing to compare); (c)
-fleetPending wait (turnloop self-caught law) — player colony ship in
-transit must delay Extinct. FIX THE ROOT (ownership law or mapgen
-spacing law or Extinct-wait law, whichever the diagnosis names) +
-pin: dense+7 seeded soak survives 60 turns with player owning >=1
-star; average stays green. Budget <=3 (CONT cycle).
-THEN tWIN-1 EJECT REUSES THE WINDOW (D32: eject opens a NEW window;
+NEXT tWIN-1 EJECT REUSES THE WINDOW (D32: eject opens a NEW window;
 some windows draw no UI elements; corner-hover exit art pops in the
 WRONG window). tESC-1 shipped windowOut handback "ONLY on eject leg"
 + runTitleScreen(windowIn) reuse per t385 law — evidently the reuse
@@ -280,7 +245,10 @@ recreated on old window). Corner-cross-talk = per-window state: the
 corner-exit overlay + any cached mouse state must key off the ACTIVE
 window. PIN: single SDL_Window* identity across eject+resume (witness
 prints the pointer twice, equal); no second X window in the witness
-screenshot; suite green. Budget <=2.
+screenshot; suite green. Budget <=2. Ordering: tXT-1 LANDED this
+iteration (peace-start fix, D32/D33-L1); tWIN-1 is the top remaining
+playability blocker (eject cross-talk corrupts the very screens the
+user playtests after every dense game).
 THEN tRS-SC RESEARCH UP/DOWN = SCROLL (D32 verbatim: "the up/down
 buttons on the research screen are supposed to scroll up and down, not
 zoom in and out"). Our research press-table row wired the same
@@ -293,37 +261,32 @@ state + clamp), hold-not-latch per tPF-7; left/right keep rotation.
 Pin: pressing up moves tree pixels up (centroid delta) WITHOUT focal
 change; zoom only if vendor has zoom buttons there (verify vs refcap
 t252). Budget <=2.
-THEN continue prior NEXT:
-tSPEC-1 UPGRADED BY D33: Begin species pick must reach PLAY
+THEN tSPEC-1 UPGRADED BY D33: Begin species pick must reach PLAY
 (user: our home planet is medium eden REGARDLESS of species; vendor =
 per-species TYPE via the tPL-D1 table; plumb wheel-species ->
 NewGameSettings -> cfg -> home terrain row + art; pins: Chamachies ->
 size idx 3 + terrain row 7 in PLAY state, Minions differs; witness =
 two Begin runs, different species, different home terrain census).
-PLUS tNAME-1 (D33 L3): vendor system/planet names DIFFER EVERY GAME;
+Port defect banked docs/re/_wip_tPF1d.md: NewGameSettings (menulaw.h:
+344) carries only stars/owners/gov and main.cpp buildCampaign(&newGame)
+rebuilds from that triple only, so "started a game with the Chamachies"
+is impossible via Begin (tESC-1 eject witness re-confirmed: species
+pick printed and dropped). Re-derive at bytes what the vendor's Begin
+writes about the PLAYER SPECIES (wheel-arms law tNG-B cites: state
+base 0x12e10 + atmosphere global 0x52b44 — find the species sibling
+write), ship the field, pin + witness. Budget: full iteration.
+THEN tNAME-1 (D33 L3): vendor system/planet names DIFFER EVERY GAME;
 ours always Phoebe => find where names are assigned (names.txt entry
-41 hit deterministically) and derive the vendor draw law (per-game
-RNG vs index); pin: two same-seed-name runs (different seeds) produce
-different home-star names.
-docs/re/_wip_tPF1d.md + this iteration's witness run). Port defect: the
-New Game screen's species selection never reaches the play state —
-NewGameSettings (menulaw.h:344) carries only stars/owners/gov, and main.cpp
-buildCampaign(&newGame) rebuilds from that triple only, so "started a game
-with the Chamachies" (D-row 693) is impossible via Begin (this iteration's
-eject witness re-confirmed: Begin builds owners=5 gov=1 with the species
-pick printed and dropped). Re-derive at bytes what the vendor's Begin writes
-about the PLAYER SPECIES (the wheel-arms law tNG-B already cites: state base
-0x12e10 + atmosphere global 0x52b44 — find the species sibling write), ship
-the field through NewGameSettings + buildCampaign, pin + witness (Begin with
-a non-default species pick -> play state carries it). Ordering rationale:
-tESC-1 CLOSED this iteration (D31 resolved in the user's favour at bytes;
-ship + 4-leg witness green), the day-20 exit stays OPEN as an unreproduced
-defect AWAITING THE INSTRUMENT (nothing further from our side), and
-TPF7-A's per-msg release-mask split (0x47d3b ~ebp role owed) is the static
-alternative if tSPEC-1 sizes out mid-iteration. TPF6-CPU-A stays parked
-(user throttle ruling pending). TPF7-C is a user feel-grading ask. TPF5-A
-ship stays gated on the D1 ruling. OQ-016/OQ-019 remain the only open
-ledger rows (both capture-blocked classes).
+41 hit deterministically) and derive the vendor draw law (per-game RNG
+vs index); pin: two runs at different seeds produce different
+home-star names. ORDERING: after tSPEC-1 — the per-species home TYPE
+table read and the name draw share buildCampaign/mapgen plumbing, and
+D33 pairs them as one user complaint.
+ALTERNATIVES/PARKED: TPF7-A per-msg release-mask split (0x47d3b ~ebp
+role owed) if tWIN-1 sizes out; TPF6-CPU-A parked (user throttle
+ruling pending); TPF7-C user feel-grading; TPF5-A ship gated on D1
+ruling. OQ-016/OQ-019 remain the only open ledger rows (both
+capture-blocked classes).
 D30/D31 LAW (standing): any closure of a user-reported defect must be by
 reproduction+fix, NEVER by attributing the symptom to the user's actions.
 TRAPS: disasm = ~/tools/revenv/bin/python scripts/t442_disasm.py START END
@@ -370,6 +333,41 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+tXT-1 LANDED 2026-11-27 (D32/D33-L1 DAY-20 EXTINCT ON DENSE+7 — ROOT
+CAUSE MEASURED + FIXED: the freeForAll=true ARCADE DEFAULT, not the
+capture emitter. REPRO (headless, no CONT needed): '--campaign 60
+--stars 100 --seed 1' exits t20 'owner 1 captured Phoebe' ->
+Victory::Extinct, byte-identical event to the user's instrument catch.
+DIAGNOSIS: campaign.h:144 freeForAll=true wrote war_[x][y]=1 for EVERY
+pair at init (campaign.cpp:321-324), so a border AI invaded the idle
+player's home at t20 (census 1->0 lockstep: NOT emitter corruption (a),
+NOT fleetPending (c) — headless player has no fleet). Vendor law says
+fresh campaigns are AT PEACE: diplomacy.md S19 '200/200 fresh-campaign
+non-war pairs sit at START_ATTITUDE 600 > DECL 210' (r207 census),
+S13.3 'scenario seeding never writes' the war state (writer = dialogue
+action case bl=2 0x455cb), S11 pre-war pairs sat at state 1 — exactly
+the user's ground truth 'vendor dense games do NOT end by t20'. FFA
+also PRE-EMPTED the cited war-start channel (guaranteeWarOnInvasion
+no-ops vs an at-war victim, 0x3a25d). FIX: freeForAll default false
+(campaign.h, cited); turnloop.md S5 updated; 8 test files set the flag
+explicitly so they are insulated. MEASURED POST-FIX: matrix 3x3 (seeds
+1/2/3 x stars 50/75/100) 9/9 survive 60t, player stars 1 at t60;
+Begin-path WITNESS scripts/tXT1_dense7_witness.sh (density rung 2 +
+species word 7 via the wheel, 'newgame live stars 100 owners 7 gov 1',
+60 NEXT TURN presses, SURVIVED rc=0); seed 2024 long-game unchanged
+(Extinct t1067), seed 13 t536->t538 (dynamics verifiably changed),
+first AI declare now mid-game t143 (chooser channel, not init);
+PLAYTHROUGH.md re-recorded, both gate greps satisfied. PINS
+test_peace_start_txt1 x3 (7x7 peace census, dense+7 60t soak x3 seeds,
+clamp-only-war-entry battery); MUTATION M1 (default back to true)
+CAUGHT (peace census 42x FAIL + soak Extinct FAIL); restore md5-
+verified c2b4b76a + REBUILD before witness. HONEST NEGATIVES: AI-AI war
+stays unmodelled (pre-existing documented gap, OQ-020 territory — the
+vendor's DA_DeclareWarOnOtherRace rung 0x44ce0 unwired; our AI-AI pairs
+are permanently at peace); D33-L2 (species->home TYPE) and L3 (per-game
+names) NOT touched here — queued tSPEC-1/tNAME-1. Suite 608->611/0/0,
+GATE_EXIT=0, LEDGER AUDIT OK, open=[016,019] unchanged.
 
 tESC-1 LANDED 2026-11-27 (VENDOR ESCAPE CHAIN RE-DERIVED AT BYTES — D31
 RESOLVED IN THE USER'S FAVOUR; EJECT-TO-TITLE SHIPPED + 4-LEG RUNTIME

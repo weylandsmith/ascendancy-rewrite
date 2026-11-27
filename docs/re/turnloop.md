@@ -110,9 +110,13 @@ From `planitem.txt` raw rows (docs/re/economy.md; verbatim rows re-read
 Diplomacy (docs/re/diplomacy.md, weights [verified] from raceNN.dip) sets a
 symmetric war table; `START_ATTITUDE` initialises each AI-vs-player relation
 [verified field] - starting at zero would put every race under its own
-DECLARE_WAR threshold on turn 1, which the data clearly does not intend. The
-campaign default `freeForAll=true` starts everyone at war (arcade setting;
-diplomacy-triggered declares also fire). Capture resolution (rewrite sites
+DECLARE_WAR threshold on turn 1, which the data clearly does not intend.
+tXT-1 RETIRES the `freeForAll=true` arcade default [MEASURED, diplomacy.md
+§19: 200/200 fresh-campaign pairs are NOT at war; §13.3: seeding never
+writes the war state — the dialogue action 0x455cb does]. Fresh campaigns
+now start at peace; wars enter ONLY through the chooser declare rung and
+the cited guaranteeWarOnInvasion clamp. Tests that need war set the flag.
+Capture resolution (rewrite sites
 campaign.cpp attackScore/defenseScore/combatPhase; original laws instruction-
 verified t85g..t88a):
 

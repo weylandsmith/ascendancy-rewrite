@@ -139,9 +139,17 @@ struct CampaignEvent {
 
 struct CampaignConfig {
     unsigned seed = 1;
-    // Free-for-all wars from turn 1 (arcade default; the diplomacy-gated war
-    // entry is evaluated too but not required — docs/re/turnloop.md §5).
-    bool freeForAll = true;
+    // tXT-1 FIX (D32): fresh campaigns start at PEACE, not war. Vendor law
+    // [MEASURED, docs/re/diplomacy.md §19: 200/200 fresh-campaign pairs sit
+    // at START_ATTITUDE > DECLARE_WAR and are NOT at war; §13.3: the AT-WAR
+    // writer is the dialogue action case bl=2 0x455cb, "scenario seeding
+    // never writes" it; §11: pre-war every pair sat at state 1]. The old
+    // arcade default freeForAll=true started every pair at war from turn 1,
+    // which let one AI take an idle player's home on dense maps (~t20 on
+    // seed 1 stars=100 — the D32 exit-to-title defect) and pre-empted the
+    // cited guaranteeWarOnInvasion escalation channel (it no-ops when the
+    // victim is already at war). Tests that need war set the flag explicitly.
+    bool freeForAll = false;
     int aiCount = 6;            // <= 6: NUMCONTROLS 7 total controls (turnloop.md §2)
     int starCount = 50;         // fresh campaigns measured 5/5 (r1-savestate 06p)
     double initialPop = 2;      // MEASURED: home + colonized planets both

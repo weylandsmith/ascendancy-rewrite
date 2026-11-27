@@ -1,6 +1,6 @@
 # Headless playthrough record
 
-Regenerated 2026-11-26T07:42:09-05:00 by scripts/record_playthrough.sh from the
+Regenerated 2026-11-27T10:00:41-05:00 by scripts/record_playthrough.sh from the
 current binary. Victory conditions and their vendor files: docs/re/turnloop.md §1.
 
 ## Run A — headless, seed 2024 (t295 home draw: Extinct t285 — uniform homes put real lethal neighbours on the player; the old spread-BFS never could)
@@ -12,9 +12,9 @@ SDL 2.32.4 initialised (video driver: (null))
 campaign seed=2024 stars=50 lanes=53 ai=6
 turn   1 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
-  ... (2026 lines elided)
+  ... (2030 lines elided)
+  [t1066] owner 6 captured Algol
   [t1067] owner 6 captured Nougat
-  [t1067] owner 1 captured Highbeam
   [t1067] VICTORY: Extinct (end-xtnc.txt)
 VICTORY Extinct via end-xtnc.txt on turn 1067 (score 0%)
 ```
@@ -28,7 +28,7 @@ SDL 2.32.4 initialised (video driver: (null))
 campaign seed=23 stars=50 lanes=53 ai=6
 turn   1 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
-  ... (1738 lines elided)
+  ... (1743 lines elided)
   [t1582] owner 0 colonised Bob
   [t1582] Shared star-lane intelligence with FLUDENTRI (2 lanes)
   [t1582] VICTORY: Control (end-ctrl.txt)
@@ -44,11 +44,11 @@ SDL 2.32.4 initialised (video driver: x11)
 campaign seed=13 stars=50 lanes=53 ai=6
 turn   1 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
 turn   2 | player stars  1 score   2% techs  0 | ai stars 1 1 1 1 1 1
-  ... (616 lines elided)
-  [t536] owner 4 captured Ajax
-  [t536] owner 4 captured Menthol
-  [t536] VICTORY: Extinct (end-xtnc.txt)
-VICTORY Extinct via end-xtnc.txt on turn 536 (score 0%)
+  ... (622 lines elided)
+  [t537] owner 4 captured Atropos
+  [t538] owner 4 captured Discordia
+  [t538] VICTORY: Extinct (end-xtnc.txt)
+VICTORY Extinct via end-xtnc.txt on turn 538 (score 0%)
 ```
 
 ## Run D — UI under Xvfb, autoplay 3 turns (gate 4c)

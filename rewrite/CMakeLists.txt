@@ -115,6 +115,7 @@ add_executable(run_tests
   tests/test_campaign_fleet_t365.cpp
   tests/test_diponattack_t204.cpp
   tests/test_invasion_war_t207.cpp
+  tests/test_peace_start_txt1.cpp
   tests/test_emergency_t201.cpp
   tests/test_demolish_t202b.cpp
   tests/test_freetech_t203.cpp
