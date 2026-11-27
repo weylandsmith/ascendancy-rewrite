@@ -462,7 +462,35 @@ unchanged; no code change, docs+script only).
    bash $((0x54820+0x40)) mixed-base arithmetic flooded 10 MB of disasm —
    pass explicit hex END bounds to t442_disasm.py.
  - GATE: see GATE_EXIT below; LEDGER AUDIT OK.
- - NEXT TPF7-A per-msg release-mask split (0x47d3b ~ebp, ebp-role owed).
+ NEXT tPF-1d QUIT-CAUSE INSTRUMENT + HONEST SOAK (D31: user denies
+ Escape VERBATIM ("mouse never moved from the next day button") —
+ 9472ac2 closure REFUTED; day-20 exit = UNREPRODUCED defect, no more
+ close-with-theory). SHIP: every exit path from runCampaignUi prints
+ "ui quit cause=<CAUSE> turn=N" BEFORE "ui ok" (causes at minimum:
+ cap, victory(enum name), sdl-window-close, escape-unwind-leg, corner-
+ exit, cont-stop); console-only, zero gameplay change; pins x2 (victory
+ exit prints cause+enum; 45-press soak prints NO quit line). Then soak
+ the USER-EXACT config (Begin-built CHAMACHIES — the prior repro used
+ 50/5/1 generic; match the user's likely wheels: reroll until the
+ scenario is Chamachi-home, factory ordered, advance 45 days, per-press
+ assertions). If soak exits, the cause line names the path and you fix
+ the ROOT law; if soak survives, say exactly that + keep the
+ instrument; do NOT invent a user-behavior explanation (D30/D31 law).
+ Budget <=2.
+ THEN tESC-1 ESCAPE-CHAIN RE-DERIVATION (D31 user law: Escape from the
+ galaxy map should return to the MAIN/TITLE screen (Play Introduction/
+ Tutorial/New Game), NOT exit the process; t410 "quit at bottom"
+ citation CONTESTED). Re-derive the vendor chain from the handler asm
+ (t252 msg map, the unwind fn cited in t410): what does Escape pop at
+ the bottom level — process exit or boot-to-title? Cite FUNs. If the
+ vendor unwinds to title, ship exactly that + pin (Escape on map ->
+ title loop state, RESUME path intact). IF the vendor asm genuinely
+ quits the process, DO NOT silently keep it — write the cited asm
+ excerpt into docs/re/_wip_tESC1.md and leave row OPEN for the user's
+ ruling (his memory may be of the DOS launcher behavior; user law vs
+ vendor law is HIS call, our job is the citation). Budget <=2.
+ THEN continue prior NEXT:
+ TPF7-A per-msg release-mask split (0x47d3b ~ebp role owed
 
 
 tPF-11 LANDED 2026-11-26 (RESEARCH-SCREEN MINERAL FRAMING SHIPPED AT
