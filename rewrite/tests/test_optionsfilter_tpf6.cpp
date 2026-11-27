@@ -8,6 +8,7 @@
 // (plain PLBUILD open) keeps the pre-tPF-6 membership EXACTLY.
 // Citations: ui/planetview.h projectOptionsFor block; docs/re/_wip_tPF6.md P4.
 #include "ui/planetview.h"
+#include "ui/planetwin.h"  // tPF-6a: popupButtonIds + kPbBuild
 
 #include <cstdio>
 #include <memory>
@@ -225,13 +226,14 @@ TEST(planlist_fill_law_tpf6b) {
     CHECK(!holds(au::projectOptionsFor(c, star), 5));
     CHECK(!holds(au::projectOptionsFor(c, star, 0), 5));
 
-    // (2) FREE-POP AT LIST TIME: with pop pinned so free == 0, no row with
-    // UPOP > 0 survives; item 23 (the 0x38422 replacement) is exempt.
+    // (2) FREE-POP AT LIST TIME: with pop pinned so free == 0, NO row with
+    // UPOP > 0 survives — item 23 included (tPF-6a F6: the 0x38420 jne
+    // skips the 0x39a9c replacement on pop-FAIL; the tPF-6b "23 exempt"
+    // reading was the direction reversed).
     ps.pop = 0;
     const auto tight = au::projectOptionsFor(c, star);
     for (const auto& o : tight) {
         const auto* pi = c.planetItem(o.item);
-        if (o.item == 23) continue;  // seam TPF6-SHIP (exempt leg taken)
         CHECK(pi && pi->upop <= 0);
     }
     // (3) ANTI-VACUITY: restoring pop brings the UPOP>0 rows back (a filter
@@ -270,6 +272,83 @@ TEST(planlist_popup_leg_wiring_tpf6b) {
     CHECK(body.find("usedPopFor") != std::string::npos);
     CHECK(body.find("requiresAvailable") != std::string::npos);
     CHECK(body.find("placementBlock") != std::string::npos);
+}
+
+// tPF-6a NEVER-EMPTY INVARIANT (docs/re/_wip_tPF6a.md F4/F8): the vendor
+// popup Build button (0x3d550 empty-cell loop, first checker-pass at 0x3d579)
+// can never sit above an empty PLANLIST: legs A+B of checker 0x3830c are
+// cell-independent (F1/F6) and leg C is inert at cell -1 (0x3843a jae), so
+// pass(item, cell) => pass(item, -1) and the fill (forced cell -1,
+// windows.txt ln1615 + 0x3b70d) appends the witness item. Port mirror: the
+// popupButtonIds buildable-lambda is (freePop AND requires AND placement),
+// projectOptionsFor(-1) is (freePop AND requires) — a Build button must
+// always imply a non-empty list CONTAINING its witness item, at every cell.
+TEST(build_button_implies_nonempty_fill_tpf6a) {
+    REQUIRE_DATA();
+    auto copt = seededCampaign();
+    CHECK(copt.has_value());
+    if (!copt) return;
+    ag::Campaign& c = *copt;
+    const int star = playerStar(c);
+    CHECK(star >= 0);
+    if (star < 0) return;
+    auto& ps = const_cast<ag::PlanetState&>(c.planetAt(star));
+    const int surf = ps.surfaceCells;
+    const int size = ag::Campaign::sizeClassFor(surf);
+    CHECK(size >= 0);
+    if (size < 0) return;
+    ps.items.clear();
+    ps.itemCells.clear();
+    ps.cellClasses.assign(size_t(surf) + 10, 1);
+    ps.pop = 50;
+    c.setAllTechs(ag::kPlayer, true);
+
+    // The per-cell buildable predicate EXACTLY as ui.cpp wires it (the
+    // source-text pin planlist_popup_leg_wiring_tpf6b guards drift; this
+    // pin guards the IMPLICATION regardless of how the legs are tuned).
+    const auto passes = [&](int item, int cell) {
+        if (item != 0xff) {
+            const auto* pi = c.planetItem(item);
+            const int fp = int(c.planetAt(star).pop) - c.usedPopFor(star);
+            if (!pi || fp < pi->upop) return false;
+            if (!ascend::game::requiresAvailable(pi->reqByte,
+                                                 c.techCountTotal(),
+                                                 c.playerTechs()))
+                return false;
+        }
+        return au::placementBlock(c, star, item, cell) ==
+               au::PlacementBlock::None;
+    };
+    int buildCells = 0;
+    for (int cell = 0; cell < surf + 10; ++cell) {
+        const auto ids = au::popupButtonIds(
+            0xff, [&](int item) { return passes(item, cell); });
+        bool hasBuild = false;
+        for (int id : ids)
+            if (id == au::kPbBuild) hasBuild = true;
+        if (!hasBuild) continue;
+        buildCells++;
+        // THE INVARIANT: armed AND plain (-1) lists are both non-empty and
+        // both contain the witness item (first popup-loop pass).
+        const auto armed = au::projectOptionsFor(c, star, cell);
+        const auto plain = au::projectOptionsFor(c, star);
+        CHECK(!armed.empty());
+        CHECK(!plain.empty());
+        int witness = -1;
+        for (int item = 0; item <= 0x26; ++item) {
+            if (item == 5) continue;  // 0x3d55f skip
+            if (passes(item, cell)) {
+                witness = item;
+                break;
+            }
+        }
+        CHECK(witness >= 0);
+        CHECK(holds(armed, witness));
+        CHECK(holds(plain, witness));
+    }
+    // ANTI-VACUITY: the fixture must actually produce Build buttons (an
+    // all-refused planet would make the loop above vacuous).
+    CHECK(buildCells > 0);
 }
 
 // Wiring pin (source-text, tPF-6): the three ui.cpp call sites must pass the

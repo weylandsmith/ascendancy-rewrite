@@ -1304,9 +1304,13 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                             cellItem, [&](int item) {
                                 // tPF-6b: the 54-loop 0x3d579 calls the FULL
                                 // checker 0x3830c(item, cell) — legs A
-                                // (REQUIRES) + B (free-pop, item 23 exempt
-                                // via 0x38422) + C (placement), not C alone.
-                                if (item != 0xff && item != 23) {
+                                // (REQUIRES) + B (free-pop) + C (placement).
+                                // tPF-6a F6: leg B applies to item 23 TOO
+                                // (the 0x38420 jne skips the 0x39a9c
+                                // replacement on pop-FAIL — it REVOKES a
+                                // passing ship row, never exempts a
+                                // pop-short one), so 23 is NOT exempt here.
+                                if (item != 0xff) {
                                     const auto* pi = camp.planetItem(item);
                                     const int fp = int(camp.planetAt(
                                                            planetStar).pop) -

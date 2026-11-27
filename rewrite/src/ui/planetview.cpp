@@ -50,10 +50,12 @@ std::vector<ProjectOption> projectOptionsFor(
     // append iff checker 0x3830c(item, cell) is nonzero. The checker is the
     // FULL orderability predicate, not placement-only: LEG-A REQUIRES
     // (0x3835d), LEG-B FREE-POP (0x383b3: pop - used [+0x42 - +0x4c, incl.
-    // the pending item's UPOP addback 0x383dd] >= UPOP(item); item 23
-    // replaced by 0x39a9c at 0x38422 — seam TPF6-SHIP), LEG-C cell geometry
-    // (0x3843a: cell >= cell-count jumps straight to the final AND, so
-    // cell -1 runs ONLY legs A+B). PLBUILD's SENDPARAM1 == 1
+    // the pending item's UPOP addback 0x383dd] >= UPOP(item); the 0x38422
+    // item-23 replacement runs ONLY on a pop PASS (0x38420 jne skips it —
+    // tPF-6a F6: 0x39a9c REVOKES a passing ship row, it never exempts a
+    // pop-short one; the revocation itself stays seam TPF6-SHIP), LEG-C
+    // cell geometry (0x3843a: cell >= cell-count jumps straight to the
+    // final AND, so cell -1 runs ONLY legs A+B). PLBUILD's SENDPARAM1 == 1
     // (windows.txt ln1615) forces word[widget+0xae] := 0xffff BEFORE the
     // loop (0x3b70d) — every human list open is cell -1. The banked
     // "free-pop is an ORDER gate, not a list filter" reading is REFUTED
@@ -73,8 +75,14 @@ std::vector<ProjectOption> projectOptionsFor(
         if (!ascend::game::requiresAvailable(pi->reqByte, camp.techCountTotal(),
                                              camp.playerTechs()))
             continue;
-        if (id != 23 && freePop < pi->upop)
-            continue;  // 0x38416 jl; item 23 takes the 0x39a9c replacement
+        if (freePop < pi->upop)
+            continue;  // 0x38416 jl — EVERY in-domain item takes the pop
+                       // leg, item 23 included (tPF-6a F6: 0x38420 jne
+                       // 0x38430 skips the 0x39a9c replacement on pop-FAIL;
+                       // the tPF-6b "23 exempt" reading was the direction
+                       // reversed. The vendor ADDITIONALLY revokes a passing
+                       // 23 via 0x39a9c — seam TPF6-SHIP, port stays weaker
+                       // in the never-empty-safe direction)
         if (armedCell >= 0 &&
             placementBlock(camp, star, id, armedCell) != PlacementBlock::None)
             continue;  // PORT flow (tPF-6): guards the tile-first path — the
