@@ -16,6 +16,9 @@ namespace ascend::ui {
 namespace {
 // The 0x388ec domain gate: cmd0 rejects item >= 39 (cmp 0x27; jae reject).
 inline bool inOrderDomain(int item) { return item >= 0 && item < 39; }
+// planitem.txt row 22 (economy.md S4 base list; RAM item table 0x73e40 +
+// 22*0x28 read this iteration): the Shipyards item the 0x39a9c leg scans for.
+constexpr int kShipyardItem = 22;
 }  // namespace
 
 PlanetView planetViewFor(const ascend::game::Campaign& camp, int star,
@@ -40,6 +43,33 @@ PlanetView planetViewFor(const ascend::game::Campaign& camp, int star,
                                 camp.channelWordsFor(star).ind);
     }
     return v;
+}
+
+bool vendorShipLegAllowed(const ascend::game::Campaign& camp, int star) {
+    // 0x39a9c legs (docs/re/_wip_tPF6ship.md P9): (1)+(2) the ACTIVE
+    // Shipyards cell, (3) the 0x402d8 census. Port state analogs per the
+    // header citation: Campaign::fleet() is the complete ship state (idle
+    // ships leave fleet_ — campaign.cpp warp/return sites), homeStarFor(r)
+    // is the DWORD[row+7] home-record pointer, starOwner(s) is the +0x14
+    // owner byte.
+    const auto& ps = camp.planetAt(star);
+    bool activeYard = false;
+    for (size_t i = 0; i < ps.items.size(); ++i)
+        if (ps.items[i] == kShipyardItem) activeYard = true;
+    if (!activeYard) return false;  // 0x39ac8..0x39ae0: no yard cell -> 0
+    const int race = camp.starOwner(star);
+    if (race < 0) return false;     // unowned world: no row-7 to read
+    int soleStars = 0;
+    for (const auto& s : camp.galaxy().stars)
+        if (camp.starOwner(s.id) == race) soleStars++;  // sole-owner analog
+    int ships = 0;
+    for (const auto& sh : camp.fleet())
+        if (sh.owner == race) ships++;                  // 0x40ec0 analog
+    int homeBit = 0;
+    const int home = camp.homeStarFor(race);
+    if (home >= 0 && camp.starOwner(home) == race) homeBit = 1;
+    // 0x402d8 = 1 + SOLE_STARS - SHIPS + HOME_BIT; caller gate jle (0x39b16).
+    return 1 + soleStars - ships + homeBit > 0;
 }
 
 std::vector<ProjectOption> projectOptionsFor(
@@ -80,9 +110,13 @@ std::vector<ProjectOption> projectOptionsFor(
                        // leg, item 23 included (tPF-6a F6: 0x38420 jne
                        // 0x38430 skips the 0x39a9c replacement on pop-FAIL;
                        // the tPF-6b "23 exempt" reading was the direction
-                       // reversed. The vendor ADDITIONALLY revokes a passing
-                       // 23 via 0x39a9c — seam TPF6-SHIP, port stays weaker
-                       // in the never-empty-safe direction)
+                       // reversed. The vendor ADDITIONALLY gates a pop-
+                       // passing 23 through 0x39a9c — seam TPF6-SHIP,
+                       // CLOSED below)
+        if (id == kShipItem && !vendorShipLegAllowed(camp, star))
+            continue;  // 0x38422..0x3842e: 0x39a9c verdict replaces the pop
+                       // PASS for item 23 ONLY (no ACTIVE Shipyards cell or
+                       // fleet >= 1 + sole systems + home slack -> revoked)
         if (armedCell >= 0 &&
             placementBlock(camp, star, id, armedCell) != PlacementBlock::None)
             continue;  // PORT flow (tPF-6): guards the tile-first path — the

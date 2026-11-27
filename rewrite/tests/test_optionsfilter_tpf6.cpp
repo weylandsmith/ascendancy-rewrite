@@ -268,10 +268,17 @@ TEST(planlist_popup_leg_wiring_tpf6b) {
     const size_t call = src.find("popupButtonIds(");
     CHECK(call != std::string::npos);
     if (call == std::string::npos) return;
-    const std::string body = src.substr(call, 1600);
+    // tPF6-SHIP: window widened 1600 -> 2200 (the 0x39a9c leg comment + call
+    // inside the lambda pushed placementBlock past 1600; the pin guards the
+    // LAMBDA BODY, so the window must span it).
+    const std::string body = src.substr(call, 2200);
     CHECK(body.find("usedPopFor") != std::string::npos);
     CHECK(body.find("requiresAvailable") != std::string::npos);
     CHECK(body.find("placementBlock") != std::string::npos);
+    // TPF6-SHIP CLOSED: the lambda must run the 0x39a9c ship leg for item 23
+    // (one checker 0x3830c for fill AND popup; a lambda without it re-offers
+    // Ship Build buttons on yard-less / fleet-saturated planets).
+    CHECK(body.find("vendorShipLegAllowed") != std::string::npos);
     // tPF-6a F6 REVOCATION LAW: the 0x38420 jne skips the 0x39a9c
     // replacement on pop-FAIL, so item 23 takes the free-pop leg like every
     // other in-domain item. A restored `item != 23` exemption in the lambda
@@ -320,6 +327,8 @@ TEST(build_button_implies_nonempty_fill_tpf6a) {
                                                  c.techCountTotal(),
                                                  c.playerTechs()))
                 return false;
+            if (item == 23 && !au::vendorShipLegAllowed(c, star))
+                return false;  // tPF6-SHIP: mirrors the ui.cpp lambda
         }
         return au::placementBlock(c, star, item, cell) ==
                au::PlacementBlock::None;
@@ -375,6 +384,75 @@ TEST(build_button_implies_nonempty_fill_tpf6a) {
             if (id == au::kPbBuild) build4 = true;
         CHECK(build4);
     }
+}
+
+// TPF6-SHIP PIN (docs/re/_wip_tPF6ship.md P1-P9): the 0x39a9c leg runs for
+// item 23 ONLY, after a pop PASS (0x38420 jne), at LIST TIME (fill 0x3b6f3
+// and popup 0x3d579 share checker 0x3830c; the ORDER path 0x38840 has no
+// ship call — projectOrderable unchanged). Legs: ACTIVE Shipyards (22) cell
+// AND 0x402d8(race) = 1 + SOLE_STARS - SHIPS + HOME_BIT > 0.
+TEST(ship_leg_tpf6ship) {
+    REQUIRE_DATA();
+    auto copt = seededCampaign();
+    CHECK(copt.has_value());
+    if (!copt) return;
+    ag::Campaign& c = *copt;
+    const int star = playerStar(c);
+    CHECK(star >= 0);
+    if (star < 0) return;
+    auto& ps = const_cast<ag::PlanetState&>(c.planetAt(star));
+    ps.items.clear();
+    ps.itemCells.clear();
+    ps.cellClasses.assign(size_t(ps.surfaceCells) + 10, 1);
+    ps.pop = 50;
+    c.setAllTechs(ag::kPlayer, true);
+
+    // (1) NO Shipyards cell => item 23 is revoked at every list open even
+    // with pop abundant (0x39ae0 -> verdict 0). Other rows unaffected.
+    CHECK(!holds(au::projectOptionsFor(c, star), 23));
+    CHECK(!holds(au::projectOptionsFor(c, star, 0), 23));
+    CHECK(!au::vendorShipLegAllowed(c, star));
+    // ANTI-VACUITY: the list is non-empty WITHOUT 23 (the gate removes one
+    // row, not the list).
+    CHECK(au::projectOptionsFor(c, star).size() > 1);
+
+    // (2) ACTIVE Shipyards + small fleet => 23 returns. Fleet 0 < 1 +
+    // soleStars + homeBit holds on any owned empire (soleStars >= 1: the
+    // player owns its home; homeBit 1).
+    ps.items.push_back(22);
+    ps.itemCells.push_back(0);
+    CHECK(au::vendorShipLegAllowed(c, star));
+    CHECK(holds(au::projectOptionsFor(c, star), 23));
+
+    // (3) FLEET SATURATION: N player ships with N >= 1 + soleStars + homeBit
+    // revokes 23 again (0x40ec0 census analog = fleet() owner count).
+    int sole = 0;
+    for (const auto& s : c.galaxy().stars)
+        if (c.starOwner(s.id) == ag::kPlayer) sole++;
+    const int home = c.homeStarFor(ag::kPlayer);
+    const int homeBit = (home >= 0 && c.starOwner(home) == ag::kPlayer) ? 1 : 0;
+    std::vector<ag::ShipInTransit> fleet;
+    for (int i = 0; i < 1 + sole + homeBit; ++i)
+        fleet.push_back({ag::kPlayer, star, star});
+    c.setFleetForTest(fleet);
+    CHECK(!au::vendorShipLegAllowed(c, star));
+    CHECK(!holds(au::projectOptionsFor(c, star), 23));
+    // HOME SLACK: fleet EXACTLY 1 + sole (one below saturation) still
+    // passes — isolates the HOME_BIT term of 1 + SOLE - SHIPS + HOME (a
+    // formula without +HOME revokes here: value 0).
+    fleet.pop_back();
+    c.setFleetForTest(fleet);
+    CHECK(au::vendorShipLegAllowed(c, star));
+    CHECK(holds(au::projectOptionsFor(c, star), 23));
+    // One ship fewer passes again (boundary is exact, not slack).
+    fleet.pop_back();
+    c.setFleetForTest(fleet);
+    CHECK(au::vendorShipLegAllowed(c, star));
+    CHECK(holds(au::projectOptionsFor(c, star), 23));
+    // The leg is CELL-INDEPENDENT (0x39a9c reads no cell operand — tPF-6a
+    // F1): same verdict armed or plain.
+    c.setFleetForTest({});
+    CHECK(au::vendorShipLegAllowed(c, star));
 }
 
 // Wiring pin (source-text, tPF-6): the three ui.cpp call sites must pass the

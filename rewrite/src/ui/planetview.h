@@ -94,10 +94,11 @@ struct ProjectOption { int item; std::string name; int cost; };
 // Buildable options for one planet, planitem TABLE ORDER — the vendor fill
 // law 0x3b6f3 (tPF-6b, docs/re/_wip_tPF6b.md P4-P7): item < 39 (0x388ec),
 // item != 5 (0x3b76a unconditional skip), requiresAvailable(reqByte)
-// (checker LEG-A 0x3835d = income-law S4), and the FREE-POP leg (checker
-// LEG-B 0x383b3: pop - used >= UPOP(item); item 23 exempt via the 0x38422
-// replacement, seam TPF6-SHIP). The old "list shows pop-short rows, the
-// ORDER rejects" reading is REFUTED (R-tPF6b) — leg B sits inside the
+// (checker LEG-A 0x3835d = income-law S4), the FREE-POP leg (checker
+// LEG-B 0x383b3: pop - used >= UPOP(item), item 23 included per tPF-6a F6),
+// and for item 23 the 0x39a9c SHIP leg (vendorShipLegAllowed, TPF6-SHIP
+// CLOSED — docs/re/_wip_tPF6ship.md). The old "list shows pop-short rows,
+// the ORDER rejects" reading is REFUTED (R-tPF6b) — leg B sits inside the
 // per-row checker the fill calls.
 // tPF-6 ARMED-CELL FILTER (D28 item 11): when the list opens from a square
 // popup's Build button on cell `armedCell`, additionally drop every item the
@@ -106,8 +107,39 @@ struct ProjectOption { int item; std::string name; int cost; };
 // 0xffff before the loop, windows.txt ln1615 + 0x3b70d) — this filter is
 // PORT-flow (tile-first), corroborated by the popup D6 law (no Build button
 // appears for a refused (item, cell)), not by the fill law.
+// tPF-6a F6 REVOCATION LAW + tPF6-SHIP SEAM CLOSURE: item 23 ('Ship') takes
+// the free-pop leg like every other row, AND ADDITIONALLY must pass the
+// 0x38429 -> 0x39a9c leg (below) at LIST/POPUP time. The ORDER path (fn
+// 0x38840, sole call 0x38ba4) has NO ship gate — projectOrderable stays
+// unchanged.
 std::vector<ProjectOption> projectOptionsFor(
     const ascend::game::Campaign& camp, int star, int armedCell = -1);
+
+// THE 0x39a9c SHIP LEG (TPF6-SHIP CLOSED, docs/re/_wip_tPF6ship.md P1-P9):
+// checker 0x3830c replaces the verdict for item 23 via 0x39a9c(planet),
+// which passes iff ALL of:
+//   (1) the planet has a cell whose BUILT-ITEM byte == 22 (Shipyards)
+//       (0x3958c(planet, 0x16) != 0xffff);
+//   (2) that cell's word+2 flag bit0 is set (0x39af3) — the ACTIVE flag; the
+//       port stores ACTIVE items only (campaign.h PlanetState::items), so
+//       scanning items for 22 IS the active-yard scan;
+//   (3) 0x402d8(0x12e16 + race*0x1ee) > 0 (0x39b11 jle), where [verified
+//       body 0x402d8..0x40347]
+//       0x402d8(row) = 1 + SOLE_STARS(r) - SHIPS(r) + HOME_BIT(r)
+//       SOLE_STARS: count of star records (0x13bc5 stride 0x60, t248 law)
+//         with owner byte EXACTLY (1<<r) — sole ownership (0x40305..0x40312);
+//       SHIPS: 0x40ec0 census — slots of the ship array whose owner handle
+//         +0x54>>16 == r (pership-spec A1; port analog: Campaign::fleet(),
+//         the model's complete ship state — no idle fleets, campaign.cpp
+//         warp/return comments);
+//       HOME_BIT: byte[DWORD[row+7] + 0x14] & (1<<r) (0x40325..0x40340);
+//         DWORD[row+7] == DWORD[0x12e1d + r*0x1ee] is the race's HOME STAR
+//         record pointer — the t246 PLANETALLOC exclusion pointer, MEASURED
+//         live (scripts/r1_t246_header_law.py); port analog: homeStarFor(r)
+//         with owner bit held (starOwner analog of the bitmask test).
+// So a race keeps being OFFERED Ships only while its fleet stays below
+// 1 + sole systems (+1 home slack); the gate is cell-independent.
+bool vendorShipLegAllowed(const ascend::game::Campaign& camp, int star);
 
 // The cmd0 gate predicate (1)+(2)+(3) above, evaluated against campaign
 // state. Pure; the caller's orderProject applies the SAME law — exposed so

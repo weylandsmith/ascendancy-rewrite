@@ -1321,6 +1321,12 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                                             camp.techCountTotal(),
                                             camp.playerTechs()))
                                         return false;
+                                    // tPF6-SHIP: 0x38429 runs the 0x39a9c
+                                    // legs for item 23 after a pop PASS.
+                                    if (item == 23 &&
+                                        !ascend::ui::vendorShipLegAllowed(
+                                            camp, planetStar))
+                                        return false;
                                 }
                                 return placementBlock(camp, planetStar, item,
                                                       hit) ==
