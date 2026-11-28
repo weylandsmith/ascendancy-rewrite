@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-27T21:45
+updated: 2026-11-27T23:30
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,12 +233,10 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tADJ-BRANCH (control-plane, zero capture): the D2/D3 adjudication page
-SHIPPED 2026-11-27 (scripts/tADJ_ruling_page.py; live at
-http://<this-host>:8613/; SUBMIT round-trip verified on a scratch server —
-docs/re/_wip_tADJ-ruling-page.md T1-T5). BRANCH on docs/DECISIONS.md (the
-loop's BRANCH-2 wake grep is the "USER:" prefix; grep -n "ADJ OQ-\|ADJ D3"
-docs/DECISIONS.md FIRST):
+NEXT tADJ-BRANCH (control-plane, zero capture; SECOND pass — the tCITE-AUDIT
+hygiene slot was SPENT 2026-11-27, see LANDED below; never re-run a spent
+audit class). grep -n "ADJ OQ-\|ADJ D3" docs/DECISIONS.md FIRST (the loop's
+BRANCH-2 wake grep is the "USER:" prefix):
 (A) A ruling block exists -> THAT is the task: apply it. accept-cited-dead on
     OQ-019 = apply docs/re/_wip_t329.md S4 verbatim to the row (ruling is the
     license); accept-cited-dead on OQ-016 = write the eight-leg unreachable
@@ -248,18 +246,32 @@ docs/DECISIONS.md FIRST):
     then queue or refuse in writing; D3 answer = rewrite this NEXT ACTION to
     match (idle = say so plainly and stop; hygiene-loop = one audit per
     session; stop = prepare the ship note).
-(B) NO ruling block -> ONE control-plane hygiene audit, <=1 tool-heavy audit,
-    pick the thinnest real one (candidates: ledger_index_check + gate cross-
-    audit already run every gate, so prefer a docs/re law-file citation-audit
-    or a BLOCKED.md header-vs-REFUTED-ROUTES drift sweep — the tOQ19-AUDIT
-    class). Say plainly that no ruling arrived. NEVER invent a capture
-    (t178 + REFUTED-ROUTES); NEVER re-queue a spent class.
-ORDERING: tADJ-RULING-PAGE shipped this handoff (LANDED below). Both open
-rows are USER-gated and every capture route on them is cited-dead, so nothing
-else is derivable — branch (A) converts rulings into real work, branch (B)
-keeps the loop green honestly until one lands. PARKED (do not run without the
-named ruling): TPF6-CPU-A (user throttle ruling), TPF7-C (user feel-grading),
-OQ-016/OQ-019 closures.
+(B) NO ruling block -> the ONE remaining thin audit: a BLOCKED.md header-vs-
+    REFUTED-ROUTES drift sweep (tOQ19-AUDIT already corrected the scripted-
+    move header; sweep the REMAINING BLOCKED.md headers and the STATE.md
+    standing-law blocks for premises a later refutation superseded). If
+    clean, say so plainly and stop. NEVER invent a capture (t178 +
+    REFUTED-ROUTES); NEVER re-queue a spent class (citation audit tCITE
+    SPENT; ledger/gate cross-audit already runs every gate).
+ORDERING: the D2/D3 page shipped 2026-11-27 and serves :8613 (listener
+verified this session); DECISIONS.md mtime 2026-11-27 18:05 predates the
+page, so no ruling had landed at tCITE-AUDIT time. Both open rows are
+USER-gated and every capture route on them is cited-dead, so branch (A) is
+the only real unlock; (B) keeps the loop green honestly until one lands.
+PARKED (do not run without the named ruling): TPF6-CPU-A (user throttle
+ruling), TPF7-C (user feel-grading), OQ-016/OQ-019 closures.
+NEW tCITE-AUDIT LAW (standing, 2026-11-27): a code-address citation is a
+CANDIDATE not a refutation until POSITIVELY contradicted — ghp5
+functions_full.tsv is an INCOMPLETE boundary oracle (holes: 0x52axx region,
+GAP 0x2b3d2..0x2cf04), so classify cites SITE/OPERAND-ANCHOR/DATA/RANGE-EDGE/
+RUNTIME first (tools scripts/tCITE_boundary_audit.py + tCITE_callsites.py,
+run via ~/tools/revenv/bin/python). Call-target cites must be validated
+against E8 rel32 OPERANDS, never region membership: the one real defect in
+5,358 tokens (t310's "format call 0x250bb") survived its own era precisely
+because it was checked as "0x250bb is in the region". Call-SITE cites
+(`call 0xX` where the E8 sits at X) are a legitimate convention — the
+tCITE_callsites.py residual OFFENDER list is dispositioned FINE in
+_wip_tCITE-audit.md P5; do not re-adjudicate those shapes.
 NEW tPF5-A LAW (standing): a SHAPEFRAME -1 widget is NOT "unframed" — check
 the CODE path for a GLOBAL lib-id slot first (ds:0x6fd8e serves the whole
 popup family through the 0x1fc34 join; three read sites, zero write sites,
@@ -343,6 +355,29 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+LANDED tCITE-AUDIT 2026-11-27 (tADJ-BRANCH BRANCH (B): NO RULING BLOCK
+grepped in DECISIONS.md ("ADJ OQ-|ADJ D3" EMPTY; mtime 18:05 predates the
+page); ONE hygiene audit run — docs/re CODE-CITATION INTEGRITY vs the
+restored binary; no OQ row moved — open=[016,019] unchanged; zero capture,
+zero rewrite change). 53 durable law docs, 5,358 code-span tokens: 1,235
+non-boundary candidates auto-adjudicated (496 jump-table-named, 653 operand-
+anchor convention, 18 reachable-in-map-hole) + 62 unique site-role candidates
+HAND-adjudicated against bytes + a full E8 call-target sweep (2,734 targets).
+TWO DEFECTS FOUND + FIXED: (1) ships.md:1833 "format call 0x250bb" (t310
+origin) is a TRUE MIS-CITATION — zero rel32 operands name 0x250bb, it sits
+mid-instruction in 0x250b7 `mov edx,0x838bf`; the label builder fn 0x51b68's
+real chain VERBATIM: `mov eax,0x2b13` @0x51bc0, `call 0x21a20` @0x51c17,
+`call 0x76c79` @0x51c23; _wip_t310 annotated, no rewrite dependency (grep
+250bb rewrite/ EMPTY). (2) aicode.md:83 gate site 0x3e6f0 mid-instruction ->
+corrected to 0x3e6ee `cmp [eax+3],-1` + 0x3e6f2 je (t90-era cite; law was
+already correct). Everything else clean or dispositioned (runtime addresses,
+call-site convention, range edges, DATA words in code range, ghp5 map holes —
+full dispositions _wip_tCITE-audit.md P2/P5). Tools banked:
+scripts/tCITE_boundary_audit.py, tCITE_callsites.py (revenv python).
+Standing law banked above. GATE_EXIT=0, LEDGER AUDIT OK, LEDGER INDEX OK.
+NEXT tADJ-BRANCH second pass (branch B slot narrowed to the BLOCKED.md/
+STATE.md drift sweep — citation-audit class now SPENT).
 
 LANDED tADJ-RULING-PAGE 2026-11-27 (D2/D3 ADJUDICATION PAGE SHIPPED, SERVED,
 SUBMIT ROUND-TRIP VERIFIED; NO OQ ROW MOVED — open=[016,019] UNCHANGED —

@@ -1,4 +1,9 @@
 # _wip_t310 — DESTINATION-WIDGET WRITER WINDOWS (DAT_43508 family, ret_stack caller map)
+# tCITE-AUDIT 2026-11-27 ANNOTATION: "calls 0x250bb (format)" (S1/S3) is a
+# MIS-CITATION — zero rel32 call operands name 0x250bb in the code span; fn
+# 0x51b68's real format chain is `call 0x21a20` @0x51c17 + `call 0x76c79`
+# @0x51c23 (string-id select `mov eax,0x2b13` @0x51bc0). Corrected in
+# ships.md:1833; this wip is kept as history.
 
 ## S0. Assignment + pre-flight
 - STATE.md NEXT ACTION t310: fire the DAT_43508 family via a LIVE ORDER FLOW and

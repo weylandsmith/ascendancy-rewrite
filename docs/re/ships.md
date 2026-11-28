@@ -1830,7 +1830,10 @@ Full evidence docs/re/_wip_t310.md S1-S5; run t299-leg-20261105-173627 rc=0.
   0x13bc5 + ([sysrec+0xa]>>16)*96 (star-record addr; +0x242000 = 0x255bc5 =
   the t308 witness value) -> DAT_43504=edx + RING-A post 0x10 (0x51AC9).
   SPAN FIX vs t309 STATE: BOTH stores are inside fn 0x51834; fn 0x51b68 is a
-  star LABEL builder (string ids 0x2b13/0x2b14, format call 0x250bb) and the
+  star LABEL builder (string id 0x2b13 select @0x51bc0, format chain
+  `call 0x21a20` @0x51c17 + `call 0x76c79` @0x51c23 — tCITE-AUDIT 2026-11-27:
+  t310's "format call 0x250bb" was a MIS-CITATION, zero rel32 operands name
+  0x250bb; it sits mid-instruction in 0x250b7 `mov edx,0x838bf`) and the
   orphan blocks 0x51FB5/0x51FF6 (DAT stores of [edx+0x59]/[esi+0x59]) live
   past fn 0x51b68's ret in a further fn (add esp,0x1bc epilogue).
 - GATE MEASURED 2/2: ds:0x484ec = LAST MOUSE X (0x30 after the x=48 sprite

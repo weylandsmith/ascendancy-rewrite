@@ -80,7 +80,8 @@ Phase order inside the turn (call sites verbatim):
 FUN_0003e6e0(EAX = 0x1ee-stride race row; row+0 == race byte, row+3 ==
 status dword, 0xffffffff == eliminated/absent):
 
-  0x3e6f0 status<0 -> eliminated branch:
+  0x3e6ee `cmp dword [eax+3],-1` + 0x3e6f2 je -> eliminated branch (site
+  corrected tCITE-AUDIT from t90-era 0x3e6f0, mid-instruction):
      0x402d8 (§2c); if it returns <0: FUN_00040ec0 collects the race's
      ships (sort §2b) and the loop 0x3e71f calls FUN_00049d2c per ship =
      DEATH handler (combat.md S2g) — eliminated race's whole fleet is
