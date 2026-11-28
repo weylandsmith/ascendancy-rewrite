@@ -188,7 +188,16 @@ HARNESS INCIDENTS (all mine, all recovered, all banked as skill traps):
       once and reconstructed from the session record. Append correctly: read
       into a variable FIRST, then open("w"); or open(p,"a").
 
-## P7 — ITEM 9 (POPUP FRAME) STATUS: RESEARCH BANKED, SHIP GATED
+## P7 — ITEM 9 (POPUP FRAME) STATUS: CLOSED 2026-11-27 BY tPF5-A
+
+[CLOSED: the named-open seam — "which lib the 0x9f10c cache path resolves
+for the INDICATOR widgets" — was MEASURED: ds:0x6fd8e == id 37 ==
+'data\\help.shp', frame record 0, blitted by the builder itself at the
+WIDGET ORIGIN before the key switch (live-RAM 60/60 saves). Same answer as
+the tile popup, three-way-verified on PLSQUARE's rect. Shipped + pinned +
+mutation 5/5 + runtime witness PASS: docs/re/_wip_tPF5A.md P0-P7, law
+planets-ui.md S18. The D1-gate sentence below was STALE (OQ-005 CLOSED
+t367; research.md S14(f)).]
 
 Item 9 asks the top-frame popups to carry "the same mineral framing" as the
 tile-click popup. What exists: tPF-2d D8 MEASURED help.shp k0 (336x256, bbox

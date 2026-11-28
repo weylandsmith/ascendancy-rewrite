@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-27T18:40
+updated: 2026-11-27T21:05
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,43 +233,49 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tPF5-A: name and (if derivable) ship the planet INDICATOR-popup frame —
-the last open leg of D28 item 9 ("clicking the frames along the top should pop
-up a window ... with the same mineral framing as the rest of the UI").
-CONSTRAINT ALREADY MEASURED (docs/re/_wip_tOQ19-audit.md A7 — read that FIRST):
-the four indicator tiles PLRES/PLIND/PLPRO/PLPOP (extracted/ascend00/
-windows.txt lines 1536/1553/1570/1587) each carry SHAPEFRAME -1, so there is
-NO per-widget frame word; the framing must come from the lib the CODE resolves.
-STATIC ROUTE, ZERO guest boot, budget <=4 probes: (1) locate the popup-open
-site behind SENDMESSAGE 50 with SENDPARAM1 0/1/2/4 (the four tiles' params) and
-read which shape-lib id the indicator path pushes; (2) resolve that id through
-the ds:0x9f10c cache join (ctx+0x7d0+id*32 — tPF-4 pattern, script
-scripts/tPF4_rowart_runtime.py) over the FROZEN BANK
-work/r1/bank-t438-ring-2200 (t439 LAW: PIN A BANK, NEVER THE LIVE RING);
-(3) if it names a decoded lib, blit it at the indicator popup (ui.cpp draws a
-port vector frame there today) + pin + mutation; if it resolves to help.shp-k0
-then item 9 CLOSES as "same answer as the tile popup" with a citation and NO
-code delta. Frame-word precedent from the A7 census: list/popup windows all
-use frame 7 (RACELIST/LOADLIST/GIZLIST/PLANLIST/STATSHIPLST/PLAYERDIP/
-BatListWnd/HELPWINDOW). The tPF-5 note that TPF5-A is "gated on the user's D1
-ruling" is STALE and already audited: OQ-005 CLOSED t367 by the D1 ruling
-(research.md S14(f) verbatim) — no gate stands on shipping decoded frame art.
-ORDERING: tOQ19-1 (this file's previous assignment) was AUDITED-DEAD this
-iteration, not run — see the tOQ19-AUDIT LANDED block and
-docs/re/_wip_tOQ19-audit.md A1-A6; the scripted-mouse class is budget-spent
-(REFUTED-ROUTES.md:465-467) and every OQ-019 capture route is cited-dead
-(t319/t320 pump, t322 mouse, t323 activation, t324 class table), so OQ-019 is
-USER-RULING work (D2 + accept cited-dead, t329 S4 draft stays DO-NOT-APPLY),
-never capture work. That leaves NO capture route for either open row: OQ-016's
-residue list is EXHAUSTED (OPEN-QUESTIONS.md:269 — "(1) cited-dead x8 legs =
-user ruling, (2)(3)(4) CLOSED, (6) CLOSED as misattribution") and OQ-019's is
-cited-dead x4. Therefore the loop's live work is the D28/tPF DEFECT QUEUE, and
-TPF5-A is its only non-user-gated, statically derivable item. PARKED (do not
-run without the named ruling): TPF6-CPU-A (user throttle ruling), TPF7-C (user
-feel-grading), OQ-016/OQ-019 closures (D2/D3 adjudication). AFTER tPF5-A the
-defect queue has no derivable item left — the next session must either adopt a
-fresh user ruling or hand the two rows to D2/D3 adjudication rather than
-inventing a capture (t178).
+NEXT tADJ-RULING-PAGE: build and serve the D2/D3 ADJUDICATION RULING PAGE —
+the loop's two open rows OQ-016 and OQ-019 have EXHAUSTED every capture route
+(OQ-016: OPEN-QUESTIONS.md:269 "(1) cited-dead x8 legs = user ruling,
+(2)(3)(4) CLOSED, (6) CLOSED as misattribution"; OQ-019: cited-dead x4 —
+t319/t320 pump, t322 mouse, t323 activation, t324 class table, all verbatim
+in docs/re/_wip_tOQ19-audit.md A1), so closure is USER-RULING work only. The
+user is time-poor: text asks go unanswered, the SAME choices close fast on a
+visual page (radio buttons + images on a local URL — standing pattern, see
+scripts/t424_grading_page.py for the newest shape and DECISIONS.md:184 for a
+ruling that landed from one). Deliverable: scripts/tADJ_ruling_page.py that
+serves 127.0.0.1 with, per row, (a) the question in one sentence, (b) the
+cited-dead evidence collapsed under <details>, (c) radio options: for OQ-019
+{accept-cited-dead-and-close-with-residue, fund-debugger-witness (name the
+REFUTED-ROUTES budget consequence), defer}; for OQ-016 {accept-cited-dead,
+name-a-new-capture-target, defer}; (d) the D3 leg: how long the loop keeps
+running under an empty-derivable-work ledger (GOAL.txt says it may run
+indefinitely — the user's D3 answer decides whether the harness idles).
+SUBMIT must append a dated, verbatim block to docs/DECISIONS.md exactly like
+the 2026-11-09 page (DECISIONS.md:184-196). Do NOT answer FOR the user; do
+NOT pre-fill the t329 S4 draft (DO-NOT-APPLY until an accept-cited-dead
+ruling lands). The page is DONE when it serves, every option round-trips to
+DECISIONS.md, and the next launch can be pointed at the answers.
+ORDERING: tPF5-A shipped this handoff (LANDED tPF5-A below) and it was the
+LAST non-user-gated, statically derivable item in the D28/tPF defect queue —
+the tOQ19-AUDIT prediction "after tPF5-A the queue has no derivable item" is
+now in force. PARKED (do not run without the named ruling): TPF6-CPU-A (user
+throttle ruling), TPF7-C (user feel-grading), OQ-016/OQ-019 closures (this
+page is their gate). Control-plane work is NOT busywork here: t178 forbids
+re-checking for new arrivals, but a ruling page is the ONLY mechanism that
+converts the two USER-RULING rows into future derivable work. If the page
+lands and no ruling arrives, later sessions keep the loop green on
+control-plane hygiene (ledger/gate/doc audits) at <=1 audit per session and
+say so plainly — never invent a capture (t178 + REFUTED-ROUTES).
+NEW tPF5-A LAW (standing): a SHAPEFRAME -1 widget is NOT "unframed" — check
+the CODE path for a GLOBAL lib-id slot first (ds:0x6fd8e serves the whole
+popup family through the 0x1fc34 join; three read sites, zero write sites,
+static init — live-RAM 60/60 saves). Before calling a frame blit "refuted by
+geometry", verify WHICH rect the blit call actually receives (push-arg
+sequence, not the neighbouring content rect) — the P2-vs-P4 near-miss of
+tPF5-A. Port witness nav to the planet screen: the tPF5_port STATUS-rail
+chain (553,145 -> row 300,100), never a vendor-map coord (ships.md 439,331
+hits nothing on the port seed-5 map); the app.log prints the home-star coords
+so a witness can self-locate.
 NEW CONTROL-PLANE LAW (tOQ19-AUDIT, standing): a NEXT ACTION names a ROUTE, and
 routes ROT. Before executing any assignment that spends a capture/budget class,
 grep the route's class in docs/REFUTED-ROUTES.md and check the row's USER-RULING
@@ -343,6 +349,38 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+LANDED tPF5-A 2026-11-27 (INDICATOR-POPUP MINERAL FRAME FOUND, SHIPPED,
+WITNESSED — D28 ITEM 9 CLOSED AS REPRODUCTION+FIX; NO OQ ROW MOVED,
+open=[016,019] UNCHANGED — both are USER-RULING work). THE ASSIGNMENT's
+static route delivered in 2 probes: (1) the msg-50 builder FUN_0x3db80
+resolves its frame BEFORE the key switch — 0x3dbb3 mov eax,0x9f10c / mov
+dx,[ds:0x6fd8e] / call 0x1fc34 / push record / push widget+4 / call 0x5caac
+(blit AT THE WIDGET DESCRIPTOR, not the content rect); (2) ds:0x6fd8e ==
+lib id 37 == 'data\help.shp' MEASURED live-RAM 60/60 saves over THREE
+independent banks (scripts/tPF5A_indlib.py; registry join ctx+0x7d0+id*0x32
+static under the pointer law; the control slot 0x6fd80=30 reads as expected),
+frame record 0 via the composer site 0x341b5 ([rec+0x18]=id, [rec+0x1e]=0);
+third site 0x559ed (display-queue consumer) proves 0x6fd8e is THE popup-frame
+slot family-wide, and it has ZERO write sites (static init). A7's SHAPEFRAME
+-1 x4 is thereby EXPLAINED, not bypassed. GEOMETRY: frame 1:1 at the widget
+origin; content rect (origin+10..+0x145/+0xcf) is the TEXT box; agreement on
+PLSQUARE 152,120 -> 152..487x120..375 == its own rect == tPF-2d D8's k0
+extents (three-way). A P2 reading that compared k0 against the content rect
+called the blit refuted — SUPERSEDED by reading the push-arg sequence (law
+banked above). SHIPPED: ui.cpp help.shp load (silent-degrade to the tPL-B2
+dim backing) + k0 blit behind EVERY planet popup, key-independent; pins
+test_indframe_tPF5a x4; MUTATION 5/5 CAUGHT (tPF5a_mutate.py: M1 origin
+-10, M2 size 316x198, M3 drop-blit wiring, M4 record-idx, M5 square-gate;
+md5-verified restore, AFTER-RESTORE 635/0/0); RUNTIME WITNESS PASS
+(scripts/tPF5A_witness.sh seed 5: frame edges OUTSIDE the old backing
+top/left/bottom all 1.000 non-black, control 0.494; 'ui planet popup
+plres' logged, no refuse line). Suite 631 -> 635/0/0. Law distilled
+docs/re/planets-ui.md S18; working log docs/re/_wip_tPF5A.md P0-P7.
+RESIDUES named: PLPOP frame crosses x=640 by 51 px (clip is the faithful
+reading — no flip law at any of the three sites); the popup WINDOW object
+is still unmodelled port-side; the teal band fill keeps standing in for
+k0's transparent cut-out (D8, unchanged).
 
 tOQ19-AUDIT LANDED 2026-11-27 (ASSIGNED TASK tOQ19-1 AUDITED DEAD, NOT RUN —
 PREMISE AUDIT IS THE ITERATION'S HONEST NEGATIVE; no OQ row moved —

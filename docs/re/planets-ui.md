@@ -673,3 +673,40 @@ cell-independence) + planlist_popup_leg_wiring_tpf6b extended
 MUTATION 3/3 CAUGHT (M1 yard leg removed, M2 census always-pass, M3
 HOME_BIT dropped — all named FAILs in ship_leg_tpf6ship; AFTER-RESTORE
 md5 42f5132d4f4c4753b728ddcca0a0fd07 green).
+
+
+## 18. THE POPUP FRAME LIB SLOT ds:0x6fd8e == help.shp (tPF5-A, 2026-11-27)
+
+Full working log docs/re/_wip_tPF5A.md P0-P7. Headlines (D28 item 9 closed
+as reproduction+fix; no OQ row):
+- THE msg-50 popup builder FUN_0x3db80 resolves its frame BEFORE the key
+  switch: 0x3dbb3 mov eax,0x9f10c / mov dx,[ds:0x6fd8e] / call 0x1fc34 /
+  push record / push widget+4 / call 0x5caac (blit). ds:0x6fd8e == lib id 37
+  == 'data\help.shp' [verified live-RAM 60/60 saves over three banks,
+  scripts/tPF5A_indlib.py — the registry join ctx+0x7d0+id*0x32 is static
+  under the pointer law]; frame record 0 (composer 0x341b5: [rec+0x18]=id,
+  [rec+0x1e]=0). help.shp has EXACTLY 2 records (k0 336x256 frame, k1 171x76
+  text box). NO WRITE SITE to the slot exists — static init, identical in
+  every save. The third site (display-queue consumer fn ~0x557xx, 0x559e5)
+  blits the same slot for the queued-text popup family: 0x6fd8e is THE
+  popup-frame lib slot, not an indicator oddity.
+- A7 RESOLVED: the four tiles' SHAPEFRAME -1 means exactly "the frame comes
+  from the slot, not the file" — no per-widget word was ever needed.
+- GEOMETRY LAW: frame blits 1:1 AT THE WIDGET ORIGIN; the builder's content
+  rect (origin+10 .. origin+0x145/0xcf) is the TEXT box only. Agreement on
+  the tile popup: PLSQUARE 152,120 -> frame 152..487 x 120..375 == PLSQUARE's
+  own rect == tPF-2d D8's measured k0 extents; content right inset 10; bottom
+  inset 48 = the button-band cut-out (k0 rows 217..247 transparent).
+- SHIPPED: ui.cpp loads help.shp (silent-degrade to the tPL-B2 dim backing)
+  and blits k0 behind EVERY planet popup (tile and indicator — one draw
+  block, key-independent). Pins test_indframe_tpf5a x4; MUTATION 5/5 CAUGHT
+  (tPF5a_mutate.py: M1 origin, M2 size, M3 wiring, M4 record idx, M5 gating);
+  runtime witness PASS (tPF5A_witness.sh: frame edges outside the old backing
+  1.000 non-black, control 0.494; log 'ui planet popup plres', no refuse).
+- WITNESS TRAP (nav): ships.md's cited map coord (439,331) hits nothing on
+  the port's seed-5 map — the port's planet-view nav is the tPF5_port chain
+  (STATUS rail 553,145 -> row 0 300,100); the app.log prints the home-star
+  coords, so witnesses can self-locate.
+- RESIDUES (named, not law): PLPOP frame crosses x=640 by 51 px, clipped
+  (no flip law at any site — do not invent); the popup WINDOW record object
+  is still unmodelled port-side (blit-at-derived-rect only).
