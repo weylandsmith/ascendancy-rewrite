@@ -297,6 +297,12 @@ orbitalThreatFor sets runtime-verified unchanged. No code delta; row stays
 open per D3. t397: D11 grading page is the answer channel
 (http://<this-host>:8613/, work/r1/d1page + scripts/t397_grading_page.py);
 acceptance close still requires the USER ruling, nothing closed here.
+tADJ-RULING-PAGE NOTE 2026-11-27 (zero capture; docs/re/_wip_tADJ-ruling-
+page.md T1-T5): the D2/D3 adjudication page SHIPPED and its SUBMIT round-trip
+is VERIFIED on a scratch server (all three fields append verbatim USER: lines;
+real DECISIONS.md untouched). The OQ-016 ask (accept cited-dead x8 legs / name
+a new capture target / defer) is live at http://<this-host>:8613/. Row STAYS
+OPEN — shipping the mechanism closes nothing (strict-close).
 
 OQ-027 | audio | intro TUNEID index base + per-button vendor SFX id
 | CLOSED 2026-11-20 t440 | OPENED t388b 2026-11-14 (docs/re/audio.md §6). Two named residues
@@ -1024,6 +1030,12 @@ fn 0x32100). The row has NO remaining capture route of ANY class and is
 USER-RULING work (D2 + accept cited-dead; t329 S4 draft stays DO-NOT-APPLY).
 Row STAYS OPEN (strict-close — honest negative; a refuted route is not a
 closure).
+tADJ-RULING-PAGE NOTE 2026-11-27 (zero capture; docs/re/_wip_tADJ-ruling-
+page.md): the OQ-019 disposition ask (accept-cited-dead-and-close-with-
+residue / fund-debugger-witness with the named budget consequence / defer) is
+live at http://<this-host>:8613/ alongside the D3 loop-lifetime row. An
+accept ruling is what licenses applying the t329 S4 draft; until then it
+stays DO-NOT-APPLY and the row STAYS OPEN.
 CLOSED (slimmed 2026-11-03: full evidence text of every row below lives in
 archive/state-v2-full/2026-11-03/OPEN-QUESTIONS.md and the cited law file.
 DO NOT re-open, re-derive, or re-census any of these from a fresh session —

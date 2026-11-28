@@ -14,7 +14,7 @@
 
 phase: P7-closeout
 milestone: 6  # keep 6: gate.sh keys build/test/boot stages off milestone >= 3; lowering it silently guts the gate
-updated: 2026-11-27T21:05
+updated: 2026-11-27T21:45
 policy: strict-close  # FINAL-DEFAULT never closes an OQ; only cited measurement does (docs/GOAL.txt)
 ## LEDGER (statuses mirror docs/OPEN-QUESTIONS.md — that file is the record;
 ## this is the fast index. RE-DERIVE via scripts/ledger_index_check.py, never
@@ -233,39 +233,33 @@ Full pre-slim text + all measurement provenance: archive copy above + docs/re/.
   scripts/ledger_index_check.py must print OK (both in gate 3t).
 
 ## NEXT ACTION (exactly one)
-NEXT tADJ-RULING-PAGE: build and serve the D2/D3 ADJUDICATION RULING PAGE —
-the loop's two open rows OQ-016 and OQ-019 have EXHAUSTED every capture route
-(OQ-016: OPEN-QUESTIONS.md:269 "(1) cited-dead x8 legs = user ruling,
-(2)(3)(4) CLOSED, (6) CLOSED as misattribution"; OQ-019: cited-dead x4 —
-t319/t320 pump, t322 mouse, t323 activation, t324 class table, all verbatim
-in docs/re/_wip_tOQ19-audit.md A1), so closure is USER-RULING work only. The
-user is time-poor: text asks go unanswered, the SAME choices close fast on a
-visual page (radio buttons + images on a local URL — standing pattern, see
-scripts/t424_grading_page.py for the newest shape and DECISIONS.md:184 for a
-ruling that landed from one). Deliverable: scripts/tADJ_ruling_page.py that
-serves 127.0.0.1 with, per row, (a) the question in one sentence, (b) the
-cited-dead evidence collapsed under <details>, (c) radio options: for OQ-019
-{accept-cited-dead-and-close-with-residue, fund-debugger-witness (name the
-REFUTED-ROUTES budget consequence), defer}; for OQ-016 {accept-cited-dead,
-name-a-new-capture-target, defer}; (d) the D3 leg: how long the loop keeps
-running under an empty-derivable-work ledger (GOAL.txt says it may run
-indefinitely — the user's D3 answer decides whether the harness idles).
-SUBMIT must append a dated, verbatim block to docs/DECISIONS.md exactly like
-the 2026-11-09 page (DECISIONS.md:184-196). Do NOT answer FOR the user; do
-NOT pre-fill the t329 S4 draft (DO-NOT-APPLY until an accept-cited-dead
-ruling lands). The page is DONE when it serves, every option round-trips to
-DECISIONS.md, and the next launch can be pointed at the answers.
-ORDERING: tPF5-A shipped this handoff (LANDED tPF5-A below) and it was the
-LAST non-user-gated, statically derivable item in the D28/tPF defect queue —
-the tOQ19-AUDIT prediction "after tPF5-A the queue has no derivable item" is
-now in force. PARKED (do not run without the named ruling): TPF6-CPU-A (user
-throttle ruling), TPF7-C (user feel-grading), OQ-016/OQ-019 closures (this
-page is their gate). Control-plane work is NOT busywork here: t178 forbids
-re-checking for new arrivals, but a ruling page is the ONLY mechanism that
-converts the two USER-RULING rows into future derivable work. If the page
-lands and no ruling arrives, later sessions keep the loop green on
-control-plane hygiene (ledger/gate/doc audits) at <=1 audit per session and
-say so plainly — never invent a capture (t178 + REFUTED-ROUTES).
+NEXT tADJ-BRANCH (control-plane, zero capture): the D2/D3 adjudication page
+SHIPPED 2026-11-27 (scripts/tADJ_ruling_page.py; live at
+http://<this-host>:8613/; SUBMIT round-trip verified on a scratch server —
+docs/re/_wip_tADJ-ruling-page.md T1-T5). BRANCH on docs/DECISIONS.md (the
+loop's BRANCH-2 wake grep is the "USER:" prefix; grep -n "ADJ OQ-\|ADJ D3"
+docs/DECISIONS.md FIRST):
+(A) A ruling block exists -> THAT is the task: apply it. accept-cited-dead on
+    OQ-019 = apply docs/re/_wip_t329.md S4 verbatim to the row (ruling is the
+    license); accept-cited-dead on OQ-016 = write the eight-leg unreachable
+    note (OPEN-QUESTIONS.md:269 + ships.md S52-S57 citations) and close per
+    the ruling's wording; name-a-new-capture-target = audit the named route
+    against REFUTED-ROUTES.md BEFORE spending anything (standing law below),
+    then queue or refuse in writing; D3 answer = rewrite this NEXT ACTION to
+    match (idle = say so plainly and stop; hygiene-loop = one audit per
+    session; stop = prepare the ship note).
+(B) NO ruling block -> ONE control-plane hygiene audit, <=1 tool-heavy audit,
+    pick the thinnest real one (candidates: ledger_index_check + gate cross-
+    audit already run every gate, so prefer a docs/re law-file citation-audit
+    or a BLOCKED.md header-vs-REFUTED-ROUTES drift sweep — the tOQ19-AUDIT
+    class). Say plainly that no ruling arrived. NEVER invent a capture
+    (t178 + REFUTED-ROUTES); NEVER re-queue a spent class.
+ORDERING: tADJ-RULING-PAGE shipped this handoff (LANDED below). Both open
+rows are USER-gated and every capture route on them is cited-dead, so nothing
+else is derivable — branch (A) converts rulings into real work, branch (B)
+keeps the loop green honestly until one lands. PARKED (do not run without the
+named ruling): TPF6-CPU-A (user throttle ruling), TPF7-C (user feel-grading),
+OQ-016/OQ-019 closures.
 NEW tPF5-A LAW (standing): a SHAPEFRAME -1 widget is NOT "unframed" — check
 the CODE path for a GLOBAL lib-id slot first (ds:0x6fd8e serves the whole
 popup family through the 0x1fc34 join; three read sites, zero write sites,
@@ -349,6 +343,36 @@ own log line (grep -c the click line per press), the order log reads
 cell leaves projectOpen set (recovery = Escape to STATUS + row re-select,
 ui.cpp:899), repro scripts need a cleanup trap, and BIN/DATA must be
 env-overridable before an era-tree A/B is trusted (tPF-1c x11).
+
+LANDED tADJ-RULING-PAGE 2026-11-27 (D2/D3 ADJUDICATION PAGE SHIPPED, SERVED,
+SUBMIT ROUND-TRIP VERIFIED; NO OQ ROW MOVED — open=[016,019] UNCHANGED —
+zero capture, zero code change). scripts/tADJ_ruling_page.py (stdlib-only)
+writes work/r1/d1page/index.html (9536 B) + the state-16 witness shot
+d11/tadj-state16.png (from t338 session 10_state16_screen.png — the same
+screen whose chain legs are cited-dead for BOTH rows), archives the prior
+sheet to index-d17r2.html. MEASURED serving law (server.py:78-107 + curl):
+the ruling server (pid 646702, ThreadingHTTPServer :8613) serves ROOT/
+index.html FRESH PER REQUEST (no restart ships a sheet), and its do_GET
+static whitelist is ONLY /img/ and /d11/ — an adj/ subdir 404s (measured);
+images MUST live under d11/. THREE ROWS, no option pre-checked, nothing
+recommended (do-not-answer-FOR-the-user held): OQ-019 {accept-cited-dead-and-
+close-with-residue, fund-debugger-witness (stated verbatim: mouse class spent
+REFUTED-ROUTES.md:465-467 AND debugger carries t288 dbg-build aborts bank
+restore + t299 three sessions eight legs zero — funding buys a NEW instrument
+class, not a rerun), defer}; OQ-016 {accept-cited-dead, name-a-new-capture-
+target, defer}; D3 {idle-until-ruling, hygiene-loop, run-until-zero, stop
+(18/20 closed — re-derived this session via scripts/ledger_audit.py, NOT a
+memorized count), defer}. Cited-dead evidence collapsed under <details>
+verbatim (t319/t320 pump, t322 mouse, t323 activation, t324 class-table;
+OPEN-QUESTIONS.md:269; t332+t338 double-zero with the TYPE-19-parent
+mechanism). SUBMIT VERIFIED against a SCRATCH server (:8777,
+D11_DECISIONS_FILE=/tmp — server.py's own test law): all three fields
+appended verbatim USER: lines, HTTP 200; scratch killed via ss -tlnp pid,
+real DECISIONS.md git-clean throughout, real server re-verified 200. Ledger
+notes appended to both rows (mechanism shipped, rows STAY OPEN strict-close).
+Working log docs/re/_wip_tADJ-ruling-page.md T1-T5. NEXT tADJ-BRANCH: on a
+ruling block in DECISIONS.md, APPLY it (branch A); else one thin control-plane
+audit and say plainly no ruling arrived (branch B).)
 
 LANDED tPF5-A 2026-11-27 (INDICATOR-POPUP MINERAL FRAME FOUND, SHIPPED,
 WITNESSED — D28 ITEM 9 CLOSED AS REPRODUCTION+FIX; NO OQ ROW MOVED,
