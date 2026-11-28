@@ -111,6 +111,22 @@ int countdownDays(int target, int acc, int rate);
 // NOT frame-clipped — the renderer clips).
 Rect indicatorPopupRect(Rect pr);
 
+// tPF5-A POPUP FRAME RECT (D28 item 9). The msg-50 builder blits the frame
+// record 1:1 AT THE WIDGET ORIGIN (0x3dbb3 mov eax,0x9f10c / mov dx,
+// [0x6fd8e] / call 0x1fc34 / push record / push widget+4 / call 0x5caac —
+// docs/re/_wip_tPF5A.md P3), BEFORE the key switch, so ALL four tiles share
+// one frame lib. ds:0x6fd8e == lib id 37 == 'data\help.shp' (live-RAM,
+// 60/60 saves over three banks, scripts/tPF5A_indlib.py), frame record 0
+// (the composer site 0x341b5: [rec+0x18]=id, [rec+0x1e]=0). help.shp k0 is
+// 336x256, so with the content rect at origin+10 the frame rect is the
+// content rect grown by 10 left/top and to bottom = top + 255:
+// cross-checked on the tile popup where both are cited law — PLSQUARE
+// X0=152,Y0=120 -> frame 152..487 x 120..375 == PLSQUARE's own rect ==
+// tPF-2d D8's measured k0 extents (docs/re/_wip_tPF5A.md P4).
+inline constexpr int kIndPopupFrameW = 336;  // help.shp k0 width
+inline constexpr int kIndPopupFrameH = 256;  // help.shp k0 height
+Rect indicatorPopupFrameRect(Rect content);
+
 // ---- pure content law (the ebp field struct the builder fills) ----------
 struct IndicatorContent {
     const char* nameWord = nullptr;    // +0x72 (null => no L-D line)

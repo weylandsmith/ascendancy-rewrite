@@ -108,6 +108,7 @@ add_executable(run_tests
   tests/test_quitcause_tPF1d.cpp
   tests/test_toTitle_tESC1.cpp
   tests/test_windowcount_tWIN1.cpp
+  tests/test_indframe_tpf5a.cpp
   tests/test_stripanchor_tpf5.cpp
   tests/test_optionsfilter_tpf6.cpp
   tests/test_starttech_tpf8.cpp

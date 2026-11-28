@@ -25,6 +25,17 @@ Rect indicatorPopupRect(Rect pr) {
     return Rect{pr.x0 + 10, pr.y0 + 10, pr.x0 + 0x145, pr.y0 + 0xcf};
 }
 
+Rect indicatorPopupFrameRect(Rect content) {
+    // tPF5-A: frame 1:1 at the widget origin = content origin - 10 (the
+    // content rect is inset exactly 10 from that origin on left/top —
+    // 0x3dbe8/0x3dbf9 add 0xa; tPF-2d D8's tile-popup agreement pins the
+    // right inset at 10 too: PLSQUARE 487 - content 477). Size is the
+    // help.shp k0 extents (336x256), NOT the content rect's 316x198 —
+    // the bottom inset 48 is the button-band cut-out band (D8).
+    const int x0 = content.x0 - 10, y0 = content.y0 - 10;
+    return Rect{x0, y0, x0 + kIndPopupFrameW - 1, y0 + kIndPopupFrameH - 1};
+}
+
 std::vector<PopupLine> indicatorLines(const std::string& planetName,
                                       const IndicatorContent& c) {
     std::vector<PopupLine> out;

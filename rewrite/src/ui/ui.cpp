@@ -477,6 +477,17 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 dataRoot + "/extracted/ascend01/data/racering.shp", &rerr))
             std::printf("ui species racering refused: %s\n", rerr.c_str());
     }
+    // tPF5-A POPUP FRAME LIB (D28 item 9): ds:0x6fd8e == lib id 37 ==
+    // 'data\help.shp' (live-RAM 60/60 saves, scripts/tPF5A_indlib.py); the
+    // msg-50 builder blits record 0 at the widget origin (0x3dbb3..0x3dbd5).
+    // Refusal falls back to the tPL-B2 dim backing (silent-degrade law).
+    ascend::formats::ShapeLibrary indPopupFrameLib;
+    {
+        std::string herr;
+        if (!indPopupFrameLib.load(
+                dataRoot + "/extracted/ascend01/data/help.shp", &herr))
+            std::printf("ui popup frame lib refused: %s\n", herr.c_str());
+    }
     std::vector<ascend::formats::ShapeLibrary> speciesPortraitLibs(21);
     std::vector<bool> spTried(21, false), spOk(21, false);
     const auto speciesPortraitFor = [&](int specnum)
@@ -3101,12 +3112,26 @@ int runCampaignUi(ag::Campaign& camp, int turns, bool autoplay,
                 // backing shape is a port affordance, the TEXT is the law.
                 if (!planetPopup.empty()) {
                     const Rect& pr = planetPopupRect;
-                    SDL_Rect pb{pr.x0, pr.y0, pr.x1 - pr.x0 + 1,
-                                pr.y1 - pr.y0 + 1};
-                    SDL_SetRenderDrawColor(ren, 8, 12, 20, 235);
-                    SDL_RenderFillRect(ren, &pb);
-                    SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
-                    SDL_RenderDrawRect(ren, &pb);
+                    // tPF5-A MINERAL FRAME (D28 item 9): the vendor builder
+                    // blits help.shp k0 (ds:0x6fd8e id 37, record 0) 1:1 at
+                    // the WIDGET ORIGIN (content origin - 10) before the key
+                    // switch — tile and indicator popups share it. k0's rows
+                    // 217..247 are transparent (the button-band cut-out,
+                    // tPF-2d D8), so the teal band fill below still shows.
+                    // Load failure keeps the tPL-B2 dim backing (the port
+                    // affordance it always had).
+                    const bool haveFrame = indPopupFrameLib.count() > 0;
+                    if (haveFrame) {
+                        const Rect fr = indicatorPopupFrameRect(pr);
+                        blitShape(ren, indPopupFrameLib, 0, fr.x0, fr.y0);
+                    } else {
+                        SDL_Rect pb{pr.x0, pr.y0, pr.x1 - pr.x0 + 1,
+                                    pr.y1 - pr.y0 + 1};
+                        SDL_SetRenderDrawColor(ren, 8, 12, 20, 235);
+                        SDL_RenderFillRect(ren, &pb);
+                        SDL_SetRenderDrawColor(ren, 150, 130, 110, 255);
+                        SDL_RenderDrawRect(ren, &pb);
+                    }
                     int ly = pr.y0 + 6;
                     for (const auto& ln : planetPopup) {
                         txt.draw(ren, pr.x0 + 8, ly, ln.text, false, kText);
